@@ -11,13 +11,13 @@
 
 class AgradFwdLogit : public testing::Test {
   void SetUp() {
-    stan::agrad::recover_memory();
+    stan::math::recover_memory();
   }
 };
 
 TEST_F(AgradFwdLogit,FvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::logit;
 
   fvar<var> x(0.5,1.3);
@@ -32,8 +32,8 @@ TEST_F(AgradFwdLogit,FvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(1 / (0.5 - 0.25), g[0]);
 }
 TEST_F(AgradFwdLogit,FvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::logit;
 
   fvar<var> x(0.5,1.3);
@@ -46,8 +46,8 @@ TEST_F(AgradFwdLogit,FvarVar_2ndDeriv) {
 }
 
 TEST_F(AgradFwdLogit,FvarFvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::logit;
 
   fvar<fvar<var> > x;
@@ -64,7 +64,7 @@ TEST_F(AgradFwdLogit,FvarFvarVar_1stDeriv) {
   AVEC p = createAVEC(x.val_.val_);
   VEC g;
   a.val_.val_.grad(p,g);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
   EXPECT_FLOAT_EQ(1 / (0.5 - 0.25), g[0]);
 
   fvar<fvar<var> > y;
@@ -83,8 +83,8 @@ TEST_F(AgradFwdLogit,FvarFvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(1 / (0.5 - 0.25), r[0]);
 }
 TEST_F(AgradFwdLogit,FvarFvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::logit;
 
   fvar<fvar<var> > x;
@@ -96,7 +96,7 @@ TEST_F(AgradFwdLogit,FvarFvarVar_2ndDeriv) {
   AVEC p = createAVEC(x.val_.val_);
   VEC g;
   a.val_.d_.grad(p,g);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
   EXPECT_FLOAT_EQ(0, g[0]);
 
   fvar<fvar<var> > y;
@@ -111,8 +111,8 @@ TEST_F(AgradFwdLogit,FvarFvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(0, r[0]);
 }
 TEST_F(AgradFwdLogit,FvarFvarVar_3rdDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > x;
   x.val_.val_ = 0.5;

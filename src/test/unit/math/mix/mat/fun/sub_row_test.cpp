@@ -6,7 +6,7 @@
 
 TEST(AgradMixMatrixSubRow,SubRow1_matrix_fv) {
   using stan::math::sub_row;
-  stan::agrad::matrix_fv m(3,4);
+  stan::math::matrix_fv m(3,4);
   for (int i = 0; i < 3; ++i)
     for (int j = 0; j < 4; ++j)
       m(i,j) = (i + 1) * (j + 1);
@@ -14,7 +14,7 @@ TEST(AgradMixMatrixSubRow,SubRow1_matrix_fv) {
 }
 TEST(AgradMixMatrixSubRow,SubRow2_matrix_fv) {
   using stan::math::sub_row;
-  stan::agrad::matrix_fv m(3,4);
+  stan::math::matrix_fv m(3,4);
   for (int i = 0; i < 3; ++i)
     for (int j = 0; j < 4; ++j)
       m(i,j) = (i + 1) * (j + 1);
@@ -22,7 +22,7 @@ TEST(AgradMixMatrixSubRow,SubRow2_matrix_fv) {
 }
 TEST(AgradMixMatrixSubRow,SubRow3_matrix_fv) {
   using stan::math::sub_row;
-  stan::agrad::matrix_fv m(3,4);
+  stan::math::matrix_fv m(3,4);
   for (int i = 0; i < 3; ++i)
     for (int j = 0; j < 4; ++j)
       m(i,j) = (i + 1) * (j + 1);
@@ -30,7 +30,7 @@ TEST(AgradMixMatrixSubRow,SubRow3_matrix_fv) {
 }
 TEST(AgradMixMatrixSubRow,SubRow4_matrix_fv) {
   using stan::math::sub_row;
-  stan::agrad::matrix_fv m(3,4);
+  stan::math::matrix_fv m(3,4);
   for (int i = 0; i < 3; ++i)
     for (int j = 0; j < 4; ++j)
       m(i,j) = (i + 1) * (j + 1);
@@ -46,13 +46,13 @@ TEST(AgradMixMatrixSubRow,SubRow5_matrix_fv) {
 }
 TEST(AgradMixMatrixSubRow,SubRow6_matrix_fv) {
   using stan::math::sub_row;
-  stan::agrad::matrix_fv m(3,4);
+  stan::math::matrix_fv m(3,4);
   for (int i = 0; i < 3; ++i)
     for (int j = 0; j < 4; ++j) {
       m(i,j) = (i + 1) * (j + 1);
       m(i,j).d_ = 1.0;
     }
-  stan::agrad::row_vector_fv v = sub_row(m,1,2,2);
+  stan::math::row_vector_fv v = sub_row(m,1,2,2);
   EXPECT_EQ(2,v.size());
   for (int i = 0; i < 2; ++i) {
     EXPECT_FLOAT_EQ(m(0,1+i).val_.val(), v(i).val_.val());
@@ -61,7 +61,7 @@ TEST(AgradMixMatrixSubRow,SubRow6_matrix_fv) {
 }
 TEST(AgradMixMatrixSubRow,SubRow1_matrix_ffv) {
   using stan::math::sub_row;
-  stan::agrad::matrix_ffv m(3,4);
+  stan::math::matrix_ffv m(3,4);
   for (int i = 0; i < 3; ++i)
     for (int j = 0; j < 4; ++j)
       m(i,j) = (i + 1) * (j + 1);
@@ -69,7 +69,7 @@ TEST(AgradMixMatrixSubRow,SubRow1_matrix_ffv) {
 }
 TEST(AgradMixMatrixSubRow,SubRow2_matrix_ffv) {
   using stan::math::sub_row;
-  stan::agrad::matrix_ffv m(3,4);
+  stan::math::matrix_ffv m(3,4);
   for (int i = 0; i < 3; ++i)
     for (int j = 0; j < 4; ++j)
       m(i,j) = (i + 1) * (j + 1);
@@ -77,7 +77,7 @@ TEST(AgradMixMatrixSubRow,SubRow2_matrix_ffv) {
 }
 TEST(AgradMixMatrixSubRow,SubRow3_matrix_ffv) {
   using stan::math::sub_row;
-  stan::agrad::matrix_ffv m(3,4);
+  stan::math::matrix_ffv m(3,4);
   for (int i = 0; i < 3; ++i)
     for (int j = 0; j < 4; ++j)
       m(i,j) = (i + 1) * (j + 1);
@@ -85,7 +85,7 @@ TEST(AgradMixMatrixSubRow,SubRow3_matrix_ffv) {
 }
 TEST(AgradMixMatrixSubRow,SubRow4_matrix_ffv) {
   using stan::math::sub_row;
-  stan::agrad::matrix_ffv m(3,4);
+  stan::math::matrix_ffv m(3,4);
   for (int i = 0; i < 3; ++i)
     for (int j = 0; j < 4; ++j)
       m(i,j) = (i + 1) * (j + 1);
@@ -101,13 +101,13 @@ TEST(AgradMixMatrixSubRow,SubRow5_matrix_ffv) {
 }
 TEST(AgradMixMatrixSubRow,SubRow6_matrix_ffv) {
   using stan::math::sub_row;
-  stan::agrad::matrix_ffv m(3,4);
+  stan::math::matrix_ffv m(3,4);
   for (int i = 0; i < 3; ++i)
     for (int j = 0; j < 4; ++j) {
       m(i,j) = (i + 1) * (j + 1);
       m(i,j).d_ = 1.0;
     }
-  stan::agrad::row_vector_ffv v = sub_row(m,1,2,2);
+  stan::math::row_vector_ffv v = sub_row(m,1,2,2);
   EXPECT_EQ(2,v.size());
   for (int i = 0; i < 2; ++i) {
     EXPECT_FLOAT_EQ(m(0,1+i).val_.val_.val(), v(i).val_.val_.val());

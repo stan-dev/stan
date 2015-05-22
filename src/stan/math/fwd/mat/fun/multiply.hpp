@@ -12,7 +12,7 @@
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     template<typename T, int R1, int C1>
     inline
@@ -84,7 +84,7 @@ namespace stan {
         Eigen::Matrix<fvar<T>, 1, C1> crow = m1.row(i);
         for (size_type j = 0; j < m2.cols(); j++) {
           Eigen::Matrix<fvar<T>, R2, 1> ccol = m2.col(j);
-          result(i, j) = stan::agrad::dot_product(crow, ccol);
+          result(i, j) = stan::math::dot_product(crow, ccol);
         }
       }
       return result;
@@ -103,7 +103,7 @@ namespace stan {
         Eigen::Matrix<fvar<T>, 1, C1> crow = m1.row(i);
         for (size_type j = 0; j < m2.cols(); j++) {
           Eigen::Matrix<double, R2, 1> ccol = m2.col(j);
-          result(i, j) = stan::agrad::dot_product(crow, ccol);
+          result(i, j) = stan::math::dot_product(crow, ccol);
         }
       }
       return result;
@@ -122,7 +122,7 @@ namespace stan {
         Eigen::Matrix<double, 1, C1> crow = m1.row(i);
         for (size_type j = 0; j < m2.cols(); j++) {
           Eigen::Matrix<fvar<T>, R2, 1> ccol = m2.col(j);
-          result(i, j) = stan::agrad::dot_product(crow, ccol);
+          result(i, j) = stan::math::dot_product(crow, ccol);
         }
       }
       return result;

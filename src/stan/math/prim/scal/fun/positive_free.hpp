@@ -6,7 +6,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * Return the unconstrained value corresponding to the specified
@@ -27,7 +27,7 @@ namespace stan {
     template <typename T>
     inline
     T positive_free(const T y) {
-      stan::math::check_positive("stan::prob::positive_free",
+      stan::math::check_positive("stan::math::positive_free",
                                  "Positive variable", y);
       return log(y);
     }

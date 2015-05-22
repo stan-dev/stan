@@ -8,7 +8,7 @@
 // can be assigned to var, but not vice-versa)
 
 TEST(AgradRevFunctionsPromoteScalar, Mismatch) {
-  using stan::agrad::var;
+  using stan::math::var;
   using stan::math::promote_scalar;
   EXPECT_FLOAT_EQ(2.3, promote_scalar<var>(2.3).val());
 }

@@ -5,8 +5,8 @@
 #include <stan/math/rev/core.hpp>
 
 TEST(AgradFwdSign, Fvar) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> v;
   v = 0;
@@ -19,8 +19,8 @@ TEST(AgradFwdSign, Fvar) {
 
 
 TEST(AgradFwdSign, FvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::sign;
 
   fvar<var> x(1.5,1.3);
@@ -33,8 +33,8 @@ TEST(AgradFwdSign, FvarVar_2ndDeriv) {
 }
 
 TEST(AgradFwdSign, FvarFvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::sign;
 
   fvar<fvar<var> > x(1.5,1.3);
@@ -67,8 +67,8 @@ TEST(AgradFwdSign, FvarFvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(0, r[0]);
 }
 TEST(AgradFwdSign, FvarFvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::sign;
 
   fvar<fvar<var> > x;
@@ -94,8 +94,8 @@ TEST(AgradFwdSign, FvarFvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(0, r[0]);
 }
 TEST(AgradFwdSign, FvarFvarVar_3rdDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::sign;
 
   fvar<fvar<var> > x;

@@ -8,7 +8,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     using Eigen::Dynamic;
 
@@ -19,8 +19,8 @@ namespace stan {
                          const Eigen::Matrix<double, Dynamic, 1>& v,
                          double& fx,
                          Eigen::Matrix<double, Dynamic, 1>& Hv) {
-      using stan::agrad::fvar;
-      using stan::agrad::var;
+      using stan::math::fvar;
+      using stan::math::var;
       using Eigen::Matrix;
       start_nested();
       try {
@@ -31,15 +31,15 @@ namespace stan {
         var grad_fx_var_dot_v;
         gradient_dot_vector(f, x_var, v, fx_var, grad_fx_var_dot_v);
         fx = fx_var.val();
-        stan::agrad::grad(grad_fx_var_dot_v.vi_);
+        stan::math::grad(grad_fx_var_dot_v.vi_);
         Hv.resize(x.size());
         for (int i = 0; i < x.size(); ++i)
           Hv(i) = x_var(i).adj();
       } catch (const std::exception& e) {
-        stan::agrad::recover_memory_nested();
+        stan::math::recover_memory_nested();
         throw;
       }
-      stan::agrad::recover_memory_nested();
+      stan::math::recover_memory_nested();
     }
     template <typename T, typename F>
     void
@@ -55,6 +55,6 @@ namespace stan {
       Hv = H * v;
     }
 
-  }  // namespace agrad
+  }  // namespace math
 }  // namespace stan
 #endif

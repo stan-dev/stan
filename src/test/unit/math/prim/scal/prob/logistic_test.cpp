@@ -5,13 +5,13 @@
 
 TEST(ProbDistributionsLogistic, error_check) {
   boost::random::mt19937 rng;
-  EXPECT_NO_THROW(stan::prob::logistic_rng(4.0,3.0,rng));
+  EXPECT_NO_THROW(stan::math::logistic_rng(4.0,3.0,rng));
 
-  EXPECT_THROW(stan::prob::logistic_rng(4.0,-3.0,rng),std::domain_error);
-  EXPECT_THROW(stan::prob::logistic_rng(4.0,stan::math::positive_infinity(),
+  EXPECT_THROW(stan::math::logistic_rng(4.0,-3.0,rng),std::domain_error);
+  EXPECT_THROW(stan::math::logistic_rng(4.0,stan::math::positive_infinity(),
                                         rng),
                std::domain_error);
-  EXPECT_THROW(stan::prob::logistic_rng(stan::math::positive_infinity(),3,
+  EXPECT_THROW(stan::math::logistic_rng(stan::math::positive_infinity(),3,
                                         rng),
                std::domain_error);
 }
@@ -36,7 +36,7 @@ TEST(ProbDistributionsLogistic, chiSquareGoodnessFitTest) {
   }
 
   while (count < N) {
-    double a = stan::prob::logistic_rng(9.0,4.0,rng);
+    double a = stan::math::logistic_rng(9.0,4.0,rng);
     int i = 0;
     while (i < K-1 && a > loc[i]) 
       ++i;

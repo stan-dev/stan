@@ -7,7 +7,7 @@
 namespace stan {
 
   template <>
-  struct is_var<stan::agrad::var> {
+  struct is_var<stan::math::var> {
     enum { value = true };
   };
 

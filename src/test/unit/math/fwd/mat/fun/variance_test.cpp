@@ -7,7 +7,7 @@
 TEST(AgradFwdMatrixVariance, fd_vector) {
   using stan::math::variance;
   using stan::math::vector_d;
-  using stan::agrad::vector_fd;
+  using stan::math::vector_fd;
 
   vector_d d(1);
   d << 12.9;
@@ -39,7 +39,7 @@ TEST(AgradFwdMatrixVariance, fd_vector) {
 TEST(AgradFwdMatrixVariance, fd_vector_exception) {
   using stan::math::variance;
   using stan::math::vector_d;
-  using stan::agrad::vector_fd;
+  using stan::math::vector_fd;
 
   vector_d d1;
   vector_fd v1;
@@ -49,7 +49,7 @@ TEST(AgradFwdMatrixVariance, fd_vector_exception) {
 TEST(AgradFwdMatrixVariance, fd_rowvector) {
   using stan::math::variance;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fd;
+  using stan::math::row_vector_fd;
 
   row_vector_d d(1);
   d << 12.9;
@@ -81,7 +81,7 @@ TEST(AgradFwdMatrixVariance, fd_rowvector) {
 TEST(AgradFwdMatrixVariance, fd_rowvector_exception) {
   using stan::math::variance;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fd;
+  using stan::math::row_vector_fd;
 
   row_vector_d d1;
   row_vector_fd v1;
@@ -91,7 +91,7 @@ TEST(AgradFwdMatrixVariance, fd_rowvector_exception) {
 TEST(AgradFwdMatrixVariance, fd_matrix) {
   using stan::math::variance;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
   
   matrix_d m(1,1);
   m << 12.9;
@@ -123,7 +123,7 @@ TEST(AgradFwdMatrixVariance, fd_matrix) {
 TEST(AgradFwdMatrixVariance, fd_matrix_exception) {
   using stan::math::variance;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
 
   matrix_d d1;
   matrix_fd v1;
@@ -142,7 +142,7 @@ TEST(AgradFwdMatrixVariance, fd_matrix_exception) {
 }
 TEST(AgradFwdMatrixVariance, fd_StdVector) {
   using stan::math::variance;
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<double> x1 = 0.5;
   x1.d_ = 1.0;
@@ -162,7 +162,7 @@ TEST(AgradFwdMatrixVariance, fd_StdVector) {
 TEST(AgradFwdMatrixVariance, ffd_vector) {
   using stan::math::variance;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffd;
+  using stan::math::vector_ffd;
 
   vector_d d(1);
   d << 12.9;
@@ -194,7 +194,7 @@ TEST(AgradFwdMatrixVariance, ffd_vector) {
 TEST(AgradFwdMatrixVariance, ffd_vector_exception) {
   using stan::math::variance;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffd;
+  using stan::math::vector_ffd;
 
   vector_d d1;
   vector_ffd v1;
@@ -204,7 +204,7 @@ TEST(AgradFwdMatrixVariance, ffd_vector_exception) {
 TEST(AgradFwdMatrixVariance, ffd_rowvector) {
   using stan::math::variance;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffd;
+  using stan::math::row_vector_ffd;
 
   row_vector_d d(1);
   d << 12.9;
@@ -236,7 +236,7 @@ TEST(AgradFwdMatrixVariance, ffd_rowvector) {
 TEST(AgradFwdMatrixVariance, ffd_rowvector_exception) {
   using stan::math::variance;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffd;
+  using stan::math::row_vector_ffd;
 
   row_vector_d d1;
   row_vector_ffd v1;
@@ -246,7 +246,7 @@ TEST(AgradFwdMatrixVariance, ffd_rowvector_exception) {
 TEST(AgradFwdMatrixVariance, ffd_matrix) {
   using stan::math::variance;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffd;
+  using stan::math::matrix_ffd;
   
   matrix_d m(1,1);
   m << 12.9;
@@ -278,7 +278,7 @@ TEST(AgradFwdMatrixVariance, ffd_matrix) {
 TEST(AgradFwdMatrixVariance, ffd_matrix_exception) {
   using stan::math::variance;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffd;
+  using stan::math::matrix_ffd;
 
   matrix_d d1;
   matrix_ffd v1;
@@ -297,7 +297,7 @@ TEST(AgradFwdMatrixVariance, ffd_matrix_exception) {
 }
 TEST(AgradFwdMatrixVariance, ffd_StdVector) {
   using stan::math::variance;
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<fvar<double> > x1 = 0.5;
   x1.d_ = 1.0;

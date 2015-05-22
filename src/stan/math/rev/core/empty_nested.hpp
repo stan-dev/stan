@@ -6,7 +6,7 @@
 #include <stan/math/rev/core/chainablestack.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Return true if there is no nested autodiff being executed.

@@ -18,9 +18,9 @@
 #include <stan/math/rev/mat/fun/mdivide_left_spd.hpp>
 
 TEST(AgradRevMatrix, mdivide_right_ldlt_vv) {
-  using stan::agrad::var;
-  using stan::agrad::row_vector_v;
-  using stan::agrad::matrix_v;
+  using stan::math::var;
+  using stan::math::row_vector_v;
+  using stan::math::matrix_v;
   using stan::math::row_vector_d;
   using stan::math::mdivide_right_spd;
   using stan::math::mdivide_right_ldlt;
@@ -106,8 +106,8 @@ TEST(AgradRevMatrix, mdivide_right_ldlt_vv) {
 
 
 TEST(AgradRevMatrix, mdivide_right_ldlt_vd) {
-  using stan::agrad::var;
-  using stan::agrad::row_vector_v;
+  using stan::math::var;
+  using stan::math::row_vector_v;
   using stan::math::matrix_d;
   using stan::math::row_vector_d;
   using stan::math::mdivide_right_ldlt;
@@ -162,7 +162,7 @@ TEST(AgradRevMatrix, mdivide_right_ldlt_vd) {
      -9, 0,  20,  2,  5, 
       7, 4,  2,  20, -5, 
       5, 4,  5, -5,  20;
-    x_basic = mdivide_right_spd(b ,stan::agrad::to_var(A));
+    x_basic = mdivide_right_spd(b ,stan::math::to_var(A));
     x_basic_val = value_of(x_basic);
     ASSERT_EQ(expected.size(), x_basic_val.size());
     for (int n = 0; n < expected.size(); n++) {
@@ -187,9 +187,9 @@ TEST(AgradRevMatrix, mdivide_right_ldlt_vd) {
 }
 
 TEST(AgradRevMatrix, mdivide_right_ldlt_dv) {
-  using stan::agrad::var;
-  using stan::agrad::row_vector_v;
-  using stan::agrad::matrix_v;
+  using stan::math::var;
+  using stan::math::row_vector_v;
+  using stan::math::matrix_v;
   using stan::math::row_vector_d;
   using stan::math::mdivide_right_ldlt;
   using stan::math::LDLT_factor;  
@@ -243,7 +243,7 @@ TEST(AgradRevMatrix, mdivide_right_ldlt_dv) {
      -9, 0,  20,  2,  5, 
       7, 4,  2,  20, -5, 
       5, 4,  5, -5,  20;
-    x_basic = mdivide_right_spd(stan::agrad::to_var(b),A);
+    x_basic = mdivide_right_spd(stan::math::to_var(b),A);
     x_basic_val = value_of(x_basic);
     ASSERT_EQ(expected.size(), x_basic_val.size());
     for (int n = 0; n < expected.size(); n++) {

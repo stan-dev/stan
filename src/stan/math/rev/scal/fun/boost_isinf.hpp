@@ -19,7 +19,7 @@ namespace boost {
      */
     template <>
     inline
-    bool isinf(const stan::agrad::var& v) {
+    bool isinf(const stan::math::var& v) {
       return (boost::math::isinf)(v.val());
     }
 

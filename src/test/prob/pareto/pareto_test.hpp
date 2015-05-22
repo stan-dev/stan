@@ -6,7 +6,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::math::var;
 
 class AgradDistributionsPareto : public AgradDistributionTest {
 public:
@@ -64,7 +64,7 @@ public:
   typename stan::return_type<T_y, T_scale, T_shape>::type 
   log_prob(const T_y& y, const T_scale& y_min, const T_shape& alpha,
            const T3&, const T4&, const T5&) {
-    return stan::prob::pareto_log(y, y_min, alpha);
+    return stan::math::pareto_log(y, y_min, alpha);
   }
 
   template <bool propto, 
@@ -73,7 +73,7 @@ public:
   typename stan::return_type<T_y, T_scale, T_shape>::type 
   log_prob(const T_y& y, const T_scale& y_min, const T_shape& alpha,
            const T3&, const T4&, const T5&) {
-    return stan::prob::pareto_log<propto>(y, y_min, alpha);
+    return stan::math::pareto_log<propto>(y, y_min, alpha);
   }
   
 
@@ -84,7 +84,7 @@ public:
                     const T_shape& alpha,
                     const T3&, const T4&, const T5&) {
       using stan::math::multiply_log;
-      using stan::prob::LOG_ZERO;
+      using stan::math::LOG_ZERO;
 
       if (y < y_min)
         return LOG_ZERO;
@@ -94,5 +94,5 @@ public:
 };
 
 TEST(ProbDistributionsParetoCDF, Values) {
-    EXPECT_FLOAT_EQ(0.60434447, stan::prob::pareto_cdf(3.45, 2.89, 5.235));
+    EXPECT_FLOAT_EQ(0.60434447, stan::math::pareto_cdf(3.45, 2.89, 5.235));
 }

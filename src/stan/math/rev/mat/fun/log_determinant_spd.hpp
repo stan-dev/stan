@@ -9,7 +9,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     template <int R, int C>
     inline var log_determinant_spd(const Eigen::Matrix<var, R, C>& m) {

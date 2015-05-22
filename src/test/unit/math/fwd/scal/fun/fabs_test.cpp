@@ -5,7 +5,7 @@
 #include <stan/math/fwd/scal/fun/value_of.hpp>
 
 TEST(AgradFwdFabs,Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using std::fabs;
   using std::isnan;
 
@@ -50,7 +50,7 @@ TEST(AgradFwdFabs,Fvar) {
 }
 
 TEST(AgradFwdFabs,FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using std::fabs;
 
   fvar<fvar<double> > x;

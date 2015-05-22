@@ -4,8 +4,8 @@
 #include <stan/math/prim/scal/meta/return_type.hpp>
 
 TEST(AgradMixOperatorSubtraction, FvarVar_FvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> x(0.5,1.3);
   fvar<var> z(0.5,1.3);
@@ -21,8 +21,8 @@ TEST(AgradMixOperatorSubtraction, FvarVar_FvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(-1, g[1]);
 }
 TEST(AgradMixOperatorSubtraction, FvarVar_Double_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> x(0.5,1.3);
   double z(0.5);
@@ -37,8 +37,8 @@ TEST(AgradMixOperatorSubtraction, FvarVar_Double_1stDeriv) {
   EXPECT_FLOAT_EQ(1, g[0]);
 }
 TEST(AgradMixOperatorSubtraction, Double_FvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   double x(0.5);
   fvar<var> z(0.5,1.3);
@@ -53,8 +53,8 @@ TEST(AgradMixOperatorSubtraction, Double_FvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(-1, g[0]);
 }
 TEST(AgradMixOperatorSubtraction, FvarVar_FvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> x(0.5,1.3);
   fvar<var> z(0.5,1.3);
@@ -67,8 +67,8 @@ TEST(AgradMixOperatorSubtraction, FvarVar_FvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(0, g[1]);
 }
 TEST(AgradMixOperatorSubtraction, FvarVar_Double_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> x(0.5,1.3);
   double z(0.5);
@@ -80,8 +80,8 @@ TEST(AgradMixOperatorSubtraction, FvarVar_Double_2ndDeriv) {
   EXPECT_FLOAT_EQ(0, g[0]);
 }
 TEST(AgradMixOperatorSubtraction, Double_FvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   double x(0.5);
   fvar<var> z(0.5,1.3);
@@ -93,8 +93,8 @@ TEST(AgradMixOperatorSubtraction, Double_FvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(0, g[0]);
 }
 TEST(AgradMixOperatorSubtraction, FvarFvarVar_FvarFvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > x;
   x.val_.val_ = 0.5;
@@ -117,8 +117,8 @@ TEST(AgradMixOperatorSubtraction, FvarFvarVar_FvarFvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(-1.0, g[1]);
 }
 TEST(AgradMixOperatorSubtraction, FvarFvarVar_Double_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > x;
   x.val_.val_ = 0.5;
@@ -137,8 +137,8 @@ TEST(AgradMixOperatorSubtraction, FvarFvarVar_Double_1stDeriv) {
   EXPECT_FLOAT_EQ(1.0, g[0]);
 }
 TEST(AgradMixOperatorSubtraction, Double_FvarFvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   double x(0.5);
   fvar<fvar<var> > y;
@@ -158,8 +158,8 @@ TEST(AgradMixOperatorSubtraction, Double_FvarFvarVar_1stDeriv) {
 }
 
 TEST(AgradMixOperatorSubtraction, FvarFvarVar_FvarFvarVar_2ndDeriv_x) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > x;
   x.val_.val_ = 0.5;
@@ -178,8 +178,8 @@ TEST(AgradMixOperatorSubtraction, FvarFvarVar_FvarFvarVar_2ndDeriv_x) {
   EXPECT_FLOAT_EQ(0, g[1]);
 }
 TEST(AgradMixOperatorSubtraction, FvarFvarVar_FvarFvarVar_2ndDeriv_y) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > x;
   x.val_.val_ = 0.5;
@@ -198,8 +198,8 @@ TEST(AgradMixOperatorSubtraction, FvarFvarVar_FvarFvarVar_2ndDeriv_y) {
   EXPECT_FLOAT_EQ(0, g[1]);
 }
 TEST(AgradMixOperatorSubtraction, FvarFvarVar_Double_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > x;
   x.val_.val_ = 0.5;
@@ -214,8 +214,8 @@ TEST(AgradMixOperatorSubtraction, FvarFvarVar_Double_2ndDeriv) {
   EXPECT_FLOAT_EQ(0, g[0]);
 }
 TEST(AgradMixOperatorSubtraction, Double_FvarFvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   double x(0.5);
   fvar<fvar<var> > y;
@@ -230,8 +230,8 @@ TEST(AgradMixOperatorSubtraction, Double_FvarFvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(0, g[0]);
 }
 TEST(AgradMixOperatorSubtraction, FvarFvarVar_FvarFvarVar_3rdDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > x;
   x.val_.val_ = 0.5;
@@ -252,8 +252,8 @@ TEST(AgradMixOperatorSubtraction, FvarFvarVar_FvarFvarVar_3rdDeriv) {
   EXPECT_FLOAT_EQ(0, g[1]);
 }
 TEST(AgradMixOperatorSubtraction, FvarFvarVar_Double_3rdDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > x;
   x.val_.val_ = 0.5;
@@ -269,8 +269,8 @@ TEST(AgradMixOperatorSubtraction, FvarFvarVar_Double_3rdDeriv) {
   EXPECT_FLOAT_EQ(0, g[0]);
 }
 TEST(AgradMixOperatorSubtraction, Double_FvarFvarVar_3rdDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   double x(0.5);
   fvar<fvar<var> > y;

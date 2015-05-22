@@ -12,9 +12,9 @@ TEST(AgradMixMatrixSoftmax,fv_1stDeriv) {
   using stan::math::softmax;
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::agrad::vector_fv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::vector_fv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   EXPECT_THROW(softmax(vector_fv()),std::invalid_argument);
   
@@ -65,9 +65,9 @@ TEST(AgradMixMatrixSoftmax,fv_2ndDeriv) {
   using stan::math::softmax;
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::agrad::vector_fv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::vector_fv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   Matrix<fvar<var>,Dynamic,1> x3(3);
   x3 << -1.0, 1.0, 10.0;
@@ -88,9 +88,9 @@ TEST(AgradMixMatrixSoftmax,ffv_1stDeriv) {
   using stan::math::softmax;
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::agrad::vector_ffv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::vector_ffv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   EXPECT_THROW(softmax(vector_ffv()),std::invalid_argument);
   
@@ -141,9 +141,9 @@ TEST(AgradMixMatrixSoftmax,ffv_2ndDeriv_1) {
   using stan::math::softmax;
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::agrad::vector_ffv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::vector_ffv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   Matrix<fvar<fvar<var> >,Dynamic,1> x3(3);
   x3 << -1.0, 1.0, 10.0;
@@ -165,9 +165,9 @@ TEST(AgradMixMatrixSoftmax,ffv_2ndDeriv_2) {
   using stan::math::softmax;
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::agrad::vector_ffv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::vector_ffv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   Matrix<fvar<fvar<var> >,Dynamic,1> x3(3);
   x3 << -1.0, 1.0, 10.0;
@@ -189,9 +189,9 @@ TEST(AgradMixMatrixSoftmax,ffv_3rdDeriv) {
   using stan::math::softmax;
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::agrad::vector_ffv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::vector_ffv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   Matrix<fvar<fvar<var> >,Dynamic,1> x3(3);
   x3 << -1.0, 1.0, 10.0;

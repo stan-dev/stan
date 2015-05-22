@@ -7,7 +7,7 @@
 #include <stan/math/prim/scal/fun/constants.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Unary plus operator for variables (C++).

@@ -25,11 +25,11 @@ template <typename F>
 std::vector<double>
 grad(const F& fun,
      const std::vector<double>& args) {
-  std::vector<stan::agrad::var> x;
+  std::vector<stan::math::var> x;
   for (size_t i = 0; i < args.size(); ++i)
     x.push_back(args[i]);
 
-  stan::agrad::var fx = fun(x);
+  stan::math::var fx = fun(x);
   std::vector<double> grad;
   fx.grad(x,grad);
   return grad;

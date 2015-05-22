@@ -3,7 +3,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::math::var;
 
 class AgradCdfLogGumbel : public AgradCdfLogTest {
 public:
@@ -71,7 +71,7 @@ public:
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   cdf_log(const T_y& y, const T_loc& mu, const T_scale& beta,
           const T3&, const T4&, const T5&) {
-    return stan::prob::gumbel_cdf_log(y, mu, beta);
+    return stan::math::gumbel_cdf_log(y, mu, beta);
   }
 
 

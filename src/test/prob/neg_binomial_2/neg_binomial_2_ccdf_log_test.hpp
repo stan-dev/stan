@@ -7,7 +7,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::math::var;
 
 class AgradCdfLogNegBinomial2 : public AgradCcdfLogTest {
 public:
@@ -73,7 +73,7 @@ public:
   typename stan::return_type<T_location, T_precision>::type
   ccdf_log(const T_n& n, const T_location& alpha, const T_precision& beta,
       const T3&, const T4&, const T5&) {
-    return stan::prob::neg_binomial_2_ccdf_log(n, alpha, beta);
+    return stan::math::neg_binomial_2_ccdf_log(n, alpha, beta);
   }
 
   template <typename T_n, typename T_location, typename T_precision,

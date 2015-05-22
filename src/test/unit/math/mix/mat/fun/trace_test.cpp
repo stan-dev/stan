@@ -9,9 +9,9 @@
 
 TEST(AgradMixMatrixTrace,fv) {
   using stan::math::trace;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::matrix_fv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   matrix_fv a(2,2);
   a << -1.0, 2.0, 
@@ -27,9 +27,9 @@ TEST(AgradMixMatrixTrace,fv) {
 }
 TEST(AgradMixMatrixTrace,ffv) {
   using stan::math::trace;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::matrix_ffv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   matrix_ffv a(2,2);
   a << -1.0, 2.0, 

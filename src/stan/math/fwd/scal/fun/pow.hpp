@@ -10,7 +10,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     template <typename T>
     inline
@@ -39,10 +39,10 @@ namespace stan {
     fvar<T>
     pow(const fvar<T>& x1, const double x2) {
       using std::pow;
-      using stan::agrad::sqrt;
-      using stan::agrad::inv;
-      using stan::agrad::inv_sqrt;
-      using stan::agrad::inv_square;
+      using stan::math::sqrt;
+      using stan::math::inv;
+      using stan::math::inv_sqrt;
+      using stan::math::inv_square;
       using std::sqrt;
       using stan::math::square;
 

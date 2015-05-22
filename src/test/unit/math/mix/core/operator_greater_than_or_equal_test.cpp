@@ -4,8 +4,8 @@
 #include <stan/math/rev/core.hpp>
 
 TEST(AgradMixOperatorGreaterThanOrEqual, FvarVar) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> x(0.5,1.3);
   fvar<var> y(1.5,1.0);
@@ -17,8 +17,8 @@ TEST(AgradMixOperatorGreaterThanOrEqual, FvarVar) {
 }
 
 TEST(AgradMixOperatorGreaterThanOrEqual, FvarFvarVar) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > x;
   x.val_.val_ = 1.5;
@@ -38,8 +38,8 @@ TEST(AgradMixOperatorGreaterThanOrEqual, FvarFvarVar) {
 }
 
 TEST(AgradMixOperatorGreaterThanOrEqual, geq_nan) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   double nan = std::numeric_limits<double>::quiet_NaN();
   double a = 3.0;
   fvar<var> nan_fv = std::numeric_limits<double>::quiet_NaN();

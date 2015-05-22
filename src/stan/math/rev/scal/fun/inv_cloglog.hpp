@@ -5,7 +5,7 @@
 #include <stan/math/prim/scal/fun/inv_cloglog.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class inv_cloglog_vari : public op_v_vari {
@@ -33,7 +33,7 @@ namespace stan {
      * @return The inverse complementary log-log of the specified
      * argument.
      */
-    inline var inv_cloglog(const stan::agrad::var& a) {
+    inline var inv_cloglog(const stan::math::var& a) {
       return var(new inv_cloglog_vari(a.vi_));
     }
 

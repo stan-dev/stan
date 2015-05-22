@@ -13,7 +13,7 @@
 using Eigen::Dynamic;
 using Eigen::Matrix;
 using std::vector;
-using stan::prob::multi_student_t_log;
+using stan::math::multi_student_t_log;
 
 TEST(ProbDistributionsMultiStudentT,NotVectorized) {
   Matrix<double,Dynamic,1> y(3,1);
@@ -62,22 +62,22 @@ TEST(ProbDistributionsMultiStudentT,Vectorized) {
   double nu = 4.0;
     
   //y and mu vectorized
-  EXPECT_FLOAT_EQ(-8.92867-6.81839, stan::prob::multi_student_t_log(vec_y,nu,vec_mu,Sigma));
-  EXPECT_FLOAT_EQ(-8.92867-6.81839, stan::prob::multi_student_t_log(vec_y_t,nu,vec_mu,Sigma));
-  EXPECT_FLOAT_EQ(-8.92867-6.81839, stan::prob::multi_student_t_log(vec_y,nu,vec_mu_t,Sigma));
-  EXPECT_FLOAT_EQ(-8.92867-6.81839, stan::prob::multi_student_t_log(vec_y_t,nu,vec_mu_t,Sigma));
+  EXPECT_FLOAT_EQ(-8.92867-6.81839, stan::math::multi_student_t_log(vec_y,nu,vec_mu,Sigma));
+  EXPECT_FLOAT_EQ(-8.92867-6.81839, stan::math::multi_student_t_log(vec_y_t,nu,vec_mu,Sigma));
+  EXPECT_FLOAT_EQ(-8.92867-6.81839, stan::math::multi_student_t_log(vec_y,nu,vec_mu_t,Sigma));
+  EXPECT_FLOAT_EQ(-8.92867-6.81839, stan::math::multi_student_t_log(vec_y_t,nu,vec_mu_t,Sigma));
 
   //y vectorized
-  EXPECT_FLOAT_EQ(-9.167054-6.81839, stan::prob::multi_student_t_log(vec_y,nu,mu,Sigma));
-  EXPECT_FLOAT_EQ(-9.167054-6.81839, stan::prob::multi_student_t_log(vec_y_t,nu,mu,Sigma));
-  EXPECT_FLOAT_EQ(-9.167054-6.81839, stan::prob::multi_student_t_log(vec_y,nu,mu_t,Sigma));
-  EXPECT_FLOAT_EQ(-9.167054-6.81839, stan::prob::multi_student_t_log(vec_y_t,nu,mu_t,Sigma));
+  EXPECT_FLOAT_EQ(-9.167054-6.81839, stan::math::multi_student_t_log(vec_y,nu,mu,Sigma));
+  EXPECT_FLOAT_EQ(-9.167054-6.81839, stan::math::multi_student_t_log(vec_y_t,nu,mu,Sigma));
+  EXPECT_FLOAT_EQ(-9.167054-6.81839, stan::math::multi_student_t_log(vec_y,nu,mu_t,Sigma));
+  EXPECT_FLOAT_EQ(-9.167054-6.81839, stan::math::multi_student_t_log(vec_y_t,nu,mu_t,Sigma));
 
   //mu vectorized
-  EXPECT_FLOAT_EQ(-5.528012-6.81839, stan::prob::multi_student_t_log(y,nu,vec_mu,Sigma));
-  EXPECT_FLOAT_EQ(-5.528012-6.81839, stan::prob::multi_student_t_log(y_t,nu,vec_mu,Sigma));
-  EXPECT_FLOAT_EQ(-5.528012-6.81839, stan::prob::multi_student_t_log(y,nu,vec_mu_t,Sigma));
-  EXPECT_FLOAT_EQ(-5.528012-6.81839, stan::prob::multi_student_t_log(y_t,nu,vec_mu_t,Sigma));  
+  EXPECT_FLOAT_EQ(-5.528012-6.81839, stan::math::multi_student_t_log(y,nu,vec_mu,Sigma));
+  EXPECT_FLOAT_EQ(-5.528012-6.81839, stan::math::multi_student_t_log(y_t,nu,vec_mu,Sigma));
+  EXPECT_FLOAT_EQ(-5.528012-6.81839, stan::math::multi_student_t_log(y,nu,vec_mu_t,Sigma));
+  EXPECT_FLOAT_EQ(-5.528012-6.81839, stan::math::multi_student_t_log(y_t,nu,vec_mu_t,Sigma));  
 }
 TEST(ProbDistributionsMultiStudentT,Sigma) {
   Matrix<double,Dynamic,1> y(3,1);
@@ -236,14 +236,14 @@ Matrix<double,Dynamic,Dynamic> s(3,3);
    3.0, 9.0, 1.2,
    11.0, 1.2, 16.0;
 
-  EXPECT_NO_THROW(stan::prob::multi_student_t_rng(2.0,mu,s,rng));
-  EXPECT_THROW(stan::prob::multi_student_t_rng(-2.0,mu,s,rng),
+  EXPECT_NO_THROW(stan::math::multi_student_t_rng(2.0,mu,s,rng));
+  EXPECT_THROW(stan::math::multi_student_t_rng(-2.0,mu,s,rng),
                std::domain_error);
 
  s << 2.0, 3.0, 11.0,
    3.0, 9.0, 1.2,
    11.0, -1.2, 16.0;
-  EXPECT_THROW(stan::prob::multi_student_t_rng(2.0,mu,s,rng),
+  EXPECT_THROW(stan::math::multi_student_t_rng(2.0,mu,s,rng),
                std::domain_error);
 
   mu << stan::math::positive_infinity(), 
@@ -252,7 +252,7 @@ Matrix<double,Dynamic,Dynamic> s(3,3);
  s << 2.0, 3.0, 11.0,
    3.0, 9.0, 1.2,
    11.0, 1.2, 16.0;
-  EXPECT_THROW(stan::prob::multi_student_t_rng(2.0,mu,s,rng),
+  EXPECT_THROW(stan::math::multi_student_t_rng(2.0,mu,s,rng),
                std::domain_error);
 }
 
@@ -286,7 +286,7 @@ Matrix<double,Dynamic,Dynamic> s(3,3);
 
   Eigen::VectorXd a(mu.rows());
   while (count < N) {
-    a = stan::prob::multi_student_t_rng(3.0,mu,s,rng);
+    a = stan::math::multi_student_t_rng(3.0,mu,s,rng);
     a(0) = (a(0) - mu(0,0)) / std::sqrt(s(0,0));
     int i = 0;
     while (i < K-1 && a(0) > loc[i]) 
@@ -332,7 +332,7 @@ Matrix<double,Dynamic,Dynamic> s(3,3);
 
   Eigen::VectorXd a(mu.rows());
   while (count < N) {
-    a = stan::prob::multi_student_t_rng(3.0,mu,s,rng);
+    a = stan::math::multi_student_t_rng(3.0,mu,s,rng);
     a(1) = (a(1) - mu(1,0)) / std::sqrt(s(1,1));
     int i = 0;
     while (i < K-1 && a(1) > loc[i]) 

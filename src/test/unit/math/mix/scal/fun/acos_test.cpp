@@ -10,8 +10,8 @@
 
 
 TEST(AgradFwdAcos,FvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::acos;
 
   fvar<var> x(0.5,0.3);
@@ -26,8 +26,8 @@ TEST(AgradFwdAcos,FvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(-1.0 / sqrt(1.0 - 0.5 * 0.5), g[0]);
 }
 TEST(AgradFwdAcos,FvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::acos;
 
   fvar<var> x(0.5,0.3);
@@ -41,8 +41,8 @@ TEST(AgradFwdAcos,FvarVar_2ndDeriv) {
 
 
 TEST(AgradFwdAcos,FvarFvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::acos;
 
   fvar<fvar<var> > z;
@@ -77,8 +77,8 @@ TEST(AgradFwdAcos,FvarFvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(-1.0 / sqrt(1.0 - 0.5 * 0.5), q[0]);
 }
 TEST(AgradFwdAcos,FvarFvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::acos;
 
   fvar<fvar<var> > z;
@@ -105,8 +105,8 @@ TEST(AgradFwdAcos,FvarFvarVar_2ndDeriv) {
 }
 
 TEST(AgradFwdAcos,FvarFvarVar_3rdDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::acos;
 
   fvar<fvar<var> > z;

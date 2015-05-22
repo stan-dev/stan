@@ -5,13 +5,14 @@
 #include <stan/math/fwd/scal/fun/cos.hpp>
 #include <stan/math/fwd/scal/fun/fabs.hpp>
 #include <stan/math/fwd/scal/fun/floor.hpp>
+#include <stan/math/fwd/scal/fun/lgamma.hpp>
 #include <stan/math/fwd/scal/fun/log.hpp>
 #include <stan/math/fwd/scal/fun/tan.hpp>
 #include <stan/math/fwd/scal/fun/value_of.hpp>
 
 TEST(AgradFwdLogFallingFactorial,Fvar) {
-  using stan::agrad::fvar;
-  using stan::agrad::log_falling_factorial;
+  using stan::math::fvar;
+  using stan::math::log_falling_factorial;
   using boost::math::digamma;
 
   fvar<double> a(4.0,1.0);
@@ -35,7 +36,7 @@ TEST(AgradFwdLogFallingFactorial,Fvar) {
 }
 
 TEST(AgradFwdLogFallingFactorial,FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::log_falling_factorial;
 
   fvar<fvar<double> > x;

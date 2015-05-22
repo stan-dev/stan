@@ -14,15 +14,16 @@
 #include <stan/math/prim/mat/fun/dot_product.hpp>
 #include <stan/math/prim/mat/fun/subtract.hpp>
 #include <stan/math/prim/scal/fun/log1p.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/mat/prob/multi_normal_log.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/meta/VectorViewMvt.hpp>
+#include <cmath>
 #include <cstdlib>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
     using Eigen::Dynamic;
     /**
      * Return the log of the multivariate Student t distribution
@@ -37,7 +38,7 @@ namespace stan {
                         const T_dof& nu,
                         const T_loc& mu,
                         const T_scale& Sigma) {
-      static const char* function("stan::prob::multi_student_t");
+      static const char* function("stan::math::multi_student_t");
 
       using stan::math::check_size_match;
       using stan::math::check_finite;
@@ -49,6 +50,7 @@ namespace stan {
       using stan::math::LDLT_factor;
       using stan::math::check_ldlt_factor;
       using stan::math::log1p;
+      using std::log;
 
       typedef typename scalar_type<T_scale>::type T_scale_elem;
       typedef typename return_type<T_y, T_dof, T_loc, T_scale>::type lp_type;

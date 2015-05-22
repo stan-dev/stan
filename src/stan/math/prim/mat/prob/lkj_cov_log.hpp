@@ -6,14 +6,14 @@
 #include <stan/math/prim/scal/err/check_finite.hpp>
 #include <stan/math/prim/scal/err/check_positive.hpp>
 
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/prob/lognormal_log.hpp>
 #include <stan/math/prim/mat/prob/lkj_corr_log.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     // LKJ_cov(y|mu, sigma, eta) [ y covariance matrix (not correlation matrix)
     //                         mu vector, sigma > 0 vector, eta > 0 ]
@@ -25,7 +25,7 @@ namespace stan {
                 const Eigen::Matrix<T_loc, Eigen::Dynamic, 1>& mu,
                 const Eigen::Matrix<T_scale, Eigen::Dynamic, 1>& sigma,
                 const T_shape& eta) {
-      static const char* function("stan::prob::lkj_cov_log");
+      static const char* function("stan::math::lkj_cov_log");
 
       using stan::math::check_size_match;
       using stan::math::check_finite;
@@ -88,7 +88,7 @@ namespace stan {
                 const T_loc& mu,
                 const T_scale& sigma,
                 const T_shape& eta) {
-      static const char* function("stan::prob::lkj_cov_log");
+      static const char* function("stan::math::lkj_cov_log");
 
       using stan::math::check_finite;
       using stan::math::check_positive;

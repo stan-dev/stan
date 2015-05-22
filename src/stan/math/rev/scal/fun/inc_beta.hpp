@@ -10,7 +10,7 @@
 #include <valarray>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
 
@@ -42,9 +42,9 @@ namespace stan {
 
     }
 
-    inline var inc_beta(const stan::agrad::var& a,
-                        const stan::agrad::var& b,
-                        const stan::agrad::var& c) {
+    inline var inc_beta(const stan::math::var& a,
+                        const stan::math::var& b,
+                        const stan::math::var& c) {
       return var(new inc_beta_vvv_vari(a.vi_, b.vi_, c.vi_));
     }
 

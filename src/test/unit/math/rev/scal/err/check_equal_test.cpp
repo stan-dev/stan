@@ -11,7 +11,7 @@
 #include <stan/math/rev/core.hpp>
 
 using stan::math::check_equal;
-using stan::agrad::var;
+using stan::math::var;
 
 TEST(AgradRevErrorHandlingScalar,CheckEqual) {
   const char* function = "check_equal";
@@ -45,7 +45,7 @@ TEST(AgradRevErrorHandlingScalar,CheckEqual) {
   eq = std::numeric_limits<double>::infinity();
   EXPECT_NO_THROW(check_equal(function, "x", x, eq))
     << "check_equal should not throw an exception with x == Inf and eq == Inf";
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 TEST(AgradRevErrorHandlingScalar,CheckEqualMatrix) {
@@ -72,7 +72,7 @@ TEST(AgradRevErrorHandlingScalar,CheckEqualMatrix) {
   EXPECT_THROW(check_equal(function, "x", x_vec, eq_vec), 
                std::domain_error) 
     << "check_equal: matrix<3,1>, matrix<3,1>, should fail with infinity";
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 TEST(AgradRevErrorHandlingScalar, CheckEqualVarCheckUnivariate) {
@@ -81,24 +81,24 @@ TEST(AgradRevErrorHandlingScalar, CheckEqualVarCheckUnivariate) {
   var a(5.0);
   var b(4.0);
 
-  size_t stack_size = stan::agrad::ChainableStack::var_stack_.size();
+  size_t stack_size = stan::math::ChainableStack::var_stack_.size();
 
   EXPECT_EQ(2U,stack_size);
   EXPECT_THROW(check_equal(function,"a",a,b),std::domain_error);
 
-  size_t stack_size_after_call = stan::agrad::ChainableStack::var_stack_.size();
+  size_t stack_size_after_call = stan::math::ChainableStack::var_stack_.size();
   EXPECT_EQ(2U,stack_size_after_call);
 
   b = 5.0;
   EXPECT_TRUE(check_equal(function,"a",a,b));
-  stack_size_after_call = stan::agrad::ChainableStack::var_stack_.size();
+  stack_size_after_call = stan::math::ChainableStack::var_stack_.size();
   EXPECT_EQ(3U,stack_size_after_call);
 
   b = std::numeric_limits<double>::infinity();
   EXPECT_THROW(check_equal(function,"a",a,b),std::domain_error);
-  stack_size_after_call = stan::agrad::ChainableStack::var_stack_.size();
+  stack_size_after_call = stan::math::ChainableStack::var_stack_.size();
   EXPECT_EQ(4U,stack_size_after_call);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 TEST(AgradRevErrorHandlingScalar, CheckNotNanVarCheckVectorized) {
@@ -114,20 +114,20 @@ TEST(AgradRevErrorHandlingScalar, CheckNotNanVarCheckVectorized) {
    b.push_back(var(i));
   }
 
-  size_t stack_size = stan::agrad::ChainableStack::var_stack_.size();
+  size_t stack_size = stan::math::ChainableStack::var_stack_.size();
 
   EXPECT_EQ(10U,stack_size);
   EXPECT_TRUE(check_equal(function,"a",a,b));
 
-  size_t stack_size_after_call = stan::agrad::ChainableStack::var_stack_.size();
+  size_t stack_size_after_call = stan::math::ChainableStack::var_stack_.size();
   EXPECT_EQ(10U,stack_size_after_call);
 
   b[1] = 4.0;
   EXPECT_THROW(check_equal(function,"a",a,b),std::domain_error);
-  stack_size_after_call = stan::agrad::ChainableStack::var_stack_.size();
+  stack_size_after_call = stan::math::ChainableStack::var_stack_.size();
   EXPECT_EQ(11U,stack_size_after_call);
 
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 TEST(AgradRevErrorHandlingScalar, CheckEqualVarCheckMatrix) {
@@ -145,19 +145,19 @@ TEST(AgradRevErrorHandlingScalar, CheckEqualVarCheckMatrix) {
       b(i,j) = var(i+j+1);
     }
 
-  size_t stack_size = stan::agrad::ChainableStack::var_stack_.size();
+  size_t stack_size = stan::math::ChainableStack::var_stack_.size();
   size_t stack_size_expected = 2 * N * N;
 
   EXPECT_EQ(stack_size_expected,stack_size);
   EXPECT_TRUE(check_equal(function,"a",a,b));
 
-  size_t stack_size_after_call = stan::agrad::ChainableStack::var_stack_.size();
+  size_t stack_size_after_call = stan::math::ChainableStack::var_stack_.size();
   EXPECT_EQ(stack_size_expected,stack_size_after_call);
 
   b(1,1) = 45;
   EXPECT_THROW(check_equal(function,"a",a,b),std::domain_error);
-  stack_size_after_call = stan::agrad::ChainableStack::var_stack_.size();
+  stack_size_after_call = stan::math::ChainableStack::var_stack_.size();
   EXPECT_EQ(stack_size_expected + 1,stack_size_after_call);
 
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }

@@ -496,7 +496,7 @@ discrete distributions, require integer arguments.
 A two-dimensional array is just an array of arrays, both conceptually
 and in terms of current implementation.  When an index is supplied to
 an array, it returns the value at that index.  When more than one
-index is supplied, this idexing operation is chained.  For example, if
+index is supplied, this indexing operation is chained.  For example, if
 \code{a} is a two-dimensional array, then \code{a[m,n]} is just
 a convenient shorthand for \code{a[m][n]}.
 
@@ -8392,7 +8392,7 @@ necessary because the $K$th is just one minus the sum of the first $K
 - 1$ parameters, so that if $\theta$ is a $K$-simplex,
 %
 \[
-\theta_K = 1 - \sum_{k=1}^K \theta_k.
+\theta_K = 1 - \sum_{k=1}^{K-1} \theta_k.
 \]
 %
 The softmax function (see \refsection{softmax}) maps a $K$-vector
@@ -9800,7 +9800,7 @@ by more fully exploiting expression templates inside the Eigen
 \Cpp matrix library.  This will require enhancing Eigen to deal
 with mixed-type arguments, such as the type \code{double} used
 for constants and the algorithmic differentiation type
-\code{stan::agrad::var} 
+\code{stan::math::var} 
 used for variables.}.
 %
 The inefficiency of transposition could itself be mitigated somewhat by

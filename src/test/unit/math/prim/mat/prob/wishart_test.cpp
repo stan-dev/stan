@@ -21,7 +21,7 @@ TEST(ProbDistributionsWishart,LowerTriangular) {
   //Tests if only of the lower triangular portion of
   //outcome and scale matrices is taken
   using Eigen::MatrixXd;
-  using stan::prob::wishart_log;
+  using stan::math::wishart_log;
   
   MatrixXd Sigma(4,4);
   MatrixXd Sigma_sym(4,4);
@@ -67,7 +67,7 @@ TEST(ProbDistributionsWishart,2x2) {
   
   double lp = log(8.658e-07); // computed with MCMCpack in R
  
-  EXPECT_NEAR(lp, stan::prob::wishart_log(Y,dof,Sigma), 0.01);
+  EXPECT_NEAR(lp, stan::math::wishart_log(Y,dof,Sigma), 0.01);
 }
 TEST(ProbDistributionsWishart,4x4) {
   Matrix<double,Dynamic,Dynamic> Y(4,4);
@@ -84,11 +84,11 @@ TEST(ProbDistributionsWishart,4x4) {
 
   double dof = 4;
   double log_p = log(8.034197e-10);
-  EXPECT_NEAR(log_p, stan::prob::wishart_log(Y,dof,Sigma),0.01);
+  EXPECT_NEAR(log_p, stan::math::wishart_log(Y,dof,Sigma),0.01);
   
   dof = 5;
   log_p = log(1.517951e-10);
-  EXPECT_NEAR(log_p, stan::prob::wishart_log(Y,dof,Sigma),0.01);
+  EXPECT_NEAR(log_p, stan::math::wishart_log(Y,dof,Sigma),0.01);
 }
 TEST(ProbDistributionsWishart,2x2Propto) {
   Matrix<double,Dynamic,Dynamic> Sigma(2,2);
@@ -101,7 +101,7 @@ TEST(ProbDistributionsWishart,2x2Propto) {
 
   unsigned int dof = 3;
  
-  EXPECT_FLOAT_EQ(0.0, stan::prob::wishart_log<true>(Y,dof,Sigma));
+  EXPECT_FLOAT_EQ(0.0, stan::math::wishart_log<true>(Y,dof,Sigma));
 }
 TEST(ProbDistributionsWishart,4x4Propto) {
   Matrix<double,Dynamic,Dynamic> Y(4,4);
@@ -117,13 +117,13 @@ TEST(ProbDistributionsWishart,4x4Propto) {
     0.1055911, -3.1129955, -3.586685,  1.4482736;
 
   double dof = 4;
-  EXPECT_FLOAT_EQ(0.0, stan::prob::wishart_log<true>(Y,dof,Sigma));
+  EXPECT_FLOAT_EQ(0.0, stan::math::wishart_log<true>(Y,dof,Sigma));
   
   dof = 5;
-  EXPECT_FLOAT_EQ(0.0, stan::prob::wishart_log<true>(Y,dof,Sigma));
+  EXPECT_FLOAT_EQ(0.0, stan::math::wishart_log<true>(Y,dof,Sigma));
 }
 
-using stan::prob::wishart_log;
+using stan::math::wishart_log;
 
 TEST(ProbDistributionsWishart, error) {
   Matrix<double,Dynamic,Dynamic> Sigma;
@@ -168,12 +168,12 @@ TEST(ProbDistributionsWishart, error_check) {
   sigma << 9.0, -3.0, 0.0,
     -3.0,  4.0, 0.0,
     2.0, 1.0, 3.0;
-  EXPECT_NO_THROW(stan::prob::wishart_rng(3.0, sigma,rng));
+  EXPECT_NO_THROW(stan::math::wishart_rng(3.0, sigma,rng));
 
-  EXPECT_THROW(stan::prob::wishart_rng(-3.0, sigma,rng),std::domain_error);
+  EXPECT_THROW(stan::math::wishart_rng(-3.0, sigma,rng),std::domain_error);
 
   Matrix<double,Dynamic,Dynamic> sigma2(3,4);
-  EXPECT_THROW(stan::prob::wishart_rng(3.0, sigma2,rng),std::invalid_argument);
+  EXPECT_THROW(stan::math::wishart_rng(3.0, sigma2,rng),std::invalid_argument);
 }
 
 TEST(ProbDistributionsWishart, marginalTwoChiSquareGoodnessFitTest) {
@@ -191,7 +191,7 @@ TEST(ProbDistributionsWishart, marginalTwoChiSquareGoodnessFitTest) {
 
   Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> a(sigma.rows(),sigma.rows());
   while (count < N) {
-    a = stan::prob::wishart_rng(5.0, sigma, rng);
+    a = stan::math::wishart_rng(5.0, sigma, rng);
     avg += std::log(stan::math::determinant(a)) / N;
     count++;
    }
@@ -233,7 +233,7 @@ TEST(ProbDistributionsWishart, SpecialRNGTest) {
   std::vector<double> acum;
   acum.reserve(N);
   for (size_t i = 0; i < N; i++)
-    acum.push_back((C.transpose() * stan::prob::wishart_rng(k, sigma, rng) * C)(0) /
+    acum.push_back((C.transpose() * stan::math::wishart_rng(k, sigma, rng) * C)(0) /
            (C.transpose() * sigma_sym * C)(0));
   
 

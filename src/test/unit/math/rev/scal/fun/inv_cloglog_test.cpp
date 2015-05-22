@@ -8,7 +8,7 @@
 
 TEST(AgradRev,inv_cloglog) {
   using std::exp;
-  using stan::agrad::exp;
+  using stan::math::exp;
   AVAR a = 2.7;
   AVAR f = inv_cloglog(a);
   EXPECT_FLOAT_EQ(1 - std::exp(-std::exp(2.7)),f.val());

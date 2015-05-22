@@ -8,7 +8,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * This function is intended to make starting values, given a

@@ -5,7 +5,7 @@
 #include <stan/math/rev/core/operator_subtraction.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     inline var& var::operator-=(const var& b) {
       vi_ = new subtract_vv_vari(vi_, b.vi_);

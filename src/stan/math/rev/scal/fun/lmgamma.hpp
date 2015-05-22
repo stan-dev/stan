@@ -8,7 +8,7 @@
 #include <valarray>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class lmgamma_dv_vari : public op_dv_vari {
@@ -25,7 +25,7 @@ namespace stan {
       };
     }
 
-    inline var lmgamma(int a, const stan::agrad::var& b) {
+    inline var lmgamma(int a, const stan::math::var& b) {
       return var(new lmgamma_dv_vari(a, b.vi_));
     }
 

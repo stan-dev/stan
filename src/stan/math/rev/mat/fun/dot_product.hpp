@@ -14,7 +14,7 @@
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       template<typename T>
@@ -61,7 +61,7 @@ namespace stan {
         template<typename Derived1, typename Derived2>
         inline static double var_dot(const Eigen::DenseBase<Derived1> &v1,
                                      const Eigen::DenseBase<Derived2> &v2) {
-          using stan::agrad::value_of;
+          using stan::math::value_of;
           using stan::math::value_of;
           Eigen::VectorXd vd1(v1.size()), vd2(v1.size());
           for (int i = 0; i < v1.size(); i++) {

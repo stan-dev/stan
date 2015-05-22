@@ -50,16 +50,16 @@ namespace stan {
     }
 
     // expr_type ctors and methods
-    expr_type::expr_type() 
+    expr_type::expr_type()
       : base_type_(ILL_FORMED_T),
-        num_dims_(0) { 
+        num_dims_(0) {
     }
-    expr_type::expr_type(const base_expr_type base_type) 
+    expr_type::expr_type(const base_expr_type base_type)
       : base_type_(base_type),
         num_dims_(0) {
     }
     expr_type::expr_type(const base_expr_type base_type,
-                         size_t num_dims) 
+                         size_t num_dims)
       : base_type_(base_type),
         num_dims_(num_dims) {
     }
@@ -91,7 +91,7 @@ namespace stan {
              && num_dims_ >= et.num_dims_ );
     }
     bool expr_type::is_primitive() const {
-      return is_primitive_int() 
+      return is_primitive_int()
         || is_primitive_double();
     }
     bool expr_type::is_primitive_int() const {
@@ -158,14 +158,14 @@ namespace stan {
                                           name_sig) {
       user_defined_set_.insert(name_sig);
     }
-    bool 
+    bool
     function_signatures::is_user_defined(const std::pair<std::string,
                                                          function_signature_t>&
                                               name_sig) {
       return user_defined_set_.find(name_sig) != user_defined_set_.end();
     }
     bool
-    function_signatures::is_defined(const std::string& name, 
+    function_signatures::is_defined(const std::string& name,
                                     const function_signature_t& sig) {
       const std::vector<function_signature_t> sigs = sigs_map_[name];
       for (size_t i = 0; i < sigs.size(); ++i)
@@ -305,7 +305,7 @@ namespace stan {
           ++num_promotions;
         } else {
           return -1; // failed match
-        } 
+        }
       }
       return num_promotions;
     }
@@ -314,7 +314,7 @@ namespace stan {
                               function_signature_t& signature) {
 
       std::vector<function_signature_t> signatures = sigs_map_[name];
-      size_t min_promotions = std::numeric_limits<size_t>::max(); 
+      size_t min_promotions = std::numeric_limits<size_t>::max();
       size_t num_matches = 0;
       for (size_t i = 0; i < signatures.size(); ++i) {
         signature = signatures[i];
@@ -330,14 +330,14 @@ namespace stan {
       }
       return num_matches;
     }
-        
+
     expr_type function_signatures::get_result_type(
                                          const std::string& name,
                                          const std::vector<expr_type>& args,
                                          std::ostream& error_msgs) {
       std::vector<function_signature_t> signatures = sigs_map_[name];
-      size_t match_index = 0; 
-      size_t min_promotions = std::numeric_limits<size_t>::max(); 
+      size_t match_index = 0;
+      size_t min_promotions = std::numeric_limits<size_t>::max();
       size_t num_matches = 0;
 
       for (size_t i = 0; i < signatures.size(); ++i) {
@@ -354,7 +354,7 @@ namespace stan {
       }
 
       if (num_matches == 1)
-        return signatures[match_index].first; 
+        return signatures[match_index].first;
 
       // all returns after here are for ill-typed input
 
@@ -362,7 +362,7 @@ namespace stan {
         error_msgs << "no matches for function signature:"
                    << std::endl;
       } else {
-        error_msgs << num_matches << " matches for function signature with " 
+        error_msgs << num_matches << " matches for function signature with "
                    << min_promotions << " integer promotions: "
                    << std::endl;
       }
@@ -389,7 +389,7 @@ namespace stan {
       }
       return expr_type(); // ill-formed dummy
     }
-    function_signatures::function_signatures() { 
+    function_signatures::function_signatures() {
 #include <stan/lang/function_signatures.h>
     }
     std::set<std::string>
@@ -399,7 +399,7 @@ namespace stan {
       using std::string;
       using std::vector;
       set<string> result;
-      for (map<string,vector<function_signature_t> >::const_iterator 
+      for (map<string,vector<function_signature_t> >::const_iterator
              it = sigs_map_.begin();
            it != sigs_map_.end();
            ++it)
@@ -428,62 +428,62 @@ namespace stan {
                                          const std::string& name,
                                          const std::vector<arg_decl>& arg_decls,
                                          const statement& body)
-                                         
+
       : return_type_(return_type),
         name_(name),
         arg_decls_(arg_decls),
-        body_(body) { 
+        body_(body) {
     }
 
     function_decl_defs::function_decl_defs() { }
-    function_decl_defs::function_decl_defs(const std::vector<function_decl_def>& 
+    function_decl_defs::function_decl_defs(const std::vector<function_decl_def>&
                                            decl_defs)
-      : decl_defs_(decl_defs) { 
+      : decl_defs_(decl_defs) {
     }
 
     returns_type_vis::returns_type_vis(const expr_type& return_type,
-                                       std::ostream& error_msgs) 
+                                       std::ostream& error_msgs)
       : return_type_(return_type),
         error_msgs_(error_msgs) {
     }
     bool returns_type_vis::operator()(const nil& st) const {
-      error_msgs_ << "Expecting return, found nil statement." 
+      error_msgs_ << "Expecting return, found nil statement."
                  << std::endl;
       return false;
     }
     bool returns_type_vis::operator()(const assignment& st) const {
-      error_msgs_ << "Expecting return, found assignment statement." 
+      error_msgs_ << "Expecting return, found assignment statement."
                  << std::endl;
       return false;
     }
     bool returns_type_vis::operator()(const sample& st) const {
-      error_msgs_ << "Expecting return, found sampling statement." 
+      error_msgs_ << "Expecting return, found sampling statement."
                  << std::endl;
       return false;
     }
-    bool returns_type_vis::operator()(const 
+    bool returns_type_vis::operator()(const
                                       increment_log_prob_statement& t) const {
-      error_msgs_ << "Expecting return, found increment_log_prob statement." 
+      error_msgs_ << "Expecting return, found increment_log_prob statement."
                  << std::endl;
       return false;
     }
     bool returns_type_vis::operator()(const expression& st) const  {
-      error_msgs_ << "Expecting return, found increment_log_prob statement." 
+      error_msgs_ << "Expecting return, found increment_log_prob statement."
                  << std::endl;
       return false;
     }
     bool returns_type_vis::operator()(const print_statement& st) const  {
-      error_msgs_ << "Expecting return, found print statement." 
+      error_msgs_ << "Expecting return, found print statement."
                  << std::endl;
       return false;
     }
     bool returns_type_vis::operator()(const reject_statement& st) const  {
-      error_msgs_ << "Expecting return, found reject statement." 
+      error_msgs_ << "Expecting return, found reject statement."
                  << std::endl;
       return false;
     }
     bool returns_type_vis::operator()(const no_op_statement& st) const  {
-      error_msgs_ << "Expecting return, found no_op statement." 
+      error_msgs_ << "Expecting return, found no_op statement."
                  << std::endl;
       return false;
     }
@@ -506,7 +506,7 @@ namespace stan {
       // body must end in appropriate return
       return returns_type(return_type_, st.body_, error_msgs_);
     }
-    bool returns_type_vis::operator()(const 
+    bool returns_type_vis::operator()(const
                                       conditional_statement& st) const  {
       // all condition bodies must end in appropriate return
       if (st.bodies_.size() != (st.conditions_.size() + 1)) {
@@ -531,12 +531,12 @@ namespace stan {
     bool returns_type(const expr_type& return_type,
                       const statement& statement,
                       std::ostream& error_msgs) {
-      if (return_type == VOID_T) 
+      if (return_type == VOID_T)
         return true;
       returns_type_vis vis(return_type,error_msgs);
       return boost::apply_visitor(vis,statement.statement_);
     }
-    
+
 
 
     statements::statements() {  }
@@ -580,7 +580,7 @@ namespace stan {
     expression::expression()
       : expr_(nil()) {
     }
-    expression::expression(const expression& e) 
+    expression::expression(const expression& e)
       : expr_(e.expr_) {
     }
     expr_type expression::expression_type() const {
@@ -604,9 +604,9 @@ namespace stan {
 
     int expression::total_dims() const {
       int sum = expression_type().num_dims_;
-      if (expression_type().type() == VECTOR_T) 
+      if (expression_type().type() == VECTOR_T)
         ++sum;
-      if (expression_type().type() == ROW_VECTOR_T) 
+      if (expression_type().type() == ROW_VECTOR_T)
         ++sum;
       if (expression_type().type() == MATRIX_T)
         sum += 2;
@@ -618,12 +618,12 @@ namespace stan {
     printable::printable() : printable_("") { }
     printable::printable(const expression& expr) : printable_(expr) { }
     printable::printable(const std::string& msg) : printable_(msg) { }
-    printable::printable(const printable_t& printable) 
+    printable::printable(const printable_t& printable)
       : printable_(printable) { }
     printable::printable(const printable& printable)
       : printable_(printable.printable_) { }
 
-    contains_var::contains_var(const variable_map& var_map) 
+    contains_var::contains_var(const variable_map& var_map)
       : var_map_(var_map) {
     }
     bool contains_var::operator()(const nil& e) const {
@@ -707,7 +707,7 @@ namespace stan {
       return boost::apply_visitor(vis,e.expr_);
     }
 
-    contains_nonparam_var::contains_nonparam_var(const variable_map& var_map) 
+    contains_nonparam_var::contains_nonparam_var(const variable_map& var_map)
       : var_map_(var_map) {
     }
     bool contains_nonparam_var::operator()(const nil& e) const {
@@ -753,7 +753,7 @@ namespace stan {
       return boost::apply_visitor(*this,e.expr_.expr_);
     }
     bool contains_nonparam_var::operator()(const binary_op& e) const {
-      if (e.op == "||" 
+      if (e.op == "||"
           || e.op == "&&"
           || e.op == "=="
           || e.op == "!="
@@ -790,7 +790,7 @@ namespace stan {
     bool is_nil_op::operator()(const index_op& /* x */) const { return false; }
     bool is_nil_op::operator()(const binary_op& /* x */) const { return false; }
     bool is_nil_op::operator()(const unary_op& /* x */) const { return false; }
-      
+
     // template <typename T>
     // bool is_nil_op::operator()(const T& /* x */) const { return false; }
 
@@ -801,20 +801,20 @@ namespace stan {
 
     variable_dims::variable_dims() { } // req for FUSION_ADAPT
     variable_dims::variable_dims(std::string const& name,
-                                 std::vector<expression> const& dims) 
+                                 std::vector<expression> const& dims)
       : name_(name),
         dims_(dims) {
     }
 
 
     int_literal::int_literal()
-      : type_(INT_T) { 
+      : type_(INT_T) {
     }
-    int_literal::int_literal(int val) 
-      : val_(val), 
-        type_(INT_T) { 
+    int_literal::int_literal(int val)
+      : val_(val),
+        type_(INT_T) {
     }
-    int_literal::int_literal(const int_literal& il) 
+    int_literal::int_literal(const int_literal& il)
       : val_(il.val_),
         type_(il.type_) {
     }
@@ -825,8 +825,8 @@ namespace stan {
     }
 
 
-    double_literal::double_literal() 
-      : type_(DOUBLE_T,0U) { 
+    double_literal::double_literal()
+      : type_(DOUBLE_T,0U) {
     }
     double_literal::double_literal(double val)
       : val_(val),
@@ -839,11 +839,11 @@ namespace stan {
     }
 
 
-    array_literal::array_literal() 
+    array_literal::array_literal()
       : args_(),
         type_(DOUBLE_T,1U) {
     }
-    array_literal::array_literal(const std::vector<expression>& args) 
+    array_literal::array_literal(const std::vector<expression>& args)
       : args_(args),
         type_() { // ill-formed w/o help
     }
@@ -855,7 +855,7 @@ namespace stan {
 
     variable::variable() { }
     variable::variable(std::string name) : name_(name) { }
-    void variable::set_type(const base_expr_type& base_type, 
+    void variable::set_type(const base_expr_type& base_type,
                             size_t num_dims) {
       type_ = expr_type(base_type, num_dims);
     }
@@ -868,7 +868,7 @@ namespace stan {
                          const expression& ts,
                          const expression& theta,
                          const expression& x,
-                         const expression& x_int) 
+                         const expression& x_int)
       : system_function_name_(system_function_name),
         y0_(y0),
         t0_(t0),
@@ -881,7 +881,7 @@ namespace stan {
 
     fun::fun() { }
     fun::fun(std::string const& name,
-             std::vector<expression> const& args) 
+             std::vector<expression> const& args)
       : name_(name),
         args_(args) {
       infer_type();
@@ -913,7 +913,7 @@ namespace stan {
       if (num_index_dims == (num_expr_dims + 2))
         if (expr_base_type == MATRIX_T)
           return expr_type(DOUBLE_T,0U);
-      
+
       // error condition, result expr_type has is_ill_formed() = true
       return expr_type();
     }
@@ -928,7 +928,7 @@ namespace stan {
 
     index_op::index_op() { }
     index_op::index_op(const expression& expr,
-                       const std::vector<std::vector<expression> >& dimss) 
+                       const std::vector<std::vector<expression> >& dimss)
       : expr_(expr),
         dimss_(dimss) {
       infer_type();
@@ -941,8 +941,8 @@ namespace stan {
     binary_op::binary_op(const expression& left,
                          const std::string& op,
                          const expression& right)
-      : op(op), 
-        left(left), 
+      : op(op),
+        left(left),
         right(right),
         type_(promote_primitive(left.expression_type(),
                                   right.expression_type())) {
@@ -951,13 +951,13 @@ namespace stan {
 
     unary_op::unary_op(char op,
                        expression const& subject)
-      : op(op), 
+      : op(op),
         subject(subject),
         type_(promote_primitive(subject.expression_type())) {
     }
 
 
-    range::range() { } 
+    range::range() { }
     range::range(expression const& low,
                  expression const& high)
       : low_(low),
@@ -977,7 +977,7 @@ namespace stan {
         o << "data";
       else if (vo == transformed_data_origin)
         o << "transformed data";
-      else if (vo == parameter_origin) 
+      else if (vo == parameter_origin)
         o << "parameter";
       else if (vo == transformed_parameter_origin)
         o << "transformed parameter";
@@ -997,13 +997,13 @@ namespace stan {
         o << "void function argument '_lp' suffixed";
       else if (vo == void_function_argument_origin_rng)
         o << "void function argument '_rng' suffixed";
-      else 
+      else
         o << "UNKNOWN ORIGIN=" << vo;
     }
 
 
     base_var_decl::base_var_decl() { }
-    base_var_decl::base_var_decl(const base_expr_type& base_type) 
+    base_var_decl::base_var_decl(const base_expr_type& base_type)
       : base_type_(base_type) {
     }
     base_var_decl::base_var_decl(const std::string& name,
@@ -1018,8 +1018,8 @@ namespace stan {
       return map_.find(name) != map_.end();
     }
     base_var_decl variable_map::get(const std::string& name) const {
-      if (!exists(name)) 
-        throw std::invalid_argument("variable does not exist"); 
+      if (!exists(name))
+        throw std::invalid_argument("variable does not exist");
       return map_.find(name)->second.first;
     }
     base_expr_type variable_map::get_base_type(const std::string& name) const {
@@ -1042,54 +1042,54 @@ namespace stan {
       map_.erase(name);
     }
 
-    int_var_decl::int_var_decl() 
-      : base_var_decl(INT_T) 
+    int_var_decl::int_var_decl()
+      : base_var_decl(INT_T)
     { }
 
     int_var_decl::int_var_decl(range const& range,
                                std::string const& name,
-                               std::vector<expression> const& dims) 
+                               std::vector<expression> const& dims)
       : base_var_decl(name,dims,INT_T),
         range_(range)
     { }
-    
 
 
-    double_var_decl::double_var_decl() 
-      : base_var_decl(DOUBLE_T) 
+
+    double_var_decl::double_var_decl()
+      : base_var_decl(DOUBLE_T)
     { }
 
     double_var_decl::double_var_decl(range const& range,
                                      std::string const& name,
                                      std::vector<expression> const& dims)
       : base_var_decl(name,dims,DOUBLE_T),
-        range_(range) 
+        range_(range)
     { }
 
-    unit_vector_var_decl::unit_vector_var_decl() 
-      : base_var_decl(VECTOR_T) 
+    unit_vector_var_decl::unit_vector_var_decl()
+      : base_var_decl(VECTOR_T)
     { }
 
     unit_vector_var_decl::unit_vector_var_decl(expression const& K,
                                        std::string const& name,
                                        std::vector<expression> const& dims)
       : base_var_decl(name,dims,VECTOR_T),
-        K_(K) 
+        K_(K)
     { }
 
-    simplex_var_decl::simplex_var_decl() 
-      : base_var_decl(VECTOR_T) 
+    simplex_var_decl::simplex_var_decl()
+      : base_var_decl(VECTOR_T)
     { }
 
     simplex_var_decl::simplex_var_decl(expression const& K,
                                        std::string const& name,
                                        std::vector<expression> const& dims)
       : base_var_decl(name,dims,VECTOR_T),
-        K_(K) 
+        K_(K)
     { }
 
-    ordered_var_decl::ordered_var_decl() 
-      : base_var_decl(VECTOR_T) 
+    ordered_var_decl::ordered_var_decl()
+      : base_var_decl(VECTOR_T)
     { }
 
     ordered_var_decl::ordered_var_decl(expression const& K,
@@ -1098,9 +1098,9 @@ namespace stan {
         : base_var_decl(name,dims,VECTOR_T),
           K_(K) {
       }
-    
-    positive_ordered_var_decl::positive_ordered_var_decl() 
-      : base_var_decl(VECTOR_T) 
+
+    positive_ordered_var_decl::positive_ordered_var_decl()
+      : base_var_decl(VECTOR_T)
     { }
 
     positive_ordered_var_decl::positive_ordered_var_decl(expression const& K,
@@ -1109,7 +1109,7 @@ namespace stan {
         : base_var_decl(name,dims,VECTOR_T),
           K_(K) {
       }
-    
+
     vector_var_decl::vector_var_decl() : base_var_decl(VECTOR_T) { }
 
     vector_var_decl::vector_var_decl(range const& range,
@@ -1120,7 +1120,7 @@ namespace stan {
           range_(range),
           M_(M) {
     }
-    
+
     row_vector_var_decl::row_vector_var_decl() : base_var_decl(ROW_VECTOR_T) { }
     row_vector_var_decl::row_vector_var_decl(range const& range,
                                         expression const& N,
@@ -1144,8 +1144,8 @@ namespace stan {
     }
 
 
-    cholesky_factor_var_decl::cholesky_factor_var_decl() 
-      : base_var_decl(MATRIX_T) { 
+    cholesky_factor_var_decl::cholesky_factor_var_decl()
+      : base_var_decl(MATRIX_T) {
     }
     cholesky_factor_var_decl::cholesky_factor_var_decl(expression const& M,
                                                        expression const& N,
@@ -1156,8 +1156,8 @@ namespace stan {
         N_(N) {
     }
 
-    cholesky_corr_var_decl::cholesky_corr_var_decl() 
-      : base_var_decl(MATRIX_T) { 
+    cholesky_corr_var_decl::cholesky_corr_var_decl()
+      : base_var_decl(MATRIX_T) {
     }
     cholesky_corr_var_decl::cholesky_corr_var_decl(expression const& K,
                                                    std::string const& name,
@@ -1166,7 +1166,7 @@ namespace stan {
         K_(K) {
     }
 
-    cov_matrix_var_decl::cov_matrix_var_decl() : base_var_decl(MATRIX_T) { 
+    cov_matrix_var_decl::cov_matrix_var_decl() : base_var_decl(MATRIX_T) {
     }
     cov_matrix_var_decl::cov_matrix_var_decl(expression const& K,
                                              std::string const& name,
@@ -1187,9 +1187,9 @@ namespace stan {
 
 
     name_vis::name_vis() { }
-    std::string name_vis::operator()(const nil& /* x */) const { 
+    std::string name_vis::operator()(const nil& /* x */) const {
       return ""; // fail if arises
-    } 
+    }
     std::string name_vis::operator()(const int_var_decl& x) const {
       return x.name_;
     }
@@ -1272,44 +1272,44 @@ namespace stan {
     statement::statement(const no_op_statement& st) : statement_(st) { }
 
 
-    bool is_no_op_statement_vis::operator()(const nil& st) const { 
-      return false; 
+    bool is_no_op_statement_vis::operator()(const nil& st) const {
+      return false;
     }
-    bool is_no_op_statement_vis::operator()(const assignment& st) const { 
-      return false; 
+    bool is_no_op_statement_vis::operator()(const assignment& st) const {
+      return false;
     }
-    bool is_no_op_statement_vis::operator()(const sample& st) const { 
-      return false; 
+    bool is_no_op_statement_vis::operator()(const sample& st) const {
+      return false;
     }
     bool is_no_op_statement_vis::operator()(const increment_log_prob_statement& t) const {
-      return false; 
+      return false;
     }
-    bool is_no_op_statement_vis::operator()(const expression& st) const { 
-      return false; 
+    bool is_no_op_statement_vis::operator()(const expression& st) const {
+      return false;
     }
-    bool is_no_op_statement_vis::operator()(const statements& st) const { 
-      return false; 
+    bool is_no_op_statement_vis::operator()(const statements& st) const {
+      return false;
     }
-    bool is_no_op_statement_vis::operator()(const for_statement& st) const { 
-      return false; 
+    bool is_no_op_statement_vis::operator()(const for_statement& st) const {
+      return false;
     }
-    bool is_no_op_statement_vis::operator()(const conditional_statement& st) const { 
-      return false; 
+    bool is_no_op_statement_vis::operator()(const conditional_statement& st) const {
+      return false;
     }
-    bool is_no_op_statement_vis::operator()(const while_statement& st) const { 
-      return false; 
+    bool is_no_op_statement_vis::operator()(const while_statement& st) const {
+      return false;
     }
     bool is_no_op_statement_vis::operator()(const print_statement& st) const {
-      return false; 
+      return false;
     }
     bool is_no_op_statement_vis::operator()(const reject_statement& st) const {
-      return false; 
+      return false;
     }
-    bool is_no_op_statement_vis::operator()(const no_op_statement& st) const { 
-      return true; 
+    bool is_no_op_statement_vis::operator()(const no_op_statement& st) const {
+      return true;
     }
     bool is_no_op_statement_vis::operator()(const return_statement& st) const {
-      return false; 
+      return false;
     }
 
     bool statement::is_no_op_statement() const {
@@ -1333,10 +1333,10 @@ namespace stan {
         statement_(stmt) {
     }
 
-    while_statement::while_statement() { 
+    while_statement::while_statement() {
     }
     while_statement::while_statement(const expression& condition,
-                                     const statement& body) 
+                                     const statement& body)
       : condition_(condition),
         body_(body) {
     }
@@ -1351,22 +1351,22 @@ namespace stan {
     }
 
     return_statement::return_statement() { }
-    return_statement::return_statement(const expression& expr) 
+    return_statement::return_statement(const expression& expr)
       : return_value_(expr) {
     }
 
     print_statement::print_statement() { }
 
-    print_statement::print_statement(const std::vector<printable>& printables) 
-      : printables_(printables) { 
+    print_statement::print_statement(const std::vector<printable>& printables)
+      : printables_(printables) {
     }
 
     reject_statement::reject_statement() { }
 
-    reject_statement::reject_statement(const std::vector<printable>& printables) 
-      : printables_(printables) { 
+    reject_statement::reject_statement(const std::vector<printable>& printables)
+      : printables_(printables) {
     }
-    
+
     program::program() { }
     program::program(const std::vector<function_decl_def>& function_decl_defs,
                      const std::vector<var_decl>& data_decl,
@@ -1390,17 +1390,17 @@ namespace stan {
     sample::sample() {
       }
     sample::sample(expression& e,
-             distribution& dist) 
+             distribution& dist)
         : expr_(e),
           dist_(dist) {
       }
     bool sample::is_ill_formed() const {
         return expr_.expression_type().is_ill_formed()
           || ( truncation_.has_low()
-               && expr_.expression_type() 
+               && expr_.expression_type()
                   != truncation_.low_.expression_type() )
           || ( truncation_.has_high()
-               && expr_.expression_type() 
+               && expr_.expression_type()
                   != truncation_.high_.expression_type() );
       }
 
@@ -1411,7 +1411,7 @@ namespace stan {
       : var_dims_(var_dims),
         expr_(expr) {
     }
-      
+
     expression& expression::operator+=(const expression& rhs) {
       expr_ = binary_op(expr_, "+", rhs);
       return *this;
@@ -1435,7 +1435,7 @@ namespace stan {
     bool has_rng_suffix(const std::string& s) {
       int n = s.size();
       return n > 4
-        && s[n-1] == 'g' 
+        && s[n-1] == 'g'
         && s[n-2] == 'n'
         && s[n-3] == 'r'
         && s[n-4] == '_';
@@ -1460,7 +1460,7 @@ namespace stan {
         .get_signature_matches(name,arg_types,sig);
       if (matches != 1)
         return false; // reall shouldn't come up;  throw instead?
-      std::pair<std::string, function_signature_t> 
+      std::pair<std::string, function_signature_t>
         name_sig(name, sig);
       return function_signatures::instance().is_user_defined(name_sig);
     }
@@ -1503,7 +1503,7 @@ namespace stan {
     }
 
 
-    bool ends_with(const std::string& suffix, 
+    bool ends_with(const std::string& suffix,
                    const std::string& s) {
       size_t idx = s.rfind(suffix);
       return idx != std::string::npos

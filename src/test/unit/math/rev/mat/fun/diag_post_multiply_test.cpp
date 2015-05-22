@@ -14,7 +14,7 @@
 
 using Eigen::Matrix;
 using Eigen::Dynamic;
-using stan::agrad::var;
+using stan::math::var;
 using stan::math::diag_post_multiply;
 
 TEST(MathMatrix,diagPostMultiply2_vv) {

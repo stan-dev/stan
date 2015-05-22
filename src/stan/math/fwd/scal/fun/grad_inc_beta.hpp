@@ -16,34 +16,34 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     // Gradient of the incomplete beta function beta(a, b, z)
     // with respect to the first two arguments, using the
     // equivalence to a hypergeometric function.
     // See http://dlmf.nist.gov/8.17#ii
     template<typename T>
-    void grad_inc_beta(stan::agrad::fvar<T>& g1,
-                       stan::agrad::fvar<T>& g2,
-                       stan::agrad::fvar<T> a,
-                       stan::agrad::fvar<T> b,
-                       stan::agrad::fvar<T> z) {
-      using stan::agrad::value_of;
+    void grad_inc_beta(stan::math::fvar<T>& g1,
+                       stan::math::fvar<T>& g2,
+                       stan::math::fvar<T> a,
+                       stan::math::fvar<T> b,
+                       stan::math::fvar<T> z) {
       using stan::math::value_of;
-      using stan::agrad::log1m;
+      using stan::math::value_of;
+      using stan::math::log1m;
 
-      stan::agrad::fvar<T> c1 = log(z);
-      stan::agrad::fvar<T> c2 = log1m(z);
-      stan::agrad::fvar<T> c3 = exp(lbeta(a, b)) * inc_beta(a, b, z);
+      stan::math::fvar<T> c1 = log(z);
+      stan::math::fvar<T> c2 = log1m(z);
+      stan::math::fvar<T> c3 = exp(lbeta(a, b)) * inc_beta(a, b, z);
 
-      stan::agrad::fvar<T> C = exp(a * c1 + b * c2) / a;
+      stan::math::fvar<T> C = exp(a * c1 + b * c2) / a;
 
-      stan::agrad::fvar<T> dF1 = 0;
-      stan::agrad::fvar<T> dF2 = 0;
+      stan::math::fvar<T> dF1 = 0;
+      stan::math::fvar<T> dF2 = 0;
 
       if (value_of(value_of(C)))
         stan::math::grad_2F1(dF1, dF2, a + b,
-                             (stan::agrad::fvar<T>)1.0,
+                             (stan::math::fvar<T>)1.0,
                              a + 1, z);
 
       g1 = (c1 - 1.0 / a) * c3 + C * (dF1 + dF2);
