@@ -5,7 +5,7 @@
 #include <stan/math/fwd/core.hpp>
 #include <gtest/gtest.h>
 
-using stan::agrad::fvar;
+using stan::math::fvar;
 
 TEST(AgradFwdMatrixAssign,vector_fvar_double) {
   using stan::math::assign;

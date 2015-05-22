@@ -52,7 +52,7 @@ TEST(ProbDistributionsParetoType2, chiSquareGoodnessFitTest) {
   }
 
   while (count < N) {
-    double a = stan::prob::pareto_type_2_rng(mu, lambda, alpha,rng);
+    double a = stan::math::pareto_type_2_rng(mu, lambda, alpha,rng);
     int i = 0;
     while (i < K-1 && a > loc[i]) 
       ++i;

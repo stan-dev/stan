@@ -4,13 +4,14 @@
 #include <stan/math/prim/mat/meta/is_vector.hpp>
 #include <stan/math/prim/mat/meta/is_vector_like.hpp>
 #include <stan/math/rev/mat/fun/crossprod.hpp>
+#include <stan/math/prim/mat/fun/crossprod.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <stan/math/rev/core.hpp>
 
-void test_crossprod(const stan::agrad::matrix_v& L) {
-  using stan::agrad::matrix_v;
-  using stan::agrad::crossprod;
+void test_crossprod(const stan::math::matrix_v& L) {
+  using stan::math::matrix_v;
+  using stan::math::crossprod;
   matrix_v LLT_eigen = L.transpose() * L;
   matrix_v LLT_stan = crossprod(L);
   EXPECT_EQ(L.rows(),LLT_stan.rows());
@@ -21,7 +22,7 @@ void test_crossprod(const stan::agrad::matrix_v& L) {
 }
 
 TEST(AgradRevMatrix, crossprod) {
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
 
   matrix_v L(3,3);
   L << 1, 0, 0,

@@ -12,7 +12,7 @@
 
 TEST(AgradRevMatrix,elt_multiply_vec_vv) {
   using stan::math::elt_multiply;
-  using stan::agrad::vector_v;
+  using stan::math::vector_v;
 
   vector_v x(2);
   x << 2, 5;
@@ -33,7 +33,7 @@ TEST(AgradRevMatrix,elt_multiply_vec_vv) {
 TEST(AgradRevMatrix,elt_multiply_vec_vd) {
   using stan::math::elt_multiply;
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::math::vector_v;
 
   vector_v x(2);
   x << 2, 5;
@@ -51,7 +51,7 @@ TEST(AgradRevMatrix,elt_multiply_vec_vd) {
 TEST(AgradRevMatrix,elt_multiply_vec_dv) {
   using stan::math::elt_multiply;
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::math::vector_v;
 
   vector_d x(2);
   x << 2, 5;
@@ -69,7 +69,7 @@ TEST(AgradRevMatrix,elt_multiply_vec_dv) {
 
 TEST(AgradRevMatrix,elt_multiply_row_vec_vv) {
   using stan::math::elt_multiply;
-  using stan::agrad::row_vector_v;
+  using stan::math::row_vector_v;
 
   row_vector_v x(2);
   x << 2, 5;
@@ -89,7 +89,7 @@ TEST(AgradRevMatrix,elt_multiply_row_vec_vv) {
 TEST(AgradRevMatrix,elt_multiply_row_vec_vd) {
   using stan::math::elt_multiply;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::math::row_vector_v;
 
   row_vector_v x(2);
   x << 2, 5;
@@ -107,7 +107,7 @@ TEST(AgradRevMatrix,elt_multiply_row_vec_vd) {
 TEST(AgradRevMatrix,elt_multiply_row_vec_dv) {
   using stan::math::elt_multiply;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::math::row_vector_v;
 
   row_vector_d x(2);
   x << 2, 5;
@@ -126,7 +126,7 @@ TEST(AgradRevMatrix,elt_multiply_row_vec_dv) {
 
 TEST(AgradRevMatrix,elt_multiply_matrix_vv) {
   using stan::math::elt_multiply;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
 
   matrix_v x(2,3);
   x << 2, 5, 6, 9, 13, 29;
@@ -147,7 +147,7 @@ TEST(AgradRevMatrix,elt_multiply_matrix_vv) {
 TEST(AgradRevMatrix,elt_multiply_matrix_vd) {
   using stan::math::elt_multiply;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
 
   matrix_v x(2,3);
   x << 2, 5, 6, 9, 13, 29;
@@ -168,7 +168,7 @@ TEST(AgradRevMatrix,elt_multiply_matrix_vd) {
 TEST(AgradRevMatrix,elt_multiply_matrix_dv) {
   using stan::math::elt_multiply;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
 
   matrix_d x(2,3);
   x << 2, 5, 6, 9, 13, 29;

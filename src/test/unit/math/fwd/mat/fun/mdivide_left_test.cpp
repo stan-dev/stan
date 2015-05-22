@@ -11,11 +11,11 @@
 #include <stan/math/fwd/scal/fun/value_of.hpp>
 #include <stan/math/fwd/scal/fun/value_of_rec.hpp>
 
-using stan::agrad::fvar;
+using stan::math::fvar;
 TEST(AgradFwdMatrixMdivideLeft,fd_matrix_matrix) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fd;
-  using stan::agrad::mdivide_left;
+  using stan::math::matrix_fd;
+  using stan::math::mdivide_left;
 
   matrix_fd Av(2,2);
   matrix_d Ad(2,2);
@@ -62,10 +62,10 @@ TEST(AgradFwdMatrixMdivideLeft,fd_matrix_matrix) {
 }
 TEST(AgradFwdMatrixMdivideLeft,fd_matrix_vector) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fd;
-  using stan::agrad::vector_fd;
+  using stan::math::matrix_fd;
+  using stan::math::vector_fd;
   using stan::math::vector_d;
-  using stan::agrad::mdivide_left;
+  using stan::math::mdivide_left;
 
   matrix_fd fv(2,2);
   fv << 1, 2, 3, 4;
@@ -108,10 +108,10 @@ TEST(AgradFwdMatrixMdivideLeft,fd_exceptions) {
   using stan::math::matrix_d;
   using stan::math::vector_d;
   using stan::math::row_vector_d;
-  using stan::agrad::matrix_fd;
-  using stan::agrad::vector_fd;
-  using stan::agrad::row_vector_fd;
-  using stan::agrad::mdivide_left;
+  using stan::math::matrix_fd;
+  using stan::math::vector_fd;
+  using stan::math::row_vector_fd;
+  using stan::math::mdivide_left;
 
   matrix_fd fv1(3,3), fv2(4,4);
   row_vector_fd rvf1(3), rvf2(4);
@@ -147,8 +147,8 @@ TEST(AgradFwdMatrixMdivideLeft,fd_exceptions) {
 }
 TEST(AgradFwdMatrixMdivideLeft,ffd_matrix_matrix) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffd;
-  using stan::agrad::mdivide_left;
+  using stan::math::matrix_ffd;
+  using stan::math::mdivide_left;
 
   matrix_ffd Av(2,2);
   matrix_d Ad(2,2);
@@ -200,10 +200,10 @@ TEST(AgradFwdMatrixMdivideLeft,ffd_matrix_matrix) {
 }
 TEST(AgradFwdMatrixMdivideLeft,ffd_matrix_vector) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffd;
-  using stan::agrad::vector_ffd;
+  using stan::math::matrix_ffd;
+  using stan::math::vector_ffd;
   using stan::math::vector_d;
-  using stan::agrad::mdivide_left;
+  using stan::math::mdivide_left;
 
   fvar<fvar<double> > a,b,c,d,e,f;
   a.val_.val_ = 1.0;
@@ -254,10 +254,10 @@ TEST(AgradFwdMatrixMdivideLeft,ffd_exceptions) {
   using stan::math::matrix_d;
   using stan::math::vector_d;
   using stan::math::row_vector_d;
-  using stan::agrad::matrix_ffd;
-  using stan::agrad::vector_ffd;
-  using stan::agrad::row_vector_ffd;
-  using stan::agrad::mdivide_left;
+  using stan::math::matrix_ffd;
+  using stan::math::vector_ffd;
+  using stan::math::row_vector_ffd;
+  using stan::math::mdivide_left;
 
   matrix_ffd fv1(3,3), fv2(4,4);
   row_vector_ffd rvf1(3), rvf2(4);

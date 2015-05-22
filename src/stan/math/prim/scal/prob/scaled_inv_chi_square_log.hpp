@@ -16,16 +16,15 @@
 #include <stan/math/prim/scal/fun/square.hpp>
 #include <stan/math/prim/scal/meta/VectorView.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/meta/length.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
-
 #include <stan/math/prim/scal/fun/grad_reg_inc_gamma.hpp>
+#include <cmath>
 
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * The log of a scaled inverse chi-squared density for y with the
@@ -50,7 +49,7 @@ namespace stan {
               typename T_y, typename T_dof, typename T_scale>
     typename return_type<T_y, T_dof, T_scale>::type
     scaled_inv_chi_square_log(const T_y& y, const T_dof& nu, const T_scale& s) {
-      static const char* function("stan::prob::scaled_inv_chi_square_log");
+      static const char* function("stan::math::scaled_inv_chi_square_log");
       typedef typename stan::partials_return_type<T_y, T_dof, T_scale>::type
         T_partials_return;
 
@@ -91,6 +90,7 @@ namespace stan {
       using stan::math::lgamma;
       using stan::math::digamma;
       using stan::math::square;
+      using std::log;
 
       VectorBuilder<include_summand<propto, T_dof, T_y, T_scale>::value,
                     T_partials_return, T_dof> half_nu(length(nu));
@@ -132,7 +132,7 @@ namespace stan {
           digamma_half_nu_over_two[i] = digamma(half_nu[i]) * 0.5;
       }
 
-      agrad::OperandsAndPartials<T_y, T_dof, T_scale>
+      OperandsAndPartials<T_y, T_dof, T_scale>
         operands_and_partials(y, nu, s);
       for (size_t n = 0; n < N; n++) {
         const T_partials_return s_dbl = value_of(s_vec[n]);

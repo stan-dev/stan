@@ -8,14 +8,15 @@
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/mat/fun/sum.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/meta/is_constant_struct.hpp>
+#include <cmath>
 #include <vector>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     // Categorical(n|theta)  [0 < n <= N;   0 <= theta[n] <= 1;  SUM theta = 1]
     template <bool propto,
@@ -23,12 +24,13 @@ namespace stan {
     typename boost::math::tools::promote_args<T_prob>::type
     categorical_log(int n,
                     const Eigen::Matrix<T_prob, Eigen::Dynamic, 1>& theta) {
-      static const char* function("stan::prob::categorical_log");
+      static const char* function("stan::math::categorical_log");
 
       using stan::math::check_bounded;
       using stan::math::check_simplex;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
+      using std::log;
 
       int lb = 1;
 
@@ -65,13 +67,14 @@ namespace stan {
     typename boost::math::tools::promote_args<T_prob>::type
     categorical_log(const std::vector<int>& ns,
                     const Eigen::Matrix<T_prob, Eigen::Dynamic, 1>& theta) {
-      static const char* function("stan::prob::categorical_log");
+      static const char* function("stan::math::categorical_log");
 
       using boost::math::tools::promote_args;
       using stan::math::check_bounded;
       using stan::math::check_simplex;
       using stan::math::sum;
       using stan::math::value_of;
+      using std::log;
 
       int lb = 1;
 

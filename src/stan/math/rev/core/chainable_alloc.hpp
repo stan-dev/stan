@@ -5,7 +5,7 @@
 #include <stdexcept>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
 
     /**

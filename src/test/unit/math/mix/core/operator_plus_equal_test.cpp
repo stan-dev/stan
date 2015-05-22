@@ -4,8 +4,8 @@
 #include <stan/math/rev/core.hpp>
 
 TEST(AgradMixOperatorPlusEqual, FvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> x(0.5,1.3);
   x += 0.3;
@@ -18,8 +18,8 @@ TEST(AgradMixOperatorPlusEqual, FvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(1.0, g[0]);
 }
 TEST(AgradMixOperatorPlusEqual, FvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> x(0.5,1.3);
   x += 0.3;
@@ -30,8 +30,8 @@ TEST(AgradMixOperatorPlusEqual, FvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(0, g[0]);
 }
 TEST(AgradMixOperatorPlusEqual, FvarFvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > x;
   x.val_.val_ = 0.5;
@@ -49,8 +49,8 @@ TEST(AgradMixOperatorPlusEqual, FvarFvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(1.0, g[0]);
 }
 TEST(AgradMixOperatorPlusEqual, FvarFvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > x;
   x.val_.val_ = 0.5;
@@ -64,8 +64,8 @@ TEST(AgradMixOperatorPlusEqual, FvarFvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(0, g[0]);
 }
 TEST(AgradMixOperatorPlusEqual, FvarFvarVar_3rdDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > x;
   x.val_.val_ = 0.5;
@@ -81,8 +81,8 @@ TEST(AgradMixOperatorPlusEqual, FvarFvarVar_3rdDeriv) {
 }
 
 TEST(AgradMixOperatorPlusEqual, plus_eq_nan) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   double nan = std::numeric_limits<double>::quiet_NaN();
   double a = 3.0;
   fvar<var> nan_fv = std::numeric_limits<double>::quiet_NaN();

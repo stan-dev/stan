@@ -19,7 +19,7 @@ namespace boost {
      */
     template <>
     inline
-    bool isnormal(const stan::agrad::var& v) {
+    bool isnormal(const stan::math::var& v) {
       return (boost::math::isnormal)(v.val());
     }
 

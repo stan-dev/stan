@@ -13,7 +13,7 @@ void fill(const std::vector<double>& contents,
 }
 
 TEST(AgradMatrix,value_of_rec) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::value_of_rec;
   using std::vector;
 

@@ -6,8 +6,8 @@
 #include <gtest/gtest.h>
 
 TEST(AgradFwd,primitiveValueRevNested) {
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::math::var;
+  using stan::math::fvar;
   using stan::math::primitive_value;
 
   fvar<var> a = 5.2;
@@ -19,8 +19,8 @@ TEST(AgradFwd,primitiveValueRevNested) {
 }
 
 TEST(AgradFwd,primitiveValueNanRevNested) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::primitive_value;
   double nan = std::numeric_limits<double>::quiet_NaN();
 

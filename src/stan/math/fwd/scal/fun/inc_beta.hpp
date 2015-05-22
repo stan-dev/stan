@@ -14,7 +14,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     template<typename T>
     inline fvar<T> inc_beta(const fvar<T>& a,
@@ -24,9 +24,9 @@ namespace stan {
       using stan::math::grad_reg_inc_beta;
       using stan::math::inc_beta;
       using stan::math::lbeta;
-      using stan::agrad::digamma;
-      using stan::agrad::lbeta;
-      using stan::agrad::pow;
+      using stan::math::digamma;
+      using stan::math::lbeta;
+      using stan::math::pow;
       using std::exp;
       using std::pow;
 

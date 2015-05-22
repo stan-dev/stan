@@ -8,7 +8,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * Return the vector of unconstrained scalars that transform to
@@ -32,7 +32,7 @@ namespace stan {
 
       typedef typename index_type<Matrix<T, Dynamic, 1> >::type size_type;
 
-      stan::math::check_positive_ordered("stan::prob::positive_ordered_free",
+      stan::math::check_positive_ordered("stan::math::positive_ordered_free",
                                                    "Positive ordered variable",
                                                    y);
 

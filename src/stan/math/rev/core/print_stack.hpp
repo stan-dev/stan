@@ -8,7 +8,7 @@
 #include <ostream>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Prints the auto-dif variable stack. This function

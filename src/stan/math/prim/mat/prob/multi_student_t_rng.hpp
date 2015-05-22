@@ -14,7 +14,7 @@
 #include <stan/math/prim/mat/fun/dot_product.hpp>
 #include <stan/math/prim/mat/fun/subtract.hpp>
 #include <stan/math/prim/scal/fun/log1p.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/mat/prob/multi_normal_rng.hpp>
 #include <stan/math/prim/scal/prob/inv_gamma_rng.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
@@ -22,7 +22,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
     using Eigen::Dynamic;
 
     template <class RNG>
@@ -31,7 +31,7 @@ namespace stan {
                         const Eigen::Matrix<double, Dynamic, 1>& mu,
                         const Eigen::Matrix<double, Dynamic, Dynamic>& s,
                         RNG& rng) {
-      static const char* function("stan::prob::multi_student_t_rng");
+      static const char* function("stan::math::multi_student_t_rng");
 
       using stan::math::check_finite;
       using stan::math::check_not_nan;
@@ -46,8 +46,8 @@ namespace stan {
       Eigen::VectorXd z(s.cols());
       z.setZero();
 
-      double w = stan::prob::inv_gamma_rng(nu / 2, nu / 2, rng);
-      return mu + std::sqrt(w) * stan::prob::multi_normal_rng(z, s, rng);
+      double w = stan::math::inv_gamma_rng(nu / 2, nu / 2, rng);
+      return mu + std::sqrt(w) * stan::math::multi_normal_rng(z, s, rng);
     }
   }
 }

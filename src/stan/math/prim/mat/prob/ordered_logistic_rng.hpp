@@ -12,12 +12,12 @@
 #include <stan/math/prim/scal/err/check_less_or_equal.hpp>
 #include <stan/math/prim/scal/err/check_nonnegative.hpp>
 #include <stan/math/prim/scal/err/check_positive.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/mat/prob/categorical_rng.hpp>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <class RNG>
     inline int
@@ -27,7 +27,7 @@ namespace stan {
       using boost::variate_generator;
       using stan::math::inv_logit;
 
-      static const char* function("stan::prob::ordered_logistic");
+      static const char* function("stan::math::ordered_logistic");
 
       using stan::math::check_finite;
       using stan::math::check_positive;
@@ -51,7 +51,7 @@ namespace stan {
         cut(j) = inv_logit(eta - c(j - 1)) - inv_logit(eta - c(j));
       cut(c.rows()) = inv_logit(eta - c(c.rows() - 1));
 
-      return stan::prob::categorical_rng(cut, rng);
+      return stan::math::categorical_rng(cut, rng);
     }
   }
 }

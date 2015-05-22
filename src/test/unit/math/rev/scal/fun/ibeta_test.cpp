@@ -7,9 +7,9 @@
 #include <stan/math/prim/scal/meta/return_type.hpp>
 
 TEST(AgradRev,ibeta_vvv) {
-  using stan::agrad::var;
+  using stan::math::var;
   using stan::math::ibeta;
-  using stan::agrad::ibeta;
+  using stan::math::ibeta;
   
   using boost::math::ibeta_derivative;
 
@@ -38,9 +38,9 @@ TEST(AgradRev,ibeta_vvv) {
   EXPECT_FLOAT_EQ(ibeta_derivative(a.val(), b.val(), c.val()),grad_f[2]);
 }
 TEST(AgradRev,ibeta_vvd) {
-  using stan::agrad::var;
+  using stan::math::var;
   using stan::math::ibeta;
-  using stan::agrad::ibeta;
+  using stan::math::ibeta;
   
   using boost::math::ibeta_derivative;
 
@@ -67,9 +67,9 @@ TEST(AgradRev,ibeta_vvd) {
   EXPECT_FLOAT_EQ(0.02507405,grad_f[1]);
 }
 TEST(AgradRev,ibeta_vdv) {
-  using stan::agrad::var;
+  using stan::math::var;
   using stan::math::ibeta;
-  using stan::agrad::ibeta;
+  using stan::math::ibeta;
   
   using boost::math::ibeta_derivative;
 
@@ -96,9 +96,9 @@ TEST(AgradRev,ibeta_vdv) {
   EXPECT_FLOAT_EQ(ibeta_derivative(a.val(), b, c.val()),grad_f[1]);
 }
 TEST(AgradRev,ibeta_vdd) {
-  using stan::agrad::var;
+  using stan::math::var;
   using stan::math::ibeta;
-  using stan::agrad::ibeta;
+  using stan::math::ibeta;
   
   using boost::math::ibeta_derivative;
 
@@ -123,9 +123,9 @@ TEST(AgradRev,ibeta_vdd) {
   EXPECT_FLOAT_EQ(-0.03737671,grad_f[0]);
 }
 TEST(AgradRev,ibeta_dvv) {
-  using stan::agrad::var;
+  using stan::math::var;
   using stan::math::ibeta;
-  using stan::agrad::ibeta;
+  using stan::math::ibeta;
   
   using boost::math::ibeta_derivative;
 
@@ -152,9 +152,9 @@ TEST(AgradRev,ibeta_dvv) {
   EXPECT_FLOAT_EQ(ibeta_derivative(a, b.val(), c.val()),grad_f[1]);
 }
 TEST(AgradRev,ibeta_dvd) {
-  using stan::agrad::var;
+  using stan::math::var;
   using stan::math::ibeta;
-  using stan::agrad::ibeta;
+  using stan::math::ibeta;
   
   using boost::math::ibeta_derivative;
 
@@ -179,9 +179,9 @@ TEST(AgradRev,ibeta_dvd) {
   EXPECT_FLOAT_EQ(0.02507405,grad_f[0]);
 }
 TEST(AgradRev,ibeta_ddv) {
-  using stan::agrad::var;
+  using stan::math::var;
   using stan::math::ibeta;
-  using stan::agrad::ibeta;
+  using stan::math::ibeta;
   
   using boost::math::ibeta_derivative;
 

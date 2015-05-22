@@ -6,7 +6,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::math::var;
 
 class AgradDistributionsScaledInvChiSquare : public AgradDistributionTest {
 public:
@@ -61,7 +61,7 @@ public:
   typename stan::return_type<T_y, T_dof, T_scale>::type 
   log_prob(const T_y& y, const T_dof& nu, const T_scale& s,
            const T3&, const T4&, const T5&) {
-    return stan::prob::scaled_inv_chi_square_log(y, nu, s);
+    return stan::math::scaled_inv_chi_square_log(y, nu, s);
   }
 
   template <bool propto, 
@@ -70,7 +70,7 @@ public:
   typename stan::return_type<T_y, T_dof, T_scale>::type 
   log_prob(const T_y& y, const T_dof& nu, const T_scale& s,
            const T3&, const T4&, const T5&) {
-    return stan::prob::scaled_inv_chi_square_log<propto>(y, nu, s);
+    return stan::math::scaled_inv_chi_square_log<propto>(y, nu, s);
   }
   
   
@@ -84,7 +84,7 @@ public:
     using stan::math::square;
 
     if (y <= 0)
-      return stan::prob::LOG_ZERO;
+      return stan::math::LOG_ZERO;
     
     return multiply_log(0.5*nu,0.5*nu) - lgamma(0.5*nu) + nu * log(s) 
       - multiply_log(nu*0.5+1.0, y) - nu * 0.5 * square(s) / y;

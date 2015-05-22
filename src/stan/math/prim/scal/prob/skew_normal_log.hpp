@@ -15,17 +15,18 @@
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
 #include <stan/math/prim/scal/meta/VectorView.hpp>
+#include <cmath>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <bool propto,
               typename T_y, typename T_loc, typename T_scale, typename T_shape>
     typename return_type<T_y, T_loc, T_scale, T_shape>::type
     skew_normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma,
                     const T_shape& alpha) {
-      static const char* function("stan::prob::skew_normal_log");
+      static const char* function("stan::math::skew_normal_log");
       typedef typename stan::partials_return_type<T_y, T_loc,
                                                   T_scale, T_shape>::type
         T_partials_return;
@@ -37,7 +38,8 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
-      using stan::prob::include_summand;
+      using stan::math::include_summand;
+      using std::exp;
 
       // check if any vectors are zero length
       if (!(stan::length(y)
@@ -65,11 +67,12 @@ namespace stan {
         return 0.0;
 
       // set up template expressions wrapping scalars into vector views
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale, T_shape>
+      OperandsAndPartials<T_y, T_loc, T_scale, T_shape>
         operands_and_partials(y, mu, sigma, alpha);
 
       using boost::math::erfc;
       using boost::math::erf;
+      using std::log;
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_loc> mu_vec(mu);

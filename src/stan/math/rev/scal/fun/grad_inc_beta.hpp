@@ -17,32 +17,32 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     // Gradient of the incomplete beta function beta(a, b, z)
     // with respect to the first two arguments, using the
     // equivalence to a hypergeometric function.
     // See http://dlmf.nist.gov/8.17#ii
-    void grad_inc_beta(stan::agrad::var& g1,
-                       stan::agrad::var& g2,
-                       stan::agrad::var a,
-                       stan::agrad::var b,
-                       stan::agrad::var z) {
-      using stan::agrad::value_of;
+    void grad_inc_beta(stan::math::var& g1,
+                       stan::math::var& g2,
+                       stan::math::var a,
+                       stan::math::var b,
+                       stan::math::var z) {
+      using stan::math::value_of;
       using stan::math::value_of;
 
-      stan::agrad::var c1 = stan::agrad::log(z);
-      stan::agrad::var c2 = stan::agrad::log1m(z);
-      stan::agrad::var c3 = stan::agrad::exp(stan::math::lbeta(a, b))
-        * stan::agrad::inc_beta(a, b, z);
+      stan::math::var c1 = stan::math::log(z);
+      stan::math::var c2 = stan::math::log1m(z);
+      stan::math::var c3 = stan::math::exp(stan::math::lbeta(a, b))
+        * stan::math::inc_beta(a, b, z);
 
-      stan::agrad::var C = exp(a * c1 + b * c2) / a;
+      stan::math::var C = exp(a * c1 + b * c2) / a;
 
-      stan::agrad::var dF1 = 0;
-      stan::agrad::var dF2 = 0;
+      stan::math::var dF1 = 0;
+      stan::math::var dF2 = 0;
 
       if (value_of(value_of(C))) stan::math::grad_2F1(dF1, dF2, a + b,
-                                                    (stan::agrad::var)1.0,
+                                                    (stan::math::var)1.0,
                                                     a + 1, z);
 
 

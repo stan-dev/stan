@@ -5,7 +5,7 @@
 #include <stan/math/fwd/scal/fun/exp.hpp>
 
 TEST(AgradFwdErfc,Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using std::exp;
   using std::sqrt;
   using boost::math::erfc;
@@ -24,7 +24,7 @@ TEST(AgradFwdErfc,Fvar) {
 }
 
 TEST(AgradFwdErfc,FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using std::exp;
   using std::sqrt;
   using boost::math::erfc;

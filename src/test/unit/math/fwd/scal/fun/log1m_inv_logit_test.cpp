@@ -7,7 +7,7 @@
 #include <stan/math/fwd/scal/fun/log1p.hpp>
 
 TEST(AgradFwdLog1mInvLogit,Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::log1m_inv_logit;
   using std::exp;
 
@@ -29,7 +29,7 @@ TEST(AgradFwdLog1mInvLogit,Fvar) {
 }
 
 TEST(AgradFwdLog1mInvLogit,FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::log1m_inv_logit;
   using std::exp;
 

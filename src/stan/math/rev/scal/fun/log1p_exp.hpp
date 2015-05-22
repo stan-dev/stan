@@ -6,7 +6,7 @@
 #include <stan/math/rev/scal/fun/calculate_chain.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class log1p_exp_v_vari : public op_v_vari {
@@ -25,7 +25,7 @@ namespace stan {
      * Return the log of 1 plus the exponential of the specified
      * variable.
      */
-    inline var log1p_exp(const stan::agrad::var& a) {
+    inline var log1p_exp(const stan::math::var& a) {
       return var(new log1p_exp_v_vari(a.vi_));
     }
 

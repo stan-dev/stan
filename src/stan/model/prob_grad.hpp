@@ -32,7 +32,7 @@ namespace stan {
       prob_grad(size_t num_params_r,
                 std::vector<std::pair<int,int> >& param_ranges_i)
         : num_params_r__(num_params_r),
-          param_ranges_i__(param_ranges_i) { 
+          param_ranges_i__(param_ranges_i) {
       }
 
       virtual ~prob_grad() { }

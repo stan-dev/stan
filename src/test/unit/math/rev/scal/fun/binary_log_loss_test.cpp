@@ -34,7 +34,7 @@ TEST(AgradRev,binary_log_loss) {
   y = 0;
   y_hat = 0.0;
   x = createAVEC(y_hat);
-  f = stan::agrad::binary_log_loss(y, y_hat);
+  f = stan::math::binary_log_loss(y, y_hat);
   f.grad(x, grad_f);
   EXPECT_FLOAT_EQ(0.0, f.val());
   EXPECT_FLOAT_EQ(deriv(0, 0.0), grad_f[0]);
@@ -42,7 +42,7 @@ TEST(AgradRev,binary_log_loss) {
   y = 1;
   y_hat = 1.0;
   x = createAVEC(y_hat);
-  f = stan::agrad::binary_log_loss(y, y_hat);
+  f = stan::math::binary_log_loss(y, y_hat);
   f.grad(x, grad_f);
   EXPECT_FLOAT_EQ(0.0, f.val());
   EXPECT_FLOAT_EQ(deriv(1, 1.0), grad_f[0]);
@@ -50,7 +50,7 @@ TEST(AgradRev,binary_log_loss) {
   y = 0;
   y_hat = 0.5;
   x = createAVEC(y_hat);
-  f = stan::agrad::binary_log_loss(y, y_hat);
+  f = stan::math::binary_log_loss(y, y_hat);
   f.grad(x, grad_f);
   EXPECT_FLOAT_EQ(-std::log(0.5), f.val());
   EXPECT_FLOAT_EQ(deriv(0, 0.5), grad_f[0]);
@@ -59,7 +59,7 @@ TEST(AgradRev,binary_log_loss) {
   y = 1;
   y_hat = 0.5;
   x = createAVEC(y_hat);
-  f = stan::agrad::binary_log_loss(y, y_hat);
+  f = stan::math::binary_log_loss(y, y_hat);
   f.grad(x, grad_f);
   EXPECT_FLOAT_EQ(-std::log(0.5), f.val());
   EXPECT_FLOAT_EQ(deriv(1, 0.5), grad_f[0]);
@@ -68,7 +68,7 @@ TEST(AgradRev,binary_log_loss) {
   y = 0;
   y_hat = 0.25;
   x = createAVEC(y_hat);
-  f = stan::agrad::binary_log_loss(y, y_hat);
+  f = stan::math::binary_log_loss(y, y_hat);
   f.grad(x, grad_f);
   EXPECT_FLOAT_EQ(-std::log(0.75), f.val());
   EXPECT_FLOAT_EQ(deriv(0, 0.25), grad_f[0]);
@@ -77,7 +77,7 @@ TEST(AgradRev,binary_log_loss) {
   y = 1;
   y_hat = 0.75;
   x = createAVEC(y_hat);
-  f = stan::agrad::binary_log_loss(y, y_hat);
+  f = stan::math::binary_log_loss(y, y_hat);
   f.grad(x, grad_f);
   EXPECT_FLOAT_EQ(-std::log(0.75), f.val());
   EXPECT_FLOAT_EQ(deriv(1, 0.75), grad_f[0]);

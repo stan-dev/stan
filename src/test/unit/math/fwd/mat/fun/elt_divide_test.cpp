@@ -6,7 +6,7 @@
 
 TEST(AgradFwdMatrixEltDivide,fd_vec_vv) {
   using stan::math::elt_divide;
-  using stan::agrad::vector_fd;
+  using stan::math::vector_fd;
 
   vector_fd x(2), y(2);
   x << 2, 5;
@@ -26,7 +26,7 @@ TEST(AgradFwdMatrixEltDivide,fd_vec_vv) {
 TEST(AgradFwdMatrixEltDivide,fd_vec_vd) {
   using stan::math::elt_divide;
   using stan::math::vector_d;
-  using stan::agrad::vector_fd;
+  using stan::math::vector_fd;
 
   vector_fd x(2);
   x << 2, 5;
@@ -44,7 +44,7 @@ TEST(AgradFwdMatrixEltDivide,fd_vec_vd) {
 TEST(AgradFwdMatrixEltDivide,fd_vec_dv) {
   using stan::math::elt_divide;
   using stan::math::vector_d;
-  using stan::agrad::vector_fd;
+  using stan::math::vector_fd;
 
   vector_d x(2);
   x << 2, 5;
@@ -62,7 +62,7 @@ TEST(AgradFwdMatrixEltDivide,fd_vec_dv) {
 
 TEST(AgradFwdMatrixEltDivide,fd_rowvec_vv) {
   using stan::math::elt_divide;
-  using stan::agrad::row_vector_fd;
+  using stan::math::row_vector_fd;
 
   row_vector_fd x(2),y(2);
   x << 2, 5;
@@ -81,7 +81,7 @@ TEST(AgradFwdMatrixEltDivide,fd_rowvec_vv) {
 TEST(AgradFwdMatrixEltDivide,fd_rowvec_vd) {
   using stan::math::elt_divide;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fd;
+  using stan::math::row_vector_fd;
 
   row_vector_fd x(2);
   x << 2, 5;
@@ -99,7 +99,7 @@ TEST(AgradFwdMatrixEltDivide,fd_rowvec_vd) {
 TEST(AgradFwdMatrixEltDivide,fd_rowvec_dv) {
   using stan::math::elt_divide;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fd;
+  using stan::math::row_vector_fd;
 
   row_vector_d x(2);
   x << 2, 5;
@@ -117,7 +117,7 @@ TEST(AgradFwdMatrixEltDivide,fd_rowvec_dv) {
 
 TEST(AgradFwdMatrixEltDivide,fd_mat_vv) {
   using stan::math::elt_divide;
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
 
   matrix_fd x(2,3),y(2,3);
   x << 2, 5, 7, 13, 29, 112;
@@ -146,7 +146,7 @@ TEST(AgradFwdMatrixEltDivide,fd_mat_vv) {
 TEST(AgradFwdMatrixEltDivide,fd_mat_vd) {
   using stan::math::elt_divide;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
   
   matrix_fd x(2,3);
   x << 2, 5, 7, 13, 29, 112;
@@ -170,7 +170,7 @@ TEST(AgradFwdMatrixEltDivide,fd_mat_vd) {
 TEST(AgradFwdMatrixEltDivide,fd_mat_dv) {
   using stan::math::elt_divide;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
 
   matrix_d x(2,3);
   x << 2, 5, 7, 13, 29, 112;
@@ -193,8 +193,8 @@ TEST(AgradFwdMatrixEltDivide,fd_mat_dv) {
 }
 TEST(AgradFwdMatrixEltDivide,ffd_vec_vv) {
   using stan::math::elt_divide;
-  using stan::agrad::vector_ffd;
-  using stan::agrad::fvar;
+  using stan::math::vector_ffd;
+  using stan::math::fvar;
 
   fvar<fvar<double> > a,b,c,d;
   a.val_.val_ = 2.0;
@@ -221,8 +221,8 @@ TEST(AgradFwdMatrixEltDivide,ffd_vec_vv) {
 TEST(AgradFwdMatrixEltDivide,ffd_vec_vd) {
   using stan::math::elt_divide;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffd;
-  using stan::agrad::fvar;
+  using stan::math::vector_ffd;
+  using stan::math::fvar;
 
   fvar<fvar<double> > a,b;
   a.val_.val_ = 2.0;
@@ -244,8 +244,8 @@ TEST(AgradFwdMatrixEltDivide,ffd_vec_vd) {
 TEST(AgradFwdMatrixEltDivide,ffd_vec_dv) {
   using stan::math::elt_divide;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffd;  
-  using stan::agrad::fvar;
+  using stan::math::vector_ffd;  
+  using stan::math::fvar;
 
   fvar<fvar<double> > c,d;
   c.val_.val_ = 10.0;
@@ -266,8 +266,8 @@ TEST(AgradFwdMatrixEltDivide,ffd_vec_dv) {
 }
 TEST(AgradFwdMatrixEltDivide,ffd_rowvec_vv) {
   using stan::math::elt_divide;
-  using stan::agrad::row_vector_ffd;
-  using stan::agrad::fvar;
+  using stan::math::row_vector_ffd;
+  using stan::math::fvar;
 
   fvar<fvar<double> > a,b,c,d;
   a.val_.val_ = 2.0;
@@ -292,8 +292,8 @@ TEST(AgradFwdMatrixEltDivide,ffd_rowvec_vv) {
 TEST(AgradFwdMatrixEltDivide,ffd_rowvec_vd) {
   using stan::math::elt_divide;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffd;
-  using stan::agrad::fvar;
+  using stan::math::row_vector_ffd;
+  using stan::math::fvar;
 
   fvar<fvar<double> > a;
   fvar<fvar<double> > b;
@@ -316,8 +316,8 @@ TEST(AgradFwdMatrixEltDivide,ffd_rowvec_vd) {
 TEST(AgradFwdMatrixEltDivide,ffd_rowvec_dv) {
   using stan::math::elt_divide;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffd;
-  using stan::agrad::fvar;
+  using stan::math::row_vector_ffd;
+  using stan::math::fvar;
 
   fvar<fvar<double> > c,d;
   c.val_.val_ = 10.0;
@@ -338,8 +338,8 @@ TEST(AgradFwdMatrixEltDivide,ffd_rowvec_dv) {
 
 TEST(AgradFwdMatrixEltDivide,ffd_mat_vv) {
   using stan::math::elt_divide;
-  using stan::agrad::matrix_ffd;
-  using stan::agrad::fvar;
+  using stan::math::matrix_ffd;
+  using stan::math::fvar;
 
   fvar<fvar<double> > a,b,c,d,e,f,g,h,i,j,k,l;
   a.val_.val_ = 2.0;
@@ -382,8 +382,8 @@ TEST(AgradFwdMatrixEltDivide,ffd_mat_vv) {
 TEST(AgradFwdMatrixEltDivide,ffd_mat_vd) {
   using stan::math::elt_divide;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffd;
-  using stan::agrad::fvar;
+  using stan::math::matrix_ffd;
+  using stan::math::fvar;
 
   fvar<fvar<double> > a,b,c,d,e,f;
   a.val_.val_ = 2.0;
@@ -415,8 +415,8 @@ TEST(AgradFwdMatrixEltDivide,ffd_mat_vd) {
 TEST(AgradFwdMatrixEltDivide,ffd_mat_dv) {
   using stan::math::elt_divide;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffd;
-  using stan::agrad::fvar;
+  using stan::math::matrix_ffd;
+  using stan::math::fvar;
 
   fvar<fvar<double> > g,h,i,j,k,l;
   g.val_.val_ = 10.0;

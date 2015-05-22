@@ -11,7 +11,7 @@
 #include <stan/math/rev/core.hpp>
 
 using stan::math::check_greater;
-using stan::agrad::var;
+using stan::math::var;
 
 TEST(AgradRevErrorHandlingScalar,CheckGreater) {
   const char* function = "check_greater";
@@ -44,7 +44,7 @@ TEST(AgradRevErrorHandlingScalar,CheckGreater) {
   lb = std::numeric_limits<double>::infinity();
   EXPECT_THROW(check_greater(function, "x", x, lb),std::domain_error)
     << "check_greater should throw an exception with x == Inf and lb == Inf";
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 TEST(AgradRevErrorHandlingScalar,CheckGreaterMatrix) {
@@ -154,33 +154,33 @@ TEST(AgradRevErrorHandlingScalar,CheckGreaterMatrix) {
   EXPECT_THROW(check_greater(function, "x", x, low_vec), 
                std::domain_error) 
     << "check_greater: double, matrix<3,1>";
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 TEST(AgradRevErrorHandlingScalar, CheckGreaterVarCheckUnivariate) {
-  using stan::agrad::var;
+  using stan::math::var;
   using stan::math::check_greater;
 
   const char* function = "check_greater";
   var a(5.0);
 
-  size_t stack_size = stan::agrad::ChainableStack::var_stack_.size();
+  size_t stack_size = stan::math::ChainableStack::var_stack_.size();
 
   EXPECT_EQ(1U,stack_size);
   EXPECT_TRUE(check_greater(function,"a",a,2.0));
 
-  size_t stack_size_after_call = stan::agrad::ChainableStack::var_stack_.size();
+  size_t stack_size_after_call = stan::math::ChainableStack::var_stack_.size();
   EXPECT_EQ(1U,stack_size_after_call);
 
   EXPECT_THROW(check_greater(function,"a",a,10.0),std::domain_error);
-  stack_size_after_call = stan::agrad::ChainableStack::var_stack_.size();
+  stack_size_after_call = stan::math::ChainableStack::var_stack_.size();
   EXPECT_EQ(1U,stack_size_after_call);
 
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 TEST(AgradRevErrorHandlingScalar, CheckGreaterVarCheckVectorized) {
-  using stan::agrad::var;
+  using stan::math::var;
   using std::vector;
   using stan::math::check_greater;
 
@@ -191,17 +191,17 @@ TEST(AgradRevErrorHandlingScalar, CheckGreaterVarCheckVectorized) {
   for (int i = 0; i < N; ++i)
    a.push_back(var(i));
 
-  size_t stack_size = stan::agrad::ChainableStack::var_stack_.size();
+  size_t stack_size = stan::math::ChainableStack::var_stack_.size();
 
   EXPECT_EQ(5U,stack_size);
   EXPECT_TRUE(check_greater(function,"a",a,-1.0));
 
-  size_t stack_size_after_call = stan::agrad::ChainableStack::var_stack_.size();
+  size_t stack_size_after_call = stan::math::ChainableStack::var_stack_.size();
   EXPECT_EQ(5U,stack_size_after_call);
 
   EXPECT_THROW(check_greater(function,"a",a,2.0),std::domain_error);
-  stack_size_after_call = stan::agrad::ChainableStack::var_stack_.size();
+  stack_size_after_call = stan::math::ChainableStack::var_stack_.size();
   EXPECT_EQ(5U,stack_size_after_call);
 
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }

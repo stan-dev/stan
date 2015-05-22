@@ -28,7 +28,7 @@ namespace stan {
       TERM_MAXIT = 40,
       TERM_LSFAIL = -1
     } TerminationCondition;
-    
+
     template<typename Scalar = double>
     class ConvergenceOptions {
     public:
@@ -74,7 +74,7 @@ namespace stan {
     public:
       typedef Eigen::Matrix<Scalar,DimAtCompile,1> VectorT;
       typedef Eigen::Matrix<Scalar,DimAtCompile,DimAtCompile> HessianT;
-      
+
     protected:
       FunctorType &_func;
       VectorT _gk, _gk_1, _xk_1, _xk, _pk, _pk_1;
@@ -83,19 +83,19 @@ namespace stan {
       size_t _itNum;
       std::string _note;
       QNUpdateType _qn;
-      
+
     public:
       LSOptions<Scalar> _ls_opts;
       ConvergenceOptions<Scalar> _conv_opts;
 
       QNUpdateType &get_qnupdate() { return _qn; }
       const QNUpdateType &get_qnupdate() const { return _qn; }
-      
+
       const Scalar &curr_f() const { return _fk; }
       const VectorT &curr_x() const { return _xk; }
       const VectorT &curr_g() const { return _gk; }
       const VectorT &curr_p() const { return _pk; }
-      
+
       const Scalar &prev_f() const { return _fk_1; }
       const VectorT &prev_x() const { return _xk_1; }
       const VectorT &prev_g() const { return _gk_1; }
@@ -105,7 +105,7 @@ namespace stan {
       inline Scalar rel_grad_norm() const {
         return -_pk.dot(_gk) / std::max(std::fabs(_fk),_conv_opts.fScale);
       }
-      inline Scalar rel_obj_decrease() const { 
+      inline Scalar rel_obj_decrease() const {
         return std::fabs(_fk_1 - _fk) / std::max(std::fabs(_fk_1),
                                                  std::max(std::fabs(_fk),
                                                           _conv_opts.fScale));
@@ -114,9 +114,9 @@ namespace stan {
       const Scalar &alpha0() const { return _alpha0; }
       const Scalar &alpha() const { return _alpha; }
       const size_t iter_num() const { return _itNum; }
-      
+
       const std::string &note() const { return _note; }
-      
+
       std::string get_code_string(int retCode) {
         switch(retCode) {
           case TERM_SUCCESS:
@@ -139,9 +139,9 @@ namespace stan {
             return std::string("Unknown termination code");
         }
       }
-      
+
       BFGSMinimizer(FunctorType &f) : _func(f) { }
-      
+
       void initialize(const VectorT &x0) {
         int ret;
         _xk = x0;
@@ -150,17 +150,17 @@ namespace stan {
           throw std::runtime_error("Error evaluating initial BFGS point.");
         }
         _pk = -_gk;
-        
+
         _itNum = 0;
         _note = "";
       }
-      
+
       int step() {
         Scalar gradNorm, stepNorm;
         VectorT sk, yk;
         int retCode(0);
         int resetB(0);
-        
+
         _itNum++;
 
         if (_itNum == 1) {
@@ -171,7 +171,7 @@ namespace stan {
           resetB = 0;
           _note = "";
         }
-        
+
         while (true) {
           if (resetB) {
             // Reset the Hessian approximation
@@ -193,11 +193,11 @@ namespace stan {
             _alpha0 = _alpha = _ls_opts.alpha0;
           }
 
-          // Perform the line search.  If successful, the results are in the 
+          // Perform the line search.  If successful, the results are in the
           // variables: _xk_1, _fk_1 and _gk_1.
           retCode = WolfeLineSearch(_func, _alpha, _xk_1, _fk_1, _gk_1,
                                     _pk, _xk, _fk, _gk,
-                                    _ls_opts.c1, _ls_opts.c2, 
+                                    _ls_opts.c1, _ls_opts.c2,
                                     _ls_opts.minAlpha);
           if (retCode) {
             // Line search failed...
@@ -223,7 +223,7 @@ namespace stan {
         _xk.swap(_xk_1);
         _gk.swap(_gk_1);
         _pk.swap(_pk_1);
-        
+
         sk.noalias() = _xk - _xk_1;
         yk.noalias() = _gk - _gk_1;
 
@@ -272,7 +272,7 @@ namespace stan {
 
         return retCode;
       }
-      
+
       int minimize(VectorT &x0) {
         int retcode;
         initialize(x0);
@@ -282,7 +282,7 @@ namespace stan {
       }
     };
 
-                                
+
 
     template <typename M>
     double lp_no_jacobian(const M& model,
@@ -307,9 +307,9 @@ namespace stan {
                    const std::vector<int>& params_i,
                    std::ostream* msgs)
       : _model(model), _params_i(params_i), _msgs(msgs), _fevals(0) {}
-                  
+
       size_t fevals() const { return _fevals; }
-      int operator()(const Eigen::Matrix<double,Eigen::Dynamic,1> &x, 
+      int operator()(const Eigen::Matrix<double,Eigen::Dynamic,1> &x,
                      double &f) {
         using Eigen::Matrix;
         using Eigen::Dynamic;
@@ -333,13 +333,13 @@ namespace stan {
           return 0;
         else {
           if (_msgs)
-            *_msgs << "Error evaluating model log probability: " 
+            *_msgs << "Error evaluating model log probability: "
                       "Non-finite function evaluation." << std::endl;
           return 2;
         }
       }
-      int operator()(const Eigen::Matrix<double,Eigen::Dynamic,1> &x, 
-                     double &f, 
+      int operator()(const Eigen::Matrix<double,Eigen::Dynamic,1> &x,
+                     double &f,
                      Eigen::Matrix<double,Eigen::Dynamic,1> &g) {
         using Eigen::Matrix;
         using Eigen::Dynamic;
@@ -350,7 +350,7 @@ namespace stan {
         _x.resize(x.size());
         for (idx_t i = 0; i < x.size(); i++)
           _x[i] = x[i];
-        
+
         _fevals++;
 
         try {
@@ -365,7 +365,7 @@ namespace stan {
         for (size_t i = 0; i < _g.size(); i++) {
           if (!boost::math::isfinite(_g[i])) {
             if (_msgs)
-              *_msgs << "Error evaluating model log probability: " 
+              *_msgs << "Error evaluating model log probability: "
                                  "Non-finite gradient." << std::endl;
             return 3;
           }
@@ -376,19 +376,19 @@ namespace stan {
           return 0;
         else {
           if (_msgs)
-            *_msgs << "Error evaluating model log probability: " 
-                               "Non-finite function evaluation." 
+            *_msgs << "Error evaluating model log probability: "
+                               "Non-finite function evaluation."
                    << std::endl;
           return 2;
         }
       }
-      int df(const Eigen::Matrix<double,Eigen::Dynamic,1> &x, 
+      int df(const Eigen::Matrix<double,Eigen::Dynamic,1> &x,
              Eigen::Matrix<double,Eigen::Dynamic,1> &g) {
         double f;
         return (*this)(x,f,g);
       }
     };
-    
+
     template<typename M, typename QNUpdateType, typename Scalar = double,
              int DimAtCompile = Eigen::Dynamic>
     class BFGSLineSearch : public BFGSMinimizer<ModelAdaptor<M>,QNUpdateType,Scalar,DimAtCompile> {
@@ -398,7 +398,7 @@ namespace stan {
       typedef BFGSMinimizer<ModelAdaptor<M>,QNUpdateType,Scalar,DimAtCompile> BFGSBase;
       typedef typename BFGSBase::VectorT vector_t;
       typedef typename stan::math::index_type<vector_t>::type idx_t;
-      
+
       BFGSLineSearch(M& model,
                      const std::vector<double>& params_r,
                      const std::vector<int>& params_i,
@@ -420,7 +420,7 @@ namespace stan {
       size_t grad_evals() { return _adaptor.fevals(); }
       double logp() { return -(this->curr_f()); }
       double grad_norm() { return this->curr_g().norm(); }
-      void grad(std::vector<double>& g) { 
+      void grad(std::vector<double>& g) {
         const vector_t &cg(this->curr_g());
         g.resize(cg.size());
         for (idx_t i = 0; i < cg.size(); i++)

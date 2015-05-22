@@ -19,7 +19,7 @@
 
 TEST(AgradRevMatrix, quad_form_mat) {
   using stan::math::quad_form;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::matrix_d;
   
   matrix_v av(4,4);
@@ -80,7 +80,7 @@ TEST(AgradRevMatrix, quad_form_mat) {
 TEST(AgradRevMatrix, quad_form_mat_grad_vd) {
   using stan::math::quad_form;
   using stan::math::sum;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::matrix_d;
   
   matrix_v av(4,4);
@@ -124,7 +124,7 @@ TEST(AgradRevMatrix, quad_form_mat_grad_vd) {
 TEST(AgradRevMatrix, quad_form_mat_grad_dv) {
   using stan::math::quad_form;
   using stan::math::sum;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::matrix_d;
   
   matrix_d ad(4,4);
@@ -168,7 +168,7 @@ TEST(AgradRevMatrix, quad_form_mat_grad_dv) {
 TEST(AgradRevMatrix, quad_form_mat_grad_vv) {
   using stan::math::quad_form;
   using stan::math::sum;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::matrix_d;
   
   matrix_v av(4,4);
@@ -223,7 +223,7 @@ TEST(AgradRevMatrix, quad_form_mat_grad_vv) {
 
 TEST(AgradRevMatrix, quad_form_sym_mat) {
   using stan::math::quad_form_sym;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::matrix_d;
   
   matrix_v av(4,4);
@@ -288,7 +288,7 @@ TEST(AgradRevMatrix, quad_form_sym_mat) {
 TEST(AgradRevMatrix, quad_form_sym_mat_grad_vd) {
   using stan::math::quad_form_sym;
   using stan::math::sum;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::matrix_d;
   
   matrix_v av(4,4);
@@ -332,7 +332,7 @@ TEST(AgradRevMatrix, quad_form_sym_mat_grad_vd) {
 TEST(AgradRevMatrix, quad_form_sym_mat_grad_dv) {
   using stan::math::quad_form_sym;
   using stan::math::sum;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::matrix_d;
   
   matrix_d ad(4,4);
@@ -376,7 +376,7 @@ TEST(AgradRevMatrix, quad_form_sym_mat_grad_dv) {
 TEST(AgradRevMatrix, quad_form_sym_mat_grad_vv) {
   using stan::math::quad_form_sym;
   using stan::math::sum;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::matrix_d;
   
   matrix_v av(4,4);
@@ -431,8 +431,8 @@ TEST(AgradRevMatrix, quad_form_sym_mat_grad_vv) {
 
 TEST(AgradRevMatrix, quad_form_vec) {
   using stan::math::quad_form;
-  using stan::agrad::matrix_v;
-  using stan::agrad::vector_v;
+  using stan::math::matrix_v;
+  using stan::math::vector_v;
   using stan::math::matrix_d;
   using stan::math::vector_d;
 
@@ -440,7 +440,7 @@ TEST(AgradRevMatrix, quad_form_vec) {
   matrix_d ad(4,4);
   vector_d bd(4);
   vector_v bv(4);
-  stan::agrad::var res;
+  stan::math::var res;
   AVEC vars;
   VEC grad;
 
@@ -475,8 +475,8 @@ TEST(AgradRevMatrix, quad_form_vec) {
 
 TEST(AgradRevMatrix, quad_form_vec_grad_vd) {
   using stan::math::quad_form;
-  using stan::agrad::matrix_v;
-  using stan::agrad::vector_v;
+  using stan::math::matrix_v;
+  using stan::math::vector_v;
   using stan::math::matrix_d;
   using stan::math::vector_d;
   
@@ -484,7 +484,7 @@ TEST(AgradRevMatrix, quad_form_vec_grad_vd) {
   matrix_d ad(4,4);
   vector_d bd(4);
   vector_v bv(4);
-  stan::agrad::var res;
+  stan::math::var res;
   AVEC vars;
   VEC grad;
   size_t pos, i, j;
@@ -518,8 +518,8 @@ TEST(AgradRevMatrix, quad_form_vec_grad_vd) {
 
 TEST(AgradRevMatrix, quad_form_vec_grad_dv) {
   using stan::math::quad_form;
-  using stan::agrad::matrix_v;
-  using stan::agrad::vector_v;
+  using stan::math::matrix_v;
+  using stan::math::vector_v;
   using stan::math::matrix_d;
   using stan::math::vector_d;
   
@@ -527,7 +527,7 @@ TEST(AgradRevMatrix, quad_form_vec_grad_dv) {
   matrix_d ad(4,4);
   vector_d bd(4);
   vector_v bv(4);
-  stan::agrad::var res;
+  stan::math::var res;
   AVEC vars;
   VEC grad;
   size_t pos, i;
@@ -559,8 +559,8 @@ TEST(AgradRevMatrix, quad_form_vec_grad_dv) {
 
 TEST(AgradRevMatrix, quad_form_vec_grad_vv) {
   using stan::math::quad_form;
-  using stan::agrad::matrix_v;
-  using stan::agrad::vector_v;
+  using stan::math::matrix_v;
+  using stan::math::vector_v;
   using stan::math::matrix_d;
   using stan::math::vector_d;
   
@@ -568,7 +568,7 @@ TEST(AgradRevMatrix, quad_form_vec_grad_vv) {
   matrix_d ad(4,4);
   vector_d bd(4);
   vector_v bv(4);
-  stan::agrad::var res;
+  stan::math::var res;
   AVEC vars;
   VEC grad;
   size_t pos, i, j;
@@ -607,8 +607,8 @@ TEST(AgradRevMatrix, quad_form_vec_grad_vv) {
 
 TEST(AgradRevMatrix, quad_form_sym_vec) {
   using stan::math::quad_form_sym;
-  using stan::agrad::matrix_v;
-  using stan::agrad::vector_v;
+  using stan::math::matrix_v;
+  using stan::math::vector_v;
   using stan::math::matrix_d;
   using stan::math::vector_d;
   
@@ -616,7 +616,7 @@ TEST(AgradRevMatrix, quad_form_sym_vec) {
   matrix_d ad(4,4);
   vector_d bd(4);
   vector_v bv(4);
-  stan::agrad::var res;
+  stan::math::var res;
   AVEC vars;
   VEC grad;
   
@@ -651,8 +651,8 @@ TEST(AgradRevMatrix, quad_form_sym_vec) {
 
 TEST(AgradRevMatrix, quad_form_sym_vec_grad_vd) {
   using stan::math::quad_form_sym;
-  using stan::agrad::matrix_v;
-  using stan::agrad::vector_v;
+  using stan::math::matrix_v;
+  using stan::math::vector_v;
   using stan::math::matrix_d;
   using stan::math::vector_d;
   
@@ -660,7 +660,7 @@ TEST(AgradRevMatrix, quad_form_sym_vec_grad_vd) {
   matrix_d ad(4,4);
   vector_d bd(4);
   vector_v bv(4);
-  stan::agrad::var res;
+  stan::math::var res;
   AVEC vars;
   VEC grad;
   size_t pos, i, j;
@@ -695,8 +695,8 @@ TEST(AgradRevMatrix, quad_form_sym_vec_grad_vd) {
 
 TEST(AgradRevMatrix, quad_form_sym_vec_grad_dv) {
   using stan::math::quad_form_sym;
-  using stan::agrad::matrix_v;
-  using stan::agrad::vector_v;
+  using stan::math::matrix_v;
+  using stan::math::vector_v;
   using stan::math::matrix_d;
   using stan::math::vector_d;
   
@@ -704,7 +704,7 @@ TEST(AgradRevMatrix, quad_form_sym_vec_grad_dv) {
   matrix_d ad(4,4);
   vector_d bd(4);
   vector_v bv(4);
-  stan::agrad::var res;
+  stan::math::var res;
   AVEC vars;
   VEC grad;
   size_t pos, i;
@@ -737,8 +737,8 @@ TEST(AgradRevMatrix, quad_form_sym_vec_grad_dv) {
 
 TEST(AgradRevMatrix, quad_form_sym_vec_grad_vv) {
   using stan::math::quad_form_sym;
-  using stan::agrad::matrix_v;
-  using stan::agrad::vector_v;
+  using stan::math::matrix_v;
+  using stan::math::vector_v;
   using stan::math::matrix_d;
   using stan::math::vector_d;
   
@@ -746,7 +746,7 @@ TEST(AgradRevMatrix, quad_form_sym_vec_grad_vv) {
   matrix_d ad(4,4);
   vector_d bd(4);
   vector_v bv(4);
-  stan::agrad::var res;
+  stan::math::var res;
   AVEC vars;
   VEC grad;
   size_t pos, i, j;

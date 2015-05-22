@@ -40,20 +40,20 @@ TEST(MetaTraits, error_index) {
 
 TEST(MetaTraits, isConstant) {
   using stan::is_constant;
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   EXPECT_FALSE(is_constant<fvar<double> >::value);
 }
 
 TEST(MetaTraits,containsFvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::contains_fvar;
   EXPECT_TRUE((contains_fvar<fvar<double> >::value));
   EXPECT_TRUE((contains_fvar<double, fvar<double> >::value));
   EXPECT_TRUE((contains_fvar<fvar<fvar<double> > >::value));
 }
 TEST(MetaTraits, partials_type) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::partials_type;
 
   stan::partials_type<fvar<double> >::type a(2.0);
@@ -65,7 +65,7 @@ TEST(MetaTraits, partials_type) {
   EXPECT_EQ(1.0,c.d_);
 }
 TEST(MetaTraits, partials_return_type) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::partials_return_type;
 
   partials_return_type<double,fvar<double>, std::vector<fvar<double> > >::type a(5.0);

@@ -3,7 +3,7 @@
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/prim/mat/fun/fill.hpp>
 
-using stan::agrad::fvar;
+using stan::math::fvar;
 
 TEST(AgradFwdMatrixFill, fd) {
   using stan::math::fill;

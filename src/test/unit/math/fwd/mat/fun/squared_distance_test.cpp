@@ -4,10 +4,10 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/math/fwd/core.hpp>
 
-using stan::agrad::fvar;
+using stan::math::fvar;
 
 TEST(AgradFwdMatrixSquaredDistance, vector_fd_vector_fd) {
-  stan::agrad::vector_fd v1, v2;
+  stan::math::vector_fd v1, v2;
   
   v1.resize(3);
   v2.resize(3);
@@ -20,7 +20,7 @@ TEST(AgradFwdMatrixSquaredDistance, vector_fd_vector_fd) {
   v2(1).d_ = 5.0;
   v2(2).d_ = 6.0;
   
-  stan::agrad::fvar<double> a = stan::math::squared_distance(v1, v2);
+  stan::math::fvar<double> a = stan::math::squared_distance(v1, v2);
 
   EXPECT_FLOAT_EQ(50, a.val_);
   EXPECT_FLOAT_EQ(12, a.d_);
@@ -37,8 +37,8 @@ TEST(AgradFwdMatrixSquaredDistance, vector_fd_vector_fd) {
 }
 
 TEST(AgradFwdMatrixSquaredDistance, rowvector_fd_vector_fd) {
-  stan::agrad::row_vector_fd rv;
-  stan::agrad::vector_fd v;
+  stan::math::row_vector_fd rv;
+  stan::math::vector_fd v;
   
   rv.resize(3);
   v.resize(3);
@@ -51,7 +51,7 @@ TEST(AgradFwdMatrixSquaredDistance, rowvector_fd_vector_fd) {
   v(1).d_ = 5.0;
   v(2).d_ = 6.0;
 
-  stan::agrad::fvar<double> a = stan::math::squared_distance(rv, v);
+  stan::math::fvar<double> a = stan::math::squared_distance(rv, v);
 
   EXPECT_FLOAT_EQ(50, a.val_);
   EXPECT_FLOAT_EQ(12, a.d_);
@@ -68,8 +68,8 @@ TEST(AgradFwdMatrixSquaredDistance, rowvector_fd_vector_fd) {
 }
 
 TEST(AgradFwdMatrixSquaredDistance, vector_fd_rowvector_fd) {
-  stan::agrad::row_vector_fd rv;
-  stan::agrad::vector_fd v;
+  stan::math::row_vector_fd rv;
+  stan::math::vector_fd v;
   
   rv.resize(3);
   v.resize(3);
@@ -82,7 +82,7 @@ TEST(AgradFwdMatrixSquaredDistance, vector_fd_rowvector_fd) {
   v(1).d_ = 5.0;
   v(2).d_ = 6.0;
 
-  stan::agrad::fvar<double> a = stan::math::squared_distance(v, rv);
+  stan::math::fvar<double> a = stan::math::squared_distance(v, rv);
 
   EXPECT_FLOAT_EQ(50, a.val_);
   EXPECT_FLOAT_EQ(12, a.d_);
@@ -99,7 +99,7 @@ TEST(AgradFwdMatrixSquaredDistance, vector_fd_rowvector_fd) {
 }
 
 TEST(AgradFwdMatrixSquaredDistance, special_values_fd) {
-  stan::agrad::vector_fd v1, v2;
+  stan::math::vector_fd v1, v2;
   v1.resize(1);
   v2.resize(1);
   
@@ -125,7 +125,7 @@ TEST(AgradFwdMatrixSquaredDistance, special_values_fd) {
 }
 
 TEST(AgradFwdMatrixSquaredDistance, vector_ffd_vector_ffd) {
-  stan::agrad::vector_ffd v1, v2;
+  stan::math::vector_ffd v1, v2;
   
   v1.resize(3);
   v2.resize(3);
@@ -138,7 +138,7 @@ TEST(AgradFwdMatrixSquaredDistance, vector_ffd_vector_ffd) {
   v2(1).d_ = 5.0;
   v2(2).d_ = 6.0;
   
-  stan::agrad::fvar<fvar<double> > a = stan::math::squared_distance(v1, v2);
+  stan::math::fvar<fvar<double> > a = stan::math::squared_distance(v1, v2);
 
   EXPECT_FLOAT_EQ(50, a.val_.val_);
   EXPECT_FLOAT_EQ(12, a.d_.val_);
@@ -155,8 +155,8 @@ TEST(AgradFwdMatrixSquaredDistance, vector_ffd_vector_ffd) {
 }
 
 TEST(AgradFwdMatrixSquaredDistance, rowvector_ffd_vector_ffd) {
-  stan::agrad::row_vector_ffd rv;
-  stan::agrad::vector_ffd v;
+  stan::math::row_vector_ffd rv;
+  stan::math::vector_ffd v;
   
   rv.resize(3);
   v.resize(3);
@@ -169,7 +169,7 @@ TEST(AgradFwdMatrixSquaredDistance, rowvector_ffd_vector_ffd) {
   v(1).d_ = 5.0;
   v(2).d_ = 6.0;
 
-  stan::agrad::fvar<fvar<double> > a = stan::math::squared_distance(rv, v);
+  stan::math::fvar<fvar<double> > a = stan::math::squared_distance(rv, v);
 
   EXPECT_FLOAT_EQ(50, a.val_.val_);
   EXPECT_FLOAT_EQ(12, a.d_.val_);
@@ -186,8 +186,8 @@ TEST(AgradFwdMatrixSquaredDistance, rowvector_ffd_vector_ffd) {
 }
 
 TEST(AgradFwdMatrixSquaredDistance, vector_ffd_rowvector_ffd) {
-  stan::agrad::row_vector_ffd rv;
-  stan::agrad::vector_ffd v;
+  stan::math::row_vector_ffd rv;
+  stan::math::vector_ffd v;
   
   rv.resize(3);
   v.resize(3);
@@ -200,7 +200,7 @@ TEST(AgradFwdMatrixSquaredDistance, vector_ffd_rowvector_ffd) {
   v(1).d_ = 5.0;
   v(2).d_ = 6.0;
 
-  stan::agrad::fvar<fvar<double> > a = stan::math::squared_distance(v, rv);
+  stan::math::fvar<fvar<double> > a = stan::math::squared_distance(v, rv);
 
   EXPECT_FLOAT_EQ(50, a.val_.val_);
   EXPECT_FLOAT_EQ(12, a.d_.val_);
@@ -217,7 +217,7 @@ TEST(AgradFwdMatrixSquaredDistance, vector_ffd_rowvector_ffd) {
 }
 
 TEST(AgradFwdMatrixSquaredDistance, special_values_ffd) {
-  stan::agrad::vector_ffd v1, v2;
+  stan::math::vector_ffd v1, v2;
   v1.resize(1);
   v2.resize(1);
   

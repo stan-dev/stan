@@ -3,7 +3,7 @@
 #include <test/unit/math/rev/mat/fun/jacobian.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>
 
-typedef stan::agrad::var AVAR;
+typedef stan::math::var AVAR;
 typedef std::vector<AVAR> AVEC;
 typedef std::vector<double> VEC;
 typedef stan::math::index_type<Eigen::Matrix<double,-1,-1> >::type size_type;

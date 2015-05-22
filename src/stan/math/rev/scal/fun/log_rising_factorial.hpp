@@ -6,7 +6,7 @@
 #include <boost/math/special_functions/digamma.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
 

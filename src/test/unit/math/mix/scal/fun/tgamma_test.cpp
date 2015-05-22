@@ -29,8 +29,8 @@
 #include <stan/math/rev/core.hpp>
 
 TEST(AgradFwdTgamma, FvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using boost::math::tgamma;
   using boost::math::digamma;
 
@@ -46,8 +46,8 @@ TEST(AgradFwdTgamma, FvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(tgamma(0.5) * digamma(0.5), g[0]);
 }
 TEST(AgradFwdTgamma, FvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using boost::math::tgamma;
   using boost::math::digamma;
 
@@ -61,7 +61,7 @@ TEST(AgradFwdTgamma, FvarVar_2ndDeriv) {
 }
 
 TEST(AgradFwdTgamma, FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using boost::math::tgamma;
   using boost::math::digamma;
 
@@ -87,8 +87,8 @@ TEST(AgradFwdTgamma, FvarFvarDouble) {
   EXPECT_FLOAT_EQ(0, a.d_.d_);
 }
 TEST(AgradFwdTgamma, FvarFvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using boost::math::tgamma;
   using boost::math::digamma;
 
@@ -124,8 +124,8 @@ TEST(AgradFwdTgamma, FvarFvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(tgamma(0.5) * digamma(0.5), r[0]);
 }
 TEST(AgradFwdTgamma, FvarFvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using boost::math::tgamma;
   using boost::math::digamma;
 
@@ -152,8 +152,8 @@ TEST(AgradFwdTgamma, FvarFvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(15.580177, r[0]);
 }
 TEST(AgradFwdTgamma, FvarFvarVar_3rdDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using boost::math::tgamma;
   using boost::math::digamma;
 

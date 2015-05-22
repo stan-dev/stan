@@ -4,8 +4,8 @@
 
 TEST(AgradFwdMatrixCol,matrix_fd) {
   using stan::math::col;
-  using stan::agrad::matrix_fd;
-  using stan::agrad::vector_fd;
+  using stan::math::matrix_fd;
+  using stan::math::vector_fd;
 
   matrix_fd y(2,3);
   y << 1, 2, 3, 4, 5, 6;
@@ -31,7 +31,7 @@ TEST(AgradFwdMatrixCol,matrix_fd) {
 }
 TEST(AgradFwdMatrixCol,matrix_fd_exc0) {
   using stan::math::col;
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
 
   matrix_fd y(2,3);
   y << 1, 2, 3, 4, 5, 6;
@@ -46,7 +46,7 @@ TEST(AgradFwdMatrixCol,matrix_fd_exc0) {
 }
 TEST(AgradFwdMatrixCol,matrix_fd_excHigh) {
   using stan::math::col;
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
 
   matrix_fd y(2,3);
   y << 1, 2, 3, 4, 5, 6;
@@ -61,9 +61,9 @@ TEST(AgradFwdMatrixCol,matrix_fd_excHigh) {
 }
 TEST(AgradFwdMatrixCol,matrix_ffd) {
   using stan::math::col;
-  using stan::agrad::matrix_ffd;
-  using stan::agrad::vector_ffd;
-  using stan::agrad::fvar;
+  using stan::math::matrix_ffd;
+  using stan::math::vector_ffd;
+  using stan::math::fvar;
 
   fvar<fvar<double> > a;
   fvar<fvar<double> > b;
@@ -103,8 +103,8 @@ TEST(AgradFwdMatrixCol,matrix_ffd) {
 }
 TEST(AgradFwdMatrixCol,matrix_ffd_exc0) {
   using stan::math::col;
-  using stan::agrad::matrix_ffd;
-  using stan::agrad::fvar;
+  using stan::math::matrix_ffd;
+  using stan::math::fvar;
 
   fvar<fvar<double> > a;
   fvar<fvar<double> > b;
@@ -133,8 +133,8 @@ TEST(AgradFwdMatrixCol,matrix_ffd_exc0) {
 }
 TEST(AgradFwdMatrixCol,matrix_ffd_excHigh) {
   using stan::math::col;
-  using stan::agrad::matrix_ffd;
-  using stan::agrad::fvar;
+  using stan::math::matrix_ffd;
+  using stan::math::fvar;
 
   fvar<fvar<double> > a;
   fvar<fvar<double> > b;

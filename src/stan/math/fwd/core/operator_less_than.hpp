@@ -6,7 +6,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     template <typename T>
     inline bool operator<(const fvar<T>& x,

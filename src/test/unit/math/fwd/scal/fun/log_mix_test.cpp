@@ -12,7 +12,7 @@
 
 void test_log_mix_fff(double theta, double lambda1, double lambda2,
                       double theta_d, double lambda1_d, double lambda2_d){
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::log_mix;
   using ::exp;
   using ::log;
@@ -31,7 +31,7 @@ void test_log_mix_fff(double theta, double lambda1, double lambda2,
 }
 
 void test_log_mix_f_explicit(double theta, double lambda1, double x){
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::log_mix;
   using std::exp;
   using ::cos;
@@ -52,7 +52,7 @@ void test_log_mix_f_explicit(double theta, double lambda1, double x){
 
 void test_log_mix_ff_ex_lam_2(double theta, double lambda1, double lambda2,
                               double theta_d, double lambda1_d){
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::log_mix;
   using ::exp;
 
@@ -71,7 +71,7 @@ void test_log_mix_ff_ex_lam_2(double theta, double lambda1, double lambda2,
 
 void test_log_mix_ff_ex_lam_1(double theta, double lambda1, double lambda2,
                               double theta_d, double lambda2_d){
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::log_mix;
 
   fvar<double> theta_f(theta,theta_d);
@@ -88,7 +88,7 @@ void test_log_mix_ff_ex_lam_1(double theta, double lambda1, double lambda2,
 
 void test_log_mix_ff_ex_theta(double theta, double lambda1, double lambda2,
                               double lambda1_d, double lambda2_d){
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::log_mix;
 
   fvar<double> lambda1_f(lambda1,lambda1_d);
@@ -104,7 +104,7 @@ void test_log_mix_ff_ex_theta(double theta, double lambda1, double lambda2,
 
 void test_log_mix_f_theta(double theta, double lambda1, double lambda2,
                           double theta_d){
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::log_mix;
 
   fvar<double> theta_f(theta,theta_d);
@@ -120,7 +120,7 @@ void test_log_mix_f_theta(double theta, double lambda1, double lambda2,
 
 void test_log_mix_f_lam_1(double theta, double lambda1, double lambda2,
                           double lambda1_d){
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::log_mix;
 
   fvar<double> lambda1_f(lambda1,lambda1_d);
@@ -135,7 +135,7 @@ void test_log_mix_f_lam_1(double theta, double lambda1, double lambda2,
 
 void test_log_mix_f_lam_2(double theta, double lambda1, double lambda2,
                           double lambda2_d){
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::log_mix;
 
   fvar<double> lambda2_f(lambda2,lambda2_d);
