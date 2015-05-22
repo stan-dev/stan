@@ -237,8 +237,9 @@ namespace stan {
 
 
     struct add_var {
-      template <typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
+      struct result<F(T1,T2,T3,T4,T5,T6)> { typedef void type; };
       // each type derived from base_var_decl gets own instance
       template <typename R, typename T>
       void operator()(R& var_decl_result,
@@ -281,8 +282,9 @@ namespace stan {
 
 
     struct validate_decl_constraints {
-      template <typename T1, typename T2, typename T3, typename T4>
-      struct result { typedef bool type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3, typename T4>
+      struct result<F(T1,T2,T3,T4)> { typedef bool type; };
 
       bool operator()(const bool& allow_constraints,
                       const bool& declaration_ok,
@@ -306,8 +308,9 @@ namespace stan {
       std::set<std::string> reserved_word_set_;
       std::set<std::string> const_fun_name_set_;
 
-      template <typename T1, typename T2>
-      struct result { typedef bool type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2>
+      struct result<F(T1,T2)> { typedef bool type; };
 
       void reserve(const std::string& w) {
         reserved_word_set_.insert(w);
@@ -506,8 +509,9 @@ namespace stan {
 
     // copies single dimension from M to N if only M declared
     struct copy_square_cholesky_dimension_if_necessary {
-      template <typename T1>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1>
+      struct result<F(T1)> { typedef void type; };
       void operator()(cholesky_factor_var_decl& var_decl) const {
         if (is_nil(var_decl.N_))
           var_decl.N_ = var_decl.M_;
@@ -517,8 +521,9 @@ namespace stan {
     copy_square_cholesky_dimension_if_necessary_f;
 
     struct empty_range {
-      template <typename T1>
-      struct result { typedef range type; };
+      template <class> struct result;
+      template <typename F, typename T1>
+      struct result<F(T1)> { typedef range type; };
       range operator()(std::stringstream& /*error_msgs*/) const {
         return range();
       }
@@ -526,8 +531,9 @@ namespace stan {
     boost::phoenix::function<empty_range> empty_range_f;
 
     struct validate_int_expr {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1,T2,T3)> { typedef void type; };
 
       void operator()(const expression& expr,
                       bool& pass,
@@ -545,8 +551,9 @@ namespace stan {
     boost::phoenix::function<validate_int_expr> validate_int_expr_f;
 
     struct set_int_range_lower {
-      template <typename T1, typename T2, typename T3, typename T4>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3, typename T4>
+      struct result<F(T1,T2,T3,T4)> { typedef void type; };
       void operator()(range& range,
                       const expression& expr,
                       bool& pass,
@@ -559,8 +566,9 @@ namespace stan {
     boost::phoenix::function<set_int_range_lower> set_int_range_lower_f;
 
     struct set_int_range_upper {
-      template <typename T1, typename T2, typename T3, typename T4>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3, typename T4>
+      struct result<F(T1,T2,T3,T4)> { typedef void type; };
       void operator()(range& range,
                       const expression& expr,
                       bool& pass,
@@ -572,11 +580,10 @@ namespace stan {
     };
     boost::phoenix::function<set_int_range_upper> set_int_range_upper_f;
 
-
-
     struct validate_int_data_expr {
-      template <typename T1, typename T2, typename T3, typename T4, typename T5>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3, typename T4, typename T5>
+      struct result<F(T1,T2,T3,T4,T5)> { typedef void type; };
 
       void operator()(const expression& expr,
                       int var_origin,
@@ -621,8 +628,9 @@ namespace stan {
 
 
     struct set_double_range_lower {
-      template <typename T1, typename T2, typename T3, typename T4>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3, typename T4>
+      struct result<F(T1,T2,T3,T4)> { typedef void type; };
       void operator()(range& range,
                       const expression& expr,
                       bool& pass,
@@ -635,8 +643,9 @@ namespace stan {
     boost::phoenix::function<set_double_range_lower> set_double_range_lower_f;
 
     struct set_double_range_upper {
-      template <typename T1, typename T2, typename T3, typename T4>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3, typename T4>
+      struct result<F(T1,T2,T3,T4)> { typedef void type; };
       void operator()(range& range,
                       const expression& expr,
                       bool& pass,

@@ -86,9 +86,10 @@ namespace stan {
     boost::phoenix::function<remove_lp_var> remove_lp_var_f;
 
     struct program_error {
-      template <typename T1, typename T2, typename ,
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3,
         typename T4, typename T5, typename T6, typename T7>
-      struct result { typedef void type; };
+      struct result<F(T1,T2,T3,T4,T5,T6,T7)> { typedef void type; };
 
       template <class Iterator, class I>
       void operator()(

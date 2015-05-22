@@ -51,8 +51,10 @@ namespace stan {
   namespace lang {
 
     struct validate_expr_type3 {
-      template <typename T1, typename T2>
-      struct result { typedef bool type; };
+      template <class> struct result;
+
+      template <typename F, typename T1, typename T2>
+      struct result<F(T1,T2)> { typedef bool type; };
 
       bool operator()(const expression& expr,
                       std::ostream& error_msgs) const {
@@ -84,8 +86,10 @@ namespace stan {
     boost::phoenix::function<set_fun_type3> set_fun_type3_f;
 
     struct addition_expr3 {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef expression type; };
+      template <class> struct result;
+
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1,T2,T3)> { typedef expression type; };
 
       expression operator()(expression& expr1,
                             const expression& expr2,
@@ -108,8 +112,9 @@ namespace stan {
 
 
     struct subtraction_expr3 {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef expression type; };
+      template <class> struct result; 
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1,T2,T3)> { typedef expression type; };
 
       expression operator()(expression& expr1,
                             const expression& expr2,

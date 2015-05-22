@@ -53,8 +53,9 @@ namespace stan {
   namespace lang {
 
     struct add_conditional_condition {
-      template <typename T1, typename T2, typename T3, typename T4>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3, typename T4>
+      struct result<F(T1,T2,T3,T4)> { typedef void type; };
       void operator()(conditional_statement& cs,
                       const expression& e,
                       bool& pass,
@@ -73,8 +74,9 @@ namespace stan {
     boost::phoenix::function<add_conditional_condition> add_conditional_condition_f;
 
     struct add_conditional_body {
-      template <typename T1, typename T2>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2>
+      struct result<F(T1,T2)> { typedef void type; };
       void operator()(conditional_statement& cs,
                       const statement& s) const {
         cs.bodies_.push_back(s);

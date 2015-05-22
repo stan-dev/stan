@@ -83,8 +83,9 @@ namespace stan {
   namespace lang {
 
     struct validate_return_allowed {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1,T2,T3)> { typedef void type; };
       void operator()(var_origin origin,
                       bool& pass,
                       std::ostream& error_msgs) const {
@@ -101,8 +102,9 @@ namespace stan {
     boost::phoenix::function<validate_return_allowed> validate_return_allowed_f;
 
     struct validate_void_return_allowed {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1,T2,T3)> { typedef void type; };
       void operator()(var_origin origin,
                       bool& pass,
                       std::ostream& error_msgs) const {
@@ -121,8 +123,9 @@ namespace stan {
 
 
     struct validate_assignment {
-      template <typename T1, typename T2, typename T3, typename T4>
-      struct result { typedef bool type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3, typename T4>
+      struct result<F(T1,T2,T3,T4)> { typedef bool type; };
 
       bool operator()(assignment& a,
                       const var_origin& origin_allowed,
@@ -216,8 +219,9 @@ namespace stan {
     boost::phoenix::function<validate_assignment> validate_assignment_f;
 
     struct validate_sample {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef bool type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1,T2,T3)> { typedef bool type; };
 
       bool is_double_return(const std::string& function_name,
                             const std::vector<expr_type>& arg_types,
@@ -366,8 +370,9 @@ namespace stan {
     boost::phoenix::function<validate_sample> validate_sample_f;
 
     struct expression_as_statement {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1,T2,T3)> { typedef void type; };
       void operator()(bool& pass,
                       const stan::lang::expression& expr,
                       std::stringstream& error_msgs) const {
@@ -399,8 +404,9 @@ namespace stan {
     boost::phoenix::function<expression_as_statement> expression_as_statement_f;
 
     struct unscope_locals {
-      template <typename T1, typename T2>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2>
+      struct result<F(T1,T2)> { typedef void type; };
       void operator()(const std::vector<var_decl>& var_decls,
                       variable_map& vm) const {
         for (size_t i = 0; i < var_decls.size(); ++i)
@@ -410,8 +416,9 @@ namespace stan {
     boost::phoenix::function<unscope_locals> unscope_locals_f;
 
     struct add_while_condition {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef bool type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1,T2,T3)> { typedef bool type; };
       bool operator()(while_statement& ws,
                       const expression& e,
                       std::stringstream& error_msgs) const {
@@ -427,8 +434,9 @@ namespace stan {
     boost::phoenix::function<add_while_condition> add_while_condition_f;
 
     struct add_while_body {
-      template <typename T1, typename T2>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2>
+      struct result<F(T1,T2)> { typedef void type; };
       void operator()(while_statement& ws,
                       const statement& s) const {
         ws.body_ = s;
@@ -437,8 +445,9 @@ namespace stan {
     boost::phoenix::function<add_while_body> add_while_body_f;
 
     struct add_loop_identifier {
-      template <typename T1, typename T2, typename T3, typename T4>
-      struct result { typedef bool type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3, typename T4>
+      struct result<F(T1,T2,T3,T4)> { typedef bool type; };
       bool operator()(const std::string& name,
                       std::string& name_local,
                       variable_map& vm,
@@ -459,8 +468,9 @@ namespace stan {
     boost::phoenix::function<add_loop_identifier> add_loop_identifier_f;
 
     struct remove_loop_identifier {
-      template <typename T1, typename T2>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2>
+      struct result<F(T1,T2)> { typedef void type; };
       void operator()(const std::string& name,
                       variable_map& vm) const {
         vm.remove(name);
@@ -469,8 +479,9 @@ namespace stan {
     boost::phoenix::function<remove_loop_identifier> remove_loop_identifier_f;
 
     struct validate_int_expr2 {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1,T2,T3)> { typedef void type; };
 
       void operator()(const expression& expr,
                       bool& pass,
@@ -488,8 +499,9 @@ namespace stan {
     boost::phoenix::function<validate_int_expr2> validate_int_expr2_f;
 
     struct validate_allow_sample {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1,T2,T3)> { typedef void type; };
 
       void operator()(const bool& allow_sample,
                       bool& pass,
@@ -509,8 +521,9 @@ namespace stan {
     boost::phoenix::function<validate_allow_sample> validate_allow_sample_f;
 
     struct validate_non_void_expression {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1,T2,T3)> { typedef void type; };
 
       void operator()(const expression& e,
                       bool& pass,
@@ -524,8 +537,9 @@ namespace stan {
     boost::phoenix::function<validate_non_void_expression> validate_non_void_expression_f;
 
     struct add_line_number {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1,T2,T3)> { typedef void type; };
       template <typename T, typename It>
       void operator()(T& stmt,
                       It& begin,

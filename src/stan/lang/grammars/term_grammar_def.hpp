@@ -79,8 +79,9 @@ namespace stan {
 
     struct validate_integrate_ode {
 
-      template <typename T1, typename T2, typename T3, typename T4>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3, typename T4>
+      struct result<F(T1,T2,T3,T4)> { typedef void type; };
 
       void operator()(const integrate_ode& ode_fun,
                       const variable_map& var_map,
@@ -175,8 +176,9 @@ namespace stan {
     boost::phoenix::function<validate_integrate_ode> validate_integrate_ode_f;
 
     struct set_fun_type {
-      template <typename T1, typename T2>
-      struct result { typedef fun type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2>
+      struct result<F(T1,T2)> { typedef fun type; };
 
       fun operator()(fun& fun,
                      std::ostream& error_msgs) const {
@@ -193,8 +195,9 @@ namespace stan {
 
 
     struct set_fun_type_named {
-      template <typename T1, typename T2, typename T3, typename T4, typename T5>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3, typename T4, typename T5>
+      struct result<F(T1,T2,T3,T4,T5)> { typedef void type; };
 
       void operator()(expression& fun_result,
                       fun& fun,
@@ -274,8 +277,9 @@ namespace stan {
     boost::phoenix::function<set_fun_type_named> set_fun_type_named_f;
 
     struct exponentiation_expr {
-      template <typename T1, typename T2, typename T3, typename T4, typename T5>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3, typename T4, typename T5>
+      struct result<F(T1,T2,T3,T4,T5)> { typedef void type; };
 
       void operator()(expression& expr1,
                       const expression& expr2,
@@ -308,8 +312,9 @@ namespace stan {
     boost::phoenix::function<exponentiation_expr> exponentiation_f;
 
     struct multiplication_expr {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1,T2,T3)> { typedef void type; };
 
       void operator()(expression& expr1,
                       const expression& expr2,
@@ -334,8 +339,9 @@ namespace stan {
     void generate_expression(const expression& e, std::ostream& o);
 
     struct division_expr {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1,T2,T3)> { typedef void type; };
 
       void operator()(expression& expr1,
                       const expression& expr2,
@@ -386,8 +392,9 @@ namespace stan {
     boost::phoenix::function<division_expr> division_f;
 
     struct modulus_expr {
-      template <typename T1, typename T2, typename T3, typename T4>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3, typename T4>
+      struct result<F(T1,T2,T3,T4)> { typedef void type; };
 
       void operator()(expression& expr1,
                       const expression& expr2,
@@ -416,8 +423,9 @@ namespace stan {
     boost::phoenix::function<modulus_expr> modulus_f;
 
     struct left_division_expr {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1,T2,T3)> { typedef void type; };
 
       void operator()(expression& expr1,
                       const expression& expr2,
@@ -443,8 +451,9 @@ namespace stan {
     boost::phoenix::function<left_division_expr> left_division_f;
 
     struct elt_multiplication_expr {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1,T2,T3)> { typedef void type; };
 
       void operator()(expression& expr1,
                       const expression& expr2,
@@ -467,8 +476,9 @@ namespace stan {
     boost::phoenix::function<elt_multiplication_expr> elt_multiplication_f;
 
     struct elt_division_expr {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1,T2,T3)> { typedef void type; };
 
       void operator()(expression& expr1,
                       const expression& expr2,
@@ -496,8 +506,9 @@ namespace stan {
     // so. Phoenix will be switching to BOOST_TYPEOF. In the meantime,
     // we will use a phoenix::function below:
     struct negate_expr {
-      template <typename T1, typename T2, typename T3, typename T4>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3, typename T4>
+      struct result<F(T1,T2,T3,T4)> { typedef void type; };
 
       void operator()(expression& expr_result,
                       const expression& expr,
@@ -518,8 +529,9 @@ namespace stan {
     boost::phoenix::function<negate_expr> negate_expr_f;
 
     struct logical_negate_expr {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1,T2,T3)> { typedef void type; };
 
       void operator()(expression& expr_result,
                       const expression& expr,
@@ -539,8 +551,9 @@ namespace stan {
     boost::phoenix::function<logical_negate_expr> logical_negate_expr_f;
 
     struct transpose_expr {
-      template <typename T1, typename T2>
-      struct result { typedef expression type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2>
+      struct result<F(T1,T2)> { typedef expression type; };
 
       expression operator()(const expression& expr,
                             std::ostream& error_msgs) const {
@@ -566,8 +579,9 @@ namespace stan {
     }
 
     struct add_expression_dimss {
-      template <typename T1, typename T2, typename T3, typename T4>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3, typename T4>
+      struct result<F(T1,T2,T3,T4)> { typedef void type; };
       void operator()(expression& expression,
                       std::vector<std::vector<stan::lang::expression> >& dimss,
                       bool& pass,
@@ -600,8 +614,9 @@ namespace stan {
     boost::phoenix::function<add_expression_dimss> add_expression_dimss_f;
 
     struct set_var_type {
-      template <typename T1, typename T2, typename T3, typename T4>
-      struct result { typedef variable type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3, typename T4>
+      struct result<F(T1,T2,T3,T4)> { typedef variable type; };
       variable operator()(variable& var_expr,
                           variable_map& vm,
                           std::ostream& error_msgs,
@@ -630,8 +645,9 @@ namespace stan {
     boost::phoenix::function<set_var_type> set_var_type_f;
 
     struct validate_int_expr3 {
-      template <typename T1, typename T2>
-      struct result { typedef bool type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2>
+      struct result<F(T1,T2)> { typedef bool type; };
 
       bool operator()(const expression& expr,
                       std::stringstream& error_msgs) const {
