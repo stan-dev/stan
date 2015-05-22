@@ -12,6 +12,18 @@ namespace stan {
     T inc_beta_ddb(T a, T b, T z,
                    T digamma_b, T digamma_ab);
 
+    /**
+     * Returns the partial derivative of the incomplete beta function
+     * with respect to a.
+     *
+     * @tparam T scalar types of arguments
+     * @param a a
+     * @param b b
+     * @param z upper bound of the integral; must be greater than 0
+     * @param digamma_a value of digamma(a)
+     * @param digamma_ab value of digamma(b)
+     * @return partial derivative of the incomplete beta with respect to a
+     */
     template <typename T>
     T inc_beta_dda(T a, T b, T z,
                    T digamma_a, T digamma_ab) {
