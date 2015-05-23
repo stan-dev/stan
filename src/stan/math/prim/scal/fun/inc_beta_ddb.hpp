@@ -7,12 +7,29 @@
 
 namespace stan {
   namespace math {
-    
 
     template <typename T>
     T inc_beta_dda(T a, T b, T z,
                    T digamma_a, T digamma_ab);
 
+    /**
+     * Returns the partial derivative of the regularized
+     * incomplete beta function, I_{z}(a, b) with respect to b.
+     * The power series used to compute the deriative tends to
+     * converge slowly when a and b are large, especailly if z
+     * approaches 1.  The implementation will throw an exception
+     * if the series have not converged within 100,000 iterations.
+     * The current implementation has been tested for values
+     * of a and b up to 12500 and z = 0.999.
+     *
+     * @tparam T scalar types of arguments
+     * @param a a >= 0
+     * @param b b >= 0
+     * @param z 0 <= z <= 1; upper bound of the integral
+     * @param digamma_a value of digamma(a)
+     * @param digamma_ab value of digamma(b)
+     * @return partial derivative of the incomplete beta with respect to b
+     */
     template <typename T>
     T inc_beta_ddb(T a, T b, T z,
                    T digamma_b, T digamma_ab) {

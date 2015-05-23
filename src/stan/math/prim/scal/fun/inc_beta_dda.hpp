@@ -13,13 +13,19 @@ namespace stan {
                    T digamma_b, T digamma_ab);
 
     /**
-     * Returns the partial derivative of the incomplete beta function
-     * with respect to a.
+     * Returns the partial derivative of the regularized
+     * incomplete beta function, I_{z}(a, b) with respect to a.
+     * The power series used to compute the deriative tends to
+     * converge slowly when a and b are large, especailly if z
+     * approaches 1.  The implementation will throw an exception
+     * if the series have not converged within 100,000 iterations.
+     * The current implementation has been tested for values
+     * of a and b up to 12500 and z = 0.999.
      *
      * @tparam T scalar types of arguments
-     * @param a a
-     * @param b b
-     * @param z upper bound of the integral; must be greater than 0
+     * @param a a >= 0
+     * @param b b >= 0
+     * @param z 0 <= z <= 1; upper bound of the integral
      * @param digamma_a value of digamma(a)
      * @param digamma_ab value of digamma(b)
      * @return partial derivative of the incomplete beta with respect to a
