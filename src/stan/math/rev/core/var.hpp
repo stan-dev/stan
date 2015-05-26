@@ -267,6 +267,16 @@ namespace stan {
           g[i] = x[i].vi_->adj_;
       }
 
+      /**
+       * Compute the gradient of this (dependent) variable with respect
+       * to all (independent) variables.
+       * 
+       * The grad() function does <i>not</i> recover memory.
+       */
+      void grad() {
+        stan::math::grad(vi_);  // defined in chainable.hpp
+      }
+      
       // POINTER OVERRIDES
 
       /**

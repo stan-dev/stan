@@ -335,3 +335,19 @@ TEST_F(AgradRev, nestedGradient3) {
   recover_memory();
 }
 
+TEST_F(AgradRev, grad) {
+  AVAR a = 5.0;
+  AVAR b = 10.0;
+  AVAR f = a * b + a;
+
+  EXPECT_NO_THROW(f.grad())
+    << "testing the grad function with no args";
+
+  EXPECT_FLOAT_EQ(5.0, a.val());
+  EXPECT_FLOAT_EQ(10.0, b.val());
+  EXPECT_FLOAT_EQ(55.0, f.val());
+
+  EXPECT_FLOAT_EQ(1.0, f.adj());
+  EXPECT_FLOAT_EQ(11.0, a.adj());
+  EXPECT_FLOAT_EQ(5.0, b.adj());
+}
