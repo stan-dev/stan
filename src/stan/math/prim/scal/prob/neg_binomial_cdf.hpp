@@ -13,7 +13,9 @@
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/fun/digamma.hpp>
 #include <stan/math/prim/scal/fun/inc_beta.hpp>
-#include <stan/math/prim/scal/fun/inc_beta_derivatives.hpp>
+#include <stan/math/prim/scal/fun/inc_beta_dda.hpp>
+#include <stan/math/prim/scal/fun/inc_beta_ddb.hpp>
+#include <stan/math/prim/scal/fun/inc_beta_ddz.hpp>
 #include <cmath>
 #include <limits>
 
