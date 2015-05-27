@@ -10,6 +10,20 @@ namespace stan {
   namespace math {
     
 
+    /**
+     * Returns the partial derivative of the regularized
+     * incomplete beta function, I_{z}(a, b) with respect to z.
+     *
+     * @tparam T scalar types of arguments
+     * @param a a
+     * @param b b
+     * @param z upper bound of the integral
+     * @return partial derivative of the incomplete beta with respect to z
+     *
+     * @pre a > 0
+     * @pre b > 0
+     * @pre 0 < z <= 1
+     */
     template <typename T>
     T inc_beta_ddz(T a, T b, T z) {
       using std::exp;

@@ -23,12 +23,16 @@ namespace stan {
      * of a and b up to 12500 and z = 0.999.
      *
      * @tparam T scalar types of arguments
-     * @param a a >= 0
-     * @param b b >= 0
-     * @param z 0 <= z <= 1; upper bound of the integral
+     * @param a a
+     * @param b b
+     * @param z upper bound of the integral
      * @param digamma_a value of digamma(a)
      * @param digamma_ab value of digamma(b)
      * @return partial derivative of the incomplete beta with respect to b
+     *
+     * @pre a >= 0
+     * @pre b >= 0
+     * @pre 0 <= z <= 1
      */
     template <typename T>
     T inc_beta_ddb(T a, T b, T z,
