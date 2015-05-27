@@ -3,7 +3,8 @@
 
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/log_rising_factorial.hpp>
-#include <boost/math/special_functions/digamma.hpp>
+#include <stan/math/prim/scal/fun/digamma.hpp>
+#include <stan/math/rev/scal/fun/digamma.hpp>
 
 namespace stan {
   namespace math {
@@ -17,9 +18,9 @@ namespace stan {
                      avi, bvi) {
         }
         void chain() {
-          avi_->adj_ += adj_ * (boost::math::digamma(avi_->val_ + bvi_->val_)
-                                - boost::math::digamma(avi_->val_));
-          bvi_->adj_ += adj_ * boost::math::digamma(avi_->val_ + bvi_->val_);
+          avi_->adj_ += adj_ * (digamma(avi_->val_ + bvi_->val_)
+                                - digamma(avi_->val_));
+          bvi_->adj_ += adj_ * digamma(avi_->val_ + bvi_->val_);
         }
       };
 
@@ -29,8 +30,8 @@ namespace stan {
           op_vd_vari(stan::math::log_rising_factorial(avi->val_, b), avi, b) {
         }
         void chain() {
-          avi_->adj_ += adj_ * (boost::math::digamma(avi_->val_ + bd_)
-                                - boost::math::digamma(avi_->val_));
+          avi_->adj_ += adj_ * (digamma(avi_->val_ + bd_)
+                                - digamma(avi_->val_));
         }
       };
 
@@ -40,7 +41,7 @@ namespace stan {
           op_dv_vari(stan::math::log_rising_factorial(a, bvi->val_), a, bvi) {
         }
         void chain() {
-          bvi_->adj_ += adj_ * boost::math::digamma(bvi_->val_ + ad_);
+          bvi_->adj_ += adj_ * digamma(bvi_->val_ + ad_);
         }
       };
     }

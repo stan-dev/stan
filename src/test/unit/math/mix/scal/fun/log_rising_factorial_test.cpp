@@ -2,6 +2,7 @@
 #include <boost/math/special_functions/digamma.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/mix/scal/fun/nan_util.hpp>
+#include <stan/math/prim/scal/fun/digamma.hpp>
 #include <stan/math/fwd/scal/fun/log_rising_factorial.hpp>
 #include <stan/math/rev/scal/fun/log_rising_factorial.hpp>
 #include <stan/math/fwd/scal/fun/cos.hpp>
