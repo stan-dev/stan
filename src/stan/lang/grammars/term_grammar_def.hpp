@@ -1,6 +1,31 @@
 #ifndef STAN_LANG_GRAMMARS_TERM_GRAMMAR_DEF_HPP
 #define STAN_LANG_GRAMMARS_TERM_GRAMMAR_DEF_HPP
 
+
+#include <boost/lexical_cast.hpp>
+#include <boost/config/warning_disable.hpp>
+#include <boost/fusion/include/adapt_struct.hpp>
+#include <boost/fusion/include/std_pair.hpp>
+
+#include <boost/spirit/include/classic_position_iterator.hpp>
+#include <boost/spirit/include/phoenix_core.hpp>
+#include <boost/spirit/include/phoenix_function.hpp>
+#include <boost/spirit/include/phoenix_fusion.hpp>
+#include <boost/spirit/include/phoenix_object.hpp>
+#include <boost/spirit/include/phoenix_operator.hpp>
+#include <boost/spirit/include/phoenix_stl.hpp>
+#include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/include/qi_numeric.hpp>
+#include <boost/spirit/include/support_multi_pass.hpp>
+#include <boost/tuple/tuple.hpp>
+#include <boost/variant/apply_visitor.hpp>
+#include <boost/variant/recursive_variant.hpp>
+
+#include <stan/lang/ast.hpp>
+#include <stan/lang/grammars/expression_grammar.hpp>
+#include <stan/lang/grammars/term_grammar.hpp>
+#include <stan/lang/grammars/whitespace_grammar.hpp>
+
 #include <cstddef>
 #include <iomanip>
 #include <iostream>
@@ -12,38 +37,6 @@
 #include <utility>
 #include <vector>
 #include <stdexcept>
-
-#include <boost/spirit/include/qi.hpp>
-// FIXME: get rid of unused include
-#include <boost/spirit/include/phoenix_core.hpp>
-#include <boost/spirit/include/phoenix_function.hpp>
-#include <boost/spirit/include/phoenix_fusion.hpp>
-#include <boost/spirit/include/phoenix_object.hpp>
-#include <boost/spirit/include/phoenix_operator.hpp>
-#include <boost/spirit/include/phoenix_stl.hpp>
-
-#include <boost/lexical_cast.hpp>
-#include <boost/fusion/include/adapt_struct.hpp>
-#include <boost/fusion/include/std_pair.hpp>
-#include <boost/config/warning_disable.hpp>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/qi_numeric.hpp>
-#include <boost/spirit/include/classic_position_iterator.hpp>
-#include <boost/spirit/include/phoenix_core.hpp>
-#include <boost/spirit/include/phoenix_function.hpp>
-#include <boost/spirit/include/phoenix_fusion.hpp>
-#include <boost/spirit/include/phoenix_object.hpp>
-#include <boost/spirit/include/phoenix_operator.hpp>
-#include <boost/spirit/include/phoenix_stl.hpp>
-#include <boost/spirit/include/support_multi_pass.hpp>
-#include <boost/tuple/tuple.hpp>
-#include <boost/variant/apply_visitor.hpp>
-#include <boost/variant/recursive_variant.hpp>
-
-#include <stan/lang/ast.hpp>
-#include <stan/lang/grammars/whitespace_grammar.hpp>
-#include <stan/lang/grammars/term_grammar.hpp>
-#include <stan/lang/grammars/expression_grammar.hpp>
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::index_op,
                           (stan::lang::expression, expr_)
@@ -64,12 +57,12 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::fun,
                           (std::vector<stan::lang::expression>, args_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::int_literal,
-                          (int,val_)
-                          (stan::lang::expr_type,type_))
+                          (int, val_)
+                          (stan::lang::expr_type, type_))
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::double_literal,
-                          (double,val_)
-                          (stan::lang::expr_type,type_) )
+                          (double, val_)
+                          (stan::lang::expr_type, type_) )
 
 
 namespace stan {
@@ -78,10 +71,9 @@ namespace stan {
 
 
     struct validate_integrate_ode {
-
       template <class> struct result;
       template <typename F, typename T1, typename T2, typename T3, typename T4>
-      struct result<F(T1,T2,T3,T4)> { typedef void type; };
+      struct result<F(T1, T2, T3, T4)> { typedef void type; };
 
       void operator()(const integrate_ode& ode_fun,
                       const variable_map& var_map,
@@ -90,23 +82,23 @@ namespace stan {
         pass = true;
 
         // test function argument type
-        expr_type sys_result_type(DOUBLE_T,1);
+        expr_type sys_result_type(DOUBLE_T, 1);
         std::vector<expr_type> sys_arg_types;
-        sys_arg_types.push_back(expr_type(DOUBLE_T,0));
-        sys_arg_types.push_back(expr_type(DOUBLE_T,1));
-        sys_arg_types.push_back(expr_type(DOUBLE_T,1));
-        sys_arg_types.push_back(expr_type(DOUBLE_T,1));
-        sys_arg_types.push_back(expr_type(INT_T,1));
+        sys_arg_types.push_back(expr_type(DOUBLE_T, 0));
+        sys_arg_types.push_back(expr_type(DOUBLE_T, 1));
+        sys_arg_types.push_back(expr_type(DOUBLE_T, 1));
+        sys_arg_types.push_back(expr_type(DOUBLE_T, 1));
+        sys_arg_types.push_back(expr_type(INT_T, 1));
         function_signature_t system_signature(sys_result_type, sys_arg_types);
         if (!function_signatures::instance()
-            .is_defined(ode_fun.system_function_name_,system_signature)) {
+            .is_defined(ode_fun.system_function_name_, system_signature)) {
           error_msgs << "first argument to integrate_ode must be a function with signature"
                      << " (real, real[], real[], real[], int[]) : real[] ";
           pass = false;
         }
 
         // test regular argument types
-        if (ode_fun.y0_.expression_type() != expr_type(DOUBLE_T,1)) {
+        if (ode_fun.y0_.expression_type() != expr_type(DOUBLE_T, 1)) {
           error_msgs << "second argument to integrate_ode must be type real[]"
                      << " for intial system state"
                      << "; found type="
@@ -122,7 +114,7 @@ namespace stan {
                      << ". ";
           pass = false;
         }
-        if (ode_fun.ts_.expression_type() != expr_type(DOUBLE_T,1)) {
+        if (ode_fun.ts_.expression_type() != expr_type(DOUBLE_T, 1)) {
           error_msgs << "fourth argument to integrate_ode must be type real[]"
                      << " for requested solution times"
                      << "; found type="
@@ -130,7 +122,7 @@ namespace stan {
                      << ". ";
           pass = false;
         }
-        if (ode_fun.theta_.expression_type() != expr_type(DOUBLE_T,1)) {
+        if (ode_fun.theta_.expression_type() != expr_type(DOUBLE_T, 1)) {
           error_msgs << "fifth argument to integrate_ode must be type real[]"
                      << " for parameters"
                      << "; found type="
@@ -138,7 +130,7 @@ namespace stan {
                      << ". ";
           pass = false;
         }
-        if (ode_fun.x_.expression_type() != expr_type(DOUBLE_T,1)) {
+        if (ode_fun.x_.expression_type() != expr_type(DOUBLE_T, 1)) {
           error_msgs << "sixth argument to integrate_ode must be type real[]"
                      << " for real data;"
                      << " found type="
@@ -146,7 +138,7 @@ namespace stan {
                      << ". ";
           pass = false;
         }
-        if (ode_fun.x_int_.expression_type() != expr_type(INT_T,1)) {
+        if (ode_fun.x_int_.expression_type() != expr_type(INT_T, 1)) {
           error_msgs << "seventh argument to integrate_ode must be type int[]"
                      << " for integer data;"
                      << " found type="
@@ -178,7 +170,7 @@ namespace stan {
     struct set_fun_type {
       template <class> struct result;
       template <typename F, typename T1, typename T2>
-      struct result<F(T1,T2)> { typedef fun type; };
+      struct result<F(T1, T2)> { typedef fun type; };
 
       fun operator()(fun& fun,
                      std::ostream& error_msgs) const {
@@ -197,7 +189,7 @@ namespace stan {
     struct set_fun_type_named {
       template <class> struct result;
       template <typename F, typename T1, typename T2, typename T3, typename T4, typename T5>
-      struct result<F(T1,T2,T3,T4,T5)> { typedef void type; };
+      struct result<F(T1, T2, T3, T4, T5)> { typedef void type; };
 
       void operator()(expression& fun_result,
                       fun& fun,
@@ -224,7 +216,7 @@ namespace stan {
                        << " user-defined functions with names ending in _rng"
                        << "; found function=" << fun.name_
                        << " in block=";
-          print_var_origin(error_msgs,var_origin);
+          print_var_origin(error_msgs, var_origin);
           error_msgs << std::endl;
           pass = false;
           return;
@@ -242,7 +234,7 @@ namespace stan {
                        << " transformed parameter, function argument, or model"
 
                        << " in block=";
-            print_var_origin(error_msgs,var_origin);
+            print_var_origin(error_msgs, var_origin);
             error_msgs << std::endl;
             pass = false;
             return;
@@ -279,7 +271,7 @@ namespace stan {
     struct exponentiation_expr {
       template <class> struct result;
       template <typename F, typename T1, typename T2, typename T3, typename T4, typename T5>
-      struct result<F(T1,T2,T3,T4,T5)> { typedef void type; };
+      struct result<F(T1, T2, T3, T4, T5)> { typedef void type; };
 
       void operator()(expression& expr1,
                       const expression& expr2,
@@ -295,7 +287,7 @@ namespace stan {
                      << " by "
                      << expr2.expression_type()
                      << " in block=";
-          print_var_origin(error_msgs,var_origin);
+          print_var_origin(error_msgs, var_origin);
           error_msgs << std::endl;
           pass = false;
           return;
@@ -304,8 +296,8 @@ namespace stan {
         args.push_back(expr1);
         args.push_back(expr2);
         set_fun_type sft;
-        fun f("pow",args);
-        sft(f,error_msgs);
+        fun f("pow", args);
+        sft(f, error_msgs);
         expr1 = expression(f);
       }
     };
@@ -314,7 +306,7 @@ namespace stan {
     struct multiplication_expr {
       template <class> struct result;
       template <typename F, typename T1, typename T2, typename T3>
-      struct result<F(T1,T2,T3)> { typedef void type; };
+      struct result<F(T1, T2, T3)> { typedef void type; };
 
       void operator()(expression& expr1,
                       const expression& expr2,
@@ -329,7 +321,7 @@ namespace stan {
         args.push_back(expr1);
         args.push_back(expr2);
         set_fun_type sft;
-        fun f("multiply",args);
+        fun f("multiply", args);
         sft(f,error_msgs);
         expr1 = expression(f);
       }
@@ -341,7 +333,7 @@ namespace stan {
     struct division_expr {
       template <class> struct result;
       template <typename F, typename T1, typename T2, typename T3>
-      struct result<F(T1,T2,T3)> { typedef void type; };
+      struct result<F(T1, T2, T3)> { typedef void type; };
 
       void operator()(expression& expr1,
                       const expression& expr2,
@@ -370,21 +362,21 @@ namespace stan {
                      << " in platform-dependent way."
                      << std::endl;
 
-          fun f("divide",args);
-          sft(f,error_msgs);
+          fun f("divide", args);
+          sft(f, error_msgs);
           expr1 = expression(f);
           return;
         }
         if ((expr1.expression_type().type() == MATRIX_T
              || expr1.expression_type().type() == ROW_VECTOR_T)
             && expr2.expression_type().type() == MATRIX_T) {
-          fun f("mdivide_right",args);
-          sft(f,error_msgs);
+          fun f("mdivide_right", args);
+          sft(f, error_msgs);
           expr1 = expression(f);
           return;
         }
-        fun f("divide",args);
-        sft(f,error_msgs);
+        fun f("divide", args);
+        sft(f, error_msgs);
         expr1 = expression(f);
         return;
       }
@@ -394,7 +386,7 @@ namespace stan {
     struct modulus_expr {
       template <class> struct result;
       template <typename F, typename T1, typename T2, typename T3, typename T4>
-      struct result<F(T1,T2,T3,T4)> { typedef void type; };
+      struct result<F(T1, T2, T3, T4)> { typedef void type; };
 
       void operator()(expression& expr1,
                       const expression& expr2,
@@ -415,8 +407,8 @@ namespace stan {
         args.push_back(expr1);
         args.push_back(expr2);
         set_fun_type sft;
-        fun f("modulus",args);
-        sft(f,error_msgs);
+        fun f("modulus", args);
+        sft(f, error_msgs);
         expr1 = expression(f);
       }
     };
@@ -425,7 +417,7 @@ namespace stan {
     struct left_division_expr {
       template <class> struct result;
       template <typename F, typename T1, typename T2, typename T3>
-      struct result<F(T1,T2,T3)> { typedef void type; };
+      struct result<F(T1, T2, T3)> { typedef void type; };
 
       void operator()(expression& expr1,
                       const expression& expr2,
@@ -437,14 +429,14 @@ namespace stan {
         if (expr1.expression_type().type() == MATRIX_T
             && (expr2.expression_type().type() == VECTOR_T
                 || expr2.expression_type().type() == MATRIX_T)) {
-          fun f("mdivide_left",args);
-          sft(f,error_msgs);
+          fun f("mdivide_left", args);
+          sft(f, error_msgs);
           expr1 = expression(f);
           return;
         }
-        fun f("divide_left",args); // this doesn't exist, so will
-                                   // throw error on purpose
-        sft(f,error_msgs);
+        fun f("divide_left", args);  // this doesn't exist, so will
+                                     // throw error on purpose
+        sft(f, error_msgs);
         expr1 = expression(f);
       }
     };
@@ -453,7 +445,7 @@ namespace stan {
     struct elt_multiplication_expr {
       template <class> struct result;
       template <typename F, typename T1, typename T2, typename T3>
-      struct result<F(T1,T2,T3)> { typedef void type; };
+      struct result<F(T1, T2, T3)> { typedef void type; };
 
       void operator()(expression& expr1,
                       const expression& expr2,
@@ -468,8 +460,8 @@ namespace stan {
         args.push_back(expr1);
         args.push_back(expr2);
         set_fun_type sft;
-        fun f("elt_multiply",args);
-        sft(f,error_msgs);
+        fun f("elt_multiply", args);
+        sft(f, error_msgs);
         expr1 = expression(f);
       }
     };
@@ -478,7 +470,7 @@ namespace stan {
     struct elt_division_expr {
       template <class> struct result;
       template <typename F, typename T1, typename T2, typename T3>
-      struct result<F(T1,T2,T3)> { typedef void type; };
+      struct result<F(T1, T2, T3)> { typedef void type; };
 
       void operator()(expression& expr1,
                       const expression& expr2,
@@ -493,8 +485,8 @@ namespace stan {
         args.push_back(expr1);
         args.push_back(expr2);
         set_fun_type sft;
-        fun f("elt_divide",args);
-        sft(f,error_msgs);
+        fun f("elt_divide", args);
+        sft(f, error_msgs);
         expr1 = expression(f);
       }
     };
@@ -508,7 +500,7 @@ namespace stan {
     struct negate_expr {
       template <class> struct result;
       template <typename F, typename T1, typename T2, typename T3, typename T4>
-      struct result<F(T1,T2,T3,T4)> { typedef void type; };
+      struct result<F(T1, T2, T3, T4)> { typedef void type; };
 
       void operator()(expression& expr_result,
                       const expression& expr,
@@ -521,8 +513,8 @@ namespace stan {
         std::vector<expression> args;
         args.push_back(expr);
         set_fun_type sft;
-        fun f("minus",args);
-        sft(f,error_msgs);
+        fun f("minus", args);
+        sft(f, error_msgs);
         expr_result = expression(f);
       }
     };
@@ -531,7 +523,7 @@ namespace stan {
     struct logical_negate_expr {
       template <class> struct result;
       template <typename F, typename T1, typename T2, typename T3>
-      struct result<F(T1,T2,T3)> { typedef void type; };
+      struct result<F(T1, T2, T3)> { typedef void type; };
 
       void operator()(expression& expr_result,
                       const expression& expr,
@@ -543,8 +535,8 @@ namespace stan {
         std::vector<expression> args;
         args.push_back(expr);
         set_fun_type sft;
-        fun f("logical_negation",args);
-        sft(f,error_msgs);
+        fun f("logical_negation", args);
+        sft(f, error_msgs);
         expr_result = expression(f);
       }
     };
@@ -553,7 +545,7 @@ namespace stan {
     struct transpose_expr {
       template <class> struct result;
       template <typename F, typename T1, typename T2>
-      struct result<F(T1,T2)> { typedef expression type; };
+      struct result<F(T1, T2)> { typedef expression type; };
 
       expression operator()(const expression& expr,
                             std::ostream& error_msgs) const {
@@ -564,8 +556,8 @@ namespace stan {
         std::vector<expression> args;
         args.push_back(expr);
         set_fun_type sft;
-        fun f("transpose",args);
-        sft(f,error_msgs);
+        fun f("transpose", args);
+        sft(f, error_msgs);
         return expression(f);
       }
     };
@@ -581,7 +573,7 @@ namespace stan {
     struct add_expression_dimss {
       template <class> struct result;
       template <typename F, typename T1, typename T2, typename T3, typename T4>
-      struct result<F(T1,T2,T3,T4)> { typedef void type; };
+      struct result<F(T1, T2, T3, T4)> { typedef void type; };
       void operator()(expression& expression,
                       std::vector<std::vector<stan::lang::expression> >& dimss,
                       bool& pass,
@@ -616,7 +608,7 @@ namespace stan {
     struct set_var_type {
       template <class> struct result;
       template <typename F, typename T1, typename T2, typename T3, typename T4>
-      struct result<F(T1,T2,T3,T4)> { typedef variable type; };
+      struct result<F(T1, T2, T3, T4)> { typedef variable type; };
       variable operator()(variable& var_expr,
                           variable_map& vm,
                           std::ostream& error_msgs,
@@ -638,7 +630,7 @@ namespace stan {
                      << std::endl;
         }
         pass = true;
-        var_expr.set_type(vm.get_base_type(name),vm.get_num_dims(name));
+        var_expr.set_type(vm.get_base_type(name), vm.get_num_dims(name));
         return var_expr;
       }
     };
@@ -647,7 +639,7 @@ namespace stan {
     struct validate_int_expr3 {
       template <class> struct result;
       template <typename F, typename T1, typename T2>
-      struct result<F(T1,T2)> { typedef bool type; };
+      struct result<F(T1, T2)> { typedef bool type; };
 
       bool operator()(const expression& expr,
                       std::stringstream& error_msgs) const {
@@ -693,22 +685,22 @@ namespace stan {
         = ( negated_factor_r(_r1)
             [_val = _1]
             >> *( (lit('*') > negated_factor_r(_r1)
-                              [multiplication_f(_val,_1,
+                              [multiplication_f(_val, _1,
                                                 boost::phoenix::ref(error_msgs_))])
                   | (lit('/') > negated_factor_r(_r1)
-                                [division_f(_val,_1,
+                                [division_f(_val, _1,
                                             boost::phoenix::ref(error_msgs_))])
                   | (lit('%') > negated_factor_r(_r1)
-                                [modulus_f(_val,_1,_pass,
+                                [modulus_f(_val, _1, _pass,
                                            boost::phoenix::ref(error_msgs_))])
                   | (lit('\\') > negated_factor_r(_r1)
-                                 [left_division_f(_val,_1,
+                                 [left_division_f(_val, _1,
                                                    boost::phoenix::ref(error_msgs_))])
                   | (lit(".*") > negated_factor_r(_r1)
-                                 [elt_multiplication_f(_val,_1,
+                                 [elt_multiplication_f(_val, _1,
                                                         boost::phoenix::ref(error_msgs_))])
                   | (lit("./") > negated_factor_r(_r1)
-                                 [elt_division_f(_val,_1,
+                                 [elt_division_f(_val, _1,
                                                  boost::phoenix::ref(error_msgs_))])
                    )
              )
@@ -717,9 +709,9 @@ namespace stan {
       negated_factor_r.name("expression");
       negated_factor_r
         = lit('-') >> negated_factor_r(_r1)
-                      [negate_expr_f(_val,_1,_pass,boost::phoenix::ref(error_msgs_))]
+                      [negate_expr_f(_val, _1, _pass, boost::phoenix::ref(error_msgs_))]
         | lit('!') >> negated_factor_r(_r1)
-                      [logical_negate_expr_f(_val,_1,boost::phoenix::ref(error_msgs_))]
+                      [logical_negate_expr_f(_val, _1, boost::phoenix::ref(error_msgs_))]
         | lit('+') >> negated_factor_r(_r1)  [_val = _1]
         | exponentiated_factor_r(_r1) [_val = _1]
         | indexed_factor_r(_r1) [_val = _1];
@@ -730,7 +722,7 @@ namespace stan {
         = ( indexed_factor_r(_r1) [_val = _1]
             >> lit('^')
             > negated_factor_r(_r1)
-            [exponentiation_f(_val,_1,_r1,_pass,
+            [exponentiation_f(_val, _1, _r1, _pass,
                               boost::phoenix::ref(error_msgs_))]
             )
         ;
@@ -775,10 +767,10 @@ namespace stan {
       factor_r =
         integrate_ode_r(_r1)    [_val = _1]
         | ( fun_r(_r1)[_b = _1]
-            > eps[set_fun_type_named_f(_val,_b,_r1,_pass,
+            > eps[set_fun_type_named_f(_val, _b, _r1, _pass,
                                        boost::phoenix::ref(error_msgs_))] )
         | ( variable_r[_a = _1]
-            > eps [_val = set_var_type_f(_a,boost::phoenix::ref(var_map_),
+            > eps [_val = set_var_type_f(_a, boost::phoenix::ref(var_map_),
                                         boost::phoenix::ref(error_msgs_),
                                         _pass)] )
         | int_literal_r       [_val = _1]
@@ -824,7 +816,7 @@ namespace stan {
       dim_r.name("array dimension (integer expression)");
       dim_r
         %= expression_g(_r1)
-        > eps [_pass = validate_int_expr3_f(_val,boost::phoenix::ref(error_msgs_))]
+        > eps [_pass = validate_int_expr3_f(_val, boost::phoenix::ref(error_msgs_))]
         ;
 
       dims_r.name("array dimensions");

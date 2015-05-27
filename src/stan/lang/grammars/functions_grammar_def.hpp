@@ -1,10 +1,6 @@
 #ifndef STAN_LANG_GRAMMARS_FUNCTIONS_GRAMMAR_DEF_HPP
 #define STAN_LANG_GRAMMARS_FUNCTIONS_GRAMMAR_DEF_HPP
 
-#include <set>
-#include <utility>
-#include <vector>
-
 #include <boost/spirit/include/qi.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
@@ -30,6 +26,10 @@
 #include <stan/lang/grammars/statement_grammar.hpp>
 #include <stan/lang/grammars/whitespace_grammar.hpp>
 
+#include <set>
+#include <utility>
+#include <vector>
+
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::function_decl_def,
                           (stan::lang::expr_type, return_type_)
@@ -49,7 +49,7 @@ namespace stan {
     struct validate_non_void_arg_function {
       template <class> struct result;
       template <typename F, typename T1, typename T2, typename T3>
-      struct result<F(T1,T2,T3)> { typedef void type; };
+      struct result<F(T1, T2, T3)> { typedef void type; };
       void operator()(const expr_type& arg_type,
                       bool& pass,
                       std::ostream& error_msgs) const {
@@ -65,7 +65,7 @@ namespace stan {
     struct set_void_function {
       template <class> struct result;
       template <typename F, typename T1, typename T2, typename T3, typename T4>
-      struct result<F(T1,T2,T3,T4)> { typedef void type; };
+      struct result<F(T1, T2, T3, T4)> { typedef void type; };
       void operator()(const expr_type& return_type,
                       var_origin& origin,
                       bool& pass,
@@ -86,7 +86,7 @@ namespace stan {
     struct set_allows_sampling_origin {
       template <class> struct result;
       template <typename F, typename T1, typename T2, typename T3>
-      struct result<F(T1,T2,T3)> { typedef void type; };
+      struct result<F(T1, T2, T3)> { typedef void type; };
       void operator()(const std::string& identifier,
                       bool& allow_sampling,
                       int& origin) const {
@@ -112,9 +112,9 @@ namespace stan {
     boost::phoenix::function<set_allows_sampling_origin> set_allows_sampling_origin_f;
 
     struct validate_declarations {
-      template <class> struct result; 
+      template <class> struct result;
       template <typename F, typename T1, typename T2, typename T3, typename T4>
-      struct result<F(T1,T2,T3,T4)> { typedef void type; };
+      struct result<F(T1, T2, T3, T4)> { typedef void type; };
       void operator()(bool& pass,
                       std::set<std::pair<std::string,
                                          function_signature_t> >& declared,
@@ -142,10 +142,10 @@ namespace stan {
     struct add_function_signature {
       template <class> struct result;
       template <typename F, typename T1, typename T2, typename T3, typename T4, typename T5>
-      struct result<F(T1,T2,T3,T4,T5)> { typedef void type; };
+      struct result<F(T1, T2, T3, T4, T5)> { typedef void type; };
       static bool fun_exists(const std::set<std::pair<std::string,
                                                       function_signature_t> >& existing,
-                             const std::pair<std::string,function_signature_t>& name_sig) {
+                             const std::pair<std::string, function_signature_t>& name_sig) {
         for (std::set<std::pair<std::string, function_signature_t> >::const_iterator it
                = existing.begin();
              it != existing.end();
@@ -217,7 +217,7 @@ namespace stan {
     struct validate_return_type {
       template <class> struct result;
       template <typename F, typename T1, typename T2, typename T3>
-      struct result<F(T1,T2,T3)> { typedef void type; };
+      struct result<F(T1, T2, T3)> { typedef void type; };
       void operator()(function_decl_def& decl,
                       bool& pass,
                       std::ostream& error_msgs) const {
@@ -251,7 +251,7 @@ namespace stan {
     struct unscope_variables {
       template <class> struct result;
       template <typename F, typename T1, typename T2>
-      struct result<F(T1,T2)> { typedef void type; };
+      struct result<F(T1, T2)> { typedef void type; };
       void operator()(function_decl_def& decl,
                       variable_map& vm) const {
         vm.remove("lp__");
@@ -265,7 +265,7 @@ namespace stan {
     struct add_fun_var {
       template <class> struct result;
       template <typename F, typename T1, typename T2, typename T3, typename T4>
-      struct result<F(T1,T2,T3,T4)> { typedef void type; };
+      struct result<F(T1, T2, T3, T4)> { typedef void type; };
       // each type derived from base_var_decl gets own instance
       void operator()(arg_decl& decl,
                       bool& pass,
@@ -303,8 +303,7 @@ namespace stan {
         functions_defined_(),
         error_msgs_(error_msgs),
         statement_g(var_map_,error_msgs_),
-        bare_type_g(var_map_,error_msgs_)
-  {
+        bare_type_g(var_map_,error_msgs_) {
       using boost::spirit::qi::_1;
       using boost::spirit::qi::char_;
       using boost::spirit::qi::eps;
@@ -338,19 +337,19 @@ namespace stan {
       // locals: _a = allow sampling, _b = origin (function, rng/lp)
       function_r.name("function declaration or definition");
       function_r
-        %= bare_type_g[ set_void_function_f(_1,_b, _pass,
+        %= bare_type_g[ set_void_function_f(_1, _b, _pass,
                                             boost::phoenix::ref(error_msgs_)) ]
-        > identifier_r[ set_allows_sampling_origin_f(_1,_a,_b) ]
+        > identifier_r[ set_allows_sampling_origin_f(_1, _a, _b) ]
         > lit('(')
         > arg_decls_r
         > close_arg_decls_r
         > eps [ scope_lp_f(boost::phoenix::ref(var_map_)) ]
-        > statement_g(_a,_b,true)
+        > statement_g(_a, _b, true)
         > eps [ unscope_variables_f(_val,
                                      boost::phoenix::ref(var_map_)) ]
-        > eps [ validate_return_type_f(_val,_pass,
+        > eps [ validate_return_type_f(_val, _pass,
                                         boost::phoenix::ref(error_msgs_)) ]
-        > eps [ add_function_signature_f(_val,_pass,
+        > eps [ add_function_signature_f(_val, _pass,
                                           boost::phoenix::ref(functions_declared_),
                                           boost::phoenix::ref(functions_defined_),
                                           boost::phoenix::ref(error_msgs_) ) ]
@@ -370,7 +369,7 @@ namespace stan {
         %= bare_type_g [ validate_non_void_arg_f(_1, _pass,
                                                  boost::phoenix::ref(error_msgs_)) ]
         > identifier_r
-        > eps[ add_fun_var_f(_val,_pass,
+        > eps[ add_fun_var_f(_val, _pass,
                               boost::phoenix::ref(var_map_),
                               boost::phoenix::ref(error_msgs_)) ]
         ;
