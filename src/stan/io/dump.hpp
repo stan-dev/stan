@@ -2,13 +2,13 @@
 #define STAN_IO_DUMP_HPP
 
 #include <boost/lexical_cast.hpp>
-#include <boost/lexical_cast/bad_lexical_cast.hpp>
 #include <boost/throw_exception.hpp>
 #include <boost/type_traits/is_floating_point.hpp>
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/type_traits/is_arithmetic.hpp>
 #include <boost/utility/enable_if.hpp>
 
+#include <stan/io/validate_zero_buf.hpp>
 #include <stan/io/var_context.hpp>
 #include <stan/math/prim/scal/meta/index_type.hpp>
 #include <stan/math/prim/arr/meta/index_type.hpp>
@@ -616,23 +616,12 @@ namespace stan {
         return n;
       }
 
-      void validate_zero_buf() {
-        for (size_t i = 0; i < buf_.size(); ++i) {
-          if (buf_[i] == 'e' || buf_[i] == 'E')
-            return;
-          if (buf_[i] >= '1' && buf_[i] <= '9')
-            boost::conversion::detail::throw_bad_cast<std::string, double>();
-        }
-      }
-
       double scan_double() {
         double x = 0;
         try {
           x = boost::lexical_cast<double>(buf_);
-          if (x == 0) {
-            std::cout << "x == 0: buf_ = " << buf_ << std::endl;
-            validate_zero_buf();
-          }
+          if (x == 0)
+            validate_zero_buf(buf_);
         }
         catch ( const boost::bad_lexical_cast &exc ) {
           std::string msg = "value " + buf_ + " beyond numeric range";
