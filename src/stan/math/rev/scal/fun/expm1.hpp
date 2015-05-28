@@ -3,7 +3,7 @@
 
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
-#include <math.h>
+#include <cmath>
 #include <valarray>
 
 namespace stan {
@@ -13,7 +13,7 @@ namespace stan {
       class expm1_vari : public op_v_vari {
       public:
         explicit expm1_vari(vari* avi) :
-          op_v_vari(::expm1(avi->val_), avi) {
+          op_v_vari(std::expm1(avi->val_), avi) {
         }
         void chain() {
           avi_->adj_ += adj_ * (val_ + 1.0);
@@ -23,8 +23,6 @@ namespace stan {
 
     /**
      * The exponentiation of the specified variable minus 1 (C99).
-     *
-     * For non-variable function, see boost::math::expm1().
      *
      * The derivative is given by
      *

@@ -4,7 +4,7 @@
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/log1m_exp.hpp>
 #include <stan/math/rev/scal/fun/calculate_chain.hpp>
-#include <boost/math/special_functions/expm1.hpp>
+#include <cmath>
 
 namespace stan {
   namespace math {
@@ -21,7 +21,7 @@ namespace stan {
           //   log(1-exp(x)) = -exp(x)/(1-exp(x))
           //                 = -1/(exp(-x)-1)
           //                 = -1/expm1(-x)
-          avi_->adj_ -= adj_ / boost::math::expm1(-(avi_->val_));
+          avi_->adj_ -= adj_ / std::expm1(-(avi_->val_));
         }
       };
     }

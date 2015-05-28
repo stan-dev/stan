@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
+#include <stan/math/fwd/scal/fun/exp.hpp>
 #include <stan/math/prim/scal/fun/log1p_exp.hpp>
-#include <test/unit/math/fwd/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/log.hpp>
 #include <stan/math/fwd/scal/fun/log1p_exp.hpp>
-#include <stan/math/fwd/scal/fun/exp.hpp>
+#include <test/unit/math/fwd/scal/fun/nan_util.hpp>
 
 TEST(AgradFwdLog1pExp,Fvar) {
   using stan::math::fvar;
@@ -22,10 +22,10 @@ TEST(AgradFwdLog1pExp,Fvar) {
   EXPECT_FLOAT_EQ(log1p_exp(1.0), b.val_);
   EXPECT_FLOAT_EQ(2.0 * exp(1.0) / (1 + exp(1.0)), b.d_);
 
-  fvar<double> a2 = log(1+exp(x));
+  fvar<double> a2 = log(1 + exp(x));
   EXPECT_FLOAT_EQ(a.d_, a2.d_);
 
-  fvar<double> b2 = log(1+exp(y));
+  fvar<double> b2 = log(1 + exp(y));
   EXPECT_FLOAT_EQ(b.d_, b2.d_);
 }
 

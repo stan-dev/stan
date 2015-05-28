@@ -2,21 +2,18 @@
 #define STAN_MATH_FWD_SCAL_FUN_EXPM1_HPP
 
 #include <stan/math/fwd/core.hpp>
-
-#include <math.h>
+#include <cmath>
 
 namespace stan {
-
   namespace math {
 
     template <typename T>
-    inline
-    fvar<T>
-    expm1(const fvar<T>& x) {
-      using ::expm1;
-      using ::exp;
+    inline fvar<T> expm1(const fvar<T>& x) {
+      using std::expm1;
+      using std::exp;
       return fvar<T>(expm1(x.val_), x.d_ * exp(x.val_));
     }
+
   }
 }
 #endif

@@ -1,11 +1,12 @@
 #include <gtest/gtest.h>
 #include <stan/math/prim/scal/fun/log1m_exp.hpp>
-#include <test/unit/math/fwd/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/log1m_exp.hpp>
 #include <stan/math/fwd/scal/fun/exp.hpp>
 #include <stan/math/fwd/scal/fun/fabs.hpp>
 #include <stan/math/fwd/scal/fun/log.hpp>
 #include <stan/math/fwd/scal/fun/value_of.hpp>
+#include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <cmath>
 
 TEST(AgradFwdLog1mExp,Fvar) {
   using stan::math::fvar;
@@ -21,12 +22,12 @@ TEST(AgradFwdLog1mExp,Fvar) {
   fvar<double> a = log1m_exp(x);
   EXPECT_FLOAT_EQ(log1m_exp(-0.5), a.val_);
   EXPECT_FLOAT_EQ(-exp(-0.5) / (1 - exp(-0.5)), a.d_);
-  EXPECT_FLOAT_EQ(-1 / boost::math::expm1(0.5), a.d_);
+  EXPECT_FLOAT_EQ(-1 / std::expm1(0.5), a.d_);
 
   fvar<double> b = log1m_exp(y);
   EXPECT_FLOAT_EQ(log1m_exp(-1.0), b.val_);
   EXPECT_FLOAT_EQ(2.0 * -exp(-1.0) / (1 - exp(-1.0)), b.d_);
-  EXPECT_FLOAT_EQ(2.0 * -1 / boost::math::expm1(1), b.d_);
+  EXPECT_FLOAT_EQ(2.0 * -1 / std::expm1(1), b.d_);
   
   fvar<double> a2 = log(1-exp(x));
   EXPECT_FLOAT_EQ(a.d_, a2.d_);
