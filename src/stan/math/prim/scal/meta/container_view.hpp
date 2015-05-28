@@ -9,6 +9,24 @@ namespace stan {
 
     struct dummy { };
 
+    /**
+     * Primary template class for container view of
+     * array y with same structure as T1 and 
+     * size as x
+     *
+     * operator[](int i) returns reference to view, 
+     * indexed by i
+     * Specializations handle appropriate broadcasting
+     * if size of x is 1
+     *
+     * Intended for use in OperandsAndPartials
+     *
+     * @tparam T1 type of view.
+     * @tparam T2 type of scalar returned by view.
+     * @param x object from which size is to be inferred
+     * @param y underlying array 
+     */
+
     template <typename T1, typename T2>
     class container_view {
       public:
@@ -20,6 +38,18 @@ namespace stan {
       private:
         T2* y_;
     };
+
+    /**
+     * Intended for usage in OperandsAndPartials
+     *
+     * operator[](int i) 
+     * throws exception
+     *
+     * @tparam T1 type of x
+     * @tparam T2 type of scalar returned by view
+     * @param x object from which size is to be inferred
+     * @param y underlying array 
+     */
 
     template <typename T2>
     class container_view<dummy, T2> {
