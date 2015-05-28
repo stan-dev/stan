@@ -2,7 +2,6 @@
 #define STAN_MATH_PRIM_SCAL_FUN_LOG_DIFF_EXP_HPP
 
 #include <stan/math/prim/scal/fun/log1m_exp.hpp>
-#include <stan/math/rev/scal/fun/expm1.hpp>
 #include <boost/math/tools/promotion.hpp>
 #include <boost/throw_exception.hpp>
 #include <limits>

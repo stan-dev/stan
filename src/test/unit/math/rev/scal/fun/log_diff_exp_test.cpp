@@ -7,6 +7,7 @@
 #include <stan/math/rev/scal/fun/exp.hpp>
 #include <stan/math/rev/scal/fun/fabs.hpp>
 #include <stan/math/rev/scal/fun/log.hpp>
+#include <stan/math/rev/scal/fun/expm1.hpp>
 
 TEST(AgradRev, log_diff_exp_vv) {
   AVAR a = 5.0;
