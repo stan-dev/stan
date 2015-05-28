@@ -41,7 +41,7 @@ namespace stan {
     log1m_exp(const T a) {
       using std::log;
       using std::exp;
-      using std::expm1;
+      using ::expm1;
 
       if (a >= 0)
         return std::numeric_limits<double>::quiet_NaN();

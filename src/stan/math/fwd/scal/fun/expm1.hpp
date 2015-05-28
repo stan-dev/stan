@@ -9,8 +9,8 @@ namespace stan {
 
     template <typename T>
     inline fvar<T> expm1(const fvar<T>& x) {
-      using std::expm1;
       using std::exp;
+      using ::expm1;
       return fvar<T>(expm1(x.val_), x.d_ * exp(x.val_));
     }
 

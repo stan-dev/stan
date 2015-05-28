@@ -31,7 +31,7 @@ void test_log1m_exp(double val) {
   EXPECT_EQ(1U,g.size());
   EXPECT_EQ(1U,g2.size());
   EXPECT_FLOAT_EQ(g2[0],g[0]);
-  EXPECT_FLOAT_EQ(g2[0],-1 / std::expm1(-val)); // analytic deriv
+  EXPECT_FLOAT_EQ(g2[0],-1 / ::expm1(-val)); // analytic deriv
   EXPECT_FLOAT_EQ(f2.val(),f_val);
 }
 

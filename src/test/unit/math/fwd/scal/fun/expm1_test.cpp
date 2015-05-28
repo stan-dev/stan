@@ -6,7 +6,6 @@
 
 TEST(AgradFwdExpm1,Fvar) {
   using stan::math::fvar;
-  using std::expm1;
   using std::exp;
 
   fvar<double> x(0.5,1.0);
@@ -41,7 +40,6 @@ TEST(AgradFwdExpm1,Fvar) {
 
 TEST(AgradFwdExpm1,FvarFvarDouble) {
   using stan::math::fvar;
-  using std::expm1;
   using std::exp;
 
   fvar<fvar<double> > x;

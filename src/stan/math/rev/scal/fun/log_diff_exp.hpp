@@ -18,7 +18,7 @@ namespace stan {
         }
         void chain() {
           avi_->adj_ += adj_ * calculate_chain(avi_->val_, val_);
-          bvi_->adj_ -= adj_ / std::expm1(avi_->val_ - bvi_->val_);
+          bvi_->adj_ -= adj_ / ::expm1(avi_->val_ - bvi_->val_);
         }
       };
       class log_diff_exp_vd_vari : public op_vd_vari {
@@ -38,7 +38,7 @@ namespace stan {
                      a, bvi) {
         }
         void chain() {
-          bvi_->adj_ -= adj_ / std::expm1(ad_ - bvi_->val_);
+          bvi_->adj_ -= adj_ / ::expm1(ad_ - bvi_->val_);
         }
       };
     }
