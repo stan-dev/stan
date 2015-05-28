@@ -20,7 +20,7 @@ namespace stan {
       argument_probe(std::vector<argument*>& valid_args)
         : _arguments(valid_args) {}
       
-      void probe_args(interface_callbacks::writer::base_writer&) {
+      void probe_args(interface_callbacks::writer::base_writer& w) {
 
         for (std::vector<argument*>::iterator arg_it = _arguments.begin();
              arg_it != _arguments.end(); ++arg_it)
