@@ -7,7 +7,6 @@
 #include <stan/lang.hpp>
 #include <stan/math.hpp>
 #include <stan/mcmc.hpp>
-#include <stan/memory.hpp>
 #include <stan/model.hpp>
 #include <stan/optimization.hpp>
 #include <stan/services.hpp>

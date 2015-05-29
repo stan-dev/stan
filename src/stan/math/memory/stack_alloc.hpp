@@ -1,5 +1,5 @@
-#ifndef STAN_MEMORY_STACK_ALLOC_HPP
-#define STAN_MEMORY_STACK_ALLOC_HPP
+#ifndef STAN_MATH_MEMORY_STACK_ALLOC_HPP
+#define STAN_MATH_MEMORY_STACK_ALLOC_HPP
 
 #include <cstdlib>
 #include <cstddef>
@@ -15,7 +15,7 @@
 
 namespace stan {
 
-  namespace memory {
+  namespace math {
 
     /**
      * Return <code>true</code> if the specified pointer is aligned

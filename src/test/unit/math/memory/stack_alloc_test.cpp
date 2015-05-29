@@ -3,11 +3,11 @@
 #include <stdlib.h>
 #include <utility>
 #include <vector>
-#include <stan/memory/stack_alloc.hpp>
+#include <stan/math/memory/stack_alloc.hpp>
 
 TEST(MemoryStackAlloc, allocArray) {
   // just an example to show how alloc_array is used
-  stan::memory::stack_alloc allocator;
+  stan::math::stack_alloc allocator;
   double* x = allocator.alloc_array<double>(10U);
   for (int i = 0; i < 10; ++i)
     x[i] = 3.0;
@@ -22,7 +22,7 @@ struct biggy {
 TEST(MemoryStackAlloc, allocArrayBigger) {
   size_t N = 1000;
   size_t K = 10;
-  stan::memory::stack_alloc allocator;
+  stan::math::stack_alloc allocator;
   biggy* x = allocator.alloc_array<biggy>(N);
   for (size_t i = 0; i < N; ++i)
     for (size_t k = 1; k < K; ++k)
@@ -32,7 +32,7 @@ TEST(MemoryStackAlloc, allocArrayBigger) {
       EXPECT_FLOAT_EQ(k * i, x[i].r[k]);
 }
 TEST(stack_alloc, bytes_allocated) {
-  stan::memory::stack_alloc allocator;
+  stan::math::stack_alloc allocator;
   EXPECT_TRUE(0L <= allocator.bytes_allocated());
   for (size_t n = 1; n <= 10000; ++n) {
     allocator.alloc(n);
@@ -48,12 +48,12 @@ TEST(stack_alloc, bytes_allocated) {
 
 TEST(stack_alloc,is_aligned) {
   char* ptr = static_cast<char*>(malloc(1024));
-  EXPECT_TRUE(stan::memory::is_aligned(ptr,1U));
-  EXPECT_TRUE(stan::memory::is_aligned(ptr,2U));
-  EXPECT_TRUE(stan::memory::is_aligned(ptr,4U));
-  EXPECT_TRUE(stan::memory::is_aligned(ptr,8U));
+  EXPECT_TRUE(stan::math::is_aligned(ptr,1U));
+  EXPECT_TRUE(stan::math::is_aligned(ptr,2U));
+  EXPECT_TRUE(stan::math::is_aligned(ptr,4U));
+  EXPECT_TRUE(stan::math::is_aligned(ptr,8U));
   
-  EXPECT_FALSE(stan::memory::is_aligned(ptr+1,8U));
+  EXPECT_FALSE(stan::math::is_aligned(ptr+1,8U));
   free(ptr); // not very safe, but just a test
 }
 
@@ -63,7 +63,7 @@ TEST(stack_alloc,alloc) {
   std::vector<int*> is;
   std::vector<char*> cs;
 
-  stan::memory::stack_alloc allocator;
+  stan::math::stack_alloc allocator;
 
   for (int i = 0; i < 100000; ++i) {
     allocator.alloc(1317);

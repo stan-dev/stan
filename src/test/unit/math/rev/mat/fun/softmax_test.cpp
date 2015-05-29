@@ -13,7 +13,7 @@
 
 TEST(AgradRevMatrix,softmaxLeak) {
   // FIXME: very brittle test depending on unrelated constants of 
-  //        block sizes/growth in stan::memory::stack_alloc
+  //        block sizes/growth in stan::math::stack_alloc
   using stan::math::softmax;
   using stan::math::softmax;
   using Eigen::Matrix;
