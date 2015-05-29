@@ -19,7 +19,6 @@ TEST(MathMeta, container_view_vector) {
   }
 }
 
-
 TEST(MathMeta, container_view_throw) {
   using Eigen::Dynamic;
   using Eigen::Matrix;

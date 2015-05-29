@@ -29,6 +29,18 @@ TEST(MathMeta, container_view_vector) {
   }
 }
 
+TEST(MathMeta, container_view_vector_zero_size) {
+  using stan::math::container_view;
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+
+  double y[0];
+  Matrix<double, Dynamic, 1> x(1);
+  x.resize(0);
+  container_view<Matrix<double, Dynamic, 1>, Matrix<double, Dynamic, 1> > view_test_vec(x, y);
+  EXPECT_DEATH(view_test_vec[0](0), "");
+}
+
 TEST(MathMeta, container_view_row_vector) {
   using stan::math::container_view;
   using Eigen::Matrix;
@@ -55,6 +67,18 @@ TEST(MathMeta, container_view_row_vector) {
   }
 }
 
+TEST(MathMeta, container_view_row_vector_zero_size) {
+  using stan::math::container_view;
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+
+  double y[0];
+  Matrix<double, 1, Dynamic> x(1);
+  x.resize(0);
+  container_view<Matrix<double, 1, Dynamic>, Matrix<double, 1, Dynamic> > view_test_vec(x, y);
+  EXPECT_DEATH(view_test_vec[0](0), "");
+}
+
 TEST(MathMeta, container_view_matrix) {
   using stan::math::container_view;
   using Eigen::Matrix;
@@ -74,6 +98,18 @@ TEST(MathMeta, container_view_matrix) {
       EXPECT_FLOAT_EQ(fill++, view_test[matindex](i, j));
     }
   }
+}
+
+TEST(MathMeta, container_view_matrix_zero_size) {
+  using stan::math::container_view;
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+
+  double y[0];
+  Matrix<double, Dynamic, Dynamic> x(1,1);
+  x.resize(0,0);
+  container_view<Matrix<double, Dynamic, Dynamic>, Matrix<double, Dynamic, Dynamic> > view_test_vec(x, y);
+  EXPECT_DEATH(view_test_vec[0](0,0), "");
 }
 
 TEST(MathMeta, container_view_vector_vector) {
@@ -96,6 +132,24 @@ TEST(MathMeta, container_view_vector_vector) {
   }
 }
 
+TEST(MathMeta, container_view_vector_vector_zero_size) {
+  using stan::math::container_view;
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+
+  double y[0];
+  std::vector<Matrix<double, Dynamic, 1> > x;
+  x.push_back(Matrix<double, Dynamic, 1>(5));
+  x.push_back(Matrix<double, Dynamic, 1>(5));
+  x.push_back(Matrix<double, Dynamic, 1>(5));
+  x[0].resize(0);
+  x[1].resize(0);
+  x[2].resize(0);
+  container_view<std::vector<Matrix<double, Dynamic, 1> >, Matrix<double, Dynamic, 1> > view_test(x, y);
+  for (int i = 0; i < 3; ++i) 
+    EXPECT_DEATH(view_test[i](0),"");
+}
+
 TEST(MathMeta, container_view_vector_row_vector) {
   using stan::math::container_view;
   using Eigen::Matrix;
@@ -114,6 +168,24 @@ TEST(MathMeta, container_view_vector_row_vector) {
       EXPECT_FLOAT_EQ(j, y[i * 5 + j]);
     }
   }
+}
+
+TEST(MathMeta, container_view_vector_row_vector_zero_size) {
+  using stan::math::container_view;
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+
+  double y[0];
+  std::vector<Matrix<double, 1, Dynamic> > x;
+  x.push_back(Matrix<double, 1, Dynamic>(5));
+  x.push_back(Matrix<double, 1, Dynamic>(5));
+  x.push_back(Matrix<double, 1, Dynamic>(5));
+  x[0].resize(0);
+  x[1].resize(0);
+  x[2].resize(0);
+  container_view<std::vector<Matrix<double, 1, Dynamic> >, Matrix<double, 1, Dynamic> > view_test(x, y);
+  for (int i = 0; i < 3; ++i) 
+    EXPECT_DEATH(view_test[i](0),"");
 }
 
 TEST(MathMeta, container_view_vector_matrix) {
@@ -139,6 +211,35 @@ TEST(MathMeta, container_view_vector_matrix) {
       }
     }
   }
+}
+
+TEST(MathMeta, container_view_vector_matrix_zero_size) {
+  using stan::math::container_view;
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+
+  double y[0];
+  std::vector<Matrix<double, Dynamic, Dynamic> > x;
+  x.push_back(Matrix<double, Dynamic, Dynamic>(5,5));
+  x.push_back(Matrix<double, Dynamic, Dynamic>(5,5));
+  x.push_back(Matrix<double, Dynamic, Dynamic>(5,5));
+  x[0].resize(0,0);
+  x[1].resize(0,0);
+  x[2].resize(0,0);
+  container_view<std::vector<Matrix<double, Dynamic, Dynamic> >, Matrix<double, Dynamic, Dynamic> > view_test(x, y);
+  for (int i = 0; i < 3; ++i) 
+    EXPECT_DEATH(view_test[i](0,0),"");
+}
+
+TEST(MathMeta, container_view_zero_size_vector_matrix) {
+  using stan::math::container_view;
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+
+  double y[0];
+  std::vector<Matrix<double, Dynamic, Dynamic> > x;
+  container_view<std::vector<Matrix<double, Dynamic, Dynamic> >, Matrix<double, Dynamic, Dynamic> > view_test(x, y);
+  EXPECT_DEATH(view_test[0](0,0),"");
 }
 
 TEST(MathMeta, container_view_throw_matrix) {
