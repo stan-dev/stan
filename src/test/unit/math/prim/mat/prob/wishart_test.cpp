@@ -208,7 +208,7 @@ TEST(ProbDistributionsWishart, SpecialRNGTest) {
   //must be chi-square distributed with df = k
   //which has mean = k and variance = 2k
   
-  boost::random::mt19937 rng;
+  boost::random::mt19937 rng(1234);
   using Eigen::MatrixXd;
   using Eigen::VectorXd;
 
@@ -237,6 +237,6 @@ TEST(ProbDistributionsWishart, SpecialRNGTest) {
            (C.transpose() * sigma_sym * C)(0));
   
 
-  EXPECT_NEAR(k, stan::math::mean(acum), std::pow(tol, 2));
-  EXPECT_NEAR(2*k, stan::math::variance(acum), tol);
+  EXPECT_NEAR(1, stan::math::mean(acum) / k, std::pow(tol, 2));
+  EXPECT_NEAR(1, stan::math::variance(acum) / (2 * k), tol);
 }

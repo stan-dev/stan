@@ -202,7 +202,7 @@ namespace stan {
                       << std::endl
                       << "     found variable=" << x.name_
                       << "; declared in block=";
-          print_var_origin(error_msgs_,origin);
+          print_var_origin(error_msgs_, origin);
           error_msgs_ << std::endl;
         }
         return is_data;
@@ -213,32 +213,33 @@ namespace stan {
       }
       bool operator()(const fun& x) const {
         for (size_t i = 0; i < x.args_.size(); ++i)
-          if (!boost::apply_visitor(*this,x.args_[i].expr_))
+          if (!boost::apply_visitor(*this, x.args_[i].expr_))
             return false;
         return true;
       }
       bool operator()(const index_op& x) const {
-        if (!boost::apply_visitor(*this,x.expr_.expr_))
+        if (!boost::apply_visitor(*this, x.expr_.expr_))
           return false;
         for (size_t i = 0; i < x.dimss_.size(); ++i)
           for (size_t j = 0; j < x.dimss_[i].size(); ++j)
-            if (!boost::apply_visitor(*this,x.dimss_[i][j].expr_))
+            if (!boost::apply_visitor(*this, x.dimss_[i][j].expr_))
               return false;
         return true;
       }
       bool operator()(const binary_op& x) const {
-        return boost::apply_visitor(*this,x.left.expr_)
-          && boost::apply_visitor(*this,x.right.expr_);
+        return boost::apply_visitor(*this, x.left.expr_)
+          && boost::apply_visitor(*this, x.right.expr_);
       }
       bool operator()(const unary_op& x) const {
-        return boost::apply_visitor(*this,x.subject.expr_);
+        return boost::apply_visitor(*this, x.subject.expr_);
       }
     };
 
 
     struct add_var {
-      template <typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
+      struct result<F(T1, T2, T3, T4, T5, T6)> { typedef void type; };
       // each type derived from base_var_decl gets own instance
       template <typename R, typename T>
       void operator()(R& var_decl_result,
@@ -254,10 +255,10 @@ namespace stan {
                      << var_decl.name_;
 
           error_msgs << "; attempt to redeclare as ";
-          print_var_origin(error_msgs,vo);  // FIXME -- need original vo
+          print_var_origin(error_msgs, vo);  // FIXME -- need original vo
 
           error_msgs << "; original declaration as ";
-          print_var_origin(error_msgs,vm.get_origin(var_decl.name_));
+          print_var_origin(error_msgs, vm.get_origin(var_decl.name_));
 
           error_msgs << std::endl;
           var_decl_result = var_decl;
@@ -273,7 +274,7 @@ namespace stan {
           return;
         }
         pass = true;  // probably don't need to set true
-        vm.add(var_decl.name_,var_decl,vo);
+        vm.add(var_decl.name_, var_decl, vo);
         var_decl_result = var_decl;
       }
     };
@@ -281,8 +282,9 @@ namespace stan {
 
 
     struct validate_decl_constraints {
-      template <typename T1, typename T2, typename T3, typename T4>
-      struct result { typedef bool type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3, typename T4>
+      struct result<F(T1, T2, T3, T4)> { typedef bool type; };
 
       bool operator()(const bool& allow_constraints,
                       const bool& declaration_ok,
@@ -295,7 +297,7 @@ namespace stan {
         if (allow_constraints)
           return true;
         validate_no_constraints_vis vis(error_msgs);
-        bool constraints_ok = boost::apply_visitor(vis,var_decl.decl_);
+        bool constraints_ok = boost::apply_visitor(vis, var_decl.decl_);
         return constraints_ok;
       }
     };
@@ -306,8 +308,9 @@ namespace stan {
       std::set<std::string> reserved_word_set_;
       std::set<std::string> const_fun_name_set_;
 
-      template <typename T1, typename T2>
-      struct result { typedef bool type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2>
+      struct result<F(T1, T2)> { typedef bool type; };
 
       void reserve(const std::string& w) {
         reserved_word_set_.insert(w);
@@ -506,8 +509,9 @@ namespace stan {
 
     // copies single dimension from M to N if only M declared
     struct copy_square_cholesky_dimension_if_necessary {
-      template <typename T1>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1>
+      struct result<F(T1)> { typedef void type; };
       void operator()(cholesky_factor_var_decl& var_decl) const {
         if (is_nil(var_decl.N_))
           var_decl.N_ = var_decl.M_;
@@ -517,8 +521,9 @@ namespace stan {
     copy_square_cholesky_dimension_if_necessary_f;
 
     struct empty_range {
-      template <typename T1>
-      struct result { typedef range type; };
+      template <class> struct result;
+      template <typename F, typename T1>
+      struct result<F(T1)> { typedef range type; };
       range operator()(std::stringstream& /*error_msgs*/) const {
         return range();
       }
@@ -526,8 +531,9 @@ namespace stan {
     boost::phoenix::function<empty_range> empty_range_f;
 
     struct validate_int_expr {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1, T2, T3)> { typedef void type; };
 
       void operator()(const expression& expr,
                       bool& pass,
@@ -545,38 +551,39 @@ namespace stan {
     boost::phoenix::function<validate_int_expr> validate_int_expr_f;
 
     struct set_int_range_lower {
-      template <typename T1, typename T2, typename T3, typename T4>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3, typename T4>
+      struct result<F(T1, T2, T3, T4)> { typedef void type; };
       void operator()(range& range,
                       const expression& expr,
                       bool& pass,
                       std::stringstream& error_msgs) const {
         range.low_ = expr;
         validate_int_expr validator;
-        validator(expr,pass,error_msgs);
+        validator(expr,pass, error_msgs);
       }
     };
     boost::phoenix::function<set_int_range_lower> set_int_range_lower_f;
 
     struct set_int_range_upper {
-      template <typename T1, typename T2, typename T3, typename T4>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3, typename T4>
+      struct result<F(T1, T2, T3, T4)> { typedef void type; };
       void operator()(range& range,
                       const expression& expr,
                       bool& pass,
                       std::stringstream& error_msgs) const {
         range.high_ = expr;
         validate_int_expr validator;
-        validator(expr,pass,error_msgs);
+        validator(expr,pass, error_msgs);
       }
     };
     boost::phoenix::function<set_int_range_upper> set_int_range_upper_f;
 
-
-
     struct validate_int_data_expr {
-      template <typename T1, typename T2, typename T3, typename T4, typename T5>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3, typename T4, typename T5>
+      struct result<F(T1, T2, T3, T4, T5)> { typedef void type; };
 
       void operator()(const expression& expr,
                       int var_origin,
@@ -590,8 +597,8 @@ namespace stan {
                      << std::endl;
           pass = false;
         } else if (var_origin != local_origin) {
-          data_only_expression vis(error_msgs,var_map);
-          bool only_data_dimensions = boost::apply_visitor(vis,expr.expr_);
+          data_only_expression vis(error_msgs, var_map);
+          bool only_data_dimensions = boost::apply_visitor(vis, expr.expr_);
           pass = only_data_dimensions;
         } else {
           // don't need to check data vs. parameter in dimensions for
@@ -621,29 +628,31 @@ namespace stan {
 
 
     struct set_double_range_lower {
-      template <typename T1, typename T2, typename T3, typename T4>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3, typename T4>
+      struct result<F(T1, T2, T3, T4)> { typedef void type; };
       void operator()(range& range,
                       const expression& expr,
                       bool& pass,
                       std::stringstream& error_msgs) const {
         range.low_ = expr;
         validate_double_expr validator;
-        pass = validator(expr,error_msgs);
+        pass = validator(expr, error_msgs);
       }
     };
     boost::phoenix::function<set_double_range_lower> set_double_range_lower_f;
 
     struct set_double_range_upper {
-      template <typename T1, typename T2, typename T3, typename T4>
-      struct result { typedef void type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3, typename T4>
+      struct result<F(T1, T2, T3, T4)> { typedef void type; };
       void operator()(range& range,
                       const expression& expr,
                       bool& pass,
                       std::stringstream& error_msgs) const {
         range.high_ = expr;
         validate_double_expr validator;
-        pass = validator(expr,error_msgs);
+        pass = validator(expr, error_msgs);
       }
     };
     boost::phoenix::function<set_double_range_upper> set_double_range_upper_f;
@@ -656,9 +665,9 @@ namespace stan {
         var_map_(var_map),
         error_msgs_(error_msgs),
         // expression_g allows full recursion
-        expression_g(var_map,error_msgs),
+        expression_g(var_map, error_msgs),
         // expression07_g disallows comparisons
-        expression07_g(var_map,error_msgs,expression_g)
+        expression07_g(var_map, error_msgs, expression_g)
     {
 
       using boost::spirit::qi::_1;
@@ -676,7 +685,7 @@ namespace stan {
 
       var_decls_r.name("variable declarations");
       var_decls_r
-        %= *(var_decl_r(_r1,_r2))
+        %= *(var_decl_r(_r1, _r2))
         ;
 
       // _a = error state local,
@@ -685,47 +694,47 @@ namespace stan {
       var_decl_r.name("variable declaration");
       var_decl_r
         %= (int_decl_r(_r2)
-            [add_var_f(_val,_1,boost::phoenix::ref(var_map_),_a,_r2,
+            [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
                        boost::phoenix::ref(error_msgs))]
             | double_decl_r(_r2)
-            [add_var_f(_val,_1,boost::phoenix::ref(var_map_),_a,_r2,
+            [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
                        boost::phoenix::ref(error_msgs_))]
             | vector_decl_r(_r2)
-            [add_var_f(_val,_1,boost::phoenix::ref(var_map_),_a,_r2,
+            [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
                        boost::phoenix::ref(error_msgs_))]
             | row_vector_decl_r(_r2)
-            [add_var_f(_val,_1,boost::phoenix::ref(var_map_),_a,_r2,
+            [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
                        boost::phoenix::ref(error_msgs_))]
             | matrix_decl_r(_r2)
-            [add_var_f(_val,_1,boost::phoenix::ref(var_map_),_a,_r2,
+            [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
                        boost::phoenix::ref(error_msgs_))]
             | unit_vector_decl_r(_r2)
-            [add_var_f(_val,_1,boost::phoenix::ref(var_map_),_a,_r2,
+            [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
                        boost::phoenix::ref(error_msgs_))]
             | simplex_decl_r(_r2)
-            [add_var_f(_val,_1,boost::phoenix::ref(var_map_),_a,_r2,
+            [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
                        boost::phoenix::ref(error_msgs_))]
             | ordered_decl_r(_r2)
-            [add_var_f(_val,_1,boost::phoenix::ref(var_map_),_a,_r2,
+            [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
                        boost::phoenix::ref(error_msgs_))]
             | positive_ordered_decl_r(_r2)
-            [add_var_f(_val,_1,boost::phoenix::ref(var_map_),_a,_r2,
+            [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
                        boost::phoenix::ref(error_msgs_))]
             | cholesky_factor_decl_r(_r2)
-            [add_var_f(_val,_1,boost::phoenix::ref(var_map_),_a,_r2,
+            [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
                               boost::phoenix::ref(error_msgs_))]
             | cholesky_corr_decl_r(_r2)
-            [add_var_f(_val,_1,boost::phoenix::ref(var_map_),_a,_r2,
+            [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
                               boost::phoenix::ref(error_msgs_))]
             | cov_matrix_decl_r(_r2)
-            [add_var_f(_val,_1,boost::phoenix::ref(var_map_),_a,_r2,
+            [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
                        boost::phoenix::ref(error_msgs_))]
             | corr_matrix_decl_r(_r2)
-            [add_var_f(_val,_1,boost::phoenix::ref(var_map_),_a,_r2,
+            [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
                        boost::phoenix::ref(error_msgs_))]
             )
         > eps
-          [_pass = validate_decl_constraints_f(_r1,_a,_val,
+          [_pass = validate_decl_constraints_f(_r1, _a, _val,
                                      boost::phoenix::ref(error_msgs_))]
 
         > lit(';')
@@ -756,7 +765,7 @@ namespace stan {
         > -range_brackets_double_r(_r1)
         > lit('[')
         > expression_g(_r1)
-        [validate_int_expr_f(_1,_pass,boost::phoenix::ref(error_msgs_))]
+        [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
         > lit(']')
         > identifier_r
         > opt_dims_r(_r1)
@@ -769,7 +778,7 @@ namespace stan {
         > -range_brackets_double_r(_r1)
         > lit('[')
         > expression_g(_r1)
-        [validate_int_expr_f(_1,_pass,boost::phoenix::ref(error_msgs_))]
+        [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
         > lit(']')
         > identifier_r
         > opt_dims_r(_r1)
@@ -782,10 +791,10 @@ namespace stan {
         > -range_brackets_double_r(_r1)
         > lit('[')
         > expression_g(_r1)
-          [validate_int_expr_f(_1,_pass,boost::phoenix::ref(error_msgs_))]
+          [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
         > lit(',')
         > expression_g(_r1)
-          [validate_int_expr_f(_1,_pass,boost::phoenix::ref(error_msgs_))]
+          [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
         > lit(']')
         > identifier_r
         > opt_dims_r(_r1)
@@ -797,7 +806,7 @@ namespace stan {
              >> no_skip[!char_("a-zA-Z0-9_")] )
         > lit('[')
         > expression_g(_r1)
-          [validate_int_expr_f(_1,_pass,boost::phoenix::ref(error_msgs_))]
+          [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
         > lit(']')
         > identifier_r
         > opt_dims_r(_r1)
@@ -809,7 +818,7 @@ namespace stan {
              >> no_skip[!char_("a-zA-Z0-9_")] )
         > lit('[')
         > expression_g(_r1)
-          [validate_int_expr_f(_1,_pass,boost::phoenix::ref(error_msgs_))]
+          [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
         > lit(']')
         > identifier_r
         > opt_dims_r(_r1)
@@ -821,7 +830,7 @@ namespace stan {
              >> no_skip[!char_("a-zA-Z0-9_")] )
         > lit('[')
         > expression_g(_r1)
-          [validate_int_expr_f(_1,_pass,boost::phoenix::ref(error_msgs_))]
+          [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
         > lit(']')
         > identifier_r
         > opt_dims_r(_r1)
@@ -833,7 +842,7 @@ namespace stan {
              >> no_skip[!char_("a-zA-Z0-9_")] )
         > lit('[')
         > expression_g(_r1)
-          [validate_int_expr_f(_1,_pass,boost::phoenix::ref(error_msgs_))]
+          [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
         > lit(']')
         > identifier_r
         > opt_dims_r(_r1)
@@ -845,10 +854,10 @@ namespace stan {
              >> no_skip[!char_("a-zA-Z0-9_")] )
         > lit('[')
         > expression_g(_r1)
-          [validate_int_expr_f(_1,_pass,boost::phoenix::ref(error_msgs_))]
+          [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
         > -( lit(',')
              > expression_g(_r1)
-               [validate_int_expr_f(_1,_pass,boost::phoenix::ref(error_msgs_))]
+               [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
              )
         > lit(']')
         > identifier_r
@@ -863,7 +872,7 @@ namespace stan {
              >> no_skip[!char_("a-zA-Z0-9_")] )
         > lit('[')
         > expression_g(_r1)
-          [validate_int_expr_f(_1,_pass,boost::phoenix::ref(error_msgs_))]
+          [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
         > lit(']')
         > identifier_r
         > opt_dims_r(_r1)
@@ -875,7 +884,7 @@ namespace stan {
              >> no_skip[!char_("a-zA-Z0-9_")] )
         > lit('[')
         > expression_g(_r1)
-          [validate_int_expr_f(_1,_pass,boost::phoenix::ref(error_msgs_))]
+          [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
         > lit(']')
         > identifier_r
         > opt_dims_r(_r1)
@@ -887,7 +896,7 @@ namespace stan {
              >> no_skip[!char_("a-zA-Z0-9_")] )
         > lit('[')
         > expression_g(_r1)
-          [validate_int_expr_f(_1,_pass,boost::phoenix::ref(error_msgs_))]
+          [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
         > lit(']')
         > identifier_r
         > opt_dims_r(_r1)
@@ -901,7 +910,7 @@ namespace stan {
       dims_r
         %= lit('[')
         > (expression_g(_r1)
-           [validate_int_data_expr_f(_1,_r1,_pass,
+           [validate_int_data_expr_f(_1, _r1, _pass,
                                      boost::phoenix::ref(var_map_),
                                      boost::phoenix::ref(error_msgs_))]
            % ',')
@@ -915,19 +924,19 @@ namespace stan {
            ( (lit("lower")
               >> lit('=')
               >> expression07_g(_r1)
-                 [set_int_range_lower_f(_val,_1,_pass,
+                 [set_int_range_lower_f(_val, _1, _pass,
                                         boost::phoenix::ref(error_msgs_)) ])
              >> -( lit(',')
                    >> lit("upper")
                    >> lit('=')
                    >> expression07_g(_r1)
-                      [set_int_range_upper_f(_val,_1,_pass,
+                      [set_int_range_upper_f(_val, _1, _pass,
                                              boost::phoenix::ref(error_msgs_)) ] ) )
            |
            ( lit("upper")
              >> lit('=')
              >> expression07_g(_r1)
-                [set_int_range_upper_f(_val,_1,_pass,
+                [set_int_range_upper_f(_val, _1, _pass,
                                        boost::phoenix::ref(error_msgs_)) ])
             )
         >> lit('>');
@@ -939,19 +948,19 @@ namespace stan {
            ( (lit("lower")
               > lit('=')
               > expression07_g(_r1)
-                [set_double_range_lower_f(_val,_1,_pass,
+                [set_double_range_lower_f(_val, _1, _pass,
                                           boost::phoenix::ref(error_msgs_)) ])
              > -( lit(',')
                   > lit("upper")
                   > lit('=')
                   > expression07_g(_r1)
-                  [set_double_range_upper_f(_val,_1,_pass,
+                  [set_double_range_upper_f(_val, _1, _pass,
                                             boost::phoenix::ref(error_msgs_)) ] ) )
            |
            ( lit("upper")
              > lit('=')
              > expression07_g(_r1)
-               [set_double_range_upper_f(_val,_1,_pass,
+               [set_double_range_upper_f(_val, _1, _pass,
                                          boost::phoenix::ref(error_msgs_)) ])
             )
         > lit('>');
@@ -959,7 +968,7 @@ namespace stan {
       identifier_r.name("identifier");
       identifier_r
         %= identifier_name_r
-           [_pass = validate_identifier_f(_val,boost::phoenix::ref(error_msgs_))]
+           [_pass = validate_identifier_f(_val, boost::phoenix::ref(error_msgs_))]
         ;
 
       identifier_name_r.name("identifier subrule");

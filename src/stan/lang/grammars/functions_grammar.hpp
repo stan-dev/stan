@@ -1,11 +1,6 @@
 #ifndef STAN_LANG_GRAMMARS_FUNCTIONS_GRAMMAR_HPP
 #define STAN_LANG_GRAMMARS_FUNCTIONS_GRAMMAR_HPP
 
-#include <set>
-#include <string>
-#include <sstream>
-#include <vector>
-
 #include <boost/spirit/include/qi.hpp>
 
 #include <stan/lang/ast.hpp>
@@ -13,8 +8,13 @@
 #include <stan/lang/grammars/statement_grammar.hpp>
 #include <stan/lang/grammars/bare_type_grammar.hpp>
 
-namespace stan {
+#include <set>
+#include <string>
+#include <sstream>
+#include <utility>
+#include <vector>
 
+namespace stan {
   namespace lang {
 
     template <typename Iterator>
@@ -22,9 +22,7 @@ namespace stan {
       : boost::spirit::qi::grammar<Iterator,
                                    std::vector<function_decl_def>(),
                                    whitespace_grammar<Iterator> > {
-
-      // global variable info
-      variable_map& var_map_;
+      variable_map& var_map_;  // global variable info
 
       // local info to keep track of which functions declared defined
       // so far
@@ -50,7 +48,7 @@ namespace stan {
       functions_r;
 
       boost::spirit::qi::rule<Iterator,
-                              boost::spirit::qi::locals<bool,int>,
+                              boost::spirit::qi::locals<bool, int>,
                               function_decl_def(),
                               whitespace_grammar<Iterator> >
       function_r;
@@ -74,12 +72,8 @@ namespace stan {
                               boost::spirit::qi::unused_type,
                               whitespace_grammar<Iterator> >
       close_arg_decls_r;
-
     };
-
 
   }
 }
-
-
 #endif

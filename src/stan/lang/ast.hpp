@@ -1,13 +1,12 @@
 #ifndef STAN_LANG_AST_HPP
 #define STAN_LANG_AST_HPP
 
-#include <map>
-#include <string>
-#include <vector>
+#include <boost/variant/recursive_variant.hpp>
+
 #include <map>
 #include <set>
-
-#include <boost/variant/recursive_variant.hpp>
+#include <string>
+#include <vector>
 
 namespace stan {
 
