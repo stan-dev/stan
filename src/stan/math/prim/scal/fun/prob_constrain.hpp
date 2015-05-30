@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__PROB_CONSTRAIN_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__PROB_CONSTRAIN_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_PROB_CONSTRAIN_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_PROB_CONSTRAIN_HPP
 
 #include <stan/math/prim/scal/fun/inv_logit.hpp>
 #include <stan/math/prim/scal/fun/log1m.hpp>
@@ -7,7 +7,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * Return a probability value constrained to fall between 0 and 1
@@ -55,6 +55,7 @@ namespace stan {
     T prob_constrain(const T x, T& lp) {
       using stan::math::inv_logit;
       using stan::math::log1m;
+      using std::log;
       T inv_logit_x = inv_logit(x);
       lp += log(inv_logit_x) + log1m(inv_logit_x);
       return inv_logit_x;

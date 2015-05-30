@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__MAT__FUN__MULTIPLY_LOWER_TRI_SELF_TRANSPOSE_HPP
-#define STAN__MATH__FWD__MAT__FUN__MULTIPLY_LOWER_TRI_SELF_TRANSPOSE_HPP
+#ifndef STAN_MATH_FWD_MAT_FUN_MULTIPLY_LOWER_TRI_SELF_TRANSPOSE_HPP
+#define STAN_MATH_FWD_MAT_FUN_MULTIPLY_LOWER_TRI_SELF_TRANSPOSE_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/typedefs.hpp>
@@ -9,7 +9,7 @@
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     template<typename T, int R, int C>
     inline
@@ -25,7 +25,7 @@ namespace stan {
           L(i, j) = m(i, j);
       }
 
-      return stan::agrad::multiply(L, stan::math::transpose(L));
+      return stan::math::multiply(L, stan::math::transpose(L));
     }
 
   }

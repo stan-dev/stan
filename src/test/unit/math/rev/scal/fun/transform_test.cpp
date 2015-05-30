@@ -1,3 +1,4 @@
+#include <stan/math/rev/scal/fun/log.hpp>
 #include <stan/math/rev/core.hpp>
 #include <stan/math/rev/mat/fun/sum.hpp>
 #include <stan/math/rev/mat/fun/multiply_lower_tri_self_transpose.hpp>
@@ -60,8 +61,8 @@ using Eigen::Matrix;
 using Eigen::Dynamic;
 
 TEST(prob_transform,ordered_jacobian_ad) {
-  using stan::agrad::var;
-  using stan::prob::ordered_constrain;
+  using stan::math::var;
+  using stan::math::ordered_constrain;
   using stan::math::determinant;
   using Eigen::Matrix;
   using Eigen::Dynamic;
@@ -90,7 +91,7 @@ TEST(prob_transform,ordered_jacobian_ad) {
     yvec[i] = yv[i];
 
   std::vector<std::vector<double> > j;
-  stan::agrad::jacobian(yvec,xvec,j);
+  stan::math::jacobian(yvec,xvec,j);
 
   Matrix<double,Dynamic,Dynamic> J(3,3);
   for (int m = 0; m < 3; ++m)
@@ -102,8 +103,8 @@ TEST(prob_transform,ordered_jacobian_ad) {
 }
 
 TEST(prob_transform,positive_ordered_jacobian_ad) {
-  using stan::agrad::var;
-  using stan::prob::positive_ordered_constrain;
+  using stan::math::var;
+  using stan::math::positive_ordered_constrain;
   using stan::math::determinant;
   using Eigen::Matrix;
   using Eigen::Dynamic;
@@ -132,7 +133,7 @@ TEST(prob_transform,positive_ordered_jacobian_ad) {
     yvec[i] = yv[i];
 
   std::vector<std::vector<double> > j;
-  stan::agrad::jacobian(yvec,xvec,j);
+  stan::math::jacobian(yvec,xvec,j);
 
   Matrix<double,Dynamic,Dynamic> J(3,3);
   for (int m = 0; m < 3; ++m)
@@ -144,7 +145,7 @@ TEST(prob_transform,positive_ordered_jacobian_ad) {
 }
 
 TEST(prob_transform,corr_matrix_jacobian) {
-  using stan::agrad::var;
+  using stan::math::var;
   using stan::math::determinant;
   using std::log;
   using std::fabs;
@@ -157,7 +158,7 @@ TEST(prob_transform,corr_matrix_jacobian) {
   for (int i = 0; i < X.size(); ++i)
     x.push_back(X(i));
   var lp = 0.0;
-  Matrix<var,Dynamic,Dynamic> Sigma = stan::prob::corr_matrix_constrain(X,K,lp);
+  Matrix<var,Dynamic,Dynamic> Sigma = stan::math::corr_matrix_constrain(X,K,lp);
   std::vector<var> y;
   for (int m = 0; m < K; ++m)
     for (int n = 0; n < m; ++n)
@@ -165,7 +166,7 @@ TEST(prob_transform,corr_matrix_jacobian) {
   EXPECT_EQ(K_choose_2, y.size());
 
   std::vector<std::vector<double> > j;
-  stan::agrad::jacobian(y,x,j);
+  stan::math::jacobian(y,x,j);
 
   Matrix<double,Dynamic,Dynamic> J(X.size(),X.size());
   for (int m = 0; m < J.rows(); ++m)
@@ -178,7 +179,7 @@ TEST(prob_transform,corr_matrix_jacobian) {
 
 
 TEST(prob_transform,cov_matrix_jacobian) {
-  using stan::agrad::var;
+  using stan::math::var;
   using stan::math::determinant;
   using std::log;
   using std::fabs;
@@ -193,14 +194,14 @@ TEST(prob_transform,cov_matrix_jacobian) {
   for (int i = 0; i < X.size(); ++i)
     x.push_back(X(i));
   var lp = 0.0;
-  Matrix<var,Dynamic,Dynamic> Sigma = stan::prob::cov_matrix_constrain(X,K,lp);
+  Matrix<var,Dynamic,Dynamic> Sigma = stan::math::cov_matrix_constrain(X,K,lp);
   std::vector<var> y;
   for (int m = 0; m < K; ++m)
     for (int n = 0; n <= m; ++n)
       y.push_back(Sigma(m,n));
 
   std::vector<std::vector<double> > j;
-  stan::agrad::jacobian(y,x,j);
+  stan::math::jacobian(y,x,j);
 
   Matrix<double,Dynamic,Dynamic> J(10,10);
   for (int m = 0; m < 10; ++m)
@@ -212,7 +213,7 @@ TEST(prob_transform,cov_matrix_jacobian) {
 }
 
 TEST(probTransform,simplex_jacobian) {
-  using stan::agrad::var;
+  using stan::math::var;
   using std::vector;
   var a = 2.0;
   var b = 3.0;
@@ -223,7 +224,7 @@ TEST(probTransform,simplex_jacobian) {
   
   var lp(0);
   Matrix<var,Dynamic,1> x 
-    = stan::prob::simplex_constrain(y,lp);
+    = stan::math::simplex_constrain(y,lp);
   
   vector<var> indeps;
   indeps.push_back(a);
@@ -236,7 +237,7 @@ TEST(probTransform,simplex_jacobian) {
   deps.push_back(x(2));
   
   vector<vector<double> > jacobian;
-  stan::agrad::jacobian(deps,indeps,jacobian);
+  stan::math::jacobian(deps,indeps,jacobian);
 
   Matrix<double,Dynamic,Dynamic> J(3,3);
   for (int m = 0; m < 3; ++m)
@@ -251,7 +252,7 @@ TEST(probTransform,simplex_jacobian) {
 }
 
 TEST(probTransform,unit_vector_jacobian) {
-  using stan::agrad::var;
+  using stan::math::var;
   using std::vector;
   var a = 2.0;
   var b = 3.0;
@@ -262,7 +263,7 @@ TEST(probTransform,unit_vector_jacobian) {
   
   var lp(0);
   Matrix<var,Dynamic,1> x 
-    = stan::prob::unit_vector_constrain(y,lp);
+    = stan::math::unit_vector_constrain(y,lp);
   
   vector<var> indeps;
   indeps.push_back(a);
@@ -276,7 +277,7 @@ TEST(probTransform,unit_vector_jacobian) {
   deps.push_back(x(3));
   
   vector<vector<double> > jacobian;
-  stan::agrad::jacobian(deps,indeps,jacobian);
+  stan::math::jacobian(deps,indeps,jacobian);
 
   Matrix<double,Dynamic,Dynamic> J(4,4);
   for (int m = 0; m < 4; ++m) {
@@ -295,14 +296,14 @@ TEST(probTransform,unit_vector_jacobian) {
 
 
 void 
-test_cholesky_correlation_jacobian(const Eigen::Matrix<stan::agrad::var,
+test_cholesky_correlation_jacobian(const Eigen::Matrix<stan::math::var,
                                                        Eigen::Dynamic,1>& y,
                                    int K) {
   using std::vector;
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::agrad::var;
-  using stan::prob::cholesky_corr_constrain;
+  using stan::math::var;
+  using stan::math::cholesky_corr_constrain;
 
   int K_choose_2 = (K * (K - 1)) / 2;
 
@@ -320,7 +321,7 @@ test_cholesky_correlation_jacobian(const Eigen::Matrix<stan::agrad::var,
       deps.push_back(x(i,j));
   
   vector<vector<double> > jacobian;
-  stan::agrad::jacobian(deps,indeps,jacobian);
+  stan::math::jacobian(deps,indeps,jacobian);
 
   Matrix<double,Dynamic,Dynamic> J(K_choose_2,K_choose_2);
   for (int m = 0; m < K_choose_2; ++m)
@@ -338,7 +339,7 @@ test_cholesky_correlation_jacobian(const Eigen::Matrix<stan::agrad::var,
 TEST(probTransform,choleskyCorrJacobian) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::agrad::var;
+  using stan::math::var;
 
   // K = 1; (K choose 2) = 0
   Matrix<var,Dynamic,1> y1;

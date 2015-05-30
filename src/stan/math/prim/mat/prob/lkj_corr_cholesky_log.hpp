@@ -1,9 +1,9 @@
-#ifndef STAN__MATH__PRIM__MAT__PROB__LKJ_CORR_CHOLESKY_LOG_HPP
-#define STAN__MATH__PRIM__MAT__PROB__LKJ_CORR_CHOLESKY_LOG_HPP
+#ifndef STAN_MATH_PRIM_MAT_PROB_LKJ_CORR_CHOLESKY_LOG_HPP
+#define STAN_MATH_PRIM_MAT_PROB_LKJ_CORR_CHOLESKY_LOG_HPP
 
 #include <stan/math/prim/scal/err/check_finite.hpp>
 #include <stan/math/prim/scal/err/check_positive.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/mat/fun/factor_cov_matrix.hpp>
 #include <stan/math/prim/mat/fun/factor_U.hpp>
@@ -47,7 +47,7 @@
 #include <stan/math/prim/mat/prob/lkj_corr_log.hpp>
 
 namespace stan {
-  namespace prob {
+  namespace math {
 
     // LKJ_Corr(L|eta) [ L Cholesky factor of correlation matrix
     //                  eta > 0; eta == 1 <-> uniform]
@@ -57,7 +57,7 @@ namespace stan {
     lkj_corr_cholesky_log(const Eigen::Matrix
                           <T_covar, Eigen::Dynamic, Eigen::Dynamic>& L,
                           const T_shape& eta) {
-      static const char* function("stan::prob::lkj_corr_cholesky_log");
+      static const char* function("stan::math::lkj_corr_cholesky_log");
 
       using boost::math::tools::promote_args;
       using stan::math::check_positive;

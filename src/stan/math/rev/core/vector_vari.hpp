@@ -1,19 +1,19 @@
-#ifndef STAN__MATH__REV__CORE__VECTOR_VARI_HPP
-#define STAN__MATH__REV__CORE__VECTOR_VARI_HPP
+#ifndef STAN_MATH_REV_CORE_VECTOR_VARI_HPP
+#define STAN_MATH_REV_CORE_VECTOR_VARI_HPP
 
 #include <stan/math/rev/core/var.hpp>
 #include <stan/math/rev/core/vari.hpp>
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     class op_vector_vari : public vari {
     protected:
       const size_t size_;
       vari** vis_;
     public:
-      op_vector_vari(double f, const std::vector<stan::agrad::var>& vs) :
+      op_vector_vari(double f, const std::vector<stan::math::var>& vs) :
         vari(f),
         size_(vs.size()) {
         vis_ = reinterpret_cast<vari**>

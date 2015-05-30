@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__PROB__BETA_RNG_HPP
-#define STAN__MATH__PRIM__SCAL__PROB__BETA_RNG_HPP
+#ifndef STAN_MATH_PRIM_SCAL_PROB_BETA_RNG_HPP
+#define STAN_MATH_PRIM_SCAL_PROB_BETA_RNG_HPP
 
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/random/gamma_distribution.hpp>
@@ -16,14 +16,14 @@
 #include <stan/math/prim/scal/fun/digamma.hpp>
 #include <stan/math/prim/scal/fun/lgamma.hpp>
 #include <stan/math/prim/scal/fun/lbeta.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/fun/grad_reg_inc_beta.hpp>
 #include <stan/math/prim/scal/fun/inc_beta.hpp>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <class RNG>
     inline double
@@ -33,7 +33,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::gamma_distribution;
       // Error checks
-      static const char* function("stan::prob::beta_rng");
+      static const char* function("stan::math::beta_rng");
 
       using stan::math::check_positive_finite;
 

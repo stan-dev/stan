@@ -1111,12 +1111,12 @@ TEST(io_reader, matrix_lb_constrain) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y = reader.matrix_lb_constrain(lb,3,2);
   EXPECT_EQ(3,y.rows());
   EXPECT_EQ(2,y.cols());
-  EXPECT_FLOAT_EQ(stan::prob::lb_constrain(7.0,lb),y(0,0));
-  EXPECT_FLOAT_EQ(stan::prob::lb_constrain(8.0,lb),y(1,0));
-  EXPECT_FLOAT_EQ(stan::prob::lb_constrain(9.0,lb),y(2,0));
-  EXPECT_FLOAT_EQ(stan::prob::lb_constrain(10.0,lb),y(0,1));
-  EXPECT_FLOAT_EQ(stan::prob::lb_constrain(11.0,lb),y(1,1));
-  EXPECT_FLOAT_EQ(stan::prob::lb_constrain(12.0,lb),y(2,1));
+  EXPECT_FLOAT_EQ(stan::math::lb_constrain(7.0,lb),y(0,0));
+  EXPECT_FLOAT_EQ(stan::math::lb_constrain(8.0,lb),y(1,0));
+  EXPECT_FLOAT_EQ(stan::math::lb_constrain(9.0,lb),y(2,0));
+  EXPECT_FLOAT_EQ(stan::math::lb_constrain(10.0,lb),y(0,1));
+  EXPECT_FLOAT_EQ(stan::math::lb_constrain(11.0,lb),y(1,1));
+  EXPECT_FLOAT_EQ(stan::math::lb_constrain(12.0,lb),y(2,1));
   
   double a = reader.scalar();
   EXPECT_FLOAT_EQ(13.0,a);
@@ -1137,12 +1137,12 @@ TEST(io_reader, matrix_lb_constrain_lp) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y = reader.matrix_lb_constrain(lb,3,2,lp);
   EXPECT_EQ(3,y.rows());
   EXPECT_EQ(2,y.cols());
-  EXPECT_FLOAT_EQ(stan::prob::lb_constrain(7.0,lb,lp),y(0,0));
-  EXPECT_FLOAT_EQ(stan::prob::lb_constrain(8.0,lb,lp),y(1,0));
-  EXPECT_FLOAT_EQ(stan::prob::lb_constrain(9.0,lb,lp),y(2,0));
-  EXPECT_FLOAT_EQ(stan::prob::lb_constrain(10.0,lb,lp),y(0,1));
-  EXPECT_FLOAT_EQ(stan::prob::lb_constrain(11.0,lb,lp),y(1,1));
-  EXPECT_FLOAT_EQ(stan::prob::lb_constrain(12.0,lb,lp),y(2,1));
+  EXPECT_FLOAT_EQ(stan::math::lb_constrain(7.0,lb,lp),y(0,0));
+  EXPECT_FLOAT_EQ(stan::math::lb_constrain(8.0,lb,lp),y(1,0));
+  EXPECT_FLOAT_EQ(stan::math::lb_constrain(9.0,lb,lp),y(2,0));
+  EXPECT_FLOAT_EQ(stan::math::lb_constrain(10.0,lb,lp),y(0,1));
+  EXPECT_FLOAT_EQ(stan::math::lb_constrain(11.0,lb,lp),y(1,1));
+  EXPECT_FLOAT_EQ(stan::math::lb_constrain(12.0,lb,lp),y(2,1));
   
   double a = reader.scalar();
   EXPECT_FLOAT_EQ(13.0,a);
@@ -1188,12 +1188,12 @@ TEST(io_reader, matrix_ub_constrain) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y = reader.matrix_ub_constrain(ub,3,2);
   EXPECT_EQ(3,y.rows());
   EXPECT_EQ(2,y.cols());
-  EXPECT_FLOAT_EQ(stan::prob::ub_constrain(7.0,ub),y(0,0));
-  EXPECT_FLOAT_EQ(stan::prob::ub_constrain(8.0,ub),y(1,0));
-  EXPECT_FLOAT_EQ(stan::prob::ub_constrain(9.0,ub),y(2,0));
-  EXPECT_FLOAT_EQ(stan::prob::ub_constrain(10.0,ub),y(0,1));
-  EXPECT_FLOAT_EQ(stan::prob::ub_constrain(11.0,ub),y(1,1));
-  EXPECT_FLOAT_EQ(stan::prob::ub_constrain(12.0,ub),y(2,1));
+  EXPECT_FLOAT_EQ(stan::math::ub_constrain(7.0,ub),y(0,0));
+  EXPECT_FLOAT_EQ(stan::math::ub_constrain(8.0,ub),y(1,0));
+  EXPECT_FLOAT_EQ(stan::math::ub_constrain(9.0,ub),y(2,0));
+  EXPECT_FLOAT_EQ(stan::math::ub_constrain(10.0,ub),y(0,1));
+  EXPECT_FLOAT_EQ(stan::math::ub_constrain(11.0,ub),y(1,1));
+  EXPECT_FLOAT_EQ(stan::math::ub_constrain(12.0,ub),y(2,1));
   
   double a = reader.scalar();
   EXPECT_FLOAT_EQ(13.0,a);
@@ -1214,12 +1214,12 @@ TEST(io_reader, matrix_ub_constrain_lp) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y = reader.matrix_ub_constrain(ub,3,2,lp);
   EXPECT_EQ(3,y.rows());
   EXPECT_EQ(2,y.cols());
-  EXPECT_FLOAT_EQ(stan::prob::ub_constrain(7.0,ub,lp),y(0,0));
-  EXPECT_FLOAT_EQ(stan::prob::ub_constrain(8.0,ub,lp),y(1,0));
-  EXPECT_FLOAT_EQ(stan::prob::ub_constrain(9.0,ub,lp),y(2,0));
-  EXPECT_FLOAT_EQ(stan::prob::ub_constrain(10.0,ub,lp),y(0,1));
-  EXPECT_FLOAT_EQ(stan::prob::ub_constrain(11.0,ub,lp),y(1,1));
-  EXPECT_FLOAT_EQ(stan::prob::ub_constrain(12.0,ub,lp),y(2,1));
+  EXPECT_FLOAT_EQ(stan::math::ub_constrain(7.0,ub,lp),y(0,0));
+  EXPECT_FLOAT_EQ(stan::math::ub_constrain(8.0,ub,lp),y(1,0));
+  EXPECT_FLOAT_EQ(stan::math::ub_constrain(9.0,ub,lp),y(2,0));
+  EXPECT_FLOAT_EQ(stan::math::ub_constrain(10.0,ub,lp),y(0,1));
+  EXPECT_FLOAT_EQ(stan::math::ub_constrain(11.0,ub,lp),y(1,1));
+  EXPECT_FLOAT_EQ(stan::math::ub_constrain(12.0,ub,lp),y(2,1));
   
   double a = reader.scalar();
   EXPECT_FLOAT_EQ(13.0,a);
@@ -1266,12 +1266,12 @@ TEST(io_reader, matrix_lub_constrain) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y = reader.matrix_lub_constrain(lb,ub,3,2);
   EXPECT_EQ(3,y.rows());
   EXPECT_EQ(2,y.cols());
-  EXPECT_FLOAT_EQ(stan::prob::lub_constrain(7.0,lb,ub),y(0,0));
-  EXPECT_FLOAT_EQ(stan::prob::lub_constrain(8.0,lb,ub),y(1,0));
-  EXPECT_FLOAT_EQ(stan::prob::lub_constrain(9.0,lb,ub),y(2,0));
-  EXPECT_FLOAT_EQ(stan::prob::lub_constrain(10.0,lb,ub),y(0,1));
-  EXPECT_FLOAT_EQ(stan::prob::lub_constrain(11.0,lb,ub),y(1,1));
-  EXPECT_FLOAT_EQ(stan::prob::lub_constrain(12.0,lb,ub),y(2,1));
+  EXPECT_FLOAT_EQ(stan::math::lub_constrain(7.0,lb,ub),y(0,0));
+  EXPECT_FLOAT_EQ(stan::math::lub_constrain(8.0,lb,ub),y(1,0));
+  EXPECT_FLOAT_EQ(stan::math::lub_constrain(9.0,lb,ub),y(2,0));
+  EXPECT_FLOAT_EQ(stan::math::lub_constrain(10.0,lb,ub),y(0,1));
+  EXPECT_FLOAT_EQ(stan::math::lub_constrain(11.0,lb,ub),y(1,1));
+  EXPECT_FLOAT_EQ(stan::math::lub_constrain(12.0,lb,ub),y(2,1));
   
   double a = reader.scalar();
   EXPECT_FLOAT_EQ(13.0,a);
@@ -1293,12 +1293,12 @@ TEST(io_reader, matrix_lub_constrain_lp) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y = reader.matrix_lub_constrain(lb,ub,3,2,lp);
   EXPECT_EQ(3,y.rows());
   EXPECT_EQ(2,y.cols());
-  EXPECT_FLOAT_EQ(stan::prob::lub_constrain(7.0,lb,ub,lp),y(0,0));
-  EXPECT_FLOAT_EQ(stan::prob::lub_constrain(8.0,lb,ub,lp),y(1,0));
-  EXPECT_FLOAT_EQ(stan::prob::lub_constrain(9.0,lb,ub,lp),y(2,0));
-  EXPECT_FLOAT_EQ(stan::prob::lub_constrain(10.0,lb,ub,lp),y(0,1));
-  EXPECT_FLOAT_EQ(stan::prob::lub_constrain(11.0,lb,ub,lp),y(1,1));
-  EXPECT_FLOAT_EQ(stan::prob::lub_constrain(12.0,lb,ub,lp),y(2,1));
+  EXPECT_FLOAT_EQ(stan::math::lub_constrain(7.0,lb,ub,lp),y(0,0));
+  EXPECT_FLOAT_EQ(stan::math::lub_constrain(8.0,lb,ub,lp),y(1,0));
+  EXPECT_FLOAT_EQ(stan::math::lub_constrain(9.0,lb,ub,lp),y(2,0));
+  EXPECT_FLOAT_EQ(stan::math::lub_constrain(10.0,lb,ub,lp),y(0,1));
+  EXPECT_FLOAT_EQ(stan::math::lub_constrain(11.0,lb,ub,lp),y(1,1));
+  EXPECT_FLOAT_EQ(stan::math::lub_constrain(12.0,lb,ub,lp),y(2,1));
   
   double a = reader.scalar();
   EXPECT_FLOAT_EQ(13.0,a);

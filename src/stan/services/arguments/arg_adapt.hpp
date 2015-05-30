@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__ARGUMENTS__ADAPT__HPP
-#define STAN__SERVICES__ARGUMENTS__ADAPT__HPP
+#ifndef STAN_SERVICES_ARGUMENTS_ARG_ADAPT_HPP
+#define STAN_SERVICES_ARGUMENTS_ARG_ADAPT_HPP
 
 #include <stan/services/arguments/categorical_argument.hpp>
 
@@ -13,18 +13,18 @@
 #include <stan/services/arguments/arg_adapt_window.hpp>
 
 namespace stan {
-  
+
   namespace services {
-    
+
     class arg_adapt: public categorical_argument {
-      
+
     public:
-      
+
       arg_adapt() {
-        
+
         _name = "adapt";
         _description = "Warmup Adaptation";
-        
+
         _subarguments.push_back(new arg_adapt_engaged());
         _subarguments.push_back(new arg_adapt_gamma());
         _subarguments.push_back(new arg_adapt_delta());
@@ -33,13 +33,13 @@ namespace stan {
         _subarguments.push_back(new arg_adapt_init_buffer());
         _subarguments.push_back(new arg_adapt_term_buffer());
         _subarguments.push_back(new arg_adapt_window());
-        
+
       }
-      
+
     };
-    
+
   } // services
-  
+
 } // stan
 
 #endif

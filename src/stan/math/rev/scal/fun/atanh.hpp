@@ -1,12 +1,12 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__ATANH_HPP
-#define STAN__MATH__REV__SCAL__FUN__ATANH_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_ATANH_HPP
+#define STAN_MATH_REV_SCAL_FUN_ATANH_HPP
 
 #include <stan/math/rev/core.hpp>
 #include <math.h>
 #include <limits>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class atanh_vari : public op_v_vari {
@@ -61,7 +61,7 @@ namespace stan {
      * @param a The variable.
      * @return Inverse hyperbolic tangent of the variable.
      */
-    inline var atanh(const stan::agrad::var& a) {
+    inline var atanh(const stan::math::var& a) {
       if (a == 1.0)
         return var(new atanh_vari(std::numeric_limits<double>::infinity(),
                                   a.vi_));

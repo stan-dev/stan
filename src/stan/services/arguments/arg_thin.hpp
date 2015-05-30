@@ -1,16 +1,16 @@
-#ifndef STAN__SERVICES__ARGUMENTS__THIN__HPP
-#define STAN__SERVICES__ARGUMENTS__THIN__HPP
+#ifndef STAN_SERVICES_ARGUMENTS_ARG_THIN_HPP
+#define STAN_SERVICES_ARGUMENTS_ARG_THIN_HPP
 
 #include <stan/services/arguments/singleton_argument.hpp>
 
 namespace stan {
-  
+
   namespace services {
-    
+
     class arg_thin: public int_argument {
-      
+
     public:
-      
+
       arg_thin(): int_argument() {
         _name = "thin";
         _description = "Period between saved samples";
@@ -22,13 +22,13 @@ namespace stan {
         _bad_value = -1.0;
         _value = _default_value;
       };
-      
+
       bool is_valid(int value) { return value > 0; }
-      
+
     };
-    
+
   } // services
-  
+
 } // stan
 
 #endif

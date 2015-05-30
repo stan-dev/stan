@@ -8,10 +8,10 @@
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/rev/core.hpp>
 
-using stan::agrad::fvar;
+using stan::math::fvar;
 TEST(AgradMixMatrixOperatorSubtraction,fv_scalar_matrix_1stDeriv) {
   using stan::math::subtract;
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
 
   matrix_fv v(2,2);
   v << 1, 2, 3, 4;
@@ -51,7 +51,7 @@ TEST(AgradMixMatrixOperatorSubtraction,fv_scalar_matrix_1stDeriv) {
 }
 TEST(AgradMixMatrixOperatorSubtraction,fv_scalar_matrix_2ndDeriv) {
   using stan::math::subtract;
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
 
   matrix_fv v(2,2);
   v << 1, 2, 3, 4;
@@ -72,7 +72,7 @@ TEST(AgradMixMatrixOperatorSubtraction,fv_scalar_matrix_2ndDeriv) {
 }
 TEST(AgradMixMatrixOperatorSubtraction,fv_scalar_vector_1stDeriv) {
   using stan::math::subtract;
-  using stan::agrad::vector_fv;
+  using stan::math::vector_fv;
 
   vector_fv v(4);
   v << 1, 2, 3, 4;
@@ -112,7 +112,7 @@ TEST(AgradMixMatrixOperatorSubtraction,fv_scalar_vector_1stDeriv) {
 }
 TEST(AgradMixMatrixOperatorSubtraction,fv_scalar_vector_2ndDeriv) {
   using stan::math::subtract;
-  using stan::agrad::vector_fv;
+  using stan::math::vector_fv;
 
   vector_fv v(4);
   v << 1, 2, 3, 4;
@@ -133,7 +133,7 @@ TEST(AgradMixMatrixOperatorSubtraction,fv_scalar_vector_2ndDeriv) {
 }
 TEST(AgradMixMatrixOperatorSubtraction,fv_scalar_rowvector_1stDeriv) {
   using stan::math::subtract;
-  using stan::agrad::row_vector_fv;
+  using stan::math::row_vector_fv;
 
   row_vector_fv v(4);
   v << 1, 2, 3, 4;
@@ -173,7 +173,7 @@ TEST(AgradMixMatrixOperatorSubtraction,fv_scalar_rowvector_1stDeriv) {
 }
 TEST(AgradMixMatrixOperatorSubtraction,fv_scalar_rowvector_2ndDeriv) {
   using stan::math::subtract;
-  using stan::agrad::row_vector_fv;
+  using stan::math::row_vector_fv;
 
   row_vector_fv v(4);
   v << 1, 2, 3, 4;
@@ -195,7 +195,7 @@ TEST(AgradMixMatrixOperatorSubtraction,fv_scalar_rowvector_2ndDeriv) {
 TEST(AgradMixMatrixOperatorSubtraction,fv_vector_vector_1stDeriv) {
   using stan::math::subtract;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::math::vector_fv;
 
   vector_d expected_output(5);
   vector_fv output;
@@ -274,7 +274,7 @@ TEST(AgradMixMatrixOperatorSubtraction,fv_vector_vector_1stDeriv) {
 TEST(AgradMixMatrixOperatorSubtraction,fv_vector_vector_2ndDeriv) {
   using stan::math::subtract;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::math::vector_fv;
 
   vector_d expected_output(5);
   vector_fv output;
@@ -309,7 +309,7 @@ TEST(AgradMixMatrixOperatorSubtraction,fv_vector_vector_2ndDeriv) {
 TEST(AgradMixMatrixOperatorSubtraction,fv_vector_vector_exception) {
   using stan::math::subtract;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::math::vector_fv;
 
   vector_d d1(5), d2(1);
   vector_fv v1(5), v2(1);
@@ -323,7 +323,7 @@ TEST(AgradMixMatrixOperatorSubtraction,fv_vector_vector_exception) {
 TEST(AgradMixMatrixOperatorSubtraction,fv_rowvector_rowvector_1stDeriv) {
   using stan::math::subtract;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::math::row_vector_fv;
 
   row_vector_d expected_output(5);
   row_vector_d  output_d;
@@ -402,7 +402,7 @@ TEST(AgradMixMatrixOperatorSubtraction,fv_rowvector_rowvector_1stDeriv) {
 TEST(AgradMixMatrixOperatorSubtraction,fv_rowvector_rowvector_2ndDeriv) {
   using stan::math::subtract;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::math::row_vector_fv;
 
   row_vector_d expected_output(5);
   row_vector_d  output_d;
@@ -437,7 +437,7 @@ TEST(AgradMixMatrixOperatorSubtraction,fv_rowvector_rowvector_2ndDeriv) {
 TEST(AgradMixMatrixOperatorSubtraction,fv_rowvector_rowvector_exception) {
   using stan::math::subtract;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::math::row_vector_fv;
 
   row_vector_d d1(5), d2(2);
   row_vector_fv v1(5), v2(2);
@@ -451,7 +451,7 @@ TEST(AgradMixMatrixOperatorSubtraction,fv_rowvector_rowvector_exception) {
 TEST(AgradMixMatrixOperatorSubtraction,fv_matrix_matrix_1stDeriv) {
   using stan::math::subtract;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
   
   matrix_d expected_output(2,2);
   matrix_fv output;
@@ -522,7 +522,7 @@ TEST(AgradMixMatrixOperatorSubtraction,fv_matrix_matrix_1stDeriv) {
 TEST(AgradMixMatrixOperatorSubtraction,fv_matrix_matrix_2ndDeriv) {
   using stan::math::subtract;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
   
   matrix_d expected_output(2,2);
   matrix_fv output;
@@ -557,7 +557,7 @@ TEST(AgradMixMatrixOperatorSubtraction,fv_matrix_matrix_2ndDeriv) {
 TEST(AgradMixMatrixOperatorSubtraction,fv_matrix_matrix_exception) {
   using stan::math::subtract;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
 
   matrix_d d1(2,2), d2(1,2);
   matrix_fv v1(2,2), v2(1,2);
@@ -569,7 +569,7 @@ TEST(AgradMixMatrixOperatorSubtraction,fv_matrix_matrix_exception) {
 }
 TEST(AgradMixMatrixOperatorSubtraction,ffv_scalar_matrix_1stDeriv) {
   using stan::math::subtract;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
 
   matrix_ffv v(2,2);
   v << 1, 2, 3, 4;
@@ -609,7 +609,7 @@ TEST(AgradMixMatrixOperatorSubtraction,ffv_scalar_matrix_1stDeriv) {
 }
 TEST(AgradMixMatrixOperatorSubtraction,ffv_scalar_matrix_2ndDeriv_1) {
   using stan::math::subtract;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
 
   matrix_ffv v(2,2);
   v << 1, 2, 3, 4;
@@ -630,7 +630,7 @@ TEST(AgradMixMatrixOperatorSubtraction,ffv_scalar_matrix_2ndDeriv_1) {
 }
 TEST(AgradMixMatrixOperatorSubtraction,ffv_scalar_matrix_2ndDeriv_2) {
   using stan::math::subtract;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
 
   matrix_ffv v(2,2);
   v << 1, 2, 3, 4;
@@ -651,7 +651,7 @@ TEST(AgradMixMatrixOperatorSubtraction,ffv_scalar_matrix_2ndDeriv_2) {
 }
 TEST(AgradMixMatrixOperatorSubtraction,ffv_scalar_matrix_3rdDeriv) {
   using stan::math::subtract;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
 
   matrix_ffv v(2,2);
   v << 1, 2, 3, 4;
@@ -676,7 +676,7 @@ TEST(AgradMixMatrixOperatorSubtraction,ffv_scalar_matrix_3rdDeriv) {
 }
 TEST(AgradMixMatrixOperatorSubtraction,ffv_scalar_vector_1stDeriv) {
   using stan::math::subtract;
-  using stan::agrad::vector_ffv;
+  using stan::math::vector_ffv;
 
   vector_ffv v(4);
   v << 1, 2, 3, 4;
@@ -716,7 +716,7 @@ TEST(AgradMixMatrixOperatorSubtraction,ffv_scalar_vector_1stDeriv) {
 }
 TEST(AgradMixMatrixOperatorSubtraction,ffv_scalar_vector_2ndDeriv_1) {
   using stan::math::subtract;
-  using stan::agrad::vector_ffv;
+  using stan::math::vector_ffv;
 
   vector_ffv v(4);
   v << 1, 2, 3, 4;
@@ -737,7 +737,7 @@ TEST(AgradMixMatrixOperatorSubtraction,ffv_scalar_vector_2ndDeriv_1) {
 }
 TEST(AgradMixMatrixOperatorSubtraction,ffv_scalar_vector_2ndDeriv_2) {
   using stan::math::subtract;
-  using stan::agrad::vector_ffv;
+  using stan::math::vector_ffv;
 
   vector_ffv v(4);
   v << 1, 2, 3, 4;
@@ -758,7 +758,7 @@ TEST(AgradMixMatrixOperatorSubtraction,ffv_scalar_vector_2ndDeriv_2) {
 }
 TEST(AgradMixMatrixOperatorSubtraction,ffv_scalar_vector_3rdDeriv) {
   using stan::math::subtract;
-  using stan::agrad::vector_ffv;
+  using stan::math::vector_ffv;
 
   vector_ffv v(4);
   v << 1, 2, 3, 4;
@@ -783,7 +783,7 @@ TEST(AgradMixMatrixOperatorSubtraction,ffv_scalar_vector_3rdDeriv) {
 }
 TEST(AgradMixMatrixOperatorSubtraction,ffv_scalar_rowvector_1stDeriv) {
   using stan::math::subtract;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
 
   row_vector_ffv v(4);
   v << 1, 2, 3, 4;
@@ -823,7 +823,7 @@ TEST(AgradMixMatrixOperatorSubtraction,ffv_scalar_rowvector_1stDeriv) {
 }
 TEST(AgradMixMatrixOperatorSubtraction,ffv_scalar_rowvector_2ndDeriv_1) {
   using stan::math::subtract;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
 
   row_vector_ffv v(4);
   v << 1, 2, 3, 4;
@@ -844,7 +844,7 @@ TEST(AgradMixMatrixOperatorSubtraction,ffv_scalar_rowvector_2ndDeriv_1) {
 }
 TEST(AgradMixMatrixOperatorSubtraction,ffv_scalar_rowvector_2ndDeriv_2) {
   using stan::math::subtract;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
 
   row_vector_ffv v(4);
   v << 1, 2, 3, 4;
@@ -865,7 +865,7 @@ TEST(AgradMixMatrixOperatorSubtraction,ffv_scalar_rowvector_2ndDeriv_2) {
 }
 TEST(AgradMixMatrixOperatorSubtraction,ffv_scalar_rowvector_3rdDeriv) {
   using stan::math::subtract;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
 
   row_vector_ffv v(4);
   v << 1, 2, 3, 4;
@@ -891,7 +891,7 @@ TEST(AgradMixMatrixOperatorSubtraction,ffv_scalar_rowvector_3rdDeriv) {
 TEST(AgradMixMatrixOperatorSubtraction,ffv_vector_vector_1stDeriv) {
   using stan::math::subtract;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
+  using stan::math::vector_ffv;
 
   vector_d expected_output(5);
   vector_ffv output;
@@ -970,7 +970,7 @@ TEST(AgradMixMatrixOperatorSubtraction,ffv_vector_vector_1stDeriv) {
 TEST(AgradMixMatrixOperatorSubtraction,ffv_vector_vector_2ndDeriv_1) {
   using stan::math::subtract;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
+  using stan::math::vector_ffv;
 
   vector_d expected_output(5);
   vector_ffv output;
@@ -1005,7 +1005,7 @@ TEST(AgradMixMatrixOperatorSubtraction,ffv_vector_vector_2ndDeriv_1) {
 TEST(AgradMixMatrixOperatorSubtraction,ffv_vector_vector_2ndDeriv_2) {
   using stan::math::subtract;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
+  using stan::math::vector_ffv;
 
   vector_d expected_output(5);
   vector_ffv output;
@@ -1040,7 +1040,7 @@ TEST(AgradMixMatrixOperatorSubtraction,ffv_vector_vector_2ndDeriv_2) {
 TEST(AgradMixMatrixOperatorSubtraction,ffv_vector_vector_3rdDeriv) {
   using stan::math::subtract;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
+  using stan::math::vector_ffv;
 
   vector_d expected_output(5);
   vector_ffv output;
@@ -1085,7 +1085,7 @@ TEST(AgradMixMatrixOperatorSubtraction,ffv_vector_vector_3rdDeriv) {
 TEST(AgradMixMatrixOperatorSubtraction,ffv_vector_vector_exception) {
   using stan::math::subtract;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
+  using stan::math::vector_ffv;
 
   vector_d d1(5), d2(1);
   vector_ffv v1(5), v2(1);
@@ -1099,7 +1099,7 @@ TEST(AgradMixMatrixOperatorSubtraction,ffv_vector_vector_exception) {
 TEST(AgradMixMatrixOperatorSubtraction,ffv_rowvector_rowvector_1stDeriv) {
   using stan::math::subtract;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
 
   row_vector_d expected_output(5);
   row_vector_d  output_d;
@@ -1178,7 +1178,7 @@ TEST(AgradMixMatrixOperatorSubtraction,ffv_rowvector_rowvector_1stDeriv) {
 TEST(AgradMixMatrixOperatorSubtraction,ffv_rowvector_rowvector_2ndDeriv_1) {
   using stan::math::subtract;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
 
   row_vector_d expected_output(5);
   row_vector_d  output_d;
@@ -1213,7 +1213,7 @@ TEST(AgradMixMatrixOperatorSubtraction,ffv_rowvector_rowvector_2ndDeriv_1) {
 TEST(AgradMixMatrixOperatorSubtraction,ffv_rowvector_rowvector_2ndDeriv_2) {
   using stan::math::subtract;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
 
   row_vector_d expected_output(5);
   row_vector_d  output_d;
@@ -1248,7 +1248,7 @@ TEST(AgradMixMatrixOperatorSubtraction,ffv_rowvector_rowvector_2ndDeriv_2) {
 TEST(AgradMixMatrixOperatorSubtraction,ffv_rowvector_rowvector_3rdDeriv) {
   using stan::math::subtract;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
 
   row_vector_d expected_output(5);
   row_vector_d  output_d;
@@ -1293,7 +1293,7 @@ TEST(AgradMixMatrixOperatorSubtraction,ffv_rowvector_rowvector_3rdDeriv) {
 TEST(AgradMixMatrixOperatorSubtraction,ffv_rowvector_rowvector_exception) {
   using stan::math::subtract;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
 
   row_vector_d d1(5), d2(2);
   row_vector_ffv v1(5), v2(2);
@@ -1307,7 +1307,7 @@ TEST(AgradMixMatrixOperatorSubtraction,ffv_rowvector_rowvector_exception) {
 TEST(AgradMixMatrixOperatorSubtraction,ffv_matrix_matrix_1stDeriv) {
   using stan::math::subtract;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   
   matrix_d expected_output(2,2);
   matrix_ffv output;
@@ -1378,7 +1378,7 @@ TEST(AgradMixMatrixOperatorSubtraction,ffv_matrix_matrix_1stDeriv) {
 TEST(AgradMixMatrixOperatorSubtraction,ffv_matrix_matrix_2ndDeriv_1) {
   using stan::math::subtract;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   
   matrix_d expected_output(2,2);
   matrix_ffv output;
@@ -1413,7 +1413,7 @@ TEST(AgradMixMatrixOperatorSubtraction,ffv_matrix_matrix_2ndDeriv_1) {
 TEST(AgradMixMatrixOperatorSubtraction,ffv_matrix_matrix_2ndDeriv_2) {
   using stan::math::subtract;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   
   matrix_d expected_output(2,2);
   matrix_ffv output;
@@ -1448,7 +1448,7 @@ TEST(AgradMixMatrixOperatorSubtraction,ffv_matrix_matrix_2ndDeriv_2) {
 TEST(AgradMixMatrixOperatorSubtraction,ffv_matrix_matrix_3rdDeriv) {
   using stan::math::subtract;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   
   matrix_d expected_output(2,2);
   matrix_ffv output;
@@ -1491,7 +1491,7 @@ TEST(AgradMixMatrixOperatorSubtraction,ffv_matrix_matrix_3rdDeriv) {
 TEST(AgradMixMatrixOperatorSubtraction,ffv_matrix_matrix_exception) {
   using stan::math::subtract;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
 
   matrix_d d1(2,2), d2(1,2);
   matrix_ffv v1(2,2), v2(1,2);

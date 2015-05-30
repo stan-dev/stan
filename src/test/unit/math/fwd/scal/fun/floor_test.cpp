@@ -3,7 +3,7 @@
 #include <stan/math/fwd/scal/fun/floor.hpp>
 
 TEST(AgradFwdFloor,Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using std::floor;
 
   fvar<double> x(0.5,1.0);
@@ -23,7 +23,7 @@ TEST(AgradFwdFloor,Fvar) {
 }
 
 TEST(AgradFwdFloor,FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using std::floor;
 
   fvar<fvar<double> > x;

@@ -1,12 +1,12 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__POSITIVE_FREE_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__POSITIVE_FREE_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_POSITIVE_FREE_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_POSITIVE_FREE_HPP
 
 #include <stan/math/prim/scal/err/check_positive.hpp>
 #include <cmath>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * Return the unconstrained value corresponding to the specified
@@ -27,7 +27,7 @@ namespace stan {
     template <typename T>
     inline
     T positive_free(const T y) {
-      stan::math::check_positive("stan::prob::positive_free",
+      stan::math::check_positive("stan::math::positive_free",
                                  "Positive variable", y);
       return log(y);
     }

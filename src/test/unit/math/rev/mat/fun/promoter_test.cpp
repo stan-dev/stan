@@ -14,7 +14,7 @@ TEST(AgradRevMatrix, promoter) {
   using stan::math::promoter;
   using stan::math::promote_common;
 
-  using stan::agrad::var;
+  using stan::math::var;
 
   using std::vector;
 
@@ -22,9 +22,9 @@ TEST(AgradRevMatrix, promoter) {
   using stan::math::vector_d;
   using stan::math::row_vector_d;
 
-  using stan::agrad::matrix_v;
-  using stan::agrad::vector_v;
-  using stan::agrad::row_vector_v;
+  using stan::math::matrix_v;
+  using stan::math::vector_v;
+  using stan::math::row_vector_v;
   
   double a = promote_common<double,double>(3.0);
   var b = promote_common<double,var>(4.0);

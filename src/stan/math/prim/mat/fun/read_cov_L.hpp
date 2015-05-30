@@ -1,12 +1,12 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__READ_COV_L_HPP
-#define STAN__MATH__PRIM__MAT__FUN__READ_COV_L_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_READ_COV_L_HPP
+#define STAN_MATH_PRIM_MAT_FUN_READ_COV_L_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * This is the function that should be called prior to evaluating

@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__PROB__DIRICHLET_RNG_HPP
-#define STAN__MATH__PRIM__MAT__PROB__DIRICHLET_RNG_HPP
+#ifndef STAN_MATH_PRIM_MAT_PROB_DIRICHLET_RNG_HPP
+#define STAN_MATH_PRIM_MAT_PROB_DIRICHLET_RNG_HPP
 
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/random/gamma_distribution.hpp>
@@ -8,12 +8,12 @@
 #include <stan/math/prim/scal/err/check_consistent_sizes.hpp>
 #include <stan/math/prim/scal/err/check_positive.hpp>
 #include <stan/math/prim/scal/fun/multiply_log.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <class RNG>
     inline Eigen::VectorXd

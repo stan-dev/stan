@@ -1,5 +1,5 @@
-#ifndef STAN__INTERFACE__CALLBACK__CALLBACK_HPP
-#define STAN__INTERFACE__CALLBACK__CALLBACK_HPP
+#ifndef STAN_INTERFACE_CALLBACK_CALLBACK_HPP
+#define STAN_INTERFACE_CALLBACK_CALLBACK_HPP
 
 namespace stan {
   namespace interface {
@@ -10,7 +10,7 @@ namespace stan {
         callback() {}
         virtual void operator()() = 0;
       };
-    
+
     }
   }
 }

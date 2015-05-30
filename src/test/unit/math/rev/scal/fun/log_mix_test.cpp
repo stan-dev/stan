@@ -8,7 +8,7 @@
 #include <stan/math/rev/scal/fun/log.hpp>
 
 void test_log_mix_vvv(double theta, double lambda1, double lambda2) {
-  using stan::agrad::var;
+  using stan::math::var;
 
   var theta_v = theta;
   var lambda1_v = lambda1;
@@ -25,7 +25,7 @@ void test_log_mix_vvv(double theta, double lambda1, double lambda2) {
   std::vector<double> g;
   lp.grad(x,g);
   
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
   
   var theta_v2 = theta;
   var lambda1_v2 = lambda1;
@@ -49,12 +49,12 @@ void test_log_mix_vvv(double theta, double lambda1, double lambda2) {
 
   var theta_v3 = 2.0;
   EXPECT_THROW(log_mix(theta_v3,lambda1_v,lambda2_v),std::domain_error);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 
 void test_log_mix_vv_ex_lam_2(double theta, double lambda1, double lambda2) {
-  using stan::agrad::var;
+  using stan::math::var;
 
   var theta_v = theta;
   var lambda1_v = lambda1;
@@ -69,7 +69,7 @@ void test_log_mix_vv_ex_lam_2(double theta, double lambda1, double lambda2) {
   std::vector<double> g;
   lp.grad(x,g);
   
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
   
   var theta_v2 = theta;
   var lambda1_v2 = lambda1;
@@ -91,11 +91,11 @@ void test_log_mix_vv_ex_lam_2(double theta, double lambda1, double lambda2) {
 
   var theta_v3 = 2.0;
   EXPECT_THROW(log_mix(theta_v3,lambda1_v,lambda2),std::domain_error);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 void test_log_mix_vv_ex_lam_1(double theta, double lambda1, double lambda2) {
-  using stan::agrad::var;
+  using stan::math::var;
 
   var theta_v = theta;
   var lambda2_v = lambda2;
@@ -110,7 +110,7 @@ void test_log_mix_vv_ex_lam_1(double theta, double lambda1, double lambda2) {
   std::vector<double> g;
   lp.grad(x,g);
   
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
   
   var theta_v2 = theta;
   var lambda2_v2 = lambda2;
@@ -132,11 +132,11 @@ void test_log_mix_vv_ex_lam_1(double theta, double lambda1, double lambda2) {
 
   var theta_v3 = 2.0;
   EXPECT_THROW(log_mix(theta_v3,lambda1,lambda2_v),std::domain_error);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 void test_log_mix_vv_ex_theta(double theta, double lambda1, double lambda2) {
-  using stan::agrad::var;
+  using stan::math::var;
 
   var lambda1_v = lambda1;
   var lambda2_v = lambda2;
@@ -151,7 +151,7 @@ void test_log_mix_vv_ex_theta(double theta, double lambda1, double lambda2) {
   std::vector<double> g;
   lp.grad(x,g);
   
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
   
   var lambda1_v2 = lambda1;
   var lambda2_v2 = lambda2;
@@ -172,11 +172,11 @@ void test_log_mix_vv_ex_theta(double theta, double lambda1, double lambda2) {
     EXPECT_FLOAT_EQ(g2[i], g[i]) << "failed on " << i << std::endl;
 
   EXPECT_THROW(log_mix(2.0,lambda1_v,lambda2_v),std::domain_error);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 void test_log_mix_v_theta(double theta, double lambda1, double lambda2) {
-  using stan::agrad::var;
+  using stan::math::var;
 
   var theta_v = theta;
 
@@ -189,7 +189,7 @@ void test_log_mix_v_theta(double theta, double lambda1, double lambda2) {
   std::vector<double> g;
   lp.grad(x,g);
   
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
   
   var theta_v2 = theta;
   
@@ -209,11 +209,11 @@ void test_log_mix_v_theta(double theta, double lambda1, double lambda2) {
 
   var theta_v3 = 2.0;
   EXPECT_THROW(log_mix(theta_v3,lambda1,lambda2),std::domain_error);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 void test_log_mix_v_lam_1(double theta, double lambda1, double lambda2) {
-  using stan::agrad::var;
+  using stan::math::var;
 
   var lambda1_v = lambda1;
 
@@ -226,7 +226,7 @@ void test_log_mix_v_lam_1(double theta, double lambda1, double lambda2) {
   std::vector<double> g;
   lp.grad(x,g);
   
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
   
   var lambda1_v2 = lambda1;
   
@@ -245,11 +245,11 @@ void test_log_mix_v_lam_1(double theta, double lambda1, double lambda2) {
     EXPECT_FLOAT_EQ(g2[i], g[i]) << "failed on " << i << std::endl;
 
   EXPECT_THROW(log_mix(2.0,lambda1_v,lambda2),std::domain_error);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 void test_log_mix_v_lam_2(double theta, double lambda1, double lambda2) {
-  using stan::agrad::var;
+  using stan::math::var;
 
   var lambda2_v = lambda2;
 
@@ -262,7 +262,7 @@ void test_log_mix_v_lam_2(double theta, double lambda1, double lambda2) {
   std::vector<double> g;
   lp.grad(x,g);
   
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
   
   var lambda2_v2 = lambda2;
   
@@ -281,7 +281,7 @@ void test_log_mix_v_lam_2(double theta, double lambda1, double lambda2) {
     EXPECT_FLOAT_EQ(g2[i], g[i]) << "failed on " << i << std::endl;
 
   EXPECT_THROW(log_mix(2.0,lambda1,lambda2_v),std::domain_error);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 TEST(AgradRev,log_mix) {

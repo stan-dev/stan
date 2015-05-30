@@ -5,11 +5,11 @@
 
 TEST(ProbDistributionsBernoulli, error_check) {
   boost::random::mt19937 rng;
-  EXPECT_NO_THROW(stan::prob::bernoulli_rng(0.6,rng));
+  EXPECT_NO_THROW(stan::math::bernoulli_rng(0.6,rng));
 
-  EXPECT_THROW(stan::prob::bernoulli_rng(1.6,rng),std::domain_error);
-  EXPECT_THROW(stan::prob::bernoulli_rng(-0.6,rng),std::domain_error);
-  EXPECT_THROW(stan::prob::bernoulli_rng(stan::math::positive_infinity(),rng),
+  EXPECT_THROW(stan::math::bernoulli_rng(1.6,rng),std::domain_error);
+  EXPECT_THROW(stan::math::bernoulli_rng(-0.6,rng),std::domain_error);
+  EXPECT_THROW(stan::math::bernoulli_rng(stan::math::positive_infinity(),rng),
                std::domain_error);
 }
 
@@ -25,7 +25,7 @@ TEST(ProbDistributionsBernoulli, chiSquareGoodnessFitTest) {
   int count = 0;
 
   while (count < N) {
-    int a = stan::prob::bernoulli_rng(0.4,rng);
+    int a = stan::math::bernoulli_rng(0.4,rng);
     if(a == 1)
       ++bin[1];
     else

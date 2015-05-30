@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__SCAL__FUN__LOG2_HPP
-#define STAN__MATH__FWD__SCAL__FUN__LOG2_HPP
+#ifndef STAN_MATH_FWD_SCAL_FUN_LOG2_HPP
+#define STAN_MATH_FWD_SCAL_FUN_LOG2_HPP
 
 #include <stan/math/fwd/core.hpp>
 
@@ -9,7 +9,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     template <typename T>
     inline

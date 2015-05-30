@@ -1,10 +1,10 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__SQUARE_HPP
-#define STAN__MATH__REV__SCAL__FUN__SQUARE_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_SQUARE_HPP
+#define STAN_MATH_REV_SCAL_FUN_SQUARE_HPP
 
 #include <stan/math/rev/core.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class square_vari : public op_v_vari {

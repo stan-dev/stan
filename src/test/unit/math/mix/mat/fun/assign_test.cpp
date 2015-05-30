@@ -7,8 +7,8 @@
 #include <stan/math/fwd/core.hpp>
 #include <gtest/gtest.h>
 
-using stan::agrad::fvar;
-using stan::agrad::var;
+using stan::math::fvar;
+using stan::math::var;
 
 
 TEST(AgradMixMatrixAssign,vector_fvar_var) {

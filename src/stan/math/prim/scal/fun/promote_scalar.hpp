@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__PROMOTE_SCALAR_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__PROMOTE_SCALAR_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_PROMOTE_SCALAR_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_PROMOTE_SCALAR_HPP
 
 #include <stan/math/prim/scal/fun/promote_scalar_type.hpp>
 #include <stan/math/prim/scal/meta/index_type.hpp>

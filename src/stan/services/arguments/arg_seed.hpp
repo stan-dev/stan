@@ -1,16 +1,16 @@
-#ifndef STAN__SERVICES__ARGUMENTS__SEED__HPP
-#define STAN__SERVICES__ARGUMENTS__SEED__HPP
+#ifndef STAN_SERVICES_ARGUMENTS_ARG_SEED_HPP
+#define STAN_SERVICES_ARGUMENTS_ARG_SEED_HPP
 
 #include <stan/services/arguments/singleton_argument.hpp>
 
 namespace stan {
-  
+
   namespace services {
-    
+
     class arg_seed: public u_int_argument {
-      
+
     public:
-      
+
       arg_seed(): u_int_argument() {
         _name = "seed";
         _description = "Random number generator seed";
@@ -21,11 +21,11 @@ namespace stan {
         _good_value = 18383;
         _value = _default_value;
       };
-      
+
     };
-    
+
   } // services
-  
+
 } // stan
 
 #endif

@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__ERR__CHECK_ROW_INDEX_HPP
-#define STAN__MATH__PRIM__MAT__ERR__CHECK_ROW_INDEX_HPP
+#ifndef STAN_MATH_PRIM_MAT_ERR_CHECK_ROW_INDEX_HPP
+#define STAN_MATH_PRIM_MAT_ERR_CHECK_ROW_INDEX_HPP
 
 #include <stan/math/prim/scal/err/out_of_range.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>

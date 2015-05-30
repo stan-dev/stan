@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__TRUNC_HPP
-#define STAN__MATH__REV__SCAL__FUN__TRUNC_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_TRUNC_HPP
+#define STAN_MATH_REV_SCAL_FUN_TRUNC_HPP
 
 #include <stan/math/rev/core.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
@@ -7,7 +7,7 @@
 #include <limits>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class trunc_vari : public op_v_vari {
@@ -52,7 +52,7 @@ namespace stan {
      * @param a Specified variable.
      * @return Truncation of the variable.
      */
-    inline var trunc(const stan::agrad::var& a) {
+    inline var trunc(const stan::math::var& a) {
       return var(new trunc_vari(a.vi_));
     }
 

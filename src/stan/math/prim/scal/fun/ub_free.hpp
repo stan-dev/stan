@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__UB_FREE_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__UB_FREE_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_UB_FREE_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_UB_FREE_HPP
 
 #include <stan/math/prim/scal/fun/identity_free.hpp>
 #include <stan/math/prim/scal/err/check_less_or_equal.hpp>
@@ -9,7 +9,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * Return the free scalar that corresponds to the specified
@@ -37,9 +37,10 @@ namespace stan {
     inline
     typename boost::math::tools::promote_args<T, TU>::type
     ub_free(const T y, const TU ub) {
+      using std::log;
       if (ub == std::numeric_limits<double>::infinity())
         return identity_free(y);
-      stan::math::check_less_or_equal("stan::prob::ub_free",
+      stan::math::check_less_or_equal("stan::math::ub_free",
                                       "Upper bounded variable", y, ub);
       return log(ub - y);
     }

@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__MAT__FUN__TRACE_INV_QUAD_FORM_LDLT_HPP
-#define STAN__MATH__REV__MAT__FUN__TRACE_INV_QUAD_FORM_LDLT_HPP
+#ifndef STAN_MATH_REV_MAT_FUN_TRACE_INV_QUAD_FORM_LDLT_HPP
+#define STAN_MATH_REV_MAT_FUN_TRACE_INV_QUAD_FORM_LDLT_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/rev/core.hpp>
@@ -10,7 +10,7 @@
 #include <stan/math/rev/scal/meta/is_var.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
     namespace {
       template <typename T2, int R2, int C2, typename T3, int R3, int C3>
       class trace_inv_quad_form_ldlt_impl : public chainable_alloc {

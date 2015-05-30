@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__MAT__FUN__COLUMNS_DOT_PRODUCT_HPP
-#define STAN__MATH__REV__MAT__FUN__COLUMNS_DOT_PRODUCT_HPP
+#ifndef STAN_MATH_REV_MAT_FUN_COLUMNS_DOT_PRODUCT_HPP
+#define STAN_MATH_REV_MAT_FUN_COLUMNS_DOT_PRODUCT_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/typedefs.hpp>
@@ -15,7 +15,7 @@
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     template<typename T1, int R1, int C1, typename T2, int R2, int C2>
     inline

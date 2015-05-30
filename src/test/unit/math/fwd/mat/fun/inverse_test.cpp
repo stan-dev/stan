@@ -5,7 +5,7 @@
 #include <stan/math/fwd/scal/fun/abs.hpp>
 
 TEST(AgradFwdMatrixInverse,fd) {
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
   using stan::math::matrix_d;
 
   matrix_fd a(2,2);
@@ -19,7 +19,7 @@ TEST(AgradFwdMatrixInverse,fd) {
    b << 2.0, 3.0, 5.0,7.0;
    b = b.inverse();
 
-  matrix_fd a_inv = stan::agrad::inverse(a);
+  matrix_fd a_inv = stan::math::inverse(a);
 
   EXPECT_NEAR(b(0,0),a_inv(0,0).val_,1.0E-12);
   EXPECT_NEAR(b(0,1),a_inv(0,1).val_,1.0E-12);
@@ -30,12 +30,12 @@ TEST(AgradFwdMatrixInverse,fd) {
   EXPECT_NEAR( 6,a_inv(1,0).d_,1.0E-12);
   EXPECT_NEAR(-3,a_inv(1,1).d_,1.0E-12);
 
-  EXPECT_THROW(stan::agrad::inverse(matrix_fd(2,3)), std::invalid_argument);
+  EXPECT_THROW(stan::math::inverse(matrix_fd(2,3)), std::invalid_argument);
 }
 TEST(AgradFwdMatrixInverse,ffd) {
-  using stan::agrad::matrix_ffd;
+  using stan::math::matrix_ffd;
   using stan::math::matrix_d;
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<fvar<double> > d,e,f,g;
   d.val_.val_ = 2.0;
@@ -54,7 +54,7 @@ TEST(AgradFwdMatrixInverse,ffd) {
    b << 2.0, 3.0, 5.0,7.0;
    b = b.inverse();
 
-  matrix_ffd a_inv = stan::agrad::inverse(a);
+  matrix_ffd a_inv = stan::math::inverse(a);
 
   EXPECT_NEAR(b(0,0),a_inv(0,0).val_.val(),1.0E-12);
   EXPECT_NEAR(b(0,1),a_inv(0,1).val_.val(),1.0E-12);
@@ -65,5 +65,5 @@ TEST(AgradFwdMatrixInverse,ffd) {
   EXPECT_NEAR( 6,a_inv(1,0).d_.val(),1.0E-12);
   EXPECT_NEAR(-3,a_inv(1,1).d_.val(),1.0E-12);
 
-  EXPECT_THROW(stan::agrad::inverse(matrix_ffd(2,3)), std::invalid_argument);
+  EXPECT_THROW(stan::math::inverse(matrix_ffd(2,3)), std::invalid_argument);
 }

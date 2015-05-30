@@ -5,10 +5,10 @@
 
 TEST(AgradMixMatrixCol,matrix_fv) {
   using stan::math::col;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::vector_fv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::matrix_fv;
+  using stan::math::vector_fv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a(1.0,1.0);
   fvar<var> b(2.0,1.0);
@@ -35,9 +35,9 @@ TEST(AgradMixMatrixCol,matrix_fv) {
 }
 TEST(AgradMixMatrixCol,matrix_fv_exc0) {
   using stan::math::col;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::matrix_fv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a(1.0,1.0);
   fvar<var> b(2.0,1.0);
@@ -53,9 +53,9 @@ TEST(AgradMixMatrixCol,matrix_fv_exc0) {
 }
 TEST(AgradMixMatrixCol,matrix_fv_excHigh) {
   using stan::math::col;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::matrix_fv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a(1.0,1.0);
   fvar<var> b(2.0,1.0);
@@ -71,10 +71,10 @@ TEST(AgradMixMatrixCol,matrix_fv_excHigh) {
 }
 TEST(AgradMixMatrixCol,matrix_ffv) {
   using stan::math::col;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::vector_ffv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::matrix_ffv;
+  using stan::math::vector_ffv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > a;
   fvar<fvar<var> > b;
@@ -114,9 +114,9 @@ TEST(AgradMixMatrixCol,matrix_ffv) {
 }
 TEST(AgradMixMatrixCol,matrix_ffv_exc0) {
   using stan::math::col;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::matrix_ffv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > a;
   fvar<fvar<var> > b;
@@ -145,9 +145,9 @@ TEST(AgradMixMatrixCol,matrix_ffv_exc0) {
 }
 TEST(AgradMixMatrixCol,matrix_ffv_excHigh) {
   using stan::math::col;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::matrix_ffv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > a;
   fvar<fvar<var> > b;

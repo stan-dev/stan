@@ -1,5 +1,5 @@
-#ifndef STAN__VERSION_HPP
-#define STAN__VERSION_HPP
+#ifndef STAN_VERSION_HPP
+#define STAN_VERSION_HPP
 
 #include <string>
 

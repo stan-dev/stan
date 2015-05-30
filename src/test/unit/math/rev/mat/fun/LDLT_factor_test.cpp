@@ -8,7 +8,7 @@
 
 TEST(AgradRevMatrix, LDLT_factor_default_constructor) {
   using stan::math::LDLT_factor;
-  using stan::agrad::var;
+  using stan::math::var;
   
   Eigen::Matrix<var,-1,-1> A(2,2);
   A << 2,1,1,2;
@@ -23,7 +23,7 @@ TEST(AgradRevMatrix, LDLT_factor_default_constructor) {
 
 TEST(AgradRevMatrix, LDLT_factor_constructor_matrix) {
   using stan::math::LDLT_factor;
-  using stan::agrad::var;
+  using stan::math::var;
   
   Eigen::Matrix<var,-1,-1> A(2,2);
   A << 2,1,1,2;
@@ -42,7 +42,7 @@ TEST(AgradRevMatrix, LDLT_factor_constructor_matrix) {
 
 TEST(AgradRevMatrix, success) {
   using stan::math::LDLT_factor;
-  using stan::agrad::var;
+  using stan::math::var;
   
   Eigen::Matrix<var,-1,-1> A(2,2);
   A << 0,0,0,0;
@@ -58,7 +58,7 @@ TEST(AgradRevMatrix, success) {
 
 TEST(AgradRevMatrix, solve) {
   using stan::math::LDLT_factor;
-  using stan::agrad::var;
+  using stan::math::var;
   
   Eigen::Matrix<var,-1,-1> A(2,2);
   A << 2,1,1,2;
@@ -86,7 +86,7 @@ TEST(AgradRevMatrix, solve) {
 
 TEST(AgradRevMatrix, vectorD) {
   using stan::math::LDLT_factor;
-  using stan::agrad::var;
+  using stan::math::var;
   
   Eigen::Matrix<var,-1,-1> A(2,2);
   A << 2,1,1,2;
@@ -109,7 +109,7 @@ TEST(AgradRevMatrix, vectorD) {
 
 TEST(AgradRevMatrix, rows) {
   using stan::math::LDLT_factor;
-  using stan::agrad::var;
+  using stan::math::var;
   
   Eigen::Matrix<var,-1,-1> A(2,2);
   A << 2,1,1,2;
@@ -121,7 +121,7 @@ TEST(AgradRevMatrix, rows) {
 
 TEST(AgradRevMatrix, cols) {
   using stan::math::LDLT_factor;
-  using stan::agrad::var;
+  using stan::math::var;
   
   Eigen::Matrix<var,-1,-1> A(2,2);
   A << 2,1,1,2;
@@ -133,7 +133,7 @@ TEST(AgradRevMatrix, cols) {
 
 TEST(AgradRevMatrix, compute) {
   using stan::math::LDLT_factor;
-  using stan::agrad::var;
+  using stan::math::var;
   
   Eigen::Matrix<var,-1,-1> A(2,2);
   A << 2,1,1,2;

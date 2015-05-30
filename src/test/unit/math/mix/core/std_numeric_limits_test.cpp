@@ -4,8 +4,8 @@
 #include <stan/math/prim/scal/fun/constants.hpp>
 
 TEST(AgradMixNumericLimits,All_Fvar) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::isnan;
   using stan::math::INFTY;
 

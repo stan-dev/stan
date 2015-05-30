@@ -4,10 +4,10 @@
 
 TEST(StanAgradRevInternal, precomputed_gradients) {
   double value;
-  std::vector<stan::agrad::var> vars;
+  std::vector<stan::math::var> vars;
   std::vector<double> gradients;
-  stan::agrad::var x1(2), x2(3);
-  stan::agrad::var y;
+  stan::math::var x1(2), x2(3);
+  stan::math::var y;
   
   value = 1;
   vars.resize(2);
@@ -17,7 +17,7 @@ TEST(StanAgradRevInternal, precomputed_gradients) {
   gradients[0] = 4;
   gradients[1] = 5;
 
-  EXPECT_NO_THROW(y = stan::agrad::precomputed_gradients(value, vars, gradients));
+  EXPECT_NO_THROW(y = stan::math::precomputed_gradients(value, vars, gradients));
   EXPECT_FLOAT_EQ(value, y.val());
 
   std::vector<double> g;
@@ -26,16 +26,16 @@ TEST(StanAgradRevInternal, precomputed_gradients) {
   EXPECT_FLOAT_EQ(gradients[0], g[0]);
   EXPECT_FLOAT_EQ(gradients[1], g[1]);
 
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 
 TEST(StanAgradRevInternal, precomputed_gradients_vari_no_independent_vars) {
   double value = 1;
-  std::vector<stan::agrad::var> vars;
+  std::vector<stan::math::var> vars;
   std::vector<double> gradients;
 
-  stan::agrad::precomputed_gradients_vari vi(value, vars, gradients);
+  stan::math::precomputed_gradients_vari vi(value, vars, gradients);
   EXPECT_FLOAT_EQ(value, vi.val_);
   EXPECT_FLOAT_EQ(0, vi.adj_);
   EXPECT_NO_THROW(vi.chain());
@@ -43,20 +43,20 @@ TEST(StanAgradRevInternal, precomputed_gradients_vari_no_independent_vars) {
 
 TEST(StanAgradRevInternal, precomputed_gradients_vari_mismatched_sizes) {
   double value;
-  std::vector<stan::agrad::var> vars;
+  std::vector<stan::math::var> vars;
   std::vector<double> gradients;
 
   value = 1;
   vars.resize(1);
   gradients.resize(2);
-  EXPECT_THROW(stan::agrad::precomputed_gradients_vari(value, vars, gradients),
+  EXPECT_THROW(stan::math::precomputed_gradients_vari(value, vars, gradients),
                std::invalid_argument);
 }
 
 TEST(StanAgradRevInternal, precomputed_gradients_vari) {
   double value = 1;
-  std::vector<stan::agrad::var> vars;
-  stan::agrad::var x1(2), x2(3);
+  std::vector<stan::math::var> vars;
+  stan::math::var x1(2), x2(3);
   vars.push_back(x1);
   vars.push_back(x2);
 
@@ -64,7 +64,7 @@ TEST(StanAgradRevInternal, precomputed_gradients_vari) {
   gradients.push_back(4);
   gradients.push_back(5);
 
-  stan::agrad::precomputed_gradients_vari vi(value, vars, gradients);  
+  stan::math::precomputed_gradients_vari vi(value, vars, gradients);  
   EXPECT_FLOAT_EQ(value, vi.val_);
   EXPECT_FLOAT_EQ(0, vi.adj_);
 
@@ -86,7 +86,7 @@ TEST(StanAgradRevInternal, precomputed_gradients_vari) {
 
 TEST(StanAgradRevInternal, precomputed_gradients_mismatched_sizes) {
   double value;
-  std::vector<stan::agrad::var> vars;
+  std::vector<stan::math::var> vars;
   std::vector<double> gradients;
   
   value = 1;
@@ -96,8 +96,8 @@ TEST(StanAgradRevInternal, precomputed_gradients_mismatched_sizes) {
   gradients[0] = 2;
   gradients[1] = 3;
 
-  EXPECT_THROW(stan::agrad::precomputed_gradients(value, vars, gradients),
+  EXPECT_THROW(stan::math::precomputed_gradients(value, vars, gradients),
                std::invalid_argument);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 

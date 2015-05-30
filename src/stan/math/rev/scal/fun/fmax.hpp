@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__FMAX_HPP
-#define STAN__MATH__REV__SCAL__FUN__FMAX_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_FMAX_HPP
+#define STAN_MATH_REV_SCAL_FUN_FMAX_HPP
 
 #include <stan/math/rev/core.hpp>
 #include <stan/math/rev/scal/fun/is_nan.hpp>
@@ -10,7 +10,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     /**
      * Returns the maximum of the two variable arguments (C99).
@@ -60,8 +60,8 @@ namespace stan {
      * @return If the first variable's value is larger than the
      * second's, the first variable, otherwise the second variable.
      */
-    inline var fmax(const stan::agrad::var& a,
-                    const stan::agrad::var& b) {
+    inline var fmax(const stan::math::var& a,
+                    const stan::math::var& b) {
       using stan::math::NOT_A_NUMBER;
       if (unlikely(is_nan(a))) {
         if (unlikely(is_nan(b)))
@@ -92,7 +92,7 @@ namespace stan {
      * to the second value, the first variable, otherwise the second
      * value promoted to a fresh variable.
      */
-    inline var fmax(const stan::agrad::var& a,
+    inline var fmax(const stan::math::var& a,
                     const double& b) {
       using stan::math::NOT_A_NUMBER;
       if (unlikely(is_nan(a))) {
@@ -125,7 +125,7 @@ namespace stan {
      * second variable.
      */
     inline var fmax(const double& a,
-                    const stan::agrad::var& b) {
+                    const stan::math::var& b) {
       using stan::math::NOT_A_NUMBER;
       if (unlikely(is_nan(b))) {
         if (unlikely(is_nan(a)))

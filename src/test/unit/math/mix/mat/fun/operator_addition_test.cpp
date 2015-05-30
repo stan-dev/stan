@@ -7,9 +7,9 @@
 #include <stan/math/fwd/mat/fun/Eigen_NumTraits.hpp>
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/rev/core.hpp>
-using stan::agrad::fvar;
+using stan::math::fvar;
 TEST(AgradMixMatrixOperatorAddition,fv_scalar_matrix_1stDeriv) {
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
   using stan::math::add;
 
   matrix_fv v(2,2);
@@ -49,7 +49,7 @@ TEST(AgradMixMatrixOperatorAddition,fv_scalar_matrix_1stDeriv) {
   EXPECT_FLOAT_EQ(0,h[3]);
 }
 TEST(AgradMixMatrixOperatorAddition,fv_scalar_matrix_2ndDeriv) {
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
   using stan::math::add;
 
   matrix_fv v(2,2);
@@ -70,7 +70,7 @@ TEST(AgradMixMatrixOperatorAddition,fv_scalar_matrix_2ndDeriv) {
   EXPECT_FLOAT_EQ(0,h[3]);
 }
 TEST(AgradMixMatrixOperatorAddition,fv_scalar_vector_1stDeriv) {
-  using stan::agrad::vector_fv;
+  using stan::math::vector_fv;
   using stan::math::add;
 
   vector_fv v(4);
@@ -110,7 +110,7 @@ TEST(AgradMixMatrixOperatorAddition,fv_scalar_vector_1stDeriv) {
   EXPECT_FLOAT_EQ(0,h[3]);
 }
 TEST(AgradMixMatrixOperatorAddition,fv_scalar_vector_2ndDeriv) {
-  using stan::agrad::vector_fv;
+  using stan::math::vector_fv;
   using stan::math::add;
 
   vector_fv v(4);
@@ -131,7 +131,7 @@ TEST(AgradMixMatrixOperatorAddition,fv_scalar_vector_2ndDeriv) {
   EXPECT_FLOAT_EQ(0,h[3]);
 }
 TEST(AgradMixMatrixOperatorAddition,fv_scalar_rowvector_1stDeriv) {
-  using stan::agrad::row_vector_fv;
+  using stan::math::row_vector_fv;
   using stan::math::add;
 
   row_vector_fv v(4);
@@ -171,7 +171,7 @@ TEST(AgradMixMatrixOperatorAddition,fv_scalar_rowvector_1stDeriv) {
   EXPECT_FLOAT_EQ(0,h[3]);
 }
 TEST(AgradMixMatrixOperatorAddition,fv_scalar_rowvector_2ndDeriv) {
-  using stan::agrad::row_vector_fv;
+  using stan::math::row_vector_fv;
   using stan::math::add;
 
   row_vector_fv v(4);
@@ -195,7 +195,7 @@ TEST(AgradMixMatrixOperatorAddition,fv_scalar_rowvector_2ndDeriv) {
 TEST(AgradMixMatrixOperatorAddition,fv_vector_vector_1stDeriv) {
   using stan::math::add;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::math::vector_fv;
 
   vector_d vd_1(5);
   vector_d vd_2(5);
@@ -275,7 +275,7 @@ TEST(AgradMixMatrixOperatorAddition,fv_vector_vector_1stDeriv) {
 TEST(AgradMixMatrixOperatorAddition,fv_vector_vector_2ndDeriv) {
   using stan::math::add;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::math::vector_fv;
 
   vector_d vd_1(5);
   vector_d vd_2(5);
@@ -311,7 +311,7 @@ TEST(AgradMixMatrixOperatorAddition,fv_vector_vector_2ndDeriv) {
 TEST(AgradMixMatrixOperatorAddition,fv_vector_vector_exception) {
   using stan::math::add;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::math::vector_fv;
 
   vector_d d1(5), d2(1);
   vector_fv v1(5), v2(1);
@@ -324,7 +324,7 @@ TEST(AgradMixMatrixOperatorAddition,fv_vector_vector_exception) {
 TEST(AgradMixMatrixOperatorAddition,fv_rowvector_rowvector_1stDeriv) {
   using stan::math::add;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::math::row_vector_fv;
 
   row_vector_d rvd_1(5), rvd_2(5);
   row_vector_fv rvv_1(5), rvv_2(5);
@@ -401,7 +401,7 @@ TEST(AgradMixMatrixOperatorAddition,fv_rowvector_rowvector_1stDeriv) {
 TEST(AgradMixMatrixOperatorAddition,fv_rowvector_rowvector_2ndDeriv) {
   using stan::math::add;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::math::row_vector_fv;
 
   row_vector_d rvd_1(5), rvd_2(5);
   row_vector_fv rvv_1(5), rvv_2(5);
@@ -435,7 +435,7 @@ TEST(AgradMixMatrixOperatorAddition,fv_rowvector_rowvector_2ndDeriv) {
 TEST(AgradMixMatrixOperatorAddition,fv_rowvector_rowvector_exception) {
   using stan::math::add;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::math::row_vector_fv;
 
   row_vector_d d1(5), d2(2);
   row_vector_fv v1(5), v2(2);
@@ -449,7 +449,7 @@ TEST(AgradMixMatrixOperatorAddition,fv_rowvector_rowvector_exception) {
 TEST(AgradMixMatrixOperatorAddition,fv_matrix_matrix_1stDeriv) {
   using stan::math::add;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
 
   matrix_d md_1(2,2), md_2(2,2);
   matrix_fv mv_1(2,2), mv_2(2,2);
@@ -517,7 +517,7 @@ TEST(AgradMixMatrixOperatorAddition,fv_matrix_matrix_1stDeriv) {
 TEST(AgradMixMatrixOperatorAddition,fv_matrix_matrix_2ndDeriv) {
   using stan::math::add;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
 
   matrix_d md_1(2,2), md_2(2,2);
   matrix_fv mv_1(2,2), mv_2(2,2);
@@ -549,7 +549,7 @@ TEST(AgradMixMatrixOperatorAddition,fv_matrix_matrix_2ndDeriv) {
 TEST(AgradMixMatrixOperatorAddition,fv_matrix_matrix_exception) {
   using stan::math::add;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
   
   matrix_d d1(2,2), d2(1,2);
   matrix_fv v1(2,2), v2(1,2);
@@ -560,7 +560,7 @@ TEST(AgradMixMatrixOperatorAddition,fv_matrix_matrix_exception) {
   EXPECT_THROW(add(v1, v2), std::invalid_argument);
 }
 TEST(AgradMixMatrixOperatorAddition,ffv_scalar_matrix_1stDeriv) {
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using stan::math::add;
 
   matrix_ffv v(2,2);
@@ -600,7 +600,7 @@ TEST(AgradMixMatrixOperatorAddition,ffv_scalar_matrix_1stDeriv) {
   EXPECT_FLOAT_EQ(0,h[3]);
 }
 TEST(AgradMixMatrixOperatorAddition,ffv_scalar_matrix_2ndDeriv_1) {
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using stan::math::add;
 
   matrix_ffv v(2,2);
@@ -621,7 +621,7 @@ TEST(AgradMixMatrixOperatorAddition,ffv_scalar_matrix_2ndDeriv_1) {
   EXPECT_FLOAT_EQ(0,h[3]);
 }
 TEST(AgradMixMatrixOperatorAddition,ffv_scalar_matrix_2ndDeriv_2) {
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using stan::math::add;
 
   matrix_ffv v(2,2);
@@ -642,7 +642,7 @@ TEST(AgradMixMatrixOperatorAddition,ffv_scalar_matrix_2ndDeriv_2) {
   EXPECT_FLOAT_EQ(0,h[3]);
 }
 TEST(AgradMixMatrixOperatorAddition,ffv_scalar_matrix_3rdDeriv) {
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using stan::math::add;
 
   matrix_ffv v(2,2);
@@ -667,7 +667,7 @@ TEST(AgradMixMatrixOperatorAddition,ffv_scalar_matrix_3rdDeriv) {
   EXPECT_FLOAT_EQ(0,h[3]);
 }
 TEST(AgradMixMatrixOperatorAddition,ffv_scalar_vector_1stDeriv) {
-  using stan::agrad::vector_ffv;
+  using stan::math::vector_ffv;
   using stan::math::add;
 
   vector_ffv v(4);
@@ -707,7 +707,7 @@ TEST(AgradMixMatrixOperatorAddition,ffv_scalar_vector_1stDeriv) {
   EXPECT_FLOAT_EQ(0,h[3]);
 }
 TEST(AgradMixMatrixOperatorAddition,ffv_scalar_vector_2ndDeriv_1) {
-  using stan::agrad::vector_ffv;
+  using stan::math::vector_ffv;
   using stan::math::add;
 
   vector_ffv v(4);
@@ -728,7 +728,7 @@ TEST(AgradMixMatrixOperatorAddition,ffv_scalar_vector_2ndDeriv_1) {
   EXPECT_FLOAT_EQ(0,h[3]);
 }
 TEST(AgradMixMatrixOperatorAddition,ffv_scalar_vector_2ndDeriv_2) {
-  using stan::agrad::vector_ffv;
+  using stan::math::vector_ffv;
   using stan::math::add;
 
   vector_ffv v(4);
@@ -749,7 +749,7 @@ TEST(AgradMixMatrixOperatorAddition,ffv_scalar_vector_2ndDeriv_2) {
   EXPECT_FLOAT_EQ(0,h[3]);
 }
 TEST(AgradMixMatrixOperatorAddition,ffv_scalar_vector_3rdDeriv) {
-  using stan::agrad::vector_ffv;
+  using stan::math::vector_ffv;
   using stan::math::add;
 
   vector_ffv v(4);
@@ -774,7 +774,7 @@ TEST(AgradMixMatrixOperatorAddition,ffv_scalar_vector_3rdDeriv) {
   EXPECT_FLOAT_EQ(0,h[3]);
 }
 TEST(AgradMixMatrixOperatorAddition,ffv_scalar_rowvector_1stDeriv) {
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
   using stan::math::add;
 
   row_vector_ffv v(4);
@@ -814,7 +814,7 @@ TEST(AgradMixMatrixOperatorAddition,ffv_scalar_rowvector_1stDeriv) {
   EXPECT_FLOAT_EQ(0,h[3]);
 }
 TEST(AgradMixMatrixOperatorAddition,ffv_scalar_rowvector_2ndDeriv_1) {
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
   using stan::math::add;
 
   row_vector_ffv v(4);
@@ -836,7 +836,7 @@ TEST(AgradMixMatrixOperatorAddition,ffv_scalar_rowvector_2ndDeriv_1) {
   EXPECT_FLOAT_EQ(0,h[3]);
 }
 TEST(AgradMixMatrixOperatorAddition,ffv_scalar_rowvector_2ndDeriv_2) {
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
   using stan::math::add;
 
   row_vector_ffv v(4);
@@ -858,7 +858,7 @@ TEST(AgradMixMatrixOperatorAddition,ffv_scalar_rowvector_2ndDeriv_2) {
   EXPECT_FLOAT_EQ(0,h[3]);
 }
 TEST(AgradMixMatrixOperatorAddition,ffv_scalar_rowvector_3rdDeriv) {
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
   using stan::math::add;
 
   row_vector_ffv v(4);
@@ -886,7 +886,7 @@ TEST(AgradMixMatrixOperatorAddition,ffv_scalar_rowvector_3rdDeriv) {
 TEST(AgradMixMatrixOperatorAddition,ffv_vector_vector_1stDeriv) {
   using stan::math::add;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
+  using stan::math::vector_ffv;
 
   vector_d vd_1(5);
   vector_d vd_2(5);
@@ -966,7 +966,7 @@ TEST(AgradMixMatrixOperatorAddition,ffv_vector_vector_1stDeriv) {
 TEST(AgradMixMatrixOperatorAddition,ffv_vector_vector_2ndDeriv_1) {
   using stan::math::add;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
+  using stan::math::vector_ffv;
 
   vector_d vd_1(5);
   vector_d vd_2(5);
@@ -1002,7 +1002,7 @@ TEST(AgradMixMatrixOperatorAddition,ffv_vector_vector_2ndDeriv_1) {
 TEST(AgradMixMatrixOperatorAddition,ffv_vector_vector_2ndDeriv_2) {
   using stan::math::add;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
+  using stan::math::vector_ffv;
 
   vector_d vd_1(5);
   vector_d vd_2(5);
@@ -1038,7 +1038,7 @@ TEST(AgradMixMatrixOperatorAddition,ffv_vector_vector_2ndDeriv_2) {
 TEST(AgradMixMatrixOperatorAddition,ffv_vector_vector_3rdDeriv) {
   using stan::math::add;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
+  using stan::math::vector_ffv;
 
   vector_d vd_1(5);
   vector_d vd_2(5);
@@ -1084,7 +1084,7 @@ TEST(AgradMixMatrixOperatorAddition,ffv_vector_vector_3rdDeriv) {
 TEST(AgradMixMatrixOperatorAddition,ffv_vector_vector_exception) {
   using stan::math::add;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
+  using stan::math::vector_ffv;
 
   vector_d d1(5), d2(1);
   vector_ffv v1(5), v2(1);
@@ -1097,7 +1097,7 @@ TEST(AgradMixMatrixOperatorAddition,ffv_vector_vector_exception) {
 TEST(AgradMixMatrixOperatorAddition,ffv_rowvector_rowvector_1stDeriv) {
   using stan::math::add;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
 
   row_vector_d rvd_1(5), rvd_2(5);
   row_vector_ffv rvv_1(5), rvv_2(5);
@@ -1174,7 +1174,7 @@ TEST(AgradMixMatrixOperatorAddition,ffv_rowvector_rowvector_1stDeriv) {
 TEST(AgradMixMatrixOperatorAddition,ffv_rowvector_rowvector_2ndDeriv_1) {
   using stan::math::add;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
 
   row_vector_d rvd_1(5), rvd_2(5);
   row_vector_ffv rvv_1(5), rvv_2(5);
@@ -1208,7 +1208,7 @@ TEST(AgradMixMatrixOperatorAddition,ffv_rowvector_rowvector_2ndDeriv_1) {
 TEST(AgradMixMatrixOperatorAddition,ffv_rowvector_rowvector_2ndDeriv_2) {
   using stan::math::add;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
 
   row_vector_d rvd_1(5), rvd_2(5);
   row_vector_ffv rvv_1(5), rvv_2(5);
@@ -1242,7 +1242,7 @@ TEST(AgradMixMatrixOperatorAddition,ffv_rowvector_rowvector_2ndDeriv_2) {
 TEST(AgradMixMatrixOperatorAddition,ffv_rowvector_rowvector_3rdDeriv) {
   using stan::math::add;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
 
   row_vector_d rvd_1(5), rvd_2(5);
   row_vector_ffv rvv_1(5), rvv_2(5);
@@ -1286,7 +1286,7 @@ TEST(AgradMixMatrixOperatorAddition,ffv_rowvector_rowvector_3rdDeriv) {
 TEST(AgradMixMatrixOperatorAddition,ffv_rowvector_rowvector_exception) {
   using stan::math::add;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
 
   row_vector_d d1(5), d2(2);
   row_vector_ffv v1(5), v2(2);
@@ -1300,7 +1300,7 @@ TEST(AgradMixMatrixOperatorAddition,ffv_rowvector_rowvector_exception) {
 TEST(AgradMixMatrixOperatorAddition,ffv_matrix_matrix_1stDeriv) {
   using stan::math::add;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
 
   matrix_d md_1(2,2), md_2(2,2);
   matrix_ffv mv_1(2,2), mv_2(2,2);
@@ -1368,7 +1368,7 @@ TEST(AgradMixMatrixOperatorAddition,ffv_matrix_matrix_1stDeriv) {
 TEST(AgradMixMatrixOperatorAddition,ffv_matrix_matrix_2ndDeriv_1) {
   using stan::math::add;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
 
   matrix_d md_1(2,2), md_2(2,2);
   matrix_ffv mv_1(2,2), mv_2(2,2);
@@ -1400,7 +1400,7 @@ TEST(AgradMixMatrixOperatorAddition,ffv_matrix_matrix_2ndDeriv_1) {
 TEST(AgradMixMatrixOperatorAddition,ffv_matrix_matrix_2ndDeriv_2) {
   using stan::math::add;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
 
   matrix_d md_1(2,2), md_2(2,2);
   matrix_ffv mv_1(2,2), mv_2(2,2);
@@ -1432,7 +1432,7 @@ TEST(AgradMixMatrixOperatorAddition,ffv_matrix_matrix_2ndDeriv_2) {
 TEST(AgradMixMatrixOperatorAddition,ffv_matrix_matrix_3rdDeriv) {
   using stan::math::add;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
 
   matrix_d md_1(2,2), md_2(2,2);
   matrix_ffv mv_1(2,2), mv_2(2,2);
@@ -1472,7 +1472,7 @@ TEST(AgradMixMatrixOperatorAddition,ffv_matrix_matrix_3rdDeriv) {
 TEST(AgradMixMatrixOperatorAddition,ffv_matrix_matrix_exception) {
   using stan::math::add;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   
   matrix_d d1(2,2), d2(1,2);
   matrix_ffv v1(2,2), v2(1,2);

@@ -1,5 +1,5 @@
-#ifndef STAN__INTERFACE__RECORDER__RECORDER_HPP
-#define STAN__INTERFACE__RECORDER__RECORDER_HPP
+#ifndef STAN_INTERFACE_RECORDER_RECORDER_HPP
+#define STAN_INTERFACE_RECORDER_RECORDER_HPP
 
 #include <string>
 #include <vector>
@@ -7,7 +7,7 @@
 namespace stan {
   namespace interface {
     namespace recorder {
-      
+
       class recorder {
       public:
         virtual ~recorder() {};

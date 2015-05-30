@@ -1,18 +1,18 @@
-#ifndef STAN__SERVICES__ARGUMENTS__TOLERANCE_HPP
-#define STAN__SERVICES__ARGUMENTS__TOLERANCE_HPP
+#ifndef STAN_SERVICES_ARGUMENTS_ARG_TOLERANCE_HPP
+#define STAN_SERVICES_ARGUMENTS_ARG_TOLERANCE_HPP
 
 #include <boost/lexical_cast.hpp>
 
 #include <stan/services/arguments/singleton_argument.hpp>
 
 namespace stan {
-  
+
   namespace services {
-    
+
     class arg_tolerance : public real_argument {
-      
+
     public:
-      
+
       arg_tolerance(const char *name, const char *desc, double def) : real_argument() {
         _name = name;
         _description = desc;
@@ -24,13 +24,13 @@ namespace stan {
         _bad_value = -1.0;
         _value = _default_value;
       };
-      
+
       bool is_valid(double value) { return value >= 0; }
 
     };
-    
+
   } // services
-  
+
 } // stan
 
 #endif

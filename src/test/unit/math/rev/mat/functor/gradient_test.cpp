@@ -22,16 +22,16 @@ TEST(AgradAutoDiff,gradient) {
   x << 5, 7;
   double fx;
   Matrix<double,Dynamic,1> grad_fx;
-  stan::agrad::gradient(f,x,fx,grad_fx);
+  stan::math::gradient(f,x,fx,grad_fx);
   EXPECT_FLOAT_EQ(5 * 5 * 7 + 3 * 7 * 7, fx);
   EXPECT_EQ(2,grad_fx.size());
   EXPECT_FLOAT_EQ(2 * x(0) * x(1), grad_fx(0));
   EXPECT_FLOAT_EQ(x(0) * x(0) + 3 * 2 * x(1), grad_fx(1));
 }
 
-stan::agrad::var 
-sum_and_throw(const Matrix<stan::agrad::var,Dynamic,1>& x) {
-  stan::agrad::var y = 0;
+stan::math::var 
+sum_and_throw(const Matrix<stan::math::var,Dynamic,1>& x) {
+  stan::math::var y = 0;
   for (int i = 0; i < x.size(); ++i)
     y += x(i);
   throw std::domain_error("fooey");
@@ -46,12 +46,12 @@ TEST(AgradAutoDiff, RecoverMemory) {
       x << 1, 2, 3, 4, 5;
       double fx;
       VectorXd grad_fx;
-      stan::agrad::gradient(sum_and_throw,x,fx,grad_fx);
+      stan::math::gradient(sum_and_throw,x,fx,grad_fx);
     } catch (const std::domain_error& e) {
       // ignore me
     }
   }
   // depends on starting allocation of 65K not being exceeded
   // without recovery_memory in autodiff::apply_recover(), takes 67M 
-  EXPECT_TRUE(stan::agrad::ChainableStack::memalloc_.bytes_allocated() < 100000);
+  EXPECT_TRUE(stan::math::ChainableStack::memalloc_.bytes_allocated() < 100000);
 }  

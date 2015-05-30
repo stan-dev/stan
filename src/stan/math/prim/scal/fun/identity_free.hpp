@@ -1,9 +1,9 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__IDENTITY_FREE_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__IDENTITY_FREE_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_IDENTITY_FREE_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_IDENTITY_FREE_HPP
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * Returns the result of applying the inverse of the identity

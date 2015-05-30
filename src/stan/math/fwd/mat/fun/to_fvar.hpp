@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__MAT__FUN__TO_FVAR_HPP
-#define STAN__MATH__FWD__MAT__FUN__TO_FVAR_HPP
+#ifndef STAN_MATH_FWD_MAT_FUN_TO_FVAR_HPP
+#define STAN_MATH_FWD_MAT_FUN_TO_FVAR_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/fwd/core.hpp>
@@ -8,7 +8,7 @@
 #include <boost/utility/enable_if.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     template<typename T>
     inline

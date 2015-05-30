@@ -1,12 +1,12 @@
-#ifndef STAN__MATH__FWD__SCAL__FUN__IS_NAN_HPP
-#define STAN__MATH__FWD__SCAL__FUN__IS_NAN_HPP
+#ifndef STAN_MATH_FWD_SCAL_FUN_IS_NAN_HPP
+#define STAN_MATH_FWD_SCAL_FUN_IS_NAN_HPP
 
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/prim/scal/fun/is_nan.hpp>
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     /**
      * Returns 1 if the input's value is NaN and 0 otherwise.

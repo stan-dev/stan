@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__SCAL__FUN__POW_HPP
-#define STAN__MATH__FWD__SCAL__FUN__POW_HPP
+#ifndef STAN_MATH_FWD_SCAL_FUN_POW_HPP
+#define STAN_MATH_FWD_SCAL_FUN_POW_HPP
 
 #include <stan/math/fwd/core.hpp>
 
@@ -10,7 +10,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     template <typename T>
     inline
@@ -39,10 +39,10 @@ namespace stan {
     fvar<T>
     pow(const fvar<T>& x1, const double x2) {
       using std::pow;
-      using stan::agrad::sqrt;
-      using stan::agrad::inv;
-      using stan::agrad::inv_sqrt;
-      using stan::agrad::inv_square;
+      using stan::math::sqrt;
+      using stan::math::inv;
+      using stan::math::inv_sqrt;
+      using stan::math::inv_square;
       using std::sqrt;
       using stan::math::square;
 

@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__PROB__MATRIX_NORMAL_PREC_LOG_HPP
-#define STAN__MATH__PRIM__MAT__PROB__MATRIX_NORMAL_PREC_LOG_HPP
+#ifndef STAN_MATH_PRIM_MAT_PROB_MATRIX_NORMAL_PREC_LOG_HPP
+#define STAN_MATH_PRIM_MAT_PROB_MATRIX_NORMAL_PREC_LOG_HPP
 
 #include <stan/math/prim/mat/err/check_ldlt_factor.hpp>
 #include <stan/math/prim/scal/err/check_size_match.hpp>
@@ -14,11 +14,11 @@
 #include <stan/math/prim/mat/fun/subtract.hpp>
 #include <stan/math/prim/mat/fun/trace_quad_form.hpp>
 #include <stan/math/prim/mat/fun/trace_gen_quad_form.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 
 namespace stan {
-  namespace prob {
+  namespace math {
     /**
      * The log of the matrix normal density for the given y, mu, Sigma and D
      * where Sigma and D are given as precision matrices, not covariance matrices.
@@ -48,7 +48,7 @@ namespace stan {
                            <T_Sigma, Eigen::Dynamic, Eigen::Dynamic>& Sigma,
                            const Eigen::Matrix
                            <T_D, Eigen::Dynamic, Eigen::Dynamic>& D) {
-      static const char* function("stan::prob::matrix_normal_prec_log");
+      static const char* function("stan::math::matrix_normal_prec_log");
       typename
         boost::math::tools::promote_args<T_y, T_Mu, T_Sigma, T_D>::type lp(0.0);
 

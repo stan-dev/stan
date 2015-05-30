@@ -11,7 +11,7 @@
 
 TEST(AgradMixMatrixRowsDotSelf,fd) {
   using stan::math::columns_dot_self;
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   Eigen::Matrix<fvar<double>,Eigen::Dynamic,Eigen::Dynamic> m1(1,1);
   m1 << 2.0;
@@ -42,7 +42,7 @@ TEST(AgradMixMatrixRowsDotSelf,fd) {
 }
 TEST(AgradMixMatrixRowsDotSelf,ffd) {
   using stan::math::columns_dot_self;
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   Eigen::Matrix<fvar<fvar<double> >,Eigen::Dynamic,Eigen::Dynamic> m1(1,1);
   m1 << 2.0;

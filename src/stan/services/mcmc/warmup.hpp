@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__MCMC__WARMUP_HPP
-#define STAN__SERVICES__MCMC__WARMUP_HPP
+#ifndef STAN_SERVICES_MCMC_WARMUP_HPP
+#define STAN_SERVICES_MCMC_WARMUP_HPP
 
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/io/mcmc_writer.hpp>
@@ -26,7 +26,7 @@ namespace stan {
                   const std::string& suffix,
                   std::ostream& o,
                   StartTransitionCallback& callback) {
-        run_markov_chain<Model, RNG, StartTransitionCallback, 
+        run_markov_chain<Model, RNG, StartTransitionCallback,
                          SampleRecorder, DiagnosticRecorder, MessageRecorder>
           (sampler, num_warmup, 0, num_warmup + num_samples, num_thin,
            refresh, save, true,
@@ -35,7 +35,7 @@ namespace stan {
            prefix, suffix, o,
            callback);
       }
-      
+
     }
   }
 }

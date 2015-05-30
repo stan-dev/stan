@@ -4,7 +4,7 @@
 #include <test/unit/math/rev/scal/fun/nan_util.hpp>
 
 TEST(AgradRev, Phi) {
-  using stan::agrad::var;
+  using stan::math::var;
   using std::exp;
 
   std::vector<double> y_values;
@@ -27,7 +27,7 @@ TEST(AgradRev, Phi) {
     AVEC x;
     VEC dy;
     y = y_values[i];
-    phi_y = stan::agrad::Phi(y);
+    phi_y = stan::math::Phi(y);
     x = createAVEC(y);
     phi_y.grad(x,dy);
     EXPECT_FLOAT_EQ(stan::math::Phi(y.val()), phi_y.val());
@@ -38,8 +38,8 @@ TEST(AgradRev, Phi) {
 
 // tests calculating using R 3.0.2 Snow Leopard build (6558)
 TEST(AgradRev, PhiTails) {
-  using stan::agrad::Phi;
-  using stan::agrad::var;
+  using stan::math::Phi;
+  using stan::math::var;
 
   EXPECT_EQ(0, Phi(var(-40)).val());
 

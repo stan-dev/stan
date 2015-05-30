@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__MAT__FUN__INVERSE_HPP
-#define STAN__MATH__FWD__MAT__FUN__INVERSE_HPP
+#ifndef STAN_MATH_FWD_MAT_FUN_INVERSE_HPP
+#define STAN_MATH_FWD_MAT_FUN_INVERSE_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/multiply.hpp>
@@ -12,14 +12,14 @@
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     template<typename T, int R, int C>
     inline
     Eigen::Matrix<fvar<T>, R, C>
     inverse(const Eigen::Matrix<fvar<T>, R, C>& m) {
       using stan::math::multiply;
-      using stan::agrad::multiply;
+      using stan::math::multiply;
       using stan::math::inverse;
       stan::math::check_square("inverse", "m", m);
       Eigen::Matrix<T, R, C> m_deriv(m.rows(), m.cols());

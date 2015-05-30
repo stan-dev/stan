@@ -8,7 +8,7 @@ TEST(AgradFwdMatrixSize,fvar_double) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
   using stan::math::size;
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   vector<fvar<double> > y(6);
   EXPECT_EQ(6,size(y));
@@ -46,7 +46,7 @@ TEST(AgradFwdMatrixSize,fvar_fvar_double) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
   using stan::math::size;
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   vector<fvar<fvar<double> > > y(6);
   EXPECT_EQ(6,size(y));

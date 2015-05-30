@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__MAT__FUN__EIGEN_NUMTRAITS_HPP
-#define STAN__MATH__FWD__MAT__FUN__EIGEN_NUMTRAITS_HPP
+#ifndef STAN_MATH_FWD_MAT_FUN_EIGEN_NUMTRAITS_HPP
+#define STAN_MATH_FWD_MAT_FUN_EIGEN_NUMTRAITS_HPP
 
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
@@ -12,27 +12,27 @@ namespace Eigen {
    * gradient variables.
    */
   template <typename T>
-  struct NumTraits<stan::agrad::fvar<T> > {
+  struct NumTraits<stan::math::fvar<T> > {
     /**
      * Real-valued variables.
      *
      * Required for numerical traits.
      */
-    typedef stan::agrad::fvar<T> Real;
+    typedef stan::math::fvar<T> Real;
 
     /**
      * Non-integer valued variables.
      *
      * Required for numerical traits.
      */
-    typedef stan::agrad::fvar<T> NonInteger;
+    typedef stan::math::fvar<T> NonInteger;
 
     /**
      * Nested variables.
      *
      * Required for numerical traits.
      */
-    typedef stan::agrad::fvar<T> Nested;
+    typedef stan::math::fvar<T> Nested;
 
     /**
      * Return standard library's epsilon for double-precision floating
@@ -92,7 +92,7 @@ namespace Eigen {
      * Implemented this for printing to stream.
      */
     template<typename T>
-    struct significant_decimals_default_impl<stan::agrad::fvar<T>, false> {
+    struct significant_decimals_default_impl<stan::math::fvar<T>, false> {
       static inline int run() {
         using std::ceil;
         using std::log;

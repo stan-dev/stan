@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__IO__WRITE_ITERATION_CSV_HPP
-#define STAN__SERVICES__IO__WRITE_ITERATION_CSV_HPP
+#ifndef STAN_SERVICES_IO_WRITE_ITERATION_CSV_HPP
+#define STAN_SERVICES_IO_WRITE_ITERATION_CSV_HPP
 
 #include <ostream>
 #include <vector>
@@ -7,7 +7,7 @@
 namespace stan {
   namespace services {
     namespace io {
-    
+
       void write_iteration_csv(std::ostream& output_stream,
                                const double lp,
                                const std::vector<double>& model_values) {
@@ -17,7 +17,7 @@ namespace stan {
         }
         output_stream << std::endl;
       }
-      
+
     }
   }
 }

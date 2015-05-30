@@ -4,7 +4,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::math::var;
 
 class AgradDistributionsDoubleExponential : public AgradDistributionTest {
 public:
@@ -84,7 +84,7 @@ public:
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
            const T3&, const T4&, const T5&) {
-    return stan::prob::double_exponential_log(y, mu, sigma);
+    return stan::math::double_exponential_log(y, mu, sigma);
   }
 
   template <bool propto, 
@@ -93,7 +93,7 @@ public:
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
            const T3&, const T4&, const T5&) {
-    return stan::prob::double_exponential_log<propto>(y, mu, sigma);
+    return stan::math::double_exponential_log<propto>(y, mu, sigma);
   }
   
   
@@ -104,7 +104,7 @@ public:
                         const T3&, const T4&, const T5&) {
     using std::log;
     using std::fabs;
-    using stan::prob::NEG_LOG_TWO;
+    using stan::math::NEG_LOG_TWO;
 
     return NEG_LOG_TWO- log(sigma) - fabs(y - mu) / sigma;
   }
@@ -112,11 +112,11 @@ public:
 
 
 TEST(ProbDistributionsDoubleExponential,Cumulative) {
-  EXPECT_FLOAT_EQ(0.5, stan::prob::double_exponential_cdf(1.0,1.0,1.0));
-  EXPECT_FLOAT_EQ(0.8160603, stan::prob::double_exponential_cdf(2.0,1.0,1.0));
-  EXPECT_FLOAT_EQ(0.003368973, stan::prob::double_exponential_cdf(-3.0,2.0,1.0));
-  EXPECT_FLOAT_EQ(0.6967347, stan::prob::double_exponential_cdf(1.0,0.0,2.0));
-  EXPECT_FLOAT_EQ(0.2246645, stan::prob::double_exponential_cdf(1.9,2.3,0.5));
-  EXPECT_FLOAT_EQ(0.10094826, stan::prob::double_exponential_cdf(1.9,2.3,0.25));
+  EXPECT_FLOAT_EQ(0.5, stan::math::double_exponential_cdf(1.0,1.0,1.0));
+  EXPECT_FLOAT_EQ(0.8160603, stan::math::double_exponential_cdf(2.0,1.0,1.0));
+  EXPECT_FLOAT_EQ(0.003368973, stan::math::double_exponential_cdf(-3.0,2.0,1.0));
+  EXPECT_FLOAT_EQ(0.6967347, stan::math::double_exponential_cdf(1.0,0.0,2.0));
+  EXPECT_FLOAT_EQ(0.2246645, stan::math::double_exponential_cdf(1.9,2.3,0.5));
+  EXPECT_FLOAT_EQ(0.10094826, stan::math::double_exponential_cdf(1.9,2.3,0.25));
 }
 

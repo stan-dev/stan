@@ -9,8 +9,8 @@
 
 
 TEST(AgradFwdFdim,FvarVar_FvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::fdim;
   using std::floor;
   using std::isnan;
@@ -30,8 +30,8 @@ TEST(AgradFwdFdim,FvarVar_FvarVar_1stDeriv) {
 }
 
 TEST(AgradFwdFdim,FvarVar_double_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::fdim;
   using std::floor;
   using std::isnan;
@@ -50,8 +50,8 @@ TEST(AgradFwdFdim,FvarVar_double_1stDeriv) {
 }
 
 TEST(AgradFwdFdim,Double_FvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::fdim;
   using std::floor;
   using std::isnan;
@@ -69,8 +69,8 @@ TEST(AgradFwdFdim,Double_FvarVar_1stDeriv) {
   isnan(g[0]);
 }
 TEST(AgradFwdFdim,FvarVar_FvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::fdim;
   using std::floor;
   using std::isnan;
@@ -87,8 +87,8 @@ TEST(AgradFwdFdim,FvarVar_FvarVar_2ndDeriv) {
 }
 
 TEST(AgradFwdFdim,FvarVar_double_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::fdim;
   using std::floor;
   using std::isnan;
@@ -104,8 +104,8 @@ TEST(AgradFwdFdim,FvarVar_double_2ndDeriv) {
 }
 
 TEST(AgradFwdFdim,Double_FvarVar_2nd_Deriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::fdim;
   using std::floor;
   using std::isnan;
@@ -122,8 +122,8 @@ TEST(AgradFwdFdim,Double_FvarVar_2nd_Deriv) {
 
 
 TEST(AgradFwdFdim,FvarFvarVar_FvarFvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::fdim;
   using std::floor;
 
@@ -150,8 +150,8 @@ TEST(AgradFwdFdim,FvarFvarVar_FvarFvarVar_1stDeriv) {
 }
 
 TEST(AgradFwdFdim,FvarFvarVar_double_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::fdim;
   using std::floor;
 
@@ -175,8 +175,8 @@ TEST(AgradFwdFdim,FvarFvarVar_double_1stDeriv) {
 }
 
 TEST(AgradFwdFdim,Double_FvarFvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::fdim;
   using std::floor;
 
@@ -200,8 +200,8 @@ TEST(AgradFwdFdim,Double_FvarFvarVar_1stDeriv) {
 }
 
 TEST(AgradFwdFdim,FvarFvarVar_FvarFvarVar_2ndDeriv_x) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::fdim;
   using std::floor;
 
@@ -227,8 +227,8 @@ TEST(AgradFwdFdim,FvarFvarVar_FvarFvarVar_2ndDeriv_x) {
 }
 
 TEST(AgradFwdFdim,FvarFvarVar_FvarFvarVar_2ndDeriv_y) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::fdim;
   using std::floor;
 
@@ -253,8 +253,8 @@ TEST(AgradFwdFdim,FvarFvarVar_FvarFvarVar_2ndDeriv_y) {
   EXPECT_FLOAT_EQ(0.0, g[0]);
 }
 TEST(AgradFwdFdim,FvarFvarVar_double_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::fdim;
   using std::floor;
 
@@ -278,8 +278,8 @@ TEST(AgradFwdFdim,FvarFvarVar_double_2ndDeriv) {
 }
 
 TEST(AgradFwdFdim,Double_FvarFvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::fdim;
   using std::floor;
 
@@ -303,8 +303,8 @@ TEST(AgradFwdFdim,Double_FvarFvarVar_2ndDeriv) {
 }
 
 TEST(AgradFwdFdim,FvarFvarVar_FvarFvarVar_3rdDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::fdim;
   using std::floor;
 
@@ -324,8 +324,8 @@ TEST(AgradFwdFdim,FvarFvarVar_FvarFvarVar_3rdDeriv) {
   EXPECT_FLOAT_EQ(0.0, g[0]);
 }
 TEST(AgradFwdFdim,FvarFvarVar_double_3rdDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::fdim;
   using std::floor;
 
@@ -345,8 +345,8 @@ TEST(AgradFwdFdim,FvarFvarVar_double_3rdDeriv) {
 }
 
 TEST(AgradFwdFdim,Double_FvarFvarVar_3rdDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::fdim;
   using std::floor;
 

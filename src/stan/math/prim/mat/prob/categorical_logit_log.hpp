@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__PROB__CATEGORICAL_LOGIT_LOG_HPP
-#define STAN__MATH__PRIM__MAT__PROB__CATEGORICAL_LOGIT_LOG_HPP
+#ifndef STAN_MATH_PRIM_MAT_PROB_CATEGORICAL_LOGIT_LOG_HPP
+#define STAN_MATH_PRIM_MAT_PROB_CATEGORICAL_LOGIT_LOG_HPP
 
 #include <stan/math/prim/scal/err/check_bounded.hpp>
 #include <stan/math/prim/scal/err/check_finite.hpp>
@@ -13,7 +13,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     // CategoricalLog(n|theta)  [0 < n <= N, theta unconstrained], no checking
     template <bool propto,
@@ -22,7 +22,7 @@ namespace stan {
     categorical_logit_log(int n,
                           const Eigen::Matrix<T_prob, Eigen::Dynamic, 1>&
                           beta) {
-      static const char* function("stan::prob::categorical_logit_log");
+      static const char* function("stan::math::categorical_logit_log");
 
       using stan::math::check_bounded;
       using stan::math::check_finite;
@@ -54,7 +54,7 @@ namespace stan {
     categorical_logit_log(const std::vector<int>& ns,
                           const Eigen::Matrix<T_prob, Eigen::Dynamic, 1>&
                           beta) {
-      static const char* function("stan::prob::categorical_logit_log");
+      static const char* function("stan::math::categorical_logit_log");
 
       using stan::math::check_bounded;
       using stan::math::check_finite;

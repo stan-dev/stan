@@ -1,12 +1,11 @@
 #include <gtest/gtest.h>
-#include <boost/math/special_functions/expm1.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/expm1.hpp>
 #include <stan/math/fwd/scal/fun/exp.hpp>
+#include <cmath>
 
 TEST(AgradFwdExpm1,Fvar) {
-  using stan::agrad::fvar;
-  using boost::math::expm1;
+  using stan::math::fvar;
   using std::exp;
 
   fvar<double> x(0.5,1.0);
@@ -40,8 +39,7 @@ TEST(AgradFwdExpm1,Fvar) {
 
 
 TEST(AgradFwdExpm1,FvarFvarDouble) {
-  using stan::agrad::fvar;
-  using boost::math::expm1;
+  using stan::math::fvar;
   using std::exp;
 
   fvar<fvar<double> > x;

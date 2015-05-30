@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__MDIVIDE_RIGHT_HPP
-#define STAN__MATH__PRIM__MAT__FUN__MDIVIDE_RIGHT_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_MDIVIDE_RIGHT_HPP
+#define STAN_MATH_PRIM_MAT_FUN_MDIVIDE_RIGHT_HPP
 
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>

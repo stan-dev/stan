@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__MAT__FUN__COLUMNS_DOT_SELF_HPP
-#define STAN__MATH__REV__MAT__FUN__COLUMNS_DOT_SELF_HPP
+#ifndef STAN_MATH_REV_MAT_FUN_COLUMNS_DOT_SELF_HPP
+#define STAN_MATH_REV_MAT_FUN_COLUMNS_DOT_SELF_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/typedefs.hpp>
@@ -10,7 +10,7 @@
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Returns the dot product of each column of a matrix with itself.

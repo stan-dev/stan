@@ -6,7 +6,7 @@
 #include <gtest/gtest.h>
 
 TEST(AgradRev,primitiveValue) {
-  using stan::agrad::var;
+  using stan::math::var;
   using stan::math::primitive_value;
 
   var a = 5.0;

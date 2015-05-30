@@ -1,12 +1,12 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__ASIN_HPP
-#define STAN__MATH__REV__SCAL__FUN__ASIN_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_ASIN_HPP
+#define STAN_MATH_REV_SCAL_FUN_ASIN_HPP
 
 #include <stan/math/rev/core.hpp>
 #include <math.h>
 #include <cmath>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class asin_vari : public op_v_vari {

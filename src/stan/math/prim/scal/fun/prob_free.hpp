@@ -1,12 +1,12 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__PROB_FREE_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__PROB_FREE_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_PROB_FREE_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_PROB_FREE_HPP
 
 #include <stan/math/prim/scal/err/check_bounded.hpp>
 #include <stan/math/prim/scal/fun/logit.hpp>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * Return the free scalar that when transformed to a probability
@@ -27,7 +27,7 @@ namespace stan {
     T prob_free(const T y) {
       using stan::math::logit;
       stan::math::check_bounded<T, double, double>
-        ("stan::prob::prob_free", "Probability variable",
+        ("stan::math::prob_free", "Probability variable",
          y, 0, 1);
       return logit(y);
     }

@@ -5,11 +5,11 @@
 #include <stan/math/fwd/core.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 
-using stan::agrad::var;
+using stan::math::var;
 TEST(AgradMixMatrixRepVector,fv_vector) {
   using stan::math::rep_vector;
-  using stan::agrad::vector_fv;
-  using stan::agrad::fvar;
+  using stan::math::vector_fv;
+  using stan::math::fvar;
   fvar<var> a;
   a.val_ = 3.0;
   a.d_ = 2.0;
@@ -28,8 +28,8 @@ TEST(AgradMixMatrixRepVector,fv_vector) {
 
 TEST(AgradMixMatrixRepVector,fv_vector_exception) {
   using stan::math::rep_vector;
-  using stan::agrad::vector_fv;
-  using stan::agrad::fvar;
+  using stan::math::vector_fv;
+  using stan::math::fvar;
   fvar<var> a;
   a.val_ = 3.0;
   a.d_ = 2.0;
@@ -38,8 +38,8 @@ TEST(AgradMixMatrixRepVector,fv_vector_exception) {
 }
 TEST(AgradMixMatrixRepVector,ffv_vector) {
   using stan::math::rep_vector;
-  using stan::agrad::vector_ffv;
-  using stan::agrad::fvar;
+  using stan::math::vector_ffv;
+  using stan::math::fvar;
   fvar<fvar<var> > a;
   a.val_ = 3.0;
   a.d_ = 2.0;
@@ -58,8 +58,8 @@ TEST(AgradMixMatrixRepVector,ffv_vector) {
 
 TEST(AgradMixMatrixRepVector,ffv_vector_exception) {
   using stan::math::rep_vector;
-  using stan::agrad::vector_ffv;
-  using stan::agrad::fvar;
+  using stan::math::vector_ffv;
+  using stan::math::fvar;
   fvar<fvar<var> > a;
   a.val_ = 3.0;
   a.d_ = 2.0;

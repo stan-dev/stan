@@ -10,7 +10,7 @@
 
 
 TEST(MathMatrix,getAssignRowVar) {
-  using stan::agrad::var;
+  using stan::math::var;
   using Eigen::Matrix;
   using Eigen::Dynamic;
   using stan::math::get_base1_lhs;
@@ -125,7 +125,7 @@ TEST(AgradRevMatrix, assign_error) {
 }
 
 TEST(MathAssign,VarDouble) {
-  using stan::agrad::var;
+  using stan::math::var;
   using stan::math::assign;
   var x;
   double y = 10.1;

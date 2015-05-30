@@ -19,9 +19,9 @@
 
 
 TEST(AgradFwdFallingFactorial,FvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
-  using stan::agrad::falling_factorial;
+  using stan::math::fvar;
+  using stan::math::var;
+  using stan::math::falling_factorial;
 
   fvar<var> a(4.0,1.0);
   fvar<var> b(4.0,1.0);
@@ -37,9 +37,9 @@ TEST(AgradFwdFallingFactorial,FvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(-1.5061177, g[1]);
 }
 TEST(AgradFwdFallingFactorial,FvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
-  using stan::agrad::falling_factorial;
+  using stan::math::fvar;
+  using stan::math::var;
+  using stan::math::falling_factorial;
 
   fvar<var> a(4.0,1.0);
   fvar<var> b(4.0,1.0);
@@ -53,8 +53,8 @@ TEST(AgradFwdFallingFactorial,FvarVar_2ndDeriv) {
 }
 
 TEST(AgradFwdFallingFactorial,FvarFvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::falling_factorial;
 
   fvar<fvar<var> > x;
@@ -79,8 +79,8 @@ TEST(AgradFwdFallingFactorial,FvarFvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(-1.5061177, g[1]);
 }
 TEST(AgradFwdFallingFactorial,FvarFvarVar_2ndDeriv_x) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::falling_factorial;
 
   fvar<fvar<var> > x;
@@ -100,8 +100,8 @@ TEST(AgradFwdFallingFactorial,FvarFvarVar_2ndDeriv_x) {
   EXPECT_FLOAT_EQ(-2.2683904, g[1]);
 }
 TEST(AgradFwdFallingFactorial,FvarFvarVar_2ndDeriv_y) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::falling_factorial;
 
   fvar<fvar<var> > x;
@@ -121,8 +121,8 @@ TEST(AgradFwdFallingFactorial,FvarFvarVar_2ndDeriv_y) {
   EXPECT_FLOAT_EQ(2.0470674, g[1]);
 }
 TEST(AgradFwdFallingFactorial,FvarFvarVar_3rdDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::falling_factorial;
 
   fvar<fvar<var> > x;

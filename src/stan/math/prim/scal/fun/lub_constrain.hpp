@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__LUB_CONSTRAIN_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__LUB_CONSTRAIN_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_LUB_CONSTRAIN_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_LUB_CONSTRAIN_HPP
 
 #include <stan/math/prim/scal/err/check_less.hpp>
 #include <stan/math/prim/scal/fun/lb_constrain.hpp>
@@ -10,7 +10,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
     /**
      * Return the lower- and upper-bounded scalar derived by
      * transforming the specified free scalar given the specified
@@ -42,6 +42,7 @@ namespace stan {
     inline
     typename boost::math::tools::promote_args<T, TL, TU>::type
     lub_constrain(const T x, TL lb, TU ub) {
+      using std::exp;
       stan::math::check_less("lub_constrain", "lb", lb, ub);
       if (lb == -std::numeric_limits<double>::infinity())
         return ub_constrain(x, ub);
@@ -111,6 +112,8 @@ namespace stan {
     template <typename T, typename TL, typename TU>
     typename boost::math::tools::promote_args<T, TL, TU>::type
     lub_constrain(const T x, const TL lb, const TU ub, T& lp) {
+      using std::log;
+      using std::exp;
       if (!(lb < ub)) {
         std::stringstream s;
         s << "domain error in lub_constrain;  lower bound = " << lb

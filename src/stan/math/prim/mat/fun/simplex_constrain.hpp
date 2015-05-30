@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__SIMPLEX_CONSTRAIN_HPP
-#define STAN__MATH__PRIM__MAT__FUN__SIMPLEX_CONSTRAIN_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_SIMPLEX_CONSTRAIN_HPP
+#define STAN_MATH_PRIM_MAT_FUN_SIMPLEX_CONSTRAIN_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>
@@ -7,10 +7,11 @@
 #include <stan/math/prim/scal/fun/log1m.hpp>
 #include <stan/math/prim/scal/fun/log1p_exp.hpp>
 #include <stan/math/prim/scal/fun/logit.hpp>
+#include <cmath>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * Return the simplex corresponding to the specified free vector.
@@ -34,6 +35,7 @@ namespace stan {
       using stan::math::inv_logit;
       using stan::math::logit;
       using stan::math::log1m;
+      using std::log;
       typedef typename index_type<Matrix<T, Dynamic, 1> >::type size_type;
 
 
@@ -73,6 +75,7 @@ namespace stan {
       using stan::math::logit;
       using stan::math::log1m;
       using stan::math::log1p_exp;
+      using std::log;
 
       typedef typename index_type<Matrix<T, Dynamic, 1> >::type size_type;
 

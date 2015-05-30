@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__BOOST_ISNAN_HPP
-#define STAN__MATH__REV__SCAL__FUN__BOOST_ISNAN_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_BOOST_ISNAN_HPP
+#define STAN_MATH_REV_SCAL_FUN_BOOST_ISNAN_HPP
 
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/math/rev/core.hpp>
@@ -19,7 +19,7 @@ namespace boost {
      */
     template <>
     inline
-    bool isnan(const stan::agrad::var& v) {
+    bool isnan(const stan::math::var& v) {
       return (boost::math::isnan)(v.val());
     }
 

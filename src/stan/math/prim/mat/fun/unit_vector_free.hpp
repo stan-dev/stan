@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__UNIT_VECTOR_FREE_HPP
-#define STAN__MATH__PRIM__MAT__FUN__UNIT_VECTOR_FREE_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_UNIT_VECTOR_FREE_HPP
+#define STAN_MATH_PRIM_MAT_FUN_UNIT_VECTOR_FREE_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>
@@ -8,7 +8,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
 
     template <typename T>
@@ -17,7 +17,7 @@ namespace stan {
       using Eigen::Matrix;
       using Eigen::Dynamic;
 
-      stan::math::check_unit_vector("stan::prob::unit_vector_free",
+      stan::math::check_unit_vector("stan::math::unit_vector_free",
                                               "Unit vector variable", x);
       int Km1 = x.size() - 1;
       Matrix<T, Dynamic, 1> y(Km1);

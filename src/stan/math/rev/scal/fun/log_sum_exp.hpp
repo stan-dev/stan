@@ -1,12 +1,12 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__LOG_SUM_EXP_HPP
-#define STAN__MATH__REV__SCAL__FUN__LOG_SUM_EXP_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_LOG_SUM_EXP_HPP
+#define STAN_MATH_REV_SCAL_FUN_LOG_SUM_EXP_HPP
 
 #include <stan/math/rev/core.hpp>
 #include <stan/math/rev/scal/fun/calculate_chain.hpp>
 #include <stan/math/prim/scal/fun/log_sum_exp.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
 
@@ -47,14 +47,14 @@ namespace stan {
     /**
      * Returns the log sum of exponentials.
      */
-    inline var log_sum_exp(const stan::agrad::var& a,
-                           const stan::agrad::var& b) {
+    inline var log_sum_exp(const stan::math::var& a,
+                           const stan::math::var& b) {
       return var(new log_sum_exp_vv_vari(a.vi_, b.vi_));
     }
     /**
      * Returns the log sum of exponentials.
      */
-    inline var log_sum_exp(const stan::agrad::var& a,
+    inline var log_sum_exp(const stan::math::var& a,
                            const double& b) {
       return var(new log_sum_exp_vd_vari(a.vi_, b));
     }
@@ -62,7 +62,7 @@ namespace stan {
      * Returns the log sum of exponentials.
      */
     inline var log_sum_exp(const double& a,
-                           const stan::agrad::var& b) {
+                           const stan::math::var& b) {
       return var(new log_sum_exp_dv_vari(a, b.vi_));
     }
 

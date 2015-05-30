@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__PROB__RAYLEIGH_RNG_HPP
-#define STAN__MATH__PRIM__SCAL__PROB__RAYLEIGH_RNG_HPP
+#ifndef STAN_MATH_PRIM_SCAL_PROB_RAYLEIGH_RNG_HPP
+#define STAN_MATH_PRIM_SCAL_PROB_RAYLEIGH_RNG_HPP
 
 #include <boost/random/uniform_real_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -14,13 +14,13 @@
 #include <stan/math/prim/scal/meta/length.hpp>
 #include <stan/math/prim/scal/meta/is_constant_struct.hpp>
 #include <stan/math/prim/scal/meta/partials_return_type.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <class RNG>
     inline double
@@ -29,7 +29,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::uniform_real_distribution;
 
-      static const char* function("stan::prob::rayleigh_rng");
+      static const char* function("stan::math::rayleigh_rng");
 
       using stan::math::check_positive;
 

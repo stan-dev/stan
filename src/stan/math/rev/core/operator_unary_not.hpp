@@ -1,10 +1,10 @@
-#ifndef STAN__MATH__REV__CORE__OPERATOR_UNARY_NOT_HPP
-#define STAN__MATH__REV__CORE__OPERATOR_UNARY_NOT_HPP
+#ifndef STAN_MATH_REV_CORE_OPERATOR_UNARY_NOT_HPP
+#define STAN_MATH_REV_CORE_OPERATOR_UNARY_NOT_HPP
 
 #include <stan/math/rev/core/var.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Prefix logical negation for the value of variables (C++).  The

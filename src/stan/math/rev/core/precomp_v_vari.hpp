@@ -1,11 +1,11 @@
-#ifndef STAN__MATH__REV__CORE__PRECOMP_V_VARI_HPP
-#define STAN__MATH__REV__CORE__PRECOMP_V_VARI_HPP
+#ifndef STAN_MATH_REV_CORE_PRECOMP_V_VARI_HPP
+#define STAN_MATH_REV_CORE_PRECOMP_V_VARI_HPP
 
 #include <stan/math/rev/core/vari.hpp>
 #include <stan/math/rev/core/v_vari.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     // use for single precomputed partials
     class precomp_v_vari : public op_v_vari {

@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__PROB__NEG_BINOMIAL_2_CDF_LOG_HPP
-#define STAN__MATH__PRIM__SCAL__PROB__NEG_BINOMIAL_2_CDF_LOG_HPP
+#ifndef STAN_MATH_PRIM_SCAL_PROB_NEG_BINOMIAL_2_CDF_LOG_HPP
+#define STAN_MATH_PRIM_SCAL_PROB_NEG_BINOMIAL_2_CDF_LOG_HPP
 
 #include <stan/math/prim/scal/meta/OperandsAndPartials.hpp>
 #include <stan/math/prim/scal/err/check_consistent_sizes.hpp>
@@ -13,17 +13,17 @@
 #include <stan/math/prim/scal/fun/lgamma.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/prob/beta_cdf_log.hpp>
 #include <stan/math/prim/scal/fun/grad_reg_inc_beta.hpp>
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/random/negative_binomial_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
+#include <cmath>
 #include <vector>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <typename T_n, typename T_location,
               typename T_precision>
@@ -41,8 +41,10 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
       using stan::math::check_less;
+      using std::log;
+      using std::log;
 
-      static const char* function("stan::prob::neg_binomial_2_cdf");
+      static const char* function("stan::math::neg_binomial_2_cdf");
       check_positive_finite(function, "Location parameter", mu);
       check_positive_finite(function, "Precision parameter", phi);
       check_not_nan(function, "Random variable", n);

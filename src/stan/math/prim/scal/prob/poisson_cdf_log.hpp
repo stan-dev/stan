@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__PROB__POISSON_CDF_LOG_HPP
-#define STAN__MATH__PRIM__SCAL__PROB__POISSON_CDF_LOG_HPP
+#ifndef STAN_MATH_PRIM_SCAL_PROB_POISSON_CDF_LOG_HPP
+#define STAN_MATH_PRIM_SCAL_PROB_POISSON_CDF_LOG_HPP
 
 #include <stan/math/prim/scal/meta/OperandsAndPartials.hpp>
 #include <stan/math/prim/scal/err/check_consistent_sizes.hpp>
@@ -10,20 +10,20 @@
 #include <stan/math/prim/scal/fun/multiply_log.hpp>
 #include <stan/math/prim/scal/fun/gamma_q.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/random/poisson_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
+#include <cmath>
 #include <limits>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <typename T_n, typename T_rate>
     typename return_type<T_rate>::type
     poisson_cdf_log(const T_n& n, const T_rate& lambda) {
-      static const char* function("stan::prob::poisson_cdf_log");
+      static const char* function("stan::math::poisson_cdf_log");
       typedef typename stan::partials_return_type<T_n, T_rate>::type
         T_partials_return;
 
@@ -56,8 +56,10 @@ namespace stan {
       using boost::math::tgamma;
       using std::exp;
       using std::pow;
+      using std::log;
+      using std::exp;
 
-      agrad::OperandsAndPartials<T_rate> operands_and_partials(lambda);
+      OperandsAndPartials<T_rate> operands_and_partials(lambda);
 
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as neg infinity

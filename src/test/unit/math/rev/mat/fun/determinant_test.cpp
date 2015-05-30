@@ -14,7 +14,7 @@
 #include <stan/math/rev/mat/fun/Eigen_NumTraits.hpp>
 
 TEST(AgradRevMatrix,determinant) {
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::determinant;
 
   // expected from auto-diff/Eigen
@@ -25,7 +25,6 @@ TEST(AgradRevMatrix,determinant) {
   std::vector<double> g1;
   det1.grad(x1,g1);
   
-  // optimized in agrad::matrix
   AVEC x2 = createAVEC(0,1,2,3);
   matrix_v v2(2,2);
   v2 << x2[0], x2[1], x2[2], x2[3];
@@ -39,13 +38,13 @@ TEST(AgradRevMatrix,determinant) {
     EXPECT_FLOAT_EQ(g1[i],g2[i]);
 }
 TEST(AgradRevMatrix,deteriminant_exception) {
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::determinant;
 
   EXPECT_THROW(determinant(matrix_v(2,3)), std::invalid_argument);
 }
 TEST(AgradRevMatrix,determinant_grad) {
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::determinant;
   
   matrix_v X(2,2);
@@ -71,7 +70,7 @@ TEST(AgradRevMatrix,determinant_grad) {
 }
 TEST(AgradRevMatrix,determinant3by3) {
   // just test it can handle it
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::determinant;
 
   matrix_v Z(9,9);

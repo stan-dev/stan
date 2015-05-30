@@ -6,7 +6,7 @@
 #include <stan/math/fwd/core.hpp>
 
 TEST(AgradFwdAcosh,Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using boost::math::acosh;
   using std::sqrt;
   using std::isnan;
@@ -32,7 +32,7 @@ TEST(AgradFwdAcosh,Fvar) {
 
 
 TEST(AgradFwdAcosh,FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using boost::math::acosh;
 
   fvar<fvar<double> > x;

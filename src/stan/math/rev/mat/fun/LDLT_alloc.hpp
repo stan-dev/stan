@@ -1,11 +1,11 @@
-#ifndef STAN__MATH__REV__MAT__FUN__LDLT_ALLOC_HPP
-#define STAN__MATH__REV__MAT__FUN__LDLT_ALLOC_HPP
+#ifndef STAN_MATH_REV_MAT_FUN_LDLT_ALLOC_HPP
+#define STAN_MATH_REV_MAT_FUN_LDLT_ALLOC_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/rev/core.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
     /**
      * This object stores the actual (double typed) LDLT factorization of
      * an Eigen::Matrix<var> along with pointers to its vari's which allow the
