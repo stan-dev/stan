@@ -1,10 +1,6 @@
 #ifndef STAN_LANG_GRAMMARS_PROGRAM_GRAMMAR_HPP
 #define STAN_LANG_GRAMMARS_PROGRAM_GRAMMAR_HPP
 
-#include <string>
-#include <sstream>
-#include <vector>
-
 #include <boost/spirit/include/qi.hpp>
 
 #include <stan/lang/ast.hpp>
@@ -14,8 +10,12 @@
 #include <stan/lang/grammars/statement_grammar.hpp>
 #include <stan/lang/grammars/functions_grammar.hpp>
 
-namespace stan {
+#include <string>
+#include <sstream>
+#include <utility>
+#include <vector>
 
+namespace stan {
   namespace lang {
 
     template <typename Iterator>
@@ -23,7 +23,6 @@ namespace stan {
       : boost::spirit::qi::grammar<Iterator,
                                    program(),
                                    whitespace_grammar<Iterator> > {
-
       program_grammar(const std::string& model_name);
 
       // global info for parses
@@ -92,11 +91,8 @@ namespace stan {
                               boost::spirit::qi::unused_type,
                               whitespace_grammar<Iterator> >
       end_var_definitions_r;
-
     };
-
 
   }
 }
-
 #endif
