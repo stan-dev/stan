@@ -1,18 +1,17 @@
 #ifndef STAN_LANG_GRAMMARS_STATEMENT_2_GRAMMAR_HPP
 #define STAN_LANG_GRAMMARS_STATEMENT_2_GRAMMAR_HPP
 
-#include <string>
-#include <sstream>
-#include <vector>
-
 #include <boost/spirit/include/qi.hpp>
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/grammars/whitespace_grammar.hpp>
 #include <stan/lang/grammars/expression_grammar.hpp>
 
-namespace stan {
+#include <string>
+#include <sstream>
+#include <vector>
 
+namespace stan {
   namespace lang {
 
     template <typename Iterator>
@@ -21,15 +20,11 @@ namespace stan {
     template <typename Iterator>
     struct statement_2_grammar
       : boost::spirit::qi::grammar<Iterator,
-                                   statement(bool,var_origin,bool),
+                                   statement(bool, var_origin, bool),
                                    whitespace_grammar<Iterator> > {
-
-
-
       statement_2_grammar(variable_map& var_map,
                           std::stringstream& error_msgs,
                           statement_grammar<Iterator>& sg);
-
 
       // global info for parses
       variable_map& var_map_;
@@ -42,20 +37,17 @@ namespace stan {
       // rules
 
       boost::spirit::qi::rule<Iterator,
-                              conditional_statement(bool,var_origin,bool),
+                              conditional_statement(bool, var_origin, bool),
                               whitespace_grammar<Iterator> >
       conditional_statement_r;
 
 
       boost::spirit::qi::rule<Iterator,
-                              statement(bool,var_origin,bool),
+                              statement(bool, var_origin, bool),
                               whitespace_grammar<Iterator> >
       statement_2_r;
-
     };
-
 
   }
 }
-
 #endif
