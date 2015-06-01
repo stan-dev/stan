@@ -3,16 +3,16 @@
 #include <iomanip>
 #include <stdexcept>
 
-std::vector<stan::agrad::var> get_vvar(std::vector<double> vd) {
+std::vector<stan::math::var> get_vvar(std::vector<double> vd) {
   size_t size = vd.size();
-  std::vector<stan::agrad::var> vv;
+  std::vector<stan::math::var> vv;
   vv.reserve(size);
   for (size_t i = 0; i < size; i++)
     vv.push_back(vd[i]);
   return vv;
 }
 
-std::vector<double> vdouble_from_vvar(std::vector<stan::agrad::var> vv) {
+std::vector<double> vdouble_from_vvar(std::vector<stan::math::var> vv) {
   size_t size = vv.size();
   std::vector<double> vd;
   vd.reserve(size);
@@ -21,7 +21,7 @@ std::vector<double> vdouble_from_vvar(std::vector<stan::agrad::var> vv) {
   return vd;
 }
 
-double double_from_var(stan::agrad::var var_) {
+double double_from_var(stan::math::var var_) {
   return var_.val();
 }
 
@@ -110,9 +110,9 @@ grad_multi_normal(const F& fun,
      const std::vector<T_sigma>& vec_sigma,
      const T_nu& nu) {
 
-  stan::agrad::var fx = fun(vec_y, vec_mu, vec_sigma, nu);
+  stan::math::var fx = fun(vec_y, vec_mu, vec_sigma, nu);
   std::vector<double> grad;
-  std::vector<stan::agrad::var> vec_vars;
+  std::vector<stan::math::var> vec_vars;
   if (!stan::is_constant<T_y>::value) {
     for (size_t i = 0; i < vec_y.size(); i++)
       vec_vars.push_back(vec_y[i]);

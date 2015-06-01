@@ -22,11 +22,11 @@
 using Eigen::Dynamic;
 using Eigen::Matrix;
 using Eigen::MatrixXd;
-using stan::prob::gaussian_dlm_obs_log;
+using stan::math::gaussian_dlm_obs_log;
 
 TEST(ProbDistributionsGaussianDLM,LoglikeUU_fvar_var) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   Eigen::Matrix<fvar<var>, Eigen::Dynamic, Eigen::Dynamic> FF(1, 1);
   FF << fvar<var>(0.585528817843856, 1.0);
@@ -54,8 +54,8 @@ TEST(ProbDistributionsGaussianDLM,LoglikeUU_fvar_var) {
 }
 
 TEST(ProbDistributionsGaussianDLM,LoglikeMM_fvar_var) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   Eigen::Matrix<fvar<var>, Eigen::Dynamic, Eigen::Dynamic> FF(2, 3);
   FF << fvar<var>(0.585528817843856,1.0),
@@ -132,8 +132,8 @@ TEST(ProbDistributionsGaussianDLM,LoglikeMM_fvar_var) {
 }
 
 TEST(ProbDistributionsGaussianDLM,LoglikeUU_fvar_fvar_var) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   Eigen::Matrix<fvar<fvar<var> >, Eigen::Dynamic, Eigen::Dynamic> FF(1, 1);
   FF << fvar<fvar<var> >(0.585528817843856, 1.0);
@@ -161,8 +161,8 @@ TEST(ProbDistributionsGaussianDLM,LoglikeUU_fvar_fvar_var) {
 }
 
 TEST(ProbDistributionsGaussianDLM,LoglikeMM_fvar_fvar_var) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   Eigen::Matrix<fvar<fvar<var> >, Eigen::Dynamic, Eigen::Dynamic> FF(2, 3);
   FF << fvar<fvar<var> >(0.585528817843856,1.0),

@@ -6,7 +6,7 @@
 
 TEST(AgradRev,exp2) {
   AVAR a = 1.3;
-  AVAR f = stan::agrad::exp2(a);
+  AVAR f = stan::math::exp2(a);
   EXPECT_FLOAT_EQ(std::pow(2.0,1.3), f.val());
 
   AVEC x = createAVEC(a);
@@ -16,7 +16,7 @@ TEST(AgradRev,exp2) {
   
   a = std::numeric_limits<AVAR>::infinity();
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(),
-                  stan::agrad::exp2(a).val());
+                  stan::math::exp2(a).val());
 }
 
 struct exp2_fun {

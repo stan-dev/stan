@@ -6,8 +6,8 @@
 
 TEST(AgradFwdMatrixTrace,fd) {
   using stan::math::trace;
-  using stan::agrad::matrix_fd;
-  using stan::agrad::fvar;
+  using stan::math::matrix_fd;
+  using stan::math::fvar;
 
   matrix_fd a(2,2);
   a << -1.0, 2.0, 
@@ -23,8 +23,8 @@ TEST(AgradFwdMatrixTrace,fd) {
 }  
 TEST(AgradFwdMatrixTrace,ffd) {
   using stan::math::trace;
-  using stan::agrad::matrix_ffd;
-  using stan::agrad::fvar;
+  using stan::math::matrix_ffd;
+  using stan::math::fvar;
 
   matrix_ffd a(2,2);
   a << -1.0, 2.0, 

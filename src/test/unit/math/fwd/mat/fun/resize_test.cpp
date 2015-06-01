@@ -4,7 +4,7 @@
 
 using Eigen::Matrix;
 using Eigen::Dynamic;
-using stan::agrad::fvar;
+using stan::math::fvar;
 
 TEST(AgradFwdMatrixResize, fvar_double) {
   fvar<double> x = 5;

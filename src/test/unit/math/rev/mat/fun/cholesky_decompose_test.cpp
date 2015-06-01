@@ -17,7 +17,7 @@
 #include <stan/math/rev/mat/fun/Eigen_NumTraits.hpp>
 
 TEST(AgradRevMatrix,mat_cholesky) {
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::transpose;
   using stan::math::cholesky_decompose;
   using stan::math::singular_values;

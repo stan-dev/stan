@@ -8,7 +8,7 @@
 #include <stan/math/fwd/scal/fun/inv_logit.hpp>
 
 TEST(AgradFwdPhi_approx,Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::Phi_approx;
   fvar<double> x = 1.0;
   x.d_ = 1.0;
@@ -19,7 +19,7 @@ TEST(AgradFwdPhi_approx,Fvar) {
   EXPECT_FLOAT_EQ(0.24152729,Phi_approx_x.d_);
 }
 TEST(AgradFwdPhi_approx, FvarDerivUnderOverFlow) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::Phi_approx;
 
   fvar<double> x = -27.5;
@@ -34,7 +34,7 @@ TEST(AgradFwdPhi_approx, FvarDerivUnderOverFlow) {
 }
 
 TEST(AgradFwdPhi_approx, FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::Phi_approx;
 
   fvar<fvar<double> > x;

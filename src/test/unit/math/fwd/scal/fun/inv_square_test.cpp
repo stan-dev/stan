@@ -5,7 +5,7 @@
 #include <stan/math/fwd/scal/fun/inv_square.hpp>
 
 TEST(AgradFwdInvSquare,Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::inv_square;
 
   fvar<double> x(0.5);
@@ -23,7 +23,7 @@ TEST(AgradFwdInvSquare,Fvar) {
 }   
 
 TEST(AgradFwdInvSquare,FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::inv_square;
   using std::log;
 

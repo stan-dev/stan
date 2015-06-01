@@ -3,6 +3,7 @@
 
 #include <boost/spirit/include/version.hpp>
 #include <boost/spirit/home/support/iterators/line_pos_iterator.hpp>
+#include <string>
 
 namespace stan {
   namespace lang {

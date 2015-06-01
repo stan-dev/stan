@@ -8,7 +8,7 @@
 #include <limits>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class ceil_vari : public op_v_vari {

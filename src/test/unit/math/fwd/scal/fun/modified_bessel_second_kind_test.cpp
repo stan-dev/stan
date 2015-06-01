@@ -3,8 +3,8 @@
 #include <stan/math/fwd/scal/fun/modified_bessel_second_kind.hpp>
 
 TEST(AgradFwdModifiedBesselSecondKind,Fvar) {
-  using stan::agrad::fvar;
-  using stan::agrad::modified_bessel_second_kind;
+  using stan::math::fvar;
+  using stan::math::modified_bessel_second_kind;
 
   fvar<double> a(4.0,1.0);
   int b = 1;
@@ -18,7 +18,7 @@ TEST(AgradFwdModifiedBesselSecondKind,Fvar) {
 }
 
 TEST(AgradFwdModifiedBesselSecondKind,FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::modified_bessel_second_kind;
 
   fvar<fvar<double> > x;

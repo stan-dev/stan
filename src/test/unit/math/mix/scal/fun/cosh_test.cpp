@@ -11,8 +11,8 @@
 
 
 TEST(AgradFwdCosh,FvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::sinh;
   using std::cosh;
 
@@ -29,8 +29,8 @@ TEST(AgradFwdCosh,FvarVar_1stDeriv) {
 }
 
 TEST(AgradFwdCosh,FvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::sinh;
   using std::cosh;
 
@@ -47,8 +47,8 @@ TEST(AgradFwdCosh,FvarVar_2ndDeriv) {
 }
 
 TEST(AgradFwdCosh,FvarFvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::sinh;
   using std::cosh;
 
@@ -85,8 +85,8 @@ TEST(AgradFwdCosh,FvarFvarVar_1stDeriv) {
 }
 
 TEST(AgradFwdCosh,FvarFvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::sinh;
   using std::cosh;
 
@@ -122,8 +122,8 @@ TEST(AgradFwdCosh,FvarFvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(2.0 * cosh(1.5), r[0]);
 }
 TEST(AgradFwdCosh,FvarFvarVar_3rdDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::sinh;
   using std::cosh;
 

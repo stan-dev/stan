@@ -18,7 +18,7 @@
 #include <stan/math/fwd/scal/fun/value_of.hpp>
 
 TEST(AgradFwdLmgamma,Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::lmgamma;
 
   int x = 3;
@@ -30,7 +30,7 @@ TEST(AgradFwdLmgamma,Fvar) {
 }
 
 TEST(AgradFwdLmgamma,FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::lmgamma;
 
   fvar<fvar<double> > x;

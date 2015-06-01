@@ -14,18 +14,18 @@
 #include <stan/math/prim/scal/meta/length.hpp>
 #include <stan/math/prim/scal/meta/is_constant_struct.hpp>
 #include <stan/math/prim/scal/meta/partials_return_type.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <typename T_y, typename T_scale>
     typename return_type<T_y, T_scale>::type
     rayleigh_ccdf_log(const T_y& y, const T_scale& sigma) {
-      static const char* function("stan::prob::rayleigh_ccdf_log");
+      static const char* function("stan::math::rayleigh_ccdf_log");
       typedef typename stan::partials_return_type<T_y, T_scale>::type
         T_partials_return;
 
@@ -33,7 +33,7 @@ namespace stan {
       using stan::math::check_positive;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
-      using stan::prob::include_summand;
+      using stan::math::include_summand;
       using stan::is_constant_struct;
       using stan::math::square;
       using stan::math::value_of;
@@ -54,7 +54,7 @@ namespace stan {
 
 
       // set up template expressions wrapping scalars into vector views
-      agrad::OperandsAndPartials<T_y, T_scale> operands_and_partials(y, sigma);
+      OperandsAndPartials<T_y, T_scale> operands_and_partials(y, sigma);
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_scale> sigma_vec(sigma);

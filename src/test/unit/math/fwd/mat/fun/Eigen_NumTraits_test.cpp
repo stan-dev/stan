@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 
 TEST(AgradFwdMatrixEigenNumTraits, insertion_operator) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   std::stringstream output;
 
   Eigen::Matrix<fvar<double>, -1, -1> A(2, 2);

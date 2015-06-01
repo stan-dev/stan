@@ -9,7 +9,7 @@
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     template<typename T, int R, int C>
     inline
@@ -25,7 +25,7 @@ namespace stan {
           L(i, j) = m(i, j);
       }
 
-      return stan::agrad::multiply(L, stan::math::transpose(L));
+      return stan::math::multiply(L, stan::math::transpose(L));
     }
 
   }

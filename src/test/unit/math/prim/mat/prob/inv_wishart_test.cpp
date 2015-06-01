@@ -15,13 +15,13 @@
 using Eigen::Dynamic;
 using Eigen::Matrix;
 
-using stan::prob::inv_wishart_log;
+using stan::math::inv_wishart_log;
 
 TEST(ProbDistributionsInvWishart,LowerTriangular) {
   //Tests if only of the lower triangular portion of
   //outcome and scale matrices are taken
   using Eigen::MatrixXd;
-  using stan::prob::inv_wishart_log;
+  using stan::math::inv_wishart_log;
   
   MatrixXd Sigma(4,4);
   MatrixXd Sigma_sym(4,4);
@@ -68,7 +68,7 @@ TEST(ProbDistributionsInvWishart,InvWishart) {
   double dof = 4.0;
   double log_p = log(2.008407e-08);
 
-  EXPECT_NEAR(log_p, stan::prob::inv_wishart_log(Y,dof,Sigma), 0.01);
+  EXPECT_NEAR(log_p, stan::math::inv_wishart_log(Y,dof,Sigma), 0.01);
 }
 TEST(ProbDistributionsInvWishart,Propto) {
   Matrix<double,Dynamic,Dynamic> Y(3,3);
@@ -83,7 +83,7 @@ TEST(ProbDistributionsInvWishart,Propto) {
   
   double dof = 4.0;
   
-  EXPECT_FLOAT_EQ(0.0, stan::prob::inv_wishart_log<true>(Y,dof,Sigma));
+  EXPECT_FLOAT_EQ(0.0, stan::math::inv_wishart_log<true>(Y,dof,Sigma));
 }
 TEST(ProbDistributionsInvWishart, Error) {
   Matrix<double,Dynamic,Dynamic> Sigma;
@@ -128,11 +128,11 @@ TEST(ProbDistributionsInvWishart, error_checks) {
   sigma << 9.0, -3.0, 0.0,
     -3.0,  4.0, 0.0,
     2.0, 1.0, 3.0;
-  EXPECT_NO_THROW(stan::prob::inv_wishart_rng(3.0, sigma,rng));
-  EXPECT_THROW(stan::prob::inv_wishart_rng(2.0, sigma,rng),std::domain_error);
+  EXPECT_NO_THROW(stan::math::inv_wishart_rng(3.0, sigma,rng));
+  EXPECT_THROW(stan::math::inv_wishart_rng(2.0, sigma,rng),std::domain_error);
 
   Matrix<double,Dynamic,Dynamic> sigma2(4,3);
-  EXPECT_THROW(stan::prob::inv_wishart_rng(2.0, sigma2,rng),std::domain_error);
+  EXPECT_THROW(stan::math::inv_wishart_rng(2.0, sigma2,rng),std::domain_error);
 }
 
 TEST(ProbDistributionsInvWishart, chiSquareGoodnessFitTest) {
@@ -153,7 +153,7 @@ TEST(ProbDistributionsInvWishart, chiSquareGoodnessFitTest) {
 
   Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> a(sigma.rows(),sigma.rows());
   while (count < N) {
-    a = stan::prob::inv_wishart_rng(5.0, sigma, rng);
+    a = stan::math::inv_wishart_rng(5.0, sigma, rng);
     avg += std::log(stan::math::determinant(a)) / N;
     count++;
    }
@@ -168,7 +168,7 @@ TEST(ProbDistributionsInvWishart, SpecialRNGTest) {
   //When the scale matrix is an identity matrix and df = k + 2
   //The avg of the samples should also be an identity matrix
   
-  boost::random::mt19937 rng;
+  boost::random::mt19937 rng(1234U);
   using Eigen::MatrixXd;
   
   MatrixXd sigma;
@@ -179,7 +179,7 @@ TEST(ProbDistributionsInvWishart, SpecialRNGTest) {
     sigma = MatrixXd::Identity(k, k);
     Z = MatrixXd::Zero(k, k);
     for (int i = 0; i < N; i++)
-      Z += stan::prob::inv_wishart_rng(k + 2, sigma, rng);
+      Z += stan::math::inv_wishart_rng(k + 2, sigma, rng);
     Z /= N;
     for (int j = 0; j < k; j++) {
       for (int i = 0; i < k; i++) {

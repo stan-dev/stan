@@ -5,8 +5,8 @@
 #include <test/unit/math/rev/mat/fun/util.hpp>
 
 TEST(AgradMixMatrixRows,ffd_vector) {
-  using stan::agrad::vector_ffd;
-  using stan::agrad::row_vector_ffd;
+  using stan::math::vector_ffd;
+  using stan::math::row_vector_ffd;
   using stan::math::rows;
 
   vector_ffd v(5);
@@ -17,7 +17,7 @@ TEST(AgradMixMatrixRows,ffd_vector) {
   EXPECT_EQ(0U, rows(v));
 }
 TEST(AgradMixMatrixRows,ffd_rowvector) {
-  using stan::agrad::row_vector_ffd;
+  using stan::math::row_vector_ffd;
   using stan::math::rows;
 
   row_vector_ffd rv(5);
@@ -28,7 +28,7 @@ TEST(AgradMixMatrixRows,ffd_rowvector) {
   EXPECT_EQ(1U, rows(rv));
 }
 TEST(AgradMixMatrixRows,ffd_matrix) {
-  using stan::agrad::matrix_ffd;
+  using stan::math::matrix_ffd;
   using stan::math::rows;
 
   matrix_ffd m(2,3);

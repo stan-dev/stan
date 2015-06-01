@@ -3,7 +3,7 @@
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/prim/mat/fun/initialize.hpp>
 
-using stan::agrad::fvar;
+using stan::math::fvar;
 
 TEST(AgradFwdMatrixInitialize, fd) {
   using stan::math::initialize;

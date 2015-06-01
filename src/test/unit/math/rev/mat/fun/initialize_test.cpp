@@ -9,7 +9,7 @@
 #include <gtest/gtest.h>
 
 TEST(MathMatrix,initializeVar) {
-  using stan::agrad::var;
+  using stan::math::var;
   using stan::math::initialize;
   var a;
   var b = 10;
@@ -25,7 +25,7 @@ TEST(MathMatrix,initializeVar) {
 }
   
 TEST(MathMatrix, initMatrix) {
-  using stan::agrad::var;
+  using stan::math::var;
   using stan::math::initialize;
   using Eigen::Matrix;
   using Eigen::Dynamic;

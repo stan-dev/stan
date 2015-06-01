@@ -9,7 +9,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     // COVARIANCE MATRIX
 

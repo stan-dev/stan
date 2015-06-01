@@ -5,15 +5,15 @@
 #include <stan/math/rev/core.hpp>
 #include <gtest/gtest.h>
 
-using stan::agrad::fvar;
-using stan::agrad::var;
+using stan::math::fvar;
+using stan::math::var;
 
 TEST(AgradMixMatrixDims, matrix_fv) {
   using std::vector;
   using Eigen::Matrix;
   using Eigen::Dynamic;
   using stan::math::dims;
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
 
   fvar<var> x1;
   vector<int> dims1 = dims(x1);
@@ -64,7 +64,7 @@ TEST(AgradMixMatrixDims, matrix_ffv) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
   using stan::math::dims;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
 
   fvar<fvar<var> > x1;
   vector<int> dims1 = dims(x1);

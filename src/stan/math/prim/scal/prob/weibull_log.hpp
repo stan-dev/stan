@@ -12,14 +12,15 @@
 #include <stan/math/prim/scal/fun/multiply_log.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/meta/length.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
 #include <stan/math/prim/scal/meta/VectorView.hpp>
+#include <cmath>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     // Weibull(y|alpha, sigma)     [y >= 0;  alpha > 0;  sigma > 0]
     // FIXME: document
@@ -27,7 +28,7 @@ namespace stan {
               typename T_y, typename T_shape, typename T_scale>
     typename return_type<T_y, T_shape, T_scale>::type
     weibull_log(const T_y& y, const T_shape& alpha, const T_scale& sigma) {
-      static const char* function("stan::prob::weibull_log");
+      static const char* function("stan::math::weibull_log");
       typedef typename stan::partials_return_type<T_y, T_shape, T_scale>::type
         T_partials_return;
 
@@ -37,6 +38,7 @@ namespace stan {
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
       using stan::math::multiply_log;
+      using std::log;
 
       // check if any vectors are zero length
       if (!(stan::length(y)
@@ -103,7 +105,7 @@ namespace stan {
           y_div_sigma_pow_alpha[i] = pow(y_dbl * inv_sigma[i], alpha_dbl);
         }
 
-      agrad::OperandsAndPartials<T_y, T_shape, T_scale>
+      OperandsAndPartials<T_y, T_shape, T_scale>
         operands_and_partials(y, alpha, sigma);
       for (size_t n = 0; n < N; n++) {
         const T_partials_return alpha_dbl = value_of(alpha_vec[n]);

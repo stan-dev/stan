@@ -13,8 +13,8 @@
 #include <stan/math/rev/scal/fun/sqrt.hpp>
 
 TEST(MathMatrix, qr_Q) {
-  stan::agrad::matrix_v m0(0,0);
-  stan::agrad::matrix_v m1(3,2);
+  stan::math::matrix_v m0(0,0);
+  stan::math::matrix_v m1(3,2);
   m1 << 1, 2, 3, 4, 5, 6;
 
   using stan::math::qr_Q;

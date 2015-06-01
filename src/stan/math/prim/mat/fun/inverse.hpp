@@ -12,10 +12,10 @@ namespace stan {
      * @param m Specified matrix.
      * @return Inverse of the matrix.
      */
-    template <typename T>
+    template <typename T, int R, int C>
     inline
-    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>
-    inverse(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
+    Eigen::Matrix<T, R, C>
+    inverse(const Eigen::Matrix<T, R, C>& m) {
       stan::math::check_square("inverse", "m", m);
       return m.inverse();
     }

@@ -6,7 +6,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     using Eigen::Dynamic;
 
@@ -17,13 +17,13 @@ namespace stan {
      * <p>The functor must implement
      *
      * <code>
-     * stan::agrad::fvar
+     * stan::math::fvar
      * operator()(const
-     * Eigen::Matrix<stan::agrad::var, Eigen::Dynamic, 1>&)
+     * Eigen::Matrix<stan::math::var, Eigen::Dynamic, 1>&)
      * </code>
      *
      * using only operations that are defined for
-     * <code>stan::agrad::fvar</code>.  This latter constraint usually
+     * <code>stan::math::fvar</code>.  This latter constraint usually
      * requires the functions to be defined in terms of the libraries
      * defined in Stan or in terms of functions with appropriately
      * general namespace imports that eventually depend on functions
@@ -56,6 +56,6 @@ namespace stan {
       }
     }
 
-  }  // namespace agrad
+  }  // namespace math
 }  // namespace stan
 #endif

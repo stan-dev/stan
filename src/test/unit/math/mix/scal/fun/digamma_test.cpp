@@ -14,8 +14,8 @@
 
 
 TEST(AgradFwdDigamma,FvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using boost::math::digamma;  
   using boost::math::zeta;
   
@@ -32,8 +32,8 @@ TEST(AgradFwdDigamma,FvarVar_1stDeriv) {
 }
 
 TEST(AgradFwdDigamma,FvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using boost::math::digamma;  
   using boost::math::zeta;
   
@@ -48,8 +48,8 @@ TEST(AgradFwdDigamma,FvarVar_2ndDeriv) {
 
 
 TEST(AgradFwdDigamma,FvarFvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using boost::math::digamma;
 
   fvar<fvar<var> > x;
@@ -85,8 +85,8 @@ TEST(AgradFwdDigamma,FvarFvarVar_1stDeriv) {
 }
 
 TEST(AgradFwdDigamma,FvarFvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using boost::math::digamma;
 
   fvar<fvar<var> > x;
@@ -112,8 +112,8 @@ TEST(AgradFwdDigamma,FvarFvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(-16.8288, r[0]);
 }
 TEST(AgradFwdDigamma,FvarFvarVar_3rdDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using boost::math::digamma;
 
   fvar<fvar<var> > x;

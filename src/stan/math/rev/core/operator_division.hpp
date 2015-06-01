@@ -9,7 +9,7 @@
 #include <limits>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       // (a/b)' = a' * (1 / b) - b' * (a / [b * b])

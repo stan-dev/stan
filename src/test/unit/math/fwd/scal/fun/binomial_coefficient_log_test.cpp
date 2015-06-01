@@ -16,23 +16,23 @@
 #include <stan/math/fwd/scal/fun/value_of.hpp>
 
 TEST(AgradFwdBinomialCoefficientLog,Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::binomial_coefficient_log;
   using boost::math::digamma;
 
   fvar<double> x(2004.0,1.0);
   fvar<double> y(1002.0,2.0);
 
-  fvar<double> a = stan::agrad::binomial_coefficient_log(x, y);
+  fvar<double> a = stan::math::binomial_coefficient_log(x, y);
   EXPECT_FLOAT_EQ(binomial_coefficient_log(2004.0, 1002.0), a.val_);
   EXPECT_FLOAT_EQ(0.69289774, a.d_);
 }
 
 
 TEST(AgradFwdBinomialCoefficientLog,FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::binomial_coefficient_log;
-  using stan::agrad::binomial_coefficient_log;
+  using stan::math::binomial_coefficient_log;
 
   fvar<fvar<double> > x;
   x.val_.val_ = 2004.0;

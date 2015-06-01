@@ -18,11 +18,11 @@
 #include <stan/math/prim/scal/meta/contains_nonconstant_struct.hpp>
 #include <stan/math/prim/scal/meta/partials_return_type.hpp>
 #include <stan/math/prim/scal/meta/return_type.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
+#include <cmath>
 
 namespace stan {
-  namespace prob {
+  namespace math {
 
     // Logistic(y|mu, sigma)    [sigma > 0]
     // FIXME: document
@@ -30,7 +30,7 @@ namespace stan {
               typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y, T_loc, T_scale>::type
     logistic_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      static const char* function("stan::prob::logistic_log");
+      static const char* function("stan::math::logistic_log");
       typedef typename stan::partials_return_type<T_y, T_loc, T_scale>::type
         T_partials_return;
 
@@ -38,7 +38,9 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
-      using stan::prob::include_summand;
+      using stan::math::include_summand;
+      using std::log;
+      using std::exp;
 
       // check if any vectors are zero length
       if (!(stan::length(y)
@@ -64,7 +66,7 @@ namespace stan {
 
 
       // set up template expressions wrapping scalars into vector views
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale>
+      OperandsAndPartials<T_y, T_loc, T_scale>
         operands_and_partials(y, mu, sigma);
 
       VectorView<const T_y> y_vec(y);

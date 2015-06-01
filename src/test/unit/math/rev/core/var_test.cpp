@@ -8,14 +8,14 @@
 struct AgradRev : public testing::Test {
   void SetUp() {
     // make sure memory's clean before starting each test
-    stan::agrad::recover_memory();
+    stan::math::recover_memory();
   }
 };
 
 
 TEST_F(AgradRev, ctorOverloads) {
-  using stan::agrad::var;
-  using stan::agrad::vari;
+  using stan::math::var;
+  using stan::math::vari;
 
   // make sure copy ctor is used rather than casting vari* to unsigned int
   EXPECT_FLOAT_EQ(12.3, var(new vari(12.3)).val());
@@ -120,8 +120,8 @@ TEST_F(AgradRev, smart_ptrs) {
 }
 
 TEST_F(AgradRev, stackAllocation) {
-  using stan::agrad::vari;
-  using stan::agrad::var;
+  using stan::math::vari;
+  using stan::math::var;
 
   vari ai(1.0);
   vari bi(2.0);
@@ -141,7 +141,7 @@ TEST_F(AgradRev, stackAllocation) {
 }
 
 TEST_F(AgradRev, print) {
-  using stan::agrad::var;
+  using stan::math::var;
 
   std::ostringstream output;
   std::string str;
@@ -164,16 +164,16 @@ TEST_F(AgradRev, print) {
 // should really be doing this test with a mock object using ctor
 // vari_(double,bool);  as in:
 //
-// struct nostack_test_vari : public stan::agrad::vari {
+// struct nostack_test_vari : public stan::math::vari {
 //   nostack_test_vari(double x) 
-//   : stan::agrad::vari(x,false) {  
+//   : stan::math::vari(x,false) {  
 //   }
 //   void chain() {
 //     // no op on the chain
 //   }
 // };
 
-// struct both_test_vari : public stan::agrad::vari {
+// struct both_test_vari : public stan::math::vari {
 //   both_test_vari(vari* vi, vari* bi) {
     
 //   }
@@ -203,7 +203,7 @@ struct gradable {
 
 gradable setup_quad_form() {
   using std::vector;
-  using stan::agrad::var;
+  using stan::math::var;
   using Eigen::Matrix;
   using Eigen::Dynamic;
   using stan::math::quad_form;
@@ -248,7 +248,7 @@ gradable setup_simple() {
 
 
 TEST_F(AgradRev, basicGradient1) {
-  using stan::agrad::recover_memory;
+  using stan::math::recover_memory;
 
   for (int i = 0; i < 100; ++i) {
     gradable g = setup_simple();
@@ -258,7 +258,7 @@ TEST_F(AgradRev, basicGradient1) {
 }
 
 TEST_F(AgradRev, basicGradient2) {
-  using stan::agrad::recover_memory;
+  using stan::math::recover_memory;
 
   for (int i = 0; i < 100; ++i) {
     gradable g = setup_quad_form();
@@ -269,9 +269,9 @@ TEST_F(AgradRev, basicGradient2) {
 
 
 TEST_F(AgradRev, nestedGradient1) {
-  using stan::agrad::recover_memory;
-  using stan::agrad::recover_memory_nested;
-  using stan::agrad::start_nested;
+  using stan::math::recover_memory;
+  using stan::math::recover_memory_nested;
+  using stan::math::start_nested;
 
   gradable g0 = setup_simple(); 
 
@@ -290,9 +290,9 @@ TEST_F(AgradRev, nestedGradient1) {
 }
 
 TEST_F(AgradRev, nestedGradient2) {
-  using stan::agrad::recover_memory;
-  using stan::agrad::recover_memory_nested;
-  using stan::agrad::start_nested;
+  using stan::math::recover_memory;
+  using stan::math::recover_memory_nested;
+  using stan::math::start_nested;
   
   gradable g0 = setup_quad_form();
 
@@ -312,9 +312,9 @@ TEST_F(AgradRev, nestedGradient2) {
 
 
 TEST_F(AgradRev, nestedGradient3) {
-  using stan::agrad::recover_memory;
-  using stan::agrad::recover_memory_nested;
-  using stan::agrad::start_nested;
+  using stan::math::recover_memory;
+  using stan::math::recover_memory_nested;
+  using stan::math::start_nested;
 
   start_nested();
   gradable g1 = setup_simple();
@@ -335,3 +335,19 @@ TEST_F(AgradRev, nestedGradient3) {
   recover_memory();
 }
 
+TEST_F(AgradRev, grad) {
+  AVAR a = 5.0;
+  AVAR b = 10.0;
+  AVAR f = a * b + a;
+
+  EXPECT_NO_THROW(f.grad())
+    << "testing the grad function with no args";
+
+  EXPECT_FLOAT_EQ(5.0, a.val());
+  EXPECT_FLOAT_EQ(10.0, b.val());
+  EXPECT_FLOAT_EQ(55.0, f.val());
+
+  EXPECT_FLOAT_EQ(1.0, f.adj());
+  EXPECT_FLOAT_EQ(11.0, a.adj());
+  EXPECT_FLOAT_EQ(5.0, b.adj());
+}

@@ -7,8 +7,8 @@
 #include <gtest/gtest.h>
 
 TEST(AgradMixMatrix,value_of) {
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::math::var;
+  using stan::math::fvar;
   using stan::math::value_of;
   using std::vector;
 

@@ -13,7 +13,7 @@
 
 using Eigen::Matrix;
 using Eigen::Dynamic;
-using stan::agrad::var;
+using stan::math::var;
 using stan::math::quad_form_diag;
 
 TEST(MathMatrix,quadFormDiag2_vv) {

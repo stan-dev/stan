@@ -1,6 +1,34 @@
 #ifndef STAN_LANG_GRAMMARS_PROGRAM_GRAMMAR_DEF_HPP
 #define STAN_LANG_GRAMMARS_PROGRAM_GRAMMAR_DEF_HPP
 
+#include <boost/format.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/config/warning_disable.hpp>
+#include <boost/fusion/include/adapt_struct.hpp>
+#include <boost/fusion/include/std_pair.hpp>
+#include <boost/spirit/home/support/iterators/line_pos_iterator.hpp>
+#include <boost/spirit/include/phoenix_core.hpp>
+#include <boost/spirit/include/phoenix_function.hpp>
+#include <boost/spirit/include/phoenix_fusion.hpp>
+#include <boost/spirit/include/phoenix_object.hpp>
+#include <boost/spirit/include/phoenix_operator.hpp>
+#include <boost/spirit/include/phoenix_stl.hpp>
+#include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/include/qi_numeric.hpp>
+#include <boost/spirit/include/support_multi_pass.hpp>
+#include <boost/spirit/include/version.hpp>
+#include <boost/tuple/tuple.hpp>
+#include <boost/variant/apply_visitor.hpp>
+#include <boost/variant/recursive_variant.hpp>
+
+#include <stan/lang/ast.hpp>
+#include <stan/lang/grammars/expression_grammar.hpp>
+#include <stan/lang/grammars/functions_grammar.hpp>
+#include <stan/lang/grammars/program_grammar.hpp>
+#include <stan/lang/grammars/statement_grammar.hpp>
+#include <stan/lang/grammars/var_decls_grammar.hpp>
+#include <stan/lang/grammars/whitespace_grammar.hpp>
+
 #include <cstddef>
 #include <iomanip>
 #include <iostream>
@@ -8,39 +36,10 @@
 #include <map>
 #include <set>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
-#include <stdexcept>
-
-#include <boost/format.hpp>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/fusion/include/adapt_struct.hpp>
-#include <boost/fusion/include/std_pair.hpp>
-#include <boost/config/warning_disable.hpp>
-#include <boost/spirit/include/qi_numeric.hpp>
-#include <boost/spirit/include/phoenix_core.hpp>
-#include <boost/spirit/include/phoenix_function.hpp>
-#include <boost/spirit/include/phoenix_fusion.hpp>
-#include <boost/spirit/include/phoenix_object.hpp>
-#include <boost/spirit/include/phoenix_operator.hpp>
-#include <boost/spirit/include/phoenix_stl.hpp>
-#include <boost/spirit/include/support_multi_pass.hpp>
-#include <boost/tuple/tuple.hpp>
-#include <boost/variant/apply_visitor.hpp>
-#include <boost/variant/recursive_variant.hpp>
-
-#include <boost/spirit/include/version.hpp>
-#include <boost/spirit/home/support/iterators/line_pos_iterator.hpp>
-
-#include <stan/lang/ast.hpp>
-#include <stan/lang/grammars/whitespace_grammar.hpp>
-#include <stan/lang/grammars/expression_grammar.hpp>
-#include <stan/lang/grammars/var_decls_grammar.hpp>
-#include <stan/lang/grammars/statement_grammar.hpp>
-#include <stan/lang/grammars/program_grammar.hpp>
-#include <stan/lang/grammars/functions_grammar.hpp>
 
 namespace {
   // hack to pass pair into macro below to adapt; in namespace to hide
@@ -62,7 +61,6 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::program,
 
 
 namespace stan {
-
   namespace lang {
 
     struct add_lp_var {
@@ -70,8 +68,8 @@ namespace stan {
       struct result { typedef void type; };
       void operator()(variable_map& vm) const {
         vm.add("lp__",
-               base_var_decl("lp__",std::vector<expression>(),DOUBLE_T),
-               local_origin); // lp acts as a local where defined
+               base_var_decl("lp__", std::vector<expression>(), DOUBLE_T),
+               local_origin);  // lp acts as a local where defined
       }
     };
     boost::phoenix::function<add_lp_var> add_lp_var_f;
@@ -86,15 +84,16 @@ namespace stan {
     boost::phoenix::function<remove_lp_var> remove_lp_var_f;
 
     struct program_error {
-      template <typename T1, typename T2, typename ,
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3,
         typename T4, typename T5, typename T6, typename T7>
-      struct result { typedef void type; };
+      struct result<F(T1, T2, T3, T4, T5, T6, T7)> { typedef void type; };
 
       template <class Iterator, class I>
       void operator()(
-        Iterator _begin, 
-        Iterator _end, 
-        Iterator _where, 
+        Iterator _begin,
+        Iterator _end,
+        Iterator _where,
         I const& _info,
         std::string msg,
         variable_map& vm,
@@ -119,15 +118,15 @@ namespace stan {
 
           // show error in context 2 lines before, 1 lines after
           size_t idx_errcol = 0;
-          idx_errcol = get_column(_begin,_where) - 1;
-
+          idx_errcol = get_column(_begin, _where) - 1;
+          
           std::string lineno = "";
           format fmt_lineno("% 3d:    ");
 
           std::string line_2before = "";
           std::string line_before = "";
           std::string line_err = "";
-          std::string line_after = "";            
+          std::string line_after = "";
 
           size_t idx_line = 0;
           size_t idx_before = idx_errline - 1;
@@ -135,7 +134,7 @@ namespace stan {
               // read lines up to error line, save 2 most recently read
               while (idx_before > idx_line) {
                 line_2before = line_before;
-                std::getline(sprogram,line_before);  
+                std::getline(sprogram, line_before);
                 idx_line++;
               }
               if (line_2before.length() > 0) {
@@ -146,13 +145,13 @@ namespace stan {
               error_msgs << lineno << line_before << std::endl;
           }
 
-          std::getline(sprogram,line_err);
+          std::getline(sprogram, line_err);
           lineno = str(fmt_lineno % idx_errline);
           error_msgs << lineno << line_err << std::endl
                      << setw(idx_errcol + lineno.length()) << "^" << std::endl;
-            
+
           if (!sprogram.eof()) {
-            std::getline(sprogram,line_after);
+            std::getline(sprogram, line_after);
             lineno = str(fmt_lineno % (idx_errline+1));
             error_msgs << lineno << line_after << std::endl;
           }
@@ -168,10 +167,10 @@ namespace stan {
           model_name_(model_name),
           var_map_(),
           error_msgs_(),
-          expression_g(var_map_,error_msgs_),
-          var_decls_g(var_map_,error_msgs_),
-          statement_g(var_map_,error_msgs_),
-          functions_g(var_map_,error_msgs_) {
+          expression_g(var_map_, error_msgs_),
+          var_decls_g(var_map_, error_msgs_),
+          statement_g(var_map_, error_msgs_),
+          functions_g(var_map_, error_msgs_) {
         using boost::spirit::qi::eps;
         using boost::spirit::qi::lit;
         using boost::spirit::qi::char_;
@@ -184,7 +183,7 @@ namespace stan {
                      model_name_origin);
 
         program_r.name("program");
-        program_r 
+        program_r
           %= -functions_g
           > -data_var_decls_r
           > -derived_data_var_decls_r
@@ -197,9 +196,9 @@ namespace stan {
           ;
 
         model_r.name("model declaration (or perhaps an earlier block)");
-        model_r 
+        model_r
           %= lit("model")
-          > statement_g(true,local_origin,false)  // assign only to locals
+          > statement_g(true, local_origin, false)  // assign only to locals
           ;
 
         end_var_decls_r.name(
@@ -228,7 +227,7 @@ namespace stan {
         data_var_decls_r
           %= ( lit("data")
                > lit('{') )
-          >  var_decls_g(true,data_origin) // +constraints
+          >  var_decls_g(true, data_origin)  // +constraints
           > end_var_decls_r;
 
         derived_data_var_decls_r.name("transformed data block");
@@ -236,64 +235,56 @@ namespace stan {
           %= ( ( lit("transformed")
                  >> lit("data") )
                > lit('{') )
-          > var_decls_g(true,transformed_data_origin)  // -constraints
-          > ( (statement_g(false,transformed_data_origin,false)
-               > *statement_g(false,transformed_data_origin,false)
+          > var_decls_g(true, transformed_data_origin)  // -constraints
+          > ( (statement_g(false, transformed_data_origin, false)
+               > *statement_g(false, transformed_data_origin, false)
                > end_var_definitions_r
-               ) 
-              | ( *statement_g(false,transformed_data_origin,false)
+               )
+              | ( *statement_g(false, transformed_data_origin, false)
                   > end_var_decls_statements_r
                   )
               )
           ;
-
-          //          > *statement_g(false,transformed_data_origin,false) // -sampling
-          // > end_var_decls_statements_r;
 
         param_var_decls_r.name("parameter variable declarations");
         param_var_decls_r
           %= ( lit("parameters")
                > lit('{')
                )
-          > var_decls_g(true,parameter_origin) // +constraints
+          > var_decls_g(true,parameter_origin)  // +constraints
           > end_var_decls_r;
 
         derived_var_decls_r.name("derived variable declarations");
         derived_var_decls_r
           %= ( lit("transformed")
-               > lit("parameters") 
+               > lit("parameters")
                > lit('{')
                )
-          > var_decls_g(true,transformed_parameter_origin) // -constraints
-          > *statement_g(false,transformed_parameter_origin,false) // -sampling
+          > var_decls_g(true, transformed_parameter_origin)  // -constraints
+          > *statement_g(false, transformed_parameter_origin, false)  // -sampling
           > end_var_decls_statements_r;
-
+        
         generated_var_decls_r.name("generated variable declarations");
         generated_var_decls_r
           %= ( lit("generated")
                > lit("quantities")
-               > lit('{') 
+               > lit('{')
                )
-          > var_decls_g(true,derived_origin) // -constraints
-          > *statement_g(false,derived_origin,false) // -sampling
+          > var_decls_g(true, derived_origin)  // -constraints
+          > *statement_g(false, derived_origin, false)  // -sampling
           > end_var_decls_statements_r;
 
         using boost::spirit::qi::on_error;
         using boost::spirit::qi::rethrow;
         using namespace boost::spirit::qi::labels;
 
-        on_error<rethrow>(
-          program_r,
-          program_error_f(
-            _1, _2, _3, _4 ,
-            "",
-            boost::phoenix::ref(var_map_),
-            boost::phoenix::ref(error_msgs_)
-          )
-        ); 
+        on_error<rethrow>(program_r,
+                          program_error_f(_1, _2, _3, _4 ,
+                                          "",
+                                          boost::phoenix::ref(var_map_),
+                                          boost::phoenix::ref(error_msgs_)));
     }
 
   }
 }
-
 #endif

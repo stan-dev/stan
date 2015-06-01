@@ -10,7 +10,7 @@
 #include <boost/math/tools/promotion.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Returns the solution of the system Ax=b given an LDLT_factor of A

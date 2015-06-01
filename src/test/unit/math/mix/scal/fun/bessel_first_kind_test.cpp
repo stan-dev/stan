@@ -26,8 +26,8 @@
 
 
 TEST(AgradFwdBesselFirstKind,FvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::bessel_first_kind;
 
   fvar<var> z(-3.0,2.0);
@@ -42,8 +42,8 @@ TEST(AgradFwdBesselFirstKind,FvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(-0.7461432154878245145319 / 2.0, g[0]);
 }
 TEST(AgradFwdBesselFirstKind,FvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::bessel_first_kind;
 
   fvar<var> z(-3.0,2.0);
@@ -56,8 +56,8 @@ TEST(AgradFwdBesselFirstKind,FvarVar_2ndDeriv) {
 }
 
 TEST(AgradFwdBesselFirstKind,FvarFvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::bessel_first_kind;
 
   fvar<fvar<var> > y;
@@ -93,8 +93,8 @@ TEST(AgradFwdBesselFirstKind,FvarFvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(-0.7461432154878245145319 / 2.0, r[0]);
 }
 TEST(AgradFwdBesselFirstKind,FvarFvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::bessel_first_kind;
 
   fvar<fvar<var> > y;
@@ -120,8 +120,8 @@ TEST(AgradFwdBesselFirstKind,FvarFvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(0.35405707, r[0]);
 }
 TEST(AgradFwdBesselFirstKind,FvarFvarVar_3rdDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::bessel_first_kind;
 
   fvar<fvar<var> > y;

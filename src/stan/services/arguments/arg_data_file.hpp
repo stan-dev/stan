@@ -4,13 +4,13 @@
 #include <stan/services/arguments/singleton_argument.hpp>
 
 namespace stan {
-  
+
   namespace services {
-    
+
     class arg_data_file: public string_argument {
-      
+
     public:
-      
+
       arg_data_file(): string_argument() {
         _name = "file";
         _description = "Input data file";
@@ -21,11 +21,11 @@ namespace stan {
         _good_value = "good";
         _value = _default_value;
       };
-      
+
     };
-    
+
   } // services
-  
+
 } // stan
 
 #endif

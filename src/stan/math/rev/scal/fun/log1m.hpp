@@ -5,7 +5,7 @@
 #include <stan/math/prim/scal/fun/log1p.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class log1m_vari : public op_v_vari {
@@ -29,7 +29,7 @@ namespace stan {
      * @param a The variable.
      * @return The variable representing log of 1 minus the variable.
      */
-    inline var log1m(const stan::agrad::var& a) {
+    inline var log1m(const stan::math::var& a) {
       return var(new log1m_vari(a.vi_));
     }
 

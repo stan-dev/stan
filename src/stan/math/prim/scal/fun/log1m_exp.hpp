@@ -4,9 +4,9 @@
 #include <stan/math/prim/scal/fun/log1m.hpp>
 #include <boost/math/tools/promotion.hpp>
 #include <boost/throw_exception.hpp>
-#include <boost/math/special_functions/expm1.hpp>
-#include <stdexcept>
+#include <cmath>
 #include <limits>
+#include <stdexcept>
 
 namespace stan {
   namespace math {
@@ -39,12 +39,16 @@ namespace stan {
     template <typename T>
     inline typename boost::math::tools::promote_args<T>::type
     log1m_exp(const T a) {
+      using std::log;
+      using std::exp;
+      using ::expm1;
+
       if (a >= 0)
         return std::numeric_limits<double>::quiet_NaN();
       else if (a > -0.693147)
-        return std::log(-boost::math::expm1(a));  // 0.693147 ~= log(2)
+        return log(-expm1(a));  // 0.693147 ~= log(2)
       else
-        return log1m(std::exp(a));
+        return log1m(exp(a));
     }
 
   }

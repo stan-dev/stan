@@ -11,17 +11,18 @@
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
+#include <cmath>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <typename T_y, typename T_low, typename T_high>
     typename return_type<T_y, T_low, T_high>::type
     uniform_ccdf_log(const T_y& y, const T_low& alpha, const T_high& beta) {
-      static const char* function("stan::prob::uniform_ccdf_log");
+      static const char* function("stan::math::uniform_ccdf_log");
       typedef typename stan::partials_return_type<T_y, T_low, T_high>::type
         T_partials_return;
 
@@ -30,6 +31,7 @@ namespace stan {
       using stan::math::check_greater;
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
+      using std::log;
 
       // check if any vectors are zero length
       if (!(stan::length(y)
@@ -62,7 +64,7 @@ namespace stan {
           return LOG_ZERO;
       }
 
-      agrad::OperandsAndPartials<T_y, T_low, T_high>
+      OperandsAndPartials<T_y, T_low, T_high>
         operands_and_partials(y, alpha, beta);
       for (size_t n = 0; n < N; n++) {
         const T_partials_return y_dbl = value_of(y_vec[n]);

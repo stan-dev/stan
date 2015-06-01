@@ -15,8 +15,6 @@
 #include <stan/math/prim/scal/meta/VectorView.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
 #include <stan/math/prim/scal/meta/partials_return_type.hpp>
-
-#include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/prob/normal_rng.hpp>
 #include <stan/math/prim/scal/prob/exponential_rng.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
@@ -24,7 +22,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <class RNG>
     inline double
@@ -32,7 +30,7 @@ namespace stan {
                        const double sigma,
                        const double lambda,
                        RNG& rng) {
-      static const char* function("stan::prob::exp_mod_normal_rng");
+      static const char* function("stan::math::exp_mod_normal_rng");
 
       using stan::math::check_positive_finite;
       using stan::math::check_finite;
@@ -41,8 +39,8 @@ namespace stan {
       check_positive_finite(function, "Inv_scale parameter", lambda);
       check_positive_finite(function, "Scale parameter", sigma);
 
-      return stan::prob::normal_rng(mu, sigma, rng)
-        + stan::prob::exponential_rng(lambda, rng);
+      return stan::math::normal_rng(mu, sigma, rng)
+        + stan::math::exponential_rng(lambda, rng);
     }
   }
 }

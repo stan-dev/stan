@@ -7,8 +7,8 @@
 #include <stan/math/rev/scal/fun/round.hpp>
 
 TEST(AgradFwdRound, FvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using boost::math::round;
 
   fvar<var> x(1.5,1.3);
@@ -23,8 +23,8 @@ TEST(AgradFwdRound, FvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(0, g[0]);
 }
 TEST(AgradFwdRound, FvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using boost::math::round;
 
   fvar<var> x(1.5,1.3);
@@ -37,8 +37,8 @@ TEST(AgradFwdRound, FvarVar_2ndDeriv) {
 }
 
 TEST(AgradFwdRound, FvarFvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using boost::math::round;
 
   fvar<fvar<var> > x;
@@ -73,8 +73,8 @@ TEST(AgradFwdRound, FvarFvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(0, r[0]);
 }
 TEST(AgradFwdRound, FvarFvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using boost::math::round;
 
   fvar<fvar<var> > x;
@@ -100,8 +100,8 @@ TEST(AgradFwdRound, FvarFvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(0, r[0]);
 }
 TEST(AgradFwdRound, FvarFvarVar_3rdDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using boost::math::round;
 
   fvar<fvar<var> > y;
