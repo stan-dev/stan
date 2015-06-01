@@ -28,6 +28,8 @@ public:
   void invalid_values(vector<size_t>& index, 
           vector<double>& value) {
     // y
+    index.push_back(0U);
+    value.push_back(-10.0);
     
     // beta
     index.push_back(1U);
