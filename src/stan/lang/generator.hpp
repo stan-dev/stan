@@ -318,6 +318,8 @@ namespace stan {
 
     void generate_usings(std::ostream& o) {
       generate_using("std::istream",o);
+      generate_using("std::max",o);
+      generate_using("std::min",o);
       generate_using("std::string",o);
       generate_using("std::stringstream",o);
       generate_using("std::vector",o);
@@ -348,7 +350,6 @@ namespace stan {
     void generate_includes(std::ostream& o) {
       generate_include("stan/model/model_header.hpp",o);
       generate_include("stan/services/command.hpp",o);
-      // generate_include("boost/random/linear_congruential.hpp",o);
       o << EOL;
     }
 
