@@ -3,7 +3,7 @@
 
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
-#include <math.h>
+#include <cmath>
 #include <valarray>
 
 namespace stan {
@@ -23,8 +23,6 @@ namespace stan {
 
     /**
      * The exponentiation of the specified variable minus 1 (C99).
-     *
-     * For non-variable function, see boost::math::expm1().
      *
      * The derivative is given by
      *

@@ -168,7 +168,7 @@ TEST(ProbDistributionsInvWishart, SpecialRNGTest) {
   //When the scale matrix is an identity matrix and df = k + 2
   //The avg of the samples should also be an identity matrix
   
-  boost::random::mt19937 rng;
+  boost::random::mt19937 rng(1234U);
   using Eigen::MatrixXd;
   
   MatrixXd sigma;
