@@ -59,8 +59,8 @@ namespace stan {
       // Compute vectorized CDF and gradient
       using stan::math::value_of;
       using stan::math::inc_beta;
-      using stan::math::ddz_inc_beta;
-      using stan::math::dda_inc_beta;
+      using stan::math::inc_beta_ddz;
+      using stan::math::inc_beta_dda;
       using stan::math::digamma;
 
       OperandsAndPartials<T_shape, T_inv_scale>
