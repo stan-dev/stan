@@ -1,10 +1,6 @@
 #ifndef STAN_LANG_GRAMMARS_VAR_DECLS_GRAMMAR_HPP
 #define STAN_LANG_GRAMMARS_VAR_DECLS_GRAMMAR_HPP
 
-#include <string>
-#include <sstream>
-#include <vector>
-
 #include <boost/spirit/include/qi.hpp>
 
 #include <stan/lang/ast.hpp>
@@ -12,17 +8,19 @@
 #include <stan/lang/grammars/expression_grammar.hpp>
 #include <stan/lang/grammars/expression07_grammar.hpp>
 
-namespace stan {
+#include <string>
+#include <sstream>
+#include <vector>
 
+namespace stan {
   namespace lang {
 
     template <typename Iterator>
     struct var_decls_grammar
       : boost::spirit::qi::grammar<Iterator,
                                    boost::spirit::qi::locals<bool>,
-                                   std::vector<var_decl>(bool,var_origin),
+                                   std::vector<var_decl>(bool, var_origin),
                                    whitespace_grammar<Iterator> > {
-
       var_decls_grammar(variable_map& var_map,
                         std::stringstream& error_msgs);
 
@@ -134,19 +132,17 @@ namespace stan {
 
       boost::spirit::qi::rule<Iterator,
                               boost::spirit::qi::locals<bool>,
-                              var_decl(bool,var_origin),
+                              var_decl(bool, var_origin),
                               whitespace_grammar<Iterator> >
       var_decl_r;
 
       boost::spirit::qi::rule<Iterator,
                               boost::spirit::qi::locals<bool>,
-                              std::vector<var_decl>(bool,var_origin),
+                              std::vector<var_decl>(bool, var_origin),
                               whitespace_grammar<Iterator> >
       var_decls_r;
-
     };
 
   }
 }
-
 #endif

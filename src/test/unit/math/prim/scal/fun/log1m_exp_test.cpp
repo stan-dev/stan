@@ -1,4 +1,5 @@
 #include <stan/math/prim/scal/fun/log1m_exp.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>
 
 TEST(MathFunctions, log1m_exp) {

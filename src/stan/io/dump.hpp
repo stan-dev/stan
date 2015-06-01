@@ -8,14 +8,12 @@
 #include <boost/type_traits/is_arithmetic.hpp>
 #include <boost/utility/enable_if.hpp>
 
-
-
+#include <stan/io/validate_zero_buf.hpp>
 #include <stan/io/var_context.hpp>
 #include <stan/math/prim/scal/meta/index_type.hpp>
 #include <stan/math/prim/arr/meta/index_type.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>
 
-#include <cctype>
 #include <iostream>
 #include <limits>
 #include <map>
@@ -24,9 +22,9 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <cctype>
 
 namespace stan {
-
   namespace io {
 
     namespace {
@@ -78,7 +76,10 @@ namespace stan {
        */
       // adds period at end of output if necessary for double
       template <typename T>
-      void write_val(T x, typename boost::enable_if<boost::is_floating_point<T> >::type* dummy = 0) {
+      void write_val(T x,
+                     typename
+                     boost::enable_if<boost::is_floating_point<T> >::type*
+                     dummy = 0) {
         std::stringstream ss;
         ss << x;
         std::string s;
@@ -103,10 +104,12 @@ namespace stan {
        *
        * @tparam T Type of integral input.
        * @param x Input.
-       * @paramu dummy Dummy pararameter to allow SFINAE.
+       * @param dummy Dummy pararameter to allow SFINAE.
        */
       template <typename T>
-      void write_val(T n, typename boost::enable_if<boost::is_integral<T> >::type* dummy = 0) {
+      void write_val(T n,
+                     typename boost::enable_if<boost::is_integral<T> >::type*
+                     dummy = 0) {
         out_ << n;
       }
 
@@ -259,7 +262,9 @@ namespace stan {
         write_list(x);
       }
       template <typename T>
-      void write_stan(T x, typename boost::enable_if<boost::is_arithmetic<T> >::type* dummy = 0) {
+      void write_stan(T x,
+                      typename boost::enable_if<boost::is_arithmetic<T> >::type*
+                      dummy = 0) {
         write_val(x);
       }
       void write_stan(const Eigen::Matrix<double, 1, Dynamic>& x) {
@@ -286,7 +291,6 @@ namespace stan {
       }
 
     public:
-
       /**
        * Construct a dump writer writing to standard output.
        */
@@ -616,6 +620,8 @@ namespace stan {
         double x = 0;
         try {
           x = boost::lexical_cast<double>(buf_);
+          if (x == 0)
+            validate_zero_buf(buf_);
         }
         catch ( const boost::bad_lexical_cast &exc ) {
           std::string msg = "value " + buf_ + " beyond numeric range";
