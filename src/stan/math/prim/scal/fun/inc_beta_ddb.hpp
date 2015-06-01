@@ -42,7 +42,7 @@ namespace stan {
       if (b > a)
         if ((0.1 < z && z <= 0.75 && b > 500)
             || (0.01 < z && z <= 0.1 && b > 2500)
-            || (0.001 < z && z <= 0.01 && b > 1e5)) {
+            || (0.001 < z && z <= 0.01 && b > 1e5))
           return -inc_beta_dda(b, a, 1 - z, digamma_b, digamma_ab);
 
       if ((z > 0.75 && a < 500)
@@ -80,7 +80,7 @@ namespace stan {
       }
 
       return inc_beta(a, b, z)
-             * (log(1 - z) - digamma_b + sum_numer / sum_denom);
+        * (log(1 - z) - digamma_b + sum_numer / sum_denom);
     }
 
   }  // math
