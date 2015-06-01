@@ -118,14 +118,14 @@ namespace stan {
 
         if (!is_constant_struct<T_location>::value)
           operands_and_partials.d_x1[i] +=
-            - ddz_inc_beta(phi_dbl, n_dbl + 1.0, p_dbl) * phi_dbl * d_dbl / P_i;
+            - inc_beta_ddz(phi_dbl, n_dbl + 1.0, p_dbl) * phi_dbl * d_dbl / P_i;
 
         if (!is_constant_struct<T_precision>::value) {
           operands_and_partials.d_x2[i]
-            += dda_inc_beta(phi_dbl, n_dbl + 1, p_dbl,
+            += inc_beta_dda(phi_dbl, n_dbl + 1, p_dbl,
                             digamma_phi_vec[i],
                             digamma_sum_vec[i]) / P_i
-               + ddz_inc_beta(phi_dbl, n_dbl + 1.0, p_dbl)
+               + inc_beta_ddz(phi_dbl, n_dbl + 1.0, p_dbl)
                  * mu_dbl * d_dbl / P_i;
         }
       }

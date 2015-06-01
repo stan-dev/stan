@@ -113,14 +113,14 @@ namespace stan {
 
         if (!is_constant_struct<T_shape>::value) {
           operands_and_partials.d_x1[i]
-            += dda_inc_beta(alpha_dbl, n_dbl + 1, p_dbl,
+            += inc_beta_dda(alpha_dbl, n_dbl + 1, p_dbl,
                             digamma_alpha_vec[i],
                             digamma_sum_vec[i]) / P_i;
         }
 
         if (!is_constant_struct<T_inv_scale>::value)
           operands_and_partials.d_x2[i] +=
-            ddz_inc_beta(alpha_dbl, n_dbl + 1.0, p_dbl) * d_dbl / P_i;
+            inc_beta_ddz(alpha_dbl, n_dbl + 1.0, p_dbl) * d_dbl / P_i;
       }
 
       if (!is_constant_struct<T_shape>::value) {
