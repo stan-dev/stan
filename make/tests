@@ -111,14 +111,14 @@ test/dummy-second-order.cpp:
 	@mkdir -p test
 	@touch $@
 	@echo "#include <stan/io/var_context.hpp>" >> $@
-	@echo "#include <stan/agrad/fwd/matrix.hpp>" >> $@
+	@echo "#include <stan/math/fwd.hpp>" >> $@
 	@echo "#include <stan/model/model_header.hpp>" >> $@
 	@echo "" >> $@
 	@echo "int main() {" >> $@
 	@echo "  stan::io::var_context* context = NULL;" >> $@
 	@echo "  stan_model model(*context);" >> $@
 	@echo "" >> $@
-	@echo "  std::vector<stan::agrad::fvar<double> > params_r;" >> $@
+	@echo "  std::vector<stan::math::fvar<double> > params_r;" >> $@
 	@echo "  std::vector<int> params_i;" >> $@
 	@echo "" >> $@
 	@echo "  model.log_prob<false, true>(params_r, params_i, &std::cout);" >> $@
