@@ -19,14 +19,14 @@ namespace stan {
     template <typename T>
     inline
     fvar<T>
-    operator*(const double x1, const fvar<T>& x2) {
+    operator*(double x1, const fvar<T>& x2) {
       return fvar<T>(x1 * x2.val_, x1 * x2.d_);
     }
 
     template <typename T>
     inline
     fvar<T>
-    operator*(const fvar<T>& x1, const double x2) {
+    operator*(const fvar<T>& x1, double x2) {
       return fvar<T>(x1.val_ * x2, x1.d_ * x2);
     }
   }
