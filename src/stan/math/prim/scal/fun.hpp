@@ -28,6 +28,9 @@
 #include <stan/math/prim/scal/fun/identity_free.hpp>
 #include <stan/math/prim/scal/fun/if_else.hpp>
 #include <stan/math/prim/scal/fun/inc_beta.hpp>
+#include <stan/math/prim/scal/fun/inc_beta_dda.hpp>
+#include <stan/math/prim/scal/fun/inc_beta_ddb.hpp>
+#include <stan/math/prim/scal/fun/inc_beta_ddz.hpp>
 #include <stan/math/prim/scal/fun/int_step.hpp>
 #include <stan/math/prim/scal/fun/inv.hpp>
 #include <stan/math/prim/scal/fun/inv_cloglog.hpp>
