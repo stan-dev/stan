@@ -53,6 +53,13 @@ def doCommand(command):
     if (not(p1.returncode == None) and not(p1.returncode == 0)):
         stopErr('%s failed' % command, p1.returncode)
 
+def generateTests(j):
+    if (j == None):
+        command = 'make generate-tests -s'
+    else:
+        command = 'make -j%d generate-tests -s' % j
+    doCommand(command)
+
 def makeTest(name, j):
     target = mungeName(name)
     if (j == None):
@@ -115,6 +122,9 @@ def main():
             except ValueError:
                 stopErr("bad value for -j flag",-1)
             
+    # pass 0: generate all auto-generated tests
+    generateTests(j)
+
     # pass 1:  call make to compile test targets
     for i in range(argsIdx,len(sys.argv)):
         testname = sys.argv[i]

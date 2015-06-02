@@ -1,0 +1,4 @@
+.PHONY: doxygen
+doxygen: 
+	mkdir -p doc/api
+	doxygen src/doxygen/doxygen.cfg
