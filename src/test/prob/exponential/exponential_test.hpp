@@ -23,6 +23,11 @@ public:
     param[1] = 3.9;                 // beta
     parameters.push_back(param);
     log_prob.push_back(-57.13902344686439249699);  // expected log_prob
+
+    param[0] = 1e-08;
+    param[1] = 3.9;
+    parameters.push_back(param);
+    log_prob.push_back(1.3609765141356007);
   }
  
   void invalid_values(vector<size_t>& index, 
@@ -30,6 +35,9 @@ public:
     // y
     index.push_back(0U);
     value.push_back(-10.0);
+
+    index.push_back(0U);
+    value.push_back(numeric_limits<double>::quiet_NaN());
     
     // beta
     index.push_back(1U);
