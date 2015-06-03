@@ -7,9 +7,9 @@ os:
 compiler:
   - clang
 
-before_script: cd $FOLDER
+before_install: cd $FOLDER
 
-before_install: echo "CC=$CXX" > make/local
+before_script: echo "CC=$CXX" > make/local
 
 matrix:
   fast_finish: true
