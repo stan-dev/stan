@@ -427,11 +427,6 @@ namespace stan {
 
     public:
       /**
-       * Construct a reader for standard input.
-       */
-      dump_reader() : in_(std::cin) { }
-
-      /**
        * Construct a reader for the specified input stream.
        *
        * @param in Input stream reference from which to read.
