@@ -424,26 +424,6 @@ namespace stan {
         return true;
       }
 
-      /**
-       * Helper function prints diagnostic information to std::cout.
-       */
-      void print() {
-        std::cout << "var name=|" << name_ << "|" << std::endl;
-        std:: cout << "dims=(";
-        for (size_t i = 0; i < dims_.size(); ++i) {
-          if (i > 0)
-            std::cout << ",";
-          std::cout << dims_[i];
-        }
-        std::cout << ")" << std::endl;
-        std::cout << "float stack:" << std::endl;
-        for (size_t i = 0; i < stack_r_.size(); ++i)
-          std::cout << "  [" << i << "] " << stack_r_[i] << std::endl;
-        std::cout << "int stack" << std::endl;
-        for (size_t i = 0; i < stack_i_.size(); ++i)
-          std::cout << "  [" << i << "] " << stack_i_[i] << std::endl;
-      }
-
 
     public:
       /**
