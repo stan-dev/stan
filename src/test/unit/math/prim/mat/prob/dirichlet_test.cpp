@@ -12,6 +12,7 @@
 
 using Eigen::Dynamic;
 using Eigen::Matrix;
+using Eigen::VectorXd;
 
 TEST(ProbDistributions,Dirichlet) {
   Matrix<double,Dynamic,1> theta(3,1);
@@ -87,98 +88,89 @@ TEST(ProbDistributions,DirichletBounds) {
     << "size mismatch: theta is a 2-vector, alpha is a 4-vector";
 }
 
-TEST(ProbDistributionsDirichlet, random) {
-  boost::random::mt19937 rng;
-  Matrix<double,Dynamic,Dynamic> alpha(3,1);
-  alpha << 2.0, 
-    3.0,
-    11.0;
-
-  EXPECT_NO_THROW(stan::math::dirichlet_rng(alpha,rng));
-}
-
-TEST(ProbDistributionsDirichlet, marginalOneChiSquareGoodnessFitTest) {
-  boost::random::mt19937 rng;
-  Matrix<double,Dynamic,Dynamic> alpha(3,1);
-  alpha << 2.0, 
-    3.0,
-    11.0;
-  int N = 10000;
-  int K = boost::math::round(2 * std::pow(N, 0.4));
-  boost::math::beta_distribution<>dist (2.0,3.0 + 11.0);
-  boost::math::chi_squared mydist(K-1);
-
-  double loc[K - 1];
-  for(int i = 1; i < K; i++)
-    loc[i - 1] = quantile(dist, i * std::pow(K, -1.0));
-
-  int count = 0;
-  int bin [K];
-  double expect [K];
-  for(int i = 0 ; i < K; i++) {
-    bin[i] = 0;
-    expect[i] = N / K;
-  }
-
-  Eigen::VectorXd a(alpha.rows());
-
-  while (count < N) {
-    a = stan::math::dirichlet_rng(alpha,rng);
-    int i = 0;
-    while (i < K-1 && a(0) > loc[i]) 
-      ++i;
-    ++bin[i];
-    count++;
-   }
-
+double chi_square(std::vector<int> bin, std::vector<double> expect) {
   double chi = 0;
-
-  for(int j = 0; j < K; j++)
+  for (size_t j = 0; j < bin.size(); j++)
     chi += ((bin[j] - expect[j]) * (bin[j] - expect[j]) / expect[j]);
-
-  EXPECT_TRUE(chi < quantile(complement(mydist, 1e-6)));
+  return chi;
 }
 
-
-TEST(ProbDistributionsDirichlet, marginalTwoChiSquareGoodnessFitTest) {
+void test_dirichlet3_1(VectorXd alpha) {
   boost::random::mt19937 rng;
-  Matrix<double,Dynamic,Dynamic> alpha(3,1);
-  alpha << 2.0, 
-    3.0,
-    11.0;
   int N = 10000;
   int K = boost::math::round(2 * std::pow(N, 0.4));
-  boost::math::beta_distribution<>dist (3.0,13.0);
-  boost::math::chi_squared mydist(K-1);
 
-  double loc[K - 1];
-  for(int i = 1; i < K; i++)
-    loc[i - 1] = quantile(dist, i * std::pow(K, -1.0));
+  // bins 0 vs. 1 + 2
+  boost::math::beta_distribution<> dist(alpha(0), alpha(1) + alpha(2));
+  boost::math::chi_squared mydist(K - 1);
 
-  int count = 0;
-  int bin [K];
-  double expect [K];
-  for(int i = 0 ; i < K; i++) {
-    bin[i] = 0;
-    expect[i] = N / K;
+  std::vector<double> loc(K - 1);
+  for (int i = 1; i < K; i++)
+    loc[i - 1] = quantile(dist, i / static_cast<double>(K));
+
+  std::vector<int> bin(K, 0);
+  std::vector<double> expect(K, N / static_cast<double>(K));
+
+  for (int count = 0; count < N; ++count) {
+    Eigen::VectorXd theta = stan::math::dirichlet_rng(alpha,rng);
+    int i;
+    for (i = 0; i < K-1 && theta(0) > loc[i]; ++i) ;
+    ++bin[i];
   }
+  EXPECT_TRUE(chi_square(bin,expect) < quantile(complement(mydist, 1e-6)));  
+}
 
-  Eigen::VectorXd a(alpha.rows());
+void test_dirichlet3_2(VectorXd alpha) {
+  boost::random::mt19937 rng;
+  int N = 10000;
+  int K = boost::math::round(2 * std::pow(N, 0.4));
+  boost::math::beta_distribution<> dist(alpha(1), alpha(0) + alpha(2));
+  boost::math::chi_squared mydist(K - 1);
 
-  while (count < N) {
-    a = stan::math::dirichlet_rng(alpha,rng);
+  std::vector<double> loc(K - 1);
+  for(size_t i = 0; i < loc.size(); i++)
+    loc[i] = quantile(dist, (i + 1.0) / K);
+
+
+  std::vector<int> bin(K, 0);
+  std::vector<double> expect(K);
+  for (int i = 0 ; i < K; i++)
+    expect[i] = N / K;
+
+  for (int count = 0; count < N; ++count) {
+    VectorXd a = stan::math::dirichlet_rng(alpha,rng);
     int i = 0;
     while (i < K-1 && a(1) > loc[i]) 
       ++i;
     ++bin[i];
-    count++;
    }
 
-  double chi = 0;
-
-  for(int j = 0; j < K; j++)
-    chi += ((bin[j] - expect[j]) * (bin[j] - expect[j]) / expect[j]);
-
-  EXPECT_TRUE(chi < quantile(complement(mydist, 1e-6)));
+  EXPECT_TRUE(chi_square(bin, expect) < quantile(complement(mydist, 1e-6)));
 }
+
+
+
+TEST(ProbDistributionsDirichlet, rngTest) {
+  VectorXd alpha(3);
+  alpha << 2.0, 3.0, 11.0;
+  test_dirichlet3_1(alpha);
+  test_dirichlet3_2(alpha);
+
+  VectorXd beta(3);
+  beta << 0.1, 0.01, 0.2;
+  test_dirichlet3_1(beta);
+  test_dirichlet3_2(beta);
+}
+
+TEST(ProbDistributionsDirichlet, random) {
+  boost::random::mt19937 rng;
+  VectorXd alpha;
+  alpha << 2.0, 3.0, 11.0;
+  EXPECT_NO_THROW(stan::math::dirichlet_rng(alpha, rng));
+
+  VectorXd beta;
+  beta << 0.001, 0.0001, 1e-10;
+  EXPECT_NO_THROW(stan::math::dirichlet_rng(beta, rng));
+}
+
 
