@@ -164,13 +164,11 @@ TEST(ProbDistributionsDirichlet, rngTest) {
 
 TEST(ProbDistributionsDirichlet, random) {
   boost::random::mt19937 rng;
-  VectorXd alpha;
+  VectorXd alpha(3);
   alpha << 2.0, 3.0, 11.0;
   EXPECT_NO_THROW(stan::math::dirichlet_rng(alpha, rng));
 
-  VectorXd beta;
+  VectorXd beta(3);
   beta << 0.001, 0.0001, 1e-10;
   EXPECT_NO_THROW(stan::math::dirichlet_rng(beta, rng));
 }
-
-

@@ -65,27 +65,21 @@ namespace stan {
         }
         double log_sum_y = log_sum_exp(log_y);
         VectorXd theta(alpha.size());
-        for (int i = 0; i < alpha.size(); ++i) 
+        for (int i = 0; i < alpha.size(); ++i)
           theta(i) = exp(log_y(i) - log_sum_y);
         return theta;
       }
 
       // standard normalized gamma algorithm
-      double sum = 0;
       Eigen::VectorXd y(alpha.rows());
       for (int i = 0; i < alpha.rows(); i++) {
         variate_generator<RNG&, gamma_distribution<> >
           gamma_rng(rng, gamma_distribution<>(alpha(i, 0), 1e-7));
         y(i) = gamma_rng();
-        if (y(i) == 0) {
-          
-        }
-        sum += y(i);
       }
-      for (int i = 0; i < alpha.rows(); i++)
-        y(i) /= sum;
-      return y;
+      return y / y.sum();
     }
+
   }
 }
 #endif
