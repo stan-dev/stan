@@ -5,14 +5,13 @@
 #include <stan/math/prim/scal/fun/min.hpp>
 #include <stan/mcmc/hmc/base_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
-#include <math.h>
 #include <algorithm>
+#include <cmath>
 #include <limits>
 #include <string>
 #include <vector>
 
 namespace stan {
-
   namespace mcmc {
 
     struct nuts_util {
@@ -41,12 +40,12 @@ namespace stan {
 
       ~base_nuts() {}
 
-      void set_max_depth(const int d) {
+      void set_max_depth(int d) {
         if (d > 0)
           max_depth_ = d;
       }
 
-      void set_max_delta(const double d) {
+      void set_max_delta(double d) {
         max_delta_ = d;
       }
 
@@ -244,7 +243,5 @@ namespace stan {
     };
 
   }  // mcmc
-
 }  // stan
-
 #endif

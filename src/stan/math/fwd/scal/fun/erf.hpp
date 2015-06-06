@@ -2,26 +2,23 @@
 #define STAN_MATH_FWD_SCAL_FUN_ERF_HPP
 
 #include <stan/math/fwd/core.hpp>
-
-#include <math.h>
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/square.hpp>
+#include <cmath>
 
 namespace stan {
-
   namespace math {
 
     template <typename T>
-    inline
-    fvar<T>
-    erf(const fvar<T>& x) {
-      using ::sqrt;
-      using ::exp;
-      using ::erf;
+    inline fvar<T> erf(const fvar<T>& x) {
+      using std::sqrt;
+      using std::exp;
+      using std::erf;
       using stan::math::square;
       return fvar<T>(erf(x.val_), x.d_ * exp(-square(x.val_))
                                   * stan::math::TWO_OVER_SQRT_PI);
     }
+
   }
 }
 #endif

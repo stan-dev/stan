@@ -2,23 +2,22 @@
 #define STAN_MATH_FWD_SCAL_FUN_CBRT_HPP
 
 #include <stan/math/fwd/core.hpp>
-
 #include <stan/math/prim/scal/fun/square.hpp>
-#include <math.h>
+#include <cmath>
 
 namespace stan {
-
   namespace math {
 
     template <typename T>
     inline
     fvar<T>
     cbrt(const fvar<T>& x) {
-      using ::cbrt;
+      using std::cbrt;
       using stan::math::square;
       return fvar<T>(cbrt(x.val_),
                      x.d_ / (square(cbrt(x.val_)) * 3.0));
     }
+
   }
 }
 #endif

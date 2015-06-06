@@ -3,7 +3,7 @@
 
 #include <stan/math/rev/core.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <math.h>
+#include <cmath>
 #include <limits>
 
 namespace stan {
@@ -13,7 +13,7 @@ namespace stan {
       class trunc_vari : public op_v_vari {
       public:
         explicit trunc_vari(vari* avi) :
-          op_v_vari(::trunc(avi->val_), avi) {
+          op_v_vari(std::trunc(avi->val_), avi) {
         }
         void chain() {
           if (unlikely(boost::math::isnan(avi_->val_)))
@@ -25,7 +25,7 @@ namespace stan {
     /**
      * Returns the truncatation of the specified variable (C99).
      *
-     * See boost::math::trunc() for the double-based version.
+     * See std::math::trunc() for the double-based version.
      *
      * The derivative is zero everywhere but at integer values, so for
      * convenience the derivative is defined to be everywhere zero,
@@ -52,7 +52,7 @@ namespace stan {
      * @param a Specified variable.
      * @return Truncation of the variable.
      */
-    inline var trunc(const stan::math::var& a) {
+    inline var trunc(const var& a) {
       return var(new trunc_vari(a.vi_));
     }
 

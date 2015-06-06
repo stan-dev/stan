@@ -3,7 +3,7 @@
 
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
-#include <math.h>
+#include <cmath>
 #include <valarray>
 
 namespace stan {
@@ -13,7 +13,7 @@ namespace stan {
       class exp2_vari : public op_v_vari {
       public:
         explicit exp2_vari(vari* avi) :
-          op_v_vari(::pow(2.0, avi->val_), avi) {
+          op_v_vari(std::pow(2.0, avi->val_), avi) {
         }
         void chain() {
           avi_->adj_ += adj_ * val_ * stan::math::LOG_2;
@@ -49,7 +49,7 @@ namespace stan {
      * @param a The variable.
      * @return Two to the power of the specified variable.
      */
-    inline var exp2(const stan::math::var& a) {
+    inline var exp2(const var& a) {
       return var(new exp2_vari(a.vi_));
     }
 

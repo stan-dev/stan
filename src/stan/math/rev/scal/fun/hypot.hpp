@@ -2,7 +2,7 @@
 #define STAN_MATH_REV_SCAL_FUN_HYPOT_HPP
 
 #include <stan/math/rev/core.hpp>
-#include <math.h>
+#include <cmath>
 #include <valarray>
 
 namespace stan {
@@ -12,7 +12,7 @@ namespace stan {
       class hypot_vv_vari : public op_vv_vari {
       public:
         hypot_vv_vari(vari* avi, vari* bvi) :
-          op_vv_vari(::hypot(avi->val_, bvi->val_),
+          op_vv_vari(std::hypot(avi->val_, bvi->val_),
                      avi, bvi) {
         }
         void chain() {
@@ -24,7 +24,7 @@ namespace stan {
       class hypot_vd_vari : public op_v_vari {
       public:
         hypot_vd_vari(vari* avi, double b) :
-          op_v_vari(::hypot(avi->val_, b),
+          op_v_vari(std::hypot(avi->val_, b),
                     avi) {
         }
         void chain() {
@@ -49,8 +49,7 @@ namespace stan {
      * @param b Length of second side.
      * @return Length of hypoteneuse.
      */
-    inline var hypot(const stan::math::var& a,
-                     const stan::math::var& b) {
+    inline var hypot(const var& a, const var& b) {
       return var(new hypot_vv_vari(a.vi_, b.vi_));
     }
 
@@ -58,7 +57,7 @@ namespace stan {
      * Returns the length of the hypoteneuse of a right triangle
      * with sides of the specified lengths (C99).
      *
-     * See boost::math::hypot() for double-based function.
+     * See std::hypot() for double-based function.
      *
      * The derivative is
      *
@@ -68,8 +67,7 @@ namespace stan {
      * @param b Length of second side.
      * @return Length of hypoteneuse.
      */
-    inline var hypot(const stan::math::var& a,
-                     const double& b) {
+    inline var hypot(const var& a, double b) {
       return var(new hypot_vd_vari(a.vi_, b));
     }
 
@@ -77,7 +75,7 @@ namespace stan {
      * Returns the length of the hypoteneuse of a right triangle
      * with sides of the specified lengths (C99).
      *
-     * See boost::math::hypot() for double-based function.
+     * See std::hypot() for double-based function.
      *
      * The derivative is
      *
@@ -114,8 +112,7 @@ namespace stan {
      * @param b Length of second side.
      * @return Length of hypoteneuse.
      */
-    inline var hypot(const double& a,
-                     const stan::math::var& b) {
+    inline var hypot(double a, const var& b) {
       return var(new hypot_vd_vari(b.vi_, a));
     }
 

@@ -3,7 +3,7 @@
 
 #include <stan/math/rev/core.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <math.h>
+#include <cmath>
 #include <valarray>
 
 namespace stan {
@@ -58,10 +58,10 @@ namespace stan {
      * @param a The variable.
      * @return Inverse hyperbolic sine of the variable.
      */
-    inline var asinh(const stan::math::var& a) {
+    inline var asinh(const var& a) {
       if (boost::math::isinf(a.val()))
         return var(new asinh_vari(a.val(), a.vi_));
-      return var(new asinh_vari(::asinh(a.val()), a.vi_));
+      return var(new asinh_vari(std::asinh(a.val()), a.vi_));
     }
 
   }

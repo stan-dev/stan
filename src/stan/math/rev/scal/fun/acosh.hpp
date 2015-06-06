@@ -1,9 +1,9 @@
 #ifndef STAN_MATH_REV_SCAL_FUN_ACOSH_HPP
 #define STAN_MATH_REV_SCAL_FUN_ACOSH_HPP
 
-#include <math.h>
 #include <stan/math/rev/core.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <cmath>
 
 namespace stan {
   namespace math {
@@ -59,13 +59,12 @@ namespace stan {
      * @param a The variable.
      * @return Inverse hyperbolic cosine of the variable.
      */
-    inline var acosh(const stan::math::var& a) {
+    inline var acosh(const var& a) {
       if (boost::math::isinf(a.val()) && a > 0.0)
         return var(new acosh_vari(a.val(), a.vi_));
-      return var(new acosh_vari(::acosh(a.val()), a.vi_));
+      return var(new acosh_vari(std::acosh(a.val()), a.vi_));
     }
 
   }
 }
-
 #endif
