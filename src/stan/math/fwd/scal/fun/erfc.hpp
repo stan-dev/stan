@@ -1,6 +1,7 @@
 #ifndef STAN_MATH_FWD_SCAL_FUN_ERFC_HPP
 #define STAN_MATH_FWD_SCAL_FUN_ERFC_HPP
 
+#include <math.h>
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/square.hpp>
@@ -11,7 +12,7 @@ namespace stan {
 
     template <typename T>
     inline fvar<T> erfc(const fvar<T>& x) {
-      using std::erfc;
+      using ::erfc;
       using std::sqrt;
       using std::exp;
       using stan::math::square;

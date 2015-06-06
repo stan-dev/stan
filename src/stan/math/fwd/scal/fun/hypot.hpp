@@ -1,6 +1,7 @@
 #ifndef STAN_MATH_FWD_SCAL_FUN_HYPOT_HPP
 #define STAN_MATH_FWD_SCAL_FUN_HYPOT_HPP
 
+#include <math.h>
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/prim/scal/fun/inv.hpp>
 #include <cmath>
@@ -10,7 +11,7 @@ namespace stan {
 
     template <typename T>
     inline fvar<T> hypot(const fvar<T>& x1, const fvar<T>& x2) {
-      using std::hypot;
+      using ::hypot;
       using std::sqrt;
       using stan::math::inv;
       T u = hypot(x1.val_, x2.val_);
@@ -19,7 +20,7 @@ namespace stan {
 
     template <typename T>
     inline fvar<T> hypot(const fvar<T>& x1, const double x2) {
-      using std::hypot;
+      using ::hypot;
       using std::sqrt;
       using stan::math::inv;
       T u = hypot(x1.val_, x2);
@@ -28,7 +29,7 @@ namespace stan {
 
     template <typename T>
     inline fvar<T> hypot(const double x1, const fvar<T>& x2) {
-      using std::hypot;
+      using ::hypot;
       using std::sqrt;
       using stan::math::inv;
       T u = hypot(x1, x2.val_);

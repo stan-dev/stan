@@ -1,9 +1,9 @@
 #ifndef STAN_MATH_REV_SCAL_FUN_ROUND_HPP
 #define STAN_MATH_REV_SCAL_FUN_ROUND_HPP
 
+#include <math.h>
 #include <stan/math/rev/core.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <cmath>
 #include <limits>
 
 namespace stan {
@@ -13,7 +13,7 @@ namespace stan {
       class round_vari : public op_v_vari {
       public:
         explicit round_vari(vari* avi) :
-          op_v_vari(std::round(avi->val_), avi) {
+          op_v_vari(::round(avi->val_), avi) {
         }
         void chain() {
           if (unlikely(boost::math::isnan(avi_->val_)))
@@ -25,7 +25,7 @@ namespace stan {
     /**
      * Returns the rounded form of the specified variable (C99).
      *
-     * See std::math::round() for the double-based version.
+     * See ::round() for the double-based version.
      *
      * The derivative is zero everywhere but numbers half way between
      * whole numbers, so for convenience the derivative is defined to

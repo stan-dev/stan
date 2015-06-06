@@ -1,6 +1,7 @@
 #ifndef STAN_MATH_REV_SCAL_FUN_ACOSH_HPP
 #define STAN_MATH_REV_SCAL_FUN_ACOSH_HPP
 
+#include <math.h>
 #include <stan/math/rev/core.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <cmath>
@@ -23,7 +24,7 @@ namespace stan {
     /**
      * The inverse hyperbolic cosine function for variables (C99).
      *
-     * For non-variable function, see boost::math::acosh().
+     * For non-variable function, see ::acosh().
      *
      * The derivative is defined by
      *
@@ -62,7 +63,7 @@ namespace stan {
     inline var acosh(const var& a) {
       if (boost::math::isinf(a.val()) && a > 0.0)
         return var(new acosh_vari(a.val(), a.vi_));
-      return var(new acosh_vari(std::acosh(a.val()), a.vi_));
+      return var(new acosh_vari(::acosh(a.val()), a.vi_));
     }
 
   }

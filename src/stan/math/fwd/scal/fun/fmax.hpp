@@ -1,18 +1,17 @@
 #ifndef STAN_MATH_FWD_SCAL_FUN_FMAX_HPP
 #define STAN_MATH_FWD_SCAL_FUN_FMAX_HPP
 
+#include <math.h>
 #include <stan/math/fwd/core.hpp>
-
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/likely.hpp>
-#include <cmath>
 
 namespace stan {
   namespace math {
 
     template <typename T>
     inline fvar<T> fmax(const fvar<T>& x1, const fvar<T>& x2) {
-      using std::fmax;
+      using ::fmax;
       using stan::math::NOT_A_NUMBER;
       if (unlikely(boost::math::isnan(x1.val_))) {
         if (boost::math::isnan(x2.val_))
@@ -32,7 +31,7 @@ namespace stan {
 
     template <typename T>
     inline fvar<T> fmax(const double x1, const fvar<T>& x2) {
-      using std::fmax;
+      using ::fmax;
       using stan::math::NOT_A_NUMBER;
       if (unlikely(boost::math::isnan(x1))) {
         if (boost::math::isnan(x2.val_))
@@ -52,7 +51,7 @@ namespace stan {
 
     template <typename T>
     inline fvar<T> fmax(const fvar<T>& x1, const double x2) {
-      using std::fmax;
+      using ::fmax;
       using stan::math::NOT_A_NUMBER;
       if (unlikely(boost::math::isnan(x1.val_))) {
         if (boost::math::isnan(x2))

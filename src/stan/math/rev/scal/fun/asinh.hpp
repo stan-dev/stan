@@ -1,6 +1,7 @@
 #ifndef STAN_MATH_REV_SCAL_FUN_ASINH_HPP
 #define STAN_MATH_REV_SCAL_FUN_ASINH_HPP
 
+#include <math.h>
 #include <stan/math/rev/core.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <cmath>
@@ -24,7 +25,7 @@ namespace stan {
     /**
      * The inverse hyperbolic sine function for variables (C99).
      *
-     * For non-variable function, see boost::math::asinh().
+     * For non-variable function, see ::asinh().
      *
      * The derivative is defined by
      *
@@ -61,7 +62,7 @@ namespace stan {
     inline var asinh(const var& a) {
       if (boost::math::isinf(a.val()))
         return var(new asinh_vari(a.val(), a.vi_));
-      return var(new asinh_vari(std::asinh(a.val()), a.vi_));
+      return var(new asinh_vari(::asinh(a.val()), a.vi_));
     }
 
   }

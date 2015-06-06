@@ -1,6 +1,7 @@
 #ifndef STAN_MATH_REV_SCAL_FUN_ATANH_HPP
 #define STAN_MATH_REV_SCAL_FUN_ATANH_HPP
 
+#include <math.h>
 #include <stan/math/rev/core.hpp>
 #include <cmath>
 #include <limits>
@@ -23,7 +24,7 @@ namespace stan {
     /**
      * The inverse hyperbolic tangent function for variables (C99).
      *
-     * For non-variable function, see boost::math::atanh().
+     * For non-variable function, see ::atanh().
      *
      * The derivative is defined by
      *
@@ -68,7 +69,7 @@ namespace stan {
       if (a == -1.0)
         return var(new atanh_vari(-std::numeric_limits<double>::infinity(),
                                   a.vi_));
-      return var(new atanh_vari(std::atanh(a.val()), a.vi_));
+      return var(new atanh_vari(::atanh(a.val()), a.vi_));
     }
 
   }
