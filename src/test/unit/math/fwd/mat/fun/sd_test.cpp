@@ -8,7 +8,7 @@
 TEST(AgradFwdMatrixSD, fd_vector) {
   using stan::math::sd;
   using stan::math::vector_d;
-  using stan::agrad::vector_fd;
+  using stan::math::vector_fd;
 
   vector_d v(1);
   v << 1.0;
@@ -40,7 +40,7 @@ TEST(AgradFwdMatrixSD, fd_vector) {
 TEST(AgradFwdMatrixSD, fd_vector_exception) {
   using stan::math::sd;
   using stan::math::vector_d;
-  using stan::agrad::vector_fd;
+  using stan::math::vector_fd;
 
   vector_d d1;
   vector_fd v1;
@@ -50,7 +50,7 @@ TEST(AgradFwdMatrixSD, fd_vector_exception) {
 TEST(AgradFwdMatrixSD, fd_rowvector) {
   using stan::math::sd;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fd;
+  using stan::math::row_vector_fd;
 
   row_vector_d v(1);
   v << 1.0;
@@ -83,7 +83,7 @@ TEST(AgradFwdMatrixSD, fd_rowvector) {
 TEST(AgradFwdMatrixSD, fd_rowvector_exception) {
   using stan::math::sd;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fd;
+  using stan::math::row_vector_fd;
 
   row_vector_d d;
   row_vector_fd v;
@@ -94,7 +94,7 @@ TEST(AgradFwdMatrixSD, fd_rowvector_exception) {
 TEST(AgradFwdMatrixSD, fd_matrix) {
   using stan::math::sd;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
 
   matrix_d v(1,1);
   v << 1.0;
@@ -125,7 +125,7 @@ TEST(AgradFwdMatrixSD, fd_matrix) {
 TEST(AgradFwdMatrixSD, fd_matrix_exception) {
   using stan::math::sd;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
 
   matrix_d d;
   matrix_fd v;
@@ -146,7 +146,7 @@ TEST(AgradFwdMatrixSD, fd_matrix_exception) {
 TEST(AgradFwdMatrixSD, ffd_vector) {
   using stan::math::sd;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffd;
+  using stan::math::vector_ffd;
 
   vector_d v(1);
   v << 1.0;
@@ -178,7 +178,7 @@ TEST(AgradFwdMatrixSD, ffd_vector) {
 TEST(AgradFwdMatrixSD, ffd_vector_exception) {
   using stan::math::sd;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffd;
+  using stan::math::vector_ffd;
 
   vector_d d1;
   vector_ffd v1;
@@ -188,7 +188,7 @@ TEST(AgradFwdMatrixSD, ffd_vector_exception) {
 TEST(AgradFwdMatrixSD, ffd_rowvector) {
   using stan::math::sd;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffd;
+  using stan::math::row_vector_ffd;
 
   row_vector_d v(1);
   v << 1.0;
@@ -221,7 +221,7 @@ TEST(AgradFwdMatrixSD, ffd_rowvector) {
 TEST(AgradFwdMatrixSD, ffd_rowvector_exception) {
   using stan::math::sd;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffd;
+  using stan::math::row_vector_ffd;
 
   row_vector_d d;
   row_vector_ffd v;
@@ -232,7 +232,7 @@ TEST(AgradFwdMatrixSD, ffd_rowvector_exception) {
 TEST(AgradFwdMatrixSD, ffd_matrix) {
   using stan::math::sd;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffd;
+  using stan::math::matrix_ffd;
 
   matrix_d v(1,1);
   v << 1.0;
@@ -263,7 +263,7 @@ TEST(AgradFwdMatrixSD, ffd_matrix) {
 TEST(AgradFwdMatrixSD, ffd_matrix_exception) {
   using stan::math::sd;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffd;
+  using stan::math::matrix_ffd;
 
   matrix_d d;
   matrix_ffd v;

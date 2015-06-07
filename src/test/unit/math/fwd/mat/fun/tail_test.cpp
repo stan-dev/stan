@@ -4,32 +4,32 @@
 #include <stan/math/fwd/core.hpp>
 #include <gtest/gtest.h>
 
-using stan::agrad::fvar;
+using stan::math::fvar;
 
 TEST(AgradFwdMatrixTail,TailVector1_fd) {
   using stan::math::tail;
-  stan::agrad::vector_fd v(3);
+  stan::math::vector_fd v(3);
   v << 1, 2, 3;
   EXPECT_EQ(0, tail(v,0).size());
 }
 TEST(AgradFwdMatrixTail,TailVector2_fd) {
   using stan::math::tail;
-  stan::agrad::vector_fd v(3);
+  stan::math::vector_fd v(3);
   v << 1, 2, 3;
   EXPECT_EQ(3, tail(v,3).size());
 }
 TEST(AgradFwdMatrixTail,TailVector3_fd) {
   using stan::math::tail;
-  stan::agrad::vector_fd v(3);
+  stan::math::vector_fd v(3);
   v << 1, 2, 3;
   EXPECT_THROW(tail(v,4), std::out_of_range);
 }
 TEST(AgradFwdMatrixTail,TailVector4_fd) {
   using stan::math::tail;
-  stan::agrad::vector_fd v(3);
+  stan::math::vector_fd v(3);
   v << 1, 2, 3;
 
-  stan::agrad::vector_fd v12 = tail(v,2);
+  stan::math::vector_fd v12 = tail(v,2);
   EXPECT_EQ(2,v12.size());
   for (int n = 0; n < 2; ++n) {
     EXPECT_FLOAT_EQ(v[n+1].val_,v12[n].val_);
@@ -38,28 +38,28 @@ TEST(AgradFwdMatrixTail,TailVector4_fd) {
 
 TEST(AgradFwdMatrixTail,tailRowVector1_fd) {
   using stan::math::tail;
-  stan::agrad::row_vector_fd v(3);
+  stan::math::row_vector_fd v(3);
   v << 1, 2, 3;
   EXPECT_EQ(0, tail(v,0).size());
 }
 TEST(AgradFwdMatrixTail,tailRowVector2_fd) {
   using stan::math::tail;
-  stan::agrad::row_vector_fd v(3);
+  stan::math::row_vector_fd v(3);
   v << 1, 2, 3;
   EXPECT_EQ(3, tail(v,3).size());
 }
 TEST(AgradFwdMatrixTail,tailRowVector3_fd) {
   using stan::math::tail;
-  stan::agrad::row_vector_fd v(3);
+  stan::math::row_vector_fd v(3);
   v << 1, 2, 3;
   EXPECT_THROW(tail(v,4), std::out_of_range);
 }
 TEST(AgradFwdMatrixTail,tailRowVector4_fd) {
   using stan::math::tail;
-   stan::agrad::row_vector_fd v(3);
+   stan::math::row_vector_fd v(3);
   v << 1, 2, 3;
 
-  stan::agrad::row_vector_fd v12 = tail(v,2);
+  stan::math::row_vector_fd v12 = tail(v,2);
   EXPECT_EQ(2,v12.size());
   for (int n = 0; n < 2; ++n) {
     EXPECT_FLOAT_EQ(v[n+1].val_,v12[n].val_);
@@ -97,28 +97,28 @@ TEST(AgradFwdMatrixTail,tailStdVector4_fd) {
 }
 TEST(AgradFwdMatrixTail,TailVector1_ffd) {
   using stan::math::tail;
-  stan::agrad::vector_ffd v(3);
+  stan::math::vector_ffd v(3);
   v << 1, 2, 3;
   EXPECT_EQ(0, tail(v,0).size());
 }
 TEST(AgradFwdMatrixTail,TailVector2_ffd) {
   using stan::math::tail;
-  stan::agrad::vector_ffd v(3);
+  stan::math::vector_ffd v(3);
   v << 1, 2, 3;
   EXPECT_EQ(3, tail(v,3).size());
 }
 TEST(AgradFwdMatrixTail,TailVector3_ffd) {
   using stan::math::tail;
-  stan::agrad::vector_ffd v(3);
+  stan::math::vector_ffd v(3);
   v << 1, 2, 3;
   EXPECT_THROW(tail(v,4), std::out_of_range);
 }
 TEST(AgradFwdMatrixTail,TailVector4_ffd) {
   using stan::math::tail;
-  stan::agrad::vector_ffd v(3);
+  stan::math::vector_ffd v(3);
   v << 1, 2, 3;
 
-  stan::agrad::vector_ffd v12 = tail(v,2);
+  stan::math::vector_ffd v12 = tail(v,2);
   EXPECT_EQ(2,v12.size());
   for (int n = 0; n < 2; ++n) {
     EXPECT_FLOAT_EQ(v[n+1].val_.val_,v12[n].val_.val_);
@@ -127,28 +127,28 @@ TEST(AgradFwdMatrixTail,TailVector4_ffd) {
 
 TEST(AgradFwdMatrixTail,tailRowVector1_ffd) {
   using stan::math::tail;
-  stan::agrad::row_vector_ffd v(3);
+  stan::math::row_vector_ffd v(3);
   v << 1, 2, 3;
   EXPECT_EQ(0, tail(v,0).size());
 }
 TEST(AgradFwdMatrixTail,tailRowVector2_ffd) {
   using stan::math::tail;
-  stan::agrad::row_vector_ffd v(3);
+  stan::math::row_vector_ffd v(3);
   v << 1, 2, 3;
   EXPECT_EQ(3, tail(v,3).size());
 }
 TEST(AgradFwdMatrixTail,tailRowVector3_ffd) {
   using stan::math::tail;
-  stan::agrad::row_vector_ffd v(3);
+  stan::math::row_vector_ffd v(3);
   v << 1, 2, 3;
   EXPECT_THROW(tail(v,4), std::out_of_range);
 }
 TEST(AgradFwdMatrixTail,tailRowVector4_ffd) {
   using stan::math::tail;
-   stan::agrad::row_vector_ffd v(3);
+   stan::math::row_vector_ffd v(3);
   v << 1, 2, 3;
 
-  stan::agrad::row_vector_ffd v12 = tail(v,2);
+  stan::math::row_vector_ffd v12 = tail(v,2);
   EXPECT_EQ(2,v12.size());
   for (int n = 0; n < 2; ++n) {
     EXPECT_FLOAT_EQ(v[n+1].val_.val_,v12[n].val_.val_);

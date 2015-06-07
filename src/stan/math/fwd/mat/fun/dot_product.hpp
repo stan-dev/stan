@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__MAT__FUN__DOT_PRODUCT_HPP
-#define STAN__MATH__FWD__MAT__FUN__DOT_PRODUCT_HPP
+#ifndef STAN_MATH_FWD_MAT_FUN_DOT_PRODUCT_HPP
+#define STAN_MATH_FWD_MAT_FUN_DOT_PRODUCT_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/typedefs.hpp>
@@ -10,7 +10,7 @@
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     // dot_product for vec (in matrix) * vec (in matrix);
     // does all combos of row row, col col, row col, col row

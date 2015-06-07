@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__PROB__DOUBLE_EXPONENTIAL_LOG_HPP
-#define STAN__MATH__PRIM__SCAL__PROB__DOUBLE_EXPONENTIAL_LOG_HPP
+#ifndef STAN_MATH_PRIM_SCAL_PROB_DOUBLE_EXPONENTIAL_LOG_HPP
+#define STAN_MATH_PRIM_SCAL_PROB_DOUBLE_EXPONENTIAL_LOG_HPP
 
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -12,13 +12,14 @@
 #include <stan/math/prim/scal/fun/log1m.hpp>
 #include <stan/math/prim/scal/meta/contains_nonconstant_struct.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/fun/sign.hpp>
+#include <cmath>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     // DoubleExponential(y|mu, sigma)  [sigma > 0]
     // FIXME: add documentation
@@ -27,7 +28,7 @@ namespace stan {
     typename return_type<T_y, T_loc, T_scale>::type
     double_exponential_log(const T_y& y,
                            const T_loc& mu, const T_scale& sigma) {
-      static const char* function("stan::prob::double_exponential_log");
+      static const char* function("stan::math::double_exponential_log");
       typedef typename stan::partials_return_type<T_y, T_loc, T_scale>::type
         T_partials_return;
 
@@ -36,10 +37,11 @@ namespace stan {
       using stan::math::check_positive_finite;
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
-      using stan::prob::include_summand;
+      using stan::math::include_summand;
       using std::log;
       using std::fabs;
       using stan::math::sign;
+      using std::log;
 
       // check if any vectors are zero length
       if (!(stan::length(y)
@@ -66,7 +68,7 @@ namespace stan {
       VectorView<const T_loc> mu_vec(mu);
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, mu, sigma);
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale>
+      OperandsAndPartials<T_y, T_loc, T_scale>
         operands_and_partials(y, mu, sigma);
 
       VectorBuilder<include_summand<propto, T_y, T_loc, T_scale>::value,

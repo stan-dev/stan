@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__UB_CONSTRAIN_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__UB_CONSTRAIN_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_UB_CONSTRAIN_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_UB_CONSTRAIN_HPP
 
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/prim/scal/fun/identity_constrain.hpp>
@@ -8,7 +8,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     // UPPER BOUND
 
@@ -35,6 +35,7 @@ namespace stan {
     inline
     typename boost::math::tools::promote_args<T, TU>::type
     ub_constrain(const T x, const TU ub) {
+      using std::exp;
       if (ub == std::numeric_limits<double>::infinity())
         return identity_constrain(x);
       return ub - exp(x);
@@ -67,6 +68,7 @@ namespace stan {
     inline
     typename boost::math::tools::promote_args<T, TU>::type
     ub_constrain(const T x, const TU ub, T& lp) {
+      using std::exp;
       if (ub == std::numeric_limits<double>::infinity())
         return identity_constrain(x, lp);
       lp += x;

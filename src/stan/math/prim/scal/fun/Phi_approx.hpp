@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__PHI_APPROX_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__PHI_APPROX_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_PHI_APPROX_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_PHI_APPROX_HPP
 
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/prim/scal/fun/inv_logit.hpp>

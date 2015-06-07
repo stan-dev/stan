@@ -12,7 +12,7 @@
 
 TEST(AgradRevMatrix,mv_trace) {
   using stan::math::trace;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
 
   matrix_v a(2,2);
   a << -1.0, 2.0, 

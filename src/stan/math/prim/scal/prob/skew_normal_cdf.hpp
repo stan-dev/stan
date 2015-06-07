@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__PROB__SKEW_NORMAL_CDF_HPP
-#define STAN__MATH__PRIM__SCAL__PROB__SKEW_NORMAL_CDF_HPP
+#ifndef STAN_MATH_PRIM_SCAL_PROB_SKEW_NORMAL_CDF_HPP
+#define STAN_MATH_PRIM_SCAL_PROB_SKEW_NORMAL_CDF_HPP
 
 #include <boost/random/variate_generator.hpp>
 #include <boost/math/distributions.hpp>
@@ -15,16 +15,17 @@
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
 #include <stan/math/prim/scal/meta/VectorView.hpp>
+#include <cmath>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <typename T_y, typename T_loc, typename T_scale, typename T_shape>
     typename return_type<T_y, T_loc, T_scale, T_shape>::type
     skew_normal_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma,
                     const T_shape& alpha) {
-      static const char* function("stan::prob::skew_normal_cdf");
+      static const char* function("stan::math::skew_normal_cdf");
       typedef typename stan::partials_return_type<T_y, T_loc, T_scale,
                                                   T_shape>::type
         T_partials_return;
@@ -57,11 +58,12 @@ namespace stan {
                              "Scale parameter", sigma,
                              "Shape paramter", alpha);
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale, T_shape>
+      OperandsAndPartials<T_y, T_loc, T_scale, T_shape>
         operands_and_partials(y, mu, sigma, alpha);
 
       using stan::math::SQRT_2;
       using stan::math::pi;
+      using std::exp;
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_loc> mu_vec(mu);

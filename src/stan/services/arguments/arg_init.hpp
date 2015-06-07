@@ -1,16 +1,16 @@
-#ifndef STAN__SERVICES__ARGUMENTS__INIT__HPP
-#define STAN__SERVICES__ARGUMENTS__INIT__HPP
+#ifndef STAN_SERVICES_ARGUMENTS_ARG_INIT_HPP
+#define STAN_SERVICES_ARGUMENTS_ARG_INIT_HPP
 
 #include <stan/services/arguments/singleton_argument.hpp>
 
 namespace stan {
-  
+
   namespace services {
-    
+
     class arg_init: public string_argument {
-      
+
     public:
-      
+
       arg_init(): string_argument() {
         _name = "init";
         _description = std::string("Initialization method: ")
@@ -23,11 +23,11 @@ namespace stan {
         _good_value = "../src/test/test-models/test_model.init.R";
         _value = _default_value;
       };
-      
+
     };
-    
+
   } // services
-  
+
 } // stan
 
 #endif

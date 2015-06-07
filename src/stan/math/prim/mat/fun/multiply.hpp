@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__MULTIPLY_HPP
-#define STAN__MATH__PRIM__MAT__FUN__MULTIPLY_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_MULTIPLY_HPP
+#define STAN_MATH_PRIM_MAT_FUN_MULTIPLY_HPP
 
 #include <boost/type_traits/is_arithmetic.hpp>
 #include <boost/utility/enable_if.hpp>

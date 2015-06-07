@@ -63,9 +63,9 @@ std::vector<double> finite_differences(const size_t row, const size_t col,
 
 TEST(AgradRevMatrix,mdivide_left_ldlt_val) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   stan::math::LDLT_factor<double,-1,-1> ldlt_Ad;
-  stan::math::LDLT_factor<stan::agrad::var,-1,-1> ldlt_Av;
+  stan::math::LDLT_factor<stan::math::var,-1,-1> ldlt_Av;
   matrix_v Av(2,2);
   matrix_d Ad(2,2);
   matrix_v I;
@@ -101,7 +101,7 @@ TEST(AgradRevMatrix,mdivide_left_ldlt_val) {
 
 TEST(AgradRevMatrix,mdivide_left_ldlt_grad_vv) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::multiply;
   using stan::math::mdivide_left_spd;
 
@@ -117,7 +117,7 @@ TEST(AgradRevMatrix,mdivide_left_ldlt_grad_vv) {
   size_type i,j,k;
   for (i = 0; i < Bd.rows(); i++) {
     for (j = 0; j < Bd.cols(); j++) {
-      stan::math::LDLT_factor<stan::agrad::var,-1,-1> ldlt_A;
+      stan::math::LDLT_factor<stan::math::var,-1,-1> ldlt_A;
       matrix_v A(2,2);
       matrix_v B(2,2);
       matrix_v C;
@@ -156,7 +156,7 @@ TEST(AgradRevMatrix,mdivide_left_ldlt_grad_vv) {
 
 TEST(AgradRevMatrix,mdivide_left_ldlt_finite_diff_vv) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::multiply;
   using stan::math::mdivide_left_spd;
 
@@ -182,7 +182,7 @@ TEST(AgradRevMatrix,mdivide_left_ldlt_finite_diff_vv) {
         B(k) = Bd(k);
       }
       A(0,1) = A(1,0);
-      stan::math::LDLT_factor<stan::agrad::var,-1,-1> ldlt_A;
+      stan::math::LDLT_factor<stan::math::var,-1,-1> ldlt_A;
       ldlt_A.compute(A);
       ASSERT_TRUE(ldlt_A.success());
       
@@ -204,7 +204,7 @@ TEST(AgradRevMatrix,mdivide_left_ldlt_finite_diff_vv) {
 
 TEST(AgradRevMatrix,mdivide_left_ldlt_grad_dv) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::mdivide_left_spd;
   using stan::math::multiply;
   
@@ -250,7 +250,7 @@ TEST(AgradRevMatrix,mdivide_left_ldlt_grad_dv) {
 
 TEST(AgradRevMatrix,mdivide_left_ldlt_finite_diff_dv) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::multiply;
   using stan::math::mdivide_left_spd;
 
@@ -293,7 +293,7 @@ TEST(AgradRevMatrix,mdivide_left_ldlt_finite_diff_dv) {
 
 TEST(AgradRevMatrix,mdivide_left_ldlt_grad_vd) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::mdivide_left_spd;
   using stan::math::multiply;
   
@@ -310,7 +310,7 @@ TEST(AgradRevMatrix,mdivide_left_ldlt_grad_vd) {
   size_type i,j,k;
   for (i = 0; i < Bd.rows(); i++) {
     for (j = 0; j < Bd.cols(); j++) {
-      stan::math::LDLT_factor<stan::agrad::var,-1,-1> ldlt_A;
+      stan::math::LDLT_factor<stan::math::var,-1,-1> ldlt_A;
       matrix_v A(2,2);
       matrix_v C;
       
@@ -339,7 +339,7 @@ TEST(AgradRevMatrix,mdivide_left_ldlt_grad_vd) {
 
 TEST(AgradRevMatrix,mdivide_left_ldlt_finite_diff_vd) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::multiply;
   using stan::math::mdivide_left_spd;
 
@@ -364,7 +364,7 @@ TEST(AgradRevMatrix,mdivide_left_ldlt_finite_diff_vd) {
         A(k) = Ad(k);
       }
       A(0,1) = A(1,0);
-      stan::math::LDLT_factor<stan::agrad::var,-1,-1> ldlt_A;
+      stan::math::LDLT_factor<stan::math::var,-1,-1> ldlt_A;
       ldlt_A.compute(A);
       ASSERT_TRUE(ldlt_A.success());
       

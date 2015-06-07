@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__INITIALIZE_HPP
-#define STAN__MATH__PRIM__MAT__FUN__INITIALIZE_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_INITIALIZE_HPP
+#define STAN_MATH_PRIM_MAT_FUN_INITIALIZE_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <boost/type_traits/is_arithmetic.hpp>

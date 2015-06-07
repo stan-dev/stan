@@ -1,11 +1,11 @@
-#ifndef STAN__MATH__REV__MAT__FUN__CROSSPROD_HPP
-#define STAN__MATH__REV__MAT__FUN__CROSSPROD_HPP
+#ifndef STAN_MATH_REV_MAT_FUN_CROSSPROD_HPP
+#define STAN_MATH_REV_MAT_FUN_CROSSPROD_HPP
 
 #include <stan/math/rev/mat/fun/typedefs.hpp>
 #include <stan/math/rev/mat/fun/tcrossprod.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Returns the result of pre-multiplying a matrix by its
@@ -15,7 +15,7 @@ namespace stan {
      */
     inline matrix_v
     crossprod(const matrix_v& M) {
-      return tcrossprod(M.transpose());
+      return tcrossprod(static_cast<matrix_v>(M.transpose()));
     }
 
   }

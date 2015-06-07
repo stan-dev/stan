@@ -10,8 +10,8 @@ void test_nan_vd(const F& f,
                  const double& arg2,
                  const bool& throws,
                  const bool& is_grad_nan) {
-  stan::agrad::var res;
-  stan::agrad::var arg1_v = arg1;
+  stan::math::var res;
+  stan::math::var arg1_v = arg1;
 
   std::ostringstream fail_msg;
   fail_msg << "Failed for var,double version with first argument " << arg1_v
@@ -39,8 +39,8 @@ void test_nan_dv(const F& f,
                  const double& arg2,
                  const bool& throws,
                  const bool& is_grad_nan) {
-  stan::agrad::var res;
-  stan::agrad::var arg2_v = arg2;
+  stan::math::var res;
+  stan::math::var arg2_v = arg2;
 
   std::ostringstream fail_msg;
   fail_msg << "Failed for double,var version with first argument " << arg1
@@ -69,9 +69,9 @@ void test_nan_vv(const F& f,
                  const bool& throws,
                  const bool& is_grad_nan) {
 
-  stan::agrad::var res;
-  stan::agrad::var arg1_v = arg1;
-  stan::agrad::var arg2_v = arg2;
+  stan::math::var res;
+  stan::math::var arg1_v = arg1;
+  stan::math::var arg2_v = arg2;
 
   std::ostringstream fail_msg;
   fail_msg << "Failed for var,var version with first argument " << arg1_v 
@@ -119,8 +119,8 @@ void test_nan_v(const F& f,
                 const double& arg1,
                 const bool& throws,
                 const bool& is_grad_nan) {
-  stan::agrad::var res;
-  stan::agrad::var arg1_v = arg1;
+  stan::math::var res;
+  stan::math::var arg1_v = arg1;
   if (throws)
     EXPECT_THROW(f(arg1_v), std::domain_error);
   else {
@@ -155,10 +155,10 @@ void test_nan_vvv(const F& f,
                   const double& arg3,
                   const bool& throws,
                   const bool& is_grad_nan) {
-  stan::agrad::var res;
-  stan::agrad::var arg1_v = arg1;
-  stan::agrad::var arg2_v = arg2;
-  stan::agrad::var arg3_v = arg3;
+  stan::math::var res;
+  stan::math::var arg1_v = arg1;
+  stan::math::var arg2_v = arg2;
+  stan::math::var arg3_v = arg3;
 
   std::ostringstream fail_msg;
   fail_msg << "Failed for var,var,var version with first argument " 
@@ -191,9 +191,9 @@ void test_nan_dvv(const F& f,
                   const double& arg3,
                   const bool& throws,
                   const bool& is_grad_nan) {
-  stan::agrad::var res;
-  stan::agrad::var arg2_v = arg2;
-  stan::agrad::var arg3_v = arg3;
+  stan::math::var res;
+  stan::math::var arg2_v = arg2;
+  stan::math::var arg3_v = arg3;
 
   std::ostringstream fail_msg;
   fail_msg << "Failed for double,var,var version with first argument " 
@@ -225,9 +225,9 @@ void test_nan_vdv(const F& f,
                   const double& arg3,
                   const bool& throws,
                   const bool& is_grad_nan) {
-  stan::agrad::var res;
-  stan::agrad::var arg1_v = arg1;
-  stan::agrad::var arg3_v = arg3;
+  stan::math::var res;
+  stan::math::var arg1_v = arg1;
+  stan::math::var arg3_v = arg3;
 
   std::ostringstream fail_msg;
   fail_msg << "Failed for var,double,var version with first argument " 
@@ -259,9 +259,9 @@ void test_nan_vvd(const F& f,
                   const double& arg3,
                   const bool& throws,
                   const bool& is_grad_nan) {
-  stan::agrad::var res;
-  stan::agrad::var arg1_v = arg1;
-  stan::agrad::var arg2_v = arg2;
+  stan::math::var res;
+  stan::math::var arg1_v = arg1;
+  stan::math::var arg2_v = arg2;
 
   std::ostringstream fail_msg;
   fail_msg << "Failed for var,var,double version with first argument " 
@@ -293,8 +293,8 @@ void test_nan_ddv(const F& f,
                   const double& arg3,
                   const bool& throws,
                   const bool& is_grad_nan) {
-  stan::agrad::var res;
-  stan::agrad::var arg3_v = arg3;
+  stan::math::var res;
+  stan::math::var arg3_v = arg3;
 
   std::ostringstream fail_msg;
   fail_msg << "Failed for double,double,var version with first argument " 
@@ -325,8 +325,8 @@ void test_nan_dvd(const F& f,
                   const double& arg3,
                   const bool& throws,
                   const bool& is_grad_nan) {
-  stan::agrad::var res;
-  stan::agrad::var arg2_v = arg2;
+  stan::math::var res;
+  stan::math::var arg2_v = arg2;
 
   std::ostringstream fail_msg;
   fail_msg << "Failed for double,var,double version with first argument " 
@@ -357,8 +357,8 @@ void test_nan_vdd(const F& f,
                   const double& arg3,
                   const bool& throws,
                   const bool& is_grad_nan) {
-  stan::agrad::var res;
-  stan::agrad::var arg1_v = arg1;
+  stan::math::var res;
+  stan::math::var arg1_v = arg1;
 
   std::ostringstream fail_msg;
   fail_msg << "Failed for var,double,double version with first argument " 

@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__INC_BETA_HPP
-#define STAN__MATH__REV__SCAL__FUN__INC_BETA_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_INC_BETA_HPP
+#define STAN_MATH_REV_SCAL_FUN_INC_BETA_HPP
 
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
@@ -10,7 +10,7 @@
 #include <valarray>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
 
@@ -42,9 +42,9 @@ namespace stan {
 
     }
 
-    inline var inc_beta(const stan::agrad::var& a,
-                        const stan::agrad::var& b,
-                        const stan::agrad::var& c) {
+    inline var inc_beta(const stan::math::var& a,
+                        const stan::math::var& b,
+                        const stan::math::var& c) {
       return var(new inc_beta_vvv_vari(a.vi_, b.vi_, c.vi_));
     }
 

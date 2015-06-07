@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__CHOLESKY_CORR_CONSTRAIN_HPP
-#define STAN__MATH__PRIM__MAT__FUN__CHOLESKY_CORR_CONSTRAIN_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_CHOLESKY_CORR_CONSTRAIN_HPP
+#define STAN_MATH_PRIM_MAT_FUN_CHOLESKY_CORR_CONSTRAIN_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/scal/fun/log1m.hpp>
@@ -11,7 +11,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     // CHOLESKY CORRELATION MATRIX
 
@@ -25,8 +25,6 @@ namespace stan {
       using stan::math::square;
       int k_choose_2 = (K * (K - 1)) / 2;
       if (k_choose_2 != y.size()) {
-        std::cout << "k_choose_2 = " << k_choose_2
-                  << " y.size()=" << y.size() << std::endl;
         throw std::domain_error("y is not a valid unconstrained cholesky "
                                 "correlation matrix."
                                 "Require (K choose 2) elements in y.");
@@ -67,8 +65,6 @@ namespace stan {
       using stan::math::square;
       int k_choose_2 = (K * (K - 1)) / 2;
       if (k_choose_2 != y.size()) {
-        std::cout << "k_choose_2 = " << k_choose_2
-                  << " y.size()=" << y.size() << std::endl;
         throw std::domain_error("y is not a valid unconstrained cholesky "
                                 "correlation matrix."
                                 " Require (K choose 2) elements in y.");

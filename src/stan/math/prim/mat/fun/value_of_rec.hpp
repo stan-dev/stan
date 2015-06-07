@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__VALUE_OF_REC_HPP
-#define STAN__MATH__PRIM__MAT__FUN__VALUE_OF_REC_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_VALUE_OF_REC_HPP
+#define STAN_MATH_PRIM_MAT_FUN_VALUE_OF_REC_HPP
 
 #include <stan/math/prim/scal/fun/value_of_rec.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
@@ -11,7 +11,7 @@ namespace stan {
      * Convert a matrix of type T to a matrix of doubles.
      *
      * T must implement value_of_rec. See
-     * test/agrad/fwd/matrix/value_of_test.cpp for fvar and var usage.
+     * test/unit/math/fwd/mat/fun/value_of_test.cpp for fvar and var usage.
      *
      * @tparam T Scalar type in matrix
      * @tparam R Rows of matrix

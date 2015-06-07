@@ -1,12 +1,12 @@
-#ifndef STAN__MATH__PRIM__MAT__PROB__MULTINOMIAL_RNG_HPP
-#define STAN__MATH__PRIM__MAT__PROB__MULTINOMIAL_RNG_HPP
+#ifndef STAN_MATH_PRIM_MAT_PROB_MULTINOMIAL_RNG_HPP
+#define STAN_MATH_PRIM_MAT_PROB_MULTINOMIAL_RNG_HPP
 
 #include <stan/math/prim/mat/err/check_simplex.hpp>
 #include <stan/math/prim/scal/err/check_size_match.hpp>
 #include <stan/math/prim/scal/err/check_nonnegative.hpp>
 #include <stan/math/prim/scal/err/check_positive.hpp>
 #include <stan/math/prim/scal/fun/multiply_log.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/prob/binomial_rng.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <boost/math/special_functions/gamma.hpp>
@@ -16,14 +16,14 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <class RNG>
     inline std::vector<int>
     multinomial_rng(const Eigen::Matrix<double, Eigen::Dynamic, 1>& theta,
                     const int N,
                     RNG& rng) {
-      static const char* function("stan::prob::multinomial_rng");
+      static const char* function("stan::math::multinomial_rng");
       using stan::math::check_simplex;
       using stan::math::check_positive;
 

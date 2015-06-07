@@ -1,8 +1,8 @@
-#ifndef STAN__MATH__FWD_HPP
-#define STAN__MATH__FWD_HPP
+#ifndef STAN_MATH_FWD_HPP
+#define STAN_MATH_FWD_HPP
 
-#include <stan/math/fwd/core.hpp>
 #include <stan/math/fwd/arr.hpp>
+#include <stan/math/fwd/core.hpp>
 #include <stan/math/fwd/mat.hpp>
 #include <stan/math/fwd/scal.hpp>
 

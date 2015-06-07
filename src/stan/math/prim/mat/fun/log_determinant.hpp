@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__LOG_DETERMINANT_HPP
-#define STAN__MATH__PRIM__MAT__FUN__LOG_DETERMINANT_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_LOG_DETERMINANT_HPP
+#define STAN_MATH_PRIM_MAT_FUN_LOG_DETERMINANT_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/err/check_square.hpp>

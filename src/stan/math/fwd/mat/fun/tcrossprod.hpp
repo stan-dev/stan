@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__MAT__FUN__TCROSSPROD_HPP
-#define STAN__MATH__FWD__MAT__FUN__TCROSSPROD_HPP
+#ifndef STAN_MATH_FWD_MAT_FUN_TCROSSPROD_HPP
+#define STAN_MATH_FWD_MAT_FUN_TCROSSPROD_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/typedefs.hpp>
@@ -9,7 +9,7 @@
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     template<typename T, int R, int C>
     inline
@@ -17,7 +17,7 @@ namespace stan {
     tcrossprod(const Eigen::Matrix<fvar<T>, R, C>& m) {
       if (m.rows() == 0)
         return Eigen::Matrix<fvar<T>, R, R>(0, 0);
-      return stan::agrad::multiply(m, stan::math::transpose(m));
+      return stan::math::multiply(m, stan::math::transpose(m));
     }
 
   }

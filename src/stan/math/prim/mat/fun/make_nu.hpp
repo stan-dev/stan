@@ -1,12 +1,12 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__MAKE_NU_HPP
-#define STAN__MATH__PRIM__MAT__FUN__MAKE_NU_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_MAKE_NU_HPP
+#define STAN_MATH_PRIM_MAT_FUN_MAKE_NU_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * This function calculates the degrees of freedom for the t

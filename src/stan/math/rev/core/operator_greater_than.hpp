@@ -1,10 +1,10 @@
-#ifndef STAN__MATH__REV__CORE__OPERATOR_GREATER_THAN_HPP
-#define STAN__MATH__REV__CORE__OPERATOR_GREATER_THAN_HPP
+#ifndef STAN_MATH_REV_CORE_OPERATOR_GREATER_THAN_HPP
+#define STAN_MATH_REV_CORE_OPERATOR_GREATER_THAN_HPP
 
 #include <stan/math/rev/core/var.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Greater than operator comparing variables' values (C++).

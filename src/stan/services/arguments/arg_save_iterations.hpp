@@ -1,16 +1,16 @@
-#ifndef STAN__SERVICES__ARGUMENTS__OUTPUT__SAVE__ITERATIONS__HPP
-#define STAN__SERVICES__ARGUMENTS__OUTPUT__SAVE__ITERATIONS__HPP
+#ifndef STAN_SERVICES_ARGUMENTS_ARG_SAVE_ITERATIONS_HPP
+#define STAN_SERVICES_ARGUMENTS_ARG_SAVE_ITERATIONS_HPP
 
 #include <stan/services/arguments/singleton_argument.hpp>
 
 namespace stan {
-  
+
   namespace services {
-    
+
     class arg_save_iterations: public bool_argument {
-      
+
     public:
-      
+
       arg_save_iterations(): bool_argument() {
         _name = "save_iterations";
         _description = "Stream optimization progress to output?";
@@ -21,11 +21,11 @@ namespace stan {
         _good_value = 1;
         _value = _default_value;
       };
-      
+
     };
-    
+
   } // services
-  
+
 } // stan
 
 #endif

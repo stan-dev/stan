@@ -6,11 +6,11 @@
 #include <stan/math/fwd/scal/fun/exp.hpp>
 
 TEST(AgradFwdMatrixLogSoftmax,fd) {
-  using stan::agrad::log_softmax;
+  using stan::math::log_softmax;
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::agrad::vector_fd;
-  using stan::agrad::fvar;
+  using stan::math::vector_fd;
+  using stan::math::fvar;
 
   EXPECT_THROW(softmax(vector_fd()),std::invalid_argument);
   
@@ -18,7 +18,7 @@ TEST(AgradFwdMatrixLogSoftmax,fd) {
   x << 0.0;
   x(0).d_ = 1.0;
   
-  Matrix<fvar<double>,Dynamic,1> theta = stan::agrad::log_softmax(x);
+  Matrix<fvar<double>,Dynamic,1> theta = stan::math::log_softmax(x);
   EXPECT_EQ(1,theta.size());
   EXPECT_FLOAT_EQ(0.0,theta[0].val_);
   EXPECT_FLOAT_EQ(0.0,theta[0].d_);
@@ -51,11 +51,11 @@ TEST(AgradFwdMatrixLogSoftmax,fd) {
   EXPECT_FLOAT_EQ(-1.6699361e-05, theta3[2].d_);
 }
 TEST(AgradFwdMatrixLogSoftmax,ffd) {
-  using stan::agrad::log_softmax;
+  using stan::math::log_softmax;
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::agrad::vector_ffd;
-  using stan::agrad::fvar;
+  using stan::math::vector_ffd;
+  using stan::math::fvar;
 
   EXPECT_THROW(softmax(vector_ffd()),std::invalid_argument);
   

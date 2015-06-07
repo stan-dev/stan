@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__FACTOR_COV_MATRIX_HPP
-#define STAN__MATH__PRIM__MAT__FUN__FACTOR_COV_MATRIX_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_FACTOR_COV_MATRIX_HPP
+#define STAN_MATH_PRIM_MAT_FUN_FACTOR_COV_MATRIX_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/factor_U.hpp>
@@ -8,7 +8,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * This function is intended to make starting values, given a

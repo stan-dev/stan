@@ -2,7 +2,7 @@
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
 
 TEST(AgradFwdOperatorMinusMinus, Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<double> x(0.5,1.0);
   x--;
@@ -17,7 +17,7 @@ TEST(AgradFwdOperatorMinusMinus, Fvar) {
   EXPECT_FLOAT_EQ(1.0, y.d_);
 }
 TEST(AgradFwdOperatorMinusMinus, FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<fvar<double> > x;
   x.val_.val_ = 0.5;

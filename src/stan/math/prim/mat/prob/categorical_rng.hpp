@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__PROB__CATEGORICAL_RNG_HPP
-#define STAN__MATH__PRIM__MAT__PROB__CATEGORICAL_RNG_HPP
+#ifndef STAN_MATH_PRIM_MAT_PROB_CATEGORICAL_RNG_HPP
+#define STAN_MATH_PRIM_MAT_PROB_CATEGORICAL_RNG_HPP
 
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -8,12 +8,12 @@
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/mat/fun/sum.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <class RNG>
     inline int
@@ -23,7 +23,7 @@ namespace stan {
       using boost::uniform_01;
       using stan::math::check_simplex;
 
-      static const char* function("stan::prob::categorical_rng");
+      static const char* function("stan::math::categorical_rng");
 
       check_simplex(function, "Probabilities parameter", theta);
 

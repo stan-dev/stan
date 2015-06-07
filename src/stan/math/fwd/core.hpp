@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__CORE_HPP
-#define STAN__MATH__FWD__CORE_HPP
+#ifndef STAN_MATH_FWD_CORE_HPP
+#define STAN_MATH_FWD_CORE_HPP
 
 #include <stan/math/fwd/core/fvar.hpp>
 #include <stan/math/fwd/core/operator_addition.hpp>

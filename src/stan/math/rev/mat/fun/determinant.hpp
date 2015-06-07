@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__MAT__FUN__DETERMINANT_HPP
-#define STAN__MATH__REV__MAT__FUN__DETERMINANT_HPP
+#ifndef STAN_MATH_REV_MAT_FUN_DETERMINANT_HPP
+#define STAN_MATH_REV_MAT_FUN_DETERMINANT_HPP
 
 #include <stan/math/prim/mat/err/check_square.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
@@ -9,7 +9,7 @@
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       template<int R, int C>
@@ -25,10 +25,10 @@ namespace stan {
             _rows(A.rows()),
             _cols(A.cols()),
             A_(reinterpret_cast<double*>
-               (stan::agrad::ChainableStack::memalloc_
+               (stan::math::ChainableStack::memalloc_
                 .alloc(sizeof(double) * A.rows() * A.cols()))),
             _adjARef(reinterpret_cast<vari**>
-                     (stan::agrad::ChainableStack::memalloc_
+                     (stan::math::ChainableStack::memalloc_
                       .alloc(sizeof(vari*) * A.rows() * A.cols()))) {
           size_t pos = 0;
           for (size_type j = 0; j < _cols; j++) {

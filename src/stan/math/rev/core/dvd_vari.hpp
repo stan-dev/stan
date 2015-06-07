@@ -1,10 +1,10 @@
-#ifndef STAN__MATH__REV__CORE__DVD_VARI_HPP
-#define STAN__MATH__REV__CORE__DVD_VARI_HPP
+#ifndef STAN_MATH_REV_CORE_DVD_VARI_HPP
+#define STAN_MATH_REV_CORE_DVD_VARI_HPP
 
 #include <stan/math/rev/core/vari.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     class op_dvd_vari : public vari {
     protected:

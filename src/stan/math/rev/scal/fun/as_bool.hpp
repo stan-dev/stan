@@ -1,10 +1,10 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__AS_BOOL_HPP
-#define STAN__MATH__REV__SCAL__FUN__AS_BOOL_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_AS_BOOL_HPP
+#define STAN_MATH_REV_SCAL_FUN_AS_BOOL_HPP
 
 #include <stan/math/rev/core.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Return 1 if the argument is unequal to zero and 0 otherwise.
@@ -12,7 +12,7 @@ namespace stan {
      * @param v Value.
      * @return 1 if argument is equal to zero (or NaN) and 0 otherwise.
      */
-    inline int as_bool(const agrad::var& v) {
+    inline int as_bool(const var& v) {
       return 0.0 != v.vi_->val_;
     }
 

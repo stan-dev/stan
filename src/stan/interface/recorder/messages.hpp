@@ -1,12 +1,12 @@
-#ifndef STAN__INTERFACE__RECORDER__MESSAGES_HPP
-#define STAN__INTERFACE__RECORDER__MESSAGES_HPP
+#ifndef STAN_INTERFACE_RECORDER_MESSAGES_HPP
+#define STAN_INTERFACE_RECORDER_MESSAGES_HPP
 
 #include <ostream>
 #include <stan/interface/recorder/recorder.hpp>
 
 namespace stan {
   namespace interface {
-    namespace recorder { 
+    namespace recorder {
       class messages: public recorder {
       private:
         std::ostream *o_;

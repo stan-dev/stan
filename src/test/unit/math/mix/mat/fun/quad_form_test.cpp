@@ -17,12 +17,12 @@
 #include <stan/math/fwd/scal/fun/value_of.hpp>
 #include <stan/math/rev/scal/fun/value_of.hpp>
 
-using stan::agrad::fvar;
-using stan::agrad::var;
+using stan::math::fvar;
+using stan::math::var;
 
 TEST(AgradMixMatrixQuadForm, quad_form_mat_fv_1st_deriv) {
   using stan::math::quad_form;
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
   
   matrix_fv ad(4,4);
   matrix_fv bd(4,2);
@@ -128,7 +128,7 @@ TEST(AgradMixMatrixQuadForm, quad_form_mat_fv_1st_deriv) {
 }
 TEST(AgradMixMatrixQuadForm, quad_form_mat_fv_2nd_deriv) {
   using stan::math::quad_form;
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
   
   matrix_fv ad(4,4);
   matrix_fv bd(4,2);
@@ -227,7 +227,7 @@ TEST(AgradMixMatrixQuadForm, quad_form_mat_fv_2nd_deriv) {
 
 TEST(AgradMixMatrixQuadForm, quad_form_sym_mat_fv_1st_deriv) {
   using stan::math::quad_form_sym;
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
   
   matrix_fv ad(4,4);
   matrix_fv bd(4,2);
@@ -334,7 +334,7 @@ TEST(AgradMixMatrixQuadForm, quad_form_sym_mat_fv_1st_deriv) {
 
 TEST(AgradMixMatrixQuadForm, quad_form_sym_mat_fv_2nd_deriv) {
   using stan::math::quad_form_sym;
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
   
   matrix_fv ad(4,4);
   matrix_fv bd(4,2);
@@ -431,8 +431,8 @@ TEST(AgradMixMatrixQuadForm, quad_form_sym_mat_fv_2nd_deriv) {
 }
 TEST(AgradMixMatrixQuadForm, quad_form_vec_fv_1st_deriv) {
   using stan::math::quad_form;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::vector_fv;
+  using stan::math::matrix_fv;
+  using stan::math::vector_fv;
 
   matrix_fv ad(4,4);
   vector_fv bd(4);
@@ -520,8 +520,8 @@ TEST(AgradMixMatrixQuadForm, quad_form_vec_fv_1st_deriv) {
 
 TEST(AgradMixMatrixQuadForm, quad_form_vec_fv_2nd_deriv) {
   using stan::math::quad_form;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::vector_fv;
+  using stan::math::matrix_fv;
+  using stan::math::vector_fv;
 
   matrix_fv ad(4,4);
   vector_fv bd(4);
@@ -605,8 +605,8 @@ TEST(AgradMixMatrixQuadForm, quad_form_vec_fv_2nd_deriv) {
 }
 TEST(AgradMixMatrixQuadForm, quad_form_sym_vec_fv_1st_deriv) {
   using stan::math::quad_form_sym;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::vector_fv;
+  using stan::math::matrix_fv;
+  using stan::math::vector_fv;
   
   matrix_fv ad(4,4);
   vector_fv bd(4);
@@ -692,8 +692,8 @@ TEST(AgradMixMatrixQuadForm, quad_form_sym_vec_fv_1st_deriv) {
 
 TEST(AgradMixMatrixQuadForm, quad_form_sym_vec_fv_2nd_deriv) {
   using stan::math::quad_form_sym;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::vector_fv;
+  using stan::math::matrix_fv;
+  using stan::math::vector_fv;
   
   matrix_fv ad(4,4);
   vector_fv bd(4);
@@ -776,7 +776,7 @@ TEST(AgradMixMatrixQuadForm, quad_form_sym_vec_fv_2nd_deriv) {
 }
 TEST(AgradMixMatrixQuadForm, quad_form_sym_symmetry_fv) {
   using stan::math::quad_form_sym;
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
   
   matrix_fv ad(4,4);
   matrix_fv bd(4,2);
@@ -850,7 +850,7 @@ TEST(AgradMixMatrixQuadForm, quad_form_sym_symmetry_fv) {
 
 TEST(AgradMixMatrixQuadForm, quad_form_sym_asymmetric_fv) {
   using stan::math::quad_form_sym;
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
   
   matrix_fv ad(4,4);
   matrix_fv bd(4,2);
@@ -897,7 +897,7 @@ TEST(AgradMixMatrixQuadForm, quad_form_sym_asymmetric_fv) {
 
 TEST(AgradMixMatrixQuadForm, quad_form_mat_ffv_1st_deriv) {
   using stan::math::quad_form;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   
   matrix_ffv ad(4,4);
   matrix_ffv bd(4,2);
@@ -1003,7 +1003,7 @@ TEST(AgradMixMatrixQuadForm, quad_form_mat_ffv_1st_deriv) {
 }
 TEST(AgradMixMatrixQuadForm, quad_form_mat_ffv_2nd_deriv) {
   using stan::math::quad_form;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   
   matrix_ffv ad(4,4);
   matrix_ffv bd(4,2);
@@ -1102,7 +1102,7 @@ TEST(AgradMixMatrixQuadForm, quad_form_mat_ffv_2nd_deriv) {
 
 TEST(AgradMixMatrixQuadForm, quad_form_mat_ffv_3rd_deriv) {
   using stan::math::quad_form;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   
   matrix_ffv ad(4,4);
   matrix_ffv bd(4,2);
@@ -1224,7 +1224,7 @@ TEST(AgradMixMatrixQuadForm, quad_form_mat_ffv_3rd_deriv) {
 }
 TEST(AgradMixMatrixQuadForm, quad_form_sym_mat_ffv_1st_deriv) {
   using stan::math::quad_form_sym;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   
   matrix_ffv ad(4,4);
   matrix_ffv bd(4,2);
@@ -1331,7 +1331,7 @@ TEST(AgradMixMatrixQuadForm, quad_form_sym_mat_ffv_1st_deriv) {
 
 TEST(AgradMixMatrixQuadForm, quad_form_sym_mat_ffv_2nd_deriv) {
   using stan::math::quad_form_sym;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   
   matrix_ffv ad(4,4);
   matrix_ffv bd(4,2);
@@ -1430,7 +1430,7 @@ TEST(AgradMixMatrixQuadForm, quad_form_sym_mat_ffv_2nd_deriv) {
 
 TEST(AgradMixMatrixQuadForm, quad_form_sym_mat_ffv_3rd_deriv) {
   using stan::math::quad_form_sym;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   
   matrix_ffv ad(4,4);
   matrix_ffv bd(4,2);
@@ -1551,8 +1551,8 @@ TEST(AgradMixMatrixQuadForm, quad_form_sym_mat_ffv_3rd_deriv) {
 }
 TEST(AgradMixMatrixQuadForm, quad_form_vec_ffv_1st_deriv) {
   using stan::math::quad_form;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::vector_ffv;
 
   matrix_ffv ad(4,4);
   vector_ffv bd(4);
@@ -1640,8 +1640,8 @@ TEST(AgradMixMatrixQuadForm, quad_form_vec_ffv_1st_deriv) {
 
 TEST(AgradMixMatrixQuadForm, quad_form_vec_ffv_2nd_deriv) {
   using stan::math::quad_form;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::vector_ffv;
 
   matrix_ffv ad(4,4);
   vector_ffv bd(4);
@@ -1725,8 +1725,8 @@ TEST(AgradMixMatrixQuadForm, quad_form_vec_ffv_2nd_deriv) {
 }
 TEST(AgradMixMatrixQuadForm, quad_form_vec_ffv_3rd_deriv) {
   using stan::math::quad_form;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::vector_ffv;
 
   matrix_ffv ad(4,4);
   vector_ffv bd(4);
@@ -1830,8 +1830,8 @@ TEST(AgradMixMatrixQuadForm, quad_form_vec_ffv_3rd_deriv) {
 }
 TEST(AgradMixMatrixQuadForm, quad_form_sym_vec_ffv_1st_deriv) {
   using stan::math::quad_form_sym;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::vector_ffv;
   
   matrix_ffv ad(4,4);
   vector_ffv bd(4);
@@ -1917,8 +1917,8 @@ TEST(AgradMixMatrixQuadForm, quad_form_sym_vec_ffv_1st_deriv) {
 
 TEST(AgradMixMatrixQuadForm, quad_form_sym_vec_ffv_2nd_deriv) {
   using stan::math::quad_form_sym;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::vector_ffv;
   
   matrix_ffv ad(4,4);
   vector_ffv bd(4);
@@ -2001,8 +2001,8 @@ TEST(AgradMixMatrixQuadForm, quad_form_sym_vec_ffv_2nd_deriv) {
 }
 TEST(AgradMixMatrixQuadForm, quad_form_sym_vec_ffv_3rd_deriv) {
   using stan::math::quad_form_sym;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::vector_ffv;
   
   matrix_ffv ad(4,4);
   vector_ffv bd(4);
@@ -2105,7 +2105,7 @@ TEST(AgradMixMatrixQuadForm, quad_form_sym_vec_ffv_3rd_deriv) {
 }
 TEST(AgradMixMatrixQuadForm, quad_form_sym_symmetry_ffv) {
   using stan::math::quad_form_sym;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   
   matrix_ffv ad(4,4);
   matrix_ffv bd(4,2);
@@ -2179,7 +2179,7 @@ TEST(AgradMixMatrixQuadForm, quad_form_sym_symmetry_ffv) {
 
 TEST(AgradMixMatrixQuadForm, quad_form_sym_asymmetric_ffv) {
   using stan::math::quad_form_sym;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   
   matrix_ffv ad(4,4);
   matrix_ffv bd(4,2);

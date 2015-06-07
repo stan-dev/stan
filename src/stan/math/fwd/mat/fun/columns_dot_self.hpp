@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__MAT__FUN__COLUMNS_DOT_SELF_HPP
-#define STAN__MATH__FWD__MAT__FUN__COLUMNS_DOT_SELF_HPP
+#ifndef STAN_MATH_FWD_MAT_FUN_COLUMNS_DOT_SELF_HPP
+#define STAN_MATH_FWD_MAT_FUN_COLUMNS_DOT_SELF_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/typedefs.hpp>
@@ -8,7 +8,7 @@
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     template<typename T, int R, int C>
     inline Eigen::Matrix<fvar<T>, 1, C>

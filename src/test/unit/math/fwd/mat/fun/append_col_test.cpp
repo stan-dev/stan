@@ -5,7 +5,7 @@
 
 TEST(AgradFwdMatrixAppendCol,fd) {
   using stan::math::append_col;
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
   using Eigen::MatrixXd;
 
   matrix_fd a(2,2);
@@ -40,7 +40,7 @@ TEST(AgradFwdMatrixAppendCol,fd) {
 
 TEST(AgradFwdRowVectorAppendCol,fd) {
   using stan::math::append_col;
-  using stan::agrad::row_vector_fd;
+  using stan::math::row_vector_fd;
   using Eigen::RowVectorXd;
 
   row_vector_fd a(4);
@@ -70,7 +70,7 @@ TEST(AgradFwdRowVectorAppendCol,fd) {
 
 TEST(AgradFwdMatrixAppendCol,ffd) {
   using stan::math::append_col;
-  using stan::agrad::matrix_ffd;
+  using stan::math::matrix_ffd;
   using Eigen::MatrixXd;
 
   matrix_ffd a(2,2);
@@ -105,7 +105,7 @@ TEST(AgradFwdMatrixAppendCol,ffd) {
 
 TEST(AgradFwdRowVectorAppendCol,ffd) {
   using stan::math::append_col;
-  using stan::agrad::row_vector_ffd;
+  using stan::math::row_vector_ffd;
   using Eigen::RowVectorXd;
 
   row_vector_ffd a(4);

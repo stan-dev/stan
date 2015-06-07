@@ -1,11 +1,11 @@
-#ifndef STAN__MATH__FWD__CORE__OPERATOR_ADDITION_HPP
-#define STAN__MATH__FWD__CORE__OPERATOR_ADDITION_HPP
+#ifndef STAN_MATH_FWD_CORE_OPERATOR_ADDITION_HPP
+#define STAN_MATH_FWD_CORE_OPERATOR_ADDITION_HPP
 
 #include <stan/math/fwd/core/fvar.hpp>
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     template <typename T>
     inline

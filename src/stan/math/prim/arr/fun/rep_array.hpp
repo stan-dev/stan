@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__ARR__FUN__REP_ARRAY_HPP
-#define STAN__MATH__PRIM__ARR__FUN__REP_ARRAY_HPP
+#ifndef STAN_MATH_PRIM_ARR_FUN_REP_ARRAY_HPP
+#define STAN_MATH_PRIM_ARR_FUN_REP_ARRAY_HPP
 
 #include <stan/math/prim/scal/err/check_nonnegative.hpp>
 #include <vector>

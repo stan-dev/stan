@@ -1,8 +1,9 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__CORR_MATRIX_FREE_HPP
-#define STAN__MATH__PRIM__MAT__FUN__CORR_MATRIX_FREE_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_CORR_MATRIX_FREE_HPP
+#define STAN_MATH_PRIM_MAT_FUN_CORR_MATRIX_FREE_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>
+#include <stan/math/prim/mat/err/constraint_tolerance.hpp>
 #include <boost/throw_exception.hpp>
 #include <cmath>
 #include <sstream>
@@ -10,9 +11,7 @@
 
 namespace stan {
 
-  namespace prob {
-
-    const double CONSTRAINT_TOLERANCE = 1E-8;
+  namespace math {
 
     /**
      * Return the vector of unconstrained partial correlations that

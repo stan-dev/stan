@@ -1,5 +1,5 @@
-#ifndef STAN__MCMC__COVAR__ADAPTATION__BETA
-#define STAN__MCMC__COVAR__ADAPTATION__BETA
+#ifndef STAN_MCMC_COVAR_ADAPTATION_HPP
+#define STAN_MCMC_COVAR_ADAPTATION_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/mcmc/windowed_adaptation.hpp>
@@ -40,7 +40,7 @@ namespace stan {
       }
 
     protected:
-      prob::welford_covar_estimator estimator_;
+      stan::math::welford_covar_estimator estimator_;
     };
 
   }  // mcmc

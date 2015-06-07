@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__CORE__VARI_HPP
-#define STAN__MATH__REV__CORE__VARI_HPP
+#ifndef STAN_MATH_REV_CORE_VARI_HPP
+#define STAN_MATH_REV_CORE_VARI_HPP
 
 #include <stan/math/rev/core/chainable.hpp>
 #include <stan/math/rev/core/chainable_alloc.hpp>
@@ -7,7 +7,7 @@
 #include <ostream>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     // forward declaration of var
     class var;
@@ -71,7 +71,7 @@ namespace stan {
       /**
        * Throw an illegal argument exception.
        *
-       * <i>Warning</i>: Destructors should never called for agrad objects.
+       * <i>Warning</i>: Destructors should never called for var objects.
        *
        * @throw Logic exception always.
        */

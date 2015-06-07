@@ -3,14 +3,14 @@
 #include <stan/math/fwd/core.hpp>
 #include <gtest/gtest.h>
 
-using stan::agrad::fvar;
+using stan::math::fvar;
 
 TEST(AgradFwdMatrixDims, matrix_fd) {
   using std::vector;
   using Eigen::Matrix;
   using Eigen::Dynamic;
   using stan::math::dims;
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
 
   fvar<double> x1;
   vector<int> dims1 = dims(x1);
@@ -61,7 +61,7 @@ TEST(AgradFwdMatrixDims, matrix_ffd) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
   using stan::math::dims;
-  using stan::agrad::matrix_ffd;
+  using stan::math::matrix_ffd;
 
   fvar<fvar<double> > x1;
   vector<int> dims1 = dims(x1);

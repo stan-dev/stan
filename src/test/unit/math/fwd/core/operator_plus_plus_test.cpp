@@ -2,7 +2,7 @@
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
 
 TEST(AgradFwdOperatorPlusPlus, Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<double> x(0.5,1.0);
   x++;
@@ -18,7 +18,7 @@ TEST(AgradFwdOperatorPlusPlus, Fvar) {
 }
 
 TEST(AgradFwdOperatorPlusPlus, FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<fvar<double> > x;
   x.val_.val_ = 0.5;

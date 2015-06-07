@@ -6,8 +6,8 @@
 #include <stan/math/prim/scal/fun/is_nan.hpp>
 
 TEST(normal_ccdf_log, tail) {
-   using stan::agrad::var;
-   using stan::prob::normal_ccdf_log;
+   using stan::math::var;
+   using stan::math::normal_ccdf_log;
    using std::exp;
 
    EXPECT_FLOAT_EQ(1, -6.661338147750941214694e-16/(normal_ccdf_log(var(-8.0),0,1).val()));
@@ -42,14 +42,14 @@ TEST(normal_ccdf_log, tail) {
    EXPECT_FLOAT_EQ(1, -20.73676889383495947072/(normal_ccdf_log(var(6.0),0,1).val()));
    EXPECT_FLOAT_EQ(1, -23.93814997800869548428/(normal_ccdf_log(var(6.5),0,1).val()));
 
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 void test_value_and_derivatives(double expected_val,
                                 double y_dbl, double mu_dbl, double sigma_dbl) {
   using stan::math::is_nan;
-  using stan::agrad::var;  
-  using stan::prob::normal_ccdf_log;
+  using stan::math::var;  
+  using stan::math::normal_ccdf_log;
   std::stringstream msg_ss;
   msg_ss << "parameters: (" << y_dbl << ", " << mu_dbl << ", " << sigma_dbl << ")";
   std::string msg = msg_ss.str();

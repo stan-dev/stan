@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__MCMC__SAMPLE_HPP
-#define STAN__SERVICES__MCMC__SAMPLE_HPP
+#ifndef STAN_SERVICES_MCMC_SAMPLE_HPP
+#define STAN_SERVICES_MCMC_SAMPLE_HPP
 
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/io/mcmc_writer.hpp>
@@ -8,7 +8,7 @@
 namespace stan {
   namespace services {
     namespace mcmc {
-    
+
       template <class Model, class RNG, class StartTransitionCallback,
                 class SampleRecorder, class DiagnosticRecorder, class MessageRecorder>
       void sample(stan::mcmc::base_mcmc* sampler,
@@ -26,9 +26,9 @@ namespace stan {
                   const std::string& suffix,
                   std::ostream& o,
                   StartTransitionCallback& callback) {
-        run_markov_chain<Model, RNG, StartTransitionCallback, 
+        run_markov_chain<Model, RNG, StartTransitionCallback,
                          SampleRecorder, DiagnosticRecorder, MessageRecorder>
-          (sampler, num_samples, num_warmup, 
+          (sampler, num_samples, num_warmup,
            num_warmup + num_samples, num_thin,
            refresh, save, false,
            writer,
@@ -36,7 +36,7 @@ namespace stan {
            prefix, suffix, o,
            callback);
       }
-      
+
     }
   }
 }

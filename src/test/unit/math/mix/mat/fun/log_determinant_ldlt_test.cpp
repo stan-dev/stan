@@ -12,9 +12,9 @@
 #include <stan/math/rev/scal/fun/log.hpp>
 
 TEST(AgradMixMatrixLogDeterminantLDLT,fv_1stDeriv) {
-  using stan::agrad::matrix_fv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::matrix_fv;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::log_determinant_ldlt;
   
   fvar<var> a(3.0,1.0);
@@ -42,9 +42,9 @@ TEST(AgradMixMatrixLogDeterminantLDLT,fv_1stDeriv) {
   EXPECT_FLOAT_EQ(0.25,h[3]);
 }
 TEST(AgradMixMatrixLogDeterminantLDLT,fv_2ndDeriv) {
-  using stan::agrad::matrix_fv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::matrix_fv;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::log_determinant_ldlt;
   
   fvar<var> a(3.0,1.0);
@@ -69,9 +69,9 @@ TEST(AgradMixMatrixLogDeterminantLDLT,fv_2ndDeriv) {
   EXPECT_FLOAT_EQ(-0.125,h[3]);
 }
 TEST(AgradMixMatrixLogDeterminantLDLT,ffv_1stDeriv) {
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::matrix_ffv;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::log_determinant_ldlt;
   
   fvar<fvar<var> > a(3.0,1.0);
@@ -99,9 +99,9 @@ TEST(AgradMixMatrixLogDeterminantLDLT,ffv_1stDeriv) {
   EXPECT_FLOAT_EQ(0.25,h[3]);
 }
 TEST(AgradMixMatrixLogDeterminantLDLT,ffv_2ndDeriv_1) {
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::matrix_ffv;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::log_determinant_ldlt;
   
   fvar<fvar<var> > a(3.0,1.0);
@@ -130,9 +130,9 @@ TEST(AgradMixMatrixLogDeterminantLDLT,ffv_2ndDeriv_1) {
   EXPECT_FLOAT_EQ(-0.0625,h[3]);
 }
 TEST(AgradMixMatrixLogDeterminantLDLT,ffv_2ndDeriv_2) {
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::matrix_ffv;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::log_determinant_ldlt;
   
   fvar<fvar<var> > a(3.0,1.0);
@@ -157,9 +157,9 @@ TEST(AgradMixMatrixLogDeterminantLDLT,ffv_2ndDeriv_2) {
   EXPECT_FLOAT_EQ(-.125,h[3]);
 }
 TEST(AgradMixMatrixLogDeterminantLDLT,ffv_3rdDeriv) {
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::matrix_ffv;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::log_determinant_ldlt;
   
   fvar<fvar<var> > a(3.0,1.0);

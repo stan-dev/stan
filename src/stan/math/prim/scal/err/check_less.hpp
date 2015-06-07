@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__ERR__CHECK_LESS_HPP
-#define STAN__MATH__PRIM__SCAL__ERR__CHECK_LESS_HPP
+#ifndef STAN_MATH_PRIM_SCAL_ERR_CHECK_LESS_HPP
+#define STAN_MATH_PRIM_SCAL_ERR_CHECK_LESS_HPP
 
 #include <stan/math/prim/scal/err/domain_error.hpp>
 #include <stan/math/prim/scal/err/domain_error_vec.hpp>

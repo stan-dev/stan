@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__TRIGAMMA_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__TRIGAMMA_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_TRIGAMMA_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_TRIGAMMA_HPP
 
   // Reference:
   //   BE Schneider,
@@ -9,6 +9,7 @@
   //   Volume 27, Number 1, pages 97-99, 1978.
 
 #include <stan/math/prim/scal/fun/constants.hpp>
+#include <cmath>
 
 namespace stan {
 

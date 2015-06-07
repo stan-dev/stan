@@ -1,12 +1,12 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__INV_SQUARE_HPP
-#define STAN__MATH__REV__SCAL__FUN__INV_SQUARE_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_INV_SQUARE_HPP
+#define STAN_MATH_REV_SCAL_FUN_INV_SQUARE_HPP
 
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/inv_square.hpp>
 #include <valarray>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class inv_square_vari : public op_v_vari {

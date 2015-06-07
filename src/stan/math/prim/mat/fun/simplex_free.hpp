@@ -1,14 +1,15 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__SIMPLEX_FREE_HPP
-#define STAN__MATH__PRIM__MAT__FUN__SIMPLEX_FREE_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_SIMPLEX_FREE_HPP
+#define STAN_MATH_PRIM_MAT_FUN_SIMPLEX_FREE_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/err/check_simplex.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>
 #include <stan/math/prim/scal/fun/logit.hpp>
+#include <cmath>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * Return an unconstrained vector that when transformed produces
@@ -31,10 +32,11 @@ namespace stan {
       using Eigen::Matrix;
       using stan::math::index_type;
       using stan::math::logit;
+      using std::log;
 
       typedef typename index_type<Matrix<T, Dynamic, 1> >::type size_type;
 
-      stan::math::check_simplex("stan::prob::simplex_free",
+      stan::math::check_simplex("stan::math::simplex_free",
                                 "Simplex variable", x);
       int Km1 = x.size() - 1;
       Eigen::Matrix<T, Eigen::Dynamic, 1> y(Km1);

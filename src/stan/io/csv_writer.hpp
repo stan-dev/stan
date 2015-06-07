@@ -1,5 +1,5 @@
-#ifndef STAN__IO__CSV_WRITER_HPP
-#define STAN__IO__CSV_WRITER_HPP
+#ifndef STAN_IO_CSV_WRITER_HPP
+#define STAN_IO_CSV_WRITER_HPP
 
 #include <stan/math/prim/scal/meta/index_type.hpp>
 #include <stan/math/prim/arr/meta/index_type.hpp>

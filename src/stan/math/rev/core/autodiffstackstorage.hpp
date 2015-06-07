@@ -1,11 +1,11 @@
-#ifndef STAN__MATH__REV__CORE__AUTODIFFSTACKSTORAGE_HPP
-#define STAN__MATH__REV__CORE__AUTODIFFSTACKSTORAGE_HPP
+#ifndef STAN_MATH_REV_CORE_AUTODIFFSTACKSTORAGE_HPP
+#define STAN_MATH_REV_CORE_AUTODIFFSTACKSTORAGE_HPP
 
 #include <stan/memory/stack_alloc.hpp>
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     template<typename ChainableT,
              typename ChainableAllocT>

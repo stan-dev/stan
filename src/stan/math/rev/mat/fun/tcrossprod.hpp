@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__MAT__FUN__TCROSSPROD_HPP
-#define STAN__MATH__REV__MAT__FUN__TCROSSPROD_HPP
+#ifndef STAN_MATH_REV_MAT_FUN_TCROSSPROD_HPP
+#define STAN_MATH_REV_MAT_FUN_TCROSSPROD_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/typedefs.hpp>
@@ -13,7 +13,7 @@
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Returns the result of post-multiplying a matrix by its

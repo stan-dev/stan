@@ -8,8 +8,8 @@
 
 
 TEST(AgradFwdMultiplyLog,FvarVar_FvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::log;
   using stan::math::multiply_log;
 
@@ -27,8 +27,8 @@ TEST(AgradFwdMultiplyLog,FvarVar_FvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(1.5 / 1.8, g[1]);
 }
 TEST(AgradFwdMultiplyLog,FvarVar_Double_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::log;
   using stan::math::multiply_log;
 
@@ -45,8 +45,8 @@ TEST(AgradFwdMultiplyLog,FvarVar_Double_1stDeriv) {
   EXPECT_FLOAT_EQ(log(1.8), g[0]);
 }
 TEST(AgradFwdMultiplyLog,Double_FvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::log;
   using stan::math::multiply_log;
 
@@ -63,8 +63,8 @@ TEST(AgradFwdMultiplyLog,Double_FvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(1.5 / 1.8, g[0]);
 }
 TEST(AgradFwdMultiplyLog,FvarVar_FvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::log;
   using stan::math::multiply_log;
 
@@ -79,8 +79,8 @@ TEST(AgradFwdMultiplyLog,FvarVar_FvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(1.3 / 1.8 - 1.5 * 1.1 / 1.8 / 1.8, g[1]);
 }
 TEST(AgradFwdMultiplyLog,FvarVar_Double_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::log;
   using stan::math::multiply_log;
 
@@ -94,8 +94,8 @@ TEST(AgradFwdMultiplyLog,FvarVar_Double_2ndDeriv) {
   EXPECT_FLOAT_EQ(0, g[0]);
 }
 TEST(AgradFwdMultiplyLog,Double_FvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::log;
   using stan::math::multiply_log;
 
@@ -110,8 +110,8 @@ TEST(AgradFwdMultiplyLog,Double_FvarVar_2ndDeriv) {
 }
 
 TEST(AgradFwdMultiplyLog,FvarFvarVar_FvarFvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::log;
   using stan::math::multiply_log;
 
@@ -137,8 +137,8 @@ TEST(AgradFwdMultiplyLog,FvarFvarVar_FvarFvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(1.5 / 1.8, g[1]);
 }
 TEST(AgradFwdMultiplyLog,FvarFvarVar_Double_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::log;
   using stan::math::multiply_log;
 
@@ -160,8 +160,8 @@ TEST(AgradFwdMultiplyLog,FvarFvarVar_Double_1stDeriv) {
   EXPECT_FLOAT_EQ(log(1.8), g[0]);
 }
 TEST(AgradFwdMultiplyLog,Double_FvarFvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::log;
   using stan::math::multiply_log;
 
@@ -183,8 +183,8 @@ TEST(AgradFwdMultiplyLog,Double_FvarFvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(1.5 / 1.8, g[0]);
 }
 TEST(AgradFwdMultiplyLog,FvarFvarVar_FvarFvarVar_2ndDeriv_x) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::log;
   using stan::math::multiply_log;
 
@@ -210,8 +210,8 @@ TEST(AgradFwdMultiplyLog,FvarFvarVar_FvarFvarVar_2ndDeriv_x) {
   EXPECT_FLOAT_EQ(1.3 / 1.8, g[1]);
 }
 TEST(AgradFwdMultiplyLog,FvarFvarVar_FvarFvarVar_2ndDeriv_y) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::log;
   using stan::math::multiply_log;
 
@@ -237,8 +237,8 @@ TEST(AgradFwdMultiplyLog,FvarFvarVar_FvarFvarVar_2ndDeriv_y) {
   EXPECT_FLOAT_EQ(1.5 * -1.1 / 1.8 / 1.8, g[1]);
 }
 TEST(AgradFwdMultiplyLog,FvarFvarVar_Double_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::log;
   using stan::math::multiply_log;
 
@@ -260,8 +260,8 @@ TEST(AgradFwdMultiplyLog,FvarFvarVar_Double_2ndDeriv) {
   EXPECT_FLOAT_EQ(0, g[0]);
 }
 TEST(AgradFwdMultiplyLog,Double_FvarFvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::log;
   using stan::math::multiply_log;
 
@@ -278,8 +278,8 @@ TEST(AgradFwdMultiplyLog,Double_FvarFvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(-1.5 / 1.8 / 1.8 * 1.1, g[0]);
 }
 TEST(AgradFwdMultiplyLog,FvarFvarVar_FvarFvarVar_3rdDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::log;
   using stan::math::multiply_log;
 
@@ -300,8 +300,8 @@ TEST(AgradFwdMultiplyLog,FvarFvarVar_FvarFvarVar_3rdDeriv) {
   EXPECT_FLOAT_EQ(-0.44135803, g[1]);
 }
 TEST(AgradFwdMultiplyLog,FvarFvarVar_Double_3rdDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::log;
   using stan::math::multiply_log;
 
@@ -319,8 +319,8 @@ TEST(AgradFwdMultiplyLog,FvarFvarVar_Double_3rdDeriv) {
   EXPECT_FLOAT_EQ(0, g[0]);
 }
 TEST(AgradFwdMultiplyLog,Double_FvarFvarVar_3rdDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::log;
   using stan::math::multiply_log;
 

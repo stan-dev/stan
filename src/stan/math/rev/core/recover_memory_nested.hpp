@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__CORE__RECOVER_MEMORY_NESTED_HPP
-#define STAN__MATH__REV__CORE__RECOVER_MEMORY_NESTED_HPP
+#ifndef STAN_MATH_REV_CORE_RECOVER_MEMORY_NESTED_HPP
+#define STAN_MATH_REV_CORE_RECOVER_MEMORY_NESTED_HPP
 
 #include <stan/math/rev/core/chainable.hpp>
 #include <stan/math/rev/core/chainable_alloc.hpp>
@@ -8,7 +8,7 @@
 #include <stdexcept>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Recover only the memory used for the top nested call.  If there

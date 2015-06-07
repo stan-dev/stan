@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <stan/math/fwd/core.hpp>
 
-using stan::agrad::fvar;
+using stan::math::fvar;
 
 TEST(AgradFwdMatrixArrayBuilder,fvar_double) {
   using std::vector;

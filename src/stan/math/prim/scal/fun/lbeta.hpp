@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__LBETA_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__LBETA_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_LBETA_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_LBETA_HPP
 
 #include <boost/math/tools/promotion.hpp>
 
@@ -20,7 +20,7 @@ namespace stan {
      *
      * \f$\log \mbox{B}(a, b) = \log \Gamma(a) + \log \Gamma(b) - \log \Gamma(a+b)\f$.
      *
-     * See boost::math::lgamma() for the double-based and stan::agrad for the
+     * See boost::math::lgamma() for the double-based and stan::math for the
      * variable-based log Gamma function.
      *
      *

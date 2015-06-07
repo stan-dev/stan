@@ -1,5 +1,5 @@
-#ifndef STAN__MCMC__ADAPT__DIAG__E__STATIC__HMC__BETA
-#define STAN__MCMC__ADAPT__DIAG__E__STATIC__HMC__BETA
+#ifndef STAN_MCMC_HMC_STATIC_ADAPT_DIAG_E_STATIC_HMC_HPP
+#define STAN_MCMC_HMC_STATIC_ADAPT_DIAG_E_STATIC_HMC_HPP
 
 #include <stan/mcmc/stepsize_var_adapter.hpp>
 #include <stan/mcmc/hmc/static/diag_e_static_hmc.hpp>

@@ -1,11 +1,11 @@
-#ifndef STAN__MATH__REV__CORE__CHAINABLE_HPP
-#define STAN__MATH__REV__CORE__CHAINABLE_HPP
+#ifndef STAN_MATH_REV_CORE_CHAINABLE_HPP
+#define STAN_MATH_REV_CORE_CHAINABLE_HPP
 
 #include <stan/math/rev/core/chainablestack.hpp>
 #include <cstddef>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Abstract base class for variable implementations that handles

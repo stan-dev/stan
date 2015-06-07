@@ -4,7 +4,7 @@
 #include <stan/math/fwd/scal/fun/ceil.hpp>
 
 TEST(AgradFwdCeil,Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using std::ceil;
 
   fvar<double> x(0.5,1.0);
@@ -25,7 +25,7 @@ TEST(AgradFwdCeil,Fvar) {
 
 
 TEST(AgradFwdCeil,FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using std::ceil;
 
   fvar<fvar<double> > x;

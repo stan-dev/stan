@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__ARR__FUN__LOG_SUM_EXP_HPP
-#define STAN__MATH__REV__ARR__FUN__LOG_SUM_EXP_HPP
+#ifndef STAN_MATH_REV_ARR_FUN_LOG_SUM_EXP_HPP
+#define STAN_MATH_REV_ARR_FUN_LOG_SUM_EXP_HPP
 
 #include <stan/math/rev/core.hpp>
 #include <stan/math/rev/scal/fun/calculate_chain.hpp>
@@ -8,7 +8,7 @@
 #include <limits>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       double log_sum_exp_as_double(const std::vector<var>& x) {

@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__MAT__FUN__TRACE_GEN_QUAD_FORM_HPP
-#define STAN__MATH__REV__MAT__FUN__TRACE_GEN_QUAD_FORM_HPP
+#ifndef STAN_MATH_REV_MAT_FUN_TRACE_GEN_QUAD_FORM_HPP
+#define STAN_MATH_REV_MAT_FUN_TRACE_GEN_QUAD_FORM_HPP
 
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits.hpp>
@@ -14,7 +14,7 @@
 #include <stan/math/prim/mat/err/check_square.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
     namespace {
       template <typename TD, int RD, int CD,
                 typename TA, int RA, int CA,

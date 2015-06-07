@@ -1,16 +1,16 @@
-#ifndef STAN__SERVICES__ARGUMENTS__TEST__GRAD__EPS__HPP
-#define STAN__SERVICES__ARGUMENTS__TEST__GRAD__EPS__HPP
+#ifndef STAN_SERVICES_ARGUMENTS_ARG_TEST_GRAD_EPS_HPP
+#define STAN_SERVICES_ARGUMENTS_ARG_TEST_GRAD_EPS_HPP
 
 #include <stan/services/arguments/singleton_argument.hpp>
 
 namespace stan {
-  
+
   namespace services {
-    
+
     class arg_test_grad_eps: public real_argument {
-      
+
     public:
-      
+
       arg_test_grad_eps(): real_argument() {
         _name = "epsilon";
         _description = "Finite difference step size";
@@ -22,13 +22,13 @@ namespace stan {
         _bad_value = -1.0;
         _value = _default_value;
       };
-      
+
       bool is_valid(double value) { return value > 0; }
 
     };
-    
+
   } // services
-  
+
 } // stan
 
 #endif

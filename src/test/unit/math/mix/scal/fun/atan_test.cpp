@@ -8,7 +8,7 @@
 
 class AgradFwdAtan : public testing::Test {
   void SetUp() {
-    stan::agrad::recover_memory();
+    stan::math::recover_memory();
   }
 };
 
@@ -16,8 +16,8 @@ class AgradFwdAtan : public testing::Test {
 
 
 TEST_F(AgradFwdAtan,FvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::atan;
 
   fvar<var> x(1.5,1.3);
@@ -33,8 +33,8 @@ TEST_F(AgradFwdAtan,FvarVar_1stDeriv) {
 }
 
 TEST_F(AgradFwdAtan,FvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::atan;
 
   fvar<var> x(1.5,1.3);
@@ -52,8 +52,8 @@ TEST_F(AgradFwdAtan,FvarVar_2ndDeriv) {
 
 
 TEST_F(AgradFwdAtan,FvarFvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::atan;
 
   fvar<fvar<var> > x;
@@ -71,7 +71,7 @@ TEST_F(AgradFwdAtan,FvarFvarVar_1stDeriv) {
   VEC g;
   a.val_.val_.grad(p,g);
 
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
   EXPECT_FLOAT_EQ(1.0 / (1.0 + 1.5 * 1.5), g[0]);
 
   fvar<fvar<var> > y;
@@ -91,8 +91,8 @@ TEST_F(AgradFwdAtan,FvarFvarVar_1stDeriv) {
 }
 
 TEST_F(AgradFwdAtan,FvarFvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::atan;
 
   fvar<fvar<var> > x;
@@ -118,8 +118,8 @@ TEST_F(AgradFwdAtan,FvarFvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(2.0 * -0.28402368, r[0]);
 }
 TEST_F(AgradFwdAtan,FvarFvarVar_3rdDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::atan;
 
   fvar<fvar<var> > x;

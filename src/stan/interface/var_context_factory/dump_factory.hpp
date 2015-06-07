@@ -1,9 +1,9 @@
-#ifndef STAN__INTERFACE__VAR_CONTEXT_FACTORY__DUMP_FACTORY_HPP
-#define STAN__INTERFACE__VAR_CONTEXT_FACTORY__DUMP_FACTORY_HPP
+#ifndef STAN_INTERFACE_VAR_CONTEXT_FACTORY_DUMP_FACTORY_HPP
+#define STAN_INTERFACE_VAR_CONTEXT_FACTORY_DUMP_FACTORY_HPP
 
-#include <fstream>
+#include <stan/interface/var_context_factory/var_context_factory.hpp>
 #include <stan/io/dump.hpp>
-#include <stan/interface/var_context_factory.hpp>
+#include <fstream>
 
 namespace stan {
   namespace interface {
@@ -15,7 +15,7 @@ namespace stan {
         stan::io::dump operator()(const std::string source) {
           std::fstream source_stream(source.c_str(),
                                      std::fstream::in);
-          
+
           if (source_stream.fail()) {
             std::string message("dump_factory Error: the file " + source + " does not exist.");
             throw std::runtime_error(message);
@@ -27,7 +27,7 @@ namespace stan {
           return dump;
         }
       };
-      
+
     }
   }
 }

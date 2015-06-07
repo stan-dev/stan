@@ -1,5 +1,5 @@
-#ifndef STAN__INTERFACE__VAR_CONTEXT_FACTORY__VAR_CONTEXT_FACTORY_HPP
-#define STAN__INTERFACE__VAR_CONTEXT_FACTORY__VAR_CONTEXT_FACTORY_HPP
+#ifndef STAN_INTERFACE_VAR_CONTEXT_FACTORY_VAR_CONTEXT_FACTORY_HPP
+#define STAN_INTERFACE_VAR_CONTEXT_FACTORY_VAR_CONTEXT_FACTORY_HPP
 
 #include <string>
 
@@ -14,7 +14,7 @@ namespace stan {
         virtual VARCON operator()(const std::string source) = 0;
         typedef VARCON var_context_t;
       };
-      
+
     }
   }
 }

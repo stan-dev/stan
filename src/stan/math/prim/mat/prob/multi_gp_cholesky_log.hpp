@@ -1,10 +1,10 @@
-#ifndef STAN__MATH__PRIM__MAT__PROB__MULTI_GP_CHOLESKY_LOG_HPP
-#define STAN__MATH__PRIM__MAT__PROB__MULTI_GP_CHOLESKY_LOG_HPP
+#ifndef STAN_MATH_PRIM_MAT_PROB_MULTI_GP_CHOLESKY_LOG_HPP
+#define STAN_MATH_PRIM_MAT_PROB_MULTI_GP_CHOLESKY_LOG_HPP
 
 #include <stan/math/prim/scal/err/check_size_match.hpp>
 #include <stan/math/prim/scal/err/check_finite.hpp>
 #include <stan/math/prim/scal/err/check_positive.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 
 #include <stan/math/prim/mat/fun/dot_self.hpp>
@@ -15,7 +15,7 @@
 #include <stan/math/prim/mat/fun/sum.hpp>
 
 namespace stan {
-  namespace prob {
+  namespace math {
     // MultiGPCholesky(y|L, w)   [y.rows() = w.size(), y.cols() = Sigma.rows();
     //                            Sigma symmetric, non-negative, definite]
     /**
@@ -45,7 +45,7 @@ namespace stan {
                           const Eigen::Matrix
                           <T_covar, Eigen::Dynamic, Eigen::Dynamic>& L,
                           const Eigen::Matrix<T_w, Eigen::Dynamic, 1>& w) {
-      static const char* function("stan::prob::multi_gp_cholesky_log");
+      static const char* function("stan::math::multi_gp_cholesky_log");
       typedef
         typename boost::math::tools::promote_args<T_y, T_covar, T_w>::type T_lp;
       T_lp lp(0.0);

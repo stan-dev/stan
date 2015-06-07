@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__BINARY_LOG_LOSS_HPP
-#define STAN__MATH__REV__SCAL__FUN__BINARY_LOG_LOSS_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_BINARY_LOG_LOSS_HPP
+#define STAN_MATH_REV_SCAL_FUN_BINARY_LOG_LOSS_HPP
 
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
@@ -7,7 +7,7 @@
 #include <valarray>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class binary_log_loss_1_vari : public op_v_vari {
@@ -65,7 +65,7 @@ namespace stan {
      * @param y_hat Response variable.
      * @return Log loss of response versus reference value.
      */
-    inline var binary_log_loss(const int y, const stan::agrad::var& y_hat) {
+    inline var binary_log_loss(const int y, const stan::math::var& y_hat) {
       if (y == 0)
         return var(new binary_log_loss_0_vari(y_hat.vi_));
       else

@@ -3,7 +3,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::math::var;
 
 class AgradCdfLogInvGamma : public AgradCdfLogTest {
 public:
@@ -64,7 +64,7 @@ public:
   typename stan::return_type<T_y, T_shape, T_scale>::type 
   cdf_log(const T_y& y, const T_shape& alpha, const T_scale& beta,
           const T3&, const T4&, const T5&) {
-    return stan::prob::inv_gamma_cdf_log(y, alpha, beta);
+    return stan::math::inv_gamma_cdf_log(y, alpha, beta);
   }
 
 
@@ -74,7 +74,7 @@ public:
   typename stan::return_type<T_y, T_shape, T_scale>::type 
   cdf_log_function(const T_y& y, const T_shape& alpha, const T_scale& beta,
                    const T3&, const T4&, const T5&) {
-    using stan::agrad::gamma_q;
+    using stan::math::gamma_q;
     using stan::math::gamma_q;
 
     return log(gamma_q(alpha, beta / y));

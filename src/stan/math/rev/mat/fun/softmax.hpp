@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__MAT__FUN__SOFTMAX_HPP
-#define STAN__MATH__REV__MAT__FUN__SOFTMAX_HPP
+#ifndef STAN_MATH_REV_MAT_FUN_SOFTMAX_HPP
+#define STAN_MATH_REV_MAT_FUN_SOFTMAX_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/softmax.hpp>
@@ -8,7 +8,7 @@
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class softmax_elt_vari : public vari {

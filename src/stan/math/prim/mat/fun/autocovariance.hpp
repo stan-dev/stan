@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__AUTOCOVARIANCE_HPP
-#define STAN__MATH__PRIM__MAT__FUN__AUTOCOVARIANCE_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_AUTOCOVARIANCE_HPP
+#define STAN_MATH_PRIM_MAT_FUN_AUTOCOVARIANCE_HPP
 
 #include <stan/math/prim/mat/fun/autocorrelation.hpp>
 #include <stan/math/prim/mat/fun/variance.hpp>
@@ -7,7 +7,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
 
     /**
@@ -34,7 +34,7 @@ namespace stan {
     void autocovariance(const std::vector<T>& y,
                         std::vector<T>& acov,
                         Eigen::FFT<T>& fft) {
-      stan::prob::autocorrelation(y, acov, fft);
+      stan::math::autocorrelation(y, acov, fft);
 
       T var = stan::math::variance(y) * (y.size()-1) / y.size();
       for (size_t i = 0; i < y.size(); i++) {

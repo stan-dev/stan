@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__ERR__CHECK_SYMMETRIC_HPP
-#define STAN__MATH__PRIM__MAT__ERR__CHECK_SYMMETRIC_HPP
+#ifndef STAN_MATH_PRIM_MAT_ERR_CHECK_SYMMETRIC_HPP
+#define STAN_MATH_PRIM_MAT_ERR_CHECK_SYMMETRIC_HPP
 
 #include <stan/math/prim/scal/err/domain_error.hpp>
 #include <stan/math/prim/mat/err/check_square.hpp>
@@ -42,6 +42,7 @@ namespace stan {
 
       using Eigen::Matrix;
       using stan::math::index_type;
+      using std::fabs;
 
       typedef typename index_type<Matrix<T_y, Dynamic, Dynamic> >::type
         size_type;

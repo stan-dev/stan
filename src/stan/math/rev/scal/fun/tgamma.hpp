@@ -1,11 +1,11 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__TGAMMA_HPP
-#define STAN__MATH__REV__SCAL__FUN__TGAMMA_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_TGAMMA_HPP
+#define STAN_MATH_REV_SCAL_FUN_TGAMMA_HPP
 
 #include <boost/math/special_functions/digamma.hpp>
 #include <stan/math/rev/core.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class tgamma_vari : public op_v_vari {
@@ -62,7 +62,7 @@ namespace stan {
      * @param a Argument to function.
      * @return The Gamma function applied to the specified argument.
      */
-    inline var tgamma(const stan::agrad::var& a) {
+    inline var tgamma(const stan::math::var& a) {
       return var(new tgamma_vari(a.vi_));
     }
 

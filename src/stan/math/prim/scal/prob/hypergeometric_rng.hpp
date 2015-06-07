@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__PROB__HYPERGEOMETRIC_RNG_HPP
-#define STAN__MATH__PRIM__SCAL__PROB__HYPERGEOMETRIC_RNG_HPP
+#ifndef STAN_MATH_PRIM_SCAL_PROB_HYPERGEOMETRIC_RNG_HPP
+#define STAN_MATH_PRIM_SCAL_PROB_HYPERGEOMETRIC_RNG_HPP
 
 #include <boost/math/distributions/hypergeometric.hpp>
 
@@ -9,7 +9,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <class RNG>
     inline int
@@ -19,7 +19,7 @@ namespace stan {
       using stan::math::check_bounded;
       using stan::math::check_positive;
 
-      static const char* function("stan::prob::hypergeometric_rng");
+      static const char* function("stan::math::hypergeometric_rng");
 
       check_bounded(function, "Draws parameter", N, 0, a+b);
       check_positive(function, "Draws parameter", N);

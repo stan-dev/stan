@@ -1,12 +1,12 @@
-#ifndef STAN__MATH__FWD__MAT__FUNCTOR__GRADIENT_HPP
-#define STAN__MATH__FWD__MAT__FUNCTOR__GRADIENT_HPP
+#ifndef STAN_MATH_FWD_MAT_FUNCTOR_GRADIENT_HPP
+#define STAN_MATH_FWD_MAT_FUNCTOR_GRADIENT_HPP
 
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     using Eigen::Dynamic;
 
@@ -17,13 +17,13 @@ namespace stan {
      * <p>The functor must implement
      *
      * <code>
-     * stan::agrad::fvar
+     * stan::math::fvar
      * operator()(const
-     * Eigen::Matrix<stan::agrad::var, Eigen::Dynamic, 1>&)
+     * Eigen::Matrix<stan::math::var, Eigen::Dynamic, 1>&)
      * </code>
      *
      * using only operations that are defined for
-     * <code>stan::agrad::fvar</code>.  This latter constraint usually
+     * <code>stan::math::fvar</code>.  This latter constraint usually
      * requires the functions to be defined in terms of the libraries
      * defined in Stan or in terms of functions with appropriately
      * general namespace imports that eventually depend on functions
@@ -56,6 +56,6 @@ namespace stan {
       }
     }
 
-  }  // namespace agrad
+  }  // namespace math
 }  // namespace stan
 #endif

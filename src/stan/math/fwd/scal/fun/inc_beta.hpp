@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__SCAL__FUN__INC_BETA_HPP
-#define STAN__MATH__FWD__SCAL__FUN__INC_BETA_HPP
+#ifndef STAN_MATH_FWD_SCAL_FUN_INC_BETA_HPP
+#define STAN_MATH_FWD_SCAL_FUN_INC_BETA_HPP
 
 #include <boost/math/special_functions/beta.hpp>
 #include <stan/math/prim/scal/fun/grad_reg_inc_beta.hpp>
@@ -14,7 +14,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     template<typename T>
     inline fvar<T> inc_beta(const fvar<T>& a,
@@ -24,9 +24,9 @@ namespace stan {
       using stan::math::grad_reg_inc_beta;
       using stan::math::inc_beta;
       using stan::math::lbeta;
-      using stan::agrad::digamma;
-      using stan::agrad::lbeta;
-      using stan::agrad::pow;
+      using stan::math::digamma;
+      using stan::math::lbeta;
+      using stan::math::pow;
       using std::exp;
       using std::pow;
 

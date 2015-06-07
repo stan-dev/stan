@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__LOG_MIX_HPP
-#define STAN__MATH__REV__SCAL__FUN__LOG_MIX_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_LOG_MIX_HPP
+#define STAN_MATH_REV_SCAL_FUN_LOG_MIX_HPP
 
 #include <stan/math/prim/scal/err/check_bounded.hpp>
 #include <stan/math/prim/scal/err/check_not_nan.hpp>
@@ -13,7 +13,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     /* Computes shared terms in log_mix partial derivative calculations
      *
@@ -142,7 +142,7 @@ namespace stan {
       return operands_and_partials.to_var(log_mix_function_value);
     }
 
-  }  // namespace agrad
+  }  // namespace math
 
 }  // namespace stan
 

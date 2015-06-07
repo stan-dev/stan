@@ -4,7 +4,7 @@
 #include <stan/math/fwd/scal/fun/sin.hpp>
 
 TEST(AgradFwdSin, Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using std::sin;
   using std::cos;
 
@@ -38,7 +38,7 @@ TEST(AgradFwdSin, Fvar) {
 }
 
 TEST(AgradFwdSin, FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using std::sin;
   using std::cos;
 

@@ -1,7 +1,8 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__RISING_FACTORIAL_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__RISING_FACTORIAL_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_RISING_FACTORIAL_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_RISING_FACTORIAL_HPP
 
 #include <stan/math/prim/scal/fun/log_rising_factorial.hpp>
+#include <cmath>
 
 namespace stan {
   namespace math {
@@ -51,7 +52,8 @@ namespace stan {
     template<typename T1, typename T2>
     inline typename boost::math::tools::promote_args<T1, T2>::type
     rising_factorial(const T1 x, const T2 n) {
-      return std::exp(stan::math::log_rising_factorial(x, n));
+      using std::exp;
+      return exp(stan::math::log_rising_factorial(x, n));
     }
 
   }

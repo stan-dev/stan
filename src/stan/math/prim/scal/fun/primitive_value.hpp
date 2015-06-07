@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__PRIMITIVE_VALUE_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__PRIMITIVE_VALUE_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_PRIMITIVE_VALUE_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_PRIMITIVE_VALUE_HPP
 
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_arithmetic.hpp>

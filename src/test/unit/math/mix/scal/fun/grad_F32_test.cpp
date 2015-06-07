@@ -13,7 +13,7 @@
 #include <stan/math/rev/scal/fun/value_of.hpp>
 
 TEST(ProbInternalMath, gradF32_fd1) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<double> a = 1.0;
   a.d_ = 1.0;
@@ -44,7 +44,7 @@ TEST(ProbInternalMath, gradF32_fd1) {
 }
 
 TEST(ProbInternalMath, gradF32_fd2) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<double> a = 1.0;
   fvar<double> b = 31.0;
@@ -75,7 +75,7 @@ TEST(ProbInternalMath, gradF32_fd2) {
 }
 
 TEST(ProbInternalMath, gradF32_fd3) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<double> a = 1.0;
   fvar<double> b = 31.0;
@@ -105,7 +105,7 @@ TEST(ProbInternalMath, gradF32_fd3) {
               g[2].d_,1e-5);
 }
 TEST(ProbInternalMath, gradF32_fd4) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<double> a = 1.0;
   fvar<double> b = 31.0;
@@ -135,7 +135,7 @@ TEST(ProbInternalMath, gradF32_fd4) {
               g[3].d_,1e-5);
 }
 TEST(ProbInternalMath, gradF32_fd5) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<double> a = 1.0;
   fvar<double> b = 31.0;
@@ -165,7 +165,7 @@ TEST(ProbInternalMath, gradF32_fd5) {
               g[4].d_,1e-5);
 }
 TEST(ProbInternalMath, gradF32_fd6) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<double> a = 1.0;
   fvar<double> b = 31.0;
@@ -196,7 +196,7 @@ TEST(ProbInternalMath, gradF32_fd6) {
 }
 
 TEST(ProbInternalMath, gradF32_ffd_2ndderiv1) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<fvar<double> > a = 1.0;
   a.d_ = 1.0;
@@ -227,7 +227,7 @@ TEST(ProbInternalMath, gradF32_ffd_2ndderiv1) {
 }
 
 TEST(ProbInternalMath, gradF32_ffd_2ndderiv2) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<fvar<double> > a = 1.0;
   fvar<fvar<double> > b = 31.0;
@@ -258,7 +258,7 @@ TEST(ProbInternalMath, gradF32_ffd_2ndderiv2) {
 }
 
 TEST(ProbInternalMath, gradF32_ffd_2ndderiv3) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<fvar<double> > a = 1.0;
   fvar<fvar<double> > b = 31.0;
@@ -288,7 +288,7 @@ TEST(ProbInternalMath, gradF32_ffd_2ndderiv3) {
               g[2].d_.val_,1e-5);
 }
 TEST(ProbInternalMath, gradF32_ffd_2ndderiv4) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<fvar<double> > a = 1.0;
   fvar<fvar<double> > b = 31.0;
@@ -318,7 +318,7 @@ TEST(ProbInternalMath, gradF32_ffd_2ndderiv4) {
               g[3].d_.val_,1e-5);
 }
 TEST(ProbInternalMath, gradF32_ffd_2ndderiv5) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<fvar<double> > a = 1.0;
   fvar<fvar<double> > b = 31.0;
@@ -348,7 +348,7 @@ TEST(ProbInternalMath, gradF32_ffd_2ndderiv5) {
               g[4].d_.val_,1e-5);
 }
 TEST(ProbInternalMath, gradF32_ffd_2ndderiv6) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<fvar<double> > a = 1.0;
   fvar<fvar<double> > b = 31.0;
@@ -379,7 +379,7 @@ TEST(ProbInternalMath, gradF32_ffd_2ndderiv6) {
 }
 
 TEST(ProbInternalMath, gradF32_ffd_3rdderiv1) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<fvar<double> > a = 1.0;
   a.d_ = 1.0;
@@ -410,7 +410,7 @@ TEST(ProbInternalMath, gradF32_ffd_3rdderiv1) {
 }
 
 TEST(ProbInternalMath, gradF32_ffd_3rdderiv2) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<fvar<double> > a = 1.0;
   fvar<fvar<double> > b = 31.0;
@@ -441,7 +441,7 @@ TEST(ProbInternalMath, gradF32_ffd_3rdderiv2) {
 }
 
 TEST(ProbInternalMath, gradF32_ffd_3rdderiv3) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<fvar<double> > a = 1.0;
   fvar<fvar<double> > b = 31.0;
@@ -471,7 +471,7 @@ TEST(ProbInternalMath, gradF32_ffd_3rdderiv3) {
   EXPECT_NEAR(-0.4025421605307411,g[2].d_.d_,1e-5);
 }
 TEST(ProbInternalMath, gradF32_ffd_3rdderiv4) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<fvar<double> > a = 1.0;
   fvar<fvar<double> > b = 31.0;
@@ -501,7 +501,7 @@ TEST(ProbInternalMath, gradF32_ffd_3rdderiv4) {
   EXPECT_NEAR(-0.505769456958641747831864908555691738,g[3].d_.d_,1e-5);
 }
 TEST(ProbInternalMath, gradF32_ffd_3rdderiv5) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<fvar<double> > a = 1.0;
   fvar<fvar<double> > b = 31.0;
@@ -531,7 +531,7 @@ TEST(ProbInternalMath, gradF32_ffd_3rdderiv5) {
   EXPECT_NEAR(0.143334459434983770772868891143925349,g[4].d_.d_,1e-5);
 }
 TEST(ProbInternalMath, gradF32_ffd_3rdderiv6) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<fvar<double> > a = 1.0;
   fvar<fvar<double> > b = 31.0;
@@ -562,8 +562,8 @@ TEST(ProbInternalMath, gradF32_ffd_3rdderiv6) {
 }
 
 TEST(ProbInternalMath, gradF32_fv_1stderiv1) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a = 1.0;
   a.d_ = 1.0;
@@ -599,8 +599,8 @@ TEST(ProbInternalMath, gradF32_fv_1stderiv1) {
 }
 
 TEST(ProbInternalMath, gradF32_fv_1stderiv2) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a = 1.0;
   fvar<var> b = 31.0;
@@ -636,8 +636,8 @@ TEST(ProbInternalMath, gradF32_fv_1stderiv2) {
 }
 
 TEST(ProbInternalMath, gradF32_fv_1stderiv3) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a = 1.0;
   fvar<var> b = 31.0;
@@ -672,8 +672,8 @@ TEST(ProbInternalMath, gradF32_fv_1stderiv3) {
   EXPECT_NEAR(0.90986472078762437,grad1[0],1e-5);
 }
 TEST(ProbInternalMath, gradF32_fv_1stderiv4) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a = 1.0;
   fvar<var> b = 31.0;
@@ -708,8 +708,8 @@ TEST(ProbInternalMath, gradF32_fv_1stderiv4) {
   EXPECT_NEAR(1.047024959065504556655904003595645684444382378830047020988218,grad1[0],1e-5);
 }
 TEST(ProbInternalMath, gradF32_fv_1stderiv5) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a = 1.0;
   fvar<var> b = 31.0;
@@ -744,8 +744,8 @@ TEST(ProbInternalMath, gradF32_fv_1stderiv5) {
   EXPECT_NEAR(0.415359887777218792995404669803015764396172842233556866773418,grad1[0],1e-5);
 }
 TEST(ProbInternalMath, gradF32_fv_1stderiv6) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a = 1.0;
   fvar<var> b = 31.0;
@@ -781,8 +781,8 @@ TEST(ProbInternalMath, gradF32_fv_1stderiv6) {
 }
 
 TEST(ProbInternalMath, gradF32_fv_2ndderiv1) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a = 1.0;
   a.d_ = 1.0;
@@ -818,8 +818,8 @@ TEST(ProbInternalMath, gradF32_fv_2ndderiv1) {
 }
 
 TEST(ProbInternalMath, gradF32_fv_2ndderiv2) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a = 1.0;
   fvar<var> b = 31.0;
@@ -855,8 +855,8 @@ TEST(ProbInternalMath, gradF32_fv_2ndderiv2) {
 }
 
 TEST(ProbInternalMath, gradF32_fv_2ndderiv3) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a = 1.0;
   fvar<var> b = 31.0;
@@ -891,8 +891,8 @@ TEST(ProbInternalMath, gradF32_fv_2ndderiv3) {
   EXPECT_NEAR(-0.4025421605307411,grad1[0],1e-5);
 }
 TEST(ProbInternalMath, gradF32_fv_2ndderiv4) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a = 1.0;
   fvar<var> b = 31.0;
@@ -927,8 +927,8 @@ TEST(ProbInternalMath, gradF32_fv_2ndderiv4) {
   EXPECT_NEAR(-0.505769456958641747831864908555691738,grad1[0],1e-5);
 }
 TEST(ProbInternalMath, gradF32_fv_2ndderiv5) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a = 1.0;
   fvar<var> b = 31.0;
@@ -963,8 +963,8 @@ TEST(ProbInternalMath, gradF32_fv_2ndderiv5) {
   EXPECT_NEAR(0.143334459434983770772868891143925349,grad1[0],1e-5);
 }
 TEST(ProbInternalMath, gradF32_fv_2ndderiv6) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a = 1.0;
   fvar<var> b = 31.0;

@@ -1,5 +1,5 @@
-#ifndef STAN__MCMC__SAMPLE__HPP
-#define STAN__MCMC__SAMPLE__HPP
+#ifndef STAN_MCMC_SAMPLE_HPP
+#define STAN_MCMC_SAMPLE_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 

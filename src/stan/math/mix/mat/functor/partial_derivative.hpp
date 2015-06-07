@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__MIX__MAT__FUNCTOR__PARTIAL_DERIVATIVE_HPP
-#define STAN__MATH__MIX__MAT__FUNCTOR__PARTIAL_DERIVATIVE_HPP
+#ifndef STAN_MATH_MIX_MAT_FUNCTOR_PARTIAL_DERIVATIVE_HPP
+#define STAN_MATH_MIX_MAT_FUNCTOR_PARTIAL_DERIVATIVE_HPP
 
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
@@ -8,7 +8,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     using Eigen::Dynamic;
 
@@ -39,6 +39,6 @@ namespace stan {
       dfx_dxn = fx_fvar.d_;
     }
 
-  }  // namespace agrad
+  }  // namespace math
 }  // namespace stan
 #endif

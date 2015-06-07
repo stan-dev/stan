@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__LUB_FREE_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__LUB_FREE_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_LUB_FREE_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_LUB_FREE_HPP
 
 #include <stan/math/prim/scal/err/check_bounded.hpp>
 #include <stan/math/prim/scal/fun/logit.hpp>
@@ -9,7 +9,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * Return the unconstrained scalar that transforms to the
@@ -47,7 +47,7 @@ namespace stan {
     lub_free(const T y, TL lb, TU ub) {
       using stan::math::logit;
       stan::math::check_bounded<T, TL, TU>
-        ("stan::prob::lub_free",
+        ("stan::math::lub_free",
          "Bounded variable",
          y, lb, ub);
       if (lb == -std::numeric_limits<double>::infinity())

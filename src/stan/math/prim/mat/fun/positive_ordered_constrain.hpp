@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__POSITIVE_ORDERED_CONSTRAIN_HPP
-#define STAN__MATH__PRIM__MAT__FUN__POSITIVE_ORDERED_CONSTRAIN_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_POSITIVE_ORDERED_CONSTRAIN_HPP
+#define STAN_MATH_PRIM_MAT_FUN_POSITIVE_ORDERED_CONSTRAIN_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>
@@ -7,7 +7,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * Return an increasing positive ordered vector derived from the specified
@@ -24,6 +24,7 @@ namespace stan {
       using Eigen::Matrix;
       using Eigen::Dynamic;
       using stan::math::index_type;
+      using std::exp;
       typedef typename index_type<Matrix<T, Dynamic, 1> >::type size_type;
 
       size_type k = x.size();

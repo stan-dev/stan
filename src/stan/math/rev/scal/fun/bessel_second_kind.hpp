@@ -1,12 +1,12 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__BESSEL_SECOND_KIND_HPP
-#define STAN__MATH__REV__SCAL__FUN__BESSEL_SECOND_KIND_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_BESSEL_SECOND_KIND_HPP
+#define STAN_MATH_REV_SCAL_FUN_BESSEL_SECOND_KIND_HPP
 
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/bessel_second_kind.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
 

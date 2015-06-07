@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__ARR__FUNCTOR__INTEGRATE_ODE_HPP
-#define STAN__MATH__PRIM__ARR__FUNCTOR__INTEGRATE_ODE_HPP
+#ifndef STAN_MATH_PRIM_ARR_FUNCTOR_INTEGRATE_ODE_HPP
+#define STAN_MATH_PRIM_ARR_FUNCTOR_INTEGRATE_ODE_HPP
 
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/err/check_less.hpp>
@@ -31,7 +31,7 @@ namespace stan {
      * This function is templated to allow the initial times to be
      * either data or autodiff variables and the parameters to be data
      * or autodiff variables.  The autodiff-based implementation for
-     * reverse-mode are defined in namespace <code>stan::agrad</code>
+     * reverse-mode are defined in namespace <code>stan::math</code>
      * and may be invoked via argument-dependent lookup by including
      * their headers.
      *

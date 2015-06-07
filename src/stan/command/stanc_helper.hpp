@@ -1,3 +1,6 @@
+#ifndef STAN_COMMAND_STANC_HELPER_HPP
+#define STAN_COMMAND_STANC_HELPER_HPP
+
 #include <stan/version.hpp>
 #include <stan/lang/compiler.hpp>
 #include <stan/io/cmd_line.hpp>
@@ -19,7 +22,7 @@ void print_version(std::ostream* out_stream) {
               << std::endl;
 }
 
-/** 
+/**
  * Prints the Stan compiler (stanc) help.
  */
 void print_stanc_help(std::ostream* out_stream) {
@@ -145,7 +148,7 @@ int stanc_helper(int argc, const char* argv[],
       *out_stream << "Output file=" << out_file_name << std::endl;
     }
 
-    bool valid_model 
+    bool valid_model
       = stan::lang::compile(err_stream,in,out,model_name,in_file_name);
 
     out.close();
@@ -176,3 +179,4 @@ int stanc_helper(int argc, const char* argv[],
   return SUCCESS_RC;
 }
 
+#endif

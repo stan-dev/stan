@@ -13,7 +13,7 @@
 #include <stan/math/rev/scal/fun/value_of_rec.hpp>
 
 TEST(AgradRevErrorHandlingMatrix,CheckCovMatrix) {
-  using stan::agrad::var;
+  using stan::math::var;
   using Eigen::Dynamic;
   using Eigen::Matrix;
   

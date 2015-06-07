@@ -4,11 +4,11 @@
 #include <stan/math/mix/mat/fun/typedefs.hpp>
 
 TEST(AgradMixMatrixCols,vector_fv) {
-  using stan::agrad::vector_fv;
-  using stan::agrad::row_vector_fv;
+  using stan::math::vector_fv;
+  using stan::math::row_vector_fv;
   using stan::math::cols;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a(1.0,1.0);
   fvar<var> b(2.0,1.0);
@@ -24,10 +24,10 @@ TEST(AgradMixMatrixCols,vector_fv) {
   EXPECT_EQ(1U, cols(v));
 }
 TEST(AgradMixMatrixCols,rowvector_fv) {
-  using stan::agrad::row_vector_fv;
+  using stan::math::row_vector_fv;
   using stan::math::cols;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a(1.0,1.0);
   fvar<var> b(2.0,1.0);
@@ -43,10 +43,10 @@ TEST(AgradMixMatrixCols,rowvector_fv) {
   EXPECT_EQ(0U, cols(rv));
 }
 TEST(AgradMixMatrixCols,matrix_fv) {
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
   using stan::math::cols;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a(1.0,1.0);
   fvar<var> b(2.0,1.0);
@@ -62,11 +62,11 @@ TEST(AgradMixMatrixCols,matrix_fv) {
   EXPECT_EQ(0U, cols(m));
 }
 TEST(AgradMixFvarFvarMatrix,vector_ffv) {
-  using stan::agrad::vector_ffv;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::vector_ffv;
+  using stan::math::row_vector_ffv;
   using stan::math::cols;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > a;
   fvar<fvar<var> > b;
@@ -92,10 +92,10 @@ TEST(AgradMixFvarFvarMatrix,vector_ffv) {
   EXPECT_EQ(1U, cols(v));
 }
 TEST(AgradMixMatrixCols,rowvector_ffv) {
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
   using stan::math::cols;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > a;
   fvar<fvar<var> > b;
@@ -121,10 +121,10 @@ TEST(AgradMixMatrixCols,rowvector_ffv) {
   EXPECT_EQ(0U, cols(rv));
 }
 TEST(AgradMixMatrixCols,matrix_ffv) {
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using stan::math::cols;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > a;
   fvar<fvar<var> > b;

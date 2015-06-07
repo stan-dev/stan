@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__BESSEL_FIRST_KIND_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__BESSEL_FIRST_KIND_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_BESSEL_FIRST_KIND_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_BESSEL_FIRST_KIND_HPP
 
 #include <boost/math/special_functions/bessel.hpp>
 #include <stan/math/prim/scal/err/check_not_nan.hpp>

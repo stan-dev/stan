@@ -5,11 +5,11 @@
 
 TEST(ProbDistributionBinomiali, error_check) {
   boost::random::mt19937 rng;
-  EXPECT_NO_THROW(stan::prob::binomial_rng(4,0.6,rng));
-  EXPECT_THROW(stan::prob::binomial_rng(-4,0.6,rng),std::domain_error);
-  EXPECT_THROW(stan::prob::binomial_rng(4,-0.6,rng),std::domain_error);
-  EXPECT_THROW(stan::prob::binomial_rng(4,2.6,rng),std::domain_error);
-  EXPECT_THROW(stan::prob::binomial_rng(4,stan::math::positive_infinity(),rng),
+  EXPECT_NO_THROW(stan::math::binomial_rng(4,0.6,rng));
+  EXPECT_THROW(stan::math::binomial_rng(-4,0.6,rng),std::domain_error);
+  EXPECT_THROW(stan::math::binomial_rng(4,-0.6,rng),std::domain_error);
+  EXPECT_THROW(stan::math::binomial_rng(4,2.6,rng),std::domain_error);
+  EXPECT_THROW(stan::math::binomial_rng(4,stan::math::positive_infinity(),rng),
                std::domain_error);
 }
 
@@ -34,7 +34,7 @@ TEST(ProbDistributionsBinomial, chiSquareGoodnessFitTest) {
   expect[K-1] = N * (1 - cdf(dist, K-2));
 
   while (count < N) {
-    int a = stan::prob::binomial_rng(100,0.6,rng);
+    int a = stan::math::binomial_rng(100,0.6,rng);
     int i = 0;
     while (i < K-1 && a > loc[i]) 
       ++i;

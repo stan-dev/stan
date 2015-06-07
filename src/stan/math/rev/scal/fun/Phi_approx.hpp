@@ -1,11 +1,11 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__PHI_APPROX_HPP
-#define STAN__MATH__REV__SCAL__FUN__PHI_APPROX_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_PHI_APPROX_HPP
+#define STAN_MATH_REV_SCAL_FUN_PHI_APPROX_HPP
 
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/inv_logit.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Approximation of the unit normal CDF for variables (stan).
@@ -44,7 +44,7 @@ namespace stan {
      * @param a Variable argument.
      * @return The corresponding unit normal cdf approximation.
      */
-    inline var Phi_approx(const stan::agrad::var& a) {
+    inline var Phi_approx(const stan::math::var& a) {
       // return inv_logit(0.07056 * pow(a, 3.0) + 1.5976 * a);
 
       double av = a.vi_->val_;

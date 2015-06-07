@@ -15,13 +15,13 @@ template <typename F>
 void test_nan_fv1(const F& f,
                   const double& arg1,
                   const bool& throws) {
-  using stan::agrad::var;
-  stan::agrad::fvar<var> arg1_v = arg1;
+  using stan::math::var;
+  stan::math::fvar<var> arg1_v = arg1;
 
   if (throws)
     EXPECT_THROW(f(arg1_v), std::domain_error);
   else {
-    stan::agrad::fvar<var> res = f(arg1_v);
+    stan::math::fvar<var> res = f(arg1_v);
     EXPECT_TRUE(boost::math::isnan(res.val_.val()));
 
     AVEC x = createAVEC(arg1_v.val_);
@@ -37,13 +37,13 @@ template <typename F>
 void test_nan_fv2(const F& f,
                   const double& arg1,
                   const bool& throws) {
-  using stan::agrad::var;
-  stan::agrad::fvar<var> arg1_v = arg1;
+  using stan::math::var;
+  stan::math::fvar<var> arg1_v = arg1;
 
   if (throws)
     EXPECT_THROW(f(arg1_v), std::domain_error);
   else {
-    stan::agrad::fvar<var> res = f(arg1_v);
+    stan::math::fvar<var> res = f(arg1_v);
     EXPECT_TRUE(boost::math::isnan(res.d_.val()));
 
     AVEC x = createAVEC(arg1_v.val_);
@@ -58,9 +58,9 @@ template <typename F>
 void test_nan_ffv1(const F& f,
                    const double& arg1,
                    const bool& throws) {
-  using stan::agrad::var;
-  using stan::agrad::fvar;
-  stan::agrad::fvar<fvar<var> > arg1_v = arg1;
+  using stan::math::var;
+  using stan::math::fvar;
+  stan::math::fvar<fvar<var> > arg1_v = arg1;
   arg1_v.val_.d_ = 1.0;
   arg1_v.d_.val_ = 1.0;
   arg1_v.d_.d_ = 1.0;
@@ -83,9 +83,9 @@ template <typename F>
 void test_nan_ffv2(const F& f,
                    const double& arg1,
                    const bool& throws) {
-  using stan::agrad::var;
-  using stan::agrad::fvar;
-  stan::agrad::fvar<fvar<var> > arg1_v(fvar<var>(arg1,1.0),fvar<var>(1.0,1.0));
+  using stan::math::var;
+  using stan::math::fvar;
+  stan::math::fvar<fvar<var> > arg1_v(fvar<var>(arg1,1.0),fvar<var>(1.0,1.0));
 
   if (throws)
     EXPECT_THROW(f(arg1_v), std::domain_error);
@@ -105,9 +105,9 @@ template <typename F>
 void test_nan_ffv3(const F& f,
                    const double& arg1,
                    const bool& throws) {
-  using stan::agrad::var;
-  using stan::agrad::fvar;
-  stan::agrad::fvar<fvar<var> > arg1_v = arg1;
+  using stan::math::var;
+  using stan::math::fvar;
+  stan::math::fvar<fvar<var> > arg1_v = arg1;
   arg1_v.val_.d_ = 1.0;
   arg1_v.d_.val_ = 1.0;
   arg1_v.d_.d_ = 1.0;
@@ -130,9 +130,9 @@ template <typename F>
 void test_nan_ffv4(const F& f,
                    const double& arg1,
                    const bool& throws) {
-  using stan::agrad::var;
-  using stan::agrad::fvar;
-  stan::agrad::fvar<fvar<var> > arg1_v (fvar<var>(arg1,1.0), fvar<var>(1.0,1.0));
+  using stan::math::var;
+  using stan::math::fvar;
+  stan::math::fvar<fvar<var> > arg1_v (fvar<var>(arg1,1.0), fvar<var>(1.0,1.0));
 
   if (throws)
     EXPECT_THROW(f(arg1_v), std::domain_error);
@@ -167,15 +167,15 @@ void test_nan_fv_fv1(const F& f,
                     const double& arg1,
                     const double& arg2,
                     const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<var> arg1_v(arg1, 1.0);
   fvar<var> arg2_v(arg2, 1.0);
 
   if (throws)
     EXPECT_THROW(f(arg1_v, arg2_v), std::domain_error);
   else {
-    stan::agrad::fvar<var> res = f(arg1_v, arg2_v);
+    stan::math::fvar<var> res = f(arg1_v, arg2_v);
     EXPECT_TRUE(boost::math::isnan(res.val_.val()));
 
     AVEC x = createAVEC(arg1_v.val_, arg2_v.val_);
@@ -193,15 +193,15 @@ void test_nan_fv_fv2(const F& f,
                     const double& arg1,
                     const double& arg2,
                     const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<var> arg1_v(arg1, 1.0);
   fvar<var> arg2_v(arg2, 1.0);
 
   if (throws)
     EXPECT_THROW(f(arg1_v, arg2_v), std::domain_error);
   else {
-    stan::agrad::fvar<var> res = f(arg1_v, arg2_v);
+    stan::math::fvar<var> res = f(arg1_v, arg2_v);
     EXPECT_TRUE(boost::math::isnan(res.d_.val()));
 
     AVEC x = createAVEC(arg1_v.val_, arg2_v.val_);
@@ -219,14 +219,14 @@ void test_nan_fv_d1(const F& f,
                     const double& arg1,
                     const double& arg2,
                     const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<var> arg1_v(arg1, 1.0);
 
   if (throws)
     EXPECT_THROW(f(arg1_v, arg2), std::domain_error);
   else {
-    stan::agrad::fvar<var> res = f(arg1_v, arg2);
+    stan::math::fvar<var> res = f(arg1_v, arg2);
     EXPECT_TRUE(boost::math::isnan(res.val_.val()));
 
     AVEC x = createAVEC(arg1_v.val_);
@@ -243,14 +243,14 @@ void test_nan_fv_d2(const F& f,
                     const double& arg1,
                     const double& arg2,
                     const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<var> arg1_v(arg1, 1.0);
 
   if (throws)
     EXPECT_THROW(f(arg1_v, arg2), std::domain_error);
   else {
-    stan::agrad::fvar<var> res = f(arg1_v, arg2);
+    stan::math::fvar<var> res = f(arg1_v, arg2);
     EXPECT_TRUE(boost::math::isnan(res.d_.val()));
 
     AVEC x = createAVEC(arg1_v.val_);
@@ -267,14 +267,14 @@ void test_nan_d_fv1(const F& f,
                     const double& arg1,
                     const double& arg2,
                     const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<var> arg2_v(arg2, 1.0);
 
   if (throws)
     EXPECT_THROW(f(arg1, arg2_v), std::domain_error);
   else {
-    stan::agrad::fvar<var> res = f(arg1, arg2_v);
+    stan::math::fvar<var> res = f(arg1, arg2_v);
     EXPECT_TRUE(boost::math::isnan(res.val_.val()));
 
     AVEC x = createAVEC(arg2_v.val_);
@@ -291,14 +291,14 @@ void test_nan_d_fv2(const F& f,
                     const double& arg1,
                     const double& arg2,
                     const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<var> arg2_v(arg2, 1.0);
 
   if (throws)
     EXPECT_THROW(f(arg1, arg2_v), std::domain_error);
   else {
-    stan::agrad::fvar<var> res = f(arg1, arg2_v);
+    stan::math::fvar<var> res = f(arg1, arg2_v);
     EXPECT_TRUE(boost::math::isnan(res.d_.val()));
 
     AVEC x = createAVEC(arg2_v.val_);
@@ -314,8 +314,8 @@ void test_nan_ffv_ffv1(const F& f,
                        const double& arg1,
                        const double& arg2,
                        const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg1_v = arg1;
   arg1_v.val_.d_ = 1.0;
   arg1_v.d_.val_ = 1.0;
@@ -345,8 +345,8 @@ void test_nan_ffv_ffv2(const F& f,
                        const double& arg1,
                        const double& arg2,
                        const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg1_v = arg1;
   arg1_v.val_.d_ = 1.0;
   arg1_v.d_.val_ = 1.0;
@@ -376,8 +376,8 @@ void test_nan_ffv_ffv3(const F& f,
                        const double& arg1,
                        const double& arg2,
                        const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg1_v = arg1;
   arg1_v.val_.d_ = 1.0;
   arg1_v.d_.val_ = 1.0;
@@ -407,8 +407,8 @@ void test_nan_ffv_ffv4(const F& f,
                        const double& arg1,
                        const double& arg2,
                        const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg1_v = arg1;
   arg1_v.val_.d_ = 1.0;
   arg1_v.d_.val_ = 1.0;
@@ -439,8 +439,8 @@ void test_nan_ffv_d1(const F& f,
                        const double& arg1,
                        const double& arg2,
                        const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg1_v = arg1;
   arg1_v.val_.d_ = 1.0;
   arg1_v.d_.val_ = 1.0;
@@ -465,8 +465,8 @@ void test_nan_ffv_d2(const F& f,
                        const double& arg1,
                        const double& arg2,
                        const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg1_v = arg1;
   arg1_v.val_.d_ = 1.0;
   arg1_v.d_.val_ = 1.0;
@@ -491,8 +491,8 @@ void test_nan_ffv_d3(const F& f,
                        const double& arg1,
                        const double& arg2,
                        const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg1_v = arg1;
   arg1_v.val_.d_ = 1.0;
   arg1_v.d_.val_ = 1.0;
@@ -517,8 +517,8 @@ void test_nan_ffv_d4(const F& f,
                        const double& arg1,
                        const double& arg2,
                        const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg1_v = arg1;
   arg1_v.val_.d_ = 1.0;
   arg1_v.d_.val_ = 1.0;
@@ -544,8 +544,8 @@ void test_nan_d_ffv1(const F& f,
                        const double& arg1,
                        const double& arg2,
                        const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg2_v = arg2;
   arg2_v.val_.d_ = 1.0;
   arg2_v.d_.val_ = 1.0;
@@ -570,8 +570,8 @@ void test_nan_d_ffv2(const F& f,
                        const double& arg1,
                        const double& arg2,
                        const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg2_v = arg2;
   arg2_v.val_.d_ = 1.0;
   arg2_v.d_.val_ = 1.0;
@@ -596,8 +596,8 @@ void test_nan_d_ffv3(const F& f,
                        const double& arg1,
                        const double& arg2,
                        const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg2_v = arg2;
   arg2_v.val_.d_ = 1.0;
   arg2_v.d_.val_ = 1.0;
@@ -622,8 +622,8 @@ void test_nan_d_ffv4(const F& f,
                        const double& arg1,
                        const double& arg2,
                        const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg2_v = arg2;
   arg2_v.val_.d_ = 1.0;
   arg2_v.d_.val_ = 1.0;
@@ -681,8 +681,8 @@ void test_nan_fv_fv_fv1(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<var> arg1_v(arg1,1.0);
   fvar<var> arg2_v(arg2,1.0);
   fvar<var> arg3_v(arg3,1.0);
@@ -696,7 +696,7 @@ void test_nan_fv_fv_fv1(const F& f,
   if (throws)
     EXPECT_THROW(f(arg1_v, arg2_v, arg3_v), std::domain_error) << fail_msg.str();
   else {
-    stan::agrad::fvar<var> res = f(arg1_v,arg2_v,arg3_v);
+    stan::math::fvar<var> res = f(arg1_v,arg2_v,arg3_v);
     EXPECT_TRUE(boost::math::isnan(res.val_.val())) << fail_msg.str();
 
     AVEC x = createAVEC(arg1_v.val_,arg2_v.val_,arg3_v.val_);
@@ -715,8 +715,8 @@ void test_nan_fv_fv_fv2(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<var> arg1_v(arg1,1.0);
   fvar<var> arg2_v(arg2,1.0);
   fvar<var> arg3_v(arg3,1.0);
@@ -730,7 +730,7 @@ void test_nan_fv_fv_fv2(const F& f,
   if (throws)
     EXPECT_THROW(f(arg1_v, arg2_v, arg3_v), std::domain_error) << fail_msg.str();
   else {
-    stan::agrad::fvar<var> res = f(arg1_v,arg2_v,arg3_v);
+    stan::math::fvar<var> res = f(arg1_v,arg2_v,arg3_v);
     EXPECT_TRUE(boost::math::isnan(res.d_.val())) << fail_msg.str();
 
     AVEC x = createAVEC(arg1_v.val_,arg2_v.val_,arg3_v.val_);
@@ -750,8 +750,8 @@ void test_nan_d_fv_fv1(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<var> arg2_v(arg2,1.0);
   fvar<var> arg3_v(arg3,1.0);
 
@@ -764,7 +764,7 @@ void test_nan_d_fv_fv1(const F& f,
   if (throws)
     EXPECT_THROW(f(arg1, arg2_v, arg3_v), std::domain_error) << fail_msg.str();
   else {
-    stan::agrad::fvar<var> res = f(arg1,arg2_v,arg3_v);
+    stan::math::fvar<var> res = f(arg1,arg2_v,arg3_v);
     EXPECT_TRUE(boost::math::isnan(res.val_.val())) << fail_msg.str();
 
     AVEC x = createAVEC(arg2_v.val_,arg3_v.val_);
@@ -782,8 +782,8 @@ void test_nan_d_fv_fv2(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<var> arg2_v(arg2,1.0);
   fvar<var> arg3_v(arg3,1.0);
 
@@ -796,7 +796,7 @@ void test_nan_d_fv_fv2(const F& f,
   if (throws)
     EXPECT_THROW(f(arg1, arg2_v, arg3_v), std::domain_error) << fail_msg.str();
   else {
-    stan::agrad::fvar<var> res = f(arg1,arg2_v,arg3_v);
+    stan::math::fvar<var> res = f(arg1,arg2_v,arg3_v);
     EXPECT_TRUE(boost::math::isnan(res.d_.val())) << fail_msg.str();
 
     AVEC x = createAVEC(arg2_v.val_,arg3_v.val_);
@@ -814,8 +814,8 @@ void test_nan_fv_d_fv1(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<var> arg1_v(arg1,1.0);
   fvar<var> arg3_v(arg3,1.0);
 
@@ -828,7 +828,7 @@ void test_nan_fv_d_fv1(const F& f,
   if (throws)
     EXPECT_THROW(f(arg1_v, arg2, arg3_v), std::domain_error) << fail_msg.str();
   else {
-    stan::agrad::fvar<var> res = f(arg1_v,arg2,arg3_v);
+    stan::math::fvar<var> res = f(arg1_v,arg2,arg3_v);
     EXPECT_TRUE(boost::math::isnan(res.val_.val())) << fail_msg.str();
 
     AVEC x = createAVEC(arg1_v.val_,arg3_v.val_);
@@ -846,8 +846,8 @@ void test_nan_fv_d_fv2(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<var> arg1_v(arg1,1.0);
   fvar<var> arg3_v(arg3,1.0);
 
@@ -860,7 +860,7 @@ void test_nan_fv_d_fv2(const F& f,
   if (throws)
     EXPECT_THROW(f(arg1_v, arg2, arg3_v), std::domain_error) << fail_msg.str();
   else {
-    stan::agrad::fvar<var> res = f(arg1_v,arg2,arg3_v);
+    stan::math::fvar<var> res = f(arg1_v,arg2,arg3_v);
     EXPECT_TRUE(boost::math::isnan(res.d_.val())) << fail_msg.str();
 
     AVEC x = createAVEC(arg1_v.val_,arg3_v.val_);
@@ -878,8 +878,8 @@ void test_nan_fv_fv_d1(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<var> arg1_v(arg1,1.0);
   fvar<var> arg2_v(arg2,1.0);
 
@@ -892,7 +892,7 @@ void test_nan_fv_fv_d1(const F& f,
   if (throws)
     EXPECT_THROW(f(arg1_v, arg2_v, arg3), std::domain_error) << fail_msg.str();
   else {
-    stan::agrad::fvar<var> res = f(arg1_v,arg2_v,arg3);
+    stan::math::fvar<var> res = f(arg1_v,arg2_v,arg3);
     EXPECT_TRUE(boost::math::isnan(res.val_.val())) << fail_msg.str();
 
     AVEC x = createAVEC(arg1_v.val_,arg2_v.val_);
@@ -910,8 +910,8 @@ void test_nan_fv_fv_d2(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<var> arg1_v(arg1,1.0);
   fvar<var> arg2_v(arg2,1.0);
 
@@ -924,7 +924,7 @@ void test_nan_fv_fv_d2(const F& f,
   if (throws)
     EXPECT_THROW(f(arg1_v, arg2_v, arg3), std::domain_error) << fail_msg.str();
   else {
-    stan::agrad::fvar<var> res = f(arg1_v,arg2_v,arg3);
+    stan::math::fvar<var> res = f(arg1_v,arg2_v,arg3);
     EXPECT_TRUE(boost::math::isnan(res.d_.val())) << fail_msg.str();
 
     AVEC x = createAVEC(arg1_v.val_,arg2_v.val_);
@@ -942,8 +942,8 @@ void test_nan_fv_d_d1(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<var> arg1_v(arg1,1.0);
 
   std::ostringstream fail_msg;
@@ -955,7 +955,7 @@ void test_nan_fv_d_d1(const F& f,
   if (throws)
     EXPECT_THROW(f(arg1_v, arg2, arg3), std::domain_error) << fail_msg.str();
   else {
-    stan::agrad::fvar<var> res = f(arg1_v,arg2,arg3);
+    stan::math::fvar<var> res = f(arg1_v,arg2,arg3);
     EXPECT_TRUE(boost::math::isnan(res.val_.val())) << fail_msg.str();
 
     AVEC x = createAVEC(arg1_v.val_);
@@ -972,8 +972,8 @@ void test_nan_fv_d_d2(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<var> arg1_v(arg1,1.0);
 
   std::ostringstream fail_msg;
@@ -985,7 +985,7 @@ void test_nan_fv_d_d2(const F& f,
   if (throws)
     EXPECT_THROW(f(arg1_v, arg2, arg3), std::domain_error) << fail_msg.str();
   else {
-    stan::agrad::fvar<var> res = f(arg1_v,arg2,arg3);
+    stan::math::fvar<var> res = f(arg1_v,arg2,arg3);
     EXPECT_TRUE(boost::math::isnan(res.d_.val())) << fail_msg.str();
 
     AVEC x = createAVEC(arg1_v.val_);
@@ -1003,8 +1003,8 @@ void test_nan_d_fv_d1(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<var> arg2_v(arg2,1.0);
 
   std::ostringstream fail_msg;
@@ -1016,7 +1016,7 @@ void test_nan_d_fv_d1(const F& f,
   if (throws)
     EXPECT_THROW(f(arg1, arg2_v, arg3), std::domain_error) << fail_msg.str();
   else {
-    stan::agrad::fvar<var> res = f(arg1,arg2_v,arg3);
+    stan::math::fvar<var> res = f(arg1,arg2_v,arg3);
     EXPECT_TRUE(boost::math::isnan(res.val_.val())) << fail_msg.str();
 
     AVEC x = createAVEC(arg2_v.val_);
@@ -1033,8 +1033,8 @@ void test_nan_d_fv_d2(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<var> arg2_v(arg2,1.0);
 
   std::ostringstream fail_msg;
@@ -1046,7 +1046,7 @@ void test_nan_d_fv_d2(const F& f,
   if (throws)
     EXPECT_THROW(f(arg1, arg2_v, arg3), std::domain_error) << fail_msg.str();
   else {
-    stan::agrad::fvar<var> res = f(arg1,arg2_v,arg3);
+    stan::math::fvar<var> res = f(arg1,arg2_v,arg3);
     EXPECT_TRUE(boost::math::isnan(res.d_.val())) << fail_msg.str();
 
     AVEC x = createAVEC(arg2_v.val_);
@@ -1064,8 +1064,8 @@ void test_nan_d_d_fv1(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<var> arg3_v(arg3,1.0);
 
   std::ostringstream fail_msg;
@@ -1077,7 +1077,7 @@ void test_nan_d_d_fv1(const F& f,
   if (throws)
     EXPECT_THROW(f(arg1, arg2, arg3_v), std::domain_error) << fail_msg.str();
   else {
-    stan::agrad::fvar<var> res = f(arg1,arg2,arg3_v);
+    stan::math::fvar<var> res = f(arg1,arg2,arg3_v);
     EXPECT_TRUE(boost::math::isnan(res.val_.val())) << fail_msg.str();
 
     AVEC x = createAVEC(arg3_v.val_);
@@ -1094,8 +1094,8 @@ void test_nan_d_d_fv2(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<var> arg3_v(arg3,1.0);
 
   std::ostringstream fail_msg;
@@ -1107,7 +1107,7 @@ void test_nan_d_d_fv2(const F& f,
   if (throws)
     EXPECT_THROW(f(arg1, arg2, arg3_v), std::domain_error) << fail_msg.str();
   else {
-    stan::agrad::fvar<var> res = f(arg1,arg2,arg3_v);
+    stan::math::fvar<var> res = f(arg1,arg2,arg3_v);
     EXPECT_TRUE(boost::math::isnan(res.d_.val())) << fail_msg.str();
 
     AVEC x = createAVEC(arg3_v.val_);
@@ -1124,8 +1124,8 @@ void test_nan_ffv_ffv_ffv1(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg1_v(arg1,1.0);
   fvar<fvar<var> > arg2_v(arg2,1.0);
   fvar<fvar<var> > arg3_v(arg3,1.0);
@@ -1164,8 +1164,8 @@ void test_nan_ffv_ffv_ffv2(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg1_v(arg1,1.0);
   fvar<fvar<var> > arg2_v(arg2,1.0);
   fvar<fvar<var> > arg3_v(arg3,1.0);
@@ -1204,8 +1204,8 @@ void test_nan_ffv_ffv_ffv3(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg1_v(arg1,1.0);
   fvar<fvar<var> > arg2_v(arg2,1.0);
   fvar<fvar<var> > arg3_v(arg3,1.0);
@@ -1245,8 +1245,8 @@ void test_nan_ffv_ffv_ffv4(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg1_v(arg1,1.0);
   fvar<fvar<var> > arg2_v(arg2,1.0);
   fvar<fvar<var> > arg3_v(arg3,1.0);
@@ -1285,8 +1285,8 @@ void test_nan_d_ffv_ffv1(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg2_v(arg2,1.0);
   fvar<fvar<var> > arg3_v(arg3,1.0);
   arg2_v.val_.d_ = 1.0;
@@ -1321,8 +1321,8 @@ void test_nan_d_ffv_ffv2(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg2_v(arg2,1.0);
   fvar<fvar<var> > arg3_v(arg3,1.0);
   arg2_v.val_.d_ = 1.0;
@@ -1357,8 +1357,8 @@ void test_nan_d_ffv_ffv3(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg2_v(arg2,1.0);
   fvar<fvar<var> > arg3_v(arg3,1.0);
   arg2_v.val_.d_ = 1.0;
@@ -1393,8 +1393,8 @@ void test_nan_d_ffv_ffv4(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg2_v(arg2,1.0);
   fvar<fvar<var> > arg3_v(arg3,1.0);
   arg2_v.val_.d_ = 1.0;
@@ -1429,8 +1429,8 @@ void test_nan_ffv_d_ffv1(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg1_v(arg1,1.0);
   fvar<fvar<var> > arg3_v(arg3,1.0);
   arg1_v.val_.d_ = 1.0;
@@ -1465,8 +1465,8 @@ void test_nan_ffv_d_ffv2(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg1_v(arg1,1.0);
   fvar<fvar<var> > arg3_v(arg3,1.0);
   arg1_v.val_.d_ = 1.0;
@@ -1501,8 +1501,8 @@ void test_nan_ffv_d_ffv3(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg1_v(arg1,1.0);
   fvar<fvar<var> > arg3_v(arg3,1.0);
   arg1_v.val_.d_ = 1.0;
@@ -1537,8 +1537,8 @@ void test_nan_ffv_d_ffv4(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg1_v(arg1,1.0);
   fvar<fvar<var> > arg3_v(arg3,1.0);
   arg1_v.val_.d_ = 1.0;
@@ -1573,8 +1573,8 @@ void test_nan_ffv_ffv_d1(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg1_v(arg1,1.0);
   fvar<fvar<var> > arg2_v(arg2,1.0);
   arg1_v.val_.d_ = 1.0;
@@ -1609,8 +1609,8 @@ void test_nan_ffv_ffv_d2(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg1_v(arg1,1.0);
   fvar<fvar<var> > arg2_v(arg2,1.0);
   arg1_v.val_.d_ = 1.0;
@@ -1645,8 +1645,8 @@ void test_nan_ffv_ffv_d3(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg1_v(arg1,1.0);
   fvar<fvar<var> > arg2_v(arg2,1.0);
   arg1_v.val_.d_ = 1.0;
@@ -1681,8 +1681,8 @@ void test_nan_ffv_ffv_d4(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg1_v(arg1,1.0);
   fvar<fvar<var> > arg2_v(arg2,1.0);
   arg1_v.val_.d_ = 1.0;
@@ -1717,8 +1717,8 @@ void test_nan_ffv_d_d1(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg1_v(arg1,1.0);
   arg1_v.val_.d_ = 1.0;
   arg1_v.d_.d_ = 1.0;
@@ -1749,8 +1749,8 @@ void test_nan_ffv_d_d2(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg1_v(arg1,1.0);
   arg1_v.val_.d_ = 1.0;
   arg1_v.d_.d_ = 1.0;
@@ -1781,8 +1781,8 @@ void test_nan_ffv_d_d3(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg1_v(arg1,1.0);
   arg1_v.val_.d_ = 1.0;
   arg1_v.d_.d_ = 1.0;
@@ -1813,8 +1813,8 @@ void test_nan_ffv_d_d4(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg1_v(arg1,1.0);
   arg1_v.val_.d_ = 1.0;
   arg1_v.d_.d_ = 1.0;
@@ -1846,8 +1846,8 @@ void test_nan_d_ffv_d1(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg2_v(arg2,1.0);
   arg2_v.val_.d_ = 1.0;
   arg2_v.d_.d_ = 1.0;
@@ -1878,8 +1878,8 @@ void test_nan_d_ffv_d2(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg2_v(arg2,1.0);
   arg2_v.val_.d_ = 1.0;
   arg2_v.d_.d_ = 1.0;
@@ -1910,8 +1910,8 @@ void test_nan_d_ffv_d3(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg2_v(arg2,1.0);
   arg2_v.val_.d_ = 1.0;
   arg2_v.d_.d_ = 1.0;
@@ -1942,8 +1942,8 @@ void test_nan_d_ffv_d4(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg2_v(arg2,1.0);
   arg2_v.val_.d_ = 1.0;
   arg2_v.d_.d_ = 1.0;
@@ -1975,8 +1975,8 @@ void test_nan_d_d_ffv1(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg3_v(arg3,1.0);
   arg3_v.val_.d_ = 1.0;
   arg3_v.d_.d_ = 1.0;
@@ -2007,8 +2007,8 @@ void test_nan_d_d_ffv2(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg3_v(arg3,1.0);
   arg3_v.val_.d_ = 1.0;
   arg3_v.d_.d_ = 1.0;
@@ -2039,8 +2039,8 @@ void test_nan_d_d_ffv3(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg3_v(arg3,1.0);
   arg3_v.val_.d_ = 1.0;
   arg3_v.d_.d_ = 1.0;
@@ -2071,8 +2071,8 @@ void test_nan_d_d_ffv4(const F& f,
                         const double& arg2,
                         const double& arg3,
                         const bool& throws) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   fvar<fvar<var> > arg3_v(arg3,1.0);
   arg3_v.val_.d_ = 1.0;
   arg3_v.d_.d_ = 1.0;

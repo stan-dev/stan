@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__GAMMA_P_HPP
-#define STAN__MATH__REV__SCAL__FUN__GAMMA_P_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_GAMMA_P_HPP
+#define STAN_MATH_REV_SCAL_FUN_GAMMA_P_HPP
 
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/gamma_p.hpp>
@@ -8,7 +8,7 @@
 #include <valarray>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class gamma_p_vv_vari : public op_vv_vari {
@@ -101,18 +101,18 @@ namespace stan {
       };
     }
 
-    inline var gamma_p(const stan::agrad::var& a,
-                       const stan::agrad::var& b) {
+    inline var gamma_p(const stan::math::var& a,
+                       const stan::math::var& b) {
       return var(new gamma_p_vv_vari(a.vi_, b.vi_));
     }
 
-    inline var gamma_p(const stan::agrad::var& a,
+    inline var gamma_p(const stan::math::var& a,
                        const double& b) {
       return var(new gamma_p_vd_vari(a.vi_, b));
     }
 
     inline var gamma_p(const double& a,
-                       const stan::agrad::var& b) {
+                       const stan::math::var& b) {
       return var(new gamma_p_dv_vari(a, b.vi_));
     }
 

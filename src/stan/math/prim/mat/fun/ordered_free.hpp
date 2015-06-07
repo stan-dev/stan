@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__ORDERED_FREE_HPP
-#define STAN__MATH__PRIM__MAT__FUN__ORDERED_FREE_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_ORDERED_FREE_HPP
+#define STAN_MATH_PRIM_MAT_FUN_ORDERED_FREE_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/err/check_ordered.hpp>
@@ -8,7 +8,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * Return the vector of unconstrained scalars that transform to
@@ -26,7 +26,7 @@ namespace stan {
     template <typename T>
     Eigen::Matrix<T, Eigen::Dynamic, 1>
     ordered_free(const Eigen::Matrix<T, Eigen::Dynamic, 1>& y) {
-      stan::math::check_ordered("stan::prob::ordered_free",
+      stan::math::check_ordered("stan::math::ordered_free",
                                           "Ordered variable", y);
       using Eigen::Matrix;
       using Eigen::Dynamic;

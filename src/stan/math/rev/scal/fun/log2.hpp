@@ -1,12 +1,12 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__LOG2_HPP
-#define STAN__MATH__REV__SCAL__FUN__LOG2_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_LOG2_HPP
+#define STAN_MATH_REV_SCAL_FUN_LOG2_HPP
 
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/log2.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class log2_vari : public op_v_vari {
@@ -50,7 +50,7 @@ namespace stan {
      * @param a Specified variable.
      * @return Base 2 logarithm of the variable.
      */
-    inline var log2(const stan::agrad::var& a) {
+    inline var log2(const stan::math::var& a) {
       return var(new log2_vari(a.vi_));
     }
 

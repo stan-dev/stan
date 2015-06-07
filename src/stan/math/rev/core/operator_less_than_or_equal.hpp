@@ -1,10 +1,10 @@
-#ifndef STAN__MATH__REV__CORE__OPERATOR_LESS_THAN_OR_EQUAL_HPP
-#define STAN__MATH__REV__CORE__OPERATOR_LESS_THAN_OR_EQUAL_HPP
+#ifndef STAN_MATH_REV_CORE_OPERATOR_LESS_THAN_OR_EQUAL_HPP
+#define STAN_MATH_REV_CORE_OPERATOR_LESS_THAN_OR_EQUAL_HPP
 
 #include <stan/math/rev/core/var.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Less than or equal operator comparing two variables' values

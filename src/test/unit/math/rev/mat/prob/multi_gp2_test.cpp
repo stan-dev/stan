@@ -30,15 +30,15 @@ template <typename T_y, typename T_scale, typename T_w>
 void expect_propto(T_y y1, T_scale sigma1, T_w w1, 
                    T_y y2, T_scale sigma2, T_w w2, 
                    std::string message = "") {
-  expect_eq_diffs(stan::prob::multi_gp_log<false>(y1,sigma1,w1),
-                  stan::prob::multi_gp_log<false>(y2,sigma2,w2),
-                  stan::prob::multi_gp_log<true>(y1,sigma1,w1),
-                  stan::prob::multi_gp_log<true>(y2,sigma2,w2),
+  expect_eq_diffs(stan::math::multi_gp_log<false>(y1,sigma1,w1),
+                  stan::math::multi_gp_log<false>(y2,sigma2,w2),
+                  stan::math::multi_gp_log<true>(y1,sigma1,w1),
+                  stan::math::multi_gp_log<true>(y2,sigma2,w2),
                   message);
 }
 
-using stan::agrad::var;
-using stan::agrad::to_var;
+using stan::math::var;
+using stan::math::to_var;
 
 
 TEST_F(agrad_distributions_multi_gp,Propto) {
@@ -80,7 +80,7 @@ TEST_F(agrad_distributions_multi_gp,ProptoSigma) {
 
 
 TEST(ProbDistributionsMultiGP,MultiGPVar) {
-  using stan::agrad::var;
+  using stan::math::var;
   Matrix<var,Dynamic,Dynamic> y(3,3);
   y <<  2.0, -2.0, 11.0,
        -4.0, 0.0, 2.0,
@@ -91,14 +91,14 @@ TEST(ProbDistributionsMultiGP,MultiGPVar) {
   Sigma << 9.0, -3.0, 0.0,
           -3.0,  4.0, 0.0,
            0.0, 0.0, 5.0;
-  EXPECT_FLOAT_EQ(-46.087162, stan::prob::multi_gp_log(y,Sigma,w).val());
+  EXPECT_FLOAT_EQ(-46.087162, stan::math::multi_gp_log(y,Sigma,w).val());
 }
 
 TEST(ProbDistributionsMultiGP,MultiGPGradientUnivariate) {
-  using stan::agrad::var;
+  using stan::math::var;
   using std::vector;
   using Eigen::VectorXd;
-  using stan::prob::multi_gp_log;
+  using stan::math::multi_gp_log;
   
   Matrix<var,Dynamic,Dynamic> y_var(1,1);
   y_var << 2.0;
@@ -114,7 +114,7 @@ TEST(ProbDistributionsMultiGP,MultiGPGradientUnivariate) {
   x.push_back(w_var(0));
   x.push_back(Sigma_var(0,0));
 
-  var lp = stan::prob::multi_gp_log(y_var,Sigma_var,w_var);
+  var lp = stan::math::multi_gp_log(y_var,Sigma_var,w_var);
   vector<double> grad;
   lp.grad(x,grad);
 
@@ -171,7 +171,7 @@ struct multi_gp_fun {
   T operator()(const std::vector<T>& x) const {
     using Eigen::Matrix;
     using Eigen::Dynamic;
-    using stan::agrad::var;
+    using stan::math::var;
     Matrix<T,Dynamic,Dynamic> y(K_,N_);
     Matrix<T,Dynamic,Dynamic> Sigma(N_,N_);
     Matrix<T,Dynamic,1> w(K_);
@@ -188,7 +188,7 @@ struct multi_gp_fun {
     }
     for (int i = 0; i < K_; ++i)
       w(i) = x[pos++];
-    return stan::prob::multi_gp_log<false>(y,Sigma,w);
+    return stan::math::multi_gp_log<false>(y,Sigma,w);
   }
 };
 

@@ -18,7 +18,7 @@
 #include <stan/math/rev/mat/fun/Eigen_NumTraits.hpp>
 
 TEST(AgradRevErrorHandlingMatrix, checkPosDefiniteMatrix_nan) {
-  using stan::agrad::var;
+  using stan::math::var;
   using Eigen::Dynamic;
   using Eigen::Matrix;
 
@@ -48,11 +48,11 @@ TEST(AgradRevErrorHandlingMatrix, checkPosDefiniteMatrix_nan) {
 
   y << 0, 0, 0, 0, 0, 0, 0, 0, 0;
   EXPECT_TRUE(check_pos_semidefinite("checkPosDefiniteMatrix", "y", y));
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 TEST(AgradRevErrorHandlingMatrix, CheckPosDefiniteMatrixVarCheck) {
-  using stan::agrad::var;
+  using stan::math::var;
   using Eigen::Dynamic;
   using Eigen::Matrix;
 
@@ -70,11 +70,11 @@ TEST(AgradRevErrorHandlingMatrix, CheckPosDefiniteMatrixVarCheck) {
     -1, 2, -1,
     0, -1, 2;
 
-  size_t stack_before_call = stan::agrad::ChainableStack::var_stack_.size();
+  size_t stack_before_call = stan::math::ChainableStack::var_stack_.size();
   EXPECT_EQ(10U,stack_before_call);
 
   EXPECT_TRUE(check_pos_semidefinite("checkPosDefiniteMatrix", "y", y));
-  size_t stack_after_call = stan::agrad::ChainableStack::var_stack_.size();
+  size_t stack_after_call = stan::math::ChainableStack::var_stack_.size();
 
   EXPECT_EQ(10U,stack_after_call);
 }

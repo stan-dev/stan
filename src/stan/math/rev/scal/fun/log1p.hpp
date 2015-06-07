@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__LOG1P_HPP
-#define STAN__MATH__REV__SCAL__FUN__LOG1P_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_LOG1P_HPP
+#define STAN_MATH_REV_SCAL_FUN_LOG1P_HPP
 
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
@@ -7,7 +7,7 @@
 #include <valarray>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class log1p_vari : public op_v_vari {
@@ -31,7 +31,7 @@ namespace stan {
      * @param a The variable.
      * @return The log of 1 plus the variable.
      */
-    inline var log1p(const stan::agrad::var& a) {
+    inline var log1p(const stan::math::var& a) {
       return var(new log1p_vari(a.vi_));
     }
 

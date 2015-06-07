@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__MIX__MAT__FUNCTOR__GRAD_TR_MAT_TIMES_HESSIAN_HPP
-#define STAN__MATH__MIX__MAT__FUNCTOR__GRAD_TR_MAT_TIMES_HESSIAN_HPP
+#ifndef STAN_MATH_MIX_MAT_FUNCTOR_GRAD_TR_MAT_TIMES_HESSIAN_HPP
+#define STAN_MATH_MIX_MAT_FUNCTOR_GRAD_TR_MAT_TIMES_HESSIAN_HPP
 
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
@@ -9,7 +9,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     using Eigen::Dynamic;
 
@@ -46,17 +46,17 @@ namespace stan {
           sum += grad_fx_dot_v.d_;
         }
 
-        stan::agrad::grad(sum.vi_);
+        stan::math::grad(sum.vi_);
         for (int i = 0; i < x.size(); ++i)
           grad_tr_MH(i) = x_var(i).adj();
       } catch (const std::exception& e) {
-        stan::agrad::recover_memory_nested();
+        stan::math::recover_memory_nested();
         throw;
       }
-      stan::agrad::recover_memory_nested();
+      stan::math::recover_memory_nested();
     }
 
 
-  }  // namespace agrad
+  }  // namespace math
 }  // namespace stan
 #endif

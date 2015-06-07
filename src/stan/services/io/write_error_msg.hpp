@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__IO__WRITE_ERROR_MSG_HPP
-#define STAN__SERVICES__IO__WRITE_ERROR_MSG_HPP
+#ifndef STAN_SERVICES_IO_WRITE_ERROR_MSG_HPP
+#define STAN_SERVICES_IO_WRITE_ERROR_MSG_HPP
 
 #include <ostream>
 #include <stdexcept>
@@ -7,12 +7,12 @@
 namespace stan {
   namespace services {
     namespace io {
-       
+
       void write_error_msg(std::ostream* error_stream,
                            const std::exception& e) {
-        
+
         if (!error_stream) return;
-        
+
         *error_stream << std::endl
                       << "Informational Message: The current Metropolis proposal is about to be"
                       << " rejected because of the following issue:"
@@ -25,7 +25,7 @@ namespace stan {
                       << " severely ill-conditioned or misspecified."
                       << std::endl;
       }
-    
+
     }
   }
 }

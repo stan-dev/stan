@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__EXP2_HPP
-#define STAN__MATH__REV__SCAL__FUN__EXP2_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_EXP2_HPP
+#define STAN_MATH_REV_SCAL_FUN_EXP2_HPP
 
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
@@ -7,7 +7,7 @@
 #include <valarray>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class exp2_vari : public op_v_vari {
@@ -49,7 +49,7 @@ namespace stan {
      * @param a The variable.
      * @return Two to the power of the specified variable.
      */
-    inline var exp2(const stan::agrad::var& a) {
+    inline var exp2(const stan::math::var& a) {
       return var(new exp2_vari(a.vi_));
     }
 

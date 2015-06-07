@@ -3,7 +3,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::math::var;
 
 class AgradDistributionsUniform : public AgradDistributionTest {
 public:
@@ -44,7 +44,7 @@ public:
   typename stan::return_type<T_y, T_low, T_high>::type 
   log_prob(const T_y& y, const T_low& alpha, const T_high& beta,
            const T3&, const T4&, const T5&) {
-    return stan::prob::uniform_log(y, alpha, beta);
+    return stan::math::uniform_log(y, alpha, beta);
   }
 
   template <bool propto, 
@@ -53,7 +53,7 @@ public:
   typename stan::return_type<T_y, T_low, T_high>::type 
   log_prob(const T_y& y, const T_low& alpha, const T_high& beta,
            const T3&, const T4&, const T5&) {
-    return stan::prob::uniform_log<propto>(y, alpha, beta);
+    return stan::math::uniform_log<propto>(y, alpha, beta);
   }
   
   
@@ -62,7 +62,7 @@ public:
   typename stan::return_type<T_y, T_low, T_high>::type 
   log_prob_function(const T_y& y, const T_low& alpha, const T_high& beta,
                     const T3&, const T4&, const T5&) {
-      using stan::prob::LOG_ZERO;
+      using stan::math::LOG_ZERO;
 
       if (y < alpha || y > beta)
         return LOG_ZERO;

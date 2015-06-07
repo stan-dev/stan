@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__PROB__INV_WISHART_RNG_HPP
-#define STAN__MATH__PRIM__MAT__PROB__INV_WISHART_RNG_HPP
+#ifndef STAN_MATH_PRIM_MAT_PROB_INV_WISHART_RNG_HPP
+#define STAN_MATH_PRIM_MAT_PROB_INV_WISHART_RNG_HPP
 
 #include <stan/math/prim/mat/err/check_ldlt_factor.hpp>
 #include <stan/math/prim/scal/err/check_greater.hpp>
@@ -9,12 +9,12 @@
 #include <stan/math/prim/mat/fun/log_determinant_ldlt.hpp>
 #include <stan/math/prim/mat/fun/mdivide_left_ldlt.hpp>
 
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/mat/prob/wishart_rng.hpp>
 
 namespace stan {
-  namespace prob {
+  namespace math {
 
     template <class RNG>
     inline Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>
@@ -22,7 +22,7 @@ namespace stan {
                     const Eigen::Matrix
                     <double, Eigen::Dynamic, Eigen::Dynamic>& S,
                     RNG& rng) {
-      static const char* function("stan::prob::inv_wishart_rng");
+      static const char* function("stan::math::inv_wishart_rng");
 
       using stan::math::check_greater;
       using stan::math::check_square;

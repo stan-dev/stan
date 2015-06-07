@@ -1,12 +1,12 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__CORR_CONSTRAIN_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__CORR_CONSTRAIN_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_CORR_CONSTRAIN_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_CORR_CONSTRAIN_HPP
 
 #include <stan/math/prim/scal/fun/log1m.hpp>
 #include <cmath>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * Return the result of transforming the specified scalar to have
