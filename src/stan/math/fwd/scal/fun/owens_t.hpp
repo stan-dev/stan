@@ -18,7 +18,7 @@ namespace stan {
       using stan::math::INV_SQRT_TWO_PI;
       using stan::math::square;
       using std::exp;
-      using std::erf;
+      using ::erf;
 
       T neg_x1_sq_div_2 = -square(x1.val_) * 0.5;
       T one_p_x2_sq = 1.0 + square(x2.val_);
@@ -52,7 +52,7 @@ namespace stan {
       using stan::math::INV_SQRT_2;
       using stan::math::INV_SQRT_TWO_PI;
       using std::exp;
-      using std::erf;
+      using ::erf;
 
       T neg_x1_sq_div_2 = -square(x1.val_) * 0.5;
       return fvar<T>(owens_t(x1.val_, x2),
