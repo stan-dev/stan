@@ -318,8 +318,6 @@ namespace stan {
 
     void generate_usings(std::ostream& o) {
       generate_using("std::istream",o);
-      generate_using("std::max",o);
-      generate_using("std::min",o);
       generate_using("std::string",o);
       generate_using("std::stringstream",o);
       generate_using("std::vector",o);
