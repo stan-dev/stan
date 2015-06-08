@@ -192,6 +192,7 @@ namespace stan {
        * @return Vector made up of the next scalars.
        */
       inline std::vector<T> std_vector(size_t m) {
+        if (m == 0) return std::vector<T>();
         std::vector<T> vec;
         T& start = scalar_ptr_increment(m);
         vec.insert(vec.begin(), &start, &scalar_ptr());
@@ -206,6 +207,7 @@ namespace stan {
        * @return Column vector made up of the next scalars.
        */
       inline vector_t vector(size_t m) {
+        if (m == 0) return vector_t();
         return map_vector_t(&scalar_ptr_increment(m), m);
       }
       /**
@@ -216,6 +218,7 @@ namespace stan {
        * @return Column vector made up of the next scalars.
        */
       inline vector_t vector_constrain(size_t m) {
+        if (m == 0) return vector_t();
         return map_vector_t(&scalar_ptr_increment(m), m);
       }
       /**
@@ -227,6 +230,7 @@ namespace stan {
        * @return Column vector made up of the next scalars.
        */
       inline vector_t vector_constrain(size_t m, T& /*lp*/) {
+        if (m == 0) return vector_t();
         return map_vector_t(&scalar_ptr_increment(m), m);
       }
 
@@ -240,6 +244,7 @@ namespace stan {
        * @return Column vector made up of the next scalars.
        */
       inline row_vector_t row_vector(size_t m) {
+        if (m == 0) return row_vector_t();
         return map_row_vector_t(&scalar_ptr_increment(m), m);
       }
 
@@ -251,6 +256,7 @@ namespace stan {
        * @return Column vector made up of the next scalars.
        */
       inline row_vector_t row_vector_constrain(size_t m) {
+        if (m == 0) return row_vector_t();
         return map_row_vector_t(&scalar_ptr_increment(m), m);
       }
 
@@ -264,6 +270,7 @@ namespace stan {
        * @return Column vector made up of the next scalars.
        */
       inline row_vector_t row_vector_constrain(size_t m, T& /*lp*/) {
+        if (m == 0) return row_vector_t();
         return map_row_vector_t(&scalar_ptr_increment(m), m);
       }
 
@@ -285,6 +292,7 @@ namespace stan {
        * @return Eigen::Matrix made up of the next scalars.
        */
       inline matrix_t matrix(size_t m, size_t n) {
+        if (m == 0 || n == 0) return matrix_t(m,n);
         return map_matrix_t(&scalar_ptr_increment(m*n), m, n);
       }
 
@@ -299,6 +307,7 @@ namespace stan {
        * @return Matrix made up of the next scalars.
        */
       inline matrix_t matrix_constrain(size_t m, size_t n) {
+        if (m == 0 || n == 0) return matrix_t(m,n);
         return map_matrix_t(&scalar_ptr_increment(m*n), m, n);
       }
 
@@ -315,6 +324,7 @@ namespace stan {
        * @return Matrix made up of the next scalars.
        */
       inline matrix_t matrix_constrain(size_t m, size_t n, T& /*lp*/) {
+        if (m == 0 || n == 0) return matrix_t(m,n);
         return map_matrix_t(&scalar_ptr_increment(m*n), m, n);
       }
 
