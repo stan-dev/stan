@@ -38,22 +38,25 @@ namespace stan {
 
       using stan::math::check_finite;
       using stan::math::check_positive_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_nonnegative;
+      using stan::math::check_less;
 
       check_finite(function, "Log-location parameter", eta);
       check_positive_finite(function, "Precision parameter", phi);
 
-      double phi_mult_exp_eta = std::exp(eta)/phi;
+      double exp_eta_div_phi = std::exp(eta)/phi;
 
       //gamma_rng params must be positive and finite
       check_positive_finite(function,
-        "Log-location parameter multiplied by the exponential of the"
-        " precision parameter", phi_mult_exp_eta);
+        "Exponential of the log-location parameter divided by"
+        "the precision parameter", exp_eta_div_phi);
 
       double rng_from_gamma =
         variate_generator<RNG&, gamma_distribution<> >
-        (rng, gamma_distribution<>(phi, phi_mult_exp_eta))();
+        (rng, gamma_distribution<>(phi, exp_eta_div_phi))();
 
-      //constraints for poisson_rng
+      //same as the constraints for poisson_rng
       check_less(function,
         "Random number that came from gamma distribution",
         rng_from_gamma, POISSON_MAX_RATE);
