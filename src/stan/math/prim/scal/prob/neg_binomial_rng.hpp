@@ -36,6 +36,7 @@ namespace stan {
       using boost::gamma_distribution;
 
       static const char* function("stan::math::neg_binomial_rng");
+      static const double POISSON_MAX_RATE = std::pow(2.0, 30);
 
       using stan::math::check_positive_finite;
       using stan::math::check_not_nan;
