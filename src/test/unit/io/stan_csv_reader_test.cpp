@@ -211,7 +211,7 @@ TEST_F(StanIoStanCsvReader,read_samples1) {
 TEST_F(StanIoStanCsvReader,ParseBlocker) {
   
   stan::io::stan_csv blocker0;
-  blocker0 = stan::io::stan_csv_reader::parse(blocker0_stream);
+  blocker0 = stan::io::stan_csv_reader::parse(blocker0_stream, &std::cout);
   
   // metadata
   EXPECT_EQ(1, blocker0.metadata.stan_version_major);
@@ -454,7 +454,7 @@ TEST_F(StanIoStanCsvReader,read_samples2) {
 
 TEST_F(StanIoStanCsvReader,ParseEpil) {
   stan::io::stan_csv epil0;
-  epil0 = stan::io::stan_csv_reader::parse(epil0_stream);
+  epil0 = stan::io::stan_csv_reader::parse(epil0_stream, &std::cout);
   
   // metadata
   EXPECT_EQ(1, epil0.metadata.stan_version_major);
@@ -529,7 +529,7 @@ TEST_F(StanIoStanCsvReader,ParseEpil) {
 
 TEST_F(StanIoStanCsvReader,ParseBlockerNondiag) {
   stan::io::stan_csv blocker_nondiag;
-  blocker_nondiag = stan::io::stan_csv_reader::parse(blocker_nondiag0_stream);
+  blocker_nondiag = stan::io::stan_csv_reader::parse(blocker_nondiag0_stream, &std::cout);
   
   // metadata
   EXPECT_EQ(1, blocker_nondiag.metadata.stan_version_major);
