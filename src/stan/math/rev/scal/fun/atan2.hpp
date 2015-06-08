@@ -2,7 +2,7 @@
 #define STAN_MATH_REV_SCAL_FUN_ATAN2_HPP
 
 #include <stan/math/rev/core.hpp>
-#include <math.h>
+#include <cmath>
 #include <valarray>
 
 namespace stan {
@@ -12,7 +12,7 @@ namespace stan {
       class atan2_vv_vari : public op_vv_vari {
       public:
         atan2_vv_vari(vari* avi, vari* bvi) :
-          op_vv_vari(::atan2(avi->val_, bvi->val_), avi, bvi) {
+          op_vv_vari(std::atan2(avi->val_, bvi->val_), avi, bvi) {
         }
         void chain() {
           double a_sq_plus_b_sq = (avi_->val_ * avi_->val_)
@@ -25,7 +25,7 @@ namespace stan {
       class atan2_vd_vari : public op_vd_vari {
       public:
         atan2_vd_vari(vari* avi, double b) :
-          op_vd_vari(::atan2(avi->val_, b), avi, b) {
+          op_vd_vari(std::atan2(avi->val_, b), avi, b) {
         }
         void chain() {
           double a_sq_plus_b_sq = (avi_->val_ * avi_->val_) + (bd_ * bd_);
@@ -36,7 +36,7 @@ namespace stan {
       class atan2_dv_vari : public op_dv_vari {
       public:
         atan2_dv_vari(double a, vari* bvi) :
-          op_dv_vari(::atan2(a, bvi->val_), a, bvi) {
+          op_dv_vari(std::atan2(a, bvi->val_), a, bvi) {
         }
         void chain() {
           double a_sq_plus_b_sq = (ad_ * ad_) + (bvi_->val_ * bvi_->val_);

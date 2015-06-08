@@ -6,13 +6,10 @@
 
 
 namespace stan {
-
   namespace math {
 
     template <typename T>
-    inline
-    fvar<T>
-    trunc(const fvar<T>& x) {
+    inline fvar<T> trunc(const fvar<T>& x) {
       using ::trunc;
       return fvar<T>(trunc(x.val_), 0);
     }
