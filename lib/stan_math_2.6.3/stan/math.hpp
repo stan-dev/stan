@@ -17,7 +17,6 @@
 #include <stan/math/prim/mat/meta/value_type.hpp>
 
 #include <stan/math/prim/scal/meta/child_type.hpp>
-#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/contains_fvar.hpp>
 #include <stan/math/prim/scal/meta/contains_nonconstant_struct.hpp>
 #include <stan/math/prim/scal/meta/contains_vector.hpp>
@@ -152,7 +151,6 @@
 #include <stan/math/prim/mat/fun/log_softmax.hpp>
 #include <stan/math/prim/mat/fun/log_sum_exp.hpp>
 #include <stan/math/prim/mat/fun/make_nu.hpp>
-#include <stan/math/prim/mat/fun/max.hpp>
 #include <stan/math/prim/mat/fun/mdivide_left.hpp>
 #include <stan/math/prim/mat/fun/mdivide_left_ldlt.hpp>
 #include <stan/math/prim/mat/fun/mdivide_left_spd.hpp>
@@ -164,7 +162,6 @@
 #include <stan/math/prim/mat/fun/mdivide_right_tri.hpp>
 #include <stan/math/prim/mat/fun/mdivide_right_tri_low.hpp>
 #include <stan/math/prim/mat/fun/mean.hpp>
-#include <stan/math/prim/mat/fun/min.hpp>
 #include <stan/math/prim/mat/fun/minus.hpp>
 #include <stan/math/prim/mat/fun/multiply.hpp>
 #include <stan/math/prim/mat/fun/multiply_lower_tri_self_transpose.hpp>
@@ -354,8 +351,6 @@
 #include <stan/math/prim/scal/fun/logit.hpp>
 #include <stan/math/prim/scal/fun/lub_constrain.hpp>
 #include <stan/math/prim/scal/fun/lub_free.hpp>
-#include <stan/math/prim/scal/fun/max.hpp>
-#include <stan/math/prim/scal/fun/min.hpp>
 #include <stan/math/prim/scal/fun/modified_bessel_first_kind.hpp>
 #include <stan/math/prim/scal/fun/modified_bessel_second_kind.hpp>
 #include <stan/math/prim/scal/fun/modulus.hpp>

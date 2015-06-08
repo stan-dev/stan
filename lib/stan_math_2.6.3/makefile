@@ -32,7 +32,7 @@ CPPLINT ?= ../cpplint_4.45
 ##
 # Set default compiler options.
 ## 
-CFLAGS = -I src -isystem $(EIGEN) -isystem $(BOOST) -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -pipe
+CFLAGS = -I . -isystem $(EIGEN) -isystem $(BOOST) -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -pipe
 CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
 LDLIBS = 
 EXE = 
@@ -60,7 +60,6 @@ WINE =
 -include make/detect_os
 
 include make/tests    # tests
-include make/doxygen  # doxygen
 include make/cpplint  # cpplint
 
 ##
@@ -73,7 +72,7 @@ endif
 ##
 # Rule for generating dependencies.
 ##
-test/%.d : src/%.cpp
+test/%.d : stan/%.cpp
 	@mkdir -p $(dir $@)
 	@set -e; \
 	rm -f $@; \
@@ -104,19 +103,23 @@ endif
 	@echo 'Tests:'
 	@echo ''
 	@echo '  Unit tests are built through make by specifying the executable as the target'
-	@echo '  to make. For a test in src/test/*_test.cpp, the executable is test/*$(EXE).'
+	@echo '  to make. For a test in test/*_test.cpp, the executable is test/*$(EXE).'
 	@echo ''
 	@echo '  Header tests'
 	@echo '  - test-headers  : tests all source headers to ensure they are compilable and'
 	@echo '                     include enough header files.'
 	@echo ''
 	@echo '  To run a single header test, add "-test" to the end of the file name.'
-	@echo '  Example: make src/stan/math/constants.hpp-test'
+	@echo '  Example: make stan/math/constants.hpp-test'
 	@echo ''
 	@echo '  Cpplint'
 	@echo '  - cpplint       : runs cpplint.py on source files. requires python 2.7.'
 	@echo '                    cpplint is called using the CPPLINT variable:'
 	@echo '                      CPPLINT = $(CPPLINT)'
+	@echo ''
+	@echo 'Documentation:'
+	@echo '  Doxygen'
+	@echo '  - doxygen       : runs doxygen on source files. requires doxygen.'
 	@echo ''
 	@echo 'Clean:'
 	@echo '  - clean         : Basic clean. Leaves doc and compiled libraries intact.'
@@ -126,34 +129,31 @@ endif
 	@echo ''
 	@echo '--------------------------------------------------------------------------------'
 
-
-##
-# Documentation
-##
-
-.PHONY: docs
-docs: doxygen
+## doxygen
+.PHONY: doxygen
+doxygen: 
+	mkdir -p doc/api
+	doxygen doxygen/doxygen.cfg
 
 ##
 # Clean up.
 ##
-MODEL_SPECS := $(shell find src/test -type f -name '*.stan')
-.PHONY: clean clean-demo clean-dox clean-manual clean-models clean-all clean-deps
+.PHONY: clean clean-doxygen clean-deps clean-all
 clean:
-	$(RM) $(shell find src -type f -name '*.dSYM') $(shell find src -type f -name '*.d.*')
+	@echo '  removing test executables'	
+	$(shell find test -type f -name "*_test$(EXE)" -exec rm {} +)
+	$(shell find test -type f -name "*_test.d" -exec rm {} +)
+	$(shell find test -type f -name "*_test.xml" -exec rm {} +)
 
-clean-dox:
+clean-doxygen:
 	$(RM) -r doc/api
-
-clean-manual:
-	rm -rf doc
-	cd src/docs/stan-reference; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
 
 clean-deps:
 	@echo '  removing dependency files'
 	$(shell find . -type f -name '*.d' -exec rm {} +)
+	$(RM) $(shell find stan -type f -name '*.dSYM') $(shell find stan -type f -name '*.d.*')
 
-clean-all: clean clean-manual clean-deps
-	$(RM) -r test
+clean-all: clean clean-doxygen clean-deps
 	@echo '  removing generated test files'
-	$(shell find src/test/prob -name '*_generated_*_test.cpp' -type f -exec rm {} +)
+	$(shell find test/prob -name '*_generated_*_test.cpp' -type f -exec rm {} +)
+	$(RM) $(wildcard test/gtest.o test/libgtest* test/prob/generate_tests$(EXE))

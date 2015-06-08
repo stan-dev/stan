@@ -1,5 +1,6 @@
+
+
 # /
-/test
 /*.dSYM
 
 # other binary
@@ -31,8 +32,20 @@ stan.Rproj
 stan.kdev4
 .Rapp.history
 
-# tests: generated agrad tests
-/src/test/prob/*/*_generated_*_test.cpp
+# tests:
+#test files
+/test/*
+!/test/*.hpp
+!/test/*.cpp
+!/test/*.stan
+## generated tests
+/test/prob/*/*_generated_*_test.cpp
+## lib files
+lib*.a
+## test output
+/test/*/*.xml
+## dependency files
+/test/*/*.d.*
 
 # For the Mac
 *.DS_Store
