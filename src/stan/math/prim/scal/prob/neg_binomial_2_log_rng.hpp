@@ -37,18 +37,12 @@ namespace stan {
       static const char* function("stan::math::neg_binomial_2_log_rng");
       static const double POISSON_MAX_RATE = std::pow(2.0, 30);
 
-      using stan::math::check_finite;
-      using stan::math::check_positive_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_nonnegative;
-      using stan::math::check_less;
-
       check_finite(function, "Log-location parameter", eta);
       check_positive_finite(function, "Precision parameter", phi);
 
       double exp_eta_div_phi = std::exp(eta)/phi;
 
-      //gamma_rng params must be positive and finite
+      // gamma_rng params must be positive and finite
       check_positive_finite(function,
         "Exponential of the log-location parameter divided by"
         "the precision parameter", exp_eta_div_phi);
@@ -57,7 +51,7 @@ namespace stan {
         variate_generator<RNG&, gamma_distribution<> >
         (rng, gamma_distribution<>(phi, exp_eta_div_phi))();
 
-      //same as the constraints for poisson_rng
+      // same as the constraints for poisson_rng
       check_less(function,
         "Random number that came from gamma distribution",
         rng_from_gamma, POISSON_MAX_RATE);

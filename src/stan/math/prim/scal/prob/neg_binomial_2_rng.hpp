@@ -37,17 +37,12 @@ namespace stan {
       static const char* function("stan::math::neg_binomial_2_rng");
       static const double POISSON_MAX_RATE = std::pow(2.0, 30);
 
-      using stan::math::check_positive_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_nonnegative;
-      using stan::math::check_less;
-
       check_positive_finite(function, "Location parameter", mu);
       check_positive_finite(function, "Precision parameter", phi);
 
       double mu_div_phi = mu/phi;
 
-      //gamma_rng params must be positive and finite
+      // gamma_rng params must be positive and finite
       check_positive_finite(function,
         "Location parameter divided by the precision parameter",
         mu_div_phi);
@@ -56,7 +51,7 @@ namespace stan {
         variate_generator<RNG&, gamma_distribution<> >
         (rng, gamma_distribution<>(phi, mu_div_phi))();
 
-      //same as the constraints for poisson_rng
+      // same as the constraints for poisson_rng
       check_less(function,
         "Random number that came from gamma distribution",
         rng_from_gamma, POISSON_MAX_RATE);

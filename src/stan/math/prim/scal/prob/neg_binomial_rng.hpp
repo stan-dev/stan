@@ -36,14 +36,8 @@ namespace stan {
       using boost::gamma_distribution;
 
       static const char* function("stan::math::neg_binomial_rng");
-      static const double POISSON_MAX_RATE = std::pow(2.0, 30);
 
-      using stan::math::check_positive_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_nonnegative;
-      using stan::math::check_less;
-
-      //gamma_rng params must be positive and finite
+      // gamma_rng params must be positive and finite
       check_positive_finite(function, "Shape parameter", alpha);
       check_positive_finite(function, "Inverse scale parameter", beta);
 
@@ -51,7 +45,7 @@ namespace stan {
         variate_generator<RNG&, gamma_distribution<> >
         (rng, gamma_distribution<>(alpha, 1.0 / beta))();
 
-      //same as the constraints for poisson_rng
+      // same as the constraints for poisson_rng
       check_less(function,
         "Random number that came from gamma distribution",
         rng_from_gamma, POISSON_MAX_RATE);
