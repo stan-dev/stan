@@ -22,7 +22,7 @@ namespace stan {
     /**
      * Returns the cube root of the specified variable (C99).
      *
-     * See boost::math::cbrt() for the double-based version.
+     * See ::cbrt() for the double-based version.
      *
      * The derivative is
      *
@@ -47,7 +47,7 @@ namespace stan {
      * @param a Specified variable.
      * @return Cube root of the variable.
      */
-    inline var cbrt(const stan::math::var& a) {
+    inline var cbrt(const var& a) {
       return var(new cbrt_vari(a.vi_));
     }
 

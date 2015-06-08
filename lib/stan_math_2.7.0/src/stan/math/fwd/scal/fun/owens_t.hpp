@@ -1,19 +1,17 @@
 #ifndef STAN_MATH_FWD_SCAL_FUN_OWENS_T_HPP
 #define STAN_MATH_FWD_SCAL_FUN_OWENS_T_HPP
 
-#include <math.h>
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/owens_t.hpp>
 #include <stan/math/prim/scal/fun/square.hpp>
+#include <cmath>
 
 namespace stan {
   namespace math {
 
     template <typename T>
-    inline
-    fvar<T>
-    owens_t(const fvar<T>& x1, const fvar<T>& x2) {
+    inline fvar<T> owens_t(const fvar<T>& x1, const fvar<T>& x2) {
       using stan::math::owens_t;
       using stan::math::pi;
       using stan::math::INV_SQRT_2;
@@ -24,7 +22,6 @@ namespace stan {
 
       T neg_x1_sq_div_2 = -square(x1.val_) * 0.5;
       T one_p_x2_sq = 1.0 + square(x2.val_);
-
       return fvar<T>(owens_t(x1.val_, x2.val_),
                      - x1.d_
                      * (erf(x2.val_ * x1.val_ * INV_SQRT_2)
@@ -34,9 +31,7 @@ namespace stan {
     }
 
     template <typename T>
-    inline
-    fvar<T>
-    owens_t(const double x1, const fvar<T>& x2) {
+    inline fvar<T> owens_t(const double x1, const fvar<T>& x2) {
       using stan::math::owens_t;
       using stan::math::pi;
       using stan::math::square;
@@ -44,16 +39,13 @@ namespace stan {
 
       T neg_x1_sq_div_2 = -square(x1) * 0.5;
       T one_p_x2_sq = 1.0 + square(x2.val_);
-
       return fvar<T>(owens_t(x1, x2.val_),
                      x2.d_ * exp(neg_x1_sq_div_2 * one_p_x2_sq)
                      / (one_p_x2_sq * 2.0 * pi()));
     }
 
     template <typename T>
-    inline
-    fvar<T>
-    owens_t(const fvar<T>& x1, const double x2) {
+    inline fvar<T> owens_t(const fvar<T>& x1, const double x2) {
       using stan::math::owens_t;
       using stan::math::pi;
       using stan::math::square;
@@ -63,7 +55,6 @@ namespace stan {
       using ::erf;
 
       T neg_x1_sq_div_2 = -square(x1.val_) * 0.5;
-
       return fvar<T>(owens_t(x1.val_, x2),
                      -x1.d_  * (erf(x2 * x1.val_ * INV_SQRT_2)
                                 * exp(neg_x1_sq_div_2)

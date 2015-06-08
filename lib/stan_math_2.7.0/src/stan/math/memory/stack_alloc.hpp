@@ -1,17 +1,19 @@
 #ifndef STAN_MATH_MEMORY_STACK_ALLOC_HPP
 #define STAN_MATH_MEMORY_STACK_ALLOC_HPP
 
+// TODO(Bob): <cstddef> replaces this ifdef in C++11, until then this
+//            is best we can do to get safe pointer casts to uints.
+#if defined(_MSC_VER)
+    #include <msinttypes.h>  // Microsoft Visual Studio lacks full stdint.h
+#else
+    #include <stdint.h>
+#endif
+#include <stan/math/prim/scal/meta/likely.hpp>
 #include <cstdlib>
 #include <cstddef>
 #include <sstream>
 #include <stdexcept>
-#if defined(_MSC_VER)
-    #include <msinttypes.h>  // Microsoft Visual Studio lacks compliant stdint.h
-#else
-    #include <stdint.h> // FIXME: replace with cstddef?
-#endif
 #include <vector>
-#include <stan/math/prim/scal/meta/likely.hpp>
 
 namespace stan {
 
@@ -35,15 +37,15 @@ namespace stan {
 
 
     namespace {
-      const size_t DEFAULT_INITIAL_NBYTES = 1 << 16; // 64KB
+      const size_t DEFAULT_INITIAL_NBYTES = 1 << 16;  // 64KB
 
 
       // FIXME: enforce alignment
       // big fun to inline, but only called twice
       inline char* eight_byte_aligned_malloc(size_t size) {
         char* ptr = static_cast<char*>(malloc(size));
-        if (!ptr) return ptr; // malloc failed to alloc
-        if (!is_aligned(ptr,8U)) {
+        if (!ptr) return ptr;  // malloc failed to alloc
+        if (!is_aligned(ptr, 8U)) {
           std::stringstream s;
           s << "invalid alignment to 8 bytes, ptr="
             << reinterpret_cast<uintptr_t>(ptr)
@@ -75,12 +77,13 @@ namespace stan {
      */
     class stack_alloc {
     private:
-      std::vector<char*> blocks_; // storage for blocks, may be bigger than cur_block_
-      std::vector<size_t> sizes_; // could store initial & shift for others
-      size_t cur_block_;          // index into blocks_ for next alloc
-      char* cur_block_end_;       // ptr to cur_block_ptr_ + sizes_[cur_block_]
-      char* next_loc_;            // ptr to next available spot in cur
-                                  // block
+      std::vector<char*> blocks_;  // storage for blocks,
+                                   // may be bigger than cur_block_
+      std::vector<size_t> sizes_;  // could store initial & shift for others
+      size_t cur_block_;           // index into blocks_ for next alloc
+      char* cur_block_end_;        // ptr to cur_block_ptr_ + sizes_[cur_block_]
+      char* next_loc_;             // ptr to next available spot in cur
+                                   // block
       // next three for keeping track of nested allocations on top of stack:
       std::vector<size_t> nested_cur_blocks_;
       std::vector<char*> nested_next_locs_;
@@ -120,7 +123,6 @@ namespace stan {
       }
 
     public:
-
       /**
        * Construct a resizable stack allocator initially holding the
        * specified number of bytes.
@@ -130,9 +132,9 @@ namespace stan {
        * @throws std::runtime_error if the underlying malloc is not 8-byte
        * aligned.
        */
-      stack_alloc(size_t initial_nbytes = DEFAULT_INITIAL_NBYTES) :
+      explicit stack_alloc(size_t initial_nbytes = DEFAULT_INITIAL_NBYTES) :
         blocks_(1, eight_byte_aligned_malloc(initial_nbytes)),
-        sizes_(1,initial_nbytes),
+        sizes_(1, initial_nbytes),
         cur_block_(0),
         cur_block_end_(blocks_[0] + initial_nbytes),
         next_loc_(blocks_[0]) {
@@ -172,7 +174,7 @@ namespace stan {
         // Occasionally, we have to switch blocks.
         if (unlikely(next_loc_ >= cur_block_end_))
           result = move_to_next_block(len);
-        return (void*)result;
+        return reinterpret_cast<void*>(result);
       }
 
       /**
@@ -261,7 +263,6 @@ namespace stan {
         }
         return sum;
       }
-
     };
 
   }

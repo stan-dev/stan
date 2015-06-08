@@ -5,7 +5,6 @@
 #include <boost/random/additive_combine.hpp>  // L'Ecuyer RNG
 #include <boost/random/uniform_real_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
-
 #include <stan/model/util.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/io/array_var_context.hpp>
@@ -15,8 +14,7 @@
 #include <stan/math/prim/scal/fun/is_inf.hpp>
 #include <stan/math/prim/scal/fun/is_nan.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-
-#include <math.h>
+#include <cmath>
 #include <iostream>
 #include <limits>
 #include <stdexcept>
@@ -39,9 +37,9 @@ namespace stan {
          * parameters and generated quantities), this function would not be
          * necessary.
          *
-         * FIXME: this function can be removed if the names of parameters excluding
-         * transformed parameters and generated quantities can be obtained from
-         * a model directly.
+         * FIXME: this function can be removed if the names of
+         * parameters excluding transformed parameters and generated
+         * quantities can be obtained from a model directly.
          *
          * @param[in,out]  name  parameter name
          */
@@ -258,7 +256,7 @@ namespace stan {
        */
 
       template <class ContextFactory, class Model, class RNG>
-      bool initialize_state_source_and_random(const std::string source,
+      bool initialize_state_source_and_random(const std::string& source,
                                               double R,
                                               Eigen::VectorXd& cont_params,
                                               Model& model,
@@ -409,7 +407,7 @@ namespace stan {
        *                            it's used for randomly generating partial inits
        */
       template <class ContextFactory, class Model, class RNG>
-      bool initialize_state(const std::string init,
+      bool initialize_state(const std::string& init,
                             Eigen::VectorXd& cont_params,
                             Model& model,
                             RNG& base_rng,
@@ -432,8 +430,8 @@ namespace stan {
                                        enable_random_init,
                                        init_r);
       }
+
     }  // init
   }  // services
 }  // stan
-
 #endif
