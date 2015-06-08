@@ -31,17 +31,43 @@ namespace stan {
                        RNG& rng) {
       using boost::variate_generator;
       using boost::random::negative_binomial_distribution;
+      using boost::random::poisson_distribution;
+      using boost::gamma_distribution;
 
       static const char* function("stan::math::neg_binomial_2_rng");
 
       using stan::math::check_positive_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_nonnegative;
+      using stan::math::check_less;
 
       check_positive_finite(function, "Location parameter", mu);
       check_positive_finite(function, "Precision parameter", phi);
 
+      double mu_div_phi = mu/phi;
 
-      return stan::math::poisson_rng(stan::math::gamma_rng(phi, phi/mu,
-                                                           rng), rng);
+      //gamma_rng params must be positive and finite
+      check_positive_finite(function,
+        "Location parameter divided by the precision parameter",
+        mu_div_phi);
+
+      double rng_from_gamma =
+        variate_generator<RNG&, gamma_distribution<> >
+        (rng, gamma_distribution<>(phi, mu_div_phi))();
+
+      //same as the constraints for poisson_rng
+      check_less(function,
+        "Random number that came from gamma distribution",
+        rng_from_gamma, POISSON_MAX_RATE);
+      check_not_nan(function,
+        "Random number that came from gamma distribution",
+        rng_from_gamma);
+      check_nonnegative(function,
+        "Random number that came from gamma distribution",
+        rng_from_gamma);
+
+      return variate_generator<RNG&, poisson_distribution<> >
+        (rng, poisson_distribution<>(rng_from_gamma))();
     }
   }
 }
