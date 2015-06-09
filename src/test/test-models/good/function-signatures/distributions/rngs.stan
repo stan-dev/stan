@@ -26,7 +26,7 @@ generated quantities {
   n <- neg_binomial_2_log_rng(1.2,3.9);
   n <- ordered_logistic_rng(1.9,theta);
   n <- poisson_rng(2.7);
-  // n <- poisson_log_rng(2.7);
+  n <- poisson_log_rng(2.7);
 
   n <- categorical_rng(theta);
   ns <- multinomial_rng(theta,20);
@@ -52,9 +52,9 @@ generated quantities {
   z <- pareto_type_2_rng(3.0, 2.0, 1.5);
   z <- beta_rng(110.0, 250.1);
   z <- uniform_rng(-1.0, 1.0);
-  z <- rayleigh_rng(1.0);  
+  z <- rayleigh_rng(1.0);
   z <- frechet_rng(2.0, 3.2);
-  
+
   theta <- dirichlet_rng(alpha);
   v <- multi_normal_rng(mu,Sigma);
   // v <- multi_normal_prec_rng(mu,Sigma);
@@ -65,8 +65,8 @@ generated quantities {
   Sigma <- lkj_corr_rng(3,2.5);
   L <- lkj_corr_cholesky_rng(3,3.0);
   // DEPRECATE:  Sigma <- lkj_cov_rng(Sigma, mu, alpha, 2.0);
-  
- 
-  
-  
+
+
+
+
 }
