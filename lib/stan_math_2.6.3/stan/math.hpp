@@ -151,6 +151,7 @@
 #include <stan/math/prim/mat/fun/log_softmax.hpp>
 #include <stan/math/prim/mat/fun/log_sum_exp.hpp>
 #include <stan/math/prim/mat/fun/make_nu.hpp>
+#include <stan/math/prim/mat/fun/max.hpp>
 #include <stan/math/prim/mat/fun/mdivide_left.hpp>
 #include <stan/math/prim/mat/fun/mdivide_left_ldlt.hpp>
 #include <stan/math/prim/mat/fun/mdivide_left_spd.hpp>
@@ -162,6 +163,7 @@
 #include <stan/math/prim/mat/fun/mdivide_right_tri.hpp>
 #include <stan/math/prim/mat/fun/mdivide_right_tri_low.hpp>
 #include <stan/math/prim/mat/fun/mean.hpp>
+#include <stan/math/prim/mat/fun/min.hpp>
 #include <stan/math/prim/mat/fun/minus.hpp>
 #include <stan/math/prim/mat/fun/multiply.hpp>
 #include <stan/math/prim/mat/fun/multiply_lower_tri_self_transpose.hpp>
