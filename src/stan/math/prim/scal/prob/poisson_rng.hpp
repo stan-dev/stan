@@ -29,10 +29,6 @@ namespace stan {
 
       static const char* function("stan::math::poisson_rng");
 
-      using stan::math::check_not_nan;
-      using stan::math::check_nonnegative;
-      using stan::math::check_less;
-
       check_not_nan(function, "Rate parameter", lambda);
       check_nonnegative(function, "Rate parameter", lambda);
       check_less(function, "Rate parameter", lambda, POISSON_MAX_RATE);
