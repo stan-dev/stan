@@ -3,7 +3,7 @@
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/LDLT_factor.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 
 #include <stan/math/prim/mat/meta/get.hpp>
 #include <stan/math/prim/arr/meta/get.hpp>
@@ -82,7 +82,7 @@ namespace stan {
         double tmp(0.0);
         double result(
           0.5 * static_cast<double>(dimension_)
-          * (1.0 + stan::prob::LOG_TWO_PI));
+          * (1.0 + stan::math::LOG_TWO_PI));
         for (int d = 0; d < dimension_; ++d) {
           tmp = fabs(L_chol_(d, d));
           if (tmp != 0.0) {

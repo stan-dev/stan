@@ -114,7 +114,7 @@ namespace stan {
         for (int i = 0; i < n_monte_carlo_elbo_; ++i) {
           // Draw from standard normal and transform to unconstrained space
           for (int d = 0; d < dim; ++d) {
-            z_check(d) = stan::prob::normal_rng(0, 1, rng_);
+            z_check(d) = stan::math::normal_rng(0, 1, rng_);
           }
           z_tilde = advi_params.loc_scale_transform(z_check);
 
@@ -147,7 +147,7 @@ namespace stan {
 
         // Draw from standard normal and transform to unconstrained space
         for (int d = 0; d < dim; ++d) {
-          z_check(d) = stan::prob::normal_rng(0, 1, rng_);
+          z_check(d) = stan::math::normal_rng(0, 1, rng_);
         }
 
         return advi_params.loc_scale_transform(z_check);
@@ -196,7 +196,7 @@ namespace stan {
         for (int i = 0; i < n_monte_carlo_grad_; ++i) {
           // Draw from standard normal and transform to unconstrained space
           for (int d = 0; d < dim; ++d) {
-            z_check(d) = stan::prob::normal_rng(0, 1, rng_);
+            z_check(d) = stan::math::normal_rng(0, 1, rng_);
           }
           z_tilde = muL.loc_scale_transform(z_check);
 
@@ -267,7 +267,7 @@ namespace stan {
         for (int i = 0; i < n_monte_carlo_grad_; ++i) {
           // Draw from standard normal and transform to unconstrained space
           for (int d = 0; d < dim; ++d) {
-            z_check(d) = stan::prob::normal_rng(0, 1, rng_);
+            z_check(d) = stan::math::normal_rng(0, 1, rng_);
           }
           z_tilde = musigmatilde.loc_scale_transform(z_check);
 

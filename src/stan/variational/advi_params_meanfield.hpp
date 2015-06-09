@@ -2,8 +2,7 @@
 #define STAN_VARIATIONAL_ADVI_PARAMS_MEANFIELD__HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/math/prim/scal/fun/max.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 
 #include <stan/math/prim/mat/meta/get.hpp>
 #include <stan/math/prim/arr/meta/get.hpp>
@@ -77,7 +76,7 @@ namespace stan {
       // 0.5 * dim * (1+log2pi) + sum(sigma_tilde)
       double entropy() const {
         return 0.5 * static_cast<double>(dimension_) *
-               (1.0 + stan::prob::LOG_TWO_PI) + sigma_tilde_.sum();
+               (1.0 + stan::math::LOG_TWO_PI) + sigma_tilde_.sum();
       }
 
       // Implement f^{-1}(\check{z}) = sigma * \check{z} + \mu
