@@ -27,9 +27,10 @@ namespace stan {
      * For prior counts greater than zero, the usual algorithm that
      * draws gamma variates and normalizes is used.  
      * 
-     * For prior counts less than zero, a log-scale version of the
-     * following algorithm is used to deal with underflow:
-     * 
+     * For prior counts less than zero (i.e., parameters with value
+     * less than one), a log-scale version of the following algorithm
+     * is used to deal with underflow:
+     *
      * <blockquote>
      * G. Marsaglia and W. Tsang. A simple method for generating gamma
      * variables. ACM Transactions on Mathematical Software.
@@ -47,7 +48,6 @@ namespace stan {
       using boost::variate_generator;
       using boost::gamma_distribution;
       using boost::random::uniform_real_distribution;
-      using stan::math::log_sum_exp;
       using Eigen::VectorXd;
       using std::exp;
       using std::log;
