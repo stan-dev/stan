@@ -1,8 +1,9 @@
 #ifndef STAN_MATH_REV_SCAL_FUN_HYPOT_HPP
 #define STAN_MATH_REV_SCAL_FUN_HYPOT_HPP
 
-#include <stan/math/rev/core.hpp>
 #include <math.h>
+#include <stan/math/rev/core.hpp>
+#include <cmath>
 #include <valarray>
 
 namespace stan {
@@ -37,7 +38,7 @@ namespace stan {
      * Returns the length of the hypoteneuse of a right triangle
      * with sides of the specified lengths (C99).
      *
-     * See boost::math::hypot() for double-based function.
+     * See ::hypot() for double-based function.
      *
      * The partial derivatives are given by
      *
@@ -49,8 +50,7 @@ namespace stan {
      * @param b Length of second side.
      * @return Length of hypoteneuse.
      */
-    inline var hypot(const stan::math::var& a,
-                     const stan::math::var& b) {
+    inline var hypot(const var& a, const var& b) {
       return var(new hypot_vv_vari(a.vi_, b.vi_));
     }
 
@@ -58,7 +58,7 @@ namespace stan {
      * Returns the length of the hypoteneuse of a right triangle
      * with sides of the specified lengths (C99).
      *
-     * See boost::math::hypot() for double-based function.
+     * See ::hypot() for double-based function.
      *
      * The derivative is
      *
@@ -68,8 +68,7 @@ namespace stan {
      * @param b Length of second side.
      * @return Length of hypoteneuse.
      */
-    inline var hypot(const stan::math::var& a,
-                     const double& b) {
+    inline var hypot(const var& a, double b) {
       return var(new hypot_vd_vari(a.vi_, b));
     }
 
@@ -77,7 +76,7 @@ namespace stan {
      * Returns the length of the hypoteneuse of a right triangle
      * with sides of the specified lengths (C99).
      *
-     * See boost::math::hypot() for double-based function.
+     * See ::hypot() for double-based function.
      *
      * The derivative is
      *
@@ -114,8 +113,7 @@ namespace stan {
      * @param b Length of second side.
      * @return Length of hypoteneuse.
      */
-    inline var hypot(const double& a,
-                     const stan::math::var& b) {
+    inline var hypot(double a, const var& b) {
       return var(new hypot_vd_vari(b.vi_, a));
     }
 

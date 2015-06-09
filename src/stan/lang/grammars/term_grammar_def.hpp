@@ -241,6 +241,16 @@ namespace stan {
           }
         }
 
+        if (fun.name_ == "max" || fun.name_ == "min") {
+          if (fun.args_.size() == 2) {
+            if (fun.args_[0].expression_type().is_primitive_int()
+                && fun.args_[1].expression_type().is_primitive_int()) {
+              fun.name_ = "std::" + fun.name_;
+            } 
+            // TODO: else condition to add max(real,real) and min(real,real)
+          }
+        }
+
         if (fun.name_ == "abs"
             && fun.args_.size() > 0
             && fun.args_[0].expression_type().is_primitive_double()) {

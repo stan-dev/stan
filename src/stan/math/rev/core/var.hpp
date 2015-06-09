@@ -276,7 +276,7 @@ namespace stan {
       void grad() {
         stan::math::grad(vi_);  // defined in chainable.hpp
       }
-      
+
       // POINTER OVERRIDES
 
       /**

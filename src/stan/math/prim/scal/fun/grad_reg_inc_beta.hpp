@@ -1,14 +1,12 @@
 #ifndef STAN_MATH_PRIM_SCAL_FUN_GRAD_REG_INC_BETA_HPP
 #define STAN_MATH_PRIM_SCAL_FUN_GRAD_REG_INC_BETA_HPP
 
-#include <math.h>
-
 #include <stan/math/prim/scal/fun/grad_inc_beta.hpp>
 #include <stan/math/prim/scal/fun/inc_beta.hpp>
 #include <stan/math/prim/scal/fun/lbeta.hpp>
+#include <cmath>
 
 namespace stan {
-
   namespace math {
 
     // Gradient of the regularized incomplete beta function ibeta(a, b, z)
@@ -22,18 +20,12 @@ namespace stan {
 
       T dBda = 0;
       T dBdb = 0;
-
       grad_inc_beta(dBda, dBdb, a, b, z);
-
       T b1 = exp(lbeta(a, b)) * inc_beta(a, b, z);
-
       g1 = (dBda - b1 * (digammaA - digammaSum)) / betaAB;
       g2 = (dBdb - b1 * (digammaB - digammaSum)) / betaAB;
     }
 
-
   }
-
 }
-
 #endif

@@ -28,6 +28,9 @@
 #include <stan/math/prim/scal/fun/identity_free.hpp>
 #include <stan/math/prim/scal/fun/if_else.hpp>
 #include <stan/math/prim/scal/fun/inc_beta.hpp>
+#include <stan/math/prim/scal/fun/inc_beta_dda.hpp>
+#include <stan/math/prim/scal/fun/inc_beta_ddb.hpp>
+#include <stan/math/prim/scal/fun/inc_beta_ddz.hpp>
 #include <stan/math/prim/scal/fun/int_step.hpp>
 #include <stan/math/prim/scal/fun/inv.hpp>
 #include <stan/math/prim/scal/fun/inv_cloglog.hpp>
@@ -67,8 +70,6 @@
 #include <stan/math/prim/scal/fun/logit.hpp>
 #include <stan/math/prim/scal/fun/lub_constrain.hpp>
 #include <stan/math/prim/scal/fun/lub_free.hpp>
-#include <stan/math/prim/scal/fun/max.hpp>
-#include <stan/math/prim/scal/fun/min.hpp>
 #include <stan/math/prim/scal/fun/modified_bessel_first_kind.hpp>
 #include <stan/math/prim/scal/fun/modified_bessel_second_kind.hpp>
 #include <stan/math/prim/scal/fun/modulus.hpp>
