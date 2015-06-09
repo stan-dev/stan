@@ -93,7 +93,7 @@ void write_includes(vector<std::ostream *>& outs, const string& include) {
     *out << "#include <test/prob/test_fixture_cdf.hpp>" << endl;
     *out << "#include <test/prob/test_fixture_cdf_log.hpp>" << endl;
     *out << "#include <test/prob/test_fixture_ccdf_log.hpp>" << endl;
-    *out << "#include <" << include.substr(include.find("src/")+4) << ">" << endl;  
+    *out << "#include <" << include << ">" << endl;  
     *out << endl;
   }
 }

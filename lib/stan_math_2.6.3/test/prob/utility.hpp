@@ -2,7 +2,7 @@
 #define TEST__UNIT_DISTRIBUTION__UTILITY_HPP
 
 #include <vector>
-#include <stan/model/model_header.hpp>
+#include <stan/math.hpp>
 #include <stan/math/fwd/arr/fun/log_sum_exp.hpp>
 #include <stan/math/fwd/mat/fun/Eigen_NumTraits.hpp>
 #include <stan/math/fwd/mat/fun/columns_dot_product.hpp>
@@ -101,16 +101,6 @@
 #include <stan/math/fwd/scal/fun/modified_bessel_second_kind.hpp>
 #include <stan/math/fwd/scal/fun/multiply_log.hpp>
 #include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
 #include <stan/math/fwd/scal/fun/owens_t.hpp>
 #include <stan/math/fwd/scal/fun/pow.hpp>
 #include <stan/math/fwd/scal/fun/primitive_value.hpp>
@@ -126,8 +116,6 @@
 #include <stan/math/fwd/scal/fun/trunc.hpp>
 #include <stan/math/fwd/scal/fun/value_of.hpp>
 #include <stan/math/fwd/scal/fun/value_of_rec.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
 
 using std::vector;
 using stan::math::var;
