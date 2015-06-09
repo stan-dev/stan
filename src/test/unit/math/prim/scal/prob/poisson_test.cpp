@@ -16,6 +16,10 @@ TEST(ProbDistributionsPoisson, error_check) {
 
   EXPECT_THROW(stan::math::poisson_rng(pow(2.0,31), rng),std::domain_error);
 
+  EXPECT_NO_THROW(stan::math::poisson_log_rng(6, rng));
+
+  EXPECT_NO_THROW(stan::math::poisson_log_rng(-6, rng));
+
   EXPECT_NO_THROW(stan::math::poisson_log_rng(log(1e9), rng));
 
   EXPECT_THROW(stan::math::poisson_log_rng(log(pow(2.0,31)), rng),std::domain_error);
@@ -44,7 +48,7 @@ TEST(ProbDistributionsPoisson, chiSquareGoodnessFitTest) {
   while (count < N) {
     int a = stan::math::poisson_rng(5,rng);
     int i = 0;
-    while (i < K-1 && a > loc[i]) 
+    while (i < K-1 && a > loc[i])
       ++i;
     ++bin[i];
     count++;
@@ -83,7 +87,7 @@ TEST(ProbDistributionsPoisson, chiSquareGoodnessFitTest2) {
   while (count < N) {
     int a = stan::math::poisson_log_rng(log(5),rng);
     int i = 0;
-    while (i < K-1 && a > loc[i]) 
+    while (i < K-1 && a > loc[i])
       ++i;
     ++bin[i];
     count++;
