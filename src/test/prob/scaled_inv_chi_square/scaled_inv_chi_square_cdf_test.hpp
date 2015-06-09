@@ -3,7 +3,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::math::var;
 
 class AgradCdfScaledInvChiSquare : public AgradCdfTest {
 public:
@@ -64,7 +64,7 @@ public:
   typename stan::return_type<T_y, T_dof, T_scale>::type 
   cdf(const T_y& y, const T_dof& nu, const T_scale& s,
       const T3&, const T4&, const T5&) {
-    return stan::prob::scaled_inv_chi_square_cdf(y, nu, s);
+    return stan::math::scaled_inv_chi_square_cdf(y, nu, s);
   }
 
   template <typename T_y, typename T_dof, typename T_scale,
@@ -72,7 +72,7 @@ public:
   typename stan::return_type<T_y, T_dof, T_scale>::type 
   cdf_function(const T_y& y, const T_dof& nu, const T_scale& s,
                const T3&, const T4&, const T5&) {
-    using stan::agrad::gamma_q;
+    using stan::math::gamma_q;
     using stan::math::gamma_q;
 
     return (gamma_q(nu * 0.5, 0.5 * nu * s * s / y));  

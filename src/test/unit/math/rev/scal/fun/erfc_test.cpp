@@ -6,7 +6,7 @@
 TEST(AgradRev,erfc) {
   AVAR a = 1.3;
   AVAR f = erfc(a);
-  EXPECT_FLOAT_EQ(boost::math::erfc(1.3), f.val());
+  EXPECT_FLOAT_EQ(::erfc(1.3), f.val());
 
   AVEC x = createAVEC(a);
   VEC grad_f;

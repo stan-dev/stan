@@ -2,23 +2,20 @@
 #define STAN_MATH_FWD_SCAL_FUN_ASIN_HPP
 
 #include <stan/math/fwd/core.hpp>
-
 #include <stan/math/prim/scal/fun/square.hpp>
-#include <math.h>
+#include <cmath>
 
 namespace stan {
-
-  namespace agrad {
+  namespace math {
 
     template <typename T>
-    inline
-    fvar<T>
-    asin(const fvar<T>& x) {
-      using ::asin;
+    inline fvar<T> asin(const fvar<T>& x) {
+      using std::asin;
       using std::sqrt;
       using stan::math::square;
       return fvar<T>(asin(x.val_), x.d_ / sqrt(1 - square(x.val_)));
     }
+
   }
 }
 #endif

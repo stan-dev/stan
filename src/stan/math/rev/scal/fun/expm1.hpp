@@ -1,13 +1,14 @@
 #ifndef STAN_MATH_REV_SCAL_FUN_EXPM1_HPP
 #define STAN_MATH_REV_SCAL_FUN_EXPM1_HPP
 
+#include <math.h>
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
-#include <math.h>
+#include <cmath>
 #include <valarray>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class expm1_vari : public op_v_vari {
@@ -23,8 +24,6 @@ namespace stan {
 
     /**
      * The exponentiation of the specified variable minus 1 (C99).
-     *
-     * For non-variable function, see boost::math::expm1().
      *
      * The derivative is given by
      *
@@ -50,7 +49,7 @@ namespace stan {
      * @param a The variable.
      * @return Two to the power of the specified variable.
      */
-    inline var expm1(const stan::agrad::var& a) {
+    inline var expm1(const stan::math::var& a) {
       return var(new expm1_vari(a.vi_));
     }
 

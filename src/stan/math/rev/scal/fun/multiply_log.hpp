@@ -8,7 +8,7 @@
 #include <limits>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class multiply_log_vv_vari : public op_vv_vari {

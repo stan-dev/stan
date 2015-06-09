@@ -6,7 +6,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     /**
      * Returns 1 if the input's value is NaN and 0 otherwise.

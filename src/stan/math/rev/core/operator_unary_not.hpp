@@ -4,7 +4,7 @@
 #include <stan/math/rev/core/var.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Prefix logical negation for the value of variables (C++).  The

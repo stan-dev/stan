@@ -11,8 +11,8 @@
 #include <stan/math/rev/scal/fun/sin.hpp>
 
 TEST(AgradFwdTrigamma, FvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::trigamma;  
   
   fvar<var> x(0.5,1.3);
@@ -27,8 +27,8 @@ TEST(AgradFwdTrigamma, FvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(-16.8288, g[0]);
 }
 TEST(AgradFwdTrigamma, FvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::trigamma;  
   
   fvar<var> x(0.5,1.3);
@@ -40,7 +40,7 @@ TEST(AgradFwdTrigamma, FvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(126.63182, g[0]);
 }
 TEST(AgradFwdTrigamma, FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::trigamma;
 
   fvar<fvar<double> > x;
@@ -65,8 +65,8 @@ TEST(AgradFwdTrigamma, FvarFvarDouble) {
   EXPECT_FLOAT_EQ(0, a.d_.d_);
 }
 TEST(AgradFwdTrigamma, FvarFvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::trigamma;
 
   fvar<fvar<var> > x;
@@ -101,8 +101,8 @@ TEST(AgradFwdTrigamma, FvarFvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(-16.8288, r[0]);
 }
 TEST(AgradFwdTrigamma, FvarFvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::trigamma;
 
   fvar<fvar<var> > x;
@@ -128,8 +128,8 @@ TEST(AgradFwdTrigamma, FvarFvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(97.409088, r[0]);
 }
 TEST(AgradFwdTrigamma, FvarFvarVar_3rdDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::trigamma;
 
   fvar<fvar<var> > x;

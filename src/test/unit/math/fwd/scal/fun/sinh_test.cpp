@@ -11,7 +11,7 @@ class AgradFwdSinh : public testing::Test {
 
 
 TEST_F(AgradFwdSinh, Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using std::sinh;
   using std::cosh;
 
@@ -34,7 +34,7 @@ TEST_F(AgradFwdSinh, Fvar) {
 
 
 TEST_F(AgradFwdSinh, FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using std::sinh;
   using std::cosh;
 

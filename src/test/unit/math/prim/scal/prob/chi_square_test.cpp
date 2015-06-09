@@ -5,10 +5,10 @@
 
 TEST(ProbDistributionsChiSquare, error_check) {
   boost::random::mt19937 rng;
-  EXPECT_NO_THROW(stan::prob::chi_square_rng(2.0,rng));
+  EXPECT_NO_THROW(stan::math::chi_square_rng(2.0,rng));
 
-  EXPECT_THROW(stan::prob::chi_square_rng(-2.0,rng),std::domain_error);
-  EXPECT_THROW(stan::prob::chi_square_rng(stan::math::positive_infinity(),rng),
+  EXPECT_THROW(stan::math::chi_square_rng(-2.0,rng),std::domain_error);
+  EXPECT_THROW(stan::math::chi_square_rng(stan::math::positive_infinity(),rng),
                std::domain_error);
 }
 
@@ -32,7 +32,7 @@ TEST(ProbDistributionsChiSquare, chiSquareGoodnessFitTest) {
   }
 
   while (count < N) {
-    double a = stan::prob::chi_square_rng(2.0,rng);
+    double a = stan::math::chi_square_rng(2.0,rng);
     int i = 0;
     while (i < K-1 && a > loc[i]) 
       ++i;

@@ -1,20 +1,20 @@
 #ifndef STAN_MATH_REV_SCAL_FUN_FLOOR_HPP
 #define STAN_MATH_REV_SCAL_FUN_FLOOR_HPP
 
-#include <math.h>
 #include <stan/math/rev/core.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/math/prim/scal/meta/likely.hpp>
+#include <cmath>
 #include <limits>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class floor_vari : public op_v_vari {
       public:
         explicit floor_vari(vari* avi) :
-          op_v_vari(::floor(avi->val_), avi) {
+          op_v_vari(std::floor(avi->val_), avi) {
         }
         void chain() {
           if (unlikely(boost::math::isnan(avi_->val_)))

@@ -5,9 +5,9 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 
 TEST(AgradRev,if_else) {
-  using stan::agrad::var;
+  using stan::math::var;
   using stan::math::if_else;
-  using stan::agrad::if_else;
+  using stan::math::if_else;
   
   EXPECT_FLOAT_EQ(1.0,if_else(true,var(1.0),var(2.0)).val());
   EXPECT_FLOAT_EQ(2.0,if_else(false,var(1.0),var(2.0)).val());
@@ -20,11 +20,11 @@ TEST(AgradRev,if_else) {
 }
 
 TEST(AgradRev, if_else_nan) {
-  using stan::agrad::if_else;
+  using stan::math::if_else;
 
   double nan = std::numeric_limits<double>::quiet_NaN();
-  stan::agrad::var nan_v = std::numeric_limits<double>::quiet_NaN();
-  stan::agrad::var a_v = 1.2;
+  stan::math::var nan_v = std::numeric_limits<double>::quiet_NaN();
+  stan::math::var a_v = 1.2;
 
   EXPECT_FLOAT_EQ(1.2, if_else(true, 1.2, nan_v).val());
   EXPECT_FLOAT_EQ(1.2, if_else(true, a_v, nan).val());

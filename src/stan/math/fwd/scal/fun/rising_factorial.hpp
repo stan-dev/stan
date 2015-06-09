@@ -2,20 +2,19 @@
 #define STAN_MATH_FWD_SCAL_FUN_RISING_FACTORIAL_HPP
 
 #include <stan/math/fwd/core.hpp>
-
 #include <stan/math/prim/scal/fun/rising_factorial.hpp>
-#include <boost/math/special_functions/digamma.hpp>
+#include <stan/math/prim/scal/fun/digamma.hpp>
+#include <iostream>
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     template<typename T>
     inline
     fvar<T>
     rising_factorial(const fvar<T>& x, const fvar<T>& n) {
       using stan::math::rising_factorial;
-      using boost::math::digamma;
 
       T rising_fact(rising_factorial(x.val_, n.val_));
       return fvar<T>(rising_fact,

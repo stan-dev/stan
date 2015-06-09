@@ -7,7 +7,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::math::var;
 
 class AgradDistributionsWeibull : public AgradDistributionTest {
 public:
@@ -58,7 +58,7 @@ public:
   typename stan::return_type<T_y, T_shape, T_scale>::type 
   log_prob(const T_y& y, const T_shape& alpha, const T_scale& sigma,
            const T3&, const T4&, const T5&) {
-    return stan::prob::weibull_log(y, alpha, sigma);
+    return stan::math::weibull_log(y, alpha, sigma);
   }
 
   template <bool propto, 
@@ -67,7 +67,7 @@ public:
   typename stan::return_type<T_y, T_shape, T_scale>::type 
   log_prob(const T_y& y, const T_shape& alpha, const T_scale& sigma,
            const T3&, const T4&, const T5&) {
-    return stan::prob::weibull_log<propto>(y, alpha, sigma);
+    return stan::math::weibull_log<propto>(y, alpha, sigma);
   }
   
   
@@ -86,7 +86,7 @@ public:
 };
 
 TEST(ProbDistributionsWeibull,Cumulative) {
-  using stan::prob::weibull_cdf;
+  using stan::math::weibull_cdf;
   using std::numeric_limits;
   EXPECT_FLOAT_EQ(0.86466472, weibull_cdf(2.0,1.0,1.0));
   EXPECT_FLOAT_EQ(0.0032585711, weibull_cdf(0.25,2.9,1.8));

@@ -34,9 +34,9 @@ TEST(AgradRev,x_lte_b) {
 }
 
 TEST(AgradRev, logical_lte_nan) {
-  stan::agrad::var nan = std::numeric_limits<double>::quiet_NaN();
-  stan::agrad::var a = 1.0;
-  stan::agrad::var b = 2.0;
+  stan::math::var nan = std::numeric_limits<double>::quiet_NaN();
+  stan::math::var a = 1.0;
+  stan::math::var b = 2.0;
   double nan_dbl = std::numeric_limits<double>::quiet_NaN();
 
   EXPECT_FALSE(1.0 <= nan);

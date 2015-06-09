@@ -2,17 +2,13 @@
 #define STAN_MATH_FWD_SCAL_FUN_FDIM_HPP
 
 #include <stan/math/fwd/core.hpp>
-
 #include <stan/math/prim/scal/fun/fdim.hpp>
 
 namespace stan {
-
-  namespace agrad {
+  namespace math {
 
     template <typename T>
-    inline
-    fvar<T>
-    fdim(const fvar<T>& x1, const fvar<T>& x2) {
+    inline fvar<T> fdim(const fvar<T>& x1, const fvar<T>& x2) {
       using stan::math::fdim;
       using std::floor;
       if (x1.val_ < x2.val_)
@@ -23,9 +19,7 @@ namespace stan {
     }
 
     template <typename T>
-    inline
-    fvar<T>
-    fdim(const fvar<T>& x1, const double x2) {
+    inline fvar<T> fdim(const fvar<T>& x1, const double x2) {
       using stan::math::fdim;
       using std::floor;
       if (x1.val_ < x2)
@@ -35,9 +29,7 @@ namespace stan {
     }
 
     template <typename T>
-    inline
-    fvar<T>
-    fdim(const double x1, const fvar<T>& x2) {
+    inline fvar<T> fdim(const double x1, const fvar<T>& x2) {
       using stan::math::fdim;
       using std::floor;
       if (x1 < x2.val_)
@@ -45,6 +37,7 @@ namespace stan {
       else
         return fvar<T>(fdim(x1, x2.val_), x2.d_ * -floor(x1 / x2.val_));
     }
+
   }
 }
 #endif

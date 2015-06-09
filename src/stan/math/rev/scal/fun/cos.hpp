@@ -1,20 +1,20 @@
 #ifndef STAN_MATH_REV_SCAL_FUN_COS_HPP
 #define STAN_MATH_REV_SCAL_FUN_COS_HPP
 
-#include <math.h>
 #include <stan/math/rev/core.hpp>
+#include <cmath>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class cos_vari : public op_v_vari {
       public:
         explicit cos_vari(vari* avi) :
-          op_v_vari(::cos(avi->val_), avi) {
+          op_v_vari(std::cos(avi->val_), avi) {
         }
         void chain() {
-          avi_->adj_ -= adj_ * ::sin(avi_->val_);
+          avi_->adj_ -= adj_ * std::sin(avi_->val_);
         }
       };
     }

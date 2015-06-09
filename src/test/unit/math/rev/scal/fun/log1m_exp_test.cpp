@@ -1,18 +1,17 @@
-#include <stan/math/rev/scal/fun/log1m_exp.hpp>
-#include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
+#include <stan/math/rev/scal/fun/log1m_exp.hpp>
 #include <stan/math/rev/scal/fun/exp.hpp>
-#include <test/unit/math/rev/scal/fun/nan_util.hpp>
 #include <stan/math/prim/scal/fun/log1m_inv_logit.hpp>
 #include <stan/math/prim/scal/fun/inv_logit.hpp>
 #include <stan/math/rev/core.hpp>
 #include <stan/math/rev/scal/fun/inv_logit.hpp>
 #include <stan/math/rev/scal/fun/log.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/scal/fun/nan_util.hpp>
 
 void test_log1m_exp(double val) {
   using stan::math::log1m_exp;
-  using stan::agrad::log1m_exp;
-  using stan::agrad::exp;
+  using stan::math::exp;
   using std::exp;
 
   AVAR a(val);   
@@ -32,7 +31,7 @@ void test_log1m_exp(double val) {
   EXPECT_EQ(1U,g.size());
   EXPECT_EQ(1U,g2.size());
   EXPECT_FLOAT_EQ(g2[0],g[0]);
-  EXPECT_FLOAT_EQ(g2[0],-1/boost::math::expm1(-val)); // analytic deriv
+  EXPECT_FLOAT_EQ(g2[0],-1 / ::expm1(-val)); // analytic deriv
   EXPECT_FLOAT_EQ(f2.val(),f_val);
 }
 
@@ -46,7 +45,7 @@ TEST(AgradRev, log1m_exp) {
 
 TEST(AgradRev, log1m_exp_exception) {
   using stan::math::log1m_exp;
-  using stan::agrad::log1m_exp;
+  using stan::math::log1m_exp;
   EXPECT_NO_THROW(log1m_exp(AVAR(-3)));
   EXPECT_NO_THROW(log1m_exp(AVAR(3)));
 }

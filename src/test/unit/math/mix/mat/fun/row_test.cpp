@@ -6,8 +6,8 @@
 
 TEST(AgradMixMatrixRow,fv_v) {
   using stan::math::row;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::row_vector_fv;
+  using stan::math::matrix_fv;
+  using stan::math::row_vector_fv;
 
   matrix_fv y(2,3);
   y << 1, 2, 3, 4, 5, 6;
@@ -31,7 +31,7 @@ TEST(AgradMixMatrixRow,fv_v) {
 }
 TEST(AgradMixMatrixRow,fv_v_exc0) {
   using stan::math::row;
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
 
   matrix_fv y(2,3);
   y << 1, 2, 3, 4, 5, 6;
@@ -46,7 +46,7 @@ TEST(AgradMixMatrixRow,fv_v_exc0) {
 }
 TEST(AgradMixMatrixRow,fv_v_excHigh) {
   using stan::math::row;
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
 
   matrix_fv y(2,3);
   y << 1, 2, 3, 4, 5, 6;
@@ -61,8 +61,8 @@ TEST(AgradMixMatrixRow,fv_v_excHigh) {
 }
 TEST(AgradMixMatrixRow,ffv_v) {
   using stan::math::row;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::row_vector_ffv;
 
   matrix_ffv y(2,3);
   y << 1, 2, 3, 4, 5, 6;
@@ -86,7 +86,7 @@ TEST(AgradMixMatrixRow,ffv_v) {
 }
 TEST(AgradMixMatrixRow,ffv_v_exc0) {
   using stan::math::row;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
 
   matrix_ffv y(2,3);
   y << 1, 2, 3, 4, 5, 6;
@@ -101,7 +101,7 @@ TEST(AgradMixMatrixRow,ffv_v_exc0) {
 }
 TEST(AgradMixMatrixRow,ffv_v_excHigh) {
   using stan::math::row;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
 
   matrix_ffv y(2,3);
   y << 1, 2, 3, 4, 5, 6;

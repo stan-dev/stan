@@ -2,7 +2,7 @@
 #include <stan/math/fwd/core.hpp>
 #include <gtest/gtest.h>
 
-using stan::agrad::fvar;
+using stan::math::fvar;
 
 TEST(AgradFwdMatrixGetBase1LHS,failing_pre_20_fd) {
   using Eigen::Matrix;

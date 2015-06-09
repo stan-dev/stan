@@ -10,7 +10,7 @@
 #include <stan/math/rev/scal/meta/is_var.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
     namespace {
       template <typename T2, int R2, int C2, typename T3, int R3, int C3>
       class trace_inv_quad_form_ldlt_impl : public chainable_alloc {

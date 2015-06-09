@@ -8,7 +8,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     using Eigen::Dynamic;
 
@@ -39,6 +39,6 @@ namespace stan {
       dfx_dxn = fx_fvar.d_;
     }
 
-  }  // namespace agrad
+  }  // namespace math
 }  // namespace stan
 #endif

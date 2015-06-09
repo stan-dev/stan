@@ -6,7 +6,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * This function calculates the degrees of freedom for the t

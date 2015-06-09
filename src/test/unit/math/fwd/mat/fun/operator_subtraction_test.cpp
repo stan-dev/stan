@@ -5,10 +5,10 @@
 #include <stan/math/fwd/mat/fun/Eigen_NumTraits.hpp>
 #include <stan/math/fwd/core.hpp>
 
-using stan::agrad::fvar;
+using stan::math::fvar;
 TEST(AgradFwdMatrixOperatorSubtraction,fd_scalar_matrix) {
   using stan::math::subtract;
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
 
   matrix_fd v(2,2);
   v << 1, 2, 3, 4;
@@ -40,7 +40,7 @@ TEST(AgradFwdMatrixOperatorSubtraction,fd_scalar_matrix) {
 }
 TEST(AgradFwdMatrixOperatorSubtraction,fd_scalar_vector) {
   using stan::math::subtract;
-  using stan::agrad::vector_fd;
+  using stan::math::vector_fd;
 
   vector_fd v(4);
   v << 1, 2, 3, 4;
@@ -72,7 +72,7 @@ TEST(AgradFwdMatrixOperatorSubtraction,fd_scalar_vector) {
 }
 TEST(AgradFwdMatrixOperatorSubtraction,fd_scalar_rowvector) {
   using stan::math::subtract;
-  using stan::agrad::row_vector_fd;
+  using stan::math::row_vector_fd;
 
   row_vector_fd v(4);
   v << 1, 2, 3, 4;
@@ -105,7 +105,7 @@ TEST(AgradFwdMatrixOperatorSubtraction,fd_scalar_rowvector) {
 TEST(AgradFwdMatrixOperatorSubtraction,fd_vector_vector) {
   using stan::math::subtract;
   using stan::math::vector_d;
-  using stan::agrad::vector_fd;
+  using stan::math::vector_fd;
 
   vector_d expected_output(5);
   vector_fd output;
@@ -176,7 +176,7 @@ TEST(AgradFwdMatrixOperatorSubtraction,fd_vector_vector) {
 TEST(AgradFwdMatrixOperatorSubtraction,fd_vector_vector_exception) {
   using stan::math::subtract;
   using stan::math::vector_d;
-  using stan::agrad::vector_fd;
+  using stan::math::vector_fd;
 
   vector_d d1(5), d2(1);
   vector_fd v1(5), v2(1);
@@ -190,7 +190,7 @@ TEST(AgradFwdMatrixOperatorSubtraction,fd_vector_vector_exception) {
 TEST(AgradFwdMatrixOperatorSubtraction,fd_rowvector_rowvector) {
   using stan::math::subtract;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fd;
+  using stan::math::row_vector_fd;
 
   row_vector_d expected_output(5);
   row_vector_d  output_d;
@@ -261,7 +261,7 @@ TEST(AgradFwdMatrixOperatorSubtraction,fd_rowvector_rowvector) {
 TEST(AgradFwdMatrixOperatorSubtraction,fd_rowvector_rowvector_exception) {
   using stan::math::subtract;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fd;
+  using stan::math::row_vector_fd;
 
   row_vector_d d1(5), d2(2);
   row_vector_fd v1(5), v2(2);
@@ -275,7 +275,7 @@ TEST(AgradFwdMatrixOperatorSubtraction,fd_rowvector_rowvector_exception) {
 TEST(AgradFwdMatrixOperatorSubtraction,fd_matrix_matrix) {
   using stan::math::subtract;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
   
   matrix_d expected_output(2,2);
   matrix_fd output;
@@ -338,7 +338,7 @@ TEST(AgradFwdMatrixOperatorSubtraction,fd_matrix_matrix) {
 TEST(AgradFwdMatrixOperatorSubtraction,fd_matrix_matrix_exception) {
   using stan::math::subtract;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
 
   matrix_d d1(2,2), d2(1,2);
   matrix_fd v1(2,2), v2(1,2);
@@ -350,7 +350,7 @@ TEST(AgradFwdMatrixOperatorSubtraction,fd_matrix_matrix_exception) {
 }
 TEST(AgradFwdMatrixOperatorSubtraction,ffd_scalar_matrix) {
   using stan::math::subtract;
-  using stan::agrad::matrix_ffd;
+  using stan::math::matrix_ffd;
 
  fvar<fvar<double> > a,b,c,d,e,f,g,h;
   a.val_.val_ = 1.0;
@@ -388,7 +388,7 @@ TEST(AgradFwdMatrixOperatorSubtraction,ffd_scalar_matrix) {
 }
 TEST(AgradFwdMatrixOperatorSubtraction,ffd_scalar_vector) {
   using stan::math::subtract;
-  using stan::agrad::vector_ffd;
+  using stan::math::vector_ffd;
 
   fvar<fvar<double> > a,b,c,d;
   a.val_.val_ = 1.0;
@@ -426,7 +426,7 @@ TEST(AgradFwdMatrixOperatorSubtraction,ffd_scalar_vector) {
 }
 TEST(AgradFwdMatrixOperatorSubtraction,ffd_scalar_rowvector) {
   using stan::math::subtract;
-  using stan::agrad::row_vector_ffd;
+  using stan::math::row_vector_ffd;
 
  fvar<fvar<double> > a,b,c,d;
   a.val_.val_ = 1.0;
@@ -465,7 +465,7 @@ TEST(AgradFwdMatrixOperatorSubtraction,ffd_scalar_rowvector) {
 TEST(AgradFwdMatrixOperatorSubtraction,ffd_vector_vector) {
   using stan::math::subtract;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffd;
+  using stan::math::vector_ffd;
 
   vector_d expected_output(5);
   vector_ffd output;
@@ -544,7 +544,7 @@ TEST(AgradFwdMatrixOperatorSubtraction,ffd_vector_vector) {
 TEST(AgradFwdMatrixOperatorSubtraction,ffd_vector_vector_exception) {
   using stan::math::subtract;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffd;
+  using stan::math::vector_ffd;
 
   vector_d d1(5), d2(1);
   vector_ffd v1(5), v2(1);
@@ -558,7 +558,7 @@ TEST(AgradFwdMatrixOperatorSubtraction,ffd_vector_vector_exception) {
 TEST(AgradFwdMatrixOperatorSubtraction,ffd_rowvector_rowvector) {
   using stan::math::subtract;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffd;
+  using stan::math::row_vector_ffd;
 
   row_vector_d expected_output(5);
   row_vector_d  output_d;
@@ -637,7 +637,7 @@ TEST(AgradFwdMatrixOperatorSubtraction,ffd_rowvector_rowvector) {
 TEST(AgradFwdMatrixOperatorSubtraction,ffd_rowvector_rowvector_exception) {
   using stan::math::subtract;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffd;
+  using stan::math::row_vector_ffd;
 
   row_vector_d d1(5), d2(2);
   row_vector_ffd v1(5), v2(2);
@@ -651,7 +651,7 @@ TEST(AgradFwdMatrixOperatorSubtraction,ffd_rowvector_rowvector_exception) {
 TEST(AgradFwdMatrixOperatorSubtraction,ffd_matrix_matrix) {
   using stan::math::subtract;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffd;
+  using stan::math::matrix_ffd;
   
   matrix_d expected_output(2,2);
   matrix_ffd output;
@@ -718,7 +718,7 @@ TEST(AgradFwdMatrixOperatorSubtraction,ffd_matrix_matrix) {
 TEST(AgradFwdMatrixOperatorSubtraction,ffd_matrix_matrix_exception) {
   using stan::math::subtract;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffd;
+  using stan::math::matrix_ffd;
 
   matrix_d d1(2,2), d2(1,2);
   matrix_ffd v1(2,2), v2(1,2);

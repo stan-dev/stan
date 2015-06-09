@@ -11,11 +11,11 @@
 #include <stan/math/fwd/scal/fun/sqrt.hpp>
 #include <stan/math/rev/scal/fun/sqrt.hpp>
 
-using stan::agrad::var;
+using stan::math::var;
 
 TEST(AgradMixMatrixQrQ, fv1) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
   matrix_fv m0(0,0);
   matrix_d m2(3,2);
   matrix_fv m1(3,2);
@@ -69,7 +69,7 @@ TEST(AgradMixMatrixQrQ, fv1) {
 
 TEST(AgradMixMatrixQrQ, fv2) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
   matrix_fv m0(0,0);
   matrix_d m2(3,2);
   matrix_fv m1(3,2);
@@ -109,7 +109,7 @@ TEST(AgradMixMatrixQrQ, fv2) {
 
 TEST(AgradMixMatrixQrQ, ffv1) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   matrix_ffv m0(0,0);
   matrix_d m2(3,2);
   matrix_ffv m1(3,2);
@@ -163,7 +163,7 @@ TEST(AgradMixMatrixQrQ, ffv1) {
 
 TEST(AgradMixMatrixQrQ, ffv2) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   matrix_ffv m0(0,0);
   matrix_d m2(3,2);
   matrix_ffv m1(3,2);
@@ -203,7 +203,7 @@ TEST(AgradMixMatrixQrQ, ffv2) {
 
 TEST(AgradMixMatrixQrQ, ffv3) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   matrix_ffv m0(0,0);
   matrix_d m2(3,2);
   matrix_ffv m1(3,2);
@@ -249,7 +249,7 @@ TEST(AgradMixMatrixQrQ, ffv3) {
 
 TEST(AgradMixMatrixQrQ, ffv4) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   matrix_ffv m0(0,0);
   matrix_d m2(3,2);
   matrix_ffv m1(3,2);

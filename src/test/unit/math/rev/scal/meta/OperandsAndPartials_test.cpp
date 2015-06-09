@@ -3,8 +3,8 @@
 #include <stan/math/rev/core.hpp>
 
 TEST(AgradPartialsVari, OperandsAndPartials) {
-  using stan::agrad::OperandsAndPartials;
-  using stan::agrad::var;
+  using stan::math::OperandsAndPartials;
+  using stan::math::var;
 
   OperandsAndPartials<double> o1;
   EXPECT_EQ(0U, o1.nvaris);
@@ -40,9 +40,9 @@ TEST(AgradPartialsVari, OperandsAndPartials) {
   EXPECT_FLOAT_EQ(40.0, grad[3]);
 }
 TEST(AgradPartialsVari,OperandsAndPartials1) {
-  using stan::agrad::vari;
-  using stan::agrad::OperandsAndPartials;
-  using stan::agrad::var;
+  using stan::math::vari;
+  using stan::math::OperandsAndPartials;
+  using stan::math::var;
 
   var x = 2.0;
   var z = -3.0 * x;  // dz/dx = -3
@@ -51,13 +51,13 @@ TEST(AgradPartialsVari,OperandsAndPartials1) {
 
   var y = o.to_var(-1.0);
 
-  stan::agrad::grad(y.vi_);
+  stan::math::grad(y.vi_);
   EXPECT_FLOAT_EQ(-15.0, x.adj());  // dy/dx = -15
 }
 TEST(AgradPartialsVari,OperandsAndPartials2) {
-  using stan::agrad::OperandsAndPartials;
-  using stan::agrad::vari;
-  using stan::agrad::var;
+  using stan::math::OperandsAndPartials;
+  using stan::math::vari;
+  using stan::math::var;
 
   var x1 = 2.0;
   var x2 = 3.0;
@@ -68,14 +68,14 @@ TEST(AgradPartialsVari,OperandsAndPartials2) {
   o.d_x2[0] += 13.0;  // dy/dz2 = 13.0
   var y = o.to_var(-1.0);
 
-  stan::agrad::grad(y.vi_);
+  stan::math::grad(y.vi_);
   EXPECT_FLOAT_EQ(-55.0, x1.adj());  // dy/dx1 = -55
   EXPECT_FLOAT_EQ(-91.0, x2.adj());  // dy/dx2 = -91
 }
 TEST(AgradPartialsVari, OperandsAndPartials3) {
-  using stan::agrad::OperandsAndPartials;
-  using stan::agrad::vari;
-  using stan::agrad::var;
+  using stan::math::OperandsAndPartials;
+  using stan::math::vari;
+  using stan::math::var;
 
   var x1 = 2.0;
   var x2 = 3.0;
@@ -90,14 +90,14 @@ TEST(AgradPartialsVari, OperandsAndPartials3) {
   o.d_x3[0] += 23.0;  // dy/dz3 = 23.0
   var y = o.to_var(-1.0);
 
-  stan::agrad::grad(y.vi_);
+  stan::math::grad(y.vi_);
   EXPECT_FLOAT_EQ(-119.0, x1.adj());  // dy/dx1 = -119
   EXPECT_FLOAT_EQ(-171.0, x2.adj());  // dy/dx2 = -133
   EXPECT_FLOAT_EQ(-253.0, x3.adj());  // dy/dx2 = -253
 }
 TEST(AgradPartialsVari, OperandsAndPartials_check_throw) {
-  using stan::agrad::OperandsAndPartials;
-  using stan::agrad::var;
+  using stan::math::OperandsAndPartials;
+  using stan::math::var;
   using std::vector;
   
   double d;

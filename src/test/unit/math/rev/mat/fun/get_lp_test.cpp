@@ -12,7 +12,7 @@
 TEST(mathMatrix,getLp) {
   using stan::math::accumulator;
   using stan::math::get_lp;
-  using stan::agrad::var;
+  using stan::math::var;
 
   var lp = 12.5;
   accumulator<var> lp_accum;

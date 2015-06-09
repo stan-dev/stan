@@ -1,24 +1,24 @@
 #ifndef STAN_MATH_REV_SCAL_FUN_ERFC_HPP
 #define STAN_MATH_REV_SCAL_FUN_ERFC_HPP
 
+#include <math.h>
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
-#include <boost/math/special_functions/erf.hpp>
-#include <math.h>
+#include <cmath>
 #include <valarray>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class erfc_vari : public op_v_vari {
       public:
         explicit erfc_vari(vari* avi) :
-          op_v_vari(::erfc(avi->val_), avi) {
+        op_v_vari(::erfc(avi->val_), avi) {
         }
         void chain() {
           avi_->adj_ += adj_ * stan::math::NEG_TWO_OVER_SQRT_PI
-            * ::exp(- avi_->val_ * avi_->val_);
+            * std::exp(- avi_->val_ * avi_->val_);
         }
       };
     }
@@ -26,7 +26,7 @@ namespace stan {
     /**
      * The complementary error function for variables (C99).
      *
-     * For non-variable function, see ::erfc() from math.h.
+     * For non-variable function, see ::erfc() from <cmath>.
      *
      * The derivative is
      *
@@ -60,7 +60,7 @@ namespace stan {
      * @param a The variable.
      * @return Complementary error function applied to the variable.
      */
-    inline var erfc(const stan::agrad::var& a) {
+    inline var erfc(const var& a) {
       return var(new erfc_vari(a.vi_));
     }
 

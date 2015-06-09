@@ -6,33 +6,33 @@
 #include <stan/math/rev/core.hpp>
 #include <gtest/gtest.h>
 
-using stan::agrad::fvar;
-using stan::agrad::var;
+using stan::math::fvar;
+using stan::math::var;
 
 TEST(AgradMixMatrixTail,TailVector1_fv) {
   using stan::math::tail;
-  stan::agrad::vector_fv v(3);
+  stan::math::vector_fv v(3);
   v << 1, 2, 3;
   EXPECT_EQ(0, tail(v,0).size());
 }
 TEST(AgradMixMatrixTail,TailVector2_fv) {
   using stan::math::tail;
-  stan::agrad::vector_fv v(3);
+  stan::math::vector_fv v(3);
   v << 1, 2, 3;
   EXPECT_EQ(3, tail(v,3).size());
 }
 TEST(AgradMixMatrixTail,TailVector3_fv) {
   using stan::math::tail;
-  stan::agrad::vector_fv v(3);
+  stan::math::vector_fv v(3);
   v << 1, 2, 3;
   EXPECT_THROW(tail(v,4), std::out_of_range);
 }
 TEST(AgradMixMatrixTail,TailVector4_fv) {
   using stan::math::tail;
-  stan::agrad::vector_fv v(3);
+  stan::math::vector_fv v(3);
   v << 1, 2, 3;
 
-  stan::agrad::vector_fv v12 = tail(v,2);
+  stan::math::vector_fv v12 = tail(v,2);
   EXPECT_EQ(2,v12.size());
   for (int n = 0; n < 2; ++n) {
     EXPECT_FLOAT_EQ(v[n+1].val_.val(),v12[n].val_.val());
@@ -41,28 +41,28 @@ TEST(AgradMixMatrixTail,TailVector4_fv) {
 
 TEST(AgradMixMatrixTail,tailRowVector1_fv) {
   using stan::math::tail;
-  stan::agrad::row_vector_fv v(3);
+  stan::math::row_vector_fv v(3);
   v << 1, 2, 3;
   EXPECT_EQ(0, tail(v,0).size());
 }
 TEST(AgradMixMatrixTail,tailRowVector2_fv) {
   using stan::math::tail;
-  stan::agrad::row_vector_fv v(3);
+  stan::math::row_vector_fv v(3);
   v << 1, 2, 3;
   EXPECT_EQ(3, tail(v,3).size());
 }
 TEST(AgradMixMatrixTail,tailRowVector3_fv) {
   using stan::math::tail;
-  stan::agrad::row_vector_fv v(3);
+  stan::math::row_vector_fv v(3);
   v << 1, 2, 3;
   EXPECT_THROW(tail(v,4), std::out_of_range);
 }
 TEST(AgradMixMatrixTail,tailRowVector4_fv) {
   using stan::math::tail;
-   stan::agrad::row_vector_fv v(3);
+   stan::math::row_vector_fv v(3);
   v << 1, 2, 3;
 
-  stan::agrad::row_vector_fv v12 = tail(v,2);
+  stan::math::row_vector_fv v12 = tail(v,2);
   EXPECT_EQ(2,v12.size());
   for (int n = 0; n < 2; ++n) {
     EXPECT_FLOAT_EQ(v[n+1].val_.val(),v12[n].val_.val());
@@ -100,28 +100,28 @@ TEST(AgradMixMatrixTail,tailStdVector4_fv) {
 }
 TEST(AgradMixMatrixTail,TailVector1_ffv) {
   using stan::math::tail;
-  stan::agrad::vector_ffv v(3);
+  stan::math::vector_ffv v(3);
   v << 1, 2, 3;
   EXPECT_EQ(0, tail(v,0).size());
 }
 TEST(AgradMixMatrixTail,TailVector2_ffv) {
   using stan::math::tail;
-  stan::agrad::vector_ffv v(3);
+  stan::math::vector_ffv v(3);
   v << 1, 2, 3;
   EXPECT_EQ(3, tail(v,3).size());
 }
 TEST(AgradMixMatrixTail,TailVector3_ffv) {
   using stan::math::tail;
-  stan::agrad::vector_ffv v(3);
+  stan::math::vector_ffv v(3);
   v << 1, 2, 3;
   EXPECT_THROW(tail(v,4), std::out_of_range);
 }
 TEST(AgradMixMatrixTail,TailVector4_ffv) {
   using stan::math::tail;
-  stan::agrad::vector_ffv v(3);
+  stan::math::vector_ffv v(3);
   v << 1, 2, 3;
 
-  stan::agrad::vector_ffv v12 = tail(v,2);
+  stan::math::vector_ffv v12 = tail(v,2);
   EXPECT_EQ(2,v12.size());
   for (int n = 0; n < 2; ++n) {
     EXPECT_FLOAT_EQ(v[n+1].val_.val_.val(),v12[n].val_.val_.val());
@@ -130,28 +130,28 @@ TEST(AgradMixMatrixTail,TailVector4_ffv) {
 
 TEST(AgradMixMatrixTail,tailRowVector1_ffv) {
   using stan::math::tail;
-  stan::agrad::row_vector_ffv v(3);
+  stan::math::row_vector_ffv v(3);
   v << 1, 2, 3;
   EXPECT_EQ(0, tail(v,0).size());
 }
 TEST(AgradMixMatrixTail,tailRowVector2_ffv) {
   using stan::math::tail;
-  stan::agrad::row_vector_ffv v(3);
+  stan::math::row_vector_ffv v(3);
   v << 1, 2, 3;
   EXPECT_EQ(3, tail(v,3).size());
 }
 TEST(AgradMixMatrixTail,tailRowVector3_ffv) {
   using stan::math::tail;
-  stan::agrad::row_vector_ffv v(3);
+  stan::math::row_vector_ffv v(3);
   v << 1, 2, 3;
   EXPECT_THROW(tail(v,4), std::out_of_range);
 }
 TEST(AgradMixMatrixTail,tailRowVector4_ffv) {
   using stan::math::tail;
-   stan::agrad::row_vector_ffv v(3);
+   stan::math::row_vector_ffv v(3);
   v << 1, 2, 3;
 
-  stan::agrad::row_vector_ffv v12 = tail(v,2);
+  stan::math::row_vector_ffv v12 = tail(v,2);
   EXPECT_EQ(2,v12.size());
   for (int n = 0; n < 2; ++n) {
     EXPECT_FLOAT_EQ(v[n+1].val_.val_.val(),v12[n].val_.val_.val());

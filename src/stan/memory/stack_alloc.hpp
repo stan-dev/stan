@@ -1,21 +1,23 @@
 #ifndef STAN_MEMORY_STACK_ALLOC_HPP
 #define STAN_MEMORY_STACK_ALLOC_HPP
 
+// TODO(Bob): <cstddef> replaces this ifdef in C++11, until then this
+//            is best we can do to get safe pointer casts to uints.
+#if defined(_MSC_VER)
+    #include <msinttypes.h>  // Microsoft Visual Studio lacks full stdint.h
+#else
+    #include <stdint.h>
+#endif
+#include <stan/math/prim/scal/meta/likely.hpp>
 #include <cstdlib>
 #include <cstddef>
 #include <sstream>
 #include <stdexcept>
-#if defined(_MSC_VER)
-    #include <msinttypes.h>  // Microsoft Visual Studio lacks compliant stdint.h
-#else
-    #include <stdint.h> // FIXME: replace with cstddef?
-#endif
 #include <vector>
-#include <stan/math/prim/scal/meta/likely.hpp>
 
-namespace stan { 
+namespace stan {
 
-  namespace memory { 
+  namespace memory {
 
     /**
      * Return <code>true</code> if the specified pointer is aligned
@@ -35,18 +37,18 @@ namespace stan {
 
 
     namespace {
-      const size_t DEFAULT_INITIAL_NBYTES = 1 << 16; // 64KB
+      const size_t DEFAULT_INITIAL_NBYTES = 1 << 16;  // 64KB
 
 
       // FIXME: enforce alignment
       // big fun to inline, but only called twice
       inline char* eight_byte_aligned_malloc(size_t size) {
         char* ptr = static_cast<char*>(malloc(size));
-        if (!ptr) return ptr; // malloc failed to alloc
-        if (!is_aligned(ptr,8U)) {
+        if (!ptr) return ptr;  // malloc failed to alloc
+        if (!is_aligned(ptr, 8U)) {
           std::stringstream s;
-          s << "invalid alignment to 8 bytes, ptr=" 
-            << reinterpret_cast<uintptr_t>(ptr) 
+          s << "invalid alignment to 8 bytes, ptr="
+            << reinterpret_cast<uintptr_t>(ptr)
             << std::endl;
           throw std::runtime_error(s.str());
         }
@@ -58,15 +60,15 @@ namespace stan {
      * An instance of this class provides a memory pool through
      * which blocks of raw memory may be allocated and then collected
      * simultaneously.
-     * 
+     *
      * This class is useful in settings where large numbers of small
      * objects are allocated and then collected all at once.  This may
      * include objects whose destructors have no effect.
-     * 
+     *
      * Memory is allocated on a stack of blocks.  Each block allocated
      * is twice as large as the previous one.  The memory may be
      * recovered, with the blocks being reused, or all blocks may be
-     * freed, resetting the stack of blocks to its original state. 
+     * freed, resetting the stack of blocks to its original state.
      *
      * Alignment up to 8 byte boundaries guaranteed for the first malloc,
      * and after that it's up to the caller.  On 64-bit architectures,
@@ -74,18 +76,19 @@ namespace stan {
      * contain an 8-byte member or a virtual function.
      */
     class stack_alloc {
-    private: 
-      std::vector<char*> blocks_; // storage for blocks, may be bigger than cur_block_
-      std::vector<size_t> sizes_; // could store initial & shift for others
-      size_t cur_block_;          // index into blocks_ for next alloc
-      char* cur_block_end_;       // ptr to cur_block_ptr_ + sizes_[cur_block_]
-      char* next_loc_;            // ptr to next available spot in cur
-                                  // block
+    private:
+      std::vector<char*> blocks_;  // storage for blocks,
+                                   // may be bigger than cur_block_
+      std::vector<size_t> sizes_;  // could store initial & shift for others
+      size_t cur_block_;           // index into blocks_ for next alloc
+      char* cur_block_end_;        // ptr to cur_block_ptr_ + sizes_[cur_block_]
+      char* next_loc_;             // ptr to next available spot in cur
+                                   // block
       // next three for keeping track of nested allocations on top of stack:
       std::vector<size_t> nested_cur_blocks_;
       std::vector<char*> nested_next_locs_;
       std::vector<char*> nested_cur_block_ends_;
-      
+
 
       /**
        * Moves us to the next block of memory, allocating that block
@@ -120,7 +123,6 @@ namespace stan {
       }
 
     public:
-
       /**
        * Construct a resizable stack allocator initially holding the
        * specified number of bytes.
@@ -130,9 +132,9 @@ namespace stan {
        * @throws std::runtime_error if the underlying malloc is not 8-byte
        * aligned.
        */
-      stack_alloc(size_t initial_nbytes = DEFAULT_INITIAL_NBYTES) :
+      explicit stack_alloc(size_t initial_nbytes = DEFAULT_INITIAL_NBYTES) :
         blocks_(1, eight_byte_aligned_malloc(initial_nbytes)),
-        sizes_(1,initial_nbytes),
+        sizes_(1, initial_nbytes),
         cur_block_(0),
         cur_block_end_(blocks_[0] + initial_nbytes),
         next_loc_(blocks_[0]) {
@@ -146,7 +148,7 @@ namespace stan {
        * This is implemented as a no-op as there is no destruction
        * required.
        */
-      ~stack_alloc() { 
+      ~stack_alloc() {
         // free ALL blocks
         for (size_t i = 0; i < blocks_.size(); ++i)
           if (blocks_[i])
@@ -172,7 +174,7 @@ namespace stan {
         // Occasionally, we have to switch blocks.
         if (unlikely(next_loc_ >= cur_block_end_))
           result = move_to_next_block(len);
-        return (void*)result;
+        return reinterpret_cast<void*>(result);
       }
 
       /**
@@ -224,11 +226,11 @@ namespace stan {
 
         next_loc_ = nested_next_locs_.back();
         nested_next_locs_.pop_back();
-        
+
         cur_block_end_ = nested_cur_block_ends_.back();
         nested_cur_block_ends_.pop_back();
       }
-    
+
       /**
        * Free all memory used by the stack allocator other than the
        * initial block allocation back to the system.  Note:  the
@@ -240,7 +242,7 @@ namespace stan {
           if (blocks_[i])
             free(blocks_[i]);
         sizes_.resize(1);
-        blocks_.resize(1); 
+        blocks_.resize(1);
         recover_all();
       }
 
@@ -249,7 +251,7 @@ namespace stan {
        * This is not the same as the number of bytes allocated through
        * calls to memalloc_.  The latter number is not calculatable
        * because space is wasted at the end of blocks if the next
-       * alloc request doesn't fit.  (Perhaps we could trim down to 
+       * alloc request doesn't fit.  (Perhaps we could trim down to
        * what is actually used?)
        *
        * @return number of bytes allocated to this instance
@@ -261,7 +263,6 @@ namespace stan {
         }
         return sum;
       }
-
     };
 
   }

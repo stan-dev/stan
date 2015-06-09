@@ -97,6 +97,11 @@ void test_exception(const std::string& input,
 }
 
 
+TEST(ioDump, sciNotationDouble) {
+  test_val("a", 5.0, "a <- 5e0");
+  test_val("a", 0.0, "a <- 0e5");
+}
+
 TEST(io_dump, reader_double) {
   test_val("a",-5.0,"a <- -5.0");
   test_val("a",5.0,"a <- 5.0");

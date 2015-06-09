@@ -2,21 +2,20 @@
 #define STAN_MATH_FWD_SCAL_FUN_COSH_HPP
 
 #include <stan/math/fwd/core.hpp>
-
-#include <math.h>
+#include <cmath>
 
 namespace stan {
-
-  namespace agrad {
+  namespace math {
 
     template <typename T>
     inline
     fvar<T>
     cosh(const fvar<T>& x) {
-      using ::sinh;
-      using ::cosh;
+      using std::sinh;
+      using std::cosh;
       return fvar<T>(cosh(x.val_), x.d_ * sinh(x.val_));
     }
+
   }
 }
 #endif

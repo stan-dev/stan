@@ -17,7 +17,7 @@
 #include <stan/math/fwd/scal/fun/value_of.hpp>
 
 TEST(AgradFwdTgamma, Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using boost::math::tgamma;
   using boost::math::digamma;
 

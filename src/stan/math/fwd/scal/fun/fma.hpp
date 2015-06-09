@@ -1,13 +1,12 @@
 #ifndef STAN_MATH_FWD_SCAL_FUN_FMA_HPP
 #define STAN_MATH_FWD_SCAL_FUN_FMA_HPP
 
+#include <math.h>
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/prim/scal/meta/return_type.hpp>
-#include <cmath>
 
 namespace stan {
-
-  namespace agrad {
+  namespace math {
 
     /**
      * The fused multiply-add operation (C99).

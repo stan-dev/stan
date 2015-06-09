@@ -13,7 +13,7 @@
 TEST(AgradRevMatrix, sum_vector) {
   using stan::math::sum;
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::math::vector_v;
 
   vector_d d(6);
   vector_v v(6);
@@ -24,10 +24,19 @@ TEST(AgradRevMatrix, sum_vector) {
   AVAR output;
   output = sum(d);
   EXPECT_FLOAT_EQ(21.0, output.val());
-                   
+  
   output = sum(v);
   EXPECT_FLOAT_EQ(21.0, output.val());
 
+  std::vector<double> grad;
+  std::vector<AVAR> x(v.size());
+  for (int i = 0; i < v.size(); ++i)
+    x[i] = v(i);
+  output.grad(x, grad);
+  EXPECT_EQ(6, grad.size());
+  for (int i = 0; i < 6; ++i)
+    EXPECT_FLOAT_EQ(1.0, grad[i]);
+                   
   d.resize(0);
   v.resize(0);
   EXPECT_FLOAT_EQ(0.0, sum(d));
@@ -36,7 +45,7 @@ TEST(AgradRevMatrix, sum_vector) {
 TEST(AgradRevMatrix, sum_rowvector) {
   using stan::math::sum;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::math::row_vector_v;
 
   row_vector_d d(6);
   row_vector_v v(6);
@@ -59,7 +68,7 @@ TEST(AgradRevMatrix, sum_rowvector) {
 TEST(AgradRevMatrix, sum_matrix) {
   using stan::math::sum;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
 
   matrix_d d(2, 3);
   matrix_v v(2, 3);

@@ -10,7 +10,7 @@
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Returns the dot product of each column of a matrix with itself.

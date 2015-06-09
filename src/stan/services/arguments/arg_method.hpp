@@ -13,8 +13,11 @@ namespace stan {
   namespace services {
 
     class arg_method: public list_argument {
+
     public:
+
       arg_method() {
+
         _name = "method";
         _description = "Analysis method (Note that method= is optional)";
 
@@ -25,10 +28,12 @@ namespace stan {
 
         _default_cursor = 0;
         _cursor = _default_cursor;
+
       }
+
     };
 
-  }  // services
+  } // services
 
 }  // stan
 

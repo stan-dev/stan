@@ -12,20 +12,19 @@
 #include <stan/math/prim/scal/fun/inv_logit.hpp>
 #include <stan/math/prim/scal/fun/log1m.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
-
-#include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
+#include <cmath>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     // Bernoulli(n|inv_logit(theta))   [0 <= n <= 1;   -inf <= theta <= inf]
     // FIXME: documentation
     template <bool propto, typename T_n, typename T_prob>
     typename return_type<T_prob>::type
     bernoulli_logit_log(const T_n& n, const T_prob& theta) {
-      static const char* function("stan::prob::bernoulli_logit_log");
+      static const char* function("stan::math::bernoulli_logit_log");
       typedef typename stan::partials_return_type<T_n, T_prob>::type
         T_partials_return;
 
@@ -34,9 +33,10 @@ namespace stan {
       using stan::math::check_bounded;
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
-      using stan::prob::include_summand;
+      using stan::math::include_summand;
       using stan::math::log1p;
       using stan::math::inv_logit;
+      using std::exp;
 
       // check if any vectors are zero length
       if (!(stan::length(n)
@@ -61,7 +61,7 @@ namespace stan {
       VectorView<const T_n> n_vec(n);
       VectorView<const T_prob> theta_vec(theta);
       size_t N = max_size(n, theta);
-      agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
+      OperandsAndPartials<T_prob> operands_and_partials(theta);
 
       for (size_t n = 0; n < N; n++) {
         // pull out values of arguments
@@ -106,6 +106,6 @@ namespace stan {
       return bernoulli_logit_log<false>(n, theta);
     }
 
-  }  // namespace prob
+  }  // namespace math
 }  // namespace stan
 #endif

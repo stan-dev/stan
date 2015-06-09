@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 TEST(AgradFwd,value_of_rec) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<double> a = 5.0;
   fvar<fvar<double> > ff_a(5.0);

@@ -17,7 +17,6 @@
 #include <stan/math/prim/scal/fun/lgamma.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/prob/neg_binomial_ccdf_log.hpp>
 #include <stan/math/prim/scal/fun/grad_reg_inc_beta.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
@@ -25,7 +24,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     // Temporary neg_binomial_2_ccdf implementation that
     // transforms the input parameters and calls neg_binomial_ccdf
@@ -43,7 +42,7 @@ namespace stan {
       using stan::math::check_consistent_sizes;
       using stan::math::check_less;
 
-      static const char* function("stan::prob::neg_binomial_2_cdf");
+      static const char* function("stan::math::neg_binomial_2_cdf");
       check_positive_finite(function, "Location parameter", mu);
       check_positive_finite(function, "Precision parameter", phi);
       check_not_nan(function, "Random variable", n);

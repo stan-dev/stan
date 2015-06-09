@@ -12,17 +12,16 @@
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/fun/square.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
-
+#include <cmath>
 
 namespace stan {
-  namespace prob {
+  namespace math {
 
     template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y, T_loc, T_scale>::type
     lognormal_ccdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      static const char* function("stan::prob::lognormal_ccdf_log");
+      static const char* function("stan::math::lognormal_ccdf_log");
       typedef typename stan::partials_return_type<T_y, T_loc, T_scale>::type
         T_partials_return;
 
@@ -34,6 +33,8 @@ namespace stan {
       using stan::math::check_positive_finite;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
+      using std::log;
+      using std::exp;
 
       // check if any vectors are zero length
       if (!(stan::length(y)
@@ -46,7 +47,7 @@ namespace stan {
       check_finite(function, "Location parameter", mu);
       check_positive_finite(function, "Scale parameter", sigma);
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale>
+      OperandsAndPartials<T_y, T_loc, T_scale>
         operands_and_partials(y, mu, sigma);
 
       VectorView<const T_y> y_vec(y);

@@ -2,17 +2,17 @@
 #define STAN_MATH_REV_SCAL_FUN_ACOS_HPP
 
 #include <stan/math/rev/core.hpp>
-#include <math.h>
+#include <cmath>
 #include <valarray>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class acos_vari : public op_v_vari {
       public:
         explicit acos_vari(vari* avi) :
-          op_v_vari(::acos(avi->val_), avi) {
+          op_v_vari(std::acos(avi->val_), avi) {
         }
         void chain() {
           avi_->adj_ -= adj_ / std::sqrt(1.0 - (avi_->val_ * avi_->val_));

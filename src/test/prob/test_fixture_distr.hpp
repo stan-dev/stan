@@ -11,8 +11,8 @@
 using std::vector;
 using Eigen::Matrix;
 using Eigen::Dynamic;
-using stan::agrad::var;
-using stan::agrad::fvar;
+using stan::math::var;
+using stan::math::fvar;
 using stan::scalar_type;
 using stan::is_vector;
 using stan::is_constant;
@@ -60,7 +60,7 @@ public:
   typedef typename scalar_type<T4>::type Scalar4;
   typedef typename scalar_type<T5>::type Scalar5;
 
-  typedef typename stan::agrad::fvar<typename stan::partials_return_type<T0,T1,T2,T3,T4,T5>::type> T_fvar_return;
+  typedef typename stan::math::fvar<typename stan::partials_return_type<T0,T1,T2,T3,T4,T5>::type> T_fvar_return;
   typedef typename stan::return_type<T0,T1,T2,T3,T4,T5>::type T_return_type;
 
   void call_all_versions() {
@@ -120,7 +120,7 @@ public:
         lp = TestClass.template log_prob
           <false,T0,T1,T2,T3,T4,T5>
           (p0,p1,p2,p3,p4,p5);
-        EXPECT_TRUE(stan::agrad::abs(lp - log_prob[n]) < 1e-8)
+        EXPECT_TRUE(stan::math::abs(lp - log_prob[n]) < 1e-8)
           << "For all scalar inputs, when propto is false, log_prob should match the provided value. Failed at index: "
           << n << std::endl
           << "expected: " << log_prob[n] << std::endl
@@ -131,7 +131,7 @@ public:
         lp = TestClass.template log_prob
           <T0,T1,T2,T3,T4,T5>
           (p0,p1,p2,p3,p4,p5);
-        EXPECT_TRUE(stan::agrad::abs(lp - log_prob[n]) < 1e-8)
+        EXPECT_TRUE(stan::math::abs(lp - log_prob[n]) < 1e-8)
           << "For all scalar and all constant inputs log_prob should match the provided value. Failed at index: "
           << n << std::endl
           << "expected: " << log_prob[n] << std::endl
@@ -323,7 +323,7 @@ public:
                                       var& logprob,
                                       vector<var>& x) {
     logprob.grad(x, grad);
-    stan::agrad::recover_memory();
+    stan::math::recover_memory();
     return logprob.val();
   }
   double calculate_gradients_2ndorder(vector<double>& grad,
@@ -378,14 +378,14 @@ public:
                                       fvar<var>& logprob, 
                                       vector<var>& x) {
     logprob.val_.grad(x, grad);
-    stan::agrad::recover_memory();
+    stan::math::recover_memory();
     return logprob.val_.val();
   }
   double calculate_gradients_2ndorder(vector<double>& grad, 
                                       fvar<var>& logprob, 
                                       vector<var>& x) {
     logprob.d_.grad(x, grad);
-    stan::agrad::recover_memory();
+    stan::math::recover_memory();
     return logprob.val_.val();
   }
   double calculate_gradients_3rdorder(vector<double>& grad, 
@@ -399,21 +399,21 @@ public:
                                       fvar<fvar<var> >& logprob,
                                       vector<var>& x) {
     logprob.val_.val_.grad(x, grad);
-    stan::agrad::recover_memory();
+    stan::math::recover_memory();
     return logprob.val_.val_.val();
   }
   double calculate_gradients_2ndorder(vector<double>& grad,
                                       fvar<fvar<var> >& logprob, 
                                       vector<var>& x) {
     logprob.d_.val_.grad(x, grad);
-    stan::agrad::recover_memory();
+    stan::math::recover_memory();
     return logprob.val_.val_.val();
   }
   double calculate_gradients_3rdorder(vector<double>& grad,
                                       fvar<fvar<var> >& logprob, 
                                       vector<var>& x) {
     logprob.d_.d_.grad(x, grad);
-    stan::agrad::recover_memory();
+    stan::math::recover_memory();
     return logprob.val_.val_.val();
   }
 

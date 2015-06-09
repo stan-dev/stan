@@ -1,13 +1,14 @@
 #ifndef STAN_MATH_REV_SCAL_FUN_ERF_HPP
 #define STAN_MATH_REV_SCAL_FUN_ERF_HPP
 
+#include <math.h>
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
-#include <math.h>
+#include <cmath>
 #include <valarray>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class erf_vari : public op_v_vari {
@@ -17,7 +18,7 @@ namespace stan {
         }
         void chain() {
           avi_->adj_ += adj_ * stan::math::TWO_OVER_SQRT_PI
-            * ::exp(- avi_->val_ * avi_->val_);
+            * std::exp(- avi_->val_ * avi_->val_);
         }
       };
     }
@@ -25,7 +26,7 @@ namespace stan {
     /**
      * The error function for variables (C99).
      *
-     * For non-variable function, see ::erf() from math.h
+     * For non-variable function, see ::erf() from cmath.
      *
      * The derivative is
      *
@@ -59,7 +60,7 @@ namespace stan {
      * @param a The variable.
      * @return Error function applied to the variable.
      */
-    inline var erf(const stan::agrad::var& a) {
+    inline var erf(const var& a) {
       return var(new erf_vari(a.vi_));
     }
 

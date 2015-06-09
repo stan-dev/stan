@@ -33,7 +33,7 @@ TEST(ProbDistributions,ordered_logistic_vals) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
 
-  using stan::prob::ordered_logistic_log;
+  using stan::math::ordered_logistic_log;
   using stan::math::inv_logit;
 
   int K = 5;
@@ -60,7 +60,7 @@ TEST(ProbDistributions,ordered_logistic_vals_2) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
 
-  using stan::prob::ordered_logistic_log;
+  using stan::math::ordered_logistic_log;
   using stan::math::inv_logit;
 
   int K = 3;
@@ -83,7 +83,7 @@ TEST(ProbDistributions,ordered_logistic_vals_2) {
 }
 
 TEST(ProbDistributions,ordered_logistic) {
-  using stan::prob::ordered_logistic_log;
+  using stan::math::ordered_logistic_log;
   int K = 4;
   Eigen::Matrix<double,Eigen::Dynamic,1> c(K-1);
   c << -0.3, 0.1, 1.2;
@@ -148,16 +148,16 @@ TEST(ProbDistributionOrderedLogistic, error_check) {
     2.0,
     5,
     10;
-  EXPECT_NO_THROW(stan::prob::ordered_logistic_rng(4.0, c, rng));
+  EXPECT_NO_THROW(stan::math::ordered_logistic_rng(4.0, c, rng));
 
-  EXPECT_THROW(stan::prob::ordered_logistic_rng(stan::math::positive_infinity(), 
+  EXPECT_THROW(stan::math::ordered_logistic_rng(stan::math::positive_infinity(), 
                                                 c, rng),
                std::domain_error);
   c << -inf, 
     2.0,
     -5,
     inf;
-  EXPECT_THROW(stan::prob::ordered_logistic_rng(4.0, c, rng),
+  EXPECT_THROW(stan::math::ordered_logistic_rng(4.0, c, rng),
                std::domain_error);
 
 }
@@ -197,7 +197,7 @@ TEST(ProbDistributionOrderedLogistic, chiSquareGoodnessFitTest) {
   }
 
   while (count < N) {
-    int a = stan::prob::ordered_logistic_rng(eta,theta,rng);
+    int a = stan::math::ordered_logistic_rng(eta,theta,rng);
     bin[a - 1]++;
     count++;
    }

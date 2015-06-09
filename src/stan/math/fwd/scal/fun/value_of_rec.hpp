@@ -5,7 +5,7 @@
 #include <stan/math/fwd/core.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Return the value of the specified variable.

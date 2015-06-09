@@ -15,8 +15,8 @@
 
 using stan::math::sum;
 using stan::math::append_col;
-using stan::agrad::matrix_v;
-using stan::agrad::row_vector_v;
+using stan::math::matrix_v;
+using stan::math::row_vector_v;
 using Eigen::MatrixXd;
 using Eigen::RowVectorXd;
 
@@ -35,7 +35,7 @@ TEST(AgradRevMatrix, append_col_matrix) {
   for (int i = 0; i < 2; ++i) {
     for (int j = 0; j < 2; ++j) {
       x.push_back(a(i,j));
-      a_exp(i, j) = stan::agrad::exp(a(i, j));
+      a_exp(i, j) = stan::math::exp(a(i, j));
     }
   }
   
@@ -47,7 +47,7 @@ TEST(AgradRevMatrix, append_col_matrix) {
   for (int i = 0; i < 2; i++)
     for (int j = 0; j < 2; j++)
       EXPECT_FLOAT_EQ(std::exp(a(i, j).val()), g[idx++]);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 TEST(AgradRevMatrix, append_col_row_vector) {
@@ -62,7 +62,7 @@ TEST(AgradRevMatrix, append_col_row_vector) {
   AVEC x;
   for (int i = 0; i < 3; ++i) {
     x.push_back(a(i));
-    a_exp(i) = stan::agrad::exp(a(i));
+    a_exp(i) = stan::math::exp(a(i));
   }
   
   AVAR append_col_ab = sum(append_col(a_exp, b));
@@ -72,7 +72,7 @@ TEST(AgradRevMatrix, append_col_row_vector) {
   size_t idx = 0;
   for (int i = 0; i < 3; i++)
     EXPECT_FLOAT_EQ(std::exp(a(i).val()), g[idx++]);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 template <typename T, int R, int C>
@@ -93,9 +93,9 @@ TEST(MathMatrix, append_col_different_types) {
   using Eigen::MatrixXd;
   using Eigen::VectorXd;
   using Eigen::RowVectorXd;
-  using stan::agrad::matrix_v;
-  using stan::agrad::row_vector_v;
-  using stan::agrad::vector_v;
+  using stan::math::matrix_v;
+  using stan::math::row_vector_v;
+  using stan::math::vector_v;
   using std::vector;  
   
   MatrixXd m33(3, 3);

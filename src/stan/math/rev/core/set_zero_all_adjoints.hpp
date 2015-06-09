@@ -6,7 +6,7 @@
 #include <stan/math/rev/core/chainablestack.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Reset all adjoint values in the stack to zero.

@@ -12,7 +12,7 @@
 #include <stan/math/rev/scal/fun/value_of_rec.hpp>
 
 TEST(AgradRevErrorHandlingScalar,CheckNotNan) {
-  using stan::agrad::var;
+  using stan::math::var;
   using stan::math::check_not_nan;
   const char* function = "check_not_nan";
 
@@ -44,29 +44,29 @@ TEST(AgradRevErrorHandlingScalar,CheckNotNan) {
     << "check_not_nan should throw exception on NaN: " << x;
   EXPECT_THROW(check_not_nan(function, "x", x_d), std::domain_error)
     << "check_not_nan should throw exception on NaN: " << x_d;
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 TEST(AgradRevErrorHandlingScalar, CheckNotNanVarCheckUnivariate) {
-  using stan::agrad::var;
+  using stan::math::var;
   using stan::math::check_not_nan;
 
   const char* function = "check_not_nan";
   var a(5.0);
 
-  size_t stack_size = stan::agrad::ChainableStack::var_stack_.size();
+  size_t stack_size = stan::math::ChainableStack::var_stack_.size();
 
   EXPECT_EQ(1U,stack_size);
   EXPECT_TRUE(check_not_nan(function,"a",a));
 
-  size_t stack_size_after_call = stan::agrad::ChainableStack::var_stack_.size();
+  size_t stack_size_after_call = stan::math::ChainableStack::var_stack_.size();
   EXPECT_EQ(1U,stack_size_after_call);
 
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 TEST(AgradRevErrorHandlingScalar, CheckNotNanVarCheckVectorized) {
-  using stan::agrad::var;
+  using stan::math::var;
   using std::vector;
   using stan::math::check_not_nan;
 
@@ -77,37 +77,37 @@ TEST(AgradRevErrorHandlingScalar, CheckNotNanVarCheckVectorized) {
   for (int i = 0; i < N; ++i)
    a.push_back(var(i));
 
-  size_t stack_size = stan::agrad::ChainableStack::var_stack_.size();
+  size_t stack_size = stan::math::ChainableStack::var_stack_.size();
 
   EXPECT_EQ(5U,stack_size);
   EXPECT_TRUE(check_not_nan(function,"a",a));
 
-  size_t stack_size_after_call = stan::agrad::ChainableStack::var_stack_.size();
+  size_t stack_size_after_call = stan::math::ChainableStack::var_stack_.size();
   EXPECT_EQ(5U,stack_size_after_call);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 
 TEST(ErrorHandlingScalar, CheckNotNanVarCheckUnivariate) {
-  using stan::agrad::var;
+  using stan::math::var;
   using stan::math::check_not_nan;
   
   const char* function = "check_not_nan";
   var a(5.0);
 
-  size_t stack_size = stan::agrad::ChainableStack::var_stack_.size();
+  size_t stack_size = stan::math::ChainableStack::var_stack_.size();
 
   EXPECT_TRUE(1U == stack_size);
   EXPECT_TRUE(check_not_nan(function,"a",a));
 
-  size_t stack_size_after_call = stan::agrad::ChainableStack::var_stack_.size();
+  size_t stack_size_after_call = stan::math::ChainableStack::var_stack_.size();
   EXPECT_TRUE(1U == stack_size_after_call);
 
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 TEST(ErrorHandlingScalar, CheckNotNanVarCheckVectorized) {
-  using stan::agrad::var;
+  using stan::math::var;
   using std::vector;
   using stan::math::check_not_nan;
 
@@ -118,12 +118,12 @@ TEST(ErrorHandlingScalar, CheckNotNanVarCheckVectorized) {
   for (int i = 0; i < N; ++i)
    a.push_back(var(i));
 
-  size_t stack_size = stan::agrad::ChainableStack::var_stack_.size();
+  size_t stack_size = stan::math::ChainableStack::var_stack_.size();
 
   EXPECT_TRUE(5U == stack_size);
   EXPECT_TRUE(check_not_nan(function,"a",a));
 
-  size_t stack_size_after_call = stan::agrad::ChainableStack::var_stack_.size();
+  size_t stack_size_after_call = stan::math::ChainableStack::var_stack_.size();
   EXPECT_TRUE(5U == stack_size_after_call);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }

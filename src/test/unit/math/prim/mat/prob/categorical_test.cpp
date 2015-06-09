@@ -16,21 +16,21 @@ using Eigen::Matrix;
 TEST(ProbDistributionsCategorical,Categorical) {
   Matrix<double,Dynamic,1> theta(3,1);
   theta << 0.3, 0.5, 0.2;
-  EXPECT_FLOAT_EQ(-1.203973, stan::prob::categorical_log(1,theta));
-  EXPECT_FLOAT_EQ(-0.6931472, stan::prob::categorical_log(2,theta));
+  EXPECT_FLOAT_EQ(-1.203973, stan::math::categorical_log(1,theta));
+  EXPECT_FLOAT_EQ(-0.6931472, stan::math::categorical_log(2,theta));
 }
 TEST(ProbDistributionsCategorical,Propto) {
   Matrix<double,Dynamic,1> theta(3,1);
   theta << 0.3, 0.5, 0.2;
-  EXPECT_FLOAT_EQ(0.0, stan::prob::categorical_log<true>(1,theta));
-  EXPECT_FLOAT_EQ(0.0, stan::prob::categorical_log<true>(2,theta));
+  EXPECT_FLOAT_EQ(0.0, stan::math::categorical_log<true>(1,theta));
+  EXPECT_FLOAT_EQ(0.0, stan::math::categorical_log<true>(2,theta));
 }
 
 TEST(ProbDistributionsCategorical,VectorInt) {
   Matrix<double,Dynamic,1> theta(3,1);
   theta << 0.3, 0.5, 0.2;
   std::vector<int> xs0;
-  EXPECT_FLOAT_EQ(0.0, stan::prob::categorical_log(xs0,theta));
+  EXPECT_FLOAT_EQ(0.0, stan::math::categorical_log(xs0,theta));
 
   std::vector<int> xs(3);
   xs[0] = 1;
@@ -38,10 +38,10 @@ TEST(ProbDistributionsCategorical,VectorInt) {
   xs[2] = 1;
   
   EXPECT_FLOAT_EQ(log(0.3) + log(0.2) + log(0.3),
-                  stan::prob::categorical_log(xs,theta));
+                  stan::math::categorical_log(xs,theta));
 }
 
-using stan::prob::categorical_log;
+using stan::math::categorical_log;
 
 TEST(ProbDistributionsCategorical, error) {
   double nan = std::numeric_limits<double>::quiet_NaN();
@@ -96,7 +96,7 @@ TEST(ProbDistributionsCategorical, error_check) {
     0.45,
     0.50;
 
-  EXPECT_THROW(stan::prob::categorical_rng(theta,rng),std::domain_error);
+  EXPECT_THROW(stan::math::categorical_rng(theta,rng),std::domain_error);
 }
 
 TEST(ProbDistributionsCategorical, chiSquareGoodnessFitTest) {
@@ -128,7 +128,7 @@ TEST(ProbDistributionsCategorical, chiSquareGoodnessFitTest) {
   }
 
   while (count < N) {
-    int a = stan::prob::categorical_rng(theta,rng);
+    int a = stan::math::categorical_rng(theta,rng);
     bin[a - 1]++;
     count++;
    }

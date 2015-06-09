@@ -3,15 +3,17 @@
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/scal/fun/nan_util.hpp>
 #include <stan/math/prim/scal/meta/return_type.hpp>
-#include <stan/math/rev/scal/fun/exp.hpp>
 #include <stan/math/rev/core.hpp>
+#include <stan/math/rev/scal/fun/exp.hpp>
+#include <stan/math/rev/scal/fun/fabs.hpp>
 #include <stan/math/rev/scal/fun/log.hpp>
+#include <stan/math/rev/scal/fun/expm1.hpp>
 
-TEST(AgradRev,log_diff_exp_vv) {
+TEST(AgradRev, log_diff_exp_vv) {
   AVAR a = 5.0;
   AVAR b = 2.0;
   AVAR f = log_diff_exp(a, b);
-  EXPECT_FLOAT_EQ (std::log(std::exp(5) - std::exp(2)), f.val());
+  EXPECT_FLOAT_EQ(std::log(std::exp(5) - std::exp(2)), f.val());
   
   AVEC x = createAVEC(a, b);
   VEC grad_f;
@@ -23,19 +25,21 @@ TEST(AgradRev,log_diff_exp_vv) {
   a = 1000;
   b = 10;
   f = log_diff_exp(a, b);
-  EXPECT_FLOAT_EQ (std::log(std::exp(0.0) - std::exp(-990.0)) + 1000.0, f.val());
+  EXPECT_FLOAT_EQ(std::log(std::exp(0.0) - std::exp(-990.0)) + 1000.0, f.val());
   
   x = createAVEC(a, b);
   f.grad(x,grad_f);
-  EXPECT_FLOAT_EQ (std::exp (1000.0 - (std::log(std::exp(0.0) - std::exp(-999.0)) + 1000)), grad_f[0]);
-  EXPECT_FLOAT_EQ (std::exp (10.0 - (std::log(std::exp(0.0) - std::exp(-999.0)) + 1000)), grad_f[1]);
+  EXPECT_FLOAT_EQ(std::exp(1000.0 - (std::log(std::exp(0.0) - std::exp(-999.0)) + 1000)),
+                  grad_f[0]);
+  EXPECT_FLOAT_EQ(std::exp(10.0 - (std::log(std::exp(0.0) - std::exp(-999.0)) + 1000)), 
+                  grad_f[1]);
 }
 
 TEST(AgradRev,log_diff_exp_vd) {
   AVAR a = 5.0;
   double b = 2.0;
   AVAR f = log_diff_exp(a, b);
-  EXPECT_FLOAT_EQ (std::log(std::exp(5) - std::exp(2)), f.val());
+  EXPECT_FLOAT_EQ(std::log(std::exp(5) - std::exp(2)), f.val());
 
   AVEC x = createAVEC(a);
   VEC grad_f;
@@ -46,18 +50,20 @@ TEST(AgradRev,log_diff_exp_vd) {
   a = 1000;
   b = 10;
   f = log_diff_exp(a, b);
-  EXPECT_FLOAT_EQ (std::log(std::exp(0.0) - std::exp(-990.0)) + 1000.0, f.val());
+  EXPECT_FLOAT_EQ(std::log(std::exp(0.0) - std::exp(-990.0)) + 1000.0, 
+                   f.val());
   
   x = createAVEC(a);
   f.grad(x,grad_f);
-  EXPECT_FLOAT_EQ (std::exp (1000.0 - (std::log(std::exp(0.0) - std::exp(-999.0)) + 1000)), grad_f[0]);
+  EXPECT_FLOAT_EQ(std::exp(1000.0 - (std::log(std::exp(0.0) - std::exp(-999.0)) + 1000)), 
+                   grad_f[0]);
 }
 
 TEST(AgradRev,log_diff_exp_dv) {
   double a = 5.0;
   AVAR b = 2.0;
   AVAR f = log_diff_exp(a, b);
-  EXPECT_FLOAT_EQ (std::log(std::exp(5) - std::exp(2)), f.val());
+  EXPECT_FLOAT_EQ(std::log(std::exp(5) - std::exp(2)), f.val());
   
   AVEC x = createAVEC(b);
   VEC grad_f;
@@ -68,11 +74,11 @@ TEST(AgradRev,log_diff_exp_dv) {
   a = 1000;
   b = 10;
   f = log_diff_exp(a, b);
-  EXPECT_FLOAT_EQ (std::log(std::exp(0.0) - std::exp(-990.0)) + 1000.0, f.val());
+  EXPECT_FLOAT_EQ(std::log(std::exp(0.0) - std::exp(-990.0)) + 1000.0, f.val());
   
   x = createAVEC(b);
   f.grad(x,grad_f);
-  EXPECT_FLOAT_EQ (0, grad_f[0]); //1/(1-exp(1000-10)) explodes to 1/-inf = 0
+  EXPECT_FLOAT_EQ(0, grad_f[0]); //1/(1-exp(1000-10)) explodes to 1/-inf = 0
 }
 
 void test_log_diff_exp_2_vv(double a_val, 
@@ -91,8 +97,8 @@ void test_log_diff_exp_2_vv(double a_val,
   
   double f_val = f.val();
 
-  stan::agrad::var a2(a_val);
-  stan::agrad::var b2(b_val);
+  stan::math::var a2(a_val);
+  stan::math::var b2(b_val);
   AVEC x2 = createAVEC(a2,b2);
   AVAR f2 = log(exp(a2) - exp(b2));
   VEC g2;
@@ -118,7 +124,7 @@ void test_log_diff_exp_2_vd(double a_val,
   
   double f_val = f.val();
 
-  stan::agrad::var a2(a_val);
+  stan::math::var a2(a_val);
   AVEC x2 = createAVEC(a2);
   AVAR f2 = log(exp(a2) - exp(b));
   VEC g2;

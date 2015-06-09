@@ -12,7 +12,7 @@
 
 TEST(AgradRevMatrix,subtract_scalar) {
   using stan::math::subtract;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
 
   matrix_v v(2,2);
   v << 1, 2, 3, 4;
@@ -34,7 +34,7 @@ TEST(AgradRevMatrix,subtract_scalar) {
 TEST(AgradRevMatrix, subtract_vector_vector) {
   using stan::math::subtract;
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::math::vector_v;
 
   vector_d expected_output(5);
   vector_v output;
@@ -80,7 +80,7 @@ TEST(AgradRevMatrix, subtract_vector_vector) {
 TEST(AgradRevMatrix, subtract_vector_vector_exception) {
   using stan::math::subtract;
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::math::vector_v;
 
   vector_d d1(5), d2(1);
   vector_v v1(5), v2(1);
@@ -94,7 +94,7 @@ TEST(AgradRevMatrix, subtract_vector_vector_exception) {
 TEST(AgradRevMatrix, subtract_rowvector_rowvector) {
   using stan::math::subtract;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::math::row_vector_v;
 
   row_vector_d expected_output(5);
   row_vector_d  output_d;
@@ -140,7 +140,7 @@ TEST(AgradRevMatrix, subtract_rowvector_rowvector) {
 TEST(AgradRevMatrix, subtract_rowvector_rowvector_exception) {
   using stan::math::subtract;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::math::row_vector_v;
 
   row_vector_d d1(5), d2(2);
   row_vector_v v1(5), v2(2);
@@ -154,7 +154,7 @@ TEST(AgradRevMatrix, subtract_rowvector_rowvector_exception) {
 TEST(AgradRevMatrix, subtract_matrix_matrix) {
   using stan::math::subtract;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   
   matrix_d expected_output(2,2);
   matrix_v output;
@@ -197,7 +197,7 @@ TEST(AgradRevMatrix, subtract_matrix_matrix) {
 TEST(AgradRevMatrix, subtract_matrix_matrix_exception) {
   using stan::math::subtract;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
 
   matrix_d d1(2,2), d2(1,2);
   matrix_v v1(2,2), v2(1,2);

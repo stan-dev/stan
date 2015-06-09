@@ -10,7 +10,7 @@
 
 TEST(AgradFwdMatrixQrR, fd) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
   matrix_fd m0(0,0);
   matrix_d m2(3,2);
   matrix_fd m1(3,2);
@@ -46,7 +46,7 @@ TEST(AgradFwdMatrixQrR, fd) {
 
 TEST(AgradFwdMatrixQrR, ffd) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffd;
+  using stan::math::matrix_ffd;
   matrix_ffd m0(0,0);
   matrix_d m2(3,2);
   matrix_ffd m1(3,2);

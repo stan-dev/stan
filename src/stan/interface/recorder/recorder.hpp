@@ -7,7 +7,7 @@
 namespace stan {
   namespace interface {
     namespace recorder {
-      
+
       class recorder {
       public:
         virtual ~recorder() {};

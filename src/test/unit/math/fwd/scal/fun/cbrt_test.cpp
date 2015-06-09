@@ -6,7 +6,7 @@
 #include <stan/math/fwd/scal/fun/cbrt.hpp>
 
 TEST(AgradFwdCbrt,Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using boost::math::cbrt;
   using std::isnan;
 
@@ -40,7 +40,7 @@ TEST(AgradFwdCbrt,Fvar) {
 
 
 TEST(AgradFwdCbrt,FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using boost::math::cbrt;
 
   fvar<fvar<double> > x;
