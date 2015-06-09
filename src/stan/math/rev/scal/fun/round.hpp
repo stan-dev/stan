@@ -25,7 +25,7 @@ namespace stan {
     /**
      * Returns the rounded form of the specified variable (C99).
      *
-     * See boost::math::round() for the double-based version.
+     * See ::round() for the double-based version.
      *
      * The derivative is zero everywhere but numbers half way between
      * whole numbers, so for convenience the derivative is defined to
@@ -54,7 +54,7 @@ namespace stan {
      * @param a Specified variable.
      * @return Rounded variable.
      */
-    inline var round(const stan::math::var& a) {
+    inline var round(const var& a) {
       return var(new round_vari(a.vi_));
     }
 

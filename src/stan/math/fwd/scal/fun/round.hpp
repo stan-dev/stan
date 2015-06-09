@@ -4,17 +4,13 @@
 #include <math.h>
 #include <stan/math/fwd/core.hpp>
 
-
 namespace stan {
-
   namespace math {
 
     template <typename T>
-    inline
-    fvar<T>
-    round(const fvar<T>& x) {
+    inline fvar<T> round(const fvar<T>& x) {
       using ::round;
-        return fvar<T>(round(x.val_), 0);
+      return fvar<T>(round(x.val_), 0);
     }
 
   }

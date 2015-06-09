@@ -1,8 +1,8 @@
 #ifndef STAN_MATH_REV_SCAL_FUN_EXP_HPP
 #define STAN_MATH_REV_SCAL_FUN_EXP_HPP
 
-#include <math.h>
 #include <stan/math/rev/core.hpp>
+#include <cmath>
 
 namespace stan {
   namespace math {
@@ -11,7 +11,7 @@ namespace stan {
       class exp_vari : public op_v_vari {
       public:
         explicit exp_vari(vari* avi) :
-          op_v_vari(::exp(avi->val_), avi) {
+          op_v_vari(std::exp(avi->val_), avi) {
         }
         void chain() {
           avi_->adj_ += adj_ * val_;

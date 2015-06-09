@@ -12,14 +12,21 @@
 #include <stan/math/prim/scal/err/check_not_nan.hpp>
 
 #include <stan/math/prim/scal/fun/value_of.hpp>
+#include <stan/math/prim/scal/prob/beta_cdf.hpp>
+#include <stan/math/prim/scal/fun/grad_reg_inc_beta.hpp>
+
 #include <stan/math/prim/scal/fun/digamma.hpp>
 #include <stan/math/prim/scal/fun/inc_beta.hpp>
 #include <stan/math/prim/scal/fun/inc_beta_dda.hpp>
 #include <stan/math/prim/scal/fun/inc_beta_ddb.hpp>
 #include <stan/math/prim/scal/fun/inc_beta_ddz.hpp>
-#include <vector>
+
+#include <boost/math/special_functions/digamma.hpp>
+#include <boost/random/negative_binomial_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
 
 #include <limits>
+#include <vector>
 
 namespace stan {
   namespace math {
@@ -34,7 +41,7 @@ namespace stan {
       typedef typename stan::partials_return_type<T_n, T_location,
                                                   T_precision>::type
         T_partials_return;
-      
+
       using stan::math::check_positive_finite;
       using stan::math::check_nonnegative;
       using stan::math::check_not_nan;

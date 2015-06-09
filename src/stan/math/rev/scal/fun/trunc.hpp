@@ -1,9 +1,9 @@
 #ifndef STAN_MATH_REV_SCAL_FUN_TRUNC_HPP
 #define STAN_MATH_REV_SCAL_FUN_TRUNC_HPP
 
+#include <math.h>
 #include <stan/math/rev/core.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <math.h>
 #include <limits>
 
 namespace stan {
@@ -25,7 +25,7 @@ namespace stan {
     /**
      * Returns the truncatation of the specified variable (C99).
      *
-     * See boost::math::trunc() for the double-based version.
+     * See ::trunc() for the double-based version.
      *
      * The derivative is zero everywhere but at integer values, so for
      * convenience the derivative is defined to be everywhere zero,
@@ -52,7 +52,7 @@ namespace stan {
      * @param a Specified variable.
      * @return Truncation of the variable.
      */
-    inline var trunc(const stan::math::var& a) {
+    inline var trunc(const var& a) {
       return var(new trunc_vari(a.vi_));
     }
 

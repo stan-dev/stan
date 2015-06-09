@@ -8,7 +8,6 @@
 
 namespace stan {
   namespace math {
-    
 
     /**
      * Returns the partial derivative of the regularized
