@@ -1,0 +1,16 @@
+/**
+ * @mainpage
+ * 
+ * This is the API documentation for the Stan Math Library.
+ *
+ * <h3>More Information</h3>
+ *
+ * <div style="width:30em;">
+ * <p>For more information, including pointers to narrative 
+ * documentation, please visit Stan's home page at:
+ * </div>
+ *
+ * <a style="font-family: 'lucida console', courier; font-size:1.15em; font-weight:bold; margin:2em 1em 2em
+ 1em;" href="http://mc-stan.org/">http://mc-stan.org/</a>
+ *
+ */

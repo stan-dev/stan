@@ -1,9 +1,22 @@
 #ifndef STAN_IO_WRITER_HPP
 #define STAN_IO_WRITER_HPP
 
-#include <stan/math/prim/arr.hpp>
-#include <stan/math/prim/mat.hpp>
-#include <stan/math/prim/scal.hpp>
+#include <stan/math/prim/arr/meta/index_type.hpp>
+#include <stan/math/prim/mat/meta/index_type.hpp>
+#include <stan/math/prim/scal/meta/index_type.hpp>
+#include <stan/math/prim/mat/err/check_corr_matrix.hpp>
+#include <stan/math/prim/mat/err/check_ordered.hpp>
+#include <stan/math/prim/mat/err/check_positive_ordered.hpp>
+#include <stan/math/prim/mat/err/check_simplex.hpp>
+#include <stan/math/prim/mat/err/check_unit_vector.hpp>
+#include <stan/math/prim/mat/fun/cholesky_corr_free.hpp>
+#include <stan/math/prim/mat/fun/cholesky_factor_free.hpp>
+#include <stan/math/prim/mat/fun/factor_cov_matrix.hpp>
+#include <stan/math/prim/mat/fun/simplex_free.hpp>
+#include <stan/math/prim/mat/fun/unit_vector_free.hpp>
+#include <stan/math/prim/scal/fun/prob_free.hpp>
+#include <stan/math/prim/scal/fun/lb_free.hpp>
+#include <stan/math/prim/scal/fun/lub_free.hpp>
 #include <stdexcept>
 #include <vector>
 
