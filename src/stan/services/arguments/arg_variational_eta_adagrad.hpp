@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__ARGUMENTS__VARIATIONAL_ETA_STEPSIZE__HPP
-#define STAN__SERVICES__ARGUMENTS__VARIATIONAL_ETA_STEPSIZE__HPP
+#ifndef STAN__SERVICES__ARGUMENTS__VARIATIONAL_ETA_ADAGRAD__HPP
+#define STAN__SERVICES__ARGUMENTS__VARIATIONAL_ETA_ADAGRAD__HPP
 
 #include <stan/services/arguments/singleton_argument.hpp>
 
@@ -7,12 +7,12 @@ namespace stan {
 
   namespace services {
 
-    class arg_variational_eta_stepsize: public real_argument {
+    class arg_variational_eta_adagrad: public real_argument {
     public:
-      arg_variational_eta_stepsize(): real_argument() {
-        _name = "eta_stepsize";
+      arg_variational_eta_adagrad(): real_argument() {
+        _name = "eta_adagrad";
         _description = "Stepsize weighting parameter for variational iteration";
-        _validity = "0 < init_stepsize <= 1.0";
+        _validity = "0 < eta_adagrad <= 1.0";
         _default = "0.1";
         _default_value = 0.1;
         _constrained = true;
