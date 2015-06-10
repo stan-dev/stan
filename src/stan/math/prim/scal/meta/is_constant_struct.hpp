@@ -17,7 +17,6 @@ namespace stan {
     enum { value = is_constant<T>::value };
   };
 
-
   template <typename T>
   struct is_constant_struct<std::vector<T> > {
     enum { value = is_constant_struct<T>::value };
