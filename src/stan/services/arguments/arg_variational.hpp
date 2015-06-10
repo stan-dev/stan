@@ -4,7 +4,7 @@
 #include <stan/services/arguments/categorical_argument.hpp>
 
 #include <stan/services/arguments/arg_variational_algo.hpp>
-#include <stan/services/arguments/arg_iter.hpp>
+#include <stan/services/arguments/arg_variational_iter.hpp>
 #include <stan/services/arguments/arg_variational_num_samples.hpp>
 #include <stan/services/arguments/arg_variational_eta_stepsize.hpp>
 #include <stan/services/arguments/arg_tolerance.hpp>
@@ -22,9 +22,9 @@ namespace stan {
         _description = "Variational inference";
 
         _subarguments.push_back(new arg_variational_algo());
-        _subarguments.push_back(new arg_iter());
+        _subarguments.push_back(new arg_variational_iter());
         _subarguments.push_back(new arg_variational_num_samples("grad_samples",
-          "Number of samples for Monte Carlo estimate of gradients", 10));
+          "Number of samples for Monte Carlo estimate of gradients", 1));
         _subarguments.push_back(new arg_variational_num_samples
                                 ("elbo_samples",
                                  "Number of samples for Monte Carlo estimate "
