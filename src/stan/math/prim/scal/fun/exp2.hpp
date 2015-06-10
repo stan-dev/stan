@@ -2,9 +2,9 @@
 #define STAN_MATH_PRIM_SCAL_FUN_EXP2_HPP
 
 #include <boost/math/tools/promotion.hpp>
-#include <math.h>
-namespace stan {
+#include <cmath>
 
+namespace stan {
   namespace math {
 
     /**
@@ -21,10 +21,10 @@ namespace stan {
     template <typename T>
     inline typename boost::math::tools::promote_args<T>::type
     exp2(const T y) {
-      using ::pow;
+      using std::pow;
       return pow(2.0, y);
     }
+
   }
 }
-
 #endif

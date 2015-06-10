@@ -2,7 +2,7 @@
 #define STAN_MATH_REV_SCAL_FUN_ATAN_HPP
 
 #include <stan/math/rev/core.hpp>
-#include <math.h>
+#include <cmath>
 #include <valarray>
 
 namespace stan {
@@ -12,7 +12,7 @@ namespace stan {
       class atan_vari : public op_v_vari {
       public:
         explicit atan_vari(vari* avi) :
-          op_v_vari(::atan(avi->val_), avi) {
+          op_v_vari(std::atan(avi->val_), avi) {
         }
         void chain() {
           avi_->adj_ += adj_ / (1.0 + (avi_->val_ * avi_->val_));

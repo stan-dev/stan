@@ -2,22 +2,18 @@
 #define STAN_MATH_FWD_SCAL_FUN_FABS_HPP
 
 #include <stan/math/fwd/core.hpp>
-
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
-#include <math.h>
 #include <stan/math/prim/scal/meta/likely.hpp>
+#include <cmath>
 
 namespace stan {
-
   namespace math {
 
     template<typename T>
-    inline
-    fvar<T>
-    fabs(const fvar<T>& x) {
+    inline fvar<T> fabs(const fvar<T>& x) {
+      using std::fabs;
       using stan::math::NOT_A_NUMBER;
-      using ::fabs;
       using stan::math::value_of;
 
       if (unlikely(boost::math::isnan(value_of(x.val_))))
@@ -29,6 +25,7 @@ namespace stan {
       else
         return fvar<T>(0, 0);
     }
+
   }
 }
 #endif

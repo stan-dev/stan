@@ -50,7 +50,7 @@ namespace stan {
           || (z > 0.99 && a < 1e5)
           || (z > 0.999))
         return -inc_beta_dda(b, a, 1 - z, digamma_b, digamma_ab);
-      
+
       double threshold = 1e-10;
 
       // Common prefactor to regularize numerator and denomentator
