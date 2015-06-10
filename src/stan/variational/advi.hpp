@@ -349,12 +349,14 @@ namespace stan {
         boost::circular_buffer<double> cb(cb_size);
 
         // Print stuff
-        *print_stream_ << "  iter"
-                       << "       ELBO"
-                       << "   delta_ELBO_mean"
-                       << "   delta_ELBO_med"
-                       << "   notes "
-                       << std::endl;
+        if (print_stream_) {
+          *print_stream_ << "  iter"
+                         << "       ELBO"
+                         << "   delta_ELBO_mean"
+                         << "   delta_ELBO_med"
+                         << "   notes "
+                         << std::endl;
+        }
 
         // Timing variables
         clock_t start = clock();
@@ -398,18 +400,20 @@ namespace stan {
             delta_elbo_ave = std::accumulate(cb.begin(), cb.end(), 0.0)
                              / static_cast<double>(cb.size());
             delta_elbo_med = circ_buff_median(cb);
-            *print_stream_
-                      << "  "
-                      << std::setw(4) << iter_counter
-                      << "  "
-                      << std::right << std::setw(9) << std::setprecision(1)
-                      << elbo
-                      << "  "
-                      << std::setw(16) << std::fixed << std::setprecision(3)
-                      << delta_elbo_ave
-                      << "  "
-                      << std::setw(15) << std::fixed << std::setprecision(3)
-                      << delta_elbo_med;
+            if (print_stream_) {
+              *print_stream_
+                        << "  "
+                        << std::setw(4) << iter_counter
+                        << "  "
+                        << std::right << std::setw(9) << std::setprecision(1)
+                        << elbo
+                        << "  "
+                        << std::setw(16) << std::fixed << std::setprecision(3)
+                        << delta_elbo_ave
+                        << "  "
+                        << std::setw(15) << std::fixed << std::setprecision(3)
+                        << delta_elbo_med;
+            }
 
             if (diag_stream_) {
               end = clock();
@@ -423,27 +427,32 @@ namespace stan {
             }
 
             if (delta_elbo_ave < tol_rel_obj) {
-              *print_stream_ << "   MEAN ELBO CONVERGED";
+              if (print_stream_)
+                *print_stream_ << "   MEAN ELBO CONVERGED";
               do_more_iterations = false;
             }
 
             if (delta_elbo_med < tol_rel_obj) {
-              *print_stream_ << "   MEDIAN ELBO CONVERGED";
+              if (print_stream_)
+                *print_stream_ << "   MEDIAN ELBO CONVERGED";
               do_more_iterations = false;
             }
 
             if (iter_counter > 100) {
               if (delta_elbo_med > 0.5 || delta_elbo_ave > 0.5) {
-                *print_stream_ << "   MAY BE DIVERGING... INSPECT ELBO";
+                if (print_stream_)
+                  *print_stream_ << "   MAY BE DIVERGING... INSPECT ELBO";
               }
             }
 
-            *print_stream_ << std::endl;
+            if (print_stream_)
+              *print_stream_ << std::endl;
           }
 
           // Check for max iterations
           if (iter_counter == max_iterations) {
-            *print_stream_ << "MAX ITERATIONS" << std::endl;
+            if (print_stream_)
+              *print_stream_ << "MAX ITERATIONS" << std::endl;
             do_more_iterations = false;
           }
 
@@ -506,12 +515,14 @@ namespace stan {
         boost::circular_buffer<double> cb(cb_size);
 
         // Print stuff
-        *print_stream_ << "  iter"
-                       << "       ELBO"
-                       << "   delta_ELBO_mean"
-                       << "   delta_ELBO_med"
-                       << "   notes "
-                       << std::endl;
+        if (print_stream_) {
+          *print_stream_ << "  iter"
+                         << "       ELBO"
+                         << "   delta_ELBO_mean"
+                         << "   delta_ELBO_med"
+                         << "   notes "
+                         << std::endl;
+        }
 
         // Timing variables
         clock_t start = clock();
@@ -556,18 +567,20 @@ namespace stan {
             delta_elbo_ave = std::accumulate(cb.begin(), cb.end(), 0.0)
                              / static_cast<double>(cb.size());
             delta_elbo_med = circ_buff_median(cb);
-            *print_stream_
-                      << "  "
-                      << std::setw(4) << iter_counter
-                      << "  "
-                      << std::right << std::setw(9) << std::setprecision(1)
-                      << elbo
-                      << "  "
-                      << std::setw(16) << std::fixed << std::setprecision(3)
-                      << delta_elbo_ave
-                      << "  "
-                      << std::setw(15) << std::fixed << std::setprecision(3)
-                      << delta_elbo_med;
+            if (print_stream_) {
+              *print_stream_
+                        << "  "
+                        << std::setw(4) << iter_counter
+                        << "  "
+                        << std::right << std::setw(9) << std::setprecision(1)
+                        << elbo
+                        << "  "
+                        << std::setw(16) << std::fixed << std::setprecision(3)
+                        << delta_elbo_ave
+                        << "  "
+                        << std::setw(15) << std::fixed << std::setprecision(3)
+                        << delta_elbo_med;
+            }
 
             if (diag_stream_) {
               end = clock();
@@ -581,27 +594,32 @@ namespace stan {
             }
 
             if (delta_elbo_ave < tol_rel_obj) {
-              *print_stream_ << "   MEAN ELBO CONVERGED";
+              if (print_stream_)
+                *print_stream_ << "   MEAN ELBO CONVERGED";
               do_more_iterations = false;
             }
 
             if (delta_elbo_med < tol_rel_obj) {
-              *print_stream_ << "   MEDIAN ELBO CONVERGED";
+              if (print_stream_)
+                *print_stream_ << "   MEDIAN ELBO CONVERGED";
               do_more_iterations = false;
             }
 
             if (iter_counter > 100) {
               if (delta_elbo_med > 0.5 || delta_elbo_ave > 0.5) {
-                *print_stream_ << "   MAY BE DIVERGING... INSPECT ELBO";
+                if (print_stream_)
+                  *print_stream_ << "   MAY BE DIVERGING... INSPECT ELBO";
               }
             }
 
-            *print_stream_ << std::endl;
+            if (print_stream_)
+              *print_stream_ << std::endl;
           }
 
           // Check for max iterations
           if (iter_counter == max_iterations) {
-            *print_stream_ << "MAX ITERATIONS REACHED" << std::endl;
+            if (print_stream_)
+              *print_stream_ << "MAX ITERATIONS REACHED" << std::endl;
             do_more_iterations = false;
           }
 
@@ -610,8 +628,10 @@ namespace stan {
       }
 
       int run_fullrank(double tol_rel_obj, int max_iterations) {
-        *print_stream_
-        << "This is stan::variational::advi::run_fullrank()" << std::endl;
+        if (print_stream_) {
+          *print_stream_
+            << "This is stan::variational::advi::run_fullrank()" << std::endl;
+        }
 
         // initialize variational approximation
         Eigen::VectorXd mu = cont_params_;
@@ -650,8 +670,10 @@ namespace stan {
       }
 
       int run_meanfield(double tol_rel_obj, int max_iterations) {
-        *print_stream_
-        << "This is stan::variational::advi::run_meanfield()" << std::endl;
+        if (print_stream_) {
+          *print_stream_
+            << "This is stan::variational::advi::run_meanfield()" << std::endl;
+        }
 
         // initialize variational approximation
         Eigen::VectorXd mu           = cont_params_;
