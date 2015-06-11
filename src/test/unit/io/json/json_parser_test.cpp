@@ -1,6 +1,10 @@
 #include <gtest/gtest.h>
 
-#include <stan/io/json.hpp>
+#include <stan/io/json/json_data.hpp>
+#include <stan/io/json/json_data_handler.hpp>
+#include <stan/io/json/json_error.hpp>
+#include <stan/io/json/json_handler.hpp>
+#include <stan/io/json/json_parser.hpp>
 
 class recording_handler : public stan::json::json_handler {
 public:
