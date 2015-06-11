@@ -20,7 +20,7 @@ TEST(AgradFwdOperatorMultiplyEqual, Fvar) {
   double x3(0.3);
   c *= x3;
   EXPECT_FLOAT_EQ(0.6 * 0.3, c.val_);
-  EXPECT_FLOAT_EQ(3.0, c.d_);
+  EXPECT_FLOAT_EQ(3.0 * 0.3, c.d_);
 
   fvar<double> d(0.5,1.0);
   fvar<double> x4(-0.4,2.0);

@@ -41,73 +41,67 @@ namespace stan {
       }
 
 
-      template <typename T2>
       inline
       fvar<T>&
-      operator+=(const fvar<T2>& x2) {
+      operator+=(const fvar<T>& x2) {
         val_ += x2.val_;
         d_ += x2.d_;
         return *this;
       }
 
-      template <typename T2>
       inline
       fvar<T>&
-      operator+=(const T2& x2) {
+      operator+=(double x2) {
         val_ += x2;
         return *this;
       }
 
-      template <typename T2>
       inline
       fvar<T>&
-      operator-=(const fvar<T2>& x2) {
+      operator-=(const fvar<T>& x2) {
         val_ -= x2.val_;
         d_ -= x2.d_;
         return *this;
       }
 
-      template <typename T2>
       inline
       fvar<T>&
-      operator-=(const T2& x2) {
+      operator-=(double x2) {
         val_ -= x2;
         return *this;
       }
 
-      template <typename T2>
       inline
       fvar<T>&
-      operator*=(const fvar<T2>& x2) {
+      operator*=(const fvar<T>& x2) {
         d_ = d_ * x2.val_ + val_ * x2.d_;
         val_ *= x2.val_;
         return *this;
       }
 
-      template <typename T2>
       inline
       fvar<T>&
-      operator*=(const T2& x2) {
+      operator*=(double x2) {
         val_ *= x2;
+        d_ *= x2;
         return *this;
       }
 
       // SPEEDUP: specialize for T2 == var with d_ function
 
-      template <typename T2>
       inline
       fvar<T>&
-      operator/=(const fvar<T2>& x2) {
+      operator/=(const fvar<T>& x2) {
         d_ = (d_ * x2.val_ - val_ * x2.d_) / (x2.val_ * x2.val_);
         val_ /= x2.val_;
         return *this;
       }
 
-      template <typename T2>
       inline
       fvar<T>&
-      operator/=(const T2& x2) {
+      operator/=(double x2) {
         val_ /= x2;
+        d_ /= x2;
         return *this;
       }
 

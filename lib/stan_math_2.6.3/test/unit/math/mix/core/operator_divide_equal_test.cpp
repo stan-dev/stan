@@ -11,7 +11,7 @@ TEST(AgradMixOperatorDivideEqual, FvarVar_1stDeriv) {
 
   x /= 0.3;
   EXPECT_FLOAT_EQ(0.5 / 0.3, x.val_.val());
-  EXPECT_FLOAT_EQ(1.3, x.d_.val());
+  EXPECT_FLOAT_EQ(1.3 / 0.3, x.d_.val());
 
   AVEC y = createAVEC(x.val_);
   VEC g;
@@ -42,7 +42,7 @@ TEST(AgradMixOperatorDivideEqual, FvarFvarVar_1stDeriv) {
 
   x /= 0.3;
   EXPECT_FLOAT_EQ(0.5 / 0.3, x.val_.val_.val());
-  EXPECT_FLOAT_EQ(1, x.val_.d_.val());
+  EXPECT_FLOAT_EQ(1 / 0.3, x.val_.d_.val());
   EXPECT_FLOAT_EQ(0, x.d_.val_.val());
   EXPECT_FLOAT_EQ(0, x.d_.d_.val());
 

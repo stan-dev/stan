@@ -20,7 +20,7 @@ TEST(AgradFwdOperatorDivideEqual, Fvar) {
   double x3(0.3);
   c /= x3;
   EXPECT_FLOAT_EQ(0.6 / 0.3, c.val_);
-  EXPECT_FLOAT_EQ(3.0, c.d_);
+  EXPECT_FLOAT_EQ(10.0, c.d_);
 
   fvar<double> d(0.5,1.0);
   fvar<double> x4(-0.4,2.0);
@@ -37,7 +37,7 @@ TEST(AgradFwdOperatorDivideEqual, FvarFvarDouble) {
 
   x /= 0.3;
   EXPECT_FLOAT_EQ(0.5 / 0.3, x.val_.val_);
-  EXPECT_FLOAT_EQ(1, x.val_.d_);
+  EXPECT_FLOAT_EQ(1 / 0.3, x.val_.d_);
   EXPECT_FLOAT_EQ(0, x.d_.val_);
   EXPECT_FLOAT_EQ(0, x.d_.d_);
 }
