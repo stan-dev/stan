@@ -23,15 +23,15 @@ means or medians.
 
 Given a likelihood function $p(y|\theta)$ and a fixed data vector $y$,
 the maximum likelihood estimate (MLE) is the parameter vector $\hat{\theta}$
-that maximizes the likelihood, i.e., 
+that maximizes the likelihood, i.e.,
 \[
 \hat{\theta} = \mbox{argmax}_{\theta} \ p(y|\theta).
 \]
-It is usually more convenient to work on the log scale.  
+It is usually more convenient to work on the log scale.
 An equivalent%
 %
 \footnote{The equivalence follows from the fact that densities are
-  positive and the log function is strictly monotonic, i.e., 
+  positive and the log function is strictly monotonic, i.e.,
   $p(y|\theta) \geq 0$ and for all $a, b > 0$, $\log a > \log b$ if and
   only if $a > b$.}
 %
@@ -56,7 +56,7 @@ likelihood estimates are not guaranteed to exist.  As discussed in
 %
 These problems persist with the penalized maximum likelihood estimates
 discussed in the next section, and Bayesian posterior modes as
-discussed in the following section.  
+discussed in the following section.
 
 
 \subsection{Example: Linear Regression}
@@ -75,7 +75,7 @@ The maximum likelihood estimate for $\theta = (\beta,\sigma)$ is just
 \[
 (\hat{\beta},\hat{\sigma})
 \ = \
-\mbox{argmax}_{\beta,\sigma} 
+\mbox{argmax}_{\beta,\sigma}
 \log p(y|\beta,\sigma,x) = \sum_{n=1}^N \log \distro{Normal}(y_n|x_n \beta, \sigma).
 \]
 
@@ -89,17 +89,17 @@ the value for the coefficient vector that minimizes the sum of squared
 prediction errors,
 %
 \[
-\hat{\beta} 
+\hat{\beta}
 \ = \
 \mbox{argmin}_{\beta} \sum_{n=1}^N (y_n - x_n \beta)^2
-\ = \ 
+\ = \
 \mbox{argmin}_{\beta} (y - x \beta)^{\top} (y - x\beta).
 \]
 %
 The residual error for data item $n$ is the difference between the
 actual value and predicted value, $y_n - x_n \hat{\beta}$.  The
 maximum likelihood estimate for the noise scale, $\hat{\sigma}$ is
-just the square root of the average squared residual, 
+just the square root of the average squared residual,
 \[
 \hat{\sigma}^2
 \ = \
@@ -129,7 +129,7 @@ transformed parameters {
 }
 model {
   increment_log_prob(-squared_error);
-}  
+}
 generated quantities {
   real<lower=0> sigma_squared;
   sigma_squared <- squared_error / N;
@@ -154,7 +154,7 @@ There is nothing special about a likelihood function as far as the
 ability to perform optimization is concerned.  It is common among
 non-Bayesian statisticians to add so-called ``penalty'' functions
 to log likelihoods and optimize the new function.  The penalized
-maximum likelihood estimator for a log likelihood function 
+maximum likelihood estimator for a log likelihood function
 $\log p(y|\theta)$ and penalty function $r(\theta)$ is defined to be
 \[
 \hat{\theta} = \mbox{argmax}_{\theta} \log p(y|\theta) - r(\theta).
@@ -174,22 +174,22 @@ Euclidean length of the coefficient vector $\beta$. The ridge penalty
 function is
 %
 \[
-r(\beta) 
+r(\beta)
 \ = \
 \lambda \, \sum_{k=1}^K \beta_k^2
-\ = \ 
+\ = \
 \lambda \, \beta^{\top} \beta,
 \]
 %
 where $\lambda$ is a constant tuning parameter that determines the
-magnitude of the penalty. 
+magnitude of the penalty.
 
 
 Therefore, the penalized maximum likelihood estimate for ridge
 regression is just
 %
 \[
-(\hat{\beta},\hat{\sigma}) 
+(\hat{\beta},\hat{\sigma})
 \ = \
 \mbox{argmax}_{\beta,\sigma} \,
  \sum_{n=1}^N \log \distro{Normal}(y_n|x_n \beta, \sigma) - \lambda
@@ -205,9 +205,9 @@ of least squares,
 %
 \[
 \hat{\beta}
-\ = \ 
+\ = \
 \mbox{argmin}_{\beta} \, \sum_{n=1}^N (y_n - x_n \beta)^2 + \sum_{k=1}^K \beta_k^2
-\ = \ 
+\ = \
 \mbox{argmin}_{\beta} \, (y - x\beta)^{\top} (y - x\beta) +
 \lambda \beta^{\top} \beta.
 \]
@@ -426,12 +426,12 @@ the estimate.
 
 An estimate of the posterior mean for each parameter is returned by
 Stan's interfaces;  see the RStan, CmdStan, and PyStan user's guides
-for details on the interfaces and data formats.  
+for details on the interfaces and data formats.
 
 Posterior means exist in many situations where posterior
 modes do not exist.  For example, in the $\distro{Beta}(0.1, 0.1)$
 case, there is no posterior mode, but posterior mean is well defined
-with value 0.5.  
+with value 0.5.
 
 A situation where posterior means fail to exist but posterior modes do
 exist is with a posterior with a Cauchy distribution
@@ -443,7 +443,7 @@ that the posterior is better behaved and means exist.
 
 Sometimes when posterior means exist, they are not meaningful, as in
 the case of a multimodal posterior arising from a mixture model or in
-the case of a uniform distribution on a closed interval.  
+the case of a uniform distribution on a closed interval.
 
 
 \section{Posterior Median Estimation}
@@ -453,7 +453,7 @@ another popular point estimate reported for Bayesian models.  The
 posterior median minimizes the expected absolute error of estimates.
 These estimates are returned in the various Stan interfaces;  see the
 RStan, PyStan and CmdStan user's guides for more information on
-format. 
+format.
 
 Although posterior medians may fail to be meaningful, they often exist
 even where posterior means do not, as in the Cauchy distribution.
@@ -488,7 +488,7 @@ possible data sets $y$ according to their density under the likelihood
 is
 %
 \[
-\mathbb{E}_{p(y|\theta)}[\hat{\theta}] 
+\mathbb{E}_{p(y|\theta)}[\hat{\theta}]
 \ = \
 \int \left( \mbox{argmax}_{\theta'} p(y|\theta') \right) p(y|\theta) dy.
 \]
@@ -528,7 +528,7 @@ average of the squared difference from the mean,
 \hat{\sigma}^2 = \frac{1}{N} \sum_{n=1}^N (y_n - \hat{\mu})^2.
 \]
 The maximum likelihood for the variance is biased on the low side,
-i.e., 
+i.e.,
 %
 \[
 \mathbb{E}_{p(y|\mu,\sigma)}[\hat{\sigma}^2] < \sigma.
@@ -540,7 +540,7 @@ in the actual mean can lead to larger sum of squared differences;  if
 $\mu \neq \hat{\mu}$, then
 \[
 \frac{1}{N} \sum_{n=1}^N (y_n - \mu)^2
-> 
+>
 \frac{1}{N} \sum_{n=1}^N (y_n - \hat{\mu})^2.
 \]
 
@@ -557,7 +557,7 @@ of $N/(N-1)$.
 
 The variance of component $k$ of an estimator $\hat{\theta}$ is
 computed like any other variance, as the expected squared difference
-from its expectation, 
+from its expectation,
 %
 \[
 \mbox{var}_{p(y|\theta})[\hat{\theta}_k]
@@ -618,7 +618,7 @@ frequentist approaches.
 %
 Because they view probability as the limit of relative frequencies of
 observations, strict frequentists forbid probability statements about
-parameters.  Parameters are considered fixed, not random.  
+parameters.  Parameters are considered fixed, not random.
 
 Bayesians also treat parameters as fixed but unknown.  But unlike
 frequentists, they make use of both prior distributions over
@@ -676,7 +676,7 @@ constants $x$ is called the prior because it characterizes the probability
 of the parameters before any data is observed.  The conditional
 probability function $p(\theta|y)$ is called the posterior because
 it characterizes the probability of parameters given observed data $y$
-and constants $x$.  
+and constants $x$.
 
 \subsection{Bayes's Rule}
 
@@ -686,7 +686,7 @@ again, the constants $x$ are implicit).
 %
 \[
 \begin{array}{rcll}
-p(\theta|y)  & =  & \displaystyle \frac{p(\theta,y)}{p(y)} 
+p(\theta|y)  & =  & \displaystyle \frac{p(\theta,y)}{p(y)}
 & \mbox{{} \ \ \ \ \ [definition of  conditional probability]}
 \\[16pt]
 & = & \displaystyle \frac{p(y|\theta) \, p(\theta)}{p(y)}
@@ -725,7 +725,7 @@ given by
 %
 \[
 p(\tilde{y}|y)
-= \int_{\Theta} p(\tilde{y}|\theta) 
+= \int_{\Theta} p(\tilde{y}|\theta)
                 \, p(\theta|y) \, d\theta.
 \]
 Here, both the original constants and predictors $x$ and the new
@@ -764,8 +764,8 @@ p(\tilde{y}|\theta) p(\theta|y) \, d\tilde{y} \, d\theta.
 After the parameters are fit to data, they can be used to simulate a
 new data set by running the model inferences in the forward
 direction.  These replicated data sets can then be compared to the
-original data either visually or statistically to assess model fit 
-\citep[Chapter 6]{GelmanEtAl:2013}.  
+original data either visually or statistically to assess model fit
+\citep[Chapter 6]{GelmanEtAl:2013}.
 
 In Stan, posterior simulations can be generated in two ways.  The
 first approach is to treat the predicted variables as parameters and
@@ -780,7 +780,7 @@ quantities block.
 
 \noindent
 Like \BUGS, \Stan uses Markov chain Monte Carlo (\MCMC) techniques to
-generate samples from the posterior distribution for inference.  
+generate samples from the posterior distribution for inference.
 
 
 \section{Monte Carlo Sampling}
@@ -921,7 +921,7 @@ where
 %
 The within-sample variance is
 \[
-W 
+W
 = \frac{1}{M} \, \sum_{m=1}^M s_m^2,
 \]
 where
@@ -937,7 +937,7 @@ The variance estimator is
 %
 Finally, the potential scale reduction statistic is defined by
 \[
-\hat{R} 
+\hat{R}
 \, = \,
 \sqrt{\frac{\widehat{\mbox{var}}^{+}\!(\theta|y)}{W}}.
 \]
@@ -965,13 +965,13 @@ monitoring convergence with multiple chains.
 Because it contains the term $N$, the estimate $\widehat{var}^{+}$
 must be generalized.  By expanding the first term,
 \[
-\frac{N-1}{N}\, W \, 
-\ = \ 
+\frac{N-1}{N}\, W \,
+\ = \
 \frac{N-1}{N} \frac{1}{M} \, \sum_{m=1}^M
 \frac{1}{N-1} \, \sum_{n=1}^N (\theta^{(n)}_m -
 \bar{\theta}^{(\bullet)}_m)^2
 \ = \
-\frac{1}{M} 
+\frac{1}{M}
 \sum_{m=1}^M
 \frac{1}{N}
 \sum_{n=1}^N (\theta^{(n)}_m -
@@ -986,8 +986,8 @@ and the second term,
 the variance estimator naturally generalizes to
 \[
 \widehat{\mbox{var}}^{+}\!(\theta|y)
-= 
-\frac{1}{M} 
+=
+\frac{1}{M}
 \sum_{m=1}^M
 \frac{1}{N_m}
 \sum_{n=1}^{N_m} (\theta^{(n)}_m -
@@ -1012,7 +1012,7 @@ gradually increasing values and one involves gradually decreasing
 values, they have not mixed well, but they can have $\hat{R}$ values
 near unity.  In this case, splitting each chain into two parts leads
 to $\hat{R}$ values substantially greater than 1 because the first
-half of each chain has not mixed with the second half.  
+half of each chain has not mixed with the second half.
 
 
 \subsection{Converence is Global}
@@ -1048,7 +1048,7 @@ The $\hat{R}$ statistic considers the composition of a Markov chain
 and a function, and if the Markov chain has converged then each Markov
 chain and function composition will have converged. Multivariate
 functions converge when all of their margins have converged by the
-Cramer-Wold theorem.  
+Cramer-Wold theorem.
 
 The transformation from unconstrained space to constrained space is
 just another function, so does not effect convergence.
@@ -1061,7 +1061,7 @@ be unreasonable to test every function, \code{lp\_\_} and other
 measured quantities should at least be consistent.
 
 The obvious difference in \code{lp\_\_} is that it tends to vary
-quickly with position and is consequently susceptible to outliers. 
+quickly with position and is consequently susceptible to outliers.
 
 \subsubsection{Finite numbers of states}
 
@@ -1121,7 +1121,7 @@ and can apply the standard tests.
 The second technical difficulty posed by \MCMC methods is that the
 samples will typically be autocorrelated within a chain.  This
 increases the uncertainty of the estimation of posterior quantities of
-interest, such as means, variances or quantiles.  
+interest, such as means, variances or quantiles.
 
 A nice introductory reference for analyzing MCMC results in general
 and effective sample size in particular is \citep{Geyer:2011}.  The
@@ -1149,8 +1149,8 @@ autocorrelation $\rho_t$ at lag $t \geq 0$ for a chain with joint
 probability function $p(\theta)$ with mean $\mu$ and variance
 $\sigma^2$ is defined to be
 \[
-\rho_t 
-= 
+\rho_t
+=
 \frac{1}{\sigma^2} \, \int_{\Theta} (\theta^{(n)} - \mu)
 (\theta^{(n+t)} - \mu) \, p(\theta) \, d\theta.
 \]
@@ -1160,7 +1160,7 @@ the same marginal distribution in an \MCMC setting, multiplying the
 two difference terms and reducing yields
 \[
 \rho_t
-= 
+=
 \frac{1}{\sigma^2} \, \int_{\Theta} \theta^{(n)} \, \theta^{(n+t)} \, p(\theta) \, d\theta.
 \]
 
@@ -1190,10 +1190,10 @@ defined as follows for (univariate) samples $\theta_m^{(n)}$, where $m \in
 \setlist{1,\ldots,M}$ is the chain, and $N_m$ is the number of samples
 in chain $m$.
 \[
-V_t = 
+V_t =
 \frac{1}{M}
 \,
-\sum_{m=1}^M 
+\sum_{m=1}^M
 \
 \left(
 \frac{1}{N_m - t}
@@ -1213,14 +1213,14 @@ used to estimate the autocorrelation at lag $t$ as
             \displaystyle 2 \, \widehat{\mbox{var}}^{+}}.
 \]
 If the chains have not converged, the variance estimator
-$\widehat{\mbox{var}}^{+}$ will overestimate variance, 
+$\widehat{\mbox{var}}^{+}$ will overestimate variance,
 leading to an overestimate of autocorrelation and an underestimate
 effective sample size.
 
 Because of the noise in the correlation estimates $\hat{\rho}_t$ as $t$
 increases, typically only the initial estimates of $\hat{\rho}_t$
 where $\hat{\rho}_t > 0$ will be used.  Setting $T'$ to be the
-first lag such that $\rho_{T' + 1} < 0$, 
+first lag such that $\rho_{T' + 1} < 0$,
 %
 \[
 T' = \arg\min_t \ \hat{\rho}_{t+1} < 0,
@@ -1228,7 +1228,7 @@ T' = \arg\min_t \ \hat{\rho}_{t+1} < 0,
 the effective sample size estimator is defined as
 \[
 \hat{N}_{\mbox{\scriptsize eff}}
-= 
+=
 \frac{MN}
      {1 + \sum_{t=1}^{T'} \hat{\rho}_t}.
 \]
@@ -1266,7 +1266,7 @@ Even though both produce one thousand samples, the second approach
 with thinning will produce more effective samples.  That's because the
 autocorrelation $\rho_t$ for the thinned sequence is equivalent to
 $\rho_{10t}$ in the unthinned samples, so the sum of the autocorrelations
-will be lower and thus the effective sample size higher.  
+will be lower and thus the effective sample size higher.
 
 On the other hand, if memory and data storage are no object, saving all
 ten thousand samples will have a higher effective sample size than
@@ -1320,7 +1320,7 @@ Suppose $X$ is one dimensional and $f: \mbox{supp}(X) \rightarrow
 inverse $f^{-1}$.  Then the density of $Y$ is given by
 %
 \[
-p_Y(y) = p_X(f^{-1}(y))  
+p_Y(y) = p_X(f^{-1}(y))
          \,
          \left| \, \frac{d}{dy} f^{-1}(y)\, \right|.
 \]
@@ -1353,7 +1353,7 @@ where $\det{}$ is the matrix determinant operation and $J_{f^{-1}}(y)$
 is the Jacobian matrix of $f^{-1}$ evaluated at $y$.  Taking $x =
 f^{-1}(y)$, the Jacobian matrix is defined by
 \[
-J_{f^{-1}}(y) = 
+J_{f^{-1}}(y) =
 \left[
 \begin{array}{ccc}\displaystyle
 \frac{\partial x_1}{\partial y_1}
@@ -1386,7 +1386,7 @@ variable.
 
 \section{Lower Bounded Scalar}\label{lower-bound-transform.section}
 
-\Stan uses a logarithmic transform for lower and upper bounds.  
+\Stan uses a logarithmic transform for lower and upper bounds.
 
 \subsection{Lower Bound Transform}
 
@@ -1415,10 +1415,10 @@ The absolute derivative of the inverse transform is
 \, \right|
 = \exp(y).
 \]
-Therefore, given the density $p_X$ of $X$, the density of $Y$ is 
+Therefore, given the density $p_X$ of $X$, the density of $Y$ is
 %
 \[
-p_Y(y) 
+p_Y(y)
 = p_X\!\left( \exp(y) + a \right) \cdot \exp(y).
 \]
 
@@ -1447,7 +1447,7 @@ X = b - \exp(Y).
 
 \subsection{Absolute Derivative of the Upper Bound Inverse Transform}
 
-The absolute derivative of the inverse of the upper bound transform is 
+The absolute derivative of the inverse of the upper bound transform is
 \[
 \left| \,
 \frac{d}{dy} \left( b - \exp(y) \right)
@@ -1459,7 +1459,7 @@ Therefore, the density of the unconstrained variable $Y$ is defined in
 terms of the density of the variable $X$ with an upper bound of $b$ by
 %
 \[
-p_Y(y) 
+p_Y(y)
  =   p_X \!\left( b - \exp(y) \right) \cdot \exp(y).
 \]
 
@@ -1476,18 +1476,18 @@ The log-odds function is defined for $u \in (0,1)$ by
 \[
 \mbox{logit}(u) = \log \frac{u}{1 - u}.
 \]
-% 
-The inverse of the log odds function is the logistic sigmoid, defined 
+%
+The inverse of the log odds function is the logistic sigmoid, defined
 for $v \in (-\infty,\infty)$ by
 %
 \[
 \mbox{logit}^{-1}(v) = \frac{1}{1 + \exp(-v)}.
 \]
-% 
+%
 The derivative of the logistic sigmoid is
 %
 \[
-\frac{d}{dy} \mbox{logit}^{-1}(y) 
+\frac{d}{dy} \mbox{logit}^{-1}(y)
 = \mbox{logit}^{-1}(y) \cdot \left( 1 - \mbox{logit}^{-1}(y) \right).
 \]
 
@@ -1517,9 +1517,9 @@ X = a + (b - a) \cdot \mbox{logit}^{-1}(Y).
 
 The absolute derivative of the inverse transform is given by
 \[
-\left|  
-  \frac{d}{dy} 
-    \left( 
+\left|
+  \frac{d}{dy}
+    \left(
       a + (b - a) \cdot \mbox{logit}^{-1}(y)
     \right)
   \right|
@@ -1530,8 +1530,8 @@ The absolute derivative of the inverse transform is given by
 Therefore, the density of the transformed variable $Y$ is
 %
 \[
-p_Y(y) 
-= 
+p_Y(y)
+=
  p_X \! \left( a + (b - a) \cdot \mbox{logit}^{-1}(y) \right)
     \cdot (b - a)
     \cdot \mbox{logit}^{-1}(y)
@@ -1566,7 +1566,7 @@ increasing vector $x \in \reals^{K}$ to an unconstrained vector $y \in
 %
 \[
 y_k
-= 
+=
 \left\{
 \begin{array}{ll}
 x_1 & \mbox{if } k = 1, \mbox{ and}
@@ -1574,7 +1574,7 @@ x_1 & \mbox{if } k = 1, \mbox{ and}
 \log \left( x_{k} - x_{k-1} \right) & \mbox{if } 1 < k \leq K.
 \end{array}
 \right.
-\] 
+\]
 
 \subsection{Ordered Inverse Transform}
 
@@ -1583,9 +1583,9 @@ ordered sequence $x \in \reals^K$ is defined by the recursion
 %
 \[
 x_k
-= 
+=
 \left\{
-\begin{array}{ll} 
+\begin{array}{ll}
 y_1 & \mbox{if } k = 1, \mbox{ and}
 \\[4pt]
 x_{k-1} + \exp(y_k) & \mbox{if } 1 < k \leq K.
@@ -1604,9 +1604,9 @@ x_k = y_1 + \sum_{k'=2}^k \exp(y_{k'}).
 The Jacobian of the inverse transform $f^{-1}$ is lower triangular,
 with diagonal elements for $1 \leq k \leq K$ of
 \[
-J_{k,k} = 
+J_{k,k} =
 \left\{
-\begin{array}{ll} 
+\begin{array}{ll}
 1 & \mbox{if } k = 1, \mbox{ and}
 \\[4pt]
 \exp(y_k) & \mbox{if } 1 < k \leq K.
@@ -1618,9 +1618,9 @@ Because $J$ is triangular, the absolute Jacobian determinant is
 %
 \[
 \left| \, \det \, J \, \right|
-\ = \ 
+\ = \
 \left| \, \prod_{k=1}^K J_{k,k} \, \right|
-\ = \ 
+\ = \
 \prod_{k=2}^K \exp(y_k).
 \]
 
@@ -1629,7 +1629,7 @@ transformed variable $Y$ has density $p_Y$ given by
 %
 \[
 p_Y(y)
-= p_X(f^{-1}(y)) 
+= p_X(f^{-1}(y))
 \
 \prod_{k=2}^K \exp(y_k).
 \]
@@ -1643,15 +1643,15 @@ as variates generated by their priors (Dirichlet and multivariate
 logistic).
 
 The unit $K$-simplex is the set of points $x \in \reals^K$ such that
-for $1 \leq k \leq K$, 
-\[ 
+for $1 \leq k \leq K$,
+\[
 x_k > 0,
-\] 
+\]
 and
 \[
 \sum_{k=1}^K x_k = 1.
 \]
-%   
+%
 An alternative definition is to take the convex closure of the
 vertices.  For instance, in 2-dimensions, the simplex vertices are the
 extreme values $(0,1)$, and $(1,0)$ and the unit 2-simplex is the line
@@ -1660,7 +1660,7 @@ $(0.99,0.01)$ lie on the line.  In 3-dimensions, the basis is
 $(0,0,1)$, $(0,1,0)$ and $(1,0,0)$ and the unit 3-simplex is the
 boundary and interior of the triangle with these vertices.  Points in
 the 3-simplex include $(0.5,0.5,0)$, $(0.2,0.7,0.1)$ and all other
-triplets of non-negative values summing to 1.  
+triplets of non-negative values summing to 1.
 
 As these examples illustrate, the simplex always picks out a subspace
 of $K-1$ dimensions from $\reals^K$.  Therefore a point $x$ in the
@@ -1701,7 +1701,7 @@ coordinates $z_k$ represent the proportion of the stick broken off in
 step $k$, is defined elementwise for $1 \leq k < K$ by
 %
 \[
-z_k = \mbox{logit}^{-1} \left( y_k 
+z_k = \mbox{logit}^{-1} \left( y_k
                              + \log \left( \frac{1}{K - k}
                                             \right)
                        \right).
@@ -1712,13 +1712,13 @@ $\log\left(\frac{1}{K-k}\right) (i.e., \mbox{logit}\left(\frac{1}{K-k+1}\right)$
 the above definition adjusts the transform so that a
 zero vector $y$ is mapped to the simplex $x = (1/K,\ldots,1/K)$.  For instance, if
 $y_1 = 0$, then $z_1 = 1/K$; if $y_2 = 0$, then $z_2 = 1/(K-1)$; and
-if $y_{K-1} = 0$, then $z_{K-1} = 1/2$.  
+if $y_{K-1} = 0$, then $z_{K-1} = 1/2$.
 
 The break proportions $z$ are applied to determine the stick sizes and
 resulting value of $x_k$ for $1 \leq k < K$ by
 %
 \[
-x_k = 
+x_k =
 \left( 1 - \sum_{k'=1}^{k-1} x_{k'} \right) z_k.
 \]
 %
@@ -1747,8 +1747,8 @@ J_{k,k}
 %
 where
 \[
-\frac{\partial z_k}{\partial y_k} 
-= \frac{\partial}{\partial y_k} 
+\frac{\partial z_k}{\partial y_k}
+= \frac{\partial}{\partial y_k}
    \mbox{logit}^{-1} \left(
                        y_k + \log \left( \frac{1}{K-k}
                                           \right)
@@ -1761,7 +1761,7 @@ and
 \[
 \frac{\partial x_k}{\partial z_k}
 =
-\left( 
+\left(
   1 - \sum_{k' = 1}^{k-1} x_{k'}
    \right)
 .
@@ -1778,9 +1778,9 @@ absolute determinant reduces to
 \ = \
 \prod_{k=1}^{K-1} J_{k,k}
 \ = \
-\prod_{k=1}^{K-1} 
+\prod_{k=1}^{K-1}
 z_k
-\, 
+\,
 (1 - z_k)
 \
 \left(
@@ -1792,12 +1792,12 @@ z_k
 Thus the transformed variable $Y = f(X)$ has a density given by
 %
 \[
-p_Y(y) 
+p_Y(y)
 = p_X(f^{-1}(y))
 \,
-\prod_{k=1}^{K-1} 
+\prod_{k=1}^{K-1}
 z_k
-\, 
+\,
 (1 - z_k)
 \
 \left(
@@ -1819,7 +1819,7 @@ inverse transform.  Working backwards, given the break proportions
 $z$, $y$ is defined elementwise by
 %
 \[
-y_k 
+y_k
 = \mbox{logit}(z_k)
 - \mbox{log}\left(
    \frac{1}{K-k}
@@ -1829,10 +1829,10 @@ y_k
 %
 The break proportions $z_k$ are defined to be the ratio of $x_k$ to
 the length of stick left after the first $k-1$ pieces have been broken
-off, 
+off,
 %
 \[
-z_k 
+z_k
 = \frac{x_k}
        {1 - \sum_{k' = 1}^{k-1} x_{k'}}
 .
@@ -1841,7 +1841,7 @@ z_k
 \section{Unit Vector}
 Unit vectors show up in directional statistics.
 
-The $n$-sphere is the set of points $x \in \reals^n$ such that 
+The $n$-sphere is the set of points $x \in \reals^n$ such that
 \[
 \Vert x \Vert^2 = \sum_{i=1}^n x_i^2 = 1\ .
 \]
@@ -1869,7 +1869,7 @@ $y_i = 0$.
 To derive the determinant of the Jacobian we first add a radius coordinate
 $r=1$ which multiplies the vector $x$.
 The Jacobian, $J$, can be shown to be lower triangular, so its
-determinant is just the product of diagonal entries and the 
+determinant is just the product of diagonal entries and the
 absolute value of the determinant is
 \[
 \left| \, \det J \, \right| = \left|r^{n-1} \sin^{n-2}(y_1) \sin^{n-3}(y_2) ... \sin(y_{n-2})\right| .
@@ -1884,7 +1884,7 @@ A $K \times K$ correlation matrix $x$ must be is a symmetric, so that
 x_{k,k'} = x_{k',k}
 \]
 for all $k,k' \in \setlist{1,\ldots,K}$, it must have a unit diagonal,
-so that 
+so that
 \[
 x_{k,k} = 1
 \]
@@ -1915,7 +1915,7 @@ which are filled by row with the transformed values.  For example, in
 the $4 \times 4$ case, there are $\binom{4}{2}$ values arranged as
 %
 \[
-z 
+z
 =
 \left[
 \begin{array}{cccc}
@@ -1936,14 +1936,14 @@ matrix $x$.  The entry $z_{i,j}$ for $i < j$ is interpreted as the
 canonical partial correlation (\CPC) between $i$ and $j$, which is the
 correlation between $i$'s residuals and $j$'s residuals when both $i$
 and $j$ are regressed on all variables $i'$ such that $i'< i$.
-In the case of $i=1$, there are no earlier variables, 
+In the case of $i=1$, there are no earlier variables,
 so $z_{1,j}$ is just the Pearson correlation between $i$ and $j$.
 
 In \Stan, the \LKJ transform is reformulated in terms of a Cholesky factor $w$
 of the final correlation matrix, defined for $1 \leq i,j \leq K$ by
 %
 \[
-w_{i,j} = 
+w_{i,j} =
 \left\{
 \begin{array}{cl}
 %
@@ -1963,18 +1963,18 @@ z_{i,j} \, \prod_{i'=1}^{i-1} \left( 1 - z_{i'\!,\,j}^2 \right)^{1/2}
 \right.
 \]
 %
-This does not require as much computation per matrix entry as it may appear; 
+This does not require as much computation per matrix entry as it may appear;
 calculating the rows in terms of earlier rows yields the more
-manageable expression 
+manageable expression
 %
 \[
-w_{i,j} = 
+w_{i,j} =
 \left\{
 \begin{array}{cl}
 %
 0 & \mbox{if } i > j,
 \\[4pt]
-1 & \mbox{if } 1 = i = j, 
+1 & \mbox{if } 1 = i = j,
 \\[8pt]
 z_{i,j} & \mbox{if } 1 = i < j, \mbox{ and}
 \\[8pt]
@@ -2006,13 +2006,13 @@ the absolute Jacobian determinant is
 %
 \[
 \sqrt{\prod_{i=1}^{K-1}\prod_{j=i+1}^K \left(1-z_{i,j}^2\right)^{K-i-1}} \
-\times \prod_{i=1}^{K-1}\prod_{j=i+1}^K 
+\times \prod_{i=1}^{K-1}\prod_{j=i+1}^K
 \frac{\partial \tanh z_{i,j}}{\partial y_{i,j}}
 \]
 \subsection{Correlation Matrix Transform}
 
 The correlation transform is defined by reversing the steps of the
-inverse transform defined in the previous section.  
+inverse transform defined in the previous section.
 
 Starting with a correlation matrix $x$, the first step is to find the
 unique upper triangular $w$ such that $x = w w^{\top}$.  Because $x$
@@ -2043,7 +2043,7 @@ w_{i,j} & \mbox{if } 1 = i < j, \mbox{ and}
 \right.
 \]
 The final stage of the transform reverses the hyperbolic tangent
-transform, which is defined by 
+transform, which is defined by
 \[
 \tanh^{-1} v = \frac{1}{2} \log \left( \frac{1 + v}{1 - v} \right).
 \]
@@ -2093,7 +2093,7 @@ but the diagonal entries $z_{k,k}$ must be positive for $1 \leq k
 To complete the transform, the diagonal is log-transformed to produce
 a fully unconstrained lower-triangular matrix $y$ defined by
 \[
-y_{m,n} = 
+y_{m,n} =
 \left\{
 \begin{array}{cl}
 0 & \mbox{if } m < n,
@@ -2112,7 +2112,7 @@ Given an unconstrained lower-triangular $K \times K$ matrix $y$, the
 first step is to recover the intermediate matrix $z$ by reversing the
 log transform,
 \[
-z_{m,n} = 
+z_{m,n} =
 \left\{
 \begin{array}{cl}
 0 & \mbox{if } m < n,
@@ -2144,7 +2144,7 @@ diagonal Jacobian matrix, the absolute determinant of which is thus
 %
 \[
 \prod_{k=1}^K  \frac{\partial}{\partial_{y_{k,k}}} \, \exp(y_{k,k})
-\ = \ 
+\ = \
 \prod_{k=1}^K \exp(y_{k,k})
 \ = \
 \prod_{k=1}^K z_{k,k}.
@@ -2174,18 +2174,18 @@ The absolute Jacobian determinant of the second transform is thus
 2^{K} \ \prod_{m = 1}^{K} \ \prod_{n=1}^{m} z_{n,n}
 \ = \
 \prod_{n=1}^K \ \prod_{m=n}^K z_{n,n}
-\ = \ 
+\ = \
 2^{K} \ \prod_{k=1}^K z_{k,k}^{K - k + 1}.
 \]
 Finally, the full absolute Jacobian determinant of the inverse
-of the covariance matrix transform from the unconstrained lower-triangular 
+of the covariance matrix transform from the unconstrained lower-triangular
 $y$ to a symmetric, positive definite matrix $x$ is the product of the
 Jacobian determinants of the exponentiation and product transforms,
 \[
 \left( \prod_{k=1}^K z_{k,k} \right)
-\left( 
+\left(
 2^{K} \ \prod_{k=1}^K z_{k,k}^{K - k + 1}
-\right) 
+\right)
 \ = \
 2^K
 \, \prod_{k=1}^K z_{k,k}^{K-k+2}.
@@ -2205,7 +2205,7 @@ An $M \times M$ covariance matrix $\Sigma$ can be Cholesky factored to
 a lower triangular matrix $L$ such that $L\,L^{\top} = \Sigma$.  If
 $\Sigma$ is positive definite, then $L$ will be $M \times M$.  If
 $\Sigma$ is only positive semi-definite, then $L$ will be $M \times N$,
-with $N < M$.  
+with $N < M$.
 
 A matrix is a Cholesky factor for a covariance matrix if and only if
 it is lower triangular, the diagonal entries are positive, and $M \geq
@@ -2226,7 +2226,7 @@ positive, and the below-diagonal entries are unconstrained.  The
 transform required is thus
 %
 \[
-y_{m,n} = 
+y_{m,n} =
 \left\{
 \begin{array}{cl}
 0 & \mbox{if } m < n,
@@ -2263,7 +2263,7 @@ of which is
 %
 \[
 \prod_{n=1}^N  \frac{\partial}{\partial_{y_{n,n}}} \, \exp(y_{n,n})
-\ = \ 
+\ = \
 \prod_{n=1}^N \exp(y_{n,n})
 \ = \
 \prod_{n=1}^N x_{n,n}.
@@ -2288,7 +2288,7 @@ Cholesky factored to a $K \times K$ lower-triangular matrix $L$ with
 positive diagonal elements such that $\Omega = L\,L^{\top}$.  Because
 the corelation matrix has a unit diagonal,
 \[
-\Omega_{k,k} = L_k\,L_k^{\top} = 1, 
+\Omega_{k,k} = L_k\,L_k^{\top} = 1,
 \]
 each row vector $L_k$ of the Cholesky factor is of unit length.  The
 length and positivity constraint allow the diagonal elemens of $L$ to
@@ -2322,7 +2322,7 @@ z =
 \\
 \tanh y_2 & \tanh y_3 & 0
 \end{array}
-\right] 
+\right]
 \]
 %
 The matrix $z$, with entries in the range $(-1,1)$, is then
@@ -2350,15 +2350,15 @@ z_{i,j} \ \sqrt{1 - \sum_{j' < j} x_{i,j'}^2}
 %
 In the $3 \times 3$ case, this yields
 \[
-x = 
+x =
 \left[
 \begin{array}{ccc}
 1 & 0 & 0
 \\[6pt]
 z_{2,1} & \sqrt{1 - x_{2,1}^2} & 0
 \\[6pt]
-z_{3,1} & z_{3,2} \sqrt{1 - x_{3,1}^2} 
-        & \sqrt{1 - (x_{3,1}^2 + x_{3,2}^2)} 
+z_{3,1} & z_{3,2} \sqrt{1 - x_{3,1}^2}
+        & \sqrt{1 - (x_{3,1}^2 + x_{3,2}^2)}
 \end{array}
 \right],
 \]
@@ -2375,15 +2375,15 @@ entries in their row.  The above-diagonal entries are zero.
 
 Suppose $x$ is a $K \times K$ Cholesky factor for some correlation
 matrix.  The first step of the transform reconstructs the intermediate
-values $z$ from $x$, 
+values $z$ from $x$,
 \[
 z_{i,j} = \frac{x_{i,j}}{\sqrt{1 - \sum_{j' < j}x_{i,j'}^2}}.
 \]
 %
 The mapping from the resulting $z$ to $y$ inverts
-$\tanh$, 
+$\tanh$,
 \[
-y 
+y
 \ = \
 \tanh^{-1} z
 \ = \
@@ -2422,10 +2422,10 @@ where
 = \sqrt{1 - \sum_{j' < j} x^2_{i,j'}}.
 \]
 %
-So the combined density for unconstrained $y$ is 
+So the combined density for unconstrained $y$ is
 \[
-p_Y(y) 
-= p_X(f^{-1}(y)) 
+p_Y(y)
+= p_X(f^{-1}(y))
   \ \
   \mathlarger{\prod}_{n < \binom{K}{2}} \frac{1}{(\cosh y)^2}
   \ \
@@ -2438,7 +2438,7 @@ Jacobian determinant of the complete inverse transform $x = f^{-1}(y)$
 is given by
 \[
 \log \left| \, \det J \, \right|
-= 
+=
 -2 \sum_{n \leq \binom{K}{2}}
 \log \cosh y
 \
@@ -2449,6 +2449,153 @@ is given by
 \log \left( 1 - \sum_{j' < j} x_{i,j'}^2 \right)
 .
 \]
+
+
+\chapter{Variational Inference}\label{vi-advanced.chapter}
+
+\noindent
+\Stan implements an automatic variational inference algorithm that leverages
+the transformations from \refchapter{variable-transforms}.
+
+Classical variational inference algorithms are difficult to
+derive. We must first define the family of approximating
+densities, and then calculate model-specific quantities relative
+to that family to solve the variational optimization problem.  Both
+steps require expert knowledge.  The resulting algorithm is tied to
+both the model and the chosen approximation.
+
+We begin by briefly describing the classical variational inference framework.
+For a thorough exposition, please refer to
+\citet{Jordan:1999,Wainwright-Jordan:2008}; for a textbook presentation, please
+see \citet{Bishop:2006}. We follow with a high-level description of Automatic
+Differentiation Variational Inference (ADVI). For more details, see
+\citep{Kucukelbir:2015}.
+
+
+\section{Classical Variational Inference}
+
+Variational inference approximates the
+posterior $p(\theta \mid y)$ with a simple, parameterized distribution
+$q(\theta \,;\, \phi)$. It matches the approximation to the
+true posterior by minimizing the Kullback-Leibler (KL) divergence,
+%
+\[
+  \phi^* = \argmin_\phi
+  \KL{ q(\theta \,;\, \phi) }{ p(\theta \mid y) }.
+\]
+%
+Typically the KL divergence lacks an analytic, closed-form solution.
+Instead we maximize a proxy to the KL divergence, the evidence lower bound
+(ELBO)
+%
+\[
+  \mathcal{L} (\phi)
+  =
+  \E_{q (\theta)} \big[ \log p (y,\theta) \big]
+  -
+  \E_{q (\theta)} \big[ \log q (\theta\,;\,\phi) \big].
+\]
+%
+The first term is an expectation of the log
+joint density under the approximation, and the second is the entropy of the
+variational density. Maximizing the ELBO minimizes the KL
+divergence \citep{Jordan:1999,Bishop:2006}.
+
+
+\section{Automatic Variational Inference}
+
+ADVI maximizes the ELBO in the real-coordinate space. \Stan transforms the
+parameters from (potentially) constrained domains to
+the real-coordinate space. We denote the combined transformation as
+$T:\theta \to \zeta$, with the $\zeta$ variables living in $\mathbb{R}^K$.
+The variational objective (ELBO) becomes
+%
+\[
+  \mathcal{L}(\phi)
+  =
+  \E_{q(\zeta\,;\,\phi)}
+  \bigg[
+  \log p (y, T^{-1}(\zeta))
+  +
+  \log \big| \det J_{T^{-1}}(\zeta) \big|
+  \bigg]
+  -
+  \E_{q (\zeta\,;\,\phi)} \big[ \log q (\zeta\,;\,\phi) \big].
+\]
+%
+Since the $\zeta$ variables live in the real-coordinate space, we can choose a
+fixed family for the variational distribution. We choose a fully-factorized
+Gaussian,
+%
+\[
+  q(\zeta \,;\, \phi)
+  =
+  \mathcal{N}\left(\zeta \,;\, \mu, \sigma\right)
+  =
+  \prod_{k=1}^K
+  \mathcal{N}
+  \left(\zeta_k \,;\, \mu_k, \sigma_k\right),
+\]
+%
+where the vector
+$\phi = (\mu_{1},\cdots,\mu_{K}, \sigma_ {1},\cdots,\sigma_{K})$
+concatenates the mean and standard deviation of each Gaussian factor.
+This reflects the ``mean-field'' assumption in classical variational
+inference algorithms; we will refer to this particular decomposition
+as the \texttt{meanfield} option.
+
+The transformation $T$ maps the support of the parameters to the real
+coordinate space. Thus, its inverse $T^{-1}$ maps back to the support of the
+latent variables. This implicitly defines the variational approximation in the
+original latent variable space as
+%
+\[
+\mathcal{N} \left(T^{-1}(\zeta)\,;\, \mu, \sigma\right)
+\big| \det J_{T^{-1}}(\zeta) \big|.
+\]
+Note that this is, in general, not a Gaussian distribution. We choose a
+fully factorized Gaussian for its efficiency and analytic entropy term.
+This choice may call to mind the Laplace approximation
+technique, where a second-order Taylor expansion around the
+maximum-a-posteriori estimate gives a Gaussian approximation to the
+posterior. However, they are not the same \citep{Kucukelbir:2015}.
+
+The variational objective (ELBO) that we maximize is,
+\[
+  \mathcal{L}(\phi)
+  =
+  \E_{q(\zeta\,;\,\phi)}
+  \bigg[
+  \log p (y, T^{-1}(\zeta))
+  +
+  \log \big| \det J_{T^{-1}}(\zeta) \big|
+  \bigg]
+  +
+  \sum_{k=1}^K \log \sigma_k,
+\]
+where we plug in the analytic form for the Gaussian entropy and drop all terms
+that do not depend on $\phi$. We discuss how we perform the maximization in
+\refchapter{vi-algorithms}.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
