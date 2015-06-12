@@ -43,7 +43,7 @@ namespace stan {
 
       // gamma_rng params must be positive and finite
       check_positive_finite(function,
-        "Exponential of the log-location parameter divided by"
+        "Exponential of the log-location parameter divided by "
         "the precision parameter", exp_eta_div_phi);
 
       double rng_from_gamma =
