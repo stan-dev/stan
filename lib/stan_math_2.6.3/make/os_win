@@ -1,0 +1,37 @@
+##
+# This file should modify the following variables
+# as appropriate:
+#   - CFLAGS
+#   - CFLAGS_GTEST
+#   - OPT
+#   - EXE
+# 
+# Additionally, set the following variables to build
+# demo/lang using the Microsoft Visual Studio compiler.
+#   - CC_STANC
+#   - CFLAGS_STANC
+#   - OUTPUT_OPTION_STANC
+##
+
+EXE = .exe
+O_STANC = 3
+CFLAGS_GTEST += -DGTEST_HAS_PTHREAD=0
+PATH_SEPARATOR = '\'
+BIT = 64
+ifeq (g++,$(CC_TYPE))
+  CFLAGS += -m$(BIT)
+  CFLAGS += -Wno-unused-function
+  CFLAGS += -Wno-uninitialized
+  CFLAGS += -Wno-unused-but-set
+  LDLIBS += -static-libgcc
+  LDLIBS += -static-libstdc++
+endif
+ifeq (mingw32-g++,$(CC_TYPE))
+  CFLAGS += -Wno-unused-function
+  CFLAGS += -Wno-uninitialized
+  LDLIBS += -static-libgcc
+#  LDLIBS += -static-libstdc++
+endif
+ifeq (clang++,$(CC_TYPE))
+endif
+

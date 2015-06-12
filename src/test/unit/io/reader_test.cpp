@@ -1,6 +1,21 @@
 #include <stan/io/reader.hpp>
-#include <stan/math/prim/mat/err/check_cholesky_factor.hpp>
 #include <gtest/gtest.h>
+
+TEST(ioReader, zeroSizeVecs) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  theta.push_back(1.0);
+  stan::io::reader<double> reader(theta,theta_i);
+  
+  EXPECT_FLOAT_EQ(1.0, reader.scalar());  // finish available
+  
+  // these all fail in 2.6.3
+  EXPECT_EQ(0, reader.std_vector(0).size());
+  EXPECT_EQ(0, reader.vector(0).size());
+  EXPECT_EQ(0, reader.row_vector(0).size());
+  EXPECT_EQ(0, reader.matrix(0,3).size());
+  EXPECT_EQ(0, reader.matrix(3,0).size());
+}
 
 TEST(io_reader, scalar) {
   std::vector<int> theta_i;
