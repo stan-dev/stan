@@ -1,5 +1,5 @@
-CPPLINT ?= python lib/cpplint_4.45/cpplint.py
+RUN_CPPLINT ?= python $(CPPLINT)/cpplint.py
 
 .PHONY: cpplint
 cpplint:
-	@$(CPPLINT) --output=vs7 --counting=detailed --root=src --extension=hpp,cpp --filter=-runtime/indentation_namespace,-readability/namespace,-legal/copyright,-whitespace/indent,-runtime/reference $(shell find src/stan -name '*.hpp' -o -name '*.cpp')
+	@$(RUN_CPPLINT) --output=vs7 --counting=detailed --root=src --extension=hpp,cpp --filter=-runtime/indentation_namespace,-readability/namespace,-legal/copyright,-whitespace/indent,-runtime/reference $(shell find src/stan -name '*.hpp' -o -name '*.cpp')

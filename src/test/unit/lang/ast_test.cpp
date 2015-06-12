@@ -14,6 +14,31 @@ using stan::lang::VECTOR_T;
 using stan::lang::ROW_VECTOR_T;
 using stan::lang::MATRIX_T;
 
+TEST(langAst, printSignature) {
+  using stan::lang::expr_type;
+  std::vector<expr_type> arg_types;
+  arg_types.push_back(expr_type(DOUBLE_T, 2U));
+  arg_types.push_back(expr_type(INT_T, 1U));
+  arg_types.push_back(expr_type(VECTOR_T, 0U));
+  std::string name = "foo";
+
+  std::stringstream platform_eol_ss;
+  platform_eol_ss << std::endl;
+  std::string platform_eol = platform_eol_ss.str();
+
+  std::stringstream msgs1;
+  bool sampling_error_style1 = true;
+  stan::lang::print_signature(name, arg_types, sampling_error_style1, msgs1);
+  EXPECT_EQ("  real[,] ~ foo(int[], vector)" + platform_eol,  
+            msgs1.str());
+
+  std::stringstream msgs2;
+  bool sampling_error_style2 = false;
+  stan::lang::print_signature(name, arg_types, sampling_error_style2, msgs2);
+  EXPECT_EQ("  foo(real[,], int[], vector)" + platform_eol,
+            msgs2.str());
+}
+
 TEST(langAst, hasVar) {
   using stan::lang::base_var_decl;
   using stan::lang::binary_op;
