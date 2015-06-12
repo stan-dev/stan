@@ -113,7 +113,7 @@ void test_throws(const std::string& model_name, const std::string& error_msg) {
   }
   
   FAIL() << "model name=" << model_name 
-         << " is parsable and were exepecting msg=" << error_msg
+         << " is parsable and were expecting msg=" << error_msg
          << std::endl;
 }
 
