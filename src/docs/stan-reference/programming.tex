@@ -1313,7 +1313,7 @@ the same prior on \code{beta\_raw}.
 
 \subsection{Translated and Scaled Simplex}
 
-An alternative approch that's less efficient, but amenable to a
+An alternative approach that's less efficient, but amenable to 
 a symmetric prior, is to offset and scale a simplex.
 %
 \begin{stancode}
@@ -1843,7 +1843,7 @@ regression, if two predictors are collinear (i.e, one is a linear
 function of the other), then their coefficients will have a
 correlation of 1 (or -1) in the posterior.  This leads to
 non-identifiability.  By placing normal priors on the coefficients,
-the maximum likelihood solution of two duplicated preditors (trivially
+the maximum likelihood solution of two duplicated predictors (trivially
 collinear) will be half the value than would be obtained by only
 including one.
 
@@ -2662,7 +2662,7 @@ converge --- they compute the same model).
 \section{Autoregressive Moving Average Models}
 
 Autoregressive moving-average models (ARMA), combine the predictors
-of the autoregressive model and the oving average model.  An
+of the autoregressive model and the moving average model.  An
 ARMA(1,1) model, with a single state of history, can be encoded in
 Stan as follows.
 %
@@ -3943,7 +3943,7 @@ probability function follows the definition (on the log scale).
 Most quantities used in statistical models arise from measurements.
 Most of these measurements are taken with some error.  When the
 measurement error is small relative to the quantity being measured,
-its effect on a model are usually small.  When measurement error is
+its effect on a model is usually small.  When measurement error is
 large relative to the quantity being measured, or when very precise
 relations can be estimated being measured quantities, it is useful to
 introduce an explicit model of measurement error.
@@ -8392,7 +8392,7 @@ necessary because the $K$th is just one minus the sum of the first $K
 - 1$ parameters, so that if $\theta$ is a $K$-simplex,
 %
 \[
-\theta_K = 1 - \sum_{k=1}^K \theta_k.
+\theta_K = 1 - \sum_{k=1}^{K-1} \theta_k.
 \]
 %
 The softmax function (see \refsection{softmax}) maps a $K$-vector
@@ -9147,7 +9147,7 @@ difficult for Hamiltonian Monte Carlo, which operates within a
 Euclidean geometry.%
 %
 \footnote{Riemannian Manifold Hamiltonian Monte Carlo (RMHMC) overcomes
-  this difficulty by simulating the Hamiltonian dynamics in a a space
+  this difficulty by simulating the Hamiltonian dynamics in a space
   with a position-dependent metric; see
   \citep{GirolamiCalderhead:2011} and \citep{Betancourt:2012}.}
 %
