@@ -1,13 +1,13 @@
 #ifndef STAN_LANG_AST_HPP
 #define STAN_LANG_AST_HPP
 
-#include <map>
-#include <string>
-#include <vector>
+#include <boost/variant/recursive_variant.hpp>
+
 #include <map>
 #include <set>
-
-#include <boost/variant/recursive_variant.hpp>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace stan {
 
@@ -107,9 +107,9 @@ namespace stan {
     public:
       static function_signatures& instance();
       static void reset_sigs();
-      void set_user_defined(const std::pair<std::string,function_signature_t>&
+      void set_user_defined(const std::pair<std::string, function_signature_t>&
                             name_sig);
-      bool is_user_defined(const std::pair<std::string,function_signature_t>&
+      bool is_user_defined(const std::pair<std::string, function_signature_t>&
                            name_sig);
       void add(const std::string& name,
                const expr_type& result_type,
@@ -167,18 +167,20 @@ namespace stan {
                          const std::vector<expr_type>& sig_args);
       expr_type get_result_type(const std::string& name,
                                 const std::vector<expr_type>& args,
-                                std::ostream& error_msgs);
+                                std::ostream& error_msgs,
+                                bool sampling_error_style = false);
       int get_signature_matches(const std::string& name,
                                 const std::vector<expr_type>& args,
                                 function_signature_t& signature);
       bool is_defined(const std::string& name,
                       const function_signature_t& sig);
       std::set<std::string> key_set() const;
+
     private:
       function_signatures();
       function_signatures(const function_signatures& fs);
       std::map<std::string, std::vector<function_signature_t> > sigs_map_;
-      std::set<std::pair<std::string,function_signature_t> > user_defined_set_;
+      std::set<std::pair<std::string, function_signature_t> > user_defined_set_;
       static function_signatures* sigs_;  // init below outside of class
     };
 
@@ -259,13 +261,13 @@ namespace stan {
                              boost::recursive_wrapper<expression> >
       printable_t;
 
-    printable();
-    printable(const expression& expression);
-    printable(const std::string& msg);
-    printable(const printable_t& printable);
-    printable(const printable& printable);
+      printable();
+      printable(const expression& expression);
+      printable(const std::string& msg);
+      printable(const printable_t& printable);
+      printable(const printable& printable);
 
-    printable_t printable_;
+      printable_t printable_;
     };
 
     struct is_nil_op : public boost::static_visitor<bool> {
@@ -332,12 +334,12 @@ namespace stan {
 
     struct integrate_ode {
       std::string system_function_name_;
-      expression y0_;    // initial state
-      expression t0_;    // initial time
-      expression ts_;    // solution times
-      expression theta_; // params
-      expression x_;     // data
-      expression x_int_;     // integer data
+      expression y0_;  // initial state
+      expression t0_;  // initial time
+      expression ts_;  // solution times
+      expression theta_;  // params
+      expression x_;  // data
+      expression x_int_;  // integer data
       integrate_ode();
       integrate_ode(const std::string& system_function_name,
                 const expression& y0,
@@ -438,7 +440,7 @@ namespace stan {
     };
 
     struct variable_map {
-      typedef std::pair<base_var_decl,var_origin> range_t;
+      typedef std::pair<base_var_decl, var_origin> range_t;
 
       bool exists(const std::string& name) const;
       base_var_decl get(const std::string& name) const;
@@ -592,19 +594,19 @@ namespace stan {
 
     struct var_decl {
       typedef boost::variant<boost::recursive_wrapper<nil>,
-                             boost::recursive_wrapper<int_var_decl>,
-                             boost::recursive_wrapper<double_var_decl>,
-                             boost::recursive_wrapper<vector_var_decl>,
-                             boost::recursive_wrapper<row_vector_var_decl>,
-                             boost::recursive_wrapper<matrix_var_decl>,
-                             boost::recursive_wrapper<simplex_var_decl>,
-                             boost::recursive_wrapper<unit_vector_var_decl>,
-                             boost::recursive_wrapper<ordered_var_decl>,
-                             boost::recursive_wrapper<positive_ordered_var_decl>,
-                             boost::recursive_wrapper<cholesky_factor_var_decl>,
-                             boost::recursive_wrapper<cholesky_corr_var_decl>,
-                             boost::recursive_wrapper<cov_matrix_var_decl>,
-                             boost::recursive_wrapper<corr_matrix_var_decl> >
+                     boost::recursive_wrapper<int_var_decl>,
+                     boost::recursive_wrapper<double_var_decl>,
+                     boost::recursive_wrapper<vector_var_decl>,
+                     boost::recursive_wrapper<row_vector_var_decl>,
+                     boost::recursive_wrapper<matrix_var_decl>,
+                     boost::recursive_wrapper<simplex_var_decl>,
+                     boost::recursive_wrapper<unit_vector_var_decl>,
+                     boost::recursive_wrapper<ordered_var_decl>,
+                     boost::recursive_wrapper<positive_ordered_var_decl>,
+                     boost::recursive_wrapper<cholesky_factor_var_decl>,
+                     boost::recursive_wrapper<cholesky_corr_var_decl>,
+                     boost::recursive_wrapper<cov_matrix_var_decl>,
+                     boost::recursive_wrapper<corr_matrix_var_decl> >
       var_decl_t;
 
       var_decl_t decl_;
@@ -634,18 +636,18 @@ namespace stan {
 
     struct statement {
       typedef boost::variant<boost::recursive_wrapper<nil>,
-                             boost::recursive_wrapper<assignment>,
-                             boost::recursive_wrapper<sample>,
-                             boost::recursive_wrapper<increment_log_prob_statement>,
-                             boost::recursive_wrapper<expression>, // dummy now
-                             boost::recursive_wrapper<statements>,
-                             boost::recursive_wrapper<for_statement>,
-                             boost::recursive_wrapper<conditional_statement>,
-                             boost::recursive_wrapper<while_statement>,
-                             boost::recursive_wrapper<print_statement>,
-                             boost::recursive_wrapper<reject_statement>,
-                             boost::recursive_wrapper<return_statement>,
-                             boost::recursive_wrapper<no_op_statement> >
+                     boost::recursive_wrapper<assignment>,
+                     boost::recursive_wrapper<sample>,
+                     boost::recursive_wrapper<increment_log_prob_statement>,
+                     boost::recursive_wrapper<expression>,
+                     boost::recursive_wrapper<statements>,
+                     boost::recursive_wrapper<for_statement>,
+                     boost::recursive_wrapper<conditional_statement>,
+                     boost::recursive_wrapper<while_statement>,
+                     boost::recursive_wrapper<print_statement>,
+                     boost::recursive_wrapper<reject_statement>,
+                     boost::recursive_wrapper<return_statement>,
+                     boost::recursive_wrapper<no_op_statement> >
       statement_t;
 
       statement_t statement_;
@@ -790,7 +792,10 @@ namespace stan {
 
     struct function_decl_defs {
       function_decl_defs();
-      function_decl_defs(const std::vector<function_decl_def>& decl_defs);
+
+      function_decl_defs(
+                   const std::vector<function_decl_def>& decl_defs);
+
       std::vector<function_decl_def> decl_defs_;
     };
 
@@ -798,13 +803,15 @@ namespace stan {
     struct program {
       std::vector<function_decl_def> function_decl_defs_;
       std::vector<var_decl> data_decl_;
-      std::pair<std::vector<var_decl>,std::vector<statement> >
+      std::pair<std::vector<var_decl>, std::vector<statement> >
         derived_data_decl_;
       std::vector<var_decl> parameter_decl_;
-      std::pair<std::vector<var_decl>,std::vector<statement> >
+      std::pair<std::vector<var_decl>, std::vector<statement> >
         derived_decl_;
       statement statement_;
-      std::pair<std::vector<var_decl>,std::vector<statement> > generated_decl_;
+      std::pair<std::vector<var_decl>, std::vector<statement> >
+      generated_decl_;
+
       program();
       program(const std::vector<function_decl_def>& function_decl_defs,
               const std::vector<var_decl>& data_decl,
@@ -829,9 +836,9 @@ namespace stan {
     };
 
     struct assignment {
-      variable_dims var_dims_; // lhs_var[dim0,...,dimN-1]
-      expression expr_;        // = rhs
-      base_var_decl var_type_; // type of lhs_var
+      variable_dims var_dims_;  // lhs_var[dim0,...,dimN-1]
+      expression expr_;  // = rhs
+      base_var_decl var_type_;  // type of lhs_var
       assignment();
       assignment(variable_dims& var_dims,
                  expression& expr);

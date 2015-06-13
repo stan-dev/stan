@@ -682,6 +682,7 @@ for (size_t i = 0; i < int_vector_types.size(); ++i)
     add("poisson_log_log",DOUBLE_T, int_vector_types[i],vector_types[j]);
   }
 add("poisson_rng",INT_T,DOUBLE_T);
+add("poisson_log_rng",INT_T,DOUBLE_T);
 add_nullary("positive_infinity");
 add_binary("pow");
 add("prod",INT_T,expr_type(INT_T,1));
