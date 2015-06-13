@@ -26,8 +26,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 // THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef STAN__MATH__PRIM__MAT__PROB__WIENER_LOG_HPP
-#define STAN__MATH__PRIM__MAT__PROB__WIENER_LOG_HPP
+#ifndef STAN_MATH_PRIM_MAT_PROB_WIENER_LOG_HPP
+#define STAN_MATH_PRIM_MAT_PROB_WIENER_LOG_HPP
 
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
