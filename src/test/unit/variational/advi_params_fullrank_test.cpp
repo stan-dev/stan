@@ -1,9 +1,9 @@
-#include <stan/variational/advi_params_fullrank.hpp>
+#include <stan/variational/advi_params_normal_fullrank.hpp>
 #include <vector>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 
-TEST(advi_params_fullrank_test, dimension) {
+TEST(advi_params_normal_fullrank_test, dimension) {
 
   Eigen::Vector3d mu;
   mu << 5.7, -3.2, 0.1332;
@@ -13,13 +13,13 @@ TEST(advi_params_fullrank_test, dimension) {
        2.3, 41, 0,
        3.3, 42, 92;
 
-  stan::variational::advi_params_fullrank my_advi_params_fullrank(mu, L);
+  stan::variational::advi_params_normal_fullrank my_advi_params_normal_fullrank(mu, L);
 
-  EXPECT_FLOAT_EQ(mu.size(), my_advi_params_fullrank.dimension());
+  EXPECT_FLOAT_EQ(mu.size(), my_advi_params_normal_fullrank.dimension());
 
 }
 
-TEST(advi_params_fullrank_test, mean_vector) {
+TEST(advi_params_normal_fullrank_test, mean_vector) {
 
   Eigen::Vector3d mu;
   mu << 5.7, -3.2, 0.1332;
@@ -29,28 +29,28 @@ TEST(advi_params_fullrank_test, mean_vector) {
        2.3, 41, 0,
        3.3, 42, 92;
 
-  stan::variational::advi_params_fullrank my_advi_params_fullrank(mu, L);
+  stan::variational::advi_params_normal_fullrank my_advi_params_normal_fullrank(mu, L);
 
-  const Eigen::Vector3d& mu_out = my_advi_params_fullrank.mu();
+  const Eigen::Vector3d& mu_out = my_advi_params_normal_fullrank.mu();
 
-  for (int i = 0; i < my_advi_params_fullrank.dimension(); ++i)
+  for (int i = 0; i < my_advi_params_normal_fullrank.dimension(); ++i)
     EXPECT_FLOAT_EQ(mu(i), mu_out(i));
 
 
   double nan = std::numeric_limits<double>::quiet_NaN();
   Eigen::Vector3d mu_nan = Eigen::VectorXd::Constant(3, nan);
 
-  EXPECT_THROW(stan::variational::advi_params_fullrank my_advi_params_fullrank_nan(mu_nan, L);,
+  EXPECT_THROW(stan::variational::advi_params_normal_fullrank my_advi_params_normal_fullrank_nan(mu_nan, L);,
                    std::domain_error);
-  EXPECT_THROW(my_advi_params_fullrank.set_mu(mu_nan);,
+  EXPECT_THROW(my_advi_params_normal_fullrank.set_mu(mu_nan);,
                    std::domain_error);
   Eigen::MatrixXd L_nan = Eigen::MatrixXd::Constant(3,3,nan);
-  EXPECT_THROW(stan::variational::advi_params_fullrank my_advi_params_fullrank_nan(mu, L_nan);,
+  EXPECT_THROW(stan::variational::advi_params_normal_fullrank my_advi_params_normal_fullrank_nan(mu, L_nan);,
                    std::domain_error);
 
 }
 
-TEST(advi_params_fullrank_test, cholesky_factor) {
+TEST(advi_params_normal_fullrank_test, cholesky_factor) {
 
   Eigen::Vector3d mu;
   mu << 5.7, -3.2, 0.1332;
@@ -60,9 +60,9 @@ TEST(advi_params_fullrank_test, cholesky_factor) {
        2.3, 41, 0,
        3.3, 42, 92;
 
-  stan::variational::advi_params_fullrank my_advi_params_fullrank(mu, L);
+  stan::variational::advi_params_normal_fullrank my_advi_params_normal_fullrank(mu, L);
 
-  const Eigen::Matrix3d& L_out = my_advi_params_fullrank.L_chol();
+  const Eigen::Matrix3d& L_out = my_advi_params_normal_fullrank.L_chol();
 
   for (int j = 0, nRows = L.rows(), nCols = L.cols(); j < nCols; ++j) {
     for (int i = 0; i < nRows; ++i) {
@@ -72,12 +72,12 @@ TEST(advi_params_fullrank_test, cholesky_factor) {
 
   double nan = std::numeric_limits<double>::quiet_NaN();
   Eigen::MatrixXd L_nan = Eigen::MatrixXd::Constant(3,3,nan);
-  EXPECT_THROW(my_advi_params_fullrank.set_L_chol(L_nan),
+  EXPECT_THROW(my_advi_params_normal_fullrank.set_L_chol(L_nan),
                    std::domain_error);
 
 }
 
-TEST(advi_params_fullrank_test, entropy) {
+TEST(advi_params_normal_fullrank_test, entropy) {
 
   Eigen::Vector3d mu;
   mu << 5.7, -3.2, 0.1332;
@@ -87,17 +87,17 @@ TEST(advi_params_fullrank_test, entropy) {
        2.3, 41, 0,
        3.3, 42, 92;
 
-  stan::variational::advi_params_fullrank my_advi_params_fullrank(mu, L);
+  stan::variational::advi_params_normal_fullrank my_advi_params_normal_fullrank(mu, L);
 
   double entropy_true = 12.754540507834857;
 
-  const double entropy_out = my_advi_params_fullrank.entropy();
+  const double entropy_out = my_advi_params_normal_fullrank.entropy();
 
   EXPECT_FLOAT_EQ(entropy_out, entropy_true);
 
 }
 
-TEST(advi_params_fullrank_test, transform_loc_scale) {
+TEST(advi_params_normal_fullrank_test, transform) {
 
   Eigen::Vector3d mu;
   mu << 5.7, -3.2, 0.1332;
@@ -113,16 +113,16 @@ TEST(advi_params_fullrank_test, transform_loc_scale) {
   Eigen::Vector3d x_transformed;
   x_transformed << 14.93, -364.07, -308.5568;
 
-  stan::variational::advi_params_fullrank my_advi_params_fullrank(mu, L);
+  stan::variational::advi_params_normal_fullrank my_advi_params_normal_fullrank(mu, L);
 
   Eigen::Vector3d x_result;
-  x_result = my_advi_params_fullrank.loc_scale_transform(x);
+  x_result = my_advi_params_normal_fullrank.transform(x);
 
-  for (int i = 0; i < my_advi_params_fullrank.dimension(); ++i)
+  for (int i = 0; i < my_advi_params_normal_fullrank.dimension(); ++i)
     EXPECT_FLOAT_EQ(x_result(i), x_transformed(i));
 
   double nan = std::numeric_limits<double>::quiet_NaN();
   Eigen::Vector3d x_nan = Eigen::VectorXd::Constant(3, nan);
-  EXPECT_THROW(my_advi_params_fullrank.loc_scale_transform(x_nan);,
+  EXPECT_THROW(my_advi_params_normal_fullrank.transform(x_nan);,
                    std::domain_error);
 }

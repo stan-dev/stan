@@ -10,8 +10,8 @@
 #include <stan/services/io/write_iteration.hpp>
 #include <stan/services/error_codes.hpp>
 
-#include <stan/variational/advi_params_fullrank.hpp>
-#include <stan/variational/advi_params_meanfield.hpp>
+#include <stan/variational/advi_params_normal_fullrank.hpp>
+#include <stan/variational/advi_params_normal_meanfield.hpp>
 
 #include <stan/io/dump.hpp>
 
@@ -94,10 +94,9 @@ namespace stan {
       /**
        * ELBO
        *
-       * Calculates the "blackbox" Evidence Lower BOund (ELBO) by sampling
-       * from the standard multivariate normal (for now), affine transform
-       * the sample, and evaluating the log joint, adjusted by the entropy
-       * term of the normal
+       * Calculates the "blackbox" Evidence Lower BOund (ELBO) by sampling from
+       * the variational distribution and then evaluating the log joint,
+       * adjusted by the entropy term of the variational distribution.
        *
        * @tparam  T                type of advi_params (meanfield or fullrank)
        * @param   advi_params      variational parameters class
@@ -108,15 +107,11 @@ namespace stan {
         double elbo(0.0);
         int dim = advi_params.dimension();
 
-        Eigen::VectorXd eta  = Eigen::VectorXd::Zero(dim);
         Eigen::VectorXd zeta = Eigen::VectorXd::Zero(dim);
 
         for (int i = 0; i < n_monte_carlo_elbo_; ++i) {
-          // Draw from standard normal and transform to real-coordinate space
-          for (int d = 0; d < dim; ++d) {
-            eta(d) = stan::math::normal_rng(0, 1, rng_);
-          }
-          zeta = advi_params.loc_scale_transform(eta);
+          // Draw from variational distribution
+          zeta = advi_params.sample(rng_);
 
           // Accumulate log probability
           elbo += (model_.template
@@ -132,170 +127,6 @@ namespace stan {
       }
 
       /**
-       * Draws samples from the (converged) posterior, which is a multivariate
-       * Gaussian distribution. The posterior can be either a fullrank Gaussian
-       * or a mean-field (diagonal) Gaussian.
-       *
-       * @tparam  T                type of advi_params (meanfield or fullrank)
-       * @param   advi_params      variational parameters class
-       * @return                   a sample from the posterior distribution
-       */
-      template <typename T>
-      Eigen::VectorXd draw_posterior_sample(const T& advi_params) {
-        int dim = advi_params.dimension();
-        Eigen::VectorXd eta = Eigen::VectorXd::Zero(dim);
-
-        // Draw from standard normal and transform to real-coordinate space
-        for (int d = 0; d < dim; ++d) {
-          eta(d) = stan::math::normal_rng(0, 1, rng_);
-        }
-
-        return advi_params.loc_scale_transform(eta);
-      }
-
-      /**
-       * FULL-RANK GRADIENTS
-       *
-       * Calculates the "blackbox" gradient with respect to BOTH the location
-       * vector (mu) and the cholesky factor of the scale matrix (L) in
-       * parallel. It uses the same gradient computed from a set of Monte Carlo
-       * samples
-       *
-       * @param muL     mean and cholesky factor of affine transform
-       * @param mu_grad gradient of location vector parameter
-       * @param L_grad  gradient of scale matrix parameter
-       */
-      void calc_combined_grad(const advi_params_fullrank& muL,
-                              Eigen::VectorXd& mu_grad,
-                              Eigen::MatrixXd& L_grad) {
-        static const char* function =
-          "stan::variational::advi.calc_combined_grad";
-
-        int dim       = muL.dimension();
-        double tmp_lp = 0.0;
-
-        stan::math::check_size_match(function,
-                        "Dimension of muL", muL.dimension(),
-                        "Dimension of variables in model", cont_params_.size());
-        stan::math::check_size_match(function,
-                        "Dimension of mu grad vector", mu_grad.size(),
-                        "Dimension of mean vector in variational q", dim);
-        stan::math::check_square(function, "Scale matrix", L_grad);
-        stan::math::check_size_match(function,
-                        "Dimension of scale matrix", L_grad.rows(),
-                        "Dimension of mean vector in variational q", dim);
-
-        // Initialize everything to zero
-        mu_grad = Eigen::VectorXd::Zero(dim);
-        L_grad  = Eigen::MatrixXd::Zero(dim, dim);
-        Eigen::VectorXd tmp_mu_grad = Eigen::VectorXd::Zero(dim);
-        Eigen::VectorXd z_check = Eigen::VectorXd::Zero(dim);
-        Eigen::VectorXd z_tilde = Eigen::VectorXd::Zero(dim);
-
-        // Naive Monte Carlo integration
-        for (int i = 0; i < n_monte_carlo_grad_; ++i) {
-          // Draw from standard normal and transform to real-coordinate space
-          for (int d = 0; d < dim; ++d) {
-            z_check(d) = stan::math::normal_rng(0, 1, rng_);
-          }
-          z_tilde = muL.loc_scale_transform(z_check);
-
-          // Compute gradient step in real-coordinate space
-          stan::model::gradient(model_, z_tilde, tmp_lp, tmp_mu_grad,
-                                print_stream_);
-
-          // Update mu
-          mu_grad += tmp_mu_grad;
-
-          // Update L (lower triangular)
-          for (int ii = 0; ii < dim; ++ii) {
-            for (int jj = 0; jj <= ii; ++jj) {
-              L_grad(ii, jj) += tmp_mu_grad(ii) * z_check(jj);
-            }
-          }
-        }
-        mu_grad /= static_cast<double>(n_monte_carlo_grad_);
-        L_grad  /= static_cast<double>(n_monte_carlo_grad_);
-
-        // Add gradient of entropy term
-        L_grad.diagonal().array() += muL.L_chol().diagonal().array().inverse();
-      }
-
-
-      /**
-       * MEAN-FIELD GRADIENTS
-       *
-       * Calculates the "blackbox" gradient with respect to BOTH the location
-       * vector (mu) and the log-std vector (omega) in parallel.
-       * It uses the same gradient computed from a set of Monte Carlo
-       * samples.
-       *
-       * @param muomega      mean and log-std vector of affine transform
-       * @param mu_grad      gradient of mean vector parameter
-       * @param omega_grad   gradient of log-std vector parameter
-       */
-      void calc_combined_grad(const advi_params_meanfield& muomega,
-                              Eigen::VectorXd& mu_grad,
-                              Eigen::VectorXd& omega_grad) {
-        static const char* function =
-          "stan::variational::advi.calc_combined_grad";
-
-        int dim       = muomega.dimension();
-        double tmp_lp = 0.0;
-
-        stan::math::check_size_match(function,
-                        "Dimension of mu grad vector", mu_grad.size(),
-                        "Dimension of mean vector in variational q", dim);
-        stan::math::check_size_match(function,
-                        "Dimension of omega grad vector", omega_grad.size(),
-                        "Dimension of mean vector in variational q", dim);
-        stan::math::check_size_match(function,
-                        "Dimension of muomega", dim,
-                        "Dimension of variables in model", cont_params_.size());
-
-        // Initialize everything to zero
-        mu_grad    = Eigen::VectorXd::Zero(dim);
-        omega_grad = Eigen::VectorXd::Zero(dim);
-
-        Eigen::VectorXd tmp_mu_grad = Eigen::VectorXd::Zero(dim);
-
-        Eigen::VectorXd eta  = Eigen::VectorXd::Zero(dim);
-        Eigen::VectorXd zeta = Eigen::VectorXd::Zero(dim);
-
-        // Naive Monte Carlo integration
-        for (int i = 0; i < n_monte_carlo_grad_; ++i) {
-          // Draw from standard normal and transform to real-coordinate space
-          for (int d = 0; d < dim; ++d) {
-            eta(d) = stan::math::normal_rng(0, 1, rng_);
-          }
-          zeta = muomega.loc_scale_transform(eta);
-
-          stan::math::check_not_nan(function, "zeta", zeta);
-
-          // Compute gradient step in real-coordinate space
-          stan::model::gradient(model_, zeta, tmp_lp, tmp_mu_grad,
-                                print_stream_);
-
-          // Update mu
-          mu_grad.array() = mu_grad.array() + tmp_mu_grad.array();
-
-          // Update omega
-          omega_grad.array() = omega_grad.array()
-            + tmp_mu_grad.array().cwiseProduct(eta.array());
-        }
-        mu_grad    /= static_cast<double>(n_monte_carlo_grad_);
-        omega_grad /= static_cast<double>(n_monte_carlo_grad_);
-
-        // Multiply by exp(omega)
-        omega_grad.array() =
-          omega_grad.array().cwiseProduct(muomega.omega().array().exp());
-
-        // Add gradient of entropy term (just equal to element-wise 1 here)
-        omega_grad.array() += 1.0;
-      }
-
-
-      /**
        * FULL-RANK ROBBINS-MONRO ADAGRAD
        *
        * Runs stochastic gradient ascent for some number of iterations
@@ -304,7 +135,7 @@ namespace stan {
        * @param tol_rel_obj    relative tolerance parameter for convergence
        * @param max_iterations max number of iterations to run algorithm
        */
-      void robbins_monro_adagrad(advi_params_fullrank& muL,
+      void robbins_monro_adagrad(advi_params_normal_fullrank& muL,
                                     double tol_rel_obj,
                                     int max_iterations) {
         static const char* function =
@@ -367,7 +198,9 @@ namespace stan {
         int iter_counter = 0;
         while (do_more_iterations) {
           // Compute gradient using Monte Carlo integration
-          calc_combined_grad(muL, mu_grad, L_grad);
+          muL.calc_grad(mu_grad, L_grad,
+                        model_, cont_params_, n_monte_carlo_grad_, rng_,
+                        print_stream_);
 
           // Accumulate S vector for ADAgrad
           mu_s.array() += mu_grad.array().square();
@@ -456,7 +289,6 @@ namespace stan {
         }
       }
 
-
       /**
        * MEAN-FIELD ROBBINS-MONRO ADAGRAD
        *
@@ -466,7 +298,7 @@ namespace stan {
        * @param tol_rel_obj     relative tolerance parameter for convergence
        * @param max_iterations  max number of iterations to run algorithm
        */
-      void robbins_monro_adagrad(advi_params_meanfield& muomega,
+      void robbins_monro_adagrad(advi_params_normal_meanfield& muomega,
                                     double tol_rel_obj,
                                     int max_iterations) {
         static const char* function =
@@ -531,7 +363,9 @@ namespace stan {
         int iter_counter = 0;
         while (do_more_iterations) {
           // Compute gradient using Monte Carlo integration
-          calc_combined_grad(muomega, mu_grad, omega_grad);
+          muomega.calc_grad(mu_grad, omega_grad,
+                            model_, cont_params_, n_monte_carlo_grad_, rng_,
+                            print_stream_);
 
           // Accumulate S vector for ADAgrad
           mu_s.array()     += mu_grad.array().square();
@@ -635,7 +469,7 @@ namespace stan {
         Eigen::VectorXd mu = cont_params_;
         Eigen::MatrixXd L  = Eigen::MatrixXd::Identity(model_.num_params_r(),
                                                        model_.num_params_r());
-        advi_params_fullrank muL = advi_params_fullrank(mu, L);
+        advi_params_normal_fullrank muL = advi_params_normal_fullrank(mu, L);
 
         // run inference algorithm
         robbins_monro_adagrad(muL, tol_rel_obj, max_iterations);
@@ -655,7 +489,7 @@ namespace stan {
         // draw more samples from posterior and write on subsequent lines
         if (out_stream_) {
           for (int n = 0; n < n_posterior_samples_; ++n) {
-            cont_params_ = draw_posterior_sample(muL);
+            cont_params_ = muL.sample(rng_);
             for (int i = 0; i < cont_params_.size(); ++i)
               cont_vector.at(i) = cont_params_(i);
             services::io::write_iteration(*out_stream_, model_, rng_,
@@ -683,7 +517,7 @@ namespace stan {
                                                 model_.num_params_r(), 0.0);
                                                 // initializing omega = 0
                                                 // means sigma = 1
-        advi_params_meanfield muomega = advi_params_meanfield(mu, omega);
+        advi_params_normal_meanfield muomega = advi_params_normal_meanfield(mu, omega);
 
         // run inference algorithm
         robbins_monro_adagrad(muomega, tol_rel_obj, max_iterations);
@@ -703,7 +537,7 @@ namespace stan {
         // draw more samples from posterior and write on subsequent lines
         if (out_stream_) {
           for (int n = 0; n < n_posterior_samples_; ++n) {
-            cont_params_ = draw_posterior_sample(muomega);
+            cont_params_ = muomega.sample(rng_);
             for (int i = 0; i < cont_params_.size(); ++i)
               cont_vector.at(i) = cont_params_(i);
             services::io::write_iteration(*out_stream_, model_, rng_,
