@@ -28,11 +28,13 @@ C++11 = false
 EIGEN ?= lib/eigen_3.2.4
 BOOST ?= lib/boost_1.58.0
 GTEST ?= lib/gtest_1.7.0
+CPPLINT ?= lib/cpplint_4.45
+MATH ?= lib/stan_math_2.6.3
 
 ##
 # Set default compiler options.
 ## 
-CFLAGS = -I src -isystem $(EIGEN) -isystem $(BOOST) -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -pipe
+CFLAGS = -I src -isystem $(EIGEN) -isystem $(BOOST) -isystem $(MATH) -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -pipe
 CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
 LDLIBS = 
 LDLIBS_STANC = -Lbin -lstanc
@@ -182,5 +184,3 @@ clean-all: clean clean-manual clean-deps
 	$(RM) -r test bin
 	@echo '  removing .o files'
 	$(shell find src -type f -name '*.o' -exec rm {} +)
-	@echo '  removing generated test files'
-	$(shell find src/test/prob -name '*_generated_*_test.cpp' -type f -exec rm {} +)
