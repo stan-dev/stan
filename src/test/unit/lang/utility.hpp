@@ -149,11 +149,11 @@ void test_warning(const std::string& model_name,
                   const std::string& warning_msg) {
   std::stringstream msgs;
   EXPECT_TRUE(is_parsable_folder(model_name, "good", &msgs));
-  EXPECT_TRUE(msgs.str().find_first_of(warning_msg) != std::string::npos)
-    << std::endl 
+  bool found = msgs.str().find(warning_msg) != std::string::npos;
+  EXPECT_TRUE(found) << std::endl 
     << "FOUND: " << msgs.str() 
     << std::endl
-    << "EXPECTED: " << warning_msg
+    << "EXPECTED (as substring): " << warning_msg
     << std::endl;
 }
 

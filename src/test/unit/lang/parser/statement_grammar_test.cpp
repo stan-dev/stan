@@ -34,17 +34,17 @@ TEST(langParserStatementGrammar, validateAllowSample) {
 TEST(langParserStatementGrammarDef, jacobianAdjustmentWarning) {
   test_parsable("validate_jacobian_warning_good");
   test_warning("validate_jacobian_warning1",
-               "you must call increment_log_prob() with the log absolute determinant");
+               "If so, you need to call increment_log_prob() with the log");
   test_warning("validate_jacobian_warning2",
-               "you must call increment_log_prob() with the log absolute determinant");
+               "If so, you need to call increment_log_prob() with the log");
   test_warning("validate_jacobian_warning3",
-               "you must call increment_log_prob() with the log absolute determinant");
+               "If so, you need to call increment_log_prob() with the log");
   test_warning("validate_jacobian_warning4",
-               "you must call increment_log_prob() with the log absolute determinant");
+               "If so, you need to call increment_log_prob() with the log");
   test_warning("validate_jacobian_warning5",
-               "you must call increment_log_prob() with the log absolute determinant");
+               "If so, you need to call increment_log_prob() with the log");
   test_warning("validate_jacobian_warning6",
-               "you must call increment_log_prob() with the log absolute determinant");
+               "If so, you need to call increment_log_prob() with the log");
 }
 
 TEST(langParserStatementGrammarDef, comparisonsInBoundsTest) {
@@ -77,3 +77,4 @@ TEST(langParserStatementGrammar, useCdfWithSamplingNotation) {
   test_throws("binomial_coefficient_sample",
               "Only distribution names can be used with sampling (~) notation");
 }
+

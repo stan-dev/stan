@@ -248,7 +248,7 @@ namespace stan {
         std::string function_name(s.dist_.family_);
         std::string internal_function_name = function_name + "_log";
 
-        if ((internal_function_name.find("multiply_log") 
+        if ((internal_function_name.find("multiply_log")
              != std::string::npos)
             || (internal_function_name.find("binomial_coefficient_log")
                 != std::string::npos)) {
@@ -285,13 +285,14 @@ namespace stan {
         if (has_non_param_var(s.expr_, var_map)) {
           // FIXME:  really want to get line numbers in here too
           error_msgs << "Warning (non-fatal):"
+             << std::endl
              << " Left-hand side of sampling statement (~) may contain a"
              << " non-linear transform of a parameter or local variable."
              << std::endl
-             << " You may need to call increment_log_prob() with the log"
+             << "If so, you need to call increment_log_prob() with the log"
              << " absolute determinant of the Jacobian of the transform."
              << std::endl
-             << "  Sampling Statement left-hand-side expression:"
+             << "Left-hand-side of sampling statement:"
              << std::endl
              << "    ";
           generate_expression(s.expr_, error_msgs);
