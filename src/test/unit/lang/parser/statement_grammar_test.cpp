@@ -61,3 +61,8 @@ TEST(langParserStatementGrammar, validateAssignmentTypes) {
   test_throws("bad_var_assignment_vec_arr",
               "mismatch in assignment");
 }
+
+TEST(langParserStatementGrammar, assignRealToIntMessage) {
+  test_throws("assign_real_to_int",
+              "PARSER EXPECTED: <expression assignable to left-hand side>");
+}
