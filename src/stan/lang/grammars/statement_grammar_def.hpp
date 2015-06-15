@@ -717,11 +717,15 @@ namespace stan {
       assignment_r
         %= (var_lhs_r(_r1)
             >> lit("<-"))
-        > expression_g(_r1)
-        > lit(';')
+        > expression_rhs_r(_r1)
         [_pass = validate_assignment_f(_val, _r1,
                                        boost::phoenix::ref(var_map_),
-                                       boost::phoenix::ref(error_msgs_))];
+                                       boost::phoenix::ref(error_msgs_))]
+        > lit(';');
+
+      expression_rhs_r.name("expression assignable to left-hand side");
+      expression_rhs_r
+        %= expression_g(_r1);
 
       var_lhs_r.name("variable and array dimensions");
       var_lhs_r
