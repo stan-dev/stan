@@ -248,6 +248,26 @@ namespace stan {
         std::string function_name(s.dist_.family_);
         std::string internal_function_name = function_name + "_log";
 
+        if ((internal_function_name.find("multiply_log") 
+             != std::string::npos)
+            || (internal_function_name.find("binomial_coefficient_log")
+                != std::string::npos)) {
+          error_msgs << "Only distribution names can be used with"
+                     << " sampling (~) notation; found non-distribution"
+                     << " function: " << function_name
+                     << std::endl;
+          return false;
+        }
+
+        if (internal_function_name.find("cdf_log") != std::string::npos) {
+          error_msgs << "CDF and CCDF functions may not be used with"
+                     << " sampling notation."
+                     << " Use increment_log_prob("
+                     << internal_function_name << "(...)) instead."
+                     << std::endl;
+          return false;
+        }
+
         if (!is_double_return(internal_function_name, arg_types, error_msgs))
           return false;
 
@@ -265,10 +285,10 @@ namespace stan {
         if (has_non_param_var(s.expr_, var_map)) {
           // FIXME:  really want to get line numbers in here too
           error_msgs << "Warning (non-fatal):"
-             << " Left-hand side of sampling statement (~) contains a"
+             << " Left-hand side of sampling statement (~) may contain a"
              << " non-linear transform of a parameter or local variable."
              << std::endl
-             << " You must call increment_log_prob() with the log"
+             << " You may need to call increment_log_prob() with the log"
              << " absolute determinant of the Jacobian of the transform."
              << std::endl
              << "  Sampling Statement left-hand-side expression:"

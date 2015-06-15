@@ -66,3 +66,14 @@ TEST(langParserStatementGrammar, assignRealToIntMessage) {
   test_throws("assign_real_to_int",
               "PARSER EXPECTED: <expression assignable to left-hand side>");
 }
+
+TEST(langParserStatementGrammar, useCdfWithSamplingNotation) {
+  test_throws("cdf-sample",
+              "CDF and CCDF functions may not be used with sampling notation.");
+  test_throws("ccdf-sample",
+              "CDF and CCDF functions may not be used with sampling notation.");
+  test_throws("multiply_sample",
+              "Only distribution names can be used with sampling (~) notation");
+  test_throws("binomial_coefficient_sample",
+              "Only distribution names can be used with sampling (~) notation");
+}
