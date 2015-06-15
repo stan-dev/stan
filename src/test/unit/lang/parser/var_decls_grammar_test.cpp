@@ -58,3 +58,12 @@ TEST(langParserVarDeclsGrammarDef, parametersInLocals) {
    test_throws("var-decl-bad-1",
                "non-data variables not allowed in dimension declarations");
 }
+
+TEST(langParserVarDeclsGrammarDef, constraintsInLocals) {
+  test_throws("local_var_constraint",
+              "require unconstrained. found range constraint.");
+  test_throws("local_var_constraint2",
+              "require unconstrained. found range constraint.");
+  test_throws("local_var_constraint3",
+              "require unconstrained. found range constraint.");
+}
