@@ -1,7 +1,6 @@
 #ifndef STAN_VARIATIONAL_ADVI_HPP
 #define STAN_VARIATIONAL_ADVI_HPP
 
-#include <stan/math/prim.hpp>
 #include <stan/math/prim/scal/err/check_positive.hpp>
 
 #include <stan/model/util.hpp>
