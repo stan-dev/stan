@@ -86,14 +86,6 @@ TEST(lang, logProbPolymorphismDouble) {
   lp2 = model.log_prob<false,false>(params_r_vec, 0);
   EXPECT_FLOAT_EQ(lp1, lp2);
 
-  // only test write_csv for doubles -- no var allowed
-  std::stringstream s1;
-  std::stringstream s2;
-  boost::ecuyer1988 rng(123);
-  model.write_csv(rng,params_r,params_i,s1,0);
-  model.write_csv(rng,params_r_vec,s2,0);
-  EXPECT_EQ(s1.str(), s2.str());
-
   // only test generate_inits for doubles -- no var allowed
   std::string init_txt = "y <- c(-2.9,1.2)";
   std::stringstream init_in(init_txt);
@@ -120,6 +112,7 @@ TEST(lang, logProbPolymorphismDouble) {
   Matrix<double,Dynamic,1> params_r_vec_write(2);
   params_r_vec_write << -3.2, 1.79;
 
+  boost::ecuyer1988 rng(123);
   for (int incl_tp = 0; incl_tp < 2; ++incl_tp) {
     for (int incl_gq = 0; incl_gq < 2; ++incl_gq) { 
       std::vector<double> vars_write;
@@ -181,7 +174,6 @@ TEST(lang, generate_model_typedef) {
                              ss.str()));
 }
 
-// * write_csv
 // * transform_inits
 
 TEST(lang, generate_cpp) {
@@ -230,10 +222,6 @@ TEST(lang, generate_cpp) {
     << "generate_dims_method()";
   EXPECT_EQ(2, count_matches("void write_array(", output.str()))
     << "generate_write_array_method()";
-  EXPECT_EQ(1, count_matches("void write_csv_header(", output.str()))
-    << "generate_write_csv_header_method()";
-  EXPECT_EQ(2, count_matches("void write_csv(", output.str()))
-    << "generate_write_csv_method()";
   EXPECT_EQ(1, count_matches("static std::string model_name()", output.str()))
     << "generate_model_name_method()";
   EXPECT_EQ(1, count_matches("void constrained_param_names(", output.str()))
