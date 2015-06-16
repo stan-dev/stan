@@ -71,7 +71,6 @@ namespace stan {
                                "Dimension of Cholesky factor", L_chol.rows());
         stan::math::check_lower_triangular(function,
                                "Cholesky factor", L_chol);
-
         L_chol_ = L_chol;
       }
 
@@ -81,8 +80,7 @@ namespace stan {
       double entropy() const {
         double tmp(0.0);
         double result(
-          0.5 * static_cast<double>(dimension_)
-          * (1.0 + stan::math::LOG_TWO_PI));
+          0.5 * static_cast<double>(dimension_)*(1.0 + stan::math::LOG_TWO_PI));
         for (int d = 0; d < dimension_; ++d) {
           tmp = fabs(L_chol_(d, d));
           if (tmp != 0.0) {
@@ -92,18 +90,18 @@ namespace stan {
         return result;
       }
 
-      // Implements f^{-1}(\check{z}) = L\check{z} + \mu
+      // Implements S^{-1}(eta) = L*eta + \mu
       Eigen::VectorXd
-      loc_scale_transform(const Eigen::VectorXd& z_check) const {
+      loc_scale_transform(const Eigen::VectorXd& eta) const {
         static const char* function = "stan::variational::advi_params_fullrank"
                                       "::loc_scale_transform";
 
         stan::math::check_size_match(function,
-                         "Dimension of input vector", z_check.size(),
+                         "Dimension of input vector", eta.size(),
                          "Dimension of mean vector",  dimension_);
-        stan::math::check_not_nan(function, "Input vector", z_check);
+        stan::math::check_not_nan(function, "Input vector", eta);
 
-        return L_chol_*z_check + mu_;
+        return (L_chol_*eta).array() + mu_.array();
       }
     };
   }  // variational

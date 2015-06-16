@@ -79,7 +79,7 @@ namespace stan {
                (1.0 + stan::math::LOG_TWO_PI) + omega_.sum();
       }
 
-      // Implement f^{-1}(\check{z}) = sigma * \check{z} + \mu
+      // Implement S^{-1}(eta) = sigma * eta + \mu
       Eigen::VectorXd loc_scale_transform(const Eigen::VectorXd& eta) const {
         static const char* function = "stan::variational::advi_params_meanfield"
                                       "::loc_scale_transform";

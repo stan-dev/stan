@@ -189,19 +189,19 @@ namespace stan {
         mu_grad = Eigen::VectorXd::Zero(dim);
         L_grad  = Eigen::MatrixXd::Zero(dim, dim);
         Eigen::VectorXd tmp_mu_grad = Eigen::VectorXd::Zero(dim);
-        Eigen::VectorXd z_check = Eigen::VectorXd::Zero(dim);
-        Eigen::VectorXd z_tilde = Eigen::VectorXd::Zero(dim);
+        Eigen::VectorXd eta = Eigen::VectorXd::Zero(dim);
+        Eigen::VectorXd zeta = Eigen::VectorXd::Zero(dim);
 
         // Naive Monte Carlo integration
         for (int i = 0; i < n_monte_carlo_grad_; ++i) {
           // Draw from standard normal and transform to real-coordinate space
           for (int d = 0; d < dim; ++d) {
-            z_check(d) = stan::math::normal_rng(0, 1, rng_);
+            eta(d) = stan::math::normal_rng(0, 1, rng_);
           }
-          z_tilde = muL.loc_scale_transform(z_check);
+          zeta = muL.loc_scale_transform(eta);
 
           // Compute gradient step in real-coordinate space
-          stan::model::gradient(model_, z_tilde, tmp_lp, tmp_mu_grad,
+          stan::model::gradient(model_, zeta, tmp_lp, tmp_mu_grad,
                                 print_stream_);
 
           // Update mu
@@ -210,7 +210,7 @@ namespace stan {
           // Update L (lower triangular)
           for (int ii = 0; ii < dim; ++ii) {
             for (int jj = 0; jj <= ii; ++jj) {
-              L_grad(ii, jj) += tmp_mu_grad(ii) * z_check(jj);
+              L_grad(ii, jj) += tmp_mu_grad(ii) * eta(jj);
             }
           }
         }
@@ -375,11 +375,11 @@ namespace stan {
 
           // RMSprop moving average weighting
           mu_s.array() = pre_factor * mu_s.array()
-                       + post_factor *
-                       mu_grad.array().square();
+                         + post_factor *
+                         mu_grad.array().square();
           L_s.array()  = pre_factor * L_s.array()
-                       + post_factor *
-                       L_grad.array().square();
+                         + post_factor *
+                         L_grad.array().square();
 
           // Take ADAgrad or rmsprop step
           muL.set_mu(muL.mu().array() + eta_adagrad_ * mu_grad.array()
