@@ -165,6 +165,11 @@ namespace stan {
                               variable_dims(var_origin),
                               whitespace_grammar<Iterator> >
       var_lhs_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              expression(var_origin),
+                              whitespace_grammar<Iterator> >
+      expression_rhs_r;
     };
 
   }
