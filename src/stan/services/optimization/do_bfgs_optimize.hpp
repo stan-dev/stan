@@ -1,13 +1,17 @@
 #ifndef STAN_SERVICES_OPTIMIZATION_DO_BFGS_OPTIMIZE_HPP
 #define STAN_SERVICES_OPTIMIZATION_DO_BFGS_OPTIMIZE_HPP
 
+#include <stan/services/error_codes.hpp>
+#include <stan/services/io/do_print.hpp>
+#include <stan/services/io/write_error_msg.hpp>
+#include <stan/services/io/write_iteration.hpp>
+#include <stan/services/io/write_iteration_csv.hpp>
+#include <stan/services/io/write_model.hpp>
+#include <stan/services/io/write_stan.hpp>
 #include <fstream>
 #include <iostream>
 #include <iomanip>
 #include <vector>
-
-#include <stan/services/error_codes.hpp>
-#include <stan/services/io.hpp>
 
 namespace stan {
   namespace services {

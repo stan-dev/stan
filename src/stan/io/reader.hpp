@@ -2,9 +2,30 @@
 #define STAN_IO_READER_HPP
 
 #include <boost/throw_exception.hpp>
-#include <stan/math/prim/arr.hpp>
-#include <stan/math/prim/mat.hpp>
-#include <stan/math/prim/scal.hpp>
+#include <stan/math/prim/mat/err/check_cholesky_factor.hpp>
+#include <stan/math/prim/mat/err/check_cholesky_factor_corr.hpp>
+#include <stan/math/prim/mat/err/check_corr_matrix.hpp>
+#include <stan/math/prim/mat/err/check_cov_matrix.hpp>
+#include <stan/math/prim/mat/err/check_ordered.hpp>
+#include <stan/math/prim/mat/err/check_positive_ordered.hpp>
+#include <stan/math/prim/mat/err/check_simplex.hpp>
+#include <stan/math/prim/mat/err/check_unit_vector.hpp>
+#include <stan/math/prim/mat/fun/cholesky_corr_constrain.hpp>
+#include <stan/math/prim/mat/fun/cholesky_factor_constrain.hpp>
+#include <stan/math/prim/mat/fun/corr_matrix_constrain.hpp>
+#include <stan/math/prim/mat/fun/cov_matrix_constrain.hpp>
+#include <stan/math/prim/mat/fun/ordered_constrain.hpp>
+#include <stan/math/prim/mat/fun/positive_ordered_constrain.hpp>
+#include <stan/math/prim/mat/fun/simplex_constrain.hpp>
+#include <stan/math/prim/mat/fun/unit_vector_constrain.hpp>
+#include <stan/math/prim/scal/err/check_bounded.hpp>
+#include <stan/math/prim/scal/err/check_greater_or_equal.hpp>
+#include <stan/math/prim/scal/fun/corr_constrain.hpp>
+#include <stan/math/prim/scal/fun/lb_constrain.hpp>
+#include <stan/math/prim/scal/fun/lub_constrain.hpp>
+#include <stan/math/prim/scal/fun/positive_constrain.hpp>
+#include <stan/math/prim/scal/fun/prob_constrain.hpp>
+#include <stan/math/prim/scal/fun/ub_constrain.hpp>
 #include <vector>
 
 namespace stan {
