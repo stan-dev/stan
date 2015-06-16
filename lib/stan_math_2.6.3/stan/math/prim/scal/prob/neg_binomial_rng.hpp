@@ -32,16 +32,32 @@ namespace stan {
                      RNG& rng) {
       using boost::variate_generator;
       using boost::random::negative_binomial_distribution;
+      using boost::random::poisson_distribution;
+      using boost::gamma_distribution;
 
       static const char* function("stan::math::neg_binomial_rng");
 
-      using stan::math::check_positive_finite;
-
+      // gamma_rng params must be positive and finite
       check_positive_finite(function, "Shape parameter", alpha);
       check_positive_finite(function, "Inverse scale parameter", beta);
 
-      return stan::math::poisson_rng(stan::math::gamma_rng(alpha, beta,
-                                                           rng), rng);
+      double rng_from_gamma =
+        variate_generator<RNG&, gamma_distribution<> >
+        (rng, gamma_distribution<>(alpha, 1.0 / beta))();
+
+      // same as the constraints for poisson_rng
+      check_less(function,
+        "Random number that came from gamma distribution",
+        rng_from_gamma, POISSON_MAX_RATE);
+      check_not_nan(function,
+        "Random number that came from gamma distribution",
+        rng_from_gamma);
+      check_nonnegative(function,
+        "Random number that came from gamma distribution",
+        rng_from_gamma);
+
+      return variate_generator<RNG&, poisson_distribution<> >
+        (rng, poisson_distribution<>(rng_from_gamma))();
     }
   }
 }
