@@ -63,8 +63,12 @@ namespace stan {
      */
     const double NEGATIVE_EPSILON = - std::numeric_limits<double>::epsilon();
 
+    /**
+     * Largest rate parameter allowed in Poisson RNG
+     */
+    const double POISSON_MAX_RATE = std::pow(2.0, 30);
 
-    /*
+    /**
      * Log pi divided by 4
      * \f$ \log \pi / 4 \f$
      */
