@@ -24,6 +24,7 @@ TEST(advi_test, multivar_with_constraint_fullrank) {
 
   // Other params
   int n_monte_carlo_grad = 10;
+  int n_monte_carlo_elbo = 1e6;
   std::ostream* print_stream = &std::cout;
 
   // Dummy input
@@ -35,7 +36,7 @@ TEST(advi_test, multivar_with_constraint_fullrank) {
   stan::variational::advi<Model, rng_t> test_advi(my_model,
                                                   cont_params,
                                                   n_monte_carlo_grad,
-                                                  5e5, // absurdly high!
+                                                  n_monte_carlo_elbo,
                                                   0.1,
                                                   base_rng,
                                                   100,
@@ -63,7 +64,7 @@ TEST(advi_test, multivar_with_constraint_fullrank) {
 
   double elbo_true = 0.0;
   elbo_true += zeta;
-  elbo_true += 74.192457181505773; //;mu_J.dot( (mu + 0.5).exp() );
+  elbo_true += 74.192457181505773; // mu_J.dot( (mu + 0.5).exp() );
   elbo_true += -0.5 * 3 * ( 92.363201236633131 );
   elbo_true += 2*log(2.5);
   elbo_true += 1 + log(2.0*stan::math::pi());
@@ -88,6 +89,7 @@ TEST(advi_test, multivar_with_constraint_meanfield) {
 
   // Other params
   int n_monte_carlo_grad = 10;
+  int n_monte_carlo_elbo = 1e6;
   std::ostream* print_stream = &std::cout;
 
   // Dummy input
@@ -99,7 +101,7 @@ TEST(advi_test, multivar_with_constraint_meanfield) {
   stan::variational::advi<Model, rng_t> test_advi(my_model,
                                                   cont_params,
                                                   n_monte_carlo_grad,
-                                                  5e5, // absurdly high!
+                                                  n_monte_carlo_elbo,
                                                   0.1,
                                                   base_rng,
                                                   100,

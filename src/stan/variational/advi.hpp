@@ -113,9 +113,9 @@ namespace stan {
           zeta = advi_params.sample(rng_);
 
           // Accumulate log probability
-          elbo += (model_.template
-                   log_prob<false, true>(zeta, print_stream_));
+          elbo += (model_.template log_prob<false, true>(zeta, print_stream_));
         }
+
         // Divide to get Monte Carlo integral estimate
         elbo /= n_monte_carlo_elbo_;
 
