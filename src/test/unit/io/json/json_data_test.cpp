@@ -1,6 +1,10 @@
 #include <gtest/gtest.h>
 
-#include <stan/io/json.hpp>
+#include <stan/io/json/json_data.hpp>
+#include <stan/io/json/json_data_handler.hpp>
+#include <stan/io/json/json_error.hpp>
+#include <stan/io/json/json_handler.hpp>
+#include <stan/io/json/json_parser.hpp>
 
 void test_int_var(stan::json::json_data& jdata,
                   const std::string& text,

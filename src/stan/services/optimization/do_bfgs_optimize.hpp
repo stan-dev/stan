@@ -1,13 +1,17 @@
 #ifndef STAN_SERVICES_OPTIMIZATION_DO_BFGS_OPTIMIZE_HPP
 #define STAN_SERVICES_OPTIMIZATION_DO_BFGS_OPTIMIZE_HPP
 
+#include <stan/services/error_codes.hpp>
+#include <stan/services/io/do_print.hpp>
+#include <stan/services/io/write_error_msg.hpp>
+#include <stan/services/io/write_iteration.hpp>
+#include <stan/services/io/write_iteration_csv.hpp>
+#include <stan/services/io/write_model.hpp>
+#include <stan/services/io/write_stan.hpp>
 #include <fstream>
 #include <iostream>
 #include <iomanip>
 #include <vector>
-
-#include <stan/services/error_codes.hpp>
-#include <stan/services/io.hpp>
 
 namespace stan {
   namespace services {
@@ -26,8 +30,8 @@ namespace stan {
                            int refresh,
                            StartIterationCallback& callback) {
         lp = bfgs.logp();
-            
-        if (notice_stream) 
+
+        if (notice_stream)
           (*notice_stream) << "initial log joint probability = " << lp << std::endl;
         if (output_stream && save_iterations) {
           io::write_iteration(*output_stream, model, base_rng,
@@ -35,8 +39,8 @@ namespace stan {
         }
 
         int ret = 0;
-            
-        while (ret == 0) {  
+
+        while (ret == 0) {
           callback();
           if (notice_stream && io::do_print(bfgs.iter_num(), 50*refresh)) {
             (*notice_stream) << "    Iter ";
@@ -48,35 +52,35 @@ namespace stan {
             (*notice_stream) << " # evals ";
             (*notice_stream) << " Notes " << std::endl;
           }
-              
+
           ret = bfgs.step();
           lp = bfgs.logp();
           bfgs.params_r(cont_vector);
-              
+
           if (notice_stream && (io::do_print(bfgs.iter_num(), ret != 0 || !bfgs.note().empty(),refresh))) {
             (*notice_stream) << " " << std::setw(7) << bfgs.iter_num() << " ";
-            (*notice_stream) << " " << std::setw(12) << std::setprecision(6) 
+            (*notice_stream) << " " << std::setw(12) << std::setprecision(6)
                       << lp << " ";
-            (*notice_stream) << " " << std::setw(12) << std::setprecision(6) 
+            (*notice_stream) << " " << std::setw(12) << std::setprecision(6)
                       << bfgs.prev_step_size() << " ";
-            (*notice_stream) << " " << std::setw(12) << std::setprecision(6) 
+            (*notice_stream) << " " << std::setw(12) << std::setprecision(6)
                       << bfgs.curr_g().norm() << " ";
-            (*notice_stream) << " " << std::setw(10) << std::setprecision(4) 
+            (*notice_stream) << " " << std::setw(10) << std::setprecision(4)
                       << bfgs.alpha() << " ";
-            (*notice_stream) << " " << std::setw(10) << std::setprecision(4) 
+            (*notice_stream) << " " << std::setw(10) << std::setprecision(4)
                       << bfgs.alpha0() << " ";
-            (*notice_stream) << " " << std::setw(7) 
+            (*notice_stream) << " " << std::setw(7)
                       << bfgs.grad_evals() << " ";
             (*notice_stream) << " " << bfgs.note() << " ";
             (*notice_stream) << std::endl;
           }
-              
+
           if (output_stream && save_iterations) {
             io::write_iteration(*output_stream, model, base_rng,
                                lp, cont_vector, disc_vector);
           }
         }
-            
+
         int return_code;
         if (ret >= 0) {
           if (notice_stream)
@@ -92,7 +96,7 @@ namespace stan {
 
         return return_code;
       }
-      
+
     }
   }
 }

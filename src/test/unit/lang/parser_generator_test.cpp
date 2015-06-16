@@ -66,6 +66,6 @@ TEST(unitLang, odeTest) {
   expected = "stan::math::assign(y_hat, "
     "integrate_ode(sho_functor__(), y0, t0, ts, theta, x, x_int, pstream__));";
   test_pg("ode", expected);
-  test_pg_count("ode", expected, 2);
+  test_pg_count("ode", expected, 1);
 }
              

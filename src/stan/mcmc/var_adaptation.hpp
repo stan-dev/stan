@@ -39,7 +39,7 @@ namespace stan {
       }
 
     protected:
-      prob::welford_var_estimator estimator_;
+      stan::math::welford_var_estimator estimator_;
     };
 
   }  // mcmc

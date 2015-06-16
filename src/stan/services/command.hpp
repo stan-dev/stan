@@ -9,10 +9,77 @@
 #include <stan/version.hpp>
 #include <stan/io/cmd_line.hpp>
 #include <stan/io/dump.hpp>
-#include <stan/io/json.hpp>
+#include <stan/io/json/json_data.hpp>
+#include <stan/io/json/json_data_handler.hpp>
+#include <stan/io/json/json_error.hpp>
+#include <stan/io/json/json_handler.hpp>
+#include <stan/io/json/json_parser.hpp>
 #include <stan/io/mcmc_writer.hpp>
 
-#include <stan/services/arguments.hpp>
+#include <stan/services/arguments/arg_adapt.hpp>
+#include <stan/services/arguments/arg_adapt_delta.hpp>
+#include <stan/services/arguments/arg_adapt_engaged.hpp>
+#include <stan/services/arguments/arg_adapt_gamma.hpp>
+#include <stan/services/arguments/arg_adapt_init_buffer.hpp>
+#include <stan/services/arguments/arg_adapt_kappa.hpp>
+#include <stan/services/arguments/arg_adapt_t0.hpp>
+#include <stan/services/arguments/arg_adapt_term_buffer.hpp>
+#include <stan/services/arguments/arg_adapt_window.hpp>
+#include <stan/services/arguments/arg_bfgs.hpp>
+#include <stan/services/arguments/arg_data.hpp>
+#include <stan/services/arguments/arg_data_file.hpp>
+#include <stan/services/arguments/arg_dense_e.hpp>
+#include <stan/services/arguments/arg_diag_e.hpp>
+#include <stan/services/arguments/arg_diagnose.hpp>
+#include <stan/services/arguments/arg_diagnostic_file.hpp>
+#include <stan/services/arguments/arg_engine.hpp>
+#include <stan/services/arguments/arg_fail.hpp>
+#include <stan/services/arguments/arg_fixed_param.hpp>
+#include <stan/services/arguments/arg_history_size.hpp>
+#include <stan/services/arguments/arg_hmc.hpp>
+#include <stan/services/arguments/arg_id.hpp>
+#include <stan/services/arguments/arg_init.hpp>
+#include <stan/services/arguments/arg_init_alpha.hpp>
+#include <stan/services/arguments/arg_int_time.hpp>
+#include <stan/services/arguments/arg_iter.hpp>
+#include <stan/services/arguments/arg_lbfgs.hpp>
+#include <stan/services/arguments/arg_max_depth.hpp>
+#include <stan/services/arguments/arg_method.hpp>
+#include <stan/services/arguments/arg_metric.hpp>
+#include <stan/services/arguments/arg_newton.hpp>
+#include <stan/services/arguments/arg_num_samples.hpp>
+#include <stan/services/arguments/arg_num_warmup.hpp>
+#include <stan/services/arguments/arg_nuts.hpp>
+#include <stan/services/arguments/arg_optimize.hpp>
+#include <stan/services/arguments/arg_optimize_algo.hpp>
+#include <stan/services/arguments/arg_output.hpp>
+#include <stan/services/arguments/arg_output_file.hpp>
+#include <stan/services/arguments/arg_random.hpp>
+#include <stan/services/arguments/arg_refresh.hpp>
+#include <stan/services/arguments/arg_rwm.hpp>
+#include <stan/services/arguments/arg_sample.hpp>
+#include <stan/services/arguments/arg_sample_algo.hpp>
+#include <stan/services/arguments/arg_save_iterations.hpp>
+#include <stan/services/arguments/arg_save_warmup.hpp>
+#include <stan/services/arguments/arg_seed.hpp>
+#include <stan/services/arguments/arg_static.hpp>
+#include <stan/services/arguments/arg_stepsize.hpp>
+#include <stan/services/arguments/arg_stepsize_jitter.hpp>
+#include <stan/services/arguments/arg_test.hpp>
+#include <stan/services/arguments/arg_test_grad_eps.hpp>
+#include <stan/services/arguments/arg_test_grad_err.hpp>
+#include <stan/services/arguments/arg_test_gradient.hpp>
+#include <stan/services/arguments/arg_thin.hpp>
+#include <stan/services/arguments/arg_tolerance.hpp>
+#include <stan/services/arguments/arg_unit_e.hpp>
+#include <stan/services/arguments/argument.hpp>
+#include <stan/services/arguments/argument_parser.hpp>
+#include <stan/services/arguments/argument_probe.hpp>
+#include <stan/services/arguments/categorical_argument.hpp>
+#include <stan/services/arguments/list_argument.hpp>
+#include <stan/services/arguments/singleton_argument.hpp>
+#include <stan/services/arguments/unvalued_argument.hpp>
+#include <stan/services/arguments/valued_argument.hpp>
 
 #include <stan/mcmc/fixed_param_sampler.hpp>
 #include <stan/mcmc/hmc/static/adapt_unit_e_static_hmc.hpp>
@@ -28,15 +95,33 @@
 #include <stan/optimization/bfgs.hpp>
 
 #include <stan/services/diagnose.hpp>
-#include <stan/services/init.hpp>
-#include <stan/services/io.hpp>
-#include <stan/services/mcmc.hpp>
-#include <stan/services/optimization.hpp>
+#include <stan/services/init/init_adapt.hpp>
+#include <stan/services/init/init_nuts.hpp>
+#include <stan/services/init/init_static_hmc.hpp>
+#include <stan/services/init/init_windowed_adapt.hpp>
+#include <stan/services/init/initialize_state.hpp>
+#include <stan/services/io/do_print.hpp>
+#include <stan/services/io/write_error_msg.hpp>
+#include <stan/services/io/write_iteration.hpp>
+#include <stan/services/io/write_iteration_csv.hpp>
+#include <stan/services/io/write_model.hpp>
+#include <stan/services/io/write_stan.hpp>
+#include <stan/services/mcmc/print_progress.hpp>
+#include <stan/services/mcmc/run_markov_chain.hpp>
+#include <stan/services/mcmc/sample.hpp>
+#include <stan/services/mcmc/warmup.hpp>
+#include <stan/services/optimization/do_bfgs_optimize.hpp>
 
 // FIXME: These belong to the interfaces and should be templated out here
 #include <stan/interface/callback/noop_callback.hpp>
 #include <stan/interface/var_context_factory/dump_factory.hpp>
-#include <stan/interface/recorder.hpp>
+#include <stan/interface/recorder/csv.hpp>
+#include <stan/interface/recorder/filtered_values.hpp>
+#include <stan/interface/recorder/messages.hpp>
+#include <stan/interface/recorder/noop.hpp>
+#include <stan/interface/recorder/recorder.hpp>
+#include <stan/interface/recorder/sum_values.hpp>
+#include <stan/interface/recorder/values.hpp>
 
 #include <fstream>
 #include <limits>
@@ -55,7 +140,7 @@ namespace stan {
       valid_arguments.push_back(new stan::services::arg_init());
       valid_arguments.push_back(new stan::services::arg_random());
       valid_arguments.push_back(new stan::services::arg_output());
-      
+
       stan::services::argument_parser parser(valid_arguments);
 
       int err_code = parser.parse_args(argc, argv, &std::cout, &std::cout);
@@ -77,8 +162,8 @@ namespace stan {
       //////////////////////////////////////////////////
 
       unsigned int random_seed = 0;
-      
-      stan::services::u_int_argument* random_arg 
+
+      stan::services::u_int_argument* random_arg
         = dynamic_cast<stan::services::u_int_argument*>
         (parser.arg("random")->arg("seed"));
 
@@ -110,7 +195,7 @@ namespace stan {
       std::string data_file
         = dynamic_cast<stan::services::string_argument*>
         (parser.arg("data")->arg("file"))->value();
-      
+
       std::fstream data_stream(data_file.c_str(),
                                std::fstream::in);
       stan::io::dump data_var_context(data_stream);
@@ -129,7 +214,7 @@ namespace stan {
       std::string diagnostic_file
         = dynamic_cast<stan::services::string_argument*>
           (parser.arg("output")->arg("diagnostic_file"))->value();
-      
+
       std::fstream* diagnostic_stream = 0;
       if (diagnostic_file != "") {
         diagnostic_stream = new std::fstream(diagnostic_file.c_str(),
@@ -165,13 +250,13 @@ namespace stan {
 
       std::string init = dynamic_cast<stan::services::string_argument*>(
                          parser.arg("init"))->value();
-      
+
       interface::var_context_factory::dump_factory var_context_factory;
       if (!init::initialize_state<interface::var_context_factory::dump_factory>
           (init, cont_params, model, base_rng, &std::cout,
            var_context_factory))
         return stan::services::error_codes::SOFTWARE;
-      
+
       //////////////////////////////////////////////////
       //               Model Diagnostics              //
       //////////////////////////////////////////////////
@@ -181,19 +266,19 @@ namespace stan {
         for (int i = 0; i < cont_params.size(); ++i)
           cont_vector.at(i) = cont_params(i);
         std::vector<int> disc_vector;
-        
+
         stan::services::list_argument* test = dynamic_cast<stan::services::list_argument*>
                               (parser.arg("method")->arg("diagnose")->arg("test"));
-        
+
         if (test->value() == "gradient") {
           std::cout << std::endl << "TEST GRADIENT MODE" << std::endl;
 
           double epsilon = dynamic_cast<stan::services::real_argument*>
                            (test->arg("gradient")->arg("epsilon"))->value();
-          
+
           double error = dynamic_cast<stan::services::real_argument*>
                          (test->arg("gradient")->arg("error"))->value();
-          
+
           int num_failed
             = stan::model::test_gradients<true, true>
             (model, cont_vector, disc_vector,
@@ -212,9 +297,9 @@ namespace stan {
               (model, cont_vector, disc_vector,
                epsilon, error, *diagnostic_stream);
           }
-          
+
           (void) num_failed; // FIXME: do something with the number failed
-          
+
           return stan::services::error_codes::OK;
 
         }
@@ -229,14 +314,14 @@ namespace stan {
         for (int i = 0; i < cont_params.size(); ++i)
           cont_vector.at(i) = cont_params(i);
         std::vector<int> disc_vector;
-        
+
         stan::services::list_argument* algo = dynamic_cast<stan::services::list_argument*>
                               (parser.arg("method")->arg("optimize")->arg("algorithm"));
 
         int num_iterations = dynamic_cast<stan::services::int_argument*>(
                              parser.arg("method")->arg("optimize")->arg("iter"))->value();
 
-        bool save_iterations 
+        bool save_iterations
           = dynamic_cast<stan::services::bool_argument*>(parser.arg("method")
                                          ->arg("optimize")
                                          ->arg("save_iterations"))->value();
@@ -311,7 +396,7 @@ namespace stan {
           bfgs._conv_opts.tolAbsX = dynamic_cast<stan::services::real_argument*>(
                          algo->arg("bfgs")->arg("tol_param"))->value();
           bfgs._conv_opts.maxIts = num_iterations;
-          
+
           return_code = optimization::do_bfgs_optimize(model,bfgs, base_rng,
                                          lp, cont_vector, disc_vector,
                                          output_stream, &std::cout,
@@ -321,7 +406,7 @@ namespace stan {
           interface::callback::noop_callback callback;
           typedef stan::optimization::BFGSLineSearch
             <Model,stan::optimization::LBFGSUpdate<> > Optimizer;
-          
+
           Optimizer bfgs(model, cont_vector, disc_vector, &std::cout);
 
           bfgs.get_qnupdate().set_history_size(dynamic_cast<services::int_argument*>(
@@ -389,25 +474,25 @@ namespace stan {
         interface::recorder::csv sample_recorder(output_stream, "# ");
         interface::recorder::csv diagnostic_recorder(diagnostic_stream, "# ");
         interface::recorder::messages message_recorder(&std::cout, "# ");
-        
-        stan::io::mcmc_writer<Model, 
+
+        stan::io::mcmc_writer<Model,
                               interface::recorder::csv, interface::recorder::csv,
                               interface::recorder::messages>
           writer(sample_recorder, diagnostic_recorder, message_recorder, &std::cout);
-        
+
         // Sampling parameters
         int num_warmup = dynamic_cast<stan::services::int_argument*>(
                           parser.arg("method")->arg("sample")->arg("num_warmup"))->value();
-        
+
         int num_samples = dynamic_cast<stan::services::int_argument*>(
                           parser.arg("method")->arg("sample")->arg("num_samples"))->value();
-        
+
         int num_thin = dynamic_cast<stan::services::int_argument*>(
                        parser.arg("method")->arg("sample")->arg("thin"))->value();
-        
+
         bool save_warmup = dynamic_cast<stan::services::bool_argument*>(
                            parser.arg("method")->arg("sample")->arg("save_warmup"))->value();
-        
+
         stan::mcmc::sample s(cont_params, 0, 0);
 
         double warmDeltaT;
@@ -419,7 +504,7 @@ namespace stan {
         stan::services::list_argument* algo
           = dynamic_cast<stan::services::list_argument*>
             (parser.arg("method")->arg("sample")->arg("algorithm"));
-        
+
         stan::services::categorical_argument* adapt
           = dynamic_cast<stan::services::categorical_argument*>
             (parser.arg("method")->arg("sample")->arg("adapt"));
@@ -453,8 +538,8 @@ namespace stan {
 
         } else if (algo->value() == "hmc") {
           int engine_index = 0;
-          
-          stan::services::list_argument* engine 
+
+          stan::services::list_argument* engine
             = dynamic_cast<stan::services::list_argument*>
               (algo->arg("hmc")->arg("engine"));
 
@@ -465,7 +550,7 @@ namespace stan {
           }
 
           int metric_index = 0;
-          stan::services::list_argument* metric 
+          stan::services::list_argument* metric
             = dynamic_cast<stan::services::list_argument*>
               (algo->arg("hmc")->arg("metric"));
           if (metric->value() == "unit_e") {
@@ -620,14 +705,14 @@ namespace stan {
 
         // Warm-Up
         clock_t start = clock();
-        
+
         mcmc::warmup<Model, rng_t>(sampler_ptr, num_warmup, num_samples, num_thin,
                                    refresh, save_warmup,
                                    writer,
                                    s, model, base_rng,
                                    prefix, suffix, std::cout,
                                    startTransitionCallback);
-        
+
         clock_t end = clock();
         warmDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;
 
@@ -639,7 +724,7 @@ namespace stan {
 
         // Sampling
         start = clock();
-        
+
         mcmc::sample<Model, rng_t>
           (sampler_ptr, num_warmup, num_samples, num_thin,
            refresh, true,
@@ -647,7 +732,7 @@ namespace stan {
            s, model, base_rng,
            prefix, suffix, std::cout,
            startTransitionCallback);
-        
+
         end = clock();
         sampleDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;
 
