@@ -9,8 +9,8 @@
 #include <stan/services/io/write_iteration.hpp>
 #include <stan/services/error_codes.hpp>
 
-#include <stan/variational/advi_params_normal_fullrank.hpp>
-#include <stan/variational/advi_params_normal_meanfield.hpp>
+#include <stan/variational/families/normal_fullrank.hpp>
+#include <stan/variational/families/normal_meanfield.hpp>
 
 #include <stan/io/dump.hpp>
 
@@ -28,13 +28,16 @@ namespace stan {
     /**
      * AUTOMATIC DIFFERENTIATION VARIATIONAL INFERENCE
      *
-     * Calculates the "blackbox" Evidence Lower BOund (ELBO) by sampling
-     * from the standard multivariate normal (for now), affine transform
-     * the sample, and evaluating the log joint, adjusted by the entropy
-     * term of the normal
+     * Calculates the "blackbox" Evidence Lower BOund (ELBO) by sampling from
+     * the variational distribution and then evaluating the log joint,
+     * adjusted by the entropy term of the variational distribution
      *
      * @tparam M                     class of model
      * @tparam BaseRNG               class of random number generator
+     * @tparam MeanField      mean-field class, which has mean and log-std
+     *                        vector of affine transform
+     * @tparam FullRank       full-rank class, which has mean and cholesky
+     *                        factor of affine transform
      * @param  m                     stan model
      * @param  cont_params           initialization of continuous parameters
      * @param  n_monte_carlo_grad    number of samples for gradient computation
@@ -47,7 +50,7 @@ namespace stan {
      * @param  output_stream         stream for parameters output
      * @param  diagnostic_stream     stream for ELBO output
      */
-    template <class M, class BaseRNG>
+    template <class M, class BaseRNG, class MeanField, class FullRank> // FIXME either or, not both
     class advi {
     public:
       advi(M& m,
@@ -130,13 +133,14 @@ namespace stan {
        *
        * Runs stochastic gradient ascent for some number of iterations
        *
-       * @param muL            mean and cholesky factor of affine transform
-       * @param tol_rel_obj    relative tolerance parameter for convergence
-       * @param max_iterations max number of iterations to run algorithm
+       * @tparam FullRank       full-rank class, which has mean and cholesky
+       *                        factor of affine transform
+       * @param  tol_rel_obj    relative tolerance parameter for convergence
+       * @param  max_iterations max number of iterations to run algorithm
        */
-      void robbins_monro_adagrad(advi_params_normal_fullrank& muL,
-                                    double tol_rel_obj,
-                                    int max_iterations) {
+      void robbins_monro_adagrad(FullRank& muL,
+                                 double tol_rel_obj,
+                                 int max_iterations) {
         static const char* function =
           "stan::variational::advi.robbins_monro_adagrad";
 
@@ -294,13 +298,14 @@ namespace stan {
        *
        * Runs stochastic gradient ascent for some number of iterations
        *
-       * @param muomega         mean and log-std vector of affine transform
-       * @param tol_rel_obj     relative tolerance parameter for convergence
-       * @param max_iterations  max number of iterations to run algorithm
+       * @tparam MeanField      mean-field class, which has mean and log-std
+       *                        vector of affine transform
+       * @param  tol_rel_obj    relative tolerance parameter for convergence
+       * @param  max_iterations max number of iterations to run algorithm
        */
-      void robbins_monro_adagrad(advi_params_normal_meanfield& muomega,
-                                    double tol_rel_obj,
-                                    int max_iterations) {
+      void robbins_monro_adagrad(MeanField& muomega,
+                                 double tol_rel_obj,
+                                 int max_iterations) {
         static const char* function =
           "stan::variational::advi.robbins_monro_adagrad";
 
@@ -470,7 +475,7 @@ namespace stan {
         Eigen::VectorXd mu = cont_params_;
         Eigen::MatrixXd L  = Eigen::MatrixXd::Identity(model_.num_params_r(),
                                                        model_.num_params_r());
-        advi_params_normal_fullrank muL = advi_params_normal_fullrank(mu, L);
+        FullRank muL = FullRank(mu, L);
 
         // run inference algorithm
         robbins_monro_adagrad(muL, tol_rel_obj, max_iterations);
@@ -518,7 +523,7 @@ namespace stan {
                                                 model_.num_params_r(), 0.0);
                                                 // initializing omega = 0
                                                 // means sigma = 1
-        advi_params_normal_meanfield muomega = advi_params_normal_meanfield(mu, omega);
+        MeanField muomega = MeanField(mu, omega);
 
         // run inference algorithm
         robbins_monro_adagrad(muomega, tol_rel_obj, max_iterations);

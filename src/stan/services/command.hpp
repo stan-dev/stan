@@ -826,7 +826,7 @@ namespace stan {
               (*output_stream) << std::endl;
             }
 
-            stan::variational::advi<Model, rng_t>
+            stan::variational::advi<Model, rng_t, double, variational::normal_fullrank>
               cmd_advi(model,
                        cont_params,
                        grad_samples,
@@ -855,7 +855,7 @@ namespace stan {
               (*output_stream) << std::endl;
             }
 
-            stan::variational::advi<Model, rng_t>
+            stan::variational::advi<Model, rng_t, variational::normal_meanfield, double>
               cmd_advi(model,
                        cont_params,
                        grad_samples,

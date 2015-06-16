@@ -29,7 +29,7 @@ public:
     output_stream_.str("");
     diagnostic_stream_.str("");
 
-    advi_ = new stan::variational::advi<stan_model, rng_t>
+    advi_ = new stan::variational::advi<stan_model, rng_t, stan::variational::normal_meanfield, stan::variational::normal_fullrank>
       (*model_, cont_params_,
        10, 100, 0.01,
        base_rng_,
@@ -37,7 +37,7 @@ public:
        &print_stream_,
        &output_stream_,
        &diagnostic_stream_);
-    advi_null_streams_ = new stan::variational::advi<stan_model, rng_t>
+    advi_null_streams_ = new stan::variational::advi<stan_model, rng_t, stan::variational::normal_meanfield, stan::variational::normal_fullrank>
       (*model_null_stream_, cont_params_,
        10, 100, 0.01,
        base_rng_,
@@ -54,8 +54,8 @@ public:
     delete model_null_stream_;
   }
 
-  stan::variational::advi<stan_model, rng_t> *advi_;
-  stan::variational::advi<stan_model, rng_t> *advi_null_streams_;
+  stan::variational::advi<stan_model, rng_t, stan::variational::normal_meanfield, stan::variational::normal_fullrank> *advi_;
+  stan::variational::advi<stan_model, rng_t, stan::variational::normal_meanfield, stan::variational::normal_fullrank> *advi_null_streams_;
   std::stringstream model_stream_;
   std::stringstream print_stream_;
   std::stringstream output_stream_;

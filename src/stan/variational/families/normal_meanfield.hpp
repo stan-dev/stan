@@ -1,5 +1,5 @@
-#ifndef STAN_VARIATIONAL_ADVI_PARAMS_NORMAL_MEANFIELD__HPP
-#define STAN_VARIATIONAL_ADVI_PARAMS_NORMAL_MEANFIELD__HPP
+#ifndef STAN_VARIATIONAL_NORMAL_MEANFIELD_HPP
+#define STAN_VARIATIONAL_NORMAL_MEANFIELD_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
@@ -24,18 +24,27 @@ namespace stan {
 
   namespace variational {
 
-    class advi_params_normal_meanfield {
+    /*
+     * MULTIVARIATE NORMAL DISTRIBUTION MEAN-FIELD
+     *
+     * Variational family as mean-field multivariate normal distribution, with
+     * free parameters mean and log standard deviation.
+     *
+     * @param  mu    mean vector
+     * @param  omega log standard deviation vector
+     */
+    class normal_meanfield {
     private:
-      Eigen::VectorXd mu_;     // Mean vector
-      Eigen::VectorXd omega_;  // Log standard deviation vector
+      Eigen::VectorXd mu_;
+      Eigen::VectorXd omega_;
       int dimension_;
 
     public:
-      advi_params_normal_meanfield(const Eigen::VectorXd& mu,
+      normal_meanfield(const Eigen::VectorXd& mu,
                                    const Eigen::VectorXd& omega) :
       mu_(mu), omega_(omega), dimension_(mu.size()) {
         static const char* function =
-          "stan::variational::advi_params_normal_meanfield";
+          "stan::variational::normal_meanfield";
 
         stan::math::check_size_match(function,
                              "Dimension of mean vector", dimension_,
@@ -55,7 +64,7 @@ namespace stan {
       // Mutators
       void set_mu(const Eigen::VectorXd& mu) {
         static const char* function =
-          "stan::variational::advi_params_normal_meanfield::set_mu";
+          "stan::variational::normal_meanfield::set_mu";
 
         stan::math::check_size_match(function,
                                "Dimension of input vector", mu.size(),
@@ -66,7 +75,7 @@ namespace stan {
 
       void set_omega(const Eigen::VectorXd& omega) {
         static const char* function =
-          "stan::variational::advi_params_normal_meanfield::set_omega";
+          "stan::variational::normal_meanfield::set_omega";
 
         stan::math::check_size_match(function,
                                "Dimension of input vector", omega.size(),
@@ -87,7 +96,7 @@ namespace stan {
       // Implements S^{-1}(eta) = sigma * eta + \mu
       Eigen::VectorXd transform(const Eigen::VectorXd& eta) const {
         static const char* function =
-          "stan::variational::advi_params_normal_meanfield::transform";
+          "stan::variational::normal_meanfield::transform";
 
         stan::math::check_size_match(function,
                          "Dimension of mean vector", dimension_,
@@ -142,7 +151,7 @@ namespace stan {
                      BaseRNG& rng,
                      std::ostream* print_stream) {
         static const char* function =
-          "stan::variational::advi_params_normal_meanfield::calc_grad";
+          "stan::variational::normal_meanfield::calc_grad";
 
         stan::math::check_size_match(function,
                         "Dimension of mu grad vector", mu_grad.size(),

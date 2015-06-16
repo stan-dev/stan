@@ -1,5 +1,5 @@
-#ifndef STAN_VARIATIONAL_ADVI_PARAMS_NORMAL_FULLRANK__HPP
-#define STAN_VARIATIONAL_ADVI_PARAMS_NORMAL_FULLRANK__HPP
+#ifndef STAN_VARIATIONAL_NORMAL_FULLRANK_HPP
+#define STAN_VARIATIONAL_NORMAL_FULLRANK_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/LDLT_factor.hpp>
@@ -27,19 +27,28 @@ namespace stan {
 
   namespace variational {
 
-    class advi_params_normal_fullrank {
+    /*
+     * MULTIVARIATE NORMAL DISTRIBUTION FULL-RANK
+     *
+     * Variational family as full-rank multivariate normal distribution, with free
+     * parameters mean and cholesky factor of the covariance
+     *
+     * @param  mu     mean vector
+     * @param  L_chol cholesky factor of covariance (\Sigma = L_chol *
+     *                L_chol.transpose())
+     */
+    class normal_fullrank {
     private:
-      Eigen::VectorXd mu_;      // Mean of location-scale family
-      Eigen::MatrixXd L_chol_;  // Cholesky factor of scale matrix
-                                // NOTE: \Sigma = L_chol_ * L_chol_.transpose()
+      Eigen::VectorXd mu_;
+      Eigen::MatrixXd L_chol_;
       int dimension_;
 
     public:
-      advi_params_normal_fullrank(const Eigen::VectorXd& mu,
+      normal_fullrank(const Eigen::VectorXd& mu,
                                   const Eigen::MatrixXd& L_chol) :
       mu_(mu), L_chol_(L_chol), dimension_(mu.size()) {
         static const char* function =
-          "stan::variational::advi_params_normal_fullrank";
+          "stan::variational::normal_fullrank";
 
         stan::math::check_size_match(function,
                                "Dimension of mean vector",     dimension_,
@@ -57,7 +66,7 @@ namespace stan {
       // Mutators
       void set_mu(const Eigen::VectorXd& mu) {
         static const char* function =
-          "stan::variational::advi_params_normal_fullrank::set_mu";
+          "stan::variational::normal_fullrank::set_mu";
 
         stan::math::check_size_match(function,
                                "Dimension of input vector", mu.size(),
@@ -68,7 +77,7 @@ namespace stan {
 
       void set_L_chol(const Eigen::MatrixXd& L_chol) {
         static const char* function =
-          "stan::variational::advi_params_normal_fullrank::set_L_chol";
+          "stan::variational::normal_fullrank::set_L_chol";
 
         stan::math::check_size_match(function,
                                "Dimension of mean vector",     dimension_,
@@ -98,7 +107,7 @@ namespace stan {
       Eigen::VectorXd
       transform(const Eigen::VectorXd& eta) const {
         static const char* function =
-          "stan::variational::advi_params_normal_fullrank::transform";
+          "stan::variational::normal_fullrank::transform";
 
         stan::math::check_size_match(function,
                          "Dimension of input vector", eta.size(),
@@ -109,8 +118,8 @@ namespace stan {
       }
 
       /**
-       * Draw samples from the variational distribution, which in this case is a
-       * fullrank Gaussian.
+       * Draws samples from the variational distribution, which in this case is
+       * a fullrank Gaussian.
        *
        * @tparam BaseRNG           class of random number generator
        * @return                   a sample from the variational distribution
@@ -152,7 +161,7 @@ namespace stan {
                      BaseRNG& rng,
                      std::ostream* print_stream) {
         static const char* function =
-          "stan::variational::advi_params_normal_fullrank::calc_grad";
+          "stan::variational::normal_fullrank::calc_grad";
 
         stan::math::check_size_match(function,
                         "Dimension of muL", dimension_,

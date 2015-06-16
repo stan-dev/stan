@@ -28,7 +28,7 @@ TEST(advi_test, hier_logistic_cp_constraint_meanfield) {
   Eigen::VectorXd cont_params = Eigen::VectorXd::Zero(my_model.num_params_r());
 
   // ADVI
-  stan::variational::advi<Model_cp, rng_t> test_advi(my_model,
+  stan::variational::advi<Model_cp, rng_t, stan::variational::normal_meanfield, stan::variational::normal_fullrank> test_advi(my_model,
                                                      cont_params,
                                                      10,
                                                      100,
