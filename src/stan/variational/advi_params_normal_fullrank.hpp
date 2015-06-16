@@ -75,7 +75,6 @@ namespace stan {
                                "Dimension of Cholesky factor", L_chol.rows());
         stan::math::check_lower_triangular(function,
                                "Cholesky factor", L_chol);
-
         L_chol_ = L_chol;
       }
 
@@ -85,8 +84,7 @@ namespace stan {
       double entropy() const {
         double tmp(0.0);
         double result(
-          0.5 * static_cast<double>(dimension_)
-          * (1.0 + stan::math::LOG_TWO_PI));
+          0.5 * static_cast<double>(dimension_) * (1.0 + stan::math::LOG_TWO_PI));
         for (int d = 0; d < dimension_; ++d) {
           tmp = fabs(L_chol_(d, d));
           if (tmp != 0.0) {
@@ -96,18 +94,18 @@ namespace stan {
         return result;
       }
 
-      // Implements f^{-1}(\check{z}) = L\check{z} + \mu
+      // Implements S^{-1}(eta) = L*eta + \mu
       Eigen::VectorXd
-      transform(const Eigen::VectorXd& z_check) const {
+      transform(const Eigen::VectorXd& eta) const {
         static const char* function =
           "stan::variational::advi_params_normal_fullrank::transform";
 
         stan::math::check_size_match(function,
-                         "Dimension of input vector", z_check.size(),
+                         "Dimension of input vector", eta.size(),
                          "Dimension of mean vector",  dimension_);
-        stan::math::check_not_nan(function, "Input vector", z_check);
+        stan::math::check_not_nan(function, "Input vector", eta);
 
-        return L_chol_*z_check + mu_;
+        return (L_chol_*eta).array() + mu_.array();
       }
 
       /**
@@ -172,19 +170,19 @@ namespace stan {
         L_grad  = Eigen::MatrixXd::Zero(dimension_, dimension_);
         double tmp_lp = 0.0;
         Eigen::VectorXd tmp_mu_grad = Eigen::VectorXd::Zero(dimension_);
-        Eigen::VectorXd z_check = Eigen::VectorXd::Zero(dimension_);
-        Eigen::VectorXd z_tilde = Eigen::VectorXd::Zero(dimension_);
+        Eigen::VectorXd eta = Eigen::VectorXd::Zero(dimension_);
+        Eigen::VectorXd zeta = Eigen::VectorXd::Zero(dimension_);
 
         // Naive Monte Carlo integration
         for (int i = 0; i < n_monte_carlo_grad; ++i) {
           // Draw from standard normal and transform to real-coordinate space
           for (int d = 0; d < dimension_; ++d) {
-            z_check(d) = stan::math::normal_rng(0, 1, rng);
+            eta(d) = stan::math::normal_rng(0, 1, rng);
           }
-          z_tilde = transform(z_check);
+          zeta = transform(eta);
 
           // Compute gradient step in real-coordinate space
-          stan::model::gradient(m, z_tilde, tmp_lp, tmp_mu_grad,
+          stan::model::gradient(m, zeta, tmp_lp, tmp_mu_grad,
                                 print_stream);
 
           // Update mu
@@ -193,7 +191,7 @@ namespace stan {
           // Update L (lower triangular)
           for (int ii = 0; ii < dimension_; ++ii) {
             for (int jj = 0; jj <= ii; ++jj) {
-              L_grad(ii, jj) += tmp_mu_grad(ii) * z_check(jj);
+              L_grad(ii, jj) += tmp_mu_grad(ii) * eta(jj);
             }
           }
         }

@@ -84,7 +84,7 @@ namespace stan {
                (1.0 + stan::math::LOG_TWO_PI) + omega_.sum();
       }
 
-      // Implement f^{-1}(\check{z}) = sigma * \check{z} + \mu
+      // Implements S^{-1}(eta) = sigma * eta + \mu
       Eigen::VectorXd transform(const Eigen::VectorXd& eta) const {
         static const char* function =
           "stan::variational::advi_params_normal_meanfield::transform";
