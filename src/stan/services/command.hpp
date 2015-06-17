@@ -124,6 +124,7 @@
 #include <stan/interface/recorder/values.hpp>
 
 #include <fstream>
+#include <iostream>
 #include <limits>
 #include <stdexcept>
 #include <string>
@@ -352,7 +353,7 @@ namespace stan {
           std::cout << "initial log joint probability = " << lp << std::endl;
           if (output_stream && save_iterations) {
             io::write_iteration(*output_stream, model, base_rng,
-                            lp, cont_vector, disc_vector);
+                                lp, cont_vector, disc_vector);
           }
 
           double lastlp = lp * 1.1;
@@ -373,7 +374,7 @@ namespace stan {
 
             if (output_stream && save_iterations) {
               io::write_iteration(*output_stream, model, base_rng,
-                              lp, cont_vector, disc_vector);
+                                  lp, cont_vector, disc_vector);
             }
           }
           return_code = stan::services::error_codes::OK;
@@ -521,7 +522,8 @@ namespace stan {
         }
 
         if (algo->value() == "fixed_param") {
-          sampler_ptr = new stan::mcmc::fixed_param_sampler();
+          sampler_ptr = new stan::mcmc::fixed_param_sampler(&std::cout,
+                                                            NULL);
 
           adapt_engaged = false;
 

@@ -16,8 +16,8 @@ namespace stan {
     class dense_e_nuts : public base_nuts<M, dense_e_point, dense_e_metric,
                                           expl_leapfrog, BaseRNG> {
     public:
-      dense_e_nuts(M &m, BaseRNG& rng, std::ostream* o = &std::cout,
-                   std::ostream* e = 0)
+      dense_e_nuts(M &m, BaseRNG& rng, std::ostream* o,
+                   std::ostream* e)
         : base_nuts<M, dense_e_point, dense_e_metric, expl_leapfrog,
                     BaseRNG>(m, rng, o, e) {
         this->name_ = "NUTS with a dense Euclidean metric";
