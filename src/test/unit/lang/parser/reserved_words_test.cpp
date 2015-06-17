@@ -113,6 +113,18 @@ TEST(parserReservedWords, macro_STAN_PATCH) {
   test_throws("reserved/STAN_PATCH", "variable identifier (name) may not be reserved word");
 }
 
+TEST(parserReservedWords, macro_STAN_MATH_MAJOR) {
+  test_throws("reserved/STAN_MATH_MAJOR", "variable identifier (name) may not be reserved word");
+}
+
+TEST(parserReservedWords, macro_STAN_MATH_MINOR) {
+  test_throws("reserved/STAN_MATH_MINOR", "variable identifier (name) may not be reserved word");
+}
+
+TEST(parserReservedWords, macro_STAN_MATH_PATCH) {
+  test_throws("reserved/STAN_MATH_PATCH", "variable identifier (name) may not be reserved word");
+}
+
 TEST(parserReservedWords, alignas) {
   test_throws("reserved/alignas", "variable identifier (name) may not be reserved word");
 }

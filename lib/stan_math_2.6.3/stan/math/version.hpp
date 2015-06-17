@@ -2,8 +2,14 @@
 #define STAN_MATH_VERSION_HPP
 
 #include <string>
+
+#ifndef STRING_EXPAND
 #define STRING_EXPAND(s) #s
+#endif
+
+#ifndef STRING
 #define STRING(s) STRING_EXPAND(s)
+#endif
 
 #define STAN_MATH_MAJOR 2
 #define STAN_MATH_MINOR 6
