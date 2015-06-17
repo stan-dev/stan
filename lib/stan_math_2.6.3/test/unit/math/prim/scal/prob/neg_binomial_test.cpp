@@ -10,21 +10,39 @@ TEST(ProbDistributionsNegBinomial, error_check) {
   EXPECT_NO_THROW(stan::math::neg_binomial_rng(0.5,1,rng));
   EXPECT_NO_THROW(stan::math::neg_binomial_rng(1e9,1,rng));
 
-  EXPECT_THROW(stan::math::neg_binomial_rng(0, 2, rng),std::domain_error);
-  EXPECT_THROW(stan::math::neg_binomial_rng(-6, 2, rng),std::domain_error);
-  EXPECT_THROW(stan::math::neg_binomial_rng(6, -2, rng),std::domain_error);
-  EXPECT_THROW(stan::math::neg_binomial_rng(stan::math::positive_infinity(), 2, 
-                                            rng),
-               std::domain_error);
-  EXPECT_THROW(stan::math::neg_binomial_rng(1e10,1,rng),std::domain_error);
+  EXPECT_THROW(stan::math::neg_binomial_rng(0, -2, rng),
+                 std::domain_error);
+  EXPECT_THROW(stan::math::neg_binomial_rng(6, -2, rng),
+                   std::domain_error);
+  EXPECT_THROW(stan::math::neg_binomial_rng(-6, -0.1, rng),
+                   std::domain_error);
+  EXPECT_THROW(stan::math::neg_binomial_rng(
+                 stan::math::positive_infinity(), 2, rng),
+                 std::domain_error);
+  EXPECT_THROW(stan::math::neg_binomial_rng(
+                 stan::math::positive_infinity(), 6, rng),
+                 std::domain_error);
+  EXPECT_THROW(stan::math::neg_binomial_rng(2,
+                 stan::math::positive_infinity(), rng),
+                 std::domain_error);
 
-  EXPECT_THROW(stan::math::neg_binomial_rng(6,stan::math::positive_infinity(), 
-                                            rng),
-               std::domain_error);
+  std::string error_msg;
+  error_msg = "stan::math::neg_binomial_rng: Random number that "
+              "came from gamma distribution is";
+  try {
+    stan::math::neg_binomial_rng(1e10,1,rng);
+    FAIL() << "neg_binomial_rng should have thrown" << std::endl;
+  } catch (const std::exception& e) {
+    if (std::string(e.what()).find(error_msg) == std::string::npos)
+      FAIL() << "Error message is different than expected" << std::endl
+             << "EXPECTED: " << error_msg << std::endl
+             << "FOUND: " << e.what() << std::endl;
+    SUCCEED();
+  }
 }
 
-void expected_bin_sizes(double *expect, const int K, 
-                        const int N, 
+void expected_bin_sizes(double *expect, const int K,
+                        const int N,
                         const double alpha, const double beta) {
   double p = 0;
   for(int i = 0 ; i < K; i++)  {
@@ -51,14 +69,14 @@ TEST(ProbDistributionsNegBinomial, chiSquareGoodnessFitTest) {
   double bin [K];
   double expect [K];
 
-  for(int i = 0 ; i < K; i++) 
+  for(int i = 0 ; i < K; i++)
     bin[i] = 0;
   expected_bin_sizes(expect, K, N, alpha, beta);
 
   while (count < N) {
     int a = stan::math::neg_binomial_rng(alpha, beta, rng);
     int i = 0;
-    while (i < K-1 && a > loc[i]) 
+    while (i < K-1 && a > loc[i])
       ++i;
     ++bin[i];
     count++;
@@ -89,14 +107,14 @@ TEST(ProbDistributionsNegBinomial, chiSquareGoodnessFitTest2) {
   double bin [K];
   double expect [K];
 
-  for(int i = 0 ; i < K; i++) 
+  for(int i = 0 ; i < K; i++)
     bin[i] = 0;
   expected_bin_sizes(expect, K, N, alpha, beta);
 
   while (count < N) {
     int a = stan::math::neg_binomial_rng(alpha, beta, rng);
     int i = 0;
-    while (i < K-1 && a > loc[i]) 
+    while (i < K-1 && a > loc[i])
       ++i;
     ++bin[i];
     count++;
@@ -127,14 +145,14 @@ TEST(ProbDistributionsNegBinomial, chiSquareGoodnessFitTest3) {
   double bin [K];
   double expect [K];
 
-  for(int i = 0 ; i < K; i++) 
+  for(int i = 0 ; i < K; i++)
     bin[i] = 0;
   expected_bin_sizes(expect, K, N, alpha, beta);
 
   while (count < N) {
     int a = stan::math::neg_binomial_rng(alpha, beta, rng);
     int i = 0;
-    while (i < K-1 && a > loc[i]) 
+    while (i < K-1 && a > loc[i])
       ++i;
     ++bin[i];
     count++;

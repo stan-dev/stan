@@ -9,18 +9,50 @@ TEST(ProbDistributionsNegBinomial, error_check) {
   EXPECT_NO_THROW(stan::math::neg_binomial_2_rng(0.5,1,rng));
   EXPECT_NO_THROW(stan::math::neg_binomial_2_rng(1e8,1,rng));
 
-  EXPECT_THROW(stan::math::neg_binomial_2_rng(0, -2, rng),std::domain_error);
-  EXPECT_THROW(stan::math::neg_binomial_2_rng(-6, 2, rng),std::domain_error);
-  EXPECT_THROW(stan::math::neg_binomial_2_rng(-6, -0.1, rng),std::domain_error);
+  EXPECT_THROW(stan::math::neg_binomial_2_rng(0, -2, rng),
+                 std::domain_error);
+  EXPECT_THROW(stan::math::neg_binomial_2_rng(6, -2, rng),
+                   std::domain_error);
+  EXPECT_THROW(stan::math::neg_binomial_2_rng(-6, -0.1, rng),
+                   std::domain_error);
+  EXPECT_THROW(stan::math::neg_binomial_2_rng(
+                 stan::math::positive_infinity(), 2, rng),
+                 std::domain_error);
+  EXPECT_THROW(stan::math::neg_binomial_2_rng(
+                 stan::math::positive_infinity(), 6, rng),
+                 std::domain_error);
+  EXPECT_THROW(stan::math::neg_binomial_2_rng(2,
+                 stan::math::positive_infinity(), rng),
+                 std::domain_error);
 
-  EXPECT_THROW(stan::math::neg_binomial_2_rng(1e10, 1e20, rng),std::domain_error);
+  std::string error_msg;
 
-  EXPECT_THROW(stan::math::neg_binomial_2_rng(stan::math::positive_infinity(), 2,
-                                            rng),
-               std::domain_error);
-  EXPECT_THROW(stan::math::neg_binomial_2_rng(stan::math::positive_infinity(),
-                                            6, rng),
-               std::domain_error);
+  error_msg = "stan::math::neg_binomial_2_rng: Location parameter "
+              "divided by the precision parameter is "
+              "inf, but must be finite!";
+  try {
+    stan::math::neg_binomial_2_rng(1e300, 1e-300, rng);
+    FAIL() << "neg_binomial_2_rng should have thrown" << std::endl;
+  } catch (const std::exception& e) {
+    if (std::string(e.what()).find(error_msg) == std::string::npos)
+      FAIL() << "Error message is different than expected" << std::endl
+             << "EXPECTED: " << error_msg << std::endl
+             << "FOUND: " << e.what() << std::endl;
+    SUCCEED();
+  }
+
+  error_msg = "stan::math::neg_binomial_2_rng: Random number that "
+              "came from gamma distribution is";
+  try {
+    stan::math::neg_binomial_2_rng(1e10, 1e20, rng);
+    FAIL() << "neg_binomial_2_rng should have thrown" << std::endl;
+  } catch (const std::exception& e) {
+    if (std::string(e.what()).find(error_msg) == std::string::npos)
+      FAIL() << "Error message is different than expected" << std::endl
+             << "EXPECTED: " << error_msg << std::endl
+             << "FOUND: " << e.what() << std::endl;
+    SUCCEED();
+  }
 }
 
 TEST(ProbDistributionsNegBinomial, chiSquareGoodnessFitTest) {
