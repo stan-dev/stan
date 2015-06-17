@@ -35,7 +35,7 @@ namespace stan {
           (*notice_stream) << "initial log joint probability = " << lp << std::endl;
         if (output_stream && save_iterations) {
           io::write_iteration(*output_stream, model, base_rng,
-                              lp, cont_vector, disc_vector);
+                              lp, cont_vector, disc_vector, output_stream);
         }
 
         int ret = 0;
@@ -77,7 +77,7 @@ namespace stan {
 
           if (output_stream && save_iterations) {
             io::write_iteration(*output_stream, model, base_rng,
-                               lp, cont_vector, disc_vector);
+                                lp, cont_vector, disc_vector, output_stream);
           }
         }
 

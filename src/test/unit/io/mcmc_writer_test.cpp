@@ -6,6 +6,8 @@
 
 #include <stan/mcmc/sample.hpp>
 #include <stan/mcmc/hmc/nuts/diag_e_nuts.hpp>
+#include <stan/mcmc/hmc/nuts/adapt_diag_e_nuts.hpp>
+#include <stan/interface/recorder/messages.hpp>
 
 #include <sstream>
 #include <string>

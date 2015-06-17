@@ -15,10 +15,11 @@ namespace stan {
                            RNG& base_rng,
                            double lp,
                            std::vector<double>& cont_vector,
-                           std::vector<int>& disc_vector) {
+                           std::vector<int>& disc_vector,
+                           std::ostream* o) {
         std::vector<double> model_values;
         model.write_array(base_rng, cont_vector, disc_vector, model_values,
-                          true, true, &output_stream);
+                          true, true, o);
         write_iteration_csv(output_stream, lp, model_values);
       }
 

@@ -1,6 +1,8 @@
-#include <stan/services/command.hpp>
 #include <gtest/gtest.h>
 #include <test/test-models/good/services/test_lp.hpp>
+#include <boost/random/additive_combine.hpp>
+#include <stan/mcmc/hmc/nuts/adapt_unit_e_nuts.hpp>
+#include <stan/services/init/init_adapt.hpp>
 
 typedef test_lp_model_namespace::test_lp_model Model;
 typedef boost::ecuyer1988 rng_t;

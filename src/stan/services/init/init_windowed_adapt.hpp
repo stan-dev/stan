@@ -17,7 +17,7 @@ namespace stan {
                                unsigned int num_warmup,
                                const Eigen::VectorXd& cont_params,
                                std::ostream* o) {
-        init_adapt<Sampler>(sampler, adapt, cont_params);
+        init_adapt<Sampler>(sampler, adapt, cont_params, o);
 
         unsigned int init_buffer
           = dynamic_cast<stan::services::u_int_argument*>

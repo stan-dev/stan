@@ -3,6 +3,7 @@
 #include <stan/optimization/bfgs.hpp>
 #include <test/test-models/good/optimization/rosenbrock.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
+#include <boost/random/additive_combine.hpp>
 
 typedef rosenbrock_model_namespace::rosenbrock_model Model;
 typedef boost::ecuyer1988 rng_t; // (2**50 = 1T samples, 1000 chains)

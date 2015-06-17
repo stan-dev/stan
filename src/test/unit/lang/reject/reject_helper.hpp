@@ -37,7 +37,7 @@ void reject_test(const std::string& expected_msg1 = "",
     std::vector<double> cont_vector(model.num_params_r(), 0.0);
     std::vector<int> disc_vector;
     double lp = model.template log_prob<false,false>(cont_vector, disc_vector, &std::cout);    
-    write_iteration(model_output, model, base_rng, lp, cont_vector, disc_vector);
+    write_iteration(model_output, model, base_rng, lp, cont_vector, disc_vector, &std::cout);
   } catch (const E& e) {
     expect_substring(e.what(), expected_msg1);
     expect_substring(e.what(), expected_msg2);
