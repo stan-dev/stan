@@ -29,7 +29,9 @@ TEST(Services, do_bfgs_optimize__bfgs) {
   stan::io::dump dummy_context(data_stream);
   Model model(dummy_context);
 
-  Optimizer_BFGS bfgs(model, cont_vector, disc_vector, &std::cout);
+  std::stringstream out;
+  Optimizer_BFGS bfgs(model, cont_vector, disc_vector, &out);
+  EXPECT_EQ("", out.str());
 
   double lp = 0;
   bool save_iterations = true;
@@ -41,11 +43,13 @@ TEST(Services, do_bfgs_optimize__bfgs) {
   std::fstream* output_stream = 0;
   mock_callback callback;
 
+  std::stringstream notice;
   return_code = stan::services::optimization::do_bfgs_optimize(model,bfgs, base_rng,
                                                                lp, cont_vector, disc_vector,
-                                                               output_stream, &std::cout,
+                                                               output_stream, &notice,
                                                                save_iterations, refresh,
                                                                callback);
+  EXPECT_EQ("initial log joint probability = -4\nOptimization terminated normally: \n  Convergence detected: relative gradient magnitude is below tolerance\n", notice.str());
   EXPECT_FLOAT_EQ(return_code, 0);
   EXPECT_EQ(33, callback.n);
 }
@@ -61,7 +65,9 @@ TEST(Services, do_bfgs_optimize__lbfgs) {
   Model model(dummy_context);
 
   typedef stan::optimization::BFGSLineSearch<Model,stan::optimization::LBFGSUpdate<> > Optimizer_LBFGS;
-  Optimizer_LBFGS lbfgs(model, cont_vector, disc_vector, &std::cout);
+  std::stringstream out;
+  Optimizer_LBFGS lbfgs(model, cont_vector, disc_vector, &out);
+  EXPECT_EQ("", out.str());
 
 
   double lp = 0;
@@ -74,11 +80,13 @@ TEST(Services, do_bfgs_optimize__lbfgs) {
   std::fstream* output_stream = 0;
   mock_callback callback;
 
+  std::stringstream notice;
   return_code = stan::services::optimization::do_bfgs_optimize(model, lbfgs, base_rng,
                                                                lp, cont_vector, disc_vector,
-                                                               output_stream, &std::cout,
+                                                               output_stream, &notice,
                                                                save_iterations, refresh,
                                                                callback);
+  EXPECT_EQ("initial log joint probability = -4\nOptimization terminated normally: \n  Convergence detected: relative gradient magnitude is below tolerance\n", notice.str());
   EXPECT_FLOAT_EQ(return_code, 0);
   EXPECT_EQ(35, callback.n);
 }

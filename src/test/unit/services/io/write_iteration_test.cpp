@@ -39,9 +39,11 @@ TEST_F(StanUi, write_iteration) {
   cont_vector.push_back(0);
   cont_vector.push_back(0);
 
+  std::stringstream out;
   stan::services::io::write_iteration(stream, model, base_rng,
                                       lp, cont_vector, disc_vector,
-                                      &std::cout);
+                                      &out);
+  EXPECT_EQ("", out.str());
   EXPECT_EQ("1,0,0,1,1,2713\n", stream.str())
     << "the output should be (1,  0,       0,    exp(0),    exp(0), 2713) \n"
     << "                     (lp, y[1], y[2], exp(y[1]), exp(y[2]),  xgq)";

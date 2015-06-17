@@ -1,7 +1,7 @@
 #include <stan/io/stan_csv_reader.hpp>
-
 #include <gtest/gtest.h>
 #include <fstream>
+#include <sstream>
 
 class StanIoStanCsvReader : public testing::Test {
   
@@ -209,9 +209,9 @@ TEST_F(StanIoStanCsvReader,read_samples1) {
 }
 
 TEST_F(StanIoStanCsvReader,ParseBlocker) {
-  
   stan::io::stan_csv blocker0;
-  blocker0 = stan::io::stan_csv_reader::parse(blocker0_stream, &std::cout);
+  std::stringstream out;
+  blocker0 = stan::io::stan_csv_reader::parse(blocker0_stream, &out);
   
   // metadata
   EXPECT_EQ(1, blocker0.metadata.stan_version_major);
@@ -357,7 +357,8 @@ TEST_F(StanIoStanCsvReader,ParseBlocker) {
   
   EXPECT_FLOAT_EQ(0.307221, blocker0.timing.warmup);
   EXPECT_FLOAT_EQ(0.350392, blocker0.timing.sampling);
-  
+
+  EXPECT_EQ("", out.str());
 }
 
 TEST_F(StanIoStanCsvReader,read_metadata2) {
@@ -454,7 +455,8 @@ TEST_F(StanIoStanCsvReader,read_samples2) {
 
 TEST_F(StanIoStanCsvReader,ParseEpil) {
   stan::io::stan_csv epil0;
-  epil0 = stan::io::stan_csv_reader::parse(epil0_stream, &std::cout);
+  std::stringstream out;
+  epil0 = stan::io::stan_csv_reader::parse(epil0_stream, &out);
   
   // metadata
   EXPECT_EQ(1, epil0.metadata.stan_version_major);
@@ -524,12 +526,14 @@ TEST_F(StanIoStanCsvReader,ParseEpil) {
   
   EXPECT_FLOAT_EQ(4.60978, epil0.timing.warmup);
   EXPECT_FLOAT_EQ(6.02445, epil0.timing.sampling);
-  
+
+  EXPECT_EQ("", out.str());
 }
 
 TEST_F(StanIoStanCsvReader,ParseBlockerNondiag) {
   stan::io::stan_csv blocker_nondiag;
-  blocker_nondiag = stan::io::stan_csv_reader::parse(blocker_nondiag0_stream, &std::cout);
+  std::stringstream out;
+  blocker_nondiag = stan::io::stan_csv_reader::parse(blocker_nondiag0_stream, &out);
   
   // metadata
   EXPECT_EQ(1, blocker_nondiag.metadata.stan_version_major);
@@ -635,5 +639,6 @@ TEST_F(StanIoStanCsvReader,ParseBlockerNondiag) {
   
   EXPECT_FLOAT_EQ(35.276, blocker_nondiag.timing.warmup);
   EXPECT_FLOAT_EQ(46.3784, blocker_nondiag.timing.sampling);
-  
+
+  EXPECT_EQ("", out.str());
 }

@@ -16,7 +16,9 @@ TEST(OptimizationBfgs, rosenbrock_bfgs_convergence) {
   stan::io::dump dummy_context(data_stream);
 
   Model rb_model(dummy_context);
-  Optimizer bfgs(rb_model, cont_vector, disc_vector, &std::cout);
+  std::stringstream out;
+  Optimizer bfgs(rb_model, cont_vector, disc_vector, &out);
+  EXPECT_EQ("", out.str());
 
   int ret = 0;
   while (ret == 0) {
@@ -47,7 +49,10 @@ TEST(OptimizationBfgs, rosenbrock_bfgs_termconds) {
   stan::io::dump dummy_context(data_stream);
 
   Model rb_model(dummy_context);
-  Optimizer bfgs(rb_model, cont_vector, disc_vector, &std::cout);
+
+  std::stringstream out;
+  Optimizer bfgs(rb_model, cont_vector, disc_vector, &out);
+  EXPECT_EQ("", out.str());
   int ret;
 
   bfgs._conv_opts.maxIts = 1e9;
@@ -106,16 +111,15 @@ TEST(OptimizationBfgs, rosenbrock_lbfgs_convergence) {
   stan::io::dump dummy_context(data_stream);
 
   Model rb_model(dummy_context);
-  Optimizer bfgs(rb_model, cont_vector, disc_vector, &std::cout);
+  std::stringstream out;
+  Optimizer bfgs(rb_model, cont_vector, disc_vector, &out);
+  EXPECT_EQ("", out.str());
 
   int ret = 0;
   while (ret == 0) {
     ret = bfgs.step();
   }
   bfgs.params_r(cont_vector);
-
-//  std::cerr << "Convergence condition: " << bfgs.get_code_string(ret) << std::endl;
-//  std::cerr << "Converged after " << bfgs.iter_num() << " iterations and " << bfgs.grad_evals() << " gradient evaluations." << std::endl;
 
   // Check that the return code is normal
   EXPECT_GE(ret,0);
@@ -140,7 +144,9 @@ TEST(OptimizationBfgs, rosenbrock_lbfgs_termconds) {
   stan::io::dump dummy_context(data_stream);
 
   Model rb_model(dummy_context);
-  Optimizer bfgs(rb_model, cont_vector, disc_vector, &std::cout);
+  std::stringstream out;
+  Optimizer bfgs(rb_model, cont_vector, disc_vector, &out);
+  EXPECT_EQ("", out.str());
   int ret;
 
   bfgs._conv_opts.maxIts = 1e9;
@@ -232,7 +238,9 @@ TEST(OptimizationBfgs, ModelAdaptor) {
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
-  stan::optimization::ModelAdaptor<Model> mod(rb_model, disc_vector, &std::cout);
+  std::stringstream out;
+  stan::optimization::ModelAdaptor<Model> mod(rb_model, disc_vector, &out);
+  EXPECT_EQ("", out.str());
 }
 
 TEST(OptimizationBfgs, ModelAdaptor_fevals) {
@@ -244,7 +252,9 @@ TEST(OptimizationBfgs, ModelAdaptor_fevals) {
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
-  stan::optimization::ModelAdaptor<Model> mod(rb_model, disc_vector, &std::cout);
+  std::stringstream out;
+  stan::optimization::ModelAdaptor<Model> mod(rb_model, disc_vector, &out);
+  EXPECT_EQ("", out.str());
 
   EXPECT_FLOAT_EQ(mod.fevals(), 0);
 }
@@ -258,7 +268,9 @@ TEST(OptimizationBfgs, ModelAdaptor_operator_parens__matrix_double) {
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
-  stan::optimization::ModelAdaptor<Model> mod(rb_model, disc_vector, &std::cout);
+  std::stringstream out;
+  stan::optimization::ModelAdaptor<Model> mod(rb_model, disc_vector, &out);
+  EXPECT_EQ("", out.str());
 
   Eigen::Matrix<double,Eigen::Dynamic,1> grad(2);
   grad[0] = 4;
@@ -277,7 +289,9 @@ TEST(OptimizationBfgs, ModelAdaptor_operator_parens__matrix_double_matrix) {
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
-  stan::optimization::ModelAdaptor<Model> mod(rb_model, disc_vector, &std::cout);
+  std::stringstream out;
+  stan::optimization::ModelAdaptor<Model> mod(rb_model, disc_vector, &out);
+  EXPECT_EQ("", out.str());
 
   Eigen::Matrix<double,Eigen::Dynamic,1> grad(2);
   grad[0] = 4;
@@ -296,7 +310,9 @@ TEST(OptimizationBfgs, ModelAdaptor_df) {
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
-  stan::optimization::ModelAdaptor<Model> mod(rb_model, disc_vector, &std::cout);
+  std::stringstream out;
+  stan::optimization::ModelAdaptor<Model> mod(rb_model, disc_vector, &out);
+  EXPECT_EQ("", out.str());
 
   Eigen::Matrix<double,Eigen::Dynamic,1> grad(2);
   grad[0] = 4;
@@ -314,7 +330,9 @@ TEST(OptimizationBfgs, BFGSLineSearch) {
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
-  Optimizer bfgs(rb_model, cont_vector, disc_vector, &std::cout);
+  std::stringstream out;
+  Optimizer bfgs(rb_model, cont_vector, disc_vector, &out);
+  EXPECT_EQ("", out.str());
 }
 
 
@@ -327,7 +345,9 @@ TEST(OptimizationBfgs, BFGSLineSearch_initialize) {
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
-  Optimizer bfgs(rb_model, cont_vector, disc_vector, &std::cout);
+  std::stringstream out;
+  Optimizer bfgs(rb_model, cont_vector, disc_vector, &out);
+  EXPECT_EQ("", out.str());
 
   bfgs.initialize(cont_vector);
   EXPECT_FLOAT_EQ(bfgs.curr_f(), 4);
@@ -348,7 +368,9 @@ TEST(OptimizationBfgs, BFGSLineSearch_grad_evals) {
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
-  Optimizer bfgs(rb_model, cont_vector, disc_vector, &std::cout);
+  std::stringstream out;
+  Optimizer bfgs(rb_model, cont_vector, disc_vector, &out);
+  EXPECT_EQ("", out.str());
 
   EXPECT_FLOAT_EQ(bfgs.grad_evals(), 1);
 }
@@ -362,7 +384,9 @@ TEST(OptimizationBfgs, BFGSLineSearch_logp) {
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
-  Optimizer bfgs(rb_model, cont_vector, disc_vector, &std::cout);
+  std::stringstream out;
+  Optimizer bfgs(rb_model, cont_vector, disc_vector, &out);
+  EXPECT_EQ("", out.str());
 
   EXPECT_FLOAT_EQ(bfgs.logp(), -4);
 }
@@ -376,7 +400,9 @@ TEST(OptimizationBfgs, BFGSLineSearch_grad_norm) {
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
-  Optimizer bfgs(rb_model, cont_vector, disc_vector, &std::cout);
+  std::stringstream out;
+  Optimizer bfgs(rb_model, cont_vector, disc_vector, &out);
+  EXPECT_EQ("", out.str());
   
   std::vector<double> grad;
   
@@ -393,7 +419,9 @@ TEST(OptimizationBfgs, BFGSLineSearch_grad) {
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
-  Optimizer bfgs(rb_model, cont_vector, disc_vector, &std::cout);
+  std::stringstream out;
+  Optimizer bfgs(rb_model, cont_vector, disc_vector, &out);
+  EXPECT_EQ("", out.str());
   std::vector<double> grad;
   
   bfgs.grad(grad);
@@ -411,7 +439,9 @@ TEST(OptimizationBfgs, BFGSLineSearch_params_r) {
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
-  Optimizer bfgs(rb_model, cont_vector, disc_vector, &std::cout);
+  std::stringstream out;
+  Optimizer bfgs(rb_model, cont_vector, disc_vector, &out);
+  EXPECT_EQ("", out.str());
   std::vector<double> x;
   
   bfgs.params_r(x);
