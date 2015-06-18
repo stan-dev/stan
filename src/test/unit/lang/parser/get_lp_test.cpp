@@ -3,10 +3,13 @@
 
 TEST(langParser, illegalScope) { 
   test_throws("get_lp_bad_scope1",
-              "lp suffixed functions only allowed in ");
+              "Functions suffixed with _lp only allowed in");
   test_throws("get_lp_bad_scope2",
-              "lp suffixed functions only allowed in ");
+              "Functions suffixed with _lp only allowed in");
 }
 TEST(langParser, legal) {
   test_parsable("get_lp_good");
+}
+TEST(langParser, withinLpFunction) {
+  test_parsable("lp_in_fun");
 }
