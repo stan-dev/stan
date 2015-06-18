@@ -1,9 +1,9 @@
 .PHONY: manual $(STANAPI_HOME)src/docs/stan-reference/stan-reference.tex $(STANAPI_HOME)src/docs/stan-reference/stan-functions.txt
 
-MAJOR_VERSION := $(shell grep MAJOR_VERSION $(STANAPI_HOME)src/stan/version.hpp | sed -e 's/.*\"\([^]]*\)\".*/\1/g')
-MINOR_VERSION := $(shell grep MINOR_VERSION $(STANAPI_HOME)src/stan/version.hpp | sed -e 's/.*\"\([^]]*\)\".*/\1/g')
-PATCH_VERSION := $(shell grep PATCH_VERSION $(STANAPI_HOME)src/stan/version.hpp | sed -e 's/.*\"\([^]]*\)\".*/\1/g')
-VERSION_STRING := $(MAJOR_VERSION).$(MINOR_VERSION).$(PATCH_VERSION)
+STAN_MAJOR := $(shell grep "\#define STAN_MAJOR" $(STANAPI_HOME)src/stan/version.hpp | sed -e 's/.*STAN_MAJOR \(.*\)/\1/')
+STAN_MINOR := $(shell grep "\#define STAN_MINOR" $(STANAPI_HOME)src/stan/version.hpp | sed -e 's/.*STAN_MINOR \(.*\)/\1/')
+STAN_PATCH := $(shell grep "\#define STAN_PATCH" $(STANAPI_HOME)src/stan/version.hpp | sed -e 's/.*STAN_PATCH \(.*\)/\1/')
+VERSION_STRING := $(STAN_MAJOR).$(STAN_MINOR).$(STAN_PATCH)
 
 manual: $(STANAPI_HOME)src/docs/stan-reference/stan-reference.pdf $(STANAPI_HOME)src/docs/stan-reference/stan-functions.txt
 	@mkdir -p doc/
