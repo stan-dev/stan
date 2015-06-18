@@ -32,6 +32,8 @@ $(STANAPI_HOME)src/docs/stan-reference/stan-functions.txt: $(STANAPI_HOME)src/do
 	sed 's/\\textasciicircum/\^/g' | \
 	sed 's/\\textbackslash /\\/g' | \
 	sed 's/@.*(/;(/g' | \
+	sed 's/ ;/;/g' | \
+	sed 's/^phi/Phi/g' | \
 	sort >> $@
 
 MANUAL_FLAGS=
