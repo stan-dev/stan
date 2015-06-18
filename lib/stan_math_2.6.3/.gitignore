@@ -1,5 +1,3 @@
-
-
 # /
 /*.dSYM
 
@@ -38,6 +36,7 @@ stan.kdev4
 !/test/*.hpp
 !/test/*.cpp
 !/test/*.stan
+
 ## generated tests
 /test/prob/*/*_generated_*_test.cpp
 ## lib files
