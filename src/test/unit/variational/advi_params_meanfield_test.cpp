@@ -4,7 +4,6 @@
 #include <test/unit/util.hpp>
 
 TEST(normal_meanfield_test, dimension) {
-
   Eigen::Vector3d mu;
   mu << 5.7, -3.2, 0.1332;
 
@@ -15,11 +14,9 @@ TEST(normal_meanfield_test, dimension) {
 
   EXPECT_FLOAT_EQ(mu.size(), my_normal_meanfield.dimension());
   EXPECT_FLOAT_EQ(omega.size(), my_normal_meanfield.dimension());
-
 }
 
 TEST(normal_meanfield_test, mean_vector) {
-
   Eigen::Vector3d mu;
   mu << 5.7, -3.2, 0.1332;
 
@@ -42,11 +39,9 @@ TEST(normal_meanfield_test, mean_vector) {
   Eigen::Vector3d omega_nan = Eigen::VectorXd::Constant(3,nan);
   EXPECT_THROW(stan::variational::normal_meanfield my_normal_meanfield_nan(mu, omega_nan);,
                    std::domain_error);
-
 }
 
 TEST(normal_meanfield_test, omega_vector) {
-
   Eigen::Vector3d mu;
   mu << 5.7, -3.2, 0.1332;
 
@@ -65,11 +60,9 @@ TEST(normal_meanfield_test, omega_vector) {
 
   EXPECT_THROW(my_normal_meanfield.set_omega(omega_nan);,
                    std::domain_error);
-
 }
 
 TEST(normal_meanfield_test, entropy) {
-
   Eigen::Vector3d mu;
   mu << 5.7, -3.2, 0.1332;
 
@@ -114,5 +107,4 @@ TEST(normal_meanfield_test, transform) {
 
   EXPECT_THROW(my_normal_meanfield.transform(x_nan);,
                    std::domain_error);
-
 }

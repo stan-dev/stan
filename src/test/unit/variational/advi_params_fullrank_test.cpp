@@ -4,7 +4,6 @@
 #include <test/unit/util.hpp>
 
 TEST(normal_fullrank_test, dimension) {
-
   Eigen::Vector3d mu;
   mu << 5.7, -3.2, 0.1332;
 
@@ -16,11 +15,9 @@ TEST(normal_fullrank_test, dimension) {
   stan::variational::normal_fullrank my_normal_fullrank(mu, L);
 
   EXPECT_FLOAT_EQ(mu.size(), my_normal_fullrank.dimension());
-
 }
 
 TEST(normal_fullrank_test, mean_vector) {
-
   Eigen::Vector3d mu;
   mu << 5.7, -3.2, 0.1332;
 
@@ -47,11 +44,9 @@ TEST(normal_fullrank_test, mean_vector) {
   Eigen::MatrixXd L_nan = Eigen::MatrixXd::Constant(3,3,nan);
   EXPECT_THROW(stan::variational::normal_fullrank my_normal_fullrank_nan(mu, L_nan);,
                    std::domain_error);
-
 }
 
 TEST(normal_fullrank_test, cholesky_factor) {
-
   Eigen::Vector3d mu;
   mu << 5.7, -3.2, 0.1332;
 
@@ -74,11 +69,9 @@ TEST(normal_fullrank_test, cholesky_factor) {
   Eigen::MatrixXd L_nan = Eigen::MatrixXd::Constant(3,3,nan);
   EXPECT_THROW(my_normal_fullrank.set_L_chol(L_nan),
                    std::domain_error);
-
 }
 
 TEST(normal_fullrank_test, entropy) {
-
   Eigen::Vector3d mu;
   mu << 5.7, -3.2, 0.1332;
 
@@ -94,11 +87,9 @@ TEST(normal_fullrank_test, entropy) {
   const double entropy_out = my_normal_fullrank.entropy();
 
   EXPECT_FLOAT_EQ(entropy_out, entropy_true);
-
 }
 
 TEST(normal_fullrank_test, transform) {
-
   Eigen::Vector3d mu;
   mu << 5.7, -3.2, 0.1332;
 

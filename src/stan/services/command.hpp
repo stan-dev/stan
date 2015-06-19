@@ -826,7 +826,7 @@ namespace stan {
               (*output_stream) << std::endl;
             }
 
-            stan::variational::advi<Model, rng_t, double, variational::normal_fullrank>
+            stan::variational::advi<Model, variational::normal_fullrank, rng_t>
               cmd_advi(model,
                        cont_params,
                        grad_samples,
@@ -838,7 +838,7 @@ namespace stan {
                        &std::cout,
                        output_stream,
                        diagnostic_stream);
-            cmd_advi.run_fullrank(tol_rel_obj, max_iterations);
+            cmd_advi.run(tol_rel_obj, max_iterations);
           }
 
           if (algo->value() == "meanfield") {
@@ -855,7 +855,7 @@ namespace stan {
               (*output_stream) << std::endl;
             }
 
-            stan::variational::advi<Model, rng_t, variational::normal_meanfield, double>
+            stan::variational::advi<Model, variational::normal_meanfield, rng_t>
               cmd_advi(model,
                        cont_params,
                        grad_samples,
@@ -867,7 +867,7 @@ namespace stan {
                        &std::cout,
                        output_stream,
                        diagnostic_stream);
-            cmd_advi.run_meanfield(tol_rel_obj, max_iterations);
+            cmd_advi.run(tol_rel_obj, max_iterations);
           }
         }
       }
