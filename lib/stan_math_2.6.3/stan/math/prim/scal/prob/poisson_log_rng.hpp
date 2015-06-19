@@ -19,8 +19,6 @@ namespace stan {
 
   namespace math {
 
-    static const double POISSON_MAX_LOG_RATE = 30 * std::log(2);
-
     template <class RNG>
     inline int
     poisson_log_rng(const double alpha,
@@ -29,6 +27,7 @@ namespace stan {
       using boost::random::poisson_distribution;
 
       static const char* function("stan::math::poisson_log_rng");
+      static const double POISSON_MAX_LOG_RATE = 30 * std::log(2);
 
       using stan::math::check_not_nan;
       using stan::math::check_nonnegative;
