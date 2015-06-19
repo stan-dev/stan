@@ -1,5 +1,5 @@
-#ifndef STAN_VARIATIONAL_ITER__HPP
-#define STAN_VARIATIONAL_ITER__HPP
+#ifndef STAN_VARIATIONAL_ITER_HPP
+#define STAN_VARIATIONAL_ITER_HPP
 
 #include <stan/services/arguments/singleton_argument.hpp>
 
