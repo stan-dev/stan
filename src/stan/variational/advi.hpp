@@ -201,17 +201,18 @@ namespace stan {
                         model_, cont_params_, n_monte_carlo_grad_, rng_,
                         print_stream_);
 
-          // Accumulate S vector for ADAgrad
-          mu_s.array() += mu_grad.array().square();
-          L_s.array()  += L_grad.array().square();
-
-          // RMSprop moving average weighting
-          mu_s.array() = pre_factor * mu_s.array()
-                         + post_factor *
-                         mu_grad.array().square();
-          L_s.array()  = pre_factor * L_s.array()
-                         + post_factor *
-                         L_grad.array().square();
+          if (iter_counter == 0) {
+            mu_s.array() += mu_grad.array().square();
+            L_s.array() += L_grad.array().square();
+          } else {
+            // RMSprop moving average weighting
+            mu_s.array() = pre_factor * mu_s.array()
+                           + post_factor *
+                           mu_grad.array().square();
+            L_s.array()  = pre_factor * L_s.array()
+                           + post_factor *
+                           L_grad.array().square();
+          }
 
           // Take ADAgrad or rmsprop step
           muL.set_mu(muL.mu().array() + eta_adagrad_ * mu_grad.array()
@@ -366,15 +367,16 @@ namespace stan {
                             model_, cont_params_, n_monte_carlo_grad_, rng_,
                             print_stream_);
 
-          // Accumulate S vector for ADAgrad
-          mu_s.array()     += mu_grad.array().square();
-          omega_s.array()  += omega_grad.array().square();
-
-          // RMSprop moving average weighting
-          mu_s.array() = pre_factor * mu_s.array()
-                       + post_factor * mu_grad.array().square();
-          omega_s.array() = pre_factor * omega_s.array()
-                          + post_factor * omega_grad.array().square();
+          if (iter_counter == 0) {
+            mu_s.array() += mu_grad.array().square();
+            omega_s.array() += omega_grad.array().square();
+          } else {
+            // RMSprop moving average weighting
+            mu_s.array() = pre_factor * mu_s.array()
+                         + post_factor * mu_grad.array().square();
+            omega_s.array() = pre_factor * omega_s.array()
+                            + post_factor * omega_grad.array().square();
+          }
 
           // Take ADAgrad or rmsprop step
           muomega.set_mu( muomega.mu().array()
