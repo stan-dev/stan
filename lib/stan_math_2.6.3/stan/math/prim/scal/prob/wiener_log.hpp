@@ -150,7 +150,7 @@ namespace stan {
         if (pi() * x * WIENER_ERR < 1) {
           // compute bound
           kl = sqrt(-2.0 * log(pi() * x * WIENER_ERR) * SQRT_PI) /
-               sqrt(x);
+               sqrt_x;
           // ensure boundary conditions met
           kl = (kl > 1.0 / (pi() * sqrt_x)) ?
                kl : 1.0 / (pi() * sqrt_x);
