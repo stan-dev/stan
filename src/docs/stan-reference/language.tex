@@ -1431,7 +1431,13 @@ Stan's \Cpp implementation.  These are
 %
 \begin{quote}
 \code{var},
-\code{fvar}
+\code{fvar},
+\code{STAN\_MAJOR},
+\code{STAN\_MINOR},
+\code{STAN\_PATCH},
+\code{STAN\_MATH\_MAJOR},
+\code{STAN\_MATH\_MINOR},
+\code{STAN\_MATH\_PATCH}
 \end{quote}
 %
 
@@ -3311,16 +3317,15 @@ real foo(real mu, real sigma);
 declares a function named \code{foo} with two argument variables of
 types \code{real} and \code{real}.  The arguments are named \code{mu}
 and \code{sigma}, but that is not part of the declaration.  Two
-functions may have the same name if they have different sequences of
-argument types; see \refsection{function-overloading} for details.  A
-function may not have the same name and argument type sequence as
-another function, including a built-in function.
+functions may \emph{not} \, have the same name even if they have
+different sequences of argument types; see
+\refsection{function-overloading} for details.  A function may not
+have the same name and argument type sequence as another function,
+including a built-in function.
 
 \section{Calling Functions}
 
-All function arguments are mandatory---there are no default values
-(though see \refsection{function-overloading} for alternatives based
-on overloading).
+All function arguments are mandatory---there are no default values.
 
 \subsection{Functions as Expressions}
 
@@ -3599,53 +3604,58 @@ In a return statement within a void function's definition, the
 
 \section{Overloading}\label{function-overloading.section}
 
-Stan allows function overloading, where two functions have the same
-name.  For example, an overloaded unit-normal log density function
-might be declared with an overload of the function
-\code{unit\_normal\_log}, giving it three signatures with one argument
-each.
-%
-\begin{stancode}
-real unit_normal_log(real y);
-real unit_normal_log(vector y);
-real unit_normal_log(row_vector y);
-\end{stancode}
-%
-The sequence of argument types must be distinct for each distinct
-function; attempting to declare two functions with the same name
-and argument type sequence will cause a compile-time error, even if
-the return types or argument names are different.  For instance, it
-would not be possible to add the following declaration to those
-above.
-%
-\begin{stancode}
-vector unit_normal_log(vector y);
-\end{stancode}
+For built-in functions, Stan allows function overloading, where two
+functions have the same name, but different sequences of arguments.
+As of yet, Stan's function-definition language does not support
+overloading for user-defined functions.
 
-
-\subsection{Overloading for Defaults}
-
-In order to write functions with default values, the function must be
-overloaded; see \refsection{function-overloading} for more on
-overloading.  Overloading comes with no guarantees that the overloaded
-functions all share an underlying implementation.   For example, the function
-\code{unit\_normal\_log} above could've just been named
-\code{normal\_log} and used to overload the regular normal function
-with default parameter values (0 location and 1 scale).
-
-Functions are not called using named arguments, the options for
-defaults are more limited than with named arguments in languages such
-as R.  For example, it would not be possible to define two
-two-argument normal density functions, one of which specified a
-location and one of which specified a scale,
+% TODO(carpenter): leaving this here for when I figure out overloading
+% ----------------------------------------------
+% For example, an overloaded unit-normal log density function might be
+% declared with an overload of the function \code{unit\_normal\_log},
+% giving it three signatures with one argument each.
+% %
+% \begin{stancode}
+% real unit_normal_log(real y);
+% real unit_normal_log(vector y);
+% real unit_normal_log(row_vector y);
+% \end{stancode}
+% %
+% The sequence of argument types must be distinct for each distinct
+% function; attempting to declare two functions with the same name
+% and argument type sequence will cause a compile-time error, even if
+% the return types or argument names are different.  For instance, it
+% would not be possible to add the following declaration to those
+% above.
+% %
+% \begin{stancode}
+% vector unit_normal_log(vector y);
+% \end{stancode}
 %
-\begin{stancode}
-real normal_log(real y, real mu);
-real normal_log(real y, real sigma); // illegal
-\end{stancode}
 %
-because they have the same argument-type sequence, (\code{real},
-\code{real}).
+% \subsection{Overloading for Defaults}
+%
+% In order to write functions with default values, the function must be
+% overloaded; see \refsection{function-overloading} for more on
+% overloading.  Overloading comes with no guarantees that the overloaded
+% functions all share an underlying implementation.   For example, the function
+% \code{unit\_normal\_log} above could've just been named
+% \code{normal\_log} and used to overload the regular normal function
+% with default parameter values (0 location and 1 scale).
+
+% Functions are not called using named arguments, the options for
+% defaults are more limited than with named arguments in languages such
+% as R.  For example, it would not be possible to define two
+% two-argument normal density functions, one of which specified a
+% location and one of which specified a scale,
+% %
+% \begin{stancode}
+% real normal_log(real y, real mu);
+% real normal_log(real y, real sigma); // illegal
+% \end{stancode}
+% %
+% because they have the same argument-type sequence, (\code{real},
+% \code{real}).
 
 
 \section{Declarations}\label{forward-declarations.section}

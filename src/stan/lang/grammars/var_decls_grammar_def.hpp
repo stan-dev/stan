@@ -399,6 +399,13 @@ namespace stan {
         reserve("generated");
 
         reserve("var");
+        reserve("fvar");
+        reserve("STAN_MAJOR");
+        reserve("STAN_MINOR");
+        reserve("STAN_PATCH");
+        reserve("STAN_MATH_MAJOR");
+        reserve("STAN_MATH_MINOR");
+        reserve("STAN_MATH_PATCH");
 
         reserve("alignas");
         reserve("alignof");
