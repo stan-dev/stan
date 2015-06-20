@@ -813,7 +813,6 @@ namespace stan {
           std::cout << std::endl;
 
           if (algo->value() == "fullrank") {
-
             if (output_stream) {
               std::vector<std::string> names;
               names.push_back("lp");
@@ -842,7 +841,6 @@ namespace stan {
           }
 
           if (algo->value() == "meanfield") {
-
             if (output_stream) {
               std::vector<std::string> names;
               names.push_back("lp");

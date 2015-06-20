@@ -379,10 +379,10 @@ namespace stan {
           }
 
           // Take ADAgrad or rmsprop step
-          muomega.set_mu( muomega.mu().array()
+          muomega.set_mu(muomega.mu().array()
             + eta_adagrad_ * mu_grad.array()
             / (tau + mu_s.array().sqrt()) );
-          muomega.set_omega( muomega.omega().array()
+          muomega.set_omega(muomega.omega().array()
             + eta_adagrad_ * omega_grad.array()
             / (tau + omega_s.array().sqrt()) );
 
@@ -518,7 +518,8 @@ namespace stan {
                                                 model_.num_params_r(), 0.0);
                                                 // initializing omega = 0
                                                 // means sigma = 1
-        advi_params_normal_meanfield muomega = advi_params_normal_meanfield(mu, omega);
+        advi_params_normal_meanfield muomega =
+          advi_params_normal_meanfield(mu, omega);
 
         // run inference algorithm
         robbins_monro_adagrad(muomega, tol_rel_obj, max_iterations);

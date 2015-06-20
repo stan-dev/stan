@@ -146,10 +146,12 @@ namespace stan {
 
         stan::math::check_size_match(function,
                         "Dimension of mu grad vector", mu_grad.size(),
-                        "Dimension of mean vector in variational q", dimension_);
+                        "Dimension of mean vector in variational q",
+                          dimension_);
         stan::math::check_size_match(function,
                         "Dimension of omega grad vector", omega_grad.size(),
-                        "Dimension of mean vector in variational q", dimension_);
+                        "Dimension of mean vector in variational q",
+                          dimension_);
         stan::math::check_size_match(function,
                         "Dimension of muomega", dimension_,
                         "Dimension of variables in model", cont_params.size());
