@@ -160,7 +160,11 @@ namespace stan {
         return *this;
       }
 
-      // Entropy of normal:
+      // Distribution-based operations
+      const Eigen::VectorXd& mean() const {
+        return mu();
+      }
+
       // 0.5 * dim * (1+log2pi) + 0.5 * log det diag(sigma^2) =
       // 0.5 * dim * (1+log2pi) + sum(log(sigma)) =
       // 0.5 * dim * (1+log2pi) + sum(omega)
@@ -203,8 +207,6 @@ namespace stan {
       }
 
       /**
-       * MEAN-FIELD GRADIENTS
-       *
        * Calculates the "blackbox" gradient with respect to BOTH the location
        * vector (mu) and the log-std vector (omega) in parallel.
        * It uses the same gradient computed from a set of Monte Carlo

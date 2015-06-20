@@ -299,7 +299,7 @@ namespace stan {
         robbins_monro_adagrad(variational, tol_rel_obj, max_iterations);
 
         // get mean of posterior approximation and write on first output line
-        cont_params_ = variational.mu();
+        cont_params_ = variational.mean();
         std::vector<double> cont_vector(cont_params_.size());
         for (int i = 0; i < cont_params_.size(); ++i)
           cont_vector.at(i) = cont_params_(i);

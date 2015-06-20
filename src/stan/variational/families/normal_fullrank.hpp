@@ -168,7 +168,11 @@ namespace stan {
         return *this;
       }
 
-      // Entropy of normal:
+      // Distribution-based operations
+      const Eigen::VectorXd& mean() const {
+        return mu();
+      }
+
       // 0.5 * dim * (1+log2pi) + 0.5 * log det (L^T L) =
       // 0.5 * dim * (1+log2pi) + sum(log(abs(diag(L))))
       double entropy() const {
@@ -217,8 +221,6 @@ namespace stan {
       }
 
       /**
-       * FULL-RANK GRADIENTS
-       *
        * Calculates the "blackbox" gradient with respect to BOTH the location
        * vector (mu) and the cholesky factor of the scale matrix (L) in
        * parallel. It uses the same gradient computed from a set of Monte Carlo

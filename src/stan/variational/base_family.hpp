@@ -1,7 +1,3 @@
-// This will have all the declarations of methods that each
-// variational family requires. It will also do all the standard stuff
-// automatically, like operator overloading when they are based on other method
-// functions.
 #ifndef STAN_VARIATIONAL_BASE_FAMILY_HPP
 #define STAN_VARIATIONAL_BASE_FAMILY_HPP
 
@@ -44,7 +40,8 @@ namespace stan {
       base_family operator+=(double scalar);
       base_family operator*=(double scalar);
 
-      // Others
+      // Distribution-based operations
+      const Eigen::VectorXd& mean() const;
       double entropy() const;
       Eigen::VectorXd transform(const Eigen::VectorXd& eta) const;
       template <class BaseRNG>
