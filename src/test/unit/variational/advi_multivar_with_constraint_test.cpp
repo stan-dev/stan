@@ -173,12 +173,12 @@ TEST(advi_test, multivar_with_constraint_meanfield) {
 
   mu_grad = Eigen::VectorXd::Zero(3);
   st_grad  = Eigen::VectorXd::Zero(3);
-  stan::variational::normal_meanfield params_grad = stan::variational::normal_meanfield(mu_grad, st_grad);
+  stan::variational::normal_meanfield elbo_grad = stan::variational::normal_meanfield(mu_grad, st_grad);
 
   error = "stan::variational::normal_meanfield::calc_grad: "
-          "Dimension of params_grad (3) and "
+          "Dimension of elbo_grad (3) and "
           "Dimension of variational q (2) must match in size";
-  EXPECT_THROW_MSG(musigmatilde.calc_grad(params_grad,
+  EXPECT_THROW_MSG(musigmatilde.calc_grad(elbo_grad,
                                  my_model, cont_params, n_monte_carlo_grad,
                                  base_rng, print_stream),
                    std::invalid_argument, error);

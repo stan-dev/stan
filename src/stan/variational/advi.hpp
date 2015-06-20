@@ -28,9 +28,9 @@ namespace stan {
     /**
      * AUTOMATIC DIFFERENTIATION VARIATIONAL INFERENCE
      *
-     * Calculates the "blackbox" Evidence Lower BOund (ELBO) by sampling from
-     * the variational distribution and then evaluating the log joint,
-     * adjusted by the entropy term of the variational distribution
+     * Runs "black box" variational inference by applying stochastic gradient
+     * ascent in order to maximize the Evidence Lower Bound for a given model
+     * and variational family.
      *
      * @tparam M                     class of model
      * @tparam Q                     class of variational distribution
@@ -60,7 +60,7 @@ namespace stan {
            int n_posterior_samples,
            std::ostream* print_stream,
            std::ostream* output_stream,
-           std::ostream* diagnostic_stream):
+           std::ostream* diagnostic_stream) :
         model_(m),
         cont_params_(cont_params),
         rng_(rng),
@@ -72,35 +72,28 @@ namespace stan {
         print_stream_(print_stream),
         out_stream_(output_stream),
         diag_stream_(diagnostic_stream) {
-        static const char* function =
-          "stan::variational::advi";
-
+        static const char* function = "stan::variational::advi";
         stan::math::check_positive(function,
                                  "Number of Monte Carlo samples for gradients",
                                  n_monte_carlo_grad_);
-
         stan::math::check_positive(function,
                                  "Number of Monte Carlo samples for ELBO",
                                  n_monte_carlo_elbo_);
-
         stan::math::check_positive(function,
                                  "Number of posterior samples for output",
                                  n_posterior_samples_);
-
         stan::math::check_positive(function, "Eta stepsize", eta_adagrad_);
         }
 
       /**
-       * ELBO
-       *
-       * Calculates the "blackbox" Evidence Lower BOund (ELBO) by sampling from
+       * Calculates the Evidence Lower BOund (ELBO) by sampling from
        * the variational distribution and then evaluating the log joint,
        * adjusted by the entropy term of the variational distribution.
        *
        * @tparam Q class of variational distribution
        * @return   evidence lower bound (elbo)
        */
-      double calc_ELBO(const Q& variational) {
+      double calc_ELBO(const Q& variational) const {
         double elbo = 0.0;
         int dim = variational.dimension();
 
@@ -124,9 +117,29 @@ namespace stan {
       }
 
       /**
-       * ROBBINS-MONRO ADAGRAD
+       * Calculates the "black box" gradient of the ELBO.
        *
-       * Runs stochastic gradient ascent for some number of iterations
+       * @tparam Q         class of variational distribution
+       * @param  elbo_grad gradient of ELBO with respect to variational parameters
+       */
+      void calc_ELBO_grad(const Q& variational, Q& elbo_grad) const {
+        static const char* function =
+          "stan::variational::advi::calc_ELBO_grad";
+
+        stan::math::check_size_match(function,
+                        "Dimension of elbo_grad", elbo_grad.dimension(),
+                        "Dimension of variational q", variational.dimension());
+        stan::math::check_size_match(function,
+                        "Dimension of variational q", variational.dimension(),
+                        "Dimension of variables in model", cont_params_.size());
+
+        variational.calc_grad(elbo_grad,
+                              model_, cont_params_, n_monte_carlo_grad_, rng_,
+                              print_stream_);
+      }
+
+      /**
+       * Runs stochastic gradient ascent with Adagrad.
        *
        * @tparam Q              class of variational distribution
        * @param  tol_rel_obj    relative tolerance parameter for convergence
@@ -134,7 +147,7 @@ namespace stan {
        */
       void robbins_monro_adagrad(Q& variational,
                                  double tol_rel_obj,
-                                 int max_iterations) {
+                                 int max_iterations) const {
         static const char* function =
           "stan::variational::advi.robbins_monro_adagrad";
 
@@ -145,10 +158,10 @@ namespace stan {
                                    "Maximum iterations",
                                    max_iterations);
 
-        // Gradients
-        Q params_grad = Q(model_.num_params_r());
+        // Gradient parameters
+        Q elbo_grad = Q(model_.num_params_r());
 
-        // ADAgrad parameters
+        // Adagrad parameters
         double tau = 1.0;
         Q params_adagrad = Q(model_.num_params_r());
 
@@ -191,20 +204,18 @@ namespace stan {
         int iter_counter = 0;
         while (do_more_iterations) {
           // Compute gradient using Monte Carlo integration
-          variational.calc_grad(params_grad,
-                        model_, cont_params_, n_monte_carlo_grad_, rng_,
-                        print_stream_);
+          calc_ELBO_grad(variational, elbo_grad);
 
           // RMSprop moving average weighting
           if (iter_counter == 0) {
-            params_adagrad += params_grad.square();
+            params_adagrad += elbo_grad.square();
           } else {
             params_adagrad = pre_factor * params_adagrad +
-                             post_factor * params_grad.square();
+                             post_factor * elbo_grad.square();
           }
 
           // Stochastic gradient update
-          variational += eta_adagrad_ * params_grad / (tau + params_adagrad.sqrt());
+          variational += eta_adagrad_ * elbo_grad / (tau + params_adagrad.sqrt());
 
           // Check for convergence every "eval_elbo_"th iteration
           if (iter_counter % eval_elbo_ == 0) {
@@ -281,7 +292,7 @@ namespace stan {
        * @param  tol_rel_obj    relative tolerance parameter for convergence
        * @param  max_iterations max number of iterations to run algorithm
        */
-      int run(double tol_rel_obj, int max_iterations) {
+      int run(double tol_rel_obj, int max_iterations) const {
         if (print_stream_) {
           *print_stream_
             << "This is Automatic Differentiation Variational Inference."
@@ -325,7 +336,7 @@ namespace stan {
       }
 
       // Helper function: compute the median of a circular buffer
-      double circ_buff_median(const boost::circular_buffer<double>& cb) {
+      double circ_buff_median(const boost::circular_buffer<double>& cb) const {
           // FIXME: naive implementation; creates a copy as a vector
           std::vector<double> v;
           for (boost::circular_buffer<double>::const_iterator i = cb.begin();
@@ -360,4 +371,3 @@ namespace stan {
 }  // stan
 
 #endif
-

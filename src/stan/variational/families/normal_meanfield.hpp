@@ -29,8 +29,7 @@ namespace stan {
     /*
      * MULTIVARIATE NORMAL DISTRIBUTION MEAN-FIELD
      *
-     * Variational family as mean-field multivariate normal distribution, with
-     * free parameters mean and log standard deviation.
+     * Variational family as mean-field multivariate normal distribution
      *
      * @param  mu    mean vector
      * @param  omega log standard deviation vector
@@ -214,23 +213,23 @@ namespace stan {
        *
        * @tparam M                     class of model
        * @tparam BaseRNG               class of random number generator
-       * @param  params_grad           parameters to store "blackbox" gradient
+       * @param  elbo_grad             parameters to store "blackbox" gradient
        * @param  cont_params           continuous parameters
        * @param  n_monte_carlo_grad    number of samples for gradient computation
        * @param  print_stream          stream for convergence assessment output
        */
       template <class M, class BaseRNG>
-      void calc_grad(normal_meanfield& params_grad,
+      void calc_grad(normal_meanfield& elbo_grad,
                      M& m,
                      Eigen::VectorXd& cont_params,
                      int n_monte_carlo_grad,
                      BaseRNG& rng,
-                     std::ostream* print_stream) {
+                     std::ostream* print_stream) const {
         static const char* function =
           "stan::variational::normal_meanfield::calc_grad";
 
         stan::math::check_size_match(function,
-                        "Dimension of params_grad", params_grad.dimension(),
+                        "Dimension of elbo_grad", elbo_grad.dimension(),
                         "Dimension of variational q", dimension_);
         stan::math::check_size_match(function,
                         "Dimension of variational q", dimension_,
@@ -273,8 +272,8 @@ namespace stan {
         omega_grad.array() += 1.0;
 
         // Set parameters to argument
-        params_grad.set_mu(mu_grad);
-        params_grad.set_omega(omega_grad);
+        elbo_grad.set_mu(mu_grad);
+        elbo_grad.set_omega(omega_grad);
       }
     };
 

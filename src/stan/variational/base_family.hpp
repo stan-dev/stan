@@ -32,12 +32,12 @@ namespace stan {
       template <class BaseRNG>
       Eigen::VectorXd sample(BaseRNG& rng) const;
       template <class M, class BaseRNG>
-      void calc_grad(base_family& params_grad,
+      void calc_grad(base_family& elbo_grad,
                      M& m,
                      Eigen::VectorXd& cont_params,
                      int n_monte_carlo_grad,
                      BaseRNG& rng,
-                     std::ostream* print_stream);
+                     std::ostream* print_stream) const;
     };
 
     // Arithmetic operators

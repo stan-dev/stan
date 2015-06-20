@@ -32,8 +32,7 @@ namespace stan {
     /*
      * MULTIVARIATE NORMAL DISTRIBUTION FULL-RANK
      *
-     * Variational family as full-rank multivariate normal distribution, with free
-     * parameters mean and cholesky factor of the covariance
+     * Variational family as full-rank multivariate normal distribution
      *
      * @param  mu     mean vector
      * @param  L_chol cholesky factor of covariance (\Sigma = L_chol *
@@ -228,23 +227,23 @@ namespace stan {
        *
        * @tparam M                     class of model
        * @tparam BaseRNG               class of random number generator
-       * @param  params_grad           parameters to store "blackbox" gradient
+       * @param  elbo_grad             parameters to store "blackbox" gradient
        * @param  cont_params           continuous parameters
        * @param  n_monte_carlo_grad    number of samples for gradient computation
        * @param  print_stream          stream for convergence assessment output
        */
       template <class M, class BaseRNG>
-      void calc_grad(normal_fullrank& params_grad,
+      void calc_grad(normal_fullrank& elbo_grad,
                      M& m,
                      Eigen::VectorXd& cont_params,
                      int n_monte_carlo_grad,
                      BaseRNG& rng,
-                     std::ostream* print_stream) {
+                     std::ostream* print_stream) const {
         static const char* function =
           "stan::variational::normal_fullrank::calc_grad";
 
         stan::math::check_size_match(function,
-                        "Dimension of params_grad", params_grad.dimension(),
+                        "Dimension of elbo_grad", elbo_grad.dimension(),
                         "Dimension of variational q", dimension_);
         stan::math::check_size_match(function,
                         "Dimension of variational q", dimension_,
@@ -285,8 +284,8 @@ namespace stan {
         L_grad.diagonal().array() += L_chol_.diagonal().array().inverse();
 
         // Set parameters to argument
-        params_grad.set_mu(mu_grad);
-        params_grad.set_L_chol(L_grad);
+        elbo_grad.set_mu(mu_grad);
+        elbo_grad.set_L_chol(L_grad);
       }
     };
 
