@@ -1313,8 +1313,8 @@ the same prior on \code{beta\_raw}.
 
 \subsection{Translated and Scaled Simplex}
 
-An alternative approach that's less efficient, but amenable to 
-a symmetric prior, is to offset and scale a simplex.
+An alternative approach that's less efficient, but amenable to a
+symmetric prior, is to offset and scale a simplex.
 %
 \begin{stancode}
 parameters {
@@ -1356,7 +1356,7 @@ IRT models).  This is another way of achieving a symmetric prior.
 Ordered regression for an outcome $y_n \in \setlist{1,\ldots,K}$ with
 predictors $x_n \in \reals^D$ is determined by a single coefficient
 vector $\beta \in \reals^D$ along with a sequence of cutpoints $c \in
-\reals^{D-1}$ sorted so that $c_d < c_{d+1}$.  The discrete output is
+\reals^{K-1}$ sorted so that $c_d < c_{d+1}$.  The discrete output is
 $k$ if the linear predictor $x_n \beta$ falls between $c_{k-1}$ and
 $c_k$, assuming $c_0 = -\infty$ and $c_K = \infty$.  The noise term is
 fixed by the form of regression, with examples for ordered logistic
@@ -1871,7 +1871,7 @@ example, a model with multiple varying intercepts and slopes within
 might assign them a multivariate prior. 
 
 As an example, the individuals might people and the outcome income,
-with predictors such as income and age, and the groups might be states
+with predictors such as education level and age, and the groups might be states
 or other geographic divisions.  The effect of education level and age
 as well as an intercept might be allowed to vary by state.
 Furthermore, there might be state-level predictors, such as average
@@ -2026,6 +2026,13 @@ model {
   for (j in 1:J)
     beta[j] ~ multi_normal((u[j] * gamma)', Sigma_beta);
 
+  {
+    vector[N] x_beta_jj;
+    for (n in 1:N)
+      x_beta_jj[n] <- x[n] * beta[jj[n]];
+    y ~ normal(x_beta_jj, sigma);
+  }
+
   for (n in 1:N)
     y[n] ~ normal(x[n] * beta[jj[n]], sigma);
 }
@@ -2044,38 +2051,24 @@ diagonal and zeroes off diagonal; the version using
 \refsection{matrix-arithmetic-operators} for more information on
 specialized matrix operations.
 
-This is not the most optimal way to define this model;  it can be sped
-up through vectorization and through reparameterization in terms of
-Cholesky factors.
-
 \subsubsection{Optimization through Vectorization}
 
-Another optimization would be to vectorize the likelihood sampling
-statement by generating a temporary vector of the linear predictor.
-%
-\begin{stancode}
-{
-  vector[N] x_beta_jj;
-  for (n in 1:N)
-    x_beta_jj[n] <- x[n] * beta[jj[n]];
-  y ~ normal(x_beta_jj, sigma);
-}
-\end{stancode}
-%
-The outer brackets provide a local scope in which to define
-\code{x\_beta\_jj}.  
+The code in the Stan program above builds up a vector with entries
+\code{x\_beta\_jj[n]} of means using the predictor \code{x[n]} and
+group-level coefficient \code{beta[jj[n]]}.  A block is defined with
+brackets around it so that \code{x\_beta\_jj} can be declared as a
+local variable.  
 
-The multi-normal prior on \code{beta} can also be optimized through
-vectorization with a bit more work.  
+The vectorized code is equivalent to the simpler, non-vectorized alternative:
 %
 \begin{stancode}
-{
-   vector[K] u_gamma_t[J];
-   for (j in 1:J)
-     u_gamma_t[j] <- (u[j] * gamma)';
-   beta ~ multi_normal(u_gamma_t, Sigma_beta);
-}
+  for (j in 1:J)
+    beta[j] ~ multi_normal((u[j] * gamma)', Sigma_beta);
 \end{stancode}
+%
+But there is a huge speedup with vectorization for multivariates
+because the covariance matrix \code{Sigma\_beta} need only be solved
+once.  
 
 \subsubsection{Optimization through Cholesky Factorization}
 
@@ -2279,8 +2272,288 @@ normal distribution.
 
   
 
+\section{Multivariate Outcomes}
+
+Most regressions are set up to model univariate observations (be they
+scalar, boolean, categorical, ordinal, or count).  Even multinomial
+regressions are just repeated categorical regressions.  In contrast,
+this section discusses regression when each observed value is
+multivariate.  To relate multiple outcomes in a regression setting,
+their error terms are provided with covariance structure.  
+
+This section considers two cases, seemingly unrelated regressions for
+continuous multivariate quantities and multivariate probit regression
+for boolean multivariate quantities.
+
+\subsection{Seemingly Unrelated Regressions} 
+
+The first model considered is the ``seemingly unrelated'' regressions
+(SUR) of econometrics where several linear regressions share
+predictors and use a covariance error structure rather than
+independent errors \citep{Zellner:1962,Greene:2011}.
+
+The model is easy to write down as a regression,
+%
+\begin{eqnarray*}
+ y_n & = & x_n \, \beta + \epsilon_n
+\\[4pt]
+ \epsilon_n & \sim & \distro{MultiNormal}(0, \Sigma)
+\end{eqnarray*}
+%
+where $x_n$ is a $J$-row-vector of predictors ($x$ is an $(N \times
+J)$-matrix), $y_n$ is a $K$-vector of observations, $\beta$ is a $(K
+\times J)$-matrix of regression coefficients (vector $\beta_k$ holds
+coefficients for outcome $k$), and $\Sigma$ is covariance matrix
+governing the error.  As usual, the intercept can be rolled into $x$
+as a column of ones.
+
+The basic Stan code is straightforward (though see below for more
+optimized code for use with LKJ priors on correlation).
+%
+\begin{stancode}
+data {
+  int<lower=1> K;
+  int<lower=1> J;
+  int<lower=0> N;
+  vector[J] x[N];
+  vector[K] y[N];
+}
+parameters {
+  matrix[K,J] beta;
+  cov_matrix[K] Sigma;
+}
+model {
+  vector[K] mu[N];
+  for (n in 1:N)
+    mu[n] <- beta * x[n];
+  y ~ multi_normal(mu, Sigma);
+}
+\end{stancode}
+%
+For efficiency, the multivariate normal is vectorized by precomputing
+the array of mean vectors and sharing the same covariance matrix.
+
+Following the advice in \refsection{multivariate-hierarchical-priors},
+we will place a weakly informative normal prior on the regression
+coefficients, an LKJ prior on the correlations and a half-Cauchy prior
+on standard deviations.  The covariance structure is parameterized in
+terms of Cholesky factors for efficiency and arithmetic stability.
+%
+\begin{stancode}
+...
+parameters {
+  matrix[K,J] beta;
+  cholesky_factor_corr[K] L_Omega;
+  vector<lower=0>[K] L_sigma;
+}
+model {
+  vector[K] mu[N];
+  matrix[K,K] L_Sigma;
+
+  for (n in 1:N)
+    mu[n] <- beta * x[n];
+
+  L_Sigma <- diag_post_multiply(L_Omega, L_sigma);
+
+  to_vector(beta) ~ normal(0, 5);
+  L_Omega ~ lkj_corr_cholesky(4);
+  L_sigma ~ cauchy(0, 2.5);
+
+  y ~ multi_normal_cholesky(mu, L_Sigma);
+}
+\end{stancode}
+%
+The Cholesky factor of the covariance matrix is then reconstructed as
+a local variable and used in the model by scaling the Cholesky factor
+of the correatlion matrices. The regression coefficients get a prior
+all at once by converting the matrix \code{beta} to a vector.
+
+If required, the full correlation or covariance matrices may be
+reconstructed from their Cholesky factors in the generated quantities
+block.  
 
 
+\subsection{Multivariate Probit Regression}
+
+The multivariate probit model generates sequences of boolean variables
+by applying a step function to the output of a seemingly urelated
+regression.
+
+The observations $y_n$ are $D$-vectors of boolean values (coded 0 for
+false, 1 for true).  The values for the observations $y_n$ are based
+on latent values $z_n$ drawn from a seemingly unrelated regression
+model (see the previous section), 
+%
+\begin{eqnarray*}
+ z_n & = & x_n \, \beta + \epsilon_n
+\\[4pt]
+ \epsilon_n & \sim & \distro{MultiNormal}(0, \Sigma)
+\end{eqnarray*}
+%
+These are then put through the step function to produce a $K$-vector $z_n$
+of boolean values with elements defined by
+\[
+y_{n,k} = \mathrm{I}(z_{n,k} > 0),
+\]
+where $\mathrm{I}()$ is the indicator function taking the value 1 if its
+argument is true and 0 otherwise.
+
+Unlike in the seemingly unrelated regressions case, here the
+covariance matrix $\Sigma$ has unit standard deviations (i.e., it is a
+correlation matrix).  As with ordinary probit and logistic
+regressions, letting the scale vary causes the model (which is defined
+only by a cutpoint at 0, not a scale) to be unidentified (see
+\citep{Greene:2011}).
+
+Multivariate probit regression can be coded in Stan using the trick
+introduced by \cite{AlbertChib:1993}, where the underlying continuous
+value vectors $y_n$ are coded as truncated parameters.  The key to
+coding the model in Stan is declaring the latent vector $z$ in two
+parts, based on whether the correspdonding value of $y$ is 0 or 1.
+Otherwise, the model is identical to the seemingly unrelated
+regression model in the previous section.
+
+First, we introduce a sum function for two-dimensional arrays of
+integers;  this is going to help us calculate how many total 1 values
+there are in $y$.
+%
+\begin{stancode}
+functions {
+  int sum(int[,] a) {
+    int s;
+    s <- 0;
+    for (i in 1:size(a))
+      s <- s + sum(a[i]);
+    return s;
+  }
+}
+\end{stancode}
+%
+The function is trivial, but it's not a built-in for Stan and it's easier to
+understand the rest of the model if it's pulled into its own function
+so as not to create a distraction.
+
+The data declaration block is much like for the seemingly unrelated
+regressions, but the observations \code{y} are now integers
+constrained to be 0 or 1.
+%
+\begin{stancode}
+data {
+  int<lower=1> K;
+  int<lower=1> D;
+  int<lower=0> N;
+  int<lower=0,upper=1> y[N,D];
+  vector[K] x[N];
+}
+\end{stancode}
+
+After declaring the data, there is a rather involved transformed data
+block whose sole purpose is to sort the data array \code{y} into
+positive and negative components, keeping track of indexes so that
+\code{z} can be easily reassembled in the transformed parameters
+block.
+%
+\begin{stancode}
+transformed data {
+  int<lower=0> N_pos;
+  int<lower=1,upper=N> n_pos[sum(y)];
+  int<lower=1,upper=D> d_pos[size(n_pos)];
+  int<lower=0> N_neg;
+  int<lower=1,upper=N> n_neg[(N * D) - size(n_pos)];
+  int<lower=1,upper=D> d_neg[size(n_neg)];
+
+  N_pos <- size(n_pos);
+  N_neg <- size(n_neg);
+  {
+    int i;
+    int j;
+    i <- 1;
+    j <- 1;
+    for (n in 1:N) {
+      for (d in 1:D) {
+        if (y[n,d] == 1) {
+          n_pos[i] <- n;
+          d_pos[i] <- d;
+          i <- i + 1;
+        } else {
+          n_neg[j] <- n;
+          d_neg[j] <- d;
+          j <- j + 1;
+        }
+      }
+    }
+  }
+}
+\end{stancode}
+%
+The variables \code{N\_pos} and \code{N\_neg} are set to the number of
+true (1) and number of false (0) observations in \code{y}.  The loop
+then fills in the sequence of indexes for the positive and negative
+values in four arrays.
+
+The parameters are declared as follows.
+%
+\begin{stancode}
+parameters {
+  matrix[D,K] beta;
+  cholesky_factor_corr[D] L_Omega;
+  vector<lower=0>[N_pos] z_pos;
+  vector<upper=0>[N_neg] z_neg;
+}
+\end{stancode}
+%
+These include the regression coefficients \code{beta} and the Cholesky
+factor of the correlation matrix, \code{L\_Omega}.  This time there is
+no scaling because the covariance matrix has unit scale (i.e., it is a
+correlation matrix;  see above). 
+
+The critical part of the parameter declaration is that the latent real
+value $z$ is broken into positive-constrained and negative-constrained
+components, whose size was conveniently calculated in the transformed
+data block.  The transformed data block's real work was to allow the
+transformed parameter block to reconstruct $z$.
+%
+\begin{stancode}
+transformed parameters {
+  vector[D] z[N];
+  for (n in 1:N_pos)
+    z[n_pos[n], d_pos[n]] <- z_pos[n];
+  for (n in 1:N_neg)
+    z[n_neg[n], d_neg[n]] <- z_neg[n];
+}
+\end{stancode}
+
+At this point, the model is simple, pretty much recreating the
+seemingly unrelated regression.
+%
+\begin{stancode}
+model {
+  L_Omega ~ lkj_corr_cholesky(4);
+  to_vector(beta) ~ normal(0, 5);
+  { 
+    vector[D] beta_x[N];
+    for (n in 1:N) 
+      beta_x[n] <- beta * x[n];
+    z ~ multi_normal_cholesky(beta_x, L_Omega);
+  }
+}
+\end{stancode}
+%
+This simple form of model is made possible by the Albert and
+Chib-style constraints on \code{z}.
+
+Finally, the correlation matrix itself can be put back together in the
+generated quantities block if desired. 
+%
+\begin{stancode}
+generated quantities {
+  corr_matrix[D] Omega;
+  Omega <- multiply_lower_tri_self_transpose(L_Omega);  
+}
+\end{stancode}
+%
+Of course, the same could be done for the seemingly unrelated
+regressions in the previous section.
 
 \chapter{Time-Series Models}
 
@@ -2926,7 +3199,7 @@ In the situation where the hidden states are known, the following
 naive model can be used to fit the parameters $\theta$ and $\phi$.%
 %
 \footnote{The program code is available in the Stan example model repository;
-see \url{http://mc-stan.org/examples.html}.}
+see \url{https://github.com/stan-dev/example-models/tree/master/misc/gaussian-process}.}
 %
 \begin{stancode}
 data {
@@ -8665,6 +8938,27 @@ initial values can be found and the labels do not switch within a
 Markov chain.  The result is that all chains are glued to a
 neighborhood of a particular mode in the posterior.
 
+\section{Component Collapsing in Mixture Models}
+
+It is possible for two mixture components in a mixture model to
+collapse to the same values during sampling or optimization.  For
+example, a mixture of $K$ normals might devolve to have $\mu_i =
+\mu_j$ and $\sigma_i = \sigma_j$ for $i \neq j$.  
+
+This will typically happen early in sampling due to initialization in
+MCMC or optimization or arise from random movement during MCMC.  Once
+the parameters match for a given draw $(m)$, it can become hard to
+escape because there can be a trough of low-density mass between the
+current parameter values and the ones without collapsed components.  
+
+It may help to use a smaller step size during warmup, a stronger prior
+on each mixture component's membership responsibility.  A more extreme
+measure is to include additional mixture components to deal with the
+possiblity that some of them may collapse.
+
+In general, it is very difficult to recover exactly the right $K$
+mixture components in a mixture model as $K$ increases beyond one
+(yes, even a two-component mixture can have this problem).
 
 
 \section{Posteriors with Unbounded Densities}
@@ -10202,3 +10496,7 @@ you are running in RStan, Rcpp handles the conversion between R's
 floating point numbers and C++ doubles. If Rcpp changes the conversion
 process or use different types, the results are not guaranteed to be
 the same down to the bit level.  
+
+The compiler and compiler settings can also be an issue.  There is a
+nice discussion of the issues and how to control reproducibility in
+Intel's proprietary compiler by \cite{CordenKreitzer:2014}.

@@ -1,0 +1,5 @@
+data {
+  real virtual;
+}
+model {
+}
