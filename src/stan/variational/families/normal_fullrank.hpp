@@ -295,16 +295,16 @@ namespace stan {
       return lhs += rhs;
     }
 
+    normal_fullrank operator/(normal_fullrank lhs, const normal_fullrank& rhs) {
+      return lhs /= rhs;
+    }
+
     normal_fullrank operator+(double scalar, normal_fullrank rhs) {
       return rhs += scalar;
     }
 
     normal_fullrank operator*(double scalar, normal_fullrank rhs) {
       return rhs *= scalar;
-    }
-
-    normal_fullrank operator/(normal_fullrank lhs, const normal_fullrank& rhs) {
-      return lhs /= rhs;
     }
   }  // variational
 }  // stan

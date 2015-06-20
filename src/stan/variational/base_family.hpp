@@ -42,9 +42,9 @@ namespace stan {
 
     // Arithmetic operators
     base_family operator+(base_family lhs, const base_family& rhs);
+    base_family operator/(base_family lhs, const base_family& rhs);
     base_family operator+(double scalar, base_family rhs);
     base_family operator*(double scalar, base_family rhs);
-    base_family operator/(base_family lhs, const base_family& rhs);
   }  // variational
 }  // stan
 

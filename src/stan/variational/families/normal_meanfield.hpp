@@ -283,16 +283,16 @@ namespace stan {
       return lhs += rhs;
     }
 
+    normal_meanfield operator/(normal_meanfield lhs, const normal_meanfield& rhs) {
+      return lhs /= rhs;
+    }
+
     normal_meanfield operator+(double scalar, normal_meanfield rhs) {
       return rhs += scalar;
     }
 
     normal_meanfield operator*(double scalar, normal_meanfield rhs) {
       return rhs *= scalar;
-    }
-
-    normal_meanfield operator/(normal_meanfield lhs, const normal_meanfield& rhs) {
-      return lhs /= rhs;
     }
   }  // variational
 }  // stan
