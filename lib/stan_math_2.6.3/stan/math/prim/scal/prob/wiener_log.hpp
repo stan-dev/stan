@@ -45,7 +45,11 @@
 namespace stan {
 
   namespace math {
-    /**
+
+     const double WIENER_ERR = 0.000001,
+       LOG_TWO_OVER_TWO_PLUS_LOG_SQRT_PI = LOG_TWO / 2 + LOG_SQRT_PI;
+
+     /**
      * The log of the first passage time density function for a (Wiener) drift diffusion model for the given $y$,
      * boundary separation $\alpha$, nondecision time $\tau$, relative bias $\beta$, and drift rate $\delta$.
      * $\alpha$ and $\tau$ must be greater than 0, and $\beta$ must be between 0 and 1. $y$ should contain
@@ -59,11 +63,6 @@ namespace stan {
      * @param delta The drift rate.
      * @return The log of the Wiener first passage time density of the specified arguments.
      */
-
-     const double MY_PI = boost::math::constants::pi<double>(),
-     MY_LN_SQRT_PI = std::log(std::sqrt(boost::math::constants::pi<double>())),
-     WIENER_ERR = 0.000001;
-
      template <bool propto,
                typename T_y, typename T_alpha, typename T_tau,
                typename T_beta, typename T_delta>
@@ -72,12 +71,6 @@ namespace stan {
        const T_beta& beta, const T_delta& delta) {
       static const char* function("stan::math::wiener_log(%1%)");
 
-      using stan::math::check_not_nan;
-      using stan::math::check_finite;
-      using stan::math::check_positive;
-      using stan::math::check_bounded;
-      using stan::math::check_consistent_sizes;
-      using stan::math::value_of;
       using boost::math::tools::promote_args;
       using boost::math::isinf;
       using boost::math::isfinite;
@@ -110,13 +103,14 @@ namespace stan {
       check_positive(function, "Nondecision time", tau);
       check_bounded(function, "A-priori bias", beta , 0, 1);
       check_consistent_sizes(function,
-       "Random variable", y,
-       "Boundary separation", alpha,
-       "A-priori bias", beta,
-       "Nondecision time", tau,
-       "Drift rate", delta);
+                             "Random variable", y,
+                             "Boundary separation", alpha,
+                             "A-priori bias", beta,
+                             "Nondecision time", tau,
+                             "Drift rate", delta);
 
-      size_t N = std::max(max_size(y, alpha, beta), max_size(tau, delta));
+      size_t N =
+        std::max(max_size(y, alpha, beta), max_size(tau, delta));
       if (!N)
         return 0.0;
       VectorView<const T_y> y_vec(y);
@@ -136,61 +130,70 @@ namespace stan {
           return lp;
         }
 
-        for (size_t i = 0; i < N; i++) {
-          typename scalar_type<T_beta>::type one_minus_beta = 1.0 - beta_vec[i];
-          typename scalar_type<T_alpha>::type alpha2 = alpha_vec[i] *
-                                                       alpha_vec[i];
-          T_return_type x = y_vec[i];
-          T_return_type kl, ks, tmp = 0;
-          T_return_type k, K;
+      for (size_t i = 0; i < N; i++) {
+        typename scalar_type<T_beta>::type one_minus_beta
+          = 1.0 - beta_vec[i];
+        typename scalar_type<T_alpha>::type alpha2
+          = square(alpha_vec[i]);
+        T_return_type x = y_vec[i];
+        T_return_type kl, ks, tmp = 0;
+        T_return_type k, K;
 
 
         x = x - tau_vec[i];  // remove non-decision time from x
         x = x / alpha2;  // convert t to normalized time tt
+        T_return_type sqrt_x = sqrt(x);
 
         // calculate number of terms needed for large t:
         // if error threshold is set low enough
-        if (MY_PI * x * WIENER_ERR < 1) {
+        if (pi() * x * WIENER_ERR < 1) {
           // compute bound
-          kl = sqrt(-2.0 * log(MY_PI * x * WIENER_ERR) / (pow(MY_PI, 2) * x));
+          kl = sqrt(-2.0 * log(pi() * x * WIENER_ERR) * SQRT_PI / x);
           // ensure boundary conditions met
-          kl = (kl > 1.0 / (MY_PI * sqrt(x))) ? kl : 1.0 / (MY_PI * sqrt(x));
+          kl = (kl > 1.0 / (pi() * sqrt_x)) ?
+               kl : 1.0 / (pi() * sqrt_x);
         } else {  // if error threshold set too high
-          kl = 1.0 / (MY_PI * sqrt(x));  // set to boundary condition
+          kl = 1.0 / (pi() * sqrt_x);  // set to boundary condition
         }
         // calculate number of terms needed for small t:
         // if error threshold is set low enough
-        if ((2.0 * sqrt(2.0 * MY_PI * x) * WIENER_ERR) < 1) {
+        T_return_type tmp_expr0
+          = 2.0 * SQRT_2_TIMES_SQRT_PI * sqrt_x * WIENER_ERR;
+        if (tmp_expr0 < 1) {
           // compute bound
-          ks = 2.0 + sqrt(-2.0 * x *
-               log(2.0 * sqrt(2.0 * MY_PI * x) * WIENER_ERR));
+          ks = 2.0 +  sqrt_x * sqrt(-2 * log(tmp_expr0));
           // ensure boundary conditions are met
-          ks = (ks > sqrt(x) + 1.0) ? ks : sqrt(x) + 1.0;
+          T_return_type sqrt_x_plus_one = sqrt_x + 1.0;
+          ks = (ks > sqrt_x_plus_one) ? ks : sqrt_x_plus_one;
         } else {  // if error threshold was set too high
           ks = 2.0;  // minimal kappa for that case
         }
         // compute density: f(tt|0,1,w)
         if (ks < kl) {  // if small t is better (i.e., lambda<0)
           K = ceil(ks);  // round to smallest integer meeting error
-          for (k = -floor((K - 1.0) / 2.0); k <= ceil((K - 1.0) / 2.0); k++)
+          T_return_type tmp_expr1 = (K - 1.0) / 2.0;
+          T_return_type tmp_expr2 = ceil(tmp_expr1);
+          for (k = -floor(tmp_expr1); k <= tmp_expr2; k++)
             // increment sum
             tmp += (one_minus_beta + 2.0 * k) *
-                    exp(-(pow((one_minus_beta + 2.0 * k), 2)) / 2.0 / x);
+                    exp(-(square(one_minus_beta + 2.0 * k)) * 0.5 / x);
             // add constant term
-            tmp = log(tmp) - 0.5 * LOG_TWO - MY_LN_SQRT_PI - 1.5 * log(x);
+            tmp = log(tmp) -
+                  LOG_TWO_OVER_TWO_PLUS_LOG_SQRT_PI- 1.5 * log(x);
         } else {  // if large t is better...
           K = ceil(kl);  // round to smallest integer meeting error
           for (k = 1; k <= K; k++)
             // increment sum
             tmp += k * exp(-(pow(k, 2)) *
-                   (pow(MY_PI, 2)) * x / 2.0) *
-                   sin(k * MY_PI * one_minus_beta);
-            tmp = log(tmp) + 2.0 * MY_LN_SQRT_PI;  // add constant term
+                   (square(pi()) * x * 0.5)) *
+                   sin(k * pi() * one_minus_beta);
+            tmp = log(tmp) + 2.0 * LOG_SQRT_PI;  // add constant term
         }
 
         // convert to f(t|v,a,w) and return result
         lp += delta_vec[i] * alpha_vec[i] * one_minus_beta -
-              pow(delta_vec[i], 2) * x * alpha2 / 2.0 - log(alpha2) + tmp;
+              pow(delta_vec[i], 2) * x * alpha2 / 2.0 -
+              log(alpha2) + tmp;
       }
 
       return lp;
