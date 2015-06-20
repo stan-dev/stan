@@ -30,6 +30,7 @@
 #define STAN_MATH_PRIM_MAT_PROB_WIENER_LOG_HPP
 
 #include <stan/math/prim/scal/fun/constants.hpp>
+#include <stan/math/prim/scal/fun/square.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/err/check_consistent_sizes.hpp>
 #include <stan/math/prim/scal/err/check_bounded.hpp>
@@ -148,7 +149,8 @@ namespace stan {
         // if error threshold is set low enough
         if (pi() * x * WIENER_ERR < 1) {
           // compute bound
-          kl = sqrt(-2.0 * log(pi() * x * WIENER_ERR) * SQRT_PI / x);
+          kl = sqrt(-2.0 * log(pi() * x * WIENER_ERR) * SQRT_PI) /
+               sqrt(x);
           // ensure boundary conditions met
           kl = (kl > 1.0 / (pi() * sqrt_x)) ?
                kl : 1.0 / (pi() * sqrt_x);
@@ -185,7 +187,7 @@ namespace stan {
           for (k = 1; k <= K; k++)
             // increment sum
             tmp += k * exp(-(pow(k, 2)) *
-                   (square(pi()) * x * 0.5)) *
+                   (square(pi()) * 0.5 * x)) *
                    sin(k * pi() * one_minus_beta);
             tmp = log(tmp) + 2.0 * LOG_SQRT_PI;  // add constant term
         }
