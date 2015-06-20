@@ -138,8 +138,8 @@ namespace stan {
                              "Dimension of lhs", dimension_,
                              "Dimension of rhs", rhs.dimension());
 
-        mu_.array() += rhs.mu().array();
-        L_chol_.array() += rhs.L_chol().array();
+        mu_ += rhs.mu();
+        L_chol_ += rhs.L_chol();
         return *this;
       }
 
@@ -163,8 +163,8 @@ namespace stan {
       }
 
       normal_fullrank operator*=(double scalar) {
-        mu_.array() *= scalar;
-        L_chol_.array() *= scalar;
+        mu_ *= scalar;
+        L_chol_ *= scalar;
         return *this;
       }
 
@@ -198,7 +198,7 @@ namespace stan {
                          "Dimension of mean vector",  dimension_);
         stan::math::check_not_nan(function, "Input vector", eta);
 
-        return (L_chol_*eta).array() + mu_.array();
+        return (L_chol_ * eta) + mu_;
       }
 
       /**
@@ -270,10 +270,8 @@ namespace stan {
           stan::model::gradient(m, zeta, tmp_lp, tmp_mu_grad,
                                 print_stream);
 
-          // Update mu
+          // Update gradient parameters
           mu_grad += tmp_mu_grad;
-
-          // Update L (lower triangular)
           for (int ii = 0; ii < dimension_; ++ii) {
             for (int jj = 0; jj <= ii; ++jj) {
               L_grad(ii, jj) += tmp_mu_grad(ii) * eta(jj);

@@ -130,8 +130,8 @@ namespace stan {
                              "Dimension of lhs", dimension_,
                              "Dimension of rhs", rhs.dimension());
 
-        mu_.array() += rhs.mu().array();
-        omega_.array() += rhs.omega().array();
+        mu_ += rhs.mu();
+        omega_ += rhs.omega();
         return *this;
       }
 
@@ -155,8 +155,8 @@ namespace stan {
       }
 
       normal_meanfield operator*=(double scalar) {
-        mu_.array() *= scalar;
-        omega_.array() *= scalar;
+        mu_ *= scalar;
+        omega_ *= scalar;
         return *this;
       }
 
@@ -258,12 +258,9 @@ namespace stan {
           stan::model::gradient(m, zeta, tmp_lp, tmp_mu_grad,
                                 print_stream);
 
-          // Update mu
-          mu_grad.array() = mu_grad.array() + tmp_mu_grad.array();
-
-          // Update omega
-          omega_grad.array() = omega_grad.array()
-            + tmp_mu_grad.array().cwiseProduct(eta.array());
+          // Update gradient parameters
+          mu_grad += tmp_mu_grad;
+          omega_grad.array() += tmp_mu_grad.array().cwiseProduct(eta.array());
         }
         mu_grad    /= static_cast<double>(n_monte_carlo_grad);
         omega_grad /= static_cast<double>(n_monte_carlo_grad);
