@@ -175,9 +175,9 @@ namespace stan {
       // 0.5 * dim * (1+log2pi) + 0.5 * log det (L^T L) =
       // 0.5 * dim * (1+log2pi) + sum(log(abs(diag(L))))
       double entropy() const {
-        double tmp(0.0);
-        double result(
-          0.5 * static_cast<double>(dimension_) * (1.0 + stan::math::LOG_TWO_PI));
+        double tmp = 0.0;
+        double result = 0.5 * static_cast<double>(dimension_) *
+          (1.0 + stan::math::LOG_TWO_PI);
         for (int d = 0; d < dimension_; ++d) {
           tmp = fabs(L_chol_(d, d));
           if (tmp != 0.0) {

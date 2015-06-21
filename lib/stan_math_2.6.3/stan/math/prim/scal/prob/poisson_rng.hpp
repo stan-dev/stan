@@ -28,11 +28,6 @@ namespace stan {
       using boost::random::poisson_distribution;
 
       static const char* function("stan::math::poisson_rng");
-      static const double POISSON_MAX_RATE = std::pow(2.0, 30);
-
-      using stan::math::check_not_nan;
-      using stan::math::check_nonnegative;
-      using stan::math::check_less;
 
       check_not_nan(function, "Rate parameter", lambda);
       check_nonnegative(function, "Rate parameter", lambda);

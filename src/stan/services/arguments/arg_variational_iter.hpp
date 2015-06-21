@@ -8,9 +8,7 @@ namespace stan {
   namespace services {
 
     class arg_variational_iter: public int_argument {
-
     public:
-
       arg_variational_iter(): int_argument() {
         _name = "iter";
         _description = "Maximum number of iterations";
@@ -23,12 +21,13 @@ namespace stan {
         _value = _default_value;
       };
 
-      bool is_valid(int value) { return value > 0; }
-
+      bool is_valid(int value) {
+        return value > 0;
+      }
     };
 
-  } // services
+  }  // services
 
-} // stan
+}  // stan
 
 #endif

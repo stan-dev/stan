@@ -1015,7 +1015,7 @@ to $\hat{R}$ values substantially greater than 1 because the first
 half of each chain has not mixed with the second half.
 
 
-\subsection{Converence is Global}
+\subsection{Convergence is Global}
 
 A question that often arises is whether it is acceptable to monitor
 convergence of only a subset of the parameters or generated
@@ -2286,12 +2286,12 @@ A $K \times K$ correlation matrix $\Omega$ is positive definite and
 has a unit diagonal.  Because it is positive definite, it can be
 Cholesky factored to a $K \times K$ lower-triangular matrix $L$ with
 positive diagonal elements such that $\Omega = L\,L^{\top}$.  Because
-the corelation matrix has a unit diagonal,
+the correlation matrix has a unit diagonal,
 \[
 \Omega_{k,k} = L_k\,L_k^{\top} = 1,
 \]
 each row vector $L_k$ of the Cholesky factor is of unit length.  The
-length and positivity constraint allow the diagonal elemens of $L$ to
+length and positivity constraint allow the diagonal elements of $L$ to
 be calculated from the off-diagonal elements, so that a Cholesky
 factor for a $K \times K$ correlation matrix requires only
 $\binom{K}{2}$ unconstrained parameters.
