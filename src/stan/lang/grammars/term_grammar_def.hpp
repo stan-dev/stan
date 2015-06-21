@@ -561,19 +561,18 @@ namespace stan {
     struct transpose_expr {
       template <class> struct result;
       template <typename F, typename T1, typename T2>
-      struct result<F(T1, T2)> { typedef expression type; };
+      struct result<F(T1, T2)> { typedef void type; };
 
-      expression operator()(const expression& expr,
+      void operator()(expression& expr,
                             std::ostream& error_msgs) const {
-        if (expr.expression_type().is_primitive()) {
-          return expr;
-        }
+        if (expr.expression_type().is_primitive())
+          return;
         std::vector<expression> args;
         args.push_back(expr);
         set_fun_type sft;
         fun f("transpose", args);
         sft(f, error_msgs);
-        return expression(f);
+        expr = expression(f);
       }
     };
     boost::phoenix::function<transpose_expr> transpose_f;
@@ -622,33 +621,30 @@ namespace stan {
 
     struct set_var_type {
       template <class> struct result;
-      template <typename F, typename T1, typename T2, typename T3, typename T4>
-      struct result<F(T1, T2, T3, T4)> { typedef variable type; };
-      variable operator()(variable& var_expr,
-                          variable_map& vm,
-                          std::ostream& error_msgs,
-                          bool& pass) const {
+      template <typename F, typename T1, typename T2, typename T3, 
+                typename T4, typename T5>
+      struct result<F(T1, T2, T3, T4, T5)> { typedef void type; };
+      void operator()(variable& var_expr, expression& val, variable_map& vm,
+                      std::ostream& error_msgs, bool& pass) const {
         std::string name = var_expr.name_;
-        if (!vm.exists(name)) {
-          pass = false;
+        if (name == std::string("lp__"))
+            error_msgs << std::endl
+                       << "WARNING:"
+                       << std::endl
+                       << "  Direct use of variable lp__ is deprecated"
+                       << " and will be removed in a future release."
+                       << std::endl
+                       << "  Please use increment_log_prob(u)"
+                       << " in place of of lp__ <- lp__ + u."
+                       << std::endl;
+        pass = vm.exists(name);
+        if (pass)
+          var_expr.set_type(vm.get_base_type(name), vm.get_num_dims(name));
+        else
           error_msgs << "variable \"" << name << '"' << " does not exist."
                      << std::endl;
-          return var_expr;
-        }
-        if (name == std::string("lp__")) {
-          error_msgs << std::endl
-                     << "WARNING:"
-                     << std::endl
-                     << "  Direct use of variable lp__ is deprecated"
-                     << " and will be removed in a future release."
-                     << std::endl
-                     << "  Please use increment_log_prob(u)"
-                     << " in place of of lp__ <- lp__ + u."
-                     << std::endl;
-        }
-        pass = true;
-        var_expr.set_type(vm.get_base_type(name), vm.get_num_dims(name));
-        return var_expr;
+
+        val = expression(var_expr);
       }
     };
     boost::phoenix::function<set_var_type> set_var_type_f;
@@ -693,8 +689,6 @@ namespace stan {
       using boost::spirit::qi::_pass;
       using boost::spirit::qi::_val;
       using boost::spirit::qi::labels::_r1;
-
-      // _r1 : var_origin
 
       term_r.name("expression");
       term_r
@@ -750,7 +744,7 @@ namespace stan {
                                         boost::phoenix::ref(error_msgs_))])
              |
                lit("'")
-               [_val = transpose_f(_val, boost::phoenix::ref(error_msgs_))]);
+               [transpose_f(_val, boost::phoenix::ref(error_msgs_))]);
 
       integrate_ode_r.name("expression");
       integrate_ode_r
@@ -781,9 +775,9 @@ namespace stan {
            > eps[set_fun_type_named_f(_val, _b, _r1, _pass,
                                       boost::phoenix::ref(error_msgs_))])
         | (variable_r[_a = _1]
-           > eps[_val = set_var_type_f(_a, boost::phoenix::ref(var_map_),
-                                       boost::phoenix::ref(error_msgs_),
-                                       _pass)])
+           > eps[set_var_type_f(_a, _val, boost::phoenix::ref(var_map_),
+                                boost::phoenix::ref(error_msgs_),
+                                _pass)])
         | int_literal_r[_val = _1]
         | double_literal_r[_val = _1]
         | (lit('(')

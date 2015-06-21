@@ -588,6 +588,26 @@ namespace stan {
     };
     boost::phoenix::function<add_line_number> add_line_number_f;
 
+    struct set_void_return {
+      template <class> struct result;
+      template <typename F, typename T1>
+      struct result<F(T1)> { typedef void type; };
+      void operator()(return_statement& s) const {
+        s = return_statement();
+      }
+    };
+    boost::phoenix::function<set_void_return> set_void_return_f;
+
+    struct set_no_op {
+      template <class> struct result;
+      template <typename F, typename T1>
+      struct result<F(T1)> { typedef void type; };
+      void operator()(no_op_statement& s) const {
+        s = no_op_statement();
+      }
+    };
+    boost::phoenix::function<set_no_op> set_no_op_f;
+
     template <typename Iterator>
     statement_grammar<Iterator>::statement_grammar(variable_map& var_map,
                                                std::stringstream& error_msgs)
@@ -808,13 +828,13 @@ namespace stan {
       // _r1 = var origin
       void_return_statement_r.name("void return statement");
       void_return_statement_r
-        = lit("return")[_val = expression()]
-        >> lit(';') [validate_void_return_allowed_f(_r1, _pass,
+        = lit("return")[set_void_return_f(_val)]  // = expression()]
+        >> lit(';')[validate_void_return_allowed_f(_r1, _pass,
                                         boost::phoenix::ref(error_msgs_))];
 
       no_op_statement_r.name("no op statement");
       no_op_statement_r
-        %= lit(';') [_val = no_op_statement()];  // ok to re-use instance
+        %= lit(';')[set_no_op_f(_val)];
     }
 
   }

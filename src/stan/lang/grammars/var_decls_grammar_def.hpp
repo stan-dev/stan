@@ -556,10 +556,10 @@ namespace stan {
 
     struct empty_range {
       template <class> struct result;
-      template <typename F, typename T1>
-      struct result<F(T1)> { typedef range type; };
-      range operator()(std::stringstream& /*error_msgs*/) const {
-        return range();
+      template <typename F, typename T1, typename T2>
+      struct result<F(T1, T2)> { typedef void type; };
+      void operator()(range& r, std::stringstream& /*error_msgs*/) const {
+        r = range();
       }
     };
     boost::phoenix::function<empty_range> empty_range_f;
@@ -938,7 +938,7 @@ namespace stan {
 
       range_brackets_int_r.name("integer range expression pair, brackets");
       range_brackets_int_r
-        = lit('<') [_val = empty_range_f(boost::phoenix::ref(error_msgs_))]
+        = lit('<') [empty_range_f(_val, boost::phoenix::ref(error_msgs_))]
         >> (
             ((lit("lower")
               >> lit('=')
@@ -962,7 +962,7 @@ namespace stan {
 
       range_brackets_double_r.name("real range expression pair, brackets");
       range_brackets_double_r
-        = lit('<') [_val = empty_range_f(boost::phoenix::ref(error_msgs_))]
+        = lit('<')[empty_range_f(_val, boost::phoenix::ref(error_msgs_))]
         > (
            ((lit("lower")
              > lit('=')
