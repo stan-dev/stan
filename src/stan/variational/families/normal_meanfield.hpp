@@ -42,14 +42,14 @@ namespace stan {
 
     public:
       // Constructors
-      normal_meanfield(size_t dimension) :
+      explicit normal_meanfield(size_t dimension) :
         dimension_(dimension) {
         mu_     = Eigen::VectorXd::Zero(dimension_);
         // initializing omega = 0 means sigma = 1
         omega_  = Eigen::VectorXd::Zero(dimension_);
       }
 
-      normal_meanfield(const Eigen::VectorXd& cont_params) :
+      explicit normal_meanfield(const Eigen::VectorXd& cont_params) :
         mu_(cont_params), dimension_(cont_params.size()) {
         // initializing omega = 0 means sigma = 1
         omega_  = Eigen::VectorXd::Zero(dimension_);
@@ -254,8 +254,7 @@ namespace stan {
           stan::math::check_not_nan(function, "zeta", zeta);
 
           // Compute gradient step in real-coordinate space
-          stan::model::gradient(m, zeta, tmp_lp, tmp_mu_grad,
-                                print_stream);
+          stan::model::gradient(m, zeta, tmp_lp, tmp_mu_grad, print_stream);
 
           // Update gradient parameters
           mu_grad += tmp_mu_grad;
@@ -278,11 +277,13 @@ namespace stan {
     };
 
     // Arithmetic operators
-    normal_meanfield operator+(normal_meanfield lhs, const normal_meanfield& rhs) {
+    normal_meanfield operator+(normal_meanfield lhs,
+                               const normal_meanfield& rhs) {
       return lhs += rhs;
     }
 
-    normal_meanfield operator/(normal_meanfield lhs, const normal_meanfield& rhs) {
+    normal_meanfield operator/(normal_meanfield lhs,
+                               const normal_meanfield& rhs) {
       return lhs /= rhs;
     }
 

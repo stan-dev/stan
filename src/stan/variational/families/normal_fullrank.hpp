@@ -46,13 +46,13 @@ namespace stan {
 
     public:
       // Constructors
-      normal_fullrank(size_t dimension) :
+      explicit normal_fullrank(size_t dimension) :
         dimension_(dimension) {
         mu_     = Eigen::VectorXd::Zero(dimension_);
         L_chol_  = Eigen::MatrixXd::Identity(dimension_, dimension_);
       }
 
-      normal_fullrank(const Eigen::VectorXd& cont_params) :
+      explicit normal_fullrank(const Eigen::VectorXd& cont_params) :
         mu_(cont_params), dimension_(cont_params.size()) {
         L_chol_  = Eigen::MatrixXd::Identity(dimension_, dimension_);
       }
@@ -266,8 +266,7 @@ namespace stan {
           zeta = transform(eta);
 
           // Compute gradient step in real-coordinate space
-          stan::model::gradient(m, zeta, tmp_lp, tmp_mu_grad,
-                                print_stream);
+          stan::model::gradient(m, zeta, tmp_lp, tmp_mu_grad, print_stream);
 
           // Update gradient parameters
           mu_grad += tmp_mu_grad;

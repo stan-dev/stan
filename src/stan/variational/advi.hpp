@@ -215,7 +215,8 @@ namespace stan {
           }
 
           // Stochastic gradient update
-          variational += eta_adagrad_ * elbo_grad / (tau + params_adagrad.sqrt());
+          variational += eta_adagrad_ * elbo_grad /
+            (tau + params_adagrad.sqrt());
 
           // Check for convergence every "eval_elbo_"th iteration
           if (iter_counter % eval_elbo_ == 0) {

@@ -12,7 +12,7 @@ namespace stan {
     class base_family {
     public:
       // Constructors
-      base_family() {};
+      base_family() {}
 
       // Operations
       base_family square() const;
@@ -38,7 +38,7 @@ namespace stan {
                      int n_monte_carlo_grad,
                      BaseRNG& rng,
                      std::ostream* print_stream) const;
-    };
+    }
 
     // Arithmetic operators
     base_family operator+(base_family lhs, const base_family& rhs);
