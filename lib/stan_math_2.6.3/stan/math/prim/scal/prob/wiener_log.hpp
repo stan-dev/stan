@@ -47,9 +47,6 @@ namespace stan {
 
   namespace math {
 
-     const double WIENER_ERR = 0.000001,
-       LOG_TWO_OVER_TWO_PLUS_LOG_SQRT_PI = LOG_TWO / 2 + LOG_SQRT_PI;
-
      /**
      * The log of the first passage time density function for a (Wiener) drift diffusion model for the given $y$,
      * boundary separation $\alpha$, nondecision time $\tau$, relative bias $\beta$, and drift rate $\delta$.
@@ -78,6 +75,18 @@ namespace stan {
       using std::log;
       using std::exp;
       using std::pow;
+
+      static const double WIENER_ERR = 0.000001;
+      static const double PI_TIMES_WIENER_ERR = pi() * WIENER_ERR;
+      static const double LOG_PI_LOG_WIENER_ERR =
+        LOG_PI + log(WIENER_ERR);
+      static const double
+        TWO_TIMES_SQRT_2_TIMES_SQRT_PI_TIMES_WIENER_ERR =
+        2.0 * SQRT_2_TIMES_SQRT_PI * WIENER_ERR;
+      static const double LOG_TWO_OVER_TWO_PLUS_LOG_SQRT_PI =
+       LOG_TWO / 2 + LOG_SQRT_PI;
+      static const double SQUARE_PI_OVER_TWO = square(pi()) * 0.5;
+      static const double TWO_TIMES_LOG_SQRT_PI = 2.0 * LOG_SQRT_PI;
 
       if (!(stan::length(y)
         && stan::length(alpha)
@@ -144,23 +153,26 @@ namespace stan {
         x = x - tau_vec[i];  // remove non-decision time from x
         x = x / alpha2;  // convert t to normalized time tt
         T_return_type sqrt_x = sqrt(x);
+        T_return_type log_x = log(x);
+        T_return_type one_over_pi_times_sqrt_x = 1.0 / pi() * sqrt_x;
 
         // calculate number of terms needed for large t:
         // if error threshold is set low enough
-        if (pi() * x * WIENER_ERR < 1) {
+        if (PI_TIMES_WIENER_ERR * x < 1) {
           // compute bound
-          kl = sqrt(-2.0 * log(pi() * x * WIENER_ERR) * SQRT_PI) /
+          kl = sqrt(-2.0 * SQRT_PI *
+               (LOG_PI_LOG_WIENER_ERR + log_x)) /
                sqrt_x;
           // ensure boundary conditions met
-          kl = (kl > 1.0 / (pi() * sqrt_x)) ?
-               kl : 1.0 / (pi() * sqrt_x);
+          kl = (kl > one_over_pi_times_sqrt_x) ?
+               kl : one_over_pi_times_sqrt_x;
         } else {  // if error threshold set too high
-          kl = 1.0 / (pi() * sqrt_x);  // set to boundary condition
+          kl = one_over_pi_times_sqrt_x;  // set to boundary condition
         }
         // calculate number of terms needed for small t:
         // if error threshold is set low enough
         T_return_type tmp_expr0
-          = 2.0 * SQRT_2_TIMES_SQRT_PI * sqrt_x * WIENER_ERR;
+          = TWO_TIMES_SQRT_2_TIMES_SQRT_PI_TIMES_WIENER_ERR * sqrt_x;
         if (tmp_expr0 < 1) {
           // compute bound
           ks = 2.0 +  sqrt_x * sqrt(-2 * log(tmp_expr0));
@@ -181,20 +193,21 @@ namespace stan {
                     exp(-(square(one_minus_beta + 2.0 * k)) * 0.5 / x);
             // add constant term
             tmp = log(tmp) -
-                  LOG_TWO_OVER_TWO_PLUS_LOG_SQRT_PI- 1.5 * log(x);
+                  LOG_TWO_OVER_TWO_PLUS_LOG_SQRT_PI - 1.5 * log_x;
         } else {  // if large t is better...
           K = ceil(kl);  // round to smallest integer meeting error
           for (k = 1; k <= K; k++)
             // increment sum
-            tmp += k * exp(-(pow(k, 2)) *
-                   (square(pi()) * 0.5 * x)) *
+            tmp += k * exp(-(square(k)) *
+                   (SQUARE_PI_OVER_TWO * x)) *
                    sin(k * pi() * one_minus_beta);
-            tmp = log(tmp) + 2.0 * LOG_SQRT_PI;  // add constant term
+            tmp = log(tmp) +
+                  TWO_TIMES_LOG_SQRT_PI;  // add constant term
         }
 
         // convert to f(t|v,a,w) and return result
         lp += delta_vec[i] * alpha_vec[i] * one_minus_beta -
-              pow(delta_vec[i], 2) * x * alpha2 / 2.0 -
+              square(delta_vec[i]) * x * alpha2 / 2.0 -
               log(alpha2) + tmp;
       }
 
@@ -209,21 +222,6 @@ namespace stan {
                const T_beta& beta, const T_delta& delta) {
       return wiener_log<false>(y, alpha, tau, beta, delta);
     }
-
-    /* Not actually implemented yet
-    template <class RNG>
-    inline double
-    wiener_rng(const double alpha,
-         const double tau,
-         const double beta,
-         const double delta,
-                     RNG& rng) {
-      using boost::variate_generator;
-      double a = tau+alpha*beta/stan::math::normal_rng(delta,1,rng);
-      //stan::math::wiener_rng(alpha, tau, beta, delta, rng);
-      return a;
-    }
-    */
   }
 }
 #endif
