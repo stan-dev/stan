@@ -38,7 +38,7 @@ namespace stan {
                      int n_monte_carlo_grad,
                      BaseRNG& rng,
                      std::ostream* print_stream) const;
-    }
+    };
 
     // Arithmetic operators
     base_family operator+(base_family lhs, const base_family& rhs);
