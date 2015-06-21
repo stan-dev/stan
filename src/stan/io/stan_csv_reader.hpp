@@ -74,7 +74,8 @@ namespace stan {
       stan_csv_reader() {}
       ~stan_csv_reader() {}
       
-      static bool read_metadata(std::istream& in, stan_csv_metadata& metadata, std::ostream* out) {
+      static bool read_metadata(std::istream& in, stan_csv_metadata& metadata,
+                                std::ostream* out) {
         std::stringstream ss;
         std::string line;
 

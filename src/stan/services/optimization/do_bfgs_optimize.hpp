@@ -24,7 +24,7 @@ namespace stan {
                            double &lp,
                            std::vector<double> &cont_vector,
                            std::vector<int> &disc_vector,
-                           std::fstream* output_stream,
+                           std::ostream* output_stream,
                            std::ostream* notice_stream,
                            bool save_iterations,
                            int refresh,

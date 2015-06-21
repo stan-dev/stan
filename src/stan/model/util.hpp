@@ -141,6 +141,8 @@ namespace stan {
                            std::ostream* msgs = 0) {
       using stan::math::var;
       using std::vector;
+      vector<int> params_i(0);
+
       double lp;
       try {
         vector<var> ad_params_r;
@@ -149,7 +151,7 @@ namespace stan {
         lp
           = model
           .template log_prob<true,
-                             jacobian_adjust_transform>(ad_params_r, msgs)
+                             jacobian_adjust_transform>(ad_params_r, params_i, msgs)
           .val();
       } catch (std::exception &ex) {
         stan::math::recover_memory();
@@ -182,6 +184,7 @@ namespace stan {
                          std::ostream* msgs = 0) {
       using std::vector;
       using stan::math::var;
+      
       Eigen::Matrix<var, Eigen::Dynamic, 1> ad_params_r(params_r.size());
       for (size_t i = 0; i < model.num_params_r(); ++i) {
         stan::math::var var_i(params_r[i]);
@@ -190,8 +193,8 @@ namespace stan {
       try {
         var adLogProb
           = model
-            .template log_prob<propto,
-                               jacobian_adjust_transform>(ad_params_r, msgs);
+          .template log_prob<propto,
+                             jacobian_adjust_transform>(ad_params_r, msgs);
         double val = adLogProb.val();
         stan::math::grad(adLogProb, ad_params_r, gradient);
         return val;
@@ -280,8 +283,11 @@ namespace stan {
                        std::ostream* msgs) {
       std::vector<double> grad;
       double lp
-        = stan::model::log_prob_grad<propto, jacobian_adjust_transform>
-        (model, params_r, params_i, grad, msgs);
+        = log_prob_grad<propto, jacobian_adjust_transform>(model,
+                                                           params_r,
+                                                           params_i,
+                                                           grad,
+                                                           msgs);
 
       std::vector<double> grad_fd;
       finite_diff_grad<false,
@@ -358,12 +364,11 @@ namespace stan {
             -1.0 / 12.0 };
 
       double result
-        = stan::model::log_prob_grad<propto,
-                                     jacobian_adjust_transform>(model,
-                                                                params_r,
-                                                                params_i,
-                                                                gradient,
-                                                                msgs);
+        = log_prob_grad<propto, jacobian_adjust_transform>(model,
+                                                           params_r,
+                                                           params_i,
+                                                           gradient,
+                                                           msgs);
       hessian.assign(params_r.size() * params_r.size(), 0);
       std::vector<double> temp_grad(params_r.size());
       std::vector<double> perturbed_params(params_r.begin(), params_r.end());
@@ -371,11 +376,10 @@ namespace stan {
         double* row = &hessian[d*params_r.size()];
         for (int i = 0; i < order; i++) {
           perturbed_params[d] = params_r[d] + perturbations[i];
-          stan::model::log_prob_grad<propto,
-                                     jacobian_adjust_transform>(model,
-                                                            perturbed_params,
-                                                            params_i,
-                                                            temp_grad);
+          log_prob_grad<propto, jacobian_adjust_transform>(model,
+                                                           perturbed_params,
+                                                           params_i,
+                                                           temp_grad);
           for (size_t dd = 0; dd < params_r.size(); dd++) {
             row[dd] += 0.5 * coefficients[i] * temp_grad[dd] / epsilon;
             hessian[d + dd*params_r.size()]
@@ -448,13 +452,11 @@ namespace stan {
 
     template <class M>
     void grad_tr_mat_times_hessian(const M& model,
-                                   const Eigen::Matrix
-                                   <double, Eigen::Dynamic, 1>& x,
-                                   const Eigen::Matrix
-                                   <double, Eigen::Dynamic, Eigen::Dynamic>& X,
-                                   Eigen::Matrix<double, Eigen::Dynamic, 1>&
-                                   grad_tr_X_hess_f,
-                                   std::ostream* msgs = 0) {
+            const Eigen::Matrix <double, Eigen::Dynamic, 1>& x,
+            const Eigen::Matrix <double, Eigen::Dynamic, Eigen::Dynamic>& X,
+            Eigen::Matrix<double, Eigen::Dynamic, 1>&
+            grad_tr_X_hess_f,
+            std::ostream* msgs = 0) {
       stan::math::grad_tr_mat_times_hessian(model_functional<M>(model, msgs),
                                             x, X, grad_tr_X_hess_f);
     }

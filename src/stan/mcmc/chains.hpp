@@ -30,7 +30,6 @@
 #include <sstream>
 #include <utility>
 #include <vector>
-#include <fstream>
 #include <cstdlib>
 
 namespace stan {

@@ -7,7 +7,7 @@
 #include <stan/mcmc/hmc/hamiltonians/diag_e_metric.hpp>
 
 #include <test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp>
-
+#include <test/unit/util.hpp>
 #include <gtest/gtest.h>
 
 typedef boost::ecuyer1988 rng_t;
@@ -142,4 +142,30 @@ TEST(McmcDiagEMetric, gradients) {
 
   EXPECT_EQ("", model_output.str());
   EXPECT_EQ("", metric_output.str());
+}
+
+TEST(McmcDiagEMetric, streams) {
+  stan::test::capture_std_streams();
+  
+  rng_t base_rng(0);
+  
+  Eigen::VectorXd q(2);
+  q(0) = 5;
+  q(1) = 1;
+
+  
+  stan::mcmc::mock_model model(q.size());
+
+  // typedef to use within Google Test macros
+  typedef stan::mcmc::diag_e_metric<stan::mcmc::mock_model, rng_t> dense_e;
+  
+  EXPECT_NO_THROW(dense_e metric(model, 0));
+
+  std::stringstream metric_output;
+  EXPECT_NO_THROW(dense_e metric(model, &metric_output));
+  EXPECT_EQ("", metric_output.str());
+
+  stan::test::reset_std_streams();
+  EXPECT_EQ("", stan::test::cout_ss.str());
+  EXPECT_EQ("", stan::test::cerr_ss.str());
 }

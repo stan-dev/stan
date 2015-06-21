@@ -227,6 +227,13 @@ TEST(OptimizationBfgs, lp_no_jacobian) {
 
   EXPECT_FLOAT_EQ(stan::optimization::lp_no_jacobian(rb_model, cont_vector, 
                                                      disc_vector), 0);
+  // test streams
+  EXPECT_NO_THROW(stan::optimization::lp_no_jacobian(rb_model, cont_vector, 
+                                                     disc_vector, 0));
+  std::stringstream out;
+  EXPECT_NO_THROW(stan::optimization::lp_no_jacobian(rb_model, cont_vector, 
+                                                     disc_vector, &out));
+  EXPECT_EQ("", out.str());
 }
 
 TEST(OptimizationBfgs, ModelAdaptor) {
@@ -241,6 +248,10 @@ TEST(OptimizationBfgs, ModelAdaptor) {
   std::stringstream out;
   stan::optimization::ModelAdaptor<Model> mod(rb_model, disc_vector, &out);
   EXPECT_EQ("", out.str());
+
+  // test streams
+  EXPECT_NO_THROW(stan::optimization::ModelAdaptor<Model> mod(rb_model, disc_vector, 0));
+  EXPECT_NO_THROW(stan::optimization::ModelAdaptor<Model> mod(rb_model, disc_vector, &out));
 }
 
 TEST(OptimizationBfgs, ModelAdaptor_fevals) {
@@ -333,6 +344,10 @@ TEST(OptimizationBfgs, BFGSLineSearch) {
   std::stringstream out;
   Optimizer bfgs(rb_model, cont_vector, disc_vector, &out);
   EXPECT_EQ("", out.str());
+
+  // test streams
+  EXPECT_NO_THROW(Optimizer bfgs(rb_model, cont_vector, disc_vector, 0));
+  EXPECT_NO_THROW(Optimizer bfgs(rb_model, cont_vector, disc_vector, &out));
 }
 
 
