@@ -1,5 +1,5 @@
-#ifndef STAN_VARIATIONAL_ADVI_PARAMS_NORMAL_MEANFIELD__HPP
-#define STAN_VARIATIONAL_ADVI_PARAMS_NORMAL_MEANFIELD__HPP
+#ifndef STAN_VARIATIONAL_NORMAL_MEANFIELD_HPP
+#define STAN_VARIATIONAL_NORMAL_MEANFIELD_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
@@ -17,6 +17,8 @@
 
 #include <stan/model/util.hpp>
 
+#include <stan/variational/base_family.hpp>
+
 #include <vector>
 #include <ostream>
 
@@ -24,27 +26,46 @@ namespace stan {
 
   namespace variational {
 
-    class advi_params_normal_meanfield {
+    /*
+     * MULTIVARIATE NORMAL DISTRIBUTION MEAN-FIELD
+     *
+     * Variational family as mean-field multivariate normal distribution
+     *
+     * @param  mu    mean vector
+     * @param  omega log standard deviation vector
+     */
+    class normal_meanfield : public base_family {
     private:
-      Eigen::VectorXd mu_;     // Mean vector
-      Eigen::VectorXd omega_;  // Log standard deviation vector
+      Eigen::VectorXd mu_;
+      Eigen::VectorXd omega_;
       int dimension_;
 
     public:
-      advi_params_normal_meanfield(const Eigen::VectorXd& mu,
-                                   const Eigen::VectorXd& omega) :
+      // Constructors
+      explicit normal_meanfield(size_t dimension) :
+        dimension_(dimension) {
+        mu_     = Eigen::VectorXd::Zero(dimension_);
+        // initializing omega = 0 means sigma = 1
+        omega_  = Eigen::VectorXd::Zero(dimension_);
+      }
+
+      explicit normal_meanfield(const Eigen::VectorXd& cont_params) :
+        mu_(cont_params), dimension_(cont_params.size()) {
+        // initializing omega = 0 means sigma = 1
+        omega_  = Eigen::VectorXd::Zero(dimension_);
+      }
+
+      normal_meanfield(const Eigen::VectorXd& mu,
+                       const Eigen::VectorXd& omega) :
       mu_(mu), omega_(omega), dimension_(mu.size()) {
         static const char* function =
-          "stan::variational::advi_params_normal_meanfield";
+          "stan::variational::normal_meanfield";
 
         stan::math::check_size_match(function,
                              "Dimension of mean vector", dimension_,
                              "Dimension of log std vector", omega_.size() );
-        for (int i = 0; i < dimension_; ++i) {
-          stan::math::check_not_nan(function, "Mean vector", mu_(i));
-          stan::math::check_not_nan(function, "Log std vector",
-                                              omega_(i));
-        }
+        stan::math::check_not_nan(function, "Mean vector", mu_);
+        stan::math::check_not_nan(function, "Log std vector", omega_);
       }
 
       // Accessors
@@ -55,7 +76,7 @@ namespace stan {
       // Mutators
       void set_mu(const Eigen::VectorXd& mu) {
         static const char* function =
-          "stan::variational::advi_params_normal_meanfield::set_mu";
+          "stan::variational::normal_meanfield::set_mu";
 
         stan::math::check_size_match(function,
                                "Dimension of input vector", mu.size(),
@@ -66,7 +87,7 @@ namespace stan {
 
       void set_omega(const Eigen::VectorXd& omega) {
         static const char* function =
-          "stan::variational::advi_params_normal_meanfield::set_omega";
+          "stan::variational::normal_meanfield::set_omega";
 
         stan::math::check_size_match(function,
                                "Dimension of input vector", omega.size(),
@@ -75,7 +96,74 @@ namespace stan {
         omega_ = omega;
       }
 
-      // Entropy of normal:
+      // Operations
+      normal_meanfield square() const {
+        return normal_meanfield(Eigen::VectorXd(mu_.array().square()),
+                                Eigen::VectorXd(omega_.array().square()));
+      }
+
+      normal_meanfield sqrt() const {
+        return normal_meanfield(Eigen::VectorXd(mu_.array().sqrt()),
+                                Eigen::VectorXd(omega_.array().sqrt()));
+      }
+
+      // Compound assignment operators
+      normal_meanfield operator=(const normal_meanfield& rhs) {
+        static const char* function =
+          "stan::variational::normal_meanfield::operator=";
+
+        stan::math::check_size_match(function,
+                             "Dimension of lhs", dimension_,
+                             "Dimension of rhs", rhs.dimension());
+
+        mu_ = rhs.mu();
+        omega_ = rhs.omega();
+        return *this;
+      }
+
+      normal_meanfield operator+=(const normal_meanfield& rhs) {
+        static const char* function =
+          "stan::variational::normal_meanfield::operator+=";
+
+        stan::math::check_size_match(function,
+                             "Dimension of lhs", dimension_,
+                             "Dimension of rhs", rhs.dimension());
+
+        mu_ += rhs.mu();
+        omega_ += rhs.omega();
+        return *this;
+      }
+
+      normal_meanfield operator/=(const normal_meanfield& rhs) {
+        static const char* function =
+          "stan::variational::normal_meanfield::operator/=";
+
+        stan::math::check_size_match(function,
+                             "Dimension of lhs", dimension_,
+                             "Dimension of rhs", rhs.dimension());
+
+        mu_.array() /= rhs.mu().array();
+        omega_.array() /= rhs.omega().array();
+        return *this;
+      }
+
+      normal_meanfield operator+=(double scalar) {
+        mu_.array() += scalar;
+        omega_.array() += scalar;
+        return *this;
+      }
+
+      normal_meanfield operator*=(double scalar) {
+        mu_ *= scalar;
+        omega_ *= scalar;
+        return *this;
+      }
+
+      // Distribution-based operations
+      const Eigen::VectorXd& mean() const {
+        return mu();
+      }
+
       // 0.5 * dim * (1+log2pi) + 0.5 * log det diag(sigma^2) =
       // 0.5 * dim * (1+log2pi) + sum(log(sigma)) =
       // 0.5 * dim * (1+log2pi) + sum(omega)
@@ -87,7 +175,7 @@ namespace stan {
       // Implements S^{-1}(eta) = sigma * eta + \mu
       Eigen::VectorXd transform(const Eigen::VectorXd& eta) const {
         static const char* function =
-          "stan::variational::advi_params_normal_meanfield::transform";
+          "stan::variational::normal_meanfield::transform";
 
         stan::math::check_size_match(function,
                          "Dimension of mean vector", dimension_,
@@ -118,8 +206,6 @@ namespace stan {
       }
 
       /**
-       * MEAN-FIELD GRADIENTS
-       *
        * Calculates the "blackbox" gradient with respect to BOTH the location
        * vector (mu) and the log-std vector (omega) in parallel.
        * It uses the same gradient computed from a set of Monte Carlo
@@ -127,38 +213,31 @@ namespace stan {
        *
        * @tparam M                     class of model
        * @tparam BaseRNG               class of random number generator
-       * @param  mu_grad               gradient of mean vector parameter
-       * @param  omega_grad            gradient of log-std vector parameter
+       * @param  elbo_grad             parameters to store "blackbox" gradient
        * @param  cont_params           continuous parameters
        * @param  n_monte_carlo_grad    number of samples for gradient computation
        * @param  print_stream          stream for convergence assessment output
        */
       template <class M, class BaseRNG>
-      void calc_grad(Eigen::VectorXd& mu_grad,
-                     Eigen::VectorXd& omega_grad,
+      void calc_grad(normal_meanfield& elbo_grad,
                      M& m,
                      Eigen::VectorXd& cont_params,
                      int n_monte_carlo_grad,
                      BaseRNG& rng,
-                     std::ostream* print_stream) {
+                     std::ostream* print_stream) const {
         static const char* function =
-          "stan::variational::advi_params_normal_meanfield::calc_grad";
+          "stan::variational::normal_meanfield::calc_grad";
 
         stan::math::check_size_match(function,
-                        "Dimension of mu grad vector", mu_grad.size(),
-                        "Dimension of mean vector in variational q",
-                          dimension_);
+                        "Dimension of elbo_grad", elbo_grad.dimension(),
+                        "Dimension of variational q", dimension_);
         stan::math::check_size_match(function,
-                        "Dimension of omega grad vector", omega_grad.size(),
-                        "Dimension of mean vector in variational q",
-                          dimension_);
-        stan::math::check_size_match(function,
-                        "Dimension of muomega", dimension_,
+                        "Dimension of variational q", dimension_,
                         "Dimension of variables in model", cont_params.size());
 
         // Initialize everything to zero
-        mu_grad    = Eigen::VectorXd::Zero(dimension_);
-        omega_grad = Eigen::VectorXd::Zero(dimension_);
+        Eigen::VectorXd mu_grad    = Eigen::VectorXd::Zero(dimension_);
+        Eigen::VectorXd omega_grad = Eigen::VectorXd::Zero(dimension_);
         double tmp_lp = 0.0;
         Eigen::VectorXd tmp_mu_grad = Eigen::VectorXd::Zero(dimension_);
         Eigen::VectorXd eta  = Eigen::VectorXd::Zero(dimension_);
@@ -175,15 +254,11 @@ namespace stan {
           stan::math::check_not_nan(function, "zeta", zeta);
 
           // Compute gradient step in real-coordinate space
-          stan::model::gradient(m, zeta, tmp_lp, tmp_mu_grad,
-                                print_stream);
+          stan::model::gradient(m, zeta, tmp_lp, tmp_mu_grad, print_stream);
 
-          // Update mu
-          mu_grad.array() = mu_grad.array() + tmp_mu_grad.array();
-
-          // Update omega
-          omega_grad.array() = omega_grad.array()
-            + tmp_mu_grad.array().cwiseProduct(eta.array());
+          // Update gradient parameters
+          mu_grad += tmp_mu_grad;
+          omega_grad.array() += tmp_mu_grad.array().cwiseProduct(eta.array());
         }
         mu_grad    /= static_cast<double>(n_monte_carlo_grad);
         omega_grad /= static_cast<double>(n_monte_carlo_grad);
@@ -194,8 +269,31 @@ namespace stan {
 
         // Add gradient of entropy term (just equal to element-wise 1 here)
         omega_grad.array() += 1.0;
+
+        // Set parameters to argument
+        elbo_grad.set_mu(mu_grad);
+        elbo_grad.set_omega(omega_grad);
       }
     };
+
+    // Arithmetic operators
+    normal_meanfield operator+(normal_meanfield lhs,
+                               const normal_meanfield& rhs) {
+      return lhs += rhs;
+    }
+
+    normal_meanfield operator/(normal_meanfield lhs,
+                               const normal_meanfield& rhs) {
+      return lhs /= rhs;
+    }
+
+    normal_meanfield operator+(double scalar, normal_meanfield rhs) {
+      return rhs += scalar;
+    }
+
+    normal_meanfield operator*(double scalar, normal_meanfield rhs) {
+      return rhs *= scalar;
+    }
   }  // variational
 }  // stan
 
