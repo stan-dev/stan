@@ -209,17 +209,17 @@ namespace boost { namespace phoenix
             return *this;
         }
 
-        template <typename A0>
-        typename proto::result_of::make_expr<
-            proto::tag::assign
-          , phoenix_domain
-          , proto_base_expr
-          , A0
-        >::type const
-        operator=(A0 const & a0) const
-        {
-            return proto::make_expr<proto::tag::assign, phoenix_domain>(this->proto_expr_, a0);
-        }
+        // template <typename A0>
+        // typename proto::result_of::make_expr<
+        //     proto::tag::assign
+        //   , phoenix_domain
+        //   , proto_base_expr
+        //   , A0
+        // >::type const
+        // operator=(A0 const & a0) const
+        // {
+        //     return proto::make_expr<proto::tag::assign, phoenix_domain>(this->proto_expr_, a0);
+        // }
 
         template <typename A0>
         typename proto::result_of::make_expr<

@@ -115,7 +115,7 @@ namespace stan {
 
 
     struct subtraction_expr3 {
-      template <class> struct result; 
+      template <class> struct result;
       template <typename F, typename T1, typename T2, typename T3>
       struct result<F(T1, T2, T3)> { typedef void type; };
 
@@ -166,7 +166,7 @@ namespace stan {
             (lit('-')
              > term_g(_r1)
              [subtraction3_f(_val, _1, boost::phoenix::ref(error_msgs))]))
-        > eps[validate_expr_type3_f(_val, _pass, 
+        > eps[validate_expr_type3_f(_val, _pass,
                                     boost::phoenix::ref(error_msgs_))];
     }
 

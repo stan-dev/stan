@@ -140,7 +140,7 @@ namespace stan {
 
     struct validate_assignment {
       template <class> struct result;
-      template <typename F, typename T1, typename T2, typename T3, 
+      template <typename F, typename T1, typename T2, typename T3,
                 typename T4, typename T5>
       struct result<F(T1, T2, T3, T4, T5)> { typedef void type; };
 
@@ -646,7 +646,7 @@ namespace stan {
 
     template <typename Iterator>
     statement_grammar<Iterator>::statement_grammar(variable_map& var_map,
-                                                   std::stringstream& error_msgs)
+                                           std::stringstream& error_msgs)
       : statement_grammar::base_type(statement_r),
         var_map_(var_map),
         error_msgs_(error_msgs),
@@ -718,8 +718,9 @@ namespace stan {
         > eps[ validate_allow_sample_f(_r1, _pass,
                                        boost::phoenix::ref(error_msgs_)) ]
         > lit('(')
-        > expression_g(_r2) [validate_non_void_expression_f(_1, _pass,
-                                                            boost::phoenix::ref(error_msgs_))]
+        > expression_g(_r2)
+          [validate_non_void_expression_f(_1, _pass,
+                                          boost::phoenix::ref(error_msgs_))]
         > lit(')')
         > lit(';');
 

@@ -632,7 +632,7 @@ namespace stan {
 
     struct set_var_type {
       template <class> struct result;
-      template <typename F, typename T1, typename T2, typename T3, 
+      template <typename F, typename T1, typename T2, typename T3,
                 typename T4, typename T5>
       struct result<F(T1, T2, T3, T4, T5)> { typedef void type; };
       void operator()(variable& var_expr, expression& val, variable_map& vm,
