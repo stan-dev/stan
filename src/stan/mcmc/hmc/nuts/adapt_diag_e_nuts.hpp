@@ -17,7 +17,7 @@ namespace stan {
                              public stepsize_var_adapter {
     public:
         adapt_diag_e_nuts(M &m, BaseRNG& rng,
-                          std::ostream* o = &std::cout, std::ostream* e = 0)
+                          std::ostream* o, std::ostream* e)
           : diag_e_nuts<M, BaseRNG>(m, rng, o, e),
           stepsize_var_adapter(m.num_params_r()) {}
 

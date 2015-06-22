@@ -4,7 +4,6 @@
 #include <boost/lexical_cast.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 
-#include <fstream>
 #include <string>
 #include <vector>
 

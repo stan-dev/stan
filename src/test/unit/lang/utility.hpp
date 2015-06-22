@@ -174,11 +174,8 @@ std::string model_to_cpp(const std::string& model_text) {
 
 void expect_matches(int n,
                     const std::string& stan_code,
-                    const std::string& target,
-                    bool print_model = false) {
+                    const std::string& target) {
   std::string model_cpp = model_to_cpp(stan_code);
-  if (print_model)
-    std::cout << model_cpp << std::endl;
   EXPECT_EQ(n, count_matches(target,model_cpp));
 }
 

@@ -6,6 +6,8 @@
 
 #include <stan/mcmc/sample.hpp>
 #include <stan/mcmc/hmc/nuts/diag_e_nuts.hpp>
+#include <stan/mcmc/hmc/nuts/adapt_diag_e_nuts.hpp>
+#include <stan/interface/recorder/messages.hpp>
 
 #include <sstream>
 #include <string>
@@ -37,7 +39,8 @@ TEST(StanIoMcmcWriter, write_sample_names) {
   typedef boost::ecuyer1988 rng_t;
   rng_t base_rng(0);
   
-  stan::mcmc::adapt_diag_e_nuts<io_example_model_namespace::io_example_model, rng_t> sampler(model, base_rng, 0);
+  stan::mcmc::adapt_diag_e_nuts<io_example_model_namespace::io_example_model, rng_t>
+    sampler(model, base_rng, 0, 0);
   sampler.seed(real);
   
   // Writer
@@ -89,7 +92,8 @@ TEST(StanIoMcmcWriter, write_sample_params) {
   typedef boost::ecuyer1988 rng_t;
   rng_t base_rng(0);
   
-  stan::mcmc::adapt_diag_e_nuts<io_example_model_namespace::io_example_model, rng_t> sampler(model, base_rng, 0);
+  stan::mcmc::adapt_diag_e_nuts<io_example_model_namespace::io_example_model, rng_t>
+    sampler(model, base_rng, 0, 0);
   sampler.seed(real);
   
   // Writer
@@ -154,7 +158,8 @@ TEST(StanIoMcmcWriter, write_adapt_finish) {
   typedef boost::ecuyer1988 rng_t;
   rng_t base_rng(0);
   
-  stan::mcmc::adapt_diag_e_nuts<io_example_model_namespace::io_example_model, rng_t> sampler(model, base_rng, 0);
+  stan::mcmc::adapt_diag_e_nuts<io_example_model_namespace::io_example_model, rng_t>
+    sampler(model, base_rng, 0, 0);
   sampler.seed(real);
   
   // Writer
@@ -247,7 +252,8 @@ TEST(StanIoMcmcWriter, write_diagnostic_names) {
   typedef boost::ecuyer1988 rng_t;
   rng_t base_rng(0);
   
-  stan::mcmc::adapt_diag_e_nuts<io_example_model_namespace::io_example_model, rng_t> sampler(model, base_rng, 0);
+  stan::mcmc::adapt_diag_e_nuts<io_example_model_namespace::io_example_model, rng_t>
+    sampler(model, base_rng, 0, 0);
   sampler.seed(real);
   
   // Writer
@@ -301,7 +307,8 @@ TEST(StanIoMcmcWriter, write_diagnostic_params) {
   typedef boost::ecuyer1988 rng_t;
   rng_t base_rng(0);
   
-  stan::mcmc::adapt_diag_e_nuts<io_example_model_namespace::io_example_model, rng_t> sampler(model, base_rng, 0);
+  stan::mcmc::adapt_diag_e_nuts<io_example_model_namespace::io_example_model, rng_t>
+    sampler(model, base_rng, 0, 0);
   sampler.seed(real);
   sampler.z().p(0) = 0;
   sampler.z().p(1) = 0;
@@ -373,7 +380,8 @@ TEST(StanIoMcmcWriter, write_timing) {
   typedef boost::ecuyer1988 rng_t;
   rng_t base_rng(0);
   
-  stan::mcmc::adapt_diag_e_nuts<io_example_model_namespace::io_example_model, rng_t> sampler(model, base_rng, 0);
+  stan::mcmc::adapt_diag_e_nuts<io_example_model_namespace::io_example_model, rng_t>
+    sampler(model, base_rng, 0, 0);
   sampler.seed(real);
   
   // Writer
