@@ -20,7 +20,6 @@ void test_pg(const std::string& program_name,
 
   std::string hpp_code;
   read_file(path, hpp_code);
-  // std::cout << "hpp_code=" << hpp_code << std::endl;
   
   EXPECT_TRUE(hpp_code.find(expected_substring) != std::string::npos)
     << "program_name: " << program_name << std::endl
@@ -50,8 +49,6 @@ void test_pg_count(const std::string& program_name,
 
   std::string hpp_code;
   read_file(path, hpp_code);
-  // std::cout << "hpp_code=" << hpp_code << std::endl;
-  
 
   EXPECT_EQ(expected_count, count_occurrences(expected_substring,hpp_code));
 }
