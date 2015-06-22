@@ -41,6 +41,19 @@ namespace stan {
 
   namespace lang {
 
+    // see bare_type_grammar_def.hpp for original
+    struct set_val2 {
+      template <class> struct result;
+      template <typename F, typename T1, typename T2>
+      struct result<F(T1, T2)> { typedef void type; };
+      template <typename T1, typename T2>
+      void operator()(T1& lhs,
+                      const T2& rhs) const {
+        lhs = rhs;
+      }
+    };
+    boost::phoenix::function<set_val2> set_val2_f;
+
     struct validate_expr_type3 {
       template <class> struct result;
 
@@ -145,7 +158,7 @@ namespace stan {
       expression07_r.name("expression");
       expression07_r
         %=  term_g(_r1)
-            [_val = _1]
+            [set_val2_f(_val, _1)]
         > *((lit('+')
              > term_g(_r1)
                [addition3_f(_val, _1, boost::phoenix::ref(error_msgs))])

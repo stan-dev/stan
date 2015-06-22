@@ -66,9 +66,20 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::double_literal,
 
 
 namespace stan {
-
   namespace lang {
 
+   // see bare_type_grammar_def.hpp for original
+    struct set_val5 {
+      template <class> struct result;
+      template <typename F, typename T1, typename T2>
+      struct result<F(T1, T2)> { typedef void type; };
+      template <typename T1, typename T2>
+      void operator()(T1& lhs,
+                      const T2& rhs) const {
+        lhs = rhs;
+      }
+    };
+    boost::phoenix::function<set_val5> set_val5_f;
 
     struct validate_integrate_ode {
       template <class> struct result;
@@ -651,17 +662,16 @@ namespace stan {
 
     struct validate_int_expr3 {
       template <class> struct result;
-      template <typename F, typename T1, typename T2>
-      struct result<F(T1, T2)> { typedef bool type; };
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1, T2, T3)> { typedef void type; };
 
-      bool operator()(const expression& expr,
+      void operator()(const expression& expr,
+                      bool& pass,
                       std::stringstream& error_msgs) const {
-        if (!expr.expression_type().is_primitive_int()) {
+        pass = expr.expression_type().is_primitive_int();
+        if (!pass)
           error_msgs << "array indices must be integer expressions; found type="
                      << expr.expression_type() << std::endl;
-          return false;
-        }
-        return true;
       }
     };
     boost::phoenix::function<validate_int_expr3> validate_int_expr3_f;
@@ -692,8 +702,7 @@ namespace stan {
 
       term_r.name("expression");
       term_r
-        = (negated_factor_r(_r1)
-           [_val = _1]
+        = (negated_factor_r(_r1)[set_val5_f(_val, _1)]
             >> *((lit('*') > negated_factor_r(_r1)
                              [multiplication_f(_val, _1,
                                            boost::phoenix::ref(error_msgs_))])
@@ -721,24 +730,24 @@ namespace stan {
         | lit('!') >> negated_factor_r(_r1)
                       [logical_negate_expr_f(_val, _1,
                                              boost::phoenix::ref(error_msgs_))]
-        | lit('+') >> negated_factor_r(_r1)  [_val = _1]
-        | exponentiated_factor_r(_r1) [_val = _1]
-        | indexed_factor_r(_r1) [_val = _1];
+        | lit('+') >> negated_factor_r(_r1)[set_val5_f(_val, _1)]
+        | exponentiated_factor_r(_r1)[set_val5_f(_val, _1)]
+        | indexed_factor_r(_r1) [set_val5_f(_val, _1)];
 
 
       exponentiated_factor_r.name("expression");
       exponentiated_factor_r
-        = (indexed_factor_r(_r1) [_val = _1]
+        = (indexed_factor_r(_r1)[set_val5_f(_val, _1)]
            >> lit('^')
            > negated_factor_r(_r1)
-           [exponentiation_f(_val, _1, _r1, _pass,
-                             boost::phoenix::ref(error_msgs_))]);
+             [exponentiation_f(_val, _1, _r1, _pass,
+                               boost::phoenix::ref(error_msgs_))]);
 
       indexed_factor_r.name("expression");
       indexed_factor_r
-        = factor_r(_r1) [_val = _1]
+        = factor_r(_r1)[set_val5_f(_val, _1)]
         > * (
-             ((+dims_r(_r1))[_a = _1]
+             ((+dims_r(_r1))[set_val5_f(_a, _1)]
               > eps
                 [add_expression_dimss_f(_val, _a, _pass,
                                         boost::phoenix::ref(error_msgs_))])
@@ -770,18 +779,18 @@ namespace stan {
 
       factor_r.name("expression");
       factor_r =
-        integrate_ode_r(_r1)[_val = _1]
-        | (fun_r(_r1)[_b = _1]
+        integrate_ode_r(_r1)[set_val5_f(_val, _1)]
+        | (fun_r(_r1)[set_val5_f(_b, _1)]
            > eps[set_fun_type_named_f(_val, _b, _r1, _pass,
                                       boost::phoenix::ref(error_msgs_))])
-        | (variable_r[_a = _1]
+        | (variable_r[set_val5_f(_a, _1)]
            > eps[set_var_type_f(_a, _val, boost::phoenix::ref(var_map_),
                                 boost::phoenix::ref(error_msgs_),
                                 _pass)])
-        | int_literal_r[_val = _1]
-        | double_literal_r[_val = _1]
+        | int_literal_r[set_val5_f(_val, _1)]
+        | double_literal_r[set_val5_f(_val, _1)]
         | (lit('(')
-           > expression_g(_r1)[_val = _1]
+           > expression_g(_r1)[set_val5_f(_val, _1)]
            > lit(')'));
 
       int_literal_r.name("integer literal");
@@ -818,8 +827,8 @@ namespace stan {
       dim_r.name("array dimension (integer expression)");
       dim_r
         %= expression_g(_r1)
-        > eps[_pass = validate_int_expr3_f(_val,
-                                           boost::phoenix::ref(error_msgs_))];
+        > eps[validate_int_expr3_f(_val, _pass,
+                                   boost::phoenix::ref(error_msgs_))];
 
       dims_r.name("array dimensions");
       dims_r

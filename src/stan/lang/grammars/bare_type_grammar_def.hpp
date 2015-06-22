@@ -88,7 +88,7 @@ namespace stan {
       array_dims_r.name("array dimensions,\n"
              "    e.g., empty (not an array) [] (1D array) or [,] (2D array)");
       array_dims_r
-        %= eps[_val = 0]
+        %= eps[set_val_f(_val, 0)]
         >> - (lit('[')[set_val_f(_val, 1)]
               > *(lit(',')[increment_val_f(_val)])
               > end_bare_types_r);
