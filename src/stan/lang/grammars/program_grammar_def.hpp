@@ -70,6 +70,9 @@ namespace stan {
         vm.add("lp__",
                base_var_decl("lp__", std::vector<expression>(), DOUBLE_T),
                local_origin);  // lp acts as a local where defined
+        vm.add("params_r__",
+               base_var_decl("params_r__", std::vector<expression>(), VECTOR_T),
+               local_origin);  // lp acts as a local where defined
       }
     };
     boost::phoenix::function<add_lp_var> add_lp_var_f;
@@ -79,6 +82,7 @@ namespace stan {
       struct result { typedef void type; };
       void operator()(variable_map& vm) const {
         vm.remove("lp__");
+        vm.remove("params_r__");
       }
     };
     boost::phoenix::function<remove_lp_var> remove_lp_var_f;
