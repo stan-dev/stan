@@ -1,5 +1,3 @@
-N_TESTS = 100 # override this in make/local. If <= 0, N_TESTS + 1 is interpreted as the number of batches to group the tests into
-
 ##
 # LIBGTEST is the google test library
 # GTEST_MAIN is the file that contains the google test
@@ -176,36 +174,8 @@ test/integration/compile_models$(EXE) : $(patsubst %.stan,%.hpp-test,$(shell fin
 
 src/test/performance/logistic_test.cpp: src/test/test-models/performance/logistic.hpp
 
-############################################################
-##
-# Test generator for distribution tests
-##
-test/prob/generate_tests$(EXE) : src/test/prob/generate_tests.cpp
-	@mkdir -p $(dir $@)
-	$(LINK.c) -O$(O_STANC) $(CFLAGS) $< $(OUTPUT_OPTION)
-
-
 test_name = $(shell echo $(1) | sed 's,_[0-9]\{5\},_test.hpp,g')
-
-## FIXME: think about how to do this generally using test_types
-# test_types := v fd fv ffd ffv
-
-.SECONDEXPANSION:
-src/test/prob/%_generated_v_test.cpp src/test/prob/%_generated_fd_test.cpp src/test/prob/%_generated_fv_test.cpp src/test/prob/%_generated_ffd_test.cpp src/test/prob/%_generated_ffv_test.cpp: src/test/prob/$$(call test_name,$$*) test/prob/generate_tests$(EXE)
-	$(WINE) test/prob/generate_tests$(EXE) $< $(N_TESTS)
-
-LIST_OF_GENERATED_TESTS := $(shell find src/test/prob -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_v_test.cpp,g') $(shell find src/test/prob -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_fd_test.cpp,g') $(shell find src/test/prob -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_fv_test.cpp,g') $(shell find src/test/prob -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_ffd_test.cpp,g') $(shell find src/test/prob -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_ffv_test.cpp,g')
-
-.PHONY: generate-tests
-generate-tests: $(LIST_OF_GENERATED_TESTS)
 
 ifeq (,$(filter-out test/% src/test/test-models/%.hpp,$(MAKECMDGOALS)))
   -include test/test-models/stanc.d
 endif
-
-
-
-##
-# Include the test dependencies
-##
-include make/test-math-dependencies

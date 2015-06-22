@@ -83,18 +83,14 @@ using stan::test::performance::get_git_date;
 using stan::test::performance::get_date;
 
 TEST_F(performance, run) {
-  const int argc = 11;
-  const char* argv[] = {"logistic", 
-                        "sample", "num_samples=10000", 
-                        "init=0", 
-                        "random", "seed=0",
-                        "data", "file=src/test/test-models/performance/logistic.data.R",
-                        "output", "refresh=10000", "file=test/performance/logistic_output.csv"};
-  
   clock_t t;
   for (int n = 0; n < N; ++n) {
     t = clock();      // start timer
-    stan::services::command<stan_model>(argc, argv);
+    stan::test::performance::command<stan_model>(1000,
+                                                 10000,
+                                                 "src/test/test-models/performance/logistic.data.R",
+                                                 "test/performance/logistic_output.csv",
+                                                 0U);
     t = clock() - t;  // end timer
     seconds_per_run[n] = static_cast<double>(t) / CLOCKS_PER_SEC; 
     last_draws_per_run[n] 

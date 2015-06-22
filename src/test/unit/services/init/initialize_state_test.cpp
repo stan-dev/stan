@@ -935,3 +935,41 @@ TEST_F(StanServices2, initialize_state_disable_random_init) {
   EXPECT_NE("", output.str())
     << "expecting an error message here";
 }
+
+
+TEST_F(StanServices2, streams) {
+  stan::test::capture_std_streams();
+  using stan::services::init::initialize_state;
+  using stan::services::init::initialize_state_source;
+  using stan::services::init::initialize_state_source_and_random;
+  using stan::services::init::initialize_state_random;
+  using stan::services::init::initialize_state_values;
+  std::stringstream out;
+
+  init = "0";
+  EXPECT_NO_THROW(initialize_state(init, cont_params, model, rng, 0, context_factory));
+  out.str("");
+  EXPECT_NO_THROW(initialize_state(init, cont_params, model, rng, &out, context_factory));
+  EXPECT_EQ("", out.str());
+
+  EXPECT_NO_THROW(initialize_state_source(init, cont_params, model, rng, 0, context_factory));
+  out.str("");
+  EXPECT_NO_THROW(initialize_state_source(init, cont_params, model, rng, &out, context_factory));
+
+  EXPECT_NO_THROW(initialize_state_source_and_random(init, 0.5, cont_params, model, rng, 0, context_factory));
+  out.str("");
+  EXPECT_NO_THROW(initialize_state_source_and_random(init, 0.5, cont_params, model, rng, &out, context_factory));
+
+  EXPECT_NO_THROW(initialize_state_random(0.5, cont_params, model, rng, 0));
+  out.str("");
+  EXPECT_NO_THROW(initialize_state_random(0.5, cont_params, model, rng, &out));
+
+
+  EXPECT_NO_THROW(initialize_state_values(cont_params, model, 0));
+  out.str("");
+  EXPECT_NO_THROW(initialize_state_values(cont_params, model, &out));
+
+  stan::test::reset_std_streams();
+  EXPECT_EQ("", stan::test::cout_ss.str());
+  EXPECT_EQ("", stan::test::cerr_ss.str());
+}
