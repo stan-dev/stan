@@ -1,18 +1,17 @@
 #include <gtest/gtest.h>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
+#include <test/unit/util.hpp>
 
 namespace stan {
 
   namespace mcmc {
 
-    class ps_point_test : public ::testing::Test
-    {
+    class ps_point_test : public ::testing::Test {
     public:
       typedef Eigen::Matrix<double, Eigen::Dynamic, 1> vector_t;
       typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> matrix_t;
 
-      static void fast_vector_copy()
-      {
+      static void fast_vector_copy() {
         vector_t from3(3); from3 << 5.25, 3.125, -6.5;
         vector_t to3(12);
         ps_point::fast_vector_copy_(to3, from3);
@@ -27,8 +26,7 @@ namespace stan {
         EXPECT_EQ(from0, to0);    
       }
 
-      static void fast_matrix_copy()
-      {
+      static void fast_matrix_copy() {
         matrix_t from2_3(2, 3);
         from2_3 << 5, 2, 7, -3, 4, -9;
         matrix_t to2_3(1, 13);
@@ -50,7 +48,6 @@ namespace stan {
 
         EXPECT_EQ(from0_5, to0_5);
       }
-  
     };
 
     TEST(psPoint, fastVectorCopy) {
@@ -60,5 +57,21 @@ namespace stan {
     TEST(psPoint, fastMatrixCopy) {
       ps_point_test::fast_matrix_copy();
     }
+
+    TEST(psPoint, write_metric_streams) {
+      stan::test::capture_std_streams();
+
+      ps_point point(2);
+      EXPECT_NO_THROW(point.write_metric(0));
+
+      std::stringstream out;
+      EXPECT_NO_THROW(point.write_metric(&out));
+      EXPECT_EQ("# No free parameters for unit metric\n", out.str());
+      
+      stan::test::reset_std_streams();
+      EXPECT_EQ("", stan::test::cout_ss.str());
+      EXPECT_EQ("", stan::test::cerr_ss.str());
+    }
+    
   }
 }

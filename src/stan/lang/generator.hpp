@@ -346,7 +346,6 @@ namespace stan {
 
     void generate_includes(std::ostream& o) {
       generate_include("stan/model/model_header.hpp", o);
-      generate_include("stan/services/command.hpp", o);
       o << EOL;
     }
 

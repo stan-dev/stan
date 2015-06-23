@@ -1,6 +1,8 @@
 #include <stan/services/mcmc/warmup.hpp>
 #include <gtest/gtest.h>
 #include <test/test-models/good/services/test_lp.hpp>
+#include <stan/interface/recorder/messages.hpp>
+#include <boost/random/additive_combine.hpp>
 #include <sstream>
 
 typedef boost::ecuyer1988 rng_t;

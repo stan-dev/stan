@@ -4,6 +4,133 @@
 #include <stdexcept>
 #include <boost/algorithm/string.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
+#include <boost/random/additive_combine.hpp>  // L'Ecuyer RNG
+#include <boost/random/uniform_real_distribution.hpp>
+
+#include <stan/version.hpp>
+#include <stan/io/cmd_line.hpp>
+#include <stan/io/dump.hpp>
+#include <stan/io/json/json_data.hpp>
+#include <stan/io/json/json_data_handler.hpp>
+#include <stan/io/json/json_error.hpp>
+#include <stan/io/json/json_handler.hpp>
+#include <stan/io/json/json_parser.hpp>
+#include <stan/io/mcmc_writer.hpp>
+
+#include <stan/services/arguments/arg_adapt.hpp>
+#include <stan/services/arguments/arg_adapt_delta.hpp>
+#include <stan/services/arguments/arg_adapt_engaged.hpp>
+#include <stan/services/arguments/arg_adapt_gamma.hpp>
+#include <stan/services/arguments/arg_adapt_init_buffer.hpp>
+#include <stan/services/arguments/arg_adapt_kappa.hpp>
+#include <stan/services/arguments/arg_adapt_t0.hpp>
+#include <stan/services/arguments/arg_adapt_term_buffer.hpp>
+#include <stan/services/arguments/arg_adapt_window.hpp>
+#include <stan/services/arguments/arg_bfgs.hpp>
+#include <stan/services/arguments/arg_data.hpp>
+#include <stan/services/arguments/arg_data_file.hpp>
+#include <stan/services/arguments/arg_dense_e.hpp>
+#include <stan/services/arguments/arg_diag_e.hpp>
+#include <stan/services/arguments/arg_diagnose.hpp>
+#include <stan/services/arguments/arg_diagnostic_file.hpp>
+#include <stan/services/arguments/arg_engine.hpp>
+#include <stan/services/arguments/arg_fail.hpp>
+#include <stan/services/arguments/arg_fixed_param.hpp>
+#include <stan/services/arguments/arg_history_size.hpp>
+#include <stan/services/arguments/arg_hmc.hpp>
+#include <stan/services/arguments/arg_id.hpp>
+#include <stan/services/arguments/arg_init.hpp>
+#include <stan/services/arguments/arg_init_alpha.hpp>
+#include <stan/services/arguments/arg_int_time.hpp>
+#include <stan/services/arguments/arg_iter.hpp>
+#include <stan/services/arguments/arg_lbfgs.hpp>
+#include <stan/services/arguments/arg_max_depth.hpp>
+#include <stan/services/arguments/arg_method.hpp>
+#include <stan/services/arguments/arg_metric.hpp>
+#include <stan/services/arguments/arg_newton.hpp>
+#include <stan/services/arguments/arg_num_samples.hpp>
+#include <stan/services/arguments/arg_num_warmup.hpp>
+#include <stan/services/arguments/arg_nuts.hpp>
+#include <stan/services/arguments/arg_optimize.hpp>
+#include <stan/services/arguments/arg_optimize_algo.hpp>
+#include <stan/services/arguments/arg_output.hpp>
+#include <stan/services/arguments/arg_output_file.hpp>
+#include <stan/services/arguments/arg_random.hpp>
+#include <stan/services/arguments/arg_refresh.hpp>
+#include <stan/services/arguments/arg_rwm.hpp>
+#include <stan/services/arguments/arg_sample.hpp>
+#include <stan/services/arguments/arg_sample_algo.hpp>
+#include <stan/services/arguments/arg_save_iterations.hpp>
+#include <stan/services/arguments/arg_save_warmup.hpp>
+#include <stan/services/arguments/arg_seed.hpp>
+#include <stan/services/arguments/arg_static.hpp>
+#include <stan/services/arguments/arg_stepsize.hpp>
+#include <stan/services/arguments/arg_stepsize_jitter.hpp>
+#include <stan/services/arguments/arg_test.hpp>
+#include <stan/services/arguments/arg_test_grad_eps.hpp>
+#include <stan/services/arguments/arg_test_grad_err.hpp>
+#include <stan/services/arguments/arg_test_gradient.hpp>
+#include <stan/services/arguments/arg_thin.hpp>
+#include <stan/services/arguments/arg_tolerance.hpp>
+#include <stan/services/arguments/arg_unit_e.hpp>
+#include <stan/services/arguments/argument.hpp>
+#include <stan/services/arguments/argument_parser.hpp>
+#include <stan/services/arguments/argument_probe.hpp>
+#include <stan/services/arguments/categorical_argument.hpp>
+#include <stan/services/arguments/list_argument.hpp>
+#include <stan/services/arguments/singleton_argument.hpp>
+#include <stan/services/arguments/unvalued_argument.hpp>
+#include <stan/services/arguments/valued_argument.hpp>
+#include <stan/mcmc/fixed_param_sampler.hpp>
+#include <stan/mcmc/hmc/static/adapt_unit_e_static_hmc.hpp>
+#include <stan/mcmc/hmc/static/adapt_diag_e_static_hmc.hpp>
+#include <stan/mcmc/hmc/static/adapt_dense_e_static_hmc.hpp>
+#include <stan/mcmc/hmc/nuts/adapt_unit_e_nuts.hpp>
+#include <stan/mcmc/hmc/nuts/adapt_diag_e_nuts.hpp>
+#include <stan/mcmc/hmc/nuts/adapt_dense_e_nuts.hpp>
+
+#include <stan/model/util.hpp>
+
+#include <stan/optimization/newton.hpp>
+#include <stan/optimization/bfgs.hpp>
+
+#include <stan/services/diagnose.hpp>
+#include <stan/services/init/init_adapt.hpp>
+#include <stan/services/init/init_nuts.hpp>
+#include <stan/services/init/init_static_hmc.hpp>
+#include <stan/services/init/init_windowed_adapt.hpp>
+#include <stan/services/init/initialize_state.hpp>
+#include <stan/services/io/do_print.hpp>
+#include <stan/services/io/write_error_msg.hpp>
+#include <stan/services/io/write_iteration.hpp>
+#include <stan/services/io/write_iteration_csv.hpp>
+#include <stan/services/io/write_model.hpp>
+#include <stan/services/io/write_stan.hpp>
+#include <stan/services/mcmc/print_progress.hpp>
+#include <stan/services/mcmc/run_markov_chain.hpp>
+#include <stan/services/mcmc/sample.hpp>
+#include <stan/services/mcmc/warmup.hpp>
+#include <stan/services/optimization/do_bfgs_optimize.hpp>
+
+// FIXME: These belong to the interfaces and should be templated out here
+#include <stan/interface/callback/noop_callback.hpp>
+#include <stan/interface/var_context_factory/dump_factory.hpp>
+#include <stan/interface/recorder/csv.hpp>
+#include <stan/interface/recorder/filtered_values.hpp>
+#include <stan/interface/recorder/messages.hpp>
+#include <stan/interface/recorder/noop.hpp>
+#include <stan/interface/recorder/recorder.hpp>
+#include <stan/interface/recorder/sum_values.hpp>
+#include <stan/interface/recorder/values.hpp>
+
+#include <fstream>
+#include <iostream>
+#include <limits>
+#include <stdexcept>
+#include <string>
+#include <vector>
 
 namespace stan {
   namespace test {
@@ -75,7 +202,7 @@ namespace stan {
   
         FILE *in;
         std::string new_command = command + " 2>&1"; 
-        // captures both std::cout amd std::err
+        // captures both cout amd err
   
         in = popen(command.c_str(), "r");
   
@@ -185,6 +312,199 @@ namespace stan {
         return date;
       }
 
+
+      template <class Model>
+      int command(int num_warmup,
+                  int num_samples,
+                  const std::string data_file, const std::string output_file,
+                  unsigned int random_seed) {
+        //////////////////////////////////////////////////
+        //            Random number generator           //
+        //////////////////////////////////////////////////
+
+        typedef boost::ecuyer1988 rng_t;  // (2**50 = 1T samples, 1000 chains)
+        rng_t base_rng(random_seed);
+
+        // Advance generator to avoid process conflicts
+        static boost::uintmax_t DISCARD_STRIDE
+          = static_cast<boost::uintmax_t>(1) << 50;
+        base_rng.discard(-DISCARD_STRIDE);
+
+        //////////////////////////////////////////////////
+        //                  Input/Output                //
+        //////////////////////////////////////////////////
+
+        // Data input
+        std::fstream data_stream(data_file.c_str(),
+                                 std::fstream::in);
+        stan::io::dump data_var_context(data_stream);
+        data_stream.close();
+
+        // Sample output
+        std::fstream* output_stream = 0;
+        if (output_file != "") {
+          output_stream = new std::fstream(output_file.c_str(),
+                                           std::fstream::out);
+        }
+
+        std::fstream* diagnostic_stream = 0;
+
+        // Refresh rate
+        int refresh = num_samples;
+
+        //////////////////////////////////////////////////
+        //                Initialize Model              //
+        //////////////////////////////////////////////////
+
+        Model model(data_var_context, &std::cout);
+
+        Eigen::VectorXd cont_params = Eigen::VectorXd::Zero(model.num_params_r());
+
+        //parser.print(&std::cout);
+        //std::cout << std::endl;
+
+        if (output_stream) {
+          services::io::write_stan(output_stream, "#");
+          services::io::write_model(output_stream, model.model_name(), "#");
+          //parser.print(output_stream, "#");
+        }
+
+        if (diagnostic_stream) {
+          services::io::write_stan(diagnostic_stream, "#");
+          services::io::write_model(diagnostic_stream, model.model_name(), "#");
+          //parser.print(diagnostic_stream, "#");
+        }
+
+        std::string init = "0";
+        //dynamic_cast<stan::services::string_argument*>(
+        //parser.arg("init"))->value();
+
+        interface::var_context_factory::dump_factory var_context_factory;
+        if (!services::init::initialize_state<interface::var_context_factory::dump_factory>
+            (init, cont_params, model, base_rng, &std::cout,
+             var_context_factory))
+          return stan::services::error_codes::SOFTWARE;
+
+        //////////////////////////////////////////////////
+        //              Sampling Algorithms             //
+        //////////////////////////////////////////////////
+
+        // Check timing
+        clock_t start_check = clock();
+
+        double init_log_prob;
+        Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
+
+        stan::model::gradient(model, cont_params, init_log_prob,
+                              init_grad, &std::cout);
+
+        clock_t end_check = clock();
+        double deltaT
+          = static_cast<double>(end_check - start_check) / CLOCKS_PER_SEC;
+
+        std::cout << std::endl;
+        std::cout << "Gradient evaluation took " << deltaT
+                  << " seconds" << std::endl;
+        std::cout << "1000 transitions using 10 leapfrog steps "
+                  << "per transition would take "
+                  << 1e4 * deltaT << " seconds." << std::endl;
+        std::cout << "Adjust your expectations accordingly!"
+                  << std::endl << std::endl;
+        std::cout << std::endl;
+
+        interface::recorder::csv sample_recorder(output_stream, "# ");
+        interface::recorder::csv diagnostic_recorder(diagnostic_stream, "# ");
+        interface::recorder::messages message_recorder(&std::cout, "# ");
+
+        stan::io::mcmc_writer<Model,
+                              interface::recorder::csv, interface::recorder::csv,
+                              interface::recorder::messages>
+          writer(sample_recorder, diagnostic_recorder, message_recorder, &std::cout);
+
+        // Sampling parameters
+        int num_thin = 1;
+        bool save_warmup = false;
+
+        stan::mcmc::sample s(cont_params, 0, 0);
+
+        double warmDeltaT;
+        double sampleDeltaT;
+
+        // Sampler
+
+
+        bool adapt_engaged = true;
+
+        typedef stan::mcmc::adapt_diag_e_nuts<Model, rng_t> sampler;
+        sampler* sampler_ptr = 0;
+        sampler_ptr = new sampler(model, base_rng,
+                                  &std::cout, &std::cout);
+        sampler_ptr->set_nominal_stepsize(1.0);
+        sampler_ptr->set_stepsize_jitter(0.0);
+        sampler_ptr->set_max_depth(10);
+
+        stan::services::init::init_adapt(sampler_ptr, 0.8, 0.05, 0.75, 10,
+                                         cont_params, &std::cout);
+        sampler_ptr->set_window_params(num_warmup, 75, 50, 25, &std::cout);
+          
+        // Headers
+        writer.write_sample_names(s, sampler_ptr, model);
+        writer.write_diagnostic_names(s, sampler_ptr, model);
+          
+        std::string prefix = "";
+        std::string suffix = "\n";
+        interface::callback::noop_callback startTransitionCallback;
+          
+        // Warm-Up
+        clock_t start = clock();
+          
+        services::mcmc::warmup<Model, rng_t>(sampler_ptr, num_warmup, num_samples, num_thin,
+                                   refresh, save_warmup,
+                                   writer,
+                                   s, model, base_rng,
+                                   prefix, suffix, std::cout,
+                                   startTransitionCallback);
+
+        clock_t end = clock();
+        warmDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;
+          
+        if (adapt_engaged) {
+          sampler_ptr->disengage_adaptation();
+          writer.write_adapt_finish(sampler_ptr);
+        }
+          
+        // Sampling
+        start = clock();
+          
+        services::mcmc::sample<Model, rng_t>
+          (sampler_ptr, num_warmup, num_samples, num_thin,
+           refresh, true,
+           writer,
+           s, model, base_rng,
+           prefix, suffix, std::cout,
+           startTransitionCallback);
+          
+        end = clock();
+        sampleDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;
+          
+        writer.write_timing(warmDeltaT, sampleDeltaT);
+          
+        if (sampler_ptr)
+          delete sampler_ptr;
+
+        
+        if (output_stream) {
+          output_stream->close();
+          delete output_stream;
+        }
+
+        if (diagnostic_stream) {
+          diagnostic_stream->close();
+          delete diagnostic_stream;
+        }
+        
+        return 0;
+      }
 
     }
   }
