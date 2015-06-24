@@ -10,7 +10,7 @@
 #include <stan/mcmc/hmc/hamiltonians/unit_e_metric.hpp>
 #include <stan/mcmc/hmc/hamiltonians/diag_e_metric.hpp>
 #include <boost/random/additive_combine.hpp> // L'Ecuyer RNG
-
+#include <test/unit/util.hpp>
 
 // namespace
 //************************************************************
@@ -387,5 +387,22 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_9) {
   EXPECT_NEAR(z.g(0), -1.71246374711032, 5e-14);
 
   EXPECT_EQ("", output.str());
+}
+
+TEST_F(McmcHmcIntegratorsExplLeapfrogF, streams) {
+  stan::test::capture_std_streams();
+
+  typedef stan::mcmc::expl_leapfrog<
+    stan::mcmc::unit_e_metric<command_model_namespace::command_model,rng_t>, 
+    stan::mcmc::unit_e_point> integrator;
+  EXPECT_NO_THROW(integrator i(0));
+  
+  std::stringstream out;
+  EXPECT_NO_THROW(integrator i(&out));
+  EXPECT_EQ("", out.str());
+  
+  stan::test::reset_std_streams();
+  EXPECT_EQ("", stan::test::cout_ss.str());
+  EXPECT_EQ("", stan::test::cerr_ss.str());
 }
 

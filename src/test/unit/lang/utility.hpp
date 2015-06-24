@@ -113,7 +113,7 @@ void test_throws(const std::string& model_name, const std::string& error_msg) {
   }
   
   FAIL() << "model name=" << model_name 
-         << " is parsable and were exepecting msg=" << error_msg
+         << " is parsable and were expecting msg=" << error_msg
          << std::endl;
 }
 
@@ -149,11 +149,11 @@ void test_warning(const std::string& model_name,
                   const std::string& warning_msg) {
   std::stringstream msgs;
   EXPECT_TRUE(is_parsable_folder(model_name, "good", &msgs));
-  EXPECT_TRUE(msgs.str().find_first_of(warning_msg) != std::string::npos)
-    << std::endl 
+  bool found = msgs.str().find(warning_msg) != std::string::npos;
+  EXPECT_TRUE(found) << std::endl 
     << "FOUND: " << msgs.str() 
     << std::endl
-    << "EXPECTED: " << warning_msg
+    << "EXPECTED (as substring): " << warning_msg
     << std::endl;
 }
 
@@ -174,11 +174,8 @@ std::string model_to_cpp(const std::string& model_text) {
 
 void expect_matches(int n,
                     const std::string& stan_code,
-                    const std::string& target,
-                    bool print_model = false) {
+                    const std::string& target) {
   std::string model_cpp = model_to_cpp(stan_code);
-  if (print_model)
-    std::cout << model_cpp << std::endl;
   EXPECT_EQ(n, count_matches(target,model_cpp));
 }
 

@@ -11,7 +11,6 @@
 
 #include <stan/lang/rethrow_located.hpp>
 #include <stan/model/prob_grad.hpp>
-#include <stan/services/command.hpp>
 
 #include <boost/exception/all.hpp>
 #include <boost/random/linear_congruential.hpp>

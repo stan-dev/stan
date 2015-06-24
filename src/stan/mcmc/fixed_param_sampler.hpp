@@ -13,8 +13,8 @@ namespace stan {
 
     class fixed_param_sampler : public base_mcmc {
     public:
-      explicit fixed_param_sampler(std::ostream* o = &std::cout,
-                                   std::ostream* e = 0)
+      explicit fixed_param_sampler(std::ostream* o,
+                                   std::ostream* e)
         : base_mcmc(o, e) {
         this->name_ = "Fixed Parameter Sampler";
       }

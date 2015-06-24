@@ -60,11 +60,8 @@ namespace stan {
         ad_params_r.push_back(params_r[i]);
       try {
         double lp
-          = model
-          .template log_prob<true,
-                             jacobian_adjust_transform>(ad_params_r,params_i,
-                                                        msgs)
-        .val();
+          = model.template log_prob<true, jacobian_adjust_transform>
+          (ad_params_r, params_i, msgs).val();
         stan::math::recover_memory();
         return lp;
       } catch (std::exception &ex) {
@@ -106,12 +103,10 @@ namespace stan {
           ad_params_r[i] = var_i;
         }
         var adLogProb
-          = model
-          .template log_prob<propto,
-                             jacobian_adjust_transform>(ad_params_r,
-                                                        params_i,msgs);
+          = model.template log_prob<propto, jacobian_adjust_transform>
+          (ad_params_r, params_i, msgs);
         lp = adLogProb.val();
-        adLogProb.grad(ad_params_r,gradient);
+        adLogProb.grad(ad_params_r, gradient);
       } catch (const std::exception &ex) {
         stan::math::recover_memory();
         throw;
@@ -146,6 +141,8 @@ namespace stan {
                            std::ostream* msgs = 0) {
       using stan::math::var;
       using std::vector;
+      vector<int> params_i(0);
+
       double lp;
       try {
         vector<var> ad_params_r;
@@ -154,7 +151,7 @@ namespace stan {
         lp
           = model
           .template log_prob<true,
-                             jacobian_adjust_transform>(ad_params_r, msgs)
+                             jacobian_adjust_transform>(ad_params_r, params_i, msgs)
           .val();
       } catch (std::exception &ex) {
         stan::math::recover_memory();
@@ -187,7 +184,8 @@ namespace stan {
                          std::ostream* msgs = 0) {
       using std::vector;
       using stan::math::var;
-      Eigen::Matrix<var,Eigen::Dynamic,1> ad_params_r(params_r.size());
+      
+      Eigen::Matrix<var, Eigen::Dynamic, 1> ad_params_r(params_r.size());
       for (size_t i = 0; i < model.num_params_r(); ++i) {
         stan::math::var var_i(params_r[i]);
         ad_params_r[i] = var_i;
@@ -195,8 +193,8 @@ namespace stan {
       try {
         var adLogProb
           = model
-            .template log_prob<propto,
-                               jacobian_adjust_transform>(ad_params_r, msgs);
+          .template log_prob<propto,
+                             jacobian_adjust_transform>(ad_params_r, msgs);
         double val = adLogProb.val();
         stan::math::grad(adLogProb, ad_params_r, gradient);
         return val;
@@ -268,10 +266,10 @@ namespace stan {
      * @param model Model.
      * @param params_r Real-valued parameter vector.
      * @param params_i Integer-valued parameter vector.
-     * @param epsilon Real-valued scalar saying how much to perturb. Defaults to 1e-6.
-     * @param error Real-valued scalar saying how much error to allow. Defaults to 1e-6.
-     * @param o Output stream for messages. Defaults to std::cout.
-     * @param msgs Stream to which Stan programs write. Defaults to 0.
+     * @param epsilon Real-valued scalar saying how much to perturb. Reasonable value is 1e-6.
+     * @param error Real-valued scalar saying how much error to allow. Reasonable value is 1e-6.
+     * @param o Output stream for messages. 
+     * @param msgs Stream to which Stan programs write. 
      * @return number of failed gradient comparisons versus allowed
      * error, so 0 if all gradients pass
      */
@@ -279,17 +277,17 @@ namespace stan {
     int test_gradients(const M& model,
                        std::vector<double>& params_r,
                        std::vector<int>& params_i,
-                       double epsilon = 1e-6,
-                       double error = 1e-6,
-                       std::ostream& o = std::cout,
-                       std::ostream* msgs = 0) {
+                       double epsilon,
+                       double error,
+                       std::ostream& o,
+                       std::ostream* msgs) {
       std::vector<double> grad;
       double lp
-        = stan::model::log_prob_grad<propto,
-                                     jacobian_adjust_transform>(model,
-                                                                params_r,
-                                                                params_i,
-                                                                grad,msgs);
+        = log_prob_grad<propto, jacobian_adjust_transform>(model,
+                                                           params_r,
+                                                           params_i,
+                                                           grad,
+                                                           msgs);
 
       std::vector<double> grad_fd;
       finite_diff_grad<false,
@@ -366,12 +364,11 @@ namespace stan {
             -1.0 / 12.0 };
 
       double result
-        = stan::model::log_prob_grad<propto,
-                                     jacobian_adjust_transform>(model,
-                                                                params_r,
-                                                                params_i,
-                                                                gradient,
-                                                                msgs);
+        = log_prob_grad<propto, jacobian_adjust_transform>(model,
+                                                           params_r,
+                                                           params_i,
+                                                           gradient,
+                                                           msgs);
       hessian.assign(params_r.size() * params_r.size(), 0);
       std::vector<double> temp_grad(params_r.size());
       std::vector<double> perturbed_params(params_r.begin(), params_r.end());
@@ -379,11 +376,10 @@ namespace stan {
         double* row = &hessian[d*params_r.size()];
         for (int i = 0; i < order; i++) {
           perturbed_params[d] = params_r[d] + perturbations[i];
-          stan::model::log_prob_grad<propto,
-                                     jacobian_adjust_transform>(model,
-                                                            perturbed_params,
-                                                            params_i,
-                                                            temp_grad);
+          log_prob_grad<propto, jacobian_adjust_transform>(model,
+                                                           perturbed_params,
+                                                           params_i,
+                                                           temp_grad);
           for (size_t dd = 0; dd < params_r.size(); dd++) {
             row[dd] += 0.5 * coefficients[i] * temp_grad[dd] / epsilon;
             hessian[d + dd*params_r.size()]
@@ -399,17 +395,16 @@ namespace stan {
 
     template <class M>
     struct model_functional {
-
       const M& model;
       std::ostream* o;
 
-      model_functional(const M& m, std::ostream* out): model(m), o(out) {};
+      model_functional(const M& m, std::ostream* out)
+        : model(m), o(out) {}
 
       template <typename T>
       T operator()(Eigen::Matrix<T, Eigen::Dynamic, 1>& x) const {
         return model.template log_prob<true, true, T>(x, o);
       }
-
     };
 
     template <class M>
@@ -418,9 +413,7 @@ namespace stan {
                   double& f,
                   Eigen::Matrix<double, Eigen::Dynamic, 1>& grad_f,
                   std::ostream* msgs = 0) {
-
       stan::math::gradient(model_functional<M>(model, msgs), x, f, grad_f);
-
     }
 
     template <class M>
@@ -430,9 +423,8 @@ namespace stan {
                  Eigen::Matrix<double, Eigen::Dynamic, 1>& grad_f,
                  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& hess_f,
                  std::ostream* msgs = 0) {
-
-      stan::math::hessian(model_functional<M>(model, msgs), x, f, grad_f, hess_f);
-
+      stan::math::hessian(model_functional<M>(model, msgs),
+                          x, f, grad_f, hess_f);
     }
 
     template <class M>
@@ -442,9 +434,8 @@ namespace stan {
                              double& f,
                              double& grad_f_dot_v,
                              std::ostream* msgs = 0) {
-
-      stan::math::gradient_dot_vector(model_functional<M>(model, msgs), x, v, f, grad_f_dot_v);
-
+      stan::math::gradient_dot_vector(model_functional<M>(model, msgs),
+                                      x, v, f, grad_f_dot_v);
     }
 
     template <class M>
@@ -452,28 +443,24 @@ namespace stan {
                               const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
                               const Eigen::Matrix<double, Eigen::Dynamic, 1>& v,
                               double& f,
-                              Eigen::Matrix<double, Eigen::Dynamic, 1>& hess_f_dot_v,
+                              Eigen::Matrix<double, Eigen::Dynamic, 1>&
+                              hess_f_dot_v,
                               std::ostream* msgs = 0) {
-
-      stan::math::hessian_times_vector(model_functional<M>(model, msgs), x, v, f, hess_f_dot_v);
-
+      stan::math::hessian_times_vector(model_functional<M>(model, msgs),
+                                       x, v, f, hess_f_dot_v);
     }
 
     template <class M>
     void grad_tr_mat_times_hessian(const M& model,
-                                   const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
-                                   const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& X,
-                                   Eigen::Matrix<double, Eigen::Dynamic, 1>& grad_tr_X_hess_f,
-                                   std::ostream* msgs = 0) {
-
-      stan::math::grad_tr_mat_times_hessian(model_functional<M>(model, msgs), x, X, grad_tr_X_hess_f);
-
+            const Eigen::Matrix <double, Eigen::Dynamic, 1>& x,
+            const Eigen::Matrix <double, Eigen::Dynamic, Eigen::Dynamic>& X,
+            Eigen::Matrix<double, Eigen::Dynamic, 1>&
+            grad_tr_X_hess_f,
+            std::ostream* msgs = 0) {
+      stan::math::grad_tr_mat_times_hessian(model_functional<M>(model, msgs),
+                                            x, X, grad_tr_X_hess_f);
     }
-
 
   }
 }
-
-
-
 #endif
