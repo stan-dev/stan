@@ -294,12 +294,6 @@ namespace stan {
        * @param  max_iterations max number of iterations to run algorithm
        */
       int run(double tol_rel_obj, int max_iterations) const {
-        if (print_stream_) {
-          *print_stream_
-            << "This is Automatic Differentiation Variational Inference."
-            << std::endl << std::endl;
-        }
-
         if (diag_stream_) {
           *diag_stream_ << "iter,time_in_seconds,ELBO" << std::endl;
         }
