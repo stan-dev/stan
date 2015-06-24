@@ -1,0 +1,22 @@
+##
+# Detects:
+# - CC_TYPE: {g++, clang++, mingw32-g++, other}
+# - CC_MAJOR: major version of CC
+# - CC_MINOR: minor version of CC
+##
+ifneq (,$(findstring clang++,$(CC)))
+  CC_TYPE ?= clang++
+endif
+ifneq (,$(findstring mingw32-g++,$(CC)))
+  CC_TYPE ?= mingw32-g++
+endif
+ifneq (,$(findstring i686-w64-mingw32-g++,$(CC)))
+  CFLAGS += -m32
+endif
+ifneq (,$(findstring g++,$(CC)))
+  CC_TYPE ?= g++
+endif
+CC_TYPE ?= other
+CC_MAJOR := $(shell $(CC) -dumpversion 2>&1 | cut -d'.' -f1)
+CC_MINOR := $(shell $(CC) -dumpversion 2>&1 | cut -d'.' -f2)
+

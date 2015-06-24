@@ -1,13 +1,17 @@
 #ifndef STAN_SERVICES_OPTIMIZATION_DO_BFGS_OPTIMIZE_HPP
 #define STAN_SERVICES_OPTIMIZATION_DO_BFGS_OPTIMIZE_HPP
 
+#include <stan/services/error_codes.hpp>
+#include <stan/services/io/do_print.hpp>
+#include <stan/services/io/write_error_msg.hpp>
+#include <stan/services/io/write_iteration.hpp>
+#include <stan/services/io/write_iteration_csv.hpp>
+#include <stan/services/io/write_model.hpp>
+#include <stan/services/io/write_stan.hpp>
 #include <fstream>
 #include <iostream>
 #include <iomanip>
 #include <vector>
-
-#include <stan/services/error_codes.hpp>
-#include <stan/services/io.hpp>
 
 namespace stan {
   namespace services {
@@ -20,7 +24,7 @@ namespace stan {
                            double &lp,
                            std::vector<double> &cont_vector,
                            std::vector<int> &disc_vector,
-                           std::fstream* output_stream,
+                           std::ostream* output_stream,
                            std::ostream* notice_stream,
                            bool save_iterations,
                            int refresh,
@@ -31,7 +35,7 @@ namespace stan {
           (*notice_stream) << "initial log joint probability = " << lp << std::endl;
         if (output_stream && save_iterations) {
           io::write_iteration(*output_stream, model, base_rng,
-                              lp, cont_vector, disc_vector);
+                              lp, cont_vector, disc_vector, output_stream);
         }
 
         int ret = 0;
@@ -73,7 +77,7 @@ namespace stan {
 
           if (output_stream && save_iterations) {
             io::write_iteration(*output_stream, model, base_rng,
-                               lp, cont_vector, disc_vector);
+                                lp, cont_vector, disc_vector, output_stream);
           }
         }
 

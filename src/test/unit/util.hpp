@@ -22,4 +22,32 @@ int count_matches(const std::string& target,
   return count;
 }
 
+namespace stan {
+  namespace test {
+    std::streambuf *cout_buf = 0;
+    std::streambuf *cerr_buf = 0;
+
+    std::stringstream cout_ss;
+    std::stringstream cerr_ss;
+    
+    void capture_std_streams() {
+      cout_ss.str("");
+      cerr_ss.str("");
+
+      cout_buf = std::cout.rdbuf();
+      cerr_buf = std::cerr.rdbuf();
+
+      std::cout.rdbuf(cout_ss.rdbuf());
+      std::cerr.rdbuf(cerr_ss.rdbuf());
+    }
+
+    void reset_std_streams() {
+      std::cout.rdbuf(cout_buf);
+      std::cerr.rdbuf(cerr_buf);
+      cout_buf = 0;
+      cerr_buf = 0;
+    }
+  }
+}
+
 #endif

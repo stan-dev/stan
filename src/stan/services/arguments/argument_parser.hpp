@@ -3,7 +3,6 @@
 
 #include <string>
 #include <vector>
-#include <fstream>
 #include <cstring>
 
 #include <stan/services/arguments/argument.hpp>

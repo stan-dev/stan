@@ -31,19 +31,22 @@ void reject_test(const std::string& expected_msg1 = "",
   boost::ecuyer1988 base_rng;
   base_rng.seed(123456);
 
+  std::stringstream out;
   try {
     using stan::services::io::write_iteration;
     M model(empty_data_context, &model_output);
     std::vector<double> cont_vector(model.num_params_r(), 0.0);
     std::vector<int> disc_vector;
-    double lp = model.template log_prob<false,false>(cont_vector, disc_vector, &std::cout);    
-    write_iteration(model_output, model, base_rng, lp, cont_vector, disc_vector);
+    double lp = model.template log_prob<false,false>(cont_vector, disc_vector, &out);    
+    write_iteration(model_output, model, base_rng, lp, cont_vector, disc_vector, &out);
   } catch (const E& e) {
     expect_substring(e.what(), expected_msg1);
     expect_substring(e.what(), expected_msg2);
     expect_substring(e.what(), expected_msg3);
+    EXPECT_EQ("", out.str());
     return;
   }
+  EXPECT_EQ("", out.str());
   FAIL() << "model failed to reject" << std::endl;
 }
 
@@ -64,14 +67,17 @@ void reject_log_prob_test(const std::string& expected_msg1 = "",
   std::vector<int> disc_vector;
 
   // call model's log_prob function, check that exception is thrown
+  std::stringstream out;
   try {
-    model.template log_prob<false, false>(cont_vector, disc_vector, &std::cout);
+    model.template log_prob<false, false>(cont_vector, disc_vector, &out);
   } catch (const std::exception& e) {
     expect_substring(e.what(), expected_msg1);
     expect_substring(e.what(), expected_msg2);
     expect_substring(e.what(), expected_msg3);
+    EXPECT_EQ("", out.str());
     return;
   }
+  EXPECT_EQ("", out.str());
   FAIL() << "model failed to do reject" << std::endl;
 }
 
