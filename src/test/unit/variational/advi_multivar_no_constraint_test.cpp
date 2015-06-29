@@ -23,6 +23,7 @@ TEST(advi_test, multivar_no_constraint_fullrank) {
 
   // Other params
   int n_monte_carlo_grad = 10;
+  int n_grad_samples = 1e4;
   std::ostream* print_stream = &std::cout;
 
   // Dummy input
@@ -34,7 +35,7 @@ TEST(advi_test, multivar_no_constraint_fullrank) {
   stan::variational::advi<Model, stan::variational::normal_fullrank, rng_t> test_advi(my_model,
                                                   cont_params,
                                                   n_monte_carlo_grad,
-                                                  1e4, // absurdly high!
+                                                  n_grad_samples,
                                                   0.1,
                                                   base_rng,
                                                   100,
