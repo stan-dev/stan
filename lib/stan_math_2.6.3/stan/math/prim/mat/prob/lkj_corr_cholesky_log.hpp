@@ -66,7 +66,7 @@ namespace stan {
       using stan::math::sum;
 
       typedef typename promote_args<T_covar, T_shape>::type lp_ret;
-			lp_ret lp(0.0);
+      lp_ret lp(0.0);
       check_positive(function, "Shape parameter", eta);
       check_lower_triangular(function, "Random variable", L);
 
