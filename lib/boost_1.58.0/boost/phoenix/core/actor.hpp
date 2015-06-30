@@ -209,6 +209,12 @@ namespace boost { namespace phoenix
             return *this;
         }
 
+#ifdef __INTEL_COMPILER 
+/* Intel compiler cannot currently compile return type on assignment
+ * operator declared below.  See:
+ * https://software.intel.com/en-us/articles/boost-compiler-error-class-has-no-member-type
+ */ 
+#else 
         template <typename A0>
         typename proto::result_of::make_expr<
             proto::tag::assign
@@ -220,6 +226,7 @@ namespace boost { namespace phoenix
         {
             return proto::make_expr<proto::tag::assign, phoenix_domain>(this->proto_expr_, a0);
         }
+#endif
 
         template <typename A0>
         typename proto::result_of::make_expr<
