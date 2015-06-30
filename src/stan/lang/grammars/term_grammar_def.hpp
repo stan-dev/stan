@@ -444,10 +444,11 @@ namespace stan {
 
     struct left_division_expr {
       template <class> struct result;
-      template <typename F, typename T1, typename T2, typename T3>
-      struct result<F(T1, T2, T3)> { typedef void type; };
+      template <typename F, typename T1, typename T2, typename T3, typename T4>
+      struct result<F(T1, T2, T3, T4)> { typedef void type; };
 
       void operator()(expression& expr1,
+                      bool& pass,
                       const expression& expr2,
                       std::ostream& error_msgs) const {
         std::vector<expression> args;
@@ -460,12 +461,13 @@ namespace stan {
           fun f("mdivide_left", args);
           sft(f, error_msgs);
           expr1 = expression(f);
+          pass = true;
           return;
         }
-        fun f("divide_left", args);  // this doesn't exist, so will
-                                     // throw error on purpose
+        fun f("mdivide_left", args);  // set for alt args err msg
         sft(f, error_msgs);
         expr1 = expression(f);
+        pass = false;
       }
     };
     boost::phoenix::function<left_division_expr> left_division_f;
@@ -571,11 +573,12 @@ namespace stan {
 
     struct transpose_expr {
       template <class> struct result;
-      template <typename F, typename T1, typename T2>
-      struct result<F(T1, T2)> { typedef void type; };
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1, T2, T3)> { typedef void type; };
 
       void operator()(expression& expr,
-                            std::ostream& error_msgs) const {
+                      bool& pass,
+                      std::ostream& error_msgs) const {
         if (expr.expression_type().is_primitive())
           return;
         std::vector<expression> args;
@@ -584,6 +587,7 @@ namespace stan {
         fun f("transpose", args);
         sft(f, error_msgs);
         expr = expression(f);
+        pass = !expr.expression_type().is_ill_formed();
       }
     };
     boost::phoenix::function<transpose_expr> transpose_f;
@@ -713,7 +717,7 @@ namespace stan {
                                [modulus_f(_val, _1, _pass,
                                           boost::phoenix::ref(error_msgs_))])
                  | (lit('\\') > negated_factor_r(_r1)
-                                [left_division_f(_val, _1,
+                                [left_division_f(_val, _pass, _1,
                                          boost::phoenix::ref(error_msgs_))])
                  | (lit(".*") > negated_factor_r(_r1)
                                 [elt_multiplication_f(_val, _1,
@@ -752,9 +756,9 @@ namespace stan {
                 [add_expression_dimss_f(_val, _a, _pass,
                                         boost::phoenix::ref(error_msgs_))])
              |
-               lit("'")
-               [transpose_f(_val, boost::phoenix::ref(error_msgs_))]);
-
+             (lit("'")
+              > eps[transpose_f(_val, _pass,
+                                boost::phoenix::ref(error_msgs_))]));
       integrate_ode_r.name("expression");
       integrate_ode_r
         %= (lit("integrate_ode") >> no_skip[!char_("a-zA-Z0-9_")])

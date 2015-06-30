@@ -58,3 +58,32 @@ TEST(langParserTermGrammar, setFunTypeNamed) {
               "random number generators only allowed in generated quantities");
   test_parsable("validate_set_fun_type_named_good");
 }
+
+TEST(langGrammarsTermGrammar, operatorErrorMsg) {
+  test_throws("op_addition_bad",
+              "matrix + vector",
+              "Available argument signatures for operator+");
+  test_throws("op_subtraction_bad",
+              "vector - matrix",
+              "Available argument signatures for operator-");
+  test_throws("op_multiplication_bad",
+              "int[] * matrix",
+              "Available argument signatures for operator*");
+  test_throws("op_divide_bad",
+              "int[] / matrix",
+              "Available argument signatures for operator/");
+  test_throws("op_modulus_bad",
+              "both operands of % must be int; cannot modulo int[] by matrix");
+  test_throws("op_mdivide_left_bad",
+              "int[] \\ matrix",
+              "Available argument signatures for operator\\");
+  test_throws("op_divide_right_bad",
+              "int[] / matrix",
+              "Available argument signatures for operator/");
+  test_throws("op_elt_multiply_bad",
+              "int[] .* matrix",
+              "Available argument signatures for operator.*");
+  test_throws("op_elt_divide_bad",
+              "int[] ./ matrix",
+              "Available argument signatures for operator./");
+}
