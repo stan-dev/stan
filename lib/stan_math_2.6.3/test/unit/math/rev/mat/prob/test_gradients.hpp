@@ -2,6 +2,30 @@
 #include <vector>
 #include <iomanip>
 
+void test_grad_eq(Eigen::Matrix<double, -1, 1> grad_1,
+                    Eigen::Matrix<double, -1, 1> grad_2) {
+  for (int i = 0; i < grad_1.size(); ++i) 
+    EXPECT_FLOAT_EQ(grad_1(i),grad_2(i));
+}
+
+double test_hess_eq(Eigen::Matrix<double, -1, -1> hess_1,
+                    Eigen::Matrix<double, -1, -1> hess_2) {
+  double accum(0.0);
+  for (int i = 0; i < hess_1.size(); ++i)
+    accum += fabs(hess_1(i) - hess_2(i));
+  return accum;
+}
+
+double test_grad_hess_eq(std::vector<Eigen::Matrix<double, -1, -1> > g_hess_1,
+                         std::vector<Eigen::Matrix<double, -1, -1> > g_hess_2) {
+  double accum(0.0);
+  for (size_t m = 0; m < g_hess_1.size(); ++m)
+    for (int i = 0; i < g_hess_1[m].size(); ++i)
+      accum += fabs(g_hess_1[m](i) - g_hess_2[m](i));
+  return accum;
+}
+
+
 template <typename F>
 std::vector<double> 
 finite_diffs(const F& fun,
