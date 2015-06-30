@@ -18,9 +18,9 @@
 #include <stan/model/util.hpp>
 
 #include <stan/variational/base_family.hpp>
-
-#include <vector>
+#include <algorithm>
 #include <ostream>
+#include <vector>
 
 namespace stan {
 

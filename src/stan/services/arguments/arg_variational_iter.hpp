@@ -19,7 +19,7 @@ namespace stan {
         _good_value = 2.0;
         _bad_value = -1.0;
         _value = _default_value;
-      };
+      }
 
       bool is_valid(int value) {
         return value > 0;

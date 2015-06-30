@@ -2,7 +2,7 @@
 #define STAN_VARIATIONAL_BASE_FAMILY_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-
+#include <algorithm>
 #include <ostream>
 
 namespace stan {
