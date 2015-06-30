@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include <stan/services/mcmc/run_markov_chain.hpp>
 #include <test/test-models/good/services/test_lp.hpp>
+#include <stan/interface/recorder/messages.hpp>
+#include <boost/random/additive_combine.hpp>
 #include <sstream>
 
 typedef boost::ecuyer1988 rng_t;

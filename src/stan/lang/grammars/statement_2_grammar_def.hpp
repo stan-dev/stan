@@ -51,8 +51,10 @@ namespace stan {
                       bool& pass,
                       std::stringstream& error_msgs) const {
         if (!e.expression_type().is_primitive()) {
-          error_msgs << "conditions in if-else statement must be primitive int or real;"
-                     << " found type=" << e.expression_type() << std::endl;
+          error_msgs << "conditions in if-else statement must be"
+                     << " primitive int or real;"
+                     << " found type=" << e.expression_type()
+                     << std::endl;
           pass = false;
           return;
         }
@@ -61,7 +63,8 @@ namespace stan {
         return;
       }
     };
-    boost::phoenix::function<add_conditional_condition> add_conditional_condition_f;
+    boost::phoenix::function<add_conditional_condition>
+    add_conditional_condition_f;
 
     struct add_conditional_body {
       template <class> struct result;
@@ -78,21 +81,19 @@ namespace stan {
 
     template <typename Iterator>
     statement_2_grammar<Iterator>::statement_2_grammar(variable_map& var_map,
-                                                       std::stringstream& error_msgs,
-                                                       statement_grammar<Iterator>& sg)
+                                           std::stringstream& error_msgs,
+                                           statement_grammar<Iterator>& sg)
       : statement_2_grammar::base_type(statement_2_r),
         var_map_(var_map),
         error_msgs_(error_msgs),
         expression_g(var_map, error_msgs),
-        statement_g(sg)
-    {
+        statement_g(sg) {
       using boost::spirit::qi::_1;
       using boost::spirit::qi::char_;
       using boost::spirit::qi::lit;
       using boost::spirit::qi::no_skip;
       using boost::spirit::qi::_pass;
       using boost::spirit::qi::_val;
-
       using boost::spirit::qi::labels::_r1;
       using boost::spirit::qi::labels::_r2;
       using boost::spirit::qi::labels::_r3;
@@ -102,8 +103,7 @@ namespace stan {
       // set to true if sample_r are allowed
       statement_2_r.name("statement");
       statement_2_r
-        %= conditional_statement_r(_r1, _r2, _r3)
-        ;
+        %= conditional_statement_r(_r1, _r2, _r3);
 
 
       conditional_statement_r.name("if-else statement");
@@ -124,14 +124,10 @@ namespace stan {
                                             boost::phoenix::ref(error_msgs_))]
              > lit(')')
              > statement_g(_r1, _r2, _r3)
-               [add_conditional_body_f(_val, _1)]
-             )
-        > - ((lit("else") >> no_skip[!char_("a-zA-Z0-9_")])
-             > statement_g(_r1, _r2, _r3)
-               [add_conditional_body_f(_val, _1)]
-             )
-        ;
-
+               [add_conditional_body_f(_val, _1)])
+        > -((lit("else") >> no_skip[!char_("a-zA-Z0-9_")])
+            > statement_g(_r1, _r2, _r3)
+              [add_conditional_body_f(_val, _1)]);
     }
 
   }

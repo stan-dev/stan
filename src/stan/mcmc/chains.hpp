@@ -30,7 +30,6 @@
 #include <sstream>
 #include <utility>
 #include <vector>
-#include <fstream>
 #include <cstdlib>
 
 namespace stan {
@@ -74,9 +73,10 @@ namespace stan {
 
 
       static double covariance(const Eigen::VectorXd& x,
-                               const Eigen::VectorXd& y) {
-        if (x.rows() != y.rows())
-          std::cerr << "warning: covariance of different length chains";
+                               const Eigen::VectorXd& y,
+                               std::ostream* err = 0) {
+        if (x.rows() != y.rows() && err)
+          *err << "warning: covariance of different length chains";
         using boost::accumulators::accumulator_set;
         using boost::accumulators::stats;
         using boost::accumulators::tag::variance;
@@ -93,9 +93,10 @@ namespace stan {
       }
 
       static double correlation(const Eigen::VectorXd& x,
-                                const Eigen::VectorXd& y) {
-        if (x.rows() != y.rows())
-          std::cerr << "warning: covariance of different length chains";
+                                const Eigen::VectorXd& y,
+                                std::ostream* err = 0) {
+        if (x.rows() != y.rows() && err)
+          *err << "warning: covariance of different length chains";
         using boost::accumulators::accumulator_set;
         using boost::accumulators::stats;
         using boost::accumulators::tag::variance;

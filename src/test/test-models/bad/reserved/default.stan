@@ -1,0 +1,5 @@
+data {
+  real default;
+}
+model {
+}

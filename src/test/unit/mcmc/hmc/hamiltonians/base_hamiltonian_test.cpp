@@ -1,6 +1,7 @@
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
 #include <test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp>
-
+#include <boost/random/additive_combine.hpp>
+#include <test/unit/util.hpp>
 #include <gtest/gtest.h>
 
 typedef boost::ecuyer1988 rng_t;
@@ -30,4 +31,22 @@ TEST(BaseHamiltonian, update) {
 
   EXPECT_EQ("", model_output.str());
   EXPECT_EQ("", metric_output.str());
+}
+
+TEST(BaseHamiltonian, streams) {
+  stan::test::capture_std_streams();
+  
+  std::fstream data_stream(std::string("").c_str(), std::fstream::in);
+  stan::io::dump data_var_context(data_stream);
+  data_stream.close();
+
+  EXPECT_NO_THROW(funnel_model_namespace::funnel_model model(data_var_context, 0));
+
+  std::stringstream output;
+  EXPECT_NO_THROW(funnel_model_namespace::funnel_model model(data_var_context, &output));
+  EXPECT_EQ("", output.str());
+  
+  stan::test::reset_std_streams();
+  EXPECT_EQ("", stan::test::cout_ss.str());
+  EXPECT_EQ("", stan::test::cerr_ss.str());
 }
