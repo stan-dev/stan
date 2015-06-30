@@ -313,7 +313,8 @@ namespace stan {
 
         if (out_stream_) {
           services::io::write_iteration(*out_stream_, model_, rng_,
-                          0.0, cont_vector, disc_vector, &std::cout);
+                                        0.0, cont_vector, disc_vector,
+                                        print_stream_);
         }
 
         // draw more samples from posterior and write on subsequent lines
