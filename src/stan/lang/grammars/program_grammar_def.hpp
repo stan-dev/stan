@@ -51,7 +51,8 @@ namespace {
 
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::program,
-                          (std::vector<stan::lang::function_decl_def>, function_decl_defs_)
+                          (std::vector<stan::lang::function_decl_def>,
+                           function_decl_defs_)
                           (std::vector<stan::lang::var_decl>, data_decl_)
                           (DUMMY_STRUCT::type, derived_data_decl_)
                           (std::vector<stan::lang::var_decl>, parameter_decl_)
@@ -90,15 +91,9 @@ namespace stan {
       struct result<F(T1, T2, T3, T4, T5, T6, T7)> { typedef void type; };
 
       template <class Iterator, class I>
-      void operator()(
-        Iterator _begin,
-        Iterator _end,
-        Iterator _where,
-        I const& _info,
-        std::string msg,
-        variable_map& vm,
-        std::stringstream& error_msgs) const {
-
+      void operator()(Iterator _begin, Iterator _end, Iterator _where,
+                      I const& _info, std::string msg, variable_map& vm,
+                      std::stringstream& error_msgs) const {
         using boost::phoenix::construct;
         using boost::phoenix::val;
         using boost::spirit::get_line;
@@ -110,8 +105,8 @@ namespace stan {
         error_msgs << msg << std::endl;
 
         if (idx_errline > 0) {
-          error_msgs << "ERROR at line " << idx_errline << std::endl << std::endl;
-
+          error_msgs << "ERROR at line " << idx_errline
+                     << std::endl << std::endl;
 
           std::basic_stringstream<char> sprogram;
           sprogram << boost::make_iterator_range(_begin, _end);
@@ -119,7 +114,7 @@ namespace stan {
           // show error in context 2 lines before, 1 lines after
           size_t idx_errcol = 0;
           idx_errcol = get_column(_begin, _where) - 1;
-          
+
           std::string lineno = "";
           format fmt_lineno("% 3d:    ");
 
@@ -176,6 +171,12 @@ namespace stan {
         using boost::spirit::qi::char_;
         using boost::spirit::qi::_pass;
         using boost::spirit::qi::lexeme;
+        using boost::spirit::qi::on_error;
+        using boost::spirit::qi::rethrow;
+        using boost::spirit::qi::_1;
+        using boost::spirit::qi::_2;
+        using boost::spirit::qi::_3;
+        using boost::spirit::qi::_4;
 
         // add model_name to var_map with special origin and no
         var_map_.add(model_name,
@@ -192,20 +193,19 @@ namespace stan {
           > -derived_var_decls_r
           > model_r
           > eps[remove_lp_var_f(boost::phoenix::ref(var_map_))]
-          > -generated_var_decls_r
-          ;
+          > -generated_var_decls_r;
 
         model_r.name("model declaration (or perhaps an earlier block)");
         model_r
           %= lit("model")
-          > statement_g(true, local_origin, false)  // assign only to locals
-          ;
+          > statement_g(true, local_origin, false);
 
         end_var_decls_r.name(
             "one of the following:\n"
             "  a variable declaration, beginning with type,\n"
             "      (int, real, vector, row_vector, matrix, unit_vector,\n"
-            "       simplex, ordered, positive_ordered, corr_matrix, cov_matrix,\n"
+            "       simplex, ordered, positive_ordered,\n"
+            "       corr_matrix, cov_matrix,\n"
             "       cholesky_corr, cholesky_cov\n"
             "  or '}' to close variable declarations");
         end_var_decls_r %= lit('}');
@@ -213,74 +213,64 @@ namespace stan {
         end_var_decls_statements_r.name(
            "one of the following:\n"
            "  a variable declaration, beginning with type\n"
-            "      (int, real, vector, row_vector, matrix, unit_vector,\n"
-            "       simplex, ordered, positive_ordered, corr_matrix, cov_matrix,\n"
-            "       cholesky_corr, cholesky_cov\n"
+           "      (int, real, vector, row_vector, matrix, unit_vector,\n"
+           "       simplex, ordered, positive_ordered,\n"
+           "       corr_matrix, cov_matrix,\n"
+           "       cholesky_corr, cholesky_cov\n"
            "  or a <statement>\n"
            "  or '}' to close variable declarations and definitions");
         end_var_decls_statements_r %= lit('}');
 
-        end_var_definitions_r.name("expected another statement or '}' to close declarations");
+        end_var_definitions_r.name("expected another statement or '}'"
+                                   " to close declarations");
         end_var_definitions_r %= lit('}');
 
         data_var_decls_r.name("data variable declarations");
         data_var_decls_r
-          %= ( lit("data")
-               > lit('{') )
+          %= (lit("data")
+              > lit('{'))
           >  var_decls_g(true, data_origin)  // +constraints
           > end_var_decls_r;
 
         derived_data_var_decls_r.name("transformed data block");
         derived_data_var_decls_r
-          %= ( ( lit("transformed")
-                 >> lit("data") )
-               > lit('{') )
+          %= ((lit("transformed")
+               >> lit("data"))
+              > lit('{'))
           > var_decls_g(true, transformed_data_origin)  // -constraints
-          > ( (statement_g(false, transformed_data_origin, false)
-               > *statement_g(false, transformed_data_origin, false)
-               > end_var_definitions_r
-               )
-              | ( *statement_g(false, transformed_data_origin, false)
-                  > end_var_decls_statements_r
-                  )
-              )
-          ;
+          > ((statement_g(false, transformed_data_origin, false)
+              > *statement_g(false, transformed_data_origin, false)
+              > end_var_definitions_r)
+             | (*statement_g(false, transformed_data_origin, false)
+                > end_var_decls_statements_r));
 
         param_var_decls_r.name("parameter variable declarations");
         param_var_decls_r
-          %= ( lit("parameters")
-               > lit('{')
-               )
-          > var_decls_g(true,parameter_origin)  // +constraints
+          %= (lit("parameters")
+              > lit('{'))
+          > var_decls_g(true, parameter_origin)  // +constraints
           > end_var_decls_r;
 
         derived_var_decls_r.name("derived variable declarations");
         derived_var_decls_r
-          %= ( lit("transformed")
-               > lit("parameters")
-               > lit('{')
-               )
-          > var_decls_g(true, transformed_parameter_origin)  // -constraints
-          > *statement_g(false, transformed_parameter_origin, false)  // -sampling
+          %= (lit("transformed")
+              > lit("parameters")
+              > lit('{'))
+          > var_decls_g(true, transformed_parameter_origin)
+          > *statement_g(false, transformed_parameter_origin, false)
           > end_var_decls_statements_r;
-        
+
         generated_var_decls_r.name("generated variable declarations");
         generated_var_decls_r
-          %= ( lit("generated")
-               > lit("quantities")
-               > lit('{')
-               )
-          > var_decls_g(true, derived_origin)  // -constraints
-          > *statement_g(false, derived_origin, false)  // -sampling
+          %= (lit("generated")
+              > lit("quantities")
+              > lit('{'))
+          > var_decls_g(true, derived_origin)
+          > *statement_g(false, derived_origin, false)
           > end_var_decls_statements_r;
 
-        using boost::spirit::qi::on_error;
-        using boost::spirit::qi::rethrow;
-        using namespace boost::spirit::qi::labels;
-
         on_error<rethrow>(program_r,
-                          program_error_f(_1, _2, _3, _4 ,
-                                          "",
+                          program_error_f(_1, _2, _3, _4, "",
                                           boost::phoenix::ref(var_map_),
                                           boost::phoenix::ref(error_msgs_)));
     }
