@@ -41,19 +41,31 @@ namespace stan {
 
   namespace lang {
 
+    // see bare_type_grammar_def.hpp for original
+    struct set_val2 {
+      template <class> struct result;
+      template <typename F, typename T1, typename T2>
+      struct result<F(T1, T2)> { typedef void type; };
+      template <typename T1, typename T2>
+      void operator()(T1& lhs,
+                      const T2& rhs) const {
+        lhs = rhs;
+      }
+    };
+    boost::phoenix::function<set_val2> set_val2_f;
+
     struct validate_expr_type3 {
       template <class> struct result;
 
-      template <typename F, typename T1, typename T2>
-      struct result<F(T1, T2)> { typedef bool type; };
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1, T2, T3)> { typedef void type; };
 
-      bool operator()(const expression& expr,
+      void operator()(const expression& expr,
+                      bool& pass,
                       std::ostream& error_msgs) const {
-        if (expr.expression_type().is_ill_formed()) {
+        pass = !expr.expression_type().is_ill_formed();
+        if (!pass)
           error_msgs << "expression is ill formed" << std::endl;
-          return false;
-        }
-        return true;
       }
     };
     boost::phoenix::function<validate_expr_type3> validate_expr_type3_f;
@@ -80,14 +92,15 @@ namespace stan {
       template <class> struct result;
 
       template <typename F, typename T1, typename T2, typename T3>
-      struct result<F(T1, T2, T3)> { typedef expression type; };
+      struct result<F(T1, T2, T3)> { typedef void type; };
 
-      expression operator()(expression& expr1,
-                            const expression& expr2,
-                            std::ostream& error_msgs) const {
+      void operator()(expression& expr1,
+                      const expression& expr2,
+                      std::ostream& error_msgs) const {
         if (expr1.expression_type().is_primitive()
             && expr2.expression_type().is_primitive()) {
-          return expr1 += expr2;
+          expr1 += expr2;
+          return;
         }
         std::vector<expression> args;
         args.push_back(expr1);
@@ -95,24 +108,24 @@ namespace stan {
         set_fun_type3 sft;
         fun f("add", args);
         sft(f, error_msgs);
-        return expression(f);
-        return expr1 += expr2;
+        expr1 = expression(f);
       }
     };
     boost::phoenix::function<addition_expr3> addition3_f;
 
 
     struct subtraction_expr3 {
-      template <class> struct result; 
+      template <class> struct result;
       template <typename F, typename T1, typename T2, typename T3>
-      struct result<F(T1, T2, T3)> { typedef expression type; };
+      struct result<F(T1, T2, T3)> { typedef void type; };
 
-      expression operator()(expression& expr1,
-                            const expression& expr2,
-                            std::ostream& error_msgs) const {
+      void operator()(expression& expr1,
+                      const expression& expr2,
+                      std::ostream& error_msgs) const {
         if (expr1.expression_type().is_primitive()
             && expr2.expression_type().is_primitive()) {
-          return expr1 -= expr2;
+          expr1 -= expr2;
+          return;
         }
         std::vector<expression> args;
         args.push_back(expr1);
@@ -120,7 +133,7 @@ namespace stan {
         set_fun_type3 sft;
         fun f("subtract", args);
         sft(f, error_msgs);
-        return expression(f);
+        expr1 = expression(f);
       }
     };
     boost::phoenix::function<subtraction_expr3> subtraction3_f;
@@ -129,8 +142,8 @@ namespace stan {
 
     template <typename Iterator>
     expression07_grammar<Iterator>::expression07_grammar(variable_map& var_map,
-                                                         std::stringstream& error_msgs,
-                                                         expression_grammar<Iterator>& eg)
+                                             std::stringstream& error_msgs,
+                                             expression_grammar<Iterator>& eg)
       : expression07_grammar::base_type(expression07_r),
         var_map_(var_map),
         error_msgs_(error_msgs),
@@ -144,19 +157,17 @@ namespace stan {
 
       expression07_r.name("expression");
       expression07_r
-        =  term_g(_r1)
-            [_val = _1]
-        > *( ( lit('+')
-               > term_g(_r1) // expression07_r
-                [_val = addition3_f(_val, _1, boost::phoenix::ref(error_msgs))] )
-              |
-              ( lit('-')
-                > term_g(_r1) // expression07_r
-                [_val = subtraction3_f(_val, _1, boost::phoenix::ref(error_msgs))] )
-              )
-        > eps[_pass = validate_expr_type3_f(_val, boost::phoenix::ref(error_msgs_))]
-        ;
-
+        %=  term_g(_r1)
+            [set_val2_f(_val, _1)]
+        > *((lit('+')
+             > term_g(_r1)
+               [addition3_f(_val, _1, boost::phoenix::ref(error_msgs))])
+            |
+            (lit('-')
+             > term_g(_r1)
+             [subtraction3_f(_val, _1, boost::phoenix::ref(error_msgs))]))
+        > eps[validate_expr_type3_f(_val, _pass,
+                                    boost::phoenix::ref(error_msgs_))];
     }
 
   }

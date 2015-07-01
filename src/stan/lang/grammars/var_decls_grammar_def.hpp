@@ -306,22 +306,24 @@ namespace stan {
 
     struct validate_decl_constraints {
       template <class> struct result;
-      template <typename F, typename T1, typename T2, typename T3, typename T4>
-      struct result<F(T1, T2, T3, T4)> { typedef bool type; };
+      template <typename F, typename T1, typename T2, typename T3,
+                typename T4, typename T5>
+      struct result<F(T1, T2, T3, T4, T5)> { typedef void type; };
 
-      bool operator()(const bool& allow_constraints,
-                      const bool& declaration_ok,
-                      const var_decl& var_decl,
-                      std::stringstream& error_msgs) const {
+      void operator()(const bool& allow_constraints,
+                      const bool& declaration_ok, const var_decl& var_decl,
+                      bool& pass, std::stringstream& error_msgs) const {
         if (!declaration_ok) {
           error_msgs << "Problem with declaration." << std::endl;
-          return false;  // short-circuits test of constraints
+          pass = false;
+          return;  // short-circuits test of constraints
         }
-        if (allow_constraints)
-          return true;
+        if (allow_constraints) {
+          pass = true;
+          return;
+        }
         validate_no_constraints_vis vis(error_msgs);
-        bool constraints_ok = boost::apply_visitor(vis, var_decl.decl_);
-        return constraints_ok;
+        pass = boost::apply_visitor(vis, var_decl.decl_);
       }
     };
     boost::phoenix::function<validate_decl_constraints>
@@ -332,8 +334,8 @@ namespace stan {
       std::set<std::string> const_fun_name_set_;
 
       template <class> struct result;
-      template <typename F, typename T1, typename T2>
-      struct result<F(T1, T2)> { typedef bool type; };
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1, T2, T3)> { typedef void type; };
 
       void reserve(const std::string& w) {
         reserved_word_set_.insert(w);
@@ -506,7 +508,8 @@ namespace stan {
             reserve(*it);
       }
 
-      bool operator()(const std::string& identifier,
+      void operator()(const std::string& identifier,
+                      bool& pass,
                       std::stringstream& error_msgs) const {
         int len = identifier.size();
         if (len >= 2
@@ -516,7 +519,8 @@ namespace stan {
                      << " not end in double underscore (__)"
                      << std::endl
                      << "    found identifer=" << identifier << std::endl;
-          return false;
+          pass = false;
+          return;
         }
         size_t period_position = identifier.find('.');
         if (period_position != std::string::npos) {
@@ -527,16 +531,18 @@ namespace stan {
                      << std::endl
                      << "    found identifier=" << identifier
                      << std::endl;
-          return false;
+          pass = false;
+          return;
         }
         if (identifier_exists(identifier)) {
           error_msgs << "variable identifier (name) may not be reserved word"
                      << std::endl
                      << "    found identifier=" << identifier
                      << std::endl;
-          return false;
+          pass = false;
+          return;
         }
-        return true;
+        pass = true;
       }
     };
     boost::phoenix::function<validate_identifier> validate_identifier_f;
@@ -556,10 +562,10 @@ namespace stan {
 
     struct empty_range {
       template <class> struct result;
-      template <typename F, typename T1>
-      struct result<F(T1)> { typedef range type; };
-      range operator()(std::stringstream& /*error_msgs*/) const {
-        return range();
+      template <typename F, typename T1, typename T2>
+      struct result<F(T1, T2)> { typedef void type; };
+      void operator()(range& r, std::stringstream& /*error_msgs*/) const {
+        r = range();
       }
     };
     boost::phoenix::function<empty_range> empty_range_f;
@@ -766,8 +772,8 @@ namespace stan {
                        boost::phoenix::ref(error_msgs_))]
             )
         > eps
-          [_pass = validate_decl_constraints_f(_r1, _a, _val,
-                                     boost::phoenix::ref(error_msgs_))]
+          [validate_decl_constraints_f(_r1, _a, _val, _pass,
+                                       boost::phoenix::ref(error_msgs_))]
 
         > lit(';');
 
@@ -938,7 +944,7 @@ namespace stan {
 
       range_brackets_int_r.name("integer range expression pair, brackets");
       range_brackets_int_r
-        = lit('<') [_val = empty_range_f(boost::phoenix::ref(error_msgs_))]
+        = lit('<') [empty_range_f(_val, boost::phoenix::ref(error_msgs_))]
         >> (
             ((lit("lower")
               >> lit('=')
@@ -962,7 +968,7 @@ namespace stan {
 
       range_brackets_double_r.name("real range expression pair, brackets");
       range_brackets_double_r
-        = lit('<') [_val = empty_range_f(boost::phoenix::ref(error_msgs_))]
+        = lit('<')[empty_range_f(_val, boost::phoenix::ref(error_msgs_))]
         > (
            ((lit("lower")
              > lit('=')
@@ -987,8 +993,8 @@ namespace stan {
       identifier_r.name("identifier");
       identifier_r
         %= identifier_name_r
-           [_pass = validate_identifier_f(_val,
-                                          boost::phoenix::ref(error_msgs_))];
+           [validate_identifier_f(_val, _pass,
+                                  boost::phoenix::ref(error_msgs_))];
 
       identifier_name_r.name("identifier subrule");
       identifier_name_r

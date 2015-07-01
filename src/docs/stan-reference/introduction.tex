@@ -29,7 +29,7 @@ Stan project.  Models and their use are the same across the three
 interfaces, and this manual is the modeling language manual for all
 three interfaces.  All of the interfaces share initialization,
 sampling and tuning controls, and roughly share posterior analysis
-functionality.   
+functionality.
 
 \subsection{CmdStan}
 
@@ -48,7 +48,7 @@ and installation instructions and the manual is code and manual is
 RStan is the R interface to Stan.  RStan interfaces to Stan through
 R's memory rather than just calling Stan from the outside, as in the
 R2WinBUGS and R2jags interfaces on which it was modeled.  The RStan
-home page, with links to download and installation instructions and the 
+home page, with links to download and installation instructions and the
 manual is
 %
 \begin{quote}
@@ -120,7 +120,7 @@ the Stan message groups at
 A \Stan program defines a statistical model through a conditional
 probability function $p(\theta|y,x)$, where $\theta$ is a sequence of
 modeled unknown values (e.g., model parameters, latent variables, missing
-data, future predictions), $y$ is a sequence of modeled known 
+data, future predictions), $y$ is a sequence of modeled known
 values, and $x$ is a sequence of unmodeled predictors and constants
 (e.g., sizes, hyperparameters).
 
@@ -201,14 +201,14 @@ discretization of the Hamiltonian and the total number of steps taken
 per iteration (with their product determining total simulation time).
 \Stan can be configured with a user-specified step size or it can
 estimate an optimal step size during warmup using dual averaging
-\citep{Nesterov:2009, Hoffman-Gelman:2011, Hoffman-Gelman:2014}.  
-In either case, additional randomization may be applied to draw the 
+\citep{Nesterov:2009, Hoffman-Gelman:2011, Hoffman-Gelman:2014}.
+In either case, additional randomization may be applied to draw the
 step size from an interval of possible step sizes \citep{Neal:2011}.
 
 \Stan can be set to use a specified number of steps, or it can
 automatically adapt the number of steps during sampling using the
-No-U-Turn (\NUTS) sampler 
-\citep{Hoffman-Gelman:2011, Hoffman-Gelman:2014}.  
+No-U-Turn (\NUTS) sampler
+\citep{Hoffman-Gelman:2011, Hoffman-Gelman:2014}.
 
 The third tuning parameter is a mass matrix for the fictional
 particle.  \Stan can be configured to estimate a diagonal mass matrix
@@ -285,14 +285,14 @@ which is defined by
 \]
 %
 Here the notation $\mbox{argmax}_u \ f(v)$ is used to pick out the value
-of $v$ at which $f(v)$ is maximized.  
+of $v$ at which $f(v)$ is maximized.
 
 If the prior is uniform, the posterior mode corresponds to the maximum
 likelihood estimate (MLE) of the parameters.  If the prior is not
 uniform, the posterior mode is sometimes called the maximum a
 posterior (MAP) estimate.  If parameters (typically hierarchical) have
 been marginalized out, it's sometimes called a maximum marginal
-likelihood (MML) estimate. 
+likelihood (MML) estimate.
 
 For optimization, the Jacobian of any transforms induced by
 constraints on variables are ignored.  It is more efficient in many
@@ -315,6 +315,37 @@ posterior variance is low and the posterior mean is near the posterior
 mode, inference with point estimates can be very similar to full
 Bayesian inference.
 
+
+\section{Variational Inference}
+
+Stan also supports variational inference, an approximate Bayesian inference
+technique \citep{Jordan:1999,Wainwright-Jordan:2008}. Variational inference has
+had a tremendous impact on Bayesian computation, especially in the machine
+learning community; it is typically faster than sampling techniques and can
+scale to massive datasets \citep{Hoffman:2013}.
+
+Variational inference approximates the posterior
+$p(\theta \mid y)$ with a simple, parameterized distribution
+$q(\theta \,;\, \phi)$. It matches the approximation to the
+true posterior by minimizing the Kullback-Leibler divergence,
+%
+\[
+  \phi^* = \argmin_\phi
+  \KL{ q(\theta \,;\, \phi) }{ p(\theta \mid y) }.
+\]
+%
+This converts Bayesian inference into an optimization problem with a
+well-defined metric for convergence. Variational inference can provide orders of
+magnitude faster convergence than sampling; the quality of the approximation
+will vary from model to model. Note that variational inference is not a point
+estimation technique; the result is a distribution that approximates the
+posterior.
+
+Stan implements Automatic Differentiation Variational Inference (ADVI), an
+algorithm designed to leverage Stan's library of transformations and automatic
+differentiation toolbox \citep{Kucukelbir:2015}. ADVI circumvents all of the
+mathematics typically required to derive variational inference algorithms; it
+works with any Stan model.
 
 
 

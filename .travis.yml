@@ -22,6 +22,7 @@ env:
   - FOLDER=. TESTFOLDER=src/test/unit/model
   - FOLDER=. TESTFOLDER=src/test/unit/optimization
   - FOLDER=. TESTFOLDER=src/test/unit/services
+  - FOLDER=. TESTFOLDER=src/test/unit/variational
   - FOLDER=lib/stan_math_2.6.3 TESTFOLDER=test/unit/math/memory
   - FOLDER=lib/stan_math_2.6.3 TESTFOLDER=test/unit/math/prim
   - FOLDER=lib/stan_math_2.6.3 TESTFOLDER=test/unit/math/rev
