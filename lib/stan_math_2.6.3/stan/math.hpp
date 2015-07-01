@@ -478,6 +478,7 @@
 #include <stan/math/prim/scal/prob/normal_cdf_log.hpp>
 #include <stan/math/prim/scal/prob/normal_log.hpp>
 #include <stan/math/prim/scal/prob/normal_rng.hpp>
+#include <stan/math/prim/scal/prob/normal_sufficient_log.hpp>
 #include <stan/math/prim/scal/prob/pareto_ccdf_log.hpp>
 #include <stan/math/prim/scal/prob/pareto_cdf.hpp>
 #include <stan/math/prim/scal/prob/pareto_cdf_log.hpp>
