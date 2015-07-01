@@ -642,7 +642,7 @@ namespace stan {
       void operator()(variable& var_expr, expression& val, variable_map& vm,
                       std::ostream& error_msgs, bool& pass) const {
         std::string name = var_expr.name_;
-        if (name == std::string("lp__"))
+        if (name == std::string("lp__")) {
             error_msgs << std::endl
                        << "WARNING:"
                        << std::endl
@@ -652,18 +652,28 @@ namespace stan {
                        << "  Please use increment_log_prob(u)"
                        << " in place of of lp__ <- lp__ + u."
                        << std::endl;
+        } else if (name == std::string("params_r__")) {
+          error_msgs << std::endl << "WARNING:" << std::endl
+                     << "  Direct access to params_r__ yields an inconsistent"
+                     << " statistical model in isolation and no guarantee is"
+                     << " made that this model will yield valid inferences."
+                     << std::endl
+                     << "  Moreover, access to params_r__ is unsupported"
+                     << " and the variable may be removed without notice."
+                     << std::endl;
+        }
         pass = vm.exists(name);
-        if (pass)
+        if (pass) {
           var_expr.set_type(vm.get_base_type(name), vm.get_num_dims(name));
-        else
+        } else {
           error_msgs << "variable \"" << name << '"' << " does not exist."
                      << std::endl;
-
+          return;
+        }
         val = expression(var_expr);
       }
     };
     boost::phoenix::function<set_var_type> set_var_type_f;
-
     struct validate_int_expr3 {
       template <class> struct result;
       template <typename F, typename T1, typename T2, typename T3>
