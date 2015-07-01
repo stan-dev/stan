@@ -73,7 +73,6 @@ namespace stan {
       const char* what() const throw() {
         return what_.c_str();
       }
-
     };
 
     /**

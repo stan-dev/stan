@@ -548,7 +548,11 @@ TEST(io_dump, reader_vec_data_max_dims) {
 
 TEST(io_dump, reader_big_doubles) {
   double dmax = std::numeric_limits<double>::max();
-  double dmin = std::numeric_limits<double>::min();
+
+  // TODO(carpenter): in C++11, min() should change to lowest()
+  // test as written in Stan 2.6 fails on Intel's icpc compiler
+  //   min = std::numeric_limits<double>::min();
+  double dmin = -dmax; 
   std::stringstream sa;
   sa << "a <- " << dmax ;
   test_val("a",dmax,sa.str());

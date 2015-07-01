@@ -123,6 +123,30 @@ namespace stan {
         && check_consistent_size(function, name3, x3, max_size)
         && check_consistent_size(function, name4, x4, max_size);
     }
+    template <typename T1, typename T2, typename T3, typename T4,
+              typename T5>
+    inline bool check_consistent_sizes(const char* function,
+                                       const char* name1,
+                                       const T1& x1,
+                                       const char* name2,
+                                       const T2& x2,
+                                       const char* name3,
+                                       const T3& x3,
+                                       const char* name4,
+                                       const T4& x4,
+                                       const char* name5,
+                                       const T5& x5) {
+      size_t max_size = std::max(size_of(x1),
+                                 std::max(size_of(x2),
+                                          std::max(size_of(x3),
+                                            std::max(size_of(x4),
+                                                     size_of(x5)))));
+      return check_consistent_size(function, name1, x1, max_size)
+        && check_consistent_size(function, name2, x2, max_size)
+        && check_consistent_size(function, name3, x3, max_size)
+        && check_consistent_size(function, name4, x4, max_size)
+        && check_consistent_size(function, name5, x5, max_size);
+    }
 
   }
 }
