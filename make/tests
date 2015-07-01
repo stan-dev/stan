@@ -8,7 +8,6 @@ CFLAGS_GTEST += -isystem $(GTEST)/include -isystem $(GTEST)
 
 ##
 # Build the google test library.
-## 
 $(LIBGTEST): $(LIBGTEST)(test/gtest.o)
 
 test/gtest.o: $(GTEST)/src/gtest-all.cc
@@ -79,9 +78,9 @@ test/test-models/stanc.d : src/test/test-models/stanc.cpp
 # Target to verify header files within Stan has
 # enough include calls
 ##
-HEADER_TESTS := $(addsuffix -test,$(shell find src/stan -name '*.hpp' -type f)) 
+HEADER_TESTS := $(addsuffix -test,$(shell find src/stan -name '*.hpp' -type f))
 
-ifeq ($(OS_TYPE),win) 
+ifeq ($(OS_TYPE),win)
   DEV_NULL = nul
 else
   DEV_NULL = /dev/null
@@ -93,7 +92,7 @@ endif
 ##
 .PHONY: %.hpp-test
 src/test/test-models/good/%.hpp-test : src/test/test-models/good/%.hpp
-	$(COMPILE.c) -fsyntax-only -O0 $< 
+	$(COMPILE.c) -fsyntax-only -O0 $<
 
 .PHONY: HEADER_TESTS
 %.hpp-test : %.hpp test/dummy.cpp
@@ -134,7 +133,7 @@ src/test/unit/mcmc/hmc/hamiltonians/base_hamiltonian_test.cpp: src/test/test-mod
 src/test/unit/mcmc/hmc/hamiltonians/unit_e_metric_test.cpp: src/test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp
 src/test/unit/mcmc/hmc/hamiltonians/diag_e_metric_test.cpp: src/test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp
 src/test/unit/mcmc/hmc/hamiltonians/dense_e_metric_test.cpp: src/test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp
-src/test/unit/mcmc/hmc/integrators/expl_leapfrog_test.cpp: src/test/test-models/good/mcmc/hmc/integrators/command.hpp 
+src/test/unit/mcmc/hmc/integrators/expl_leapfrog_test.cpp: src/test/test-models/good/mcmc/hmc/integrators/command.hpp
 src/test/unit/mcmc/hmc/integrators/expl_leapfrog2_test.cpp: src/test/test-models/good/mcmc/hmc/integrators/gauss.hpp
 
 src/test/unit/services/optimization/do_bfgs_optimize_test.cpp: src/test/test-models/good/optimization/rosenbrock.hpp
@@ -163,6 +162,13 @@ src/test/unit/lang/reject/reject_func_call_transformed_parameters_test.cpp: src/
 
 src/test/unit/lang/reject/reject_generated_quantities_test.cpp: src/test/test-models/good/lang/reject_generated_quantities.hpp
 src/test/unit/lang/reject/reject_func_call_generated_quantities_test.cpp: src/test/test-models/good/lang/reject_func_call_generated_quantities.hpp
+
+src/test/unit/variational/advi_univar_no_constraint_test.cpp: src/test/test-models/good/variational/univariate_no_constraint.hpp
+src/test/unit/variational/advi_univar_with_constraint_test.cpp: src/test/test-models/good/variational/univariate_with_constraint.hpp
+src/test/unit/variational/advi_multivar_no_constraint_test.cpp: src/test/test-models/good/variational/multivariate_no_constraint.hpp
+src/test/unit/variational/advi_multivar_with_constraint_test.cpp: src/test/test-models/good/variational/multivariate_with_constraint.hpp
+src/test/unit/variational/hier_logistic_test.cpp: src/test/test-models/good/variational/hier_logistic.hpp
+src/test/unit/variational/hier_logistic_cp_test.cpp: src/test/test-models/good/variational/hier_logistic_cp.hpp
 
 ##
 # Compile models depends on every model within

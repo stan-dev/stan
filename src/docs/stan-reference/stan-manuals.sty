@@ -44,7 +44,7 @@
 \renewcommand{\cftpartpagefont}{\normalsize\rm\bfseries}
 \renewcommand{\cftchapaftersnum}{.}
 \renewcommand{\cftchapaftersnumb}{\hspace*{8pt}}
-\renewcommand{\@pnumwidth}{5em} 
+\renewcommand{\@pnumwidth}{5em}
 \renewcommand{\@tocrmarg}{4em}
 \setcounter{tocdepth}{0}
 
@@ -78,8 +78,8 @@
 \newcommand{\Stan}{Stan\xspace}
 \newcommand{\stanc}{{\ttfamily stanc}\xspace}
 \newcommand*{\Cpp}{C\raise.15ex\hbox{\footnotesize ++}\xspace} %\ensuremath{++}
-\newcommand{\clang}{{\ttfamily clang\raise.2ex\hbox{\footnotesize ++}}\xspace} 
-\newcommand{\gpp}{{\ttfamily g\raise.2ex\hbox{\footnotesize ++}}\xspace} 
+\newcommand{\clang}{{\ttfamily clang\raise.2ex\hbox{\footnotesize ++}}\xspace}
+\newcommand{\gpp}{{\ttfamily g\raise.2ex\hbox{\footnotesize ++}}\xspace}
 
 \newcommand{\acronym}[1]{#1\xspace}
 
@@ -110,6 +110,12 @@
 \newcommand{\erfc}[1]{\operatorname{erfc}#1}
 \newcommand{\erf}[1]{\operatorname{erf}#1}
 \newcommand{\sech}[1]{\operatorname{sech}#1}
+
+% math macros for variational inference
+\newcommand{\KL}[2]{\ensuremath{\textrm{KL}\left(#1\;\|\;#2}\right)}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand{\E}{\mathbb{E}}
 
 \newcommand{\ternary}[3]{#1 \ ? \ #2 \ : \ #3}
 
@@ -170,7 +176,7 @@
 \newcommand{\samp}{{\lower.78ex\hbox{\texttt{\char`\~}}}}%
 %{{\lower1.1ex\hbox{\Large\texttt{\char`\~}}}}
 
-% iPad: 3w x 4h, 
+% iPad: 3w x 4h,
 
 \setlength{\paperwidth}{6in}
 \setlength{\paperheight}{8in}

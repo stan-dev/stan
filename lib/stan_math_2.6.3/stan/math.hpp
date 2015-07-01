@@ -527,6 +527,7 @@
 #include <stan/math/prim/scal/prob/weibull_cdf_log.hpp>
 #include <stan/math/prim/scal/prob/weibull_log.hpp>
 #include <stan/math/prim/scal/prob/weibull_rng.hpp>
+#include <stan/math/prim/scal/prob/wiener_log.hpp>
 
 #include <stan/math/rev/arr/fun/log_sum_exp.hpp>
 #include <stan/math/rev/arr/functor/coupled_ode_system.hpp>

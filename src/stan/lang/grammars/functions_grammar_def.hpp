@@ -254,6 +254,7 @@ namespace stan {
       struct result { typedef void type; };
       void operator()(variable_map& vm) const {
         vm.add("lp__", DOUBLE_T, local_origin);
+        vm.add("params_r__", VECTOR_T, local_origin);
       }
     };
     boost::phoenix::function<scope_lp> scope_lp_f;
@@ -266,6 +267,7 @@ namespace stan {
       void operator()(function_decl_def& decl,
                       variable_map& vm) const {
         vm.remove("lp__");
+        vm.remove("params_r__");
         for (size_t i = 0; i < decl.arg_decls_.size(); ++i)
           vm.remove(decl.arg_decls_[i].name_);
       }
