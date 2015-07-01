@@ -46,12 +46,14 @@ namespace stan {
     /**
      * Negative infinity.
      */
-    const double NEGATIVE_INFTY = - std::numeric_limits<double>::infinity();
+    const double NEGATIVE_INFTY
+    = - std::numeric_limits<double>::infinity();
 
     /**
      * (Quiet) not-a-number value.
      */
-    const double NOT_A_NUMBER = std::numeric_limits<double>::quiet_NaN();
+    const double NOT_A_NUMBER
+    = std::numeric_limits<double>::quiet_NaN();
 
     /**
      * Smallest positive value.
@@ -61,7 +63,8 @@ namespace stan {
     /**
      * Largest negative value (i.e., smallest absolute value).
      */
-    const double NEGATIVE_EPSILON = - std::numeric_limits<double>::epsilon();
+    const double NEGATIVE_EPSILON
+    = - std::numeric_limits<double>::epsilon();
 
     /**
      * Largest rate parameter allowed in Poisson RNG
@@ -149,8 +152,13 @@ namespace stan {
       return EPSILON;
     }
 
+    const double SQRT_PI
+    = std::sqrt(boost::math::constants::pi<double>());
+
+    const double SQRT_2_TIMES_SQRT_PI = SQRT_2 * SQRT_PI;
+
     const double TWO_OVER_SQRT_PI
-    = 2.0 / std::sqrt(boost::math::constants::pi<double>());
+    = 2.0 / SQRT_PI;
 
     const double NEG_TWO_OVER_SQRT_PI = -TWO_OVER_SQRT_PI;
 
@@ -158,7 +166,11 @@ namespace stan {
     = 1.0 / std::sqrt(2.0 * boost::math::constants::pi<double>());
 
 
-    const double LOG_PI = std::log(boost::math::constants::pi<double>());
+    const double LOG_PI
+    = std::log(boost::math::constants::pi<double>());
+
+    const double LOG_SQRT_PI
+    = std::log(SQRT_PI);
 
     const double LOG_ZERO = std::log(0.0);
 
