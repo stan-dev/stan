@@ -86,4 +86,13 @@ TEST(langGrammarsTermGrammar, operatorErrorMsg) {
   test_throws("op_elt_divide_bad",
               "int[] ./ matrix",
               "Available argument signatures for operator./");
+  test_throws("op_minus_bad",
+              "-int[]",
+              "Available argument signatures for operator-");
+  test_throws("op_logical_negation_bad",
+              "!int[]",
+              "Available argument signatures for operator!");
+  test_throws("op_transpose_bad",
+              "int[]'",
+              "Available argument signatures for operator'");
 }
