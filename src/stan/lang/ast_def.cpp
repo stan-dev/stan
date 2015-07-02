@@ -352,7 +352,7 @@ namespace stan {
     }
 
     bool is_operator(const std::string& name) {
-      return is_binary_operator(name) 
+      return is_binary_operator(name)
         || is_unary_operator(name)
         || is_unary_postfix_operator(name);
     }
@@ -374,7 +374,7 @@ namespace stan {
       if (name == "logical_negation") return "!";
 
       // unary suffix
-      if (name == "transpose") return "'"; 
+      if (name == "transpose") return "'";
 
       // none of the above
       return "ERROR";
@@ -475,12 +475,12 @@ namespace stan {
         }
         error_msgs << std::endl;
       }
-      
+
       return expr_type();  // ill-formed dummy
     }
 
     function_signatures::function_signatures() {
-#include <stan/lang/function_signatures.h>
+#include <stan/lang/function_signatures.h>  // NOLINT
     }
     std::set<std::string>
     function_signatures::key_set() const {
