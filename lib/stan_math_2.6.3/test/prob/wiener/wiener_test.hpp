@@ -11,7 +11,7 @@ using std::numeric_limits;
 using stan::math::var;
 
 class AgradDistributionWiener : public AgradDistributionTest {
- public:
+public:
   void valid_values(vector<vector<double> >& parameters,
                     vector<double>& log_prob) {
     vector<double> param(5);
