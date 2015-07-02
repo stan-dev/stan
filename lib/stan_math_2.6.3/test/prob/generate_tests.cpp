@@ -129,7 +129,7 @@ bool is_argument_list(const string& line) {
 }
 
 string read_file(const string& in_name) {
-  std::ifstream in(in_name);
+  std::ifstream in(in_name.c_str());
 
   string file;
   in.seekg(0, std::ios::end);
