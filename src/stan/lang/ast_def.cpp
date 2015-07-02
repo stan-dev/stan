@@ -330,11 +330,80 @@ namespace stan {
       return num_matches;
     }
 
+    bool is_binary_operator(const std::string& name) {
+      return name == "add"
+        || name == "subtract"
+        || name == "multiply"
+        || name == "divide"
+        || name == "modulus"
+        || name == "mdivide_left"
+        || name == "mdivide_right"
+        || name == "elt_multiply"
+        || name == "elt_divide";
+    }
+
+    bool is_unary_operator(const std::string& name) {
+      return name == "minus"
+        || name == "logical_negation";
+    }
+
+    bool is_unary_postfix_operator(const std::string& name) {
+      return name == "transpose";
+    }
+
+    bool is_operator(const std::string& name) {
+      return is_binary_operator(name)
+        || is_unary_operator(name)
+        || is_unary_postfix_operator(name);
+    }
+
+    std::string fun_name_to_operator(const std::string& name) {
+      // binary infix (pow handled by parser)
+      if (name == "add") return "+";
+      if (name == "subtract") return "-";
+      if (name == "multiply") return "*";
+      if (name == "divide") return "/";
+      if (name == "modulus") return "%";
+      if (name == "mdivide_left") return "\\";
+      if (name == "mdivide_right") return "/";
+      if (name == "elt_multiply") return ".*";
+      if (name == "elt_divide") return "./";
+
+      // unary prefix (+ handled by parser)
+      if (name == "minus") return "-";
+      if (name == "logical_negation") return "!";
+
+      // unary suffix
+      if (name == "transpose") return "'";
+
+      // none of the above
+      return "ERROR";
+    }
+
     void print_signature(const std::string& name,
                          const std::vector<expr_type>& arg_types,
                          bool sampling_error_style,
                          std::ostream& msgs) {
+      static size_t OP_SIZE = std::string("operator").size();
       msgs << "  ";
+      if (name.size() > OP_SIZE && name.substr(0, OP_SIZE) == "operator") {
+        std::string operator_name = name.substr(OP_SIZE);
+        if (arg_types.size() == 2) {
+          msgs << arg_types[0] << " " << operator_name << " " << arg_types[1]
+               << std::endl;
+          return;
+        } else if (arg_types.size() == 1) {
+          if (operator_name == "'")  // exception for postfix
+            msgs << arg_types[0] << operator_name << std::endl;
+          else
+            msgs << operator_name << arg_types[0] << std::endl;
+          return;
+        } else {
+          // should not be reachable due to operator grammar
+          // continue on purpose to get more info to user if this happens
+          msgs << "Operators must have 1 or 2 arguments." << std::endl;
+        }
+      }
       if (sampling_error_style && arg_types.size() > 0)
         msgs << arg_types[0] << " ~ ";
       msgs << name << "(";
@@ -358,7 +427,9 @@ namespace stan {
       std::string display_name
         = (sampling_error_style && name.size() > 4)
         ? name.substr(0, name.size() - 4)
-        : name;
+        : (is_operator(name)
+           ? ("operator" + fun_name_to_operator(name))
+           : name);
 
       for (size_t i = 0; i < signatures.size(); ++i) {
         int promotions = num_promotions(args, signatures[i].second);
@@ -402,12 +473,14 @@ namespace stan {
           print_signature(display_name, signatures[i].second,
                           sampling_error_style, error_msgs);
         }
+        error_msgs << std::endl;
       }
+
       return expr_type();  // ill-formed dummy
     }
 
     function_signatures::function_signatures() {
-#include <stan/lang/function_signatures.h>
+#include <stan/lang/function_signatures.h>  // NOLINT
     }
     std::set<std::string>
     function_signatures::key_set() const {
