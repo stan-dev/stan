@@ -1,5 +1,0 @@
-RUN_CPPLINT ?= python $(CPPLINT)/cpplint.py
-
-.PHONY: cpplint
-cpplint:
-	@$(RUN_CPPLINT) --output=vs7 --counting=detailed --root=stan --extension=hpp,cpp --filter=-runtime/indentation_namespace,-readability/namespace,-legal/copyright,-whitespace/indent,-runtime/reference $(shell find stan -name '*.hpp' -o -name '*.cpp')
