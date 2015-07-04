@@ -55,7 +55,7 @@ namespace stan {
     class mock_lbfgs_update : public LBFGSUpdate<> {
 
     public:
-      mock_lbfgs_update(size_t L) : LBFGSUpdate(L) {};
+      mock_lbfgs_update(size_t L) : LBFGSUpdate<>(L) {};
 
       size_t get_history_size() { return this->_buf.capacity(); }
     };

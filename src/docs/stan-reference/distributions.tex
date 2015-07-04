@@ -1627,6 +1627,32 @@ non-negative real numbers.
 quantities block}
 \end{description}
 
+\section{Wiener Diffusion Model Distributions}
+
+\pitem{y}{wiener}{alpha,tau,beta,delta}
+
+\subsubsection{Stan Functions}
+\begin{description}
+\fitem{real}{wiener\_log}{reals \farg{y}, reals \farg{alpha},
+ reals \farg{tau}, reals \farg{beta}, reals \farg{delta}}
+ {The log of the Wiener first passage time 
+ density of \farg{y} given boundary separation \farg{alpha}, 
+ non-decision time \farg{tau}, a-priori bias \farg{beta} and
+ drift rate \farg{delta}}
+\end{description}
+
+\subsubsection{Boundaries}
+
+Stan returns the first passage time of the accumulation process
+over the upper boundary only. Therefore, one needs to calculate:
+\[
+\distro{wiener}(y|\alpha, \tau, 1 - \beta, - \delta).
+\]
+
+To get the result for the lower
+boundary. For more details, see the appendix of
+\citet{Vandekerckhove-Wabersich:2014}.
+
 \chapter{Positive Lower-Bounded Probabilities}
 
 \noindent
