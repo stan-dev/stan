@@ -442,7 +442,7 @@ in some problems. This requires knowing the global correlations.
 In complex models, the global correlations are usually difficult, if
 not impossible, to derivate analytically; for example, nonlinear model
 components convolve the scales of the data, so standardizing the data
-doesn’t always help.  Therefore, Stan estimates these correlations
+does not always help.  Therefore, Stan estimates these correlations
 online with an adaptive warmup.  In models with strong nonlinear
 (i.e. local) correlations this learning can be slow, even with
 regularization. This is ultimately why warmup in Stan often needs to

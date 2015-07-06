@@ -324,7 +324,7 @@ namespace stan {
             for (int i = 0; i < cont_params_.size(); ++i)
               cont_vector.at(i) = cont_params_(i);
             services::io::write_iteration(*out_stream_, model_, rng_,
-                          0.0, cont_vector, disc_vector, &std::cout);
+                          0.0, cont_vector, disc_vector, print_stream_);
           }
         }
 

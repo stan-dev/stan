@@ -4,12 +4,13 @@
 \chapter{Model Building as Software Development}
 
 \noindent
-Developing a Stan model is a software development process.  Developing
+Developing a statistical model in Stan means writing a Stan program
+and is thus a kind of software development process.  Developing
 software is hard.  Very hard.  So many things can go wrong because
-there are so many moving parts and combinations of parts.  
+there are so many moving parts and combinations of parts.
 
 Software development practices are designed to mitigate the problems
-caused by the inherent complexity of software development.
+caused by the inherent complexity of writing computer programs.
 Unfortunately, many methodologies veer off into dogma, bean counting,
 or both.  A couple we can recommend that provide solid, practical
 advice for developers are \citep{HuntThomas:99} and
@@ -30,7 +31,10 @@ It may seem like a big investment to learn version control, but it's
 well worth it to be able to type a single command to revert to a
 previously working version or to get the difference between the
 current version and an old version.  It's even better when you need
-to share work with others, even on a paper.
+to share work with others, even on a paper---work can be done
+independently and then automatically merged.  See
+\refchapter{software-development} for information on how Stan itself
+is developed.
 
 
 \section{Make it Reproducible}
@@ -65,13 +69,13 @@ pseudo-random number generators.  These operate by generating a
 sequence of random numbers based on a ``seed.''  Stan (and other
 languages like R) can use time-based methods to generate a seed based
 on the time and date, or seeds can be provided to Stan (or R) in the
-form of long integers.  Stan writes out the seed used to generate the
+form ofintegers.  Stan writes out the seed used to generate the
 data as well as the version number of the Stan software so that
 results can be reproduced at a later date.%
 %
 \footnote{This also requires fixing compilers and hardware, because
   floating-point arithmetic does not have an absolutely fixed behavior
-  across platforms or compilers, just operating parameters.}
+  across operating systems, hardware configurations, or compilers.}
 
 
 
@@ -829,8 +833,6 @@ but can be useful as a starting point for inference and as a baseline
 for sensitivity analysis (i.e., considering the effect the prior
 has on the posterior).
 
-\subsection{Uniform Priors and Transforms}
-
 Uniform priors are specific to the scale on which they are formulated.
 For instance, we could give a scale parameter $\sigma > 0$ a uniform
 prior on $(0,\infty)$, $q(\sigma) = c$ (we use $q$ because the
@@ -847,6 +849,47 @@ variables declared with constraints to ensure a uniform density on the
 legal constrained values.  This Jacobian adjustment is turned off when
 optimization is being applied in order to produce appropriate maximum
 likelihood estimates.
+
+\subsection{Proper Uniform Priors: Interval Constraints}
+
+It is possible to declare a variable with a proper uniform prior by
+imposing both an upper and lower bound on it, for example,
+%
+\begin{stancode}
+real<lower=0.1, upper=2.7> sigma;
+\end{stancode}
+%
+This will implicitly give \code{sigma} a $\distro{Uniform}(0.1, 2.7)$
+prior.  
+
+\subsubsection{Matching Support to Constraints}
+
+As with all constraints, it is important that the model
+provide support for all legal values of \code{sigma}.  For example,
+the following code constraints \code{sigma} to be positive, but then
+imposes a bounded uniform prior on it.
+%
+\begin{stancode}
+parameters {
+  real<lower=0> sigma;
+  ...
+model {
+  // *** bad *** : support narrower than constraint
+  sigma ~ uniform(0.1, 2.7);  
+\end{stancode}
+%
+The sampling statement imposes a limited support for \code{sigma} in
+(0.1, 2.7), which is narrower than the support declared in the
+constraint, namely $(0, \infty)$.  This can cause the Stan program to
+be difficult to initialize, hang during sampling, or devolve to a
+random walk.
+
+\subsubsection{Boundary Estimates}
+
+Estimates near boundaries for interval-constrained parameters
+typically signal that the prior is not appropriate for the model.  It
+can also cause numerical problems with underflow and overlow when
+sampling or optimizing.
 
 \subsection{``Uninformative'' Proper Priors}
 
@@ -4605,9 +4648,11 @@ Stan operates on the log scale and thus requires the log likelihood,
 \\[3pt]
 \mbox{ } \ \ = \
 \begin{array}[t]{l}
-\mbox{log\_sum\_exp}_{s=1}^T \log \distro{Uniform}(s | 1,T) 
+\mbox{log\_sum\_exp}_{s=1}^T 
+\left( \log \distro{Uniform}(s | 1,T) \right.
 \\[3pt]
-{} + \sum_{t=1}^T \log \distro{Poisson}(D_t | t < s \ ? \ e \ : \ l),
+{} \hspace*{12pt} + \left. \sum_{t=1}^T \log \distro{Poisson}(D_t | t < s \ ?
+\ e \ : \ l) \right),
 \end{array}
 \]
 %
@@ -4743,9 +4788,10 @@ default MCMC implementation is shown in
 
 \subsection{Discrete Sampling}
 
-Although not computationally advantageous compared to working in
-expectation using \code{lp}, it is possible to use Stan to sample the
-value of \code{s} at every iteration.
+The generated quantities block may be used to draw discrete parameter
+values using the built-in pseudo-random number generators.  For
+example, with \code{lp} defined as above, the following program
+draws a random value for \code{s} at every iteration.
 %
 \begin{stancode}
 generated quantities {
@@ -4756,6 +4802,13 @@ generated quantities {
 %
 A posterior histogram of draws for $s$ is shown on the right side of
 \reffigure{change-point-posterior}.
+
+Compared to working in terms of expectations, discrete sampling is
+highly inefficient, especially for tails of distributions, so this
+approach should only be used if draws from a distribution are
+explicitly required.   Otherwise, expectations should be computed in
+the generated quantities block based on the posterior distribution for
+\code{s} given by \code{softmax(lp)}.
 
 
 \subsection{Posterior Covariance}
