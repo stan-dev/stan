@@ -29,7 +29,7 @@ EIGEN ?= lib/eigen_3.2.4
 BOOST ?= lib/boost_1.58.0
 GTEST ?= lib/gtest_1.7.0
 CPPLINT ?= lib/cpplint_4.45
-MATH ?= lib/stan_math_2.6.3
+MATH ?= lib/stan_math_2.7.0
 
 ##
 # Set default compiler options.
@@ -120,6 +120,14 @@ endif
 	@echo '  - doxygen        : Builds the API documentation. The documentation is located'
 	@echo '                     doc/api/'
 	@echo '                     (requires doxygen installation)'
+	@echo '  Submodule:'
+	@echo '  - math-revert    : Resets the Stan Math Library git submodule to the tagged'
+	@echo '                     version'
+	@echo '  - math-update    : Updates the Stan Math Library git submodule to the latest'
+	@echo '                     development version'
+	@echo '  - math-update/<branch-name> : Updates the Stan Math Library git submodule to'
+	@echo '                     the branch specified'
+	@echo ''
 	@echo 'Tests:'
 	@echo ''
 	@echo '  Unit tests are built through make by specifying the executable as the target'
@@ -184,3 +192,20 @@ clean-all: clean clean-manual clean-deps
 	$(RM) -r test bin
 	@echo '  removing .o files'
 	$(shell find src -type f -name '*.o' -exec rm {} +)
+
+
+##
+# Submodule related tasks
+##
+.PHONY: math-revert
+math-revert:
+	git submodule update --init --recursive
+
+.PHONY: math-update
+math-update:
+	git submodule init
+	git submodule update --recursive
+
+math-update/%: math-update
+	cd $(MATH) && git fetch --all && git checkout $* && git pull
+
