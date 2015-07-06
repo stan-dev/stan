@@ -208,4 +208,3 @@ math-update:
 
 math-update/%: math-update
 	cd $(MATH) && git fetch --all && git checkout $* && git pull
-
