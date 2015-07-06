@@ -128,25 +128,9 @@ bool is_argument_list(const string& line) {
   return true;
 }
 
-string read_arguments_from_file(const string& in_name) {
-  string arguments;
+string read_file(const string& in_name) {
   std::ifstream in(in_name.c_str());
-  if (in.is_open() && in.good()) {
-    std::getline (in, arguments);
-    while (in.good() && !is_argument_list(arguments)) {
-      std::getline (in, arguments);
-    }
-    in.close();
-  }
-  if (!is_argument_list(arguments))
-    arguments = "";
-  return arguments;
-}
 
-pair<string, string> read_test_name_from_file(const string& in_name) {
-  pair<string, string> name;
-  std::ifstream in(in_name.c_str());
-  
   string file;
   in.seekg(0, std::ios::end);
   file.resize(in.tellg());
@@ -154,6 +138,26 @@ pair<string, string> read_test_name_from_file(const string& in_name) {
   in.read(&file[0], file.size());
   in.close();
   
+  return file;
+}
+
+string read_arguments_from_file(const string& file) {
+  string arguments;
+  std::istringstream in(file);
+  if (!in.eof()) {
+    std::getline (in, arguments);
+    while (in.good() && !is_argument_list(arguments)) {
+      std::getline (in, arguments);
+    }
+  }
+  if (!is_argument_list(arguments))
+    arguments = "";
+  return arguments;
+}
+
+pair<string, string> read_test_name_from_file(const string& file) {
+  pair<string, string> name;
+
   size_t pos = 0;
   string class_keyword = "class ";
   string public_keyword = "public ";
@@ -333,10 +337,10 @@ void write_test(vector<std::ostream *>& outs, const string& test_name,
   }
 }
 
-void write_test_cases(vector<std::ostream *>& outs, const string& in_name,
+void write_test_cases(vector<std::ostream *>& outs, const string& file,
                       const vector<vector<string> >& argument_sequence,
                       const int& index, const int& N_TESTS) {
-  pair<string, string> name = read_test_name_from_file(in_name);
+  pair<string, string> name = read_test_name_from_file(file);
   string test_name = name.first;
   string fixture_name = name.second;
 
@@ -354,8 +358,10 @@ int create_files(const int& argc, const char* argv[],const int& index,
   
   size_t last_in_suffix = in_name.find_last_of(in_suffix) + 1 - in_suffix.length();
   string out_name_base = in_name.substr(0, last_in_suffix);
+
+  string file = read_file(in_name);
   
-  string arguments = read_arguments_from_file(in_name);
+  string arguments = read_arguments_from_file(file);
   vector<vector<string> > argument_sequence = build_argument_sequence(arguments,index);
   
   int num_tests;
@@ -387,9 +393,9 @@ int create_files(const int& argc, const char* argv[],const int& index,
 
   write_includes(outs, in_name);
   if(N_TESTS > 0)
-    write_test_cases(outs, in_name, argument_sequence,index,N_TESTS);
+    write_test_cases(outs, file, argument_sequence,index,N_TESTS);
   else if(num_tests > 0)
-    write_test_cases(outs, in_name, argument_sequence,index,ceil(num_tests / BATCHES));
+    write_test_cases(outs, file, argument_sequence,index,ceil(num_tests / BATCHES));
 
 
   for (size_t n = 0; n < outs.size(); n++) {
