@@ -45,6 +45,7 @@
 #include <stan/math/prim/mat/fun/cov_matrix_constrain_lkj.hpp>
 #include <stan/math/prim/mat/fun/cov_matrix_free_lkj.hpp>
 #include <stan/math/prim/mat/prob/lkj_corr_log.hpp>
+#include <stan/math/prim/mat/fun/multiply.hpp>
 
 namespace stan {
   namespace math {
@@ -64,7 +65,8 @@ namespace stan {
       using stan::math::check_lower_triangular;
       using stan::math::sum;
 
-      typename promote_args<T_covar, T_shape>::type lp(0.0);
+      typedef typename promote_args<T_covar, T_shape>::type lp_ret;
+      lp_ret lp(0.0);
       check_positive(function, "Shape parameter", eta);
       check_lower_triangular(function, "Random variable", L);
 
@@ -78,7 +80,7 @@ namespace stan {
         const int Km1 = K - 1;
         Eigen::Matrix<T_covar, Eigen::Dynamic, 1> log_diagonals =
           L.diagonal().tail(Km1).array().log();
-        Eigen::Matrix<T_covar, Eigen::Dynamic, 1> values(Km1);
+        Eigen::Matrix<lp_ret, Eigen::Dynamic, 1> values(Km1);
         for (int k = 0; k < Km1; k++)
           values(k) = (Km1 - k - 1) * log_diagonals(k);
         if ( (eta == 1.0) &&
@@ -86,7 +88,7 @@ namespace stan {
           lp += sum(values);
           return(lp);
         }
-        values += (2.0 * eta - 2.0) * log_diagonals;
+        values += multiply(2.0 * eta - 2.0, log_diagonals);
         lp += sum(values);
       }
 

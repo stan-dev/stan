@@ -2,6 +2,12 @@
 #include <vector>
 #include <iomanip>
 
+void test_grad_eq(Eigen::Matrix<double, -1, 1> grad_1,
+                    Eigen::Matrix<double, -1, 1> grad_2) {
+  for (int i = 0; i < grad_1.size(); ++i) 
+    EXPECT_FLOAT_EQ(grad_1(i),grad_2(i));
+}
+
 template <typename F>
 std::vector<double> 
 finite_diffs(const F& fun,
