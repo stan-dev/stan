@@ -1,7 +1,5 @@
-#ifndef STAN__IO__TRANSFORMS__UNCONSTRAIN__SCALAR_LOWER_BOUND_HPP
-#define STAN__IO__TRANSFORMS__UNCONSTRAIN__SCALAR_LOWER_BOUND_HPP
-
-#include <vector>
+#ifndef STAN__IO__TRANSFORMS__SCALAR_LOWER_BOUND_HPP
+#define STAN__IO__TRANSFORMS__SCALAR_LOWER_BOUND_HPP
 
 #include <stan/math/prim/scal/fun/lb_constrain.hpp>
 #include <stan/math/prim/scal/fun/lb_free.hpp>
@@ -17,27 +15,27 @@ namespace stan {
       T lower_bound_;
     public:
       scalar_lower_bound(T lower_bound): lower_bound_(lower_bound) {}
-      
-      void unconstrain(T input, vector<T>& output) {
+
+      void unconstrain(T input, std::vector<T>& output) {
         output.push_back(stan::prob::lb_free(input, lower_bound_));
       }
-      
+
       T unconstrain(T input) {
         return stan::prob::lb_free(input, lower_bound_);
       }
-      
+
       void constrain(T input, T& output) {
         output = stan::prob::lb_constrain(input, lower_bound_);
       }
-      
+
       void constrain(T input, T& output, T& lp) {
         output = stan::prob::lb_constrain(input, lower_bound_, lp);
       }
-      
+
       T constrain(T input) {
         return stan::prob::lb_constrain(input, lower_bound_);
       }
-      
+
       T constrain(T input, T& lp) {
         stan::prob::lb_constrain(input, lower_bound_, lp);
       }

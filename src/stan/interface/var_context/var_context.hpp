@@ -15,7 +15,7 @@
 namespace stan {
   namespace interface {
     namespace var_context {
-          
+
       /**
        * A <code>var_reader</code> reads array variables of integer and
        * floating point type by name and dimension.
@@ -35,7 +35,7 @@ namespace stan {
       class var_context {
       public:
         virtual ~var_context() {}
-        
+
         /**
          * Return <code>true</code> if the specified variable name is
          * defined.  This method should return <code>true</code> even
@@ -46,7 +46,7 @@ namespace stan {
          * values.
          */
         virtual bool contains_r(const std::string& name) const = 0;
-        
+
         /**
          * Return the floating point values for the variable of the
          * specified variable name in last-index-major order.  This
@@ -60,7 +60,7 @@ namespace stan {
          * @return Sequence of values for the named variable.
          */
         virtual std::vector<double> vals_r(const std::string& name) const = 0;
-        
+
         /**
          * Return the dimensions for the specified floating point variable.
          * If the variable doesn't exist or if it is a scalar, the
@@ -70,7 +70,7 @@ namespace stan {
          * @return Sequence of dimensions for the variable.
          */
         virtual std::vector<size_t> dims_r(const std::string& name) const = 0;
-        
+
         /**
          * Return <code>true</code> if the specified variable name has
          * integer values.
@@ -80,7 +80,7 @@ namespace stan {
          * name is defined.
          */
         virtual bool contains_i(const std::string& name) const = 0;
-        
+
         /**
          * Return the integer values for the variable of the specified
          * name in last-index-major order or the empty sequence if the
@@ -90,7 +90,7 @@ namespace stan {
          * @return Sequence of integer values.
          */
         virtual std::vector<int> vals_i(const std::string& name) const = 0;
-        
+
         /**
          * Return the dimensions of the specified floating point variable.
          * If the variable doesn't exist (or if it is a scalar), the
@@ -100,7 +100,7 @@ namespace stan {
          * @return Sequence of dimensions for the variable.
          */
         virtual std::vector<size_t> dims_i(const std::string& name) const = 0;
-        
+
         /**
          * Return a list of the names of the floating point variables in
          * the context.
@@ -108,7 +108,7 @@ namespace stan {
          * @param names Vector to store the list of names in.
          */
         virtual void names_r(std::vector<std::string>& names) const = 0;
-        
+
         /**
          * Return a list of the names of the integer variables in
          * the context.
@@ -116,7 +116,7 @@ namespace stan {
          * @param names Vector to store the list of names in.
          */
         virtual void names_i(std::vector<std::string>& names) const = 0;
-        
+
         void validate_dims(const std::string& stage,
                            const std::string& name,
                            const std::string& base_type,
@@ -171,66 +171,141 @@ namespace stan {
             }
           }
         }
-        
+
         double scalar(const std::string& name) {
-          if (!contains_r(name))
-            // throw exception
-            
+          if (!contains_r(name)) {
+            std::stringstream msg;
+            msg << "Variable " << name
+                << " not found in variable context" << std::endl;
+            throw std::runtime_error(msg.str());
+          }
+
           std::vector<size_t> dims = dims_r(name);
-          if (dims.size() != 1)
-            // throw exception
-          if (dims[0] != 1)
-            // throw exception
-            
+          if (dims.size() != 1) {
+            std::stringstream msg;
+            msg << "Requested the scalar  " << name
+                << ", but " << name
+                << " is not defined as a scalar in variable context"
+                << std::endl;
+            throw std::runtime_error(msg.str());
+          }
+
+          if (dims[0] != 1) {
+            std::stringstream msg;
+            msg << "Requested the scalar " << name
+                << ", but " << name
+                << " is not defined as a scalar in variable context"
+                << std::endl;
+            throw std::runtime_error(msg.str());
+          }
+
           return vals_r(name)[0];
         }
-        
+
         vector_t vector(const std::string& name, size_t N) {
-          if (!contains_r(name))
-            // throw exception
-            
+          if (!contains_r(name)) {
+            std::stringstream msg;
+            msg << "Variable " << name
+                << " not found in variable context" << std::endl;
+            throw std::runtime_error(msg.str());
+          }
+
           std::vector<size_t> dims = dims_r(name);
-          if (dims.size() != 1)
-            // throw exception
-          if (dims[0] != N)
-            // throw exception
-          
+          if (dims.size() != 1) {
+            std::stringstream msg;
+            msg << "Requested the vector " << name
+                << ", but " << name
+                << " is not defined as a vector in variable context"
+                << std::endl;
+            throw std::runtime_error(msg.str());
+          }
+
+          if (dims[0] != N) {
+            std::stringstream msg;
+            msg << "Requested the vector " << name
+                << " with size " << N << ", but " << name
+                << " is defined with size " << dims[0] << " in variable context"
+                << std::endl;
+            throw std::runtime_error(msg.str());
+          }
+
           std::vector<double> vals = vals_r(name);
           vector_t output(N);
           for (vector_t_idx n = 0; n < N; ++n)
             output(n) = vals[n];
           return output;
         }
-        
+
         row_vector_t row_vector(const std::string& name, size_t N) {
-          if (!contains_r(name))
-            // throw exception
-            
+          if (!contains_r(name)) {
+            std::stringstream msg;
+            msg << "Variable " << name
+                << " not found in variable context" << std::endl;
+            throw std::runtime_error(msg.str());
+          }
+
           std::vector<size_t> dims = dims_r(name);
-          if (dims.size() != 1)
-            // throw exception
-          if (dims[0] != N)
-            // throw exception
-              
+          if (dims.size() != 1) {
+            std::stringstream msg;
+            msg << "Requested the row vector " << name
+                << ", but " << name
+                << " is not defined as a row vector in variable context"
+                << std::endl;
+            throw std::runtime_error(msg.str());
+          }
+
+          if (dims[0] != N) {
+            std::stringstream msg;
+            msg << "Requested the row vector " << name
+                << " with size " << N << ", but " << name
+                << " is defined with size " << dims[0] << " in variable context"
+                << std::endl;
+            throw std::runtime_error(msg.str());
+          }
+
           std::vector<double> vals = vals_r(name);
           row_vector_t output(N);
           for (row_vector_t_idx n = 0; n < N; ++n)
             output(n) = vals[n];
           return output;
         }
-        
+
         matrix_t matrix(const std::string& name, size_t n_rows, size_t n_cols) {
-          if (!contains_r(name))
-            // throw exception
-            
+          if (!contains_r(name)) {
+            std::stringstream msg;
+            msg << "Variable " << name
+                << " not found in variable context" << std::endl;
+            throw std::runtime_error(msg.str());
+          }
+
           std::vector<size_t> dims = dims_r(name);
-          if (dims.size() != 2)
-            // throw exception
-          if (dims[0] != n_rows)
-            // throw exception
-          if (dims[1] != n_cols)
-            // throw exception
-          
+          if (dims.size() != 2) {
+            std::stringstream msg;
+            msg << "Requested the matrix " << name
+                << ", but " << name
+                << " is not defined as a matrix in variable context"
+                << std::endl;
+            throw std::runtime_error(msg.str());
+          }
+
+          if (dims[0] != n_rows) {
+            std::stringstream msg;
+            msg << "Requested the matrix " << name
+                << " with " << n_rows << " rows, but " << name
+                << " is defined with " << dims[0] << " rows in variable context"
+                << std::endl;
+            throw std::runtime_error(msg.str());
+          }
+
+          if (dims[1] != n_cols) {
+            std::stringstream msg;
+            msg << "Requested the matrix " << name
+                << " with " << n_cols << " columns, but " << name
+                << " is defined with " << dims[1] << " columns in variable context"
+                << std::endl;
+            throw std::runtime_error(msg.str());
+          }
+
           std::vector<double> vals = vals_r(name);
           matrix_t output(n_rows, n_cols);
           for (matrix_t_idx c = 0; c < n_cols; ++c)
@@ -238,46 +313,41 @@ namespace stan {
               output(r, c) = values[r * n_cols + c];
           return output;
         }
-        
+
         void get_unconstrained_scalar(std::vector<double>& parameters,
                                       const std::string& name,
-                                      const std::string& scope,
                                       stan::io::scalar_transform& transform) {
           double constr_val = scalar(name);
           transform.unconstrain(constr_val, parameters);
         }
-        
+
         void get_unconstrained_vector(std::vector<double>& parameters,
                                       const std::string& name,
-                                      const std::string& scope,
-                                      size_t N,
                                       stan::io::vector_transform& transform) {
-          vector_t constr_val = vector(name, N);
+          vector_t constr_val = vector(name, transform.size());
           transform.unconstrain(constr_val, parameters);
         }
-        
+
         void get_unconstrained_row_vector(std::vector<double>& parameters,
                                           const std::string& name,
-                                          const std::string& scope,
-                                          size_t N,
                                           stan::io::row_vector_transform& transform) {
-          row_vector_t constr_val = row_vector(name, N);
+          row_vector_t constr_val = row_vector(name, transform.size());
           transform.unconstrain(constr_val, parameters);
         }
-        
+
         void get_unconstrained_matrix(std::vector<double>& parameters,
                                       const std::string& name,
-                                      const std::string& scope,
-                                      size_t n_rows, size_t n_cols,
                                       stan::io::matrix_transform& transform) {
-          matrix_t constr_val = matrix(name, n_rows, n_cols);
+          matrix_t constr_val = matrix(name,
+                                       transform.n_rows(),
+                                       transform.n_cols());
           transform.unconstrain(constr_val, parameters);
         }
-        
+
         static std::vector<size_t> to_vec() {
           return std::vector<size_t>();
         }
-        
+
         static std::vector<size_t> to_vec(size_t n1) {
           std::vector<size_t> v(1);
           v[0] = n1;
@@ -358,9 +428,9 @@ namespace stan {
           v[7] = n8;
           return v;
         }
-        
+
       };
-      
+
     }
   }
 }
