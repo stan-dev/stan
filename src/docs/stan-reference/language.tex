@@ -21,7 +21,7 @@ optimization and diagnostics.
 
 The first step of execution is to read data into memory.   Data may be
 read in through file (in CmdStan) or through memory (RStan and
-PyStan);  see their respective manuals for details.
+PyStan);  see their respective manuals for details.%
 %
 \footnote{The \Cpp code underlying Stan is flexible enough to allow
   data to be read from memory or file.  Calls from \R, for instance,
@@ -3276,6 +3276,63 @@ message.  To aid in diagnosing problems, the message for each
 reject statement will be printed as a result of executing it.
 
 
+\subsection{Rejection is not for Constraints}
+
+Rejection should be used for error handling, not defining arbitrary
+constraints.  Consider the following errorful Stan program.
+%
+\begin{stancode}
+parameters {
+  real a;
+  real<lower=a> b;
+  real<lower=a, upper=b> theta;
+  ...
+model {
+  // **wrong** needs explicit truncation
+  theta ~ normal(0, 1); 
+  ...
+\end{stancode}
+%
+This program is wrong because its truncation bounds on \code{theta}
+depend on parameters, and thus need to be accounted for using an
+explicit truncation on the distribution.  This is the right way to do
+it.  
+%
+\begin{stancode}
+  theta ~ normal(0, 1) T[a,b];
+\end{stancode}
+%
+The conceptual issue is that the prior does not integrate to one over
+the admissible parameter space; it integrates to one over all real
+numbers and integrates to something less than one over $(a,b)$; in these
+simple univariate cases, we can overcome that with the T[,] notation,
+which essentially divides by whatever the prior integrates to over
+$(a,b)$.  
+
+This problem is exactly the same problem as you would get using reject
+statements to enforce complicated inequalities on multivariate
+functions.  In this case, it is wrong to try to deal with truncation
+through constraints.
+%
+\begin{stancode}
+  if (theta < a || theta > b)
+    reject("theta not in (a, b)");
+  // still **wrong**, needs T[a,b]
+  theta ~ normal(0, 1);
+\end{stancode} 
+%
+In this case, the prior integrates to something less than one over the
+region of the parameter space where the complicated inequalities are
+satisfied. But we don't generally know what value the prior integrates
+to, so we can't increment the log probability function to compensate.
+
+Even if this adjustment to a proper probability model may seem like
+``no big deal'' in particular models where the amount of truncated
+posterior density is negligible or constant, we can't sample from that
+truncated posterior efficiently.  Programs need to use one-to-one
+mappings that guarantee the constraints are satisfied and only use
+reject statements to raise errors or help with debugging.
+
 \chapter{User-Defined Functions}\label{functions.chapter}%
 %
 \noindent
@@ -4268,6 +4325,20 @@ Any variable that is defined wholly in terms of data or transformed
 data should be declared and defined in the transformed data block.
 Defining such quantities in the transformed parameters block is legal,
 but much less efficient than defining them as transformed data.
+
+\subsection{Constraints are for Error Checking}
+
+Like the constraints on data, the constraints on transformed
+parameters is meant to catch programming errors as well as convey
+programmer intent.  They are not automatically transformed in such a
+way as to be satisfied.  What will happen if a transformed parameter
+does not match its constraint is that the current parameter values
+will be rejected.  This can cause Stan's algorithms to hang or
+to devolve to random walks.  It is not intended to be a way to enforce
+ad hoc constraints in Stan programs.   See \refsection{reject-statements}
+for furtehr discussion of the behavior of reject statements.
+
+
 
 \section{Program Block: \code{model}}
 
