@@ -1,7 +1,0 @@
-/**
- * @namespace stan::math
- * Matrices and templated mathematical functions.
- * Templated probability distributions. All paramaterizations
- *   are based on Bayesian Data Analysis.
- * Function gradients via reverse-mode automatic differentiation.
- */

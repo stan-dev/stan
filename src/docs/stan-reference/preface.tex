@@ -3,28 +3,7 @@
 
 \section*{Why \Stan?}
 
-We%
-%
-\footnote{In Fall 2010, the ``we'' consisted of Andrew Gelman and his
-  crew of Ph.D.\ students (Wei Wang and Vince Dorie), postdocs (Ben
-  Goodrich, Matt Hoffman and Michael Malecki), and research staff (Bob
-  Carpenter and Daniel Lee).  Previous postdocs whose work directly
-  influenced \Stan included Matt Schofield, Kenny Shirley, and Aleks
-  Jakulin.  Jiqiang Guo joined as a postdoc in Fall 2011.  Marcus
-  Brubaker, a computer science postdoc at Toyota Technical Institute
-  at Chicago, joined the development team in early 2012.  Michael
-  Betancourt, a physics Ph.D.\ about to start a postdoc at University
-  College London, joined the development team in late 2012 after
-  months of providing useful feedback on geometry and debugging
-  samplers at our meetings. Yuanjun Gao, a statistics graduate student
-  at Columbia, and Peter Li, an undergraduate student at Columbia,
-  joined the development team in the Fall semester of 2012.  Allen
-  Riddell joined the development team in Fall of 2013 and is currently
-  maintaining PyStan.  In the summer of 2014, Marco Inacio (University
-  of S\~ao Paulo), Mitzi Morris (independent contractor), and Jeffrey
-  Arnold (University of Washington) joined the development team. }
-%
-did not set out to build \Stan as it currently exists.  We set out to
+We did not set out to build \Stan as it currently exists.  We set out to
 apply full Bayesian inference to the sort of multilevel generalized
 linear models discussed in Part II of \citep{GelmanHill:2007}.  These
 models are structured with grouped and interacted predictors at
@@ -33,8 +12,8 @@ coefficient priors, latent effects as in item-response models, and
 varying output link functions and distributions.
 
 The models we wanted to fit turned out to be a challenge for current
-general-purpose software to fit.  A direct encoding in \BUGS or \JAGS
-can grind these tools to a halt.  Matt Schofield found his multilevel
+general-purpose software.  A direct encoding in \BUGS or \JAGS can
+grind these tools to a halt.  Matt Schofield found his multilevel
 time-series regression of climate on tree-ring measurements wasn't
 converging after hundreds of thousands of iterations.
 
@@ -91,10 +70,7 @@ templates for lazy evaluation and the curiously recurring template
 pattern to implement concepts without virtual function calls.  But we
 ran into the same problem with Eigen as with the existing probability
 libraries --- it doesn't support mixed operations of algorithmic
-differentiation variables and primitives like \code{double}.  This is
-a problem we have yet to optimize away as of \Stan version 1.3, but we
-have plans to extend Eigen itself to support heterogeneous 
-matrix operator types.
+differentiation variables and primitives like \code{double}.
 
 At this point (Spring 2011), we were happily fitting models coded 
 directly in \Cpp on top of the pre-release versions of the \Stan API. 
@@ -102,7 +78,14 @@ Seeing how well this all worked, we set our sights on the generality
 and ease of use of \BUGS.  So we designed a modeling language in which 
 statisticians could write their models in familiar notation that could 
 be transformed to efficient \Cpp code and then compiled into an 
-efficient executable program.
+efficient executable program.  It turned out that our modeling
+language was a bit more general than we'd anticipated, and we had an
+imperative probabilistic programming language on our hands.%
+%
+\footnote{In contrast, BUGS and JAGS can be viewed as declarative
+  probabilistic programming languages for specifying a directed
+  graphical model.  In these languages, stochastic and deterministic
+  (poor choice of name) nodes may represent random quantities.}
  
 The next problem we ran into as we started implementing richer models
 is variables with constrained support (e.g., simplexes and covariance
@@ -115,16 +98,24 @@ with suitable adjustments to the log probability from the log absolute
 Jacobian determinant of the inverse transforms.
 
 Even with the prototype compiler generating models, we still faced a
-major hurdle to ease of use.  \HMC requires two tuning parameters
-(step size and number of steps) and is very sensitive to how they are
-set.  The step size parameter could be tuned during warmup based on
-Metropolis rejection rates, but the number of steps was not so easy to
-tune while maintaining detailed balance in the sampler.  This led to
-the development of the No-U-Turn sampler (\NUTS)
-\citep{Hoffman-Gelman:2011, Hoffman-Gelman:2014}, which takes an ever
-increasing number of steps until the direction of the simulation turns
-around, then uses slice sampling to select a point on the simulated
-trajectory.
+major hurdle to ease of use.  \HMC requires a step size
+(discretization time) and number of steps (for total simulation time),
+and is very sensitive to how they are set.  The step size parameter
+could be tuned during warmup based on Metropolis rejection rates, but
+the number of steps was not so easy to tune while maintaining detailed
+balance in the sampler.  This led to the development of the No-U-Turn
+sampler (\NUTS) \citep{Hoffman-Gelman:2011, Hoffman-Gelman:2014},
+which takes an exponentially increasing number of steps (structured as
+a binary tree) forward and backward in time until the direction of the
+simulation turns around, then uses slice sampling to select a point on
+the simulated trajectory.
+
+Although not part of the original Stan prototype, which used a unit
+mass matrix, Stan now allows a diagonal or dense mass matrix to be
+estimated during warmup.  This allows adjustment for globally scaled
+or correlated parameters.  Without this adjustment, models with
+differently scaled parameters could only mix as quickly as their most
+constrained parameter allowed.
 
 We thought we were home free at this point.  But when we measured the
 speed of some \BUGS examples versus \Stan, we were very disappointed.
@@ -137,13 +128,13 @@ fit to the problem.
 
 We realized we were doing redundant calculations, so we wrote a
 vectorized form of the normal distribution for multiple variates with
-the same mean and scale, which sped things up a bit. At the same
-time, we introduced some simple template metaprograms to remove the
+the same mean and scale, which sped things up a bit. At the same time,
+we introduced some simple template metaprograms to remove the
 calculation of constant terms in the log probability.  These both
 improved speed, but not enough.  Finally, we figured out how to both
 vectorize and partially evaluate the gradients of the densities using
 a combination of expression templates and metaprogramming.  At this
-point, we are within a factor of two or so of a hand-coded gradient
+point, we are within a small multiple of a hand-coded gradient
 function.
 
 Later, when we were trying to fit a time-series model, we found that
@@ -162,8 +153,9 @@ beyond the \NUTS paper on {\it arXiv}.  Using a mass matrix sped up
 the unscaled data models by an order of magnitude, though it breaks
 the nice theoretical property of rotation invariance.  The full mass
 matrix estimation has rotational invariance as well, but scales less
-well because of the need to invert the mass matrix once and then do matrix
-multiplications every leapfrog step.
+well because of the need to invert the mass matrix at the end of
+adaptation blocks and then perform matrix multiplications every
+leapfrog step.
 
 \section*{Stan 2}
 
@@ -186,13 +178,16 @@ almost totally different in terms of how the HMC samplers are
 organized, how the output is analyzed, how the mathematics library is
 organized, etc.  
 
-We've also improved our optimization algorithm (BFGS) and its
-parameterization.  We've added more compile-time and run-time error
-checking for models.  We've added many new functions, including new
-matrix functions and new distributions.  We've added some new
-parameterizations and managed to vectorize all the univariate
-distributions.  We've increased compatibility with a range of C++
-compilers.  
+We've also improved our original simple optimization algorithms and
+now use L-BFGS (a limited memory quasi-Newton method that uses
+gradients and a short history of the gradients to make a rolling
+estimate of the Hessian).
+
+We've added more compile-time and run-time error checking for models.
+We've added many new functions, including new matrix functions and new
+distributions.  We've added some new parameterizations and managed to
+vectorize all the univariate distributions.  We've increased
+compatibility with a range of C++ compilers.
 
 We've also tried to fill out the manual to clarify things like array
 and vector indexing, programming style, and the I/O and command-line
@@ -204,6 +199,14 @@ Finally, we've fixed all the bugs which we know about.  It was keeping
 up with the latter that really set the development time back,
 including bugs that resulted in our having to add more error checking.
 
+Perhaps most importantly, we've developed a much stricter process for
+unit testing, code review, and automated integration testing (see
+\refchapter{software-development}).
+
+As of Stan 2.7, variational inference is supported for arbitrary Stan
+models.  This promises Bayesian inference at much larger scale than is
+possible with MCMC methods.
+
 
 \section*{\Stan's Future}
 
@@ -212,7 +215,7 @@ improve \Stan.  Some older, higher-level goals are in a standalone
 to-do list:
 %
 \begin{quote}
-\url{https://github.com/stan-dev/stan/wiki/To-Do-List}
+\url{https://github.com/stan-dev/stan/wiki/Longer-Term-To-Do-List}
 \end{quote}
 
 %
@@ -229,6 +232,14 @@ We will also continue to work on improving numerical stability and
 efficiency throughout.  In addition, we plan to revise the interfaces
 to make them easier to understand and more flexible to use (a
 difficult pair of goals to balance).
+
+Later in the Stan 2 release cycle (Stan 2.7), we added variational
+inference to Stan's sampling and optimization routines, with the
+promise of approximate Bayesian inference at much larger scales than
+is possible with Monte Carlo methods.  The future plans involve
+extending to a stochastic data-streaming implementation for very
+large-scale data problems.
+
 
 
 \section*{You Can Help}
