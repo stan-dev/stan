@@ -71,7 +71,7 @@ include make/cpplint  # cpplint
 ##
 # Dependencies
 ##
-ifneq (,$(filter-out test-headers generate-tests clean% %-test %.d,$(MAKECMDGOALS)))
+ifneq (,$(filter-out test-headers generate-tests clean% %-test math-% %.d,$(MAKECMDGOALS)))
   -include $(addsuffix .d,$(subst $(EXE),,$(MAKECMDGOALS)))
 endif
 
