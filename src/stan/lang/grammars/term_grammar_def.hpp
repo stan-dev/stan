@@ -66,9 +66,20 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::double_literal,
 
 
 namespace stan {
-
   namespace lang {
 
+   // see bare_type_grammar_def.hpp for original
+    struct set_val5 {
+      template <class> struct result;
+      template <typename F, typename T1, typename T2>
+      struct result<F(T1, T2)> { typedef void type; };
+      template <typename T1, typename T2>
+      void operator()(T1& lhs,
+                      const T2& rhs) const {
+        lhs = rhs;
+      }
+    };
+    boost::phoenix::function<set_val5> set_val5_f;
 
     struct validate_integrate_ode {
       template <class> struct result;
@@ -433,10 +444,11 @@ namespace stan {
 
     struct left_division_expr {
       template <class> struct result;
-      template <typename F, typename T1, typename T2, typename T3>
-      struct result<F(T1, T2, T3)> { typedef void type; };
+      template <typename F, typename T1, typename T2, typename T3, typename T4>
+      struct result<F(T1, T2, T3, T4)> { typedef void type; };
 
       void operator()(expression& expr1,
+                      bool& pass,
                       const expression& expr2,
                       std::ostream& error_msgs) const {
         std::vector<expression> args;
@@ -449,12 +461,13 @@ namespace stan {
           fun f("mdivide_left", args);
           sft(f, error_msgs);
           expr1 = expression(f);
+          pass = true;
           return;
         }
-        fun f("divide_left", args);  // this doesn't exist, so will
-                                     // throw error on purpose
+        fun f("mdivide_left", args);  // set for alt args err msg
         sft(f, error_msgs);
         expr1 = expression(f);
+        pass = false;
       }
     };
     boost::phoenix::function<left_division_expr> left_division_f;
@@ -560,20 +573,21 @@ namespace stan {
 
     struct transpose_expr {
       template <class> struct result;
-      template <typename F, typename T1, typename T2>
-      struct result<F(T1, T2)> { typedef expression type; };
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1, T2, T3)> { typedef void type; };
 
-      expression operator()(const expression& expr,
-                            std::ostream& error_msgs) const {
-        if (expr.expression_type().is_primitive()) {
-          return expr;
-        }
+      void operator()(expression& expr,
+                      bool& pass,
+                      std::ostream& error_msgs) const {
+        if (expr.expression_type().is_primitive())
+          return;
         std::vector<expression> args;
         args.push_back(expr);
         set_fun_type sft;
         fun f("transpose", args);
         sft(f, error_msgs);
-        return expression(f);
+        expr = expression(f);
+        pass = !expr.expression_type().is_ill_formed();
       }
     };
     boost::phoenix::function<transpose_expr> transpose_f;
@@ -622,50 +636,56 @@ namespace stan {
 
     struct set_var_type {
       template <class> struct result;
-      template <typename F, typename T1, typename T2, typename T3, typename T4>
-      struct result<F(T1, T2, T3, T4)> { typedef variable type; };
-      variable operator()(variable& var_expr,
-                          variable_map& vm,
-                          std::ostream& error_msgs,
-                          bool& pass) const {
+      template <typename F, typename T1, typename T2, typename T3,
+                typename T4, typename T5>
+      struct result<F(T1, T2, T3, T4, T5)> { typedef void type; };
+      void operator()(variable& var_expr, expression& val, variable_map& vm,
+                      std::ostream& error_msgs, bool& pass) const {
         std::string name = var_expr.name_;
-        if (!vm.exists(name)) {
-          pass = false;
+        if (name == std::string("lp__")) {
+            error_msgs << std::endl
+                       << "WARNING:"
+                       << std::endl
+                       << "  Direct use of variable lp__ is deprecated"
+                       << " and will be removed in a future release."
+                       << std::endl
+                       << "  Please use increment_log_prob(u)"
+                       << " in place of of lp__ <- lp__ + u."
+                       << std::endl;
+        } else if (name == std::string("params_r__")) {
+          error_msgs << std::endl << "WARNING:" << std::endl
+                     << "  Direct access to params_r__ yields an inconsistent"
+                     << " statistical model in isolation and no guarantee is"
+                     << " made that this model will yield valid inferences."
+                     << std::endl
+                     << "  Moreover, access to params_r__ is unsupported"
+                     << " and the variable may be removed without notice."
+                     << std::endl;
+        }
+        pass = vm.exists(name);
+        if (pass) {
+          var_expr.set_type(vm.get_base_type(name), vm.get_num_dims(name));
+        } else {
           error_msgs << "variable \"" << name << '"' << " does not exist."
                      << std::endl;
-          return var_expr;
+          return;
         }
-        if (name == std::string("lp__")) {
-          error_msgs << std::endl
-                     << "WARNING:"
-                     << std::endl
-                     << "  Direct use of variable lp__ is deprecated"
-                     << " and will be removed in a future release."
-                     << std::endl
-                     << "  Please use increment_log_prob(u)"
-                     << " in place of of lp__ <- lp__ + u."
-                     << std::endl;
-        }
-        pass = true;
-        var_expr.set_type(vm.get_base_type(name), vm.get_num_dims(name));
-        return var_expr;
+        val = expression(var_expr);
       }
     };
     boost::phoenix::function<set_var_type> set_var_type_f;
-
     struct validate_int_expr3 {
       template <class> struct result;
-      template <typename F, typename T1, typename T2>
-      struct result<F(T1, T2)> { typedef bool type; };
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1, T2, T3)> { typedef void type; };
 
-      bool operator()(const expression& expr,
+      void operator()(const expression& expr,
+                      bool& pass,
                       std::stringstream& error_msgs) const {
-        if (!expr.expression_type().is_primitive_int()) {
+        pass = expr.expression_type().is_primitive_int();
+        if (!pass)
           error_msgs << "array indices must be integer expressions; found type="
                      << expr.expression_type() << std::endl;
-          return false;
-        }
-        return true;
       }
     };
     boost::phoenix::function<validate_int_expr3> validate_int_expr3_f;
@@ -694,12 +714,9 @@ namespace stan {
       using boost::spirit::qi::_val;
       using boost::spirit::qi::labels::_r1;
 
-      // _r1 : var_origin
-
       term_r.name("expression");
       term_r
-        = (negated_factor_r(_r1)
-           [_val = _1]
+        = (negated_factor_r(_r1)[set_val5_f(_val, _1)]
             >> *((lit('*') > negated_factor_r(_r1)
                              [multiplication_f(_val, _1,
                                            boost::phoenix::ref(error_msgs_))])
@@ -710,7 +727,7 @@ namespace stan {
                                [modulus_f(_val, _1, _pass,
                                           boost::phoenix::ref(error_msgs_))])
                  | (lit('\\') > negated_factor_r(_r1)
-                                [left_division_f(_val, _1,
+                                [left_division_f(_val, _pass, _1,
                                          boost::phoenix::ref(error_msgs_))])
                  | (lit(".*") > negated_factor_r(_r1)
                                 [elt_multiplication_f(_val, _1,
@@ -727,31 +744,31 @@ namespace stan {
         | lit('!') >> negated_factor_r(_r1)
                       [logical_negate_expr_f(_val, _1,
                                              boost::phoenix::ref(error_msgs_))]
-        | lit('+') >> negated_factor_r(_r1)  [_val = _1]
-        | exponentiated_factor_r(_r1) [_val = _1]
-        | indexed_factor_r(_r1) [_val = _1];
+        | lit('+') >> negated_factor_r(_r1)[set_val5_f(_val, _1)]
+        | exponentiated_factor_r(_r1)[set_val5_f(_val, _1)]
+        | indexed_factor_r(_r1) [set_val5_f(_val, _1)];
 
 
       exponentiated_factor_r.name("expression");
       exponentiated_factor_r
-        = (indexed_factor_r(_r1) [_val = _1]
+        = (indexed_factor_r(_r1)[set_val5_f(_val, _1)]
            >> lit('^')
            > negated_factor_r(_r1)
-           [exponentiation_f(_val, _1, _r1, _pass,
-                             boost::phoenix::ref(error_msgs_))]);
+             [exponentiation_f(_val, _1, _r1, _pass,
+                               boost::phoenix::ref(error_msgs_))]);
 
       indexed_factor_r.name("expression");
       indexed_factor_r
-        = factor_r(_r1) [_val = _1]
+        = factor_r(_r1)[set_val5_f(_val, _1)]
         > * (
-             ((+dims_r(_r1))[_a = _1]
+             ((+dims_r(_r1))[set_val5_f(_a, _1)]
               > eps
                 [add_expression_dimss_f(_val, _a, _pass,
                                         boost::phoenix::ref(error_msgs_))])
              |
-               lit("'")
-               [_val = transpose_f(_val, boost::phoenix::ref(error_msgs_))]);
-
+             (lit("'")
+              > eps[transpose_f(_val, _pass,
+                                boost::phoenix::ref(error_msgs_))]));
       integrate_ode_r.name("expression");
       integrate_ode_r
         %= (lit("integrate_ode") >> no_skip[!char_("a-zA-Z0-9_")])
@@ -776,18 +793,18 @@ namespace stan {
 
       factor_r.name("expression");
       factor_r =
-        integrate_ode_r(_r1)[_val = _1]
-        | (fun_r(_r1)[_b = _1]
+        integrate_ode_r(_r1)[set_val5_f(_val, _1)]
+        | (fun_r(_r1)[set_val5_f(_b, _1)]
            > eps[set_fun_type_named_f(_val, _b, _r1, _pass,
                                       boost::phoenix::ref(error_msgs_))])
-        | (variable_r[_a = _1]
-           > eps[_val = set_var_type_f(_a, boost::phoenix::ref(var_map_),
-                                       boost::phoenix::ref(error_msgs_),
-                                       _pass)])
-        | int_literal_r[_val = _1]
-        | double_literal_r[_val = _1]
+        | (variable_r[set_val5_f(_a, _1)]
+           > eps[set_var_type_f(_a, _val, boost::phoenix::ref(var_map_),
+                                boost::phoenix::ref(error_msgs_),
+                                _pass)])
+        | int_literal_r[set_val5_f(_val, _1)]
+        | double_literal_r[set_val5_f(_val, _1)]
         | (lit('(')
-           > expression_g(_r1)[_val = _1]
+           > expression_g(_r1)[set_val5_f(_val, _1)]
            > lit(')'));
 
       int_literal_r.name("integer literal");
@@ -824,8 +841,8 @@ namespace stan {
       dim_r.name("array dimension (integer expression)");
       dim_r
         %= expression_g(_r1)
-        > eps[_pass = validate_int_expr3_f(_val,
-                                           boost::phoenix::ref(error_msgs_))];
+        > eps[validate_int_expr3_f(_val, _pass,
+                                   boost::phoenix::ref(error_msgs_))];
 
       dims_r.name("array dimensions");
       dims_r

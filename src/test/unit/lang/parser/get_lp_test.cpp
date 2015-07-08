@@ -13,3 +13,6 @@ TEST(langParser, legal) {
 TEST(langParser, withinLpFunction) {
   test_parsable("lp_in_fun");
 }
+TEST(langParser, getParamsUnconstrained) {
+  test_parsable("unconstrained_params_var");
+}

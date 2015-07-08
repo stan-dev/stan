@@ -7,7 +7,7 @@ os:
 compiler:
   - clang
 
-before_install: cd $FOLDER
+before_install: make math-revert
 
 before_script: echo "CC=$CXX" > make/local
 
@@ -15,17 +15,13 @@ matrix:
   fast_finish: true
 
 env:
-  - FOLDER=. TESTFOLDER=src/test/unit/interface
-  - FOLDER=. TESTFOLDER=src/test/unit/io
-  - FOLDER=. TESTFOLDER=src/test/unit/lang
-  - FOLDER=. TESTFOLDER=src/test/unit/mcmc
-  - FOLDER=. TESTFOLDER=src/test/unit/model
-  - FOLDER=. TESTFOLDER=src/test/unit/optimization
-  - FOLDER=. TESTFOLDER=src/test/unit/services
-  - FOLDER=lib/stan_math_2.6.3 TESTFOLDER=test/unit/math/memory
-  - FOLDER=lib/stan_math_2.6.3 TESTFOLDER=test/unit/math/prim
-  - FOLDER=lib/stan_math_2.6.3 TESTFOLDER=test/unit/math/rev
-  - FOLDER=lib/stan_math_2.6.3 TESTFOLDER=test/unit/math/fwd
- # - FOLDER=lib/stan_math_2.6.3 TESTFOLDER=test/unit/math/mix  ## commenting this out due to segfault on travis
+  -  TESTFOLDER=src/test/unit/interface
+  -  TESTFOLDER=src/test/unit/io
+  -  TESTFOLDER=src/test/unit/lang
+  -  TESTFOLDER=src/test/unit/mcmc
+  -  TESTFOLDER=src/test/unit/model
+  -  TESTFOLDER=src/test/unit/optimization
+  -  TESTFOLDER=src/test/unit/services
+  -  TESTFOLDER=src/test/unit/variational
 
 script: ./runTests.py $TESTFOLDER
