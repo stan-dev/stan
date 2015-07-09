@@ -1,6 +1,92 @@
 STAN C++ RELEASE NOTES
 ======================================================================
 
+v2.7.0 (8 July 2015)
+======================================================================
+
+New Team Members
+--------------------------------------------------
+* Alp Kucukelbir, who brings you variational inference
+* Robert L. Grant, who brings you the StataStan interface
+
+Major New Feature
+--------------------------------------------------
+* Black-box variational inference, mean field and full
+  rank (#1505)
+
+New Features
+--------------------------------------------------
+* Line numbers reported for runtime errors (#1195)
+* Wiener first passage time density (#765) (thanks to
+  Michael Schvartsman)
+* Partial initialization (#1069)
+* NegBinomial2 RNG (#1471) and PoissonLog RNG (#1458) and extended
+  range for Dirichlet RNG (#1474) and fixed Poisson RNG for older
+  Mac compilers (#1472)
+* Error messages now use operator notation (#1401)
+* More specific error messages for illegal assignments (#1100)
+* More specific error messages for illegal sampling statement 
+  signatures (#1425)
+* Extended range on ibeta derivatives with wide impact on CDFs (#1426)
+* Display initialization error messages (#1403)
+* Works with Intel compilers and GCC 4.4 (#1506, #1514, #1519)
+
+Bug Fixes
+--------------------------------------------------
+* Allow functions ending in _lp to call functions ending in _lp (#1500)
+* Update warnings to catch uses of illegal sampling functions like
+  CDFs and updated declared signatures (#1152)
+* Disallow constraints on local variables (#1295)
+* Allow min() and max() in variable declaration bounds and remove
+  unnecessary use of math.h and top-level :: namespace (#1436)
+* Updated exponential lower bound check (#1179)
+* Extended sum to work with zero size arrays (#1443)
+* Positive definiteness checks fixed (were > 1e-8, now > 0) (#1386)
+
+Code Reorganization and Back End Upgrades
+--------------------------------------------------
+* New static constants (#469, #765)
+* Added major/minor/patch versions as properties (#1383)
+* Pulled all math-like functionality into stan::math namespace
+* Pulled the Stan Math Library out into its own repository (#1520)
+* Included in Stan C++ repository as submodule
+* Removed final usage of std::cout and std::cerr (#699) and
+  updated tests for null streams (#1239)
+* Removed over 1000 CppLint warnings
+* Remove model write CSV methods (#445)
+* Reduced generality of operators in fvar (#1198)
+* Removed folder-level includes due to order issues (part of Math
+  reorg) and include math.hpp include (#1438)
+* Updated to Boost 1.58 (#1457)
+* Travis continuous integration for Linux (#607)
+* Add grad() method to math::var for autodiff to encapsulate math::vari
+* Added finite diff functionals for testing (#1271)
+* More configurable distribution unit tests (#1268)
+* Clean up directory-level includes (#1511)
+* Removed all lint from new math lib and add cpplint to build lib
+  (#1412)
+* Split out derivative functionals (#1389)
+
+
+Manual and Dcoumentation
+--------------------------------------------------
+* New Logo in Manual; remove old logos (#1023)
+* Corrected all known bug reports and typos; details in 
+  issues #1420, #1508, #1496
+* Thanks to Sunil Nandihalli, Andy Choi, Sebastian Weber,
+  Heraa Hu, @jonathan-g (GitHub handle), M. B. Joseph, Damjan
+  Vukcevic, @tosh1ki (GitHub handle), Juan S. Casallas
+* Fix some parsing issues for index (#1498)
+* Added chapter on variational inference
+* Added strangely unrelated regressions and multivariate probit
+  examples 
+* Discussion from Ben Goodrich about reject() and sampling
+* Start to reorganize code with fast examples first, then
+  explanations
+* Added CONTRIBUTING.md file (#1408)
+
+
+
 v2.6.3 (17 March 2015)
 ======================================================================
 
