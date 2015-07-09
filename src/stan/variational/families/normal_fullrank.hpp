@@ -251,7 +251,7 @@ namespace stan {
 
         // Initialize everything to zero
         Eigen::VectorXd mu_grad = Eigen::VectorXd::Zero(dimension_);
-        Eigen::VectorXd L_grad  = Eigen::MatrixXd::Zero(dimension_, dimension_);
+        Eigen::MatrixXd L_grad  = Eigen::MatrixXd::Zero(dimension_, dimension_);
         double tmp_lp = 0.0;
         Eigen::VectorXd tmp_mu_grad = Eigen::VectorXd::Zero(dimension_);
         Eigen::VectorXd eta = Eigen::VectorXd::Zero(dimension_);
