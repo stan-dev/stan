@@ -1,0 +1,13 @@
+\form#0:\[ \min_\alpha f(x_0 + \alpha p) \]
+\form#1:$ f(x_0 + \alpha p) \leq f(x_0) + c_1 \alpha p^T g(x_0) $
+\form#2:$ \vert p^T g(x_0 + \alpha p) \vert \leq c_2 \vert p^T g(x_0) \vert $
+\form#3:$g(x) = \frac{\partial f}{\partial x}$
+\form#4:$ \alpha $
+\form#5:$ x_0 + \alpha p $
+\form#6:$ f(x_0 + \alpha p) $
+\form#7:$ g(x_0 + \alpha p) $
+\form#8:$ p^T g(x_0) < 0 $
+\form#9:$ x_0 $
+\form#10:$ f(x_0) $
+\form#11:$ g(x_0) $
+\form#12:$ 0 < c_1 < c_2 < 1 $
