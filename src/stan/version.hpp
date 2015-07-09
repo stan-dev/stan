@@ -12,13 +12,13 @@
 #endif
 
 #define STAN_MAJOR 2
-#define STAN_MINOR 6
-#define STAN_PATCH 3
+#define STAN_MINOR 7
+#define STAN_PATCH 0
 
 namespace stan {
 
   /** Major version number for Stan package. */
-  const std::string MAJOR_VERSION = STAN_STRING(STAN_MAJOR);
+  const std::string MAJOR_VERSION = STAN_STRING(STAN_MAJOR2
 
   /** Minor version number for Stan package. */
   const std::string MINOR_VERSION = STAN_STRING(STAN_MINOR);
