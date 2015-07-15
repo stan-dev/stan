@@ -255,6 +255,10 @@ namespace stan {
 
           // Compute gradient step in real-coordinate space
           stan::model::gradient(m, zeta, tmp_lp, tmp_mu_grad, print_stream);
+          stan::math::check_not_nan(function, "tmp_lp", tmp_lp);
+          stan::math::check_finite(function, "tmp_lp", tmp_lp);
+          stan::math::check_not_nan(function, "tmp_mu_grad", tmp_mu_grad);
+          stan::math::check_finite(function, "tmp_mu_grad", tmp_mu_grad);
 
           // Update gradient parameters
           mu_grad += tmp_mu_grad;
