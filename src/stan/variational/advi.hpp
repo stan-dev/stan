@@ -102,11 +102,14 @@ namespace stan {
         for (int i = 0; i < n_monte_carlo_elbo_; ++i) {
           zeta = variational.sample(rng_);
 
-          energy_i = model_.template log_prob<false, true>(zeta, print_stream_);
-          stan::math::check_not_nan(function, "energy_i", energy_i);
-          stan::math::check_finite(function, "energy_i", energy_i);
-
-          elbo += energy_i;
+          try {
+            energy_i = model_.template log_prob<false, true>(zeta,
+                                                             print_stream_);
+            elbo += energy_i;
+          } catch (std::exception& e) {
+            this->write_error_msg_(print_stream_, e);
+            i -= 1;
+          }
         }
 
         // Divide to get Monte Carlo integral estimate
@@ -364,6 +367,23 @@ namespace stan {
       std::ostream* print_stream_;
       std::ostream* out_stream_;
       std::ostream* diag_stream_;
+
+      void write_error_msg_(std::ostream* error_msgs,
+                            const std::exception& e) {
+        if (!error_msgs) {
+          return;
+        }
+
+        *error_msgs
+          << std::endl
+          << "Informational Message: The current sample evaluation
+          << "of the ELBO is ignored because of the following issue:"
+          << std::endl
+          << e.what() << std::endl
+          << "If this warning occurs often then your model may be "
+          << "either severely ill-conditioned or misspecified."
+          << std::endl;
+      }
     };
   }  // variational
 }  // stan

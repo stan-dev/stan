@@ -38,6 +38,23 @@ namespace stan {
                      int n_monte_carlo_grad,
                      BaseRNG& rng,
                      std::ostream* print_stream) const;
+    protected:
+      void write_error_msg_(std::ostream* error_msgs,
+                            const std::exception& e) {
+        if (!error_msgs) {
+          return;
+        }
+
+        *error_msgs
+          << std::endl
+          << "Informational Message: The current gradient evaluation
+          << "of the ELBO is ignored because of the following issue:"
+          << std::endl
+          << e.what() << std::endl
+          << "If this warning occurs often then your model may be "
+          << "either severely ill-conditioned or misspecified."
+          << std::endl;
+      }
     };
 
     // Arithmetic operators
