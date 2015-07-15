@@ -1,6 +1,30 @@
 #ifndef STAN_LANG_GRAMMARS_EXPRESSION07_GRAMMAR_DEF_HPP
 #define STAN_LANG_GRAMMARS_EXPRESSION07_GRAMMAR_DEF_HPP
 
+#include <boost/lexical_cast.hpp>
+#include <boost/config/warning_disable.hpp>
+#include <boost/fusion/include/adapt_struct.hpp>
+#include <boost/fusion/include/std_pair.hpp>
+#include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/include/phoenix_core.hpp>
+#include <boost/spirit/include/phoenix_function.hpp>
+#include <boost/spirit/include/phoenix_fusion.hpp>
+#include <boost/spirit/include/phoenix_object.hpp>
+#include <boost/spirit/include/phoenix_operator.hpp>
+#include <boost/spirit/include/phoenix_stl.hpp>
+#include <boost/spirit/include/qi_numeric.hpp>
+#include <boost/spirit/include/classic_position_iterator.hpp>
+#include <boost/spirit/include/support_multi_pass.hpp>
+#include <boost/tuple/tuple.hpp>
+#include <boost/variant/apply_visitor.hpp>
+#include <boost/variant/recursive_variant.hpp>
+
+#include <stan/lang/ast.hpp>
+#include <stan/lang/grammars/whitespace_grammar.hpp>
+#include <stan/lang/grammars/term_grammar.hpp>
+#include <stan/lang/grammars/expression_grammar.hpp>
+#include <stan/lang/grammars/expression07_grammar.hpp>
+
 #include <cstddef>
 #include <iomanip>
 #include <iostream>
@@ -13,54 +37,35 @@
 #include <vector>
 #include <stdexcept>
 
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/phoenix_core.hpp>
-#include <boost/spirit/include/phoenix_function.hpp>
-#include <boost/spirit/include/phoenix_fusion.hpp>
-#include <boost/spirit/include/phoenix_object.hpp>
-#include <boost/spirit/include/phoenix_operator.hpp>
-#include <boost/spirit/include/phoenix_stl.hpp>
-
-#include <boost/lexical_cast.hpp>
-#include <boost/fusion/include/adapt_struct.hpp>
-#include <boost/fusion/include/std_pair.hpp>
-#include <boost/config/warning_disable.hpp>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/qi_numeric.hpp>
-#include <boost/spirit/include/classic_position_iterator.hpp>
-#include <boost/spirit/include/phoenix_core.hpp>
-#include <boost/spirit/include/phoenix_function.hpp>
-#include <boost/spirit/include/phoenix_fusion.hpp>
-#include <boost/spirit/include/phoenix_object.hpp>
-#include <boost/spirit/include/phoenix_operator.hpp>
-#include <boost/spirit/include/phoenix_stl.hpp>
-#include <boost/spirit/include/support_multi_pass.hpp>
-#include <boost/tuple/tuple.hpp>
-#include <boost/variant/apply_visitor.hpp>
-#include <boost/variant/recursive_variant.hpp>
-
-#include <stan/lang/ast.hpp>
-#include <stan/lang/grammars/whitespace_grammar.hpp>
-#include <stan/lang/grammars/term_grammar.hpp>
-#include <stan/lang/grammars/expression_grammar.hpp>
-#include <stan/lang/grammars/expression07_grammar.hpp>
-
-
-namespace stan { 
+namespace stan {
 
   namespace lang {
 
-    struct validate_expr_type3 {
+    // see bare_type_grammar_def.hpp for original
+    struct set_val2 {
+      template <class> struct result;
+      template <typename F, typename T1, typename T2>
+      struct result<F(T1, T2)> { typedef void type; };
       template <typename T1, typename T2>
-      struct result { typedef bool type; };
+      void operator()(T1& lhs,
+                      const T2& rhs) const {
+        lhs = rhs;
+      }
+    };
+    boost::phoenix::function<set_val2> set_val2_f;
 
-      bool operator()(const expression& expr,
+    struct validate_expr_type3 {
+      template <class> struct result;
+
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1, T2, T3)> { typedef void type; };
+
+      void operator()(const expression& expr,
+                      bool& pass,
                       std::ostream& error_msgs) const {
-        if (expr.expression_type().is_ill_formed()) {
+        pass = !expr.expression_type().is_ill_formed();
+        if (!pass)
           error_msgs << "expression is ill formed" << std::endl;
-          return false;
-        }
-        return true;
       }
     };
     boost::phoenix::function<validate_expr_type3> validate_expr_type3_f;
@@ -84,47 +89,51 @@ namespace stan {
     boost::phoenix::function<set_fun_type3> set_fun_type3_f;
 
     struct addition_expr3 {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef expression type; };
+      template <class> struct result;
 
-      expression operator()(expression& expr1,
-                            const expression& expr2,
-                            std::ostream& error_msgs) const {
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1, T2, T3)> { typedef void type; };
+
+      void operator()(expression& expr1,
+                      const expression& expr2,
+                      std::ostream& error_msgs) const {
         if (expr1.expression_type().is_primitive()
             && expr2.expression_type().is_primitive()) {
-          return expr1 += expr2;
+          expr1 += expr2;
+          return;
         }
         std::vector<expression> args;
         args.push_back(expr1);
         args.push_back(expr2);
         set_fun_type3 sft;
-        fun f("add",args);
-        sft(f,error_msgs);
-        return expression(f);
-        return expr1 += expr2;
+        fun f("add", args);
+        sft(f, error_msgs);
+        expr1 = expression(f);
       }
     };
     boost::phoenix::function<addition_expr3> addition3_f;
 
 
     struct subtraction_expr3 {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef expression type; };
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1, T2, T3)> { typedef void type; };
 
-      expression operator()(expression& expr1,
-                            const expression& expr2,
-                            std::ostream& error_msgs) const {
+      void operator()(expression& expr1,
+                      const expression& expr2,
+                      std::ostream& error_msgs) const {
         if (expr1.expression_type().is_primitive()
             && expr2.expression_type().is_primitive()) {
-          return expr1 -= expr2;
+          expr1 -= expr2;
+          return;
         }
         std::vector<expression> args;
         args.push_back(expr1);
         args.push_back(expr2);
         set_fun_type3 sft;
-        fun f("subtract",args);
-        sft(f,error_msgs);
-        return expression(f);
+        fun f("subtract", args);
+        sft(f, error_msgs);
+        expr1 = expression(f);
       }
     };
     boost::phoenix::function<subtraction_expr3> subtraction3_f;
@@ -133,38 +142,34 @@ namespace stan {
 
     template <typename Iterator>
     expression07_grammar<Iterator>::expression07_grammar(variable_map& var_map,
-                                                         std::stringstream& error_msgs,
-                                                         expression_grammar<Iterator>& eg)
+                                             std::stringstream& error_msgs,
+                                             expression_grammar<Iterator>& eg)
       : expression07_grammar::base_type(expression07_r),
         var_map_(var_map),
         error_msgs_(error_msgs),
-        term_g(var_map,error_msgs,eg)
-    {
+        term_g(var_map, error_msgs, eg) {
       using boost::spirit::qi::_1;
       using boost::spirit::qi::eps;
       using boost::spirit::qi::lit;
       using boost::spirit::qi::_pass;
       using boost::spirit::qi::_val;
       using boost::spirit::qi::labels::_r1;
-      
+
       expression07_r.name("expression");
-      expression07_r 
-        =  term_g(_r1)
-            [_val = _1]
-        > *( ( lit('+')
-               > term_g(_r1) // expression07_r       
-                [_val = addition3_f(_val,_1,boost::phoenix::ref(error_msgs))] )
-              |  
-              ( lit('-') 
-                > term_g(_r1) // expression07_r   
-                [_val = subtraction3_f(_val,_1,boost::phoenix::ref(error_msgs))] )
-              )
-        > eps[_pass = validate_expr_type3_f(_val,boost::phoenix::ref(error_msgs_))]
-        ;
-
-
+      expression07_r
+        %=  term_g(_r1)
+            [set_val2_f(_val, _1)]
+        > *((lit('+')
+             > term_g(_r1)
+               [addition3_f(_val, _1, boost::phoenix::ref(error_msgs))])
+            |
+            (lit('-')
+             > term_g(_r1)
+             [subtraction3_f(_val, _1, boost::phoenix::ref(error_msgs))]))
+        > eps[validate_expr_type3_f(_val, _pass,
+                                    boost::phoenix::ref(error_msgs_))];
     }
+
   }
 }
-
 #endif

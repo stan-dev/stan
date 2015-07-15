@@ -2,9 +2,30 @@
 #define STAN_IO_READER_HPP
 
 #include <boost/throw_exception.hpp>
-#include <stan/math/prim/arr.hpp>
-#include <stan/math/prim/mat.hpp>
-#include <stan/math/prim/scal.hpp>
+#include <stan/math/prim/mat/err/check_cholesky_factor.hpp>
+#include <stan/math/prim/mat/err/check_cholesky_factor_corr.hpp>
+#include <stan/math/prim/mat/err/check_corr_matrix.hpp>
+#include <stan/math/prim/mat/err/check_cov_matrix.hpp>
+#include <stan/math/prim/mat/err/check_ordered.hpp>
+#include <stan/math/prim/mat/err/check_positive_ordered.hpp>
+#include <stan/math/prim/mat/err/check_simplex.hpp>
+#include <stan/math/prim/mat/err/check_unit_vector.hpp>
+#include <stan/math/prim/mat/fun/cholesky_corr_constrain.hpp>
+#include <stan/math/prim/mat/fun/cholesky_factor_constrain.hpp>
+#include <stan/math/prim/mat/fun/corr_matrix_constrain.hpp>
+#include <stan/math/prim/mat/fun/cov_matrix_constrain.hpp>
+#include <stan/math/prim/mat/fun/ordered_constrain.hpp>
+#include <stan/math/prim/mat/fun/positive_ordered_constrain.hpp>
+#include <stan/math/prim/mat/fun/simplex_constrain.hpp>
+#include <stan/math/prim/mat/fun/unit_vector_constrain.hpp>
+#include <stan/math/prim/scal/err/check_bounded.hpp>
+#include <stan/math/prim/scal/err/check_greater_or_equal.hpp>
+#include <stan/math/prim/scal/fun/corr_constrain.hpp>
+#include <stan/math/prim/scal/fun/lb_constrain.hpp>
+#include <stan/math/prim/scal/fun/lub_constrain.hpp>
+#include <stan/math/prim/scal/fun/positive_constrain.hpp>
+#include <stan/math/prim/scal/fun/prob_constrain.hpp>
+#include <stan/math/prim/scal/fun/ub_constrain.hpp>
 #include <vector>
 
 namespace stan {
@@ -24,7 +45,7 @@ namespace stan {
      * <code>T t = 0.0;</code>
      *
      * This includes <code>double</code> itself and the reverse-mode
-     * algorithmic differentiation class <code>stan::agrad::var</code>.
+     * algorithmic differentiation class <code>stan::math::var</code>.
      *
      * <p>For transformed values, the scalar type parameter <code>T</code>
      * must support the transforming operations, such as <code>exp(x)</code>
@@ -192,6 +213,7 @@ namespace stan {
        * @return Vector made up of the next scalars.
        */
       inline std::vector<T> std_vector(size_t m) {
+        if (m == 0) return std::vector<T>();
         std::vector<T> vec;
         T& start = scalar_ptr_increment(m);
         vec.insert(vec.begin(), &start, &scalar_ptr());
@@ -206,6 +228,7 @@ namespace stan {
        * @return Column vector made up of the next scalars.
        */
       inline vector_t vector(size_t m) {
+        if (m == 0) return vector_t();
         return map_vector_t(&scalar_ptr_increment(m), m);
       }
       /**
@@ -216,6 +239,7 @@ namespace stan {
        * @return Column vector made up of the next scalars.
        */
       inline vector_t vector_constrain(size_t m) {
+        if (m == 0) return vector_t();
         return map_vector_t(&scalar_ptr_increment(m), m);
       }
       /**
@@ -227,6 +251,7 @@ namespace stan {
        * @return Column vector made up of the next scalars.
        */
       inline vector_t vector_constrain(size_t m, T& /*lp*/) {
+        if (m == 0) return vector_t();
         return map_vector_t(&scalar_ptr_increment(m), m);
       }
 
@@ -240,6 +265,7 @@ namespace stan {
        * @return Column vector made up of the next scalars.
        */
       inline row_vector_t row_vector(size_t m) {
+        if (m == 0) return row_vector_t();
         return map_row_vector_t(&scalar_ptr_increment(m), m);
       }
 
@@ -251,6 +277,7 @@ namespace stan {
        * @return Column vector made up of the next scalars.
        */
       inline row_vector_t row_vector_constrain(size_t m) {
+        if (m == 0) return row_vector_t();
         return map_row_vector_t(&scalar_ptr_increment(m), m);
       }
 
@@ -264,6 +291,7 @@ namespace stan {
        * @return Column vector made up of the next scalars.
        */
       inline row_vector_t row_vector_constrain(size_t m, T& /*lp*/) {
+        if (m == 0) return row_vector_t();
         return map_row_vector_t(&scalar_ptr_increment(m), m);
       }
 
@@ -285,6 +313,7 @@ namespace stan {
        * @return Eigen::Matrix made up of the next scalars.
        */
       inline matrix_t matrix(size_t m, size_t n) {
+        if (m == 0 || n == 0) return matrix_t(m,n);
         return map_matrix_t(&scalar_ptr_increment(m*n), m, n);
       }
 
@@ -299,6 +328,7 @@ namespace stan {
        * @return Matrix made up of the next scalars.
        */
       inline matrix_t matrix_constrain(size_t m, size_t n) {
+        if (m == 0 || n == 0) return matrix_t(m,n);
         return map_matrix_t(&scalar_ptr_increment(m*n), m, n);
       }
 
@@ -315,6 +345,7 @@ namespace stan {
        * @return Matrix made up of the next scalars.
        */
       inline matrix_t matrix_constrain(size_t m, size_t n, T& /*lp*/) {
+        if (m == 0 || n == 0) return matrix_t(m,n);
         return map_matrix_t(&scalar_ptr_increment(m*n), m, n);
       }
 
@@ -479,12 +510,12 @@ namespace stan {
       /**
        * Return the next scalar, transformed to be positive.
        *
-       * <p>See <code>stan::prob::positive_constrain(T)</code>.
+       * <p>See <code>stan::math::positive_constrain(T)</code>.
        *
        * @return The next scalar transformed to be positive.
        */
       inline T scalar_pos_constrain() {
-        return stan::prob::positive_constrain(scalar());
+        return stan::math::positive_constrain(scalar());
       }
 
       /**
@@ -492,13 +523,13 @@ namespace stan {
        * incrementing the specified reference with the log absolute
        * determinant of the Jacobian.
        *
-       * <p>See <code>stan::prob::positive_constrain(T,T&)</code>.
+       * <p>See <code>stan::math::positive_constrain(T,T&)</code>.
        *
        * @param lp Reference to log probability variable to increment.
        * @return The next scalar transformed to be positive.
        */
       inline T scalar_pos_constrain(T& lp) {
-        return stan::prob::positive_constrain(scalar(), lp);
+        return stan::math::positive_constrain(scalar(), lp);
       }
 
       /**
@@ -525,7 +556,7 @@ namespace stan {
        * Return the next scalar transformed to have the
        * specified lower bound.
        *
-       * <p>See <code>stan::prob::lb_constrain(T,double)</code>.
+       * <p>See <code>stan::math::lb_constrain(T,double)</code>.
        *
        * @tparam TL Type of lower bound.
        * @param lb Lower bound on values.
@@ -534,7 +565,7 @@ namespace stan {
        */
       template <typename TL>
       inline T scalar_lb_constrain(const TL lb) {
-        return stan::prob::lb_constrain(scalar(), lb);
+        return stan::math::lb_constrain(scalar(), lb);
       }
 
       /**
@@ -542,7 +573,7 @@ namespace stan {
        * lower bound, incrementing the specified reference with the
        * log of the absolute Jacobian determinant of the transform.
        *
-       * <p>See <code>stan::prob::lb_constrain(T,double,T&)</code>.
+       * <p>See <code>stan::math::lb_constrain(T,double,T&)</code>.
        *
        * @tparam TL Type of lower bound.
        * @param lb Lower bound on result.
@@ -550,7 +581,7 @@ namespace stan {
        */
       template <typename TL>
       inline T scalar_lb_constrain(const TL lb, T& lp) {
-        return stan::prob::lb_constrain(scalar(), lb, lp);
+        return stan::math::lb_constrain(scalar(), lb, lp);
       }
 
 
@@ -579,7 +610,7 @@ namespace stan {
        * Return the next scalar transformed to have the
        * specified upper bound.
        *
-       * <p>See <code>stan::prob::ub_constrain(T,double)</code>.
+       * <p>See <code>stan::math::ub_constrain(T,double)</code>.
        *
        * @tparam TU Type of upper bound.
        * @param ub Upper bound on values.
@@ -588,7 +619,7 @@ namespace stan {
        */
       template <typename TU>
       inline T scalar_ub_constrain(const TU ub) {
-        return stan::prob::ub_constrain(scalar(), ub);
+        return stan::math::ub_constrain(scalar(), ub);
       }
 
       /**
@@ -596,7 +627,7 @@ namespace stan {
        * upper bound, incrementing the specified reference with the
        * log of the absolute Jacobian determinant of the transform.
        *
-       * <p>See <code>stan::prob::ub_constrain(T,double,T&)</code>.
+       * <p>See <code>stan::math::ub_constrain(T,double,T&)</code>.
        *
        * @tparam TU Type of upper bound.
        * @param ub Upper bound on result.
@@ -604,7 +635,7 @@ namespace stan {
        */
       template <typename TU>
       inline T scalar_ub_constrain(const TU ub, T& lp) {
-        return stan::prob::ub_constrain(scalar(), ub, lp);
+        return stan::math::ub_constrain(scalar(), ub, lp);
       }
 
       /**
@@ -633,7 +664,7 @@ namespace stan {
        * Return the next scalar transformed to be between
        * the specified lower and upper bounds.
        *
-       * <p>See <code>stan::prob::lub_constrain(T, double, double)</code>.
+       * <p>See <code>stan::math::lub_constrain(T, double, double)</code>.
        *
        * @tparam TL Type of lower bound.
        * @tparam TU Type of upper bound.
@@ -644,14 +675,14 @@ namespace stan {
        */
       template <typename TL, typename TU>
       inline T scalar_lub_constrain(const TL lb, const TU ub) {
-        return stan::prob::lub_constrain(scalar(), lb, ub);
+        return stan::math::lub_constrain(scalar(), lb, ub);
       }
 
       /**
        * Return the next scalar transformed to be between the
        * the specified lower and upper bounds.
        *
-       * <p>See <code>stan::prob::lub_constrain(T, double, double, T&)</code>.
+       * <p>See <code>stan::math::lub_constrain(T, double, double, T&)</code>.
        *
        * @param lb Lower bound.
        * @param ub Upper bound.
@@ -662,7 +693,7 @@ namespace stan {
        */
       template <typename TL, typename TU>
       inline T scalar_lub_constrain(TL lb, TU ub, T& lp) {
-        return stan::prob::lub_constrain(scalar(), lb, ub, lp);
+        return stan::math::lub_constrain(scalar(), lb, ub, lp);
       }
 
       /**
@@ -684,12 +715,12 @@ namespace stan {
        * Return the next scalar transformed to be a probability
        * between 0 and 1.
        *
-       * <p>See <code>stan::prob::prob_constrain(T)</code>.
+       * <p>See <code>stan::math::prob_constrain(T)</code>.
        *
        * @return The next scalar transformed to a probability.
        */
       inline T prob_constrain() {
-        return stan::prob::prob_constrain(scalar());
+        return stan::math::prob_constrain(scalar());
       }
 
       /**
@@ -697,13 +728,13 @@ namespace stan {
        * between 0 and 1, incrementing the specified reference with
        * the log of the absolute Jacobian determinant.
        *
-       * <p>See <code>stan::prob::prob_constrain(T)</code>.
+       * <p>See <code>stan::math::prob_constrain(T)</code>.
        *
        * @param lp Reference to log probability variable to increment.
        * @return The next scalar transformed to a probability.
        */
       inline T prob_constrain(T& lp) {
-        return stan::prob::prob_constrain(scalar(), lp);
+        return stan::math::prob_constrain(scalar(), lp);
       }
 
 
@@ -731,12 +762,12 @@ namespace stan {
        * Return the next scalar transformed to be a correlation
        * between -1 and 1.
        *
-       * <p>See <code>stan::prob::corr_constrain(T)</code>.
+       * <p>See <code>stan::math::corr_constrain(T)</code>.
        *
        * @return The next scalar transformed to a correlation.
        */
       inline T corr_constrain() {
-        return stan::prob::corr_constrain(scalar());
+        return stan::math::corr_constrain(scalar());
       }
 
       /**
@@ -744,14 +775,14 @@ namespace stan {
        * correlation between -1 and 1, incrementing the specified
        * reference with the log of the absolute Jacobian determinant.
        *
-       * <p>See <code>stan::prob::corr_constrain(T,T&)</code>.
+       * <p>See <code>stan::math::corr_constrain(T,T&)</code>.
        *
        * @param lp The reference to the variable holding the log
        * probability to increment.
        * @return The next scalar transformed to a correlation.
        */
       inline T corr_constrain(T& lp) {
-        return stan::prob::corr_constrain(scalar(), lp);
+        return stan::math::corr_constrain(scalar(), lp);
       }
 
       /**
@@ -776,14 +807,14 @@ namespace stan {
        * length.  This operation consumes one less than the specified
        * length number of scalars.
        *
-       * <p>See <code>stan::prob::unit_vector_constrain(Eigen::Matrix)</code>.
+       * <p>See <code>stan::math::unit_vector_constrain(Eigen::Matrix)</code>.
        *
        * @param k Number of dimensions in resulting unit_vector.
        * @return unit_vector derived from next <code>k-1</code> scalars.
        */
       inline
       Eigen::Matrix<T, Eigen::Dynamic, 1> unit_vector_constrain(size_t k) {
-        return stan::prob::unit_vector_constrain(vector(k-1));
+        return stan::math::unit_vector_constrain(vector(k-1));
       }
 
       /**
@@ -791,7 +822,7 @@ namespace stan {
        * unconstrained scalars), incrementing the specified reference with the
        * log absolute Jacobian determinant.
        *
-       * <p>See <code>stan::prob::unit_vector_constrain(Eigen::Matrix,T&)</code>.
+       * <p>See <code>stan::math::unit_vector_constrain(Eigen::Matrix,T&)</code>.
        *
        * @param k Size of unit_vector.
        * @param lp Log probability to increment with log absolute
@@ -799,7 +830,7 @@ namespace stan {
        * @return The next unit_vector of the specified size.
        */
       inline vector_t unit_vector_constrain(size_t k, T& lp) {
-        return stan::prob::unit_vector_constrain(vector(k-1), lp);
+        return stan::math::unit_vector_constrain(vector(k-1), lp);
       }
 
       /**
@@ -824,14 +855,14 @@ namespace stan {
        * length.  This operation consumes one less than the specified
        * length number of scalars.
        *
-       * <p>See <code>stan::prob::simplex_constrain(Eigen::Matrix)</code>.
+       * <p>See <code>stan::math::simplex_constrain(Eigen::Matrix)</code>.
        *
        * @param k Number of dimensions in resulting simplex.
        * @return Simplex derived from next <code>k-1</code> scalars.
        */
       inline
       Eigen::Matrix<T, Eigen::Dynamic, 1> simplex_constrain(size_t k) {
-        return stan::prob::simplex_constrain(vector(k-1));
+        return stan::math::simplex_constrain(vector(k-1));
       }
 
       /**
@@ -839,7 +870,7 @@ namespace stan {
        * unconstrained scalars), incrementing the specified reference with the
        * log absolute Jacobian determinant.
        *
-       * <p>See <code>stan::prob::simplex_constrain(Eigen::Matrix,T&)</code>.
+       * <p>See <code>stan::math::simplex_constrain(Eigen::Matrix,T&)</code>.
        *
        * @param k Size of simplex.
        * @param lp Log probability to increment with log absolute
@@ -847,7 +878,7 @@ namespace stan {
        * @return The next simplex of the specified size.
        */
       inline vector_t simplex_constrain(size_t k, T& lp) {
-        return stan::prob::simplex_constrain(vector(k-1), lp);
+        return stan::math::simplex_constrain(vector(k-1), lp);
       }
 
       /**
@@ -869,14 +900,14 @@ namespace stan {
       /**
        * Return the next ordered vector of the specified length.
        *
-       * <p>See <code>stan::prob::ordered_constrain(Matrix)</code>.
+       * <p>See <code>stan::math::ordered_constrain(Matrix)</code>.
        *
        * @param k Length of returned vector.
        * @return Next ordered vector of the specified
        * length.
        */
       inline vector_t ordered_constrain(size_t k) {
-        return stan::prob::ordered_constrain(vector(k));
+        return stan::math::ordered_constrain(vector(k));
       }
 
       /**
@@ -884,14 +915,14 @@ namespace stan {
        * size, incrementing the specified reference with the log
        * absolute Jacobian of the determinant.
        *
-       * <p>See <code>stan::prob::ordered_constrain(Matrix,T&)</code>.
+       * <p>See <code>stan::math::ordered_constrain(Matrix,T&)</code>.
        *
        * @param k Size of vector.
        * @param lp Log probability reference to increment.
        * @return Next ordered vector of the specified size.
        */
       inline vector_t ordered_constrain(size_t k, T& lp) {
-        return stan::prob::ordered_constrain(vector(k), lp);
+        return stan::math::ordered_constrain(vector(k), lp);
       }
 
       /**
@@ -914,14 +945,14 @@ namespace stan {
       /**
        * Return the next positive ordered vector of the specified length.
        *
-       * <p>See <code>stan::prob::positive_ordered_constrain(Matrix)</code>.
+       * <p>See <code>stan::math::positive_ordered_constrain(Matrix)</code>.
        *
        * @param k Length of returned vector.
        * @return Next positive_ordered vector of the specified
        * length.
        */
       inline vector_t positive_ordered_constrain(size_t k) {
-        return stan::prob::positive_ordered_constrain(vector(k));
+        return stan::math::positive_ordered_constrain(vector(k));
       }
 
       /**
@@ -929,14 +960,14 @@ namespace stan {
        * size, incrementing the specified reference with the log
        * absolute Jacobian of the determinant.
        *
-       * <p>See <code>stan::prob::positive_ordered_constrain(Matrix,T&)</code>.
+       * <p>See <code>stan::math::positive_ordered_constrain(Matrix,T&)</code>.
        *
        * @param k Size of vector.
        * @param lp Log probability reference to increment.
        * @return Next positive_ordered vector of the specified size.
        */
       inline vector_t positive_ordered_constrain(size_t k, T& lp) {
-        return stan::prob::positive_ordered_constrain(vector(k), lp);
+        return stan::math::positive_ordered_constrain(vector(k), lp);
       }
 
 
@@ -970,7 +1001,7 @@ namespace stan {
        *    Cholesky factor.
        */
       inline matrix_t cholesky_factor_constrain(size_t M, size_t N) {
-        return stan::prob::cholesky_factor_constrain
+        return stan::math::cholesky_factor_constrain
           (vector((N * (N + 1)) / 2 + (M - N) * N), M, N);
       }
 
@@ -988,7 +1019,7 @@ namespace stan {
        *    Cholesky factor.
        */
       inline matrix_t cholesky_factor_constrain(size_t M, size_t N, T& lp) {
-        return stan::prob::cholesky_factor_constrain
+        return stan::math::cholesky_factor_constrain
           (vector((N * (N + 1)) / 2 + (M - N) * N), M, N, lp);
       }
 
@@ -1023,7 +1054,7 @@ namespace stan {
        *    Cholesky factor for a correlation matrix.
        */
       inline matrix_t cholesky_corr_constrain(size_t K) {
-        return stan::prob::cholesky_corr_constrain(vector((K * (K - 1)) / 2),
+        return stan::math::cholesky_corr_constrain(vector((K * (K - 1)) / 2),
                                                           K);
       }
 
@@ -1041,7 +1072,7 @@ namespace stan {
        *    Cholesky factor for a correlation matrix.
        */
       inline matrix_t cholesky_corr_constrain(size_t K, T& lp) {
-        return stan::prob::cholesky_corr_constrain(vector((K * (K - 1)) / 2),
+        return stan::math::cholesky_corr_constrain(vector((K * (K - 1)) / 2),
                                                    K, lp);
       }
 
@@ -1068,13 +1099,13 @@ namespace stan {
       /**
        * Return the next covariance matrix of the specified dimensionality.
        *
-       * <p>See <code>stan::prob::cov_matrix_constrain(Matrix)</code>.
+       * <p>See <code>stan::math::cov_matrix_constrain(Matrix)</code>.
        *
        * @param k Dimensionality of covariance matrix.
        * @return Next covariance matrix of the specified dimensionality.
        */
       inline matrix_t cov_matrix_constrain(size_t k) {
-        return stan::prob::cov_matrix_constrain(vector(k + (k * (k - 1)) / 2),
+        return stan::math::cov_matrix_constrain(vector(k + (k * (k - 1)) / 2),
                                                 k);
       }
 
@@ -1083,14 +1114,14 @@ namespace stan {
        * incrementing the specified reference with the log absolute Jacobian
        * determinant.
        *
-       * <p>See <code>stan::prob::cov_matrix_constrain(Matrix,T&)</code>.
+       * <p>See <code>stan::math::cov_matrix_constrain(Matrix,T&)</code>.
        *
        * @param k Dimensionality of the (square) covariance matrix.
        * @param lp Log probability reference to increment.
        * @return The next covariance matrix of the specified dimensionality.
        */
       inline matrix_t cov_matrix_constrain(size_t k, T& lp) {
-        return stan::prob::cov_matrix_constrain(vector(k + (k * (k - 1)) / 2),
+        return stan::math::cov_matrix_constrain(vector(k + (k * (k - 1)) / 2),
                                                 k, lp);
       }
 
@@ -1114,13 +1145,13 @@ namespace stan {
       /**
        * Return the next correlation matrix of the specified dimensionality.
        *
-       * <p>See <code>stan::prob::corr_matrix_constrain(Matrix)</code>.
+       * <p>See <code>stan::math::corr_matrix_constrain(Matrix)</code>.
        *
        * @param k Dimensionality of correlation matrix.
        * @return Next correlation matrix of the specified dimensionality.
        */
       inline matrix_t corr_matrix_constrain(size_t k) {
-        return stan::prob::corr_matrix_constrain(vector((k * (k - 1)) / 2), k);
+        return stan::math::corr_matrix_constrain(vector((k * (k - 1)) / 2), k);
       }
 
       /**
@@ -1128,14 +1159,14 @@ namespace stan {
        * incrementing the specified reference with the log absolute Jacobian
        * determinant.
        *
-       * <p>See <code>stan::prob::corr_matrix_constrain(Matrix,T&)</code>.
+       * <p>See <code>stan::math::corr_matrix_constrain(Matrix,T&)</code>.
        *
        * @param k Dimensionality of the (square) correlation matrix.
        * @param lp Log probability reference to increment.
        * @return The next correlation matrix of the specified dimensionality.
        */
       inline matrix_t corr_matrix_constrain(size_t k, T& lp) {
-        return stan::prob::corr_matrix_constrain(vector((k * (k - 1)) / 2),
+        return stan::math::corr_matrix_constrain(vector((k * (k - 1)) / 2),
                                                  k, lp);
       }
 

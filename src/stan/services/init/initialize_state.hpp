@@ -5,7 +5,6 @@
 #include <boost/random/additive_combine.hpp>  // L'Ecuyer RNG
 #include <boost/random/uniform_real_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
-
 #include <stan/model/util.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/io/array_var_context.hpp>
@@ -15,8 +14,7 @@
 #include <stan/math/prim/scal/fun/is_inf.hpp>
 #include <stan/math/prim/scal/fun/is_nan.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-
-#include <math.h>
+#include <cmath>
 #include <iostream>
 #include <limits>
 #include <stdexcept>
@@ -39,9 +37,9 @@ namespace stan {
          * parameters and generated quantities), this function would not be
          * necessary.
          *
-         * FIXME: this function can be removed if the names of parameters excluding
-         * transformed parameters and generated quantities can be obtained from
-         * a model directly.
+         * FIXME: this function can be removed if the names of
+         * parameters excluding transformed parameters and generated
+         * quantities can be obtained from a model directly.
          *
          * @param[in,out]  name  parameter name
          */
@@ -121,7 +119,7 @@ namespace stan {
       bool initialize_state_values(Eigen::VectorXd& cont_params,
                                    Model& model,
                                    Writer& writer) {
-        
+
         try {
           validate_unconstrained_initialization(cont_params, model);
         } catch (const std::exception& e) {
@@ -200,7 +198,7 @@ namespace stan {
         boost::variate_generator
           <RNG&, boost::random::uniform_real_distribution<double> >
             init_rng(base_rng, init_range_distribution);
-        
+
         cont_params.setZero();
 
         // Random initializations until log_prob is finite
@@ -218,12 +216,12 @@ namespace stan {
         if (num_init_tries > MAX_INIT_TRIES) {
           writer();
           writer();
-          
+
           std::stringstream msg;
           msg << "Initialization between (" << -R << ", " << R
               << ") failed after " << MAX_INIT_TRIES << " attempts.";
           writer(msg.str());
-          
+
           writer(" Try specifying initial values,"
                  " reducing ranges of constrained values,"
                  " or reparameterizing the model.");
@@ -252,8 +250,8 @@ namespace stan {
                                     inits, otherwise not
        */
 
-      template <class ContextFactory, class Model, class RNG, class Writer>
-      bool initialize_state_source_and_random(const std::string source,
+      template <class ContextFactory, class Model, class RNG>
+      bool initialize_state_source_and_random(const std::string& source,
                                               double R,
                                               Eigen::VectorXd& cont_params,
                                               Model& model,
@@ -300,7 +298,7 @@ namespace stan {
           if (num_init_tries > MAX_INIT_TRIES) {
             writer();
             writer();
-            
+
             std::stringstream msg;
             msg << "Initialization between (" << -R << ", " << R
                 << ") failed after "
@@ -404,8 +402,8 @@ namespace stan {
        * @param[in] R               a double for the range of generating random inits.
        *                            it's used for randomly generating partial inits
        */
-      template <class ContextFactory, class Model, class RNG, class Writer>
-      bool initialize_state(const std::string init,
+      template <class ContextFactory, class Model, class RNG>
+      bool initialize_state(const std::string& init,
                             Eigen::VectorXd& cont_params,
                             Model& model,
                             RNG& base_rng,
@@ -428,8 +426,8 @@ namespace stan {
                                        enable_random_init,
                                        init_r);
       }
+
     }  // init
   }  // services
 }  // stan
-
 #endif

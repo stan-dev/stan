@@ -4,7 +4,6 @@
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/model/util.hpp>
 
-#include <fstream>
 #include <iostream>
 #include <limits>
 #include <stdexcept>

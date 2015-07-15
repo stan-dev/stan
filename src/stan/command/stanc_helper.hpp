@@ -22,7 +22,7 @@ void print_version(std::ostream* out_stream) {
               << std::endl;
 }
 
-/** 
+/**
  * Prints the Stan compiler (stanc) help.
  */
 void print_stanc_help(std::ostream* out_stream) {
@@ -58,8 +58,8 @@ void delete_file(std::ostream* err_stream,
   int deleted = std::remove(file_name.c_str());
   if (deleted != 0 && file_name.size() > 0)
     if (err_stream)
-      std::cerr << "Could not remove output file=" << file_name
-                << std::endl;
+      *err_stream << "Could not remove output file=" << file_name
+                  << std::endl;
 }
 
 
@@ -148,8 +148,8 @@ int stanc_helper(int argc, const char* argv[],
       *out_stream << "Output file=" << out_file_name << std::endl;
     }
 
-    bool valid_model 
-      = stan::lang::compile(err_stream,in,out,model_name,in_file_name);
+    bool valid_model
+      = stan::lang::compile(err_stream, in, out, model_name, in_file_name);
 
     out.close();
     if (!valid_model) {

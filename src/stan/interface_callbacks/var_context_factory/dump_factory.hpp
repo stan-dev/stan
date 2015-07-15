@@ -16,7 +16,7 @@ namespace stan {
         stan::io::dump operator()(const std::string source) {
           std::fstream source_stream(source.c_str(),
                                      std::fstream::in);
-          
+
           if (source_stream.fail()) {
             std::string message("dump_factory Error: the file " + source + " does not exist.");
             throw std::runtime_error(message);
@@ -28,7 +28,7 @@ namespace stan {
           return dump;
         }
       };
-      
+
     }
   }
 }

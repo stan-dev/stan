@@ -29,15 +29,17 @@ Stan project.  Models and their use are the same across the three
 interfaces, and this manual is the modeling language manual for all
 three interfaces.  All of the interfaces share initialization,
 sampling and tuning controls, and roughly share posterior analysis
-functionality.   
+functionality.
+
+The interfaces all provide getting-started guides, documentation, and
+full source code.
 
 \subsection{CmdStan}
 
 CmdStan allows Stan to be run from the command line.  In some sense,
 CmdStan is the reference implementation of Stan.  The CmdStan
 documentation used to be part of this document, but is now its own
-standalone document.  The CmdStan home page, with links to download
-and installation instructions and the manual is code and manual is
+standalone document.  The CmdStan home page is
 %
 \begin{quote}
 \url{http://mc-stan.org/cmdstan.html}
@@ -48,8 +50,7 @@ and installation instructions and the manual is code and manual is
 RStan is the R interface to Stan.  RStan interfaces to Stan through
 R's memory rather than just calling Stan from the outside, as in the
 R2WinBUGS and R2jags interfaces on which it was modeled.  The RStan
-home page, with links to download and installation instructions and the 
-manual is
+home page is
 %
 \begin{quote}
 \url{http://mc-stan.org/rstan.html}
@@ -59,59 +60,40 @@ manual is
 
 PyStan is the Python interface to Stan.  Like RStan, it interfaces at
 the Python memory level rather than calling Stan from the outside.
-The PyStan home page, with links to download and installation
-instructions and the manual is
+The PyStan home page is
 %
 \begin{quote}
 \url{http://mc-stan.org/pystan.html}
 \end{quote}
 
-\subsection{Contributed Interfaces}
-
-Two additional interfaces have been contributed by people outside the
-Stan development team.
-
 \subsubsection{MatlabStan}
 
 MatlabStan is the MATLAB interface to Stan.  Unlike RStan and PyStan,
 MatlabStan currently wraps aq CmdStan process.  The
-MatlabStan home page, with links to download and installation
-instructions and the manual can be found at
+MatlabStan home page is
 %
 \begin{quote}
 \url{http://mc-stan.org/matlab-stan.html}
 \end{quote}
 %
-MatlabStan was written and is maintained by Brian Lau.
-
 
 \subsubsection{Stan.jl}
 
 Stan.jl is the Julia interface to Stan.  Like MatlabStan, Stan.jl
-wraps a CmdStan process.  The Stan.jl home page, with links to
-download and installation instructions and the manual can be found at
+wraps a CmdStan process.  The Stan.jl home page is
 %
 \begin{quote}
 \url{http://mc-stan.org/julia-stan.html}
 \end{quote}
 %
-Stan.jl was written and is maintained by Rob Goedman.
 
-\subsection{Future Interfaces}
+\subsubsection{StataStan}
 
-Work is underway to develop interfaces for Stan in:
-%
-\begin{itemize}
-\item MATLAB
-\item Julia
-\item Stata
-\end{itemize}
-%
-For more information, or to get involved in the design or coding, see
-the Stan message groups at
+StataStan is the Stata interface to Stan.  Like MatlabStan, Stan.jl
+wraps a CmdStan process.  The StataStan home page is
 %
 \begin{quote}
-\url{http://mc-stan.org/groups.html}
+\url{http://mc-stan.org/stata-stan.html}
 \end{quote}
 
 
@@ -120,7 +102,7 @@ the Stan message groups at
 A \Stan program defines a statistical model through a conditional
 probability function $p(\theta|y,x)$, where $\theta$ is a sequence of
 modeled unknown values (e.g., model parameters, latent variables, missing
-data, future predictions), $y$ is a sequence of modeled known 
+data, future predictions), $y$ is a sequence of modeled known
 values, and $x$ is a sequence of unmodeled predictors and constants
 (e.g., sizes, hyperparameters).
 
@@ -130,13 +112,7 @@ vector, and matrix types, as well as (multidimensional) arrays of
 other types.  Variables are declared in blocks corresponding to the
 variable's use: data, transformed data, parameter, transformed
 parameter, or generated quantity.  Unconstrained local variables may
-be declared within statement blocks.
-
-Statements in \Stan are interpreted imperatively, so their order
-matters.  Atomic statements involve the assignment of a value to a
-variable.  Sequences of statements (and optionally local variable
-declarations) may be organized into a block.  \Stan also provides bounded
-for-each loops of the sort used in \R and \BUGS.
+be declared within statement blocks.  
 
 The transformed data, transformed parameter, and generated quantities
 blocks contain statements defining the variables declared in their
@@ -149,10 +125,69 @@ value of which defines the log probability function.  The log
 probability variable may also be accessed directly, allowing
 user-defined probability functions and Jacobians of transforms.
 
+\subsection{Variable Constraints}
+
+Variable constraints are very important in Stan, particularly for
+parameters.  For Stan to sample efficiently, any parameter values that
+satisfy the constraints declared for the parameters must have support
+in the model block (i.e., must have non-zero posterior density).
+
+Constraints in the data and transformed data block are only used for
+error checking data input and transforms.  Constraints in the
+transformed parameters block must be satisfied the same way as
+parameter constraints or sampling will devolve to a random walk or
+fail.  Constraints in the generated quantities block must succeed or
+sampling will be halted altogether because it is too late to reject
+a draw at the point the generated quantities block is evaluated.
+
+\subsection{Execution Order}
+
+Statements in \Stan are interpreted imperatively, so their order
+matters.  Atomic statements involve the assignment of a value to a
+variable.  Sequences of statements (and optionally local variable
+declarations) may be organized into a block.  \Stan also provides bounded
+for-each loops of the sort used in \R and \BUGS.
+
+
+
+\subsection{Probabilistic Programming Language}
+
+Stan is an imperative probabilistic programming language.  It is an
+instance of a domain-specific language, meaning that it was
+developed for a specific domain, namely statistical inference.
+
+Stan is a probabilistic programming language in the sense that a
+random variable is a bona fide first-class object.  In Stan, variables
+may be treated as random, and among the random variables, some are
+observed and some are unknown and need to be estimated or used for
+posterior predictive inference.  Observed random variables are
+declared as data and unobserved random variables are declared as
+parameters (including transformed parametrs, generated quantities, and
+local variables depending on them).  For the unobserved random
+variables, it is possible to sample them either marginally or jointly,
+estimate their means and variance, or plug them in for downstream
+posterior predictive inference.
+
+Stan is an imperative language, like C or Fortran (and parts of \Cpp,
+R, Python, and Java), in the sense that is based on assignment, loops,
+conditionals, local variables, object-level function application, and
+array-like data structures.  In contrast and/or complement, functional
+languages typically allow higher-order functions and often allow
+reflection of programming language features into the object language,
+whereas pure functional languages remove assignment altogether.
+Object-oriented languages introduce more general data types with
+dynamic function dispatch.
+
+Stan's language is Church-Turing complete
+\cite{Church:1936,Turing:1936,HopcroftMotwani:2006}, in the same way
+that C or R is.  That means any program that is computable on a Turing
+machine (or in C) can be implemented in Stan (not necessarily easily,
+of course).  All that is required for Turing completeness is loops,
+conditionals, and arrays that can be dynamically (re)sized in a loop.
 
 \section{Compiling and Running \Stan Programs}
 
-A \Stan program is first compiled to a \Cpp program by the \Stan
+A \Stan program is first translated to a \Cpp program by the \Stan
 compiler \stanc, then the \Cpp program compiled to a self-contained
 platform-specific executable.  \Stan can generate executables for
 various flavors of Windows, Mac OS X, and Linux.%
@@ -172,10 +207,13 @@ $p(\theta|y,x)$.
 
 For continuous parameters, \Stan uses Hamiltonian Monte Carlo (\HMC)
 sampling \citep{Duane:1987, Neal:1994, Neal:2011}, a form of Markov
-chain Monte Carlo (\MCMC) sampling \citep{Metropolis:1953}.  \Stan 1.0
-does not do discrete sampling. \refchapter{mixture-modeling} and
+chain Monte Carlo (\MCMC) sampling \citep{Metropolis:1953}.  Stan does
+not provide discrete sampling for parameters. Discrete observations
+can be handled directly, but discrete parameters must be marginalized
+out of the model.  \refchapter{mixture-modeling} and
 \refchapter{latent-discrete} discuss how finite discrete parameters
-can be summed out of models.
+can be summed out of models, leading to large efficiency gains versus
+discrete parameter sampling.
 
 \HMC accelerates both convergence to the stationary distribution and
 subsequent parameter exploration by using the gradient of the log
@@ -192,23 +230,25 @@ is then applied to correct for any simulation error and ensure
 detailed balance of the resulting Markov chain transitions
 \citep{Metropolis:1953, Hastings:1970}.
 
-Standard \HMC involves three ``tuning'' parameters to which its
-behavior is quite sensitive.  \Stan's samplers allow these parameters
-to be set by hand or set automatically without user intervention.
+Basic Euclidean Hamiltonian Monte Carlo involves three ``tuning''
+parameters to which its behavior is quite sensitive.  \Stan's samplers
+allow these parameters to be set by hand or set automatically without
+user intervention.
 
-The first two tuning parameters set the temporal step size of the
-discretization of the Hamiltonian and the total number of steps taken
-per iteration (with their product determining total simulation time).
-\Stan can be configured with a user-specified step size or it can
-estimate an optimal step size during warmup using dual averaging
-\citep{Nesterov:2009, Hoffman-Gelman:2011, Hoffman-Gelman:2014}.  
-In either case, additional randomization may be applied to draw the 
-step size from an interval of possible step sizes \citep{Neal:2011}.
+The first tuning parameter is the step size, measured in temporal
+units (i.e., the discretization interval) of the Hamiltonian.  Stan
+can be configured with a user-specified step size or it can estimate
+an optimal step size during warmup using dual averaging
+\citep{Nesterov:2009, Hoffman-Gelman:2011, Hoffman-Gelman:2014}.  In
+either case, additional randomization may be applied to draw the step
+size from an interval of possible step sizes \citep{Neal:2011}.
 
-\Stan can be set to use a specified number of steps, or it can
-automatically adapt the number of steps during sampling using the
-No-U-Turn (\NUTS) sampler 
-\citep{Hoffman-Gelman:2011, Hoffman-Gelman:2014}.  
+The second tuning parameter is the number of steps taken per
+iteration, the product of which with the temporal step size determines
+the total Hamiltonian simulation time.  \Stan can be set to use a
+specified number of steps, or it can automatically adapt the number of
+steps during sampling using the No-U-Turn (\NUTS) sampler
+\citep{Hoffman-Gelman:2011, Hoffman-Gelman:2014}.
 
 The third tuning parameter is a mass matrix for the fictional
 particle.  \Stan can be configured to estimate a diagonal mass matrix
@@ -233,19 +273,27 @@ distribution $p(\theta|y,x)$ after the chain has converged to its
 equilibrium distribution.  There are several methods to test whether
 an \MCMC method has failed to converge; unfortunately, passing the
 tests does not guarantee convergence.  The recommended method for
-\Stan is to run multiple Markov chains each with different diffuse
-initial parameter values, discard the warmup/adaptation samples, then
-split the remainder of each chain in half and compute the potential
-scale reduction statistic, $\hat{R}$ \citep{GelmanRubin:1992}.
-
-When estimating a mean based on $M$ independent samples, the
-estimation error is proportional to $1/\sqrt{M}$.  If the samples are
+\Stan is to run multiple Markov chains, initialized randomly with a
+diffuse set of initial parameter values, discard the warmup/adaptation
+samples, then split the remainder of each chain in half and compute
+the potential scale reduction statistic, $\hat{R}$
+\citep{GelmanRubin:1992}.  If the result is not enough effective
+samples, double the number of iterations and start again, including
+rerunning warmup and everything.%
+%
+\footnote{Often a lack of effective samples is a result of not enough
+  warmup iterations.  At most this rerunning strategy will consume
+  about 50\% more cycles than guessing the correct number of
+  iterations at the outset.}
+  
+When estimating a mean based on a sample of $M$ independent draws, the
+estimation error is proportional to $1/\sqrt{M}$.  If the draws are
 positively correlated, as they typically are when drawn using \MCMC
-methods, the error is proportional to $1/\sqrt{\mbox{\sc ess}}$, where
-{\sc ess} is the effective sample size.  Thus it is standard practice
-to also monitor (an estimate of) the effective sample size of
-parameters of interest in order to estimate the additional estimation
-error due to correlated samples.
+methods, the error is proportional to $1/\sqrt{\mbox{\sc n\_eff}}$,
+where {\sc n\_eff} is the effective sample size.  Thus it is standard
+practice to also monitor (an estimate of) the effective sample size
+until it is large enough for the estimation or inference task at
+hand.  
 
 \subsection{Bayesian Inference and Monte Carlo Methods}
 
@@ -274,6 +322,16 @@ posterior such as event outcomes or the values of as yet unobserved
 data.
 
 
+\section{Variational Inference}
+
+Stan implements a general, black-box form of variational inference,
+which provide an approximate posterior distribution.  Variational
+inference provides estimates of posterior means and uncertainty
+througha parametric approximation of a posterior that is optimized for
+its fit to the true posterior.  Variational inference can be much for
+estimating posterior means and marginal variances than MCMC.  See
+\refchapter{vi-algorithms} for more information.
+
 \section{Optimization}
 
 \Stan also supports optimization-based inference for models.  Given a
@@ -284,20 +342,18 @@ which is defined by
 \theta^{*} = \mbox{argmax}_{\theta} \ p(\theta|y).
 \]
 %
-Here the notation $\mbox{argmax}_u \ f(v)$ is used to pick out the value
-of $v$ at which $f(v)$ is maximized.  
+Here the notation $\mbox{argmax}_v \ f(v)$ is used to pick out the value
+of $v$ at which $f(v)$ is maximized.
 
 If the prior is uniform, the posterior mode corresponds to the maximum
 likelihood estimate (MLE) of the parameters.  If the prior is not
 uniform, the posterior mode is sometimes called the maximum a
-posterior (MAP) estimate.  If parameters (typically hierarchical) have
-been marginalized out, it's sometimes called a maximum marginal
-likelihood (MML) estimate. 
+posterior (MAP) estimate. 
 
 For optimization, the Jacobian of any transforms induced by
 constraints on variables are ignored.  It is more efficient in many
 optimization problems to remove lower and upper bound constraints in
-variable the declarations and instead rely on rejection in the model
+variable declarations and instead rely on rejection in the model
 block to disallow out-of-support solutions.
 
 
@@ -315,6 +371,37 @@ posterior variance is low and the posterior mean is near the posterior
 mode, inference with point estimates can be very similar to full
 Bayesian inference.
 
+
+\section{Variational Inference}
+
+Stan also supports variational inference, an approximate Bayesian inference
+technique \citep{Jordan:1999,Wainwright-Jordan:2008}. Variational inference has
+had a tremendous impact on Bayesian computation, especially in the machine
+learning community; it is typically faster than sampling techniques and can
+scale to massive datasets \citep{Hoffman:2013}.
+
+Variational inference approximates the posterior
+$p(\theta \mid y)$ with a simple, parameterized distribution
+$q(\theta \,;\, \phi)$. It matches the approximation to the
+true posterior by minimizing the Kullback-Leibler divergence,
+%
+\[
+  \phi^* = \argmin_\phi
+  \KL{ q(\theta \,;\, \phi) }{ p(\theta \mid y) }.
+\]
+%
+This converts Bayesian inference into an optimization problem with a
+well-defined metric for convergence. Variational inference can provide orders of
+magnitude faster convergence than sampling; the quality of the approximation
+will vary from model to model. Note that variational inference is not a point
+estimation technique; the result is a distribution that approximates the
+posterior.
+
+Stan implements Automatic Differentiation Variational Inference (ADVI), an
+algorithm designed to leverage Stan's library of transformations and automatic
+differentiation toolbox \citep{Kucukelbir:2015}. ADVI circumvents all of the
+mathematics typically required to derive variational inference algorithms; it
+works with any Stan model.
 
 
 

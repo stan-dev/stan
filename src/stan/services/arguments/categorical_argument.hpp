@@ -5,53 +5,52 @@
 #include <stan/services/arguments/argument.hpp>
 
 namespace stan {
-  
+
   namespace services {
-    
+
     class categorical_argument: public argument {
-      
+
     public:
-      
+
       virtual ~categorical_argument() {
         for (std::vector<argument*>::iterator it = _subarguments.begin();
              it != _subarguments.end(); ++it) {
           delete *it;
         }
-        
+
         _subarguments.clear();
       }
-      
+
       void print(interface_callbacks::writer::base_writer& w,
                  const int depth, const std::string prefix) {
         w(prefix + std::string(compute_indent(depth), ' ') + _name);
-        
+
         for (std::vector<argument*>::iterator it = _subarguments.begin();
              it != _subarguments.end(); ++it)
           (*it)->print(w, depth + 1, prefix);
       }
-      
+
       void print_help(interface_callbacks::writer::base_writer& w,
                       const int depth, const bool recurse) {
         std::string indent(indent_width * depth, ' ');
         std::string subindent(indent_width, ' ');
-        
+
         w(indent + _name);
         w(indent + subindent + _description);
         if (_subarguments.size() > 0) {
           w(indent + subindent + "Valid subarguments:");
-          
-          
+
           std::vector<argument*>::iterator it = _subarguments.begin();
-          
+
           std::string subargs(" " + (*it)->name());
           ++it;
-          
+
           for (; it != _subarguments.end(); ++it)
             subargs += ", " + (*it)->name();
-          
+
           w(subargs);
           w();
-        
+
           if (recurse) {
             for (std::vector<argument*>::iterator it = _subarguments.begin();
                  it != _subarguments.end(); ++it)
@@ -61,9 +60,9 @@ namespace stan {
         else {
           w();
         }
-         
+
       }
-      
+
       bool parse_args(std::vector<std::string>& args,
                       interface_callbacks::writer::base_writer& info,
                       interface_callbacks::writer::base_writer& err,
@@ -71,15 +70,15 @@ namespace stan {
 
         bool good_arg = true;
         bool valid_arg = true;
-        
+
         while (good_arg) {
           if (args.size() == 0)
             return valid_arg;
-          
+
           good_arg = false;
-          
+
           std::string cat_name = args.back();
-          
+
           if (cat_name == "help") {
             print_help(info, 0, false);
             help_flag |= true;
@@ -91,11 +90,11 @@ namespace stan {
             args.clear();
             return true;
           }
-          
+
           std::string val_name;
           std::string val;
           split_arg(cat_name, val_name, val);
-          
+
           if (_subarguments.size() == 0)
             valid_arg = true;
           for (std::vector<argument*>::iterator it = _subarguments.begin();
@@ -116,7 +115,7 @@ namespace stan {
         }
         return valid_arg;
       };
-      
+
       virtual void probe_args(argument* base_arg,
                               interface_callbacks::writer::base_writer& w) {
         for (std::vector<argument*>::iterator it = _subarguments.begin();
@@ -124,40 +123,40 @@ namespace stan {
           (*it)->probe_args(base_arg, w);
         }
       }
-      
+
       void find_arg(std::string name,
                     std::string prefix,
                     std::vector<std::string>& valid_paths) {
-        
+
         argument::find_arg(name, prefix, valid_paths);
-        
+
         prefix += _name + " ";
         for (std::vector<argument*>::iterator it = _subarguments.begin();
              it != _subarguments.end(); ++it)
           (*it)->find_arg(name, prefix, valid_paths);
-        
+
       }
-      
+
       std::vector<argument*>& subarguments() {
         return _subarguments;
       }
-      
+
       argument* arg(const std::string name) {
         for (std::vector<argument*>::iterator it = _subarguments.begin();
              it != _subarguments.end(); ++it)
-          if ( name == (*it)->name() ) 
+          if ( name == (*it)->name() )
             return (*it);
         return 0;
       }
-      
+
     protected:
-      
+
       std::vector<argument*> _subarguments;
-      
+
     };
-    
+
   } // services
-  
+
 } // stan
 
 #endif

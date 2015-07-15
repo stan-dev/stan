@@ -1,9 +1,22 @@
 #ifndef STAN_IO_WRITER_HPP
 #define STAN_IO_WRITER_HPP
 
-#include <stan/math/prim/arr.hpp>
-#include <stan/math/prim/mat.hpp>
-#include <stan/math/prim/scal.hpp>
+#include <stan/math/prim/arr/meta/index_type.hpp>
+#include <stan/math/prim/mat/meta/index_type.hpp>
+#include <stan/math/prim/scal/meta/index_type.hpp>
+#include <stan/math/prim/mat/err/check_corr_matrix.hpp>
+#include <stan/math/prim/mat/err/check_ordered.hpp>
+#include <stan/math/prim/mat/err/check_positive_ordered.hpp>
+#include <stan/math/prim/mat/err/check_simplex.hpp>
+#include <stan/math/prim/mat/err/check_unit_vector.hpp>
+#include <stan/math/prim/mat/fun/cholesky_corr_free.hpp>
+#include <stan/math/prim/mat/fun/cholesky_factor_free.hpp>
+#include <stan/math/prim/mat/fun/factor_cov_matrix.hpp>
+#include <stan/math/prim/mat/fun/simplex_free.hpp>
+#include <stan/math/prim/mat/fun/unit_vector_free.hpp>
+#include <stan/math/prim/scal/fun/prob_free.hpp>
+#include <stan/math/prim/scal/fun/lb_free.hpp>
+#include <stan/math/prim/scal/fun/lub_free.hpp>
 #include <stdexcept>
 #include <vector>
 
@@ -133,7 +146,7 @@ namespace stan {
        * @throw std::runtime_error if y is lower than the lower bound provided.
        */
       void scalar_lb_unconstrain(double lb, T& y) {
-        data_r_.push_back(stan::prob::lb_free(y, lb));
+        data_r_.push_back(stan::math::lb_free(y, lb));
       }
 
       /**
@@ -147,7 +160,7 @@ namespace stan {
        * @throw std::runtime_error if y is higher than the upper bound provided.
        */
       void scalar_ub_unconstrain(double ub, T& y) {
-        data_r_.push_back(stan::prob::ub_free(y, ub));
+        data_r_.push_back(stan::math::ub_free(y, ub));
       }
 
       /**
@@ -163,7 +176,7 @@ namespace stan {
        * @throw std::runtime_error if y is not between the lower and upper bounds
        */
       void scalar_lub_unconstrain(double lb, double ub, T& y) {
-        data_r_.push_back(stan::prob::lub_free(y, lb, ub));
+        data_r_.push_back(stan::math::lub_free(y, lb, ub));
       }
 
       /**
@@ -177,7 +190,7 @@ namespace stan {
        * @throw std::runtime_error if y is not between -1.0 and 1.0
        */
       void corr_unconstrain(T& y) {
-        data_r_.push_back(stan::prob::corr_free(y));
+        data_r_.push_back(stan::math::corr_free(y));
       }
 
       /**
@@ -192,7 +205,7 @@ namespace stan {
        * @throw std::runtime_error if y is not between 0.0 and 1.0
         */
       void prob_unconstrain(T& y) {
-        data_r_.push_back(stan::prob::prob_free(y));
+        data_r_.push_back(stan::math::prob_free(y));
       }
 
       /**
@@ -357,7 +370,7 @@ namespace stan {
         stan::math::check_unit_vector("stan::io::unit_vector_unconstrain",
                                       "Vector", y);
         typedef typename stan::math::index_type<vector_t>::type idx_t;
-        vector_t uy = stan::prob::unit_vector_free(y);
+        vector_t uy = stan::math::unit_vector_free(y);
         for (idx_t i = 0; i < uy.size(); ++i)
           data_r_.push_back(uy[i]);
       }
@@ -381,7 +394,7 @@ namespace stan {
         typedef typename stan::math::index_type<vector_t>::type idx_t;
 
         stan::math::check_simplex("stan::io::simplex_unconstrain", "Vector", y);
-        vector_t uy = stan::prob::simplex_free(y);
+        vector_t uy = stan::math::simplex_free(y);
         for (idx_t i = 0; i < uy.size(); ++i)
           data_r_.push_back(uy[i]);
       }
@@ -402,7 +415,7 @@ namespace stan {
 
         // FIXME:  optimize by unrolling cholesky_factor_free
         Eigen::Matrix<T, Eigen::Dynamic, 1> y_free
-          = stan::prob::cholesky_factor_free(y);
+          = stan::math::cholesky_factor_free(y);
         for (idx_t i = 0; i < y_free.size(); ++i)
           data_r_.push_back(y_free[i]);
       }
@@ -424,7 +437,7 @@ namespace stan {
 
         // FIXME:  optimize by unrolling cholesky_factor_free
         Eigen::Matrix<T, Eigen::Dynamic, 1> y_free
-          = stan::prob::cholesky_corr_free(y);
+          = stan::math::cholesky_corr_free(y);
         for (idx_t i = 0; i < y_free.size(); ++i)
           data_r_.push_back(y_free[i]);
       }
@@ -451,7 +464,7 @@ namespace stan {
         idx_t k_choose_2 = (k * (k-1)) / 2;
         array_vec_t cpcs(k_choose_2);
         array_vec_t sds(k);
-        bool successful = stan::prob::factor_cov_matrix(y, cpcs, sds);
+        bool successful = stan::math::factor_cov_matrix(y, cpcs, sds);
         if (!successful)
           BOOST_THROW_EXCEPTION
             (std::runtime_error("factor_cov_matrix failed"));
@@ -485,7 +498,7 @@ namespace stan {
         idx_t k_choose_2 = (k * (k-1)) / 2;
         array_vec_t cpcs(k_choose_2);
         array_vec_t sds(k);
-        bool successful = stan::prob::factor_cov_matrix(y, cpcs, sds);
+        bool successful = stan::math::factor_cov_matrix(y, cpcs, sds);
         if (!successful)
           BOOST_THROW_EXCEPTION
             (std::runtime_error("y cannot be factorized by factor_cov_matrix"));

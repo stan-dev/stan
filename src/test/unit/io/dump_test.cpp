@@ -97,6 +97,11 @@ void test_exception(const std::string& input,
 }
 
 
+TEST(ioDump, sciNotationDouble) {
+  test_val("a", 5.0, "a <- 5e0");
+  test_val("a", 0.0, "a <- 0e5");
+}
+
 TEST(io_dump, reader_double) {
   test_val("a",-5.0,"a <- -5.0");
   test_val("a",5.0,"a <- 5.0");
@@ -434,17 +439,6 @@ TEST(io_dump, dump_abs_ref) {
   EXPECT_TRUE(context.contains_i("N"));
 }
 
-TEST(io_dump, product) {
-  std::vector<size_t>dims;
-  dims.push_back(1);
-  
-  EXPECT_FLOAT_EQ(1.0, stan::io::product(dims));
-  dims.push_back(3);
-  dims.push_back(4);
-  EXPECT_FLOAT_EQ(12.0, stan::io::product(dims));
-}
-
-
 // thanks to ksvanhorn for pointing out this test case
 // which failed in Stan 1.3
 TEST(io_dump, it_sign_ksvanhorn) {
@@ -554,7 +548,11 @@ TEST(io_dump, reader_vec_data_max_dims) {
 
 TEST(io_dump, reader_big_doubles) {
   double dmax = std::numeric_limits<double>::max();
-  double dmin = std::numeric_limits<double>::min();
+
+  // TODO(carpenter): in C++11, min() should change to lowest()
+  // test as written in Stan 2.6 fails on Intel's icpc compiler
+  //   min = std::numeric_limits<double>::min();
+  double dmin = -dmax; 
   std::stringstream sa;
   sa << "a <- " << dmax ;
   test_val("a",dmax,sa.str());
@@ -613,45 +611,4 @@ TEST(io_dump, bad_syntax_seq2) {
 
 TEST(io_dump, bad_syntax_struct) {
   test_exception("a <- structure(1:2, .Dim = c(2,3) ");
-}
-
-template <typename T>
-void testWriteVal(const::std::string& expected_number_string,
-                  T x) {
-  std::stringstream s;
-  stan::io::dump_writer writer(s);
-  writer.write("foo", x);
-  std::string written = s.str();
-
-  std::stringstream ss_expected;
-  ss_expected << "\"foo\" <- "
-             << std::endl
-             << expected_number_string;
-  std::string expected = ss_expected.str();
-  EXPECT_EQ(expected, written);
-}
-
-TEST(ioDump, writeVal) {
-  testWriteVal("2", static_cast<char>(2));
-  testWriteVal("2", static_cast<short>(2));
-  testWriteVal("2", static_cast<int>(2));
-  testWriteVal("2", static_cast<long>(2));
-
-  testWriteVal("2", static_cast<unsigned char>(2));
-  testWriteVal("2", static_cast<unsigned short>(2));
-  testWriteVal("2", static_cast<unsigned int>(2));
-  testWriteVal("2", static_cast<unsigned long>(2));
-
-  testWriteVal("2", static_cast<size_t>(2));
-  testWriteVal("2", static_cast<ptrdiff_t>(2));
-
-  testWriteVal("2.", static_cast<float>(2.0));
-  testWriteVal("2.", static_cast<double>(2.0));
-
-  // need to make this round in binary to guarantee output
-  testWriteVal("2.5", static_cast<float>(2.5));
-  testWriteVal("2.5", static_cast<double>(2.5));
-
-  testWriteVal("1e+100", static_cast<double>(1e+100));
-  testWriteVal("-1e-100", static_cast<double>(-1e-100));
 }

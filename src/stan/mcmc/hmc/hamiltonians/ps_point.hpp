@@ -4,7 +4,6 @@
 #include <boost/lexical_cast.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 
-#include <fstream>
 #include <string>
 #include <vector>
 
@@ -66,6 +65,9 @@ namespace stan {
         for (int i = 0; i < q.size(); ++i)
           values.push_back(g(i));
       }
+
+      template <class Writer>
+      void write_metric(Writer& writer) {}
 
     protected:
       template <typename T>

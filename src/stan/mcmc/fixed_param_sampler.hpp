@@ -27,4 +27,3 @@ namespace stan {
 }  // stan
 
 #endif
-

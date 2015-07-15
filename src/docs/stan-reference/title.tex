@@ -7,10 +7,10 @@
 \\[36pt]
 {
 \vfill
-\includegraphics[width=0.6in]{img/stanlogo-main.pdf}}
+\includegraphics[width=1in]{img/stanlogo-main.pdf}}
 \\
 \vspace*{6pt}
-{\small \url{http://mc-stan.org/}}
+{\bfseries \href{http://mc-stan.org/}{\tt mc-stan.org}}
 }
 \maketitle
 
@@ -21,7 +21,7 @@
 \begin{center}
 \begin{minipage}[t]{0.75\textwidth}
 \small
-Stan Development Team. 2015.  
+Stan Development Team. 2015.
 {\it Stan Modeling Language: User's Guide and Reference Manual}. Version
 \stanversion
 \vspace*{20pt}
@@ -33,7 +33,7 @@ Copyright \copyright \ 2011--2015, Stan Development Team.
 This document is distributed under the Creative Commons Attribute 4.0
 Unported License (CC BY 4.0).  For full details, see
 \begin{center}
-\url{https://creativecommons.org/licenses/by/4.0/legalcode} 
+\url{https://creativecommons.org/licenses/by/4.0/legalcode}
 \end{center}
 \end{minipage}
 \vspace*{24pt}
@@ -51,15 +51,15 @@ The list order is the order of joining the development team.
 \begin{itemize}
 \item Andrew Gelman \ (Columbia University)
 \\ {\footnotesize chief of staff, chief of marketing, chief of
-  fundraising, chief of modeling, chief of training, max marginal
-  likelihood, expectation propagation, posterior analysis, R, founder}
+  fundraising, chief of modeling, max marginal likelihood,
+  expectation propagation,  posterior analysis, R, founder}
 \item Bob Carpenter \ (Columbia University) \\ {\footnotesize language
     design, parsing, code generation, autodiff, templating, ODEs,
     probability functions, constraint transforms, manual, web design /
     maintenance, fundraising, support, training, \Cpp, founder}
 \item Matt Hoffman \ (Adobe Creative Technologies Lab)
 \\ {\footnotesize NUTS, adaptation, autodiff, memory management,
-  (re)parameterization, \Cpp, founder}
+  (re)parameterization, optimization \Cpp, founder}
 \item Daniel Lee \   (Columbia University)
 \\ {\footnotesize chief of engineering, CmdStan (founder), builds, continuous
   integration, testing, templates, ODEs, autodiff,
@@ -71,13 +71,13 @@ The list order is the order of joining the development team.
 \item Michael Betancourt \ (University of Warwick) \\
   {\footnotesize chief of smooth manifolds, MCMC, Riemannian HMC,
     geometry, analysis and measure theory, ODEs, CmdStan, CDFs,
-    autodiff, transformations, refactoring, modeling, variational
+    autodiff, transformations, refactoring, modeling, adaptation, variational
     inference, logos, web design, \Cpp, training}
 \item Marcus Brubaker \   (University of Toronto, Scarborough)
-\\ {\footnotesize optimization routines, code efficiency, matrix
+\\ {\footnotesize chief of optimization, code efficiency, matrix
   algebra, multivariate distributions, \Cpp}
 \item Jiqiang Guo \   (NPD Group)
-\\ {\footnotesize RStan (founder), \Cpp, Rcpp, R}
+\\ {\footnotesize RStan (founder), modeling, \Cpp, Rcpp, R}
 \item Peter Li \   (Columbia University)
 \\ {\footnotesize RNGs, higher-order autodiff, ensemble sampling,
   Metropolis, example models, \Cpp}
@@ -88,16 +88,22 @@ The list order is the order of joining the development team.
 \item Jeffrey Arnold \   (University of Washington)
 \\ {\footnotesize emacs mode, pretty printing, manual, emacs}
 \item Rob J.\ Goedman \ (D3Consulting b.v.)
-\\ {\footnotesize parsing, Stan.jl, \Cpp, Julia}
+\\ {\footnotesize Stan.jl (founder), parsing, \Cpp, Julia}
 \item Brian Lau \ (CNRS, Paris)
 \\ {\footnotesize MatlabStan, MATLAB}
 \item Mitzi Morris \   (Lucidworks)
-\\ {\footnotesize parsing, testing, \Cpp}
+\\ {\footnotesize parsing, testing, JSON, \Cpp}
 \item Rob Trangucci \   (Columbia University)
 \\ {\footnotesize max marginal likelihood, multilevel modeling and
-  poststratification, template metaprogramming, training, \Cpp, R}
+  GLMs, poststratification, autodiff, template metaprogramming, 
+  training, \Cpp, R}
 \item Jonah Sol Gabry \ (Columbia University)
 \\ {\footnotesize shinyStan (founder), R}
+\item Alp Kucukelbir \ (Columbia University)
+\\ {\footnotesize variational inference, \Cpp}
+\item Robert L. Grant \ (St. George's, University of London and
+  Kingston University)
+\\ {\footnotesize StataStan (founder)}
 \end{itemize}
 
 \subsection*{Development Team Alumni}

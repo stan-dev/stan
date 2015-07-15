@@ -11,15 +11,16 @@
 #include <stan/mcmc/hmc/hamiltonians/diag_e_metric.hpp>
 #include <boost/random/additive_combine.hpp> // L'Ecuyer RNG
 
-typedef boost::ecuyer1988 rng_t;
+#include <test/unit/util.hpp>
 
+typedef boost::ecuyer1988 rng_t;
 
 // namespace
 //************************************************************
 
 class McmcHmcIntegratorsExplLeapfrogF : public testing::Test {
 public:
-  
+
   void SetUp() {
     static const std::string DATA("mu <- 0.0\ny <- 0\n");
     std::stringstream data_stream(DATA);
@@ -27,11 +28,11 @@ public:
 
     model = new command_model_namespace::command_model(data_var_context);
   }
-  
+
   void TearDown() {
     delete model;
   }
-  
+
   // integrator under test
   stan::mcmc::expl_leapfrog<
     stan::mcmc::unit_e_metric<command_model_namespace::command_model, rng_t> >
@@ -40,7 +41,7 @@ public:
   stan::mcmc::expl_leapfrog<
     stan::mcmc::diag_e_metric<command_model_namespace::command_model, rng_t> >
       diag_e_integrator;
-  
+
   // model
   command_model_namespace::command_model *model;
 
@@ -59,7 +60,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, begin_update_p) {
   EXPECT_NEAR(z.q(0),  1.99987371079118, 1e-15);
   EXPECT_NEAR(z.p(0), -1.58612292129732, 1e-15);
   EXPECT_NEAR(z.g(0),  1.99987371079118, 1e-15);
-  
+
   // setup hamiltonian
   stan::mcmc::unit_e_metric<command_model_namespace::command_model, rng_t>
     hamiltonian(*model);
@@ -361,3 +362,15 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_9) {
   EXPECT_NEAR(z.g(0), -1.71246374711032, 5e-14);
 }
 
+TEST_F(McmcHmcIntegratorsExplLeapfrogF, streams) {
+  stan::test::capture_std_streams();
+
+  typedef stan::mcmc::expl_leapfrog<
+    stan::mcmc::unit_e_metric<command_model_namespace::command_model, rng_t> >
+      integrator;
+  EXPECT_NO_THROW(integrator i);
+
+  stan::test::reset_std_streams();
+  EXPECT_EQ("", stan::test::cout_ss.str());
+  EXPECT_EQ("", stan::test::cerr_ss.str());
+}

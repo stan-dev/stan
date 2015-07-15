@@ -6,7 +6,7 @@
 namespace stan {
   namespace services {
     namespace io {
-    
+
       template <class Writer, class Model, class RNG>
       void write_iteration(Writer& writer,
                            Model& model,

@@ -7,7 +7,7 @@
 namespace stan {
   namespace services {
     namespace io {
-      
+
       template <class Writer>
       void write_error_msg(Writer& writer,
                            const std::exception& e) {
@@ -23,7 +23,7 @@ namespace stan {
                "may be either severely ill-conditioned or "
                "misspecified.");
       }
-    
+
     }
   }
 }
