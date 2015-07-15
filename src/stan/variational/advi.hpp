@@ -5,7 +5,6 @@
 
 #include <stan/model/util.hpp>
 
-#include <stan/services/io/write_iteration_csv.hpp>
 #include <stan/services/io/write_iteration.hpp>
 #include <stan/services/error_codes.hpp>
 
@@ -249,8 +248,11 @@ namespace stan {
               print_vector.clear();
               print_vector.push_back(delta_t);
               print_vector.push_back(elbo);
-              services::io::write_iteration_csv(*diag_stream_,
-                                                iter_counter, print_vector);
+
+              *diag_stream_ << iter_counter;
+              for (size_t i = 0; i < print_vector.size(); ++i)
+                *diag_stream_ << "," << print_vector.at(i);
+              *diag_stream_ << std::endl;
             }
 
             if (delta_elbo_ave < tol_rel_obj) {
@@ -312,9 +314,16 @@ namespace stan {
         std::vector<int> disc_vector;
 
         if (out_stream_) {
-          services::io::write_iteration(*out_stream_, model_, rng_,
-                                        0.0, cont_vector, disc_vector,
-                                        print_stream_);
+          //services::io::write_iteration(*out_stream_, model_, rng_,
+          //                              0.0, cont_vector, disc_vector,
+          //                              print_stream_);
+          std::vector<double> model_values;
+          model_.write_array(rng_, cont_vector, disc_vector, model_values,
+                          true, true, print_stream_);
+          *out_stream_ << 0.0;
+          for (size_t i = 0; i < model_values.size(); ++i)
+            *out_stream_ << "," << model_values.at(i);
+          *out_stream_ << std::endl;
         }
 
         // draw more samples from posterior and write on subsequent lines
@@ -323,8 +332,15 @@ namespace stan {
             cont_params_ = variational.sample(rng_);
             for (int i = 0; i < cont_params_.size(); ++i)
               cont_vector.at(i) = cont_params_(i);
-            services::io::write_iteration(*out_stream_, model_, rng_,
-                          0.0, cont_vector, disc_vector, print_stream_);
+            //services::io::write_iteration(*out_stream_, model_, rng_,
+            //              0.0, cont_vector, disc_vector, print_stream_);
+            std::vector<double> model_values;
+            model_.write_array(rng_, cont_vector, disc_vector, model_values,
+                            true, true, print_stream_);
+            *out_stream_ << 0.0;
+            for (size_t i = 0; i < model_values.size(); ++i)
+              *out_stream_ << "," << model_values.at(i);
+            *out_stream_ << std::endl;
           }
         }
 

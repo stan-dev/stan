@@ -250,7 +250,7 @@ namespace stan {
                                     inits, otherwise not
        */
 
-      template <class ContextFactory, class Model, class RNG>
+      template <class Model, class RNG, class Writer, class ContextFactory>
       bool initialize_state_source_and_random(const std::string& source,
                                               double R,
                                               Eigen::VectorXd& cont_params,
@@ -402,7 +402,7 @@ namespace stan {
        * @param[in] R               a double for the range of generating random inits.
        *                            it's used for randomly generating partial inits
        */
-      template <class ContextFactory, class Model, class RNG>
+      template <class Model, class RNG, class Writer, class ContextFactory>
       bool initialize_state(const std::string& init,
                             Eigen::VectorXd& cont_params,
                             Model& model,

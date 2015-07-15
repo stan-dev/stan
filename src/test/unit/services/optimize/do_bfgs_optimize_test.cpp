@@ -4,6 +4,7 @@
 #include <stan/services/optimize/do_bfgs_optimize.hpp>
 #include <stan/optimization/bfgs.hpp>
 #include <test/test-models/good/optimization/rosenbrock.hpp>
+#include <boost/random/additive_combine.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
 
 typedef rosenbrock_model_namespace::rosenbrock_model Model;
@@ -13,19 +14,19 @@ typedef stan::interface_callbacks::writer::noop writer_t;
 class mock_interrupt: public stan::interface_callbacks::interrupt::base_interrupt {
 public:
   mock_interrupt(): n_(0) {}
-  
+
   void operator()() {
     n_++;
   }
-  
+
   void clear() {
     n_ = 0;
   }
-  
+
   int n() {
     return n_;
   }
-  
+
 private:
   int n_;
 };
@@ -64,7 +65,7 @@ TEST(Services, do_bfgs_optimize__bfgs) {
   EXPECT_FLOAT_EQ(return_code, 0);
   EXPECT_EQ(33, interrupt.n());
 }
-  
+
 TEST(Services, do_bfgs_optimize__lbfgs) {
   std::vector<double> cont_vector(2);
   cont_vector[0] = -1; cont_vector[1] = 1;
@@ -89,7 +90,7 @@ TEST(Services, do_bfgs_optimize__lbfgs) {
   writer_t output;
   writer_t info;
   mock_interrupt interrupt;
-  
+
   return_code = stan::services::optimize::do_bfgs_optimize(model, lbfgs, base_rng,
                                                            lp, cont_vector, disc_vector,
                                                            output, info,

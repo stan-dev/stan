@@ -7,7 +7,8 @@
 #include <vector>
 
 #include <stan/services/error_codes.hpp>
-#include <stan/services/io.hpp>
+#include <stan/services/io/write_iteration.hpp>
+#include <stan/services/io/do_print.hpp>
 
 namespace stan {
   namespace services {
@@ -27,19 +28,19 @@ namespace stan {
                            int refresh,
                            Interrupt& interrupt) {
         lp = bfgs.logp();
-        
+
         std::stringstream msg;
         msg << "initial log joint probability = " << lp;
         info(msg.str());
-        
+
         if (save_iterations) {
           io::write_iteration(output_stream, model, base_rng,
                               lp, cont_vector, disc_vector);
         }
 
         int ret = 0;
-        
-        while (ret == 0) {  
+
+        while (ret == 0) {
           interrupt();
           if (io::do_print(bfgs.iter_num(), 50 * refresh)) {
             msg.str(std::string());
@@ -49,11 +50,11 @@ namespace stan {
                 << " # evals " << " Notes ";
             info(msg.str());
           }
-              
+
           ret = bfgs.step();
           lp = bfgs.logp();
           bfgs.params_r(cont_vector);
-              
+
           if (io::do_print(bfgs.iter_num(), ret != 0 || !bfgs.note().empty(),refresh)) {
             msg.str(std::string());
             msg.clear();
@@ -67,13 +68,13 @@ namespace stan {
             msg << " " << bfgs.note();
             info(msg.str());
           }
-             
+
           if (save_iterations) {
             io::write_iteration(output_stream, model, base_rng,
                                lp, cont_vector, disc_vector);
           }
         }
-            
+
         int return_code;
         if (ret >= 0) {
           info("Optimization terminated normally: ");
@@ -86,9 +87,8 @@ namespace stan {
 
         return return_code;
       }
-      
+
     } // optimize
   } // services
 } // stan
 #endif
-
