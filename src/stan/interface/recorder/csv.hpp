@@ -1,10 +1,12 @@
 #ifndef STAN_INTERFACE_RECORDER_CSV_HPP
 #define STAN_INTERFACE_RECORDER_CSV_HPP
 
+#include <stan/interface/recorder/recorder.hpp>
 #include <stan/math/prim/scal/meta/index_type.hpp>
 #include <stan/math/prim/arr/meta/index_type.hpp>
 #include <ostream>
-#include <stan/interface/recorder/recorder.hpp>
+#include <string>
+#include <vector>
 
 namespace stan {
   namespace interface {

@@ -10,7 +10,7 @@ namespace stan {
       class noop_callback: public callback {
       public:
         noop_callback() {}
-        void operator()() { };
+        void operator()() { }
       };
 
     }

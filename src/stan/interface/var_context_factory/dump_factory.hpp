@@ -4,6 +4,7 @@
 #include <stan/interface/var_context_factory/var_context_factory.hpp>
 #include <stan/io/dump.hpp>
 #include <fstream>
+#include <string>
 
 namespace stan {
   namespace interface {
@@ -17,7 +18,8 @@ namespace stan {
                                      std::fstream::in);
 
           if (source_stream.fail()) {
-            std::string message("dump_factory Error: the file " + source + " does not exist.");
+            std::string message("dump_factory Error: the file "
+                                + source + " does not exist.");
             throw std::runtime_error(message);
           }
 
