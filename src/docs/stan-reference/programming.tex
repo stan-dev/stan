@@ -69,7 +69,7 @@ pseudo-random number generators.  These operate by generating a
 sequence of random numbers based on a ``seed.''  Stan (and other
 languages like R) can use time-based methods to generate a seed based
 on the time and date, or seeds can be provided to Stan (or R) in the
-form ofintegers.  Stan writes out the seed used to generate the
+form of integers.  Stan writes out the seed used to generate the
 data as well as the version number of the Stan software so that
 results can be reproduced at a later date.%
 %
@@ -888,7 +888,7 @@ random walk.
 
 Estimates near boundaries for interval-constrained parameters
 typically signal that the prior is not appropriate for the model.  It
-can also cause numerical problems with underflow and overlow when
+can also cause numerical problems with underflow and overflow when
 sampling or optimizing.
 
 \subsection{``Uninformative'' Proper Priors}
@@ -1855,7 +1855,7 @@ variables are constrained to $(0,\infty)$ by their declarations.
 
 
 
-\section{Priors for Identifiabilty}\label{priors-for-identification.section}
+\section{Priors for Identifiability}\label{priors-for-identification.section}
 
 \subsection{Location and Scale Invariance}
 
@@ -2408,7 +2408,7 @@ model {
 %
 The Cholesky factor of the covariance matrix is then reconstructed as
 a local variable and used in the model by scaling the Cholesky factor
-of the correatlion matrices. The regression coefficients get a prior
+of the correlation matrices. The regression coefficients get a prior
 all at once by converting the matrix \code{beta} to a vector.
 
 If required, the full correlation or covariance matrices may be
@@ -2419,7 +2419,7 @@ block.
 \subsection{Multivariate Probit Regression}
 
 The multivariate probit model generates sequences of boolean variables
-by applying a step function to the output of a seemingly urelated
+by applying a step function to the output of a seemingly unrelated
 regression.
 
 The observations $y_n$ are $D$-vectors of boolean values (coded 0 for
@@ -2452,7 +2452,7 @@ Multivariate probit regression can be coded in Stan using the trick
 introduced by \cite{AlbertChib:1993}, where the underlying continuous
 value vectors $y_n$ are coded as truncated parameters.  The key to
 coding the model in Stan is declaring the latent vector $z$ in two
-parts, based on whether the correspdonding value of $y$ is 0 or 1.
+parts, based on whether the corresponding value of $y$ is 0 or 1.
 Otherwise, the model is identical to the seemingly unrelated
 regression model in the previous section.
 
@@ -5238,7 +5238,7 @@ The definition of \code{prob\_uncaptured}, from the functions block,
 is
 %
 \begin{stancode}
-funtions {
+functions {
   ...
   vector prob_uncaptured(int T, vector p, vector phi) {
     vector[T] chi;
@@ -5299,7 +5299,7 @@ information in the CJS model is conditional on the first capture.
 
 In the inner loop, the observed capture status \code{y[i,t]} for
 individual \code{i} at time \code{t} has a Bernoulli distribution
-based on the capture probabilty \code{p[t]} at time \code{t}.
+based on the capture probability \code{p[t]} at time \code{t}.
 
 After the inner loop, the probability of an animal never being seen
 again after being observed at time \code{last[i]} is included, because
@@ -6061,7 +6061,7 @@ The specification for naive Bayes in the previous sections have used a ragged
 array notation for the words $w$.  Because Stan does not support
 ragged arrays, the models are coded using an alternative strategy that
 provides an index for each word in a global list of words.   The data
-is organized as follows, with the word arrays layed out in a column and each
+is organized as follows, with the word arrays laid out in a column and each
 assigned to its document in a second column.
 %
 \begin{center}
@@ -7540,7 +7540,7 @@ transformed parameters {
   vector[K] J_diag;  // diagonals of Jacobian matrix
   ... 
   ... compute J[k,k] = d.v[k] / d.u[k] ...
-  incement_log_prob(sum(log(J_diag)));
+  increment_log_prob(sum(log(J_diag)));
   ...
 \end{stancode}
 
@@ -9007,7 +9007,7 @@ current parameter values and the ones without collapsed components.
 It may help to use a smaller step size during warmup, a stronger prior
 on each mixture component's membership responsibility.  A more extreme
 measure is to include additional mixture components to deal with the
-possiblity that some of them may collapse.
+possibility that some of them may collapse.
 
 In general, it is very difficult to recover exactly the right $K$
 mixture components in a mixture model as $K$ increases beyond one
