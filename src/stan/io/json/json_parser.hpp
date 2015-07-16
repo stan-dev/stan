@@ -210,7 +210,7 @@ namespace stan {
             try {
               std::string ss_str = ss.str();
               x = boost::lexical_cast<double>(ss_str);
-              if (x == 0) 
+              if (x == 0)
                 io::validate_zero_buf(ss_str);
             } catch (const boost::bad_lexical_cast & ) {
               throw json_exception("number exceeds double range");
