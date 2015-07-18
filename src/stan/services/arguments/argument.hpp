@@ -11,7 +11,6 @@ namespace stan {
 
     class argument {
     public:
-
       argument()
         : indent_width(2),
           help_width(20) { }
@@ -31,8 +30,10 @@ namespace stan {
         return _description;
       }
 
-      virtual void print(std::ostream* s, const int depth, const std::string prefix) = 0;
-      virtual void print_help(std::ostream* s, const int depth, const bool recurse) = 0;
+      virtual void print(std::ostream* s, const int depth,
+                         const std::string prefix) = 0;
+      virtual void print_help(std::ostream* s, const int depth,
+                              const bool recurse) = 0;
 
       virtual bool parse_args(std::vector<std::string>& args,
                               std::ostream* out,
@@ -41,7 +42,7 @@ namespace stan {
         return true;
       }
 
-      virtual void probe_args(argument* base_arg, std::stringstream& s) {};
+      virtual void probe_args(argument* base_arg, std::stringstream& s) {}
 
       virtual void find_arg(std::string name,
                             std::string prefix,
@@ -51,14 +52,14 @@ namespace stan {
         }
       }
 
-      static void split_arg(const std::string& arg, std::string& name, std::string& value) {
+      static void split_arg(const std::string& arg, std::string& name,
+                            std::string& value) {
         size_t pos = arg.find('=');
 
         if (pos != std::string::npos) {
           name = arg.substr(0, pos);
           value = arg.substr(pos + 1, arg.size() - pos);
-        }
-        else {
+        } else {
           name = arg;
           value = "";
         }
@@ -80,7 +81,6 @@ namespace stan {
       int help_width;
     };
 
-  } // services
-} // stan
+  }  // services
+}  // stan
 #endif
-
