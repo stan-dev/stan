@@ -1,12 +1,12 @@
 #ifndef STAN_OPTIMIZATION_BFGS_LINESEARCH_HPP
 #define STAN_OPTIMIZATION_BFGS_LINESEARCH_HPP
 
+#include <boost/math/special_functions/fpclassify.hpp>
+#include <algorithm>
 #include <cmath>
 #include <cstdlib>
 #include <string>
 #include <limits>
-
-#include <boost/math/special_functions/fpclassify.hpp>
 
 namespace stan {
   namespace optimization {
@@ -34,8 +34,7 @@ namespace stan {
     template<typename Scalar>
     Scalar CubicInterp(const Scalar &df0,
                        const Scalar &x1, const Scalar &f1, const Scalar &df1,
-                       const Scalar &loX, const Scalar &hiX)
-    {
+                       const Scalar &loX, const Scalar &hiX) {
       const Scalar c3((-12*f1 + 6*x1*(df0 + df1))/(x1*x1*x1));
       const Scalar c2(-(4*df0 + 2*df1)/x1 + 6*f1/(x1*x1));
       const Scalar &c1(df0);
@@ -103,9 +102,8 @@ namespace stan {
     template<typename Scalar>
     Scalar CubicInterp(const Scalar &x0, const Scalar &f0, const Scalar &df0,
                        const Scalar &x1, const Scalar &f1, const Scalar &df1,
-                       const Scalar &loX, const Scalar &hiX)
-    {
-      return x0 + CubicInterp(df0,x1-x0,f1-f0,df1,loX-x0,hiX-x0);
+                       const Scalar &loX, const Scalar &hiX) {
+      return x0 + CubicInterp(df0, x1-x0, f1-f0, df1, loX-x0, hiX-x0);
     }
 
     namespace {
@@ -119,8 +117,7 @@ namespace stan {
                      const Scalar &c1dfp, const Scalar &c2dfp, const XType &p,
                      Scalar alo, Scalar aloF, Scalar aloDFp,
                      Scalar ahi, Scalar ahiF, Scalar ahiDFp,
-                     const Scalar &min_range)
-      {
+                     const Scalar &min_range) {
         Scalar d1, d2, newDFp;
         int itNum(0);
 
@@ -132,34 +129,33 @@ namespace stan {
 
           if (itNum%5 == 0) {
             alpha = 0.5*(alo+ahi);
-          }
-          else {
+          } else {
             // Perform cubic interpolation to determine next point to try
             d1 = aloDFp + ahiDFp - 3*(aloF-ahiF)/(alo-ahi);
             d2 = std::sqrt(d1*d1 - aloDFp*ahiDFp);
             if (ahi < alo)
               d2 = -d2;
-            alpha = ahi - (ahi - alo)*(ahiDFp + d2 - d1)/(ahiDFp - aloDFp + 2*d2);
+            alpha = ahi
+              - (ahi - alo) * (ahiDFp + d2 - d1) / (ahiDFp - aloDFp + 2*d2);
             if (!boost::math::isfinite(alpha) ||
-                alpha < std::min(alo,ahi)+0.01*std::fabs(alo-ahi) ||
-                alpha > std::max(alo,ahi)-0.01*std::fabs(alo-ahi))
-              alpha = 0.5*(alo+ahi);
+                alpha < std::min(alo, ahi) + 0.01 * std::fabs(alo - ahi) ||
+                alpha > std::max(alo, ahi) - 0.01 * std::fabs(alo - ahi))
+              alpha = 0.5 * (alo + ahi);
           }
 
-          newX = x + alpha*p;
-          while (func(newX,newF,newDF)) {
-            alpha = 0.5*(alpha+std::min(alo,ahi));
-            if (std::fabs(std::min(alo,ahi)-alpha) < min_range)
+          newX = x + alpha * p;
+          while (func(newX, newF, newDF)) {
+            alpha = 0.5 * (alpha + std::min(alo, ahi));
+            if (std::fabs(std::min(alo, ahi) - alpha) < min_range)
               return 1;
-            newX = x + alpha*p;
+            newX = x + alpha * p;
           }
           newDFp = newDF.dot(p);
-          if (newF > (f + alpha*c1dfp) || newF >= aloF) {
+          if (newF > (f + alpha * c1dfp) || newF >= aloF) {
             ahi = alpha;
             ahiF = newF;
             ahiDFp = newDFp;
-          }
-          else {
+          } else {
             if (std::fabs(newDFp) <= -c2dfp)
               break;
             if (newDFp*(ahi-alo) >= 0) {
@@ -209,7 +205,8 @@ namespace stan {
      *
      * @param f0 Value of function at starting point, \f$ f(x_0) \f$.
      *
-     * @param gradx0 Value of function gradient at starting point, \f$ g(x_0) \f$.
+     * @param gradx0 Value of function gradient at starting point, 
+     *    \f$ g(x_0) \f$.
      *
      * @param c1 Parameter of the Wolfe conditions. \f$ 0 < c_1 < c_2 < 1 \f$
      * Typically c1 = 1e-4.
@@ -228,8 +225,7 @@ namespace stan {
                         const XType &p,
                         const XType &x0, const Scalar &f0, const XType &gradx0,
                         const Scalar &c1, const Scalar &c2,
-                        const Scalar &minAlpha)
-    {
+                        const Scalar &minAlpha) {
       const Scalar dfp(gradx0.dot(p));
       const Scalar c1dfp(c1*dfp);
       const Scalar c2dfp(c2*dfp);
@@ -245,14 +241,14 @@ namespace stan {
       int retCode = 0, nits = 0, ret;
 
       while (1) {
-        x1.noalias() = x0 + alpha1*p;
-        ret = func(x1,f1,gradx1);
-        if (ret!=0) {
-          alpha1 = 0.5*(alpha0+alpha1);
+        x1.noalias() = x0 + alpha1 * p;
+        ret = func(x1, f1, gradx1);
+        if (ret != 0) {
+          alpha1 = 0.5 * (alpha0 + alpha1);
           continue;
         }
         newDFp = gradx1.dot(p);
-        if ((f1 > f0 + alpha*c1dfp) || (f1 >= prevF && nits > 0)) {
+        if ((f1 > f0 + alpha * c1dfp) || (f1 >= prevF && nits > 0)) {
           retCode = WolfLSZoom(alpha, x1, f1, gradx1,
                                func,
                                x0, f0, dfp,
@@ -279,7 +275,7 @@ namespace stan {
 
         alpha0 = alpha1;
         prevF = f1;
-        std::swap(prevDF,gradx1);
+        std::swap(prevDF, gradx1);
         prevDFp = newDFp;
 
         alpha1 *= 10.0;
@@ -292,4 +288,3 @@ namespace stan {
 }
 
 #endif
-

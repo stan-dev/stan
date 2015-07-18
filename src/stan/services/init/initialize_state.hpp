@@ -143,7 +143,8 @@ namespace stan {
         if (!boost::math::isfinite(init_log_prob)) {
           if (output)
             *output << "Rejecting initial value:" << std::endl
-                    << "  Log probability evaluates to log(0), i.e. negative infinity."
+                    << "  Log probability evaluates to log(0), "
+                    << "i.e. negative infinity."
                     << std::endl
                     << "  Stan can't start sampling from this initial value."
                     << std::endl;
@@ -153,7 +154,8 @@ namespace stan {
           if (!boost::math::isfinite(init_grad(i))) {
             if (output)
               *output << "Rejecting initial value:" << std::endl
-                      << "  Gradient evaluated at the initial value is not finite."
+                      << "  Gradient evaluated at the initial value "
+                      << "is not finite."
                       << std::endl
                       << "  Stan can't start sampling from this initial value."
                       << std::endl;
@@ -191,7 +193,8 @@ namespace stan {
        *                            right size and set to 0.
        * @param[in,out] model       the model. Side effects on model? I'm not
        *                            quite sure
-       * @param[in,out] base_rng    the random number generator. State may change.
+       * @param[in,out] base_rng    the random number generator.
+       *                            State may change.
        * @param[in,out] output      output stream for messages
        */
       template <class Model, class RNG>
@@ -241,20 +244,21 @@ namespace stan {
        *
        * @param[in]     source      a string that the context_factory can
        *                            interpret and provide a valid var_context
-       * @param[in]     R           a double to specify the range of random inits
+       * @param[in]     R           a double to specify the range of
+       *                            random inits
        * @param[out]    cont_params the initialized state. This should be the
        *                            right size and set to 0.
        * @param[in,out] model       the model. Side effects on model? I'm not
        *                            quite sure
-       * @param[in,out] base_rng    the random number generator. State may change.
+       * @param[in,out] base_rng    the random number generator.
+       *                            State may change.
        * @param[in,out] output      output stream for messages
        * @param[in,out] context_factory  an instantiated factory that implements
        *                            the concept of a context_factory. This has
        *                            one method that takes a string.
-       * @param[in]     enable_random_init if true, it allows partially specifying
-                                    inits, otherwise not
+       * @param[in]                 enable_random_init if true, it allows
+       *                            partially specifying inits, otherwise not
        */
-
       template <class ContextFactory, class Model, class RNG>
       bool initialize_state_source_and_random(const std::string& source,
                                               double R,
@@ -331,7 +335,8 @@ namespace stan {
        *                            right size and set to 0.
        * @param[in,out] model       the model. Side effects on model? I'm not
        *                            quite sure
-       * @param[in,out] base_rng    the random number generator. State may change.
+       * @param[in,out] base_rng    the random number generator.
+       *                            State may change.
        * @param[in,out] output      output stream for messages
        * @param[in,out] context_factory  an instantiated factory that implements
        *                            the concept of a context_factory. This has
@@ -391,20 +396,22 @@ namespace stan {
       /**
        * Creates the initial state.
        *
-       * @param[in]     init        init can either be "0", a number as a string,
-       *                            or a filename.
+       * @param[in]     init        init can either be "0", a number as a
+       *                            string, or a filename.
        * @param[out]    cont_params the initialized state. This should be the
        *                            right size and set to 0.
        * @param[in,out] model       the model. Side effects on model? I'm not
        *                            quite sure
-       * @param[in,out] base_rng    the random number generator. State may change.
+       * @param[in,out] base_rng    the random number generator.
+       *                            State may change.
        * @param[in,out] output      output stream for messages
        * @param[in,out] context_factory  an instantiated factory that implements
        *                            the concept of a context_factory. This has
        *                            one method that takes a string.
        * @param[in] enable_random_init true or false.
-       * @param[in] R               a double for the range of generating random inits.
-       *                            it's used for randomly generating partial inits
+       * @param[in] R               a double for the range of generating
+       *                            random inits. it's used for randomly
+       *                            generating partial inits
        */
       template <class ContextFactory, class Model, class RNG>
       bool initialize_state(const std::string& init,

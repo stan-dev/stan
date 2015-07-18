@@ -1,8 +1,10 @@
 #ifndef STAN_INTERFACE_RECORDER_MESSAGES_HPP
 #define STAN_INTERFACE_RECORDER_MESSAGES_HPP
 
-#include <ostream>
 #include <stan/interface/recorder/recorder.hpp>
+#include <ostream>
+#include <string>
+#include <vector>
 
 namespace stan {
   namespace interface {

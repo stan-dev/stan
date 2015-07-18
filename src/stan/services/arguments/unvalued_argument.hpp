@@ -1,24 +1,23 @@
 #ifndef STAN_SERVICES_ARGUMENTS_UNVALUED_ARGUMENT_HPP
 #define STAN_SERVICES_ARGUMENTS_UNVALUED_ARGUMENT_HPP
-#include <iostream>
 
-#include <vector>
 #include <stan/services/arguments/argument.hpp>
+#include <iostream>
+#include <string>
+#include <vector>
 
 namespace stan {
-
   namespace services {
 
     class unvalued_argument: public argument {
-
     public:
-
       unvalued_argument()
         : _is_present(false) {}
 
       void print(std::ostream* s, const int depth, const std::string prefix) {}
 
-      void print_help(std::ostream* s, const int depth, const bool recurse = false) {
+      void print_help(std::ostream* s, const int depth,
+                      const bool recurse = false) {
         if (!s)
           return;
 
@@ -28,7 +27,6 @@ namespace stan {
         *s << indent << _name << std::endl;
         *s << indent << subindent << _description << std::endl;
         *s << std::endl;
-
       }
 
       bool parse_args(std::vector<std::string>& args, std::ostream* out,
@@ -45,7 +43,7 @@ namespace stan {
 
         _is_present = true;
         return true;
-      };
+      }
 
       bool is_present() {
         return _is_present;
@@ -55,6 +53,7 @@ namespace stan {
       bool _is_present;
     };
 
-  } // services
-} // stan
+  }  // services
+}  // stan
+
 #endif

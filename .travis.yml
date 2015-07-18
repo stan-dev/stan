@@ -1,5 +1,7 @@
 language: cpp
 
+sudo: false
+
 os:
   - linux
   - osx

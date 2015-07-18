@@ -151,7 +151,8 @@ namespace stan {
         lp
           = model
           .template log_prob<true,
-                             jacobian_adjust_transform>(ad_params_r, params_i, msgs)
+                             jacobian_adjust_transform>(ad_params_r,
+                                                        params_i, msgs)
           .val();
       } catch (std::exception &ex) {
         stan::math::recover_memory();
@@ -184,7 +185,7 @@ namespace stan {
                          std::ostream* msgs = 0) {
       using std::vector;
       using stan::math::var;
-      
+
       Eigen::Matrix<var, Eigen::Dynamic, 1> ad_params_r(params_r.size());
       for (size_t i = 0; i < model.num_params_r(); ++i) {
         stan::math::var var_i(params_r[i]);

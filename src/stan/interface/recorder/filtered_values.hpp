@@ -1,10 +1,12 @@
 #ifndef STAN_INTERFACE_RECORDER_FILTERED_VALUES_HPP
 #define STAN_INTERFACE_RECORDER_FILTERED_VALUES_HPP
 
-#include <ostream>
-#include <stdexcept>
 #include <stan/interface/recorder/recorder.hpp>
 #include <stan/interface/recorder/values.hpp>
+#include <ostream>
+#include <stdexcept>
+#include <string>
+#include <vector>
 
 namespace stan {
   namespace interface {

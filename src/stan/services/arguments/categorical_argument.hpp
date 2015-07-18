@@ -1,17 +1,15 @@
 #ifndef STAN_SERVICES_ARGUMENTS_CATEGORICAL_ARGUMENT_HPP
 #define STAN_SERVICES_ARGUMENTS_CATEGORICAL_ARGUMENT_HPP
 
-#include <vector>
 #include <stan/services/arguments/argument.hpp>
+#include <string>
+#include <vector>
 
 namespace stan {
-
   namespace services {
 
     class categorical_argument: public argument {
-
     public:
-
       virtual ~categorical_argument() {
         for (std::vector<argument*>::iterator it = _subarguments.begin();
              it != _subarguments.end(); ++it) {
@@ -33,7 +31,6 @@ namespace stan {
       }
 
       void print_help(std::ostream* s, const int depth, const bool recurse) {
-
         if (!s)
           return;
 
@@ -58,16 +55,13 @@ namespace stan {
                  it != _subarguments.end(); ++it)
               (*it)->print_help(s, depth + 1, true);
           }
-        }
-        else {
+        } else {
           *s << std::endl;
         }
-
       }
 
       bool parse_args(std::vector<std::string>& args, std::ostream* out,
                       std::ostream* err, bool& help_flag) {
-
         bool good_arg = true;
         bool valid_arg = true;
 
@@ -99,7 +93,7 @@ namespace stan {
             valid_arg = true;
           for (std::vector<argument*>::iterator it = _subarguments.begin();
                it != _subarguments.end(); ++it) {
-            if ( (*it)->name() == cat_name) {
+            if ((*it)->name() == cat_name) {
               args.pop_back();
               valid_arg &= (*it)->parse_args(args, out, err, help_flag);
               good_arg = true;
@@ -114,7 +108,7 @@ namespace stan {
           }
         }
         return valid_arg;
-      };
+      }
 
       virtual void probe_args(argument* base_arg, std::stringstream& s) {
         for (std::vector<argument*>::iterator it = _subarguments.begin();
@@ -126,14 +120,12 @@ namespace stan {
       void find_arg(std::string name,
                     std::string prefix,
                     std::vector<std::string>& valid_paths) {
-
         argument::find_arg(name, prefix, valid_paths);
 
         prefix += _name + " ";
         for (std::vector<argument*>::iterator it = _subarguments.begin();
              it != _subarguments.end(); ++it)
           (*it)->find_arg(name, prefix, valid_paths);
-
       }
 
       std::vector<argument*>& subarguments() {
@@ -149,13 +141,10 @@ namespace stan {
       }
 
     protected:
-
       std::vector<argument*> _subarguments;
-
     };
 
-  } // services
-
-} // stan
+  }  // services
+}  // stan
 
 #endif
