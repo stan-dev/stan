@@ -17,7 +17,7 @@ namespace stan {
   namespace services {
     namespace optimization {
 
-      template<typename ModelT,typename BFGSOptimizerT,typename RNGT,
+      template<typename ModelT, typename BFGSOptimizerT, typename RNGT,
                typename StartIterationCallback>
       int do_bfgs_optimize(ModelT &model, BFGSOptimizerT &bfgs,
                            RNGT &base_rng,
@@ -32,7 +32,8 @@ namespace stan {
         lp = bfgs.logp();
 
         if (notice_stream)
-          (*notice_stream) << "initial log joint probability = " << lp << std::endl;
+          *notice_stream << "initial log joint probability = "
+                         << lp << std::endl;
         if (output_stream && save_iterations) {
           io::write_iteration(*output_stream, model, base_rng,
                               lp, cont_vector, disc_vector, output_stream);
@@ -57,7 +58,10 @@ namespace stan {
           lp = bfgs.logp();
           bfgs.params_r(cont_vector);
 
-          if (notice_stream && (io::do_print(bfgs.iter_num(), ret != 0 || !bfgs.note().empty(),refresh))) {
+          if (notice_stream
+              && (io::do_print(bfgs.iter_num(),
+                               ret != 0 || !bfgs.note().empty(),
+                               refresh))) {
             (*notice_stream) << " " << std::setw(7) << bfgs.iter_num() << " ";
             (*notice_stream) << " " << std::setw(12) << std::setprecision(6)
                       << lp << " ";
@@ -84,11 +88,12 @@ namespace stan {
         int return_code;
         if (ret >= 0) {
           if (notice_stream)
-            (*notice_stream) << "Optimization terminated normally: " << std::endl;
+            *notice_stream << "Optimization terminated normally: " << std::endl;
           return_code = stan::services::error_codes::OK;
         } else {
           if (notice_stream)
-            (*notice_stream) << "Optimization terminated with error: " << std::endl;
+            *notice_stream << "Optimization terminated with error: "
+                           << std::endl;
           return_code = stan::services::error_codes::SOFTWARE;
         }
         if (notice_stream)
@@ -101,4 +106,3 @@ namespace stan {
   }
 }
 #endif
-
