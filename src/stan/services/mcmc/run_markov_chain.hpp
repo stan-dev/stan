@@ -4,13 +4,15 @@
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/io/mcmc_writer.hpp>
 #include <stan/services/mcmc/print_progress.hpp>
+#include <string>
 
 namespace stan {
   namespace services {
     namespace mcmc {
 
       template <class Model, class RNG, class StartTransitionCallback,
-                class SampleRecorder, class DiagnosticRecorder, class MessageRecorder>
+                class SampleRecorder, class DiagnosticRecorder,
+                class MessageRecorder>
       void run_markov_chain(stan::mcmc::base_mcmc* sampler,
                             const int num_iterations,
                             const int start,
@@ -19,9 +21,9 @@ namespace stan {
                             const int refresh,
                             const bool save,
                             const bool warmup,
-                            stan::io::mcmc_writer <Model,
-                            SampleRecorder, DiagnosticRecorder, MessageRecorder>&
-                            writer,
+                            stan::io::mcmc_writer<
+                               Model, SampleRecorder,
+                               DiagnosticRecorder, MessageRecorder>& writer,
                             stan::mcmc::sample& init_s,
                             Model& model,
                             RNG& base_rng,
@@ -40,9 +42,7 @@ namespace stan {
             writer.write_sample_params(base_rng, init_s, *sampler, model);
             writer.write_diagnostic_params(init_s, sampler);
           }
-
         }
-
       }
 
     }
