@@ -40,14 +40,14 @@ namespace stan {
                      std::ostream* print_stream) const;
     protected:
       void write_error_msg_(std::ostream* error_msgs,
-                            const std::exception& e) {
+                            const std::exception& e) const {
         if (!error_msgs) {
           return;
         }
 
         *error_msgs
           << std::endl
-          << "Informational Message: The current gradient evaluation
+          << "Informational Message: The current gradient evaluation"
           << "of the ELBO is ignored because of the following issue:"
           << std::endl
           << e.what() << std::endl

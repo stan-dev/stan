@@ -268,7 +268,7 @@ namespace stan {
           try {
             stan::model::gradient(m, zeta, tmp_lp, tmp_mu_grad, print_stream);
           } catch (std::exception& e) {
-            this->write_error_msg(print_stream_, e);
+            this->write_error_msg_(print_stream, e);
             i -= 1;
           }
 

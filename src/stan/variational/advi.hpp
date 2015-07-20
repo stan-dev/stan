@@ -369,14 +369,14 @@ namespace stan {
       std::ostream* diag_stream_;
 
       void write_error_msg_(std::ostream* error_msgs,
-                            const std::exception& e) {
+                            const std::exception& e) const {
         if (!error_msgs) {
           return;
         }
 
         *error_msgs
           << std::endl
-          << "Informational Message: The current sample evaluation
+          << "Informational Message: The current sample evaluation"
           << "of the ELBO is ignored because of the following issue:"
           << std::endl
           << e.what() << std::endl
