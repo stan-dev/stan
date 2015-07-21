@@ -88,13 +88,24 @@ private:
   Eigen::VectorXd cont_params_;
 };
 
-
 TEST_F(advi_test, hier_logistic_constraint_meanfield) {
   EXPECT_EQ(0, advi_->run(1, 2e4));
   SUCCEED() << "expecting it to compile and run without problems";
+  EXPECT_NE("", output_stream_.str());
+  double lp;
+  std::string line;
+  while (std::getline(output_stream_, line)) {
+    std::stringstream line_ss(line);
+    line_ss >> lp;
+    EXPECT_FALSE(std::fabs(lp) < 0.0001)
+      << "lp (" << lp << ") should not be 0.0";
+  }
+  SUCCEED() << "expecting it to output values";
 }
 
 TEST_F(advi_test, hier_logistic_constraint_meanfield_no_streams) {
   EXPECT_EQ(0, advi_null_streams_->run(1, 2e4));
   SUCCEED() << "expecting it to compile and run without problems";
+  EXPECT_EQ("", output_stream_.str());
+  SUCCEED() << "expecting it to not output values";
 }
