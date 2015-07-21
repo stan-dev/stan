@@ -380,7 +380,7 @@ namespace stan {
 
         *error_msgs
           << std::endl
-          << "Informational Message: The current sample evaluation"
+          << "Informational Message: The current sample evaluation "
           << "of the ELBO is ignored because of the following issue:"
           << std::endl
           << e.what() << std::endl

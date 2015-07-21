@@ -267,17 +267,18 @@ namespace stan {
 
           try {
             stan::model::gradient(m, zeta, tmp_lp, tmp_mu_grad, print_stream);
+            stan::math::check_not_nan(function, "Gradient of mu", tmp_mu_grad);
+
+            // Update gradient parameters
+            mu_grad += tmp_mu_grad;
+            for (int ii = 0; ii < dimension_; ++ii) {
+              for (int jj = 0; jj <= ii; ++jj) {
+                L_grad(ii, jj) += tmp_mu_grad(ii) * eta(jj);
+              }
+            }
           } catch (std::exception& e) {
             this->write_error_msg_(print_stream, e);
             i -= 1;
-          }
-
-          // Update gradient parameters
-          mu_grad += tmp_mu_grad;
-          for (int ii = 0; ii < dimension_; ++ii) {
-            for (int jj = 0; jj <= ii; ++jj) {
-              L_grad(ii, jj) += tmp_mu_grad(ii) * eta(jj);
-            }
           }
         }
         mu_grad /= static_cast<double>(n_monte_carlo_grad);

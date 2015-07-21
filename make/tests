@@ -167,9 +167,9 @@ src/test/unit/variational/advi_univar_no_constraint_test.cpp: src/test/test-mode
 src/test/unit/variational/advi_univar_with_constraint_test.cpp: src/test/test-models/good/variational/univariate_with_constraint.hpp
 src/test/unit/variational/advi_multivar_no_constraint_test.cpp: src/test/test-models/good/variational/multivariate_no_constraint.hpp
 src/test/unit/variational/advi_multivar_with_constraint_test.cpp: src/test/test-models/good/variational/multivariate_with_constraint.hpp
+src/test/unit/variational/gradient_warn_test.cpp: src/test/test-models/good/variational/gradient_warn.hpp
 src/test/unit/variational/hier_logistic_test.cpp: src/test/test-models/good/variational/hier_logistic.hpp
 src/test/unit/variational/hier_logistic_cp_test.cpp: src/test/test-models/good/variational/hier_logistic_cp.hpp
-src/test/unit/variational/advi_test.cpp: src/test/test-models/good/variational/hier_logistic.hpp
 
 ##
 # Compile models depends on every model within

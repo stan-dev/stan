@@ -253,14 +253,15 @@ namespace stan {
 
           try {
             stan::model::gradient(m, zeta, tmp_lp, tmp_mu_grad, print_stream);
+            stan::math::check_not_nan(function, "Gradient of mu", tmp_mu_grad);
+
+            // Update gradient parameters
+            mu_grad += tmp_mu_grad;
+            omega_grad.array() += tmp_mu_grad.array().cwiseProduct(eta.array());
           } catch (std::exception& e) {
             this->write_error_msg_(print_stream, e);
             i -= 1;
           }
-
-          // Update gradient parameters
-          mu_grad += tmp_mu_grad;
-          omega_grad.array() += tmp_mu_grad.array().cwiseProduct(eta.array());
         }
         mu_grad    /= static_cast<double>(n_monte_carlo_grad);
         omega_grad /= static_cast<double>(n_monte_carlo_grad);
