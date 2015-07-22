@@ -1,5 +1,5 @@
 <a href="http://mc-stan.org">
-<img src="https://github.com/stan-dev/stan/blob/master/logos/stanlogo-main.png?raw=true" alt="Stan Logo"/>
+<img src="https://raw.githubusercontent.com/stan-dev/logos/master/logo.png" alt="Stan Logo"/>
 </a>
 
 <b>Stan</b> is a C++ and R package providing
