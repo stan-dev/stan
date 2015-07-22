@@ -1,7 +1,10 @@
 #ifndef STAN_VARIATIONAL_ADVI_HPP
 #define STAN_VARIATIONAL_ADVI_HPP
 
+#include <stan/math/prim/scal/err/check_finite.hpp>
+#include <stan/math/prim/scal/err/check_not_nan.hpp>
 #include <stan/math/prim/scal/err/check_positive.hpp>
+#include <stan/math/prim/scal/err/check_size_match.hpp>
 
 #include <stan/model/util.hpp>
 
@@ -94,6 +97,9 @@ namespace stan {
        * @return   evidence lower bound (elbo)
        */
       double calc_ELBO(const Q& variational) const {
+        static const char* function =
+          "stan::variational::advi::calc_ELBO";
+
         double elbo = 0.0;
         double energy_i;
         int dim = variational.dimension();

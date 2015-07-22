@@ -12,8 +12,10 @@
 #include <stan/math/prim/mat/fun/value_of_rec.hpp>
 #include <stan/math/prim/scal/prob/normal_rng.hpp>
 
-#include <stan/math/prim/scal/err/check_size_match.hpp>
+#include <stan/math/prim/scal/err/check_finite.hpp>
 #include <stan/math/prim/scal/err/check_not_nan.hpp>
+#include <stan/math/prim/scal/err/check_positive.hpp>
+#include <stan/math/prim/scal/err/check_size_match.hpp>
 
 #include <stan/model/util.hpp>
 
