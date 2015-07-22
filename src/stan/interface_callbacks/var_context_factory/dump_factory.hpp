@@ -3,7 +3,6 @@
 
 #include <stan/interface_callbacks/var_context_factory/var_context_factory.hpp>
 #include <stan/io/dump.hpp>
-#include <stan/interface_callbacks/var_context_factory.hpp>
 #include <fstream>
 
 namespace stan {
