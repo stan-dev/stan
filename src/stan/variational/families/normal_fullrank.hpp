@@ -268,6 +268,7 @@ namespace stan {
           try {
             stan::model::gradient(m, zeta, tmp_lp, tmp_mu_grad, print_stream);
             stan::math::check_not_nan(function, "Gradient of mu", tmp_mu_grad);
+            stan::math::check_finite(function, "Gradient of mu", tmp_mu_grad);;
 
             // Update gradient parameters
             mu_grad += tmp_mu_grad;

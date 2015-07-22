@@ -104,6 +104,8 @@ namespace stan {
           try {
             energy_i = model_.template log_prob<false, true>(zeta,
                                                              print_stream_);
+            stan::math::check_not_nan(function, "energy_i", energy_i);
+            stan::math::check_finite(function, "energy_i", energy_i);
             elbo += energy_i;
           } catch (std::exception& e) {
             this->write_error_msg_(print_stream_, e);
