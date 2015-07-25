@@ -2,28 +2,28 @@
 #define STAN_SERVICES_ARGUMENTS_VALUED_ARGUMENT_HPP
 
 #include <stan/services/arguments/argument.hpp>
+#include <string>
 
 namespace stan {
-
   namespace services {
 
     class valued_argument: public argument {
-
     public:
-
-      virtual void print(std::ostream* s, const int depth, const std::string prefix) {
+      virtual void print(std::ostream* s, const int depth,
+                         const std::string prefix) {
         if (!s)
           return;
 
         std::string indent(compute_indent(depth), ' ');
 
         *s << prefix << indent << _name << " = " << print_value();
-        if(is_default())
+        if (is_default())
           *s << " (Default)";
         *s << std::endl;
       }
 
-      virtual void print_help(std::ostream* s, const int depth, const bool recurse = false) {
+      virtual void print_help(std::ostream* s, const int depth,
+                              const bool recurse = false) {
         if (!s)
           return;
 
@@ -32,10 +32,10 @@ namespace stan {
 
         *s << indent << _name << "=<" << _value_type << ">" << std::endl;
         *s << indent << subindent << _description << std::endl;
-        *s << indent << subindent << "Valid values:" << print_valid() << std::endl;
+        *s << indent << subindent << "Valid values:"
+           << print_valid() << std::endl;
         *s << indent << subindent << "Defaults to " << _default << std::endl;
         *s << std::endl;
-
       }
 
       virtual std::string print_value() = 0;
@@ -43,12 +43,11 @@ namespace stan {
       virtual bool is_default() = 0;
 
     protected:
-
       std::string _default;
       std::string _value_type;
-
     };
 
-  } // services
-} // stan
+  }  // services
+}  // stan
+
 #endif

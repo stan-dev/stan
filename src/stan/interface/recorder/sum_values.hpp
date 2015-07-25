@@ -1,14 +1,15 @@
 #ifndef STAN_INTERFACE_RECORDER_SUM_VALUES_HPP
 #define STAN_INTERFACE_RECORDER_SUM_VALUES_HPP
 
-#include <stdexcept>
 #include <stan/interface/recorder/recorder.hpp>
+#include <stdexcept>
+#include <string>
+#include <vector>
 
 namespace stan {
   namespace interface {
     namespace recorder {
       class sum_values: public recorder {
-
       public:
         explicit sum_values(const size_t N)
           : N_(N), m_(0), skip_(0), sum_(N_, 0.0) { }

@@ -13,7 +13,6 @@ namespace stan {
       template<class Sampler>
       bool init_static_hmc(stan::mcmc::base_mcmc* sampler,
                            stan::services::argument* algorithm) {
-
         stan::services::categorical_argument* hmc
           = dynamic_cast<stan::services::categorical_argument*>
           (algorithm->arg("hmc"));
@@ -29,9 +28,11 @@ namespace stan {
           = dynamic_cast<stan::services::real_argument*>
           (hmc->arg("stepsize_jitter"))->value();
         double int_time
-          = dynamic_cast<stan::services::real_argument*>(base->arg("int_time"))->value();
+          = dynamic_cast<stan::services::real_argument*>(base->arg("int_time"))
+          ->value();
 
-        dynamic_cast<Sampler*>(sampler)->set_nominal_stepsize_and_T(epsilon, int_time);
+        dynamic_cast<Sampler*>(sampler)
+          ->set_nominal_stepsize_and_T(epsilon, int_time);
         dynamic_cast<Sampler*>(sampler)->set_stepsize_jitter(epsilon_jitter);
 
         return true;

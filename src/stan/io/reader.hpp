@@ -313,7 +313,8 @@ namespace stan {
        * @return Eigen::Matrix made up of the next scalars.
        */
       inline matrix_t matrix(size_t m, size_t n) {
-        if (m == 0 || n == 0) return matrix_t(m,n);
+        if (m == 0 || n == 0)
+          return matrix_t(m, n);
         return map_matrix_t(&scalar_ptr_increment(m*n), m, n);
       }
 
@@ -328,7 +329,8 @@ namespace stan {
        * @return Matrix made up of the next scalars.
        */
       inline matrix_t matrix_constrain(size_t m, size_t n) {
-        if (m == 0 || n == 0) return matrix_t(m,n);
+        if (m == 0 || n == 0)
+          return matrix_t(m, n);
         return map_matrix_t(&scalar_ptr_increment(m*n), m, n);
       }
 
@@ -345,7 +347,8 @@ namespace stan {
        * @return Matrix made up of the next scalars.
        */
       inline matrix_t matrix_constrain(size_t m, size_t n, T& /*lp*/) {
-        if (m == 0 || n == 0) return matrix_t(m,n);
+        if (m == 0 || n == 0)
+          return matrix_t(m, n);
         return map_matrix_t(&scalar_ptr_increment(m*n), m, n);
       }
 

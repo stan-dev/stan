@@ -7,15 +7,11 @@
 #include <stan/services/arguments/arg_nuts.hpp>
 
 namespace stan {
-
   namespace services {
 
     class arg_engine: public list_argument {
-
     public:
-
       arg_engine() {
-
         _name = "engine";
         _description = "Engine for Hamiltonian Monte Carlo";
 
@@ -24,14 +20,11 @@ namespace stan {
 
         _default_cursor = 1;
         _cursor = _default_cursor;
-
       }
-
     };
 
-  } // services
-
-} // stan
+  }  // services
+}  // stan
 
 #endif
 

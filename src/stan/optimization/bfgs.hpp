@@ -1,20 +1,19 @@
 #ifndef STAN_OPTIMIZATION_BFGS_HPP
 #define STAN_OPTIMIZATION_BFGS_HPP
 
-#include <cmath>
-#include <cstdlib>
-#include <string>
-#include <limits>
-
-#include <boost/math/special_functions/fpclassify.hpp>
-
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>
 #include <stan/model/util.hpp>
-
 #include <stan/optimization/bfgs_linesearch.hpp>
 #include <stan/optimization/bfgs_update.hpp>
 #include <stan/optimization/lbfgs_update.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
+#include <algorithm>
+#include <cmath>
+#include <cstdlib>
+#include <limits>
+#include <string>
+#include <vector>
 
 namespace stan {
   namespace optimization {
@@ -72,8 +71,8 @@ namespace stan {
              typename Scalar = double, int DimAtCompile = Eigen::Dynamic>
     class BFGSMinimizer {
     public:
-      typedef Eigen::Matrix<Scalar,DimAtCompile,1> VectorT;
-      typedef Eigen::Matrix<Scalar,DimAtCompile,DimAtCompile> HessianT;
+      typedef Eigen::Matrix<Scalar, DimAtCompile, 1> VectorT;
+      typedef Eigen::Matrix<Scalar, DimAtCompile, DimAtCompile> HessianT;
 
     protected:
       FunctorType &_func;
@@ -103,7 +102,7 @@ namespace stan {
       Scalar prev_step_size() const { return _pk_1.norm()*_alphak_1; }
 
       inline Scalar rel_grad_norm() const {
-        return -_pk.dot(_gk) / std::max(std::fabs(_fk),_conv_opts.fScale);
+        return -_pk.dot(_gk) / std::max(std::fabs(_fk), _conv_opts.fScale);
       }
       inline Scalar rel_obj_decrease() const {
         return std::fabs(_fk_1 - _fk) / std::max(std::fabs(_fk_1),
@@ -118,23 +117,30 @@ namespace stan {
       const std::string &note() const { return _note; }
 
       std::string get_code_string(int retCode) {
-        switch(retCode) {
+        switch (retCode) {
           case TERM_SUCCESS:
             return std::string("Successful step completed");
           case TERM_ABSF:
-            return std::string("Convergence detected: absolute change in objective function was below tolerance");
+            return std::string("Convergence detected: absolute change "
+                               "in objective function was below tolerance");
           case TERM_RELF:
-            return std::string("Convergence detected: relative change in objective function was below tolerance");
+            return std::string("Convergence detected: relative change "
+                               "in objective function was below tolerance");
           case TERM_ABSGRAD:
-            return std::string("Convergence detected: gradient norm is below tolerance");
+            return std::string("Convergence detected: "
+                               "gradient norm is below tolerance");
           case TERM_RELGRAD:
-            return std::string("Convergence detected: relative gradient magnitude is below tolerance");
+            return std::string("Convergence detected: relative "
+                               "gradient magnitude is below tolerance");
           case TERM_ABSX:
-            return std::string("Convergence detected: absolute parameter change was below tolerance");
+            return std::string("Convergence detected: "
+                               "absolute parameter change was below tolerance");
           case TERM_MAXIT:
-            return std::string("Maximum number of iterations hit, may not be at an optima");
+            return std::string("Maximum number of iterations hit, "
+                               "may not be at an optima");
           case TERM_LSFAIL:
-            return std::string("Line search failed to achieve a sufficient decrease, no more progress can be made");
+            return std::string("Line search failed to achieve a sufficient "
+                               "decrease, no more progress can be made");
           default:
             return std::string("Unknown termination code");
         }
@@ -145,7 +151,7 @@ namespace stan {
       void initialize(const VectorT &x0) {
         int ret;
         _xk = x0;
-        ret = _func(_xk,_fk,_gk);
+        ret = _func(_xk, _fk, _gk);
         if (ret) {
           throw std::runtime_error("Error evaluating initial BFGS point.");
         }
@@ -166,8 +172,7 @@ namespace stan {
         if (_itNum == 1) {
           resetB = 1;
           _note = "";
-        }
-        else {
+        } else {
           resetB = 0;
           _note = "";
         }
@@ -186,9 +191,9 @@ namespace stan {
                                                          _alphak_1,
                                                          _fk - _fk_1,
                                                          _gk.dot(_pk_1),
-                                                         _ls_opts.minAlpha, 1.0));
-          }
-          else {
+                                                         _ls_opts.minAlpha,
+                                                         1.0));
+          } else {
             // On the first step (or, after a reset) use the default step size
             _alpha0 = _alpha = _ls_opts.alpha0;
           }
@@ -202,24 +207,23 @@ namespace stan {
           if (retCode) {
             // Line search failed...
             if (resetB) {
-              // did a Hessian reset and it still failed, and nothing left to try
+              // did a Hessian reset and it still failed,
+              // and nothing left to try
               retCode = TERM_LSFAIL;
               return retCode;
-            }
-            else {
+            } else {
               // try resetting the Hessian approximation
               resetB = 2;
               _note += "LS failed, Hessian reset";
               continue;
             }
-          }
-          else {
+          } else {
             break;
           }
         }
 
         // Swap things so that k is the most recent iterate
-        std::swap(_fk,_fk_1);
+        std::swap(_fk, _fk_1);
         _xk.swap(_xk_1);
         _gk.swap(_gk_1);
         _pk.swap(_pk_1);
@@ -234,40 +238,41 @@ namespace stan {
         if (resetB) {
           // If the QN approximation was reset, automatically scale it
           // and update the step-size accordingly
-          Scalar B0fact = _qn.update(yk,sk,true);
+          Scalar B0fact = _qn.update(yk, sk, true);
           _pk_1 /= B0fact;
           _alphak_1 = _alpha*B0fact;
-        }
-        else {
-          _qn.update(yk,sk);
+        } else {
+          _qn.update(yk, sk);
           _alphak_1 = _alpha;
         }
 
 
         // Compute search direction for next step
-        _qn.search_direction(_pk,_gk);
+        _qn.search_direction(_pk, _gk);
 
         // Check for convergence
         if (std::fabs(_fk_1 - _fk) < _conv_opts.tolAbsF) {
-          retCode = TERM_ABSF; // Objective function improvement wasn't sufficient
-        }
-        else if (gradNorm < _conv_opts.tolAbsGrad) {
-          retCode = TERM_ABSGRAD; // Gradient norm was below threshold
-        }
-        else if (stepNorm < _conv_opts.tolAbsX) {
-          retCode = TERM_ABSX; // Change in x was too small
-        }
-        else if (_itNum >= _conv_opts.maxIts) {
-          retCode = TERM_MAXIT; // Max number of iterations hit
-        }
-        else if (rel_obj_decrease() < _conv_opts.tolRelF*std::numeric_limits<Scalar>::epsilon()) {
-          retCode = TERM_RELF; // Relative improvement in objective function wasn't sufficient
-        }
-        else if (rel_grad_norm() < _conv_opts.tolRelGrad*std::numeric_limits<Scalar>::epsilon()) {
-          retCode = TERM_RELGRAD; // Relative gradient norm was below threshold
-        }
-        else {
-          retCode = TERM_SUCCESS; // Step was successful more progress to be made
+          // Objective function improvement wasn't sufficient
+          retCode = TERM_ABSF;
+        } else if (gradNorm < _conv_opts.tolAbsGrad) {
+          retCode = TERM_ABSGRAD;  // Gradient norm was below threshold
+        } else if (stepNorm < _conv_opts.tolAbsX) {
+          retCode = TERM_ABSX;  // Change in x was too small
+        } else if (_itNum >= _conv_opts.maxIts) {
+          retCode = TERM_MAXIT;  // Max number of iterations hit
+        } else if (rel_obj_decrease()
+                 < _conv_opts.tolRelF
+                 * std::numeric_limits<Scalar>::epsilon()) {
+          // Relative improvement in objective function wasn't sufficient
+          retCode = TERM_RELF;
+        } else if (rel_grad_norm()
+                   < _conv_opts.tolRelGrad
+                   * std::numeric_limits<Scalar>::epsilon()) {
+          // Relative gradient norm was below threshold
+          retCode = TERM_RELGRAD;
+        } else {
+          // Step was successful more progress to be made
+          retCode = TERM_SUCCESS;
         }
 
         return retCode;
@@ -276,7 +281,8 @@ namespace stan {
       int minimize(VectorT &x0) {
         int retcode;
         initialize(x0);
-        while (!(retcode = step()));
+        while (!(retcode = step()))
+          continue;
         x0 = _xk;
         return retcode;
       }
@@ -309,13 +315,13 @@ namespace stan {
       : _model(model), _params_i(params_i), _msgs(msgs), _fevals(0) {}
 
       size_t fevals() const { return _fevals; }
-      int operator()(const Eigen::Matrix<double,Eigen::Dynamic,1> &x,
+      int operator()(const Eigen::Matrix<double, Eigen::Dynamic, 1> &x,
                      double &f) {
         using Eigen::Matrix;
         using Eigen::Dynamic;
         using stan::math::index_type;
         using stan::model::log_prob_propto;
-        typedef typename index_type<Matrix<double,Dynamic,1> >::type idx_t;
+        typedef typename index_type<Matrix<double, Dynamic, 1> >::type idx_t;
 
         _x.resize(x.size());
         for (idx_t i = 0; i < x.size(); i++)
@@ -329,23 +335,23 @@ namespace stan {
           return 1;
         }
 
-        if (boost::math::isfinite(f))
+        if (boost::math::isfinite(f)) {
           return 0;
-        else {
+        } else {
           if (_msgs)
             *_msgs << "Error evaluating model log probability: "
                       "Non-finite function evaluation." << std::endl;
           return 2;
         }
       }
-      int operator()(const Eigen::Matrix<double,Eigen::Dynamic,1> &x,
+      int operator()(const Eigen::Matrix<double, Eigen::Dynamic, 1> &x,
                      double &f,
-                     Eigen::Matrix<double,Eigen::Dynamic,1> &g) {
+                     Eigen::Matrix<double, Eigen::Dynamic, 1> &g) {
         using Eigen::Matrix;
         using Eigen::Dynamic;
         using stan::math::index_type;
         using stan::model::log_prob_grad;
-        typedef typename index_type<Matrix<double,Dynamic,1> >::type idx_t;
+        typedef typename index_type<Matrix<double, Dynamic, 1> >::type idx_t;
 
         _x.resize(x.size());
         for (idx_t i = 0; i < x.size(); i++)
@@ -354,7 +360,7 @@ namespace stan {
         _fevals++;
 
         try {
-          f = - log_prob_grad<true,false>(_model, _x, _params_i, _g, _msgs);
+          f = - log_prob_grad<true, false>(_model, _x, _params_i, _g, _msgs);
         } catch (const std::exception& e) {
           if (_msgs)
             (*_msgs) << e.what() << std::endl;
@@ -372,30 +378,34 @@ namespace stan {
           g[i] = -_g[i];
         }
 
-        if (boost::math::isfinite(f))
+        if (boost::math::isfinite(f)) {
           return 0;
-        else {
+        } else {
           if (_msgs)
             *_msgs << "Error evaluating model log probability: "
-                               "Non-finite function evaluation."
+                   << "Non-finite function evaluation."
                    << std::endl;
           return 2;
         }
       }
-      int df(const Eigen::Matrix<double,Eigen::Dynamic,1> &x,
-             Eigen::Matrix<double,Eigen::Dynamic,1> &g) {
+      int df(const Eigen::Matrix<double, Eigen::Dynamic, 1> &x,
+             Eigen::Matrix<double, Eigen:: Dynamic, 1> &g) {
         double f;
-        return (*this)(x,f,g);
+        return (*this)(x, f, g);
       }
     };
 
     template<typename M, typename QNUpdateType, typename Scalar = double,
              int DimAtCompile = Eigen::Dynamic>
-    class BFGSLineSearch : public BFGSMinimizer<ModelAdaptor<M>,QNUpdateType,Scalar,DimAtCompile> {
+    class BFGSLineSearch
+      : public BFGSMinimizer<ModelAdaptor<M>, QNUpdateType,
+                             Scalar, DimAtCompile> {
     private:
       ModelAdaptor<M> _adaptor;
+
     public:
-      typedef BFGSMinimizer<ModelAdaptor<M>,QNUpdateType,Scalar,DimAtCompile> BFGSBase;
+      typedef BFGSMinimizer<ModelAdaptor<M>, QNUpdateType, Scalar, DimAtCompile>
+      BFGSBase;
       typedef typename BFGSBase::VectorT vector_t;
       typedef typename stan::math::index_type<vector_t>::type idx_t;
 
@@ -404,13 +414,12 @@ namespace stan {
                      const std::vector<int>& params_i,
                      std::ostream* msgs = 0)
         : BFGSBase(_adaptor),
-          _adaptor(model,params_i,msgs)
-      {
+          _adaptor(model, params_i, msgs) {
         initialize(params_r);
       }
 
       void initialize(const std::vector<double>& params_r) {
-        Eigen::Matrix<double,Eigen::Dynamic,1> x;
+        Eigen::Matrix<double, Eigen::Dynamic, 1> x;
         x.resize(params_r.size());
         for (size_t i = 0; i < params_r.size(); i++)
           x[i] = params_r[i];
