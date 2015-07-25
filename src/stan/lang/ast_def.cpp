@@ -482,6 +482,12 @@ namespace stan {
     function_signatures::function_signatures() {
 #include <stan/lang/function_signatures.h>  // NOLINT
     }
+    std::vector<function_signature_t>
+    function_signatures::sigs(const std::string& key) {
+      return sigs_map_[key];
+    }
+    
+
     std::set<std::string>
     function_signatures::key_set() const {
       using std::map;
