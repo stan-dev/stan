@@ -1,19 +1,19 @@
-#ifndef STAN_INTERFACE_RECORDER_FILTERED_VALUES_HPP
-#define STAN_INTERFACE_RECORDER_FILTERED_VALUES_HPP
+#ifndef STAN_INTERFACE_CALLBACKS_WRITER_FILTERED_VALUES_HPP
+#define STAN_INTERFACE_CALLBACKS_WRITER_FILTERED_VALUES_HPP
 
-#include <stan/interface/recorder/recorder.hpp>
-#include <stan/interface/recorder/values.hpp>
+#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/interface_callbacks/writer/values.hpp>
 #include <ostream>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
 namespace stan {
-  namespace interface {
-    namespace recorder {
+  namespace interface_callbacks {
+    namespace writer {
 
       template <class InternalVector>
-      class filtered_values: public recorder {
+      class filtered_values: public base_writer {
       private:
         size_t N_, M_, N_filter_;
         std::vector<size_t> filter_;
@@ -70,8 +70,8 @@ namespace stan {
           values_();
         }
 
-        bool is_recording() const {
-          return values_.is_recording();
+        bool is_writing() const {
+          return values_.is_writing();
         }
 
         const std::vector<InternalVector>& x() {

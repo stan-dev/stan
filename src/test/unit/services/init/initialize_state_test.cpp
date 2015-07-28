@@ -1,7 +1,7 @@
 #include <ostream>
 #include <stan/io/var_context.hpp>
 #include <stan/io/dump.hpp>
-#include <stan/interface/var_context_factory/var_context_factory.hpp>
+#include <stan/interface_callbacks/var_context_factory/var_context_factory.hpp>
 #include <stan/services/init/initialize_state.hpp>
 #include <stan/model/prob_grad.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
@@ -288,7 +288,7 @@ public:
 
 
 class mock_context_factory 
-  : public stan::interface::var_context_factory::var_context_factory<stan::io::dump> {
+  : public stan::interface_callbacks::var_context_factory::var_context_factory<stan::io::dump> {
 public:
   mock_context_factory() 
     : calls(0),

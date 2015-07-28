@@ -1,15 +1,15 @@
-#ifndef STAN_INTERFACE_RECORDER_SUM_VALUES_HPP
-#define STAN_INTERFACE_RECORDER_SUM_VALUES_HPP
+#ifndef STAN_INTERFACE_CALLBACKS_WRITER_SUM_VALUES_HPP
+#define STAN_INTERFACE_CALLBACKS_WRITER_SUM_VALUES_HPP
 
-#include <stan/interface/recorder/recorder.hpp>
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
 namespace stan {
-  namespace interface {
-    namespace recorder {
-      class sum_values: public recorder {
+  namespace interface_callbacks {
+    namespace writer {
+      class sum_values: public base_writer {
       public:
         explicit sum_values(const size_t N)
           : N_(N), m_(0), skip_(0), sum_(N_, 0.0) { }
@@ -61,7 +61,7 @@ namespace stan {
         /**
          * Indicator function for whether the instance is recording.
          */
-        bool is_recording() const {
+        bool is_writing() const {
           return true;
         }
 

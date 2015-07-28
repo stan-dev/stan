@@ -1,15 +1,15 @@
-#ifndef STAN_INTERFACE_RECORDER_MESSAGES_HPP
-#define STAN_INTERFACE_RECORDER_MESSAGES_HPP
+#ifndef STAN_INTERFACE_CALLBACKS_WRITER_MESSAGES_HPP
+#define STAN_INTERFACE_CALLBACKS_WRITER_MESSAGES_HPP
 
-#include <stan/interface/recorder/recorder.hpp>
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <ostream>
 #include <string>
 #include <vector>
 
 namespace stan {
-  namespace interface {
-    namespace recorder {
-      class messages: public recorder {
+  namespace interface_callbacks {
+    namespace writer {
+      class messages: public base_writer {
       private:
         std::ostream *o_;
         const bool has_stream_;
@@ -39,7 +39,7 @@ namespace stan {
           *o_ << std::endl;
         }
 
-        bool is_recording() const {
+        bool is_writing() const {
           return has_stream_;
         }
       };

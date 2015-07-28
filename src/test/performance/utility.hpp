@@ -115,15 +115,15 @@
 #include <stan/services/optimization/do_bfgs_optimize.hpp>
 
 // FIXME: These belong to the interfaces and should be templated out here
-#include <stan/interface/callback/noop_callback.hpp>
-#include <stan/interface/var_context_factory/dump_factory.hpp>
-#include <stan/interface/recorder/csv.hpp>
-#include <stan/interface/recorder/filtered_values.hpp>
-#include <stan/interface/recorder/messages.hpp>
-#include <stan/interface/recorder/noop.hpp>
-#include <stan/interface/recorder/recorder.hpp>
-#include <stan/interface/recorder/sum_values.hpp>
-#include <stan/interface/recorder/values.hpp>
+#include <stan/interface_callbacks/callback/noop_callback.hpp>
+#include <stan/interface_callbacks/var_context_factory/dump_factory.hpp>
+#include <stan/interface_callbacks/writer/csv.hpp>
+#include <stan/interface_callbacks/writer/filtered_values.hpp>
+#include <stan/interface_callbacks/writer/messages.hpp>
+#include <stan/interface_callbacks/writer/noop.hpp>
+#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/interface_callbacks/writer/sum_values.hpp>
+#include <stan/interface_callbacks/writer/values.hpp>
 
 #include <fstream>
 #include <iostream>
@@ -379,8 +379,8 @@ namespace stan {
         //dynamic_cast<stan::services::string_argument*>(
         //parser.arg("init"))->value();
 
-        interface::var_context_factory::dump_factory var_context_factory;
-        if (!services::init::initialize_state<interface::var_context_factory::dump_factory>
+        interface_callbacks::var_context_factory::dump_factory var_context_factory;
+        if (!services::init::initialize_state<interface_callbacks::var_context_factory::dump_factory>
             (init, cont_params, model, base_rng, &std::cout,
              var_context_factory))
           return stan::services::error_codes::SOFTWARE;
@@ -412,14 +412,15 @@ namespace stan {
                   << std::endl << std::endl;
         std::cout << std::endl;
 
-        interface::recorder::csv sample_recorder(output_stream, "# ");
-        interface::recorder::csv diagnostic_recorder(diagnostic_stream, "# ");
-        interface::recorder::messages message_recorder(&std::cout, "# ");
+        interface_callbacks::writer::csv sample_writer(output_stream, "# ");
+        interface_callbacks::writer::csv diagnostic_writer(diagnostic_stream, "# ");
+        interface_callbacks::writer::messages message_writer(&std::cout, "# ");
 
         stan::io::mcmc_writer<Model,
-                              interface::recorder::csv, interface::recorder::csv,
-                              interface::recorder::messages>
-          writer(sample_recorder, diagnostic_recorder, message_recorder, &std::cout);
+                              interface_callbacks::writer::csv,
+                              interface_callbacks::writer::csv,
+                              interface_callbacks::writer::messages>
+          writer(sample_writer, diagnostic_writer, message_writer, &std::cout);
 
         // Sampling parameters
         int num_thin = 1;
@@ -453,7 +454,7 @@ namespace stan {
           
         std::string prefix = "";
         std::string suffix = "\n";
-        interface::callback::noop_callback startTransitionCallback;
+        interface_callbacks::callback::noop_callback startTransitionCallback;
           
         // Warm-Up
         clock_t start = clock();
