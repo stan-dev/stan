@@ -16,6 +16,7 @@
 #include <stan/math/prim/mat/err/check_square.hpp>
 #include <stan/math/prim/mat/err/check_lower_triangular.hpp>
 #include <stan/math/prim/scal/err/check_finite.hpp>
+#include <stan/math/prim/scal/err/check_less.hpp>
 #include <stan/math/prim/scal/err/check_not_nan.hpp>
 #include <stan/math/prim/scal/err/check_positive.hpp>
 #include <stan/math/prim/scal/err/check_size_match.hpp>
@@ -258,6 +259,7 @@ namespace stan {
         Eigen::VectorXd tmp_mu_grad = Eigen::VectorXd::Zero(dimension_);
         Eigen::VectorXd eta = Eigen::VectorXd::Zero(dimension_);
         Eigen::VectorXd zeta = Eigen::VectorXd::Zero(dimension_);
+        int n_monte_carlo_drop = 0;
 
         // Naive Monte Carlo integration
         for (int i = 0; i < n_monte_carlo_grad; ++i) {
@@ -270,7 +272,7 @@ namespace stan {
           try {
             stan::model::gradient(m, zeta, tmp_lp, tmp_mu_grad, print_stream);
             stan::math::check_not_nan(function, "Gradient of mu", tmp_mu_grad);
-            stan::math::check_finite(function, "Gradient of mu", tmp_mu_grad);;
+            stan::math::check_finite(function, "Gradient of mu", tmp_mu_grad);
 
             // Update gradient parameters
             mu_grad += tmp_mu_grad;
@@ -282,6 +284,9 @@ namespace stan {
           } catch (std::exception& e) {
             this->write_error_msg_(print_stream, e);
             i -= 1;
+            n_monte_carlo_drop += 1;
+            stan::math::check_less(function, "n_monte_carlo_drop",
+              n_monte_carlo_drop, n_monte_carlo_grad);
           }
         }
         mu_grad /= static_cast<double>(n_monte_carlo_grad);

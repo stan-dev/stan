@@ -28,7 +28,7 @@ public:
 
     advi_meanfield_ = new stan::variational::advi<stan_model, stan::variational::normal_meanfield, rng_t>
       (*model_, cont_params_,
-       1, 100, 0.1,
+       2, 100, 0.1,
        base_rng_,
        100, 1,
        &print_stream_,
