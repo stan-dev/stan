@@ -29,7 +29,7 @@ EIGEN ?= lib/eigen_3.2.4
 BOOST ?= lib/boost_1.58.0
 GTEST ?= lib/gtest_1.7.0
 CPPLINT ?= lib/cpplint_4.45
-MATH ?= lib/stan_math_2.7.0
+MATH ?= lib/stan_math
 
 ##
 # Set default compiler options.
