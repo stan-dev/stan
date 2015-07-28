@@ -1,28 +1,20 @@
 #ifndef STAN_VARIATIONAL_ADVI_HPP
 #define STAN_VARIATIONAL_ADVI_HPP
 
-#include <stan/math/prim/scal/err/check_finite.hpp>
-#include <stan/math/prim/scal/err/check_not_nan.hpp>
-#include <stan/math/prim/scal/err/check_positive.hpp>
-#include <stan/math/prim/scal/err/check_size_match.hpp>
-
+#include <stan/math.hpp>
+#include <stan/io/dump.hpp>
 #include <stan/model/util.hpp>
-
 #include <stan/services/io/write_iteration_csv.hpp>
 #include <stan/services/io/write_iteration.hpp>
 #include <stan/services/error_codes.hpp>
-
 #include <stan/variational/families/normal_fullrank.hpp>
 #include <stan/variational/families/normal_meanfield.hpp>
-
-#include <stan/io/dump.hpp>
-
 #include <boost/circular_buffer.hpp>
-#include <ostream>
-#include <limits>
-#include <vector>
-#include <numeric>
 #include <algorithm>
+#include <limits>
+#include <numeric>
+#include <ostream>
+#include <vector>
 
 namespace stan {
 
