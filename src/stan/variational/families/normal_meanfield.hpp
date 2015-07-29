@@ -245,10 +245,11 @@ namespace stan {
         Eigen::VectorXd tmp_mu_grad = Eigen::VectorXd::Zero(dimension_);
         Eigen::VectorXd eta  = Eigen::VectorXd::Zero(dimension_);
         Eigen::VectorXd zeta = Eigen::VectorXd::Zero(dimension_);
-        int n_monte_carlo_drop = 0;
 
         // Naive Monte Carlo integration
-        for (int i = 0; i < n_monte_carlo_grad; ++i) {
+        int i = 0;
+        int n_monte_carlo_drop = 0;
+        while (i < n_monte_carlo_grad) {
           // Draw from standard normal and transform to real-coordinate space
           for (int d = 0; d < dimension_; ++d) {
             eta(d) = stan::math::normal_rng(0, 1, rng);
@@ -260,12 +261,11 @@ namespace stan {
             stan::math::check_not_nan(function, "Gradient of mu", tmp_mu_grad);
             stan::math::check_finite(function, "Gradient of mu", tmp_mu_grad);
 
-            // Update gradient parameters
             mu_grad += tmp_mu_grad;
             omega_grad.array() += tmp_mu_grad.array().cwiseProduct(eta.array());
+            i += 1;
           } catch (std::exception& e) {
             this->write_error_msg_(print_stream, e);
-            i -= 1;
             n_monte_carlo_drop += 1;
             stan::math::check_less(function, "n_monte_carlo_drop",
               n_monte_carlo_drop, n_monte_carlo_grad);

@@ -96,9 +96,10 @@ namespace stan {
         double energy_i;
         int dim = variational.dimension();
         Eigen::VectorXd zeta(dim);
-        int n_monte_carlo_drop = 0;
 
-        for (int i = 0; i < n_monte_carlo_elbo_; ++i) {
+        int i = 0;
+        int n_monte_carlo_drop = 0;
+        while (i < n_monte_carlo_elbo_) {
           zeta = variational.sample(rng_);
           try {
             energy_i = model_.template log_prob<false, true>(zeta,
@@ -106,9 +107,9 @@ namespace stan {
             stan::math::check_not_nan(function, "energy_i", energy_i);
             stan::math::check_finite(function, "energy_i", energy_i);
             elbo += energy_i;
+            i += 1;
           } catch (std::exception& e) {
             this->write_error_msg_(print_stream_, e);
-            i -= 1;
             n_monte_carlo_drop += 1;
             stan::math::check_less(function, "n_monte_carlo_drop",
               n_monte_carlo_drop, n_monte_carlo_elbo_);
