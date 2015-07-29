@@ -115,7 +115,7 @@
 #include <stan/services/optimization/do_bfgs_optimize.hpp>
 
 // FIXME: These belong to the interfaces and should be templated out here
-#include <stan/interface_callbacks/callback/noop_callback.hpp>
+#include <stan/interface_callbacks/callback/noop.hpp>
 #include <stan/interface_callbacks/var_context_factory/dump_factory.hpp>
 #include <stan/interface_callbacks/writer/csv.hpp>
 #include <stan/interface_callbacks/writer/filtered_values.hpp>
