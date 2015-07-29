@@ -80,7 +80,7 @@ namespace stan {
      * the specified exception, adding the specified line number to
      * the specified exception's message.
      *
-     * @parem[in] e Original exception.
+     * @param[in] e Original exception.
      * @param[in] line Line number in Stan source program where
      * exception originated.
      */

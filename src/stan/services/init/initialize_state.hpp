@@ -256,8 +256,6 @@ namespace stan {
        * @param[in,out] context_factory  an instantiated factory that implements
        *                            the concept of a context_factory. This has
        *                            one method that takes a string.
-       * @param[in]                 enable_random_init if true, it allows
-       *                            partially specifying inits, otherwise not
        */
       template <class ContextFactory, class Model, class RNG>
       bool initialize_state_source_and_random(const std::string& source,
@@ -341,6 +339,10 @@ namespace stan {
        * @param[in,out] context_factory  an instantiated factory that implements
        *                            the concept of a context_factory. This has
        *                            one method that takes a string.
+       * @param[in] enable_random_init true or false
+       * @param[in] R               a double for the range of generating
+       *                            random inits. it's used for randomly
+       *                            generating partial inits
        */
       template <class ContextFactory, class Model, class RNG>
       bool initialize_state_source(const std::string source,
@@ -409,7 +411,7 @@ namespace stan {
        *                            the concept of a context_factory. This has
        *                            one method that takes a string.
        * @param[in] enable_random_init true or false.
-       * @param[in] R               a double for the range of generating
+       * @param[in] init_r          a double for the range of generating
        *                            random inits. it's used for randomly
        *                            generating partial inits
        */
