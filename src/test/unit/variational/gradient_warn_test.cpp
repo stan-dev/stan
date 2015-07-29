@@ -20,7 +20,7 @@ public:
 
     model_ = new stan_model(data_var_context, &model_stream_);
     cont_params_ = Eigen::VectorXd::Zero(model_->num_params_r());
-    base_rng_.seed(3021828106u);
+    base_rng_.seed(3021828106U);
     model_stream_.str("");
     print_stream_.str("");
     output_stream_.str("");
