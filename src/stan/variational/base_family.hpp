@@ -38,6 +38,7 @@ namespace stan {
                      int n_monte_carlo_grad,
                      BaseRNG& rng,
                      std::ostream* print_stream) const;
+
     protected:
       void write_error_msg_(std::ostream* error_msgs,
                             const std::exception& e) const {
