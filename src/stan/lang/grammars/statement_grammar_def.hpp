@@ -84,7 +84,9 @@ namespace stan {
 
     // see bare_type_grammar_def.hpp for original
     struct set_val4 {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2>
       struct result<F(T1, T2)> { typedef void type; };
       template <typename T1, typename T2>
@@ -96,7 +98,9 @@ namespace stan {
     boost::phoenix::function<set_val4> set_val4_f;
 
     struct validate_return_allowed {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2, typename T3>
       struct result<F(T1, T2, T3)> { typedef void type; };
       void operator()(var_origin origin,
@@ -116,7 +120,9 @@ namespace stan {
     boost::phoenix::function<validate_return_allowed> validate_return_allowed_f;
 
     struct validate_void_return_allowed {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2, typename T3>
       struct result<F(T1, T2, T3)> { typedef void type; };
       void operator()(var_origin origin,
@@ -139,7 +145,9 @@ namespace stan {
 
 
     struct validate_assignment {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2, typename T3,
                 typename T4, typename T5>
       struct result<F(T1, T2, T3, T4, T5)> { typedef void type; };
@@ -243,7 +251,9 @@ namespace stan {
     boost::phoenix::function<validate_assignment> validate_assignment_f;
 
     struct validate_sample {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2, typename T3, typename T4>
       struct result<F(T1, T2, T3, T4)> { typedef void type; };
 
@@ -433,7 +443,9 @@ namespace stan {
     boost::phoenix::function<validate_sample> validate_sample_f;
 
     struct expression_as_statement {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2, typename T3>
       struct result<F(T1, T2, T3)> { typedef void type; };
       void operator()(bool& pass,
@@ -474,7 +486,9 @@ namespace stan {
     boost::phoenix::function<expression_as_statement> expression_as_statement_f;
 
     struct unscope_locals {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2>
       struct result<F(T1, T2)> { typedef void type; };
       void operator()(const std::vector<var_decl>& var_decls,
@@ -486,7 +500,9 @@ namespace stan {
     boost::phoenix::function<unscope_locals> unscope_locals_f;
 
     struct add_while_condition {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2, typename T3, typename T4>
       struct result<F(T1, T2, T3, T4)> { typedef void type; };
       void operator()(while_statement& ws,
@@ -506,7 +522,9 @@ namespace stan {
     boost::phoenix::function<add_while_condition> add_while_condition_f;
 
     struct add_while_body {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2>
       struct result<F(T1, T2)> { typedef void type; };
       void operator()(while_statement& ws,
@@ -517,7 +535,9 @@ namespace stan {
     boost::phoenix::function<add_while_body> add_while_body_f;
 
     struct add_loop_identifier {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2, typename T3, typename T4,
                 typename T5>
       struct result<F(T1, T2, T3, T4, T5)> { typedef void type; };
@@ -540,7 +560,9 @@ namespace stan {
     boost::phoenix::function<add_loop_identifier> add_loop_identifier_f;
 
     struct remove_loop_identifier {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2>
       struct result<F(T1, T2)> { typedef void type; };
       void operator()(const std::string& name,
@@ -551,7 +573,9 @@ namespace stan {
     boost::phoenix::function<remove_loop_identifier> remove_loop_identifier_f;
 
     struct validate_int_expr2 {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2, typename T3>
       struct result<F(T1, T2, T3)> { typedef void type; };
 
@@ -571,7 +595,9 @@ namespace stan {
     boost::phoenix::function<validate_int_expr2> validate_int_expr2_f;
 
     struct validate_allow_sample {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2, typename T3>
       struct result<F(T1, T2, T3)> { typedef void type; };
 
@@ -593,7 +619,9 @@ namespace stan {
     boost::phoenix::function<validate_allow_sample> validate_allow_sample_f;
 
     struct validate_non_void_expression {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2, typename T3>
       struct result<F(T1, T2, T3)> { typedef void type; };
 
@@ -611,7 +639,9 @@ namespace stan {
     validate_non_void_expression_f;
 
     struct add_line_number {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2, typename T3>
       struct result<F(T1, T2, T3)> { typedef void type; };
       template <typename T, typename It>
@@ -625,7 +655,9 @@ namespace stan {
     boost::phoenix::function<add_line_number> add_line_number_f;
 
     struct set_void_return {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1>
       struct result<F(T1)> { typedef void type; };
       void operator()(return_statement& s) const {
@@ -635,7 +667,9 @@ namespace stan {
     boost::phoenix::function<set_void_return> set_void_return_f;
 
     struct set_no_op {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1>
       struct result<F(T1)> { typedef void type; };
       void operator()(no_op_statement& s) const {
