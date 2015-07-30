@@ -93,18 +93,16 @@ namespace stan {
           "stan::variational::advi::calc_ELBO";
 
         double elbo = 0.0;
-        double energy_i;
         int dim = variational.dimension();
         Eigen::VectorXd zeta(dim);
 
         int i = 0;
         int n_monte_carlo_drop = 0;
         while (i < n_monte_carlo_elbo_) {
-          zeta = variational.sample(rng_);
+          variational.sample(rng_, zeta);
           try {
-            energy_i = model_.template log_prob<false, true>(zeta,
-                                                             print_stream_);
-            stan::math::check_not_nan(function, "energy_i", energy_i);
+            double energy_i = model_.template log_prob<false, true>(zeta,
+              print_stream_);
             stan::math::check_finite(function, "energy_i", energy_i);
             elbo += energy_i;
             i += 1;
@@ -331,7 +329,7 @@ namespace stan {
         // draw more samples from posterior and write on subsequent lines
         if (out_stream_) {
           for (int n = 0; n < n_posterior_samples_; ++n) {
-            cont_params_ = variational.sample(rng_);
+            variational.sample(rng_, cont_params_);
             double lp = model_.template log_prob<false, true>(cont_params_,
               print_stream_);
             for (int i = 0; i < cont_params_.size(); ++i) {

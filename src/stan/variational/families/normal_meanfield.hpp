@@ -197,15 +197,13 @@ namespace stan {
        * @return                   a sample from the variational distribution
        */
       template <class BaseRNG>
-      Eigen::VectorXd sample(BaseRNG& rng) const {
-        Eigen::VectorXd eta = Eigen::VectorXd::Zero(dimension_);
-
+      void sample(BaseRNG& rng, Eigen::VectorXd& eta) const {
         // Draw from standard normal and transform to real-coordinate space
         for (int d = 0; d < dimension_; ++d) {
           eta(d) = stan::math::normal_rng(0, 1, rng);
         }
 
-        return transform(eta);
+        eta = transform(eta);
       }
 
       /**
@@ -258,7 +256,6 @@ namespace stan {
 
           try {
             stan::model::gradient(m, zeta, tmp_lp, tmp_mu_grad, print_stream);
-            stan::math::check_not_nan(function, "Gradient of mu", tmp_mu_grad);
             stan::math::check_finite(function, "Gradient of mu", tmp_mu_grad);
 
             mu_grad += tmp_mu_grad;

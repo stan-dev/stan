@@ -30,7 +30,7 @@ namespace stan {
       double entropy() const;
       Eigen::VectorXd transform(const Eigen::VectorXd& eta) const;
       template <class BaseRNG>
-      Eigen::VectorXd sample(BaseRNG& rng) const;
+      void sample(BaseRNG& rng, Eigen::VectorXd& eta) const;
       template <class M, class BaseRNG>
       void calc_grad(base_family& elbo_grad,
                      M& m,
