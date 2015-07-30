@@ -1,18 +1,18 @@
-#ifndef STAN_INTERFACE_RECORDER_VALUES_HPP
-#define STAN_INTERFACE_RECORDER_VALUES_HPP
+#ifndef STAN_INTERFACE_CALLBACKS_WRITER_VALUES_HPP
+#define STAN_INTERFACE_CALLBACKS_WRITER_VALUES_HPP
 
-#include <stan/interface/recorder/recorder.hpp>
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <ostream>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
 namespace stan {
-  namespace interface {
-    namespace recorder {
+  namespace interface_callbacks {
+    namespace writer {
 
       template <class InternalVector>
-      class values: public recorder {
+      class values: public base_writer {
       private:
         size_t m_;
         size_t N_;
@@ -53,7 +53,7 @@ namespace stan {
 
         void operator()() { }
 
-        bool is_recording() const {
+        bool is_writing() const {
           if (m_ < M_)
             return true;
           return false;
