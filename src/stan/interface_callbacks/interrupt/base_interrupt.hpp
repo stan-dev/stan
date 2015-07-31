@@ -12,7 +12,6 @@ namespace stan {
         base_interrupt() {}
         virtual void operator()() = 0;
       };
-    
     }
   }
 }

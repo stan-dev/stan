@@ -96,20 +96,16 @@ namespace stan {
         double elbo = 0.0;
         int dim = variational.dimension();
 
-        Eigen::VectorXd zeta = Eigen::VectorXd::Zero(dim);
+        Eigen::VectorXd zeta(dim);
 
         for (int i = 0; i < n_monte_carlo_elbo_; ++i) {
-          // Draw from variational distribution
           zeta = variational.sample(rng_);
-
           // Accumulate log probability
-          elbo += (model_.template log_prob<false, true>(zeta, print_stream_));
+          elbo += model_.template log_prob<false, true>(zeta, print_stream_);
         }
 
         // Divide to get Monte Carlo integral estimate
         elbo /= n_monte_carlo_elbo_;
-
-        // Add entropy term
         elbo += variational.entropy();
 
         return elbo;
@@ -118,8 +114,8 @@ namespace stan {
       /**
        * Calculates the "black box" gradient of the ELBO.
        *
-       * @tparam Q         class of variational distribution
-       * @param  elbo_grad gradient of ELBO with respect to variational parameters
+       * @param variational variational distribution
+       * @param elbo_grad gradient of ELBO with respect to variational parameters
        */
       void calc_ELBO_grad(const Q& variational, Q& elbo_grad) const {
         static const char* function =
@@ -140,7 +136,7 @@ namespace stan {
       /**
        * Runs stochastic gradient ascent with Adagrad.
        *
-       * @tparam Q              class of variational distribution
+       * @param  variational    variational distribution
        * @param  tol_rel_obj    relative tolerance parameter for convergence
        * @param  max_iterations max number of iterations to run algorithm
        */
@@ -308,12 +304,17 @@ namespace stan {
 
         // get mean of posterior approximation and write on first output line
         cont_params_ = variational.mean();
+        // This is temporary as lp is not really helpful for variational
+        // inference; furthermore it can be costly to compute.
+        double lp = model_.template log_prob<false, true>(cont_params_,
+          print_stream_);
         std::vector<double> cont_vector(cont_params_.size());
         for (int i = 0; i < cont_params_.size(); ++i)
           cont_vector.at(i) = cont_params_(i);
         std::vector<int> disc_vector;
 
         if (out_stream_) {
+
           //services::io::write_iteration(*out_stream_, model_, rng_,
           //                              0.0, cont_vector, disc_vector,
           //                              print_stream_);
@@ -330,7 +331,9 @@ namespace stan {
         if (out_stream_) {
           for (int n = 0; n < n_posterior_samples_; ++n) {
             cont_params_ = variational.sample(rng_);
-            for (int i = 0; i < cont_params_.size(); ++i)
+            double lp = model_.template log_prob<false, true>(cont_params_,
+              print_stream_);
+            for (int i = 0; i < cont_params_.size(); ++i) {
               cont_vector.at(i) = cont_params_(i);
             //services::io::write_iteration(*out_stream_, model_, rng_,
             //              0.0, cont_vector, disc_vector, print_stream_);

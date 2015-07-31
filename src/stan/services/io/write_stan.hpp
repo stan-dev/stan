@@ -1,8 +1,9 @@
 #ifndef STAN_SERVICES_IO_WRITE_STAN_HPP
 #define STAN_SERVICES_IO_WRITE_STAN_HPP
 
-#include <string>
 #include <stan/version.hpp>
+#include <ostream>
+#include <string>
 
 namespace stan {
   namespace services {

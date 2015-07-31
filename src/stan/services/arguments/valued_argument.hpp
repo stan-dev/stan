@@ -2,13 +2,12 @@
 #define STAN_SERVICES_ARGUMENTS_VALUED_ARGUMENT_HPP
 
 #include <stan/services/arguments/argument.hpp>
+#include <string>
 
 namespace stan {
-
   namespace services {
 
     class valued_argument: public argument {
-
     public:
 
       virtual void print(interface_callbacks::writer::base_writer& w,
@@ -42,12 +41,11 @@ namespace stan {
       virtual bool is_default() = 0;
 
     protected:
-
       std::string _default;
       std::string _value_type;
-
     };
 
-  } // services
-} // stan
+  }  // services
+}  // stan
+
 #endif

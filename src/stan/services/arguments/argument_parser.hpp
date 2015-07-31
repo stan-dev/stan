@@ -1,22 +1,17 @@
 #ifndef STAN_SERVICES_ARGUMENTS_ARGUMENT_PARSER_HPP
 #define STAN_SERVICES_ARGUMENTS_ARGUMENT_PARSER_HPP
 
-#include <string>
-#include <vector>
-#include <sstream>
-
-#include <stan/interface_callbacks/writer/base_writer.hpp>
-
 #include <stan/services/arguments/argument.hpp>
 #include <stan/services/arguments/arg_method.hpp>
 #include <stan/services/error_codes.hpp>
+#include <cstring>
+#include <string>
+#include <vector>
 
 namespace stan {
-
   namespace services {
 
     class argument_parser {
-
     public:
       argument_parser()
         : _arguments(),
@@ -58,7 +53,6 @@ namespace stan {
         std::vector<argument*> unset_args = _arguments;
 
         while (good_arg) {
-
           if (args.size() == 0)
             break;
 
@@ -67,14 +61,13 @@ namespace stan {
 
           // Check for method arguments entered without the method= prefix
           if (!_method_flag) {
-
-            list_argument* method = dynamic_cast<list_argument*>(_arguments.front());
+            list_argument* method
+              = dynamic_cast<list_argument*>(_arguments.front());
 
             if (method->valid_value(cat_name)) {
               cat_name = "method=" + cat_name;
               args.back() = cat_name;
             }
-
           }
 
           std::string val_name;
@@ -86,8 +79,9 @@ namespace stan {
 
           std::vector<argument*>::iterator arg_it;
 
-          for (arg_it = unset_args.begin(); arg_it != unset_args.end(); ++arg_it) {
-            if ( (*arg_it)->name() == cat_name) {
+          for (arg_it = unset_args.begin();
+               arg_it != unset_args.end(); ++arg_it) {
+            if ((*arg_it)->name() == cat_name) {
               args.pop_back();
               valid_arg &= (*arg_it)->parse_args(args, info, err, _help_flag);
               good_arg = true;
@@ -98,7 +92,6 @@ namespace stan {
               good_arg = true;
               break;
             }
-
           }
 
           if (good_arg) unset_args.erase(arg_it);
@@ -150,7 +143,6 @@ namespace stan {
         for (size_t i = 0; i < _arguments.size(); ++i) {
           _arguments.at(i)->print(w, 0, prefix);
         }
-
       }
 
       void print_help(interface_callbacks::writer::base_writer& w,
@@ -249,16 +241,15 @@ namespace stan {
       std::vector<argument*> _arguments;
 
       // We can also check for, and warn the user of, deprecated arguments
-      //std::vector<argument*> deprecated_arguments;
-      // check_arg_conflict // Ensure non-zero intersection of valid and deprecated arguments
+      // std::vector<argument*> deprecated_arguments;
+      // check_arg_conflict
+      // Ensure non-zero intersection of valid and deprecated arguments
 
       bool _help_flag;
       bool _method_flag;
-
     };
 
-  } // services
-
-} // stan
+  }  // services
+}  // stan
 
 #endif

@@ -1,31 +1,28 @@
 #ifndef STAN_SERVICES_ARGUMENTS_LIST_ARGUMENT_HPP
 #define STAN_SERVICES_ARGUMENTS_LIST_ARGUMENT_HPP
 
-#include <iostream>
 #include <stan/services/arguments/valued_argument.hpp>
 #include <stan/services/arguments/arg_fail.hpp>
+#include <iostream>
+#include <string>
+#include <vector>
 
 namespace stan {
-
   namespace services {
 
     class list_argument: public valued_argument {
-
     public:
-
       list_argument() {
         _value_type = "list element";
       }
 
       ~list_argument() {
-
         for (std::vector<argument*>::iterator it = _values.begin();
              it != _values.end(); ++it) {
           delete *it;
         }
 
         _values.clear();
-
       }
 
       void print(interface_callbacks::writer::base_writer& w,
@@ -46,6 +43,7 @@ namespace stan {
             (*it)->print_help(w, depth + 1, true);
         }
       }
+
 
       bool parse_args(std::vector<std::string>& args,
                       interface_callbacks::writer::base_writer& info,
@@ -69,16 +67,14 @@ namespace stan {
           help_flag |= true;
           args.clear();
           return false;
-        }
-        else if(_name == name) {
-
+        } else if (_name == name) {
           args.pop_back();
 
           bool good_arg = false;
           bool valid_arg = true;
 
           for (size_t i = 0; i < _values.size(); ++i) {
-            if( _values.at(i)->name() != value) continue;
+            if ( _values.at(i)->name() != value) continue;
 
             _cursor = i;
             valid_arg &= _values.at(_cursor)->parse_args(args, info, err, help_flag);
@@ -97,14 +93,10 @@ namespace stan {
 
             args.clear();
           }
-
           return valid_arg && good_arg;
-
         }
-
         return true;
-
-      };
+      }
 
       virtual void probe_args(argument* base_arg,
                               interface_callbacks::writer::base_writer& w) {
@@ -128,13 +120,11 @@ namespace stan {
 
         _values.pop_back();
         _cursor = _default_cursor;
-
       }
 
       void find_arg(std::string name,
                     std::string prefix,
                     std::vector<std::string>& valid_paths) {
-
         if (name == _name) {
           valid_paths.push_back(prefix + _name + "=<list_element>");
         }
@@ -145,7 +135,6 @@ namespace stan {
           std::string value_prefix = prefix + (*it)->name() + " ";
           (*it)->find_arg(name, prefix, valid_paths);
         }
-
       }
 
       bool valid_value(std::string name) {
@@ -157,7 +146,7 @@ namespace stan {
       }
 
       argument* arg(std::string name) {
-        if(name == _values.at(_cursor)->name())
+        if (name == _values.at(_cursor)->name())
           return _values.at(_cursor);
         else
           return 0;
@@ -180,22 +169,18 @@ namespace stan {
           valid_values += ", " + (*it)->name();
 
         return valid_values;
-
       }
 
       bool is_default() { return _cursor == _default_cursor; }
 
     protected:
-
       int _cursor;
       int _default_cursor;
 
       std::vector<argument*> _values;
-
     };
 
-  } // services
-
-} // stan
+  }  // services
+}  // stan
 
 #endif

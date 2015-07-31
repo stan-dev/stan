@@ -1,18 +1,16 @@
 #ifndef STAN_SERVICES_ARGUMENTS_UNVALUED_ARGUMENT_HPP
 #define STAN_SERVICES_ARGUMENTS_UNVALUED_ARGUMENT_HPP
-#include <iostream>
 
-#include <vector>
 #include <stan/services/arguments/argument.hpp>
+#include <iostream>
+#include <string>
+#include <vector>
 
 namespace stan {
-
   namespace services {
 
     class unvalued_argument: public argument {
-
     public:
-
       unvalued_argument()
         : _is_present(false) {}
 
@@ -48,7 +46,7 @@ namespace stan {
 
         _is_present = true;
         return true;
-      };
+      }
 
       bool is_present() {
         return _is_present;
@@ -58,6 +56,7 @@ namespace stan {
       bool _is_present;
     };
 
-  } // services
-} // stan
+  }  // services
+}  // stan
+
 #endif

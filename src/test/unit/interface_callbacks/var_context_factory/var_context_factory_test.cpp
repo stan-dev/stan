@@ -4,7 +4,6 @@
 // FIXME: move to CmdStan
 TEST(CmdStan, dump_factory_constructor) {
   stan::interface_callbacks::var_context_factory::dump_factory f;
-
   SUCCEED()
     << "dump_factory was instantiated properly";
 }
@@ -25,6 +24,6 @@ TEST(CmdStan, dump_factory_source) {
 
 TEST(StanInterface, var_context_factory) {
   //stan::interface_callbacks::var_context_factory f;
-  SUCCEED()
+  SUCCEED() 
     << "Can't instantiate a var_context_factory because it's an abstract class";
 }

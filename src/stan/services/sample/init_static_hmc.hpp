@@ -12,7 +12,6 @@ namespace stan {
       template<class Sampler>
       bool init_static_hmc(Sampler& sampler,
                            stan::services::argument* algorithm) {
-
         stan::services::categorical_argument* hmc
           = dynamic_cast<stan::services::categorical_argument*>
             (algorithm->arg("hmc"));

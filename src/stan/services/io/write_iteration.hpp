@@ -1,6 +1,8 @@
 #ifndef STAN_SERVICES_IO_WRITE_ITERATION_HPP
 #define STAN_SERVICES_IO_WRITE_ITERATION_HPP
 
+#include <stan/services/io/write_iteration_csv.hpp>
+#include <ostream>
 #include <vector>
 
 namespace stan {

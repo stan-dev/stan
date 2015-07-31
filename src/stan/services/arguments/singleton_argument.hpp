@@ -1,12 +1,13 @@
 #ifndef STAN_SERVICES_ARGUMENTS_SINGLETON_ARGUMENT_HPP
 #define STAN_SERVICES_ARGUMENTS_SINGLETON_ARGUMENT_HPP
 
-#include <iostream>
-#include <boost/lexical_cast.hpp>
 #include <stan/services/arguments/valued_argument.hpp>
+#include <boost/lexical_cast.hpp>
+#include <iostream>
+#include <string>
+#include <vector>
 
 namespace stan {
-
   namespace services {
 
     template <typename T>
@@ -42,9 +43,7 @@ namespace stan {
 
     template<typename T>
     class singleton_argument: public valued_argument {
-
     public:
-
       singleton_argument(): _validity("All") {
         _constrained = false;
         _name = "";
@@ -74,7 +73,6 @@ namespace stan {
         split_arg(args.back(), name, value);
 
         if (_name == name) {
-
           args.pop_back();
 
           T proposed_value = boost::lexical_cast<T>(value);
@@ -91,7 +89,6 @@ namespace stan {
             args.clear();
             return false;
           }
-
         }
         return true;
       }
@@ -113,7 +110,6 @@ namespace stan {
         }
 
         _value = _default_value;
-
       }
 
       void find_arg(std::string name,
@@ -127,12 +123,10 @@ namespace stan {
       T value() { return _value; }
 
       bool set_value(const T& value) {
-
         if (is_valid(value)) {
           _value = value;
           return true;
         }
-
         return false;
       }
 
@@ -148,9 +142,7 @@ namespace stan {
         return _value == _default_value;
       }
 
-
     protected:
-
       std::string _validity;
       virtual bool is_valid(T value) { return true; }
 
@@ -161,7 +153,6 @@ namespace stan {
 
       T _good_value;
       T _bad_value;
-
     };
 
     typedef singleton_argument<double> real_argument;
@@ -170,8 +161,7 @@ namespace stan {
     typedef singleton_argument<bool> bool_argument;
     typedef singleton_argument<std::string> string_argument;
 
-  } // services
-
-} // stan
+  }  // services
+}  // stan
 
 #endif

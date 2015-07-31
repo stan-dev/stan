@@ -13,7 +13,6 @@ namespace stan {
 
     class argument {
     public:
-
       argument()
         : indent_width(2),
           help_width(20) { }
@@ -33,6 +32,7 @@ namespace stan {
         return _description;
       }
 
+
       virtual void print(interface_callbacks::writer::base_writer& w,
                          const int depth, const std::string prefix) = 0;
 
@@ -45,6 +45,7 @@ namespace stan {
                               bool& help_flag) {
         return true;
       }
+
 
       virtual void probe_args(argument* base_arg,
                               interface_callbacks::writer::base_writer& w) {};
@@ -65,8 +66,7 @@ namespace stan {
         if (pos != std::string::npos) {
           name = arg.substr(0, pos);
           value = arg.substr(pos + 1, arg.size() - pos);
-        }
-        else {
+        } else {
           name = arg;
           value = "";
         }
@@ -88,6 +88,6 @@ namespace stan {
       int help_width;
     };
 
-  } // services
-} // stan
+  }  // services
+}  // stan
 #endif

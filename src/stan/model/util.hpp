@@ -151,7 +151,8 @@ namespace stan {
         lp
           = model
           .template log_prob<true,
-                             jacobian_adjust_transform>(ad_params_r, params_i, msgs)
+                             jacobian_adjust_transform>(ad_params_r,
+                                                        params_i, msgs)
           .val();
       } catch (std::exception &ex) {
         stan::math::recover_memory();
@@ -267,17 +268,10 @@ namespace stan {
      * @param model Model.
      * @param params_r Real-valued parameter vector.
      * @param params_i Integer-valued parameter vector.
-<<<<<<< HEAD
      * @param writer Writer callback for output.
      * @param epsilon Real-valued scalar saying how much to perturb. Defaults to 1e-6.
      * @param error Real-valued scalar saying how much error to allow. Defaults to 1e-6.
      * @param msgs Stream to which Stan programs write. Defaults to 0.
-=======
-     * @param epsilon Real-valued scalar saying how much to perturb. Reasonable value is 1e-6.
-     * @param error Real-valued scalar saying how much error to allow. Reasonable value is 1e-6.
-     * @param o Output stream for messages.
-     * @param msgs Stream to which Stan programs write.
->>>>>>> develop
      * @return number of failed gradient comparisons versus allowed
      * error, so 0 if all gradients pass
      */
