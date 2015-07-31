@@ -109,8 +109,13 @@ namespace stan {
           } catch (std::exception& e) {
             this->write_error_msg_(print_stream_, e);
             n_monte_carlo_drop += 1;
-            stan::math::check_less(function, "n_monte_carlo_drop",
-              n_monte_carlo_drop, n_monte_carlo_elbo_);
+            if (n_monte_carlo_drop >= n_monte_carlo_elbo_) {
+              const char* name = "The number of dropped evaluations";
+              const char* msg1 = "has reached its maximum amount (";
+              int y = n_monte_carlo_elbo_;
+              const char* msg2 = "). Your model may be either severely ill-conditioned or misspecified.";
+              stan::math::domain_error(function, name, y, msg1, msg2);
+            }
           }
         }
 
