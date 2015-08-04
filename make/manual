@@ -1,20 +1,20 @@
-.PHONY: manual $(STANAPI_HOME)src/docs/stan-reference/stan-reference.tex $(STANAPI_HOME)src/docs/stan-reference/stan-functions.txt
+.PHONY: manual $(STAN)src/docs/stan-reference/stan-reference.tex $(STAN)src/docs/stan-reference/stan-functions.txt
 
-STAN_MAJOR := $(shell grep "\#define STAN_MAJOR" $(STANAPI_HOME)src/stan/version.hpp | sed -e 's/.*STAN_MAJOR \(.*\)/\1/')
-STAN_MINOR := $(shell grep "\#define STAN_MINOR" $(STANAPI_HOME)src/stan/version.hpp | sed -e 's/.*STAN_MINOR \(.*\)/\1/')
-STAN_PATCH := $(shell grep "\#define STAN_PATCH" $(STANAPI_HOME)src/stan/version.hpp | sed -e 's/.*STAN_PATCH \(.*\)/\1/')
+STAN_MAJOR := $(shell grep "\#define STAN_MAJOR" $(STAN)src/stan/version.hpp | sed -e 's/.*STAN_MAJOR \(.*\)/\1/')
+STAN_MINOR := $(shell grep "\#define STAN_MINOR" $(STAN)src/stan/version.hpp | sed -e 's/.*STAN_MINOR \(.*\)/\1/')
+STAN_PATCH := $(shell grep "\#define STAN_PATCH" $(STAN)src/stan/version.hpp | sed -e 's/.*STAN_PATCH \(.*\)/\1/')
 VERSION_STRING := $(STAN_MAJOR).$(STAN_MINOR).$(STAN_PATCH)
 
-manual: $(STANAPI_HOME)src/docs/stan-reference/stan-reference.pdf $(STANAPI_HOME)src/docs/stan-reference/stan-functions.txt
+manual: $(STAN)src/docs/stan-reference/stan-reference.pdf $(STAN)src/docs/stan-reference/stan-functions.txt
 	@mkdir -p doc/
 	$(foreach artifact, $^, cp $(artifact) doc/$(basename $(notdir $(artifact)))-$(VERSION_STRING)$(suffix $(artifact));)
 
 
-$(STANAPI_HOME)src/docs/stan-reference/stan-functions.txt: $(STANAPI_HOME)src/docs/stan-reference/stan-reference.pdf
+$(STAN)src/docs/stan-reference/stan-functions.txt: $(STAN)src/docs/stan-reference/stan-reference.pdf
 	@echo '  building $@'
 	@echo '# This file is semicolon delimited' > $@
 	@echo 'StanFunction; Arguments; ReturnType; Page' >> $@
-	@sed 's/^\\indexentry{{\\tt  \\bfseries //g' $(STANAPI_HOME)src/docs/stan-reference/stan-reference.idx | \
+	@sed 's/^\\indexentry{{\\tt  \\bfseries //g' $(STAN)src/docs/stan-reference/stan-reference.idx | \
 	sed 's/ }!{\\tt  /;/g' | \
 	sed 's/{\\tt  \\slshape  //g' | \
 	sed 's/:.*T}\[.*\]}/;T\[\]/g' | \

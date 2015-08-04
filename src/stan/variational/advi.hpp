@@ -129,8 +129,8 @@ namespace stan {
       /**
        * Calculates the "black box" gradient of the ELBO.
        *
-       * @tparam Q         class of variational distribution
-       * @param  elbo_grad gradient of ELBO with respect to variational parameters
+       * @param variational variational distribution
+       * @param elbo_grad gradient of ELBO with respect to variational parameters
        */
       void calc_ELBO_grad(const Q& variational, Q& elbo_grad) const {
         static const char* function =
@@ -151,7 +151,7 @@ namespace stan {
       /**
        * Runs stochastic gradient ascent with Adagrad.
        *
-       * @tparam Q              class of variational distribution
+       * @param  variational    variational distribution
        * @param  tol_rel_obj    relative tolerance parameter for convergence
        * @param  max_iterations max number of iterations to run algorithm
        */

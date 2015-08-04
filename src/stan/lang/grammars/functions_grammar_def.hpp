@@ -48,7 +48,9 @@ namespace stan {
   namespace lang {
 
     struct validate_non_void_arg_function {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2, typename T3>
       struct result<F(T1, T2, T3)> { typedef void type; };
       void operator()(const expr_type& arg_type,
@@ -65,7 +67,9 @@ namespace stan {
     validate_non_void_arg_f;
 
     struct set_void_function {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2, typename T3, typename T4>
       struct result<F(T1, T2, T3, T4)> { typedef void type; };
       void operator()(const expr_type& return_type,
@@ -86,7 +90,9 @@ namespace stan {
     boost::phoenix::function<set_void_function> set_void_function_f;
 
     struct set_allows_sampling_origin {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2, typename T3>
       struct result<F(T1, T2, T3)> { typedef void type; };
       void operator()(const std::string& identifier,
@@ -116,7 +122,9 @@ namespace stan {
     set_allows_sampling_origin_f;
 
     struct validate_declarations {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2, typename T3, typename T4>
       struct result<F(T1, T2, T3, T4)> { typedef void type; };
       void operator()(bool& pass,
@@ -144,7 +152,9 @@ namespace stan {
     boost::phoenix::function<validate_declarations> validate_declarations_f;
 
     struct add_function_signature {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2, typename T3,
                 typename T4, typename T5>
       struct result<F(T1, T2, T3, T4, T5)> { typedef void type; };
@@ -225,7 +235,9 @@ namespace stan {
     boost::phoenix::function<add_function_signature> add_function_signature_f;
 
     struct validate_return_type {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2, typename T3>
       struct result<F(T1, T2, T3)> { typedef void type; };
       void operator()(function_decl_def& decl,
@@ -261,7 +273,9 @@ namespace stan {
 
 
     struct unscope_variables {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2>
       struct result<F(T1, T2)> { typedef void type; };
       void operator()(function_decl_def& decl,
@@ -276,7 +290,9 @@ namespace stan {
 
 
     struct add_fun_var {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2, typename T3, typename T4>
       struct result<F(T1, T2, T3, T4)> { typedef void type; };
       // each type derived from base_var_decl gets own instance

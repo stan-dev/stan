@@ -111,7 +111,7 @@ namespace stan {
        *
        * @param names_r  names for each element
        * @param values_r a vector of double values for all elements
-       * @param dims_r   a vector of dimensions
+       * @param dim_r   a vector of dimensions
        */
       array_var_context(const std::vector<std::string>& names_r,
                         const std::vector<double>& values_r,
@@ -124,7 +124,7 @@ namespace stan {
        *
        * @param names_i  names for each element
        * @param values_i a vector of integer values for all elements
-       * @param dims_i   a vector of dimensions
+       * @param dim_i   a vector of dimensions
        */
       array_var_context(const std::vector<std::string>& names_i,
                         const std::vector<int>& values_i,

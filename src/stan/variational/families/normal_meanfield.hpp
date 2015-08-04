@@ -212,11 +212,11 @@ namespace stan {
        * It uses the same gradient computed from a set of Monte Carlo
        * samples.
        *
-       * @tparam M                     class of model
-       * @tparam BaseRNG               class of random number generator
        * @param  elbo_grad             parameters to store "blackbox" gradient
+       * @param  m                     model
        * @param  cont_params           continuous parameters
        * @param  n_monte_carlo_grad    number of samples for gradient computation
+       * @param  rng                   random number generator
        * @param  print_stream          stream for convergence assessment output
        */
       template <class M, class BaseRNG>
