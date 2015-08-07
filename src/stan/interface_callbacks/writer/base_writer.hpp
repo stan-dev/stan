@@ -11,11 +11,24 @@ namespace stan {
       class base_writer {
       public:
         virtual ~base_writer() {}
-        // Can't enforce this method with a pure virtual function
-        // template <class T>
-        // virtual void operator()(const std::vector<T>& x) = 0;
-        virtual void operator()(const std::string x) = 0;
-        virtual void operator()() = 0;
+
+        virtual void operator()(const std::string& key,
+                                double value) { }
+        virtual void operator()(const std::string& key,
+                                const std::string& value) { }
+        virtual void operator()(const std::string& key,
+                                const double* values,
+                                int n_values) { }
+        virtual void operator()(const std::string& key,
+                                const double* values,
+                                int n_rows, int n_cols) { }
+        
+        virtual void operator()(const std::vector<std::string>& names) { }
+        virtual void operator()(const std::vector<double>& state) { }
+        
+        virtual void operator()() { }
+        virtual void operator()(const std::string& message) { }
+        
         virtual bool is_writing() const = 0;
       };
 
