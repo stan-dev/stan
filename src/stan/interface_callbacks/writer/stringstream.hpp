@@ -12,11 +12,15 @@ namespace stan {
       // using stringstream
       class stringstream: public base_writer {
       public:
+        stringstream(std::stringstream& stream)
+          : stream_(&stream) {
+        }
+        
         void operator()(const std::string& key, double value) {
-          stream_ << key << " = " << value << std::endl;
+          *stream_ << key << " = " << value << std::endl;
         }
         void operator()(const std::string& key, const std::string& value) {
-          stream_ << key << " = " << value << std::endl;
+          *stream_ << key << " = " << value << std::endl;
         }
 
         void operator()(const std::string& key,
@@ -25,12 +29,12 @@ namespace stan {
           if (n_values == 0)
             return;
 
-          stream_ << key << " = ";
+          *stream_ << key << " = ";
 
-          stream_ << values[0];
+          *stream_ << values[0];
           for (int n = 1; n < n_values; ++n)
-            stream_ << "," << values[n];
-          stream_ << std::endl;
+            *stream_ << "," << values[n];
+          *stream_ << std::endl;
         }
 
         void operator()(const std::string& key,
@@ -39,13 +43,16 @@ namespace stan {
           if (n_rows == 0 || n_cols == 0)
             return;
 
-          stream_ << key << ":" << std::endl;
-
+          *stream_ << key << " = [";
+          
           for (int i = 0; i < n_rows; ++i) {
-            stream_ << "," << values[i];
+            *stream_ << values[i * n_cols];
             for (int j = 1; j < n_cols; ++j)
-              stream_ << "," << values[i * n_cols + j];
-            stream_ << std::endl;
+              *stream_ << "," << values[i * n_cols + j];
+            if (i == n_rows - 1)
+              *stream_ << "]" << std::endl;
+            else
+              *stream_ << std::endl;
           }
         }
 
@@ -58,8 +65,8 @@ namespace stan {
 
           for (std::vector<std::string>::const_iterator it = names.begin();
                it != last; ++it)
-            stream_ << *it << ",";
-          stream_ << names.back() << std::endl;
+            *stream_ << *it << ",";
+          *stream_ << names.back() << std::endl;
         }
 
         void operator()(const std::vector<double>& state) {
@@ -71,33 +78,24 @@ namespace stan {
 
           for (std::vector<double>::const_iterator it = state.begin();
                it != last; ++it)
-            stream_ << *it << ",";
-          stream_ << state.back() << std::endl;
+            *stream_ << *it << ",";
+          *stream_ << state.back() << std::endl;
         }
 
         void operator()() {
-          stream_ << std::endl;
+          *stream_ << std::endl;
         }
 
         void operator()(const std::string& message) {
-          stream_ << message << std::endl;
+          *stream_ << message << std::endl;
         }
 
-        void operator()(const std::string message) {
-          stream_ << message << std::endl;
+        bool is_writing() const {
+          return true;
         }
-
-        void clear() {
-          stream_.str(std::string());
-          stream_.clear();
-        }
-
-        std::string contents() {
-          return stream_.str();
-        }
-
+        
       private:
-        std::stringstream stream_;
+        std::stringstream* stream_;
       };
 
     }
