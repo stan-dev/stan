@@ -50,7 +50,7 @@ namespace stan {
          *
          * @param x string to print with prefix in front
          */
-        void operator()(const std::string x) { }
+        void operator()(const std::string& message) { }
 
         /**
          * Do nothing

@@ -62,8 +62,8 @@ namespace stan {
           values_(tmp);
         }
 
-        void operator()(const std::string x) {
-          values_(x);
+        void operator()(const std::string& message) {
+          values_(message);
         }
 
         void operator()() {

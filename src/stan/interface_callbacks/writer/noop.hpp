@@ -13,7 +13,7 @@ namespace stan {
       public:
         template <class T>
         void operator()(const std::vector<T>& x) {}
-        void operator()(const std::string x) {}
+        void operator()(const std::string& message) {}
         void operator()() {}
         bool is_writing() const { return false; }
       };

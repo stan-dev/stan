@@ -27,10 +27,10 @@ namespace stan {
           // no op
         }
 
-        void operator()(const std::string x) {
+        void operator()(const std::string& message) {
           if (!has_stream_)
             return;
-          *o_ << prefix_ << x << std::endl;
+          *o_ << prefix_ << message << std::endl;
         }
 
         void operator()() {

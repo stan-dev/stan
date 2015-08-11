@@ -49,7 +49,7 @@ namespace stan {
           m_++;
         }
 
-        void operator()(const std::string x) { }
+        void operator()(const std::string& message) { }
 
         void operator()() { }
 
