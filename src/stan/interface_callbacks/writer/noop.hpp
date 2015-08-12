@@ -9,6 +9,10 @@ namespace stan {
   namespace interface_callbacks {
     namespace writer {
 
+      /**
+       * No op writer.
+       *
+       */
       class noop: public base_writer {
       public:
         /**
