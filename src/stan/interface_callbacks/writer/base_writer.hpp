@@ -83,7 +83,7 @@ namespace stan {
           if (n_rows > 0 && n_cols > 0) {
             for (int i = 0; i < n_rows; i++) {
               ss << values[i * n_cols];
-              for (int j = 0; j < n_cols; j++)
+              for (int j = 1; j < n_cols; j++)
                 ss << "," << values[i * n_cols + j];
               if (i != n_rows - 1)
                 ss << std::endl;
@@ -102,9 +102,8 @@ namespace stan {
           std::stringstream ss;
           if (names.size() > 0)
             ss << names[0];
-          for (std::vector<std::string>::const_iterator it = names.begin()+1;
-               it != names.end(); it++)
-            ss << "," << *it;
+          for (size_t n = 1; n < names.size(); n++)
+            ss << "," << names[n];
           this->operator()(ss.str());
         }
 
