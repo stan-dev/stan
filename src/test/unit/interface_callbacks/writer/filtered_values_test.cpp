@@ -121,17 +121,3 @@ TEST_F(StanInterfaceWriter, filtered_values_noargs) {
   EXPECT_NO_THROW(writer());
 }
 
-TEST_F(StanInterfaceWriter, filtered_values_is_writing) {
-  stan::interface_callbacks::writer::filtered_values<std::vector<double> > 
-    writer = *writer_ptr;
-
-  std::vector<double> x(N);
-  for (int n = 0; n < N; n++) 
-    x.at(n) = n;
-
-  for (int m = 0; m < M; m++) {
-    EXPECT_TRUE(writer.is_writing());
-    writer(x);
-  }
-  EXPECT_FALSE(writer.is_writing());
-}

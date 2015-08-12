@@ -103,18 +103,6 @@ TEST_F(StanInterfaceWriter, values_noargs) {
   EXPECT_NO_THROW(writer());
 }
 
-TEST_F(StanInterfaceWriter, values_is_writing) {
-  std::vector<double> x(N);
-  for (int n = 0; n < N; n++) 
-    x.at(n) = n;
-
-  for (int m = 0; m < M; m++) {
-    EXPECT_TRUE(writer.is_writing());
-    writer(x);
-  }
-  EXPECT_FALSE(writer.is_writing());
-}
-
 TEST_F(StanInterfaceWriter, values_preallocated_vector_double) {
   stan::interface_callbacks::writer::values<std::vector<double> > 
     writer_preallocated(preallocated_values);
@@ -203,17 +191,3 @@ TEST_F(StanInterfaceWriter, values_preallocated_noargs) {
   EXPECT_NO_THROW(writer_preallocated());
 }
 
-TEST_F(StanInterfaceWriter, values_preallocated_is_writing) {
-  stan::interface_callbacks::writer::values<std::vector<double> > 
-    writer_preallocated(preallocated_values);
-
-  std::vector<double> x(N);
-  for (int n = 0; n < N; n++) 
-    x.at(n) = n;
-
-  for (int m = 0; m < M; m++) {
-    EXPECT_TRUE(writer_preallocated.is_writing());
-    writer_preallocated(x);
-  }
-  EXPECT_FALSE(writer_preallocated.is_writing());
-}

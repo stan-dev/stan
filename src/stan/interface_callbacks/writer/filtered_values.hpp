@@ -70,10 +70,6 @@ namespace stan {
           values_();
         }
 
-        bool is_writing() const {
-          return values_.is_writing();
-        }
-
         const std::vector<InternalVector>& x() {
           return values_.x();
         }

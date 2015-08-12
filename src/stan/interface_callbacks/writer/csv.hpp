@@ -80,17 +80,7 @@ namespace stan {
             return;
           *o_ << std::endl;
         }
-
-        /**
-         * Indicator function for whether the instance is recording.
-         *
-         * For this class, returns true if it has a stream.
-         */
-        bool is_writing() const {
-          return has_stream_;
-        }
       };
-
 
     }
   }

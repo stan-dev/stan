@@ -58,13 +58,6 @@ namespace stan {
          */
         void operator()() { }
 
-        /**
-         * Indicator function for whether the instance is recording.
-         */
-        bool is_writing() const {
-          return true;
-        }
-
         const std::vector<double>& sum() const {
           return sum_;
         }

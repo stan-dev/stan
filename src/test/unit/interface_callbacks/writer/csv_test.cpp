@@ -93,9 +93,3 @@ TEST_F(StanInterfaceWriter, csv_noargs) {
   EXPECT_EQ("\n\n", ss.str());
 }
 
-TEST_F(StanInterfaceWriter, csv_is_writing) {
-  EXPECT_TRUE(writer.is_writing());
-  
-  stan::interface_callbacks::writer::csv null_writer(0, "");
-  EXPECT_FALSE(null_writer.is_writing());
-}

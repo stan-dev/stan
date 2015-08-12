@@ -16,7 +16,6 @@ namespace stan {
        * an implementing class needs to implement are
        * - void operator()(const std::string& message)
        * - void operator()()
-       * - bool is_writing()
        */
       class base_writer {
       public:
@@ -137,13 +136,6 @@ namespace stan {
          * An implementation may choose to treat this as a flush.
          */
         virtual void operator()() = 0;
-
-        /**
-         * Indicates whether this writer is writing.
-         *
-         * This will be removed.
-         */
-        virtual bool is_writing() const = 0;
       };
 
     }

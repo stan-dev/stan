@@ -38,10 +38,6 @@ namespace stan {
             return;
           *o_ << std::endl;
         }
-
-        bool is_writing() const {
-          return has_stream_;
-        }
       };
     }
   }

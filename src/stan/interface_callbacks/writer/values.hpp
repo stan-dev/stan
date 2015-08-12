@@ -53,12 +53,6 @@ namespace stan {
 
         void operator()() { }
 
-        bool is_writing() const {
-          if (m_ < M_)
-            return true;
-          return false;
-        }
-
         const std::vector<InternalVector>& x() const {
           return x_;
         }

@@ -115,7 +115,3 @@ TEST_F(StanInterfaceWriter, sum_values_noargs) {
   EXPECT_EQ(0U, writer2.recorded());
 }
 
-TEST_F(StanInterfaceWriter, csv_is_writing) {
-  EXPECT_TRUE(writer1.is_writing());
-  EXPECT_TRUE(writer2.is_writing());
-}
