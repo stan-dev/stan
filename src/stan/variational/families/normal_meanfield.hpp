@@ -12,8 +12,11 @@
 #include <stan/math/prim/mat/fun/value_of_rec.hpp>
 #include <stan/math/prim/scal/prob/normal_rng.hpp>
 
-#include <stan/math/prim/scal/err/check_size_match.hpp>
+#include <stan/math/prim/scal/err/check_finite.hpp>
 #include <stan/math/prim/scal/err/check_not_nan.hpp>
+#include <stan/math/prim/scal/err/check_positive.hpp>
+#include <stan/math/prim/scal/err/check_size_match.hpp>
+#include <stan/math/prim/scal/err/domain_error.hpp>
 
 #include <stan/model/util.hpp>
 
@@ -194,15 +197,13 @@ namespace stan {
        * @return                   a sample from the variational distribution
        */
       template <class BaseRNG>
-      Eigen::VectorXd sample(BaseRNG& rng) const {
-        Eigen::VectorXd eta = Eigen::VectorXd::Zero(dimension_);
-
+      void sample(BaseRNG& rng, Eigen::VectorXd& eta) const {
         // Draw from standard normal and transform to real-coordinate space
         for (int d = 0; d < dimension_; ++d) {
           eta(d) = stan::math::normal_rng(0, 1, rng);
         }
 
-        return transform(eta);
+        eta = transform(eta);
       }
 
       /**
@@ -244,21 +245,34 @@ namespace stan {
         Eigen::VectorXd zeta = Eigen::VectorXd::Zero(dimension_);
 
         // Naive Monte Carlo integration
-        for (int i = 0; i < n_monte_carlo_grad; ++i) {
+        int i = 0;
+        int n_monte_carlo_drop = 0;
+        while (i < n_monte_carlo_grad) {
           // Draw from standard normal and transform to real-coordinate space
           for (int d = 0; d < dimension_; ++d) {
             eta(d) = stan::math::normal_rng(0, 1, rng);
           }
           zeta = transform(eta);
 
-          stan::math::check_not_nan(function, "zeta", zeta);
+          try {
+            stan::model::gradient(m, zeta, tmp_lp, tmp_mu_grad, print_stream);
+            stan::math::check_finite(function, "Gradient of mu", tmp_mu_grad);
 
-          // Compute gradient step in real-coordinate space
-          stan::model::gradient(m, zeta, tmp_lp, tmp_mu_grad, print_stream);
-
-          // Update gradient parameters
-          mu_grad += tmp_mu_grad;
-          omega_grad.array() += tmp_mu_grad.array().cwiseProduct(eta.array());
+            mu_grad += tmp_mu_grad;
+            omega_grad.array() += tmp_mu_grad.array().cwiseProduct(eta.array());
+            i += 1;
+          } catch (std::exception& e) {
+            this->write_error_msg_(print_stream, e);
+            n_monte_carlo_drop += 1;
+            if (n_monte_carlo_drop >= n_monte_carlo_grad) {
+              const char* name = "The number of dropped evaluations";
+              const char* msg1 = "has reached its maximum amount (";
+              int y = n_monte_carlo_grad;
+              const char* msg2 = "). Your model may be either severely "
+                "ill-conditioned or misspecified.";
+              stan::math::domain_error(function, name, y, msg1, msg2);
+            }
+          }
         }
         mu_grad    /= static_cast<double>(n_monte_carlo_grad);
         omega_grad /= static_cast<double>(n_monte_carlo_grad);
