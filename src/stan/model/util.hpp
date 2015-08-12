@@ -1,16 +1,26 @@
-#ifndef STAN__MODEL__UTIL_HPP
-#define STAN__MODEL__UTIL_HPP
+#ifndef STAN_MODEL_UTIL_HPP
+#define STAN_MODEL_UTIL_HPP
+
+#include <stan/math/fwd/scal/fun/square.hpp>
+#include <stan/math/fwd/core.hpp>
+#include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/math/rev/mat/fun/grad.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/mix/mat/functor/derivative.hpp>
+#include <stan/math/mix/mat/functor/grad_hessian.hpp>
+#include <stan/math/mix/mat/functor/grad_tr_mat_times_hessian.hpp>
+#include <stan/math/rev/mat/functor/gradient.hpp>
+#include <stan/math/fwd/mat/functor/gradient.hpp>
+#include <stan/math/mix/mat/functor/gradient_dot_vector.hpp>
+#include <stan/math/mix/mat/functor/hessian.hpp>
+#include <stan/math/mix/mat/functor/hessian_times_vector.hpp>
+#include <stan/math/mix/mat/functor/jacobian.hpp>
+#include <stan/math/mix/mat/functor/partial_derivative.hpp>
 
 #include <cmath>
 #include <iomanip>
 #include <iostream>
 #include <vector>
-
-#include <stan/math/matrix/Eigen.hpp>
-#include <stan/agrad/rev/matrix/grad.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/autodiff.hpp>
 
 namespace stan {
 
@@ -87,24 +97,26 @@ namespace stan {
                          std::ostream* msgs = 0) {
       using std::vector;
       using stan::agrad::var;
-      vector<var> ad_params_r(params_r.size());
-      for (size_t i = 0; i < model.num_params_r(); ++i) {
-        stan::agrad::var var_i(params_r[i]);
-        ad_params_r[i] = var_i;
-      }
+      double lp;
       try {
+        vector<var> ad_params_r(params_r.size());
+        for (size_t i = 0; i < model.num_params_r(); ++i) {
+          stan::agrad::var var_i(params_r[i]);
+          ad_params_r[i] = var_i;
+        }
         var adLogProb
           = model
           .template log_prob<propto,
                              jacobian_adjust_transform>(ad_params_r,
                                                         params_i,msgs);
-        double val = adLogProb.val();
+        lp = adLogProb.val();
         adLogProb.grad(ad_params_r,gradient);
-        return val;
-      } catch (std::exception &ex) {
+      } catch (const std::exception &ex) {
         stan::agrad::recover_memory();
         throw;
       }
+      stan::agrad::recover_memory();
+      return lp;
     }
     
     /**
@@ -133,21 +145,22 @@ namespace stan {
                            std::ostream* msgs = 0) {
       using stan::agrad::var;
       using std::vector;
-      vector<var> ad_params_r;
-      for (size_t i = 0; i < model.num_params_r(); ++i)
-        ad_params_r.push_back(params_r(i));
+      double lp;
       try {
-        double lp
-        = model
+        vector<var> ad_params_r;
+        for (size_t i = 0; i < model.num_params_r(); ++i)
+          ad_params_r.push_back(params_r(i));
+        lp
+          = model
           .template log_prob<true,
                              jacobian_adjust_transform>(ad_params_r, msgs)
-            .val();
-        stan::agrad::recover_memory();
-        return lp;
+          .val();
       } catch (std::exception &ex) {
         stan::agrad::recover_memory();
         throw;
       }
+      stan::agrad::recover_memory();
+      return lp;
     }
     
     /**

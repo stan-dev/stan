@@ -2,7 +2,7 @@
 #include <stan/optimization/bfgs_update.hpp>
 
 TEST(OptimizationBfgsUpdate, bfgs_update_secant) {
-  const unsigned int nDim = 10;
+  const int nDim = 10;
 
   typedef stan::optimization::BFGSUpdate_HInv<double,nDim> QNUpdateT;
   typedef QNUpdateT::VectorT VectorT;
@@ -12,7 +12,7 @@ TEST(OptimizationBfgsUpdate, bfgs_update_secant) {
 
   // Construct a set of BFGS update vectors and check that
   // the secant equation H*yk = sk is always satisfied.
-  for (unsigned int i = 0; i < nDim; i++) {
+  for (int i = 0; i < nDim; i++) {
     sk.setZero(nDim);
     yk.setZero(nDim);
     sk[i] = 1;
@@ -22,7 +22,7 @@ TEST(OptimizationBfgsUpdate, bfgs_update_secant) {
 
     // Because the constructed update vectors are all orthogonal the secant
     // equation should be exactlty satisfied for all nDim updates.
-    for (unsigned int j = 0; j <= i; j++) {
+    for (int j = 0; j <= i; j++) {
       sk.setZero(nDim);
       yk.setZero(nDim);
       sk[i - j] = 1;
@@ -36,7 +36,7 @@ TEST(OptimizationBfgsUpdate, bfgs_update_secant) {
 }
 
 TEST(OptimizationBfgsUpdate, BFGSUpdate_HInv_update) {
-  const unsigned int nDim = 10;
+  const int nDim = 10;
 
   typedef stan::optimization::BFGSUpdate_HInv<double,nDim> QNUpdateT;
   typedef QNUpdateT::VectorT VectorT;
@@ -44,7 +44,7 @@ TEST(OptimizationBfgsUpdate, BFGSUpdate_HInv_update) {
   QNUpdateT bfgsUp;
   VectorT yk(nDim), sk(nDim), sdir(nDim);
 
-  for (unsigned int i = 0; i < nDim; i++) {
+  for (int i = 0; i < nDim; i++) {
     sk.setZero(nDim);
     yk.setZero(nDim);
     sk[i] = 1;
@@ -55,7 +55,7 @@ TEST(OptimizationBfgsUpdate, BFGSUpdate_HInv_update) {
 }
 
 TEST(OptimizationBfgsUpdate, BFGSUpdate_HInv_search_direction) {
-  const unsigned int nDim = 10;
+  const int nDim = 10;
   typedef stan::optimization::BFGSUpdate_HInv<double,nDim> QNUpdateT;
   typedef QNUpdateT::VectorT VectorT;
 
@@ -67,9 +67,9 @@ TEST(OptimizationBfgsUpdate, BFGSUpdate_HInv_search_direction) {
   yk[0] = 1;
   bfgsUp.update(yk,sk,true);
 
-  for (unsigned int i = 0; i < nDim; i++) {
+  for (int i = 0; i < nDim; i++) {
 
-    for (unsigned int j = 0; j <= i; j++) {
+    for (int j = 0; j <= i; j++) {
       yk.setZero(nDim);
       yk[i - j] = 1;
       

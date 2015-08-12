@@ -1,5 +1,5 @@
-#ifndef STAN__MEMORY__STACK_ALLOC_HPP
-#define STAN__MEMORY__STACK_ALLOC_HPP
+#ifndef STAN_MEMORY_STACK_ALLOC_HPP
+#define STAN_MEMORY_STACK_ALLOC_HPP
 
 #include <cstdlib>
 #include <cstddef>
@@ -11,7 +11,7 @@
     #include <stdint.h> // FIXME: replace with cstddef?
 #endif
 #include <vector>
-#include <stan/meta/likely.hpp>
+#include <stan/math/prim/scal/meta/likely.hpp>
 
 namespace stan { 
 
@@ -174,6 +174,21 @@ namespace stan {
           result = move_to_next_block(len);
         return (void*)result;
       }
+
+      /**
+       * Allocate an array on the arena of the specified size to hold
+       * values of the specified template parameter type.
+       *
+       * @tparam T type of entries in allocated array.
+       * @param[in] n size of array to allocate.
+       * @return new array allocated on the arena.
+       */
+      template <typename T>
+      inline
+      T* alloc_array(size_t n) {
+        return static_cast<T*>(alloc(n * sizeof(T)));
+      }
+
 
       /**
        * Recover all the memory used by the stack allocator.  The stack

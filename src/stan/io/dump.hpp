@@ -1,18 +1,29 @@
-#ifndef STAN__IO__DUMP_HPP
-#define STAN__IO__DUMP_HPP
+#ifndef STAN_IO_DUMP_HPP
+#define STAN_IO_DUMP_HPP
+
+#include <boost/lexical_cast.hpp>
+#include <boost/throw_exception.hpp>
+#include <boost/type_traits/is_floating_point.hpp> 
+#include <boost/type_traits/is_integral.hpp>
+#include <boost/type_traits/is_arithmetic.hpp>
+#include <boost/utility/enable_if.hpp>
+
+
+
+#include <stan/io/var_context.hpp>
+#include <stan/math/prim/scal/meta/index_type.hpp>
+#include <stan/math/prim/arr/meta/index_type.hpp>
+#include <stan/math/prim/mat/meta/index_type.hpp>
 
 #include <cctype>
 #include <iostream>
 #include <limits>
 #include <map>
 #include <sstream>
-#include <string>
-#include <vector>
 #include <stdexcept>
-#include <boost/throw_exception.hpp>
-#include <boost/lexical_cast.hpp>
-#include <stan/math/matrix.hpp>
-#include <stan/io/var_context.hpp>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace stan {
 
@@ -27,9 +38,11 @@ namespace stan {
        }
     }
 
+    using Eigen::Dynamic;
+
     /**
      * Writes data into the S-plus dump format.
-     * 
+     *
      * A <code>dump_writer</code> writes data into the S-plus dump
      * format, a human-readable ASCII representation of arbitrarily
      * dimensioned arrays of integers and arrays of floating point
@@ -43,14 +56,29 @@ namespace stan {
       void write_name_equals(const std::string& name) {
         for (size_t i = 0; i < name.size(); ++i)
           if (name.at(i) == '"')
-            BOOST_THROW_EXCEPTION(
-              std::invalid_argument ("name can not contain quote char"));
+            BOOST_THROW_EXCEPTION
+              (std::invalid_argument("name can not contain quote char"));
         out_ << '"' << name << '"' << " <- " << '\n';
       }
 
 
+      /**
+       * Write the sepcified floating-point value to the output,
+       * adding a period to the end if the output would otherwise not
+       * include a period or scientific notation.  This allows the
+       * parser to detect that this is a floating-point value.
+       *
+       * <p>The second argument should not be specified; it is only there
+       * to enable SFINAE to restrict the first argument to integral
+       * types.
+       *
+       * @tparam T Type of floating point input. 
+       * @param x Input.
+       * @paramu dummy Dummy pararameter to allow SFINAE.
+       */
       // adds period at end of output if necessary for double
-      void write_val(const double& x) {
+      template <typename T>
+      void write_val(T x, typename boost::enable_if<boost::is_floating_point<T> >::type* dummy = 0) {
         std::stringstream ss;
         ss << x;
         std::string s;
@@ -66,47 +94,45 @@ namespace stan {
         out_ << s << ".";
       }
 
-      void write_val(const unsigned long long int& n) {
+      /**
+       * Write the sepcified integer value to the output.  
+       *
+       * <p>The second argument should not be specified; it is only
+       * there to enable SFINAE to restrict the first argument to
+       * integral types.
+       *
+       * @tparam T Type of integral input. 
+       * @param x Input.
+       * @paramu dummy Dummy pararameter to allow SFINAE.
+       */
+      template <typename T>
+      void write_val(T n, typename boost::enable_if<boost::is_integral<T> >::type* dummy = 0) {
         out_ << n;
       }
 
-      void write_val(const unsigned long int& n) {
-        out_ << n;
+      /**
+       * Write the specified character as an integer.  
+       *
+       * @param c character to write
+       */
+      void write_val(char c) {
+        return write_val(static_cast<short>(c));
       }
 
-      void write_val(const unsigned int& n) {
-        out_ << n;
+      /**
+       * Write the specified unsigned character as an integer.  
+       *
+       * @param c character to write
+       */
+      void write_val(unsigned char c) {
+        return write_val(static_cast<unsigned short>(c));
       }
-
-      void write_val(const unsigned short& n) {
-        out_ << n;
-      }
-
-      void write_val(const long long& n) {
-        out_ << n;
-      }
-
-      void write_val(const long& n) {
-        out_ << n;
-      }
-
-      void write_val(const int& n) {
-        out_ << n;
-      }
-
-      void write_val(const short& n) {
-        out_ << n;
-      }
-
-      void write_val(const char& n) {
-        out_ << n;
-      }
-
 
       template <typename T>
       void write_list(T xs) {
+        typedef typename stan::math::index_type<T>::type idx_t;
         out_ << "c(";
-        for (typename T::size_type i = 0; i < xs.size(); ++i) {
+        for (idx_t i = 0; i < xs.size(); ++i) {
           if (i > 0) out_ << ", ";
           write_val(xs[i]);
         }
@@ -123,7 +149,7 @@ namespace stan {
         write_list(dims);
         out_ << ")";
       }
-      
+
 
       void dims(double /*x*/, std::vector<size_t> /*ds*/) {
         // no op
@@ -133,36 +159,36 @@ namespace stan {
         // no op
       }
 
-      template <typename T> 
-      void dims(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> m, 
+      template <typename T>
+      void dims(Eigen::Matrix<T, Dynamic, Dynamic> m,
                 std::vector<size_t> ds) {
         ds.push_back(m.rows());
         ds.push_back(m.cols());
       }
 
-      template <typename T> 
-      void dims(Eigen::Matrix<T,Eigen::Dynamic,1> v, 
+      template <typename T>
+      void dims(Eigen::Matrix<T, Dynamic, 1> v,
                 std::vector<size_t> ds) {
         ds.push_back(v.size());
       }
 
-      template <typename T> 
-      void dims(Eigen::Matrix<T,1,Eigen::Dynamic> rv, 
+      template <typename T>
+      void dims(Eigen::Matrix<T, 1, Dynamic> rv,
                 std::vector<size_t> ds) {
         ds.push_back(rv.size());
       }
 
-      template <typename T> 
+      template <typename T>
       void dims(std::vector<T> x, std::vector<size_t> ds) {
         ds.push_back(x.size());
         if (x.size() > 0)
-          dims(x[0],ds);
+          dims(x[0], ds);
       }
-      
+
       template <typename T>
       std::vector<size_t> dims(T x) {
         std::vector<size_t> ds;
-        dims(x,ds);
+        dims(x, ds);
         return ds;
       }
 
@@ -181,7 +207,7 @@ namespace stan {
                           const std::vector<size_t>& idx,
                           const size_t pos) {
         size_t next_pos = pos + 1;
-        write_stan_val(x[idx[pos]],idx,next_pos);
+        write_stan_val(x[idx[pos]], idx, next_pos);
       }
       void write_stan_val(const std::vector<double>& x,
                           const std::vector<size_t>& idx,
@@ -193,18 +219,18 @@ namespace stan {
                           const size_t pos) {
         write_val(x[idx[pos]]);
       }
-      void write_stan_val(const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& x,
+      void write_stan_val(const Eigen::Matrix<double, Dynamic, Dynamic>& x,
                           const std::vector<size_t>& idx,
                           const size_t pos) {
         size_t next_pos = pos + 1;
-        write_val(x(idx[pos],idx[next_pos]));
+        write_val(x(idx[pos], idx[next_pos]));
       }
-      void write_stan_val(const Eigen::Matrix<double,1,Eigen::Dynamic>& x,
+      void write_stan_val(const Eigen::Matrix<double, 1, Dynamic>& x,
                           const std::vector<size_t>& idx,
                           const size_t pos) {
         write_val(x[idx[pos]]);
       }
-      void write_stan_val(const Eigen::Matrix<double,Eigen::Dynamic,1>& x,
+      void write_stan_val(const Eigen::Matrix<double, Dynamic, 1>& x,
                           const std::vector<size_t>& idx,
                           const size_t pos) {
         write_val(x[idx[pos]]);
@@ -215,11 +241,12 @@ namespace stan {
       void write_stan(const std::vector<T>& x) {
         std::vector<size_t> dims = dims(x);
         out_ << "structure(c(";
-        std::vector<size_t> idx(dims.size(),0U);
+        std::vector<size_t> idx(dims.size(), 0U);
         for (size_t count = 0; true; ++count) {
           if (count > 0) out_ << ", ";
-          write_stan_val(x,idx);
-          if (!increment(dims,idx)) break;
+          write_stan_val(x, idx);
+          if (!increment(dims, idx))
+            break;
         }
         out_ << "), .Dim = ";
         write_list(dims);
@@ -231,48 +258,47 @@ namespace stan {
       void write_stan(const std::vector<int>& x) {
         write_list(x);
       }
-      void write_stan(double x) {
+      template <typename T>
+      void write_stan(T x, typename boost::enable_if<boost::is_arithmetic<T> >::type* dummy = 0) {
         write_val(x);
       }
-      void write_stan(int x) {
-        write_val(x);
-      }
-      void write_stan(const Eigen::Matrix<double,1,Eigen::Dynamic>& x) {
+      void write_stan(const Eigen::Matrix<double, 1, Dynamic>& x) {
         write_list(x);
       }
-      void write_stan(const Eigen::Matrix<double,Eigen::Dynamic,1>& x) {
+      void write_stan(const Eigen::Matrix<double, Dynamic, 1>& x) {
         write_list(x);
       }
-      void write_stan(const Eigen::Matrix<double,
-                                          Eigen::Dynamic,Eigen::Dynamic>& x) {
-        typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::Index Index;
+      void write_stan(const Eigen::Matrix<double, Dynamic, Dynamic>& x) {
+        typedef Eigen::Matrix<double, Dynamic, Dynamic>::Index
+          Index;
         out_ << "structure(c(";
         std::vector<double> vals;
         for (Index m = 0; m < x.cols(); ++m) {
           for (Index n = 0; n < x.rows(); ++n) {
-            if (m > 0 || n > 0) out_ << ", ";
-            write_val(x(m,n));
+            if (m > 0 || n > 0)
+              out_ << ", ";
+            write_val(x(m, n));
           }
         }
         out_ << "), .Dim = c(";
         out_ << x.rows() << ", " << x.cols();
         out_ << "))";
       }
-      
-    public:
+
+    public: 
 
       /**
        * Construct a dump writer writing to standard output.
        */
       dump_writer() : out_(std::cout) { }
-      
+
       /**
        * Construct a dump writer writing to the specified output
        * stream.
        *
        * @param out Output stream for writing.
        */
-      dump_writer(std::ostream& out) : out_(out) { }
+      explicit dump_writer(std::ostream& out) : out_(out) { }
 
       /**
        * Destroy this writer.
@@ -292,7 +318,7 @@ namespace stan {
        *
        * <p>All data is written in final-index dominant
        * ordering.
-       * 
+       *
        * @param name Name of variable to write.
        * @param x Value of variable.
        * @tparam Type of variable being written.
@@ -317,16 +343,16 @@ namespace stan {
       void dump_structure(std::string /*name*/,
                           std::vector<size_t> dims,
                           std::vector<T> xs) {
-        if (xs.size() != product(dims)) 
-          BOOST_THROW_EXCEPTION(
-              std::invalid_argument ("xs.size() != product(dims)"));
-        write_structure(xs,dims);
+        if (xs.size() != product(dims))
+          BOOST_THROW_EXCEPTION
+            (std::invalid_argument("xs.size() != product(dims)"));
+        write_structure(xs, dims);
       }
 
       /**
        * Write a list variable with the specified name and
        * integer or double values.
-       * 
+       *
        * @param name Name of variable.
        * @param xs Values of variable.
        * @tparam T <code>double</code> or <code>int</code>.
@@ -341,7 +367,7 @@ namespace stan {
       /**
        * Write a list variable with the specified name and
        * integer or double values.
-       * 
+       *
        * @param name Name of variable.
        * @param x Value of variable.
        * @tparam T <code>double</code> or <code>int</code>.
@@ -352,7 +378,6 @@ namespace stan {
         write_name_equals(name);
         write_val(x);
       }
-      
     };
 
     /**
@@ -379,13 +404,13 @@ namespace stan {
      * double or integer, and the values are the name of the variable
      * and its array of values.  If there is a single value, the
      * dimension array is empty.  For a list, the dimension
-     * array contains a single entry for the number of values.  
+     * array contains a single entry for the number of values.
      * For an array, the dimensions are the dimensions of the array.
      *
      * <p>Reads are performed in an "S-compatible" mode whereby
      * a string such as "1" or "-127" denotes and integer, whereas
      * a string such as "1." or "0.9e-5" represents a floating
-     * point value.  
+     * point value.
      *
      * <p>For dumping, arrays are indexed in last-index major fashion,
      * which corresponds to column-major order for matrices
@@ -394,27 +419,27 @@ namespace stan {
      * three-dimensional array <code>x</code> with dimensions
      * <code>[2,2,2]</code>, then there are 8 values, provided in the
      * order
-     * 
-     * <p><code>[0,0,0]</code>, 
-     * <code>[1,0,0]</code>, 
-     * <code>[0,1,0]</code>, 
-     * <code>[1,1,0]</code>, 
-     * <code>[0,0,1]</code>, 
-     * <code>[1,0,1]</code>, 
-     * <code>[0,1,1]</code>, 
+     *
+     * <p><code>[0,0,0]</code>,
+     * <code>[1,0,0]</code>,
+     * <code>[0,1,0]</code>,
+     * <code>[1,1,0]</code>,
+     * <code>[0,0,1]</code>,
+     * <code>[1,0,1]</code>,
+     * <code>[0,1,1]</code>,
      * <code>[1,1,1]</code>.
      *
      * definitions ::= definition+
      *
      * definition ::= name ("->" | '=') value optional_semicolon
      *
-     * name ::= char* 
-     *        | ''' char* ''' 
+     * name ::= char*
+     *        | ''' char* '''
      *        | '"' char* '"'
      *
      * value ::= value<int> | value<double>
      *
-     * value<T> ::= T 
+     * value<T> ::= T
      *            | seq<T>
      *            | 'struct' '(' seq<T> ',' ".Dim" '=' seq<int> ')'
      *
@@ -467,11 +492,11 @@ namespace stan {
 
       bool scan_name_unquoted() {
         char c;
-        in_ >> c; // 
+        in_ >> c;
         if (in_.fail()) return false;
         if (!std::isalpha(c)) return false;
-        name_.push_back(c); 
-        while (in_.get(c)) { // get turns off auto space skip
+        name_.push_back(c);
+        while (in_.get(c)) {  // get turns off auto space skip
           if (std::isalpha(c) || std::isdigit(c) || c == '_' || c == '.') {
             name_.push_back(c);
           } else {
@@ -479,7 +504,7 @@ namespace stan {
             return true;
           }
         }
-        return true; // but hit eos
+        return true;  // but hit eos
       }
 
       bool scan_name() {
@@ -500,7 +525,7 @@ namespace stan {
         for (size_t i = 0; s[i]; ++i) {
           char c;
           if (!(in_ >> c)) {
-            for (size_t j = 1; j < i; ++j) 
+            for (size_t j = 1; j < i; ++j)
               in_.putback(s[i-j]);
             return false;
           }
@@ -508,7 +533,7 @@ namespace stan {
           if ((case_sensitive && c != s[i])
               || (!case_sensitive && ::toupper(c) != ::toupper(s[i]))) {
             in_.putback(c);
-            for (size_t j = 1; j < i; ++j) 
+            for (size_t j = 1; j < i; ++j)
               in_.putback(s[i-j]);
             return false;
           }
@@ -520,7 +545,7 @@ namespace stan {
         for (size_t i = 0; i < s.size(); ++i) {
           char c;
           if (!(in_ >> c)) {
-            for (size_t j = 1; j < i; ++j) 
+            for (size_t j = 1; j < i; ++j)
               in_.putback(s[i-j]);
             return false;
           }
@@ -528,7 +553,7 @@ namespace stan {
           if ((case_sensitive && c != s[i])
               || (!case_sensitive && ::toupper(c) != ::toupper(s[i]))) {
             in_.putback(c);
-            for (size_t j = 1; j < i; ++j) 
+            for (size_t j = 1; j < i; ++j)
               in_.putback(s[i-j]);
             return false;
           }
@@ -555,7 +580,7 @@ namespace stan {
         }
         catch ( const boost::bad_lexical_cast &exc ) {
           std::string msg = "value " + buf_ + " beyond array dimension range";
-          BOOST_THROW_EXCEPTION (std::invalid_argument (msg));
+          BOOST_THROW_EXCEPTION(std::invalid_argument(msg));
         }
         return d;
       }
@@ -582,7 +607,7 @@ namespace stan {
         }
         catch ( const boost::bad_lexical_cast &exc ) {
           std::string msg = "value " + buf_ + " beyond int range";
-          BOOST_THROW_EXCEPTION (std::invalid_argument (msg));
+          BOOST_THROW_EXCEPTION(std::invalid_argument(msg));
         }
         return n;
       }
@@ -594,7 +619,7 @@ namespace stan {
         }
         catch ( const boost::bad_lexical_cast &exc ) {
           std::string msg = "value " + buf_ + " beyond numeric range";
-          BOOST_THROW_EXCEPTION (std::invalid_argument (msg));
+          BOOST_THROW_EXCEPTION(std::invalid_argument(msg));
         }
         return x;
       }
@@ -604,14 +629,14 @@ namespace stan {
       // scan number stores number or throws bad lexical cast exception
       void scan_number(bool negate_val) {
         // must take longest first!
-        if (scan_chars("Inf")) { 
-          scan_chars("inity"); // read past if there
+        if (scan_chars("Inf")) {
+          scan_chars("inity");  // read past if there
           stack_r_.push_back(negate_val
                              ? -std::numeric_limits<double>::infinity()
                              : std::numeric_limits<double>::infinity());
           return;
         }
-        if (scan_chars("NaN",false)) {
+        if (scan_chars("NaN", false)) {
           stack_r_.push_back(std::numeric_limits<double>::quiet_NaN());
           return;
         }
@@ -620,7 +645,7 @@ namespace stan {
         bool is_double = false;
         buf_.clear();
         while (in_.get(c)) {
-          if (std::isdigit(c)) { // before pre-scan || c == '-' || c == '+') {
+          if (std::isdigit(c)) {  // before pre-scan || c == '-' || c == '+') {
             buf_.push_back(c);
           } else if (c == '.'
                      || c == 'e'
@@ -654,8 +679,8 @@ namespace stan {
           in_.putback(c);
           break;
         }
-        bool negate_val = scan_char('-'); 
-        if (!negate_val) scan_char('+'); // flush leading +
+        bool negate_val = scan_char('-');
+        if (!negate_val) scan_char('+');  // flush leading +
         return scan_number(negate_val);
       }
 
@@ -666,7 +691,7 @@ namespace stan {
           dims_.push_back(0U);
           return true;
         }
-        scan_number(); // first entry
+        scan_number();  // first entry
         while (scan_char(',')) {
           scan_number();
         }
@@ -676,7 +701,7 @@ namespace stan {
 
       bool scan_struct_value() {
         if (!scan_char('(')) return false;
-        if (scan_char('c')) { 
+        if (scan_char('c')) {
           scan_seq_value();
         } else {
           int start = scan_int();
@@ -690,7 +715,7 @@ namespace stan {
             for (int i = start; i >= end; --i)
               stack_i_.push_back(i);
           }
-        } 
+        }
         dims_.clear();
         if (!scan_char(',')) return false;
         if (!scan_char('.')) return false;
@@ -705,8 +730,7 @@ namespace stan {
             dims_.push_back(dim);
           }
           if (!scan_char(')')) return false;
-        } 
-        else {
+        } else {
           size_t start = scan_dim();
           if (!scan_char(':'))
             return false;
@@ -743,7 +767,7 @@ namespace stan {
           for (int i = start; i <= end; ++i)
             stack_i_.push_back(i);
         } else {
-          for (int i = start; i >= end; --i) 
+          for (int i = start; i >= end; --i)
             stack_i_.push_back(i);
         }
         dims_.push_back(stack_i_.size());
@@ -782,7 +806,7 @@ namespace stan {
        *
        * @param in Input stream reference from which to read.
        */
-      dump_reader(std::istream& in) : in_(in) { }
+      explicit dump_reader(std::istream& in) : in_(in) { }
 
       /**
        * Destroy this reader.
@@ -857,24 +881,23 @@ namespace stan {
         name_.erase();
         if (!scan_name())  // set name
           return false;
-        if (!scan_char('<')) // set <- 
+        if (!scan_char('<'))  // set <-
           return false;
-        if (!scan_char('-')) 
+        if (!scan_char('-'))
           return false;
         try {
-          bool okSyntax = scan_value(); // set stack_r_, stack_i_, dims_
+          bool okSyntax = scan_value();  // set stack_r_, stack_i_, dims_
           if (!okSyntax) {
             std::string msg = "syntax error";
-            BOOST_THROW_EXCEPTION (std::invalid_argument (msg));
+            BOOST_THROW_EXCEPTION(std::invalid_argument(msg));
           }
         }
         catch (const std::invalid_argument &e) {
           std::string msg = "data " + name_ + " " + e.what();
-          BOOST_THROW_EXCEPTION (std::invalid_argument (msg));
+          BOOST_THROW_EXCEPTION(std::invalid_argument(msg));
         }
         return true;
       }
-  
     };
 
 
@@ -884,23 +907,23 @@ namespace stan {
      *
      * A dump object represents a dump of named arrays with dimensions.
      * The arrays may have any dimensionality.  The values for an array
-     * are typed to double or int.  
+     * are typed to double or int.
      *
      * <p>See <code>dump_reader</code> for more information on the format.
      *
      * <p>Dump objects are created from reading dump files from an
-     * input stream.  
+     * input stream.
      *
      * <p>The dimensions and values of variables
-     * may be accessed by name. 
+     * may be accessed by name.
      */
     class dump : public stan::io::var_context {
-    private: 
-      std::map<std::string, 
+    private:
+      std::map<std::string,
                std::pair<std::vector<double>,
                          std::vector<size_t> > > vars_r_;
-      std::map<std::string, 
-               std::pair<std::vector<int>, 
+      std::map<std::string,
+               std::pair<std::vector<int>,
                          std::vector<size_t> > > vars_i_;
       std::vector<double> const empty_vec_r_;
       std::vector<int> const empty_vec_i_;
@@ -911,14 +934,14 @@ namespace stan {
        * returns <code>false</code> if the values are all integers.
        *
        * @param name Variable name to test.
-       * @return <code>true</code> if the variable exists in the 
+       * @return <code>true</code> if the variable exists in the
        * real values of the dump.
        */
       bool contains_r_only(const std::string& name) const {
         return vars_r_.find(name) != vars_r_.end();
       }
-    public: 
 
+    public:
       /**
        * Construct a dump object from the specified input stream.
        *
@@ -926,19 +949,19 @@ namespace stan {
        *
        * @param in Input stream from which to read.
        */
-      dump(std::istream& in) {
+      explicit dump(std::istream& in) {
         dump_reader reader(in);
         while (reader.next()) {
           if (reader.is_int()) {
-            vars_i_[reader.name()] 
-              = std::pair<std::vector<int>, 
-                          std::vector<size_t> >(reader.int_values(), 
+            vars_i_[reader.name()]
+              = std::pair<std::vector<int>,
+                          std::vector<size_t> >(reader.int_values(),
                                                 reader.dims());
-            
+
           } else {
-            vars_r_[reader.name()] 
-              = std::pair<std::vector<double>, 
-                          std::vector<size_t> >(reader.double_values(), 
+            vars_r_[reader.name()]
+              = std::pair<std::vector<double>,
+                          std::vector<size_t> >(reader.double_values(),
                                                 reader.dims());
           }
         }
@@ -970,7 +993,7 @@ namespace stan {
 
       /**
        * Return the double values for the variable with the specified
-       * name or null. 
+       * name or null.
        *
        * @param name Name of variable.
        * @return Values of variable.
@@ -988,7 +1011,7 @@ namespace stan {
         }
         return empty_vec_r_;
       }
-      
+
       /**
        * Return the dimensions for the double variable with the specified
        * name.
@@ -1018,7 +1041,7 @@ namespace stan {
         }
         return empty_vec_i_;
       }
-      
+
       /**
        * Return the dimensions for the integer variable with the specified
        * name.
@@ -1040,8 +1063,8 @@ namespace stan {
        * @param names Vector to store the list of names in.
        */
       virtual void names_r(std::vector<std::string>& names) const {
-        names.resize(0);        
-        for (std::map<std::string, 
+        names.resize(0);
+        for (std::map<std::string,
                       std::pair<std::vector<double>,
                                 std::vector<size_t> > >
                  ::const_iterator it = vars_r_.begin();
@@ -1056,29 +1079,28 @@ namespace stan {
        * @param names Vector to store the list of names in.
        */
       virtual void names_i(std::vector<std::string>& names) const {
-        names.resize(0);        
-        for (std::map<std::string, 
-                      std::pair<std::vector<int>, 
+        names.resize(0);
+        for (std::map<std::string,
+                      std::pair<std::vector<int>,
                                 std::vector<size_t> > >
                  ::const_iterator it = vars_i_.begin();
              it != vars_i_.end(); ++it)
           names.push_back((*it).first);
       }
 
-      /** 
+      /**
        * Remove variable from the object.
-       * 
+       *
        * @param name Name of the variable to remove.
        * @return If variable is removed returns <code>true</code>, else
        *   returns <code>false</code>.
        */
       bool remove(const std::string& name) {
-        return (vars_i_.erase(name) > 0) 
+        return (vars_i_.erase(name) > 0)
           || (vars_r_.erase(name) > 0);
       }
-      
     };
-    
+
   }
 
 }

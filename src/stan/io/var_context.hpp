@@ -1,5 +1,5 @@
-#ifndef STAN__IO__VAR_CONTEXT_HPP
-#define STAN__IO__VAR_CONTEXT_HPP
+#ifndef STAN_IO_VAR_CONTEXT_HPP
+#define STAN_IO_VAR_CONTEXT_HPP
 
 #include <sstream>
 #include <stdexcept>
@@ -12,12 +12,12 @@ namespace stan {
 
     /**
      * A <code>var_reader</code> reads array variables of integer and
-     * floating point type by name and dimension.  
+     * floating point type by name and dimension.
      *
      * <p>An array's dimensionality is described by a sequence of
      * (unsigned) integers.  For instance, <code>(7, 2, 3)</code> picks
      * out a 7 by 2 by 3 array.  The empty dimensionality sequence
-     * <code>()</code> is used for scalars.  
+     * <code>()</code> is used for scalars.
      *
      * <p>Multidimensional arrays are stored in column-major order,
      * meaning the first index changes the most quickly.
@@ -28,7 +28,7 @@ namespace stan {
      */
     class var_context {
     public:
-      virtual ~var_context() {};
+      virtual ~var_context() {}
 
       /**
        * Return <code>true</code> if the specified variable name is
@@ -129,7 +129,7 @@ namespace stan {
         if (is_int_type) {
           if (!contains_i(name)) {
             std::stringstream msg;
-            msg << (contains_r(name) 
+            msg << (contains_r(name)
                     ? "int variable contained non-int values"
                     : "variable does not exist" )
                 << "; processing stage=" << stage
@@ -154,9 +154,9 @@ namespace stan {
               << "; processing stage=" << stage
               << "; variable name=" << name
               << "; dims declared=";
-          add_vec(msg,dims_declared);
+          add_vec(msg, dims_declared);
           msg << "; dims found=";
-          add_vec(msg,dims);
+          add_vec(msg, dims);
           throw std::runtime_error(msg.str());
         }
         for (size_t i = 0; i < dims.size(); ++i) {
@@ -168,9 +168,9 @@ namespace stan {
                 << "; position="
                 << i
                 << "; dims declared=";
-            add_vec(msg,dims_declared);
+            add_vec(msg, dims_declared);
             msg << "; dims found=";
-            add_vec(msg,dims);
+            add_vec(msg, dims);
             throw std::runtime_error(msg.str());
           }
         }
@@ -260,7 +260,7 @@ namespace stan {
         return v;
       }
     };
-    
+
 
   }
 

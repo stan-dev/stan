@@ -1,5 +1,5 @@
-#ifndef STAN__IO__UTIL_HPP
-#define STAN__IO__UTIL_HPP
+#ifndef STAN_IO_UTIL_HPP
+#define STAN_IO_UTIL_HPP
 
 #include <string>
 #include <ctime>
@@ -28,7 +28,7 @@ namespace stan {
       std::time(&rawtime);
 
       char cbuf[80];
-      std::strftime(cbuf,80,"%a %b %d %Y %H:%M:%S",
+      std::strftime(cbuf, 80, "%a %b %d %Y %H:%M:%S",
                     std::localtime(&rawtime));
 
       return std::string(cbuf);
