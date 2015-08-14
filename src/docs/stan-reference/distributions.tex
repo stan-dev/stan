@@ -762,7 +762,7 @@ where the multinomial coefficient is defined by
     distribution parameter \farg{theta} and (implicit) total count
     \code{N = sum(\farg{y})}}
 %
-\fitem{vector}{multinomial\_rng}{vector \farg{theta}, int \farg{N}}{Generate a
+\fitem{int[]}{multinomial\_rng}{vector \farg{theta}, int \farg{N}}{Generate a
   multinomial variate with simplex distribution parameter \farg{theta} and 
   total count \farg{N}; may only be used in generated quantities block}
 \end{description}
@@ -1038,6 +1038,10 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in \reals$,
   \exp \left( - \, \frac{|y - \mu|}{\sigma} \right)
 .
 \]
+Note that the double exponential distribution is parameterized in
+terms of the scale, in contrast to the exponential distribution (see
+\refsection{exponential-distribution}), which is parameterized in
+terms of inverse scale.
 
 \pitem{y}{double\_exponential}{mu, sigma}
 
@@ -1372,7 +1376,7 @@ quantities block}
 \end{description}
 
 
-\section{Exponential Distribution}
+\section{Exponential Distribution}\label{exponential-distribution.section}
 
 \subsubsection{Probability Density Function}
 
