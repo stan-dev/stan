@@ -192,10 +192,14 @@ namespace stan {
         // Heuristic to estimate how far to look back in rolling window
         int cb_size = static_cast<int>(
                 std::max(0.1*max_iterations/static_cast<double>(eval_elbo_),
-                         1.0));
-        boost::circular_buffer<double> cb(cb_size);
+                         2.0));
+        boost::circular_buffer<double> elbo_diff(cb_size);
 
-        // Print stuff
+        // Store rolling window of ELBO's for warmup and convergence
+        int elbo_hist_size = 200;
+        boost::circular_buffer<double> elbo_hist(elbo_hist_size);
+
+        // Print header
         if (print_stream_) {
           *print_stream_ << "  iter"
                          << "       ELBO"
@@ -239,10 +243,12 @@ namespace stan {
             elbo_prev = elbo;
             elbo = calc_ELBO(variational);
             delta_elbo = rel_difference(elbo, elbo_prev);
-            cb.push_back(delta_elbo);
-            delta_elbo_ave = std::accumulate(cb.begin(), cb.end(), 0.0)
-                             / static_cast<double>(cb.size());
-            delta_elbo_med = circ_buff_median(cb);
+            elbo_diff.push_back(delta_elbo);
+            delta_elbo_ave = std::accumulate(
+                               elbo_diff.begin(), elbo_diff.end(), 0.0)
+                             / static_cast<double>(elbo_diff.size());
+            delta_elbo_med = circ_buff_median(elbo_diff);
+
             if (print_stream_) {
               *print_stream_
                         << "  "
