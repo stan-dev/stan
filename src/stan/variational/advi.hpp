@@ -320,7 +320,7 @@ namespace stan {
           }
 
           // Ensure that the sequence decreases (in expectation)
-          eta_scaled = eta / sqrt(static_cast<double>(iter_tune));
+          eta_scaled = eta / sqrt(static_cast<double>(iter_main));
 
           // Stochastic gradient update
           variational += eta_scaled * elbo_grad / (tau + params_prop.sqrt());
