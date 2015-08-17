@@ -54,7 +54,7 @@ namespace stan {
        * @param[in] orig_type Original type.
        */
       located_exception(const std::string& what,
-                        const std::string& orig_type) throw() 
+                        const std::string& orig_type) throw()
         : what_(what + " [origin: " + orig_type + "]") {
       }
 
@@ -70,10 +70,9 @@ namespace stan {
        *
        * @return Description of exception.
        */
-      const char* what() const throw() { 
+      const char* what() const throw() {
         return what_.c_str();
       }
-
     };
 
     /**
@@ -81,7 +80,7 @@ namespace stan {
      * the specified exception, adding the specified line number to
      * the specified exception's message.
      *
-     * @parem[in] e Original exception.
+     * @param[in] e Original exception.
      * @param[in] line Line number in Stan source program where
      * exception originated.
      */
@@ -106,19 +105,19 @@ namespace stan {
       using std::exception;
 
       std::stringstream o;
-      o << "Exception thrown at line " << line << ":" 
+      o << "Exception thrown at line " << line << ":"
         << std::endl
         << e.what();
       std::string s = o.str();
 
       if (is_type<bad_alloc>(e))
-        throw located_exception<bad_alloc>(s,"bad_alloc");
+        throw located_exception<bad_alloc>(s, "bad_alloc");
       if (is_type<bad_cast>(e))
-        throw located_exception<bad_cast>(s,"bad_cast");
+        throw located_exception<bad_cast>(s, "bad_cast");
       if (is_type<bad_exception>(e))
-        throw located_exception<bad_exception>(s,"bad_exception");
+        throw located_exception<bad_exception>(s, "bad_exception");
       if (is_type<bad_typeid>(e))
-        throw located_exception<bad_typeid>(s,"bad_typeid");
+        throw located_exception<bad_typeid>(s, "bad_typeid");
       if (is_type<std::ios_base::failure>(e))
         throw std::ios_base::failure(s);
       if (is_type<domain_error>(e))
@@ -140,7 +139,7 @@ namespace stan {
       if (is_type<runtime_error>(e))
         throw runtime_error(s);
 
-      throw located_exception<exception>(s,"unknown original type");
+      throw located_exception<exception>(s, "unknown original type");
     }
 
   }

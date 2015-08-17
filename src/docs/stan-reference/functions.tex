@@ -1247,19 +1247,21 @@ distribution function (and its complement).
     \mbox{\code{trigamma}}(x) 
     = 
     \begin{cases}
-      \sum_{n=0}^\infty \frac{1}{(x+n)^2}        & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\
+      \sum_{n=0}^\infty \frac{1}{(x+n)^2}        & \mbox{if } x\not\in
+      \{\dots,-3,-2,-1,0\}
+      \\[6pt]
       \textrm{error}                           & \mbox{otherwise}
     \end{cases}
     \]}
   %
   \fitem{real}{lmgamma}{int \farg{n}, real \farg{x}}{
-    Returns the natural logarithm of the multinomial gamma function with \farg{n}
-    dimensions applied to \farg{x}.
+    Returns the natural logarithm of the multivariate gamma function
+    $\Gamma_n$ with \farg{n} dimensions applied to \farg{x}.
     \[
     \mbox{\code{lmgamma}}(n,x) 
-    = 
+    =
     \begin{cases}
-      \pi^{n(n-1)/4} \, \prod_{j=1}^n \Gamma(x + (1 - j)/2) 
+      \frac{n(n-1)}{4} \log \pi + \sum_{j=1}^n \log \Gamma\left(x + \frac{1 - j}{2}\right) 
                      & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\
       \textrm{error} & \mbox{otherwise}
     \end{cases}

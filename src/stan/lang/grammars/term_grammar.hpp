@@ -1,15 +1,15 @@
 #ifndef STAN_LANG_GRAMMARS_TERM_GRAMMAR_HPP
 #define STAN_LANG_GRAMMARS_TERM_GRAMMAR_HPP
 
-#include <string>
-#include <sstream>
-#include <vector>
-
 #include <boost/spirit/include/qi.hpp>
 
 #include <stan/lang/ast.hpp>
-#include <stan/lang/grammars/whitespace_grammar.hpp>
 #include <stan/lang/grammars/expression_grammar.hpp>
+#include <stan/lang/grammars/whitespace_grammar.hpp>
+
+#include <string>
+#include <sstream>
+#include <vector>
 
 namespace stan {
 
@@ -26,7 +26,6 @@ namespace stan {
       : public boost::spirit::qi::grammar<Iterator,
                                           expression(var_origin),
                                           whitespace_grammar<Iterator> > {
-
       term_grammar(variable_map& var_map,
                    std::stringstream& error_msgs,
                    expression_grammar<Iterator>& eg);
@@ -60,7 +59,7 @@ namespace stan {
 
 
       boost::spirit::qi::rule<Iterator,
-                              boost::spirit::qi::locals<variable,fun>,
+                              boost::spirit::qi::locals<variable, fun>,
                               expression(var_origin),
                               whitespace_grammar<Iterator> >
       factor_r;
@@ -85,7 +84,7 @@ namespace stan {
 
       boost::spirit::qi::rule<Iterator,
                               expression(var_origin),
-                              boost::spirit::qi::locals<std::vector<std::vector<stan::lang::expression> > >,
+ boost::spirit::qi::locals<std::vector<std::vector<stan::lang::expression> > >,
                               whitespace_grammar<Iterator> >
       indexed_factor_r;
 
@@ -118,7 +117,6 @@ namespace stan {
                               variable(),
                               whitespace_grammar<Iterator> >
       variable_r;
-
     };
 
   }

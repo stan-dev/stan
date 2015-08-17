@@ -4,13 +4,10 @@
 #include <stan/services/arguments/singleton_argument.hpp>
 
 namespace stan {
-  
   namespace services {
-    
+
     class arg_output_file: public string_argument {
-      
     public:
-      
       arg_output_file(): string_argument() {
         _name = "file";
         _description = "Output file";
@@ -20,12 +17,10 @@ namespace stan {
         _constrained = false;
         _good_value = "good";
         _value = _default_value;
-      };
-      
+      }
     };
-    
-  } // services
-  
-} // stan
+
+  }  // services
+}  // stan
 
 #endif

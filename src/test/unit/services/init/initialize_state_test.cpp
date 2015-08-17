@@ -1,7 +1,7 @@
 #include <ostream>
 #include <stan/io/var_context.hpp>
 #include <stan/io/dump.hpp>
-#include <stan/interface/var_context_factory/var_context_factory.hpp>
+#include <stan/interface_callbacks/var_context_factory/var_context_factory.hpp>
 #include <stan/services/init/initialize_state.hpp>
 #include <stan/model/prob_grad.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
@@ -288,7 +288,7 @@ public:
 
 
 class mock_context_factory 
-  : public stan::interface::var_context_factory::var_context_factory<stan::io::dump> {
+  : public stan::interface_callbacks::var_context_factory::var_context_factory<stan::io::dump> {
 public:
   mock_context_factory() 
     : calls(0),
@@ -934,4 +934,42 @@ TEST_F(StanServices2, initialize_state_disable_random_init) {
   EXPECT_EQ(0, model.write_array_calls);
   EXPECT_NE("", output.str())
     << "expecting an error message here";
+}
+
+
+TEST_F(StanServices2, streams) {
+  stan::test::capture_std_streams();
+  using stan::services::init::initialize_state;
+  using stan::services::init::initialize_state_source;
+  using stan::services::init::initialize_state_source_and_random;
+  using stan::services::init::initialize_state_random;
+  using stan::services::init::initialize_state_values;
+  std::stringstream out;
+
+  init = "0";
+  EXPECT_NO_THROW(initialize_state(init, cont_params, model, rng, 0, context_factory));
+  out.str("");
+  EXPECT_NO_THROW(initialize_state(init, cont_params, model, rng, &out, context_factory));
+  EXPECT_EQ("", out.str());
+
+  EXPECT_NO_THROW(initialize_state_source(init, cont_params, model, rng, 0, context_factory));
+  out.str("");
+  EXPECT_NO_THROW(initialize_state_source(init, cont_params, model, rng, &out, context_factory));
+
+  EXPECT_NO_THROW(initialize_state_source_and_random(init, 0.5, cont_params, model, rng, 0, context_factory));
+  out.str("");
+  EXPECT_NO_THROW(initialize_state_source_and_random(init, 0.5, cont_params, model, rng, &out, context_factory));
+
+  EXPECT_NO_THROW(initialize_state_random(0.5, cont_params, model, rng, 0));
+  out.str("");
+  EXPECT_NO_THROW(initialize_state_random(0.5, cont_params, model, rng, &out));
+
+
+  EXPECT_NO_THROW(initialize_state_values(cont_params, model, 0));
+  out.str("");
+  EXPECT_NO_THROW(initialize_state_values(cont_params, model, &out));
+
+  stan::test::reset_std_streams();
+  EXPECT_EQ("", stan::test::cout_ss.str());
+  EXPECT_EQ("", stan::test::cerr_ss.str());
 }

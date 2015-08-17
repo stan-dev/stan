@@ -4,12 +4,13 @@
 \chapter{Model Building as Software Development}
 
 \noindent
-Developing a Stan model is a software development process.  Developing
+Developing a statistical model in Stan means writing a Stan program
+and is thus a kind of software development process.  Developing
 software is hard.  Very hard.  So many things can go wrong because
-there are so many moving parts and combinations of parts.  
+there are so many moving parts and combinations of parts.
 
 Software development practices are designed to mitigate the problems
-caused by the inherent complexity of software development.
+caused by the inherent complexity of writing computer programs.
 Unfortunately, many methodologies veer off into dogma, bean counting,
 or both.  A couple we can recommend that provide solid, practical
 advice for developers are \citep{HuntThomas:99} and
@@ -30,7 +31,10 @@ It may seem like a big investment to learn version control, but it's
 well worth it to be able to type a single command to revert to a
 previously working version or to get the difference between the
 current version and an old version.  It's even better when you need
-to share work with others, even on a paper.
+to share work with others, even on a paper---work can be done
+independently and then automatically merged.  See
+\refchapter{software-development} for information on how Stan itself
+is developed.
 
 
 \section{Make it Reproducible}
@@ -65,13 +69,13 @@ pseudo-random number generators.  These operate by generating a
 sequence of random numbers based on a ``seed.''  Stan (and other
 languages like R) can use time-based methods to generate a seed based
 on the time and date, or seeds can be provided to Stan (or R) in the
-form of long integers.  Stan writes out the seed used to generate the
+form of integers.  Stan writes out the seed used to generate the
 data as well as the version number of the Stan software so that
 results can be reproduced at a later date.%
 %
 \footnote{This also requires fixing compilers and hardware, because
   floating-point arithmetic does not have an absolutely fixed behavior
-  across platforms or compilers, just operating parameters.}
+  across operating systems, hardware configurations, or compilers.}
 
 
 
@@ -496,7 +500,7 @@ discrete distributions, require integer arguments.
 A two-dimensional array is just an array of arrays, both conceptually
 and in terms of current implementation.  When an index is supplied to
 an array, it returns the value at that index.  When more than one
-index is supplied, this idexing operation is chained.  For example, if
+index is supplied, this indexing operation is chained.  For example, if
 \code{a} is a two-dimensional array, then \code{a[m,n]} is just
 a convenient shorthand for \code{a[m][n]}.
 
@@ -748,7 +752,7 @@ model {
 The constraint \code{lower=0} in the declaration of \code{sigma}
 constrains the value to be greater than or equal to 0.  With no prior
 in the model block, the effect is an improper prior on non-negative
-real numbers.  Althogh a more informative prior may be added, improper
+real numbers.  Although a more informative prior may be added, improper
 priors are acceptable as long as they lead to proper posteriors.
 
 In the model above, \code{x} is an $N \times K$ matrix of predictors
@@ -829,8 +833,6 @@ but can be useful as a starting point for inference and as a baseline
 for sensitivity analysis (i.e., considering the effect the prior
 has on the posterior).
 
-\subsection{Uniform Priors and Transforms}
-
 Uniform priors are specific to the scale on which they are formulated.
 For instance, we could give a scale parameter $\sigma > 0$ a uniform
 prior on $(0,\infty)$, $q(\sigma) = c$ (we use $q$ because the
@@ -847,6 +849,47 @@ variables declared with constraints to ensure a uniform density on the
 legal constrained values.  This Jacobian adjustment is turned off when
 optimization is being applied in order to produce appropriate maximum
 likelihood estimates.
+
+\subsection{Proper Uniform Priors: Interval Constraints}
+
+It is possible to declare a variable with a proper uniform prior by
+imposing both an upper and lower bound on it, for example,
+%
+\begin{stancode}
+real<lower=0.1, upper=2.7> sigma;
+\end{stancode}
+%
+This will implicitly give \code{sigma} a $\distro{Uniform}(0.1, 2.7)$
+prior.  
+
+\subsubsection{Matching Support to Constraints}
+
+As with all constraints, it is important that the model
+provide support for all legal values of \code{sigma}.  For example,
+the following code constraints \code{sigma} to be positive, but then
+imposes a bounded uniform prior on it.
+%
+\begin{stancode}
+parameters {
+  real<lower=0> sigma;
+  ...
+model {
+  // *** bad *** : support narrower than constraint
+  sigma ~ uniform(0.1, 2.7);  
+\end{stancode}
+%
+The sampling statement imposes a limited support for \code{sigma} in
+(0.1, 2.7), which is narrower than the support declared in the
+constraint, namely $(0, \infty)$.  This can cause the Stan program to
+be difficult to initialize, hang during sampling, or devolve to a
+random walk.
+
+\subsubsection{Boundary Estimates}
+
+Estimates near boundaries for interval-constrained parameters
+typically signal that the prior is not appropriate for the model.  It
+can also cause numerical problems with underflow and overflow when
+sampling or optimizing.
 
 \subsection{``Uninformative'' Proper Priors}
 
@@ -968,7 +1011,7 @@ without such constraints, or boundary-avoid priors should be used (see
 
 \subsection{Fat-Tailed Priors and ``Default'' Priors}
 
-A reasonable alternative if we want to accomodate outliers is to use a
+A reasonable alternative if we want to accommodate outliers is to use a
 prior that concentrates most of mass around the area where values are
 expected to be, but still leaves a lot of mass in its tails.  The
 usual choice in such a situation is to use a Cauchy distribution for a
@@ -1313,8 +1356,8 @@ the same prior on \code{beta\_raw}.
 
 \subsection{Translated and Scaled Simplex}
 
-An alternative approch that's less efficient, but amenable to a
-a symmetric prior, is to offset and scale a simplex.
+An alternative approach that's less efficient, but amenable to a
+symmetric prior, is to offset and scale a simplex.
 %
 \begin{stancode}
 parameters {
@@ -1356,7 +1399,7 @@ IRT models).  This is another way of achieving a symmetric prior.
 Ordered regression for an outcome $y_n \in \setlist{1,\ldots,K}$ with
 predictors $x_n \in \reals^D$ is determined by a single coefficient
 vector $\beta \in \reals^D$ along with a sequence of cutpoints $c \in
-\reals^{D-1}$ sorted so that $c_d < c_{d+1}$.  The discrete output is
+\reals^{K-1}$ sorted so that $c_d < c_{d+1}$.  The discrete output is
 $k$ if the linear predictor $x_n \beta$ falls between $c_{k-1}$ and
 $c_k$, assuming $c_0 = -\infty$ and $c_K = \infty$.  The noise term is
 fixed by the form of regression, with examples for ordered logistic
@@ -1400,7 +1443,7 @@ the probability is needed only up to a proportion.
 \subsubsection{Ordered Probit}
 
 An ordered probit model could be coded in exactly the same way by
-swapping the cumultive logistic (\code{inv\_logit}) for the cumulative
+swapping the cumulative logistic (\code{inv\_logit}) for the cumulative
 normal (\code{Phi}).
 %
 
@@ -1812,7 +1855,7 @@ variables are constrained to $(0,\infty)$ by their declarations.
 
 
 
-\section{Priors for Identifiabilty}\label{priors-for-identification.section}
+\section{Priors for Identifiability}\label{priors-for-identification.section}
 
 \subsection{Location and Scale Invariance}
 
@@ -1843,7 +1886,7 @@ regression, if two predictors are collinear (i.e, one is a linear
 function of the other), then their coefficients will have a
 correlation of 1 (or -1) in the posterior.  This leads to
 non-identifiability.  By placing normal priors on the coefficients,
-the maximum likelihood solution of two duplicated preditors (trivially
+the maximum likelihood solution of two duplicated predictors (trivially
 collinear) will be half the value than would be obtained by only
 including one.
 
@@ -1871,7 +1914,7 @@ example, a model with multiple varying intercepts and slopes within
 might assign them a multivariate prior. 
 
 As an example, the individuals might people and the outcome income,
-with predictors such as income and age, and the groups might be states
+with predictors such as education level and age, and the groups might be states
 or other geographic divisions.  The effect of education level and age
 as well as an intercept might be allowed to vary by state.
 Furthermore, there might be state-level predictors, such as average
@@ -2026,6 +2069,13 @@ model {
   for (j in 1:J)
     beta[j] ~ multi_normal((u[j] * gamma)', Sigma_beta);
 
+  {
+    vector[N] x_beta_jj;
+    for (n in 1:N)
+      x_beta_jj[n] <- x[n] * beta[jj[n]];
+    y ~ normal(x_beta_jj, sigma);
+  }
+
   for (n in 1:N)
     y[n] ~ normal(x[n] * beta[jj[n]], sigma);
 }
@@ -2044,38 +2094,24 @@ diagonal and zeroes off diagonal; the version using
 \refsection{matrix-arithmetic-operators} for more information on
 specialized matrix operations.
 
-This is not the most optimal way to define this model;  it can be sped
-up through vectorization and through reparameterization in terms of
-Cholesky factors.
-
 \subsubsection{Optimization through Vectorization}
 
-Another optimization would be to vectorize the likelihood sampling
-statement by generating a temporary vector of the linear predictor.
-%
-\begin{stancode}
-{
-  vector[N] x_beta_jj;
-  for (n in 1:N)
-    x_beta_jj[n] <- x[n] * beta[jj[n]];
-  y ~ normal(x_beta_jj, sigma);
-}
-\end{stancode}
-%
-The outer brackets provide a local scope in which to define
-\code{x\_beta\_jj}.  
+The code in the Stan program above builds up a vector with entries
+\code{x\_beta\_jj[n]} of means using the predictor \code{x[n]} and
+group-level coefficient \code{beta[jj[n]]}.  A block is defined with
+brackets around it so that \code{x\_beta\_jj} can be declared as a
+local variable.  
 
-The multi-normal prior on \code{beta} can also be optimized through
-vectorization with a bit more work.  
+The vectorized code is equivalent to the simpler, non-vectorized alternative:
 %
 \begin{stancode}
-{
-   vector[K] u_gamma_t[J];
-   for (j in 1:J)
-     u_gamma_t[j] <- (u[j] * gamma)';
-   beta ~ multi_normal(u_gamma_t, Sigma_beta);
-}
+  for (j in 1:J)
+    beta[j] ~ multi_normal((u[j] * gamma)', Sigma_beta);
 \end{stancode}
+%
+But there is a huge speedup with vectorization for multivariates
+because the covariance matrix \code{Sigma\_beta} need only be solved
+once.  
 
 \subsubsection{Optimization through Cholesky Factorization}
 
@@ -2279,15 +2315,295 @@ normal distribution.
 
   
 
+\section{Multivariate Outcomes}
+
+Most regressions are set up to model univariate observations (be they
+scalar, boolean, categorical, ordinal, or count).  Even multinomial
+regressions are just repeated categorical regressions.  In contrast,
+this section discusses regression when each observed value is
+multivariate.  To relate multiple outcomes in a regression setting,
+their error terms are provided with covariance structure.  
+
+This section considers two cases, seemingly unrelated regressions for
+continuous multivariate quantities and multivariate probit regression
+for boolean multivariate quantities.
+
+\subsection{Seemingly Unrelated Regressions} 
+
+The first model considered is the ``seemingly unrelated'' regressions
+(SUR) of econometrics where several linear regressions share
+predictors and use a covariance error structure rather than
+independent errors \citep{Zellner:1962,Greene:2011}.
+
+The model is easy to write down as a regression,
+%
+\begin{eqnarray*}
+ y_n & = & x_n \, \beta + \epsilon_n
+\\[4pt]
+ \epsilon_n & \sim & \distro{MultiNormal}(0, \Sigma)
+\end{eqnarray*}
+%
+where $x_n$ is a $J$-row-vector of predictors ($x$ is an $(N \times
+J)$-matrix), $y_n$ is a $K$-vector of observations, $\beta$ is a $(K
+\times J)$-matrix of regression coefficients (vector $\beta_k$ holds
+coefficients for outcome $k$), and $\Sigma$ is covariance matrix
+governing the error.  As usual, the intercept can be rolled into $x$
+as a column of ones.
+
+The basic Stan code is straightforward (though see below for more
+optimized code for use with LKJ priors on correlation).
+%
+\begin{stancode}
+data {
+  int<lower=1> K;
+  int<lower=1> J;
+  int<lower=0> N;
+  vector[J] x[N];
+  vector[K] y[N];
+}
+parameters {
+  matrix[K,J] beta;
+  cov_matrix[K] Sigma;
+}
+model {
+  vector[K] mu[N];
+  for (n in 1:N)
+    mu[n] <- beta * x[n];
+  y ~ multi_normal(mu, Sigma);
+}
+\end{stancode}
+%
+For efficiency, the multivariate normal is vectorized by precomputing
+the array of mean vectors and sharing the same covariance matrix.
+
+Following the advice in \refsection{multivariate-hierarchical-priors},
+we will place a weakly informative normal prior on the regression
+coefficients, an LKJ prior on the correlations and a half-Cauchy prior
+on standard deviations.  The covariance structure is parameterized in
+terms of Cholesky factors for efficiency and arithmetic stability.
+%
+\begin{stancode}
+...
+parameters {
+  matrix[K,J] beta;
+  cholesky_factor_corr[K] L_Omega;
+  vector<lower=0>[K] L_sigma;
+}
+model {
+  vector[K] mu[N];
+  matrix[K,K] L_Sigma;
+
+  for (n in 1:N)
+    mu[n] <- beta * x[n];
+
+  L_Sigma <- diag_post_multiply(L_Omega, L_sigma);
+
+  to_vector(beta) ~ normal(0, 5);
+  L_Omega ~ lkj_corr_cholesky(4);
+  L_sigma ~ cauchy(0, 2.5);
+
+  y ~ multi_normal_cholesky(mu, L_Sigma);
+}
+\end{stancode}
+%
+The Cholesky factor of the covariance matrix is then reconstructed as
+a local variable and used in the model by scaling the Cholesky factor
+of the correlation matrices. The regression coefficients get a prior
+all at once by converting the matrix \code{beta} to a vector.
+
+If required, the full correlation or covariance matrices may be
+reconstructed from their Cholesky factors in the generated quantities
+block.  
 
 
+\subsection{Multivariate Probit Regression}
+
+The multivariate probit model generates sequences of boolean variables
+by applying a step function to the output of a seemingly unrelated
+regression.
+
+The observations $y_n$ are $D$-vectors of boolean values (coded 0 for
+false, 1 for true).  The values for the observations $y_n$ are based
+on latent values $z_n$ drawn from a seemingly unrelated regression
+model (see the previous section), 
+%
+\begin{eqnarray*}
+ z_n & = & x_n \, \beta + \epsilon_n
+\\[4pt]
+ \epsilon_n & \sim & \distro{MultiNormal}(0, \Sigma)
+\end{eqnarray*}
+%
+These are then put through the step function to produce a $K$-vector $z_n$
+of boolean values with elements defined by
+\[
+y_{n,k} = \mathrm{I}(z_{n,k} > 0),
+\]
+where $\mathrm{I}()$ is the indicator function taking the value 1 if its
+argument is true and 0 otherwise.
+
+Unlike in the seemingly unrelated regressions case, here the
+covariance matrix $\Sigma$ has unit standard deviations (i.e., it is a
+correlation matrix).  As with ordinary probit and logistic
+regressions, letting the scale vary causes the model (which is defined
+only by a cutpoint at 0, not a scale) to be unidentified (see
+\citep{Greene:2011}).
+
+Multivariate probit regression can be coded in Stan using the trick
+introduced by \cite{AlbertChib:1993}, where the underlying continuous
+value vectors $y_n$ are coded as truncated parameters.  The key to
+coding the model in Stan is declaring the latent vector $z$ in two
+parts, based on whether the corresponding value of $y$ is 0 or 1.
+Otherwise, the model is identical to the seemingly unrelated
+regression model in the previous section.
+
+First, we introduce a sum function for two-dimensional arrays of
+integers;  this is going to help us calculate how many total 1 values
+there are in $y$.
+%
+\begin{stancode}
+functions {
+  int sum(int[,] a) {
+    int s;
+    s <- 0;
+    for (i in 1:size(a))
+      s <- s + sum(a[i]);
+    return s;
+  }
+}
+\end{stancode}
+%
+The function is trivial, but it's not a built-in for Stan and it's easier to
+understand the rest of the model if it's pulled into its own function
+so as not to create a distraction.
+
+The data declaration block is much like for the seemingly unrelated
+regressions, but the observations \code{y} are now integers
+constrained to be 0 or 1.
+%
+\begin{stancode}
+data {
+  int<lower=1> K;
+  int<lower=1> D;
+  int<lower=0> N;
+  int<lower=0,upper=1> y[N,D];
+  vector[K] x[N];
+}
+\end{stancode}
+
+After declaring the data, there is a rather involved transformed data
+block whose sole purpose is to sort the data array \code{y} into
+positive and negative components, keeping track of indexes so that
+\code{z} can be easily reassembled in the transformed parameters
+block.
+%
+\begin{stancode}
+transformed data {
+  int<lower=0> N_pos;
+  int<lower=1,upper=N> n_pos[sum(y)];
+  int<lower=1,upper=D> d_pos[size(n_pos)];
+  int<lower=0> N_neg;
+  int<lower=1,upper=N> n_neg[(N * D) - size(n_pos)];
+  int<lower=1,upper=D> d_neg[size(n_neg)];
+
+  N_pos <- size(n_pos);
+  N_neg <- size(n_neg);
+  {
+    int i;
+    int j;
+    i <- 1;
+    j <- 1;
+    for (n in 1:N) {
+      for (d in 1:D) {
+        if (y[n,d] == 1) {
+          n_pos[i] <- n;
+          d_pos[i] <- d;
+          i <- i + 1;
+        } else {
+          n_neg[j] <- n;
+          d_neg[j] <- d;
+          j <- j + 1;
+        }
+      }
+    }
+  }
+}
+\end{stancode}
+%
+The variables \code{N\_pos} and \code{N\_neg} are set to the number of
+true (1) and number of false (0) observations in \code{y}.  The loop
+then fills in the sequence of indexes for the positive and negative
+values in four arrays.
+
+The parameters are declared as follows.
+%
+\begin{stancode}
+parameters {
+  matrix[D,K] beta;
+  cholesky_factor_corr[D] L_Omega;
+  vector<lower=0>[N_pos] z_pos;
+  vector<upper=0>[N_neg] z_neg;
+}
+\end{stancode}
+%
+These include the regression coefficients \code{beta} and the Cholesky
+factor of the correlation matrix, \code{L\_Omega}.  This time there is
+no scaling because the covariance matrix has unit scale (i.e., it is a
+correlation matrix;  see above). 
+
+The critical part of the parameter declaration is that the latent real
+value $z$ is broken into positive-constrained and negative-constrained
+components, whose size was conveniently calculated in the transformed
+data block.  The transformed data block's real work was to allow the
+transformed parameter block to reconstruct $z$.
+%
+\begin{stancode}
+transformed parameters {
+  vector[D] z[N];
+  for (n in 1:N_pos)
+    z[n_pos[n], d_pos[n]] <- z_pos[n];
+  for (n in 1:N_neg)
+    z[n_neg[n], d_neg[n]] <- z_neg[n];
+}
+\end{stancode}
+
+At this point, the model is simple, pretty much recreating the
+seemingly unrelated regression.
+%
+\begin{stancode}
+model {
+  L_Omega ~ lkj_corr_cholesky(4);
+  to_vector(beta) ~ normal(0, 5);
+  { 
+    vector[D] beta_x[N];
+    for (n in 1:N) 
+      beta_x[n] <- beta * x[n];
+    z ~ multi_normal_cholesky(beta_x, L_Omega);
+  }
+}
+\end{stancode}
+%
+This simple form of model is made possible by the Albert and
+Chib-style constraints on \code{z}.
+
+Finally, the correlation matrix itself can be put back together in the
+generated quantities block if desired. 
+%
+\begin{stancode}
+generated quantities {
+  corr_matrix[D] Omega;
+  Omega <- multiply_lower_tri_self_transpose(L_Omega);  
+}
+\end{stancode}
+%
+Of course, the same could be done for the seemingly unrelated
+regressions in the previous section.
 
 \chapter{Time-Series Models}
 
 \noindent
 Times series data come arranged in temporal order.  This chapter
 presents two kinds of time series models, regression-like models such
-as autogression and moving average models, and hidden Markov models. 
+as autoregressive and moving average models, and hidden Markov models. 
 
 \refchapter{gaussian-processes} presents Gaussian processes, which may
 also be used for time-series (and spatial) data.
@@ -2662,7 +2978,7 @@ converge --- they compute the same model).
 \section{Autoregressive Moving Average Models}
 
 Autoregressive moving-average models (ARMA), combine the predictors
-of the autoregressive model and the oving average model.  An
+of the autoregressive model and the moving average model.  An
 ARMA(1,1) model, with a single state of history, can be encoded in
 Stan as follows.
 %
@@ -2867,7 +3183,7 @@ The first assignment rescales \code{h\_std} to have a
 $\distro{Normal}(0,\sigma)$ distribution and temporarily assigns it to
 \code{h}.  The second assignment rescales \code{h[1]} so that its
 prior differs from that of \code{h[2]} through \code{h[T]}.  The next
-assignment supplies a \code{mu} offset, so that \code{h[2]} throgh
+assignment supplies a \code{mu} offset, so that \code{h[2]} through
 \code{h[T]} are now distributed $\distro{Normal}(\mu,\sigma)$; note
 that this shift must be done after the rescaling of \code{h[1]}.  The
 final loop adds in the moving average so that \code{h[2]} through
@@ -2926,7 +3242,7 @@ In the situation where the hidden states are known, the following
 naive model can be used to fit the parameters $\theta$ and $\phi$.%
 %
 \footnote{The program code is available in the Stan example model repository;
-see \url{http://mc-stan.org/examples.html}.}
+see \url{https://github.com/stan-dev/example-models/tree/master/misc/gaussian-process}.}
 %
 \begin{stancode}
 data {
@@ -3758,7 +4074,7 @@ model {
 }
 \end{stancode}
 %
-The log probabilty term is derived by taking
+The log probability term is derived by taking
 %
 \begin{eqnarray*}
 \log p_Y(y | \theta,\mu,\sigma) & = & \log\!\left( 0.3 \times \distro{Normal}(y|-1,2) \, + \,
@@ -3834,7 +4150,7 @@ sum of exponentials of those values.
 \section{Zero-Inflated and Hurdle Models}\label{zero-inflated.section}
 
 Zero-inflated and hurdle models both provide mixtures of a Poisson and
-Bernoulli probabilty mass function to allow more flexiblity in
+Bernoulli probability mass function to allow more flexibility in
 modeling the probability of a zero outcome.  Zero-inflated models, as
 defined by \citet{Lambert:1992}, add additional probability mass to
 the outcome of zero.  Hurdle models, on the other hand, are formulated
@@ -3943,7 +4259,7 @@ probability function follows the definition (on the log scale).
 Most quantities used in statistical models arise from measurements.
 Most of these measurements are taken with some error.  When the
 measurement error is small relative to the quantity being measured,
-its effect on a model are usually small.  When measurement error is
+its effect on a model is usually small.  When measurement error is
 large relative to the quantity being measured, or when very precise
 relations can be estimated being measured quantities, it is useful to
 introduce an explicit model of measurement error.
@@ -4332,9 +4648,11 @@ Stan operates on the log scale and thus requires the log likelihood,
 \\[3pt]
 \mbox{ } \ \ = \
 \begin{array}[t]{l}
-\mbox{log\_sum\_exp}_{s=1}^T \log \distro{Uniform}(s | 1,T) 
+\mbox{log\_sum\_exp}_{s=1}^T 
+\left( \log \distro{Uniform}(s | 1,T) \right.
 \\[3pt]
-{} + \sum_{t=1}^T \log \distro{Poisson}(D_t | t < s \ ? \ e \ : \ l),
+{} \hspace*{12pt} + \left. \sum_{t=1}^T \log \distro{Poisson}(D_t | t < s \ ?
+\ e \ : \ l) \right),
 \end{array}
 \]
 %
@@ -4470,9 +4788,10 @@ default MCMC implementation is shown in
 
 \subsection{Discrete Sampling}
 
-Although not computationally advantageous compared to working in
-expectation using \code{lp}, it is possible to use Stan to sample the
-value of \code{s} at every iteration.
+The generated quantities block may be used to draw discrete parameter
+values using the built-in pseudo-random number generators.  For
+example, with \code{lp} defined as above, the following program
+draws a random value for \code{s} at every iteration.
 %
 \begin{stancode}
 generated quantities {
@@ -4483,6 +4802,13 @@ generated quantities {
 %
 A posterior histogram of draws for $s$ is shown on the right side of
 \reffigure{change-point-posterior}.
+
+Compared to working in terms of expectations, discrete sampling is
+highly inefficient, especially for tails of distributions, so this
+approach should only be used if draws from a distribution are
+explicitly required.   Otherwise, expectations should be computed in
+the generated quantities block based on the posterior distribution for
+\code{s} given by \code{softmax(lp)}.
 
 
 \subsection{Posterior Covariance}
@@ -4584,7 +4910,7 @@ model {
 \end{stancode}
 \vspace*{-6pt}
 \caption{\small\it A probabilistic formulation of the Lincoln-Petersen
-population estimator for pulation size based on data from a one-step
+estimator for population size based on data from a one-step
 mark-recapture study.  The lower bound on $N$ is necessary to
 efficiently eliminate impossible values.}%
 \label{lincoln-petersen-model.figure}
@@ -4595,7 +4921,7 @@ directly coded in Stan as shown in \reffigure{lincoln-petersen-model}.
 The Lincoln-Petersen estimate is the maximum likelihood estimate (MLE)
 for this model.
 
-To enusre the MLE is the Lincoln-Petersen estimate, an improper
+To ensure the MLE is the Lincoln-Petersen estimate, an improper
 uniform prior for $N$ is used; this could (and should) be replaced
 with a more informative prior if possible based on knowledge of the
 population under study.
@@ -4690,10 +5016,10 @@ this quantity is defined recursively by
 The base case arises because if an animal was captured in the last
 time period, the probability it is never captured again is 1 because
 there are no more capture periods.  The recursive case defining
-$\chi_{t}$ in terms of $\chi_{t+1}$ involves two possibiliites: (1)
+$\chi_{t}$ in terms of $\chi_{t+1}$ involves two possibilities: (1)
 not surviving to the next time period, with probability $(1 -
-\phi_t)$, or (2) suriviving to the next time period with probability
-$\phi_t$, not being captured in the next time period with probabilty
+\phi_t)$, or (2) surviving to the next time period with probability
+$\phi_t$, not being captured in the next time period with probability
 $(1 - p_{t+1})$, and not being captured again after being alive in
 period $t+1$ with probability $\chi_{t+1}$. 
 
@@ -4791,7 +5117,7 @@ generated quantities {
 \subsubsection{Identifiability}
 
 The parameters $\phi_2$ and $p_3$, the probability of death at time 2
-and probabilty of capture at time 3 are not identifiable, because both
+and probability of capture at time 3 are not identifiable, because both
 may be used to account for lack of capture at time 3.  Their product,
 $\beta_3 = \phi_2 \, p_3$, is identified.  The Stan model defines
 \code{beta3} as a generated quantity.  Unidentified parameters pose a
@@ -4912,7 +5238,7 @@ The definition of \code{prob\_uncaptured}, from the functions block,
 is
 %
 \begin{stancode}
-funtions {
+functions {
   ...
   vector prob_uncaptured(int T, vector p, vector phi) {
     vector[T] chi;
@@ -4965,7 +5291,7 @@ on the convention of the first-capture and last-capture functions
 returning 0 for \code{first} if an individual is never captured.
 
 The inner loop for individual \code{i} first increments the log
-probability based on the survival of the individual with proability
+probability based on the survival of the individual with probability
 \code{phi[t-1]}.  The outcome of 1 is fixed because the individual
 must survive between the first and last capture (i.e., no zombies).
 Note that the loop starts after the first capture, because all
@@ -4973,7 +5299,7 @@ information in the CJS model is conditional on the first capture.
 
 In the inner loop, the observed capture status \code{y[i,t]} for
 individual \code{i} at time \code{t} has a Bernoulli distribution
-based on the capture probabilty \code{p[t]} at time \code{t}.
+based on the capture probability \code{p[t]} at time \code{t}.
 
 After the inner loop, the probability of an animal never being seen
 again after being observed at time \code{last[i]} is included, because
@@ -5001,7 +5327,7 @@ generated quantities {
 The parameter \code{p[1]} is also not modeled and will just be uniform
 between 0 and 1.  A more finely articulated model might have a
 hierarchical or time-series component, in which case \code{p[1]} would
-be an unknown intial condition and both \code{phi[T-1]} and
+be an unknown initial condition and both \code{phi[T-1]} and
 \code{p[T]} could be identified.
 
 \subsubsection{Population Size Estimates}
@@ -5064,7 +5390,7 @@ Humans are often given the task of coding (equivalently rating or
 annotating) data.  For example, journal or grant reviewers rate
 submissions, a political study may code campaign commercials as to
 whether they are attack ads or not, a natural language processing
-study might annotate Tweets as to whehter they are positive or
+study might annotate Tweets as to whether they are positive or
 negative in overall sentiment, or a dentist looking at an X-ray
 classifies a patient as having a cavity or not.  In all of these
 cases, the data coders play the role of the diagnostic tests and all
@@ -5090,7 +5416,7 @@ items (patients), and $K$ categories (condition statuses) to annotate,
 with $y_{i,j} \in 1{:}K$ being the rating provided by rater $j$ for
 item $i$.  In a diagnostic test setting for a particular condition,
 the raters are diagnostic procedures and often $K=2$, with values
-signaling the presense or absence of the condition.%
+signaling the presence or absence of the condition.%
 %
 \footnote{Diagnostic procedures are often ordinal, as in stages of
   cancer in oncological diagnosis or the severity of a cavity in
@@ -5135,7 +5461,7 @@ y_{i,j} \sim \distro{Categorical}(\theta_{j,\pi_{z[i]}}).
 \subsubsection{Priors and Hierarchical Modeling}
 
 Dawid and Skene provided maximum likelihood estimates for $\theta$ and
-$\pi$, which allows them to generate probabilty estimates for each $z_i$.
+$\pi$, which allows them to generate probability estimates for each $z_i$.
 
 To mimic Dawid and Skene's maximum likelihood model, the parameters
 $\theta_{j,k}$ and $\pi$ can be given uniform priors over
@@ -5445,7 +5771,7 @@ using vectorized notation, would yield a likelihood
 \]
 There's no direct way to encode this in Stan.  
 
-A full datatabse type structure could be used, as in the sparse
+A full database type structure could be used, as in the sparse
 example, but this is inefficient, wasting space for unnecessary
 indices and not allowing vector-based density operations.  A better
 way to code this data is as a single list of values, with a separate
@@ -5637,7 +5963,7 @@ situation, a hierarchical prior may be used for the covariance matrices.
 Two problems make it pretty much impossible to perform full Bayesian
 inference for clustering models, the lack of parameter identifiability
 and the extreme multimodality of the posteriors.  There is additional
-discussion related to the non-identifiability due to label swtiching
+discussion related to the non-identifiability due to label switching
 in \refsection{label-switching-problematic}.
 
 \subsection{Non-Identifiability}
@@ -5685,7 +6011,7 @@ which labels for items are observed.%
   mixture models present a problem, whereas there is no such problem
   for classification.  Despite the difficulties with full Bayesian
   inference for clustering, researchers continue to use it, often in
-  an explorata data analysis setting rather than for predictive
+  an exploratory data analysis setting rather than for predictive
   modeling.}
 
 Multinomial mixture models are referred to as ``naive Bayes'' because
@@ -5735,7 +6061,7 @@ The specification for naive Bayes in the previous sections have used a ragged
 array notation for the words $w$.  Because Stan does not support
 ragged arrays, the models are coded using an alternative strategy that
 provides an index for each word in a global list of words.   The data
-is organized as follows, with the word arrays layed out in a column and each
+is organized as follows, with the word arrays laid out in a column and each
 assigned to its document in a second column.
 %
 \begin{center}
@@ -6481,7 +6807,7 @@ data points in seconds.
 ``Automatic relevance determination'' is the term used in machine
 learning corresponding to the term ``hierarchical modeling'' in
 statistics.  In either case, the idea is that hyperparameters are
-estimated from data (in Bayesian inference, via the joint posteiror
+estimated from data (in Bayesian inference, via the joint posterior
 distribution) rather than being preset.
 
 For multivariate inputs $x \in \reals^D$, the squared exponential
@@ -6862,7 +7188,7 @@ A pure logistic Gaussian process regression would not include a noise
 term in the definition of the covariance matrix.  This can be
 implemented by simply removing the noise term(s) \code{sigma\_sq} from
 the definition of \code{Sigma}.  Probit regression can be coded by
-subsituting the probit link for the logit.%
+substituting the probit link for the logit.%
 %
 \footnote{Although it is possible to implement probit regression by
   including the noise term \code{sigma\_sq} and then quantizing
@@ -7174,7 +7500,7 @@ transform, which in this case is
 
 In the case of a multivariate transform, the log of the Jacobian of
 the transform must be added to the log probability accumulator (see
-the subsection of \refsection{change-of-variables} on multivarate
+the subsection of \refsection{change-of-variables} on multivariate
 changes of variables for more precise definitions of multivariate
 transforms and Jacobians).  In Stan, this can be coded as follows in
 the general case where the Jacobian is not a full matrix.
@@ -7214,7 +7540,7 @@ transformed parameters {
   vector[K] J_diag;  // diagonals of Jacobian matrix
   ... 
   ... compute J[k,k] = d.v[k] / d.u[k] ...
-  incement_log_prob(sum(log(J_diag)));
+  increment_log_prob(sum(log(J_diag)));
   ...
 \end{stancode}
 
@@ -7827,11 +8153,11 @@ generator.
 \begin{stancode}
 /**
  * Return a data matrix of specified size with rows 
- * correspdonding to items and the first column filled 
+ * corresponding to items and the first column filled 
  * with the value 1 to represent the intercept and the 
  * remaining columns randomly filled with unit-normal draws.
  *
- * @param N Number of rows correspdong to data items
+ * @param N Number of rows corresponding to data items
  * @param K Number of predictors, counting the intercept, per
  *          item.
  * @return Simulated predictor matrix.
@@ -7851,7 +8177,7 @@ and ending with \code{*/} to the Stan parser.
 For functions that raise exceptions, exceptions can be documented using
 \code{@throws}.%
 %
-\footnote{As of Stan 2.6.3, the only way a user-defined
+\footnote{As of Stan 2.7.0, the only way a user-defined
 producer will raise an exception is if a function it calls (including
 sampling statements) raises an exception via the reject statement.}
 %
@@ -7976,7 +8302,7 @@ value of the system parameter ($\theta$).
 Given a value of the parameter $\theta$ and an initial state $y(t_0)$
 at time $t_0$, it is possible to solve the equations numerically to
 calculate $y(t)$ for any given time $t$.  The rest of this chapter
-shows how Stan is able to provide the functionalty to specify and
+shows how Stan is able to provide the functionality to specify and
 solve a system of ODEs.
 
 
@@ -8014,13 +8340,13 @@ All of the arguments to such a function must be provided in exactly
 the order shown above.  This may require passing in zero-length
 arrays for data or parameters if the system does not involve data or
 parameters.  A full example for the simple harmonic oscillator, which
-does not depend on any constant data variables, is provided in
-in \reffigure{sho-trajectory}.
+does not depend on any constant data variables, is provided in 
+\reffigure{sho-trajectory}.
 
 \subsection{Data versus Parameters}
 
 Unlike other functions, a function describing a system of ODEs is
-limited as to the origins of variables its arguments.  In particular,
+limited as to the origins of variables in its arguments.  In particular,
 the time \code{t}, real data \code{x}, and integer data \code{x\_int}
 must be expressions that only involve data or transformed data
 variables.  The initial state \code{y} or the parameters \code{theta}
@@ -8291,7 +8617,7 @@ and $\lambda_2=-1000000000$ as it does in the neighborhood of
 $\lambda_1=0$ and $\lambda_2=0$, and so on for ever more far-ranging
 values.
 
-The maringal posterior $p(\lambda_1,\lambda_2|y)$ for this model is
+The marginal posterior $p(\lambda_1,\lambda_2|y)$ for this model is
 thus improper.%
 %
 \footnote{The marginal posterior $p(\sigma|y)$ for $\sigma$ is proper
@@ -8392,7 +8718,7 @@ necessary because the $K$th is just one minus the sum of the first $K
 - 1$ parameters, so that if $\theta$ is a $K$-simplex,
 %
 \[
-\theta_K = 1 - \sum_{k=1}^K \theta_k.
+\theta_K = 1 - \sum_{k=1}^{K-1} \theta_k.
 \]
 %
 The softmax function (see \refsection{softmax}) maps a $K$-vector
@@ -8521,7 +8847,7 @@ with varying location).  Unlike the approaching of pinning $\alpha_K =
 0$, the prior-based approach models the $K$ outcomes symmetrically
 rather than modeling $K-1$ outcomes relative to the $K$-th.  The
 pinned parameterization, on the other hand, is usually more efficient
-statisticaly because it does not have the extra degree of (prior
+statistically because it does not have the extra degree of (prior
 constrained) wiggle room.
 
 
@@ -8615,7 +8941,7 @@ neighborhoods of multiple local maxima according to the probability
 masses. In Gibbs sampling, it is unlikely for $\mu_1$
 to move to a new mode when sampled conditioned on the current values
 of $\mu_2$ and $\theta$. For HMC and NUTS, the problem is that the
-sampler gets stuck in one of the two ``bowls'' arounds the modes and
+sampler gets stuck in one of the two ``bowls'' around the modes and
 cannot gather enough energy from random momentum assignment to move
 from one mode to another.
 
@@ -8635,7 +8961,7 @@ One common strategy is to impose a constraint on the parameters that
 identifies the components.  For instance, we might consider
 constraining $\mu_1 < \mu_2$ in the two-component normal mixture model
 discussed above.  A problem that can arise from such an approach is
-when there is substantial probabilty mass for the opposite ordering
+when there is substantial probability mass for the opposite ordering
 $\mu_1 > \mu_2$.  In these cases, the posteriors are affected by
 the constraint and true posterior uncertainty in $\mu_1$ and $\mu_2$
 is not captured by the model with the constraint.  In addition,
@@ -8665,6 +8991,27 @@ initial values can be found and the labels do not switch within a
 Markov chain.  The result is that all chains are glued to a
 neighborhood of a particular mode in the posterior.
 
+\section{Component Collapsing in Mixture Models}
+
+It is possible for two mixture components in a mixture model to
+collapse to the same values during sampling or optimization.  For
+example, a mixture of $K$ normals might devolve to have $\mu_i =
+\mu_j$ and $\sigma_i = \sigma_j$ for $i \neq j$.  
+
+This will typically happen early in sampling due to initialization in
+MCMC or optimization or arise from random movement during MCMC.  Once
+the parameters match for a given draw $(m)$, it can become hard to
+escape because there can be a trough of low-density mass between the
+current parameter values and the ones without collapsed components.  
+
+It may help to use a smaller step size during warmup, a stronger prior
+on each mixture component's membership responsibility.  A more extreme
+measure is to include additional mixture components to deal with the
+possibility that some of them may collapse.
+
+In general, it is very difficult to recover exactly the right $K$
+mixture components in a mixture model as $K$ increases beyond one
+(yes, even a two-component mixture can have this problem).
 
 
 \section{Posteriors with Unbounded Densities}
@@ -8758,7 +9105,7 @@ $\mbox{logit}^{-1}(x_n \beta) \rightarrow 1$.
 
 With separability, there is no maximum to the likelihood and hence no
 maximum likelihood estimate.  From the Bayesian perspective, the
-posterior is improper and therefor the marginal posterior mean for
+posterior is improper and therefore the marginal posterior mean for
 $\beta_k$ is also not defined.  The usual solution to this problem in
 Bayesian models is to include a proper prior for $\beta$, which
 ensures a proper posterior.
@@ -8784,7 +9131,7 @@ $\psi$ at all points in $[0,1]$.
 
 With an improper posterior, it is theoretically impossible to properly
 explore the posterior. However, Gibbs sampling as performed by BUGS
-and JAGS, although still ineable to properly sample from such an
+and JAGS, although still unable to properly sample from such an
 improper posterior, behaves quite differently in practice than the
 Hamiltonian Monte Carlo sampling performed by Stan when faced with an
 example such as the two intercept model discussed in
@@ -9147,7 +9494,7 @@ difficult for Hamiltonian Monte Carlo, which operates within a
 Euclidean geometry.%
 %
 \footnote{Riemannian Manifold Hamiltonian Monte Carlo (RMHMC) overcomes
-  this difficulty by simulating the Hamiltonian dynamics in a a space
+  this difficulty by simulating the Hamiltonian dynamics in a space
   with a position-dependent metric; see
   \citep{GirolamiCalderhead:2011} and \citep{Betancourt:2012}.}
 %
@@ -9800,7 +10147,7 @@ by more fully exploiting expression templates inside the Eigen
 \Cpp matrix library.  This will require enhancing Eigen to deal
 with mixed-type arguments, such as the type \code{double} used
 for constants and the algorithmic differentiation type
-\code{stan::agrad::var} 
+\code{stan::math::var} 
 used for variables.}.
 %
 The inefficiency of transposition could itself be mitigated somewhat by
@@ -10202,3 +10549,7 @@ you are running in RStan, Rcpp handles the conversion between R's
 floating point numbers and C++ doubles. If Rcpp changes the conversion
 process or use different types, the results are not guaranteed to be
 the same down to the bit level.  
+
+The compiler and compiler settings can also be an issue.  There is a
+nice discussion of the issues and how to control reproducibility in
+Intel's proprietary compiler by \cite{CordenKreitzer:2014}.

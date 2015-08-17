@@ -165,7 +165,7 @@ Suppose $N \in \nats$ and $\theta \in [0,1]$, and $n \in
 \]
 
 
-\pitem{n}{binomial}{N,theta}
+\pitem{n}{binomial}{N, theta}
 
 \subsubsection{Stan Functions}
 
@@ -238,7 +238,7 @@ Suppose $N \in \nats$, $\alpha \in \reals$, and $n \in
 - \frac{N - n}{\mbox{logit}^{-1}(\alpha)}
 \]
 
-\pitem{n}{binomial\_logit}{N,alpha}
+\pitem{n}{binomial\_logit}{N, alpha}
 
 \subsubsection{Stan Functions}
 
@@ -273,7 +273,7 @@ where the beta function $\Betafun(u,v)$ is defined for $u \in
 = \frac{\Gamma(u) \ \Gamma(v)}{\Gamma(u + v)}.
 \]
 
-\pitem{n}{beta\_binomial}{N,alpha,beta}
+\pitem{n}{beta\_binomial}{N, alpha, beta}
 
 \subsubsection{Stan Functions}
 
@@ -330,7 +330,7 @@ then for $n \in \setlist{\max(0,N-b),\ldots,\min(a,N)}$,
 \]
 
 
-\pitem{n}{hypergeometric}{N,a,b}
+\pitem{n}{hypergeometric}{N, a, b}
 
 \subsubsection{Stan Functions}
 
@@ -438,7 +438,7 @@ The $k=1$ and $k=K$ edge cases can be subsumed into the general definition
 by setting $c_0 = -\infty$ and $c_K = +\infty$ with
 $\mbox{logit}^{-1}(-\infty) = 0$ and $\mbox{logit}^{-1}(\infty) = 1$.
 
-\pitem{k}{ordered\_logistic}{eta,c}
+\pitem{k}{ordered\_logistic}{eta, c}
 
 
 \subsubsection{Stan Functions}
@@ -466,15 +466,14 @@ numbers (i.e., the non-negative integers).
 \section{Negative Binomial Distribution}
 
 For the negative binomial distribution Stan uses the parameterization
-described in \citet{GelmanEtAl:2013}.
-For an alternative parametrization, see section \ref{sec:nbalt}
+described in \citet{GelmanEtAl:2013}.  For alternative parametrizations, see \refsection{nbalt}.
 
 \subsubsection{Probability Mass Function}
 
 If $\alpha \in \posreals$ and $\beta \in \posreals$, then for $y \in
 \nats$,
 \[
-\distro{NegativeBinomial}(y|\alpha,\beta)
+\distro{NegBinomial}(y|\alpha,\beta)
  = 
 \binom{y + \alpha - 1}{\alpha - 1}
 \,
@@ -485,7 +484,7 @@ If $\alpha \in \posreals$ and $\beta \in \posreals$, then for $y \in
 
 % DON'T REMOVE --- WE MAY INCLUDE ALL THESE IN THE FUTURE ELSEWHERE
 % \begin{eqnarray*}
-% \log \distro{NegativeBinomial}(y|\alpha,\beta)
+% \log \distro{NegBinomial}(y|\alpha,\beta)
 % & = & \log \Gamma(y + \alpha) 
 %   - \log \Gamma(y + 1)
 %   - \log \Gamma(\alpha)
@@ -504,21 +503,21 @@ If $\alpha \in \posreals$ and $\beta \in \posreals$, then for $y \in
 % \]
 % \[
 % \frac{\partial}{\partial \beta} 
-% \log \distro{NegativeBinomial}(y|\alpha,\beta)
+% \log \distro{NegBinomial}(y|\alpha,\beta)
 % = \frac{\alpha}{\beta} - \frac{\alpha + y}{\beta + 1}
 % \]
 % where $\Psi$ is the digamma function (see
 % \refsection{digamma-appendix} for a definition).
 
 The mean and variance of a random variable $y \sim
-\distro{NegativeBinomial}(\alpha,\beta)$ are given by
+\distro{NegBinomial}(\alpha,\beta)$ are given by
 \[
 \mathbb{E}[y] = \frac{\alpha}{\beta} 
 \ \ \mbox{ and } \ \ 
 \mbox{Var}[Y] = \frac{\alpha}{\beta^2} (\beta + 1).
 \]
 
-\pitem{n}{neg\_binomial}{alpha,beta}
+\pitem{n}{neg\_binomial}{alpha, beta}
 
 \subsubsection{Stan Functions}
 
@@ -550,20 +549,20 @@ must be less than $2 ^ {29}$}
 \end{description}
 
 
-
-\section{Negative Binomial Distribution, alternative parameterization}
-\label{sec:nbalt}
+\section{Negative Binomial Distribution (alternative parameterization)}\label{nbalt.section}
 
 Stan also provides an alternative parameterization of the negative
-binomial distribution using the mean and inverse scale
-(overdispersion) as parameters.
+binomial distribution directly using a mean (i.e., location) parameter
+and a parameter that controls overdispersion relative to the square of
+the mean.  \refsection{neg-binom-2-log}, below, provides a second
+alternative parameterization directly in terms of the log mean.
 
 \subsubsection{Probability Mass Function}
 
-If $\eta \in \reals$, $\mu \in \posreals$ and $\phi \in \posreals$,
-then for $y \in \nats$,
+The first parameterization is for $\mu \in \posreals$ and $\phi \in
+\posreals$, which for $y \in \nats$ is defined as
 \[
-\distro{NegativeBinomial2}(y|\mu,\phi)
+\distro{NegBinomial2}(y \, | \, \mu, \phi)
  =
 \binom{y + \phi - 1}{y}
 \,
@@ -571,19 +570,21 @@ then for $y \in \nats$,
 \,
 \left( \frac{\phi}{\mu+\phi} \right)^{\!\phi} \!.
 \]
+
 The mean and variance of a random variable $y \sim
-\distro{NegativeBinomial2}(y|\mu,\phi)$ are
+\distro{NegBinomial2}(y|\mu,\phi)$ are
 \[
-\mathbb{E}[Y] = \mu = e^\eta 
+\mathbb{E}[Y] = \mu
 \ \ \ \mbox{ and } \ \ \
 \mbox{Var}[Y] = \mu + \frac{\mu^2}{\phi}.
 \]
-The parameter $\phi$ represents precision, whereas its inverse,
-$\phi^{-1}$, represents overdispersion.
+Recall that $\distro{Poisson}(\mu)$ has variance $\mu$, so $\mu^2 /
+\phi > 0$ is the additional variance of the negative binomial above
+that of the Poisson with mean $\mu$.  So the inverse of parameter
+$\phi$ controls the overdispersion, scaled by the square of the mean,
+$\mu^2$.
 
 \pitem{y}{neg\_binomial\_2}{mu, phi}
-
-\pitem{y}{neg\_binomial\_2\_log}{eta, phi}
 
 \subsubsection{Stan Functions}
 
@@ -593,12 +594,6 @@ $\phi^{-1}$, represents overdispersion.
    \farg{mu}, reals \farg{phi}}{The negative binomial probability
    mass of \farg{n} given location \farg{mu} and precision
    \farg{phi}.}
-%
- \fitem{real}{neg\_binomial\_2\_log\_log}{ints \farg{y}, reals
-   \farg{eta}, reals \farg{phi}}{The log negative binomial probability
-   mass of \farg{n} given log-location \farg{eta} and precision
-   \farg{phi}. This is especially useful for log-linear negative
-   binomial regressions.}
 %
  \fitem{real}{neg\_binomial\_2\_cdf}{ints \farg{n}, reals
    \farg{mu}, reals \farg{phi}}{The negative binomial cumulative
@@ -621,12 +616,42 @@ $\phi^{-1}$, represents overdispersion.
   generated quantities block.
   \farg{mu} must be less than $2 ^ {29}$.}
 %
-\fitem{int}{neg\_binomial\_2\_log\_rng}{real \farg{eta}, real \farg{phi}}{
-  Generate a negative binomial variate with log-location \farg{eta}
-  and precision \farg{phi}; may only be used in generated
-  quantities block. \farg{eta} must be less than $29 \log 2$.}
 \end{description}
 
+\section{Negative Binomial Distribution (log alternative parameterization)}\label{neg-binom-2-log.section}
+
+Related to the parameterization in \refsection{nbalt}, the following
+parameterization uses a log mean parameter $\eta = \log(\mu)$, defined
+for $\eta \in \reals$, $\phi \in \posreals$, so that for $y \in \nats$,
+%
+\[
+\distro{NegBinomial2Log}(y \, | \, \eta, \phi)
+=
+\distro{NegBinomial2}(y | \exp(\eta), \phi).
+\]
+%
+This alternative may be used for sampling, as a function, and for
+random number generation, but as of yet, there are no CDFs implemented
+for it.
+
+\pitem{y}{neg\_binomial\_2\_log}{eta, phi}
+
+\section{Stan Functions}
+
+\begin{description}
+%
+  \fitem{real}{neg\_binomial\_2\_log\_log}{ints \farg{y}, reals
+    \farg{eta}, reals \farg{phi}}{The log negative binomial
+    probability mass of \farg{n} given log-location \farg{eta} and
+    inverse overdispersion control \farg{phi}. This is especially
+    useful for log-linear negative binomial regressions.}
+%
+\fitem{int}{neg\_binomial\_2\_log\_rng}{real \farg{eta}, real \farg{phi}}{
+  Generate a negative binomial variate with log-location \farg{eta}
+  and inverse overdispersion control \farg{phi}; may only be used in generated
+  quantities block. \farg{eta} must be less than $29 \log 2$.}
+%
+\end{description}
 
 \section{Poisson Distribution}\label{poisson.section}
 
@@ -771,7 +796,7 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
 \!.
 \]
 
-\pitem{y}{normal}{mu,sigma}
+\pitem{y}{normal}{mu, sigma}
 
 \subsubsection{Stan Functions}
 
@@ -815,28 +840,28 @@ If $\mu \in \reals$, $\sigma \in \posreals$, and $\lambda \in
 .
 \]
 
-\pitem{y}{exp\_mod\_normal}{mu,sigma,lambda}
+\pitem{y}{exp\_mod\_normal}{mu, sigma, lambda}
 
 \subsubsection{Stan Functions}
 
 \begin{description}
   \fitemtwolines{real}{exp\_mod\_normal\_log}{reals \farg{y}, reals
-    \farg{mu}, reals \farg{sigma}}{reals \farg{lambda}}{The
+    \farg{mu}, reals \farg{sigma},}{reals \farg{lambda}}{The
     log of the exponentially modified normal density of \farg{y} given
     location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda}}
 %
   \fitemtwolines{real}{exp\_mod\_normal\_cdf}{reals \farg{y}, reals \farg{mu},
-    reals \farg{sigma}}{reals \farg{lambda}}{The
+    reals \farg{sigma},}{reals \farg{lambda}}{The
     exponentially modified normal cumulative distribution function of \farg{y} 
     given location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda}}
 %
   \fitemtwolines{real}{exp\_mod\_normal\_cdf\_log}{reals \farg{y}, reals \farg{mu},
-<    reals \farg{sigma}}{reals \farg{lambda}}{The log of the
+    reals \farg{sigma},}{reals \farg{lambda}}{The log of the
     exponentially modified normal cumulative distribution function of \farg{y} 
     given location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda}}
 %
   \fitemtwolines{real}{exp\_mod\_normal\_ccdf\_log}{reals \farg{y}, reals \farg{mu},
-    reals \farg{sigma}}{reals \farg{lambda}}{The log of the
+    reals \farg{sigma},}{reals \farg{lambda}}{The log of the
     exponentially modified normal complementary cumulative distribution 
     function of \farg{y} given location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda}}
 \end{description}
@@ -867,7 +892,7 @@ then for $y \in \reals$,
 .
 \]
 
-\pitem{y}{skew\_normal}{mu,sigma,alpha}
+\pitem{y}{skew\_normal}{mu, sigma, alpha}
 
 \subsubsection{Stan Functions}
 
@@ -921,7 +946,7 @@ then for $y \in \reals$,
 \! .
 \]
 
-\pitem{y}{student\_t}{nu,mu,sigma}
+\pitem{y}{student\_t}{nu, mu, sigma}
 
 \subsubsection{Stan Functions}
 
@@ -972,7 +997,7 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in \reals$,
 .
 \]
 
-\pitem{y}{cauchy}{mu,sigma}
+\pitem{y}{cauchy}{mu, sigma}
 
 \subsubsection{Stan Functions}
 
@@ -1014,7 +1039,7 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in \reals$,
 .
 \]
 
-\pitem{y}{double\_exponential}{mu,sigma}
+\pitem{y}{double\_exponential}{mu, sigma}
 
 \subsubsection{Stan Functions}
 
@@ -1061,7 +1086,7 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in \reals$,
 \]
 
 
-\pitem{y}{logistic}{mu,sigma}
+\pitem{y}{logistic}{mu, sigma}
 
 \subsubsection{Stan Functions}
 
@@ -1105,7 +1130,7 @@ If $\mu \in \reals$ and $\beta \in \posreals$, then for $y \in \reals$,
 .
 \]
 
-\pitem{y}{gumbel}{mu,beta}
+\pitem{y}{gumbel}{mu, beta}
 
 \subsubsection{Stan Functions}
 
@@ -1161,7 +1186,7 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
 .
 \]
 
-\pitem{y}{lognormal}{mu,sigma}
+\pitem{y}{lognormal}{mu, sigma}
 
 
 \subsubsection{Stan Functions}
@@ -1308,7 +1333,7 @@ y^{-(\nu/2 + 1)}
 \]
 
 
-\pitem{y}{scaled\_inv\_chi\_square}{nu,sigma}
+\pitem{y}{scaled\_inv\_chi\_square}{nu, sigma}
 
 \subsubsection{Stan Functions}
 
@@ -1406,7 +1431,7 @@ y^{\alpha - 1}
 \]
 
 
-\pitem{y}{gamma}{alpha,beta}
+\pitem{y}{gamma}{alpha, beta}
 
 \subsubsection{Stan Functions}
 
@@ -1454,7 +1479,7 @@ y^{-(\alpha + 1)}
 .
 \]
 
-\pitem{y}{inv\_gamma}{alpha,beta}
+\pitem{y}{inv\_gamma}{alpha, beta}
 
 
 \subsubsection{Stan Functions}
@@ -1505,7 +1530,7 @@ If $\alpha \in \posreals$ and $\sigma \in \posreals$, then for $y \in
 Note that if $Y \propto \distro{Weibull}(\alpha,\sigma)$,
 then $Y^{-1} \propto \distro{Frechet}(\alpha,\sigma^{-1})$.
 
-\pitem{y}{weibull}{alpha,sigma}
+\pitem{y}{weibull}{alpha, sigma}
 
 \subsubsection{Stan Functions}
 
@@ -1555,7 +1580,7 @@ If $\alpha \in \posreals$ and $\sigma \in \posreals$, then for $y \in
 Note that if $Y \propto \distro{Frechet}(\alpha,\sigma)$,
 then $Y^{-1} \propto \distro{Weibull}(\alpha,\sigma^{-1})$.
 
-\pitem{y}{frechet}{alpha,sigma}
+\pitem{y}{frechet}{alpha, sigma}
 
 \subsubsection{Stan Functions}
 
@@ -1627,6 +1652,32 @@ non-negative real numbers.
 quantities block}
 \end{description}
 
+\section{Wiener Diffusion Model Distributions}
+
+\pitem{y}{wiener}{alpha, tau, beta, delta}
+
+\subsubsection{Stan Functions}
+\begin{description}
+\fitem{real}{wiener\_log}{reals \farg{y}, reals \farg{alpha},
+ reals \farg{tau}, reals \farg{beta}, reals \farg{delta}}
+ {The log of the Wiener first passage time 
+ density of \farg{y} given boundary separation \farg{alpha}, 
+ non-decision time \farg{tau}, a-priori bias \farg{beta} and
+ drift rate \farg{delta}}
+\end{description}
+
+\subsubsection{Boundaries}
+
+Stan returns the first passage time of the accumulation process
+over the upper boundary only. Therefore, one needs to calculate:
+\[
+\distro{wiener}(y|\alpha, \tau, 1 - \beta, - \delta).
+\]
+
+To get the result for the lower
+boundary. For more details, see the appendix of
+\citet{Vandekerckhove-Wabersich:2014}.
+
 \chapter{Positive Lower-Bounded Probabilities}
 
 \noindent
@@ -1646,7 +1697,7 @@ $y \in \posreals$ with $y \geq y_{\mbox{\footnotesize\rm min}}$,
 \frac{\displaystyle \alpha\,y_{\mbox{\footnotesize\rm min}}^\alpha}{\displaystyle y^{\alpha+1}}.
 \]
 
-\pitem{y}{pareto}{y\_min,alpha}
+\pitem{y}{pareto}{y\_min, alpha}
 
 \subsubsection{Stan Functions}
 
@@ -1692,7 +1743,7 @@ $y \geq \mu$,
 
 Note that the Lomax distribution is a Pareto Type 2 distribution with $\mu=0$.
 
-\pitem{y}{pareto\_type\_2}{mu,lambda,alpha}
+\pitem{y}{pareto\_type\_2}{mu, lambda, alpha}
 
 \subsubsection{Stan Functions}
 
@@ -1753,7 +1804,7 @@ is 0 and the log probability is $-\infty$.  Similarly, the
 distribution requires strictly positive parameters, $\alpha, \beta >
 0$.
 
-\pitem{theta}{beta}{alpha,beta}
+\pitem{theta}{beta}{alpha, beta}
 
 \subsubsection{Stan Functions}
 
@@ -1831,7 +1882,7 @@ the mode.  Ideally, the parameterization and support will be set up so
 that the bulk of the probability mass is in a continuous interval
 around the mean $\mu$.
 
-\pitem{y}{von\_mises}{mu,kappa}
+\pitem{y}{von\_mises}{mu, kappa}
 
 \subsubsection{Stan Functions}
 
@@ -1889,7 +1940,7 @@ If $\alpha \in \reals$ and $\beta \in (\alpha,\infty)$, then for $y
 .
 \]
 
-\pitem{y}{uniform}{alpha,beta}
+\pitem{y}{uniform}{alpha, beta}
 
 \subsubsection{Stan Functions}
 
@@ -1951,7 +2002,7 @@ If $K \in \nats$, $\mu \in \reals^K$, and $\Sigma \in \reals^{K \times
 %
 where $|\Sigma|$ is the absolute determinant of $\Sigma$.
 
-\pitem{y}{multi\_normal}{mu,Sigma}
+\pitem{y}{multi\_normal}{mu, Sigma}
 
 \subsubsection{Stan Functions}
 
@@ -2007,7 +2058,7 @@ If $K \in \nats$, $\mu \in \reals^K$, and $\Omega \in \reals^{K \times
 = \distro{MultiNormal}(y|\mu,\Sigma^{-1})
 \]
 
-\pitem{y}{multi\_normal\_prec}{mu,Omega}
+\pitem{y}{multi\_normal\_prec}{mu, Omega}
 
 \subsubsection{Stan Functions}
 
@@ -2051,7 +2102,7 @@ triangular and such that $LL^{\top}$ is positive definite, then for $y
 \]
 
 
-\pitem{y}{multi\_normal\_cholesky}{mu,L}
+\pitem{y}{multi\_normal\_cholesky}{mu, L}
 
 \subsubsection{Stan Functions}
 
@@ -2104,7 +2155,7 @@ Gaussian Processes with multi-variate outputs where only the output dimensions
 share a kernel function but vary based on their scale.  Note that this
 function does not take into account the mean prediction.
 
-\pitem{y}{multi\_gp}{Sigma,w}
+\pitem{y}{multi\_gp}{Sigma, w}
 
 \subsubsection{Stan Functions}
 
@@ -2138,7 +2189,7 @@ parametrization in terms of Cholesky factor of the kernel matrix, this distribut
 is also more efficient than $\distro{MultiGP}()$. Note that this
 function does not take into account the mean prediction.
 
-\pitem{y}{multi\_gp\_cholesky}{L,w}
+\pitem{y}{multi\_gp\_cholesky}{L, w}
 
 \subsubsection{Stan Functions}
 
@@ -2183,7 +2234,7 @@ $y \in \reals^K$,
 \]
 \vspace*{4pt}
 
-\pitem{y}{multi\_student\_t}{nu,mu,Sigma}
+\pitem{y}{multi\_student\_t}{nu, mu, Sigma}
 
 
 \subsubsection{Stan Functions}
@@ -2221,7 +2272,6 @@ may only be used in generated quantities block}
 
 
 \section{Gaussian Dynamic Linear Models}
-\label{sec:guass-dynam-line}
 
 A Gaussian Dynamic Linear model is defined as follows,
 For $t \in 1, \dots, T$,
@@ -2240,7 +2290,7 @@ the Kalman Filter. If $V$ is diagonal, then a more efficient
 algorithm which sequentially processes observations and avoids a
 matrix inversions can be used \citep[Sec~6.4]{DurbinKoopman:2001}.
 
-\pitem{y}{gaussian\_dlm\_obs}{F,G,V,W,m0,C0}
+\pitem{y}{gaussian\_dlm\_obs}{F, G, V, W, m0, C0}
 
 \subsubsection{Stan Functions}
 
@@ -2507,7 +2557,7 @@ the multivariate Gamma function,
 \!.
 \]
 
-\pitem{W}{wishart}{nu,Sigma}
+\pitem{W}{wishart}{nu, Sigma}
 
 \subsubsection{Stan Functions}
 
@@ -2553,7 +2603,7 @@ positive-definite $W \in \reals^{K \times K}$,
 \! .
 \]
 
-\pitem{W}{inv\_wishart}{nu,Sigma}
+\pitem{W}{inv\_wishart}{nu, Sigma}
 
 \subsubsection{Stan Functions}
 

@@ -2,17 +2,15 @@
 #define STAN_MCMC_HMC_NUTS_BASE_NUTS_HPP
 
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <stan/math/prim/scal/fun/min.hpp>
 #include <stan/mcmc/hmc/base_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
-#include <math.h>
 #include <algorithm>
+#include <cmath>
 #include <limits>
 #include <string>
 #include <vector>
 
 namespace stan {
-
   namespace mcmc {
 
     struct nuts_util {
@@ -41,12 +39,12 @@ namespace stan {
 
       ~base_nuts() {}
 
-      void set_max_depth(const int d) {
+      void set_max_depth(int d) {
         if (d > 0)
           max_depth_ = d;
       }
 
-      void set_max_delta(const double d) {
+      void set_max_delta(double d) {
         max_delta_ = d;
       }
 
@@ -193,7 +191,7 @@ namespace stan {
             util.criterion = util.log_u + (h - util.H0) < this->max_delta_;
             if (!util.criterion) ++(this->n_divergent_);
 
-            util.sum_prob += stan::math::min(1, std::exp(util.H0 - h));
+            util.sum_prob += std::min(1.0, std::exp(util.H0 - h));
             util.n_tree += 1;
 
             return (util.log_u + (h - util.H0) < 0);
@@ -244,7 +242,5 @@ namespace stan {
     };
 
   }  // mcmc
-
 }  // stan
-
 #endif
