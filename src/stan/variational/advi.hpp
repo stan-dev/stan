@@ -396,9 +396,9 @@ namespace stan {
                 << "Informational Message: The maximum number of "
                 << "iterations is reached! The algorithm has not "
                 << "converged."
-                << std::endl;
+                << std::endl
                 << "Values from this variational approximation are not "
-                << "guaranteed to be useful."
+                << "guaranteed to be meaningful."
                 << std::endl;
             do_more_iterations = false;
           }
