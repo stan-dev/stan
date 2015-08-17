@@ -15,6 +15,7 @@
 #include <numeric>
 #include <ostream>
 #include <vector>
+#include <queue>
 
 namespace stan {
 
@@ -176,9 +177,25 @@ namespace stan {
         double eta_adagrad_scaled;
         Q params_adagrad = Q(model_.num_params_r());
 
-        double eta_adagrad_sequence[5] = {1.0, 0.5, 0.1, 0.05, 0.01};
-        if (eta_adagrad == 0.0)
-          eta_adagrad = eta_adagrad_sequence[0];
+        // Sequence of eta_adagrad values to try during warmup
+        std::queue<double> eta_adagrad_sequence;
+        eta_adagrad_sequence.push(1.00);
+        eta_adagrad_sequence.push(0.50);
+        eta_adagrad_sequence.push(0.10);
+        eta_adagrad_sequence.push(0.05);
+        eta_adagrad_sequence.push(0.01);
+
+        // If eta_adagrad is not specified by user (0.0) then do warmup
+        bool do_more_warmup = false;
+        if (eta_adagrad == 0.0) {
+          eta_adagrad = eta_adagrad_sequence.front();
+          eta_adagrad_sequence.pop();
+          do_more_warmup = true;
+        }
+
+        // Construct rolling window of ELBOs for warmup
+        int warmup_iterations = 50;
+        boost::circular_buffer<double> elbo_hist(warmup_iterations);
 
         // RMSprop window_size
         double window_size = 10.0;
@@ -198,10 +215,6 @@ namespace stan {
                          2.0));
         boost::circular_buffer<double> elbo_diff(cb_size);
 
-        // Store rolling window of ELBOs for warmup
-        int warmup_iterations = 50;
-        boost::circular_buffer<double> elbo_hist(warmup_iterations);
-
         // Timing variables
         clock_t start = clock();
         clock_t end;
@@ -212,10 +225,9 @@ namespace stan {
 
         // Iteration variables for warmup and main loops
         int iter_w;
-        int iter_main;
+        int iter_main = 1;
 
         // Warmup
-        bool do_more_warmup = true;
         while (do_more_warmup) {
           if (print_stream_) {
             *print_stream_ << "ADVI WARMUP: trying eta_adagrad = "
@@ -224,6 +236,7 @@ namespace stan {
                            << " for "
                            << warmup_iterations
                            << " iterations... ";
+            print_stream_->flush();
           }
 
           for (iter_w = 1; iter_w <= warmup_iterations; ++iter_w) {
@@ -249,8 +262,6 @@ namespace stan {
             // Calculate and store ELBO at every iteration
             elbo_prev = elbo;
             elbo = calc_ELBO(variational);
-            if (eta_adagrad==1.0 && iter_w == warmup_iterations)                ////////////////// HACK TO TRIP
-              elbo = -10000.0;
             elbo_hist.push_back(elbo);
 
             // Keep track of differences for consistent behavior in main loop
@@ -258,6 +269,7 @@ namespace stan {
             elbo_diff.push_back(delta_elbo);
           }
 
+          // Check whether the ELBO has increased or decreased during warmup
           if (elbo_hist.back() > elbo_hist.front()) {
             if (print_stream_)
               *print_stream_ << "SUCCESS." << std::endl << std::endl;
@@ -266,12 +278,25 @@ namespace stan {
           } else {
             if (print_stream_)
               *print_stream_ << "FAILED." << std::endl;
-            eta_adagrad = 0.5;
+            // Get the next eta_adagrad value to try
+            if (eta_adagrad_sequence.size() > 0) {
+              eta_adagrad = eta_adagrad_sequence.front();
+              eta_adagrad_sequence.pop();
+            } else {
+              // If we are out of values to try, exit with fatal error.
+              if (print_stream_) {
+                *print_stream_ << "ALL STEP SIZES FAILED." << std::endl;
+                return;
+              }
+            }
+            // Reset everything for next warmup phase
             variational = variational_init;
+            elbo_hist.clear();
+            elbo_diff.clear();
           }
         }
 
-        // Print header
+        // Print main loop header
         if (print_stream_) {
           *print_stream_ << "  iter"
                          << "       ELBO"
@@ -284,7 +309,6 @@ namespace stan {
         // Main loop
         std::vector<double> print_vector;
         bool do_more_iterations = true;
-        // int iter_counter = 1;
         while (do_more_iterations) {
           // Compute gradient using Monte Carlo integration
           calc_ELBO_grad(variational, elbo_grad);
