@@ -20,6 +20,8 @@ namespace stan {
   namespace lang {
 
     void generate_expression(const expression& e, std::ostream& o);
+    void generate_expression(const expression& e, bool user_facing,
+                             std::ostream& o);
 
     const std::string EOL("\n");
     const std::string EOL2("\n\n");
@@ -101,12 +103,32 @@ namespace stan {
       o << '"';
     }
 
+    void generate_indexed_expr_user(const std::string& expr,
+                                    const std::vector<expression> indexes,
+                                    base_expr_type base_type,
+                                    std::ostream& o) {
+      static const bool user_facing = true;
+      o << expr;
+      if (indexes.size() == 0) return;
+      o << '[';
+      for (size_t i = 0; i < indexes.size(); ++i) {
+        if (i > 0) o << ", ";
+        generate_expression(indexes[i], user_facing, o);
+      }
+      o << ']';
+    }
+
     template <bool isLHS>
     void generate_indexed_expr(const std::string& expr,
                                const std::vector<expression> indexes,
                                base_expr_type base_type,  // may have more dims
                                size_t e_num_dims,  // array dims
+                               bool user_facing,
                                std::ostream& o) {
+      if (user_facing) {
+        generate_indexed_expr_user(expr, indexes, base_type, o);
+        return;
+      }
       size_t ai_size = indexes.size();
       if (ai_size == 0) {
         // no indexes
@@ -119,7 +141,7 @@ namespace stan {
         o << expr;
         for (size_t n = 0; n < ai_size; ++n) {
           o << ',';
-          generate_expression(indexes[n], o);
+          generate_expression(indexes[n], user_facing, o);
           o << ',';
           generate_quoted_string(expr, o);
           o << ',' << (n+1) << ')';
@@ -130,15 +152,15 @@ namespace stan {
         o << expr;
         for (size_t n = 0; n < ai_size - 2; ++n) {
           o << ',';
-          generate_expression(indexes[n], o);
+          generate_expression(indexes[n], user_facing, o);
           o << ',';
           generate_quoted_string(expr, o);
           o << ',' << (n+1) << ')';
         }
         o << ',';
-        generate_expression(indexes[ai_size - 2U], o);
+        generate_expression(indexes[ai_size - 2U], user_facing, o);
         o << ',';
-        generate_expression(indexes[ai_size - 1U], o);
+        generate_expression(indexes[ai_size - 1U], user_facing, o);
         o << ',';
         generate_quoted_string(expr, o);
         o << ',' << (ai_size-1U) << ')';
@@ -158,7 +180,11 @@ namespace stan {
     }
 
     struct expression_visgen : public visgen {
-      explicit expression_visgen(std::ostream& o) : visgen(o) {  }
+      const bool user_facing_;
+      explicit expression_visgen(std::ostream& o, bool user_facing)
+        : visgen(o),
+          user_facing_(user_facing) {
+      }
       void operator()(nil const& /*x*/) const {
         o_ << "nil";
       }
@@ -198,7 +224,7 @@ namespace stan {
           for (size_t j = 0; j < x.dimss_[i].size(); ++j)
             indexes.push_back(x.dimss_[i][j]);  // wasteful copy, could use refs
         generate_indexed_expr<false>(expr_string, indexes, base_type,
-                                     e_num_dims, o_);
+                                     e_num_dims, user_facing_, o_);
       }
       void operator()(const integrate_ode& fx) const {
         o_ << "integrate_ode("
@@ -270,9 +296,15 @@ namespace stan {
       }
     };
 
-    void generate_expression(const expression& e, std::ostream& o) {
-      expression_visgen vis(o);
+    void generate_expression(const expression& e, bool user_facing,
+                             std::ostream& o) {
+      expression_visgen vis(o, user_facing);
       boost::apply_visitor(vis, e.expr_);
+    }
+
+    void generate_expression(const expression& e, std::ostream& o) {
+      static const bool user_facing = false;  // default value
+      generate_expression(e, user_facing, o);
     }
 
     static void print_string_literal(std::ostream& o,
@@ -1626,6 +1658,7 @@ namespace stan {
                                     x.var_dims_.dims_,
                                     x.var_type_.base_type_,
                                     x.var_type_.dims_.size(),
+                                    false,
                                     o_);
         o_ << ", ";
         generate_expression(x.expr_, o_);
@@ -1656,10 +1689,9 @@ namespace stan {
         if (x.truncation_.has_low()) {
           generate_indent(indent_, o_);
           o_ << "if (";
-          generate_expression(x.expr_, o_);
+          generate_expression(x.expr_,  o_);
           o_ << " < ";
-          generate_expression(x.truncation_.low_.expr_, o_);  // low
-                                                              // bound
+          generate_expression(x.truncation_.low_.expr_, o_);
           o_ << ") lp_accum__.add(-std::numeric_limits<double>::infinity());"
              << EOL;
         }
@@ -1669,8 +1701,7 @@ namespace stan {
           o_ << "if (";
           generate_expression(x.expr_, o_);
           o_ << " > ";
-          generate_expression(x.truncation_.high_.expr_, o_);  // low
-          // bound
+          generate_expression(x.truncation_.high_.expr_, o_);
           o_ << ") lp_accum__.add(-std::numeric_limits<double>::infinity());"
              << EOL;
         }
