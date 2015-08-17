@@ -149,7 +149,7 @@ namespace stan {
        * Runs stochastic gradient ascent with Adagrad.
        *
        * @param  variational    variational distribution
-
+       * @param  eta_adagrad    eta parameter for stepsize scaling
        * @param  tol_rel_obj    relative tolerance parameter for convergence
        * @param  max_iterations max number of iterations to run algorithm
        */
@@ -166,15 +166,19 @@ namespace stan {
         stan::math::check_positive(function,
                                    "Maximum iterations",
                                    max_iterations);
-        stan::math::check_positive(function, "Eta stepsize", eta_adagrad);
+        stan::math::check_nonnegative(function, "Eta stepsize", eta_adagrad);
 
         // Gradient parameters
         Q elbo_grad = Q(model_.num_params_r());
 
         // Adagrad parameters
         double tau = 1.0;
-        Q params_adagrad = Q(model_.num_params_r());
         double eta_adagrad_scaled;
+        Q params_adagrad = Q(model_.num_params_r());
+
+        double eta_adagrad_sequence[5] = {1.0, 0.5, 0.1, 0.05, 0.01};
+        if (eta_adagrad == 0.0)
+          eta_adagrad = eta_adagrad_sequence[0];
 
         // RMSprop window_size
         double window_size = 10.0;
@@ -215,6 +219,7 @@ namespace stan {
         while (do_more_warmup) {
           if (print_stream_) {
             *print_stream_ << "ADVI WARMUP: trying eta_adagrad = "
+                           << std::right << std::setw(4) << std::setprecision(2)
                            << eta_adagrad
                            << " for "
                            << warmup_iterations
@@ -244,6 +249,8 @@ namespace stan {
             // Calculate and store ELBO at every iteration
             elbo_prev = elbo;
             elbo = calc_ELBO(variational);
+            if (eta_adagrad==1.0 && iter_w == warmup_iterations)                ////////////////// HACK TO TRIP
+              elbo = -10000.0;
             elbo_hist.push_back(elbo);
 
             // Keep track of differences for consistent behavior in main loop
@@ -260,20 +267,9 @@ namespace stan {
             if (print_stream_)
               *print_stream_ << "FAILED." << std::endl;
             eta_adagrad = 0.5;
+            variational = variational_init;
           }
         }
-
-        // variational = variational_init;
-
-            // // warmup
-
-            // if (iter_counter == elbo_hist_size) {
-            //   *print_stream_ << "CHECK FOR DIVERGENCE HERE." << std::endl;
-            //   *print_stream_ << std::endl;
-            //   *print_stream_ << "elbo_hist.front(): " << elbo_hist.front() << std::endl;
-            //   *print_stream_ << "elbo_hist.back(): " << elbo_hist.back() << std::endl;
-            // }
-
 
         // Print header
         if (print_stream_) {
