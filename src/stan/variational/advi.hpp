@@ -195,14 +195,9 @@ namespace stan {
           do_more_tuning = true;
         }
 
-        // RMSprop window_size
-        double window_size = 10.0;
-        double post_factor = 1.0 / window_size;
-        double pre_factor  = 1.0 - post_factor;
-
-        // Construct rolling window of ELBOs for tuning
-        int tuning_iterations = 50;
-        boost::circular_buffer<double> elbo_hist(tuning_iterations);
+        // Weighting of gradient history in learning rate
+        double pre_factor  = 9.0 / 10.0;
+        double post_factor = 1.0 / 10.0;
 
         // Initialize ELBO and convergence tracking variables
         double elbo(0.0);
@@ -210,6 +205,10 @@ namespace stan {
         double delta_elbo     = std::numeric_limits<double>::max();
         double delta_elbo_ave = std::numeric_limits<double>::max();
         double delta_elbo_med = std::numeric_limits<double>::max();
+
+        // Initialize tuning
+        int tuning_iterations = 50;
+        double elbo_old(0.0);
 
         // Heuristic to estimate how far to look back in rolling window
         int cb_size = static_cast<int>(
@@ -245,7 +244,7 @@ namespace stan {
             // Compute gradient using Monte Carlo integration
             calc_ELBO_grad(variational, elbo_grad);
 
-            // RMSprop moving average weighting
+            // Weighted moving average
             if (iter_tune == 1) {
               params_prop += elbo_grad.square();
             } else {
@@ -253,7 +252,7 @@ namespace stan {
                             post_factor * elbo_grad.square();
             }
 
-            // Robbins-Monro scaling of eta to ensure convergence
+            // Ensure that the sequence decreases (in expectation)
             eta_scaled = eta / sqrt(static_cast<double>(iter_tune));
 
             // Stochastic gradient update
@@ -262,7 +261,6 @@ namespace stan {
             // Calculate and store ELBO at every iteration
             elbo_prev = elbo;
             elbo = calc_ELBO(variational);
-            elbo_hist.push_back(elbo);
 
             // Keep track of differences for consistent behavior in main loop
             delta_elbo = rel_difference(elbo, elbo_prev);
@@ -270,7 +268,7 @@ namespace stan {
           }
 
           // Check whether the ELBO has increased or decreased during tuning
-          if (elbo_hist.back() > elbo_hist.front()) {
+          if (elbo > elbo_old) {
             if (print_stream_)
               *print_stream_ << "SUCCESS." << std::endl << std::endl;
             iter_main = iter_tune;
@@ -291,8 +289,8 @@ namespace stan {
             }
             // Reset everything for next tuning phase
             variational = variational_init;
-            elbo_hist.clear();
             elbo_diff.clear();
+            elbo_old = elbo;
           }
         }
 
@@ -313,7 +311,7 @@ namespace stan {
           // Compute gradient using Monte Carlo integration
           calc_ELBO_grad(variational, elbo_grad);
 
-          // RMSprop moving average weighting
+          // Weighted moving average
           if (iter_main == 1) {
             params_prop += elbo_grad.square();
           } else {
@@ -321,9 +319,8 @@ namespace stan {
                           post_factor * elbo_grad.square();
           }
 
-          // Robbins-Monro scaling of eta to ensure convergence
-          eta_scaled = eta /
-            sqrt(static_cast<double>(iter_main));
+          // Ensure that the sequence decreases (in expectation)
+          eta_scaled = eta / sqrt(static_cast<double>(iter_tune));
 
           // Stochastic gradient update
           variational += eta_scaled * elbo_grad / (tau + params_prop.sqrt());
