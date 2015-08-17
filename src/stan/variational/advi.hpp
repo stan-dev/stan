@@ -34,7 +34,6 @@ namespace stan {
      * @param  cont_params           initialization of continuous parameters
      * @param  n_monte_carlo_grad    number of samples for gradient computation
      * @param  n_monte_carlo_elbo    number of samples for ELBO computation
-     * @param  eta_adagrad           eta parameter for adaGrad
      * @param  rng                   random number generator
      * @param  eval_elbo             evaluate ELBO at every "eval_elbo" iters
      * @param  n_posterior_samples   number of samples to draw from posterior
@@ -49,7 +48,6 @@ namespace stan {
            Eigen::VectorXd& cont_params,
            int n_monte_carlo_grad,
            int n_monte_carlo_elbo,
-           double eta_adagrad,
            BaseRNG& rng,
            int eval_elbo,
            int n_posterior_samples,
@@ -61,7 +59,6 @@ namespace stan {
         rng_(rng),
         n_monte_carlo_grad_(n_monte_carlo_grad),
         n_monte_carlo_elbo_(n_monte_carlo_elbo),
-        eta_adagrad_(eta_adagrad),
         eval_elbo_(eval_elbo),
         n_posterior_samples_(n_posterior_samples),
         print_stream_(print_stream),
@@ -77,7 +74,6 @@ namespace stan {
         stan::math::check_positive(function,
                                  "Number of posterior samples for output",
                                  n_posterior_samples_);
-        stan::math::check_positive(function, "Eta stepsize", eta_adagrad_);
         }
 
       /**
@@ -153,10 +149,12 @@ namespace stan {
        * Runs stochastic gradient ascent with Adagrad.
        *
        * @param  variational    variational distribution
+
        * @param  tol_rel_obj    relative tolerance parameter for convergence
        * @param  max_iterations max number of iterations to run algorithm
        */
       void robbins_monro_adagrad(Q& variational,
+                                 double eta_adagrad,
                                  double tol_rel_obj,
                                  int max_iterations) const {
         static const char* function =
@@ -168,6 +166,7 @@ namespace stan {
         stan::math::check_positive(function,
                                    "Maximum iterations",
                                    max_iterations);
+        stan::math::check_positive(function, "Eta stepsize", eta_adagrad);
 
         // Gradient parameters
         Q elbo_grad = Q(model_.num_params_r());
@@ -195,9 +194,86 @@ namespace stan {
                          2.0));
         boost::circular_buffer<double> elbo_diff(cb_size);
 
-        // Store rolling window of ELBO's for warmup and convergence
-        int elbo_hist_size = 200;
-        boost::circular_buffer<double> elbo_hist(elbo_hist_size);
+        // Store rolling window of ELBOs for warmup
+        int warmup_iterations = 50;
+        boost::circular_buffer<double> elbo_hist(warmup_iterations);
+
+        // Timing variables
+        clock_t start = clock();
+        clock_t end;
+        double delta_t;
+
+        // Make a copy of the initial variational distribution
+        Q variational_init = variational;
+
+        // Iteration variables for warmup and main loops
+        int iter_w;
+        int iter_main;
+
+        // Warmup
+        bool do_more_warmup = true;
+        while (do_more_warmup) {
+          if (print_stream_) {
+            *print_stream_ << "ADVI WARMUP: trying eta_adagrad = "
+                           << eta_adagrad
+                           << " for "
+                           << warmup_iterations
+                           << " iterations... ";
+          }
+
+          for (iter_w = 1; iter_w <= warmup_iterations; ++iter_w) {
+            // Compute gradient using Monte Carlo integration
+            calc_ELBO_grad(variational, elbo_grad);
+
+            // RMSprop moving average weighting
+            if (iter_w == 1) {
+              params_adagrad += elbo_grad.square();
+            } else {
+              params_adagrad = pre_factor * params_adagrad +
+                               post_factor * elbo_grad.square();
+            }
+
+            // Robbins-Monro scaling of eta to ensure convergence
+            eta_adagrad_scaled = eta_adagrad /
+              sqrt(static_cast<double>(iter_w));
+
+            // Stochastic gradient update
+            variational += eta_adagrad_scaled * elbo_grad /
+              (tau + params_adagrad.sqrt());
+
+            // Calculate and store ELBO at every iteration
+            elbo_prev = elbo;
+            elbo = calc_ELBO(variational);
+            elbo_hist.push_back(elbo);
+
+            // Keep track of differences for consistent behavior in main loop
+            delta_elbo = rel_difference(elbo, elbo_prev);
+            elbo_diff.push_back(delta_elbo);
+          }
+
+          if (elbo_hist.back() > elbo_hist.front()) {
+            if (print_stream_)
+              *print_stream_ << "SUCCESS." << std::endl << std::endl;
+            iter_main = iter_w;
+            do_more_warmup = false;
+          } else {
+            if (print_stream_)
+              *print_stream_ << "FAILED." << std::endl;
+            eta_adagrad = 0.5;
+          }
+        }
+
+        // variational = variational_init;
+
+            // // warmup
+
+            // if (iter_counter == elbo_hist_size) {
+            //   *print_stream_ << "CHECK FOR DIVERGENCE HERE." << std::endl;
+            //   *print_stream_ << std::endl;
+            //   *print_stream_ << "elbo_hist.front(): " << elbo_hist.front() << std::endl;
+            //   *print_stream_ << "elbo_hist.back(): " << elbo_hist.back() << std::endl;
+            // }
+
 
         // Print header
         if (print_stream_) {
@@ -209,21 +285,16 @@ namespace stan {
                          << std::endl;
         }
 
-        // Timing variables
-        clock_t start = clock();
-        clock_t end;
-        double delta_t;
-
         // Main loop
         std::vector<double> print_vector;
         bool do_more_iterations = true;
-        int iter_counter = 1;
+        // int iter_counter = 1;
         while (do_more_iterations) {
           // Compute gradient using Monte Carlo integration
           calc_ELBO_grad(variational, elbo_grad);
 
           // RMSprop moving average weighting
-          if (iter_counter == 1) {
+          if (iter_main == 1) {
             params_adagrad += elbo_grad.square();
           } else {
             params_adagrad = pre_factor * params_adagrad +
@@ -231,15 +302,15 @@ namespace stan {
           }
 
           // Robbins-Monro scaling of eta to ensure convergence
-          eta_adagrad_scaled = eta_adagrad_ /
-            sqrt(static_cast<double>(iter_counter));
+          eta_adagrad_scaled = eta_adagrad /
+            sqrt(static_cast<double>(iter_main));
 
           // Stochastic gradient update
           variational += eta_adagrad_scaled * elbo_grad /
             (tau + params_adagrad.sqrt());
 
           // Check for convergence every "eval_elbo_"th iteration
-          if (iter_counter % eval_elbo_ == 0) {
+          if (iter_main % eval_elbo_ == 0) {
             elbo_prev = elbo;
             elbo = calc_ELBO(variational);
             delta_elbo = rel_difference(elbo, elbo_prev);
@@ -252,7 +323,7 @@ namespace stan {
             if (print_stream_) {
               *print_stream_
                         << "  "
-                        << std::setw(4) << iter_counter
+                        << std::setw(4) << iter_main
                         << "  "
                         << std::right << std::setw(9) << std::setprecision(1)
                         << elbo
@@ -272,7 +343,7 @@ namespace stan {
               print_vector.push_back(delta_t);
               print_vector.push_back(elbo);
               services::io::write_iteration_csv(*diag_stream_,
-                                                iter_counter, print_vector);
+                                                iter_main, print_vector);
             }
 
             if (delta_elbo_ave < tol_rel_obj) {
@@ -287,7 +358,7 @@ namespace stan {
               do_more_iterations = false;
             }
 
-            if (iter_counter > 100) {
+            if (iter_main > 100) {
               if (delta_elbo_med > 0.5 || delta_elbo_ave > 0.5) {
                 if (print_stream_)
                   *print_stream_ << "   MAY BE DIVERGING... INSPECT ELBO";
@@ -299,23 +370,25 @@ namespace stan {
           }
 
           // Check for max iterations
-          if (iter_counter == max_iterations) {
+          if (iter_main == max_iterations) {
             if (print_stream_)
               *print_stream_ << "MAX ITERATIONS REACHED" << std::endl;
             do_more_iterations = false;
           }
 
-          ++iter_counter;
+          ++iter_main;
         }
       }
 
       /**
        * Runs the algorithm and writes to output.
        *
+       * @param  eta_adagrad    eta parameter for stepsize scaling
        * @param  tol_rel_obj    relative tolerance parameter for convergence
        * @param  max_iterations max number of iterations to run algorithm
        */
-      int run(double tol_rel_obj, int max_iterations) const {
+      int run(double eta_adagrad, double tol_rel_obj,
+              int max_iterations) const {
         if (diag_stream_) {
           *diag_stream_ << "iter,time_in_seconds,ELBO" << std::endl;
         }
@@ -324,7 +397,8 @@ namespace stan {
         Q variational = Q(cont_params_);
 
         // run inference algorithm
-        robbins_monro_adagrad(variational, tol_rel_obj, max_iterations);
+        robbins_monro_adagrad(variational, eta_adagrad, tol_rel_obj,
+                              max_iterations);
 
         // get mean of posterior approximation and write on first output line
         cont_params_ = variational.mean();
@@ -385,7 +459,6 @@ namespace stan {
       BaseRNG& rng_;
       int n_monte_carlo_grad_;
       int n_monte_carlo_elbo_;
-      double eta_adagrad_;
       int eval_elbo_;
       int n_posterior_samples_;
       std::ostream* print_stream_;
