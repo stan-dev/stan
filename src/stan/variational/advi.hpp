@@ -238,7 +238,7 @@ namespace stan {
           if (iter_counter % eval_elbo_ == 0) {
             elbo_prev = elbo;
             elbo = calc_ELBO(variational);
-            delta_elbo = rel_decrease(elbo, elbo_prev);
+            delta_elbo = rel_difference(elbo, elbo_prev);
             cb.push_back(delta_elbo);
             delta_elbo_ave = std::accumulate(cb.begin(), cb.end(), 0.0)
                              / static_cast<double>(cb.size());
@@ -368,8 +368,8 @@ namespace stan {
           return v[n];
       }
 
-      // Helper function: compute relative decrease between two doubles
-      double rel_decrease(double prev, double curr) const {
+      // Helper function: compute relative difference between two doubles
+      double rel_difference(double prev, double curr) const {
         return std::abs(curr - prev) / std::abs(prev);
       }
 
