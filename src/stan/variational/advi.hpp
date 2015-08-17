@@ -208,7 +208,6 @@ namespace stan {
 
         // Initialize tuning
         int tuning_iterations = 50;
-        double elbo_old(0.0);
 
         // Heuristic to estimate how far to look back in rolling window
         int cb_size = static_cast<int>(
@@ -223,6 +222,12 @@ namespace stan {
 
         // Make a copy of the initial variational distribution
         Q variational_init = variational;
+        double elbo_init = calc_ELBO(variational_init);
+
+        // Store bests
+        Q variational_best = variational;
+        double elbo_best = -std::numeric_limits<double>::max();
+        boost::circular_buffer<double> elbo_diff_best(cb_size);
 
         // Iteration variables for tuning and main loops
         int iter_tune;
@@ -267,30 +272,43 @@ namespace stan {
             elbo_diff.push_back(delta_elbo);
           }
 
-          // Check whether the ELBO has increased or decreased during tuning
-          if (elbo > elbo_old) {
+          // Check if ELBO at current eta is worse than the best ELBO
+          // and if the best ELBO hasn't actually diverged
+          // TODO eta=1 will always fail
+          if (elbo < elbo_best && elbo_best > elbo_init) {
             if (print_stream_)
-              *print_stream_ << "SUCCESS." << std::endl << std::endl;
+              *print_stream_ << "SUCCESS. USING PREVIOUS ONE" << std::endl << std::endl;
             iter_main = iter_tune;
+            variational = variational_best;
+            elbo_diff = elbo_diff_best;
             do_more_tuning = false;
           } else {
-            if (print_stream_)
-              *print_stream_ << "FAILED." << std::endl;
             // Get the next eta value to try
             if (eta_sequence.size() > 0) {
+              if (print_stream_)
+                *print_stream_ << "FAILED." << std::endl;
+              variational_best = variational;
+              elbo_diff_best = elbo_diff;
+              elbo_best = elbo;
               eta = eta_sequence.front();
               eta_sequence.pop();
             } else {
-              // If we are out of values to try, exit with fatal error.
-              if (print_stream_) {
-                *print_stream_ << "ALL STEP SIZES FAILED." << std::endl;
-                return;
+              if (elbo > elbo_init) {
+                if (print_stream_)
+                  *print_stream_ << "SUCCESS. USING CURRENT ONE" << std::endl << std::endl;
+                iter_main = iter_tune;
+                do_more_tuning = false;
+              } else {
+                if (print_stream_) {
+                  *print_stream_ << "FAILED." << std::endl;
+                  *print_stream_ << "ALL STEP SIZES FAILED." << std::endl;
+                  return;
+                }
               }
             }
             // Reset everything for next tuning phase
             variational = variational_init;
             elbo_diff.clear();
-            elbo_old = elbo;
           }
         }
 
