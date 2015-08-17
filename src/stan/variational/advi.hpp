@@ -457,12 +457,11 @@ namespace stan {
             services::io::write_iteration(*out_stream_, model_, rng_,
                           lp, cont_vector, disc_vector, print_stream_);
           }
+
           if (print_stream_) {
             *print_stream_ << "DONE." << std::endl;
           }
         }
-
-
 
         return stan::services::error_codes::OK;
       }
