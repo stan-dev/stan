@@ -296,6 +296,7 @@ namespace stan {
               if (elbo > elbo_init) {
                 if (print_stream_)
                   *print_stream_ << "SUCCESS. USING CURRENT ONE" << std::endl << std::endl;
+                elbo_best = elbo; // for consistent behavior in main loop
                 iter_main = iter_tune;
                 do_more_tuning = false;
               } else {
@@ -347,6 +348,9 @@ namespace stan {
           if (iter_main % eval_elbo_ == 0) {
             elbo_prev = elbo;
             elbo = calc_ELBO(variational);
+            if (elbo > elbo_best) {
+              elbo_best = elbo;
+            }
             delta_elbo = rel_difference(elbo, elbo_prev);
             elbo_diff.push_back(delta_elbo);
             delta_elbo_ave = std::accumulate(
@@ -392,18 +396,27 @@ namespace stan {
               do_more_iterations = false;
             }
 
-            if (iter_main > 100) {
-              if (delta_elbo_med > 0.5 || delta_elbo_ave > 0.5) {
-                if (print_stream_)
-                  *print_stream_ << "   MAY BE DIVERGING... INSPECT ELBO";
-              }
+            if (delta_elbo_med > 0.5 || delta_elbo_ave > 0.5) {
+              if (print_stream_)
+                *print_stream_ << "   MAY BE DIVERGING... INSPECT ELBO";
             }
 
             if (print_stream_)
               *print_stream_ << std::endl;
+
+            if (do_more_iterations == false && elbo < elbo_best) {
+              if (print_stream_)
+                *print_stream_
+                  << "Informational Message: The ELBO at a previous "
+                  << "iteration is larger than the ELBO upon "
+                  << "convergence!"
+                  << std::endl
+                  << "This means that the variational approximation has "
+                  << "not converged to the global optima."
+                  << std::endl;
+            }
           }
 
-          // Check for max iterations
           if (iter_main >= max_iterations) {
             if (print_stream_)
               *print_stream_
