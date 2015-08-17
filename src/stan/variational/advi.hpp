@@ -439,6 +439,14 @@ namespace stan {
 
         // draw more samples from posterior and write on subsequent lines
         if (out_stream_) {
+          if (print_stream_) {
+            *print_stream_ << std::endl
+                           << "Drawing "
+                           << n_posterior_samples_
+                           << " samples from the approximate posterior... ";
+            print_stream_->flush();
+          }
+
           for (int n = 0; n < n_posterior_samples_; ++n) {
             variational.sample(rng_, cont_params_);
             double lp = model_.template log_prob<false, true>(cont_params_,
@@ -449,7 +457,12 @@ namespace stan {
             services::io::write_iteration(*out_stream_, model_, rng_,
                           lp, cont_vector, disc_vector, print_stream_);
           }
+          if (print_stream_) {
+            *print_stream_ << "DONE." << std::endl;
+          }
         }
+
+
 
         return stan::services::error_codes::OK;
       }
