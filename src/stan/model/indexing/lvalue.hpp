@@ -1,14 +1,14 @@
 #ifndef STAN_MODEL_INDEXING_LVALUE_HPP
 #define STAN_MODEL_INDEXING_LVALUE_HPP
 
-#include <stdexcept>
-#include <vector>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <Eigen/Dense>
 #include <stan/model/indexing/index.hpp>
 #include <stan/model/indexing/index_list.hpp>
 #include <stan/model/indexing/rvalue.hpp>
+#include <stdexcept>
+#include <vector>
 
 // ***** DOCUMENT ALIASING ISSUE if RHS isn't copy ******
 
@@ -98,7 +98,7 @@ namespace stan {
         if (m < 0 || m > x.rows())
           throw std::out_of_range("matrix[multi] out of range");
         x.row(m) = y.row(i);
-      }   
+      }
     }
 
     // mat[single, single] = scalar
@@ -140,10 +140,9 @@ namespace stan {
 
     // mat[multiple, multiple] = mat
     template <typename T, typename U, typename I1, typename I2>
-    inline typename 
-    boost::disable_if_c<boost::is_same<I1, index_uni>::value 
-                        || boost::is_same<I2, index_uni>::value, 
-                        void>::type
+    inline typename
+    boost::disable_if_c<boost::is_same<I1, index_uni>::value
+                        || boost::is_same<I2, index_uni>::value, void>::type
     assign(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
            const cons_index_list<I1,
                                  cons_index_list<I2, nil_index_list> >& idxs,
