@@ -29,6 +29,9 @@ namespace stan {
                   const std::string& suffix,
                   std::ostream& o,
                   StartTransitionCallback& callback) {
+        std::fstream* sample_timing_stream =
+          new std::fstream("sample_timing.csv", std::fstream::out);
+
         run_markov_chain<Model, RNG, StartTransitionCallback,
                          SampleRecorder, DiagnosticRecorder, MessageRecorder>(
            sampler, num_samples, num_warmup,
@@ -37,7 +40,13 @@ namespace stan {
            writer,
            init_s, model, base_rng,
            prefix, suffix, o,
+           sample_timing_stream,
            callback);
+
+        if (sample_timing_stream) {
+          sample_timing_stream->close();
+          delete sample_timing_stream;
+        }
       }
 
     }

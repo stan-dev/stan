@@ -29,6 +29,9 @@ namespace stan {
                   const std::string& suffix,
                   std::ostream& o,
                   StartTransitionCallback& callback) {
+        std::fstream* warmup_timing_stream =
+          new std::fstream("warmup_timing.csv", std::fstream::out);
+
         run_markov_chain<Model, RNG, StartTransitionCallback,
                          SampleRecorder, DiagnosticRecorder, MessageRecorder>
           (sampler, num_warmup, 0, num_warmup + num_samples, num_thin,
@@ -36,7 +39,13 @@ namespace stan {
            writer,
            init_s, model, base_rng,
            prefix, suffix, o,
+           warmup_timing_stream,
            callback);
+
+        if (warmup_timing_stream) {
+          warmup_timing_stream->close();
+          delete warmup_timing_stream;
+        }
       }
 
     }
