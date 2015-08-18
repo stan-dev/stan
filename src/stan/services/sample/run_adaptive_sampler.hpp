@@ -8,6 +8,20 @@ namespace stan {
   namespace services {
     namespace sample {
       
+      /**
+       * @tparam Sampler MCMC sampler implementation
+       * @tparam MCMCWriter MCMC writer implementation
+       * @tparam Interrupt Interrupt callback implementation
+       * @param sampler MCMC sampler
+       * @param sample Initial sample
+       * @param num_warmup Number of warmup iterations
+       * @param num_samples Number of sampling iterations
+       * @param refresh Progress update rate
+       * @param save_warmup Flag to save warmup iterations
+       * @param writer MCMC writer
+       * @param iteration_interrupt Interrupt callback called at the beginning
+       of each iteration
+       */
       template <class Sampler, class MCMCWriter, class Interrupt>
       void run_adaptive_sampler(Sampler& sampler,
                                 stan::mcmc::sample& sample,

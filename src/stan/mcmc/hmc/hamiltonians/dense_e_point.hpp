@@ -23,6 +23,11 @@ namespace stan {
         fast_matrix_copy_<double>(mInv, z.mInv);
       }
 
+      /**
+       * @tparam Writer An implementation of
+       *                    src/stan/interface_callbacks/writer/base_writer.hpp
+       * @param writer Writer callback
+       */
       template <class Writer>
       void write_metric(Writer& writer) {
         writer("# Dense Euclidean metric");

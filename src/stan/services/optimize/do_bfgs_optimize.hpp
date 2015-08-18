@@ -14,6 +14,29 @@ namespace stan {
   namespace services {
     namespace optimize {
 
+      /**
+       * @tparam ModelT Model implementation
+       * @tparam BFGSOptimizerT BFGS implementation
+       * @tparam RNGT Random number generator implementation
+       * @tparam OutputWriter An implementation of
+       *                    src/stan/interface_callbacks/writer/base_writer.hpp
+       * @tparam InfoWriter An implementation of
+       *                    src/stan/interface_callbacks/writer/base_writer.hpp
+       * @tparam Interrupt Interrupt callback implementation
+       * @param cont_params Continuous state values
+       * @param model Model
+       * @param bfgs BFGS functor
+       * @param base_rng Random number generator
+       * @param lp Log posterior density
+       * @param cont_vector Continuous state values
+       * @param disc_vector Discrete state values
+       * @param output_stream Writer callback for storing optimization history
+       * @param info Writer callback for display informative messages
+       * @param save_iterations Flag to save entire optimization history
+       * @param refresh Progress update rate
+       * @param iteration_interrupt Interrupt callback called at the beginning
+                                    of each iteration
+       */
       template<typename ModelT,typename BFGSOptimizerT,typename RNGT,
                typename OutputWriter, typename InfoWriter, typename Interrupt>
       int do_bfgs_optimize(ModelT &model,

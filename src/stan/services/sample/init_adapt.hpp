@@ -9,6 +9,19 @@ namespace stan {
   namespace services {
     namespace sample {
     
+      /**
+       * @tparam Sampler MCMC sampler implementation
+       * @tparam ErrWriter An implementation of
+       *                   src/stan/interface_callbacks/writer/base_writer.hpp
+       * @param sampler MCMC sampler
+       * @param adapt Adaptation configuration
+       * @param delta Dual averaging target
+       * @param gamma Dual averaging scale
+       * @param kappa Dual averaging shrinkage
+       * @param t0 Dual averaging effective starting iteration
+       * @param cont_params Continuous state values
+       * @param err Writer callback for displaying error messages
+       */
       template<class Sampler, class ErrWriter>
       bool init_adapt(Sampler& sampler,
                       const double delta,
@@ -39,6 +52,15 @@ namespace stan {
         return true;
       }
 
+      /**
+       * @tparam Sampler MCMC sampler implementation
+       * @tparam ErrWriter An implementation of
+       *                   src/stan/interface_callbacks/writer/base_writer.hpp
+       * @param sampler MCMC sampler
+       * @param adapt Adaptation configuration
+       * @param cont_params Continuous state values
+       * @param err Writer callback for displaying error messages
+       */
       template<class Sampler, class ErrWriter>
       bool init_adapt(Sampler& sampler,
                       stan::services::categorical_argument* adapt,

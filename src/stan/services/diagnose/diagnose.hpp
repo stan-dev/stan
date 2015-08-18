@@ -7,6 +7,18 @@ namespace stan {
   namespace services {
     namespace diagnose {
 
+      /**
+       * @tparam Model A model implementation
+       * @tparam InfoWriter An implementation of
+       *                    src/stan/interface_callbacks/writer/base_writer.hpp
+       * @tparam OutputWriter An implementation of
+       *                      src/stan/interface_callbacks/writer/base_writer.hpp
+       * @param cont_params Input values
+       * @param model Input model
+       * @param test Diagnostic configuration
+       * @param info Writer callback for display output
+       * @param output Writer callback for file output
+       */
       template <class Model, class InfoWriter, class OutputWriter>
       int diagnose(Eigen::VectorXd& cont_params,
                    Model& model,

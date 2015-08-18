@@ -25,7 +25,15 @@ namespace stan {
 
         end_update_p(z, hamiltonian, 0.5 * epsilon);
       }
-
+        
+      /**
+       * @tparam Writer An implementation of
+       *                src/stan/interface_callbacks/writer/base_writer.hpp
+       * @param z Initial point in phase space
+       * @param hamiltonian Hamiltonian implementation
+       * @param epsilon Integrator step size
+       * @param writer Writer callback
+       */
       template <class Writer>
       void verbose_evolve(typename Hamiltonian::PointType& z,
                           Hamiltonian& hamiltonian,

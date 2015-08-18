@@ -66,6 +66,11 @@ namespace stan {
           values.push_back(g(i));
       }
 
+      /**
+       * @tparam Writer An implementation of
+       *                    src/stan/interface_callbacks/writer/base_writer.hpp
+       * @param writer Writer callback
+       */
       template <class Writer>
       void write_metric(Writer& writer) {}
 

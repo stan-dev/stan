@@ -9,6 +9,11 @@ namespace stan {
   namespace services {
     namespace sample {
 
+      /**
+       * @tparam Sampler MCMC sampler implementation
+       * @param sampler MCMC sampler
+       * @param algorithm Static HMC configuration
+       */
       template<class Sampler>
       bool init_static_hmc(Sampler& sampler,
                            stan::services::argument* algorithm) {

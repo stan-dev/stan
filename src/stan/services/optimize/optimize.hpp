@@ -80,6 +80,27 @@ namespace stan {
   namespace services {
     namespace optimize {
 
+      /**
+       * @tparam Model Model implementation
+       * @tparam RNG Random number generator implementation
+       * @tparam InfoWriter An implementation of
+       *                    src/stan/interface_callbacks/writer/base_writer.hpp
+       * @tparam ErrWriter An implementation of
+       *                   src/stan/interface_callbacks/writer/base_writer.hpp
+       * @tparam OutputWriter An implementation of
+       *                      src/stan/interface_callbacks/writer/base_writer.hpp
+       * @tparam Interrupt Interrupt callback implementation
+       * @param cont_params Continuous state values
+       * @param model Model
+       * @param base_rng Random number generator
+       * @param optimize_arg Optimization configuration
+       * @param refresh Progress update rate
+       * @param info Writer callback for display informative messages
+       * @param err Writer callback for display error messages
+       * @param output Writer callback for storing optimization history
+       * @param iteration_interrupt Interrupt callback called at the beginning
+                                    of each iteration
+       */
       template <class Model, class RNG,
                 class InfoWriter, class ErrWriter,
                 class OutputWriter, class Interrupt>

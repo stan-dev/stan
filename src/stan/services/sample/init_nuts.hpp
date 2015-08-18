@@ -9,6 +9,11 @@ namespace stan {
   namespace services {
     namespace sample {
     
+      /**
+       * @tparam Sampler MCMC sampler implementation
+       * @param sampler MCMC sampler
+       * @param algorithm NUTS configuration
+       */
       template<class Sampler>
       bool init_nuts(Sampler& sampler,
                      stan::services::argument* algorithm) {

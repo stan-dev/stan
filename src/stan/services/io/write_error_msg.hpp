@@ -8,6 +8,12 @@ namespace stan {
   namespace services {
     namespace io {
 
+      /**
+       * @tparam Writer An implementation of
+       *                src/stan/interface_callbacks/writer/base_writer.hpp
+       * @param writer Writer callback
+       * @param e Input exception
+       */
       template <class Writer>
       void write_error_msg(Writer& writer,
                            const std::exception& e) {

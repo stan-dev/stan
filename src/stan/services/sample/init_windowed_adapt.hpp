@@ -9,6 +9,16 @@ namespace stan {
   namespace services {
     namespace sample {
     
+      /**
+       * @tparam Sampler MCMC sampler implementation
+       * @tparam ErrWriter An implementation of
+       *                   src/stan/interface_callbacks/writer/base_writer.hpp
+       * @param sampler MCMC sampler
+       * @param adapt Adaptation configuration
+       * @param num_warmup Number of warmup iterations
+       * @param cont_params Continuous state values
+       * @param err Writer callback for displaying error messages
+       */
       template<class Sampler, class ErrWriter>
       bool init_windowed_adapt(Sampler& sampler,
                                stan::services::categorical_argument* adapt, 

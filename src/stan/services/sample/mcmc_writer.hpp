@@ -11,6 +11,14 @@ namespace stan {
   namespace services {
     namespace sample {
 
+      /**
+       * @tparam Model Model implementation
+       * @tparam RNG Random number generator implementation
+       * @tparam SampleWriter Writer callback for storing sampling history
+       * @tparam DiagnosticWriter Writer callback for storing sampling diagnostic history
+       * @tparam InfoWriter Writer callback for displaying informative messages
+       * @tparam ErrWriter Writer callback for displaying error messages
+       */
       template <class Model, class RNG,
                 class SampleWriter, class DiagnosticWriter,
                 class InfoWriter, class ErrWriter>

@@ -32,6 +32,11 @@ namespace stan {
           epsilon_(nom_epsilon_),
           epsilon_jitter_(0.0) {}
 
+      /**
+       * @tparam InfoWriter An implementation of
+       *                    src/stan/interface_callbacks/writer/base_writer.hpp
+       * @param writer Writer callback
+       */
       template <class InfoWriter>
       void write_sampler_state(InfoWriter& writer) {
         writer("Step size", get_nominal_stepsize());
