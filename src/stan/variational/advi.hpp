@@ -346,12 +346,12 @@ namespace stan {
             if (elbo > elbo_best) {
               elbo_best = elbo;
             }
-            delta_elbo = rel_difference(elbo, elbo_prev);
+            delta_elbo = rel_difference_(elbo, elbo_prev);
             elbo_diff.push_back(delta_elbo);
             delta_elbo_ave = std::accumulate(
                                elbo_diff.begin(), elbo_diff.end(), 0.0)
                              / static_cast<double>(elbo_diff.size());
-            delta_elbo_med = circ_buff_median(elbo_diff);
+            delta_elbo_med = circ_buff_median_(elbo_diff);
 
             if (print_stream_) {
               *print_stream_
@@ -500,8 +500,20 @@ namespace stan {
         return stan::services::error_codes::OK;
       }
 
+    protected:
+      M& model_;
+      Eigen::VectorXd& cont_params_;
+      BaseRNG& rng_;
+      int n_monte_carlo_grad_;
+      int n_monte_carlo_elbo_;
+      int eval_elbo_;
+      int n_posterior_samples_;
+      std::ostream* print_stream_;
+      std::ostream* out_stream_;
+      std::ostream* diag_stream_;
+
       // Helper function: compute the median of a circular buffer
-      double circ_buff_median(const boost::circular_buffer<double>& cb) const {
+      double circ_buff_median_(const boost::circular_buffer<double>& cb) const {
           // FIXME: naive implementation; creates a copy as a vector
           std::vector<double> v;
           for (boost::circular_buffer<double>::const_iterator i = cb.begin();
@@ -515,21 +527,9 @@ namespace stan {
       }
 
       // Helper function: compute relative difference between two doubles
-      double rel_difference(double prev, double curr) const {
+      double rel_difference_(double prev, double curr) const {
         return std::abs(curr - prev) / std::abs(prev);
       }
-
-    protected:
-      M& model_;
-      Eigen::VectorXd& cont_params_;
-      BaseRNG& rng_;
-      int n_monte_carlo_grad_;
-      int n_monte_carlo_elbo_;
-      int eval_elbo_;
-      int n_posterior_samples_;
-      std::ostream* print_stream_;
-      std::ostream* out_stream_;
-      std::ostream* diag_stream_;
 
       void write_error_msg_(std::ostream* error_msgs,
                             const std::exception& e) const {
