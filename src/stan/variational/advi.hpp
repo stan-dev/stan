@@ -250,10 +250,10 @@ namespace stan {
                 }
               }
             }
-            // Reset for next tuning phase
-            variational = variational_init;
+            // Reset
             params_prop = Q(model_.num_params_r());
           }
+          variational = variational_init;
         }
         return eta_best;
       }
