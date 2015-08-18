@@ -52,7 +52,3 @@ TEST_F(StanInterfaceWriter, noop_noargs) {
   EXPECT_NO_THROW(writer());
   EXPECT_NO_THROW(writer());
 }
-
-TEST_F(StanInterfaceWriter, noop_is_writing) {
-  EXPECT_FALSE(writer.is_writing());
-}

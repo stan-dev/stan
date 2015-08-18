@@ -61,12 +61,6 @@ TEST_F(StanInterfaceWriter, messages_noargs) {
   EXPECT_NO_THROW(writer());
   EXPECT_NO_THROW(writer());
   
-  EXPECT_EQ("\n\n", ss.str());
-}
-
-TEST_F(StanInterfaceWriter, messages_is_writing) {
-  EXPECT_TRUE(writer.is_writing());
-  
-  EXPECT_EQ("", ss.str());
+  EXPECT_EQ("prefix\nprefix\n", ss.str());
 }
 

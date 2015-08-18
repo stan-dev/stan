@@ -63,12 +63,12 @@ namespace stan {
          * as comma separated values, flushing the buffer after the
          * line is complete
          *
-         * @param x string to print with prefix in front
+         * @param message string to print with prefix in front
          */
-        void operator()(const std::string x) {
+        void operator()(const std::string& message) {
           if (!has_stream_)
             return;
-          *o_ << prefix_ << x << std::endl;
+          *o_ << prefix_ << message << std::endl;
         }
 
         /**
@@ -80,17 +80,7 @@ namespace stan {
             return;
           *o_ << std::endl;
         }
-
-        /**
-         * Indicator function for whether the instance is recording.
-         *
-         * For this class, returns true if it has a stream.
-         */
-        bool is_writing() const {
-          return has_stream_;
-        }
       };
-
 
     }
   }
