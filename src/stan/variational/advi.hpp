@@ -154,6 +154,9 @@ namespace stan {
        * @return optimal value of eta in a coarse grid
        */
       double tune(Q& variational) const {
+        static const char* function =
+          "stan::variational::advi::tune";
+
         // Gradient parameters
         Q elbo_grad = Q(model_.num_params_r());
 
@@ -243,12 +246,10 @@ namespace stan {
                 eta_best = eta;
                 do_more_tuning = false;
               } else {
-                if (print_stream_)
-                  *print_stream_
-                    << "Informational Message: All proposed step-sizes "
-                    << "failed. Your model may be either severely "
-                    << "ill-conditioned or misspecified."
-                    << std::endl;
+                const char* name = "All proposed step-sizes";
+                const char* msg1 = "failed. Your model may be either "
+                  "severely ill-conditioned or misspecified.";
+                stan::math::domain_error(function, name, "", msg1);
                 return 0;
               }
             }
