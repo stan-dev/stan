@@ -31,7 +31,6 @@ TEST(advi_test, hier_logistic_cp_constraint_meanfield) {
                                                      cont_params,
                                                      10,
                                                      100,
-                                                     0.01,
                                                      base_rng,
                                                      100,
                                                      1,
@@ -39,5 +38,5 @@ TEST(advi_test, hier_logistic_cp_constraint_meanfield) {
                                                      &std::cout,
                                                      &std::cout);
 
-  test_advi.run(1,2e4);
+  test_advi.run(0.01, 1,2e4);
 }
