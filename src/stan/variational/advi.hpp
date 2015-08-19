@@ -7,6 +7,7 @@
 #include <stan/services/io/write_iteration_csv.hpp>
 #include <stan/services/io/write_iteration.hpp>
 #include <stan/services/error_codes.hpp>
+#include <stan/services/variational/print_progress.hpp>
 #include <stan/variational/families/normal_fullrank.hpp>
 #include <stan/variational/families/normal_meanfield.hpp>
 #include <boost/circular_buffer.hpp>
@@ -153,14 +154,17 @@ namespace stan {
        * @return optimal value of eta in a coarse grid
        */
       double tune(Q& variational) const {
+        static const char* function =
+          "stan::variational::advi::tune";
+
         // Gradient parameters
         Q elbo_grad = Q(model_.num_params_r());
 
         // Learning rate parameters
         Q params_prop = Q(model_.num_params_r());
         double tau = 1.0;
-        double pre_factor  = 9.0 / 10.0;
-        double post_factor = 1.0 / 10.0;
+        double pre_factor  = 0.9;
+        double post_factor = 0.1;
         double eta_scaled;
 
         // Sequence of eta values to try during tuning
@@ -171,35 +175,32 @@ namespace stan {
         eta_sequence.push(0.05);
         eta_sequence.push(0.01);
 
-        double eta = eta_sequence.front();
-        eta_sequence.pop();
+        // Print progress
+        int eta_sequence_size = eta_sequence.size();
+        int m;
 
-        // Initialize ELBO
+        // Initialize ELBO and convergence tracking variables
         double elbo(0.0);
-
-        // Make a copy of the initial variational distribution
-        Q variational_init = variational;
-        double elbo_init = calc_ELBO(variational_init);
-
-        // Store bests
         double elbo_best = -std::numeric_limits<double>::max();
+        double elbo_init = calc_ELBO(variational);
+        double eta;
         double eta_best;
 
         int iter_tune;
         int tuning_iterations = 50;
         bool do_more_tuning = true;
         while (do_more_tuning) {
-          if (print_stream_) {
-            *print_stream_ << "ADVI TUNING: trying eta = "
-                           << std::right << std::setw(4) << std::setprecision(2)
-                           << eta
-                           << " for "
-                           << tuning_iterations
-                           << " iterations... ";
-            print_stream_->flush();
-          }
+          // Try next eta
+          eta = eta_sequence.front();
+          eta_sequence.pop();
 
           for (iter_tune = 1; iter_tune <= tuning_iterations; ++iter_tune) {
+            m = (eta_sequence_size - eta_sequence.size() - 1) *
+              tuning_iterations + iter_tune; // # of total tuning iterations
+            stan::services::variational::print_progress(
+              m, 0, tuning_iterations*eta_sequence_size,
+              tuning_iterations, true, "", "", *print_stream_);
+
             // Compute gradient of ELBO
             calc_ELBO_grad(variational, elbo_grad);
 
@@ -220,40 +221,42 @@ namespace stan {
           // Check if:
           // (1) ELBO at current eta is worse than the best ELBO
           // (2) the best ELBO hasn't actually diverged
-          // TODO eta=1 will always fail
           if (elbo < elbo_best && elbo_best > elbo_init) {
             if (print_stream_)
-              *print_stream_ << "SUCCESS. USING PREVIOUS ONE" << std::endl << std::endl;
+              *print_stream_
+                << "Success! Found best tuned hyperparameters earlier "
+                << "than expected."
+                << std::endl
+                << std::endl;
             do_more_tuning = false;
           } else {
             if (eta_sequence.size() > 0) {
-              // Get the next eta value to try
-              if (print_stream_)
-                *print_stream_ << "FAILED." << std::endl;
+              // Restart phase
               elbo_best = elbo;
               eta_best = eta;
-              eta = eta_sequence.front();
-              eta_sequence.pop();
             } else {
               // No more eta values to try, so use current eta if it
               // didn't diverge or fail if it did diverge
               if (elbo > elbo_init) {
                 if (print_stream_)
-                  *print_stream_ << "SUCCESS. USING CURRENT ONE" << std::endl << std::endl;
+                  *print_stream_
+                    << "Success!"
+                    << std::endl
+                    << std::endl;
                 eta_best = eta;
                 do_more_tuning = false;
               } else {
-                if (print_stream_) {
-                  *print_stream_ << "FAILED." << std::endl;
-                  *print_stream_ << "ALL STEP SIZES FAILED." << std::endl;
-                  return 0;
-                }
+                const char* name = "All proposed step-sizes";
+                const char* msg1 = "failed. Your model may be either "
+                  "severely ill-conditioned or misspecified.";
+                stan::math::domain_error(function, name, "", msg1);
+                return 0;
               }
             }
             // Reset
             params_prop = Q(model_.num_params_r());
           }
-          variational = variational_init;
+          variational = Q(cont_params_);
         }
         return eta_best;
       }
@@ -287,8 +290,8 @@ namespace stan {
         // Learning rate parameters
         Q params_prop = Q(model_.num_params_r());
         double tau = 1.0;
-        double pre_factor  = 9.0 / 10.0;
-        double post_factor = 1.0 / 10.0;
+        double pre_factor  = 0.9;
+        double post_factor = 0.1;
         double eta_scaled;
 
         // Initialize ELBO and convergence tracking variables
@@ -400,7 +403,7 @@ namespace stan {
               *print_stream_ << std::endl;
 
             if (do_more_iterations == false &&
-                std::abs(elbo - elbo_best) > 0.5) {
+                std::abs((elbo - elbo_best)/elbo) > 0.05) {
               if (print_stream_)
                 *print_stream_
                   << "Informational Message: The ELBO at a previous "
