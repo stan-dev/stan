@@ -273,6 +273,7 @@ namespace stan {
                       const variable_map& var_map,
                       bool& pass,
                       std::ostream& error_msgs) const {
+        static const bool user_facing = true;
         std::vector<expr_type> arg_types;
         arg_types.push_back(s.expr_.expression_type());
         for (size_t i = 0; i < s.dist_.args_.size(); ++i)
@@ -319,10 +320,10 @@ namespace stan {
 
         // test for LHS not being purely a variable
         if (has_non_param_var(s.expr_, var_map)) {
-          // FIXME:  really want to get line numbers in here too
+          // TODO(carpenter):  really want to get line numbers in here too
           error_msgs << "Warning (non-fatal):"
              << std::endl
-             << " Left-hand side of sampling statement (~) may contain a"
+             << "Left-hand side of sampling statement (~) may contain a"
              << " non-linear transform of a parameter or local variable."
              << std::endl
              << "If so, you need to call increment_log_prob() with the log"
@@ -331,7 +332,7 @@ namespace stan {
              << "Left-hand-side of sampling statement:"
              << std::endl
              << "    ";
-          generate_expression(s.expr_, error_msgs);
+          generate_expression(s.expr_, user_facing, error_msgs);
           error_msgs << " ~ " << function_name << "(...)"
                      << std::endl;
         }
@@ -342,7 +343,7 @@ namespace stan {
                        << " must be univariate."
                        << std::endl
                        << "  Found outcome expression: ";
-            generate_expression(s.expr_, error_msgs);
+            generate_expression(s.expr_, user_facing, error_msgs);
             error_msgs << std::endl
                        << "  with non-univariate type: "
                        << s.expr_.expression_type()
@@ -356,7 +357,7 @@ namespace stan {
                          << " must be univariate."
                          << std::endl
                          << "  Found parameter expression: ";
-              generate_expression(s.dist_.args_[i], error_msgs);
+              generate_expression(s.dist_.args_[i], user_facing, error_msgs);
               error_msgs << std::endl
                          << "  with non-univariate type: "
                          << s.dist_.args_[i].expression_type()
@@ -371,7 +372,7 @@ namespace stan {
                      << " must be univariate."
                      << std::endl
                      << "  Found lower bound expression: ";
-          generate_expression(s.truncation_.low_, error_msgs);
+          generate_expression(s.truncation_.low_, user_facing, error_msgs);
           error_msgs << std::endl
                      << "  with non-univariate type: "
                      << s.truncation_.low_.expression_type()
@@ -385,7 +386,7 @@ namespace stan {
                      << " must be univariate."
                      << std::endl
                      << "  Found upper bound expression: ";
-          generate_expression(s.truncation_.high_, error_msgs);
+          generate_expression(s.truncation_.high_, user_facing, error_msgs);
           error_msgs << std::endl
                      << "  with non-univariate type: "
                      << s.truncation_.high_.expression_type()
@@ -451,11 +452,12 @@ namespace stan {
       void operator()(bool& pass,
                       const stan::lang::expression& expr,
                       std::stringstream& error_msgs) const {
+        static const bool user_facing = true;
         if (expr.expression_type() != VOID_T) {
           error_msgs << "Illegal statement beginning with non-void"
                      << " expression parsed as"
                      << std::endl << "  ";
-          generate_expression(expr.expr_, error_msgs);
+          generate_expression(expr.expr_, user_facing, error_msgs);
           error_msgs << std::endl
                      << "Not a legal assignment, sampling, or function"
                      << " statement.  Note that"
@@ -710,6 +712,7 @@ namespace stan {
       //   _r2 source of variables allowed for assignments
       //   _r3 true if return_r allowed
 
+      // raw[ ] just to wrap to get line numbers
       statement_r.name("statement");
       statement_r
         = raw[statement_sub_r(_r1, _r2, _r3)[set_val4_f(_val, _1)]]

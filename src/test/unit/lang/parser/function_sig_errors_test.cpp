@@ -25,3 +25,8 @@ TEST(langParser, functionSigErrorsSampKnown) {
               "vector ~ bernoulli_logit(vector)",
               "Available argument signatures for bernoulli_logit:");
 }
+TEST(langParser, functionSigErrorsMultiDef) {
+  test_parsable("multiple_funs");
+  test_throws("multi_fun",
+              "Function already defined, name=foo");
+}

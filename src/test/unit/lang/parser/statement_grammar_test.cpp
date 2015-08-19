@@ -47,6 +47,11 @@ TEST(langParserStatementGrammarDef, jacobianAdjustmentWarning) {
                "If so, you need to call increment_log_prob() with the log");
 }
 
+TEST(langParserStatementGrammarDef, jacobianUserFacing) {
+  test_warning("validate_jacobian_warning_user",
+               "exp(y[1]) ~ normal(...)");
+}
+
 TEST(langParserStatementGrammarDef, comparisonsInBoundsTest) {
   test_parsable("validate_bounds_comparison");
   EXPECT_THROW(is_parsable("src/test/test-models/bad/lang/bad_bounds1.stan"),
