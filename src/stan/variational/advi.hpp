@@ -7,6 +7,7 @@
 #include <stan/services/io/write_iteration_csv.hpp>
 #include <stan/services/io/write_iteration.hpp>
 #include <stan/services/error_codes.hpp>
+#include <stan/services/variational/print_progress.hpp>
 #include <stan/variational/families/normal_fullrank.hpp>
 #include <stan/variational/families/normal_meanfield.hpp>
 #include <boost/circular_buffer.hpp>
@@ -171,30 +172,32 @@ namespace stan {
         eta_sequence.push(0.05);
         eta_sequence.push(0.01);
 
-        double eta = eta_sequence.front();
-        eta_sequence.pop();
+        // Print progress
+        int eta_sequence_size = eta_sequence.size();
+        int m;
 
-        // Initialize ELBO and initial and best ELBO
+        // Initialize ELBO and convergence tracking variables
         double elbo(0.0);
-        double elbo_init = calc_ELBO(variational);
         double elbo_best = -std::numeric_limits<double>::max();
+        double elbo_init = calc_ELBO(variational);
+        double eta;
         double eta_best;
 
         int iter_tune;
         int tuning_iterations = 50;
         bool do_more_tuning = true;
         while (do_more_tuning) {
-          if (print_stream_) {
-            *print_stream_ << "ADVI TUNING: trying eta = "
-                           << std::right << std::setw(4) << std::setprecision(2)
-                           << eta
-                           << " for "
-                           << tuning_iterations
-                           << " iterations... ";
-            print_stream_->flush();
-          }
+          // Try next eta
+          eta = eta_sequence.front();
+          eta_sequence.pop();
 
           for (iter_tune = 1; iter_tune <= tuning_iterations; ++iter_tune) {
+            m = (eta_sequence_size - eta_sequence.size() - 1) *
+              tuning_iterations + iter_tune; // # of total tuning iterations
+            stan::services::variational::print_progress(
+              m, 0, tuning_iterations*eta_sequence_size,
+              tuning_iterations, true, "", "", *print_stream_);
+
             // Compute gradient of ELBO
             calc_ELBO_grad(variational, elbo_grad);
 
@@ -215,34 +218,38 @@ namespace stan {
           // Check if:
           // (1) ELBO at current eta is worse than the best ELBO
           // (2) the best ELBO hasn't actually diverged
-          // TODO eta=1 will always fail
           if (elbo < elbo_best && elbo_best > elbo_init) {
             if (print_stream_)
-              *print_stream_ << "SUCCESS. USING PREVIOUS ONE" << std::endl << std::endl;
+              *print_stream_
+                << "Success! Found best tuned hyperparameters earlier "
+                << "than expected."
+                << std::endl
+                << std::endl;
             do_more_tuning = false;
           } else {
             if (eta_sequence.size() > 0) {
-              // Get the next eta value to try
-              if (print_stream_)
-                *print_stream_ << "FAILED." << std::endl;
+              // Restart phase
               elbo_best = elbo;
               eta_best = eta;
-              eta = eta_sequence.front();
-              eta_sequence.pop();
             } else {
               // No more eta values to try, so use current eta if it
               // didn't diverge or fail if it did diverge
               if (elbo > elbo_init) {
                 if (print_stream_)
-                  *print_stream_ << "SUCCESS. USING CURRENT ONE" << std::endl << std::endl;
+                  *print_stream_
+                    << "Success!"
+                    << std::endl
+                    << std::endl;
                 eta_best = eta;
                 do_more_tuning = false;
               } else {
-                if (print_stream_) {
-                  *print_stream_ << "FAILED." << std::endl;
-                  *print_stream_ << "ALL STEP SIZES FAILED." << std::endl;
-                  return 0;
-                }
+                if (print_stream_)
+                  *print_stream_
+                    << "Informational Message: All proposed step-sizes "
+                    << "failed. Your model may be either severely "
+                    << "ill-conditioned or misspecified."
+                    << std::endl;
+                return 0;
               }
             }
             // Reset
