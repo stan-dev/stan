@@ -403,7 +403,7 @@ namespace stan {
               *print_stream_ << std::endl;
 
             if (do_more_iterations == false &&
-                std::abs(elbo - elbo_best) > 0.5) {
+                std::abs((elbo - elbo_best)/elbo) > 0.05) {
               if (print_stream_)
                 *print_stream_
                   << "Informational Message: The ELBO at a previous "
