@@ -209,6 +209,15 @@ namespace stan {
         clock_t end;
         double delta_t;
 
+        // INTERMEDIATE SAMPLING OUTPUT
+        int num_intermediate_samples = 25;
+        std::fstream* intermediate_stream = 0;
+        std::string intermediate_basename = "intermediate_variational_samples_";
+        std::string intermediate_extension = ".csv";
+        std::string intermediate_filename;
+        std::vector<double> cont_vector(cont_params_.size());
+        std::vector<int> disc_vector;
+
         // Main loop
         std::vector<double> print_vector;
         bool do_more_iterations = true;
@@ -262,6 +271,27 @@ namespace stan {
               print_vector.push_back(elbo);
               services::io::write_iteration_csv(*diag_stream_,
                                                 iter_counter, print_vector);
+
+              // INTERMEDIATE BUSINESS
+              intermediate_filename = intermediate_basename
+                + boost::lexical_cast<std::string>(iter_counter)
+                + intermediate_extension;
+              intermediate_stream = new std::fstream(intermediate_filename.c_str(),
+                                                     std::fstream::out);
+
+              for (int n = 0; n < num_intermediate_samples; ++n) {
+                // cont_params_ = draw_posterior_sample(musigmatilde);
+                variational.sample(rng_, cont_params_);
+                for (int i = 0; i < cont_params_.size(); ++i)
+                  cont_vector.at(i) = cont_params_(i);
+
+                services::io::write_iteration(*intermediate_stream, model_, rng_,
+                              0.0, cont_vector, disc_vector, print_stream_);
+              }
+
+              intermediate_stream->close();
+              delete intermediate_stream;
+
             }
 
             if (delta_elbo_ave < tol_rel_obj) {
