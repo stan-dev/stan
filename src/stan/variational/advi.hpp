@@ -159,8 +159,8 @@ namespace stan {
         // Learning rate parameters
         Q params_prop = Q(model_.num_params_r());
         double tau = 1.0;
-        double pre_factor  = 9.0 / 10.0;
-        double post_factor = 1.0 / 10.0;
+        double pre_factor  = 0.9;
+        double post_factor = 0.1;
         double eta_scaled;
 
         // Sequence of eta values to try during tuning
@@ -174,14 +174,9 @@ namespace stan {
         double eta = eta_sequence.front();
         eta_sequence.pop();
 
-        // Initialize ELBO
+        // Initialize ELBO and initial and best ELBO
         double elbo(0.0);
-
-        // Make a copy of the initial variational distribution
-        Q variational_init = variational;
-        double elbo_init = calc_ELBO(variational_init);
-
-        // Store bests
+        double elbo_init = calc_ELBO(variational);
         double elbo_best = -std::numeric_limits<double>::max();
         double eta_best;
 
@@ -253,7 +248,7 @@ namespace stan {
             // Reset
             params_prop = Q(model_.num_params_r());
           }
-          variational = variational_init;
+          variational = Q(cont_params_);
         }
         return eta_best;
       }
@@ -287,8 +282,8 @@ namespace stan {
         // Learning rate parameters
         Q params_prop = Q(model_.num_params_r());
         double tau = 1.0;
-        double pre_factor  = 9.0 / 10.0;
-        double post_factor = 1.0 / 10.0;
+        double pre_factor  = 0.9;
+        double post_factor = 0.1;
         double eta_scaled;
 
         // Initialize ELBO and convergence tracking variables
