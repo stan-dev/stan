@@ -393,16 +393,18 @@ namespace stan {
               do_more_iterations = false;
             }
 
-            if (delta_elbo_med > 0.5 || delta_elbo_ave > 0.5) {
-              if (print_stream_)
-                *print_stream_ << "   MAY BE DIVERGING... INSPECT ELBO";
+            if (iter_main > 200) {
+              if (delta_elbo_med > 0.5 || delta_elbo_ave > 0.5) {
+                if (print_stream_)
+                  *print_stream_ << "   MAY BE DIVERGING... INSPECT ELBO";
+              }
             }
 
             if (print_stream_)
               *print_stream_ << std::endl;
 
             if (do_more_iterations == false &&
-                std::abs((elbo - elbo_best)/elbo) > 0.05) {
+                rel_difference_(elbo, elbo_best) > 0.05) {
               if (print_stream_)
                 *print_stream_
                   << "Informational Message: The ELBO at a previous "
