@@ -222,12 +222,14 @@ namespace stan {
           // (1) ELBO at current eta is worse than the best ELBO
           // (2) the best ELBO hasn't actually diverged
           if (elbo < elbo_best && elbo_best > elbo_init) {
-            if (print_stream_)
-              *print_stream_
-                << "Success! Found best tuned hyperparameters earlier "
-                << "than expected."
-                << std::endl
-                << std::endl;
+            if (print_stream_) {
+              *print_stream_ << "Success!";
+              if (eta_sequence.size() > 0) {
+                *print_stream_
+                  << " Found best tuned hyperparameters earlier than expected.";
+              }
+              *print_stream_ << std::endl << std::endl;
+            }
             do_more_tuning = false;
           } else {
             if (eta_sequence.size() > 0) {
@@ -239,10 +241,7 @@ namespace stan {
               // didn't diverge or fail if it did diverge
               if (elbo > elbo_init) {
                 if (print_stream_)
-                  *print_stream_
-                    << "Success!"
-                    << std::endl
-                    << std::endl;
+                  *print_stream_ << "Success!" << std::endl << std::endl;
                 eta_best = eta;
                 do_more_tuning = false;
               } else {
