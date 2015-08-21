@@ -1,0 +1,47 @@
+# stan_version_major = 2
+# stan_version_minor = 7
+# stan_version_patch = 0
+# model = gmm_diag_model
+# method = variational
+#   variational
+#     algorithm = meanfield (Default)
+#       meanfield
+#     iter = 10000 (Default)
+#     grad_samples = 1 (Default)
+#     elbo_samples = 100 (Default)
+#     eta_adagrad = 0.5
+#     tol_rel_obj = 0.014999999999999999
+#     eval_elbo = 10
+#     output_samples = 1000 (Default)
+# id = 0 (Default)
+# data
+#   file = training.data.R
+# init = 2 (Default)
+# random
+#   seed = 1
+# output
+#   file = output_mf.csv
+#   diagnostic_file = elbo_mf.csv
+#   refresh = 100 (Default)
+iter,time_in_seconds,ELBO
+0,0.161838,-120011
+10,0.348537,-35382.2
+20,0.535009,-18471.9
+30,0.70565,-18265.1
+40,0.883079,-17880.4
+50,1.05464,-17680.1
+60,1.2282,-18283.9
+70,1.40945,-17822.9
+80,1.57933,-18923
+90,1.75375,-17849.7
+100,1.9283,-17604.4
+110,2.10983,-17796.7
+120,2.28801,-18245.4
+130,2.46359,-17744.4
+140,2.63687,-17771.4
+150,2.80877,-17561.1
+160,2.99057,-17680.1
+170,3.16487,-17784.5
+180,3.34477,-17802
+190,3.52993,-17833.4
+200,3.70771,-17856.4

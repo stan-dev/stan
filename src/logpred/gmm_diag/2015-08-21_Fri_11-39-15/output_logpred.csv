@@ -1,0 +1,37 @@
+# stan_version_major = 2
+# stan_version_minor = 7
+# stan_version_patch = 0
+# model = gmm_diag_logpred_model
+# method = sample (Default)
+#   sample
+#     num_samples = 1
+#     num_warmup = 1000 (Default)
+#     save_warmup = 0 (Default)
+#     thin = 1 (Default)
+#     adapt
+#       engaged = 1 (Default)
+#       gamma = 0.050000000000000003 (Default)
+#       delta = 0.80000000000000004 (Default)
+#       kappa = 0.75 (Default)
+#       t0 = 10 (Default)
+#       init_buffer = 75 (Default)
+#       term_buffer = 50 (Default)
+#       window = 25 (Default)
+#     algorithm = fixed_param
+# id = 0 (Default)
+# data
+#   file = logpred.data.R
+# init = 2 (Default)
+# random
+#   seed = 1477648403
+# output
+#   file = output_logpred.csv
+#   diagnostic_file =  (Default)
+#   refresh = 100 (Default)
+lp__,accept_stat__,ps.1,ps.2,ps.3,log_pred,ave_log_pred
+0,0,-8.8998,-7.92402,-10.4953,-7.56942,-8.4777
+
+#  Elapsed Time: 1.9e-05 seconds (Warm-up)
+#                0.043973 seconds (Sampling)
+#                0.043992 seconds (Total)
+
