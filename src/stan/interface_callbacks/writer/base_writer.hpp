@@ -1,6 +1,7 @@
 #ifndef STAN_INTERFACE_CALLBACKS_WRITER_BASE_WRITER_HPP
 #define STAN_INTERFACE_CALLBACKS_WRITER_BASE_WRITER_HPP
 
+#include <boost/lexical_cast.hpp>
 #include <string>
 #include <vector>
 
@@ -28,7 +29,7 @@ namespace stan {
       class base_writer {
       public:
         // Virtual destructor to avoid compiler warnings
-        virtual ~base_writer() {};
+        virtual ~base_writer() {}
 
         // Key-scalar input
         virtual void operator()(const std::string& key,
@@ -57,7 +58,6 @@ namespace stan {
 
         // String input
         virtual void operator()(const std::string& message) = 0;
-
       };
 
     }

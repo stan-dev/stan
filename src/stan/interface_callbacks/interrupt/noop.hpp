@@ -10,9 +10,9 @@ namespace stan {
       class noop: public base_interrupt {
       public:
         noop() {}
-        void operator()() { };
+        void operator()() { }
       };
-    
+
     }
   }
 }
