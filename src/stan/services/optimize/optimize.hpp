@@ -1,10 +1,6 @@
 #ifndef STAN_SERVICES_OPTIMIZE_OPTIMIZE_HPP
 #define STAN_SERVICES_OPTIMIZE_OPTIMIZE_HPP
 
-#include <cmath>
-#include <sstream>
-#include <iomanip>
-
 #include <stan/optimization/newton.hpp>
 
 #include <stan/services/arguments/arg_adapt.hpp>
@@ -78,6 +74,13 @@
 
 #include <stan/services/optimize/do_bfgs_optimize.hpp>
 
+#include <cmath>
+#include <sstream>
+#include <iomanip>
+#include <limits>
+#include <string>
+#include <vector>
+
 namespace stan {
   namespace services {
     namespace optimize {
@@ -115,7 +118,6 @@ namespace stan {
                    ErrWriter& err,
                    OutputWriter& output,
                    Interrupt& iteration_interrupt) {
-
         std::stringstream msg;
 
         std::vector<double> cont_vector(cont_params.size());
@@ -143,7 +145,6 @@ namespace stan {
         double lp(0);
 
         if (algo->value() == "newton") {
-
           std::vector<double> gradient;
           try {
             msg.str(std::string());
@@ -196,16 +197,14 @@ namespace stan {
           }
 
           return stan::services::error_codes::OK;
-
         }
 
         if (algo->value() == "bfgs") {
-
           msg.str(std::string());
           msg.clear();
 
           typedef stan::optimization::BFGSLineSearch
-            <Model,stan::optimization::BFGSUpdate_HInv<> > Optimizer;
+            <Model, stan::optimization::BFGSUpdate_HInv<> > Optimizer;
           Optimizer bfgs(model, cont_vector, disc_vector, &msg);
 
           bfgs._ls_opts.alpha0
@@ -228,27 +227,26 @@ namespace stan {
               (algo->arg("bfgs")->arg("tol_param"))->value();
           bfgs._conv_opts.maxIts = num_iterations;
 
-          return do_bfgs_optimize(model,bfgs, base_rng,
+          return do_bfgs_optimize(model, bfgs, base_rng,
                                   lp, cont_vector, disc_vector,
                                   output, info,
                                   save_iterations, refresh,
                                   iteration_interrupt);
 
           if (msg.str().size()) info(msg.str());
-
         }
 
         if (algo->value() == "lbfgs") {
-
           msg.str(std::string());
           msg.clear();
 
           typedef stan::optimization::BFGSLineSearch
-            <Model,stan::optimization::LBFGSUpdate<> > Optimizer;
+            <Model, stan::optimization::LBFGSUpdate<> > Optimizer;
           Optimizer bfgs(model, cont_vector, disc_vector, &msg);
 
-          bfgs.get_qnupdate().set_history_size(dynamic_cast<services::int_argument*>
-                                               (algo->arg("lbfgs")->arg("history_size"))->value());
+          bfgs.get_qnupdate().set_history_size(
+            dynamic_cast<services::int_argument*>
+              (algo->arg("lbfgs")->arg("history_size"))->value());
           bfgs._ls_opts.alpha0
             = dynamic_cast<services::real_argument*>
               (algo->arg("lbfgs")->arg("init_alpha"))->value();
@@ -269,22 +267,20 @@ namespace stan {
               (algo->arg("lbfgs")->arg("tol_param"))->value();
           bfgs._conv_opts.maxIts = num_iterations;
 
-          return do_bfgs_optimize(model,bfgs, base_rng,
+          return do_bfgs_optimize(model, bfgs, base_rng,
                                   lp, cont_vector, disc_vector,
                                   output, info,
                                   save_iterations, refresh,
                                   iteration_interrupt);
 
           if (msg.str().size()) info(msg.str());
-
         }
 
         return stan::services::error_codes::USAGE;
-
       }
 
-    } // sample
-  } // services
-} // stan
+    }  // sample
+  }  // services
+}  // stan
 
 #endif

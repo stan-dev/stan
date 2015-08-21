@@ -4,18 +4,19 @@
 #include <cmath>
 #include <sstream>
 #include <iomanip>
+#include <string>
 
 namespace stan {
   namespace services {
     namespace sample {
-    
       std::string progress(const int n,
                            const int start,
                            const int finish,
                            const int refresh,
                            const bool warmup) {
-        int it_print_width = std::ceil(std::log10((double) finish));
-        
+        int it_print_width
+          = std::ceil(std::log10((static_cast<double>(finish)));
+
         std::stringstream message;
         message << "Iteration: ";
         message << std::setw(it_print_width) << n + 1 + start
@@ -24,12 +25,12 @@ namespace stan {
                 << static_cast<int>( (100.0 * (start + n + 1)) / finish )
                 << "%] ";
         message << (warmup ? " (Warmup)" : " (Sampling)");
-        
+
         return message.str();
       }
 
-    } // sample
-  } // services
-} // stan
+    }  // sample
+  }  // services
+}  // stan
 
 #endif

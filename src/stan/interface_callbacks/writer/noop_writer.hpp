@@ -10,7 +10,6 @@ namespace stan {
     namespace writer {
 
       class noop_writer: public base_writer {
-
       public:
         void operator()(const std::string& key, double value) {}
         void operator()(const std::string& key, int value) {}

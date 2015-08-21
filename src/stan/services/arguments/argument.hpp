@@ -1,12 +1,12 @@
 #ifndef STAN_SERVICES_ARGUMENTS_ARGUMENT_HPP
 #define STAN_SERVICES_ARGUMENTS_ARGUMENT_HPP
 
+#include <stan/interface_callbacks/writer/base_writer.hpp>
+
 #include <vector>
 #include <string>
 #include <sstream>
 #include <iomanip>
-
-#include <stan/interface_callbacks/writer/base_writer.hpp>
 
 namespace stan {
   namespace services {
@@ -17,10 +17,10 @@ namespace stan {
         : indent_width(2),
           help_width(20) { }
 
-      argument(const std::string name)
-        : _name(name),
-          indent_width(2),
-          help_width(20) { }
+      explicit argument(const std::string name):
+        _name(name),
+        indent_width(2),
+        help_width(20) { }
 
       virtual ~argument() { }
 
@@ -48,7 +48,7 @@ namespace stan {
 
 
       virtual void probe_args(argument* base_arg,
-                              interface_callbacks::writer::base_writer& w) {};
+                              interface_callbacks::writer::base_writer& w) {}
 
       virtual void find_arg(std::string name,
                             std::string prefix,

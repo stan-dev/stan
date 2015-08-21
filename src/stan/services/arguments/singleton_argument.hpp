@@ -50,7 +50,7 @@ namespace stan {
         _value_type = type_name<T>::name();
       }
 
-      singleton_argument(const std::string name): _validity("All") {
+      explicit singleton_argument(const std::string name): _validity("All") {
         _name = name;
       }
 
@@ -95,7 +95,6 @@ namespace stan {
 
       virtual void probe_args(argument* base_arg,
                               interface_callbacks::writer::base_writer& w) {
-
         w("good");
         _value = _good_value;
 

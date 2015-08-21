@@ -10,12 +10,12 @@
 namespace stan {
   namespace services {
     namespace sample {
-
       /**
        * @tparam Model Model implementation
        * @tparam RNG Random number generator implementation
        * @tparam SampleWriter Writer callback for storing sampling history
-       * @tparam DiagnosticWriter Writer callback for storing sampling diagnostic history
+       * @tparam DiagnosticWriter Writer callback for storing sampling 
+       *         diagnostic history
        * @tparam InfoWriter Writer callback for displaying informative messages
        * @tparam ErrWriter Writer callback for displaying error messages
        */
@@ -32,7 +32,6 @@ namespace stan {
         ErrWriter& err_writer_;
 
       public:
-
         mcmc_writer(Model& model,
                     RNG& rng,
                     SampleWriter& sample_writer,
@@ -49,7 +48,6 @@ namespace stan {
 
         template <class Sampler>
         void write_names(stan::mcmc::sample& sample, Sampler& sampler) {
-          
           // Writer sample names
           std::vector<std::string> names;
 
@@ -58,25 +56,23 @@ namespace stan {
           model_.constrained_param_names(names, true, true);
 
           sample_writer_(names);
-          
+
           // Write diagnostic names
           names.clear();
-          
+
           sample.get_sample_param_names(names);
           sampler.get_sampler_param_names(names);
-          
+
           std::vector<std::string> model_names;
           model_.unconstrained_param_names(model_names, false, false);
-          
+
           sampler.get_sampler_diagnostic_names(model_names, names);
-          
+
           diagnostic_writer_(names);
-          
         }
 
         template <class Sampler>
         void write_state(stan::mcmc::sample& sample, Sampler& sampler) {
-          
           // External sampler state
           std::vector<double> values;
 
@@ -93,16 +89,15 @@ namespace stan {
             values.push_back(model_values(i));
 
           sample_writer_(values);
-          
+
           // Internal sampler state
           values.clear();
-          
+
           sample.get_sample_params(values);
           sampler.get_sampler_params(values);
           sampler.get_sampler_diagnostics(values);
-          
+
           diagnostic_writer_(values);
-          
         }
 
         template <class Sampler>
@@ -116,15 +111,15 @@ namespace stan {
           write_timing_(warm_delta_t, sample_delta_t, diagnostic_writer_, "# ");
           write_timing_(warm_delta_t, sample_delta_t, info_writer_, "");
         }
-        
+
         void write_info_message(const std::string& message) {
           if (message.size()) info_writer_(message);
         }
-        
+
         void write_err_message(const std::string& message) {
           if (message.size()) err_writer_(message);
         }
-        
+
       private:
         template <class Sampler, class Writer>
         void write_adapt_finish_(Sampler& sampler,
@@ -132,7 +127,7 @@ namespace stan {
           writer(prefix + "Adaptation terminated");
           sampler.write_sampler_state(writer);
         }
-        
+
         template <class Writer>
         void write_timing_(double warm_delta_t, double sample_delta_t,
                            Writer& writer, std::string prefix) {
@@ -143,10 +138,9 @@ namespace stan {
           writer("Total", warm_delta_t + sample_delta_t);
           writer("");
         }
-
       };
-    } // sample
-  } // services
-} // stan
+    }  // sample
+  }  // services
+}  // stan
 
 #endif

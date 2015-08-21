@@ -13,9 +13,10 @@ namespace stan {
 
     // Euclidean manifold with unit metric
     template <class Model, class BaseRNG>
-    class unit_e_metric : public base_hamiltonian<Model, unit_e_point, BaseRNG> {
+    class unit_e_metric :
+      public base_hamiltonian<Model, unit_e_point, BaseRNG> {
     public:
-      unit_e_metric(Model& model)
+      explicit unit_e_metric(Model& model)
         : base_hamiltonian<Model, unit_e_point, BaseRNG>(model) {}
 
       ~unit_e_metric() {}

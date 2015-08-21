@@ -1,16 +1,17 @@
 #ifndef STAN_SERVICES_OPTIMIZE_DO_BFGS_OPTIMIZE_HPP
 #define STAN_SERVICES_OPTIMIZE_DO_BFGS_OPTIMIZE_HPP
 
-#include <fstream>
-#include <iostream>
-#include <iomanip>
-#include <vector>
-
 #include <stan/optimization/bfgs.hpp>
 
 #include <stan/services/error_codes.hpp>
 #include <stan/services/io/write_iteration.hpp>
 #include <stan/services/io/do_print.hpp>
+
+#include <fstream>
+#include <iostream>
+#include <iomanip>
+#include <vector>
+#include <string>
 
 namespace stan {
   namespace services {
@@ -39,7 +40,7 @@ namespace stan {
        * @param iteration_interrupt Interrupt callback called at the beginning
                                     of each iteration
        */
-      template<typename ModelT,typename BFGSOptimizerT,typename RNGT,
+      template<typename ModelT, typename BFGSOptimizerT, typename RNGT,
                typename OutputWriter, typename InfoWriter, typename Interrupt>
       int do_bfgs_optimize(ModelT &model,
                            BFGSOptimizerT &bfgs,
@@ -80,15 +81,21 @@ namespace stan {
           lp = bfgs.logp();
           bfgs.params_r(cont_vector);
 
-          if (io::do_print(bfgs.iter_num(), ret != 0 || !bfgs.note().empty(),refresh)) {
+          if (io::do_print(bfgs.iter_num(),
+                           ret != 0 || !bfgs.note().empty(), refresh)) {
             msg.str(std::string());
             msg.clear();
             msg << " " << std::setw(7) << bfgs.iter_num() << " ";
-            msg << " " << std::setw(12) << std::setprecision(6) << lp << " ";
-            msg << " " << std::setw(12) << std::setprecision(6) << bfgs.prev_step_size() << " ";
-            msg << " " << std::setw(12) << std::setprecision(6) << bfgs.curr_g().norm() << " ";
-            msg << " " << std::setw(10) << std::setprecision(4) << bfgs.alpha() << " ";
-            msg << " " << std::setw(10) << std::setprecision(4) << bfgs.alpha0() << " ";
+            msg << " " << std::setw(12) << std::setprecision(6)
+                << lp << " ";
+            msg << " " << std::setw(12) << std::setprecision(6)
+                << bfgs.prev_step_size() << " ";
+            msg << " " << std::setw(12) << std::setprecision(6)
+                << bfgs.curr_g().norm() << " ";
+            msg << " " << std::setw(10) << std::setprecision(4)
+                << bfgs.alpha() << " ";
+            msg << " " << std::setw(10) << std::setprecision(4)
+                << bfgs.alpha0() << " ";
             msg << " " << std::setw(7) << bfgs.grad_evals() << " ";
             msg << " " << bfgs.note();
             info(msg.str());
@@ -113,7 +120,7 @@ namespace stan {
         return return_code;
       }
 
-    } // optimize
-  } // services
-} // stan
+    }  // optimize
+  }  // services
+}  // stan
 #endif

@@ -7,7 +7,6 @@
 namespace stan {
   namespace services {
     namespace sample {
-      
       /**
        * @tparam Sampler MCMC sampler implementation
        * @tparam MCMCWriter MCMC writer implementation
@@ -32,13 +31,12 @@ namespace stan {
                        bool save_warmup,
                        MCMCWriter& writer,
                        Interrupt& interrupt) {
-        
         double warm_delta_t;
         double sample_delta_t;
-        
+
         // Headers
         writer.write_names(sample, sampler);
-        
+
         // Warm-Up
         clock_t start = clock();
         generate_transitions(sampler, sample,
@@ -50,17 +48,16 @@ namespace stan {
         // Sampling
         start = clock();
         generate_transitions(sampler, sample,
-                             num_samples, num_warmup, num_warmup + num_samples, num_thin,
-                             refresh, true, false, writer, interrupt);
+                             num_samples, num_warmup, num_warmup + num_samples,
+                             num_thin, refresh, true, false, writer, interrupt);
         end = clock();
         sample_delta_t = static_cast<double>(end - start) / CLOCKS_PER_SEC;
-        
-        writer.write_timing(warm_delta_t, sample_delta_t);
 
+        writer.write_timing(warm_delta_t, sample_delta_t);
       }
 
-    } // sample
-  } // services
-} // stan
+    }  // sample
+  }  // services
+}  // stan
 
 #endif

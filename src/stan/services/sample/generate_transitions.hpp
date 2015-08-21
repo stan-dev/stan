@@ -4,11 +4,11 @@
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/services/io/do_print.hpp>
 #include <stan/services/sample/progress.hpp>
+#include <string>
 
 namespace stan {
   namespace services {
     namespace sample {
-
       /**
        * @tparam Sampler MCMC sampler implementation
        * @tparam MCMCWriter MCMC writer implementation
@@ -40,25 +40,24 @@ namespace stan {
                                 Interrupt& interrupt) {
         for (int n = 0; n < num_iterations; ++n) {
           interrupt();
-          
+
           if (io::do_print(n, (start + n + 1 == finish), refresh)) {
             std::string msg = progress(n, start, finish, refresh, warmup);
             mcmc_writer.write_info_message(msg);
           }
-          
+
           sample = sampler.transition(sample);
           mcmc_writer.write_info_message(sampler.flush_info_buffer());
           mcmc_writer.write_err_message(sampler.flush_err_buffer());
           sampler.clear_buffers();
-            
+
           if ( save && ( (n % num_thin) == 0) )
             mcmc_writer.write_state(sample, sampler);
         }
-        
       }
 
-    } // sample
-  } // services
-} // stan
+    }  // sample
+  }  // services
+}  // stan
 
 #endif

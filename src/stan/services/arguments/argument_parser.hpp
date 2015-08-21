@@ -21,7 +21,7 @@ namespace stan {
       }
 
       ~argument_parser() {
-        for(std::vector<argument*>::iterator it = _arguments.begin();
+        for (std::vector<argument*>::iterator it = _arguments.begin();
             it != _arguments.end(); it++)
           if (*it) delete *it;
       }
@@ -34,7 +34,6 @@ namespace stan {
                      const char* argv[],
                      interface_callbacks::writer::base_writer& info,
                      interface_callbacks::writer::base_writer& err) {
-
         if (argc == 1) {
           print_usage(info, argv[0]);
           return error_codes::USAGE;
@@ -86,8 +85,7 @@ namespace stan {
               valid_arg &= (*arg_it)->parse_args(args, info, err, _help_flag);
               good_arg = true;
               break;
-            }
-            else if ( (*arg_it)->name() == val_name) {
+            } else if ((*arg_it)->name() == val_name) {
               valid_arg &= (*arg_it)->parse_args(args, info, err, _help_flag);
               good_arg = true;
               break;
@@ -111,7 +109,6 @@ namespace stan {
           }
 
           if (!good_arg) {
-
             err(cat_name + " is either mistyped or misplaced.");
 
             std::vector<std::string> valid_paths;
@@ -121,7 +118,8 @@ namespace stan {
             }
 
             if (valid_paths.size()) {
-              err("Perhaps you meant one of the following valid configurations?");
+              err("Perhaps you meant one of the "
+                  + std::string("following valid configurations?"));
               for (size_t i = 0; i < valid_paths.size(); ++i)
                 err("  " + valid_paths.at(i));
             }
@@ -154,7 +152,6 @@ namespace stan {
 
       void print_usage(interface_callbacks::writer::base_writer& w,
                        const char* executable) {
-
         std::string indent(2, ' ');
         int width = 12;
 
@@ -170,7 +167,8 @@ namespace stan {
 
         std::stringstream ss;
 
-        for (std::vector<argument*>::iterator value_it = method->values().begin();
+        for (std::vector<argument*>::iterator value_it
+               = method->values().begin();
              value_it != method->values().end(); ++value_it) {
           ss.str(std::string());
           ss.clear();
@@ -222,7 +220,6 @@ namespace stan {
         w(std::string("See ") + executable + " <arg1> [ help | help-all ] "
           + "for details on individual arguments.");
         w();
-
       }
 
       argument* arg(std::string name) {

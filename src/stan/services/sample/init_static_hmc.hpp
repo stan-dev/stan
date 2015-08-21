@@ -8,7 +8,6 @@
 namespace stan {
   namespace services {
     namespace sample {
-
       /**
        * @tparam Sampler MCMC sampler implementation
        * @param sampler MCMC sampler
@@ -41,8 +40,8 @@ namespace stan {
         return true;
       }
 
-    } // sample
-  } // services
-} // stan
+    }  // sample
+  }  // services
+}  // stan
 
 #endif

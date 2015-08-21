@@ -119,7 +119,6 @@ namespace stan {
       bool initialize_state_values(Eigen::VectorXd& cont_params,
                                    Model& model,
                                    Writer& writer) {
-
         try {
           validate_unconstrained_initialization(cont_params, model);
         } catch (const std::exception& e) {
@@ -129,17 +128,20 @@ namespace stan {
         double init_log_prob;
         Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
         try {
-          stan::model::gradient(model, cont_params, init_log_prob, init_grad, 0);
+          stan::model::gradient(model, cont_params,
+                                init_log_prob, init_grad, 0);
         } catch (const std::exception& e) {
           io::write_error_msg(writer, e);
           writer();
           writer("Rejecting initial value:");
-          writer("  Error evaluating the log probability at the initial value.");
+          writer("  Error evaluating the log probability
+                 + std::string("at the initial value."));
           return false;
         }
         if (!boost::math::isfinite(init_log_prob)) {
           writer("Rejecting initial value:");
-          writer("  Log probability evaluates to log(0), i.e. negative infinity.");
+          writer("  Log probability evaluates to log(0),"
+                 + std::string("i.e. negative infinity."));
           writer("  Stan can't start sampling from this initial value.");
           return false;
         }

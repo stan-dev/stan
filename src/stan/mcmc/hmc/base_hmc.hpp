@@ -147,10 +147,10 @@ namespace stan {
           this->epsilon_ *= 1.0
             + this->epsilon_jitter_ * (2.0 * this->rand_uniform_() - 1.0);
       }
-      
+
       std::string flush_info_buffer() { return hamiltonian_.info().str(); }
       std::string flush_err_buffer() { return hamiltonian_.err().str(); }
-      
+
       void clear_buffers() {
         hamiltonian_.info().str(std::string());
         hamiltonian_.info().clear();

@@ -50,21 +50,21 @@ namespace stan {
             = num_warmup - (adapt_init_buffer_ + adapt_term_buffer_);
 
           writer("         Defaulting to a 15%/75%/10% partition,");
-          
+
           std::stringstream msg;
           msg << "           init_buffer = " << adapt_init_buffer_;
           writer(msg.str());
-          
+
           msg.str(std::string());
           msg.clear();
           msg << "           adapt_window = " << adapt_base_window_;
           writer(msg.str());
-                 
+
           msg.str(std::string());
           msg.clear();
           msg << "           term_buffer = " << adapt_term_buffer_;
           writer(msg.str());
-          
+
           writer();
 
           return;

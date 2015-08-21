@@ -13,7 +13,7 @@ namespace stan {
     public:
       explicit unit_e_point(int n)
         : ps_point(n) {}
-      
+
       /**
        * @tparam Writer An implementation of
        *                    src/stan/interface_callbacks/writer/base_writer.hpp
@@ -23,7 +23,6 @@ namespace stan {
       void write_metric(Writer& writer) {
         writer("# Unit Eucliden metric");
       }
-      
     };
 
   }  // mcmc

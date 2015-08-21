@@ -49,20 +49,18 @@ namespace stan {
                       interface_callbacks::writer::base_writer& info,
                       interface_callbacks::writer::base_writer& err,
                       bool& help_flag) {
-
-        if(args.size() == 0) return true;
+        if (args.size() == 0) return true;
 
         std::string name;
         std::string value;
         split_arg(args.back(), name, value);
 
-        if(_name == "help") {
+        if (_name == "help") {
           print_help(info, 0, false);
           help_flag |= true;
           args.clear();
           return false;
-        }
-        else if(_name == "help-all") {
+        } else if (_name == "help-all") {
           print_help(info, 0, true);
           help_flag |= true;
           args.clear();
@@ -77,13 +75,13 @@ namespace stan {
             if ( _values.at(i)->name() != value) continue;
 
             _cursor = i;
-            valid_arg &= _values.at(_cursor)->parse_args(args, info, err, help_flag);
+            valid_arg
+              &= _values.at(_cursor)->parse_args(args, info, err, help_flag);
             good_arg = true;
             break;
           }
 
-          if(!good_arg) {
-
+          if (!good_arg) {
             std::stringstream msg;
             msg << value << " is not a valid value for \"" << _name << "\"";
             err(msg.str());
@@ -100,7 +98,6 @@ namespace stan {
 
       virtual void probe_args(argument* base_arg,
                               interface_callbacks::writer::base_writer& w) {
-
         for (size_t i = 0; i < _values.size(); ++i) {
           _cursor = i;
 
@@ -113,7 +110,7 @@ namespace stan {
 
         _values.push_back(new arg_fail);
         _cursor = _values.size() - 1;
-        
+
         w("bad");
         base_arg->print(w, 0, "");
         w();

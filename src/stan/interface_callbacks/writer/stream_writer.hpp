@@ -3,6 +3,8 @@
 
 #include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <iostream>
+#include <vector>
+#include <string>
 
 namespace stan {
   namespace interface_callbacks {
@@ -17,15 +19,15 @@ namespace stan {
 
         void operator()(const std::string& key, double value) {
           output__ << key_value_prefix__ << key << " = " << value << std::endl;
-        };
+        }
 
         void operator()(const std::string& key, int value) {
           output__ << key_value_prefix__ << key << " = " << value << std::endl;
-        };
+        }
 
         void operator()(const std::string& key, const std::string& value) {
           output__ << key_value_prefix__ << key << " = " << value << std::endl;
-        };
+        }
 
         void operator()(const std::string& key,
                         const double* values,
@@ -65,7 +67,7 @@ namespace stan {
                it != last; ++it)
             output__ << *it << ",";
           output__ << names.back() << std::endl;
-        };
+        }
 
         void operator()(const std::vector<double>& state) {
           if (state.empty()) return;
@@ -77,7 +79,7 @@ namespace stan {
                it != last; ++it)
             output__ << *it << ",";
           output__ << state.back() << std::endl;
-        };
+        }
 
         void operator()() {
           output__ << std::endl;
@@ -85,7 +87,7 @@ namespace stan {
 
         void operator()(const std::string& message) {
           output__ << message << std::endl;
-        };
+        }
 
       private:
         Stream& output__;

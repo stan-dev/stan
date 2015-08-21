@@ -8,16 +8,9 @@
 namespace stan {
   namespace interface_callbacks {
     namespace writer {
-
       // An implementation of stream_writer
       // using stringstream for unit tests
       typedef stream_writer<std::stringstream> sstream_writer;
-
-      typedef stream_writer<std::ostream> ostream_writer;
-
-      //typedef stream_writer<std::cout> cout_writer;
-      //typedef stream_writer<std::cout> cerr_writer;
-
     }
   }
 }

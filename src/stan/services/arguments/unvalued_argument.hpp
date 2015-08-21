@@ -19,7 +19,6 @@ namespace stan {
 
       void print_help(interface_callbacks::writer::base_writer& w,
                       const int depth, const bool recurse = false) {
-
         std::string indent(indent_width * depth, ' ');
         std::string subindent(indent_width, ' ');
 
@@ -27,7 +26,6 @@ namespace stan {
         w(std::string(indent_width * (depth + 1), ' ')
           + _description);
         w();
-
       }
 
       bool parse_args(std::vector<std::string>& args,

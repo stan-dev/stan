@@ -1,10 +1,6 @@
 #ifndef STAN_SERVICES_SAMPLE_SAMPLE_HPP
 #define STAN_SERVICES_SAMPLE_SAMPLE_HPP
 
-#include <cmath>
-#include <sstream>
-#include <iomanip>
-
 #include <stan/mcmc/fixed_param_sampler.hpp>
 #include <stan/mcmc/hmc/static/adapt_unit_e_static_hmc.hpp>
 #include <stan/mcmc/hmc/static/adapt_diag_e_static_hmc.hpp>
@@ -90,6 +86,11 @@
 #include <stan/services/sample/run_sampler.hpp>
 #include <stan/services/sample/generate_transitions.hpp>
 
+#include <cmath>
+#include <sstream>
+#include <iomanip>
+#include <string>
+
 namespace stan {
   namespace services {
     namespace sample {
@@ -136,7 +137,6 @@ namespace stan {
                  OutputWriter& output,
                  DiagnosticWriter& diagnostic,
                  Interrupt& iteration_interrupt) {
-
         // Check timing
         clock_t start_check = clock();
 
@@ -191,7 +191,6 @@ namespace stan {
         stan::mcmc::sample s(cont_params, 0, 0);
 
         if (algo->value() == "fixed_param") {
-
           if (model.num_params_r() == 0 && algo->value() != "fixed_param") {
             err(std::string("Must use algorithm=fixed_param for ")
                 + "model that has no parameters.");
@@ -365,7 +364,8 @@ namespace stan {
 
             if (!init_static_hmc(sampler, algo))
               return stan::services::error_codes::SOFTWARE;
-            if (!init_windowed_adapt(sampler, adapt, num_warmup, cont_params, err))
+            if (!init_windowed_adapt(sampler, adapt,
+                                     num_warmup, cont_params, err))
               return stan::services::error_codes::SOFTWARE;
 
             sample::run_adaptive_sampler(sampler, s, num_warmup, num_samples,
@@ -383,7 +383,8 @@ namespace stan {
 
             if (!init_nuts(sampler, algo))
               return stan::services::error_codes::SOFTWARE;
-            if (!init_windowed_adapt(sampler, adapt, num_warmup, cont_params, err))
+            if (!init_windowed_adapt(sampler, adapt,
+                                     num_warmup, cont_params, err))
               return stan::services::error_codes::SOFTWARE;
 
             sample::run_adaptive_sampler(sampler, s, num_warmup, num_samples,
@@ -401,7 +402,8 @@ namespace stan {
 
             if (!init_static_hmc(sampler, algo))
               return stan::services::error_codes::SOFTWARE;
-            if (!init_windowed_adapt(sampler, adapt, num_warmup, cont_params, err))
+            if (!init_windowed_adapt(sampler, adapt,
+                                     num_warmup, cont_params, err))
               return stan::services::error_codes::SOFTWARE;
 
             sample::run_adaptive_sampler(sampler, s, num_warmup, num_samples,
@@ -419,7 +421,8 @@ namespace stan {
 
             if (!init_nuts(sampler, algo))
               return stan::services::error_codes::SOFTWARE;
-            if (!init_windowed_adapt(sampler, adapt, num_warmup, cont_params, err))
+            if (!init_windowed_adapt(sampler, adapt,
+                                     num_warmup, cont_params, err))
               return stan::services::error_codes::SOFTWARE;
 
             sample::run_adaptive_sampler(sampler, s, num_warmup, num_samples,
@@ -429,23 +432,21 @@ namespace stan {
             return stan::services::error_codes::OK;
           }
 
-          if(   !(   engine->value() == "static"
+          if (   !(engine->value() == "static"
                   || engine->value() == "nuts")
-             || !(   metric->value() == "unit_e"
-                  || metric->value() == "diag_e"
-                  || metric->value() == "dense_e")) {
-               err("No sampler matching HMC specification!");
+              || !(metric->value() == "unit_e"
+                   || metric->value() == "diag_e"
+                   || metric->value() == "dense_e")) {
+              err("No sampler matching HMC specification!");
                return stan::services::error_codes::USAGE;
-             }
-
+          }
         }
 
         return stan::services::error_codes::USAGE;
-
       }
 
-    } // sample
-  } // services
-} // stan
+    }  // sample
+  }  // services
+}  // stan
 
 #endif

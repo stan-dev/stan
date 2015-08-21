@@ -7,7 +7,6 @@
 namespace stan {
   namespace services {
     namespace io {
-
       /**
        * @tparam Writer An implementation of
        *                src/stan/interface_callbacks/writer/base_writer.hpp
@@ -17,7 +16,6 @@ namespace stan {
       template <class Writer>
       void write_error_msg(Writer& writer,
                            const std::exception& e) {
-
         writer();
         writer("Informational Message: The current Metropolis "
                "proposal is about to be rejected because of the "

@@ -54,8 +54,7 @@ namespace stan {
                  it != _subarguments.end(); ++it)
               (*it)->print_help(w, depth + 1, true);
           }
-        }
-        else {
+        } else {
           w();
         }
       }
@@ -64,7 +63,6 @@ namespace stan {
                       interface_callbacks::writer::base_writer& info,
                       interface_callbacks::writer::base_writer& err,
                       bool& help_flag) {
-
         bool good_arg = true;
         bool valid_arg = true;
 

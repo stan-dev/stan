@@ -22,6 +22,7 @@
 #include <iomanip>
 #include <iostream>
 #include <vector>
+#include <string>
 
 namespace stan {
 
@@ -275,7 +276,8 @@ namespace stan {
      * @return number of failed gradient comparisons versus allowed
      * error, so 0 if all gradients pass
      */
-    template <bool propto, bool jacobian_adjust_transform, class M, class Writer>
+    template <bool propto, bool jacobian_adjust_transform,
+              class M, class Writer>
     int test_gradients(const M& model,
                        std::vector<double>& params_r,
                        std::vector<int>& params_i,

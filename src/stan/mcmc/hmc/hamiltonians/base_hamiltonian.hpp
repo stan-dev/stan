@@ -17,11 +17,11 @@ namespace stan {
     template <class Model, class Point, class BaseRNG>
     class base_hamiltonian {
     public:
-      base_hamiltonian(Model& m)
-        : model_(m), info_buffer_(), err_buffer_() {}
+      explicit base_hamiltonian(Model& m):
+        model_(m), info_buffer_(), err_buffer_() {}
 
       ~base_hamiltonian() {}
-      
+
       typedef Point PointType;
 
       virtual double T(Point& z) = 0;
@@ -65,7 +65,7 @@ namespace stan {
 
       std::stringstream& info() { return info_buffer_; }
       std::stringstream& err() { return err_buffer_; }
-      
+
     protected:
       Model& model_;
       std::stringstream info_buffer_;
@@ -77,12 +77,12 @@ namespace stan {
                     << "is about to be rejected because of the following issue:"
                     << std::endl;
         err_buffer_ << e.what() << std::endl;
-        err_buffer_ << "If this warning occurs sporadically, such as for highly "
-                    << "constrained variable types like covariance matrices, then "
-                    << "the sampler is fine,"
+        err_buffer_ << "If this warning occurs sporadically, such as for "
+                    << "highly constrained variable types like covariance "
+                    << "matrices, then the sampler is fine,"
                     << std::endl;
-        err_buffer_ << "but if this warning occurs often then your model may be "
-                    << "either severely ill-conditioned or misspecified.";
+        err_buffer_ << "but if this warning occurs often then your model may "
+                    << "be either severely ill-conditioned or misspecified.";
       }
     };
 

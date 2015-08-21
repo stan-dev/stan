@@ -30,10 +30,10 @@ namespace stan {
         (std::vector<std::string>& model_names,
          std::vector<std::string>& names) {}
       virtual void get_sampler_diagnostics(std::vector<double>& values) {}
-      
+
       std::string flush_info_buffer() { return std::string(); }
       std::string flush_err_buffer() { return std::string(); }
-      
+
       void clear_buffers() {}
 
     protected:
