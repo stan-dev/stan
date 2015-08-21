@@ -134,7 +134,7 @@ namespace stan {
           io::write_error_msg(writer, e);
           writer();
           writer("Rejecting initial value:");
-          writer("  Error evaluating the log probability
+          writer("  Error evaluating the log probability"
                  + std::string("at the initial value."));
           return false;
         }

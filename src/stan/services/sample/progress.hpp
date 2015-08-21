@@ -15,7 +15,7 @@ namespace stan {
                            const int refresh,
                            const bool warmup) {
         int it_print_width
-          = std::ceil(std::log10((static_cast<double>(finish)));
+          = std::ceil(std::log10(static_cast<double>(finish)));
 
         std::stringstream message;
         message << "Iteration: ";
