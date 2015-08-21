@@ -5,6 +5,8 @@
 #include <sstream>
 #include <iomanip>
 
+#include <stan/optimization/newton.hpp>
+
 #include <stan/services/arguments/arg_adapt.hpp>
 #include <stan/services/arguments/arg_adapt_delta.hpp>
 #include <stan/services/arguments/arg_adapt_engaged.hpp>

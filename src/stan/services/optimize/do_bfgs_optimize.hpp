@@ -6,6 +6,8 @@
 #include <iomanip>
 #include <vector>
 
+#include <stan/optimization/bfgs.hpp>
+
 #include <stan/services/error_codes.hpp>
 #include <stan/services/io/write_iteration.hpp>
 #include <stan/services/io/do_print.hpp>
