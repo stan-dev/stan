@@ -17,6 +17,14 @@ TEST(advi_test, hier_logistic_cp_constraint_meanfield) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
 
+  std::stringstream print_stream_;
+  std::stringstream output_stream_;
+  std::stringstream diagnostic_stream_;
+
+  print_stream_.str("");
+  output_stream_.str("");
+  diagnostic_stream_.str("");
+
   // Instantiate model
   Model_cp my_model(data_var_context);
 
@@ -29,14 +37,14 @@ TEST(advi_test, hier_logistic_cp_constraint_meanfield) {
   // ADVI
   stan::variational::advi<Model_cp, stan::variational::normal_meanfield, rng_t> test_advi(my_model,
                                                      cont_params,
-                                                     10,
+                                                     1,
                                                      100,
                                                      base_rng,
                                                      100,
                                                      1,
                                                      &std::cout,
-                                                     &std::cout,
-                                                     &std::cout);
+                                                     &output_stream_,
+                                                     &diagnostic_stream_);
 
-  test_advi.run(0.01, 1,2e4);
+  test_advi.run(0.1, 0.1, 1e4);
 }
