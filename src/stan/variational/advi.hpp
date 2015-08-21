@@ -393,7 +393,7 @@ namespace stan {
               do_more_iterations = false;
             }
 
-            if (iter_main > 200) {
+            if (iter_main > 2*eval_elbo_) {
               if (delta_elbo_med > 0.5 || delta_elbo_ave > 0.5) {
                 if (print_stream_)
                   *print_stream_ << "   MAY BE DIVERGING... INSPECT ELBO";
@@ -516,21 +516,19 @@ namespace stan {
       std::ostream* out_stream_;
       std::ostream* diag_stream_;
 
-      // Helper function: compute the median of a circular buffer
       double circ_buff_median_(const boost::circular_buffer<double>& cb) const {
-          // FIXME: naive implementation; creates a copy as a vector
-          std::vector<double> v;
-          for (boost::circular_buffer<double>::const_iterator i = cb.begin();
-                i != cb.end(); ++i) {
-            v.push_back(*i);
-          }
+        // FIXME: naive implementation; creates a copy as a vector
+        std::vector<double> v;
+        for (boost::circular_buffer<double>::const_iterator i = cb.begin();
+              i != cb.end(); ++i) {
+          v.push_back(*i);
+        }
 
-          size_t n = v.size() / 2;
-          std::nth_element(v.begin(), v.begin()+n, v.end());
-          return v[n];
+        size_t n = v.size() / 2;
+        std::nth_element(v.begin(), v.begin()+n, v.end());
+        return v[n];
       }
 
-      // Helper function: compute relative difference between two doubles
       double rel_difference_(double prev, double curr) const {
         return std::abs(curr - prev) / std::abs(prev);
       }
