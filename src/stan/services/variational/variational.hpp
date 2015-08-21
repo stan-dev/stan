@@ -79,43 +79,14 @@ namespace stan {
   namespace services {
     namespace variational {
 
-      /**
-       * @tparam Model Model implementation
-       * @tparam RNG Random number generator implementation
-       * @tparam InfoWriter An implementation of
-       *                    src/stan/interface_callbacks/writer/base_writer.hpp
-       * @tparam ErrWriter An implementation of
-       *                   src/stan/interface_callbacks/writer/base_writer.hpp
-       * @tparam OutputWriter An implementation of
-       *                    src/stan/interface_callbacks/writer/base_writer.hpp
-       * @tparam Diagnostic Writer An implementation of
-       *                           src/stan/interface_callbacks/writer/base_writer.hpp
-       * @tparam Interrupt Interrupt callback implementation
-       * @param cont_params Continuous state values
-       * @param model Model
-       * @param base_rng Random number generator
-       * @param variational_args Variational Bayes configuration
-       * @param refresh Progress update rate
-       * @param info Writer callback for displaying informative messages
-       * @param err Writer callback for displaying error messages
-       * @param output Writer callback for storing sampling history
-       * @param dianostic Writer callback for storing sampling diagnostic history
-       * @param iteration_interrupt Interrupt callback called at the beginning
-       of each iteration
-       */
-      template <class Model, class RNG,
-                class InfoWriter, class ErrWriter,
-                class OutputWriter, class DiagnosticWriter,
-                class Interrupt>
+      template <class Model, class RNG, class Interrupt>
       int variational(Eigen::VectorXd& cont_params,
                       Model& model,
                       RNG& base_rng,
                       stan::services::categorical_argument* variational_args,
                       int refresh,
-                      InfoWriter& info,
-                      ErrWriter& err,
-                      OutputWriter& output,
-                      DiagnosticWriter& diagnostic,
+                      std::ostream* output_stream,
+                      std::ostream* diagnostic_stream,
                       Interrupt& iteration_interrupt) {
 
         stan::services::list_argument* algo
