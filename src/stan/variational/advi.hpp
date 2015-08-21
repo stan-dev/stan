@@ -222,12 +222,14 @@ namespace stan {
           // (1) ELBO at current eta is worse than the best ELBO
           // (2) the best ELBO hasn't actually diverged
           if (elbo < elbo_best && elbo_best > elbo_init) {
-            if (print_stream_)
-              *print_stream_
-                << "Success! Found best tuned hyperparameters earlier "
-                << "than expected."
-                << std::endl
-                << std::endl;
+            if (print_stream_) {
+              *print_stream_ << "Success!";
+              if (eta_sequence.size() > 0) {
+                *print_stream_
+                  << " Found best tuned hyperparameters earlier than expected.";
+              }
+              *print_stream_ << std::endl << std::endl;
+            }
             do_more_tuning = false;
           } else {
             if (eta_sequence.size() > 0) {
@@ -239,10 +241,7 @@ namespace stan {
               // didn't diverge or fail if it did diverge
               if (elbo > elbo_init) {
                 if (print_stream_)
-                  *print_stream_
-                    << "Success!"
-                    << std::endl
-                    << std::endl;
+                  *print_stream_ << "Success!" << std::endl << std::endl;
                 eta_best = eta;
                 do_more_tuning = false;
               } else {
@@ -394,16 +393,18 @@ namespace stan {
               do_more_iterations = false;
             }
 
-            if (delta_elbo_med > 0.5 || delta_elbo_ave > 0.5) {
-              if (print_stream_)
-                *print_stream_ << "   MAY BE DIVERGING... INSPECT ELBO";
+            if (iter_main > 2*eval_elbo_) {
+              if (delta_elbo_med > 0.5 || delta_elbo_ave > 0.5) {
+                if (print_stream_)
+                  *print_stream_ << "   MAY BE DIVERGING... INSPECT ELBO";
+              }
             }
 
             if (print_stream_)
               *print_stream_ << std::endl;
 
             if (do_more_iterations == false &&
-                std::abs((elbo - elbo_best)/elbo) > 0.05) {
+                rel_difference_(elbo, elbo_best) > 0.05) {
               if (print_stream_)
                 *print_stream_
                   << "Informational Message: The ELBO at a previous "
@@ -515,21 +516,19 @@ namespace stan {
       std::ostream* out_stream_;
       std::ostream* diag_stream_;
 
-      // Helper function: compute the median of a circular buffer
       double circ_buff_median_(const boost::circular_buffer<double>& cb) const {
-          // FIXME: naive implementation; creates a copy as a vector
-          std::vector<double> v;
-          for (boost::circular_buffer<double>::const_iterator i = cb.begin();
-                i != cb.end(); ++i) {
-            v.push_back(*i);
-          }
+        // FIXME: naive implementation; creates a copy as a vector
+        std::vector<double> v;
+        for (boost::circular_buffer<double>::const_iterator i = cb.begin();
+              i != cb.end(); ++i) {
+          v.push_back(*i);
+        }
 
-          size_t n = v.size() / 2;
-          std::nth_element(v.begin(), v.begin()+n, v.end());
-          return v[n];
+        size_t n = v.size() / 2;
+        std::nth_element(v.begin(), v.begin()+n, v.end());
+        return v[n];
       }
 
-      // Helper function: compute relative difference between two doubles
       double rel_difference_(double prev, double curr) const {
         return std::abs(curr - prev) / std::abs(prev);
       }
