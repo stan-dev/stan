@@ -4336,7 +4336,14 @@ measurement error is small relative to the quantity being measured,
 its effect on a model is usually small.  When measurement error is
 large relative to the quantity being measured, or when very precise
 relations can be estimated being measured quantities, it is useful to
-introduce an explicit model of measurement error.
+introduce an explicit model of measurement error.  One kind of
+measurement error is rounding. 
+
+Meta-analysis plays out statistically very much like measurement error
+models, where the inferences drawn from multiple data sets are
+combined to do inference over all of them.  Inferences for each data
+set are treated as providing a kind of measurement error with respect
+to true parameter values.
 
 
 \section{Bayesian Measurement Error Model}
@@ -4424,6 +4431,137 @@ x_n \sim \distro{Normal}(\gamma^{\top}c, \upsilon).
 \]
 This can be coded in Stan just like any other regression.  And, of
 course, other exposure models can be provided.
+
+
+\subsection{Rounding}
+
+A common form of measurement error arises from rounding measurements.
+Rounding may be done in many ways, such as rounding weights to the
+nearest milligram, or to the nearest pound; rounding may even be done
+by rounding down to the nearest integer.  
+
+Exercise 3.5(b) from \citep{GelmanEtAl:2013} provides an example.
+%
+\begin{quote}
+  3.5. \ Suppose we weigh an object five times and measure
+  weights, rounded to the nearest pound, of 10, 10, 12, 11, 9.  Assume
+  the unrounded measurements are normally distributed with a
+  noninformative prior distribution on $\mu$ and $\sigma^2$. 
+  \\[4pt]
+  (b) \ Give the correct posterior distribution for $(\mu, \sigma^2)$,
+  treating the measurements as rounded.
+\end{quote}
+%
+Letting $z_n$ be the unrounded measurement for $y_n$, the problem
+as stated assumes the likelihood
+%
+\[
+z_n \sim \distro{Normal}(\mu, \sigma).
+\]
+%
+The rounding process entails that $z_n \in (y_n - 0.5, y_n + 0.5)$.
+The probability mass function for the discrete observation $y$ is then given
+by marginalizing out the unrounded measurement, producing the likelihood
+\[
+p(y_n \, | \, \mu, \sigma)
+= 
+\int_{y_n - 0.5}^{y_n + 0.5}
+\
+\distro{Normal}(z_n \, | \, \mu, \sigma)
+\
+\mathrm{d}z_n
+= 
+\Phi\!\left(\frac{y_n + 0.5 - \mu}{\sigma}\right)
+- 
+\Phi\!\left(\frac{y_n - 0.5 - \mu}{\sigma}\right).
+\]
+Gelman's answer for this problem took the noninformative prior to be
+uniform in the variance $\sigma^2$ on the log scale, which yields (due
+to the Jacobian adjustment), the prior density
+\[
+p(\mu, \sigma^2) \propto \frac{1}{\sigma^2}.
+\]
+The posterior after observing $y = (10, 10, 12, 11, 9)$ can be
+calculated by Bayes's rule as
+%
+\begin{eqnarray*}
+p(\mu, \sigma^2 \, | \, y)
+& \propto &
+p(\mu, \sigma^2) \ p(y \, | \, \mu, \sigma^2)
+\\[6pt]
+&  \propto &
+\frac{1}{\sigma^2}
+\
+\mathlarger{\mathlarger{\prod}}_{n=1}^5 
+\left(
+\Phi\!\left(\frac{y_n + 0.5 - \mu}{\sigma}\right)
+- 
+\Phi\!\left(\frac{y_n - 0.5 - \mu}{\sigma}\right)
+\right).
+\end{eqnarray*}
+%
+
+The Stan code simply follows the mathematical definition, providing an
+example of the direct definition of a probability function up to a
+proportion.
+%
+\begin{stancode}
+data {
+  int<lower=0> N;
+  vector[N] y;
+}
+parameters {
+  real mu;
+  real<lower=0> sigma_sq;
+}
+transformed parameters {
+  real<lower=0> sigma;
+  sigma <- sqrt(sigma_sq);
+}
+model {
+  increment_log_prob(-2 * log(sigma));
+  for (n in 1:N)
+    increment_log_prob(log(Phi((y[n] + 0.5 - mu) / sigma)
+                           - Phi((y[n] - 0.5 - mu) / sigma)));
+}
+\end{stancode}
+
+Alternatively, the model may be defined with latent parameters for the
+unrounded measurements $z_n$.  The Stan code in this case uses the
+likelihood for $z_n$ directly while respecting the constraint $z_n \in
+(y_n - 0.5, y_n + 0.5)$.  Because Stan does not allow varying upper-
+and lower-bound constraints on the elements of a vector (or array),
+the parameters are declared to be the rounding error $y - z$, and
+then $z$ is defined as a transformed parameter.
+%
+\begin{stancode}
+data {
+  int<lower=0> N;
+  vector[N] y;
+}
+parameters {
+  real mu;
+  real<lower=0> sigma_sq;
+  vector<lower=-0.5, upper=0.5>[5] y_err;
+}
+transformed parameters {
+  real<lower=0> sigma;
+  vector[N] z;
+  sigma <- sqrt(sigma_sq);
+  z <- y + y_err;
+}
+model {
+  increment_log_prob(-2 * log(sigma));
+  z ~ normal(mu, sigma);
+}
+\end{stancode}
+%
+This explicit model for the unrounded measurements $z$ produces the
+same posterior for $\mu$ and $\sigma$ as the previous model that
+marginalizes $z$ out.  Both approaches mix well, but the latent
+parameter version is about twice as efficient in terms of effective
+samples per iteration, as well as providing a posterior for the
+unrounded parameters.
 
 
 \section{Meta-Analysis}
