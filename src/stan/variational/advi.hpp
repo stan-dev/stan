@@ -17,6 +17,7 @@
 #include <ostream>
 #include <vector>
 #include <queue>
+#include <string>
 
 namespace stan {
 
@@ -226,7 +227,10 @@ namespace stan {
           // (2) the best ELBO hasn't actually diverged
           if (elbo < elbo_best && elbo_best > elbo_init) {
             if (print_stream_) {
-              *print_stream_ << "Success!";
+              *print_stream_ << "Success!"
+                << " Found best tuned hyperparameter"
+                << " [eta = " << eta_best
+                << "] ";
               if (eta_sequence.size() > 0) {
                 *print_stream_
                   << " Found best tuned hyperparameter"
@@ -451,7 +455,7 @@ namespace stan {
        * @param  max_iterations max number of iterations to run algorithm
        * @param  tuning_iter    number of iterations for hyperparameter tuning
        */
-      int run(double eta, double tol_rel_obj,
+      int run(std::string eta, double tol_rel_obj,
               int max_iterations, int tuning_iter) const {
         if (diag_stream_) {
           *diag_stream_ << "iter,time_in_seconds,ELBO" << std::endl;
@@ -461,16 +465,41 @@ namespace stan {
         Q variational = Q(cont_params_);
 
         // tune if eta is unspecified
-        if (eta == 0.0) {
-          eta = tune(variational, tuning_iter);
+        double eta_double(0);
+        if (eta.compare("automatically tuned") == 0) {
+          eta_double = tune(variational, tuning_iter);
           if (out_stream_) {
-            *out_stream_ << "# Step-size tuning complete." << std::endl
-                         << "# eta = " << eta << std::endl;
+            *out_stream_ << "# Stepsize tuning complete." << std::endl
+                         << "# eta = " << eta_double << std::endl;
+          }
+        } else {
+          try {
+            eta_double = std::stod(eta);
+          } catch (std::exception& e) {
+            std::stringstream eta_error_message;
+            eta_error_message << "You specified the value eta = "
+              << eta
+              << " for the stepsize." << std::endl
+              << "There is no valid conversion to a double." << std::endl
+              << "Please check for typos. We recommend using "
+              << "Stan's default automatic tuning procedure.";
+            throw std::runtime_error(eta_error_message.str());
+          }
+          if (eta_double <= 0.0 || eta_double > 1.0){
+            std::stringstream eta_error_message;
+            eta_error_message << "You specified the value eta = "
+              << eta
+              << " for the stepsize." << std::endl
+              << "This is outside of the allowable range 0 < eta <= 1."
+              << std::endl
+              << "Please check for typos. We recommend using "
+              << "Stan's default automatic tuning procedure.";
+            throw std::runtime_error(eta_error_message.str());
           }
         }
 
         // run inference algorithm
-        stochastic_gradient_ascent(variational, eta, tol_rel_obj,
+        stochastic_gradient_ascent(variational, eta_double, tol_rel_obj,
           max_iterations);
 
         // get mean of posterior approximation and write on first output line
