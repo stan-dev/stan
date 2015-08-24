@@ -65,11 +65,11 @@ private:
 
 
 TEST_F(advi_test, gradient_warn_meanfield) {
-  EXPECT_EQ(0, advi_meanfield_->run(0.1, 0.01, 10000, 50));
+  EXPECT_EQ(0, advi_meanfield_->run("0.1", 0.01, 10000, 50));
   SUCCEED() << "expecting it to compile and run without problems";
 }
 
 TEST_F(advi_test, gradient_warn_fullrank) {
-  EXPECT_EQ(0, advi_fullrank_->run(0.1, 0.01, 10000, 50));
+  EXPECT_EQ(0, advi_fullrank_->run("0.1", 0.01, 10000, 50));
   SUCCEED() << "expecting it to compile and run without problems";
 }
