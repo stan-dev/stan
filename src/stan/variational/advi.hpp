@@ -18,6 +18,7 @@
 #include <vector>
 #include <queue>
 #include <string>
+#include <boost/lexical_cast.hpp>
 
 namespace stan {
 
@@ -474,7 +475,7 @@ namespace stan {
           }
         } else {
           try {
-            eta_double = std::stod(eta);
+            eta_double = boost::lexical_cast<double>(eta);
           } catch (std::exception& e) {
             std::stringstream eta_error_message;
             eta_error_message << "You specified the value eta = "
