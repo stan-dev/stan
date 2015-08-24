@@ -47,5 +47,5 @@ TEST(advi_test, multivariate_with_constraint_test_adapt_eta) {
 
   // ADVI should choose a relatively small eta and
   // should converge in < 2e4 iterations
-  test_advi.run(0.0, 0.01, 2e4);
+  test_advi.run(0.0, 0.01, 2e4, 50);
 }

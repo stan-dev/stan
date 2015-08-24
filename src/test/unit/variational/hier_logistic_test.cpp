@@ -89,7 +89,7 @@ private:
 };
 
 TEST_F(advi_test, hier_logistic_constraint_meanfield) {
-  EXPECT_EQ(0, advi_->run(0.01, 1, 2e4));
+  EXPECT_EQ(0, advi_->run(0.01, 1, 2e4, 50));
   SUCCEED() << "expecting it to compile and run without problems";
   EXPECT_NE("", output_stream_.str());
   double lp;
@@ -104,7 +104,7 @@ TEST_F(advi_test, hier_logistic_constraint_meanfield) {
 }
 
 TEST_F(advi_test, hier_logistic_constraint_meanfield_no_streams) {
-  EXPECT_EQ(0, advi_null_streams_->run(0.01, 1, 2e4));
+  EXPECT_EQ(0, advi_null_streams_->run(0.01, 1, 2e4, 50));
   SUCCEED() << "expecting it to compile and run without problems";
   EXPECT_EQ("", output_stream_.str());
   SUCCEED() << "expecting it to not output values";

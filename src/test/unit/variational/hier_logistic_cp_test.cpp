@@ -46,5 +46,5 @@ TEST(advi_test, hier_logistic_cp_constraint_meanfield) {
                                                      &output_stream_,
                                                      &diagnostic_stream_);
 
-  test_advi.run(0.1, 0.1, 1e4);
+  test_advi.run(0.1, 0.1, 1e4, 50);
 }
