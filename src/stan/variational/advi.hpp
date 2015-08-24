@@ -151,9 +151,10 @@ namespace stan {
        * Adaptively set hyperparameters for ADVI.
        *
        * @param variational variational distribution
+       * @param tuning_iter number of tuning iterations
        * @return optimal value of eta in a coarse grid
        */
-      double tune(Q& variational) const {
+      double tune(Q& variational, int tuning_iter) const {
         static const char* function =
           "stan::variational::advi::tune";
 
@@ -190,19 +191,18 @@ namespace stan {
         double eta_best;
 
         int iter_tune;
-        int tuning_iterations = 50;
         bool do_more_tuning = true;
         while (do_more_tuning) {
           // Try next eta
           eta = eta_sequence.front();
           eta_sequence.pop();
 
-          for (iter_tune = 1; iter_tune <= tuning_iterations; ++iter_tune) {
+          for (iter_tune = 1; iter_tune <= tuning_iter; ++iter_tune) {
             m = (eta_sequence_size - eta_sequence.size() - 1) *
-              tuning_iterations + iter_tune; // # of total tuning iterations
+              tuning_iter + iter_tune; // # of total tuning iterations
             stan::services::variational::print_progress(
-              m, 0, tuning_iterations*eta_sequence_size,
-              tuning_iterations, true, "", "", *print_stream_);
+              m, 0, tuning_iter*eta_sequence_size,
+              tuning_iter, true, "", "", *print_stream_);
 
             // Compute gradient of ELBO
             calc_ELBO_grad(variational, elbo_grad);
@@ -449,8 +449,10 @@ namespace stan {
        * @param  eta            eta parameter for stepsize scaling
        * @param  tol_rel_obj    relative tolerance parameter for convergence
        * @param  max_iterations max number of iterations to run algorithm
+       * @param  tuning_iter    number of iterations for hyperparameter tuning
        */
-      int run(double eta, double tol_rel_obj, int max_iterations) const {
+      int run(double eta, double tol_rel_obj,
+              int max_iterations, int tuning_iter) const {
         if (diag_stream_) {
           *diag_stream_ << "iter,time_in_seconds,ELBO" << std::endl;
         }
@@ -460,7 +462,7 @@ namespace stan {
 
         // tune if eta is unspecified
         if (eta == 0.0) {
-          eta = tune(variational);
+          eta = tune(variational, tuning_iter);
           if (out_stream_) {
             *out_stream_ << "# Step-size tuning complete." << std::endl
                          << "# eta = " << eta << std::endl;
