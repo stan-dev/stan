@@ -178,6 +178,9 @@ namespace stan {
         // Print progress
         int eta_sequence_size = eta_sequence.size();
         int m;
+        if (print_stream_) {
+          *print_stream_ << "Begin hyperparameter tuning." << std::endl;
+        }
 
         // Initialize ELBO and convergence tracking variables
         double elbo(0.0);
@@ -226,7 +229,9 @@ namespace stan {
               *print_stream_ << "Success!";
               if (eta_sequence.size() > 0) {
                 *print_stream_
-                  << " Found best tuned hyperparameters earlier than expected.";
+                  << " Found best tuned hyperparameter"
+                  << " [eta = " << eta_best
+                  << "] earlier than expected.";
               }
               *print_stream_ << std::endl << std::endl;
             }
@@ -241,7 +246,10 @@ namespace stan {
               // didn't diverge or fail if it did diverge
               if (elbo > elbo_init) {
                 if (print_stream_)
-                  *print_stream_ << "Success!" << std::endl << std::endl;
+                  *print_stream_ << "Success!"
+                    << " Found best tuned hyperparameter"
+                    << " [eta = " << eta_best
+                    << "] " << std::endl << std::endl;
                 eta_best = eta;
                 do_more_tuning = false;
               } else {
@@ -314,7 +322,8 @@ namespace stan {
 
         // Print main loop header
         if (print_stream_) {
-          *print_stream_ << "  iter"
+          *print_stream_ << "Begin stochastic gradient ascent." << std::endl
+                         << "  iter"
                          << "       ELBO"
                          << "   delta_ELBO_mean"
                          << "   delta_ELBO_med"
@@ -452,6 +461,10 @@ namespace stan {
         // tune if eta is unspecified
         if (eta == 0.0) {
           eta = tune(variational);
+          if (out_stream_) {
+            *out_stream_ << "# Step-size tuning complete." << std::endl
+                         << "# eta = " << eta << std::endl;
+          }
         }
 
         // run inference algorithm
