@@ -10,6 +10,7 @@
 #include <stan/services/arguments/arg_tolerance.hpp>
 #include <stan/services/arguments/arg_variational_eval_elbo.hpp>
 #include <stan/services/arguments/arg_variational_tuning_iter.hpp>
+#include <stan/services/arguments/arg_variational_subsample.hpp>
 #include <stan/services/arguments/arg_variational_output_samples.hpp>
 
 namespace stan {
@@ -37,6 +38,7 @@ namespace stan {
         _subarguments.push_back(new arg_variational_eval_elbo("eval_elbo",
           "Evaluate ELBO every Nth iteration", 100));
         _subarguments.push_back(new arg_variational_tuning_iter());
+        _subarguments.push_back(new arg_variational_subsample());
         _subarguments.push_back(new arg_variational_output_samples
                                 ("output_samples",
                                  "Number of posterior samples to draw and save",

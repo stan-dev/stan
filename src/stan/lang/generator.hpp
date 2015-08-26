@@ -381,8 +381,17 @@ namespace stan {
     }
 
     void generate_includes(std::ostream& o) {
+      generate_include("random", o);
       generate_include("stan/model/model_header.hpp", o);
       o << EOL;
+    }
+
+    void generate_update_minibatch(std::ostream& o) {
+      o << INDENT << "void update_minibatch() {" << EOL
+        << INDENT2 << "// random number generator stuff for uniform sampling" << EOL
+        << INDENT2 << "std::random_device rd;" << EOL
+        << INDENT2 << "std::mt19937_64 gen(rd());" << EOL
+        << INDENT << "}" << EOL;
     }
 
     void generate_version_comment(std::ostream& o) {
@@ -4488,6 +4497,7 @@ namespace stan {
       generate_public_decl(out);
       generate_constructor(prog, model_name, out);
       generate_destructor(model_name, out);
+      generate_update_minibatch(out);
       // put back if ever need integer params
       // generate_set_param_ranges(prog.parameter_decl_, out);
       generate_init_method(prog.parameter_decl_, out);
