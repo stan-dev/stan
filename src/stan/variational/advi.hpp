@@ -154,11 +154,15 @@ namespace stan {
        *
        * @param variational variational distribution
        * @param tuning_iter number of tuning iterations
-       * @return optimal value of eta in a coarse grid
+       * @return optimal value of eta via grid search
        */
       double tune(Q& variational, int tuning_iter) const {
         static const char* function =
           "stan::variational::advi::tune";
+
+        stan::math::check_positive(function,
+                                   "Number of tuning iterations",
+                                   tuning_iter);
 
         // Gradient parameters
         Q elbo_grad = Q(model_.num_params_r());
