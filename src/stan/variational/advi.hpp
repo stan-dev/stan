@@ -458,7 +458,7 @@ namespace stan {
        * @param  max_iterations max number of iterations to run algorithm
        * @param  tuning_iter    number of iterations for hyperparameter tuning
        */
-      int run(std::string eta, double tol_rel_obj,
+      int run(const std::string eta, double tol_rel_obj,
               int max_iterations, int tuning_iter) const {
         if (diag_stream_) {
           *diag_stream_ << "iter,time_in_seconds,ELBO" << std::endl;
