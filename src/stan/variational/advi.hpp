@@ -354,6 +354,10 @@ namespace stan {
         int iter_counter = 1;
         bool do_more_iterations = true;
         while (do_more_iterations) {
+
+          // SVI
+          model_.update_minibatch();
+
           // Compute gradient of ELBO
           calc_ELBO_grad(variational, elbo_grad);
 
