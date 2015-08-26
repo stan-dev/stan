@@ -324,11 +324,6 @@ namespace stan {
                          2.0));
         boost::circular_buffer<double> elbo_diff(cb_size);
 
-        // Timing variables
-        clock_t start = clock();
-        clock_t end;
-        double delta_t;
-
         // Print main loop header
         if (print_stream_) {
           *print_stream_ << "Begin stochastic gradient ascent." << std::endl
@@ -356,26 +351,26 @@ namespace stan {
 
         // Main loop
         std::vector<double> print_vector;
-        int iter_main = 1;
+        int iter_counter = 1;
         bool do_more_iterations = true;
         while (do_more_iterations) {
           // Compute gradient of ELBO
           calc_ELBO_grad(variational, elbo_grad);
 
           // Update learning rate parameters
-          if (iter_main == 1) {
+          if (iter_counter == 1) {
             params_prop += elbo_grad.square();
           } else {
             params_prop = pre_factor * params_prop +
                           post_factor * elbo_grad.square();
           }
-          eta_scaled = eta / sqrt(static_cast<double>(iter_main));
+          eta_scaled = eta / sqrt(static_cast<double>(iter_counter));
 
           // Stochastic gradient update
           variational += eta_scaled * elbo_grad / (tau + params_prop.sqrt());
 
           // Check for convergence every "eval_elbo_"th iteration
-          if (iter_main % eval_elbo_ == 0) {
+          if (iter_counter % eval_elbo_ == 0) {
             elbo_prev = elbo;
             elbo = calc_ELBO(variational);
             if (elbo > elbo_best) {
@@ -391,7 +386,7 @@ namespace stan {
             if (print_stream_) {
               *print_stream_
                         << "  "
-                        << std::setw(4) << iter_main
+                        << std::setw(4) << iter_counter
                         << "  "
                         << std::right << std::setw(9) << std::setprecision(1)
                         << elbo
@@ -447,7 +442,7 @@ namespace stan {
               do_more_iterations = false;
             }
 
-            if (iter_main > 2*eval_elbo_) {
+            if (iter_counter > 2*eval_elbo_) {
               if (delta_elbo_med > 0.5 || delta_elbo_ave > 0.5) {
                 if (print_stream_)
                   *print_stream_ << "   MAY BE DIVERGING... INSPECT ELBO";
@@ -471,7 +466,7 @@ namespace stan {
             }
           }
 
-          if (iter_main == max_iterations) {
+          if (iter_counter == max_iterations) {
             if (print_stream_)
               *print_stream_
                 << "Informational Message: The maximum number of "
@@ -484,7 +479,7 @@ namespace stan {
             do_more_iterations = false;
           }
 
-          ++iter_main;
+          ++iter_counter;
         }
       }
 
