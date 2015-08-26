@@ -193,14 +193,13 @@ namespace stan {
         double elbo(0.0);
         double elbo_best = -std::numeric_limits<double>::max();
         double elbo_init = calc_ELBO(variational);
-        double eta;
-        double eta_best;
+        double eta_best(0.0);
 
         int iter_tune;
         bool do_more_tuning = true;
         while (do_more_tuning) {
           // Try next eta
-          eta = eta_sequence.front();
+          double eta = eta_sequence.front();
           eta_sequence.pop();
 
           for (iter_tune = 1; iter_tune <= tuning_iter; ++iter_tune) {
@@ -462,7 +461,7 @@ namespace stan {
        * @param  tuning_iter    number of iterations for hyperparameter tuning
        * @return stanserviceOK code if all goes well
        */
-      int run(const std::string eta, double tol_rel_obj,
+      int run(const std::string& eta, double tol_rel_obj,
               int max_iterations, int tuning_iter) const {
         if (diag_stream_) {
           *diag_stream_ << "iter,time_in_seconds,ELBO" << std::endl;
