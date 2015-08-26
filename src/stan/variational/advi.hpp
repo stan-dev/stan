@@ -231,12 +231,10 @@ namespace stan {
               *print_stream_ << "Success!"
                 << " Found best tuned hyperparameter"
                 << " [eta = " << eta_best
-                << "] ";
+                << "]";
               if (eta_sequence.size() > 0) {
                 *print_stream_
-                  << " Found best tuned hyperparameter"
-                  << " [eta = " << eta_best
-                  << "] earlier than expected.";
+                  << " earlier than expected.";
               }
               *print_stream_ << std::endl << std::endl;
             }
@@ -254,7 +252,7 @@ namespace stan {
                   *print_stream_ << "Success!"
                     << " Found best tuned hyperparameter"
                     << " [eta = " << eta_best
-                    << "] " << std::endl << std::endl;
+                    << "]" << std::endl << std::endl;
                 eta_best = eta;
                 do_more_tuning = false;
               } else {
