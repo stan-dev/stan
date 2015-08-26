@@ -204,8 +204,8 @@ namespace stan {
           eta_sequence.pop();
 
           for (iter_tune = 1; iter_tune <= tuning_iter; ++iter_tune) {
-            m = (eta_sequence_size - eta_sequence.size() - 1) *
-              tuning_iter + iter_tune; // # of total tuning iterations
+            m = (eta_sequence_size - eta_sequence.size() - 1)
+              * tuning_iter + iter_tune; // # of total tuning iterations
             stan::services::variational::print_progress(
               m, 0, tuning_iter*eta_sequence_size,
               tuning_iter, true, "", "", *print_stream_);
@@ -217,8 +217,8 @@ namespace stan {
             if (iter_tune == 1) {
               params_prop += elbo_grad.square();
             } else {
-              params_prop = pre_factor * params_prop +
-                            post_factor * elbo_grad.square();
+              params_prop = pre_factor * params_prop
+                            + post_factor * elbo_grad.square();
             }
             eta_scaled = eta / sqrt(static_cast<double>(iter_tune));
 
