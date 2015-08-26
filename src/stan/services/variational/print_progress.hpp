@@ -11,13 +11,25 @@ namespace stan {
   namespace services {
     namespace variational {
 
-      void print_progress(const int m,
-                          const int start,
-                          const int finish,
-                          const int refresh,
-                          const bool tune,
-                          const std::string prefix,
-                          const std::string suffix,
+      /**
+       * Helper function for printing progress for variational inference
+       *
+       * @param m       total number of iterations
+       * @param start   starting iteration
+       * @param finish  final iteration number
+       * @param refresh how frequently we want to print an update
+       * @param tune    boolean indicates tuning vs. variational inference
+       * @param prefix  prefix string
+       * @param suffix  suffix string
+       * @param o       output stream
+       */
+      void print_progress(int m,
+                          int start,
+                          int finish,
+                          int refresh,
+                          bool tune,
+                          const std::string& prefix,
+                          const std::string& suffix,
                           std::ostream& o) {
         int it_print_width = std::ceil(std::log10(static_cast<double>(finish)));
         if (io::do_print(m - 1, (start + m == finish), refresh)) {
