@@ -19,7 +19,6 @@ namespace stan {
         _good_value = "good";
         _value = _default_value;
       }
-      // bool is_valid(double value) { return value >= 0 && value <= 1.0; }
     };
   }  // services
 }  // stan
