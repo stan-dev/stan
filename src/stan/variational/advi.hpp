@@ -454,12 +454,13 @@ namespace stan {
       }
 
       /**
-       * Runs the algorithm and writes to output.
+       * Runs the ADVI algorithm and writes to output.
        *
        * @param  eta            eta parameter for stepsize scaling
        * @param  tol_rel_obj    relative tolerance parameter for convergence
        * @param  max_iterations max number of iterations to run algorithm
        * @param  tuning_iter    number of iterations for hyperparameter tuning
+       * @return stanserviceOK code if all goes well
        */
       int run(const std::string eta, double tol_rel_obj,
               int max_iterations, int tuning_iter) const {
