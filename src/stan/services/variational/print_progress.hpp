@@ -1,6 +1,7 @@
 #ifndef STAN_SERVICES_VARIATIONAL_PRINT_PROGRESS_HPP
 #define STAN_SERVICES_VARIATIONAL_PRINT_PROGRESS_HPP
 
+#include <stan/math.hpp>
 #include <stan/services/io/do_print.hpp>
 #include <cmath>
 #include <iomanip>
