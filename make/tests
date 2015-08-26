@@ -170,6 +170,7 @@ src/test/unit/variational/advi_multivar_with_constraint_test.cpp: src/test/test-
 src/test/unit/variational/gradient_warn_test.cpp: src/test/test-models/good/variational/gradient_warn.hpp
 src/test/unit/variational/hier_logistic_test.cpp: src/test/test-models/good/variational/hier_logistic.hpp
 src/test/unit/variational/hier_logistic_cp_test.cpp: src/test/test-models/good/variational/hier_logistic_cp.hpp
+src/test/unit/variational/eta_adapt_test.cpp: src/test/test-models/good/variational/multivariate_with_constraint.hpp
 
 ##
 # Compile models depends on every model within

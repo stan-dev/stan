@@ -34,7 +34,6 @@ TEST(advi_test, univar_with_constraint_fullrank) {
                                                   cont_params,
                                                   n_monte_carlo_grad,
                                                   5e5, // absurdly high!
-                                                  0.1,
                                                   base_rng,
                                                   100,
                                                   1,
@@ -162,7 +161,6 @@ TEST(advi_test, univar_with_constraint_meanfield) {
                                                   cont_params,
                                                   n_monte_carlo_grad,
                                                   5e5, // absurdly high!
-                                                  0.1,
                                                   base_rng,
                                                   100,
                                                   1,
