@@ -278,10 +278,13 @@ namespace stan {
       /**
        * Runs stochastic gradient ascent with an adaptive stepsize.
        *
-       * @param  variational    variational distribution
-       * @param  eta            eta parameter for stepsize scaling
-       * @param  tol_rel_obj    relative tolerance parameter for convergence
-       * @param  max_iterations max number of iterations to run algorithm
+       * @param[in,out] variational This is the variational distribution we
+       *     update with stochastic gradient ascent. The input is the initial
+       *     variational distribution. The output is the variational
+       *     distribution that maximizes the objective function (ELBO).
+       * @param eta            eta parameter for stepsize scaling
+       * @param tol_rel_obj    relative tolerance parameter for convergence
+       * @param max_iterations max number of iterations to run algorithm
        */
       void stochastic_gradient_ascent(Q& variational,
                                       double eta,
