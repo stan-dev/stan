@@ -55,6 +55,7 @@ namespace stan {
            BaseRNG& rng,
            int eval_elbo,
            int n_posterior_samples,
+           bool subsample,
            std::ostream* print_stream,
            std::ostream* output_stream,
            std::ostream* diagnostic_stream) :
@@ -65,6 +66,7 @@ namespace stan {
         n_monte_carlo_elbo_(n_monte_carlo_elbo),
         eval_elbo_(eval_elbo),
         n_posterior_samples_(n_posterior_samples),
+        subsample_(subsample),
         print_stream_(print_stream),
         out_stream_(output_stream),
         diag_stream_(diagnostic_stream) {
@@ -356,7 +358,9 @@ namespace stan {
         while (do_more_iterations) {
 
           // SVI
-          model_.update_minibatch();
+          if (subsample_) {
+            model_.update_minibatch();
+          }
 
           // Compute gradient of ELBO
           calc_ELBO_grad(variational, elbo_grad);
@@ -502,6 +506,11 @@ namespace stan {
           *diag_stream_ << "iter,time_in_seconds,ELBO" << std::endl;
         }
 
+        // SVI: initialize the
+        if (subsample_) {
+          model_.update_minibatch();
+        }
+
         // initialize variational approximation
         Q variational = Q(cont_params_);
 
@@ -597,6 +606,7 @@ namespace stan {
       int n_monte_carlo_elbo_;
       int eval_elbo_;
       int n_posterior_samples_;
+      bool subsample_;
       std::ostream* print_stream_;
       std::ostream* out_stream_;
       std::ostream* diag_stream_;

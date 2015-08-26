@@ -391,6 +391,17 @@ namespace stan {
         << INDENT2 << "// random number generator stuff for uniform sampling" << EOL
         << INDENT2 << "std::random_device rd;" << EOL
         << INDENT2 << "std::mt19937_64 gen(rd());" << EOL
+        << EOL
+        << INDENT2 << "/*" << EOL
+        << INDENT2 << "// declare a uniform integer RNG" << EOL
+        << INDENT2 << "std::uniform_int_distribution<> unif(0, NFULL - 1 );" << EOL
+        << INDENT2 << "y.clear(); // clear whatever is in the minibatch" << EOL
+        << INDENT2 << "int index;" << EOL
+        << INDENT2 << "for (int n = 0; n < N; ++n) {" << EOL
+        << INDENT3 << "index = unif(gen);" << EOL
+        << INDENT3 << "y.push_back(yFULL.at(index)); // grab a row at random" << EOL
+        << INDENT2 << "}" << EOL
+        << INDENT2 << "*/" << EOL
         << INDENT << "}" << EOL;
     }
 
