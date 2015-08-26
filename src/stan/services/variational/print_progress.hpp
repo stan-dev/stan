@@ -16,7 +16,7 @@ namespace stan {
        *
        * @param m       total number of iterations
        * @param start   starting iteration
-       * @param finish  final iteration number
+       * @param finish  final iteration
        * @param refresh how frequently we want to print an update
        * @param tune    boolean indicates tuning vs. variational inference
        * @param prefix  prefix string
@@ -31,6 +31,22 @@ namespace stan {
                           const std::string& prefix,
                           const std::string& suffix,
                           std::ostream& o) {
+        static const char* function =
+          "stan::services::variational::print_progress";
+
+        stan::math::check_positive(function,
+                                   "Total number of iterations",
+                                   m);
+        stan::math::check_nonnegative(function,
+                                   "Starting iteration",
+                                   start);
+        stan::math::check_positive(function,
+                                   "Final iteration",
+                                   finish);
+        stan::math::check_positive(function,
+                                   "Refresh rate",
+                                   refresh);
+
         int it_print_width = std::ceil(std::log10(static_cast<double>(finish)));
         if (io::do_print(m - 1, (start + m == finish), refresh)) {
           o << prefix;
