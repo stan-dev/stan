@@ -161,17 +161,21 @@ namespace stan {
       static bool fun_exists(
              const std::set<std::pair<std::string,
                                       function_signature_t> >& existing,
-             const std::pair<std::string, function_signature_t>& name_sig) {
+             const std::pair<std::string, function_signature_t>& name_sig,
+             bool name_only = true) {
         for (std::set<std::pair<std::string,
                                 function_signature_t> >::const_iterator it
                = existing.begin();
              it != existing.end();
              ++it)
           if (name_sig.first == (*it).first
-              && name_sig.second.second == (*it).second.second)
+              && (name_only
+                  || name_sig.second.second == (*it).second.second))
             return true;  // name and arg sequences match
         return false;
       }
+
+
       void operator()(const function_decl_def& decl,
               bool& pass,
               std::set<std::pair<std::string,
