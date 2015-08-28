@@ -567,7 +567,14 @@ namespace stan {
       std::ostream* diag_stream_;
 
       double circ_buff_median_(const boost::circular_buffer<double>& cb) const {
-        // FIXME: naive implementation; creates a copy as a vector
+        static const char* function =
+          "stan::variational::advi::circ_buff_median_";
+
+        stan::math::check_positive(function,
+                                   "Size of input circular_buffer object",
+                                   cb.size());
+
+        // naive implementation: creates a copy as a vector
         std::vector<double> v;
         for (boost::circular_buffer<double>::const_iterator i = cb.begin();
               i != cb.end(); ++i) {
