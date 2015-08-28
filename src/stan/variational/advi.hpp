@@ -340,10 +340,11 @@ namespace stan {
                          << std::endl;
         }
 
+        // MAIN LOOP
         std::vector<double> print_vector;
-        int iter_main = 1;
         bool do_more_iterations = true;
-        while (do_more_iterations) {
+        for (int iter_main = 1; do_more_iterations; ++iter_main) {
+
           // Compute gradient of ELBO
           calc_ELBO_grad(variational, elbo_grad);
 
@@ -351,8 +352,8 @@ namespace stan {
           if (iter_main == 1) {
             params_prop += elbo_grad.square();
           } else {
-            params_prop = pre_factor * params_prop +
-                          post_factor * elbo_grad.square();
+            params_prop = pre_factor * params_prop
+                          + post_factor * elbo_grad.square();
           }
           eta_scaled = eta / sqrt(static_cast<double>(iter_main));
 
@@ -448,7 +449,6 @@ namespace stan {
             do_more_iterations = false;
           }
 
-          ++iter_main;
         }
       }
 
