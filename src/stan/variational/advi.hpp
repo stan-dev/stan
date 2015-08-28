@@ -587,6 +587,14 @@ namespace stan {
       }
 
       double rel_difference_(double prev, double curr) const {
+        static const char* function =
+          "stan::variational::advi::rel_difference_";
+
+        if (prev == 0) {
+          stan::math:: domain_error(function, "The value for prev", prev,
+                                    "is ", ", but must be != 0!");
+        }
+
         return std::abs(curr - prev) / std::abs(prev);
       }
 
