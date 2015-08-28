@@ -48,6 +48,8 @@ namespace stan {
     template <class M, class Q, class BaseRNG>
     class advi {
     public:
+      advi();
+
       advi(M& m,
            Eigen::VectorXd& cont_params,
            int n_monte_carlo_grad,
