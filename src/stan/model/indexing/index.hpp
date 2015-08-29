@@ -4,6 +4,7 @@
 #include <vector>
 
 namespace stan {
+
   namespace model {
 
     // SINGLE INDEXING (reduces dimensionality)

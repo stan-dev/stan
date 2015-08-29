@@ -13,42 +13,120 @@ namespace stan {
 
   namespace model {
 
+    /**
+     * Return size of specified multi-index.
+     *
+     * @param[in] idx Input index.
+     * @param[in] size Ignored.
+     * @return Size of result structure.
+     */
     inline int rvalue_index_size(const index_multi& idx, int size) {
       return idx.ns_.size();
     }
 
+    /**
+     * Return size of specified omni-index for specified size of
+     * input. 
+     *
+     * @param[in] idx Input index.
+     * @param[in] size Ignored.
+     * @return Size of result structure.
+     */
     inline int rvalue_index_size(const index_omni& idx, int size) {
       return size;
     }
 
+    /**
+     * Return size of specified min index for specified size of
+     * input. 
+     *
+     * @param[in] idx Input index.
+     * @param[in] size Ignored.
+     * @return Size of result structure.
+     */
     inline int rvalue_index_size(const index_min& idx, int size) {
       return size - idx.min_;
     }
 
+    /**
+     * Return size of specified max index.
+     *
+     * @param[in] idx Input index.
+     * @param[in] size Ignored.
+     * @return Size of result structure.
+     */
     inline int rvalue_index_size(const index_max& idx, int size) {
       return idx.max_ + 1;
     }
 
+    /**
+     * Return size of specified min-max index.
+     *
+     * @param[in] idx Input index.
+     * @param[in] size Ignored.
+     * @return Size of result structure.
+     */
     inline int rvalue_index_size(const index_min_max& idx, int size) {
       return idx.max_ - idx.min_ + 1;
     }
 
+
+    /**
+     * Return the index in the underlying array corresponding to the
+     * specified position in the specified multi-index.
+     
+     * @param[in] n Relative index position.
+     * @param[in] idx Index.
+     * @return Underlying index position.
+     */
     inline int rvalue_at(int n, const index_multi& idx) {
       return idx.ns_[n];
     }
 
+    /**
+     * Return the index in the underlying array corresponding to the
+     * specified position in the specified omni-index.
+     
+     * @param[in] n Relative index position.
+     * @param[in] idx Index.
+     * @return Underlying index position.
+     */
     inline int rvalue_at(int n, const index_omni& idx) {
       return n;
     }
 
+    /**
+     * Return the index in the underlying array corresponding to the
+     * specified position in the specified min-index.
+     
+     * @param[in] n Relative index position.
+     * @param[in] idx Index.
+     * @return Underlying index position.
+     */
     inline int rvalue_at(int n, const index_min& idx) {
       return idx.min_ + n;
     }
 
+    /**
+     * Return the index in the underlying array corresponding to the
+     * specified position in the specified max-index.
+     
+     * @param[in] n Relative index position.
+     * @param[in] idx Index.
+     * @return Underlying index position.
+     */
     inline int rvalue_at(int n, const index_max& idx) {
       return n;
     }
 
+    /**
+     * Return the index in the underlying array corresponding to the
+     * specified position in the specified min-max-index.
+     
+     * @param[in] n Relative index position.
+     * @param[in] idx Index.
+     * @return Underlying index position.
+     */
     inline int rvalue_at(int n, const index_min_max& idx) {
       return idx.min_ + n;
     }

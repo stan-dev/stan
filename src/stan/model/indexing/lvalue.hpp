@@ -15,6 +15,7 @@
 // given sizings and rvalue copy, only for index_multi()
 
 namespace stan {
+
   namespace model {
 
     // x[] = y

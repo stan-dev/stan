@@ -546,6 +546,11 @@ namespace stan {
                  << std::endl;
       return false;
     }
+    bool returns_type_vis::operator()(const assgn& st) const {
+      error_msgs_ << "Expecting return, found assignment statement."
+                 << std::endl;
+      return false;
+    }
     bool returns_type_vis::operator()(const sample& st) const {
       error_msgs_ << "Expecting return, found sampling statement."
                  << std::endl;
@@ -1059,6 +1064,30 @@ namespace stan {
       return !is_nil(high_.expr_);
     }
 
+    uni_idx::uni_idx() { }
+    uni_idx::uni_idx(const expression& idx) : idx_(idx) { }
+
+    multi_idx::multi_idx() { }
+    multi_idx::multi_idx(const expression& idxs) : idxs_(idxs) { }
+
+    omni_idx::omni_idx() { }
+
+    lb_idx::lb_idx() { }
+    lb_idx::lb_idx(const expression& lb) : lb_(lb) { }
+
+    ub_idx::ub_idx() { }
+    ub_idx::ub_idx(const expression& ub) : ub_(ub) { }
+
+    lub_idx::lub_idx() { }
+    lub_idx::lub_idx(const expression& lb, const expression& ub)
+      : lb_(lb), ub_(ub) {
+    }
+
+    idx::idx() { }
+
+    template <typename T>
+    idx::idx(const T& idx) : idx_(idx) { }
+
     void print_var_origin(std::ostream& o, const var_origin& vo) {
       if (vo == model_name_origin)
         o << "model name";
@@ -1348,6 +1377,7 @@ namespace stan {
     statement::statement(const statement_t& st) : statement_(st) { }
     statement::statement(const nil& st) : statement_(st) { }
     statement::statement(const assignment& st) : statement_(st) { }
+    statement::statement(const assgn& st) : statement_(st) { }
     statement::statement(const sample& st) : statement_(st) { }
     statement::statement(const increment_log_prob_statement& st)
       : statement_(st) {
@@ -1367,6 +1397,9 @@ namespace stan {
       return false;
     }
     bool is_no_op_statement_vis::operator()(const assignment& st) const {
+      return false;
+    }
+    bool is_no_op_statement_vis::operator()(const assgn& st) const {
       return false;
     }
     bool is_no_op_statement_vis::operator()(const sample& st) const {
@@ -1504,6 +1537,13 @@ namespace stan {
       : var_dims_(var_dims),
         expr_(expr) {
     }
+
+    assgn::assgn() { }
+    assgn::assgn(const expression& lhs_var, const std::vector<idx>& idxs,
+                 const expression& rhs)
+      : lhs_var_(lhs_var), idxs_(idxs), rhs_(rhs) { }
+
+
 
     expression& expression::operator+=(const expression& rhs) {
       expr_ = binary_op(expr_, "+", rhs);

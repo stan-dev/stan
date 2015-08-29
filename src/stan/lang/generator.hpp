@@ -1629,6 +1629,56 @@ namespace stan {
       o << EOL;
     }
 
+    struct idx_visgen : public visgen {
+      explicit idx_visgen(std::ostream& o): visgen(o) { }
+      void operator()(const uni_idx& i) const {
+        o_ << "index_uni(";
+        generate_expression(i.idx_, o_);
+        o_ << ")";
+      }
+      void operator()(const multi_idx& i) const {
+        o_ << "index_multi(";
+        generate_expression(i.idxs_, o_);
+        o_ << ")";
+      }
+      void operator()(const omni_idx& i) const {
+        o_ << "index_omni()";
+      }
+      void operator()(const lb_idx& i) const {
+        o_ << "index_min(";
+        generate_expression(i.lb_, o_);
+        o_ << ")";
+      }
+      void operator()(const ub_idx& i) const {
+        o_ << "index_max(";
+        generate_expression(i.ub_, o_);
+        o_ << ")";
+      }
+      void operator()(const lub_idx& i) const {
+        o_ << "index_min_max(";
+        generate_expression(i.lb_, o_);
+        o_ << ", ";
+        generate_expression(i.ub_, o_);
+        o_ << ")";
+      }
+    };
+
+    void generate_idx(const idx& i, std::ostream& o) {
+      idx_visgen vis(o);
+      boost::apply_visitor(vis, i.idx_);
+    }
+
+    void generate_idxs(const std::vector<idx>& idxs, std::ostream& o) {
+      for (size_t i = 0; i < idxs.size(); ++i) {
+        o << "cons_list(";
+        generate_idx(idxs[i], o);
+        o << ", ";
+      }
+      o << " nil_index_list()";
+      for (size_t i = 0; i < idxs.size(); ++i)
+        o << ")";
+    }
+
     void generate_statement(statement const& s, int indent, std::ostream& o,
                             bool include_sampling, bool is_var,
                             bool is_fun_return);
@@ -1663,6 +1713,27 @@ namespace stan {
         o_ << ", ";
         generate_expression(x.expr_, o_);
         o_ << ");" << EOL;
+      }
+      void operator()(const assgn& y) const {
+        generate_indent(indent_, o_);
+        o_ << "assign(";
+
+        generate_expression(y.lhs_var_, o_);
+        o_ << ", "
+           << EOL;
+
+        generate_indent(indent_, o_);
+        o_ << "       ";
+        generate_idxs(y.idxs_, o_);
+        o_ << ", "
+           << EOL;
+
+        generate_indent(indent_, o_);
+        o_ << "       ";
+        generate_expression(y.rhs_, o_);
+
+        o_ << ");"
+           << EOL;
       }
       void operator()(expression const& x) const {
         generate_indent(indent_, o_);
@@ -1865,6 +1936,7 @@ namespace stan {
     struct is_numbered_statement_vis : public boost::static_visitor<bool> {
       bool operator()(const nil& st) const { return false; }
       bool operator()(const assignment& st) const { return true; }
+      bool operator()(const assgn& st) const { return true; }
       bool operator()(const sample& st) const { return true; }
       bool operator()(const increment_log_prob_statement& t) const {
         return true;

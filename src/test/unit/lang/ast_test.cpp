@@ -422,3 +422,81 @@ TEST(gmAst, funNameToOperator) {
   EXPECT_EQ("-", fun_name_to_operator("minus"));
   EXPECT_EQ("ERROR", fun_name_to_operator("foo"));
 }
+
+TEST(langAst, uniIdx) {
+  stan::lang::expression e(stan::lang::int_literal(3));
+  stan::lang::uni_idx i(e);
+  // test proper type storage and retrieval
+  EXPECT_EQ(INT_T, i.idx_.expression_type().type());
+  EXPECT_EQ(0, i.idx_.expression_type().num_dims());
+  // test allow construction
+  EXPECT_NO_THROW(stan::lang::idx(i));
+}
+TEST(langAst, multiIdx) {
+  stan::lang::variable v("foo");
+  v.set_type(INT_T, 1);
+  stan::lang::expression e(v);
+  stan::lang::multi_idx i(e);
+  // test proper type storage and retrieval
+  EXPECT_EQ(INT_T, i.idxs_.expression_type().type());
+  EXPECT_EQ(1, i.idxs_.expression_type().num_dims());
+  // test allow construction
+  EXPECT_NO_THROW(stan::lang::idx(i));
+}
+TEST(langAst, omniIdx) {
+  // nothing to store or retrieve for omni
+  EXPECT_NO_THROW(stan::lang::omni_idx());
+  // test allow construction
+  EXPECT_NO_THROW(stan::lang::idx(i));
+}
+TEST(langAst, lbIdx) {
+  stan::lang::expression e(stan::lang::int_literal(3));
+  stan::lang::lb_idx i(e);
+  // test proper type storage and retrieval
+  EXPECT_EQ(INT_T, i.lb_.expression_type().type());
+  EXPECT_EQ(0, i.lb_.expression_type().num_dims());
+  // test allow construction
+  EXPECT_NO_THROW(stan::lang::idx(i));
+}
+TEST(langAst, ubIdx) {
+  stan::lang::expression e(stan::lang::int_literal(3));
+  stan::lang::ub_idx i(e);
+  // test proper type storage and retrieval
+  EXPECT_EQ(INT_T, i.ub_.expression_type().type());
+  EXPECT_EQ(0, i.ub_.expression_type().num_dims());
+  // test allow construction
+  EXPECT_NO_THROW(stan::lang::idx(i));
+}
+TEST(langAst, lubIdx) {
+  stan::lang::expression e1(stan::lang::int_literal(3));
+  stan::lang::variable v("foo");
+  v.set_type(INT_T, 0);
+  stan::lang::expression e2(v);
+  stan::lang::lub_idx i(e1,e2);
+  // test proper type storage and retrieval
+  EXPECT_EQ(INT_T, i.lb_.expression_type().type());
+  EXPECT_EQ(0, i.lb_.expression_type().num_dims());
+  EXPECT_EQ(INT_T, i.ub_.expression_type().type());
+  EXPECT_EQ(0, i.ub_.expression_type().num_dims());
+  // test allow construction
+  EXPECT_NO_THROW(stan::lang::idx(i));
+}
+TEST(langAst, assgn) {
+  stan::lang::variable v("foo");
+  v.set_type(DOUBLE_T, 0);
+  std::vector<stan::lang::idx> is;
+  stan::lang::expression e_int3(stan::lang::int_literal(3));
+  stan::lang::uni_idx ui(e_int3);
+  stan::lang::idx idx0(ui);
+  is.push_back(idx0);
+  stan::lang::expression e(stan::lang::int_literal(3));
+  stan::lang::assgn a(v, is, e);
+  // retrieve indexes
+  EXPECT_EQ(1, a.idxs_.size());
+  // retrieve LHS variable
+  EXPECT_EQ(0, a.lhs_var_.expression_type().num_dims());
+  EXPECT_EQ(DOUBLE_T, a.lhs_var_.expression_type().type());
+  // retrieve RHS expression
+  EXPECT_EQ(0, a.rhs_.expression_type().num_dims());
+  EXPECT_EQ(INT_T, a.rhs_.expression_type().type());
+}

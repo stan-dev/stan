@@ -20,6 +20,7 @@ namespace stan {
     // components of abstract syntax tree
     struct array_literal;
     struct assignment;
+    struct assgn;
     struct binary_op;
     struct conditional_statement;
     struct distribution;
@@ -191,7 +192,6 @@ namespace stan {
       statements(const std::vector<var_decl>& local_decl,
                  const std::vector<statement>& stmts);
     };
-
 
     struct distribution {
       std::string family_;
@@ -409,6 +409,53 @@ namespace stan {
             expression const& high);
       bool has_low() const;
       bool has_high() const;
+    };
+
+    struct uni_idx {
+      expression idx_;
+      uni_idx();
+      uni_idx(const expression& idx);
+    };
+    struct multi_idx {
+      expression idxs_;
+      multi_idx();
+      multi_idx(const expression& idxs);
+    };
+    struct omni_idx {
+      omni_idx();
+    };
+    struct lb_idx {
+      expression lb_;
+      lb_idx();
+      lb_idx(const expression& lb);
+    };
+    struct ub_idx {
+      expression ub_;
+      ub_idx();
+      ub_idx(const expression& ub);
+    };
+    struct lub_idx {
+      expression lb_;
+      expression ub_;
+      lub_idx();
+      lub_idx(const expression& lb,
+              const expression& ub);
+    };
+
+    struct idx {
+      typedef boost::variant<boost::recursive_wrapper<uni_idx>,
+                             boost::recursive_wrapper<multi_idx>,
+                             boost::recursive_wrapper<omni_idx>,
+                             boost::recursive_wrapper<lb_idx>,
+                             boost::recursive_wrapper<ub_idx>,
+                             boost::recursive_wrapper<lub_idx> >
+      idx_t;
+
+      idx();
+      template <typename T>
+      idx(const T& i);
+
+      idx_t idx_;
     };
 
     typedef int var_origin;
@@ -637,6 +684,7 @@ namespace stan {
     struct statement {
       typedef boost::variant<boost::recursive_wrapper<nil>,
                      boost::recursive_wrapper<assignment>,
+                     boost::recursive_wrapper<assgn>,
                      boost::recursive_wrapper<sample>,
                      boost::recursive_wrapper<increment_log_prob_statement>,
                      boost::recursive_wrapper<expression>,
@@ -658,6 +706,7 @@ namespace stan {
       statement(const statement_t& st);
       statement(const nil& st);
       statement(const assignment& st);
+      statement(const assgn& st);
       statement(const sample& st);
       statement(const increment_log_prob_statement& st);
       statement(const expression& st);
@@ -676,6 +725,7 @@ namespace stan {
     struct is_no_op_statement_vis : public boost::static_visitor<bool> {
       bool operator()(const nil& st) const;
       bool operator()(const assignment& st) const;
+      bool operator()(const assgn& st) const;
       bool operator()(const sample& st) const;
       bool operator()(const increment_log_prob_statement& t) const;
       bool operator()(const expression& st) const;
@@ -697,6 +747,7 @@ namespace stan {
                        std::ostream& error_msgs);
       bool operator()(const nil& st) const;
       bool operator()(const assignment& st) const;
+      bool operator()(const assgn& st) const;
       bool operator()(const sample& st) const;
       bool operator()(const increment_log_prob_statement& t) const;
       bool operator()(const expression& st) const;
@@ -842,6 +893,15 @@ namespace stan {
       assignment();
       assignment(variable_dims& var_dims,
                  expression& expr);
+    };
+
+    struct assgn {
+      expression lhs_var_;
+      std::vector<idx> idxs_;
+      expression rhs_;
+      assgn();
+      assgn(const expression& lhs_var, const std::vector<idx>& idxs,
+            const expression& rhs);
     };
 
     // FIXME:  is this next dependency necessary?
