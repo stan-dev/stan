@@ -194,6 +194,11 @@ namespace stan {
         }
         ss.seekg(std::ios_base::beg);
 
+        // All the code below is specific to NUTS
+        // which has at least 4 lines of adaptation output
+        if (lines < 4)
+          return false;
+
         char comment;  // Buffer for comment indicator, #
 
         // Skip first two lines
