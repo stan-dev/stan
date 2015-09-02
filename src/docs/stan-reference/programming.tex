@@ -8099,44 +8099,48 @@ in the sampling statement.
 
 \section{Overloading Functions}
 
-Stan permits overloading (i.e., different functions with the same
-name).  For example, the function \code{unit\_normal} defined above
-could be named \code{normal}, thus overloading with the built-in
-function of the same name.
+Stan does not permit overloading user-defined functions.  This means
+that it is not possible to define two different functions with the
+same name, even if they have different signatures.
 
-For example, built-in functions might be written to convert sequences
-of scalar arguments to vectors, leading to the following overloading
-of the name \code{as\_vector} in four distinct functions.
-%
-\begin{stancode}
-vector as_vector();
-vector as_vector(real a);
-vector as_vector(real a, real b);
-vector as_vector(real a, real b, real c);
-\end{stancode}
+% TODO(carpenter):  leave as is for when we allow overloading
+% For example, the function \code{unit\_normal} defined above could be
+% named \code{normal}, thus overloading with the built-in function of
+% the same name.
 
-A function's name combined with its argument type sequence must be
-unique.  Therefore, it is not possible to have two functions of the
-same name and argument sequence with different return types.  It is
-possible to have two functions of the same name and number of
-arguments as long as the arguments are of different types.  For
-example, the following signatures are legal together.
-%
-\begin{stancode}
-real bar(matrix m);
-real bar(vector v);
-real bar(row_vector rv);
-real bar(real[] a1);
-real bar(real[,] a2);
-\end{stancode}
-%
-They could be used to define an operation that can apply to any one-
-or two-dimensional container.
+% For example, built-in functions might be written to convert sequences
+% of scalar arguments to vectors, leading to the following overloading
+% of the name \code{as\_vector} in four distinct functions.
+% %
+% \begin{stancode}
+% vector as_vector();
+% vector as_vector(real a);
+% vector as_vector(real a, real b);
+% vector as_vector(real a, real b, real c);
+% \end{stancode}
 
-Overloaded functions only share names---their implementations are not
-intrinsically related.  Nevertheless, it is good programming practice
-to only reuse names for related functions---otherwise, those reading
-the program will be confused.
+% A function's name combined with its argument type sequence must be
+% unique.  Therefore, it is not possible to have two functions of the
+% same name and argument sequence with different return types.  It is
+% possible to have two functions of the same name and number of
+% arguments as long as the arguments are of different types.  For
+% example, the following signatures are legal together.
+% %
+% \begin{stancode}
+% real bar(matrix m);
+% real bar(vector v);
+% real bar(row_vector rv);
+% real bar(real[] a1);
+% real bar(real[,] a2);
+% \end{stancode}
+% %
+% They could be used to define an operation that can apply to any one-
+% or two-dimensional container.
+
+% Overloaded functions only share names---their implementations are not
+% intrinsically related.  Nevertheless, it is good programming practice
+% to only reuse names for related functions---otherwise, those reading
+% the program will be confused.
 
 
 \section{Documenting Functions}\label{documenting-functions.section}
