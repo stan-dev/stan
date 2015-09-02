@@ -1668,15 +1668,21 @@ namespace stan {
       boost::apply_visitor(vis, i.idx_);
     }
 
-    void generate_idxs(const std::vector<idx>& idxs, std::ostream& o) {
-      for (size_t i = 0; i < idxs.size(); ++i) {
+    void generate_idxs(int pos, const std::vector<idx>& idxs,
+                       std::ostream& o) {
+      if (pos == idxs.size()) {
+        o << "nil_index_list()";
+      } else {
         o << "cons_list(";
-        generate_idx(idxs[i], o);
+        generate_idx(idxs[pos], o);
         o << ", ";
-      }
-      o << " nil_index_list()";
-      for (size_t i = 0; i < idxs.size(); ++i)
+        generate_idxs(pos + 1, idxs, o);
         o << ")";
+      }
+    }
+
+    void generate_idxs(const std::vector<idx>& idxs, std::ostream& o) {
+      generate_idxs(0, idxs, o);
     }
 
     void generate_statement(statement const& s, int indent, std::ostream& o,

@@ -37,7 +37,7 @@ namespace stan {
       }
     };
 
-
+    // factory-like function does type inference for I and T
     template <typename I, typename T>
     inline cons_index_list<I, T>
     cons_list(const I& idx1, const T& t) {

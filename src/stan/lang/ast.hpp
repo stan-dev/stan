@@ -458,6 +458,18 @@ namespace stan {
       idx_t idx_;
     };
 
+    struct is_multi_index_vis : public boost::static_visitor<bool> {
+      is_multi_index_vis();
+      bool operator()(const uni_idx& i) const;
+      bool operator()(const multi_idx& i) const;
+      bool operator()(const omni_idx& i) const;
+      bool operator()(const lb_idx& i) const;
+      bool operator()(const ub_idx& i) const;
+      bool operator()(const lub_idx& i) const;
+    };
+
+    bool is_multi_index(const idx& idx);
+
     typedef int var_origin;
     const int model_name_origin = 0;
     const int data_origin = 1;
@@ -641,19 +653,19 @@ namespace stan {
 
     struct var_decl {
       typedef boost::variant<boost::recursive_wrapper<nil>,
-                     boost::recursive_wrapper<int_var_decl>,
-                     boost::recursive_wrapper<double_var_decl>,
-                     boost::recursive_wrapper<vector_var_decl>,
-                     boost::recursive_wrapper<row_vector_var_decl>,
-                     boost::recursive_wrapper<matrix_var_decl>,
-                     boost::recursive_wrapper<simplex_var_decl>,
-                     boost::recursive_wrapper<unit_vector_var_decl>,
-                     boost::recursive_wrapper<ordered_var_decl>,
-                     boost::recursive_wrapper<positive_ordered_var_decl>,
-                     boost::recursive_wrapper<cholesky_factor_var_decl>,
-                     boost::recursive_wrapper<cholesky_corr_var_decl>,
-                     boost::recursive_wrapper<cov_matrix_var_decl>,
-                     boost::recursive_wrapper<corr_matrix_var_decl> >
+                             boost::recursive_wrapper<int_var_decl>,
+                             boost::recursive_wrapper<double_var_decl>,
+                             boost::recursive_wrapper<vector_var_decl>,
+                             boost::recursive_wrapper<row_vector_var_decl>,
+                             boost::recursive_wrapper<matrix_var_decl>,
+                             boost::recursive_wrapper<simplex_var_decl>,
+                             boost::recursive_wrapper<unit_vector_var_decl>,
+                             boost::recursive_wrapper<ordered_var_decl>,
+                             boost::recursive_wrapper<positive_ordered_var_decl>,
+                             boost::recursive_wrapper<cholesky_factor_var_decl>,
+                             boost::recursive_wrapper<cholesky_corr_var_decl>,
+                             boost::recursive_wrapper<cov_matrix_var_decl>,
+                             boost::recursive_wrapper<corr_matrix_var_decl> >
       var_decl_t;
 
       var_decl_t decl_;
@@ -683,19 +695,19 @@ namespace stan {
 
     struct statement {
       typedef boost::variant<boost::recursive_wrapper<nil>,
-                     boost::recursive_wrapper<assignment>,
-                     boost::recursive_wrapper<assgn>,
-                     boost::recursive_wrapper<sample>,
-                     boost::recursive_wrapper<increment_log_prob_statement>,
-                     boost::recursive_wrapper<expression>,
-                     boost::recursive_wrapper<statements>,
-                     boost::recursive_wrapper<for_statement>,
-                     boost::recursive_wrapper<conditional_statement>,
-                     boost::recursive_wrapper<while_statement>,
-                     boost::recursive_wrapper<print_statement>,
-                     boost::recursive_wrapper<reject_statement>,
-                     boost::recursive_wrapper<return_statement>,
-                     boost::recursive_wrapper<no_op_statement> >
+                             boost::recursive_wrapper<assignment>,
+                             boost::recursive_wrapper<assgn>,
+                             boost::recursive_wrapper<sample>,
+                             boost::recursive_wrapper<increment_log_prob_statement>,
+                             boost::recursive_wrapper<expression>,
+                             boost::recursive_wrapper<statements>,
+                             boost::recursive_wrapper<for_statement>,
+                             boost::recursive_wrapper<conditional_statement>,
+                             boost::recursive_wrapper<while_statement>,
+                             boost::recursive_wrapper<print_statement>,
+                             boost::recursive_wrapper<reject_statement>,
+                             boost::recursive_wrapper<return_statement>,
+                             boost::recursive_wrapper<no_op_statement> >
       statement_t;
 
       statement_t statement_;
@@ -845,7 +857,7 @@ namespace stan {
       function_decl_defs();
 
       function_decl_defs(
-                   const std::vector<function_decl_def>& decl_defs);
+                         const std::vector<function_decl_def>& decl_defs);
 
       std::vector<function_decl_def> decl_defs_;
     };
@@ -855,10 +867,10 @@ namespace stan {
       std::vector<function_decl_def> function_decl_defs_;
       std::vector<var_decl> data_decl_;
       std::pair<std::vector<var_decl>, std::vector<statement> >
-        derived_data_decl_;
+      derived_data_decl_;
       std::vector<var_decl> parameter_decl_;
       std::pair<std::vector<var_decl>, std::vector<statement> >
-        derived_decl_;
+      derived_decl_;
       statement statement_;
       std::pair<std::vector<var_decl>, std::vector<statement> >
       generated_decl_;
@@ -867,13 +879,13 @@ namespace stan {
       program(const std::vector<function_decl_def>& function_decl_defs,
               const std::vector<var_decl>& data_decl,
               const std::pair<std::vector<var_decl>,
-                              std::vector<statement> >& derived_data_decl,
+              std::vector<statement> >& derived_data_decl,
               const std::vector<var_decl>& parameter_decl,
               const std::pair<std::vector<var_decl>,
-                              std::vector<statement> >& derived_decl,
+              std::vector<statement> >& derived_decl,
               const statement& st,
               const std::pair<std::vector<var_decl>,
-                              std::vector<statement> >& generated_decl);
+              std::vector<statement> >& generated_decl);
     };
 
     struct sample {
@@ -903,6 +915,18 @@ namespace stan {
       assgn(const expression& lhs_var, const std::vector<idx>& idxs,
             const expression& rhs);
     };
+
+    /**
+     * Return the type of the expression indexed by the generalized
+     * index sequence.  Return a type with base type
+     * <code>ILL_FORMED_T</code> if there are too many indexes.
+     *
+     * @param[in] e Expression being indexed.
+     * @param[in] idxs Index sequence.
+     * @return Type of expression applied to indexes.
+     */
+    expr_type indexed_type(const expression& e,
+                           const std::vector<idx> idxs);
 
     // FIXME:  is this next dependency necessary?
     // from generator.hpp

@@ -1088,6 +1088,33 @@ namespace stan {
     template <typename T>
     idx::idx(const T& idx) : idx_(idx) { }
 
+
+    is_multi_index_vis::is_multi_index_vis() { }
+    bool is_multi_index_vis::operator()(const uni_idx& i) const { 
+      return false; 
+    }
+    bool is_multi_index_vis::operator()(const multi_idx& i) const { 
+      return true;
+    }
+    bool is_multi_index_vis::operator()(const omni_idx& i) const {
+      return true;
+    }
+    bool is_multi_index_vis::operator()(const lb_idx& i) const {
+      return true;
+    }
+    bool is_multi_index_vis::operator()(const ub_idx& i) const {
+      return true;
+    }
+    bool is_multi_index_vis::operator()(const lub_idx& i) const {
+      return true;
+    }
+
+    bool is_multi_index(const idx& idx) {
+      is_multi_index_vis v;
+      return boost::apply_visitor(v, idx.idx_);
+    }
+
+
     void print_var_origin(std::ostream& o, const var_origin& vo) {
       if (vo == model_name_origin)
         o << "model name";
@@ -1543,6 +1570,36 @@ namespace stan {
                  const expression& rhs)
       : lhs_var_(lhs_var), idxs_(idxs), rhs_(rhs) { }
 
+    
+    expr_type indexed_type(const expression& e,
+                           const std::vector<idx> idxs) {
+      expr_type e_type = e.expression_type();
+      base_expr_type base_type = e_type.base_type_;
+      size_t base_dims = e_type.num_dims_;
+      size_t unindexed_dims = base_dims;
+      size_t out_dims = 0U;
+      size_t i = 0;
+      for ( ; unindexed_dims > 0 && i < idxs.size(); ++i, --unindexed_dims)
+        if (is_multi_index(idxs[i])) 
+          ++out_dims;
+      if (idxs.size() - i == 0) {  // unindexed_dims >= 0
+        return expr_type(base_type, out_dims + unindexed_dims);
+      } else if (idxs.size() - i == 1) {  // unindexed_dims == 0
+        if (base_type == MATRIX_T)
+          return expr_type(ROW_VECTOR_T, out_dims);
+        else if (base_type == VECTOR_T || base_type == ROW_VECTOR_T)
+          return expr_type(DOUBLE_T, out_dims);
+        else
+          return expr_type(ILL_FORMED_T, 0U);
+      } else if (idxs.size() - i == 2) {  // unindexed_dims == 0
+        if (base_type == MATRIX_T)
+          return expr_type(DOUBLE_T, out_dims);
+        else
+          return expr_type(ILL_FORMED_T, 0U);
+      } else {
+        return expr_type(ILL_FORMED_T, 0U);
+      }
+    }
 
 
     expression& expression::operator+=(const expression& rhs) {

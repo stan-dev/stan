@@ -500,3 +500,23 @@ TEST(langAst, assgn) {
   EXPECT_EQ(0, a.rhs_.expression_type().num_dims());
   EXPECT_EQ(INT_T, a.rhs_.expression_type().type());
 }
+void test_recover(stan::lang::base_expr_type base_et, size_t num_dims) {
+  stan::lang::variable v("foo");
+  v.set_type(base_et, num_dims);
+  stan::lang::expression e(v);
+  std::vector<stan::lang::idx> idxs;
+  stan::lang::expr_type et = indexed_type(e, idxs);
+  EXPECT_EQ(base_et, et.base_type_);
+  EXPECT_EQ(num_dims, et.num_dims_);
+
+}
+TEST(langAst, indexedType) {
+  // base case: empty index list
+  for (size_t n = 0; n < 4; ++n) {
+    test_recover(INT_T, n);
+    test_recover(DOUBLE_T, n);
+    test_recover(VECTOR_T, n);
+    test_recover(ROW_VECTOR_T, n);
+    test_recover(MATRIX_T, n);
+  }
+}
