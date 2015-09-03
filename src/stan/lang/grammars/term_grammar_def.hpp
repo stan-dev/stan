@@ -366,8 +366,6 @@ namespace stan {
     };
     boost::phoenix::function<multiplication_expr> multiplication_f;
 
-    void generate_expression(const expression& e, std::ostream& o);
-
     struct division_expr {
       //! @cond Doxygen_Suppress
       template <class> struct result;
@@ -378,6 +376,7 @@ namespace stan {
       void operator()(expression& expr1,
                       const expression& expr2,
                       std::ostream& error_msgs) const {
+        static const bool user_facing = true;
         if (expr1.expression_type().is_primitive()
             && expr2.expression_type().is_primitive()
             && (expr1.expression_type().is_primitive_double()
@@ -395,9 +394,9 @@ namespace stan {
           error_msgs << "Warning: integer division"
                      << " implicitly rounds to integer."
                      << " Found int division: ";
-          generate_expression(expr1.expr_, error_msgs);
+          generate_expression(expr1.expr_, user_facing, error_msgs);
           error_msgs << " / ";
-          generate_expression(expr2.expr_, error_msgs);
+          generate_expression(expr2.expr_, user_facing, error_msgs);
           error_msgs << std::endl
                      << " Positive values rounded down,"
                      << " negative values rounded up or down"
