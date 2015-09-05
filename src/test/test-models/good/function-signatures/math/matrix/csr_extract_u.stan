@@ -1,17 +1,25 @@
 data { 
-  int d_int;
-  matrix[d_int,d_int] d_matrix;
+  matrix[3, 4] a_d;
 }
-
 transformed data {
-  int transformed_data_array[d_int];
-  transformed_data_array <- csr_extract_u(d_matrix);
+  int u[5];
+  u <- csr_extract_u(a_d);
 }
-
 parameters {
-  real y_p;
+  real y;
+  matrix[3, 4] a_p;
+}
+transformed parameters {
+  real v;
+  { 
+    int u_p[5];
+    u_p <- csr_extract_u(a_d);
+    u_p <- csr_extract_u(a_p);
+    v <- 3;
+  }
+}
+model {  
+  y ~ normal(0, 1);
 }
 
-model {  
-  y_p ~ normal(0,1);
-}
+

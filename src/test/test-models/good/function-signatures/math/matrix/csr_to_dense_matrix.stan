@@ -1,43 +1,20 @@
-
-data { 
-  int d_int;
-  matrix[d_int,d_int] d_matrix;
-}
-
 transformed data {
-  matrix[d_int, d_int] transformed_d_matrix;
-  vector[d_int] transformed_data_vector_w;
-  int transformed_data_array_v[d_int];
-  int transformed_data_array_u[d_int];
-  int transformed_data_array_z[d_int];
-
-  transformed_d_matrix <- csr_to_dense_matrix(
-    d_int, d_int,
-    transformed_data_vector_w,
-    transformed_data_array_v,
-    transformed_data_array_u,
-    transformed_data_array_z
-  );
+  matrix[3, 4] a_td;
+  vector[5] w_d;
+  int v[6];
+  int u[7];
+  
+  a_td <- csr_to_dense_matrix(3, 4, w_d, v, u);  
 }
-
 parameters {
   real y_p;
-  matrix[d_int,d_int] p_matrix;
+  vector[5] w_p;
 }
-
 transformed parameters {
-  matrix[d_int, d_int] transformed_p_matrix;
-  vector[d_int] transformed_param_vector_w;
-
-  transformed_p_matrix <- csr_to_dense_matrix(
-    d_int, d_int,
-    transformed_param_vector_w,
-    transformed_data_array_v,
-    transformed_data_array_u,
-    transformed_data_array_z
-  );
+  matrix[3,4] a_tp;
+  a_tp <- csr_to_dense_matrix(3, 4, w_d, v, u);
+  a_tp <- csr_to_dense_matrix(3, 4, w_p, v, u);
 }
-
 model {  
-  y_p ~ normal(0,1);
+  y_p ~ normal(0, 1);
 }

@@ -1,58 +1,27 @@
-
 data { 
-  int d_int;
-  matrix[d_int,d_int] d_matrix;
+  int m;
+  int n;
+  int v[3];
+  int u[3];
+  vector[3] w_d;
+  vector[3] b_d;
 }
-
 transformed data {
-  vector[d_int] transformed_data_vector_w;
-  int transformed_data_array_v[d_int];
-  int transformed_data_array_u[d_int];
-  int transformed_data_array_z[d_int];
-
-  vector[d_int] transformed_d_vector;
-  vector[d_int] transformed_d_vector_2;
-
-  transformed_d_vector <- csr_matrix_times_vector(
-    d_int, d_int,
-    transformed_data_vector_w,
-    transformed_data_array_v,
-    transformed_data_array_u,
-    transformed_data_array_z,
-    transformed_d_vector_2
-  );
+  vector[3] ab_d;
+  ab_d <- csr_matrix_times_vector(m, n, w_d, v, u, b_d);
 }
-
 parameters {
   real y_p;
-
-  vector[d_int] p_vector;
+  vector[3] w_p;
+  vector[3] b_p;
 }
-
 transformed parameters {
-  matrix[d_int, d_int] transformed_p_matrix;
-  vector[d_int] transformed_p_vector;
-  vector[d_int] transformed_param_vector_w;
-
-  transformed_p_vector <- csr_matrix_times_vector(
-    d_int, d_int,
-    transformed_param_vector_w,
-    transformed_data_array_v,
-    transformed_data_array_u,
-    transformed_data_array_z,
-    transformed_d_vector
-  );
-
-  transformed_p_vector <- csr_matrix_times_vector(
-    d_int, d_int,
-    transformed_data_vector_w,
-    transformed_data_array_v,
-    transformed_data_array_u,
-    transformed_data_array_z,
-    p_vector
-  );
+  vector[3] ab_p;
+  ab_p <- csr_matrix_times_vector(m, n, w_d, v, u, b_d);
+  ab_p <- csr_matrix_times_vector(m, n, w_d, v, u, b_p);
+  ab_p <- csr_matrix_times_vector(m, n, w_p, v, u, b_d);
+  ab_p <- csr_matrix_times_vector(m, n, w_p, v, u, b_p);
 }
-
 model {  
   y_p ~ normal(0,1);
 }
