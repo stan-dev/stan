@@ -3012,6 +3012,136 @@ Number of components of \farg{v} less than \farg{v[s]}}
 \end{description}
 
 
+\chapter{Sparse Matrix Operations}\label{sparse.chapter}
+
+\noindent
+For sparse matrices, for which many elements are zero, it is more
+efficient to use specialized representations to save memory and speed
+up matrix arithmetic (including derivative calculations).  Because of
+this speedup, it may even be useful to read in a dense matrix and convert
+it to a sparse matrix before multiplying it by a vector.
+
+\section{Compressed Row Storage}\label{CSR.section}
+
+Sparse matrices are represented in Stan using compressed row storage
+(CSR).  For example, the matrix
+\[
+A = 
+\begin{bmatrix}
+19 & 27 & 0 & 0 
+\\ 
+0 & 0 & 0 & 0 
+\\
+0 & 0 & 0 & 52
+\\
+81 & 0 & 95 & 33
+\end{bmatrix}
+\]
+is translated into a vector of the non-zero real values, read by row
+from the matrix $A$,
+\[
+w(A) =
+\begin{bmatrix}
+19 & 27 & 52 & 81 & 95 & 33
+\end{bmatrix}^{\top} \! \! \! ,
+\]
+an array of integer column indices for the values,
+\[
+v(A) = 
+\begin{bmatrix}
+1 & 2 & 4 & 1 & 3 & 4
+\end{bmatrix} \! ,
+\]
+and an array of integer indices indicating where a given row's values
+start,
+\[
+u(A) = 
+\begin{bmatrix}
+1 & 3 & 3 & 4 & 7
+\end{bmatrix} \! ,
+\]
+with a padded value at the end to guarantee that 
+\[
+u(A)[n+1] - u(A)[n]
+\]
+is the number of non-zero elements in row $n$ of the matrix (here $2$, $0$,
+$1$, and $3$).  The values $(w(A), \, v(A), \, u(A))$ are sufficient for
+reconstructing $A$.
+
+The values are structured so that there is a real value and integer
+column index for each non-zero entry in the array, plus one integer
+for each row of the matrix, pluse one for padding.  There is also
+underlying storage for internal container pointers and sizes.  The
+total memory usage is roughly $12 K + M$ bytes plus a small constant
+overhead, which is often considerably fewer bytes than the $M \times N$
+required to store a dense matrix.  Even more importantly, zero
+values do not introduce derivatives under multiplication or addition,
+so many storage and evaluation steps are saved when sparse matrices
+are multiplied.
+
+\section{Conversion Functions}
+
+Conversion functions between dense and sparse matrices are provided.
+
+\subsection{Dense to Sparse Conversion}
+
+Converting a desne matrix $m$ to a sparse representation produces a
+vector $w$ and two integer arrays, $u$ and $v$.
+
+\begin{description}
+%
+  \fitem{vector}{csr\_extract\_w}{matrix \farg{a}}{ Return non-zero
+    values in matrix \farg{a}; see \refsection{CSR}.}
+%
+  \fitem{int[]}{csr\_extract\_v}{matrix \farg{a}}{Return colum
+    indices for values in \code{csr\_extract\_w(\farg{a})}; see
+    \refsection{CSR}.}
+%
+  \fitem{int[]}{csr\_extract\_u}{matrix \farg{a}}{Return array of row
+    starting indices for entries in \code{csr\_extract\_w(\farg{a})}
+    followed by the size of \code{csr\_extract\_w(\farg{a})} plus one;
+    see \refsection{CSR}.}
+%
+\end{description}
+%
+
+\subsection{Sparse to Dense Conversion}
+
+To convert a sparse matrix representation to a dense matrix, there is
+a single function.
+%
+\begin{description}
+\fitem{matrix}{csr\_to\_dense\_matrix}{int \farg{m}, int \farg{n}, int
+  \farg{w}, int \farg{v}, int \farg{u}}{Return dense $m \times n$
+  matrix with specified values, column indices, and row starting
+  indices;  see \refsection{CSR}.}
+\end{description}
+
+\section{Sparse Matrix Arithmetic}
+
+\subsection{Sparse Matrix Multiplication}
+
+The only supported operation is the multiplication of a sparse matrix
+$A$ and a dense vector $b$ to produce a dense vector $A\,b$.  This
+allows dense row vector $b$ times a sparse matrices $A$ to be coded
+using transposition as
+\[
+v \, A = (A^{\top} \, v^{\top})^{\top},
+\]
+but care must be taken to represent $A^{\top}$ rather than $A$ as a
+sparse matrix.
+
+
+
+\begin{description}
+\fitemtwolines{vector}{csr\_matrix\_times\_vector}{int \farg{m}, int \farg{n},
+vector \farg{w}, int[] \farg{v}}{int[] \farg{u}, vector \farg{b}}{
+Multiply the matrix represented by (\farg{w}, \farg{v}, \farg{u}) by
+the vector \farg{b}; see \refsection{CSR}.}
+\end{description}
+
+
+
 \chapter{Mixed Operations}
 
 These functions perform conversions between Stan containers matrix,
