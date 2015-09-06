@@ -3012,14 +3012,17 @@ Number of components of \farg{v} less than \farg{v[s]}}
 \end{description}
 
 
-\chapter{Sparse Matrix Operations}\label{sparse.chapter}
+\chapter{Sparse Matrix Operations}\label{sparse-matrices.chapter}
 
 \noindent
 For sparse matrices, for which many elements are zero, it is more
 efficient to use specialized representations to save memory and speed
 up matrix arithmetic (including derivative calculations).  Because of
 this speedup, it may even be useful to read in a dense matrix and convert
-it to a sparse matrix before multiplying it by a vector.
+it to a sparse matrix before multiplying it by a vector.  This chapter
+covers a very specific form of sparsity consisting of a sparse matrix
+multiplied by a dense vector;  for more general coding strategies for
+sparse data structures within Stan, see \refchapter{sparse-ragged}.
 
 \section{Compressed Row Storage}\label{CSR.section}
 
@@ -3113,10 +3116,11 @@ To convert a sparse matrix representation to a dense matrix, there is
 a single function.
 %
 \begin{description}
-\fitem{matrix}{csr\_to\_dense\_matrix}{int \farg{m}, int \farg{n}, int
-  \farg{w}, int \farg{v}, int \farg{u}}{Return dense $m \times n$
-  matrix with specified values, column indices, and row starting
-  indices;  see \refsection{CSR}.}
+  \fitem{matrix}{csr\_to\_dense\_matrix}{int \farg{m}, int \farg{n},
+    int \farg{w}, int \farg{v}, int \farg{u}}{Return dense
+    $\mbox{\farg{m}} \times \mbox{\farg{n}}$ matrix with specified
+    values \farg{w}, column indices \farg{v}, and row starting indices
+    \farg{u}; see \refsection{CSR}.}
 \end{description}
 
 \section{Sparse Matrix Arithmetic}
@@ -3124,22 +3128,22 @@ a single function.
 \subsection{Sparse Matrix Multiplication}
 
 The only supported operation is the multiplication of a sparse matrix
-$A$ and a dense vector $b$ to produce a dense vector $A\,b$.  This
-allows dense row vector $b$ times a sparse matrices $A$ to be coded
-using transposition as
+$A$ and a dense vector $b$ to produce a dense vector $A\,b$.
+Multipying a dense row vector $b$ and a sparse matrix $A$ 
+can be coded using transposition as
 \[
-v \, A = (A^{\top} \, v^{\top})^{\top},
+b \, A = (A^{\top} \, b^{\top})^{\top},
 \]
 but care must be taken to represent $A^{\top}$ rather than $A$ as a
 sparse matrix.
 
-
-
 \begin{description}
-\fitemtwolines{vector}{csr\_matrix\_times\_vector}{int \farg{m}, int \farg{n},
-vector \farg{w}}{int[] \farg{v}, int[] \farg{u}, vector \farg{b}}{
-Multiply the matrix represented by (\farg{w}, \farg{v}, \farg{u}) by
-the vector \farg{b}; see \refsection{CSR}.}
+  \fitemtwolines{vector}{csr\_matrix\_times\_vector}{int \farg{m}, int
+    \farg{n}, vector \farg{w}}{int[] \farg{v}, int[] \farg{u}, vector
+    \farg{b}}{ Multiply the $\mbox{\farg{m}} \times \mbox{\farg{n}}$
+    matrix represented by values \farg{w}, column indices \farg{v},
+    and row start indices \farg{u} by the vector \farg{b}\,; see
+    \refsection{CSR}.}
 \end{description}
 
 
