@@ -3052,8 +3052,8 @@ v(A) =
 1 & 2 & 4 & 1 & 3 & 4
 \end{bmatrix} \! ,
 \]
-and an array of integer indices indicating where a given row's values
-start,
+and an array of integer indices indicating where in $w(A)$ a given row's
+values start,
 \[
 u(A) = 
 \begin{bmatrix}
@@ -3065,8 +3065,10 @@ with a padded value at the end to guarantee that
 u(A)[n+1] - u(A)[n]
 \]
 is the number of non-zero elements in row $n$ of the matrix (here $2$, $0$,
-$1$, and $3$).  The values $(w(A), \, v(A), \, u(A))$ are sufficient for
-reconstructing $A$.
+$1$, and $3$). Note that because the second row has no non-zero elments both
+the second and third elements of $u(A)$ correspond to the third element of
+$w(A)$, which is $52$. The values $(w(A), \, v(A), \, u(A))$ are sufficient 
+to reconstruct $A$.
 
 The values are structured so that there is a real value and integer
 column index for each non-zero entry in the array, plus one integer
@@ -3135,7 +3137,7 @@ sparse matrix.
 
 \begin{description}
 \fitemtwolines{vector}{csr\_matrix\_times\_vector}{int \farg{m}, int \farg{n},
-vector \farg{w}, int[] \farg{v}}{int[] \farg{u}, vector \farg{b}}{
+vector \farg{w}}{int[] \farg{v}, int[] \farg{u}, vector \farg{b}}{
 Multiply the matrix represented by (\farg{w}, \farg{v}, \farg{u}) by
 the vector \farg{b}; see \refsection{CSR}.}
 \end{description}
