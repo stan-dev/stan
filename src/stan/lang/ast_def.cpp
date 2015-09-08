@@ -1582,20 +1582,40 @@ namespace stan {
       for ( ; unindexed_dims > 0 && i < idxs.size(); ++i, --unindexed_dims)
         if (is_multi_index(idxs[i])) 
           ++out_dims;
-      if (idxs.size() - i == 0) {  // unindexed_dims >= 0
+      if (idxs.size() - i == 0) {
         return expr_type(base_type, out_dims + unindexed_dims);
-      } else if (idxs.size() - i == 1) {  // unindexed_dims == 0
-        if (base_type == MATRIX_T)
-          return expr_type(ROW_VECTOR_T, out_dims);
-        else if (base_type == VECTOR_T || base_type == ROW_VECTOR_T)
-          return expr_type(DOUBLE_T, out_dims);
-        else
+      } else if (idxs.size() - i == 1) {
+        if (base_type == MATRIX_T) {
+          if (is_multi_index(idxs[i]))
+            return expr_type(MATRIX_T, out_dims);
+          else
+            return expr_type(ROW_VECTOR_T, out_dims);
+        } else if (base_type == VECTOR_T) {
+          if (is_multi_index(idxs[i]))
+            return expr_type(VECTOR_T, out_dims);
+          else
+            return expr_type(DOUBLE_T, out_dims);
+        } else if (base_type == ROW_VECTOR_T) {
+          if (is_multi_index(idxs[i]))
+            return expr_type(ROW_VECTOR_T, out_dims);
+          else
+            return expr_type(DOUBLE_T, out_dims);
+        } else {
           return expr_type(ILL_FORMED_T, 0U);
-      } else if (idxs.size() - i == 2) {  // unindexed_dims == 0
-        if (base_type == MATRIX_T)
-          return expr_type(DOUBLE_T, out_dims);
-        else
+        }
+      } else if (idxs.size() - i == 2) {
+        if (base_type == MATRIX_T) {
+          if (is_multi_index(idxs[i]) && is_multi_index(idxs[i + 1]))
+            return expr_type(MATRIX_T, out_dims);
+          else if (is_multi_index(idxs[i]))
+            return expr_type(VECTOR_T, out_dims);
+          else if (is_multi_index(idxs[i + 1]))
+            return expr_type(ROW_VECTOR_T, out_dims);
+          else
+            return expr_type(DOUBLE_T, out_dims);
+        } else {
           return expr_type(ILL_FORMED_T, 0U);
+        }
       } else {
         return expr_type(ILL_FORMED_T, 0U);
       }

@@ -500,23 +500,194 @@ TEST(langAst, assgn) {
   EXPECT_EQ(0, a.rhs_.expression_type().num_dims());
   EXPECT_EQ(INT_T, a.rhs_.expression_type().type());
 }
-void test_recover(stan::lang::base_expr_type base_et, size_t num_dims) {
+
+// Type Inference Tests for Generalized Indexing
+
+// tests recovery of base expression type and number of dims
+// given expression and indexing
+void test_recover(stan::lang::base_expr_type base_et_expected, 
+                  size_t num_dims_expected,
+                  stan::lang::base_expr_type base_et, size_t num_dims,
+                  const std::vector<stan::lang::idx>& idxs) {
   stan::lang::variable v("foo");
   v.set_type(base_et, num_dims);
   stan::lang::expression e(v);
-  std::vector<stan::lang::idx> idxs;
   stan::lang::expr_type et = indexed_type(e, idxs);
-  EXPECT_EQ(base_et, et.base_type_);
-  EXPECT_EQ(num_dims, et.num_dims_);
+  EXPECT_EQ(base_et_expected, et.base_type_);
+  EXPECT_EQ(num_dims_expected, et.num_dims_);
+}
+void test_err(stan::lang::base_expr_type base_et, size_t num_dims,
+              const std::vector<stan::lang::idx>& idxs) {
+  stan::lang::variable v("foo");
+  v.set_type(base_et, num_dims);
+  stan::lang::expression e(v);
+  stan::lang::expr_type et = indexed_type(e, idxs);
+  EXPECT_EQ(stan::lang::ILL_FORMED_T, et.base_type_);
+}
+TEST(langAst, idxs) {
+  using std::vector;
+  using stan::lang::idx;
+
+  const stan::lang::base_expr_type bet[] 
+    = { INT_T, DOUBLE_T, VECTOR_T, ROW_VECTOR_T, MATRIX_T };
+
+  vector<idx> idxs;
+
+  for (size_t n = 0; n < 4; ++n)
+    for (int i = 0; i < 5; ++i)
+      test_recover(bet[i], n, bet[i], n, idxs);
+}
+
+void one_index_recover(const std::vector<stan::lang::idx>& idxs, size_t redux) {
+  const stan::lang::base_expr_type bet[] 
+    = { INT_T, DOUBLE_T, VECTOR_T, ROW_VECTOR_T, MATRIX_T };
+  for (size_t n = 1; n < 4; ++n)
+    for (int i = 0; i < 5; ++i)
+      test_recover(bet[i], n - redux, bet[i], n, idxs);
+
 
 }
-TEST(langAst, indexedType) {
-  // base case: empty index list
-  for (size_t n = 0; n < 4; ++n) {
-    test_recover(INT_T, n);
-    test_recover(DOUBLE_T, n);
-    test_recover(VECTOR_T, n);
-    test_recover(ROW_VECTOR_T, n);
-    test_recover(MATRIX_T, n);
-  }
+void one_index_errs(const std::vector<stan::lang::idx>& idxs) {
+  test_err(DOUBLE_T, 0U, idxs);
+  test_err(INT_T, 0U, idxs);
 }
+TEST(langAst, idxs0) {
+  using std::vector;
+  using stan::lang::idx;
+  using stan::lang::uni_idx;
+  using stan::lang::expression;
+  using stan::lang::int_literal;
+
+  vector<idx> idxs;
+  idxs.push_back(uni_idx(expression(int_literal(3))));
+
+  one_index_recover(idxs, 1U);
+
+  test_recover(DOUBLE_T, 0U, VECTOR_T, 0U, idxs);
+  test_recover(DOUBLE_T, 0U, ROW_VECTOR_T, 0U, idxs);
+  test_recover(ROW_VECTOR_T, 0U, MATRIX_T, 0U, idxs);
+
+  one_index_errs(idxs);
+}
+TEST(langAst, idxs1) {
+  using std::vector;
+  using stan::lang::idx;
+  using stan::lang::omni_idx;
+  using stan::lang::expression;
+  using stan::lang::int_literal;
+
+  vector<idx> idxs;
+  idxs.push_back(omni_idx());
+
+  one_index_recover(idxs, 0U);
+
+  test_recover(VECTOR_T, 0U, VECTOR_T, 0U, idxs);
+  test_recover(ROW_VECTOR_T, 0U, ROW_VECTOR_T, 0U, idxs);
+  test_recover(MATRIX_T, 0U, MATRIX_T, 0U, idxs);
+  
+  one_index_errs(idxs);
+}
+
+void two_index_recover(const std::vector<stan::lang::idx>& idxs, size_t redux) {
+  const stan::lang::base_expr_type bet[] 
+    = { INT_T, DOUBLE_T, VECTOR_T, ROW_VECTOR_T, MATRIX_T };
+  for (size_t n = 2; n < 4; ++n)
+    for (int i = 0; i < 5; ++i)
+      test_recover(bet[i], n - redux, bet[i], n, idxs);
+}
+void two_index_errs(const std::vector<stan::lang::idx>& idxs) {
+  test_err(DOUBLE_T, 0U, idxs);
+  test_err(DOUBLE_T, 1U, idxs);
+  test_err(INT_T, 0U, idxs);
+  test_err(INT_T, 1U, idxs);
+  test_err(VECTOR_T, 0U, idxs);
+  test_err(ROW_VECTOR_T, 0U, idxs);
+}
+TEST(langAst, idxs00) {
+  using std::vector;
+  using stan::lang::idx;
+  using stan::lang::uni_idx;
+  using stan::lang::expression;
+  using stan::lang::int_literal;
+
+  vector<idx> idxs;
+  idxs.push_back(uni_idx(expression(int_literal(3))));
+  idxs.push_back(uni_idx(expression(int_literal(5))));
+
+  two_index_recover(idxs, 2U);
+
+  test_recover(DOUBLE_T, 0U, VECTOR_T, 1U, idxs);
+  test_recover(DOUBLE_T, 0U, ROW_VECTOR_T, 1U, idxs);
+  test_recover(DOUBLE_T, 0U, MATRIX_T, 0U, idxs);
+  test_recover(ROW_VECTOR_T, 0U, MATRIX_T, 1U, idxs);
+
+  two_index_errs(idxs);
+}
+TEST(langAst, idxs01) {
+  using std::vector;
+  using stan::lang::idx;
+  using stan::lang::omni_idx;
+  using stan::lang::uni_idx;
+  using stan::lang::expression;
+  using stan::lang::int_literal;
+
+  vector<idx> idxs;
+  idxs.push_back(uni_idx(expression(int_literal(5))));
+  idxs.push_back(omni_idx());
+
+  two_index_recover(idxs, 1U);
+
+  test_recover(VECTOR_T, 0U, VECTOR_T, 1U, idxs);
+  test_recover(ROW_VECTOR_T, 0U, ROW_VECTOR_T, 1U, idxs);
+  test_recover(ROW_VECTOR_T, 0U, MATRIX_T, 0U, idxs);
+  test_recover(MATRIX_T, 0U, MATRIX_T, 1U, idxs);
+
+  two_index_errs(idxs);
+}
+TEST(langAst, idxs10) {
+  using std::vector;
+  using stan::lang::idx;
+  using stan::lang::omni_idx;
+  using stan::lang::uni_idx;
+  using stan::lang::expression;
+  using stan::lang::int_literal;
+
+  vector<idx> idxs;
+  idxs.push_back(omni_idx());
+  idxs.push_back(uni_idx(expression(int_literal(5))));
+
+  two_index_recover(idxs, 1U);
+
+  test_recover(DOUBLE_T, 1U, VECTOR_T, 1U, idxs);
+  test_recover(DOUBLE_T, 1U, ROW_VECTOR_T, 1U, idxs);
+  test_recover(VECTOR_T, 0U, MATRIX_T, 0U, idxs);
+  test_recover(ROW_VECTOR_T, 1U, MATRIX_T, 1U, idxs);
+
+  two_index_errs(idxs);
+}
+TEST(langAst, idxs11) {
+  using std::vector;
+  using stan::lang::idx;
+  using stan::lang::omni_idx;
+  using stan::lang::uni_idx;
+  using stan::lang::expression;
+  using stan::lang::int_literal;
+
+  vector<idx> idxs;
+  idxs.push_back(omni_idx());
+  idxs.push_back(omni_idx());
+
+  two_index_recover(idxs, 0U);
+
+  test_recover(VECTOR_T, 1U, VECTOR_T, 1U, idxs);
+  test_recover(ROW_VECTOR_T, 1U, ROW_VECTOR_T, 1U, idxs);
+  test_recover(MATRIX_T, 0U, MATRIX_T, 0U, idxs);
+  test_recover(MATRIX_T, 1U, MATRIX_T, 1U, idxs);
+
+  two_index_errs(idxs);
+}
+
+
+
+
+
