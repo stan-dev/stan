@@ -5607,12 +5607,14 @@ be averaged across the iterations to provide the posterior probability
 distribution over each $z_i$.
 
 
-\chapter{Sparse and Ragged Data Structures}
+\chapter{Sparse and Ragged Data Structures}\label{sparse-ragged.chapter}
 
 \noindent
 Stan does not directly support either sparse or ragged data
 structures, though both can be accommodated with some programming
-effort. 
+effort.  \refchapter{sparse-matrices} introduces a special-purpose
+sparse matrix times dense vector multiplication, which should be used
+where applicable;  this chapter covers more general data structures.
 
 \section{Sparse Data Structures}
 
