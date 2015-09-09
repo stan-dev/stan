@@ -653,19 +653,19 @@ namespace stan {
 
     struct var_decl {
       typedef boost::variant<boost::recursive_wrapper<nil>,
-                             boost::recursive_wrapper<int_var_decl>,
-                             boost::recursive_wrapper<double_var_decl>,
-                             boost::recursive_wrapper<vector_var_decl>,
-                             boost::recursive_wrapper<row_vector_var_decl>,
-                             boost::recursive_wrapper<matrix_var_decl>,
-                             boost::recursive_wrapper<simplex_var_decl>,
-                             boost::recursive_wrapper<unit_vector_var_decl>,
-                             boost::recursive_wrapper<ordered_var_decl>,
-                             boost::recursive_wrapper<positive_ordered_var_decl>,
-                             boost::recursive_wrapper<cholesky_factor_var_decl>,
-                             boost::recursive_wrapper<cholesky_corr_var_decl>,
-                             boost::recursive_wrapper<cov_matrix_var_decl>,
-                             boost::recursive_wrapper<corr_matrix_var_decl> >
+                         boost::recursive_wrapper<int_var_decl>,
+                         boost::recursive_wrapper<double_var_decl>,
+                         boost::recursive_wrapper<vector_var_decl>,
+                         boost::recursive_wrapper<row_vector_var_decl>,
+                         boost::recursive_wrapper<matrix_var_decl>,
+                         boost::recursive_wrapper<simplex_var_decl>,
+                         boost::recursive_wrapper<unit_vector_var_decl>,
+                         boost::recursive_wrapper<ordered_var_decl>,
+                         boost::recursive_wrapper<positive_ordered_var_decl>,
+                         boost::recursive_wrapper<cholesky_factor_var_decl>,
+                         boost::recursive_wrapper<cholesky_corr_var_decl>,
+                         boost::recursive_wrapper<cov_matrix_var_decl>,
+                         boost::recursive_wrapper<corr_matrix_var_decl> >
       var_decl_t;
 
       var_decl_t decl_;
@@ -695,19 +695,19 @@ namespace stan {
 
     struct statement {
       typedef boost::variant<boost::recursive_wrapper<nil>,
-                             boost::recursive_wrapper<assignment>,
-                             boost::recursive_wrapper<assgn>,
-                             boost::recursive_wrapper<sample>,
-                             boost::recursive_wrapper<increment_log_prob_statement>,
-                             boost::recursive_wrapper<expression>,
-                             boost::recursive_wrapper<statements>,
-                             boost::recursive_wrapper<for_statement>,
-                             boost::recursive_wrapper<conditional_statement>,
-                             boost::recursive_wrapper<while_statement>,
-                             boost::recursive_wrapper<print_statement>,
-                             boost::recursive_wrapper<reject_statement>,
-                             boost::recursive_wrapper<return_statement>,
-                             boost::recursive_wrapper<no_op_statement> >
+                     boost::recursive_wrapper<assignment>,
+                     boost::recursive_wrapper<assgn>,
+                     boost::recursive_wrapper<sample>,
+                     boost::recursive_wrapper<increment_log_prob_statement>,
+                     boost::recursive_wrapper<expression>,
+                     boost::recursive_wrapper<statements>,
+                     boost::recursive_wrapper<for_statement>,
+                     boost::recursive_wrapper<conditional_statement>,
+                     boost::recursive_wrapper<while_statement>,
+                     boost::recursive_wrapper<print_statement>,
+                     boost::recursive_wrapper<reject_statement>,
+                     boost::recursive_wrapper<return_statement>,
+                     boost::recursive_wrapper<no_op_statement> >
       statement_t;
 
       statement_t statement_;

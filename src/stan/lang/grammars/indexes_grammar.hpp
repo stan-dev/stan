@@ -72,8 +72,6 @@ namespace stan {
                               expression(var_origin),
                               whitespace_grammar<Iterator> >
       int_expression_r;
-      
-
     };
 
   }

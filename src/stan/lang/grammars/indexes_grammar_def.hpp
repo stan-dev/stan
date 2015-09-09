@@ -52,6 +52,42 @@ namespace stan {
     };
     boost::phoenix::function<set_omni_idx> set_omni_idx_f;
 
+    struct validate_int_expression {
+      template <class> struct result;
+      template <typename F, typename T1, typename T2>
+      struct result<F(T1, T2)> { typedef void type; };
+      void operator()(const expression & e, bool& pass) const {
+        pass = e.expression_type().is_primitive_int();
+      }
+    };
+    boost::phoenix::function<validate_int_expression>
+    validate_int_expression_f;
+
+    struct validate_ints_expression {
+      template <class> struct result;
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1, T2, T3)> { typedef void type; };
+      void operator()(const expression & e, bool& pass,
+                      std::ostream& error_msgs) const {
+        if (e.expression_type().type() != INT_T) {
+          error_msgs << "index must be integer; found type=";
+          write_base_expr_type(error_msgs, e.expression_type().type());
+          error_msgs << std::endl;
+          pass = false;
+        }
+        else if (e.expression_type().num_dims_ != 1) {
+          error_msgs << "index must be integer or integer array"
+                     << " found number of dimensions=" 
+                     << e.expression_type().num_dims_ 
+                     << std::endl;
+          pass = false;
+        } else {
+          pass = true;
+        }
+      }
+    };
+    boost::phoenix::function<validate_ints_expression>
+    validate_ints_expression_f;
 
     template <typename Iterator>
     indexes_grammar<Iterator>::indexes_grammar(variable_map& var_map,
@@ -66,50 +102,54 @@ namespace stan {
       using boost::spirit::qi::_val;
       using boost::spirit::qi::_r1;
       using boost::spirit::qi::_1;
+      using boost::spirit::qi::_pass;
 
       indexes_r.name("indexes (zero or more)");
       indexes_r
         %= -(lit("[")
              > (index_r(_r1) % ',')
              > lit("]"));
-      
-      index_r.name("index expression denoting (int, int[], int:, :int, int:int, :)");
+      index_r.name("index expression denoting, e.g., "
+                   " int, int[], int:, :int, int:int, :)");
       index_r
-        %= uni_index_r(_r1)
-        | multi_index_r(_r1)
-        | omni_index_r(_r1)
+        %= lub_index_r(_r1)
         | lb_index_r(_r1)
+        | uni_index_r(_r1)
+        | multi_index_r(_r1)
         | ub_index_r(_r1)
-        | lub_index_r(_r1);
+        | omni_index_r(_r1);
 
       lub_index_r
-        %= int_expression_r(_r1) 
-        >> lit(":") 
+        %= int_expression_r(_r1)
+        >> lit(":")
         >> int_expression_r(_r1)
         > eps;
-      
+
       lb_index_r
-        %= int_expression_r(_r1) 
+        %= int_expression_r(_r1)
         >> lit(":")
         > eps;
 
-      uni_index_r 
+      uni_index_r
         %= int_expression_r(_r1);
 
       multi_index_r
-        %= expression_g(_r1);  // validate int[]
-      
+        %= expression_g(_r1)
+           [validate_ints_expression_f(_1, _pass, 
+                                       boost::phoenix::ref(error_msgs_))]
+        > eps;
+
       ub_index_r
-        %= lit(":") 
+        %= lit(":")
         >> int_expression_r(_r1)
         > eps;
 
       omni_index_r
-        = -lit(":")[set_omni_idx_f(_val)];
-      
+        = lit(":")[set_omni_idx_f(_val)];
+      // > eps;
+
       int_expression_r
-        %= expression_g(_r1);  // validate int
-      
+        %= expression_g(_r1)[validate_int_expression_f(_1, _pass)];
     }
 
   }

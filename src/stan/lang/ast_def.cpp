@@ -1090,10 +1090,10 @@ namespace stan {
 
 
     is_multi_index_vis::is_multi_index_vis() { }
-    bool is_multi_index_vis::operator()(const uni_idx& i) const { 
-      return false; 
+    bool is_multi_index_vis::operator()(const uni_idx& i) const {
+      return false;
     }
-    bool is_multi_index_vis::operator()(const multi_idx& i) const { 
+    bool is_multi_index_vis::operator()(const multi_idx& i) const {
       return true;
     }
     bool is_multi_index_vis::operator()(const omni_idx& i) const {
@@ -1570,7 +1570,6 @@ namespace stan {
                  const expression& rhs)
       : lhs_var_(lhs_var), idxs_(idxs), rhs_(rhs) { }
 
-    
     expr_type indexed_type(const expression& e,
                            const std::vector<idx> idxs) {
       expr_type e_type = e.expression_type();
@@ -1580,7 +1579,7 @@ namespace stan {
       size_t out_dims = 0U;
       size_t i = 0;
       for ( ; unindexed_dims > 0 && i < idxs.size(); ++i, --unindexed_dims)
-        if (is_multi_index(idxs[i])) 
+        if (is_multi_index(idxs[i]))
           ++out_dims;
       if (idxs.size() - i == 0) {
         return expr_type(base_type, out_dims + unindexed_dims);
