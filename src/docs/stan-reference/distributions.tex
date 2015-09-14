@@ -2,8 +2,11 @@
 
 \chapter{Conventions for Probability Functions}
 
-The probability functions (density or mass, depending on discreteness
-of the variable) are all set up to follow some basic conventions.
+The probability functions (probability density functions for
+continuous outputs and probability mass functions for discrete
+outputs) probability mass, depending on discreteness of the variable)
+are all set up to follow the same basic naming and behavioral
+conventions.
 
 \section{Finite Inputs}
 
@@ -26,6 +29,277 @@ This is true even for (complementary) cumulative distribution
 functions, which will throw exceptions when given input that is out of
 the support.
 
+\section{Pseudorandom Number Generators}
+
+For most of the probability functions, there is a matching
+pseudorandom number generator (PRNG) with the suffix \code{\_rng}.
+For example, the function \code{normal\_rng(real, real)} accepts two
+real arguments, an unconstrained location $\mu$ and positive scale
+$\sigma > 0$, and returns an unconstrained pseudorandom value drawn
+from $\distro{Normal}(\mu,\sigma)$.
+
+\subsection{Generated Quantities Only}
+
+Unlike regular functions, the PRNG functions may only be used in the
+generated quantities block.
+
+\subsection{Not Vectorized}
+
+Unlike the probability functions, the PRNG functions are not
+vectorized.
+
+
+\subsection{Applications of PRNGs}
+
+The main application of PRNGs is for posterior inference, including
+prediction and posterior predictive checks.  They can also be used for
+pure data simulation, which is like a posterior predictive check with
+no conditioning.
+
+\subsubsection{Prediction}
+
+Consider predicting unobserved outcomes using linear
+regression.  Given predictors $x_1, \ldots, x_N$ and observed outcomes
+$y_1,\ldots,y_N$, and assuming a standard linear regression with
+intercept $\alpha$, slope $\beta$, and error scale $\sigma$, along with
+improper uniform priors, the posterior over the parameters given $x$
+and $y$ is
+%
+\[
+p(\alpha, \beta, \sigma \, | \, x, y) 
+\propto 
+\prod_{n=1}^N 
+  \distro{Normal}(y_n \, | \, \alpha + \beta x_n, \sigma).
+\]
+%
+For this model, the posterior predictive inference for a new outcome
+$\tilde{y}_m$ given a predictor $\tilde{x}_m$, conditioned on the
+observed data $x$ and $y$, is
+\[
+p(\tilde{y}_n \, | \, \tilde{x}_n, x, y)
+= \int_{(\alpha,\beta,\sigma)}
+  \distro{Normal}(\tilde{y}_n \, | \, \alpha + \beta \tilde{x}_n, \sigma)
+  \times
+  p(\alpha, \beta, \sigma \, | \, x, y) 
+  \
+  \mathrm{d}(\alpha,\beta,\sigma).
+\]
+%
+To code the posterior predictive inference in Stan, a standard linear
+regression is combined with a random number in the generated
+quantities block.
+%
+\begin{stancode}
+data {
+  int<lower=0> N;
+  vector[N] y;
+  vector[N] x;
+  int<lower=0> N_tilde;
+  vector[N_tilde] x_tilde;
+}
+parameters {
+  real alpha;
+  real beta;
+  real<lower=0> sigma;
+}
+model {
+  y ~ normal(alpha + beta * x, sigma);
+}
+generated quantities {
+  vector[N_tilde] y_tilde;
+  for (n in 1:N_tilde)
+    y_tilde[n] <- normal_rng(alpha + beta * x[n], sigma);
+}
+\end{stancode}
+%
+Given observed predictors $x$ and outcomes $y$, \code{y\_tilde} will
+be drawn according to $p(\tilde{y} \, | \, \tilde{x}, y, x)$.  This
+means that, for example, the posterior mean for \code{y\_tilde} is the
+estimate of the outcome that minimizes expected square error
+(conditioned on the data and model, of course).
+
+\subsubsection{Posterior Predictive Checks}
+
+A good way to investigate the fit of a model to the data, a critical
+step in Bayesian data analysis, is to generate simulated data
+according to the parameters of the model.  This is carried out with
+exactly the same procedure as before, only the observed data
+predictors $x$ are used in place of new predictors $\tilde{x}$ for
+unobserved outcomes.  If the model fits the data well, the predictions
+for $\tilde{y}$ based on $x$ should match the observed data $y$.
+
+To code posterior predictive checks in Stan requires only a slight
+modification of the prediction code to use $x$ and $N$ in place of
+$\tilde{x}$ and $\tilde{N}$,
+%
+\begin{stancode}
+generated quantities {
+  vector[N] y_tilde;
+  for (n in 1:N)
+    y_tilde <- normal_rng(alpha + beta * x[n], sigma);
+}
+\end{stancode}
+%
+\cite{GelmanEtAl:2013} recommend choosing several posterior draws
+$\tilde{y}^{(1)}, \ldots, \tilde{y}^{(M)}$ and plotting each of them
+alongside the data $y$ that was actually observed.  If the model fits
+well, the simulated $\tilde{y}$ will look like the actual data $y$.
+
+
+\section{Cumulative Distribution Functions}
+
+For most of the univariate probability functions, there is a
+corresponding cumulative distribution function, log cumulative
+distribution function, and log complementary cumulative distribution
+function.
+
+For a univariate random variable $Y$ with probability function $p_Y(y \,
+| \, \theta)$, the cumulative distribution function (CDF) $F_Y$ is
+defined by
+\[
+F_Y(y) 
+\ = \
+\mbox{Pr}[Y < y] 
+\ = \
+\int_0^y p(y \, | \, \theta) \ \mathrm{d}\theta.
+\]
+The complementary cumulative distribution function (CCDF) is defined
+as 
+\[
+\mbox{Pr}[Y \geq y]
+\ = \
+1 - F_Y(y).
+\]
+The reason to use CCDFs instead of CDFs in floating-point arithmetic
+is that it is possible to represent numbers very close to 0 (the
+closest you can get is roughly $10^{-300}$), but not numbers very close
+to 1 (the closest you can get is roughly $1 - 10^{-15}$).
+
+In Stan, there is a cumulative distribution function for each
+probability function.  For instance, \code{normal\_cdf(y,~mu,~sigma)}
+is defined by 
+%
+\[
+\int_0^y \distro{Normal}(y \, | \, \mu, \sigma) \ \mathrm{d}y.
+\]
+%
+There are also log forms of the CDF and CCDF for most univariate
+distributions.  For example, \code{normal\_cdf\_log(y,~mu,~sigma)} is
+defined by
+%
+\[
+\log \left( \int_0^y \distro{Normal}(y \, | \, \mu, \sigma) \
+  \mathrm{d}y \right)
+\]
+%
+and \code{normal\_ccdf\_log(y,~mu,~sigma)} is defined by
+%
+\[
+\log \left( 1 - \int_0^y \distro{Normal}(y \, | \, \mu, \sigma) \
+  \mathrm{d}y \right).
+\]
+
+
+\section{Vectorization}\label{vectorization.section}
+
+\noindent
+Stan's univariate log probability functions, including the log density
+functions, log mass functions, log CDFs, and log CCDFs, all support vectorized
+function application, with results defined to be the sum of the
+elementwise application of the function.
+
+In all cases, matrix operations are at least as fast and usually
+faster than loops and vectorized log probability functions are faster
+than their equivalent form defined with loops.  This isn't because
+loops are slow in Stan, but because more efficient automatic
+differentiation can be used.  The efficiency comes from the fact that
+a vectorized log probably function only introduces one new node into
+the expression graph, thus reducing the number of virtual function
+calls required to compute gradients in \Cpp, as well as from allowing
+caching of repeated computations.
+
+Stan also overloads the multivariate normal distribution, including
+the Cholesky-factor form, allowing arrays of row vectors or vectors
+for the variate and location parameter.  This is a huge savings in
+speed because the work required to solve the linear system for the
+covariance matrix is only done once.
+
+Stan also overloads some scalar functions, such as \code{log} and
+\code{exp}, to apply to vectors (arrays) and return vectors (arrays).  
+These vectorizations are defined elementwise and unlike the
+probability functions, provide only minimal efficiency speedups over
+repeated application and assignment in a loop.
+
+
+\subsection{Vectorized Function Signatures}\label{prob-vectorization.section}
+
+\subsubsection{Vectorized Scalar Arguments}
+
+The normal probability function is specified with the signature
+%
+\begin{stancode}
+normal_log(reals, reals, reals);
+\end{stancode}
+%
+The pseudo-type \code{reals} is used to indicate that an argument
+position may be vectorized.  Argument positions declared as
+\code{reals} may be filled with a real, a one-dimensional array, a
+vector, or a row-vector.  If there is more than one array or vector
+argument, their types can be anything but their size must match.  For
+instance, it is legal to use
+\code{normal\_log(row\_vector,~vector,~real)} as long as the vector and
+row vector have the same size.  
+
+\subsubsection{Vectorized Vector and Row Vector Arguments}
+
+The multivariate normal distribution accepting vector or array of
+vector arguments is written as
+%
+\begin{stancode}
+multi_normal_log(vectors, vectors, matrix);
+\end{stancode}
+%
+These arguments may be row vectors, column vectors, or arrays of row
+vectors or column vectors.
+
+\subsubsection{Vectorized Integer Arguments}
+
+The pseudo-type \code{ints} is used for vectorized integer arguments.
+Where it appears either an integer or array of integers may be used.
+
+
+\subsection{Evaluating Vectorized Functions}
+
+The result of a vectorized log probability function is equivalent to
+the sum of the evaluations on each element.  Any non-vector argument,
+namely \code{real} or \code{int}, is repeated.  For instance, if
+\code{y} is a vector of size \code{N}, \code{mu} is a vector of size
+\code{N}, and \code{sigma} is a scalar, then
+%
+\begin{stancode}
+ll <- normal_log(y, mu, sigma);
+\end{stancode}
+%
+is just a more efficient way to write
+%
+\begin{stancode}
+ll <- 0;
+for (n in 1:N)
+  ll <- ll + normal_log(y[n], mu[n], sigma);
+\end{stancode}
+%
+With the same arguments, the vectorized sampling statement
+%
+\begin{stancode}
+y ~ normal(mu, sigma);
+\end{stancode}
+%
+has the same effect on the total log probability as
+%
+\begin{stancode}
+for (n in 1:N)
+  y[n] ~ normal(mu[n], sigma);
+\end{stancode}
 
 
 
@@ -762,7 +1036,7 @@ where the multinomial coefficient is defined by
     distribution parameter \farg{theta} and (implicit) total count
     \code{N = sum(\farg{y})}}
 %
-\fitem{vector}{multinomial\_rng}{vector \farg{theta}, int \farg{N}}{Generate a
+\fitem{int[]}{multinomial\_rng}{vector \farg{theta}, int \farg{N}}{Generate a
   multinomial variate with simplex distribution parameter \farg{theta} and 
   total count \farg{N}; may only be used in generated quantities block}
 \end{description}
@@ -1038,6 +1312,10 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in \reals$,
   \exp \left( - \, \frac{|y - \mu|}{\sigma} \right)
 .
 \]
+Note that the double exponential distribution is parameterized in
+terms of the scale, in contrast to the exponential distribution (see
+\refsection{exponential-distribution}), which is parameterized in
+terms of inverse scale.
 
 \pitem{y}{double\_exponential}{mu, sigma}
 
@@ -1372,7 +1650,7 @@ quantities block}
 \end{description}
 
 
-\section{Exponential Distribution}
+\section{Exponential Distribution}\label{exponential-distribution.section}
 
 \subsubsection{Probability Density Function}
 
