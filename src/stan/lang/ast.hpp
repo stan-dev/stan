@@ -847,6 +847,8 @@ namespace stan {
     // FIXME:  is this next dependency necessary?
     // from generator.hpp
     void generate_expression(const expression& e, std::ostream& o);
+    void generate_expression(const expression& e, bool user_facing,
+                             std::ostream& o);
 
     bool has_rng_suffix(const std::string& s);
     bool has_lp_suffix(const std::string& s);

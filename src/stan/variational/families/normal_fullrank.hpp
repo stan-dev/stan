@@ -282,10 +282,10 @@ namespace stan {
           } catch (std::exception& e) {
             this->write_error_msg_(print_stream, e);
             n_monte_carlo_drop += 1;
-            if (n_monte_carlo_drop >= n_monte_carlo_grad) {
+            if (n_monte_carlo_drop >= 5*n_monte_carlo_grad) {
               const char* name = "The number of dropped evaluations";
               const char* msg1 = "has reached its maximum amount (";
-              int y = n_monte_carlo_grad;
+              int y = 5*n_monte_carlo_grad;
               const char* msg2 = "). Your model may be either severely "
                 "ill-conditioned or misspecified.";
               stan::math::domain_error(function, name, y, msg1, msg2);

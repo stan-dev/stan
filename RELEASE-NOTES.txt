@@ -1,5 +1,31 @@
 STAN C++ RELEASE NOTES
 ======================================================================
+v2.8.0 (8 Sep 2015)
+======================================================================
+New Team Members
+--------------------------------------------------
+* Dustin Tran, helps make variational inference a reality
+
+New Features
+--------------------------------------------------
+* Inverse CDF for normal distribution (#1157)
+* Compiler error messages are friendlier
+  - operator[] (#1517)
+  - assignment (#1543, stan-dev/math#146)
+* Sparse matrix by dense vector multiplication (#1565)
+
+Bug Fixes
+--------------------------------------------------
+* Disallow user-defiend function overloading (#1547)
+* Better behaved beta cdf (#1561, stan-dev/math#124)
+
+Manual
+--------------------------------------------------
+* Corrected all known bug reports and typos; details in
+  issues #1526, #1548, #1577
+* Thanks to @jonathan-g (Github handle), Damjan Vukcevic,
+  Daniel Chen, Guido Biele, Takahiro Kubo, Andy Choi
+
 
 v2.7.0 (9 July 2015)
 ======================================================================
