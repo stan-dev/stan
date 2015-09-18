@@ -34,6 +34,7 @@ namespace stan {
     struct identifier;
     struct increment_log_prob_statement;
     struct index_op;
+    struct index_op_sliced;
     struct int_literal;
     struct inv_var_decl;
     struct matrix_var_decl;
@@ -207,6 +208,7 @@ namespace stan {
       expr_type operator()(const fun& e) const;
       expr_type operator()(const integrate_ode& e) const;
       expr_type operator()(const index_op& e) const;
+      expr_type operator()(const index_op_sliced& e) const;
       expr_type operator()(const binary_op& e) const;
       expr_type operator()(const unary_op& e) const;
       // template <typename T> expr_type operator()(const T& e) const;
@@ -224,6 +226,7 @@ namespace stan {
                              boost::recursive_wrapper<integrate_ode>,
                              boost::recursive_wrapper<fun>,
                              boost::recursive_wrapper<index_op>,
+                             boost::recursive_wrapper<index_op_sliced>,
                              boost::recursive_wrapper<binary_op>,
                              boost::recursive_wrapper<unary_op> >
       expression_t;
@@ -240,6 +243,7 @@ namespace stan {
       expression(const fun& expr);
       expression(const integrate_ode& expr);
       expression(const index_op& expr);
+      expression(const index_op_sliced& expr);
       expression(const binary_op& expr);
       expression(const unary_op& expr);
       expression(const expression_t& expr_);
@@ -279,6 +283,7 @@ namespace stan {
       bool operator()(const integrate_ode& x) const;
       bool operator()(const fun& x) const;
       bool operator()(const index_op& x) const;
+      bool operator()(const index_op_sliced& x) const;
       bool operator()(const binary_op& x) const;
       bool operator()(const unary_op& x) const;
 
@@ -381,7 +386,6 @@ namespace stan {
       void infer_type();
     };
 
-
     struct binary_op {
       std::string op;
       expression left;
@@ -452,8 +456,13 @@ namespace stan {
       idx_t;
 
       idx();
-      template <typename T>
-      idx(const T& i);
+
+      idx(const uni_idx& i);
+      idx(const multi_idx& i);
+      idx(const omni_idx& i);
+      idx(const lb_idx& i);
+      idx(const ub_idx& i);
+      idx(const lub_idx& i);
 
       idx_t idx_;
     };
@@ -469,6 +478,17 @@ namespace stan {
     };
 
     bool is_multi_index(const idx& idx);
+
+    struct index_op_sliced {
+      expression expr_;
+      std::vector<idx> idxs_;
+      expr_type type_;
+      index_op_sliced();
+      // vec of vec for e.g., e[1,2][3][4,5,6]
+      index_op_sliced(const expression& expr,
+                      const std::vector<idx>& idxs);
+      void infer_type();
+    };
 
     typedef int var_origin;
     const int model_name_origin = 0;
@@ -954,6 +974,7 @@ namespace stan {
       bool operator()(const integrate_ode& e) const;
       bool operator()(const fun& e) const;
       bool operator()(const index_op& e) const;
+      bool operator()(const index_op_sliced& e) const;
       bool operator()(const binary_op& e) const;
       bool operator()(const unary_op& e) const;
     };
@@ -973,6 +994,7 @@ namespace stan {
       bool operator()(const integrate_ode& e) const;
       bool operator()(const fun& e) const;
       bool operator()(const index_op& e) const;
+      bool operator()(const index_op_sliced& e) const;
       bool operator()(const binary_op& e) const;
       bool operator()(const unary_op& e) const;
     };

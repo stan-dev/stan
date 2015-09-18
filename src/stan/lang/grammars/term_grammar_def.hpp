@@ -23,6 +23,7 @@
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/grammars/expression_grammar.hpp>
+#include <stan/lang/grammars/indexes_grammar.hpp>
 #include <stan/lang/grammars/term_grammar.hpp>
 #include <stan/lang/grammars/whitespace_grammar.hpp>
 
@@ -42,6 +43,10 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::index_op,
                           (stan::lang::expression, expr_)
                           (std::vector<std::vector<stan::lang::expression> >,
                            dimss_) )
+
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::index_op_sliced,
+                          (stan::lang::expression, expr_)
+                          (std::vector<stan::lang::idx>, idxs_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::integrate_ode,
                           (std::string, system_function_name_)
@@ -271,8 +276,6 @@ namespace stan {
                 && fun.args_[1].expression_type().is_primitive_int()) {
               fun.name_ = "std::" + fun.name_;
             }
-            // TODO(carpenter): else condition
-            // to add max(real,real) and min(real,real)
           }
         }
 
@@ -732,7 +735,8 @@ namespace stan {
       : term_grammar::base_type(term_r),
         var_map_(var_map),
         error_msgs_(error_msgs),
-        expression_g(eg) {
+        expression_g(eg),
+        indexes_g(var_map, error_msgs, eg) {
       using boost::spirit::qi::_1;
       using boost::spirit::qi::_a;
       using boost::spirit::qi::_b;
@@ -802,6 +806,16 @@ namespace stan {
              (lit("'")
               > eps[transpose_f(_val, _pass,
                                 boost::phoenix::ref(error_msgs_))]));
+
+      // TODO(carpenter): redo as indexed_factor_r 
+      // allow multiple [][] not in one go but natural recursion
+      idx_factor_r.name("expression");
+      idx_factor_r
+        %= ( factor_r(_r1)
+             >> indexes_g(_r1)
+             > eps )
+        | factor_r(_r1);
+      
       integrate_ode_r.name("expression");
       integrate_ode_r
         %= (lit("integrate_ode") >> no_skip[!char_("a-zA-Z0-9_")])

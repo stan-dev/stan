@@ -25,6 +25,9 @@ namespace stan {
     struct expression07_grammar;
 
     template <typename Iterator>
+    struct indexes_grammar;
+
+    template <typename Iterator>
     struct expression_grammar
       : public boost::spirit::qi::grammar<Iterator,
                                           expression(var_origin),

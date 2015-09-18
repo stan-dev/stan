@@ -665,6 +665,9 @@ namespace stan {
     expr_type expression_type_vis::operator()(const index_op& e) const {
       return e.type_;
     }
+    expr_type expression_type_vis::operator()(const index_op_sliced& e) const {
+      return e.type_;
+    }
     expr_type expression_type_vis::operator()(const binary_op& e) const {
       return e.type_;
     }
@@ -694,6 +697,7 @@ namespace stan {
     expression::expression(const integrate_ode& expr) : expr_(expr) { }
     expression::expression(const fun& expr) : expr_(expr) { }
     expression::expression(const index_op& expr) : expr_(expr) { }
+    expression::expression(const index_op_sliced& expr) : expr_(expr) { }
     expression::expression(const binary_op& expr) : expr_(expr) { }
     expression::expression(const unary_op& expr) : expr_(expr) { }
 
@@ -754,6 +758,9 @@ namespace stan {
         || boost::apply_visitor(*this, e.theta_.expr_);
     }
     bool contains_var::operator()(const index_op& e) const {
+      return boost::apply_visitor(*this, e.expr_.expr_);
+    }
+    bool contains_var::operator()(const index_op_sliced& e) const {
       return boost::apply_visitor(*this, e.expr_.expr_);
     }
     bool contains_var::operator()(const binary_op& e) const {
@@ -844,6 +851,9 @@ namespace stan {
     bool contains_nonparam_var::operator()(const index_op& e) const {
       return boost::apply_visitor(*this, e.expr_.expr_);
     }
+    bool contains_nonparam_var::operator()(const index_op_sliced& e) const {
+      return boost::apply_visitor(*this, e.expr_.expr_);
+    }
     bool contains_nonparam_var::operator()(const binary_op& e) const {
       if (e.op == "||"
           || e.op == "&&"
@@ -885,6 +895,9 @@ namespace stan {
     }
     bool is_nil_op::operator()(const fun& /* x */) const { return false; }
     bool is_nil_op::operator()(const index_op& /* x */) const { return false; }
+    bool is_nil_op::operator()(const index_op_sliced& /* x */) const { 
+      return false; 
+    }
     bool is_nil_op::operator()(const binary_op& /* x */) const { return false; }
     bool is_nil_op::operator()(const unary_op& /* x */) const { return false; }
 
@@ -1031,6 +1044,14 @@ namespace stan {
       type_ = infer_type_indexing(expr_, total_dims(dimss_));
     }
 
+    index_op_sliced::index_op_sliced() { }
+    index_op_sliced::index_op_sliced(const expression& expr,
+                                     const std::vector<idx>& idxs)
+      : expr_(expr), idxs_(idxs), type_(indexed_type(expr_, idxs_)) { }
+    void index_op_sliced::infer_type() {
+      type_ = indexed_type(expr_, idxs_);
+    }
+
     binary_op::binary_op() { }
     binary_op::binary_op(const expression& left,
                          const std::string& op,
@@ -1085,8 +1106,12 @@ namespace stan {
 
     idx::idx() { }
 
-    template <typename T>
-    idx::idx(const T& idx) : idx_(idx) { }
+    idx::idx(const uni_idx& i) : idx_(i) { }
+    idx::idx(const multi_idx& i) : idx_(i) { }
+    idx::idx(const omni_idx& i) : idx_(i) { }
+    idx::idx(const lb_idx& i) : idx_(i) { }
+    idx::idx(const ub_idx& i) : idx_(i) { }
+    idx::idx(const lub_idx& i) : idx_(i) { }
 
 
     is_multi_index_vis::is_multi_index_vis() { }

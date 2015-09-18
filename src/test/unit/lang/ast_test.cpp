@@ -747,7 +747,23 @@ TEST(langAst, idxs111) {
   test_recover(MATRIX_T, 2U, MATRIX_T, 2U, idxs);
 }
 
+TEST(langAst, indexOpSliced) {
+  using stan::lang::index_op_sliced;
+  
+  vector<idx> idxs;
+  idxs.push_back(omni_idx());
+  idxs.push_back(uni_idx(expression(int_literal(3))));
 
+  // no need to retest all of type inference here --- just that it's plumbed
+  index_op_sliced ios;
+  stan::lang::variable v("foo");
+  v.set_type(VECTOR_T, 1U);
+  ios.expr_ = v;
+  ios.idxs_ = idxs;
+  ios.infer_type();
+  EXPECT_EQ(DOUBLE_T, ios.type_.base_type_);
+  EXPECT_EQ(1U, ios.type_.num_dims_);
+}
 
 
 

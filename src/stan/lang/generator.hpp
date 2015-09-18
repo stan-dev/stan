@@ -179,6 +179,9 @@ namespace stan {
       }
     }
 
+    void generate_idxs(const std::vector<idx>& idxs,
+                       std::ostream& o);
+
     struct expression_visgen : public visgen {
       const bool user_facing_;
       explicit expression_visgen(std::ostream& o, bool user_facing)
@@ -225,6 +228,13 @@ namespace stan {
             indexes.push_back(x.dimss_[i][j]);  // wasteful copy, could use refs
         generate_indexed_expr<false>(expr_string, indexes, base_type,
                                      e_num_dims, user_facing_, o_);
+      }
+      void operator()(const index_op_sliced& x) const {
+        o_ << "stan::model::rvalue(";
+        generate_expression(x.expr_, o_);
+        o_ << ", ";
+        generate_idxs(x.idxs_, o_);
+        o_ << ")";
       }
       void operator()(const integrate_ode& fx) const {
         o_ << "integrate_ode("
@@ -1668,7 +1678,7 @@ namespace stan {
       boost::apply_visitor(vis, i.idx_);
     }
 
-    void generate_idxs(int pos, const std::vector<idx>& idxs,
+    void generate_idxs(size_t pos, const std::vector<idx>& idxs,
                        std::ostream& o) {
       if (pos == idxs.size()) {
         o << "nil_index_list()";

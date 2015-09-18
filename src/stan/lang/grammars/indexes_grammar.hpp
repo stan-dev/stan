@@ -4,6 +4,7 @@
 #include <boost/spirit/include/qi.hpp>
 
 #include <stan/lang/ast.hpp>
+#include <stan/lang/grammars/expression_grammar.hpp>
 #include <stan/lang/grammars/whitespace_grammar.hpp>
 
 #include <string>
@@ -14,13 +15,16 @@ namespace stan {
   namespace lang {
 
     template <typename Iterator>
+    struct expression_grammar;
+
+    template <typename Iterator>
     struct indexes_grammar
       : boost::spirit::qi::grammar<Iterator,
                                    std::vector<idx>(var_origin),
                                    whitespace_grammar<Iterator> > {
       variable_map& var_map_;
       std::stringstream& error_msgs_;
-      stan::lang::expression_grammar<Iterator>& expression_g;
+      expression_grammar<Iterator>& expression_g;
 
       indexes_grammar(variable_map& var_map,
                       std::stringstream& error_msgs,

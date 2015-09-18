@@ -5,6 +5,7 @@
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/grammars/expression_grammar.hpp>
+#include <stan/lang/grammars/indexes_grammar.hpp>
 #include <stan/lang/grammars/whitespace_grammar.hpp>
 
 #include <string>
@@ -31,9 +32,12 @@ namespace stan {
                    expression_grammar<Iterator>& eg);
 
       variable_map& var_map_;
+
       std::stringstream& error_msgs_;
 
       stan::lang::expression_grammar<Iterator>& expression_g;
+
+      stan::lang::indexes_grammar<Iterator> indexes_g;
 
       boost::spirit::qi::rule<Iterator,
                               std::vector<expression>(var_origin),
@@ -88,6 +92,10 @@ namespace stan {
                               whitespace_grammar<Iterator> >
       indexed_factor_r;
 
+      boost::spirit::qi::rule<Iterator,
+                              expression(var_origin),
+                              whitespace_grammar<Iterator> >
+      idx_factor_r;
 
       boost::spirit::qi::rule<Iterator,
                               int_literal(),

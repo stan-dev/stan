@@ -54,10 +54,16 @@ namespace stan {
 
     struct validate_int_expression {
       template <class> struct result;
-      template <typename F, typename T1, typename T2>
-      struct result<F(T1, T2)> { typedef void type; };
-      void operator()(const expression & e, bool& pass) const {
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1, T2, T3)> { typedef void type; };
+      void operator()(const expression & e, bool& pass,
+                      std::ostream& error_msgs) const {
         pass = e.expression_type().is_primitive_int();
+        if (!pass) {
+          error_msgs << "Expected integer expression; found type=";
+          write_base_expr_type(error_msgs, e.expression_type().type());
+          error_msgs << std::endl;
+        }
       }
     };
     boost::phoenix::function<validate_int_expression>
@@ -69,6 +75,7 @@ namespace stan {
       struct result<F(T1, T2, T3)> { typedef void type; };
       void operator()(const expression & e, bool& pass,
                       std::ostream& error_msgs) const {
+        std::cout << std::endl << "validating INT_T" << std::endl << std::endl;
         if (e.expression_type().type() != INT_T) {
           error_msgs << "index must be integer; found type=";
           write_base_expr_type(error_msgs, e.expression_type().type());
@@ -106,9 +113,10 @@ namespace stan {
 
       indexes_r.name("indexes (zero or more)");
       indexes_r
-        %= -(lit("[")
-             > (index_r(_r1) % ',')
-             > lit("]"));
+        %=  lit("[")
+        > (index_r(_r1) % ',')
+        > lit("]");
+
       index_r.name("index expression denoting, e.g., "
                    " int, int[], int:, :int, int:int, :)");
       index_r
@@ -149,7 +157,9 @@ namespace stan {
       // > eps;
 
       int_expression_r
-        %= expression_g(_r1)[validate_int_expression_f(_1, _pass)];
+        %= expression_g(_r1)
+           [validate_int_expression_f(_1, _pass,
+                                      boost::phoenix::ref(error_msgs_))];
     }
 
   }
