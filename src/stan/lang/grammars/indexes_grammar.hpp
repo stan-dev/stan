@@ -68,7 +68,7 @@ namespace stan {
 
 
       boost::spirit::qi::rule<Iterator,
-                              ub_idx(var_origin),
+                              lub_idx(var_origin),
                               whitespace_grammar<Iterator> >
       lub_index_r;
 

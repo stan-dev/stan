@@ -1642,30 +1642,30 @@ namespace stan {
     struct idx_visgen : public visgen {
       explicit idx_visgen(std::ostream& o): visgen(o) { }
       void operator()(const uni_idx& i) const {
-        o_ << "index_uni(";
+        o_ << "stan::model::index_uni(";
         generate_expression(i.idx_, o_);
         o_ << ")";
       }
       void operator()(const multi_idx& i) const {
-        o_ << "index_multi(";
+        o_ << "stan::model::index_multi(";
         generate_expression(i.idxs_, o_);
         o_ << ")";
       }
       void operator()(const omni_idx& i) const {
-        o_ << "index_omni()";
+        o_ << "stan::model::index_omni()";
       }
       void operator()(const lb_idx& i) const {
-        o_ << "index_min(";
+        o_ << "stan::model::index_min(";
         generate_expression(i.lb_, o_);
         o_ << ")";
       }
       void operator()(const ub_idx& i) const {
-        o_ << "index_max(";
+        o_ << "stan::model::index_max(";
         generate_expression(i.ub_, o_);
         o_ << ")";
       }
       void operator()(const lub_idx& i) const {
-        o_ << "index_min_max(";
+        o_ << "stan::model::index_min_max(";
         generate_expression(i.lb_, o_);
         o_ << ", ";
         generate_expression(i.ub_, o_);
@@ -1681,9 +1681,9 @@ namespace stan {
     void generate_idxs(size_t pos, const std::vector<idx>& idxs,
                        std::ostream& o) {
       if (pos == idxs.size()) {
-        o << "nil_index_list()";
+        o << "stan::model::nil_index_list()";
       } else {
-        o << "cons_list(";
+        o << "stan::model::cons_list(";
         generate_idx(idxs[pos], o);
         o << ", ";
         generate_idxs(pos + 1, idxs, o);

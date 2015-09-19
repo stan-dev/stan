@@ -87,13 +87,14 @@ namespace stan {
 
 
       boost::spirit::qi::rule<Iterator,
-                              expression(var_origin),
- boost::spirit::qi::locals<std::vector<std::vector<stan::lang::expression> > >,
-                              whitespace_grammar<Iterator> >
+          expression(var_origin),
+          boost::spirit::qi::locals<std::vector<std::vector<expression> > >,
+          whitespace_grammar<Iterator> >
       indexed_factor_r;
 
       boost::spirit::qi::rule<Iterator,
                               expression(var_origin),
+                              boost::spirit::qi::locals<std::vector<idx> >,
                               whitespace_grammar<Iterator> >
       idx_factor_r;
 
