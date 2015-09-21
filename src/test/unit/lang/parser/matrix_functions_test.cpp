@@ -1,6 +1,24 @@
 #include <gtest/gtest.h>
 #include <test/unit/lang/utility.hpp>
 
+
+TEST(lang_parser, csr_extract_w_function_signatures) {
+  test_parsable("function-signatures/math/matrix/csr_extract_w");
+}
+TEST(lang_parser, csr_extract_v_function_signatures) {
+  test_parsable("function-signatures/math/matrix/csr_extract_v");
+}
+TEST(lang_parser, csr_extract_u_function_signatures) {
+  test_parsable("function-signatures/math/matrix/csr_extract_u");
+}
+TEST(lang_parser, csr_matrix_times_vector_function_signatures) {
+  test_parsable("function-signatures/math/matrix/csr_matrix_times_vector");
+}
+TEST(lang_parser, csr_to_dense_matrix_function_signatures) {
+  test_parsable("function-signatures/math/matrix/csr_to_dense_matrix");
+}
+
+
 TEST(lang_parser, append_col_matrix_function_signatures) {
   test_parsable("function-signatures/math/matrix/append_col");
 }
