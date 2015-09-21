@@ -190,7 +190,7 @@ namespace stan {
 
         // Sequence of eta values to try during tuning
         std::queue<double> eta_sequence;
-        eta_sequence.push(10.000);
+        // eta_sequence.push(10.000);
         eta_sequence.push( 1.000);
         eta_sequence.push( 0.100);
         eta_sequence.push( 0.010);
@@ -215,6 +215,7 @@ namespace stan {
           double eta = eta_sequence.front();
           eta_sequence.pop();
 
+          bool grad_failed = false;
           for (int iter_tune = 1; iter_tune <= tuning_iter; ++iter_tune) {
             m = (eta_sequence_size - eta_sequence.size() - 1)
               * tuning_iter + iter_tune; // # of total tuning iterations
@@ -223,7 +224,12 @@ namespace stan {
               tuning_iter, true, "", "", *print_stream_);
 
             // Compute gradient of ELBO
-            calc_ELBO_grad(variational, elbo_grad);
+            if (!calc_ELBO_grad(variational, elbo_grad)) {
+              std::cout << "eta: " << eta << " caused us trouble." << std::endl;
+              eta_sequence.push(eta);
+              grad_failed = true;
+              break;
+            }
 
             // Update learning rate parameters
             if (iter_tune == 1) {
@@ -237,50 +243,54 @@ namespace stan {
             // Stochastic gradient update
             variational += eta_scaled * elbo_grad / (tau + params_prop.sqrt());
           }
-          elbo = calc_ELBO(variational);
 
-          // Check if:
-          // (1) ELBO at current eta is worse than the best ELBO
-          // (2) the best ELBO hasn't actually diverged
-          if (elbo < elbo_best && elbo_best > elbo_init) {
-            if (print_stream_) {
-              *print_stream_ << "Success!"
-                << " Found best tuned hyperparameter"
-                << " [eta = " << eta_best
-                << "]";
-              if (eta_sequence.size() > 0) {
-                *print_stream_
-                  << " earlier than expected.";
+          if (!grad_failed) {
+
+            // Check if:
+            // (1) ELBO at current eta is worse than the best ELBO
+            // (2) the best ELBO hasn't actually diverged
+            elbo = calc_ELBO(variational);
+
+            if (elbo < elbo_best && elbo_best > elbo_init) {
+              if (print_stream_) {
+                *print_stream_ << "Success!"
+                  << " Found best tuned hyperparameter"
+                  << " [eta = " << eta_best
+                  << "]";
+                if (eta_sequence.size() > 0) {
+                  *print_stream_
+                    << " earlier than expected.";
+                }
+                *print_stream_ << std::endl << std::endl;
               }
-              *print_stream_ << std::endl << std::endl;
-            }
-            do_more_tuning = false;
-          } else {
-            if (eta_sequence.size() > 0) {
-              // Restart phase
-              elbo_best = elbo;
-              eta_best = eta;
+              do_more_tuning = false;
             } else {
-              // No more eta values to try, so use current eta if it
-              // didn't diverge or fail if it did diverge
-              if (elbo > elbo_init) {
-                if (print_stream_)
-                  *print_stream_ << "Success!"
-                    << " Found best tuned hyperparameter"
-                    << " [eta = " << eta_best
-                    << "]" << std::endl << std::endl;
+              if (eta_sequence.size() > 0) {
+                // Restart phase
+                elbo_best = elbo;
                 eta_best = eta;
-                do_more_tuning = false;
               } else {
-                const char* name = "All proposed step-sizes";
-                const char* msg1 = "failed. Your model may be either "
-                  "severely ill-conditioned or misspecified.";
-                stan::math::domain_error(function, name, "", msg1);
-                return 0;
+                // No more eta values to try, so use current eta if it
+                // didn't diverge or fail if it did diverge
+                if (elbo > elbo_init) {
+                  if (print_stream_)
+                    *print_stream_ << "Success!"
+                      << " Found best tuned hyperparameter"
+                      << " [eta = " << eta_best
+                      << "]" << std::endl << std::endl;
+                  eta_best = eta;
+                  do_more_tuning = false;
+                } else {
+                  const char* name = "All proposed step-sizes";
+                  const char* msg1 = "failed. Your model may be either "
+                    "severely ill-conditioned or misspecified.";
+                  stan::math::domain_error(function, name, "", msg1);
+                  return 0;
+                }
               }
+              // Reset
+              params_prop = Q(model_.num_params_r());
             }
-            // Reset
-            params_prop = Q(model_.num_params_r());
           }
           variational = Q(cont_params_);
         }
