@@ -243,7 +243,7 @@ namespace stan {
        * @param print_stream          stream for convergence assessment output
        */
       template <class M, class BaseRNG>
-      void calc_grad(normal_fullrank& elbo_grad,
+      bool calc_grad(normal_fullrank& elbo_grad,
                      M& m,
                      Eigen::VectorXd& cont_params,
                      int n_monte_carlo_grad,
@@ -297,7 +297,8 @@ namespace stan {
               int y = 5*n_monte_carlo_grad;
               const char* msg2 = "). Your model may be either severely "
                 "ill-conditioned or misspecified.";
-              stan::math::domain_error(function, name, y, msg1, msg2);
+              // stan::math::domain_error(function, name, y, msg1, msg2);
+              return false;
             }
           }
         }
@@ -310,6 +311,8 @@ namespace stan {
         // Set parameters to argument
         elbo_grad.set_mu(mu_grad);
         elbo_grad.set_L_chol(L_grad);
+
+        return true;
       }
     };
 

@@ -139,7 +139,7 @@ namespace stan {
        * @param elbo_grad   gradient of ELBO with respect to
        *                    variational parameters
        */
-      void calc_ELBO_grad(const Q& variational, Q& elbo_grad) const {
+      bool calc_ELBO_grad(const Q& variational, Q& elbo_grad) const {
         static const char* function =
           "stan::variational::advi::calc_ELBO_grad";
 
@@ -150,33 +150,8 @@ namespace stan {
                         "Dimension of variational q", variational.dimension(),
                         "Dimension of variables in model", cont_params_.size());
 
-        variational.calc_grad(elbo_grad,
+        return variational.calc_grad(elbo_grad,
                               model_, cont_params_, n_monte_carlo_grad_, rng_,
-                              print_stream_);
-      }
-
-      /**
-       * Calculates the "black box" gradient of the ELBO.
-       *
-       * @param variational          variational distribution
-       * @param elbo_grad            gradient of ELBO with respect to
-       *                             variational parameters
-       * @param n_monte_carlo_grad   number of monte carlo samples for gradient
-       */
-      void calc_ELBO_grad(const Q& variational, Q& elbo_grad,
-        int n_monte_carlo_grad) const {
-        static const char* function =
-          "stan::variational::advi::calc_ELBO_grad";
-
-        stan::math::check_size_match(function,
-                        "Dimension of elbo_grad", elbo_grad.dimension(),
-                        "Dimension of variational q", variational.dimension());
-        stan::math::check_size_match(function,
-                        "Dimension of variational q", variational.dimension(),
-                        "Dimension of variables in model", cont_params_.size());
-
-        variational.calc_grad(elbo_grad,
-                              model_, cont_params_, n_monte_carlo_grad, rng_,
                               print_stream_);
       }
 
@@ -234,14 +209,13 @@ namespace stan {
         double elbo_init = calc_ELBO(variational);
         double eta_best(0.0);
 
-        int iter_tune;
         bool do_more_tuning = true;
         while (do_more_tuning) {
           // Try next eta
           double eta = eta_sequence.front();
           eta_sequence.pop();
 
-          for (iter_tune = 1; iter_tune <= tuning_iter; ++iter_tune) {
+          for (int iter_tune = 1; iter_tune <= tuning_iter; ++iter_tune) {
             m = (eta_sequence_size - eta_sequence.size() - 1)
               * tuning_iter + iter_tune; // # of total tuning iterations
             stan::services::variational::print_progress(
@@ -509,8 +483,8 @@ namespace stan {
         // initialize variational approximation
         Q variational = Q(cont_params_);
 
-        services::init::initialize_state_random(10, cont_params_, model_,
-                                rng_, out_stream_);
+        // services::init::initialize_state_random(10, cont_params_, model_,
+        //                         rng_, out_stream_);
 
         // tune if eta is unspecified
         double eta_double(0);
