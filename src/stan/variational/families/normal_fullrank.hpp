@@ -52,12 +52,17 @@ namespace stan {
       explicit normal_fullrank(size_t dimension) :
         dimension_(dimension) {
         mu_     = Eigen::VectorXd::Zero(dimension_);
-        L_chol_  = Eigen::MatrixXd::Identity(dimension_, dimension_);
+        L_chol_ = Eigen::MatrixXd::Identity(dimension_, dimension_);
       }
 
       explicit normal_fullrank(const Eigen::VectorXd& cont_params) :
         mu_(cont_params), dimension_(cont_params.size()) {
-        L_chol_  = Eigen::MatrixXd::Identity(dimension_, dimension_);
+        L_chol_ = Eigen::MatrixXd::Identity(dimension_, dimension_);
+      }
+
+      explicit normal_fullrank(const Eigen::VectorXd& cont_params, double std) :
+        mu_(cont_params), dimension_(cont_params.size()) {
+        L_chol_ = std * Eigen::MatrixXd::Identity(dimension_, dimension_);
       }
 
       normal_fullrank(const Eigen::VectorXd& mu,
@@ -116,6 +121,10 @@ namespace stan {
       normal_fullrank sqrt() const {
         return normal_fullrank(Eigen::VectorXd(mu_.array().sqrt()),
                                Eigen::MatrixXd(L_chol_.array().sqrt()));
+      }
+
+      double squaredNorm() const {
+        return mu_.squaredNorm() + L_chol_.squaredNorm();
       }
 
       // Compound assignment operators

@@ -58,6 +58,12 @@ namespace stan {
         omega_  = Eigen::VectorXd::Zero(dimension_);
       }
 
+      explicit normal_meanfield(const Eigen::VectorXd& cont_params, double std) :
+        mu_(cont_params), dimension_(cont_params.size()) {
+        // initializing omega = 0 means sigma = 1
+        omega_  = std::log(std) * Eigen::VectorXd::Ones(dimension_);
+      }
+
       normal_meanfield(const Eigen::VectorXd& mu,
                        const Eigen::VectorXd& omega) :
       mu_(mu), omega_(omega), dimension_(mu.size()) {
@@ -108,6 +114,10 @@ namespace stan {
       normal_meanfield sqrt() const {
         return normal_meanfield(Eigen::VectorXd(mu_.array().sqrt()),
                                 Eigen::VectorXd(omega_.array().sqrt()));
+      }
+
+      double squaredNorm() const {
+        return mu_.squaredNorm() + omega_.squaredNorm();
       }
 
       // Compound assignment operators

@@ -4,6 +4,7 @@
 #include <stan/math.hpp>
 #include <stan/io/dump.hpp>
 #include <stan/model/util.hpp>
+#include <stan/services/init/initialize_state.hpp>
 #include <stan/services/io/write_iteration_csv.hpp>
 #include <stan/services/io/write_iteration.hpp>
 #include <stan/services/error_codes.hpp>
@@ -52,9 +53,10 @@ namespace stan {
 
       advi(M& m,
            Eigen::VectorXd& cont_params,
+           BaseRNG& rng,
+           std::string& init,
            int n_monte_carlo_grad,
            int n_monte_carlo_elbo,
-           BaseRNG& rng,
            int eval_elbo,
            int n_posterior_samples,
            std::ostream* print_stream,
@@ -63,6 +65,7 @@ namespace stan {
         model_(m),
         cont_params_(cont_params),
         rng_(rng),
+        init_(init),
         n_monte_carlo_grad_(n_monte_carlo_grad),
         n_monte_carlo_elbo_(n_monte_carlo_elbo),
         eval_elbo_(eval_elbo),
@@ -133,7 +136,8 @@ namespace stan {
        * Calculates the "black box" gradient of the ELBO.
        *
        * @param variational variational distribution
-       * @param elbo_grad   gradient of ELBO with respect to variational parameters
+       * @param elbo_grad   gradient of ELBO with respect to
+       *                    variational parameters
        */
       void calc_ELBO_grad(const Q& variational, Q& elbo_grad) const {
         static const char* function =
@@ -152,6 +156,31 @@ namespace stan {
       }
 
       /**
+       * Calculates the "black box" gradient of the ELBO.
+       *
+       * @param variational          variational distribution
+       * @param elbo_grad            gradient of ELBO with respect to
+       *                             variational parameters
+       * @param n_monte_carlo_grad   number of monte carlo samples for gradient
+       */
+      void calc_ELBO_grad(const Q& variational, Q& elbo_grad,
+        int n_monte_carlo_grad) const {
+        static const char* function =
+          "stan::variational::advi::calc_ELBO_grad";
+
+        stan::math::check_size_match(function,
+                        "Dimension of elbo_grad", elbo_grad.dimension(),
+                        "Dimension of variational q", variational.dimension());
+        stan::math::check_size_match(function,
+                        "Dimension of variational q", variational.dimension(),
+                        "Dimension of variables in model", cont_params_.size());
+
+        variational.calc_grad(elbo_grad,
+                              model_, cont_params_, n_monte_carlo_grad, rng_,
+                              print_stream_);
+      }
+
+      /**
        * Adaptively set hyperparameters for ADVI.
        *
        * @param variational variational distribution
@@ -166,6 +195,14 @@ namespace stan {
                                    "Number of tuning iterations",
                                    tuning_iter);
 
+        int max_init_tries(1);
+        double R;
+        if (services::init::get_double_from_string(init_, R)) {
+          if (R != 0) {
+            max_init_tries = 10;
+          }
+        }
+
         // Gradient parameters
         Q elbo_grad = Q(model_.num_params_r());
 
@@ -178,11 +215,11 @@ namespace stan {
 
         // Sequence of eta values to try during tuning
         std::queue<double> eta_sequence;
-        eta_sequence.push(1.00);
-        eta_sequence.push(0.50);
-        eta_sequence.push(0.10);
-        eta_sequence.push(0.05);
-        eta_sequence.push(0.01);
+        eta_sequence.push(10.000);
+        eta_sequence.push( 1.000);
+        eta_sequence.push( 0.100);
+        eta_sequence.push( 0.010);
+        eta_sequence.push( 0.001);
 
         // Print progress
         int eta_sequence_size = eta_sequence.size();
@@ -472,6 +509,9 @@ namespace stan {
         // initialize variational approximation
         Q variational = Q(cont_params_);
 
+        services::init::initialize_state_random(10, cont_params_, model_,
+                                rng_, out_stream_);
+
         // tune if eta is unspecified
         double eta_double(0);
         if (eta.compare("automatically tuned") == 0) {
@@ -483,7 +523,7 @@ namespace stan {
         } else {
           try {
             eta_double = boost::lexical_cast<double>(eta);
-          } catch (std::exception& e) {
+          } catch (const boost::bad_lexical_cast& e) {
             std::stringstream eta_error_message;
             eta_error_message << "You specified the value eta = "
               << eta
@@ -493,12 +533,12 @@ namespace stan {
               << "Stan's default automatic tuning procedure.";
             throw std::runtime_error(eta_error_message.str());
           }
-          if (eta_double <= 0.0 || eta_double > 1.0){
+          if (eta_double <= 0.0){
             std::stringstream eta_error_message;
             eta_error_message << "You specified the value eta = "
               << eta
               << " for the stepsize." << std::endl
-              << "This is outside of the allowable range 0 < eta <= 1."
+              << "This is outside of the allowable range 0 < eta."
               << std::endl
               << "Please check for typos. We recommend using "
               << "Stan's default automatic tuning procedure.";
@@ -560,6 +600,7 @@ namespace stan {
       M& model_;
       Eigen::VectorXd& cont_params_;
       BaseRNG& rng_;
+      std::string& init_;
       int n_monte_carlo_grad_;
       int n_monte_carlo_elbo_;
       int eval_elbo_;
