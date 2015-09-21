@@ -539,13 +539,13 @@ namespace stan {
 
           for (int n = 0; n < n_posterior_samples_; ++n) {
             variational.sample(rng_, cont_params_);
-            double lp = model_.template log_prob<false, true>(cont_params_,
-              print_stream_);
+            // double lp = model_.template log_prob<false, true>(cont_params_,
+              // print_stream_);
             for (int i = 0; i < cont_params_.size(); ++i) {
               cont_vector.at(i) = cont_params_(i);
             }
             services::io::write_iteration(*out_stream_, model_, rng_,
-                          lp, cont_vector, disc_vector, print_stream_);
+                          0.0, cont_vector, disc_vector, print_stream_);
           }
 
           if (print_stream_) {
