@@ -5,7 +5,6 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/circular_buffer.hpp>
 #include <vector>
-#include <tuple>
 
 namespace stan {
   namespace optimization {
