@@ -112,14 +112,10 @@ namespace stan {
        * @param base_rng Random number generator
        * @param sample_args Sampling configuration
        * @param refresh Progress update rate
-       
-       * @param lp Log posterior density
-       * @param cont_vector Continuous state values
-       * @param disc_vector Discrete state values
        * @param info Writer callback for displaying informative messages
        * @param err Writer callback for displaying error messages
        * @param output Writer callback for storing sampling history
-       * @param dianostic Writer callback for storing sampling diagnostic history
+       * @param diagnostic Writer callback for storing sampling diagnostic history
        * @param iteration_interrupt Interrupt callback called at the beginning
                                     of each iteration
        */

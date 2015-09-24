@@ -15,10 +15,11 @@ namespace stan {
        * @param sample Initial sample
        * @param num_warmup Number of warmup iterations
        * @param num_samples Number of sampling iterations
+       * @param num_thin Number to thin
        * @param refresh Progress update rate
        * @param save_warmup Flag to save warmup iterations
        * @param writer MCMC writer
-       * @param iteration_interrupt Interrupt callback called at the beginning
+       * @param interrupt Interrupt callback called at the beginning
        of each iteration
        */
       template <class Sampler, class MCMCWriter, class Interrupt>

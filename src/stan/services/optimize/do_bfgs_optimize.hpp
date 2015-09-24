@@ -26,7 +26,6 @@ namespace stan {
        * @tparam InfoWriter An implementation of
        *                    src/stan/interface_callbacks/writer/base_writer.hpp
        * @tparam Interrupt Interrupt callback implementation
-       * @param cont_params Continuous state values
        * @param model Model
        * @param bfgs BFGS functor
        * @param base_rng Random number generator
@@ -37,7 +36,7 @@ namespace stan {
        * @param info Writer callback for display informative messages
        * @param save_iterations Flag to save entire optimization history
        * @param refresh Progress update rate
-       * @param iteration_interrupt Interrupt callback called at the beginning
+       * @param interrupt Interrupt callback called at the beginning
                                     of each iteration
        */
       template<typename ModelT, typename BFGSOptimizerT, typename RNGT,

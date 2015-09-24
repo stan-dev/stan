@@ -98,7 +98,7 @@ namespace stan {
        * @param cont_params Continuous state values
        * @param model Model
        * @param base_rng Random number generator
-       * @param optimize_arg Optimization configuration
+       * @param optimize_args Optimization configuration
        * @param refresh Progress update rate
        * @param info Writer callback for display informative messages
        * @param err Writer callback for display error messages

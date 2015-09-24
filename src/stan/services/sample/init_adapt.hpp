@@ -13,7 +13,6 @@ namespace stan {
        * @tparam ErrWriter An implementation of
        *                   src/stan/interface_callbacks/writer/base_writer.hpp
        * @param sampler MCMC sampler
-       * @param adapt Adaptation configuration
        * @param delta Dual averaging target
        * @param gamma Dual averaging scale
        * @param kappa Dual averaging shrinkage
