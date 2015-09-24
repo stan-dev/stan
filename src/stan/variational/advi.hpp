@@ -4,7 +4,7 @@
 #include <stan/math.hpp>
 #include <stan/io/dump.hpp>
 #include <stan/model/util.hpp>
-
+#include <stan/services/io/write_iteration.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/variational/families/normal_fullrank.hpp>
 #include <stan/variational/families/normal_meanfield.hpp>
@@ -77,7 +77,7 @@ namespace stan {
                                  "Number of posterior samples for output",
                                  n_posterior_samples_);
         stan::math::check_positive(function, "Eta stepsize", eta_adagrad_);
-      }
+        }
 
       /**
        * Calculates the Evidence Lower BOund (ELBO) by sampling from
@@ -264,6 +264,8 @@ namespace stan {
               for (size_t i = 0; i < print_vector.size(); ++i)
                 *diag_stream_ << "," << print_vector.at(i);
               *diag_stream_ << std::endl;
+              // services::io::write_iteration_csv(*diag_stream_,
+              // iter_counter, print_vector);
             }
 
             if (delta_elbo_ave < tol_rel_obj) {
@@ -329,14 +331,13 @@ namespace stan {
         std::vector<int> disc_vector;
 
         if (out_stream_) {
-
-          //services::io::write_iteration(*out_stream_, model_, rng_,
-          //                              0.0, cont_vector, disc_vector,
-          //                              print_stream_);
+          // services::io::write_iteration(*out_stream_, model_, rng_,
+          //                               lp, cont_vector, disc_vector,
+          //                               print_stream_);
           std::vector<double> model_values;
           model_.write_array(rng_, cont_vector, disc_vector, model_values,
                           true, true, print_stream_);
-          *out_stream_ << 0.0;
+          *out_stream_ << lp;
           for (size_t i = 0; i < model_values.size(); ++i)
             *out_stream_ << "," << model_values.at(i);
           *out_stream_ << std::endl;
@@ -347,15 +348,16 @@ namespace stan {
           for (int n = 0; n < n_posterior_samples_; ++n) {
             variational.sample(rng_, cont_params_);
             double lp = model_.template log_prob<false, true>(cont_params_,
-              print_stream_);
+                                                              print_stream_);
             for (int i = 0; i < cont_params_.size(); ++i) {
               cont_vector.at(i) = cont_params_(i);
-            //services::io::write_iteration(*out_stream_, model_, rng_,
-            //              0.0, cont_vector, disc_vector, print_stream_);
+            }            
+            // services::io::write_iteration(*out_stream_, model_, rng_,
+            // lp, cont_vector, disc_vector, print_stream_);
             std::vector<double> model_values;
             model_.write_array(rng_, cont_vector, disc_vector, model_values,
-                            true, true, print_stream_);
-            *out_stream_ << 0.0;
+                               true, true, print_stream_);
+            *out_stream_ << lp;
             for (size_t i = 0; i < model_values.size(); ++i)
               *out_stream_ << "," << model_values.at(i);
             *out_stream_ << std::endl;
@@ -383,7 +385,7 @@ namespace stan {
       double rel_decrease(double prev, double curr) const {
         return std::abs(curr - prev) / std::abs(prev);
       }
-        
+
     protected:
       M& model_;
       Eigen::VectorXd& cont_params_;
@@ -396,24 +398,23 @@ namespace stan {
       std::ostream* print_stream_;
       std::ostream* out_stream_;
       std::ostream* diag_stream_;
-      
+
       void write_error_msg_(std::ostream* error_msgs,
                             const std::exception& e) const {
         if (!error_msgs) {
           return;
         }
-        
-        *error_msgs
-        << std::endl
-        << "Informational Message: The current sample evaluation "
-        << "of the ELBO is ignored because of the following issue:"
-        << std::endl
-        << e.what() << std::endl
-        << "If this warning occurs often then your model may be "
-        << "either severely ill-conditioned or misspecified."
-        << std::endl;
-      }
 
+        *error_msgs
+          << std::endl
+          << "Informational Message: The current sample evaluation "
+          << "of the ELBO is ignored because of the following issue:"
+          << std::endl
+          << e.what() << std::endl
+          << "If this warning occurs often then your model may be "
+          << "either severely ill-conditioned or misspecified."
+          << std::endl;
+      }
     };
   }  // variational
 }  // stan
