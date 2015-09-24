@@ -10,6 +10,7 @@
 #include <stan/variational/families/normal_meanfield.hpp>
 #include <boost/circular_buffer.hpp>
 #include <algorithm>
+#include <ctime>
 #include <limits>
 #include <numeric>
 #include <ostream>

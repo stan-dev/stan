@@ -3,6 +3,7 @@
 
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/services/sample/generate_transitions.hpp>
+#include <ctime>
 
 namespace stan {
   namespace services {

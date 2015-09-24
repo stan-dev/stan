@@ -87,6 +87,7 @@
 #include <stan/services/sample/generate_transitions.hpp>
 
 #include <cmath>
+#include <ctime>
 #include <sstream>
 #include <iomanip>
 #include <string>
