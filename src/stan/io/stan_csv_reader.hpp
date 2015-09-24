@@ -221,6 +221,9 @@ namespace stan {
           for (int col = 0; col < cols; col++) {
             std::string token;
             std::getline(line_ss, token, ',');
+            // strip "M_inv" from string if it's at the start (for new output)
+            if (col == 0 && token.find("M_inv") != std::string::npos)
+              token = token.substr(7);
             boost::trim(token);
             adaptation.metric(row, col) = boost::lexical_cast<double>(token);
           }
@@ -286,7 +289,6 @@ namespace stan {
         }
 
         ss.seekg(std::ios_base::beg);
-
         if (rows > 0) {
           samples.resize(rows, cols);
           for (int row = 0; row < rows; row++) {
@@ -336,7 +338,6 @@ namespace stan {
           if (out)
             *out << "Warning: non-fatal error reading samples" << std::endl;
         }
-
         return data;
       }
     };

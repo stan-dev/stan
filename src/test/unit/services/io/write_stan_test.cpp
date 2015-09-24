@@ -1,19 +1,21 @@
-#include <stan/interface_callbacks/writer/stringstream.hpp>
+#include <stan/interface_callbacks/writer/stream_writer_typedefs.hpp>
 #include <stan/services/io/write_stan.hpp>
 #include <gtest/gtest.h>
 #include <sstream>
 #include <stan/version.hpp>
 
-typedef stan::interface_callbacks::writer::stringstream writer_t;
+typedef stan::interface_callbacks::writer::sstream_writer writer_t;
 
 TEST(StanUi, write_stan_nostream) {
-  writer_t writer;
+  std::stringstream writer_ss;
+  writer_t writer(writer_ss);
   EXPECT_NO_THROW(stan::services::io::write_stan(writer, ""));
   EXPECT_NO_THROW(stan::services::io::write_stan(writer));
 }
 
 TEST(StanUi, write_stan_noprefix) {
-  writer_t writer;
+  std::stringstream writer_ss;
+  writer_t writer(writer_ss);
   std::string expected_output;
   expected_output 
     = " stan_version_major = " + stan::MAJOR_VERSION + "\n"
@@ -21,11 +23,12 @@ TEST(StanUi, write_stan_noprefix) {
     + " stan_version_patch = " + stan::PATCH_VERSION + "\n";
 
   EXPECT_NO_THROW(stan::services::io::write_stan(writer));
-  EXPECT_EQ(expected_output, writer.contents());
+  EXPECT_EQ(expected_output, writer_ss.str());
 }
 
 TEST(StanUi, write_stan) {
-  writer_t writer;
+  std::stringstream writer_ss;
+  writer_t writer(writer_ss);
   std::string prefix = "123";
   std::string expected_output;
   expected_output 
@@ -34,5 +37,5 @@ TEST(StanUi, write_stan) {
     + prefix + " stan_version_patch = " + stan::PATCH_VERSION + "\n";
 
   EXPECT_NO_THROW(stan::services::io::write_stan(writer, prefix));
-  EXPECT_EQ(expected_output, writer.contents());
+  EXPECT_EQ(expected_output, writer_ss.str());
 }

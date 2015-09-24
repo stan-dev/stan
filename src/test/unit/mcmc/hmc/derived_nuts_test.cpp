@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <boost/random/additive_combine.hpp>
-#include <stan/interface_callbacks/writer/noop.hpp>
+#include <stan/interface_callbacks/writer/noop_writer.hpp>
 
 #include <stan/mcmc/hmc/hamiltonians/unit_e_point.hpp>
 #include <stan/mcmc/hmc/hamiltonians/diag_e_point.hpp>
@@ -14,7 +14,7 @@
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
 
 typedef boost::ecuyer1988 rng_t;
-typedef stan::interface_callbacks::writer::noop writer_t;
+typedef stan::interface_callbacks::writer::noop_writer writer_t;
 
 TEST(McmcDerivedNuts, compute_criterion_unit_e) {
   

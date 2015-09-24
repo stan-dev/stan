@@ -1,8 +1,8 @@
-#include <stan/interface_callbacks/writer/noop.hpp>
+#include <stan/interface_callbacks/writer/noop_writer.hpp>
 #include <stan/services/arguments/unvalued_argument.hpp>
 #include <gtest/gtest.h>
 
-typedef stan::interface_callbacks::writer::noop writer_t;
+typedef stan::interface_callbacks::writer::noop_writer writer_t;
 
 class test_arg_impl : public stan::services::unvalued_argument {
   std::string print_value() {

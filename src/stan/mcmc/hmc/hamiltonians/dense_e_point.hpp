@@ -31,7 +31,7 @@ namespace stan {
       template <class Writer>
       void write_metric(Writer& writer) {
         writer("# Dense Euclidean metric");
-        writer("M_inv", mInv.data(), mInv.rows(), mInv.cols());
+        writer("# M_inv", mInv.data(), mInv.rows(), mInv.cols());
       }
     };
 

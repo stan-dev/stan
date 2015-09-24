@@ -30,7 +30,7 @@ namespace stan {
       template <class Writer>
       void write_metric(Writer& writer) {
         writer("# Diagonal Euclidean metric");
-        writer("M_inv", mInv.data(), mInv.size());
+        writer("# M_inv", mInv.data(), mInv.size());
       }
     };
 

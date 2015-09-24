@@ -2,14 +2,14 @@
 #include <stan/services/sample/generate_transitions.hpp>
 #include <stan/services/sample/mcmc_writer.hpp>
 #include <stan/interface_callbacks/interrupt/base_interrupt.hpp>
-#include <stan/interface_callbacks/writer/stringstream.hpp>
+#include <stan/interface_callbacks/writer/stream_writer_typedefs.hpp>
 #include <gtest/gtest.h>
 #include <test/test-models/good/services/test_lp.hpp>
 #include <boost/random/additive_combine.hpp>
 #include <sstream>
 
 typedef boost::ecuyer1988 rng_t;
-typedef stan::interface_callbacks::writer::stringstream writer_t;
+typedef stan::interface_callbacks::writer::sstream_writer writer_t;
 
 class mock_sampler : public stan::mcmc::base_mcmc {
 public:
@@ -51,13 +51,19 @@ private:
 
 class StanServices : public testing::Test {
 public:
-  void SetUp() {
 
+  StanServices()
+    : output(output_ss),
+      diagnostic(diagnostic_ss),
+      info(info_ss),
+      err(err_ss) {}
+  
+  void SetUp() {
     model_output.str("");
-    output.clear();
-    diagnostic.clear();
-    info.clear();
-    err.clear();
+    output_ss.str("");
+    diagnostic_ss.str("");
+    info_ss.str("");
+    err_ss.str("");
 
     base_rng.seed(123456);
 
@@ -84,6 +90,10 @@ public:
   }
 
   std::stringstream model_output;
+  std::stringstream output_ss;
+  std::stringstream diagnostic_ss;
+  std::stringstream info_ss;
+  std::stringstream err_ss;
 
   writer_t output;
   writer_t diagnostic;
@@ -128,10 +138,10 @@ TEST_F(StanServices, Warmup) {
   EXPECT_EQ(num_warmup, interrupt.n());
 
   EXPECT_EQ("", model_output.str());
-  EXPECT_EQ(expected_output, output.contents());
-  EXPECT_EQ(expected_diagnostic, diagnostic.contents());
-  EXPECT_EQ(expected_info, info.contents());
-  EXPECT_EQ(expected_err, err.contents());
+  EXPECT_EQ(expected_output, output_ss.str());
+  EXPECT_EQ(expected_diagnostic, diagnostic_ss.str());
+  EXPECT_EQ(expected_info, info_ss.str());
+  EXPECT_EQ(expected_err, err_ss.str());
 }
 
 TEST_F(StanServices, Sample) {
@@ -159,8 +169,8 @@ TEST_F(StanServices, Sample) {
   EXPECT_EQ(num_samples, interrupt.n());
 
   EXPECT_EQ("", model_output.str());
-  EXPECT_EQ(expected_output, output.contents());
-  EXPECT_EQ(expected_diagnostic, diagnostic.contents());
-  EXPECT_EQ(expected_info, info.contents());
-  EXPECT_EQ(expected_err, err.contents());
+  EXPECT_EQ(expected_output, output_ss.str());
+  EXPECT_EQ(expected_diagnostic, diagnostic_ss.str());
+  EXPECT_EQ(expected_info, info_ss.str());
+  EXPECT_EQ(expected_err, err_ss.str());
 }

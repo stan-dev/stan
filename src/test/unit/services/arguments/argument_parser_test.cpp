@@ -1,4 +1,4 @@
-#include <stan/interface_callbacks/writer/noop.hpp>
+#include <stan/interface_callbacks/writer/noop_writer.hpp>
 #include <stan/services/arguments/argument_parser.hpp>
 #include <stan/services/arguments/arg_id.hpp>
 #include <stan/services/arguments/arg_data.hpp>
@@ -7,7 +7,7 @@
 #include <stan/services/arguments/arg_output.hpp>
 #include <gtest/gtest.h>
 
-typedef stan::interface_callbacks::writer::noop writer_t;
+typedef stan::interface_callbacks::writer::noop_writer writer_t;
 
 using stan::services::argument;
 using stan::services::arg_id;

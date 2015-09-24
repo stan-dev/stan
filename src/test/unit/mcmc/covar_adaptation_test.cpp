@@ -1,8 +1,8 @@
-#include <stan/interface_callbacks/writer/noop.hpp>
+#include <stan/interface_callbacks/writer/noop_writer.hpp>
 #include <stan/mcmc/covar_adaptation.hpp>
 #include <gtest/gtest.h>
 
-typedef stan::interface_callbacks::writer::noop writer_t;
+typedef stan::interface_callbacks::writer::noop_writer writer_t;
 
 TEST(McmcCovarAdaptation, learn_covariance) {
 

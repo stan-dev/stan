@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/interface_callbacks/writer/noop.hpp>
+#include <stan/interface_callbacks/writer/noop_writer.hpp>
 #include <stan/interface_callbacks/interrupt/base_interrupt.hpp>
 #include <stan/services/optimize/do_bfgs_optimize.hpp>
 #include <stan/optimization/bfgs.hpp>
@@ -9,7 +9,7 @@
 
 typedef rosenbrock_model_namespace::rosenbrock_model Model;
 typedef boost::ecuyer1988 rng_t; // (2**50 = 1T samples, 1000 chains)
-typedef stan::interface_callbacks::writer::noop writer_t;
+typedef stan::interface_callbacks::writer::noop_writer writer_t;
 
 class mock_interrupt: public stan::interface_callbacks::interrupt::base_interrupt {
 public:

@@ -1,9 +1,6 @@
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
 #include <stan/mcmc/hmc/static/base_static_hmc.hpp>
-#include <stan/interface_callbacks/writer/stringstream.hpp>
-
 #include <boost/random/additive_combine.hpp>
-
 #include <gtest/gtest.h>
 
 typedef boost::ecuyer1988 rng_t;

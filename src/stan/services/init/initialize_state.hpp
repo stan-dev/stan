@@ -134,13 +134,13 @@ namespace stan {
           io::write_error_msg(writer, e);
           writer();
           writer("Rejecting initial value:");
-          writer("  Error evaluating the log probability"
+          writer("  Error evaluating the log probability "
                  + std::string("at the initial value."));
           return false;
         }
         if (!boost::math::isfinite(init_log_prob)) {
           writer("Rejecting initial value:");
-          writer("  Log probability evaluates to log(0),"
+          writer("  Log probability evaluates to log(0), "
                  + std::string("i.e. negative infinity."));
           writer("  Stan can't start sampling from this initial value.");
           return false;

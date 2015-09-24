@@ -39,7 +39,7 @@ namespace stan {
        */
       template <class InfoWriter>
       void write_sampler_state(InfoWriter& writer) {
-        writer("Step size", get_nominal_stepsize());
+        writer("# Step size", get_nominal_stepsize());
         z_.write_metric(writer);
       }
 

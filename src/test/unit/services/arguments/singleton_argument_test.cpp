@@ -1,8 +1,8 @@
-#include <stan/interface_callbacks/writer/noop.hpp>
+#include <stan/interface_callbacks/writer/noop_writer.hpp>
 #include <gtest/gtest.h>
 #include <stan/services/arguments/singleton_argument.hpp>
 
-typedef stan::interface_callbacks::writer::noop writer_t;
+typedef stan::interface_callbacks::writer::noop_writer writer_t;
 
 template <typename T>
 T argument_value() {

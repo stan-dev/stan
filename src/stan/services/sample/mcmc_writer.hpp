@@ -133,9 +133,9 @@ namespace stan {
                            Writer& writer, std::string prefix) {
           writer("");
           writer(prefix + "Elapsed Time (seconds):");
-          writer("Warmup", warm_delta_t);
-          writer("Sampling", sample_delta_t);
-          writer("Total", warm_delta_t + sample_delta_t);
+          writer(prefix + "Warmup", warm_delta_t);
+          writer(prefix + "Sampling", sample_delta_t);
+          writer(prefix + "Total", warm_delta_t + sample_delta_t);
           writer("");
         }
       };

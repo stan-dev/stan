@@ -3,14 +3,14 @@
 #include <stan/services/sample/run_adaptive_sampler.hpp>
 #include <stan/services/sample/mcmc_writer.hpp>
 #include <stan/interface_callbacks/interrupt/base_interrupt.hpp>
-#include <stan/interface_callbacks/writer/stringstream.hpp>
+#include <stan/interface_callbacks/writer/stream_writer_typedefs.hpp>
 #include <gtest/gtest.h>
 #include <test/test-models/good/services/test_lp.hpp>
 #include <boost/random/additive_combine.hpp>
 #include <sstream>
 
 typedef boost::ecuyer1988 rng_t;
-typedef stan::interface_callbacks::writer::stringstream writer_t;
+typedef stan::interface_callbacks::writer::sstream_writer writer_t;
 
 class mock_sampler : public stan::mcmc::base_mcmc,
                      public stan::mcmc::base_adapter {
@@ -58,13 +58,20 @@ private:
 
 class StanServices : public testing::Test {
 public:
+
+  StanServices()
+    : output(output_ss),
+      diagnostic(diagnostic_ss),
+      info(info_ss),
+      err(err_ss) {}
+  
   void SetUp() {
 
     model_output.str("");
-    output.clear();
-    diagnostic.clear();
-    info.clear();
-    err.clear();
+    output_ss.str("");
+    diagnostic_ss.str("");
+    info_ss.str("");
+    err_ss.str("");
 
     base_rng.seed(123456);
 
@@ -91,6 +98,10 @@ public:
   }
 
   std::stringstream model_output;
+  std::stringstream output_ss;
+  std::stringstream diagnostic_ss;
+  std::stringstream info_ss;
+  std::stringstream err_ss;
 
   writer_t output;
   writer_t diagnostic;
@@ -137,10 +148,10 @@ TEST_F(StanServices, sample) {
   // Strip away elapsed time which is too variable
   EXPECT_EQ("", model_output.str());
   EXPECT_EQ(expected_output,
-            output.contents().substr(0, output.contents().find("Elapsed")));
+            output_ss.str().substr(0, output_ss.str().find("Elapsed")));
   EXPECT_EQ(expected_diagnostic,
-            diagnostic.contents().substr(0, diagnostic.contents().find("Elapsed")));
+            diagnostic_ss.str().substr(0, diagnostic_ss.str().find("Elapsed")));
   EXPECT_EQ(expected_info,
-            info.contents().substr(0, info.contents().find("Elapsed")));
-  EXPECT_EQ(expected_err, err.contents());
+            info_ss.str().substr(0, info_ss.str().find("Elapsed")));
+  EXPECT_EQ(expected_err, err_ss.str());
 }

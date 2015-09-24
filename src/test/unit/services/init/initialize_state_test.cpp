@@ -2,14 +2,14 @@
 #include <stan/io/var_context.hpp>
 #include <stan/io/dump.hpp>
 #include <stan/interface_callbacks/var_context_factory/var_context_factory.hpp>
-#include <stan/interface_callbacks/writer/stringstream.hpp>
+#include <stan/interface_callbacks/writer/stream_writer_typedefs.hpp>
 #include <stan/services/init/initialize_state.hpp>
 #include <stan/model/prob_grad.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 
-typedef stan::interface_callbacks::writer::stringstream writer_t;
+typedef stan::interface_callbacks::writer::sstream_writer writer_t;
 
 // Mock Model
 class mock_model: public stan::model::prob_grad {
@@ -319,14 +319,15 @@ public:
   StanServices() :
     model(3),
     inf_model(3),
-    throwing_model(3) {}
+    throwing_model(3),
+    writer(writer_ss) {}
 
   void SetUp() {
     cont_params = Eigen::VectorXd::Zero(3);
     model.reset();
     inf_model.reset();
     rng.reset();
-    writer.clear();
+    writer_ss.str("");
     context_factory.reset();
   }
 
@@ -336,6 +337,7 @@ public:
   mock_inf_model inf_model;
   mock_throwing_model throwing_model;
   mock_rng rng;
+  std::stringstream writer_ss;
   writer_t writer;
   mock_context_factory context_factory;
 };
@@ -357,7 +359,7 @@ TEST_F(StanServices, initialize_state_0) {
   EXPECT_EQ(0, model.transform_inits_calls);
   EXPECT_EQ(0, model.write_array_calls);
   EXPECT_EQ(0, rng.calls);
-  EXPECT_EQ("", writer.contents());
+  EXPECT_EQ("", writer_ss.str());
   EXPECT_EQ(0, context_factory.calls);
   EXPECT_EQ("", context_factory.last_call);
 }
@@ -374,7 +376,7 @@ TEST_F(StanServices, initialize_state_zero) {
   EXPECT_EQ(1, model.templated_log_prob_calls);
   EXPECT_EQ(0, model.transform_inits_calls);
   EXPECT_EQ(0, model.write_array_calls);
-  EXPECT_EQ("", writer.contents());
+  EXPECT_EQ("", writer_ss.str());
 }
 
 TEST_F(StanServices, initialize_state_zero_negative_infinity) {
@@ -391,15 +393,15 @@ TEST_F(StanServices, initialize_state_zero_negative_infinity) {
   EXPECT_FLOAT_EQ(0, cont_params[2]);
   EXPECT_EQ(1, model.templated_log_prob_calls);
   EXPECT_EQ(0, model.transform_inits_calls);
-  EXPECT_NE("", writer.contents())
+  EXPECT_NE("", writer_ss.str())
     << "expecting an error message here";
-  EXPECT_TRUE(writer.contents()
+  EXPECT_TRUE(writer_ss.str()
               .find("Rejecting initial value")
               != std::string::npos);
-  EXPECT_TRUE(writer.contents()
+  EXPECT_TRUE(writer_ss.str()
               .find("Log probability evaluates to log(0)")
               != std::string::npos)
-    << writer.contents();
+    << writer_ss.str();
 }
 
 TEST_F(StanServices, initialize_state_zero_grad_error) {
@@ -415,20 +417,20 @@ TEST_F(StanServices, initialize_state_zero_grad_error) {
   EXPECT_FLOAT_EQ(0, cont_params[2]);
   EXPECT_EQ(1, throwing_model.templated_log_prob_calls);
   EXPECT_EQ(0, model.transform_inits_calls);
-  EXPECT_NE("", writer.contents())
+  EXPECT_NE("", writer_ss.str())
     << "expecting error message";
-  EXPECT_TRUE(writer.contents()
+  EXPECT_TRUE(writer_ss.str()
               .find("Rejecting initial value")
               != std::string::npos);
-  EXPECT_TRUE(writer.contents()
+  EXPECT_TRUE(writer_ss.str()
               .find("throwing within log_prob")
               != std::string::npos)
-    << writer.contents();
-  EXPECT_TRUE(writer.contents()
+    << writer_ss.str();
+  EXPECT_TRUE(writer_ss.str()
               .find("Error evaluating the log probability "
                     "at the initial value.")
               != std::string::npos)
-    << writer.contents();
+    << writer_ss.str();
 }
 
 TEST_F(StanServices, initialize_state_number) {
@@ -448,7 +450,7 @@ TEST_F(StanServices, initialize_state_number) {
   EXPECT_EQ(0, model.transform_inits_calls);
   EXPECT_EQ(0, model.write_array_calls);
   EXPECT_EQ(3, rng.calls);
-  EXPECT_EQ("", writer.contents());
+  EXPECT_EQ("", writer_ss.str());
   EXPECT_EQ(0, context_factory.calls);
   EXPECT_EQ("", context_factory.last_call);
 }
@@ -469,7 +471,7 @@ TEST_F(StanServices, initialize_state_random) {
   EXPECT_EQ(0, model.transform_inits_calls);
   EXPECT_EQ(0, model.write_array_calls);
   EXPECT_EQ(3, rng.calls);
-  EXPECT_EQ("", writer.contents());
+  EXPECT_EQ("", writer_ss.str());
 }
 
 
@@ -489,11 +491,11 @@ TEST_F(StanServices, initialize_state_random_reject_all) {
   EXPECT_EQ(0, model.transform_inits_calls);
   EXPECT_EQ(0, model.write_array_calls);
   EXPECT_EQ(300, rng.calls);
-  EXPECT_NE("", writer.contents()) << "expecting error message";
-  EXPECT_TRUE(writer.contents()
+  EXPECT_NE("", writer_ss.str()) << "expecting error message";
+  EXPECT_TRUE(writer_ss.str()
               .find("Rejecting initial value")
               != std::string::npos);
-  EXPECT_TRUE(writer.contents()
+  EXPECT_TRUE(writer_ss.str()
               .find("Log probability evaluates to log(0)")
               != std::string::npos);
 }
@@ -521,7 +523,7 @@ TEST_F(StanServices, initialize_state_string) {
   EXPECT_EQ(1, model.transform_inits_calls);
   EXPECT_EQ(0, model.write_array_calls);
   EXPECT_EQ(0, rng.calls);
-  EXPECT_EQ("", writer.contents());
+  EXPECT_EQ("", writer_ss.str());
   EXPECT_EQ(1, context_factory.calls);
   EXPECT_EQ("abcd", context_factory.last_call);
 }
@@ -543,7 +545,7 @@ TEST_F(StanServices, initialize_state_source) {
   EXPECT_EQ(1, model.transform_inits_calls);
   EXPECT_EQ(0, model.write_array_calls);
   EXPECT_EQ(0, rng.calls);
-  EXPECT_EQ("", writer.contents());
+  EXPECT_EQ("", writer_ss.str());
   EXPECT_EQ(1, context_factory.calls);
   EXPECT_EQ("abcd", context_factory.last_call);
 }
@@ -567,14 +569,14 @@ TEST_F(StanServices, initialize_state_source_neg_infinity) {
   EXPECT_EQ(1, model.transform_inits_calls);
   EXPECT_EQ(0, model.write_array_calls);
   EXPECT_EQ(0, rng.calls);
-  EXPECT_NE("", writer.contents())
+  EXPECT_NE("", writer_ss.str())
     << "expecting error message";
-  EXPECT_TRUE(writer.contents()
+  EXPECT_TRUE(writer_ss.str()
               .find("Rejecting initial value")
               != std::string::npos);
-  EXPECT_TRUE(writer.contents()
+  EXPECT_TRUE(writer_ss.str()
               .find("Log probability evaluates to log(0)")
-              != std::string::npos) << writer.contents();
+              != std::string::npos) << writer_ss.str();
   EXPECT_EQ(1, context_factory.calls);
   EXPECT_EQ("abcd", context_factory.last_call);
 }
@@ -598,17 +600,17 @@ TEST_F(StanServices, initialize_state_source_gradient_throws) {
   EXPECT_EQ(1, throwing_model.transform_inits_calls);
   EXPECT_EQ(0, throwing_model.write_array_calls);
   EXPECT_EQ(0, rng.calls);
-  EXPECT_NE("", writer.contents())
+  EXPECT_NE("", writer_ss.str())
     << "expecting error message";
-  EXPECT_TRUE(writer.contents()
+  EXPECT_TRUE(writer_ss.str()
               .find("Rejecting initial value")
               != std::string::npos);
-  EXPECT_TRUE(writer.contents()
+  EXPECT_TRUE(writer_ss.str()
               .find("Error evaluating the log probability at the initial value.")
-              != std::string::npos) << writer.contents();
-  EXPECT_TRUE(writer.contents()
+              != std::string::npos) << writer_ss.str();
+  EXPECT_TRUE(writer_ss.str()
               .find("throwing within log_prob")
-              != std::string::npos) << writer.contents();
+              != std::string::npos) << writer_ss.str();
   EXPECT_EQ(1, context_factory.calls);
   EXPECT_EQ("abcd", context_factory.last_call);
 }
@@ -741,7 +743,7 @@ TEST_F(StanServices, initialize_state_source_inf) {
   std::stringstream expected_msg;
   expected_msg << "param_0 initialized to invalid value ("
                << std::numeric_limits<double>::infinity() << ")\n";
-  EXPECT_EQ(expected_msg.str(), writer.contents());
+  EXPECT_EQ(expected_msg.str(), writer_ss.str());
   EXPECT_EQ(1, context_factory.calls);
   EXPECT_EQ("abcd", context_factory.last_call);
 }
@@ -841,13 +843,14 @@ public:
 
 class StanServices2 : public testing::Test {
 public:
-  StanServices2() {}
+  StanServices2() 
+    : writer(writer_ss) {}
 
   void SetUp() {
     cont_params = Eigen::VectorXd::Zero(8);
     model.reset();
     rng.reset();
-    writer.clear();
+    writer_ss.str("");
     context_factory.reset();
   }
 
@@ -855,6 +858,7 @@ public:
   Eigen::VectorXd cont_params;
   mock_model2 model;
   mock_rng rng;
+  std::stringstream writer_ss;
   writer_t writer;
   mock_context_factory2 context_factory;
 };
@@ -936,7 +940,7 @@ TEST_F(StanServices2, initialize_state_disable_random_init) {
   EXPECT_EQ("abcd", context_factory.last_call);
   EXPECT_EQ(1, model.transform_inits_calls);
   EXPECT_EQ(0, model.write_array_calls);
-  EXPECT_NE("", writer.contents())
+  EXPECT_NE("", writer_ss.str())
     << "expecting an error message here";
 }
 
@@ -950,21 +954,19 @@ TEST_F(StanServices2, streams) {
   using stan::services::init::initialize_state_values;
   std::stringstream out;
 
-  writer_t writer;
-
   EXPECT_NO_THROW(initialize_state(init, cont_params, model, rng, writer, context_factory));
-  EXPECT_EQ("", writer.contents());
+  EXPECT_EQ("Initialization from source failed.\nmissing some parameters\n", writer_ss.str());
 
-  writer.clear();
+  writer_ss.str("");
   EXPECT_NO_THROW(initialize_state_source(init, cont_params, model, rng, writer, context_factory));
 
-  writer.clear();
+  writer_ss.str("");
   EXPECT_NO_THROW(initialize_state_source_and_random(init, 0.5, cont_params, model, rng, writer, context_factory));
 
-  writer.clear();
+  writer_ss.str("");
   EXPECT_NO_THROW(initialize_state_random(0.5, cont_params, model, rng, writer));
 
-  writer.clear();
+  writer_ss.str("");
   EXPECT_NO_THROW(initialize_state_values(cont_params, model, writer));
 
   stan::test::reset_std_streams();

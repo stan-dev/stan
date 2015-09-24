@@ -1,9 +1,9 @@
-#include <stan/interface_callbacks/writer/noop.hpp>
+#include <stan/interface_callbacks/writer/noop_writer.hpp>
 #include <stan/services/arguments/categorical_argument.hpp>
 #include <gtest/gtest.h>
 #include <stan/services/arguments/singleton_argument.hpp>
 
-typedef stan::interface_callbacks::writer::noop writer_t;
+typedef stan::interface_callbacks::writer::noop_writer writer_t;
 
 class StanServicesArgumentsCategoricalArgument : public testing::Test {
 public:
