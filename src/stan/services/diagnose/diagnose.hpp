@@ -2,6 +2,9 @@
 #define STAN_SERVICES_DIAGNOSE_DIAGNOSE_HPP
 
 #include <stan/model/util.hpp>
+#include <stan/services/arguments/list_argument.hpp>
+#include <stan/services/arguments/singleton_argument.hpp>
+#include <stan/services/error_codes.hpp>
 #include <vector>
 
 namespace stan {

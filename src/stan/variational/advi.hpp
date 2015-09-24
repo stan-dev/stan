@@ -351,7 +351,7 @@ namespace stan {
                                                               print_stream_);
             for (int i = 0; i < cont_params_.size(); ++i) {
               cont_vector.at(i) = cont_params_(i);
-            }            
+            }
             // services::io::write_iteration(*out_stream_, model_, rng_,
             // lp, cont_vector, disc_vector, print_stream_);
             std::vector<double> model_values;

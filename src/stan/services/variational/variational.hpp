@@ -69,11 +69,11 @@
 #include <stan/services/arguments/singleton_argument.hpp>
 #include <stan/services/arguments/unvalued_argument.hpp>
 #include <stan/services/arguments/valued_argument.hpp>
-
-#include <stan/variational/advi.hpp>
-
 #include <stan/services/error_codes.hpp>
+#include <stan/variational/advi.hpp>
 #include <ostream>
+#include <string>
+#include <vector>
 
 namespace stan {
   namespace services {
