@@ -723,7 +723,8 @@ In general, Stan allows the arguments to distributions such as
 \code{normal} to be vectors.  If any of the other arguments are
 vectors or arrays, they have to be the same size.  If any of the other
 arguments is a scalar, it is reused for each vector entry.  See
-\refchapter{vectorization} for more information on vectorization.
+\refsection{vectorization} for more information on vectorization of
+probabilty functions.
 
 The other reason this works is that Stan's arithmetic operators are
 overloaded to perform matrix arithmetic on matrices.  In this case,
@@ -2048,7 +2049,7 @@ data {
   int<lower=1> L;              // num group predictors
   int<lower=1,upper=J> jj[N];  // group for individual
   matrix[N,K] x;               // individual predictors
-  matrix[J,L] u;               // group predictors
+  row_vector[L] u[J];          // group predictors
   vector[N] y;                 // outcomes
 }
 parameters {
@@ -2059,30 +2060,27 @@ parameters {
   real<lower=0> sigma;         // prediction error scale
 }
 model {
-  matrix[K,K] Sigma_beta;
-  Sigma_beta <- quad_form_diag(Omega,tau);
-
   tau ~ cauchy(0,2.5);
   Omega ~ lkj_corr(2);
-  to_vector(gamma) ~ normal(0,5);
-
-  for (j in 1:J)
-    beta[j] ~ multi_normal((u[j] * gamma)', Sigma_beta);
-
+  to_vector(gamma) ~ normal(0, 5);
+  {
+    row_vector[K] u_gamma[J];
+    for (j in 1:J)
+      u_gamma[j] <- u[j] * gamma;
+    beta ~ multi_normal(u_gamma, quad_form_diag(Omega, tau));
+  }
   {
     vector[N] x_beta_jj;
     for (n in 1:N)
       x_beta_jj[n] <- x[n] * beta[jj[n]];
     y ~ normal(x_beta_jj, sigma);
   }
-
-  for (n in 1:N)
-    y[n] ~ normal(x[n] * beta[jj[n]], sigma);
 }
 \end{stancode}
 %
-The hyperprior covariance matrix is defined as a local variable in the
-model because the correlation matrix \code{Omega} and scale vector
+The hyperprior covariance matrix is defined implicitly through the
+a quadratic form in the code 
+because the correlation matrix \code{Omega} and scale vector
 \code{tau} are more natural to inspect in the output; to output
 \code{Sigma}, define it as a transformed parameter.  The function
 \code{quad\_form\_diag} is defined so that
@@ -2100,18 +2098,33 @@ The code in the Stan program above builds up a vector with entries
 \code{x\_beta\_jj[n]} of means using the predictor \code{x[n]} and
 group-level coefficient \code{beta[jj[n]]}.  A block is defined with
 brackets around it so that \code{x\_beta\_jj} can be declared as a
-local variable.  
-
-The vectorized code is equivalent to the simpler, non-vectorized alternative:
+local variable.  The vectorized code is equivalent to the simpler,
+non-vectorized alternative:
 %
 \begin{stancode}
-  for (j in 1:J)
-    beta[j] ~ multi_normal((u[j] * gamma)', Sigma_beta);
+  for (n in 1:N)
+    y[n] ~ normal(x[n] * beta[jj[n]], sigma);
 \end{stancode}
 %
-But there is a huge speedup with vectorization for multivariates
-because the covariance matrix \code{Sigma\_beta} need only be solved
-once.  
+
+The code in the Stan program above also builds up an array of vectors
+for the outcomes and for the multivariate normal, which provides a
+very significant speedup by reducing the number of linear systems that
+need to be solved and differentiated.  
+%
+\begin{stancode}
+  {
+    matrix[K,K] Sigma_beta;
+    Sigma_beta <- quad_form_diag(Omega, tau);
+    for (j in 1:J)
+      beta[j] ~ multi_normal((u[j] * gamma)', Sigma_beta);
+  }
+\end{stancode}
+%
+In this example, the covariance matrix \code{Sigma\_beta} is defined
+as a local variable so as not to have to repeat the quadratic form
+computation $J$ times.  This vectorization can be combined with the
+Cholesky-factor optimization in the next section.
 
 \subsubsection{Optimization through Cholesky Factorization}
 
@@ -2396,7 +2409,7 @@ model {
   for (n in 1:N)
     mu[n] <- beta * x[n];
 
-  L_Sigma <- diag_post_multiply(L_Omega, L_sigma);
+  L_Sigma <- diag_pre_multiply(L_sigma, L_Omega);
 
   to_vector(beta) ~ normal(0, 5);
   L_Omega ~ lkj_corr_cholesky(4);
@@ -2635,7 +2648,7 @@ data {
 parameters {
   real alpha;
   real beta;
-  real sigma;
+  real<lower=0> sigma;
 }
 model {
   for (n in 2:N)
@@ -4146,6 +4159,67 @@ such point, the log of $\theta_k \times
 array \code{ps}.  Then the log probability is incremented with the log
 sum of exponentials of those values.
 
+\section{Vectorizing Mixtures}
+
+There is (currently) no way to vectorize mixture models at the
+observation level in Stan.  This section is to warn users away from
+attempting to vectorize naively, as it results in a different model.
+A proper mixture at the observation level is defined as
+%
+\begin{stancode}
+for (n in 1:N)
+  increment_log_prob(log(lambda) 
+                       + normal_log(y[n], mu[1], sigma[1]),
+                     log1m(lambda) 
+                       + normal_log(y[n], mu[2], sigma[2]));
+\end{stancode}
+%
+or equivalently
+%
+\begin{stancode}
+for (n in 1:N)
+  increment_log_prob(log_mix(lambda, 
+                             normal_log(y[n], mu[1], sigma[1]),
+                             normal_log(y[n], mu[2], sigma[2])));
+\end{stancode}
+%
+This definition assumes that each observation $y_n$ may have arisen
+from either of the mixture components. The density is
+\[
+p(y \, | \, \lambda, \mu, \sigma) 
+= \prod_{n=1}^N (\lambda \times \distro{Normal}(y_n \, | \, \mu_1, \sigma_1)
+                 + (1 - \lambda) \times \distro{Normal}(y_n \, | \, \mu_2, \sigma_2).
+\]
+%                       
+Contrast the previous model with the following (erroneous) attempt to
+vectorize the model.
+%
+\begin{stancode}
+increment_log_prob(log(lambda) 
+                     + normal_log(y, mu[1], sigma[1]),
+                   log1m(lambda)
+                     + normal_log(y, mu[2], sigma[2]));
+\end{stancode}
+%
+or equivalently,
+%
+\begin{stancode}
+increment_log_prob(log_mix(lambda,
+                           normal_log(y, mu[1], sigma[1]),
+                           normal_log(y, mu[2], sigma[2])));
+\end{stancode}
+%
+This second definition implies that the entire sequence $y_1, \ldots, y_n$ of
+observations comes form one component or the other, defining a
+different density,
+\[
+p(y \, | \, \lambda, \mu, \sigma)
+= \lambda \times \prod_{n=1}^N \mbox{Normal}(y_n \, | \, \mu_1, \sigma_1)
++ (1 - \lambda) \times \prod_{n=1}^N \mbox{Normal}(y_n \, | \, \mu_2, \sigma_2).
+\]
+
+
+
 
 \section{Zero-Inflated and Hurdle Models}\label{zero-inflated.section}
 
@@ -4262,7 +4336,14 @@ measurement error is small relative to the quantity being measured,
 its effect on a model is usually small.  When measurement error is
 large relative to the quantity being measured, or when very precise
 relations can be estimated being measured quantities, it is useful to
-introduce an explicit model of measurement error.
+introduce an explicit model of measurement error.  One kind of
+measurement error is rounding. 
+
+Meta-analysis plays out statistically very much like measurement error
+models, where the inferences drawn from multiple data sets are
+combined to do inference over all of them.  Inferences for each data
+set are treated as providing a kind of measurement error with respect
+to true parameter values.
 
 
 \section{Bayesian Measurement Error Model}
@@ -4350,6 +4431,137 @@ x_n \sim \distro{Normal}(\gamma^{\top}c, \upsilon).
 \]
 This can be coded in Stan just like any other regression.  And, of
 course, other exposure models can be provided.
+
+
+\subsection{Rounding}
+
+A common form of measurement error arises from rounding measurements.
+Rounding may be done in many ways, such as rounding weights to the
+nearest milligram, or to the nearest pound; rounding may even be done
+by rounding down to the nearest integer.  
+
+Exercise 3.5(b) from \citep{GelmanEtAl:2013} provides an example.
+%
+\begin{quote}
+  3.5. \ Suppose we weigh an object five times and measure
+  weights, rounded to the nearest pound, of 10, 10, 12, 11, 9.  Assume
+  the unrounded measurements are normally distributed with a
+  noninformative prior distribution on $\mu$ and $\sigma^2$. 
+  \\[4pt]
+  (b) \ Give the correct posterior distribution for $(\mu, \sigma^2)$,
+  treating the measurements as rounded.
+\end{quote}
+%
+Letting $z_n$ be the unrounded measurement for $y_n$, the problem
+as stated assumes the likelihood
+%
+\[
+z_n \sim \distro{Normal}(\mu, \sigma).
+\]
+%
+The rounding process entails that $z_n \in (y_n - 0.5, y_n + 0.5)$.
+The probability mass function for the discrete observation $y$ is then given
+by marginalizing out the unrounded measurement, producing the likelihood
+\[
+p(y_n \, | \, \mu, \sigma)
+= 
+\int_{y_n - 0.5}^{y_n + 0.5}
+\
+\distro{Normal}(z_n \, | \, \mu, \sigma)
+\
+\mathrm{d}z_n
+= 
+\Phi\!\left(\frac{y_n + 0.5 - \mu}{\sigma}\right)
+- 
+\Phi\!\left(\frac{y_n - 0.5 - \mu}{\sigma}\right).
+\]
+Gelman's answer for this problem took the noninformative prior to be
+uniform in the variance $\sigma^2$ on the log scale, which yields (due
+to the Jacobian adjustment), the prior density
+\[
+p(\mu, \sigma^2) \propto \frac{1}{\sigma^2}.
+\]
+The posterior after observing $y = (10, 10, 12, 11, 9)$ can be
+calculated by Bayes's rule as
+%
+\begin{eqnarray*}
+p(\mu, \sigma^2 \, | \, y)
+& \propto &
+p(\mu, \sigma^2) \ p(y \, | \, \mu, \sigma^2)
+\\[6pt]
+&  \propto &
+\frac{1}{\sigma^2}
+\
+\mathlarger{\mathlarger{\prod}}_{n=1}^5 
+\left(
+\Phi\!\left(\frac{y_n + 0.5 - \mu}{\sigma}\right)
+- 
+\Phi\!\left(\frac{y_n - 0.5 - \mu}{\sigma}\right)
+\right).
+\end{eqnarray*}
+%
+
+The Stan code simply follows the mathematical definition, providing an
+example of the direct definition of a probability function up to a
+proportion.
+%
+\begin{stancode}
+data {
+  int<lower=0> N;
+  vector[N] y;
+}
+parameters {
+  real mu;
+  real<lower=0> sigma_sq;
+}
+transformed parameters {
+  real<lower=0> sigma;
+  sigma <- sqrt(sigma_sq);
+}
+model {
+  increment_log_prob(-2 * log(sigma));
+  for (n in 1:N)
+    increment_log_prob(log(Phi((y[n] + 0.5 - mu) / sigma)
+                           - Phi((y[n] - 0.5 - mu) / sigma)));
+}
+\end{stancode}
+
+Alternatively, the model may be defined with latent parameters for the
+unrounded measurements $z_n$.  The Stan code in this case uses the
+likelihood for $z_n$ directly while respecting the constraint $z_n \in
+(y_n - 0.5, y_n + 0.5)$.  Because Stan does not allow varying upper-
+and lower-bound constraints on the elements of a vector (or array),
+the parameters are declared to be the rounding error $y - z$, and
+then $z$ is defined as a transformed parameter.
+%
+\begin{stancode}
+data {
+  int<lower=0> N;
+  vector[N] y;
+}
+parameters {
+  real mu;
+  real<lower=0> sigma_sq;
+  vector<lower=-0.5, upper=0.5>[5] y_err;
+}
+transformed parameters {
+  real<lower=0> sigma;
+  vector[N] z;
+  sigma <- sqrt(sigma_sq);
+  z <- y + y_err;
+}
+model {
+  increment_log_prob(-2 * log(sigma));
+  z ~ normal(mu, sigma);
+}
+\end{stancode}
+%
+This explicit model for the unrounded measurements $z$ produces the
+same posterior for $\mu$ and $\sigma$ as the previous model that
+marginalizes $z$ out.  Both approaches mix well, but the latent
+parameter version is about twice as efficient in terms of effective
+samples per iteration, as well as providing a posterior for the
+unrounded parameters.
 
 
 \section{Meta-Analysis}
@@ -5607,12 +5819,14 @@ be averaged across the iterations to provide the posterior probability
 distribution over each $z_i$.
 
 
-\chapter{Sparse and Ragged Data Structures}
+\chapter{Sparse and Ragged Data Structures}\label{sparse-ragged.chapter}
 
 \noindent
 Stan does not directly support either sparse or ragged data
 structures, though both can be accommodated with some programming
-effort. 
+effort.  \refchapter{sparse-matrices} introduces a special-purpose
+sparse matrix times dense vector multiplication, which should be used
+where applicable;  this chapter covers more general data structures.
 
 \section{Sparse Data Structures}
 
@@ -5747,7 +5961,7 @@ $y_3 = \left[12.9 \ \ 18.7 \ \ 42.9 \ \ 4.7\right]$
 \end{minipage}
 \ \ \
 \begin{minipage}[c]{0.60\textwidth}
-$y = [1.3 \ \ 2.4 \ \ 0.9 \ \ -1.8 \ \ -0.1 \ \ 129 \ \ 18.7 \ \ 42.9
+$z = [1.3 \ \ 2.4 \ \ 0.9 \ \ -1.8 \ \ -0.1 \ \ 129 \ \ 18.7 \ \ 42.9
 \ \ 4.7]$
 \\[3pt]
 $s  =  \{ 3 \ \ 2 \ \ 4 \}$
@@ -5757,7 +5971,7 @@ $s  =  \{ 3 \ \ 2 \ \ 4 \}$
   left is the definition of a ragged data structure $y$ with three
   rows of different sizes ($y_1$ is size 3, $y_2$ size 2, and $y_3$
   size 4).  On the right is an example of how to code the data in Stan,
-  using a single vector $z$ to hold all the values and a separate
+  using a single vector $y$ to hold all the values and a separate
   array of integers $s$ to hold the group row sizes.  With this
   coding, In this particular example, $y_1 = z_{1:3}$, $y_2 =
   z_{4:5}$, and $y_3 = z_{6:9}$.}\label{ragged-data.figure}
@@ -5792,8 +6006,10 @@ data {
 model {
   int pos;
   pos <- 1;
-  for (k in 1:K)
+  for (k in 1:K) {
     segment(y, pos, s[k]) ~ normal(mu[k], sigma);
+    pos <- pos + s[k];
+  }
 \end{Verbatim}
 \end{quote}
 %
@@ -6055,7 +6271,7 @@ The parameters $\theta$ and $\phi$ are typically given symmetric
 Dirichlet priors.  The prevalence $\theta$ is sometimes fixed to
 produce equal probabilities for each category $k \in 1:K$.
 
-\subsection{Representing Ragged Arrays in Stan}
+\subsection{Coding Ragged Arrays}
 
 The specification for naive Bayes in the previous sections have used a ragged
 array notation for the words $w$.  Because Stan does not support
@@ -8181,7 +8397,7 @@ and ending with \code{*/} to the Stan parser.
 For functions that raise exceptions, exceptions can be documented using
 \code{@throws}.%
 %
-\footnote{As of Stan 2.7.0, the only way a user-defined
+\footnote{As of Stan 2.8.0, the only way a user-defined
 producer will raise an exception is if a function it calls (including
 sampling statements) raises an exception via the reject statement.}
 %
@@ -8293,7 +8509,7 @@ characterized by the following pair of
 differential equations.
 %
 \begin{equation}\label{ode-sho.equation}
-\frac{d}{dt} y_1 = -y_2 
+\frac{d}{dt} y_1 = y_2 
 \hspace*{0.5in}
 \frac{d}{dt} y_2 = -y_1 - \theta y_2
 \end{equation}

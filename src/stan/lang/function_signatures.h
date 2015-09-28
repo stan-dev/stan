@@ -175,6 +175,13 @@ add("columns_dot_self", ROW_VECTOR_T, MATRIX_T);
 add_unary("cos");
 add_unary("cosh");
 add("crossprod", MATRIX_T, MATRIX_T);
+add("csr_matrix_times_vector",VECTOR_T, INT_T, INT_T,
+          VECTOR_T, expr_type(INT_T, 1U), expr_type(INT_T, 1U), VECTOR_T);
+add("csr_to_dense_matrix", MATRIX_T,INT_T, INT_T,
+          VECTOR_T, expr_type(INT_T, 1U), expr_type(INT_T, 1U));
+add("csr_extract_w", VECTOR_T, MATRIX_T);
+add("csr_extract_v", expr_type(INT_T, 1U), MATRIX_T);
+add("csr_extract_u", expr_type(INT_T, 1U), MATRIX_T);
 add("cumulative_sum", expr_type(DOUBLE_T, 1U),
     expr_type(DOUBLE_T, 1U));
 add("cumulative_sum", VECTOR_T, VECTOR_T);
