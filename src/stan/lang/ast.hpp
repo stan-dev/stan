@@ -928,11 +928,11 @@ namespace stan {
     };
 
     struct assgn {
-      expression lhs_var_;
+      variable lhs_var_;
       std::vector<idx> idxs_;
       expression rhs_;
       assgn();
-      assgn(const expression& lhs_var, const std::vector<idx>& idxs,
+      assgn(const variable& lhs_var, const std::vector<idx>& idxs,
             const expression& rhs);
     };
 

@@ -499,8 +499,8 @@ TEST(langAst, assgn) {
   // retrieve indexes
   EXPECT_EQ(1, a.idxs_.size());
   // retrieve LHS variable
-  EXPECT_EQ(0, a.lhs_var_.expression_type().num_dims());
-  EXPECT_EQ(DOUBLE_T, a.lhs_var_.expression_type().type());
+  EXPECT_EQ(0, a.lhs_var_.type_.num_dims());
+  EXPECT_EQ(DOUBLE_T, a.lhs_var_.type_.type());
   // retrieve RHS expression
   EXPECT_EQ(0, a.rhs_.expression_type().num_dims());
   EXPECT_EQ(INT_T, a.rhs_.expression_type().type());

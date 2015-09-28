@@ -967,7 +967,6 @@ namespace stan {
       type_ = expr_type(base_type, num_dims);
     }
 
-
     integrate_ode::integrate_ode() { }
     integrate_ode::integrate_ode(const std::string& system_function_name,
                          const expression& y0,
@@ -1591,7 +1590,7 @@ namespace stan {
     }
 
     assgn::assgn() { }
-    assgn::assgn(const expression& lhs_var, const std::vector<idx>& idxs,
+    assgn::assgn(const variable& lhs_var, const std::vector<idx>& idxs,
                  const expression& rhs)
       : lhs_var_(lhs_var), idxs_(idxs), rhs_(rhs) { }
 

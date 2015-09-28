@@ -35,9 +35,9 @@ namespace stan {
 
       std::stringstream& error_msgs_;
 
-      stan::lang::expression_grammar<Iterator>& expression_g;
+      expression_grammar<Iterator>& expression_g;
 
-      stan::lang::indexes_grammar<Iterator> indexes_g;
+      indexes_grammar<Iterator> indexes_g;
 
       boost::spirit::qi::rule<Iterator,
                               std::vector<expression>(var_origin),

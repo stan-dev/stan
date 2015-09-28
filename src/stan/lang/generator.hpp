@@ -1732,20 +1732,19 @@ namespace stan {
       }
       void operator()(const assgn& y) const {
         generate_indent(indent_, o_);
-        o_ << "assign(";
+        o_ << "stan::math::assign(";
 
-        generate_expression(y.lhs_var_, o_);
+        expression var_expr(y.lhs_var_);
+        generate_expression(var_expr, o_);
         o_ << ", "
            << EOL;
 
-        generate_indent(indent_, o_);
-        o_ << "       ";
+        generate_indent(indent_ + 3, o_);
         generate_idxs(y.idxs_, o_);
         o_ << ", "
            << EOL;
 
-        generate_indent(indent_, o_);
-        o_ << "       ";
+        generate_indent(indent_ + 3, o_);
         generate_expression(y.rhs_, o_);
 
         o_ << ");"

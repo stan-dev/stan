@@ -45,6 +45,11 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::assignment,
                           (stan::lang::variable_dims, var_dims_)
                           (stan::lang::expression, expr_) )
 
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::assgn,
+                          (stan::lang::variable, lhs_var_)
+                          (std::vector<stan::lang::idx>, idxs_)
+                          (stan::lang::expression, rhs_) )
+
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::variable_dims,
                           (std::string, name_)
                           (std::vector<stan::lang::expression>, dims_) )
@@ -117,7 +122,8 @@ namespace stan {
         pass = true;
       }
     };
-    boost::phoenix::function<validate_return_allowed> validate_return_allowed_f;
+    boost::phoenix::function<validate_return_allowed>
+    validate_return_allowed_f;
 
     struct validate_void_return_allowed {
       //! @cond Doxygen_Suppress
@@ -143,6 +149,124 @@ namespace stan {
     boost::phoenix::function<validate_void_return_allowed>
     validate_void_return_allowed_f;
 
+    struct identifier_to_var {
+      //! @cond Doxygen_Suppress
+      template <class> struct result;
+      //! @endcond
+      template <typename F, typename T1, typename T2, typename T3,
+                typename T4, typename T5, typename T6>
+      struct result<F(T1, T2, T3, T4, T5, T6)> { typedef void type; };
+
+      void operator()(const std::string& name,
+                      const var_origin& origin_allowed,
+                      variable& v,
+                      bool& pass,
+                      const variable_map& vm,
+                      std::ostream& error_msgs) const {
+        // validate existence
+        if (!vm.exists(name)) {
+          error_msgs << "unknown variable in assignment"
+                     << "; lhs variable=" << name
+                     << std::endl;
+
+          pass = false;
+          return;
+        }
+        // validate origin
+        var_origin lhs_origin = vm.get_origin(name);
+        if (lhs_origin != local_origin
+            && lhs_origin != origin_allowed) {
+          error_msgs << "attempt to assign variable in block other than that"
+                     << " in which it was defined;"
+                     << " left-hand-side variable was declared in block=";
+          print_var_origin(error_msgs, lhs_origin);
+          error_msgs << " but current top-level block=";
+          print_var_origin(error_msgs, origin_allowed);
+          error_msgs << std::endl;
+          pass = false;
+          return;
+        }
+        // enforce constancy of function args
+        if (lhs_origin == function_argument_origin
+            || lhs_origin == function_argument_origin_lp
+            || lhs_origin == function_argument_origin_rng
+            || lhs_origin == void_function_argument_origin
+            || lhs_origin == void_function_argument_origin_lp
+            || lhs_origin == void_function_argument_origin_rng) {
+          error_msgs << "Illegal to assign to function argument variables."
+                     << "; use local variables instead."
+                     << std::endl;
+          pass = false;
+          return;
+        }
+
+
+        v = variable(name);
+        v.set_type(vm.get_base_type(name), vm.get_num_dims(name));
+        pass = true;
+      }
+    };
+    boost::phoenix::function<identifier_to_var> identifier_to_var_f;
+
+
+    struct validate_assgn {
+      //! @cond Doxygen_Suppress
+      template <class> struct result;
+      //! @endcond
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1, T2, T3)> { typedef void type; };
+
+      void operator()(const assgn& a,
+                      bool& pass,
+                      std::ostream& error_msgs) const {
+        // resolve type of lhs[idxs] and make sure it matches rhs
+        std::string name = a.lhs_var_.name_;
+        expression lhs_expr = expression(a.lhs_var_);
+        expr_type lhs_type = indexed_type(lhs_expr, a.idxs_);
+        if (lhs_type.is_ill_formed()) {
+          error_msgs << "too many indexes for variable "
+                     << "; variable name=" << name
+                     << "; dims available=" << lhs_expr.total_dims()
+                     << "; dims given=" << a.idxs_.size()
+                     << std::endl;
+          pass = false;
+          return;
+        }
+        expr_type rhs_type = a.rhs_.expression_type();
+        base_expr_type lhs_base_type = lhs_type.base_type_;
+        base_expr_type rhs_base_type = rhs_type.base_type_;
+        // allow int -> double promotion, even in arrays
+        bool types_compatible
+          = lhs_base_type == rhs_base_type
+          || (lhs_base_type == DOUBLE_T && rhs_base_type == INT_T);
+        if (!types_compatible) {
+          error_msgs << "base type mismatch in assignment"
+                     << "; variable name="
+                     << name
+                     << ", type=";
+          write_base_expr_type(error_msgs, lhs_base_type);
+          error_msgs << "; right-hand side type=";
+          write_base_expr_type(error_msgs, rhs_base_type);
+          error_msgs << std::endl;
+          pass = false;
+          return;
+        }
+        if (lhs_type.num_dims_ != rhs_type.num_dims_) {
+          error_msgs << "dimension mismatch in assignment"
+                     << "; variable name="
+                     << name
+                     << ", num dimensions given="
+                     << lhs_type.num_dims_
+                     << "; right-hand side dimensions="
+                     << rhs_type.num_dims_
+                     << std::endl;
+          pass = false;
+          return;
+        }
+        pass = true;
+      }
+    };
+    boost::phoenix::function<validate_assgn> validate_assgn_f;
 
     struct validate_assignment {
       //! @cond Doxygen_Suppress
@@ -688,7 +812,8 @@ namespace stan {
         error_msgs_(error_msgs),
         expression_g(var_map, error_msgs),
         var_decls_g(var_map, error_msgs),
-        statement_2_g(var_map, error_msgs, *this) {
+        statement_2_g(var_map, error_msgs, *this),
+        indexes_g(var_map, error_msgs, expression_g) {
       using boost::spirit::qi::_1;
       using boost::spirit::qi::char_;
       using boost::spirit::qi::eps;
@@ -731,6 +856,7 @@ namespace stan {
         | return_statement_r(_r2)                   // key "return"
         | void_return_statement_r(_r2)              // key "return"
         | assignment_r(_r2)                         // lvalue "<-"
+        | assgn_r(_r2)                              // var[idxs] <- expr
         | sample_r(_r1, _r2)                         // expression "~"
         | expression_g(_r2)                         // expression
         [expression_as_statement_f(_pass, _1,
@@ -833,10 +959,25 @@ namespace stan {
         %= (var_lhs_r(_r1)
             >> lit("<-"))
         > expression_rhs_r(_r1)
-        [validate_assignment_f(_val, _r1, _pass,
-       boost::phoenix::ref(var_map_),
-                               boost::phoenix::ref(error_msgs_))]
+          [validate_assignment_f(_val, _r1, _pass,
+                                 boost::phoenix::ref(var_map_),
+                                 boost::phoenix::ref(error_msgs_))]
         > lit(';');
+
+      assgn_r.name("assginment statement");
+      assgn_r
+        = var_r(_r1)
+        > -indexes_g(_r1)
+        > lit("<-")
+        > expression_g(_r1)
+          [validate_assgn_f(_val, _pass, boost::phoenix::ref(error_msgs_))];
+
+      var_r.name("variable for left-hand side of assignment");
+      var_r
+        = identifier_r
+          [identifier_to_var_f(_1, _r1, _val,  _pass,
+                               boost::phoenix::ref(var_map_),
+                               boost::phoenix::ref(error_msgs_))];
 
       expression_rhs_r.name("expression assignable to left-hand side");
       expression_rhs_r
