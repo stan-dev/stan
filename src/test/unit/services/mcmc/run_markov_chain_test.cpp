@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <stan/services/mcmc/run_markov_chain.hpp>
 #include <test/test-models/good/services/test_lp.hpp>
-#include <stan/interface_callbacks/writer/messages.hpp>
+#include <stan/interface_callbacks/writer/stream_writer_typedefs.hpp>
 #include <boost/random/additive_combine.hpp>
 #include <sstream>
 
@@ -49,14 +49,14 @@ public:
     
     model = new stan_model(empty_data_context, &model_output);
     
-    stan::interface_callbacks::writer::csv sample_writer(&sample_output, "# ");
-    stan::interface_callbacks::writer::csv diagnostic_writer(&diagnostic_output, "# ");
-    stan::interface_callbacks::writer::messages message_writer(&message_output, "# ");
+    stan::interface_callbacks::writer::sstream_writer sample_writer(sample_output, "# ");
+    stan::interface_callbacks::writer::sstream_writer diagnostic_writer(diagnostic_output, "# ");
+    stan::interface_callbacks::writer::sstream_writer message_writer(message_output, "# ");
 
     writer = new stan::io::mcmc_writer<stan_model,
-                                       stan::interface_callbacks::writer::csv,
-                                       stan::interface_callbacks::writer::csv,
-                                       stan::interface_callbacks::writer::messages>
+                                       stan::interface_callbacks::writer::sstream_writer,
+                                       stan::interface_callbacks::writer::sstream_writer,
+                                       stan::interface_callbacks::writer::sstream_writer>
       (sample_writer, diagnostic_writer, message_writer, &writer_output);
 
     base_rng.seed(123456);
@@ -74,9 +74,9 @@ public:
   mock_sampler* sampler;
   stan_model* model;
   stan::io::mcmc_writer<stan_model,
-                        stan::interface_callbacks::writer::csv,
-                        stan::interface_callbacks::writer::csv,
-                        stan::interface_callbacks::writer::messages>* writer;
+                        stan::interface_callbacks::writer::sstream_writer,
+                        stan::interface_callbacks::writer::sstream_writer,
+                        stan::interface_callbacks::writer::sstream_writer>* writer;
   rng_t base_rng;
 
   Eigen::VectorXd q;
