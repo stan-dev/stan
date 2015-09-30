@@ -17,7 +17,9 @@ EXE = .exe
 O_STANC = 3
 CFLAGS_GTEST += -DGTEST_HAS_PTHREAD=0
 PATH_SEPARATOR = '\'
-ifeq ($(PROCESSOR_ARCHITECTURE)$(PROCESSOR_ARCHITECTURE6432),x86)
+## Detecting Process Bitness:
+## http://blogs.msdn.com/b/david.wang/archive/2006/03/26/howto-detect-process-bitness.aspx
+ifeq ($(PROCESSOR_ARCHITECTURE)$(PROCESSOR_ARCHITEW6432),x86)
   BIT=32
 else
   BIT=64
