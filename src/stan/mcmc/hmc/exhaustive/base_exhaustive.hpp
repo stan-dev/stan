@@ -13,27 +13,22 @@
 namespace stan {
   namespace mcmc {
 
-    struct exhaustive_util {
-      // Constants through each recursion
-      double log_u;
-      double H0;
-      int sign;
-
-      // Aggregators through each recursion
-      int n_tree;
-      double sum_prob;
-      bool criterion;
-    };
-
-
     template <class M, class P, template<class, class> class H,
               template<class, class> class I, class BaseRNG>
     class base_exhaustive: public base_hmc<M, P, H, I, BaseRNG> {
+    private:
+      int depth_;
+      int max_depth_;
+      double max_Delta_;
+      double exhaustion_delta_;
+      int n_leapfrog_;
+      bool divergent_;
+
     public:
       base_exhaustive(M &m, BaseRNG& rng, std::ostream* o, std::ostream* e)
         : base_hmc<M, P, H, I, BaseRNG>(m, rng, o, e),
-        depth_(0), max_depth_(5), max_delta_(1000),
-        exhaustion_delta_(0.1), n_leapfrog_(0), n_divergent_(0) {
+        depth_(0), max_depth_(10), max_Delta_(1000),
+        exhaustion_delta_(0.1), n_leapfrog_(0), divergent_(false) {
       }
 
       ~base_exhaustive() {}
@@ -43,104 +38,99 @@ namespace stan {
           max_depth_ = d;
       }
 
-      void set_max_delta(double d) {
-        max_delta_ = d;
+      void set_max_Delta(double d) {
+        max_Delta_ = d;
       }
 
       int get_max_depth() { return this->max_depth_; }
-      double get_max_delta() { return this->max_delta_; }
+      double get_max_Delta() { return this->max_Delta_; }
 
       void write_sampler_param_names(std::ostream& o) {
-        o << "stepsize__,treedepth__,n_leapfrog__,n_divergent__,";
+        o << "stepsize__,treedepth__,n_leapfrog__,divergent__,";
       }
 
       void write_sampler_params(std::ostream& o) {
         o << this->epsilon_    << "," << this->depth_ << ","
-        << this->n_leapfrog_ << "," << this->n_divergent_ << ",";
+        << this->n_leapfrog_ << "," << this->divergent_ << ",";
       }
 
       void get_sampler_param_names(std::vector<std::string>& names) {
         names.push_back("stepsize__");
         names.push_back("treedepth__");
         names.push_back("n_leapfrog__");
-        names.push_back("n_divergent__");
+        names.push_back("divergent__");
       }
 
       void get_sampler_params(std::vector<double>& values) {
         values.push_back(this->epsilon_);
         values.push_back(this->depth_);
         values.push_back(this->n_leapfrog_);
-        values.push_back(this->n_divergent_);
+        values.push_back(this->divergent_);
       }
 
-      bool check_termination(double G_init, double G_final, double delta_t) {
-        return std::fabs( (G_final - G_init) / delta_t ) < exhaustion_delta_;
-      }
-
-      // Returns number of valid points in the completed subtree
-      int build_tree(int depth,
-                     double& G_init,
-                     double& G_final,
-                     ps_point& z_propose,
-                     nuts_util& util) {
+      // Returns validity of completed subtree
+      bool build_tree(int depth,
+                      double& ex_numer,
+                      double& ex_denom,
+                      double H0,
+                      double sign,
+                      ps_point& z_propose) {
         // Base case
         if (depth == 0) {
           this->integrator_.evolve(this->z_, this->hamiltonian_,
-                                   util.sign * this->epsilon_);
-
-          G_init  = this->z_.p.dot(this->z_.q);
-          G_final = G_init;
-
-          z_propose = this->z_;
+                                   sign * this->epsilon_);
 
           double h = this->hamiltonian_.H(this->z_);
           if (boost::math::isnan(h))
             h = std::numeric_limits<double>::infinity();
 
-          util.criterion = util.log_u + (h - util.H0) < this->max_delta_;
-          if (!util.criterion) ++(this->n_divergent_);
+          if ((h - H0) > this->max_Delta_) this->divergent_ = true;
 
-          util.sum_prob += std::min(1.0, std::exp(util.H0 - h));
-          util.n_tree += 1;
+          double pi = exp(H0 - h);
+          ex_numer += pi * this->hamiltonian_.dG_dt(this->z_);
+          ex_denom += pi;
 
-          return (util.log_u + (h - util.H0) < 0);
+          z_propose = this->z_;
+
+          return !this->divergent_;
 
         } else {
           // General recursion
-          double G_left = 0;
-          double G_right = 0;
+          double ex_numer_left = 0;
+          double ex_denom_left = 0;
 
-          int n1 = build_tree(depth - 1, G_left, G_right, z_propose, util);
+          // Build the left subtree
+          bool valid_left = build_tree(depth - 1,
+                                       ex_numer_left, ex_denom_left, H0,
+                                       sign, z_propose);
 
-          G_init = G_left;
-          G_final = G_right;
+          if (!valid_left) return false;
 
-          if (!util.criterion) return 0;
-
+          // Build the right subtree
           ps_point z_propose_right(this->z_);
+          double ex_numer_right = 0;
+          double ex_denom_right = 0;
 
-          int n2 = build_tree(depth - 1, G_left, G_right, z_propose_right, util);
+          bool valid_right = build_tree(depth - 1,
+                                        ex_numer_right, ex_denom_right, H0,
+                                        sign, z_propose_right);
 
-          G_final = G_right;
+          if (!valid_right) return false;
 
-          double accept_prob =   static_cast<double>(n2)
-                               / static_cast<double>(n1 + n2);
+          ex_numer = ex_numer_left + ex_numer_right;
+          ex_denom = ex_denom_left + ex_denom_right;
 
-          if ( util.criterion && (this->rand_uniform_() < accept_prob) )
+          double accept_prob = ex_denom_right / ex_denom;
+          if (this->rand_uniform_() < accept_prob)
             z_propose = z_propose_right;
 
-          util.criterion &= !check_termination(G_init, G_final,
-                                               this->epsilon_ * (1 << depth));
-
-          return n1 + n2;
+          return std::fabs(ex_numer / ex_denom) >= exhaustion_delta_;
         }
       }
 
       sample transition(sample& init_sample) {
         // Initialize the algorithm
         this->sample_stepsize();
-
-        nuts_util util;
 
         this->seed(init_sample.cont_params());
 
@@ -153,83 +143,58 @@ namespace stan {
         ps_point z_sample(z_plus);
         ps_point z_propose(z_plus);
 
-        double G_plus = this->z_.p.dot(this->z_.q);
-        double G_minus = G_plus;
-        double G_dump;
+        double ex_numer = this->hamiltonian_.dG_dt(this->z_);
+        double ex_denom = 1;
+        double H0 = this->hamiltonian_.H(this->z_);
 
-        util.H0 = this->hamiltonian_.H(this->z_);
-
-        // Sample the slice variable
-        util.log_u = std::log(this->rand_uniform_());
-
-        // Build a balanced binary tree until the exhaustion criterion is satsified
-        util.criterion = true;
-        int n_valid = 0;
-
+        // Build a balanced binary tree until the
+        // exhaustion criterion is satsified
         this->depth_ = 0;
-        this->n_divergent_ = 0;
+        this->divergent_ = false;
 
-        util.n_tree = 0;
-        util.sum_prob = 0;
-
-        while (util.criterion && (this->depth_ <= this->max_depth_)) {
+        while (this->depth_ < this->max_depth_) {
           // Build a new subtree in a random direction
-          int n_valid_subtree = 0;
+          bool valid_subtree = false;
+          double ex_numer_subtree = 0;
+          double ex_denom_subtree = 0;
 
           if (this->rand_uniform_() > 0.5) {
-            util.sign = 1;
             this->z_.ps_point::operator=(z_plus);
-            n_valid_subtree = build_tree(depth_, G_dump, G_plus, z_propose, util);
+            valid_subtree = build_tree(this->depth_,
+                                       ex_numer_subtree, ex_denom_subtree,
+                                       H0, 1, z_propose);
           } else {
-            util.sign = -1;
             this->z_.ps_point::operator=(z_minus);
-            n_valid_subtree = build_tree(depth_, G_dump, G_minus, z_propose, util);
+            valid_subtree = build_tree(this->depth_,
+                                       ex_numer_subtree, ex_denom_subtree,
+                                       H0, -1, z_propose);
           }
+
+          if (!valid_subtree) break;
 
           ++(this->depth_);
 
-          // Metropolis-Hastings sample the fresh subtree
-          if (!util.criterion)
-            break;
+          // Sample from an accepted subtree
+          ex_numer += ex_numer_subtree;
+          ex_denom += ex_denom_subtree;
 
-          double subtree_prob = 0;
+          double accept_prob = ex_denom_subtree / ex_denom;
 
-          if (n_valid) {
-            subtree_prob = static_cast<double>(n_valid_subtree) /
-              static_cast<double>(n_valid);
-          } else {
-            subtree_prob = n_valid_subtree ? 1 : 0;
-          }
-
-          if (this->rand_uniform_() < subtree_prob)
+          if (this->rand_uniform_() < accept_prob)
             z_sample = z_propose;
 
-          n_valid += n_valid_subtree;
-
-          util.criterion
-            = !check_termination(G_plus, G_minus, this->epsilon_ * util.n_tree);
-
+          // Break if exhaustion criterion is satisfied
+          if (std::fabs(ex_numer / ex_denom) < exhaustion_delta_)
+            break;
         }
 
-        this->n_leapfrog_ = util.n_tree;
-
-        double accept_prob = util.sum_prob / static_cast<double>(util.n_tree);
+        this->n_leapfrog_ = (1 << this->depth_);
+        double accept_prob = ex_denom / this->n_leapfrog_;
 
         this->z_.ps_point::operator=(z_sample);
-        return sample(this->z_.q, - this->z_.V, accept_prob);
+        return sample(this->z_.q, -this->z_.V, accept_prob);
       }
-
-    private:
-      int depth_;
-      int max_depth_;
-      double max_delta_;
-
-      double exhaustion_delta_;
-
-      int n_leapfrog_;
-      int n_divergent_;
     };
-
   }  // mcmc
 }  // stan
 #endif
