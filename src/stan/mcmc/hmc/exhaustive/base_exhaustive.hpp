@@ -28,7 +28,7 @@ namespace stan {
       base_exhaustive(M &m, BaseRNG& rng, std::ostream* o, std::ostream* e)
         : base_hmc<M, P, H, I, BaseRNG>(m, rng, o, e),
         depth_(0), max_depth_(10), max_Delta_(1000),
-        exhaustion_delta_(0.01), n_leapfrog_(0), divergent_(false) {
+        exhaustion_delta_(0.1), n_leapfrog_(0), divergent_(false) {
       }
 
       ~base_exhaustive() {}
@@ -38,11 +38,17 @@ namespace stan {
           max_depth_ = d;
       }
 
+      void set_x_delta(double d) {
+        if (d > 0)
+          exhaustion_delta_ = d;
+      }
+
       void set_max_Delta(double d) {
         max_Delta_ = d;
       }
 
       int get_max_depth() { return this->max_depth_; }
+      double get_x_delta() { return this->exhaustion_delta_; }
       double get_max_Delta() { return this->max_Delta_; }
 
       void write_sampler_param_names(std::ostream& o) {

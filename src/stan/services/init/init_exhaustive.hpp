@@ -31,11 +31,15 @@ namespace stan {
           ->value();
         int max_depth
           = dynamic_cast<stan::services::int_argument*>(base->arg("max_depth"))
-          ->value();
+              ->value();
+        double x_delta
+          = dynamic_cast<stan::services::real_argument*>(base->arg("x_delta"))
+              ->value();
 
         dynamic_cast<Sampler*>(sampler)->set_nominal_stepsize(epsilon);
         dynamic_cast<Sampler*>(sampler)->set_stepsize_jitter(epsilon_jitter);
         dynamic_cast<Sampler*>(sampler)->set_max_depth(max_depth);
+        dynamic_cast<Sampler*>(sampler)->set_x_delta(x_delta);
         
         return true;
       }
