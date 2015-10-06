@@ -1,3 +1,5 @@
+
+
 \part{Modeling Language Reference}
 
 \chapter{Execution of a Stan Program}
@@ -592,7 +594,7 @@ Vectors, row vectors, and matrices contain real values.  Arrays, on
 the other hand, may contain any kind of value, including integers and
 structured values like vectors.
 
-\subsection{Indexing}
+\subsection{Indexing from 1}
 
 Vectors and matrices, as well as arrays, are indexed starting from one
 in Stan.  This follows the convention in statistics and linear
@@ -1097,12 +1099,6 @@ Partial array assignment also works for arrays of matrices, vectors,
 and row vectors.
 
 
-
-
-
-
-
-
 \subsection{Mixing Array, Vector, and Matrix Types}
 
 Arrays, row vectors, column vectors and matrices are not
@@ -1184,6 +1180,9 @@ An integer expression is used to pick out the sizes of arrays.  The
 same restrictions as for vector and matrix sizes apply, namely that
 the size is declared with an integer-denoting expression that does not
 contain any parameters, transformed parameters, or generated quantities.
+
+
+
 
 \section{Variable Types vs.\ Constraints and Sizes}
 
@@ -1809,7 +1808,7 @@ is interpreted as \mbox{\code{-(n \textasciicircum\ 3)}}.
 
 
 
-\section{Subscripting}
+\section{Indexing}\label{language-indexing.section}
 
 Stan arrays, matrices, vectors, and row vectors are all accessed
 using the same array-like notation.  For instance, if \code{x} is a
@@ -1853,6 +1852,115 @@ the third row of the matrix denoted by \code{m[1,2]}.  Finally,
 \code{m[1,2,3,4]} is of type \code{real} and denotes the value in the
 third row and fourth column of the matrix that is found at the first
 row and second column of the array \code{m}.
+
+\section{Multiple Indexing}\label{language-multi-indexing}
+
+In addition to single integer indexes, as described in
+\refsection{language-indexing}, Stan supports multiple indexing.
+Multiple indexes can be integer arrays of indexes, lower
+bounds, upper bounds, lower and upper bounds, or simply shorthand for
+all of the indexes.  A complete table of index types is given in
+\reffigure{index-types}.
+%
+\begin{figure}[t]
+\begin{center}
+\begin{tabular}{c|c|c}
+{\it index type} & {\it example}  & {\it value} \\ \hline \hline
+integer & \code{a[11]} 
+& value of \code{a} at index 11
+\\ \hline
+integer array & \code{a[ii]}
+& \code{a[ii[1]]}, \ \ldots, \ \code{a[ii[K]]}
+\\[4pt]
+lower bound & \code{a[3:]} 
+& \code{a[3]}, \ \ldots, \ \code{a[N]}
+\\
+upper bound & \code{a[:5]}
+& \code{a[1]}, \ \ldots, \code{a[5]}
+\\
+range & \code{a[2:7]}
+& \code{a[2]}, \ \ldots, \  \code{a[7]}
+\\[4pt]
+all & \code{a[:]}
+& \code{a[1]}, \ldots, \ \code{a[N]}
+\\
+all & \code{a[]}
+& \code{a[1]}, \ldots, \ \code{a[N]}
+\end{tabular}
+\end{center}
+\vspace*{-8pt}
+\caption{\small\it Types of indexes and examples with one-dimensional
+  containers of size \code{N} and an integer array \code{ii} of type 
+\code{int[]} size \code{K}.}\label{index-types.figure}
+\end{figure}
+
+\subsection{Multiple Index Semantics}
+
+The fundamental semantic rule for dealing with multiple indexes is the
+following.  If \code{idxs} is a multiple index, then it produces an
+indexable position in the result.  To evaluate that index position in
+the result, the index is first passed to the multiple index, and the
+resulting index used.
+%
+\begin{stancode}
+a[idxs, ...][i, ...] = a[idxs[i], ...][...]
+\end{stancode}
+%
+On the other hand, if \code{idx} is a single index, it reduces the
+dimensionality of the output, so that
+%
+\begin{stancode}
+a[idx, ...] = a[idx][...]
+\end{stancode}
+
+The only issue is what happens with matrices and vectors.  Vectors
+work just like arrays.  Matrices with multiple row indexes and
+multiple column indexes produce matrices.  Matrices with multiple row
+indexes and a single column index become (column) vectors.  Matrices
+with a single row index and multiple column indexes become row
+vectors.  The types are summarized in \reffigure{matrix-indexing}.
+%
+\begin{figure}[t]
+\begin{center}
+\begin{tabular}{c|c|c|c}
+{\it example} & {\it row index} & {\it column index} & {\it result type}
+\\ \hline \hline
+\code{a[i]} &
+single & n/a & row vector
+\\
+\code{a[is]} &
+multiple & n/a & matrix
+\\ \hline
+\code{a[is, js]} & single & single & real
+\\
+\code{a[i, js]} & single & multiple & row vector
+\\
+\code{a[is, j]} & multiple & single & vector
+\\
+\code{a[is, js]} & multiple & multiple & matrix
+\end{tabular}
+\end{center}
+\caption{\small\it Special rules for reducing matrices based on
+  whether the argumnt is a single or multiple index.  Examples are for
+a matrix \code{a}, with integer single indexes \code{i} and \code{j}
+and integer array multiple indexes \code{is} and \code{js}.  The same
+typing rules apply for all multiple indexes.}%
+\label{matrix-indexing.figure} 
+\end{figure}
+
+Evaluation of matrices with multiple indexes is defined to respect the
+following distributivity conditions.
+%
+\begin{stancode}
+m[idxs1, idxs2][i, j] = m[idxs1[i], idxs2[j]]
+m[idxs, idx][j] = m[idxs[j], idx]
+m[idx, idxs][j] = m[idx, idxs[j]]
+\end{stancode}
+%
+
+Evaluation of arrays of matrices and arrays of vectors or row vectors
+is defined recursively, beginning with the array dimensions.
+
 
 \section{Function Application}\label{function-application.section}
 
@@ -2432,6 +2540,24 @@ dimension than the array.  Note that the number of indices can be less
 than the number of dimensions of the variable, meaning that the right
 hand side must itself be multidimensional to match the remaining
 dimensions.
+
+\subsection{Multiple Indexes}
+
+Multiple indexes, as described in
+\refsection{language-multi-indexing}, are also permitted on the
+left-hand side of assignments.  Indexing on the left side works
+exactly as it does for expressions, with multiple indexes preserving
+index positions and single indexes reducing them.    The type on the
+left side must still match the type on the right side.
+
+\subsubsection{Aliasing}
+
+All assignment is carried out as if the right-hand side is copied
+before the assignment.  This resolves any potential aliasing issues
+arising from he right-hand side changing in the middle of an
+assignment statement's execution.
+
+
 
 \section{Log Probability Increment Statement}\label{increment-log-prob.section}
 
@@ -4505,12 +4631,15 @@ expression ::= numeric_literal
              | expression infixOp expression
              | prefixOp expression
              | expression postfixOp
-             | expression '[' expressions ']'
+             | expression '[' indexes ']'
              | function_literal '(' ?expressions ')'
              | integrate_ode '(' function_literal (',' expression){6} ')'
              | '(' expression ')'
 
-expressions ::= expression % ','
+index ::= ?(expression | expression ':' | ':' expression
+            | expression ':' expression)
+
+indexes ::= index % ','
 
 numeric_literal ::= int_literal | real_literal
 
@@ -4546,8 +4675,7 @@ string_literal ::= '"' char* '"'
 
 truncation ::= 'T' '[' ?expression ',' ?expression ']'
 
-lhs ::= identifier ?indices
-indices ::= '[' expressions ']'
+lhs ::= identifier ?('[' indexes ']')
 
 nested_statement
 ::=
@@ -4611,3 +4739,18 @@ The \code{integrate\_ode} expression requires
   containing any variables not originating in the data or transformed
   data blocks.
 \end{itemize}
+
+\subsection{Indexes}
+
+Standalone expressions used as indexes must denote either an integer
+(\code{int}) or an integer array (\code{int[]}).  Expressions
+participating in range indexes (e.g., \code{a} and \code{b} in
+\code{a~:~b}) must denote integers (\code{int}).
+
+A second condition is that there not be more indexes provided than
+dimensions of the underlying expression (in general) or variable (on
+the left side of assignments) being indexed.  A vector or row vector
+adds 1 to the array dimension and a matrix adds 2.  That is, the type
+\code{matrix[\,,\,,\,]}, a three-dimensional array of matrices, has five
+index positions: three for the array, one for the row of the matrix
+and one for the column.
