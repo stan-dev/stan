@@ -183,6 +183,6 @@ src/test/performance/logistic_test.cpp: src/test/test-models/performance/logisti
 
 test_name = $(shell echo $(1) | sed 's,_[0-9]\{5\},_test.hpp,g')
 
-ifeq (,$(filter-out test/% src/test/test-models/%.hpp,$(MAKECMDGOALS)))
+ifneq (,$(filter test/% src/test/test-models/%.hpp,$(MAKECMDGOALS)))
   -include test/test-models/stanc.d
 endif
