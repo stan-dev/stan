@@ -388,9 +388,9 @@ namespace stan {
 
         interface_callbacks::interrupt::noop iteration_interrupt;
 
-        stan::services::sample::run_sampler(*sampler_ptr, s, num_warmup, num_samples,
-                                            num_thin, refresh, save_warmup,
-                                            writer, iteration_interrupt);
+        stan::services::sample::run_adaptive_sampler(*sampler_ptr, s, num_warmup, num_samples,
+                                                     num_thin, refresh, save_warmup,
+                                                     writer, iteration_interrupt);
                             
           
         if (sampler_ptr)
