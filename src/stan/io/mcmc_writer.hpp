@@ -1,7 +1,6 @@
 #ifndef STAN_IO_MCMC_WRITER_HPP
 #define STAN_IO_MCMC_WRITER_HPP
 
-#include <stan/interface_callbacks/writer/csv.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/mcmc/sample.hpp>
 #include <stan/model/prob_grad.hpp>
@@ -135,8 +134,6 @@ namespace stan {
       template <class Writer>
       void write_adapt_finish(stan::mcmc::base_mcmc* sampler,
                               Writer& writer) {
-        if (!writer.is_writing())
-          return;
         std::stringstream stream;
         sampler->write_sampler_state(&stream);
 
@@ -226,9 +223,6 @@ namespace stan {
       template <class Writer>
       void write_timing(double warmDeltaT, double sampleDeltaT,
                         Writer& writer) {
-        if (!writer.is_writing())
-          return;
-
         std::string title(" Elapsed Time: ");
         std::stringstream ss;
 

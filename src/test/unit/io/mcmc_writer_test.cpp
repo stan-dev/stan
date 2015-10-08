@@ -1,4 +1,5 @@
 #include <stan/io/mcmc_writer.hpp>
+#include <stan/interface_callbacks/writer/stream_writer_typedefs.hpp>
 #include <test/test-models/good/io_example.hpp>
 
 #include <vector>
@@ -7,13 +8,13 @@
 #include <stan/mcmc/sample.hpp>
 #include <stan/mcmc/hmc/nuts/diag_e_nuts.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_diag_e_nuts.hpp>
-#include <stan/interface_callbacks/writer/messages.hpp>
 
 #include <sstream>
 #include <string>
 
 #include <gtest/gtest.h>
 
+typedef stan::interface_callbacks::writer::sstream_writer writer_t;
 
 TEST(StanIoMcmcWriter, write_sample_names) {
   
@@ -48,14 +49,14 @@ TEST(StanIoMcmcWriter, write_sample_names) {
   std::stringstream diagnostic_stream;
   std::stringstream message_stream;
 
-  stan::interface_callbacks::writer::csv sample_writer(&sample_stream, "# ");
-  stan::interface_callbacks::writer::csv diagnostic_writer(&diagnostic_stream, "# ");
-  stan::interface_callbacks::writer::messages message_writer(&message_stream, "# ");
+  writer_t sample_writer(sample_stream, "# ");
+  writer_t diagnostic_writer(diagnostic_stream, "# ");
+  writer_t message_writer(message_stream, "# ");
 
   stan::io::mcmc_writer<io_example_model_namespace::io_example_model,
-                        stan::interface_callbacks::writer::csv,
-                        stan::interface_callbacks::writer::csv,
-                        stan::interface_callbacks::writer::messages>
+                        writer_t,
+                        writer_t,
+                        writer_t>
     writer(sample_writer, diagnostic_writer, message_writer);
   
   writer.write_sample_names(sample, &sampler, model);
@@ -101,14 +102,14 @@ TEST(StanIoMcmcWriter, write_sample_params) {
   std::stringstream diagnostic_stream;
   std::stringstream message_stream;
 
-  stan::interface_callbacks::writer::csv sample_writer(&sample_stream, "# ");
-  stan::interface_callbacks::writer::csv diagnostic_writer(&diagnostic_stream, "# ");
-  stan::interface_callbacks::writer::messages message_writer(&message_stream, "# ");
+  writer_t sample_writer(sample_stream, "# ");
+  writer_t diagnostic_writer(diagnostic_stream, "# ");
+  writer_t message_writer(message_stream, "# ");
 
   stan::io::mcmc_writer<io_example_model_namespace::io_example_model,
-                        stan::interface_callbacks::writer::csv,
-                        stan::interface_callbacks::writer::csv,
-                        stan::interface_callbacks::writer::messages> 
+                        writer_t,
+                        writer_t,
+                        writer_t>
     writer(sample_writer, diagnostic_writer, message_writer);
   
   writer.write_sample_params<rng_t>(base_rng, sample, sampler, model);
@@ -167,14 +168,14 @@ TEST(StanIoMcmcWriter, write_adapt_finish) {
   std::stringstream diagnostic_stream;
   std::stringstream message_stream;
   
-  stan::interface_callbacks::writer::csv sample_writer(&sample_stream, "# ");
-  stan::interface_callbacks::writer::csv diagnostic_writer(&diagnostic_stream, "# ");
-  stan::interface_callbacks::writer::messages message_writer(&message_stream, "# ");
+  writer_t sample_writer(sample_stream, "# ");
+  writer_t diagnostic_writer(diagnostic_stream, "# ");
+  writer_t message_writer(message_stream, "# ");
 
   stan::io::mcmc_writer<io_example_model_namespace::io_example_model,
-                        stan::interface_callbacks::writer::csv,
-                        stan::interface_callbacks::writer::csv,
-                        stan::interface_callbacks::writer::messages> 
+                        writer_t,
+                        writer_t,
+                        writer_t>
     writer(sample_writer, diagnostic_writer, message_writer);
   
   writer.write_adapt_finish(&sampler);
@@ -261,14 +262,14 @@ TEST(StanIoMcmcWriter, write_diagnostic_names) {
   std::stringstream diagnostic_stream;
   std::stringstream message_stream;
   
-  stan::interface_callbacks::writer::csv sample_writer(&sample_stream, "# ");
-  stan::interface_callbacks::writer::csv diagnostic_writer(&diagnostic_stream, "# ");
-  stan::interface_callbacks::writer::messages message_writer(&message_stream, "# ");
+  writer_t sample_writer(sample_stream, "# ");
+  writer_t diagnostic_writer(diagnostic_stream, "# ");
+  writer_t message_writer(message_stream, "# ");
 
   stan::io::mcmc_writer<io_example_model_namespace::io_example_model,
-                        stan::interface_callbacks::writer::csv,
-                        stan::interface_callbacks::writer::csv,
-                        stan::interface_callbacks::writer::messages> 
+                        writer_t,
+                        writer_t,
+                        writer_t> 
     writer(sample_writer, diagnostic_writer, message_writer);
   
   writer.write_diagnostic_names(sample, &sampler, model);
@@ -320,14 +321,14 @@ TEST(StanIoMcmcWriter, write_diagnostic_params) {
   std::stringstream diagnostic_stream;
   std::stringstream message_stream;
   
-  stan::interface_callbacks::writer::csv sample_writer(&sample_stream, "# ");
-  stan::interface_callbacks::writer::csv diagnostic_writer(&diagnostic_stream, "# ");
-  stan::interface_callbacks::writer::messages message_writer(&message_stream, "# ");
+  writer_t sample_writer(sample_stream, "# ");
+  writer_t diagnostic_writer(diagnostic_stream, "# ");
+  writer_t message_writer(message_stream, "# ");
 
   stan::io::mcmc_writer<io_example_model_namespace::io_example_model,
-                        stan::interface_callbacks::writer::csv,
-                        stan::interface_callbacks::writer::csv,
-                        stan::interface_callbacks::writer::messages> 
+                        writer_t,
+                        writer_t,
+                        writer_t> 
     writer(sample_writer, diagnostic_writer, message_writer);
   
   writer.write_diagnostic_params(sample, &sampler);
@@ -389,14 +390,14 @@ TEST(StanIoMcmcWriter, write_timing) {
   std::stringstream diagnostic_stream;
   std::stringstream message_stream;
   
-  stan::interface_callbacks::writer::csv sample_writer(&sample_stream, "# ");
-  stan::interface_callbacks::writer::csv diagnostic_writer(&diagnostic_stream, "# ");
-  stan::interface_callbacks::writer::messages message_writer(&message_stream, "# ");
+  writer_t sample_writer(sample_stream, "# ");
+  writer_t diagnostic_writer(diagnostic_stream, "# ");
+  writer_t message_writer(message_stream, "# ");
 
   stan::io::mcmc_writer<io_example_model_namespace::io_example_model,
-                        stan::interface_callbacks::writer::csv,
-                        stan::interface_callbacks::writer::csv,
-                        stan::interface_callbacks::writer::messages> 
+                        writer_t,
+                        writer_t,
+                        writer_t> 
     writer(sample_writer, diagnostic_writer, message_writer);
   
   double warm = 0.193933;
