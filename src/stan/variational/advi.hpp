@@ -175,6 +175,7 @@ namespace stan {
         // Adagrad parameters
         double tau = 1.0;
         Q params_adagrad = Q(model_.num_params_r());
+        double eta_scaled;
 
         // RMSprop window_size
         double window_size = 10.0;
@@ -191,7 +192,7 @@ namespace stan {
         // Heuristic to estimate how far to look back in rolling window
         int cb_size = static_cast<int>(
                 std::max(0.1*max_iterations/static_cast<double>(eval_elbo_),
-                         1.0));
+                         2.0));
         boost::circular_buffer<double> cb(cb_size);
 
         // Print stuff
@@ -224,9 +225,10 @@ namespace stan {
             params_adagrad = pre_factor * params_adagrad +
                              post_factor * elbo_grad.square();
           }
+          eta_scaled = eta_adagrad_ / sqrt(static_cast<double>(iter_counter));
 
           // Stochastic gradient update
-          variational += eta_adagrad_ * elbo_grad /
+          variational += eta_scaled * elbo_grad /
             (tau + params_adagrad.sqrt());
 
           // Check for convergence every "eval_elbo_"th iteration
@@ -276,7 +278,7 @@ namespace stan {
               do_more_iterations = false;
             }
 
-            if (iter_counter > 100) {
+            if (iter_counter > 2*eval_elbo_) {
               if (delta_elbo_med > 0.5 || delta_elbo_ave > 0.5) {
                 if (print_stream_)
                   *print_stream_ << "   MAY BE DIVERGING... INSPECT ELBO";
