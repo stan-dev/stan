@@ -183,6 +183,7 @@ namespace stan {
 
         // Initialize ELBO and convergence tracking variables
         double elbo(0.0);
+        double elbo_best      = -std::numeric_limits<double>::max();
         double elbo_prev      = std::numeric_limits<double>::min();
         double delta_elbo     = std::numeric_limits<double>::max();
         double delta_elbo_ave = std::numeric_limits<double>::max();
@@ -233,6 +234,9 @@ namespace stan {
           if (iter_counter % eval_elbo_ == 0) {
             elbo_prev = elbo;
             elbo = calc_ELBO(variational);
+            if (elbo > elbo_best) {
+              elbo_best = elbo;
+            }
             delta_elbo = rel_decrease(elbo, elbo_prev);
             cb.push_back(delta_elbo);
             delta_elbo_ave = std::accumulate(cb.begin(), cb.end(), 0.0)
@@ -285,12 +289,31 @@ namespace stan {
 
             if (print_stream_)
               *print_stream_ << std::endl;
+
+            if (do_more_iterations == false &&
+                rel_decrease(elbo, elbo_best) > 0.05) {
+              if (print_stream_)
+                *print_stream_
+                  << "Informational Message: The ELBO at a previous "
+                  << "iteration is larger than the ELBO upon "
+                  << "convergence!"
+                  << std::endl
+                  << "This means that the variational approximation has "
+                  << "not converged to the global optima."
+                  << std::endl;
+            }
           }
 
-          // Check for max iterations
-          if (iter_counter == max_iterations) {
+          if (iter_main == max_iterations) {
             if (print_stream_)
-              *print_stream_ << "MAX ITERATIONS REACHED" << std::endl;
+              *print_stream_
+                << "Informational Message: The maximum number of "
+                << "iterations is reached! The algorithm has not "
+                << "converged."
+                << std::endl
+                << "Values from this variational approximation are not "
+                << "guaranteed to be meaningful."
+                << std::endl;
             do_more_iterations = false;
           }
 
@@ -334,6 +357,14 @@ namespace stan {
 
         // draw more samples from posterior and write on subsequent lines
         if (out_stream_) {
+          if (print_stream_) {
+            *print_stream_ << std::endl
+                           << "Drawing "
+                           << n_posterior_samples_
+                           << " samples from the approximate posterior... ";
+            print_stream_->flush();
+          }
+
           for (int n = 0; n < n_posterior_samples_; ++n) {
             variational.sample(rng_, cont_params_);
             double lp = model_.template log_prob<false, true>(cont_params_,
