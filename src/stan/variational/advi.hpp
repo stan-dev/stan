@@ -204,13 +204,12 @@ namespace stan {
         // Main loop
         std::vector<double> print_vector;
         bool do_more_iterations = true;
-        int iter_sgd = 0;
-        while (do_more_iterations) {
-          // Compute gradient using Monte Carlo integration
+        for (int iter_sgd = 1; do_more_iterations; ++iter_sgd) {
+          // Compute gradient of ELBO
           calc_ELBO_grad(variational, elbo_grad);
 
           // Update learning rate parameters
-          if (iter_sgd == 0) {
+          if (iter_sgd == 1) {
             params_prop += elbo_grad.square();
           } else {
             params_prop = pre_factor * params_prop +
@@ -218,8 +217,7 @@ namespace stan {
           }
 
           // Stochastic gradient update
-          variational += eta_ * elbo_grad /
-            (tau + params_prop.sqrt());
+          variational += eta_ * elbo_grad / (tau + params_prop.sqrt());
 
           // Check for convergence every "eval_elbo_"th iteration
           if (iter_sgd % eval_elbo_ == 0) {
@@ -255,7 +253,8 @@ namespace stan {
               print_vector.push_back(delta_t);
               print_vector.push_back(elbo);
               services::io::write_iteration_csv(*diag_stream_,
-                                                iter_sgd, print_vector);
+                                                iter_sgd,
+                                                print_vector);
             }
 
             if (delta_elbo_ave < tol_rel_obj) {
@@ -287,8 +286,6 @@ namespace stan {
               *print_stream_ << "MAX ITERATIONS REACHED" << std::endl;
             do_more_iterations = false;
           }
-
-          ++iter_sgd;
         }
         return stan::services::error_codes::OK;
       }
