@@ -21,11 +21,7 @@ namespace stan {
   namespace variational {
 
     /**
-     * AUTOMATIC DIFFERENTIATION VARIATIONAL INFERENCE
-     *
-     * Runs "black box" variational inference by applying stochastic gradient
-     * ascent in order to maximize the Evidence Lower Bound for a given model
-     * and variational family.
+     * Runs automatic differentiation variational inference.
      *
      * @tparam M                     class of model
      * @tparam Q                     class of variational distribution
@@ -34,7 +30,7 @@ namespace stan {
      * @param  cont_params           initialization of continuous parameters
      * @param  n_monte_carlo_grad    number of samples for gradient computation
      * @param  n_monte_carlo_elbo    number of samples for ELBO computation
-     * @param  eta_adagrad           eta parameter for adaGrad
+     * @param  eta                   stepsize scaling in learning rate
      * @param  rng                   random number generator
      * @param  eval_elbo             evaluate ELBO at every "eval_elbo" iters
      * @param  n_posterior_samples   number of samples to draw from posterior
@@ -47,10 +43,10 @@ namespace stan {
     public:
       advi(M& m,
            Eigen::VectorXd& cont_params,
+           BaseRNG& rng,
            int n_monte_carlo_grad,
            int n_monte_carlo_elbo,
-           double eta_adagrad,
-           BaseRNG& rng,
+           double eta,
            int eval_elbo,
            int n_posterior_samples,
            std::ostream* print_stream,
@@ -61,7 +57,7 @@ namespace stan {
         rng_(rng),
         n_monte_carlo_grad_(n_monte_carlo_grad),
         n_monte_carlo_elbo_(n_monte_carlo_elbo),
-        eta_adagrad_(eta_adagrad),
+        eta_(eta),
         eval_elbo_(eval_elbo),
         n_posterior_samples_(n_posterior_samples),
         print_stream_(print_stream),
@@ -77,7 +73,7 @@ namespace stan {
         stan::math::check_positive(function,
                                  "Number of posterior samples for output",
                                  n_posterior_samples_);
-        stan::math::check_positive(function, "Eta stepsize", eta_adagrad_);
+        stan::math::check_positive(function, "Eta stepsize", eta_);
         }
 
       /**
@@ -85,8 +81,8 @@ namespace stan {
        * the variational distribution and then evaluating the log joint,
        * adjusted by the entropy term of the variational distribution.
        *
-       * @tparam Q class of variational distribution
-       * @return   evidence lower bound (elbo)
+       * @param variational variational distribution
+       * @return evidence lower bound (elbo)
        */
       double calc_ELBO(const Q& variational) const {
         static const char* function =
@@ -131,7 +127,8 @@ namespace stan {
        * Calculates the "black box" gradient of the ELBO.
        *
        * @param variational variational distribution
-       * @param elbo_grad gradient of ELBO with respect to variational parameters
+       * @param elbo_grad gradient of ELBO with respect to variational
+       *                  parameters
        */
       void calc_ELBO_grad(const Q& variational, Q& elbo_grad) const {
         static const char* function =
@@ -150,17 +147,18 @@ namespace stan {
       }
 
       /**
-       * Runs stochastic gradient ascent with Adagrad.
+       * Runs stochastic gradient descent.
        *
-       * @param  variational    variational distribution
-       * @param  tol_rel_obj    relative tolerance parameter for convergence
-       * @param  max_iterations max number of iterations to run algorithm
+       * @param[in,out] variational variational distribution
+       * @param tol_rel_obj    relative tolerance parameter for convergence
+       * @param max_iterations max number of iterations to run algorithm
+       * @return stan::services::error_codes::OK
        */
-      void robbins_monro_adagrad(Q& variational,
-                                 double tol_rel_obj,
-                                 int max_iterations) const {
+      int stochastic_gradient_descent(Q& variational,
+                                       double tol_rel_obj,
+                                       int max_iterations) const {
         static const char* function =
-          "stan::variational::advi.robbins_monro_adagrad";
+          "stan::variational::advi::stochastic_gradient_descent";
 
         stan::math::check_positive(function,
                                    "Relative objective function tolerance",
@@ -226,7 +224,7 @@ namespace stan {
           }
 
           // Stochastic gradient update
-          variational += eta_adagrad_ * elbo_grad /
+          variational += eta_ * elbo_grad /
             (tau + params_adagrad.sqrt());
 
           // Check for convergence every "eval_elbo_"th iteration
@@ -296,26 +294,29 @@ namespace stan {
 
           ++iter_counter;
         }
+        return stan::services::error_codes::OK;
       }
 
       /**
-       * Runs the algorithm and writes to output.
+       * Pre-processing steps.
        *
-       * @param  tol_rel_obj    relative tolerance parameter for convergence
-       * @param  max_iterations max number of iterations to run algorithm
+       * @return stan::services::error_codes::OK
        */
-      int run(double tol_rel_obj, int max_iterations) const {
+      int pre_process() const {
         if (diag_stream_) {
           *diag_stream_ << "iter,time_in_seconds,ELBO" << std::endl;
         }
+        return stan::services::error_codes::OK;
+      }
 
-        // initialize variational approximation
-        Q variational = Q(cont_params_);
-
-        // run inference algorithm
-        robbins_monro_adagrad(variational, tol_rel_obj, max_iterations);
-
-        // get mean of posterior approximation and write on first output line
+      /**
+       * Post-processing steps, writing to output.
+       *
+       * @param variational variational distribution
+       * @return stan::services::error_codes::OK
+       */
+      int post_process(const Q& variational) const {
+        // Write mean of posterior approximation to first line
         cont_params_ = variational.mean();
         // This is temporary as lp is not really helpful for variational
         // inference; furthermore it can be costly to compute.
@@ -332,7 +333,7 @@ namespace stan {
                                         print_stream_);
         }
 
-        // draw more samples from posterior and write on subsequent lines
+        // Draw approximate posterior samples and write to subsequent lines
         if (out_stream_) {
           for (int n = 0; n < n_posterior_samples_; ++n) {
             variational.sample(rng_, cont_params_);
@@ -346,6 +347,21 @@ namespace stan {
           }
         }
 
+        return stan::services::error_codes::OK;
+      }
+
+      /**
+       * Runs ADVI.
+       *
+       * @param tol_rel_obj    relative tolerance parameter for convergence
+       * @param max_iterations max number of iterations to run algorithm
+       * @return stan::services::error_codes::OK
+       */
+      int run(double tol_rel_obj, int max_iterations) const {
+        pre_process();
+        Q variational = Q(cont_params_);
+        stochastic_gradient_descent(variational, tol_rel_obj, max_iterations);
+        post_process(variational);
         return stan::services::error_codes::OK;
       }
 
@@ -374,7 +390,7 @@ namespace stan {
       BaseRNG& rng_;
       int n_monte_carlo_grad_;
       int n_monte_carlo_elbo_;
-      double eta_adagrad_;
+      double eta_;
       int eval_elbo_;
       int n_posterior_samples_;
       std::ostream* print_stream_;
