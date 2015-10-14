@@ -29,18 +29,10 @@ namespace stan {
 
   namespace variational {
 
-    /*
-     * MULTIVARIATE NORMAL DISTRIBUTION MEAN-FIELD
-     *
-     * Variational family as mean-field multivariate normal distribution
-     *
-     * @param  mu    mean vector
-     * @param  omega log standard deviation vector
-     */
     class normal_meanfield : public base_family {
     private:
-      Eigen::VectorXd mu_;
-      Eigen::VectorXd omega_;
+      Eigen::VectorXd mu_;    // mean
+      Eigen::VectorXd omega_; // log std-dev
       int dimension_;
 
     public:
@@ -150,15 +142,15 @@ namespace stan {
         return *this;
       }
 
-      normal_meanfield operator+=(double scalar) {
-        mu_.array() += scalar;
-        omega_.array() += scalar;
+      normal_meanfield operator+=(double x) {
+        mu_.array() += x;
+        omega_.array() += x;
         return *this;
       }
 
-      normal_meanfield operator*=(double scalar) {
-        mu_ *= scalar;
-        omega_ *= scalar;
+      normal_meanfield operator*=(double x) {
+        mu_ *= x;
+        omega_ *= x;
         return *this;
       }
 
@@ -301,12 +293,12 @@ namespace stan {
       return lhs /= rhs;
     }
 
-    normal_meanfield operator+(double scalar, normal_meanfield rhs) {
-      return rhs += scalar;
+    normal_meanfield operator+(double x, normal_meanfield rhs) {
+      return rhs += x;
     }
 
-    normal_meanfield operator*(double scalar, normal_meanfield rhs) {
-      return rhs *= scalar;
+    normal_meanfield operator*(double x, normal_meanfield rhs) {
+      return rhs *= x;
     }
   }  // variational
 }  // stan
