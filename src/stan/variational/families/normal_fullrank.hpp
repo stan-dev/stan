@@ -39,6 +39,7 @@ namespace stan {
       int dimension_;
 
     public:
+      // TODO explicitly describe why all these cosntructors
       explicit normal_fullrank(size_t dimension) :
         dimension_(dimension) {
         mu_ = Eigen::VectorXd::Zero(dimension_);
@@ -46,7 +47,8 @@ namespace stan {
       }
 
       explicit normal_fullrank(const Eigen::VectorXd& cont_params) :
-        mu_(cont_params), dimension_(cont_params.size()) {
+        dimension_(cont_params.size()) {
+        set_mu(cont_params);
         L_ = Eigen::MatrixXd::Identity(dimension_, dimension_);
       }
 
@@ -66,12 +68,11 @@ namespace stan {
         stan::math::check_not_nan(function, "Cholesky factor", L_);
       }
 
-      // Accessors
-      int dimension() const { return dimension_; }
-      const Eigen::VectorXd& mu()     const { return mu_; }
-      const Eigen::MatrixXd& L() const { return L_; }
+      int dimension()             const { return dimension_; }
+      const Eigen::VectorXd& mu() const { return mu_; }
+      const Eigen::MatrixXd& L()  const { return L_; }
 
-      // Mutators
+      // TODO @throws
       void set_mu(const Eigen::VectorXd& mu) {
         static const char* function =
           "stan::variational::normal_fullrank::set_mu";
@@ -97,7 +98,6 @@ namespace stan {
         L_ = L;
       }
 
-      // Operations
       normal_fullrank square() const {
         return normal_fullrank(Eigen::VectorXd(mu_.array().square()),
                                Eigen::MatrixXd(L_.array().square()));
@@ -108,7 +108,6 @@ namespace stan {
                                Eigen::MatrixXd(L_.array().sqrt()));
       }
 
-      // Compound assignment operators
       normal_fullrank operator=(const normal_fullrank& rhs) {
         static const char* function =
           "stan::variational::normal_fullrank::operator=";
@@ -160,7 +159,6 @@ namespace stan {
         return *this;
       }
 
-      // Distribution-based operations
       const Eigen::VectorXd& mean() const {
         return mu();
       }
@@ -197,8 +195,8 @@ namespace stan {
        * Draws samples from the variational distribution, which in this case is
        * a fullrank Gaussian.
        *
-       * @tparam BaseRNG           class of random number generator
-       * @return                   a sample from the variational distribution
+       * @tparam BaseRNG class of random number generator
+       * @return sample from the variational distribution
        */
       template <class BaseRNG>
       void sample(BaseRNG& rng, Eigen::VectorXd& eta) const {
@@ -211,17 +209,15 @@ namespace stan {
       }
 
       /**
-       * Calculates the "blackbox" gradient with respect to BOTH the location
-       * vector (mu) and the cholesky factor of the scale matrix (L) in
-       * parallel. It uses the same gradient computed from a set of Monte Carlo
-       * samples
+       * Calculates the "black box" gradient with respect to the location
+       * vector (mu) and the cholesky factor of the scale matrix (L).
        *
-       * @param elbo_grad             parameters to store "blackbox" gradient
-       * @param m                     model
-       * @param cont_params           continuous parameters
-       * @param n_monte_carlo_grad    number of samples for gradient computation
-       * @param rng                   random number generator
-       * @param print_stream          stream for convergence assessment output
+       * @param[out] elbo_grad     parameters to store gradient
+       * @param m                  model
+       * @param cont_params        continuous parameters
+       * @param n_monte_carlo_grad number of samples for gradient computation
+       * @param rng                random number generator
+       * @param print_stream       stream for convergence assessment output
        */
       template <class M, class BaseRNG>
       void calc_grad(normal_fullrank& elbo_grad,
@@ -240,19 +236,17 @@ namespace stan {
                         "Dimension of variational q", dimension_,
                         "Dimension of variables in model", cont_params.size());
 
-        // Initialize everything to zero
         Eigen::VectorXd mu_grad = Eigen::VectorXd::Zero(dimension_);
         Eigen::MatrixXd L_grad  = Eigen::MatrixXd::Zero(dimension_, dimension_);
-        double tmp_lp = 0.0;
+        double tmp_lp(0.0);
         Eigen::VectorXd tmp_mu_grad = Eigen::VectorXd::Zero(dimension_);
-        Eigen::VectorXd eta = Eigen::VectorXd::Zero(dimension_);
-        Eigen::VectorXd zeta = Eigen::VectorXd::Zero(dimension_);
+        Eigen::VectorXd eta(dimension_);
+        Eigen::VectorXd zeta(dimension_);
 
-        // Naive Monte Carlo integration
+        // Monte Carlo integration
         int i = 0;
         int n_monte_carlo_drop = 0;
         while (i < n_monte_carlo_grad) {
-          // Draw from standard normal and transform to real-coordinate space
           for (int d = 0; d < dimension_; ++d) {
             eta(d) = stan::math::normal_rng(0, 1, rng);
           }
@@ -282,10 +276,10 @@ namespace stan {
             }
           }
         }
-        mu_grad /= static_cast<double>(n_monte_carlo_grad);
-        L_grad  /= static_cast<double>(n_monte_carlo_grad);
+        mu_grad /= n_monte_carlo_grad;
+        L_grad  /= n_monte_carlo_grad;
 
-        // Add gradient of entropy term
+        // Add gradient of entropy
         L_grad.diagonal().array() += L_.diagonal().array().inverse();
 
         // Set parameters to argument
@@ -294,7 +288,6 @@ namespace stan {
       }
     };
 
-    // Arithmetic operators
     normal_fullrank operator+(normal_fullrank lhs, const normal_fullrank& rhs) {
       return lhs += rhs;
     }

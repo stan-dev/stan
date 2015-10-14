@@ -31,12 +31,11 @@ namespace stan {
 
     class normal_meanfield : public base_family {
     private:
-      Eigen::VectorXd mu_;    // mean
-      Eigen::VectorXd omega_; // log std-dev
+      Eigen::VectorXd mu_;
+      Eigen::VectorXd omega_; // log-standard deviation
       int dimension_;
 
     public:
-      // Constructors
       explicit normal_meanfield(size_t dimension) :
         dimension_(dimension) {
         mu_     = Eigen::VectorXd::Zero(dimension_);
@@ -45,30 +44,23 @@ namespace stan {
       }
 
       explicit normal_meanfield(const Eigen::VectorXd& cont_params) :
-        mu_(cont_params), dimension_(cont_params.size()) {
+        dimension_(cont_params.size()) {
+        set_mu(cont_params);
         // initializing omega = 0 means sigma = 1
         omega_  = Eigen::VectorXd::Zero(dimension_);
       }
 
       normal_meanfield(const Eigen::VectorXd& mu,
                        const Eigen::VectorXd& omega) :
-      mu_(mu), omega_(omega), dimension_(mu.size()) {
-        static const char* function =
-          "stan::variational::normal_meanfield";
-
-        stan::math::check_size_match(function,
-                             "Dimension of mean vector", dimension_,
-                             "Dimension of log std vector", omega_.size() );
-        stan::math::check_not_nan(function, "Mean vector", mu_);
-        stan::math::check_not_nan(function, "Log std vector", omega_);
+        dimension_(mu.size()) {
+        set_mu(mu);
+        set_omega(omega);
       }
 
-      // Accessors
-      int dimension() const { return dimension_; }
+      int dimension()                const { return dimension_; }
       const Eigen::VectorXd& mu()    const { return mu_; }
       const Eigen::VectorXd& omega() const { return omega_; }
 
-      // Mutators
       void set_mu(const Eigen::VectorXd& mu) {
         static const char* function =
           "stan::variational::normal_meanfield::set_mu";
@@ -91,7 +83,6 @@ namespace stan {
         omega_ = omega;
       }
 
-      // Operations
       normal_meanfield square() const {
         return normal_meanfield(Eigen::VectorXd(mu_.array().square()),
                                 Eigen::VectorXd(omega_.array().square()));
@@ -102,7 +93,6 @@ namespace stan {
                                 Eigen::VectorXd(omega_.array().sqrt()));
       }
 
-      // Compound assignment operators
       normal_meanfield operator=(const normal_meanfield& rhs) {
         static const char* function =
           "stan::variational::normal_meanfield::operator=";
@@ -154,7 +144,6 @@ namespace stan {
         return *this;
       }
 
-      // Distribution-based operations
       const Eigen::VectorXd& mean() const {
         return mu();
       }
@@ -167,7 +156,7 @@ namespace stan {
                (1.0 + stan::math::LOG_TWO_PI) + omega_.sum();
       }
 
-      // Implements S^{-1}(eta) = sigma * eta + \mu
+      // S^{-1}(eta) = sigma * eta + mu
       Eigen::VectorXd transform(const Eigen::VectorXd& eta) const {
         static const char* function =
           "stan::variational::normal_meanfield::transform";
@@ -185,31 +174,27 @@ namespace stan {
        * Draws samples from the variational distribution, which in this case is
        * a mean-field (diagonal) Gaussian.
        *
-       * @tparam BaseRNG           class of random number generator
-       * @return                   a sample from the variational distribution
+       * @tparam BaseRNG class of random number generator
+       * @return sample from the variational distribution
        */
       template <class BaseRNG>
       void sample(BaseRNG& rng, Eigen::VectorXd& eta) const {
-        // Draw from standard normal and transform to real-coordinate space
         for (int d = 0; d < dimension_; ++d) {
           eta(d) = stan::math::normal_rng(0, 1, rng);
         }
-
         eta = transform(eta);
       }
 
       /**
-       * Calculates the "blackbox" gradient with respect to BOTH the location
-       * vector (mu) and the log-std vector (omega) in parallel.
-       * It uses the same gradient computed from a set of Monte Carlo
-       * samples.
+       * Calculates the "black box" gradient with respect to the location
+       * vector (mu) and the log-std vector (omega).
        *
-       * @param  elbo_grad             parameters to store "blackbox" gradient
-       * @param  m                     model
-       * @param  cont_params           continuous parameters
-       * @param  n_monte_carlo_grad    number of samples for gradient computation
-       * @param  rng                   random number generator
-       * @param  print_stream          stream for convergence assessment output
+       * @param[out]  elbo_grad     parameters to store gradient
+       * @param m                   model
+       * @param cont_params         continuous parameters
+       * @param n_monte_carlo_grad  number of samples for gradient computation
+       * @param rng                 random number generator
+       * @param print_stream        stream for convergence assessment output
        */
       template <class M, class BaseRNG>
       void calc_grad(normal_meanfield& elbo_grad,
@@ -228,19 +213,17 @@ namespace stan {
                         "Dimension of variational q", dimension_,
                         "Dimension of variables in model", cont_params.size());
 
-        // Initialize everything to zero
         Eigen::VectorXd mu_grad    = Eigen::VectorXd::Zero(dimension_);
         Eigen::VectorXd omega_grad = Eigen::VectorXd::Zero(dimension_);
-        double tmp_lp = 0.0;
+        double tmp_lp(0.0);
         Eigen::VectorXd tmp_mu_grad = Eigen::VectorXd::Zero(dimension_);
-        Eigen::VectorXd eta  = Eigen::VectorXd::Zero(dimension_);
-        Eigen::VectorXd zeta = Eigen::VectorXd::Zero(dimension_);
+        Eigen::VectorXd eta(dimension_);
+        Eigen::VectorXd zeta(dimension_);
 
-        // Naive Monte Carlo integration
+        // Monte Carlo integration
         int i = 0;
         int n_monte_carlo_drop = 0;
         while (i < n_monte_carlo_grad) {
-          // Draw from standard normal and transform to real-coordinate space
           for (int d = 0; d < dimension_; ++d) {
             eta(d) = stan::math::normal_rng(0, 1, rng);
           }
@@ -266,14 +249,14 @@ namespace stan {
             }
           }
         }
-        mu_grad    /= static_cast<double>(n_monte_carlo_grad);
-        omega_grad /= static_cast<double>(n_monte_carlo_grad);
+        mu_grad    /= n_monte_carlo_grad;
+        omega_grad /= n_monte_carlo_grad;
 
         // Multiply by exp(omega)
         omega_grad.array() =
           omega_grad.array().cwiseProduct(omega_.array().exp());
 
-        // Add gradient of entropy term (just equal to element-wise 1 here)
+        // Add gradient of entropy (just equal to element-wise 1)
         omega_grad.array() += 1.0;
 
         // Set parameters to argument
@@ -282,7 +265,6 @@ namespace stan {
       }
     };
 
-    // Arithmetic operators
     normal_meanfield operator+(normal_meanfield lhs,
                                const normal_meanfield& rhs) {
       return lhs += rhs;
