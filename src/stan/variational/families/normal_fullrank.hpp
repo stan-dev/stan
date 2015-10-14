@@ -275,7 +275,9 @@ namespace stan {
     normal_fullrank operator/(normal_fullrank lhs, const normal_fullrank& rhs) { return lhs /= rhs; }
     normal_fullrank operator+(double x, normal_fullrank rhs) { return rhs += x; }
     normal_fullrank operator*(double x, normal_fullrank rhs) { return rhs *= x; }
+
   }  // variational
+
 }  // stan
 
 #endif

@@ -383,7 +383,9 @@ namespace stan {
           << std::endl;
       }
     };
+
   }  // variational
+
 }  // stan
 
 #endif
