@@ -149,7 +149,7 @@ namespace stan {
        * Runs stochastic gradient descent.
        *
        * @param[in,out] variational variational distribution
-       * @param tol_rel_obj    relative tolerance parameter for convergence
+       * @param tol_rel_obj relative tolerance for convergence
        * @param max_iterations max number of iterations to run algorithm
        * @return stan::services::error_codes::OK
        */
@@ -204,13 +204,13 @@ namespace stan {
         // Main loop
         std::vector<double> print_vector;
         bool do_more_iterations = true;
-        int iter_counter = 0;
+        int iter_sgd = 0;
         while (do_more_iterations) {
           // Compute gradient using Monte Carlo integration
           calc_ELBO_grad(variational, elbo_grad);
 
           // Update learning rate parameters
-          if (iter_counter == 0) {
+          if (iter_sgd == 0) {
             params_prop += elbo_grad.square();
           } else {
             params_prop = pre_factor * params_prop +
@@ -222,7 +222,7 @@ namespace stan {
             (tau + params_prop.sqrt());
 
           // Check for convergence every "eval_elbo_"th iteration
-          if (iter_counter % eval_elbo_ == 0) {
+          if (iter_sgd % eval_elbo_ == 0) {
             elbo_prev = elbo;
             elbo = calc_ELBO(variational);
             delta_elbo = rel_decrease(elbo, elbo_prev);
@@ -235,7 +235,7 @@ namespace stan {
             if (print_stream_) {
               *print_stream_
                         << "  "
-                        << std::setw(4) << iter_counter
+                        << std::setw(4) << iter_sgd
                         << "  "
                         << std::right << std::setw(9) << std::setprecision(1)
                         << elbo
@@ -255,7 +255,7 @@ namespace stan {
               print_vector.push_back(delta_t);
               print_vector.push_back(elbo);
               services::io::write_iteration_csv(*diag_stream_,
-                                                iter_counter, print_vector);
+                                                iter_sgd, print_vector);
             }
 
             if (delta_elbo_ave < tol_rel_obj) {
@@ -270,7 +270,7 @@ namespace stan {
               do_more_iterations = false;
             }
 
-            if (iter_counter > 100) {
+            if (iter_sgd > 100) {
               if (delta_elbo_med > 0.5 || delta_elbo_ave > 0.5) {
                 if (print_stream_)
                   *print_stream_ << "   MAY BE DIVERGING... INSPECT ELBO";
@@ -282,13 +282,13 @@ namespace stan {
           }
 
           // Check for max iterations
-          if (iter_counter == max_iterations) {
+          if (iter_sgd == max_iterations) {
             if (print_stream_)
               *print_stream_ << "MAX ITERATIONS REACHED" << std::endl;
             do_more_iterations = false;
           }
 
-          ++iter_counter;
+          ++iter_sgd;
         }
         return stan::services::error_codes::OK;
       }
