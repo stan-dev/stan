@@ -1,0 +1,24 @@
+force decreasing learning rate; convergence; minimum buffer size
+
+#### Summary:
+This implements three changes all related to convergence of ADVI.
+- The learning rate is now multiplied by `1/t^{1/2}`. This forces the optimization procedure to converge to a point and satisfy Robbins-Monro assumptions for various stochastic approximation theory. RMSProp, which is what is currently implemented, does not satisfy this and currently works based on only heuristics from the deep learning literature. Technically, the rate should be `1/t^{1/2 + epsilon}` for some `epsilon>0`, but due to the efficiency of square roots, we're doing `1/t^{1/2}` instead.
+- The buffer size when looking at changes in the ELBO is forced to at least be of size 2. Previously it was only of size 1.
+- This signals the "may be diverging" message after `2*eval_elbo_` (default is `2*100=200`), rather than after 100. This is based on two reasons: 1. It's obvious that the message should occur after a constant multiple of `eval_elbo_`, because that is when a new line of convergence information is given, and `eval_elbo_` is not necessarily 100; 2. There should be more leeway than after 1 line to spit out if the procedure might be diverging. Naturally then, why 2 instead of some other multiple? It's a heuristic we base on what we see in practice; we won't be able to solve this by finding an "optimal" number any time soon.
+
+Part of a round of pull requests, splitting out #1590. See #1590 for the blueprint.
+
+#### Intended Effect:
+Optimization is forced to converge to a point and satisfy Robbins-Monro assumptions for stochastic approximations.
+
+#### How to Verify:
+Run unit tests as typically. Let me know if any of these changes need new tests.
+
+#### Side Effects:
+None
+
+#### Documentation:
+N/A
+
+#### Reviewer Suggestions:
+None
