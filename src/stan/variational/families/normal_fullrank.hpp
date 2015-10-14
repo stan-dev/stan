@@ -33,11 +33,6 @@ namespace stan {
   namespace variational {
 
     class normal_fullrank : public base_family {
-    private:
-      Eigen::VectorXd mu_;
-      Eigen::MatrixXd L_;
-      int dimension_;
-
     public:
       // TODO explicitly describe why all these cosntructors
       explicit normal_fullrank(size_t dimension) :
@@ -59,35 +54,7 @@ namespace stan {
         set_L(L);
       }
 
-      int dimension()             const { return dimension_; }
-      const Eigen::VectorXd& mu() const { return mu_; }
-      const Eigen::MatrixXd& L()  const { return L_; }
-
-      // TODO @throws
-      void set_mu(const Eigen::VectorXd& mu) {
-        static const char* function =
-          "stan::variational::normal_fullrank::set_mu";
-
-        stan::math::check_size_match(function,
-                               "Dimension of input vector", mu.size(),
-                               "Dimension of current vector", dimension_);
-        stan::math::check_not_nan(function, "Input vector", mu);
-        mu_ = mu;
-      }
-
-      void set_L(const Eigen::MatrixXd& L) {
-        static const char* function =
-          "stan::variational::normal_fullrank::set_L";
-
-        stan::math::check_square(function, "Input matrix", L);
-        stan::math::check_lower_triangular(function,
-                               "Input matrix", L);
-        stan::math::check_size_match(function,
-                               "Dimension of input matrix", L.rows(),
-                               "Dimension of current matrix", dimension_);
-        stan::math::check_not_nan(function, "Input matrix", L);
-        L_ = L;
-      }
+      int dimension() const { return dimension_; }
 
       normal_fullrank square() const {
         return normal_fullrank(Eigen::VectorXd(mu_.array().square()),
@@ -272,6 +239,40 @@ namespace stan {
         // Set parameters to argument
         elbo_grad.set_mu(mu_grad);
         elbo_grad.set_L(L_grad);
+      }
+
+    private:
+      Eigen::VectorXd mu_;
+      Eigen::MatrixXd L_;
+      int dimension_;
+
+      const Eigen::VectorXd& mu() const { return mu_; }
+      const Eigen::MatrixXd& L()  const { return L_; }
+
+      // TODO @throws
+      void set_mu(const Eigen::VectorXd& mu) {
+        static const char* function =
+          "stan::variational::normal_fullrank::set_mu";
+
+        stan::math::check_size_match(function,
+                               "Dimension of input vector", mu.size(),
+                               "Dimension of current vector", dimension_);
+        stan::math::check_not_nan(function, "Input vector", mu);
+        mu_ = mu;
+      }
+
+      void set_L(const Eigen::MatrixXd& L) {
+        static const char* function =
+          "stan::variational::normal_fullrank::set_L";
+
+        stan::math::check_square(function, "Input matrix", L);
+        stan::math::check_lower_triangular(function,
+                               "Input matrix", L);
+        stan::math::check_size_match(function,
+                               "Dimension of input matrix", L.rows(),
+                               "Dimension of current matrix", dimension_);
+        stan::math::check_not_nan(function, "Input matrix", L);
+        L_ = L;
       }
     };
 

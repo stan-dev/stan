@@ -30,11 +30,6 @@ namespace stan {
   namespace variational {
 
     class normal_meanfield : public base_family {
-    private:
-      Eigen::VectorXd mu_;
-      Eigen::VectorXd omega_; // log-standard deviation
-      int dimension_;
-
     public:
       explicit normal_meanfield(size_t dimension) :
         dimension_(dimension) {
@@ -57,31 +52,7 @@ namespace stan {
         set_omega(omega);
       }
 
-      int dimension()                const { return dimension_; }
-      const Eigen::VectorXd& mu()    const { return mu_; }
-      const Eigen::VectorXd& omega() const { return omega_; }
-
-      void set_mu(const Eigen::VectorXd& mu) {
-        static const char* function =
-          "stan::variational::normal_meanfield::set_mu";
-
-        stan::math::check_size_match(function,
-                               "Dimension of input vector", mu.size(),
-                               "Dimension of current vector", dimension_);
-        stan::math::check_not_nan(function, "Input vector", mu);
-        mu_ = mu;
-      }
-
-      void set_omega(const Eigen::VectorXd& omega) {
-        static const char* function =
-          "stan::variational::normal_meanfield::set_omega";
-
-        stan::math::check_size_match(function,
-                               "Dimension of input vector", omega.size(),
-                               "Dimension of current vector", dimension_);
-        stan::math::check_not_nan(function, "Input vector", omega);
-        omega_ = omega;
-      }
+      int dimension() const { return dimension_; }
 
       normal_meanfield square() const {
         return normal_meanfield(Eigen::VectorXd(mu_.array().square()),
@@ -256,6 +227,36 @@ namespace stan {
         // Set parameters to argument
         elbo_grad.set_mu(mu_grad);
         elbo_grad.set_omega(omega_grad);
+      }
+
+    private:
+      Eigen::VectorXd mu_;
+      Eigen::VectorXd omega_; // log-standard deviation
+      int dimension_;
+
+      const Eigen::VectorXd& mu()    const { return mu_; }
+      const Eigen::VectorXd& omega() const { return omega_; }
+
+      void set_mu(const Eigen::VectorXd& mu) {
+        static const char* function =
+          "stan::variational::normal_meanfield::set_mu";
+
+        stan::math::check_size_match(function,
+                               "Dimension of input vector", mu.size(),
+                               "Dimension of current vector", dimension_);
+        stan::math::check_not_nan(function, "Input vector", mu);
+        mu_ = mu;
+      }
+
+      void set_omega(const Eigen::VectorXd& omega) {
+        static const char* function =
+          "stan::variational::normal_meanfield::set_omega";
+
+        stan::math::check_size_match(function,
+                               "Dimension of input vector", omega.size(),
+                               "Dimension of current vector", dimension_);
+        stan::math::check_not_nan(function, "Input vector", omega);
+        omega_ = omega;
       }
     };
 
