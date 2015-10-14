@@ -28,16 +28,16 @@ public:
 
     advi_meanfield_ = new stan::variational::advi<stan_model, stan::variational::normal_meanfield, rng_t>
       (*model_, cont_params_,
-       1, 100, 0.1,
        base_rng_,
+       1, 100, 0.1,
        100, 1,
        &print_stream_,
        &output_stream_,
        &diagnostic_stream_);
     advi_fullrank_ = new stan::variational::advi<stan_model, stan::variational::normal_fullrank, rng_t>
       (*model_, cont_params_,
-       1, 100, 0.1,
        base_rng_,
+       1, 100, 0.1,
        100, 1,
        &print_stream_,
        &output_stream_,

@@ -31,32 +31,32 @@ public:
 
     advi_ = new stan::variational::advi<stan_model, stan::variational::normal_meanfield, rng_t>
       (*model_, cont_params_,
-       10, 100, 0.01,
        base_rng_,
+       10, 100, 0.01,
        100, 1,
        &print_stream_,
        &output_stream_,
        &diagnostic_stream_);
     advi_null_streams_ = new stan::variational::advi<stan_model, stan::variational::normal_meanfield, rng_t>
       (*model_null_stream_, cont_params_,
-       10, 100, 0.01,
        base_rng_,
+       10, 100, 0.01,
        100, 1,
        NULL,
        NULL,
        NULL);
     advi_fullrank_ = new stan::variational::advi<stan_model, stan::variational::normal_fullrank, rng_t>
       (*model_, cont_params_,
-       10, 100, 0.01,
        base_rng_,
+       10, 100, 0.01,
        100, 1,
        &print_stream_,
        &output_stream_,
        &diagnostic_stream_);
     advi_null_streams_fullrank_ = new stan::variational::advi<stan_model, stan::variational::normal_fullrank, rng_t>
       (*model_null_stream_, cont_params_,
-       10, 100, 0.01,
        base_rng_,
+       10, 100, 0.01,
        100, 1,
        NULL,
        NULL,

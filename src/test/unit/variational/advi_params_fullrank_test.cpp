@@ -57,7 +57,7 @@ TEST(normal_fullrank_test, cholesky_factor) {
 
   stan::variational::normal_fullrank my_normal_fullrank(mu, L);
 
-  const Eigen::Matrix3d& L_out = my_normal_fullrank.L_chol();
+  const Eigen::Matrix3d& L_out = my_normal_fullrank.L();
 
   for (int j = 0, nRows = L.rows(), nCols = L.cols(); j < nCols; ++j) {
     for (int i = 0; i < nRows; ++i) {
@@ -67,7 +67,7 @@ TEST(normal_fullrank_test, cholesky_factor) {
 
   double nan = std::numeric_limits<double>::quiet_NaN();
   Eigen::MatrixXd L_nan = Eigen::MatrixXd::Constant(3,3,nan);
-  EXPECT_THROW(my_normal_fullrank.set_L_chol(L_nan),
+  EXPECT_THROW(my_normal_fullrank.set_L(L_nan),
                    std::domain_error);
 }
 

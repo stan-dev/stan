@@ -54,18 +54,9 @@ namespace stan {
 
       normal_fullrank(const Eigen::VectorXd& mu,
                       const Eigen::MatrixXd& L) :
-      mu_(mu), L_(L), dimension_(mu.size()) {
-        static const char* function =
-          "stan::variational::normal_fullrank";
-
-        stan::math::check_square(function, "Cholesky factor", L_);
-        stan::math::check_lower_triangular(function,
-                               "Cholesky factor", L_);
-        stan::math::check_size_match(function,
-                               "Dimension of mean vector",     dimension_,
-                               "Dimension of Cholesky factor", L_.rows() );
-        stan::math::check_not_nan(function, "Mean vector", mu_);
-        stan::math::check_not_nan(function, "Cholesky factor", L_);
+        dimension_(mu.size()) {
+        set_mu(mu);
+        set_L(L);
       }
 
       int dimension()             const { return dimension_; }
@@ -88,13 +79,13 @@ namespace stan {
         static const char* function =
           "stan::variational::normal_fullrank::set_L";
 
-        stan::math::check_square(function, "Input matrix", L_);
+        stan::math::check_square(function, "Input matrix", L);
         stan::math::check_lower_triangular(function,
                                "Input matrix", L);
         stan::math::check_size_match(function,
-                               "Dimension of mean vector",     dimension_,
-                               "Dimension of input matrix", L.rows());
-        stan::math::check_not_nan(function, "Input matrix", L_);
+                               "Dimension of input matrix", L.rows(),
+                               "Dimension of current matrix", dimension_);
+        stan::math::check_not_nan(function, "Input matrix", L);
         L_ = L;
       }
 
@@ -165,10 +156,10 @@ namespace stan {
 
       // 0.5 * dim * (1+log2pi) + 0.5 * log det (L^T L) =
       // 0.5 * dim * (1+log2pi) + sum(log(abs(diag(L))))
+      // TODO entropy, zeros, various checks
       double entropy() const {
         double tmp = 0.0;
-        double result = 0.5 * static_cast<double>(dimension_) *
-          (1.0 + stan::math::LOG_TWO_PI);
+        double result = 0.5 * dimension_ * (1.0 + stan::math::LOG_TWO_PI);
         for (int d = 0; d < dimension_; ++d) {
           tmp = fabs(L_(d, d));
           if (tmp != 0.0) {
@@ -191,13 +182,6 @@ namespace stan {
         return (L_ * eta) + mu_;
       }
 
-      /**
-       * Draws samples from the variational distribution, which in this case is
-       * a fullrank Gaussian.
-       *
-       * @tparam BaseRNG class of random number generator
-       * @return sample from the variational distribution
-       */
       template <class BaseRNG>
       void sample(BaseRNG& rng, Eigen::VectorXd& eta) const {
         // Draw from standard normal and transform to real-coordinate space
@@ -240,8 +224,11 @@ namespace stan {
         Eigen::MatrixXd L_grad  = Eigen::MatrixXd::Zero(dimension_, dimension_);
         double tmp_lp(0.0);
         Eigen::VectorXd tmp_mu_grad = Eigen::VectorXd::Zero(dimension_);
-        Eigen::VectorXd eta(dimension_);
-        Eigen::VectorXd zeta(dimension_);
+        Eigen::VectorXd eta         = Eigen::VectorXd::Zero(dimension_);
+        Eigen::VectorXd zeta        = Eigen::VectorXd::Zero(dimension_);
+        // TODO
+        //Eigen::VectorXd eta(dimension_);
+        //Eigen::VectorXd zeta(dimension_);
 
         // Monte Carlo integration
         int i = 0;
@@ -288,21 +275,10 @@ namespace stan {
       }
     };
 
-    normal_fullrank operator+(normal_fullrank lhs, const normal_fullrank& rhs) {
-      return lhs += rhs;
-    }
-
-    normal_fullrank operator/(normal_fullrank lhs, const normal_fullrank& rhs) {
-      return lhs /= rhs;
-    }
-
-    normal_fullrank operator+(double x, normal_fullrank rhs) {
-      return rhs += x;
-    }
-
-    normal_fullrank operator*(double x, normal_fullrank rhs) {
-      return rhs *= x;
-    }
+    normal_fullrank operator+(normal_fullrank lhs, const normal_fullrank& rhs) { return lhs += rhs; }
+    normal_fullrank operator/(normal_fullrank lhs, const normal_fullrank& rhs) { return lhs /= rhs; }
+    normal_fullrank operator+(double x, normal_fullrank rhs) { return rhs += x; }
+    normal_fullrank operator*(double x, normal_fullrank rhs) { return rhs *= x; }
   }  // variational
 }  // stan
 

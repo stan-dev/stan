@@ -152,8 +152,7 @@ namespace stan {
       // 0.5 * dim * (1+log2pi) + sum(log(sigma)) =
       // 0.5 * dim * (1+log2pi) + sum(omega)
       double entropy() const {
-        return 0.5 * static_cast<double>(dimension_) *
-               (1.0 + stan::math::LOG_TWO_PI) + omega_.sum();
+        return 0.5 * dimension_ * (1.0 + stan::math::LOG_TWO_PI) + omega_.sum();
       }
 
       // S^{-1}(eta) = sigma * eta + mu
@@ -170,13 +169,6 @@ namespace stan {
         return eta.array().cwiseProduct(omega_.array().exp()) + mu_.array();
       }
 
-      /**
-       * Draws samples from the variational distribution, which in this case is
-       * a mean-field (diagonal) Gaussian.
-       *
-       * @tparam BaseRNG class of random number generator
-       * @return sample from the variational distribution
-       */
       template <class BaseRNG>
       void sample(BaseRNG& rng, Eigen::VectorXd& eta) const {
         for (int d = 0; d < dimension_; ++d) {
@@ -217,8 +209,10 @@ namespace stan {
         Eigen::VectorXd omega_grad = Eigen::VectorXd::Zero(dimension_);
         double tmp_lp(0.0);
         Eigen::VectorXd tmp_mu_grad = Eigen::VectorXd::Zero(dimension_);
-        Eigen::VectorXd eta(dimension_);
-        Eigen::VectorXd zeta(dimension_);
+        Eigen::VectorXd eta         = Eigen::VectorXd::Zero(dimension_);
+        Eigen::VectorXd zeta        = Eigen::VectorXd::Zero(dimension_);
+        //Eigen::VectorXd eta(dimension_);
+        //Eigen::VectorXd zeta(dimension_);
 
         // Monte Carlo integration
         int i = 0;
@@ -265,23 +259,10 @@ namespace stan {
       }
     };
 
-    normal_meanfield operator+(normal_meanfield lhs,
-                               const normal_meanfield& rhs) {
-      return lhs += rhs;
-    }
-
-    normal_meanfield operator/(normal_meanfield lhs,
-                               const normal_meanfield& rhs) {
-      return lhs /= rhs;
-    }
-
-    normal_meanfield operator+(double x, normal_meanfield rhs) {
-      return rhs += x;
-    }
-
-    normal_meanfield operator*(double x, normal_meanfield rhs) {
-      return rhs *= x;
-    }
+    normal_meanfield operator+(normal_meanfield lhs, const normal_meanfield& rhs) { return lhs += rhs; }
+    normal_meanfield operator/(normal_meanfield lhs, const normal_meanfield& rhs) { return lhs /= rhs; }
+    normal_meanfield operator+(double x, normal_meanfield rhs) { return rhs += x; }
+    normal_meanfield operator*(double x, normal_meanfield rhs) { return rhs *= x; }
   }  // variational
 }  // stan
 

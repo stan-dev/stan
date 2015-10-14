@@ -32,10 +32,10 @@ TEST(advi_test, univar_no_constraint_fullrank) {
   // ADVI
   stan::variational::advi<Model, stan::variational::normal_fullrank, rng_t> test_advi(my_model,
                                                   cont_params,
+                                                  base_rng,
                                                   n_monte_carlo_grad,
                                                   1e4, // absurdly high!
                                                   0.1,
-                                                  base_rng,
                                                   100,
                                                   1,
                                                   print_stream,
@@ -80,44 +80,44 @@ TEST(advi_test, univar_no_constraint_fullrank) {
   Eigen::MatrixXd L_grad  = Eigen::MatrixXd::Identity(my_model.num_params_r(),
                                                      my_model.num_params_r());
 
-  std::string error = "stan::variational::normal_fullrank: "
-                      "Dimension of mean vector (3) and "
-                      "Dimension of Cholesky factor (1) must match in size";
+  std::string error = "stan::variational::normal_fullrank::set_L: "
+                      "Dimension of input matrix (1) and "
+                      "Dimension of current matrix (3) must match in size";
   EXPECT_THROW_MSG(stan::variational::normal_fullrank(mu_grad, L_grad),
                    std::invalid_argument, error);
 
   mu_grad = Eigen::VectorXd::Zero(0);
 
-  error = "stan::variational::normal_fullrank: "
-          "Dimension of mean vector (0) and "
-          "Dimension of Cholesky factor (1) must match in size";
+  error = "stan::variational::normal_fullrank::set_L: "
+          "Dimension of input matrix (1) and "
+          "Dimension of current matrix (0) must match in size";
   EXPECT_THROW_MSG(stan::variational::normal_fullrank(mu_grad, L_grad),
                    std::invalid_argument, error);
 
   mu_grad = Eigen::VectorXd::Zero(my_model.num_params_r());
   L_grad  = Eigen::MatrixXd::Identity(3,3);
 
-  error = "stan::variational::normal_fullrank: "
-          "Dimension of mean vector (1) and "
-          "Dimension of Cholesky factor (3) must match in size";
+  error = "stan::variational::normal_fullrank::set_L: "
+          "Dimension of input matrix (3) and "
+          "Dimension of current matrix (1) must match in size";
   EXPECT_THROW_MSG(stan::variational::normal_fullrank(mu_grad, L_grad),
                    std::invalid_argument, error);
 
   mu_grad = Eigen::VectorXd::Zero(my_model.num_params_r());
   L_grad  = Eigen::MatrixXd::Identity(0,0);
 
-  error = "stan::variational::normal_fullrank: "
-          "Dimension of mean vector (1) and "
-          "Dimension of Cholesky factor (0) must match in size";
+  error = "stan::variational::normal_fullrank::set_L: "
+          "Dimension of input matrix (0) and "
+          "Dimension of current matrix (1) must match in size";
   EXPECT_THROW_MSG(stan::variational::normal_fullrank(mu_grad, L_grad),
                    std::invalid_argument, error);
 
   mu_grad = Eigen::VectorXd::Zero(my_model.num_params_r());
   L_grad  = Eigen::MatrixXd::Identity(1,4);
 
-  error = "stan::variational::normal_fullrank: "
-          "Expecting a square matrix; rows of Cholesky factor (1) and columns "
-          "of Cholesky factor (4) must match in size";
+  error = "stan::variational::normal_fullrank::set_L: "
+          "Expecting a square matrix; rows of Input matrix (1) and columns "
+          "of Input matrix (4) must match in size";
   EXPECT_THROW_MSG(stan::variational::normal_fullrank(mu_grad, L_grad),
                    std::invalid_argument, error);
 
@@ -157,10 +157,10 @@ TEST(advi_test, univar_no_constraint_meanfield) {
   // ADVI
   stan::variational::advi<Model, stan::variational::normal_meanfield, rng_t> test_advi(my_model,
                                                   cont_params,
+                                                  base_rng,
                                                   n_monte_carlo_grad,
                                                   1e4, // absurdly high!
                                                   0.1,
-                                                  base_rng,
                                                   100,
                                                   1,
                                                   print_stream,
@@ -206,35 +206,35 @@ TEST(advi_test, univar_no_constraint_meanfield) {
   Eigen::VectorXd mu_grad = Eigen::VectorXd::Zero(3);
   Eigen::VectorXd st_grad = Eigen::VectorXd::Zero(my_model.num_params_r());
 
-  std::string error = "stan::variational::normal_meanfield: "
-                      "Dimension of mean vector (3) and "
-                      "Dimension of log std vector (1) must match in size";
+  std::string error = "stan::variational::normal_meanfield::set_omega: "
+                      "Dimension of input vector (1) and "
+                      "Dimension of current vector (3) must match in size";
   EXPECT_THROW_MSG(stan::variational::normal_meanfield(mu_grad, st_grad),
                    std::invalid_argument, error);
 
   mu_grad = Eigen::VectorXd::Zero(0);
 
-  error = "stan::variational::normal_meanfield: "
-          "Dimension of mean vector (0) and "
-          "Dimension of log std vector (1) must match in size";
+  error = "stan::variational::normal_meanfield::set_omega: "
+          "Dimension of input vector (1) and "
+          "Dimension of current vector (0) must match in size";
   EXPECT_THROW_MSG(stan::variational::normal_meanfield(mu_grad, st_grad),
                    std::invalid_argument, error);
 
   mu_grad = Eigen::VectorXd::Zero(my_model.num_params_r());
   st_grad  = Eigen::VectorXd::Zero(3);
 
-  error = "stan::variational::normal_meanfield: "
-          "Dimension of mean vector (1) and "
-          "Dimension of log std vector (3) must match in size";
+  error = "stan::variational::normal_meanfield::set_omega: "
+          "Dimension of input vector (3) and "
+          "Dimension of current vector (1) must match in size";
   EXPECT_THROW_MSG(stan::variational::normal_meanfield(mu_grad, st_grad),
                    std::invalid_argument, error);
 
   mu_grad = Eigen::VectorXd::Zero(my_model.num_params_r());
   st_grad  = Eigen::VectorXd::Zero(0);
 
-  error = "stan::variational::normal_meanfield: "
-          "Dimension of mean vector (1) and "
-          "Dimension of log std vector (0) must match in size";
+  error = "stan::variational::normal_meanfield::set_omega: "
+          "Dimension of input vector (0) and "
+          "Dimension of current vector (1) must match in size";
   EXPECT_THROW_MSG(stan::variational::normal_meanfield(mu_grad, st_grad),
                    std::invalid_argument, error);
 
