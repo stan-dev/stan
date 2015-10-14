@@ -169,14 +169,11 @@ namespace stan {
         // Gradient parameters
         Q elbo_grad = Q(model_.num_params_r());
 
-        // Adagrad parameters
+        // Learning rate parameters
         double tau = 1.0;
-        Q params_adagrad = Q(model_.num_params_r());
-
-        // RMSprop window_size
-        double window_size = 10.0;
-        double post_factor = 1.0 / window_size;
-        double pre_factor  = 1.0 - post_factor;
+        Q params_prop = Q(model_.num_params_r());
+        double pre_factor  = 0.9;
+        double post_factor = 0.1;
 
         // Initialize ELBO and convergence tracking variables
         double elbo(0.0);
@@ -184,14 +181,12 @@ namespace stan {
         double delta_elbo     = std::numeric_limits<double>::max();
         double delta_elbo_ave = std::numeric_limits<double>::max();
         double delta_elbo_med = std::numeric_limits<double>::max();
-
-        // Heuristic to estimate how far to look back in rolling window
         int cb_size = static_cast<int>(
                 std::max(0.1*max_iterations/static_cast<double>(eval_elbo_),
                          1.0));
-        boost::circular_buffer<double> cb(cb_size);
+        boost::circular_buffer<double> elbo_diff(cb_size);
 
-        // Print stuff
+        // Print main loop header
         if (print_stream_) {
           *print_stream_ << "  iter"
                          << "       ELBO"
@@ -214,27 +209,29 @@ namespace stan {
           // Compute gradient using Monte Carlo integration
           calc_ELBO_grad(variational, elbo_grad);
 
-          // RMSprop moving average weighting
+          // Update learning rate parameters
           if (iter_counter == 0) {
-            params_adagrad += elbo_grad.square();
+            params_prop += elbo_grad.square();
           } else {
-            params_adagrad = pre_factor * params_adagrad +
-                             post_factor * elbo_grad.square();
+            params_prop = pre_factor * params_prop +
+                          post_factor * elbo_grad.square();
           }
 
           // Stochastic gradient update
           variational += eta_ * elbo_grad /
-            (tau + params_adagrad.sqrt());
+            (tau + params_prop.sqrt());
 
           // Check for convergence every "eval_elbo_"th iteration
           if (iter_counter % eval_elbo_ == 0) {
             elbo_prev = elbo;
             elbo = calc_ELBO(variational);
             delta_elbo = rel_decrease(elbo, elbo_prev);
-            cb.push_back(delta_elbo);
-            delta_elbo_ave = std::accumulate(cb.begin(), cb.end(), 0.0)
-                             / static_cast<double>(cb.size());
-            delta_elbo_med = circ_buff_median(cb);
+            elbo_diff.push_back(delta_elbo);
+            delta_elbo_ave = std::accumulate(elbo_diff.begin(),
+                                             elbo_diff.end(),
+                                             0.0) /
+                             static_cast<double>(elbo_diff.size());
+            delta_elbo_med = circ_buff_median(elbo_diff);
             if (print_stream_) {
               *print_stream_
                         << "  "
