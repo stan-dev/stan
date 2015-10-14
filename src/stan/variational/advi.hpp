@@ -304,7 +304,7 @@ namespace stan {
             }
           }
 
-          if (iter_main == max_iterations) {
+          if (iter_counter == max_iterations) {
             if (print_stream_)
               *print_stream_
                 << "Informational Message: The maximum number of "
