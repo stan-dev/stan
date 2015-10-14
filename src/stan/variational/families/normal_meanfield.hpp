@@ -20,7 +20,7 @@
 
 #include <stan/model/util.hpp>
 
-#include <stan/variational/base_family.hpp>
+#include <stan/variational/families/base_family.hpp>
 #include <algorithm>
 #include <ostream>
 #include <vector>
@@ -31,6 +31,7 @@ namespace stan {
 
     class normal_meanfield : public base_family {
     public:
+      // Initializes variational parameters to zero
       explicit normal_meanfield(size_t dimension) :
         dimension_(dimension) {
         mu_     = Eigen::VectorXd::Zero(dimension_);
@@ -38,18 +39,12 @@ namespace stan {
         omega_  = Eigen::VectorXd::Zero(dimension_);
       }
 
+      // Initializes variational parameters given initial values
       explicit normal_meanfield(const Eigen::VectorXd& cont_params) :
         dimension_(cont_params.size()) {
         set_mu(cont_params);
         // initializing omega = 0 means sigma = 1
         omega_  = Eigen::VectorXd::Zero(dimension_);
-      }
-
-      normal_meanfield(const Eigen::VectorXd& mu,
-                       const Eigen::VectorXd& omega) :
-        dimension_(mu.size()) {
-        set_mu(mu);
-        set_omega(omega);
       }
 
       int dimension() const { return dimension_; }
@@ -126,23 +121,9 @@ namespace stan {
         return 0.5 * dimension_ * (1.0 + stan::math::LOG_TWO_PI) + omega_.sum();
       }
 
-      // S^{-1}(eta) = sigma * eta + mu
-      Eigen::VectorXd transform(const Eigen::VectorXd& eta) const {
-        static const char* function =
-          "stan::variational::normal_meanfield::transform";
-
-        stan::math::check_size_match(function,
-                         "Dimension of mean vector", dimension_,
-                         "Dimension of input vector", eta.size() );
-        stan::math::check_not_nan(function, "Input vector", eta);
-
-        // exp(omega) * eta + mu
-        return eta.array().cwiseProduct(omega_.array().exp()) + mu_.array();
-      }
-
       template <class BaseRNG>
       void sample(BaseRNG& rng, Eigen::VectorXd& eta) const {
-        for (int d = 0; d < dimension_; ++d) {
+        for (int d = 0; d < eta.size(); ++d) {
           eta(d) = stan::math::normal_rng(0, 1, rng);
         }
         eta = transform(eta);
@@ -178,18 +159,16 @@ namespace stan {
 
         Eigen::VectorXd mu_grad    = Eigen::VectorXd::Zero(dimension_);
         Eigen::VectorXd omega_grad = Eigen::VectorXd::Zero(dimension_);
-        double tmp_lp(0.0);
-        Eigen::VectorXd tmp_mu_grad = Eigen::VectorXd::Zero(dimension_);
-        Eigen::VectorXd eta         = Eigen::VectorXd::Zero(dimension_);
-        Eigen::VectorXd zeta        = Eigen::VectorXd::Zero(dimension_);
-        //Eigen::VectorXd eta(dimension_);
-        //Eigen::VectorXd zeta(dimension_);
+        double tmp_lp;
+        Eigen::VectorXd tmp_mu_grad(dimension_);
+        Eigen::VectorXd eta(dimension_);
+        Eigen::VectorXd zeta(dimension_);
 
         // Monte Carlo integration
         int i = 0;
         int n_monte_carlo_drop = 0;
         while (i < n_monte_carlo_grad) {
-          for (int d = 0; d < dimension_; ++d) {
+          for (int d = 0; d < eta.size(); ++d) {
             eta(d) = stan::math::normal_rng(0, 1, rng);
           }
           zeta = transform(eta);
@@ -234,6 +213,13 @@ namespace stan {
       Eigen::VectorXd omega_; // log-standard deviation
       int dimension_;
 
+      normal_meanfield(const Eigen::VectorXd& mu,
+                       const Eigen::VectorXd& omega) :
+        dimension_(mu.size()) {
+        set_mu(mu);
+        set_omega(omega);
+      }
+
       const Eigen::VectorXd& mu()    const { return mu_; }
       const Eigen::VectorXd& omega() const { return omega_; }
 
@@ -257,6 +243,20 @@ namespace stan {
                                "Dimension of current vector", dimension_);
         stan::math::check_not_nan(function, "Input vector", omega);
         omega_ = omega;
+      }
+
+      // S^{-1}(eta) = sigma * eta + mu
+      Eigen::VectorXd transform(const Eigen::VectorXd& eta) const {
+        static const char* function =
+          "stan::variational::normal_meanfield::transform";
+
+        stan::math::check_size_match(function,
+                         "Dimension of mean vector", dimension_,
+                         "Dimension of input vector", eta.size() );
+        stan::math::check_not_nan(function, "Input vector", eta);
+
+        // exp(omega) * eta + mu
+        return eta.array().cwiseProduct(omega_.array().exp()) + mu_.array();
       }
     };
 

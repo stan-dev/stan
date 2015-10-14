@@ -11,24 +11,19 @@ namespace stan {
 
     class base_family {
     public:
-      // Constructors
       base_family() {}
 
-      // Operations
       base_family square() const;
       base_family sqrt() const;
 
-      // Compound assignment operators
       base_family operator=(const base_family& rhs);
       base_family operator+=(const base_family& rhs);
       base_family operator/=(const base_family& rhs);
       base_family operator+=(double scalar);
       base_family operator*=(double scalar);
 
-      // Distribution-based operations
       const Eigen::VectorXd& mean() const;
       double entropy() const;
-      Eigen::VectorXd transform(const Eigen::VectorXd& eta) const;
       template <class BaseRNG>
       void sample(BaseRNG& rng, Eigen::VectorXd& eta) const;
       template <class M, class BaseRNG>
@@ -58,7 +53,6 @@ namespace stan {
       }
     };
 
-    // Arithmetic operators
     base_family operator+(base_family lhs, const base_family& rhs);
     base_family operator/(base_family lhs, const base_family& rhs);
     base_family operator+(double scalar, base_family rhs);

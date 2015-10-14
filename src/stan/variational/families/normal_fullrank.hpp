@@ -21,9 +21,9 @@
 #include <stan/math/prim/scal/err/check_size_match.hpp>
 #include <stan/math/prim/scal/err/domain_error.hpp>
 
-#include <stan/variational/base_family.hpp>
-
 #include <stan/model/util.hpp>
+
+#include <stan/variational/families/base_family.hpp>
 #include <algorithm>
 #include <ostream>
 #include <vector>
@@ -34,24 +34,18 @@ namespace stan {
 
     class normal_fullrank : public base_family {
     public:
-      // TODO explicitly describe why all these cosntructors
+      // Initializes variational parameters to zero
       explicit normal_fullrank(size_t dimension) :
         dimension_(dimension) {
         mu_ = Eigen::VectorXd::Zero(dimension_);
         L_  = Eigen::MatrixXd::Identity(dimension_, dimension_);
       }
 
+      // Initializes variational parameters given initial values
       explicit normal_fullrank(const Eigen::VectorXd& cont_params) :
         dimension_(cont_params.size()) {
         set_mu(cont_params);
         L_ = Eigen::MatrixXd::Identity(dimension_, dimension_);
-      }
-
-      normal_fullrank(const Eigen::VectorXd& mu,
-                      const Eigen::MatrixXd& L) :
-        dimension_(mu.size()) {
-        set_mu(mu);
-        set_L(L);
       }
 
       int dimension() const { return dimension_; }
@@ -123,39 +117,24 @@ namespace stan {
 
       // 0.5 * dim * (1+log2pi) + 0.5 * log det (L^T L) =
       // 0.5 * dim * (1+log2pi) + sum(log(abs(diag(L))))
-      // TODO entropy, zeros, various checks
       double entropy() const {
-        double tmp = 0.0;
         double result = 0.5 * dimension_ * (1.0 + stan::math::LOG_TWO_PI);
         for (int d = 0; d < dimension_; ++d) {
-          tmp = fabs(L_(d, d));
-          if (tmp != 0.0) {
-            result += log(tmp);
-          }
+          result += log(L_(d,d));
         }
         return result;
       }
-
-      // Implements S^{-1}(eta) = L*eta + \mu
-      Eigen::VectorXd transform(const Eigen::VectorXd& eta) const {
-        static const char* function =
-          "stan::variational::normal_fullrank::transform";
-
-        stan::math::check_size_match(function,
-                         "Dimension of input vector", eta.size(),
-                         "Dimension of mean vector",  dimension_);
-        stan::math::check_not_nan(function, "Input vector", eta);
-
-        return (L_ * eta) + mu_;
-      }
+      // TODO doesn't work
+      //double entropy() const {
+      //  return 0.5 * dimension_ * (1 + stan::math::LOG_TWO_PI)
+      //    + L_.diagonal().log().sum();
+      //}
 
       template <class BaseRNG>
       void sample(BaseRNG& rng, Eigen::VectorXd& eta) const {
-        // Draw from standard normal and transform to real-coordinate space
-        for (int d = 0; d < dimension_; ++d) {
+        for (int d = 0; d < eta.size(); ++d) {
           eta(d) = stan::math::normal_rng(0, 1, rng);
         }
-
         eta = transform(eta);
       }
 
@@ -189,19 +168,16 @@ namespace stan {
 
         Eigen::VectorXd mu_grad = Eigen::VectorXd::Zero(dimension_);
         Eigen::MatrixXd L_grad  = Eigen::MatrixXd::Zero(dimension_, dimension_);
-        double tmp_lp(0.0);
-        Eigen::VectorXd tmp_mu_grad = Eigen::VectorXd::Zero(dimension_);
-        Eigen::VectorXd eta         = Eigen::VectorXd::Zero(dimension_);
-        Eigen::VectorXd zeta        = Eigen::VectorXd::Zero(dimension_);
-        // TODO
-        //Eigen::VectorXd eta(dimension_);
-        //Eigen::VectorXd zeta(dimension_);
+        double tmp_lp;
+        Eigen::VectorXd tmp_mu_grad(dimension_);
+        Eigen::VectorXd eta(dimension_);
+        Eigen::VectorXd zeta(dimension_);
 
         // Monte Carlo integration
         int i = 0;
         int n_monte_carlo_drop = 0;
         while (i < n_monte_carlo_grad) {
-          for (int d = 0; d < dimension_; ++d) {
+          for (int d = 0; d < eta.size(); ++d) {
             eta(d) = stan::math::normal_rng(0, 1, rng);
           }
           zeta = transform(eta);
@@ -246,10 +222,16 @@ namespace stan {
       Eigen::MatrixXd L_;
       int dimension_;
 
+      normal_fullrank(const Eigen::VectorXd& mu,
+                      const Eigen::MatrixXd& L) :
+        dimension_(mu.size()) {
+        set_mu(mu);
+        set_L(L);
+      }
+
       const Eigen::VectorXd& mu() const { return mu_; }
       const Eigen::MatrixXd& L()  const { return L_; }
 
-      // TODO @throws
       void set_mu(const Eigen::VectorXd& mu) {
         static const char* function =
           "stan::variational::normal_fullrank::set_mu";
@@ -273,6 +255,19 @@ namespace stan {
                                "Dimension of current matrix", dimension_);
         stan::math::check_not_nan(function, "Input matrix", L);
         L_ = L;
+      }
+
+      // Implements S^{-1}(eta) = L*eta + \mu
+      Eigen::VectorXd transform(const Eigen::VectorXd& eta) const {
+        static const char* function =
+          "stan::variational::normal_fullrank::transform";
+
+        stan::math::check_size_match(function,
+                         "Dimension of input vector", eta.size(),
+                         "Dimension of mean vector",  dimension_);
+        stan::math::check_not_nan(function, "Input vector", eta);
+
+        return (L_ * eta) + mu_;
       }
     };
 
