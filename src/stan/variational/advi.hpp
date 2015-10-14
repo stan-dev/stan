@@ -141,9 +141,8 @@ namespace stan {
                         "Dimension of variational q", variational.dimension(),
                         "Dimension of variables in model", cont_params_.size());
 
-        variational.calc_grad(elbo_grad,
-                              model_, cont_params_, n_monte_carlo_grad_, rng_,
-                              print_stream_);
+        variational.calc_grad(elbo_grad, model_, cont_params_,
+          n_monte_carlo_grad_, rng_, print_stream_);
       }
 
       /**
@@ -299,23 +298,19 @@ namespace stan {
 
       /**
        * Pre-processing steps.
-       *
-       * @return stan::services::error_codes::OK
        */
-      int pre_process() const {
+      void pre_process() const {
         if (diag_stream_) {
           *diag_stream_ << "iter,time_in_seconds,ELBO" << std::endl;
         }
-        return stan::services::error_codes::OK;
       }
 
       /**
        * Post-processing steps, writing to output.
        *
        * @param variational variational distribution
-       * @return stan::services::error_codes::OK
        */
-      int post_process(const Q& variational) const {
+      void post_process(const Q& variational) const {
         // Write mean of posterior approximation to first line
         cont_params_ = variational.mean();
         // This is temporary as lp is not really helpful for variational
@@ -346,8 +341,6 @@ namespace stan {
                           lp, cont_vector, disc_vector, print_stream_);
           }
         }
-
-        return stan::services::error_codes::OK;
       }
 
       /**
