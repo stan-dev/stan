@@ -20,24 +20,6 @@ namespace stan {
 
   namespace variational {
 
-    /**
-     * Runs automatic differentiation variational inference.
-     *
-     * @tparam M                     class of model
-     * @tparam Q                     class of variational distribution
-     * @tparam BaseRNG               class of random number generator
-     * @param  m                     stan model
-     * @param  cont_params           initialization of continuous parameters
-     * @param  n_monte_carlo_grad    number of samples for gradient computation
-     * @param  n_monte_carlo_elbo    number of samples for ELBO computation
-     * @param  eta                   stepsize scaling in learning rate
-     * @param  rng                   random number generator
-     * @param  eval_elbo             evaluate ELBO at every "eval_elbo" iters
-     * @param  n_posterior_samples   number of samples to draw from posterior
-     * @param  print_stream          stream for convergence assessment output
-     * @param  output_stream         stream for parameters output
-     * @param  diagnostic_stream     stream for ELBO output
-     */
     template <class M, class Q, class BaseRNG>
     class advi {
     public:
@@ -372,17 +354,17 @@ namespace stan {
       }
 
     protected:
-      M& model_;
-      Eigen::VectorXd& cont_params_;
-      BaseRNG& rng_;
-      int n_monte_carlo_grad_;
-      int n_monte_carlo_elbo_;
-      double eta_;
-      int eval_elbo_;
-      int n_posterior_samples_;
-      std::ostream* print_stream_;
-      std::ostream* out_stream_;
-      std::ostream* diag_stream_;
+      M& model_;                     // model
+      Eigen::VectorXd& cont_params_; // parameters
+      BaseRNG& rng_;                 // random number generator
+      int n_monte_carlo_grad_;       // # of samples for gradient computation
+      int n_monte_carlo_elbo_;       // # of samples for ELBO computation
+      double eta_;                   // stepsize scaling in learning rate
+      int eval_elbo_;                // evaluate ELBO every "eval_elbo" iters
+      int n_posterior_samples_;      // # of samples to draw after convergence
+      std::ostream* print_stream_;   // progress output
+      std::ostream* out_stream_;     // final output
+      std::ostream* diag_stream_;    // diagnostic output
 
       void write_error_msg_(std::ostream* error_msgs,
                             const std::exception& e) const {
