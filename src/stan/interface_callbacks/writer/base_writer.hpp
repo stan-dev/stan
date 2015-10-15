@@ -50,7 +50,7 @@ namespace stan {
          * Writes a key, value pair.
          *
          * @param[in] key A string
-         * @param[in] value A double array, typically used with
+         * @param[in] values A double array, typically used with
          *   contiguous Eigen vectors
          * @param[in] n_values Length of the array
          */
@@ -62,7 +62,7 @@ namespace stan {
          * Writes a key, value pair.
          *
          * @param[in] key A string
-         * @param[in] value A double array assumed to represent a 2d 
+         * @param[in] values A double array assumed to represent a 2d 
          *   matrix stored in column major order, typically used with
          *   contiguous Eigen matrices
          * @param[in] n_rows Rows

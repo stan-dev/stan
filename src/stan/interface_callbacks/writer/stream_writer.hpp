@@ -11,18 +11,21 @@ namespace stan {
     namespace writer {
 
       /**
-       * stream_writer writes to an std::ostream.
+       * stream_writer writes to a stream.
+       *
+       * @tparam Stream A concept that matches that of std::ostream.
        */
-      class stream_writer : public base_writer {
+      template <class Stream>
+      class stream_writer: public base_writer {
       public:
         /**
          * Constructor.
          *
-         * @param output std::ostream to write to
+         * @param output Stream to write to
          * @param key_value_prefix String to write before lines
          *   treated as comments.
          */
-        stream_writer(std::ostream& output,
+        stream_writer(Stream& output,
                       const std::string& key_value_prefix = ""):
           output__(output), key_value_prefix__(key_value_prefix) {}
 
