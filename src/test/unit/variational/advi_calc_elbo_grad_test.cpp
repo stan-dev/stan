@@ -64,12 +64,12 @@ private:
 };
 
 
-TEST_F(advi_test, gradient_warn_meanfield) {
+TEST_F(AdviCalcElboGrad, no_warn_normal_meanfield) {
   EXPECT_EQ(0, advi_meanfield_->run(0.01, 10000));
   SUCCEED() << "expecting it to compile and run without problems";
 }
 
-TEST_F(advi_test, gradient_warn_fullrank) {
+TEST_F(AdviCalcElboGrad, no_warn_normal_fullrank) {
   EXPECT_EQ(0, advi_fullrank_->run(0.01, 10000));
   SUCCEED() << "expecting it to compile and run without problems";
 }
