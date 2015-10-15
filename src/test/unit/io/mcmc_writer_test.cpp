@@ -406,11 +406,11 @@ TEST(StanIoMcmcWriter, write_timing) {
   writer.write_timing(warm, sampling, sample_writer);
 
   std::stringstream expected_stream;
-  expected_stream << std::endl;
+  expected_stream << "# " << std::endl;
   expected_stream << "#  Elapsed Time: " << warm << " seconds (Warm-up)" << std::endl;
   expected_stream << "#                " << sampling << " seconds (Sampling)" << std::endl;
   expected_stream << "#                " << warm + sampling << " seconds (Total)" << std::endl;
-  expected_stream << std::endl;
+  expected_stream << "# " << std::endl;
   
   std::string line;
   std::string expected_line;
@@ -422,7 +422,7 @@ TEST(StanIoMcmcWriter, write_timing) {
   EXPECT_EQ(expected_line, line);
   
   std::getline(diagnostic_stream, line);
-  EXPECT_EQ(expected_line, line);
+  EXPECT_EQ("", line);
   
   // Line 2
   std::getline(expected_stream, expected_line);
