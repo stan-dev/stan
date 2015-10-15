@@ -9,55 +9,102 @@ namespace stan {
   namespace interface_callbacks {
     namespace writer {
 
-      // base_writer is an absract base class defining the
-      // interface for Stan writer callbacks.  The Stan API
-      // writes structured output to implementations of this
-      // class defined by a given interface.
-      //
-      // A typical API function signature will be of the form
-      //
-      // template <class WriterA, class WriterB>
-      // void function(WriterA& writer_a, WriterB& writer_b) {
-      //   ...
-      //   writer_a(key, value);
-      //   writer_b("message");
-      //   ...
-      // }
-      //
-      // where WriterA and WriterB are base_writer implementations.
 
+      /**
+       * base_writer is an abstract base class defining the interface
+       * for Stan writer callbacks.
+       * 
+       * The Stan API writes structured output to implementations of
+       * this class defined by a given interface.
+       */
       class base_writer {
       public:
-        // Virtual destructor to avoid compiler warnings
-        virtual ~base_writer() {}
-
-        // Key-scalar input
+        /**
+         * Writes a key, value pair.
+         *
+         * @param[in] key A string
+         * @param[in] value A double value
+         */
         virtual void operator()(const std::string& key,
                                 double value) = 0;
+
+        /**
+         * Writes a key, value pair.
+         *
+         * @param[in] key A string
+         * @param[in] value An integer value
+         */
         virtual void operator()(const std::string& key,
                                 int value) = 0;
+
+        /**
+         * Writes a key, value pair.
+         *
+         * @param[in] key A string
+         * @param[in] value A string
+         */
         virtual void operator()(const std::string& key,
                                 const std::string& value) = 0;
 
-        // Key-array input, used for contingous Eigen vectors
+        /**
+         * Writes a key, value pair.
+         *
+         * @param[in] key A string
+         * @param[in] value A double array, typically used with
+         *   contiguous Eigen vectors
+         * @param[in] n_values Length of the array
+         */
         virtual void operator()(const std::string& key,
                                 const double* values,
                                 int n_values) = 0;
 
-        // Key-array input, used for contiguous Eigen matrices
+        /**
+         * Writes a key, value pair.
+         *
+         * @param[in] key A string
+         * @param[in] value A double array assumed to represent a 2d 
+         *   matrix stored in column major order, typically used with
+         *   contiguous Eigen matrices
+         * @param[in] n_rows Rows
+         * @param[in] n_cols Columns
+         */
         virtual void operator()(const std::string& key,
                                 const double* values,
                                 int n_rows, int n_cols) = 0;
 
-        // STL vectors input, used for state names and values
+        /**
+         * Writes a set of names.
+         *
+         * @param[in] names Names in a std::vector
+         */
         virtual void operator()(const std::vector<std::string>& names) = 0;
+
+        /**
+         * Writes a set of values.
+         *
+         * @param[in] state Values in a std::vector
+         */
         virtual void operator()(const std::vector<double>& state) = 0;
 
-        // Null input
+        /**
+         * Writes blank input.
+         */
         virtual void operator()() = 0;
 
-        // String input
+        /**
+         * Writes a string.
+         *
+         * @param[in] message A string
+         */
         virtual void operator()(const std::string& message) = 0;
+
+        /**
+         * Destructor.
+         *
+         * Virtual destructor to avoid compiler warnings
+         *
+         */
+        virtual ~base_writer() {}
       };
 
     }
