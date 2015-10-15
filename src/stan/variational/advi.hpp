@@ -135,7 +135,7 @@ namespace stan {
        * @param max_iterations max number of iterations to run algorithm
        * @return stan::services::error_codes::OK
        */
-      int stochastic_gradient_descent(Q& variational,
+      void stochastic_gradient_descent(Q& variational,
                                        double tol_rel_obj,
                                        int max_iterations) const {
         static const char* function =
@@ -148,16 +148,13 @@ namespace stan {
                                    "Maximum iterations",
                                    max_iterations);
 
-        // Gradient parameters
         Q elbo_grad = Q(model_.num_params_r());
 
-        // Learning rate parameters
         double tau = 1.0;
         Q params_prop = Q(model_.num_params_r());
         double pre_factor  = 0.9;
         double post_factor = 0.1;
 
-        // Initialize ELBO and convergence tracking variables
         double elbo(0.0);
         double elbo_prev      = std::numeric_limits<double>::min();
         double delta_elbo     = std::numeric_limits<double>::max();
@@ -168,7 +165,6 @@ namespace stan {
                          1.0));
         boost::circular_buffer<double> elbo_diff(cb_size);
 
-        // Print main loop header
         if (print_stream_) {
           *print_stream_ << "  iter"
                          << "       ELBO"
@@ -178,19 +174,15 @@ namespace stan {
                          << std::endl;
         }
 
-        // Timing variables
         clock_t start = clock();
         clock_t end;
         double delta_t;
 
-        // Main loop
         std::vector<double> print_vector;
         bool do_more_iterations = true;
         for (int iter_sgd = 1; do_more_iterations; ++iter_sgd) {
-          // Compute gradient of ELBO
           calc_ELBO_grad(variational, elbo_grad);
 
-          // Update learning rate parameters
           if (iter_sgd == 1) {
             params_prop += elbo_grad.square();
           } else {
@@ -198,10 +190,8 @@ namespace stan {
                           post_factor * elbo_grad.square();
           }
 
-          // Stochastic gradient update
           variational += eta_ * elbo_grad / (tau + params_prop.sqrt());
 
-          // Check for convergence every "eval_elbo_"th iteration
           if (iter_sgd % eval_elbo_ == 0) {
             elbo_prev = elbo;
             elbo = calc_ELBO(variational);
@@ -209,8 +199,7 @@ namespace stan {
             elbo_diff.push_back(delta_elbo);
             delta_elbo_ave = std::accumulate(elbo_diff.begin(),
                                              elbo_diff.end(),
-                                             0.0) /
-                             static_cast<double>(elbo_diff.size());
+                                             0.0) / elbo_diff.size();
             delta_elbo_med = circ_buff_median(elbo_diff);
             if (print_stream_) {
               *print_stream_
@@ -229,7 +218,7 @@ namespace stan {
 
             if (diag_stream_) {
               end = clock();
-              delta_t = static_cast<double>(end - start) / CLOCKS_PER_SEC;
+              delta_t = (end - start) / CLOCKS_PER_SEC;
 
               print_vector.clear();
               print_vector.push_back(delta_t);
@@ -262,14 +251,12 @@ namespace stan {
               *print_stream_ << std::endl;
           }
 
-          // Check for max iterations
           if (iter_sgd == max_iterations) {
             if (print_stream_)
               *print_stream_ << "MAX ITERATIONS REACHED" << std::endl;
             do_more_iterations = false;
           }
         }
-        return stan::services::error_codes::OK;
       }
 
       /**
