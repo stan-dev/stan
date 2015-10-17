@@ -4,13 +4,6 @@
 #
 library(rstan)
 
-<<<<<<< HEAD
-=======
-# TODO
-# rlogitnorm
-# tanh
-
->>>>>>> 476482d2a9a398156b5396fdbfa9c5931f650206
 # Data
 N <- 50
 I <- 500
@@ -37,21 +30,13 @@ set.seed(42)
 for (k in 1:K2)
   W1[k, ] <- rnorm(K1, mu_W1, std_W1)
 for (k in 1:K1)
-<<<<<<< HEAD
   W0[k, ] <- rlnorm(I, mu_W0, std_W0)
-=======
-  W0[k, ] <- rlogitnorm(I, mu_W0, std_W0)
->>>>>>> 476482d2a9a398156b5396fdbfa9c5931f650206
 
 # Deep exponential family
 for (n in 1:N) {
   z2[n, ] <- rnorm(K2, mu_z2, std_z2)
   for (k in 1:K1)
-<<<<<<< HEAD
     z1[n, k] <- rlnorm(1, tanh(z2[n, ] %*% W1[, k]), std_z1)
-=======
-    z1[n, k] <- rlogitnorm(1, tanh(z2[n, ] %*% W1[, k]), std_z1)
->>>>>>> 476482d2a9a398156b5396fdbfa9c5931f650206
 }
 
 # Observation model
