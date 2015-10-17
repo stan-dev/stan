@@ -175,6 +175,11 @@ namespace stan {
         return mu();
       }
 
+      // TODO
+      double log_q(const Eigen::VectorXd& cont_params) const {
+        return 0;
+      }
+
       // 0.5 * dim * (1+log2pi) + 0.5 * log det (L^T L) =
       // 0.5 * dim * (1+log2pi) + sum(log(abs(diag(L))))
       double entropy() const {

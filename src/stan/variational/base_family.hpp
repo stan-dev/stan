@@ -27,6 +27,7 @@ namespace stan {
 
       // Distribution-based operations
       const Eigen::VectorXd& mean() const;
+      double log_q(const Eigen::VectorXd& cont_params) const;
       double entropy() const;
       Eigen::VectorXd transform(const Eigen::VectorXd& eta) const;
       template <class BaseRNG>

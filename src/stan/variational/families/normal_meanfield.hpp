@@ -167,6 +167,21 @@ namespace stan {
         return mu();
       }
 
+      // -0.5 * log (2pi)^dim - 0.5 * log det diag (sigma^2) -
+      //   0.5 * (x - mu)^T * diag(1/sigma^2) * (x - mu) =
+      // -0.5 * dim * log2pi - sum(omega) -
+      //   0.5 * (x - mu)^T * diag(1/exp(omega)^2) * (x - mu)
+      double log_q(const Eigen::VectorXd& cont_params) const {
+        double out = -0.5 * static_cast<double>(dimension_) *
+               stan::math::LOG_TWO_PI - omega_.sum();
+        double tmp;
+        for (int n = 0; n < dimension_; ++n) {
+          tmp = (cont_params(n) - mu_(n)) * 1.0 / exp(omega_(n));
+          out += -0.5 * tmp * tmp;
+        }
+        return out;
+      }
+
       // 0.5 * dim * (1+log2pi) + 0.5 * log det diag(sigma^2) =
       // 0.5 * dim * (1+log2pi) + sum(log(sigma)) =
       // 0.5 * dim * (1+log2pi) + sum(omega)

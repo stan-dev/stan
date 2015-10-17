@@ -315,6 +315,12 @@ namespace stan {
         // run inference algorithm
         robbins_monro_adagrad(variational, tol_rel_obj, max_iterations);
 
+        // LOG Q OUTPUT
+        // Here, lp returns log densities of the variational distribution
+        std::string logq_filename = "output_logq.csv";
+        std::fstream* logq_stream = new std::fstream(logq_filename.c_str(),
+                                                     std::fstream::out);
+
         // get mean of posterior approximation and write on first output line
         cont_params_ = variational.mean();
         // lp returns unnormalized log probability without jacobian adjustment
@@ -329,7 +335,13 @@ namespace stan {
           services::io::write_iteration(*out_stream_, model_, rng_,
                                         lp, cont_vector, disc_vector,
                                         print_stream_);
+
+          // Write to log q output
+          lp = variational.log_q(cont_params_);
+          services::io::write_iteration(*logq_stream, model_, rng_,
+                        lp, cont_vector, disc_vector, print_stream_);
         }
+
 
         // draw more samples from posterior and write on subsequent lines
         if (out_stream_) {
@@ -341,6 +353,11 @@ namespace stan {
               cont_vector.at(i) = cont_params_(i);
             }
             services::io::write_iteration(*out_stream_, model_, rng_,
+                          lp, cont_vector, disc_vector, print_stream_);
+
+            // Write to log q output
+            lp = variational.log_q(cont_params_);
+            services::io::write_iteration(*logq_stream, model_, rng_,
                           lp, cont_vector, disc_vector, print_stream_);
           }
         }
