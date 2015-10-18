@@ -1,3 +1,4 @@
+// TODO the ordering of the layers in the DGP should be reversed
 /*
  * Sparse Gamma DEF (Ranganath et al., 2015)
  */
