@@ -119,6 +119,7 @@ $(patsubst %.stan,%.hpp,$(TEST_MODELS)) : %.hpp : %.stan test/test-models/stanc$
 ##
 # Explicitly specify dependencies for tests that depend on the generated C++ of Stan programs.
 ##
+src/test/integration/regression-models/logearn_interaction_test.cpp: src/test/test-models/regression/logearn_interaction.hpp
 src/test/performance/logistic_test.cpp: src/test/test-models/performance/logistic.hpp
 src/test/unit/lang/generator_test.cpp: src/test/test-models/good/lang/test_lp.hpp
 src/test/unit/lang/parser_generator_test.cpp: $(patsubst %.stan,%.hpp,$(shell find src/test/test-models/good/parser-generator -type f -name '*.stan'))
@@ -165,7 +166,6 @@ src/test/unit/variational/hier_logistic_cp_test.cpp: src/test/test-models/good/v
 # the compiler using the -fsyntax-only flag
 ##
 test/integration/compile_models$(EXE) : $(patsubst %.stan,%.hpp-test,$(shell find src/test/test-models/good -type f -name '*.stan'))
-
 
 test_name = $(shell echo $(1) | sed 's,_[0-9]\{5\},_test.hpp,g')
 
