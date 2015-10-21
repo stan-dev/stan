@@ -108,7 +108,7 @@ namespace stan {
             stan::math::check_finite(function, "energy_i", energy_i);
             elbo += energy_i;
             i += 1;
-          } catch (std::exception& e) {
+          } catch (std::domain_error& e) {
             this->write_error_msg_(print_stream_, e);
             n_monte_carlo_drop += 1;
             if (n_monte_carlo_drop >= n_monte_carlo_elbo_) {
@@ -159,8 +159,7 @@ namespace stan {
        * @return optimal value of eta via grid search
        */
       double tune(Q& variational, int tuning_iter) const {
-        static const char* function =
-          "stan::variational::advi::tune";
+        static const char* function = "stan::variational::advi::tune";
 
         stan::math::check_positive(function,
                                    "Number of tuning iterations",
@@ -178,10 +177,10 @@ namespace stan {
 
         // Sequence of eta values to try during tuning
         std::queue<double> eta_sequence;
+        eta_sequence.push(100.00);
+        eta_sequence.push(10.00);
         eta_sequence.push(1.00);
-        eta_sequence.push(0.50);
         eta_sequence.push(0.10);
-        eta_sequence.push(0.05);
         eta_sequence.push(0.01);
 
         // Print progress
@@ -192,7 +191,7 @@ namespace stan {
         }
 
         // Initialize ELBO and convergence tracking variables
-        double elbo(0.0);
+        double elbo = -std::numeric_limits<double>::max();
         double elbo_best = -std::numeric_limits<double>::max();
         double elbo_init = calc_ELBO(variational);
         double eta_best(0.0);
@@ -212,7 +211,13 @@ namespace stan {
               tuning_iter, true, "", "", *print_stream_);
 
             // Compute gradient of ELBO
-            calc_ELBO_grad(variational, elbo_grad);
+            try {
+              calc_ELBO_grad(variational, elbo_grad);
+            } catch (std::domain_error& e) {
+              if (print_stream_)
+                *print_stream_ << e.what() << std::endl;
+              elbo_grad.reset_to_zero();
+            }
 
             // Update learning rate parameters
             if (iter_tune == 1) {
@@ -226,7 +231,14 @@ namespace stan {
             // Stochastic gradient update
             variational += eta_scaled * elbo_grad / (tau + params_prop.sqrt());
           }
-          elbo = calc_ELBO(variational);
+
+          try {
+            elbo = calc_ELBO(variational);
+          } catch (std::domain_error& e) {
+            if (print_stream_)
+                *print_stream_ << e.what() << std::endl;
+            elbo = -std::numeric_limits<double>::max();
+          }
 
           // Check if:
           // (1) ELBO at current eta is worse than the best ELBO
@@ -535,12 +547,12 @@ namespace stan {
               << "Stan's default automatic tuning procedure.";
             throw std::runtime_error(eta_error_message.str());
           }
-          if (eta_double <= 0.0 || eta_double > 1.0){
+          if (eta_double <= 0.0){
             std::stringstream eta_error_message;
             eta_error_message << "You specified the value eta = "
               << eta
               << " for the stepsize." << std::endl
-              << "This is outside of the allowable range 0 < eta <= 1."
+              << "This is outside of the allowable range 0 < eta."
               << std::endl
               << "Please check for typos. We recommend using "
               << "Stan's default automatic tuning procedure.";

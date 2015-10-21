@@ -45,19 +45,24 @@ namespace stan {
 
     public:
       // Constructors
+
+      // Constructs a zero-filled object
       explicit normal_meanfield(size_t dimension) :
         dimension_(dimension) {
         mu_     = Eigen::VectorXd::Zero(dimension_);
-        // initializing omega = 0 means sigma = 1
         omega_  = Eigen::VectorXd::Zero(dimension_);
       }
 
+      // Constructs the initial variational distribution
       explicit normal_meanfield(const Eigen::VectorXd& cont_params) :
         mu_(cont_params), dimension_(cont_params.size()) {
+
         // initializing omega = 0 means sigma = 1
-        omega_  = Eigen::VectorXd::Zero(dimension_);
+        omega_  = -10 * Eigen::VectorXd::Ones(dimension_);
+
       }
 
+      // Constructs based on input parameters
       normal_meanfield(const Eigen::VectorXd& mu,
                        const Eigen::VectorXd& omega) :
       mu_(mu), omega_(omega), dimension_(mu.size()) {
@@ -97,6 +102,11 @@ namespace stan {
                                "Dimension of current vector", dimension_);
         stan::math::check_not_nan(function, "Input vector", omega);
         omega_ = omega;
+      }
+
+      void reset_to_zero() {
+        mu_     = Eigen::VectorXd::Zero(dimension_);
+        omega_  = Eigen::VectorXd::Zero(dimension_);
       }
 
       // Operations
@@ -271,6 +281,9 @@ namespace stan {
               const char* msg2 = "). Your model may be either severely "
                 "ill-conditioned or misspecified.";
               stan::math::domain_error(function, name, y, msg1, msg2);
+              // elbo_grad.set_mu(Eigen::VectorXd::Zero(dimension_));
+              // elbo_grad.set_omega(Eigen::VectorXd::Zero(dimension_));
+              // return;
             }
           }
         }

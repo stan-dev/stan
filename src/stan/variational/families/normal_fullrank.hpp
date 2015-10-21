@@ -52,12 +52,12 @@ namespace stan {
       explicit normal_fullrank(size_t dimension) :
         dimension_(dimension) {
         mu_     = Eigen::VectorXd::Zero(dimension_);
-        L_chol_  = Eigen::MatrixXd::Identity(dimension_, dimension_);
+        L_chol_ = Eigen::MatrixXd::Zero(dimension_, dimension_);
       }
 
       explicit normal_fullrank(const Eigen::VectorXd& cont_params) :
         mu_(cont_params), dimension_(cont_params.size()) {
-        L_chol_  = Eigen::MatrixXd::Identity(dimension_, dimension_);
+        L_chol_ = Eigen::MatrixXd::Identity(dimension_, dimension_);
       }
 
       normal_fullrank(const Eigen::VectorXd& mu,
@@ -80,6 +80,8 @@ namespace stan {
       int dimension() const { return dimension_; }
       const Eigen::VectorXd& mu()     const { return mu_; }
       const Eigen::MatrixXd& L_chol() const { return L_chol_; }
+
+      const Eigen::VectorXd& omega() const { return mu_; }
 
       // Mutators
       void set_mu(const Eigen::VectorXd& mu) {
@@ -105,6 +107,11 @@ namespace stan {
                                "Dimension of input matrix", L_chol.rows());
         stan::math::check_not_nan(function, "Input matrix", L_chol_);
         L_chol_ = L_chol;
+      }
+
+      void reset_to_zero() {
+        mu_     = Eigen::VectorXd::Zero(dimension_);
+        L_chol_ = Eigen::MatrixXd::Zero(dimension_, dimension_);
       }
 
       // Operations
