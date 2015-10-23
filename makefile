@@ -23,16 +23,9 @@ AR = ar
 C++11 = false
 
 ##
-# Library locations
-##
-EIGEN ?= lib/eigen_3.2.4
-BOOST ?= lib/boost_1.55.0
-GTEST ?= lib/gtest_1.7.0
-
-##
 # Set default compiler options.
 ## 
-CFLAGS = -I src -isystem $(EIGEN) -isystem $(BOOST) -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -pipe
+CFLAGS = -I src -isystem $(EIGEN) -isystem $(BOOST) -isystem $(MATH) -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -pipe
 CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
 LDLIBS = 
 LDLIBS_STANC = -Lbin -lstanc
@@ -41,6 +34,14 @@ WINE =
 
 -include $(HOME)/.config/stan/make.local  # define local variables
 -include make/local                       # overwrite local variables
+
+
+##
+# Library locations
+##
+STAN ?= 
+MATH ?= lib/stan_math/
+-include $(MATH)make/libraries
 
 ##
 # Get information about the compiler used.
@@ -69,7 +70,7 @@ include make/cpplint  # cpplint
 ##
 # Dependencies
 ##
-ifneq (,$(filter-out test-headers generate-tests clean% %-test %.d,$(MAKECMDGOALS)))
+ifneq (,$(filter-out test-headers generate-tests clean% %-test math-% %.d,$(MAKECMDGOALS)))
   -include $(addsuffix .d,$(subst $(EXE),,$(MAKECMDGOALS)))
 endif
 
@@ -118,6 +119,14 @@ endif
 	@echo '  - doxygen        : Builds the API documentation. The documentation is located'
 	@echo '                     doc/api/'
 	@echo '                     (requires doxygen installation)'
+	@echo '  Submodule:'
+	@echo '  - math-revert    : Resets the Stan Math Library git submodule to the tagged'
+	@echo '                     version'
+	@echo '  - math-update    : Updates the Stan Math Library git submodule to the latest'
+	@echo '                     development version'
+	@echo '  - math-update/<branch-name> : Updates the Stan Math Library git submodule to'
+	@echo '                     the branch specified'
+	@echo ''
 	@echo 'Tests:'
 	@echo ''
 	@echo '  Unit tests are built through make by specifying the executable as the target'
@@ -182,5 +191,19 @@ clean-all: clean clean-manual clean-deps
 	$(RM) -r test bin
 	@echo '  removing .o files'
 	$(shell find src -type f -name '*.o' -exec rm {} +)
-	@echo '  removing generated test files'
-	$(shell find src/test/prob -name '*_generated_*_test.cpp' -type f -exec rm {} +)
+
+
+##
+# Submodule related tasks
+##
+.PHONY: math-revert
+math-revert:
+	git submodule update --init --recursive
+
+.PHONY: math-update
+math-update:
+	git submodule init
+	git submodule update --recursive
+
+math-update/%: math-update
+	cd $(MATH) && git fetch --all && git checkout $* && git pull

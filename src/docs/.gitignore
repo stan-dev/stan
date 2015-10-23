@@ -8,6 +8,7 @@
 *.cb
 *.cb2
 *.upa
+*.synctex.gz
 stan-reference/stan-reference.pdf
 stan-reference/stan-functions.txt
 

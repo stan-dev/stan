@@ -2,8 +2,11 @@
 
 \chapter{Conventions for Probability Functions}
 
-The probability functions (density or mass, depending on discreteness
-of the variable) are all set up to follow some basic conventions.
+The probability functions (probability density functions for
+continuous outputs and probability mass functions for discrete
+outputs) probability mass, depending on discreteness of the variable)
+are all set up to follow the same basic naming and behavioral
+conventions.
 
 \section{Finite Inputs}
 
@@ -26,6 +29,277 @@ This is true even for (complementary) cumulative distribution
 functions, which will throw exceptions when given input that is out of
 the support.
 
+\section{Pseudorandom Number Generators}
+
+For most of the probability functions, there is a matching
+pseudorandom number generator (PRNG) with the suffix \code{\_rng}.
+For example, the function \code{normal\_rng(real, real)} accepts two
+real arguments, an unconstrained location $\mu$ and positive scale
+$\sigma > 0$, and returns an unconstrained pseudorandom value drawn
+from $\distro{Normal}(\mu,\sigma)$.
+
+\subsection{Generated Quantities Only}
+
+Unlike regular functions, the PRNG functions may only be used in the
+generated quantities block.
+
+\subsection{Not Vectorized}
+
+Unlike the probability functions, the PRNG functions are not
+vectorized.
+
+
+\subsection{Applications of PRNGs}
+
+The main application of PRNGs is for posterior inference, including
+prediction and posterior predictive checks.  They can also be used for
+pure data simulation, which is like a posterior predictive check with
+no conditioning.
+
+\subsubsection{Prediction}
+
+Consider predicting unobserved outcomes using linear
+regression.  Given predictors $x_1, \ldots, x_N$ and observed outcomes
+$y_1,\ldots,y_N$, and assuming a standard linear regression with
+intercept $\alpha$, slope $\beta$, and error scale $\sigma$, along with
+improper uniform priors, the posterior over the parameters given $x$
+and $y$ is
+%
+\[
+p(\alpha, \beta, \sigma \, | \, x, y) 
+\propto 
+\prod_{n=1}^N 
+  \distro{Normal}(y_n \, | \, \alpha + \beta x_n, \sigma).
+\]
+%
+For this model, the posterior predictive inference for a new outcome
+$\tilde{y}_m$ given a predictor $\tilde{x}_m$, conditioned on the
+observed data $x$ and $y$, is
+\[
+p(\tilde{y}_n \, | \, \tilde{x}_n, x, y)
+= \int_{(\alpha,\beta,\sigma)}
+  \distro{Normal}(\tilde{y}_n \, | \, \alpha + \beta \tilde{x}_n, \sigma)
+  \times
+  p(\alpha, \beta, \sigma \, | \, x, y) 
+  \
+  \mathrm{d}(\alpha,\beta,\sigma).
+\]
+%
+To code the posterior predictive inference in Stan, a standard linear
+regression is combined with a random number in the generated
+quantities block.
+%
+\begin{stancode}
+data {
+  int<lower=0> N;
+  vector[N] y;
+  vector[N] x;
+  int<lower=0> N_tilde;
+  vector[N_tilde] x_tilde;
+}
+parameters {
+  real alpha;
+  real beta;
+  real<lower=0> sigma;
+}
+model {
+  y ~ normal(alpha + beta * x, sigma);
+}
+generated quantities {
+  vector[N_tilde] y_tilde;
+  for (n in 1:N_tilde)
+    y_tilde[n] <- normal_rng(alpha + beta * x[n], sigma);
+}
+\end{stancode}
+%
+Given observed predictors $x$ and outcomes $y$, \code{y\_tilde} will
+be drawn according to $p(\tilde{y} \, | \, \tilde{x}, y, x)$.  This
+means that, for example, the posterior mean for \code{y\_tilde} is the
+estimate of the outcome that minimizes expected square error
+(conditioned on the data and model, of course).
+
+\subsubsection{Posterior Predictive Checks}
+
+A good way to investigate the fit of a model to the data, a critical
+step in Bayesian data analysis, is to generate simulated data
+according to the parameters of the model.  This is carried out with
+exactly the same procedure as before, only the observed data
+predictors $x$ are used in place of new predictors $\tilde{x}$ for
+unobserved outcomes.  If the model fits the data well, the predictions
+for $\tilde{y}$ based on $x$ should match the observed data $y$.
+
+To code posterior predictive checks in Stan requires only a slight
+modification of the prediction code to use $x$ and $N$ in place of
+$\tilde{x}$ and $\tilde{N}$,
+%
+\begin{stancode}
+generated quantities {
+  vector[N] y_tilde;
+  for (n in 1:N)
+    y_tilde <- normal_rng(alpha + beta * x[n], sigma);
+}
+\end{stancode}
+%
+\cite{GelmanEtAl:2013} recommend choosing several posterior draws
+$\tilde{y}^{(1)}, \ldots, \tilde{y}^{(M)}$ and plotting each of them
+alongside the data $y$ that was actually observed.  If the model fits
+well, the simulated $\tilde{y}$ will look like the actual data $y$.
+
+
+\section{Cumulative Distribution Functions}
+
+For most of the univariate probability functions, there is a
+corresponding cumulative distribution function, log cumulative
+distribution function, and log complementary cumulative distribution
+function.
+
+For a univariate random variable $Y$ with probability function $p_Y(y \,
+| \, \theta)$, the cumulative distribution function (CDF) $F_Y$ is
+defined by
+\[
+F_Y(y) 
+\ = \
+\mbox{Pr}[Y < y] 
+\ = \
+\int_0^y p(y \, | \, \theta) \ \mathrm{d}\theta.
+\]
+The complementary cumulative distribution function (CCDF) is defined
+as 
+\[
+\mbox{Pr}[Y \geq y]
+\ = \
+1 - F_Y(y).
+\]
+The reason to use CCDFs instead of CDFs in floating-point arithmetic
+is that it is possible to represent numbers very close to 0 (the
+closest you can get is roughly $10^{-300}$), but not numbers very close
+to 1 (the closest you can get is roughly $1 - 10^{-15}$).
+
+In Stan, there is a cumulative distribution function for each
+probability function.  For instance, \code{normal\_cdf(y,~mu,~sigma)}
+is defined by 
+%
+\[
+\int_0^y \distro{Normal}(y \, | \, \mu, \sigma) \ \mathrm{d}y.
+\]
+%
+There are also log forms of the CDF and CCDF for most univariate
+distributions.  For example, \code{normal\_cdf\_log(y,~mu,~sigma)} is
+defined by
+%
+\[
+\log \left( \int_0^y \distro{Normal}(y \, | \, \mu, \sigma) \
+  \mathrm{d}y \right)
+\]
+%
+and \code{normal\_ccdf\_log(y,~mu,~sigma)} is defined by
+%
+\[
+\log \left( 1 - \int_0^y \distro{Normal}(y \, | \, \mu, \sigma) \
+  \mathrm{d}y \right).
+\]
+
+
+\section{Vectorization}\label{vectorization.section}
+
+\noindent
+Stan's univariate log probability functions, including the log density
+functions, log mass functions, log CDFs, and log CCDFs, all support vectorized
+function application, with results defined to be the sum of the
+elementwise application of the function.
+
+In all cases, matrix operations are at least as fast and usually
+faster than loops and vectorized log probability functions are faster
+than their equivalent form defined with loops.  This isn't because
+loops are slow in Stan, but because more efficient automatic
+differentiation can be used.  The efficiency comes from the fact that
+a vectorized log probably function only introduces one new node into
+the expression graph, thus reducing the number of virtual function
+calls required to compute gradients in \Cpp, as well as from allowing
+caching of repeated computations.
+
+Stan also overloads the multivariate normal distribution, including
+the Cholesky-factor form, allowing arrays of row vectors or vectors
+for the variate and location parameter.  This is a huge savings in
+speed because the work required to solve the linear system for the
+covariance matrix is only done once.
+
+Stan also overloads some scalar functions, such as \code{log} and
+\code{exp}, to apply to vectors (arrays) and return vectors (arrays).  
+These vectorizations are defined elementwise and unlike the
+probability functions, provide only minimal efficiency speedups over
+repeated application and assignment in a loop.
+
+
+\subsection{Vectorized Function Signatures}\label{prob-vectorization.section}
+
+\subsubsection{Vectorized Scalar Arguments}
+
+The normal probability function is specified with the signature
+%
+\begin{stancode}
+normal_log(reals, reals, reals);
+\end{stancode}
+%
+The pseudo-type \code{reals} is used to indicate that an argument
+position may be vectorized.  Argument positions declared as
+\code{reals} may be filled with a real, a one-dimensional array, a
+vector, or a row-vector.  If there is more than one array or vector
+argument, their types can be anything but their size must match.  For
+instance, it is legal to use
+\code{normal\_log(row\_vector,~vector,~real)} as long as the vector and
+row vector have the same size.  
+
+\subsubsection{Vectorized Vector and Row Vector Arguments}
+
+The multivariate normal distribution accepting vector or array of
+vector arguments is written as
+%
+\begin{stancode}
+multi_normal_log(vectors, vectors, matrix);
+\end{stancode}
+%
+These arguments may be row vectors, column vectors, or arrays of row
+vectors or column vectors.
+
+\subsubsection{Vectorized Integer Arguments}
+
+The pseudo-type \code{ints} is used for vectorized integer arguments.
+Where it appears either an integer or array of integers may be used.
+
+
+\subsection{Evaluating Vectorized Functions}
+
+The result of a vectorized log probability function is equivalent to
+the sum of the evaluations on each element.  Any non-vector argument,
+namely \code{real} or \code{int}, is repeated.  For instance, if
+\code{y} is a vector of size \code{N}, \code{mu} is a vector of size
+\code{N}, and \code{sigma} is a scalar, then
+%
+\begin{stancode}
+ll <- normal_log(y, mu, sigma);
+\end{stancode}
+%
+is just a more efficient way to write
+%
+\begin{stancode}
+ll <- 0;
+for (n in 1:N)
+  ll <- ll + normal_log(y[n], mu[n], sigma);
+\end{stancode}
+%
+With the same arguments, the vectorized sampling statement
+%
+\begin{stancode}
+y ~ normal(mu, sigma);
+\end{stancode}
+%
+has the same effect on the total log probability as
+%
+\begin{stancode}
+for (n in 1:N)
+  y[n] ~ normal(mu[n], sigma);
+\end{stancode}
 
 
 
@@ -165,7 +439,7 @@ Suppose $N \in \nats$ and $\theta \in [0,1]$, and $n \in
 \]
 
 
-\pitem{n}{binomial}{N,theta}
+\pitem{n}{binomial}{N, theta}
 
 \subsubsection{Stan Functions}
 
@@ -238,7 +512,7 @@ Suppose $N \in \nats$, $\alpha \in \reals$, and $n \in
 - \frac{N - n}{\mbox{logit}^{-1}(\alpha)}
 \]
 
-\pitem{n}{binomial\_logit}{N,alpha}
+\pitem{n}{binomial\_logit}{N, alpha}
 
 \subsubsection{Stan Functions}
 
@@ -273,7 +547,7 @@ where the beta function $\Betafun(u,v)$ is defined for $u \in
 = \frac{\Gamma(u) \ \Gamma(v)}{\Gamma(u + v)}.
 \]
 
-\pitem{n}{beta\_binomial}{N,alpha,beta}
+\pitem{n}{beta\_binomial}{N, alpha, beta}
 
 \subsubsection{Stan Functions}
 
@@ -330,7 +604,7 @@ then for $n \in \setlist{\max(0,N-b),\ldots,\min(a,N)}$,
 \]
 
 
-\pitem{n}{hypergeometric}{N,a,b}
+\pitem{n}{hypergeometric}{N, a, b}
 
 \subsubsection{Stan Functions}
 
@@ -438,7 +712,7 @@ The $k=1$ and $k=K$ edge cases can be subsumed into the general definition
 by setting $c_0 = -\infty$ and $c_K = +\infty$ with
 $\mbox{logit}^{-1}(-\infty) = 0$ and $\mbox{logit}^{-1}(\infty) = 1$.
 
-\pitem{k}{ordered\_logistic}{eta,c}
+\pitem{k}{ordered\_logistic}{eta, c}
 
 
 \subsubsection{Stan Functions}
@@ -466,15 +740,14 @@ numbers (i.e., the non-negative integers).
 \section{Negative Binomial Distribution}
 
 For the negative binomial distribution Stan uses the parameterization
-described in \citet{GelmanEtAl:2013}.
-For an alternative parametrization, see section \ref{sec:nbalt}
+described in \citet{GelmanEtAl:2013}.  For alternative parametrizations, see \refsection{nbalt}.
 
 \subsubsection{Probability Mass Function}
 
 If $\alpha \in \posreals$ and $\beta \in \posreals$, then for $y \in
 \nats$,
 \[
-\distro{NegativeBinomial}(y|\alpha,\beta)
+\distro{NegBinomial}(y|\alpha,\beta)
  = 
 \binom{y + \alpha - 1}{\alpha - 1}
 \,
@@ -485,7 +758,7 @@ If $\alpha \in \posreals$ and $\beta \in \posreals$, then for $y \in
 
 % DON'T REMOVE --- WE MAY INCLUDE ALL THESE IN THE FUTURE ELSEWHERE
 % \begin{eqnarray*}
-% \log \distro{NegativeBinomial}(y|\alpha,\beta)
+% \log \distro{NegBinomial}(y|\alpha,\beta)
 % & = & \log \Gamma(y + \alpha) 
 %   - \log \Gamma(y + 1)
 %   - \log \Gamma(\alpha)
@@ -504,21 +777,21 @@ If $\alpha \in \posreals$ and $\beta \in \posreals$, then for $y \in
 % \]
 % \[
 % \frac{\partial}{\partial \beta} 
-% \log \distro{NegativeBinomial}(y|\alpha,\beta)
+% \log \distro{NegBinomial}(y|\alpha,\beta)
 % = \frac{\alpha}{\beta} - \frac{\alpha + y}{\beta + 1}
 % \]
 % where $\Psi$ is the digamma function (see
 % \refsection{digamma-appendix} for a definition).
 
 The mean and variance of a random variable $y \sim
-\distro{NegativeBinomial}(\alpha,\beta)$ are given by
+\distro{NegBinomial}(\alpha,\beta)$ are given by
 \[
 \mathbb{E}[y] = \frac{\alpha}{\beta} 
 \ \ \mbox{ and } \ \ 
 \mbox{Var}[Y] = \frac{\alpha}{\beta^2} (\beta + 1).
 \]
 
-\pitem{n}{neg\_binomial}{alpha,beta}
+\pitem{n}{neg\_binomial}{alpha, beta}
 
 \subsubsection{Stan Functions}
 
@@ -550,20 +823,20 @@ must be less than $2 ^ {29}$}
 \end{description}
 
 
-
-\section{Negative Binomial Distribution, alternative parameterization}
-\label{sec:nbalt}
+\section{Negative Binomial Distribution (alternative parameterization)}\label{nbalt.section}
 
 Stan also provides an alternative parameterization of the negative
-binomial distribution using the mean and inverse scale
-(overdispersion) as parameters.
+binomial distribution directly using a mean (i.e., location) parameter
+and a parameter that controls overdispersion relative to the square of
+the mean.  \refsection{neg-binom-2-log}, below, provides a second
+alternative parameterization directly in terms of the log mean.
 
 \subsubsection{Probability Mass Function}
 
-If $\eta \in \reals$, $\mu \in \posreals$ and $\phi \in \posreals$,
-then for $y \in \nats$,
+The first parameterization is for $\mu \in \posreals$ and $\phi \in
+\posreals$, which for $y \in \nats$ is defined as
 \[
-\distro{NegativeBinomial2}(y|\mu,\phi)
+\distro{NegBinomial2}(y \, | \, \mu, \phi)
  =
 \binom{y + \phi - 1}{y}
 \,
@@ -571,19 +844,21 @@ then for $y \in \nats$,
 \,
 \left( \frac{\phi}{\mu+\phi} \right)^{\!\phi} \!.
 \]
+
 The mean and variance of a random variable $y \sim
-\distro{NegativeBinomial2}(y|\mu,\phi)$ are
+\distro{NegBinomial2}(y|\mu,\phi)$ are
 \[
-\mathbb{E}[Y] = \mu = e^\eta 
+\mathbb{E}[Y] = \mu
 \ \ \ \mbox{ and } \ \ \
 \mbox{Var}[Y] = \mu + \frac{\mu^2}{\phi}.
 \]
-The parameter $\phi$ represents precision, whereas its inverse,
-$\phi^{-1}$, represents overdispersion.
+Recall that $\distro{Poisson}(\mu)$ has variance $\mu$, so $\mu^2 /
+\phi > 0$ is the additional variance of the negative binomial above
+that of the Poisson with mean $\mu$.  So the inverse of parameter
+$\phi$ controls the overdispersion, scaled by the square of the mean,
+$\mu^2$.
 
 \pitem{y}{neg\_binomial\_2}{mu, phi}
-
-\pitem{y}{neg\_binomial\_2\_log}{eta, phi}
 
 \subsubsection{Stan Functions}
 
@@ -593,12 +868,6 @@ $\phi^{-1}$, represents overdispersion.
    \farg{mu}, reals \farg{phi}}{The negative binomial probability
    mass of \farg{n} given location \farg{mu} and precision
    \farg{phi}.}
-%
- \fitem{real}{neg\_binomial\_2\_log\_log}{ints \farg{y}, reals
-   \farg{eta}, reals \farg{phi}}{The log negative binomial probability
-   mass of \farg{n} given log-location \farg{eta} and precision
-   \farg{phi}. This is especially useful for log-linear negative
-   binomial regressions.}
 %
  \fitem{real}{neg\_binomial\_2\_cdf}{ints \farg{n}, reals
    \farg{mu}, reals \farg{phi}}{The negative binomial cumulative
@@ -621,12 +890,42 @@ $\phi^{-1}$, represents overdispersion.
   generated quantities block.
   \farg{mu} must be less than $2 ^ {29}$.}
 %
-\fitem{int}{neg\_binomial\_2\_log\_rng}{real \farg{eta}, real \farg{phi}}{
-  Generate a negative binomial variate with log-location \farg{eta}
-  and precision \farg{phi}; may only be used in generated
-  quantities block. \farg{eta} must be less than $29 \log 2$.}
 \end{description}
 
+\section{Negative Binomial Distribution (log alternative parameterization)}\label{neg-binom-2-log.section}
+
+Related to the parameterization in \refsection{nbalt}, the following
+parameterization uses a log mean parameter $\eta = \log(\mu)$, defined
+for $\eta \in \reals$, $\phi \in \posreals$, so that for $y \in \nats$,
+%
+\[
+\distro{NegBinomial2Log}(y \, | \, \eta, \phi)
+=
+\distro{NegBinomial2}(y | \exp(\eta), \phi).
+\]
+%
+This alternative may be used for sampling, as a function, and for
+random number generation, but as of yet, there are no CDFs implemented
+for it.
+
+\pitem{y}{neg\_binomial\_2\_log}{eta, phi}
+
+\section{Stan Functions}
+
+\begin{description}
+%
+  \fitem{real}{neg\_binomial\_2\_log\_log}{ints \farg{y}, reals
+    \farg{eta}, reals \farg{phi}}{The log negative binomial
+    probability mass of \farg{n} given log-location \farg{eta} and
+    inverse overdispersion control \farg{phi}. This is especially
+    useful for log-linear negative binomial regressions.}
+%
+\fitem{int}{neg\_binomial\_2\_log\_rng}{real \farg{eta}, real \farg{phi}}{
+  Generate a negative binomial variate with log-location \farg{eta}
+  and inverse overdispersion control \farg{phi}; may only be used in generated
+  quantities block. \farg{eta} must be less than $29 \log 2$.}
+%
+\end{description}
 
 \section{Poisson Distribution}\label{poisson.section}
 
@@ -737,7 +1036,7 @@ where the multinomial coefficient is defined by
     distribution parameter \farg{theta} and (implicit) total count
     \code{N = sum(\farg{y})}}
 %
-\fitem{vector}{multinomial\_rng}{vector \farg{theta}, int \farg{N}}{Generate a
+\fitem{int[]}{multinomial\_rng}{vector \farg{theta}, int \farg{N}}{Generate a
   multinomial variate with simplex distribution parameter \farg{theta} and 
   total count \farg{N}; may only be used in generated quantities block}
 \end{description}
@@ -771,7 +1070,7 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
 \!.
 \]
 
-\pitem{y}{normal}{mu,sigma}
+\pitem{y}{normal}{mu, sigma}
 
 \subsubsection{Stan Functions}
 
@@ -815,28 +1114,28 @@ If $\mu \in \reals$, $\sigma \in \posreals$, and $\lambda \in
 .
 \]
 
-\pitem{y}{exp\_mod\_normal}{mu,sigma,lambda}
+\pitem{y}{exp\_mod\_normal}{mu, sigma, lambda}
 
 \subsubsection{Stan Functions}
 
 \begin{description}
   \fitemtwolines{real}{exp\_mod\_normal\_log}{reals \farg{y}, reals
-    \farg{mu}, reals \farg{sigma}}{reals \farg{lambda}}{The
+    \farg{mu}, reals \farg{sigma},}{reals \farg{lambda}}{The
     log of the exponentially modified normal density of \farg{y} given
     location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda}}
 %
   \fitemtwolines{real}{exp\_mod\_normal\_cdf}{reals \farg{y}, reals \farg{mu},
-    reals \farg{sigma}}{reals \farg{lambda}}{The
+    reals \farg{sigma},}{reals \farg{lambda}}{The
     exponentially modified normal cumulative distribution function of \farg{y} 
     given location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda}}
 %
   \fitemtwolines{real}{exp\_mod\_normal\_cdf\_log}{reals \farg{y}, reals \farg{mu},
-<    reals \farg{sigma}}{reals \farg{lambda}}{The log of the
+    reals \farg{sigma},}{reals \farg{lambda}}{The log of the
     exponentially modified normal cumulative distribution function of \farg{y} 
     given location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda}}
 %
   \fitemtwolines{real}{exp\_mod\_normal\_ccdf\_log}{reals \farg{y}, reals \farg{mu},
-    reals \farg{sigma}}{reals \farg{lambda}}{The log of the
+    reals \farg{sigma},}{reals \farg{lambda}}{The log of the
     exponentially modified normal complementary cumulative distribution 
     function of \farg{y} given location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda}}
 \end{description}
@@ -867,7 +1166,7 @@ then for $y \in \reals$,
 .
 \]
 
-\pitem{y}{skew\_normal}{mu,sigma,alpha}
+\pitem{y}{skew\_normal}{mu, sigma, alpha}
 
 \subsubsection{Stan Functions}
 
@@ -921,7 +1220,7 @@ then for $y \in \reals$,
 \! .
 \]
 
-\pitem{y}{student\_t}{nu,mu,sigma}
+\pitem{y}{student\_t}{nu, mu, sigma}
 
 \subsubsection{Stan Functions}
 
@@ -972,7 +1271,7 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in \reals$,
 .
 \]
 
-\pitem{y}{cauchy}{mu,sigma}
+\pitem{y}{cauchy}{mu, sigma}
 
 \subsubsection{Stan Functions}
 
@@ -1013,8 +1312,12 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in \reals$,
   \exp \left( - \, \frac{|y - \mu|}{\sigma} \right)
 .
 \]
+Note that the double exponential distribution is parameterized in
+terms of the scale, in contrast to the exponential distribution (see
+\refsection{exponential-distribution}), which is parameterized in
+terms of inverse scale.
 
-\pitem{y}{double\_exponential}{mu,sigma}
+\pitem{y}{double\_exponential}{mu, sigma}
 
 \subsubsection{Stan Functions}
 
@@ -1061,7 +1364,7 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in \reals$,
 \]
 
 
-\pitem{y}{logistic}{mu,sigma}
+\pitem{y}{logistic}{mu, sigma}
 
 \subsubsection{Stan Functions}
 
@@ -1105,7 +1408,7 @@ If $\mu \in \reals$ and $\beta \in \posreals$, then for $y \in \reals$,
 .
 \]
 
-\pitem{y}{gumbel}{mu,beta}
+\pitem{y}{gumbel}{mu, beta}
 
 \subsubsection{Stan Functions}
 
@@ -1161,7 +1464,7 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
 .
 \]
 
-\pitem{y}{lognormal}{mu,sigma}
+\pitem{y}{lognormal}{mu, sigma}
 
 
 \subsubsection{Stan Functions}
@@ -1308,7 +1611,7 @@ y^{-(\nu/2 + 1)}
 \]
 
 
-\pitem{y}{scaled\_inv\_chi\_square}{nu,sigma}
+\pitem{y}{scaled\_inv\_chi\_square}{nu, sigma}
 
 \subsubsection{Stan Functions}
 
@@ -1347,7 +1650,7 @@ quantities block}
 \end{description}
 
 
-\section{Exponential Distribution}
+\section{Exponential Distribution}\label{exponential-distribution.section}
 
 \subsubsection{Probability Density Function}
 
@@ -1406,7 +1709,7 @@ y^{\alpha - 1}
 \]
 
 
-\pitem{y}{gamma}{alpha,beta}
+\pitem{y}{gamma}{alpha, beta}
 
 \subsubsection{Stan Functions}
 
@@ -1454,7 +1757,7 @@ y^{-(\alpha + 1)}
 .
 \]
 
-\pitem{y}{inv\_gamma}{alpha,beta}
+\pitem{y}{inv\_gamma}{alpha, beta}
 
 
 \subsubsection{Stan Functions}
@@ -1505,7 +1808,7 @@ If $\alpha \in \posreals$ and $\sigma \in \posreals$, then for $y \in
 Note that if $Y \propto \distro{Weibull}(\alpha,\sigma)$,
 then $Y^{-1} \propto \distro{Frechet}(\alpha,\sigma^{-1})$.
 
-\pitem{y}{weibull}{alpha,sigma}
+\pitem{y}{weibull}{alpha, sigma}
 
 \subsubsection{Stan Functions}
 
@@ -1555,7 +1858,7 @@ If $\alpha \in \posreals$ and $\sigma \in \posreals$, then for $y \in
 Note that if $Y \propto \distro{Frechet}(\alpha,\sigma)$,
 then $Y^{-1} \propto \distro{Weibull}(\alpha,\sigma^{-1})$.
 
-\pitem{y}{frechet}{alpha,sigma}
+\pitem{y}{frechet}{alpha, sigma}
 
 \subsubsection{Stan Functions}
 
@@ -1627,6 +1930,32 @@ non-negative real numbers.
 quantities block}
 \end{description}
 
+\section{Wiener Diffusion Model Distributions}
+
+\pitem{y}{wiener}{alpha, tau, beta, delta}
+
+\subsubsection{Stan Functions}
+\begin{description}
+\fitem{real}{wiener\_log}{reals \farg{y}, reals \farg{alpha},
+ reals \farg{tau}, reals \farg{beta}, reals \farg{delta}}
+ {The log of the Wiener first passage time 
+ density of \farg{y} given boundary separation \farg{alpha}, 
+ non-decision time \farg{tau}, a-priori bias \farg{beta} and
+ drift rate \farg{delta}}
+\end{description}
+
+\subsubsection{Boundaries}
+
+Stan returns the first passage time of the accumulation process
+over the upper boundary only. Therefore, one needs to calculate:
+\[
+\distro{wiener}(y|\alpha, \tau, 1 - \beta, - \delta).
+\]
+
+To get the result for the lower
+boundary. For more details, see the appendix of
+\citet{Vandekerckhove-Wabersich:2014}.
+
 \chapter{Positive Lower-Bounded Probabilities}
 
 \noindent
@@ -1646,7 +1975,7 @@ $y \in \posreals$ with $y \geq y_{\mbox{\footnotesize\rm min}}$,
 \frac{\displaystyle \alpha\,y_{\mbox{\footnotesize\rm min}}^\alpha}{\displaystyle y^{\alpha+1}}.
 \]
 
-\pitem{y}{pareto}{y\_min,alpha}
+\pitem{y}{pareto}{y\_min, alpha}
 
 \subsubsection{Stan Functions}
 
@@ -1692,7 +2021,7 @@ $y \geq \mu$,
 
 Note that the Lomax distribution is a Pareto Type 2 distribution with $\mu=0$.
 
-\pitem{y}{pareto\_type\_2}{mu,lambda,alpha}
+\pitem{y}{pareto\_type\_2}{mu, lambda, alpha}
 
 \subsubsection{Stan Functions}
 
@@ -1753,7 +2082,7 @@ is 0 and the log probability is $-\infty$.  Similarly, the
 distribution requires strictly positive parameters, $\alpha, \beta >
 0$.
 
-\pitem{theta}{beta}{alpha,beta}
+\pitem{theta}{beta}{alpha, beta}
 
 \subsubsection{Stan Functions}
 
@@ -1831,7 +2160,7 @@ the mode.  Ideally, the parameterization and support will be set up so
 that the bulk of the probability mass is in a continuous interval
 around the mean $\mu$.
 
-\pitem{y}{von\_mises}{mu,kappa}
+\pitem{y}{von\_mises}{mu, kappa}
 
 \subsubsection{Stan Functions}
 
@@ -1889,7 +2218,7 @@ If $\alpha \in \reals$ and $\beta \in (\alpha,\infty)$, then for $y
 .
 \]
 
-\pitem{y}{uniform}{alpha,beta}
+\pitem{y}{uniform}{alpha, beta}
 
 \subsubsection{Stan Functions}
 
@@ -1951,7 +2280,7 @@ If $K \in \nats$, $\mu \in \reals^K$, and $\Sigma \in \reals^{K \times
 %
 where $|\Sigma|$ is the absolute determinant of $\Sigma$.
 
-\pitem{y}{multi\_normal}{mu,Sigma}
+\pitem{y}{multi\_normal}{mu, Sigma}
 
 \subsubsection{Stan Functions}
 
@@ -2007,7 +2336,7 @@ If $K \in \nats$, $\mu \in \reals^K$, and $\Omega \in \reals^{K \times
 = \distro{MultiNormal}(y|\mu,\Sigma^{-1})
 \]
 
-\pitem{y}{multi\_normal\_prec}{mu,Omega}
+\pitem{y}{multi\_normal\_prec}{mu, Omega}
 
 \subsubsection{Stan Functions}
 
@@ -2051,7 +2380,7 @@ triangular and such that $LL^{\top}$ is positive definite, then for $y
 \]
 
 
-\pitem{y}{multi\_normal\_cholesky}{mu,L}
+\pitem{y}{multi\_normal\_cholesky}{mu, L}
 
 \subsubsection{Stan Functions}
 
@@ -2104,7 +2433,7 @@ Gaussian Processes with multi-variate outputs where only the output dimensions
 share a kernel function but vary based on their scale.  Note that this
 function does not take into account the mean prediction.
 
-\pitem{y}{multi\_gp}{Sigma,w}
+\pitem{y}{multi\_gp}{Sigma, w}
 
 \subsubsection{Stan Functions}
 
@@ -2138,7 +2467,7 @@ parametrization in terms of Cholesky factor of the kernel matrix, this distribut
 is also more efficient than $\distro{MultiGP}()$. Note that this
 function does not take into account the mean prediction.
 
-\pitem{y}{multi\_gp\_cholesky}{L,w}
+\pitem{y}{multi\_gp\_cholesky}{L, w}
 
 \subsubsection{Stan Functions}
 
@@ -2183,7 +2512,7 @@ $y \in \reals^K$,
 \]
 \vspace*{4pt}
 
-\pitem{y}{multi\_student\_t}{nu,mu,Sigma}
+\pitem{y}{multi\_student\_t}{nu, mu, Sigma}
 
 
 \subsubsection{Stan Functions}
@@ -2221,7 +2550,6 @@ may only be used in generated quantities block}
 
 
 \section{Gaussian Dynamic Linear Models}
-\label{sec:guass-dynam-line}
 
 A Gaussian Dynamic Linear model is defined as follows,
 For $t \in 1, \dots, T$,
@@ -2240,7 +2568,7 @@ the Kalman Filter. If $V$ is diagonal, then a more efficient
 algorithm which sequentially processes observations and avoids a
 matrix inversions can be used \citep[Sec~6.4]{DurbinKoopman:2001}.
 
-\pitem{y}{gaussian\_dlm\_obs}{F,G,V,W,m0,C0}
+\pitem{y}{gaussian\_dlm\_obs}{F, G, V, W, m0, C0}
 
 \subsubsection{Stan Functions}
 
@@ -2507,7 +2835,7 @@ the multivariate Gamma function,
 \!.
 \]
 
-\pitem{W}{wishart}{nu,Sigma}
+\pitem{W}{wishart}{nu, Sigma}
 
 \subsubsection{Stan Functions}
 
@@ -2553,7 +2881,7 @@ positive-definite $W \in \reals^{K \times K}$,
 \! .
 \]
 
-\pitem{W}{inv\_wishart}{nu,Sigma}
+\pitem{W}{inv\_wishart}{nu, Sigma}
 
 \subsubsection{Stan Functions}
 

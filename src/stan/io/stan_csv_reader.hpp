@@ -74,7 +74,8 @@ namespace stan {
       stan_csv_reader() {}
       ~stan_csv_reader() {}
 
-      static bool read_metadata(std::istream& in, stan_csv_metadata& metadata) {
+      static bool read_metadata(std::istream& in, stan_csv_metadata& metadata,
+                                std::ostream* out) {
         std::stringstream ss;
         std::string line;
 
@@ -148,7 +149,8 @@ namespace stan {
 
       static bool
       read_header(std::istream& in,
-                  Eigen::Matrix<std::string, Eigen::Dynamic, 1>& header) {
+                  Eigen::Matrix<std::string, Eigen::Dynamic, 1>& header,
+                  std::ostream* out) {
         std::string line;
 
         if (in.peek() != 'l')
@@ -176,7 +178,8 @@ namespace stan {
       }
 
       static bool read_adaptation(std::istream& in,
-                                  stan_csv_adaptation& adaptation) {
+                                  stan_csv_adaptation& adaptation,
+                                  std::ostream* out) {
         std::stringstream ss;
         std::string line;
         int lines = 0;
@@ -231,7 +234,7 @@ namespace stan {
       }
 
       static bool read_samples(std::istream& in, Eigen::MatrixXd& samples,
-                               stan_csv_timing& timing) {
+                               stan_csv_timing& timing, std::ostream* out) {
         std::stringstream ss;
         std::string line;
 
@@ -270,9 +273,10 @@ namespace stan {
             if (cols == -1) {
               cols = current_cols;
             } else if (cols != current_cols) {
-              std::cout << "Error: expected " << cols << " columns, but found "
-                        << current_cols << " instead for row " << rows + 1
-                        << std::endl;
+              if (out)
+              *out << "Error: expected " << cols << " columns, but found "
+                   << current_cols << " instead for row " << rows + 1
+                   << std::endl;
               return false;
             }
             rows++;
@@ -301,30 +305,36 @@ namespace stan {
       /**
        * Parses the file.
        *
+       * @param[in] in input stream to parse
+       * @param[out] out output stream to send messages
        */
-      static stan_csv parse(std::istream& in) {
+      static stan_csv parse(std::istream& in, std::ostream* out) {
         stan_csv data;
 
-        if (!read_metadata(in, data.metadata)) {
-          std::cout << "Warning: non-fatal error reading metadata" << std::endl;
+        if (!read_metadata(in, data.metadata, out)) {
+          if (out)
+            *out << "Warning: non-fatal error reading metadata" << std::endl;
         }
 
-        if (!read_header(in, data.header)) {
-          std::cout << "Error: error reading header" << std::endl;
+        if (!read_header(in, data.header, out)) {
+          if (out)
+            *out << "Error: error reading header" << std::endl;
           throw std::invalid_argument
             ("Error with header of input file in parse");
         }
 
-        if (!read_adaptation(in, data.adaptation)) {
-          std::cout << "Warning: non-fatal error reading adapation data"
-                    << std::endl;
+        if (!read_adaptation(in, data.adaptation, out)) {
+          if (out)
+            *out << "Warning: non-fatal error reading adapation data"
+                 << std::endl;
         }
 
         data.timing.warmup = 0;
         data.timing.sampling = 0;
 
-        if (!read_samples(in, data.samples, data.timing)) {
-          std::cout << "Warning: non-fatal error reading samples" << std::endl;
+        if (!read_samples(in, data.samples, data.timing, out)) {
+          if (out)
+            *out << "Warning: non-fatal error reading samples" << std::endl;
         }
 
         return data;

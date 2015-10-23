@@ -33,68 +33,72 @@ namespace stan {
 
   namespace lang {
 
-     template <typename Iterator>
-     bare_type_grammar<Iterator>::bare_type_grammar(variable_map& var_map,
-                                                    std::stringstream& error_msgs)
-       : bare_type_grammar::base_type(bare_type_r),
-         var_map_(var_map),
-         error_msgs_(error_msgs)
-     {
-      using boost::spirit::qi::_1;
-      using boost::spirit::qi::char_;
+    struct set_val {
+      template <class> struct result;
+      template <typename F, typename T1, typename T2>
+      struct result<F(T1, T2)> { typedef void type; };
+      template <typename T1, typename T2>
+      void operator()(T1& lhs,
+                      const T2& rhs) const {
+        lhs = rhs;
+      }
+    };
+    boost::phoenix::function<set_val> set_val_f;
+
+    struct increment_val {
+      template <class> struct result;
+      template <typename F, typename T1>
+      struct result<F(T1)> { typedef void type; };
+      template <typename T1>
+      void operator()(T1& lhs) const {
+        lhs += 1;
+      }
+    };
+    boost::phoenix::function<increment_val> increment_val_f;
+
+    template <typename Iterator>
+    bare_type_grammar<Iterator>::bare_type_grammar(variable_map& var_map,
+                                           std::stringstream& error_msgs)
+      : bare_type_grammar::base_type(bare_type_r),
+        var_map_(var_map),
+        error_msgs_(error_msgs) {
       using boost::spirit::qi::eps;
-      using boost::spirit::qi::lexeme;
       using boost::spirit::qi::lit;
-      using boost::spirit::qi::no_skip;
-      using boost::spirit::qi::_pass;
       using boost::spirit::qi::_val;
 
-      using boost::spirit::qi::labels::_a;
-      using boost::spirit::qi::labels::_r1;
-      using boost::spirit::qi::labels::_r2;
-
-      using boost::spirit::qi::on_error;
-      using boost::spirit::qi::fail;
-      using boost::spirit::qi::rethrow;
-      using namespace boost::spirit::qi::labels;
-
       bare_type_r.name("bare type definition\n"
-                       "   (no dimensions or constraints, just commas,\n"
-                       "   e.g. real[,] for a 2D array or int for a single integer,\n"
-                       "   and constrained types such as cov_matrix not allowed)");
+               "   (no dimensions or constraints, just commas,\n"
+               "   e.g. real[,] for a 2D array or int for a single integer,\n"
+               "   and constrained types such as cov_matrix not allowed)");
       bare_type_r
-        %= 
-        type_identifier_r
-        >> array_dims_r
-        ;
-      
-      type_identifier_r.name("bare type identifier\n"
-                             "    legal values: void, int, real, vector, row_vector, matrix");
-      type_identifier_r
-        %= 
-        lit("void")[_val = VOID_T]
-        | lit("int")[_val = INT_T]
-        | lit("real")[_val = DOUBLE_T]
-        | lit("vector")[_val = VECTOR_T]
-        | lit("row_vector")[_val = ROW_VECTOR_T]
-        | lit("matrix")[_val = MATRIX_T]
-        ;
-      
-      array_dims_r.name("array dimensions,\n"
-                        "    e.g., empty (not an array) [] (1D array) or [,] (2D array)");
-      array_dims_r
-        %= 
-        eps[_val = 0]
-        >> - ( lit('[')[_val = 1]
-               > *(lit(',')[_val += 1])
-               > end_bare_types_r
-               );
+        %= type_identifier_r
+        >> array_dims_r;
 
-      end_bare_types_r.name("comma to indicate more dimensions or ] to end type declaration");
+      type_identifier_r.name("bare type identifier\n"
+                "  legal values: void, int, real, vector, row_vector, matrix");
+
+      type_identifier_r
+        %= lit("void")[set_val_f(_val, VOID_T)]
+        | lit("int")[set_val_f(_val, INT_T)]
+        | lit("real")[set_val_f(_val, DOUBLE_T)]
+        | lit("vector")[set_val_f(_val, VECTOR_T)]
+        | lit("row_vector")[set_val_f(_val, ROW_VECTOR_T)]
+        | lit("matrix")[set_val_f(_val, MATRIX_T)];
+
+      array_dims_r.name("array dimensions,\n"
+             "    e.g., empty (not an array) [] (1D array) or [,] (2D array)");
+      array_dims_r
+        %= eps[set_val_f(_val, 0)]
+        >> - (lit('[')[set_val_f(_val, 1)]
+              > *(lit(',')[increment_val_f(_val)])
+              > end_bare_types_r);
+
+      end_bare_types_r.name("comma to indicate more dimensions"
+                            " or ] to end type declaration");
       end_bare_types_r
         %= lit(']');
-      
-     }
+    }
+
   }
 }
 #endif

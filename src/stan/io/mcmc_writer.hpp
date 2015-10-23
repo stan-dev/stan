@@ -1,7 +1,7 @@
 #ifndef STAN_IO_MCMC_WRITER_HPP
 #define STAN_IO_MCMC_WRITER_HPP
 
-#include <stan/interface/recorder/csv.hpp>
+#include <stan/interface_callbacks/writer/csv.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/mcmc/sample.hpp>
 #include <stan/model/prob_grad.hpp>
@@ -18,17 +18,17 @@ namespace stan {
      * mcmc_writer writes out headers and samples
      *
      * @tparam M Model class
-     * @tparam SampleRecorder Class for recording samples
-     * @tparam DiagnosticRecorder Class for diagnostic samples
+     * @tparam SampleWriter Class for recording samples
+     * @tparam DiagnosticWriter Class for diagnostic samples
      */
     template <class M,
-              class SampleRecorder, class DiagnosticRecorder,
-              class MessageRecorder>
+              class SampleWriter, class DiagnosticWriter,
+              class MessageWriter>
     class mcmc_writer {
     private:
-      SampleRecorder& sample_recorder_;
-      DiagnosticRecorder& diagnostic_recorder_;
-      MessageRecorder& message_recorder_;
+      SampleWriter& sample_writer_;
+      DiagnosticWriter& diagnostic_writer_;
+      MessageWriter& message_writer_;
 
       std::ostream* msg_stream_;
 
@@ -36,22 +36,22 @@ namespace stan {
       /**
        * Constructor.
        *
-       * @param sample_recorder samples are "written" to this stream (can abstract this?)
-       * @param diagnostic_recorder diagnostic information is "written" to this stream
-       * @param message_recorder messages are written to this stream
+       * @param sample_writer samples are "written" to this stream (can abstract this?)
+       * @param diagnostic_writer diagnostic information is "written" to this stream
+       * @param message_writer messages are written to this stream
        * @param msg_stream messages are output to this stream
        *
        * @pre arguments == 0 if and only if they are not meant to be used
        * @post none
        * @sideeffects streams are stored in this object
        */
-      mcmc_writer(SampleRecorder& sample_recorder,
-                  DiagnosticRecorder& diagnostic_recorder,
-                  MessageRecorder& message_recorder,
+      mcmc_writer(SampleWriter& sample_writer,
+                  DiagnosticWriter& diagnostic_writer,
+                  MessageWriter& message_writer,
                   std::ostream* msg_stream = 0)
-        : sample_recorder_(sample_recorder),
-          diagnostic_recorder_(diagnostic_recorder),
-          message_recorder_(message_recorder),
+        : sample_writer_(sample_writer),
+          diagnostic_writer_(diagnostic_writer),
+          message_writer_(message_writer),
           msg_stream_(msg_stream) {
       }
 
@@ -82,7 +82,7 @@ namespace stan {
         sampler->get_sampler_param_names(names);
         model.constrained_param_names(names, true, true);
 
-        sample_recorder_(names);
+        sample_writer_(names);
       }
 
 
@@ -121,7 +121,7 @@ namespace stan {
         for (int i = 0; i < model_values.size(); ++i)
           values.push_back(model_values(i));
 
-        sample_recorder_(values);
+        sample_writer_(values);
       }
 
       /**
@@ -130,17 +130,17 @@ namespace stan {
        * Prints additional sampler info to the stream.
        *
        * @param sampler sampler
-       * @param recorder stream to output stuff to
+       * @param writer stream to output stuff to
        */
-      template <class Recorder>
+      template <class Writer>
       void write_adapt_finish(stan::mcmc::base_mcmc* sampler,
-                              Recorder& recorder) {
-        if (!recorder.is_recording())
+                              Writer& writer) {
+        if (!writer.is_writing())
           return;
         std::stringstream stream;
         sampler->write_sampler_state(&stream);
 
-        recorder("Adaptation terminated\n" + stream.str());
+        writer("Adaptation terminated\n" + stream.str());
       }
 
 
@@ -152,8 +152,8 @@ namespace stan {
        * @param sampler sampler
        */
       void write_adapt_finish(stan::mcmc::base_mcmc* sampler) {
-        write_adapt_finish(sampler, sample_recorder_);
-        write_adapt_finish(sampler, diagnostic_recorder_);
+        write_adapt_finish(sampler, sample_writer_);
+        write_adapt_finish(sampler, diagnostic_writer_);
       }
 
 
@@ -182,7 +182,7 @@ namespace stan {
 
         sampler->get_sampler_diagnostic_names(model_names, names);
 
-        diagnostic_recorder_(names);
+        diagnostic_writer_(names);
       }
 
       /**
@@ -205,7 +205,7 @@ namespace stan {
         sampler->get_sampler_params(values);
         sampler->get_sampler_diagnostics(values);
 
-        diagnostic_recorder_(values);
+        diagnostic_writer_(values);
       }
 
 
@@ -216,41 +216,41 @@ namespace stan {
        *
        * @param warmDeltaT warmup time in seconds
        * @param sampleDeltaT sample time in seconds
-       * @param recorder output stream
+       * @param writer output stream
        *
        * @pre none
        * @post none
        * @sideeffects stream is updated with information about timing
        *
        */
-      template <class Recorder>
+      template <class Writer>
       void write_timing(double warmDeltaT, double sampleDeltaT,
-                        Recorder& recorder) {
-        if (!recorder.is_recording())
+                        Writer& writer) {
+        if (!writer.is_writing())
           return;
 
         std::string title(" Elapsed Time: ");
         std::stringstream ss;
 
 
-        recorder();
+        writer();
 
         ss.str("");
         ss << title << warmDeltaT << " seconds (Warm-up)";
-        recorder(ss.str());
+        writer(ss.str());
 
         ss.str("");
         ss << std::string(title.size(), ' ') << sampleDeltaT
            << " seconds (Sampling)";
-        recorder(ss.str());
+        writer(ss.str());
 
         ss.str("");
         ss << std::string(title.size(), ' ')
            << warmDeltaT + sampleDeltaT
            << " seconds (Total)";
-        recorder(ss.str());
+        writer(ss.str());
 
-        recorder();
+        writer();
       }
 
 
@@ -261,9 +261,9 @@ namespace stan {
        * @param sampleDeltaT sample time (sec)
        */
       void write_timing(double warmDeltaT, double sampleDeltaT) {
-        write_timing(warmDeltaT, sampleDeltaT, sample_recorder_);
-        write_timing(warmDeltaT, sampleDeltaT, diagnostic_recorder_);
-        write_timing(warmDeltaT, sampleDeltaT, message_recorder_);
+        write_timing(warmDeltaT, sampleDeltaT, sample_writer_);
+        write_timing(warmDeltaT, sampleDeltaT, diagnostic_writer_);
+        write_timing(warmDeltaT, sampleDeltaT, message_writer_);
       }
     };
 

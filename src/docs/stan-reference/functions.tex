@@ -1,93 +1,6 @@
 \part{Built-In Functions}\label{built-in-functions.part}
 
 
-\chapter{Vectorization}\label{vectorization.chapter}
-
-\noindent
-Stan's scalar log probability functions, including the density
-functions, mass functions, CDFs, and CCDFs, all support vectorized
-function application, with results defined to be the sum of the
-elementwise application of the function.  In all cases, matrix
-operations are faster than loops and vectorized log probability
-functions are faster than their equivalent form defined with loops.
-
-Stan also overloads the multivariate normal distribution, allowing
-arrays of row vectors or vectors for the variate and location
-parameter.
-
-Stan also overloads some scalar functions, such as \code{log} and
-\code{exp}, to apply to vectors (arrays) and return vectors (arrays).  
-These vectorizations are defined elementwise and unlike the
-probability functions, provide only minimal efficiency speedups over
-repeated application and assignment in a loop.
-
-
-\section{Vectorized Function Signatures}\label{prob-vectorization.section}
-
-\subsection{Vectorized Scalar Arguments}
-
-The normal probability function is specified with the signature
-%
-\begin{stancode}
-normal_log(reals,reals,reals);
-\end{stancode}
-%
-The pseudo-type \code{reals} is used to indicate that an argument
-position may be vectorized.  Argument positions declared as
-\code{reals} may be filled with a real, a one-dimensional array, a
-vector, or a row-vector.  If there is more than one array or vector
-argument, their types can be anything but their size must match.  For
-instance, it is legal to use
-\code{normal\_log(row\_vector,vector,real)} as long as the vector and
-row vector have the same size.  
-
-\subsection{Vectorized Vector and Row Vector Arguments}
-
-The multivariate normal distribution accepting vector or array of
-vector arguments is written as
-\begin{stancode}
-multi_normal_log(vectors,vectors,matrix);
-\end{stancode}
-
-\subsection{Vectorized Integer Arguments}
-
-The pseudo-type \code{ints} is used for vectorized integer arguments.
-
-
-\section{Evaluating Vectorized Functions}
-
-The result of a vectorized log probability function is equivalent to
-the sum of the evaluations on each element.  Any non-vector argument,
-namely \code{real} or \code{int}, is repeated.  For instance, if
-\code{y} is a vector of size \code{N}, \code{mu} is a vector of size
-\code{N}, and \code{sigma} is a scalar, then
-%
-\begin{stancode}
-ll <- normal_log(y, mu, sigma);
-\end{stancode}
-%
-is just a more efficient way to write
-%
-\begin{stancode}
-ll <- 0;
-for (n in 1:N)
-  ll <- ll + normal_log(y[n], mu[n], sigma);
-\end{stancode}
-%
-With the same arguments, the vectorized sampling statement
-%
-\begin{stancode}
-y ~ normal(mu, sigma);
-\end{stancode}
-%
-has the same effect on the total log probability as
-%
-\begin{stancode}
-for (n in 1:N)
-  y[n] ~ normal(mu[n], sigma);
-\end{stancode}
-
-
 
 
 \chapter{Void Functions}
@@ -1141,6 +1054,13 @@ distribution function (and its complement).
     \mbox{\code{Phi}}(x) = \frac{1}{\sqrt{2\pi}} \int_{0}^{x} e^{-t^2/2} dt
     \]}{Phi}{phi}
   %
+  \fitemindexsort{real}{inv\_Phi}{real \farg{p}}{
+    Returns the standard normal inverse cumulative distribution function of 
+    \farg{p}, otherwise known as the quantile function, which satisfies
+    \[
+    \mbox{\code{Phi(inv\_Phi(p))}} = p
+    \]}{inv\_Phi}{inv\_phi}
+  %  
   \fitemindexsort{real}{Phi\_approx}{real \farg{x}}{
     Returns a fast approximation of the unit normal cumulative distribution 
     function of \farg{x}. This approximation has a maximum absolute error 
@@ -1247,19 +1167,21 @@ distribution function (and its complement).
     \mbox{\code{trigamma}}(x) 
     = 
     \begin{cases}
-      \sum_{n=0}^\infty \frac{1}{(x+n)^2}        & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\
+      \sum_{n=0}^\infty \frac{1}{(x+n)^2}        & \mbox{if } x\not\in
+      \{\dots,-3,-2,-1,0\}
+      \\[6pt]
       \textrm{error}                           & \mbox{otherwise}
     \end{cases}
     \]}
   %
   \fitem{real}{lmgamma}{int \farg{n}, real \farg{x}}{
-    Returns the natural logarithm of the multinomial gamma function with \farg{n}
-    dimensions applied to \farg{x}.
+    Returns the natural logarithm of the multivariate gamma function
+    $\Gamma_n$ with \farg{n} dimensions applied to \farg{x}.
     \[
     \mbox{\code{lmgamma}}(n,x) 
-    = 
+    =
     \begin{cases}
-      \pi^{n(n-1)/4} \, \prod_{j=1}^n \Gamma(x + (1 - j)/2) 
+      \frac{n(n-1)}{4} \log \pi + \sum_{j=1}^n \log \Gamma\left(x + \frac{1 - j}{2}\right) 
                      & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\
       \textrm{error} & \mbox{otherwise}
     \end{cases}
@@ -3001,6 +2923,142 @@ Number of components of \farg{v} less than \farg{v[s]}}
 Number of components of \farg{v} less than \farg{v[s]}}
 %
 \end{description}
+
+
+\chapter{Sparse Matrix Operations}\label{sparse-matrices.chapter}
+
+\noindent
+For sparse matrices, for which many elements are zero, it is more
+efficient to use specialized representations to save memory and speed
+up matrix arithmetic (including derivative calculations).  Because of
+this speedup, it may even be useful to read in a dense matrix and convert
+it to a sparse matrix before multiplying it by a vector.  This chapter
+covers a very specific form of sparsity consisting of a sparse matrix
+multiplied by a dense vector;  for more general coding strategies for
+sparse data structures within Stan, see \refchapter{sparse-ragged}.
+
+\section{Compressed Row Storage}\label{CSR.section}
+
+Sparse matrices are represented in Stan using compressed row storage
+(CSR).  For example, the matrix
+\[
+A = 
+\begin{bmatrix}
+19 & 27 & 0 & 0 
+\\ 
+0 & 0 & 0 & 0 
+\\
+0 & 0 & 0 & 52
+\\
+81 & 0 & 95 & 33
+\end{bmatrix}
+\]
+is translated into a vector of the non-zero real values, read by row
+from the matrix $A$,
+\[
+w(A) =
+\begin{bmatrix}
+19 & 27 & 52 & 81 & 95 & 33
+\end{bmatrix}^{\top} \! \! \! ,
+\]
+an array of integer column indices for the values,
+\[
+v(A) = 
+\begin{bmatrix}
+1 & 2 & 4 & 1 & 3 & 4
+\end{bmatrix} \! ,
+\]
+and an array of integer indices indicating where in $w(A)$ a given row's
+values start,
+\[
+u(A) = 
+\begin{bmatrix}
+1 & 3 & 3 & 4 & 7
+\end{bmatrix} \! ,
+\]
+with a padded value at the end to guarantee that 
+\[
+u(A)[n+1] - u(A)[n]
+\]
+is the number of non-zero elements in row $n$ of the matrix (here $2$, $0$,
+$1$, and $3$). Note that because the second row has no non-zero elments both
+the second and third elements of $u(A)$ correspond to the third element of
+$w(A)$, which is $52$. The values $(w(A), \, v(A), \, u(A))$ are sufficient 
+to reconstruct $A$.
+
+The values are structured so that there is a real value and integer
+column index for each non-zero entry in the array, plus one integer
+for each row of the matrix, pluse one for padding.  There is also
+underlying storage for internal container pointers and sizes.  The
+total memory usage is roughly $12 K + M$ bytes plus a small constant
+overhead, which is often considerably fewer bytes than the $M \times N$
+required to store a dense matrix.  Even more importantly, zero
+values do not introduce derivatives under multiplication or addition,
+so many storage and evaluation steps are saved when sparse matrices
+are multiplied.
+
+\section{Conversion Functions}
+
+Conversion functions between dense and sparse matrices are provided.
+
+\subsection{Dense to Sparse Conversion}
+
+Converting a desne matrix $m$ to a sparse representation produces a
+vector $w$ and two integer arrays, $u$ and $v$.
+
+\begin{description}
+%
+  \fitem{vector}{csr\_extract\_w}{matrix \farg{a}}{ Return non-zero
+    values in matrix \farg{a}; see \refsection{CSR}.}
+%
+  \fitem{int[]}{csr\_extract\_v}{matrix \farg{a}}{Return colum
+    indices for values in \code{csr\_extract\_w(\farg{a})}; see
+    \refsection{CSR}.}
+%
+  \fitem{int[]}{csr\_extract\_u}{matrix \farg{a}}{Return array of row
+    starting indices for entries in \code{csr\_extract\_w(\farg{a})}
+    followed by the size of \code{csr\_extract\_w(\farg{a})} plus one;
+    see \refsection{CSR}.}
+%
+\end{description}
+%
+
+\subsection{Sparse to Dense Conversion}
+
+To convert a sparse matrix representation to a dense matrix, there is
+a single function.
+%
+\begin{description}
+  \fitem{matrix}{csr\_to\_dense\_matrix}{int \farg{m}, int \farg{n},
+    int \farg{w}, int \farg{v}, int \farg{u}}{Return dense
+    $\mbox{\farg{m}} \times \mbox{\farg{n}}$ matrix with specified
+    values \farg{w}, column indices \farg{v}, and row starting indices
+    \farg{u}; see \refsection{CSR}.}
+\end{description}
+
+\section{Sparse Matrix Arithmetic}
+
+\subsection{Sparse Matrix Multiplication}
+
+The only supported operation is the multiplication of a sparse matrix
+$A$ and a dense vector $b$ to produce a dense vector $A\,b$.
+Multipying a dense row vector $b$ and a sparse matrix $A$ 
+can be coded using transposition as
+\[
+b \, A = (A^{\top} \, b^{\top})^{\top},
+\]
+but care must be taken to represent $A^{\top}$ rather than $A$ as a
+sparse matrix.
+
+\begin{description}
+  \fitemtwolines{vector}{csr\_matrix\_times\_vector}{int \farg{m}, int
+    \farg{n}, vector \farg{w}}{int[] \farg{v}, int[] \farg{u}, vector
+    \farg{b}}{ Multiply the $\mbox{\farg{m}} \times \mbox{\farg{n}}$
+    matrix represented by values \farg{w}, column indices \farg{v},
+    and row start indices \farg{u} by the vector \farg{b}\,; see
+    \refsection{CSR}.}
+\end{description}
+
 
 
 \chapter{Mixed Operations}

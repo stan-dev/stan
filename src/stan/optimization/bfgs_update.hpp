@@ -9,15 +9,15 @@ namespace stan {
              int DimAtCompile = Eigen::Dynamic>
     class BFGSUpdate_HInv {
     public:
-      typedef Eigen::Matrix<Scalar,DimAtCompile,1> VectorT;
-      typedef Eigen::Matrix<Scalar,DimAtCompile,DimAtCompile> HessianT;
+      typedef Eigen::Matrix<Scalar, DimAtCompile, 1> VectorT;
+      typedef Eigen::Matrix<Scalar, DimAtCompile, DimAtCompile> HessianT;
 
       /**
        * Update the inverse Hessian approximation.
        *
        * @param yk Difference between the current and previous gradient vector.
        * @param sk Difference between the current and previous state vector.
-       * @param reset Whether to reset the approximation, forgetting about 
+       * @param reset Whether to reset the approximation, forgetting about
        * previous values.
        * @return In the case of a reset, returns the optimal scaling of the
        * initial Hessian approximation which is useful for predicting
@@ -31,13 +31,12 @@ namespace stan {
         skyk = yk.dot(sk);
         rhok = 1.0/skyk;
 
-        Hupd.noalias() = HessianT::Identity(yk.size(),yk.size()) 
-                                        - rhok*sk*yk.transpose();
+        Hupd.noalias() = HessianT::Identity(yk.size(), yk.size())
+                                        - rhok * sk * yk.transpose();
         if (reset) {
           B0fact = yk.squaredNorm()/skyk;
           _Hk.noalias() = ((1.0/B0fact)*Hupd)*Hupd.transpose();
-        }
-        else {
+        } else {
           B0fact = 1.0;
           _Hk = Hupd*_Hk*Hupd.transpose();
         }

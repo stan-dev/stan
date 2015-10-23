@@ -31,14 +31,13 @@ namespace stan {
        * @param head Index for head.
        * @param tail Index list for tail.
        */
-      cons_index_list(const H& head, const T& tail) 
+      explicit cons_index_list(const H& head, const T& tail)
         : head_(head),
           tail_(tail) {
       }
-
     };
 
-
+    // factory-like function does type inference for I and T
     template <typename I, typename T>
     inline cons_index_list<I, T>
     cons_list(const I& idx1, const T& t) {
@@ -63,10 +62,10 @@ namespace stan {
     }
 
     template <typename I1, typename I2, typename I3>
-    inline 
-    cons_index_list<I1, 
-                    cons_index_list<I2, 
-                                    cons_index_list<I3, 
+    inline
+    cons_index_list<I1,
+                    cons_index_list<I2,
+                                    cons_index_list<I3,
                                                     nil_index_list> > >
     index_list(const I1& idx1, const I2& idx2, const I3& idx3) {
       return cons_list(idx1, index_list(idx2, idx3));

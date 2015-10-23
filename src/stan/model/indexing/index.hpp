@@ -4,6 +4,7 @@
 #include <vector>
 
 namespace stan {
+
   namespace model {
 
     // SINGLE INDEXING (reduces dimensionality)
@@ -21,7 +22,7 @@ namespace stan {
        *
        * @param n single index.
        */
-      index_uni(int n) 
+      explicit index_uni(int n)
       : n_(n) {
       }
     };
@@ -43,9 +44,7 @@ namespace stan {
        *
        * @param ns multiple indexes.
        */
-      index_multi(const std::vector<int>& ns) 
-        : ns_(ns) { 
-      }
+      explicit index_multi(const std::vector<int>& ns) : ns_(ns) {  }
     };
 
 
@@ -69,9 +68,7 @@ namespace stan {
        *
        * @param min minimum index (inclusive).
        */
-      index_min(int min) 
-      : min_(min) {
-      }
+      explicit index_min(int min) : min_(min) {  }
     };
 
 
@@ -88,9 +85,7 @@ namespace stan {
        *
        * @param max maximum index (inclusive).
        */
-      index_max(int max) 
-      : max_(max) {
-      }
+      explicit index_max(int max) : max_(max) {  }
     };
 
 
@@ -110,9 +105,7 @@ namespace stan {
        * @param min minimum index (inclusive).
        * @param max maximum index (inclusive).
        */
-      index_min_max(int min, int max) 
-        : min_(min), max_(max) {
-      }
+      explicit index_min_max(int min, int max) : min_(min), max_(max) {  }
     };
 
   }

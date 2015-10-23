@@ -4,18 +4,15 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/uniform_01.hpp>
-
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
-
-#include <math.h>
+#include <cmath>
 #include <limits>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
 namespace stan {
-
   namespace mcmc {
 
     template <class M, class P, template<class, class> class H,
@@ -116,7 +113,7 @@ namespace stan {
         return z_;
       }
 
-      virtual void set_nominal_stepsize(const double e) {
+      virtual void set_nominal_stepsize(double e) {
         if (e > 0)
           nom_epsilon_ = e;
       }
@@ -129,7 +126,7 @@ namespace stan {
         return this->epsilon_;
       }
 
-      virtual void set_stepsize_jitter(const double j) {
+      virtual void set_stepsize_jitter(double j) {
         if (j > 0 && j < 1)
           epsilon_jitter_ = j;
       }
@@ -161,7 +158,5 @@ namespace stan {
     };
 
   }  // mcmc
-
 }  // stan
-
 #endif

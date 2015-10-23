@@ -1,10 +1,6 @@
 #ifndef STAN_LANG_GRAMMARS_FUNCTIONS_GRAMMAR_DEF_HPP
 #define STAN_LANG_GRAMMARS_FUNCTIONS_GRAMMAR_DEF_HPP
 
-#include <set>
-#include <utility>
-#include <vector>
-
 #include <boost/spirit/include/qi.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
@@ -30,10 +26,15 @@
 #include <stan/lang/grammars/statement_grammar.hpp>
 #include <stan/lang/grammars/whitespace_grammar.hpp>
 
+#include <set>
+#include <string>
+#include <utility>
+#include <vector>
+
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::function_decl_def,
                           (stan::lang::expr_type, return_type_)
-                          (std::string, name_) 
+                          (std::string, name_)
                           (std::vector<stan::lang::arg_decl>, arg_decls_)
                           (stan::lang::statement, body_) )
 
@@ -47,8 +48,11 @@ namespace stan {
   namespace lang {
 
     struct validate_non_void_arg_function {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef void type; };
+      //! @cond Doxygen_Suppress
+      template <class> struct result;
+      //! @endcond
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1, T2, T3)> { typedef void type; };
       void operator()(const expr_type& arg_type,
                       bool& pass,
                       std::ostream& error_msgs) const {
@@ -59,11 +63,15 @@ namespace stan {
                      << std::endl;
       }
     };
-    boost::phoenix::function<validate_non_void_arg_function> validate_non_void_arg_f;
+    boost::phoenix::function<validate_non_void_arg_function>
+    validate_non_void_arg_f;
 
     struct set_void_function {
-      template <typename T1, typename T2, typename T3, typename T4>
-      struct result { typedef void type; };
+      //! @cond Doxygen_Suppress
+      template <class> struct result;
+      //! @endcond
+      template <typename F, typename T1, typename T2, typename T3, typename T4>
+      struct result<F(T1, T2, T3, T4)> { typedef void type; };
       void operator()(const expr_type& return_type,
                       var_origin& origin,
                       bool& pass,
@@ -75,19 +83,23 @@ namespace stan {
           return;
         }
         origin = return_type.is_void()
-          ? void_function_argument_origin 
+          ? void_function_argument_origin
           : function_argument_origin;
       }
     };
     boost::phoenix::function<set_void_function> set_void_function_f;
 
     struct set_allows_sampling_origin {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef void type; };
+      //! @cond Doxygen_Suppress
+      template <class> struct result;
+      //! @endcond
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1, T2, T3)> { typedef void type; };
       void operator()(const std::string& identifier,
                       bool& allow_sampling,
                       int& origin) const {
-        bool is_void_function_origin = (origin == void_function_argument_origin);
+        bool is_void_function_origin
+          = (origin == void_function_argument_origin);
         if (ends_with("_lp", identifier)) {
           allow_sampling = true;
           origin = is_void_function_origin
@@ -106,15 +118,19 @@ namespace stan {
         }
       }
     };
-    boost::phoenix::function<set_allows_sampling_origin> set_allows_sampling_origin_f;
+    boost::phoenix::function<set_allows_sampling_origin>
+    set_allows_sampling_origin_f;
 
     struct validate_declarations {
-      template <typename T1, typename T2, typename T3, typename T4>
-      struct result { typedef void type; };
+      //! @cond Doxygen_Suppress
+      template <class> struct result;
+      //! @endcond
+      template <typename F, typename T1, typename T2, typename T3, typename T4>
+      struct result<F(T1, T2, T3, T4)> { typedef void type; };
       void operator()(bool& pass,
-                      std::set<std::pair<std::string, 
+                      std::set<std::pair<std::string,
                                          function_signature_t> >& declared,
-                      std::set<std::pair<std::string, 
+                      std::set<std::pair<std::string,
                                          function_signature_t> >& defined,
                       std::ostream& error_msgs) const {
         using std::set;
@@ -136,57 +152,70 @@ namespace stan {
     boost::phoenix::function<validate_declarations> validate_declarations_f;
 
     struct add_function_signature {
-      template <typename T1, typename T2, typename T3, typename T4, typename T5>
-      struct result { typedef void type; };
-      static bool fun_exists(const std::set<std::pair<std::string, 
-                                                      function_signature_t> >& existing,
-                             const std::pair<std::string,function_signature_t>& name_sig) {
-        for (std::set<std::pair<std::string, function_signature_t> >::const_iterator it 
+      //! @cond Doxygen_Suppress
+      template <class> struct result;
+      //! @endcond
+      template <typename F, typename T1, typename T2, typename T3,
+                typename T4, typename T5>
+      struct result<F(T1, T2, T3, T4, T5)> { typedef void type; };
+      static bool fun_exists(
+             const std::set<std::pair<std::string,
+                                      function_signature_t> >& existing,
+             const std::pair<std::string, function_signature_t>& name_sig,
+             bool name_only = true) {
+        for (std::set<std::pair<std::string,
+                                function_signature_t> >::const_iterator it
                = existing.begin();
              it != existing.end();
              ++it)
-          if (name_sig.first == (*it).first 
-              && name_sig.second.second == (*it).second.second)
+          if (name_sig.first == (*it).first
+              && (name_only
+                  || name_sig.second.second == (*it).second.second))
             return true;  // name and arg sequences match
         return false;
       }
-      void operator()(const function_decl_def& decl,
-                      bool& pass,
-                      std::set<std::pair<std::string, 
-                                         function_signature_t> >& functions_declared,
-                      std::set<std::pair<std::string, 
-                                         function_signature_t> >& functions_defined,
-                      std::ostream& error_msgs) const {
 
+
+      void operator()(const function_decl_def& decl,
+              bool& pass,
+              std::set<std::pair<std::string,
+                                 function_signature_t> >& functions_declared,
+              std::set<std::pair<std::string,
+                                 function_signature_t> >& functions_defined,
+              std::ostream& error_msgs) const {
         // build up representations
         expr_type result_type(decl.return_type_.base_type_,
                               decl.return_type_.num_dims_);
         std::vector<expr_type> arg_types;
         for (size_t i = 0; i < decl.arg_decls_.size(); ++i)
-          arg_types.push_back(expr_type(decl.arg_decls_[i].arg_type_.base_type_,
-                                        decl.arg_decls_[i].arg_type_.num_dims_));
+          arg_types.push_back(
+                      expr_type(decl.arg_decls_[i].arg_type_.base_type_,
+                                decl.arg_decls_[i].arg_type_.num_dims_));
         function_signature_t sig(result_type, arg_types);
         std::pair<std::string, function_signature_t> name_sig(decl.name_, sig);
-        
+
         // check that not already declared if just declaration
         if (decl.body_.is_no_op_statement()
-            && fun_exists(functions_declared,name_sig)) {
-          error_msgs << "Parse Error.  Function already declared, name=" << decl.name_;
+            && fun_exists(functions_declared, name_sig)) {
+          error_msgs << "Parse Error.  Function already declared, name="
+                     << decl.name_;
           pass = false;
           return;
         }
 
         // check not already user defined
         if (fun_exists(functions_defined, name_sig)) {
-          error_msgs << "Parse Error.  Function already defined, name=" << decl.name_;
+          error_msgs << "Parse Error.  Function already defined, name="
+                     << decl.name_;
           pass = false;
           return;
         }
 
         // check not already system defined
-        if (!fun_exists(functions_declared,name_sig)
+        if (!fun_exists(functions_declared, name_sig)
             && function_signatures::instance().is_defined(decl.name_, sig)) {
-          error_msgs << "Parse Error.  Function system defined, name=" << decl.name_;
+          error_msgs << "Parse Error.  Function system defined, name="
+                     << decl.name_;
           pass = false;
           return;
         }
@@ -196,11 +225,11 @@ namespace stan {
             functions_declared.insert(name_sig);
             function_signatures::instance()
               .add(decl.name_,
-                   result_type,arg_types);
+                   result_type, arg_types);
             function_signatures::instance()
               .set_user_defined(name_sig);
         }
-        
+
         // add as definition if there's a body
         if (!decl.body_.is_no_op_statement())
           functions_defined.insert(name_sig);
@@ -210,23 +239,27 @@ namespace stan {
     boost::phoenix::function<add_function_signature> add_function_signature_f;
 
     struct validate_return_type {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef void type; };
+      //! @cond Doxygen_Suppress
+      template <class> struct result;
+      //! @endcond
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1, T2, T3)> { typedef void type; };
       void operator()(function_decl_def& decl,
                       bool& pass,
                       std::ostream& error_msgs) const {
         pass = decl.body_.is_no_op_statement()
-          || stan::lang::returns_type(decl.return_type_, decl.body_, 
+          || stan::lang::returns_type(decl.return_type_, decl.body_,
                                     error_msgs);
         if (!pass) {
           error_msgs << "Improper return in body of function.";
           return;
         }
 
-        if (ends_with("_log",decl.name_)
+        if (ends_with("_log", decl.name_)
             && !decl.return_type_.is_primitive_double()) {
             pass = false;
-            error_msgs << "Require real return type for functions ending in _log.";
+            error_msgs << "Require real return type for functions"
+                       << " ending in _log.";
         }
       }
     };
@@ -237,17 +270,22 @@ namespace stan {
       struct result { typedef void type; };
       void operator()(variable_map& vm) const {
         vm.add("lp__", DOUBLE_T, local_origin);
+        vm.add("params_r__", VECTOR_T, local_origin);
       }
     };
     boost::phoenix::function<scope_lp> scope_lp_f;
-    
+
 
     struct unscope_variables {
-      template <typename T1, typename T2>
-      struct result { typedef void type; };
+      //! @cond Doxygen_Suppress
+      template <class> struct result;
+      //! @endcond
+      template <typename F, typename T1, typename T2>
+      struct result<F(T1, T2)> { typedef void type; };
       void operator()(function_decl_def& decl,
                       variable_map& vm) const {
         vm.remove("lp__");
+        vm.remove("params_r__");
         for (size_t i = 0; i < decl.arg_decls_.size(); ++i)
           vm.remove(decl.arg_decls_[i].name_);
       }
@@ -256,8 +294,11 @@ namespace stan {
 
 
     struct add_fun_var {
-      template <typename T1, typename T2, typename T3, typename T4>
-      struct result { typedef void type; };
+      //! @cond Doxygen_Suppress
+      template <class> struct result;
+      //! @endcond
+      template <typename F, typename T1, typename T2, typename T3, typename T4>
+      struct result<F(T1, T2, T3, T4)> { typedef void type; };
       // each type derived from base_var_decl gets own instance
       void operator()(arg_decl& decl,
                       bool& pass,
@@ -272,7 +313,7 @@ namespace stan {
           error_msgs << "; attempt to redeclare as function argument";
 
           error_msgs << "; original declaration as ";
-          print_var_origin(error_msgs,vm.get_origin(decl.name_));
+          print_var_origin(error_msgs, vm.get_origin(decl.name_));
 
           error_msgs << std::endl;
           return;
@@ -294,84 +335,68 @@ namespace stan {
         functions_declared_(),
         functions_defined_(),
         error_msgs_(error_msgs),
-        statement_g(var_map_,error_msgs_),
-        bare_type_g(var_map_,error_msgs_)
-  {
+        statement_g(var_map_, error_msgs_),
+        bare_type_g(var_map_, error_msgs_) {
       using boost::spirit::qi::_1;
       using boost::spirit::qi::char_;
       using boost::spirit::qi::eps;
       using boost::spirit::qi::lexeme;
       using boost::spirit::qi::lit;
-      using boost::spirit::qi::no_skip;
       using boost::spirit::qi::_pass;
       using boost::spirit::qi::_val;
-
       using boost::spirit::qi::labels::_a;
       using boost::spirit::qi::labels::_b;
-      using boost::spirit::qi::labels::_r1;
-      using boost::spirit::qi::labels::_r2;
-
-      using boost::spirit::qi::on_error;
-      using boost::spirit::qi::fail;
-      using boost::spirit::qi::rethrow;
-      using namespace boost::spirit::qi::labels;
 
       functions_r.name("function declarations and definitions");
-      functions_r 
-        %= ( lit("functions")  // block, so doesn't need guard to not be continued
-             > lit("{") )
+      functions_r
+        %= (lit("functions") > lit("{"))
         >> *function_r
         > lit('}')
-        > eps[ validate_declarations_f(_pass, 
-                                       boost::phoenix::ref(functions_declared_),
-                                       boost::phoenix::ref(functions_defined_),
-                                       boost::phoenix::ref(error_msgs_) ) ]
-        ;
+        > eps[validate_declarations_f(_pass,
+                                      boost::phoenix::ref(functions_declared_),
+                                      boost::phoenix::ref(functions_defined_),
+                                      boost::phoenix::ref(error_msgs_))];
       // locals: _a = allow sampling, _b = origin (function, rng/lp)
       function_r.name("function declaration or definition");
       function_r
-        %= bare_type_g[ set_void_function_f(_1,_b, _pass, 
-                                            boost::phoenix::ref(error_msgs_)) ]
-        > identifier_r[ set_allows_sampling_origin_f(_1,_a,_b) ]
+        %= bare_type_g[set_void_function_f(_1, _b, _pass,
+                                           boost::phoenix::ref(error_msgs_))]
+        > identifier_r[set_allows_sampling_origin_f(_1, _a, _b)]
         > lit('(')
         > arg_decls_r
         > close_arg_decls_r
-        > eps [ scope_lp_f(boost::phoenix::ref(var_map_)) ]
-        > statement_g(_a,_b,true)
-        > eps [ unscope_variables_f(_val,
-                                     boost::phoenix::ref(var_map_)) ]
-        > eps [ validate_return_type_f(_val,_pass,
-                                        boost::phoenix::ref(error_msgs_)) ]
-        > eps [ add_function_signature_f(_val,_pass,
-                                          boost::phoenix::ref(functions_declared_),
-                                          boost::phoenix::ref(functions_defined_),
-                                          boost::phoenix::ref(error_msgs_) ) ]
-        ;
-      
-      close_arg_decls_r.name("argument declaration or close paren ) to end argument declarations");
+        > eps[scope_lp_f(boost::phoenix::ref(var_map_))]
+        > statement_g(_a, _b, true)
+        > eps[unscope_variables_f(_val, boost::phoenix::ref(var_map_))]
+        > eps[validate_return_type_f(_val, _pass,
+                                     boost::phoenix::ref(error_msgs_))]
+        > eps[add_function_signature_f(_val, _pass,
+                                       boost::phoenix::ref(functions_declared_),
+                                       boost::phoenix::ref(functions_defined_),
+                                       boost::phoenix::ref(error_msgs_))];
+
+      close_arg_decls_r.name("argument declaration or close paren )"
+                             " to end argument declarations");
       close_arg_decls_r %= lit(')');
 
       arg_decls_r.name("function argument declaration sequence");
       arg_decls_r
         %= arg_decl_r % ','
-        | eps
-        ;
+        | eps;
 
       arg_decl_r.name("function argument declaration");
-      arg_decl_r 
-        %= bare_type_g [ validate_non_void_arg_f(_1, _pass, 
-                                                 boost::phoenix::ref(error_msgs_)) ]
+      arg_decl_r
+        %= bare_type_g[validate_non_void_arg_f(_1, _pass,
+                                       boost::phoenix::ref(error_msgs_))]
         > identifier_r
-        > eps[ add_fun_var_f(_val,_pass,
-                              boost::phoenix::ref(var_map_),
-                              boost::phoenix::ref(error_msgs_)) ]
-        ;
+        > eps[add_fun_var_f(_val, _pass,
+                            boost::phoenix::ref(var_map_),
+                            boost::phoenix::ref(error_msgs_))];
 
       identifier_r.name("identifier");
       identifier_r
-        %= lexeme[char_("a-zA-Z") 
+        %= lexeme[char_("a-zA-Z")
                    >> *char_("a-zA-Z0-9_.")];
-
     }
 
   }

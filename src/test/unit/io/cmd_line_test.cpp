@@ -1,5 +1,6 @@
 #include <stan/io/cmd_line.hpp>
 #include <gtest/gtest.h>
+#include <test/unit/util.hpp>
 
 TEST(io_cmd_line, cmd_line_0) {
   int argc = 0;
@@ -67,4 +68,17 @@ TEST(io_cmd_line, spaces) {
   std::string y;
   EXPECT_TRUE(cl.val<std::string>("foo",y));
   EXPECT_EQ("arg 2",y);
+}
+
+TEST(io_cmd_line, pad_help_option) {
+  stan::test::capture_std_streams();
+  EXPECT_NO_THROW(stan::io::pad_help_option(0, "foo", 2));
+
+  std::stringstream out;
+  EXPECT_NO_THROW(stan::io::pad_help_option(&out, "foo", 2));
+  EXPECT_EQ("  foo\n    ", out.str());
+  stan::test::reset_std_streams();
+
+  EXPECT_EQ("", stan::test::cout_ss.str());
+  EXPECT_EQ("", stan::test::cerr_ss.str());
 }

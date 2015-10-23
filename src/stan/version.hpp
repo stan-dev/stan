@@ -3,16 +3,28 @@
 
 #include <string>
 
+#ifndef STAN_STRING_EXPAND
+#define STAN_STRING_EXPAND(s) #s
+#endif
+
+#ifndef STAN_STRING
+#define STAN_STRING(s) STAN_STRING_EXPAND(s)
+#endif
+
+#define STAN_MAJOR 2
+#define STAN_MINOR 8
+#define STAN_PATCH 0
+
 namespace stan {
 
   /** Major version number for Stan package. */
-  const std::string MAJOR_VERSION = "2";
+  const std::string MAJOR_VERSION = STAN_STRING(STAN_MAJOR);
 
   /** Minor version number for Stan package. */
-  const std::string MINOR_VERSION = "6";
+  const std::string MINOR_VERSION = STAN_STRING(STAN_MINOR);
 
   /** Patch version for Stan package. */
-  const std::string PATCH_VERSION = "3";
+  const std::string PATCH_VERSION = STAN_STRING(STAN_PATCH);
 
 }
 

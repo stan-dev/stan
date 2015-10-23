@@ -4,13 +4,10 @@
 #include <stan/services/arguments/singleton_argument.hpp>
 
 namespace stan {
-  
   namespace services {
-    
+
     class arg_num_warmup: public int_argument {
-      
     public:
-      
       arg_num_warmup(): int_argument() {
         _name = "num_warmup";
         _description = "Number of warmup iterations";
@@ -21,15 +18,13 @@ namespace stan {
         _good_value = 2.0;
         _bad_value = -1.0;
         _value = _default_value;
-      };
-      
+      }
+
       bool is_valid(int value) { return value >= 0; }
-      
     };
-    
-  } // services
-  
-} // stan
+
+  }  // services
+}  // stan
 
 #endif
 

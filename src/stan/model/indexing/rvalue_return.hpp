@@ -1,12 +1,13 @@
 #ifndef STAN_MODEL_INDEXING_RVALUE_RETURN_HPP
 #define STAN_MODEL_INDEXING_RVALUE_RETURN_HPP
 
-#include <vector>
 #include <Eigen/Dense>
 #include <stan/model/indexing/index.hpp>
 #include <stan/model/indexing/index_list.hpp>
+#include <vector>
 
 namespace stan {
+
   namespace model {
 
     /**
@@ -53,7 +54,7 @@ namespace stan {
      * @tparam C Columns for matrix.
      */
     template <typename T, typename I, int R, int C>
-    struct rvalue_return<Eigen::Matrix<T, R, C>, 
+    struct rvalue_return<Eigen::Matrix<T, R, C>,
                          cons_index_list<I, nil_index_list> > {
       /**
        * Return type is the matrix container type.
@@ -68,7 +69,7 @@ namespace stan {
      * @tparam T Type of scalar in matrix.
      */
     template <typename T>
-    struct rvalue_return<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>, 
+    struct rvalue_return<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>,
                          cons_index_list<index_uni, nil_index_list> > {
       /**
        * Return type is row vector.
@@ -83,7 +84,7 @@ namespace stan {
      * @tparam T Type of scalar in vector.
      */
     template <typename T>
-    struct rvalue_return<Eigen::Matrix<T, Eigen::Dynamic, 1>, 
+    struct rvalue_return<Eigen::Matrix<T, Eigen::Dynamic, 1>,
                          cons_index_list<index_uni, nil_index_list> > {
       /**
        * Return type is scalar type of vector.
@@ -98,7 +99,7 @@ namespace stan {
      * @tparam T Type of scalar in row vector. 
      */
     template <typename T>
-    struct rvalue_return<Eigen::Matrix<T, 1, Eigen::Dynamic>, 
+    struct rvalue_return<Eigen::Matrix<T, 1, Eigen::Dynamic>,
                          cons_index_list<index_uni, nil_index_list> > {
       /**
        * Return type is scalar type of row vector. 
@@ -115,8 +116,8 @@ namespace stan {
      * @tparam I2 Type of second multiple index.
      */
     template <typename T, typename I1, typename I2>
-    struct rvalue_return<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>, 
-                         cons_index_list<I1, 
+    struct rvalue_return<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>,
+                         cons_index_list<I1,
                                          cons_index_list<I2,
                                                          nil_index_list> > > {
       /**
@@ -133,8 +134,8 @@ namespace stan {
      * @tparam I Type of multiple index.
      */
     template <typename T, typename I>
-    struct rvalue_return<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>, 
-                         cons_index_list<I, 
+    struct rvalue_return<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>,
+                         cons_index_list<I,
                                          cons_index_list<index_uni,
                                                          nil_index_list> > > {
       /**
@@ -151,8 +152,8 @@ namespace stan {
      * @tparam I Type of multiple index.
      */
     template <typename T, typename I>
-    struct rvalue_return<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>, 
-                         cons_index_list<index_uni, 
+    struct rvalue_return<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>,
+                         cons_index_list<index_uni,
                                          cons_index_list<I,
                                                          nil_index_list> > > {
       /**
@@ -168,8 +169,8 @@ namespace stan {
      * @tparam T Type of scalar in matrix.
      */
     template <typename T>
-    struct rvalue_return<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>, 
-                         cons_index_list<index_uni, 
+    struct rvalue_return<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>,
+                         cons_index_list<index_uni,
                                          cons_index_list<index_uni,
                                                          nil_index_list> > > {
       /**
