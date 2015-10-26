@@ -2,7 +2,7 @@
 #define STAN_INTERFACE_CALLBACKS_WRITER_STREAM_WRITER_HPP
 
 #include <stan/interface_callbacks/writer/base_writer.hpp>
-#include <iostream>
+#include <ostream>
 #include <vector>
 #include <string>
 
@@ -10,10 +10,19 @@ namespace stan {
   namespace interface_callbacks {
     namespace writer {
 
-      template <class Stream>
-      class stream_writer: public base_writer {
+      /**
+       * stream_writer writes to an std::ostream.
+       */
+      class stream_writer : public base_writer {
       public:
-        stream_writer(Stream& output,
+        /**
+         * Constructor.
+         *
+         * @param output std::ostream to write to
+         * @param key_value_prefix String to write before lines
+         *   treated as comments.
+         */
+        stream_writer(std::ostream& output,
                       const std::string& key_value_prefix = ""):
           output__(output), key_value_prefix__(key_value_prefix) {}
 
@@ -82,15 +91,15 @@ namespace stan {
         }
 
         void operator()() {
-          output__ << std::endl;
+          output__ << key_value_prefix__ << std::endl;
         }
 
         void operator()(const std::string& message) {
-          output__ << message << std::endl;
+          output__ << key_value_prefix__ << message << std::endl;
         }
 
       private:
-        Stream& output__;
+        std::ostream& output__;
         std::string key_value_prefix__;
       };
 

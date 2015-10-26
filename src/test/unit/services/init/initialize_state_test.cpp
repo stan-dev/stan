@@ -2,14 +2,14 @@
 #include <stan/io/var_context.hpp>
 #include <stan/io/dump.hpp>
 #include <stan/interface_callbacks/var_context_factory/var_context_factory.hpp>
-#include <stan/interface_callbacks/writer/stream_writer_typedefs.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <stan/services/init/initialize_state.hpp>
 #include <stan/model/prob_grad.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 
-typedef stan::interface_callbacks::writer::sstream_writer writer_t;
+typedef stan::interface_callbacks::writer::stream_writer writer_t;
 
 // Mock Model
 class mock_model: public stan::model::prob_grad {

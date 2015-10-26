@@ -1,4 +1,4 @@
-#include <stan/interface_callbacks/writer/stream_writer_typedefs.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <stan/services/io/write_iteration.hpp>
 #include <gtest/gtest.h>
 #include <test/test-models/good/services/test_lp.hpp>
@@ -9,7 +9,7 @@
 
 typedef test_lp_model_namespace::test_lp_model Model;
 typedef boost::ecuyer1988 rng_t;
-typedef stan::interface_callbacks::writer::sstream_writer writer_t;
+typedef stan::interface_callbacks::writer::stream_writer writer_t;
 
 class StanUi : public testing::Test {
 public:

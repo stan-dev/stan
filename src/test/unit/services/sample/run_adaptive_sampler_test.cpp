@@ -3,14 +3,14 @@
 #include <stan/services/sample/run_adaptive_sampler.hpp>
 #include <stan/services/sample/mcmc_writer.hpp>
 #include <stan/interface_callbacks/interrupt/base_interrupt.hpp>
-#include <stan/interface_callbacks/writer/stream_writer_typedefs.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <gtest/gtest.h>
 #include <test/test-models/good/services/test_lp.hpp>
 #include <boost/random/additive_combine.hpp>
 #include <sstream>
 
 typedef boost::ecuyer1988 rng_t;
-typedef stan::interface_callbacks::writer::sstream_writer writer_t;
+typedef stan::interface_callbacks::writer::stream_writer writer_t;
 
 class mock_sampler : public stan::mcmc::base_mcmc,
                      public stan::mcmc::base_adapter {

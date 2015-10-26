@@ -1,10 +1,10 @@
-#include <stan/interface_callbacks/writer/stream_writer_typedefs.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <stan/services/io/write_stan.hpp>
 #include <gtest/gtest.h>
 #include <sstream>
 #include <stan/version.hpp>
 
-typedef stan::interface_callbacks::writer::sstream_writer writer_t;
+typedef stan::interface_callbacks::writer::stream_writer writer_t;
 
 TEST(StanUi, write_stan_nostream) {
   std::stringstream writer_ss;

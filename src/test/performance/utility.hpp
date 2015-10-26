@@ -65,7 +65,7 @@
 #include <stan/interface_callbacks/var_context_factory/dump_factory.hpp>
 #include <stan/interface_callbacks/writer/noop_writer.hpp>
 #include <stan/interface_callbacks/writer/stream_writer.hpp>
-#include <stan/interface_callbacks/writer/stream_writer_typedefs.hpp>
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 
 #include <fstream>
 #include <iostream>
@@ -311,10 +311,10 @@ namespace stan {
         //parser.arg("init"))->value();
 
 
-        interface_callbacks::writer::stream_writer<std::fstream> sample_writer(*output_stream, "# ");
+        interface_callbacks::writer::stream_writer sample_writer(*output_stream, "# ");
         interface_callbacks::writer::noop_writer diagnostic_writer;
-        interface_callbacks::writer::stream_writer<std::ostream> info_writer(std::cout, "# ");
-        interface_callbacks::writer::stream_writer<std::ostream> err_writer(std::cerr);
+        interface_callbacks::writer::stream_writer info_writer(std::cout, "# ");
+        interface_callbacks::writer::stream_writer err_writer(std::cerr);
 
         if (output_stream) {
           services::io::write_stan(info_writer, "#");
@@ -324,15 +324,15 @@ namespace stan {
 
         stan::services::sample::mcmc_writer<Model,
                                             rng_t,
-                                            interface_callbacks::writer::stream_writer<std::fstream>,
+                                            interface_callbacks::writer::stream_writer,
                                             interface_callbacks::writer::noop_writer,
-                                            interface_callbacks::writer::stream_writer<std::ostream>,
-                                            interface_callbacks::writer::stream_writer<std::ostream> >
+                                            interface_callbacks::writer::stream_writer,
+                                            interface_callbacks::writer::stream_writer>
           writer(model, base_rng, sample_writer, diagnostic_writer, info_writer, err_writer);
 
         interface_callbacks::var_context_factory::dump_factory var_context_factory;
         if (!services::init::initialize_state<Model, rng_t,
-            interface_callbacks::writer::stream_writer<std::ostream>,
+            interface_callbacks::writer::stream_writer,
             interface_callbacks::var_context_factory::dump_factory>
             (init, cont_params, model, base_rng, info_writer,
              var_context_factory))
@@ -365,7 +365,6 @@ namespace stan {
         std::cout << "Adjust your expectations accordingly!"
                   << std::endl << std::endl;
         std::cout << std::endl;
-
 
 
         // Sampling parameters

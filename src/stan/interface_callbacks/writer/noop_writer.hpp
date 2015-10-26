@@ -9,6 +9,12 @@ namespace stan {
   namespace interface_callbacks {
     namespace writer {
 
+      /**
+       * No op writer.
+       *
+       * This is a trivial implementation of the base writer that
+       * accepts input and writes nowhere.
+       */
       class noop_writer: public base_writer {
       public:
         void operator()(const std::string& key, double value) {}

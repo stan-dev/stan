@@ -1,9 +1,9 @@
-#include <stan/interface_callbacks/writer/stream_writer_typedefs.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <stan/services/io/write_model.hpp>
 #include <gtest/gtest.h>
 #include <sstream>
 
-typedef stan::interface_callbacks::writer::sstream_writer writer_t;
+typedef stan::interface_callbacks::writer::stream_writer writer_t;
 
 const std::string model_name = "model name";
 const std::string prefix = "prefix";

@@ -1,5 +1,5 @@
 #include <stan/services/sample/mcmc_writer.hpp>
-#include <stan/interface_callbacks/writer/stream_writer_typedefs.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <test/test-models/good/io_example.hpp>
 
 #include <vector>
@@ -15,7 +15,7 @@
 #include <gtest/gtest.h>
 
 typedef boost::ecuyer1988 rng_t;
-typedef stan::interface_callbacks::writer::sstream_writer writer_t;
+typedef stan::interface_callbacks::writer::stream_writer writer_t;
 
 TEST(StanIoMcmcWriter, write_names) {
 

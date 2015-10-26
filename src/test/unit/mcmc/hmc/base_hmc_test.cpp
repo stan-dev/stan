@@ -6,7 +6,7 @@
 #include <test/unit/util.hpp>
 #include <gtest/gtest.h>
 
-#include <stan/interface_callbacks/writer/stream_writer_typedefs.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 
 typedef boost::ecuyer1988 rng_t;
 
@@ -138,7 +138,7 @@ TEST(McmcBaseHMC, streams) {
   stan::mcmc::mock_hmc sampler(model, base_rng);
 
   std::stringstream writer_ss;
-  stan::interface_callbacks::writer::sstream_writer writer(writer_ss);
+  stan::interface_callbacks::writer::stream_writer writer(writer_ss);
   EXPECT_NO_THROW(sampler.write_sampler_state(writer));
   EXPECT_EQ("# Step size = 0.1\n",
             writer_ss.str());

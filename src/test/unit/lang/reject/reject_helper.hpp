@@ -7,7 +7,7 @@
 #include <fstream>
 #include <boost/random/additive_combine.hpp>
 #include <stan/io/dump.hpp>
-#include <stan/interface_callbacks/writer/stream_writer_typedefs.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <stan/services/io/write_iteration.hpp>
 
 void expect_substring(const std::string& msg,
@@ -29,7 +29,7 @@ void reject_test(const std::string& expected_msg1 = "",
 
   std::stringstream model_output;
   std::stringstream writer_ss;
-  stan::interface_callbacks::writer::sstream_writer writer(writer_ss);
+  stan::interface_callbacks::writer::stream_writer writer(writer_ss);
 
   boost::ecuyer1988 base_rng;
   base_rng.seed(123456);

@@ -1,4 +1,4 @@
-#include <stan/interface_callbacks/writer/stream_writer_typedefs.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <stan/services/io/write_error_msg.hpp>
 #include <gtest/gtest.h>
 #include <stdexcept>
@@ -9,7 +9,7 @@ std::string err_msg2 = "<error message 2>";
 std::runtime_error err1(err_msg1);
 std::domain_error err2(err_msg2);
 
-typedef stan::interface_callbacks::writer::sstream_writer writer_t;
+typedef stan::interface_callbacks::writer::stream_writer writer_t;
 
 TEST(StanUi, write_error_msg_nostream) {
   std::stringstream writer_ss;
