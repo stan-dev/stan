@@ -117,8 +117,8 @@
 // FIXME: These belong to the interfaces and should be templated out here
 #include <stan/interface_callbacks/interrupt/noop.hpp>
 #include <stan/interface_callbacks/var_context_factory/dump_factory.hpp>
-#include <stan/interface_callbacks/writer/csv.hpp>
-#include <stan/interface_callbacks/writer/messages.hpp>
+#include <stan/interface_callbacks/writer/noop_writer.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <stan/interface_callbacks/writer/base_writer.hpp>
 
 #include <fstream>
@@ -408,14 +408,14 @@ namespace stan {
                   << std::endl << std::endl;
         std::cout << std::endl;
 
-        interface_callbacks::writer::csv sample_writer(output_stream, "# ");
-        interface_callbacks::writer::csv diagnostic_writer(diagnostic_stream, "# ");
-        interface_callbacks::writer::messages message_writer(&std::cout, "# ");
+        interface_callbacks::writer::stream_writer sample_writer(*output_stream, "# ");
+        interface_callbacks::writer::noop_writer diagnostic_writer;
+        interface_callbacks::writer::stream_writer message_writer(std::cout, "# ");
 
         stan::io::mcmc_writer<Model,
-                              interface_callbacks::writer::csv,
-                              interface_callbacks::writer::csv,
-                              interface_callbacks::writer::messages>
+                              interface_callbacks::writer::stream_writer,
+                              interface_callbacks::writer::noop_writer,
+                              interface_callbacks::writer::stream_writer>
           writer(sample_writer, diagnostic_writer, message_writer, &std::cout);
 
         // Sampling parameters
