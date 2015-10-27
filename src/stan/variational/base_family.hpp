@@ -17,6 +17,7 @@ namespace stan {
       // Operations
       base_family square() const;
       base_family sqrt() const;
+      double squaredNorm() const;
 
       // Compound assignment operators
       base_family operator=(const base_family& rhs);

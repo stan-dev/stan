@@ -58,6 +58,12 @@ namespace stan {
         omega_  = Eigen::VectorXd::Zero(dimension_);
       }
 
+      explicit normal_meanfield(const Eigen::VectorXd& cont_params, double std) :
+        mu_(cont_params), dimension_(cont_params.size()) {
+        // initializing omega = 0 means sigma = 1
+        omega_  = std::log(std) * Eigen::VectorXd::Ones(dimension_);
+      }
+
       normal_meanfield(const Eigen::VectorXd& mu,
                        const Eigen::VectorXd& omega) :
       mu_(mu), omega_(omega), dimension_(mu.size()) {
@@ -108,6 +114,10 @@ namespace stan {
       normal_meanfield sqrt() const {
         return normal_meanfield(Eigen::VectorXd(mu_.array().sqrt()),
                                 Eigen::VectorXd(omega_.array().sqrt()));
+      }
+
+      double squaredNorm() const {
+        return mu_.squaredNorm() + omega_.squaredNorm();
       }
 
       // Compound assignment operators
@@ -220,7 +230,7 @@ namespace stan {
        * @param  print_stream          stream for convergence assessment output
        */
       template <class M, class BaseRNG>
-      void calc_grad(normal_meanfield& elbo_grad,
+      bool calc_grad(normal_meanfield& elbo_grad,
                      M& m,
                      Eigen::VectorXd& cont_params,
                      int n_monte_carlo_grad,
@@ -264,13 +274,17 @@ namespace stan {
           } catch (std::exception& e) {
             this->write_error_msg_(print_stream, e);
             n_monte_carlo_drop += 1;
-            if (n_monte_carlo_drop >= 5*n_monte_carlo_grad) {
+            if (n_monte_carlo_drop >= 10*n_monte_carlo_grad) {
               const char* name = "The number of dropped evaluations";
               const char* msg1 = "has reached its maximum amount (";
-              int y = 5*n_monte_carlo_grad;
+              int y = 10*n_monte_carlo_grad;
               const char* msg2 = "). Your model may be either severely "
                 "ill-conditioned or misspecified.";
-              stan::math::domain_error(function, name, y, msg1, msg2);
+              // stan::math::domain_error(function, name, y, msg1, msg2)
+
+              elbo_grad.set_mu(Eigen::VectorXd::Zero(dimension_));
+              elbo_grad.set_omega(Eigen::VectorXd::Zero(dimension_));
+              return false;
             }
           }
         }
@@ -287,6 +301,8 @@ namespace stan {
         // Set parameters to argument
         elbo_grad.set_mu(mu_grad);
         elbo_grad.set_omega(omega_grad);
+
+        return true;
       }
     };
 
