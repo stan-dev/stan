@@ -1,5 +1,5 @@
-#ifndef STAN_SERVICES_OPTIMIZATION_DO_BFGS_OPTIMIZE_HPP
-#define STAN_SERVICES_OPTIMIZATION_DO_BFGS_OPTIMIZE_HPP
+#ifndef STAN_SERVICES_OPTIMIZE_DO_BFGS_OPTIMIZE_HPP
+#define STAN_SERVICES_OPTIMIZE_DO_BFGS_OPTIMIZE_HPP
 
 #include <stan/services/error_codes.hpp>
 #include <stan/services/io/do_print.hpp>
@@ -15,7 +15,7 @@
 
 namespace stan {
   namespace services {
-    namespace optimization {
+    namespace optimize {
 
       template<typename ModelT, typename BFGSOptimizerT, typename RNGT,
                typename StartIterationCallback>
@@ -64,17 +64,17 @@ namespace stan {
                                refresh))) {
             (*notice_stream) << " " << std::setw(7) << bfgs.iter_num() << " ";
             (*notice_stream) << " " << std::setw(12) << std::setprecision(6)
-                      << lp << " ";
+                             << lp << " ";
             (*notice_stream) << " " << std::setw(12) << std::setprecision(6)
-                      << bfgs.prev_step_size() << " ";
+                             << bfgs.prev_step_size() << " ";
             (*notice_stream) << " " << std::setw(12) << std::setprecision(6)
-                      << bfgs.curr_g().norm() << " ";
+                             << bfgs.curr_g().norm() << " ";
             (*notice_stream) << " " << std::setw(10) << std::setprecision(4)
-                      << bfgs.alpha() << " ";
+                             << bfgs.alpha() << " ";
             (*notice_stream) << " " << std::setw(10) << std::setprecision(4)
-                      << bfgs.alpha0() << " ";
+                             << bfgs.alpha0() << " ";
             (*notice_stream) << " " << std::setw(7)
-                      << bfgs.grad_evals() << " ";
+                             << bfgs.grad_evals() << " ";
             (*notice_stream) << " " << bfgs.note() << " ";
             (*notice_stream) << std::endl;
           }

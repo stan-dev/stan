@@ -135,7 +135,6 @@ src/test/unit/mcmc/hmc/hamiltonians/dense_e_metric_test.cpp: src/test/test-model
 src/test/unit/mcmc/hmc/integrators/expl_leapfrog_test.cpp: src/test/test-models/good/mcmc/hmc/integrators/command.hpp
 src/test/unit/mcmc/hmc/integrators/expl_leapfrog2_test.cpp: src/test/test-models/good/mcmc/hmc/integrators/gauss.hpp
 
-src/test/unit/services/optimization/do_bfgs_optimize_test.cpp: src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/optimization/bfgs_linesearch_test.cpp: src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/optimization/bfgs_minimizer_test.cpp: src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/optimization/bfgs_test.cpp: src/test/test-models/good/optimization/rosenbrock.hpp
@@ -143,10 +142,11 @@ src/test/unit/optimization/bfgs_update_test.cpp: src/test/test-models/good/optim
 src/test/unit/optimization/lbfgs_update_test.cpp: src/test/test-models/good/optimization/rosenbrock.hpp
 
 src/test/unit/services/init/command_init_test.cpp: src/test/test-models/good/services/test_lp.hpp
+src/test/unit/services/io/write_iteration_test.cpp: src/test/test-models/good/services/test_lp.hpp
 src/test/unit/services/mcmc/run_markov_chain_test.cpp: src/test/test-models/good/services/test_lp.hpp
 src/test/unit/services/mcmc/sample_test.cpp: src/test/test-models/good/services/test_lp.hpp
 src/test/unit/services/mcmc/warmup_test.cpp: src/test/test-models/good/services/test_lp.hpp
-src/test/unit/services/io/write_iteration_test.cpp: src/test/test-models/good/services/test_lp.hpp
+src/test/unit/services/optimize/do_bfgs_optimize_test.cpp: src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/services/sample/mcmc_writer_test.cpp: src/test/test-models/good/io_example.hpp
 
 src/test/unit/lang/reject/reject_mult_args_test.cpp: src/test/test-models/good/lang/reject_mult_args.hpp
