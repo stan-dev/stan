@@ -2,7 +2,7 @@
 #define STAN_SERVICES_MCMC_RUN_MARKOV_CHAIN_HPP
 
 #include <stan/mcmc/base_mcmc.hpp>
-#include <stan/io/mcmc_writer.hpp>
+#include <stan/services/sample/mcmc_writer.hpp>
 #include <stan/services/mcmc/print_progress.hpp>
 #include <string>
 
@@ -21,9 +21,9 @@ namespace stan {
                             const int refresh,
                             const bool save,
                             const bool warmup,
-                            stan::io::mcmc_writer<
-                               Model, SampleRecorder,
-                               DiagnosticRecorder, MessageRecorder>& writer,
+                            stan::services::sample::mcmc_writer<
+                            Model, SampleRecorder,
+                            DiagnosticRecorder, MessageRecorder>& writer,
                             stan::mcmc::sample& init_s,
                             Model& model,
                             RNG& base_rng,

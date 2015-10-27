@@ -17,7 +17,7 @@
 #include <stan/io/json/json_error.hpp>
 #include <stan/io/json/json_handler.hpp>
 #include <stan/io/json/json_parser.hpp>
-#include <stan/io/mcmc_writer.hpp>
+#include <stan/services/sample/mcmc_writer.hpp>
 
 #include <stan/services/arguments/arg_adapt.hpp>
 #include <stan/services/arguments/arg_adapt_delta.hpp>
@@ -412,10 +412,10 @@ namespace stan {
         interface_callbacks::writer::noop_writer diagnostic_writer;
         interface_callbacks::writer::stream_writer message_writer(std::cout, "# ");
 
-        stan::io::mcmc_writer<Model,
-                              interface_callbacks::writer::stream_writer,
-                              interface_callbacks::writer::noop_writer,
-                              interface_callbacks::writer::stream_writer>
+        stan::services::sample::mcmc_writer<Model,
+                                            interface_callbacks::writer::stream_writer,
+                                            interface_callbacks::writer::noop_writer,
+                                            interface_callbacks::writer::stream_writer>
           writer(sample_writer, diagnostic_writer, message_writer, &std::cout);
 
         // Sampling parameters
@@ -456,11 +456,11 @@ namespace stan {
         clock_t start = clock();
           
         services::mcmc::warmup<Model, rng_t>(sampler_ptr, num_warmup, num_samples, num_thin,
-                                   refresh, save_warmup,
-                                   writer,
-                                   s, model, base_rng,
-                                   prefix, suffix, std::cout,
-                                   startTransitionCallback);
+                                             refresh, save_warmup,
+                                             writer,
+                                             s, model, base_rng,
+                                             prefix, suffix, std::cout,
+                                             startTransitionCallback);
 
         clock_t end = clock();
         warmDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;

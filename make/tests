@@ -123,7 +123,6 @@ $(patsubst %.stan,%.hpp,$(TEST_MODELS)) : %.hpp : %.stan test/test-models/stanc$
 ##
 # Explicitly specify dependencies for tests that depend on the generated C++ of Stan programs.
 ##
-src/test/unit/io/mcmc_writer_test.cpp: src/test/test-models/good/io_example.hpp
 src/test/unit/lang/generator_test.cpp: src/test/test-models/good/lang/test_lp.hpp
 src/test/unit/lang/parser_generator_test.cpp: $(patsubst %.stan,%.hpp,$(shell find src/test/test-models/good/parser-generator -type f -name '*.stan'))
 
@@ -148,6 +147,7 @@ src/test/unit/services/mcmc/run_markov_chain_test.cpp: src/test/test-models/good
 src/test/unit/services/mcmc/sample_test.cpp: src/test/test-models/good/services/test_lp.hpp
 src/test/unit/services/mcmc/warmup_test.cpp: src/test/test-models/good/services/test_lp.hpp
 src/test/unit/services/io/write_iteration_test.cpp: src/test/test-models/good/services/test_lp.hpp
+src/test/unit/services/sample/mcmc_writer_test.cpp: src/test/test-models/good/io_example.hpp
 
 src/test/unit/lang/reject/reject_mult_args_test.cpp: src/test/test-models/good/lang/reject_mult_args.hpp
 
