@@ -52,7 +52,7 @@ namespace stan {
                     const cons_index_list<index_uni, nil_index_list>& idx,
                     const char* name = "ANON", int depth = 0) {
       int ones_idx = idx.head_.n_;
-      math::check_range("vector[single] indexing", name, ones_idx, v.size());
+      math::check_range("vector[single] indexing", name, v.size(), ones_idx);
       return v(ones_idx - 1);
     }
 
@@ -76,7 +76,7 @@ namespace stan {
                     const char* name = "ANON", int depth = 0) {
       int n = idx.head_.n_;
       math::check_range("row_vector[single] indexing", name,
-                        n, rv.size());
+                        rv.size(), n);
       return rv(n - 1);
     }
 
@@ -105,7 +105,7 @@ namespace stan {
       Eigen::Matrix<T, Eigen::Dynamic, 1> a(size);
       for (int i = 0; i < size; ++i) {
         int n = rvalue_at(i, idx.head_);
-        math::check_range("vector[multi] indexing", name, n, v.size());
+        math::check_range("vector[multi] indexing", name, v.size(), n);
         a(i) = v(n - 1);
       }
       return a;
@@ -133,11 +133,11 @@ namespace stan {
     rvalue(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv,
            const cons_index_list<I, nil_index_list>& idx,
            const char* name = "ANON", int depth = 0) {
-      int size = rvalue_index_size(idx.head_, v.size());
+      int size = rvalue_index_size(idx.head_, rv.size());
       Eigen::Matrix<T, 1, Eigen::Dynamic> a(size);
       for (int i = 0; i < size; ++i) {
         int n = rvalue_at(i, idx.head_);
-        math::check_range("row_vector[multi] indexing", name, n, rv.size());
+        math::check_range("row_vector[multi] indexing", name, rv.size(), n);
         a(i) = rv(n - 1);
       }
       return a;
@@ -162,7 +162,7 @@ namespace stan {
            const cons_index_list<index_uni, nil_index_list>& idx,
            const char* name = "ANON", int depth = 0) {
       int n = idx.head_.n_;
-      math::check_range("matrix[uni] indexing", name, n, a.rows());
+      math::check_range("matrix[uni] indexing", name, a.rows(), n);
       return a.row(n - 1);
     }
 
@@ -188,13 +188,13 @@ namespace stan {
            const cons_index_list<I, nil_index_list>& idx,
            const char* name = "ANON", int depth = 0) {
       int n_rows = rvalue_index_size(idx.head_, a.rows());
-      Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> a(n_rows, a.cols());
+      Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> b(n_rows, a.cols());
       for (int i = 0; i < n_rows; ++i) {
         int n = rvalue_at(i, idx.head_);
-        math::check_range("matrix[multi] indexing", name, n, a.rows());
-        a.row(i) = a.row(n - 1);
+        math::check_range("matrix[multi] indexing", name, a.rows(), n);
+        b.row(i) = a.row(n - 1);
       }
-      return a;
+      return b;
     }
     
     /**
@@ -217,10 +217,10 @@ namespace stan {
                                  cons_index_list<index_uni,
                                                  nil_index_list> >& idx,
            const char* name = "ANON", int depth = 0) {
-      int m = rvalue_at(idx.head_.n_);
-      int n = rvalue_at(idx.tail_.head_.n_);
-      math::check_range("matrix[uni,uni] indexing, row", name, m, a.rows());
-      math::check_range("matrix[uni,uni] indexing, col", name, n, a.cols());
+      int m = idx.head_.n_;
+      int n = idx.tail_.head_.n_;
+      math::check_range("matrix[uni,uni] indexing, row", name, a.rows(), m);
+      math::check_range("matrix[uni,uni] indexing, col", name, a.cols(), n);
       return a(m - 1, n - 1);
     }
 
@@ -243,11 +243,13 @@ namespace stan {
     inline typename boost::disable_if<boost::is_same<I, index_uni>,
                                       Eigen::Matrix<T,
                                                     1, Eigen::Dynamic> >::type
-    rvalue(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m,
+    rvalue(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& a,
            const cons_index_list<index_uni,
                                  cons_index_list<I, nil_index_list> >& idx,
            const char* name = "ANON", int depth = 0) {
-      Eigen::Matrix<T, 1, Eigen::Dynamic> r = m.row(idx.head_.n_);
+      int m = idx.head_.n_;
+      math::check_range("matrix[uni,multi] indexing, row", name, a.rows(), m);
+      Eigen::Matrix<T, 1, Eigen::Dynamic> r = a.row(m - 1);
       return rvalue(r, idx.tail_);
     }
 
@@ -279,9 +281,9 @@ namespace stan {
       for (int i = 0; i < rows; ++i) {
         int m = rvalue_at(i, idx.head_);
         int n = idx.tail_.head_.n_;
-        math::check_range("matrix[multi,uni] index row", name, m, a.rows());
-        math::check_range("matrix[multi,uni] index col", name, n, a.cols());
-        c(i) = m(m - 1, n - 1);
+        math::check_range("matrix[multi,uni] index row", name, a.rows(), m);
+        math::check_range("matrix[multi,uni] index col", name, a.cols(), n);
+        c(i) = a(m - 1, n - 1);
       }
       return c;
     }
@@ -318,10 +320,10 @@ namespace stan {
         for (int i = 0; i < rows; ++i) {
           int m = rvalue_at(i, idx.head_);
           int n = rvalue_at(j, idx.tail_.head_);
-          math::check_range("matrix[multi,multi] row index", name,
-                            m, a.rows());
+          math::check_range("matrix[multi,multi] row index", name, 
+                            a.rows(), m);
           math::check_range("matrix[multi,multi] col index", name,
-                            n, a.cols());
+                            a.cols(), n);
           c(i, j) = a(m - 1, n - 1);
         }
       }
@@ -350,7 +352,7 @@ namespace stan {
     rvalue(const std::vector<T>& c, const cons_index_list<index_uni, L>& idx,
            const char* name = "ANON", int depth = 0) {
       int n = idx.head_.n_;
-      math::check_range("array[uni,...] index", name, n, c.size());
+      math::check_range("array[uni,...] index", name, c.size(), n);
       return rvalue(c[n - 1], idx.tail_, name, depth + 1);
     }
 
@@ -378,7 +380,7 @@ namespace stan {
                              cons_index_list<I, L> >::type result;
       for (int i = 0; i < rvalue_index_size(idx.head_, c.size()); ++i) {
         int n = rvalue_at(i, idx.head_);
-        math::check_range("array[multi,...] index", name, n, c.size());
+        math::check_range("array[multi,...] index", name, c.size(), n);
         result.push_back(rvalue(c[n - 1], idx.tail_, name, depth + 1));
       }
       return result;
