@@ -7,9 +7,9 @@ namespace stan {
 
   namespace services {
 
-    class arg_variational_eta: public string_argument {
+    class arg_variational_eta: public real_argument {
     public:
-      arg_variational_eta(): string_argument() {
+      arg_variational_eta(): real_argument() {
         _name = "eta";
         _description = "Stepsize scaling parameter for variational inference";
         _validity = "0 < eta <= 1.0";
