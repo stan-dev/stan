@@ -104,7 +104,6 @@
 #include <stan/services/io/write_iteration_csv.hpp>
 #include <stan/services/io/write_model.hpp>
 #include <stan/services/io/write_stan.hpp>
-#include <stan/services/mcmc/print_progress.hpp>
 #include <stan/services/mcmc/sample.hpp>
 #include <stan/services/mcmc/warmup.hpp>
 #include <stan/services/optimization/do_bfgs_optimize.hpp>
@@ -113,6 +112,7 @@
 #include <stan/services/sample/init_nuts.hpp>
 #include <stan/services/sample/init_static_hmc.hpp>
 #include <stan/services/sample/init_windowed_adapt.hpp>
+#include <stan/services/sample/progress.hpp>
 
 // FIXME: These belong to the interfaces and should be templated out here
 #include <stan/interface_callbacks/interrupt/noop.hpp>

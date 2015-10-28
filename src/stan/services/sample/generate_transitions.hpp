@@ -3,7 +3,7 @@
 
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/services/sample/mcmc_writer.hpp>
-#include <stan/services/mcmc/print_progress.hpp>
+#include <stan/services/sample/progress.hpp>
 #include <string>
 
 namespace stan {
@@ -34,7 +34,7 @@ namespace stan {
         for (int m = 0; m < num_iterations; ++m) {
           callback();
 
-          mcmc::print_progress(m, start, finish, refresh, warmup, prefix, suffix, o);
+          progress(m, start, finish, refresh, warmup, prefix, suffix, o);
 
           init_s = sampler->transition(init_s);
 
