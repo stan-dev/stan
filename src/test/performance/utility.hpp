@@ -97,10 +97,6 @@
 #include <stan/optimization/bfgs.hpp>
 
 #include <stan/services/diagnose.hpp>
-#include <stan/services/init/init_adapt.hpp>
-#include <stan/services/init/init_nuts.hpp>
-#include <stan/services/init/init_static_hmc.hpp>
-#include <stan/services/init/init_windowed_adapt.hpp>
 #include <stan/services/init/initialize_state.hpp>
 #include <stan/services/io/do_print.hpp>
 #include <stan/services/io/write_error_msg.hpp>
@@ -113,6 +109,10 @@
 #include <stan/services/mcmc/sample.hpp>
 #include <stan/services/mcmc/warmup.hpp>
 #include <stan/services/optimization/do_bfgs_optimize.hpp>
+#include <stan/services/sample/init_adapt.hpp>
+#include <stan/services/sample/init_nuts.hpp>
+#include <stan/services/sample/init_static_hmc.hpp>
+#include <stan/services/sample/init_windowed_adapt.hpp>
 
 // FIXME: These belong to the interfaces and should be templated out here
 #include <stan/interface_callbacks/interrupt/noop.hpp>
@@ -440,8 +440,8 @@ namespace stan {
         sampler_ptr->set_stepsize_jitter(0.0);
         sampler_ptr->set_max_depth(10);
 
-        stan::services::init::init_adapt(sampler_ptr, 0.8, 0.05, 0.75, 10,
-                                         cont_params, &std::cout);
+        stan::services::sample::init_adapt(sampler_ptr, 0.8, 0.05, 0.75, 10,
+                                           cont_params, &std::cout);
         sampler_ptr->set_window_params(num_warmup, 75, 50, 25, &std::cout);
           
         // Headers
