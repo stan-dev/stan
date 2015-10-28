@@ -3,7 +3,7 @@
 
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/services/sample/mcmc_writer.hpp>
-#include <stan/services/mcmc/run_markov_chain.hpp>
+#include <stan/services/sample/generate_transitions.hpp>
 #include <string>
 
 namespace stan {
@@ -29,8 +29,8 @@ namespace stan {
                   const std::string& suffix,
                   std::ostream& o,
                   StartTransitionCallback& callback) {
-        run_markov_chain<Model, RNG, StartTransitionCallback,
-                         SampleRecorder, DiagnosticRecorder, MessageRecorder>
+        sample::generate_transitions<Model, RNG, StartTransitionCallback,
+                                     SampleRecorder, DiagnosticRecorder, MessageRecorder>
           (sampler, num_warmup, 0, num_warmup + num_samples, num_thin,
            refresh, save, true,
            writer,

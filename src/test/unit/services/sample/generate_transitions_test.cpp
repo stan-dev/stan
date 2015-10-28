@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/services/mcmc/run_markov_chain.hpp>
+#include <stan/services/sample/generate_transitions.hpp>
 #include <test/test-models/good/services/test_lp.hpp>
 #include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <boost/random/additive_combine.hpp>
@@ -92,8 +92,8 @@ public:
 };
 
 
-TEST_F(StanServices, run_markov_chain) {
-  std::string expected_run_markov_chain_output = "Iteration: 50 / 100 [ 50%]  (Sampling)\nIteration: 53 / 100 [ 53%]  (Sampling)\nIteration: 57 / 100 [ 57%]  (Sampling)\nIteration: 61 / 100 [ 61%]  (Sampling)\nIteration: 65 / 100 [ 65%]  (Sampling)\nIteration: 69 / 100 [ 69%]  (Sampling)\nIteration: 73 / 100 [ 73%]  (Sampling)\nIteration: 77 / 100 [ 77%]  (Sampling)\nIteration: 81 / 100 [ 81%]  (Sampling)\nIteration: 85 / 100 [ 85%]  (Sampling)\nIteration: 89 / 100 [ 89%]  (Sampling)\nIteration: 93 / 100 [ 93%]  (Sampling)\nIteration: 97 / 100 [ 97%]  (Sampling)\nIteration: 100 / 100 [100%]  (Sampling)\n";
+TEST_F(StanServices, generate_transitions) {
+  std::string expected_output = "Iteration: 50 / 100 [ 50%]  (Sampling)\nIteration: 53 / 100 [ 53%]  (Sampling)\nIteration: 57 / 100 [ 57%]  (Sampling)\nIteration: 61 / 100 [ 61%]  (Sampling)\nIteration: 65 / 100 [ 65%]  (Sampling)\nIteration: 69 / 100 [ 69%]  (Sampling)\nIteration: 73 / 100 [ 73%]  (Sampling)\nIteration: 77 / 100 [ 77%]  (Sampling)\nIteration: 81 / 100 [ 81%]  (Sampling)\nIteration: 85 / 100 [ 85%]  (Sampling)\nIteration: 89 / 100 [ 89%]  (Sampling)\nIteration: 93 / 100 [ 93%]  (Sampling)\nIteration: 97 / 100 [ 97%]  (Sampling)\nIteration: 100 / 100 [100%]  (Sampling)\n";
 
   int num_iterations = 51;
   int start = 49;
@@ -108,7 +108,7 @@ TEST_F(StanServices, run_markov_chain) {
   std::stringstream ss;
   mock_callback callback;
 
-  stan::services::mcmc::run_markov_chain(sampler,
+  stan::services::sample::generate_transitions(sampler,
                                          num_iterations, start, finish,
                                          num_thin, refresh, save, warmup,
                                          *writer, s, *model, base_rng,
@@ -118,7 +118,7 @@ TEST_F(StanServices, run_markov_chain) {
   EXPECT_EQ(num_iterations, sampler->n_transition_called);
   EXPECT_EQ(num_iterations, callback.n);
 
-  EXPECT_EQ(expected_run_markov_chain_output, ss.str());
+  EXPECT_EQ(expected_output, ss.str());
 
   EXPECT_EQ("", output.str());
   EXPECT_EQ("", error.str());

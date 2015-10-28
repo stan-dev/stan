@@ -105,10 +105,10 @@
 #include <stan/services/io/write_model.hpp>
 #include <stan/services/io/write_stan.hpp>
 #include <stan/services/mcmc/print_progress.hpp>
-#include <stan/services/mcmc/run_markov_chain.hpp>
 #include <stan/services/mcmc/sample.hpp>
 #include <stan/services/mcmc/warmup.hpp>
 #include <stan/services/optimization/do_bfgs_optimize.hpp>
+#include <stan/services/sample/generate_transitions.hpp>
 #include <stan/services/sample/init_adapt.hpp>
 #include <stan/services/sample/init_nuts.hpp>
 #include <stan/services/sample/init_static_hmc.hpp>
