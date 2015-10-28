@@ -4,11 +4,12 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <Eigen/Dense>
-#include <stan/math/prim/mat/err/check_equal.hpp>
+#include <stan/math/prim/scal/err/check_equal.hpp>
 #include <stan/math/prim/mat/err/check_range.hpp>
 #include <stan/model/indexing/index.hpp>
 #include <stan/model/indexing/index_list.hpp>
 #include <stan/model/indexing/rvalue_at.hpp>
+#include <stan/model/indexing/rvalue_index_size.hpp>
 #include <vector>
 
 namespace stan {
@@ -55,7 +56,7 @@ namespace stan {
                        const U& y,
                        const char* name = "ANON", int depth = 0) {
       int i = idxs.head_.n_;
-      math::check_range("vector[uni] assign range", name, i, x.size());
+      math::check_range("vector[uni] assign range", name, x.size(), i);
       x(i - 1) = y;
     }
 
@@ -80,7 +81,7 @@ namespace stan {
                        const U& y,
                        const char* name = "ANON", int depth = 0) {
       int i = idxs.head_.n_;
-      math::check_range("row_vector[uni] assign range", name, i, x.size());
+      math::check_range("row_vector[uni] assign range", name, x.size(), i);
       x(i - 1) = y;
     }
 
@@ -112,7 +113,7 @@ namespace stan {
                         rvalue_index_size(idxs.head_, x.size()));
       for (int n = 0; n < y.size(); ++n) {
         int i = rvalue_at(n, idxs.head_);
-        math::check_range("vector[multi] assign range", name, i, x.size());
+        math::check_range("vector[multi] assign range", name, x.size(), i);
         x(i - 1) = y(n);
       }
     }
@@ -142,11 +143,12 @@ namespace stan {
            const cons_index_list<I, nil_index_list>& idxs,
            const Eigen::Matrix<U, 1, Eigen::Dynamic>& y,
            const char* name = "ANON", int depth = 0) {
-      math::check_equal("row_vector[multi] assign sizes", name, y.size(),
-                        rvalue_index_size(idxs.head_, x.size()));
+      using stan::math::check_equal;
+      check_equal("row_vector[multi] assign sizes",
+                  name, y.size(), rvalue_index_size(idxs.head_, x.size()));
       for (int n = 0; n < y.size(); ++n) {
         int i = rvalue_at(n, idxs.head_);
-        math::check_range("row_vector[multi] assign range", name, i, x.size());
+        math::check_range("row_vector[multi] assign range", name, x.size(), i);
         x(i - 1) = y(n);
       }
     }
@@ -172,11 +174,11 @@ namespace stan {
     template <typename T, typename U>
     void assign(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
                 const cons_index_list<index_uni, nil_index_list>& idxs,
-                const Eigen::Matrix<T, 1, Eigen::Dynamic>& y,
+                const Eigen::Matrix<U, 1, Eigen::Dynamic>& y,
                 const char* name = "ANON", int depth = 0) {
       math::check_equal("matrix[uni] assign sizes", name, y.cols(), x.cols());
       int i = idxs.head_.n_;
-      math::check_range("matrix[uni] assign range", name, i, x.rows());
+      math::check_range("matrix[uni] assign range", name, x.rows(), i);
       x.row(i - 1) = y;
     }
 
@@ -202,16 +204,16 @@ namespace stan {
     inline typename boost::disable_if<boost::is_same<I, index_uni>, void>::type
     assign(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
            const cons_index_list<I, nil_index_list>& idxs,
-           const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& y,
+           const Eigen::Matrix<U, Eigen::Dynamic, Eigen::Dynamic>& y,
            const char* name = "ANON", int depth = 0) {
       int x_idx_rows = rvalue_index_size(idxs.head_, x.rows());
-      math::check_equal("matrix[multi] assign sizes", name, y.rows(),
+      math::check_equal("matrix[multi] assign row sizes", name, y.rows(),
                         x_idx_rows);
-      math::check_equal("matrix[multi] assign sizes", name, y.cols(),
+      math::check_equal("matrix[multi] assign col sizes", name, y.cols(),
                         x.cols());
       for (int i = 0; i < y.rows(); ++i) {
         int m = rvalue_at(i, idxs.head_);
-        math::check_range("matrix[multi] assign range", name, m, x.rows());
+        math::check_range("matrix[multi] assign range", name, x.rows(), m);
         x.row(m - 1) = y.row(i);
       }
     }
@@ -240,8 +242,8 @@ namespace stan {
                 const char* name = "ANON", int depth = 0) {
       int m = idxs.head_.n_;
       int n = idxs.tail_.head_.n_;
-      math::check_range("matrix[uni,uni] assign range", name, m, x.rows());
-      math::check_range("matrix[uni,uni] assign range", name, n, x.cols());
+      math::check_range("matrix[uni,uni] assign range", name, x.rows(), m);
+      math::check_range("matrix[uni,uni] assign range", name, x.cols(), n);
       x(m - 1, n - 1) = y;
     }
 
@@ -275,10 +277,10 @@ namespace stan {
       math::check_equal("matrix[uni,multi] assign sizes", name, y.cols(),
                         x_idxs_cols);
       int m = idxs.head_.n_;
-      math::check_range("matrix[uni,multi] assign range", name, m, x.rows());
+      math::check_range("matrix[uni,multi] assign range", name, x.rows(), m);
       for (int i = 0; i < y.size(); ++i) {
         int n = rvalue_at(i, idxs.tail_.head_);
-        math::check_range("matrix[uni,multi] assign range", name, n, x.cols());
+        math::check_range("matrix[uni,multi] assign range", name, x.cols(), n);
         x(m - 1, n - 1) = y(i);
       }
     }
@@ -313,10 +315,10 @@ namespace stan {
       math::check_equal("matrix[multi,uni] assign sizes", name, y.rows(),
                         x_idxs_rows);
       int n = idxs.tail_.head_.n_;
-      math::check_range("matrix[multi,uni] assign range", name, n, x.cols());
+      math::check_range("matrix[multi,uni] assign range", name, x.cols(), n);
       for (int i = 0; i < y.size(); ++i) {
         int m = rvalue_at(i, idxs.head_);
-        math::check_range("matrix[multi,uni] assign range", name, m, x.rows());
+        math::check_range("matrix[multi,uni] assign range", name, x.rows(), m);
         x(m - 1, n - 1) = y(i);
       }
     }
@@ -357,12 +359,12 @@ namespace stan {
                         x_idxs_cols);
       for (int j = 0; j < y.cols(); ++j) {
         int n = rvalue_at(j, idxs.tail_.head_);
-        math::check_range("matrix[multi,multi] assign range", name, n,
-                          x.cols());
+        math::check_range("matrix[multi,multi] assign range", name,
+                          x.cols(), n);
         for (int i = 0; i < y.rows(); ++i) {
           int m = rvalue_at(i, idxs.head_);
-          math::check_range("matrix[multi,multi] assign range", name, m,
-                            x.rows());
+          math::check_range("matrix[multi,multi] assign range", name,
+                            x.rows(), m);
           x(m - 1, n - 1) = y(i, j);
         }
       }
@@ -397,7 +399,7 @@ namespace stan {
                        const char* name = "ANON", int depth = 0) {
 
       int i = idxs.head_.n_;
-      math::check_range("vector[uni,...] assign range", name, i, x.size());
+      math::check_range("vector[uni,...] assign range", name, x.size(), i);
       assign(x[i - 1], idxs.tail_, y, name, depth + 1);
     }
 
@@ -436,7 +438,7 @@ namespace stan {
                         x_idx_size);
       for (size_t n = 0; n < y.size(); ++n) {
         int i = rvalue_at(n, idxs.head_);
-        math::check_range("vector[multi,...] assign range", name, i, x.size());
+        math::check_range("vector[multi,...] assign range", name, x.size(), i);
         assign(x[i - 1], idxs.tail_, y[n], name, depth + 1);
       }
     }
