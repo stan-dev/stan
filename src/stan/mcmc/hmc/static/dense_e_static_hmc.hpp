@@ -13,15 +13,15 @@ namespace stan {
     // Hamiltonian Monte Carlo on a
     // Euclidean manifold with dense metric
     // and static integration time
-    template <typename M, class BaseRNG>
+    template <typename Model, class BaseRNG>
     class dense_e_static_hmc
-      : public base_static_hmc<M, dense_e_point, dense_e_metric,
+      : public base_static_hmc<Model, dense_e_point, dense_e_metric,
                                expl_leapfrog, BaseRNG> {
     public:
-      dense_e_static_hmc(M &m, BaseRNG& rng,
+      dense_e_static_hmc(Model &model, BaseRNG& rng,
                          std::ostream* o, std::ostream* e)
-        : base_static_hmc<M, dense_e_point, dense_e_metric,
-                          expl_leapfrog, BaseRNG>(m, rng, o, e) {
+        : base_static_hmc<Model, dense_e_point, dense_e_metric,
+                          expl_leapfrog, BaseRNG>(model, rng, o, e) {
         this->name_ = "Static HMC with a dense Euclidean metric";
       }
     };
