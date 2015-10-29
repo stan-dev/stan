@@ -96,7 +96,6 @@
 #include <stan/optimization/newton.hpp>
 #include <stan/optimization/bfgs.hpp>
 
-#include <stan/services/diagnose.hpp>
 #include <stan/services/init/initialize_state.hpp>
 #include <stan/services/io/do_print.hpp>
 #include <stan/services/io/write_error_msg.hpp>
@@ -106,7 +105,7 @@
 #include <stan/services/io/write_stan.hpp>
 #include <stan/services/mcmc/sample.hpp>
 #include <stan/services/mcmc/warmup.hpp>
-#include <stan/services/optimization/do_bfgs_optimize.hpp>
+#include <stan/services/optimize/do_bfgs_optimize.hpp>
 #include <stan/services/sample/generate_transitions.hpp>
 #include <stan/services/sample/init_adapt.hpp>
 #include <stan/services/sample/init_nuts.hpp>
