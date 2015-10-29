@@ -2,7 +2,7 @@
 #include <test/test-models/good/services/test_lp.hpp>
 #include <boost/random/additive_combine.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_unit_e_nuts.hpp>
-#include <stan/services/init/init_adapt.hpp>
+#include <stan/services/sample/init_adapt.hpp>
 
 typedef test_lp_model_namespace::test_lp_model Model;
 typedef boost::ecuyer1988 rng_t;
@@ -53,9 +53,9 @@ public:
 };
 
 TEST_F(UiCommand, init_adapt_z_0) {
-  EXPECT_TRUE(stan::services::init::init_adapt<sampler>(sampler_ptr,
-                                                        delta, gamma, kappa, t0,
-                                                        z_0, 0));
+  EXPECT_TRUE(stan::services::sample::init_adapt<sampler>(sampler_ptr,
+                                                          delta, gamma, kappa, t0,
+                                                          z_0, 0));
   EXPECT_FLOAT_EQ(0.125, sampler_ptr->get_nominal_stepsize());
 
   for (size_t n = 0; n < model->num_params_r(); n++) {
@@ -69,9 +69,9 @@ TEST_F(UiCommand, init_adapt_z_0) {
 
 
 TEST_F(UiCommand, init_adapt_z_init) {
-  EXPECT_TRUE(stan::services::init::init_adapt<sampler>(sampler_ptr,
-                                                        delta, gamma, kappa, t0,
-                                                        z_init, 0));
+  EXPECT_TRUE(stan::services::sample::init_adapt<sampler>(sampler_ptr,
+                                                          delta, gamma, kappa, t0,
+                                                          z_init, 0));
   EXPECT_FLOAT_EQ(0.25, sampler_ptr->get_nominal_stepsize());
   for (size_t n = 0; n < model->num_params_r(); n++) {
     EXPECT_FLOAT_EQ(z_init[n], sampler_ptr->z().q[n]);
