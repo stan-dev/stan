@@ -1,15 +1,15 @@
-#ifndef STAN_SERVICES_INIT_INIT_WINDOWED_ADAPT_HPP
-#define STAN_SERVICES_INIT_INIT_WINDOWED_ADAPT_HPP
+#ifndef STAN_SERVICES_SAMPLE_INIT_WINDOWED_ADAPT_HPP
+#define STAN_SERVICES_SAMPLE_INIT_WINDOWED_ADAPT_HPP
 
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/services/arguments/categorical_argument.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/services/init/init_adapt.hpp>
+#include <stan/services/sample/init_adapt.hpp>
 #include <ostream>
 
 namespace stan {
   namespace services {
-    namespace init {
+    namespace sample {
 
       template<class Sampler>
       bool init_windowed_adapt(stan::mcmc::base_mcmc* sampler,

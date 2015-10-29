@@ -1,4 +1,4 @@
-#include <stan/io/mcmc_writer.hpp>
+#include <stan/services/sample/mcmc_writer.hpp>
 #include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <test/test-models/good/io_example.hpp>
 
@@ -53,10 +53,10 @@ TEST(StanIoMcmcWriter, write_sample_names) {
   writer_t diagnostic_writer(diagnostic_stream, "# ");
   writer_t message_writer(message_stream, "# ");
 
-  stan::io::mcmc_writer<io_example_model_namespace::io_example_model,
-                        writer_t,
-                        writer_t,
-                        writer_t>
+  stan::services::sample::mcmc_writer<io_example_model_namespace::io_example_model,
+                                      writer_t,
+                                      writer_t,
+                                      writer_t>
     writer(sample_writer, diagnostic_writer, message_writer);
   
   writer.write_sample_names(sample, &sampler, model);
@@ -106,10 +106,10 @@ TEST(StanIoMcmcWriter, write_sample_params) {
   writer_t diagnostic_writer(diagnostic_stream, "# ");
   writer_t message_writer(message_stream, "# ");
 
-  stan::io::mcmc_writer<io_example_model_namespace::io_example_model,
-                        writer_t,
-                        writer_t,
-                        writer_t>
+  stan::services::sample::mcmc_writer<io_example_model_namespace::io_example_model,
+                                      writer_t,
+                                      writer_t,
+                                      writer_t>
     writer(sample_writer, diagnostic_writer, message_writer);
   
   writer.write_sample_params<rng_t>(base_rng, sample, sampler, model);
@@ -172,10 +172,10 @@ TEST(StanIoMcmcWriter, write_adapt_finish) {
   writer_t diagnostic_writer(diagnostic_stream, "# ");
   writer_t message_writer(message_stream, "# ");
 
-  stan::io::mcmc_writer<io_example_model_namespace::io_example_model,
-                        writer_t,
-                        writer_t,
-                        writer_t>
+  stan::services::sample::mcmc_writer<io_example_model_namespace::io_example_model,
+                                      writer_t,
+                                      writer_t,
+                                      writer_t>
     writer(sample_writer, diagnostic_writer, message_writer);
   
   writer.write_adapt_finish(&sampler);
@@ -266,10 +266,10 @@ TEST(StanIoMcmcWriter, write_diagnostic_names) {
   writer_t diagnostic_writer(diagnostic_stream, "# ");
   writer_t message_writer(message_stream, "# ");
 
-  stan::io::mcmc_writer<io_example_model_namespace::io_example_model,
-                        writer_t,
-                        writer_t,
-                        writer_t> 
+  stan::services::sample::mcmc_writer<io_example_model_namespace::io_example_model,
+                                      writer_t,
+                                      writer_t,
+                                      writer_t> 
     writer(sample_writer, diagnostic_writer, message_writer);
   
   writer.write_diagnostic_names(sample, &sampler, model);
@@ -325,10 +325,10 @@ TEST(StanIoMcmcWriter, write_diagnostic_params) {
   writer_t diagnostic_writer(diagnostic_stream, "# ");
   writer_t message_writer(message_stream, "# ");
 
-  stan::io::mcmc_writer<io_example_model_namespace::io_example_model,
-                        writer_t,
-                        writer_t,
-                        writer_t> 
+  stan::services::sample::mcmc_writer<io_example_model_namespace::io_example_model,
+                                      writer_t,
+                                      writer_t,
+                                      writer_t> 
     writer(sample_writer, diagnostic_writer, message_writer);
   
   writer.write_diagnostic_params(sample, &sampler);
@@ -394,10 +394,10 @@ TEST(StanIoMcmcWriter, write_timing) {
   writer_t diagnostic_writer(diagnostic_stream, "# ");
   writer_t message_writer(message_stream, "# ");
 
-  stan::io::mcmc_writer<io_example_model_namespace::io_example_model,
-                        writer_t,
-                        writer_t,
-                        writer_t> 
+  stan::services::sample::mcmc_writer<io_example_model_namespace::io_example_model,
+                                      writer_t,
+                                      writer_t,
+                                      writer_t> 
     writer(sample_writer, diagnostic_writer, message_writer);
   
   double warm = 0.193933;
