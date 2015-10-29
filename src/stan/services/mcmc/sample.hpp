@@ -29,15 +29,17 @@ namespace stan {
                   const std::string& suffix,
                   std::ostream& o,
                   StartTransitionCallback& callback) {
-        stan::services::sample::generate_transitions<Model, RNG, StartTransitionCallback,
-                                                     SampleRecorder, DiagnosticRecorder, MessageRecorder>(
-                                                                                                          sampler, num_samples, num_warmup,
-                                                                                                          num_warmup + num_samples, num_thin,
-                                                                                                          refresh, save, false,
-                                                                                                          writer,
-                                                                                                          init_s, model, base_rng,
-                                                                                                          prefix, suffix, o,
-                                                                                                          callback);
+        stan::services::sample::generate_transitions<Model, RNG,
+                                                     StartTransitionCallback,
+                                                     SampleRecorder,
+                                                     DiagnosticRecorder,
+                                                     MessageRecorder>
+          (sampler, num_samples, num_warmup, num_warmup + num_samples, num_thin,
+           refresh, save, false,
+           writer,
+           init_s, model, base_rng,
+           prefix, suffix, o,
+           callback);
       }
 
     }

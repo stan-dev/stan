@@ -30,7 +30,8 @@ namespace stan {
                   std::ostream& o,
                   StartTransitionCallback& callback) {
         sample::generate_transitions<Model, RNG, StartTransitionCallback,
-                                     SampleRecorder, DiagnosticRecorder, MessageRecorder>
+                                     SampleRecorder, DiagnosticRecorder,
+                                     MessageRecorder>
           (sampler, num_warmup, 0, num_warmup + num_samples, num_thin,
            refresh, save, true,
            writer,
