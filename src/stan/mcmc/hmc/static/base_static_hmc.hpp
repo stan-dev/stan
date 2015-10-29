@@ -19,11 +19,13 @@ namespace stan {
               template<class, class> class Hamiltonian,
               template<class> class Integrator,
               class BaseRNG>
-    class base_static_hmc : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
+    class base_static_hmc
+      : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     public:
       base_static_hmc(Model &model, BaseRNG& rng,
                       std::ostream* o, std::ostream* e)
-        : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng, o, e), T_(1) {
+        : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng, o, e),
+        T_(1) {
         update_L_();
       }
 

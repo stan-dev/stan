@@ -12,12 +12,12 @@
 #include <stan/mcmc/hmc/hamiltonians/dense_e_point.hpp>
 
 namespace stan {
-
   namespace mcmc {
 
     // Euclidean manifold with dense metric
     template <typename Model, typename BaseRNG>
-    class dense_e_metric : public base_hamiltonian<Model, dense_e_point, BaseRNG> {
+    class dense_e_metric
+      : public base_hamiltonian<Model, dense_e_point, BaseRNG> {
     public:
       dense_e_metric(Model& model, std::ostream* e)
         : base_hamiltonian<Model, dense_e_point, BaseRNG>(model, e) {}
@@ -63,7 +63,5 @@ namespace stan {
     };
 
   }  // mcmc
-
 }  // stan
-
 #endif

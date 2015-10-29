@@ -22,7 +22,7 @@ namespace stan {
       ~base_hamiltonian() {}
 
       typedef Point PointType;
-      
+
       virtual double T(Point& z) = 0;
 
       double V(Point& z) {

@@ -8,12 +8,12 @@
 #include <stan/mcmc/hmc/hamiltonians/unit_e_point.hpp>
 
 namespace stan {
-
   namespace mcmc {
 
     // Euclidean manifold with unit metric
     template <typename Model, typename BaseRNG>
-    class unit_e_metric : public base_hamiltonian<Model, unit_e_point, BaseRNG> {
+    class unit_e_metric
+      : public base_hamiltonian<Model, unit_e_point, BaseRNG> {
     public:
       unit_e_metric(Model& model, std::ostream* e)
         : base_hamiltonian<Model, unit_e_point, BaseRNG>(model, e) {}
@@ -54,7 +54,5 @@ namespace stan {
     };
 
   }  // mcmc
-
 }  // stan
-
 #endif

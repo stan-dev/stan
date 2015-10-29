@@ -170,7 +170,8 @@ namespace stan {
       }
 
       virtual bool compute_criterion(ps_point& start,
-                                     typename Hamiltonian<Model, BaseRNG>::PointType& finish,
+                                     typename Hamiltonian<Model, BaseRNG>
+                                     ::PointType& finish,
                                      Eigen::VectorXd& rho) = 0;
 
       // Returns number of valid points in the completed subtree
