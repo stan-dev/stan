@@ -14,12 +14,12 @@ namespace stan {
     // Euclidean manifold with unit metric
     template <typename Model, class BaseRNG>
     class unit_e_nuts
-      : public base_nuts<Model, unit_e_point, unit_e_metric,
+      : public base_nuts<Model, unit_e_metric,
                          expl_leapfrog, BaseRNG> {
     public:
       unit_e_nuts(Model &model, BaseRNG& rng, std::ostream* o,
                   std::ostream* e)
-        : base_nuts<Model, unit_e_point, unit_e_metric, expl_leapfrog,
+        : base_nuts<Model, unit_e_metric, expl_leapfrog,
                     BaseRNG>(model, rng, o, e) {
         this->name_ = "NUTS with a unit Euclidean metric";
       }

@@ -37,12 +37,12 @@ public:
   
   // integrator under test
   stan::mcmc::expl_leapfrog<
-    stan::mcmc::unit_e_metric<command_model_namespace::command_model,rng_t>, 
-    stan::mcmc::unit_e_point> unit_e_integrator;
+    stan::mcmc::unit_e_metric<command_model_namespace::command_model,rng_t> >
+  unit_e_integrator;
 
   stan::mcmc::expl_leapfrog<
-    stan::mcmc::diag_e_metric<command_model_namespace::command_model,rng_t>, 
-    stan::mcmc::diag_e_point> diag_e_integrator;
+    stan::mcmc::diag_e_metric<command_model_namespace::command_model,rng_t> >
+  diag_e_integrator;
   
   // model
   command_model_namespace::command_model *model;
@@ -393,8 +393,8 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, streams) {
   stan::test::capture_std_streams();
 
   typedef stan::mcmc::expl_leapfrog<
-    stan::mcmc::unit_e_metric<command_model_namespace::command_model,rng_t>, 
-    stan::mcmc::unit_e_point> integrator;
+    stan::mcmc::unit_e_metric<command_model_namespace::command_model,rng_t> >
+    integrator;
   EXPECT_NO_THROW(integrator i(0));
   
   std::stringstream out;

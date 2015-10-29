@@ -7,13 +7,11 @@
 #include <stan/mcmc/hmc/integrators/expl_leapfrog.hpp>
 
 namespace stan {
-
   namespace mcmc {
 
     // Hamiltonian Monte Carlo on a
     // Euclidean manifold with unit metric
     // and static integration time
-
     template <typename Model, class BaseRNG>
     class unit_e_static_hmc
       : public base_static_hmc<Model, unit_e_point,  unit_e_metric,
@@ -28,7 +26,5 @@ namespace stan {
     };
 
   }  // mcmc
-
 }  // stan
-
 #endif

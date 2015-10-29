@@ -6,16 +6,17 @@
 #include <iomanip>
 
 namespace stan {
-
   namespace mcmc {
 
-    template <typename H, typename P>
-    class base_leapfrog : public base_integrator<H, P> {
+    template <typename Hamiltonian>
+    class base_leapfrog : public base_integrator<Hamiltonian> {
     public:
       explicit base_leapfrog(std::ostream* o)
-        : base_integrator<H, P>(o) {}
+        : base_integrator<Hamiltonian>(o) {}
 
-      void evolve(P& z, H& hamiltonian, const double epsilon) {
+      void evolve(typename Hamiltonian::PointType& z,
+                  Hamiltonian& hamiltonian,
+                  const double epsilon) {
         begin_update_p(z, hamiltonian, 0.5 * epsilon);
 
         update_q(z, hamiltonian, epsilon);
@@ -24,7 +25,9 @@ namespace stan {
         end_update_p(z, hamiltonian, 0.5 * epsilon);
       }
 
-      void verbose_evolve(P& z, H& hamiltonian, const double epsilon) {
+      void verbose_evolve(typename Hamiltonian::PointType& z,
+                          Hamiltonian& hamiltonian,
+                          const double epsilon) {
         this->out_stream_->precision(6);
         int width = 14;
         int nColumn = 4;
@@ -103,13 +106,18 @@ namespace stan {
         }
       }
 
-      virtual void begin_update_p(P& z, H& hamiltonian, double epsilon) = 0;
-      virtual void update_q(P& z, H& hamiltonian, double epsilon) = 0;
-      virtual void end_update_p(P& z, H& hamiltonian, double epsilon) = 0;
+      virtual void begin_update_p(typename Hamiltonian::PointType& z,
+                                  Hamiltonian& hamiltonian,
+                                  double epsilon) = 0;
+      virtual void update_q(typename Hamiltonian::PointType& z,
+                            Hamiltonian& hamiltonian,
+                            double epsilon) = 0;
+      virtual void end_update_p(typename Hamiltonian::PointType& z,
+                                Hamiltonian& hamiltonian,
+                                double epsilon) = 0;
     };
 
   }  // mcmc
-
 }  // stan
 
 #endif
