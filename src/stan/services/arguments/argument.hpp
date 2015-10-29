@@ -15,7 +15,7 @@ namespace stan {
         : indent_width(2),
           help_width(20) { }
 
-      argument(const std::string name)
+      explicit argument(const std::string name)
         : _name(name),
           indent_width(2),
           help_width(20) { }

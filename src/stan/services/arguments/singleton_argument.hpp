@@ -44,7 +44,7 @@ namespace stan {
     template<typename T>
     class singleton_argument: public valued_argument {
     public:
-      singleton_argument(): _validity("All") {
+      explicit singleton_argument(): _validity("All") {
         _constrained = false;
         _name = "";
         _value_type = type_name<T>::name();
