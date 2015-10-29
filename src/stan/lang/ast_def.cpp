@@ -1589,10 +1589,58 @@ namespace stan {
         expr_(expr) {
     }
 
+    var_occurs_vis::var_occurs_vis(const variable& e)
+      : var_name_(e.name_) { 
+    }
+    
+    bool var_occurs_vis::operator()(const nil& st) const {
+      return false;
+    }
+    bool var_occurs_vis::operator()(const int_literal& e) const {
+      return false;
+    }
+    bool var_occurs_vis::operator()(const double_literal& e) const {
+      return false;
+    }
+    bool var_occurs_vis::operator()(const array_literal& e) const {
+      return false;  // TODO(carpenter): update for array_literal
+    }
+    bool var_occurs_vis::operator()(const variable& e) const {
+      return var_name_ == e.name_;
+    }
+    bool var_occurs_vis::operator()(const fun& e) const {
+      for (size_t i = 0; i < e.args_.size(); ++i)
+        if (boost::apply_visitor(*this, e.args_[i].expr_))
+          return true;
+      return false;
+    }
+    bool var_occurs_vis::operator()(const integrate_ode& e) const {
+      return false;  // no refs persist out of integrate_ode() call
+    }
+    bool var_occurs_vis::operator()(const index_op& e) const {
+      // refs only persist out of expression, not indexes
+      return boost::apply_visitor(*this, e.expr_.expr_);
+    }
+    bool var_occurs_vis::operator()(const index_op_sliced& e) const {
+      return boost::apply_visitor(*this, e.expr_.expr_);
+    }
+    bool var_occurs_vis::operator()(const binary_op& e) const {
+      return boost::apply_visitor(*this, e.left.expr_)
+        || boost::apply_visitor(*this, e.right.expr_);
+    }
+    bool var_occurs_vis::operator()(const unary_op& e) const {
+      return boost::apply_visitor(*this, e.subject.expr_);
+    }
+
     assgn::assgn() { }
     assgn::assgn(const variable& lhs_var, const std::vector<idx>& idxs,
                  const expression& rhs)
       : lhs_var_(lhs_var), idxs_(idxs), rhs_(rhs) { }
+
+    bool assgn::lhs_var_occurs_on_rhs() const {
+      var_occurs_vis vis(lhs_var_);
+      return boost::apply_visitor(vis, rhs_.expr_);
+    }
 
     expr_type indexed_type(const expression& e,
                            const std::vector<idx> idxs) {

@@ -927,6 +927,23 @@ namespace stan {
                  expression& expr);
     };
 
+
+    struct var_occurs_vis : public boost::static_visitor<bool> {
+      const std::string var_name_;
+      var_occurs_vis(const variable& e);
+      bool operator()(const nil& e) const;
+      bool operator()(const int_literal& e) const;
+      bool operator()(const double_literal& e) const;
+      bool operator()(const array_literal& e) const;
+      bool operator()(const variable& e) const;
+      bool operator()(const fun& e) const;
+      bool operator()(const integrate_ode& e) const;
+      bool operator()(const index_op& e) const;
+      bool operator()(const index_op_sliced& e) const;
+      bool operator()(const binary_op& e) const;
+      bool operator()(const unary_op& e) const;
+    };
+
     struct assgn {
       variable lhs_var_;
       std::vector<idx> idxs_;
@@ -934,6 +951,7 @@ namespace stan {
       assgn();
       assgn(const variable& lhs_var, const std::vector<idx>& idxs,
             const expression& rhs);
+      bool lhs_var_occurs_on_rhs() const;
     };
 
     /**

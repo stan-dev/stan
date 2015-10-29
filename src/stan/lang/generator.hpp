@@ -234,6 +234,11 @@ namespace stan {
         generate_expression(x.expr_, o_);
         o_ << ", ";
         generate_idxs(x.idxs_, o_);
+        o_ << ", ";
+        o_ << '"';
+        bool user_facing = true;
+        generate_expression(x.expr_, user_facing, o_);
+        o_ << '"';
         o_ << ")";
       }
       void operator()(const integrate_ode& fx) const {
@@ -1745,8 +1750,21 @@ namespace stan {
            << EOL;
 
         generate_indent(indent_ + 3, o_);
-        generate_expression(y.rhs_, o_);
+        if (y.lhs_var_occurs_on_rhs()) {
+          o_ << "stan::model::deep_copy(";
+          generate_expression(y.rhs_, o_);
+          o_ << ")";
+        } else {
+          generate_expression(y.rhs_, o_);
+        }       
 
+        o_ << ", "
+           << EOL;
+        generate_indent(indent_ + 3, o_);
+        o_ << '"' 
+           << "assigning variable "
+           << y.lhs_var_.name_
+           << '"';
         o_ << ");"
            << EOL;
       }
