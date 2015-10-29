@@ -13,43 +13,45 @@ namespace stan {
 
   namespace mcmc {
 
-    template <typename M, typename P, typename BaseRNG>
+    template <typename Model, typename Point, typename BaseRNG>
     class base_hamiltonian {
     public:
-      base_hamiltonian(M& m, std::ostream* e)
+      base_hamiltonian(Model& m, std::ostream* e)
         : model_(m), err_stream_(e) {}
 
       ~base_hamiltonian() {}
 
-      virtual double T(P& z) = 0;
+      typedef Point PointType;
+      
+      virtual double T(Point& z) = 0;
 
-      double V(P& z) {
+      double V(Point& z) {
         return z.V;
       }
 
-      virtual double tau(P& z) = 0;
+      virtual double tau(Point& z) = 0;
 
-      virtual double phi(P& z) = 0;
+      virtual double phi(Point& z) = 0;
 
-      double H(P& z) {
+      double H(Point& z) {
         return T(z) + V(z);
       }
 
       // tau = 0.5 p_{i} p_{j} Lambda^{ij} (q)
-      virtual const Eigen::VectorXd dtau_dq(P& z) = 0;
+      virtual const Eigen::VectorXd dtau_dq(Point& z) = 0;
 
-      virtual const Eigen::VectorXd dtau_dp(P& z) = 0;
+      virtual const Eigen::VectorXd dtau_dp(Point& z) = 0;
 
       // phi = 0.5 * log | Lambda (q) | + V(q)
-      virtual const Eigen::VectorXd dphi_dq(P& z) = 0;
+      virtual const Eigen::VectorXd dphi_dq(Point& z) = 0;
 
-      virtual void sample_p(P& z, BaseRNG& rng) = 0;
+      virtual void sample_p(Point& z, BaseRNG& rng) = 0;
 
-      virtual void init(P& z) {
+      virtual void init(Point& z) {
         this->update(z);
       }
 
-      virtual void update(P& z) {
+      virtual void update(Point& z) {
         try {
           stan::model::gradient(model_, z.q, z.V, z.g, err_stream_);
           z.V *= -1;
@@ -61,7 +63,7 @@ namespace stan {
       }
 
     protected:
-        M& model_;
+        Model& model_;
 
         std::ostream* err_stream_;
 
@@ -87,7 +89,6 @@ namespace stan {
     };
 
   }  // mcmc
-
 }  // stan
 
 #endif
