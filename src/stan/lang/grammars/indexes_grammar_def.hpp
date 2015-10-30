@@ -75,7 +75,6 @@ namespace stan {
       struct result<F(T1, T2, T3)> { typedef void type; };
       void operator()(const expression & e, bool& pass,
                       std::ostream& error_msgs) const {
-        std::cout << std::endl << "validating INT_T" << std::endl << std::endl;
         if (e.expression_type().type() != INT_T) {
           error_msgs << "index must be integer; found type=";
           write_base_expr_type(error_msgs, e.expression_type().type());

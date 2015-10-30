@@ -181,6 +181,8 @@ namespace stan {
 
     void generate_idxs(const std::vector<idx>& idxs,
                        std::ostream& o);
+    void generate_idxs_user(const std::vector<idx>& idxs,
+                            std::ostream& o);
 
     struct expression_visgen : public visgen {
       const bool user_facing_;
@@ -230,6 +232,15 @@ namespace stan {
                                      e_num_dims, user_facing_, o_);
       }
       void operator()(const index_op_sliced& x) const {
+        if (x.idxs_.size() == 0) {
+          generate_expression(x.expr_, user_facing_, o_);
+          return;
+        }
+        if (user_facing_) {
+          generate_expression(x.expr_, user_facing_, o_);
+          generate_idxs_user(x.idxs_, o_);
+          return;
+        }
         o_ << "stan::model::rvalue(";
         generate_expression(x.expr_, o_);
         o_ << ", ";
@@ -1699,6 +1710,52 @@ namespace stan {
     void generate_idxs(const std::vector<idx>& idxs, std::ostream& o) {
       generate_idxs(0, idxs, o);
     }
+
+
+    struct idx_user_visgen : public visgen {
+      explicit idx_user_visgen(std::ostream& o): visgen(o) { }
+      void operator()(const uni_idx& i) const {
+        generate_expression(i.idx_, true, o_);
+      }
+      void operator()(const multi_idx& i) const {
+        generate_expression(i.idxs_, true, o_);
+      }
+      void operator()(const omni_idx& i) const {
+        o_ << " ";
+      }
+      void operator()(const lb_idx& i) const {
+        generate_expression(i.lb_, true, o_);
+        o_ << ": ";
+      }
+      void operator()(const ub_idx& i) const {
+        o_ << " :";
+        generate_expression(i.ub_, true, o_);
+      }
+      void operator()(const lub_idx& i) const {
+        generate_expression(i.lb_, true, o_);
+        o_ << ":";
+        generate_expression(i.ub_, true, o_);
+      }
+    };
+
+    void generate_idx_user(const idx& i, std::ostream& o) {
+      idx_user_visgen vis(o);
+      boost::apply_visitor(vis, i.idx_);
+    }
+
+    void generate_idxs_user(const std::vector<idx>& idxs, std::ostream& o) {
+      if (idxs.size() == 0)
+        return;
+      o << "[";
+      for (size_t i = 0; i < idxs.size(); ++i) {
+        if (i > 0) 
+          o << ", ";
+        generate_idx_user(idxs[i], o);
+      }
+      o << "]";
+    }
+
+
 
     void generate_statement(statement const& s, int indent, std::ostream& o,
                             bool include_sampling, bool is_var,

@@ -25,7 +25,7 @@ TEST(LangGrammars,test1) {
   test_throws("err-integrate-ode-comma",
               "PARSER EXPECTED: \",");
   test_throws("err-non-int-dims",
-              "array indices must be integer expressions; found type=real");
+              "index must be integer; found type=real");
   test_throws("err-no-cond-else-if",
               "PARSER EXPECTED: \"(");
   test_throws("err-no-cond",
@@ -41,7 +41,7 @@ TEST(LangGrammars,test1) {
   test_throws("err-decl-matrix",
               "PARSER EXPECTED: \",");
   test_throws("err-decl-matrix-2",
-              "indexed expression dimensionality = 0; indexes supplied = 1");
+              "indexed expression dims=0; num indexes=1");
   test_throws("err-decl-no-expression",
               "PARSER EXPECTED: <expression>");
   test_throws("err-decl-double",
