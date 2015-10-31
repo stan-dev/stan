@@ -41,12 +41,15 @@ namespace stan {
     };
 
     // Mock Hamiltonian
-    template <typename M, typename BaseRNG>
-    class mock_hamiltonian: public base_hamiltonian<M, ps_point, BaseRNG> {
+    template <typename Model, typename BaseRNG>
+    class mock_hamiltonian: public base_hamiltonian<Model,
+                                                    ps_point,
+                                                    BaseRNG> {
       
     public:
       
-      mock_hamiltonian(M& m): base_hamiltonian<M, ps_point, BaseRNG> (m) {};
+      mock_hamiltonian(Model& model)
+        : base_hamiltonian<Model, ps_point, BaseRNG> (model) {};
       
       double T(ps_point& z) { return 0; }
       
@@ -70,13 +73,15 @@ namespace stan {
     };
     
     // Mock Integrator
-    template <typename H>
-    class mock_integrator: public base_integrator<H> {
+    template <typename Hamiltonian>
+    class mock_integrator: public base_integrator<Hamiltonian> {
     
     public:
-      mock_integrator(): base_integrator<H>() {}
+      mock_integrator(): base_integrator<Hamiltonian>() {}
       
-      void evolve(typename H::PointType& z, H& hamiltonian, const double epsilon) {
+      void evolve(typename Hamiltonian::PointType& z,
+                  Hamiltonian& hamiltonian,
+                  const double epsilon) {
         z.q += epsilon * z.p;
       };
       

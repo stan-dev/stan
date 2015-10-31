@@ -36,11 +36,11 @@ public:
   // integrator under test
   stan::mcmc::expl_leapfrog<
     stan::mcmc::unit_e_metric<command_model_namespace::command_model, rng_t> >
-      unit_e_integrator;
+  unit_e_integrator;
 
   stan::mcmc::expl_leapfrog<
     stan::mcmc::diag_e_metric<command_model_namespace::command_model, rng_t> >
-      diag_e_integrator;
+  diag_e_integrator;
 
   // model
   command_model_namespace::command_model *model;
@@ -367,7 +367,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, streams) {
 
   typedef stan::mcmc::expl_leapfrog<
     stan::mcmc::unit_e_metric<command_model_namespace::command_model, rng_t> >
-      integrator;
+    integrator;
   EXPECT_NO_THROW(integrator i);
 
   stan::test::reset_std_streams();

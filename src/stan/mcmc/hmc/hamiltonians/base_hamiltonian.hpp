@@ -17,8 +17,8 @@ namespace stan {
     template <class Model, class Point, class BaseRNG>
     class base_hamiltonian {
     public:
-      explicit base_hamiltonian(Model& m):
-        model_(m), info_buffer_(), err_buffer_() {}
+      explicit base_hamiltonian(Model& model):
+        model_(model), info_buffer_(), err_buffer_() {}
 
       ~base_hamiltonian() {}
 

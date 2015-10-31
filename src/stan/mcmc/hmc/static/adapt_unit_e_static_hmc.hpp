@@ -12,17 +12,17 @@ namespace stan {
     // Euclidean manifold with unit metric,
     // static integration time,
     // and adaptive stepsize
-    template <class M, class BaseRNG>
-    class adapt_unit_e_static_hmc : public unit_e_static_hmc<M, BaseRNG>,
+    template <class Model, class BaseRNG>
+    class adapt_unit_e_static_hmc : public unit_e_static_hmc<Model, BaseRNG>,
                                     public stepsize_adapter {
     public:
-      adapt_unit_e_static_hmc(M &m, BaseRNG& rng)
-        : unit_e_static_hmc<M, BaseRNG>(m, rng) { }
+      adapt_unit_e_static_hmc(Model &model, BaseRNG& rng)
+        : unit_e_static_hmc<Model, BaseRNG>(model, rng) { }
 
       ~adapt_unit_e_static_hmc() { }
 
       sample transition(sample& init_sample) {
-        sample s = unit_e_static_hmc<M, BaseRNG>::transition(init_sample);
+        sample s = unit_e_static_hmc<Model, BaseRNG>::transition(init_sample);
 
         if (this->adapt_flag_) {
           this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,

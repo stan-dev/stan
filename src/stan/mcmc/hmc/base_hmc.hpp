@@ -21,11 +21,11 @@ namespace stan {
               class BaseRNG>
     class base_hmc : public base_mcmc {
     public:
-      base_hmc(Model &m, BaseRNG& rng)
+      base_hmc(Model &model, BaseRNG& rng)
         : base_mcmc(),
-          z_(m.num_params_r()),
+          z_(model.num_params_r()),
           integrator_(),
-          hamiltonian_(m),
+          hamiltonian_(model),
           rand_int_(rng),
           rand_uniform_(rand_int_),
           nom_epsilon_(0.1),
@@ -115,7 +115,7 @@ namespace stan {
         this->z_.ps_point::operator=(z_init);
       }
 
-     typename Hamiltonian<Model, BaseRNG>::PointType& z() {
+      typename Hamiltonian<Model, BaseRNG>::PointType& z() {
         return z_;
       }
 

@@ -8,7 +8,6 @@
 #include <stan/mcmc/hmc/hamiltonians/unit_e_point.hpp>
 
 namespace stan {
-
   namespace mcmc {
 
     // Euclidean manifold with unit metric
@@ -55,7 +54,5 @@ namespace stan {
     };
 
   }  // mcmc
-
 }  // stan
-
 #endif

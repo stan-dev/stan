@@ -12,7 +12,6 @@
 #include <stan/mcmc/hmc/hamiltonians/dense_e_point.hpp>
 
 namespace stan {
-
   namespace mcmc {
 
     // Euclidean manifold with dense metric
@@ -64,7 +63,5 @@ namespace stan {
     };
 
   }  // mcmc
-
 }  // stan
-
 #endif

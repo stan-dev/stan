@@ -7,17 +7,17 @@
 #include <stan/mcmc/hmc/integrators/expl_leapfrog.hpp>
 
 namespace stan {
-
   namespace mcmc {
 
     // The No-U-Turn Sampler (NUTS) on a
     // Euclidean manifold with dense metric
-    template <class M, class BaseRNG>
-    class dense_e_nuts : public base_nuts<M, dense_e_metric,
+    template <class Model, class BaseRNG>
+    class dense_e_nuts : public base_nuts<Model, dense_e_metric,
                                           expl_leapfrog, BaseRNG> {
     public:
-      dense_e_nuts(M &m, BaseRNG& rng)
-        : base_nuts<M, dense_e_metric, expl_leapfrog, BaseRNG>(m, rng) {
+      dense_e_nuts(Model &model, BaseRNG& rng)
+        : base_nuts<Model, dense_e_metric, expl_leapfrog,
+                    BaseRNG>(model, rng) {
         this->name_ = "NUTS with a dense Euclidean metric";
       }
 
@@ -32,7 +32,5 @@ namespace stan {
     };
 
   }  // mcmc
-
 }  // stan
-
 #endif

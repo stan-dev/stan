@@ -5,7 +5,6 @@
 #include <stan/mcmc/hmc/integrators/base_leapfrog.hpp>
 
 namespace stan {
-
   namespace mcmc {
 
     template <typename Hamiltonian>
@@ -35,7 +34,6 @@ namespace stan {
     };
 
   }  // mcmc
-
 }  // stan
 
 #endif

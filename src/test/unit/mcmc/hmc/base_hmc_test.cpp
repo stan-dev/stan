@@ -21,9 +21,9 @@ namespace stan {
 
     public:
 
-      mock_hmc(mock_model& m, rng_t& rng) :
+      mock_hmc(mock_model& model, rng_t& rng) :
         base_hmc<mock_model, mock_hamiltonian, mock_integrator, rng_t>
-          (m, rng)
+          (model, rng)
       { this->name_ = "Mock HMC"; }
 
 

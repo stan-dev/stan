@@ -8,7 +8,6 @@
 #include <string>
 
 namespace stan {
-
   namespace mcmc {
 
     template <typename Hamiltonian>

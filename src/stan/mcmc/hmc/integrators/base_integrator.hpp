@@ -4,7 +4,6 @@
 #include <ostream>
 
 namespace stan {
-
   namespace mcmc {
 
     template <typename Hamiltonian>
@@ -17,7 +16,6 @@ namespace stan {
     };
 
   }  // mcmc
-
 }  // stan
 
 #endif

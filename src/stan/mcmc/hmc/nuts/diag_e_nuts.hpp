@@ -13,12 +13,13 @@ namespace stan {
     // The No-U-Turn Sampler (NUTS) on a
     // Euclidean manifold with diagonal metric
 
-    template <class M, class BaseRNG>
-    class diag_e_nuts : public base_nuts<M, diag_e_metric,
+    template <class Model, class BaseRNG>
+    class diag_e_nuts : public base_nuts<Model, diag_e_metric,
                                          expl_leapfrog, BaseRNG> {
     public:
-      diag_e_nuts(M &m, BaseRNG& rng)
-        : base_nuts<M, diag_e_metric, expl_leapfrog, BaseRNG>(m, rng) {
+      diag_e_nuts(Model &model, BaseRNG& rng)
+        : base_nuts<Model, diag_e_metric, expl_leapfrog,
+                    BaseRNG>(model, rng) {
         this->name_ = "NUTS with a diagonal Euclidean metric";
       }
 

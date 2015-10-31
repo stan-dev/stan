@@ -12,18 +12,18 @@ namespace stan {
     // Euclidean manifold with dense metric,
     // static integration time,
     // and adaptive stepsize
-    template <class M, class BaseRNG>
-    class adapt_dense_e_static_hmc : public dense_e_static_hmc<M, BaseRNG>,
+    template <class Model, class BaseRNG>
+    class adapt_dense_e_static_hmc : public dense_e_static_hmc<Model, BaseRNG>,
                                      public stepsize_covar_adapter {
     public:
-      adapt_dense_e_static_hmc(M &m, BaseRNG& rng)
-        : dense_e_static_hmc<M, BaseRNG>(m, rng),
-        stepsize_covar_adapter(m.num_params_r()) { }
+      adapt_dense_e_static_hmc(Model &model, BaseRNG& rng)
+        : dense_e_static_hmc<Model, BaseRNG>(model, rng),
+        stepsize_covar_adapter(model.num_params_r()) { }
 
       ~adapt_dense_e_static_hmc() { }
 
       sample transition(sample& init_sample) {
-        sample s = dense_e_static_hmc<M, BaseRNG>::transition(init_sample);
+        sample s = dense_e_static_hmc<Model, BaseRNG>::transition(init_sample);
 
         if (this->adapt_flag_) {
           this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,

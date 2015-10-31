@@ -11,18 +11,18 @@ namespace stan {
     // The No-U-Turn Sampler (NUTS) on a
     // Euclidean manifold with dense metric
     // and adaptive stepsize
-    template <class M, class BaseRNG>
-    class adapt_dense_e_nuts : public dense_e_nuts<M, BaseRNG>,
+    template <class Model, class BaseRNG>
+    class adapt_dense_e_nuts : public dense_e_nuts<Model, BaseRNG>,
                                public stepsize_covar_adapter {
     public:
-        adapt_dense_e_nuts(M &m, BaseRNG& rng)
-          : dense_e_nuts<M, BaseRNG>(m, rng),
-          stepsize_covar_adapter(m.num_params_r()) {}
+        adapt_dense_e_nuts(Model &model, BaseRNG& rng)
+          : dense_e_nuts<Model, BaseRNG>(model, rng),
+          stepsize_covar_adapter(model.num_params_r()) {}
 
       ~adapt_dense_e_nuts() {}
 
       sample transition(sample& init_sample) {
-        sample s = dense_e_nuts<M, BaseRNG>::transition(init_sample);
+        sample s = dense_e_nuts<Model, BaseRNG>::transition(init_sample);
 
         if (this->adapt_flag_) {
           this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,
