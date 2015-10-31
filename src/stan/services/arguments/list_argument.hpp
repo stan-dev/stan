@@ -122,7 +122,7 @@ namespace stan {
         for (std::vector<argument*>::iterator it = _values.begin();
              it != _values.end(); ++it) {
           std::string value_prefix = prefix + _name + "=" + (*it)->name() + " ";
-          (*it)->find_arg(name, new_prefix, valid_paths);
+          (*it)->find_arg(name, value_prefix, valid_paths);
         }
       }
 
