@@ -146,7 +146,7 @@ namespace stan {
         }
       }
 
-      BFGSMinimizer(FunctorType &f) : _func(f) { }
+      explicit BFGSMinimizer(FunctorType &f) : _func(f) { }
 
       void initialize(const VectorT &x0) {
         int ret;
