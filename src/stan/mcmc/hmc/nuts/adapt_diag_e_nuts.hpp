@@ -19,7 +19,7 @@ namespace stan {
         adapt_diag_e_nuts(Model &model, BaseRNG& rng,
                           std::ostream* o, std::ostream* e)
           : diag_e_nuts<Model, BaseRNG>(model, rng, o, e),
-          stepsize_var_adapter(m.num_params_r()) {}
+          stepsize_var_adapter(model.num_params_r()) {}
 
       ~adapt_diag_e_nuts() {}
 
