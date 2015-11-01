@@ -152,8 +152,8 @@ namespace stan {
         > eps;
 
       omni_index_r
-        = lit(":")[set_omni_idx_f(_val)];
-      // > eps;
+        = lit(":")[set_omni_idx_f(_val)]
+        |  eps[set_omni_idx_f(_val)];
 
       int_expression_r
         %= expression_g(_r1)

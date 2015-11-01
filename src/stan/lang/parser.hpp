@@ -77,6 +77,8 @@ namespace stan {
       buf << input.rdbuf();
       std::string stan_string = buf.str();
 
+      std::cout << "stan_string=" << stan_string << std::endl;
+
       typedef std::string::const_iterator input_iterator;
       typedef boost::spirit::line_pos_iterator<input_iterator> lp_iterator;
 
@@ -120,7 +122,7 @@ namespace stan {
                 << std::endl;
         }
         throw std::invalid_argument(msg.str());
-      } catch (const std::runtime_error& e) {
+      } catch (const std::exception& e) {
         std::stringstream msg;
         msg << "PROGRAM ERROR, MESSAGE(S) FROM PARSER:"
             << std::endl

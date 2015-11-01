@@ -1642,9 +1642,24 @@ namespace stan {
       return boost::apply_visitor(vis, rhs_.expr_);
     }
 
+    /**
+     * Return the expression type for the result of applying the
+     * specified indexes to the specified expression.  If the reuslt
+     * is ill typed, the output type is <code>ILL_FORMED_T</code> and
+     * dimensions are <code>OU</code>.
+     *
+     * @param[in] e Expression to index.
+     * @param[in] idxs Vector of indexes.
+     * @return Type of indexed expression.
+     */
     expr_type indexed_type(const expression& e,
-                           const std::vector<idx> idxs) {
+                           const std::vector<idx>& idxs) {
       expr_type e_type = e.expression_type();
+
+      // TODO(carpenter): remove this and others in function 
+      std::cout << std::endl << "*** indexed_type() ***" << std::endl;
+      std::cout << "  e.expression_type() = " << e_type << std::endl;
+
       base_expr_type base_type = e_type.base_type_;
       size_t base_dims = e_type.num_dims_;
       size_t unindexed_dims = base_dims;

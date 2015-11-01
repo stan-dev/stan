@@ -41,14 +41,14 @@
 #include <vector>
 
 
-BOOST_FUSION_ADAPT_STRUCT(stan::lang::assignment,
-                          (stan::lang::variable_dims, var_dims_)
-                          (stan::lang::expression, expr_) )
-
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::assgn,
                           (stan::lang::variable, lhs_var_)
                           (std::vector<stan::lang::idx>, idxs_)
                           (stan::lang::expression, rhs_) )
+
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::assignment,
+                          (stan::lang::variable_dims, var_dims_)
+                          (stan::lang::expression, expr_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::variable_dims,
                           (std::string, name_)
@@ -163,6 +163,7 @@ namespace stan {
                       bool& pass,
                       const variable_map& vm,
                       std::ostream& error_msgs) const {
+        std::cout << std::endl << "*** identifier_to_var: " << std::endl;
         // validate existence
         if (!vm.exists(name)) {
           error_msgs << "unknown variable in assignment"
@@ -200,9 +201,12 @@ namespace stan {
           return;
         }
 
-
         v = variable(name);
         v.set_type(vm.get_base_type(name), vm.get_num_dims(name));
+
+        // TODO(carpenter): remove this and others in function 
+        std::cout << "  v.expression_type()=" << v.type_ << std::endl;
+        
         pass = true;
       }
     };
@@ -219,11 +223,19 @@ namespace stan {
       void operator()(const assgn& a,
                       bool& pass,
                       std::ostream& error_msgs) const {
+        std::cout << std::endl << "*** validate_assign_f" << std::endl;
+
         // resolve type of lhs[idxs] and make sure it matches rhs
         std::string name = a.lhs_var_.name_;
+        std::cout << "  validate_assgn: variable type="
+                  << a.lhs_var_.type_
+                  << " name=" << name
+                  << std::endl;
         expression lhs_expr = expression(a.lhs_var_);
         expr_type lhs_type = indexed_type(lhs_expr, a.idxs_);
         if (lhs_type.is_ill_formed()) {
+          // TODO(carpenter): remove this debug print
+          std::cout << "ILL FFFFORMED" << std::endl;
           error_msgs << "too many indexes for variable "
                      << "; variable name=" << name
                      << "; dims available=" << lhs_expr.total_dims()
@@ -232,6 +244,8 @@ namespace stan {
           pass = false;
           return;
         }
+        std::cout << "    validate_assgin_f: 2" << std::endl;
+
         expr_type rhs_type = a.rhs_.expression_type();
         base_expr_type lhs_base_type = lhs_type.base_type_;
         base_expr_type rhs_base_type = rhs_type.base_type_;
@@ -251,6 +265,8 @@ namespace stan {
           pass = false;
           return;
         }
+        std::cout << "    validate_assgin_f: 3" << std::endl;
+
         if (lhs_type.num_dims_ != rhs_type.num_dims_) {
           error_msgs << "dimension mismatch in assignment"
                      << "; variable name="
@@ -263,6 +279,9 @@ namespace stan {
           pass = false;
           return;
         }
+
+        std::cout << "    validate_assgin_f: 4" << std::endl;
+
         if (a.lhs_var_occurs_on_rhs()) {
           // this only requires a warning --- a deep copy will be made
           error_msgs << "WARNING: left-hand side variable"
@@ -271,6 +290,9 @@ namespace stan {
                      << " inefficient deep copy to avoid aliasing."
                      << std::endl;
         }
+        std::cout << "    validate_assgin_f: 5; PASSED!" << std::endl;
+
+
         pass = true;
       }
     };
@@ -967,19 +989,20 @@ namespace stan {
       assignment_r
         %= (var_lhs_r(_r1)
             >> lit("<-"))
-        > expression_rhs_r(_r1)
+        >> expression_rhs_r(_r1)
           [validate_assignment_f(_val, _r1, _pass,
                                  boost::phoenix::ref(var_map_),
                                  boost::phoenix::ref(error_msgs_))]
-        > lit(';');
+        >> lit(';');
 
       assgn_r.name("assginment statement");
       assgn_r
-        = var_r(_r1)
-        > -indexes_g(_r1)
-        > lit("<-")
-        > expression_g(_r1)
-          [validate_assgn_f(_val, _pass, boost::phoenix::ref(error_msgs_))];
+        %= var_r(_r1)
+        >> indexes_g(_r1)
+        >> lit("<-")
+        >> expression_g(_r1)
+        > eps[validate_assgn_f(_val, _pass, boost::phoenix::ref(error_msgs_))]
+        > lit(';');
 
       var_r.name("variable for left-hand side of assignment");
       var_r
@@ -999,15 +1022,15 @@ namespace stan {
 
       opt_dims_r.name("array dimensions (optional)");
       opt_dims_r
-        %=  * dims_r(_r1);
+        %=  *dims_r(_r1);
 
       dims_r.name("array dimensions");
       dims_r
         %= lit('[')
-        > (expression_g(_r1)
+        >> (expression_g(_r1)
            [validate_int_expr2_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
-           % ',')
-        > lit(']');
+            % ',')
+        >> lit(']');
 
       // inherited  _r1 = true if samples allowed as statements
       sample_r.name("distribution of expression");

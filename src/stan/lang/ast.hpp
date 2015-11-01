@@ -964,7 +964,7 @@ namespace stan {
      * @return Type of expression applied to indexes.
      */
     expr_type indexed_type(const expression& e,
-                           const std::vector<idx> idxs);
+                           const std::vector<idx>& idxs);
 
     // FIXME:  is this next dependency necessary?
     // from generator.hpp
