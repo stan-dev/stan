@@ -77,8 +77,6 @@ namespace stan {
       buf << input.rdbuf();
       std::string stan_string = buf.str();
 
-      std::cout << "stan_string=" << stan_string << std::endl;
-
       typedef std::string::const_iterator input_iterator;
       typedef boost::spirit::line_pos_iterator<input_iterator> lp_iterator;
 

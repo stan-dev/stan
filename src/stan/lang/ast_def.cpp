@@ -1656,10 +1656,6 @@ namespace stan {
                            const std::vector<idx>& idxs) {
       expr_type e_type = e.expression_type();
 
-      // TODO(carpenter): remove this and others in function 
-      std::cout << std::endl << "*** indexed_type() ***" << std::endl;
-      std::cout << "  e.expression_type() = " << e_type << std::endl;
-
       base_expr_type base_type = e_type.base_type_;
       size_t base_dims = e_type.num_dims_;
       size_t unindexed_dims = base_dims;

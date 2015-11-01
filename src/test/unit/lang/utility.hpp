@@ -66,7 +66,6 @@ bool is_parsable(const std::string& file_name,
 bool is_parsable_folder(const std::string& model_name,
                         const std::string folder = "good",
                         std::ostream* msgs = 0) {
-  std::cout << "model_name =" << model_name << std::endl;
   std::string path("src/test/test-models/");
   path += folder;
   path += "/";
@@ -81,7 +80,6 @@ bool is_parsable_folder(const std::string& model_name,
  * @param model_name Name of model to parse
  */
 void test_parsable(const std::string& model_name) {
-  std::cout << "testing parsability of model=" << model_name << std::endl;
   {
     SCOPED_TRACE("parsing: " + model_name);
     EXPECT_TRUE(is_parsable_folder(model_name, "good"));
