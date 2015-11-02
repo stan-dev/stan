@@ -17,10 +17,10 @@ namespace stan {
         : indent_width(2),
           help_width(20) { }
 
-      explicit argument(const std::string name):
-        _name(name),
-        indent_width(2),
-        help_width(20) { }
+      explicit argument(const std::string& name)
+        : _name(name),
+          indent_width(2),
+          help_width(20) { }
 
       virtual ~argument() { }
 
@@ -50,8 +50,8 @@ namespace stan {
       virtual void probe_args(argument* base_arg,
                               interface_callbacks::writer::base_writer& w) {}
 
-      virtual void find_arg(std::string name,
-                            std::string prefix,
+      virtual void find_arg(const std::string& name,
+                            const std::string& prefix,
                             std::vector<std::string>& valid_paths) {
         if (name == _name) {
           valid_paths.push_back(prefix + _name);
@@ -72,7 +72,7 @@ namespace stan {
         }
       }
 
-      virtual argument* arg(const std::string name) {
+      virtual argument* arg(const std::string& name) {
         return 0;
       }
 

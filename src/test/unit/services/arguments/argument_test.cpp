@@ -4,7 +4,7 @@
 
 class test_arg_impl : public stan::services::argument {
   void print(stan::interface_callbacks::writer::base_writer& w,
-             int depth, const std::string prefix) {}
+             int depth, const std::string& prefix) {}
   void print_help(stan::interface_callbacks::writer::base_writer& w,
                   int depth, bool recurse) {}
 };

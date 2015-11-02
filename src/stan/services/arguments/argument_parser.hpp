@@ -137,7 +137,7 @@ namespace stan {
       }
 
       void print(interface_callbacks::writer::base_writer& w,
-                 std::string prefix = "") {
+                 const std::string& prefix = "") {
         for (size_t i = 0; i < _arguments.size(); ++i) {
           _arguments.at(i)->print(w, 0, prefix);
         }
@@ -222,7 +222,7 @@ namespace stan {
         w();
       }
 
-      argument* arg(std::string name) {
+      argument* arg(const std::string& name) {
         for (std::vector<argument*>::iterator it = _arguments.begin();
              it != _arguments.end(); ++it)
           if ( name == (*it)->name() )

@@ -111,8 +111,8 @@ namespace stan {
         _value = _default_value;
       }
 
-      void find_arg(std::string name,
-                    std::string prefix,
+      void find_arg(const std::string& name,
+                    const std::string& prefix,
                     std::vector<std::string>& valid_paths) {
         if (name == _name) {
           valid_paths.push_back(prefix + _name + "=<" + _value_type + ">");

@@ -10,7 +10,7 @@ namespace stan {
     class valued_argument: public argument {
     public:
       virtual void print(interface_callbacks::writer::base_writer& w,
-                         const int depth, const std::string prefix) {
+                         const int depth, const std::string& prefix) {
         std::string indent(compute_indent(depth), ' ');
 
         std::string msg = prefix + std::string(compute_indent(depth), ' ')
