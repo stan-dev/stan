@@ -128,7 +128,7 @@ namespace stan {
           error_codes::OK : error_codes::USAGE;
       }
 
-      void print(std::ostream* s, const std::string prefix = "") {
+      void print(std::ostream* s, const std::string& prefix = "") {
         if (!s)
           return;
 
@@ -196,7 +196,7 @@ namespace stan {
            << "for details on individual arguments." << std::endl << std::endl;
       }
 
-      argument* arg(std::string name) {
+      argument* arg(const std::string& name) {
         for (std::vector<argument*>::iterator it = _arguments.begin();
              it != _arguments.end(); ++it)
           if ( name == (*it)->name() )

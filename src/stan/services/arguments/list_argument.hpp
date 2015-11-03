@@ -25,7 +25,7 @@ namespace stan {
         _values.clear();
       }
 
-      void print(std::ostream* s, int depth, const std::string prefix) {
+      void print(std::ostream* s, int depth, const std::string& prefix) {
         valued_argument::print(s, depth, prefix);
         _values.at(_cursor)->print(s, depth + 1, prefix);
       }
@@ -112,22 +112,21 @@ namespace stan {
         _cursor = _default_cursor;
       }
 
-      void find_arg(std::string name,
-                    std::string prefix,
+      void find_arg(const std::string& name,
+                    const std::string& prefix,
                     std::vector<std::string>& valid_paths) {
         if (name == _name) {
           valid_paths.push_back(prefix + _name + "=<list_element>");
         }
 
-        prefix += _name + "=";
         for (std::vector<argument*>::iterator it = _values.begin();
              it != _values.end(); ++it) {
-          std::string value_prefix = prefix + (*it)->name() + " ";
-          (*it)->find_arg(name, prefix, valid_paths);
+          std::string value_prefix = prefix + _name + "=" + (*it)->name() + " ";
+          (*it)->find_arg(name, value_prefix, valid_paths);
         }
       }
 
-      bool valid_value(std::string name) {
+      bool valid_value(const std::string& name) {
         for (std::vector<argument*>::iterator it = _values.begin();
              it != _values.end(); ++it)
           if (name == (*it)->name())
@@ -135,7 +134,7 @@ namespace stan {
         return false;
       }
 
-      argument* arg(std::string name) {
+      argument* arg(const std::string& name) {
         if (name == _values.at(_cursor)->name())
           return _values.at(_cursor);
         else

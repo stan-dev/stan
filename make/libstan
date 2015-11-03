@@ -12,6 +12,6 @@ $(TEMPLATE_INSTANTIATION) : bin/%.o : src/%.cpp
 ##
 # Generate dependencies for libraries
 ##
-ifneq (,$(filter-out test-headers clean% %-test %.d,$(MAKECMDGOALS)))
+ifneq (,$(filter $(STANC_TESTS),$(MAKECMDGOALS)))
   -include $(addsuffix .d,$(basename $(TEMPLATE_INSTANTIATION)))
 endif

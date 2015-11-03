@@ -19,7 +19,7 @@ namespace stan {
         _subarguments.clear();
       }
 
-      void print(std::ostream* s, const int depth, const std::string prefix) {
+      void print(std::ostream* s, const int depth, const std::string& prefix) {
         if (!s)
           return;
         std::string indent(compute_indent(depth), ' ');
@@ -117,22 +117,22 @@ namespace stan {
         }
       }
 
-      void find_arg(std::string name,
-                    std::string prefix,
+      void find_arg(const std::string& name,
+                    const std::string& prefix,
                     std::vector<std::string>& valid_paths) {
         argument::find_arg(name, prefix, valid_paths);
 
-        prefix += _name + " ";
+        std::string new_prefix = prefix + _name + " ";
         for (std::vector<argument*>::iterator it = _subarguments.begin();
              it != _subarguments.end(); ++it)
-          (*it)->find_arg(name, prefix, valid_paths);
+          (*it)->find_arg(name, new_prefix, valid_paths);
       }
 
       std::vector<argument*>& subarguments() {
         return _subarguments;
       }
 
-      argument* arg(const std::string name) {
+      argument* arg(const std::string& name) {
         for (std::vector<argument*>::iterator it = _subarguments.begin();
              it != _subarguments.end(); ++it)
           if ( name == (*it)->name() )

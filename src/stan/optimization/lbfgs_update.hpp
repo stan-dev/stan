@@ -21,7 +21,7 @@ namespace stan {
       typedef Eigen::Matrix<Scalar, DimAtCompile, DimAtCompile> HessianT;
       typedef boost::tuple<Scalar, VectorT, VectorT> UpdateT;
 
-      LBFGSUpdate(size_t L = 5) : _buf(L) {}
+      explicit LBFGSUpdate(size_t L = 5) : _buf(L) {}
 
       /**
        * Set the number of inverse Hessian updates to keep.
