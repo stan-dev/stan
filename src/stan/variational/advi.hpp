@@ -109,7 +109,6 @@ namespace stan {
             elbo += energy_i;
             i += 1;
           } catch (std::domain_error& e) {
-            this->write_error_msg_(print_stream_, e);
             n_monte_carlo_drop += 1;
             if (n_monte_carlo_drop >= n_monte_carlo_elbo_) {
               const char* name = "The number of dropped evaluations";
@@ -214,8 +213,6 @@ namespace stan {
             try {
               calc_ELBO_grad(variational, elbo_grad);
             } catch (std::domain_error& e) {
-              if (print_stream_)
-                *print_stream_ << e.what() << std::endl;
               elbo_grad.reset_to_zero();
             }
 
@@ -235,8 +232,6 @@ namespace stan {
           try {
             elbo = calc_ELBO(variational);
           } catch (std::domain_error& e) {
-            if (print_stream_)
-                *print_stream_ << e.what() << std::endl;
             elbo = -std::numeric_limits<double>::max();
           }
 
@@ -638,23 +633,6 @@ namespace stan {
 
       double rel_difference_(double prev, double curr) const {
         return std::abs(curr - prev) / std::abs(prev);
-      }
-
-      void write_error_msg_(std::ostream* error_msgs,
-                            const std::exception& e) const {
-        if (!error_msgs) {
-          return;
-        }
-
-        *error_msgs
-          << std::endl
-          << "Informational Message: The current sample evaluation "
-          << "of the ELBO is ignored because of the following issue:"
-          << std::endl
-          << e.what() << std::endl
-          << "If this warning occurs often then your model may be "
-          << "either severely ill-conditioned or misspecified."
-          << std::endl;
       }
     };
   }  // variational
