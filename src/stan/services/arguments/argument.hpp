@@ -2,7 +2,6 @@
 #define STAN_SERVICES_ARGUMENTS_ARGUMENT_HPP
 
 #include <stan/interface_callbacks/writer/base_writer.hpp>
-
 #include <vector>
 #include <string>
 #include <sstream>
@@ -32,12 +31,13 @@ namespace stan {
         return _description;
       }
 
-
       virtual void print(interface_callbacks::writer::base_writer& w,
-                         const int depth, const std::string prefix) = 0;
+                         const int depth,
+                         const std::string& prefix) = 0;
 
       virtual void print_help(interface_callbacks::writer::base_writer& w,
-                              const int depth, const bool recurse) = 0;
+                              const int depth,
+                              const bool recurse) = 0;
 
       virtual bool parse_args(std::vector<std::string>& args,
                               interface_callbacks::writer::base_writer& info,
@@ -45,7 +45,6 @@ namespace stan {
                               bool& help_flag) {
         return true;
       }
-
 
       virtual void probe_args(argument* base_arg,
                               interface_callbacks::writer::base_writer& w) {}

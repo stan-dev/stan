@@ -78,11 +78,11 @@ namespace stan {
           T proposed_value = boost::lexical_cast<T>(value);
 
           if (!set_value(proposed_value)) {
-            std::stringstream msg;
-            msg << proposed_value << " is not a valid value for "
-                << "\"" << _name << "\"";
-            err(msg.str());
-
+            std::stringstream message;
+            message << proposed_value
+                    << " is not a valid value for "
+                    << "\"" << _name << "\"";
+            err(message.str());
             err(std::string(indent_width, ' ')
                 + "Valid values:" + print_valid());
 
@@ -94,10 +94,9 @@ namespace stan {
       }
 
       virtual void probe_args(argument* base_arg,
-                              interface_callbacks::writer::base_writer& w) {
+                            stan::interface_callbacks::writer::base_writer& w) {
         w("good");
         _value = _good_value;
-
         base_arg->print(w, 0, "");
         w();
 

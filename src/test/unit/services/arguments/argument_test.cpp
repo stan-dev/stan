@@ -1,6 +1,7 @@
 #include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/services/arguments/argument.hpp>
 #include <gtest/gtest.h>
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 
 class test_arg_impl : public stan::services::argument {
   void print(stan::interface_callbacks::writer::base_writer& w,

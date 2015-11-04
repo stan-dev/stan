@@ -20,8 +20,10 @@ namespace stan {
       }
 
       void print(interface_callbacks::writer::base_writer& w,
-                 const int depth, const std::string& prefix) {
-        w(prefix + std::string(compute_indent(depth), ' ') + _name);
+                 const int depth,
+                 const std::string& prefix) {
+        std::string indent(compute_indent(depth), ' ');
+        w(prefix + indent + _name);
 
         for (std::vector<argument*>::iterator it = _subarguments.begin();
              it != _subarguments.end(); ++it)
@@ -29,24 +31,24 @@ namespace stan {
       }
 
       void print_help(interface_callbacks::writer::base_writer& w,
-                      const int depth, const bool recurse) {
+                      const int depth,
+                      const bool recurse) {
         std::string indent(indent_width * depth, ' ');
         std::string subindent(indent_width, ' ');
 
         w(indent + _name);
         w(indent + subindent + _description);
         if (_subarguments.size() > 0) {
-          w(indent + subindent + "Valid subarguments:");
+          std::stringstream ss;
+          ss << indent << subindent << "Valid subarguments:";
 
           std::vector<argument*>::iterator it = _subarguments.begin();
-
-          std::string subargs(" " + (*it)->name());
+          ss << " " << (*it)->name();
           ++it;
 
           for (; it != _subarguments.end(); ++it)
-            subargs += ", " + (*it)->name();
-
-          w(subargs);
+            ss << ", " << (*it)->name();
+          w(ss.str());
           w();
 
           if (recurse) {

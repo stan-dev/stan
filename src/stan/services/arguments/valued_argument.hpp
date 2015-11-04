@@ -10,19 +10,20 @@ namespace stan {
     class valued_argument: public argument {
     public:
       virtual void print(interface_callbacks::writer::base_writer& w,
-                         const int depth, const std::string& prefix) {
+                         const int depth,
+                         const std::string& prefix) {
         std::string indent(compute_indent(depth), ' ');
 
-        std::string msg = prefix + std::string(compute_indent(depth), ' ')
-                          + _name + " = " + print_value();
+        std::string message = prefix + indent + _name + " = " + print_value();
 
         if (is_default())
-          msg += " (Default)";
-        w(msg);
+          message +=" (Default)";
+        w(message);
       }
 
       virtual void print_help(interface_callbacks::writer::base_writer& w,
-                              const int depth, const bool recurse = false) {
+                              const int depth,
+                              const bool recurse = false) {
         std::string indent(indent_width * depth, ' ');
         std::string subindent(indent_width, ' ');
 

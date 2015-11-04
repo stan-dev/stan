@@ -118,8 +118,8 @@ namespace stan {
             }
 
             if (valid_paths.size()) {
-              err("Perhaps you meant one of the "
-                  + std::string("following valid configurations?"));
+              err("Perhaps you meant one of the following "
+                  "valid configurations?");
               for (size_t i = 0; i < valid_paths.size(); ++i)
                 err("  " + valid_paths.at(i));
             }
@@ -133,7 +133,7 @@ namespace stan {
           err("A method must be specified!");
 
         return (valid_arg && good_arg && _method_flag)
-               ? error_codes::OK : error_codes::USAGE;
+          ? error_codes::OK : error_codes::USAGE;
       }
 
       void print(interface_callbacks::writer::base_writer& w,
@@ -158,47 +158,37 @@ namespace stan {
         w(std::string("Usage: ") + executable
           + " <arg1> <subarg1_1> ... <subarg1_m>"
           + " ... <arg_n> <subarg_n_1> ... <subarg_n_m>");
+        w();
 
-        w(std::string("Begin by selecting amongst the following ")
-          + " inference methods and diagnostics,");
+        w("Begin by selecting amongst the following inference methods"
+          " and diagnostics,");
 
         std::vector<argument*>::iterator arg_it = _arguments.begin();
         list_argument* method = dynamic_cast<list_argument*>(*arg_it);
 
         std::stringstream ss;
-
+        ss << std::left;
         for (std::vector<argument*>::iterator value_it
                = method->values().begin();
              value_it != method->values().end(); ++value_it) {
-          ss.str(std::string());
-          ss.clear();
-
+          ss.str("");
           ss << std::setw(width)
              << indent + (*value_it)->name()
              << indent + (*value_it)->description();
-
           w(ss.str());
         }
-
         w();
+
         w("Or see help information with");
-
-        ss.str(std::string());
-        ss.clear();
-
+        ss.str("");
         ss << std::setw(width)
            << indent + "help"
            << indent + "Prints help";
-
         w(ss.str());
-
-        ss.str(std::string());
-        ss.clear();
-
+        ss.str("");
         ss << std::setw(width)
            << indent + "help-all"
            << indent + "Prints entire argument tree";
-
         w(ss.str());
         w();
 
@@ -206,13 +196,10 @@ namespace stan {
 
         ++arg_it;
         for (; arg_it != _arguments.end(); ++arg_it) {
-          ss.str(std::string());
-          ss.clear();
-
+          ss.str("");
           ss << std::setw(width)
              << indent + (*arg_it)->name()
              << indent + (*arg_it)->description();
-
           w(ss.str());
         }
 

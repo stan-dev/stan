@@ -15,16 +15,17 @@ namespace stan {
         : _is_present(false) {}
 
       void print(interface_callbacks::writer::base_writer& w,
-                 const int depth, const std::string& prefix) {}
+                 const int depth,
+                 const std::string& prefix) {}
 
       void print_help(interface_callbacks::writer::base_writer& w,
-                      const int depth, const bool recurse = false) {
+                      const int depth,
+                      const bool recurse = false) {
         std::string indent(indent_width * depth, ' ');
         std::string subindent(indent_width, ' ');
 
-        w(std::string(indent_width * depth, ' ') + _name);
-        w(std::string(indent_width * (depth + 1), ' ')
-          + _description);
+        w(indent + _name);
+        w(indent + subindent + _description);
         w();
       }
 

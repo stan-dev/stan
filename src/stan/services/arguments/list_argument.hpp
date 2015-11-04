@@ -1,6 +1,7 @@
 #ifndef STAN_SERVICES_ARGUMENTS_LIST_ARGUMENT_HPP
 #define STAN_SERVICES_ARGUMENTS_LIST_ARGUMENT_HPP
 
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/services/arguments/valued_argument.hpp>
 #include <stan/services/arguments/arg_fail.hpp>
 #include <iostream>
@@ -26,13 +27,15 @@ namespace stan {
       }
 
       void print(interface_callbacks::writer::base_writer& w,
-                 int depth, const std::string& prefix) {
+                 int depth,
+                 const std::string& prefix) {
         valued_argument::print(w, depth, prefix);
         _values.at(_cursor)->print(w, depth + 1, prefix);
       }
 
       void print_help(interface_callbacks::writer::base_writer& w,
-                      int depth, bool recurse) {
+                      int depth,
+                      bool recurse) {
         _default = _values.at(_default_cursor)->name();
 
         valued_argument::print_help(w, depth);
@@ -44,12 +47,12 @@ namespace stan {
         }
       }
 
-
       bool parse_args(std::vector<std::string>& args,
                       interface_callbacks::writer::base_writer& info,
                       interface_callbacks::writer::base_writer& err,
                       bool& help_flag) {
-        if (args.size() == 0) return true;
+        if (args.size() == 0)
+          return true;
 
         std::string name;
         std::string value;
@@ -82,13 +85,13 @@ namespace stan {
           }
 
           if (!good_arg) {
-            std::stringstream msg;
-            msg << value << " is not a valid value for \"" << _name << "\"";
-            err(msg.str());
-
+            std::stringstream message;
+            message << value << " is not a valid value for \""
+                    << _name << "\"";
+            err(message.str());
             err(std::string(indent_width, ' ')
-                + "Valid values:" + print_valid());
-
+                + "Valid values:"
+                + print_valid());
             args.clear();
           }
           return valid_arg && good_arg;
@@ -97,7 +100,7 @@ namespace stan {
       }
 
       virtual void probe_args(argument* base_arg,
-                              interface_callbacks::writer::base_writer& w) {
+                           stan::interface_callbacks::writer::base_writer& w) {
         for (size_t i = 0; i < _values.size(); ++i) {
           _cursor = i;
 
@@ -110,7 +113,6 @@ namespace stan {
 
         _values.push_back(new arg_fail);
         _cursor = _values.size() - 1;
-
         w("bad");
         base_arg->print(w, 0, "");
         w();

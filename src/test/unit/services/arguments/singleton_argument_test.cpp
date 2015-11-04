@@ -1,8 +1,8 @@
 #include <stan/interface_callbacks/writer/noop_writer.hpp>
 #include <gtest/gtest.h>
 #include <stan/services/arguments/singleton_argument.hpp>
-
-typedef stan::interface_callbacks::writer::noop_writer writer_t;
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
+#include <stan/interface_callbacks/writer/noop_writer.hpp>
 
 template <typename T>
 T argument_value() {
@@ -45,6 +45,7 @@ public:
   }
   
   stan::services::argument *arg;
+  std::stringstream ss;
 };
 
 TYPED_TEST_CASE_P(StanServicesArgumentsSingleton);
@@ -77,11 +78,13 @@ TYPED_TEST_P(StanServicesArgumentsSingleton, parse_args) {
   bool return_value;
   std::vector<std::string> args;
   bool help_flag;
-  
+  stan::interface_callbacks::writer::stream_writer out(this->ss);
+  stan::interface_callbacks::writer::noop_writer err;
+
   return_value = false;
   args.clear();
   help_flag = false;
-  return_value = this->arg->parse_args(args, info, err, help_flag);
+  return_value = this->arg->parse_args(args,out,err,help_flag);
   
   EXPECT_TRUE(return_value);
   EXPECT_FALSE(help_flag);
@@ -91,7 +94,7 @@ TYPED_TEST_P(StanServicesArgumentsSingleton, parse_args) {
   args.clear();
   args.push_back("help");
   help_flag = false;
-  return_value = this->arg->parse_args(args, info, err, help_flag);
+  return_value = this->arg->parse_args(args,out,err,help_flag);
   
   EXPECT_TRUE(return_value);
   EXPECT_TRUE(help_flag);
@@ -101,7 +104,7 @@ TYPED_TEST_P(StanServicesArgumentsSingleton, parse_args) {
   args.clear();
   args.push_back("help-all");
   help_flag = false;
-  return_value = this->arg->parse_args(args, info, err, help_flag);
+  return_value = this->arg->parse_args(args,out,err,help_flag);
   
   EXPECT_TRUE(return_value);
   EXPECT_TRUE(help_flag);
@@ -112,7 +115,7 @@ TYPED_TEST_P(StanServicesArgumentsSingleton, parse_args) {
   args.clear();
   args.push_back("argument=" + argument_string<TypeParam>());
   help_flag = false;
-  return_value = this->arg->parse_args(args, info, err, help_flag);
+  return_value = this->arg->parse_args(args,out,err,help_flag);
   
   EXPECT_TRUE(return_value);
   EXPECT_FALSE(help_flag);
@@ -128,12 +131,14 @@ TYPED_TEST_P(StanServicesArgumentsSingleton, parse_args_unexpected) {
   bool return_value;
   std::vector<std::string> args;
   bool help_flag;
+  stan::interface_callbacks::writer::stream_writer out(this->ss);
+  stan::interface_callbacks::writer::noop_writer err;
   
   return_value = false;
   args.clear();
   args.push_back("foo=bar");
   help_flag = false;
-  return_value = this->arg->parse_args(args, info, err, help_flag);
+  return_value = this->arg->parse_args(args,out,err,help_flag);
   
   EXPECT_TRUE(return_value);
   EXPECT_FALSE(help_flag);
