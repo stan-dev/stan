@@ -34,7 +34,7 @@ namespace stan {
       virtual void print(interface_callbacks::writer::base_writer& w,
                          const int depth,
                          const std::string& prefix) = 0;
-      
+
       virtual void print_help(interface_callbacks::writer::base_writer& w,
                               const int depth,
                               const bool recurse) = 0;

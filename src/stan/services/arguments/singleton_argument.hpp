@@ -94,7 +94,7 @@ namespace stan {
       }
 
       virtual void probe_args(argument* base_arg,
-                              stan::interface_callbacks::writer::base_writer& w) {
+                            stan::interface_callbacks::writer::base_writer& w) {
         w("good");
         _value = _good_value;
         base_arg->print(w, 0, "");

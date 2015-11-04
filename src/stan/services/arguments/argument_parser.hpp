@@ -145,16 +145,17 @@ namespace stan {
         std::string indent(2, ' ');
         int width = 12;
 
-        w(std::string("Usage: ") + executable + " <arg1> <subarg1_1> ... <subarg1_m>"
+        w(std::string("Usage: ") + executable
+          + " <arg1> <subarg1_1> ... <subarg1_m>"
           + " ... <arg_n> <subarg_n_1> ... <subarg_n_m>");
         w();
-        
+
         w("Begin by selecting amongst the following inference methods"
           " and diagnostics,");
 
         std::vector<argument*>::iterator arg_it = _arguments.begin();
         list_argument* method = dynamic_cast<list_argument*>(*arg_it);
-        
+
         std::stringstream ss;
         ss << std::left;
         for (std::vector<argument*>::iterator value_it
@@ -167,7 +168,7 @@ namespace stan {
           w(ss.str());
         }
         w();
-        
+
         w("Or see help information with");
         ss.str("");
         ss << std::setw(width)

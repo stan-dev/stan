@@ -100,7 +100,7 @@ namespace stan {
       }
 
       virtual void probe_args(argument* base_arg,
-                              stan::interface_callbacks::writer::base_writer& w) {
+                           stan::interface_callbacks::writer::base_writer& w) {
         for (size_t i = 0; i < _values.size(); ++i) {
           _cursor = i;
 
