@@ -1,6 +1,7 @@
 #ifndef STAN_SERVICES_ARGUMENTS_LIST_ARGUMENT_HPP
 #define STAN_SERVICES_ARGUMENTS_LIST_ARGUMENT_HPP
 
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/services/arguments/valued_argument.hpp>
 #include <stan/services/arguments/arg_fail.hpp>
 #include <iostream>
@@ -25,25 +26,31 @@ namespace stan {
         _values.clear();
       }
 
-      void print(std::ostream* s, int depth, const std::string& prefix) {
-        valued_argument::print(s, depth, prefix);
-        _values.at(_cursor)->print(s, depth + 1, prefix);
+      void print(interface_callbacks::writer::base_writer& w,
+                 int depth,
+                 const std::string& prefix) {
+        valued_argument::print(w, depth, prefix);
+        _values.at(_cursor)->print(w, depth + 1, prefix);
       }
 
-      void print_help(std::ostream* s, int depth, bool recurse) {
+      void print_help(interface_callbacks::writer::base_writer& w,
+                      int depth,
+                      bool recurse) {
         _default = _values.at(_default_cursor)->name();
 
-        valued_argument::print_help(s, depth);
+        valued_argument::print_help(w, depth);
 
         if (recurse) {
           for (std::vector<argument*>::iterator it = _values.begin();
                it != _values.end(); ++it)
-            (*it)->print_help(s, depth + 1, true);
+            (*it)->print_help(w, depth + 1, true);
         }
       }
 
-      bool parse_args(std::vector<std::string>& args, std::ostream* out,
-                      std::ostream* err, bool& help_flag) {
+      bool parse_args(std::vector<std::string>& args,
+                      interface_callbacks::writer::base_writer& info,
+                      interface_callbacks::writer::base_writer& err,
+                      bool& help_flag) {
         if (args.size() == 0)
           return true;
 
@@ -52,12 +59,12 @@ namespace stan {
         split_arg(args.back(), name, value);
 
         if (_name == "help") {
-          print_help(out, 0, false);
+          print_help(info, 0, false);
           help_flag |= true;
           args.clear();
           return false;
         } else if (_name == "help-all") {
-          print_help(out, 0, true);
+          print_help(info, 0, true);
           help_flag |= true;
           args.clear();
           return false;
@@ -72,18 +79,19 @@ namespace stan {
 
             _cursor = i;
             valid_arg
-              &= _values.at(_cursor)->parse_args(args, out, err, help_flag);
+              &= _values.at(_cursor)->parse_args(args, info, err, help_flag);
             good_arg = true;
             break;
           }
 
           if (!good_arg) {
-            if (err) {
-              *err << value << " is not a valid value for \""
-                   << _name << "\"" << std::endl;
-              *err << std::string(indent_width, ' ')
-                   << "Valid values:" << print_valid() << std::endl;
-            }
+            std::stringstream message;
+            message << value << " is not a valid value for \""
+                    << _name << "\"";
+            err(message.str());
+            err(std::string(indent_width, ' ')
+                + "Valid values:"
+                + print_valid());
             args.clear();
           }
           return valid_arg && good_arg;
@@ -91,22 +99,23 @@ namespace stan {
         return true;
       }
 
-      virtual void probe_args(argument* base_arg, std::stringstream& s) {
+      virtual void probe_args(argument* base_arg,
+                              stan::interface_callbacks::writer::base_writer& w) {
         for (size_t i = 0; i < _values.size(); ++i) {
           _cursor = i;
 
-          s << "good" << std::endl;
-          base_arg->print(&s, 0, "");
-          s << std::endl;
+          w("good");
+          base_arg->print(w, 0, "");
+          w();
 
-          _values.at(i)->probe_args(base_arg, s);
+          _values.at(i)->probe_args(base_arg, w);
         }
 
         _values.push_back(new arg_fail);
         _cursor = _values.size() - 1;
-        s << "bad" << std::endl;
-        base_arg->print(&s, 0, "");
-        s << std::endl;
+        w("bad");
+        base_arg->print(w, 0, "");
+        w();
 
         _values.pop_back();
         _cursor = _default_cursor;
