@@ -20,6 +20,7 @@ ifeq (clang++,$(CC_TYPE))
   CFLAGS += -Wno-tautological-compare
   CFLAGS += -Wno-c++11-long-long
   CFLAGS += -Wsign-compare
+  CFLAGS += -Wno-unused-local-typedef
   ifeq (true,$(C++11))
     CFLAGS += -stdlib=libc++ -std=c++11
   endif
