@@ -835,13 +835,16 @@ namespace stan {
       idx_factor_r.name("expression");
       idx_factor_r
         =  factor_r(_r1)[set_val5_f(_val, _1)]
-        > *((indexes_g(_r1)[set_val5_f(_a, _1)]
-             > eps[add_idxs_f(_val, _a, _pass, 
+        > *(// ((+dims_r(_r1))[set_val5_f(_a, _1)]
+            // > eps[add_expression_dimss_f(_val, _a, _pass,
+            // boost::phoenix::ref(error_msgs_))])
+            // | 
+            (indexes_g(_r1)[set_val5_f(_b, _1)]
+               > eps[add_idxs_f(_val, _b, _pass, 
                               boost::phoenix::ref(error_msgs_))])
             | (lit("'")
                > eps[transpose_f(_val, _pass,
                                  boost::phoenix::ref(error_msgs_))]));
-
 
         // indexes_g(_r1)
 

@@ -222,6 +222,7 @@ namespace stan {
         expression lhs_expr = expression(a.lhs_var_);
         expr_type lhs_type = indexed_type(lhs_expr, a.idxs_);
         if (lhs_type.is_ill_formed()) {
+          error_msgs << "Left-hand side indexing incompatible with variable." << std::endl;
           pass = false;
           return;
         }
@@ -286,6 +287,7 @@ namespace stan {
                       bool& pass,
                       variable_map& vm,
                       std::ostream& error_msgs) const {
+
         // validate existence
         std::string name = a.var_dims_.name_;
         if (!vm.exists(name)) {
@@ -324,7 +326,6 @@ namespace stan {
           return;
         }
 
-
         // validate types
         a.var_type_ = vm.get(name);
         size_t lhs_var_num_dims = a.var_type_.dims_.size();
@@ -362,6 +363,7 @@ namespace stan {
           pass = false;
           return;
         }
+
         if (lhs_type.num_dims_ != a.expr_.expression_type().num_dims_) {
           error_msgs << "dimension mismatch in assignment"
                      << "; variable name = "
