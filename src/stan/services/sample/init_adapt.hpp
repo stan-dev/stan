@@ -1,5 +1,5 @@
-#ifndef STAN_SERVICES_INIT_INIT_ADAPT_HPP
-#define STAN_SERVICES_INIT_INIT_ADAPT_HPP
+#ifndef STAN_SERVICES_SAMPLE_INIT_ADAPT_HPP
+#define STAN_SERVICES_SAMPLE_INIT_ADAPT_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
@@ -9,7 +9,7 @@
 
 namespace stan {
   namespace services {
-    namespace init {
+    namespace sample {
 
       template<class Sampler>
       bool init_adapt(Sampler* sampler,

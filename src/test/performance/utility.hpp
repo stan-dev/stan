@@ -17,7 +17,7 @@
 #include <stan/io/json/json_error.hpp>
 #include <stan/io/json/json_handler.hpp>
 #include <stan/io/json/json_parser.hpp>
-#include <stan/io/mcmc_writer.hpp>
+#include <stan/services/sample/mcmc_writer.hpp>
 
 #include <stan/services/arguments/arg_adapt.hpp>
 #include <stan/services/arguments/arg_adapt_delta.hpp>
@@ -96,11 +96,6 @@
 #include <stan/optimization/newton.hpp>
 #include <stan/optimization/bfgs.hpp>
 
-#include <stan/services/diagnose.hpp>
-#include <stan/services/init/init_adapt.hpp>
-#include <stan/services/init/init_nuts.hpp>
-#include <stan/services/init/init_static_hmc.hpp>
-#include <stan/services/init/init_windowed_adapt.hpp>
 #include <stan/services/init/initialize_state.hpp>
 #include <stan/services/io/do_print.hpp>
 #include <stan/services/io/write_error_msg.hpp>
@@ -108,17 +103,21 @@
 #include <stan/services/io/write_iteration_csv.hpp>
 #include <stan/services/io/write_model.hpp>
 #include <stan/services/io/write_stan.hpp>
-#include <stan/services/mcmc/print_progress.hpp>
-#include <stan/services/mcmc/run_markov_chain.hpp>
 #include <stan/services/mcmc/sample.hpp>
 #include <stan/services/mcmc/warmup.hpp>
-#include <stan/services/optimization/do_bfgs_optimize.hpp>
+#include <stan/services/optimize/do_bfgs_optimize.hpp>
+#include <stan/services/sample/generate_transitions.hpp>
+#include <stan/services/sample/init_adapt.hpp>
+#include <stan/services/sample/init_nuts.hpp>
+#include <stan/services/sample/init_static_hmc.hpp>
+#include <stan/services/sample/init_windowed_adapt.hpp>
+#include <stan/services/sample/progress.hpp>
 
 // FIXME: These belong to the interfaces and should be templated out here
 #include <stan/interface_callbacks/interrupt/noop.hpp>
 #include <stan/interface_callbacks/var_context_factory/dump_factory.hpp>
-#include <stan/interface_callbacks/writer/csv.hpp>
-#include <stan/interface_callbacks/writer/messages.hpp>
+#include <stan/interface_callbacks/writer/noop_writer.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <stan/interface_callbacks/writer/base_writer.hpp>
 
 #include <fstream>
@@ -408,14 +407,14 @@ namespace stan {
                   << std::endl << std::endl;
         std::cout << std::endl;
 
-        interface_callbacks::writer::csv sample_writer(output_stream, "# ");
-        interface_callbacks::writer::csv diagnostic_writer(diagnostic_stream, "# ");
-        interface_callbacks::writer::messages message_writer(&std::cout, "# ");
+        interface_callbacks::writer::stream_writer sample_writer(*output_stream, "# ");
+        interface_callbacks::writer::noop_writer diagnostic_writer;
+        interface_callbacks::writer::stream_writer message_writer(std::cout, "# ");
 
-        stan::io::mcmc_writer<Model,
-                              interface_callbacks::writer::csv,
-                              interface_callbacks::writer::csv,
-                              interface_callbacks::writer::messages>
+        stan::services::sample::mcmc_writer<Model,
+                                            interface_callbacks::writer::stream_writer,
+                                            interface_callbacks::writer::noop_writer,
+                                            interface_callbacks::writer::stream_writer>
           writer(sample_writer, diagnostic_writer, message_writer, &std::cout);
 
         // Sampling parameters
@@ -440,8 +439,8 @@ namespace stan {
         sampler_ptr->set_stepsize_jitter(0.0);
         sampler_ptr->set_max_depth(10);
 
-        stan::services::init::init_adapt(sampler_ptr, 0.8, 0.05, 0.75, 10,
-                                         cont_params, &std::cout);
+        stan::services::sample::init_adapt(sampler_ptr, 0.8, 0.05, 0.75, 10,
+                                           cont_params, &std::cout);
         sampler_ptr->set_window_params(num_warmup, 75, 50, 25, &std::cout);
           
         // Headers
@@ -456,11 +455,11 @@ namespace stan {
         clock_t start = clock();
           
         services::mcmc::warmup<Model, rng_t>(sampler_ptr, num_warmup, num_samples, num_thin,
-                                   refresh, save_warmup,
-                                   writer,
-                                   s, model, base_rng,
-                                   prefix, suffix, std::cout,
-                                   startTransitionCallback);
+                                             refresh, save_warmup,
+                                             writer,
+                                             s, model, base_rng,
+                                             prefix, suffix, std::cout,
+                                             startTransitionCallback);
 
         clock_t end = clock();
         warmDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;

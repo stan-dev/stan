@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 
 class test_arg_impl : public stan::services::argument {
-  void print(std::ostream* s, int depth, const std::string prefix) {}
+  void print(std::ostream* s, int depth, const std::string& prefix) {}
   void print_help(std::ostream* s, int depth, bool recurse) {}
 };
 

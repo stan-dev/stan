@@ -10,7 +10,7 @@ namespace stan {
     class valued_argument: public argument {
     public:
       virtual void print(std::ostream* s, const int depth,
-                         const std::string prefix) {
+                         const std::string& prefix) {
         if (!s)
           return;
 

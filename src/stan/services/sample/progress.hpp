@@ -1,5 +1,5 @@
-#ifndef STAN_SERVICES_MCMC_PRINT_PROGRESS_HPP
-#define STAN_SERVICES_MCMC_PRINT_PROGRESS_HPP
+#ifndef STAN_SERVICES_SAMPLE_PROGRESS_HPP
+#define STAN_SERVICES_SAMPLE_PROGRESS_HPP
 
 #include <stan/services/io/do_print.hpp>
 #include <cmath>
@@ -9,16 +9,16 @@
 
 namespace stan {
   namespace services {
-    namespace mcmc {
+    namespace sample {
 
-      void print_progress(const int m,
-                          const int start,
-                          const int finish,
-                          const int refresh,
-                          const bool warmup,
-                          const std::string prefix,
-                          const std::string suffix,
-                          std::ostream& o) {
+      void progress(const int m,
+                    const int start,
+                    const int finish,
+                    const int refresh,
+                    const bool warmup,
+                    const std::string prefix,
+                    const std::string suffix,
+                    std::ostream& o) {
         int it_print_width = std::ceil(std::log10(static_cast<double>(finish)));
         if (io::do_print(m, (start + m + 1 == finish), refresh)) {
           o << prefix;

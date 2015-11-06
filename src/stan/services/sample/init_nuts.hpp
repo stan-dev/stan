@@ -1,5 +1,5 @@
-#ifndef STAN_SERVICES_INIT_INIT_NUTS_HPP
-#define STAN_SERVICES_INIT_INIT_NUTS_HPP
+#ifndef STAN_SERVICES_SAMPLE_INIT_NUTS_HPP
+#define STAN_SERVICES_SAMPLE_INIT_NUTS_HPP
 
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/services/arguments/argument.hpp>
@@ -8,7 +8,7 @@
 
 namespace stan {
   namespace services {
-    namespace init {
+    namespace sample {
 
       template<class Sampler>
       bool init_nuts(stan::mcmc::base_mcmc* sampler,
