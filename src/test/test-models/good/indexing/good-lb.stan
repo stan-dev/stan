@@ -1,21 +1,26 @@
 /**
- * tests LHS and RHS so both assignment and expression indexing
- * get covered
-
- * COMBINATORICS
-
+ * Check all possible legal indexing for assignment statements (left
+ * side) and indexed expressions (right side).
+ *
+ * COMBINATORICS (m = multi-index, u = uni-index)
+ * 
  * 1 index
- *    multi
- *    uni
+ *    m
+ *    u
  * 2 indexes
- *    multi, multi,
- *    uni, multi  * 2
- *    uni, uni
+ *    uu
+ *    um
+ *    mu
+ *    mm
  * 3 indexes
- *    m, m, m
- *    m, m, u  * 3
- *    m, u, u  * 3
- *    u, u, u
+ *    uuu
+ *    uum
+ *    umu
+ *    umm
+ *    muu
+ *    mum
+ *    mmu
+ *    mmm
  */
 transformed data {
   real x;
