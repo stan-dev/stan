@@ -1,6 +1,8 @@
 #include <stan/services/arguments/categorical_argument.hpp>
 #include <gtest/gtest.h>
 #include <stan/services/arguments/singleton_argument.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
+#include <stan/interface_callbacks/writer/noop_writer.hpp>
 
 class StanServicesArgumentsCategoricalArgument : public testing::Test {
 public:
@@ -12,6 +14,7 @@ public:
   }
   
   stan::services::argument *arg;
+  std::stringstream ss;
 };
 
 
@@ -39,11 +42,13 @@ TEST_F(StanServicesArgumentsCategoricalArgument,parse_args) {
   bool return_value;
   std::vector<std::string> args;
   bool help_flag;
+  stan::interface_callbacks::writer::stream_writer out(ss);
+  stan::interface_callbacks::writer::noop_writer err;
   
   return_value = false;
   args.clear();
   help_flag = false;
-  return_value = arg->parse_args(args,0,0,help_flag);
+  return_value = arg->parse_args(args,out,err,help_flag);
   
   EXPECT_TRUE(return_value);
   EXPECT_FALSE(help_flag);
@@ -54,7 +59,7 @@ TEST_F(StanServicesArgumentsCategoricalArgument,parse_args) {
   args.clear();
   args.push_back("help");
   help_flag = false;
-  return_value = arg->parse_args(args,0,0,help_flag);
+  return_value = arg->parse_args(args,out,err,help_flag);
   
   EXPECT_TRUE(return_value);
   EXPECT_TRUE(help_flag);
@@ -65,7 +70,7 @@ TEST_F(StanServicesArgumentsCategoricalArgument,parse_args) {
   args.clear();
   args.push_back("help-all");
   help_flag = false;
-  return_value = arg->parse_args(args,0,0,help_flag);
+  return_value = arg->parse_args(args,out,err,help_flag);
   
   EXPECT_TRUE(return_value);
   EXPECT_TRUE(help_flag);
@@ -76,12 +81,14 @@ TEST_F(StanServicesArgumentsCategoricalArgument,parse_args_unexpected) {
   bool return_value;
   std::vector<std::string> args;
   bool help_flag;
+  stan::interface_callbacks::writer::stream_writer out(ss);
+  stan::interface_callbacks::writer::noop_writer err;
 
   return_value = false;
   args.clear();
   args.push_back("foo=bar");
   help_flag = false;
-  return_value = arg->parse_args(args,0,0,help_flag);
+  return_value = arg->parse_args(args,out,err,help_flag);
   
   EXPECT_TRUE(return_value);
   EXPECT_FALSE(help_flag);
@@ -93,7 +100,7 @@ TEST_F(StanServicesArgumentsCategoricalArgument,parse_args_unexpected) {
   args.push_back("help");
   args.push_back("foo=bar");
   help_flag = false;
-  return_value = arg->parse_args(args,0,0,help_flag);
+  return_value = arg->parse_args(args,out,err,help_flag);
   
   EXPECT_TRUE(return_value);
   EXPECT_FALSE(help_flag);
@@ -105,7 +112,7 @@ TEST_F(StanServicesArgumentsCategoricalArgument,parse_args_unexpected) {
   args.push_back("foo=bar");
   args.push_back("help");
   help_flag = false;
-  return_value = arg->parse_args(args,0,0,help_flag);
+  return_value = arg->parse_args(args,out,err,help_flag);
   
   EXPECT_TRUE(return_value);
   EXPECT_TRUE(help_flag);
@@ -116,7 +123,7 @@ TEST_F(StanServicesArgumentsCategoricalArgument,parse_args_unexpected) {
   args.clear();
   args.push_back("foo");
   help_flag = false;
-  return_value = arg->parse_args(args,0,0,help_flag);
+  return_value = arg->parse_args(args,out,err,help_flag);
   
   EXPECT_TRUE(return_value);
   EXPECT_FALSE(help_flag);
@@ -127,7 +134,9 @@ TEST_F(StanServicesArgumentsCategoricalArgument, parse_args_with_1_singleton) {
   bool return_value;
   std::vector<std::string> args;
   bool help_flag;
-  
+  stan::interface_callbacks::writer::stream_writer out(ss);
+  stan::interface_callbacks::writer::noop_writer err;
+
   dynamic_cast<stan::services::categorical_argument*>(arg)
     ->subarguments().push_back(new stan::services::singleton_argument<std::string>("foo"));
 
@@ -135,7 +144,7 @@ TEST_F(StanServicesArgumentsCategoricalArgument, parse_args_with_1_singleton) {
   args.clear();
   args.push_back("foo");
   help_flag = false;
-  return_value = arg->parse_args(args,0,0,help_flag);
+  return_value = arg->parse_args(args,out,err,help_flag);
   
   EXPECT_TRUE(return_value)
     << "called with 'foo'";
@@ -146,7 +155,7 @@ TEST_F(StanServicesArgumentsCategoricalArgument, parse_args_with_1_singleton) {
   args.clear();
   args.push_back("bar");
   help_flag = false;
-  return_value = arg->parse_args(args,0,0,help_flag);
+  return_value = arg->parse_args(args,out,err,help_flag);
   
   EXPECT_TRUE(return_value)
     << "called with 'bar'";
@@ -159,7 +168,7 @@ TEST_F(StanServicesArgumentsCategoricalArgument, parse_args_with_1_singleton) {
   args.push_back("help");
   args.push_back("foo");
   help_flag = false;
-  return_value = arg->parse_args(args,0,0,help_flag);
+  return_value = arg->parse_args(args,out,err,help_flag);
   
   EXPECT_TRUE(return_value)
     << "called with 'foo help'";
@@ -171,7 +180,7 @@ TEST_F(StanServicesArgumentsCategoricalArgument, parse_args_with_1_singleton) {
   args.push_back("help");
   args.push_back("bar");
   help_flag = false;
-  return_value = arg->parse_args(args,0,0,help_flag);
+  return_value = arg->parse_args(args,out,err,help_flag);
   
   EXPECT_TRUE(return_value)
     << "called with 'bar help'";

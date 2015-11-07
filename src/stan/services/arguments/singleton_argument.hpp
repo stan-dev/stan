@@ -54,13 +54,15 @@ namespace stan {
         _name = name;
       }
 
-      bool parse_args(std::vector<std::string>& args, std::ostream* out,
-                      std::ostream* err, bool& help_flag) {
+      bool parse_args(std::vector<std::string>& args,
+                      interface_callbacks::writer::base_writer& info,
+                      interface_callbacks::writer::base_writer& err,
+                      bool& help_flag) {
         if (args.size() == 0)
           return true;
 
         if ( (args.back() == "help") || (args.back() == "help-all") ) {
-          print_help(out, 0);
+          print_help(info, 0);
           help_flag |= true;
           args.clear();
           return true;
@@ -76,12 +78,13 @@ namespace stan {
           T proposed_value = boost::lexical_cast<T>(value);
 
           if (!set_value(proposed_value)) {
-            if (err) {
-              *err << proposed_value << " is not a valid value for "
-                   << "\"" << _name << "\"" << std::endl;
-              *err << std::string(indent_width, ' ')
-                   << "Valid values:" << print_valid() << std::endl;
-            }
+            std::stringstream message;
+            message << proposed_value
+                    << " is not a valid value for "
+                    << "\"" << _name << "\"";
+            err(message.str());
+            err(std::string(indent_width, ' ')
+                + "Valid values:" + print_valid());
 
             args.clear();
             return false;
@@ -90,17 +93,18 @@ namespace stan {
         return true;
       }
 
-      virtual void probe_args(argument* base_arg, std::stringstream& s) {
-        s << "good" << std::endl;
+      virtual void probe_args(argument* base_arg,
+                            stan::interface_callbacks::writer::base_writer& w) {
+        w("good");
         _value = _good_value;
-        base_arg->print(&s, 0, "");
-        s << std::endl;
+        base_arg->print(w, 0, "");
+        w();
 
         if (_constrained) {
-          s << "bad" << std::endl;
+          w("bad");
           _value = _bad_value;
-          base_arg->print(&s, 0, "");
-          s << std::endl;
+          base_arg->print(w, 0, "");
+          w();
         }
 
         _value = _default_value;
