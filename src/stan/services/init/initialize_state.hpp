@@ -73,7 +73,7 @@ namespace stan {
          * @param[in] model   the model.
          * @param[in] context the context of inits provided by user
          * @return            true if all are contained,
-                              false if anyone is not
+         *                    false if anyone is not
          */
 
         template <class Model>
@@ -98,7 +98,7 @@ namespace stan {
 
               std::stringstream msg;
               msg << param_names[n] << " initialized to invalid value ("
-              << cont_params[n] << ")";
+                  << cont_params[n] << ")";
 
               throw std::invalid_argument(msg.str());
             }
@@ -199,11 +199,11 @@ namespace stan {
         int num_init_tries = -1;
 
         boost::random::uniform_real_distribution<double>
-        init_range_distribution(-R, R);
+          init_range_distribution(-R, R);
 
         boost::variate_generator
-        <RNG&, boost::random::uniform_real_distribution<double> >
-        init_rng(base_rng, init_range_distribution);
+          <RNG&, boost::random::uniform_real_distribution<double> >
+          init_rng(base_rng, init_range_distribution);
 
         // Random initializations until log_prob is finite
         static int MAX_INIT_TRIES = 100;
@@ -353,7 +353,7 @@ namespace stan {
                                    double R = 2) {
         try {
           typename ContextFactory::var_context_t context
-          = context_factory(source);
+            = context_factory(source);
 
           if (enable_random_init && !are_all_pars_initialized(model, context)) {
             return initialize_state_source_and_random(source,
