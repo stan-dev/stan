@@ -171,7 +171,7 @@ namespace stan {
       template <class Model>
       bool initialize_state_zero(Eigen::VectorXd& cont_params,
                                  Model& model,
-                                 interface_callbacks::writer::base_writer& writer) {
+                             interface_callbacks::writer::base_writer& writer) {
         cont_params.setZero();
         return initialize_state_values(cont_params, model, writer);
       }
@@ -195,7 +195,7 @@ namespace stan {
                                    Eigen::VectorXd& cont_params,
                                    Model& model,
                                    RNG& base_rng,
-                                   interface_callbacks::writer::base_writer& writer) {
+                             interface_callbacks::writer::base_writer& writer) {
         int num_init_tries = -1;
 
         boost::random::uniform_real_distribution<double>
@@ -259,7 +259,7 @@ namespace stan {
                                               Eigen::VectorXd& cont_params,
                                               Model& model,
                                               RNG& base_rng,
-                                              interface_callbacks::writer::base_writer& writer,
+                               interface_callbacks::writer::base_writer& writer,
                                               ContextFactory& context_factory) {
         try {
           boost::random::uniform_real_distribution<double>
