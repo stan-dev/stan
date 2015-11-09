@@ -9,8 +9,6 @@
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 
-typedef stan::interface_callbacks::writer::stream_writer writer_t;
-
 // Mock Model
 class mock_model: public stan::model::prob_grad {
 public:
@@ -338,8 +336,8 @@ public:
   mock_throwing_model throwing_model;
   mock_rng rng;
   std::stringstream writer_ss;
-  writer_t writer;
   mock_context_factory context_factory;
+  stan::interface_callbacks::writer::stream_writer writer;
 };
 
 TEST_F(StanServices, initialize_state_0) {
@@ -843,7 +841,7 @@ public:
 
 class StanServices2 : public testing::Test {
 public:
-  StanServices2() 
+  StanServices2()
     : writer(writer_ss) {}
 
   void SetUp() {
@@ -859,8 +857,8 @@ public:
   mock_model2 model;
   mock_rng rng;
   std::stringstream writer_ss;
-  writer_t writer;
   mock_context_factory2 context_factory;
+  stan::interface_callbacks::writer::stream_writer writer;
 };
 
 TEST_F(StanServices2, initialize_state_source_and_random) {
@@ -952,16 +950,20 @@ TEST_F(StanServices2, streams) {
   using stan::services::init::initialize_state_source_and_random;
   using stan::services::init::initialize_state_random;
   using stan::services::init::initialize_state_values;
-  std::stringstream out;
 
+  init = "0";
+  writer_ss.str("");
   EXPECT_NO_THROW(initialize_state(init, cont_params, model, rng, writer, context_factory));
-  EXPECT_EQ("Initialization from source failed.\nmissing some parameters\n", writer_ss.str());
+  EXPECT_EQ("", writer_ss.str());
 
   writer_ss.str("");
   EXPECT_NO_THROW(initialize_state_source(init, cont_params, model, rng, writer, context_factory));
 
   writer_ss.str("");
   EXPECT_NO_THROW(initialize_state_source_and_random(init, 0.5, cont_params, model, rng, writer, context_factory));
+
+  writer_ss.str("");
+  EXPECT_NO_THROW(initialize_state_random(0.5, cont_params, model, rng, writer));
 
   writer_ss.str("");
   EXPECT_NO_THROW(initialize_state_random(0.5, cont_params, model, rng, writer));

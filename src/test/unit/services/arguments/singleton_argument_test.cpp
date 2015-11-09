@@ -71,10 +71,6 @@ TYPED_TEST_P(StanServicesArgumentsSingleton, print_help) {
 }
 
 TYPED_TEST_P(StanServicesArgumentsSingleton, parse_args) {
-  
-  writer_t info;
-  writer_t err;
-  
   bool return_value;
   std::vector<std::string> args;
   bool help_flag;
@@ -125,9 +121,6 @@ TYPED_TEST_P(StanServicesArgumentsSingleton, parse_args) {
 }
 
 TYPED_TEST_P(StanServicesArgumentsSingleton, parse_args_unexpected) {
-  writer_t info;
-  writer_t err;
-  
   bool return_value;
   std::vector<std::string> args;
   bool help_flag;

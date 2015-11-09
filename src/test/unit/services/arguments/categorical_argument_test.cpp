@@ -5,8 +5,6 @@
 #include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <stan/interface_callbacks/writer/noop_writer.hpp>
 
-typedef stan::interface_callbacks::writer::noop_writer writer_t;
-
 class StanServicesArgumentsCategoricalArgument : public testing::Test {
 public:
   void SetUp () {
@@ -41,10 +39,6 @@ TEST_F(StanServicesArgumentsCategoricalArgument, print_help) {
 }
 
 TEST_F(StanServicesArgumentsCategoricalArgument, parse_args) {
-  
-  writer_t info;
-  writer_t err;
-  
   bool return_value;
   std::vector<std::string> args;
   bool help_flag;
@@ -84,9 +78,6 @@ TEST_F(StanServicesArgumentsCategoricalArgument, parse_args) {
 }
 
 TEST_F(StanServicesArgumentsCategoricalArgument, parse_args_unexpected) {
-  writer_t info;
-  writer_t err;
-  
   bool return_value;
   std::vector<std::string> args;
   bool help_flag;
@@ -140,10 +131,6 @@ TEST_F(StanServicesArgumentsCategoricalArgument, parse_args_unexpected) {
 }
 
 TEST_F(StanServicesArgumentsCategoricalArgument, parse_args_with_1_singleton) {
-  
-  writer_t info;
-  writer_t err;
-  
   bool return_value;
   std::vector<std::string> args;
   bool help_flag;

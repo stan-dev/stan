@@ -4,8 +4,6 @@
 #include <stan/interface_callbacks/writer/noop_writer.hpp>
 #include <gtest/gtest.h>
 
-typedef stan::interface_callbacks::writer::noop_writer writer_t;
-
 class test_arg_impl : public stan::services::unvalued_argument {
   std::string print_value() {
     return "";
@@ -52,10 +50,6 @@ TEST_F(StanServicesArgumentsUnvaluedArgument, print_help) {
 }
 
 TEST_F(StanServicesArgumentsUnvaluedArgument, parse_args) {
-  
-  writer_t info;
-  writer_t err;
-  
   bool return_value;
   std::vector<std::string> args;
   bool help_flag;
@@ -95,10 +89,6 @@ TEST_F(StanServicesArgumentsUnvaluedArgument, parse_args) {
 }
 
 TEST_F(StanServicesArgumentsUnvaluedArgument, parse_args_unexpected) {
-  
-  writer_t info;
-  writer_t err;
-  
   bool return_value;
   std::vector<std::string> args;
   bool help_flag;
