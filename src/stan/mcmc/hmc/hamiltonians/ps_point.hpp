@@ -1,14 +1,13 @@
 #ifndef STAN_MCMC_HMC_HAMILTONIANS_PS_POINT_HPP
 #define STAN_MCMC_HMC_HAMILTONIANS_PS_POINT_HPP
 
-#include <boost/lexical_cast.hpp>
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-
+#include <boost/lexical_cast.hpp>
 #include <string>
 #include <vector>
 
 namespace stan {
-
   namespace mcmc {
     using Eigen::Dynamic;
 
@@ -67,12 +66,12 @@ namespace stan {
       }
 
       /**
-       * @tparam Writer An implementation of
-       *                    src/stan/interface_callbacks/writer/base_writer.hpp
-       * @param writer Writer callback
+       * Writes the metric
+       *
+       * @param writer writer callback
        */
-      template <class Writer>
-      void write_metric(Writer& writer) {}
+      virtual void
+      write_metric(stan::interface_callbacks::writer::base_writer& writer) { }
 
     protected:
       template <typename T>
@@ -98,7 +97,5 @@ namespace stan {
     };
 
   }  // mcmc
-
 }  // stan
-
 #endif

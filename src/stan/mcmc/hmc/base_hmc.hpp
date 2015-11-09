@@ -1,11 +1,12 @@
 #ifndef STAN_MCMC_HMC_BASE_HMC_HPP
 #define STAN_MCMC_HMC_BASE_HMC_HPP
 
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
+#include <stan/mcmc/base_mcmc.hpp>
+#include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/uniform_01.hpp>
-#include <stan/mcmc/base_mcmc.hpp>
-#include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 #include <cmath>
 #include <limits>
 #include <stdexcept>

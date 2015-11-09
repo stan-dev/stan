@@ -1,10 +1,11 @@
 #include <gtest/gtest.h>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
+#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <test/unit/util.hpp>
 #include <stan/interface_callbacks/writer/stream_writer.hpp>
 
 namespace stan {
-
   namespace mcmc {
 
     class ps_point_test : public ::testing::Test {
@@ -63,7 +64,6 @@ namespace stan {
       stan::test::capture_std_streams();
 
       ps_point point(2);
-
       std::stringstream writer_ss;
       stan::interface_callbacks::writer::stream_writer writer(writer_ss);
       EXPECT_NO_THROW(point.write_metric(writer));
