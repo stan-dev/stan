@@ -4,14 +4,14 @@
 #include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
+#include <boost/random/variate_generator.hpp>
+#include <boost/random/uniform_01.hpp>
 #include <cmath>
 #include <limits>
 #include <stdexcept>
 #include <string>
 #include <vector>
-#include <boost/math/special_functions/fpclassify.hpp>
-#include <boost/random/variate_generator.hpp>
-#include <boost/random/uniform_01.hpp>
 
 namespace stan {
   namespace mcmc {

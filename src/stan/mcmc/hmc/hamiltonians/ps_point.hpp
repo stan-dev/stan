@@ -3,9 +3,9 @@
 
 #include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <boost/lexical_cast.hpp>
 #include <string>
 #include <vector>
-#include <boost/lexical_cast.hpp>
 
 namespace stan {
   namespace mcmc {
