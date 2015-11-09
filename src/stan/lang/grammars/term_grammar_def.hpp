@@ -819,7 +819,7 @@ namespace stan {
              [exponentiation_f(_val, _1, _r1, _pass,
                                boost::phoenix::ref(error_msgs_))]);
 
-      // indexed_factor_r.name("expression");
+      indexed_factor_r.name("expression");
       // indexed_factor_r
       //   = factor_r(_r1)[set_val5_f(_val, _1)]
       //   > * (
@@ -835,18 +835,16 @@ namespace stan {
       idx_factor_r.name("expression");
       idx_factor_r
         =  factor_r(_r1)[set_val5_f(_val, _1)]
-        > *(// ((+dims_r(_r1))[set_val5_f(_a, _1)]
-            // > eps[add_expression_dimss_f(_val, _a, _pass,
-            // boost::phoenix::ref(error_msgs_))])
-            // | 
-            (indexes_g(_r1)[set_val5_f(_b, _1)]
+        > *( ( (+dims_r(_r1))[set_val5_f(_a, _1)]
+               > eps
+               [add_expression_dimss_f(_val, _a, _pass,
+                                       boost::phoenix::ref(error_msgs_) )] )
+            | (indexes_g(_r1)[set_val5_f(_b, _1)]
                > eps[add_idxs_f(_val, _b, _pass, 
                               boost::phoenix::ref(error_msgs_))])
             | (lit("'")
                > eps[transpose_f(_val, _pass,
-                                 boost::phoenix::ref(error_msgs_))]));
-
-        // indexes_g(_r1)
+                                 boost::phoenix::ref(error_msgs_))]) );
 
       integrate_ode_r.name("expression");
       integrate_ode_r
@@ -920,15 +918,15 @@ namespace stan {
       dim_r.name("array dimension (integer expression)");
       dim_r
         %= expression_g(_r1)
-        > eps[validate_int_expr3_f(_val, _pass,
+        >> eps[validate_int_expr3_f(_val, _pass,
                                    boost::phoenix::ref(error_msgs_))];
 
       dims_r.name("array dimensions");
       dims_r
         %= lit('[')
-        > (dim_r(_r1)
+        >> (dim_r(_r1)
            % ',' )
-        > lit(']');
+        >> lit(']');
 
       variable_r.name("variable name");
       variable_r

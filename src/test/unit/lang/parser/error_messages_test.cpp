@@ -41,7 +41,7 @@ TEST(LangGrammars,test1) {
   test_throws("err-decl-matrix",
               "PARSER EXPECTED: \",");
   test_throws("err-decl-matrix-2",
-              "indexed expression dims=0; num indexes=1");
+              "indexed expression dimensionality = 0; indexes supplied = 1");
   test_throws("err-decl-no-expression",
               "PARSER EXPECTED: <expression>");
   test_throws("err-decl-double",
