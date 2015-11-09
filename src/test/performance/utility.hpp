@@ -320,6 +320,9 @@ namespace stan {
         typedef boost::ecuyer1988 rng_t;  // (2**50 = 1T samples, 1000 chains)
         rng_t base_rng(random_seed);
 
+        stan::interface_callbacks::writer::stream_writer info(std::cout);
+        
+
         // Advance generator to avoid process conflicts
         static boost::uintmax_t DISCARD_STRIDE
           = static_cast<boost::uintmax_t>(1) << 50;
@@ -376,7 +379,7 @@ namespace stan {
 
         interface_callbacks::var_context_factory::dump_factory var_context_factory;
         if (!services::init::initialize_state<interface_callbacks::var_context_factory::dump_factory>
-            (init, cont_params, model, base_rng, &std::cout,
+            (init, cont_params, model, base_rng, info,
              var_context_factory))
           return stan::services::error_codes::SOFTWARE;
 
