@@ -1,9 +1,7 @@
 #ifndef STAN_MCMC_HMC_BASE_HMC_HPP
 #define STAN_MCMC_HMC_BASE_HMC_HPP
 
-#include <boost/math/special_functions/fpclassify.hpp>
-#include <boost/random/variate_generator.hpp>
-#include <boost/random/uniform_01.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 #include <cmath>
@@ -11,6 +9,9 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <boost/math/special_functions/fpclassify.hpp>
+#include <boost/random/variate_generator.hpp>
+#include <boost/random/uniform_01.hpp>
 
 namespace stan {
   namespace mcmc {
@@ -37,7 +38,8 @@ namespace stan {
         if (!o)
           return;
         *o << "# Step size = " << get_nominal_stepsize() << std::endl;
-        z_.write_metric(o);
+        stan::interface_callbacks::writer::stream_writer writer(*o);
+        z_.write_metric(writer);
       }
 
       void get_sampler_diagnostic_names(std::vector<std::string>& model_names,
