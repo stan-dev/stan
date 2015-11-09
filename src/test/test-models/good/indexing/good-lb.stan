@@ -25,8 +25,6 @@
 transformed data {
   real x;
 
-  int is[3];
-
   real a[4];
   real b[3];
   
@@ -354,6 +352,7 @@ transformed parameters {
   
   matrix[3, 4] var_cc[5];
   matrix[3, 4] var_dd[5];
+
 
   // 1) ASSIGN DATA TO PARAMS  [see below for params to params]
 
