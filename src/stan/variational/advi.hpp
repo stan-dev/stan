@@ -213,7 +213,7 @@ namespace stan {
         // Main loop
         std::vector<double> print_vector;
         bool do_more_iterations = true;
-        int iter_counter = 0;
+        int iter_counter = 1;
         while (do_more_iterations) {
           // Compute gradient using Monte Carlo integration
           calc_ELBO_grad(variational, elbo_grad);
