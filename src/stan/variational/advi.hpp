@@ -350,7 +350,7 @@ namespace stan {
         double delta_t;
 
         // INTERMEDIATE SAMPLING OUTPUT
-        int num_intermediate_samples = 25;
+        int num_intermediate_samples = 1;
         std::fstream* intermediate_stream = 0;
         std::string intermediate_basename = "intermediate_variational_samples_";
         std::string intermediate_extension = ".csv";
