@@ -14,7 +14,6 @@ namespace stan {
     
     // Mock Static HMC
     class mock_static_hmc: public base_static_hmc<mock_model,
-                                                  ps_point,
                                                   mock_hamiltonian,
                                                   mock_integrator,
                                                   rng_t> {
@@ -22,7 +21,7 @@ namespace stan {
     public:
       
       mock_static_hmc(mock_model &m, rng_t& rng, std::ostream* o, std::ostream* e)
-        : base_static_hmc<mock_model,ps_point,mock_hamiltonian,mock_integrator,rng_t>(m, rng, o, e)
+        : base_static_hmc<mock_model,mock_hamiltonian,mock_integrator,rng_t>(m, rng, o, e)
       { this->name_ = "Mock Static HMC"; }
       
     };
