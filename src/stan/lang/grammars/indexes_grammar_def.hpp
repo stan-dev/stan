@@ -80,11 +80,10 @@ namespace stan {
           write_base_expr_type(error_msgs, e.expression_type().type());
           error_msgs << std::endl;
           pass = false;
-        }
-        else if (e.expression_type().num_dims_ != 1) {
+        } else if (e.expression_type().num_dims_ != 1) {
           error_msgs << "index must be integer or integer array"
-                     << " found number of dimensions=" 
-                     << e.expression_type().num_dims_ 
+                     << " found number of dimensions="
+                     << e.expression_type().num_dims_
                      << std::endl;
           pass = false;
         } else {
@@ -142,7 +141,7 @@ namespace stan {
 
       multi_index_r
         %= expression_g(_r1)
-           [validate_ints_expression_f(_1, _pass, 
+           [validate_ints_expression_f(_1, _pass,
                                        boost::phoenix::ref(error_msgs_))]
         > eps;
 

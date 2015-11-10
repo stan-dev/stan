@@ -397,7 +397,6 @@ namespace stan {
     inline void assign(std::vector<T>& x,
                        const cons_index_list<index_uni, L>& idxs, const U& y,
                        const char* name = "ANON", int depth = 0) {
-
       int i = idxs.head_.n_;
       math::check_range("vector[uni,...] assign range", name, x.size(), i);
       assign(x[i - 1], idxs.tail_, y, name, depth + 1);

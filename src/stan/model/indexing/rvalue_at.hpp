@@ -6,7 +6,7 @@
 namespace stan {
 
   namespace model {
-    
+
     // relative indexing from 0; multi-indexing and return from 1
     // no error checking from these methods, just indexing
 

@@ -930,7 +930,7 @@ namespace stan {
 
     struct var_occurs_vis : public boost::static_visitor<bool> {
       const std::string var_name_;
-      var_occurs_vis(const variable& e);
+      explicit var_occurs_vis(const variable& e);
       bool operator()(const nil& e) const;
       bool operator()(const int_literal& e) const;
       bool operator()(const double_literal& e) const;
@@ -983,7 +983,7 @@ namespace stan {
 
     struct contains_var : public boost::static_visitor<bool> {
       const variable_map& var_map_;
-      contains_var(const variable_map& var_map);
+      explicit contains_var(const variable_map& var_map);
       bool operator()(const nil& e) const;
       bool operator()(const int_literal& e) const;
       bool operator()(const double_literal& e) const;
@@ -1003,7 +1003,7 @@ namespace stan {
 
     struct contains_nonparam_var : public boost::static_visitor<bool> {
       const variable_map& var_map_;
-      contains_nonparam_var(const variable_map& var_map);
+      explicit contains_nonparam_var(const variable_map& var_map);
       bool operator()(const nil& e) const;
       bool operator()(const int_literal& e) const;
       bool operator()(const double_literal& e) const;

@@ -641,11 +641,11 @@ namespace stan {
                       std::ostream& error_msgs) const {
         e = index_op_sliced(e, idxs);
         pass = !e.expression_type().is_ill_formed();
-        if (!pass) 
+        if (!pass)
           error_msgs << "Indexed expression must have at least as many"
                      << " dimensions as number of indexes supplied:"
                      << std::endl
-                     << " indexed expression dims=" 
+                     << " indexed expression dims="
                      << e.total_dims()
                      << "; num indexes=" << idxs.size()
                      << std::endl;
@@ -827,7 +827,7 @@ namespace stan {
                [add_expression_dimss_f(_val, _a, _pass,
                                        boost::phoenix::ref(error_msgs_) )] )
             | (indexes_g(_r1)[set_val5_f(_b, _1)]
-               > eps[add_idxs_f(_val, _b, _pass, 
+               > eps[add_idxs_f(_val, _b, _pass,
                               boost::phoenix::ref(error_msgs_))])
             | (lit("'")
                > eps[transpose_f(_val, _pass,

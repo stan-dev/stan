@@ -895,8 +895,8 @@ namespace stan {
     }
     bool is_nil_op::operator()(const fun& /* x */) const { return false; }
     bool is_nil_op::operator()(const index_op& /* x */) const { return false; }
-    bool is_nil_op::operator()(const index_op_sliced& /* x */) const { 
-      return false; 
+    bool is_nil_op::operator()(const index_op_sliced& /* x */) const {
+      return false;
     }
     bool is_nil_op::operator()(const binary_op& /* x */) const { return false; }
     bool is_nil_op::operator()(const unary_op& /* x */) const { return false; }
@@ -984,7 +984,6 @@ namespace stan {
         x_int_(x_int) {
     }
 
-
     fun::fun() { }
     fun::fun(std::string const& name,
              std::vector<expression> const& args)
@@ -1003,7 +1002,6 @@ namespace stan {
         total += dimss[i].size();
       return total;
     }
-
 
     expr_type infer_type_indexing(const base_expr_type& expr_base_type,
                                   size_t num_expr_dims,
@@ -1590,9 +1588,9 @@ namespace stan {
     }
 
     var_occurs_vis::var_occurs_vis(const variable& e)
-      : var_name_(e.name_) { 
+      : var_name_(e.name_) {
     }
-    
+
     bool var_occurs_vis::operator()(const nil& st) const {
       return false;
     }

@@ -215,7 +215,9 @@ namespace stan {
         o_ << ".array()";
       }
       void operator()(const variable& v) const { o_ << v.name_; }
-      void operator()(int n) const { o_ << static_cast<long>(n); }
+      void operator()(int n) const {   // NOLINT
+        o_ << static_cast<long>(n);    // NOLINT
+      }
       void operator()(double x) const { o_ << x; }
       void operator()(const std::string& x) const { o_ << x; }  // identifiers
       void operator()(const index_op& x) const {
@@ -1748,7 +1750,7 @@ namespace stan {
         return;
       o << "[";
       for (size_t i = 0; i < idxs.size(); ++i) {
-        if (i > 0) 
+        if (i > 0)
           o << ", ";
         generate_idx_user(idxs[i], o);
       }
@@ -1813,12 +1815,12 @@ namespace stan {
           o_ << ")";
         } else {
           generate_expression(y.rhs_, o_);
-        }       
+        }
 
         o_ << ", "
            << EOL;
         generate_indent(indent_ + 3, o_);
-        o_ << '"' 
+        o_ << '"'
            << "assigning variable "
            << y.lhs_var_.name_
            << '"';

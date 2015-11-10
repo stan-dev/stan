@@ -196,7 +196,7 @@ namespace stan {
       }
       return b;
     }
-    
+
     /**
      * Return the result of indexing the specified Eigen matrix with a
      * sequence consisting of two single indexes, returning a scalar.
@@ -273,7 +273,7 @@ namespace stan {
     typename boost::disable_if<boost::is_same<I, index_uni>,
                                Eigen::Matrix<T, Eigen::Dynamic, 1> >::type
     rvalue(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& a,
-           const cons_index_list<I, cons_index_list<index_uni, 
+           const cons_index_list<I, cons_index_list<index_uni,
                                                     nil_index_list> >& idx,
            const char* name = "ANON", int depth = 0) {
       int rows = rvalue_index_size(idx.head_, a.rows());
@@ -320,7 +320,7 @@ namespace stan {
         for (int i = 0; i < rows; ++i) {
           int m = rvalue_at(i, idx.head_);
           int n = rvalue_at(j, idx.tail_.head_);
-          math::check_range("matrix[multi,multi] row index", name, 
+          math::check_range("matrix[multi,multi] row index", name,
                             a.rows(), m);
           math::check_range("matrix[multi,multi] col index", name,
                             a.cols(), n);
