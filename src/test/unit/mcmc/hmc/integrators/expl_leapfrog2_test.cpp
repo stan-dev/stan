@@ -26,9 +26,9 @@ TEST(McmcHmcIntegratorsExplLeapfrog, energy_conservation) {
   gauss_model_namespace::gauss_model model(data_var_context, &model_output);
   
   stan::mcmc::expl_leapfrog<
-  stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t>,
-  stan::mcmc::unit_e_point> integrator;
-
+    stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> >
+    integrator;
+  
   stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> metric(model, &metric_output);
   
   stan::mcmc::unit_e_point z(1);
@@ -72,8 +72,8 @@ TEST(McmcHmcIntegratorsExplLeapfrog, symplecticness) {
   gauss_model_namespace::gauss_model model(data_var_context, &model_output);
   
   stan::mcmc::expl_leapfrog<
-  stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t>,
-  stan::mcmc::unit_e_point> integrator;
+    stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> >
+    integrator;
 
   std::stringstream metric_output;
   

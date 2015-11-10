@@ -1,4 +1,6 @@
 #include <stan/services/arguments/valued_argument.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
+#include <stan/interface_callbacks/writer/noop_writer.hpp>
 #include <gtest/gtest.h>
 
 class test_arg_impl : public stan::services::valued_argument {
@@ -24,6 +26,7 @@ public:
   }
   
   stan::services::argument *arg;
+  std::stringstream ss;
 };
 
 
@@ -51,11 +54,13 @@ TEST_F(StanServicesArgumentsValuedArgument,parse_args) {
   bool return_value;
   std::vector<std::string> args;
   bool help_flag;
+  stan::interface_callbacks::writer::stream_writer out(std::cout);
+  stan::interface_callbacks::writer::noop_writer err;
   
   return_value = false;
   args.clear();
   help_flag = false;
-  return_value = arg->parse_args(args,0,0,help_flag);
+  return_value = arg->parse_args(args,out,err,help_flag);
   
   EXPECT_TRUE(return_value);
   EXPECT_FALSE(help_flag);
@@ -66,7 +71,7 @@ TEST_F(StanServicesArgumentsValuedArgument,parse_args) {
   args.clear();
   args.push_back("help");
   help_flag = false;
-  return_value = arg->parse_args(args,0,0,help_flag);
+  return_value = arg->parse_args(args,out,err,help_flag);
   
   EXPECT_TRUE(return_value);
   EXPECT_FALSE(help_flag);
@@ -77,12 +82,14 @@ TEST_F(StanServicesArgumentsValuedArgument,parse_args_unexpected) {
   bool return_value;
   std::vector<std::string> args;
   bool help_flag;
+  stan::interface_callbacks::writer::stream_writer out(ss);
+  stan::interface_callbacks::writer::noop_writer err;
 
   return_value = false;
   args.clear();
   args.push_back("foo=bar");
   help_flag = false;
-  return_value = arg->parse_args(args,0,0,help_flag);
+  return_value = arg->parse_args(args,out,err,help_flag);
   
   EXPECT_TRUE(return_value);
   EXPECT_FALSE(help_flag);
