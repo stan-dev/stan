@@ -298,8 +298,8 @@ namespace stan {
                   << "iteration is larger than the ELBO upon "
                   << "convergence!"
                   << std::endl
-                  << "This means that the variational approximation has "
-                  << "not converged to the global optima."
+                  << "This variational approximation may not "
+                  << "have converged to a good optimum."
                   << std::endl;
             }
           }
@@ -311,7 +311,7 @@ namespace stan {
                 << "iterations is reached! The algorithm has not "
                 << "converged."
                 << std::endl
-                << "Values from this variational approximation are not "
+                << "This variational approximation is not "
                 << "guaranteed to be meaningful."
                 << std::endl;
             do_more_iterations = false;
