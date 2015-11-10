@@ -11,12 +11,12 @@ namespace stan {
   namespace mcmc {
 
     // Euclidean manifold with unit metric
-    template <typename Model, typename BaseRNG>
+    template <class Model, class BaseRNG>
     class unit_e_metric
       : public base_hamiltonian<Model, unit_e_point, BaseRNG> {
     public:
-      unit_e_metric(Model& model, std::ostream* e)
-        : base_hamiltonian<Model, unit_e_point, BaseRNG>(model, e) {}
+      explicit unit_e_metric(Model& model)
+        : base_hamiltonian<Model, unit_e_point, BaseRNG>(model) {}
 
       ~unit_e_metric() {}
 

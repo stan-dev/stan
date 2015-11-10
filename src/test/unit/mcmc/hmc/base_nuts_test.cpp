@@ -33,15 +33,11 @@ namespace stan {
     
     // Mock Hamiltonian
     template <typename M, typename BaseRNG>
-    class divergent_hamiltonian: public base_hamiltonian<M,
-                                                         ps_point,
-                                                         BaseRNG> {
-      
+    class divergent_hamiltonian
+      : public base_hamiltonian<M, ps_point, BaseRNG> {
     public:
-      
-      divergent_hamiltonian(M& m, std::ostream *e): base_hamiltonian<M,
-                                                                     ps_point,
-                                                                     BaseRNG> (m,e) {};
+      explicit divergent_hamiltonian(M& m)
+        : base_hamiltonian<M, ps_point, BaseRNG>(m) {}
       
       double T(ps_point& z) { return 0; }
       

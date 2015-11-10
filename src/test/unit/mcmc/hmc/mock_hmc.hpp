@@ -49,9 +49,8 @@ namespace stan {
                                                     BaseRNG> {
       
     public:
-      
-      mock_hamiltonian(Model& model, std::ostream *e)
-        : base_hamiltonian<Model, ps_point, BaseRNG> (model, e) {}
+      explicit mock_hamiltonian(Model& model)
+        : base_hamiltonian<Model, ps_point, BaseRNG>(model) {}
       
       double T(ps_point& z) { return 0; }
       
@@ -70,7 +69,7 @@ namespace stan {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
       
-      void sample_p(ps_point& z, BaseRNG& rng) {};
+      void sample_p(ps_point& z, BaseRNG& rng) {}
       
     };
     

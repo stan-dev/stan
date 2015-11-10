@@ -67,7 +67,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, begin_update_p) {
   
   // setup hamiltonian
   stan::mcmc::unit_e_metric<command_model_namespace::command_model,
-    rng_t> hamiltonian(*model, &output);
+                            rng_t> hamiltonian(*model);
 
   // setup epsilon
   double epsilon = 0.1;
@@ -95,7 +95,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, update_q) {
 
   // setup hamiltonian
   stan::mcmc::unit_e_metric<command_model_namespace::command_model,
-    rng_t> hamiltonian(*model, &output);
+                            rng_t> hamiltonian(*model);
 
   // setup epsilon
   double epsilon = 0.1;
@@ -123,7 +123,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, end_update_p) {
 
   // setup hamiltonian
   stan::mcmc::unit_e_metric<command_model_namespace::command_model,
-    rng_t> hamiltonian(*model, &output);
+                            rng_t> hamiltonian(*model);
 
   // setup epsilon
   double epsilon = 0.1;
@@ -151,7 +151,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_1) {
 
   // setup hamiltonian
   stan::mcmc::unit_e_metric<command_model_namespace::command_model,
-    rng_t> hamiltonian(*model, &output);
+                            rng_t> hamiltonian(*model);
 
   // setup epsilon
   double epsilon = 0.1;
@@ -179,7 +179,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_2) {
 
   // setup hamiltonian
   stan::mcmc::unit_e_metric<command_model_namespace::command_model,
-    rng_t> hamiltonian(*model, &output);
+                            rng_t> hamiltonian(*model);
 
   // setup epsilon
   double epsilon = 0.2;
@@ -207,7 +207,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_3) {
 
   // setup hamiltonian
   stan::mcmc::unit_e_metric<command_model_namespace::command_model,
-    rng_t> hamiltonian(*model, &output);
+                            rng_t> hamiltonian(*model);
 
   // setup epsilon
   double epsilon = 0.2;
@@ -235,7 +235,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_4) {
 
   // setup hamiltonian
   stan::mcmc::unit_e_metric<command_model_namespace::command_model,
-    rng_t> hamiltonian(*model, &output);
+                            rng_t> hamiltonian(*model);
 
   // setup epsilon
   double epsilon = 0.4;
@@ -263,7 +263,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_5) {
 
   // setup hamiltonian
   stan::mcmc::unit_e_metric<command_model_namespace::command_model,
-    rng_t> hamiltonian(*model, &output);
+                            rng_t> hamiltonian(*model);
 
   // setup epsilon
   double epsilon = 0.8;
@@ -290,7 +290,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_6) {
 
   // setup hamiltonian
   stan::mcmc::unit_e_metric<command_model_namespace::command_model,
-    rng_t> hamiltonian(*model, &output);
+                            rng_t> hamiltonian(*model);
 
   // setup epsilon
   double epsilon = 1.6;
@@ -318,7 +318,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_7) {
 
   // setup hamiltonian
   stan::mcmc::unit_e_metric<command_model_namespace::command_model,
-    rng_t> hamiltonian(*model, &output);
+                            rng_t> hamiltonian(*model);
 
   // setup epsilon
   double epsilon = 3.2;
@@ -346,7 +346,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_8) {
 
   // setup hamiltonian
   stan::mcmc::unit_e_metric<command_model_namespace::command_model,
-    rng_t> hamiltonian(*model, &output);
+                            rng_t> hamiltonian(*model);
 
   // setup epsilon
   double epsilon = -1;
@@ -375,7 +375,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_9) {
 
   // setup hamiltonian
   stan::mcmc::diag_e_metric<command_model_namespace::command_model,
-    rng_t> hamiltonian(*model, &output);
+                            rng_t> hamiltonian(*model);
 
   // setup epsilon
   double epsilon = 2.40769920051673;

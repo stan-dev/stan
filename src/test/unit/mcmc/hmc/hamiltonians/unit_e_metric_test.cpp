@@ -22,7 +22,7 @@ TEST(McmcUnitEMetric, sample_p) {
   std::stringstream metric_output;
   
   stan::mcmc::mock_model model(q.size());
-  stan::mcmc::unit_e_metric<stan::mcmc::mock_model, rng_t> metric(model, &metric_output);
+  stan::mcmc::unit_e_metric<stan::mcmc::mock_model, rng_t> metric(model);
   stan::mcmc::unit_e_point z(q.size());
   
   int n_samples = 1000;
@@ -67,7 +67,7 @@ TEST(McmcUnitEMetric, gradients) {
   
   funnel_model_namespace::funnel_model model(data_var_context, &model_output);
   
-  stan::mcmc::unit_e_metric<funnel_model_namespace::funnel_model, rng_t> metric(model, &metric_output);
+  stan::mcmc::unit_e_metric<funnel_model_namespace::funnel_model, rng_t> metric(model);
   
   double epsilon = 1e-6;
 
@@ -156,11 +156,7 @@ TEST(McmcUnitEMetric, streams) {
   // for use in Google Test macros below
   typedef stan::mcmc::unit_e_metric<stan::mcmc::mock_model, rng_t> unit_e;
 
-  EXPECT_NO_THROW(unit_e metric(model, 0));
-
-  std::stringstream out;
-  EXPECT_NO_THROW(unit_e metric(model, &out));
-  EXPECT_EQ("", out.str());
+  EXPECT_NO_THROW(unit_e metric(model));
   
   stan::test::reset_std_streams();
   EXPECT_EQ("", stan::test::cout_ss.str());

@@ -27,7 +27,7 @@ namespace stan {
         : base_mcmc(o, e),
           z_(model.num_params_r()),
           integrator_(this->out_stream_),
-          hamiltonian_(model, this->err_stream_),
+          hamiltonian_(model),
           rand_int_(rng),
           rand_uniform_(rand_int_),
           nom_epsilon_(0.1),

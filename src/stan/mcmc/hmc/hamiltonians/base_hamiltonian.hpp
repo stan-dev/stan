@@ -10,14 +10,13 @@
 #include <vector>
 
 namespace stan {
-
   namespace mcmc {
 
-    template <typename Model, typename Point, typename BaseRNG>
+    template <class Model, class Point, class BaseRNG>
     class base_hamiltonian {
     public:
-      base_hamiltonian(Model& m, std::ostream* e)
-        : model_(m), err_stream_(e) {}
+      explicit base_hamiltonian(Model& model)
+        : model_(model), info_buffer_(), err_buffer_() {}
 
       ~base_hamiltonian() {}
 
@@ -53,38 +52,37 @@ namespace stan {
 
       virtual void update(Point& z) {
         try {
-          stan::model::gradient(model_, z.q, z.V, z.g, err_stream_);
+          stan::model::gradient(model_, z.q, z.V, z.g, &info_buffer_);
           z.V *= -1;
         } catch (const std::exception& e) {
-          this->write_error_msg_(err_stream_, e);
+          this->write_error_msg_(e);
           z.V = std::numeric_limits<double>::infinity();
         }
         z.g *= -1;
       }
 
+      std::stringstream& info() { return info_buffer_; }
+      std::stringstream& err() { return err_buffer_; }
+
     protected:
-        Model& model_;
+      Model& model_;
+      std::stringstream info_buffer_;
+      std::stringstream err_buffer_;
 
-        std::ostream* err_stream_;
-
-        void write_error_msg_(std::ostream* error_msgs,
-                              const std::exception& e) {
-          if (!error_msgs)
-            return;
-
-          *error_msgs
-            << std::endl
-            << "Informational Message: The current Metropolis proposal "
-            << "is about to be rejected because of the following issue:"
-            << std::endl
-            << e.what() << std::endl
-            << "If this warning occurs sporadically, such as for highly "
-            << "constrained variable types like covariance matrices, then "
-            << "the sampler is fine,"
-            << std::endl
-            << "but if this warning occurs often then your model may be "
-            << "either severely ill-conditioned or misspecified."
-            << std::endl;
+      void write_error_msg_(const std::exception& e) {
+        err_buffer_
+          << std::endl
+          << "Informational Message: The current Metropolis proposal "
+          << "is about to be rejected because of the following issue:"
+          << std::endl
+          << e.what() << std::endl
+          << "If this warning occurs sporadically, such as for highly "
+          << "constrained variable types like covariance matrices, then "
+          << "the sampler is fine,"
+          << std::endl
+          << "but if this warning occurs often then your model may be "
+          << "either severely ill-conditioned or misspecified."
+          << std::endl;
       }
     };
 
