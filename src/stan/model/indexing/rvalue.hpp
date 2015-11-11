@@ -25,7 +25,7 @@ namespace stan {
      * Types:  T[] : T
      * 
      * @tparam T Scalar type.
-     * @paramp[in] c Value to index.
+     * @param[in] c Value to index.
      * @return Input value.
      */
     template <typename T>
@@ -64,7 +64,7 @@ namespace stan {
      * Types:  rowvec[single] : scal
      *
      * @tparam T Scalar type.
-     * @param[in] v Row vector being indexed.
+     * @param[in] rv Row vector being indexed.
      * @param[in] idx One single index in list.
      * @param[in] name String form of expression being evaluated.
      * @param[in] depth Depth of indexing dimension.
@@ -120,7 +120,7 @@ namespace stan {
      *
      * @tparam T Scalar type.
      * @tparam I Multi-index type.
-     * @param[in] v Eigen row vector.
+     * @param[in] rv Eigen row vector.
      * @param[in] idx Index consisting of one multi-index.
      * @param[in] name String form of expression being evaluated.
      * @param[in] depth Depth of indexing dimension.
