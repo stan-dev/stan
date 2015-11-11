@@ -12,11 +12,11 @@ namespace stan {
   namespace mcmc {
 
     // Euclidean manifold with diagonal metric
-    template <typename M, typename BaseRNG>
-    class diag_e_metric: public base_hamiltonian<M, diag_e_point, BaseRNG> {
+    template <typename Model, typename BaseRNG>
+    class diag_e_metric: public base_hamiltonian<Model, diag_e_point, BaseRNG> {
     public:
-      diag_e_metric(M& m, std::ostream* e)
-        : base_hamiltonian<M, diag_e_point, BaseRNG>(m, e) {}
+      diag_e_metric(Model& model, std::ostream* e)
+        : base_hamiltonian<Model, diag_e_point, BaseRNG>(model, e) {}
 
       ~diag_e_metric() {}
 

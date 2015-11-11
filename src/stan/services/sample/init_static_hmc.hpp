@@ -1,5 +1,5 @@
-#ifndef STAN_SERVICES_INIT_INIT_STATIC_HMC_HPP
-#define STAN_SERVICES_INIT_INIT_STATIC_HMC_HPP
+#ifndef STAN_SERVICES_SAMPLE_INIT_STATIC_HMC_HPP
+#define STAN_SERVICES_SAMPLE_INIT_STATIC_HMC_HPP
 
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/services/arguments/argument.hpp>
@@ -8,7 +8,7 @@
 
 namespace stan {
   namespace services {
-    namespace init {
+    namespace sample {
 
       template<class Sampler>
       bool init_static_hmc(stan::mcmc::base_mcmc* sampler,
