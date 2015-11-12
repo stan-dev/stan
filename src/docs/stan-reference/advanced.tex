@@ -2550,11 +2550,10 @@ latent variables. This implicitly defines the variational approximation in the
 original latent variable space as
 %
 \[
-\mathcal{N} \left(T^{-1}(\zeta)\,;\, \mu, \sigma\right)
-\big| \det J_{T^{-1}}(\zeta) \big|.
+\mathcal{N} \left(T(\theta)\,;\, \mu, \sigma\right)
+\big| \det J_{T}(\theta) \big|.
 \]
-Note that this is, in general, not a Gaussian distribution. We choose a
-fully factorized Gaussian for its efficiency and analytic entropy term.
+This is, in general, not a Gaussian distribution.
 This choice may call to mind the Laplace approximation
 technique, where a second-order Taylor expansion around the
 maximum-a-posteriori estimate gives a Gaussian approximation to the

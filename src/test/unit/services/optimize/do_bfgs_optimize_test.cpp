@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/services/optimization/do_bfgs_optimize.hpp>
+#include <stan/services/optimize/do_bfgs_optimize.hpp>
 #include <stan/optimization/bfgs.hpp>
 #include <test/test-models/good/optimization/rosenbrock.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
@@ -45,11 +45,11 @@ TEST(Services, do_bfgs_optimize__bfgs) {
   mock_callback callback;
 
   std::stringstream notice;
-  return_code = stan::services::optimization::do_bfgs_optimize(model,bfgs, base_rng,
-                                                               lp, cont_vector, disc_vector,
-                                                               output_stream, &notice,
-                                                               save_iterations, refresh,
-                                                               callback);
+  return_code = stan::services::optimize::do_bfgs_optimize(model,bfgs, base_rng,
+                                                           lp, cont_vector, disc_vector,
+                                                           output_stream, &notice,
+                                                           save_iterations, refresh,
+                                                           callback);
   EXPECT_EQ("initial log joint probability = -4\nOptimization terminated normally: \n  Convergence detected: relative gradient magnitude is below tolerance\n", notice.str());
   EXPECT_FLOAT_EQ(return_code, 0);
   EXPECT_EQ(33, callback.n);
@@ -82,11 +82,11 @@ TEST(Services, do_bfgs_optimize__lbfgs) {
   mock_callback callback;
 
   std::stringstream notice;
-  return_code = stan::services::optimization::do_bfgs_optimize(model, lbfgs, base_rng,
-                                                               lp, cont_vector, disc_vector,
-                                                               output_stream, &notice,
-                                                               save_iterations, refresh,
-                                                               callback);
+  return_code = stan::services::optimize::do_bfgs_optimize(model, lbfgs, base_rng,
+                                                           lp, cont_vector, disc_vector,
+                                                           output_stream, &notice,
+                                                           save_iterations, refresh,
+                                                           callback);
   EXPECT_EQ("initial log joint probability = -4\nOptimization terminated normally: \n  Convergence detected: relative gradient magnitude is below tolerance\n", notice.str());
   EXPECT_FLOAT_EQ(return_code, 0);
   EXPECT_EQ(35, callback.n);
@@ -120,19 +120,19 @@ TEST(Services, do_bfgs_optimize__streams) {
 
   mock_callback callback;
 
-  EXPECT_NO_THROW(stan::services::optimization::do_bfgs_optimize(model, lbfgs_none, base_rng,
-                                                                 lp, cont_vector, disc_vector,
-                                                                 0, 0,
-                                                                 save_iterations, refresh,
-                                                                 callback));
+  EXPECT_NO_THROW(stan::services::optimize::do_bfgs_optimize(model, lbfgs_none, base_rng,
+                                                             lp, cont_vector, disc_vector,
+                                                             0, 0,
+                                                             save_iterations, refresh,
+                                                             callback));
 
   std::stringstream notice;
   out.str("");
-  EXPECT_NO_THROW(stan::services::optimization::do_bfgs_optimize(model, lbfgs_out, base_rng,
-                                                                 lp, cont_vector, disc_vector,
-                                                                 &out, &notice,
-                                                                 save_iterations, refresh,
-                                                                 callback));
+  EXPECT_NO_THROW(stan::services::optimize::do_bfgs_optimize(model, lbfgs_out, base_rng,
+                                                             lp, cont_vector, disc_vector,
+                                                             &out, &notice,
+                                                             save_iterations, refresh,
+                                                             callback));
   EXPECT_EQ(1, count_matches("-4,1,1\n-3.99039,-0.996,1\n", out.str()));
   EXPECT_EQ("initial log joint probability = -4\nOptimization terminated normally: \n  Convergence detected: relative gradient magnitude is below tolerance\n", notice.str());
 

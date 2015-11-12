@@ -2,6 +2,7 @@
 #include <stan/io/var_context.hpp>
 #include <stan/io/dump.hpp>
 #include <stan/interface_callbacks/var_context_factory/var_context_factory.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <stan/services/init/initialize_state.hpp>
 #include <stan/model/prob_grad.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
@@ -316,7 +317,8 @@ public:
   StanServices() :
     model(3),
     inf_model(3),
-    throwing_model(3) {}
+    throwing_model(3),
+    writer(output) {}
 
   void SetUp() {
     cont_params = Eigen::VectorXd::Zero(3);
@@ -335,6 +337,7 @@ public:
   mock_rng rng;
   std::stringstream output;
   mock_context_factory context_factory;
+  stan::interface_callbacks::writer::stream_writer writer;
 };
 
 TEST_F(StanServices, initialize_state_0) {
@@ -344,7 +347,7 @@ TEST_F(StanServices, initialize_state_0) {
                                cont_params,
                                model,
                                rng,
-                               &output,
+                               writer,
                                context_factory));
   ASSERT_EQ(3, cont_params.size());
   EXPECT_FLOAT_EQ(0, cont_params[0]);
@@ -363,7 +366,7 @@ TEST_F(StanServices, initialize_state_zero) {
   using stan::services::init::initialize_state_zero;
   EXPECT_TRUE(initialize_state_zero(cont_params,
                                     model,
-                                    &output));
+                                    writer));
   ASSERT_EQ(3, cont_params.size());
   EXPECT_FLOAT_EQ(0, cont_params[0]);
   EXPECT_FLOAT_EQ(0, cont_params[1]);
@@ -381,7 +384,7 @@ TEST_F(StanServices, initialize_state_zero_negative_infinity) {
   
   EXPECT_FALSE(initialize_state_zero(cont_params,
                                      model,
-                                     &output));
+                                     writer));
   ASSERT_EQ(3, cont_params.size());
   EXPECT_FLOAT_EQ(0, cont_params[0]);
   EXPECT_FLOAT_EQ(0, cont_params[1]);
@@ -405,7 +408,7 @@ TEST_F(StanServices, initialize_state_zero_grad_error) {
     -std::numeric_limits<double>::infinity();
   EXPECT_FALSE(initialize_state_zero(cont_params,
                                      throwing_model,
-                                     &output));
+                                     writer));
   ASSERT_EQ(3, cont_params.size());
   EXPECT_FLOAT_EQ(0, cont_params[0]);
   EXPECT_FLOAT_EQ(0, cont_params[1]);
@@ -434,7 +437,7 @@ TEST_F(StanServices, initialize_state_number) {
                                cont_params,
                                model,
                                rng,
-                               &output,
+                               writer,
                                context_factory));
   ASSERT_EQ(3, cont_params.size());
   EXPECT_FLOAT_EQ((1.0 / 10000.0 / (rng.max() - rng.min())) * 3, cont_params[0]);
@@ -456,7 +459,7 @@ TEST_F(StanServices, initialize_state_random) {
                                       cont_params,
                                       model,
                                       rng,
-                                      &output));
+                                      writer));
   ASSERT_EQ(3, cont_params.size());
   EXPECT_FLOAT_EQ((1.0 / 10000.0 / (rng.max() - rng.min())) * 3, cont_params[0]);
   EXPECT_FLOAT_EQ((2.0 / 10000.0 / (rng.max() - rng.min())) * 3, cont_params[1]);
@@ -476,7 +479,7 @@ TEST_F(StanServices, initialize_state_random_reject_all) {
                                        cont_params,
                                        model,
                                        rng,
-                                       &output));
+                                       writer));
   ASSERT_EQ(3, cont_params.size());
   EXPECT_FLOAT_EQ((298.0 / 10000.0 / (rng.max() - rng.min())) * 3, cont_params[0]);
   EXPECT_FLOAT_EQ((299.0 / 10000.0 / (rng.max() - rng.min())) * 3, cont_params[1]);
@@ -507,7 +510,7 @@ TEST_F(StanServices, initialize_state_string) {
                                cont_params,
                                model,
                                rng,
-                               &output,
+                               writer,
                                context_factory));
   ASSERT_EQ(3, cont_params.size());
   EXPECT_FLOAT_EQ(0, cont_params[0]);
@@ -529,7 +532,7 @@ TEST_F(StanServices, initialize_state_source) {
                                       cont_params,
                                       model,
                                       rng,
-                                      &output,
+                                      writer,
                                       context_factory));
   ASSERT_EQ(3, cont_params.size());
   EXPECT_FLOAT_EQ(0, cont_params[0]);
@@ -553,7 +556,7 @@ TEST_F(StanServices, initialize_state_source_neg_infinity) {
                                       cont_params,
                                       model,
                                       rng,
-                                      &output,
+                                      writer,
                                       context_factory));
   ASSERT_EQ(3, cont_params.size());
   EXPECT_FLOAT_EQ(0, cont_params[0]);
@@ -584,7 +587,7 @@ TEST_F(StanServices, initialize_state_source_gradient_throws) {
                                        cont_params,
                                        throwing_model,
                                        rng,
-                                       &output,
+                                       writer,
                                        context_factory));
   ASSERT_EQ(3, cont_params.size());
   EXPECT_FLOAT_EQ(0, cont_params[0]);
@@ -725,7 +728,7 @@ TEST_F(StanServices, initialize_state_source_inf) {
                                        cont_params,
                                        inf_model,
                                        rng,
-                                       &output,
+                                       writer,
                                        context_factory));
   ASSERT_EQ(3, cont_params.size());
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), cont_params[0]);
@@ -837,7 +840,8 @@ public:
 
 class StanServices2 : public testing::Test {
 public:
-  StanServices2() {}
+  StanServices2()
+    : writer(output) {}
 
   void SetUp() {
     cont_params = Eigen::VectorXd::Zero(8);
@@ -853,6 +857,7 @@ public:
   mock_rng rng;
   std::stringstream output;
   mock_context_factory2 context_factory;
+  stan::interface_callbacks::writer::stream_writer writer;
 };
 
 TEST_F(StanServices2, initialize_state_source_and_random) {
@@ -863,7 +868,7 @@ TEST_F(StanServices2, initialize_state_source_and_random) {
                                                  cont_params,
                                                  model,
                                                  rng,
-                                                 &output,
+                                                 writer,
                                                  context_factory));
   ASSERT_EQ(8, cont_params.size());
   EXPECT_FLOAT_EQ(0, cont_params[0]);
@@ -899,7 +904,7 @@ TEST_F(StanServices2, initialize_state_source_and_random_R1) {
                                                  cont_params,
                                                  model,
                                                  rng,
-                                                 &output,
+                                                 writer,
                                                  context_factory));
   ASSERT_EQ(8, cont_params.size());
   EXPECT_FLOAT_EQ(0, cont_params[0]);
@@ -924,7 +929,7 @@ TEST_F(StanServices2, initialize_state_disable_random_init) {
                                 cont_params,
                                 model,
                                 rng,
-                                &output,
+                                writer,
                                 context_factory,
                                 false, 2));
   EXPECT_EQ(0, rng.calls);
@@ -944,30 +949,24 @@ TEST_F(StanServices2, streams) {
   using stan::services::init::initialize_state_source_and_random;
   using stan::services::init::initialize_state_random;
   using stan::services::init::initialize_state_values;
-  std::stringstream out;
 
   init = "0";
-  EXPECT_NO_THROW(initialize_state(init, cont_params, model, rng, 0, context_factory));
-  out.str("");
-  EXPECT_NO_THROW(initialize_state(init, cont_params, model, rng, &out, context_factory));
-  EXPECT_EQ("", out.str());
+  output.str("");
+  EXPECT_NO_THROW(initialize_state(init, cont_params, model, rng, writer, context_factory));
+  EXPECT_EQ("", output.str());
 
-  EXPECT_NO_THROW(initialize_state_source(init, cont_params, model, rng, 0, context_factory));
-  out.str("");
-  EXPECT_NO_THROW(initialize_state_source(init, cont_params, model, rng, &out, context_factory));
+  output.str("");
+  EXPECT_NO_THROW(initialize_state_source(init, cont_params, model, rng, writer, context_factory));
 
-  EXPECT_NO_THROW(initialize_state_source_and_random(init, 0.5, cont_params, model, rng, 0, context_factory));
-  out.str("");
-  EXPECT_NO_THROW(initialize_state_source_and_random(init, 0.5, cont_params, model, rng, &out, context_factory));
+  output.str("");
+  EXPECT_NO_THROW(initialize_state_source_and_random(init, 0.5, cont_params, model, rng, writer, context_factory));
 
-  EXPECT_NO_THROW(initialize_state_random(0.5, cont_params, model, rng, 0));
-  out.str("");
-  EXPECT_NO_THROW(initialize_state_random(0.5, cont_params, model, rng, &out));
+  output.str("");
+  EXPECT_NO_THROW(initialize_state_random(0.5, cont_params, model, rng, writer));
 
 
-  EXPECT_NO_THROW(initialize_state_values(cont_params, model, 0));
-  out.str("");
-  EXPECT_NO_THROW(initialize_state_values(cont_params, model, &out));
+  output.str("");
+  EXPECT_NO_THROW(initialize_state_values(cont_params, model, writer));
 
   stan::test::reset_std_streams();
   EXPECT_EQ("", stan::test::cout_ss.str());
