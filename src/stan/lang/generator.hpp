@@ -1796,7 +1796,7 @@ namespace stan {
       }
       void operator()(const assgn& y) const {
         generate_indent(indent_, o_);
-        o_ << "stan::math::assign(";
+        o_ << "stan::model::assign(";
 
         expression var_expr(y.lhs_var_);
         generate_expression(var_expr, o_);

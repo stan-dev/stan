@@ -59,11 +59,6 @@ namespace stan {
       void operator()(const expression & e, bool& pass,
                       std::ostream& error_msgs) const {
         pass = e.expression_type().is_primitive_int();
-        if (!pass) {
-          error_msgs << "Expected integer expression; found type=";
-          write_base_expr_type(error_msgs, e.expression_type().type());
-          error_msgs << std::endl;
-        }
       }
     };
     boost::phoenix::function<validate_int_expression>
@@ -80,15 +75,24 @@ namespace stan {
           write_base_expr_type(error_msgs, e.expression_type().type());
           error_msgs << std::endl;
           pass = false;
-        } else if (e.expression_type().num_dims_ != 1) {
-          error_msgs << "index must be integer or integer array"
+          return;
+        }
+        if (e.expression_type().num_dims_ > 1) {
+          // tests > 1 so that message is coherent because the single
+          // integer array tests don't print
+          error_msgs << "index must be integer or 1D integer array;"
                      << " found number of dimensions="
                      << e.expression_type().num_dims_
                      << std::endl;
           pass = false;
-        } else {
-          pass = true;
+          return;
         }
+        if (e.expression_type().num_dims_ == 0) {
+          // need integer array expression here, but nothing else to report
+          pass = false;
+          return;
+        }
+        pass = true;
       }
     };
     boost::phoenix::function<validate_ints_expression>
@@ -115,7 +119,7 @@ namespace stan {
         > (index_r(_r1) % ',')
         > lit("]");
 
-      index_r.name("index expression denoting, e.g., "
+      index_r.name("index expression, one of: "
                    " int, int[], int:, :int, int:int, :)");
       index_r
         %= lub_index_r(_r1)
@@ -125,35 +129,48 @@ namespace stan {
         | ub_index_r(_r1)
         | omni_index_r(_r1);
 
+      index_r.name("index expression, one of: "
+                   " int, int[], int:, :int, int:int, :)");
       lub_index_r
         %= int_expression_r(_r1)
         >> lit(":")
         >> int_expression_r(_r1)
         > eps;
 
+      index_r.name("index expression, one of: "
+                   " int, int[], int:, :int, int:int, :)");
       lb_index_r
         %= int_expression_r(_r1)
         >> lit(":")
         > eps;
 
+      index_r.name("index expression, one of: "
+                   " int, int[], int:, :int, int:int, :)");
       uni_index_r
         %= int_expression_r(_r1);
 
+      index_r.name("index expression, one of: "
+                   " int, int[], int:, :int, int:int, :)");
       multi_index_r
         %= expression_g(_r1)
            [validate_ints_expression_f(_1, _pass,
                                        boost::phoenix::ref(error_msgs_))]
         > eps;
 
+      index_r.name("index expression, one of: "
+                   " int, int[], int:, :int, int:int, :)");
       ub_index_r
         %= lit(":")
         >> int_expression_r(_r1)
         > eps;
 
+      index_r.name("index expression, one of: "
+                   " int, int[], int:, :int, int:int, :)");
       omni_index_r
         = lit(":")[set_omni_idx_f(_val)]
         |  eps[set_omni_idx_f(_val)];
 
+      int_expression_r.name("integer expression");
       int_expression_r
         %= expression_g(_r1)
            [validate_int_expression_f(_1, _pass,

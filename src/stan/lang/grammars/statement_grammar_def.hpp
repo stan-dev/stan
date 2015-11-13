@@ -164,10 +164,6 @@ namespace stan {
                       std::ostream& error_msgs) const {
         // validate existence
         if (!vm.exists(name)) {
-          error_msgs << "unknown variable in assignment"
-                     << "; lhs variable=" << name
-                     << std::endl;
-
           pass = false;
           return;
         }
@@ -175,13 +171,6 @@ namespace stan {
         var_origin lhs_origin = vm.get_origin(name);
         if (lhs_origin != local_origin
             && lhs_origin != origin_allowed) {
-          error_msgs << "attempt to assign variable in block other than that"
-                     << " in which it was defined;"
-                     << " left-hand-side variable was declared in block=";
-          print_var_origin(error_msgs, lhs_origin);
-          error_msgs << " but current top-level block=";
-          print_var_origin(error_msgs, origin_allowed);
-          error_msgs << std::endl;
           pass = false;
           return;
         }
@@ -192,13 +181,9 @@ namespace stan {
             || lhs_origin == void_function_argument_origin
             || lhs_origin == void_function_argument_origin_lp
             || lhs_origin == void_function_argument_origin_rng) {
-          error_msgs << "Illegal to assign to function argument variables."
-                     << "; use local variables instead."
-                     << std::endl;
           pass = false;
           return;
         }
-
         v = variable(name);
         v.set_type(vm.get_base_type(name), vm.get_num_dims(name));
         pass = true;
@@ -452,7 +437,6 @@ namespace stan {
 
         // test for LHS not being purely a variable
         if (has_non_param_var(s.expr_, var_map)) {
-          // TODO(carpenter):  really want to get line numbers in here too
           error_msgs << "Warning (non-fatal):"
              << std::endl
              << "Left-hand side of sampling statement (~) may contain a"
@@ -728,6 +712,21 @@ namespace stan {
     };
     boost::phoenix::function<validate_int_expr2> validate_int_expr2_f;
 
+    struct validate_int_expr_silent {
+      //! @cond Doxygen_Suppress
+      template <class> struct result;
+      //! @endcond
+      template <typename F, typename T1, typename T2>
+      struct result<F(T1, T2)> { typedef void type; };
+
+      void operator()(const expression& expr, bool& pass) const {
+        pass = expr.expression_type().is_primitive_int();
+      }
+    };
+    boost::phoenix::function<validate_int_expr_silent>
+    validate_int_expr_silent_f;
+
+
     struct validate_allow_sample {
       //! @cond Doxygen_Suppress
       template <class> struct result;
@@ -854,18 +853,18 @@ namespace stan {
       statement_sub_r.name("statement");
       statement_sub_r
         %= no_op_statement_r                        // key ";"
-        | statement_seq_r(_r1, _r2, _r3)              // key "{"
+        | statement_seq_r(_r1, _r2, _r3)            // key "{"
         | increment_log_prob_statement_r(_r1, _r2)  // key "increment_log_prob"
-        | for_statement_r(_r1, _r2, _r3)              // key "for"
-        | while_statement_r(_r1, _r2, _r3)            // key "while"
-        | statement_2_g(_r1, _r2, _r3)                // key "if"
+        | for_statement_r(_r1, _r2, _r3)            // key "for"
+        | while_statement_r(_r1, _r2, _r3)          // key "while"
+        | statement_2_g(_r1, _r2, _r3)              // key "if"
         | print_statement_r(_r2)                    // key "print"
         | reject_statement_r(_r2)                   // key "reject"
         | return_statement_r(_r2)                   // key "return"
         | void_return_statement_r(_r2)              // key "return"
         | assignment_r(_r2)                         // lvalue "<-"
         | assgn_r(_r2)                              // var[idxs] <- expr
-        | sample_r(_r1, _r2)                         // expression "~"
+        | sample_r(_r1, _r2)                        // expression "~"
         | expression_g(_r2)                         // expression
         [expression_as_statement_f(_pass, _1,
                                    boost::phoenix::ref(error_msgs_))];
@@ -1002,10 +1001,11 @@ namespace stan {
         %=  *dims_r(_r1);
 
       dims_r.name("array dimensions");
+      // uses silent test because errors will be reported in sliced rules
       dims_r
         %= lit('[')
         >> (expression_g(_r1)
-           [validate_int_expr2_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
+            [validate_int_expr_silent_f(_1, _pass)]
             % ',')
         >> lit(']');
 

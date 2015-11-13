@@ -680,8 +680,8 @@ namespace stan {
         iop.infer_type();
         if (iop.type_.is_ill_formed()) {
           error_msgs << "Indexed expression must have at least as many"
-                     << " dimensions as number of indexes supplied."
-                     << std::endl;
+          << " dimensions as number of indexes supplied."
+          << std::endl;
           pass = false;
           return;
         }
@@ -744,9 +744,6 @@ namespace stan {
                       bool& pass,
                       std::stringstream& error_msgs) const {
         pass = expr.expression_type().is_primitive_int();
-        if (!pass)
-          error_msgs << "array indices must be integer expressions; found type="
-                     << expr.expression_type() << std::endl;
       }
     };
     boost::phoenix::function<validate_int_expr3> validate_int_expr3_f;
