@@ -78,7 +78,7 @@ namespace stan {
                                  "Number of posterior samples for output",
                                  n_posterior_samples_);
         stan::math::check_positive(function, "Eta stepsize", eta_adagrad_);
-        }
+      }
 
       /**
        * Calculates the Evidence Lower BOund (ELBO) by sampling from
@@ -214,13 +214,12 @@ namespace stan {
         // Main loop
         std::vector<double> print_vector;
         bool do_more_iterations = true;
-        int iter_counter = 1;
-        while (do_more_iterations) {
+        for (int iter_counter = 1; do_more_iterations; ++iter_counter) {
           // Compute gradient using Monte Carlo integration
           calc_ELBO_grad(variational, elbo_grad);
 
           // RMSprop moving average weighting
-          if (iter_counter == 0) {
+          if (iter_counter == 1) {
             params_adagrad += elbo_grad.square();
           } else {
             params_adagrad = pre_factor * params_adagrad +
@@ -318,8 +317,6 @@ namespace stan {
                 << std::endl;
             do_more_iterations = false;
           }
-
-          ++iter_counter;
         }
       }
 
