@@ -1,6 +1,7 @@
 #ifndef STAN_MCMC_HMC_STATIC_DENSE_E_STATIC_HMC_HPP
 #define STAN_MCMC_HMC_STATIC_DENSE_E_STATIC_HMC_HPP
 
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/hmc/static/base_static_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/dense_e_point.hpp>
 #include <stan/mcmc/hmc/hamiltonians/dense_e_metric.hpp>
@@ -19,9 +20,9 @@ namespace stan {
                                expl_leapfrog, BaseRNG> {
     public:
       dense_e_static_hmc(Model &model, BaseRNG& rng,
-                         std::ostream* o, std::ostream* e)
+                         stan::interface_callbacks::writer::base_writer& writer)
         : base_static_hmc<Model, dense_e_metric,
-                          expl_leapfrog, BaseRNG>(model, rng, o, e) {
+                          expl_leapfrog, BaseRNG>(model, rng, writer) {
         this->name_ = "Static HMC with a dense Euclidean metric";
       }
     };

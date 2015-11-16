@@ -1,7 +1,7 @@
 #ifndef STAN_MCMC_HMC_BASE_HMC_HPP
 #define STAN_MCMC_HMC_BASE_HMC_HPP
 
-#include <stan/interface_callbacks/writer/stream_writer.hpp>
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
@@ -23,23 +23,22 @@ namespace stan {
     class base_hmc : public base_mcmc {
     public:
       base_hmc(Model &model, BaseRNG& rng,
-               std::ostream* o, std::ostream* e)
-        : base_mcmc(o, e),
+               interface_callbacks::writer::base_writer& writer)
+        : base_mcmc(writer),
           z_(model.num_params_r()),
-          integrator_(this->out_stream_),
-          hamiltonian_(model),
+          integrator_(writer),
+          hamiltonian_(model, writer),
           rand_int_(rng),
           rand_uniform_(rand_int_),
           nom_epsilon_(0.1),
           epsilon_(nom_epsilon_),
           epsilon_jitter_(0.0) {}
 
-      void write_sampler_state(std::ostream* o) {
-        if (!o)
-          return;
-        *o << "# Step size = " << get_nominal_stepsize() << std::endl;
-        stan::interface_callbacks::writer::stream_writer writer(*o);
-        z_.write_metric(writer);
+      void write_sampler_state() {
+        std::stringstream nominal_stepsize;
+        nominal_stepsize << "Step size = " << get_nominal_stepsize();
+        this->writer_(nominal_stepsize.str());
+        z_.write_metric(this->writer_);
       }
 
       void get_sampler_diagnostic_names(std::vector<std::string>& model_names,

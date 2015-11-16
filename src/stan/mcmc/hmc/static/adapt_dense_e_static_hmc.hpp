@@ -1,6 +1,7 @@
 #ifndef STAN_MCMC_HMC_STATIC_ADAPT_DENSE_E_STATIC_HMC_HPP
 #define STAN_MCMC_HMC_STATIC_ADAPT_DENSE_E_STATIC_HMC_HPP
 
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/stepsize_covar_adapter.hpp>
 #include <stan/mcmc/hmc/static/dense_e_static_hmc.hpp>
 
@@ -17,9 +18,8 @@ namespace stan {
                                      public stepsize_covar_adapter {
     public:
       adapt_dense_e_static_hmc(Model &model, BaseRNG& rng,
-                               std::ostream* o,
-                               std::ostream* e)
-        : dense_e_static_hmc<Model, BaseRNG>(model, rng, o, e),
+                               interface_callbacks::writer::base_writer& writer)
+        : dense_e_static_hmc<Model, BaseRNG>(model, rng, writer),
         stepsize_covar_adapter(model.num_params_r()) { }
 
       ~adapt_dense_e_static_hmc() { }

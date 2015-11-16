@@ -22,7 +22,7 @@ namespace stan {
       
       template <bool propto, bool jacobian_adjust_transforms, typename T>
       T log_prob(Eigen::Matrix<T,Eigen::Dynamic,1>& params_r,
-                      std::ostream* output_stream = 0) const {
+                 std::ostream* output_stream = 0) const {
         return 0;
       }
 
@@ -49,8 +49,9 @@ namespace stan {
                                                     BaseRNG> {
       
     public:
-      explicit mock_hamiltonian(Model& model)
-        : base_hamiltonian<Model, ps_point, BaseRNG>(model) {}
+      mock_hamiltonian(Model& model,
+                       interface_callbacks::writer::base_writer& writer)
+        : base_hamiltonian<Model, ps_point, BaseRNG>(model, writer) {}
       
       double T(ps_point& z) { return 0; }
       
@@ -78,8 +79,8 @@ namespace stan {
     class mock_integrator: public base_integrator<Hamiltonian> {
     
     public:
-      mock_integrator(std::ostream* o) 
-      : base_integrator<Hamiltonian>(o)
+      mock_integrator(stan::interface_callbacks::writer::base_writer& writer) 
+      : base_integrator<Hamiltonian>(writer)
       { }
       
       void evolve(typename Hamiltonian::PointType& z,

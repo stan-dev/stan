@@ -1,15 +1,13 @@
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <stan/mcmc/hmc/nuts/base_nuts.hpp>
 #include <stan/mcmc/hmc/integrators/expl_leapfrog.hpp>
-
 #include <boost/random/additive_combine.hpp>
-
 #include <gtest/gtest.h>
 
 typedef boost::ecuyer1988 rng_t;
 
 namespace stan {
-  
   namespace mcmc {
     
     class mock_nuts: public base_nuts<mock_model,
@@ -19,8 +17,9 @@ namespace stan {
       
     public:
       
-      mock_nuts(mock_model &m, rng_t& rng, std::ostream* o, std::ostream* e)
-        : base_nuts<mock_model,mock_hamiltonian,mock_integrator,rng_t>(m, rng, o, e)
+      mock_nuts(mock_model &m, rng_t& rng,
+                interface_callbacks::writer::base_writer& writer)
+        : base_nuts<mock_model,mock_hamiltonian,mock_integrator,rng_t>(m, rng, writer)
       { this->name_ = "Mock NUTS"; }
       
     private:
@@ -36,8 +35,9 @@ namespace stan {
     class divergent_hamiltonian
       : public base_hamiltonian<M, ps_point, BaseRNG> {
     public:
-      explicit divergent_hamiltonian(M& m)
-        : base_hamiltonian<M, ps_point, BaseRNG>(m) {}
+      divergent_hamiltonian(M& m,
+                            interface_callbacks::writer::base_writer& writer)
+        : base_hamiltonian<M, ps_point, BaseRNG>(m, writer) {}
       
       double T(ps_point& z) { return 0; }
       
@@ -73,8 +73,9 @@ namespace stan {
       
     public:
       
-      divergent_nuts(mock_model &m, rng_t& rng, std::ostream* o, std::ostream* e):
-        base_nuts<mock_model, divergent_hamiltonian, expl_leapfrog,rng_t>(m, rng, o, e)
+      divergent_nuts(mock_model &m, rng_t& rng,
+                     interface_callbacks::writer::base_writer& writer)
+        : base_nuts<mock_model, divergent_hamiltonian, expl_leapfrog,rng_t>(m, rng, writer)
       { this->name_ = "Divergent NUTS"; }
       
     private:
@@ -86,7 +87,6 @@ namespace stan {
     };
     
   }
-  
 }
 
 TEST(McmcBaseNuts, set_max_depth) {
@@ -97,10 +97,11 @@ TEST(McmcBaseNuts, set_max_depth) {
   q(0) = 5;
   q(1) = 1;
   
-  std::stringstream output, error;
+  std::stringstream output;
+  stan::interface_callbacks::writer::stream_writer writer(output);
 
   stan::mcmc::mock_model model(q.size());
-  stan::mcmc::mock_nuts sampler(model, base_rng, &output, &error);
+  stan::mcmc::mock_nuts sampler(model, base_rng, writer);
   
   int old_max_depth = 1;
   sampler.set_max_depth(old_max_depth);
@@ -110,7 +111,6 @@ TEST(McmcBaseNuts, set_max_depth) {
   EXPECT_EQ(old_max_depth, sampler.get_max_depth());
   
   EXPECT_EQ("", output.str());
-  EXPECT_EQ("", error.str());
 }
 
 
@@ -121,16 +121,16 @@ TEST(McmcBaseNuts, set_max_delta) {
   q(0) = 5;
   q(1) = 1;
   
-  std::stringstream output, error;
+  std::stringstream output;
+  stan::interface_callbacks::writer::stream_writer writer(output);
   stan::mcmc::mock_model model(q.size());
-  stan::mcmc::mock_nuts sampler(model, base_rng, &output, &error);
+  stan::mcmc::mock_nuts sampler(model, base_rng, writer);
   
   double old_max_delta = 10;
   sampler.set_max_delta(old_max_delta);
   EXPECT_EQ(old_max_delta, sampler.get_max_delta());
 
   EXPECT_EQ("", output.str());
-  EXPECT_EQ("", error.str());  
 }
 
 TEST(McmcBaseNuts, build_tree) {
@@ -155,9 +155,10 @@ TEST(McmcBaseNuts, build_tree) {
   util.n_tree = 0;
   util.sum_prob = 0;
   
-  std::stringstream output, error;
+  std::stringstream output;
+  stan::interface_callbacks::writer::stream_writer writer(output);
   stan::mcmc::mock_model model(model_size);
-  stan::mcmc::mock_nuts sampler(model, base_rng, &output, &error);
+  stan::mcmc::mock_nuts sampler(model, base_rng, writer);
   
   sampler.set_nominal_stepsize(1);
   sampler.set_stepsize_jitter(0);
@@ -180,7 +181,6 @@ TEST(McmcBaseNuts, build_tree) {
   EXPECT_EQ(init_momentum, sampler.z().p(0));
 
   EXPECT_EQ("", output.str());
-  EXPECT_EQ("", error.str());  
 }
 
 TEST(McmcBaseNuts, slice_criterion) {
@@ -205,9 +205,10 @@ TEST(McmcBaseNuts, slice_criterion) {
   util.n_tree = 0;
   util.sum_prob = 0;
   
-  std::stringstream output, error;
+  std::stringstream output;
+  stan::interface_callbacks::writer::stream_writer writer(output);
   stan::mcmc::mock_model model(model_size);
-  stan::mcmc::divergent_nuts sampler(model, base_rng, &output, &error);
+  stan::mcmc::divergent_nuts sampler(model, base_rng, writer);
   
   sampler.set_nominal_stepsize(1);
   sampler.set_stepsize_jitter(0);
@@ -235,5 +236,4 @@ TEST(McmcBaseNuts, slice_criterion) {
   EXPECT_EQ(1, sampler.n_divergent_);
 
   EXPECT_EQ("", output.str());
-  EXPECT_EQ("", error.str());  
 }

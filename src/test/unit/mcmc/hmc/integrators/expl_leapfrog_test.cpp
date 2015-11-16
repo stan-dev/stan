@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 
 #include <sstream>
-
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <test/test-models/good/mcmc/hmc/integrators/command.hpp>
 
 #include <stan/io/dump.hpp>
@@ -19,6 +19,10 @@ typedef boost::ecuyer1988 rng_t;
 
 class McmcHmcIntegratorsExplLeapfrogF : public testing::Test {
 public:
+  McmcHmcIntegratorsExplLeapfrogF()
+    : writer_(output),
+      unit_e_integrator(writer_),
+      diag_e_integrator(writer_) {}
   
   void SetUp() {
     static const std::string DATA("mu <- 0.0\ny <- 0\n");
@@ -34,6 +38,8 @@ public:
   void TearDown() {
     delete(model);
   }
+
+  stan::interface_callbacks::writer::stream_writer writer_;
   
   // integrator under test
   stan::mcmc::expl_leapfrog<
@@ -67,7 +73,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, begin_update_p) {
   
   // setup hamiltonian
   stan::mcmc::unit_e_metric<command_model_namespace::command_model,
-                            rng_t> hamiltonian(*model);
+                            rng_t> hamiltonian(*model, writer_);
 
   // setup epsilon
   double epsilon = 0.1;
@@ -95,7 +101,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, update_q) {
 
   // setup hamiltonian
   stan::mcmc::unit_e_metric<command_model_namespace::command_model,
-                            rng_t> hamiltonian(*model);
+                            rng_t> hamiltonian(*model, writer_);
 
   // setup epsilon
   double epsilon = 0.1;
@@ -123,7 +129,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, end_update_p) {
 
   // setup hamiltonian
   stan::mcmc::unit_e_metric<command_model_namespace::command_model,
-                            rng_t> hamiltonian(*model);
+                            rng_t> hamiltonian(*model, writer_);
 
   // setup epsilon
   double epsilon = 0.1;
@@ -151,7 +157,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_1) {
 
   // setup hamiltonian
   stan::mcmc::unit_e_metric<command_model_namespace::command_model,
-                            rng_t> hamiltonian(*model);
+                            rng_t> hamiltonian(*model, writer_);
 
   // setup epsilon
   double epsilon = 0.1;
@@ -179,7 +185,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_2) {
 
   // setup hamiltonian
   stan::mcmc::unit_e_metric<command_model_namespace::command_model,
-                            rng_t> hamiltonian(*model);
+                            rng_t> hamiltonian(*model, writer_);
 
   // setup epsilon
   double epsilon = 0.2;
@@ -207,7 +213,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_3) {
 
   // setup hamiltonian
   stan::mcmc::unit_e_metric<command_model_namespace::command_model,
-                            rng_t> hamiltonian(*model);
+                            rng_t> hamiltonian(*model, writer_);
 
   // setup epsilon
   double epsilon = 0.2;
@@ -235,7 +241,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_4) {
 
   // setup hamiltonian
   stan::mcmc::unit_e_metric<command_model_namespace::command_model,
-                            rng_t> hamiltonian(*model);
+                            rng_t> hamiltonian(*model, writer_);
 
   // setup epsilon
   double epsilon = 0.4;
@@ -263,7 +269,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_5) {
 
   // setup hamiltonian
   stan::mcmc::unit_e_metric<command_model_namespace::command_model,
-                            rng_t> hamiltonian(*model);
+                            rng_t> hamiltonian(*model, writer_);
 
   // setup epsilon
   double epsilon = 0.8;
@@ -290,7 +296,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_6) {
 
   // setup hamiltonian
   stan::mcmc::unit_e_metric<command_model_namespace::command_model,
-                            rng_t> hamiltonian(*model);
+                            rng_t> hamiltonian(*model, writer_);
 
   // setup epsilon
   double epsilon = 1.6;
@@ -318,7 +324,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_7) {
 
   // setup hamiltonian
   stan::mcmc::unit_e_metric<command_model_namespace::command_model,
-                            rng_t> hamiltonian(*model);
+                            rng_t> hamiltonian(*model, writer_);
 
   // setup epsilon
   double epsilon = 3.2;
@@ -346,7 +352,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_8) {
 
   // setup hamiltonian
   stan::mcmc::unit_e_metric<command_model_namespace::command_model,
-                            rng_t> hamiltonian(*model);
+                            rng_t> hamiltonian(*model, writer_);
 
   // setup epsilon
   double epsilon = -1;
@@ -375,7 +381,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_9) {
 
   // setup hamiltonian
   stan::mcmc::diag_e_metric<command_model_namespace::command_model,
-                            rng_t> hamiltonian(*model);
+                            rng_t> hamiltonian(*model, writer_);
 
   // setup epsilon
   double epsilon = 2.40769920051673;
@@ -395,10 +401,10 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, streams) {
   typedef stan::mcmc::expl_leapfrog<
     stan::mcmc::unit_e_metric<command_model_namespace::command_model,rng_t> >
     integrator;
-  EXPECT_NO_THROW(integrator i(0));
   
   std::stringstream out;
-  EXPECT_NO_THROW(integrator i(&out));
+  stan::interface_callbacks::writer::stream_writer writer(out);
+  EXPECT_NO_THROW(integrator i(writer));
   EXPECT_EQ("", out.str());
   
   stan::test::reset_std_streams();

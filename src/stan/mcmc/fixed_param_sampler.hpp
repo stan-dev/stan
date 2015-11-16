@@ -1,6 +1,7 @@
 #ifndef STAN_MCMC_FIXED_PARAM_SAMPLER_HPP
 #define STAN_MCMC_FIXED_PARAM_SAMPLER_HPP
 
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/mcmc/sample.hpp>
 
@@ -13,9 +14,9 @@ namespace stan {
 
     class fixed_param_sampler : public base_mcmc {
     public:
-      explicit fixed_param_sampler(std::ostream* o,
-                                   std::ostream* e)
-        : base_mcmc(o, e) {
+      explicit
+      fixed_param_sampler(interface_callbacks::writer::base_writer& writer)
+        : base_mcmc(writer) {
         this->name_ = "Fixed Parameter Sampler";
       }
 

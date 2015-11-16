@@ -1,6 +1,7 @@
 #ifndef STAN_MCMC_HMC_STATIC_ADAPT_DIAG_E_STATIC_HMC_HPP
 #define STAN_MCMC_HMC_STATIC_ADAPT_DIAG_E_STATIC_HMC_HPP
 
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/stepsize_var_adapter.hpp>
 #include <stan/mcmc/hmc/static/diag_e_static_hmc.hpp>
 
@@ -17,9 +18,8 @@ namespace stan {
                                     public stepsize_var_adapter {
     public:
         adapt_diag_e_static_hmc(Model &model, BaseRNG& rng,
-                                std::ostream* o,
-                                std::ostream* e)
-          : diag_e_static_hmc<Model, BaseRNG>(model, rng, o, e),
+                                interface_callbacks::writer::base_writer& writer)
+          : diag_e_static_hmc<Model, BaseRNG>(model, rng, writer),
           stepsize_var_adapter(model.num_params_r()) {}
 
       ~adapt_diag_e_static_hmc() {}

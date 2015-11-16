@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <test/test-models/good/services/test_lp.hpp>
 #include <boost/random/additive_combine.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_unit_e_nuts.hpp>
@@ -10,6 +11,9 @@ typedef stan::mcmc::adapt_unit_e_nuts<Model, rng_t> sampler;
 
 class UiCommand : public testing::Test {
 public:
+  UiCommand()
+    : writer(output) {}
+  
   void SetUp() {
     std::fstream empty_data_stream(std::string("").c_str());
     stan::io::dump empty_data_context(empty_data_stream);
@@ -21,7 +25,7 @@ public:
     
     output.str("");
     error.str("");
-    sampler_ptr = new sampler((*model), base_rng, &output, &error);
+    sampler_ptr = new sampler((*model), base_rng, writer);
     sampler_ptr->set_nominal_stepsize(1);
     sampler_ptr->set_stepsize_jitter(0);
     sampler_ptr->set_max_depth(10);
@@ -50,6 +54,7 @@ public:
   Eigen::VectorXd z_init;
 
   std::stringstream model_output, output, error;
+  stan::interface_callbacks::writer::stream_writer writer;
 };
 
 TEST_F(UiCommand, init_adapt_z_0) {

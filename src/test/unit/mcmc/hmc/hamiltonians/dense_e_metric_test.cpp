@@ -4,6 +4,8 @@
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/dense_e_metric.hpp>
 #include <test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
+#include <stan/interface_callbacks/writer/noop_writer.hpp>
 #include <test/unit/util.hpp>
 #include <gtest/gtest.h>
 
@@ -17,10 +19,11 @@ TEST(McmcDenseEMetric, sample_p) {
   q(1) = 1;
 
   std::stringstream metric_output;
+  stan::interface_callbacks::writer::stream_writer writer(metric_output);
 
   stan::mcmc::mock_model model(q.size());
 
-  stan::mcmc::dense_e_metric<stan::mcmc::mock_model, rng_t> metric(model);
+  stan::mcmc::dense_e_metric<stan::mcmc::mock_model, rng_t> metric(model,writer);
   stan::mcmc::dense_e_point z(q.size());
 
   int n_samples = 1000;
@@ -62,10 +65,10 @@ TEST(McmcDenseEMetric, gradients) {
   
 
   std::stringstream model_output, metric_output;
-
   funnel_model_namespace::funnel_model model(data_var_context, &model_output);
-  
-  stan::mcmc::dense_e_metric<funnel_model_namespace::funnel_model, rng_t> metric(model);
+
+  stan::interface_callbacks::writer::stream_writer writer(metric_output);
+  stan::mcmc::dense_e_metric<funnel_model_namespace::funnel_model, rng_t> metric(model, writer);
   
   double epsilon = 1e-6;
   
@@ -153,11 +156,12 @@ TEST(McmcDenseEMetric, streams) {
 
   
   stan::mcmc::mock_model model(q.size());
-
+  stan::interface_callbacks::writer::noop_writer writer;
+  
   // typedef to use within Google Test macros
   typedef stan::mcmc::dense_e_metric<stan::mcmc::mock_model, rng_t> dense_e;
   
-  EXPECT_NO_THROW(dense_e metric(model));
+  EXPECT_NO_THROW(dense_e metric(model, writer));
 
   stan::test::reset_std_streams();
   EXPECT_EQ("", stan::test::cout_ss.str());

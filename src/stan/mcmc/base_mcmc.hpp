@@ -1,8 +1,8 @@
 #ifndef STAN_MCMC_BASE_MCMC_HPP
 #define STAN_MCMC_BASE_MCMC_HPP
 
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/sample.hpp>
-
 #include <ostream>
 #include <string>
 #include <vector>
@@ -13,8 +13,8 @@ namespace stan {
 
     class base_mcmc {
     public:
-      base_mcmc(std::ostream* o, std::ostream* e)
-        : out_stream_(o), err_stream_(e) {}
+      base_mcmc(interface_callbacks::writer::base_writer& writer)
+        : writer_(writer) {}
 
       virtual ~base_mcmc() {}
 
@@ -24,15 +24,15 @@ namespace stan {
         return name_;
       }
 
-      virtual void write_sampler_param_names(std::ostream& o) {}
+      virtual void write_sampler_param_names() {}
 
-      virtual void write_sampler_params(std::ostream& o) {}
+      virtual void write_sampler_params() {}
 
       virtual void get_sampler_param_names(std::vector<std::string>& names) {}
 
       virtual void get_sampler_params(std::vector<double>& values) {}
 
-      virtual void write_sampler_state(std::ostream* o) {}
+      virtual void write_sampler_state() {}
 
       virtual void
       get_sampler_diagnostic_names(std::vector<std::string>& model_names,
@@ -42,9 +42,7 @@ namespace stan {
 
     protected:
       std::string name_;
-
-      std::ostream* out_stream_;
-      std::ostream* err_stream_;
+      stan::interface_callbacks::writer::base_writer& writer_;
     };
 
   }  // mcmc

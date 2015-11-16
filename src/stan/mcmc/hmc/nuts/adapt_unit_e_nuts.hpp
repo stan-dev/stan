@@ -1,6 +1,7 @@
 #ifndef STAN_MCMC_HMC_NUTS_ADAPT_UNIT_E_NUTS_HPP
 #define STAN_MCMC_HMC_NUTS_ADAPT_UNIT_E_NUTS_HPP
 
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/stepsize_adapter.hpp>
 #include <stan/mcmc/hmc/nuts/unit_e_nuts.hpp>
 
@@ -17,8 +18,8 @@ namespace stan {
                              public stepsize_adapter {
     public:
       adapt_unit_e_nuts(Model &model, BaseRNG& rng,
-                        std::ostream* o, std::ostream* e)
-        : unit_e_nuts<Model, BaseRNG>(model, rng, o, e) {}
+                        interface_callbacks::writer::base_writer& writer)
+        : unit_e_nuts<Model, BaseRNG>(model, rng, writer) {}
 
       ~adapt_unit_e_nuts() {}
 

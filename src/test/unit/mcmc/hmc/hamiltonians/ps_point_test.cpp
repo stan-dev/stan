@@ -66,7 +66,7 @@ namespace stan {
       std::stringstream out;
       stan::interface_callbacks::writer::stream_writer writer(out);
       EXPECT_NO_THROW(point.write_metric(writer));
-      EXPECT_EQ("# No free parameters for unit metric\n", out.str());
+      EXPECT_EQ("No free parameters for unit metric\n", out.str());
       
       stan::test::reset_std_streams();
       EXPECT_EQ("", stan::test::cout_ss.str());

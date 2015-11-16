@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 
 #include <sstream>
-
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <test/test-models/good/mcmc/hmc/integrators/gauss.hpp>
 
 #include <stan/io/dump.hpp>
@@ -22,14 +22,14 @@ TEST(McmcHmcIntegratorsExplLeapfrog, energy_conservation) {
   
   std::stringstream model_output;
   std::stringstream metric_output;
-
+  stan::interface_callbacks::writer::stream_writer writer(metric_output);
   gauss_model_namespace::gauss_model model(data_var_context, &model_output);
   
   stan::mcmc::expl_leapfrog<
     stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> >
-    integrator;
-  
-  stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> metric(model);
+    integrator(writer);
+
+  stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> metric(model, writer);
   
   stan::mcmc::unit_e_point z(1);
   z.q(0) = 1;
@@ -68,16 +68,16 @@ TEST(McmcHmcIntegratorsExplLeapfrog, symplecticness) {
   data_stream.close();
 
   std::stringstream model_output;
+  std::stringstream metric_output;
+  stan::interface_callbacks::writer::stream_writer writer(metric_output);  
   
   gauss_model_namespace::gauss_model model(data_var_context, &model_output);
   
   stan::mcmc::expl_leapfrog<
     stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> >
-    integrator;
+    integrator(writer);
 
-  std::stringstream metric_output;
-  
-  stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> metric(model);
+  stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> metric(model, writer);
   
   // Create a circle of points
   const int n_points = 1000;

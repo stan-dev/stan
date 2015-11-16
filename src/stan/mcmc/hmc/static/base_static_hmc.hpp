@@ -1,16 +1,16 @@
 #ifndef STAN_MCMC_HMC_STATIC_BASE_STATIC_HMC_HPP
 #define STAN_MCMC_HMC_STATIC_BASE_STATIC_HMC_HPP
 
-#include <boost/math/special_functions/fpclassify.hpp>
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/hmc/base_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <cmath>
 #include <limits>
 #include <string>
 #include <vector>
 
 namespace stan {
-
   namespace mcmc {
 
     // Hamiltonian Monte Carlo
@@ -23,8 +23,8 @@ namespace stan {
       : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     public:
       base_static_hmc(Model &model, BaseRNG& rng,
-                      std::ostream* o, std::ostream* e)
-        : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng, o, e),
+                      interface_callbacks::writer::base_writer& writer)
+        : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng, writer),
         T_(1) {
         update_L_();
       }
@@ -60,12 +60,14 @@ namespace stan {
         return sample(this->z_.q, - this->hamiltonian_.V(this->z_), acceptProb);
       }
 
-      void write_sampler_param_names(std::ostream& o) {
-        o << "stepsize__,int_time__,";
+      void write_sampler_param_names() {
+        this->writer_("stepsize__,int_time__,");
       }
 
-      void write_sampler_params(std::ostream& o) {
-        o << this->epsilon_ << "," << this->T_ << ",";
+      void write_sampler_params() {
+        std::stringstream sampler_params;
+        sampler_params << this->epsilon_ << "," << this->T_ << ",";
+        this->writer_(sampler_params.str());
       }
 
       void get_sampler_param_names(std::vector<std::string>& names) {

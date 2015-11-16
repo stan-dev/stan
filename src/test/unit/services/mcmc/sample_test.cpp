@@ -1,6 +1,7 @@
 #include <stan/services/mcmc/sample.hpp>
 #include <gtest/gtest.h>
 #include <test/test-models/good/services/test_lp.hpp>
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <boost/random/additive_combine.hpp>
 #include <sstream>
@@ -10,8 +11,8 @@ typedef stan::interface_callbacks::writer::stream_writer writer_t;
 
 class mock_sampler : public stan::mcmc::base_mcmc {
 public:
-  mock_sampler(std::ostream *output, std::ostream *error)
-    : base_mcmc(output, error), n_transition_called(0) { }
+  mock_sampler(stan::interface_callbacks::writer::base_writer& writer)
+    : base_mcmc(writer), n_transition_called(0) { }
 
   stan::mcmc::sample transition(stan::mcmc::sample& init_sample) {
     n_transition_called++;
@@ -32,6 +33,9 @@ struct mock_callback {
 
 class StanServices : public testing::Test {
 public:
+  StanServices()
+    : message_writer(writer_output) {}
+  
   void SetUp() {
     output.str("");
     error.str("");
@@ -41,8 +45,8 @@ public:
     diagnostic_output.str("");
     message_output.str("");
     writer_output.str("");
-
-    sampler = new mock_sampler(&output, &error);
+    
+    sampler = new mock_sampler(message_writer);
 
     std::fstream empty_data_stream(std::string("").c_str());
     stan::io::dump empty_data_context(empty_data_stream);
@@ -89,11 +93,9 @@ public:
   std::stringstream model_output,
     sample_output, diagnostic_output, message_output,
     writer_output;
+
+  stan::interface_callbacks::writer::stream_writer message_writer;
 };
-
-
-
-
 
 TEST_F(StanServices, sample) {
   std::string expected_sample_output = "Iteration: 31 / 80 [ 38%]  (Sampling)\nIteration: 34 / 80 [ 42%]  (Sampling)\nIteration: 38 / 80 [ 47%]  (Sampling)\nIteration: 42 / 80 [ 52%]  (Sampling)\nIteration: 46 / 80 [ 57%]  (Sampling)\nIteration: 50 / 80 [ 62%]  (Sampling)\nIteration: 54 / 80 [ 67%]  (Sampling)\nIteration: 58 / 80 [ 72%]  (Sampling)\nIteration: 62 / 80 [ 77%]  (Sampling)\nIteration: 66 / 80 [ 82%]  (Sampling)\nIteration: 70 / 80 [ 87%]  (Sampling)\nIteration: 74 / 80 [ 92%]  (Sampling)\nIteration: 78 / 80 [ 97%]  (Sampling)\nIteration: 80 / 80 [100%]  (Sampling)\n";
@@ -116,6 +118,7 @@ TEST_F(StanServices, sample) {
                                prefix, suffix, ss,
                                callback);
   
+
   EXPECT_EQ(num_samples, sampler->n_transition_called);
   EXPECT_EQ(num_samples, callback.n);
 

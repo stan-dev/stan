@@ -23,9 +23,9 @@ namespace stan {
 
       void
       write_metric(stan::interface_callbacks::writer::base_writer& writer) {
-        writer("# Diagonal elements of inverse mass matrix:");
+        writer("Diagonal elements of inverse mass matrix:");
         std::stringstream mInv_ss;
-        mInv_ss << "# " << mInv(0);
+        mInv_ss << mInv(0);
         for (int i = 1; i < mInv.size(); ++i)
           mInv_ss << ", " << mInv(i);
         writer(mInv_ss.str());

@@ -1,6 +1,7 @@
 #ifndef STAN_MCMC_HMC_NUTS_BASE_NUTS_HPP
 #define STAN_MCMC_HMC_NUTS_BASE_NUTS_HPP
 
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/mcmc/hmc/base_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
@@ -32,8 +33,8 @@ namespace stan {
     class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     public:
       base_nuts(Model &model, BaseRNG& rng,
-                std::ostream* o, std::ostream* e)
-        : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng, o, e),
+                interface_callbacks::writer::base_writer& writer)
+        : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng, writer),
         depth_(0), max_depth_(5), max_delta_(1000),
         n_leapfrog_(0), n_divergent_(0) {
       }
@@ -146,13 +147,15 @@ namespace stan {
         return sample(this->z_.q, - this->z_.V, accept_prob);
       }
 
-      void write_sampler_param_names(std::ostream& o) {
-        o << "stepsize__,treedepth__,n_leapfrog__,n_divergent__,";
+      void write_sampler_param_names() {
+        this->writer_("stepsize__,treedepth__,n_leapfrog__,n_divergent__,");
       }
 
-      void write_sampler_params(std::ostream& o) {
-        o << this->epsilon_    << "," << this->depth_ << ","
-          << this->n_leapfrog_ << "," << this->n_divergent_ << ",";
+      void write_sampler_params() {
+        std::stringstream sampler_params;
+        sampler_params << this->epsilon_    << "," << this->depth_ << ","
+                       << this->n_leapfrog_ << "," << this->n_divergent_ << ",";
+        this->writer_(sampler_params.str());
       }
 
       void get_sampler_param_names(std::vector<std::string>& names) {
