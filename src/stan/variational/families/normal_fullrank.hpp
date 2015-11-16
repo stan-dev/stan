@@ -49,12 +49,15 @@ namespace stan {
 
     public:
       // Constructors
+
+      // Constructs a zero-filled variational distribution
       explicit normal_fullrank(size_t dimension) :
         dimension_(dimension) {
         mu_     = Eigen::VectorXd::Zero(dimension_);
-        L_chol_  = Eigen::MatrixXd::Identity(dimension_, dimension_);
+        L_chol_ = Eigen::MatrixXd::Zero(dimension_, dimension_);
       }
 
+      // Constructs the initial variational distribution
       explicit normal_fullrank(const Eigen::VectorXd& cont_params) :
         mu_(cont_params), dimension_(cont_params.size()) {
         L_chol_  = Eigen::MatrixXd::Identity(dimension_, dimension_);
@@ -105,6 +108,11 @@ namespace stan {
                                "Dimension of input matrix", L_chol.rows());
         stan::math::check_not_nan(function, "Input matrix", L_chol_);
         L_chol_ = L_chol;
+      }
+
+      void set_to_zero() {
+        mu_     = Eigen::VectorXd::Zero(dimension_);
+        L_chol_ = Eigen::MatrixXd::Zero(dimension_, dimension_);
       }
 
       // Operations
@@ -280,12 +288,11 @@ namespace stan {
             }
             i += 1;
           } catch (std::exception& e) {
-            this->write_error_msg_(print_stream, e);
             n_monte_carlo_drop += 1;
-            if (n_monte_carlo_drop >= 5*n_monte_carlo_grad) {
+            if (n_monte_carlo_drop >= 10*n_monte_carlo_grad) {
               const char* name = "The number of dropped evaluations";
               const char* msg1 = "has reached its maximum amount (";
-              int y = 5*n_monte_carlo_grad;
+              int y = 10*n_monte_carlo_grad;
               const char* msg2 = "). Your model may be either severely "
                 "ill-conditioned or misspecified.";
               stan::math::domain_error(function, name, y, msg1, msg2);
