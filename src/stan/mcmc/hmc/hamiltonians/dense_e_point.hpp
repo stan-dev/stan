@@ -1,6 +1,7 @@
 #ifndef STAN_MCMC_HMC_HAMILTONIANS_DENSE_E_POINT_HPP
 #define STAN_MCMC_HMC_HAMILTONIANS_DENSE_E_POINT_HPP
 
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 
 namespace stan {
@@ -23,21 +24,21 @@ namespace stan {
         fast_matrix_copy_<double>(mInv, z.mInv);
       }
 
-      void write_metric(std::ostream* o) {
-        if (!o)
-          return;
-        *o << "# Elements of inverse mass matrix:" << std::endl;
+      void
+      write_metric(stan::interface_callbacks::writer::base_writer& writer) {
+        writer("# Elements of inverse mass matrix:");
+        std::stringstream mInv_ss;
         for (int i = 0; i < mInv.rows(); ++i) {
-          *o << "# " << mInv(i, 0) << std::flush;
+          mInv_ss.str("");
+          mInv_ss << "# " << mInv(i, 0);
           for (int j = 1; j < mInv.cols(); ++j)
-            *o << ", " << mInv(i, j) << std::flush;
-          *o << std::endl;
+            mInv_ss << ", " << mInv(i, j);
+          writer(mInv_ss.str());
         }
       }
     };
 
   }  // mcmc
-
 }  // stan
 
 #endif

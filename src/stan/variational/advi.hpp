@@ -80,7 +80,7 @@ namespace stan {
         stan::math::check_positive(function,
                                  "Number of posterior samples for output",
                                  n_posterior_samples_);
-        }
+      }
 
       /**
        * Calculates the Evidence Lower BOund (ELBO) by sampling from
@@ -362,7 +362,7 @@ namespace stan {
         std::vector<double> print_vector;
         int iter_counter = 1;
         bool do_more_iterations = true;
-        while (do_more_iterations) {
+        for (int iter_counter = 1; do_more_iterations; ++iter_counter) {
 
           // SVI
           if (subsample_) {
@@ -372,17 +372,18 @@ namespace stan {
           // Compute gradient of ELBO
           calc_ELBO_grad(variational, elbo_grad);
 
-          // Update learning rate parameters
+          // RMSprop moving average weighting
           if (iter_counter == 1) {
             params_prop += elbo_grad.square();
           } else {
             params_prop = pre_factor * params_prop +
                           post_factor * elbo_grad.square();
           }
-          eta_scaled = eta / sqrt(static_cast<double>(iter_counter));
+          eta_scaled = eta_adagrad_ / sqrt(static_cast<double>(iter_counter));
 
           // Stochastic gradient update
-          variational += eta_scaled * elbo_grad / (tau + params_prop.sqrt());
+          variational += eta_scaled * elbo_grad /
+            (tau + params_adagrad.sqrt());
 
           // Check for convergence every "eval_elbo_"th iteration
           if (iter_counter % eval_elbo_ == 0) {
@@ -468,15 +469,15 @@ namespace stan {
               *print_stream_ << std::endl;
 
             if (do_more_iterations == false &&
-                rel_difference_(elbo, elbo_best) > 0.05) {
+                rel_decrease(elbo, elbo_best) > 0.05) {
               if (print_stream_)
                 *print_stream_
                   << "Informational Message: The ELBO at a previous "
                   << "iteration is larger than the ELBO upon "
                   << "convergence!"
                   << std::endl
-                  << "This means that the variational approximation has "
-                  << "not converged to the global optima."
+                  << "This variational approximation may not "
+                  << "have converged to a good optimum."
                   << std::endl;
             }
           }
@@ -488,13 +489,11 @@ namespace stan {
                 << "iterations is reached! The algorithm has not "
                 << "converged."
                 << std::endl
-                << "Values from this variational approximation are not "
+                << "This variational approximation is not "
                 << "guaranteed to be meaningful."
                 << std::endl;
             do_more_iterations = false;
           }
-
-          ++iter_counter;
         }
       }
 
@@ -598,7 +597,7 @@ namespace stan {
           }
 
           if (print_stream_) {
-            *print_stream_ << "DONE." << std::endl;
+            *print_stream_ << "COMPLETED." << std::endl;
           }
         }
 
