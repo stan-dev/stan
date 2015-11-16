@@ -3,6 +3,26 @@
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 
+TEST(normal_fullrank_test, zero_init) {
+  int my_dimension =  10;
+  Eigen::VectorXd my_zero_vector = Eigen::VectorXd::Zero(my_dimension);
+  Eigen::MatrixXd my_zero_matrix =
+    Eigen::MatrixXd::Zero(my_dimension, my_dimension);
+
+  stan::variational::normal_fullrank my_normal_fullrank(my_dimension);
+  EXPECT_FLOAT_EQ(my_dimension, my_normal_fullrank.dimension());
+
+  const Eigen::VectorXd& mu_out     = my_normal_fullrank.mu();
+  const Eigen::MatrixXd& L_chol_out = my_normal_fullrank.L_chol();
+
+  for (int i = 0; i < my_dimension; ++i) {
+    EXPECT_FLOAT_EQ(my_zero_vector(i), mu_out(i));
+    for (int j = 0; j < my_dimension; ++j) {
+      EXPECT_FLOAT_EQ(my_zero_matrix(i,j), L_chol_out(i));
+    }
+  }
+}
+
 TEST(normal_fullrank_test, dimension) {
   Eigen::Vector3d mu;
   mu << 5.7, -3.2, 0.1332;

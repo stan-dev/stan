@@ -3,6 +3,22 @@
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 
+TEST(normal_meanfield_test, zero_init) {
+  int my_dimension =  10;
+  Eigen::VectorXd my_zero_vector = Eigen::VectorXd::Zero(my_dimension);
+
+  stan::variational::normal_meanfield my_normal_meanfield(my_dimension);
+  EXPECT_FLOAT_EQ(my_dimension, my_normal_meanfield.dimension());
+
+  const Eigen::VectorXd& mu_out    = my_normal_meanfield.mu();
+  const Eigen::VectorXd& omega_out = my_normal_meanfield.omega();
+
+  for (int i = 0; i < my_dimension; ++i) {
+    EXPECT_FLOAT_EQ(my_zero_vector(i), mu_out(i));
+    EXPECT_FLOAT_EQ(my_zero_vector(i), omega_out(i));
+  }
+}
+
 TEST(normal_meanfield_test, dimension) {
   Eigen::Vector3d mu;
   mu << 5.7, -3.2, 0.1332;

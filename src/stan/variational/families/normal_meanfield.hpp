@@ -45,17 +45,19 @@ namespace stan {
 
     public:
       // Constructors
+
+      // Constructs a zero-filled variational distribution
       explicit normal_meanfield(size_t dimension) :
         dimension_(dimension) {
-        mu_     = Eigen::VectorXd::Zero(dimension_);
-        // initializing omega = 0 means sigma = 1
-        omega_  = Eigen::VectorXd::Zero(dimension_);
+        mu_    = Eigen::VectorXd::Zero(dimension_);
+        omega_ = Eigen::VectorXd::Zero(dimension_);
       }
 
+      // Constructs the initial variational distribution
       explicit normal_meanfield(const Eigen::VectorXd& cont_params) :
         mu_(cont_params), dimension_(cont_params.size()) {
         // initializing omega = 0 means sigma = 1
-        omega_  = Eigen::VectorXd::Zero(dimension_);
+        omega_ = Eigen::VectorXd::Zero(dimension_);
       }
 
       normal_meanfield(const Eigen::VectorXd& mu,
@@ -97,6 +99,11 @@ namespace stan {
                                "Dimension of current vector", dimension_);
         stan::math::check_not_nan(function, "Input vector", omega);
         omega_ = omega;
+      }
+
+      void set_to_zero() {
+        mu_    = Eigen::VectorXd::Zero(dimension_);
+        omega_ = Eigen::VectorXd::Zero(dimension_);
       }
 
       // Operations
@@ -262,12 +269,11 @@ namespace stan {
             omega_grad.array() += tmp_mu_grad.array().cwiseProduct(eta.array());
             i += 1;
           } catch (std::exception& e) {
-            this->write_error_msg_(print_stream, e);
             n_monte_carlo_drop += 1;
-            if (n_monte_carlo_drop >= 5*n_monte_carlo_grad) {
+            if (n_monte_carlo_drop >= 10*n_monte_carlo_grad) {
               const char* name = "The number of dropped evaluations";
               const char* msg1 = "has reached its maximum amount (";
-              int y = 5*n_monte_carlo_grad;
+              int y = 10*n_monte_carlo_grad;
               const char* msg2 = "). Your model may be either severely "
                 "ill-conditioned or misspecified.";
               stan::math::domain_error(function, name, y, msg1, msg2);
