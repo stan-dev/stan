@@ -360,7 +360,6 @@ namespace stan {
 
         // Main loop
         std::vector<double> print_vector;
-        int iter_counter = 1;
         bool do_more_iterations = true;
         for (int iter_counter = 1; do_more_iterations; ++iter_counter) {
 
@@ -379,11 +378,11 @@ namespace stan {
             params_prop = pre_factor * params_prop +
                           post_factor * elbo_grad.square();
           }
-          eta_scaled = eta_adagrad_ / sqrt(static_cast<double>(iter_counter));
+          eta_scaled = eta / sqrt(static_cast<double>(iter_counter));
 
           // Stochastic gradient update
           variational += eta_scaled * elbo_grad /
-            (tau + params_adagrad.sqrt());
+            (tau + params_prop.sqrt());
 
           // Check for convergence every "eval_elbo_"th iteration
           if (iter_counter % eval_elbo_ == 0) {
@@ -392,12 +391,12 @@ namespace stan {
             if (elbo > elbo_best) {
               elbo_best = elbo;
             }
-            delta_elbo = rel_difference_(elbo, elbo_prev);
+            delta_elbo = rel_decrease(elbo, elbo_prev);
             elbo_diff.push_back(delta_elbo);
             delta_elbo_ave = std::accumulate(
                                elbo_diff.begin(), elbo_diff.end(), 0.0)
                              / static_cast<double>(elbo_diff.size());
-            delta_elbo_med = circ_buff_median_(elbo_diff);
+            delta_elbo_med = circ_buff_median(elbo_diff);
 
             if (print_stream_) {
               *print_stream_
@@ -604,12 +603,32 @@ namespace stan {
         return stan::services::error_codes::OK;
       }
 
+      // Helper function: compute the median of a circular buffer
+      double circ_buff_median(const boost::circular_buffer<double>& cb) const {
+          // FIXME: naive implementation; creates a copy as a vector
+          std::vector<double> v;
+          for (boost::circular_buffer<double>::const_iterator i = cb.begin();
+                i != cb.end(); ++i) {
+            v.push_back(*i);
+          }
+
+          size_t n = v.size() / 2;
+          std::nth_element(v.begin(), v.begin()+n, v.end());
+          return v[n];
+      }
+
+      // Helper function: compute relative decrease between two doubles
+      double rel_decrease(double prev, double curr) const {
+        return std::abs(curr - prev) / std::abs(prev);
+      }
+
     protected:
       M& model_;
       Eigen::VectorXd& cont_params_;
       BaseRNG& rng_;
       int n_monte_carlo_grad_;
       int n_monte_carlo_elbo_;
+      double eta_adagrad_;
       int eval_elbo_;
       int n_posterior_samples_;
       bool subsample_;
@@ -617,21 +636,21 @@ namespace stan {
       std::ostream* out_stream_;
       std::ostream* diag_stream_;
 
-      double circ_buff_median_(const boost::circular_buffer<double>& cb) const {
-        // FIXME: naive implementation; creates a copy as a vector
-        std::vector<double> v;
-        for (boost::circular_buffer<double>::const_iterator i = cb.begin();
-              i != cb.end(); ++i) {
-          v.push_back(*i);
+      void write_error_msg_(std::ostream* error_msgs,
+                            const std::exception& e) const {
+        if (!error_msgs) {
+          return;
         }
 
-        size_t n = v.size() / 2;
-        std::nth_element(v.begin(), v.begin()+n, v.end());
-        return v[n];
-      }
-
-      double rel_difference_(double prev, double curr) const {
-        return std::abs(curr - prev) / std::abs(prev);
+        *error_msgs
+          << std::endl
+          << "Informational Message: The current sample evaluation "
+          << "of the ELBO is ignored because of the following issue:"
+          << std::endl
+          << e.what() << std::endl
+          << "If this warning occurs often then your model may be "
+          << "either severely ill-conditioned or misspecified."
+          << std::endl;
       }
     };
   }  // variational
