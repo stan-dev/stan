@@ -78,7 +78,7 @@ namespace stan {
                                  "Number of posterior samples for output",
                                  n_posterior_samples_);
         stan::math::check_positive(function, "Eta stepsize", eta_adagrad_);
-        }
+      }
 
       /**
        * Calculates the Evidence Lower BOund (ELBO) by sampling from
@@ -175,6 +175,7 @@ namespace stan {
         // Adagrad parameters
         double tau = 1.0;
         Q params_adagrad = Q(model_.num_params_r());
+        double eta_scaled;
 
         // RMSprop window_size
         double window_size = 10.0;
@@ -192,7 +193,7 @@ namespace stan {
         // Heuristic to estimate how far to look back in rolling window
         int cb_size = static_cast<int>(
                 std::max(0.1*max_iterations/static_cast<double>(eval_elbo_),
-                         1.0));
+                         2.0));
         boost::circular_buffer<double> cb(cb_size);
 
         // Print stuff
@@ -213,21 +214,21 @@ namespace stan {
         // Main loop
         std::vector<double> print_vector;
         bool do_more_iterations = true;
-        int iter_counter = 0;
-        while (do_more_iterations) {
+        for (int iter_counter = 1; do_more_iterations; ++iter_counter) {
           // Compute gradient using Monte Carlo integration
           calc_ELBO_grad(variational, elbo_grad);
 
           // RMSprop moving average weighting
-          if (iter_counter == 0) {
+          if (iter_counter == 1) {
             params_adagrad += elbo_grad.square();
           } else {
             params_adagrad = pre_factor * params_adagrad +
                              post_factor * elbo_grad.square();
           }
+          eta_scaled = eta_adagrad_ / sqrt(static_cast<double>(iter_counter));
 
           // Stochastic gradient update
-          variational += eta_adagrad_ * elbo_grad /
+          variational += eta_scaled * elbo_grad /
             (tau + params_adagrad.sqrt());
 
           // Check for convergence every "eval_elbo_"th iteration
@@ -280,7 +281,7 @@ namespace stan {
               do_more_iterations = false;
             }
 
-            if (iter_counter > 100) {
+            if (iter_counter > 2*eval_elbo_) {
               if (delta_elbo_med > 0.5 || delta_elbo_ave > 0.5) {
                 if (print_stream_)
                   *print_stream_ << "   MAY BE DIVERGING... INSPECT ELBO";
@@ -316,8 +317,6 @@ namespace stan {
                 << std::endl;
             do_more_iterations = false;
           }
-
-          ++iter_counter;
         }
       }
 

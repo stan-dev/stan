@@ -83,13 +83,13 @@ TEST_F(advi_test, max_iteration_warn_fullrank) {
 }
 
 TEST_F(advi_test, prev_elbo_larger_meanfield) {
-  EXPECT_EQ(0, advi_meanfield_->run(0.01, 10));
+  EXPECT_EQ(0, advi_meanfield_->run(0.1, 100));
   EXPECT_TRUE(print_stream_.str().find(err_msg2) != std::string::npos)
     << "The message should have err_msg2 inside it.";
 }
 
 TEST_F(advi_test, prev_elbo_larger_fullrank) {
-  EXPECT_EQ(0, advi_fullrank_->run(0.01, 10));
+  EXPECT_EQ(0, advi_fullrank_->run(0.2, 100));
   EXPECT_TRUE(print_stream_.str().find(err_msg2) != std::string::npos)
     << "The message should have err_msg2 inside it.";
 }
