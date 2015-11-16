@@ -5,9 +5,6 @@
 
 TEST(normal_fullrank_test, zero_init) {
   int my_dimension =  10;
-  Eigen::VectorXd my_zero_vector = Eigen::VectorXd::Zero(my_dimension);
-  Eigen::MatrixXd my_zero_matrix =
-    Eigen::MatrixXd::Zero(my_dimension, my_dimension);
 
   stan::variational::normal_fullrank my_normal_fullrank(my_dimension);
   EXPECT_FLOAT_EQ(my_dimension, my_normal_fullrank.dimension());
@@ -16,9 +13,9 @@ TEST(normal_fullrank_test, zero_init) {
   const Eigen::MatrixXd& L_chol_out = my_normal_fullrank.L_chol();
 
   for (int i = 0; i < my_dimension; ++i) {
-    EXPECT_FLOAT_EQ(my_zero_vector(i), mu_out(i));
+    EXPECT_FLOAT_EQ(0.0, mu_out(i));
     for (int j = 0; j < my_dimension; ++j) {
-      EXPECT_FLOAT_EQ(my_zero_matrix(i,j), L_chol_out(i));
+      EXPECT_FLOAT_EQ(0.0, L_chol_out(i,j));
     }
   }
 }
@@ -64,6 +61,13 @@ TEST(normal_fullrank_test, mean_vector) {
   Eigen::MatrixXd L_nan = Eigen::MatrixXd::Constant(3,3,nan);
   EXPECT_THROW(stan::variational::normal_fullrank my_normal_fullrank_nan(mu, L_nan);,
                    std::domain_error);
+
+  my_normal_fullrank.set_to_zero();
+  const Eigen::Vector3d& mu_out_zero = my_normal_fullrank.mu();
+
+  for (int i = 0; i < my_normal_fullrank.dimension(); ++i) {
+    EXPECT_FLOAT_EQ(0.0, mu_out_zero(i));
+  }
 }
 
 TEST(normal_fullrank_test, cholesky_factor) {
@@ -89,6 +93,16 @@ TEST(normal_fullrank_test, cholesky_factor) {
   Eigen::MatrixXd L_nan = Eigen::MatrixXd::Constant(3,3,nan);
   EXPECT_THROW(my_normal_fullrank.set_L_chol(L_nan),
                    std::domain_error);
+
+  my_normal_fullrank.set_to_zero();
+  const Eigen::Matrix3d& L_out_zero = my_normal_fullrank.L_chol();
+
+  for (int i = 0; i < my_normal_fullrank.dimension(); ++i) {
+    for (int j = 0; j < my_normal_fullrank.dimension(); ++j) {
+      EXPECT_FLOAT_EQ(0.0, L_out_zero(i,j));
+    }
+  }
+
 }
 
 TEST(normal_fullrank_test, entropy) {

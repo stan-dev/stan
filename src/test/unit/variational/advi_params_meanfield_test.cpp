@@ -5,7 +5,6 @@
 
 TEST(normal_meanfield_test, zero_init) {
   int my_dimension =  10;
-  Eigen::VectorXd my_zero_vector = Eigen::VectorXd::Zero(my_dimension);
 
   stan::variational::normal_meanfield my_normal_meanfield(my_dimension);
   EXPECT_FLOAT_EQ(my_dimension, my_normal_meanfield.dimension());
@@ -14,8 +13,8 @@ TEST(normal_meanfield_test, zero_init) {
   const Eigen::VectorXd& omega_out = my_normal_meanfield.omega();
 
   for (int i = 0; i < my_dimension; ++i) {
-    EXPECT_FLOAT_EQ(my_zero_vector(i), mu_out(i));
-    EXPECT_FLOAT_EQ(my_zero_vector(i), omega_out(i));
+    EXPECT_FLOAT_EQ(0.0, mu_out(i));
+    EXPECT_FLOAT_EQ(0.0, omega_out(i));
   }
 }
 
@@ -55,6 +54,14 @@ TEST(normal_meanfield_test, mean_vector) {
   Eigen::Vector3d omega_nan = Eigen::VectorXd::Constant(3,nan);
   EXPECT_THROW(stan::variational::normal_meanfield my_normal_meanfield_nan(mu, omega_nan);,
                    std::domain_error);
+
+  my_normal_meanfield.set_to_zero();
+  const Eigen::Vector3d& mu_out_zero = my_normal_meanfield.mu();
+
+  for (int i = 0; i < my_normal_meanfield.dimension(); ++i) {
+    EXPECT_FLOAT_EQ(0.0, mu_out_zero(i));
+  }
+
 }
 
 TEST(normal_meanfield_test, omega_vector) {
@@ -76,6 +83,13 @@ TEST(normal_meanfield_test, omega_vector) {
 
   EXPECT_THROW(my_normal_meanfield.set_omega(omega_nan);,
                    std::domain_error);
+
+  my_normal_meanfield.set_to_zero();
+  const Eigen::Vector3d& omega_out_zero = my_normal_meanfield.omega();
+
+  for (int i = 0; i < my_normal_meanfield.dimension(); ++i) {
+    EXPECT_FLOAT_EQ(0.0, omega_out_zero(i));
+  }
 }
 
 TEST(normal_meanfield_test, entropy) {
