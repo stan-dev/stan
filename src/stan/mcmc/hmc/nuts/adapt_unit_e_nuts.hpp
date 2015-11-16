@@ -12,18 +12,18 @@ namespace stan {
     // Euclidean manifold with unit metric
     // and adaptive stepsize
 
-    template <typename M, class BaseRNG>
-    class adapt_unit_e_nuts: public unit_e_nuts<M, BaseRNG>,
+    template <typename Model, class BaseRNG>
+    class adapt_unit_e_nuts: public unit_e_nuts<Model, BaseRNG>,
                              public stepsize_adapter {
     public:
-      adapt_unit_e_nuts(M &m, BaseRNG& rng,
+      adapt_unit_e_nuts(Model &model, BaseRNG& rng,
                         std::ostream* o, std::ostream* e)
-        : unit_e_nuts<M, BaseRNG>(m, rng, o, e) {}
+        : unit_e_nuts<Model, BaseRNG>(model, rng, o, e) {}
 
       ~adapt_unit_e_nuts() {}
 
       sample transition(sample& init_sample) {
-        sample s = unit_e_nuts<M, BaseRNG>::transition(init_sample);
+        sample s = unit_e_nuts<Model, BaseRNG>::transition(init_sample);
 
         if (this->adapt_flag_)
           this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,

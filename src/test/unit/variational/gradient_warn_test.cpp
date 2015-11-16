@@ -12,7 +12,6 @@ typedef boost::ecuyer1988 rng_t;
 class advi_test : public ::testing::Test {
 public:
   void SetUp() {
-    // Create mock data_var_context
     std::fstream data_stream("src/test/test-models/good/variational/gradient_warn.data.R",
                              std::fstream::in);
     stan::io::dump data_var_context(data_stream);

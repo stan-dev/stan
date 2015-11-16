@@ -21,11 +21,11 @@ namespace stan {
       }
 
       int parse_args(int argc,
-                      const char* argv[],
-                      std::ostream* out = 0,
-                      std::ostream* err = 0) {
+                     const char* argv[],
+                     interface_callbacks::writer::base_writer& info,
+                     interface_callbacks::writer::base_writer& err) {
         if (argc == 1) {
-          print_usage(out, argv[0]);
+          print_usage(info, argv[0]);
           return error_codes::USAGE;
         }
 
@@ -72,11 +72,11 @@ namespace stan {
                arg_it != unset_args.end(); ++arg_it) {
             if ((*arg_it)->name() == cat_name) {
               args.pop_back();
-              valid_arg &= (*arg_it)->parse_args(args, out, err, _help_flag);
+              valid_arg &= (*arg_it)->parse_args(args, info, err, _help_flag);
               good_arg = true;
               break;
             } else if ((*arg_it)->name() == val_name) {
-              valid_arg &= (*arg_it)->parse_args(args, out, err, _help_flag);
+              valid_arg &= (*arg_it)->parse_args(args, info, err, _help_flag);
               good_arg = true;
               break;
             }
@@ -88,19 +88,18 @@ namespace stan {
             _help_flag |= true;
             args.clear();
           } else if (cat_name == "help-all") {
-            print_help(out, true);
+            print_help(info, true);
             _help_flag |= true;
             args.clear();
           }
 
           if (_help_flag) {
-            print_usage(out, argv[0]);
+            print_usage(info, argv[0]);
             return error_codes::OK;
           }
 
-          if (!good_arg && err) {
-            *err << cat_name << " is either mistyped or misplaced."
-                 << std::endl;
+          if (!good_arg) {
+            err(cat_name + " is either mistyped or misplaced.");
 
             std::vector<std::string> valid_paths;
 
@@ -109,11 +108,10 @@ namespace stan {
             }
 
             if (valid_paths.size()) {
-              *err << "Perhaps you meant one of the following "
-                   << "valid configurations?"
-                   << std::endl;
+              err("Perhaps you meant one of the following "
+                  "valid configurations?");
               for (size_t i = 0; i < valid_paths.size(); ++i)
-                *err << "  " << valid_paths.at(i) << std::endl;
+                err("  " + valid_paths.at(i));
             }
           }
         }
@@ -122,81 +120,86 @@ namespace stan {
           return error_codes::OK;
 
         if (!_method_flag)
-          *err << "A method must be specified!" << std::endl;
+          err("A method must be specified!");
 
-        return (valid_arg && good_arg && _method_flag) ?
-          error_codes::OK : error_codes::USAGE;
+        return (valid_arg && good_arg && _method_flag)
+          ? error_codes::OK : error_codes::USAGE;
       }
 
-      void print(std::ostream* s, const std::string prefix = "") {
-        if (!s)
-          return;
-
+      void print(interface_callbacks::writer::base_writer& w,
+                 const std::string& prefix = "") {
         for (size_t i = 0; i < _arguments.size(); ++i) {
-          _arguments.at(i)->print(s, 0, prefix);
+          _arguments.at(i)->print(w, 0, prefix);
         }
       }
 
-      void print_help(std::ostream* s, bool recurse) {
-        if (!s)
-          return;
-
+      void print_help(interface_callbacks::writer::base_writer& w,
+                      bool recurse) {
         for (size_t i = 0; i < _arguments.size(); ++i) {
-          _arguments.at(i)->print_help(s, 1, recurse);
+          _arguments.at(i)->print_help(w, 1, recurse);
         }
       }
 
-      void print_usage(std::ostream* s, const char* executable) {
-        if (!s)
-          return;
-
+      void print_usage(interface_callbacks::writer::base_writer& w,
+                       const char* executable) {
         std::string indent(2, ' ');
         int width = 12;
-        *s << std::left;
 
-        *s << "Usage: " << executable << " <arg1> <subarg1_1> ... <subarg1_m>"
-           << " ... <arg_n> <subarg_n_1> ... <subarg_n_m>"
-           << std::endl << std::endl;
+        w(std::string("Usage: ") + executable
+          + " <arg1> <subarg1_1> ... <subarg1_m>"
+          + " ... <arg_n> <subarg_n_1> ... <subarg_n_m>");
+        w();
 
-        *s << "Begin by selecting amongst the following inference methods"
-           << " and diagnostics," << std::endl;
+        w("Begin by selecting amongst the following inference methods"
+          " and diagnostics,");
 
         std::vector<argument*>::iterator arg_it = _arguments.begin();
         list_argument* method = dynamic_cast<list_argument*>(*arg_it);
 
+        std::stringstream ss;
+        ss << std::left;
         for (std::vector<argument*>::iterator value_it
                = method->values().begin();
              value_it != method->values().end(); ++value_it) {
-          *s << std::setw(width)
+          ss.str("");
+          ss << std::setw(width)
              << indent + (*value_it)->name()
-             << indent + (*value_it)->description() << std::endl;
+             << indent + (*value_it)->description();
+          w(ss.str());
         }
-        *s << std::endl;
+        w();
 
-        *s << "Or see help information with" << std::endl;
-        *s << std::setw(width)
+        w("Or see help information with");
+        ss.str("");
+        ss << std::setw(width)
            << indent + "help"
-           << indent + "Prints help" << std::endl;
-        *s << std::setw(width)
+           << indent + "Prints help";
+        w(ss.str());
+        ss.str("");
+        ss << std::setw(width)
            << indent + "help-all"
-           << indent + "Prints entire argument tree" << std::endl;
-        *s << std::endl;
+           << indent + "Prints entire argument tree";
+        w(ss.str());
+        w();
 
-        *s << "Additional configuration available by specifying" << std::endl;
+        w("Additional configuration available by specifying");
 
         ++arg_it;
         for (; arg_it != _arguments.end(); ++arg_it) {
-          *s << std::setw(width)
+          ss.str("");
+          ss << std::setw(width)
              << indent + (*arg_it)->name()
-             << indent + (*arg_it)->description() << std::endl;
+             << indent + (*arg_it)->description();
+          w(ss.str());
         }
 
-        *s << std::endl;
-        *s << "See " << executable << " <arg1> [ help | help-all ] "
-           << "for details on individual arguments." << std::endl << std::endl;
+        w();
+        w(std::string("See ") + executable + " <arg1> [ help | help-all ] "
+          + "for details on individual arguments.");
+        w();
       }
 
-      argument* arg(std::string name) {
+      argument* arg(const std::string& name) {
         for (std::vector<argument*>::iterator it = _arguments.begin();
              it != _arguments.end(); ++it)
           if ( name == (*it)->name() )

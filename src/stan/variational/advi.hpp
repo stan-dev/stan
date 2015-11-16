@@ -78,7 +78,7 @@ namespace stan {
                                  "Number of posterior samples for output",
                                  n_posterior_samples_);
         stan::math::check_positive(function, "Eta stepsize", eta_adagrad_);
-        }
+      }
 
       /**
        * Calculates the Evidence Lower BOund (ELBO) by sampling from
@@ -175,6 +175,7 @@ namespace stan {
         // Adagrad parameters
         double tau = 1.0;
         Q params_adagrad = Q(model_.num_params_r());
+        double eta_scaled;
 
         // RMSprop window_size
         double window_size = 10.0;
@@ -183,6 +184,7 @@ namespace stan {
 
         // Initialize ELBO and convergence tracking variables
         double elbo(0.0);
+        double elbo_best      = -std::numeric_limits<double>::max();
         double elbo_prev      = std::numeric_limits<double>::min();
         double delta_elbo     = std::numeric_limits<double>::max();
         double delta_elbo_ave = std::numeric_limits<double>::max();
@@ -191,7 +193,7 @@ namespace stan {
         // Heuristic to estimate how far to look back in rolling window
         int cb_size = static_cast<int>(
                 std::max(0.1*max_iterations/static_cast<double>(eval_elbo_),
-                         1.0));
+                         2.0));
         boost::circular_buffer<double> cb(cb_size);
 
         // Print stuff
@@ -212,27 +214,30 @@ namespace stan {
         // Main loop
         std::vector<double> print_vector;
         bool do_more_iterations = true;
-        int iter_counter = 0;
-        while (do_more_iterations) {
+        for (int iter_counter = 1; do_more_iterations; ++iter_counter) {
           // Compute gradient using Monte Carlo integration
           calc_ELBO_grad(variational, elbo_grad);
 
           // RMSprop moving average weighting
-          if (iter_counter == 0) {
+          if (iter_counter == 1) {
             params_adagrad += elbo_grad.square();
           } else {
             params_adagrad = pre_factor * params_adagrad +
                              post_factor * elbo_grad.square();
           }
+          eta_scaled = eta_adagrad_ / sqrt(static_cast<double>(iter_counter));
 
           // Stochastic gradient update
-          variational += eta_adagrad_ * elbo_grad /
+          variational += eta_scaled * elbo_grad /
             (tau + params_adagrad.sqrt());
 
           // Check for convergence every "eval_elbo_"th iteration
           if (iter_counter % eval_elbo_ == 0) {
             elbo_prev = elbo;
             elbo = calc_ELBO(variational);
+            if (elbo > elbo_best) {
+              elbo_best = elbo;
+            }
             delta_elbo = rel_decrease(elbo, elbo_prev);
             cb.push_back(delta_elbo);
             delta_elbo_ave = std::accumulate(cb.begin(), cb.end(), 0.0)
@@ -276,7 +281,7 @@ namespace stan {
               do_more_iterations = false;
             }
 
-            if (iter_counter > 100) {
+            if (iter_counter > 2*eval_elbo_) {
               if (delta_elbo_med > 0.5 || delta_elbo_ave > 0.5) {
                 if (print_stream_)
                   *print_stream_ << "   MAY BE DIVERGING... INSPECT ELBO";
@@ -285,16 +290,33 @@ namespace stan {
 
             if (print_stream_)
               *print_stream_ << std::endl;
+
+            if (do_more_iterations == false &&
+                rel_decrease(elbo, elbo_best) > 0.05) {
+              if (print_stream_)
+                *print_stream_
+                  << "Informational Message: The ELBO at a previous "
+                  << "iteration is larger than the ELBO upon "
+                  << "convergence!"
+                  << std::endl
+                  << "This variational approximation may not "
+                  << "have converged to a good optimum."
+                  << std::endl;
+            }
           }
 
-          // Check for max iterations
           if (iter_counter == max_iterations) {
             if (print_stream_)
-              *print_stream_ << "MAX ITERATIONS REACHED" << std::endl;
+              *print_stream_
+                << "Informational Message: The maximum number of "
+                << "iterations is reached! The algorithm has not "
+                << "converged."
+                << std::endl
+                << "This variational approximation is not "
+                << "guaranteed to be meaningful."
+                << std::endl;
             do_more_iterations = false;
           }
-
-          ++iter_counter;
         }
       }
 
@@ -334,6 +356,14 @@ namespace stan {
 
         // draw more samples from posterior and write on subsequent lines
         if (out_stream_) {
+          if (print_stream_) {
+            *print_stream_ << std::endl
+                           << "Drawing "
+                           << n_posterior_samples_
+                           << " samples from the approximate posterior... ";
+            print_stream_->flush();
+          }
+
           for (int n = 0; n < n_posterior_samples_; ++n) {
             variational.sample(rng_, cont_params_);
             double lp = model_.template log_prob<false, true>(cont_params_,
@@ -343,6 +373,10 @@ namespace stan {
             }
             services::io::write_iteration(*out_stream_, model_, rng_,
                           lp, cont_vector, disc_vector, print_stream_);
+          }
+
+          if (print_stream_) {
+            *print_stream_ << "COMPLETED." << std::endl;
           }
         }
 

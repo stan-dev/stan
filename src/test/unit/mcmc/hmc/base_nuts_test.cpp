@@ -13,7 +13,6 @@ namespace stan {
   namespace mcmc {
     
     class mock_nuts: public base_nuts<mock_model,
-                                      ps_point,
                                       mock_hamiltonian,
                                       mock_integrator,
                                       rng_t> {
@@ -21,7 +20,7 @@ namespace stan {
     public:
       
       mock_nuts(mock_model &m, rng_t& rng, std::ostream* o, std::ostream* e)
-        : base_nuts<mock_model,ps_point,mock_hamiltonian,mock_integrator,rng_t>(m, rng, o, e)
+        : base_nuts<mock_model,mock_hamiltonian,mock_integrator,rng_t>(m, rng, o, e)
       { this->name_ = "Mock NUTS"; }
       
     private:
@@ -72,7 +71,6 @@ namespace stan {
     };
     
     class divergent_nuts: public base_nuts<mock_model,
-                                           ps_point,
                                            divergent_hamiltonian,
                                            expl_leapfrog,
                                            rng_t> {
@@ -80,7 +78,7 @@ namespace stan {
     public:
       
       divergent_nuts(mock_model &m, rng_t& rng, std::ostream* o, std::ostream* e):
-        base_nuts<mock_model, ps_point, divergent_hamiltonian, expl_leapfrog,rng_t>(m, rng, o, e)
+        base_nuts<mock_model, divergent_hamiltonian, expl_leapfrog,rng_t>(m, rng, o, e)
       { this->name_ = "Divergent NUTS"; }
       
     private:
