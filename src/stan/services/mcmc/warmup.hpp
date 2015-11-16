@@ -29,8 +29,9 @@ namespace stan {
                   const std::string& suffix,
                   std::ostream& o,
                   StartTransitionCallback& callback) {
-		 std::fstream* warmup_timing_stream =
+		    std::fstream* warmup_timing_stream =
           new std::fstream("warmup_timing.csv", std::fstream::out);
+
         sample::generate_transitions<Model, RNG, StartTransitionCallback,
                                      SampleRecorder, DiagnosticRecorder,
                                      MessageRecorder>

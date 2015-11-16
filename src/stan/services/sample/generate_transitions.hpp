@@ -30,13 +30,26 @@ namespace stan {
                                 const std::string& prefix,
                                 const std::string& suffix,
                                 std::ostream& o,
+                                std::ostream* timing_stream,
                                 StartTransitionCallback& callback) {
+        // Timing variables
+        clock_t start_time = clock();
+        clock_t end_time;
+        double delta_t;
+
         for (int m = 0; m < num_iterations; ++m) {
           callback();
 
           progress(m, start, finish, refresh, warmup, prefix, suffix, o);
 
           init_s = sampler->transition(init_s);
+
+          end_time = clock();
+          delta_t = static_cast<double>(end_time - start_time) / CLOCKS_PER_SEC;
+          *timing_stream << m;
+          *timing_stream << ", ";
+          *timing_stream << delta_t;
+          *timing_stream << std::endl;
 
           if ( save && ( (m % num_thin) == 0) ) {
             writer.write_sample_params(base_rng, init_s, *sampler, model);
