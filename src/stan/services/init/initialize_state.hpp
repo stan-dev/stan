@@ -219,7 +219,7 @@ namespace stan {
         if (num_init_tries > MAX_INIT_TRIES) {
           std::stringstream R_ss, MAX_INIT_TRIES_ss;
           R_ss << -R;
-          MAX_INIT_TRIES_ss << MAX_INIT_TRIES_ss;
+          MAX_INIT_TRIES_ss << MAX_INIT_TRIES;
 
           writer();
           writer();
