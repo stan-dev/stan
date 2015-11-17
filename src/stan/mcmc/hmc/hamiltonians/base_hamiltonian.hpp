@@ -65,7 +65,7 @@ namespace stan {
     protected:
       Model& model_;
       interface_callbacks::writer::base_writer& writer_;
-      
+
       void write_error_msg_(const std::exception& e) {
         writer_();
         writer_("Informational Message: The current Metropolis proposal "

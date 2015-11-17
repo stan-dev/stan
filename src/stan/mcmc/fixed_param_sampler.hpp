@@ -9,13 +9,12 @@
 #include <string>
 
 namespace stan {
-
   namespace mcmc {
 
     class fixed_param_sampler : public base_mcmc {
     public:
-      explicit
-      fixed_param_sampler(interface_callbacks::writer::base_writer& writer)
+      explicit fixed_param_sampler(interface_callbacks::writer::base_writer&
+                                   writer)
         : base_mcmc(writer) {
         this->name_ = "Fixed Parameter Sampler";
       }
@@ -26,8 +25,6 @@ namespace stan {
     };
 
   }  // mcmc
-
 }  // stan
 
 #endif
-

@@ -6,7 +6,6 @@
 #include <stan/mcmc/hmc/static/unit_e_static_hmc.hpp>
 
 namespace stan {
-
   namespace mcmc {
 
     // Hamiltonian Monte Carlo on a
@@ -18,7 +17,7 @@ namespace stan {
                                     public stepsize_adapter {
     public:
       adapt_unit_e_static_hmc(Model &model, BaseRNG& rng,
-                              stan::interface_callbacks::writer::base_writer& writer)
+                              interface_callbacks::writer::base_writer& writer)
         : unit_e_static_hmc<Model, BaseRNG>(model, rng, writer) { }
 
       ~adapt_unit_e_static_hmc() { }
@@ -42,7 +41,5 @@ namespace stan {
     };
 
   }  // mcmc
-
 }  // stan
-
 #endif

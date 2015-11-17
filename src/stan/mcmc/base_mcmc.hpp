@@ -8,12 +8,11 @@
 #include <vector>
 
 namespace stan {
-
   namespace mcmc {
 
     class base_mcmc {
     public:
-      base_mcmc(interface_callbacks::writer::base_writer& writer)
+      explicit base_mcmc(interface_callbacks::writer::base_writer& writer)
         : writer_(writer) {}
 
       virtual ~base_mcmc() {}
@@ -46,8 +45,6 @@ namespace stan {
     };
 
   }  // mcmc
-
 }  // stan
 
 #endif
-
