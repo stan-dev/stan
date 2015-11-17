@@ -246,6 +246,9 @@ namespace stan {
               return false;
         return true;
       }
+      bool operator()(const index_op_sliced& x) const {
+        return boost::apply_visitor(*this, x.expr_.expr_);
+      }
       bool operator()(const binary_op& x) const {
         return boost::apply_visitor(*this, x.left.expr_)
           && boost::apply_visitor(*this, x.right.expr_);

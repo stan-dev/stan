@@ -23,6 +23,7 @@
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/grammars/expression_grammar.hpp>
+#include <stan/lang/grammars/indexes_grammar.hpp>
 #include <stan/lang/grammars/term_grammar.hpp>
 #include <stan/lang/grammars/whitespace_grammar.hpp>
 
@@ -42,6 +43,10 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::index_op,
                           (stan::lang::expression, expr_)
                           (std::vector<std::vector<stan::lang::expression> >,
                            dimss_) )
+
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::index_op_sliced,
+                          (stan::lang::expression, expr_)
+                          (std::vector<stan::lang::idx>, idxs_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::integrate_ode,
                           (std::string, system_function_name_)
@@ -271,8 +276,6 @@ namespace stan {
                 && fun.args_[1].expression_type().is_primitive_int()) {
               fun.name_ = "std::" + fun.name_;
             }
-            // TODO(carpenter): else condition
-            // to add max(real,real) and min(real,real)
           }
         }
 
@@ -626,6 +629,31 @@ namespace stan {
       return sum;
     }
 
+    struct add_idxs {
+      //! @cond Doxygen_Suppress
+      template <class> struct result;
+      //! @endcond
+      template <typename F, typename T1, typename T2, typename T3, typename T4>
+      struct result<F(T1, T2, T3, T4)> { typedef void type; };
+      void operator()(expression& e,
+                      std::vector<idx>& idxs,
+                      bool& pass,
+                      std::ostream& error_msgs) const {
+        e = index_op_sliced(e, idxs);
+        pass = !e.expression_type().is_ill_formed();
+        if (!pass)
+          error_msgs << "Indexed expression must have at least as many"
+                     << " dimensions as number of indexes supplied:"
+                     << std::endl
+                     << " indexed expression dims="
+                     << e.total_dims()
+                     << "; num indexes=" << idxs.size()
+                     << std::endl;
+      }
+    };
+    boost::phoenix::function<add_idxs> add_idxs_f;
+
+
     struct add_expression_dimss {
       //! @cond Doxygen_Suppress
       template <class> struct result;
@@ -652,8 +680,8 @@ namespace stan {
         iop.infer_type();
         if (iop.type_.is_ill_formed()) {
           error_msgs << "Indexed expression must have at least as many"
-                     << " dimensions as number of indexes supplied."
-                     << std::endl;
+          << " dimensions as number of indexes supplied."
+          << std::endl;
           pass = false;
           return;
         }
@@ -716,9 +744,6 @@ namespace stan {
                       bool& pass,
                       std::stringstream& error_msgs) const {
         pass = expr.expression_type().is_primitive_int();
-        if (!pass)
-          error_msgs << "array indices must be integer expressions; found type="
-                     << expr.expression_type() << std::endl;
       }
     };
     boost::phoenix::function<validate_int_expr3> validate_int_expr3_f;
@@ -732,7 +757,8 @@ namespace stan {
       : term_grammar::base_type(term_r),
         var_map_(var_map),
         error_msgs_(error_msgs),
-        expression_g(eg) {
+        expression_g(eg),
+        indexes_g(var_map, error_msgs, eg) {
       using boost::spirit::qi::_1;
       using boost::spirit::qi::_a;
       using boost::spirit::qi::_b;
@@ -779,29 +805,31 @@ namespace stan {
                                              boost::phoenix::ref(error_msgs_))]
         | lit('+') >> negated_factor_r(_r1)[set_val5_f(_val, _1)]
         | exponentiated_factor_r(_r1)[set_val5_f(_val, _1)]
-        | indexed_factor_r(_r1) [set_val5_f(_val, _1)];
+        | idx_factor_r(_r1)[set_val5_f(_val, _1)];
 
 
       exponentiated_factor_r.name("expression");
       exponentiated_factor_r
-        = (indexed_factor_r(_r1)[set_val5_f(_val, _1)]
+        = (idx_factor_r(_r1)[set_val5_f(_val, _1)]
            >> lit('^')
            > negated_factor_r(_r1)
              [exponentiation_f(_val, _1, _r1, _pass,
                                boost::phoenix::ref(error_msgs_))]);
 
-      indexed_factor_r.name("expression");
-      indexed_factor_r
-        = factor_r(_r1)[set_val5_f(_val, _1)]
-        > * (
-             ((+dims_r(_r1))[set_val5_f(_a, _1)]
-              > eps
-                [add_expression_dimss_f(_val, _a, _pass,
-                                        boost::phoenix::ref(error_msgs_))])
-             |
-             (lit("'")
-              > eps[transpose_f(_val, _pass,
-                                boost::phoenix::ref(error_msgs_))]));
+      idx_factor_r.name("expression");
+      idx_factor_r
+        =  factor_r(_r1)[set_val5_f(_val, _1)]
+        > *( ( (+dims_r(_r1))[set_val5_f(_a, _1)]
+               > eps
+               [add_expression_dimss_f(_val, _a, _pass,
+                                       boost::phoenix::ref(error_msgs_) )] )
+            | (indexes_g(_r1)[set_val5_f(_b, _1)]
+               > eps[add_idxs_f(_val, _b, _pass,
+                              boost::phoenix::ref(error_msgs_))])
+            | (lit("'")
+               > eps[transpose_f(_val, _pass,
+                                 boost::phoenix::ref(error_msgs_))]) );
+
       integrate_ode_r.name("expression");
       integrate_ode_r
         %= (lit("integrate_ode") >> no_skip[!char_("a-zA-Z0-9_")])
@@ -874,15 +902,15 @@ namespace stan {
       dim_r.name("array dimension (integer expression)");
       dim_r
         %= expression_g(_r1)
-        > eps[validate_int_expr3_f(_val, _pass,
+        >> eps[validate_int_expr3_f(_val, _pass,
                                    boost::phoenix::ref(error_msgs_))];
 
       dims_r.name("array dimensions");
       dims_r
         %= lit('[')
-        > (dim_r(_r1)
+        >> (dim_r(_r1)
            % ',' )
-        > lit(']');
+        >> lit(']');
 
       variable_r.name("variable name");
       variable_r

@@ -30,7 +30,6 @@
 
 #include <cstddef>
 #include <iomanip>
-#include <iostream>
 #include <istream>
 #include <map>
 #include <set>
@@ -40,6 +39,11 @@
 #include <utility>
 #include <vector>
 
+
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::assgn,
+                          (stan::lang::variable, lhs_var_)
+                          (std::vector<stan::lang::idx>, idxs_)
+                          (stan::lang::expression, rhs_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::assignment,
                           (stan::lang::variable_dims, var_dims_)
@@ -117,7 +121,8 @@ namespace stan {
         pass = true;
       }
     };
-    boost::phoenix::function<validate_return_allowed> validate_return_allowed_f;
+    boost::phoenix::function<validate_return_allowed>
+    validate_return_allowed_f;
 
     struct validate_void_return_allowed {
       //! @cond Doxygen_Suppress
@@ -143,6 +148,117 @@ namespace stan {
     boost::phoenix::function<validate_void_return_allowed>
     validate_void_return_allowed_f;
 
+    struct identifier_to_var {
+      //! @cond Doxygen_Suppress
+      template <class> struct result;
+      //! @endcond
+      template <typename F, typename T1, typename T2, typename T3,
+                typename T4, typename T5, typename T6>
+      struct result<F(T1, T2, T3, T4, T5, T6)> { typedef void type; };
+
+      void operator()(const std::string& name,
+                      const var_origin& origin_allowed,
+                      variable& v,
+                      bool& pass,
+                      const variable_map& vm,
+                      std::ostream& error_msgs) const {
+        // validate existence
+        if (!vm.exists(name)) {
+          pass = false;
+          return;
+        }
+        // validate origin
+        var_origin lhs_origin = vm.get_origin(name);
+        if (lhs_origin != local_origin
+            && lhs_origin != origin_allowed) {
+          pass = false;
+          return;
+        }
+        // enforce constancy of function args
+        if (lhs_origin == function_argument_origin
+            || lhs_origin == function_argument_origin_lp
+            || lhs_origin == function_argument_origin_rng
+            || lhs_origin == void_function_argument_origin
+            || lhs_origin == void_function_argument_origin_lp
+            || lhs_origin == void_function_argument_origin_rng) {
+          pass = false;
+          return;
+        }
+        v = variable(name);
+        v.set_type(vm.get_base_type(name), vm.get_num_dims(name));
+        pass = true;
+      }
+    };
+    boost::phoenix::function<identifier_to_var> identifier_to_var_f;
+
+
+    struct validate_assgn {
+      //! @cond Doxygen_Suppress
+      template <class> struct result;
+      //! @endcond
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1, T2, T3)> { typedef void type; };
+
+      void operator()(const assgn& a,
+                      bool& pass,
+                      std::ostream& error_msgs) const {
+        // resolve type of lhs[idxs] and make sure it matches rhs
+        std::string name = a.lhs_var_.name_;
+        expression lhs_expr = expression(a.lhs_var_);
+        expr_type lhs_type = indexed_type(lhs_expr, a.idxs_);
+        if (lhs_type.is_ill_formed()) {
+          error_msgs << "Left-hand side indexing incompatible with variable."
+                     << std::endl;
+          pass = false;
+          return;
+        }
+
+        expr_type rhs_type = a.rhs_.expression_type();
+        base_expr_type lhs_base_type = lhs_type.base_type_;
+        base_expr_type rhs_base_type = rhs_type.base_type_;
+        // allow int -> double promotion, even in arrays
+        bool types_compatible
+          = lhs_base_type == rhs_base_type
+          || (lhs_base_type == DOUBLE_T && rhs_base_type == INT_T);
+        if (!types_compatible) {
+          error_msgs << "base type mismatch in assignment"
+                     << "; variable name="
+                     << name
+                     << ", type=";
+          write_base_expr_type(error_msgs, lhs_base_type);
+          error_msgs << "; right-hand side type=";
+          write_base_expr_type(error_msgs, rhs_base_type);
+          error_msgs << std::endl;
+          pass = false;
+          return;
+        }
+
+        if (lhs_type.num_dims_ != rhs_type.num_dims_) {
+          error_msgs << "dimension mismatch in assignment"
+                     << "; variable name="
+                     << name
+                     << ", num dimensions given="
+                     << lhs_type.num_dims_
+                     << "; right-hand side dimensions="
+                     << rhs_type.num_dims_
+                     << std::endl;
+          pass = false;
+          return;
+        }
+
+        if (a.lhs_var_occurs_on_rhs()) {
+          // this only requires a warning --- a deep copy will be made
+          error_msgs << "WARNING: left-hand side variable"
+                     << " (name=" << name << ")"
+                     << " occurs on right-hand side of assignment, causing"
+                     << " inefficient deep copy to avoid aliasing."
+                     << std::endl;
+        }
+
+        pass = true;
+      }
+    };
+    boost::phoenix::function<validate_assgn> validate_assgn_f;
 
     struct validate_assignment {
       //! @cond Doxygen_Suppress
@@ -195,7 +311,6 @@ namespace stan {
           return;
         }
 
-
         // validate types
         a.var_type_ = vm.get(name);
         size_t lhs_var_num_dims = a.var_type_.dims_.size();
@@ -233,6 +348,7 @@ namespace stan {
           pass = false;
           return;
         }
+
         if (lhs_type.num_dims_ != a.expr_.expression_type().num_dims_) {
           error_msgs << "dimension mismatch in assignment"
                      << "; variable name = "
@@ -245,6 +361,7 @@ namespace stan {
           pass = false;
           return;
         }
+
         pass = true;
       }
     };
@@ -320,7 +437,6 @@ namespace stan {
 
         // test for LHS not being purely a variable
         if (has_non_param_var(s.expr_, var_map)) {
-          // TODO(carpenter):  really want to get line numbers in here too
           error_msgs << "Warning (non-fatal):"
              << std::endl
              << "Left-hand side of sampling statement (~) may contain a"
@@ -596,6 +712,21 @@ namespace stan {
     };
     boost::phoenix::function<validate_int_expr2> validate_int_expr2_f;
 
+    struct validate_int_expr_silent {
+      //! @cond Doxygen_Suppress
+      template <class> struct result;
+      //! @endcond
+      template <typename F, typename T1, typename T2>
+      struct result<F(T1, T2)> { typedef void type; };
+
+      void operator()(const expression& expr, bool& pass) const {
+        pass = expr.expression_type().is_primitive_int();
+      }
+    };
+    boost::phoenix::function<validate_int_expr_silent>
+    validate_int_expr_silent_f;
+
+
     struct validate_allow_sample {
       //! @cond Doxygen_Suppress
       template <class> struct result;
@@ -688,7 +819,8 @@ namespace stan {
         error_msgs_(error_msgs),
         expression_g(var_map, error_msgs),
         var_decls_g(var_map, error_msgs),
-        statement_2_g(var_map, error_msgs, *this) {
+        statement_2_g(var_map, error_msgs, *this),
+        indexes_g(var_map, error_msgs, expression_g) {
       using boost::spirit::qi::_1;
       using boost::spirit::qi::char_;
       using boost::spirit::qi::eps;
@@ -721,17 +853,18 @@ namespace stan {
       statement_sub_r.name("statement");
       statement_sub_r
         %= no_op_statement_r                        // key ";"
-        | statement_seq_r(_r1, _r2, _r3)              // key "{"
+        | statement_seq_r(_r1, _r2, _r3)            // key "{"
         | increment_log_prob_statement_r(_r1, _r2)  // key "increment_log_prob"
-        | for_statement_r(_r1, _r2, _r3)              // key "for"
-        | while_statement_r(_r1, _r2, _r3)            // key "while"
-        | statement_2_g(_r1, _r2, _r3)                // key "if"
+        | for_statement_r(_r1, _r2, _r3)            // key "for"
+        | while_statement_r(_r1, _r2, _r3)          // key "while"
+        | statement_2_g(_r1, _r2, _r3)              // key "if"
         | print_statement_r(_r2)                    // key "print"
         | reject_statement_r(_r2)                   // key "reject"
         | return_statement_r(_r2)                   // key "return"
         | void_return_statement_r(_r2)              // key "return"
         | assignment_r(_r2)                         // lvalue "<-"
-        | sample_r(_r1, _r2)                         // expression "~"
+        | assgn_r(_r2)                              // var[idxs] <- expr
+        | sample_r(_r1, _r2)                        // expression "~"
         | expression_g(_r2)                         // expression
         [expression_as_statement_f(_pass, _1,
                                    boost::phoenix::ref(error_msgs_))];
@@ -833,10 +966,26 @@ namespace stan {
         %= (var_lhs_r(_r1)
             >> lit("<-"))
         > expression_rhs_r(_r1)
-        [validate_assignment_f(_val, _r1, _pass,
-       boost::phoenix::ref(var_map_),
-                               boost::phoenix::ref(error_msgs_))]
+          [validate_assignment_f(_val, _r1, _pass,
+                                 boost::phoenix::ref(var_map_),
+                                 boost::phoenix::ref(error_msgs_))]
         > lit(';');
+
+      assgn_r.name("assginment statement");
+      assgn_r
+        %= var_r(_r1)
+        >> indexes_g(_r1)
+        >> lit("<-")
+        >> (eps > expression_rhs_r(_r1))
+           [validate_assgn_f(_val, _pass, boost::phoenix::ref(error_msgs_))]
+        > lit(';');
+
+      var_r.name("variable for left-hand side of assignment");
+      var_r
+        = identifier_r
+          [identifier_to_var_f(_1, _r1, _val,  _pass,
+                               boost::phoenix::ref(var_map_),
+                               boost::phoenix::ref(error_msgs_))];
 
       expression_rhs_r.name("expression assignable to left-hand side");
       expression_rhs_r
@@ -849,15 +998,16 @@ namespace stan {
 
       opt_dims_r.name("array dimensions (optional)");
       opt_dims_r
-        %=  * dims_r(_r1);
+        %=  *dims_r(_r1);
 
       dims_r.name("array dimensions");
+      // uses silent test because errors will be reported in sliced rules
       dims_r
         %= lit('[')
-        > (expression_g(_r1)
-           [validate_int_expr2_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
-           % ',')
-        > lit(']');
+        >> (expression_g(_r1)
+            [validate_int_expr_silent_f(_1, _pass)]
+            % ',')
+        >> lit(']');
 
       // inherited  _r1 = true if samples allowed as statements
       sample_r.name("distribution of expression");
