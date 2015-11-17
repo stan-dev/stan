@@ -269,6 +269,7 @@ namespace stan {
         // Naive Monte Carlo integration
         int i = 0;
         int n_monte_carlo_drop = 0;
+        const int n_retries = 10;
         while (i < n_monte_carlo_grad) {
           // Draw from standard normal and transform to real-coordinate space
           for (int d = 0; d < dimension_; ++d) {
@@ -289,10 +290,10 @@ namespace stan {
             i += 1;
           } catch (std::exception& e) {
             n_monte_carlo_drop += 1;
-            if (n_monte_carlo_drop >= 10*n_monte_carlo_grad) {
+            if (n_monte_carlo_drop >= n_retries * n_monte_carlo_grad) {
               const char* name = "The number of dropped evaluations";
               const char* msg1 = "has reached its maximum amount (";
-              int y = 10*n_monte_carlo_grad;
+              int y = n_retries * n_monte_carlo_grad;
               const char* msg2 = "). Your model may be either severely "
                 "ill-conditioned or misspecified.";
               stan::math::domain_error(function, name, y, msg1, msg2);
