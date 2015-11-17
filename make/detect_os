@@ -13,6 +13,9 @@ endif
 ifeq ($(uname_S), Linux)
   OS_TYPE := linux
 endif
+ifeq ($(uname_S), FreeBSD)
+  OS_TYPE := linux
+endif
 OS_TYPE ?= win
 
 # These includes should update the following variables
