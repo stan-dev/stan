@@ -34,7 +34,7 @@ namespace stan {
       base_nuts(M &m, BaseRNG& rng, std::ostream* o, std::ostream* e)
         : base_hmc<M, P, H, I, BaseRNG>(m, rng, o, e),
         depth_(0), max_depth_(5), max_delta_(1000),
-        n_leapfrog_(0), n_divergent_(0) {
+        n_leapfrog_(0), n_divergent_(0), E_(0) {
       }
 
       ~base_nuts() {}
@@ -142,16 +142,18 @@ namespace stan {
         double accept_prob = util.sum_prob / static_cast<double>(util.n_tree);
 
         this->z_.ps_point::operator=(z_sample);
+        this->E_ = this->hamiltonian_.H(this->z_);
         return sample(this->z_.q, - this->z_.V, accept_prob);
       }
 
       void write_sampler_param_names(std::ostream& o) {
-        o << "stepsize__,treedepth__,n_leapfrog__,n_divergent__,";
+        o << "stepsize__,treedepth__,n_leapfrog__,n_divergent__,E__,";
       }
 
       void write_sampler_params(std::ostream& o) {
         o << this->epsilon_    << "," << this->depth_ << ","
-          << this->n_leapfrog_ << "," << this->n_divergent_ << ",";
+          << this->n_leapfrog_ << "," << this->n_divergent_ << ","
+          << this->E_ << ",";
       }
 
       void get_sampler_param_names(std::vector<std::string>& names) {
@@ -159,6 +161,7 @@ namespace stan {
         names.push_back("treedepth__");
         names.push_back("n_leapfrog__");
         names.push_back("n_divergent__");
+        names.push_back("E__");
       }
 
       void get_sampler_params(std::vector<double>& values) {
@@ -166,6 +169,7 @@ namespace stan {
         values.push_back(this->depth_);
         values.push_back(this->n_leapfrog_);
         values.push_back(this->n_divergent_);
+        values.push_back(this->E_);
       }
 
       virtual bool compute_criterion(ps_point& start, P& finish,
@@ -239,6 +243,7 @@ namespace stan {
 
       int n_leapfrog_;
       int n_divergent_;
+      double E_;
     };
 
   }  // mcmc

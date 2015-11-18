@@ -23,12 +23,13 @@ namespace stan {
       double exhaustion_delta_;
       int n_leapfrog_;
       bool divergent_;
+      double E_;
 
     public:
       base_exhaustive(M &m, BaseRNG& rng, std::ostream* o, std::ostream* e)
         : base_hmc<M, P, H, I, BaseRNG>(m, rng, o, e),
         depth_(0), max_depth_(10), max_Delta_(1000),
-        exhaustion_delta_(0.1), n_leapfrog_(0), divergent_(false) {
+        exhaustion_delta_(0.1), n_leapfrog_(0), divergent_(false), E_(0) {
       }
 
       ~base_exhaustive() {}
@@ -52,12 +53,13 @@ namespace stan {
       double get_max_Delta() { return this->max_Delta_; }
 
       void write_sampler_param_names(std::ostream& o) {
-        o << "stepsize__,treedepth__,n_leapfrog__,divergent__,";
+        o << "stepsize__,treedepth__,n_leapfrog__,divergent__,E__,";
       }
 
       void write_sampler_params(std::ostream& o) {
         o << this->epsilon_    << "," << this->depth_ << ","
-        << this->n_leapfrog_ << "," << this->divergent_ << ",";
+          << this->n_leapfrog_ << "," << this->divergent_ << ","
+          << this->E_ << ",";
       }
 
       void get_sampler_param_names(std::vector<std::string>& names) {
@@ -65,6 +67,7 @@ namespace stan {
         names.push_back("treedepth__");
         names.push_back("n_leapfrog__");
         names.push_back("divergent__");
+        names.push_back("E__");
       }
 
       void get_sampler_params(std::vector<double>& values) {
@@ -72,6 +75,7 @@ namespace stan {
         values.push_back(this->depth_);
         values.push_back(this->n_leapfrog_);
         values.push_back(this->divergent_);
+        values.push_back(this->E_);
       }
 
       // Returns validity of completed subtree
@@ -216,6 +220,7 @@ namespace stan {
           accept_prob = sum_metro_prob / static_cast<double>(n_total_leapfrog);
 
         this->z_.ps_point::operator=(z_sample);
+        this->E_ = this->hamiltonian_.H(this->z_);
         return sample(this->z_.q, -this->z_.V, accept_prob);
       }
     };
