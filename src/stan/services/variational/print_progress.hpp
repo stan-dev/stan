@@ -56,7 +56,7 @@ namespace stan {
           o << " [" << std::setw(3)
             << static_cast<int>( (100.0 * (start + m)) / finish )
             << "%] ";
-          o << (tune ? " (Tuning)" : " (Variational Inference)");
+          o << (tune ? " (Adaptation)" : " (Variational Inference)");
           o << suffix;
           o << std::endl;
         }
