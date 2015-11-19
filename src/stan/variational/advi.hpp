@@ -547,6 +547,7 @@ namespace stan {
       }
 
       // Helper function: compute the median of a circular buffer
+      // TODO(akucukelbir): move to stan math and test there
       double circ_buff_median(const boost::circular_buffer<double>& cb) const {
           // FIXME: naive implementation; creates a copy as a vector
           std::vector<double> v;
@@ -561,6 +562,7 @@ namespace stan {
       }
 
       // Helper function: compute relative decrease between two doubles
+      // TODO(akucukelbir): move to stan math and test there
       double rel_decrease(double prev, double curr) const {
         return std::abs(curr - prev) / std::abs(prev);
       }
@@ -576,23 +578,6 @@ namespace stan {
       std::ostream* print_stream_;
       std::ostream* out_stream_;
       std::ostream* diag_stream_;
-
-      void write_error_msg_(std::ostream* error_msgs,
-                            const std::exception& e) const {
-        if (!error_msgs) {
-          return;
-        }
-
-        *error_msgs
-          << std::endl
-          << "Informational Message: The current sample evaluation "
-          << "of the ELBO is ignored because of the following issue:"
-          << std::endl
-          << e.what() << std::endl
-          << "If this warning occurs often then your model may be "
-          << "either severely ill-conditioned or misspecified."
-          << std::endl;
-      }
     };
   }  // variational
 }  // stan
