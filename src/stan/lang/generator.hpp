@@ -179,6 +179,11 @@ namespace stan {
       }
     }
 
+    void generate_idxs(const std::vector<idx>& idxs,
+                       std::ostream& o);
+    void generate_idxs_user(const std::vector<idx>& idxs,
+                            std::ostream& o);
+
     struct expression_visgen : public visgen {
       const bool user_facing_;
       explicit expression_visgen(std::ostream& o, bool user_facing)
@@ -210,7 +215,9 @@ namespace stan {
         o_ << ".array()";
       }
       void operator()(const variable& v) const { o_ << v.name_; }
-      void operator()(int n) const { o_ << static_cast<long>(n); }
+      void operator()(int n) const {   // NOLINT
+        o_ << static_cast<long>(n);    // NOLINT
+      }
       void operator()(double x) const { o_ << x; }
       void operator()(const std::string& x) const { o_ << x; }  // identifiers
       void operator()(const index_op& x) const {
@@ -225,6 +232,27 @@ namespace stan {
             indexes.push_back(x.dimss_[i][j]);  // wasteful copy, could use refs
         generate_indexed_expr<false>(expr_string, indexes, base_type,
                                      e_num_dims, user_facing_, o_);
+      }
+      void operator()(const index_op_sliced& x) const {
+        if (x.idxs_.size() == 0) {
+          generate_expression(x.expr_, user_facing_, o_);
+          return;
+        }
+        if (user_facing_) {
+          generate_expression(x.expr_, user_facing_, o_);
+          generate_idxs_user(x.idxs_, o_);
+          return;
+        }
+        o_ << "stan::model::rvalue(";
+        generate_expression(x.expr_, o_);
+        o_ << ", ";
+        generate_idxs(x.idxs_, o_);
+        o_ << ", ";
+        o_ << '"';
+        bool user_facing = true;
+        generate_expression(x.expr_, user_facing, o_);
+        o_ << '"';
+        o_ << ")";
       }
       void operator()(const integrate_ode& fx) const {
         o_ << "integrate_ode("
@@ -1629,6 +1657,108 @@ namespace stan {
       o << EOL;
     }
 
+    struct idx_visgen : public visgen {
+      explicit idx_visgen(std::ostream& o): visgen(o) { }
+      void operator()(const uni_idx& i) const {
+        o_ << "stan::model::index_uni(";
+        generate_expression(i.idx_, o_);
+        o_ << ")";
+      }
+      void operator()(const multi_idx& i) const {
+        o_ << "stan::model::index_multi(";
+        generate_expression(i.idxs_, o_);
+        o_ << ")";
+      }
+      void operator()(const omni_idx& i) const {
+        o_ << "stan::model::index_omni()";
+      }
+      void operator()(const lb_idx& i) const {
+        o_ << "stan::model::index_min(";
+        generate_expression(i.lb_, o_);
+        o_ << ")";
+      }
+      void operator()(const ub_idx& i) const {
+        o_ << "stan::model::index_max(";
+        generate_expression(i.ub_, o_);
+        o_ << ")";
+      }
+      void operator()(const lub_idx& i) const {
+        o_ << "stan::model::index_min_max(";
+        generate_expression(i.lb_, o_);
+        o_ << ", ";
+        generate_expression(i.ub_, o_);
+        o_ << ")";
+      }
+    };
+
+    void generate_idx(const idx& i, std::ostream& o) {
+      idx_visgen vis(o);
+      boost::apply_visitor(vis, i.idx_);
+    }
+
+    void generate_idxs(size_t pos, const std::vector<idx>& idxs,
+                       std::ostream& o) {
+      if (pos == idxs.size()) {
+        o << "stan::model::nil_index_list()";
+      } else {
+        o << "stan::model::cons_list(";
+        generate_idx(idxs[pos], o);
+        o << ", ";
+        generate_idxs(pos + 1, idxs, o);
+        o << ")";
+      }
+    }
+
+    void generate_idxs(const std::vector<idx>& idxs, std::ostream& o) {
+      generate_idxs(0, idxs, o);
+    }
+
+
+    struct idx_user_visgen : public visgen {
+      explicit idx_user_visgen(std::ostream& o): visgen(o) { }
+      void operator()(const uni_idx& i) const {
+        generate_expression(i.idx_, true, o_);
+      }
+      void operator()(const multi_idx& i) const {
+        generate_expression(i.idxs_, true, o_);
+      }
+      void operator()(const omni_idx& i) const {
+        o_ << " ";
+      }
+      void operator()(const lb_idx& i) const {
+        generate_expression(i.lb_, true, o_);
+        o_ << ": ";
+      }
+      void operator()(const ub_idx& i) const {
+        o_ << " :";
+        generate_expression(i.ub_, true, o_);
+      }
+      void operator()(const lub_idx& i) const {
+        generate_expression(i.lb_, true, o_);
+        o_ << ":";
+        generate_expression(i.ub_, true, o_);
+      }
+    };
+
+    void generate_idx_user(const idx& i, std::ostream& o) {
+      idx_user_visgen vis(o);
+      boost::apply_visitor(vis, i.idx_);
+    }
+
+    void generate_idxs_user(const std::vector<idx>& idxs, std::ostream& o) {
+      if (idxs.size() == 0)
+        return;
+      o << "[";
+      for (size_t i = 0; i < idxs.size(); ++i) {
+        if (i > 0)
+          o << ", ";
+        generate_idx_user(idxs[i], o);
+      }
+      o << "]";
+    }
+
+
+
     void generate_statement(statement const& s, int indent, std::ostream& o,
                             bool include_sampling, bool is_var,
                             bool is_fun_return);
@@ -1663,6 +1793,39 @@ namespace stan {
         o_ << ", ";
         generate_expression(x.expr_, o_);
         o_ << ");" << EOL;
+      }
+      void operator()(const assgn& y) const {
+        generate_indent(indent_, o_);
+        o_ << "stan::model::assign(";
+
+        expression var_expr(y.lhs_var_);
+        generate_expression(var_expr, o_);
+        o_ << ", "
+           << EOL;
+
+        generate_indent(indent_ + 3, o_);
+        generate_idxs(y.idxs_, o_);
+        o_ << ", "
+           << EOL;
+
+        generate_indent(indent_ + 3, o_);
+        if (y.lhs_var_occurs_on_rhs()) {
+          o_ << "stan::model::deep_copy(";
+          generate_expression(y.rhs_, o_);
+          o_ << ")";
+        } else {
+          generate_expression(y.rhs_, o_);
+        }
+
+        o_ << ", "
+           << EOL;
+        generate_indent(indent_ + 3, o_);
+        o_ << '"'
+           << "assigning variable "
+           << y.lhs_var_.name_
+           << '"';
+        o_ << ");"
+           << EOL;
       }
       void operator()(expression const& x) const {
         generate_indent(indent_, o_);
@@ -1865,6 +2028,7 @@ namespace stan {
     struct is_numbered_statement_vis : public boost::static_visitor<bool> {
       bool operator()(const nil& st) const { return false; }
       bool operator()(const assignment& st) const { return true; }
+      bool operator()(const assgn& st) const { return true; }
       bool operator()(const sample& st) const { return true; }
       bool operator()(const increment_log_prob_statement& t) const {
         return true;

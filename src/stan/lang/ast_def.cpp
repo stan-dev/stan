@@ -546,6 +546,11 @@ namespace stan {
                  << std::endl;
       return false;
     }
+    bool returns_type_vis::operator()(const assgn& st) const {
+      error_msgs_ << "Expecting return, found assignment statement."
+                 << std::endl;
+      return false;
+    }
     bool returns_type_vis::operator()(const sample& st) const {
       error_msgs_ << "Expecting return, found sampling statement."
                  << std::endl;
@@ -660,6 +665,9 @@ namespace stan {
     expr_type expression_type_vis::operator()(const index_op& e) const {
       return e.type_;
     }
+    expr_type expression_type_vis::operator()(const index_op_sliced& e) const {
+      return e.type_;
+    }
     expr_type expression_type_vis::operator()(const binary_op& e) const {
       return e.type_;
     }
@@ -689,6 +697,7 @@ namespace stan {
     expression::expression(const integrate_ode& expr) : expr_(expr) { }
     expression::expression(const fun& expr) : expr_(expr) { }
     expression::expression(const index_op& expr) : expr_(expr) { }
+    expression::expression(const index_op_sliced& expr) : expr_(expr) { }
     expression::expression(const binary_op& expr) : expr_(expr) { }
     expression::expression(const unary_op& expr) : expr_(expr) { }
 
@@ -749,6 +758,9 @@ namespace stan {
         || boost::apply_visitor(*this, e.theta_.expr_);
     }
     bool contains_var::operator()(const index_op& e) const {
+      return boost::apply_visitor(*this, e.expr_.expr_);
+    }
+    bool contains_var::operator()(const index_op_sliced& e) const {
       return boost::apply_visitor(*this, e.expr_.expr_);
     }
     bool contains_var::operator()(const binary_op& e) const {
@@ -839,6 +851,9 @@ namespace stan {
     bool contains_nonparam_var::operator()(const index_op& e) const {
       return boost::apply_visitor(*this, e.expr_.expr_);
     }
+    bool contains_nonparam_var::operator()(const index_op_sliced& e) const {
+      return boost::apply_visitor(*this, e.expr_.expr_);
+    }
     bool contains_nonparam_var::operator()(const binary_op& e) const {
       if (e.op == "||"
           || e.op == "&&"
@@ -880,6 +895,9 @@ namespace stan {
     }
     bool is_nil_op::operator()(const fun& /* x */) const { return false; }
     bool is_nil_op::operator()(const index_op& /* x */) const { return false; }
+    bool is_nil_op::operator()(const index_op_sliced& /* x */) const {
+      return false;
+    }
     bool is_nil_op::operator()(const binary_op& /* x */) const { return false; }
     bool is_nil_op::operator()(const unary_op& /* x */) const { return false; }
 
@@ -949,7 +967,6 @@ namespace stan {
       type_ = expr_type(base_type, num_dims);
     }
 
-
     integrate_ode::integrate_ode() { }
     integrate_ode::integrate_ode(const std::string& system_function_name,
                          const expression& y0,
@@ -966,7 +983,6 @@ namespace stan {
         x_(x),
         x_int_(x_int) {
     }
-
 
     fun::fun() { }
     fun::fun(std::string const& name,
@@ -986,7 +1002,6 @@ namespace stan {
         total += dimss[i].size();
       return total;
     }
-
 
     expr_type infer_type_indexing(const base_expr_type& expr_base_type,
                                   size_t num_expr_dims,
@@ -1026,6 +1041,14 @@ namespace stan {
       type_ = infer_type_indexing(expr_, total_dims(dimss_));
     }
 
+    index_op_sliced::index_op_sliced() { }
+    index_op_sliced::index_op_sliced(const expression& expr,
+                                     const std::vector<idx>& idxs)
+      : expr_(expr), idxs_(idxs), type_(indexed_type(expr_, idxs_)) { }
+    void index_op_sliced::infer_type() {
+      type_ = indexed_type(expr_, idxs_);
+    }
+
     binary_op::binary_op() { }
     binary_op::binary_op(const expression& left,
                          const std::string& op,
@@ -1058,6 +1081,61 @@ namespace stan {
     bool range::has_high() const {
       return !is_nil(high_.expr_);
     }
+
+    uni_idx::uni_idx() { }
+    uni_idx::uni_idx(const expression& idx) : idx_(idx) { }
+
+    multi_idx::multi_idx() { }
+    multi_idx::multi_idx(const expression& idxs) : idxs_(idxs) { }
+
+    omni_idx::omni_idx() { }
+
+    lb_idx::lb_idx() { }
+    lb_idx::lb_idx(const expression& lb) : lb_(lb) { }
+
+    ub_idx::ub_idx() { }
+    ub_idx::ub_idx(const expression& ub) : ub_(ub) { }
+
+    lub_idx::lub_idx() { }
+    lub_idx::lub_idx(const expression& lb, const expression& ub)
+      : lb_(lb), ub_(ub) {
+    }
+
+    idx::idx() { }
+
+    idx::idx(const uni_idx& i) : idx_(i) { }
+    idx::idx(const multi_idx& i) : idx_(i) { }
+    idx::idx(const omni_idx& i) : idx_(i) { }
+    idx::idx(const lb_idx& i) : idx_(i) { }
+    idx::idx(const ub_idx& i) : idx_(i) { }
+    idx::idx(const lub_idx& i) : idx_(i) { }
+
+
+    is_multi_index_vis::is_multi_index_vis() { }
+    bool is_multi_index_vis::operator()(const uni_idx& i) const {
+      return false;
+    }
+    bool is_multi_index_vis::operator()(const multi_idx& i) const {
+      return true;
+    }
+    bool is_multi_index_vis::operator()(const omni_idx& i) const {
+      return true;
+    }
+    bool is_multi_index_vis::operator()(const lb_idx& i) const {
+      return true;
+    }
+    bool is_multi_index_vis::operator()(const ub_idx& i) const {
+      return true;
+    }
+    bool is_multi_index_vis::operator()(const lub_idx& i) const {
+      return true;
+    }
+
+    bool is_multi_index(const idx& idx) {
+      is_multi_index_vis v;
+      return boost::apply_visitor(v, idx.idx_);
+    }
+
 
     void print_var_origin(std::ostream& o, const var_origin& vo) {
       if (vo == model_name_origin)
@@ -1348,6 +1426,7 @@ namespace stan {
     statement::statement(const statement_t& st) : statement_(st) { }
     statement::statement(const nil& st) : statement_(st) { }
     statement::statement(const assignment& st) : statement_(st) { }
+    statement::statement(const assgn& st) : statement_(st) { }
     statement::statement(const sample& st) : statement_(st) { }
     statement::statement(const increment_log_prob_statement& st)
       : statement_(st) {
@@ -1367,6 +1446,9 @@ namespace stan {
       return false;
     }
     bool is_no_op_statement_vis::operator()(const assignment& st) const {
+      return false;
+    }
+    bool is_no_op_statement_vis::operator()(const assgn& st) const {
       return false;
     }
     bool is_no_op_statement_vis::operator()(const sample& st) const {
@@ -1504,6 +1586,121 @@ namespace stan {
       : var_dims_(var_dims),
         expr_(expr) {
     }
+
+    var_occurs_vis::var_occurs_vis(const variable& e)
+      : var_name_(e.name_) {
+    }
+
+    bool var_occurs_vis::operator()(const nil& st) const {
+      return false;
+    }
+    bool var_occurs_vis::operator()(const int_literal& e) const {
+      return false;
+    }
+    bool var_occurs_vis::operator()(const double_literal& e) const {
+      return false;
+    }
+    bool var_occurs_vis::operator()(const array_literal& e) const {
+      return false;  // TODO(carpenter): update for array_literal
+    }
+    bool var_occurs_vis::operator()(const variable& e) const {
+      return var_name_ == e.name_;
+    }
+    bool var_occurs_vis::operator()(const fun& e) const {
+      for (size_t i = 0; i < e.args_.size(); ++i)
+        if (boost::apply_visitor(*this, e.args_[i].expr_))
+          return true;
+      return false;
+    }
+    bool var_occurs_vis::operator()(const integrate_ode& e) const {
+      return false;  // no refs persist out of integrate_ode() call
+    }
+    bool var_occurs_vis::operator()(const index_op& e) const {
+      // refs only persist out of expression, not indexes
+      return boost::apply_visitor(*this, e.expr_.expr_);
+    }
+    bool var_occurs_vis::operator()(const index_op_sliced& e) const {
+      return boost::apply_visitor(*this, e.expr_.expr_);
+    }
+    bool var_occurs_vis::operator()(const binary_op& e) const {
+      return boost::apply_visitor(*this, e.left.expr_)
+        || boost::apply_visitor(*this, e.right.expr_);
+    }
+    bool var_occurs_vis::operator()(const unary_op& e) const {
+      return boost::apply_visitor(*this, e.subject.expr_);
+    }
+
+    assgn::assgn() { }
+    assgn::assgn(const variable& lhs_var, const std::vector<idx>& idxs,
+                 const expression& rhs)
+      : lhs_var_(lhs_var), idxs_(idxs), rhs_(rhs) { }
+
+    bool assgn::lhs_var_occurs_on_rhs() const {
+      var_occurs_vis vis(lhs_var_);
+      return boost::apply_visitor(vis, rhs_.expr_);
+    }
+
+    /**
+     * Return the expression type for the result of applying the
+     * specified indexes to the specified expression.  If the reuslt
+     * is ill typed, the output type is <code>ILL_FORMED_T</code> and
+     * dimensions are <code>OU</code>.
+     *
+     * @param[in] e Expression to index.
+     * @param[in] idxs Vector of indexes.
+     * @return Type of indexed expression.
+     */
+    expr_type indexed_type(const expression& e,
+                           const std::vector<idx>& idxs) {
+      expr_type e_type = e.expression_type();
+
+      base_expr_type base_type = e_type.base_type_;
+      size_t base_dims = e_type.num_dims_;
+      size_t unindexed_dims = base_dims;
+      size_t out_dims = 0U;
+      size_t i = 0;
+      for ( ; unindexed_dims > 0 && i < idxs.size(); ++i, --unindexed_dims)
+        if (is_multi_index(idxs[i]))
+          ++out_dims;
+      if (idxs.size() - i == 0) {
+        return expr_type(base_type, out_dims + unindexed_dims);
+      } else if (idxs.size() - i == 1) {
+        if (base_type == MATRIX_T) {
+          if (is_multi_index(idxs[i]))
+            return expr_type(MATRIX_T, out_dims);
+          else
+            return expr_type(ROW_VECTOR_T, out_dims);
+        } else if (base_type == VECTOR_T) {
+          if (is_multi_index(idxs[i]))
+            return expr_type(VECTOR_T, out_dims);
+          else
+            return expr_type(DOUBLE_T, out_dims);
+        } else if (base_type == ROW_VECTOR_T) {
+          if (is_multi_index(idxs[i]))
+            return expr_type(ROW_VECTOR_T, out_dims);
+          else
+            return expr_type(DOUBLE_T, out_dims);
+        } else {
+          return expr_type(ILL_FORMED_T, 0U);
+        }
+      } else if (idxs.size() - i == 2) {
+        if (base_type == MATRIX_T) {
+          if (is_multi_index(idxs[i]) && is_multi_index(idxs[i + 1]))
+            return expr_type(MATRIX_T, out_dims);
+          else if (is_multi_index(idxs[i]))
+            return expr_type(VECTOR_T, out_dims);
+          else if (is_multi_index(idxs[i + 1]))
+            return expr_type(ROW_VECTOR_T, out_dims);
+          else
+            return expr_type(DOUBLE_T, out_dims);
+        } else {
+          return expr_type(ILL_FORMED_T, 0U);
+        }
+      } else {
+        return expr_type(ILL_FORMED_T, 0U);
+      }
+    }
+
 
     expression& expression::operator+=(const expression& rhs) {
       expr_ = binary_op(expr_, "+", rhs);

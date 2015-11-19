@@ -5,6 +5,7 @@
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/grammars/expression_grammar.hpp>
+#include <stan/lang/grammars/indexes_grammar.hpp>
 #include <stan/lang/grammars/statement_2_grammar.hpp>
 #include <stan/lang/grammars/var_decls_grammar.hpp>
 #include <stan/lang/grammars/whitespace_grammar.hpp>
@@ -32,12 +33,19 @@ namespace stan {
       expression_grammar<Iterator> expression_g;
       var_decls_grammar<Iterator> var_decls_g;
       statement_2_grammar<Iterator> statement_2_g;
+      indexes_grammar<Iterator> indexes_g;
+
 
       // rules
       boost::spirit::qi::rule<Iterator,
                               assignment(var_origin),
                               whitespace_grammar<Iterator> >
       assignment_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              assgn(var_origin),
+                              whitespace_grammar<Iterator> >
+      assgn_r;
 
       boost::spirit::qi::rule<Iterator,
                               expression(var_origin),
@@ -49,6 +57,11 @@ namespace stan {
                               std::vector<expression>(var_origin),
                               whitespace_grammar<Iterator> >
       dims_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              variable(var_origin),
+                              whitespace_grammar<Iterator> >
+      var_r;
 
 
       boost::spirit::qi::rule<Iterator,

@@ -52,7 +52,8 @@ bool is_parsable(const std::string& file_name,
   stan::lang::program prog;
   std::ifstream fs(file_name.c_str());
   std::string model_name = file_name_to_model_name(file_name);
-  bool parsable = stan::lang::parse(msgs, fs, file_name, model_name, prog);
+  bool parsable
+    = stan::lang::parse(msgs, fs, file_name, model_name, prog);             
   return parsable;
 }
 
