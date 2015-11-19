@@ -7,6 +7,7 @@
 #include <stan/services/io/write_iteration_csv.hpp>
 #include <stan/services/io/write_iteration.hpp>
 #include <stan/services/error_codes.hpp>
+#include <stan/services/variational/print_progress.hpp>
 #include <stan/variational/families/normal_fullrank.hpp>
 #include <stan/variational/families/normal_meanfield.hpp>
 #include <boost/circular_buffer.hpp>
@@ -15,6 +16,9 @@
 #include <numeric>
 #include <ostream>
 #include <vector>
+#include <queue>
+#include <string>
+#include <boost/lexical_cast.hpp>
 
 namespace stan {
 
@@ -34,7 +38,6 @@ namespace stan {
      * @param  cont_params           initialization of continuous parameters
      * @param  n_monte_carlo_grad    number of samples for gradient computation
      * @param  n_monte_carlo_elbo    number of samples for ELBO computation
-     * @param  eta_adagrad           eta parameter for adaGrad
      * @param  rng                   random number generator
      * @param  eval_elbo             evaluate ELBO at every "eval_elbo" iters
      * @param  n_posterior_samples   number of samples to draw from posterior
@@ -49,7 +52,6 @@ namespace stan {
            Eigen::VectorXd& cont_params,
            int n_monte_carlo_grad,
            int n_monte_carlo_elbo,
-           double eta_adagrad,
            BaseRNG& rng,
            int eval_elbo,
            int n_posterior_samples,
@@ -61,7 +63,6 @@ namespace stan {
         rng_(rng),
         n_monte_carlo_grad_(n_monte_carlo_grad),
         n_monte_carlo_elbo_(n_monte_carlo_elbo),
-        eta_adagrad_(eta_adagrad),
         eval_elbo_(eval_elbo),
         n_posterior_samples_(n_posterior_samples),
         print_stream_(print_stream),
@@ -77,7 +78,6 @@ namespace stan {
         stan::math::check_positive(function,
                                  "Number of posterior samples for output",
                                  n_posterior_samples_);
-        stan::math::check_positive(function, "Eta stepsize", eta_adagrad_);
       }
 
       /**
@@ -85,8 +85,8 @@ namespace stan {
        * the variational distribution and then evaluating the log joint,
        * adjusted by the entropy term of the variational distribution.
        *
-       * @tparam Q class of variational distribution
-       * @return   evidence lower bound (elbo)
+       * @param variational class of variational distribution
+       * @return evidence lower bound (elbo)
        */
       double calc_ELBO(const Q& variational) const {
         static const char* function =
@@ -106,8 +106,7 @@ namespace stan {
             stan::math::check_finite(function, "energy_i", energy_i);
             elbo += energy_i;
             i += 1;
-          } catch (std::exception& e) {
-            this->write_error_msg_(print_stream_, e);
+          } catch (const std::domain_error& e) {
             n_monte_carlo_drop += 1;
             if (n_monte_carlo_drop >= n_monte_carlo_elbo_) {
               const char* name = "The number of dropped evaluations";
@@ -150,18 +149,21 @@ namespace stan {
       }
 
       /**
-       * Runs stochastic gradient ascent with Adagrad.
+       * Runs stochastic gradient ascent with an adaptive stepsize sequence.
        *
        * @param  variational    variational distribution
+       * @param  eta            eta parameter for stepsize scaling
        * @param  tol_rel_obj    relative tolerance parameter for convergence
        * @param  max_iterations max number of iterations to run algorithm
        */
-      void robbins_monro_adagrad(Q& variational,
+      void stochastic_gradient_ascent(Q& variational,
+                                 double eta,
                                  double tol_rel_obj,
                                  int max_iterations) const {
         static const char* function =
-          "stan::variational::advi.robbins_monro_adagrad";
+          "stan::variational::advi.stochastic_gradient_ascent";
 
+        stan::math::check_nonnegative(function, "Eta stepsize", eta);
         stan::math::check_positive(function,
                                    "Relative objective function tolerance",
                                    tol_rel_obj);
@@ -172,15 +174,12 @@ namespace stan {
         // Gradient parameters
         Q elbo_grad = Q(model_.num_params_r());
 
-        // Adagrad parameters
+        // Stepsize sequence parameters
+        Q propagated_parameters = Q(model_.num_params_r());
         double tau = 1.0;
-        Q params_adagrad = Q(model_.num_params_r());
+        double pre_factor  = 0.9;
+        double post_factor = 0.1;
         double eta_scaled;
-
-        // RMSprop window_size
-        double window_size = 10.0;
-        double post_factor = 1.0 / window_size;
-        double pre_factor  = 1.0 - post_factor;
 
         // Initialize ELBO and convergence tracking variables
         double elbo(0.0);
@@ -194,11 +193,11 @@ namespace stan {
         int cb_size = static_cast<int>(
                 std::max(0.1*max_iterations/static_cast<double>(eval_elbo_),
                          2.0));
-        boost::circular_buffer<double> cb(cb_size);
+        boost::circular_buffer<double> elbo_diff(cb_size);
 
-        // Print stuff
         if (print_stream_) {
-          *print_stream_ << "  iter"
+          *print_stream_ << "Begin stochastic gradient ascent." << std::endl
+                         << "  iter"
                          << "       ELBO"
                          << "   delta_ELBO_mean"
                          << "   delta_ELBO_med"
@@ -220,16 +219,16 @@ namespace stan {
 
           // RMSprop moving average weighting
           if (iter_counter == 1) {
-            params_adagrad += elbo_grad.square();
+            propagated_parameters += elbo_grad.square();
           } else {
-            params_adagrad = pre_factor * params_adagrad +
+            propagated_parameters = pre_factor * propagated_parameters +
                              post_factor * elbo_grad.square();
           }
-          eta_scaled = eta_adagrad_ / sqrt(static_cast<double>(iter_counter));
+          eta_scaled = eta / sqrt(static_cast<double>(iter_counter));
 
           // Stochastic gradient update
           variational += eta_scaled * elbo_grad /
-            (tau + params_adagrad.sqrt());
+            (tau + propagated_parameters.sqrt());
 
           // Check for convergence every "eval_elbo_"th iteration
           if (iter_counter % eval_elbo_ == 0) {
@@ -239,10 +238,10 @@ namespace stan {
               elbo_best = elbo;
             }
             delta_elbo = rel_decrease(elbo, elbo_prev);
-            cb.push_back(delta_elbo);
-            delta_elbo_ave = std::accumulate(cb.begin(), cb.end(), 0.0)
-                             / static_cast<double>(cb.size());
-            delta_elbo_med = circ_buff_median(cb);
+            elbo_diff.push_back(delta_elbo);
+            delta_elbo_ave = std::accumulate(elbo_diff.begin(), elbo_diff.end(), 0.0)
+                             / static_cast<double>(elbo_diff.size());
+            delta_elbo_med = circ_buff_median(elbo_diff);
             if (print_stream_) {
               *print_stream_
                         << "  "
@@ -321,12 +320,16 @@ namespace stan {
       }
 
       /**
-       * Runs the algorithm and writes to output.
+       * Runs ADVI and writes to output.
        *
-       * @param  tol_rel_obj    relative tolerance parameter for convergence
-       * @param  max_iterations max number of iterations to run algorithm
+       * @param  eta              eta parameter of stepsize sequence
+       * @param  adapt_engaged    boolean flag for eta adaptation
+       * @param  adapt_iterations number of iterations for eta adaptation
+       * @param  tol_rel_obj      relative tolerance parameter for convergence
+       * @param  max_iterations   max number of iterations to run algorithm
        */
-      int run(double tol_rel_obj, int max_iterations) const {
+      int run(double eta, bool adapt_engaged, int adapt_iterations,
+              double tol_rel_obj, int max_iterations) const {
         if (diag_stream_) {
           *diag_stream_ << "iter,time_in_seconds,ELBO" << std::endl;
         }
@@ -335,7 +338,7 @@ namespace stan {
         Q variational = Q(cont_params_);
 
         // run inference algorithm
-        robbins_monro_adagrad(variational, tol_rel_obj, max_iterations);
+        stochastic_gradient_ascent(variational, eta, tol_rel_obj, max_iterations);
 
         // get mean of posterior approximation and write on first output line
         cont_params_ = variational.mean();
@@ -408,7 +411,6 @@ namespace stan {
       BaseRNG& rng_;
       int n_monte_carlo_grad_;
       int n_monte_carlo_elbo_;
-      double eta_adagrad_;
       int eval_elbo_;
       int n_posterior_samples_;
       std::ostream* print_stream_;
