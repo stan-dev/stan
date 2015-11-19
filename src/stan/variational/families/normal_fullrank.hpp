@@ -228,10 +228,10 @@ namespace stan {
        * @param[in] rhs Approximation from which to gather the mean and
        * covariance. 
        * @return This approximation after assignment.
-       * @throw std::domain_error If the size of the specified
-       * approximation does not match the size of this approximation.
+       * @throw std::domain_error If the dimensionality of the specified
+       * approximation does not match this approximation's dimensionality.
        */
-      normal_fullrank operator=(const normal_fullrank& rhs) {
+      normal_fullrank& operator=(const normal_fullrank& rhs) {
         static const char* function =
           "stan::variational::normal_fullrank::operator=";
         stan::math::check_size_match(function,
@@ -250,10 +250,10 @@ namespace stan {
        * covariance. 
        * @return This approximation after adding the specified
        * approximation. 
-       * @throw std::domain_error If the size of the specified
-       * approximation does not match the size of this approximation.
+       * @throw std::domain_error If the dimensionality of the specified
+       * approximation does not match this approximation's dimensionality.
        */
-      normal_fullrank operator+=(const normal_fullrank& rhs) {
+      normal_fullrank& operator+=(const normal_fullrank& rhs) {
         static const char* function =
           "stan::variational::normal_fullrank::operator+=";
         stan::math::check_size_match(function,
@@ -273,10 +273,10 @@ namespace stan {
        * covariance.
        * @return This approximation after elementwise division by the
        * specified approximation.
-       * @throw std::domain_error If the size of the specified
-       * approximation does not match the size of this approximation.
+       * @throw std::domain_error If the dimensionality of the specified
+       * approximation does not match this approximation's dimensionality.
        */
-      normal_fullrank operator/=(const normal_fullrank& rhs) {
+      normal_fullrank& operator/=(const normal_fullrank& rhs) {
         static const char* function =
           "stan::variational::normal_fullrank::operator/=";
 
@@ -300,7 +300,7 @@ namespace stan {
        * @return This approximation after elementwise addition of the
        * specified scalar.
        */
-      normal_fullrank operator+=(double scalar) {
+      normal_fullrank& operator+=(double scalar) {
         mu_.array() += scalar;
         L_chol_.array() += scalar;
         return *this;
@@ -318,7 +318,7 @@ namespace stan {
        * @return This approximation after elementwise addition of the
        * specified scalar.
        */
-      normal_fullrank operator*=(double scalar) {
+      normal_fullrank& operator*=(double scalar) {
         mu_ *= scalar;
         L_chol_ *= scalar;
         return *this;
@@ -339,23 +339,17 @@ namespace stan {
        * Return the entropy of this approximation.
        *
        * <p>The entropy is defined by
-       0.5 * dim * (1+log2pi) + 0.5 * log det (L^T L).
+       * 0.5 * dim * (1+log2pi) + 0.5 * log det (L^T L)
+       * = 0.5 * dim * (1+log2pi) + sum(log(abs(diag(L)))).
        *
        * @return Entropy of this approximation
        */
       double entropy() const {
-        // TODO(akuckelbir): THIS LOOKS WRONG BECAUSE MATRIX
-        //                   ISN'T GUARANTEED TO BE SQUARE
-        //   0.5 * dim * (1+log2pi) + 0.5 * log det (L^T L)
-        // = 0.5 * dim * (1+log2pi) + sum(log(abs(diag(L))))
-        double tmp = 0.0;
-        double result = 0.5 * static_cast<double>(dimension_) *
-          (1.0 + stan::math::LOG_TWO_PI);
+        static double mult = 0.5 * (1.0 + stan::math::LOG_TWO_PI);
+        double result = mult * dimension_;
         for (int d = 0; d < dimension_; ++d) {
-          tmp = fabs(L_chol_(d, d));
-          if (tmp != 0.0) {
-            result += log(tmp);
-          }
+          double tmp = fabs(L_chol_(d, d));
+          if (tmp != 0.0) result += log(tmp);
         }
         return result;
       }
@@ -375,7 +369,6 @@ namespace stan {
       Eigen::VectorXd transform(const Eigen::VectorXd& eta) const {
         static const char* function =
           "stan::variational::normal_fullrank::transform";
-
         stan::math::check_size_match(function,
                          "Dimension of input vector", eta.size(),
                          "Dimension of mean vector",  dimension_);
@@ -426,8 +419,6 @@ namespace stan {
                      std::ostream* print_stream) const {
         static const char* function =
           "stan::variational::normal_fullrank::calc_grad";
-        static const int n_retries = 10;
-
         stan::math::check_size_match(function,
                         "Dimension of elbo_grad", elbo_grad.dimension(),
                         "Dimension of variational q", dimension_);
@@ -443,6 +434,7 @@ namespace stan {
         Eigen::VectorXd zeta = Eigen::VectorXd::Zero(dimension_);
 
         // Naive Monte Carlo integration
+        static const int n_retries = 10;
         for (int i = 0, n_monte_carlo_drop = 0; i < n_monte_carlo_grad; ) {
           // Draw from standard normal and transform to real-coordinate space
           for (int d = 0; d < dimension_; ++d) {
@@ -459,7 +451,7 @@ namespace stan {
                 L_grad(ii, jj) += tmp_mu_grad(ii) * eta(jj);
               }
             }
-            i += 1;
+            ++i;
           } catch (const std::exception& e) {
             n_monte_carlo_drop += 1;
             if (n_monte_carlo_drop >= n_retries * n_monte_carlo_grad) {
@@ -478,7 +470,6 @@ namespace stan {
         // Add gradient of entropy term
         L_grad.diagonal().array() += L_chol_.diagonal().array().inverse();
 
-        // Set parameters to argument
         elbo_grad.set_mu(mu_grad);
         elbo_grad.set_L_chol(L_grad);
       }
@@ -486,7 +477,7 @@ namespace stan {
 
     /**
      * Return a new approximation resulting from adding the mean and
-     * covariance matrix Choleskay factor of the specified
+     * covariance matrix Cholesky factor of the specified
      * approximations.
      *
      * @param[in] lhs First approximation.
