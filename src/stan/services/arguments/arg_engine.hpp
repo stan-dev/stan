@@ -4,6 +4,7 @@
 #include <stan/services/arguments/list_argument.hpp>
 
 #include <stan/services/arguments/arg_static.hpp>
+#include <stan/services/arguments/arg_static_uniform.hpp>
 #include <stan/services/arguments/arg_nuts.hpp>
 #include <stan/services/arguments/arg_exhaustive.hpp>
 
@@ -17,6 +18,7 @@ namespace stan {
         _description = "Engine for Hamiltonian Monte Carlo";
 
         _values.push_back(new arg_static());
+        _values.push_back(new arg_static_uniform());
         _values.push_back(new arg_nuts());
         _values.push_back(new arg_exhaustive());
 
