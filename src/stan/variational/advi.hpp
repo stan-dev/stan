@@ -239,8 +239,9 @@ namespace stan {
             }
             delta_elbo = rel_decrease(elbo, elbo_prev);
             elbo_diff.push_back(delta_elbo);
-            delta_elbo_ave = std::accumulate(elbo_diff.begin(), elbo_diff.end(), 0.0)
-                             / static_cast<double>(elbo_diff.size());
+            delta_elbo_ave = std::accumulate(elbo_diff.begin(),
+                              elbo_diff.end(), 0.0)
+                              / static_cast<double>(elbo_diff.size());
             delta_elbo_med = circ_buff_median(elbo_diff);
             if (print_stream_) {
               *print_stream_
@@ -337,15 +338,19 @@ namespace stan {
         // initialize variational approximation
         Q variational = Q(cont_params_);
 
-        // run inference algorithm
-        stochastic_gradient_ascent(variational, eta, tol_rel_obj, max_iterations);
+        if (adapt_engaged) {
+          eta = adapt_eta(variational, adapt_iterations);
+          if (out_stream_) {
+            *out_stream_ << "# Stepsize tuning complete." << std::endl
+                         << "# eta = " << eta << std::endl;
+          }
+        }
+
+        stochastic_gradient_ascent(variational, eta,
+                                   tol_rel_obj, max_iterations);
 
         // get mean of posterior approximation and write on first output line
         cont_params_ = variational.mean();
-        // This is temporary as lp is not really helpful for variational
-        // inference; furthermore it can be costly to compute.
-        double lp = model_.template log_prob<false, true>(cont_params_,
-          print_stream_);
         std::vector<double> cont_vector(cont_params_.size());
         for (int i = 0; i < cont_params_.size(); ++i)
           cont_vector.at(i) = cont_params_(i);
@@ -353,7 +358,7 @@ namespace stan {
 
         if (out_stream_) {
           services::io::write_iteration(*out_stream_, model_, rng_,
-                                        lp, cont_vector, disc_vector,
+                                        0, cont_vector, disc_vector,
                                         print_stream_);
         }
 
@@ -369,13 +374,11 @@ namespace stan {
 
           for (int n = 0; n < n_posterior_samples_; ++n) {
             variational.sample(rng_, cont_params_);
-            double lp = model_.template log_prob<false, true>(cont_params_,
-              print_stream_);
             for (int i = 0; i < cont_params_.size(); ++i) {
               cont_vector.at(i) = cont_params_(i);
             }
             services::io::write_iteration(*out_stream_, model_, rng_,
-                          lp, cont_vector, disc_vector, print_stream_);
+                          0, cont_vector, disc_vector, print_stream_);
           }
 
           if (print_stream_) {
