@@ -86,6 +86,7 @@ using stan::test::performance::get_date;
 TEST_F(performance, run) {
   clock_t t;
   for (int n = 0; n < N; ++n) {
+    std::cout << "iteration: " << n << " / " << N << std::endl;
     t = clock();      // start timer
     stan::test::performance::command<stan_model>(1000,
                                                  10000,
@@ -183,22 +184,6 @@ TEST_F(performance, check_output_is_same) {
 
   getline(file_stream, line);
   ASSERT_EQ("# Adaptation terminated", line);
-  ASSERT_TRUE(file_stream.good());
-
-  getline(file_stream, line);
-  ASSERT_EQ("# Step size = 0.921227", line);
-  ASSERT_TRUE(file_stream.good());
-
-  getline(file_stream, line);
-  ASSERT_EQ("# Diagonal elements of inverse mass matrix:", line);
-  ASSERT_TRUE(file_stream.good());
-
-  getline(file_stream, line);
-  ASSERT_EQ("# 0.042031, 0.0487736", line);
-  ASSERT_TRUE(file_stream.good());
-
-  getline(file_stream, line);
-  ASSERT_EQ("", line);
   ASSERT_TRUE(file_stream.good());
 
   file_stream.close();
