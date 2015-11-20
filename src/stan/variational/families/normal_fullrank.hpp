@@ -453,7 +453,7 @@ namespace stan {
             }
             ++i;
           } catch (const std::exception& e) {
-            n_monte_carlo_drop += 1;
+            ++n_monte_carlo_drop;
             if (n_monte_carlo_drop >= n_retries * n_monte_carlo_grad) {
               const char* name = "The number of dropped evaluations";
               const char* msg1 = "has reached its maximum amount (";
