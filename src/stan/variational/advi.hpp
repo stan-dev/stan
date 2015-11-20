@@ -11,6 +11,7 @@
 #include <stan/variational/families/normal_fullrank.hpp>
 #include <stan/variational/families/normal_meanfield.hpp>
 #include <boost/circular_buffer.hpp>
+#include <boost/lexical_cast.hpp>
 #include <algorithm>
 #include <limits>
 #include <numeric>
@@ -18,7 +19,6 @@
 #include <vector>
 #include <queue>
 #include <string>
-#include <boost/lexical_cast.hpp>
 
 namespace stan {
 
@@ -371,7 +371,6 @@ namespace stan {
         std::vector<double> print_vector;
         bool do_more_iterations = true;
         for (int iter_counter = 1; do_more_iterations; ++iter_counter) {
-
           // Compute gradient using Monte Carlo integration
           calc_ELBO_grad(variational, elbo_grad);
 
