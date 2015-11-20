@@ -438,7 +438,7 @@ namespace stan {
               do_more_iterations = false;
             }
 
-            if (iter_counter > 10*eval_elbo_) {
+            if (iter_counter > 10 * eval_elbo_) {
               if (delta_elbo_med > 0.5 || delta_elbo_ave > 0.5) {
                 if (print_stream_)
                   *print_stream_ << "   MAY BE DIVERGING... INSPECT ELBO";
