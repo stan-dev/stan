@@ -546,8 +546,14 @@ namespace stan {
         return stan::services::error_codes::OK;
       }
 
-      // Helper function: compute the median of a circular buffer
-      // TODO(akucukelbir): move to stan math and test there
+      // TODO(akucukelbir): move these things to stan math and test there
+
+      /**
+       * Compute the median of a circular buffer.
+       *
+       * @param  cb circular buffer with some number of values in it.
+       * @return    median of values in circular buffer.
+       */
       double circ_buff_median(const boost::circular_buffer<double>& cb) const {
           // FIXME: naive implementation; creates a copy as a vector
           std::vector<double> v;
@@ -561,8 +567,13 @@ namespace stan {
           return v[n];
       }
 
-      // Helper function: compute relative difference between two doubles
-      // TODO(akucukelbir): move to stan math and test there
+      /**
+       * Compute the relative difference between two double values.
+       *
+       * @param  prev previous value
+       * @param  curr current value
+       * @return      absolutely value of relative difference
+       */
       double rel_difference(double prev, double curr) const {
         return std::fabs((curr - prev) / prev);
       }
