@@ -394,7 +394,7 @@ namespace stan {
             elbo = calc_ELBO(variational);
             if (elbo > elbo_best)
               elbo_best = elbo;
-            delta_elbo = rel_decrease(elbo, elbo_prev);
+            delta_elbo = rel_difference(elbo, elbo_prev);
             elbo_diff.push_back(delta_elbo);
             delta_elbo_ave = std::accumulate(elbo_diff.begin(),
                               elbo_diff.end(), 0.0)
@@ -449,7 +449,7 @@ namespace stan {
               *print_stream_ << std::endl;
 
             if (do_more_iterations == false &&
-                rel_decrease(elbo, elbo_best) > 0.05) {
+                rel_difference(elbo, elbo_best) > 0.05) {
               if (print_stream_)
                 *print_stream_
                   << "Informational Message: The ELBO at a previous "
@@ -561,10 +561,10 @@ namespace stan {
           return v[n];
       }
 
-      // Helper function: compute relative decrease between two doubles
+      // Helper function: compute relative difference between two doubles
       // TODO(akucukelbir): move to stan math and test there
-      double rel_decrease(double prev, double curr) const {
-        return std::abs(curr - prev) / std::abs(prev);
+      double rel_difference(double prev, double curr) const {
+        return std::fabs((curr - prev) / prev);
       }
 
     protected:
