@@ -29,31 +29,42 @@ namespace stan {
       void verbose_evolve(typename Hamiltonian::PointType& z,
                           Hamiltonian& hamiltonian,
                           const double epsilon) {
-        this->out_stream_->precision(6);
+        std::stringstream msg;
+        msg.precision(6);
+
         int width = 14;
         int nColumn = 4;
 
-        if (this->out_stream_) {
-          *(this->out_stream_)
-            << "Verbose Hamiltonian Evolution, Step Size = " << epsilon << ":"
-            << std::endl
-            << "    " << std::setw(nColumn * width) << std::setfill('-')
-            << "" << std::setfill(' ') << std::endl
-            << "    "
+        msg << "Verbose Hamiltonian Evolution, Step Size = " << epsilon << ":";
+        this->writer_(msg.str());
+
+        msg.str("");
+        msg << "    " << std::setw(nColumn * width)
+            << std::setfill('-')
+            << "" << std::setfill(' ');
+        this->writer_(msg.str());
+
+        msg.str("");
+        msg << "    "
             << std::setw(width) << std::left << "Poisson"
             << std::setw(width) << std::left << "Initial"
             << std::setw(width) << std::left << "Current"
-            << std::setw(width) << std::left << "DeltaH"
-            << std::endl
-            << "    "
+            << std::setw(width) << std::left << "DeltaH";
+        this->writer_(msg.str());
+
+        msg.str("");
+        msg << "    "
             << std::setw(width) << std::left << "Operator"
             << std::setw(width) << std::left << "Hamiltonian"
             << std::setw(width) << std::left << "Hamiltonian"
-            << std::setw(width) << std::left << "/ Stepsize^{2}"
-            << std::endl
-            << "    " << std::setw(nColumn * width) << std::setfill('-')
-            << "" << std::setfill(' ') << std::endl;
-        }
+            << std::setw(width) << std::left << "/ Stepsize^{2}";
+        this->writer_(msg.str());
+
+        msg.str("");
+        msg << "    " << std::setw(nColumn * width)
+            << std::setfill('-')
+            << "" << std::setfill(' ');
+        this->writer_(msg.str());
 
         double H0 = hamiltonian.H(z);
 
@@ -61,50 +72,46 @@ namespace stan {
 
         double H1 = hamiltonian.H(z);
 
-        if (this->out_stream_) {
-          *(this->out_stream_)
-            << "    "
+        msg.str("");
+        msg << "    "
             << std::setw(width) << std::left << "hat{V}/2"
             << std::setw(width) << std::left << H0
             << std::setw(width) << std::left << H1
-            << std::setw(width) << std::left << (H1 - H0) / (epsilon * epsilon)
-            << std::endl;
-        }
+            << std::setw(width) << std::left << (H1 - H0) / (epsilon * epsilon);
+        this->writer_(msg.str());
 
         update_q(z, hamiltonian, epsilon);
         hamiltonian.update(z);
 
         double H2 = hamiltonian.H(z);
 
-        if (this->out_stream_) {
-          *(this->out_stream_)
-            << "    "
+        msg.str("");
+        msg << "    "
             << std::setw(width) << std::left << "hat{T}"
             << std::setw(width) << std::left << H0
             << std::setw(width) << std::left << H2
-            << std::setw(width) << std::left << (H2 - H0) / (epsilon * epsilon)
-            << std::endl;
-        }
+            << std::setw(width) << std::left << (H2 - H0) / (epsilon * epsilon);
+        this->writer_(msg.str());
 
         end_update_p(z, hamiltonian, 0.5 * epsilon);
 
         double H3 = hamiltonian.H(z);
 
-        if (this->out_stream_) {
-          *(this->out_stream_)
-            << "    "
+        msg.str("");
+        msg << "    "
             << std::setw(width) << std::left << "hat{V}/2"
             << std::setw(width) << std::left << H0
             << std::setw(width) << std::left << H3
-            << std::setw(width) << std::left << (H3 - H0) / (epsilon * epsilon)
-            << std::endl
-            << "    "
+            << std::setw(width) << std::left << (H3 - H0) / (epsilon * epsilon);
+        this->writer_(msg.str());
+
+        msg.str("");
+        msg << "    "
             << std::setw(nColumn * width)
             << std::setfill('-')
             << ""
-            << std::setfill(' ')
-            << std::endl;
-        }
+            << std::setfill(' ');
+        this->writer_(msg.str());
       }
 
       virtual void begin_update_p(typename Hamiltonian::PointType& z,
@@ -120,5 +127,4 @@ namespace stan {
 
   }  // mcmc
 }  // stan
-
 #endif

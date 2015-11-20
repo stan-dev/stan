@@ -6,7 +6,6 @@
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 
 namespace stan {
-
   namespace mcmc {
 
     // Point in a phase space with a base
