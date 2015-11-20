@@ -180,13 +180,8 @@ namespace stan {
         }
 
         // Sequence of eta values to try during adaptation
-        std::queue<double> eta_sequence;
-        eta_sequence.push(100.0);
-        eta_sequence.push(10.0);
-        eta_sequence.push(1.0);
-        eta_sequence.push(0.1);
-        eta_sequence.push(0.01);
-        int eta_sequence_size = eta_sequence.size();
+        const int eta_sequence_size = 5;
+        double eta_sequence[eta_sequence_size] = {100, 10, 1, 0.1, 0.01};
 
         // Initialize ELBO tracking variables
         double elbo      = -std::numeric_limits<double>::max();
@@ -216,15 +211,15 @@ namespace stan {
         double eta_scaled;
 
         bool do_more_tuning = true;
+        int eta_sequence_index = 0;
         while (do_more_tuning) {
           // Try next eta
-          eta = eta_sequence.front();
-          eta_sequence.pop();
+          eta = eta_sequence[eta_sequence_index];
 
           int print_progress_m;
           for (int iter_tune = 1; iter_tune <= adapt_iterations; ++iter_tune) {
-            print_progress_m = (eta_sequence_size - eta_sequence.size() - 1)
-              * adapt_iterations + iter_tune;
+            print_progress_m = eta_sequence_index
+                               * adapt_iterations + iter_tune;
             stan::services::variational::print_progress(
               print_progress_m, 0, adapt_iterations*eta_sequence_size,
               adapt_iterations, true, "", "", *print_stream_);
@@ -266,7 +261,7 @@ namespace stan {
               *print_stream_ << "Success!"
                 << " Found best value [eta = " << eta_best
                 << "]";
-              if (eta_sequence.size() > 0)
+              if (eta_sequence_index < eta_sequence_size - 1)
                 *print_stream_ << " earlier than expected."
                   << std::endl << std::endl;
               else
@@ -274,7 +269,7 @@ namespace stan {
             }
             do_more_tuning = false;
           } else {
-            if (eta_sequence.size() > 0) {
+            if (eta_sequence_index < eta_sequence_size - 1) {
               // Reset
               elbo_best = elbo;
               eta_best = eta;
@@ -298,6 +293,7 @@ namespace stan {
             // Reset
             history_grad_squared.set_to_zero();
           }
+          ++eta_sequence_index;
           variational = Q(cont_params_);
         }
         return eta_best;
