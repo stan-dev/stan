@@ -174,7 +174,6 @@ namespace stan {
                                    "Number of adaptation iterations",
                                    adapt_iterations);
 
-
         if (print_stream_) {
           *print_stream_ << "Begin eta adaptation." << std::endl;
         }

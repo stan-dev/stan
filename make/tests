@@ -158,6 +158,9 @@ src/test/unit/variational/gradient_warn_test.cpp: src/test/test-models/good/vari
 src/test/unit/variational/hier_logistic_test.cpp: src/test/test-models/good/variational/hier_logistic.hpp
 src/test/unit/variational/hier_logistic_cp_test.cpp: src/test/test-models/good/variational/hier_logistic_cp.hpp
 src/test/unit/variational/advi_messages_test.cpp:src/test/test-models/good/variational/univariate_no_constraint.hpp
+src/test/unit/variational/eta_adapt_fail_test.cpp:src/test/test-models/good/variational/eta_should_fail.hpp
+src/test/unit/variational/eta_adapt_big_test.cpp:src/test/test-models/good/variational/eta_should_be_big.hpp
+src/test/unit/variational/eta_adapt_small_test.cpp:src/test/test-models/good/variational/eta_should_be_small.hpp
 
 ##
 # Compile models depends on every model within
