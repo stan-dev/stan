@@ -313,7 +313,7 @@ namespace stan {
                                  double tol_rel_obj,
                                  int max_iterations) const {
         static const char* function =
-          "stan::variational::advi.stochastic_gradient_ascent";
+          "stan::variational::advi::stochastic_gradient_ascent";
 
         stan::math::check_positive(function, "Eta stepsize", eta);
         stan::math::check_positive(function,
