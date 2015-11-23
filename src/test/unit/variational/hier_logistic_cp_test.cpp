@@ -29,15 +29,14 @@ TEST(advi_test, hier_logistic_cp_constraint_meanfield) {
   // ADVI
   stan::variational::advi<Model_cp, stan::variational::normal_meanfield, rng_t> test_advi(my_model,
                                                      cont_params,
+                                                     base_rng,
                                                      10,
                                                      100,
-                                                     0.01,
-                                                     base_rng,
                                                      100,
                                                      1,
                                                      &std::cout,
                                                      &std::cout,
                                                      &std::cout);
 
-  test_advi.run(1,2e4);
+  test_advi.run(0.01,false,50,1,2e4);
 }

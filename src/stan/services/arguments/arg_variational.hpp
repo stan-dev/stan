@@ -7,12 +7,12 @@
 #include <stan/services/arguments/arg_variational_iter.hpp>
 #include <stan/services/arguments/arg_variational_num_samples.hpp>
 #include <stan/services/arguments/arg_variational_eta.hpp>
+#include <stan/services/arguments/arg_variational_adapt.hpp>
 #include <stan/services/arguments/arg_tolerance.hpp>
 #include <stan/services/arguments/arg_variational_eval_elbo.hpp>
 #include <stan/services/arguments/arg_variational_output_samples.hpp>
 
 namespace stan {
-
   namespace services {
 
     class arg_variational: public categorical_argument {
@@ -31,6 +31,7 @@ namespace stan {
                                  "of ELBO (objective function)",
                                  100));
         _subarguments.push_back(new arg_variational_eta());
+        _subarguments.push_back(new arg_variational_adapt());
         _subarguments.push_back(new arg_tolerance("tol_rel_obj",
           "Convergence tolerance on the relative norm of the objective", 1e-2));
         _subarguments.push_back(new arg_variational_eval_elbo("eval_elbo",
@@ -41,6 +42,7 @@ namespace stan {
                                  1000));
       }
     };
+
   }  // services
 }  // stan
 
