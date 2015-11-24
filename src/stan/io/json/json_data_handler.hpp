@@ -223,6 +223,7 @@ namespace stan {
         incr_dim_size();
       }
 
+      // NOLINTNEXTLINE(runtime/int)
       void number_long(long n) {
         set_last_dim();
         if (is_int_) {
@@ -233,6 +234,7 @@ namespace stan {
         incr_dim_size();
       }
 
+      // NOLINTNEXTLINE(runtime/int)
       void number_unsigned_long(unsigned long n) {
         set_last_dim();
         if (is_int_) {
