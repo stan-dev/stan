@@ -413,6 +413,15 @@ namespace stan {
                   const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
                   double& f,
                   Eigen::Matrix<double, Eigen::Dynamic, 1>& grad_f,
+                  std::ostream* msgs = 0) {
+      stan::math::gradient(model_functional<M>(model, msgs), x, f, grad_f);
+    }
+
+    template <class M>
+    void gradient(const M& model,
+                  const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
+                  double& f,
+                  Eigen::Matrix<double, Eigen::Dynamic, 1>& grad_f,
                   stan::interface_callbacks::writer::base_writer& writer) {
       std::stringstream ss;
       stan::math::gradient(model_functional<M>(model, &ss), x, f, grad_f);
