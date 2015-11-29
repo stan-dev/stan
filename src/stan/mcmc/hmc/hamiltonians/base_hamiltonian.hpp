@@ -53,7 +53,7 @@ namespace stan {
 
       virtual void update(Point& z) {
         try {
-          stan::model::gradient(model_, z.q, z.V, z.g);
+          stan::model::gradient(model_, z.q, z.V, z.g, writer_);
           z.V *= -1;
         } catch (const std::exception& e) {
           this->write_error_msg_(e);

@@ -5,6 +5,7 @@
 #include <stan/io/dump.hpp>
 #include <test/test-models/good/model/valid.hpp>
 #include <test/unit/util.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 //#include <test/test-models/good/model/domain_fail.hpp>
 
 class TestModel_uniform_01 {
@@ -120,8 +121,9 @@ TEST(ModelUtil, gradient) {
   data_stream.close();
 
   std::stringstream output;
+  stan::interface_callbacks::writer::stream_writer writer(output);
   valid_model_namespace::valid_model valid_model(data_var_context, &output);
-  EXPECT_NO_THROW(stan::model::gradient(valid_model, x, f, g));
+  EXPECT_NO_THROW(stan::model::gradient(valid_model, x, f, g, writer));
   
   EXPECT_FLOAT_EQ(dim, x.size());
   EXPECT_FLOAT_EQ(dim, g.size());
