@@ -8,6 +8,7 @@ os:
   
 compiler:
   - clang
+  - gcc
 
 before_install: make math-revert
 
