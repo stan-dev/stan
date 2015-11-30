@@ -120,7 +120,7 @@ namespace stan {
                 << std::endl;
         }
         throw std::invalid_argument(msg.str());
-      } catch (const std::runtime_error& e) {
+      } catch (const std::exception& e) {
         std::stringstream msg;
         msg << "PROGRAM ERROR, MESSAGE(S) FROM PARSER:"
             << std::endl

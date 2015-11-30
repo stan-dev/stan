@@ -73,6 +73,7 @@ namespace stan {
        *
        * @param n Value to handle.
        */
+      // NOLINTNEXTLINE(runtime/int)
       virtual void number_long(long n) { }
 
       /**
@@ -80,6 +81,7 @@ namespace stan {
        *
        * @param n Value to handle.
        */
+      // NOLINTNEXTLINE(runtime/int)
       virtual void number_unsigned_long(unsigned long n) { }
 
       /**

@@ -25,7 +25,7 @@ TEST(LangGrammars,test1) {
   test_throws("err-integrate-ode-comma",
               "PARSER EXPECTED: \",");
   test_throws("err-non-int-dims",
-              "array indices must be integer expressions; found type=real");
+              "index must be integer; found type=real");
   test_throws("err-no-cond-else-if",
               "PARSER EXPECTED: \"(");
   test_throws("err-no-cond",

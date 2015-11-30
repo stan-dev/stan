@@ -12,15 +12,15 @@ namespace stan {
       arg_variational_eta(): real_argument() {
         _name = "eta";
         _description = "Stepsize scaling parameter for variational inference";
-        _validity = "0 < eta <= 1.0";
-        _default = "0.1";
-        _default_value = 0.1;
+        _validity = "0 < eta";
+        _default = "1.0";
+        _default_value = 1.0;
         _constrained = true;
         _good_value = 1.0;
         _bad_value = -1.0;
         _value = _default_value;
       }
-      bool is_valid(double value) { return value > 0 && value <= 1.0; }
+      bool is_valid(double value) { return value > 0; }
     };
   }  // services
 }  // stan

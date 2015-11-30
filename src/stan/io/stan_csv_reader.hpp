@@ -194,6 +194,9 @@ namespace stan {
         }
         ss.seekg(std::ios_base::beg);
 
+        if (lines < 4)
+          return false;
+
         char comment;  // Buffer for comment indicator, #
 
         // Skip first two lines

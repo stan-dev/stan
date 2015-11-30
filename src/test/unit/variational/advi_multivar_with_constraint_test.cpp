@@ -34,10 +34,9 @@ TEST(advi_test, multivar_with_constraint_fullrank) {
   // ADVI
   stan::variational::advi<Model, stan::variational::normal_fullrank, rng_t> test_advi(my_model,
                                                   cont_params,
+                                                  base_rng,
                                                   n_monte_carlo_grad,
                                                   n_monte_carlo_elbo,
-                                                  0.1,
-                                                  base_rng,
                                                   100,
                                                   1,
                                                   print_stream,
@@ -97,10 +96,9 @@ TEST(advi_test, multivar_with_constraint_meanfield) {
   // ADVI
   stan::variational::advi<Model, stan::variational::normal_meanfield, rng_t> test_advi(my_model,
                                                   cont_params,
+                                                  base_rng,
                                                   n_monte_carlo_grad,
                                                   n_monte_carlo_elbo,
-                                                  0.1,
-                                                  base_rng,
                                                   100,
                                                   1,
                                                   print_stream,

@@ -30,6 +30,8 @@ TEST(LangCompiler, streams) {
   std::stringstream out;
   EXPECT_NO_THROW(stan::lang::compile(&out, stan_lang_in, cpp_out, model_name, in_file_name));
   
+  // TODO(carpenter): wrong place to test basic test util behavior
+  // TODO(carpenter): functions failing have no doc
   stan::test::reset_std_streams();
   EXPECT_EQ("", stan::test::cout_ss.str());
   EXPECT_EQ("", stan::test::cerr_ss.str());
