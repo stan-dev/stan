@@ -24,7 +24,6 @@ TEST(advi_test, univar_with_constraint_fullrank) {
   // Other params
   int n_monte_carlo_grad = 10;
   std::stringstream output;
-  output.clear();
 
   // Dummy input
   Eigen::VectorXd cont_params = Eigen::VectorXd::Zero(1);
@@ -152,7 +151,6 @@ TEST(advi_test, univar_with_constraint_meanfield) {
   // Other params
   int n_monte_carlo_grad = 10;
   std::stringstream output;
-  output.clear();
 
   // Dummy input
   Eigen::VectorXd cont_params = Eigen::VectorXd::Zero(1);

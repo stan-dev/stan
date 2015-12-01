@@ -25,7 +25,6 @@ TEST(advi_test, multivar_with_constraint_fullrank) {
   int n_monte_carlo_grad = 10;
   int n_monte_carlo_elbo = 1e6;
   std::stringstream output;
-  output.clear();
 
   // Dummy input
   Eigen::VectorXd cont_params = Eigen::VectorXd::Zero(2);
@@ -88,7 +87,6 @@ TEST(advi_test, multivar_with_constraint_meanfield) {
   int n_monte_carlo_grad = 10;
   int n_monte_carlo_elbo = 1e6;
   std::stringstream output;
-  output.clear();
 
   // Dummy input
   Eigen::VectorXd cont_params = Eigen::VectorXd::Zero(2);
