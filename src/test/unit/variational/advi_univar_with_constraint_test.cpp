@@ -23,7 +23,8 @@ TEST(advi_test, univar_with_constraint_fullrank) {
 
   // Other params
   int n_monte_carlo_grad = 10;
-  std::ostream* print_stream = &std::cout;
+  std::stringstream output;
+  output.clear();
 
   // Dummy input
   Eigen::VectorXd cont_params = Eigen::VectorXd::Zero(1);
@@ -37,9 +38,9 @@ TEST(advi_test, univar_with_constraint_fullrank) {
                                                   5e5, // absurdly high!
                                                   100,
                                                   1,
-                                                  print_stream,
-                                                  &std::cout,
-                                                  &std::cout);
+                                                  &output,
+                                                  &output,
+                                                  &output);
 
   // Create some arbitrary variational q() family to calculate the ELBO over
   Eigen::VectorXd mu     = Eigen::VectorXd::Constant(my_model.num_params_r(),
@@ -132,7 +133,7 @@ TEST(advi_test, univar_with_constraint_fullrank) {
           "Dimension of variational q (1) must match in size";
   EXPECT_THROW_MSG(muL.calc_grad(elbo_grad,
                                  my_model, cont_params, n_monte_carlo_grad,
-                                 base_rng, print_stream),
+                                 base_rng, &output),
                    std::invalid_argument, error);
 }
 
@@ -150,7 +151,8 @@ TEST(advi_test, univar_with_constraint_meanfield) {
 
   // Other params
   int n_monte_carlo_grad = 10;
-  std::ostream* print_stream = &std::cout;
+  std::stringstream output;
+  output.clear();
 
   // Dummy input
   Eigen::VectorXd cont_params = Eigen::VectorXd::Zero(1);
@@ -164,9 +166,9 @@ TEST(advi_test, univar_with_constraint_meanfield) {
                                                   5e5, // absurdly high!
                                                   100,
                                                   1,
-                                                  print_stream,
-                                                  &std::cout,
-                                                  &std::cout);
+                                                  &output,
+                                                  &output,
+                                                  &output);
 
   // Create some arbitrary variational q() family to calculate the ELBO over
   Eigen::VectorXd mu  = Eigen::VectorXd::Constant(my_model.num_params_r(),
@@ -252,6 +254,6 @@ TEST(advi_test, univar_with_constraint_meanfield) {
           "Dimension of variational q (1) must match in size";
   EXPECT_THROW_MSG(musigmatilde.calc_grad(elbo_grad,
                                  my_model, cont_params, n_monte_carlo_grad,
-                                 base_rng, print_stream),
+                                 base_rng, &output),
                    std::invalid_argument, error);
 }
