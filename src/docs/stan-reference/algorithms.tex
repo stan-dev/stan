@@ -877,10 +877,10 @@ gradient ascent is capable of following such gradients.
 \subsection{Adaptive Stepsize Sequence}
 
 ADVI uses a finite-memory version of adaGrad \citep{Duchi:2011}. This has a
-single parameter that we expose, denoted \texttt{eta\_adagrad}. We recommend a
-default value of $0.1$. However, for some models this may be too large. Should
-you observe the ELBO to diverge, try reducing \texttt{eta\_adagrad}. In the
-future, we hope to adaptively set this parameter using heuristics.
+single parameter that we expose, denoted \texttt{eta}. We now have a warmup
+adaptation phase that selects a good value for \texttt{eta}. The
+procedure does a heuristic search over \texttt{eta} values that span 5
+orders of magnitude.
 
 \subsection{Assessing Convergence}
 
