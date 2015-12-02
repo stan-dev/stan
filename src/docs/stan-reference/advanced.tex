@@ -2475,13 +2475,13 @@ Differentiation Variational Inference (ADVI). For more details, see
 \section{Classical Variational Inference}
 
 Variational inference approximates the
-posterior $p(\theta \mid y)$ with a simple, parameterized distribution
-$q(\theta \,;\, \phi)$. It matches the approximation to the
+posterior $p(\theta \, | \, y)$ with a simple, parameterized distribution
+$q(\theta \, | \, \phi)$. It matches the approximation to the
 true posterior by minimizing the Kullback-Leibler (KL) divergence,
 %
 \[
   \phi^* = \argmin_\phi
-  \KL{ q(\theta \,;\, \phi) }{ p(\theta \mid y) }.
+  \KL{q(\theta \, | \, \phi) }{ p(\theta \mid y)}.
 \]
 %
 Typically the KL divergence lacks an analytic, closed-form solution.
@@ -2493,7 +2493,7 @@ Instead we maximize a proxy to the KL divergence, the evidence lower bound
   =
   \E_{q (\theta)} \big[ \log p (y,\theta) \big]
   -
-  \E_{q (\theta)} \big[ \log q (\theta\,;\,\phi) \big].
+  \E_{q (\theta)} \big[ \log q (\theta\, | \,\phi) \big].
 \]
 %
 The first term is an expectation of the log
@@ -2513,14 +2513,14 @@ The variational objective (ELBO) becomes
 \[
   \mathcal{L}(\phi)
   =
-  \E_{q(\zeta\,;\,\phi)}
+  \E_{q(\zeta\,|\,\phi)}
   \bigg[
   \log p (y, T^{-1}(\zeta))
   +
   \log \big| \det J_{T^{-1}}(\zeta) \big|
   \bigg]
   -
-  \E_{q (\zeta\,;\,\phi)} \big[ \log q (\zeta\,;\,\phi) \big].
+  \E_{q (\zeta\, | \,\phi)} \big[ \log q (\zeta\, | \,\phi) \big].
 \]
 %
 Since the $\zeta$ variables live in the real-coordinate space, we can choose a
@@ -2528,13 +2528,13 @@ fixed family for the variational distribution. We choose a fully-factorized
 Gaussian,
 %
 \[
-  q(\zeta \,;\, \phi)
+  q(\zeta \, | \, \phi)
   =
-  \mathcal{N}\left(\zeta \,;\, \mu, \sigma\right)
+  \distro{Normal}\left(\zeta \, | \, \mu, \sigma\right)
   =
   \prod_{k=1}^K
-  \mathcal{N}
-  \left(\zeta_k \,;\, \mu_k, \sigma_k\right),
+  \distro{Normal}
+  \left(\zeta_k \, | \, \mu_k, \sigma_k\right),
 \]
 %
 where the vector
@@ -2550,7 +2550,7 @@ latent variables. This implicitly defines the variational approximation in the
 original latent variable space as
 %
 \[
-\mathcal{N} \left(T(\theta)\,;\, \mu, \sigma\right)
+\distro{Normal} \left(T(\theta) \, | \, \mu, \sigma\right)
 \big| \det J_{T}(\theta) \big|.
 \]
 This is, in general, not a Gaussian distribution.
@@ -2563,7 +2563,7 @@ The variational objective (ELBO) that we maximize is,
 \[
   \mathcal{L}(\phi)
   =
-  \E_{q(\zeta\,;\,\phi)}
+  \E_{q(\zeta\, | \,\phi)}
   \bigg[
   \log p (y, T^{-1}(\zeta))
   +
