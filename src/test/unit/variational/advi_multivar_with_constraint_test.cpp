@@ -24,7 +24,7 @@ TEST(advi_test, multivar_with_constraint_fullrank) {
   // Other params
   int n_monte_carlo_grad = 10;
   int n_monte_carlo_elbo = 1e6;
-  std::ostream* print_stream = &std::cout;
+  std::stringstream output;
 
   // Dummy input
   Eigen::VectorXd cont_params = Eigen::VectorXd::Zero(2);
@@ -39,9 +39,9 @@ TEST(advi_test, multivar_with_constraint_fullrank) {
                                                   n_monte_carlo_elbo,
                                                   100,
                                                   1,
-                                                  print_stream,
-                                                  &std::cout,
-                                                  &std::cout);
+                                                  &output,
+                                                  &output,
+                                                  &output);
 
   // Create some arbitrary variational q() family to calculate the ELBO over
   Eigen::VectorXd mu     = Eigen::VectorXd::Constant(my_model.num_params_r(),
@@ -86,7 +86,7 @@ TEST(advi_test, multivar_with_constraint_meanfield) {
   // Other params
   int n_monte_carlo_grad = 10;
   int n_monte_carlo_elbo = 1e6;
-  std::ostream* print_stream = &std::cout;
+  std::stringstream output;
 
   // Dummy input
   Eigen::VectorXd cont_params = Eigen::VectorXd::Zero(2);
@@ -101,9 +101,9 @@ TEST(advi_test, multivar_with_constraint_meanfield) {
                                                   n_monte_carlo_elbo,
                                                   100,
                                                   1,
-                                                  print_stream,
-                                                  &std::cout,
-                                                  &std::cout);
+                                                  &output,
+                                                  &output,
+                                                  &output);
 
   // Create some arbitrary variational q() family to calculate the ELBO over
   Eigen::VectorXd mu  = Eigen::VectorXd::Constant(my_model.num_params_r(),
@@ -178,6 +178,6 @@ TEST(advi_test, multivar_with_constraint_meanfield) {
           "Dimension of variational q (2) must match in size";
   EXPECT_THROW_MSG(musigmatilde.calc_grad(elbo_grad,
                                  my_model, cont_params, n_monte_carlo_grad,
-                                 base_rng, print_stream),
+                                 base_rng, &output),
                    std::invalid_argument, error);
 }
