@@ -17,6 +17,9 @@ TEST(advi_test, hier_logistic_cp_constraint_meanfield) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
 
+  std::stringstream output;
+  output.clear();
+
   // Instantiate model
   Model_cp my_model(data_var_context);
 
@@ -34,9 +37,9 @@ TEST(advi_test, hier_logistic_cp_constraint_meanfield) {
                                                      100,
                                                      100,
                                                      1,
-                                                     &std::cout,
-                                                     &std::cout,
-                                                     &std::cout);
+                                                     &output,
+                                                     &output,
+                                                     &output);
 
   test_advi.run(0.01,false,50,1,2e4);
 }
