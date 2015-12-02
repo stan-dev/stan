@@ -203,9 +203,19 @@ Perhaps most importantly, we've developed a much stricter process for
 unit testing, code review, and automated integration testing (see
 \refchapter{software-development}).
 
-As of Stan 2.7, variational inference is supported for arbitrary Stan
-models.  This promises Bayesian inference at much larger scale than is
-possible with MCMC methods.
+As fast and scalable as Stan's MCMC sampling is, for large data sets
+it can still be prohibitively slow.  Stan 2.7 introduced variational
+inference for arbitrary Stan models.  In contrast to penalized maximum
+likelihood, which finds the posterior mode, variational inference
+finds an approximation to the posterior mean (both methods use
+curvature to estimate a multivariate normal approximation to posterior
+covariance).  This promises Bayesian inference at much larger scale than is
+possible with MCMC methods.  In examples we've run, problems that take
+days with MCMC complete in half an hour with variational inference.
+There is still a long road ahead in understanding these variational
+approximations, both in how good the multivariate approximation is to
+the true posterior and which forms of models can be fit efficiently,
+scalably, and reliably.
 
 
 \section*{\Stan's Future}
@@ -226,7 +236,8 @@ Some major features are on our short-term horizon: Riemannian manifold
 Hamiltonian Monte Carlo (RHMC), transformed Laplace approximations
 with uncertainty quantification for maximum likelihood estimation,
 marginal maximum likelihood estimation, data-parallel expectation
-propagation, and streaming (stochastic) variational inference. 
+propagation, and streaming (stochastic) variational inference.  The
+latter has been prototyped and described in papers. 
 
 We will also continue to work on improving numerical stability and
 efficiency throughout.  In addition, we plan to revise the interfaces

@@ -238,6 +238,17 @@ maintain arithmetic precision while at the same time, the number of
 steps $L$ is increased in order to maintain simulation time to ensure
 statistical efficiency.
 
+\subsection{Integration Time}
+
+The actual integration time is $L \, \epsilon$, a function of number
+of steps.  Some interfaces to Stan set an approximate integration time
+$t$ and the discretization interval (step size) $\epsilon$.  In these
+cases, the number of steps will be rounded down as
+\[
+L = \left\lfloor \frac{t}{\epsilon} \right\rfloor.
+\]
+and the actual integration time will still be $L \, \epsilon$.
+
 \subsection{Automatic Parameter Tuning}
 
 Stan is able to automatically optimize $\epsilon$ to match an
@@ -845,52 +856,54 @@ one is more efficient.
 \noindent
 \Stan implements an automatic variational inference algorithm, called
 Automatic Differentiation Variational Inference (ADVI)
-\citep{Kucukelbir:2015}. In this chapter, we describe the specifics of how ADVI
-maximizes the variational objective. For a high-level description, please see
-\refchapter{vi-advanced}.
+\citep{Kucukelbir:2015}. In this chapter, we describe the specifics of
+how ADVI maximizes the variational objective. For a high-level
+description, please see \refchapter{vi-advanced}.
 
 \section{Stochastic Gradient Ascent}
 
-ADVI optimizes the ELBO in the real-coordinate space using stochastic gradient
-ascent. We obtain noisy (yet unbiased) gradients of the variational objective
-using automatic differentiation and Monte Carlo integration. The algorithm
-ascends these gradients using an adaptive stepsize sequence. We evaluate the
-ELBO also using Monte Carlo integration and measure convergence similar to the
-relative tolerance scheme in \Stan's optimization feature.
+ADVI optimizes the ELBO in the real-coordinate space using stochastic
+gradient ascent. We obtain noisy (yet unbiased) gradients of the
+variational objective using automatic differentiation and Monte Carlo
+integration. The algorithm ascends these gradients using an adaptive
+stepsize sequence. We evaluate the ELBO also using Monte Carlo
+integration and measure convergence similar to the relative tolerance
+scheme in \Stan's optimization feature.
 
 \subsection{Monte Carlo Approximation of the ELBO}
 
-ADVI uses Monte Carlo integration to approximate the variational objective
-function, the ELBO. The number of samples used to approximate the ELBO is
-denoted by \texttt{elbo\_samples}. We recommend a default value of $100$, as we
-only evaluate the ELBO every \texttt{eval\_elbo} iterations, which also defaults
-to $100$.
+ADVI uses Monte Carlo integration to approximate the variational
+objective function, the ELBO. The number of samples used to
+approximate the ELBO is denoted by \texttt{elbo\_samples}. We
+recommend a default value of $100$, as we only evaluate the ELBO every
+\texttt{eval\_elbo} iterations, which also defaults to $100$.
 
 \subsection{Monte Carlo Approximation of the Gradients}
 
-ADVI uses Monte Carlo integration to approximate the gradients of the ELBO. The
-number of samples used to approximate the gradients is denoted by
-\texttt{grad\_samples}. We recommend a default value of $1$, as this is the most
-efficient. It also a very noisy estimate of the gradient, but stochastic
-gradient ascent is capable of following such gradients.
+ADVI uses Monte Carlo integration to approximate the gradients of the
+ELBO. The number of samples used to approximate the gradients is
+denoted by \texttt{grad\_samples}. We recommend a default value of
+$1$, as this is the most efficient. It also a very noisy estimate of
+the gradient, but stochastic gradient ascent is capable of following
+such gradients.
 
 \subsection{Adaptive Stepsize Sequence}
 
-ADVI uses a finite-memory version of adaGrad \citep{Duchi:2011}. This has a
-single parameter that we expose, denoted \texttt{eta}. We now have a warmup
-adaptation phase that selects a good value for \texttt{eta}. The
-procedure does a heuristic search over \texttt{eta} values that span 5
-orders of magnitude.
+ADVI uses a finite-memory version of adaGrad \citep{Duchi:2011}. This
+has a single parameter that we expose, denoted \texttt{eta}. We now
+have a warmup adaptation phase that selects a good value for
+\texttt{eta}. The procedure does a heuristic search over \texttt{eta}
+values that span 5 orders of magnitude.
 
 \subsection{Assessing Convergence}
 
-ADVI tracks the progression of the ELBO through the stochastic optimization.
-Specifically, ADVI heuristically determines a rolling window over which it
-computes the average and the median change of the ELBO. Should either number
-fall below a threshold, denoted by \texttt{tol\_rel\_obj}, we consider the
-algorithm to have converged. The change in ELBO is calculated the same way as in
-\Stan's optimization module.
-
+ADVI tracks the progression of the ELBO through the stochastic
+optimization.  Specifically, ADVI heuristically determines a rolling
+window over which it computes the average and the median change of the
+ELBO. Should either number fall below a threshold, denoted by
+\texttt{tol\_rel\_obj}, we consider the algorithm to have
+converged. The change in ELBO is calculated the same way as in \Stan's
+optimization module.
 
 
 \chapter{Diagnostic Mode}\label{diagnostic-algorithms.chapter}
