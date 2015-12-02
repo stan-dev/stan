@@ -54,17 +54,17 @@ namespace stan {
         z_.q = q;
       }
 
-      void init_stepsize() {
+      void init_stepsize(interface_callbacks::writer::base_writer& writer) {
         ps_point z_init(this->z_);
 
         this->hamiltonian_.sample_p(this->z_, this->rand_int_);
-        this->hamiltonian_.init(this->z_);
+        this->hamiltonian_.init(this->z_, writer);
 
         // Guaranteed to be finite if randomly initialized
         double H0 = this->hamiltonian_.H(this->z_);
 
         this->integrator_.evolve(this->z_, this->hamiltonian_,
-                                 this->nom_epsilon_);
+                                 this->nom_epsilon_, writer);
 
         double h = this->hamiltonian_.H(this->z_);
         if (boost::math::isnan(h))
@@ -78,12 +78,12 @@ namespace stan {
           this->z_.ps_point::operator=(z_init);
 
           this->hamiltonian_.sample_p(this->z_, this->rand_int_);
-          this->hamiltonian_.init(this->z_);
+          this->hamiltonian_.init(this->z_, writer);
 
           double H0 = this->hamiltonian_.H(this->z_);
 
           this->integrator_.evolve(this->z_, this->hamiltonian_,
-                                   this->nom_epsilon_);
+                                   this->nom_epsilon_, writer);
 
           double h = this->hamiltonian_.H(this->z_);
           if (boost::math::isnan(h))

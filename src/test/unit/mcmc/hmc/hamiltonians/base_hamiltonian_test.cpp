@@ -22,7 +22,7 @@ TEST(BaseHamiltonian, update) {
   stan::mcmc::ps_point z(11);
   z.q.setOnes();
   
-  metric.update(z);
+  metric.update(z, writer);
 
   EXPECT_FLOAT_EQ(10.73223197, z.V);
 

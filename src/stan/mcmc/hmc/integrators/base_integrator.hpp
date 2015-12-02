@@ -14,7 +14,8 @@ namespace stan {
 
       virtual void evolve(typename Hamiltonian::PointType& z,
                           Hamiltonian& hamiltonian,
-                          const double epsilon) = 0;
+                          const double epsilon,
+                          interface_callbacks::writer::base_writer& writer) = 0;
 
     protected:
       interface_callbacks::writer::base_writer& writer_;

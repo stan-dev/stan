@@ -24,8 +24,10 @@ namespace stan {
 
       ~adapt_dense_e_static_hmc() { }
 
-      sample transition(sample& init_sample) {
-        sample s = dense_e_static_hmc<Model, BaseRNG>::transition(init_sample);
+      sample transition(sample& init_sample,
+                        interface_callbacks::writer::base_writer& writer) {
+        sample s = dense_e_static_hmc<Model, BaseRNG>::transition(init_sample,
+                                                                  writer);
 
         if (this->adapt_flag_) {
           this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,

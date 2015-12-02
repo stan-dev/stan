@@ -85,7 +85,8 @@ namespace stan {
       
       void evolve(typename Hamiltonian::PointType& z,
                   Hamiltonian& hamiltonian,
-                  const double epsilon) {
+                  const double epsilon,
+                  stan::interface_callbacks::writer::base_writer& writer) {
         z.q += epsilon * z.p;
       };
       

@@ -23,7 +23,8 @@ namespace stan {
         : base_hmc<mock_model,mock_hamiltonian,mock_integrator,rng_t>(m, rng, writer)
       { this->name_ = "Mock HMC"; }
       
-      sample transition(sample& init_sample) {
+      sample transition(sample& init_sample,
+                        interface_callbacks::writer::base_writer& writer) {
         this->seed(init_sample.cont_params());
         return sample(this->z_.q, - this->hamiltonian_.V(this->z_), 0);
       }

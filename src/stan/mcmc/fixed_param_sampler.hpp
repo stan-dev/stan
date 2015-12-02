@@ -19,7 +19,8 @@ namespace stan {
         this->name_ = "Fixed Parameter Sampler";
       }
 
-      sample transition(sample& init_sample) {
+      sample transition(sample& init_sample,
+                        interface_callbacks::writer::base_writer& writer) {
         return init_sample;
       }
     };

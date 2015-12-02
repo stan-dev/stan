@@ -53,7 +53,8 @@ namespace stan {
       int get_max_depth() { return this->max_depth_; }
       double get_max_delta() { return this->max_delta_; }
 
-      sample transition(sample& init_sample) {
+      sample transition(sample& init_sample,
+                        interface_callbacks::writer::base_writer& writer) {
         // Initialize the algorithm
         this->sample_stepsize();
 
@@ -62,7 +63,7 @@ namespace stan {
         this->seed(init_sample.cont_params());
 
         this->hamiltonian_.sample_p(this->z_, this->rand_int_);
-        this->hamiltonian_.init(this->z_);
+        this->hamiltonian_.init(this->z_, writer);
 
         ps_point z_plus(this->z_);
         ps_point z_minus(z_plus);
@@ -109,7 +110,8 @@ namespace stan {
           // And build a new subtree in that direction
           this->z_.ps_point::operator=(*z);
 
-          int n_valid_subtree = build_tree(depth_, *rho, 0, z_propose, util);
+          int n_valid_subtree = build_tree(depth_, *rho, 0, z_propose, util,
+                                           writer);
           ++(this->depth_);
 
           *z = this->z_;
@@ -180,11 +182,13 @@ namespace stan {
       // Returns number of valid points in the completed subtree
       int build_tree(int depth, Eigen::VectorXd& rho,
                      ps_point* z_init_parent, ps_point& z_propose,
-                     nuts_util& util) {
+                     nuts_util& util,
+                     interface_callbacks::writer::base_writer& writer) {
         // Base case
         if (depth == 0) {
             this->integrator_.evolve(this->z_, this->hamiltonian_,
-                                     util.sign * this->epsilon_);
+                                     util.sign * this->epsilon_,
+                                     writer);
             rho += this->z_.p;
 
             if (z_init_parent) *z_init_parent = this->z_;
@@ -209,7 +213,7 @@ namespace stan {
           ps_point z_init(this->z_);
 
           int n1 = build_tree(depth - 1, left_subtree_rho, &z_init,
-                              z_propose, util);
+                              z_propose, util, writer);
 
           if (z_init_parent) *z_init_parent = z_init;
 
@@ -220,7 +224,7 @@ namespace stan {
           ps_point z_propose_right(z_init);
 
           int n2 = build_tree(depth - 1, right_subtree_rho, 0,
-                              z_propose_right, util);
+                              z_propose_right, util, writer);
 
           double accept_prob = static_cast<double>(n2) /
             static_cast<double>(n1 + n2);

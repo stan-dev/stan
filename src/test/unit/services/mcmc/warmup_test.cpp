@@ -14,7 +14,8 @@ public:
   mock_sampler(stan::interface_callbacks::writer::base_writer& writer)
     : base_mcmc(writer), n_transition_called(0) { }
 
-  stan::mcmc::sample transition(stan::mcmc::sample& init_sample) {
+  stan::mcmc::sample transition(stan::mcmc::sample& init_sample,
+                                stan::interface_callbacks::writer::base_writer& writer) {
     n_transition_called++;
     return init_sample;
   }
@@ -116,7 +117,8 @@ TEST_F(StanServices, warmup) {
                                num_thin, refresh, save,
                                *writer, s, *model, base_rng,
                                prefix, suffix, ss,
-                               callback);
+                               callback,
+                               message_writer);
   
   EXPECT_EQ(num_warmup, sampler->n_transition_called);
   EXPECT_EQ(num_warmup, callback.n);

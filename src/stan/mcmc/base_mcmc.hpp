@@ -17,7 +17,8 @@ namespace stan {
 
       virtual ~base_mcmc() {}
 
-      virtual sample transition(sample& init_sample) = 0;
+      virtual sample transition(sample& init_sample,
+                                interface_callbacks::writer::base_writer& writer) = 0;
 
       std::string name() {
         return name_;

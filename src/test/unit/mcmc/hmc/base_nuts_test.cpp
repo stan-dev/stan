@@ -56,11 +56,15 @@ namespace stan {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
       
-      void init(ps_point& z) { z.V = 0; }
+      void init(ps_point& z,
+                stan::interface_callbacks::writer::base_writer& writer) {
+        z.V = 0;
+      }
       
       void sample_p(ps_point& z, BaseRNG& rng) {};
       
-      void update(ps_point& z) {
+      void update(ps_point& z,
+                  stan::interface_callbacks::writer::base_writer& writer) {
         z.V += 500;
       }
       
@@ -165,7 +169,7 @@ TEST(McmcBaseNuts, build_tree) {
   sampler.sample_stepsize();
   sampler.z() = z_init;
   
-  int n_valid = sampler.build_tree(3, rho, &z_init, z_propose, util);
+  int n_valid = sampler.build_tree(3, rho, &z_init, z_propose, util, writer);
   
   EXPECT_EQ(8, n_valid);
   
@@ -218,19 +222,19 @@ TEST(McmcBaseNuts, slice_criterion) {
   int n_valid = 0;
   
   sampler.z().V = -750;
-  n_valid = sampler.build_tree(0, rho, &z_init, z_propose, util);
+  n_valid = sampler.build_tree(0, rho, &z_init, z_propose, util, writer);
   
   EXPECT_EQ(1, n_valid);
   EXPECT_EQ(0, sampler.n_divergent_);
   
   sampler.z().V = -250;
-  n_valid = sampler.build_tree(0, rho, &z_init, z_propose, util);
+  n_valid = sampler.build_tree(0, rho, &z_init, z_propose, util, writer);
   
   EXPECT_EQ(0, n_valid);
   EXPECT_EQ(0, sampler.n_divergent_);
   
   sampler.z().V = 750;
-  n_valid = sampler.build_tree(0, rho, &z_init, z_propose, util);
+  n_valid = sampler.build_tree(0, rho, &z_init, z_propose, util, writer);
   
   EXPECT_EQ(0, n_valid);
   EXPECT_EQ(1, sampler.n_divergent_);

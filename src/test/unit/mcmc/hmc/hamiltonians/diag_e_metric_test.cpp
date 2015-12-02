@@ -70,7 +70,7 @@ TEST(McmcDiagEMetric, gradients) {
   
   double epsilon = 1e-6;
   
-  metric.update(z);
+  metric.update(z, writer);
   
   Eigen::VectorXd g1 = metric.dtau_dq(z);
   
@@ -79,15 +79,15 @@ TEST(McmcDiagEMetric, gradients) {
     double delta = 0;
     
     z.q(i) += epsilon;
-    metric.update(z);
+    metric.update(z, writer);
     delta += metric.tau(z);
     
     z.q(i) -= 2 * epsilon;
-    metric.update(z);
+    metric.update(z, writer);
     delta -= metric.tau(z);
     
     z.q(i) += epsilon;
-    metric.update(z);
+    metric.update(z, writer);
     
     delta /= 2 * epsilon;
     
@@ -122,15 +122,15 @@ TEST(McmcDiagEMetric, gradients) {
     double delta = 0;
     
     z.q(i) += epsilon;
-    metric.update(z);
+    metric.update(z, writer);
     delta += metric.phi(z);
     
     z.q(i) -= 2 * epsilon;
-    metric.update(z);
+    metric.update(z, writer);
     delta -= metric.phi(z);
     
     z.q(i) += epsilon;
-    metric.update(z);
+    metric.update(z, writer);
     
     delta /= 2 * epsilon;
     

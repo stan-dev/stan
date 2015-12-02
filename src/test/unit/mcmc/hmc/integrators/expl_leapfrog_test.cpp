@@ -162,7 +162,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_1) {
   // setup epsilon
   double epsilon = 0.1;
 
-  unit_e_integrator.evolve(z, hamiltonian, epsilon);
+  unit_e_integrator.evolve(z, hamiltonian, epsilon, writer_);
   EXPECT_NEAR(z.V,     1.67676034808195, 5e-14);
   EXPECT_NEAR(z.q(0),  1.83126205010749, 5e-14);
   EXPECT_NEAR(z.p(0), -1.77767970934226, 5e-14);
@@ -190,7 +190,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_2) {
   // setup epsilon
   double epsilon = 0.2;
 
-  unit_e_integrator.evolve(z, hamiltonian, epsilon);
+  unit_e_integrator.evolve(z, hamiltonian, epsilon, writer_);
   EXPECT_NEAR(z.V,     2.13439496506688, 5e-14);
   EXPECT_NEAR(z.q(0),  2.06610501430439, 5e-14);
   EXPECT_NEAR(z.p(0),  0.124546016135635, 5e-14);
@@ -218,7 +218,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_3) {
   // setup epsilon
   double epsilon = 0.2;
 
-  unit_e_integrator.evolve(z, hamiltonian, epsilon);
+  unit_e_integrator.evolve(z, hamiltonian, epsilon, writer_);
   EXPECT_NEAR(z.V,     2.13439496506688, 5e-14);
   EXPECT_NEAR(z.q(0),  2.06610501430439, 5e-14);
   EXPECT_NEAR(z.p(0),  0.124546016135635, 5e-14);
@@ -246,7 +246,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_4) {
   // setup epsilon
   double epsilon = 0.4;
 
-  unit_e_integrator.evolve(z, hamiltonian, epsilon);
+  unit_e_integrator.evolve(z, hamiltonian, epsilon, writer_);
   EXPECT_NEAR(z.V,     1.03001529319458, 5e-14);
   EXPECT_NEAR(z.q(0),  1.43528066467474, 5e-14);
   EXPECT_NEAR(z.p(0), -1.69853874822605, 5e-14);
@@ -274,7 +274,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_5) {
   // setup epsilon
   double epsilon = 0.8;
 
-  unit_e_integrator.evolve(z, hamiltonian, epsilon);
+  unit_e_integrator.evolve(z, hamiltonian, epsilon, writer_);
   EXPECT_NEAR(z.V,     0.777009958583946, 5e-14);
   EXPECT_NEAR(z.q(0),  1.24660335198005, 5e-14);
   EXPECT_NEAR(z.p(0), -1.44022928930593, 5e-14);
@@ -301,7 +301,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_6) {
   // setup epsilon
   double epsilon = 1.6;
 
-  unit_e_integrator.evolve(z, hamiltonian, epsilon);
+  unit_e_integrator.evolve(z, hamiltonian, epsilon, writer_);
   EXPECT_NEAR(z.V,     0.0837242558054816, 5e-14);
   EXPECT_NEAR(z.q(0), -0.409204730680088, 5e-14);
   EXPECT_NEAR(z.p(0), -1.17831024137547, 5e-14);
@@ -329,7 +329,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_7) {
   // setup epsilon
   double epsilon = 3.2;
 
-  unit_e_integrator.evolve(z, hamiltonian, epsilon);
+  unit_e_integrator.evolve(z, hamiltonian, epsilon, writer_);
   EXPECT_NEAR(z.V,     12.3878614837537, 5e-13);
   EXPECT_NEAR(z.q(0),  -4.97752176966686, 5e-14);
   EXPECT_NEAR(z.p(0),  5.78359874382383, 5e-14);
@@ -357,7 +357,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_8) {
   // setup epsilon
   double epsilon = -1;
 
-  unit_e_integrator.evolve(z, hamiltonian, epsilon);
+  unit_e_integrator.evolve(z, hamiltonian, epsilon, writer_);
   EXPECT_NEAR(z.V,     6.96111198693627, 5e-14);
   EXPECT_NEAR(z.q(0),  3.73124965311523, 5e-14);
   EXPECT_NEAR(z.p(0),  0.134248884233563, 5e-14);
@@ -386,7 +386,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_9) {
   // setup epsilon
   double epsilon = 2.40769920051673;
 
-  diag_e_integrator.evolve(z, hamiltonian, epsilon);
+  diag_e_integrator.evolve(z, hamiltonian, epsilon, writer_);
   EXPECT_NEAR(z.V,     1.46626604258356, 5e-14);
   EXPECT_NEAR(z.q(0), -1.71246374711032, 5e-14);
   EXPECT_NEAR(z.p(0),  0.371492925378682, 5e-14);

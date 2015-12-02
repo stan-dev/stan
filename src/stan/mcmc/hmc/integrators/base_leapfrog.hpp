@@ -17,18 +17,20 @@ namespace stan {
 
       void evolve(typename Hamiltonian::PointType& z,
                   Hamiltonian& hamiltonian,
-                  const double epsilon) {
+                  const double epsilon,
+                  interface_callbacks::writer::base_writer& writer) {
         begin_update_p(z, hamiltonian, 0.5 * epsilon);
 
         update_q(z, hamiltonian, epsilon);
-        hamiltonian.update(z);
+        hamiltonian.update(z, writer);
 
         end_update_p(z, hamiltonian, 0.5 * epsilon);
       }
 
       void verbose_evolve(typename Hamiltonian::PointType& z,
                           Hamiltonian& hamiltonian,
-                          const double epsilon) {
+                          const double epsilon,
+                          interface_callbacks::writer::base_writer& writer) {
         std::stringstream msg;
         msg.precision(6);
 
@@ -81,7 +83,7 @@ namespace stan {
         this->writer_(msg.str());
 
         update_q(z, hamiltonian, epsilon);
-        hamiltonian.update(z);
+        hamiltonian.update(z, writer);
 
         double H2 = hamiltonian.H(z);
 
