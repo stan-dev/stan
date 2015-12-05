@@ -17,7 +17,7 @@ namespace stan {
     class dense_e_metric
       : public base_hamiltonian<Model, dense_e_point, BaseRNG> {
     public:
-      dense_e_metric(Model& model)
+      explicit dense_e_metric(Model& model)
         : base_hamiltonian<Model, dense_e_point, BaseRNG>(model) {}
 
       ~dense_e_metric() {}
