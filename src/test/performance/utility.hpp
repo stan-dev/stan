@@ -436,8 +436,7 @@ namespace stan {
 
         typedef stan::mcmc::adapt_diag_e_nuts<Model, rng_t> sampler;
         sampler* sampler_ptr = 0;
-        sampler_ptr = new sampler(model, base_rng,
-                                  sample_writer);
+        sampler_ptr = new sampler(model, base_rng);
         sampler_ptr->set_nominal_stepsize(1.0);
         sampler_ptr->set_stepsize_jitter(0.0);
         sampler_ptr->set_max_depth(10);

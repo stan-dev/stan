@@ -27,9 +27,9 @@ TEST(McmcHmcIntegratorsExplLeapfrog, energy_conservation) {
   
   stan::mcmc::expl_leapfrog<
     stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> >
-    integrator(writer);
+    integrator;
 
-  stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> metric(model, writer);
+  stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> metric(model);
   
   stan::mcmc::unit_e_point z(1);
   z.q(0) = 1;
@@ -75,9 +75,9 @@ TEST(McmcHmcIntegratorsExplLeapfrog, symplecticness) {
   
   stan::mcmc::expl_leapfrog<
     stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> >
-    integrator(writer);
+    integrator;
 
-  stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> metric(model, writer);
+  stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> metric(model);
   
   // Create a circle of points
   const int n_points = 1000;

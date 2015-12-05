@@ -46,7 +46,7 @@ TEST(StanIoMcmcWriter, write_sample_names) {
   
   
   stan::mcmc::adapt_diag_e_nuts<io_example_model_namespace::io_example_model, rng_t>
-    sampler(model, base_rng, sampler_writer);
+    sampler(model, base_rng);
   sampler.seed(real);
   
   // Writer
@@ -101,7 +101,7 @@ TEST(StanIoMcmcWriter, write_sample_params) {
   stan::interface_callbacks::writer::noop_writer sampler_writer;
   
   stan::mcmc::adapt_diag_e_nuts<io_example_model_namespace::io_example_model, rng_t>
-    sampler(model, base_rng, sampler_writer);
+    sampler(model, base_rng);
   sampler.seed(real);
   
   // Writer
@@ -172,7 +172,7 @@ TEST(StanIoMcmcWriter, write_adapt_finish) {
   stan::interface_callbacks::writer::stream_writer sampler_writer(sample_stream, "# ");
   
   stan::mcmc::adapt_diag_e_nuts<io_example_model_namespace::io_example_model, rng_t>
-    sampler(model, base_rng, sampler_writer);
+    sampler(model, base_rng);
   sampler.seed(real);
   
   // Writer
@@ -265,7 +265,7 @@ TEST(StanIoMcmcWriter, write_diagnostic_names) {
   stan::interface_callbacks::writer::noop_writer sampler_writer;  
 
   stan::mcmc::adapt_diag_e_nuts<io_example_model_namespace::io_example_model, rng_t>
-    sampler(model, base_rng, sampler_writer);
+    sampler(model, base_rng);
   sampler.seed(real);
   
   // Writer
@@ -322,7 +322,7 @@ TEST(StanIoMcmcWriter, write_diagnostic_params) {
   stan::interface_callbacks::writer::noop_writer sampler_writer;
   
   stan::mcmc::adapt_diag_e_nuts<io_example_model_namespace::io_example_model, rng_t>
-    sampler(model, base_rng, sampler_writer);
+    sampler(model, base_rng);
   sampler.seed(real);
   sampler.z().p(0) = 0;
   sampler.z().p(1) = 0;
@@ -397,7 +397,7 @@ TEST(StanIoMcmcWriter, write_timing) {
   stan::interface_callbacks::writer::noop_writer sampler_writer;
   
   stan::mcmc::adapt_diag_e_nuts<io_example_model_namespace::io_example_model, rng_t>
-    sampler(model, base_rng, sampler_writer);
+    sampler(model, base_rng);
   sampler.seed(real);
   
   // Writer

@@ -22,9 +22,8 @@ TEST(McmcDerivedNuts, compute_criterion_unit_e) {
   stan::mcmc::unit_e_point finish(model_size);
   Eigen::VectorXd rho(model_size);
 
-  stan::interface_callbacks::writer::noop_writer writer;
   stan::mcmc::mock_model model(model_size);
-  stan::mcmc::unit_e_nuts<stan::mcmc::mock_model, rng_t> sampler(model, base_rng, writer);
+  stan::mcmc::unit_e_nuts<stan::mcmc::mock_model, rng_t> sampler(model, base_rng);
   
   start.q(0) = 1;
   start.p(0) = 1;
@@ -57,10 +56,9 @@ TEST(McmcDerivedNuts, compute_criterion_diag_e) {
   stan::mcmc::ps_point start(model_size);
   stan::mcmc::diag_e_point finish(model_size);
   Eigen::VectorXd rho(model_size);
-  stan::interface_callbacks::writer::noop_writer writer;
     
   stan::mcmc::mock_model model(model_size);
-  stan::mcmc::diag_e_nuts<stan::mcmc::mock_model, rng_t> sampler(model, base_rng, writer);
+  stan::mcmc::diag_e_nuts<stan::mcmc::mock_model, rng_t> sampler(model, base_rng);
   
   start.q(0) = 1;
   start.p(0) = 1;
@@ -93,9 +91,8 @@ TEST(McmcDerivedNuts, compute_criterion_dense_e) {
   stan::mcmc::dense_e_point finish(model_size);
   Eigen::VectorXd rho(model_size);
 
-  stan::interface_callbacks::writer::noop_writer writer;
   stan::mcmc::mock_model model(model_size);
-  stan::mcmc::dense_e_nuts<stan::mcmc::mock_model, rng_t> sampler(model, base_rng, writer);
+  stan::mcmc::dense_e_nuts<stan::mcmc::mock_model, rng_t> sampler(model, base_rng);
   
   start.q(0) = 1;
   start.p(0) = 1;

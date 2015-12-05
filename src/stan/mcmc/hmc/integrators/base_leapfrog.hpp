@@ -12,8 +12,8 @@ namespace stan {
     template <typename Hamiltonian>
     class base_leapfrog : public base_integrator<Hamiltonian> {
     public:
-      explicit base_leapfrog(interface_callbacks::writer::base_writer& writer)
-        : base_integrator<Hamiltonian>(writer) {}
+      base_leapfrog()
+        : base_integrator<Hamiltonian>() {}
 
       void evolve(typename Hamiltonian::PointType& z,
                   Hamiltonian& hamiltonian,

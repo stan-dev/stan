@@ -1,7 +1,6 @@
 #ifndef STAN_MCMC_HMC_HAMILTONIANS_DENSE_E_METRIC_HPP
 #define STAN_MCMC_HMC_HAMILTONIANS_DENSE_E_METRIC_HPP
 
-#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>
 #include <stan/mcmc/hmc/hamiltonians/base_hamiltonian.hpp>
@@ -18,9 +17,8 @@ namespace stan {
     class dense_e_metric
       : public base_hamiltonian<Model, dense_e_point, BaseRNG> {
     public:
-      dense_e_metric(Model& model,
-                     interface_callbacks::writer::base_writer& writer)
-        : base_hamiltonian<Model, dense_e_point, BaseRNG>(model, writer) {}
+      dense_e_metric(Model& model)
+        : base_hamiltonian<Model, dense_e_point, BaseRNG>(model) {}
 
       ~dense_e_metric() {}
 

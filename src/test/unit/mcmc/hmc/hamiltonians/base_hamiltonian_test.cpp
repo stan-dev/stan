@@ -16,11 +16,11 @@ TEST(BaseHamiltonian, update) {
   std::stringstream model_output, metric_output;
 
   funnel_model_namespace::funnel_model model(data_var_context, &model_output);
-  stan::interface_callbacks::writer::stream_writer writer(metric_output);
   
-  stan::mcmc::mock_hamiltonian<funnel_model_namespace::funnel_model, rng_t> metric(model, writer);
+  stan::mcmc::mock_hamiltonian<funnel_model_namespace::funnel_model, rng_t> metric(model);
   stan::mcmc::ps_point z(11);
   z.q.setOnes();
+  stan::interface_callbacks::writer::stream_writer writer(metric_output);
   
   metric.update(z, writer);
 

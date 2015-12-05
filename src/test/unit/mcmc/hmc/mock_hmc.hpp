@@ -2,9 +2,7 @@
 #define STAN__MCMC__MOCK__HMC__BETA
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-
 #include <stan/model/prob_grad.hpp>
-
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 #include <stan/mcmc/hmc/hamiltonians/base_hamiltonian.hpp>
 #include <stan/mcmc/hmc/integrators/base_integrator.hpp>
@@ -49,9 +47,8 @@ namespace stan {
                                                     BaseRNG> {
       
     public:
-      mock_hamiltonian(Model& model,
-                       interface_callbacks::writer::base_writer& writer)
-        : base_hamiltonian<Model, ps_point, BaseRNG>(model, writer) {}
+      explicit mock_hamiltonian(Model& model)
+        : base_hamiltonian<Model, ps_point, BaseRNG>(model) {}
       
       double T(ps_point& z) { return 0; }
       
@@ -79,9 +76,8 @@ namespace stan {
     class mock_integrator: public base_integrator<Hamiltonian> {
     
     public:
-      mock_integrator(stan::interface_callbacks::writer::base_writer& writer) 
-      : base_integrator<Hamiltonian>(writer)
-      { }
+      mock_integrator() 
+        : base_integrator<Hamiltonian>() { }
       
       void evolve(typename Hamiltonian::PointType& z,
                   Hamiltonian& hamiltonian,
@@ -93,7 +89,5 @@ namespace stan {
     };
     
   } // mcmc
-  
 } // stan
-
 #endif

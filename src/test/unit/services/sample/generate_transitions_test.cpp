@@ -11,8 +11,8 @@ typedef stan::interface_callbacks::writer::stream_writer writer_t;
 
 class mock_sampler : public stan::mcmc::base_mcmc {
 public:
-  mock_sampler(stan::interface_callbacks::writer::base_writer& writer)
-    : base_mcmc(writer), n_transition_called(0) { }
+  mock_sampler()
+    : base_mcmc(), n_transition_called(0) { }
 
   stan::mcmc::sample transition(stan::mcmc::sample& init_sample,
                                 stan::interface_callbacks::writer::base_writer& writer) {
@@ -47,7 +47,7 @@ public:
     message_output.str("");
     writer_output.str("");
 
-    sampler = new mock_sampler(message_writer);
+    sampler = new mock_sampler();
 
     std::fstream empty_data_stream(std::string("").c_str());
     stan::io::dump empty_data_context(empty_data_stream);

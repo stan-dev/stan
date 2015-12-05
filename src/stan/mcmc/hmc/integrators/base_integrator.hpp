@@ -9,19 +9,15 @@ namespace stan {
     template <typename Hamiltonian>
     class base_integrator {
     public:
-      explicit base_integrator(interface_callbacks::writer::base_writer& writer)
-        : writer_(writer) {}
+      explicit base_integrator() {}
 
       virtual void evolve(typename Hamiltonian::PointType& z,
                           Hamiltonian& hamiltonian,
                           const double epsilon,
                           interface_callbacks::writer::base_writer& writer) = 0;
 
-    protected:
-      interface_callbacks::writer::base_writer& writer_;
     };
 
   }  // mcmc
 }  // stan
-
 #endif

@@ -17,9 +17,8 @@ namespace stan {
     class adapt_unit_e_nuts: public unit_e_nuts<Model, BaseRNG>,
                              public stepsize_adapter {
     public:
-      adapt_unit_e_nuts(Model &model, BaseRNG& rng,
-                        interface_callbacks::writer::base_writer& writer)
-        : unit_e_nuts<Model, BaseRNG>(model, rng, writer) {}
+      adapt_unit_e_nuts(Model &model, BaseRNG& rng)
+        : unit_e_nuts<Model, BaseRNG>(model, rng) {}
 
       ~adapt_unit_e_nuts() {}
 

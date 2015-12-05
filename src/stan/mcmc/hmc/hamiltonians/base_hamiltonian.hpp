@@ -15,9 +15,8 @@ namespace stan {
     template <class Model, class Point, class BaseRNG>
     class base_hamiltonian {
     public:
-      base_hamiltonian(Model& model,
-                       interface_callbacks::writer::base_writer& writer)
-        : model_(model), writer_(writer) {}
+      explicit base_hamiltonian(Model& model)
+        : model_(model) {}
 
       ~base_hamiltonian() {}
 
@@ -66,7 +65,6 @@ namespace stan {
 
     protected:
       Model& model_;
-      interface_callbacks::writer::base_writer& writer_;
 
       void write_error_msg_(const std::exception& e,
                             interface_callbacks::writer::base_writer& writer) {

@@ -17,9 +17,8 @@ namespace stan {
     class adapt_diag_e_nuts: public diag_e_nuts<Model, BaseRNG>,
                              public stepsize_var_adapter {
     public:
-        adapt_diag_e_nuts(Model &model, BaseRNG& rng,
-                          interface_callbacks::writer::base_writer& writer)
-          : diag_e_nuts<Model, BaseRNG>(model, rng, writer),
+        adapt_diag_e_nuts(Model &model, BaseRNG& rng)
+          : diag_e_nuts<Model, BaseRNG>(model, rng),
           stepsize_var_adapter(model.num_params_r()) {}
 
       ~adapt_diag_e_nuts() {}

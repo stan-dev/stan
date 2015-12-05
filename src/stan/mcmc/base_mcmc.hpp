@@ -12,8 +12,7 @@ namespace stan {
 
     class base_mcmc {
     public:
-      explicit base_mcmc(interface_callbacks::writer::base_writer& writer)
-        : writer_(writer) {}
+      base_mcmc() {}
 
       virtual ~base_mcmc() {}
 
@@ -24,15 +23,19 @@ namespace stan {
         return name_;
       }
 
-      virtual void write_sampler_param_names() {}
+      virtual void
+      write_sampler_param_names(interface_callbacks::writer::base_writer&
+                                writer) {}
 
-      virtual void write_sampler_params() {}
+      virtual void
+      write_sampler_params(interface_callbacks::writer::base_writer& writer) {}
 
       virtual void get_sampler_param_names(std::vector<std::string>& names) {}
 
       virtual void get_sampler_params(std::vector<double>& values) {}
 
-      virtual void write_sampler_state() {}
+      virtual void
+      write_sampler_state(interface_callbacks::writer::base_writer& writer) {}
 
       virtual void
       get_sampler_diagnostic_names(std::vector<std::string>& model_names,
@@ -42,10 +45,8 @@ namespace stan {
 
     protected:
       std::string name_;
-      stan::interface_callbacks::writer::base_writer& writer_;
     };
 
   }  // mcmc
 }  // stan
-
 #endif

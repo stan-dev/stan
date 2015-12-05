@@ -16,10 +16,8 @@ namespace stan {
                                       rng_t> {
       
     public:
-      
-      mock_nuts(mock_model &m, rng_t& rng,
-                interface_callbacks::writer::base_writer& writer)
-        : base_nuts<mock_model,mock_hamiltonian,mock_integrator,rng_t>(m, rng, writer)
+      mock_nuts(mock_model &m, rng_t& rng)
+        : base_nuts<mock_model,mock_hamiltonian,mock_integrator,rng_t>(m, rng)
       { this->name_ = "Mock NUTS"; }
       
     private:
@@ -35,9 +33,8 @@ namespace stan {
     class divergent_hamiltonian
       : public base_hamiltonian<M, ps_point, BaseRNG> {
     public:
-      divergent_hamiltonian(M& m,
-                            interface_callbacks::writer::base_writer& writer)
-        : base_hamiltonian<M, ps_point, BaseRNG>(m, writer) {}
+      divergent_hamiltonian(M& m)
+        : base_hamiltonian<M, ps_point, BaseRNG>(m) {}
       
       double T(ps_point& z) { return 0; }
       
@@ -77,9 +74,8 @@ namespace stan {
       
     public:
       
-      divergent_nuts(mock_model &m, rng_t& rng,
-                     interface_callbacks::writer::base_writer& writer)
-        : base_nuts<mock_model, divergent_hamiltonian, expl_leapfrog,rng_t>(m, rng, writer)
+      divergent_nuts(mock_model &m, rng_t& rng)
+        : base_nuts<mock_model, divergent_hamiltonian, expl_leapfrog,rng_t>(m, rng)
       { this->name_ = "Divergent NUTS"; }
       
     private:
@@ -101,11 +97,8 @@ TEST(McmcBaseNuts, set_max_depth) {
   q(0) = 5;
   q(1) = 1;
   
-  std::stringstream output;
-  stan::interface_callbacks::writer::stream_writer writer(output);
-
   stan::mcmc::mock_model model(q.size());
-  stan::mcmc::mock_nuts sampler(model, base_rng, writer);
+  stan::mcmc::mock_nuts sampler(model, base_rng);
   
   int old_max_depth = 1;
   sampler.set_max_depth(old_max_depth);
@@ -113,8 +106,6 @@ TEST(McmcBaseNuts, set_max_depth) {
   
   sampler.set_max_depth(-1);
   EXPECT_EQ(old_max_depth, sampler.get_max_depth());
-  
-  EXPECT_EQ("", output.str());
 }
 
 
@@ -125,16 +116,12 @@ TEST(McmcBaseNuts, set_max_delta) {
   q(0) = 5;
   q(1) = 1;
   
-  std::stringstream output;
-  stan::interface_callbacks::writer::stream_writer writer(output);
   stan::mcmc::mock_model model(q.size());
-  stan::mcmc::mock_nuts sampler(model, base_rng, writer);
+  stan::mcmc::mock_nuts sampler(model, base_rng);
   
   double old_max_delta = 10;
   sampler.set_max_delta(old_max_delta);
   EXPECT_EQ(old_max_delta, sampler.get_max_delta());
-
-  EXPECT_EQ("", output.str());
 }
 
 TEST(McmcBaseNuts, build_tree) {
@@ -159,16 +146,17 @@ TEST(McmcBaseNuts, build_tree) {
   util.n_tree = 0;
   util.sum_prob = 0;
   
-  std::stringstream output;
-  stan::interface_callbacks::writer::stream_writer writer(output);
   stan::mcmc::mock_model model(model_size);
-  stan::mcmc::mock_nuts sampler(model, base_rng, writer);
+  stan::mcmc::mock_nuts sampler(model, base_rng);
   
   sampler.set_nominal_stepsize(1);
   sampler.set_stepsize_jitter(0);
   sampler.sample_stepsize();
   sampler.z() = z_init;
   
+  std::stringstream output;
+  stan::interface_callbacks::writer::stream_writer writer(output);
+
   int n_valid = sampler.build_tree(3, rho, &z_init, z_propose, util, writer);
   
   EXPECT_EQ(8, n_valid);
@@ -209,16 +197,17 @@ TEST(McmcBaseNuts, slice_criterion) {
   util.n_tree = 0;
   util.sum_prob = 0;
   
-  std::stringstream output;
-  stan::interface_callbacks::writer::stream_writer writer(output);
   stan::mcmc::mock_model model(model_size);
-  stan::mcmc::divergent_nuts sampler(model, base_rng, writer);
+  stan::mcmc::divergent_nuts sampler(model, base_rng);
   
   sampler.set_nominal_stepsize(1);
   sampler.set_stepsize_jitter(0);
   sampler.sample_stepsize();
   sampler.z() = z_init;
-  
+
+  std::stringstream output;
+  stan::interface_callbacks::writer::stream_writer writer(output);
+
   int n_valid = 0;
   
   sampler.z().V = -750;

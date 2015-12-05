@@ -17,9 +17,8 @@ namespace stan {
     class adapt_dense_e_static_hmc : public dense_e_static_hmc<Model, BaseRNG>,
                                      public stepsize_covar_adapter {
     public:
-      adapt_dense_e_static_hmc(Model &model, BaseRNG& rng,
-                               interface_callbacks::writer::base_writer& writer)
-        : dense_e_static_hmc<Model, BaseRNG>(model, rng, writer),
+      adapt_dense_e_static_hmc(Model &model, BaseRNG& rng)
+        : dense_e_static_hmc<Model, BaseRNG>(model, rng),
         stepsize_covar_adapter(model.num_params_r()) { }
 
       ~adapt_dense_e_static_hmc() { }

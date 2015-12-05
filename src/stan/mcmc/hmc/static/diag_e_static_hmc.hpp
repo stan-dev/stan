@@ -1,7 +1,6 @@
 #ifndef STAN_MCMC_HMC_STATIC_DIAG_E_STATIC_HMC_HPP
 #define STAN_MCMC_HMC_STATIC_DIAG_E_STATIC_HMC_HPP
 
-#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/hmc/static/base_static_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/diag_e_point.hpp>
 #include <stan/mcmc/hmc/hamiltonians/diag_e_metric.hpp>
@@ -19,10 +18,9 @@ namespace stan {
       : public base_static_hmc<Model, diag_e_metric,
                                expl_leapfrog, BaseRNG> {
     public:
-      diag_e_static_hmc(Model &model, BaseRNG& rng,
-                        interface_callbacks::writer::base_writer& writer)
+      diag_e_static_hmc(Model &model, BaseRNG& rng)
         : base_static_hmc<Model, diag_e_metric,
-                          expl_leapfrog, BaseRNG>(model, rng, writer) {
+                          expl_leapfrog, BaseRNG>(model, rng) {
         this->name_ = "Static HMC with a diagonal Euclidean metric";
       }
     };

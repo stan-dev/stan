@@ -1,7 +1,6 @@
 #ifndef STAN_MCMC_HMC_NUTS_DENSE_E_NUTS_HPP
 #define STAN_MCMC_HMC_NUTS_DENSE_E_NUTS_HPP
 
-#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/hmc/nuts/base_nuts.hpp>
 #include <stan/mcmc/hmc/hamiltonians/dense_e_point.hpp>
 #include <stan/mcmc/hmc/hamiltonians/dense_e_metric.hpp>
@@ -16,10 +15,9 @@ namespace stan {
     class dense_e_nuts : public base_nuts<Model, dense_e_metric,
                                           expl_leapfrog, BaseRNG> {
     public:
-      dense_e_nuts(Model &model, BaseRNG& rng,
-                   interface_callbacks::writer::base_writer& writer)
+      dense_e_nuts(Model &model, BaseRNG& rng)
         : base_nuts<Model, dense_e_metric, expl_leapfrog,
-                    BaseRNG>(model, rng, writer) {
+                    BaseRNG>(model, rng) {
         this->name_ = "NUTS with a dense Euclidean metric";
       }
 

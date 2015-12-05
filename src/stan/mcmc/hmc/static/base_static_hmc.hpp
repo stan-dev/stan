@@ -22,9 +22,8 @@ namespace stan {
     class base_static_hmc
       : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     public:
-      base_static_hmc(Model &model, BaseRNG& rng,
-                      interface_callbacks::writer::base_writer& writer)
-        : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng, writer),
+      base_static_hmc(Model &model, BaseRNG& rng)
+        : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
         T_(1) {
         update_L_();
       }
@@ -62,14 +61,16 @@ namespace stan {
         return sample(this->z_.q, - this->hamiltonian_.V(this->z_), acceptProb);
       }
 
-      void write_sampler_param_names() {
-        this->writer_("stepsize__,int_time__,");
+      void write_sampler_param_names(interface_callbacks::writer::base_writer&
+                                     writer) {
+        writer("stepsize__,int_time__,");
       }
 
-      void write_sampler_params() {
+      void write_sampler_params(interface_callbacks::writer::base_writer&
+                                writer) {
         std::stringstream sampler_params;
         sampler_params << this->epsilon_ << "," << this->T_ << ",";
-        this->writer_(sampler_params.str());
+        writer(sampler_params.str());
       }
 
       void get_sampler_param_names(std::vector<std::string>& names) {

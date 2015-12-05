@@ -25,7 +25,7 @@ public:
     
     output.str("");
     error.str("");
-    sampler_ptr = new sampler((*model), base_rng, writer);
+    sampler_ptr = new sampler((*model), base_rng);
     sampler_ptr->set_nominal_stepsize(1);
     sampler_ptr->set_stepsize_jitter(0);
     sampler_ptr->set_max_depth(10);

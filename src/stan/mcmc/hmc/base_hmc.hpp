@@ -22,23 +22,23 @@ namespace stan {
               class BaseRNG>
     class base_hmc : public base_mcmc {
     public:
-      base_hmc(Model &model, BaseRNG& rng,
-               interface_callbacks::writer::base_writer& writer)
-        : base_mcmc(writer),
+      base_hmc(Model &model, BaseRNG& rng)
+        : base_mcmc(),
           z_(model.num_params_r()),
-          integrator_(writer),
-          hamiltonian_(model, writer),
+          integrator_(),
+          hamiltonian_(model),
           rand_int_(rng),
           rand_uniform_(rand_int_),
           nom_epsilon_(0.1),
           epsilon_(nom_epsilon_),
           epsilon_jitter_(0.0) {}
 
-      void write_sampler_state() {
+      void
+      write_sampler_state(interface_callbacks::writer::base_writer& writer) {
         std::stringstream nominal_stepsize;
         nominal_stepsize << "Step size = " << get_nominal_stepsize();
-        this->writer_(nominal_stepsize.str());
-        z_.write_metric(this->writer_);
+        writer(nominal_stepsize.str());
+        z_.write_metric(writer);
       }
 
       void get_sampler_diagnostic_names(std::vector<std::string>& model_names,

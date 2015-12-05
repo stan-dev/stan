@@ -18,12 +18,9 @@ TEST(McmcDenseEMetric, sample_p) {
   q(0) = 5;
   q(1) = 1;
 
-  std::stringstream metric_output;
-  stan::interface_callbacks::writer::stream_writer writer(metric_output);
-
   stan::mcmc::mock_model model(q.size());
 
-  stan::mcmc::dense_e_metric<stan::mcmc::mock_model, rng_t> metric(model,writer);
+  stan::mcmc::dense_e_metric<stan::mcmc::mock_model, rng_t> metric(model);
   stan::mcmc::dense_e_point z(q.size());
 
   int n_samples = 1000;
@@ -46,8 +43,6 @@ TEST(McmcDenseEMetric, sample_p) {
   
   // Variance within 10% of expected value (d / 2)
   EXPECT_EQ(true, fabs(var - 0.5 * q.size()) < 0.1 * q.size());
-  
-  EXPECT_EQ("", metric_output.str());
 }
 
 TEST(McmcDenseEMetric, gradients) {  
@@ -65,10 +60,10 @@ TEST(McmcDenseEMetric, gradients) {
   
 
   std::stringstream model_output, metric_output;
+  stan::interface_callbacks::writer::stream_writer writer(metric_output);
   funnel_model_namespace::funnel_model model(data_var_context, &model_output);
 
-  stan::interface_callbacks::writer::stream_writer writer(metric_output);
-  stan::mcmc::dense_e_metric<funnel_model_namespace::funnel_model, rng_t> metric(model, writer);
+  stan::mcmc::dense_e_metric<funnel_model_namespace::funnel_model, rng_t> metric(model);
   
   double epsilon = 1e-6;
   
@@ -140,7 +135,6 @@ TEST(McmcDenseEMetric, gradients) {
     
   }
 
-
   EXPECT_EQ("", model_output.str());
   EXPECT_EQ("", metric_output.str());
 }
@@ -161,7 +155,7 @@ TEST(McmcDenseEMetric, streams) {
   // typedef to use within Google Test macros
   typedef stan::mcmc::dense_e_metric<stan::mcmc::mock_model, rng_t> dense_e;
   
-  EXPECT_NO_THROW(dense_e metric(model, writer));
+  EXPECT_NO_THROW(dense_e metric(model));
 
   stan::test::reset_std_streams();
   EXPECT_EQ("", stan::test::cout_ss.str());
