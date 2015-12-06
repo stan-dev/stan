@@ -1,10 +1,33 @@
-HOW TO SVI in STAN
-==================
+HOW TO SUBSAMPLE DATA USING ADVI
+================================
 
-1. MODIFY YOUR STAN MODEL
+0. Download an unsupported branch of Stan
+-----------------------------------------
+
+(a) Recursively clone `cmdStan` 
+
+```
+git clone --recursive git@github.com:stan-dev/cmdstan.git
+```
+
+(b) Checkout the `adsvi` branch of `cmdStan`
+
+```
+cd cmdStan
+git checkout adsvi
+```
+
+(c) Checkout the `adsvi` branch of `Stan`
+
+```
+cd stan 
+git checkout adsvi
+```
+
+1. Modify your Stan model
 -------------------------
 
-(a) INCLUDE THIS USER-DEFINED FUNCTION AT TOP of `.stan` FILE
+(a) Include this user-defined function at the top of your `.stan` file
 
 ```c++
 functions {
@@ -16,14 +39,14 @@ functions {
 }
 ```
 
-(b) USE THE FOLLOWING STRUCTURE FOR THE DATA BLOCK
+(b) Use the following variable naming structure for the data block
 
 ```c++
 data {
-  int<lower=0> NFULL;   // total number of datapoints in dataset
-  int<lower=0> N;       // number of data points in minibatch
+  int<lower=0> NFULL;     // total number of datapoints in dataset
+  int<lower=0> N;         // number of data points in minibatch
 
-  int<lower=0> D;       // dimension
+  int<lower=0> D;         // dimension of each datapoint
 
   vector[D] yFULL[NFULL]; // FULL dataset
   vector[D] y[N];         // minibatch
@@ -31,7 +54,7 @@ data {
 ```
 
 
-(c) COMPUTE THE MINIBATCH SCALING FACTOR
+(c) Compute the minibatch scaling factor
 
 ```c++
 transformed data {
@@ -41,7 +64,7 @@ transformed data {
 ```
 
 
-(d) INCLUDE THE FACTOR AT THE END OF THE MODEL BLOCK
+(d) Include the factor at the end of the model block
 
 ```c++
 model{
@@ -52,18 +75,18 @@ model{
 ```
 
 
-2. COMPILE YOUR STAN MODEL INTO A .hpp FILE
+2. Compile your Stan model into a `.hpp` file
 -------------------------------------------
 
-USE MY ZSHELL SCRIPT `stankeephpp`
+Here is a helpful zshell script `stanmake`
 
 ```bash
-stankeephpp () {
+stanmake () {
   inputFile=$1
   inputFileStripped=$inputFile:r
   origPWD=$PWD
   pathToProgram=$PWD/$inputFileStripped
-  pathToStan=/Users/alpkucukelbir/GitHub/cmdstan/   # replace with your own path
+  pathToStan=/Users/my_username/GitHub/cmdstan/   # replace with your own path
   cd $pathToStan
   make $pathToProgram
   cd $origPWD
@@ -73,10 +96,10 @@ stankeephpp () {
 ```
 
 
-3. HACK THE .hpp FILE
+3. Hack the `.hpp` file
 ---------------------
 
-IMPLEMENT THE SUBSAMPLING ROUTINE
+Implement the subsampling routine in the generated `.hpp` file
 
 This is right after the destructor. Modify it to match whatever data structure
 you have defined above in your `.stan` file.
@@ -100,16 +123,16 @@ void update_minibatch() {
 ```
 
 
-4. (RE-)COMPILE the .hpp FILE INTO AN EXECUTABLE
+4. (Re-)compile the `.hpp` file into an executable
 ------------------------------------------------
 
-RUN MY ZSHELL SCRIPT `stankeephpp` AGAIN
+Run the zshell script `stanmake` again
 
 
-5. RUN with cmdstan/adsvi and stan/adsvi BRANCH
------------------------------------------------
+5. Run 
+------
 
-`./my_program variational subsample=1 data file=training_ADSVI.data.R`
+`./my_program variational subsample=1 data file=training.data.R`
 
 
 
