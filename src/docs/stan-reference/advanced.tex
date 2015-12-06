@@ -1848,33 +1848,30 @@ The $n$-sphere is the set of points $x \in \reals^n$ such that
 
 \subsection{Unit Vector Inverse Transform}
 
-To parameterize unit length vectors, we use hyperspherical coordinates.
-The unconstrained vector $y \in \reals^{n-1}$ is a set of angles which
-relates to the unit vector as follows:
+To parameterize unit length vectors, Stan formerly utilized unrestricted
+hyperspherical angles. Currently, Stan divides an unconstrained vector
+$y \in \reals^{n}$ by its norm, $\sqrt{y^\top y}$ to obtain a unit vector
+$x$.
 \begin{eqnarray*}
-x_1 & = & \cos(y_1) \\
-x_2 & = & \cos(y_2) \sin(y_1) \\
-x_3 & = & \cos(y_3) \sin(y_1) \sin(y_2) \\
-& \vdots & \\
-x_i & = & \cos(y_i) \prod_{j=1}^{i-1} \sin(y_j) \\
-& \vdots & \\
-x_n & = & \prod_{j=1}^{n-1} \sin(y_j).
+x & = & \frac{y}{\sqrt{y^\top y}}.
 \end{eqnarray*}
-Note that, in practice, we use $y_i = \hat{y}_i + \frac{\pi}{2}$ and use $\hat{y}_i$ as the unconstrained parameters to avoid a singularity at
-$y_i = 0$.
-
+This approach has a slight inconvenience that it is undefined if $y$ is
+a zero vector, which cannot occur during sampling but the unconstrained
+parameters that yield $x$ can be initialized to zero, in which case the
+sampling algorithm will be unable to start. To work around this problem,
+you can initialize each unconstrained parameter randomly from a very small
+interval centered at zero.
 
 \subsection{Absolute Jacobian Determinant of the Unit Vector
   Inverse Transform}
-To derive the determinant of the Jacobian we first add a radius coordinate
-$r=1$ which multiplies the vector $x$.
-The Jacobian, $J$, can be shown to be lower triangular, so its
-determinant is just the product of diagonal entries and the
-absolute value of the determinant is
-\[
-\left| \, \det J \, \right| = \left|r^{n-1} \sin^{n-2}(y_1) \sin^{n-3}(y_2) ... \sin(y_{n-2})\right| .
-\]
-
+The Jacobian matrix relating the input vector $y$ to the output vector $x$
+is singular because $x^\top x = 1$ for any non-zero input vector $y$. Thus,
+there technically is no unique transformation from $x$ to $y$. To 
+circumvent this issue let $r = \sqrt{y^\top y}$ so that $y = r x$. The
+transformation from $\left(r, x_{-n}\right)$ to $y$ is well-defined but $r$
+is arbitrary, so we set $r = 1$. In this case, the determinant of the 
+Jacobian is proportional to $-0.5 y^\top y$, which is the kernel of a 
+standard multivariate normal distribution with $n$ independent dimensions.
 
 \section{Correlation Matrices}\label{correlation-matrix-transform.section}
 
@@ -2475,13 +2472,13 @@ Differentiation Variational Inference (ADVI). For more details, see
 \section{Classical Variational Inference}
 
 Variational inference approximates the
-posterior $p(\theta \mid y)$ with a simple, parameterized distribution
-$q(\theta \,;\, \phi)$. It matches the approximation to the
+posterior $p(\theta \, | \, y)$ with a simple, parameterized distribution
+$q(\theta \, | \, \phi)$. It matches the approximation to the
 true posterior by minimizing the Kullback-Leibler (KL) divergence,
 %
 \[
   \phi^* = \argmin_\phi
-  \KL{ q(\theta \,;\, \phi) }{ p(\theta \mid y) }.
+  \KL{q(\theta \, | \, \phi) }{ p(\theta \mid y)}.
 \]
 %
 Typically the KL divergence lacks an analytic, closed-form solution.
@@ -2493,7 +2490,7 @@ Instead we maximize a proxy to the KL divergence, the evidence lower bound
   =
   \E_{q (\theta)} \big[ \log p (y,\theta) \big]
   -
-  \E_{q (\theta)} \big[ \log q (\theta\,;\,\phi) \big].
+  \E_{q (\theta)} \big[ \log q (\theta\, | \,\phi) \big].
 \]
 %
 The first term is an expectation of the log
@@ -2513,14 +2510,14 @@ The variational objective (ELBO) becomes
 \[
   \mathcal{L}(\phi)
   =
-  \E_{q(\zeta\,;\,\phi)}
+  \E_{q(\zeta\,|\,\phi)}
   \bigg[
   \log p (y, T^{-1}(\zeta))
   +
   \log \big| \det J_{T^{-1}}(\zeta) \big|
   \bigg]
   -
-  \E_{q (\zeta\,;\,\phi)} \big[ \log q (\zeta\,;\,\phi) \big].
+  \E_{q (\zeta\, | \,\phi)} \big[ \log q (\zeta\, | \,\phi) \big].
 \]
 %
 Since the $\zeta$ variables live in the real-coordinate space, we can choose a
@@ -2528,13 +2525,13 @@ fixed family for the variational distribution. We choose a fully-factorized
 Gaussian,
 %
 \[
-  q(\zeta \,;\, \phi)
+  q(\zeta \, | \, \phi)
   =
-  \mathcal{N}\left(\zeta \,;\, \mu, \sigma\right)
+  \distro{Normal}\left(\zeta \, | \, \mu, \sigma\right)
   =
   \prod_{k=1}^K
-  \mathcal{N}
-  \left(\zeta_k \,;\, \mu_k, \sigma_k\right),
+  \distro{Normal}
+  \left(\zeta_k \, | \, \mu_k, \sigma_k\right),
 \]
 %
 where the vector
@@ -2550,7 +2547,7 @@ latent variables. This implicitly defines the variational approximation in the
 original latent variable space as
 %
 \[
-\mathcal{N} \left(T(\theta)\,;\, \mu, \sigma\right)
+\distro{Normal} \left(T(\theta) \, | \, \mu, \sigma\right)
 \big| \det J_{T}(\theta) \big|.
 \]
 This is, in general, not a Gaussian distribution.
@@ -2563,7 +2560,7 @@ The variational objective (ELBO) that we maximize is,
 \[
   \mathcal{L}(\phi)
   =
-  \E_{q(\zeta\,;\,\phi)}
+  \E_{q(\zeta\, | \,\phi)}
   \bigg[
   \log p (y, T^{-1}(\zeta))
   +

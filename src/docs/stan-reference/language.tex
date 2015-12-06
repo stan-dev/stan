@@ -2206,17 +2206,13 @@ primitive types.
 \begin{center}
 \begin{tabular}{c|c}
 {\it Type} & {\it Primitive Type} \\ \hline \hline
-\code{int} & \code{int} \\
+\code{int} & \code{int} \\[6pt]
 \code{real} & \code{real} \\[6pt]
 \code{matrix} & \code{matrix} \\
 \code{cov\_matrix} & \code{matrix} \\
 \code{corr\_matrix} & \code{matrix} \\
 \code{cholesky\_factor\_cov} & \code{matrix} \\
-\code{cholesky\_factor\_corr} & \code{matrix} \\
-\end{tabular}
-\hspace{0.4in}
-\begin{tabular}{c|c}
-{\it Type} & {\it Primitive Type} \\ \hline \hline
+\code{cholesky\_factor\_corr} & \code{matrix} \\[6pt]
 \code{vector} & \code{vector} \\
 \code{simplex} & \code{vector} \\
 \code{unit\_vector} & \code{vector} \\
@@ -2227,9 +2223,9 @@ primitive types.
 \end{center}
 \caption{\it The table shows the variable declaration types of Stan
   and their corresponding primitive implementation type.  Stan
-  functions, operators and probability functions have argument and
-  result types declared in terms of primitive types.
-}\label{primitive-type.figure}
+  functions, operators, and probability functions have argument and
+  result types declared in terms of primitive types plus array
+  dimensionality.}\label{primitive-type.figure}
 \end{figure}
 %
 A full implementation type consists of a primitive implementation type
@@ -2246,7 +2242,7 @@ dimensions in an expression such as the following declaration of a
 three-dimensional array of matrices.
 %
 \begin{stancode}
-matrix[M,N] a[I,J,K];
+matrix[M, N] a[I, J, K];
 \end{stancode}
 %
 The matrix \code{a} is indexed as \code{a[i,j,k,m,n]} with the array
@@ -2563,14 +2559,13 @@ assignment statement's execution.
 
 The basis of Stan's execution is the evaluation of a log probability
 function for a given set of parameters.  Data and transformed data are
-fixed before log probability is involved.  Statements in the
-transformed parameter block and model block can have an effect on the
-log probability function defined by a model.
-
-The total log probability is initialized to zero.  Then statements in
-the transformed parameter block and model block may add to it.  The
-most direct way this is done is through the log probability increment
-statement, which is of the following form.
+fixed before the log density is evaluated.  The total log probability
+is initialized to zero.  Next, any log Jacobian adjustments accrued by
+the variable constraints are added to the log density (the Jacobian
+adjustment may be skipped for optimization).  Sampling and log
+probability increment statements may add to the log density in the
+model block.  A log probability increment statement directly
+increments the log density with the value of an expression, e.g.,
 %
 \begin{stancode}
 increment_log_prob(-0.5 * y * y);

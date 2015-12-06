@@ -420,10 +420,10 @@ positive definite matrices, which amounts to being a lower-triangular
 matrix with positive diagonal elements.  The second, and
 \code{cholesky\_factor\_corr}, is for Cholesky factors of correlation
 matrices, which amounts to being a lower-triangular matrix with
-positive diagonal elements, where additionally the length of each row
-is 1.  Using Cholesky factor types can be much more efficient than the
-full correlation or covariance matrices because they are easier to
-factor and scale.
+positive diagonal elements, where additionally each row is a unit
+vector (i.e., has Euclidean length 1).  Using Cholesky factor types
+can be much more efficient than the full correlation or covariance
+matrices because they are easier to factor and scale.
 
 
 
@@ -1832,14 +1832,14 @@ values \code{Phi(eta - c[k])} once and storing them for re-use.
 \section{Hierarchical Logistic Regression}
 
 The simplest multilevel model is a hierarchical model in which the
-data is grouped into $L$ distinct categories (or levels).  An extreme approach would be to
-completely pool all the data and estimate a common vector of
-regression coefficients $\beta$.  At the other extreme, an approach
-would no pooling assigns each level $l$ its own coefficient vector
-$\beta_l$ that is estimated separately from the other levels.  A
-hierarchical model is an intermediate solution where the degree of
-pooling is determined by the data and a prior on the amount of
-pooling.
+data is grouped into $L$ distinct categories (or levels).  An extreme
+approach would be to completely pool all the data and estimate a
+common vector of regression coefficients $\beta$.  At the other
+extreme, an approach with no pooling assigns each level $l$ its own
+coefficient vector $\beta_l$ that is estimated separately from the
+other levels.  A hierarchical model is an intermediate solution where
+the degree of pooling is determined by the data and a prior on the
+amount of pooling.
 
 Suppose each binary outcome $y_n \in \setlist{0,1}$ has an associated
 level, $ll_n \in \setlist{1,\ldots,L}$.  Each outcome will also have
@@ -3311,21 +3311,21 @@ transformed parameters {
   vector[T] epsilon;    // error term at time t
   for (t in 1:T) {
     epsilon[t] <- y[t] - mu;
-    for (q in 1:min(t-1,Q))
+    for (q in 1:min(t - 1, Q))
       epsilon[t] <- epsilon[t] - theta[q] * epsilon[t - q];
   }
 }
 model {
   vector[T] eta;
-  mu ~ cauchy(0,2.5);
-  theta ~ cauchy(0,2.5);
-  sigma ~ cauchy(0,2.5);
+  mu ~ cauchy(0, 2.5);
+  theta ~ cauchy(0, 2.5);
+  sigma ~ cauchy(0, 2.5);
   for (t in 1:T) {
     eta[t] <- mu;
-    for (q in 1:min(t-1,Q))
+    for (q in 1:min(t - 1, Q))
       eta[t] <- eta[t] + theta[q] * epsilon[t - q];
   }
-  y ~ normal(eta,sigma);
+  y ~ normal(eta, sigma);
 }
 \end{stancode}
 %
@@ -3372,10 +3372,7 @@ model {
 \end{stancode}
 %
 The data is declared in the same way as the other time-series
-regressions.  Here the are parameters for the mean output \code{mu}
-and error scale \code{sigma}, as well as regression coefficients
-\code{phi} for the autoregression and \code{theta} for the moving
-average component of the model.  
+regressions and the parameters are documented in the code. 
 
 In the model block, the local vector \code{nu} stores the predictions
 and \code{err} the errors.  These are computed similarly to the
@@ -3419,6 +3416,36 @@ reassigning them in the loop.
 Both encodings are very fast.  The original encoding has the advantage
 of vectorizing the normal distribution, but it uses a bit more memory.
 A halfway point would be to vectorize just \code{err}.
+
+\subsection{Identifiability and Stationarity}%
+
+MA and ARMA models are not identifiable if the roots of the
+characteristic polynomial for the MA part lie inside the unit circle,
+so it's necessary to add the following constraint.%
+%
+\footnote{This subsection is a lightly edited comment of Jonathan
+  Gilligan's on GitHub; see
+  \url{https://github.com/stan-dev/stan/issues/1617\#issuecomment-160249142}.}
+%
+\begin{stancode}
+real<lower = -1, upper = 1> theta;
+\end{stancode}
+%
+When the model is run without the constraint, using synthetic data
+generated from the model, the simulation can sometimes find modes for
+(\code{theta}, \code{phi}) outside the $[-1,1]$ interval, which
+creates a multiple mode problem in the posterior and also causes the
+NUTS tree depth to get very large (often above 10). Adding the
+constraint both improves the accuracy of the posterior and
+dramatically reduces the treedepth, which speeds up the simulation
+considerably (typically by much more than an order of magnitude).
+
+Further, unless one thinks that the process is really non-stationary,
+it's worth adding the following constraint to ensure stationarity.
+%
+\begin{stancode}
+read<lower = -1, upper = 1> phi;
+\end{stancode} 
 
 
 
@@ -3662,7 +3689,7 @@ dramatically by replacing the loops over categorical distributions
 with a single multinomial distribution.%
 %
 \footnote{The model is available in the Stan example model repository;
-see \url{http://mc-stan.org/examples.html}.}
+see \url{http://mc-stan.org/documentation}.}
 %
 The data is declared as before, but now a transformed data blocks
 computes the sufficient statistics for estimating the transition and
@@ -3708,7 +3735,7 @@ analytically because the Dirichlet is the conjugate prior to the
 multinomial.  The following example
 %
 \footnote{The program is available in the Stan example model repository;
-see \url{http://mc-stan.org/examples.html}.}
+see \url{http://mc-stan.org/documentation}.}
 %
 illustrates how a Stan model can define the posterior analytically.
 This is possible in the Stan language because the model only needs to
@@ -3763,7 +3790,7 @@ algorithm.
 In Stan, the forward algorithm is coded as follows.%
 %
 \footnote{The program is available in the Stan example model repository;
-see \url{http://mc-stan.org/examples.html}.}
+see \url{http://mc-stan.org/documentation}.}
 %
 First, two additional data variable are declared for the unsupervised
 data.
@@ -4672,7 +4699,57 @@ if (y[n] > 0)
 The \code{[1,]} after the Poisson indicates that it is truncated below
 at 1; see \refsection{poisson}.  Although the variable 
 \code{y[n]} is being ``sampled'' twice, the effect on the log
-probability function follows the definition (on the log scale).  
+probability function follows the definition (on the log scale). 
+
+Julian King pointed out that the model may be sped up by noting
+\[
+\log \distro{PoissonCDF}(0 | \lambda) = \log(1 - exp(-\lambda)).
+\]
+This allows the truncated Poisson distribution to be coded as
+%
+\begin{stancode}
+if (y[n] > 0) {
+  y[n] ~ poisson(lambda);
+  increment_log_prob(-log1m_exp(-lambda));
+}
+\end{stancode}
+%
+
+This is an example where collecting counts ahead of time can also
+greatly speed up the execution speed without changing the density.
+For example, the number of \code{y[n]~==~0} cases can be counted and
+stored as a transformed data quantity.  These can then be used to
+replace 
+%
+\begin{stancode}
+model {
+  ...
+  for (n in 1:N)
+    (y[n] == 0) ~ bernoulli(theta);
+\end{stancode}
+%
+with 
+%
+\begin{stancode}
+transformed data {
+  int N_zero;
+  N_zero <- 0;
+  for (n in 1:N)
+    if (y[n] == 0)
+      N_zero <- N_zero + 1;
+}
+model {
+  ...
+  N_zero ~ binomial(N, theta);
+\end{stancode}
+%
+
+Another speedup can be gained by storing the non-zero count (i.e.,
+\code{y[n]~>~0}) cases in a newly defined array and then using a
+vectorized Poisson sampling statement and multiplying the increment by
+the number of non-zero counts.  This is a little trickier as a
+function must be used to compute the number of zero and non-zero cases
+here because Stan requires sized declarations.
 
 
 \chapter{Measurement Error and Meta-Analysis}
@@ -5064,7 +5141,7 @@ in each school.%
 \footnote{The model provided for this data in
 \citep[Section~5.5]{GelmanEtAl:2013} is included with the
 data in the Stan example model repository, 
-\url{http://mc-stan.org/examples.html}.}
+\url{http://mc-stan.org/documentation}.}
 
 \subsubsection{Extensions and Alternatives}
 
@@ -6244,7 +6321,7 @@ $jj$ & $kk$ & $y$
   same sparse matrix $y$ that can be used directly in Stan.  The first
   two columns, $jj$ and $kk$, denote the indexes and the final column,
   $y$, the value.  For example, the fifth row of the database-like
-  data structure on the right indicates that $y_{2,4} = 0$.}\label{sparse-data.figure}
+  data structure on the right indicates that $y_{2,4} = 1$.}\label{sparse-data.figure}
 \end{figure}
 %
 When not every student is given every question, the dense array coding
@@ -6309,7 +6386,7 @@ $y_3 = \left[12.9 \ \ 18.7 \ \ 42.9 \ \ 4.7\right]$
 \end{minipage}
 \ \ \
 \begin{minipage}[c]{0.60\textwidth}
-$z = [1.3 \ \ 2.4 \ \ 0.9 \ \ -1.8 \ \ -0.1 \ \ 129 \ \ 18.7 \ \ 42.9
+$z = [1.3 \ \ 2.4 \ \ 0.9 \ \ -1.8 \ \ -0.1 \ \ 12.9 \ \ 18.7 \ \ 42.9
 \ \ 4.7]$
 \\[3pt]
 $s  =  \{ 3 \ \ 2 \ \ 4 \}$
@@ -6320,8 +6397,8 @@ $s  =  \{ 3 \ \ 2 \ \ 4 \}$
   rows of different sizes ($y_1$ is size 3, $y_2$ size 2, and $y_3$
   size 4).  On the right is an example of how to code the data in Stan,
   using a single vector $y$ to hold all the values and a separate
-  array of integers $s$ to hold the group row sizes.  With this
-  coding, In this particular example, $y_1 = z_{1:3}$, $y_2 =
+  array of integers $s$ to hold the group row sizes.  In this 
+  example, $y_1 = z_{1:3}$, $y_2 =
   z_{4:5}$, and $y_3 = z_{6:9}$.}\label{ragged-data.figure}
 \end{figure}
 %
@@ -6456,7 +6533,7 @@ Consider the following Stan program for implementing $K$-means
 clustering.%
 %
 \footnote{The model is available in the Stan example model repository;
-see \url{http://mc-stan.org/examples.html}.}
+see \url{http://mc-stan.org/documentation}.}
 %
 \begin{stancode}
 data {
@@ -6657,7 +6734,7 @@ training data with documents of known categories can be coded in Stan
 as follows%
 %
 \footnote{This model is available in the example model repository;
-  see \url{http://mc-stan.org/examples.html}.}
+  see \url{http://mc-stan.org/documentation}.}
 %
 \begin{stancode}
 data {
@@ -7156,7 +7233,7 @@ return the zero vector, $m(x) = {\bf 0}$.  Consider the following
 implementation of a Gaussian process simulator.%
 %
 \footnote{This model is available in the example model repository;
-  see \url{http://mc-stan.org/examples.html}.}
+  see \url{http://mc-stan.org/documentation}.}
 %
 \begin{stancode}
 data {
@@ -7194,7 +7271,7 @@ Only the covariance function's distance computation needs to change in
 moving from a univariate model to a multivariate model.%
 %
 \footnote{The model is available in the Stan example model repository;
-see \url{http://mc-stan.org/examples.html}.}
+see \url{http://mc-stan.org/documentation}.}
 %
 The only lines that change from the univariate model above are as follows.
 %
@@ -7245,7 +7322,7 @@ This transform can be applied directly to Gaussian process
 simulation.%
 %
 \footnote{The code is available in the Stan example model repository;
-see \url{http://mc-stan.org/examples.html}.}
+see \url{http://mc-stan.org/documentation}.}
 %
 This model has the same data declarations for \code{N} and \code{x},
 and the same transformed data definitions of \code{mu} and
@@ -7298,7 +7375,7 @@ which distances are measured among inputs ($1/\rho$).
 The Stan code%
 %
 \footnote{The program code is available in the Stan example model repository;
-see \url{http://mc-stan.org/examples.html}.}
+see \url{http://mc-stan.org/documentation}.}
 %
 is very similar to the simulation models in terms of the
 computations, but the blocks in which variables are declared and
@@ -7455,7 +7532,7 @@ directly, such a vector may be synthesized as a local variable in the
 model block.  The following model takes this approach.%
 %
 \footnote{The program code is available in the Stan example model repository;
-see \url{http://mc-stan.org/examples.html}.}
+see \url{http://mc-stan.org/documentation}.}
 %
 \begin{stancode}
 data {
@@ -7569,7 +7646,7 @@ posterior, the posterior may be coded directly.  The following
 example%
 %
 \footnote{The program code is available in the Stan example model repository;
-see \url{http://mc-stan.org/examples.html}.}
+see \url{http://mc-stan.org/documentation}.}
 %
 uses the analytic form of the posterior and provides sampling of the
 resulting multivariate normal through the Cholesky decomposition.
@@ -7691,7 +7768,7 @@ Consider the following full model for prediction using logistic Gaussian
 process regression.
 %
 \footnote{The model is available in the Stan example model repository;
-see \url{http://mc-stan.org/examples.html}.}
+see \url{http://mc-stan.org/documentation}.}
 %
 \begin{stancode}
 data {
@@ -8150,7 +8227,7 @@ Consider the following Stan implementation of
 $\distro{Triangle}(-1,1)$ for sampling.%
 %
 \footnote{The program is available in the Stan example model repository;
-see \url{http://mc-stan.org/examples.html}.}
+see \url{http://mc-stan.org/documentation}.}
 %
 \begin{stancode}
 parameters {
@@ -8745,7 +8822,7 @@ and ending with \code{*/} to the Stan parser.
 For functions that raise exceptions, exceptions can be documented using
 \code{@throws}.%
 %
-\footnote{As of Stan 2.8.0, the only way a user-defined
+\footnote{As of Stan 2.9.0, the only way a user-defined
 producer will raise an exception is if a function it calls (including
 sampling statements) raises an exception via the reject statement.}
 %
@@ -9946,11 +10023,36 @@ is a clear indication that something is amiss in the model.
 This chapter provides a grab bag of techniques for optimizing \Stan
 code, including vectorization, sufficient statistics, and conjugacy.
 
+\section{Well-Specified Models}
+
+Model misspecification, which roughly speaking means using a model
+that doesn't match the data, can be a major source of slow code.  This
+can be seen in cases where simulated data according to the model runs
+robustly and efficiently, whereas the real data for which it was
+intended runs slowly or may even have convergence and mixing issues.
+While some of the techniques recommended in the remaining sections of
+this chapter may mitigate the problem somewhat, the best remedy is a
+better model specification.  
+
+Somewhat counterintuitively, more complicated models often run faster
+than simpler models.  One common pattern is with a group of parameters
+with a wide fixed prior such as \code{normal(0, 1000)}).  This can fit
+slowly due to the mismatch between prior and posterior (the prior has
+support for values in the hundreds or even thousands, whereas the
+posterior may be concentrated near zero).  In such cases, replacing
+the fixed prior with a hierarchical prior such as \code{normal(mu,
+  sigma)}, where \code{mu} and \code{sigma} are new parameters, with
+their own hyperpriors.
+
+
 \section{Reparameterization}\label{reparameterization.section}
 
 Stan's sampler can be slow in sampling from distributions with
 difficult posterior geometries.  One way to speed up such models is
-through reparameterization.  
+through reparameterization.  In some cases, reparameterization can
+dramatically increase effective sample size for the same number of
+iterations or even make programs that would not converge well
+behaved. 
 
 \subsection{Example: Neal's Funnel}
 
@@ -10791,6 +10893,50 @@ all vector arguments are the same dimensionality.  In the example
 above, \code{y} is a vector of size \code{N}, \code{x * beta} is a
 vector of size \code{N}, and \code{1} is a scalar.
 
+\subsection{Reshaping Data for Vectorization}
+
+Sometimes data does not arrive in a shape that is ideal for
+vectorization, but can be put into such shape with some munging
+(either inside Stan's transformed data block or outside).
+
+John Hall provided a simple example on the Stan users group.
+Simplifying notation a bit, the original model had a sampling
+statement in a loop, as follows.
+%
+\begin{stancode}
+for (n in 1:N)
+  y[n] ~ normal(mu[ii[n]], sigma);
+\end{stancode}
+%
+The brute force vectorization would build up a mean vector and then
+vectorize all at once.
+%
+\begin{stancode}
+{
+  vector[N] mu_ii;
+  for (n in 1:N)
+    mu_ii[n] <- mu[ii[n]];
+  y ~ normal(mu_ii, sigma);
+\end{stancode}
+%
+If there aren't many levels (values \code{ii[n]} can take), then it
+behooves us to reorganize the data by group in a case like this.  
+Rather than having a single observation vector \code{y}, there are K of them.
+And because Stan doesn't support ragged arrays, it means K
+declarations.  For instance, with 5 levels, we have
+%
+\begin{stancode}
+  y_1 ~ normal(mu[1], sigma);
+  ...
+  y_5 ~ normal(mu[5], sigma);
+\end{stancode}
+%
+This way, both the \code{mu} and \code{sigma} parameters are shared.
+Which way works out to be more efficient will depend on the shape of
+the data; if the sizes are very small, the simple vectorization may be
+faster, but for moderate to large sized groups, the full expansion
+should be faster.
+
 \section{Exploiting Sufficient Statistics}
 
 In some cases, models can be recoded to exploit sufficient statistics
@@ -10828,6 +10974,27 @@ Because truth is represented as one and falsehood as zero, the sum
 \code{sum(y)} of a binary vector \code{y} is equal to the number of
 positive outcomes out of a total of \code{N} trials.  
 
+
+\section{Aggregating Common Subexpressions}
+
+If an expression is calculated once, the value should be saved and
+reused wherever possible.  That is, rather than using
+\code{exp(theta)} in multiple places, declare a local variable to
+store its value and reuse the local variable.  
+
+Another case that may not be so obvious is with two multilevel
+parameters, say \code{a[ii[n]] + b[jj[n]]}.  If \code{a} and \code{b}
+are small (i.e., do not have many levels), then a table \code{a\_b} of
+their sums can be created, with
+%
+\begin{stancode}
+matrix[size(a), size(b)] a_b;
+for (i in 1:size(a))
+  for (j in 1:size(b))
+    a_b[i, j] <- a[i] + b[j];
+\end{stancode}
+%
+Then the sum can be replaced with \code{a\_b[ii[n], jj[n]]}.
 
 
 \section{Exploiting Conjugacy}
@@ -11096,7 +11263,7 @@ components are {\it identical}\,:
 %
 It doesn't matter if you use a stable release version of Stan or the
 version with a particular Git hash tag.  The same goes for all of the
-interfaces, compilers, and so on on.  The point is that if any of
+interfaces, compilers, and so on.  The point is that if any of
 these moving parts changes in some way, floating point results may
 change.
 
