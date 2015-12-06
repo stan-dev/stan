@@ -1,6 +1,8 @@
 #ifndef STAN_SERVICES_VARIATIONAL_PRINT_PROGRESS_HPP
 #define STAN_SERVICES_VARIATIONAL_PRINT_PROGRESS_HPP
 
+#include <stan/math/prim/scal/err/check_positive.hpp>
+#include <stan/math/prim/scal/err/check_nonnegative.hpp>
 #include <stan/services/io/do_print.hpp>
 #include <cmath>
 #include <iomanip>
@@ -38,8 +40,8 @@ namespace stan {
                                    "Total number of iterations",
                                    m);
         stan::math::check_nonnegative(function,
-                                   "Starting iteration",
-                                   start);
+                                      "Starting iteration",
+                                      start);
         stan::math::check_positive(function,
                                    "Final iteration",
                                    finish);
@@ -54,9 +56,9 @@ namespace stan {
           o << std::setw(it_print_width) << m + start
             << " / " << finish;
           o << " [" << std::setw(3)
-            << static_cast<int>( (100.0 * (start + m)) / finish )
+            << (100 * (start + m)) / finish
             << "%] ";
-          o << (tune ? " (Tuning)" : " (Variational Inference)");
+          o << (tune ? " (Adaptation)" : " (Variational Inference)");
           o << suffix;
           o << std::endl;
         }

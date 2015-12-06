@@ -7,18 +7,20 @@ namespace stan {
 
   namespace services {
 
-    class arg_variational_eta: public string_argument {
+    class arg_variational_eta: public real_argument {
     public:
-      arg_variational_eta(): string_argument() {
+      arg_variational_eta(): real_argument() {
         _name = "eta";
         _description = "Stepsize scaling parameter for variational inference";
-        _validity = "0 < eta <= 1.0";
-        _default = "automatically tuned";
-        _default_value = "automatically tuned";
-        _constrained = false;
-        _good_value = "good";
+        _validity = "0 < eta";
+        _default = "1.0";
+        _default_value = 1.0;
+        _constrained = true;
+        _good_value = 1.0;
+        _bad_value = -1.0;
         _value = _default_value;
       }
+      bool is_valid(double value) { return value > 0; }
     };
   }  // services
 }  // stan

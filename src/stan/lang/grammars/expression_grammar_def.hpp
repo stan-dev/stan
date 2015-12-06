@@ -79,10 +79,10 @@ namespace stan {
      struct result<F(T1, T2, T3, T4, T5)> { typedef void type; };
 
      void operator()(expression& expr1,
-                            const expression& expr2,
-                            const std::string& op,
-                            const std::string& fun_name,
-                            std::ostream& error_msgs) const {
+                     const expression& expr2,
+                     const std::string& op,
+                     const std::string& fun_name,
+                     std::ostream& error_msgs) const {
         if (!expr1.expression_type().is_primitive()
             || !expr2.expression_type().is_primitive()) {
           error_msgs << "binary infix operator "
