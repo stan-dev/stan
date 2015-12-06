@@ -33,7 +33,7 @@ namespace stan {
 
         try {
           sampler->z().q = cont_params;
-          sampler->init_stepsize(writer);
+          sampler->init_stepsize();
         } catch (const std::exception& e) {
           if (o)
             *o << "Exception initializing step size." << std::endl
@@ -47,7 +47,8 @@ namespace stan {
       bool init_adapt(stan::mcmc::base_mcmc* sampler,
                       categorical_argument* adapt,
                       const Eigen::VectorXd& cont_params,
-                      std::ostream* o) {
+                      std::ostream* o,
+                      interface_callbacks::writer::base_writer& writer) {
         double delta
           = dynamic_cast<real_argument*>(adapt->arg("delta"))->value();
         double gamma
@@ -59,7 +60,8 @@ namespace stan {
 
         Sampler* s = dynamic_cast<Sampler*>(sampler);
 
-        return init_adapt<Sampler>(s, delta, gamma, kappa, t0, cont_params, o);
+        return init_adapt<Sampler>(s, delta, gamma, kappa, t0, cont_params, o,
+                                   writer);
       }
 
     }

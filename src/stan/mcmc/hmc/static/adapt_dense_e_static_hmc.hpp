@@ -37,7 +37,7 @@ namespace stan {
             (this->z_.mInv, this->z_.q);
 
           if (update) {
-            this->init_stepsize();
+            this->init_stepsize(writer);
             this->update_L_();
 
             this->stepsize_adaptation_.set_mu(log(10 * this->nom_epsilon_));
