@@ -13,12 +13,13 @@ namespace stan {
     namespace sample {
 
       template<class Sampler>
-      bool init_windowed_adapt(stan::mcmc::base_mcmc* sampler,
-                               stan::services::categorical_argument* adapt,
-                               unsigned int num_warmup,
-                               const Eigen::VectorXd& cont_params,
-                               std::ostream* o,
-                               interface_callbacks::writer::base_writer& writer) {
+      bool
+      init_windowed_adapt(stan::mcmc::base_mcmc* sampler,
+                          stan::services::categorical_argument* adapt,
+                          unsigned int num_warmup,
+                          const Eigen::VectorXd& cont_params,
+                          std::ostream* o,
+                          interface_callbacks::writer::base_writer& writer) {
         init_adapt<Sampler>(sampler, adapt, cont_params, o, writer);
 
         unsigned int init_buffer
@@ -37,5 +38,4 @@ namespace stan {
     }
   }
 }
-
 #endif
