@@ -33,7 +33,7 @@ namespace stan {
 
         try {
           sampler->z().q = cont_params;
-          sampler->init_stepsize();
+          sampler->init_stepsize(writer);
         } catch (const std::exception& e) {
           if (o)
             *o << "Exception initializing step size." << std::endl
