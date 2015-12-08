@@ -15,7 +15,7 @@ namespace stan {
         _default = "50";
         _default_value = 50;
         _constrained = true;
-        _good_value = 2.0;
+        _good_value = 50.0;
         _bad_value = -1.0;
         _value = _default_value;
       }
