@@ -24,13 +24,6 @@ namespace stan {
         return name_;
       }
 
-      virtual void
-      write_sampler_param_names(interface_callbacks::writer::base_writer&
-                                writer) {}
-
-      virtual void
-      write_sampler_params(interface_callbacks::writer::base_writer& writer) {}
-
       virtual void get_sampler_param_names(std::vector<std::string>& names) {}
 
       virtual void get_sampler_params(std::vector<double>& values) {}

@@ -148,19 +148,6 @@ namespace stan {
         return sample(this->z_.q, - this->z_.V, accept_prob);
       }
 
-      void write_sampler_param_names(interface_callbacks::writer::base_writer&
-                                     writer) {
-        writer("stepsize__,treedepth__,n_leapfrog__,n_divergent__,");
-      }
-
-      void write_sampler_params(interface_callbacks::writer::base_writer&
-                                writer) {
-        std::stringstream sampler_params;
-        sampler_params << this->epsilon_    << "," << this->depth_ << ","
-                       << this->n_leapfrog_ << "," << this->n_divergent_ << ",";
-        writer(sampler_params.str());
-      }
-
       void get_sampler_param_names(std::vector<std::string>& names) {
         names.push_back("stepsize__");
         names.push_back("treedepth__");

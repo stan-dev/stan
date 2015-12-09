@@ -61,18 +61,6 @@ namespace stan {
         return sample(this->z_.q, - this->hamiltonian_.V(this->z_), acceptProb);
       }
 
-      void write_sampler_param_names(interface_callbacks::writer::base_writer&
-                                     writer) {
-        writer("stepsize__,int_time__,");
-      }
-
-      void write_sampler_params(interface_callbacks::writer::base_writer&
-                                writer) {
-        std::stringstream sampler_params;
-        sampler_params << this->epsilon_ << "," << this->T_ << ",";
-        writer(sampler_params.str());
-      }
-
       void get_sampler_param_names(std::vector<std::string>& names) {
         names.push_back("stepsize__");
         names.push_back("int_time__");

@@ -28,10 +28,6 @@ namespace stan {
         return sample(this->z_.q, - this->hamiltonian_.V(this->z_), 0);
       }
       
-      void write_sampler_param_names(interface_callbacks::writer::base_writer& writer) {}
-      
-      void write_sampler_params(interface_callbacks::writer::base_writer& writer) {}
-      
       void get_sampler_param_names(std::vector<std::string>& names) {}
       
       void get_sampler_params(std::vector<double>& values) {}
