@@ -20,10 +20,6 @@ namespace stan {
       transition(sample& init_sample,
                  interface_callbacks::writer::base_writer& writer) = 0;
 
-      std::string name() {
-        return name_;
-      }
-
       virtual void get_sampler_param_names(std::vector<std::string>& names) {}
 
       virtual void get_sampler_params(std::vector<double>& values) {}
@@ -36,9 +32,6 @@ namespace stan {
                                    std::vector<std::string>& names) {}
 
       virtual void get_sampler_diagnostics(std::vector<double>& values) {}
-
-    protected:
-      std::string name_;
     };
 
   }  // mcmc

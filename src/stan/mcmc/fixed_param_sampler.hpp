@@ -10,9 +10,7 @@ namespace stan {
 
     class fixed_param_sampler : public base_mcmc {
     public:
-      fixed_param_sampler() {
-        this->name_ = "Fixed Parameter Sampler";
-      }
+      fixed_param_sampler() { }
 
       sample transition(sample& init_sample,
                         interface_callbacks::writer::base_writer& writer) {
@@ -22,5 +20,4 @@ namespace stan {
 
   }  // mcmc
 }  // stan
-
 #endif

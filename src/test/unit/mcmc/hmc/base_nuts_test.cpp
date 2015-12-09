@@ -18,7 +18,7 @@ namespace stan {
     public:
       mock_nuts(mock_model &m, rng_t& rng)
         : base_nuts<mock_model,mock_hamiltonian,mock_integrator,rng_t>(m, rng)
-      { this->name_ = "Mock NUTS"; }
+      { }
       
     private:
       
@@ -76,7 +76,7 @@ namespace stan {
       
       divergent_nuts(mock_model &m, rng_t& rng)
         : base_nuts<mock_model, divergent_hamiltonian, expl_leapfrog,rng_t>(m, rng)
-      { this->name_ = "Divergent NUTS"; }
+      { }
       
     private:
       

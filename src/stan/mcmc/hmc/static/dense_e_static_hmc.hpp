@@ -7,7 +7,6 @@
 #include <stan/mcmc/hmc/integrators/expl_leapfrog.hpp>
 
 namespace stan {
-
   namespace mcmc {
 
     // Hamiltonian Monte Carlo on a
@@ -20,13 +19,10 @@ namespace stan {
     public:
       dense_e_static_hmc(Model &model, BaseRNG& rng)
         : base_static_hmc<Model, dense_e_metric,
-                          expl_leapfrog, BaseRNG>(model, rng) {
-        this->name_ = "Static HMC with a dense Euclidean metric";
-      }
+                          expl_leapfrog, BaseRNG>(model, rng) { }
+
     };
 
   }  // mcmc
-
 }  // stan
-
 #endif
