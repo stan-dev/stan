@@ -5,6 +5,7 @@
 #include <stan/io/dump.hpp>
 #include <test/test-models/good/model/valid.hpp>
 #include <test/unit/util.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 //#include <test/test-models/good/model/domain_fail.hpp>
 
 class TestModel_uniform_01 {
@@ -122,6 +123,34 @@ TEST(ModelUtil, gradient) {
   std::stringstream output;
   valid_model_namespace::valid_model valid_model(data_var_context, &output);
   EXPECT_NO_THROW(stan::model::gradient(valid_model, x, f, g));
+  
+  EXPECT_FLOAT_EQ(dim, x.size());
+  EXPECT_FLOAT_EQ(dim, g.size());
+
+  EXPECT_EQ("", output.str());
+  
+  // Incorporate once operands and partials has been generalized
+  //output.str("");
+  //domain_fail_namespace::domain_fail domain_fail_model(data_var_context, &output);
+  //EXPECT_THROW(stan::model::gradient(domain_fail_model, x, f, g), std::domain_error);
+  //EXPECT_EQ("", output.str());
+}
+
+TEST(ModelUtil, gradient_writer) {
+  int dim = 5;
+  
+  Eigen::VectorXd x(dim);
+  double f;
+  Eigen::VectorXd g(dim);
+  
+  std::fstream data_stream(std::string("").c_str(), std::fstream::in);
+  stan::io::dump data_var_context(data_stream);
+  data_stream.close();
+
+  std::stringstream output;
+  stan::interface_callbacks::writer::stream_writer writer(output);
+  valid_model_namespace::valid_model valid_model(data_var_context, &output);
+  EXPECT_NO_THROW(stan::model::gradient(valid_model, x, f, g, writer));
   
   EXPECT_FLOAT_EQ(dim, x.size());
   EXPECT_FLOAT_EQ(dim, g.size());

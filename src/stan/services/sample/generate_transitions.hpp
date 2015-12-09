@@ -1,6 +1,7 @@
 #ifndef STAN_SERVICES_SAMPLE_GENERATE_TRANSITIONS_HPP
 #define STAN_SERVICES_SAMPLE_GENERATE_TRANSITIONS_HPP
 
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/services/sample/mcmc_writer.hpp>
 #include <stan/services/sample/progress.hpp>
@@ -23,24 +24,27 @@ namespace stan {
                                 const bool warmup,
                                 stan::services::sample::mcmc_writer<
                                 Model, SampleRecorder,
-                                DiagnosticRecorder, MessageRecorder>& writer,
+                                DiagnosticRecorder, MessageRecorder>&
+                                mcmc_writer,
                                 stan::mcmc::sample& init_s,
                                 Model& model,
                                 RNG& base_rng,
                                 const std::string& prefix,
                                 const std::string& suffix,
                                 std::ostream& o,
-                                StartTransitionCallback& callback) {
+                                StartTransitionCallback& callback,
+                                interface_callbacks::writer::base_writer&
+                                writer) {
         for (int m = 0; m < num_iterations; ++m) {
           callback();
 
           progress(m, start, finish, refresh, warmup, prefix, suffix, o);
 
-          init_s = sampler->transition(init_s);
+          init_s = sampler->transition(init_s, writer);
 
           if ( save && ( (m % num_thin) == 0) ) {
-            writer.write_sample_params(base_rng, init_s, *sampler, model);
-            writer.write_diagnostic_params(init_s, sampler);
+            mcmc_writer.write_sample_params(base_rng, init_s, *sampler, model);
+            mcmc_writer.write_diagnostic_params(init_s, sampler);
           }
         }
       }

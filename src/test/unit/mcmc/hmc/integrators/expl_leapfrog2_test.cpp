@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 
 #include <sstream>
-
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <test/test-models/good/mcmc/hmc/integrators/gauss.hpp>
 
 #include <stan/io/dump.hpp>
@@ -22,20 +22,20 @@ TEST(McmcHmcIntegratorsExplLeapfrog, energy_conservation) {
   
   std::stringstream model_output;
   std::stringstream metric_output;
-
+  stan::interface_callbacks::writer::stream_writer writer(metric_output);
   gauss_model_namespace::gauss_model model(data_var_context, &model_output);
   
   stan::mcmc::expl_leapfrog<
     stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> >
     integrator;
-  
-  stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> metric(model, &metric_output);
+
+  stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> metric(model);
   
   stan::mcmc::unit_e_point z(1);
   z.q(0) = 1;
   z.p(0) = 1;
   
-  metric.update(z);
+  metric.update(z, writer);
   double H0 = metric.H(z);
   double aveDeltaH = 0;
   
@@ -45,7 +45,7 @@ TEST(McmcHmcIntegratorsExplLeapfrog, energy_conservation) {
   
   for (size_t n = 0; n < L; ++n) {
     
-    integrator.evolve(z, metric, epsilon);
+    integrator.evolve(z, metric, epsilon, writer);
     
     double deltaH = metric.H(z) - H0;
     aveDeltaH += (deltaH - aveDeltaH) / double(n + 1);
@@ -68,6 +68,8 @@ TEST(McmcHmcIntegratorsExplLeapfrog, symplecticness) {
   data_stream.close();
 
   std::stringstream model_output;
+  std::stringstream metric_output;
+  stan::interface_callbacks::writer::stream_writer writer(metric_output);  
   
   gauss_model_namespace::gauss_model model(data_var_context, &model_output);
   
@@ -75,9 +77,7 @@ TEST(McmcHmcIntegratorsExplLeapfrog, symplecticness) {
     stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> >
     integrator;
 
-  std::stringstream metric_output;
-  
-  stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> metric(model, &metric_output);
+  stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> metric(model);
   
   // Create a circle of points
   const int n_points = 1000;
@@ -102,11 +102,11 @@ TEST(McmcHmcIntegratorsExplLeapfrog, symplecticness) {
   size_t L = pi / epsilon;
   
   for (int i = 0; i < n_points; ++i)
-    metric.init(z.at(i));
+    metric.init(z.at(i), writer);
   
   for (size_t n = 0; n < L; ++n)
     for (int i = 0; i < n_points; ++i)
-      integrator.evolve(z.at(i), metric, epsilon);
+      integrator.evolve(z.at(i), metric, epsilon, writer);
   
   // Compute area of evolved shape using divergence theorem in 2D
   double area = 0;

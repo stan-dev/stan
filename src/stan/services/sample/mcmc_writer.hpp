@@ -124,33 +124,15 @@ namespace stan {
         }
 
         /**
-         * Internal method
-         *
-         * Prints additional sampler info to the stream.
-         *
-         * @param sampler sampler
-         * @param writer stream to output stuff to
-         */
-        template <class Writer>
-        void write_adapt_finish(stan::mcmc::base_mcmc* sampler,
-                                Writer& writer) {
-          std::stringstream stream;
-          sampler->write_sampler_state(&stream);
-
-          writer("Adaptation terminated\n" + stream.str());
-        }
-
-
-        /**
          * Prints additional info to the streams
          *
-         * Prints to both the sample stream and the diagnostic stream
+         * Prints to the sample stream
          *
          * @param sampler sampler
          */
         void write_adapt_finish(stan::mcmc::base_mcmc* sampler) {
-          write_adapt_finish(sampler, sample_writer_);
-          write_adapt_finish(sampler, diagnostic_writer_);
+          sample_writer_("Adaptation terminated");
+          sampler->write_sampler_state(sample_writer_);
         }
 
 

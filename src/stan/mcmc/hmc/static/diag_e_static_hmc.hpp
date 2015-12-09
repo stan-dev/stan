@@ -18,12 +18,9 @@ namespace stan {
       : public base_static_hmc<Model, diag_e_metric,
                                expl_leapfrog, BaseRNG> {
     public:
-      diag_e_static_hmc(Model &model, BaseRNG& rng,
-                        std::ostream* o, std::ostream* e)
+      diag_e_static_hmc(Model &model, BaseRNG& rng)
         : base_static_hmc<Model, diag_e_metric,
-                          expl_leapfrog, BaseRNG>(model, rng, o, e) {
-        this->name_ = "Static HMC with a diagonal Euclidean metric";
-      }
+                          expl_leapfrog, BaseRNG>(model, rng) { }
     };
 
   }  // mcmc
