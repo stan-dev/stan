@@ -222,16 +222,12 @@ namespace stan {
         sys_arg_types.push_back(expr_type(DOUBLE_T, 1));
         sys_arg_types.push_back(expr_type(DOUBLE_T, 1));
         sys_arg_types.push_back(expr_type(INT_T, 1));
-        sys_arg_types.push_back(expr_type(DOUBLE_T, 0));
-        sys_arg_types.push_back(expr_type(DOUBLE_T, 0));
-        sys_arg_types.push_back(expr_type(INT_T, 0));
         function_signature_t system_signature(sys_result_type, sys_arg_types);
         if (!function_signatures::instance()
             .is_defined(ode_fun.system_function_name_, system_signature)) {
           error_msgs << "first argument to integrate_ode_cvode"
                      << " must be a function with signature"
-                     << " (real, real[], real[], real[], int[],"
-                     << " real, real, int) : real[] ";
+                     << " (real, real[], real[], real[], int[]) : real[] ";
           pass = false;
         }
         
@@ -290,8 +286,8 @@ namespace stan {
                      << " must be type real or int"
                      << " for relative tolerance"
                      << "; found type="
-          << ode_fun.rel_tol_.expression_type()
-          << ". ";
+                     << ode_fun.rel_tol_.expression_type()
+                     << ". ";
           pass = false;
         }
         if (!ode_fun.abs_tol_.expression_type().is_primitive()) {
