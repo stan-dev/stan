@@ -279,8 +279,8 @@ namespace stan {
       }
       void operator()(const integrate_ode_cvode& fx) const {
         o_ << "integrate_ode_cvode("
-        << fx.system_function_name_
-        << "_functor__(), ";
+           << fx.system_function_name_
+           << "_functor__(), ";
         
         generate_expression(fx.y0_, o_);
         o_ << ", ";

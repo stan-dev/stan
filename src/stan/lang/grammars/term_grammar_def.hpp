@@ -67,7 +67,7 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::integrate_ode_cvode,
                           (stan::lang::expression, x_int_)
                           (stan::lang::expression, rel_tol_)
                           (stan::lang::expression, abs_tol_)
-                          (stan::lang::expression, max_num_steps_))
+                          (stan::lang::expression, max_num_steps_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::fun,
                           (std::string, name_)
@@ -230,7 +230,8 @@ namespace stan {
             .is_defined(ode_fun.system_function_name_, system_signature)) {
           error_msgs << "first argument to integrate_ode_cvode"
                      << " must be a function with signature"
-                     << " (real, real[], real[], real[], int[]) : real[] ";
+                     << " (real, real[], real[], real[], int[],"
+                     << " real, real, int) : real[] ";
           pass = false;
         }
         
@@ -1028,11 +1029,11 @@ namespace stan {
         > expression_g(_r1)     // x (data only)
         > lit(',')
         > expression_g(_r1)     // x_int (data only)
-        > lit(')')
+        > lit(',')
         > expression_g(_r1)     // relative tolerance (data only)
-        > lit(')')
+        > lit(',')
         > expression_g(_r1)     // absolute tolerance (data only)
-        > lit(')')
+        > lit(',')
         > expression_g(_r1)     // maximum number of steps (data only)
         > lit(')') [validate_integrate_ode_cvode_f(
             _val, boost::phoenix::ref(var_map_),
