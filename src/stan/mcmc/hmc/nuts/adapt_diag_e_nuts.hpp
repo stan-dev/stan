@@ -6,14 +6,13 @@
 #include <stan/mcmc/hmc/nuts/diag_e_nuts.hpp>
 
 namespace stan {
-
   namespace mcmc {
 
     // The No-U-Turn Sampler (NUTS) on a
     // Euclidean manifold with diagonal metric
     // and adaptive stepsize
 
-    template <typename Model, class BaseRNG>
+    template <class Model, class BaseRNG>
     class adapt_diag_e_nuts: public diag_e_nuts<Model, BaseRNG>,
                              public stepsize_var_adapter {
     public:
@@ -52,7 +51,5 @@ namespace stan {
     };
 
   }  // mcmc
-
 }  // stan
-
 #endif

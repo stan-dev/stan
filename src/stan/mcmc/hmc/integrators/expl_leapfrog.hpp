@@ -7,7 +7,7 @@
 namespace stan {
   namespace mcmc {
 
-    template <typename Hamiltonian>
+    template <class Hamiltonian>
     class expl_leapfrog : public base_leapfrog<Hamiltonian> {
     public:
       expl_leapfrog()
@@ -35,5 +35,4 @@ namespace stan {
 
   }  // mcmc
 }  // stan
-
 #endif

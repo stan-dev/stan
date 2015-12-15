@@ -2,18 +2,17 @@
 #define STAN_MCMC_HMC_NUTS_ADAPT_UNIT_E_NUTS_HPP
 
 #include <stan/interface_callbacks/writer/base_writer.hpp>
-#include <stan/mcmc/stepsize_adapter.hpp>
 #include <stan/mcmc/hmc/nuts/unit_e_nuts.hpp>
+#include <stan/mcmc/stepsize_adapter.hpp>
 
 namespace stan {
-
   namespace mcmc {
 
     // The No-U-Turn Sampler (NUTS) on a
     // Euclidean manifold with unit metric
     // and adaptive stepsize
 
-    template <typename Model, class BaseRNG>
+    template <class Model, class BaseRNG>
     class adapt_unit_e_nuts: public unit_e_nuts<Model, BaseRNG>,
                              public stepsize_adapter {
     public:
@@ -40,7 +39,5 @@ namespace stan {
     };
 
   }  // mcmc
-
 }  // stan
-
 #endif

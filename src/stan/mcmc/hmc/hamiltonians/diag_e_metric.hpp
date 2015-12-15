@@ -10,7 +10,7 @@ namespace stan {
   namespace mcmc {
 
     // Euclidean manifold with diagonal metric
-    template <typename Model, typename BaseRNG>
+    template <class Model, class BaseRNG>
     class diag_e_metric: public base_hamiltonian<Model, diag_e_point, BaseRNG> {
     public:
       explicit diag_e_metric(Model& model)

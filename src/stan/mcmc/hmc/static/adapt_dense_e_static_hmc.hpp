@@ -2,18 +2,17 @@
 #define STAN_MCMC_HMC_STATIC_ADAPT_DENSE_E_STATIC_HMC_HPP
 
 #include <stan/interface_callbacks/writer/base_writer.hpp>
-#include <stan/mcmc/stepsize_covar_adapter.hpp>
 #include <stan/mcmc/hmc/static/dense_e_static_hmc.hpp>
+#include <stan/mcmc/stepsize_covar_adapter.hpp>
 
 namespace stan {
-
   namespace mcmc {
 
     // Hamiltonian Monte Carlo on a
     // Euclidean manifold with dense metric,
     // static integration time,
     // and adaptive stepsize
-    template <typename Model, class BaseRNG>
+    template <class Model, class BaseRNG>
     class adapt_dense_e_static_hmc : public dense_e_static_hmc<Model, BaseRNG>,
                                      public stepsize_covar_adapter {
     public:
@@ -54,7 +53,5 @@ namespace stan {
     };
 
   }  // mcmc
-
 }  // stan
-
 #endif
