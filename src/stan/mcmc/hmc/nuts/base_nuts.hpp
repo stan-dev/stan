@@ -30,7 +30,7 @@ namespace stan {
 
     template <class Model, template<class, class> class Hamiltonian,
               template<class> class Integrator, class BaseRNG>
-    class base_nuts: public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
+    class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     public:
       base_nuts(Model &model, BaseRNG& rng)
         : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng),

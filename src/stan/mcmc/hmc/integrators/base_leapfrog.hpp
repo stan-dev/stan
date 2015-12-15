@@ -12,8 +12,7 @@ namespace stan {
   namespace mcmc {
 
     template <typename Hamiltonian>
-    class base_leapfrog :
-      public base_integrator<Hamiltonian> {
+    class base_leapfrog : public base_integrator<Hamiltonian> {
     public:
       base_leapfrog()
         : base_integrator<Hamiltonian>() {}
