@@ -436,14 +436,14 @@ namespace stan {
 
         typedef stan::mcmc::adapt_diag_e_nuts<Model, rng_t> sampler;
         sampler* sampler_ptr = 0;
-        sampler_ptr = new sampler(model, base_rng,
-                                  &std::cout, &std::cout);
+        sampler_ptr = new sampler(model, base_rng);
         sampler_ptr->set_nominal_stepsize(1.0);
         sampler_ptr->set_stepsize_jitter(0.0);
         sampler_ptr->set_max_depth(10);
 
         stan::services::sample::init_adapt(sampler_ptr, 0.8, 0.05, 0.75, 10,
-                                           cont_params, &std::cout);
+                                           cont_params, &std::cout,
+                                           message_writer);
         sampler_ptr->set_window_params(num_warmup, 75, 50, 25, &std::cout);
           
         // Headers
@@ -462,7 +462,8 @@ namespace stan {
                                              writer,
                                              s, model, base_rng,
                                              prefix, suffix, std::cout,
-                                             startTransitionCallback);
+                                             startTransitionCallback,
+                                             message_writer);
 
         clock_t end = clock();
         warmDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;
@@ -481,7 +482,8 @@ namespace stan {
            writer,
            s, model, base_rng,
            prefix, suffix, std::cout,
-           startTransitionCallback);
+           startTransitionCallback,
+           message_writer);
           
         end = clock();
         sampleDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;

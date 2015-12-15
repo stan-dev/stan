@@ -72,7 +72,7 @@ namespace stan {
        */
       virtual void
       write_metric(stan::interface_callbacks::writer::base_writer& writer) {
-        writer("# No free parameters for unit metric");
+        writer("No free parameters for unit metric");
       }
 
     protected:

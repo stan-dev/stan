@@ -1,6 +1,7 @@
 #ifndef STAN_SERVICES_SAMPLE_INIT_WINDOWED_ADAPT_HPP
 #define STAN_SERVICES_SAMPLE_INIT_WINDOWED_ADAPT_HPP
 
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/services/arguments/categorical_argument.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
@@ -12,12 +13,14 @@ namespace stan {
     namespace sample {
 
       template<class Sampler>
-      bool init_windowed_adapt(stan::mcmc::base_mcmc* sampler,
-                               stan::services::categorical_argument* adapt,
-                               unsigned int num_warmup,
-                               const Eigen::VectorXd& cont_params,
-                               std::ostream* o) {
-        init_adapt<Sampler>(sampler, adapt, cont_params, o);
+      bool
+      init_windowed_adapt(stan::mcmc::base_mcmc* sampler,
+                          stan::services::categorical_argument* adapt,
+                          unsigned int num_warmup,
+                          const Eigen::VectorXd& cont_params,
+                          std::ostream* o,
+                          interface_callbacks::writer::base_writer& writer) {
+        init_adapt<Sampler>(sampler, adapt, cont_params, o, writer);
 
         unsigned int init_buffer
           = dynamic_cast<u_int_argument*>(adapt->arg("init_buffer"))->value();
@@ -35,5 +38,4 @@ namespace stan {
     }
   }
 }
-
 #endif
