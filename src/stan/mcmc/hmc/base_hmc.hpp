@@ -1,7 +1,7 @@
 #ifndef STAN_MCMC_HMC_BASE_HMC_HPP
 #define STAN_MCMC_HMC_BASE_HMC_HPP
 
-#include <stan/interface_callbacks/writer/stream_writer.hpp>
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
@@ -33,14 +33,11 @@ namespace stan {
           epsilon_(nom_epsilon_),
           epsilon_jitter_(0.0) {}
 
-      /**
-       * @tparam InfoWriter An implementation of
-       *                    src/stan/interface_callbacks/writer/base_writer.hpp
-       * @param writer Writer callback
-       */
-      template <class InfoWriter>
-      void write_sampler_state(InfoWriter& writer) {
-        writer("# Step size", get_nominal_stepsize());
+      void
+      write_sampler_state(interface_callbacks::writer::base_writer& writer) {
+        std::stringstream nominal_stepsize;
+        nominal_stepsize << "Step size = " << get_nominal_stepsize();
+        writer(nominal_stepsize.str());
         z_.write_metric(writer);
       }
 
@@ -57,17 +54,17 @@ namespace stan {
         z_.q = q;
       }
 
-      void init_stepsize() {
+      void init_stepsize(interface_callbacks::writer::base_writer& writer) {
         ps_point z_init(this->z_);
 
         this->hamiltonian_.sample_p(this->z_, this->rand_int_);
-        this->hamiltonian_.init(this->z_);
+        this->hamiltonian_.init(this->z_, writer);
 
         // Guaranteed to be finite if randomly initialized
         double H0 = this->hamiltonian_.H(this->z_);
 
         this->integrator_.evolve(this->z_, this->hamiltonian_,
-                                 this->nom_epsilon_);
+                                 this->nom_epsilon_, writer);
 
         double h = this->hamiltonian_.H(this->z_);
         if (boost::math::isnan(h))
@@ -81,12 +78,12 @@ namespace stan {
           this->z_.ps_point::operator=(z_init);
 
           this->hamiltonian_.sample_p(this->z_, this->rand_int_);
-          this->hamiltonian_.init(this->z_);
+          this->hamiltonian_.init(this->z_, writer);
 
           double H0 = this->hamiltonian_.H(this->z_);
 
           this->integrator_.evolve(this->z_, this->hamiltonian_,
-                                   this->nom_epsilon_);
+                                   this->nom_epsilon_, writer);
 
           double h = this->hamiltonian_.H(this->z_);
           if (boost::math::isnan(h))

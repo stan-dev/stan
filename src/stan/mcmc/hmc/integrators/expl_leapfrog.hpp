@@ -11,7 +11,8 @@ namespace stan {
     class expl_leapfrog :
       public base_leapfrog<Hamiltonian> {
     public:
-      expl_leapfrog(): base_leapfrog<Hamiltonian>() {}
+      expl_leapfrog()
+        : base_leapfrog<Hamiltonian>() {}
 
       void begin_update_p(typename Hamiltonian::PointType& z,
                           Hamiltonian& hamiltonian,

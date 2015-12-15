@@ -1,8 +1,8 @@
 #include <stan/services/sample/progress.hpp>
 #include <gtest/gtest.h>
-#include <string>
+#include <sstream>
 
-TEST(StanUi, print_progress) {
+TEST(StanUi, progress) {
   std::string out("");
   int m;
   int start;
@@ -22,8 +22,7 @@ TEST(StanUi, print_progress) {
   out = "";
   warmup = false;
   m = 2;
-  
   out = stan::services::sample::progress(m, start, finish, refresh, warmup);
-  EXPECT_EQ("Iteration:  3 / 100 [  3%]  (Sampling)", out);
+  EXPECT_EQ("Iteration:  3 / 100 [  3%]  (Warmup)", out);
 }
 

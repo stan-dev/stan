@@ -1,11 +1,10 @@
 #include <string>
 #include <boost/random/additive_combine.hpp>
-
 #include <stan/io/dump.hpp>
-
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/diag_e_metric.hpp>
-
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
+#include <stan/interface_callbacks/writer/noop_writer.hpp>
 #include <test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp>
 #include <test/unit/util.hpp>
 #include <gtest/gtest.h>
@@ -19,11 +18,9 @@ TEST(McmcDiagEMetric, sample_p) {
   Eigen::VectorXd q(2);
   q(0) = 5;
   q(1) = 1;
-
+  
   stan::mcmc::mock_model model(q.size());
-
-  stan::mcmc::diag_e_metric<stan::mcmc::mock_model, rng_t>
-    metric(model);
+  stan::mcmc::diag_e_metric<stan::mcmc::mock_model, rng_t> metric(model);
   stan::mcmc::diag_e_point z(q.size());
 
   int n_samples = 1000;
@@ -46,9 +43,6 @@ TEST(McmcDiagEMetric, sample_p) {
 
   // Variance within 10% of expected value (d / 2)
   EXPECT_EQ(true, fabs(var - 0.5 * q.size()) < 0.1 * q.size());
-
-  EXPECT_EQ("", metric.info().str());
-  EXPECT_EQ("", metric.err().str());
 }
 
 TEST(McmcDiagEMetric, gradients) {
@@ -64,17 +58,16 @@ TEST(McmcDiagEMetric, gradients) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
 
-  std::stringstream model_output;
-
+  std::stringstream model_output, metric_output;
   funnel_model_namespace::funnel_model model(data_var_context, &model_output);
 
-  stan::mcmc::diag_e_metric<funnel_model_namespace::funnel_model, rng_t>
-      metric(model);
-
+  stan::interface_callbacks::writer::stream_writer writer(metric_output);
+  stan::mcmc::diag_e_metric<funnel_model_namespace::funnel_model, rng_t> metric(model);
+  
   double epsilon = 1e-6;
-
-  metric.update(z);
-
+  
+  metric.update(z, writer);
+  
   Eigen::VectorXd g1 = metric.dtau_dq(z);
 
   for (int i = 0; i < z.q.size(); ++i) {
@@ -82,16 +75,16 @@ TEST(McmcDiagEMetric, gradients) {
     double delta = 0;
 
     z.q(i) += epsilon;
-    metric.update(z);
+    metric.update(z, writer);
     delta += metric.tau(z);
 
     z.q(i) -= 2 * epsilon;
-    metric.update(z);
+    metric.update(z, writer);
     delta -= metric.tau(z);
 
     z.q(i) += epsilon;
-    metric.update(z);
-
+    metric.update(z, writer);
+    
     delta /= 2 * epsilon;
 
     EXPECT_NEAR(delta, g1(i), epsilon);
@@ -125,25 +118,23 @@ TEST(McmcDiagEMetric, gradients) {
     double delta = 0;
 
     z.q(i) += epsilon;
-    metric.update(z);
+    metric.update(z, writer);
     delta += metric.phi(z);
 
     z.q(i) -= 2 * epsilon;
-    metric.update(z);
+    metric.update(z, writer);
     delta -= metric.phi(z);
 
     z.q(i) += epsilon;
-    metric.update(z);
-
+    metric.update(z, writer);
+    
     delta /= 2 * epsilon;
 
     EXPECT_NEAR(delta, g3(i), epsilon);
 
   }
-
   EXPECT_EQ("", model_output.str());
-  EXPECT_EQ("", metric.info().str());
-  EXPECT_EQ("", metric.err().str());
+  EXPECT_EQ("", metric_output.str());
 }
 
 TEST(McmcDiagEMetric, streams) {

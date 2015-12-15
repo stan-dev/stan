@@ -19,9 +19,7 @@ namespace stan {
     public:
       unit_e_static_hmc(Model &model, BaseRNG& rng)
         : base_static_hmc<Model, unit_e_metric,
-                          expl_leapfrog, BaseRNG>(model, rng) {
-        this->name_ = "Static HMC with a unit Euclidean metric";
-      }
+                          expl_leapfrog, BaseRNG>(model, rng) { }
     };
 
   }  // mcmc

@@ -1,6 +1,7 @@
 #ifndef STAN_MCMC_HMC_INTEGRATORS_BASE_LEAPFROG_HPP
 #define STAN_MCMC_HMC_INTEGRATORS_BASE_LEAPFROG_HPP
 
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/hmc/integrators/base_integrator.hpp>
 #include <iostream>
 #include <iomanip>
@@ -14,51 +15,41 @@ namespace stan {
     class base_leapfrog :
       public base_integrator<Hamiltonian> {
     public:
-      base_leapfrog(): base_integrator<Hamiltonian>() {}
+      base_leapfrog()
+        : base_integrator<Hamiltonian>() {}
 
       void evolve(typename Hamiltonian::PointType& z,
                   Hamiltonian& hamiltonian,
-                  const double epsilon) {
+                  const double epsilon,
+                  interface_callbacks::writer::base_writer& writer) {
         begin_update_p(z, hamiltonian, 0.5 * epsilon);
 
         update_q(z, hamiltonian, epsilon);
-        hamiltonian.update(z);
+        hamiltonian.update(z, writer);
 
         end_update_p(z, hamiltonian, 0.5 * epsilon);
       }
 
-      /**
-       * @tparam Writer An implementation of
-       *                src/stan/interface_callbacks/writer/base_writer.hpp
-       * @param z Initial point in phase space
-       * @param hamiltonian Hamiltonian implementation
-       * @param epsilon Integrator step size
-       * @param writer Writer callback
-       */
-      template <class Writer>
       void verbose_evolve(typename Hamiltonian::PointType& z,
                           Hamiltonian& hamiltonian,
                           const double epsilon,
-                          Writer& writer) {
+                          interface_callbacks::writer::base_writer& writer) {
         std::stringstream msg;
         msg.precision(6);
 
         int width = 14;
         int nColumn = 4;
 
-        msg << "Verbose Hamiltonian Evolution, Step Size = "
-            << epsilon << ":";
+        msg << "Verbose Hamiltonian Evolution, Step Size = " << epsilon << ":";
         writer(msg.str());
 
-        msg.str(std::string());
-        msg.clear();
+        msg.str("");
         msg << "    " << std::setw(nColumn * width)
             << std::setfill('-')
             << "" << std::setfill(' ');
         writer(msg.str());
 
-        msg.str(std::string());
-        msg.clear();
+        msg.str("");
         msg << "    "
             << std::setw(width) << std::left << "Poisson"
             << std::setw(width) << std::left << "Initial"
@@ -66,8 +57,7 @@ namespace stan {
             << std::setw(width) << std::left << "DeltaH";
         writer(msg.str());
 
-        msg.str(std::string());
-        msg.clear();
+        msg.str("");
         msg << "    "
             << std::setw(width) << std::left << "Operator"
             << std::setw(width) << std::left << "Hamiltonian"
@@ -75,8 +65,7 @@ namespace stan {
             << std::setw(width) << std::left << "/ Stepsize^{2}";
         writer(msg.str());
 
-        msg.str(std::string());
-        msg.clear();
+        msg.str("");
         msg << "    " << std::setw(nColumn * width)
             << std::setfill('-')
             << "" << std::setfill(' ');
@@ -88,8 +77,7 @@ namespace stan {
 
         double H1 = hamiltonian.H(z);
 
-        msg.str(std::string());
-        msg.clear();
+        msg.str("");
         msg << "    "
             << std::setw(width) << std::left << "hat{V}/2"
             << std::setw(width) << std::left << H0
@@ -98,12 +86,11 @@ namespace stan {
         writer(msg.str());
 
         update_q(z, hamiltonian, epsilon);
-        hamiltonian.update(z);
+        hamiltonian.update(z, writer);
 
         double H2 = hamiltonian.H(z);
 
-        msg.str(std::string());
-        msg.clear();
+        msg.str("");
         msg << "    "
             << std::setw(width) << std::left << "hat{T}"
             << std::setw(width) << std::left << H0
@@ -115,8 +102,7 @@ namespace stan {
 
         double H3 = hamiltonian.H(z);
 
-        msg.str(std::string());
-        msg.clear();
+        msg.str("");
         msg << "    "
             << std::setw(width) << std::left << "hat{V}/2"
             << std::setw(width) << std::left << H0
@@ -124,8 +110,7 @@ namespace stan {
             << std::setw(width) << std::left << (H3 - H0) / (epsilon * epsilon);
         writer(msg.str());
 
-        msg.str(std::string());
-        msg.clear();
+        msg.str("");
         msg << "    "
             << std::setw(nColumn * width)
             << std::setfill('-')
@@ -147,5 +132,4 @@ namespace stan {
 
   }  // mcmc
 }  // stan
-
 #endif

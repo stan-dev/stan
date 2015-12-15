@@ -40,18 +40,18 @@ namespace stan {
                                     of each iteration
        */
       template<typename ModelT, typename BFGSOptimizerT, typename RNGT,
-               typename OutputWriter, typename InfoWriter, typename Interrupt>
+               typename StartIterationCallback>
       int do_bfgs_optimize(ModelT &model,
                            BFGSOptimizerT &bfgs,
                            RNGT &base_rng,
                            double &lp,
                            std::vector<double> &cont_vector,
                            std::vector<int> &disc_vector,
-                           OutputWriter& output_stream,
-                           InfoWriter& info,
+                           interface_callbacks::writer::base_writer& output_stream,
+                           interface_callbacks::writer::base_writer& info,
                            bool save_iterations,
                            int refresh,
-                           Interrupt& interrupt) {
+                           StartIterationCallback& callback) {
         lp = bfgs.logp();
 
         std::stringstream msg;

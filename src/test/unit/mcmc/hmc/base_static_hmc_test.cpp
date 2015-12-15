@@ -1,12 +1,13 @@
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
 #include <stan/mcmc/hmc/static/base_static_hmc.hpp>
+#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <boost/random/additive_combine.hpp>
 #include <gtest/gtest.h>
 
 typedef boost::ecuyer1988 rng_t;
 
 namespace stan {
-  
   namespace mcmc {
     
     // Mock Static HMC
@@ -18,17 +19,15 @@ namespace stan {
     public:
       
       mock_static_hmc(mock_model &m, rng_t& rng)
-        : base_static_hmc<mock_model, mock_hamiltonian, mock_integrator, rng_t>(m, rng)
-      { this->name_ = "Mock Static HMC"; }
+        : base_static_hmc<mock_model,mock_hamiltonian,mock_integrator,rng_t>(m, rng)
+      { }
       
     };
     
   }
-  
 }
 
 TEST(McmcBaseStaticHMC, set_nominal_stepsize) {
-  
   rng_t base_rng(0);
   
   std::vector<double> q(5, 1.0);
@@ -46,9 +45,6 @@ TEST(McmcBaseStaticHMC, set_nominal_stepsize) {
   
   sampler.set_nominal_stepsize(-0.1);
   EXPECT_EQ(old_epsilon, sampler.get_nominal_stepsize());
-  
-  EXPECT_EQ("", sampler.flush_info_buffer());
-  EXPECT_EQ("", sampler.flush_err_buffer());
 }
 
 TEST(McmcBaseStaticHMC, set_T) {
@@ -70,9 +66,6 @@ TEST(McmcBaseStaticHMC, set_T) {
   
   sampler.set_T(-0.1);
   EXPECT_EQ(old_T, sampler.get_T());
-  
-  EXPECT_EQ("", sampler.flush_info_buffer());
-  EXPECT_EQ("", sampler.flush_err_buffer());
 }
 
 TEST(McmcBaseStaticHMC, set_nominal_stepsize_and_T) {
@@ -101,9 +94,6 @@ TEST(McmcBaseStaticHMC, set_nominal_stepsize_and_T) {
   sampler.set_nominal_stepsize_and_T(5.0, -0.1);
   EXPECT_EQ(old_epsilon, sampler.get_nominal_stepsize());
   EXPECT_EQ(old_T, sampler.get_T());
-  
-  EXPECT_EQ("", sampler.flush_info_buffer());
-  EXPECT_EQ("", sampler.flush_err_buffer());
 }
 
 TEST(McmcBaseStaticHMC, set_nominal_stepsize_and_L) {
@@ -132,7 +122,4 @@ TEST(McmcBaseStaticHMC, set_nominal_stepsize_and_L) {
   sampler.set_nominal_stepsize_and_T(5.0, -1);
   EXPECT_EQ(old_epsilon, sampler.get_nominal_stepsize());
   EXPECT_EQ(old_L, sampler.get_L());
-  
-  EXPECT_EQ("", sampler.flush_info_buffer());
-  EXPECT_EQ("", sampler.flush_err_buffer());
 }

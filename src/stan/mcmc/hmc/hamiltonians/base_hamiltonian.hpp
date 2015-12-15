@@ -1,9 +1,9 @@
 #ifndef STAN_MCMC_HMC_HAMILTONIANS_BASE_HAMILTONIAN_HPP
 #define STAN_MCMC_HMC_HAMILTONIANS_BASE_HAMILTONIAN_HPP
 
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/model/util.hpp>
-
 #include <iostream>
 #include <limits>
 #include <stdexcept>
@@ -11,14 +11,13 @@
 #include <sstream>
 
 namespace stan {
-
   namespace mcmc {
 
     template <class Model, class Point, class BaseRNG>
     class base_hamiltonian {
     public:
-      explicit base_hamiltonian(Model& model):
-        model_(model), info_buffer_(), err_buffer_() {}
+      explicit base_hamiltonian(Model& model)
+        : model_(model) {}
 
       ~base_hamiltonian() {}
 
@@ -48,41 +47,38 @@ namespace stan {
 
       virtual void sample_p(Point& z, BaseRNG& rng) = 0;
 
-      virtual void init(Point& z) {
-        this->update(z);
+      virtual void init(Point& z,
+                        interface_callbacks::writer::base_writer& writer) {
+        this->update(z, writer);
       }
 
-      virtual void update(Point& z) {
+      virtual void update(Point& z,
+                          interface_callbacks::writer::base_writer& writer) {
         try {
-          stan::model::gradient(model_, z.q, z.V, z.g, &info_buffer_);
+          stan::model::gradient(model_, z.q, z.V, z.g, writer);
           z.V *= -1;
         } catch (const std::exception& e) {
-          this->write_error_msg_(e);
+          this->write_error_msg_(e, writer);
           z.V = std::numeric_limits<double>::infinity();
         }
         z.g *= -1;
       }
 
-      std::stringstream& info() { return info_buffer_; }
-      std::stringstream& err() { return err_buffer_; }
-
     protected:
       Model& model_;
-      std::stringstream info_buffer_;
-      std::stringstream err_buffer_;
 
-      void write_error_msg_(const std::exception& e) {
-        err_buffer_ << std::endl
-                    << "Informational Message: The current Metropolis proposal "
-                    << "is about to be rejected because of the following issue:"
-                    << std::endl;
-        err_buffer_ << e.what() << std::endl;
-        err_buffer_ << "If this warning occurs sporadically, such as for "
-                    << "highly constrained variable types like covariance "
-                    << "matrices, then the sampler is fine,"
-                    << std::endl;
-        err_buffer_ << "but if this warning occurs often then your model may "
-                    << "be either severely ill-conditioned or misspecified.";
+      void write_error_msg_(const std::exception& e,
+                            interface_callbacks::writer::base_writer& writer) {
+        writer();
+        writer("Informational Message: The current Metropolis proposal "
+               "is about to be rejected because of the following issue:");
+        writer(e.what());
+        writer("If this warning occurs sporadically, such as for highly "
+               "constrained variable types like covariance matrices, then "
+               "the sampler is fine,");
+        writer();
+        writer("but if this warning occurs often then your model may be "
+               "either severely ill-conditioned or misspecified.");
       }
     };
 

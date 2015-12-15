@@ -19,6 +19,7 @@ namespace stan {
     public:
       typedef Eigen::Matrix<Scalar, DimAtCompile, 1> VectorT;
       typedef Eigen::Matrix<Scalar, DimAtCompile, DimAtCompile> HessianT;
+      // NOLINTNEXTLINE(build/include_what_you_use)
       typedef boost::tuple<Scalar, VectorT, VectorT> UpdateT;
 
       explicit LBFGSUpdate(size_t L = 5) : _buf(L) {}

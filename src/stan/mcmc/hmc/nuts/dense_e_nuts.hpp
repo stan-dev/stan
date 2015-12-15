@@ -17,9 +17,7 @@ namespace stan {
     public:
       dense_e_nuts(Model &model, BaseRNG& rng)
         : base_nuts<Model, dense_e_metric, expl_leapfrog,
-                    BaseRNG>(model, rng) {
-        this->name_ = "NUTS with a dense Euclidean metric";
-      }
+                    BaseRNG>(model, rng) { }
 
       // Note that the points don't need to be swapped
       // here since start.mInv = finish.mInv

@@ -12,7 +12,6 @@ typedef boost::ecuyer1988 rng_t;
 class advi_test : public ::testing::Test {
 public:
   void SetUp() {
-    // Create mock data_var_context
     std::fstream data_stream("src/test/test-models/good/variational/gradient_warn.data.R",
                              std::fstream::in);
     stan::io::dump data_var_context(data_stream);
@@ -27,17 +26,15 @@ public:
     diagnostic_stream_.str("");
 
     advi_meanfield_ = new stan::variational::advi<stan_model, stan::variational::normal_meanfield, rng_t>
-      (*model_, cont_params_,
-       1, 100, 0.1,
-       base_rng_,
+      (*model_, cont_params_, base_rng_,
+       1, 100,
        100, 1,
        &print_stream_,
        &output_stream_,
        &diagnostic_stream_);
     advi_fullrank_ = new stan::variational::advi<stan_model, stan::variational::normal_fullrank, rng_t>
-      (*model_, cont_params_,
-       1, 100, 0.1,
-       base_rng_,
+      (*model_, cont_params_, base_rng_,
+       1, 100,
        100, 1,
        &print_stream_,
        &output_stream_,
@@ -65,11 +62,11 @@ private:
 
 
 TEST_F(advi_test, gradient_warn_meanfield) {
-  EXPECT_EQ(0, advi_meanfield_->run(0.01, 10000));
+  EXPECT_EQ(0, advi_meanfield_->run(0.1, false, 50, 0.01, 10000));
   SUCCEED() << "expecting it to compile and run without problems";
 }
 
 TEST_F(advi_test, gradient_warn_fullrank) {
-  EXPECT_EQ(0, advi_fullrank_->run(0.01, 10000));
+  EXPECT_EQ(0, advi_fullrank_->run(0.1, false, 50, 0.01, 10000));
   SUCCEED() << "expecting it to compile and run without problems";
 }

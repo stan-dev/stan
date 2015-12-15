@@ -1,16 +1,16 @@
 #ifndef STAN_MCMC_HMC_STATIC_BASE_STATIC_HMC_HPP
 #define STAN_MCMC_HMC_STATIC_BASE_STATIC_HMC_HPP
 
-#include <boost/math/special_functions/fpclassify.hpp>
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/hmc/base_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <cmath>
 #include <limits>
 #include <string>
 #include <vector>
 
 namespace stan {
-
   namespace mcmc {
 
     // Hamiltonian Monte Carlo
@@ -30,13 +30,14 @@ namespace stan {
 
       ~base_static_hmc() {}
 
-      sample transition(sample& init_sample) {
+      sample transition(sample& init_sample,
+                        interface_callbacks::writer::base_writer& writer) {
         this->sample_stepsize();
 
         this->seed(init_sample.cont_params());
 
         this->hamiltonian_.sample_p(this->z_, this->rand_int_);
-        this->hamiltonian_.init(this->z_);
+        this->hamiltonian_.init(this->z_, writer);
 
         ps_point z_init(this->z_);
 
@@ -44,7 +45,8 @@ namespace stan {
 
         for (int i = 0; i < L_; ++i)
           this->integrator_.evolve(this->z_, this->hamiltonian_,
-                                   this->epsilon_);
+                                   this->epsilon_,
+                                   writer);
 
         double h = this->hamiltonian_.H(this->z_);
         if (boost::math::isnan(h)) h = std::numeric_limits<double>::infinity();

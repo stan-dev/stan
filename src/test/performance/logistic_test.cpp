@@ -45,6 +45,7 @@
 
 #include <gtest/gtest.h>
 #include <test/test-models/performance/logistic.hpp>
+#include <stan/version.hpp>
 #include <ctime>
 #include <test/performance/utility.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -85,6 +86,7 @@ using stan::test::performance::get_date;
 TEST_F(performance, run) {
   clock_t t;
   for (int n = 0; n < N; ++n) {
+    std::cout << "iteration: " << n << " / " << N << std::endl;
     t = clock();      // start timer
     stan::test::performance::command<stan_model>(1000,
                                                  10000,
@@ -148,6 +150,44 @@ TEST_F(performance, values_same_run_to_run) {
   all_values_same = !HasNonfatalFailure();
 }
 
+TEST_F(performance, check_output_is_same) {
+  std::ifstream file_stream;
+  file_stream.open("test/performance/logistic_output.csv", 
+                   std::ios_base::in);
+  ASSERT_TRUE(file_stream.good());
+
+  std::string line, expected;
+
+  getline(file_stream, line);
+  expected = "# stan_version_major = " + stan::MAJOR_VERSION; 
+  ASSERT_EQ(expected, line);
+  ASSERT_TRUE(file_stream.good());
+
+
+  getline(file_stream, line);
+  expected = "# stan_version_minor = " + stan::MINOR_VERSION; 
+  ASSERT_EQ(expected, line);
+  ASSERT_TRUE(file_stream.good());
+
+  getline(file_stream, line);
+  expected = "# stan_version_patch = " + stan::PATCH_VERSION; 
+  ASSERT_EQ(expected, line);
+  ASSERT_TRUE(file_stream.good());
+
+  getline(file_stream, line);
+  ASSERT_EQ("# model = logistic_model", line);
+  ASSERT_TRUE(file_stream.good());
+
+  getline(file_stream, line);
+  ASSERT_EQ("lp__,accept_stat__,stepsize__,treedepth__,n_leapfrog__,n_divergent__,beta.1,beta.2", line);
+  ASSERT_TRUE(file_stream.good());
+
+  getline(file_stream, line);
+  ASSERT_EQ("# Adaptation terminated", line);
+  ASSERT_TRUE(file_stream.good());
+
+  file_stream.close();
+}
 
 TEST_F(performance, write_results_to_disk) {
   std::stringstream header;

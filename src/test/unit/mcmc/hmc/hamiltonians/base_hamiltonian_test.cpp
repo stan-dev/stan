@@ -1,5 +1,6 @@
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
 #include <test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <boost/random/additive_combine.hpp>
 #include <test/unit/util.hpp>
 #include <gtest/gtest.h>
@@ -12,17 +13,16 @@ TEST(BaseHamiltonian, update) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
   
-  std::stringstream model_output;
+  std::stringstream model_output, metric_output;
 
   funnel_model_namespace::funnel_model model(data_var_context, &model_output);
   
-  stan::mcmc::mock_hamiltonian<funnel_model_namespace::funnel_model, rng_t>
-      metric(model);
-  
+  stan::mcmc::mock_hamiltonian<funnel_model_namespace::funnel_model, rng_t> metric(model);
   stan::mcmc::ps_point z(11);
   z.q.setOnes();
+  stan::interface_callbacks::writer::stream_writer writer(metric_output);
   
-  metric.update(z);
+  metric.update(z, writer);
 
   EXPECT_FLOAT_EQ(10.73223197, z.V);
 
@@ -31,8 +31,7 @@ TEST(BaseHamiltonian, update) {
     EXPECT_FLOAT_EQ(0.1353352832, z.g(i));
 
   EXPECT_EQ("", model_output.str());
-  EXPECT_EQ("", metric.info().str());
-  EXPECT_EQ("", metric.err().str());
+  EXPECT_EQ("", metric_output.str());
 }
 
 TEST(BaseHamiltonian, streams) {

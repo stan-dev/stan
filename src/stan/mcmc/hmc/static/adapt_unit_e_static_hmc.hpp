@@ -1,11 +1,11 @@
 #ifndef STAN_MCMC_HMC_STATIC_ADAPT_UNIT_E_STATIC_HMC_HPP
 #define STAN_MCMC_HMC_STATIC_ADAPT_UNIT_E_STATIC_HMC_HPP
 
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/stepsize_adapter.hpp>
 #include <stan/mcmc/hmc/static/unit_e_static_hmc.hpp>
 
 namespace stan {
-
   namespace mcmc {
 
     // Hamiltonian Monte Carlo on a
@@ -21,8 +21,10 @@ namespace stan {
 
       ~adapt_unit_e_static_hmc() { }
 
-      sample transition(sample& init_sample) {
-        sample s = unit_e_static_hmc<Model, BaseRNG>::transition(init_sample);
+      sample transition(sample& init_sample,
+                        interface_callbacks::writer::base_writer& writer) {
+        sample s = unit_e_static_hmc<Model, BaseRNG>::transition(init_sample,
+                                                                 writer);
 
         if (this->adapt_flag_) {
           this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,
@@ -40,7 +42,5 @@ namespace stan {
     };
 
   }  // mcmc
-
 }  // stan
-
 #endif

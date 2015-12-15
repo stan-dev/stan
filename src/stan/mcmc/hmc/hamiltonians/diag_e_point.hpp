@@ -1,6 +1,7 @@
 #ifndef STAN_MCMC_HMC_HAMILTONIANS_DIAG_E_POINT_HPP
 #define STAN_MCMC_HMC_HAMILTONIANS_DIAG_E_POINT_HPP
 
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 
 namespace stan {
@@ -21,15 +22,14 @@ namespace stan {
         fast_vector_copy_<double>(mInv, z.mInv);
       }
 
-      /**
-       * @tparam Writer An implementation of
-       *                    src/stan/interface_callbacks/writer/base_writer.hpp
-       * @param writer Writer callback
-       */
-      template <class Writer>
-      void write_metric(Writer& writer) {
-        writer("# Diagonal Euclidean metric");
-        writer("# M_inv", mInv.data(), mInv.size());
+      void
+      write_metric(stan::interface_callbacks::writer::base_writer& writer) {
+        writer("Diagonal elements of inverse mass matrix:");
+        std::stringstream mInv_ss;
+        mInv_ss << mInv(0);
+        for (int i = 1; i < mInv.size(); ++i)
+          mInv_ss << ", " << mInv(i);
+        writer(mInv_ss.str());
       }
     };
 

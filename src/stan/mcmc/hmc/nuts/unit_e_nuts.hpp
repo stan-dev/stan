@@ -7,7 +7,6 @@
 #include <stan/mcmc/hmc/integrators/expl_leapfrog.hpp>
 
 namespace stan {
-
   namespace mcmc {
 
     // The No-U-Turn Sampler (NUTS) on a
@@ -19,9 +18,7 @@ namespace stan {
     public:
       unit_e_nuts(Model &model, BaseRNG& rng)
         : base_nuts<Model, unit_e_metric, expl_leapfrog,
-                    BaseRNG>(model, rng) {
-        this->name_ = "NUTS with a unit Euclidean metric";
-      }
+                    BaseRNG>(model, rng) { }
 
       bool compute_criterion(ps_point& start,
                              unit_e_point& finish,
@@ -32,7 +29,5 @@ namespace stan {
     };
 
   }  // mcmc
-
 }  // stan
-
 #endif
