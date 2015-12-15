@@ -207,13 +207,13 @@ namespace stan {
       //! @endcond
       template <typename F, typename T1, typename T2, typename T3, typename T4>
       struct result<F(T1, T2, T3, T4)> { typedef void type; };
-      
+
       void operator()(const integrate_ode_cvode& ode_fun,
                       const variable_map& var_map,
                       bool& pass,
                       std::ostream& error_msgs) const {
         pass = true;
-        
+
         // test function argument type
         expr_type sys_result_type(DOUBLE_T, 1);
         std::vector<expr_type> sys_arg_types;
@@ -230,11 +230,11 @@ namespace stan {
                      << " (real, real[], real[], real[], int[]) : real[] ";
           pass = false;
         }
-        
+
         // test regular argument types
         if (ode_fun.y0_.expression_type() != expr_type(DOUBLE_T, 1)) {
-          error_msgs << "second argument to integrate_ode_cvode must be type real[]"
-                     << " for intial system state"
+          error_msgs << "second argument to integrate_ode_cvode must be"
+                     << " type real[] for intial system state"
                      << "; found type="
                      << ode_fun.y0_.expression_type()
                      << ". ";
@@ -250,32 +250,32 @@ namespace stan {
           pass = false;
         }
         if (ode_fun.ts_.expression_type() != expr_type(DOUBLE_T, 1)) {
-          error_msgs << "fourth argument to integrate_ode_cvode must be type real[]"
-                     << " for requested solution times"
+          error_msgs << "fourth argument to integrate_ode_cvode must be"
+                     << " type real[] for requested solution times"
                      << "; found type="
                      << ode_fun.ts_.expression_type()
                      << ". ";
           pass = false;
         }
         if (ode_fun.theta_.expression_type() != expr_type(DOUBLE_T, 1)) {
-          error_msgs << "fifth argument to integrate_ode_cvode must be type real[]"
-                     << " for parameters"
+          error_msgs << "fifth argument to integrate_ode_cvode must be"
+                     << " type real[] for parameters"
                      << "; found type="
                      << ode_fun.theta_.expression_type()
                      << ". ";
           pass = false;
         }
         if (ode_fun.x_.expression_type() != expr_type(DOUBLE_T, 1)) {
-          error_msgs << "sixth argument to integrate_ode_cvode must be type real[]"
-                     << " for real data;"
+          error_msgs << "sixth argument to integrate_ode_cvode must be"
+                     << " type real[] for real data;"
                      << " found type="
                      << ode_fun.x_.expression_type()
                      << ". ";
           pass = false;
         }
         if (ode_fun.x_int_.expression_type() != expr_type(INT_T, 1)) {
-          error_msgs << "seventh argument to integrate_ode_cvode must be type int[]"
-                     << " for integer data;"
+          error_msgs << "seventh argument to integrate_ode_cvode must be"
+                     << " type int[] for integer data;"
                      << " found type="
                      << ode_fun.x_int_.expression_type()
                      << ". ";
@@ -308,7 +308,7 @@ namespace stan {
                      << ". ";
           pass = false;
         }
-        
+
         // test data-only variables do not have parameters (int locals OK)
         if (has_var(ode_fun.t0_, var_map)) {
           error_msgs << "third argument to integrate_ode_cvode (initial times)"
@@ -316,8 +316,9 @@ namespace stan {
           pass = false;
         }
         if (has_var(ode_fun.ts_, var_map)) {
-          error_msgs << "fourth argument to integrate_ode_cvode (solution times)"
-                     << " must be data only and not reference parameters";
+          error_msgs << "fourth argument to integrate_ode_cvode"
+                     << " (solution times) must be data only and not"
+                     << " reference parameters";
           pass = false;
         }
         if (has_var(ode_fun.x_, var_map)) {
@@ -344,7 +345,7 @@ namespace stan {
     };
     boost::phoenix::function<validate_integrate_ode_cvode>
       validate_integrate_ode_cvode_f;
-    
+
     struct set_fun_type {
       //! @cond Doxygen_Suppress
       template <class> struct result;
@@ -1007,7 +1008,7 @@ namespace stan {
                                          boost::phoenix::ref(var_map_),
                                          _pass,
                                          boost::phoenix::ref(error_msgs_))];
-          
+
       integrate_ode_cvode_r.name("expression");
       integrate_ode_cvode_r
         %= (lit("integrate_ode_cvode") >> no_skip[!char_("a-zA-Z0-9_")])

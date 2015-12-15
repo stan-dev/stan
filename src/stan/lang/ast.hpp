@@ -356,7 +356,7 @@ namespace stan {
                 const expression& x,
                 const expression& x_int);
     };
-    
+
     struct integrate_ode_cvode {
       std::string system_function_name_;
       expression y0_;  // initial state

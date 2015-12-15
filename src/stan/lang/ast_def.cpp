@@ -1001,7 +1001,7 @@ namespace stan {
         x_(x),
         x_int_(x_int) {
     }
-    
+
     integrate_ode_cvode::integrate_ode_cvode() { }
     integrate_ode_cvode::integrate_ode_cvode(
                                        const std::string& system_function_name,
