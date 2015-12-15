@@ -495,6 +495,9 @@ TEST_F(StanServices, initialize_state_random_reject_all) {
   EXPECT_TRUE(output.str()
               .find("Log probability evaluates to log(0)")
               != std::string::npos);
+  EXPECT_TRUE(output.str()
+              .find("Initialization between (-1.5, 1.5) failed after 100 attempts.")
+              != std::string::npos);
 }
 
 
