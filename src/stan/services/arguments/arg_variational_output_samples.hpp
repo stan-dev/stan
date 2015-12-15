@@ -21,7 +21,7 @@ namespace stan {
         _default = boost::lexical_cast<std::string>(def);
         _default_value = def;
         _constrained = true;
-        _good_value = 1.0;
+        _good_value = 1000.0;
         _bad_value = -1.0;
         _value = _default_value;
       }
