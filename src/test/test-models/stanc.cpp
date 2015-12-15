@@ -12,5 +12,5 @@
 int main(int argc, const char* argv[]) {
   std::stringstream out_stream;
   std::stringstream err_stream;
-  return stanc_helper(argc, argv, &std::cout, &std::cerr);
+  return stanc_helper(argc, argv, &out_stream, &err_stream);
 }
