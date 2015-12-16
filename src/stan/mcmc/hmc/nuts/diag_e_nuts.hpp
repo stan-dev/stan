@@ -11,8 +11,7 @@ namespace stan {
 
     // The No-U-Turn Sampler (NUTS) on a
     // Euclidean manifold with diagonal metric
-
-    template <typename Model, class BaseRNG>
+    template <class Model, class BaseRNG>
     class diag_e_nuts : public base_nuts<Model, diag_e_metric,
                                          expl_leapfrog, BaseRNG> {
     public:
@@ -29,6 +28,7 @@ namespace stan {
                && finish.mInv.cwiseProduct(start.p).dot(rho - start.p) > 0;
       }
     };
+
   }  // mcmc
 }  // stan
 #endif

@@ -2,8 +2,8 @@
 #define STAN_MCMC_HMC_STATIC_ADAPT_UNIT_E_STATIC_HMC_HPP
 
 #include <stan/interface_callbacks/writer/base_writer.hpp>
-#include <stan/mcmc/stepsize_adapter.hpp>
 #include <stan/mcmc/hmc/static/unit_e_static_hmc.hpp>
+#include <stan/mcmc/stepsize_adapter.hpp>
 
 namespace stan {
   namespace mcmc {
@@ -12,7 +12,7 @@ namespace stan {
     // Euclidean manifold with unit metric,
     // static integration time,
     // and adaptive stepsize
-    template <typename Model, class BaseRNG>
+    template <class Model, class BaseRNG>
     class adapt_unit_e_static_hmc : public unit_e_static_hmc<Model, BaseRNG>,
                                     public stepsize_adapter {
     public:

@@ -11,7 +11,7 @@ namespace stan {
 
     // The No-U-Turn Sampler (NUTS) on a
     // Euclidean manifold with unit metric
-    template <typename Model, class BaseRNG>
+    template <class Model, class BaseRNG>
     class unit_e_nuts
       : public base_nuts<Model, unit_e_metric,
                          expl_leapfrog, BaseRNG> {

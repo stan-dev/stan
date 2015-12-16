@@ -6,13 +6,12 @@
 #include <stan/mcmc/hmc/nuts/dense_e_nuts.hpp>
 
 namespace stan {
-
   namespace mcmc {
 
     // The No-U-Turn Sampler (NUTS) on a
     // Euclidean manifold with dense metric
     // and adaptive stepsize
-    template <typename Model, class BaseRNG>
+    template <class Model, class BaseRNG>
     class adapt_dense_e_nuts : public dense_e_nuts<Model, BaseRNG>,
                                public stepsize_covar_adapter {
     public:
@@ -51,7 +50,5 @@ namespace stan {
     };
 
   }  // mcmc
-
 }  // stan
-
 #endif
