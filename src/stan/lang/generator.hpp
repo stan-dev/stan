@@ -277,6 +277,38 @@ namespace stan {
         generate_expression(fx.x_int_, o_);
         o_ << ", pstream__)";
       }
+      void operator()(const integrate_ode_cvode& fx) const {
+        o_ << "integrate_ode_cvode("
+           << fx.system_function_name_
+           << "_functor__(), ";
+
+        generate_expression(fx.y0_, o_);
+        o_ << ", ";
+
+        generate_expression(fx.t0_, o_);
+        o_ << ", ";
+
+        generate_expression(fx.ts_, o_);
+        o_ << ", ";
+
+        generate_expression(fx.theta_, o_);
+        o_ << ", ";
+
+        generate_expression(fx.x_, o_);
+        o_ << ", ";
+
+        generate_expression(fx.x_int_, o_);
+        o_ << ", ";
+
+        generate_expression(fx.rel_tol_, o_);
+        o_ << ", ";
+
+        generate_expression(fx.abs_tol_, o_);
+        o_ << ", ";
+
+        generate_expression(fx.max_num_steps_, o_);
+        o_ << ", pstream__)";
+      }
       void operator()(const fun& fx) const {
         // first test if short-circuit op (binary && and || applied to
         // primitives; overloads are eager, not short-circuiting)
