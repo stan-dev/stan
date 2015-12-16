@@ -444,7 +444,7 @@ namespace stan {
         stan::services::sample::init_adapt(sampler_ptr, 0.8, 0.05, 0.75, 10,
                                            cont_params, &std::cout,
                                            message_writer);
-        sampler_ptr->set_window_params(num_warmup, 75, 50, 25, &std::cout);
+        sampler_ptr->set_window_params(num_warmup, 75, 50, 25, message_writer);
           
         // Headers
         writer.write_sample_names(s, sampler_ptr, model);
