@@ -7,7 +7,6 @@
 #include <stan/io/dump.hpp>
 #include <stan/io/reader.hpp>
 #include <stan/io/writer.hpp>
-#include <stan/io/csv_writer.hpp>
 
 #include <stan/lang/rethrow_located.hpp>
 #include <stan/model/prob_grad.hpp>

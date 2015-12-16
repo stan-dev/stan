@@ -1,7 +1,6 @@
 #ifndef STAN_MODEL_PROB_GRAD_HPP
 #define STAN_MODEL_PROB_GRAD_HPP
 
-#include <stan/io/csv_writer.hpp>
 #include <utility>
 #include <vector>
 
