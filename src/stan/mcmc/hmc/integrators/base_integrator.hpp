@@ -6,7 +6,7 @@
 namespace stan {
   namespace mcmc {
 
-    template <typename Hamiltonian>
+    template <class Hamiltonian>
     class base_integrator {
     public:
       base_integrator() {}

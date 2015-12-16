@@ -1,13 +1,12 @@
 #ifndef STAN_MCMC_HMC_STATIC_DIAG_E_STATIC_HMC_HPP
 #define STAN_MCMC_HMC_STATIC_DIAG_E_STATIC_HMC_HPP
 
-#include <stan/mcmc/hmc/static/base_static_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/diag_e_point.hpp>
 #include <stan/mcmc/hmc/hamiltonians/diag_e_metric.hpp>
 #include <stan/mcmc/hmc/integrators/expl_leapfrog.hpp>
+#include <stan/mcmc/hmc/static/base_static_hmc.hpp>
 
 namespace stan {
-
   namespace mcmc {
 
     // Hamiltonian Monte Carlo on a
@@ -23,7 +22,5 @@ namespace stan {
     };
 
   }  // mcmc
-
 }  // stan
-
 #endif

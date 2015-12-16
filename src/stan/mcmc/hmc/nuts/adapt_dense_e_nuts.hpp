@@ -6,7 +6,6 @@
 #include <stan/mcmc/hmc/nuts/dense_e_nuts.hpp>
 
 namespace stan {
-
   namespace mcmc {
 
     // The No-U-Turn Sampler (NUTS) on a
@@ -51,7 +50,5 @@ namespace stan {
     };
 
   }  // mcmc
-
 }  // stan
-
 #endif
