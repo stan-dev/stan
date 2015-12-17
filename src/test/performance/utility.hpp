@@ -411,7 +411,7 @@ namespace stan {
                                             interface_callbacks::writer::stream_writer,
                                             interface_callbacks::writer::noop_writer,
                                             interface_callbacks::writer::stream_writer>
-          writer(sample_writer, diagnostic_writer, info_writer, &std::cout);
+          writer(sample_writer, diagnostic_writer, info_writer);
 
         // Sampling parameters
         int num_thin = 1;

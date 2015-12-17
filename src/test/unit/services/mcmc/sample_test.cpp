@@ -35,17 +35,13 @@ struct mock_callback {
 class StanServices : public testing::Test {
 public:
   StanServices()
-    : message_writer(writer_output) {}
+    : message_writer(message_output, "# ") { }
   
   void SetUp() {
-    output.str("");
-    error.str("");
-
     model_output.str("");
     sample_output.str("");
     diagnostic_output.str("");
     message_output.str("");
-    writer_output.str("");
     
     sampler = new mock_sampler();
 
@@ -57,13 +53,12 @@ public:
     
     writer_t sample_writer(sample_output, "# ");
     writer_t diagnostic_writer(diagnostic_output, "# ");
-    writer_t message_writer(message_output, "# ");
 
     writer = new stan::services::sample::mcmc_writer<stan_model,
                                                      writer_t,
                                                      writer_t,
                                                      writer_t>
-      (sample_writer, diagnostic_writer, message_writer, &writer_output);
+      (sample_writer, diagnostic_writer, message_writer);
 
     base_rng.seed(123456);
 
@@ -89,11 +84,8 @@ public:
   double log_prob;
   double stat;
 
-  std::stringstream output, error;
-
   std::stringstream model_output,
-    sample_output, diagnostic_output, message_output,
-    writer_output;
+    sample_output, diagnostic_output, message_output;
 
   stan::interface_callbacks::writer::stream_writer message_writer;
 };
@@ -126,13 +118,9 @@ TEST_F(StanServices, sample) {
 
   EXPECT_EQ(expected_sample_output, ss.str());
 
-  EXPECT_EQ("", output.str());
-  EXPECT_EQ("", error.str());
-
   EXPECT_EQ("", model_output.str());
   EXPECT_EQ("", sample_output.str());
   EXPECT_EQ("", diagnostic_output.str());
   EXPECT_EQ("", message_output.str());
-  EXPECT_EQ("", writer_output.str());
 }
 
