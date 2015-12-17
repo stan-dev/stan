@@ -1,6 +1,7 @@
 #ifndef STAN_SERVICES_OPTIMIZE_DO_BFGS_OPTIMIZE_HPP
 #define STAN_SERVICES_OPTIMIZE_DO_BFGS_OPTIMIZE_HPP
 
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/services/io/do_print.hpp>
 #include <stan/services/io/write_error_msg.hpp>
@@ -79,7 +80,7 @@ namespace stan {
 
           if (output_stream && save_iterations) {
             stan::interface_callbacks::writer::stream_writer writer(*output_stream);
-            io::write_iteration(writer model, base_rng,
+            io::write_iteration(writer, model, base_rng,
                                 lp, cont_vector, disc_vector);
           }
         }
