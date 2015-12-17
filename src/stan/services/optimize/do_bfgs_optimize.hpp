@@ -5,7 +5,6 @@
 #include <stan/services/io/do_print.hpp>
 #include <stan/services/io/write_error_msg.hpp>
 #include <stan/services/io/write_iteration.hpp>
-#include <stan/services/io/write_iteration_csv.hpp>
 #include <stan/services/io/write_model.hpp>
 #include <stan/services/io/write_stan.hpp>
 #include <fstream>
@@ -35,8 +34,9 @@ namespace stan {
           *notice_stream << "initial log joint probability = "
                          << lp << std::endl;
         if (output_stream && save_iterations) {
-          io::write_iteration(*output_stream, model, base_rng,
-                              lp, cont_vector, disc_vector, output_stream);
+          stan::interface_callbacks::writer::stream_writer writer(*output_stream);
+          io::write_iteration(writer, model, base_rng,
+                              lp, cont_vector, disc_vector);
         }
 
         int ret = 0;
@@ -80,8 +80,9 @@ namespace stan {
           }
 
           if (output_stream && save_iterations) {
-            io::write_iteration(*output_stream, model, base_rng,
-                                lp, cont_vector, disc_vector, output_stream);
+            stan::interface_callbacks::writer::stream_writer writer(*output_stream);
+            io::write_iteration(writer model, base_rng,
+                                lp, cont_vector, disc_vector);
           }
         }
 

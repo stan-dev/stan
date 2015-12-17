@@ -2,9 +2,9 @@
 #define STAN_VARIATIONAL_ADVI_HPP
 
 #include <stan/math.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <stan/io/dump.hpp>
 #include <stan/model/util.hpp>
-#include <stan/services/io/write_iteration_csv.hpp>
 #include <stan/services/io/write_iteration.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/services/variational/print_progress.hpp>
@@ -363,7 +363,6 @@ namespace stan {
         double delta_t;
 
         // Main loop
-        std::vector<double> print_vector;
         bool do_more_iterations = true;
         for (int iter_counter = 1; do_more_iterations; ++iter_counter) {
           // Compute gradient using Monte Carlo integration
@@ -413,11 +412,14 @@ namespace stan {
               end = clock();
               delta_t = static_cast<double>(end - start) / CLOCKS_PER_SEC;
 
+              std::vector<double> print_vector;
               print_vector.clear();
+              print_vector.push_back(iter_counter);
               print_vector.push_back(delta_t);
               print_vector.push_back(elbo);
-              services::io::write_iteration_csv(*diag_stream_,
-                                                iter_counter, print_vector);
+
+              interface_callbacks::writer::stream_writer writer(*diag_stream_);
+              writer(print_vector);
             }
 
             if (delta_elbo_ave < tol_rel_obj) {
@@ -508,13 +510,10 @@ namespace stan {
         std::vector<int> disc_vector;
 
         if (out_stream_) {
-          services::io::write_iteration(*out_stream_, model_, rng_,
-                                        0, cont_vector, disc_vector,
-                                        print_stream_);
-        }
-
-        // Draw more samples from posterior and write on subsequent lines
-        if (out_stream_) {
+          stan::interface_callbacks::writer::stream_writer writer(*out_stream_);
+          services::io::write_iteration(writer, model_, rng_,
+                                        0, cont_vector, disc_vector);
+          // Draw more samples from posterior and write on subsequent lines
           if (print_stream_) {
             *print_stream_ << std::endl
                            << "Drawing "
@@ -528,8 +527,8 @@ namespace stan {
             for (int i = 0; i < cont_params_.size(); ++i) {
               cont_vector.at(i) = cont_params_(i);
             }
-            services::io::write_iteration(*out_stream_, model_, rng_,
-                          0, cont_vector, disc_vector, print_stream_);
+            services::io::write_iteration(writer, model_, rng_,
+                                          0, cont_vector, disc_vector);
           }
 
           if (print_stream_) {
