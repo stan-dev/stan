@@ -58,9 +58,9 @@ public:
 };
 
 TEST_F(UiCommand, init_adapt_z_0) {
-  EXPECT_TRUE(stan::services::sample::init_adapt<sampler>(sampler_ptr,
-                                                          delta, gamma, kappa, t0,
-                                                          z_0, 0, writer));
+  EXPECT_TRUE(stan::services::sample::init_adapt(*sampler_ptr,
+                                                 delta, gamma, kappa, t0,
+                                                 z_0, writer));
   EXPECT_FLOAT_EQ(0.125, sampler_ptr->get_nominal_stepsize());
 
   for (size_t n = 0; n < model->num_params_r(); n++) {
@@ -74,9 +74,9 @@ TEST_F(UiCommand, init_adapt_z_0) {
 
 
 TEST_F(UiCommand, init_adapt_z_init) {
-  EXPECT_TRUE(stan::services::sample::init_adapt<sampler>(sampler_ptr,
-                                                          delta, gamma, kappa, t0,
-                                                          z_init, 0, writer));
+  EXPECT_TRUE(stan::services::sample::init_adapt(*sampler_ptr,
+                                                 delta, gamma, kappa, t0,
+                                                 z_init, writer));
   EXPECT_FLOAT_EQ(0.25, sampler_ptr->get_nominal_stepsize());
   for (size_t n = 0; n < model->num_params_r(); n++) {
     EXPECT_FLOAT_EQ(z_init[n], sampler_ptr->z().q[n]);
