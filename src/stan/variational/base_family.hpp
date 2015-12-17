@@ -1,12 +1,12 @@
 #ifndef STAN_VARIATIONAL_BASE_FAMILY_HPP
 #define STAN_VARIATIONAL_BASE_FAMILY_HPP
 
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <algorithm>
 #include <ostream>
 
 namespace stan {
-
   namespace variational {
 
     class base_family {
@@ -37,7 +37,7 @@ namespace stan {
                      Eigen::VectorXd& cont_params,
                      int n_monte_carlo_grad,
                      BaseRNG& rng,
-                     std::ostream* print_stream) const;
+                     interface_callbacks::writer::base_writer& message_writer) const;
 
     protected:
       void write_error_msg_(std::ostream* error_msgs,
@@ -65,5 +65,4 @@ namespace stan {
     base_family operator*(double scalar, base_family rhs);
   }  // variational
 }  // stan
-
 #endif

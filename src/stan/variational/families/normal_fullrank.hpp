@@ -406,7 +406,7 @@ namespace stan {
        * @param[in] cont_params Continuous parameters.
        * @param[in] n_monte_carlo_grad Sample size for gradient computation.
        * @param[in,out] rng Random number generator.
-       * @param[in,out] print_stream Stream for convergence assessment output.
+       * @param[in,out] message_writer writer for messages
        * @throw std::domain_error If the number of divergent
        * iterations exceeds its specified bounds.
        */
@@ -416,7 +416,8 @@ namespace stan {
                      Eigen::VectorXd& cont_params,
                      int n_monte_carlo_grad,
                      BaseRNG& rng,
-                     std::ostream* print_stream) const {
+                     interface_callbacks::writer::base_writer& message_writer)
+        const {
         static const char* function =
           "stan::variational::normal_fullrank::calc_grad";
         stan::math::check_size_match(function,
@@ -442,7 +443,10 @@ namespace stan {
           }
           zeta = transform(eta);
           try {
-            stan::model::gradient(m, zeta, tmp_lp, tmp_mu_grad, print_stream);
+            std::stringstream ss;
+            stan::model::gradient(m, zeta, tmp_lp, tmp_mu_grad, &ss);
+            if (ss.str().length() > 0)
+              message_writer(ss.str());
             stan::math::check_finite(function, "Gradient of mu", tmp_mu_grad);
 
             mu_grad += tmp_mu_grad;
