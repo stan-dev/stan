@@ -1,103 +1,100 @@
 #ifndef STAN_SERVICES_OPTIMIZE_DO_BFGS_OPTIMIZE_HPP
 #define STAN_SERVICES_OPTIMIZE_DO_BFGS_OPTIMIZE_HPP
 
-#include <stan/interface_callbacks/writer/stream_writer.hpp>
+#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/optimization/bfgs.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/services/io/do_print.hpp>
-#include <stan/services/io/write_error_msg.hpp>
 #include <stan/services/io/write_iteration.hpp>
 #include <fstream>
 #include <iostream>
 #include <iomanip>
+#include <string>
 #include <vector>
 
 namespace stan {
   namespace services {
     namespace optimize {
 
-      template<typename ModelT, typename BFGSOptimizerT, typename RNGT,
+      template<typename Model, typename BFGSOptimizer, typename RNGT,
                typename StartIterationCallback>
-      int do_bfgs_optimize(ModelT &model, BFGSOptimizerT &bfgs,
+      int do_bfgs_optimize(Model &model, BFGSOptimizer &bfgs,
                            RNGT &base_rng,
                            double &lp,
                            std::vector<double> &cont_vector,
                            std::vector<int> &disc_vector,
-                           std::ostream* output_stream,
-                           std::ostream* notice_stream,
+                           interface_callbacks::writer::base_writer& output,
+                           interface_callbacks::writer::base_writer& info,
                            bool save_iterations,
                            int refresh,
-                           StartIterationCallback& callback) {
+                           StartIterationCallback& interrupt) {
         lp = bfgs.logp();
 
-        if (notice_stream)
-          *notice_stream << "initial log joint probability = "
-                         << lp << std::endl;
-        if (output_stream && save_iterations) {
-          stan::interface_callbacks::writer::stream_writer writer(*output_stream);
-          io::write_iteration(writer, model, base_rng,
+        std::stringstream msg;
+        msg << "initial log joint probability = " << lp;
+        info(msg.str());
+        
+        if (save_iterations) {
+          io::write_iteration(output, model, base_rng,
                               lp, cont_vector, disc_vector);
         }
 
         int ret = 0;
 
         while (ret == 0) {
-          callback();
-          if (notice_stream && io::do_print(bfgs.iter_num(), 50*refresh)) {
-            (*notice_stream) << "    Iter ";
-            (*notice_stream) << "     log prob ";
-            (*notice_stream) << "       ||dx|| ";
-            (*notice_stream) << "     ||grad|| ";
-            (*notice_stream) << "      alpha ";
-            (*notice_stream) << "     alpha0 ";
-            (*notice_stream) << " # evals ";
-            (*notice_stream) << " Notes " << std::endl;
+          interrupt();
+          if (io::do_print(bfgs.iter_num(), 50*refresh)) {
+            msg.str("");
+            msg << "    Iter "
+                << "     log prob "
+                << "       ||dx|| "
+                << "     ||grad|| "
+                << "      alpha "
+                << "     alpha0 "
+                << " # evals "
+                << " Notes ";
+            info(msg.str());
           }
 
           ret = bfgs.step();
           lp = bfgs.logp();
           bfgs.params_r(cont_vector);
 
-          if (notice_stream
-              && (io::do_print(bfgs.iter_num(),
-                               ret != 0 || !bfgs.note().empty(),
-                               refresh))) {
-            (*notice_stream) << " " << std::setw(7) << bfgs.iter_num() << " ";
-            (*notice_stream) << " " << std::setw(12) << std::setprecision(6)
+          if (io::do_print(bfgs.iter_num(),
+                           ret != 0 || !bfgs.note().empty(), refresh)) {
+            msg.str("");
+            msg << " " << std::setw(7) << bfgs.iter_num() << " ";
+            msg  << " " << std::setw(12) << std::setprecision(6)
                              << lp << " ";
-            (*notice_stream) << " " << std::setw(12) << std::setprecision(6)
+            msg << " " << std::setw(12) << std::setprecision(6)
                              << bfgs.prev_step_size() << " ";
-            (*notice_stream) << " " << std::setw(12) << std::setprecision(6)
+            msg << " " << std::setw(12) << std::setprecision(6)
                              << bfgs.curr_g().norm() << " ";
-            (*notice_stream) << " " << std::setw(10) << std::setprecision(4)
+            msg << " " << std::setw(10) << std::setprecision(4)
                              << bfgs.alpha() << " ";
-            (*notice_stream) << " " << std::setw(10) << std::setprecision(4)
+            msg << " " << std::setw(10) << std::setprecision(4)
                              << bfgs.alpha0() << " ";
-            (*notice_stream) << " " << std::setw(7)
+            msg << " " << std::setw(7)
                              << bfgs.grad_evals() << " ";
-            (*notice_stream) << " " << bfgs.note() << " ";
-            (*notice_stream) << std::endl;
+            msg << " " << bfgs.note() << " ";
+            info(msg.str());
           }
 
-          if (output_stream && save_iterations) {
-            stan::interface_callbacks::writer::stream_writer writer(*output_stream);
-            io::write_iteration(writer, model, base_rng,
+          if (save_iterations) {
+            io::write_iteration(output, model, base_rng,
                                 lp, cont_vector, disc_vector);
           }
         }
 
         int return_code;
         if (ret >= 0) {
-          if (notice_stream)
-            *notice_stream << "Optimization terminated normally: " << std::endl;
+          info("Optimization terminated normally: ");
           return_code = stan::services::error_codes::OK;
         } else {
-          if (notice_stream)
-            *notice_stream << "Optimization terminated with error: "
-                           << std::endl;
+          info("Optimization terminated with error: ");
           return_code = stan::services::error_codes::SOFTWARE;
         }
-        if (notice_stream)
-          (*notice_stream) << "  " << bfgs.get_code_string(ret) << std::endl;
+        info("  " + bfgs.get_code_string(ret));
 
         return return_code;
       }
