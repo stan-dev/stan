@@ -654,9 +654,9 @@ namespace stan {
     struct cholesky_corr_var_decl : public base_var_decl {
       expression K_;
       cholesky_corr_var_decl();
-      cholesky_corr_var_decl(const expression& K,
-                             const std::string& name,
-                             const std::vector<expression>& dims);
+      cholesky_corr_var_decl(expression const& K,
+                             std::string const& name,
+                             std::vector<expression> const& dims);
     };
 
     struct cov_matrix_var_decl : public base_var_decl {
