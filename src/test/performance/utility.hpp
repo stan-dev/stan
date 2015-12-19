@@ -434,7 +434,7 @@ namespace stan {
         sampler_ptr->set_stepsize_jitter(0.0);
         sampler_ptr->set_max_depth(10);
 
-        stan::services::sample::init_adapt(*sampler_ptr, 0.8, 0.05, 0.75, 10,
+        stan::services::sample::init_adapt(sampler_ptr, 0.8, 0.05, 0.75, 10,
                                            cont_params,
                                            info_writer);
         sampler_ptr->set_window_params(num_warmup, 75, 50, 25, info_writer);
