@@ -10,17 +10,21 @@ namespace stan {
     namespace io {
 
       template <class Model, class RNG>
-      void write_iteration(interface_callbacks::writer::base_writer& writer,
-                           Model& model,
+      void write_iteration(Model& model,
                            RNG& base_rng,
                            double lp,
                            std::vector<double>& cont_vector,
-                           std::vector<int>& disc_vector) {
+                           std::vector<int>& disc_vector,
+                   interface_callbacks::writer::base_writer& message_writer,
+                   interface_callbacks::writer::base_writer& parameter_writer) {
         std::vector<double> values;
+        std::stringstream ss;
         model.write_array(base_rng, cont_vector, disc_vector, values,
-                          true, true);
+                          true, true, &ss);
+        if (ss.str().length() > 0)
+          message_writer(ss.str());
         values.insert(values.begin(), lp);
-        writer(values);
+        parameter_writer(values);
       }
 
     }

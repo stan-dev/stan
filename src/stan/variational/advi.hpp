@@ -505,8 +505,10 @@ namespace stan {
           cont_vector.at(i) = cont_params_(i);
         std::vector<int> disc_vector;
 
-        services::io::write_iteration(parameter_writer, model_, rng_,
-                                      0, cont_vector, disc_vector);
+        services::io::write_iteration(model_, rng_,
+                                      0, cont_vector, disc_vector,
+                                      message_writer,
+                                      parameter_writer);
         // Draw more samples from posterior and write on subsequent lines
         message_writer();
         std::stringstream ss;
@@ -520,8 +522,10 @@ namespace stan {
           for (int i = 0; i < cont_params_.size(); ++i) {
             cont_vector.at(i) = cont_params_(i);
           }
-          services::io::write_iteration(parameter_writer, model_, rng_,
-                                        0, cont_vector, disc_vector);
+          services::io::write_iteration(model_, rng_,
+                                        0, cont_vector, disc_vector,
+                                        message_writer,
+                                        parameter_writer);
         }
         message_writer("COMPLETED.");
 

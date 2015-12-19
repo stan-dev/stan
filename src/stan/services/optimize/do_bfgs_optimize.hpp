@@ -35,8 +35,9 @@ namespace stan {
         info(msg.str());
 
         if (save_iterations) {
-          io::write_iteration(output, model, base_rng,
-                              lp, cont_vector, disc_vector);
+          io::write_iteration(model, base_rng,
+                              lp, cont_vector, disc_vector,
+                              info, output);
         }
 
         int ret = 0;
@@ -79,8 +80,9 @@ namespace stan {
           }
 
           if (save_iterations) {
-            io::write_iteration(output, model, base_rng,
-                                lp, cont_vector, disc_vector);
+            io::write_iteration(model, base_rng,
+                                lp, cont_vector, disc_vector,
+                                info, output);
           }
         }
 

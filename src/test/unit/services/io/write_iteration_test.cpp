@@ -40,11 +40,14 @@ TEST_F(StanUi, write_iteration) {
   cont_vector.push_back(0);
   cont_vector.push_back(0);
 
-  std::stringstream writer_ss;
-  stan::interface_callbacks::writer::stream_writer writer(writer_ss);
-  stan::services::io::write_iteration(writer, model, base_rng,
-                                      lp, cont_vector, disc_vector);
-  EXPECT_EQ("1,0,0,1,1,2713\n", writer_ss.str())
+  std::stringstream msg_ss, param_ss;
+  stan::interface_callbacks::writer::stream_writer msg_writer(msg_ss);
+  stan::interface_callbacks::writer::stream_writer param_writer(param_ss);
+  stan::services::io::write_iteration(model, base_rng,
+                                      lp, cont_vector, disc_vector,
+                                      msg_writer, param_writer);
+  EXPECT_EQ("", msg_ss.str());
+  EXPECT_EQ("1,0,0,1,1,2713\n", param_ss.str())
     << "the output should be (1,  0,       0,    exp(0),    exp(0), 2713) \n"
     << "                     (lp, y[1], y[2], exp(y[1]), exp(y[2]),  xgq)";
 
