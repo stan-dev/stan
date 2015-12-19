@@ -224,9 +224,10 @@ namespace stan {
             print_progress_m = eta_sequence_index
               * adapt_iterations + iter_tune;
             services::variational
-              ::print_progress(print_progress_m, 0, adapt_iterations*eta_sequence_size,
+              ::print_progress(print_progress_m, 0,
+                               adapt_iterations * eta_sequence_size,
                                adapt_iterations, true, "", "", message_writer);
-            
+
             // (ROBUST) Compute gradient of ELBO. It's OK if it diverges.
             // We'll try a smaller eta.
             try {
@@ -243,7 +244,6 @@ namespace stan {
                 + post_factor * elbo_grad.square();
             }
             eta_scaled = eta / sqrt(static_cast<double>(iter_tune));
-            
             // Stochastic gradient update
             variational += eta_scaled * elbo_grad
               / (tau + history_grad_squared.sqrt());
@@ -352,9 +352,9 @@ namespace stan {
         double delta_elbo_med = std::numeric_limits<double>::max();
 
         // Heuristic to estimate how far to look back in rolling window
-        int cb_size = static_cast<int>(
-                                       std::max(0.1*max_iterations/static_cast<double>(eval_elbo_),
-                                                2.0));
+        int cb_size
+          = static_cast<int>(std::max(0.1 * max_iterations / eval_elbo_,
+                                      2.0));
         boost::circular_buffer<double> elbo_diff(cb_size);
 
         message_writer("Begin stochastic gradient ascent.");
@@ -416,14 +416,14 @@ namespace stan {
 
             end = clock();
             delta_t = static_cast<double>(end - start) / CLOCKS_PER_SEC;
-            
+
             std::vector<double> print_vector;
             print_vector.clear();
             print_vector.push_back(iter_counter);
             print_vector.push_back(delta_t);
             print_vector.push_back(elbo);
             diagnostic_writer(print_vector);
-            
+
             if (delta_elbo_ave < tol_rel_obj) {
               message_writer("   MEAN ELBO CONVERGED");
               do_more_iterations = false;
@@ -514,7 +514,7 @@ namespace stan {
            << n_posterior_samples_
            << " samples from the approximate posterior... ";
         message_writer(ss.str());
-        
+
         for (int n = 0; n < n_posterior_samples_; ++n) {
           variational.sample(rng_, cont_params_);
           for (int i = 0; i < cont_params_.size(); ++i) {
@@ -523,9 +523,8 @@ namespace stan {
           services::io::write_iteration(parameter_writer, model_, rng_,
                                         0, cont_vector, disc_vector);
         }
-
         message_writer("COMPLETED.");
-        
+
         return stan::services::error_codes::OK;
       }
 

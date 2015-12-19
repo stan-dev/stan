@@ -33,7 +33,7 @@ namespace stan {
         std::stringstream msg;
         msg << "initial log joint probability = " << lp;
         info(msg.str());
-        
+
         if (save_iterations) {
           io::write_iteration(output, model, base_rng,
                               lp, cont_vector, disc_vector);

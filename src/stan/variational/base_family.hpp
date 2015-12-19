@@ -37,7 +37,8 @@ namespace stan {
                      Eigen::VectorXd& cont_params,
                      int n_monte_carlo_grad,
                      BaseRNG& rng,
-                     interface_callbacks::writer::base_writer& message_writer) const;
+                     interface_callbacks::writer::base_writer& message_writer)
+        const;
 
     protected:
       void write_error_msg_(std::ostream* error_msgs,

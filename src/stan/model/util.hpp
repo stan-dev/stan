@@ -310,7 +310,7 @@ namespace stan {
       writer();
       writer(msg.str());
       writer();
-      
+
       msg.str("");
       msg << std::setw(10) << "param idx"
           << std::setw(16) << "value"

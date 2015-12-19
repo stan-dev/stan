@@ -63,7 +63,7 @@ namespace stan {
           msg.str("");
           msg << "           term_buffer = " << adapt_term_buffer_;
           writer(msg.str());
-          
+
           writer();
           return;
         }
