@@ -40,7 +40,8 @@ void reject_test(const std::string& expected_msg1 = "",
     std::vector<int> disc_vector;
     double lp = model.template log_prob<false,false>(cont_vector, disc_vector, &out);
     stan::interface_callbacks::writer::stream_writer writer(out);
-    write_iteration(writer, model, base_rng, lp, cont_vector, disc_vector);
+    write_iteration(model, base_rng, lp, cont_vector, disc_vector,
+                    writer, writer);
   } catch (const E& e) {
     expect_substring(e.what(), expected_msg1);
     expect_substring(e.what(), expected_msg2);
