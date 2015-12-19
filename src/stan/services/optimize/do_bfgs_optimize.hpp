@@ -44,16 +44,14 @@ namespace stan {
         while (ret == 0) {
           interrupt();
           if (io::do_print(bfgs.iter_num(), 50*refresh)) {
-            msg.str("");
-            msg << "    Iter "
-                << "     log prob "
-                << "       ||dx|| "
-                << "     ||grad|| "
-                << "      alpha "
-                << "     alpha0 "
-                << " # evals "
-                << " Notes ";
-            info(msg.str());
+            info("    Iter "
+                 "     log prob "
+                 "       ||dx|| "
+                 "     ||grad|| "
+                 "      alpha "
+                 "     alpha0 "
+                 " # evals "
+                 " Notes ");
           }
 
           ret = bfgs.step();
@@ -64,18 +62,18 @@ namespace stan {
                            ret != 0 || !bfgs.note().empty(), refresh)) {
             msg.str("");
             msg << " " << std::setw(7) << bfgs.iter_num() << " ";
-            msg  << " " << std::setw(12) << std::setprecision(6)
-                             << lp << " ";
             msg << " " << std::setw(12) << std::setprecision(6)
-                             << bfgs.prev_step_size() << " ";
+                << lp << " ";
             msg << " " << std::setw(12) << std::setprecision(6)
-                             << bfgs.curr_g().norm() << " ";
+                << bfgs.prev_step_size() << " ";
+            msg << " " << std::setw(12) << std::setprecision(6)
+                << bfgs.curr_g().norm() << " ";
             msg << " " << std::setw(10) << std::setprecision(4)
-                             << bfgs.alpha() << " ";
+                << bfgs.alpha() << " ";
             msg << " " << std::setw(10) << std::setprecision(4)
-                             << bfgs.alpha0() << " ";
+                << bfgs.alpha0() << " ";
             msg << " " << std::setw(7)
-                             << bfgs.grad_evals() << " ";
+                << bfgs.grad_evals() << " ";
             msg << " " << bfgs.note() << " ";
             info(msg.str());
           }

@@ -33,22 +33,16 @@ namespace stan {
                              unsigned int base_window,
                              interface_callbacks::writer::base_writer& writer) {
         if (num_warmup < 20) {
-          std::stringstream message;
-          message << "WARNING: No " << estimator_name_
-                  << " estimation is" << std::endl
-                  << "         performed for num_warmup < 20"
-                  << std::endl << std::endl;
-          writer(message.str());
+          writer("WARNING: No " + estimator_name_ + " estimation is");
+          writer("         performed for num_warmup < 20");
+          writer();
           return;
         }
 
         if (init_buffer + base_window + term_buffer > num_warmup) {
-          std::stringstream message;
-          message << "WARNING: The initial buffer, adaptation window, "
-                  << "and terminal buffer" << std::endl
-                  << "         overflow the total number of warmup iterations."
-                  << std::endl;
-          writer(message.str());
+          writer("WARNING: The initial buffer, adaptation window, "
+                 "and terminal buffer");
+          writer("         overflow the total number of warmup iterations.");
 
           num_warmup_ = num_warmup;
           adapt_init_buffer_ = 0.15 * num_warmup;
@@ -56,16 +50,21 @@ namespace stan {
           adapt_base_window_
             = num_warmup - (adapt_init_buffer_ + adapt_term_buffer_);
 
-          message.str("");
-          message << "         Defaulting to a 15%/75%/10% partition,"
-                  << std::endl
-                  << "           init_buffer = " << adapt_init_buffer_
-                  << std::endl
-                  << "           adapt_window = " << adapt_base_window_
-                  << std::endl
-                  << "           term_buffer = " << adapt_term_buffer_
-                  << std::endl << std::endl;
-          writer(message.str());
+          writer("         Defaulting to a 15%/75%/10% partition,");
+
+          std::stringstream msg;
+          msg << "           init_buffer = " << adapt_init_buffer_;
+          writer(msg.str());
+
+          msg.str("");
+          msg << "           adapt_window = " << adapt_base_window_;
+          writer(msg.str());
+
+          msg.str("");
+          msg << "           term_buffer = " << adapt_term_buffer_;
+          writer(msg.str());
+          
+          writer();
           return;
         }
 
@@ -121,7 +120,5 @@ namespace stan {
     };
 
   }  // mcmc
-
 }  // stan
-
 #endif
