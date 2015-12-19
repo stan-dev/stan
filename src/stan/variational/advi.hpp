@@ -165,6 +165,7 @@ namespace stan {
        * @param[in] variational initial variational distribution.
        * @param adapt_iterations number of iterations to spend doing stochastic
        * gradient ascent at each proposed eta value.
+       * @param message_writer writer for messages
        * @return adapted (tuned) value of eta via heuristic grid search
        * @throw std::domain_error If either (a) the initial ELBO cannot be
        * computed at the initial variational distribution, (b) all step-size
@@ -312,6 +313,7 @@ namespace stan {
        * @param tol_rel_obj relative tolerance parameter for convergence
        * @param max_iterations max number of iterations to run algorithm
        * @param message_writer writer for mesasges
+       * @param diagnostic_writer writer for diagnostic information
        * @throw std::domain_error If the ELBO or its gradient is ever
        * non-finite, at any iteration
        */
@@ -472,7 +474,7 @@ namespace stan {
        * @param  tol_rel_obj      relative tolerance parameter for convergence
        * @param  max_iterations   max number of iterations to run algorithm
        * @param  message_writer   writer for messages
-       * @param  message_writer   writer for parameters (typically to file)
+       * @param  parameter_writer   writer for parameters (typically to file)
        * @param  diagnostic_writer writer for diagnostic information
        */
       int run(double eta, bool adapt_engaged, int adapt_iterations,
