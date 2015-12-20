@@ -54,7 +54,7 @@
 class performance : public ::testing::Test {
 public:
   static void SetUpTestCase() {
-    N = 100;
+    N = 2;
     seconds_per_run.resize(N);
     last_draws_per_run.resize(N);
     matches_tagged_version = false;

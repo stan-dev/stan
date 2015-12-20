@@ -9,9 +9,8 @@ namespace stan {
     namespace io {
 
       void write_model(interface_callbacks::writer::base_writer& writer,
-                       const std::string model_name,
-                       const std::string prefix = "") {
-        writer(prefix + " model = " + model_name);
+                       const std::string model_name) {
+        writer("model = " + model_name);
       }
 
     }

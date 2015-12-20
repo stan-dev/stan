@@ -369,8 +369,8 @@ namespace stan {
         interface_callbacks::writer::stream_writer err_writer(std::cerr);
 
         if (output_stream) {
-          services::io::write_stan(info_writer);
-          services::io::write_model(info_writer, model.model_name());
+          services::io::write_stan(sample_writer);
+          services::io::write_model(sample_writer, model.model_name());
           //parser.print(output_stream, "#");
         }
 

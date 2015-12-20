@@ -9,11 +9,10 @@ namespace stan {
   namespace services {
     namespace io {
 
-      void write_stan(interface_callbacks::writer::base_writer& writer,
-                      const std::string prefix = "") {
-        writer(prefix + " stan_version_major = " + stan::MAJOR_VERSION);
-        writer(prefix + " stan_version_minor = " + stan::MINOR_VERSION);
-        writer(prefix + " stan_version_patch = " + stan::PATCH_VERSION);
+      void write_stan(interface_callbacks::writer::base_writer& writer) {
+        writer("stan_version_major = " + stan::MAJOR_VERSION);
+        writer("stan_version_minor = " + stan::MINOR_VERSION);
+        writer("stan_version_patch = " + stan::PATCH_VERSION);
       }
 
     }
