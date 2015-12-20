@@ -414,7 +414,6 @@ namespace stan {
                << "  "
                << std::setw(15) << std::fixed << std::setprecision(3)
                << delta_elbo_med;
-            message_writer(ss.str());
 
             end = clock();
             delta_t = static_cast<double>(end - start) / CLOCKS_PER_SEC;
@@ -427,22 +426,22 @@ namespace stan {
             diagnostic_writer(print_vector);
 
             if (delta_elbo_ave < tol_rel_obj) {
-              message_writer("   MEAN ELBO CONVERGED");
+              ss << "   MEAN ELBO CONVERGED";
               do_more_iterations = false;
             }
 
             if (delta_elbo_med < tol_rel_obj) {
-              message_writer("   MEDIAN ELBO CONVERGED");
+              ss << "   MEDIAN ELBO CONVERGED";
               do_more_iterations = false;
             }
 
             if (iter_counter > 10 * eval_elbo_) {
               if (delta_elbo_med > 0.5 || delta_elbo_ave > 0.5) {
-                message_writer("   MAY BE DIVERGING... INSPECT ELBO");
+                ss << "   MAY BE DIVERGING... INSPECT ELBO";
               }
             }
 
-            message_writer();
+            message_writer(ss.str());
 
             if (do_more_iterations == false &&
                 rel_difference(elbo, elbo_best) > 0.05) {
@@ -490,10 +489,10 @@ namespace stan {
 
         if (adapt_engaged) {
           eta = adapt_eta(variational, adapt_iterations, message_writer);
-          message_writer("# Stepsize adaptation complete.");
+          parameter_writer("Stepsize adaptation complete.");
           std::stringstream ss;
-          ss << "# eta = " << eta;
-          message_writer(ss.str());
+          ss << "eta = " << eta;
+          parameter_writer(ss.str());
         }
 
         stochastic_gradient_ascent(variational, eta,
@@ -517,7 +516,6 @@ namespace stan {
         ss << "Drawing "
            << n_posterior_samples_
            << " samples from the approximate posterior... ";
-        message_writer(ss.str());
 
         for (int n = 0; n < n_posterior_samples_; ++n) {
           variational.sample(rng_, cont_params_);
@@ -529,7 +527,8 @@ namespace stan {
                                         message_writer,
                                         parameter_writer);
         }
-        message_writer("COMPLETED.");
+        ss << "COMPLETED.";
+        message_writer(ss.str());
 
         return stan::services::error_codes::OK;
       }
