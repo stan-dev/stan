@@ -14,7 +14,8 @@ namespace stan {
     // and static integration time
     template <class Model, class BaseRNG>
     class diag_e_static_hmc
-      : public base_static_hmc<Model, diag_e_metric, expl_leapfrog, BaseRNG> {
+      : public base_static_hmc<Model, diag_e_metric,
+                               expl_leapfrog, BaseRNG> {
     public:
       diag_e_static_hmc(Model &model, BaseRNG& rng)
         : base_static_hmc<Model, diag_e_metric,

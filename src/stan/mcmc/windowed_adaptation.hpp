@@ -3,7 +3,7 @@
 
 #include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/base_adaptation.hpp>
-#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <ostream>
 #include <string>
 
 namespace stan {

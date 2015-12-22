@@ -3,7 +3,6 @@
 
 #include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/services/arguments/argument.hpp>
-
 #include <sstream>
 #include <string>
 #include <vector>

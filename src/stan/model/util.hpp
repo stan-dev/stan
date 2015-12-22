@@ -23,7 +23,6 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <string>
 
 namespace stan {
 
@@ -266,7 +265,6 @@ namespace stan {
      * Jacobian determinant of inverse parameter transforms is added to the
      * log probability.
      * @tparam M Class of model.
-     * @tparam Writer Class of writer callback
      * @param model Model.
      * @param params_r Real-valued parameter vector.
      * @param params_i Integer-valued parameter vector.
@@ -276,8 +274,7 @@ namespace stan {
      * @return number of failed gradient comparisons versus allowed
      * error, so 0 if all gradients pass
      */
-    template <bool propto, bool jacobian_adjust_transform,
-              class M, class Writer>
+    template <bool propto, bool jacobian_adjust_transform, class M>
     int test_gradients(const M& model,
                        std::vector<double>& params_r,
                        std::vector<int>& params_i,

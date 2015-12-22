@@ -5,8 +5,6 @@
 #include <stan/mcmc/hmc/integrators/base_integrator.hpp>
 #include <iostream>
 #include <iomanip>
-#include <sstream>
-#include <string>
 
 namespace stan {
   namespace mcmc {

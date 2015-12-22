@@ -11,7 +11,6 @@
 #include <iomanip>
 #include <string>
 #include <vector>
-#include <string>
 
 namespace stan {
   namespace services {
@@ -100,7 +99,7 @@ namespace stan {
         return return_code;
       }
 
-    }  // optimize
-  }  // services
-}  // stan
+    }
+  }
+}
 #endif

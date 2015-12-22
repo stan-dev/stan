@@ -176,6 +176,7 @@ namespace stan {
         return initialize_state_values(cont_params, model, writer);
       }
 
+
       /**
        * Initializes state to random uniform values within range.
        *
