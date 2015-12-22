@@ -270,10 +270,9 @@ namespace stan {
      * @param model Model.
      * @param params_r Real-valued parameter vector.
      * @param params_i Integer-valued parameter vector.
-     * @param writer Writer callback for output.
-     * @param epsilon Real-valued scalar saying how much to perturb. Defaults to 1e-6.
-     * @param error Real-valued scalar saying how much error to allow. Defaults to 1e-6.
-     * @param msgs Stream to which Stan programs write. Defaults to 0.
+     * @param epsilon Real-valued scalar saying how much to perturb. Reasonable value is 1e-6.
+     * @param error Real-valued scalar saying how much error to allow. Reasonable value is 1e-6.
+     * @param writer Writer for messages
      * @return number of failed gradient comparisons versus allowed
      * error, so 0 if all gradients pass
      */
@@ -282,17 +281,19 @@ namespace stan {
     int test_gradients(const M& model,
                        std::vector<double>& params_r,
                        std::vector<int>& params_i,
-                       Writer& writer,
-                       double epsilon = 1e-6,
-                       double error = 1e-6,
-                       std::ostream* msgs = 0) {
+                       double epsilon,
+                       double error,
+                       stan::interface_callbacks::writer::base_writer& writer) {
+      std::stringstream msg;
       std::vector<double> grad;
       double lp
         = log_prob_grad<propto, jacobian_adjust_transform>(model,
                                                            params_r,
                                                            params_i,
                                                            grad,
-                                                           msgs);
+                                                           &msg);
+      if (msg.str().length() > 0)
+        writer(msg.str());
 
       std::vector<double> grad_fd;
       finite_diff_grad<false,
@@ -300,39 +301,36 @@ namespace stan {
                        M>(model,
                           params_r, params_i,
                           grad_fd, epsilon,
-                          msgs);
+                          &msg);
+      if (msg.str().length() > 0)
+        writer(msg.str());
 
       int num_failed = 0;
 
-      std::stringstream msg;
-      msg << " Log probability = " << lp;
+      msg.str("");
+      msg << " Log probability=" << lp;
 
       writer();
       writer(msg.str());
       writer();
 
-      msg.str(std::string());
-      msg.clear();
+      msg.str("");
       msg << std::setw(10) << "param idx"
           << std::setw(16) << "value"
           << std::setw(16) << "model"
           << std::setw(16) << "finite diff"
           << std::setw(16) << "error";
 
-      writer();
       writer(msg.str());
-      writer();
 
       for (size_t k = 0; k < params_r.size(); k++) {
-        msg.str(std::string());
-        msg.clear();
+        msg.str("");
         msg << std::setw(10) << k
             << std::setw(16) << params_r[k]
             << std::setw(16) << grad[k]
             << std::setw(16) << grad_fd[k]
             << std::setw(16) << (grad[k] - grad_fd[k]);
         writer(msg.str());
-
         if (std::fabs(grad[k] - grad_fd[k]) > error)
           num_failed++;
       }

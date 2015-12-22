@@ -1,6 +1,7 @@
 #ifndef STAN_SERVICES_VARIATIONAL_PRINT_PROGRESS_HPP
 #define STAN_SERVICES_VARIATIONAL_PRINT_PROGRESS_HPP
 
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/math/prim/scal/err/check_positive.hpp>
 #include <stan/math/prim/scal/err/check_nonnegative.hpp>
 #include <stan/services/io/do_print.hpp>
@@ -23,7 +24,7 @@ namespace stan {
        * @param tune    boolean indicates tuning vs. variational inference
        * @param prefix  prefix string
        * @param suffix  suffix string
-       * @param o       output stream
+       * @param writer  writer
        */
       void print_progress(int m,
                           int start,
@@ -32,7 +33,7 @@ namespace stan {
                           bool tune,
                           const std::string& prefix,
                           const std::string& suffix,
-                          std::ostream& o) {
+                          interface_callbacks::writer::base_writer& writer) {
         static const char* function =
           "stan::services::variational::print_progress";
 
@@ -51,21 +52,21 @@ namespace stan {
 
         int it_print_width = std::ceil(std::log10(static_cast<double>(finish)));
         if (io::do_print(m - 1, (start + m == finish), refresh)) {
-          o << prefix;
-          o << "Iteration: ";
-          o << std::setw(it_print_width) << m + start
-            << " / " << finish;
-          o << " [" << std::setw(3)
-            << (100 * (start + m)) / finish
-            << "%] ";
-          o << (tune ? " (Adaptation)" : " (Variational Inference)");
-          o << suffix;
-          o << std::endl;
+          std::stringstream ss;
+          ss << prefix;
+          ss << "Iteration: ";
+          ss << std::setw(it_print_width) << m + start
+             << " / " << finish;
+          ss << " [" << std::setw(3)
+             << (100 * (start + m)) / finish
+             << "%] ";
+          ss << (tune ? " (Adaptation)" : " (Variational Inference)");
+          ss << suffix;
+          writer(ss.str());
         }
       }
 
     }
   }
 }
-
 #endif

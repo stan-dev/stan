@@ -4,7 +4,7 @@
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/mcmc/sample.hpp>
 #include <stan/model/prob_grad.hpp>
-#include <ostream>
+#include <sstream>
 #include <iomanip>
 #include <string>
 #include <vector>
@@ -16,11 +16,11 @@ namespace stan {
       /**
        * mcmc_writer writes out headers and samples
        *
-       * @tparam M Model class
+       * @tparam Model Model class
        * @tparam SampleWriter Class for recording samples
        * @tparam DiagnosticWriter Class for diagnostic samples
        */
-      template <class M,
+      template <class Model,
                 class SampleWriter, class DiagnosticWriter,
                 class MessageWriter>
       class mcmc_writer {
@@ -29,8 +29,6 @@ namespace stan {
         DiagnosticWriter& diagnostic_writer_;
         MessageWriter& message_writer_;
 
-        std::ostream* msg_stream_;
-
       public:
         /**
          * Constructor.
@@ -38,7 +36,6 @@ namespace stan {
          * @param sample_writer samples are "written" to this stream (can abstract this?)
          * @param diagnostic_writer diagnostic information is "written" to this stream
          * @param message_writer messages are written to this stream
-         * @param msg_stream messages are output to this stream
          *
          * @pre arguments == 0 if and only if they are not meant to be used
          * @post none
@@ -46,12 +43,10 @@ namespace stan {
          */
         mcmc_writer(SampleWriter& sample_writer,
                     DiagnosticWriter& diagnostic_writer,
-                    MessageWriter& message_writer,
-                    std::ostream* msg_stream = 0)
+                    MessageWriter& message_writer)
           : sample_writer_(sample_writer),
             diagnostic_writer_(diagnostic_writer),
-            message_writer_(message_writer),
-            msg_stream_(msg_stream) {
+            message_writer_(message_writer) {
         }
 
         /**
@@ -74,7 +69,7 @@ namespace stan {
          */
         void write_sample_names(stan::mcmc::sample& sample,
                                 stan::mcmc::base_mcmc* sampler,
-                                M& model) {
+                                Model& model) {
           std::vector<std::string> names;
 
           sample.get_sample_param_names(names);
@@ -103,7 +98,7 @@ namespace stan {
         void write_sample_params(RNG& rng,
                                  stan::mcmc::sample& sample,
                                  stan::mcmc::base_mcmc& sampler,
-                                 M& model) {
+                                 Model& model) {
           std::vector<double> values;
 
           sample.get_sample_params(values);
@@ -111,11 +106,14 @@ namespace stan {
 
           Eigen::VectorXd model_values;
 
+          std::stringstream ss;
           model.write_array(rng,
                             const_cast<Eigen::VectorXd&>(sample.cont_params()),
                             model_values,
                             true, true,
-                            msg_stream_);
+                            &ss);
+          if (ss.str().length() > 0)
+            message_writer_(ss.str());
 
           for (int i = 0; i < model_values.size(); ++i)
             values.push_back(model_values(i));
@@ -150,7 +148,7 @@ namespace stan {
          */
         void write_diagnostic_names(stan::mcmc::sample sample,
                                     stan::mcmc::base_mcmc* sampler,
-                                    M& model) {
+                                    Model& model) {
           std::vector<std::string> names;
 
           sample.get_sample_param_names(names);

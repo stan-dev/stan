@@ -2,6 +2,7 @@
 #define STAN_SERVICES_SAMPLE_INIT_ADAPT_HPP
 
 #include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/mcmc/base_mcmc.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/services/arguments/categorical_argument.hpp>
 #include <stan/services/arguments/singleton_argument.hpp>
@@ -26,7 +27,6 @@ namespace stan {
                       const double kappa,
                       const double t0,
                       const Eigen::VectorXd& cont_params,
-                      std::ostream* o,
                       interface_callbacks::writer::base_writer& writer) {
         const double epsilon = sampler->get_nominal_stepsize();
 
@@ -42,7 +42,7 @@ namespace stan {
           sampler->z().q = cont_params;
           sampler->init_stepsize(writer);
         } catch (const std::exception& e) {
-          writer("Error initializing step size.");
+          writer("Exception initializing step size.");
           writer(e.what());
           return false;
         }
@@ -61,7 +61,6 @@ namespace stan {
       bool init_adapt(Sampler& sampler,
                       stan::services::categorical_argument* adapt,
                       const Eigen::VectorXd& cont_params,
-                      std::ostream* o,
                       interface_callbacks::writer::base_writer& writer) {
         double delta
           = dynamic_cast<real_argument*>(adapt->arg("delta"))->value();
@@ -72,9 +71,8 @@ namespace stan {
         double t0
           = dynamic_cast<real_argument*>(adapt->arg("t0"))->value();
 
-        Sampler* s = dynamic_cast<Sampler*>(sampler);
-
-        return init_adapt<Sampler>(s, delta, gamma, kappa, t0, cont_params, o,
+        return init_adapt<Sampler>(dynamic_cast<Sampler*>(sampler),
+                                   delta, gamma, kappa, t0, cont_params,
                                    writer);
       }
 

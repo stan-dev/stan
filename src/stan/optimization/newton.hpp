@@ -8,7 +8,6 @@
 #include <vector>
 
 namespace stan {
-
   namespace optimization {
 
     typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> matrix_d;
@@ -80,7 +79,5 @@ namespace stan {
     }
 
   }
-
 }
-
 #endif

@@ -11,6 +11,11 @@ typedef boost::ecuyer1988 rng_t;
 
 class advi_test : public ::testing::Test {
 public:
+  advi_test()
+    : message_writer(message_stream_),
+      parameter_writer(parameter_stream_),
+      diagnostic_writer(diagnostic_stream_) { }
+  
   void SetUp() {
     // Create mock data_var_context
     std::fstream data_stream("src/test/test-models/good/variational/hier_logistic.data.R",
@@ -25,58 +30,37 @@ public:
     cont_params_ = Eigen::VectorXd::Zero(model_->num_params_r());
 
     model_stream_.str("");
-    print_stream_.str("");
-    output_stream_.str("");
+    message_stream_.str("");
+    parameter_stream_.str("");
     diagnostic_stream_.str("");
 
     advi_ = new stan::variational::advi<stan_model, stan::variational::normal_meanfield, rng_t>
       (*model_, cont_params_, base_rng_,
        10, 100,
-       100, 1,
-       &print_stream_,
-       &output_stream_,
-       &diagnostic_stream_);
-    advi_null_streams_ = new stan::variational::advi<stan_model, stan::variational::normal_meanfield, rng_t>
-      (*model_null_stream_, cont_params_, base_rng_,
-       10, 100,
-       100, 1,
-       NULL,
-       NULL,
-       NULL);
+       100, 1);
     advi_fullrank_ = new stan::variational::advi<stan_model, stan::variational::normal_fullrank, rng_t>
       (*model_, cont_params_, base_rng_,
        10, 100,
-       100, 1,
-       &print_stream_,
-       &output_stream_,
-       &diagnostic_stream_);
-    advi_null_streams_fullrank_ = new stan::variational::advi<stan_model, stan::variational::normal_fullrank, rng_t>
-      (*model_null_stream_, cont_params_, base_rng_,
-       10, 100,
-       100, 1,
-       NULL,
-       NULL,
-       NULL);
+       100, 1);
   }
 
   void TearDown() {
     delete advi_;
     delete advi_fullrank_;
     delete model_;
-    delete advi_null_streams_;
-    delete advi_null_streams_fullrank_;
     delete model_null_stream_;
   }
 
   stan::variational::advi<stan_model, stan::variational::normal_meanfield, rng_t> *advi_;
-  stan::variational::advi<stan_model, stan::variational::normal_meanfield, rng_t> *advi_null_streams_;
   stan::variational::advi<stan_model, stan::variational::normal_fullrank, rng_t> *advi_fullrank_;
-  stan::variational::advi<stan_model, stan::variational::normal_fullrank, rng_t> *advi_null_streams_fullrank_;
   std::stringstream model_stream_;
-  std::stringstream print_stream_;
-  std::stringstream output_stream_;
+  std::stringstream message_stream_;
+  std::stringstream parameter_stream_;
   std::stringstream diagnostic_stream_;
-
+  stan::interface_callbacks::writer::stream_writer message_writer;
+  stan::interface_callbacks::writer::stream_writer parameter_writer;
+  stan::interface_callbacks::writer::stream_writer diagnostic_writer;
+  
 private:
   stan_model *model_;
   stan_model *model_null_stream_;
@@ -85,15 +69,9 @@ private:
 };
 
 TEST_F(advi_test, hier_logistic_constraint_meanfield) {
-  EXPECT_EQ(0, advi_->run(0.1, false, 50, 1, 2e4));
+  EXPECT_EQ(0, advi_->run(0.1, false, 50, 1, 2e4,
+                          message_writer, parameter_writer, diagnostic_writer));
   SUCCEED() << "expecting it to compile and run without problems";
-  EXPECT_NE("", output_stream_.str());
+  EXPECT_NE("", parameter_stream_.str());
   SUCCEED() << "expecting it to output values";
-}
-
-TEST_F(advi_test, hier_logistic_constraint_meanfield_no_streams) {
-  EXPECT_EQ(0, advi_null_streams_->run(0.1, false, 50, 1, 2e4));
-  SUCCEED() << "expecting it to compile and run without problems";
-  EXPECT_EQ("", output_stream_.str());
-  SUCCEED() << "expecting it to not output values";
 }

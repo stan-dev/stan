@@ -1,15 +1,15 @@
 #ifndef STAN_SERVICES_OPTIMIZE_DO_BFGS_OPTIMIZE_HPP
 #define STAN_SERVICES_OPTIMIZE_DO_BFGS_OPTIMIZE_HPP
 
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/optimization/bfgs.hpp>
-
 #include <stan/services/error_codes.hpp>
-#include <stan/services/io/write_iteration.hpp>
 #include <stan/services/io/do_print.hpp>
-
+#include <stan/services/io/write_iteration.hpp>
 #include <fstream>
 #include <iostream>
 #include <iomanip>
+#include <string>
 #include <vector>
 #include <string>
 
@@ -17,41 +17,18 @@ namespace stan {
   namespace services {
     namespace optimize {
 
-      /**
-       * @tparam ModelT Model implementation
-       * @tparam BFGSOptimizerT BFGS implementation
-       * @tparam RNGT Random number generator implementation
-       * @tparam OutputWriter An implementation of
-       *                    src/stan/interface_callbacks/writer/base_writer.hpp
-       * @tparam InfoWriter An implementation of
-       *                    src/stan/interface_callbacks/writer/base_writer.hpp
-       * @tparam Interrupt Interrupt callback implementation
-       * @param model Model
-       * @param bfgs BFGS functor
-       * @param base_rng Random number generator
-       * @param lp Log posterior density
-       * @param cont_vector Continuous state values
-       * @param disc_vector Discrete state values
-       * @param output_stream Writer callback for storing optimization history
-       * @param info Writer callback for display informative messages
-       * @param save_iterations Flag to save entire optimization history
-       * @param refresh Progress update rate
-       * @param interrupt Interrupt callback called at the beginning
-                                    of each iteration
-       */
-      template<typename ModelT, typename BFGSOptimizerT, typename RNGT,
+      template<typename Model, typename BFGSOptimizer, typename RNGT,
                typename StartIterationCallback>
-      int do_bfgs_optimize(ModelT &model,
-                           BFGSOptimizerT &bfgs,
+      int do_bfgs_optimize(Model &model, BFGSOptimizer &bfgs,
                            RNGT &base_rng,
                            double &lp,
                            std::vector<double> &cont_vector,
                            std::vector<int> &disc_vector,
-                           interface_callbacks::writer::base_writer& output_stream,
+                           interface_callbacks::writer::base_writer& output,
                            interface_callbacks::writer::base_writer& info,
                            bool save_iterations,
                            int refresh,
-                           StartIterationCallback& callback) {
+                           StartIterationCallback& interrupt) {
         lp = bfgs.logp();
 
         std::stringstream msg;
@@ -59,21 +36,24 @@ namespace stan {
         info(msg.str());
 
         if (save_iterations) {
-          io::write_iteration(output_stream, model, base_rng,
-                              lp, cont_vector, disc_vector);
+          io::write_iteration(model, base_rng,
+                              lp, cont_vector, disc_vector,
+                              info, output);
         }
 
         int ret = 0;
 
         while (ret == 0) {
           interrupt();
-          if (io::do_print(bfgs.iter_num(), 50 * refresh)) {
-            msg.str(std::string());
-            msg.clear();
-            msg << "    Iter " << "     log prob " << "       ||dx|| "
-                << "     ||grad|| " <<  "      alpha " << "     alpha0 "
-                << " # evals " << " Notes ";
-            info(msg.str());
+          if (io::do_print(bfgs.iter_num(), 50*refresh)) {
+            info("    Iter "
+                 "     log prob "
+                 "       ||dx|| "
+                 "     ||grad|| "
+                 "      alpha "
+                 "     alpha0 "
+                 " # evals "
+                 " Notes ");
           }
 
           ret = bfgs.step();
@@ -82,8 +62,7 @@ namespace stan {
 
           if (io::do_print(bfgs.iter_num(),
                            ret != 0 || !bfgs.note().empty(), refresh)) {
-            msg.str(std::string());
-            msg.clear();
+            msg.str("");
             msg << " " << std::setw(7) << bfgs.iter_num() << " ";
             msg << " " << std::setw(12) << std::setprecision(6)
                 << lp << " ";
@@ -95,14 +74,16 @@ namespace stan {
                 << bfgs.alpha() << " ";
             msg << " " << std::setw(10) << std::setprecision(4)
                 << bfgs.alpha0() << " ";
-            msg << " " << std::setw(7) << bfgs.grad_evals() << " ";
-            msg << " " << bfgs.note();
+            msg << " " << std::setw(7)
+                << bfgs.grad_evals() << " ";
+            msg << " " << bfgs.note() << " ";
             info(msg.str());
           }
 
           if (save_iterations) {
-            io::write_iteration(output_stream, model, base_rng,
-                               lp, cont_vector, disc_vector);
+            io::write_iteration(model, base_rng,
+                                lp, cont_vector, disc_vector,
+                                info, output);
           }
         }
 

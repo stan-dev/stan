@@ -274,10 +274,7 @@ TEST_F(stochastic_gradient_ascent_test, initialize_state_zero_negative_infinity)
     (model,
      cont_params, rng,
      1, 100,
-     100, 1,
-     &output,
-     &output,
-     &output);
+     100, 1);
 
   stan::variational::advi<mock_model,
                           stan::variational::normal_fullrank,
@@ -288,10 +285,7 @@ TEST_F(stochastic_gradient_ascent_test, initialize_state_zero_negative_infinity)
     (model,
      cont_params, rng,
      1, 100,
-     100, 1,
-     &output,
-     &output,
-     &output);
+     100, 1);
 
   stan::variational::normal_meanfield meanfield_init =
     stan::variational::normal_meanfield(cont_params);
@@ -307,12 +301,16 @@ TEST_F(stochastic_gradient_ascent_test, initialize_state_zero_negative_infinity)
   EXPECT_THROW_MSG(advi_meanfield->stochastic_gradient_ascent(meanfield_init,
                                                               1.0,
                                                               0.01,
-                                                              1000),
+                                                              1000,
+                                                              writer,
+                                                              writer),
                    std::domain_error, error);
   EXPECT_THROW_MSG(advi_fullrank->stochastic_gradient_ascent(fullrank_init,
-                                                              1.0,
-                                                              0.01,
-                                                              1000),
+                                                             1.0,
+                                                             0.01,
+                                                             1000,
+                                                             writer,
+                                                             writer),
                    std::domain_error, error);
 
   delete advi_meanfield;
@@ -332,10 +330,7 @@ TEST_F(stochastic_gradient_ascent_test, initialize_state_zero_grad_error) {
     (throwing_model,
      cont_params, rng,
      1, 100,
-     100, 1,
-     &output,
-     &output,
-     &output);
+     100, 1);
 
   stan::variational::advi<mock_throwing_model,
                           stan::variational::normal_fullrank,
@@ -346,10 +341,7 @@ TEST_F(stochastic_gradient_ascent_test, initialize_state_zero_grad_error) {
     (throwing_model,
      cont_params, rng,
      1, 100,
-     100, 1,
-     &output,
-     &output,
-     &output);
+     100, 1);
 
   stan::variational::normal_meanfield meanfield_init =
     stan::variational::normal_meanfield(cont_params);
@@ -365,7 +357,9 @@ TEST_F(stochastic_gradient_ascent_test, initialize_state_zero_grad_error) {
   EXPECT_THROW_MSG(advi_meanfield->stochastic_gradient_ascent(meanfield_init,
                                                               1.0,
                                                               0.01,
-                                                              1000),
+                                                              1000,
+                                                              writer,
+                                                              writer),
                    std::domain_error, error);
 
   error = "stan::variational::normal_fullrank::calc_grad: "
@@ -375,9 +369,11 @@ TEST_F(stochastic_gradient_ascent_test, initialize_state_zero_grad_error) {
                       "ill-conditioned or misspecified.";
 
   EXPECT_THROW_MSG(advi_fullrank->stochastic_gradient_ascent(fullrank_init,
-                                                              1.0,
-                                                              0.01,
-                                                              1000),
+                                                             1.0,
+                                                             0.01,
+                                                             1000,
+                                                             writer,
+                                                             writer),
                    std::domain_error, error);
 
   delete advi_meanfield;

@@ -7,7 +7,6 @@
 #include <stan/mcmc/var_adaptation.hpp>
 
 namespace stan {
-
   namespace mcmc {
 
     class stepsize_var_adapter: public base_adapter {
@@ -43,6 +42,5 @@ namespace stan {
     };
 
   }  // mcmc
-
 }  // stan
 #endif

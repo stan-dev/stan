@@ -215,27 +215,6 @@ TEST(OptimizationBfgs, LsOptions) {
   EXPECT_FLOAT_EQ(a.alpha0, 1e-3);
 }
 
-TEST(OptimizationBfgs, lp_no_jacobian) {
-  std::vector<double> cont_vector(2);
-  cont_vector[0] = -1; cont_vector[1] = 1;
-  std::vector<int> disc_vector;
-
-  static const std::string DATA("");
-  std::stringstream data_stream(DATA);
-  stan::io::dump dummy_context(data_stream);
-  Model rb_model(dummy_context);
-
-  EXPECT_FLOAT_EQ(stan::optimization::lp_no_jacobian(rb_model, cont_vector, 
-                                                     disc_vector), 0);
-  // test streams
-  EXPECT_NO_THROW(stan::optimization::lp_no_jacobian(rb_model, cont_vector, 
-                                                     disc_vector, 0));
-  std::stringstream out;
-  EXPECT_NO_THROW(stan::optimization::lp_no_jacobian(rb_model, cont_vector, 
-                                                     disc_vector, &out));
-  EXPECT_EQ("", out.str());
-}
-
 TEST(OptimizationBfgs, ModelAdaptor) {
   Eigen::Matrix<double,Eigen::Dynamic,1> cont_vector(2);
   cont_vector[0] = -1; cont_vector[1] = 1;

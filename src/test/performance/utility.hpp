@@ -291,7 +291,6 @@ namespace stan {
           output_stream = new std::fstream(output_file.c_str(),
                                            std::fstream::out);
         }
-
         std::fstream* diagnostic_stream = 0;
 
         // Refresh rate
@@ -308,11 +307,9 @@ namespace stan {
         //parser.print(&std::cout);
         //std::cout << std::endl;
 
-
         std::string init = "0";
         //dynamic_cast<stan::services::string_argument*>(
         //parser.arg("init"))->value();
-
 
         interface_callbacks::writer::stream_writer sample_writer(*output_stream, "# ");
         interface_callbacks::writer::noop_writer diagnostic_writer;
@@ -320,18 +317,10 @@ namespace stan {
         interface_callbacks::writer::stream_writer err_writer(std::cerr);
 
         if (output_stream) {
-          services::io::write_stan(info_writer, "#");
-          services::io::write_model(info_writer, model.model_name(), "#");
+          services::io::write_stan(sample_writer);
+          services::io::write_model(sample_writer, model.model_name());
           //parser.print(output_stream, "#");
         }
-
-        stan::services::sample::mcmc_writer<Model,
-                                            rng_t,
-                                            interface_callbacks::writer::stream_writer,
-                                            interface_callbacks::writer::noop_writer,
-                                            interface_callbacks::writer::stream_writer,
-                                            interface_callbacks::writer::stream_writer>
-          writer(model, base_rng, sample_writer, diagnostic_writer, info_writer, err_writer);
 
         interface_callbacks::var_context_factory::dump_factory var_context_factory;
         if (!services::init::initialize_state<Model, rng_t,
@@ -368,6 +357,11 @@ namespace stan {
                   << std::endl << std::endl;
         std::cout << std::endl;
 
+        stan::services::sample::mcmc_writer<Model,
+                                            interface_callbacks::writer::stream_writer,
+                                            interface_callbacks::writer::noop_writer,
+                                            interface_callbacks::writer::stream_writer>
+          writer(sample_writer, diagnostic_writer, info_writer);
 
         // Sampling parameters
         int num_thin = 1;
@@ -383,16 +377,54 @@ namespace stan {
         sampler_ptr->set_stepsize_jitter(0.0);
         sampler_ptr->set_max_depth(10);
 
-        stan::services::sample::init_adapt(*sampler_ptr, 0.8, 0.05, 0.75, 10,
-                                           cont_params, err_writer);
-        sampler_ptr->set_window_params(num_warmup, 75, 50, 25, err_writer);
+        stan::services::sample::init_adapt(sampler_ptr, 0.8, 0.05, 0.75, 10,
+                                           cont_params,
+                                           info_writer);
+        sampler_ptr->set_window_params(num_warmup, 75, 50, 25, info_writer);
+          
+        // Headers
+        writer.write_sample_names(s, sampler_ptr, model);
+        writer.write_diagnostic_names(s, sampler_ptr, model);
+          
+        std::string prefix = "";
+        std::string suffix = "\n";
+        interface_callbacks::interrupt::noop startTransitionCallback;
+          
+        // Warm-Up
+        clock_t start = clock();
+          
+        services::mcmc::warmup<Model, rng_t>(sampler_ptr, num_warmup, num_samples, num_thin,
+                                             refresh, save_warmup,
+                                             writer,
+                                             s, model, base_rng,
+                                             prefix, suffix, std::cout,
+                                             startTransitionCallback,
+                                             info_writer);
 
-        interface_callbacks::interrupt::noop iteration_interrupt;
-
-        stan::services::sample::run_adaptive_sampler(*sampler_ptr, s, num_warmup, num_samples,
-                                                     num_thin, refresh, save_warmup,
-                                                     writer, iteration_interrupt);
-                            
+        clock_t end = clock();
+        warmDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;
+          
+        if (adapt_engaged) {
+          sampler_ptr->disengage_adaptation();
+          writer.write_adapt_finish(sampler_ptr);
+        }
+          
+        // Sampling
+        start = clock();
+          
+        services::mcmc::sample<Model, rng_t>
+          (sampler_ptr, num_warmup, num_samples, num_thin,
+           refresh, true,
+           writer,
+           s, model, base_rng,
+           prefix, suffix, std::cout,
+           startTransitionCallback,
+           info_writer);
+          
+        end = clock();
+        sampleDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;
+          
+        writer.write_timing(warmDeltaT, sampleDeltaT);
           
         if (sampler_ptr)
           delete sampler_ptr;

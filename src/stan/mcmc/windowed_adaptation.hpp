@@ -1,6 +1,7 @@
 #ifndef STAN_MCMC_WINDOWED_ADAPTATION_HPP
 #define STAN_MCMC_WINDOWED_ADAPTATION_HPP
 
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/base_adaptation.hpp>
 #include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <string>
@@ -39,8 +40,8 @@ namespace stan {
         }
 
         if (init_buffer + base_window + term_buffer > num_warmup) {
-          writer(std::string("WARNING: The initial buffer, adaptation window, ")
-                 + "and terminal buffer");
+          writer("WARNING: The initial buffer, adaptation window, "
+                 "and terminal buffer");
           writer("         overflow the total number of warmup iterations.");
 
           num_warmup_ = num_warmup;
@@ -55,18 +56,15 @@ namespace stan {
           msg << "           init_buffer = " << adapt_init_buffer_;
           writer(msg.str());
 
-          msg.str(std::string());
-          msg.clear();
+          msg.str("");
           msg << "           adapt_window = " << adapt_base_window_;
           writer(msg.str());
 
-          msg.str(std::string());
-          msg.clear();
+          msg.str("");
           msg << "           term_buffer = " << adapt_term_buffer_;
           writer(msg.str());
 
           writer();
-
           return;
         }
 
@@ -123,5 +121,4 @@ namespace stan {
 
   }  // mcmc
 }  // stan
-
 #endif
