@@ -76,7 +76,7 @@ namespace stan {
       }
 
       int compute_indent(const int depth) {
-        return indent_width * depth + 1;
+        return indent_width * depth;
       }
 
     protected:

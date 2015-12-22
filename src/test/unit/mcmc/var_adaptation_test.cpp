@@ -1,7 +1,10 @@
 #include <stan/mcmc/var_adaptation.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <gtest/gtest.h>
 
 TEST(McmcVarAdaptation, learn_variance) {
+  std::stringstream ss;
+  stan::interface_callbacks::writer::stream_writer writer(ss);
   
   const int n = 10;
   Eigen::VectorXd q = Eigen::VectorXd::Zero(n);
@@ -13,11 +16,13 @@ TEST(McmcVarAdaptation, learn_variance) {
   target_var *= 1e-3 * 5.0 / (n_learn + 5.0);
   
   stan::mcmc::var_adaptation adapter(n);
-  adapter.set_window_params(50, 0, 0, n_learn);
+  adapter.set_window_params(50, 0, 0, n_learn, writer);
   
   for (int i = 0; i < n_learn; ++i)
     adapter.learn_variance(var, q);
   
   for (int i = 0; i < n; ++i)
     EXPECT_EQ(target_var(i), var(i));
+
+  EXPECT_EQ("", ss.str());
 }

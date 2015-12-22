@@ -1,5 +1,6 @@
 #include <test/test-models/good/variational/univariate_with_constraint.hpp>
 #include <stan/variational/advi.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 #include <vector>
@@ -24,22 +25,21 @@ TEST(advi_test, univar_with_constraint_fullrank) {
   // Other params
   int n_monte_carlo_grad = 10;
   std::stringstream output;
+  stan::interface_callbacks::writer::stream_writer message_writer(output);
 
   // Dummy input
   Eigen::VectorXd cont_params = Eigen::VectorXd::Zero(1);
   cont_params(0) = -0.75;
 
   // ADVI
-  stan::variational::advi<Model, stan::variational::normal_fullrank, rng_t> test_advi(my_model,
-                                                  cont_params,
-                                                  base_rng,
-                                                  n_monte_carlo_grad,
-                                                  5e5, // absurdly high!
-                                                  100,
-                                                  1,
-                                                  &output,
-                                                  &output,
-                                                  &output);
+  stan::variational::advi<Model, stan::variational::normal_fullrank, rng_t>
+    test_advi(my_model,
+              cont_params,
+              base_rng,
+              n_monte_carlo_grad,
+              5e5, // absurdly high!
+              100,
+              1);
 
   // Create some arbitrary variational q() family to calculate the ELBO over
   Eigen::VectorXd mu     = Eigen::VectorXd::Constant(my_model.num_params_r(),
@@ -50,7 +50,7 @@ TEST(advi_test, univar_with_constraint_fullrank) {
     stan::variational::normal_fullrank(mu, L_chol);
 
   double elbo = 0.0;
-  elbo = test_advi.calc_ELBO(muL);
+  elbo = test_advi.calc_ELBO(muL, message_writer);
 
   // Can calculate ELBO analytically + moment generating function of Gaussians
   double one_over_sigma_j_sq = 1.0 + 2*1.0;
@@ -132,7 +132,7 @@ TEST(advi_test, univar_with_constraint_fullrank) {
           "Dimension of variational q (1) must match in size";
   EXPECT_THROW_MSG(muL.calc_grad(elbo_grad,
                                  my_model, cont_params, n_monte_carlo_grad,
-                                 base_rng, &output),
+                                 base_rng, message_writer),
                    std::invalid_argument, error);
 }
 
@@ -151,35 +151,34 @@ TEST(advi_test, univar_with_constraint_meanfield) {
   // Other params
   int n_monte_carlo_grad = 10;
   std::stringstream output;
+  stan::interface_callbacks::writer::stream_writer message_writer(output);
 
   // Dummy input
   Eigen::VectorXd cont_params = Eigen::VectorXd::Zero(1);
   cont_params(0) = -0.75;
 
   // ADVI
-  stan::variational::advi<Model, stan::variational::normal_meanfield, rng_t> test_advi(my_model,
-                                                  cont_params,
-                                                  base_rng,
-                                                  n_monte_carlo_grad,
-                                                  5e5, // absurdly high!
-                                                  100,
-                                                  1,
-                                                  &output,
-                                                  &output,
-                                                  &output);
-
+  stan::variational::advi<Model, stan::variational::normal_meanfield, rng_t>
+    test_advi(my_model,
+              cont_params,
+              base_rng,
+              n_monte_carlo_grad,
+              5e5, // absurdly high!
+              100,
+              1);
+  
   // Create some arbitrary variational q() family to calculate the ELBO over
   Eigen::VectorXd mu  = Eigen::VectorXd::Constant(my_model.num_params_r(),
-                                                     log(1.88));
-  Eigen::MatrixXd sigma_tilde  = Eigen::VectorXd::Constant(
-                                          my_model.num_params_r(),
-                                          0.0); // initializing sigma_tilde = 0
-                                                // means sigma = 1
+                                                  log(1.88));
+  Eigen::MatrixXd sigma_tilde
+    = Eigen::VectorXd::Constant(my_model.num_params_r(),
+                                0.0); // initializing sigma_tilde = 0
+  // means sigma = 1
   stan::variational::normal_meanfield musigmatilde =
     stan::variational::normal_meanfield(mu, sigma_tilde);
 
   double elbo = 0.0;
-  elbo = test_advi.calc_ELBO(musigmatilde);
+  elbo = test_advi.calc_ELBO(musigmatilde, message_writer);
 
   // Can calculate ELBO analytically + moment generating function of Gaussians
   double one_over_sigma_j_sq = 1.0 + 2*1.0;
@@ -251,7 +250,7 @@ TEST(advi_test, univar_with_constraint_meanfield) {
           "Dimension of elbo_grad (3) and "
           "Dimension of variational q (1) must match in size";
   EXPECT_THROW_MSG(musigmatilde.calc_grad(elbo_grad,
-                                 my_model, cont_params, n_monte_carlo_grad,
-                                 base_rng, &output),
+                                          my_model, cont_params, n_monte_carlo_grad,
+                                          base_rng, message_writer),
                    std::invalid_argument, error);
 }
