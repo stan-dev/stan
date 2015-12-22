@@ -1,6 +1,7 @@
 #ifndef STAN_MODEL_PROB_GRAD_HPP
 #define STAN_MODEL_PROB_GRAD_HPP
 
+#include <cstddef>
 #include <utility>
 #include <vector>
 
