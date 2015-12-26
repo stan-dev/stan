@@ -341,6 +341,7 @@ namespace stan {
           if (out)
             *out << "Warning: non-fatal error reading samples" << std::endl;
         }
+
         return data;
       }
     };
