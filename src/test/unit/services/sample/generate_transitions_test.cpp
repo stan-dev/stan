@@ -35,7 +35,7 @@ struct mock_callback {
 class StanServices : public testing::Test {
 public:
   StanServices()
-    : message_writer(message_output, "# ") { }
+    : message_writer(message_output) { }
   
   void SetUp() {
     model_output.str("");
@@ -102,27 +102,21 @@ TEST_F(StanServices, generate_transitions) {
   bool save = false;
   bool warmup = false;
   stan::mcmc::sample s(q, log_prob, stat);
-  std::string prefix = "";
-  std::string suffix = "\n";
-  std::stringstream ss;
   mock_callback callback;
 
   stan::services::sample::generate_transitions(sampler,
                                                num_iterations, start, finish,
                                                num_thin, refresh, save, warmup,
                                                *writer, s, *model, base_rng,
-                                               prefix, suffix, ss,
                                                callback,
                                                message_writer);
   
   EXPECT_EQ(num_iterations, sampler->n_transition_called);
   EXPECT_EQ(num_iterations, callback.n);
 
-  EXPECT_EQ(expected_output, ss.str());
-
   EXPECT_EQ("", model_output.str());
   EXPECT_EQ("", sample_output.str());
   EXPECT_EQ("", diagnostic_output.str());
-  EXPECT_EQ("", message_output.str());
+  EXPECT_EQ(expected_output, message_output.str());
 }
 

@@ -3,6 +3,7 @@
 
 #include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
+#include <stan/services/io/do_print.hpp>
 #include <stan/services/sample/mcmc_writer.hpp>
 #include <stan/services/sample/progress.hpp>
 #include <string>
@@ -26,25 +27,23 @@ namespace stan {
                                 Model, SampleRecorder,
                                 DiagnosticRecorder, MessageRecorder>&
                                 mcmc_writer,
-                                stan::mcmc::sample& init_s,
+                                stan::mcmc::sample& sample,
                                 Model& model,
                                 RNG& base_rng,
-                                const std::string& prefix,
-                                const std::string& suffix,
-                                std::ostream& o,
                                 StartTransitionCallback& callback,
                                 interface_callbacks::writer::base_writer&
                                 writer) {
         for (int m = 0; m < num_iterations; ++m) {
           callback();
+          
+          if (io::do_print(m, (start + m + 1 == finish), refresh))
+            writer(progress(m, start, finish, refresh, warmup));
 
-          progress(m, start, finish, refresh, warmup, prefix, suffix, o);
-
-          init_s = sampler->transition(init_s, writer);
+          sample = sampler->transition(sample, writer);
 
           if ( save && ( (m % num_thin) == 0) ) {
-            mcmc_writer.write_sample_params(base_rng, init_s, *sampler, model);
-            mcmc_writer.write_diagnostic_params(init_s, sampler);
+            mcmc_writer.write_sample_params(base_rng, sample, *sampler, model);
+            mcmc_writer.write_diagnostic_params(sample, sampler);
           }
         }
       }

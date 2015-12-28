@@ -99,28 +99,22 @@ TEST_F(StanServices, warmup) {
   int refresh = 4;
   bool save = false;
   stan::mcmc::sample s(q, log_prob, stat);
-  std::string prefix = "";
-  std::string suffix = "\n";
-  std::stringstream ss;
   mock_callback callback;
 
   stan::services::mcmc::warmup(sampler,
                                num_warmup, num_samples,
                                num_thin, refresh, save,
                                *writer, s, *model, base_rng,
-                               prefix, suffix, ss,
                                callback,
                                message_writer);
   
   EXPECT_EQ(num_warmup, sampler->n_transition_called);
   EXPECT_EQ(num_warmup, callback.n);
 
-  EXPECT_EQ(expected_warmup_output, ss.str());
-
   EXPECT_EQ("", model_output.str());
   EXPECT_EQ("", sample_output.str());
   EXPECT_EQ("", diagnostic_output.str());
-  EXPECT_EQ("", message_output.str());
+  EXPECT_EQ(expected_warmup_output, message_output.str());
 }
 
 

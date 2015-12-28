@@ -26,9 +26,6 @@ namespace stan {
                   stan::mcmc::sample& init_s,
                   Model& model,
                   RNG& base_rng,
-                  const std::string& prefix,
-                  const std::string& suffix,
-                  std::ostream& o,
                   StartTransitionCallback& callback,
                   interface_callbacks::writer::base_writer& writer) {
         stan::services::sample::generate_transitions<Model, RNG,
@@ -40,7 +37,6 @@ namespace stan {
            refresh, save, false,
            mcmc_writer,
            init_s, model, base_rng,
-           prefix, suffix, o,
            callback, writer);
       }
 
