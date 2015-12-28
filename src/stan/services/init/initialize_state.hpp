@@ -205,8 +205,6 @@ namespace stan {
           <RNG&, boost::random::uniform_real_distribution<double> >
             init_rng(base_rng, init_range_distribution);
 
-        cont_params.setZero();
-
         // Random initializations until log_prob is finite
         static int MAX_INIT_TRIES = 100;
 
