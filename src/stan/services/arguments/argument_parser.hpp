@@ -13,13 +13,24 @@ namespace stan {
 
     class argument_parser {
     public:
-      explicit argument_parser(std::vector<argument*>& valid_args)
-        : _arguments(valid_args),
+      argument_parser()
+        : _arguments(),
           _help_flag(false),
           _method_flag(false) {
-        _arguments.insert(_arguments.begin(), new arg_method());
+        _arguments.push_back(new arg_method());
       }
 
+      ~argument_parser() {
+        for (std::vector<argument*>::iterator it = _arguments.begin();
+             it != _arguments.end(); it++)
+          if (*it)
+            delete *it;
+      }
+
+      void push_valid_arg(argument* arg) {
+        _arguments.push_back(arg);
+      }
+        
       int parse_args(int argc,
                      const char* argv[],
                      interface_callbacks::writer::base_writer& info,
@@ -212,7 +223,7 @@ namespace stan {
       }
 
     protected:
-      std::vector<argument*>& _arguments;
+      std::vector<argument*> _arguments;
 
       // We can also check for, and warn the user of, deprecated arguments
       // std::vector<argument*> deprecated_arguments;
