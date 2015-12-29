@@ -35,7 +35,7 @@ struct mock_callback {
 class StanServices : public testing::Test {
 public:
   StanServices()
-    : message_writer(message_output, "# ") { }
+    : message_writer(message_output) { }
   
   void SetUp() {
     model_output.str("");
