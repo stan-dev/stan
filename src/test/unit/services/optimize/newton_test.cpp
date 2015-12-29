@@ -86,3 +86,49 @@ TEST_F(ServicesOptimizeNewton, rosenbrock_no_save_interations) {
   EXPECT_FLOAT_EQ(1, cont_params[0]);
   EXPECT_FLOAT_EQ(1, cont_params[1]);
 }
+
+TEST_F(ServicesOptimizeNewton, rosenbrock_1_iteration) {
+  int return_code;
+  
+  return_code = stan::services::optimize::newton(model, base_rng, cont_params,
+                                                 1, true,
+                                                 interrupt,
+                                                 message_writer,
+                                                 parameter_writer);
+  EXPECT_EQ(0, return_code);
+  EXPECT_TRUE(interrupt.n == 1);
+  EXPECT_TRUE(message.str().find("Initial log joint probability = -4") != std::string::npos);
+  EXPECT_TRUE(message.str().find("Iteration  1. Log joint probability =") != std::string::npos);
+  EXPECT_TRUE(message.str().find("Iteration  2. Log joint probability =") == std::string::npos);
+
+  std::string parameter_str = parameter.str();
+  EXPECT_TRUE(parameter_str.find("lp__,x,y\n") != std::string::npos);
+  EXPECT_EQ(3, count(parameter_str.begin(), parameter_str.end(), '\n'))
+    << "should save the header, the initial value, and the final value" << std::endl;
+
+  EXPECT_FLOAT_EQ(-0.75, cont_params[0]);
+  EXPECT_FLOAT_EQ(0.5, cont_params[1]);
+}
+
+TEST_F(ServicesOptimizeNewton, rosenbrock_1_iteration_no_save) {
+  int return_code;
+  
+  return_code = stan::services::optimize::newton(model, base_rng, cont_params,
+                                                 1, false,
+                                                 interrupt,
+                                                 message_writer,
+                                                 parameter_writer);
+  EXPECT_EQ(0, return_code);
+  EXPECT_TRUE(interrupt.n == 1);
+  EXPECT_TRUE(message.str().find("Initial log joint probability = -4") != std::string::npos);
+  EXPECT_TRUE(message.str().find("Iteration  1. Log joint probability =") != std::string::npos);
+  EXPECT_TRUE(message.str().find("Iteration  2. Log joint probability =") == std::string::npos);
+
+  std::string parameter_str = parameter.str();
+  EXPECT_TRUE(parameter_str.find("lp__,x,y\n") != std::string::npos);
+  EXPECT_EQ(2, count(parameter_str.begin(), parameter_str.end(), '\n'))
+    << "should save the header and the final value" << std::endl;
+
+  EXPECT_FLOAT_EQ(-0.75, cont_params[0]);
+  EXPECT_FLOAT_EQ(0.5, cont_params[1]);
+}
