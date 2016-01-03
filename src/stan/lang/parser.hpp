@@ -58,7 +58,6 @@ namespace stan {
 
     inline bool parse(std::ostream* output_stream,
                       std::istream& input,
-                      const std::string& filename,
                       const std::string& model_name,
                       program& result) {
       using boost::spirit::multi_pass;

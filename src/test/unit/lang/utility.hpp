@@ -53,7 +53,7 @@ bool is_parsable(const std::string& file_name,
   std::ifstream fs(file_name.c_str());
   std::string model_name = file_name_to_model_name(file_name);
   bool parsable
-    = stan::lang::parse(msgs, fs, file_name, model_name, prog);             
+    = stan::lang::parse(msgs, fs, model_name, prog);
   return parsable;
 }
 
@@ -160,11 +160,10 @@ void test_warning(const std::string& model_name,
 
 std::string model_to_cpp(const std::string& model_text) {
   std::string model_name = "foo";
-  std::string file_name = "dummy";
   std::stringstream ss(model_text);
   std::stringstream msgs;
   stan::lang::program prog;
-  bool parsable = stan::lang::parse(&msgs, ss, file_name, model_name, prog);
+  bool parsable = stan::lang::parse(&msgs, ss, model_name, prog);
   EXPECT_TRUE(parsable);
 
   std::stringstream output;
