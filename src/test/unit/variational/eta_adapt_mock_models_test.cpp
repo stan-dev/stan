@@ -5,6 +5,7 @@
 #include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <stan/services/init/initialize_state.hpp>
 #include <stan/model/prob_grad.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
@@ -274,10 +275,7 @@ TEST_F(eta_adapt_test, initialize_state_zero_negative_infinity) {
     (model,
      cont_params, rng,
      1, 100,
-     100, 1,
-     &output,
-     &output,
-     &output);
+     100, 1);
 
   stan::variational::advi<mock_model,
                           stan::variational::normal_fullrank,
@@ -288,10 +286,7 @@ TEST_F(eta_adapt_test, initialize_state_zero_negative_infinity) {
     (model,
      cont_params, rng,
      1, 100,
-     100, 1,
-     &output,
-     &output,
-     &output);
+     100, 1);
 
   stan::variational::normal_meanfield meanfield_init =
     stan::variational::normal_meanfield(cont_params);
@@ -304,9 +299,9 @@ TEST_F(eta_adapt_test, initialize_state_zero_negative_infinity) {
                       "Your model may be either "
                       "severely ill-conditioned or misspecified.";
 
-  EXPECT_THROW_MSG(advi_meanfield->adapt_eta(meanfield_init, 10),
+  EXPECT_THROW_MSG(advi_meanfield->adapt_eta(meanfield_init, 10, writer),
                    std::domain_error, error);
-  EXPECT_THROW_MSG(advi_fullrank->adapt_eta(fullrank_init, 10),
+  EXPECT_THROW_MSG(advi_fullrank->adapt_eta(fullrank_init, 10, writer),
                    std::domain_error, error);
 
   delete advi_meanfield;
@@ -326,10 +321,7 @@ TEST_F(eta_adapt_test, initialize_state_zero_grad_error) {
     (throwing_model,
      cont_params, rng,
      1, 100,
-     100, 1,
-     &output,
-     &output,
-     &output);
+     100, 1);
 
   stan::variational::advi<mock_throwing_model,
                           stan::variational::normal_fullrank,
@@ -340,10 +332,7 @@ TEST_F(eta_adapt_test, initialize_state_zero_grad_error) {
     (throwing_model,
      cont_params, rng,
      1, 100,
-     100, 1,
-     &output,
-     &output,
-     &output);
+     100, 1);
 
   stan::variational::normal_meanfield meanfield_init =
     stan::variational::normal_meanfield(cont_params);
@@ -356,9 +345,9 @@ TEST_F(eta_adapt_test, initialize_state_zero_grad_error) {
                       "Your model may be either "
                       "severely ill-conditioned or misspecified.";
 
-  EXPECT_THROW_MSG(advi_meanfield->adapt_eta(meanfield_init, 10),
+  EXPECT_THROW_MSG(advi_meanfield->adapt_eta(meanfield_init, 10, writer),
                    std::domain_error, error);
-  EXPECT_THROW_MSG(advi_fullrank->adapt_eta(fullrank_init, 10),
+  EXPECT_THROW_MSG(advi_fullrank->adapt_eta(fullrank_init, 10, writer),
                    std::domain_error, error);
 
   delete advi_meanfield;

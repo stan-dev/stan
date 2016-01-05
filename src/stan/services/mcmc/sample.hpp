@@ -1,6 +1,7 @@
 #ifndef STAN_SERVICES_MCMC_SAMPLE_HPP
 #define STAN_SERVICES_MCMC_SAMPLE_HPP
 
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/services/sample/mcmc_writer.hpp>
 #include <stan/services/sample/generate_transitions.hpp>
@@ -21,14 +22,15 @@ namespace stan {
                   bool save,
                   stan::services::sample::mcmc_writer<
                   Model, SampleRecorder, DiagnosticRecorder, MessageRecorder>&
-                  writer,
+                  mcmc_writer,
                   stan::mcmc::sample& init_s,
                   Model& model,
                   RNG& base_rng,
                   const std::string& prefix,
                   const std::string& suffix,
                   std::ostream& o,
-                  StartTransitionCallback& callback) {
+                  StartTransitionCallback& callback,
+                  interface_callbacks::writer::base_writer& writer) {
         stan::services::sample::generate_transitions<Model, RNG,
                                                      StartTransitionCallback,
                                                      SampleRecorder,
@@ -36,10 +38,10 @@ namespace stan {
                                                      MessageRecorder>
           (sampler, num_samples, num_warmup, num_warmup + num_samples, num_thin,
            refresh, save, false,
-           writer,
+           mcmc_writer,
            init_s, model, base_rng,
            prefix, suffix, o,
-           callback);
+           callback, writer);
       }
 
     }

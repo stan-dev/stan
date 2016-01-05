@@ -5,6 +5,7 @@
 #include <stan/io/dump.hpp>
 #include <test/test-models/good/model/valid.hpp>
 #include <test/unit/util.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 //#include <test/test-models/good/model/domain_fail.hpp>
 
 class TestModel_uniform_01 {
@@ -122,6 +123,34 @@ TEST(ModelUtil, gradient) {
   std::stringstream output;
   valid_model_namespace::valid_model valid_model(data_var_context, &output);
   EXPECT_NO_THROW(stan::model::gradient(valid_model, x, f, g));
+  
+  EXPECT_FLOAT_EQ(dim, x.size());
+  EXPECT_FLOAT_EQ(dim, g.size());
+
+  EXPECT_EQ("", output.str());
+  
+  // Incorporate once operands and partials has been generalized
+  //output.str("");
+  //domain_fail_namespace::domain_fail domain_fail_model(data_var_context, &output);
+  //EXPECT_THROW(stan::model::gradient(domain_fail_model, x, f, g), std::domain_error);
+  //EXPECT_EQ("", output.str());
+}
+
+TEST(ModelUtil, gradient_writer) {
+  int dim = 5;
+  
+  Eigen::VectorXd x(dim);
+  double f;
+  Eigen::VectorXd g(dim);
+  
+  std::fstream data_stream(std::string("").c_str(), std::fstream::in);
+  stan::io::dump data_var_context(data_stream);
+  data_stream.close();
+
+  std::stringstream output;
+  stan::interface_callbacks::writer::stream_writer writer(output);
+  valid_model_namespace::valid_model valid_model(data_var_context, &output);
+  EXPECT_NO_THROW(stan::model::gradient(valid_model, x, f, g, writer));
   
   EXPECT_FLOAT_EQ(dim, x.size());
   EXPECT_FLOAT_EQ(dim, g.size());
@@ -345,46 +374,23 @@ TEST(ModelUtil, streams) {
   }
 
   try {
+    stan::interface_callbacks::writer::stream_writer writer(out);
     out.str("");
     stan::model::test_gradients<true, true, stan_model>(model, params_r, params_i, 1e-6, 1e-6,
-                                                        out, 0);
+                                                        writer);
     EXPECT_EQ("\n Log probability=0\n\n param idx           value           model     finite diff           error\n         0               0               0               0               0\n", out.str());
     out.str("");
     stan::model::test_gradients<true, false, stan_model>(model, params_r, params_i, 1e-6, 1e-6,
-                                                        out, 0);
+                                                         writer);
     EXPECT_EQ("\n Log probability=0\n\n param idx           value           model     finite diff           error\n         0               0               0               0               0\n", out.str());
     out.str("");
     stan::model::test_gradients<false, true, stan_model>(model, params_r, params_i, 1e-6, 1e-6,
-                                                        out, 0);
+                                                         writer);
     EXPECT_EQ("\n Log probability=0\n\n param idx           value           model     finite diff           error\n         0               0               0               0               0\n", out.str());
     out.str("");
     stan::model::test_gradients<false, false, stan_model>(model, params_r, params_i, 1e-6, 1e-6,
-                                                        out, 0);
+                                                          writer);
     EXPECT_EQ("\n Log probability=0\n\n param idx           value           model     finite diff           error\n         0               0               0               0               0\n", out.str());
-
-
-    std::stringstream err;
-    out.str("");
-    err.str("");
-    stan::model::test_gradients<true, true, stan_model>(model, params_r, params_i, 1e-6, 1e-6,
-                                                        out, &err);
-    EXPECT_EQ("\n Log probability=0\n\n param idx           value           model     finite diff           error\n         0               0               0               0               0\n", out.str());
-    EXPECT_EQ("", err.str());
-    out.str("");
-    stan::model::test_gradients<true, false, stan_model>(model, params_r, params_i, 1e-6, 1e-6,
-                                                        out, &err);
-    EXPECT_EQ("\n Log probability=0\n\n param idx           value           model     finite diff           error\n         0               0               0               0               0\n", out.str());
-    EXPECT_EQ("", err.str());
-    out.str("");
-    stan::model::test_gradients<false, true, stan_model>(model, params_r, params_i, 1e-6, 1e-6,
-                                                        out, &err);
-    EXPECT_EQ("\n Log probability=0\n\n param idx           value           model     finite diff           error\n         0               0               0               0               0\n", out.str());
-    EXPECT_EQ("", err.str());
-    out.str("");
-    stan::model::test_gradients<false, false, stan_model>(model, params_r, params_i, 1e-6, 1e-6,
-                                                        out, &err);
-    EXPECT_EQ("\n Log probability=0\n\n param idx           value           model     finite diff           error\n         0               0               0               0               0\n", out.str());
-    EXPECT_EQ("", err.str());
   } catch (...) {
     FAIL() << "test_gradients";
   }

@@ -1,6 +1,7 @@
 #include <stan/services/mcmc/warmup.hpp>
 #include <gtest/gtest.h>
 #include <test/test-models/good/services/test_lp.hpp>
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <boost/random/additive_combine.hpp>
 #include <sstream>
@@ -10,10 +11,11 @@ typedef stan::interface_callbacks::writer::stream_writer writer_t;
 
 class mock_sampler : public stan::mcmc::base_mcmc {
 public:
-  mock_sampler(std::ostream *output, std::ostream *error)
-    : base_mcmc(output, error), n_transition_called(0) { }
+  mock_sampler()
+    : base_mcmc(), n_transition_called(0) { }
 
-  stan::mcmc::sample transition(stan::mcmc::sample& init_sample) {
+  stan::mcmc::sample transition(stan::mcmc::sample& init_sample,
+                                stan::interface_callbacks::writer::base_writer& writer) {
     n_transition_called++;
     return init_sample;
   }
@@ -32,17 +34,16 @@ struct mock_callback {
 
 class StanServices : public testing::Test {
 public:
+  StanServices()
+    : message_writer(message_output, "# ") { }
+  
   void SetUp() {
-    output.str("");
-    error.str("");
-
     model_output.str("");
     sample_output.str("");
     diagnostic_output.str("");
     message_output.str("");
-    writer_output.str("");
 
-    sampler = new mock_sampler(&output, &error);
+    sampler = new mock_sampler();
 
     std::fstream empty_data_stream(std::string("").c_str());
     stan::io::dump empty_data_context(empty_data_stream);
@@ -52,13 +53,12 @@ public:
     
     writer_t sample_writer(sample_output, "# ");
     writer_t diagnostic_writer(diagnostic_output, "# ");
-    writer_t message_writer(message_output, "# ");
 
     writer = new stan::services::sample::mcmc_writer<stan_model,
                                                      writer_t,
                                                      writer_t,
                                                      writer_t>
-      (sample_writer, diagnostic_writer, message_writer, &writer_output);
+      (sample_writer, diagnostic_writer, message_writer);
 
     base_rng.seed(123456);
 
@@ -84,11 +84,9 @@ public:
   double log_prob;
   double stat;
 
-  std::stringstream output, error;
-
   std::stringstream model_output,
-    sample_output, diagnostic_output, message_output,
-    writer_output;
+    sample_output, diagnostic_output, message_output;
+  stan::interface_callbacks::writer::stream_writer message_writer;
 };
 
 
@@ -111,21 +109,18 @@ TEST_F(StanServices, warmup) {
                                num_thin, refresh, save,
                                *writer, s, *model, base_rng,
                                prefix, suffix, ss,
-                               callback);
+                               callback,
+                               message_writer);
   
   EXPECT_EQ(num_warmup, sampler->n_transition_called);
   EXPECT_EQ(num_warmup, callback.n);
 
   EXPECT_EQ(expected_warmup_output, ss.str());
 
-  EXPECT_EQ("", output.str());
-  EXPECT_EQ("", error.str());
-
   EXPECT_EQ("", model_output.str());
   EXPECT_EQ("", sample_output.str());
   EXPECT_EQ("", diagnostic_output.str());
   EXPECT_EQ("", message_output.str());
-  EXPECT_EQ("", writer_output.str());
 }
 
 

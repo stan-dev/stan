@@ -100,7 +100,6 @@
 #include <stan/services/io/do_print.hpp>
 #include <stan/services/io/write_error_msg.hpp>
 #include <stan/services/io/write_iteration.hpp>
-#include <stan/services/io/write_iteration_csv.hpp>
 #include <stan/services/io/write_model.hpp>
 #include <stan/services/io/write_stan.hpp>
 #include <stan/services/mcmc/sample.hpp>
@@ -344,7 +343,6 @@ namespace stan {
           output_stream = new std::fstream(output_file.c_str(),
                                            std::fstream::out);
         }
-
         std::fstream* diagnostic_stream = 0;
 
         // Refresh rate
@@ -361,21 +359,20 @@ namespace stan {
         //parser.print(&std::cout);
         //std::cout << std::endl;
 
-        if (output_stream) {
-          services::io::write_stan(output_stream, "#");
-          services::io::write_model(output_stream, model.model_name(), "#");
-          //parser.print(output_stream, "#");
-        }
-
-        if (diagnostic_stream) {
-          services::io::write_stan(diagnostic_stream, "#");
-          services::io::write_model(diagnostic_stream, model.model_name(), "#");
-          //parser.print(diagnostic_stream, "#");
-        }
-
         std::string init = "0";
         //dynamic_cast<stan::services::string_argument*>(
         //parser.arg("init"))->value();
+
+        interface_callbacks::writer::stream_writer sample_writer(*output_stream, "# ");
+        interface_callbacks::writer::noop_writer diagnostic_writer;
+        interface_callbacks::writer::stream_writer info_writer(std::cout, "# ");
+        interface_callbacks::writer::stream_writer err_writer(std::cerr);
+
+        if (output_stream) {
+          services::io::write_stan(sample_writer);
+          services::io::write_model(sample_writer, model.model_name());
+          //parser.print(output_stream, "#");
+        }
 
         interface_callbacks::var_context_factory::dump_factory var_context_factory;
         if (!services::init::initialize_state<interface_callbacks::var_context_factory::dump_factory>
@@ -410,15 +407,11 @@ namespace stan {
                   << std::endl << std::endl;
         std::cout << std::endl;
 
-        interface_callbacks::writer::stream_writer sample_writer(*output_stream, "# ");
-        interface_callbacks::writer::noop_writer diagnostic_writer;
-        interface_callbacks::writer::stream_writer message_writer(std::cout, "# ");
-
         stan::services::sample::mcmc_writer<Model,
                                             interface_callbacks::writer::stream_writer,
                                             interface_callbacks::writer::noop_writer,
                                             interface_callbacks::writer::stream_writer>
-          writer(sample_writer, diagnostic_writer, message_writer, &std::cout);
+          writer(sample_writer, diagnostic_writer, info_writer);
 
         // Sampling parameters
         int num_thin = 1;
@@ -436,15 +429,15 @@ namespace stan {
 
         typedef stan::mcmc::adapt_diag_e_nuts<Model, rng_t> sampler;
         sampler* sampler_ptr = 0;
-        sampler_ptr = new sampler(model, base_rng,
-                                  &std::cout, &std::cout);
+        sampler_ptr = new sampler(model, base_rng);
         sampler_ptr->set_nominal_stepsize(1.0);
         sampler_ptr->set_stepsize_jitter(0.0);
         sampler_ptr->set_max_depth(10);
 
         stan::services::sample::init_adapt(sampler_ptr, 0.8, 0.05, 0.75, 10,
-                                           cont_params, &std::cout);
-        sampler_ptr->set_window_params(num_warmup, 75, 50, 25, &std::cout);
+                                           cont_params,
+                                           info_writer);
+        sampler_ptr->set_window_params(num_warmup, 75, 50, 25, info_writer);
           
         // Headers
         writer.write_sample_names(s, sampler_ptr, model);
@@ -462,7 +455,8 @@ namespace stan {
                                              writer,
                                              s, model, base_rng,
                                              prefix, suffix, std::cout,
-                                             startTransitionCallback);
+                                             startTransitionCallback,
+                                             info_writer);
 
         clock_t end = clock();
         warmDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;
@@ -481,7 +475,8 @@ namespace stan {
            writer,
            s, model, base_rng,
            prefix, suffix, std::cout,
-           startTransitionCallback);
+           startTransitionCallback,
+           info_writer);
           
         end = clock();
         sampleDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;

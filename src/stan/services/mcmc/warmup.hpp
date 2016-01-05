@@ -21,23 +21,24 @@ namespace stan {
                   bool save,
                   stan::services::sample::mcmc_writer<
                   Model, SampleRecorder, DiagnosticRecorder, MessageRecorder>&
-                  writer,
+                  mcmc_writer,
                   stan::mcmc::sample& init_s,
                   Model& model,
                   RNG& base_rng,
                   const std::string& prefix,
                   const std::string& suffix,
                   std::ostream& o,
-                  StartTransitionCallback& callback) {
+                  StartTransitionCallback& callback,
+                  interface_callbacks::writer::base_writer& writer) {
         sample::generate_transitions<Model, RNG, StartTransitionCallback,
                                      SampleRecorder, DiagnosticRecorder,
                                      MessageRecorder>
           (sampler, num_warmup, 0, num_warmup + num_samples, num_thin,
            refresh, save, true,
-           writer,
+           mcmc_writer,
            init_s, model, base_rng,
            prefix, suffix, o,
-           callback);
+           callback, writer);
       }
 
     }

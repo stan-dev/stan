@@ -1,5 +1,6 @@
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
 #include <test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <boost/random/additive_combine.hpp>
 #include <test/unit/util.hpp>
 #include <gtest/gtest.h>
@@ -16,11 +17,12 @@ TEST(BaseHamiltonian, update) {
 
   funnel_model_namespace::funnel_model model(data_var_context, &model_output);
   
-  stan::mcmc::mock_hamiltonian<funnel_model_namespace::funnel_model, rng_t> metric(model, &metric_output);
+  stan::mcmc::mock_hamiltonian<funnel_model_namespace::funnel_model, rng_t> metric(model);
   stan::mcmc::ps_point z(11);
   z.q.setOnes();
+  stan::interface_callbacks::writer::stream_writer writer(metric_output);
   
-  metric.update(z);
+  metric.update(z, writer);
 
   EXPECT_FLOAT_EQ(10.73223197, z.V);
 

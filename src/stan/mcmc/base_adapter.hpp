@@ -2,7 +2,6 @@
 #define STAN_MCMC_BASE_ADAPTER_HPP
 
 namespace stan {
-
   namespace mcmc {
 
     class base_adapter {
@@ -27,7 +26,5 @@ namespace stan {
     };
 
   }  // mcmc
-
 }  // stan
-
 #endif

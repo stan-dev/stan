@@ -1,22 +1,20 @@
 #ifndef STAN_MCMC_HMC_HAMILTONIANS_DIAG_E_METRIC_HPP
 #define STAN_MCMC_HMC_HAMILTONIANS_DIAG_E_METRIC_HPP
 
+#include <stan/mcmc/hmc/hamiltonians/base_hamiltonian.hpp>
+#include <stan/mcmc/hmc/hamiltonians/diag_e_point.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/normal_distribution.hpp>
 
-#include <stan/mcmc/hmc/hamiltonians/base_hamiltonian.hpp>
-#include <stan/mcmc/hmc/hamiltonians/diag_e_point.hpp>
-
 namespace stan {
-
   namespace mcmc {
 
     // Euclidean manifold with diagonal metric
-    template <typename Model, typename BaseRNG>
+    template <class Model, class BaseRNG>
     class diag_e_metric: public base_hamiltonian<Model, diag_e_point, BaseRNG> {
     public:
-      diag_e_metric(Model& model, std::ostream* e)
-        : base_hamiltonian<Model, diag_e_point, BaseRNG>(model, e) {}
+      explicit diag_e_metric(Model& model)
+        : base_hamiltonian<Model, diag_e_point, BaseRNG>(model) {}
 
       ~diag_e_metric() {}
 
@@ -54,7 +52,5 @@ namespace stan {
     };
 
   }  // mcmc
-
 }  // stan
-
 #endif
