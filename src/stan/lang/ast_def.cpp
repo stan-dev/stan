@@ -659,9 +659,13 @@ namespace stan {
     expr_type expression_type_vis::operator()(const integrate_ode& e) const {
       return expr_type(DOUBLE_T, 2);
     }
+    expr_type expression_type_vis::operator()(const integrate_function& e) const {
+      return DOUBLE_T;
+    }
     expr_type
     expression_type_vis::operator()(const integrate_ode_cvode& e) const {
       return expr_type(DOUBLE_T, 2);
+
     }
     expr_type expression_type_vis::operator()(const fun& e) const {
       return e.type_;
@@ -699,6 +703,7 @@ namespace stan {
     expression::expression(const array_literal& expr) : expr_(expr) { }
     expression::expression(const variable& expr) : expr_(expr) { }
     expression::expression(const integrate_ode& expr) : expr_(expr) { }
+    expression::expression(const integrate_function& expr) : expr_(expr) { }
     expression::expression(const integrate_ode_cvode& expr) : expr_(expr) { }
     expression::expression(const fun& expr) : expr_(expr) { }
     expression::expression(const index_op& expr) : expr_(expr) { }
@@ -762,10 +767,18 @@ namespace stan {
       return boost::apply_visitor(*this, e.y0_.expr_)
         || boost::apply_visitor(*this, e.theta_.expr_);
     }
+
+    bool contains_var::operator()(const integrate_function& e) const {
+      // only init state and params may contain vars
+      return boost::apply_visitor(*this, e.param_.expr_);
+
+    }
+
     bool contains_var::operator()(const integrate_ode_cvode& e) const {
       // only init state and params may contain vars
       return boost::apply_visitor(*this, e.y0_.expr_)
         || boost::apply_visitor(*this, e.theta_.expr_);
+
     }
     bool contains_var::operator()(const index_op& e) const {
       return boost::apply_visitor(*this, e.expr_.expr_);
@@ -845,10 +858,18 @@ namespace stan {
       return boost::apply_visitor(*this, e.y0_.expr_)
         || boost::apply_visitor(*this, e.theta_.expr_);
     }
+
+    bool contains_nonparam_var::operator()(const integrate_function& e) const {
+      // if any vars, return true because integration will be nonlinear
+      return boost::apply_visitor(*this, e.param_.expr_);
+
+    }
+
     bool contains_nonparam_var::operator()(const integrate_ode_cvode& e) const {
       // if any vars, return true because integration will be nonlinear
       return boost::apply_visitor(*this, e.y0_.expr_)
         || boost::apply_visitor(*this, e.theta_.expr_);
+
     }
     bool contains_nonparam_var::operator()(const fun& e) const {
       // any function applied to non-linearly transformed var
@@ -908,7 +929,11 @@ namespace stan {
     bool is_nil_op::operator()(const integrate_ode& /* x */) const {
       return false;
     }
+    bool is_nil_op::operator()(const integrate_function& /* x */) const {
+      return false;
+    }
     bool is_nil_op::operator()(const integrate_ode_cvode& /* x */) const {
+
       return false;
     }
     bool is_nil_op::operator()(const fun& /* x */) const { return false; }
@@ -1002,6 +1027,18 @@ namespace stan {
         x_int_(x_int) {
     }
 
+    integrate_function::integrate_function() { }
+    integrate_function::integrate_function(const std::string& system_function_name,
+                         const expression& a,
+                         const expression& b,
+                         const expression& param)
+      : system_function_name_(system_function_name),
+        a_(a),
+        b_(b),
+        param_(param) {
+
+    }
+
     integrate_ode_cvode::integrate_ode_cvode() { }
     integrate_ode_cvode::integrate_ode_cvode(
                                        const std::string& system_function_name,
@@ -1024,6 +1061,7 @@ namespace stan {
         rel_tol_(rel_tol),
         abs_tol_(abs_tol),
         max_num_steps_(max_num_steps) {
+
     }
 
     fun::fun() { }
@@ -1657,8 +1695,15 @@ namespace stan {
     bool var_occurs_vis::operator()(const integrate_ode& e) const {
       return false;  // no refs persist out of integrate_ode() call
     }
+
+    bool var_occurs_vis::operator()(const integrate_function& e) const {
+      return false;  // no refs persist out of integrate_function() call
+
+    }
+
     bool var_occurs_vis::operator()(const integrate_ode_cvode& e) const {
       return false;  // no refs persist out of integrate_ode_cvode() call
+
     }
     bool var_occurs_vis::operator()(const index_op& e) const {
       // refs only persist out of expression, not indexes

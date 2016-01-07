@@ -307,6 +307,21 @@ namespace stan {
         o_ << ", ";
 
         generate_expression(fx.max_num_steps_, o_);
+
+        o_ << ", pstream__)";
+      }
+      void operator()(const integrate_function& fx) const {
+        o_ << "integrate_function("
+           << fx.system_function_name_
+           << "_functor__(), ";
+
+        generate_expression(fx.a_, o_);
+        o_ << ", ";
+
+        generate_expression(fx.b_, o_);
+        o_ << ", ";
+
+        generate_expression(fx.param_, o_);
         o_ << ", pstream__)";
       }
       void operator()(const fun& fx) const {

@@ -50,6 +50,7 @@ namespace stan {
     struct sample;
     struct simplex_var_decl;
     struct integrate_ode;
+    struct integrate_function;
     struct integrate_ode_cvode;
     struct unit_vector_var_decl;
     struct statement;
@@ -208,6 +209,7 @@ namespace stan {
       expr_type operator()(const variable& e) const;
       expr_type operator()(const fun& e) const;
       expr_type operator()(const integrate_ode& e) const;
+      expr_type operator()(const integrate_function& e) const;
       expr_type operator()(const integrate_ode_cvode& e) const;
       expr_type operator()(const index_op& e) const;
       expr_type operator()(const index_op_sliced& e) const;
@@ -226,6 +228,7 @@ namespace stan {
                              boost::recursive_wrapper<array_literal>,
                              boost::recursive_wrapper<variable>,
                              boost::recursive_wrapper<integrate_ode>,
+                             boost::recursive_wrapper<integrate_function>,
                              boost::recursive_wrapper<integrate_ode_cvode>,
                              boost::recursive_wrapper<fun>,
                              boost::recursive_wrapper<index_op>,
@@ -245,6 +248,7 @@ namespace stan {
       expression(const variable& expr);  // NOLINT(runtime/explicit)
       expression(const fun& expr);  // NOLINT(runtime/explicit)
       expression(const integrate_ode& expr);  // NOLINT(runtime/explicit)
+      expression(const integrate_function& expr);  // NOLINT(runtime/explicit)
       expression(const integrate_ode_cvode& expr);  // NOLINT(runtime/explicit)
       expression(const index_op& expr);  // NOLINT(runtime/explicit)
       expression(const index_op_sliced& expr);  // NOLINT(runtime/explicit)
@@ -285,6 +289,7 @@ namespace stan {
       bool operator()(const array_literal& x) const;  // NOLINT
       bool operator()(const variable& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const integrate_ode& x) const;  // NOLINT
+      bool operator()(const integrate_function& x) const;  // NOLINT
       bool operator()(const integrate_ode_cvode& x) const;  // NOLINT
       bool operator()(const fun& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const index_op& x) const;  // NOLINT(runtime/explicit)
@@ -357,6 +362,20 @@ namespace stan {
                 const expression& x_int);
     };
 
+
+    struct integrate_function {
+      std::string system_function_name_;
+      expression a_;  // lower limit
+      expression b_;  // upper limit
+      expression param_;  // solution times
+      integrate_function();
+      integrate_function(const std::string& system_function_name,
+                const expression& a,
+                const expression& b,
+                const expression& param);
+
+    };
+
     struct integrate_ode_cvode {
       std::string system_function_name_;
       expression y0_;  // initial state
@@ -379,6 +398,7 @@ namespace stan {
                           const expression& rel_tol,
                           const expression& abs_tol,
                           const expression& max_num_steps);
+
     };
 
     struct fun {
@@ -964,6 +984,7 @@ namespace stan {
       bool operator()(const variable& e) const;
       bool operator()(const fun& e) const;
       bool operator()(const integrate_ode& e) const;
+      bool operator()(const integrate_function& e) const;
       bool operator()(const integrate_ode_cvode& e) const;
       bool operator()(const index_op& e) const;
       bool operator()(const index_op_sliced& e) const;
@@ -1017,6 +1038,7 @@ namespace stan {
       bool operator()(const array_literal& e) const;
       bool operator()(const variable& e) const;
       bool operator()(const integrate_ode& e) const;
+      bool operator()(const integrate_function& e) const;
       bool operator()(const integrate_ode_cvode& e) const;
       bool operator()(const fun& e) const;
       bool operator()(const index_op& e) const;
@@ -1038,6 +1060,7 @@ namespace stan {
       bool operator()(const array_literal& e) const;
       bool operator()(const variable& e) const;
       bool operator()(const integrate_ode& e) const;
+      bool operator()(const integrate_function& e) const;
       bool operator()(const integrate_ode_cvode& e) const;
       bool operator()(const fun& e) const;
       bool operator()(const index_op& e) const;

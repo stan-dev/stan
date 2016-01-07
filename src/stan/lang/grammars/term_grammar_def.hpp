@@ -57,6 +57,12 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::integrate_ode,
                           (stan::lang::expression, x_)
                           (stan::lang::expression, x_int_) )
 
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::integrate_function,
+                          (std::string, system_function_name_)
+                          (stan::lang::expression, a_)
+                          (stan::lang::expression, b_)
+                          (stan::lang::expression, param_) )
+
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::integrate_ode_cvode,
                           (std::string, system_function_name_)
                           (stan::lang::expression, y0_)
@@ -201,7 +207,9 @@ namespace stan {
     };
     boost::phoenix::function<validate_integrate_ode> validate_integrate_ode_f;
 
+
     struct validate_integrate_ode_cvode {
+
       //! @cond Doxygen_Suppress
       template <class> struct result;
       //! @endcond
@@ -346,6 +354,7 @@ namespace stan {
     boost::phoenix::function<validate_integrate_ode_cvode>
       validate_integrate_ode_cvode_f;
 
+
     struct set_fun_type {
       //! @cond Doxygen_Suppress
       template <class> struct result;
@@ -366,6 +375,26 @@ namespace stan {
     };
     boost::phoenix::function<set_fun_type> set_fun_type_f;
 
+    struct validate_integrate_function {
+
+       //! @cond Doxygen_Suppress
+       template <class> struct result;
+       //! @endcond
+       template <typename F, typename T1, typename T2, typename T3, typename T4>
+       struct result<F(T1, T2, T3, T4)> { typedef void type; };
+
+
+      void operator()(const integrate_function& ode_fun,
+                      const variable_map& var_map,
+                      bool& pass,
+                      std::ostream& error_msgs) const {
+
+        //FIXME
+        pass = true;
+
+      }
+    };
+    boost::phoenix::function<validate_integrate_function> validate_integrate_function_f;
 
     struct set_fun_type_named {
       //! @cond Doxygen_Suppress
@@ -1009,6 +1038,23 @@ namespace stan {
                                          _pass,
                                          boost::phoenix::ref(error_msgs_))];
 
+
+      integrate_function_r.name("expression");
+      integrate_function_r
+        %= (lit("integrate_function") >> no_skip[!char_("a-zA-Z0-9_")])
+        > lit('(')
+        > identifier_r          // system function name (function only)
+        > lit(',')
+        > expression_g(_r1)     // a
+        > lit(',')
+        > expression_g(_r1)     // b
+        > lit(',')
+        > expression_g(_r1)     // param
+        > lit(')') [validate_integrate_function_f(_val,
+                                         boost::phoenix::ref(var_map_),
+                                         _pass,
+                                         boost::phoenix::ref(error_msgs_))];
+
       integrate_ode_cvode_r.name("expression");
       integrate_ode_cvode_r
         %= (lit("integrate_ode_cvode") >> no_skip[!char_("a-zA-Z0-9_")])
@@ -1036,10 +1082,14 @@ namespace stan {
             _val, boost::phoenix::ref(var_map_),
             _pass, boost::phoenix::ref(error_msgs_))];
 
+
       factor_r.name("expression");
       factor_r =
         integrate_ode_r(_r1)[set_val5_f(_val, _1)]
+
+        | integrate_function_r(_r1)[set_val5_f(_val, _1)]
         | integrate_ode_cvode_r(_r1)[set_val5_f(_val, _1)]
+
         | (fun_r(_r1)[set_val5_f(_b, _1)]
            > eps[set_fun_type_named_f(_val, _b, _r1, _pass,
                                       boost::phoenix::ref(error_msgs_))])
