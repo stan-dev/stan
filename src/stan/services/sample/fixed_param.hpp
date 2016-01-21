@@ -4,13 +4,31 @@
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/interface_callbacks/interrupt/base_interrupt.hpp>
 #include <stan/mcmc/fixed_param_sampler.hpp>
+#include <stan/services/error_codes.hpp>
 #include <stan/services/sample/mcmc_writer.hpp>
 #include <stan/services/mcmc/sample.hpp>
 
 namespace stan {
   namespace services {
     namespace sample {
-      
+
+      /**
+       * Runs the fixed_param sampler.
+       *
+       * @tparam Model Model class
+       * @tparam rng_t Random number generator class
+       * @param model Instance of model
+       * @param base_rng Instance of random number generator
+       * @param cont_params Initial value
+       * @param num_samples Number of samples
+       * @param num_thin Number to thin the samples
+       * @param refresh Controls the output
+       * @param interrupt Callback for interrupts
+       * @param sample_writer Writer for draws
+       * @param diagnostic_writer Writer for diagnostic information
+       * @param message_writer Writer for messages
+       * @return error code; 0 if no error
+       */
       template <class Model, class rng_t>
       int fixed_param(Model& model,
                       rng_t& base_rng,
@@ -46,7 +64,7 @@ namespace stan {
         double sampleDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;
         writer.write_timing(0.0, sampleDeltaT);
         
-        return 0;
+        return stan::services::error_codes::OK;
       }
       
     }
