@@ -1,0 +1,108 @@
+#ifndef STAN_SERVICES_SAMPLE_HMC_STATIC_UNIT_E_ADAPT_HPP
+#define STAN_SERVICES_SAMPLE_HMC_STATIC_UNIT_E_ADAPT_HPP
+
+#include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/interface_callbacks/interrupt/base_interrupt.hpp>
+#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/mcmc/fixed_param_sampler.hpp>
+#include <stan/services/error_codes.hpp>
+#include <stan/services/check_timing.hpp>
+#include <stan/services/sample/mcmc_writer.hpp>
+#include <stan/services/mcmc/sample.hpp>
+#include <stan/services/mcmc/warmup.hpp>
+#include <stan/mcmc/hmc/static/unit_e_static_hmc.hpp>
+#include <ctime>
+
+namespace stan {
+  namespace services {
+    namespace sample {
+
+      /**
+       * Runs HMC for static integration time with unit Euclidean
+       * metric with adaptation.
+       *
+       * @tparam Model Model class
+       * @tparam rng_t Random number generator class
+       * @param model Instance of model
+       * @param base_rng Instance of random number generator
+       * @param cont_params Initial value
+       * @param num_samples Number of samples
+       * @param num_thin Number to thin the samples
+       * @param refresh Controls the output
+       * @param interrupt Callback for interrupts
+       * @param sample_writer Writer for draws
+       * @param diagnostic_writer Writer for diagnostic information
+       * @param message_writer Writer for messages
+       * @return error code; 0 if no error
+       */
+      template <class Model, class rng_t>
+      int hmc_static_unit_e_adapt(Model& model,
+                                  rng_t& base_rng,
+                                  Eigen::VectorXd& cont_params,
+                                  int num_warmup,
+                                  int num_samples,
+                                  int num_thin,
+                                  bool save_warmup,
+                                  int refresh,
+                                  double epsilon,
+                                  double epsilon_jitter,
+                                  double int_time,
+                                  interface_callbacks::interrupt::base_interrupt& interrupt,
+                                  interface_callbacks::writer::base_writer& sample_writer,
+                                  interface_callbacks::writer::base_writer& diagnostic_writer,
+                                  interface_callbacks::writer::base_writer& message_writer) {
+        stan::mcmc::unit_e_static_hmc<Model, rng_t> sampler(model, base_rng);
+        sampler.set_nominal_stepsize_and_T(epsilon, int_time);
+        sampler.set_stepsize_jitter(epsilon_jitter);
+        
+        stan::services::sample::mcmc_writer<Model,
+                                            interface_callbacks::writer::base_writer,
+                                            interface_callbacks::writer::base_writer,
+                                            interface_callbacks::writer::base_writer>
+          writer(sample_writer, diagnostic_writer, message_writer);
+        stan::mcmc::sample s(cont_params, 0, 0);
+
+        // Headers
+        writer.write_sample_names(s, &sampler, model);
+        writer.write_diagnostic_names(s, &sampler, model);
+
+        stan::services::check_timing(model, cont_params, message_writer);
+        // Warmup
+        
+        clock_t start = clock();
+        mcmc::warmup<Model, rng_t>(&sampler, num_warmup, num_samples, num_thin,
+                                   refresh, save_warmup,
+                                   writer,
+                                   s, model, base_rng,
+                                   interrupt,
+                                   message_writer);
+
+        clock_t end = clock();
+        double warmDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;
+        
+        // if (adapt_engaged) {
+        //   sampler.disengage_adaptation();
+        //   writer.write_adapt_finish(&sampler);
+        // }
+
+
+        // Sample
+        start = clock();
+        mcmc::sample<Model, rng_t>(&sampler, num_warmup, num_samples, num_thin,
+                                   refresh, true,
+                                   writer,
+                                   s, model, base_rng,
+                                   interrupt,
+                                   message_writer);        
+        end = clock();
+
+        double sampleDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;
+        writer.write_timing(warmDeltaT, sampleDeltaT);
+        
+        return stan::services::error_codes::OK;
+      }
+      
+    }
+  }
+}
+#endif

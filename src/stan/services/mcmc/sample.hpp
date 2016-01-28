@@ -11,7 +11,7 @@ namespace stan {
   namespace services {
     namespace mcmc {
 
-      template <class Model, class RNG, class StartTransitionCallback,
+      template <class Model, class rng_t, class StartTransitionCallback,
                 class SampleRecorder, class DiagnosticRecorder,
                 class MessageRecorder>
       void sample(stan::mcmc::base_mcmc* sampler,
@@ -25,10 +25,10 @@ namespace stan {
                   mcmc_writer,
                   stan::mcmc::sample& init_s,
                   Model& model,
-                  RNG& base_rng,
+                  rng_t& base_rng,
                   StartTransitionCallback& callback,
                   interface_callbacks::writer::base_writer& writer) {
-        stan::services::sample::generate_transitions<Model, RNG,
+        stan::services::sample::generate_transitions<Model, rng_t,
                                                      StartTransitionCallback,
                                                      SampleRecorder,
                                                      DiagnosticRecorder,

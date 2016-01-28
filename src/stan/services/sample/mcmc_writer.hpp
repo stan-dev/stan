@@ -68,12 +68,12 @@ namespace stan {
          *   with a newline at the end
          */
         void write_sample_names(stan::mcmc::sample& sample,
-                                stan::mcmc::base_mcmc* sampler,
+                                stan::mcmc::base_mcmc& sampler,
                                 Model& model) {
           std::vector<std::string> names;
 
           sample.get_sample_param_names(names);
-          sampler->get_sampler_param_names(names);
+          sampler.get_sampler_param_names(names);
           model.constrained_param_names(names, true, true);
 
           sample_writer_(names);
@@ -128,9 +128,9 @@ namespace stan {
          *
          * @param sampler sampler
          */
-        void write_adapt_finish(stan::mcmc::base_mcmc* sampler) {
+        void write_adapt_finish(stan::mcmc::base_mcmc& sampler) {
           sample_writer_("Adaptation terminated");
-          sampler->write_sampler_state(sample_writer_);
+          sampler.write_sampler_state(sample_writer_);
         }
 
 
@@ -147,17 +147,17 @@ namespace stan {
          *   separated names with newline at the end
          */
         void write_diagnostic_names(stan::mcmc::sample sample,
-                                    stan::mcmc::base_mcmc* sampler,
+                                    stan::mcmc::base_mcmc& sampler,
                                     Model& model) {
           std::vector<std::string> names;
 
           sample.get_sample_param_names(names);
-          sampler->get_sampler_param_names(names);
+          sampler.get_sampler_param_names(names);
 
           std::vector<std::string> model_names;
           model.unconstrained_param_names(model_names, false, false);
 
-          sampler->get_sampler_diagnostic_names(model_names, names);
+          sampler.get_sampler_diagnostic_names(model_names, names);
 
           diagnostic_writer_(names);
         }
@@ -175,12 +175,12 @@ namespace stan {
          *   and get_sampler_diagnostics()
          */
         void write_diagnostic_params(stan::mcmc::sample& sample,
-                                     stan::mcmc::base_mcmc* sampler) {
+                                     stan::mcmc::base_mcmc& sampler) {
           std::vector<double> values;
 
           sample.get_sample_params(values);
-          sampler->get_sampler_params(values);
-          sampler->get_sampler_diagnostics(values);
+          sampler.get_sampler_params(values);
+          sampler.get_sampler_diagnostics(values);
 
           diagnostic_writer_(values);
         }

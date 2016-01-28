@@ -49,16 +49,17 @@ namespace stan {
         stan::mcmc::sample s(cont_params, 0, 0);
 
         // Headers
-        writer.write_sample_names(s, &sampler, model);
-        writer.write_diagnostic_names(s, &sampler, model);
+        writer.write_sample_names(s, sampler, model);
+        writer.write_diagnostic_names(s, sampler, model);
         
         clock_t start = clock();
-        mcmc::sample<Model, rng_t>(&sampler, 0, num_samples, num_thin,
-                                   refresh, true,
-                                   writer,
-                                   s, model, base_rng,
-                                   interrupt,
-                                   message_writer);        
+
+        stan::services::sample::generate_transitions
+          (sampler, num_samples, 0, num_samples, num_thin,
+           refresh, true, false,
+           writer,
+           s, model, base_rng,
+           interrupt, message_writer);
         clock_t end = clock();
 
         double sampleDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;
