@@ -7,10 +7,10 @@
 #include <stan/mcmc/fixed_param_sampler.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/services/check_timing.hpp>
-#include <stan/services/sample/mcmc_writer.hpp>
+#include <stan/services/sample/run_sampler.hpp>
 #include <stan/services/mcmc/sample.hpp>
 #include <stan/services/mcmc/warmup.hpp>
-#include <stan/mcmc/hmc/static/unit_e_static_hmc.hpp>
+#include <stan/mcmc/hmc/static/adapt_unit_e_static_hmc.hpp>
 #include <ctime>
 
 namespace stan {
@@ -47,57 +47,44 @@ namespace stan {
                                   double epsilon,
                                   double epsilon_jitter,
                                   double int_time,
+                                  double delta,
+                                  double gamma,
+                                  double kappa,
+                                  double t0,
                                   interface_callbacks::interrupt::base_interrupt& interrupt,
                                   interface_callbacks::writer::base_writer& sample_writer,
                                   interface_callbacks::writer::base_writer& diagnostic_writer,
                                   interface_callbacks::writer::base_writer& message_writer) {
-        stan::mcmc::unit_e_static_hmc<Model, rng_t> sampler(model, base_rng);
+        stan::services::check_timing(model, cont_params, message_writer);
+
+        stan::mcmc::adapt_unit_e_static_hmc<Model, rng_t> sampler(model, base_rng);
         sampler.set_nominal_stepsize_and_T(epsilon, int_time);
         sampler.set_stepsize_jitter(epsilon_jitter);
+
+        sampler.get_stepsize_adaptation().set_mu(log(10 * epsilon));
+        sampler.get_stepsize_adaptation().set_delta(delta);
+        sampler.get_stepsize_adaptation().set_gamma(gamma);
+        sampler.get_stepsize_adaptation().set_kappa(kappa);
+        sampler.get_stepsize_adaptation().set_t0(t0);
+
         
-        stan::services::sample::mcmc_writer<Model,
-                                            interface_callbacks::writer::base_writer,
-                                            interface_callbacks::writer::base_writer,
-                                            interface_callbacks::writer::base_writer>
-          writer(sample_writer, diagnostic_writer, message_writer);
-        stan::mcmc::sample s(cont_params, 0, 0);
+        sampler.engage_adaptation();
+        try {
+          sampler.z().q = cont_params;
+          sampler.init_stepsize(message_writer);
+        } catch (const std::exception& e) {
+          message_writer("Exception initializing step size.");
+          message_writer(e.what());
+          return stan::services::error_codes::OK;
+        }
 
-        // Headers
-        writer.write_sample_names(s, &sampler, model);
-        writer.write_diagnostic_names(s, &sampler, model);
-
-        stan::services::check_timing(model, cont_params, message_writer);
-        // Warmup
         
-        clock_t start = clock();
-        mcmc::warmup<Model, rng_t>(&sampler, num_warmup, num_samples, num_thin,
-                                   refresh, save_warmup,
-                                   writer,
-                                   s, model, base_rng,
-                                   interrupt,
-                                   message_writer);
-
-        clock_t end = clock();
-        double warmDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;
-        
-        // if (adapt_engaged) {
-        //   sampler.disengage_adaptation();
-        //   writer.write_adapt_finish(&sampler);
-        // }
-
-
-        // Sample
-        start = clock();
-        mcmc::sample<Model, rng_t>(&sampler, num_warmup, num_samples, num_thin,
-                                   refresh, true,
-                                   writer,
-                                   s, model, base_rng,
-                                   interrupt,
-                                   message_writer);        
-        end = clock();
-
-        double sampleDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;
-        writer.write_timing(warmDeltaT, sampleDeltaT);
+        run_sampler(sampler, model,
+                    cont_params,
+                    num_warmup, num_samples, num_thin,
+                    refresh, save_warmup, true, base_rng,
+                    interrupt, sample_writer, diagnostic_writer,
+                    message_writer);
         
         return stan::services::error_codes::OK;
       }

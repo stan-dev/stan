@@ -60,49 +60,9 @@ namespace stan {
         run_sampler(sampler, model,
                     cont_params,
                     num_warmup, num_samples, num_thin,
-                    refresh, save_warmup, base_rng,
+                    refresh, save_warmup, false, base_rng,
                     interrupt, sample_writer, diagnostic_writer,
                     message_writer);
-
-
-        
-        
-        // stan::services::sample::mcmc_writer<Model,
-        //                                     interface_callbacks::writer::base_writer,
-        //                                     interface_callbacks::writer::base_writer,
-        //                                     interface_callbacks::writer::base_writer>
-        //   writer(sample_writer, diagnostic_writer, message_writer);
-        // stan::mcmc::sample s(cont_params, 0, 0);
-
-        // // Headers
-        // writer.write_sample_names(s, &sampler, model);
-        // writer.write_diagnostic_names(s, &sampler, model);
-
-        // // Warmup
-        
-        // clock_t start = clock();
-        // mcmc::warmup<Model, rng_t>(&sampler, num_warmup, num_samples, num_thin,
-        //                            refresh, save_warmup,
-        //                            writer,
-        //                            s, model, base_rng,
-        //                            interrupt,
-        //                            message_writer);
-
-        // clock_t end = clock();
-        // double warmDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;
-        
-        // // Sample
-        // start = clock();
-        // mcmc::sample<Model, rng_t>(&sampler, num_warmup, num_samples, num_thin,
-        //                            refresh, true,
-        //                            writer,
-        //                            s, model, base_rng,
-        //                            interrupt,
-        //                            message_writer);        
-        // end = clock();
-
-        // double sampleDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;
-        // writer.write_timing(warmDeltaT, sampleDeltaT);
         
         return stan::services::error_codes::OK;
       }

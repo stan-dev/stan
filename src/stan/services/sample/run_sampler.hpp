@@ -16,6 +16,7 @@ namespace stan {
                        int num_thin,
                        int refresh,
                        bool save_warmup,
+                       bool adapt_engaged,
                        rng_t& base_rng,
                        interface_callbacks::interrupt::base_interrupt& interrupt,
                        interface_callbacks::writer::base_writer& sample_writer,
@@ -34,13 +35,17 @@ namespace stan {
 
         clock_t start = clock();
         generate_transitions(sampler, 
-                             num_warmup, 0, num_warmup,
+                             num_warmup, 0, num_warmup + num_samples,
                              num_thin, refresh, save_warmup, true,
                              writer, s,
                              model, base_rng, interrupt, message_writer);
         clock_t end = clock();
         double warm_delta_t = static_cast<double>(end - start) / CLOCKS_PER_SEC;
 
+        if (adapt_engaged) {
+          sampler.disengage_adaptation();
+          writer.write_adapt_finish(sampler);
+        }
 
         start = clock();
         generate_transitions(sampler, 
