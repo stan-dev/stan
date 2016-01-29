@@ -32,8 +32,6 @@ namespace stan {
                                    std::vector<std::string>& names) {}
 
       virtual void get_sampler_diagnostics(std::vector<double>& values) {}
-
-      virtual void disengage_adaptation() { }
     };
 
   }  // mcmc

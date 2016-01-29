@@ -1,5 +1,5 @@
-#ifndef STAN_SERVICES_SAMPLE_HMC_STATIC_UNIT_E_HPP
-#define STAN_SERVICES_SAMPLE_HMC_STATIC_UNIT_E_HPP
+#ifndef STAN_SERVICES_SAMPLE_HMC_STATIC_DIAG_E_HPP
+#define STAN_SERVICES_SAMPLE_HMC_STATIC_DIAG_E_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/interface_callbacks/interrupt/base_interrupt.hpp>
@@ -10,7 +10,7 @@
 #include <stan/services/sample/run_sampler.hpp>
 #include <stan/services/mcmc/sample.hpp>
 #include <stan/services/mcmc/warmup.hpp>
-#include <stan/mcmc/hmc/static/unit_e_static_hmc.hpp>
+#include <stan/mcmc/hmc/static/diag_e_static_hmc.hpp>
 #include <ctime>
 
 namespace stan {
@@ -18,7 +18,7 @@ namespace stan {
     namespace sample {
 
       /**
-       * Runs HMC for static integration time with unit Euclidean
+       * Runs HMC for static integration time with diagonal Euclidean
        * metric without adapatation.
        *
        * @tparam Model Model class
@@ -36,7 +36,7 @@ namespace stan {
        * @return error code; 0 if no error
        */
       template <class Model, class rng_t>
-      int hmc_static_unit_e(Model& model,
+      int hmc_static_diag_e(Model& model,
                             rng_t& base_rng,
                             Eigen::VectorXd& cont_params,
                             int num_warmup,
@@ -52,8 +52,8 @@ namespace stan {
                             interface_callbacks::writer::base_writer& diagnostic_writer,
                             interface_callbacks::writer::base_writer& message_writer) {
         stan::services::check_timing(model, cont_params, message_writer);
-
-        stan::mcmc::unit_e_static_hmc<Model, rng_t> sampler(model, base_rng);
+        
+        stan::mcmc::diag_e_static_hmc<Model, rng_t> sampler(model, base_rng);
         sampler.set_nominal_stepsize_and_T(epsilon, int_time);
         sampler.set_stepsize_jitter(epsilon_jitter);
 
