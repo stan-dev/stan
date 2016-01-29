@@ -44,8 +44,8 @@ namespace stan {
                             int num_thin,
                             bool save_warmup,
                             int refresh,
-                            double epsilon,
-                            double epsilon_jitter,
+                            double stepsize,
+                            double stepsize_jitter,
                             double int_time,
                             interface_callbacks::interrupt::base_interrupt& interrupt,
                             interface_callbacks::writer::base_writer& sample_writer,
@@ -54,8 +54,8 @@ namespace stan {
         stan::services::check_timing(model, cont_params, message_writer);
         
         stan::mcmc::diag_e_static_hmc<Model, rng_t> sampler(model, base_rng);
-        sampler.set_nominal_stepsize_and_T(epsilon, int_time);
-        sampler.set_stepsize_jitter(epsilon_jitter);
+        sampler.set_nominal_stepsize_and_T(stepsize, int_time);
+        sampler.set_stepsize_jitter(stepsize_jitter);
 
         run_sampler(sampler, model,
                     cont_params,

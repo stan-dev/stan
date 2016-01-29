@@ -1,5 +1,5 @@
-#ifndef STAN_SERVICES_SAMPLE_HMC_STATIC_UNIT_E_ADAPT_HPP
-#define STAN_SERVICES_SAMPLE_HMC_STATIC_UNIT_E_ADAPT_HPP
+#ifndef STAN_SERVICES_SAMPLE_HMC_NUTS_UNIT_E_ADAPT_HPP
+#define STAN_SERVICES_SAMPLE_HMC_NUTS_UNIT_E_ADAPT_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/interface_callbacks/interrupt/base_interrupt.hpp>
@@ -10,7 +10,7 @@
 #include <stan/services/sample/run_adaptive_sampler.hpp>
 #include <stan/services/mcmc/sample.hpp>
 #include <stan/services/mcmc/warmup.hpp>
-#include <stan/mcmc/hmc/static/adapt_unit_e_static_hmc.hpp>
+#include <stan/mcmc/hmc/nuts/adapt_unit_e_nuts.hpp>
 #include <ctime>
 
 namespace stan {
@@ -18,8 +18,8 @@ namespace stan {
     namespace sample {
 
       /**
-       * Runs HMC for static integration time with unit Euclidean
-       * metric with adaptation.
+       * Runs HMC with NUTS with unit Euclidean
+       * metric without adapatation.
        *
        * @tparam Model Model class
        * @tparam rng_t Random number generator class
@@ -36,37 +36,38 @@ namespace stan {
        * @return error code; 0 if no error
        */
       template <class Model, class rng_t>
-      int hmc_static_unit_e_adapt(Model& model,
-                                  rng_t& base_rng,
-                                  Eigen::VectorXd& cont_params,
-                                  int num_warmup,
-                                  int num_samples,
-                                  int num_thin,
-                                  bool save_warmup,
-                                  int refresh,
-                                  double stepsize,
-                                  double stepsize_jitter,
-                                  double int_time,
-                                  double delta,
-                                  double gamma,
-                                  double kappa,
-                                  double t0,
-                                  interface_callbacks::interrupt::base_interrupt& interrupt,
-                                  interface_callbacks::writer::base_writer& sample_writer,
-                                  interface_callbacks::writer::base_writer& diagnostic_writer,
-                                  interface_callbacks::writer::base_writer& message_writer) {
+      int hmc_nuts_unit_e_adapt(Model& model,
+                                rng_t& base_rng,
+                                Eigen::VectorXd& cont_params,
+                                int num_warmup,
+                                int num_samples,
+                                int num_thin,
+                                bool save_warmup,
+                                int refresh,
+                                double stepsize,
+                                double stepsize_jitter,
+                                int max_depth,
+                                double delta,
+                                double gamma,
+                                double kappa,
+                                double t0,
+                                interface_callbacks::interrupt::base_interrupt& interrupt,
+                                interface_callbacks::writer::base_writer& sample_writer,
+                                interface_callbacks::writer::base_writer& diagnostic_writer,
+                                interface_callbacks::writer::base_writer& message_writer) {
         stan::services::check_timing(model, cont_params, message_writer);
 
-        stan::mcmc::adapt_unit_e_static_hmc<Model, rng_t> sampler(model, base_rng);
-        sampler.set_nominal_stepsize_and_T(stepsize, int_time);
+        stan::mcmc::adapt_unit_e_nuts<Model, rng_t> sampler(model, base_rng);
+        sampler.set_nominal_stepsize(stepsize);
         sampler.set_stepsize_jitter(stepsize_jitter);
+        sampler.set_max_depth(max_depth);
 
         sampler.get_stepsize_adaptation().set_mu(log(10 * stepsize));
         sampler.get_stepsize_adaptation().set_delta(delta);
         sampler.get_stepsize_adaptation().set_gamma(gamma);
         sampler.get_stepsize_adaptation().set_kappa(kappa);
         sampler.get_stepsize_adaptation().set_t0(t0);
-
+        
         run_adaptive_sampler(sampler, model,
                              cont_params,
                              num_warmup, num_samples, num_thin,

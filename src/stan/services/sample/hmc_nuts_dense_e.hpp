@@ -1,5 +1,5 @@
-#ifndef STAN_SERVICES_SAMPLE_HMC_STATIC_UNIT_E_HPP
-#define STAN_SERVICES_SAMPLE_HMC_STATIC_UNIT_E_HPP
+#ifndef STAN_SERVICES_SAMPLE_HMC_NUTS_DENSE_E_HPP
+#define STAN_SERVICES_SAMPLE_HMC_NUTS_DENSE_E_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/interface_callbacks/interrupt/base_interrupt.hpp>
@@ -10,7 +10,7 @@
 #include <stan/services/sample/run_sampler.hpp>
 #include <stan/services/mcmc/sample.hpp>
 #include <stan/services/mcmc/warmup.hpp>
-#include <stan/mcmc/hmc/static/unit_e_static_hmc.hpp>
+#include <stan/mcmc/hmc/nuts/dense_e_nuts.hpp>
 #include <ctime>
 
 namespace stan {
@@ -18,7 +18,7 @@ namespace stan {
     namespace sample {
 
       /**
-       * Runs HMC for static integration time with unit Euclidean
+       * Runs HMC with NUTS with dense Euclidean
        * metric without adapatation.
        *
        * @tparam Model Model class
@@ -36,26 +36,27 @@ namespace stan {
        * @return error code; 0 if no error
        */
       template <class Model, class rng_t>
-      int hmc_static_unit_e(Model& model,
-                            rng_t& base_rng,
-                            Eigen::VectorXd& cont_params,
-                            int num_warmup,
-                            int num_samples,
-                            int num_thin,
-                            bool save_warmup,
-                            int refresh,
-                            double stepsize,
-                            double stepsize_jitter,
-                            double int_time,
-                            interface_callbacks::interrupt::base_interrupt& interrupt,
-                            interface_callbacks::writer::base_writer& sample_writer,
-                            interface_callbacks::writer::base_writer& diagnostic_writer,
-                            interface_callbacks::writer::base_writer& message_writer) {
+      int hmc_nuts_dense_e(Model& model,
+                          rng_t& base_rng,
+                          Eigen::VectorXd& cont_params,
+                          int num_warmup,
+                          int num_samples,
+                          int num_thin,
+                          bool save_warmup,
+                          int refresh,
+                          double stepsize,
+                          double stepsize_jitter,
+                          int max_depth,
+                          interface_callbacks::interrupt::base_interrupt& interrupt,
+                          interface_callbacks::writer::base_writer& sample_writer,
+                          interface_callbacks::writer::base_writer& diagnostic_writer,
+                          interface_callbacks::writer::base_writer& message_writer) {
         stan::services::check_timing(model, cont_params, message_writer);
 
-        stan::mcmc::unit_e_static_hmc<Model, rng_t> sampler(model, base_rng);
-        sampler.set_nominal_stepsize_and_T(stepsize, int_time);
+        stan::mcmc::dense_e_nuts<Model, rng_t> sampler(model, base_rng);
+        sampler.set_nominal_stepsize(stepsize);
         sampler.set_stepsize_jitter(stepsize_jitter);
+        sampler.set_max_depth(max_depth);
 
         run_sampler(sampler, model,
                     cont_params,
