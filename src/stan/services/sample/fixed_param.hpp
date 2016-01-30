@@ -6,7 +6,6 @@
 #include <stan/mcmc/fixed_param_sampler.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/services/sample/mcmc_writer.hpp>
-#include <stan/services/mcmc/sample.hpp>
 
 namespace stan {
   namespace services {
