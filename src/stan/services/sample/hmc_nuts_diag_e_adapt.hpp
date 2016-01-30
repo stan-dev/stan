@@ -8,8 +8,6 @@
 #include <stan/services/error_codes.hpp>
 #include <stan/services/check_timing.hpp>
 #include <stan/services/sample/run_adaptive_sampler.hpp>
-#include <stan/services/mcmc/sample.hpp>
-#include <stan/services/mcmc/warmup.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_diag_e_nuts.hpp>
 #include <ctime>
 

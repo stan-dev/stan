@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <stan/services/sample/generate_transitions.hpp>
 #include <test/test-models/good/services/test_lp.hpp>
+#include <stan/interface_callbacks/interrupt/base_interrupt.hpp>
 #include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <boost/random/additive_combine.hpp>
@@ -23,7 +24,7 @@ public:
   int n_transition_called;
 };
 
-struct mock_callback {
+struct mock_callback : public stan::interface_callbacks::interrupt::base_interrupt {
   int n;
   mock_callback() : n(0) { }
   
@@ -104,7 +105,7 @@ TEST_F(StanServices, generate_transitions) {
   stan::mcmc::sample s(q, log_prob, stat);
   mock_callback callback;
 
-  stan::services::sample::generate_transitions(sampler,
+  stan::services::sample::generate_transitions(*sampler,
                                                num_iterations, start, finish,
                                                num_thin, refresh, save, warmup,
                                                *writer, s, *model, base_rng,

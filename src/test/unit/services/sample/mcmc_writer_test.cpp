@@ -64,7 +64,7 @@ TEST(StanIoMcmcWriter, write_sample_names) {
                                       writer_t>
     writer(sample_writer, diagnostic_writer, message_writer);
   
-  writer.write_sample_names(sample, &sampler, model);
+  writer.write_sample_names(sample, sampler, model);
   
   std::string line;
   std::getline(sample_stream, line);
@@ -187,7 +187,7 @@ TEST(StanIoMcmcWriter, write_adapt_finish) {
                                       writer_t>
     writer(sample_writer, diagnostic_writer, message_writer);
   
-  writer.write_adapt_finish(&sampler);
+  writer.write_adapt_finish(sampler);
   
   std::stringstream expected_stream;
   expected_stream << "# Adaptation terminated" << std::endl;
@@ -283,7 +283,7 @@ TEST(StanIoMcmcWriter, write_diagnostic_names) {
                                       writer_t> 
     writer(sample_writer, diagnostic_writer, message_writer);
   
-  writer.write_diagnostic_names(sample, &sampler, model);
+  writer.write_diagnostic_names(sample, sampler, model);
   
   std::string line;
   std::getline(diagnostic_stream, line);
@@ -344,7 +344,7 @@ TEST(StanIoMcmcWriter, write_diagnostic_params) {
                                       writer_t> 
     writer(sample_writer, diagnostic_writer, message_writer);
   
-  writer.write_diagnostic_params(sample, &sampler);
+  writer.write_diagnostic_params(sample, sampler);
   
   std::string line;
   std::getline(diagnostic_stream, line);

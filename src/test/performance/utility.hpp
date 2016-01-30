@@ -19,71 +19,6 @@
 #include <stan/io/json/json_parser.hpp>
 #include <stan/services/sample/mcmc_writer.hpp>
 
-#include <stan/services/arguments/arg_adapt.hpp>
-#include <stan/services/arguments/arg_adapt_delta.hpp>
-#include <stan/services/arguments/arg_adapt_engaged.hpp>
-#include <stan/services/arguments/arg_adapt_gamma.hpp>
-#include <stan/services/arguments/arg_adapt_init_buffer.hpp>
-#include <stan/services/arguments/arg_adapt_kappa.hpp>
-#include <stan/services/arguments/arg_adapt_t0.hpp>
-#include <stan/services/arguments/arg_adapt_term_buffer.hpp>
-#include <stan/services/arguments/arg_adapt_window.hpp>
-#include <stan/services/arguments/arg_bfgs.hpp>
-#include <stan/services/arguments/arg_data.hpp>
-#include <stan/services/arguments/arg_data_file.hpp>
-#include <stan/services/arguments/arg_dense_e.hpp>
-#include <stan/services/arguments/arg_diag_e.hpp>
-#include <stan/services/arguments/arg_diagnose.hpp>
-#include <stan/services/arguments/arg_diagnostic_file.hpp>
-#include <stan/services/arguments/arg_engine.hpp>
-#include <stan/services/arguments/arg_fail.hpp>
-#include <stan/services/arguments/arg_fixed_param.hpp>
-#include <stan/services/arguments/arg_history_size.hpp>
-#include <stan/services/arguments/arg_hmc.hpp>
-#include <stan/services/arguments/arg_id.hpp>
-#include <stan/services/arguments/arg_init.hpp>
-#include <stan/services/arguments/arg_init_alpha.hpp>
-#include <stan/services/arguments/arg_int_time.hpp>
-#include <stan/services/arguments/arg_iter.hpp>
-#include <stan/services/arguments/arg_lbfgs.hpp>
-#include <stan/services/arguments/arg_max_depth.hpp>
-#include <stan/services/arguments/arg_method.hpp>
-#include <stan/services/arguments/arg_metric.hpp>
-#include <stan/services/arguments/arg_newton.hpp>
-#include <stan/services/arguments/arg_num_samples.hpp>
-#include <stan/services/arguments/arg_num_warmup.hpp>
-#include <stan/services/arguments/arg_nuts.hpp>
-#include <stan/services/arguments/arg_optimize.hpp>
-#include <stan/services/arguments/arg_optimize_algo.hpp>
-#include <stan/services/arguments/arg_output.hpp>
-#include <stan/services/arguments/arg_output_file.hpp>
-#include <stan/services/arguments/arg_random.hpp>
-#include <stan/services/arguments/arg_refresh.hpp>
-#include <stan/services/arguments/arg_rwm.hpp>
-#include <stan/services/arguments/arg_sample.hpp>
-#include <stan/services/arguments/arg_sample_algo.hpp>
-#include <stan/services/arguments/arg_save_iterations.hpp>
-#include <stan/services/arguments/arg_save_warmup.hpp>
-#include <stan/services/arguments/arg_seed.hpp>
-#include <stan/services/arguments/arg_static.hpp>
-#include <stan/services/arguments/arg_stepsize.hpp>
-#include <stan/services/arguments/arg_stepsize_jitter.hpp>
-#include <stan/services/arguments/arg_test.hpp>
-#include <stan/services/arguments/arg_test_grad_eps.hpp>
-#include <stan/services/arguments/arg_test_grad_err.hpp>
-#include <stan/services/arguments/arg_test_gradient.hpp>
-#include <stan/services/arguments/arg_thin.hpp>
-#include <stan/services/arguments/arg_tolerance.hpp>
-#include <stan/services/arguments/arg_unit_e.hpp>
-#include <stan/services/arguments/argument.hpp>
-#include <stan/services/arguments/argument_parser.hpp>
-#include <stan/services/arguments/argument_probe.hpp>
-#include <stan/services/arguments/categorical_argument.hpp>
-#include <stan/services/arguments/list_argument.hpp>
-#include <stan/services/arguments/singleton_argument.hpp>
-#include <stan/services/arguments/unvalued_argument.hpp>
-#include <stan/services/arguments/valued_argument.hpp>
-#include <stan/mcmc/fixed_param_sampler.hpp>
 #include <stan/mcmc/hmc/static/adapt_unit_e_static_hmc.hpp>
 #include <stan/mcmc/hmc/static/adapt_diag_e_static_hmc.hpp>
 #include <stan/mcmc/hmc/static/adapt_dense_e_static_hmc.hpp>
@@ -102,15 +37,9 @@
 #include <stan/services/io/write_iteration.hpp>
 #include <stan/services/io/write_model.hpp>
 #include <stan/services/io/write_stan.hpp>
-#include <stan/services/mcmc/sample.hpp>
-#include <stan/services/mcmc/warmup.hpp>
-#include <stan/services/optimize/do_bfgs_optimize.hpp>
 #include <stan/services/sample/generate_transitions.hpp>
-#include <stan/services/sample/init_adapt.hpp>
-#include <stan/services/sample/init_nuts.hpp>
-#include <stan/services/sample/init_static_hmc.hpp>
-#include <stan/services/sample/init_windowed_adapt.hpp>
 #include <stan/services/sample/progress.hpp>
+#include <stan/services/sample/hmc_nuts_diag_e_adapt.hpp>
 
 // FIXME: These belong to the interfaces and should be templated out here
 #include <stan/interface_callbacks/interrupt/noop.hpp>
@@ -367,7 +296,8 @@ namespace stan {
         interface_callbacks::writer::noop_writer diagnostic_writer;
         interface_callbacks::writer::stream_writer info_writer(std::cout, "# ");
         interface_callbacks::writer::stream_writer err_writer(std::cerr);
-
+        interface_callbacks::interrupt::noop interrupt;
+        
         if (output_stream) {
           services::io::write_stan(sample_writer);
           services::io::write_model(sample_writer, model.model_name());
@@ -384,38 +314,47 @@ namespace stan {
         //              Sampling Algorithms             //
         //////////////////////////////////////////////////
 
-        // Check timing
-        clock_t start_check = clock();
-
-        double init_log_prob;
-        Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
-
-        stan::model::gradient(model, cont_params, init_log_prob,
-                              init_grad, &std::cout);
-
-        clock_t end_check = clock();
-        double deltaT
-          = static_cast<double>(end_check - start_check) / CLOCKS_PER_SEC;
-
-        std::cout << std::endl;
-        std::cout << "Gradient evaluation took " << deltaT
-                  << " seconds" << std::endl;
-        std::cout << "1000 transitions using 10 leapfrog steps "
-                  << "per transition would take "
-                  << 1e4 * deltaT << " seconds." << std::endl;
-        std::cout << "Adjust your expectations accordingly!"
-                  << std::endl << std::endl;
-        std::cout << std::endl;
-
-        stan::services::sample::mcmc_writer<Model,
-                                            interface_callbacks::writer::stream_writer,
-                                            interface_callbacks::writer::noop_writer,
-                                            interface_callbacks::writer::stream_writer>
-          writer(sample_writer, diagnostic_writer, info_writer);
 
         // Sampling parameters
         int num_thin = 1;
-        bool save_warmup = false;
+        //bool save_warmup = false;
+        bool save_warmup = true;
+        bool adapt_engaged = true;
+        double stepsize = 1.0;
+        double stepsize_jitter = 0.0;
+        int max_depth = 10;
+        double delta = 0.8;
+        double gamma = 0.05;
+        double kappa = 0.75;
+        double t0 = 10;
+        unsigned int init_buffer = 75;
+        unsigned int term_buffer = 50;
+        unsigned int window = 25;
+        stan::services::sample::hmc_nuts_diag_e_adapt(model,
+                                                      base_rng,
+                                                      cont_params,
+                                                      num_warmup,
+                                                      num_samples,
+                                                      num_thin,
+                                                      save_warmup,
+                                                      refresh,
+                                                      stepsize,
+                                                      stepsize_jitter,
+                                                      max_depth,
+                                                      delta,
+                                                      gamma,
+                                                      kappa,
+                                                      t0,
+                                                      init_buffer,
+                                                      term_buffer,
+                                                      window,
+                                                      interrupt,
+                                                      sample_writer,
+                                                      diagnostic_writer,
+                                                      info);
+
+        /*
+        
 
         stan::mcmc::sample s(cont_params, 0, 0);
 
@@ -425,7 +364,6 @@ namespace stan {
         // Sampler
 
 
-        bool adapt_engaged = true;
 
         typedef stan::mcmc::adapt_diag_e_nuts<Model, rng_t> sampler;
         sampler* sampler_ptr = 0;
@@ -485,7 +423,7 @@ namespace stan {
           
         if (sampler_ptr)
           delete sampler_ptr;
-
+        */
         
         if (output_stream) {
           output_stream->close();
