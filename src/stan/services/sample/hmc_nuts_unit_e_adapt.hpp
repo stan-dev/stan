@@ -49,10 +49,10 @@ namespace stan {
                                 double gamma,
                                 double kappa,
                                 double t0,
-                                interface_callbacks::interrupt::base_interrupt& interrupt,
-                                interface_callbacks::writer::base_writer& sample_writer,
-                                interface_callbacks::writer::base_writer& diagnostic_writer,
-                                interface_callbacks::writer::base_writer& message_writer) {
+                    interface_callbacks::interrupt::base_interrupt& interrupt,
+                    interface_callbacks::writer::base_writer& sample_writer,
+                    interface_callbacks::writer::base_writer& diagnostic_writer,
+                    interface_callbacks::writer::base_writer& message_writer) {
         stan::services::check_timing(model, cont_params, message_writer);
 
         stan::mcmc::adapt_unit_e_nuts<Model, rng_t> sampler(model, base_rng);
@@ -65,17 +65,17 @@ namespace stan {
         sampler.get_stepsize_adaptation().set_gamma(gamma);
         sampler.get_stepsize_adaptation().set_kappa(kappa);
         sampler.get_stepsize_adaptation().set_t0(t0);
-        
+
         run_adaptive_sampler(sampler, model,
                              cont_params,
                              num_warmup, num_samples, num_thin,
                              refresh, save_warmup, base_rng,
                              interrupt, sample_writer, diagnostic_writer,
                              message_writer);
-        
+
         return stan::services::error_codes::OK;
       }
-      
+
     }
   }
 }

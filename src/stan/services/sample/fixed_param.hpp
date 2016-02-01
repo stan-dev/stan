@@ -38,20 +38,20 @@ namespace stan {
                       int refresh,
                       interface_callbacks::interrupt::base_interrupt& interrupt,
                       interface_callbacks::writer::base_writer& sample_writer,
-                      interface_callbacks::writer::base_writer& diagnostic_writer,
-                      interface_callbacks::writer::base_writer& message_writer) {
+                  interface_callbacks::writer::base_writer& diagnostic_writer,
+                  interface_callbacks::writer::base_writer& message_writer) {
         stan::mcmc::fixed_param_sampler sampler;
         stan::services::sample::mcmc_writer<Model,
-                                            interface_callbacks::writer::base_writer,
-                                            interface_callbacks::writer::base_writer,
-                                            interface_callbacks::writer::base_writer>
+                                      interface_callbacks::writer::base_writer,
+                                      interface_callbacks::writer::base_writer,
+                                      interface_callbacks::writer::base_writer>
           writer(sample_writer, diagnostic_writer, message_writer);
         stan::mcmc::sample s(cont_params, 0, 0);
 
         // Headers
         writer.write_sample_names(s, sampler, model);
         writer.write_diagnostic_names(s, sampler, model);
-        
+
         clock_t start = clock();
 
         stan::services::sample::generate_transitions
@@ -64,10 +64,10 @@ namespace stan {
 
         double sampleDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;
         writer.write_timing(0.0, sampleDeltaT);
-        
+
         return stan::services::error_codes::OK;
       }
-      
+
     }
   }
 }

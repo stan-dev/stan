@@ -17,14 +17,14 @@ namespace stan {
                        int refresh,
                        bool save_warmup,
                        rng_t& base_rng,
-                       interface_callbacks::interrupt::base_interrupt& interrupt,
-                       interface_callbacks::writer::base_writer& sample_writer,
-                       interface_callbacks::writer::base_writer& diagnostic_writer,
-                       interface_callbacks::writer::base_writer& message_writer) {
-        stan::services::sample::mcmc_writer<Model,
-                                            interface_callbacks::writer::base_writer,
-                                            interface_callbacks::writer::base_writer,
-                                            interface_callbacks::writer::base_writer>
+                   interface_callbacks::interrupt::base_interrupt& interrupt,
+                   interface_callbacks::writer::base_writer& sample_writer,
+                   interface_callbacks::writer::base_writer& diagnostic_writer,
+                   interface_callbacks::writer::base_writer& message_writer) {
+        services::sample::mcmc_writer<Model,
+                                      interface_callbacks::writer::base_writer,
+                                      interface_callbacks::writer::base_writer,
+                                      interface_callbacks::writer::base_writer>
           writer(sample_writer, diagnostic_writer, message_writer);
         stan::mcmc::sample s(cont_params, 0, 0);
 
@@ -33,7 +33,7 @@ namespace stan {
         writer.write_diagnostic_names(s, sampler, model);
 
         clock_t start = clock();
-        generate_transitions(sampler, 
+        generate_transitions(sampler,
                              num_warmup, 0, num_warmup + num_samples,
                              num_thin, refresh, save_warmup, true,
                              writer, s,
@@ -42,13 +42,14 @@ namespace stan {
         double warm_delta_t = static_cast<double>(end - start) / CLOCKS_PER_SEC;
 
         start = clock();
-        generate_transitions(sampler, 
+        generate_transitions(sampler,
                              num_samples, num_warmup, num_warmup + num_samples,
                              num_thin, refresh, true, true,
                              writer, s,
                              model, base_rng, interrupt, message_writer);
         end = clock();
-        double sample_delta_t = static_cast<double>(end - start) / CLOCKS_PER_SEC;
+        double sample_delta_t
+          = static_cast<double>(end - start) / CLOCKS_PER_SEC;
 
         writer.write_timing(warm_delta_t, sample_delta_t);
       }

@@ -5,6 +5,7 @@
 #include <stan/math.hpp>
 #include <stan/model/util.hpp>
 #include <stan/services/error_codes.hpp>
+#include <vector>
 
 namespace stan {
   namespace services {
@@ -37,13 +38,8 @@ namespace stan {
         int num_failed =
           stan::model::test_gradients<true, true>(model,
                                                   cont_vector, disc_vector,
-                                                  epsilon, error, message_writer);
-
-        // FIXME: this is wasteful and runs the finite diff code twice
-        num_failed =
-          stan::model::test_gradients<true, true>(model,
-                                                  cont_vector, disc_vector,
-                                                  epsilon, error, parameter_writer);
+                                                  epsilon, error,
+                                                  message_writer);
 
         (void) num_failed;  // FIXME: do something with the number failed
 

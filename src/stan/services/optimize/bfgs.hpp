@@ -39,9 +39,9 @@ namespace stan {
         std::vector<int> disc_vector;
 
         std::stringstream bfgs_ss;
-        
+
         typedef stan::optimization::BFGSLineSearch
-          <Model,stan::optimization::BFGSUpdate_HInv<> > Optimizer;
+          <Model, stan::optimization::BFGSUpdate_HInv<> > Optimizer;
         Optimizer bfgs(model, cont_vector, disc_vector, &bfgs_ss);
         bfgs._ls_opts.alpha0 = init_alpha;
         bfgs._conv_opts.tolAbsF = tol_obj;
@@ -50,9 +50,9 @@ namespace stan {
         bfgs._conv_opts.tolRelGrad = tol_rel_grad;
         bfgs._conv_opts.tolAbsX = tol_param;
         bfgs._conv_opts.maxIts = num_iterations;
-        
+
         double lp = bfgs.logp();
-        
+
         std::stringstream msg;
         msg << "Initial log joint probability = " << lp;
         message_writer(msg.str());
@@ -61,7 +61,7 @@ namespace stan {
         names.push_back("lp__");
         model.constrained_param_names(names, true, true);
         parameter_writer(names);
-        
+
         if (save_iterations) {
           io::write_iteration(model, base_rng,
                               lp, cont_vector, disc_vector,
@@ -126,7 +126,7 @@ namespace stan {
 
         for (int i = 0; i < cont_params.size(); ++i)
           cont_params[i] = cont_vector[i];
-        
+
         int return_code;
         if (ret >= 0) {
           message_writer("Optimization terminated normally: ");

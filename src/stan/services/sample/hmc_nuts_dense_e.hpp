@@ -35,20 +35,20 @@ namespace stan {
        */
       template <class Model, class rng_t>
       int hmc_nuts_dense_e(Model& model,
-                          rng_t& base_rng,
-                          Eigen::VectorXd& cont_params,
-                          int num_warmup,
-                          int num_samples,
-                          int num_thin,
-                          bool save_warmup,
-                          int refresh,
-                          double stepsize,
-                          double stepsize_jitter,
-                          int max_depth,
-                          interface_callbacks::interrupt::base_interrupt& interrupt,
-                          interface_callbacks::writer::base_writer& sample_writer,
-                          interface_callbacks::writer::base_writer& diagnostic_writer,
-                          interface_callbacks::writer::base_writer& message_writer) {
+                           rng_t& base_rng,
+                           Eigen::VectorXd& cont_params,
+                           int num_warmup,
+                           int num_samples,
+                           int num_thin,
+                           bool save_warmup,
+                           int refresh,
+                           double stepsize,
+                           double stepsize_jitter,
+                           int max_depth,
+                   interface_callbacks::interrupt::base_interrupt& interrupt,
+                   interface_callbacks::writer::base_writer& sample_writer,
+                   interface_callbacks::writer::base_writer& diagnostic_writer,
+                   interface_callbacks::writer::base_writer& message_writer) {
         stan::services::check_timing(model, cont_params, message_writer);
 
         stan::mcmc::dense_e_nuts<Model, rng_t> sampler(model, base_rng);
@@ -62,10 +62,10 @@ namespace stan {
                     refresh, save_warmup, base_rng,
                     interrupt, sample_writer, diagnostic_writer,
                     message_writer);
-        
+
         return stan::services::error_codes::OK;
       }
-      
+
     }
   }
 }

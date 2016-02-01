@@ -26,11 +26,11 @@ namespace stan {
                                 stan::mcmc::sample& sample,
                                 Model& model,
                                 RNG& base_rng,
-                                interface_callbacks::interrupt::base_interrupt& interrupt,
-                                interface_callbacks::writer::base_writer& message_writer) {
+                     interface_callbacks::interrupt::base_interrupt& interrupt,
+                     interface_callbacks::writer::base_writer& message_writer) {
         for (int m = 0; m < num_iterations; ++m) {
           interrupt();
-          
+
           if (io::do_print(m, (start + m + 1 == finish), refresh))
             message_writer(progress(m, start, finish, refresh, warmup));
 

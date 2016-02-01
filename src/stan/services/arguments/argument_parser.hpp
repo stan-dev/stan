@@ -30,7 +30,7 @@ namespace stan {
       void push_valid_arg(argument* arg) {
         _arguments.push_back(arg);
       }
-        
+
       int parse_args(int argc,
                      const char* argv[],
                      interface_callbacks::writer::base_writer& info,

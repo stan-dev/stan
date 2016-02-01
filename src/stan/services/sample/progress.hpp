@@ -24,7 +24,7 @@ namespace stan {
                 << static_cast<int>( (100.0 * (start + m + 1)) / finish )
                 << "%] ";
         message << (warmup ? " (Warmup)" : " (Sampling)");
-        
+
         return message.str();
       }
 

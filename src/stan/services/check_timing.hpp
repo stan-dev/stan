@@ -12,7 +12,7 @@ namespace stan {
 
     /**
      * Checks timing of the model by calculating the gradient once.
-     * 
+     *
      * @tparam Model class of the model
      * @param model Instance of the model
      * @param cont_params Initial parameter values
@@ -21,15 +21,16 @@ namespace stan {
     template <class Model>
     void check_timing(Model& model,
                       const Eigen::VectorXd& cont_params,
-                      interface_callbacks::writer::base_writer& message_writer) {
+                      interface_callbacks::writer::base_writer&
+                      message_writer) {
       double init_log_prob = 0;
       Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
-      
+
       clock_t start = clock();
-      
+
       stan::model::gradient(model, cont_params, init_log_prob,
                             init_grad);
-      
+
       clock_t end = clock();
       double deltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;
 
@@ -45,11 +46,11 @@ namespace stan {
       message_writer("Adjust your expectations accordingly!");
       message_writer();
       message_writer();
-      
+
       return;
     }
   }
-  
+
 }
 
 #endif

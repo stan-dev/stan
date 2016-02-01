@@ -8,6 +8,9 @@
 #include <stan/services/io/write_iteration.hpp>
 #include <stan/services/io/write_error_msg.hpp>
 #include <cmath>
+#include <limits>
+#include <string>
+#include <vector>
 
 namespace stan {
   namespace services {

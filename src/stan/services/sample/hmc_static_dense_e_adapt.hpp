@@ -35,30 +35,30 @@ namespace stan {
        */
       template <class Model, class rng_t>
       int hmc_static_dense_e_adapt(Model& model,
-                                  rng_t& base_rng,
-                                  Eigen::VectorXd& cont_params,
-                                  int num_warmup,
-                                  int num_samples,
-                                  int num_thin,
-                                  bool save_warmup,
-                                  int refresh,
-                                  double stepsize,
-                                  double stepsize_jitter,
-                                  double int_time,
-                                  double delta,
-                                  double gamma,
-                                  double kappa,
-                                  double t0,
-                                  unsigned int init_buffer,
-                                  unsigned int term_buffer,
-                                  unsigned int window,
-                                  interface_callbacks::interrupt::base_interrupt& interrupt,
-                                  interface_callbacks::writer::base_writer& sample_writer,
-                                  interface_callbacks::writer::base_writer& diagnostic_writer,
-                                  interface_callbacks::writer::base_writer& message_writer) {
+                                   rng_t& base_rng,
+                                   Eigen::VectorXd& cont_params,
+                                   int num_warmup,
+                                   int num_samples,
+                                   int num_thin,
+                                   bool save_warmup,
+                                   int refresh,
+                                   double stepsize,
+                                   double stepsize_jitter,
+                                   double int_time,
+                                   double delta,
+                                   double gamma,
+                                   double kappa,
+                                   double t0,
+                                   unsigned int init_buffer,
+                                   unsigned int term_buffer,
+                                   unsigned int window,
+                   interface_callbacks::interrupt::base_interrupt& interrupt,
+                   interface_callbacks::writer::base_writer& sample_writer,
+                   interface_callbacks::writer::base_writer& diagnostic_writer,
+                   interface_callbacks::writer::base_writer& message_writer) {
         stan::services::check_timing(model, cont_params, message_writer);
 
-        stan::mcmc::adapt_dense_e_static_hmc<Model, rng_t> sampler(model, base_rng);
+        mcmc::adapt_dense_e_static_hmc<Model, rng_t> sampler(model, base_rng);
         sampler.set_nominal_stepsize_and_T(stepsize, int_time);
         sampler.set_stepsize_jitter(stepsize_jitter);
 
@@ -77,10 +77,10 @@ namespace stan {
                              refresh, save_warmup, base_rng,
                              interrupt, sample_writer, diagnostic_writer,
                              message_writer);
-        
+
         return stan::services::error_codes::OK;
       }
-      
+
     }
   }
 }

@@ -45,12 +45,12 @@ namespace stan {
                             double stepsize,
                             double stepsize_jitter,
                             double int_time,
-                            interface_callbacks::interrupt::base_interrupt& interrupt,
-                            interface_callbacks::writer::base_writer& sample_writer,
-                            interface_callbacks::writer::base_writer& diagnostic_writer,
-                            interface_callbacks::writer::base_writer& message_writer) {
+                 interface_callbacks::interrupt::base_interrupt& interrupt,
+                 interface_callbacks::writer::base_writer& sample_writer,
+                 interface_callbacks::writer::base_writer& diagnostic_writer,
+                 interface_callbacks::writer::base_writer& message_writer) {
         stan::services::check_timing(model, cont_params, message_writer);
-        
+
         stan::mcmc::diag_e_static_hmc<Model, rng_t> sampler(model, base_rng);
         sampler.set_nominal_stepsize_and_T(stepsize, int_time);
         sampler.set_stepsize_jitter(stepsize_jitter);
@@ -61,10 +61,10 @@ namespace stan {
                     refresh, save_warmup, base_rng,
                     interrupt, sample_writer, diagnostic_writer,
                     message_writer);
-        
+
         return stan::services::error_codes::OK;
       }
-      
+
     }
   }
 }

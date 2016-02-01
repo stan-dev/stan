@@ -52,10 +52,10 @@ namespace stan {
                                 unsigned int init_buffer,
                                 unsigned int term_buffer,
                                 unsigned int window,
-                                interface_callbacks::interrupt::base_interrupt& interrupt,
-                                interface_callbacks::writer::base_writer& sample_writer,
-                                interface_callbacks::writer::base_writer& diagnostic_writer,
-                                interface_callbacks::writer::base_writer& message_writer) {
+                  interface_callbacks::interrupt::base_interrupt& interrupt,
+                  interface_callbacks::writer::base_writer& sample_writer,
+                  interface_callbacks::writer::base_writer& diagnostic_writer,
+                  interface_callbacks::writer::base_writer& message_writer) {
         stan::services::check_timing(model, cont_params, message_writer);
 
         stan::mcmc::adapt_diag_e_nuts<Model, rng_t> sampler(model, base_rng);
@@ -68,7 +68,7 @@ namespace stan {
         sampler.get_stepsize_adaptation().set_gamma(gamma);
         sampler.get_stepsize_adaptation().set_kappa(kappa);
         sampler.get_stepsize_adaptation().set_t0(t0);
-         
+
         sampler.set_window_params(num_warmup, init_buffer, term_buffer,
                                   window, message_writer);
 
@@ -78,10 +78,10 @@ namespace stan {
                              refresh, save_warmup, base_rng,
                              interrupt, sample_writer, diagnostic_writer,
                              message_writer);
-        
+
         return stan::services::error_codes::OK;
       }
-      
+
     }
   }
 }
