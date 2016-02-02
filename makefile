@@ -23,18 +23,9 @@ AR = ar
 C++11 = false
 
 ##
-# Library locations
-##
-EIGEN ?= lib/eigen_3.2.4
-BOOST ?= lib/boost_1.58.0
-GTEST ?= lib/gtest_1.7.0
-CPPLINT ?= lib/cpplint_4.45
-MATH ?= lib/stan_math_2.7.0
-
-##
 # Set default compiler options.
 ## 
-CFLAGS = -I src -isystem $(EIGEN) -isystem $(BOOST) -isystem $(MATH) -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -pipe
+CFLAGS = -I src -isystem $(EIGEN) -isystem $(BOOST) -isystem $(MATH) -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -pipe -I$(CVODE)/include
 CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
 LDLIBS = 
 LDLIBS_STANC = -Lbin -lstanc
@@ -43,6 +34,14 @@ WINE =
 
 -include $(HOME)/.config/stan/make.local  # define local variables
 -include make/local                       # overwrite local variables
+
+
+##
+# Library locations
+##
+STAN ?= 
+MATH ?= lib/stan_math/
+-include $(MATH)make/libraries
 
 ##
 # Get information about the compiler used.

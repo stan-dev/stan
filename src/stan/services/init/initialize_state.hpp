@@ -9,7 +9,8 @@
 #include <stan/services/error_codes.hpp>
 #include <stan/io/array_var_context.hpp>
 #include <stan/io/chained_var_context.hpp>
-#include <stan/interface/var_context_factory/var_context_factory.hpp>
+#include <stan/interface_callbacks/var_context_factory/var_context_factory.hpp>
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/services/io/write_error_msg.hpp>
 #include <stan/math/prim/scal/fun/is_inf.hpp>
 #include <stan/math/prim/scal/fun/is_nan.hpp>
@@ -24,7 +25,6 @@
 namespace stan {
   namespace services {
     namespace init {
-
       namespace {
 
         /**
@@ -72,7 +72,7 @@ namespace stan {
          * @param[in] model   the model.
          * @param[in] context the context of inits provided by user
          * @return            true if all are contained,
-                              false if anyone is not
+         *                    false if anyone is not
          */
 
         template <class Model>
@@ -97,7 +97,7 @@ namespace stan {
 
               std::stringstream msg;
               msg << param_names[n] << " initialized to invalid value ("
-              << cont_params[n] << ")";
+                  << cont_params[n] << ")";
 
               throw std::invalid_argument(msg.str());
             }
@@ -113,52 +113,45 @@ namespace stan {
        *                            right size and set to 0.
        * @param[in,out] model       the model. Side effects on model? I'm not
        *                            quite sure
-       * @param[in,out] output      output stream for messages
+       * @param[in,out] writer      writer callback for messages
        */
       template <class Model>
       bool initialize_state_values(Eigen::VectorXd& cont_params,
                                    Model& model,
-                                   std::ostream* output) {
+                                   interface_callbacks::writer::base_writer&
+                                   writer) {
         try {
           validate_unconstrained_initialization(cont_params, model);
         } catch (const std::exception& e) {
-          if (output)
-            *output << e.what() << std::endl;
+          writer(e.what());
           return false;
         }
         double init_log_prob;
         Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
         try {
           stan::model::gradient(model, cont_params, init_log_prob,
-                                init_grad, output);
+                                init_grad);
         } catch (const std::exception& e) {
-          io::write_error_msg(output, e);
-          if (output)
-            *output << std::endl
-                    << "Rejecting initial value:" << std::endl
-                    << "  Error evaluating the log probability at the initial "
-                    << "value." << std::endl;
+          io::write_error_msg(writer, e);
+          writer();
+          writer("Rejecting initial value:");
+          writer("  Error evaluating the log probability "
+                 "at the initial value.");
           return false;
         }
         if (!boost::math::isfinite(init_log_prob)) {
-          if (output)
-            *output << "Rejecting initial value:" << std::endl
-                    << "  Log probability evaluates to log(0), "
-                    << "i.e. negative infinity."
-                    << std::endl
-                    << "  Stan can't start sampling from this initial value."
-                    << std::endl;
+          writer("Rejecting initial value:");
+          writer("  Log probability evaluates to log(0), "
+                 "i.e. negative infinity.");
+          writer("  Stan can't start sampling from this initial value.");
           return false;
         }
         for (int i = 0; i < init_grad.size(); ++i) {
           if (!boost::math::isfinite(init_grad(i))) {
-            if (output)
-              *output << "Rejecting initial value:" << std::endl
-                      << "  Gradient evaluated at the initial value "
-                      << "is not finite."
-                      << std::endl
-                      << "  Stan can't start sampling from this initial value."
-                      << std::endl;
+            writer("Rejecting initial value:");
+            writer("  Gradient evaluated at the initial value "
+                   "is not finite.");
+            writer("  Stan can't start sampling from this initial value.");
             return false;
           }
         }
@@ -173,14 +166,14 @@ namespace stan {
        *                            right size and set to 0.
        * @param[in,out] model       the model. Side effects on model? I'm not
        *                            quite sure
-       * @param[in,out] output      output stream for messages
+       * @param[in,out] writer      writer callback for messages
        */
       template <class Model>
       bool initialize_state_zero(Eigen::VectorXd& cont_params,
                                  Model& model,
-                                 std::ostream* output) {
+                             interface_callbacks::writer::base_writer& writer) {
         cont_params.setZero();
-        return initialize_state_values(cont_params, model, output);
+        return initialize_state_values(cont_params, model, writer);
       }
 
 
@@ -195,22 +188,22 @@ namespace stan {
        *                            quite sure
        * @param[in,out] base_rng    the random number generator.
        *                            State may change.
-       * @param[in,out] output      output stream for messages
+       * @param[in,out] writer      writer callback for messages
        */
       template <class Model, class RNG>
       bool initialize_state_random(const double R,
                                    Eigen::VectorXd& cont_params,
                                    Model& model,
                                    RNG& base_rng,
-                                   std::ostream* output) {
+                             interface_callbacks::writer::base_writer& writer) {
         int num_init_tries = -1;
 
         boost::random::uniform_real_distribution<double>
-        init_range_distribution(-R, R);
+          init_range_distribution(-R, R);
 
         boost::variate_generator
-        <RNG&, boost::random::uniform_real_distribution<double> >
-        init_rng(base_rng, init_range_distribution);
+          <RNG&, boost::random::uniform_real_distribution<double> >
+          init_rng(base_rng, init_range_distribution);
 
         // Random initializations until log_prob is finite
         static int MAX_INIT_TRIES = 100;
@@ -219,20 +212,23 @@ namespace stan {
              ++num_init_tries) {
           for (int i = 0; i < cont_params.size(); ++i)
             cont_params(i) = init_rng();
-          if (initialize_state_values(cont_params, model, output))
+          if (initialize_state_values(cont_params, model, writer))
             break;
         }
 
         if (num_init_tries > MAX_INIT_TRIES) {
-          if (output)
-            *output << std::endl << std::endl
-            << "Initialization between (" << -R << ", " << R
-            << ") failed after "
-            << MAX_INIT_TRIES << " attempts. " << std::endl
-            << " Try specifying initial values,"
-            << " reducing ranges of constrained values,"
-            << " or reparameterizing the model."
-            << std::endl;
+          std::stringstream R_ss, MAX_INIT_TRIES_ss;
+          R_ss << R;
+          MAX_INIT_TRIES_ss << MAX_INIT_TRIES;
+
+          writer();
+          writer();
+          writer("Initialization between (-" + R_ss.str() + ", " + R_ss.str()
+                 + ") failed after "
+                 + MAX_INIT_TRIES_ss.str() + " attempts. ");
+          writer(" Try specifying initial values,"
+                 " reducing ranges of constrained values,"
+                 " or reparameterizing the model.");
           return false;
         }
         return true;
@@ -252,12 +248,10 @@ namespace stan {
        *                            quite sure
        * @param[in,out] base_rng    the random number generator.
        *                            State may change.
-       * @param[in,out] output      output stream for messages
+       * @param[in,out] writer      writer callback for messages
        * @param[in,out] context_factory  an instantiated factory that implements
        *                            the concept of a context_factory. This has
        *                            one method that takes a string.
-       * @param[in]                 enable_random_init if true, it allows
-       *                            partially specifying inits, otherwise not
        */
       template <class ContextFactory, class Model, class RNG>
       bool initialize_state_source_and_random(const std::string& source,
@@ -265,7 +259,7 @@ namespace stan {
                                               Eigen::VectorXd& cont_params,
                                               Model& model,
                                               RNG& base_rng,
-                                              std::ostream* output,
+                               interface_callbacks::writer::base_writer& writer,
                                               ContextFactory& context_factory) {
         try {
           boost::random::uniform_real_distribution<double>
@@ -292,34 +286,36 @@ namespace stan {
             std::vector<double> cont_vecs_constrained;
             std::vector<int> int_vecs;
             model.write_array(base_rng, cont_vecs, int_vecs,
-                              cont_vecs_constrained, false, false, output);
+                              cont_vecs_constrained, false, false, 0);
             std::vector<std::vector<size_t> > dims;
             model.get_dims(dims);
             stan::io::array_var_context random_context(cont_names,
                                                        cont_vecs_constrained,
                                                        dims);
             stan::io::chained_var_context cvc(context, random_context);
-            model.transform_inits(cvc, cont_params, output);
-            if (initialize_state_values(cont_params, model, output))
+            model.transform_inits(cvc, cont_params, 0);
+            if (initialize_state_values(cont_params, model, writer))
               break;
           }
 
           if (num_init_tries > MAX_INIT_TRIES) {
-            if (output)
-              *output << std::endl << std::endl
-                      << "Initialization between (" << -R << ", " << R
-                      << ") failed after "
-                      << MAX_INIT_TRIES << " attempts. " << std::endl
-                      << " Try specifying initial values,"
-                      << " reducing ranges of constrained values,"
-                      << " or reparameterizing the model."
-                      << std::endl;
+            std::stringstream R_ss, MAX_INIT_TRIES_ss;
+            R_ss << R;
+            MAX_INIT_TRIES_ss << MAX_INIT_TRIES;
+
+            writer();
+            writer();
+            writer("Initialization between (-" + R_ss.str() + ", " + R_ss.str()
+                   + ") failed after "
+                   + MAX_INIT_TRIES_ss.str() + " attempts. ");
+            writer(" Try specifying initial values,"
+                   " reducing ranges of constrained values,"
+                   " or reparameterizing the model.");
             return false;
           }
         } catch(const std::exception& e) {
-          if (output)
-            *output << "Initialization partially from source failed."
-                    << std::endl << e.what() << std::endl;
+          writer("Initialization partially from source failed.");
+          writer(e.what());
           return false;
         }
         return true;
@@ -337,23 +333,28 @@ namespace stan {
        *                            quite sure
        * @param[in,out] base_rng    the random number generator.
        *                            State may change.
-       * @param[in,out] output      output stream for messages
+       * @param[in,out] writer      writer callback for messages
        * @param[in,out] context_factory  an instantiated factory that implements
        *                            the concept of a context_factory. This has
        *                            one method that takes a string.
+       * @param[in] enable_random_init true or false
+       * @param[in] R               a double for the range of generating
+       *                            random inits. it's used for randomly
+       *                            generating partial inits
        */
       template <class ContextFactory, class Model, class RNG>
       bool initialize_state_source(const std::string source,
                                    Eigen::VectorXd& cont_params,
                                    Model& model,
                                    RNG& base_rng,
-                                   std::ostream* output,
+                                   interface_callbacks::writer::base_writer&
+                                   writer,
                                    ContextFactory& context_factory,
                                    bool enable_random_init = false,
                                    double R = 2) {
         try {
           typename ContextFactory::var_context_t context
-          = context_factory(source);
+            = context_factory(source);
 
           if (enable_random_init && !are_all_pars_initialized(model, context)) {
             return initialize_state_source_and_random(source,
@@ -361,17 +362,16 @@ namespace stan {
                                                       cont_params,
                                                       model,
                                                       base_rng,
-                                                      output,
+                                                      writer,
                                                       context_factory);
           }
-          model.transform_inits(context, cont_params, output);
+          model.transform_inits(context, cont_params, 0);
         } catch(const std::exception& e) {
-          if (output)
-            *output << "Initialization from source failed."
-            << std::endl << e.what() << std::endl;
+          writer("Initialization from source failed.");
+          writer(e.what());
           return false;
         }
-        return initialize_state_values(cont_params, model, output);
+        return initialize_state_values(cont_params, model, writer);
       }
 
 
@@ -404,12 +404,12 @@ namespace stan {
        *                            quite sure
        * @param[in,out] base_rng    the random number generator.
        *                            State may change.
-       * @param[in,out] output      output stream for messages
+       * @param[in,out] writer      writer callback for messages
        * @param[in,out] context_factory  an instantiated factory that implements
        *                            the concept of a context_factory. This has
        *                            one method that takes a string.
        * @param[in] enable_random_init true or false.
-       * @param[in] R               a double for the range of generating
+       * @param[in] init_r          a double for the range of generating
        *                            random inits. it's used for randomly
        *                            generating partial inits
        */
@@ -418,21 +418,21 @@ namespace stan {
                             Eigen::VectorXd& cont_params,
                             Model& model,
                             RNG& base_rng,
-                            std::ostream* output,
+                            interface_callbacks::writer::base_writer& writer,
                             ContextFactory& context_factory,
                             bool enable_random_init = false,
                             double init_r = 2) {
         double R;
         if (get_double_from_string(init, R)) {
           if (R == 0) {
-            return initialize_state_zero(cont_params, model, output);
+            return initialize_state_zero(cont_params, model, writer);
           } else {
             return initialize_state_random(R, cont_params, model,
-                                           base_rng, output);
+                                           base_rng, writer);
           }
         }
         return initialize_state_source(init, cont_params, model,
-                                       base_rng, output,
+                                       base_rng, writer,
                                        context_factory,
                                        enable_random_init,
                                        init_r);

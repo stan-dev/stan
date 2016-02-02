@@ -1,18 +1,21 @@
 #include <stan/services/mcmc/sample.hpp>
 #include <gtest/gtest.h>
 #include <test/test-models/good/services/test_lp.hpp>
-#include <stan/interface/recorder/messages.hpp>
+#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <boost/random/additive_combine.hpp>
 #include <sstream>
 
 typedef boost::ecuyer1988 rng_t;
+typedef stan::interface_callbacks::writer::stream_writer writer_t;
 
 class mock_sampler : public stan::mcmc::base_mcmc {
 public:
-  mock_sampler(std::ostream *output, std::ostream *error)
-    : base_mcmc(output, error), n_transition_called(0) { }
+  mock_sampler()
+    : base_mcmc(), n_transition_called(0) { }
 
-  stan::mcmc::sample transition(stan::mcmc::sample& init_sample) {
+  stan::mcmc::sample transition(stan::mcmc::sample& init_sample,
+                                stan::interface_callbacks::writer::base_writer& writer) {
     n_transition_called++;
     return init_sample;
   }
@@ -31,17 +34,16 @@ struct mock_callback {
 
 class StanServices : public testing::Test {
 public:
+  StanServices()
+    : message_writer(message_output, "# ") { }
+  
   void SetUp() {
-    output.str("");
-    error.str("");
-
     model_output.str("");
     sample_output.str("");
     diagnostic_output.str("");
     message_output.str("");
-    writer_output.str("");
-
-    sampler = new mock_sampler(&output, &error);
+    
+    sampler = new mock_sampler();
 
     std::fstream empty_data_stream(std::string("").c_str());
     stan::io::dump empty_data_context(empty_data_stream);
@@ -49,15 +51,14 @@ public:
     
     model = new stan_model(empty_data_context, &model_output);
     
-    stan::interface::recorder::csv sample_recorder(&sample_output, "# ");
-    stan::interface::recorder::csv diagnostic_recorder(&diagnostic_output, "# ");
-    stan::interface::recorder::messages message_recorder(&message_output, "# ");
+    writer_t sample_writer(sample_output, "# ");
+    writer_t diagnostic_writer(diagnostic_output, "# ");
 
-    writer = new stan::io::mcmc_writer<stan_model,
-                                       stan::interface::recorder::csv,
-                                       stan::interface::recorder::csv,
-                                       stan::interface::recorder::messages>
-      (sample_recorder, diagnostic_recorder, message_recorder, &writer_output);
+    writer = new stan::services::sample::mcmc_writer<stan_model,
+                                                     writer_t,
+                                                     writer_t,
+                                                     writer_t>
+      (sample_writer, diagnostic_writer, message_writer);
 
     base_rng.seed(123456);
 
@@ -73,26 +74,21 @@ public:
   
   mock_sampler* sampler;
   stan_model* model;
-  stan::io::mcmc_writer<stan_model,
-                        stan::interface::recorder::csv,
-                        stan::interface::recorder::csv,
-                        stan::interface::recorder::messages>* writer;
+  stan::services::sample::mcmc_writer<stan_model,
+                                      writer_t,
+                                      writer_t,
+                                      writer_t>* writer;
   rng_t base_rng;
 
   Eigen::VectorXd q;
   double log_prob;
   double stat;
 
-  std::stringstream output, error;
-
   std::stringstream model_output,
-    sample_output, diagnostic_output, message_output,
-    writer_output;
+    sample_output, diagnostic_output, message_output;
+
+  stan::interface_callbacks::writer::stream_writer message_writer;
 };
-
-
-
-
 
 TEST_F(StanServices, sample) {
   std::string expected_sample_output = "Iteration: 31 / 80 [ 38%]  (Sampling)\nIteration: 34 / 80 [ 42%]  (Sampling)\nIteration: 38 / 80 [ 47%]  (Sampling)\nIteration: 42 / 80 [ 52%]  (Sampling)\nIteration: 46 / 80 [ 57%]  (Sampling)\nIteration: 50 / 80 [ 62%]  (Sampling)\nIteration: 54 / 80 [ 67%]  (Sampling)\nIteration: 58 / 80 [ 72%]  (Sampling)\nIteration: 62 / 80 [ 77%]  (Sampling)\nIteration: 66 / 80 [ 82%]  (Sampling)\nIteration: 70 / 80 [ 87%]  (Sampling)\nIteration: 74 / 80 [ 92%]  (Sampling)\nIteration: 78 / 80 [ 97%]  (Sampling)\nIteration: 80 / 80 [100%]  (Sampling)\n";
@@ -113,20 +109,18 @@ TEST_F(StanServices, sample) {
                                num_thin, refresh, save,
                                *writer, s, *model, base_rng,
                                prefix, suffix, ss,
-                               callback);
+                               callback,
+                               message_writer);
   
+
   EXPECT_EQ(num_samples, sampler->n_transition_called);
   EXPECT_EQ(num_samples, callback.n);
 
   EXPECT_EQ(expected_sample_output, ss.str());
 
-  EXPECT_EQ("", output.str());
-  EXPECT_EQ("", error.str());
-
   EXPECT_EQ("", model_output.str());
   EXPECT_EQ("", sample_output.str());
   EXPECT_EQ("", diagnostic_output.str());
   EXPECT_EQ("", message_output.str());
-  EXPECT_EQ("", writer_output.str());
 }
 

@@ -1,6 +1,75 @@
 STAN C++ RELEASE NOTES
 ======================================================================
 
+
+v2.9.0 (3 Dec 2015)
+======================================================================
+New Team Members
+--------------------------------------------------
+* Krzysztof Sakrejda, adding functions in Stan Math and Stan
+
+New Features
+--------------------------------------------------
+* General R-like indexing for arrays and vectors! (#1057)
+* Automatic differentation paper: http://arxiv.org/abs/1509.07164
+* Changed unit_vector transformation (#1720)
+* Automatically detect bitness for Windows 32-bit (#1614)
+* Better adaptation for ADVI (#1550, #1559, #1587, #1591, #1593, #1710)
+
+Bug Fixes
+--------------------------------------------------
+* Allows unit_vector to be used in parameters block (#1720)
+* Fixed NaN bug in ADVI (#1610)
+
+Maintenance
+--------------------------------------------------
+* Reduced Cpplint warnings to 0! (#1651, #1656, #1701)
+* Better ADVI output (#1588)
+* Updated logo for doxygen (#1631)
+* Refactoring the use of output streams (#1602, 1653, #1662,
+  #1670, #1676, #1696, #1601)
+* Moved src/stan/services files and namespaces (#1616)
+* Updated clang++ compiler options for Mac OS X (#1668)
+* Additional testing on Travis CI (#1708)
+* Removed unused python script (#1611)
+* Updated makefile (#1618, #1655, #1659)
+
+Manual
+--------------------------------------------------
+* Improved Wiener distribution documentation (#1576)
+* Corrected bugs and typos (#1617)
+* Thanks to Julain King, Ashley Ford, Evelyn Mitchell,
+  José Rojas Echenique, Miguel de Val-Borro, Bruno Jacobs,
+  Ryan Batt, David Manheim
+
+
+v2.8.0 (8 Sep 2015)
+======================================================================
+New Team Members
+--------------------------------------------------
+* Dustin Tran, helps make variational inference a reality
+
+New Features
+--------------------------------------------------
+* Inverse CDF for normal distribution (#1157)
+* Compiler error messages are friendlier
+  - operator[] (#1517)
+  - assignment (#1543, stan-dev/math#146)
+* Sparse matrix by dense vector multiplication (#1565)
+
+Bug Fixes
+--------------------------------------------------
+* Disallow user-defiend function overloading (#1547)
+* Better behaved beta cdf (#1561, stan-dev/math#124)
+
+Manual
+--------------------------------------------------
+* Corrected all known bug reports and typos; details in
+  issues #1526, #1548, #1577
+* Thanks to @jonathan-g (Github handle), Damjan Vukcevic,
+  Daniel Chen, Guido Biele, Takahiro Kubo, Andy Choi
+
+
 v2.7.0 (9 July 2015)
 ======================================================================
 

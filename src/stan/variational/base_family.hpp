@@ -1,12 +1,12 @@
 #ifndef STAN_VARIATIONAL_BASE_FAMILY_HPP
 #define STAN_VARIATIONAL_BASE_FAMILY_HPP
 
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <algorithm>
 #include <ostream>
 
 namespace stan {
-
   namespace variational {
 
     class base_family {
@@ -30,14 +30,33 @@ namespace stan {
       double entropy() const;
       Eigen::VectorXd transform(const Eigen::VectorXd& eta) const;
       template <class BaseRNG>
-      Eigen::VectorXd sample(BaseRNG& rng) const;
+      void sample(BaseRNG& rng, Eigen::VectorXd& eta) const;
       template <class M, class BaseRNG>
       void calc_grad(base_family& elbo_grad,
                      M& m,
                      Eigen::VectorXd& cont_params,
                      int n_monte_carlo_grad,
                      BaseRNG& rng,
-                     std::ostream* print_stream) const;
+                     interface_callbacks::writer::base_writer& message_writer)
+        const;
+
+    protected:
+      void write_error_msg_(std::ostream* error_msgs,
+                            const std::exception& e) const {
+        if (!error_msgs) {
+          return;
+        }
+
+        *error_msgs
+          << std::endl
+          << "Informational Message: The current gradient evaluation "
+          << "of the ELBO is ignored because of the following issue:"
+          << std::endl
+          << e.what() << std::endl
+          << "If this warning occurs often then your model may be "
+          << "either severely ill-conditioned or misspecified."
+          << std::endl;
+      }
     };
 
     // Arithmetic operators
@@ -47,5 +66,4 @@ namespace stan {
     base_family operator*(double scalar, base_family rhs);
   }  // variational
 }  // stan
-
 #endif

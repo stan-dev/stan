@@ -65,8 +65,6 @@ namespace stan {
       Scalar alpha0;
       Scalar minAlpha;
     };
-
-
     template<typename FunctorType, typename QNUpdateType,
              typename Scalar = double, int DimAtCompile = Eigen::Dynamic>
     class BFGSMinimizer {
@@ -146,7 +144,7 @@ namespace stan {
         }
       }
 
-      BFGSMinimizer(FunctorType &f) : _func(f) { }
+      explicit BFGSMinimizer(FunctorType &f) : _func(f) { }
 
       void initialize(const VectorT &x0) {
         int ret;
@@ -245,8 +243,6 @@ namespace stan {
           _qn.update(yk, sk);
           _alphak_1 = _alpha;
         }
-
-
         // Compute search direction for next step
         _qn.search_direction(_pk, _gk);
 
@@ -287,17 +283,6 @@ namespace stan {
         return retcode;
       }
     };
-
-
-
-    template <typename M>
-    double lp_no_jacobian(const M& model,
-                          std::vector<double>& params_r,
-                          std::vector<int>& params_i,
-                          std::ostream* o = 0) {
-      // FIXME: is this supposed to return the log probability from the model?
-      return 0;
-    }
 
     template <class M>
     class ModelAdaptor {

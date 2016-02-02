@@ -58,7 +58,6 @@ namespace stan {
 
     inline bool parse(std::ostream* output_stream,
                       std::istream& input,
-                      const std::string& filename,
                       const std::string& model_name,
                       program& result) {
       using boost::spirit::multi_pass;
@@ -120,7 +119,7 @@ namespace stan {
                 << std::endl;
         }
         throw std::invalid_argument(msg.str());
-      } catch (const std::runtime_error& e) {
+      } catch (const std::exception& e) {
         std::stringstream msg;
         msg << "PROGRAM ERROR, MESSAGE(S) FROM PARSER:"
             << std::endl

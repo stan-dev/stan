@@ -1,10 +1,11 @@
 <a href="http://mc-stan.org">
-<img src="https://github.com/stan-dev/stan/blob/master/logos/stanlogo-main.png?raw=true" alt="Stan Logo"/>
+<img src="https://raw.githubusercontent.com/stan-dev/logos/master/logo.png" width=200 alt="Stan Logo"/>
 </a>
 
 <b>Stan</b> is a C++ and R package providing
 
 * full Bayesian inference using the No-U-Turn sampler (NUTS), a variant of Hamiltonian Monte Carlo (HMC),
+* approximate Bayesian inference using automatic differentiation variational inference (ADVI),
 * penalized maximum likelihood estimation (MLE) using L-BFGS optimization,
 * a full first- and higher-order automatic differentiation library based on C++ template overloads, and
 * a supporting fully-templated matrix, linear algebra, and probability special function library.

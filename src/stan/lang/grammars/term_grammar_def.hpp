@@ -23,6 +23,7 @@
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/grammars/expression_grammar.hpp>
+#include <stan/lang/grammars/indexes_grammar.hpp>
 #include <stan/lang/grammars/term_grammar.hpp>
 #include <stan/lang/grammars/whitespace_grammar.hpp>
 
@@ -43,6 +44,10 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::index_op,
                           (std::vector<std::vector<stan::lang::expression> >,
                            dimss_) )
 
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::index_op_sliced,
+                          (stan::lang::expression, expr_)
+                          (std::vector<stan::lang::idx>, idxs_) )
+
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::integrate_ode,
                           (std::string, system_function_name_)
                           (stan::lang::expression, y0_)
@@ -51,6 +56,18 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::integrate_ode,
                           (stan::lang::expression, theta_)
                           (stan::lang::expression, x_)
                           (stan::lang::expression, x_int_) )
+
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::integrate_ode_cvode,
+                          (std::string, system_function_name_)
+                          (stan::lang::expression, y0_)
+                          (stan::lang::expression, t0_)
+                          (stan::lang::expression, ts_)
+                          (stan::lang::expression, theta_)
+                          (stan::lang::expression, x_)
+                          (stan::lang::expression, x_int_)
+                          (stan::lang::expression, rel_tol_)
+                          (stan::lang::expression, abs_tol_)
+                          (stan::lang::expression, max_num_steps_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::fun,
                           (std::string, name_)
@@ -70,7 +87,9 @@ namespace stan {
 
    // see bare_type_grammar_def.hpp for original
     struct set_val5 {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2>
       struct result<F(T1, T2)> { typedef void type; };
       template <typename T1, typename T2>
@@ -82,7 +101,9 @@ namespace stan {
     boost::phoenix::function<set_val5> set_val5_f;
 
     struct validate_integrate_ode {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2, typename T3, typename T4>
       struct result<F(T1, T2, T3, T4)> { typedef void type; };
 
@@ -180,8 +201,155 @@ namespace stan {
     };
     boost::phoenix::function<validate_integrate_ode> validate_integrate_ode_f;
 
-    struct set_fun_type {
+    struct validate_integrate_ode_cvode {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
+      template <typename F, typename T1, typename T2, typename T3, typename T4>
+      struct result<F(T1, T2, T3, T4)> { typedef void type; };
+
+      void operator()(const integrate_ode_cvode& ode_fun,
+                      const variable_map& var_map,
+                      bool& pass,
+                      std::ostream& error_msgs) const {
+        pass = true;
+
+        // test function argument type
+        expr_type sys_result_type(DOUBLE_T, 1);
+        std::vector<expr_type> sys_arg_types;
+        sys_arg_types.push_back(expr_type(DOUBLE_T, 0));
+        sys_arg_types.push_back(expr_type(DOUBLE_T, 1));
+        sys_arg_types.push_back(expr_type(DOUBLE_T, 1));
+        sys_arg_types.push_back(expr_type(DOUBLE_T, 1));
+        sys_arg_types.push_back(expr_type(INT_T, 1));
+        function_signature_t system_signature(sys_result_type, sys_arg_types);
+        if (!function_signatures::instance()
+            .is_defined(ode_fun.system_function_name_, system_signature)) {
+          error_msgs << "first argument to integrate_ode_cvode"
+                     << " must be a function with signature"
+                     << " (real, real[], real[], real[], int[]) : real[] ";
+          pass = false;
+        }
+
+        // test regular argument types
+        if (ode_fun.y0_.expression_type() != expr_type(DOUBLE_T, 1)) {
+          error_msgs << "second argument to integrate_ode_cvode must be"
+                     << " type real[] for intial system state"
+                     << "; found type="
+                     << ode_fun.y0_.expression_type()
+                     << ". ";
+          pass = false;
+        }
+        if (!ode_fun.t0_.expression_type().is_primitive()) {
+          error_msgs << "third argument to integrate_ode_cvode"
+                     << " must be type real or int"
+                     << " for initial time"
+                     << "; found type="
+                     << ode_fun.t0_.expression_type()
+                     << ". ";
+          pass = false;
+        }
+        if (ode_fun.ts_.expression_type() != expr_type(DOUBLE_T, 1)) {
+          error_msgs << "fourth argument to integrate_ode_cvode must be"
+                     << " type real[] for requested solution times"
+                     << "; found type="
+                     << ode_fun.ts_.expression_type()
+                     << ". ";
+          pass = false;
+        }
+        if (ode_fun.theta_.expression_type() != expr_type(DOUBLE_T, 1)) {
+          error_msgs << "fifth argument to integrate_ode_cvode must be"
+                     << " type real[] for parameters"
+                     << "; found type="
+                     << ode_fun.theta_.expression_type()
+                     << ". ";
+          pass = false;
+        }
+        if (ode_fun.x_.expression_type() != expr_type(DOUBLE_T, 1)) {
+          error_msgs << "sixth argument to integrate_ode_cvode must be"
+                     << " type real[] for real data;"
+                     << " found type="
+                     << ode_fun.x_.expression_type()
+                     << ". ";
+          pass = false;
+        }
+        if (ode_fun.x_int_.expression_type() != expr_type(INT_T, 1)) {
+          error_msgs << "seventh argument to integrate_ode_cvode must be"
+                     << " type int[] for integer data;"
+                     << " found type="
+                     << ode_fun.x_int_.expression_type()
+                     << ". ";
+          pass = false;
+        }
+        if (!ode_fun.rel_tol_.expression_type().is_primitive()) {
+          error_msgs << "eight argument to integrate_ode_cvode"
+                     << " must be type real or int"
+                     << " for relative tolerance"
+                     << "; found type="
+                     << ode_fun.rel_tol_.expression_type()
+                     << ". ";
+          pass = false;
+        }
+        if (!ode_fun.abs_tol_.expression_type().is_primitive()) {
+          error_msgs << "ninth argument to integrate_ode_cvode"
+                     << " must be type real or int"
+                     << " for absolute tolerance"
+                     << "; found type="
+                     << ode_fun.abs_tol_.expression_type()
+                     << ". ";
+          pass = false;
+        }
+        if (!ode_fun.max_num_steps_.expression_type().is_primitive()) {
+          error_msgs << "tenth argument to integrate_ode_cvode"
+                     << " must be type real or int"
+                     << " for maximum number of steps"
+                     << "; found type="
+                     << ode_fun.max_num_steps_.expression_type()
+                     << ". ";
+          pass = false;
+        }
+
+        // test data-only variables do not have parameters (int locals OK)
+        if (has_var(ode_fun.t0_, var_map)) {
+          error_msgs << "third argument to integrate_ode_cvode (initial times)"
+                     << " must be data only and not reference parameters";
+          pass = false;
+        }
+        if (has_var(ode_fun.ts_, var_map)) {
+          error_msgs << "fourth argument to integrate_ode_cvode"
+                     << " (solution times) must be data only and not"
+                     << " reference parameters";
+          pass = false;
+        }
+        if (has_var(ode_fun.x_, var_map)) {
+          error_msgs << "fifth argument to integrate_ode_cvode (real data)"
+                     << " must be data only and not reference parameters";
+          pass = false;
+        }
+        if (has_var(ode_fun.rel_tol_, var_map)) {
+          error_msgs << "eight argument to integrate_ode_cvode (real data)"
+                     << " must be data only and not reference parameters";
+          pass = false;
+        }
+        if (has_var(ode_fun.abs_tol_, var_map)) {
+          error_msgs << "ninth argument to integrate_ode_cvode (real data)"
+                     << " must be data only and not reference parameters";
+          pass = false;
+        }
+        if (has_var(ode_fun.max_num_steps_, var_map)) {
+          error_msgs << "tenth argument to integrate_ode_cvode (real data)"
+                     << " must be data only and not reference parameters";
+          pass = false;
+        }
+      }
+    };
+    boost::phoenix::function<validate_integrate_ode_cvode>
+      validate_integrate_ode_cvode_f;
+
+    struct set_fun_type {
+      //! @cond Doxygen_Suppress
+      template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2>
       struct result<F(T1, T2)> { typedef fun type; };
 
@@ -200,7 +368,9 @@ namespace stan {
 
 
     struct set_fun_type_named {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2, typename T3,
                 typename T4, typename T5>
       struct result<F(T1, T2, T3, T4, T5)> { typedef void type; };
@@ -263,8 +433,6 @@ namespace stan {
                 && fun.args_[1].expression_type().is_primitive_int()) {
               fun.name_ = "std::" + fun.name_;
             }
-            // TODO(carpenter): else condition
-            // to add max(real,real) and min(real,real)
           }
         }
 
@@ -296,7 +464,9 @@ namespace stan {
     boost::phoenix::function<set_fun_type_named> set_fun_type_named_f;
 
     struct exponentiation_expr {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2, typename T3,
                 typename T4, typename T5>
       struct result<F(T1, T2, T3, T4, T5)> { typedef void type; };
@@ -331,7 +501,9 @@ namespace stan {
     boost::phoenix::function<exponentiation_expr> exponentiation_f;
 
     struct multiplication_expr {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2, typename T3>
       struct result<F(T1, T2, T3)> { typedef void type; };
 
@@ -354,16 +526,17 @@ namespace stan {
     };
     boost::phoenix::function<multiplication_expr> multiplication_f;
 
-    void generate_expression(const expression& e, std::ostream& o);
-
     struct division_expr {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2, typename T3>
       struct result<F(T1, T2, T3)> { typedef void type; };
 
       void operator()(expression& expr1,
                       const expression& expr2,
                       std::ostream& error_msgs) const {
+        static const bool user_facing = true;
         if (expr1.expression_type().is_primitive()
             && expr2.expression_type().is_primitive()
             && (expr1.expression_type().is_primitive_double()
@@ -381,9 +554,9 @@ namespace stan {
           error_msgs << "Warning: integer division"
                      << " implicitly rounds to integer."
                      << " Found int division: ";
-          generate_expression(expr1.expr_, error_msgs);
+          generate_expression(expr1.expr_, user_facing, error_msgs);
           error_msgs << " / ";
-          generate_expression(expr2.expr_, error_msgs);
+          generate_expression(expr2.expr_, user_facing, error_msgs);
           error_msgs << std::endl
                      << " Positive values rounded down,"
                      << " negative values rounded up or down"
@@ -412,7 +585,9 @@ namespace stan {
     boost::phoenix::function<division_expr> division_f;
 
     struct modulus_expr {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2, typename T3, typename T4>
       struct result<F(T1, T2, T3, T4)> { typedef void type; };
 
@@ -443,7 +618,9 @@ namespace stan {
     boost::phoenix::function<modulus_expr> modulus_f;
 
     struct left_division_expr {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2, typename T3, typename T4>
       struct result<F(T1, T2, T3, T4)> { typedef void type; };
 
@@ -473,7 +650,9 @@ namespace stan {
     boost::phoenix::function<left_division_expr> left_division_f;
 
     struct elt_multiplication_expr {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2, typename T3>
       struct result<F(T1, T2, T3)> { typedef void type; };
 
@@ -497,7 +676,9 @@ namespace stan {
     boost::phoenix::function<elt_multiplication_expr> elt_multiplication_f;
 
     struct elt_division_expr {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2, typename T3>
       struct result<F(T1, T2, T3)> { typedef void type; };
 
@@ -526,7 +707,9 @@ namespace stan {
     // so. Phoenix will be switching to BOOST_TYPEOF. In the meantime,
     // we will use a phoenix::function below:
     struct negate_expr {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2, typename T3, typename T4>
       struct result<F(T1, T2, T3, T4)> { typedef void type; };
 
@@ -549,7 +732,9 @@ namespace stan {
     boost::phoenix::function<negate_expr> negate_expr_f;
 
     struct logical_negate_expr {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2, typename T3>
       struct result<F(T1, T2, T3)> { typedef void type; };
 
@@ -572,7 +757,9 @@ namespace stan {
     boost::phoenix::function<logical_negate_expr> logical_negate_expr_f;
 
     struct transpose_expr {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2, typename T3>
       struct result<F(T1, T2, T3)> { typedef void type; };
 
@@ -599,8 +786,35 @@ namespace stan {
       return sum;
     }
 
-    struct add_expression_dimss {
+    struct add_idxs {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
+      template <typename F, typename T1, typename T2, typename T3, typename T4>
+      struct result<F(T1, T2, T3, T4)> { typedef void type; };
+      void operator()(expression& e,
+                      std::vector<idx>& idxs,
+                      bool& pass,
+                      std::ostream& error_msgs) const {
+        e = index_op_sliced(e, idxs);
+        pass = !e.expression_type().is_ill_formed();
+        if (!pass)
+          error_msgs << "Indexed expression must have at least as many"
+                     << " dimensions as number of indexes supplied:"
+                     << std::endl
+                     << " indexed expression dims="
+                     << e.total_dims()
+                     << "; num indexes=" << idxs.size()
+                     << std::endl;
+      }
+    };
+    boost::phoenix::function<add_idxs> add_idxs_f;
+
+
+    struct add_expression_dimss {
+      //! @cond Doxygen_Suppress
+      template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2, typename T3, typename T4>
       struct result<F(T1, T2, T3, T4)> { typedef void type; };
       void operator()(expression& expression,
@@ -623,8 +837,8 @@ namespace stan {
         iop.infer_type();
         if (iop.type_.is_ill_formed()) {
           error_msgs << "Indexed expression must have at least as many"
-                     << " dimensions as number of indexes supplied."
-                     << std::endl;
+          << " dimensions as number of indexes supplied."
+          << std::endl;
           pass = false;
           return;
         }
@@ -635,7 +849,9 @@ namespace stan {
     boost::phoenix::function<add_expression_dimss> add_expression_dimss_f;
 
     struct set_var_type {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2, typename T3,
                 typename T4, typename T5>
       struct result<F(T1, T2, T3, T4, T5)> { typedef void type; };
@@ -675,7 +891,9 @@ namespace stan {
     };
     boost::phoenix::function<set_var_type> set_var_type_f;
     struct validate_int_expr3 {
+      //! @cond Doxygen_Suppress
       template <class> struct result;
+      //! @endcond
       template <typename F, typename T1, typename T2, typename T3>
       struct result<F(T1, T2, T3)> { typedef void type; };
 
@@ -683,9 +901,6 @@ namespace stan {
                       bool& pass,
                       std::stringstream& error_msgs) const {
         pass = expr.expression_type().is_primitive_int();
-        if (!pass)
-          error_msgs << "array indices must be integer expressions; found type="
-                     << expr.expression_type() << std::endl;
       }
     };
     boost::phoenix::function<validate_int_expr3> validate_int_expr3_f;
@@ -699,7 +914,8 @@ namespace stan {
       : term_grammar::base_type(term_r),
         var_map_(var_map),
         error_msgs_(error_msgs),
-        expression_g(eg) {
+        expression_g(eg),
+        indexes_g(var_map, error_msgs, eg) {
       using boost::spirit::qi::_1;
       using boost::spirit::qi::_a;
       using boost::spirit::qi::_b;
@@ -746,29 +962,31 @@ namespace stan {
                                              boost::phoenix::ref(error_msgs_))]
         | lit('+') >> negated_factor_r(_r1)[set_val5_f(_val, _1)]
         | exponentiated_factor_r(_r1)[set_val5_f(_val, _1)]
-        | indexed_factor_r(_r1) [set_val5_f(_val, _1)];
+        | idx_factor_r(_r1)[set_val5_f(_val, _1)];
 
 
       exponentiated_factor_r.name("expression");
       exponentiated_factor_r
-        = (indexed_factor_r(_r1)[set_val5_f(_val, _1)]
+        = (idx_factor_r(_r1)[set_val5_f(_val, _1)]
            >> lit('^')
            > negated_factor_r(_r1)
              [exponentiation_f(_val, _1, _r1, _pass,
                                boost::phoenix::ref(error_msgs_))]);
 
-      indexed_factor_r.name("expression");
-      indexed_factor_r
-        = factor_r(_r1)[set_val5_f(_val, _1)]
-        > * (
-             ((+dims_r(_r1))[set_val5_f(_a, _1)]
-              > eps
-                [add_expression_dimss_f(_val, _a, _pass,
-                                        boost::phoenix::ref(error_msgs_))])
-             |
-             (lit("'")
-              > eps[transpose_f(_val, _pass,
-                                boost::phoenix::ref(error_msgs_))]));
+      idx_factor_r.name("expression");
+      idx_factor_r
+        =  factor_r(_r1)[set_val5_f(_val, _1)]
+        > *( ( (+dims_r(_r1))[set_val5_f(_a, _1)]
+               > eps
+               [add_expression_dimss_f(_val, _a, _pass,
+                                       boost::phoenix::ref(error_msgs_) )] )
+            | (indexes_g(_r1)[set_val5_f(_b, _1)]
+               > eps[add_idxs_f(_val, _b, _pass,
+                              boost::phoenix::ref(error_msgs_))])
+            | (lit("'")
+               > eps[transpose_f(_val, _pass,
+                                 boost::phoenix::ref(error_msgs_))]) );
+
       integrate_ode_r.name("expression");
       integrate_ode_r
         %= (lit("integrate_ode") >> no_skip[!char_("a-zA-Z0-9_")])
@@ -791,9 +1009,37 @@ namespace stan {
                                          _pass,
                                          boost::phoenix::ref(error_msgs_))];
 
+      integrate_ode_cvode_r.name("expression");
+      integrate_ode_cvode_r
+        %= (lit("integrate_ode_cvode") >> no_skip[!char_("a-zA-Z0-9_")])
+        > lit('(')
+        > identifier_r          // system function name (function only)
+        > lit(',')
+        > expression_g(_r1)     // y0
+        > lit(',')
+        > expression_g(_r1)     // t0 (data only)
+        > lit(',')
+        > expression_g(_r1)     // ts (data only)
+        > lit(',')
+        > expression_g(_r1)     // theta
+        > lit(',')
+        > expression_g(_r1)     // x (data only)
+        > lit(',')
+        > expression_g(_r1)     // x_int (data only)
+        > lit(',')
+        > expression_g(_r1)     // relative tolerance (data only)
+        > lit(',')
+        > expression_g(_r1)     // absolute tolerance (data only)
+        > lit(',')
+        > expression_g(_r1)     // maximum number of steps (data only)
+        > lit(')') [validate_integrate_ode_cvode_f(
+            _val, boost::phoenix::ref(var_map_),
+            _pass, boost::phoenix::ref(error_msgs_))];
+
       factor_r.name("expression");
       factor_r =
         integrate_ode_r(_r1)[set_val5_f(_val, _1)]
+        | integrate_ode_cvode_r(_r1)[set_val5_f(_val, _1)]
         | (fun_r(_r1)[set_val5_f(_b, _1)]
            > eps[set_fun_type_named_f(_val, _b, _r1, _pass,
                                       boost::phoenix::ref(error_msgs_))])
@@ -841,15 +1087,15 @@ namespace stan {
       dim_r.name("array dimension (integer expression)");
       dim_r
         %= expression_g(_r1)
-        > eps[validate_int_expr3_f(_val, _pass,
+        >> eps[validate_int_expr3_f(_val, _pass,
                                    boost::phoenix::ref(error_msgs_))];
 
       dims_r.name("array dimensions");
       dims_r
         %= lit('[')
-        > (dim_r(_r1)
+        >> (dim_r(_r1)
            % ',' )
-        > lit(']');
+        >> lit(']');
 
       variable_r.name("variable name");
       variable_r

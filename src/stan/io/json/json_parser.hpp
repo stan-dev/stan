@@ -187,8 +187,9 @@ namespace stan {
 
           if (is_integer) {
             if (is_positive) {
-              unsigned long n;
+              unsigned long n;  // NOLINT(runtime/int)
               try {
+                // NOLINTNEXTLINE(runtime/int)
                 n = boost::lexical_cast<unsigned long>(ss.str());
               } catch (const boost::bad_lexical_cast & ) {
                 throw json_exception("number exceeds integer range");
@@ -196,8 +197,9 @@ namespace stan {
               ss >> n;
               h_.number_unsigned_long(n);
             } else {
-              long n;
+              long n;  // NOLINT(runtime/int)
               try {
+                // NOLINTNEXTLINE(runtime/int)
                 n = boost::lexical_cast<unsigned long>(ss.str());
               } catch (const boost::bad_lexical_cast & ) {
                 throw json_exception("number exceeds integer range");

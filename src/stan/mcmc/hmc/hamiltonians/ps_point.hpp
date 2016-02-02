@@ -1,14 +1,13 @@
 #ifndef STAN_MCMC_HMC_HAMILTONIANS_PS_POINT_HPP
 #define STAN_MCMC_HMC_HAMILTONIANS_PS_POINT_HPP
 
-#include <boost/lexical_cast.hpp>
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-
+#include <boost/lexical_cast.hpp>
 #include <string>
 #include <vector>
 
 namespace stan {
-
   namespace mcmc {
     using Eigen::Dynamic;
 
@@ -26,7 +25,6 @@ namespace stan {
         fast_vector_copy_<double>(p, z.p);
         fast_vector_copy_<double>(g, z.g);
       }
-
 
       ps_point& operator= (const ps_point& z) {
         if (this == &z)
@@ -67,10 +65,14 @@ namespace stan {
           values.push_back(g(i));
       }
 
-      virtual void write_metric(std::ostream* o) {
-        if (!o)
-          return;
-        *o << "# No free parameters for unit metric" << std::endl;
+      /**
+       * Writes the metric
+       *
+       * @param writer writer callback
+       */
+      virtual void
+      write_metric(stan::interface_callbacks::writer::base_writer& writer) {
+        writer("No free parameters for unit metric");
       }
 
     protected:
@@ -97,7 +99,5 @@ namespace stan {
     };
 
   }  // mcmc
-
 }  // stan
-
 #endif

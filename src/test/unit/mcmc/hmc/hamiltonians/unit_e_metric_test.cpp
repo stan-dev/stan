@@ -1,11 +1,10 @@
 #include <string>
 #include <boost/random/additive_combine.hpp>
-
 #include <stan/io/dump.hpp>
-
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/unit_e_metric.hpp>
-
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
+#include <stan/interface_callbacks/writer/noop_writer.hpp>
 #include <test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp>
 #include <test/unit/util.hpp>
 #include <gtest/gtest.h>
@@ -19,10 +18,8 @@ TEST(McmcUnitEMetric, sample_p) {
   q(0) = 5;
   q(1) = 1;
 
-  std::stringstream metric_output;
-  
   stan::mcmc::mock_model model(q.size());
-  stan::mcmc::unit_e_metric<stan::mcmc::mock_model, rng_t> metric(model, &metric_output);
+  stan::mcmc::unit_e_metric<stan::mcmc::mock_model, rng_t> metric(model);
   stan::mcmc::unit_e_point z(q.size());
   
   int n_samples = 1000;
@@ -45,8 +42,6 @@ TEST(McmcUnitEMetric, sample_p) {
   
   // Variance within 10% of expected value (d / 2)
   EXPECT_EQ(true, fabs(var - 0.5 * q.size()) < 0.1 * q.size());
-  
-  EXPECT_EQ("", metric_output.str());
 }
 
 TEST(McmcUnitEMetric, gradients) {
@@ -64,14 +59,15 @@ TEST(McmcUnitEMetric, gradients) {
   data_stream.close();
   
   std::stringstream model_output, metric_output;
+  stan::interface_callbacks::writer::stream_writer writer(metric_output);
   
   funnel_model_namespace::funnel_model model(data_var_context, &model_output);
   
-  stan::mcmc::unit_e_metric<funnel_model_namespace::funnel_model, rng_t> metric(model, &metric_output);
+  stan::mcmc::unit_e_metric<funnel_model_namespace::funnel_model, rng_t> metric(model);
   
   double epsilon = 1e-6;
 
-  metric.update(z);
+  metric.update(z, writer);
   
   Eigen::VectorXd g1 = metric.dtau_dq(z);
   
@@ -80,15 +76,15 @@ TEST(McmcUnitEMetric, gradients) {
     double delta = 0;
     
     z.q(i) += epsilon;
-    metric.update(z);
+    metric.update(z, writer);
     delta += metric.tau(z);
     
     z.q(i) -= 2 * epsilon;
-    metric.update(z);
+    metric.update(z, writer);
     delta -= metric.tau(z);
     
     z.q(i) += epsilon;
-    metric.update(z);
+    metric.update(z, writer);
     
     delta /= 2 * epsilon;
     
@@ -123,15 +119,15 @@ TEST(McmcUnitEMetric, gradients) {
     double delta = 0;
     
     z.q(i) += epsilon;
-    metric.update(z);
+    metric.update(z, writer);
     delta += metric.phi(z);
     
     z.q(i) -= 2 * epsilon;
-    metric.update(z);
+    metric.update(z, writer);
     delta -= metric.phi(z);
     
     z.q(i) += epsilon;
-    metric.update(z);
+    metric.update(z, writer);
     
     delta /= 2 * epsilon;
     
@@ -152,15 +148,11 @@ TEST(McmcUnitEMetric, streams) {
   q(0) = 5;
   q(1) = 1;
   stan::mcmc::mock_model model(q.size());
-
+  
   // for use in Google Test macros below
   typedef stan::mcmc::unit_e_metric<stan::mcmc::mock_model, rng_t> unit_e;
 
-  EXPECT_NO_THROW(unit_e metric(model, 0));
-
-  std::stringstream out;
-  EXPECT_NO_THROW(unit_e metric(model, &out));
-  EXPECT_EQ("", out.str());
+  EXPECT_NO_THROW(unit_e metric(model));
   
   stan::test::reset_std_streams();
   EXPECT_EQ("", stan::test::cout_ss.str());

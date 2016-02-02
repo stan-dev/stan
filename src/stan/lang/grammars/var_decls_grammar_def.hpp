@@ -231,6 +231,10 @@ namespace stan {
         return boost::apply_visitor(*this, x.y0_.expr_)
           && boost::apply_visitor(*this, x.theta_.expr_);
       }
+      bool operator()(const integrate_ode_cvode& x) const {
+        return boost::apply_visitor(*this, x.y0_.expr_)
+          && boost::apply_visitor(*this, x.theta_.expr_);
+      }
       bool operator()(const fun& x) const {
         for (size_t i = 0; i < x.args_.size(); ++i)
           if (!boost::apply_visitor(*this, x.args_[i].expr_))
@@ -245,6 +249,9 @@ namespace stan {
             if (!boost::apply_visitor(*this, x.dimss_[i][j].expr_))
               return false;
         return true;
+      }
+      bool operator()(const index_op_sliced& x) const {
+        return boost::apply_visitor(*this, x.expr_.expr_);
       }
       bool operator()(const binary_op& x) const {
         return boost::apply_visitor(*this, x.left.expr_)

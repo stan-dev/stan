@@ -1,9 +1,10 @@
 #include <gtest/gtest.h>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
+#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <test/unit/util.hpp>
 
 namespace stan {
-
   namespace mcmc {
 
     class ps_point_test : public ::testing::Test {
@@ -62,11 +63,10 @@ namespace stan {
       stan::test::capture_std_streams();
 
       ps_point point(2);
-      EXPECT_NO_THROW(point.write_metric(0));
-
       std::stringstream out;
-      EXPECT_NO_THROW(point.write_metric(&out));
-      EXPECT_EQ("# No free parameters for unit metric\n", out.str());
+      stan::interface_callbacks::writer::stream_writer writer(out);
+      EXPECT_NO_THROW(point.write_metric(writer));
+      EXPECT_EQ("No free parameters for unit metric\n", out.str());
       
       stan::test::reset_std_streams();
       EXPECT_EQ("", stan::test::cout_ss.str());

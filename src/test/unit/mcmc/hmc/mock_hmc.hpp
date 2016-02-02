@@ -2,9 +2,7 @@
 #define STAN__MCMC__MOCK__HMC__BETA
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-
 #include <stan/model/prob_grad.hpp>
-
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 #include <stan/mcmc/hmc/hamiltonians/base_hamiltonian.hpp>
 #include <stan/mcmc/hmc/integrators/base_integrator.hpp>
@@ -22,7 +20,7 @@ namespace stan {
       
       template <bool propto, bool jacobian_adjust_transforms, typename T>
       T log_prob(Eigen::Matrix<T,Eigen::Dynamic,1>& params_r,
-                      std::ostream* output_stream = 0) const {
+                 std::ostream* output_stream = 0) const {
         return 0;
       }
 
@@ -43,16 +41,14 @@ namespace stan {
     };
 
     // Mock Hamiltonian
-    template <typename M, typename BaseRNG>
-    class mock_hamiltonian: public base_hamiltonian<M,
+    template <typename Model, typename BaseRNG>
+    class mock_hamiltonian: public base_hamiltonian<Model,
                                                     ps_point,
                                                     BaseRNG> {
       
     public:
-      
-      mock_hamiltonian(M& m, std::ostream *e): base_hamiltonian<M,
-                                               ps_point,
-                                               BaseRNG> (m,e) {};
+      explicit mock_hamiltonian(Model& model)
+        : base_hamiltonian<Model, ps_point, BaseRNG>(model) {}
       
       double T(ps_point& z) { return 0; }
       
@@ -71,27 +67,27 @@ namespace stan {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
       
-      void sample_p(ps_point& z, BaseRNG& rng) {};
+      void sample_p(ps_point& z, BaseRNG& rng) {}
       
     };
     
     // Mock Integrator
-    template <typename H, typename P>
-    class mock_integrator: public base_integrator<H, P> {
+    template <typename Hamiltonian>
+    class mock_integrator: public base_integrator<Hamiltonian> {
     
     public:
-      mock_integrator(std::ostream* o) 
-      : base_integrator<H,P>(o)
-      { }
+      mock_integrator() 
+        : base_integrator<Hamiltonian>() { }
       
-      void evolve(P& z, H& hamiltonian, const double epsilon) {
+      void evolve(typename Hamiltonian::PointType& z,
+                  Hamiltonian& hamiltonian,
+                  const double epsilon,
+                  stan::interface_callbacks::writer::base_writer& writer) {
         z.q += epsilon * z.p;
       };
       
     };
     
   } // mcmc
-  
 } // stan
-
 #endif

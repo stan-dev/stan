@@ -1,6 +1,7 @@
 #ifndef STAN_SERVICES_ARGUMENTS_ARGUMENT_HPP
 #define STAN_SERVICES_ARGUMENTS_ARGUMENT_HPP
 
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <vector>
 #include <string>
 #include <sstream>
@@ -15,7 +16,7 @@ namespace stan {
         : indent_width(2),
           help_width(20) { }
 
-      argument(const std::string name)
+      explicit argument(const std::string& name)
         : _name(name),
           indent_width(2),
           help_width(20) { }
@@ -30,29 +31,34 @@ namespace stan {
         return _description;
       }
 
-      virtual void print(std::ostream* s, const int depth,
-                         const std::string prefix) = 0;
-      virtual void print_help(std::ostream* s, const int depth,
+      virtual void print(interface_callbacks::writer::base_writer& w,
+                         const int depth,
+                         const std::string& prefix) = 0;
+
+      virtual void print_help(interface_callbacks::writer::base_writer& w,
+                              const int depth,
                               const bool recurse) = 0;
 
       virtual bool parse_args(std::vector<std::string>& args,
-                              std::ostream* out,
-                              std::ostream* err,
+                              interface_callbacks::writer::base_writer& info,
+                              interface_callbacks::writer::base_writer& err,
                               bool& help_flag) {
         return true;
       }
 
-      virtual void probe_args(argument* base_arg, std::stringstream& s) {}
+      virtual void probe_args(argument* base_arg,
+                              interface_callbacks::writer::base_writer& w) {}
 
-      virtual void find_arg(std::string name,
-                            std::string prefix,
+      virtual void find_arg(const std::string& name,
+                            const std::string& prefix,
                             std::vector<std::string>& valid_paths) {
         if (name == _name) {
           valid_paths.push_back(prefix + _name);
         }
       }
 
-      static void split_arg(const std::string& arg, std::string& name,
+      static void split_arg(const std::string& arg,
+                            std::string& name,
                             std::string& value) {
         size_t pos = arg.find('=');
 
@@ -65,12 +71,12 @@ namespace stan {
         }
       }
 
-      virtual argument* arg(const std::string name) {
+      virtual argument* arg(const std::string& name) {
         return 0;
       }
 
       int compute_indent(const int depth) {
-        return indent_width * depth + 1;
+        return indent_width * depth;
       }
 
     protected:

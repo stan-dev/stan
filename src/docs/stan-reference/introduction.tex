@@ -322,15 +322,6 @@ posterior such as event outcomes or the values of as yet unobserved
 data.
 
 
-\section{Variational Inference}
-
-Stan implements a general, black-box form of variational inference,
-which provide an approximate posterior distribution.  Variational
-inference provides estimates of posterior means and uncertainty
-through a parametric approximation of a posterior that is optimized for
-its fit to the true posterior.  Variational inference can be much for
-estimating posterior means and marginal variances than MCMC.  See
-\refchapter{vi-algorithms} for more information.
 
 \section{Optimization}
 
@@ -363,8 +354,8 @@ The estimate $\theta^{*}$ is a so-called ``point estimate,'' meaning
 that it summarizes the posterior distribution by a single point,
 rather than with a distribution.  Of course, a point estimate does
 not, in and of itself, take into account estimation variance.
-Posterior predictive inferences $p(\tilde{y} | y)$ can be made using
-the posterior mode given data $y$ as $p(\tilde{y}|\theta^*)$, but they
+Posterior predictive inferences $p(\tilde{y} \, | \, y)$ can be made using
+the posterior mode given data $y$ as $p(\tilde{y} \, | \, \theta^*)$, but they
 are not Bayesian inferences, even if the model involves a prior,
 because they do not take posterior uncertainty into account.  If the
 posterior variance is low and the posterior mean is near the posterior
@@ -374,20 +365,24 @@ Bayesian inference.
 
 \section{Variational Inference}
 
-Stan also supports variational inference, an approximate Bayesian inference
-technique \citep{Jordan:1999,Wainwright-Jordan:2008}. Variational inference has
-had a tremendous impact on Bayesian computation, especially in the machine
-learning community; it is typically faster than sampling techniques and can
+Stan also supports variational inference, an approximate Bayesian
+inference technique
+\citep{Jordan:1999,Wainwright-Jordan:2008}. Variational inference
+provides estimates of posterior means and uncertainty through a
+parametric approximation of a posterior that is optimized for its fit
+to the true posterior. Variational inference has had a tremendous
+impact on Bayesian computation, especially in the machine learning
+community; it is typically faster than sampling techniques and can
 scale to massive datasets \citep{Hoffman:2013}.
 
 Variational inference approximates the posterior
-$p(\theta \mid y)$ with a simple, parameterized distribution
-$q(\theta \,;\, \phi)$. It matches the approximation to the
+$p(\theta \, | \, y)$ with a simple, parameterized distribution
+$q(\theta \, | \, \phi)$. It matches the approximation to the
 true posterior by minimizing the Kullback-Leibler divergence,
 %
 \[
   \phi^* = \argmin_\phi
-  \KL{ q(\theta \,;\, \phi) }{ p(\theta \mid y) }.
+  \KL{ q(\theta \, | \, \phi) }{ p(\theta \, | \, y) }.
 \]
 %
 This converts Bayesian inference into an optimization problem with a
