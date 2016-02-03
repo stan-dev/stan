@@ -24,9 +24,18 @@ namespace stan {
        * @param model Instance of model
        * @param base_rng Instance of random number generator
        * @param cont_params Initial value
+       * @param num_warmup Number of warmup samples
        * @param num_samples Number of samples
        * @param num_thin Number to thin the samples
+       * @param save_warmup Indicates whether to save the warmup iterations
        * @param refresh Controls the output
+       * @param stepsize initial stepsize for discrete evolution
+       * @param stepsize_jitter uniform random jitter of stepsize
+       * @param int_time Total integration time for Hamiltonian evolution
+       * @param delta Adaptation target acceptance
+       * @param kappa Adaptation relaxation exponent
+       * @param gamma Adaptation regularization scale
+       * @param t0 Adaptation iteration offset
        * @param interrupt Callback for interrupts
        * @param sample_writer Writer for draws
        * @param diagnostic_writer Writer for diagnostic information

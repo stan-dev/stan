@@ -30,6 +30,7 @@ namespace stan {
        * @param[in] num_iterations maximum number of iterations
        * @param[in] save_iterations indicates whether all the interations should
        *   be saved
+       * @param[out] interrupt interrupt callback to be called every iteration
        * @param[out] message_writer output for messages
        * @param[out] parameter_writer output for parameter values
        * @return stan::services::error_codes::OK (0) if successful
