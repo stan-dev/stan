@@ -55,10 +55,7 @@ public:
     writer_t sample_writer(sample_output, "# ");
     writer_t diagnostic_writer(diagnostic_output, "# ");
   
-    writer = new stan::services::sample::mcmc_writer<stan_model,
-                                                     writer_t,
-                                                     writer_t,
-                                                     writer_t>
+    writer = new stan::services::sample::mcmc_writer<stan_model>
       (sample_writer, diagnostic_writer, message_writer);
 
     base_rng.seed(123456);
@@ -75,10 +72,7 @@ public:
   
   mock_sampler* sampler;
   stan_model* model;
-  stan::services::sample::mcmc_writer<stan_model,
-                                      writer_t,
-                                      writer_t,
-                                      writer_t>* writer;
+  stan::services::sample::mcmc_writer<stan_model>* writer;
   rng_t base_rng;
 
   Eigen::VectorXd q;

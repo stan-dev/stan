@@ -317,9 +317,7 @@ namespace stan {
 
         // Sampling parameters
         int num_thin = 1;
-        //bool save_warmup = false;
-        bool save_warmup = true;
-        bool adapt_engaged = true;
+        bool save_warmup = false;
         double stepsize = 1.0;
         double stepsize_jitter = 0.0;
         int max_depth = 10;
@@ -353,78 +351,6 @@ namespace stan {
                                                       diagnostic_writer,
                                                       info);
 
-        /*
-        
-
-        stan::mcmc::sample s(cont_params, 0, 0);
-
-        double warmDeltaT;
-        double sampleDeltaT;
-
-        // Sampler
-
-
-
-        typedef stan::mcmc::adapt_diag_e_nuts<Model, rng_t> sampler;
-        sampler* sampler_ptr = 0;
-        sampler_ptr = new sampler(model, base_rng);
-        sampler_ptr->set_nominal_stepsize(1.0);
-        sampler_ptr->set_stepsize_jitter(0.0);
-        sampler_ptr->set_max_depth(10);
-
-        stan::services::sample::init_adapt(sampler_ptr, 0.8, 0.05, 0.75, 10,
-                                           cont_params,
-                                           info_writer);
-        sampler_ptr->set_window_params(num_warmup, 75, 50, 25, info_writer);
-          
-        // Headers
-        writer.write_sample_names(s, sampler_ptr, model);
-        writer.write_diagnostic_names(s, sampler_ptr, model);
-          
-        std::string prefix = "";
-        std::string suffix = "\n";
-        interface_callbacks::interrupt::noop startTransitionCallback;
-          
-        // Warm-Up
-        clock_t start = clock();
-          
-        services::mcmc::warmup<Model, rng_t>(sampler_ptr, num_warmup, num_samples, num_thin,
-                                             refresh, save_warmup,
-                                             writer,
-                                             s, model, base_rng,
-                                             prefix, suffix, std::cout,
-                                             startTransitionCallback,
-                                             info_writer);
-
-        clock_t end = clock();
-        warmDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;
-          
-        if (adapt_engaged) {
-          sampler_ptr->disengage_adaptation();
-          writer.write_adapt_finish(sampler_ptr);
-        }
-          
-        // Sampling
-        start = clock();
-          
-        services::mcmc::sample<Model, rng_t>
-          (sampler_ptr, num_warmup, num_samples, num_thin,
-           refresh, true,
-           writer,
-           s, model, base_rng,
-           prefix, suffix, std::cout,
-           startTransitionCallback,
-           info_writer);
-          
-        end = clock();
-        sampleDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;
-          
-        writer.write_timing(warmDeltaT, sampleDeltaT);
-          
-        if (sampler_ptr)
-          delete sampler_ptr;
-        */
-        
         if (output_stream) {
           output_stream->close();
           delete output_stream;

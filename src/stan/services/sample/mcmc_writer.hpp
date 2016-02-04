@@ -17,33 +17,29 @@ namespace stan {
        * mcmc_writer writes out headers and samples
        *
        * @tparam Model Model class
-       * @tparam SampleWriter Class for recording samples
-       * @tparam DiagnosticWriter Class for diagnostic samples
        */
-      template <class Model,
-                class SampleWriter, class DiagnosticWriter,
-                class MessageWriter>
+      template <class Model>
       class mcmc_writer {
       private:
-        SampleWriter& sample_writer_;
-        DiagnosticWriter& diagnostic_writer_;
-        MessageWriter& message_writer_;
+        interface_callbacks::writer::base_writer& sample_writer_;
+        interface_callbacks::writer::base_writer& diagnostic_writer_;
+        interface_callbacks::writer::base_writer& message_writer_;
 
       public:
         /**
          * Constructor.
          *
-         * @param sample_writer samples are "written" to this stream (can abstract this?)
-         * @param diagnostic_writer diagnostic information is "written" to this stream
+         * @param sample_writer samples are "written" to this stream
+         * @param diagnostic_writer diagnostic info is "written" to this stream
          * @param message_writer messages are written to this stream
          *
          * @pre arguments == 0 if and only if they are not meant to be used
          * @post none
          * @sideeffects streams are stored in this object
          */
-        mcmc_writer(SampleWriter& sample_writer,
-                    DiagnosticWriter& diagnostic_writer,
-                    MessageWriter& message_writer)
+        mcmc_writer(interface_callbacks::writer::base_writer& sample_writer,
+                    interface_callbacks::writer::base_writer& diagnostic_writer,
+                    interface_callbacks::writer::base_writer& message_writer)
           : sample_writer_(sample_writer),
             diagnostic_writer_(diagnostic_writer),
             message_writer_(message_writer) {
@@ -200,9 +196,8 @@ namespace stan {
          * @sideeffects stream is updated with information about timing
          *
          */
-        template <class Writer>
         void write_timing(double warmDeltaT, double sampleDeltaT,
-                          Writer& writer) {
+                          interface_callbacks::writer::base_writer& writer) {
           std::string title(" Elapsed Time: ");
           std::stringstream ss;
 
