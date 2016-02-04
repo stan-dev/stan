@@ -41,10 +41,7 @@ namespace stan {
                   interface_callbacks::writer::base_writer& diagnostic_writer,
                   interface_callbacks::writer::base_writer& message_writer) {
         stan::mcmc::fixed_param_sampler sampler;
-        stan::services::sample::mcmc_writer<Model,
-                                      interface_callbacks::writer::base_writer,
-                                      interface_callbacks::writer::base_writer,
-                                      interface_callbacks::writer::base_writer>
+        stan::services::sample::mcmc_writer<Model>
           writer(sample_writer, diagnostic_writer, message_writer);
         stan::mcmc::sample s(cont_params, 0, 0);
 
