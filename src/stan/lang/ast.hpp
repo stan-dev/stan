@@ -9,6 +9,11 @@
 #include <utility>
 #include <vector>
 
+// Edited to add GeneralCptModel_CVODE to Stan's grammar (general compartment 
+// model using CVODE solver)
+
+// RUBISH
+
 namespace stan {
 
   namespace lang {
@@ -51,6 +56,7 @@ namespace stan {
     struct simplex_var_decl;
     struct integrate_ode;
     struct integrate_ode_cvode;
+    struct GeneralCptModel_CVODE;
     struct unit_vector_var_decl;
     struct statement;
     struct statements;
@@ -61,6 +67,8 @@ namespace stan {
     struct var_type;
     struct vector_var_decl;
     struct while_statement;
+    
+    
 
     // forward declarable enum hack (can't fwd-decl enum)
     typedef int base_expr_type;
@@ -209,16 +217,17 @@ namespace stan {
       expr_type operator()(const fun& e) const;
       expr_type operator()(const integrate_ode& e) const;
       expr_type operator()(const integrate_ode_cvode& e) const;
+      expr_type operator()(const GeneralCptModel_CVODE& e) const;
       expr_type operator()(const index_op& e) const;
       expr_type operator()(const index_op_sliced& e) const;
       expr_type operator()(const binary_op& e) const;
       expr_type operator()(const unary_op& e) const;
       // template <typename T> expr_type operator()(const T& e) const;
+      
     };
 
-
     struct expression;
-
+    
     struct expression {
       typedef boost::variant<boost::recursive_wrapper<nil>,
                              boost::recursive_wrapper<int_literal>,
@@ -227,6 +236,7 @@ namespace stan {
                              boost::recursive_wrapper<variable>,
                              boost::recursive_wrapper<integrate_ode>,
                              boost::recursive_wrapper<integrate_ode_cvode>,
+                             boost::recursive_wrapper<GeneralCptModel_CVODE>,
                              boost::recursive_wrapper<fun>,
                              boost::recursive_wrapper<index_op>,
                              boost::recursive_wrapper<index_op_sliced>,
@@ -246,11 +256,13 @@ namespace stan {
       expression(const fun& expr);  // NOLINT(runtime/explicit)
       expression(const integrate_ode& expr);  // NOLINT(runtime/explicit)
       expression(const integrate_ode_cvode& expr);  // NOLINT(runtime/explicit)
+      expression(const GeneralCptModel_CVODE& expr);      
       expression(const index_op& expr);  // NOLINT(runtime/explicit)
       expression(const index_op_sliced& expr);  // NOLINT(runtime/explicit)
       expression(const binary_op& expr);  // NOLINT(runtime/explicit)
       expression(const unary_op& expr);  // NOLINT(runtime/explicit)
       expression(const expression_t& expr_);  // NOLINT(runtime/explicit)
+
 
       expr_type expression_type() const;
       int total_dims() const;
@@ -286,6 +298,7 @@ namespace stan {
       bool operator()(const variable& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const integrate_ode& x) const;  // NOLINT
       bool operator()(const integrate_ode_cvode& x) const;  // NOLINT
+      bool operator()(const GeneralCptModel_CVODE& x) const;
       bool operator()(const fun& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const index_op& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const index_op_sliced& x) const;  // NOLINT
@@ -380,6 +393,38 @@ namespace stan {
                           const expression& abs_tol,
                           const expression& max_num_steps);
     };
+    
+    struct GeneralCptModel_CVODE {
+    	std::string system_function_name_;
+    	expression pMatrix_; // matrix of parameters
+    	expression time_; // time vector
+    	expression amt_; // amount vector
+    	expression rate_; // rate vector
+    	expression ii_; // inter-dose interval vector
+    	expression evid_; // event-type vector
+    	expression cmt_; // compartment number vector
+    	expression addl_; // additional dosing vector
+    	expression ss_; // steady state vector
+    	expression rel_tol_; // relative tolerance
+    	expression abs_tol_; // absolute tolerance
+    	expression max_num_steps_; // max number of steps
+    	GeneralCptModel_CVODE();
+    	GeneralCptModel_CVODE(const std::string& system_function_name,
+    						            const expression& pMatrix,
+    						            const expression& time,
+    						            const expression& amt,
+    						            const expression& rate,
+    						            const expression& ii,
+    						            const expression& evid,
+    						            const expression& cmt,
+    						            const expression& addl,
+    						            const expression& ss,
+    						            const expression& rel_tol,
+    						            const expression& abs_tol,
+    						            const expression& max_num_steps);
+    };
+    	
+    // CHECK-POINT 1	
 
     struct fun {
       std::string name_;
@@ -965,6 +1010,7 @@ namespace stan {
       bool operator()(const fun& e) const;
       bool operator()(const integrate_ode& e) const;
       bool operator()(const integrate_ode_cvode& e) const;
+      bool operator()(const GeneralCptModel_CVODE& e) const;
       bool operator()(const index_op& e) const;
       bool operator()(const index_op_sliced& e) const;
       bool operator()(const binary_op& e) const;
@@ -1018,11 +1064,13 @@ namespace stan {
       bool operator()(const variable& e) const;
       bool operator()(const integrate_ode& e) const;
       bool operator()(const integrate_ode_cvode& e) const;
+      bool operator()(const GeneralCptModel_CVODE& e) const;      
       bool operator()(const fun& e) const;
       bool operator()(const index_op& e) const;
       bool operator()(const index_op_sliced& e) const;
       bool operator()(const binary_op& e) const;
       bool operator()(const unary_op& e) const;
+
     };
 
     bool has_var(const expression& e,
@@ -1039,6 +1087,7 @@ namespace stan {
       bool operator()(const variable& e) const;
       bool operator()(const integrate_ode& e) const;
       bool operator()(const integrate_ode_cvode& e) const;
+      bool operator()(const GeneralCptModel_CVODE& e) const;
       bool operator()(const fun& e) const;
       bool operator()(const index_op& e) const;
       bool operator()(const index_op_sliced& e) const;

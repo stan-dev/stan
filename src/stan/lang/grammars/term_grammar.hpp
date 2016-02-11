@@ -12,6 +12,8 @@
 #include <sstream>
 #include <vector>
 
+
+
 namespace stan {
 
   namespace lang {
@@ -87,6 +89,10 @@ namespace stan {
                               whitespace_grammar<Iterator> >
       integrate_ode_cvode_r;
 
+	    boost::spirit::qi::rule<Iterator,
+	  						              GeneralCptModel_CVODE(var_origin),
+	 						                whitespace_grammar<Iterator> >
+	    GeneralCptModel_CVODE_r;
 
       boost::spirit::qi::rule<Iterator,
                               std::string(),
