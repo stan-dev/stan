@@ -2126,6 +2126,7 @@ namespace stan {
         << EOL;
       generate_comment("Next line prevents compiler griping about no return",
                        indent + 1, o);
+      generate_indent(indent + 1, o);
       o << "throw std::runtime_error"
         << "(\"*** IF YOU SEE THIS, PLEASE REPORT A BUG ***\");"
         << EOL;
@@ -4600,8 +4601,10 @@ namespace stan {
       generate_function_arguments(fun, is_rng, is_lp, is_log, out);
       generate_function_body(fun, scalar_t_name, out);
 
-      // need a second function def for default propto=false for _log funs
-      if (is_log)
+      // need a second function def for default propto=false for _log
+      // funs; but don't want duplicate def, so don't do it for
+      // forward decl when body is no-op
+      if (is_log && !fun.body_.is_no_op_statement())
         generate_propto_default_function(fun, scalar_t_name, out);
       out << EOL;
     }
@@ -4666,7 +4669,7 @@ namespace stan {
 
     void generate_globals(std::ostream& out) {
       out << "static int current_statement_begin__;"
-          << EOL;
+          << EOL2;
     }
 
 
