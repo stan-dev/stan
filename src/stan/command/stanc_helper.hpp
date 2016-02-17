@@ -149,7 +149,7 @@ int stanc_helper(int argc, const char* argv[],
     }
 
     bool valid_model
-      = stan::lang::compile(err_stream, in, out, model_name, in_file_name);
+      = stan::lang::compile(err_stream, in, out, model_name);
 
     out.close();
     if (!valid_model) {
