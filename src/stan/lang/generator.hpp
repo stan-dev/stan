@@ -1492,7 +1492,9 @@ namespace stan {
       void operator()(nil const& /*x*/) const { }
       void operator()(int_var_decl const& x) const {
         generate_indent(indent_, o_);
-        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
+        o_ << "stan::math::fill(" << x.name_
+           << ", std::numeric_limits<int>::min());"
+           << EOL;
       }
       void operator()(double_var_decl const& x) const {
         generate_indent(indent_, o_);
