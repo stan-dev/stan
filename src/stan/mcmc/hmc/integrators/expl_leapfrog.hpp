@@ -7,11 +7,11 @@
 namespace stan {
   namespace mcmc {
 
-    template <typename Hamiltonian>
+    template <class Hamiltonian>
     class expl_leapfrog : public base_leapfrog<Hamiltonian> {
     public:
-      explicit expl_leapfrog(std::ostream* o = 0)
-        : base_leapfrog<Hamiltonian>(o) {}
+      expl_leapfrog()
+        : base_leapfrog<Hamiltonian>() {}
 
       void begin_update_p(typename Hamiltonian::PointType& z,
                           Hamiltonian& hamiltonian,
@@ -35,5 +35,4 @@ namespace stan {
 
   }  // mcmc
 }  // stan
-
 #endif

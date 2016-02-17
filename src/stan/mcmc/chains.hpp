@@ -1,6 +1,13 @@
 #ifndef STAN_MCMC_CHAINS_HPP
 #define STAN_MCMC_CHAINS_HPP
 
+#include <stan/io/stan_csv_reader.hpp>
+#include <stan/math/prim/mat/fun/variance.hpp>
+#include <stan/math/prim/arr/meta/index_type.hpp>
+#include <stan/math/prim/mat/meta/index_type.hpp>
+#include <stan/math/prim/scal/meta/index_type.hpp>
+#include <stan/math/prim/mat/fun/autocorrelation.hpp>
+#include <stan/math/prim/mat/fun/autocovariance.hpp>
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
 #include <boost/accumulators/statistics/mean.hpp>
@@ -9,18 +16,8 @@
 #include <boost/accumulators/statistics/variance.hpp>
 #include <boost/accumulators/statistics/covariance.hpp>
 #include <boost/accumulators/statistics/variates/covariate.hpp>
-
 #include <boost/random/uniform_int_distribution.hpp>
 #include <boost/random/additive_combine.hpp>
-
-#include <stan/io/stan_csv_reader.hpp>
-#include <stan/math/prim/mat/fun/variance.hpp>
-#include <stan/math/prim/arr/meta/index_type.hpp>
-#include <stan/math/prim/mat/meta/index_type.hpp>
-#include <stan/math/prim/scal/meta/index_type.hpp>
-#include <stan/math/prim/mat/fun/autocorrelation.hpp>
-#include <stan/math/prim/mat/fun/autocovariance.hpp>
-
 #include <algorithm>
 #include <cmath>
 #include <iostream>
@@ -33,7 +30,6 @@
 #include <cstdlib>
 
 namespace stan {
-
   namespace mcmc {
     using Eigen::Dynamic;
 
@@ -51,7 +47,7 @@ namespace stan {
      *
      * <p><b>Storage Order</b>: Storage is column/last-index major.
      */
-    template <typename RNG = boost::random::ecuyer1988>
+    template <class RNG = boost::random::ecuyer1988>
     class chains {
     private:
       Eigen::Matrix<std::string, Dynamic, 1> param_names_;

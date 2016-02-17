@@ -1,8 +1,9 @@
 #ifndef STAN_SERVICES_SAMPLE_INIT_ADAPT_HPP
 #define STAN_SERVICES_SAMPLE_INIT_ADAPT_HPP
 
-#include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
+#include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/services/arguments/categorical_argument.hpp>
 #include <stan/services/arguments/singleton_argument.hpp>
 #include <ostream>
@@ -18,7 +19,7 @@ namespace stan {
                       const double kappa,
                       const double t0,
                       const Eigen::VectorXd& cont_params,
-                      std::ostream* o) {
+                      interface_callbacks::writer::base_writer& writer) {
         const double epsilon = sampler->get_nominal_stepsize();
 
         sampler->get_stepsize_adaptation().set_mu(log(10 * epsilon));
@@ -31,11 +32,10 @@ namespace stan {
 
         try {
           sampler->z().q = cont_params;
-          sampler->init_stepsize();
+          sampler->init_stepsize(writer);
         } catch (const std::exception& e) {
-          if (o)
-            *o << "Exception initializing step size." << std::endl
-               << e.what() << std::endl;
+          writer("Exception initializing step size.");
+          writer(e.what());
           return false;
         }
         return true;
@@ -45,7 +45,7 @@ namespace stan {
       bool init_adapt(stan::mcmc::base_mcmc* sampler,
                       categorical_argument* adapt,
                       const Eigen::VectorXd& cont_params,
-                      std::ostream* o) {
+                      interface_callbacks::writer::base_writer& writer) {
         double delta
           = dynamic_cast<real_argument*>(adapt->arg("delta"))->value();
         double gamma
@@ -55,9 +55,9 @@ namespace stan {
         double t0
           = dynamic_cast<real_argument*>(adapt->arg("t0"))->value();
 
-        Sampler* s = dynamic_cast<Sampler*>(sampler);
-
-        return init_adapt<Sampler>(s, delta, gamma, kappa, t0, cont_params, o);
+        return init_adapt<Sampler>(dynamic_cast<Sampler*>(sampler),
+                                   delta, gamma, kappa, t0, cont_params,
+                                   writer);
       }
 
     }

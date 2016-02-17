@@ -17,16 +17,16 @@ test/gtest.o: $(GTEST)/src/gtest-all.cc
 ##
 # Rule for building a test
 ##
-test/%.o : src/test/%_test.cpp $(LIBGTEST)
+test/%.o : src/test/%_test.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
 
 ##
 # Rule for building a test executable
 ##
-test/%$(EXE) : test/%.o
+test/%$(EXE) : test/%.o $(LIBGTEST) $(LIBCVODE)
 	@mkdir -p $(dir $@)
-	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS)
+	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LIBCVODE)
 
 
 ##
