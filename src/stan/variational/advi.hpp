@@ -450,16 +450,20 @@ namespace stan {
                 + intermediate_extension;
               intermediate_stream = new std::fstream(intermediate_filename.c_str(),
                                                      std::fstream::out);
+              stan::interface_callbacks::writer::stream_writer intermediate_writer(*intermediate_stream);
 
 
               for (int n = 0; n < num_intermediate_samples; ++n) {
-                // cont_params_ = draw_posterior_sample(musigmatilde);
                 variational.sample(rng_, cont_params_);
-                for (int i = 0; i < cont_params_.size(); ++i)
+                for (int i = 0; i < cont_params_.size(); ++i) {
                   cont_vector.at(i) = cont_params_(i);
+                }
 
-                services::io::write_iteration(*intermediate_stream, model_, rng_,
-                              0.0, cont_vector, disc_vector, print_stream_);
+                // services::io::write_iteration(*intermediate_stream, model_, rng_,
+                //               0.0, cont_vector, disc_vector, print_stream_);
+                services::io::write_iteration(model_, rng_,
+                              0.0, cont_vector, disc_vector,
+                              intermediate_writer, intermediate_writer);
               }
 
               intermediate_stream->close();
