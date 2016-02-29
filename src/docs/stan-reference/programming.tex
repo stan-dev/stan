@@ -2539,13 +2539,13 @@ optimized model is as follows.
 parameters {
   matrix[K,J] z;
   cholesky_factor_corr[K] L_Omega;  
-  vector<lower=0;upper=pi()/2>[K] tau_unif;  // prior scale
+  vector<lower=0;upper=pi()/2>[K] tau_unif;  
   matrix[L,K] gamma;                         // group coeffs
   real<lower=0> sigma;                       // prediction error scale
 }
 transformed parameters {
   matrix[J,K] beta;
-  vector<lower=0>[K] tau;
+  vector<lower=0>[K] tau;     // prior scale
   for (k in 1:K) tau[k] <- 2.5 * tan(tau_unif[k]);
   beta <- u * gamma + (diag_pre_multiply(tau,L_Omega) * z)';
 }
