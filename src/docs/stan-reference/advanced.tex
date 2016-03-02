@@ -275,7 +275,7 @@ data {
 model {
   // ...
   for (k in 1:K)
-    increment_log_prob(- lambda * abs(beta[k]));
+    increment_log_prob(- lambda * fabs(beta[k]));
 }
 \end{stancode}
 
