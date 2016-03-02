@@ -39,6 +39,9 @@
 #include <vector>
 #include <stdexcept>
 
+// RUBISH
+
+
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::index_op,
                           (stan::lang::expression, expr_)
                           (std::vector<std::vector<stan::lang::expression> >,
@@ -69,6 +72,22 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::integrate_ode_cvode,
                           (stan::lang::expression, abs_tol_)
                           (stan::lang::expression, max_num_steps_) )
 
+  BOOST_FUSION_ADAPT_STRUCT(stan::lang::GeneralCptModel_CVODE,
+                           (std::string, system_function_name_)
+                           (stan::lang::expression, pMatrix_)
+                           (stan::lang::expression, time_)
+                           (stan::lang::expression, amt_)
+                           (stan::lang::expression, rate_)
+                           (stan::lang::expression, ii_)
+                           (stan::lang::expression, evid_)
+                           (stan::lang::expression, cmt_)
+                           (stan::lang::expression, addl_)
+                           (stan::lang::expression, ss_)
+                           (stan::lang::expression, rel_tol_)
+                           (stan::lang::expression, abs_tol_)
+                           (stan::lang::expression, max_num_steps_) )
+
+  
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::fun,
                           (std::string, name_)
                           (std::vector<stan::lang::expression>, args_) )
@@ -80,7 +99,6 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::int_literal,
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::double_literal,
                           (double, val_)
                           (stan::lang::expr_type, type_) )
-
 
 namespace stan {
   namespace lang {
@@ -345,6 +363,138 @@ namespace stan {
     };
     boost::phoenix::function<validate_integrate_ode_cvode>
       validate_integrate_ode_cvode_f;
+    
+    
+    struct validate_GeneralCptModel_CVODE {
+      //! @cond Doxygen_Suppress
+      template <class> struct result;
+      //! @endcond
+      template <typename F, typename T1, typename T2, typename T3, typename T4>
+      struct result<F(T1, T2, T3, T4)> { typedef void type; };
+      
+      void operator()(const GeneralCptModel_CVODE& ode_fun,
+                    const variable_map& var_map,
+                    bool& pass,
+                    std::ostream& error_msgs) const {
+        pass = true;
+        
+        // test function argument type
+        expr_type sys_result_type(DOUBLE_T, 1);
+        std::vector<expr_type> sys_arg_types;
+        sys_arg_types.push_back(expr_type(DOUBLE_T, 0));
+        sys_arg_types.push_back(expr_type(DOUBLE_T, 1));
+        sys_arg_types.push_back(expr_type(DOUBLE_T, 1));
+        sys_arg_types.push_back(expr_type(DOUBLE_T, 1));
+        sys_arg_types.push_back(expr_type(INT_T, 1));
+        function_signature_t system_signature(sys_result_type, sys_arg_types);
+        if (!function_signatures::instance()
+              .is_defined(ode_fun.system_function_name_, system_signature)) {
+        error_msgs << "first argument to integrate_ode_cvode"
+                   << " must be a function with signature"
+                   << " (real, real[], real[], real[], int[]) : real[] ";
+        pass = false;
+        }
+        
+        // test regular argument types
+        if (ode_fun.pMatrix_.expression_type() != MATRIX_T) {
+          error_msgs << "second argument to GeneralCptModel_CVODE must be type vector[]"
+                     << " for parameter matrix"
+                     << "; found type="
+                     << ode_fun.pMatrix_.expression_type()
+                     << ". ";
+          pass = false;
+        }
+        if (ode_fun.time_.expression_type() != expr_type(DOUBLE_T, 1)) {
+          error_msgs << "third argument to GeneralCptModel_CVODE must be type real[]"
+                     << "for time"
+                     << "; found type="
+                     << ode_fun.time_.expression_type()
+                     << ". "; 
+          pass = false;
+        }
+        if (ode_fun.amt_.expression_type() != expr_type(DOUBLE_T, 1)) {
+          error_msgs << "fourth argument to GeneralCptModel_CVODE must be type real[]"
+                     << "for amount"
+                     << "; found type="
+                     << ode_fun.amt_.expression_type()
+                     << ". ";
+          pass = false;
+        }
+        if (ode_fun.rate_.expression_type() != expr_type(DOUBLE_T, 1)) {
+          error_msgs << "fifth argument to GeneralCptModel_CVODE must be type real[]"
+                     << "for rate"
+                     << "; found type="
+                     << ode_fun.rate_.expression_type()
+                     << ". "; 
+          pass = false;
+        }        
+        if (ode_fun.ii_.expression_type() != expr_type(DOUBLE_T, 1)) {
+          error_msgs << "sixth argument to GeneralCptModel_CVODE must be type real[]"
+                     << "for inter-dose interval"
+                     << "; found type="
+                     << ode_fun.ii_.expression_type()
+                     << ". "; 
+          pass = false;
+        }
+        if (ode_fun.evid_.expression_type() != expr_type(INT_T, 1)) {
+          error_msgs << "seventh argument to GeneralCptModel_CVODE must be type int[]"
+                     << "for evid (event ID)"
+                     << "; found type="
+                     << ode_fun.evid_.expression_type()
+                     << ". "; 
+          pass = false;
+        }        
+        if (ode_fun.cmt_.expression_type() != expr_type(INT_T, 1)) {
+          error_msgs << "eighth argument to GeneralCptModel_CVODE must be type int[]"
+                     << "for cmt (compartment)"
+                     << "; found type="
+                     << ode_fun.cmt_.expression_type()
+                     << ". ";
+          pass = false;
+        }          
+        if (ode_fun.addl_.expression_type() != expr_type(INT_T, 1)) {
+          error_msgs << "ninth argument to GeneralCptModel_CVODE must be type int[]"
+                     << "for addl (additional dose)"
+                     << "; found type="
+                     << ode_fun.addl_.expression_type()
+                     << ". "; 
+          pass = false;
+        }   
+        if (ode_fun.ss_.expression_type() != expr_type(INT_T, 1)) {
+          error_msgs << "tenth argument to GeneralCptModel_CVODE must be type int[]"
+                     << "for ss (steady state)"
+                     << "; found type="
+                     << ode_fun.ss_.expression_type()
+                     << ". "; 
+          pass = false;
+        }  
+        
+        // test data-only variables do not have parameters (int locals OK)
+        if (has_var(ode_fun.evid_, var_map)) {
+          error_msgs << "seventh argument to GeneralCptModel_CVODE (evid)"
+                     << " must be data only and not reference parameters";
+          pass = false;
+        }
+        if (has_var(ode_fun.cmt_, var_map)) {
+          error_msgs << "eighth argument to GeneralCptModel_CVODE (cmt)"
+                     << " must be data only and not reference parameters";
+          pass = false;
+        } 
+        if (has_var(ode_fun.addl_, var_map)) {
+          error_msgs << "ninth argument to GeneralCptModel_CVODE (addl)"
+                     << " must be data only and not reference parameters";
+          pass = false;		  
+        }
+        if (has_var(ode_fun.ss_, var_map)) {
+          error_msgs << "tenth argument to GeneralCptModel_CVODE (ss)"
+                     << " must be data only and not reference parameters";
+          pass = false;	  
+        }
+      }
+    };
+    boost::phoenix::function<validate_GeneralCptModel_CVODE> 
+      validate_GeneralCptModel_CVODE_f;
+    
 
     struct set_fun_type {
       //! @cond Doxygen_Suppress
@@ -906,7 +1056,6 @@ namespace stan {
     boost::phoenix::function<validate_int_expr3> validate_int_expr3_f;
 
 
-
     template <typename Iterator>
     term_grammar<Iterator>::term_grammar(variable_map& var_map,
                                          std::stringstream& error_msgs,
@@ -1035,11 +1184,45 @@ namespace stan {
         > lit(')') [validate_integrate_ode_cvode_f(
             _val, boost::phoenix::ref(var_map_),
             _pass, boost::phoenix::ref(error_msgs_))];
+            
+	  GeneralCptModel_CVODE_r.name("expression");
+      GeneralCptModel_CVODE_r
+        %= (lit("GeneralCptModel_CVODE") >> no_skip[!char_("a-zA-Z0-9_")])
+        > lit('(')
+        > identifier_r        // system function name (function only)
+        > lit(',')
+        > expression_g(_r1)		// pMatrix
+        > lit(',')
+        > expression_g(_r1)		// time
+        > lit(',')
+        > expression_g(_r1)		// amt
+        > lit(',')
+        > expression_g(_r1)		// rate
+        > lit(',')
+        > expression_g(_r1)		// ii
+        > lit(',')
+        > expression_g(_r1)		// evid (data only)
+        > lit(',')
+        > expression_g(_r1)		// cmt (data only)
+        > lit(',')
+        > expression_g(_r1)		// addl (data only)
+        > lit(',')
+        > expression_g(_r1)		// ss (data only)
+        > lit(',')
+        > expression_g(_r1)		// rel_tol (data only)
+        > lit(',') 
+        > expression_g(_r1)		// abs_tol (data only)
+        > lit(',')
+        > expression_g(_r1)		// max_num_steps (data only)
+        > lit(')') [validate_GeneralCptModel_CVODE_f(
+           _val, boost::phoenix::ref(var_map_),
+           _pass, boost::phoenix::ref(error_msgs_))];
 
       factor_r.name("expression");
       factor_r =
         integrate_ode_r(_r1)[set_val5_f(_val, _1)]
         | integrate_ode_cvode_r(_r1)[set_val5_f(_val, _1)]
+        | GeneralCptModel_CVODE_r(_r1)[set_val5_f(_val, _1)]
         | (fun_r(_r1)[set_val5_f(_b, _1)]
            > eps[set_fun_type_named_f(_val, _b, _r1, _pass,
                                       boost::phoenix::ref(error_msgs_))])
@@ -1107,4 +1290,5 @@ namespace stan {
 
   }
 }
+
 #endif

@@ -17,6 +17,8 @@
 #include <utility>
 #include <vector>
 
+// RUBISH
+
 namespace stan {
 
   namespace lang {
@@ -663,6 +665,10 @@ namespace stan {
     expression_type_vis::operator()(const integrate_ode_cvode& e) const {
       return expr_type(DOUBLE_T, 2);
     }
+    expr_type 
+    expression_type_vis::operator()(const GeneralCptModel_CVODE& e) const{
+      return expr_type(MATRIX_T); // CHECK
+    }
     expr_type expression_type_vis::operator()(const fun& e) const {
       return e.type_;
     }
@@ -678,6 +684,7 @@ namespace stan {
     expr_type expression_type_vis::operator()(const unary_op& e) const {
       return e.type_;
     }
+
 
     expression::expression()
       : expr_(nil()) {
@@ -700,11 +707,13 @@ namespace stan {
     expression::expression(const variable& expr) : expr_(expr) { }
     expression::expression(const integrate_ode& expr) : expr_(expr) { }
     expression::expression(const integrate_ode_cvode& expr) : expr_(expr) { }
+  	expression::expression(const GeneralCptModel_CVODE& expr) : expr_(expr) { }    
     expression::expression(const fun& expr) : expr_(expr) { }
     expression::expression(const index_op& expr) : expr_(expr) { }
     expression::expression(const index_op_sliced& expr) : expr_(expr) { }
     expression::expression(const binary_op& expr) : expr_(expr) { }
     expression::expression(const unary_op& expr) : expr_(expr) { }
+
 
     int expression::total_dims() const {
       int sum = expression_type().num_dims_;
@@ -767,6 +776,14 @@ namespace stan {
       return boost::apply_visitor(*this, e.y0_.expr_)
         || boost::apply_visitor(*this, e.theta_.expr_);
     }
+    bool contains_var::operator()(const GeneralCptModel_CVODE& e) const {
+      // pMatrix, time, amt, rate, and ii may contain vars
+      return (((boost::apply_visitor(*this, e.pMatrix_.expr_)
+                 || boost::apply_visitor(*this, e.time_.expr_))
+                 || boost::apply_visitor(*this, e.amt_.expr_))
+                 || boost::apply_visitor(*this, e.rate_.expr_))
+                 || boost::apply_visitor(*this, e.ii_.expr_);
+    }
     bool contains_var::operator()(const index_op& e) const {
       return boost::apply_visitor(*this, e.expr_.expr_);
     }
@@ -781,6 +798,7 @@ namespace stan {
         return boost::apply_visitor(*this, e.subject.expr_);
     }
 
+    
     bool is_linear_function(const std::string& name) {
       return name == "add"
         || name == "block"
@@ -850,6 +868,14 @@ namespace stan {
       return boost::apply_visitor(*this, e.y0_.expr_)
         || boost::apply_visitor(*this, e.theta_.expr_);
     }
+    bool contains_nonparam_var::operator()(const GeneralCptModel_CVODE& e) const {
+      // IS THIS USEFUL?
+      return (((boost::apply_visitor(*this, e.pMatrix_.expr_)
+                 || boost::apply_visitor(*this, e.time_.expr_))
+                 || boost::apply_visitor(*this, e.amt_.expr_))
+                 || boost::apply_visitor(*this, e.rate_.expr_))
+                 || boost::apply_visitor(*this, e.ii_.expr_); 
+    }
     bool contains_nonparam_var::operator()(const fun& e) const {
       // any function applied to non-linearly transformed var
       for (size_t i = 0; i < e.args_.size(); ++i)
@@ -910,6 +936,9 @@ namespace stan {
     }
     bool is_nil_op::operator()(const integrate_ode_cvode& /* x */) const {
       return false;
+    }
+    bool is_nil_op::operator()(const GeneralCptModel_CVODE& /* x */) const { 
+      return false; 
     }
     bool is_nil_op::operator()(const fun& /* x */) const { return false; }
     bool is_nil_op::operator()(const index_op& /* x */) const { return false; }
@@ -1025,6 +1054,36 @@ namespace stan {
         abs_tol_(abs_tol),
         max_num_steps_(max_num_steps) {
     }
+    
+    GeneralCptModel_CVODE::GeneralCptModel_CVODE() { }
+    GeneralCptModel_CVODE::GeneralCptModel_CVODE(
+                                   const std::string& system_function_name,
+                                   const expression& pMatrix,
+                                   const expression& time,
+                                   const expression& amt,
+                                   const expression& rate,
+                                   const expression& ii,
+                                   const expression& evid,
+                                   const expression& cmt,
+                                   const expression& addl,
+                                   const expression& ss,
+                                   const expression& rel_tol,
+                                   const expression& abs_tol,
+                                   const expression& max_num_steps)
+      : system_function_name_(system_function_name),
+        pMatrix_(pMatrix),
+        time_(time),
+        amt_(amt),
+        rate_(rate),
+        ii_(ii),
+        evid_(evid),
+        cmt_(cmt),
+        addl_(addl),
+        ss_(ss),
+        rel_tol_(rel_tol),
+        abs_tol_(abs_tol),
+        max_num_steps_(max_num_steps) {
+        }
 
     fun::fun() { }
     fun::fun(std::string const& name,
@@ -1036,7 +1095,7 @@ namespace stan {
     void fun::infer_type() {
       // TODO(carpenter): remove this useless function and any calls to it
     }
-
+	    		
 
     size_t total_dims(const std::vector<std::vector<expression> >& dimss) {
       size_t total = 0U;
@@ -1660,6 +1719,9 @@ namespace stan {
     bool var_occurs_vis::operator()(const integrate_ode_cvode& e) const {
       return false;  // no refs persist out of integrate_ode_cvode() call
     }
+    bool var_occurs_vis::operator()(const GeneralCptModel_CVODE& e) const {
+      return false; // UNSURE if this is correct
+    }
     bool var_occurs_vis::operator()(const index_op& e) const {
       // refs only persist out of expression, not indexes
       return boost::apply_visitor(*this, e.expr_.expr_);
@@ -1674,6 +1736,7 @@ namespace stan {
     bool var_occurs_vis::operator()(const unary_op& e) const {
       return boost::apply_visitor(*this, e.subject.expr_);
     }
+
 
     assgn::assgn() { }
     assgn::assgn(const variable& lhs_var, const std::vector<idx>& idxs,
@@ -1848,6 +1911,5 @@ namespace stan {
 
   }
 }
-
 
 #endif

@@ -23,6 +23,7 @@
 #include <string>
 #include <vector>
 
+
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::int_var_decl,
                           (stan::lang::range, range_)
                           (std::string, name_)
@@ -235,6 +236,15 @@ namespace stan {
         return boost::apply_visitor(*this, x.y0_.expr_)
           && boost::apply_visitor(*this, x.theta_.expr_);
       }
+      bool operator()(const GeneralCptModel_CVODE& x) const {
+      	return (((boost::apply_visitor(*this, x.pMatrix_.expr_)
+        && boost::apply_visitor(*this, x.time_.expr_))
+        && boost::apply_visitor(*this, x.amt_.expr_))
+        && boost::apply_visitor(*this, x.rate_.expr_))
+        && boost::apply_visitor(*this, x.ii_.expr_);
+      } // include all the arguments with a template argument?
+      
+      
       bool operator()(const fun& x) const {
         for (size_t i = 0; i < x.args_.size(); ++i)
           if (!boost::apply_visitor(*this, x.args_[i].expr_))
@@ -1012,5 +1022,6 @@ namespace stan {
 
 
 }
+
 #endif
 
