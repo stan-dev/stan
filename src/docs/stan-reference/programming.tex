@@ -2539,12 +2539,14 @@ optimized model is as follows.
 parameters {
   matrix[K,J] z;
   cholesky_factor_corr[K] L_Omega;  
-  vector<lower=0>[K] tau;      // prior scale
-  matrix[L,K] gamma;           // group coeffs
-  real<lower=0> sigma;         // prediction error scale
+  vector<lower=0;upper=pi()/2>[K] tau_unif;  
+  matrix[L,K] gamma;                         // group coeffs
+  real<lower=0> sigma;                       // prediction error scale
 }
 transformed parameters {
   matrix[J,K] beta;
+  vector<lower=0>[K] tau;     // prior scale
+  for (k in 1:K) tau[k] <- 2.5 * tan(tau_unif[k]);
   beta <- u * gamma + (diag_pre_multiply(tau,L_Omega) * z)';
 }
 model {
@@ -2553,12 +2555,13 @@ model {
     x_beta_jj[n] <- x[n] * beta[jj[n]]';
   y ~ normal(x_beta_jj, sigma);
 
-  tau ~ cauchy(0,2.5);
   to_vector(z) ~ normal(0,1); 
   L_Omega ~ lkj_corr_cholesky(2);
   to_vector(gamma) ~ normal(0,5);
 }
 \end{stancode}
+
+This model also reparameterizes the prior scale \code{tau} to avoid potential problems with the heavy tails of the Cauchy distribution. The statement \code{tau_unif ~ uniform(0,pi()/2)} can be omitted from the model block because stan increments the log posterior for parameters with uniform priors without it.
 
 % \begin{quote}
 % \begin{stancode}
