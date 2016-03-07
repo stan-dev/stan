@@ -2561,7 +2561,7 @@ model {
 }
 \end{stancode}
 
-This model also reparameterizes the prior scale \code{tau} to avoid potential problems with the heavy tails of the Cauchy distribution. The statement \code{tau_unif ~ uniform(0,pi()/2)} can be omitted from the model block because stan increments the log posterior for parameters with uniform priors without it.
+This model also reparameterizes the prior scale \code{tau} to avoid potential problems with the heavy tails of the Cauchy distribution. The statement \code{tau\_unif ~ uniform(0,pi()/2)} can be omitted from the model block because stan increments the log posterior for parameters with uniform priors without it.
 
 % \begin{quote}
 % \begin{stancode}
