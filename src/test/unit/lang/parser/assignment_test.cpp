@@ -20,3 +20,12 @@ TEST(lang_parser, assignments_funciton_signatures) {
 TEST(lang_parser, mat_assign_funciton_signatures) {
   test_parsable("mat_assign");
 }
+
+// NEW ASSIGNMENT AFTER HERE
+
+TEST(lang_parser, new_assign) {
+  test_parsable("assignment-new");
+  test_warning("assignment-old",
+               "Warning (non-fatal): operator <- deprecated for"
+               " assignment; use = instead.");
+}
