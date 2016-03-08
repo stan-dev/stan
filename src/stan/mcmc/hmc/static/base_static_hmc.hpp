@@ -64,11 +64,13 @@ namespace stan {
       void get_sampler_param_names(std::vector<std::string>& names) {
         names.push_back("stepsize__");
         names.push_back("int_time__");
+        names.push_back("E__");
       }
 
       void get_sampler_params(std::vector<double>& values) {
         values.push_back(this->epsilon_);
         values.push_back(this->T_);
+        values.push_back(this->hamiltonian_.H(this->z_));
       }
 
       void set_nominal_stepsize_and_T(const double e, const double t) {
