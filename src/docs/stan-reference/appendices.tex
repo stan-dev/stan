@@ -137,41 +137,33 @@ you can look for similar structures in these examples.
   following \Stan program, which sets \code{mu} before using it to
   sample \code{y}.
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
-mu <- a + b * x;
+\begin{stancode}
+mu = a + b * x;
 y ~ normal(mu,sigma);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 It translates to the following \Cpp code.
 %
-\begin{quote}
-\begin{Verbatim} 
+\begin{stancode}
 mu = a + b * x; 
 lp += normal_log(mu,sigma);
-\end{Verbatim}
-\end{quote} 
+\end{stancode}
 %
 Contrast this with the \Stan program
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 y ~ normal(mu,sigma)
-mu <- a + b * x
-\end{Verbatim}
-\end{quote}
+mu = a + b * x
+\end{stancode}
 %
 This program is well formed, but is almost certainly  
 a coding error, because it attempts to use \code{mu} before 
 it is set. It translates to the following \Cpp code.
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 lp += normal_log(mu,sigma);
 mu = a + b * x;
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 The direct translation to the imperative language of \Cpp code
 highlights the potential error of using \code{mu} in the first
@@ -223,38 +215,30 @@ sample out of hand as if it had zero probability.
   line breaks are equivalent to spaces, and each statement ends in a
   semicolon.  For example:
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 y ~ normal(mu, sigma);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 and
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 for (i in 1:n) y[i] ~ normal(mu, sigma);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 Or, equivalently (recall that a line break is just another form of whitespace),
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 for (i in 1:n)
   y[i] ~ normal(mu, sigma);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 and also equivalently, 
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 for (i in 1:n) {
   y[i] ~ normal(mu, sigma);
 }
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 There's a semicolon after the model statement but not after the
 brackets indicating the body of the for loop.
@@ -293,17 +277,15 @@ $\vdots$ & $\vdots$
   of local variables, to be reassigned.  For example, the following is
   legal and meaningful (if possibly inefficient) Stan code.
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 {
-  total <- 0;
+  total = 0;
   for (i in 1:n){
     theta[i] ~ normal(total, sigma);
-    total <- total + theta[i];
+    total = total + theta[i];
   }
 }
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 In \BUGS, the above model would not be legal because the variable
 \code{total} is defined more than once.  But in Stan, the loop is
@@ -332,20 +314,16 @@ truncated versions may not exist and may not be vectorized.}
 %
 allowing
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 for (i in 1:n) 
   y[i] ~ normal(mu[i], sigma[i]);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 to be expressed more compactly as 
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 y ~ normal(mu,sigma);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 The vectorized form is also more efficient because Stan can unfold the
 computation of the chain rule during algorithmic differentiation.
@@ -353,32 +331,26 @@ computation of the chain rule during algorithmic differentiation.
 \item Stan also allows for arrays of vectors and matrices.
   For example, in a hierarchical model might have a vector of \code{K}
   parameters for each of \code{J} groups; this can be declared using
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 vector[K] theta[J];
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 Then \code{theta[j]} is an expression denoting a \code{K}-vector and
 may be used in the code just like any other vector variable.
 \\[6pt]
 An alternative encoding would be with a two-dimensional array, as in
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 real theta[J,K];
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 The vector version can have some advantages, both in convenience and
 in computational speed for some operations.
 \\[6pt]
 A third encoding would use a matrix:
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 matrix[J,K] theta;
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 but in this case, \code{theta[j]} is a row vector, not a vector, and
 accessing it as a vector is less efficient than with an array of
@@ -399,32 +371,28 @@ They are useful for defining iterative functions with complex
 termination conditions.  As an illustration of their syntax,
 the for-loop
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 model {
     ....
     for (n in 1:N) {
         ... do something with n ....
     }
 }
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 may be recoded using the following while loop.
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 model {
     int n;
     ...
-    n <- 1;
+    n = 1;
     while (n <= N) {
         ... do something with n ...
-        n <- n + 1;
+        n = n + 1;
     }
 }
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 
 
@@ -448,22 +416,18 @@ model {
   declare but don't define a parameter it implicitly has a flat prior
   (on the scale in which the parameter is defined).  For example, if
   you have a parameter \code{p} declared as 
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 real<lower=0,upper=1> p;
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 and then have no sampling statement for \code{p} in the \code{model}
 block, then you are implicitly assigning a uniform $[0,1]$ prior on
 \code{p}.
 On the other hand, if you have a parameter \code{theta} declared with
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 real theta;
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 and have no sampling statement for \code{theta} in the
 \code{model} block, 
@@ -472,11 +436,9 @@ on $(-\infty,\infty)$ to \code{theta}.
 %
 % Then if
 % you define a transformed parameter \code{p} using
-% \begin{quote}
-% \begin{Verbatim} 
-% p <- invlogit(theta);
-% \end{Verbatim}
-% \end{quote}
+% \begin{stancode}
+% p = invlogit(theta);
+% \end{stancode}
 % %
 % then you get a $\distro{Beta}(0,0)$ on \code{p}.
 % then you are implicitly assigning an improper uniform
@@ -487,14 +449,12 @@ on $(-\infty,\infty)$ to \code{theta}.
 \item \BUGS models are always proper (being constructed as a product
   of proper marginal and conditional densities).  Stan models can be
   improper.  Here is the simplest improper Stan model: 
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 parameters {
   real theta;
 } 
 model { }
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 % \item You can also define some improper models in \BUGS directly, for
 %   example, \Verb|p ~ beta (0, 0);| Remember how Stan works:
 %   lines in the model are executables that correspond directly to
@@ -508,12 +468,10 @@ model { }
   the priors are proper, the posterior will be proper also.
 \item
   As noted earlier, each statement in a Stan model is directly translated into the \Cpp code for computing the log posterior.  Thus, for example, the following pair of statements is legal in a Stan model:
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 y ~ normal(0,1);
 y ~ normal(2,3);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 The second line here does \emph{not} simply overwrite the first;
 rather, \emph{both} statements contribute to the density function that
@@ -522,12 +480,10 @@ product, $\distro{Norm}(y|0,1) \times \distro{Norm}(y|2,3)$, into the
 density function.
 \\[6pt] 
 For a perhaps more confusing example, consider the following two lines in a Stan model:
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 x ~ normal(0.8*y, sigma);
 y ~ normal(0.8*x, sigma);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 At first, this might look like a joint normal distribution with a
 correlation of 0.8.  But it is not.  The above are \emph{not}
@@ -646,13 +602,11 @@ recommended form is a single uppercase letter.  The reason for this is
 that it allows the loop variables to match.  So loops over the indices of
 an $M \times N$ matrix $a$ would look as follows.
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 for (m in 1:M)
   for (n in 1:N)
      a[m,n] = ...
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 
 
 \section{Local Variable Scope}
@@ -665,43 +619,37 @@ The following Stan program corresponds to a direct translation of a
 BUGS model, which uses a different element of \code{mu} in each
 iteration.
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 model {
   real mu[N];
   for (n in 1:N) {
-    mu[n] <- alpha * x[n] + beta;
+    mu[n] = alpha * x[n] + beta;
     y[n] ~ normal(mu[n],sigma);
   }
 }
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 Because variables can be reused in Stan and because they should be
 declared locally for clarity, this model should be recoded as follows.
 %
-\begin{quote}
-\begin{Verbatim} 
+\begin{stancode}
 model {
   for (n in 1:N) {
     real mu;
-    mu <- alpha * x[n] + beta;
+    mu = alpha * x[n] + beta;
     y[n] ~ normal(mu,sigma);
   }
 }
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 % 
 The local variable can be eliminated altogether, as follows.
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 model {
   for (n in 1:N)
     y[n] ~ normal(alpha * x[n] + beta, sigma);
 }
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 There is unlikely to be any measurable efficiency difference
 between the last two implementations, but both should be a bit
@@ -716,17 +664,15 @@ declare a local variable for the structure outside of the block
 in which it is used.  This allows it to be allocated once and then
 reused.
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 model {
   vector[K] mu;
   for (n in 1:N) {
     for (k in 1:K) 
-      mu[k] <- ...;
+      mu[k] = ...;
     y[n] ~ multi_normal(mu,Sigma);
 }
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 In this case, the vector \code{mu} will be allocated
 outside of both loops, and used a total of \code{N} times.
@@ -738,31 +684,25 @@ outside of both loops, and used a total of \code{N} times.
 Single-statement blocks can be rendered in one of two ways.  The fully
 explicit bracketed way is as follows.
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 for (n in 1:N) {
   y[n] ~ normal(mu,1);
 }
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 The following statement without brackets has the same effect.
 %
-\begin{quote}
-\begin{Verbatim}  
+\begin{stancode}
 for (n in 1:N)
   y[n] ~ normal(mu,1);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %  
 Single-statement blocks can also be written on a single line, as
 in the following example.
 %
-\begin{quote}
-\begin{Verbatim} 
+\begin{stancode}
 for (n in 1:N) y[n] ~ normal(mu,1);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 These can be much harder to read than the first example. Only use this
 style if the statement is very simple, as in this example.  Unless
@@ -774,26 +714,22 @@ Conditional and looping statements may also be written without brackets.
 The use of for loops without brackets can be dangerous.  For instance,
 consider this program.
 %
-\begin{quote}
-\begin{Verbatim}  
+\begin{stancode}
 for (n in 1:N)
   z[n] ~ normal(nu,1);
   y[n] ~ normal(mu,1);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 Because Stan ignores whitespace and the parser completes a statement
 as eagerly as possible (just as in C++), the previous program is
 equivalent to the following program.
 %
-\begin{quote}
-\begin{Verbatim}  
+\begin{stancode}
 for (n in 1:N) {
   z[n] ~ normal(nu,1);
 }
 y[n] ~ normal(mu,1);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 
 
@@ -816,26 +752,22 @@ Vertical space is valuable as it controls how much of a program you
 can see.  The preferred Stan style is as shown in the previous
 section, not as follows.
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 for (n in 1:N) 
 {
   y[n] ~ normal(mu,1);
 }
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 This also goes for parameters blocks, transformed data blocks, 
 which should look as follows.
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 transformed parameters {
   real sigma;
   ...
 }
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 
 
@@ -844,16 +776,14 @@ transformed parameters {
 Stan supports the full \Cpp-style conditional syntax,
 allowing real or integer values to act as conditions, as follows.
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 real x;
 ...
 if (x) {
    // executes if x not equal to 0
    ...
 }
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 
 \subsection{Explicit Comparisons of Non-Boolean Conditions}
@@ -862,11 +792,9 @@ The preferred form is to write the condition out explicitly for
 integer or real values that are not produced as the result of a
 comparison or boolean operation, as follows.
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 if (x != 0) ...
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 
 % \subsection{Functional \code{ifelse} versus Conditionals}
 % don't actually want this until we get proper short-circuiting conditionals!
@@ -874,35 +802,29 @@ if (x != 0) ...
 % If possible, the functional form \code{ifelse} is preferred to full
 % conditionals.  For example, the following block
 % %
-% \begin{quote}
-% \begin{Verbatim}
+% \begin{stancode}
 % if (cond)
 %   x <- foo(y);
 % else 
 %   x <- bar(z);
-% \end{Verbatim}
-% \end{quote}
+% \end{stancode}
 % %
 % should be recoded as follows.
 % %
-% \begin{quote}
-% \begin{Verbatim}
+% \begin{stancode}
 % x <- ifelse(foo(y), bar(z));
-% \end{Verbatim}
-% \end{quote}
+% \end{stancode}
 
 \section{Functions}
 
 Functions are laid out the same way as in languages such as Java and
 \Cpp.  For example,
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 real foo(real x, real y) {
   return sqrt(x * log(y));
 }
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 The return type is flush left, the parentheses for the arguments are
 adjacent to the arguments and function name, and there is a space
@@ -914,15 +836,13 @@ we use two spaces.  The close curly brace appears on its own line.
 If function names or argument lists are long, they can be
 written as
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 matrix
 function_to_do_some_hairy_algebra(matrix thingamabob,
                                   vector doohickey2) {
   ...body...
 }
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 The function starts a new line, under the type.  The arguments are
 aligned under each other.
@@ -930,8 +850,7 @@ aligned under each other.
 Function documentation should follow the Javadoc and Doxygen styles.
 Here's an example repeated from \refsection{documenting-functions}.
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 /**
  * Return a data matrix of specified size with rows 
  * corresponding to items and the first column filled 
@@ -945,8 +864,7 @@ Here's an example repeated from \refsection{documenting-functions}.
  */
 matrix predictors_rng(int N, int K) {  
   ...
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 The open comment is \code{/**}, asterisks are aligned below the first
 asterisk of the open comment, and the end comment \code{*/} is also
@@ -971,14 +889,12 @@ layout.
 It is dispreferred to have multiple statements or declarations on the
 same line, as in the following example.
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 transformed parameters {
   real mu_centered;  real sigma;
-  mu <- (mu_raw - mean_mu_raw);    sigma <- pow(tau,-2);
+  mu = (mu_raw - mean_mu_raw);    sigma = pow(tau,-2);
 }
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 These should be broken into four separate lines.
 
@@ -1010,7 +926,7 @@ to.  For instance, use \code{normal(0,1)}, not \code{normal (0,1)}.
 \subsection{Spaces Around Operators}
 
 There should be spaces around binary operators.  For instance, use
-\code{y[1]~<-~x}, not \code{y[1]<-x}, use \code{(x~+~y)~*~z} not
+\code{y[1]~=~x}, not \code{y[1]=x}, use \code{(x~+~y)~*~z} not
 \code{(x+y)*z}.
 
 \subsection{Breaking Expressions across Lines}
@@ -1027,11 +943,9 @@ aligning the operator to indicate scoping.  For example, use the
 following form (though not the content; inverting matrices is almost
 always a bad idea).
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 increment_log_prob((y - mu)' * inv(Sigma) * (y - mu));
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 Here, the multiplication operator (\code{*}) is aligned to clearly
 signal the multiplicands in the product.  
@@ -1039,12 +953,10 @@ signal the multiplicands in the product.
 For function arguments, break after a comma and line the next
 argument up underneath as follows.
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 y[n] ~ normal(alpha + beta * x + gamma * y,
               pow(tau,-0.5));
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 
 \subsection{Optional Spaces after Commas}
