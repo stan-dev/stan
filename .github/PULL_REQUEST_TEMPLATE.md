@@ -1,3 +1,5 @@
+Have you run unit and cpplint tests? (Delete this warning before submitting the PR)
+
 #### Summary:
 
 #### Intended Effect:
