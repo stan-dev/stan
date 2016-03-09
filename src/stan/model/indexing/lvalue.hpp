@@ -35,6 +35,28 @@ namespace stan {
       x = y;
     }
 
+    template <typename T, typename U, int R, int C>
+    inline void assign(Eigen::Matrix<T, R, C>& x,
+                       const nil_index_list& /* idxs */,
+                       const Eigen::Matrix<U, R, C>& y,
+                       const char* name = "ANON",
+                       int depth = 0) {
+      x.resize(y.rows(), y.cols());
+      for (size_t i = 0; i < y.size(); ++i)
+        assign(x(i), nil_index_list(), y(i), name, depth + 1);
+    }
+
+
+    template <typename T, typename U>
+    inline void assign(std::vector<T>& x, const nil_index_list& /* idxs */,
+                       const std::vector<U>& y, const char* name = "ANON",
+                       int depth = 0) {
+      x.resize(y.size());
+      for (size_t i = 0; i < y.size(); ++i)
+        assign(x[i], nil_index_list(), y[i], name, depth + 1);
+    }
+
+
     /**
      * Assign the specified Eigen vector at the specified single index
      * to the specified value.
@@ -179,7 +201,8 @@ namespace stan {
       math::check_equal("matrix[uni] assign sizes", name, y.cols(), x.cols());
       int i = idxs.head_.n_;
       math::check_range("matrix[uni] assign range", name, x.rows(), i);
-      x.row(i - 1) = y;
+      for (int j = 0; j < x.cols(); ++j)  // loop allows double to var assgn
+        x(i - 1, j) = y(j);
     }
 
     /**
@@ -214,7 +237,9 @@ namespace stan {
       for (int i = 0; i < y.rows(); ++i) {
         int m = rvalue_at(i, idxs.head_);
         math::check_range("matrix[multi] assign range", name, x.rows(), m);
-        x.row(m - 1) = y.row(i);
+        // recurse to allow double to var assign
+        for (int j = 0; j < x.cols(); ++j)
+          x(m - 1, j) = y(i, j);
       }
     }
 

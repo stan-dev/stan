@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include <vector>
 #include <stan/model/indexing/lvalue.hpp>
+#include <stan/math/rev/core.hpp>
 #include <gtest/gtest.h>
 
 using stan::model::nil_index_list;
@@ -333,7 +334,7 @@ TEST(ModelIndexing, lvalueMatrixUniUni) {
     0.0, 0.1, 0.2, 0.3,
     1.0, 1.1, 1.2, 1.3,
     2.0, 2.1, 2.2, 2.3;
-
+  
   double y = 10.12;
   assign(x, index_list(index_uni(2), index_uni(3)), y);
   EXPECT_FLOAT_EQ(y, x(1,2));
@@ -475,4 +476,54 @@ TEST(ModelIndexing, lvalueMatrixMultiMulti) {
 
   ns[ns.size() - 1] = 10;
   test_throw(x, index_list(index_multi(ms), index_multi(ns)), y);
+}
+TEST(ModelIndexing, doubleToVar) {
+  using stan::math::var;
+  using std::vector;
+  using stan::model::assign;
+  using Eigen::Dynamic;
+  using Eigen::Matrix;
+  using stan::model::cons_list;
+  using stan::model::index_omni;
+  using stan::model::nil_index_list;
+
+  vector<double> xs;
+  xs.push_back(1);
+  xs.push_back(2);
+  xs.push_back(3);
+  vector<vector<double> > xss;
+  xss.push_back(xs);
+
+  vector<var> ys(3);
+  vector<vector<var> > yss;
+  yss.push_back(ys);
+
+  assign(yss, cons_list(index_omni(), nil_index_list()),
+         xss, "foo");
+
+  // test both cases where matrix indexed by rows
+  // case 1: double matrix with single multi-index on LHS, var matrix on RHS
+  Matrix<var, Dynamic, Dynamic> a(4, 3);
+  for (int i = 0; i < 12; ++i) a(i) = -(i + 1);
+
+  Matrix<double, Dynamic, Dynamic> b(2,3);
+  b << 1, 2, 3, 4, 5, 6;
+  
+  vector<int> is;
+  is.push_back(2);
+  is.push_back(3);
+  assign(a, cons_list(index_multi(is), nil_index_list()), b);
+  for (int i = 0; i < 2; ++i)
+    for (int j = 0; j < 3; ++j)
+      EXPECT_FLOAT_EQ(a(i + 1, j).val(), b(i, j));
+                      
+  // case 2: double matrix with single multi-index on LHS, row vector
+  // on RHS
+  Matrix<var, Dynamic, Dynamic> c(4, 3);
+  for (int i = 0; i < 12; ++i) c(i) = -(i + 1);
+  Matrix<double, 1, Dynamic> d(3);
+  d << 100, 101, 102;
+  assign(c, cons_list(index_uni(2), nil_index_list()), d);
+  for (int j = 0; j < 3; ++j)
+    EXPECT_FLOAT_EQ(c(1, j).val(), d(j));
 }

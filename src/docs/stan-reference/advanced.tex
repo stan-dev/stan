@@ -125,14 +125,14 @@ parameters {
 }
 transformed parameters {
   real<lower=0> squared_error;
-  squared_error <- dot_self(y - x * beta);
+  squared_error = dot_self(y - x * beta);
 }
 model {
   increment_log_prob(-squared_error);
 }
 generated quantities {
   real<lower=0> sigma_squared;
-  sigma_squared <- squared_error / N;
+  sigma_squared = squared_error / N;
 }
 \end{stancode}
 %
@@ -275,7 +275,7 @@ data {
 model {
   // ...
   for (k in 1:K)
-    increment_log_prob(- lambda * abs(beta[k]));
+    increment_log_prob(- lambda * fabs(beta[k]));
 }
 \end{stancode}
 
@@ -328,7 +328,7 @@ elastic net estimate is calculated in the generated quantities block.
 generated quantities {
   vector[K] beta_elastic_net;
   // ...
-  beta_elastic_net <- (1 + lambda2) * beta;
+  beta_elastic_net = (1 + lambda2) * beta;
 }
 \end{stancode}
 %

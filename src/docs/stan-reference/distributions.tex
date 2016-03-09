@@ -108,7 +108,7 @@ model {
 generated quantities {
   vector[N_tilde] y_tilde;
   for (n in 1:N_tilde)
-    y_tilde[n] <- normal_rng(alpha + beta * x[n], sigma);
+    y_tilde[n] = normal_rng(alpha + beta * x[n], sigma);
 }
 \end{stancode}
 %
@@ -136,7 +136,7 @@ $\tilde{x}$ and $\tilde{N}$,
 generated quantities {
   vector[N] y_tilde;
   for (n in 1:N)
-    y_tilde <- normal_rng(alpha + beta * x[n], sigma);
+    y_tilde = normal_rng(alpha + beta * x[n], sigma);
 }
 \end{stancode}
 %
@@ -277,15 +277,15 @@ namely \code{real} or \code{int}, is repeated.  For instance, if
 \code{N}, and \code{sigma} is a scalar, then
 %
 \begin{stancode}
-ll <- normal_log(y, mu, sigma);
+ll = normal_log(y, mu, sigma);
 \end{stancode}
 %
 is just a more efficient way to write
 %
 \begin{stancode}
-ll <- 0;
+ll = 0;
 for (n in 1:N)
-  ll <- ll + normal_log(y[n], mu[n], sigma);
+  ll = ll + normal_log(y[n], mu[n], sigma);
 \end{stancode}
 %
 With the same arguments, the vectorized sampling statement
@@ -2687,7 +2687,7 @@ you can recover them in the generated quantities block via
 \begin{stancode}
 generated quantities {
   corr_matrix[K] Sigma;
-  Sigma <- multiply_lower_tri_self_transpose(L);
+  Sigma = multiply_lower_tri_self_transpose(L);
 }
 \end{stancode}
 %
