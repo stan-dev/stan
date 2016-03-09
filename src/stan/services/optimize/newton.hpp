@@ -22,7 +22,7 @@ namespace stan {
        * @tparam Model Stan model class
        * @tparam RNG Random number generator class
        * @tparam Interrupt callback for interrupts
-       * @param[in] model the Stan model
+       * @param[in] model the Stan model instantiated with data
        * @param[in] base_rng random number generator
        * @param[in, out] cont_params continuous parameters; starts at the 
        *   initial value. Ends at the optimum. This must be the same size as
@@ -36,7 +36,8 @@ namespace stan {
        * @return stan::services::error_codes::OK (0) if successful
        */
       template <class Model, class RNG, class Interrupt>
-      int newton(Model& model, RNG& base_rng,
+      int newton(Model& model,
+                 RNG& base_rng,
                  Eigen::VectorXd& cont_params,
                  int num_iterations,
                  bool save_iterations,

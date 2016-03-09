@@ -16,10 +16,35 @@ namespace stan {
   namespace services {
     namespace optimize {
 
-      template<typename Model, typename RNGT,
-               typename StartIterationCallback>
+      /**
+       * Runs the L-BFGS algorithm for a model.
+       * 
+       * @tparam Model Stan model class
+       * @tparam RNG Random number generator class
+       * @tparam Interrupt callback for interrupts
+       * @param[in] model the Stan model instantiated with data
+       * @param[in] base_rng random number generator
+       * @param[in, out] cont_params continuous parameters; starts at the 
+       *   initial value. Ends at the optimum. This must be the same size as
+       *   the model parameter size.
+       * @param[in] init_alpha
+       * @param[in] tol_obj
+       * @param[in] tol_rel_obj
+       * @param[in] tol_grad
+       * @param[in] tol_rel_grad
+       * @param[in] num_iterations maximum number of iterations
+       * @param[in] save_iterations indicates whether all the interations should
+       *   be saved to the parameter_writer
+       * @param[in] refresh how often to write output to message_writer
+       * @param[out] interrupt interrupt callback to be called every iteration
+       * @param[out] message_writer output for messages
+       * @param[out] parameter_writer output for parameter values
+       * @return stan::services::error_codes::OK (0) if successful
+       */
+      template<typename Model, typename RNG,
+               typename Interrupt>
       int lbfgs(Model &model,
-                RNGT &base_rng,
+                RNG &base_rng,
                 Eigen::VectorXd &cont_params,
                 int history_size,
                 double init_alpha,
@@ -31,7 +56,7 @@ namespace stan {
                 int num_iterations,
                 bool save_iterations,
                 int refresh,
-                StartIterationCallback& interrupt,
+                Interrupt& interrupt,
                 interface_callbacks::writer::base_writer& message_writer,
                 interface_callbacks::writer::base_writer& parameter_writer) {
         std::vector<double> cont_vector(cont_params.size());
