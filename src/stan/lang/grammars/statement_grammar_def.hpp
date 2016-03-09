@@ -87,6 +87,23 @@ namespace stan {
   namespace lang {
 
     // see bare_type_grammar_def.hpp for original
+    struct deprecate_old_assignment_op {
+      //! @cond Doxygen_Suppress
+      template <class> struct result;
+      //! @endcond
+      template <typename F, typename T1>
+      struct result<F(T1)> { typedef void type; };
+
+      void operator()(std::ostream& error_msgs) const {
+        error_msgs << "Warning (non-fatal): assignment operator <- deprecated;"
+                   << " use = instead."
+                   << std::endl;
+      }
+    };
+    boost::phoenix::function<deprecate_old_assignment_op>
+    deprecate_old_assignment_op_f;
+
+    // see bare_type_grammar_def.hpp for original
     struct set_val4 {
       //! @cond Doxygen_Suppress
       template <class> struct result;
@@ -961,24 +978,31 @@ namespace stan {
         >> expression_g(_r1)
            [validate_int_expr2_f(_1, _pass, boost::phoenix::ref(error_msgs_))];
 
+      // this one comes before assgn_r to deal with simple assignment
       assignment_r.name("variable assignment by expression");
       assignment_r
-        %= (var_lhs_r(_r1)
-            >> lit("<-"))
+        %= var_lhs_r(_r1)
+        >> assignment_operator_r
         > expression_rhs_r(_r1)
           [validate_assignment_f(_val, _r1, _pass,
                                  boost::phoenix::ref(var_map_),
                                  boost::phoenix::ref(error_msgs_))]
         > lit(';');
 
-      assgn_r.name("assginment statement");
+      assgn_r.name("indexed variable assginment statement");
       assgn_r
         %= var_r(_r1)
         >> indexes_g(_r1)
-        >> lit("<-")
+        >> assignment_operator_r
         >> (eps > expression_rhs_r(_r1))
            [validate_assgn_f(_val, _pass, boost::phoenix::ref(error_msgs_))]
         > lit(';');
+
+      assignment_operator_r.name("assignment operator");
+      assignment_operator_r
+        %= lit("<-")
+           [deprecate_old_assignment_op_f(boost::phoenix::ref(error_msgs_))]
+        | (lit("=") >> no_skip[!char_("=")]);
 
       var_r.name("variable for left-hand side of assignment");
       var_r
@@ -987,6 +1011,7 @@ namespace stan {
                                boost::phoenix::ref(var_map_),
                                boost::phoenix::ref(error_msgs_))];
 
+      // separate rule for name on expectation failure
       expression_rhs_r.name("expression assignable to left-hand side");
       expression_rhs_r
         %= expression_g(_r1);

@@ -613,7 +613,7 @@ vector[K] beta;   // coeffs
 // ...
 vector[N] y_hat;  // linear prediction
 // ...
-y_hat <- x * beta;
+y_hat = x * beta;
 \end{stancode}
 %
 than it is to do this
@@ -626,7 +626,7 @@ vector[K] beta;   // coeffs
 vector[N] y_hat;  // linear prediction
 ...
 for (n in 1:N)
-  y_hat[n] <- x[n] * beta;
+  y_hat[n] = x[n] * beta;
 \end{stancode}
 
 \subsection{(Row) Vectors vs. One-Dimensional Arrays}
@@ -659,7 +659,7 @@ int c[3];
 int idxs[4];   
 ...             // define: idxs == (3, 3, 1, 2)
 int d[4];
-d <- c[idxs];   // result: d == (7, 7, 5, 9)
+d = c[idxs];   // result: d == (7, 7, 5, 9)
 \end{stancode}
 %
 
@@ -682,7 +682,7 @@ int c[2, 3];
 int idxs[4];
 ...            // define: idxs = (2, 2, 1, 2)
 int d[4, 3]
-d <- c[idxs];  // result: d = ((7, 11, 13), (7, 11, 13),
+d = c[idxs];  // result: d = ((7, 11, 13), (7, 11, 13),
                //              (1, 3, 5), (7, 11, 13))
 \end{stancode}
 %
@@ -697,7 +697,7 @@ single index in the first position and a multiple index in the second.
 %
 \begin{stancode}
 int e[4];
-e <- c[2, idxs];  // result:  c[2] = (7, 11, 13)
+e = c[2, idxs];  // result:  c[2] = (7, 11, 13)
                   // result:  e = (11, 11, 7, 11)
 \end{stancode}
 %
@@ -716,7 +716,7 @@ int idxs1[3];
 int idxs2[2]; 
 ...                    // define: idxs2 = (1, 3)
 int d[3, 2];
-d <- c[idxs1, idxs2];  // result: d = ((7, 13), (7, 13), (1, 5))
+d = c[idxs1, idxs2];  // result: d = ((7, 13), (7, 13), (1, 5))
 \end{stancode}
 %
 With multiple indexes, we no longer have \code{c[idxs1,~idxs2]} being
@@ -749,7 +749,7 @@ index.
 int c[7];
 ...
 int d[4];
-d <- c[3:6];  // result: d == (c[3], c[4], c[5], c[6])
+d = c[3:6];  // result: d == (c[3], c[4], c[5], c[6])
 \end{stancode}
 %
 The range index \code{3:6} behaves semantically just like the multiple
@@ -787,7 +787,7 @@ int c[2];
 int idxs[2];
 ...             // define: a == (1, 2, 3);  c == (5, 9)
                 //         idxs = (3,2)
-a[idxs] <- c;   // result: a == (1, 9, 5)
+a[idxs] = c;   // result: a == (1, 9, 5)
 \end{stancode}
 %
 The result above can be worked out by noting that the assignment sets
@@ -801,7 +801,7 @@ in the following example.
 int a[5, 7];
 int c[2, 2];
 ...
-a[2:3, 5:6] <- c;  // result: a[2, 5] == c[1, 1];  a[2, 6] == c[1, 2]
+a[2:3, 5:6] = c;  // result: a[2, 5] == c[1, 1];  a[2, 6] == c[1, 2]
                    //         a[3, 5] == c[2, 1];  a[3, 6] == c[2, 2]
 \end{stancode}
 %
@@ -818,7 +818,7 @@ an array as follows.
 int a[10, 13];
 int c[2];
 ...
-a[4, 2:3] <- c;  // result:  a[4, 2] == c[1];  a[4, 3] == c[2]
+a[4, 2:3] = c;  // result:  a[4, 2] == c[1];  a[4, 3] == c[2]
 \end{stancode}
 
 \subsection{Assign-by-Value and Aliasing}
@@ -830,7 +830,7 @@ example, consider the array \code{a} in the following code fragment.
 \begin{stancode}
 int a[3];
 ...                // define: a == (5, 6, 7)
-a[2:3] <- a[1:2];
+a[2:3] = a[1:2];
 ...                // result: a == (5, 5, 6) 
 \end{stancode}
 %
@@ -843,19 +843,19 @@ consider the following.
 int a[3];
 int idxs[3];
 ...            // define idxs = (2, 1, 3)
-a[idxs] <- a;
+a[idxs] = a;
 \end{stancode}
 %
 In this case, it is evident why the right-hand side needs to be copied
 before the assignment.
 
-It is tempting (but wrong) to think of the assignment \code{a[2:3] <-
+It is tempting (but wrong) to think of the assignment \code{a[2:3] =
   a[1:2]} as executing the following assignments.
 %
 \begin{stancode}
 ...                // define: a = (5, 6, 7)
-a[2] <- a[1];      // result: a = (5, 5, 7)
-a[3] <- a[2];      // result: a = (5, 5, 5)!
+a[2] = a[1];      // result: a = (5, 5, 7)
+a[3] = a[2];      // result: a = (5, 5, 5)!
 \end{stancode}
 %
 This produces a different result than executing the assignment because
@@ -883,10 +883,10 @@ vector[5] v[3];
 int idxs[7];
 ...
 vector[7] u;
-u <- v[2, idxs];
+u = v[2, idxs];
 
 real w[7];
-w <- v[idxs, 2];
+w = v[idxs, 2];
 \end{stancode}
 %
 The key is understanding that a single index always reduces
@@ -911,13 +911,13 @@ following code shows how this works for multiple indexing of matrices.
 matrix[5,7] m;
 ...
 row_vector[3] rv;
-rv <- m[4, 3:5];    // result is 1 x 3
+rv = m[4, 3:5];    // result is 1 x 3
 ...
 vector[4] v;
-v <- m[2:5, 3];     // result is 3 x 1
+v = m[2:5, 3];     // result is 3 x 1
 ...
 matrix[3, 4] m2;
-m2 <- m[1:3, 2:5];  // result is 3 x 4
+m2 = m[1:3, 2:5];  // result is 3 x 4
 \end{stancode}
 %
 The key is realizing that any position with a multiple index or
@@ -945,8 +945,8 @@ following example.
 matrix[3, 4] m[5, 7];
 ...
 matrix[3, 4] a[2];
-a <- m[1, 2:3];  // knock off first array dimension
-a <- m[3:4, 5];  // knock off second array dimension
+a = m[1, 2:3];  // knock off first array dimension
+a = m[3:4, 5];  // knock off second array dimension
 \end{stancode}
 %
 In both assignments, the multiple index knocks off an array dimension,
@@ -959,7 +959,7 @@ Continuing the previous example, consider the following.
 \begin{stancode}
 ...
 vector[2] b;
-b <- a[1, 3, 2:3, 2];
+b = a[1, 3, 2:3, 2];
 \end{stancode}
 %
 Here, the two array dimensions are reduced as is the column dimension
@@ -976,7 +976,7 @@ Continuing further, consider continuing with the following.
 \begin{stancode}
 ...
 row_vector[3] c[2];
-c <- a[4:5, 3, 1, 2: ];
+c = a[4:5, 3, 1, 2: ];
 \end{stancode}
 %
 Here, the first array dimension is reduced, leaving a single array
@@ -1633,7 +1633,7 @@ to define a column vector of zero values,
 \begin{stancode}
 transformed data {
   vector[D] zeros;
-  zeros <- rep_vector(0, D);
+  zeros = rep_vector(0, D);
 }
 \end{stancode}
 %
@@ -1643,7 +1643,7 @@ coefficient matrix \code{beta},
 \begin{stancode}
 transformed parameters {
   matrix[K, D] beta;
-  beta <- append_col(beta_raw, zeros);
+  beta = append_col(beta_raw, zeros);
 }
 \end{stancode}
 %
@@ -1686,9 +1686,9 @@ transformed parameters {
   vector[K] beta;  // centered
 
   for (k in 1:(K-1)) {
-    beta[k] <- beta_raw[k];
+    beta[k] = beta_raw[k];
   }
-  beta[K] <- -sum(beta_raw);
+  beta[K] = -sum(beta_raw);
   ...
 \end{stancode}
 
@@ -1715,7 +1715,7 @@ parameters {
   ...
 transformed parameters {
   vector[K] beta;
-  beta <- beta_scale * (beta_raw - 1.0 / K);
+  beta = beta_scale * (beta_raw - 1.0 / K);
   ...
 \end{stancode}
 %
@@ -1812,11 +1812,11 @@ model {
   vector[K] theta;
   for (n in 1:N) {
     real eta;
-    eta <- x[n] * beta;
-    theta[1] <- 1 - Phi(eta - c[1]);
+    eta = x[n] * beta;
+    theta[1] = 1 - Phi(eta - c[1]);
     for (k in 2:(K-1))
-      theta[k] <- Phi(eta - c[k-1]) - Phi(eta - c[k]);
-    theta[K] <- Phi(eta - c[K-1]);
+      theta[k] = Phi(eta - c[k-1]) - Phi(eta - c[k]);
+    theta[K] = Phi(eta - c[K-1]);
     y[n] ~ categorical(theta);
   }
 }
@@ -1940,7 +1940,7 @@ the original formulation as a loop over a sampling statement.
   {
     vector[N] x_beta_ll;
     for (n in 1:N)
-      x_beta_ll[n] <- x[n] * beta[ll[n]];
+      x_beta_ll[n] = x[n] * beta[ll[n]];
     y ~ bernoulli_logit(x_beta_ll);
   }
 \end{stancode}
@@ -2414,13 +2414,13 @@ model {
   {
     row_vector[K] u_gamma[J];
     for (j in 1:J)
-      u_gamma[j] <- u[j] * gamma;
+      u_gamma[j] = u[j] * gamma;
     beta ~ multi_normal(u_gamma, quad_form_diag(Omega, tau));
   }
   {
     vector[N] x_beta_jj;
     for (n in 1:N)
-      x_beta_jj[n] <- x[n] * beta[jj[n]];
+      x_beta_jj[n] = x[n] * beta[jj[n]];
     y ~ normal(x_beta_jj, sigma);
   }
 }
@@ -2463,7 +2463,7 @@ need to be solved and differentiated.
 \begin{stancode}
   {
     matrix[K,K] Sigma_beta;
-    Sigma_beta <- quad_form_diag(Omega, tau);
+    Sigma_beta = quad_form_diag(Omega, tau);
     for (j in 1:J)
       beta[j] ~ multi_normal((u[j] * gamma)', Sigma_beta);
   }
@@ -2493,7 +2493,7 @@ parameters {
   ...
 transformed parameters {
   matrix[J,K] beta;
-  beta <- u * gamma + (diag_pre_multiply(tau,L_Omega) * z)';
+  beta = u * gamma + (diag_pre_multiply(tau,L_Omega) * z)';
 }
 model {
   to_vector(z) ~ normal(0,1); 
@@ -2546,13 +2546,13 @@ parameters {
 transformed parameters {
   matrix[J,K] beta;
   vector<lower=0>[K] tau;     // prior scale
-  for (k in 1:K) tau[k] <- 2.5 * tan(tau_unif[k]);
-  beta <- u * gamma + (diag_pre_multiply(tau,L_Omega) * z)';
+  for (k in 1:K) tau[k] = 2.5 * tan(tau_unif[k]);
+  beta = u * gamma + (diag_pre_multiply(tau,L_Omega) * z)';
 }
 model {
   vector[N] x_beta_jj;
   for (n in 1:N)
-    x_beta_jj[n] <- x[n] * beta[jj[n]]';
+    x_beta_jj[n] = x[n] * beta[jj[n]]';
   y ~ normal(x_beta_jj, sigma);
 
   to_vector(z) ~ normal(0,1); 
@@ -2574,7 +2574,7 @@ This model also reparameterizes the prior scale \code{tau} to avoid potential pr
 % transformed parameters {
 %   matrix[M,3] alpha;
 %   alpha 
-%     <- transpose(rep_matrix(mu,M)
+%     = transpose(rep_matrix(mu,M)
 %                  + diag_pre_multiply(sigma_Sigma,L_Sigma) * z);
 %   ...
 % model {
@@ -2668,7 +2668,7 @@ model {
 generated quantities {
   vector[N_new] y_new;  
   for (n in 1:N_new)
-    y_new[n] <- normal_rng(x_new[n] * beta, sigma);
+    y_new[n] = normal_rng(x_new[n] * beta, sigma);
 }
 \end{stancode}
 %
@@ -2732,7 +2732,7 @@ parameters {
 model {
   vector[K] mu[N];
   for (n in 1:N)
-    mu[n] <- beta * x[n];
+    mu[n] = beta * x[n];
   y ~ multi_normal(mu, Sigma);
 }
 \end{stancode}
@@ -2758,9 +2758,9 @@ model {
   matrix[K,K] L_Sigma;
 
   for (n in 1:N)
-    mu[n] <- beta * x[n];
+    mu[n] = beta * x[n];
 
-  L_Sigma <- diag_pre_multiply(L_sigma, L_Omega);
+  L_Sigma = diag_pre_multiply(L_sigma, L_Omega);
 
   to_vector(beta) ~ normal(0, 5);
   L_Omega ~ lkj_corr_cholesky(4);
@@ -2828,9 +2828,9 @@ there are in $y$.
 functions {
   int sum(int[,] a) {
     int s;
-    s <- 0;
+    s = 0;
     for (i in 1:size(a))
-      s <- s + sum(a[i]);
+      s = s + sum(a[i]);
     return s;
   }
 }
@@ -2869,23 +2869,23 @@ transformed data {
   int<lower=1,upper=N> n_neg[(N * D) - size(n_pos)];
   int<lower=1,upper=D> d_neg[size(n_neg)];
 
-  N_pos <- size(n_pos);
-  N_neg <- size(n_neg);
+  N_pos = size(n_pos);
+  N_neg = size(n_neg);
   {
     int i;
     int j;
-    i <- 1;
-    j <- 1;
+    i = 1;
+    j = 1;
     for (n in 1:N) {
       for (d in 1:D) {
         if (y[n,d] == 1) {
-          n_pos[i] <- n;
-          d_pos[i] <- d;
-          i <- i + 1;
+          n_pos[i] = n;
+          d_pos[i] = d;
+          i = i + 1;
         } else {
-          n_neg[j] <- n;
-          d_neg[j] <- d;
-          j <- j + 1;
+          n_neg[j] = n;
+          d_neg[j] = d;
+          j = j + 1;
         }
       }
     }
@@ -2924,9 +2924,9 @@ transformed parameter block to reconstruct $z$.
 transformed parameters {
   vector[D] z[N];
   for (n in 1:N_pos)
-    z[n_pos[n], d_pos[n]] <- z_pos[n];
+    z[n_pos[n], d_pos[n]] = z_pos[n];
   for (n in 1:N_neg)
-    z[n_neg[n], d_neg[n]] <- z_neg[n];
+    z[n_neg[n], d_neg[n]] = z_neg[n];
 }
 \end{stancode}
 
@@ -2940,7 +2940,7 @@ model {
   { 
     vector[D] beta_x[N];
     for (n in 1:N) 
-      beta_x[n] <- beta * x[n];
+      beta_x[n] = beta * x[n];
     z ~ multi_normal_cholesky(beta_x, L_Omega);
   }
 }
@@ -2955,7 +2955,7 @@ generated quantities block if desired.
 \begin{stancode}
 generated quantities {
   corr_matrix[D] Omega;
-  Omega <- multiply_lower_tri_self_transpose(L_Omega);  
+  Omega = multiply_lower_tri_self_transpose(L_Omega);  
 }
 \end{stancode}
 %
@@ -3087,9 +3087,9 @@ parameters {
 model {
   for (n in (K+1):N) {
     real mu;
-    mu <- alpha;
+    mu = alpha;
     for (k in 1:K)
-      mu <- mu + beta[k] * y[n-k];
+      mu = mu + beta[k] * y[n-k];
     y[n] ~ normal(mu, sigma);
   }
 }
@@ -3192,9 +3192,9 @@ parameters {
 }
 transformed parameters {
   real<lower=0> sigma[T];
-  sigma[1] <- sigma1;
+  sigma[1] = sigma1;
   for (t in 2:T)
-    sigma[t] <- sqrt(alpha0 
+    sigma[t] = sqrt(alpha0 
                      + alpha1 * pow(r[t-1] - mu, 2)
                      + beta1 * pow(sigma[t-1], 2));
 }
@@ -3262,10 +3262,10 @@ parameters {
 }
 transformed parameters {
   vector[T] epsilon;    // error terms
-  epsilon[1] <- y[1] - mu;
-  epsilon[2] <- y[2] - mu - theta[1] * epsilon[1];
+  epsilon[1] = y[1] - mu;
+  epsilon[2] = y[2] - mu - theta[1] * epsilon[1];
   for (t in 3:T)
-    epsilon[t] <- ( y[t] - mu
+    epsilon[t] = ( y[t] - mu
                     - theta[1] * epsilon[t - 1]
                     - theta[2] * epsilon[t - 2] );
 }
@@ -3313,9 +3313,9 @@ parameters {
 transformed parameters {
   vector[T] epsilon;    // error term at time t
   for (t in 1:T) {
-    epsilon[t] <- y[t] - mu;
+    epsilon[t] = y[t] - mu;
     for (q in 1:min(t - 1, Q))
-      epsilon[t] <- epsilon[t] - theta[q] * epsilon[t - q];
+      epsilon[t] = epsilon[t] - theta[q] * epsilon[t - q];
   }
 }
 model {
@@ -3324,9 +3324,9 @@ model {
   theta ~ cauchy(0, 2.5);
   sigma ~ cauchy(0, 2.5);
   for (t in 1:T) {
-    eta[t] <- mu;
+    eta[t] = mu;
     for (q in 1:min(t - 1, Q))
-      eta[t] <- eta[t] + theta[q] * epsilon[t - q];
+      eta[t] = eta[t] + theta[q] * epsilon[t - q];
   }
   y ~ normal(eta, sigma);
 }
@@ -3360,11 +3360,11 @@ parameters {
 model {
   vector[T] nu;              // prediction for time t
   vector[T] err;             // error for time t
-  nu[1] <- mu + phi * mu;    // assume err[0] == 0
-  err[1] <- y[1] - nu[1];
+  nu[1] = mu + phi * mu;    // assume err[0] == 0
+  err[1] = y[1] - nu[1];
   for (t in 2:T) {
-    nu[t] <- mu + phi * y[t-1] + theta * err[t-1];
-    err[t] <- y[t] - nu[t];
+    nu[t] = mu + phi * y[t-1] + theta * err[t-1];
+    err[t] = y[t] - nu[t];
   }
   mu ~ normal(0,10);         // priors
   phi ~ normal(0,2);
@@ -3401,10 +3401,10 @@ model {
   phi ~ normal(0,2);
   theta ~ normal(0,2);
   sigma ~ cauchy(0,5);
-  err <- y[1] - mu + phi * mu;
+  err = y[1] - mu + phi * mu;
   err ~ normal(0,sigma);
   for (t in 2:T) {
-    err <- y[t] - (mu + phi * y[t-1] + theta * err); 
+    err = y[t] - (mu + phi * y[t-1] + theta * err); 
     err ~ normal(0,sigma);
   }
 }
@@ -3562,11 +3562,11 @@ parameter block.
 \begin{stancode}
 transformed parameters {
   vector[T] h;            // log volatility at time t
-  h <- h_std * sigma;     // now h ~ normal(0,sigma)
-  h[1] <- h[1] / sqrt(1 - phi * phi);  // rescale h[1]
-  h <- h + mu;
+  h = h_std * sigma;     // now h ~ normal(0,sigma)
+  h[1] = h[1] / sqrt(1 - phi * phi);  // rescale h[1]
+  h = h + mu;
   for (t in 2:T)
-    h[t] <- h[t] + phi * (h[t-1] - mu);
+    h[t] = h[t] + phi * (h[t-1] - mu);
 }
 \end{stancode}
 %
@@ -3704,14 +3704,14 @@ transformed data {
   int<lower=0> emit[K,V];
   for (k1 in 1:K) 
     for (k2 in 1:K)
-      trans[k1,k2] <- 0;
+      trans[k1,k2] = 0;
   for (t in 2:T)
-    trans[z[t - 1], z[t]] <- 1 + trans[z[t - 1], z[t]];
+    trans[z[t - 1], z[t]] = 1 + trans[z[t - 1], z[t]];
   for (k in 1:K)
     for (v in 1:V)
-      emit[k,v] <- 0;
+      emit[k,v] = 0;
   for (t in 1:T)
-    emit[z[t], w[t]] <- 1 + emit[z[t], w[t]];
+    emit[z[t], w[t]] = 1 + emit[z[t], w[t]];
 }
 \end{stancode}
 %
@@ -3756,13 +3756,13 @@ transformed data {
   vector<lower=0>[K] alpha_post[K];
   vector<lower=0>[V] beta_post[K];
   for (k in 1:K) 
-    alpha_post[k] <- alpha;
+    alpha_post[k] = alpha;
   for (t in 2:T)
-    alpha_post[z[t-1],z[t]] <- alpha_post[z[t-1],z[t]] + 1;
+    alpha_post[z[t-1],z[t]] = alpha_post[z[t-1],z[t]] + 1;
   for (k in 1:K)
-    beta_post[k] <- beta;
+    beta_post[k] = beta;
   for (t in 1:T)
-    beta_post[z[t],w[t]] <- beta_post[z[t],w[t]] + 1;
+    beta_post[z[t],w[t]] = beta_post[z[t],w[t]] + 1;
 }
 \end{stancode}
 %
@@ -3817,12 +3817,12 @@ model {
     real acc[K];
     real gamma[T_unsup,K];
     for (k in 1:K)
-      gamma[1,k] <- log(phi[k,u[1]]);
+      gamma[1,k] = log(phi[k,u[1]]);
     for (t in 2:T_unsup) {
       for (k in 1:K) {
         for (j in 1:K)
-          acc[j] <- gamma[t-1,j] + log(theta[j,k]) + log(phi[k,u[t]]);
-        gamma[t,k] <- log_sum_exp(acc);
+          acc[j] = gamma[t-1,j] + log(theta[j,k]) + log(phi[k,u[t]]);
+        gamma[t,k] = log_sum_exp(acc);
       }
     }
     increment_log_prob(log_sum_exp(gamma[T_unsup]));
@@ -3876,27 +3876,27 @@ generated quantities {
     real best_logp[T_unsup,K];
     real best_total_logp;
     for (k in 1:K)
-      best_logp[1,K] <- log(phi[k,u[1]]);
+      best_logp[1,K] = log(phi[k,u[1]]);
     for (t in 2:T_unsup) {
       for (k in 1:K) {
-        best_logp[t,k] <- negative_infinity();
+        best_logp[t,k] = negative_infinity();
         for (j in 1:K) {
           real logp;
-          logp <- best_logp[t-1,j] 
+          logp = best_logp[t-1,j] 
                   + log(theta[j,k]) + log(phi[k,u[t]]);
           if (logp > best_logp[t,k]) {
-            back_ptr[t,k] <- j;
-            best_logp[t,k] <- logp;
+            back_ptr[t,k] = j;
+            best_logp[t,k] = logp;
           }
         }
       }
     }
-    log_p_y_star <- max(best_logp[T_unsup]);
+    log_p_y_star = max(best_logp[T_unsup]);
     for (k in 1:K)
       if (best_logp[T_unsup,k] == log_p_y_star)
-        y_star[T_unsup] <- k;
+        y_star[T_unsup] = k;
     for (t in 1:(T_unsup - 1))
-      y_star[T_unsup - t] <- back_ptr[T_unsup - t + 1, 
+      y_star[T_unsup - t] = back_ptr[T_unsup - t + 1, 
                                       y_star[T_unsup - t + 1]];
   }
 }
@@ -4025,8 +4025,8 @@ data {
 transformed data {
   real<upper=0> min_cov;   
   real<lower=0> max_cov;  
-  max_cov <- sqrt(var1 * var2);  
-  min_cov <- -max_cov;
+  max_cov = sqrt(var1 * var2);  
+  min_cov = -max_cov;
 }
 parameters {
   vector[2] mu;
@@ -4034,8 +4034,8 @@ parameters {
 }
 transformed parameters {
   matrix[2,2] sigma;
-  sigma[1,1] <- var1;     sigma[1,2] <- cov;
-  sigma[2,1] <- cov;      sigma[2,2] <- var2;
+  sigma[1,1] = var1;     sigma[1,2] = cov;
+  sigma[2,1] = cov;      sigma[2,2] = var2;
 }  
 model {
  for (n in 1:N)
@@ -4081,7 +4081,7 @@ data {
 }
 transformed data {
   int<lower=1> K_choose_2;
-  K_choose_2 <- (K * (K - 1)) / 2;
+  K_choose_2 = (K * (K - 1)) / 2;
 }
 parameters {
   vector[K_choose_2] L_lower;  
@@ -4089,14 +4089,14 @@ parameters {
 transformed parameters {
   cholesky_factor_cov[K] L;
   for (k in 1:K)
-    L[k,k] <- 1;
+    L[k,k] = 1;
   { 
     int i;
     for (m in 2:K) {
       for (n in 1:(m - 1)) {
-        L[m,n] <- L_lower[i];
-        L[n,m] <- 0;
-        i <- i + 1;
+        L[m,n] = L_lower[i];
+        L[n,m] = 0;
+        i = i + 1;
       }
     }
   }
@@ -4509,7 +4509,7 @@ model {
   mu ~ normal(0,10);
   for (n in 1:N) {
     for (k in 1:K) {
-      ps[k] <- log(theta[k]) 
+      ps[k] = log(theta[k]) 
                + normal_log(y[n],mu[k],sigma[k]);
     }
     increment_log_prob(log_sum_exp(ps));
@@ -4736,10 +4736,10 @@ with
 \begin{stancode}
 transformed data {
   int N_zero;
-  N_zero <- 0;
+  N_zero = 0;
   for (n in 1:N)
     if (y[n] == 0)
-      N_zero <- N_zero + 1;
+      N_zero = N_zero + 1;
 }
 model {
   ...
@@ -4944,7 +4944,7 @@ parameters {
 }
 transformed parameters {
   real<lower=0> sigma;
-  sigma <- sqrt(sigma_sq);
+  sigma = sqrt(sigma_sq);
 }
 model {
   increment_log_prob(-2 * log(sigma));
@@ -4975,8 +4975,8 @@ parameters {
 transformed parameters {
   real<lower=0> sigma;
   vector[N] z;
-  sigma <- sqrt(sigma_sq);
-  z <- y + y_err;
+  sigma = sqrt(sigma_sq);
+  z = y + y_err;
 }
 model {
   increment_log_prob(-2 * log(sigma));
@@ -5067,10 +5067,10 @@ transformed data {
   real y[J];
   real<lower=0> sigma[J];
   for (j in 1:J) 
-    y[j] <- log(r_t[j]) - log(n_t[j] - r_t[j])
+    y[j] = log(r_t[j]) - log(n_t[j] - r_t[j])
             - (log(r_c[j]) - log(n_c[j] - r_c[j]);
   for (j in 1:J)
-    sigma[j] <- sqrt(1.0/r_t[i] + 1.0/(n_t[i] - r_t[i])
+    sigma[j] = sqrt(1.0/r_t[i] + 1.0/(n_t[i] - r_t[i])
                      + 1.0/r_c[i] + 1.0/(n_c[i] - r_c[i]));
 }
 \end{stancode}
@@ -5326,7 +5326,7 @@ data {
 }
 transformed data {
   real log_unif;
-  log_unif <- -log(T);
+  log_unif = -log(T);
 }
 parameters {
   real<lower=0> e;
@@ -5334,10 +5334,10 @@ parameters {
 }
 transformed parameters {
   vector[T] lp;
-  lp <- rep_vector(log_unif, T);
+  lp = rep_vector(log_unif, T);
   for (s in 1:T)
     for (t in 1:T)
-      lp[s] <- lp[s] + poisson_log(D[t], if_else(t < s, e, l));
+      lp[s] = lp[s] + poisson_log(D[t], if_else(t < s, e, l));
 }
 model {
   e ~ exponential(r_e);
@@ -5436,7 +5436,7 @@ draws a random value for \code{s} at every iteration.
 \begin{stancode}
 generated quantities {
   int<lower=1,upper=T> s;
-  s <- categorical_rng(softmax(lp));
+  s = categorical_rng(softmax(lp));
 }
 \end{stancode}
 %
@@ -5471,11 +5471,11 @@ with log densities being stored in a matrix.
 %
 \begin{stancode}
 matrix[T,T] lp;
-lp <- rep_matrix(log_unif,T);
+lp = rep_matrix(log_unif,T);
 for (s1 in 1:T)
   for (s2 in 1:T)
     for (t in 1:T)
-      lp[s1,s2] <- lp[s1,s2] 
+      lp[s1,s2] = lp[s1,s2] 
         + poisson_log(D[t], if_else(t < s1, e, if_else(t < s2, m, l)));
 \end{stancode}
 %
@@ -5724,8 +5724,8 @@ parameters {
 }
 transformed parameters {
   real<lower=0,upper=1> chi[2];  
-  chi[2] <- (1 - phi[2]) + phi[2] * (1 - p[3]);
-  chi[1] <- (1 - phi[1]) + phi[1] * (1 - p[2]) * chi[2];
+  chi[2] = (1 - phi[2]) + phi[2] * (1 - p[3]);
+  chi[1] = (1 - phi[1]) + phi[1] * (1 - p[2]) * chi[2];
 }
 model {
   increment_log_prob(history[2] * log(chi[2]));
@@ -5743,7 +5743,7 @@ model {
 }
 generated quantities {
   real<lower=0,upper=1> beta3;
-  beta3 <- phi[2] * p[3];
+  beta3 = phi[2] * p[3];
 }
 \end{stancode}
 \vspace*{-12pt}
@@ -5814,7 +5814,7 @@ functions {
   int last_capture(int[] y_i) { 
     for (k_rev in 0:(size(y_i) - 1)) {
       int k;
-      k <- size(y_i) - k_rev;
+      k = size(y_i) - k_rev;
       if (y_i[k]) 
         return k;
     }
@@ -5841,14 +5841,14 @@ transformed data {
   int<lower=0,upper=T> last[I];
   vector<lower=0,upper=I>[T] n_captured;
   for (i in 1:I)
-    first[i] <- first_capture(y[i]);
+    first[i] = first_capture(y[i]);
   for (i in 1:I)
-    last[i] <- last_capture(y[i]);
-  n_captured <- rep_vector(0,T);
+    last[i] = last_capture(y[i]);
+  n_captured = rep_vector(0,T);
   for (t in 1:T)
     for (i in 1:I)
       if (y[i,t]) 
-        n_captured[t] <- n_captured[t] + 1;
+        n_captured[t] = n_captured[t] + 1;
 }
 \end{stancode}
 %
@@ -5870,7 +5870,7 @@ parameters {
 }
 transformed parameters {
   vector<lower=0,upper=1>[T] chi;
-  chi <- prob_uncaptured(T,p,phi);
+  chi = prob_uncaptured(T,p,phi);
 }
 \end{stancode}
 %
@@ -5882,13 +5882,13 @@ functions {
   ...
   vector prob_uncaptured(int T, vector p, vector phi) {
     vector[T] chi;
-    chi[T] <- 1.0;              
+    chi[T] = 1.0;              
     for (t in 1:(T - 1)) {
       int t_curr;
       int t_next;
-      t_curr <- T - t;
-      t_next <- t_curr + 1;
-      chi[t_curr] <- (1 - phi[t_curr]) 
+      t_curr = T - t;
+      t_next = t_curr + 1;
+      chi[t_curr] = (1 - phi[t_curr]) 
                      + phi[t_curr] 
                        * (1 - p[t_next]) 
                        * chi[t_next]; 
@@ -5958,7 +5958,7 @@ generated quantities {
   real beta;
   ...
 
-  beta <- phi[T-1] * p[T];
+  beta = phi[T-1] * p[T];
   ...
 }
 \end{stancode}
@@ -5984,8 +5984,8 @@ generated quantities {
   ...
   vector<lower=0>[T] pop;
   ...
-  pop <- n_captured ./ p;
-  pop[1] <- -1;
+  pop = n_captured ./ p;
+  pop[1] = -1;
 }
 \end{stancode}
 
@@ -6201,10 +6201,10 @@ parameters {
 transformed parameters {
   vector[K] log_q_z[I];
   for (i in 1:I) {
-    log_q_z[i] <- log(pi);
+    log_q_z[i] = log(pi);
     for (j in 1:J)
       for (k in 1:K)
-        log_q_z[i,k] <- log_q_z[i,k] 
+        log_q_z[i,k] = log_q_z[i,k] 
                         + log(theta[j,k,y[i,j]]);
   }
 }
@@ -6433,10 +6433,10 @@ data {
   ...
 model {
   int pos;
-  pos <- 1;
+  pos = 1;
   for (k in 1:K) {
     segment(y, pos, s[k]) ~ normal(mu[k], sigma);
-    pos <- pos + s[k];
+    pos = pos + s[k];
   }
 \end{Verbatim}
 \end{quote}
@@ -6547,7 +6547,7 @@ data {
 }
 transformed data {
   real<upper=0> neg_log_K;
-  neg_log_K <- -log(K);
+  neg_log_K = -log(K);
 }
 parameters {
   vector[D] mu[K]; // cluster means
@@ -6556,7 +6556,7 @@ transformed parameters {
   real<upper=0> soft_z[N,K]; // log unnormalized clusters
   for (n in 1:N)
     for (k in 1:K)
-      soft_z[n,k] <- neg_log_K 
+      soft_z[n,k] = neg_log_K 
                      - 0.5 * dot_self(mu[k] - y[n]);
 }
 model {
@@ -6812,10 +6812,10 @@ model {
     phi[k] ~ dirichlet(beta);
   for (m in 1:M) 
     for (k in 1:K) 
-      gamma[m,k] <- categorical_log(k,theta);
+      gamma[m,k] = categorical_log(k,theta);
   for (n in 1:N)
     for (k in 1:K)
-      gamma[doc[n],k] <- gamma[doc[n],k] 
+      gamma[doc[n],k] = gamma[doc[n],k] 
                          + categorical_log(w[n],phi[k]);
   for (m in 1:M)
     increment_log_prob(log_sum_exp(gamma[m]));
@@ -7002,7 +7002,7 @@ model {
   for (n in 1:N) {
     real gamma[K];
     for (k in 1:K) 
-      gamma[k] <- log(theta[doc[n],k]) + log(phi[k,w[n]]);
+      gamma[k] = log(theta[doc[n],k]) + log(phi[k,w[n]]);
     increment_log_prob(log_sum_exp(gamma));  // likelihood
   }
 }
@@ -7052,7 +7052,7 @@ parameters {
 transformed parameters {
   simplex[K] theta[M];
   for (m in 1:M)
-    theta[m] <- softmax(eta[m]);
+    theta[m] = softmax(eta[m]);
 }
 model {
   for (m in 1:M)
@@ -7083,11 +7083,11 @@ transformed parameters {
   ... eta as above ...
   cov_matrix[K] Sigma;       // covariance matrix
   for (m in 1:K)
-    Sigma[m,m] <- sigma[m] * sigma[m] * Omega[m,m];
+    Sigma[m,m] = sigma[m] * sigma[m] * Omega[m,m];
   for (m in 1:(K-1)) {
     for (n in (m+1):K) {
-      Sigma[m,n] <- sigma[m] * sigma[n] * Omega[m,n];
-      Sigma[n,m] <- Sigma[m,n];
+      Sigma[m,n] = sigma[m] * sigma[n] * Omega[m,n];
+      Sigma[n,m] = Sigma[m,n];
     }
   }
 }
@@ -7247,10 +7247,10 @@ transformed data {
   vector[N] mu;
   cov_matrix[N] Sigma;
   for (i in 1:N) 
-    mu[i] <- 0;
+    mu[i] = 0;
   for (i in 1:N) 
     for (j in 1:N)
-      Sigma[i,j] <- exp(-pow(x[i] - x[j],2)) 
+      Sigma[i,j] = exp(-pow(x[i] - x[j],2)) 
                     + if_else(i==j, 0.1, 0.0);
 }
 parameters {
@@ -7286,7 +7286,7 @@ data {
 }
 transformed data {
 ...
-      Sigma[i,j] <- exp(-dot_self(x[i] - x[j])) 
+      Sigma[i,j] = exp(-dot_self(x[i] - x[j])) 
                     + if_else(i==j, 0.1, 0.0);
 ...
 \end{stancode}
@@ -7339,7 +7339,7 @@ actual samples are defined as generated quantities.
 transformed data {
   matrix[N,N] L;
 ...
-  L <- cholesky_decompose(Sigma);
+  L = cholesky_decompose(Sigma);
 }
 parameters {
   vector[N] z;
@@ -7349,7 +7349,7 @@ model {
 }
 generated quantities {
   vector[N] y;
-  y <- mu + L * z;
+  y = mu + L * z;
 }
 \end{stancode}
 %
@@ -7393,7 +7393,7 @@ data {
 }
 transformed data {
   vector[N] mu;
-  for (i in 1:N) mu[i] <- 0;
+  for (i in 1:N) mu[i] = 0;
 }
 parameters {
   real<lower=0> eta_sq;
@@ -7402,20 +7402,20 @@ parameters {
 }
 transformed parameters {
   real<lower=0> rho_sq;
-  rho_sq <- inv(inv_rho_sq);
+  rho_sq = inv(inv_rho_sq);
 }
 model {
   matrix[N,N] Sigma;
   // off-diagonal elements
   for (i in 1:(N-1)) {
     for (j in (i+1):N) {
-      Sigma[i,j] <- eta_sq * exp(-rho_sq * pow(x[i] - x[j],2));
-      Sigma[j,i] <- Sigma[i,j];
+      Sigma[i,j] = eta_sq * exp(-rho_sq * pow(x[i] - x[j],2));
+      Sigma[j,i] = Sigma[i,j];
     }
   }
   // diagonal elements
   for (k in 1:N)
-    Sigma[k,k] <- eta_sq + sigma_sq;  // + jitter
+    Sigma[k,k] = eta_sq + sigma_sq;  // + jitter
 
   eta_sq ~ cauchy(0,5);
   inv_rho_sq ~ cauchy(0,5);
@@ -7550,13 +7550,13 @@ transformed data {
   vector[N1+N2] x;
   vector[N1+N2] mu;
   cov_matrix[N1+N2] Sigma;
-  N <- N1 + N2;
-  for (n in 1:N1) x[n] <- x1[n];
-  for (n in 1:N2) x[N1 + n] <- x2[n];
-  for (i in 1:N) mu[i] <- 0;
+  N = N1 + N2;
+  for (n in 1:N1) x[n] = x1[n];
+  for (n in 1:N2) x[N1 + n] = x2[n];
+  for (i in 1:N) mu[i] = 0;
   for (i in 1:N) 
     for (j in 1:N)
-      Sigma[i,j] <- exp(-pow(x[i] - x[j],2)) 
+      Sigma[i,j] = exp(-pow(x[i] - x[j],2)) 
                     + if_else(i==j, 0.1, 0.0);
 }
 parameters {
@@ -7564,8 +7564,8 @@ parameters {
 }
 model {
   vector[N] y;
-  for (n in 1:N1) y[n] <- y1[n];
-  for (n in 1:N2) y[N1 + n] <- y2[n];
+  for (n in 1:N1) y[n] = y1[n];
+  for (n in 1:N2) y[N1 + n] = y2[n];
 
   y ~ multi_normal(mu,Sigma);
 }
@@ -7597,7 +7597,7 @@ Cholesky factor of \code{Sigma} in the transformed data block
 transformed data {
   matrix[N1+N2,N1+N2] L;
 ...
-  L <- cholesky_decompose(Sigma);
+  L = cholesky_decompose(Sigma);
 ...
 \end{stancode}
 %
@@ -7671,24 +7671,24 @@ transformed data {
 
     for (i in 1:N1) 
       for (j in 1:N1)
-        Sigma[i,j] <- exp(-pow(x1[i] - x1[j],2)) 
+        Sigma[i,j] = exp(-pow(x1[i] - x1[j],2)) 
           + if_else(i==j, 0.1, 0.0);
     for (i in 1:N2) 
       for (j in 1:N2)
-        Omega[i,j] <- exp(-pow(x2[i] - x2[j],2)) 
+        Omega[i,j] = exp(-pow(x2[i] - x2[j],2)) 
           + if_else(i==j, 0.1, 0.0); 
     for (i in 1:N1)
       for (j in 1:N2)
-        K[i,j] <- exp(-pow(x1[i] - x2[j],2));
+        K[i,j] = exp(-pow(x1[i] - x2[j],2));
     
-    K_transpose_div_Sigma <- K' / Sigma;
-    mu <- K_transpose_div_Sigma * y1; 
-    Tau <- Omega - K_transpose_div_Sigma * K;
+    K_transpose_div_Sigma = K' / Sigma;
+    mu = K_transpose_div_Sigma * y1; 
+    Tau = Omega - K_transpose_div_Sigma * K;
     for (i in 1:(N2-1))
       for (j in (i+1):N2)
-        Tau[i,j] <- Tau[j,i];
+        Tau[i,j] = Tau[j,i];
 
-    L <- cholesky_decompose(Tau);
+    L = cholesky_decompose(Tau);
   }
 }
 \end{stancode}
@@ -7790,8 +7790,8 @@ parameters {
 }
 model {
   vector[N] y;
-  for (n in 1:N1) y[n] <- y1[n];
-  for (n in 1:N2) y[N1 + n] <- y2[n];
+  for (n in 1:N1) y[n] = y1[n];
+  for (n in 1:N2) y[N1 + n] = y2[n];
 
   y ~ multi_normal(mu,Sigma);
   for (n in 1:N1)
@@ -7935,8 +7935,8 @@ transformed parameters {
   real<lower=0> alpha;
   real<lower=0> beta;
   ...
-  alpha <- lambda * phi;
-  beta <- lambda * (1 - phi);
+  alpha = lambda * phi;
+  beta = lambda * (1 - phi);
   ...
 model {
   phi ~ beta(1,1); // uniform on phi, could drop
@@ -7957,8 +7957,8 @@ follows.
 model {
   real alpha;
   real beta;
-  alpha <- lambda * phi;
-  beta <- lambda * (1 - phi);
+  alpha = lambda * phi;
+  beta = lambda * (1 - phi);
 ...
   for (n in 1:N)
     theta[n] ~ beta(alpha,beta);
@@ -8054,7 +8054,7 @@ logarithm, as follows.
 \begin{stancode}
 model {
   real log_y;
-  log_y <- log(y);
+  log_y = log(y);
   log_y ~ normal(mu,sigma);
   increment_log_prob(-log_y);
   ...
@@ -8102,7 +8102,7 @@ parameters {
 }
 transformed parameters {
   real<lower=0> y_inv;   
-  y_inv <- 1 / y;
+  y_inv = 1 / y;
 }
 model {
   y ~ gamma(2,4);
@@ -8118,7 +8118,7 @@ parameters {
 }
 transformed parameters {
   real<lower=0> y;
-  y <- 1 / y_inv;                         // change
+  y = 1 / y_inv;                         // change
   increment_log_prob( -2 * log(y_inv) );  // adjustment
 }
 model {
@@ -8346,15 +8346,15 @@ functions {
   real relative_diff(real x, real y) {
     real abs_diff;
     real avg_scale;
-    abs_diff <- fabs(x - y);
-    avg_scale <- (fabs(x) + fabs(y)) / 2;
+    abs_diff = fabs(x - y);
+    avg_scale = (fabs(x) + fabs(y)) / 2;
     return abs_diff / avg_scale;
   }
 }
 ...
 generated quantities {
   real rdiff;
-  rdiff <- relative_diff(alpha,beta);
+  rdiff = relative_diff(alpha,beta);
 }
 \end{stancode}
 %
@@ -8403,8 +8403,8 @@ functions {
   real relative_diff(real x, real y, real min) {
     real abs_diff;
     real avg_scale;
-    abs_diff <- fabs(x - y);
-    avg_scale <- (fabs(x) + fabs(y)) / 2;
+    abs_diff = fabs(x - y);
+    avg_scale = (fabs(x) + fabs(y)) / 2;
     if (abs_diff / avg_scale < min) 
       reject("relative_diff below ",min);
     return abs_diff / avg_scale;
@@ -8627,7 +8627,7 @@ parameters {
 transformed parameters {
   vector[K] beta;
   ...
-  beta <- center_lp(beta_raw, mu_beta, sigma_beta);
+  beta = center_lp(beta_raw, mu_beta, sigma_beta);
   ...
 \end{stancode}
 
@@ -8653,9 +8653,9 @@ from a unit normal PRNG.
 matrix predictors_rng(int N, int K) {
   matrix[N,K] x;
   for (n in 1:N) {
-    x[n,1] <- 1.0;  // intercept
+    x[n,1] = 1.0;  // intercept
     for (k in 2:K)
-      x[n,k] <- normal_rng(0,1);
+      x[n,k] = normal_rng(0,1);
   }
   return x;
 }
@@ -8669,9 +8669,9 @@ scale \code{sigma}.
 vector regression_rng(vector beta, matrix x, real sigma) {
   vector[rows(x)] y;
   vector[rows(x)] mu;
-  mu <- x * beta;
+  mu = x * beta;
   for (n in 1:rows(x))
-    y[n] <- normal_rng(mu[n], sigma);
+    y[n] = normal_rng(mu[n], sigma);
   return y;
 }
 \end{stancode}
@@ -8687,8 +8687,8 @@ parameters {
 generated quantities {
   matrix[N_sim,K] x_sim;
   vector[N_sim] y_sim;
-  x_sim <- predictors_rng(N_sim,K);
-  y_sim <- regression_rng(beta,x_sim,sigma);
+  x_sim = predictors_rng(N_sim,K);
+  y_sim = regression_rng(beta,x_sim,sigma);
 }
 \end{stancode}
 %
@@ -8970,8 +8970,8 @@ real[] sho(real t,
            real[] x_r,
            int[] x_i) {
   real dydt[2];
-  dydt[1] <- y[2];
-  dydt[2] <- -y[1] - theta[1] * y[2];
+  dydt[1] = y[2];
+  dydt[2] = -y[1] - theta[1] * y[2];
   return dydt;
 }
 \end{stancode}
@@ -9044,8 +9044,8 @@ functions {
              real[] x_r,
              int[] x_i) {
     real dydt[2];
-    dydt[1] <- y[2];
-    dydt[2] <- -y[1] - theta[1] * y[2];
+    dydt[1] = y[2];
+    dydt[2] = -y[1] - theta[1] * y[2];
     return dydt;
   }
 }
@@ -9064,12 +9064,12 @@ model {
 }
 generated quantities {
   real y_hat[T,2];
-  y_hat <- integrate_ode(sho, y0, t0, ts, theta, x_r, x_i);
+  y_hat = integrate_ode(sho, y0, t0, ts, theta, x_r, x_i);
 
   // add measurement error
   for (t in 1:T) {
-    y_hat[t,1] <- y_hat[t,1] + normal_rng(0,0.1);
-    y_hat[t,2] <- y_hat[t,2] + normal_rng(0,0.1);
+    y_hat[t,1] = y_hat[t,1] + normal_rng(0,0.1);
+    y_hat[t,2] = y_hat[t,2] + normal_rng(0,0.1);
   }
 }
 \end{stancode}
@@ -9087,7 +9087,7 @@ This program illustrates the way in which the ODE solver is called in
 a Stan program,
 %
 \begin{stancode}
-y_hat <- integrate_ode(sho, y0, t0, ts, theta, x_r, x_i);
+y_hat = integrate_ode(sho, y0, t0, ts, theta, x_r, x_i);
 \end{stancode}
 %
 This assigns the solutions to the system defined by function
@@ -9119,8 +9119,8 @@ functions {
              real[] x_r,
              int[] x_i) {
     real dydt[2];
-    dydt[1] <- y[2];
-    dydt[2] <- -y[1] - theta[1] * y[2];
+    dydt[1] = y[2];
+    dydt[2] = -y[1] - theta[1] * y[2];
     return dydt;
   }
 }
@@ -9144,7 +9144,7 @@ model {
   sigma ~ cauchy(0,2.5);
   theta ~ normal(0,1);
   y0 ~ normal(0,1);
-  y_hat <- integrate_ode(sho, y0, t0, ts, theta, x_r, x_i);
+  y_hat = integrate_ode(sho, y0, t0, ts, theta, x_r, x_i);
   for (t in 1:T)
     y[t] ~ normal(y_hat[t], sigma);
 }
@@ -9169,7 +9169,7 @@ array \code{y\_hat}, which is then used as the location in the
 observation noise model as follows.
 %
 \begin{stancode}
-y_hat <- integrate_ode(sho, y0, t0, ts, theta, x_r, x_i);
+y_hat = integrate_ode(sho, y0, t0, ts, theta, x_r, x_i);
 for (t in 1:T)
   y[t] ~ normal(y_hat[t], sigma);
 \end{stancode}
@@ -9430,8 +9430,8 @@ code for creating a simplex from a $K-1$-vector can be written as
 vector softmax_id(vector alpha) {
   vector[num_elements(alpha) + 1] alphac1;
   for (k in 1:num_elements(alpha))
-    alphac1[k] <- alpha[k];
-  alpha[num_elements(alphac)] <- 0;
+    alphac1[k] = alpha[k];
+  alpha[num_elements(alphac)] = 0;
   return softmax(alphac);
 }
 \end{stancode}
@@ -9951,7 +9951,7 @@ parameters {
 }
 transformed parameters {
   real mu;
-  mu <- lambda1 + lambda2;
+  mu = lambda1 + lambda2;
 }
 model {
   y ~ normal(mu, sigma);
@@ -10141,8 +10141,8 @@ transformed parameters {
   real y;
   vector[9] x;
 
-  y <- 3.0 * y_raw;  
-  x <- exp(y/2) * x_raw;
+  y = 3.0 * y_raw;  
+  x = exp(y/2) * x_raw;
 }
 model {
   y_raw ~ normal(0,1); // implies y ~ normal(0,3) 
@@ -10225,7 +10225,7 @@ parameters {
 }
 transformed parameters {
   real beta;
-  beta <- mu + tau * tan(beta_unif);  // beta ~ cauchy(mu,tau)
+  beta = mu + tau * tan(beta_unif);  // beta ~ cauchy(mu,tau)
 }    
 model {
   beta_unif ~ uniform(-pi()/2, pi()/2);  // not necessary
@@ -10330,11 +10330,11 @@ parameters {
   ...
 transformed parameters {
   real beta;
-  beta <- alpha / sqrt(tau);
+  beta = alpha / sqrt(tau);
   ...
 model {
   real half_nu;
-  half_nu <- 0.5 * nu;
+  half_nu = 0.5 * nu;
   tau ~ gamma(half_nu, half_nu);
   alpha ~ normal(0, 1);
   ...
@@ -10390,7 +10390,7 @@ parameters {
 transformed parameters {
   vector[K] beta;
   // implies: beta ~ normal(mu_beta,sigma_beta)
-  beta <- mu_beta + sigma_beta * beta_raw;
+  beta = mu_beta + sigma_beta * beta_raw;
 model {
   beta_raw ~ normal(0,1);  
   ...
@@ -10476,14 +10476,14 @@ data {
   ...
 transformed data {
   matrix[K,K] L;
-  L <- cholesky_decompose(Sigma);
+  L = cholesky_decompose(Sigma);
 }
 parameters {
   vector[K] alpha;
   ...
 transformed parameters {
   vector[K] beta;
-  beta <- mu + L * alpha; 
+  beta = mu + L * alpha; 
 }
 model {
   alpha ~ normal(0,1); 
@@ -10518,7 +10518,7 @@ data {
   ...
 transformed data {
   matrix[K,K] L;
-  L <- cholesky_decompose(Tau);
+  L = cholesky_decompose(Tau);
 }
 parameters {
   vector[K] alpha;
@@ -10527,7 +10527,7 @@ parameters {
 transformed parameters {
   vector[K] beta;
   // This equals mu + diag_matrix(sigma) * L * alpha;
-  beta <- mu + sigma .* (L * alpha);
+  beta = mu + sigma .* (L * alpha);
 }
 model {
   sigma ~ cauchy(0,5);
@@ -10579,20 +10579,20 @@ parameters {
 model {
   matrix[K,K] A;
   int count;
-  count <- 1;
+  count = 1;
   for (j in 1:(K-1)) {
     for (i in (j+1):K) {
-      A[i,j] <- z[count];
-      count <- count + 1;
+      A[i,j] = z[count];
+      count = count + 1;
     }
     for (i in 1:(j - 1)) {
-      A[i,j] <- 0.0;
+      A[i,j] = 0.0;
     }
-    A[j,j] <- sqrt(c[j]);
+    A[j,j] = sqrt(c[j]);
   }
   for (i in 1:(K-1))
-    A[i,K] <- 0;
-  A[K,K] <- sqrt(c[K]);
+    A[i,K] = 0;
+  A[K,K] = sqrt(c[K]);
   
   for (i in 1:K)
     c[i] ~ chi_square(nu - i + 1);
@@ -10632,11 +10632,11 @@ transformed data {
   matrix[K,K] L_inv;
   for (j in 1:K) {
     for (i in 1:K) {
-      eye[i,j] <- 0.0;
+      eye[i,j] = 0.0;
     }
-    eye[j,j] <- 1.0;
+    eye[j,j] = 1.0;
   }
-  L_inv <- mdivide_left_tri_low(L, eye);
+  L_inv = mdivide_left_tri_low(L, eye);
 }
 parameters {
   vector<lower=0>[K] c;
@@ -10646,22 +10646,22 @@ model {
   matrix[K,K] A;
   matrix[K,K] A_inv_L_inv;  
   int count;
-  count <- 1;
+  count = 1;
   for (j in 1:(K-1)) {
     for (i in (j+1):K) {
-      A[i,j] <- z[count];
-      count <- count + 1;
+      A[i,j] = z[count];
+      count = count + 1;
     }
     for (i in 1:(j - 1)) {
-      A[i,j] <- 0.0;
+      A[i,j] = 0.0;
     }
-    A[j,j] <- sqrt(c[j]);
+    A[j,j] = sqrt(c[j]);
   }
   for (i in 1:(K-1))
-    A[i,K] <- 0;
-  A[K,K] <- sqrt(c[K]);
+    A[i,K] = 0;
+  A[K,K] = sqrt(c[K]);
 
-  A_inv_L_inv <- mdivide_left_tri_low(A, L_inv);
+  A_inv_L_inv = mdivide_left_tri_low(A, L_inv);
   for (i in 1:K)
     c[i] ~ chi_square(nu - i + 1);
 
@@ -10689,8 +10689,8 @@ parameters {
 transformed parameters {
   simplex[K] rho;
   for (k in 1:K)
-    rho[k] <- dot_self(z[k]); // sum-of-squares
-  rho <- rho / sum(rho);
+    rho[k] = dot_self(z[k]); // sum-of-squares
+  rho = rho / sum(rho);
 }
 model {
   for (k in 1:K)
@@ -10728,7 +10728,7 @@ some operation that depends on \code{n}.
 %
 \begin{stancode}
 for (n in 1:N) 
-  total <- total + foo(n,...);
+  total = total + foo(n,...);
 \end{stancode}
 %
 This code has to create intermediate representations for each
@@ -10741,8 +10741,8 @@ apply the \code{sum()} operator, as in the following refactoring.
 {  
   vector[N] summands;
   for (n in 1:N) 
-    summands[n] <- foo(n,...);
-  total <- sum(summands);
+    summands[n] = foo(n,...);
+  total = sum(summands);
 }
 \end{stancode}
 %
@@ -10777,9 +10777,9 @@ parameters {
 model {
   for (n in 1:N) {
     real gamma;  
-    gamma <- 0.0;
+    gamma = 0.0;
     for (k in 1:K)
-      gamma <- gamma + x[n,k] * beta[k];
+      gamma = gamma + x[n,k] * beta[k];
     y[n] ~ normal(gamma,1);
   }
 }
@@ -10831,7 +10831,7 @@ as follows.
 ...
 transformed parameters {
   row_vector[K] beta_t;
-  beta_t <- beta';
+  beta_t = beta';
 }
 model {
   for (n in 1:N)
@@ -10918,7 +10918,7 @@ vectorize all at once.
 {
   vector[N] mu_ii;
   for (n in 1:N)
-    mu_ii[n] <- mu[ii[n]];
+    mu_ii[n] = mu[ii[n]];
   y ~ normal(mu_ii, sigma);
 \end{stancode}
 %
@@ -10994,7 +10994,7 @@ their sums can be created, with
 matrix[size(a), size(b)] a_b;
 for (i in 1:size(a))
   for (j in 1:size(b))
-    a_b[i, j] <- a[i] + b[j];
+    a_b[i, j] = a[i] + b[j];
 \end{stancode}
 %
 Then the sum can be replaced with \code{a\_b[ii[n], jj[n]]}.
@@ -11102,8 +11102,8 @@ data {
 transformed data {
   vector[N] x_std;
   vector[N] y_std;
-  x_std <- (x - mean(x)) / sd(x);
-  y_std <- (y - mean(y)) / sd(y);
+  x_std = (x - mean(x)) / sd(x);
+  y_std = (y - mean(y)) / sd(y);
 }
 parameters {
   real alpha_std;
@@ -11218,10 +11218,10 @@ generated quantities {
   real alpha;
   real beta;
   real<lower=0> sigma;
-  alpha <- sd(y) * (alpha_std - beta_std * mean(x) / sd(x)) 
+  alpha = sd(y) * (alpha_std - beta_std * mean(x) / sd(x)) 
            + mean(y);
-  beta <- beta_std * sd(y) / sd(x);
-  sigma <- sd(y) * sigma_std;
+  beta = beta_std * sd(y) / sd(x);
+  sigma = sd(y) * sigma_std;
 }
 \end{stancode}
 %

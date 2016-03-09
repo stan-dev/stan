@@ -48,6 +48,12 @@ namespace stan {
       assgn_r;
 
       boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::unused_type,
+                              whitespace_grammar<Iterator> >
+      assignment_operator_r;
+
+
+      boost::spirit::qi::rule<Iterator,
                               expression(var_origin),
                               whitespace_grammar<Iterator> >
       non_lvalue_assign_r;
