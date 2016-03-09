@@ -12,17 +12,28 @@ namespace stan {
     namespace diagnose {
 
       /**
+       * Checks the gradients of the model computed using reverse mode
+       * autodiff against finite differences.
+       *
+       * This will test the first order gradients using reverse mode
+       * at the value specified in cont_params. This method only
+       * outputs to the message_writer.
+       *
        * @tparam Model A model implementation
+       *
+       * @param model Input model to test (with data already instantiated)
        * @param cont_params Input values
-       * @param model Input model
        * @param epsilon epsilon to use for finite differences
        * @param error amount of absolute error to allow
        * @param message_writer Writer callback for display output
        * @param parameter_writer Writer callback for file output
+       *
+       * @return the number of parameters that are not within epsilon
+       * of the finite difference calculation
        */
       template <class Model>
-      int diagnose(Eigen::VectorXd& cont_params,
-                   Model& model,
+      int diagnose(Model& model,
+                   Eigen::VectorXd& cont_params,
                    double epsilon,
                    double error,
                    interface_callbacks::writer::base_writer& message_writer,
@@ -41,9 +52,7 @@ namespace stan {
                                                   epsilon, error,
                                                   message_writer);
 
-        (void) num_failed;  // FIXME: do something with the number failed
-
-        return stan::services::error_codes::OK;
+        return num_failed;
       }
 
     }

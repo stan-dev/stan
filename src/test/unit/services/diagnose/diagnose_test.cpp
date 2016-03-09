@@ -34,7 +34,7 @@ public:
 
 
 TEST_F(ServicesDiagnose, diagnose) {
-  stan::services::diagnose::diagnose(cont_params, *model, 1e-6, 1e-6,
+  stan::services::diagnose::diagnose(*model, cont_params, 1e-6, 1e-6,
     message, parameter);
 
   EXPECT_EQ("", model_ss.str());
