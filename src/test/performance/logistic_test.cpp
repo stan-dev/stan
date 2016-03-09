@@ -108,7 +108,7 @@ TEST_F(performance, values_from_tagged_version) {
     << "last tagged version, 2.9.0, had " << N_values << " elements";
 
   std::vector<double> first_run = last_draws_per_run[0];
-  EXPECT_FLOAT_EQ(-65.9431), first_run[0])
+  EXPECT_FLOAT_EQ(-65.9431, first_run[0])
     << "lp__: index 0";
 
   EXPECT_FLOAT_EQ(0.99914801, first_run[1])
