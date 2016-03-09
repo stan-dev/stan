@@ -104,7 +104,23 @@ namespace stan {
             value = lhs.substr(equal + 2, lhs.size());
             boost::replace_first(value, " (Default)", "");
           } else {
-            continue;
+            if (lhs.compare(" data") == 0) {
+              ss >> comment;
+              std::getline(ss, lhs);
+              
+              size_t equal = lhs.find("=");
+              if (equal != std::string::npos) {
+                name = lhs.substr(0, equal);
+                boost::trim(name);
+                value = lhs.substr(equal + 2, lhs.size());
+                boost::replace_first(value, " (Default)", "");
+              }
+              
+              if (name.compare("file") == 0)
+                metadata.data = value;
+              
+              continue;
+            }
           }
 
           if (name.compare("stan_version_major") == 0) {
@@ -125,8 +141,6 @@ namespace stan {
             metadata.thin = boost::lexical_cast<int>(value);
           } else if (name.compare("chain_id") == 0) {
             metadata.chain_id = boost::lexical_cast<int>(value);
-          } else if (name.compare("data") == 0) {
-            metadata.data = value;
           } else if (name.compare("init") == 0) {
             metadata.init = value;
             boost::trim(metadata.init);
