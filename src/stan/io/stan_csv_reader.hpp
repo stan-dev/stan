@@ -107,7 +107,7 @@ namespace stan {
             if (lhs.compare(" data") == 0) {
               ss >> comment;
               std::getline(ss, lhs);
-              
+
               size_t equal = lhs.find("=");
               if (equal != std::string::npos) {
                 name = lhs.substr(0, equal);
@@ -115,10 +115,10 @@ namespace stan {
                 value = lhs.substr(equal + 2, lhs.size());
                 boost::replace_first(value, " (Default)", "");
               }
-              
+
               if (name.compare("file") == 0)
                 metadata.data = value;
-              
+
               continue;
             }
           }
