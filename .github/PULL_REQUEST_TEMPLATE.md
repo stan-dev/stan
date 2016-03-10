@@ -1,4 +1,8 @@
-Have you run unit and cpplint tests? (Delete this warning before submitting the PR)
+#### Checklist:
+
+Have you run?
+- [ ] unit tests? `./runTests.py src/test/unit`
+- [ ] cpplint? `make cpplint`
 
 #### Summary:
 
@@ -10,5 +14,11 @@ Have you run unit and cpplint tests? (Delete this warning before submitting the 
 
 #### Documentation:
 
-#### Reviewer Suggestions: 
+#### Reviewer Suggestions:
+
+#### Licensing:
+
+By submitting this pull request, you agree to:
+- BSD license for code
+- CC-BY license for doc
 
