@@ -1,24 +1,25 @@
-#### Checklist:
+#### Submisison Checklist
 
-Have you run?
-- [ ] unit tests? `./runTests.py src/test/unit`
-- [ ] cpplint? `make cpplint`
+- [ ] Run unit tests: `./runTests.py src/test/unit`
+- [ ] Run cpplint: `make cpplint`
+- [ ] Declare copyright holder and open-source license: see below
 
-#### Summary:
+#### Summary
 
-#### Intended Effect:
+#### Intended Effect
 
-#### How to Verify:
+#### How to Verify
 
-#### Side Effects:
+#### Side Effects
 
-#### Documentation:
+#### Documentation
 
-#### Reviewer Suggestions:
+#### Reviewer Suggestions
 
-#### Licensing:
+#### Copyright and Licensing
 
-By submitting this pull request, you agree to:
-- BSD license for code
-- CC-BY license for doc
+Please list the copyright holder for the work you are submitting (this will be you or your assignee, such as a university or company):
 
+By submitting this pull request, the copyright holder is agreeing to license the submitted work under the following licenses:
+- Code: BSD 3-clause (https://opensource.org/licenses/BSD-3-Clause)
+- Documentation: CC-BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
