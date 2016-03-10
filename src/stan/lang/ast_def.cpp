@@ -1849,5 +1849,368 @@ namespace stan {
   }
 }
 
+// AFTER HERE TO GO IN OWN FILE WHEN FIGURE OUT BUILDS
+
+#include <boost/spirit/include/qi.hpp>
+
+namespace stan { 
+  namespace lang {
+
+
+    void set_expression::operator()(expression& lhs,
+                                    const expression& rhs) const {
+      lhs = rhs;
+    }
+    boost::phoenix::function<set_expression> set_expression_f;
+
+
+    void validate_expr_type3::operator()(const expression& expr, bool& pass,
+                                         std::ostream& error_msgs) const {
+      pass = !expr.expression_type().is_ill_formed();
+      if (!pass)
+        error_msgs << "expression is ill formed" << std::endl;
+    }
+    boost::phoenix::function<validate_expr_type3> validate_expr_type3_f;
+
+    fun set_fun_type::operator()(fun& fun,
+                                 std::ostream& error_msgs) const {
+      std::vector<expr_type> arg_types;
+      for (size_t i = 0; i < fun.args_.size(); ++i)
+        arg_types.push_back(fun.args_[i].expression_type());
+      fun.type_ = function_signatures::instance().get_result_type(fun.name_,
+                                                                  arg_types,
+                                                                  error_msgs);
+      return fun;
+    }
+    boost::phoenix::function<set_fun_type> set_fun_type_f;
+
+    void addition_expr3::operator()(expression& expr1, const expression& expr2,
+                                    std::ostream& error_msgs) const {
+      if (expr1.expression_type().is_primitive()
+          && expr2.expression_type().is_primitive()) {
+        expr1 += expr2;
+        return;
+      }
+      std::vector<expression> args;
+      args.push_back(expr1);
+      args.push_back(expr2);
+      set_fun_type sft;
+      fun f("add", args);
+      sft(f, error_msgs);
+      expr1 = expression(f);
+    }
+    boost::phoenix::function<addition_expr3> addition3_f;
+
+    void subtraction_expr3::operator()(expression& expr1,
+                                       const expression& expr2,
+                                       std::ostream& error_msgs) const {
+      if (expr1.expression_type().is_primitive()
+          && expr2.expression_type().is_primitive()) {
+        expr1 -= expr2;
+        return;
+      }
+      std::vector<expression> args;
+      args.push_back(expr1);
+      args.push_back(expr2);
+      set_fun_type sft;
+      fun f("subtract", args);
+      sft(f, error_msgs);
+      expr1 = expression(f);
+    }
+    boost::phoenix::function<subtraction_expr3> subtraction3_f;
+
+
+    void set_int::operator()(int& lhs, const int& rhs) const {
+      lhs = rhs;
+    }
+    boost::phoenix::function<set_int> set_int_f;
+
+    void set_size_t::operator()(size_t& lhs, const size_t& rhs) const {
+      lhs = rhs;
+    }
+    boost::phoenix::function<set_size_t> set_size_t_f;
+
+    void increment_size_t::operator()(size_t& lhs) const {
+      ++lhs;
+    }
+    boost::phoenix::function<increment_size_t> increment_size_t_f;
+
+    void binary_op_expr::operator()(expression& expr1, const expression& expr2,
+                                    const std::string& op,
+                                    const std::string& fun_name,
+                                    std::ostream& error_msgs) const {
+      if (!expr1.expression_type().is_primitive()
+          || !expr2.expression_type().is_primitive()) {
+        error_msgs << "binary infix operator " << op
+                   << " with functional interpretation " << fun_name
+                   << " requires arguments or primitive type (int or real)"
+                   << ", found left type=" << expr1.expression_type()
+                   << ", right arg type=" << expr2.expression_type()
+                   << "; "
+                   << std::endl;
+      }
+      std::vector<expression> args;
+      args.push_back(expr1);
+      args.push_back(expr2);
+      set_fun_type sft;
+      fun f(fun_name, args);
+      sft(f, error_msgs);
+      expr1 = expression(f);
+    }
+    boost::phoenix::function<binary_op_expr> binary_op_f;
+
+    void validate_non_void_arg_function::operator()(const expr_type& arg_type,
+                                            bool& pass,
+                                            std::ostream& error_msgs) const {
+      pass = !arg_type.is_void();
+      if (!pass)
+        error_msgs << "Functions cannot contain void argument types; "
+                   << "found void argument."
+                   << std::endl;
+    }
+    boost::phoenix::function<validate_non_void_arg_function>
+    validate_non_void_arg_f;
+
+    void set_void_function:: operator()(const expr_type& return_type,
+                                        var_origin& origin, bool& pass,
+                                        std::ostream& error_msgs) const {
+      if (return_type.is_void() && return_type.num_dims() > 0) {
+        error_msgs << "Void return type may not have dimensions declared."
+                   << std::endl;
+        pass = false;
+        return;
+      }
+      origin = return_type.is_void()
+        ? void_function_argument_origin
+        : function_argument_origin;
+    }
+    boost::phoenix::function<set_void_function> set_void_function_f;
+
+    void set_allows_sampling_origin::operator()(const std::string& identifier,
+                                                bool& allow_sampling,
+                                                int& origin) const {
+      bool is_void_function_origin
+        = (origin == void_function_argument_origin);
+      if (ends_with("_lp", identifier)) {
+        allow_sampling = true;
+        origin = is_void_function_origin
+          ? void_function_argument_origin_lp
+          : function_argument_origin_lp;
+      } else if (ends_with("_rng", identifier)) {
+        allow_sampling = false;
+        origin = is_void_function_origin
+          ? void_function_argument_origin_rng
+          : function_argument_origin_rng;
+      } else {
+        allow_sampling = false;
+        origin = is_void_function_origin
+          ? void_function_argument_origin
+          : function_argument_origin;
+      }
+    }
+    boost::phoenix::function<set_allows_sampling_origin>
+    set_allows_sampling_origin_f;
+
+    void validate_declarations::operator()(bool& pass,
+                       std::set<std::pair<std::string,
+                                          function_signature_t> >& declared,
+                       std::set<std::pair<std::string,
+                                          function_signature_t> >& defined,
+                       std::ostream& error_msgs) const {
+      using std::set;
+      using std::string;
+      using std::pair;
+      typedef set<pair<string, function_signature_t> >::iterator iterator_t;
+      for (iterator_t it = declared.begin(); it != declared.end(); ++it) {
+        if (defined.find(*it) == defined.end()) {
+          error_msgs <<"Function declared, but not defined."
+                     << " Function name=" << (*it).first
+                     << std::endl;
+          pass = false;
+          return;
+        }
+      }
+      pass = true;
+    }
+    boost::phoenix::function<validate_declarations> validate_declarations_f;
+
+    bool fun_exists(const std::set<std::pair<std::string,
+                                             function_signature_t> >& existing,
+                    const std::pair<std::string,
+                                    function_signature_t>& name_sig,
+                    bool name_only = true) {
+      for (std::set<std::pair<std::string,
+                              function_signature_t> >::const_iterator it
+             = existing.begin();
+           it != existing.end();
+           ++it)
+        if (name_sig.first == (*it).first
+            && (name_only
+                || name_sig.second.second == (*it).second.second))
+          return true;  // name and arg sequences match
+      return false;
+    }
+
+    void add_function_signature::operator()(const function_decl_def& decl,
+              bool& pass,
+              std::set<std::pair<std::string,
+                                 function_signature_t> >& functions_declared,
+              std::set<std::pair<std::string,
+                                 function_signature_t> >& functions_defined,
+              std::ostream& error_msgs) const {
+      // build up representations
+      expr_type result_type(decl.return_type_.base_type_,
+                            decl.return_type_.num_dims_);
+      std::vector<expr_type> arg_types;
+      for (size_t i = 0; i < decl.arg_decls_.size(); ++i)
+        arg_types.push_back(
+                            expr_type(decl.arg_decls_[i].arg_type_.base_type_,
+                                      decl.arg_decls_[i].arg_type_.num_dims_));
+      function_signature_t sig(result_type, arg_types);
+      std::pair<std::string, function_signature_t> name_sig(decl.name_, sig);
+
+      // check that not already declared if just declaration
+      if (decl.body_.is_no_op_statement()
+          && fun_exists(functions_declared, name_sig)) {
+        error_msgs << "Parse Error.  Function already declared, name="
+                   << decl.name_;
+        pass = false;
+        return;
+      }
+
+      // check not already user defined
+      if (fun_exists(functions_defined, name_sig)) {
+        error_msgs << "Parse Error.  Function already defined, name="
+                   << decl.name_;
+        pass = false;
+        return;
+      }
+
+      // check not already system defined
+      if (!fun_exists(functions_declared, name_sig)
+          && function_signatures::instance().is_defined(decl.name_, sig)) {
+        error_msgs << "Parse Error.  Function system defined, name="
+                   << decl.name_;
+        pass = false;
+        return;
+      }
+
+      // add declaration in local sets and in parser function sigs
+      if (functions_declared.find(name_sig) == functions_declared.end()) {
+        functions_declared.insert(name_sig);
+        function_signatures::instance()
+          .add(decl.name_,
+               result_type, arg_types);
+        function_signatures::instance()
+          .set_user_defined(name_sig);
+      }
+
+      // add as definition if there's a body
+      if (!decl.body_.is_no_op_statement())
+        functions_defined.insert(name_sig);
+      pass = true;
+    }
+    boost::phoenix::function<add_function_signature> add_function_signature_f;
+
+
+    void validate_return_type::operator()(function_decl_def& decl,
+                                          bool& pass,
+                                          std::ostream& error_msgs) const {
+      pass = decl.body_.is_no_op_statement()
+        || stan::lang::returns_type(decl.return_type_, decl.body_,
+                                    error_msgs);
+      if (!pass) {
+        error_msgs << "Improper return in body of function.";
+        return;
+      }
+
+      if (ends_with("_log", decl.name_)
+          && !decl.return_type_.is_primitive_double()) {
+        pass = false;
+        error_msgs << "Require real return type for functions"
+                   << " ending in _log.";
+      }
+    }
+    boost::phoenix::function<validate_return_type> validate_return_type_f;
+
+    void scope_lp::operator()(variable_map& vm) const {
+      vm.add("lp__", DOUBLE_T, local_origin);
+      vm.add("params_r__", VECTOR_T, local_origin);
+    }
+    boost::phoenix::function<scope_lp> scope_lp_f;
+
+    void unscope_variables::operator()(function_decl_def& decl,
+                                       variable_map& vm) const {
+        vm.remove("lp__");
+        vm.remove("params_r__");
+        for (size_t i = 0; i < decl.arg_decls_.size(); ++i)
+          vm.remove(decl.arg_decls_[i].name_);
+    }
+    boost::phoenix::function<unscope_variables> unscope_variables_f;
+
+    void add_fun_var::operator()(arg_decl& decl, bool& pass, variable_map& vm,
+                                 std::ostream& error_msgs) const {
+      if (vm.exists(decl.name_)) {
+        // variable already exists
+        pass = false;
+        error_msgs << "duplicate declaration of variable, name="
+                   << decl.name_
+                   << "; attempt to redeclare as function argument"
+                   << "; original declaration as ";
+        print_var_origin(error_msgs, vm.get_origin(decl.name_));
+        error_msgs << std::endl;
+        return;
+      }
+      pass = true;
+      vm.add(decl.name_, decl.base_variable_declaration(),
+             function_argument_origin);
+    }
+    boost::phoenix::function<add_fun_var> add_fun_var_f;
+
+    // TODO(carpenter): seems redundant; see if it can be removed
+    void set_omni_idx::operator()(omni_idx& val) const {
+      val = omni_idx();
+    }
+    boost::phoenix::function<set_omni_idx> set_omni_idx_f;
+
+    void validate_int_expression::operator()(const expression & e, bool& pass,
+                                             std::ostream& error_msgs) const {
+      pass = e.expression_type().is_primitive_int();
+    }
+    boost::phoenix::function<validate_int_expression>
+    validate_int_expression_f;
+
+    void validate_ints_expression::operator()(const expression & e, bool& pass,
+                                              std::ostream& error_msgs) const {
+      if (e.expression_type().type() != INT_T) {
+        error_msgs << "index must be integer; found type=";
+        write_base_expr_type(error_msgs, e.expression_type().type());
+        error_msgs << std::endl;
+        pass = false;
+        return;
+      }
+      if (e.expression_type().num_dims_ > 1) {
+        // tests > 1 so that message is coherent because the single
+        // integer array tests don't print
+        error_msgs << "index must be integer or 1D integer array;"
+                   << " found number of dimensions="
+                   << e.expression_type().num_dims_
+                   << std::endl;
+        pass = false;
+        return;
+      }
+      if (e.expression_type().num_dims_ == 0) {
+        // need integer array expression here, but nothing else to report
+        pass = false;
+        return;
+      }
+      pass = true;
+    }
+    boost::phoenix::function<validate_ints_expression>
+    validate_ints_expression_f;
+
+
+  }
+}
 
 #endif

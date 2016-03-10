@@ -1,45 +1,27 @@
 #ifndef STAN_LANG_GRAMMARS_EXPRESSION_GRAMMAR_HPP
 #define STAN_LANG_GRAMMARS_EXPRESSION_GRAMMAR_HPP
 
-#include <boost/spirit/include/qi.hpp>
-
 #include <stan/lang/ast.hpp>
 #include <stan/lang/grammars/expression07_grammar.hpp>
-#include <stan/lang/grammars/term_grammar.hpp>
 #include <stan/lang/grammars/whitespace_grammar.hpp>
-
-#include <string>
+#include <boost/spirit/include/qi.hpp>
 #include <sstream>
-#include <vector>
 
 namespace stan {
+
   namespace lang {
-
-    template <typename Iterator>
-    struct term_grammar;
-
-    template <typename Iterator>
-    struct expression_grammar;
-
-    template <typename Iterator>
-    struct expression07_grammar;
-
-    template <typename Iterator>
-    struct indexes_grammar;
 
     template <typename Iterator>
     struct expression_grammar
       : public boost::spirit::qi::grammar<Iterator,
                                           expression(var_origin),
                                           whitespace_grammar<Iterator> > {
-      expression_grammar(variable_map& var_map,
-                         std::stringstream& error_msgs);
-
       variable_map& var_map_;
       std::stringstream& error_msgs_;
-
       expression07_grammar<Iterator> expression07_g;
 
+      expression_grammar(variable_map& var_map,
+                         std::stringstream& error_msgs);
 
       boost::spirit::qi::rule<Iterator,
                               expression(var_origin),

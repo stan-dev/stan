@@ -346,27 +346,6 @@ namespace stan {
     boost::phoenix::function<validate_integrate_ode_cvode>
       validate_integrate_ode_cvode_f;
 
-    struct set_fun_type {
-      //! @cond Doxygen_Suppress
-      template <class> struct result;
-      //! @endcond
-      template <typename F, typename T1, typename T2>
-      struct result<F(T1, T2)> { typedef fun type; };
-
-      fun operator()(fun& fun,
-                     std::ostream& error_msgs) const {
-        std::vector<expr_type> arg_types;
-        for (size_t i = 0; i < fun.args_.size(); ++i)
-          arg_types.push_back(fun.args_[i].expression_type());
-        fun.type_ = function_signatures::instance().get_result_type(fun.name_,
-                                                                    arg_types,
-                                                                    error_msgs);
-        return fun;
-      }
-    };
-    boost::phoenix::function<set_fun_type> set_fun_type_f;
-
-
     struct set_fun_type_named {
       //! @cond Doxygen_Suppress
       template <class> struct result;

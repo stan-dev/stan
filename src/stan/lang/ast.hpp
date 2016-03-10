@@ -1061,4 +1061,287 @@ namespace stan {
   }
 }
 
+// AFTER HERE TO GO IN OWN FILE WHEN FIGURE OUT BUILDS
+
+#include <boost/spirit/include/qi.hpp>
+
+namespace stan { 
+  namespace lang {
+
+    /**
+     * This is the base class for unnary functors that are adapted to
+     * lazy semantic actions by boost::phoenix.  The base class deals
+     * with the type dispatch required by Phoenix.
+     *
+     * @tparam R Return type of functor.
+     */
+    template <typename R>
+    struct phoenix_functor_unary {
+      /**
+       * Declare result to be a template struct.
+       */
+      template <class> struct result;
+
+      /**
+       * Specialize as required by Phoenix to functional form
+       * with typedef of return type.
+       */
+      template <typename F, typename T1>
+      struct result<F(T1)> { typedef R type; };
+    };
+
+    /**
+     * This is the base class for binary functors that are adapted to
+     * lazy semantic actions by boost::phoenix.  The base class deals
+     * with the type dispatch required by Phoenix.
+     *
+     * @tparam R Return type of functor.
+     */
+    template <typename R>
+    struct phoenix_functor_binary {
+      /**
+       * Declare result to be a template struct.
+       */
+      template <class> struct result;
+
+      /**
+       * Specialize as required by Phoenix to functional form
+       * with typedef of return type.
+       */
+      template <typename F, typename T1, typename T2>
+      struct result<F(T1, T2)> { typedef R type; };
+    };
+
+    /**
+     * This is the base class for ternary functors that are adapted to
+     * lazy semantic actions by boost::phoenix.  The base class deals
+     * with the type dispatch required by Phoenix.
+     *
+     * @tparam R Return type of functor.
+     */
+    template <typename R>
+    struct phoenix_functor_ternary {
+      /**
+       * Declare result to be a template struct.
+       */
+      template <class> struct result;
+
+      /**
+       * Specialize as required by Phoenix to functional form
+       * with typedef of return type.
+       */
+      template <typename F, typename T1, typename T2, typename T3>
+      struct result<F(T1, T2, T3)> { typedef R type; };
+    };
+
+    /**
+     * This is the base class for quatenary functors that are adapted
+     * to lazy semantic actions by boost::phoenix.  The base class
+     * deals with the type dispatch required by Phoenix.
+     *
+     * @tparam R Return type of functor.
+     */
+    template <typename R>
+    struct phoenix_functor_quaternary {
+      /**
+       * Declare result to be a template struct.
+       */
+      template <class> struct result;
+
+      /**
+       * Specialize as required by Phoenix to functional form
+       * with typedef of return type.
+       */
+      template <typename F, typename T1, typename T2, typename T3, typename T4>
+      struct result<F(T1, T2, T3, T4)> { typedef R type; };
+    };
+
+    /**
+     * This is the base class for ternary functors that are adapted to
+     * lazy semantic actions by boost::phoenix.  The base class deals
+     * with the type dispatch required by Phoenix.
+     *
+     * @tparam R Return type of functor.
+     */
+    template <typename R>
+    struct phoenix_functor_quinary {
+      /**
+       * Declare result to be a template struct.
+       */
+      template <class> struct result;
+
+      /**
+       * Specialize as required by Phoenix to functional form
+       * with typedef of return type.
+       */
+      template <typename F, typename T1, typename T2, typename T3,
+                typename T4, typename T5>
+      struct result<F(T1, T2, T3, T4, T5)> { typedef R type; };
+    };
+
+
+    // called from: expression07_grammmar, expression_grammar
+    struct set_expression : public phoenix_functor_binary<void> {
+      void operator()(expression& lhs, const expression& rhs) const;
+    };
+    extern boost::phoenix::function<set_expression> set_expression_f;
+
+
+    // called from: expression07_grammar
+    struct validate_expr_type3 : public phoenix_functor_ternary<void> {
+      void operator()(const expression& expr, bool& pass,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<validate_expr_type3> validate_expr_type3_f;
+
+    // called from: expression07_grammar, expression_grammar (in
+    // function), term_grammar (in functions)
+    struct set_fun_type : public phoenix_functor_ternary<fun> {
+      fun operator()(fun& fun, std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<set_fun_type> set_fun_type_f;
+
+    // called from: expression07_grammar
+    struct addition_expr3 : public phoenix_functor_ternary<void> {
+      void operator()(expression& expr1, const expression& expr2,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<addition_expr3> addition3_f;
+    
+    // called from: expression07_grammar
+    struct subtraction_expr3 : public phoenix_functor_ternary<void> {
+      void operator()(expression& expr1, const expression& expr2,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<subtraction_expr3> subtraction3_f;
+
+    // called from bare_type_grammar
+    struct set_int : public phoenix_functor_binary<void> {
+      void operator()(int& lhs, const int& rhs) const;
+    };
+    extern boost::phoenix::function<set_int> set_int_f;
+
+    // called from bare_type_grammar
+    struct set_size_t : public phoenix_functor_binary<void> {
+      void operator()(size_t& lhs, const size_t& rhs) const;
+    };
+    extern boost::phoenix::function<set_size_t> set_size_t_f;
+
+    // called from bare_type_grammar
+    struct increment_size_t : phoenix_functor_unary<void> {
+      void operator()(size_t& lhs) const;
+    };
+    extern boost::phoenix::function<increment_size_t> increment_size_t_f;
+
+    // called from: expression_grammar
+    struct binary_op_expr : phoenix_functor_quinary<void> {
+     void operator()(expression& expr1, const expression& expr2,
+                     const std::string& op, const std::string& fun_name,
+                     std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<binary_op_expr> binary_op_f;
+    
+    // called from: functions_grammar
+    struct validate_non_void_arg_function : phoenix_functor_ternary<void> {
+      void operator()(const expr_type& arg_type,
+                      bool& pass,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<validate_non_void_arg_function>
+    validate_non_void_arg_f;
+
+    // called from: functions_grammar
+    struct set_void_function : phoenix_functor_quaternary<void> {
+      void operator()(const expr_type& return_type, var_origin& origin,
+                      bool& pass, std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<set_void_function> set_void_function_f;
+
+    // called from: functions_grammar
+    struct set_allows_sampling_origin : public phoenix_functor_ternary<void> {
+      void operator()(const std::string& identifier, bool& allow_sampling,
+                      int& origin) const;
+    };
+    extern boost::phoenix::function<set_allows_sampling_origin>
+    set_allows_sampling_origin_f;
+
+    // called from: functions_grammar
+    struct validate_declarations : public phoenix_functor_quaternary<void> {
+      void operator()(bool& pass,
+                      std::set<std::pair<std::string,
+                                         function_signature_t> >& declared,
+                      std::set<std::pair<std::string,
+                                         function_signature_t> >& defined,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<validate_declarations>
+    validate_declarations_f;
+
+    // called from: functions_grammar
+    struct add_function_signature : public phoenix_functor_quinary<void> {
+      void operator()(const function_decl_def& decl,
+              bool& pass,
+              std::set<std::pair<std::string,
+                                 function_signature_t> >& functions_declared,
+              std::set<std::pair<std::string,
+                                 function_signature_t> >& functions_defined,
+              std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<add_function_signature>
+    add_function_signature_f;
+
+    // called from: functions_grammar
+    struct validate_return_type : phoenix_functor_ternary<void> {
+      void operator()(function_decl_def& decl, bool& pass,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<validate_return_type>
+    validate_return_type_f;
+
+    // called from: functions_grammar
+    struct scope_lp : public phoenix_functor_unary<void> {
+      void operator()(variable_map& vm) const;
+    };
+    extern boost::phoenix::function<scope_lp> scope_lp_f;
+
+    // called from: functions_grammar
+    struct unscope_variables : public phoenix_functor_binary<void> {
+      void operator()(function_decl_def& decl,
+                      variable_map& vm) const;
+    };
+    extern boost::phoenix::function<unscope_variables> unscope_variables_f;
+
+    // called from: functions_grammar
+    struct add_fun_var : public phoenix_functor_quaternary<void> {
+      void operator()(arg_decl& decl, bool& pass, variable_map& vm,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<add_fun_var> add_fun_var_f;
+
+    // called from: indexes_grammar
+    struct set_omni_idx : public phoenix_functor_unary<void> {
+      void operator()(omni_idx& val) const;
+    };
+    extern boost::phoenix::function<set_omni_idx> set_omni_idx_f;
+
+    // called from: indexes_grammar
+    struct validate_int_expression : public phoenix_functor_ternary<void> {
+      void operator()(const expression & e, bool& pass,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<validate_int_expression>
+    validate_int_expression_f;
+
+    // called from: indexes_grammar
+    struct validate_ints_expression : public phoenix_functor_ternary<void> {
+      void operator()(const expression & e, bool& pass,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<validate_ints_expression>
+    validate_ints_expression_f;
+
+  }
+}
+
+
 #endif
