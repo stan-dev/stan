@@ -29,7 +29,7 @@ git checkout adsvi
 
 (a) Include this user-defined function at the top of your `.stan` file
 
-```c++
+```Stan
 functions {
   real divide_promote_real(int x, int y) {
     real x_real;
@@ -41,7 +41,7 @@ functions {
 
 (b) Use the following variable naming structure for the data block
 
-```c++
+```Stan
 data {
   int<lower=0> NFULL;     // total number of datapoints in dataset
   int<lower=0> N;         // number of data points in minibatch
@@ -56,21 +56,21 @@ data {
 
 (c) Compute the minibatch scaling factor
 
-```c++
+```Stan
 transformed data {
   real minibatch_factor;
-  minibatch_factor <- divide_promote_real(N, NFULL);
+  minibatch_factor <- divide_promote_real(NFULL, N);
 }
 ```
 
 
-(d) Include the factor at the end of the model block
+(d) Scale the log likelihood of your model
 
-```c++
+```Stan
 model{
   // prior
   // likelihood
-  increment_log_prob(log(minibatch_factor));
+  increment_log_prob(minibatch_factor * log_likelihood_of_model);
 }
 ```
 
