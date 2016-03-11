@@ -101,9 +101,7 @@ namespace stan {
 
       int_expression_r.name("integer expression");
       int_expression_r
-        %= expression_g(_r1)
-           [validate_int_expression_f(_1, _pass,
-                                      boost::phoenix::ref(error_msgs_))];
+        %= expression_g(_r1)[validate_int_expression_f(_1, _pass)];
     }
 
   }

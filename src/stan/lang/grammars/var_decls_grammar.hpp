@@ -1,13 +1,11 @@
 #ifndef STAN_LANG_GRAMMARS_VAR_DECLS_GRAMMAR_HPP
 #define STAN_LANG_GRAMMARS_VAR_DECLS_GRAMMAR_HPP
 
-#include <boost/spirit/include/qi.hpp>
-
 #include <stan/lang/ast.hpp>
 #include <stan/lang/grammars/whitespace_grammar.hpp>
 #include <stan/lang/grammars/expression_grammar.hpp>
 #include <stan/lang/grammars/expression07_grammar.hpp>
-
+#include <boost/spirit/include/qi.hpp>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -24,16 +22,10 @@ namespace stan {
       var_decls_grammar(variable_map& var_map,
                         std::stringstream& error_msgs);
 
-      // global info for parses
       variable_map& var_map_;
       std::stringstream& error_msgs_;
-
-      // grammars
       expression_grammar<Iterator> expression_g;
-
-      expression07_grammar<Iterator> expression07_g;
-
-      // rules
+      expression07_grammar<Iterator> expression07_g;  // disallows comparisons
 
       boost::spirit::qi::rule<Iterator,
                               cholesky_factor_var_decl(var_origin),
