@@ -1,10 +1,11 @@
+#include <stan/lang/ast_def.cpp>
+#include <stan/lang/generator.hpp>
+#include <gtest/gtest.h>
 #include <cmath>
 #include <sstream>
 #include <string>
 #include <set>
-#include <stan/lang/ast_def.cpp>
 #include <vector>
-#include <gtest/gtest.h>
 
 using stan::lang::idx;
 using stan::lang::uni_idx;

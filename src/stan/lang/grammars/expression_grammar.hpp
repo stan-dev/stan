@@ -12,6 +12,9 @@ namespace stan {
   namespace lang {
 
     template <typename Iterator>
+    struct expression07_grammar;
+
+    template <typename Iterator>
     struct expression_grammar
       : public boost::spirit::qi::grammar<Iterator,
                                           expression(var_origin),
