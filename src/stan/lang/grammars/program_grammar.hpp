@@ -5,6 +5,7 @@
 #include <stan/lang/grammars/whitespace_grammar.hpp>
 #include <stan/lang/grammars/expression_grammar.hpp>
 #include <stan/lang/grammars/var_decls_grammar.hpp>
+#include <stan/lang/grammars/semantic_actions.hpp>
 #include <stan/lang/grammars/statement_grammar.hpp>
 #include <stan/lang/grammars/functions_grammar.hpp>
 #include <boost/spirit/include/qi.hpp>

@@ -28,7 +28,7 @@ namespace stan {
 
       expression_r.name("expression");
       expression_r
-        = expression14_r(_r1)[set_expression_f(_val, _1)]
+        = expression14_r(_r1)[assign_lhs_f(_val, _1)]
         > *(lit("||")
             > expression14_r(_r1)
               [binary_op_f(_val, _1, "||", "logical_or",
@@ -36,7 +36,7 @@ namespace stan {
 
       expression14_r.name("expression");
       expression14_r
-        = expression10_r(_r1)[set_expression_f(_val, _1)]
+        = expression10_r(_r1)[assign_lhs_f(_val, _1)]
         > *(lit("&&")
             > expression10_r(_r1)
               [binary_op_f(_val, _1, "&&", "logical_and",
@@ -44,7 +44,7 @@ namespace stan {
 
       expression10_r.name("expression");
       expression10_r
-        = expression09_r(_r1)[set_expression_f(_val, _1)]
+        = expression09_r(_r1)[assign_lhs_f(_val, _1)]
         > *((lit("==")
              > expression09_r(_r1)
                [binary_op_f(_val, _1, "==", "logical_eq",
@@ -57,7 +57,7 @@ namespace stan {
 
       expression09_r.name("expression");
       expression09_r
-        = expression07_g(_r1)[set_expression_f(_val, _1)]
+        = expression07_g(_r1)[assign_lhs_f(_val, _1)]
         > *((lit("<=")
              > expression07_g(_r1)
                [binary_op_f(_val, _1, "<", "logical_lte",

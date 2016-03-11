@@ -3,6 +3,7 @@
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/grammars/common_adaptors_def.hpp>
+#include <stan/lang/grammars/semantic_actions.hpp>
 #include <stan/lang/grammars/statement_grammar.hpp>
 #include <stan/lang/grammars/statement_2_grammar.hpp>
 #include <boost/spirit/include/qi.hpp>

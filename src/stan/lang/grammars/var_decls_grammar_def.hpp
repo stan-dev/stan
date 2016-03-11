@@ -4,6 +4,7 @@
 #include <stan/lang/ast.hpp>
 #include <stan/lang/grammars/var_decls_grammar.hpp>
 #include <stan/lang/grammars/common_adaptors_def.hpp>
+#include <stan/lang/grammars/semantic_actions.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <set>
@@ -83,56 +84,6 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::corr_matrix_var_decl,
 namespace stan {
 
   namespace lang {
-
-
-    // TODO(carpenter): refactor this out of here; failed so far
-    //                  because of templating on R and T
-    struct add_var {
-      template <class> struct result;
-      template <typename F, typename T1, typename T2, typename T3,
-                typename T4, typename T5, typename T6>
-      struct result<F(T1, T2, T3, T4, T5, T6)> { typedef void type; };
-      // each type derived from base_var_decl gets own instance
-      template <typename R, typename T>
-      void operator()(R& var_decl_result,
-                      const T& var_decl,
-                      variable_map& vm,
-                      bool& pass,
-                      const var_origin& vo,
-                      std::ostream& error_msgs) const {
-        if (vm.exists(var_decl.name_)) {
-          // variable already exists
-          pass = false;
-          error_msgs << "duplicate declaration of variable, name="
-                     << var_decl.name_;
-
-          error_msgs << "; attempt to redeclare as ";
-          print_var_origin(error_msgs, vo);  // FIXME -- need original vo
-
-          error_msgs << "; original declaration as ";
-          print_var_origin(error_msgs, vm.get_origin(var_decl.name_));
-
-          error_msgs << std::endl;
-          var_decl_result = var_decl;
-          return;
-        }
-        if ((vo == parameter_origin || vo == transformed_parameter_origin)
-            && var_decl.base_type_ == INT_T) {
-          pass = false;
-          error_msgs << "integer parameters or transformed parameters"
-                     << " are not allowed; "
-                     << " found declared type int, parameter name="
-                     << var_decl.name_
-                     << std::endl;
-          var_decl_result = var_decl;
-          return;
-        }
-        pass = true;  // probably don't need to set true
-        vm.add(var_decl.name_, var_decl, vo);
-        var_decl_result = var_decl;
-      }
-    };
-    boost::phoenix::function<add_var> add_var_f;
 
     template <typename Iterator>
     var_decls_grammar<Iterator>::var_decls_grammar(variable_map& var_map,

@@ -3,6 +3,7 @@
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/grammars/program_grammar.hpp>
+#include <stan/lang/grammars/semantic_actions.hpp>
 #include <boost/format.hpp>
 #include <boost/fusion/include/std_pair.hpp>
 #include <boost/spirit/home/support/iterators/line_pos_iterator.hpp>

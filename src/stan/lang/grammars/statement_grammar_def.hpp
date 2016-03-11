@@ -1,44 +1,19 @@
 #ifndef STAN_LANG_GRAMMARS_STATEMENT_GRAMMAR_DEF_HPP
 #define STAN_LANG_GRAMMARS_STATEMENT_GRAMMAR_DEF_HPP
 
-#include <boost/spirit/include/qi.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/config/warning_disable.hpp>
-#include <boost/fusion/include/adapt_struct.hpp>
-#include <boost/fusion/include/std_pair.hpp>
-#include <boost/spirit/include/phoenix_core.hpp>
-#include <boost/spirit/include/phoenix_function.hpp>
-#include <boost/spirit/include/phoenix_fusion.hpp>
-#include <boost/spirit/include/phoenix_object.hpp>
-#include <boost/spirit/include/phoenix_operator.hpp>
-#include <boost/spirit/include/phoenix_stl.hpp>
-#include <boost/spirit/include/qi_numeric.hpp>
-#include <boost/spirit/include/support_multi_pass.hpp>
-#include <boost/tuple/tuple.hpp>
-#include <boost/variant/apply_visitor.hpp>
-#include <boost/variant/recursive_variant.hpp>
-
-#include <boost/spirit/include/version.hpp>
-#include <boost/spirit/include/support_line_pos_iterator.hpp>
-
 #include <stan/lang/ast.hpp>
 #include <stan/lang/grammars/common_adaptors_def.hpp>
 #include <stan/lang/grammars/expression_grammar.hpp>
+#include <stan/lang/grammars/indexes_grammar.hpp>
+#include <stan/lang/grammars/semantic_actions.hpp>
 #include <stan/lang/grammars/statement_grammar.hpp>
 #include <stan/lang/grammars/var_decls_grammar.hpp>
 #include <stan/lang/grammars/whitespace_grammar.hpp>
-
-#include <cstddef>
-#include <iomanip>
-#include <istream>
-#include <map>
-#include <set>
+#include <boost/spirit/include/qi.hpp>
+#include <boost/phoenix/phoenix.hpp> 
 #include <sstream>
-#include <stdexcept>
 #include <string>
-#include <utility>
 #include <vector>
-
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::assgn,
                           (stan::lang::variable, lhs_var_)
@@ -123,7 +98,7 @@ namespace stan {
       // raw[ ] just to wrap to get line numbers
       statement_r.name("statement");
       statement_r
-        = raw[statement_sub_r(_r1, _r2, _r3)[set_statement_f(_val, _1)]]
+        = raw[statement_sub_r(_r1, _r2, _r3)[assign_lhs_f(_val, _1)]]
         [add_line_number_f(_val, begin(_1), end(_1))];
 
       statement_sub_r.name("statement");
@@ -149,7 +124,7 @@ namespace stan {
       statement_seq_r.name("sequence of statements");
       statement_seq_r
         %= lit('{')
-        > local_var_decls_r[set_var_decls_f(_a, _1)]
+        > local_var_decls_r[assign_lhs_f(_a, _1)]
         > *statement_r(_r1, _r2, _r3)
         > lit('}')
         > eps[unscope_locals_f(_a, boost::phoenix::ref(var_map_))];

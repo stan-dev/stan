@@ -1,10 +1,10 @@
 #ifndef STAN_LANG_GRAMMARS_TERM_GRAMMAR_DEF_HPP
 #define STAN_LANG_GRAMMARS_TERM_GRAMMAR_DEF_HPP
 
-
 #include <stan/lang/ast.hpp>
 #include <stan/lang/grammars/expression_grammar.hpp>
 #include <stan/lang/grammars/indexes_grammar.hpp>
+#include <stan/lang/grammars/semantic_actions.hpp>
 #include <stan/lang/grammars/term_grammar.hpp>
 #include <stan/lang/grammars/whitespace_grammar.hpp>
 #include <boost/spirit/include/qi.hpp>
@@ -85,7 +85,7 @@ namespace stan {
 
       term_r.name("expression");
       term_r
-        = (negated_factor_r(_r1)[set_expression_f(_val, _1)]
+        = (negated_factor_r(_r1)[assign_lhs_f(_val, _1)]
             >> *((lit('*') > negated_factor_r(_r1)
                              [multiplication_f(_val, _1,
                                            boost::phoenix::ref(error_msgs_))])
@@ -113,14 +113,14 @@ namespace stan {
         | lit('!') >> negated_factor_r(_r1)
                       [logical_negate_expr_f(_val, _1,
                                              boost::phoenix::ref(error_msgs_))]
-        | lit('+') >> negated_factor_r(_r1)[set_expression_f(_val, _1)]
-        | exponentiated_factor_r(_r1)[set_expression_f(_val, _1)]
-        | idx_factor_r(_r1)[set_expression_f(_val, _1)];
+        | lit('+') >> negated_factor_r(_r1)[assign_lhs_f(_val, _1)]
+        | exponentiated_factor_r(_r1)[assign_lhs_f(_val, _1)]
+        | idx_factor_r(_r1)[assign_lhs_f(_val, _1)];
 
 
       exponentiated_factor_r.name("expression");
       exponentiated_factor_r
-        = (idx_factor_r(_r1)[set_expression_f(_val, _1)]
+        = (idx_factor_r(_r1)[assign_lhs_f(_val, _1)]
            >> lit('^')
            > negated_factor_r(_r1)
              [exponentiation_f(_val, _1, _r1, _pass,
@@ -128,12 +128,12 @@ namespace stan {
 
       idx_factor_r.name("expression");
       idx_factor_r
-        =  factor_r(_r1)[set_expression_f(_val, _1)]
-        > *( ( (+dims_r(_r1))[set_expressionss_f(_a, _1)]
+        =  factor_r(_r1)[assign_lhs_f(_val, _1)]
+        > *( ( (+dims_r(_r1))[assign_lhs_f(_a, _1)]
                > eps
                [add_expression_dimss_f(_val, _a, _pass,
                                        boost::phoenix::ref(error_msgs_) )] )
-            | (indexes_g(_r1)[set_indexes_f(_b, _1)]
+            | (indexes_g(_r1)[assign_lhs_f(_b, _1)]
                > eps[add_idxs_f(_val, _b, _pass,
                               boost::phoenix::ref(error_msgs_))])
             | (lit("'")
@@ -192,19 +192,19 @@ namespace stan {
       
       factor_r.name("expression");
       factor_r =
-        integrate_ode_r(_r1)[set_expression_f(_val, _1)]
-        | integrate_ode_cvode_r(_r1)[set_expression_f(_val, _1)]
-        | (fun_r(_r1)[set_fun_f(_b, _1)]
+        integrate_ode_r(_r1)[assign_lhs_f(_val, _1)]
+        | integrate_ode_cvode_r(_r1)[assign_lhs_f(_val, _1)]
+        | (fun_r(_r1)[assign_lhs_f(_b, _1)]
            > eps[set_fun_type_named_f(_val, _b, _r1, _pass,
                                       boost::phoenix::ref(error_msgs_))])
-        | (variable_r[set_variable_f(_a, _1)]
+        | (variable_r[assign_lhs_f(_a, _1)]
            > eps[set_var_type_f(_a, _val, boost::phoenix::ref(var_map_),
                                 boost::phoenix::ref(error_msgs_),
                                 _pass)])
-        | int_literal_r[set_expression_f(_val, _1)]
-        | double_literal_r[set_expression_f(_val, _1)]
+        | int_literal_r[assign_lhs_f(_val, _1)]
+        | double_literal_r[assign_lhs_f(_val, _1)]
         | (lit('(')
-           > expression_g(_r1)[set_expression_f(_val, _1)]
+           > expression_g(_r1)[assign_lhs_f(_val, _1)]
            > lit(')'));
 
       int_literal_r.name("integer literal");

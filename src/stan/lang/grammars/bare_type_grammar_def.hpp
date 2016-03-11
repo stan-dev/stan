@@ -5,6 +5,7 @@
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <stan/lang/ast.hpp>
 #include <stan/lang/grammars/bare_type_grammar.hpp>
+#include <stan/lang/grammars/semantic_actions.hpp>
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::expr_type,
                           (stan::lang::base_expr_type, base_type_)
@@ -33,20 +34,20 @@ namespace stan {
       type_identifier_r.name("bare type identifier\n"
                 "  legal values: void, int, real, vector, row_vector, matrix");
       type_identifier_r
-        %= lit("void")[set_int_f(_val, VOID_T)]
-        | lit("int")[set_int_f(_val, INT_T)]
-        | lit("real")[set_int_f(_val, DOUBLE_T)]
-        | lit("vector")[set_int_f(_val, VECTOR_T)]
-        | lit("row_vector")[set_int_f(_val, ROW_VECTOR_T)]
-        | lit("matrix")[set_int_f(_val, MATRIX_T)];
+        %= lit("void")[assign_lhs_f(_val, VOID_T)]
+        | lit("int")[assign_lhs_f(_val, INT_T)]
+        | lit("real")[assign_lhs_f(_val, DOUBLE_T)]
+        | lit("vector")[assign_lhs_f(_val, VECTOR_T)]
+        | lit("row_vector")[assign_lhs_f(_val, ROW_VECTOR_T)]
+        | lit("matrix")[assign_lhs_f(_val, MATRIX_T)];
 
       array_dims_r.name("array dimensions,\n"
              "    e.g., empty (not an array) [] (1D array) or [,] (2D array)");
       array_dims_r
-        %= eps[set_size_t_f(_val, 0)]
-        >> - (lit('[')[set_size_t_f(_val, 1)]
-              > *(lit(',')[increment_size_t_f(_val)])
-              > end_bare_types_r);
+        %= eps[assign_lhs_f(_val, static_cast<size_t>(0))]
+        >> -(lit('[')[assign_lhs_f(_val, static_cast<size_t>(1))]
+             > *(lit(',')[increment_size_t_f(_val)])
+             > end_bare_types_r);
 
       end_bare_types_r.name("comma to indicate more dimensions"
                             " or ] to end type declaration");

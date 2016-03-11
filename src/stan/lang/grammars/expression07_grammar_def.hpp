@@ -9,6 +9,7 @@
 #include <stan/lang/grammars/term_grammar.hpp>
 #include <stan/lang/grammars/expression_grammar.hpp>
 #include <stan/lang/grammars/expression07_grammar.hpp>
+#include <stan/lang/grammars/semantic_actions.hpp>
 #include <sstream>
 #include <string>
 
@@ -34,7 +35,7 @@ namespace stan {
       expression07_r.name("expression");
       expression07_r
         %=  term_g(_r1)
-            [set_expression_f(_val, _1)]
+            [assign_lhs_f(_val, _1)]
         > *((lit('+')
              > term_g(_r1)
                [addition3_f(_val, _1, boost::phoenix::ref(error_msgs))])
