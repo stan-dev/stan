@@ -26,7 +26,6 @@ namespace stan {
       : public boost::spirit::qi::grammar<Iterator,
                                           expression(var_origin),
                                           whitespace_grammar<Iterator> > {
-
       term_grammar(variable_map& var_map, std::stringstream& error_msgs,
                    expression_grammar<Iterator>& eg);
 

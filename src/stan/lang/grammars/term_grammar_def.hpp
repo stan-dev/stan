@@ -185,11 +185,11 @@ namespace stan {
         > expression_g(_r1)     // absolute tolerance (data only)
         > lit(',')
         > expression_g(_r1)     // maximum number of steps (data only)
-        > lit(')') 
+        > lit(')')
           [validate_integrate_ode_cvode_f(_val, boost::phoenix::ref(var_map_),
                                           _pass,
                                           boost::phoenix::ref(error_msgs_))];
-      
+
       factor_r.name("expression");
       factor_r =
         integrate_ode_r(_r1)[assign_lhs_f(_val, _1)]

@@ -11,7 +11,7 @@
 #include <utility>
 #include <vector>
 
-namespace stan { 
+namespace stan {
 
   namespace lang {
 
@@ -202,7 +202,7 @@ namespace stan {
                       std::ostream& error_msgs) const;
     };
     extern boost::phoenix::function<addition_expr3> addition3_f;
-    
+
     // called from: expression07_grammar
     struct subtraction_expr3 : public phoenix_functor_ternary<void> {
       void operator()(expression& expr1, const expression& expr2,
@@ -223,7 +223,7 @@ namespace stan {
                      std::ostream& error_msgs) const;
     };
     extern boost::phoenix::function<binary_op_expr> binary_op_f;
-    
+
     // called from: functions_grammar
     struct validate_non_void_arg_function
       : public phoenix_functor_ternary<void> {
@@ -747,8 +747,9 @@ namespace stan {
 
     struct add_var : public phoenix_functor_senary<void> {
       template <typename T>
-      void operator()(var_decl& var_decl_result, const T& var_decl, variable_map& vm,
-                      bool& pass, const var_origin& vo, std::ostream& error_msgs)
+      void operator()(var_decl& var_decl_result, const T& var_decl,
+                      variable_map& vm, bool& pass, const var_origin& vo,
+                      std::ostream& error_msgs)
         const;
     };
     extern boost::phoenix::function<add_var> add_var_f;

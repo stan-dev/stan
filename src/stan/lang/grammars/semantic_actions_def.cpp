@@ -2,7 +2,7 @@
 #define STAN_LANG_GRAMMARS_SEMANTIC_ACTIONS_DEF_CPP
 
 #include <stan/lang/ast.hpp>
-#include <stan/lang/grammars/iterator_typedefs.hpp>  
+#include <stan/lang/grammars/iterator_typedefs.hpp>
 #include <stan/lang/grammars/semantic_actions.hpp>
 #include <boost/format.hpp>
 #include <boost/spirit/include/qi.hpp>
@@ -20,7 +20,7 @@
 #include <utility>
 #include <vector>
 
-namespace stan { 
+namespace stan {
 
   namespace lang {
 
@@ -37,11 +37,12 @@ namespace stan {
     }
     boost::phoenix::function<assign_lhs> assign_lhs_f;
 
-    
     template void assign_lhs::operator()(expression&, const expression&) const;
-    template void assign_lhs::operator()(expression&, const double_literal&) const;
+    template void assign_lhs::operator()(expression&, const double_literal&)
+      const;
     template void assign_lhs::operator()(expression&, const int_literal&) const;
-    template void assign_lhs::operator()(expression&, const integrate_ode&) const;
+    template void assign_lhs::operator()(expression&, const integrate_ode&)
+      const;
     template void assign_lhs::operator()(expression&,
                                          const integrate_ode_cvode&)
       const;
@@ -57,9 +58,6 @@ namespace stan {
         const std::vector<std::vector<expression> >&) const;
     template void assign_lhs::operator()(fun&, const fun&) const;
     template void assign_lhs::operator()(variable&, const variable&) const;
-                                         
-
-
 
     void validate_expr_type3::operator()(const expression& expr, bool& pass,
                                          std::ostream& error_msgs) const {
@@ -800,8 +798,9 @@ namespace stan {
                    << "Left-hand side of sampling statement (~) may contain a"
                    << " non-linear transform of a parameter or local variable."
                    << std::endl
-                   << "If so, you need to call increment_log_prob() with the log"
-                   << " absolute determinant of the Jacobian of the transform."
+                   << "If so, you need to call increment_log_prob() with"
+                   << "  the log absolute determinant of the Jacobian of"
+                   << " the transform."
                    << std::endl
                    << "Left-hand-side of sampling statement:"
                    << std::endl
@@ -1470,7 +1469,6 @@ namespace stan {
     }
     boost::phoenix::function<division_expr> division_f;
 
- 
     void modulus_expr::operator()(expression& expr1, const expression& expr2,
                                   bool& pass, std::ostream& error_msgs) const {
       if (!expr1.expression_type().is_primitive_int()
@@ -2198,7 +2196,7 @@ namespace stan {
         pass = false;
         error_msgs << "duplicate declaration of variable, name="
                    << var_decl.name_;
-        
+
         error_msgs << "; attempt to redeclare as ";
         print_var_origin(error_msgs, vo);  // FIXME -- need original vo
 
@@ -2226,15 +2224,15 @@ namespace stan {
     }
     boost::phoenix::function<add_var> add_var_f;
 
-    // add_var's operator() needs to be explicitly instantatiated
-    //    template void add_var::operator()<nil>(var_decl&, const nil&, variable_map&, 
-    // bool&, const var_origin&, std::ostream&) const;
-    template void add_var::operator()(var_decl&, const int_var_decl&, variable_map&, 
-                                      bool&, const var_origin&, std::ostream&) const;
-    template void add_var::operator()(var_decl&, const double_var_decl&, variable_map&, 
-                                      bool&, const var_origin&, std::ostream&) const;
-    template void add_var::operator()(var_decl&, const vector_var_decl&, variable_map&, 
-                                      bool&, const var_origin&, std::ostream&) const;
+    template void add_var::operator()(var_decl&, const int_var_decl&,
+                                      variable_map&, bool&, const var_origin&,
+                                      std::ostream&) const;
+    template void add_var::operator()(var_decl&, const double_var_decl&,
+                                      variable_map&, bool&, const var_origin&,
+                                      std::ostream&) const;
+    template void add_var::operator()(var_decl&, const vector_var_decl&,
+                                      variable_map&, bool&, const var_origin&,
+                                      std::ostream&) const;
     template void add_var::operator()(var_decl&, const row_vector_var_decl&,
                                       variable_map&, bool&, const var_origin&,
                                       std::ostream&) const;
@@ -2250,10 +2248,12 @@ namespace stan {
     template void add_var::operator()(var_decl&, const ordered_var_decl&,
                                       variable_map&, bool&, const var_origin&,
                                       std::ostream&) const;
-    template void add_var::operator()(var_decl&, const positive_ordered_var_decl&,
+    template void add_var::operator()(var_decl&,
+                                      const positive_ordered_var_decl&,
                                       variable_map&, bool&, const var_origin&,
                                       std::ostream&) const;
-    template void add_var::operator()(var_decl&, const cholesky_factor_var_decl&,
+    template void add_var::operator()(var_decl&,
+                                      const cholesky_factor_var_decl&,
                                       variable_map&, bool&, const var_origin&,
                                       std::ostream&) const;
     template void add_var::operator()(var_decl&, const cholesky_corr_var_decl&,
