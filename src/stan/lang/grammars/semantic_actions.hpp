@@ -1,7 +1,8 @@
 #ifndef STAN_LANG_GRAMMARS_SEMANTIC_ACTIONS_HPP
 #define STAN_LANG_GRAMMARS_SEMANTIC_ACTIONS_HPP
 
-#include <stan/lang/grammars/iterator_typedefs.hpp>  // only in program_error
+#include <stan/lang/ast.hpp>
+#include <stan/lang/grammars/iterator_typedefs.hpp>
 #include <boost/variant/recursive_variant.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <map>
