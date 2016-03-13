@@ -799,7 +799,7 @@ namespace stan {
                    << " non-linear transform of a parameter or local variable."
                    << std::endl
                    << "If so, you need to call increment_log_prob() with"
-                   << "  the log absolute determinant of the Jacobian of"
+                   << " the log absolute determinant of the Jacobian of"
                    << " the transform."
                    << std::endl
                    << "Left-hand-side of sampling statement:"
