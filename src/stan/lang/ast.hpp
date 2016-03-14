@@ -694,8 +694,24 @@ namespace stan {
       std::string operator()(const corr_matrix_var_decl& x) const;
     };
 
-
-
+    struct var_decl_base_type_vis
+      : public boost::static_visitor<base_var_decl> {
+      var_decl_base_type_vis();
+      base_var_decl operator()(const nil& x) const;
+      base_var_decl operator()(const int_var_decl& x) const;
+      base_var_decl operator()(const double_var_decl& x) const;
+      base_var_decl operator()(const vector_var_decl& x) const;
+      base_var_decl operator()(const row_vector_var_decl& x) const;
+      base_var_decl operator()(const matrix_var_decl& x) const;
+      base_var_decl operator()(const simplex_var_decl& x) const;
+      base_var_decl operator()(const unit_vector_var_decl& x) const;
+      base_var_decl operator()(const ordered_var_decl& x) const;
+      base_var_decl operator()(const positive_ordered_var_decl& x) const;
+      base_var_decl operator()(const cholesky_factor_var_decl& x) const;
+      base_var_decl operator()(const cholesky_corr_var_decl& x) const;
+      base_var_decl operator()(const cov_matrix_var_decl& x) const;
+      base_var_decl operator()(const corr_matrix_var_decl& x) const;
+    };
 
     struct var_decl {
       typedef boost::variant<boost::recursive_wrapper<nil>,
@@ -737,6 +753,7 @@ namespace stan {
       var_decl(const corr_matrix_var_decl& decl);  // NOLINT(runtime/explicit)
 
       std::string name() const;
+      base_var_decl base_decl() const;
     };
 
     struct statement {
@@ -1060,5 +1077,4 @@ namespace stan {
 
   }
 }
-
 #endif

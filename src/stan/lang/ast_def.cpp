@@ -488,7 +488,7 @@ namespace stan {
       using std::set;
       using std::string;
       using std::vector;
-      set<string> result;
+      set<std::string> result;
       for (map<string, vector<function_signature_t> >::const_iterator
              it = sigs_map_.begin();
            it != sigs_map_.end();
@@ -1218,10 +1218,7 @@ namespace stan {
     base_var_decl::base_var_decl(const std::string& name,
                                  const std::vector<expression>& dims,
                                  const base_expr_type& base_type)
-      : name_(name),
-          dims_(dims),
-        base_type_(base_type) {
-    }
+      : name_(name), dims_(dims), base_type_(base_type) {  }
 
     bool variable_map::exists(const std::string& name) const {
       return map_.find(name) != map_.end();
@@ -1439,8 +1436,67 @@ namespace stan {
       return x.name_;
     }
 
+    var_decl_base_type_vis::var_decl_base_type_vis() { }
+    base_var_decl var_decl_base_type_vis::operator()(const nil& /* x */)
+      const {
+      return base_var_decl();  // should not be called
+    }
+    base_var_decl var_decl_base_type_vis::operator()(const int_var_decl& x)
+      const {
+      return x.base_type_;
+    }
+    base_var_decl var_decl_base_type_vis::operator()(const double_var_decl& x)
+      const {
+      return x.base_type_;
+    }
+    base_var_decl var_decl_base_type_vis::operator()(const vector_var_decl& x)
+      const {
+      return x.base_type_;
+    }
+    base_var_decl var_decl_base_type_vis::operator()(
+                                    const row_vector_var_decl& x) const {
+      return x.base_type_;
+    }
+    base_var_decl var_decl_base_type_vis::operator()(const matrix_var_decl& x)
+      const {
+      return x.base_type_;
+    }
+    base_var_decl var_decl_base_type_vis::operator()(
+                                    const unit_vector_var_decl& x) const {
+      return x.base_type_;
+    }
+    base_var_decl var_decl_base_type_vis::operator()(
+                                     const simplex_var_decl& x) const {
+      return x.base_type_;
+    }
+    base_var_decl var_decl_base_type_vis::operator()(
+                                     const ordered_var_decl& x) const {
+      return x.base_type_;
+    }
+    base_var_decl var_decl_base_type_vis::operator()(
+                             const positive_ordered_var_decl& x) const {
+      return x.base_type_;
+    }
+    base_var_decl var_decl_base_type_vis::operator()(
+                                     const cholesky_factor_var_decl& x) const {
+      return x.base_type_;
+    }
+    base_var_decl var_decl_base_type_vis::operator()(
+                                     const cholesky_corr_var_decl& x) const {
+      return x.base_type_;
+    }
+    base_var_decl var_decl_base_type_vis::operator()(
+                                     const cov_matrix_var_decl& x) const {
+      return x.base_type_;
+    }
+    base_var_decl var_decl_base_type_vis::operator()(
+                                     const corr_matrix_var_decl& x) const {
+      return x.base_type_;
+    }
 
-    // can't template out in .cpp file
+
+
+   // can't template out in .cpp file
 
     var_decl::var_decl(const var_decl_t& decl) : decl_(decl) { }
     var_decl::var_decl() : decl_(nil()) { }
@@ -1461,6 +1517,10 @@ namespace stan {
 
     std::string var_decl::name() const {
       return boost::apply_visitor(name_vis(), decl_);
+    }
+
+    base_var_decl var_decl::base_decl() const {
+      return boost::apply_visitor(var_decl_base_type_vis(), decl_);
     }
 
     statement::statement() : statement_(nil()) { }
@@ -1848,6 +1908,4 @@ namespace stan {
 
   }
 }
-
-
 #endif
