@@ -68,7 +68,7 @@ TEST(StanIoMcmcWriter, write_sample_names) {
   std::string line;
   std::getline(sample_stream, line);
 
-  EXPECT_EQ("lp__,accept_stat__,stepsize__,treedepth__,n_leapfrog__,divergent__,E__,mu1,mu2", line);
+  EXPECT_EQ("lp__,accept_stat__,stepsize__,treedepth__,n_leapfrog__,divergent__,energy__,mu1,mu2", line);
   EXPECT_EQ("", message_stream.str());
   EXPECT_EQ("", output.str());
 }
@@ -292,7 +292,7 @@ TEST(StanIoMcmcWriter, write_diagnostic_names) {
   std::getline(diagnostic_stream, line);
 
   // FIXME: make this work, too
-  EXPECT_EQ("lp__,accept_stat__,stepsize__,treedepth__,n_leapfrog__,divergent__,E__,mu1,mu2,p_mu1,p_mu2,g_mu1,g_mu2", line);
+  EXPECT_EQ("lp__,accept_stat__,stepsize__,treedepth__,n_leapfrog__,divergent__,energy__,mu1,mu2,p_mu1,p_mu2,g_mu1,g_mu2", line);
 
   EXPECT_EQ("", message_stream.str());
   EXPECT_EQ("", output.str());
