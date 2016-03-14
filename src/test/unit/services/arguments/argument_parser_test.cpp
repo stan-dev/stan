@@ -19,19 +19,14 @@ using stan::services::error_codes;
 class StanServicesArgumentsArgumentParser : public testing::Test {
 public:
   void SetUp() {
-    // copied setup from src/stan/common/command.hpp
-    // FIXME: move to factory?
-    valid_arguments.push_back(new arg_id());
-    valid_arguments.push_back(new arg_data());
-    valid_arguments.push_back(new arg_init());
-    valid_arguments.push_back(new arg_random());
-    valid_arguments.push_back(new arg_output());
-    
-    parser = new argument_parser(valid_arguments);
+    parser = new argument_parser();
+    parser->push_valid_arg(new arg_id());
+    parser->push_valid_arg(new arg_data());
+    parser->push_valid_arg(new arg_init());
+    parser->push_valid_arg(new arg_random());
+    parser->push_valid_arg(new arg_output());
   }
   void TearDown() {
-    for (size_t i = 0; i < valid_arguments.size(); ++i)
-      delete valid_arguments.at(i);
     delete(parser);
   }
   
