@@ -2561,19 +2561,31 @@ assignment statement's execution.
 \section{Log Probability Increment Statement}\label{increment-log-prob.section}
 
 The basis of Stan's execution is the evaluation of a log probability
-function for a given set of parameters.  Data and transformed data are
-fixed before the log density is evaluated.  The total log probability
-is initialized to zero.  Next, any log Jacobian adjustments accrued by
-the variable constraints are added to the log density (the Jacobian
-adjustment may be skipped for optimization).  Sampling and log
-probability increment statements may add to the log density in the
-model block.  A log probability increment statement directly
-increments the log density with the value of an expression, e.g.,
+function for a given set of parameters; this function returns the log
+density of the posterior up to an additive constant.  Data and
+transformed data are fixed before the log density is evaluated.  The
+total log probability is initialized to zero.  Next, any log Jacobian
+adjustments accrued by the variable constraints are added to the log
+density (the Jacobian adjustment may be skipped for optimization).
+Sampling and log probability increment statements may add to the log
+density in the model block.  A log probability increment statement
+directly increments the log density with the value of an expression
+as follows.%
+%
+\footnote{The current notation replaces two previous versions.
+  Originally, a variable \code{lp\_\_} was directly exposed and
+  manipulated;  this is no longer allowed.  The original statement
+  syntax for \code{target += u} was \code{increment\_log\_prob(u)},
+  but this form has been deprecated and will be removed in Stan 3.}
 %
 \begin{stancode}
-increment_log_prob(-0.5 * y * y);
+target += -0.5 * y * y;
 \end{stancode}
 %
+The keyword \code{target} here is actually not a variable, and may not
+be accessed as such (though see below on how to access the value of
+target through a special function).
+
 In this example, the unnormalized log probability of a unit normal
 variable $y$ is added to the total log probability.  In the general
 case, the argument can be any expression.%
@@ -2596,7 +2608,7 @@ parameters {
   real y;
 }
 model {
-  increment_log_prob(-0.5 * y * y);
+  target += -0.5 * y * y;
 }
 \end{stancode}
 %
@@ -2624,38 +2636,36 @@ intractable to evaluate.
 
 \subsubsection{Vectorization}
 
-The \code{increment\_log\_prob} function accepts parameters of any
-expression type, including integers, reals, vectors, row vectors,
-matrices, and arrays of any dimensionality, including arrays of
-vectors and matrices.
+The \code{target += ...} statement accepts an argument in place of
+\code{...} for any expression type, including integers, reals,
+vectors, row vectors, matrices, and arrays of any dimensionality,
+including arrays of vectors and matrices.   For container arguments,
+their sum will be added to the total log density.
 
-\subsection{Log Probability Variable \code{lp\_\_}}
+\subsection{Accessing the Log Density}
 
-Before version 2.0 of Stan, rather than writing
+To increment the log density returned by the model by some value
+\code{u}, use the following statement.%
+%
+\footnote{Originally, Stan provided direct access to the log density
+  through a variable \code{lp\_\_} and then later through the
+  \code{increment\_log\_prob()} statement, but the first has been
+  removed and the latter deprecated.}
 %
 \begin{stancode}
-increment_log_prob(u);
+target += u;
 \end{stancode}
 %
-it was necessary to manipulate a special variable \code{lp\_\_}
-as follows
+In general, \code{u} can be any expression;  if it is a container, the
+log density will be incremented by the sum of the elements in the
+container.
+
+To access accumulated log density up to the current execution point,
+the function \code{get\_lp()} may be used.%
 %
-\begin{stancode}
-lp__ = lp__ + u;
-\end{stancode}
-%
-The special variable \code{lp\_\_} refers to the log probability value
-that will be returned by Stan's log probability function.
-
-\subsubsection{Deprecation of \code{lp\_\_}}
-
-As of Stan version 2.0, the use of \code{lp\_\_} is deprecated.  It
-will be removed altogether in a future release, but until that time,
-programs still work with \code{lp\_\_}.  A deprecation warning is now
-printed every time \code{lp\_\_} is used.
-
-To access the value of \code{lp\_\_} for printing, use the
-\code{get\_lp} function (see \refsection{get-lp}).
+\footnote{The value of \code{lp\_\_} will only hold the Jacobian until
+  the end of the execution because it is not used in either
+  \code{increment\_log\_prob(u)} or \code{target += u}.}
 
 
 \section{Sampling Statements}\label{sampling-statements.section}
@@ -2679,7 +2689,7 @@ sampling statement could be expressed as a direct increment on the
 total log probability as
 %
 \begin{stancode}
-increment_log_prob(normal_log(y,mu,sigma));
+target += normal_log(y,mu,sigma);
 \end{stancode}
 %
 See the subsection of \refsection{sampling-statements} discussing log
@@ -2696,7 +2706,7 @@ case where \code{N} is zero) will be well formed if and only if the
 corresponding assignment statement is well-formed,
 %
 \begin{stancode}
-increment_log_prob(dist_log(ex0,ex1,...,exN));
+target += dist_log(ex0,ex1,...,exN);
 \end{stancode}
 %
 This will be well formed if and only if
@@ -2715,7 +2725,7 @@ y ~ normal(mu,sigma);
 and explicitly incrementing the log probability function, as in
 %
 \begin{stancode}
-increment_log_prob(normal_log(y,mu,sigma));
+target += normal_log(y,mu,sigma);
 \end{stancode}
 %
 The sampling statement drops all the terms in the log probability
@@ -2755,7 +2765,7 @@ account for the log transform.%
   |y|$;  see \refsection{change-of-variables}.}
 %
 \begin{stancode}
-increment_log_prob(- log(fabs(y)));
+target += - log(fabs(y));
 \end{stancode}
 %
 
@@ -2823,9 +2833,8 @@ the accumulated log probability.  For instance, this example has the
 same translation (up to arithmetic precision issues; see below) as
 %
 \begin{stancode}
-increment_log_prob(normal_log(y,0,1));
-increment_log_prob(-(log(normal_cdf(2.1,0,1)
-                         - normal_cdf(-0.5,0,1))));
+target += normal_log(y,0,1);
+target += -(log(normal_cdf(2.1,0,1) - normal_cdf(-0.5,0,1))));
 \end{stancode}
 %
 The function \code{normal\_cdf} represents the cumulative normal
@@ -2844,8 +2853,8 @@ the normal distribution is \code{normal\_cdf\_log} and the ccdf is
 introduced by truncation is equivalent to
 %
 \begin{stancode}
-increment_log_prob(-log_diff_exp(normal_cdf_log(2.1,0,1),
-                                 normal_cdf_log(-0.5,0,1)));
+target += -log_diff_exp(normal_cdf_log(2.1,0,1),
+                        normal_cdf_log(-0.5,0,1));
 \end{stancode}
 %
 
@@ -2870,15 +2879,15 @@ the accumulated log probability (see the subsection of
 and sampling statements for more information).
 %
 \begin{stancode}
-increment_log_prob(normal_log(y, 0, 1));
-increment_log_prob(-(log(1 - normal_cdf(-0.5, 0, 1))));
+target += normal_log(y, 0, 1);
+target += -log(1 - normal_cdf(-0.5, 0, 1));
 \end{stancode}
 %
 The denominator (second line above) is implemented with the more
 efficient and stable version
 %
 \begin{stancode}
-increment_log_prob(-normal_ccdf_log(-0.5, 0, 1));
+target += -normal_ccdf_log(-0.5, 0, 1);
 \end{stancode}
 
 The density $p(x)$ can be truncated above by $b$ to define a density
@@ -2898,8 +2907,8 @@ The truncation has the same effect as the following direct update to
 the accumulated log probability.
 %
 \begin{stancode}
-increment_log_prob(normal_log(y, 0, 1));
-increment_log_prob(-normal_cdf_log(2.1, 0, 1));
+target += normal_log(y, 0, 1);
+target += -normal_cdf_log(2.1, 0, 1);
 \end{stancode}
 
 In all cases, the truncation is only well formed if the
@@ -3625,7 +3634,7 @@ increment statements must have a name that ends in \code{\_lp}.
 Attempts to use sampling statements or increment log probability
 statements in other functions leads to a compile-time error.
 
-Like the \code{increment\_log\_prob} statement and sampling
+Like the target log density increment statement and sampling
 statements, user-defined functions with names that end in \code{\_lp}
 may only be used in blocks where the log probability accumulator is
 accessible, namely the transformed parameters and model blocks.  An
@@ -3656,7 +3665,7 @@ z ~ foo(phi);
 to have the exact same effect as
 %
 \begin{stancode}
-increment_log_prob(foo_log(z,phi));
+target += foo_log(z,phi);
 \end{stancode}
 %
 so that functions that are going to be accessed as distributions
@@ -4664,6 +4673,7 @@ atomic_statement_body
    | expression '~' identifier '(' expressions ')' ?truncation
    | function_literal '(' expressions ')'
    | 'increment_log_prob' '(' expression ')'
+   | 'target' '+=' expression
    | 'print' '(' (expression | string_literal)* ')'
    | 'reject' '(' (expression | string_literal)* ')'
    | 'return' expression

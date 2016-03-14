@@ -1,23 +1,19 @@
 \part{Built-In Functions}\label{built-in-functions.part}
 
-
-
-
 \chapter{Void Functions}
 
 Stan does not technically support functions that do not return values.
 It does support two types of statements that look like functions, one
 for incrementing log probabilities and one for printing.
 Documentation on these functions is included here for completeness.
+The special keyword \code{void} is used for the return type of void
+functions. 
 
-Although it's not part of Stan's type language, in this chapter,
-\code{void} will be used for the return type.
+\section{Increment Log Probability (deprecated)}
 
-\section{Increment Log Probability}
-
-There is a special function \code{increment\_log\_prob} takes a single
-argument of any expression type \code{T}.
-%
+The increment log density statement, \code{increment\_log\_prob(...)}
+syntactically appears to be a function, but is treated as its own
+special statement.
 \begin{description}
   \fitem{void}{increment\_log\_prob}{T \farg{lp}}{Add \farg{lp} (or
     elements of \farg{lp} if \code{T} is a container type) to the
@@ -25,17 +21,25 @@ argument of any expression type \code{T}.
     function defined by a Stan model.}
 \end{description}
 %
-The expression \code{lp} can be of any expression type.  Specifically,
-it can be an integer or real primitive, a vector, row vector, or
-matrix, or an array of any type, including multidimensional arrays and
-arrays of matrices, vectors, or row vectors.  Vector arguments are
-included for convenience and have no speed advantage over adding
-values in a loop.
+As of Stan 2.10, the \code{increment\_log\_prob()} statement has been
+deprecated in favor of the \code{target~+=} syntax, with exactly the
+same behavior.
+%
+\begin{description}
+  \fitem{void}{target~+=}{T \farg{lp}}{Add \farg{lp} (or
+    elements of \farg{lp} if \code{T} is a container type) to the
+    total log probability accumulator returned by the log probability
+    function defined by a Stan model.}
+\end{description}
+%
 
-The full behavior of the \code{increment\_log\_prob} statement and its
-relation to sampling statements is described in
-\refsection{increment-log-prob}.
-
+In both cases, the expression \code{lp} can be of any expression type.
+Specifically, it can be an integer or real primitive, a vector, row
+vector, or matrix, or an array of any type, including multidimensional
+arrays and arrays of matrices, vectors, or row vectors.  Vector
+arguments are included for convenience and have no speed advantage
+over adding values in a loop.  See \refsection{increment-log-prob} for
+more information on \code{target +=} and \code{increment\_log\_prob}.
 
 \section{Print}
 
@@ -290,24 +294,31 @@ executed on the constrained parmeters, with each sampling statement
 of the model block execution, the value of the log probability
 accumulator is the log probability value returned by the Stan program.
 
-Stan provides a special built-in function \code{get\_lp} that takes no
+Stan provides a special built-in function \code{target()} that takes no
 arguments and returns the current value of the log probability
-accumulator.  This function is primarily useful for debugging
-purposes, where for instance, it may be used with a print statement to
-display the log probability accumulator at various stages of execution
-to see where it becomes ill defined.
+accumulator.%
+%
+\footnote{This function used to be called \code{get\_lp()}, but that
+  name has been deprecated; using it will print a warning.  The
+  function \code{get\_lp()} will be removed in a future release.}
+
+This function is primarily useful for debugging purposes, where for
+instance, it may be used with a print statement to display the log
+probability accumulator at various stages of execution to see where it
+becomes ill defined.
 
 \begin{description}
-  \fitem{real}{get\_lp}{}{
+  \fitem{real}{target}{}{
     Returns the current value of the log probability
     accumulator.}
+  \fitem{real}{get\_lp}{}{
+    Returns the current value of the log probability
+    accumulator; {\bfseries deprecated:} --- use \code{target()} instead).}
 \end{description}
 
-Like user-defined functions that end in \code{\_lp}, the log
-probability get function may only be used in the transformed parameter
-and model blocks, as well as in the bodies of functions with names
-that also end in \code{\_lp}.
-
+Both \code{target} and the deprecated \code{get\_lp} act like other
+functions ending in \code{\_lp}, meaning that they may only may only
+be used in the model block.
 
 \section{Logical Functions}
 

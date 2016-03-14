@@ -334,7 +334,7 @@ add("gaussian_dlm_obs_log", DOUBLE_T, MATRIX_T, MATRIX_T, MATRIX_T,
     MATRIX_T, MATRIX_T, VECTOR_T, MATRIX_T);
 add("gaussian_dlm_obs_log", DOUBLE_T, MATRIX_T, MATRIX_T, MATRIX_T,
     VECTOR_T, MATRIX_T, VECTOR_T, MATRIX_T);
-add_nullary("get_lp");  // special handling in term_grammar_def
+add_nullary("get_lp");  // because of get
 for (size_t i = 0; i < vector_types.size(); ++i) {
   for (size_t j = 0; j < vector_types.size(); ++j) {
     for (size_t k = 0; k < vector_types.size(); ++k) {
@@ -873,6 +873,7 @@ for (size_t i = 0; i < base_types.size(); ++i) {
 }
 add_unary("tan");
 add_unary("tanh");
+add_nullary("target");  // converted to "get_lp" in term_grammar semantics
 add("tcrossprod", MATRIX_T, MATRIX_T);
 add_unary("tgamma");
 add("to_array_1d", expr_type(DOUBLE_T, 1), MATRIX_T);
