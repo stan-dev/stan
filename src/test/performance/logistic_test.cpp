@@ -127,7 +127,7 @@ TEST_F(performance, values_from_tagged_version) {
     << "divergent__: index 5";
 
   EXPECT_FLOAT_EQ(66.082497, first_run[6])
-    << "E__: index 6";
+    << "energy__: index 6";
 
   EXPECT_FLOAT_EQ(1.4754699, first_run[7])
     << "beta.1: index 7";
@@ -182,7 +182,7 @@ TEST_F(performance, check_output_is_same) {
   ASSERT_TRUE(file_stream.good());
 
   getline(file_stream, line);
-  ASSERT_EQ("lp__,accept_stat__,stepsize__,treedepth__,n_leapfrog__,divergent__,E__,beta.1,beta.2", line);
+  ASSERT_EQ("lp__,accept_stat__,stepsize__,treedepth__,n_leapfrog__,divergent__,energy__,beta.1,beta.2", line);
   ASSERT_TRUE(file_stream.good());
 
   getline(file_stream, line);

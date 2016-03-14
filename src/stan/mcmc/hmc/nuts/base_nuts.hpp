@@ -35,7 +35,7 @@ namespace stan {
       base_nuts(Model &model, BaseRNG& rng)
         : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
         depth_(0), max_depth_(5), max_delta_(1000),
-        n_leapfrog_(0), divergent_(0) {
+        n_leapfrog_(0), divergent_(0), energy_(0) {
       }
 
       ~base_nuts() {}
@@ -145,6 +145,7 @@ namespace stan {
         double accept_prob = util.sum_prob / static_cast<double>(util.n_tree);
 
         this->z_.ps_point::operator=(z_sample);
+        this->energy_ = this->hamiltonian_.H(this->z_);
         return sample(this->z_.q, - this->z_.V, accept_prob);
       }
 
@@ -153,7 +154,7 @@ namespace stan {
         names.push_back("treedepth__");
         names.push_back("n_leapfrog__");
         names.push_back("divergent__");
-        names.push_back("E__");
+        names.push_back("energy__");
       }
 
       void get_sampler_params(std::vector<double>& values) {
@@ -161,7 +162,7 @@ namespace stan {
         values.push_back(this->depth_);
         values.push_back(this->n_leapfrog_);
         values.push_back(this->divergent_);
-        values.push_back(this->hamiltonian_.H(this->z_));
+        values.push_back(this->energy_);
       }
 
       virtual bool compute_criterion(ps_point& start,
@@ -239,6 +240,7 @@ namespace stan {
 
       int n_leapfrog_;
       int divergent_;
+      double energy_;
     };
 
   }  // mcmc

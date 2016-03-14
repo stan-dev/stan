@@ -35,7 +35,7 @@
 #   file = blocker.0.csv
 #   diagnostic_file =  (Default)
 #   refresh = 100 (Default)
-lp__,accept_stat__,stepsize__,treedepth__,n_leapfrog__,divergent__,E__,d,sigmasq_delta,mu.1,mu.2,mu.3,mu.4,mu.5,mu.6,mu.7,mu.8,mu.9,mu.10,mu.11,mu.12,mu.13,mu.14,mu.15,mu.16,mu.17,mu.18,mu.19,mu.20,mu.21,mu.22,delta.1,delta.2,delta.3,delta.4,delta.5,delta.6,delta.7,delta.8,delta.9,delta.10,delta.11,delta.12,delta.13,delta.14,delta.15,delta.16,delta.17,delta.18,delta.19,delta.20,delta.21,delta.22,delta_new,sigma_delta
+lp__,accept_stat__,stepsize__,treedepth__,n_leapfrog__,divergent__,energy__,d,sigmasq_delta,mu.1,mu.2,mu.3,mu.4,mu.5,mu.6,mu.7,mu.8,mu.9,mu.10,mu.11,mu.12,mu.13,mu.14,mu.15,mu.16,mu.17,mu.18,mu.19,mu.20,mu.21,mu.22,delta.1,delta.2,delta.3,delta.4,delta.5,delta.6,delta.7,delta.8,delta.9,delta.10,delta.11,delta.12,delta.13,delta.14,delta.15,delta.16,delta.17,delta.18,delta.19,delta.20,delta.21,delta.22,delta_new,sigma_delta
 # Adaptation terminated
 # Step size = 0.118745
 # Diagonal elements of inverse mass matrix:
@@ -1041,7 +1041,7 @@ lp__,accept_stat__,stepsize__,treedepth__,n_leapfrog__,divergent__,E__,d,sigmasq
 -5924.72,1,0.118745,5,31,0,5942.11,-0.251556,0.0239564,-2.38934,-2.30369,-2.54657,-2.40894,-2.44655,-2.33354,-1.66716,-2.26448,-1.91961,-2.22791,-2.25948,-1.33776,-3.31948,-2.79777,-1.38528,-1.608,-2.11524,-3.16401,-3.81206,-1.63513,-1.82791,-3.07918,0.0588578,-0.176493,-0.0227857,-0.252621,-0.0250794,-0.516348,-0.347444,-0.107606,-0.413655,-0.365197,-0.480382,-0.11312,-0.0299461,0.136831,-0.235133,-0.0620936,-0.193834,-0.255542,-0.27634,-0.225606,-0.678416,-0.146025,-0.337592,0.154779
 -5935.46,0.984527,0.118745,5,31,0,5953.34,-0.28065,0.0477036,-2.53706,-2.18479,-2.60634,-2.31316,-2.3373,-1.99765,-1.75935,-2.32235,-1.6793,-2.11328,-2.34902,-1.42738,-3.64645,-2.87081,-1.43597,-1.55524,-2.13866,-2.81512,-3.0734,-1.35716,-1.91732,-2.8569,0.132328,-0.290868,-0.226146,-0.378905,-0.327788,-0.692071,-0.324175,0.0367844,-0.594484,-0.363918,-0.296492,-0.16003,-0.0382253,0.314663,-0.161345,0.212177,-0.296308,-0.215906,-0.242707,-0.231057,-0.714171,-0.137168,-0.12468,0.218412
 # 
-#  Elapsed Time: 0.385465 seconds (Warm-up)
-#                0.633974 seconds (Sampling)
-#                1.01944 seconds (Total)
+#  Elapsed Time: 0.391415 seconds (Warm-up)
+#                0.648336 seconds (Sampling)
+#                1.03975 seconds (Total)
 # 

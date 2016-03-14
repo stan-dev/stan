@@ -78,7 +78,7 @@ TEST_F(StanIoStanCsvReader,read_header1) {
   EXPECT_EQ("treedepth__", header(3));
   EXPECT_EQ("n_leapfrog__", header(4));
   EXPECT_EQ("divergent__", header(5));
-  EXPECT_EQ("E__", header(6));
+  EXPECT_EQ("energy__", header(6));
   EXPECT_EQ("d", header(7));
   EXPECT_EQ("sigmasq_delta", header(8));
   EXPECT_EQ("mu[1]", header(9));
@@ -203,8 +203,8 @@ TEST_F(StanIoStanCsvReader,read_samples1) {
     for (int j = 0; j < 55; j++)
       EXPECT_FLOAT_EQ(expected_samples(i,j), samples(i,j));
 
-  EXPECT_FLOAT_EQ(0.385465, timing.warmup);
-  EXPECT_FLOAT_EQ(0.633974, timing.sampling);
+  EXPECT_FLOAT_EQ(0.391415, timing.warmup);
+  EXPECT_FLOAT_EQ(0.648336, timing.sampling);
 
 }
 TEST_F(StanIoStanCsvReader,ParseBlocker) {
@@ -239,7 +239,7 @@ TEST_F(StanIoStanCsvReader,ParseBlocker) {
   EXPECT_EQ("treedepth__", blocker0.header(3));
   EXPECT_EQ("n_leapfrog__", blocker0.header(4));
   EXPECT_EQ("divergent__", blocker0.header(5));
-  EXPECT_EQ("E__", blocker0.header(6));
+  EXPECT_EQ("energy__", blocker0.header(6));
   EXPECT_EQ("d", blocker0.header(7));
   EXPECT_EQ("sigmasq_delta", blocker0.header(8));
   EXPECT_EQ("mu[1]", blocker0.header(9));
@@ -352,8 +352,8 @@ TEST_F(StanIoStanCsvReader,ParseBlocker) {
     for (int j = 0; j < 55; j++)
       EXPECT_FLOAT_EQ(expected_samples(i,j), blocker0.samples(i,j));
 
-  EXPECT_FLOAT_EQ(0.385465, blocker0.timing.warmup);
-  EXPECT_FLOAT_EQ(0.633974, blocker0.timing.sampling);
+  EXPECT_FLOAT_EQ(0.391415, blocker0.timing.warmup);
+  EXPECT_FLOAT_EQ(0.648336, blocker0.timing.sampling);
 
   EXPECT_EQ("", out.str());
 }

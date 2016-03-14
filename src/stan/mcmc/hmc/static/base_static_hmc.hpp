@@ -24,7 +24,7 @@ namespace stan {
     public:
       base_static_hmc(Model &model, BaseRNG& rng)
         : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
-        T_(1) {
+        T_(1), energy_(0) {
         update_L_();
       }
 
@@ -58,19 +58,20 @@ namespace stan {
 
         acceptProb = acceptProb > 1 ? 1 : acceptProb;
 
+        this->energy_ = this->hamiltonian_.H(this->z_);
         return sample(this->z_.q, - this->hamiltonian_.V(this->z_), acceptProb);
       }
 
       void get_sampler_param_names(std::vector<std::string>& names) {
         names.push_back("stepsize__");
         names.push_back("int_time__");
-        names.push_back("E__");
+        names.push_back("energy__");
       }
 
       void get_sampler_params(std::vector<double>& values) {
         values.push_back(this->epsilon_);
         values.push_back(this->T_);
-        values.push_back(this->hamiltonian_.H(this->z_));
+        values.push_back(this->energy_);
       }
 
       void set_nominal_stepsize_and_T(const double e, const double t) {
@@ -113,6 +114,7 @@ namespace stan {
     protected:
       double T_;
       int L_;
+      double energy_;
 
       void update_L_() {
         L_ = static_cast<int>(T_ / this->nom_epsilon_);
