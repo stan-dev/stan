@@ -35,7 +35,7 @@ namespace stan {
       base_nuts(Model &model, BaseRNG& rng)
         : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
         depth_(0), max_depth_(5), max_delta_(1000),
-        n_leapfrog_(0), n_divergent_(0) {
+        n_leapfrog_(0), divergent_(0), energy_(0) {
       }
 
       ~base_nuts() {}
@@ -86,7 +86,7 @@ namespace stan {
         int n_valid = 0;
 
         this->depth_ = 0;
-        this->n_divergent_ = 0;
+        this->divergent_ = 0;
 
         util.n_tree = 0;
         util.sum_prob = 0;
@@ -145,6 +145,7 @@ namespace stan {
         double accept_prob = util.sum_prob / static_cast<double>(util.n_tree);
 
         this->z_.ps_point::operator=(z_sample);
+        this->energy_ = this->hamiltonian_.H(this->z_);
         return sample(this->z_.q, - this->z_.V, accept_prob);
       }
 
@@ -152,14 +153,16 @@ namespace stan {
         names.push_back("stepsize__");
         names.push_back("treedepth__");
         names.push_back("n_leapfrog__");
-        names.push_back("n_divergent__");
+        names.push_back("divergent__");
+        names.push_back("energy__");
       }
 
       void get_sampler_params(std::vector<double>& values) {
         values.push_back(this->epsilon_);
         values.push_back(this->depth_);
         values.push_back(this->n_leapfrog_);
-        values.push_back(this->n_divergent_);
+        values.push_back(this->divergent_);
+        values.push_back(this->energy_);
       }
 
       virtual bool compute_criterion(ps_point& start,
@@ -187,7 +190,7 @@ namespace stan {
               h = std::numeric_limits<double>::infinity();
 
             util.criterion = util.log_u + (h - util.H0) < this->max_delta_;
-            if (!util.criterion) ++(this->n_divergent_);
+            if (!util.criterion) ++(this->divergent_);
 
             util.sum_prob += std::min(1.0, std::exp(util.H0 - h));
             util.n_tree += 1;
@@ -236,7 +239,8 @@ namespace stan {
       double max_delta_;
 
       int n_leapfrog_;
-      int n_divergent_;
+      int divergent_;
+      double energy_;
     };
 
   }  // mcmc
