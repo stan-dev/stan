@@ -38,10 +38,6 @@ STANC_TESTS_HEADERS := $(shell find src/test/unit/lang -type f -name '*_test.cpp
 STANC_TESTS_O := $(patsubst src/%_test.cpp,%.o,$(STANC_TESTS_HEADERS))
 STANC_TESTS := $(patsubst src/%_test.cpp,%$(EXE),$(STANC_TESTS_HEADERS))
 
-# $(STANC_TESTS) : test/%$(EXE) : test/%.o bin/libstanc.a
-# 	@mkdir -p $(dir $@)
-# 	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
-
 # add additional dependency to libstanc.a
 ##$(patsubst src/%_test.cpp,%.o,$(STANC_TEST_HEADERS)) : test/%.o : bin/libstanc.a
 $(STANC_TESTS_O) : bin/libstanc.a
@@ -176,3 +172,8 @@ test_name = $(shell echo $(1) | sed 's,_[0-9]\{5\},_test.hpp,g')
 ifneq (,$(filter test/% src/test/test-models/%.hpp,$(MAKECMDGOALS)))
   -include test/test-models/stanc.d
 endif
+
+ifneq (,$(filter $(STANC_TESTS),$(MAKECMDGOALS)))
+  -include $(patsubst src/%.cpp,bin/%.d,$(TEMPLATE_INSTANTIATION_CPP))
+endif
+
