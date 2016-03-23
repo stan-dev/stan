@@ -218,25 +218,34 @@ namespace stan {
       double_literal_r
         %= double_;
 
-
       fun_r.name("function and argument expressions");
       fun_r
-        %= identifier_r
-        >> args_r(_r1);
-
+        %= (identifier_r
+            >> args_r(_r1))
+        | (identifier_r[is_prob_fun_f(_1, _pass)]
+           >> prob_args_r(_r1));
 
       identifier_r.name("identifier");
       identifier_r
         %= lexeme[char_("a-zA-Z")
                   >> *char_("a-zA-Z0-9_.")];
 
+      prob_args_r.name("probability function arguments");
+      prob_args_r
+        %= (lit('(') >> lit(')'))
+        | (lit('(')
+           >> expression_g(_r1)
+           >> lit(')'))
+        | (lit('(')
+           >> expression_g(_r1)
+           >> lit('|')
+           >> (expression_g(_r1) % ',')
+           >> lit(')'));
 
       args_r.name("function arguments");
       args_r
         %= (lit('(') >> lit(')'))
-        | ((lit('(')
-            >> (expression_g(_r1) % ','))
-            > lit(')'));
+        | (lit('(') >> (expression_g(_r1) % ',') >> lit(')'));
 
       dim_r.name("array dimension (integer expression)");
       dim_r

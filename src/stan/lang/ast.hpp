@@ -383,6 +383,7 @@ namespace stan {
 
     struct fun {
       std::string name_;
+      std::string original_name_;
       std::vector<expression> args_;
       expr_type type_;
       fun();

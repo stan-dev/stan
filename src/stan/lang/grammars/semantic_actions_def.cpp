@@ -24,6 +24,38 @@ namespace stan {
 
   namespace lang {
 
+    bool has_prob_suffix(const std::string& s) {
+      return ends_with("_lpdf", s) || ends_with("_lpmf", s)
+        || ends_with("_lcdf", s) || ends_with("_lccdf", s);
+    }
+
+    void replace_suffix(const std::string& old_suffix,
+                        const std::string& new_suffix, fun& f) {
+      if (!ends_with(old_suffix, f.name_)) return;
+      f.original_name_ = f.name_;
+      f.name_ = f.name_.substr(0, f.name_.size() - old_suffix.size())
+        + new_suffix;
+    }
+
+    bool validate_double_expr(const expression& expr,
+                              std::stringstream& error_msgs) {
+      if (!expr.expression_type().is_primitive_double()
+          && !expr.expression_type().is_primitive_int()) {
+        error_msgs << "expression denoting real required; found type="
+                   << expr.expression_type() << std::endl;
+        return false;
+      }
+      return true;
+    }
+
+    void set_fun_type(fun& fun, std::ostream& error_msgs) {
+      std::vector<expr_type> arg_types;
+      for (size_t i = 0; i < fun.args_.size(); ++i)
+        arg_types.push_back(fun.args_[i].expression_type());
+      fun.type_ = function_signatures::instance()
+        .get_result_type(fun.name_, arg_types, error_msgs);
+    }
+
     int num_dimss(std::vector<std::vector<stan::lang::expression> >& dimss) {
       int sum = 0;
       for (size_t i = 0; i < dimss.size(); ++i)
@@ -67,17 +99,11 @@ namespace stan {
     }
     boost::phoenix::function<validate_expr_type3> validate_expr_type3_f;
 
-    fun set_fun_type::operator()(fun& fun,
-                                 std::ostream& error_msgs) const {
-      std::vector<expr_type> arg_types;
-      for (size_t i = 0; i < fun.args_.size(); ++i)
-        arg_types.push_back(fun.args_[i].expression_type());
-      fun.type_ = function_signatures::instance().get_result_type(fun.name_,
-                                                                  arg_types,
-                                                                  error_msgs);
-      return fun;
+    void is_prob_fun::operator()(const std::string& s,
+                                 bool& pass) const {
+      pass = has_prob_suffix(s);
     }
-    boost::phoenix::function<set_fun_type> set_fun_type_f;
+    boost::phoenix::function<is_prob_fun> is_prob_fun_f;
 
     void addition_expr3::operator()(expression& expr1, const expression& expr2,
                                     std::ostream& error_msgs) const {
@@ -89,9 +115,8 @@ namespace stan {
       std::vector<expression> args;
       args.push_back(expr1);
       args.push_back(expr2);
-      set_fun_type sft;
       fun f("add", args);
-      sft(f, error_msgs);
+      set_fun_type(f, error_msgs);
       expr1 = expression(f);
     }
     boost::phoenix::function<addition_expr3> addition3_f;
@@ -107,9 +132,8 @@ namespace stan {
       std::vector<expression> args;
       args.push_back(expr1);
       args.push_back(expr2);
-      set_fun_type sft;
       fun f("subtract", args);
-      sft(f, error_msgs);
+      set_fun_type(f, error_msgs);
       expr1 = expression(f);
     }
     boost::phoenix::function<subtraction_expr3> subtraction3_f;
@@ -136,9 +160,8 @@ namespace stan {
       std::vector<expression> args;
       args.push_back(expr1);
       args.push_back(expr2);
-      set_fun_type sft;
       fun f(fun_name, args);
-      sft(f, error_msgs);
+      set_fun_type(f, error_msgs);
       expr1 = expression(f);
     }
     boost::phoenix::function<binary_op_expr> binary_op_f;
@@ -1294,14 +1317,19 @@ namespace stan {
       std::vector<expr_type> arg_types;
       for (size_t i = 0; i < fun.args_.size(); ++i)
         arg_types.push_back(fun.args_[i].expression_type());
-      fun.type_ = function_signatures::instance().get_result_type(fun.name_,
-                                                                  arg_types,
-                                                                  error_msgs);
+
+      fun.type_ = function_signatures::instance()
+        .get_result_type(fun.name_, arg_types, error_msgs);
       if (fun.type_ == ILL_FORMED_T) {
         pass = false;
         return;
       }
 
+      // will only need these until stan-dev/math renames
+      replace_suffix("_lpdf", "_log", fun);
+      replace_suffix("_lpmf", "_log", fun);
+      replace_suffix("_lcdf", "_cdf_log", fun);
+      replace_suffix("_lccdf", "_ccdf_log", fun);
 
       if (has_rng_suffix(fun.name_)) {
         if (!( var_origin == derived_origin
@@ -1319,8 +1347,6 @@ namespace stan {
       }
 
       if (has_lp_suffix(fun.name_)) {
-        // modified function_argument_origin to add _lp because
-        // that's only viable context
         if (!(var_origin == transformed_parameter_origin
               || var_origin == function_argument_origin_lp
               || var_origin == void_function_argument_origin_lp
@@ -1394,9 +1420,8 @@ namespace stan {
       std::vector<expression> args;
       args.push_back(expr1);
       args.push_back(expr2);
-      set_fun_type sft;
       fun f("pow", args);
-      sft(f, error_msgs);
+      set_fun_type(f, error_msgs);
       expr1 = expression(f);
     }
     boost::phoenix::function<exponentiation_expr> exponentiation_f;
@@ -1412,9 +1437,8 @@ namespace stan {
       std::vector<expression> args;
       args.push_back(expr1);
       args.push_back(expr2);
-      set_fun_type sft;
       fun f("multiply", args);
-      sft(f, error_msgs);
+      set_fun_type(f, error_msgs);
       expr1 = expression(f);
     }
     boost::phoenix::function<multiplication_expr> multiplication_f;
@@ -1433,7 +1457,6 @@ namespace stan {
       std::vector<expression> args;
       args.push_back(expr1);
       args.push_back(expr2);
-      set_fun_type sft;
       if (expr1.expression_type().is_primitive_int()
           && expr2.expression_type().is_primitive_int()) {
         // result might be assigned to real - generate warning
@@ -1450,7 +1473,7 @@ namespace stan {
                    << std::endl;
 
         fun f("divide", args);
-        sft(f, error_msgs);
+        set_fun_type(f, error_msgs);
         expr1 = expression(f);
         return;
       }
@@ -1458,12 +1481,12 @@ namespace stan {
            || expr1.expression_type().type() == ROW_VECTOR_T)
           && expr2.expression_type().type() == MATRIX_T) {
         fun f("mdivide_right", args);
-        sft(f, error_msgs);
+        set_fun_type(f, error_msgs);
         expr1 = expression(f);
         return;
       }
       fun f("divide", args);
-      sft(f, error_msgs);
+      set_fun_type(f, error_msgs);
       expr1 = expression(f);
       return;
     }
@@ -1485,9 +1508,8 @@ namespace stan {
       std::vector<expression> args;
       args.push_back(expr1);
       args.push_back(expr2);
-      set_fun_type sft;
       fun f("modulus", args);
-      sft(f, error_msgs);
+      set_fun_type(f, error_msgs);
       expr1 = expression(f);
     }
     boost::phoenix::function<modulus_expr> modulus_f;
@@ -1498,18 +1520,17 @@ namespace stan {
       std::vector<expression> args;
       args.push_back(expr1);
       args.push_back(expr2);
-      set_fun_type sft;
       if (expr1.expression_type().type() == MATRIX_T
           && (expr2.expression_type().type() == VECTOR_T
               || expr2.expression_type().type() == MATRIX_T)) {
         fun f("mdivide_left", args);
-        sft(f, error_msgs);
+        set_fun_type(f, error_msgs);
         expr1 = expression(f);
         pass = true;
         return;
       }
       fun f("mdivide_left", args);  // set for alt args err msg
-      sft(f, error_msgs);
+      set_fun_type(f, error_msgs);
       expr1 = expression(f);
       pass = false;
     }
@@ -1526,9 +1547,8 @@ namespace stan {
       std::vector<expression> args;
       args.push_back(expr1);
       args.push_back(expr2);
-      set_fun_type sft;
       fun f("elt_multiply", args);
-      sft(f, error_msgs);
+      set_fun_type(f, error_msgs);
       expr1 = expression(f);
     }
     boost::phoenix::function<elt_multiplication_expr> elt_multiplication_f;
@@ -1544,9 +1564,8 @@ namespace stan {
       std::vector<expression> args;
       args.push_back(expr1);
       args.push_back(expr2);
-      set_fun_type sft;
       fun f("elt_divide", args);
-      sft(f, error_msgs);
+      set_fun_type(f, error_msgs);
       expr1 = expression(f);
     }
     boost::phoenix::function<elt_division_expr> elt_division_f;
@@ -1560,9 +1579,8 @@ namespace stan {
       }
       std::vector<expression> args;
       args.push_back(expr);
-      set_fun_type sft;
       fun f("minus", args);
-      sft(f, error_msgs);
+      set_fun_type(f, error_msgs);
       expr_result = expression(f);
     }
     boost::phoenix::function<negate_expr> negate_expr_f;
@@ -1577,9 +1595,8 @@ namespace stan {
       }
       std::vector<expression> args;
       args.push_back(expr);
-      set_fun_type sft;
       fun f("logical_negation", args);
-      sft(f, error_msgs);
+      set_fun_type(f, error_msgs);
       expr_result = expression(f);
     }
     boost::phoenix::function<logical_negate_expr> logical_negate_expr_f;
@@ -1590,9 +1607,8 @@ namespace stan {
         return;
       std::vector<expression> args;
       args.push_back(expr);
-      set_fun_type sft;
       fun f("transpose", args);
-      sft(f, error_msgs);
+      set_fun_type(f, error_msgs);
       expr = expression(f);
       pass = !expr.expression_type().is_ill_formed();
     }
@@ -2149,30 +2165,13 @@ namespace stan {
     }
     boost::phoenix::function<validate_int_data_expr> validate_int_data_expr_f;
 
-
-
-
-
-    bool validate_double_expr::operator()(const expression& expr,
-                                          std::stringstream& error_msgs) const {
-      if (!expr.expression_type().is_primitive_double()
-          && !expr.expression_type().is_primitive_int()) {
-        error_msgs << "expression denoting real required; found type="
-                   << expr.expression_type() << std::endl;
-        return false;
-      }
-      return true;
-    }
-    boost::phoenix::function<validate_double_expr> validate_double_expr_f;
-
     void set_double_range_lower::operator()(range& range,
                                             const expression& expr,
                                             bool& pass,
                                             std::stringstream& error_msgs)
       const {
       range.low_ = expr;
-      validate_double_expr validator;
-      pass = validator(expr, error_msgs);
+      pass = validate_double_expr(expr, error_msgs);
     }
     boost::phoenix::function<set_double_range_lower> set_double_range_lower_f;
 
@@ -2182,8 +2181,7 @@ namespace stan {
                                             std::stringstream& error_msgs)
       const {
       range.high_ = expr;
-      validate_double_expr validator;
-      pass = validator(expr, error_msgs);
+      pass = validate_double_expr(expr, error_msgs);
     }
     boost::phoenix::function<set_double_range_upper> set_double_range_upper_f;
 
