@@ -128,7 +128,7 @@ transformed parameters {
   squared_error = dot_self(y - x * beta);
 }
 model {
-  increment_log_prob(-squared_error);
+  target += -squared_error;
 }
 generated quantities {
   real<lower=0> sigma_squared;
@@ -230,7 +230,7 @@ data {
 // ...
 model {
   // ...
-  increment_log_prob(- lambda * dot_self(beta));
+  target += - lambda * dot_self(beta);
 }
 \end{stancode}
 %
@@ -275,7 +275,7 @@ data {
 model {
   // ...
   for (k in 1:K)
-    increment_log_prob(- lambda * fabs(beta[k]));
+    target += - lambda * fabs(beta[k]);
 }
 \end{stancode}
 
@@ -304,8 +304,8 @@ data {
 model {
   // ...
   for (k in 1:K)
-    increment_log_prob(-lambda1 * fabs(beta[k]));
-  increment_log_prob(-lambda2 * dot_self(beta));
+    target += -lambda1 * fabs(beta[k]);
+  target += -lambda2 * dot_self(beta);
 }
 \end{stancode}
 %

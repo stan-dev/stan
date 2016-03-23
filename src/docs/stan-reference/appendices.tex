@@ -944,7 +944,7 @@ following form (though not the content; inverting matrices is almost
 always a bad idea).
 %
 \begin{stancode}
-increment_log_prob((y - mu)' * inv(Sigma) * (y - mu));
+target += (y - mu)' * inv(Sigma) * (y - mu);
 \end{stancode}
 %
 Here, the multiplication operator (\code{*}) is aligned to clearly

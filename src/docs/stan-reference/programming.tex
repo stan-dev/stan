@@ -241,7 +241,7 @@ commenting, as in the following example.
 \begin{stancode}
 exp(y) ~ normal(0,1);
 // adjust for change of vars: y = log | d/dy exp(y) |
-increment_log_prob(y);
+target += y;
 \end{stancode}
 %
 It's an art form to empathize with a future code reader and decide
@@ -3825,7 +3825,7 @@ model {
         gamma[t,k] = log_sum_exp(acc);
       }
     }
-    increment_log_prob(log_sum_exp(gamma[T_unsup]));
+    target += log_sum_exp(gamma[T_unsup]);
   }
 \end{stancode}
 %
@@ -4341,7 +4341,7 @@ parameters {
 }
 model {
   y_obs ~ normal(mu,sigma); 
-  increment_log_prob(N_cens * normal_ccdf_log(U,mu,sigma));
+  target += N_cens * normal_ccdf_log(U,mu,sigma);
 }
 \end{stancode}
 %
@@ -4369,7 +4369,7 @@ parameters {
 model {
   L ~ normal(mu,sigma);
   y_obs ~ normal(mu,sigma);
-  increment_log_prob(N_cens * normal_cdf_log(L,mu,sigma));
+  target += N_cens * normal_cdf_log(L,mu,sigma);
 }
 \end{stancode}
 %
@@ -4458,10 +4458,8 @@ parameters {
   real y;
 }
 model {
-  increment_log_prob(log_sum_exp(log(0.3) 
-                                   + normal_log(y,-1,2),
-                                 log(0.7) 
-                                   + normal_log(y,3,1)));
+  target += log_sum_exp(log(0.3) + normal_log(y,-1,2),
+                        log(0.7) + normal_log(y,3,1));
 }
 \end{stancode}
 %
@@ -4512,7 +4510,7 @@ model {
       ps[k] = log(theta[k]) 
                + normal_log(y[n],mu[k],sigma[k]);
     }
-    increment_log_prob(log_sum_exp(ps));
+    target += log_sum_exp(ps);
   }
 }
 \end{stancode}
@@ -4545,20 +4543,20 @@ attempting to vectorize naively, as it results in a different model.
 A proper mixture at the observation level is defined as
 %
 \begin{stancode}
-for (n in 1:N)
-  increment_log_prob(log(lambda) 
-                       + normal_log(y[n], mu[1], sigma[1]),
-                     log1m(lambda) 
-                       + normal_log(y[n], mu[2], sigma[2]));
+for (n in 1:N) {
+  target += log_sum_exp(log(lambda) 
+                          + normal_log(y[n], mu[1], sigma[1]),
+                        log1m(lambda)
+                          + normal_log(y[n], mu[2], sigma[2]));
 \end{stancode}
 %
 or equivalently
 %
 \begin{stancode}
 for (n in 1:N)
-  increment_log_prob(log_mix(lambda, 
-                             normal_log(y[n], mu[1], sigma[1]),
-                             normal_log(y[n], mu[2], sigma[2])));
+  target += log_mix(lambda, 
+                    normal_log(y[n], mu[1], sigma[1]),
+                    normal_log(y[n], mu[2], sigma[2])));
 \end{stancode}
 %
 This definition assumes that each observation $y_n$ may have arisen
@@ -4573,18 +4571,18 @@ Contrast the previous model with the following (erroneous) attempt to
 vectorize the model.
 %
 \begin{stancode}
-increment_log_prob(log(lambda) 
-                     + normal_log(y, mu[1], sigma[1]),
-                   log1m(lambda)
-                     + normal_log(y, mu[2], sigma[2]));
+target += log_sum_exp(log(lambda) 
+                        + normal_log(y, mu[1], sigma[1]),
+                      log1m(lambda)
+                        + normal_log(y, mu[2], sigma[2]));
 \end{stancode}
 %
 or equivalently,
 %
 \begin{stancode}
-increment_log_prob(log_mix(lambda,
-                           normal_log(y, mu[1], sigma[1]),
-                           normal_log(y, mu[2], sigma[2])));
+target += log_mix(lambda,
+                  normal_log(y, mu[1], sigma[1]),
+                  normal_log(y, mu[2], sigma[2]));
 \end{stancode}
 %
 This second definition implies that the entire sequence $y_1, \ldots, y_n$ of
@@ -4649,12 +4647,12 @@ parameters {
 model {
   for (n in 1:N) {
     if (y[n] == 0)
-      increment_log_prob(log_sum_exp(bernoulli_log(1,theta),
-                                     bernoulli_log(0,theta) 
-                                     + poisson_log(y[n],lambda)));
+      target += log_sum_exp(bernoulli_log(1,theta),
+                            bernoulli_log(0,theta) 
+                              + poisson_log(y[n],lambda));
     else
-      increment_log_prob(bernoulli_log(0,theta)
-                         + poisson_log(y[n],lambda));
+      target += bernoulli_log(0,theta)
+                  + poisson_log(y[n],lambda);
   }
 }
 \end{stancode}
@@ -4664,9 +4662,10 @@ on the linear scale; it is defined to be equal to \code{log(exp(lp1) +
   exp(lp2))}, but is more arithmetically stable and faster.
 
 Although it might be tempting to try to use the \code{if\_else} syntax
-within the \code{increment\_log\_prob} function, it is not recommended
+within the \code{target += ...} function, it is not recommended
 because \code{if\_else(c,e1,e2)} evaluates both \code{e1} and
-\code{e2} no matter what the value of \code{c} is.
+\code{e2} no matter what the value of \code{c} is, which leads to
+inefficiencies due to derivative calculations that are not needed.
 
 \subsection{Hurdle Models}
 
@@ -4713,7 +4712,7 @@ This allows the truncated Poisson distribution to be coded as
 \begin{stancode}
 if (y[n] > 0) {
   y[n] ~ poisson(lambda);
-  increment_log_prob(-log1m_exp(-lambda));
+  target += -log1m_exp(-lambda);
 }
 \end{stancode}
 %
@@ -4947,10 +4946,10 @@ transformed parameters {
   sigma = sqrt(sigma_sq);
 }
 model {
-  increment_log_prob(-2 * log(sigma));
+  target += -2 * log(sigma);
   for (n in 1:N)
-    increment_log_prob(log(Phi((y[n] + 0.5 - mu) / sigma)
-                           - Phi((y[n] - 0.5 - mu) / sigma)));
+    target += log(Phi((y[n] + 0.5 - mu) / sigma)
+                  - Phi((y[n] - 0.5 - mu) / sigma));
 }
 \end{stancode}
 
@@ -4979,7 +4978,7 @@ transformed parameters {
   z = y + y_err;
 }
 model {
-  increment_log_prob(-2 * log(sigma));
+  target += -2 * log(sigma);
   z ~ normal(mu, sigma);
 }
 \end{stancode}
@@ -5342,7 +5341,7 @@ transformed parameters {
 model {
   e ~ exponential(r_e);
   l ~ exponential(r_l);
-  increment_log_prob(log_sum_exp(lp));
+  target += log_sum_exp(lp);
 }    
 \end{stancode}
 \vspace*{-6pt}
@@ -5728,18 +5727,15 @@ transformed parameters {
   chi[1] = (1 - phi[1]) + phi[1] * (1 - p[2]) * chi[2];
 }
 model {
-  increment_log_prob(history[2] * log(chi[2]));
-  increment_log_prob(history[3] * (log(phi[2]) + log(p[3])));
-  increment_log_prob(history[4] * (log(chi[1])));
-  increment_log_prob(history[5] 
-                     * (log(phi[1]) + log1m(p[2])
-                        + log(phi[2]) + log(p[3])));
-  increment_log_prob(history[6] 
-                     * (log(phi[1]) + log(p[2]) 
-                        + log(chi[2])));
-  increment_log_prob(history[7] 
-                     * (log(phi[1]) + log(p[2]) 
-                        + log(phi[2]) + log(p[3])));
+  target += history[2] * log(chi[2]);
+  target += history[3] * (log(phi[2]) + log(p[3]));
+  target += history[4] * (log(chi[1]));
+  target += history[5] * (log(phi[1]) + log1m(p[2])
+                            + log(phi[2]) + log(p[3]));
+  target += history[6] * (log(phi[1]) + log(p[2]) 
+                            + log(chi[2]));
+  target += history[7] * (log(phi[1]) + log(p[2]) 
+                            + log(phi[2]) + log(p[3]));
 }
 generated quantities {
   real<lower=0,upper=1> beta3;
@@ -6215,7 +6211,7 @@ model {
       theta[j,k] ~ dirichlet(beta[k]);
 
   for (i in 1:I)
-    increment_log_prob(log_sum_exp(log_q_z[i]));
+    target += log_sum_exp(log_q_z[i]);
 }
 \end{stancode}
 \vspace*{-12pt}
@@ -6566,7 +6562,7 @@ model {
 
   // likelihood
   for (n in 1:N)
-    increment_log_prob(log_sum_exp(soft_z[n])); 
+    target += log_sum_exp(soft_z[n]));
 }
 \end{stancode}
 %
@@ -6818,7 +6814,7 @@ model {
       gamma[doc[n],k] = gamma[doc[n],k] 
                          + categorical_log(w[n],phi[k]);
   for (m in 1:M)
-    increment_log_prob(log_sum_exp(gamma[m]));
+    target += log_sum_exp(gamma[m]);
 }
 \end{stancode}
 %
@@ -7003,7 +6999,7 @@ model {
     real gamma[K];
     for (k in 1:K) 
       gamma[k] = log(theta[doc[n],k]) + log(phi[k,w[n]]);
-    increment_log_prob(log_sum_exp(gamma));  // likelihood
+    target += log_sum_exp(gamma));  // likeliho;
   }
 }
 \end{stancode}
@@ -8041,7 +8037,7 @@ parameters {
   ...
 model {
   log(y) ~ normal(mu,sigma);
-  increment_log_prob(-log(y));
+  target += -log(y);
   ...
 \end{stancode}
 %
@@ -8056,7 +8052,7 @@ model {
   real log_y;
   log_y = log(y);
   log_y ~ normal(mu,sigma);
-  increment_log_prob(-log_y);
+  target += -log_y;
   ...
 \end{stancode}
 %
@@ -8083,7 +8079,7 @@ log(y) ~ normal(mu,sigma);
 or as an increment to the log probability function, as in
 %
 \begin{stancode}
-increment_log_prob(normal_log(log(y), mu, sigma));
+target += normal_log(log(y), mu, sigma);
 \end{stancode}
 
 \subsubsection{Gamma and Inverse Gamma Distribution}\label{jacobian-adjustment.section}
@@ -8119,7 +8115,7 @@ parameters {
 transformed parameters {
   real<lower=0> y;
   y = 1 / y_inv;                         // change
-  increment_log_prob( -2 * log(y_inv) );  // adjustment
+  target +=  -2 * log(y_inv) );  // adjustme;
 }
 model {
   y ~ gamma(2,4);
@@ -8158,7 +8154,7 @@ transformed parameters {
   matrix[K,K] J;   // Jacobian matrix of transform
   ... compute v as a function of u ...
   ... compute J[m,n] = d.v[m] / d.u[n] ...
-  increment_log_prob(log(fabs(determinant(J))));
+  target += log(fabs(determinant(J)));
   ...
 model {
   v ~ ...;
@@ -8184,7 +8180,7 @@ transformed parameters {
   vector[K] J_diag;  // diagonals of Jacobian matrix
   ... 
   ... compute J[k,k] = d.v[k] / d.u[k] ...
-  increment_log_prob(sum(log(J_diag)));
+  target += sum(log(J_diag));
   ...
 \end{stancode}
 
@@ -8237,7 +8233,7 @@ parameters {
   real<lower=-1,upper=1> y;
 }
 model {
-  increment_log_prob(log1m(fabs(y)));
+  target += log1m(fabs(y));
 }
 \end{stancode}
 %
@@ -8261,7 +8257,7 @@ $\reals$ as follows by defining the probability to be \code{log(0.0)},
 i.e., $-\infty$, for values outside of $(-1,1)$.
 %
 \begin{stancode}
-increment_log_prob(log(fmax(0.0,1 - fabs(y))));
+target += log(fmax(0.0,1 - fabs(y)));
 \end{stancode}
 %
 With the constraint on \code{y} in place, this is just a less
@@ -8288,7 +8284,7 @@ where \code{lambda} is the inverse scale and \code{y} the sampled
 variate.
 %
 \begin{stancode}
-increment_log_prob(log(lambda) - y * lambda);
+target += log(lambda) - y * lambda;
 \end{stancode}
 %
 This encoding will work for any \code{lambda} and \code{y}; they can
@@ -8733,7 +8729,7 @@ y ~ foo(theta1,...,thetaN);
 can be used as shorthand for 
 %
 \begin{stancode}
-increment_log_prob(foo_log(y,theta1,...,thetaN));
+target += foo_log(y,theta1,...,thetaN);
 \end{stancode}
 %
 As with the built-in functions, the suffix \code{\_log} is dropped and
