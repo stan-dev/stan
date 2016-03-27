@@ -1838,7 +1838,7 @@ z_k
 .
 \]
 
-\section{Unit Vector}
+\section{Unit Vector}\label{unit-vector.section}
 
 An $n$-dimensional vector $x \in \reals^n$ is said to be a unit vector
 if it has unit Euclidean length, so that
@@ -1846,38 +1846,10 @@ if it has unit Euclidean length, so that
 \[
 \Vert x \Vert 
 \ = \ \sqrt{x^{\top}\,x}
-\ = \ \sqrt{x_1^2 + x_2^2 + \cdots + x_n^2}
+}\ = \ \sqrt{x_1^2 + x_2^2 + \cdots + x_n^2}
 \ = \ 1\ .
 \]
 %
-Unit vectors are convenient for directional statistics, because they
-determine directions, or equivalently, rotations around the origin.
-
-The $n-1$ sphere $S^{n-1}$ is defined as the set of $n$-dimensional
-unit vectors, 
-\[
-S^{n-1} = \{ x \in \reals^n \, : \, \Vert x \Vert = 1 \}.
-\]
-%
-Even though the $S^{n-1}$ sphere is made up of $n$-dimensional
-vectors, it is only an $(n-1)$-dimensional manifold.  For example, $S^2$
-is a simple model of the surface of the Earth, which despite being
-embedded in three dimensions, has a set of points definable by two
-dimensions, latitude and longitude. behaves locally as a plane in the
-sense. Unlike a plane, though, when you head off along a great circle
-on the surface of a sphere, you wind up back where you started.
-
-Even though $S^{n-1}$ behaves locally like $\reals^{n-1}$, there is no
-way to smoothly map between them. For example, because
-latitude and longitude work on a modular basis (wrapping at $2\pi$
-radians in natural units), they do not produce a smooth map. To
-finesse this problem, Stan generates points at random in $\reals^n$
-with independent unit normal distributions, which are then
-standardized by dividing by their Euclidean length.
-\cite{Marsaglia:1972} showed this generates points uniformly at random
-on $S^{n-1}$.  That is, if we draw $y_n \sim \distro{Normal}(0, 1)$,
-then $x = \frac{y}{\Vert y \Vert}$ has a uniform distribution over
-$S^{n-1}$, which allows an $n$-dimensional basis for $S^n$.
 
 
 \subsection{Unit Vector Inverse Transform}
@@ -1889,6 +1861,20 @@ $\Vert y \Vert = \sqrt{y^\top y}$, to obtain a unit vector $x$,
 x = \frac{y}{\Vert y \Vert}.
 \]
 %
+
+To generate a unit vector, Stan generates points at random in
+$\reals^n$ with independent unit normal distributions, which are then
+standardized by dividing by their Euclidean length.
+\cite{Marsaglia:1972} showed this generates points uniformly at random
+on $S^{n-1}$.  That is, if we draw $y_n \sim \distro{Normal}(0, 1)$
+for $n \in 1{:}n$, then $x = \frac{y}{\Vert y \Vert}$ has a uniform
+distribution over $S^{n-1}$.  This allows us to use an $n$-dimensional
+basis for $S^{n-1}$ that preserves local neighborhoods in that points
+that are close to each other in $\reals^n$ map to points near each
+other in $S^{n-1}$.  The mapping is not perfectly distance preserving,
+because there are points arbitrarily far away from each other in
+$\reals^n$ that map to identical points in $S^{n-1}$.
+
 
 \subsubsection{Warning: undefined at zero!}
 

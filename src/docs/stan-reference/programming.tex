@@ -7842,6 +7842,127 @@ defining the covariance matrix in the model block as a local variable.
 
 
 
+\chapter{Directions, Rotations, and Hyperspheres}
+
+Directional statistics involve data and/or parameters that are
+constrained to be directions.  The set of directions forms a sphere,
+the geometry of which is not smoothly mappable to that of a Euclidean
+space because you can move around a sphere and come back to where you
+started.  This is why it is impossible to make a map of the globe on a
+flat piece of paper where all points that are close to each other on
+the globe are close to each other on the flat map.  The fundamental
+problem is easy to visualize in two dimensions, because as you move
+around a circle, you wind up back where you started.  In other words,
+0 degrees and 360 degrees (equivalently, 0 and $2 \pi$ radians) pick
+out the same point, and the distance between 359 degrees and 2 degrees
+is the same as the distance between 137 and 140 degrees.
+
+Stan supports directional statistics by providing a unit-vector data
+type, the values of which determine points on a hypersphere (circle in
+two dimensions, sphere in three dimensions).
+
+\section{Unit Vectors}  
+
+The length of a vector $x \in \reals^K$ is given by
+\[
+\Vert x \Vert
+\ = \ \sqrt{x^{\top}\,x}
+\ = \ \sqrt{x_1^2 + x_2^2 + \cdots + x_K^2}.
+\]
+Unit vectors are defined to be vectors of unit length (i.e., length
+one).
+
+With a variable declaration such as
+%
+\begin{stancode}
+unit_vector[K] x;
+\end{stancode}
+%
+the value of \code{x} will be constrained to be a vector of size
+\code{K} with unit length.  \refsection{unit-vector} provides details
+on how a parameter constrained to be a unit-vector is transformed to
+unconstrained space for use in Stan's algorithms.
+
+\section{Circles, Spheres, and Hyperspheres}
+
+An $n$-sphere, written $S^{n}$, is defined as the set of $(n +
+1)$-dimensional unit vectors,
+\[
+S^{n} = \{ x \in \reals^{n+1} \, : \, \Vert x \Vert = 1 \}.
+\]
+%
+Even though $S^n$ is made up of points in $(n+1)$ dimensions, it is
+only an $n$-dimensional manifold.  For example, $S^2$ is defined as a
+set of points in $\reals^3$, but each such point may be described
+uniquely by a latitude and longitude.  Geometrically, the surface
+defined by $S^2$ in $\reals^3$ behaves locally like a plane, i.e.,
+$\reals^2$.  However, the overall shape of $S^2$ is not like a plane
+in that is compact (i.e., there is a maximum distance between points).
+If you set off around the globe in a ``straight line'' (i.e., a
+geodesic), you wind up back where you started eventually; that is why
+the geodesics on the sphere ($S^2$) are called ``great circles,'' and
+why we need to use some clever representations to do circular or
+spherical statistics.
+
+Even though $S^{n-1}$ behaves locally like $\reals^{n-1}$, there is no
+way to smoothly map between them. For example, because
+latitude and longitude work on a modular basis (wrapping at $2\pi$
+radians in natural units), they do not produce a smooth map. 
+
+Like a bounded interval $(a,b)$, in geometric terms, a sphere is
+compact in that the distance between any two points is bounded.
+
+
+\section{Transforming to Unconstrained Parameters}
+
+Stan (inverse) transforms arbitrary points in $\reals^{K+1}$ to points
+in $S^K$ using the auxiliary variable approach of
+\cite{Marsaglia:1972}.  A point $y \in \reals^K$ is transformed to a
+point $x \in S^{K-1}$ by
+%
+\[
+x = \frac{y}{\sqrt{y^{\top} y}}.
+\]
+%
+The problem with this mapping is that it's many to one; any point
+lying on a vector out of the origin is projected to the same point on
+the surface of the sphere.  \cite{Marsaglia:1972} introduced an
+auxiliary variable interpretation of this mapping that provides the
+desired properties of uniformity; see \refsection{unit-vector} for
+details. 
+
+
+\subsubsection{Warning: undefined at zero!}
+
+The above mapping from $\reals^n$ to $S^n$ is not defined at zero.
+While this point outcome has measure zero during sampling, and may
+thus be ignored, it is the default initialization point and thus unit
+vector parameters cannot be initialized at zero.  A simple workaround
+is to initialize from a very small interval around zero, which is an
+option built into all of the Stan interfaces.
+
+
+
+\section{Unit Vectors and Rotations}
+
+Unit vectors correspond directly to angles and thus to rotations.
+This is easy to see in two dimensions, where a point on a circle
+determines a compass direction, or equivalently, an angle $\theta$).
+Given an angle $\theta$, a matrix can be defined, the
+pre-multiplication by which rotates a point by an angle of $\theta$.
+For angle $\theta$ (in two dimensions), the $2 \times 2$ rotation
+matrix is defined by
+\[
+R_{\theta}
+=
+\begin{bmatrix}
+\cos \theta & - \sin \theta 
+\\
+\sin \theta & \cos \theta
+\end{bmatrix}.
+\]
+Given a two-dimensional vector $x$, $R_{\theta} \, x$ is the rotation
+of $x$ (around the origin) by $\theta$ degrees.
 
 
 \chapter{Reparameterization \& Change of Variables}\label{change-of-variables.chapter}
