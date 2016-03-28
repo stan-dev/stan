@@ -81,7 +81,7 @@ namespace stan {
           conn__->perform(do_sql(create_messages_sql));
           
           pqxx::work write(*conn__, "run_write");
-          pqxx::result runs_result = write.exec("INSERT INTO runs (id) VALUES (" + id__ + ") RETURNING hash;");
+          pqxx::result runs_result = write.exec("INSERT INTO runs (id) VALUES ('" + id__ + "') RETURNING hash;");
           hash__ = runs_result[0][0].c_str();   
           write.commit();
 
@@ -158,17 +158,17 @@ namespace stan {
       const std::string psql_writer::create_runs_sql = "CREATE TABLE IF NOT EXISTS "
         "runs("
         "hash SERIAL PRIMARY KEY,"
-        "timestamp TIMESTAMP WITH TIMEZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+        "timestamp TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,"
         "id VARCHAR(200) NOT NULL"
       ");";
       const std::string psql_writer::create_key_value_sql = "CREATE TABLE IF NOT EXISTS "
         "key_value("
         "row_id SERIAL PRIMARY KEY,"
-        "hash REFERENCES runs,"
+        "hash INT REFERENCES runs,"
         "key VARCHAR(50),"
         "idx INTEGER,"
-        "row INTEGER,"
-        "column INTEGER,"
+        "row_idx INTEGER,"
+        "col_idx INTEGER,"
         "double DOUBLE PRECISION,"
         "string VARCHAR(300),"
         "integer INTEGER"
@@ -176,26 +176,26 @@ namespace stan {
       const std::string psql_writer::create_parameter_names_sql = "CREATE TABLE IF NOT EXISTS "
         "parameter_names("
         "row_id BIGSERIAL PRIMARY KEY,"
-        "hash REFERENCES runs,"
-        "name VARCHAR(200),"
+        "hash INT REFERENCES runs,"
+        "name VARCHAR(200)"
       ");";
       const std::string psql_writer::create_parameter_samples_sql = "CREATE TABLE IF NOT EXISTS "
         "parameter_samples("
-        "row_id BIGSERIAL PRIMARY KEY,"
-        "hash REFERENCES runs,"
-        "iteration INTEGER,"
-        "name VARCHAR(200),"
-        "value DOUBLE PRECISION,"
+        "row_id BIGSERIAL PRIMARY KEY, " 
+        "hash INT REFERENCES runs, "
+        "iteration INTEGER, "
+        "name VARCHAR(200), "
+        "value DOUBLE PRECISION"
       ");";
       const std::string psql_writer::create_messages_sql = "CREATE TABLE IF NOT EXISTS "
         "messages("
         "row_id BIGSERIAL PRIMARY KEY,"
-        "hash REFERENCES runs,"
-        "message VARCHAR(200),"
+        "hash INT REFERENCES runs,"
+        "message VARCHAR(200)"
       ");";
 
       const std::string psql_writer::write_key_value_sql = "INSERT INTO key_value "
-        "(hash, key, idx, row, column, double, string, integer)"
+        "(hash, key, idx, row_idx, col_idx, double, string, integer)"
         " VALUES "
         "($1, $2, $3, $4, $5, $6, $7, $8);";
       const std::string psql_writer::write_parameter_name_sql = "INSERT INTO parameter_names "
