@@ -2836,10 +2836,9 @@ namespace stan {
         generate_increment(x.M_, x.N_, x.dims_);
       }
       void operator()(const unit_vector_var_decl& x) const {
-        // only K-1 vals
         o_ << INDENT2 << "num_params_r__ += (";
         generate_expression(x.K_, o_);
-        o_ << " - 1)";
+        o_ << ")";
         for (size_t i = 0; i < x.dims_.size(); ++i) {
           o_ << " * ";
           generate_expression(x.dims_[i], o_);
@@ -3712,7 +3711,7 @@ namespace stan {
       }
       void operator()(const unit_vector_var_decl& x) const {
         std::vector<expression> matrix_args;
-        matrix_args.push_back(binary_op(x.K_, "-", int_literal(1)));
+        matrix_args.push_back(x.K_);
         generate_param_names_array(matrix_args, x.name_, x.dims_);
       }
       void operator()(const simplex_var_decl& x) const {

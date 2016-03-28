@@ -813,11 +813,11 @@ namespace stan {
        * <p>See <code>stan::math::unit_vector_constrain(Eigen::Matrix)</code>.
        *
        * @param k Number of dimensions in resulting unit_vector.
-       * @return unit_vector derived from next <code>k-1</code> scalars.
+       * @return unit_vector derived from next <code>k</code> scalars.
        */
       inline
       Eigen::Matrix<T, Eigen::Dynamic, 1> unit_vector_constrain(size_t k) {
-        return stan::math::unit_vector_constrain(vector(k-1));
+        return stan::math::unit_vector_constrain(vector(k));
       }
 
       /**
@@ -833,7 +833,7 @@ namespace stan {
        * @return The next unit_vector of the specified size.
        */
       inline vector_t unit_vector_constrain(size_t k, T& lp) {
-        return stan::math::unit_vector_constrain(vector(k-1), lp);
+        return stan::math::unit_vector_constrain(vector(k), lp);
       }
 
       /**
