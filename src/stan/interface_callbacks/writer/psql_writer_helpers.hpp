@@ -1,9 +1,7 @@
-#ifndef STAN_INTERFACE_CALLBACKS_WRITER_PSQL_WRITER_HPP
-#define STAN_INTERFACE_CALLBACKS_WRITER_PSQL_WRITER_HPP
+#ifndef STAN_INTERFACE_CALLBACKS_WRITER_PSQL_WRITER_HELPERS_HPP
+#define STAN_INTERFACE_CALLBACKS_WRITER_PSQL_WRITER_HELPERS_HPP
 
-#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <pqxx/pqxx>
-#include <ostream>
 #include <vector>
 #include <string>
 
@@ -115,8 +113,8 @@ namespace stan {
         void operator()(pqxx::work &T)
         {
           for (int i=0; i < n_rows__; ++i) {
-            for (int j = 0; j < n_cols; ++j) {
-              T.prepared("write_key_value")(hash__)(key__)()(i)(j)(value__[i*n_cols+j])()().exec();
+            for (int j = 0; j < n_cols__; ++j) {
+              T.prepared("write_key_value")(hash__)(key__)()(i)(j)(value__[i*n_cols__+j])()().exec();
             }
           }
         }
@@ -125,54 +123,57 @@ namespace stan {
       class write_parameter_names : public pqxx::transactor<>
       {
         const std::string hash__;
-        const std::vector<std::string> value__;
+        const std::vector<std::string> names__;
       
       public:
         explicit write_parameter_names(const std::string hash, 
-          const std::vector<std::string> value) : 
+          const std::vector<std::string> names) : 
           pqxx::transactor<>("write_parameter_names"), 
-          hash__(hash), value__(value) { }
+          hash__(hash), names__(names) { }
       
         void operator()(pqxx::work &T)
         {
-          for (auto it = value__.begin(); it != value__.end(); ++it) {
-            T.prepared("write_parameter_names")(hash__)(*it).exec();
+          for (unsigned int i = 0; i < names__.size(); ++i) {
+            T.prepared("write_parameter_names")(hash__)(names__[i]).exec();
           }
         }
       };
 
       class write_parameter_samples : public pqxx::transactor<>
       {
+
         const std::string hash__;
-        const std::vector<double> value__;
+        const std::vector<std::string> names__;
+        const std::vector<double> values__;
       
       public:
         explicit write_parameter_samples(const std::string hash, 
-          const std::vector<std::double> value) :
+          const std::vector<std::string> names,
+          const std::vector<double> values) :
           pqxx::transactor<>("write_parameter_samples"), 
-          hash__(hash), value__(value) { }
+          hash__(hash), names__(names), values__(values) { }
       
         void operator()(pqxx::work &T)
         {  
-          for (auto it = value__.begin(); it !- value__.end(); ++it) {
-            T.prepared("write_parameter_sample")(hash__)(*it).exec();
+          for (unsigned int i = 0; i < names__.size(); ++i) {
+            T.prepared("write_parameter_sample")(hash__)(i)(names__[i])(values__[i]).exec();
           }
         }
        };
 
-      class write_messages : public pqxx::transactor<>
+      class write_message : public pqxx::transactor<>
       {
         const std::string hash__;
-        const std::string value__;
+        const std::string message__;
       
       public:
-        explicit write_messages(const std::string hash, 
-          const std::string value) : pqxx::transactor<>("write_messages"), 
-          hash__(hash), value__(value) { }
+        explicit write_message(const std::string hash, 
+          const std::string message) : pqxx::transactor<>("write_message"), 
+          hash__(hash), message__(message) { }
       
         void operator()(pqxx::work &T)
         {
-          T.prepared("write_message")(hash__)(value__).exec();
+          T.prepared("write_message")(hash__)(message__).exec();
         }
       };
 

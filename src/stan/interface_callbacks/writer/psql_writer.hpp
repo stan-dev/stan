@@ -2,7 +2,7 @@
 #define STAN_INTERFACE_CALLBACKS_WRITER_PSQL_WRITER_HPP
 
 #include <stan/interface_callbacks/writer/base_writer.hpp>
-#include <psql_writer_helpers.hpp>
+#include <stan/interface_callbacks/writer/psql_writer_helpers.hpp>
 #include <pqxx/pqxx>
 #include <ostream>
 #include <vector>
@@ -72,22 +72,23 @@ namespace stan {
          */
         psql_writer(const std::string& uri = "", const std::string id = ""):
             uri__(uri), id__(id) {
+
           conn__ = new pqxx::connection(uri);
-          conn__.perform(do_sql(create_runs_sql));
-          conn__.perform(do_sql(create_key_value_sql));
-          conn__.perform(do_sql(create_parameter_name_sql));
-          conn__.perform(do_sql(create_parameter_sample_sql));
-          conn__.perform(do_sql(create_message_sql));
+          conn__->perform(do_sql(create_runs_sql));
+          conn__->perform(do_sql(create_key_value_sql));
+          conn__->perform(do_sql(create_parameter_names_sql));
+          conn__->perform(do_sql(create_parameter_samples_sql));
+          conn__->perform(do_sql(create_messages_sql));
           
-          pqxx::work write(conn__, "run_write");
+          pqxx::work write(*conn__, "run_write");
           pqxx::result runs_result = write.exec("INSERT INTO runs (id) VALUES (" + id__ + ") RETURNING hash;");
           hash__ = runs_result[0][0].c_str();   
           write.commit();
 
-          conn__.prepare("write_key_value", write_key_value_sql);
-          conn__.prepare("write_parameter_name", write_parameter_name_sql);
-          conn__.prepare("write_parameter_sample", write_parameter_sample_sql);
-          conn__.prepare("write_message", write_message_sql);
+          conn__->prepare("write_key_value", write_key_value_sql);
+          conn__->prepare("write_parameter_name", write_parameter_name_sql);
+          conn__->prepare("write_parameter_sample", write_parameter_sample_sql);
+          conn__->prepare("write_message", write_message_sql);
 
         }
 
@@ -96,70 +97,71 @@ namespace stan {
         }
 
         void operator()(const std::string& key, double value) {
-          conn__.perform(write_key_double(hash__, key, value));
+          conn__->perform(write_key_double(hash__, key, value));
         }
 
         void operator()(const std::string& key, int value) {
-          conn__.perform(write_key_integer(hash__, key, value));
+          conn__->perform(write_key_integer(hash__, key, value));
           
         }
 
         void operator()(const std::string& key, const std::string& value) {
-          conn__.perform(write_key_string(hash__, key, value));
+          conn__->perform(write_key_string(hash__, key, value));
         }
 
         void operator()(const std::string& key,
                         const double* values,
                         int n_values
         ) {
-          conn__.perform(write_key_doubles_n(hash__, key, values, n_values));
+          conn__->perform(write_key_doubles_n(hash__, key, values, n_values));
         }
 
         void operator()(const std::string& key, const double* values,
                         int n_rows, int n_cols) {
-          conn__.perform(write_key_doubles_rows_columns(hash__, key, values, n_rows, n_cols));
+          conn__->perform(write_key_doubles_rows_columns(hash__, key, values, n_rows, n_cols));
         }
 
         void operator()(const std::vector<std::string>& names) {
           names__ = names;
-          conn__.perform(write_parameter_names(hash__, names));
+          conn__->perform(write_parameter_names(hash__, names));
         }
 
         void operator()(const std::vector<double>& state) {
-          conn__.perform(write_parameter_samples(hash__, names__, state));
+          conn__->perform(write_parameter_samples(hash__, names__, state));
         }
 
         void operator()() { }
 
         void operator()(const std::string& message) {
-          conn__.perform(write_messages(hash__, message));
+          conn__->perform(write_message(hash__, message));
         }
 
       private:
-        pqxx::connection conn__;
-        std::vector<string> names__;
+        pqxx::connection* conn__;
+        std::vector<std::string> names__;
+        std::string uri__;
         std::string hash__;
         std::string id__;
 
-        static const string create_runs_sql;
-        static const string create_key_value_sql;
-        static const string create_parameter_names_sql;
-        static const string create_parameter_samples_sql;
-        static const string create_messages_sql;
+        static const std::string create_runs_sql;
+        static const std::string create_key_value_sql;
+        static const std::string create_parameter_names_sql;
+        static const std::string create_parameter_samples_sql;
+        static const std::string create_messages_sql;
 
-        static const string write_key_value_sql;
-        static const string write_parameter_names_sql;
-        static const string write_parameter_samples_sql;
-        static const string write_messages_sql;
+        static const std::string write_key_value_sql;
+        static const std::string write_parameter_name_sql;
+        static const std::string write_parameter_sample_sql;
+        static const std::string write_message_sql;
       };
 
-      psql_writer::create_runs_sql = "CREATE TABLE IF NOT EXISTS "
+      const std::string psql_writer::create_runs_sql = "CREATE TABLE IF NOT EXISTS "
         "runs("
         "hash SERIAL PRIMARY KEY,"
         "timestamp TIMESTAMP WITH TIMEZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,"
         "id VARCHAR(200) NOT NULL"
       ");";
-      psql_writer::create_key_value_sql = "CREATE TABLE IF NOT EXISTS "
+      const std::string psql_writer::create_key_value_sql = "CREATE TABLE IF NOT EXISTS "
         "key_value("
         "row_id SERIAL PRIMARY KEY,"
         "hash REFERENCES runs,"
@@ -171,39 +173,40 @@ namespace stan {
         "string VARCHAR(300),"
         "integer INTEGER"
       ");";
-      psql_writer::create_parameter_names_sql = "CREATE TABLE IF NOT EXISTS "
+      const std::string psql_writer::create_parameter_names_sql = "CREATE TABLE IF NOT EXISTS "
         "parameter_names("
         "row_id BIGSERIAL PRIMARY KEY,"
         "hash REFERENCES runs,"
-        "names VARCHAR(200),"
+        "name VARCHAR(200),"
       ");";
-      psql_writer::create_parameter_samples_sql = "CREATE TABLE IF NOT EXISTS "
+      const std::string psql_writer::create_parameter_samples_sql = "CREATE TABLE IF NOT EXISTS "
         "parameter_samples("
         "row_id BIGSERIAL PRIMARY KEY,"
         "hash REFERENCES runs,"
         "iteration INTEGER,"
+        "name VARCHAR(200),"
         "value DOUBLE PRECISION,"
       ");";
-      psql_writer::create_messages_sql = "CREATE TABLE IF NOT EXISTS "
+      const std::string psql_writer::create_messages_sql = "CREATE TABLE IF NOT EXISTS "
         "messages("
         "row_id BIGSERIAL PRIMARY KEY,"
         "hash REFERENCES runs,"
         "message VARCHAR(200),"
       ");";
 
-      psql_writer::write_key_value_sql = "INSERT INTO key_value "
+      const std::string psql_writer::write_key_value_sql = "INSERT INTO key_value "
         "(hash, key, idx, row, column, double, string, integer)"
         " VALUES "
         "($1, $2, $3, $4, $5, $6, $7, $8);";
-      psql_writer::write_parameter_name_sql = "INSERT INTO parameter_names "
-        "(hash, names)"
+      const std::string psql_writer::write_parameter_name_sql = "INSERT INTO parameter_names "
+        "(hash, name)"
         " VALUES "
         "($1, $2);";
-      psql_writer::write_parameter_sample_sql = "INSERT INTO parameter_samples "
-        "(hash, iteration, value)"
+      const std::string psql_writer::write_parameter_sample_sql = "INSERT INTO parameter_samples "
+        "(hash, iteration, name, value)"
         " VALUES "
-        "($1, $2, $3);";
-      psql_writer::write_message_sql = "INSERT INTO messages "
+        "($1, $2, $3, $4);";
+      const std::string psql_writer::write_message_sql = "INSERT INTO messages "
         "(hash, message)"
         " VALUES "
         "($1, $2);";

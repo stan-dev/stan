@@ -25,10 +25,10 @@ C++11 = false
 ##
 # Set default compiler options.
 ## 
-CFLAGS = -I src -isystem $(EIGEN) -isystem $(BOOST) -isystem $(MATH) -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -pipe -I$(CVODE)/include
+CFLAGS = -I src -isystem $(EIGEN) -isystem $(BOOST) -isystem $(MATH) -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -pipe -I$(CVODE)/include -I/opt/include
 CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
-LDLIBS = 
-LDLIBS_STANC = -Lbin -lstanc
+LDLIBS = -L/opt/lib -lpqxx -L/usr/local/lib -lpq
+LDLIBS_STANC = -Lbin -lstanc -L/opt/lib -lpqxx
 EXE = 
 WINE =
 
