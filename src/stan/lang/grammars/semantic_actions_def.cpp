@@ -500,7 +500,8 @@ namespace stan {
 
     void deprecate_old_assignment_op::operator()(std::ostream& error_msgs)
       const {
-      error_msgs << "Warning (non-fatal): assignment operator <- deprecated;"
+      error_msgs << "Warning (non-fatal): assignment operator <- deprecated"
+                 << " in the Stan language;"
                  << " use = instead."
                  << std::endl;
     }
@@ -1372,7 +1373,8 @@ namespace stan {
       if (fun.name_ == "abs"
           && fun.args_.size() > 0
           && fun.args_[0].expression_type().is_primitive_double()) {
-        error_msgs << "Warning: Function abs(real) is deprecated."
+        error_msgs << "Warning: Function abs(real) is deprecated"
+                   << " in the Stan language."
                    << std::endl
                    << "         It will be removed in a future release."
                    << std::endl
