@@ -26,7 +26,8 @@ TEST(lang_parser, mat_assign_funciton_signatures) {
 TEST(lang_parser, new_assign) {
   test_parsable("assignment-new");
   test_warning("assignment-old",
-               "Warning (non-fatal): assignment operator <- deprecated;"
+               "Warning (non-fatal): assignment operator <- deprecated"
+               " in the Stan language;"
                " use = instead.");
 
 }
