@@ -26,20 +26,7 @@ namespace stan {
        * (short) hash that gets written with each key/value/index/type
        * message.  
        *
-       * The data format strategy in general is to write everything as
-       * key/value/index/type pairs. The simple tables required would
-       * be:
-       *  - runs
-       *  - key_value_double
-       *  - key_value_integer
-       *  - key_value_string
-       *  - key_vector
-       *  - key_matrix
-       *  - parameter_names
-       *  - parameter_samples
-       *  - messages
-       *
-       * The tables we use instead are: lower complexity, avoid dealing with binary
+       * The tables we use: lower complexity, avoid dealing with binary
        * writes for vector/matrix, all key_value in more messy key_value
        * table.  
        *  - runs
@@ -71,7 +58,7 @@ namespace stan {
          *   runs table.  Not used as an index internally. 
          */
         psql_writer(const std::string& uri = "", const std::string id = ""):
-            uri__(uri), id__(id) {
+            uri__(uri), id__(id), iteration__(0) {
 
           conn__ = new pqxx::connection(uri);
           conn__->perform(do_sql(create_runs_sql));
@@ -127,7 +114,8 @@ namespace stan {
         }
 
         void operator()(const std::vector<double>& state) {
-          conn__->perform(write_parameter_samples(hash__, names__, state));
+          ++iteration__;
+          conn__->perform(write_parameter_samples(hash__, iteration__, names__, state));
         }
 
         void operator()() { }
@@ -142,6 +130,7 @@ namespace stan {
         std::string uri__;
         std::string hash__;
         std::string id__;
+        int iteration__;
 
         static const std::string create_runs_sql;
         static const std::string create_key_value_sql;

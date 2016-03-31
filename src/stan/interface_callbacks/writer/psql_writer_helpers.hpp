@@ -143,22 +143,24 @@ namespace stan {
       {
 
         const std::string hash__;
-        const std::vector<std::string> names__;
-        const std::vector<double> values__;
+        const double iteration__;
+        const std::vector<std::string>& names__;
+        const std::vector<double>& values__;
       
       public:
         explicit write_parameter_samples(const std::string hash, 
-          const std::vector<std::string> names,
-          const std::vector<double> values) :
+          const double iteration,
+          const std::vector<std::string>& names,
+          const std::vector<double>& values) :
           pqxx::transactor<>("write_parameter_samples"), 
-          hash__(hash), names__(names), values__(values) { }
+          hash__(hash), iteration__(iteration), names__(names), values__(values) { }
       
         void operator()(pqxx::work &T)
         { 
           if (values__.size() != names__.size())
             throw std::range_error("Number of parameter names and values do not match.");
           for (unsigned int i = 0; i < values__.size(); ++i) {
-            T.prepared("write_parameter_sample")(hash__)(i)(names__[i])(values__[i]).exec();
+            T.prepared("write_parameter_sample")(hash__)(iteration__)(names__[i])(values__[i]).exec();
           }
         }
        };
