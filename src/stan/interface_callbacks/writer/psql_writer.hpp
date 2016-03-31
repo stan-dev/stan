@@ -5,7 +5,6 @@
 #include <stan/interface_callbacks/writer/psql_writer_helpers.hpp>
 #include <pqxx/pqxx>
 #include <ostream>
-#include <iostream>
 #include <vector>
 #include <queue>
 #include <string>
@@ -84,7 +83,6 @@ namespace stan {
         }
 
         ~psql_writer() {
-          std::cout << "OUT LIKE A WHALE" << std::endl;
           conn__->disconnect();
           delete conn__;
         }
@@ -124,10 +122,8 @@ namespace stan {
           if (state.size() < 1000) {
             conn__->perform(write_parameter_samples(hash__, iteration__, names__, state));
           } else {
-            std::cout << "BIG WRITE!" << std::endl;
             std::thread write_thread(&psql_writer::threadable_sample_write, this, uri__, hash__, iteration__, names__, state);
             write_thread.detach();
-            std::cout << "OUT LIKE A TROUT" << std::endl;
           }
         }
 
