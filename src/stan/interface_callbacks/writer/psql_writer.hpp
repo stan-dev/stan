@@ -9,6 +9,8 @@
 #include <queue>
 #include <string>
 #include <thread>
+#include <mutex>
+#include <condition_variable>
 
 
 namespace stan {
@@ -36,16 +38,6 @@ namespace stan {
        *  - messages
        *
        *
-       * Each call to most methods is done with the
-       * main thread.  In the method for writing samples which can
-       * be performance critical, there is a test for state size and 
-       * vectors over 1000 are written using a detached thread. That
-       * allows writes to happen simultaneously with the
-       * numerical calculations (and hopefully be done before the next
-       * set is sent over).  With a slow connection there is potential
-       * for work (threads AND connections to the postgres server) 
-       * to pile up so something fancier might ultimately be required. 
-       * Not going to think about that initially.
        */
 
       class psql_writer : public base_writer {
@@ -59,7 +51,7 @@ namespace stan {
          *   runs table.  Not used as an index internally. 
          */
         psql_writer(const std::string& uri = "", const std::string id = ""):
-            uri__(uri), id__(id), iteration__(0) {
+            uri__(uri), id__(id), iteration__(0), finished__(false) {
 
           conn__ = new pqxx::connection(uri);
           conn__->perform(do_sql(create_runs_sql));
@@ -82,6 +74,7 @@ namespace stan {
         }
 
         ~psql_writer() {
+          finished__ = true;
           conn__->disconnect();
           delete conn__;
         }
@@ -118,26 +111,16 @@ namespace stan {
 
         void operator()(const std::vector<double>& state) {
           ++iteration__;
-          if (state.size() < 1000) {
-            conn__->perform(write_parameter_samples(hash__, iteration__, names__, state));
-          } else {
-            std::thread write_thread(&psql_writer::threadable_sample_write, this, uri__, hash__, iteration__, names__, state);
-            write_thread.detach();
-          }
+          mutex_samples__.lock();
+          samples__.push(state);
+          mutex_samples__.unlock();
+          wrote_samples__.notify_one();
         }
 
         void operator()() { }
 
         void operator()(const std::string& message) {
           conn__->perform(write_message(hash__, message));
-        }
-
-        void threadable_sample_write(std::string uri, std::string hash, int iteration, 
-          std::vector<std::string> names, std::vector<double> state){
-            pqxx::connection conn(uri);
-            conn.prepare("write_parameter_sample", write_parameter_sample_sql);
-            conn.perform(write_parameter_samples(hash, iteration, names, state));
-            conn.disconnect();
         }
 
       private:
@@ -147,6 +130,29 @@ namespace stan {
         std::string hash__;
         std::string id__;
         int iteration__;
+
+        std::vector<std::thread> write_threads__;
+        std::mutex mutex_samples__;
+        std::mutex mutex_wait__;
+        std::condition_variable wrote_samples__;
+        std::atomic<bool> finished__;
+        std::queue<std::vector<double> > samples__;
+
+        void consume_samples() {
+          std::unique_lock<std::mutex> lk(mutex_wait__);
+          std::vector<double> state;
+          pqxx::connection* conn = new pqxx::connection(uri__);
+          conn->prepare("write_parameter_sample", write_parameter_sample_sql);
+          while(!finished__) {
+            wrote_samples__.wait(lk);
+            mutex_samples__.lock();
+            if (samples__.size() > 0)
+              state = samples__.pop(); 
+            mutex_samples__.unlock(); 
+            conn->perform(write_parameter_samples(hash__, iteration__, names__, state));
+          } 
+          delete conn;
+        }
 
         static const std::string create_runs_sql;
         static const std::string create_key_value_sql;
