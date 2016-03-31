@@ -1838,40 +1838,65 @@ z_k
 .
 \]
 
-\section{Unit Vector}
-Unit vectors show up in directional statistics.
+\section{Unit Vector}\label{unit-vector.section}
 
-The $n$-sphere is the set of points $x \in \reals^n$ such that
+An $n$-dimensional vector $x \in \reals^n$ is said to be a unit vector
+if it has unit Euclidean length, so that
+%
 \[
-\Vert x \Vert^2 = \sum_{i=1}^n x_i^2 = 1\ .
+\Vert x \Vert 
+\ = \ \sqrt{x^{\top}\,x}
+\ = \ \sqrt{x_1^2 + x_2^2 + \cdots + x_n^2}
+\ = \ 1\ .
 \]
+%
+
 
 \subsection{Unit Vector Inverse Transform}
 
-To parameterize unit length vectors, Stan formerly utilized unrestricted
-hyperspherical angles. Currently, Stan divides an unconstrained vector
-$y \in \reals^{n}$ by its norm, $\sqrt{y^\top y}$ to obtain a unit vector
-$x$.
-\begin{eqnarray*}
-x & = & \frac{y}{\sqrt{y^\top y}}.
-\end{eqnarray*}
-This approach has a slight inconvenience that it is undefined if $y$ is
-a zero vector, which cannot occur during sampling but the unconstrained
-parameters that yield $x$ can be initialized to zero, in which case the
-sampling algorithm will be unable to start. To work around this problem,
-you can initialize each unconstrained parameter randomly from a very small
-interval centered at zero.
+Stan divides an unconstrained vector $y \in \reals^{n}$ by its norm,
+$\Vert y \Vert = \sqrt{y^\top y}$, to obtain a unit vector $x$,
+%
+\[
+x = \frac{y}{\Vert y \Vert}.
+\]
+%
 
-\subsection{Absolute Jacobian Determinant of the Unit Vector
-  Inverse Transform}
-The Jacobian matrix relating the input vector $y$ to the output vector $x$
-is singular because $x^\top x = 1$ for any non-zero input vector $y$. Thus,
-there technically is no unique transformation from $x$ to $y$. To 
-circumvent this issue let $r = \sqrt{y^\top y}$ so that $y = r x$. The
-transformation from $\left(r, x_{-n}\right)$ to $y$ is well-defined but $r$
-is arbitrary, so we set $r = 1$. In this case, the determinant of the 
-Jacobian is proportional to $-0.5 y^\top y$, which is the kernel of a 
-standard multivariate normal distribution with $n$ independent dimensions.
+To generate a unit vector, Stan generates points at random in
+$\reals^n$ with independent unit normal distributions, which are then
+standardized by dividing by their Euclidean length.
+\cite{Marsaglia:1972} showed this generates points uniformly at random
+on $S^{n-1}$.  That is, if we draw $y_n \sim \distro{Normal}(0, 1)$
+for $n \in 1{:}n$, then $x = \frac{y}{\Vert y \Vert}$ has a uniform
+distribution over $S^{n-1}$.  This allows us to use an $n$-dimensional
+basis for $S^{n-1}$ that preserves local neighborhoods in that points
+that are close to each other in $\reals^n$ map to points near each
+other in $S^{n-1}$.  The mapping is not perfectly distance preserving,
+because there are points arbitrarily far away from each other in
+$\reals^n$ that map to identical points in $S^{n-1}$.
+
+
+\subsubsection{Warning: undefined at zero!}
+
+The above mapping from $\reals^n$ to $S^n$ is not defined at zero.
+While this point outcome has measure zero during sampling, and may
+thus be ignored, it is the default initialization point and thus unit
+vector parameters cannot be initialized at zero.  A simple workaround
+is to initialize from a very small interval around zero, which is an
+option built into all of the Stan interfaces.
+
+\subsection{Absolute Jacobian Determinant of the Unit Vector Inverse
+  Transform}
+
+The Jacobian matrix relating the input vector $y$ to the output vector
+$x$ is singular because $x^\top x = 1$ for any non-zero input vector
+$y$. Thus, there technically is no unique transformation from $x$ to
+$y$. To circumvent this issue, let $r = \sqrt{y^\top y}$ so that $y = r
+x$. The transformation from $\left(r, x_{-n}\right)$ to $y$ is
+well-defined but $r$ is arbitrary, so we set $r = 1$. In this case,
+the determinant of the Jacobian is proportional to $-\frac{1}{2} y^\top y$,
+which is the kernel of a standard multivariate normal distribution
+with $n$ independent dimensions.
 
 \section{Correlation Matrices}\label{correlation-matrix-transform.section}
 
