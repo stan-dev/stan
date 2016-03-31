@@ -20,12 +20,12 @@ CC = g++
 O = 3
 O_STANC = 0
 AR = ar
-C++11 = false
+C++11 = true
 
 ##
 # Set default compiler options.
 ## 
-CFLAGS = -I src -isystem $(EIGEN) -isystem $(BOOST) -isystem $(MATH) -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -pipe -I$(CVODE)/include -I/opt/include
+CFLAGS = -I src -isystem $(EIGEN) -isystem $(BOOST) -isystem $(MATH) -std=c++11 -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -pipe -I$(CVODE)/include -I/opt/include
 CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
 LDLIBS = -L/opt/lib -lpqxx -L/usr/local/lib -lpq
 LDLIBS_STANC = -Lbin -lstanc -L/opt/lib -lpqxx

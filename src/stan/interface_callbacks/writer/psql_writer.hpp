@@ -5,8 +5,11 @@
 #include <stan/interface_callbacks/writer/psql_writer_helpers.hpp>
 #include <pqxx/pqxx>
 #include <ostream>
+#include <iostream>
 #include <vector>
+#include <queue>
 #include <string>
+#include <thread>
 
 
 namespace stan {
@@ -76,10 +79,12 @@ namespace stan {
           conn__->prepare("write_parameter_name", write_parameter_name_sql);
           conn__->prepare("write_parameter_sample", write_parameter_sample_sql);
           conn__->prepare("write_message", write_message_sql);
-
+          
+         
         }
 
         ~psql_writer() {
+          std::cout << "OUT LIKE A WHALE" << std::endl;
           delete conn__;
         }
 
@@ -115,13 +120,27 @@ namespace stan {
 
         void operator()(const std::vector<double>& state) {
           ++iteration__;
-          conn__->perform(write_parameter_samples(hash__, iteration__, names__, state));
+          if (state.size() < 10000) {
+            conn__->perform(write_parameter_samples(hash__, iteration__, names__, state));
+          } else {
+            std::cout << "BIG WRITE!" << std::endl;
+            std::thread write_thread(&psql_writer::threadable_sample_write, this, uri__, hash__, iteration__, names__, state);
+            write_thread.detach();
+            std::cout << "OUT LIKE A TROUT" << std::endl;
+          }
         }
 
         void operator()() { }
 
         void operator()(const std::string& message) {
           conn__->perform(write_message(hash__, message));
+        }
+
+        void threadable_sample_write(std::string uri, std::string hash, int iteration, 
+          std::vector<std::string> names, std::vector<double> state){
+            pqxx::connection conn(uri);
+            conn.prepare("write_parameter_sample", write_parameter_sample_sql);
+            conn.perform(write_parameter_samples(hash, iteration, names, state));
         }
 
       private:
