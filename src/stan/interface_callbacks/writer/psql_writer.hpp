@@ -85,6 +85,7 @@ namespace stan {
 
         ~psql_writer() {
           std::cout << "OUT LIKE A WHALE" << std::endl;
+          conn__->disconnect();
           delete conn__;
         }
 
@@ -120,7 +121,7 @@ namespace stan {
 
         void operator()(const std::vector<double>& state) {
           ++iteration__;
-          if (state.size() < 10000) {
+          if (state.size() < 1000) {
             conn__->perform(write_parameter_samples(hash__, iteration__, names__, state));
           } else {
             std::cout << "BIG WRITE!" << std::endl;
@@ -141,6 +142,7 @@ namespace stan {
             pqxx::connection conn(uri);
             conn.prepare("write_parameter_sample", write_parameter_sample_sql);
             conn.perform(write_parameter_samples(hash, iteration, names, state));
+            conn.disconnect();
         }
 
       private:

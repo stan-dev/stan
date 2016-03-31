@@ -70,7 +70,8 @@ TEST_F(StanInterfaceCallbacksPQXXWriter, double_vector) {
     s.push_back(boost::lexical_cast<std::string>(n));
 
   EXPECT_NO_THROW(writer(s));
-  EXPECT_NO_THROW(writer(x));
+  for (int i = 0; i < 100; ++i) 
+    EXPECT_NO_THROW(writer(x));
 //  EXPECT_EQ("0,1,2,3,4\n", ss.str());
 }
 
@@ -84,7 +85,8 @@ TEST_F(StanInterfaceCallbacksPQXXWriter, double_vector_100k) {
     s.push_back(boost::lexical_cast<std::string>(n));
 
   EXPECT_NO_THROW(writer(s));
-  EXPECT_NO_THROW(writer(x));
+  for (int i = 0; i < 100; ++i) 
+    EXPECT_NO_THROW(writer(x));
 //  EXPECT_EQ("0,1,2,3,4\n", ss.str());
 }
 
