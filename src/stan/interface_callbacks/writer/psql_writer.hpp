@@ -28,9 +28,7 @@ namespace stan {
        * (short) hash that gets written with each key/value/index/type
        * message.  
        *
-       * The tables we use: lower complexity, avoid dealing with binary
-       * writes for vector/matrix, all key_value in more messy key_value
-       * table.  
+       * The tables we use: 
        *  - runs
        *  - key_value (as hash, key, idx, row, column, double, string, int)
        *  - parameter_names
@@ -38,17 +36,18 @@ namespace stan {
        *  - messages
        *
        *
-       * Each call to a simple (single-value) method is done with the
-       * main thread.  Initially, each call to a multi-value method is
-       * done with the main thread.  Eventually it might be worthwhile
-       * to send the work to a separate thread if the vector is very
-       * long so that the write can happen simultaneously with the
+       * Each call to most methods is done with the
+       * main thread.  In the method for writing samples which can
+       * be performance critical, there is a test for state size and 
+       * vectors over 1000 are written using a detached thread. That
+       * allows writes to happen simultaneously with the
        * numerical calculations (and hopefully be done before the next
        * set is sent over).  With a slow connection there is potential
-       * for work to pile up so either waiting in the writer or
-       * something fancier might be required.  Not going to think about
-       * that initially.
+       * for work (threads AND connections to the postgres server) 
+       * to pile up so something fancier might ultimately be required. 
+       * Not going to think about that initially.
        */
+
       class psql_writer : public base_writer {
       public:
         /**
