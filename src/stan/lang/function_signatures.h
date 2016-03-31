@@ -364,6 +364,7 @@ add("hypergeometric_log", DOUBLE_T, INT_T, INT_T, INT_T, INT_T);
 add("hypergeometric_rng", INT_T, INT_T, INT_T, INT_T);
 add_binary("hypot");
 add("if_else", DOUBLE_T, INT_T, DOUBLE_T, DOUBLE_T);
+add("inc_beta", DOUBLE_T, DOUBLE_T, DOUBLE_T, DOUBLE_T);
 add("int_step", INT_T, DOUBLE_T);
 add("int_step", INT_T, INT_T);
 add_unary("inv");
