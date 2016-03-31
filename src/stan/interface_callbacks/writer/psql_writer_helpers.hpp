@@ -134,7 +134,7 @@ namespace stan {
         void operator()(pqxx::work &T)
         {
           for (unsigned int i = 0; i < names__.size(); ++i) {
-            T.prepared("write_parameter_names")(hash__)(names__[i]).exec();
+            T.prepared("write_parameter_name")(hash__)(names__[i]).exec();
           }
         }
       };
@@ -154,8 +154,10 @@ namespace stan {
           hash__(hash), names__(names), values__(values) { }
       
         void operator()(pqxx::work &T)
-        {  
-          for (unsigned int i = 0; i < names__.size(); ++i) {
+        { 
+          if (values__.size() != names__.size())
+            throw std::range_error("Number of parameter names and values do not match.");
+          for (unsigned int i = 0; i < values__.size(); ++i) {
             T.prepared("write_parameter_sample")(hash__)(i)(names__[i])(values__[i]).exec();
           }
         }

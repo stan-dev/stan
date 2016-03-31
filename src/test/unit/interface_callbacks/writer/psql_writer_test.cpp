@@ -50,15 +50,6 @@ TEST_F(StanInterfaceCallbacksPQXXWriter, key_matrix) {
 //  EXPECT_EQ("key\n0,-1\n-2,1\n0,-1\n", ss.str());
 }
 
-TEST_F(StanInterfaceCallbacksPQXXWriter, double_vector) {
-  const int N = 5;
-  std::vector<double> x;
-    for (int n = 0; n < N; ++n) x.push_back(n);
-
-  EXPECT_NO_THROW(writer(x));
-//  EXPECT_EQ("0,1,2,3,4\n", ss.str());
-}
-
 TEST_F(StanInterfaceCallbacksPQXXWriter, string_vector) {
   const int N = 5;
   std::vector<std::string> x;
@@ -69,12 +60,40 @@ TEST_F(StanInterfaceCallbacksPQXXWriter, string_vector) {
 //  EXPECT_EQ("0,1,2,3,4\n", ss.str());
 }
 
+TEST_F(StanInterfaceCallbacksPQXXWriter, double_vector) {
+  const int N = 1000;
+  std::vector<std::string> s;
+  std::vector<double> x;
+  for (int n = 0; n < N; ++n) 
+    x.push_back(n);
+  for (int n = 0; n < N; ++n)
+    s.push_back(boost::lexical_cast<std::string>(n));
+
+  EXPECT_NO_THROW(writer(s));
+  EXPECT_NO_THROW(writer(x));
+//  EXPECT_EQ("0,1,2,3,4\n", ss.str());
+}
+
+TEST_F(StanInterfaceCallbacksPQXXWriter, double_vector_100k) {
+  const int N = 100000;
+  std::vector<std::string> s;
+  std::vector<double> x;
+  for (int n = 0; n < N; ++n) 
+    x.push_back(n);
+  for (int n = 0; n < N; ++n)
+    s.push_back(boost::lexical_cast<std::string>(n));
+
+  EXPECT_NO_THROW(writer(s));
+  EXPECT_NO_THROW(writer(x));
+//  EXPECT_EQ("0,1,2,3,4\n", ss.str());
+}
+
 TEST_F(StanInterfaceCallbacksPQXXWriter, null) {
   EXPECT_NO_THROW(writer());
 //  EXPECT_EQ("\n", ss.str());
 }
 
 TEST_F(StanInterfaceCallbacksPQXXWriter, string) {
-  EXPECT_NO_THROW(writer("message"));
+  EXPECT_NO_THROW(writer("message, I have a message for you!"));
 //  EXPECT_EQ("message\n", ss.str());
 }
