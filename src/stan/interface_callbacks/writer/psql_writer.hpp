@@ -5,6 +5,7 @@
 #include <stan/interface_callbacks/writer/psql_writer_helpers.hpp>
 #include <pqxx/pqxx>
 #include <ostream>
+#include <chrono>
 #include <vector>
 #include <queue>
 #include <string>
@@ -36,7 +37,6 @@ namespace stan {
        *  - parameter_names
        *  - parameter_samples
        *  - messages
-       *
        *
        */
 
@@ -70,11 +70,27 @@ namespace stan {
           conn__->prepare("write_parameter_sample", write_parameter_sample_sql);
           conn__->prepare("write_message", write_message_sql);
           
-         
+          int n_threads = 2;
+          for (unsigned int i=0; i < n_threads; ++i) {
+            write_threads__.emplace_back(std::thread(&psql_writer::consume_samples, this));
+          }
         }
 
         ~psql_writer() {
-          finished__ = true;
+          while(1) { 
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            mutex_samples__.lock();
+            if (samples__.size() == 0) {
+              mutex_samples__.unlock();
+              finished__ = true;
+              break;
+            } else {
+              mutex_samples__.unlock();
+            }
+          }
+          for (unsigned int i=0; i < write_threads__.size(); ++i) {
+            write_threads__[i].join();
+          }
           conn__->disconnect();
           delete conn__;
         }
@@ -110,11 +126,9 @@ namespace stan {
         }
 
         void operator()(const std::vector<double>& state) {
-          ++iteration__;
           mutex_samples__.lock();
           samples__.push(state);
           mutex_samples__.unlock();
-          wrote_samples__.notify_one();
         }
 
         void operator()() { }
@@ -133,23 +147,26 @@ namespace stan {
 
         std::vector<std::thread> write_threads__;
         std::mutex mutex_samples__;
-        std::mutex mutex_wait__;
-        std::condition_variable wrote_samples__;
         std::atomic<bool> finished__;
         std::queue<std::vector<double> > samples__;
 
         void consume_samples() {
-          std::unique_lock<std::mutex> lk(mutex_wait__);
+          int iteration;
           std::vector<double> state;
           pqxx::connection* conn = new pqxx::connection(uri__);
           conn->prepare("write_parameter_sample", write_parameter_sample_sql);
           while(!finished__) {
-            wrote_samples__.wait(lk);
             mutex_samples__.lock();
-            if (samples__.size() > 0)
-              state = samples__.pop(); 
-            mutex_samples__.unlock(); 
-            conn->perform(write_parameter_samples(hash__, iteration__, names__, state));
+            if (samples__.size() > 0) {
+              state = samples__.front(); 
+              samples__.pop();
+              ++iteration__;
+              iteration = iteration__;
+              mutex_samples__.unlock(); 
+              conn->perform(write_parameter_samples(hash__, iteration, names__, state));
+            } else {
+              mutex_samples__.unlock();
+            }
           } 
           delete conn;
         }
