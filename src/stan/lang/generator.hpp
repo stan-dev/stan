@@ -1875,14 +1875,14 @@ namespace stan {
           o_ << ", ";
           generate_expression(x.dist_.args_[i], o_);
         }
-        if (is_user_defined_prob_function(x.dist_.family_ + "_log",
-                                          x.expr_,
-                                          x.dist_.args_)) {
+        bool is_user_defined
+          = is_user_defined_prob_function(x.dist_.family_ + "_log",
+                                          x.expr_, x.dist_.args_);
+        if (is_user_defined)
           o_ << ", pstream__";
-        }
         o_ << "));" << EOL;
         // rest of impl is for truncation
-        // generate bounds test
+        // test variable is within truncation interval
         if (x.truncation_.has_low()) {
           generate_indent(indent_, o_);
           o_ << "if (";
@@ -1907,6 +1907,7 @@ namespace stan {
           generate_indent(indent_, o_);
           o_ << "else ";
         }
+        // rest of code for three cases: T[L,H], T[L,], T[,H]
         if (x.truncation_.has_low() && x.truncation_.has_high()) {
           // T[L,U]: -log_diff_exp(Dist_cdf_log(U|params),
           //                       Dist_cdf_log(L|Params))
@@ -1917,12 +1918,16 @@ namespace stan {
             o_ << ", ";
             generate_expression(x.dist_.args_[i], o_);
           }
+          if (is_user_defined)
+            o_ << ", pstream__";
           o_ << "), " << x.dist_.family_ << "_cdf_log(";
           generate_expression(x.truncation_.low_.expr_, o_);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
             o_ << ", ";
             generate_expression(x.dist_.args_[i], o_);
           }
+          if (is_user_defined)
+            o_ << ", pstream__";
           o_ << ")));" << EOL;
         } else if (!x.truncation_.has_low() && x.truncation_.has_high()) {
           // T[,U];  -Dist_cdf_log(U)
@@ -1933,6 +1938,8 @@ namespace stan {
             o_ << ", ";
             generate_expression(x.dist_.args_[i], o_);
           }
+          if (is_user_defined)
+            o_ << ", pstream__";
           o_ << "));" << EOL;
         } else if (x.truncation_.has_low() && !x.truncation_.has_high()) {
           // T[L,]: -Dist_ccdf_log(L)
@@ -1943,6 +1950,8 @@ namespace stan {
             o_ << ", ";
             generate_expression(x.dist_.args_[i], o_);
           }
+          if (is_user_defined)
+            o_ << ", pstream__";
           o_ << "));" << EOL;
         }
       }
