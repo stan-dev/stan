@@ -54,6 +54,10 @@ namespace stan {
         z_.q = q;
       }
 
+      void init_hamiltonian(interface_callbacks::writer::base_writer& writer) {
+        this->hamiltonian_.init(this->z_, writer);
+      }
+
       void init_stepsize(interface_callbacks::writer::base_writer& writer) {
         ps_point z_init(this->z_);
 
