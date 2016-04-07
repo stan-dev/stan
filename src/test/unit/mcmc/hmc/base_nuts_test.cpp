@@ -231,3 +231,35 @@ TEST(McmcBaseNuts, divergence_test) {
 
   EXPECT_EQ("", output.str());
 }
+
+TEST(McmcBaseNuts, transition) {
+
+  rng_t base_rng(0);
+
+  int model_size = 1;
+  double init_momentum = 1.5;
+
+  stan::mcmc::ps_point z_init(model_size);
+  z_init.q(0) = 0;
+  z_init.p(0) = init_momentum;
+
+  stan::mcmc::mock_model model(model_size);
+  stan::mcmc::mock_nuts sampler(model, base_rng);
+
+  sampler.set_nominal_stepsize(1);
+  sampler.set_stepsize_jitter(0);
+  sampler.sample_stepsize();
+  sampler.z() = z_init;
+
+  std::stringstream output;
+  stan::interface_callbacks::writer::stream_writer writer(output);
+
+  stan::mcmc::sample init_sample(z_init.q, 0, 0);
+
+  stan::mcmc::sample s = sampler.transition(init_sample, writer);
+
+  EXPECT_EQ(31.5, s.cont_params()(0));
+  EXPECT_EQ(0, s.log_prob());
+  EXPECT_EQ(1, s.accept_stat());
+  EXPECT_EQ("", output.str());
+}

@@ -59,7 +59,7 @@ namespace stan {
 
         double H0 = this->hamiltonian_.H(this->z_);
         int n_leapfrog = 0;
-        double sum_metro_prob = 1; // exp(H0 - H0)
+        double sum_metro_prob = 1;  // exp(H0 - H0)
 
         // Build a trajectory until the NUTS criterion is no longer satisfied
         this->depth_ = 0;
