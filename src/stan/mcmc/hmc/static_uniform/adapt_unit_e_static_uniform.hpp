@@ -2,7 +2,7 @@
 #define STAN_MCMC_HMC_STATIC_ADAPT_UNIT_E_STATIC_HMC_HPP
 
 #include <stan/interface_callbacks/writer/base_writer.hpp>
-#include <stan/mcmc/hmc/static/unit_e_static_hmc.hpp>
+#include <stan/mcmc/hmc/static_uniform/unit_e_static_uniform.hpp>
 #include <stan/mcmc/stepsize_adapter.hpp>
 
 namespace stan {
