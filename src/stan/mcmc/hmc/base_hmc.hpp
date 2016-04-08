@@ -54,8 +54,16 @@ namespace stan {
         z_.q = q;
       }
 
+      void init_hamiltonian(interface_callbacks::writer::base_writer& writer) {
+        this->hamiltonian_.init(this->z_, writer);
+      }
+
       void init_stepsize(interface_callbacks::writer::base_writer& writer) {
         ps_point z_init(this->z_);
+
+        // Skip initialization for extreme step sizes
+        if (this->nom_epsilon_ == 0 || this->nom_epsilon_ > 1e7)
+          return;
 
         this->hamiltonian_.sample_p(this->z_, this->rand_int_);
         this->hamiltonian_.init(this->z_, writer);

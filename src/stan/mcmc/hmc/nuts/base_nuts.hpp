@@ -13,28 +13,14 @@
 
 namespace stan {
   namespace mcmc {
-
-    struct nuts_util {
-      // Constants through each recursion
-      double log_u;
-      double H0;
-      int sign;
-
-      // Aggregators through each recursion
-      int n_tree;
-      double sum_prob;
-      bool criterion;
-    };
-
-    // The No-U-Turn Sampler (NUTS).
-
+    // The No-U-Turn Sampler (NUTS) with multinomial sampling
     template <class Model, template<class, class> class Hamiltonian,
               template<class> class Integrator, class BaseRNG>
     class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     public:
       base_nuts(Model &model, BaseRNG& rng)
         : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
-        depth_(0), max_depth_(5), max_delta_(1000),
+        depth_(0), max_depth_(5), max_deltaH_(1000),
         n_leapfrog_(0), divergent_(0), energy_(0) {
       }
 
@@ -46,18 +32,16 @@ namespace stan {
       }
 
       void set_max_delta(double d) {
-        max_delta_ = d;
+        max_deltaH_ = d;
       }
 
       int get_max_depth() { return this->max_depth_; }
-      double get_max_delta() { return this->max_delta_; }
+      double get_max_delta() { return this->max_deltaH_; }
 
       sample transition(sample& init_sample,
                         interface_callbacks::writer::base_writer& writer) {
         // Initialize the algorithm
         this->sample_stepsize();
-
-        nuts_util util;
 
         this->seed(init_sample.cont_params());
 
@@ -70,83 +54,69 @@ namespace stan {
         ps_point z_sample(z_plus);
         ps_point z_propose(z_plus);
 
-        int n_cont = init_sample.cont_params().size();
+        Eigen::VectorXd rho = this->z_.p;
+        double sum_weight = 1;
 
-        Eigen::VectorXd rho_init = this->z_.p;
-        Eigen::VectorXd rho_plus(n_cont); rho_plus.setZero();
-        Eigen::VectorXd rho_minus(n_cont); rho_minus.setZero();
+        double H0 = this->hamiltonian_.H(this->z_);
+        int n_leapfrog = 0;
+        double sum_metro_prob = 1;  // exp(H0 - H0)
 
-        util.H0 = this->hamiltonian_.H(this->z_);
-
-        // Sample the slice variable
-        util.log_u = std::log(this->rand_uniform_());
-
-        // Build a balanced binary tree until the NUTS criterion fails
-        util.criterion = true;
-        int n_valid = 0;
-
+        // Build a trajectory until the NUTS criterion is no longer satisfied
         this->depth_ = 0;
         this->divergent_ = 0;
 
-        util.n_tree = 0;
-        util.sum_prob = 0;
+        while (this->depth_ < this->max_depth_) {
+          // Build a new subtree in a random direction
+          Eigen::VectorXd rho_subtree(rho.size());
+          rho_subtree.setZero();
 
-        while (util.criterion && (this->depth_ <= this->max_depth_)) {
-          // Randomly sample a direction in time
-          ps_point* z = 0;
-          Eigen::VectorXd* rho = 0;
+          bool valid_subtree = false;
+          double sum_weight_subtree = 0;
 
           if (this->rand_uniform_() > 0.5) {
-            z = &z_plus;
-            rho = &rho_plus;
-            util.sign = 1;
+            this->z_.ps_point::operator=(z_plus);
+            valid_subtree
+              = build_tree(this->depth_, rho_subtree, z_propose,
+                           H0, 1, n_leapfrog,
+                           sum_weight_subtree, sum_metro_prob, writer);
+            z_plus.ps_point::operator=(this->z_);
           } else {
-            z = &z_minus;
-            rho = &rho_minus;
-            util.sign = -1;
+            this->z_.ps_point::operator=(z_minus);
+            valid_subtree
+              = build_tree(this->depth_, rho_subtree, z_propose,
+                           H0, -1, n_leapfrog,
+                           sum_weight_subtree, sum_metro_prob, writer);
+            z_minus.ps_point::operator=(this->z_);
           }
 
-          // And build a new subtree in that direction
-          this->z_.ps_point::operator=(*z);
+          sum_weight += sum_weight_subtree;
+          if (!valid_subtree) break;
 
-          int n_valid_subtree = build_tree(depth_, *rho, 0, z_propose, util,
-                                           writer);
+          // Sample from an accepted subtree
           ++(this->depth_);
 
-          *z = this->z_;
-
-          // Metropolis-Hastings sample the fresh subtree
-          if (!util.criterion)
-            break;
-
-          double subtree_prob = 0;
-
-          if (n_valid) {
-            subtree_prob = static_cast<double>(n_valid_subtree) /
-              static_cast<double>(n_valid);
-          } else {
-            subtree_prob = n_valid_subtree ? 1 : 0;
-          }
-
-          if (this->rand_uniform_() < subtree_prob)
+          double accept_prob = sum_weight_subtree / sum_weight;
+          if (this->rand_uniform_() < accept_prob)
             z_sample = z_propose;
 
-          n_valid += n_valid_subtree;
-
-          // Check validity of completed tree
+          // Break when NUTS criterion is not longer satisfied
           this->z_.ps_point::operator=(z_plus);
-          Eigen::VectorXd delta_rho = rho_minus + rho_init + rho_plus;
 
-          util.criterion = compute_criterion(z_minus, this->z_, delta_rho);
+          rho += rho_subtree;
+          if (!compute_criterion(z_minus, this->z_, rho))
+            break;
         }
 
-        this->n_leapfrog_ = util.n_tree;
+        this->n_leapfrog_ = n_leapfrog;
 
-        double accept_prob = util.sum_prob / static_cast<double>(util.n_tree);
+        // Compute average acceptance probabilty across entire trajectory,
+        // even over subtrees that may have been rejected
+        double accept_prob
+          = sum_metro_prob / static_cast<double>(n_leapfrog + 1);
 
         this->z_.ps_point::operator=(z_sample);
         this->energy_ = this->hamiltonian_.H(this->z_);
-        return sample(this->z_.q, - this->z_.V, accept_prob);
+        return sample(this->z_.q, -this->z_.V, accept_prob);
       }
 
       void get_sampler_param_names(std::vector<std::string>& names) {
@@ -171,72 +141,75 @@ namespace stan {
                                      Eigen::VectorXd& rho) = 0;
 
       // Returns number of valid points in the completed subtree
-      int build_tree(int depth, Eigen::VectorXd& rho,
-                     ps_point* z_init_parent, ps_point& z_propose,
-                     nuts_util& util,
+      int build_tree(int depth, Eigen::VectorXd& rho, ps_point& z_propose,
+                     double H0, double sign, int& n_leapfrog,
+                     double& sum_weight, double& sum_metro_prob,
                      interface_callbacks::writer::base_writer& writer) {
         // Base case
         if (depth == 0) {
             this->integrator_.evolve(this->z_, this->hamiltonian_,
-                                     util.sign * this->epsilon_,
+                                     sign * this->epsilon_,
                                      writer);
-            rho += this->z_.p;
-
-            if (z_init_parent) *z_init_parent = this->z_;
-            z_propose = this->z_;
+            ++n_leapfrog;
 
             double h = this->hamiltonian_.H(this->z_);
             if (boost::math::isnan(h))
               h = std::numeric_limits<double>::infinity();
 
-            util.criterion = util.log_u + (h - util.H0) < this->max_delta_;
-            if (!util.criterion) ++(this->divergent_);
+            if ((h - H0) > this->max_deltaH_) this->divergent_ = true;
 
-            util.sum_prob += std::min(1.0, std::exp(util.H0 - h));
-            util.n_tree += 1;
+            double pi = exp(H0 - h);
+            sum_weight += pi;
+            sum_metro_prob += pi > 1 ? 1 : pi;
 
-            return (util.log_u + (h - util.H0) < 0);
+            z_propose = this->z_;
+            rho += this->z_.p;
 
-          } else {
+            return !this->divergent_;
+
+        } else {
           // General recursion
-          Eigen::VectorXd left_subtree_rho(rho.size());
-          left_subtree_rho.setZero();
           ps_point z_init(this->z_);
 
-          int n1 = build_tree(depth - 1, left_subtree_rho, &z_init,
-                              z_propose, util, writer);
+          Eigen::VectorXd rho_subtree(rho.size());
+          rho_subtree.setZero();
 
-          if (z_init_parent) *z_init_parent = z_init;
+          // Build the left subtree
+          double sum_weight_left = 0;
 
-          if (!util.criterion) return 0;
+          bool valid_left
+            = build_tree(depth - 1, rho_subtree, z_propose,
+                         H0, sign, n_leapfrog,
+                         sum_weight_left, sum_metro_prob, writer);
 
-          Eigen::VectorXd right_subtree_rho(rho.size());
-          right_subtree_rho.setZero();
-          ps_point z_propose_right(z_init);
+          sum_weight += sum_weight_left;
+          if (!valid_left) return false;
 
-          int n2 = build_tree(depth - 1, right_subtree_rho, 0,
-                              z_propose_right, util, writer);
+          // Build the right subtree
+          ps_point z_propose_right(this->z_);
+          double sum_weight_right = 0;
 
-          double accept_prob = static_cast<double>(n2) /
-            static_cast<double>(n1 + n2);
+          bool valid_right
+            = build_tree(depth - 1, rho_subtree, z_propose_right,
+                         H0, sign, n_leapfrog,
+                         sum_weight_right, sum_metro_prob, writer);
 
-          if ( util.criterion && (this->rand_uniform_() < accept_prob) )
+          sum_weight += sum_weight_right;
+          if (!valid_right) return false;
+
+          // Multinomial sample from right subtree
+          double accept_prob = sum_weight_right / sum_weight;
+          if (this->rand_uniform_() < accept_prob)
             z_propose = z_propose_right;
 
-          Eigen::VectorXd& subtree_rho = left_subtree_rho;
-          subtree_rho += right_subtree_rho;
-
-          rho += subtree_rho;
-
-          util.criterion &= compute_criterion(z_init, this->z_, subtree_rho);
-
-          return n1 + n2;
+          rho += rho_subtree;
+          return compute_criterion(z_init, this->z_, rho_subtree);
         }
       }
 
       int depth_;
       int max_depth_;
-      double max_delta_;
+      double max_deltaH_;
 
       int n_leapfrog_;
       int divergent_;
