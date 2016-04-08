@@ -51,7 +51,7 @@ TEST(McmcUnitENuts, build_tree) {
 
   EXPECT_EQ(0.1, sampler.get_nominal_stepsize());
 
-  EXPECT_EQ(true, valid_subtree);
+  EXPECT_TRUE(valid_subtree);
 
   EXPECT_FLOAT_EQ(-11.401228, rho(0));
   EXPECT_FLOAT_EQ(11.401228, rho(1));

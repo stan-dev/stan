@@ -159,7 +159,7 @@ TEST(McmcBaseNuts, build_tree) {
                                           H0, 1, n_leapfrog, sum_weight,
                                           sum_metro_prob, writer);
 
-  EXPECT_EQ(true, valid_subtree);
+  EXPECT_TRUE(valid_subtree);
 
   EXPECT_EQ(init_momentum * (n_leapfrog + 1), rho(0));
 
@@ -210,7 +210,7 @@ TEST(McmcBaseNuts, divergence_test) {
   valid_subtree = sampler.build_tree(0, rho, z_propose,
                                      H0, 1, n_leapfrog, sum_weight,
                                      sum_metro_prob, writer);
-  EXPECT_EQ(true, valid_subtree);
+  EXPECT_TRUE(valid_subtree);
   EXPECT_EQ(0, sampler.divergent_);
 
   sampler.z().V = -250;
@@ -218,7 +218,7 @@ TEST(McmcBaseNuts, divergence_test) {
                                      H0, 1, n_leapfrog, sum_weight,
                                      sum_metro_prob, writer);
 
-  EXPECT_EQ(true, valid_subtree);
+  EXPECT_TRUE(valid_subtree);
   EXPECT_EQ(0, sampler.divergent_);
 
   sampler.z().V = 750;
@@ -226,7 +226,7 @@ TEST(McmcBaseNuts, divergence_test) {
                                      H0, 1, n_leapfrog, sum_weight,
                                      sum_metro_prob, writer);
 
-  EXPECT_EQ(false, valid_subtree);
+  EXPECT_FALSE(valid_subtree);
   EXPECT_EQ(1, sampler.divergent_);
 
   EXPECT_EQ("", output.str());
