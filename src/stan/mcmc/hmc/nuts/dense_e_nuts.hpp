@@ -18,15 +18,6 @@ namespace stan {
       dense_e_nuts(Model &model, BaseRNG& rng)
         : base_nuts<Model, dense_e_metric, expl_leapfrog,
                     BaseRNG>(model, rng) { }
-
-      // Note that the points don't need to be swapped
-      // here since start.mInv = finish.mInv
-      bool compute_criterion(ps_point& start,
-                             dense_e_point& finish,
-                             Eigen::VectorXd& rho) {
-        return finish.p.transpose() * finish.mInv * (rho - finish.p) > 0
-               && start.p.transpose() * finish.mInv * (rho - start.p)  > 0;
-      }
     };
 
   }  // mcmc

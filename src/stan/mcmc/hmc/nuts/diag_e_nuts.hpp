@@ -18,15 +18,6 @@ namespace stan {
       diag_e_nuts(Model &model, BaseRNG& rng)
         : base_nuts<Model, diag_e_metric, expl_leapfrog,
                     BaseRNG>(model, rng) { }
-
-      // Note that the points don't need to be swapped
-      // here since start.mInv = finish.mInv
-      bool compute_criterion(ps_point& start,
-                             diag_e_point& finish,
-                             Eigen::VectorXd& rho) {
-        return finish.mInv.cwiseProduct(finish.p).dot(rho - finish.p) > 0
-               && finish.mInv.cwiseProduct(start.p).dot(rho - start.p) > 0;
-      }
     };
 
   }  // mcmc

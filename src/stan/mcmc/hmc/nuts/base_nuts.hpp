@@ -20,8 +20,8 @@ namespace stan {
     public:
       base_nuts(Model &model, BaseRNG& rng)
         : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
-        depth_(0), max_depth_(5), max_deltaH_(1000),
-        n_leapfrog_(0), divergent_(0), energy_(0) {
+          depth_(0), max_depth_(5), max_deltaH_(1000),
+          n_leapfrog_(0), divergent_(0), energy_(0) {
       }
 
       ~base_nuts() {}
@@ -54,6 +54,8 @@ namespace stan {
         ps_point z_sample(z_plus);
         ps_point z_propose(z_plus);
 
+        Eigen::VectorXd p_sharp_plus = this->hamiltonian_.dtau_dp(this->z_);
+        Eigen::VectorXd p_sharp_minus = this->hamiltonian_.dtau_dp(this->z_);
         Eigen::VectorXd rho = this->z_.p;
         double sum_weight = 1;
 
@@ -80,6 +82,7 @@ namespace stan {
                            H0, 1, n_leapfrog,
                            sum_weight_subtree, sum_metro_prob, writer);
             z_plus.ps_point::operator=(this->z_);
+            p_sharp_plus = this->hamiltonian_.dtau_dp(this->z_);
           } else {
             this->z_.ps_point::operator=(z_minus);
             valid_subtree
@@ -87,6 +90,7 @@ namespace stan {
                            H0, -1, n_leapfrog,
                            sum_weight_subtree, sum_metro_prob, writer);
             z_minus.ps_point::operator=(this->z_);
+            p_sharp_minus = this->hamiltonian_.dtau_dp(this->z_);
           }
 
           sum_weight += sum_weight_subtree;
@@ -100,10 +104,8 @@ namespace stan {
             z_sample = z_propose;
 
           // Break when NUTS criterion is not longer satisfied
-          this->z_.ps_point::operator=(z_plus);
-
           rho += rho_subtree;
-          if (!compute_criterion(z_minus, this->z_, rho))
+          if (!compute_criterion(p_sharp_minus, p_sharp_plus, rho))
             break;
         }
 
@@ -135,10 +137,12 @@ namespace stan {
         values.push_back(this->energy_);
       }
 
-      virtual bool compute_criterion(ps_point& start,
-                                     typename Hamiltonian<Model, BaseRNG>
-                                     ::PointType& finish,
-                                     Eigen::VectorXd& rho) = 0;
+      bool compute_criterion(Eigen::VectorXd& p_sharp_minus,
+                             Eigen::VectorXd& p_sharp_plus,
+                             Eigen::VectorXd& rho) {
+        return    p_sharp_plus.dot(rho) > 0
+               && p_sharp_minus.dot(rho) > 0;
+      }
 
       // Returns number of valid points in the completed subtree
       int build_tree(int depth, Eigen::VectorXd& rho, ps_point& z_propose,
@@ -169,7 +173,7 @@ namespace stan {
 
         } else {
           // General recursion
-          ps_point z_init(this->z_);
+          Eigen::VectorXd p_sharp_left = this->hamiltonian_.dtau_dp(this->z_);
 
           Eigen::VectorXd rho_subtree(rho.size());
           rho_subtree.setZero();
@@ -203,7 +207,8 @@ namespace stan {
             z_propose = z_propose_right;
 
           rho += rho_subtree;
-          return compute_criterion(z_init, this->z_, rho_subtree);
+          Eigen::VectorXd p_sharp_right = this->hamiltonian_.dtau_dp(this->z_);
+          return compute_criterion(p_sharp_left, p_sharp_right, rho_subtree);
         }
       }
 

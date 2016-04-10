@@ -19,13 +19,6 @@ namespace stan {
       unit_e_nuts(Model &model, BaseRNG& rng)
         : base_nuts<Model, unit_e_metric, expl_leapfrog,
                     BaseRNG>(model, rng) { }
-
-      bool compute_criterion(ps_point& start,
-                             unit_e_point& finish,
-                             Eigen::VectorXd& rho) {
-        return finish.p.dot(rho - finish.p) > 0
-               && start.p.dot(rho - start.p) > 0;
-      }
     };
 
   }  // mcmc
