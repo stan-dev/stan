@@ -6,10 +6,12 @@
 
 namespace stan {
   namespace mcmc {
-    // Hamiltonian Monte Carlo on a
-    // Euclidean manifold with dense metric,
-    // static integration time,
-    // and adaptive stepsize
+    /**
+      * Hamiltonian Monte Carlo implemetnation that uniformly samples
+      * from trajectories with a static integration time with a
+      * Gaussian-Euclidean disintegration and dense metric and
+      * adaptive step size
+    */
     template <typename M, class BaseRNG>
     class adapt_dense_e_static_uniform:
       public dense_e_static_uniform<M, BaseRNG>,

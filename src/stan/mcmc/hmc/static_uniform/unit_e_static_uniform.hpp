@@ -8,10 +8,11 @@
 
 namespace stan {
   namespace mcmc {
-    // Hamiltonian Monte Carlo on a
-    // Euclidean manifold with unit metric
-    // and static integration time
-
+    /**
+      * Hamiltonian Monte Carlo implemetnation that uniformly samples
+      * from trajectories with a static integration time with a
+      * Gaussian-Euclidean disintegration and unit metric
+    */
     template <typename M, class BaseRNG>
     class unit_e_static_uniform
       : public base_static_uniform<M, unit_e_metric, expl_leapfrog, BaseRNG> {
