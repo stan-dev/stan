@@ -13,7 +13,9 @@
 
 namespace stan {
   namespace mcmc {
-    // The No-U-Turn Sampler (NUTS) with multinomial sampling
+    /**
+      * The No-U-Turn sampler (NUTS) with multinomial sampling
+    */
     template <class Model, template<class, class> class Hamiltonian,
               template<class> class Integrator, class BaseRNG>
     class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
