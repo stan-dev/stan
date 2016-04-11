@@ -46,13 +46,13 @@ namespace stan {
 
       virtual void sample_p(Point& z, BaseRNG& rng) = 0;
 
-      virtual void init(Point& z,
-                        interface_callbacks::writer::base_writer& writer) {
+      void init(Point& z,
+                interface_callbacks::writer::base_writer& writer) {
         this->update(z, writer);
       }
 
-      virtual void update(Point& z,
-                          interface_callbacks::writer::base_writer& writer) {
+      void update(Point& z,
+                  interface_callbacks::writer::base_writer& writer) {
         try {
           stan::model::gradient(model_, z.q, z.V, z.g, writer);
           z.V *= -1;
@@ -62,6 +62,12 @@ namespace stan {
         }
         z.g *= -1;
       }
+
+      void update_metric(Point& z,
+                         interface_callbacks::writer::base_writer& writer) {};
+
+      void update_metric_gradients(
+        Point& z, interface_callbacks::writer::base_writer& writer) {};
 
     protected:
       Model& model_;

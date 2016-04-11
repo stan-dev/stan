@@ -14,22 +14,21 @@ namespace stan {
         : base_leapfrog<Hamiltonian>() {}
 
       void begin_update_p(typename Hamiltonian::PointType& z,
-                          Hamiltonian& hamiltonian,
-                          double epsilon) {
-        z.p -= epsilon * hamiltonian.dphi_dq(z);
+                          Hamiltonian& hamiltonian, double epsilon,
+                          interface_callbacks::writer::base_writer& writer) {
+        z.p -= epsilon * hamiltonian.dphi_dq(z, writer);
       }
 
       void update_q(typename Hamiltonian::PointType& z,
-                    Hamiltonian& hamiltonian,
-                    double epsilon) {
-        Eigen::Map<Eigen::VectorXd> q(&(z.q[0]), z.q.size());
-        q += epsilon * hamiltonian.dtau_dp(z);
+                    Hamiltonian& hamiltonian, double epsilon,
+                    interface_callbacks::writer::base_writer& writer) {
+        z.q += epsilon * hamiltonian.dtau_dp(z, writer);
       }
 
       void end_update_p(typename Hamiltonian::PointType& z,
-                        Hamiltonian& hamiltonian,
-                        double epsilon) {
-        z.p -= epsilon * hamiltonian.dphi_dq(z);
+                        Hamiltonian& hamiltonian, double epsilon,
+                        interface_callbacks::writer::base_writer& writer) {
+        z.p -= epsilon * hamiltonian.dphi_dq(z, writer);
       }
     };
 

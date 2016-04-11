@@ -1,0 +1,111 @@
+#ifndef STAN_MCMC_HMC_INTEGRATORS_IMPL_LEAPFROG_HPP
+#define STAN_MCMC_HMC_INTEGRATORS_IMPL_LEAPFROG_HPP
+
+#include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/mcmc/hmc/integrators/base_leapfrog.hpp>
+
+namespace stan {
+  namespace mcmc {
+
+    template <typename Hamiltonian>
+    class impl_leapfrog: public base_leapfrog<Hamiltonian> {
+    public:
+      impl_leapfrog(): base_leapfrog<Hamiltonian>(),
+                       max_num_fixed_point_(10),
+                       fixed_point_threshold_(1e-8) {};
+
+      void begin_update_p(typename Hamiltonian::PointTypeP& z,
+                          Hamiltonian& hamiltonian,
+                          double epsilon,
+                          interface_callbacks::writer::base_writer& writer) {
+        hat_phi(z, hamiltonian, epsilon, writer);
+        hat_tau(z, hamiltonian, epsilon, this->max_num_fixed_point_, writer);
+      }
+
+      void update_q(typename Hamiltonian::PointType& z,
+                    Hamiltonian& hamiltonian,
+                    double epsilon,
+                    interface_callbacks::writer::base_writer& writer) {
+        hat_T(z, hamiltonian, epsilon, writer);
+      }
+
+      void end_update_p(typename Hamiltonian::PointType& z,
+                        Hamiltonian& hamiltonian,
+                        double epsilon,
+                        interface_callbacks::writer::base_writer& writer) {
+        hat_tau(z, hamiltonian, epsilon, 1, writer);
+        hat_phi(z, hamiltonian, epsilon, writer);
+      }
+
+      // hat{phi} = dphi/dq * d/dp
+      void hat_phi(typename Hamiltonian::PointType& z,
+                   Hamiltonian& hamiltonian,
+                   double epsilon,
+                   interface_callbacks::writer::base_writer& writer) {
+        z.p -= epsilon * hamiltonian.dphi_dq(z, writer);
+      }
+
+      // hat{tau} = dtau/dq * d/dp
+      void hat_tau(typename Hamiltonian::PointType& z,
+                   Hamiltonian& hamiltonian,
+                   double epsilon,
+                   int num_fixed_point,
+                   interface_callbacks::writer::base_writer& writer) {
+        Eigen::VectorXd p_init = z.p;
+        Eigen::VectorXd delta_p(z.p.size());
+
+        for (int n = 0; n < num_fixed_point; ++n) {
+          delta_p = z.p;
+          z.p.noalias() = p_init - epsilon * hamiltonian.dtau_dq(z, writer);
+          delta_p -= z.p;
+          if(delta_p.cwiseAbs().maxCoeff() < fixed_point_threshold_) break;
+        }
+      }
+
+      // hat{T} = dT/dp * d/dq
+      void hat_T(typename Hamiltonian::PointType& z,
+                 H& hamiltonian,
+                 double epsilon,
+                 int num_fixed_point;
+                 interface_callbacks::writer::base_writer& writer) {
+        Eigen::VectorXd q_init = q + 0.5 * epsilon * hamiltonian.dtau_dp(z);
+        Eigen::VectorXd delta_q(z.q.size());
+
+        for (int n = 0; n < num_fixed_point; ++n) {
+          delta_q = z.q;
+          z.q.noalias() = q_init + 0.5 * epsilon * hamiltonian.dtau_dp(z);
+          hamiltonian.update_metric(z, writer);
+
+          delta_q -= q;
+          if(delta_q.cwiseAbs().maxCoeff() <_fixed_point_threshold_) break;
+
+        }
+        hamiltonian.update_metric_gradients(z, writer);
+      }
+
+      int max_num_fixed_point() {
+        return this->max_num_fixed_point_;
+      }
+
+      void set_max_num_fixed_point(int n) {
+        if(n > 0) this->max_num_fixed_point_ = n;
+      }
+
+      double fixed_point_threshold() {
+        return this->fixed_point_threshold_;
+      }
+
+      void set_fixed_point_threshold(double t) {
+        if(t > 0) this->fixed_point_threshold_ = t;
+      }
+
+    private:
+      int max_num_fixed_point_;
+      double fixed_point_threshold_;
+    };
+
+  } // mcmc
+} // stan
+
+
+#endif
