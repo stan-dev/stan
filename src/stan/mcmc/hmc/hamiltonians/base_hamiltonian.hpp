@@ -36,6 +36,8 @@ namespace stan {
         return T(z) + V(z);
       }
 
+      virtual double dG_dt(Point& z) = 0;
+
       // tau = 0.5 p_{i} p_{j} Lambda^{ij} (q)
       virtual const Eigen::VectorXd dtau_dq(Point& z) = 0;
 

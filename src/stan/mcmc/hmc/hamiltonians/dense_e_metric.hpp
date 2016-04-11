@@ -34,6 +34,10 @@ namespace stan {
         return this->V(z);
       }
 
+      double dG_dt(dense_e_point& z) {
+        return 2 * T(z) - z.q.dot(z.g);
+      }
+
       const Eigen::VectorXd dtau_dq(dense_e_point& z) {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }

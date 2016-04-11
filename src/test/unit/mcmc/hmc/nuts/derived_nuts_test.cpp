@@ -12,7 +12,7 @@
 
 typedef boost::ecuyer1988 rng_t;
 
-TEST(McmcDerivedNuts, compute_criterion_unit_e) {
+TEST(McmcNutsDerivedNuts, compute_criterion_unit_e) {
 
   rng_t base_rng(0);
 
@@ -47,7 +47,7 @@ TEST(McmcDerivedNuts, compute_criterion_unit_e) {
 
 }
 
-TEST(McmcDerivedNuts, compute_criterion_diag_e) {
+TEST(McmcNutsDerivedNuts, compute_criterion_diag_e) {
 
   rng_t base_rng(0);
 
@@ -81,7 +81,7 @@ TEST(McmcDerivedNuts, compute_criterion_diag_e) {
   EXPECT_FALSE(sampler.compute_criterion(start, finish, rho));
 }
 
-TEST(McmcDerivedNuts, compute_criterion_dense_e) {
+TEST(McmcNutsDerivedNuts, compute_criterion_dense_e) {
 
   rng_t base_rng(0);
 
@@ -103,7 +103,7 @@ TEST(McmcDerivedNuts, compute_criterion_dense_e) {
   rho = start.p + finish.p;
 
   EXPECT_TRUE(sampler.compute_criterion(start, finish, rho));
-  
+
   start.q(0) = 1;
   start.p(0) = 1;
 

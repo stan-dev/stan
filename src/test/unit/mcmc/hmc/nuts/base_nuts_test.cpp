@@ -41,6 +41,8 @@ namespace stan {
       double tau(ps_point& z) { return T(z); }
       double phi(ps_point& z) { return this->V(z); }
 
+      double dG_dt(ps_point& z) { return 2; }
+
       const Eigen::VectorXd dtau_dq(ps_point& z) {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
@@ -89,7 +91,7 @@ namespace stan {
   }
 }
 
-TEST(McmcBaseNuts, set_max_depth) {
+TEST(McmcNutsBaseNuts, set_max_depth) {
 
   rng_t base_rng(0);
 
@@ -109,7 +111,7 @@ TEST(McmcBaseNuts, set_max_depth) {
 }
 
 
-TEST(McmcBaseNuts, set_max_delta) {
+TEST(McmcNutsBaseNuts, set_max_delta) {
   rng_t base_rng(0);
 
   Eigen::VectorXd q(2);
@@ -124,7 +126,7 @@ TEST(McmcBaseNuts, set_max_delta) {
   EXPECT_EQ(old_max_delta, sampler.get_max_delta());
 }
 
-TEST(McmcBaseNuts, build_tree) {
+TEST(McmcNutsBaseNuts, build_tree) {
 
   rng_t base_rng(0);
 
@@ -173,7 +175,7 @@ TEST(McmcBaseNuts, build_tree) {
   EXPECT_EQ("", output.str());
 }
 
-TEST(McmcBaseNuts, divergence_test) {
+TEST(McmcNutsBaseNuts, divergence_test) {
 
   rng_t base_rng(0);
 
@@ -232,7 +234,7 @@ TEST(McmcBaseNuts, divergence_test) {
   EXPECT_EQ("", output.str());
 }
 
-TEST(McmcBaseNuts, transition) {
+TEST(McmcNutsBaseNuts, transition) {
 
   rng_t base_rng(0);
 

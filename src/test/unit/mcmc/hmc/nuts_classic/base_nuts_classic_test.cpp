@@ -38,6 +38,8 @@ namespace stan {
       double tau(ps_point& z) { return T(z); }
       double phi(ps_point& z) { return this->V(z); }
 
+      double dG_dt(ps_point& z) { return 2; }
+
       const Eigen::VectorXd dtau_dq(ps_point& z) {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
@@ -82,7 +84,7 @@ namespace stan {
   }
 }
 
-TEST(McmcBaseNutsClassic, set_max_depth) {
+TEST(McmcNutsBaseNutsClassic, set_max_depth) {
 
   rng_t base_rng(0);
 
@@ -102,7 +104,7 @@ TEST(McmcBaseNutsClassic, set_max_depth) {
 }
 
 
-TEST(McmcBaseNuts, set_max_delta) {
+TEST(McmcNutsBaseNuts, set_max_delta) {
   rng_t base_rng(0);
 
   Eigen::VectorXd q(2);
@@ -117,7 +119,7 @@ TEST(McmcBaseNuts, set_max_delta) {
   EXPECT_EQ(old_max_delta, sampler.get_max_delta());
 }
 
-TEST(McmcBaseNutsClassic, build_tree) {
+TEST(McmcNutsBaseNutsClassic, build_tree) {
 
   rng_t base_rng(0);
 
@@ -168,7 +170,7 @@ TEST(McmcBaseNutsClassic, build_tree) {
   EXPECT_EQ("", output.str());
 }
 
-TEST(McmcBaseNutsClassic, slice_criterion) {
+TEST(McmcNutsBaseNutsClassic, slice_criterion) {
 
   rng_t base_rng(0);
 
