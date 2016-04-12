@@ -28,24 +28,32 @@ namespace stan {
     /**
      * Automatic Differentiation Variational Inference
      *
-     * Runs "black box" variational inference by applying stochastic gradient
-     * ascent in order to maximize the Evidence Lower Bound for a given model
+     * Implements "black box" variational inference using stochastic gradient
+     * ascent to maximize the Evidence Lower Bound for a given model
      * and variational family.
      *
      * @tparam Model                 class of model
      * @tparam Q                     class of variational distribution
      * @tparam BaseRNG               class of random number generator
-     * @param  m                     stan model
-     * @param  cont_params           initialization of continuous parameters
-     * @param  rng                   random number generator
-     * @param  n_monte_carlo_grad    number of samples for gradient computation
-     * @param  n_monte_carlo_elbo    number of samples for ELBO computation
-     * @param  eval_elbo             evaluate ELBO at every "eval_elbo" iters
-     * @param  n_posterior_samples   number of samples to draw from posterior
      */
     template <class Model, class Q, class BaseRNG>
     class advi {
     public:
+      /**
+       * Constructor
+       * 
+       * @param  m                    stan model
+       * @param  cont_params          initialization of continuous parameters
+       * @param  rng                  random number generator
+       * @param  n_monte_carlo_grad   number of samples for gradient computation
+       * @param  n_monte_carlo_elbo   number of samples for ELBO computation
+       * @param  eval_elbo            evaluate ELBO at every "eval_elbo" iters
+       * @param  n_posterior_samples  number of samples to draw from posterior
+       * @throw  std::runtime_error   if n_monte_carlo_grad is not positive
+       * @throw  std::runtime_error   if n_monte_carlo_elbo is not positive
+       * @throw  std::runtime_error   if eval_elbo is not positive
+       * @throw  std::runtime_error   if n_posterior_samples is not positive
+       */
       advi(Model& m,
            Eigen::VectorXd& cont_params,
            BaseRNG& rng,
@@ -65,11 +73,11 @@ namespace stan {
                              "Number of Monte Carlo samples for gradients",
                              n_monte_carlo_grad_);
         math::check_positive(function,
+                             "Number of Monte Carlo samples for ELBO",
+                             n_monte_carlo_elbo_);
+        math::check_positive(function,
                              "Evaluate ELBO at every eval_elbo iteration",
                              eval_elbo_);
-        math::check_positive(function,
-                             "Number of posterior samples for output",
-                             n_posterior_samples_);
         math::check_positive(function,
                              "Number of posterior samples for output",
                              n_posterior_samples_);
@@ -133,8 +141,8 @@ namespace stan {
        * @param[in] variational variational approximation at which to evaluate
        * the ELBO.
        * @param[out] elbo_grad gradient of ELBO with respect to variational
-       * @param message_writer writer for messages
        * approximation.
+       * @param message_writer writer for messages
        */
       void calc_ELBO_grad(const Q& variational, Q& elbo_grad,
                           interface_callbacks::writer::base_writer&
