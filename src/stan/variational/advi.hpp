@@ -521,9 +521,9 @@ namespace stan {
         // Draw more samples from posterior and write on subsequent lines
         message_writer();
         std::stringstream ss;
-        ss << "Drawing "
+        ss << "Drawing a sample of size "
            << n_posterior_samples_
-           << " samples from the approximate posterior... ";
+           << " from the approximate posterior... ";
         message_writer(ss.str());
 
         for (int n = 0; n < n_posterior_samples_; ++n) {
