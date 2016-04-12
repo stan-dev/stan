@@ -19,13 +19,6 @@ namespace stan {
       mock_nuts(mock_model &m, rng_t& rng)
         : base_nuts<mock_model,mock_hamiltonian,mock_integrator,rng_t>(m, rng)
       { }
-
-    private:
-
-      bool compute_criterion(ps_point& start,
-                             ps_point& finish,
-                             Eigen::VectorXd& rho) { return true; }
-
     };
 
     // Mock Hamiltonian
@@ -79,13 +72,6 @@ namespace stan {
       divergent_nuts(mock_model &m, rng_t& rng)
         : base_nuts<mock_model, divergent_hamiltonian, expl_leapfrog,rng_t>(m, rng)
       { }
-
-    private:
-
-      bool compute_criterion(ps_point& start,
-                             ps_point& finish,
-                             Eigen::VectorXd& rho) { return false; }
-
     };
 
   }

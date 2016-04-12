@@ -7,11 +7,11 @@
 
 namespace stan {
   namespace mcmc {
-
-    // The No-U-Turn Sampler (NUTS) on a
-    // Euclidean manifold with unit metric
-    // and adaptive stepsize
-
+    /**
+      * The No-U-Turn sampler (NUTS) with multinomial sampling
+      * with a Gaussian-Euclidean disintegration and unit metric
+      * and adaptive step size
+    */
     template <class Model, class BaseRNG>
     class adapt_unit_e_nuts: public unit_e_nuts<Model, BaseRNG>,
                              public stepsize_adapter {

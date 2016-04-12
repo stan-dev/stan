@@ -8,14 +8,10 @@
 #include <stan/mcmc/hmc/integrators/base_integrator.hpp>
 
 namespace stan {
-
   namespace mcmc {
-
-
     // Mock Model
     class mock_model: public model::prob_grad {
     public:
-
       mock_model(size_t num_params_r): model::prob_grad(num_params_r) {};
 
       template <bool propto, bool jacobian_adjust_transforms, typename T>
@@ -61,8 +57,9 @@ namespace stan {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 
+      // Ensures that NUTS non-termination criterion is always true
       const Eigen::VectorXd dtau_dp(ps_point& z) {
-        return Eigen::VectorXd::Zero(this->model_.num_params_r());
+        return Eigen::VectorXd::Ones(this->model_.num_params_r());
       }
 
       const Eigen::VectorXd dphi_dq(ps_point& z) {
@@ -70,7 +67,6 @@ namespace stan {
       }
 
       void sample_p(ps_point& z, BaseRNG& rng) {}
-
     };
 
     // Mock Integrator
@@ -89,7 +85,6 @@ namespace stan {
       };
 
     };
-
   } // mcmc
 } // stan
 #endif
