@@ -524,7 +524,7 @@ namespace stan {
         ss << "Drawing "
            << n_posterior_samples_
            << " samples from the approximate posterior... ";
-        message_writer(ss.str());           
+        message_writer(ss.str());
 
         for (int n = 0; n < n_posterior_samples_; ++n) {
           variational.sample(rng_, cont_params_);
