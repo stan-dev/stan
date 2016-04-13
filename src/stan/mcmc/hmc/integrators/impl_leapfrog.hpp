@@ -14,7 +14,7 @@ namespace stan {
                        max_num_fixed_point_(10),
                        fixed_point_threshold_(1e-8) {};
 
-      void begin_update_p(typename Hamiltonian::PointTypeP& z,
+      void begin_update_p(typename Hamiltonian::PointType& z,
                           Hamiltonian& hamiltonian,
                           double epsilon,
                           interface_callbacks::writer::base_writer& writer) {
@@ -26,7 +26,20 @@ namespace stan {
                     Hamiltonian& hamiltonian,
                     double epsilon,
                     interface_callbacks::writer::base_writer& writer) {
-        hat_T(z, hamiltonian, epsilon, writer);
+        // hat{T} = dT/dp * d/dq
+        Eigen::VectorXd q_init = z.q + 0.5 * epsilon * hamiltonian.dtau_dp(z);
+        Eigen::VectorXd delta_q(z.q.size());
+
+        for (int n = 0; n < this->max_num_fixed_point_; ++n) {
+          delta_q = z.q;
+          z.q.noalias() = q_init + 0.5 * epsilon * hamiltonian.dtau_dp(z);
+          hamiltonian.update_metric(z, writer);
+
+          delta_q -= z.q;
+          if(delta_q.cwiseAbs().maxCoeff() < this->fixed_point_threshold_)
+            break;
+        }
+        hamiltonian.update_gradients(z, writer);
       }
 
       void end_update_p(typename Hamiltonian::PointType& z,
@@ -58,29 +71,9 @@ namespace stan {
           delta_p = z.p;
           z.p.noalias() = p_init - epsilon * hamiltonian.dtau_dq(z, writer);
           delta_p -= z.p;
-          if(delta_p.cwiseAbs().maxCoeff() < fixed_point_threshold_) break;
+          if(delta_p.cwiseAbs().maxCoeff() < this->fixed_point_threshold_)
+            break;
         }
-      }
-
-      // hat{T} = dT/dp * d/dq
-      void hat_T(typename Hamiltonian::PointType& z,
-                 H& hamiltonian,
-                 double epsilon,
-                 int num_fixed_point;
-                 interface_callbacks::writer::base_writer& writer) {
-        Eigen::VectorXd q_init = q + 0.5 * epsilon * hamiltonian.dtau_dp(z);
-        Eigen::VectorXd delta_q(z.q.size());
-
-        for (int n = 0; n < num_fixed_point; ++n) {
-          delta_q = z.q;
-          z.q.noalias() = q_init + 0.5 * epsilon * hamiltonian.dtau_dp(z);
-          hamiltonian.update_metric(z, writer);
-
-          delta_q -= q;
-          if(delta_q.cwiseAbs().maxCoeff() <_fixed_point_threshold_) break;
-
-        }
-        hamiltonian.update_metric_gradients(z, writer);
       }
 
       int max_num_fixed_point() {

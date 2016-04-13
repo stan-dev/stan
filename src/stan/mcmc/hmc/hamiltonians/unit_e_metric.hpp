@@ -35,7 +35,8 @@ namespace stan {
         return 2 * T(z) - z.q.dot(z.g);
       }
 
-      const Eigen::VectorXd dtau_dq(unit_e_point& z) {
+      const Eigen::VectorXd dtau_dq(
+        unit_e_point& z, interface_callbacks::writer::base_writer& writer) {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 
@@ -43,7 +44,8 @@ namespace stan {
         return z.p;
       }
 
-      const Eigen::VectorXd dphi_dq(unit_e_point& z) {
+      const Eigen::VectorXd dphi_dq(
+        unit_e_point& z, interface_callbacks::writer::base_writer& writer) {
         return z.g;
       }
 

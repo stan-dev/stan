@@ -53,7 +53,8 @@ namespace stan {
 
       double dG_dt(ps_point& z) { return 2; }
 
-      const Eigen::VectorXd dtau_dq(ps_point& z) {
+      const Eigen::VectorXd dtau_dq(
+        ps_point& z, interface_callbacks::writer::base_writer& writer) {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 
@@ -62,7 +63,8 @@ namespace stan {
         return Eigen::VectorXd::Ones(this->model_.num_params_r());
       }
 
-      const Eigen::VectorXd dphi_dq(ps_point& z) {
+      const Eigen::VectorXd dphi_dq(
+        ps_point& z, interface_callbacks::writer::base_writer& writer) {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 

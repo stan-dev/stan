@@ -20,11 +20,7 @@ namespace stan {
                   const double epsilon,
                   interface_callbacks::writer::base_writer& writer) {
         begin_update_p(z, hamiltonian, 0.5 * epsilon, writer);
-
         update_q(z, hamiltonian, epsilon, writer);
-        hamiltonian.update(z, writer); // Remove this and let implementations
-                                       // be responsible for updating gradient?
-
         end_update_p(z, hamiltonian, 0.5 * epsilon, writer);
       }
 
@@ -84,7 +80,6 @@ namespace stan {
         writer(msg.str());
 
         update_q(z, hamiltonian, epsilon, writer);
-        hamiltonian.update(z, writer);
 
         double H2 = hamiltonian.H(z);
 

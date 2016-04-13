@@ -1,4 +1,4 @@
-#include <stan/mcmc/hmc/integrators/expl_leapfrog.hpp>
+#include <stan/mcmc/hmc/integrators/impl_leapfrog.hpp>
 #include <gtest/gtest.h>
 
 #include <sstream>
@@ -13,7 +13,7 @@
 
 typedef boost::ecuyer1988 rng_t;
 
-TEST(McmcHmcIntegratorsExplLeapfrog, energy_conservation) {
+TEST(McmcHmcIntegratorsImplLeapfrog, energy_conservation) {
   rng_t base_rng(0);
 
   std::fstream data_stream(std::string("").c_str(), std::fstream::in);
@@ -25,7 +25,7 @@ TEST(McmcHmcIntegratorsExplLeapfrog, energy_conservation) {
   stan::interface_callbacks::writer::stream_writer writer(metric_output);
   gauss_model_namespace::gauss_model model(data_var_context, &model_output);
 
-  stan::mcmc::expl_leapfrog<
+  stan::mcmc::impl_leapfrog<
     stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> >
     integrator;
 
@@ -44,23 +44,21 @@ TEST(McmcHmcIntegratorsExplLeapfrog, energy_conservation) {
   size_t L = tau / epsilon;
 
   for (size_t n = 0; n < L; ++n) {
-
     integrator.evolve(z, metric, epsilon, writer);
 
     double deltaH = metric.H(z) - H0;
     aveDeltaH += (deltaH - aveDeltaH) / double(n + 1);
-
   }
 
   // Average error in Hamiltonian should be O(epsilon^{2})
-  // in general, smaller for the gauss_modelian case due to cancellations
+  // in general, smaller for the gauss_model in this case due to cancellations
   EXPECT_NEAR(aveDeltaH, 0, epsilon * epsilon);
 
   EXPECT_EQ("", model_output.str());
   EXPECT_EQ("", metric_output.str());
 }
 
-TEST(McmcHmcIntegratorsExplLeapfrog, symplecticness) {
+TEST(McmcHmcIntegratorsImplLeapfrog, symplecticness) {
   rng_t base_rng(0);
 
   std::fstream data_stream(std::string("").c_str(), std::fstream::in);
@@ -73,7 +71,7 @@ TEST(McmcHmcIntegratorsExplLeapfrog, symplecticness) {
 
   gauss_model_namespace::gauss_model model(data_var_context, &model_output);
 
-  stan::mcmc::expl_leapfrog<
+  stan::mcmc::impl_leapfrog<
     stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> >
     integrator;
 

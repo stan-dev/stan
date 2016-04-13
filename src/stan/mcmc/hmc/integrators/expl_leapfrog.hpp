@@ -22,7 +22,8 @@ namespace stan {
       void update_q(typename Hamiltonian::PointType& z,
                     Hamiltonian& hamiltonian, double epsilon,
                     interface_callbacks::writer::base_writer& writer) {
-        z.q += epsilon * hamiltonian.dtau_dp(z, writer);
+        z.q += epsilon * hamiltonian.dtau_dp(z);
+        hamiltonian.update_potential_gradient(z, writer);
       }
 
       void end_update_p(typename Hamiltonian::PointType& z,

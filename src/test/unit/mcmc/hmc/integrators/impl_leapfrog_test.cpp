@@ -1,4 +1,4 @@
-#include <stan/mcmc/hmc/integrators/expl_leapfrog.hpp>
+#include <stan/mcmc/hmc/integrators/impl_leapfrog.hpp>
 #include <gtest/gtest.h>
 
 #include <sstream>
@@ -17,9 +17,9 @@
 
 typedef boost::ecuyer1988 rng_t;
 
-class McmcHmcIntegratorsExplLeapfrogF : public testing::Test {
+class McmcHmcIntegratorsImplLeapfrogF : public testing::Test {
 public:
-  McmcHmcIntegratorsExplLeapfrogF()
+  McmcHmcIntegratorsImplLeapfrogF()
     : unit_e_integrator(),
       diag_e_integrator(),
       writer(output) {}
@@ -40,11 +40,11 @@ public:
   }
 
   // integrator under test
-  stan::mcmc::expl_leapfrog<
+  stan::mcmc::impl_leapfrog<
     stan::mcmc::unit_e_metric<command_model_namespace::command_model, rng_t> >
   unit_e_integrator;
 
-  stan::mcmc::expl_leapfrog<
+  stan::mcmc::impl_leapfrog<
     stan::mcmc::diag_e_metric<command_model_namespace::command_model, rng_t> >
   diag_e_integrator;
 
@@ -56,7 +56,7 @@ public:
   stan::interface_callbacks::writer::stream_writer writer;
 };
 
-TEST_F(McmcHmcIntegratorsExplLeapfrogF, begin_update_p) {
+TEST_F(McmcHmcIntegratorsImplLeapfrogF, begin_update_p) {
   // setup z
   stan::mcmc::unit_e_point z(1);
   z.V    =  1.99974742955684;
@@ -84,7 +84,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, begin_update_p) {
   EXPECT_EQ("", output.str());
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrogF, update_q) {
+TEST_F(McmcHmcIntegratorsImplLeapfrogF, update_q) {
   // setup z
   stan::mcmc::unit_e_point z(1);
   z.V    =  1.99974742955684;
@@ -112,7 +112,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, update_q) {
   EXPECT_EQ("", output.str());
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrogF, end_update_p) {
+TEST_F(McmcHmcIntegratorsImplLeapfrogF, end_update_p) {
   // setup z
   stan::mcmc::unit_e_point z(1);
   z.V    =  1.39887860643153;
@@ -140,7 +140,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, end_update_p) {
   EXPECT_EQ("", output.str());
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_1) {
+TEST_F(McmcHmcIntegratorsImplLeapfrogF, evolve_1) {
   // setup z
   stan::mcmc::unit_e_point z(1);
   z.V    =  1.99974742955684;
@@ -168,7 +168,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_1) {
   EXPECT_EQ("", output.str());
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_2) {
+TEST_F(McmcHmcIntegratorsImplLeapfrogF, evolve_2) {
   // setup z
   stan::mcmc::unit_e_point z(1);
   z.V    =  1.99974742955684;
@@ -196,7 +196,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_2) {
   EXPECT_EQ("", output.str());
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_3) {
+TEST_F(McmcHmcIntegratorsImplLeapfrogF, evolve_3) {
   // setup z
   stan::mcmc::unit_e_point z(1);
   z.V    =  1.99974742955684;
@@ -224,7 +224,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_3) {
   EXPECT_EQ("", output.str());
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_4) {
+TEST_F(McmcHmcIntegratorsImplLeapfrogF, evolve_4) {
   // setup z
   stan::mcmc::unit_e_point z(1);
   z.V    =  1.99974742955684;
@@ -252,7 +252,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_4) {
   EXPECT_EQ("", output.str());
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_5) {
+TEST_F(McmcHmcIntegratorsImplLeapfrogF, evolve_5) {
   // setup z
   stan::mcmc::unit_e_point z(1);
   z.V    =  1.99974742955684;
@@ -279,7 +279,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_5) {
 
   EXPECT_EQ("", output.str());
 }
-TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_6) {
+TEST_F(McmcHmcIntegratorsImplLeapfrogF, evolve_6) {
   // setup z
   stan::mcmc::unit_e_point z(1);
   z.V    =  1.99974742955684;
@@ -307,7 +307,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_6) {
   EXPECT_EQ("", output.str());
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_7) {
+TEST_F(McmcHmcIntegratorsImplLeapfrogF, evolve_7) {
   // setup z
   stan::mcmc::unit_e_point z(1);
   z.V    =  1.99974742955684;
@@ -335,7 +335,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_7) {
   EXPECT_EQ("", output.str());
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_8) {
+TEST_F(McmcHmcIntegratorsImplLeapfrogF, evolve_8) {
   // setup z
   stan::mcmc::unit_e_point z(1);
   z.V    =  1.99974742955684;
@@ -363,7 +363,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_8) {
   EXPECT_EQ("", output.str());
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_9) {
+TEST_F(McmcHmcIntegratorsImplLeapfrogF, evolve_9) {
   // setup z
   stan::mcmc::diag_e_point z(1);
   z.V    =  0.807684865121721;
@@ -392,10 +392,10 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_9) {
   EXPECT_EQ("", output.str());
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrogF, streams) {
+TEST_F(McmcHmcIntegratorsImplLeapfrogF, streams) {
   stan::test::capture_std_streams();
 
-  typedef stan::mcmc::expl_leapfrog<
+  typedef stan::mcmc::impl_leapfrog<
     stan::mcmc::unit_e_metric<command_model_namespace::command_model,rng_t> >
     integrator;
 
