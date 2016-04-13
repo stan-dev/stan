@@ -3,6 +3,7 @@
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>
+#include <stan/math/mix/mat.hpp>
 #include <stan/mcmc/hmc/hamiltonians/base_hamiltonian.hpp>
 #include <stan/mcmc/hmc/hamiltonians/softabs_point.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -14,14 +15,14 @@ namespace stan {
 
     template <typename Model>
     struct softabs_fun {
-      const Model& model;
+      const Model& model_;
       std::ostream* o_;
 
-      softabs_fun(const Model& m, std::ostream* out): model(m), o_(out) {};
+      softabs_fun(const Model& m, std::ostream* out): model_(m), o_(out) {};
 
       template <typename T>
       T operator()(Eigen::Matrix<T, Eigen::Dynamic, 1>& x) const {
-        return model.template log_prob<true, true, T>(x, o_);
+        return model_.template log_prob<true, true, T>(x, o_);
       }
     };
 
@@ -43,7 +44,7 @@ namespace stan {
 
       double tau(softabs_point& z) {
         Eigen::VectorXd Qp = z.eigen_deco.eigenvectors().transpose() * z.p;
-        return 0.5 * Qp.transpose() * z.softabs_lambda_inv * Qp;
+        return 0.5 * Qp.transpose() * z.softabs_lambda_inv.cwiseProduct(Qp);
       }
 
       double phi(softabs_point& z) {
@@ -56,8 +57,8 @@ namespace stan {
 
       const Eigen::VectorXd dtau_dq(
         softabs_point& z, interface_callbacks::writer::base_writer& writer) {
-        Eigen::VectorXd a =    z.softabs_lambda_inv
-                             * z.eigen_deco.eigenvectors().transpose() * z.p;
+        Eigen::VectorXd a =    z.softabs_lambda_inv.cwiseProduct(
+                               z.eigen_deco.eigenvectors().transpose() * z.p);
         Eigen::MatrixXd A =   a.asDiagonal()
                             * z.eigen_deco.eigenvectors().transpose();
         Eigen::MatrixXd B = z.pseudo_j.selfadjointView<Eigen::Lower>() * A;
@@ -72,9 +73,8 @@ namespace stan {
 
       const Eigen::VectorXd dtau_dp(softabs_point& z) {
         return   z.eigen_deco.eigenvectors()
-               * z.softabs_lambda_inv
-               * z.eigen_deco.eigenvectors().transpose()
-               * z.p;
+               * z.softabs_lambda_inv.cwiseProduct(
+                   z.eigen_deco.eigenvectors().transpose() * z.p);
       }
 
       const Eigen::VectorXd dphi_dq(softabs_point& z,
@@ -86,7 +86,7 @@ namespace stan {
           Eigen::MatrixXd B = z.eigen_deco.eigenvectors() * A;
 
           stan::math::grad_tr_mat_times_hessian(
-            softabs_fun<Model>(this->_model, 0), z.q, B, a);
+            softabs_fun<Model>(this->model_, 0), z.q, B, a);
 
           return - 0.5 * a + z.g;
       }

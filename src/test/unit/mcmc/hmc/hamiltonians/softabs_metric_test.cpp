@@ -26,6 +26,10 @@ TEST(McmcSoftAbs, sample_p) {
   double m = 0;
   double m2 = 0;
 
+  std::stringstream model_output, metric_output;
+  stan::interface_callbacks::writer::stream_writer writer(metric_output);
+  metric.update_metric(z, writer);
+
   for (int i = 0; i < n_samples; ++i) {
     metric.sample_p(z, base_rng);
     double tau = metric.tau(z);
@@ -42,6 +46,8 @@ TEST(McmcSoftAbs, sample_p) {
 
   // Variance within 10% of expected value (d / 2)
   EXPECT_TRUE(std::fabs(var - 0.5 * q.size()) < 0.1 * q.size());
+
+  EXPECT_EQ("", metric_output.str());
 }
 
 TEST(McmcSoftAbs, gradients) {
