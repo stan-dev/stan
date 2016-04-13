@@ -43,7 +43,7 @@ namespace stan {
                                                     BaseRNG> {
 
     public:
-      explicit mock_hamiltonian(Model& model)
+      explicit mock_hamiltonian(const Model& model)
         : base_hamiltonian<Model, ps_point, BaseRNG>(model) {}
 
       double T(ps_point& z) { return 0; }

@@ -18,7 +18,7 @@ namespace stan {
       : public base_static_hmc<Model, unit_e_metric,
                                expl_leapfrog, BaseRNG> {
     public:
-      unit_e_static_hmc(Model &model, BaseRNG& rng)
+      unit_e_static_hmc(const Model& model, BaseRNG& rng)
         : base_static_hmc<Model, unit_e_metric,
                           expl_leapfrog, BaseRNG>(model, rng) { }
     };

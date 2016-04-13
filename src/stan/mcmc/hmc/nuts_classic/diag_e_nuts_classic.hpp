@@ -15,7 +15,7 @@ namespace stan {
       public base_nuts_classic<Model, diag_e_metric,
                                expl_leapfrog, BaseRNG> {
     public:
-      diag_e_nuts_classic(Model &model, BaseRNG& rng):
+      diag_e_nuts_classic(const Model& model, BaseRNG& rng):
         base_nuts_classic<Model, diag_e_metric,
                           expl_leapfrog, BaseRNG>(model, rng) { }
 

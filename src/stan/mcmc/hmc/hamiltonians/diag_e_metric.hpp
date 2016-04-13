@@ -13,7 +13,7 @@ namespace stan {
     template <class Model, class BaseRNG>
     class diag_e_metric: public base_hamiltonian<Model, diag_e_point, BaseRNG> {
     public:
-      explicit diag_e_metric(Model& model)
+      explicit diag_e_metric(const Model& model)
         : base_hamiltonian<Model, diag_e_point, BaseRNG>(model) {}
 
       ~diag_e_metric() {}

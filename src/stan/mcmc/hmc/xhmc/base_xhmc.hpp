@@ -21,7 +21,7 @@ namespace stan {
               template<class> class Integrator, class BaseRNG>
     class base_xhmc : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     public:
-      base_xhmc(Model &model, BaseRNG& rng)
+      base_xhmc(const Model& model, BaseRNG& rng)
         : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
           depth_(0), max_depth_(5), max_deltaH_(1000), x_delta_(0.1),
           n_leapfrog_(0), divergent_(0), energy_(0) {
@@ -167,7 +167,6 @@ namespace stan {
             z_propose = this->z_;
 
             return !this->divergent_;
-
         }
         // General recursion
 

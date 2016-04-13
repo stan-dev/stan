@@ -14,7 +14,7 @@ namespace stan {
       public base_nuts_classic<mock_model, mock_hamiltonian,
                                mock_integrator, rng_t> {
     public:
-      mock_nuts_classic(mock_model &m, rng_t& rng):
+      mock_nuts_classic(const mock_model &m, rng_t& rng):
         base_nuts_classic<mock_model, mock_hamiltonian,
                           mock_integrator, rng_t>(m, rng)
       { }
@@ -30,7 +30,7 @@ namespace stan {
     class divergent_hamiltonian
       : public base_hamiltonian<M, ps_point, BaseRNG> {
     public:
-      divergent_hamiltonian(M& m)
+      divergent_hamiltonian(const M& m)
         : base_hamiltonian<M, ps_point, BaseRNG>(m) {}
 
       double T(ps_point& z) { return 0; }
@@ -70,7 +70,7 @@ namespace stan {
       public base_nuts_classic<mock_model, divergent_hamiltonian,
                                expl_leapfrog, rng_t> {
     public:
-      divergent_nuts_classic(mock_model &m, rng_t& rng):
+      divergent_nuts_classic(const mock_model &m, rng_t& rng):
         base_nuts_classic<mock_model, divergent_hamiltonian,
                           expl_leapfrog, rng_t>(m, rng)
       { }

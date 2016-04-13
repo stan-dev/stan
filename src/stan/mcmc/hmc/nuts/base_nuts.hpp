@@ -20,7 +20,7 @@ namespace stan {
               template<class> class Integrator, class BaseRNG>
     class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     public:
-      base_nuts(Model &model, BaseRNG& rng)
+      base_nuts(const Model& model, BaseRNG& rng)
         : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
           depth_(0), max_depth_(5), max_deltaH_(1000),
           n_leapfrog_(0), divergent_(0), energy_(0) {
@@ -172,7 +172,6 @@ namespace stan {
             rho += this->z_.p;
 
             return !this->divergent_;
-
         }
         // General recursion
         Eigen::VectorXd p_sharp_left = this->hamiltonian_.dtau_dp(this->z_);

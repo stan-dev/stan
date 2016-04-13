@@ -17,7 +17,7 @@ namespace stan {
       : public base_xhmc<Model, dense_e_metric,
                          expl_leapfrog, BaseRNG> {
     public:
-      dense_e_xhmc(Model &model, BaseRNG& rng)
+      dense_e_xhmc(const Model& model, BaseRNG& rng)
         : base_xhmc<Model, dense_e_metric, expl_leapfrog,
                     BaseRNG>(model, rng) { }
     };

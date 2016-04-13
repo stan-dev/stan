@@ -17,7 +17,7 @@ namespace stan {
     class adapt_diag_e_static_hmc : public diag_e_static_hmc<Model, BaseRNG>,
                                     public stepsize_var_adapter {
     public:
-      adapt_diag_e_static_hmc(Model &model, BaseRNG& rng)
+      adapt_diag_e_static_hmc(const Model& model, BaseRNG& rng)
         : diag_e_static_hmc<Model, BaseRNG>(model, rng),
         stepsize_var_adapter(model.num_params_r()) {}
 

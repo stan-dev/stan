@@ -12,21 +12,22 @@ namespace stan {
      * Gaussian-Euclidean disintegration and adaptive dense metric and
      * adaptive step size
      */
-    template <typename M, class BaseRNG>
+    template <typename Model, class BaseRNG>
     class adapt_dense_e_static_uniform:
-      public dense_e_static_uniform<M, BaseRNG>,
+      public dense_e_static_uniform<Model, BaseRNG>,
       public stepsize_covar_adapter {
     public:
-      adapt_dense_e_static_uniform(M &m, BaseRNG& rng):
-        dense_e_static_uniform<M, BaseRNG>(m, rng),
-        stepsize_covar_adapter(m.num_params_r()) { }
+      adapt_dense_e_static_uniform(const Model& model, BaseRNG& rng):
+        dense_e_static_uniform<Model, BaseRNG>(model, rng),
+        stepsize_covar_adapter(model.num_params_r()) { }
 
       ~adapt_dense_e_static_uniform() { }
 
       sample transition(sample& init_sample,
                         interface_callbacks::writer::base_writer& writer) {
-        sample s = dense_e_static_uniform<M, BaseRNG>::transition(init_sample,
-                                                                  writer);
+        sample s
+          = dense_e_static_uniform<Model, BaseRNG>::transition(init_sample,
+                                                               writer);
 
         if (this->adapt_flag_) {
           this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,

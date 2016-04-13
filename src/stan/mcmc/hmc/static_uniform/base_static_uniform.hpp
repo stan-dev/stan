@@ -25,8 +25,8 @@ namespace stan {
     class base_static_uniform:
       public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     public:
-      base_static_uniform(Model &m, BaseRNG& rng)
-        : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(m, rng),
+      base_static_uniform(const Model& model, BaseRNG& rng)
+        : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
           T_(1), energy_(0) {
         update_L_();
       }

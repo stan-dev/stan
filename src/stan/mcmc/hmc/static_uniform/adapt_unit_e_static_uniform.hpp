@@ -18,7 +18,7 @@ namespace stan {
       public unit_e_static_uniform<Model, BaseRNG>,
       public stepsize_adapter {
     public:
-      adapt_unit_e_static_uniform(Model &model, BaseRNG& rng):
+      adapt_unit_e_static_uniform(const Model& model, BaseRNG& rng):
         unit_e_static_uniform<Model, BaseRNG>(model, rng) { }
 
       ~adapt_unit_e_static_uniform() { }

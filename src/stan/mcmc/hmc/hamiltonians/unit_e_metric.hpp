@@ -14,7 +14,7 @@ namespace stan {
     class unit_e_metric
       : public base_hamiltonian<Model, unit_e_point, BaseRNG> {
     public:
-      explicit unit_e_metric(Model& model)
+      explicit unit_e_metric(const Model& model)
         : base_hamiltonian<Model, unit_e_point, BaseRNG>(model) {}
 
       ~unit_e_metric() {}

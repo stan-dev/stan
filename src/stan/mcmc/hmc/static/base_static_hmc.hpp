@@ -23,7 +23,7 @@ namespace stan {
     class base_static_hmc
       : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     public:
-      base_static_hmc(Model &model, BaseRNG& rng)
+      base_static_hmc(const Model& model, BaseRNG& rng)
         : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
         T_(1), energy_(0) {
         update_L_();

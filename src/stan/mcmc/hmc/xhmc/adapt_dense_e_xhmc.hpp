@@ -16,7 +16,7 @@ namespace stan {
     class adapt_dense_e_xhmc : public dense_e_xhmc<Model, BaseRNG>,
                                public stepsize_covar_adapter {
     public:
-        adapt_dense_e_xhmc(Model &model, BaseRNG& rng)
+        adapt_dense_e_xhmc(const Model& model, BaseRNG& rng)
           : dense_e_xhmc<Model, BaseRNG>(model, rng),
           stepsize_covar_adapter(model.num_params_r()) {}
 

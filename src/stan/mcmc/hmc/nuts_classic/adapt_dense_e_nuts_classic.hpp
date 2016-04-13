@@ -16,7 +16,7 @@ namespace stan {
       public dense_e_nuts_classic<Model, BaseRNG>,
       public stepsize_covar_adapter {
     public:
-        adapt_dense_e_nuts_classic(Model &model, BaseRNG& rng):
+        adapt_dense_e_nuts_classic(const Model& model, BaseRNG& rng):
           dense_e_nuts_classic<Model, BaseRNG>(model, rng),
           stepsize_covar_adapter(model.num_params_r()) {}
 

@@ -14,7 +14,7 @@ namespace stan {
       public base_static_uniform<mock_model, mock_hamiltonian,
                                  mock_integrator, rng_t> {
     public:
-      mock_static_uniform(mock_model &m, rng_t& rng):
+      mock_static_uniform(const mock_model &m, rng_t& rng):
         base_static_uniform<mock_model, mock_hamiltonian,
                             mock_integrator, rng_t>(m, rng) { }
     };

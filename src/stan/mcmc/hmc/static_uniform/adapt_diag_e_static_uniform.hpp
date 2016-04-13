@@ -12,21 +12,22 @@ namespace stan {
      * Gaussian-Euclidean disintegration and adaptive diagonal metric and
      * adaptive step size
      */
-    template <typename M, class BaseRNG>
+    template <typename Model, class BaseRNG>
     class adapt_diag_e_static_uniform:
-      public diag_e_static_uniform<M, BaseRNG>,
+      public diag_e_static_uniform<Model, BaseRNG>,
       public stepsize_var_adapter {
     public:
-        adapt_diag_e_static_uniform(M &m, BaseRNG& rng):
-          diag_e_static_uniform<M, BaseRNG>(m, rng),
-          stepsize_var_adapter(m.num_params_r()) {}
+        adapt_diag_e_static_uniform(const Model& model, BaseRNG& rng):
+          diag_e_static_uniform<Model, BaseRNG>(model, rng),
+          stepsize_var_adapter(model.num_params_r()) {}
 
       ~adapt_diag_e_static_uniform() {}
 
       sample transition(sample& init_sample,
                         interface_callbacks::writer::base_writer& writer) {
-        sample s = diag_e_static_uniform<M, BaseRNG>::transition(init_sample,
-                                                                 writer);
+        sample s
+          = diag_e_static_uniform<Model, BaseRNG>::transition(init_sample,
+                                                              writer);
 
         if (this->adapt_flag_) {
           this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,

@@ -17,7 +17,7 @@ namespace stan {
     class adapt_unit_e_static_hmc : public unit_e_static_hmc<Model, BaseRNG>,
                                     public stepsize_adapter {
     public:
-      adapt_unit_e_static_hmc(Model &model, BaseRNG& rng)
+      adapt_unit_e_static_hmc(const Model& model, BaseRNG& rng)
         : unit_e_static_hmc<Model, BaseRNG>(model, rng) { }
 
       ~adapt_unit_e_static_hmc() { }
