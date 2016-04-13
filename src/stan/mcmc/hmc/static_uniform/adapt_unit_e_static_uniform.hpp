@@ -8,11 +8,11 @@
 namespace stan {
   namespace mcmc {
     /**
-      * Hamiltonian Monte Carlo implemetnation that uniformly samples
-      * from trajectories with a static integration time with a
-      * Gaussian-Euclidean disintegration and unit metric and
-      * adaptive step size
-    */
+     * Hamiltonian Monte Carlo implementation that uniformly samples
+     * from trajectories with a static integration time with a
+     * Gaussian-Euclidean disintegration and unit metric and
+     * adaptive step size
+     */
     template <class Model, class BaseRNG>
     class adapt_unit_e_static_uniform:
       public unit_e_static_uniform<Model, BaseRNG>,

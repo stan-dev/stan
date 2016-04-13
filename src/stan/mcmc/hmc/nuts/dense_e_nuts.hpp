@@ -9,9 +9,9 @@
 namespace stan {
   namespace mcmc {
     /**
-      * The No-U-Turn sampler (NUTS) with multinomial sampling
-      * with a Gaussian-Euclidean disintegration and dense metric
-    */
+     * The No-U-Turn sampler (NUTS) with multinomial sampling
+     * with a Gaussian-Euclidean disintegration and dense metric
+     */
     template <class Model, class BaseRNG>
     class dense_e_nuts : public base_nuts<Model, dense_e_metric,
                                           expl_leapfrog, BaseRNG> {

@@ -1,5 +1,5 @@
-#ifndef STAN_MCMC_HMC_xhmc_ADAPT_UNIT_E_XHMC_HPP
-#define STAN_MCMC_HMC_xhmc_ADAPT_UNIT_E_XHMC_HPP
+#ifndef STAN_MCMC_HMC_XHMC_ADAPT_UNIT_E_XHMC_HPP
+#define STAN_MCMC_HMC_XHMC_ADAPT_UNIT_E_XHMC_HPP
 
 #include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/hmc/xhmc/unit_e_xhmc.hpp>
@@ -8,10 +8,10 @@
 namespace stan {
   namespace mcmc {
     /**
-      * The No-U-Turn sampler (XHMC) with multinomial sampling
-      * with a Gaussian-Euclidean disintegration and unit metric
-      * and adaptive step size
-    */
+     * Exhausive Hamiltonian Monte Carlo (XHMC) with multinomial sampling
+     * with a Gaussian-Euclidean disintegration and unit metric
+     * and adaptive step size
+     */
     template <class Model, class BaseRNG>
     class adapt_unit_e_xhmc: public unit_e_xhmc<Model, BaseRNG>,
                              public stepsize_adapter {

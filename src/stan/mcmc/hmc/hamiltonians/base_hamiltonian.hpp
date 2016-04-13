@@ -36,6 +36,7 @@ namespace stan {
         return T(z) + V(z);
       }
 
+      // The time derivative of the virial, G = \sum_{d = 1}^{D} q^{d} p_{d}.
       virtual double dG_dt(Point& z) = 0;
 
       // tau = 0.5 p_{i} p_{j} Lambda^{ij} (q)

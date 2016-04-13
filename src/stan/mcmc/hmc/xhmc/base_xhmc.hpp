@@ -14,8 +14,9 @@
 namespace stan {
   namespace mcmc {
     /**
-      * Exhaustive Hamiltonian Monte Carlo (XHMC) with multinomial sampling
-    */
+     * Exhaustive Hamiltonian Monte Carlo (XHMC) with multinomial sampling.
+     * See http://arxiv.org/abs/1601.00225.
+     */
     template <class Model, template<class, class> class Hamiltonian,
               template<class> class Integrator, class BaseRNG>
     class base_xhmc : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
@@ -167,45 +168,44 @@ namespace stan {
 
             return !this->divergent_;
 
-        } else {
-          // General recursion
-
-          // Build the left subtree
-          double sum_numer_left = 0;
-          double sum_weight_left = 0;
-
-          bool valid_left
-            = build_tree(depth - 1, z_propose,
-                         sum_numer_left, sum_weight_left,
-                         H0, sign, n_leapfrog, sum_metro_prob, writer);
-
-          sum_numer += sum_numer_left;
-          sum_weight += sum_weight_left;
-          if (!valid_left) return false;
-
-          // Build the right subtree
-          ps_point z_propose_right(this->z_);
-          double sum_numer_right = 0;
-          double sum_weight_right = 0;
-
-          bool valid_right
-            = build_tree(depth - 1, z_propose_right,
-                         sum_numer_right, sum_weight_right,
-                         H0, sign, n_leapfrog, sum_metro_prob, writer);
-
-          sum_numer += sum_numer_right;
-          sum_weight += sum_weight_right;
-          if (!valid_right) return false;
-
-          // Multinomial sample from right subtree
-          double accept_prob = sum_weight_right / sum_weight;
-          if (this->rand_uniform_() < accept_prob)
-            z_propose = z_propose_right;
-
-          double sum_numer_subtree = sum_numer_left + sum_numer_right;
-          double sum_weight_subtree = sum_weight_left + sum_weight_right;
-          return std::fabs(sum_numer_subtree / sum_weight_subtree) >= x_delta_;
         }
+        // General recursion
+
+        // Build the left subtree
+        double sum_numer_left = 0;
+        double sum_weight_left = 0;
+
+        bool valid_left
+          = build_tree(depth - 1, z_propose,
+                       sum_numer_left, sum_weight_left,
+                       H0, sign, n_leapfrog, sum_metro_prob, writer);
+
+        sum_numer += sum_numer_left;
+        sum_weight += sum_weight_left;
+        if (!valid_left) return false;
+
+        // Build the right subtree
+        ps_point z_propose_right(this->z_);
+        double sum_numer_right = 0;
+        double sum_weight_right = 0;
+
+        bool valid_right
+          = build_tree(depth - 1, z_propose_right,
+                       sum_numer_right, sum_weight_right,
+                       H0, sign, n_leapfrog, sum_metro_prob, writer);
+
+        sum_numer += sum_numer_right;
+        sum_weight += sum_weight_right;
+        if (!valid_right) return false;
+
+        // Multinomial sample from right subtree
+        double accept_prob = sum_weight_right / sum_weight;
+        if (this->rand_uniform_() < accept_prob)
+          z_propose = z_propose_right;
+
+        double sum_numer_subtree = sum_numer_left + sum_numer_right;
+        double sum_weight_subtree = sum_weight_left + sum_weight_right;
+        return std::fabs(sum_numer_subtree / sum_weight_subtree) >= x_delta_;
       }
 
       int depth_;

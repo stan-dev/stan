@@ -15,9 +15,9 @@ namespace stan {
 
   namespace mcmc {
     /**
-      * Hamiltonian Monte Carlo implemetnation that uniformly samples
-      * from trajectories with a static integration time
-    */
+     * Hamiltonian Monte Carlo implementation that uniformly samples
+     * from trajectories with a static integration time
+     */
     template <class Model,
               template<class, class> class Hamiltonian,
               template<class> class Integrator,

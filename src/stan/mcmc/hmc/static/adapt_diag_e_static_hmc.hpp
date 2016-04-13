@@ -7,11 +7,12 @@
 
 namespace stan {
   namespace mcmc {
-
-    // Hamiltonian Monte Carlo on a
-    // Euclidean manifold with diagonal metric,
-    // static integration time,
-    // and adaptive stepsize
+    /**
+     * Hamiltonian Monte Carlo implementation using the endpoint
+     * of trajectories with a static integration time with a
+     * Gaussian-Euclidean disintegration and adaptive diagonal metric and
+     * adaptive step size
+     */
     template <class Model, class BaseRNG>
     class adapt_diag_e_static_hmc : public diag_e_static_hmc<Model, BaseRNG>,
                                     public stepsize_var_adapter {

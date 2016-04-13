@@ -8,10 +8,11 @@
 
 namespace stan {
   namespace mcmc {
-
-    // Hamiltonian Monte Carlo on a
-    // Euclidean manifold with unit metric
-    // and static integration time
+    /**
+     * Hamiltonian Monte Carlo implementation using the endpoint
+     * of trajectories with a static integration time with a
+     * Gaussian-Euclidean disintegration and unit metric
+     */
     template <class Model, class BaseRNG>
     class unit_e_static_hmc
       : public base_static_hmc<Model, unit_e_metric,

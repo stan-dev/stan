@@ -14,8 +14,8 @@
 namespace stan {
   namespace mcmc {
     /**
-      * The No-U-Turn sampler (NUTS) with multinomial sampling
-    */
+     * The No-U-Turn sampler (NUTS) with multinomial sampling
+     */
     template <class Model, template<class, class> class Hamiltonian,
               template<class> class Integrator, class BaseRNG>
     class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
@@ -173,45 +173,44 @@ namespace stan {
 
             return !this->divergent_;
 
-        } else {
-          // General recursion
-          Eigen::VectorXd p_sharp_left = this->hamiltonian_.dtau_dp(this->z_);
-
-          Eigen::VectorXd rho_subtree(rho.size());
-          rho_subtree.setZero();
-
-          // Build the left subtree
-          double sum_weight_left = 0;
-
-          bool valid_left
-            = build_tree(depth - 1, rho_subtree, z_propose,
-                         H0, sign, n_leapfrog,
-                         sum_weight_left, sum_metro_prob, writer);
-
-          sum_weight += sum_weight_left;
-          if (!valid_left) return false;
-
-          // Build the right subtree
-          ps_point z_propose_right(this->z_);
-          double sum_weight_right = 0;
-
-          bool valid_right
-            = build_tree(depth - 1, rho_subtree, z_propose_right,
-                         H0, sign, n_leapfrog,
-                         sum_weight_right, sum_metro_prob, writer);
-
-          sum_weight += sum_weight_right;
-          if (!valid_right) return false;
-
-          // Multinomial sample from right subtree
-          double accept_prob = sum_weight_right / sum_weight;
-          if (this->rand_uniform_() < accept_prob)
-            z_propose = z_propose_right;
-
-          rho += rho_subtree;
-          Eigen::VectorXd p_sharp_right = this->hamiltonian_.dtau_dp(this->z_);
-          return compute_criterion(p_sharp_left, p_sharp_right, rho_subtree);
         }
+        // General recursion
+        Eigen::VectorXd p_sharp_left = this->hamiltonian_.dtau_dp(this->z_);
+
+        Eigen::VectorXd rho_subtree(rho.size());
+        rho_subtree.setZero();
+
+        // Build the left subtree
+        double sum_weight_left = 0;
+
+        bool valid_left
+          = build_tree(depth - 1, rho_subtree, z_propose,
+                       H0, sign, n_leapfrog,
+                       sum_weight_left, sum_metro_prob, writer);
+
+        sum_weight += sum_weight_left;
+        if (!valid_left) return false;
+
+        // Build the right subtree
+        ps_point z_propose_right(this->z_);
+        double sum_weight_right = 0;
+
+        bool valid_right
+          = build_tree(depth - 1, rho_subtree, z_propose_right,
+                       H0, sign, n_leapfrog,
+                       sum_weight_right, sum_metro_prob, writer);
+
+        sum_weight += sum_weight_right;
+        if (!valid_right) return false;
+
+        // Multinomial sample from right subtree
+        double accept_prob = sum_weight_right / sum_weight;
+        if (this->rand_uniform_() < accept_prob)
+          z_propose = z_propose_right;
+
+        rho += rho_subtree;
+        Eigen::VectorXd p_sharp_right = this->hamiltonian_.dtau_dp(this->z_);
+        return compute_criterion(p_sharp_left, p_sharp_right, rho_subtree);
       }
 
       int depth_;

@@ -9,9 +9,9 @@
 namespace stan {
   namespace mcmc {
     /**
-      * The No-U-Turn sampler (NUTS) with multinomial sampling
-      * with a Gaussian-Euclidean disintegration and unit metric
-    */
+     * The No-U-Turn sampler (NUTS) with multinomial sampling
+     * with a Gaussian-Euclidean disintegration and unit metric
+     */
     template <class Model, class BaseRNG>
     class unit_e_nuts
       : public base_nuts<Model, unit_e_metric,

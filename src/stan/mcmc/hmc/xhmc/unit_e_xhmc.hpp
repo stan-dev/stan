@@ -9,9 +9,9 @@
 namespace stan {
   namespace mcmc {
     /**
-      * Exhausive Hamiltonian Monte Carlo (XHMC) with multinomial sampling
-      * with a Gaussian-Euclidean disintegration and unit metric
-    */
+     * Exhausive Hamiltonian Monte Carlo (XHMC) with multinomial sampling
+     * with a Gaussian-Euclidean disintegration and unit metric
+     */
     template <class Model, class BaseRNG>
     class unit_e_xhmc
       : public base_xhmc<Model, unit_e_metric,
