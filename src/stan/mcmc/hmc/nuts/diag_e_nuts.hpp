@@ -9,14 +9,14 @@
 namespace stan {
   namespace mcmc {
     /**
-      * The No-U-Turn sampler (NUTS) with multinomial sampling
-      * with a Gaussian-Euclidean disintegration and diagonal metric
-    */
+     * The No-U-Turn sampler (NUTS) with multinomial sampling
+     * with a Gaussian-Euclidean disintegration and diagonal metric
+     */
     template <class Model, class BaseRNG>
     class diag_e_nuts : public base_nuts<Model, diag_e_metric,
                                          expl_leapfrog, BaseRNG> {
     public:
-      diag_e_nuts(Model &model, BaseRNG& rng)
+      diag_e_nuts(const Model& model, BaseRNG& rng)
         : base_nuts<Model, diag_e_metric, expl_leapfrog,
                     BaseRNG>(model, rng) { }
     };

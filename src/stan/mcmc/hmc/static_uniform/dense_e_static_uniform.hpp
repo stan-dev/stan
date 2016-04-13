@@ -9,16 +9,18 @@
 namespace stan {
   namespace mcmc {
     /**
-      * Hamiltonian Monte Carlo implemetnation that uniformly samples
-      * from trajectories with a static integration time with a
-      * Gaussian-Euclidean disintegration and dense metric
-    */
-    template <typename M, class BaseRNG>
+     * Hamiltonian Monte Carlo implementation that uniformly samples
+     * from trajectories with a static integration time with a
+     * Gaussian-Euclidean disintegration and dense metric
+     */
+    template <typename Model, class BaseRNG>
     class dense_e_static_uniform
-      : public base_static_uniform<M, dense_e_metric, expl_leapfrog, BaseRNG> {
+      : public base_static_uniform<Model, dense_e_metric,
+                                   expl_leapfrog, BaseRNG> {
     public:
-      dense_e_static_uniform(M &m, BaseRNG& rng):
-        base_static_uniform<M, dense_e_metric, expl_leapfrog, BaseRNG>(m, rng) {
+      dense_e_static_uniform(const Model& model, BaseRNG& rng):
+        base_static_uniform<Model, dense_e_metric,
+                            expl_leapfrog, BaseRNG>(model, rng) {
       }
     };
   }  // mcmc

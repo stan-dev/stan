@@ -43,13 +43,15 @@ namespace stan {
                                                     BaseRNG> {
 
     public:
-      explicit mock_hamiltonian(Model& model)
+      explicit mock_hamiltonian(const Model& model)
         : base_hamiltonian<Model, ps_point, BaseRNG>(model) {}
 
       double T(ps_point& z) { return 0; }
 
       double tau(ps_point& z) { return T(z); }
       double phi(ps_point& z) { return this->V(z); }
+
+      double dG_dt(ps_point& z) { return 2; }
 
       const Eigen::VectorXd dtau_dq(ps_point& z) {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());

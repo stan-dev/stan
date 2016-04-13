@@ -14,7 +14,7 @@ namespace stan {
     class unit_e_metric
       : public base_hamiltonian<Model, unit_e_point, BaseRNG> {
     public:
-      explicit unit_e_metric(Model& model)
+      explicit unit_e_metric(const Model& model)
         : base_hamiltonian<Model, unit_e_point, BaseRNG>(model) {}
 
       ~unit_e_metric() {}
@@ -29,6 +29,10 @@ namespace stan {
 
       double phi(unit_e_point& z) {
         return this->V(z);
+      }
+
+      double dG_dt(unit_e_point& z) {
+        return 2 * T(z) - z.q.dot(z.g);
       }
 
       const Eigen::VectorXd dtau_dq(unit_e_point& z) {

@@ -16,7 +16,7 @@ namespace stan {
                                       rng_t> {
 
     public:
-      mock_nuts(mock_model &m, rng_t& rng)
+      mock_nuts(const mock_model &m, rng_t& rng)
         : base_nuts<mock_model,mock_hamiltonian,mock_integrator,rng_t>(m, rng)
       { }
     };
@@ -26,13 +26,15 @@ namespace stan {
     class divergent_hamiltonian
       : public base_hamiltonian<M, ps_point, BaseRNG> {
     public:
-      divergent_hamiltonian(M& m)
+      divergent_hamiltonian(const M& m)
         : base_hamiltonian<M, ps_point, BaseRNG>(m) {}
 
       double T(ps_point& z) { return 0; }
 
       double tau(ps_point& z) { return T(z); }
       double phi(ps_point& z) { return this->V(z); }
+
+      double dG_dt(ps_point& z) { return 2; }
 
       const Eigen::VectorXd dtau_dq(ps_point& z) {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
@@ -67,7 +69,7 @@ namespace stan {
 
     public:
 
-      divergent_nuts(mock_model &m, rng_t& rng)
+      divergent_nuts(const mock_model &m, rng_t& rng)
         : base_nuts<mock_model, divergent_hamiltonian, expl_leapfrog,rng_t>(m, rng)
       { }
     };
@@ -75,7 +77,7 @@ namespace stan {
   }
 }
 
-TEST(McmcBaseNuts, set_max_depth) {
+TEST(McmcNutsBaseNuts, set_max_depth) {
 
   rng_t base_rng(0);
 
@@ -95,7 +97,7 @@ TEST(McmcBaseNuts, set_max_depth) {
 }
 
 
-TEST(McmcBaseNuts, set_max_delta) {
+TEST(McmcNutsBaseNuts, set_max_delta) {
   rng_t base_rng(0);
 
   Eigen::VectorXd q(2);
@@ -110,7 +112,7 @@ TEST(McmcBaseNuts, set_max_delta) {
   EXPECT_EQ(old_max_delta, sampler.get_max_delta());
 }
 
-TEST(McmcBaseNuts, build_tree) {
+TEST(McmcNutsBaseNuts, build_tree) {
 
   rng_t base_rng(0);
 
@@ -159,7 +161,7 @@ TEST(McmcBaseNuts, build_tree) {
   EXPECT_EQ("", output.str());
 }
 
-TEST(McmcBaseNuts, divergence_test) {
+TEST(McmcNutsBaseNuts, divergence_test) {
 
   rng_t base_rng(0);
 
@@ -218,7 +220,7 @@ TEST(McmcBaseNuts, divergence_test) {
   EXPECT_EQ("", output.str());
 }
 
-TEST(McmcBaseNuts, transition) {
+TEST(McmcNutsBaseNuts, transition) {
 
   rng_t base_rng(0);
 

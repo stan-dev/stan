@@ -12,9 +12,10 @@
 
 namespace stan {
   namespace mcmc {
-
-    // Hamiltonian Monte Carlo
-    // with static integration time
+    /**
+     * Hamiltonian Monte Carlo implementation using the endpoint
+     * of trajectories with a static integration time
+     */
     template <class Model,
               template<class, class> class Hamiltonian,
               template<class> class Integrator,
@@ -22,7 +23,7 @@ namespace stan {
     class base_static_hmc
       : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     public:
-      base_static_hmc(Model &model, BaseRNG& rng)
+      base_static_hmc(const Model& model, BaseRNG& rng)
         : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
         T_(1), energy_(0) {
         update_L_();

@@ -8,15 +8,15 @@
 namespace stan {
   namespace mcmc {
     /**
-      * The No-U-Turn sampler (NUTS) with multinomial sampling
-      * with a Gaussian-Euclidean disintegration and adaptive
-      * diagonal metric and adaptive step size
-    */
+     * The No-U-Turn sampler (NUTS) with multinomial sampling
+     * with a Gaussian-Euclidean disintegration and adaptive
+     * diagonal metric and adaptive step size
+     */
     template <class Model, class BaseRNG>
     class adapt_diag_e_nuts: public diag_e_nuts<Model, BaseRNG>,
                              public stepsize_var_adapter {
     public:
-        adapt_diag_e_nuts(Model &model, BaseRNG& rng)
+        adapt_diag_e_nuts(const Model& model, BaseRNG& rng)
           : diag_e_nuts<Model, BaseRNG>(model, rng),
           stepsize_var_adapter(model.num_params_r()) {}
 
