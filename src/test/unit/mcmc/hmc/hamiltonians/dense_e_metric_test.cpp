@@ -29,20 +29,20 @@ TEST(McmcDenseEMetric, sample_p) {
 
   for (int i = 0; i < n_samples; ++i) {
     metric.sample_p(z, base_rng);
-    double T = metric.T(z);
+    double tau = metric.tau(z);
 
-    double delta = T - m;
+    double delta = tau - m;
     m += delta / static_cast<double>(i + 1);
-    m2 += delta * (T - m);
+    m2 += delta * (tau - m);
   }
 
   double var = m2 / (n_samples + 1.0);
 
   // Mean within 5sigma of expected value (d / 2)
-  EXPECT_EQ(true, fabs(m   - 0.5 * q.size()) < 5.0 * sqrt(var));
+  EXPECT_TRUE(std::fabs(m   - 0.5 * q.size()) < 5.0 * sqrt(var));
 
   // Variance within 10% of expected value (d / 2)
-  EXPECT_EQ(true, fabs(var - 0.5 * q.size()) < 0.1 * q.size());
+  EXPECT_TRUE(std::fabs(var - 0.5 * q.size()) < 0.1 * q.size());
 }
 
 TEST(McmcDenseEMetric, gradients) {

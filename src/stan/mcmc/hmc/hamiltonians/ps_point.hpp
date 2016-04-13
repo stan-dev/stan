@@ -71,9 +71,7 @@ namespace stan {
        * @param writer writer callback
        */
       virtual void
-      write_metric(stan::interface_callbacks::writer::base_writer& writer) {
-        writer("No free parameters for unit metric");
-      }
+      write_metric(stan::interface_callbacks::writer::base_writer& writer) {}
 
     protected:
       template <typename T>

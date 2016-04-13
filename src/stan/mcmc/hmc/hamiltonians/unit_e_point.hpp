@@ -4,7 +4,6 @@
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 
 namespace stan {
-
   namespace mcmc {
 
     // Point in a phase space with a base
@@ -15,8 +14,11 @@ namespace stan {
         : ps_point(n) {}
     };
 
-  }  // mcmc
+    void write_metric(stan::interface_callbacks::writer::base_writer& writer) {
+      writer("No free parameters for unit metric");
+    }
 
+  }  // mcmc
 }  // stan
 
 #endif

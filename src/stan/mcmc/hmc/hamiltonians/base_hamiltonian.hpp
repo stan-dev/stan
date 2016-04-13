@@ -82,15 +82,15 @@ namespace stan {
       }
 
       void update_metric(Point& z,
-                         interface_callbacks::writer::base_writer& writer) {};
+                         interface_callbacks::writer::base_writer& writer) {}
 
       void update_metric_gradient(
-        Point& z, interface_callbacks::writer::base_writer& writer) {};
+        Point& z, interface_callbacks::writer::base_writer& writer) {}
 
       void update_gradients(
         Point& z, interface_callbacks::writer::base_writer& writer) {
         update_potential_gradient(z, writer);
-      };
+      }
 
     protected:
       const Model& model_;
