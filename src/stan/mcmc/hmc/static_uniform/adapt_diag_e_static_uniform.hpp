@@ -1,31 +1,33 @@
-#ifndef STAN_MCMC_HMC_NUTS_ADAPT_DIAG_E_NUTS_HPP
-#define STAN_MCMC_HMC_NUTS_ADAPT_DIAG_E_NUTS_HPP
+#ifndef STAN_MCMC_HMC_STATIC_UNIFORM_ADAPT_DIAG_E_STATIC_UNIFORM_HPP
+#define STAN_MCMC_HMC_STATIC_UNIFORM_ADAPT_DIAG_E_STATIC_UNIFORM_HPP
 
-#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/stepsize_var_adapter.hpp>
-#include <stan/mcmc/hmc/nuts/diag_e_nuts.hpp>
+#include <stan/mcmc/hmc/static_uniform/diag_e_static_uniform.hpp>
 
 namespace stan {
   namespace mcmc {
     /**
-     * The No-U-Turn sampler (NUTS) with multinomial sampling
-     * with a Gaussian-Euclidean disintegration and adaptive
-     * diagonal metric and adaptive step size
+     * Hamiltonian Monte Carlo implementation that uniformly samples
+     * from trajectories with a static integration time with a
+     * Gaussian-Euclidean disintegration and adaptive diagonal metric and
+     * adaptive step size
      */
-    template <class Model, class BaseRNG>
-    class adapt_diag_e_nuts: public diag_e_nuts<Model, BaseRNG>,
-                             public stepsize_var_adapter {
+    template <typename Model, class BaseRNG>
+    class adapt_diag_e_static_uniform:
+      public diag_e_static_uniform<Model, BaseRNG>,
+      public stepsize_var_adapter {
     public:
-        adapt_diag_e_nuts(const Model& model, BaseRNG& rng)
-          : diag_e_nuts<Model, BaseRNG>(model, rng),
+        adapt_diag_e_static_uniform(const Model& model, BaseRNG& rng):
+          diag_e_static_uniform<Model, BaseRNG>(model, rng),
           stepsize_var_adapter(model.num_params_r()) {}
 
-      ~adapt_diag_e_nuts() {}
+      ~adapt_diag_e_static_uniform() {}
 
       sample transition(sample& init_sample,
                         interface_callbacks::writer::base_writer& writer) {
-        sample s = diag_e_nuts<Model, BaseRNG>::transition(init_sample,
-                                                           writer);
+        sample s
+          = diag_e_static_uniform<Model, BaseRNG>::transition(init_sample,
+                                                              writer);
 
         if (this->adapt_flag_) {
           this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,
@@ -33,10 +35,8 @@ namespace stan {
 
           bool update = this->var_adaptation_.learn_variance(this->z_.mInv,
                                                              this->z_.q);
-
           if (update) {
             this->init_stepsize(writer);
-
             this->stepsize_adaptation_.set_mu(log(10 * this->nom_epsilon_));
             this->stepsize_adaptation_.restart();
           }
@@ -49,7 +49,7 @@ namespace stan {
         this->stepsize_adaptation_.complete_adaptation(this->nom_epsilon_);
       }
     };
-
   }  // mcmc
 }  // stan
+
 #endif

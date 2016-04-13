@@ -22,7 +22,7 @@ namespace stan {
               class BaseRNG>
     class base_hmc : public base_mcmc {
     public:
-      base_hmc(Model &model, BaseRNG& rng)
+      base_hmc(const Model &model, BaseRNG& rng)
         : base_mcmc(),
           z_(model.num_params_r()),
           integrator_(),

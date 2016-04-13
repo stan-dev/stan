@@ -17,7 +17,7 @@ namespace stan {
       public diag_e_nuts_classic<Model, BaseRNG>,
       public stepsize_var_adapter {
     public:
-        adapt_diag_e_nuts_classic(Model &model, BaseRNG& rng):
+        adapt_diag_e_nuts_classic(const Model& model, BaseRNG& rng):
           diag_e_nuts_classic<Model, BaseRNG>(model, rng),
           stepsize_var_adapter(model.num_params_r()) {}
 

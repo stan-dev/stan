@@ -1,30 +1,30 @@
-#ifndef STAN_MCMC_HMC_NUTS_ADAPT_DENSE_E_NUTS_CLASSIC_HPP
-#define STAN_MCMC_HMC_NUTS_ADAPT_DENSE_E_NUTS_CLASSIC_HPP
+#ifndef STAN_MCMC_HMC_XHMC_ADAPT_DENSE_E_XHMC_HPP
+#define STAN_MCMC_HMC_XHMC_ADAPT_DENSE_E_XHMC_HPP
 
 #include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/stepsize_covar_adapter.hpp>
-#include <stan/mcmc/hmc/nuts_classic/dense_e_nuts_classic.hpp>
+#include <stan/mcmc/hmc/xhmc/dense_e_xhmc.hpp>
 
 namespace stan {
   namespace mcmc {
-
-    // The No-U-Turn Sampler (NUTS) on a
-    // Euclidean manifold with dense metric
-    // and adaptive stepsize
+    /**
+     * Exhausive Hamiltonian Monte Carlo (XHMC) with multinomial sampling
+     * with a Gaussian-Euclidean disintegration and adaptive
+     * dense metric and adaptive step size
+     */
     template <class Model, class BaseRNG>
-    class adapt_dense_e_nuts_classic:
-      public dense_e_nuts_classic<Model, BaseRNG>,
-      public stepsize_covar_adapter {
+    class adapt_dense_e_xhmc : public dense_e_xhmc<Model, BaseRNG>,
+                               public stepsize_covar_adapter {
     public:
-        adapt_dense_e_nuts_classic(const Model& model, BaseRNG& rng):
-          dense_e_nuts_classic<Model, BaseRNG>(model, rng),
+        adapt_dense_e_xhmc(const Model& model, BaseRNG& rng)
+          : dense_e_xhmc<Model, BaseRNG>(model, rng),
           stepsize_covar_adapter(model.num_params_r()) {}
 
-      ~adapt_dense_e_nuts_classic() {}
+      ~adapt_dense_e_xhmc() {}
 
       sample transition(sample& init_sample,
                         interface_callbacks::writer::base_writer& writer) {
-        sample s = dense_e_nuts_classic<Model, BaseRNG>::transition(init_sample,
+        sample s = dense_e_xhmc<Model, BaseRNG>::transition(init_sample,
                                                             writer);
 
         if (this->adapt_flag_) {

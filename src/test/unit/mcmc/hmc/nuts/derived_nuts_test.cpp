@@ -12,14 +12,16 @@
 
 typedef boost::ecuyer1988 rng_t;
 
-TEST(McmcDerivedNuts, compute_criterion_unit_e) {
+TEST(McmcNutsDerivedNuts, compute_criterion_unit_e) {
 
   rng_t base_rng(0);
 
   int model_size = 1;
 
-  stan::mcmc::ps_point start(model_size);
+  stan::mcmc::unit_e_point start(model_size);
   stan::mcmc::unit_e_point finish(model_size);
+  Eigen::VectorXd p_sharp_start(model_size);
+  Eigen::VectorXd p_sharp_finish(model_size);
   Eigen::VectorXd rho(model_size);
 
   stan::mcmc::mock_model model(model_size);
@@ -31,9 +33,11 @@ TEST(McmcDerivedNuts, compute_criterion_unit_e) {
   finish.q(0) = 2;
   finish.p(0) = 1;
 
+  p_sharp_start = start.p;
+  p_sharp_finish = finish.p;
   rho = start.p + finish.p;
 
-  EXPECT_TRUE(sampler.compute_criterion(start, finish, rho));
+  EXPECT_TRUE(sampler.compute_criterion(p_sharp_start, p_sharp_finish, rho));
 
   start.q(0) = 1;
   start.p(0) = 1;
@@ -41,20 +45,23 @@ TEST(McmcDerivedNuts, compute_criterion_unit_e) {
   finish.q(0) = 2;
   finish.p(0) = -1;
 
+  p_sharp_start = start.p;
+  p_sharp_finish = finish.p;
   rho = start.p + finish.p;
 
-  EXPECT_FALSE(sampler.compute_criterion(start, finish, rho));
-
+  EXPECT_FALSE(sampler.compute_criterion(p_sharp_start, p_sharp_finish, rho));
 }
 
-TEST(McmcDerivedNuts, compute_criterion_diag_e) {
+TEST(McmcNutsDerivedNuts, compute_criterion_diag_e) {
 
   rng_t base_rng(0);
 
   int model_size = 1;
 
-  stan::mcmc::ps_point start(model_size);
+  stan::mcmc::diag_e_point start(model_size);
   stan::mcmc::diag_e_point finish(model_size);
+  Eigen::VectorXd p_sharp_start(model_size);
+  Eigen::VectorXd p_sharp_finish(model_size);
   Eigen::VectorXd rho(model_size);
 
   stan::mcmc::mock_model model(model_size);
@@ -66,9 +73,11 @@ TEST(McmcDerivedNuts, compute_criterion_diag_e) {
   finish.q(0) = 2;
   finish.p(0) = 1;
 
+  p_sharp_start = start.mInv.cwiseProduct(start.p);
+  p_sharp_finish = finish.mInv.cwiseProduct(finish.p);
   rho = start.p + finish.p;
 
-  EXPECT_TRUE(sampler.compute_criterion(start, finish, rho));
+  EXPECT_TRUE(sampler.compute_criterion(p_sharp_start, p_sharp_finish, rho));
 
   start.q(0) = 1;
   start.p(0) = 1;
@@ -76,19 +85,23 @@ TEST(McmcDerivedNuts, compute_criterion_diag_e) {
   finish.q(0) = 2;
   finish.p(0) = -1;
 
+  p_sharp_start = start.mInv.cwiseProduct(start.p);
+  p_sharp_finish = finish.mInv.cwiseProduct(finish.p);
   rho = start.p + finish.p;
 
-  EXPECT_FALSE(sampler.compute_criterion(start, finish, rho));
+  EXPECT_FALSE(sampler.compute_criterion(p_sharp_start, p_sharp_finish, rho));
 }
 
-TEST(McmcDerivedNuts, compute_criterion_dense_e) {
+TEST(McmcNutsDerivedNuts, compute_criterion_dense_e) {
 
   rng_t base_rng(0);
 
   int model_size = 1;
 
-  stan::mcmc::ps_point start(model_size);
+  stan::mcmc::dense_e_point start(model_size);
   stan::mcmc::dense_e_point finish(model_size);
+  Eigen::VectorXd p_sharp_start(model_size);
+  Eigen::VectorXd p_sharp_finish(model_size);
   Eigen::VectorXd rho(model_size);
 
   stan::mcmc::mock_model model(model_size);
@@ -100,18 +113,21 @@ TEST(McmcDerivedNuts, compute_criterion_dense_e) {
   finish.q(0) = 2;
   finish.p(0) = 1;
 
+  p_sharp_start = start.mInv * start.p;
+  p_sharp_finish = finish.mInv * finish.p;
   rho = start.p + finish.p;
 
-  EXPECT_TRUE(sampler.compute_criterion(start, finish, rho));
-  
+  EXPECT_TRUE(sampler.compute_criterion(p_sharp_start, p_sharp_finish, rho));
+
   start.q(0) = 1;
   start.p(0) = 1;
 
   finish.q(0) = 2;
   finish.p(0) = -1;
 
+  p_sharp_start = start.mInv * start.p;
+  p_sharp_finish = finish.mInv * finish.p;
   rho = start.p + finish.p;
 
-  EXPECT_FALSE(sampler.compute_criterion(start, finish, rho));
-
+  EXPECT_FALSE(sampler.compute_criterion(p_sharp_start, p_sharp_finish, rho));
 }

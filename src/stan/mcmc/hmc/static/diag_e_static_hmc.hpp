@@ -8,16 +8,17 @@
 
 namespace stan {
   namespace mcmc {
-
-    // Hamiltonian Monte Carlo on a
-    // Euclidean manifold with diagonal metric
-    // and static integration time
+    /**
+     * Hamiltonian Monte Carlo implementation using the endpoint
+     * of trajectories with a static integration time with a
+     * Gaussian-Euclidean disintegration and diagonal metric
+     */
     template <class Model, class BaseRNG>
     class diag_e_static_hmc
       : public base_static_hmc<Model, diag_e_metric,
                                expl_leapfrog, BaseRNG> {
     public:
-      diag_e_static_hmc(Model &model, BaseRNG& rng)
+      diag_e_static_hmc(const Model& model, BaseRNG& rng)
         : base_static_hmc<Model, diag_e_metric,
                           expl_leapfrog, BaseRNG>(model, rng) { }
     };

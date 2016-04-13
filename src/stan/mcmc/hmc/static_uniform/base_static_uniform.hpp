@@ -1,35 +1,37 @@
-#ifndef STAN_MCMC_HMC_STATIC_BASE_STATIC_HMC_HPP
-#define STAN_MCMC_HMC_STATIC_BASE_STATIC_HMC_HPP
+#ifndef STAN_MCMC_HMC_UNIFORM_BASE_STATIC_UNIFORM_HPP
+#define STAN_MCMC_HMC_UNIFORM_BASE_STATIC_UNIFORM_HPP
 
 #include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/hmc/base_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <boost/random/uniform_int_distribution.hpp>
 #include <cmath>
 #include <limits>
 #include <string>
 #include <vector>
 
 namespace stan {
+
   namespace mcmc {
     /**
-     * Hamiltonian Monte Carlo implementation using the endpoint
-     * of trajectories with a static integration time
+     * Hamiltonian Monte Carlo implementation that uniformly samples
+     * from trajectories with a static integration time
      */
     template <class Model,
               template<class, class> class Hamiltonian,
               template<class> class Integrator,
               class BaseRNG>
-    class base_static_hmc
-      : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
+    class base_static_uniform:
+      public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     public:
-      base_static_hmc(const Model& model, BaseRNG& rng)
+      base_static_uniform(const Model& model, BaseRNG& rng)
         : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
-        T_(1), energy_(0) {
+          T_(1), energy_(0) {
         update_L_();
       }
 
-      ~base_static_hmc() {}
+      ~base_static_uniform() {}
 
       sample transition(sample& init_sample,
                         interface_callbacks::writer::base_writer& writer) {
@@ -41,26 +43,56 @@ namespace stan {
         this->hamiltonian_.init(this->z_, writer);
 
         ps_point z_init(this->z_);
-
         double H0 = this->hamiltonian_.H(this->z_);
 
-        for (int i = 0; i < L_; ++i)
+        ps_point z_sample(this->z_);
+        double sum_prob = 1;
+        double sum_metro_prob = 1;
+
+        boost::random::uniform_int_distribution<> uniform(0, L_ - 1);
+        int Lp = uniform(this->rand_int_);
+
+        for (int l = 0; l < Lp; ++l) {
           this->integrator_.evolve(this->z_, this->hamiltonian_,
-                                   this->epsilon_,
-                                   writer);
+                                   -this->epsilon_, writer);
 
-        double h = this->hamiltonian_.H(this->z_);
-        if (boost::math::isnan(h)) h = std::numeric_limits<double>::infinity();
+          double h = this->hamiltonian_.H(this->z_);
+          if (boost::math::isnan(h))
+            h = std::numeric_limits<double>::infinity();
 
-        double acceptProb = std::exp(H0 - h);
+          double prob = std::exp(H0 - h);
+          sum_prob += prob;
+          sum_metro_prob += prob > 1 ? 1 : prob;
 
-        if (acceptProb < 1 && this->rand_uniform_() > acceptProb)
-          this->z_.ps_point::operator=(z_init);
+          if (this->rand_uniform_() < prob / sum_prob)
+            z_sample = this->z_;
+        }
 
-        acceptProb = acceptProb > 1 ? 1 : acceptProb;
+        this->z_.ps_point::operator=(z_init);
 
+        for (int l = 0; l < L_ - 1 - Lp; ++l) {
+          this->integrator_.evolve(this->z_, this->hamiltonian_,
+                                   this->epsilon_, writer);
+
+          double h = this->hamiltonian_.H(this->z_);
+          if (boost::math::isnan(h))
+            h = std::numeric_limits<double>::infinity();
+
+          double prob = std::exp(H0 - h);
+          sum_prob += prob;
+          sum_metro_prob += prob > 1 ? 1 : prob;
+
+          if (this->rand_uniform_() < prob / sum_prob)
+            z_sample = this->z_;
+        }
+
+        double accept_prob = sum_metro_prob / static_cast<double>(L_);
+
+        this->z_.ps_point::operator=(z_sample);
         this->energy_ = this->hamiltonian_.H(this->z_);
-        return sample(this->z_.q, - this->hamiltonian_.V(this->z_), acceptProb);
+        return sample(this->z_.q,
+                      - this->hamiltonian_.V(this->z_),
+                      accept_prob);
       }
 
       void get_sampler_param_names(std::vector<std::string>& names) {
@@ -122,7 +154,6 @@ namespace stan {
         L_ = L_ < 1 ? 1 : L_;
       }
     };
-
   }  // mcmc
 }  // stan
 #endif

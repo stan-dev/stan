@@ -17,7 +17,7 @@ namespace stan {
       public unit_e_nuts_classic<Model, BaseRNG>,
       public stepsize_adapter {
     public:
-      adapt_unit_e_nuts_classic(Model &model, BaseRNG& rng):
+      adapt_unit_e_nuts_classic(const Model& model, BaseRNG& rng):
         unit_e_nuts_classic<Model, BaseRNG>(model, rng) {}
 
       ~adapt_unit_e_nuts_classic() {}

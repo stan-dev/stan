@@ -7,15 +7,16 @@
 
 namespace stan {
   namespace mcmc {
-
-    // The No-U-Turn Sampler (NUTS) on a
-    // Euclidean manifold with dense metric
-    // and adaptive stepsize
+    /**
+     * The No-U-Turn sampler (NUTS) with multinomial sampling
+     * with a Gaussian-Euclidean disintegration and adaptive
+     * dense metric and adaptive step size
+     */
     template <class Model, class BaseRNG>
     class adapt_dense_e_nuts : public dense_e_nuts<Model, BaseRNG>,
                                public stepsize_covar_adapter {
     public:
-        adapt_dense_e_nuts(Model &model, BaseRNG& rng)
+        adapt_dense_e_nuts(const Model& model, BaseRNG& rng)
           : dense_e_nuts<Model, BaseRNG>(model, rng),
           stepsize_covar_adapter(model.num_params_r()) {}
 

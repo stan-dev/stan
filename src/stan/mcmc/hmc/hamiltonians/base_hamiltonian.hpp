@@ -15,7 +15,7 @@ namespace stan {
     template <class Model, class Point, class BaseRNG>
     class base_hamiltonian {
     public:
-      explicit base_hamiltonian(Model& model)
+      explicit base_hamiltonian(const Model& model)
         : model_(model) {}
 
       ~base_hamiltonian() {}
@@ -35,6 +35,9 @@ namespace stan {
       double H(Point& z) {
         return T(z) + V(z);
       }
+
+      // The time derivative of the virial, G = \sum_{d = 1}^{D} q^{d} p_{d}.
+      virtual double dG_dt(Point& z) = 0;
 
       // tau = 0.5 p_{i} p_{j} Lambda^{ij} (q)
       virtual const Eigen::VectorXd dtau_dq(Point& z) = 0;
@@ -70,7 +73,7 @@ namespace stan {
         Point& z, interface_callbacks::writer::base_writer& writer) {};
 
     protected:
-      Model& model_;
+      const Model& model_;
 
       void write_error_msg_(const std::exception& e,
                             interface_callbacks::writer::base_writer& writer) {

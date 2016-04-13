@@ -1,30 +1,30 @@
-#ifndef STAN_MCMC_HMC_NUTS_ADAPT_DIAG_E_NUTS_HPP
-#define STAN_MCMC_HMC_NUTS_ADAPT_DIAG_E_NUTS_HPP
+#ifndef STAN_MCMC_HMC_XHMC_ADAPT_DIAG_E_XHMC_HPP
+#define STAN_MCMC_HMC_XHMC_ADAPT_DIAG_E_XHMC_HPP
 
 #include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/stepsize_var_adapter.hpp>
-#include <stan/mcmc/hmc/nuts/diag_e_nuts.hpp>
+#include <stan/mcmc/hmc/xhmc/diag_e_xhmc.hpp>
 
 namespace stan {
   namespace mcmc {
     /**
-     * The No-U-Turn sampler (NUTS) with multinomial sampling
+     * Exhausive Hamiltonian Monte Carlo (XHMC) with multinomial sampling
      * with a Gaussian-Euclidean disintegration and adaptive
      * diagonal metric and adaptive step size
      */
     template <class Model, class BaseRNG>
-    class adapt_diag_e_nuts: public diag_e_nuts<Model, BaseRNG>,
+    class adapt_diag_e_xhmc: public diag_e_xhmc<Model, BaseRNG>,
                              public stepsize_var_adapter {
     public:
-        adapt_diag_e_nuts(const Model& model, BaseRNG& rng)
-          : diag_e_nuts<Model, BaseRNG>(model, rng),
+        adapt_diag_e_xhmc(const Model& model, BaseRNG& rng)
+          : diag_e_xhmc<Model, BaseRNG>(model, rng),
           stepsize_var_adapter(model.num_params_r()) {}
 
-      ~adapt_diag_e_nuts() {}
+      ~adapt_diag_e_xhmc() {}
 
       sample transition(sample& init_sample,
                         interface_callbacks::writer::base_writer& writer) {
-        sample s = diag_e_nuts<Model, BaseRNG>::transition(init_sample,
+        sample s = diag_e_xhmc<Model, BaseRNG>::transition(init_sample,
                                                            writer);
 
         if (this->adapt_flag_) {
