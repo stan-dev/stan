@@ -640,12 +640,39 @@ Only arrays in Stan are allowed to store integer values.
 
 
 
-\chapter{Multiple and Range Indexing}\label{multi-indexing.chapter}
+\chapter{Multiple Indexing and Range Indexing}\label{multi-indexing.chapter}
 
 \noindent
 Stan allows multiple indexes to be provided for containers (i.e.,
 arrays, vectors, and matrices) in a single position, using either an
-array of integer indexes or range bounds.  This allows hierarchical 1
+array of integer indexes or range bounds.  This allows many models to
+be vectorized.  For instance, consider the likelihood for a varying-slope,
+varying-intercept hierarchical linear regression, which could be coded
+as
+%
+\begin{stancode}
+for (n in 1:N)
+  y[n] ~ normal(alpha[ii[n]] + beta[ii[n]] * x[n], sigma);
+\end{stancode}
+%
+With multiple indexing, this can be coded in one line, leading to more
+efficient vectorized code.
+%
+\begin{stancode}
+y ~ normal(alpha[ii] + beta[ii] .* x, sigma);
+\end{stancode}
+%
+This latter version is equivalent in speed to the clunky assignment to
+a local variable.
+%
+\begin{stancode}
+{ 
+  vector[N] mu;
+  for (n in 1:N)
+    mu[n] = alpha[ii[n]] + beta[ii[n]] * x[n];
+  y ~ normal(mu, sigma);
+}
+\end{stancode}
 
 \section{Multiple Indexing}
 
@@ -985,7 +1012,56 @@ vector.  For indexing, the values are given by
 \code{c[i, j] == a[i + 3, 3, 1, j + 1]}
 
 
+\section{Matrices with Parameters and Constants}
 
+Suppose you have a $3 x 3$ matrix and know that two entries are zero but the
+others are parameters.  Such a situation arises in missing data
+situations and in problems with fixed structural parameters.
+
+Suppose a $3 \times 3$ matrix is known to be zero at indexes $[1,2]$
+and $[1,3]$.  The indexes for parameters are included in a ``melted''
+data-frame or database format.
+
+\begin{stancode}
+transformed data {
+  int<lower=1, upper=3> ii[7];
+  int<lower=1, upper=3> jj[7];
+  ii[1] = 1;  jj[1] = 1;
+  ii[2] = 2;  jj[2] = 1;   // skip [1, 2] and [1, 3]
+  ii[3] = 3;  jj[3] = 1;
+  ii[4] = 2;  jj[4] = 2;
+  ii[5] = 3;  jj[5] = 2;
+  ii[6] = 2;  jj[6] = 3;
+  ii[7] = 3;  jj[7] = 3;
+}
+\end{stancode}
+%
+The seven remaining parameters are declared as a vector.
+%
+\begin{stancode}
+parameters {
+  vector[7] A_raw;
+}
+\end{stancode}
+%
+Then the full matrix \code{A} is constructed in the model block as a
+local variable.
+%
+\begin{stancode}
+model {
+  matrix[3, 3] A;
+  A[ii, jj] = A_raw;
+  A[1, 2] = 0;
+  A[1, 3] = 0;
+}
+\end{stancode}
+
+This may seem like overkill in this setting, but in more general
+settings, the matrix size, vector size, and the \code{ii} and
+\code{jj} array and size can be coded up as data along with the values
+to fill in for the constant entries.  Similar techniques can be used
+to build up matrices with ad-hoc constraints, such as a handful of
+entries known to be positive.
 
 
 \chapter{Regression Models}
@@ -1643,7 +1719,7 @@ coefficient matrix \code{beta},
 \begin{stancode}
 transformed parameters {
   matrix[K, D] beta;
-  beta = append_col(beta_raw, zeros);
+  beta = append_row(beta_raw, zeros);
 }
 \end{stancode}
 %
@@ -2181,17 +2257,20 @@ and \code{beta} and \code{gamma} are allowed to float.
 The \code{beta} parameter is here given a non-centered
 parameterization, with parameter \code{mu\_beta} serving as the mean
 \code{beta} location. An alternative would've been to take:
+%
 \begin{stancode}
   beta ~ normal(mu_beta, sigma_beta);
 \end{stancode}
+%
 and
+%
 \begin{stancode}
   y[n] ~ bernoulli_logit(gamma[kk[n]] * (alpha[jj[n]] - beta[kk[n]]));
 \end{stancode}
 %
 Non-centered parameterizations tend to be more efficient in
 hierarchical models; see \refsection{reparameterization} for more
-information on non-centered reparameterizations.
+information on non-centered reparameterizations.  
 
 The intercept term \code{mu\_beta} can't itself be modeled
 hierarchically, so it is given a weakly informative
@@ -2262,7 +2341,7 @@ individual-level variables may be assigned hierarchical priors.  For
 example, a model with multiple varying intercepts and slopes within
 might assign them a multivariate prior. 
 
-As an example, the individuals might people and the outcome income,
+As an example, the individuals might be people and the outcome income,
 with predictors such as education level and age, and the groups might be states
 or other geographic divisions.  The effect of education level and age
 as well as an intercept might be allowed to vary by state.
@@ -2487,12 +2566,15 @@ previous section, the program fragment to replace the full matrix
 prior with an equivalent Cholesky factorized prior is as follows.
 %
 \begin{stancode}
+data {
+  matrix[J, L] u;  
+  ...
 parameters {
-  matrix[K,J] z;
+  matrix[K, J] z;
   cholesky_factor_corr[K] L_Omega;
   ...
 transformed parameters {
-  matrix[J,K] beta;
+  matrix[J, K] beta;
   beta = u * gamma + (diag_pre_multiply(tau,L_Omega) * z)';
 }
 model {
@@ -2501,8 +2583,11 @@ model {
   ...
 \end{stancode}  
 %
-This new parameter \code{L\_Omega} is the Cholesky factor of
-the original correlation matrix \code{Omega}, so that 
+The data variable \code{u} was originally an array of vectors, which
+is efficient for access; here it is redeclared as a matrix in order to
+use it in matrix arithmetic.  The new parameter \code{L\_Omega} is
+the Cholesky factor of the original correlation matrix \code{Omega},
+so that
 %
 \begin{stancode}
 Omega = L_Omega * L_Omega'
@@ -2514,8 +2599,8 @@ factor of the final covariance matrix,
 %
 \begin{stancode}
   Sigma_beta 
-  = quad_form_diag(Omega,tau)
-  = diag_pre_multiply(tau,L_Omega) * diag_pre_multiply(tau,L_Omega)'
+  = quad_form_diag(Omega, tau)
+  = diag_pre_multiply(tau, L_Omega) * diag_pre_multiply(tau, L_Omega)'
 \end{stancode}
 %
 where the diagonal pre-multiply compound operation is defined by 
@@ -2677,6 +2762,18 @@ declared as a generated quantity, and the prediction model is
 removed from the model and replaced by a pseudo-random draw from a
 normal distribution.
 
+\subsubsection{Overflow in Generated Quantities}
+
+It is possible for values to overflow or underflow in generated
+quantities.  The problem is that if the result is NaN, then any
+constraints placed on the variables will be violated.  It is possible
+to check a value assigned by an RNG and reject it if it overflows, but
+this is both inefficient and leads to biased posterior estimates.
+Instead, the conditions causing overflow, such as trying to generate a
+negative binomial random variate with a mean of $2^{31}$.  These must
+be intercepted and dealt with, typically be reparameterizing or
+reimplementing the random number geneator using real values rather
+than integers, which are upper-bounded by $2^{31} - 1$ in Stan.
   
 
 \section{Multivariate Outcomes}
@@ -3931,9 +4028,6 @@ parameters used to find the most likely state to have generated
 \code{u}.
 
 
-
-
-
 \chapter{Missing Data \& Partially Known Parameters}
 
 \noindent
@@ -4121,7 +4215,7 @@ adjustment is provided in the subsection of
 Data in which measurements have been truncated or censored can be
 coded in Stan following their respective probability models.
 
-\section{Truncated Distributions}
+\section{Truncated Distributions}\label{truncation.section}
 
 Truncation in Stan is restricted to univariate distributions for which
 the corresponding log cumulative distribution function (cdf) and log
@@ -4374,6 +4468,7 @@ model {
 \end{stancode}
 %
 
+
 \chapter{Finite Mixtures}\label{mixture-modeling.chapter}
 
 \noindent
@@ -4384,6 +4479,17 @@ multimodal densities with modes near the modes of the mixture
 components.  Mixture models may be parameterized in several ways, as
 described in the following sections.
 
+\section{Relation to Clustering}\label{clustering-mixture.section}
+
+Clustering models, as discussed in \refchapter{clustering}, are just a
+particular class of mixture models that have been widely applied to
+clustering in the engineering and machine-learning literature.  The
+normal mixture model discussed in this chapter reappears in
+multivariate form as the statistical basis for the $K$-means
+algorithm;  the latent Dirichlet allocation model, usually applied to
+clustering problems, can be viewed as a mixed-membership multinomial
+mixture model. 
+
 
 \section{Latent Discrete Parameterization}
 
@@ -4391,14 +4497,14 @@ One way to parameterize a mixture model is with a latent categorical
 variable indicating which mixture component was responsible for the
 outcome. For example, consider $K$ normal distributions with locations
 $\mu_k \in \reals$ and scales $\sigma_k \in (0,\infty)$.  Now consider
-mixing them in proportion $\theta$, where $\theta_k \geq 0$ and
-$\sum_{k=1}^K \theta_k = 1$ (i.e., $\theta$ lies in the unit $K$-simplex).
+mixing them in proportion $\lambda$, where $\lambda_k \geq 0$ and
+$\sum_{k=1}^K \lambda_k = 1$ (i.e., $\lambda$ lies in the unit $K$-simplex).
 For each outcome $y_n$ there is a latent variable $z_n$ in
 $\setlist{1,\ldots,K}$ with a categorical distribution parameterized
-by $\theta$,
+by $\lambda$,
 %
 \[
-z_n \sim \distro{Categorical}(\theta).
+z_n \sim \distro{Categorical}(\lambda).
 \]
 %
 The variable $y_n$ is distributed according to the parameters
@@ -4418,9 +4524,11 @@ To implement the normal mixture model outlined in the previous
 section in \Stan, the discrete parameters can be summed out of the
 model. If $Y$ is a mixture of $K$ normal distributions with 
 locations $\mu_k$ and scales $\sigma_k$ with mixing proportions
-$\theta$ in the unit $K$-simplex, then 
+$\lambda$ in the unit $K$-simplex, then 
 \[
-p_Y(y | \theta,\mu,\sigma) = \sum_{k=1}^K \theta_k \, \distro{Normal}(\mu_k,\sigma_k).
+p_Y(y | \lambda, \mu, \sigma)
+\ = \ 
+\sum_{k=1}^K \lambda_k \, \distro{Normal}(y \, | \, \mu_k, \sigma_k).
 \]
 
 \section{Log Sum of Exponentials: Linear Sums on the Log Scale}
@@ -4450,7 +4558,7 @@ possibility of overflow or underflow in the leading term and eking the
 most arithmetic precision possible out of the operation.
 
 For example, the mixture of $\code{Normal}(-1,2)$ and
-$\code{Normal}(3,1)$ with mixing proportion $\theta =
+$\code{Normal}(3,1)$ with mixing proportion $\lambda =
 (0.3,0.7)^{\top}$ can be implemented in \Stan as follows.
 %
 \begin{stancode}
@@ -4466,7 +4574,7 @@ model {
 The log probability term is derived by taking
 %
 \begin{eqnarray*}
-\log p_Y(y | \theta,\mu,\sigma) & = & \log\!\left( 0.3 \times \distro{Normal}(y|-1,2) \, + \,
+\log p_Y(y | \lambda,\mu,\sigma) & = & \log\!\left( 0.3 \times \distro{Normal}(y|-1,2) \, + \,
   0.7 \times
   \distro{Normal}(y|3,1) \, \right)
 \\[2pt]
@@ -4530,7 +4638,7 @@ this example, but could be anything supported by \Stan.  The mixture
 components  could even be modeled hierarchically.
 
 The main action is in the loop over data points \code{n}.  For each
-such point, the log of $\theta_k \times
+such point, the log of $\lambda_k \times
 \distro{Normal}(y_n|\mu_k,\sigma_k)$ is calculated and added to the
 array \code{ps}.  Then the log probability is incremented with the log
 sum of exponentials of those values.
@@ -4619,8 +4727,10 @@ regression coefficient prior.
 Consider the following example for zero-inflated Poisson
 distributions.  It uses a parameter \code{theta} here there is a
 probability $\theta$ of drawing a zero, and a probability $1 - \theta$
-of drawing from $\distro{Poisson}(\lambda)$.  The probability function
-is thus
+of drawing from $\distro{Poisson}(\lambda)$ (now $\theta$ is being
+used for mixing proportions because $\lambda$ is the traditional
+notation for a Poisson mean parameter).  The probability function is
+thus
 \[
 p(y_n|\theta,\lambda) 
 = 
@@ -4671,8 +4781,8 @@ inefficiencies due to derivative calculations that are not needed.
 
 The hurdle model is similar to the zero-inflated model, but more
 flexible in that the zero outcomes can be deflated as well as
-inflated.  The probability mass function for the hurdle model is
-defined by 
+inflated.  The probability mass function for the hurdle likelihood is
+defined by
 %
 \[
 p(y|\theta,\lambda)
@@ -4693,65 +4803,146 @@ the Poisson distribution.  The hurdle model is even more straightforward to
 program in Stan, as it does not require an explicit mixture.  
 %
 \begin{stancode}
-(y[n] == 0) ~ bernoulli(theta);
-if (y[n] > 0)
-  y[n] ~ poisson(lambda) T[1,];
+   if (y[n] == 0)
+      1 ~ bernoulli(theta);
+    else {
+      0 ~ bernoulli(theta);
+      y[n] ~ poisson(lambda) T[1, ];
+    }
 \end{stancode}
 %
-The \code{[1,]} after the Poisson indicates that it is truncated below
-at 1; see \refsection{poisson}.  Although the variable 
-\code{y[n]} is being ``sampled'' twice, the effect on the log
-probability function follows the definition (on the log scale). 
-
-Julian King pointed out that the model may be sped up by noting
-\[
-\log \distro{PoissonCDF}(0 | \lambda) = \log(1 - exp(-\lambda)).
-\]
-This allows the truncated Poisson distribution to be coded as
+The Bernoulli statements are just shorthand for adding $\log \theta$
+and $\log (1 - \theta)$ to the log density.  The \code{T[1,]} after
+the Poisson indicates that it is truncated below at 1; see
+\refsection{truncation} for more about truncation and
+\refsection{poisson} for the specifics of the Poisson CDF.  The net
+effect is equivalent to the direct definition of the log likelihood.
 %
 \begin{stancode}
-if (y[n] > 0) {
-  y[n] ~ poisson(lambda);
-  target += -log1m_exp(-lambda);
-}
+   if (y[n] == 0)
+      target += log(theta);
+    else
+      target += log1m(theta) + poisson_log(y[n], lambda)
+                - poisson_ccdf_log(0, lambda));
+\end{stancode}
+
+Julian King pointed out that because
+\[
+\log \left( 1 - \distro{PoissonCDF}(0 | \lambda) \right)
+\ = \ \log \left( 1 - \distro{Poisson}(0 | \lambda) \right) 
+\ = \ \log(1 - \exp(-\lambda))
+\]
+the CCDF in the else clause can be replaced with a simpler expression.
+%
+\begin{stancode}
+      target += log1m(theta) + poisson_log(y[n], lambda)
+                - log1m_exp(-lambda));
 \end{stancode}
 %
+The resulting code is about 15\% faster than the code with the CCDF.
 
 This is an example where collecting counts ahead of time can also
 greatly speed up the execution speed without changing the density.
-For example, the number of \code{y[n]~==~0} cases can be counted and
-stored as a transformed data quantity.  These can then be used to
-replace 
+For data size $N=200$ and parameters $\theta=0.3$ and $\lambda = 8$,
+the speedup is a factor of 10; it will be lower for smaller $N$ and
+greater for larger $N$; it will also be greater for larger $\theta$.
+
+To achieve this speedup, it helps to have a function to count the
+number of non-zero entries in an array of integers,
 %
 \begin{stancode}
-model {
-  ...
-  for (n in 1:N)
-    (y[n] == 0) ~ bernoulli(theta);
+functions {
+  int num_zero(int[] y) {
+    int nz;
+    nz = 0;
+    for (n in 1:size(y))
+      if (y[n] == 0)
+        nz = nz + 1;
+    return nz;
+  }
+}
 \end{stancode}
 %
-with 
+Then a transformed data block can be used to store the sufficient
+statistics,
 %
 \begin{stancode}
 transformed data {
-  int N_zero;
-  N_zero = 0;
-  for (n in 1:N)
-    if (y[n] == 0)
-      N_zero = N_zero + 1;
+  int<lower=0, upper=N> N0;
+  int<lower=0, upper=N> Ngt0;
+  int<lower=1> y_nz[N - num_zero(y)];
+
+  N0 = num_zero(y);
+  Ngt0 = N - N0;
+  { 
+    int pos;
+    pos = 1;
+    for (n in 1:N) {
+      if (y[n] != 0) {
+        y_nz[pos] = y[n];
+        pos = pos + 1;
+      }
+    }
+  }
 }
-model {
-  ...
-  N_zero ~ binomial(N, theta);
 \end{stancode}
 %
+The model block can then be reduced to three statements.
+%
+\begin{stancode}
+model {
+  N0 ~ binomial(N, theta);
+  y_nz ~ poisson(lambda);
+  target += -Ngt0 * log1m_exp(-lambda);
+}
+\end{stancode}
+%
+The first statement accounts for the Bernoulli contribution to both
+the zero and non-zero counts.  The second line is the Poisson
+contribution from the non-zero counts, which is now vectorized.
+Finally, the normalization for the truncation is a single line, so
+that the expression for the log CCDF at 0 isn't repeated.  Also note
+that the negation is applied to the constant \code{Ngt0}; whenever
+possible, leave subexpressions constant because then gradients need
+not be propagated until a non-constant term is encountered.
 
-Another speedup can be gained by storing the non-zero count (i.e.,
-\code{y[n]~>~0}) cases in a newly defined array and then using a
-vectorized Poisson sampling statement and multiplying the increment by
-the number of non-zero counts.  This is a little trickier as a
-function must be used to compute the number of zero and non-zero cases
-here because Stan requires sized declarations.
+
+\section{Priors and Effective Data Size in Mixture Models}
+
+Suppose we have a two-component mixture model with mixing rate
+$\lambda \in (0, 1)$.  Because the likelihood for the mixture
+components is proportionally weighted by the mixture weights, the
+effective data size used to estimate each of the mixture components
+will also be weighted as a fraction of the overall data size.  Thus
+although there are $N$ observations, the mixture components will be
+estimated with effective data sizes of $\theta \, N$ and $(1 - \theta)
+\, N$ for the two components for some $\theta \in (0, 1)$.  The
+effective weighting size is determined by posterior responsibility,
+not simply by the mixing rate $\lambda$.
+
+\subsection{Comparison to Model Averaging}
+
+In contrast to mixture models, which create mixtures at the
+observation level, model averaging creates mixtures over the
+posteriors of models separately fit with the entire data set.  In this
+situation, the priors work as expected when fitting the models
+indepdently, with the posteriors being based on the complete observed
+data $y$.
+
+If different models are expected to account for different
+observations, we recommend building mixture models directly.  If the
+models being mixed are similar, often a single expanded model will
+capture the features of both and may be used on its own for
+inferential purposes (estimation, decision making, prediction, etc.).
+For example, rather than fitting an intercept-only regression and a
+slope-only regression and averaging their predictions, even as a
+mixture model, we would recommend building a single regression with
+both a slope and an intercept.  Model complexity, such as having more
+predictors than data points, can be tamed using appropriately
+regularizing priors.  If computation becomes a bottleneck, the only
+recourse can be model averaging, which can be calculated after fitting
+each model independently (see \citep{HoetingEtAl:1999} and
+\citep{GelmanEtAl:2013} for theoretical and computational details).
 
 
 \chapter{Measurement Error and Meta-Analysis}
@@ -5352,6 +5543,43 @@ model {
   text.}\label{change-point-model.figure}
 \end{figure}
 
+Although the model in \reffigure{change-point-model} is easy to
+undertand, the doubly nested loop used for \code{s} and \code{t} is
+quadratic in \code{T}.  Luke Wiklendt pointed out that a linear
+alternative can be achieved by the use of dynamic programming similar
+to the forward-backward algorithm for Hidden Markov models;  he
+submitted a slight variant of the following code to replace the
+transformed parameters block of the above Stan program.
+%
+\begin{stancode}
+transformed parameters {
+    vector[T] lp;
+    {
+      vector[T+1] lp_e;
+      vector[T+1] lp_l;
+      lp_e[1] <- 0;
+      lp_l[1] <- 0;
+      for (t in 1:T) {
+        lp_e[t + 1] <- lp_e[t] + poisson_log(D[t], e);
+        lp_l[t + 1] <- lp_l[t] + poisson_log(D[t], l);
+      }
+      lp <- rep_vector(log_unif + lp_l[T + 1], T) + head(lp_e, T) - head(lp_l, T);
+    }
+  }
+\end{stancode}
+%
+As should be obvious from looking at it, it has linear complexity in
+\code{T} rather than quadratic.  The result for the mining-disaster
+data is about 20 times faster;  the improvement will be stepper for
+larger \code{T}.
+
+The key to understanding Wiklendt's dynamic programming version is to
+see that \code{head(lp\_e)} holds the forward values, whereas
+\code{lp\_l[T + 1] - head(lp\_l, T)} holds the backward values; the
+clever use of subtraction allows \code{lp\_l} to be accumulated
+naturally in the forward direction.
+
+
 \subsection{Fitting the Model with MCMC}
 
 This model is easy to fit using MCMC with NUTS in its default
@@ -5376,7 +5604,8 @@ $p(e,l|D)$ by MCMC sampling and the associated \code{lp} calculated.
 The value of \code{lp} may be normalized to calculate $p(s|e,l,D)$ in
 each iteration, based on on the current values of $e$ and $l$.
 Averaging over iterations provides an unnormalized probability
-estimate of the change point being $s$,
+estimate of the change point being $s$ (see below for the normalizing
+constant),
 %
 \begin{eqnarray*}
 p(s | D)
@@ -5469,8 +5698,8 @@ and so on.  There are three parameters, \code{e}, \code{m}, and
 with log densities being stored in a matrix.
 %
 \begin{stancode}
-matrix[T,T] lp;
-lp = rep_matrix(log_unif,T);
+matrix[T, T] lp;
+lp = rep_matrix(log_unif, T);
 for (s1 in 1:T)
   for (s2 in 1:T)
     for (t in 1:T)
@@ -6455,6 +6684,15 @@ Nevertheless, they can be implemented in Stan like any other mixture
 model by marginalizing out the discrete parameters (see
 \refchapter{mixture-modeling}).
 
+\section{Relation to Finite Mixture Models}
+
+As mentioned in \refsection{clustering-mixture}, clustering models and
+finite mixture models are really just two sides of the same coin.  The
+``soft'' $K$-means model described in the next section is a normal
+mixture model (with varying assumptions about covariance in higher
+dimensions leading to variants of $K$-means).  Latent Dirichlet
+allocation is a mixed-membership multinomial mixture.
+
 \section{Soft $K$-Means}
 
 $K$-means clustering is a method of clustering data represented as
@@ -7106,10 +7344,6 @@ unit correlation matrix.  Thus the compound effect of this prior on
 the covariance matrix $\Sigma$ for the multivariate logistic normal is
 a slight concentration around diagonal covariance matrices with scales
 determined by the prior on \code{sigma}.
-
-
-
-
 
 
 \chapter{Gaussian Processes}\label{gaussian-processes.chapter}
@@ -7841,7 +8075,6 @@ previous models by declaring the hyperparameters as parameters and
 defining the covariance matrix in the model block as a local variable.
 
 
-
 \chapter{Directions, Rotations, and Hyperspheres}
 
 Directional statistics involve data and/or parameters that are
@@ -8318,6 +8551,46 @@ transformed parameters {
   ...
 \end{stancode}
 
+
+\section{Vectors with Varying Bounds}
+
+Stan only allows a single lower and upper bound to be declared in the
+constraints for a container data type.  But suppose we have a vector
+of parameters and a vector of lower bounds?  Then the transforms and
+Jacobians (all of which are described in
+\refchapter{variable-transforms}) have to be calculated in Stan.
+
+For example, suppose there is a vector parameter $\alpha$ with a
+vector $L$ of lower bounds.  The following program declares raw
+unconstrained parameters, then explicitly transforms the raw
+parameters to $\alpha$, accounting for the Jacobian along the way.
+%
+\begin{stancode}
+data {
+  int N;
+  vector[N] L;  // lower bounds
+  ...
+parameters {
+  vector[N] alpha_raw;
+  ...
+transformed parameters {
+  vector[N] alpha;
+  alpha = L + exp(my_vec_raw);
+  ...
+model {
+  target += sum(alpha_raw);  // log Jacobian
+  ...
+\end{stancode}
+%
+The adjustment in the the log Jacobian detemrinant of the transform
+mapping $\alpha_{\mathrm{raw}}$ to $\alpha = L +
+\exp(\alpha_{\mathrm{raw}})$.  The details are simple in this case
+because the Jacobian is diagonal; see
+\refsection{lower-bound-transform} for details.  Here $L$ can even be
+a vector containing parameters that don't depend on
+$\alpha_{\mathrm{raw}}$; if the bounds do depend on
+$\alpha_{\mathrm{raw}}$ then a revised Jacobian needs to be calculated
+taking into account the dependencies.
 
 
 \chapter{Custom Probability Functions}%
@@ -9130,6 +9403,33 @@ must be expressions that only involve data or transformed data
 variables.  The initial state \code{y} or the parameters \code{theta}
 are the only arguments which may involve parameters.
 
+\subsection{Discontinuous ODE System Function}
+
+The ODE integrator is able to integrate over discontinuities in the
+state function, although the accuracy of points near the discontinuity
+may be problematic (requiring many small steps).  An example of such a
+discontinuity is a lag in a pharmacokinetic model, where a
+concentration is going to be zero for times $0 < t < t'$ for some
+lag-time $t'$, whereas it will be nonzero for times $t \geq t'$.  As
+an example, would involve code in the system such as
+%
+\begin{stancode}
+if (t < t_lag)
+  return 0;
+else
+  ... return non-zero value...;
+\end{stancode}
+
+
+\subsection{Varying Initial Time}
+
+Stan's ODE solvers require the initial time argument to be a constant
+(i.e., a function of data or transformed data variables and
+constants).  This means that, in general, there's no way to use the
+\code{integrate\_ode} function to accept a parameter for the initial
+time and thus no way in general to estimate the initial time of an ODE
+system from measurements.
+  
 
 \section{Measurement Error Models}
 
@@ -9312,7 +9612,6 @@ or both (e.g., with a multivariate Student-t distribution).
 In this simple model with independent noise scales of 0.10, 10
 observed data points for times $t = 1, ..., 10$ is sufficient to
 reliably estimate the ODE parameter, initial state, and noise scales.
-
 
 
 \section{Stiff ODEs}
@@ -10196,8 +10495,9 @@ non-centered parameterization \cite{papa-et-al:2007}.%
   as the ``Matt trick'' after Matt Hoffman, who independently came up
   with it while fitting hierarchical models in Stan.}
 %
-This reparameterization is helpful because it separates the
-hierarchical parameters and lower-level parameters in the prior.
+This reparameterization is helpful when there is not much data,
+because it separates the hierarchical parameters and lower-level
+parameters in the prior.
 %
 \begin{figure}[t]
 \vspace*{-6pt}
@@ -10477,14 +10777,18 @@ very fat tails and as \code{nu} approaches infinity, the Student-t
 distribution approaches a normal distribution.  Thus the parameter
 \code{nu} characterizes the heaviness of the tails of the model.
 
-\subsection{Hierarchical Models}
+\subsection{Hierarchical Models and the Non-Centered Parameterization}
 
 Unfortunately, the usual situation in applied Bayesian modeling
 involves complex geometries and interactions that are not known
 analytically.  Nevertheless, reparameterization can still be very
-effective for separating parameters.  For example, a vectorized
-hierarchical model might draw a vector of coefficients $\beta$ with
-definitions as follows.
+effective for separating parameters.  
+
+\subsubsection{Centered parameterization}
+
+For example, a vectorized hierarchical model might draw a vector of
+coefficients $\beta$ with definitions as follows.  The so-called
+centered parameterization is as follows.
 %
 \begin{stancode}
 parameters {
@@ -10506,12 +10810,24 @@ regression with data matrix \code{x} and binary outcome vector
 intractable posterior.
 
 A hierarchical model such as the above will suffer from the same kind
-of inefficiencies as Neal's funnel, though typically not so extreme,
-because the values of \Verb|beta|, \Verb|mu_beta| and
-\Verb|sigma_beta| are highly correlated in the posterior. When there is a lot of data, such a
-hierarchical model can be made much more efficient by shifting the data's correlation with the 
-parameters to the hyperparameters. Similar to the funnel example, this will be much more 
-efficient in terms of effective sample size~\citep{Betancourt-Girolami:2013}.
+of inefficiencies as Neal's funnel, because the values of \Verb|beta|,
+\Verb|mu_beta| and \Verb|sigma_beta| are highly correlated in the
+posterior.  The extremity of the correlation depends on the amount of
+data, with Neal's funnel being the extreme with no data.  In these
+cases, the non-centered parameterization, discussed in the next
+section, is preferable; when there is a lot of data, the centered
+parameterization is more efficient.  See
+\cite{Betancourt-Girolami:2013} for more information on the effects of
+centering in hierarchical models fit with Hamiltonian Monte Carlo.
+
+
+\subsection{Non-Centered Parameterization}
+
+When there is a lot of data, such a hierarchical model can be made
+much more efficient by shifting the data's correlation with the
+parameters to the hyperparameters. Similar to the funnel example, this
+will be much more efficient in terms of effective sample size when
+there is not much data (see \citep{Betancourt-Girolami:2013}).
 %
 \begin{stancode}
 parameters {

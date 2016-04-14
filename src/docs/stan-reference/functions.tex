@@ -2544,7 +2544,7 @@ arbitrary subvector.
     starting at \farg{i}; i.e., elements \farg{i} through 
     through \farg{i} + \farg{n} - 1.}
 %
-  \fitem{row\_vector}{segment}{row\_vector \farg{v}, int \farg{i}, int
+  \fitem{row\_vector}{segment}{row\_vector \farg{rv}, int \farg{i}, int
     \farg{n}}{Return the row vector consisting of the \farg{n}
     elements of \farg{rv} starting at \farg{i}; i.e., elements
     \farg{i} through through \farg{i} + \farg{n} - 1.}
@@ -2946,12 +2946,18 @@ Number of components of \farg{v} less than \farg{v[s]}}
 \noindent
 For sparse matrices, for which many elements are zero, it is more
 efficient to use specialized representations to save memory and speed
-up matrix arithmetic (including derivative calculations).  Because of
-this speedup, it may even be useful to read in a dense matrix and convert
-it to a sparse matrix before multiplying it by a vector.  This chapter
-covers a very specific form of sparsity consisting of a sparse matrix
-multiplied by a dense vector;  for more general coding strategies for
-sparse data structures within Stan, see \refchapter{sparse-ragged}.
+up matrix arithmetic (including derivative calculations).  Given
+Stan's implementation, there is substantial space (memory) savings by
+using sparse matrices.  Because of the ease of optimizing dense matrix
+operations, speed improvements only arise at 90\% or even greater
+sparsity; below that level, dense matrices are faster but use more memory.  
+
+Because of this speedup and space savings, it may even be useful to
+read in a dense matrix and convert it to a sparse matrix before
+multiplying it by a vector.  This chapter covers a very specific form
+of sparsity consisting of a sparse matrix multiplied by a dense
+vector; for more general coding strategies for sparse data structures
+within Stan, see \refchapter{sparse-ragged}.
 
 \section{Compressed Row Storage}\label{CSR.section}
 
@@ -3046,10 +3052,13 @@ a single function.
 %
 \begin{description}
   \fitem{matrix}{csr\_to\_dense\_matrix}{int \farg{m}, int \farg{n},
-    matrix \farg{w}, int \farg{v}, int \farg{u}}{Return dense
-    $\mbox{\farg{m}} \times \mbox{\farg{n}}$ matrix with specified
-    values \farg{w}, column indices \farg{v}, and row starting indices
-    \farg{u}; see \refsection{CSR}.}
+    vector \farg{w}, int[] \farg{v}, int[] \farg{u}}{Return dense
+    $\mbox{\farg{m}} \times \mbox{\farg{n}}$ matrix with non-zero
+    matrix entries \farg{w}, column indices \farg{v}, and row starting
+    indices \farg{u}; the vector \farg{w} and arrays \farg{v} and
+    \farg{u} must all be the same size, and the arrays \farg{v} and
+    \farg{u} must have index values bounded by \farg{m} and \farg{n}.
+    See \refsection{CSR} for more details.}
 \end{description}
 
 \section{Sparse Matrix Arithmetic}
