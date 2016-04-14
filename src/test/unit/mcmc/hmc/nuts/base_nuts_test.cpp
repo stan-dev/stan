@@ -49,14 +49,16 @@ namespace stan {
       }
 
       void init(ps_point& z,
-                stan::interface_callbacks::writer::base_writer& writer) {
+                interface_callbacks::writer::base_writer& info_writer,
+                interface_callbacks::writer::base_writer& error_writer) {
         z.V = 0;
       }
 
       void sample_p(ps_point& z, BaseRNG& rng) {};
 
       void update(ps_point& z,
-                  stan::interface_callbacks::writer::base_writer& writer) {
+                  interface_callbacks::writer::base_writer& info_writer,
+                  interface_callbacks::writer::base_writer& error_writer) {
         z.V += 500;
       }
 
@@ -142,10 +144,13 @@ TEST(McmcNutsBaseNuts, build_tree) {
 
   std::stringstream output;
   stan::interface_callbacks::writer::stream_writer writer(output);
+  std::stringstream error_stream;
+  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
+
 
   bool valid_subtree = sampler.build_tree(3, rho, z_propose,
                                           H0, 1, n_leapfrog, sum_weight,
-                                          sum_metro_prob, writer);
+                                          sum_metro_prob, writer, error_writer);
 
   EXPECT_TRUE(valid_subtree);
 
@@ -159,6 +164,7 @@ TEST(McmcNutsBaseNuts, build_tree) {
   EXPECT_FLOAT_EQ(std::exp(H0) * n_leapfrog, sum_metro_prob);
 
   EXPECT_EQ("", output.str());
+  EXPECT_EQ("", error_stream.str());
 }
 
 TEST(McmcNutsBaseNuts, divergence_test) {
@@ -191,20 +197,25 @@ TEST(McmcNutsBaseNuts, divergence_test) {
 
   std::stringstream output;
   stan::interface_callbacks::writer::stream_writer writer(output);
+  std::stringstream error_stream;
+  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
+
 
   bool valid_subtree = 0;
 
   sampler.z().V = -750;
   valid_subtree = sampler.build_tree(0, rho, z_propose,
                                      H0, 1, n_leapfrog, sum_weight,
-                                     sum_metro_prob, writer);
+                                     sum_metro_prob,
+                                     writer, error_writer);
   EXPECT_TRUE(valid_subtree);
   EXPECT_EQ(0, sampler.divergent_);
 
   sampler.z().V = -250;
   valid_subtree = sampler.build_tree(0, rho, z_propose,
                                      H0, 1, n_leapfrog, sum_weight,
-                                     sum_metro_prob, writer);
+                                     sum_metro_prob,
+                                     writer, error_writer);
 
   EXPECT_TRUE(valid_subtree);
   EXPECT_EQ(0, sampler.divergent_);
@@ -212,12 +223,14 @@ TEST(McmcNutsBaseNuts, divergence_test) {
   sampler.z().V = 750;
   valid_subtree = sampler.build_tree(0, rho, z_propose,
                                      H0, 1, n_leapfrog, sum_weight,
-                                     sum_metro_prob, writer);
+                                     sum_metro_prob,
+                                     writer, error_writer);
 
   EXPECT_FALSE(valid_subtree);
   EXPECT_EQ(1, sampler.divergent_);
 
   EXPECT_EQ("", output.str());
+  EXPECT_EQ("", error_stream.str());
 }
 
 TEST(McmcNutsBaseNuts, transition) {

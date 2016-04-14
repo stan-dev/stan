@@ -21,8 +21,10 @@ TEST(BaseHamiltonian, update) {
   stan::mcmc::ps_point z(11);
   z.q.setOnes();
   stan::interface_callbacks::writer::stream_writer writer(metric_output);
-  
-  metric.update(z, writer);
+  std::stringstream error_stream;
+  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
+
+  metric.update(z, writer, error_writer);
 
   EXPECT_FLOAT_EQ(10.73223197, z.V);
 
@@ -33,6 +35,7 @@ TEST(BaseHamiltonian, update) {
 
   EXPECT_EQ("", model_output.str());
   EXPECT_EQ("", metric_output.str());
+  EXPECT_EQ("", error_stream.str());
 }
 
 TEST(BaseHamiltonian, streams) {

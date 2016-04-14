@@ -32,7 +32,7 @@ TEST(McmcStaticUniformUnitE, transition) {
     sampler(model, base_rng);
 
   sampler.z() = z_init;
-  sampler.init_hamiltonian(writer);
+  sampler.init_hamiltonian(writer, error_writer);
   sampler.set_nominal_stepsize(0.1);
   sampler.set_stepsize_jitter(0);
   sampler.sample_stepsize();
@@ -68,7 +68,7 @@ TEST(McmcStaticUniformDiagE, transition) {
     sampler(model, base_rng);
 
   sampler.z() = z_init;
-  sampler.init_hamiltonian(writer);
+  sampler.init_hamiltonian(writer, error_writer);
   sampler.set_nominal_stepsize(0.1);
   sampler.set_stepsize_jitter(0);
   sampler.sample_stepsize();
@@ -104,7 +104,7 @@ TEST(McmcStaticUniformDenseE, transition) {
     sampler(model, base_rng);
 
   sampler.z() = z_init;
-  sampler.init_hamiltonian(writer);
+  sampler.init_hamiltonian(writer, error_writer);
   sampler.set_nominal_stepsize(0.1);
   sampler.set_stepsize_jitter(0);
   sampler.sample_stepsize();
@@ -140,7 +140,7 @@ TEST(McmcAdaptStaticUniformUnitE, transition) {
     sampler(model, base_rng);
 
   sampler.z() = z_init;
-  sampler.init_hamiltonian(writer);
+  sampler.init_hamiltonian(writer, error_writer);
   sampler.set_nominal_stepsize(0.1);
   sampler.set_stepsize_jitter(0);
   sampler.sample_stepsize();
@@ -176,7 +176,7 @@ TEST(McmcAdaptStaticUniformDiagE, transition) {
     sampler(model, base_rng);
 
   sampler.z() = z_init;
-  sampler.init_hamiltonian(writer);
+  sampler.init_hamiltonian(writer, error_writer);
   sampler.set_nominal_stepsize(0.1);
   sampler.set_stepsize_jitter(0);
   sampler.sample_stepsize();
@@ -212,7 +212,7 @@ TEST(McmcAdaptStaticUniformDenseE, transition) {
     sampler(model, base_rng);
 
   sampler.z() = z_init;
-  sampler.init_hamiltonian(writer);
+  sampler.init_hamiltonian(writer, error_writer);
   sampler.set_nominal_stepsize(0.1);
   sampler.set_stepsize_jitter(0);
   sampler.sample_stepsize();

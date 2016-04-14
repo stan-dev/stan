@@ -61,13 +61,17 @@ TEST(McmcDenseEMetric, gradients) {
 
   std::stringstream model_output, metric_output;
   stan::interface_callbacks::writer::stream_writer writer(metric_output);
+  std::stringstream error_stream;
+  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
+
+
   funnel_model_namespace::funnel_model model(data_var_context, &model_output);
 
   stan::mcmc::dense_e_metric<funnel_model_namespace::funnel_model, rng_t> metric(model);
   
   double epsilon = 1e-6;
   
-  metric.update(z, writer);
+  metric.update(z, writer, error_writer);
   
   Eigen::VectorXd g1 = metric.dtau_dq(z);
   
@@ -76,15 +80,15 @@ TEST(McmcDenseEMetric, gradients) {
     double delta = 0;
     
     z.q(i) += epsilon;
-    metric.update(z, writer);
+    metric.update(z, writer, error_writer);
     delta += metric.tau(z);
     
     z.q(i) -= 2 * epsilon;
-    metric.update(z, writer);
+    metric.update(z, writer, error_writer);
     delta -= metric.tau(z);
     
     z.q(i) += epsilon;
-    metric.update(z, writer);
+    metric.update(z, writer, error_writer);
     
     delta /= 2 * epsilon;
     
@@ -119,15 +123,15 @@ TEST(McmcDenseEMetric, gradients) {
     double delta = 0;
     
     z.q(i) += epsilon;
-    metric.update(z, writer);
+    metric.update(z, writer, error_writer);
     delta += metric.phi(z);
     
     z.q(i) -= 2 * epsilon;
-    metric.update(z, writer);
+    metric.update(z, writer, error_writer);
     delta -= metric.phi(z);
     
     z.q(i) += epsilon;
-    metric.update(z, writer);
+    metric.update(z, writer, error_writer);
     
     delta /= 2 * epsilon;
     
@@ -137,6 +141,7 @@ TEST(McmcDenseEMetric, gradients) {
 
   EXPECT_EQ("", model_output.str());
   EXPECT_EQ("", metric_output.str());
+  EXPECT_EQ("", error_stream.str());
 }
 
 TEST(McmcDenseEMetric, streams) {
