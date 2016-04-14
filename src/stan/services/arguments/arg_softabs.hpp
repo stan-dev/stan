@@ -12,7 +12,7 @@ namespace stan {
       arg_softabs() {
         _name = "softabs";
         _description = "Riemannian manifold with SoftAbs metric";
-        
+
         _subarguments.push_back(new arg_softabs_alpha());
       }
     };
@@ -21,4 +21,3 @@ namespace stan {
 }  // stan
 
 #endif
-

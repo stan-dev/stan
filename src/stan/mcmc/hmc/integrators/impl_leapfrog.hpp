@@ -12,7 +12,7 @@ namespace stan {
     public:
       impl_leapfrog(): base_leapfrog<Hamiltonian>(),
                        max_num_fixed_point_(10),
-                       fixed_point_threshold_(1e-8) {};
+                       fixed_point_threshold_(1e-8) {}
 
       void begin_update_p(typename Hamiltonian::PointType& z,
                           Hamiltonian& hamiltonian,
@@ -36,7 +36,7 @@ namespace stan {
           hamiltonian.update_metric(z, writer);
 
           delta_q -= z.q;
-          if(delta_q.cwiseAbs().maxCoeff() < this->fixed_point_threshold_)
+          if (delta_q.cwiseAbs().maxCoeff() < this->fixed_point_threshold_)
             break;
         }
         hamiltonian.update_gradients(z, writer);
@@ -71,7 +71,7 @@ namespace stan {
           delta_p = z.p;
           z.p.noalias() = p_init - epsilon * hamiltonian.dtau_dq(z, writer);
           delta_p -= z.p;
-          if(delta_p.cwiseAbs().maxCoeff() < this->fixed_point_threshold_)
+          if (delta_p.cwiseAbs().maxCoeff() < this->fixed_point_threshold_)
             break;
         }
       }
@@ -81,7 +81,7 @@ namespace stan {
       }
 
       void set_max_num_fixed_point(int n) {
-        if(n > 0) this->max_num_fixed_point_ = n;
+        if (n > 0) this->max_num_fixed_point_ = n;
       }
 
       double fixed_point_threshold() {
@@ -89,7 +89,7 @@ namespace stan {
       }
 
       void set_fixed_point_threshold(double t) {
-        if(t > 0) this->fixed_point_threshold_ = t;
+        if (t > 0) this->fixed_point_threshold_ = t;
       }
 
     private:
@@ -97,8 +97,7 @@ namespace stan {
       double fixed_point_threshold_;
     };
 
-  } // mcmc
-} // stan
-
+  }  // mcmc
+}  // stan
 
 #endif

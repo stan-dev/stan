@@ -18,7 +18,7 @@ namespace stan {
       const Model& model_;
       std::ostream* o_;
 
-      softabs_fun(const Model& m, std::ostream* out): model_(m), o_(out) {};
+      softabs_fun(const Model& m, std::ostream* out): model_(m), o_(out) {}
 
       template <typename T>
       T operator()(Eigen::Matrix<T, Eigen::Dynamic, 1>& x) const {
@@ -112,7 +112,6 @@ namespace stan {
 
       void update_metric(softabs_point& z,
                          interface_callbacks::writer::base_writer& writer) {
-
         // Compute the Hessian
         stan::math::hessian<double>(
           softabs_fun<Model>(this->model_, 0), z.q, z.V, z.g, z.hessian);
@@ -133,15 +132,13 @@ namespace stan {
 
           // Thresholds defined such that the approximation
           // error is on the same order of double precision
-          if(std::fabs(alpha_lambda) < 1e-4) {
-           softabs_lambda = (   1.0
+          if (std::fabs(alpha_lambda) < 1e-4) {
+           softabs_lambda = (1.0
                              + (1.0 / 3.0) * alpha_lambda * alpha_lambda)
                              / z.alpha;
-          }
-          else if(std::fabs(alpha_lambda) > 18) {
+          } else if (std::fabs(alpha_lambda) > 18) {
            softabs_lambda = std::fabs(lambda);
-          }
-          else {
+          } else {
            softabs_lambda = lambda / std::tanh(alpha_lambda);
           }
 
@@ -160,32 +157,28 @@ namespace stan {
         // Compute the pseudo-Jacobian of the SoftAbs transform
         for (idx_t i = 0; i < z.q.size(); ++i) {
           for (idx_t j = 0; j <= i; ++j) {
+            double delta =   z.eigen_deco.eigenvalues()(i)
+                           - z.eigen_deco.eigenvalues()(j);
 
-            double delta = z.eigen_deco.eigenvalues()(i) - z.eigen_deco.eigenvalues()(j);
-
-            if(std::fabs(delta) < 1e-10) {
-
+            if (std::fabs(delta) < 1e-10) {
               double lambda = z.eigen_deco.eigenvalues()(i);
               double alpha_lambda = z.alpha * lambda;
 
               // Thresholds defined such that the approximation
               // error is on the same order of double precision
-              if(std::fabs(alpha_lambda) < 1e-4) {
+              if (std::fabs(alpha_lambda) < 1e-4) {
                 z.pseudo_j(i, j) =   (2.0 / 3.0) * alpha_lambda
                                    * (1.0 -   (2.0 / 15.0)
                                             * alpha_lambda * alpha_lambda);
-              }
-              else if(std::fabs(alpha_lambda) > 18) {
+              } else if (std::fabs(alpha_lambda) > 18) {
                 z.pseudo_j(i, j) = lambda > 0 ? 1 : -1;
-              }
-              else {
+              } else {
                 double sdx = std::sinh(alpha_lambda) / lambda;
-                z.pseudo_j(i, j) = (  z.softabs_lambda(i)
+                z.pseudo_j(i, j) = (z.softabs_lambda(i)
                                     - z.alpha / (sdx * sdx) ) / lambda;
               }
-            }
-            else {
-              z.pseudo_j(i, j) = (  z.softabs_lambda(i)
+            } else {
+              z.pseudo_j(i, j) = (z.softabs_lambda(i)
                                   - z.softabs_lambda(j) ) / delta;
             }
           }

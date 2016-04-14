@@ -20,7 +20,7 @@ namespace stan {
         double alpha
           = dynamic_cast<stan::services::real_argument*>
           (hmc->arg("metric")->arg("softabs")->arg("alpha"))->value();
-       
+
         dynamic_cast<Sampler*>(sampler)->z()->set_alpha(alpha);
 
         return true;
