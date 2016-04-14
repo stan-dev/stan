@@ -30,7 +30,8 @@ namespace stan {
         return this->V(z);
       }
 
-      double dG_dt(diag_e_point& z) {
+      double dG_dt(diag_e_point& z,
+                   interface_callbacks::writer::base_writer& writer) {
         return 2 * T(z) - z.q.dot(z.g);
       }
 

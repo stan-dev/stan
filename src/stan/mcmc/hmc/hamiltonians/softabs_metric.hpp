@@ -1,5 +1,5 @@
-#ifndef STAN_MCMC_HMC_HAMILTONIANS_DENSE_E_METRIC_HPP
-#define STAN_MCMC_HMC_HAMILTONIANS_DENSE_E_METRIC_HPP
+#ifndef STAN_MCMC_HMC_HAMILTONIANS_SOFTABS_METRIC_HPP
+#define STAN_MCMC_HMC_HAMILTONIANS_SOFTABS_METRIC_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>
@@ -51,8 +51,9 @@ namespace stan {
         return this->V(z) + 0.5 * z.log_det_metric;
       }
 
-      double dG_dt(softabs_point& z) {
-        return 2 * T(z) - z.q.dot(z.g);
+      double dG_dt(softabs_point& z,
+                   interface_callbacks::writer::base_writer& writer) {
+        return 2 * T(z) - z.q.dot(dtau_dq(z, writer) + dphi_dq(z, writer));
       }
 
       const Eigen::VectorXd dtau_dq(

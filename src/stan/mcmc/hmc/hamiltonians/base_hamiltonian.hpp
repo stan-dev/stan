@@ -37,7 +37,8 @@ namespace stan {
       }
 
       // The time derivative of the virial, G = \sum_{d = 1}^{D} q^{d} p_{d}.
-      virtual double dG_dt(Point& z) = 0;
+      virtual double dG_dt(
+        Point& z, interface_callbacks::writer::base_writer& writer) = 0;
 
       // tau = 0.5 p_{i} p_{j} Lambda^{ij} (q)
       virtual const Eigen::VectorXd dtau_dq(

@@ -51,7 +51,10 @@ namespace stan {
       double tau(ps_point& z) { return T(z); }
       double phi(ps_point& z) { return this->V(z); }
 
-      double dG_dt(ps_point& z) { return 2; }
+      double dG_dt(ps_point& z,
+                   interface_callbacks::writer::base_writer& writer) {
+        return 2;
+      }
 
       const Eigen::VectorXd dtau_dq(
         ps_point& z, interface_callbacks::writer::base_writer& writer) {

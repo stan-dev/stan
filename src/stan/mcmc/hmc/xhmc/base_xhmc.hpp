@@ -160,7 +160,7 @@ namespace stan {
             if ((h - H0) > this->max_deltaH_) this->divergent_ = true;
 
             double pi = exp(H0 - h);
-            sum_numer += pi * this->hamiltonian_.dG_dt(this->z_);
+            sum_numer += pi * this->hamiltonian_.dG_dt(this->z_, writer);
             sum_weight += pi;
             sum_metro_prob += pi > 1 ? 1 : pi;
 

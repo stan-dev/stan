@@ -24,7 +24,7 @@ namespace stan {
         vector_t to0(7);
         ps_point::fast_vector_copy_(to0, from0);
 
-        EXPECT_EQ(from0, to0);    
+        EXPECT_EQ(from0, to0);
       }
 
       static void fast_matrix_copy() {
@@ -66,12 +66,12 @@ namespace stan {
       std::stringstream out;
       stan::interface_callbacks::writer::stream_writer writer(out);
       EXPECT_NO_THROW(point.write_metric(writer));
-      EXPECT_EQ("No free parameters for unit metric\n", out.str());
-      
+      EXPECT_EQ("", out.str());
+
       stan::test::reset_std_streams();
       EXPECT_EQ("", stan::test::cout_ss.str());
       EXPECT_EQ("", stan::test::cerr_ss.str());
     }
-    
+
   }
 }
