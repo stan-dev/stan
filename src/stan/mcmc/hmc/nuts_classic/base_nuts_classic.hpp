@@ -53,8 +53,10 @@ namespace stan {
       int get_max_depth() { return this->max_depth_; }
       double get_max_delta() { return this->max_delta_; }
 
-      sample transition(sample& init_sample,
-                        interface_callbacks::writer::base_writer& writer) {
+      sample
+      transition(sample& init_sample,
+                 interface_callbacks::writer::base_writer& info_writer,
+                 interface_callbacks::writer::base_writer& error_writer) {
         // Initialize the algorithm
         this->sample_stepsize();
 
@@ -63,7 +65,7 @@ namespace stan {
         this->seed(init_sample.cont_params());
 
         this->hamiltonian_.sample_p(this->z_, this->rand_int_);
-        this->hamiltonian_.init(this->z_, writer);
+        this->hamiltonian_.init(this->z_, info_writer);
 
         ps_point z_plus(this->z_);
         ps_point z_minus(z_plus);
@@ -111,7 +113,7 @@ namespace stan {
           this->z_.ps_point::operator=(*z);
 
           int n_valid_subtree = build_tree(depth_, *rho, 0, z_propose, util,
-                                           writer);
+                                           info_writer);
           ++(this->depth_);
 
           *z = this->z_;

@@ -21,9 +21,13 @@ namespace stan {
 
       ~adapt_unit_e_nuts() {}
 
-      sample transition(sample& init_sample,
-                        interface_callbacks::writer::base_writer& writer) {
-        sample s = unit_e_nuts<Model, BaseRNG>::transition(init_sample, writer);
+      sample
+      transition(sample& init_sample,
+                 interface_callbacks::writer::base_writer& info_writer,
+                 interface_callbacks::writer::base_writer& error_writer) {
+        sample s = unit_e_nuts<Model, BaseRNG>::transition(init_sample,
+                                                           info_writer,
+                                                           error_writer);
 
         if (this->adapt_flag_)
           this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,

@@ -47,15 +47,17 @@ namespace stan {
       double get_max_deltaH() { return this->max_deltaH_; }
       double get_x_delta() { return this->x_delta_; }
 
-      sample transition(sample& init_sample,
-                        interface_callbacks::writer::base_writer& writer) {
+      sample
+      transition(sample& init_sample,
+                 interface_callbacks::writer::base_writer& info_writer,
+                 interface_callbacks::writer::base_writer& error_writer) {
         // Initialize the algorithm
         this->sample_stepsize();
 
         this->seed(init_sample.cont_params());
 
         this->hamiltonian_.sample_p(this->z_, this->rand_int_);
-        this->hamiltonian_.init(this->z_, writer);
+        this->hamiltonian_.init(this->z_, info_writer);
 
         ps_point z_plus(this->z_);
         ps_point z_minus(z_plus);
@@ -85,14 +87,14 @@ namespace stan {
             valid_subtree
               = build_tree(this->depth_, z_propose,
                            sum_numer_subtree, sum_weight_subtree,
-                           H0, 1, n_leapfrog, sum_metro_prob, writer);
+                           H0, 1, n_leapfrog, sum_metro_prob, info_writer);
             z_plus.ps_point::operator=(this->z_);
           } else {
             this->z_.ps_point::operator=(z_minus);
             valid_subtree
               = build_tree(this->depth_, z_propose,
                            sum_numer_subtree, sum_weight_subtree,
-                           H0, -1, n_leapfrog, sum_metro_prob, writer);
+                           H0, -1, n_leapfrog, sum_metro_prob, info_writer);
             z_minus.ps_point::operator=(this->z_);
           }
 

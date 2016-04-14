@@ -40,15 +40,17 @@ namespace stan {
       int get_max_depth() { return this->max_depth_; }
       double get_max_delta() { return this->max_deltaH_; }
 
-      sample transition(sample& init_sample,
-                        interface_callbacks::writer::base_writer& writer) {
+      sample
+      transition(sample& init_sample,
+                 interface_callbacks::writer::base_writer& info_writer,
+                 interface_callbacks::writer::base_writer& error_writer) {
         // Initialize the algorithm
         this->sample_stepsize();
 
         this->seed(init_sample.cont_params());
 
         this->hamiltonian_.sample_p(this->z_, this->rand_int_);
-        this->hamiltonian_.init(this->z_, writer);
+        this->hamiltonian_.init(this->z_, info_writer);
 
         ps_point z_plus(this->z_);
         ps_point z_minus(z_plus);
@@ -82,7 +84,7 @@ namespace stan {
             valid_subtree
               = build_tree(this->depth_, rho_subtree, z_propose,
                            H0, 1, n_leapfrog,
-                           sum_weight_subtree, sum_metro_prob, writer);
+                           sum_weight_subtree, sum_metro_prob, info_writer);
             z_plus.ps_point::operator=(this->z_);
             p_sharp_plus = this->hamiltonian_.dtau_dp(this->z_);
           } else {
@@ -90,7 +92,7 @@ namespace stan {
             valid_subtree
               = build_tree(this->depth_, rho_subtree, z_propose,
                            H0, -1, n_leapfrog,
-                           sum_weight_subtree, sum_metro_prob, writer);
+                           sum_weight_subtree, sum_metro_prob, info_writer);
             z_minus.ps_point::operator=(this->z_);
             p_sharp_minus = this->hamiltonian_.dtau_dp(this->z_);
           }

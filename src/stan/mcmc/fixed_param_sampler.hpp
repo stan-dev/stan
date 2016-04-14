@@ -12,8 +12,10 @@ namespace stan {
     public:
       fixed_param_sampler() { }
 
-      sample transition(sample& init_sample,
-                        interface_callbacks::writer::base_writer& writer) {
+      sample
+      transition(sample& init_sample,
+                 interface_callbacks::writer::base_writer& info_writer,
+                 interface_callbacks::writer::base_writer& error_writer) {
         return init_sample;
       }
     };

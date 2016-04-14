@@ -18,7 +18,8 @@ namespace stan {
 
       virtual sample
       transition(sample& init_sample,
-                 interface_callbacks::writer::base_writer& writer) = 0;
+                 interface_callbacks::writer::base_writer& info_writer,
+                 interface_callbacks::writer::base_writer& error_writer) = 0;
 
       virtual void get_sampler_param_names(std::vector<std::string>& names) {}
 

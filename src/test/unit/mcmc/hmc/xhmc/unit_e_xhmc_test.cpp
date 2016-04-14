@@ -88,8 +88,10 @@ TEST(McmcUnitEXHMC, transition) {
   z_init.p(1) = 1;
   z_init.p(2) = -1;
 
-  std::stringstream output;
-  stan::interface_callbacks::writer::stream_writer writer(output);
+  std::stringstream output_stream;
+  stan::interface_callbacks::writer::stream_writer writer(output_stream);
+  std::stringstream error_stream;
+  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
 
   std::fstream empty_stream("", std::fstream::in);
   stan::io::dump data_var_context(empty_stream);
@@ -106,12 +108,13 @@ TEST(McmcUnitEXHMC, transition) {
 
   stan::mcmc::sample init_sample(z_init.q, 0, 0);
 
-  stan::mcmc::sample s = sampler.transition(init_sample, writer);
+  stan::mcmc::sample s = sampler.transition(init_sample, writer, error_writer);
 
   EXPECT_FLOAT_EQ(1, s.cont_params()(0));
   EXPECT_FLOAT_EQ(-1, s.cont_params()(1));
   EXPECT_FLOAT_EQ(1, s.cont_params()(2));
   EXPECT_FLOAT_EQ(-1.5, s.log_prob());
   EXPECT_FLOAT_EQ(0.99805242, s.accept_stat());
-  EXPECT_EQ("", output.str());
+  EXPECT_EQ("", output_stream.str());
+  EXPECT_EQ("", error_stream.str());
 }

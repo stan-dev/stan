@@ -15,7 +15,8 @@ public:
     : base_mcmc(), n_transition_called(0) { }
 
   stan::mcmc::sample transition(stan::mcmc::sample& init_sample,
-                                stan::interface_callbacks::writer::base_writer& writer) {
+                                stan::interface_callbacks::writer::base_writer& info_writer,
+                                stan::interface_callbacks::writer::base_writer& error_writer) {
     n_transition_called++;
     return init_sample;
   }
@@ -35,13 +36,15 @@ struct mock_callback {
 class StanServices : public testing::Test {
 public:
   StanServices()
-    : message_writer(message_output, "# ") { }
+    : message_writer(message_output, "# "),
+      error_writer(error_output, "# ") { }
   
   void SetUp() {
     model_output.str("");
     sample_output.str("");
     diagnostic_output.str("");
     message_output.str("");
+    error_output.str("");
     
     sampler = new mock_sampler();
 
@@ -84,10 +87,13 @@ public:
   double log_prob;
   double stat;
 
-  std::stringstream model_output,
-    sample_output, diagnostic_output, message_output;
-
+  std::stringstream model_output;
+  std::stringstream sample_output;
+  std::stringstream diagnostic_output;
+  std::stringstream message_output;
+  std::stringstream error_output;
   stan::interface_callbacks::writer::stream_writer message_writer;
+  stan::interface_callbacks::writer::stream_writer error_writer;
 };
 
 TEST_F(StanServices, sample) {
@@ -110,7 +116,8 @@ TEST_F(StanServices, sample) {
                                *writer, s, *model, base_rng,
                                prefix, suffix, ss,
                                callback,
-                               message_writer);
+                               message_writer,
+                               error_writer);
   
 
   EXPECT_EQ(num_samples, sampler->n_transition_called);
@@ -122,5 +129,6 @@ TEST_F(StanServices, sample) {
   EXPECT_EQ("", sample_output.str());
   EXPECT_EQ("", diagnostic_output.str());
   EXPECT_EQ("", message_output.str());
+  EXPECT_EQ("", error_output.str());
 }
 

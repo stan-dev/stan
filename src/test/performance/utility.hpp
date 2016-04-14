@@ -456,7 +456,8 @@ namespace stan {
                                              s, model, base_rng,
                                              prefix, suffix, std::cout,
                                              startTransitionCallback,
-                                             info_writer);
+                                             info_writer,
+                                             err_writer);
 
         clock_t end = clock();
         warmDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;
@@ -476,7 +477,8 @@ namespace stan {
            s, model, base_rng,
            prefix, suffix, std::cout,
            startTransitionCallback,
-           info_writer);
+           info_writer,
+           err_writer);
           
         end = clock();
         sampleDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;

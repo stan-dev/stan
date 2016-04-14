@@ -34,13 +34,15 @@ namespace stan {
                                 std::ostream& o,
                                 StartTransitionCallback& callback,
                                 interface_callbacks::writer::base_writer&
-                                writer) {
+                                info_writer,
+                                interface_callbacks::writer::base_writer&
+                                error_writer) {
         for (int m = 0; m < num_iterations; ++m) {
           callback();
 
           progress(m, start, finish, refresh, warmup, prefix, suffix, o);
 
-          init_s = sampler->transition(init_s, writer);
+          init_s = sampler->transition(init_s, info_writer, error_writer);
 
           if ( save && ( (m % num_thin) == 0) ) {
             mcmc_writer.write_sample_params(base_rng, init_s, *sampler, model);
