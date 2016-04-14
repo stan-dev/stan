@@ -34,9 +34,13 @@ namespace stan {
       double tau(ps_point& z) { return T(z); }
       double phi(ps_point& z) { return this->V(z); }
 
-      double dG_dt(ps_point& z) { return 2; }
+      double dG_dt(
+        ps_point& z, stan::interface_callbacks::writer::base_writer& writer) {
+        return 2;
+      }
 
-      const Eigen::VectorXd dtau_dq(ps_point& z) {
+      const Eigen::VectorXd dtau_dq(
+        ps_point& z, stan::interface_callbacks::writer::base_writer& writer) {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 
@@ -44,7 +48,8 @@ namespace stan {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 
-      const Eigen::VectorXd dphi_dq(ps_point& z) {
+      const Eigen::VectorXd dphi_dq(
+        ps_point& z, stan::interface_callbacks::writer::base_writer& writer) {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 
@@ -55,8 +60,8 @@ namespace stan {
 
       void sample_p(ps_point& z, BaseRNG& rng) {};
 
-      void update(ps_point& z,
-                  stan::interface_callbacks::writer::base_writer& writer) {
+      void update_potential_gradient(
+        ps_point& z, stan::interface_callbacks::writer::base_writer& writer) {
         z.V += 500;
       }
 

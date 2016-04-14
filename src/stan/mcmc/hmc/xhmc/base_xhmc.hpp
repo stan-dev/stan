@@ -63,7 +63,7 @@ namespace stan {
         ps_point z_sample(z_plus);
         ps_point z_propose(z_plus);
 
-        double sum_numer = this->hamiltonian_.dG_dt(this->z_);
+        double sum_numer = this->hamiltonian_.dG_dt(this->z_, writer);
         double sum_weight = 1;
 
         double H0 = this->hamiltonian_.H(this->z_);
