@@ -66,6 +66,10 @@ namespace stan {
         z.g *= -1;
       }
 
+      double stein(Point& z, double alpha, double beta) {
+        return 0;
+      }
+
     protected:
       const Model& model_;
 

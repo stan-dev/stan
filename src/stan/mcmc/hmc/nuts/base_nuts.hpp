@@ -23,7 +23,8 @@ namespace stan {
       base_nuts(const Model& model, BaseRNG& rng)
         : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
           depth_(0), max_depth_(5), max_deltaH_(1000),
-          n_leapfrog_(0), divergent_(0), energy_(0) {
+          n_leapfrog_(0), divergent_(0), energy_(0),
+          stein1_(0), stein2_(0), stein3_(0) {
       }
 
       ~base_nuts() {}
@@ -120,6 +121,9 @@ namespace stan {
 
         this->z_.ps_point::operator=(z_sample);
         this->energy_ = this->hamiltonian_.H(this->z_);
+        this->stein1_ = this->hamiltonian_.stein(this->z_, 1, 0.5);
+        this->stein2_ = this->hamiltonian_.stein(this->z_, 1, 0.25);
+        this->stein3_ = this->hamiltonian_.stein(this->z_, 1, 0.1);
         return sample(this->z_.q, -this->z_.V, accept_prob);
       }
 
@@ -129,6 +133,9 @@ namespace stan {
         names.push_back("n_leapfrog__");
         names.push_back("divergent__");
         names.push_back("energy__");
+        names.push_back("stein1__");
+        names.push_back("stein2__");
+        names.push_back("stein3__");
       }
 
       void get_sampler_params(std::vector<double>& values) {
@@ -137,6 +144,9 @@ namespace stan {
         values.push_back(this->n_leapfrog_);
         values.push_back(this->divergent_);
         values.push_back(this->energy_);
+        values.push_back(this->stein1_);
+        values.push_back(this->stein2_);
+        values.push_back(this->stein3_);
       }
 
       bool compute_criterion(Eigen::VectorXd& p_sharp_minus,
@@ -219,6 +229,9 @@ namespace stan {
       int n_leapfrog_;
       int divergent_;
       double energy_;
+      double stein1_;
+      double stein2_;
+      double stein3_;
     };
 
   }  // mcmc

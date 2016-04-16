@@ -53,6 +53,21 @@ namespace stan {
         for (int i = 0; i < z.p.size(); ++i)
           z.p(i) = rand_diag_gaus() / sqrt(z.mInv(i));
       }
+
+      double stein(diag_e_point& z, double alpha, double beta) {
+        double quad = 0;
+        for (int n = 0; n < z.q.size(); ++n)
+          quad += z.q(n) * z.q(n) / z.mInv(n);
+
+        double quad_pow = std::pow(quad, 0.5 * beta);
+        double u = std::exp(-alpha * quad_pow);
+
+        double stein = alpha * beta * std::pow(quad, 0.5 * beta - 1) * u;
+        stein *= z.q.dot(z.g) - z.q.size() - beta + 2
+                 + alpha * beta * quad_pow;
+
+        return stein;
+      }
     };
 
   }  // mcmc
