@@ -18,8 +18,10 @@ namespace stan {
                           stan::services::categorical_argument* adapt,
                           unsigned int num_warmup,
                           const Eigen::VectorXd& cont_params,
-                          interface_callbacks::writer::base_writer& writer) {
-        init_adapt<Sampler>(sampler, adapt, cont_params, writer);
+                          interface_callbacks::writer::base_writer& info_writer,
+                      interface_callbacks::writer::base_writer& error_writer) {
+        init_adapt<Sampler>(sampler, adapt, cont_params,
+                            info_writer, error_writer);
 
         unsigned int init_buffer
           = dynamic_cast<u_int_argument*>(adapt->arg("init_buffer"))->value();
@@ -30,7 +32,7 @@ namespace stan {
 
         dynamic_cast<Sampler*>(sampler)
           ->set_window_params(num_warmup, init_buffer, term_buffer,
-                              window, writer);
+                              window, info_writer);
 
         return true;
       }
