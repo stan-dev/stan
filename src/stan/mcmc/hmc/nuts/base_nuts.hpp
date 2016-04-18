@@ -40,15 +40,17 @@ namespace stan {
       int get_max_depth() { return this->max_depth_; }
       double get_max_delta() { return this->max_deltaH_; }
 
-      sample transition(sample& init_sample,
-                        interface_callbacks::writer::base_writer& writer) {
+      sample
+      transition(sample& init_sample,
+                 interface_callbacks::writer::base_writer& info_writer,
+                 interface_callbacks::writer::base_writer& error_writer) {
         // Initialize the algorithm
         this->sample_stepsize();
 
         this->seed(init_sample.cont_params());
 
         this->hamiltonian_.sample_p(this->z_, this->rand_int_);
-        this->hamiltonian_.init(this->z_, writer);
+        this->hamiltonian_.init(this->z_, info_writer, error_writer);
 
         ps_point z_plus(this->z_);
         ps_point z_minus(z_plus);
@@ -82,7 +84,8 @@ namespace stan {
             valid_subtree
               = build_tree(this->depth_, rho_subtree, z_propose,
                            H0, 1, n_leapfrog,
-                           sum_weight_subtree, sum_metro_prob, writer);
+                           sum_weight_subtree, sum_metro_prob,
+                           info_writer, error_writer);
             z_plus.ps_point::operator=(this->z_);
             p_sharp_plus = this->hamiltonian_.dtau_dp(this->z_);
           } else {
@@ -90,7 +93,8 @@ namespace stan {
             valid_subtree
               = build_tree(this->depth_, rho_subtree, z_propose,
                            H0, -1, n_leapfrog,
-                           sum_weight_subtree, sum_metro_prob, writer);
+                           sum_weight_subtree, sum_metro_prob,
+                           info_writer, error_writer);
             z_minus.ps_point::operator=(this->z_);
             p_sharp_minus = this->hamiltonian_.dtau_dp(this->z_);
           }
@@ -150,12 +154,13 @@ namespace stan {
       int build_tree(int depth, Eigen::VectorXd& rho, ps_point& z_propose,
                      double H0, double sign, int& n_leapfrog,
                      double& sum_weight, double& sum_metro_prob,
-                     interface_callbacks::writer::base_writer& writer) {
+                     interface_callbacks::writer::base_writer& info_writer,
+                     interface_callbacks::writer::base_writer& error_writer) {
         // Base case
         if (depth == 0) {
             this->integrator_.evolve(this->z_, this->hamiltonian_,
                                      sign * this->epsilon_,
-                                     writer);
+                                     info_writer, error_writer);
             ++n_leapfrog;
 
             double h = this->hamiltonian_.H(this->z_);
@@ -185,7 +190,8 @@ namespace stan {
         bool valid_left
           = build_tree(depth - 1, rho_subtree, z_propose,
                        H0, sign, n_leapfrog,
-                       sum_weight_left, sum_metro_prob, writer);
+                       sum_weight_left, sum_metro_prob,
+                       info_writer, error_writer);
 
         sum_weight += sum_weight_left;
         if (!valid_left) return false;
@@ -197,7 +203,8 @@ namespace stan {
         bool valid_right
           = build_tree(depth - 1, rho_subtree, z_propose_right,
                        H0, sign, n_leapfrog,
-                       sum_weight_right, sum_metro_prob, writer);
+                       sum_weight_right, sum_metro_prob,
+                       info_writer, error_writer);
 
         sum_weight += sum_weight_right;
         if (!valid_right) return false;

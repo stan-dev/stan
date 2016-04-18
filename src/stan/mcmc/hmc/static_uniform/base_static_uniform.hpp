@@ -33,14 +33,16 @@ namespace stan {
 
       ~base_static_uniform() {}
 
-      sample transition(sample& init_sample,
-                        interface_callbacks::writer::base_writer& writer) {
+      sample
+      transition(sample& init_sample,
+                 interface_callbacks::writer::base_writer& info_writer,
+                 interface_callbacks::writer::base_writer& error_writer) {
         this->sample_stepsize();
 
         this->seed(init_sample.cont_params());
 
         this->hamiltonian_.sample_p(this->z_, this->rand_int_);
-        this->hamiltonian_.init(this->z_, writer);
+        this->hamiltonian_.init(this->z_, info_writer, error_writer);
 
         ps_point z_init(this->z_);
         double H0 = this->hamiltonian_.H(this->z_);
@@ -54,7 +56,8 @@ namespace stan {
 
         for (int l = 0; l < Lp; ++l) {
           this->integrator_.evolve(this->z_, this->hamiltonian_,
-                                   -this->epsilon_, writer);
+                                   -this->epsilon_,
+                                   info_writer, error_writer);
 
           double h = this->hamiltonian_.H(this->z_);
           if (boost::math::isnan(h))
@@ -72,7 +75,8 @@ namespace stan {
 
         for (int l = 0; l < L_ - 1 - Lp; ++l) {
           this->integrator_.evolve(this->z_, this->hamiltonian_,
-                                   this->epsilon_, writer);
+                                   this->epsilon_,
+                                   info_writer, error_writer);
 
           double h = this->hamiltonian_.H(this->z_);
           if (boost::math::isnan(h))

@@ -19,8 +19,10 @@ TEST(McmcStaticUniformUnitE, transition) {
   z_init.q(0) = 1;
   z_init.p(0) = -1;
 
-  std::stringstream output;
-  stan::interface_callbacks::writer::stream_writer writer(output);
+  std::stringstream output_stream;
+  stan::interface_callbacks::writer::stream_writer writer(output_stream);
+  std::stringstream error_stream;
+  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
 
   std::fstream empty_stream("", std::fstream::in);
   stan::io::dump data_var_context(empty_stream);
@@ -30,19 +32,20 @@ TEST(McmcStaticUniformUnitE, transition) {
     sampler(model, base_rng);
 
   sampler.z() = z_init;
-  sampler.init_hamiltonian(writer);
+  sampler.init_hamiltonian(writer, error_writer);
   sampler.set_nominal_stepsize(0.1);
   sampler.set_stepsize_jitter(0);
   sampler.sample_stepsize();
 
   stan::mcmc::sample init_sample(z_init.q, 0, 0);
 
-  stan::mcmc::sample s = sampler.transition(init_sample, writer);
+  stan::mcmc::sample s = sampler.transition(init_sample, writer, error_writer);
 
   EXPECT_FLOAT_EQ(0.27224374, s.cont_params()(0));
   EXPECT_FLOAT_EQ(-0.037058324, s.log_prob());
   EXPECT_FLOAT_EQ(0.9998666, s.accept_stat());
-  EXPECT_EQ("", output.str());
+  EXPECT_EQ("", output_stream.str());
+  EXPECT_EQ("", error_stream.str());
 }
 
 TEST(McmcStaticUniformDiagE, transition) {
@@ -52,8 +55,10 @@ TEST(McmcStaticUniformDiagE, transition) {
   z_init.q(0) = 1;
   z_init.p(0) = -1;
 
-  std::stringstream output;
-  stan::interface_callbacks::writer::stream_writer writer(output);
+  std::stringstream output_stream;
+  stan::interface_callbacks::writer::stream_writer writer(output_stream);
+  std::stringstream error_stream;
+  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
 
   std::fstream empty_stream("", std::fstream::in);
   stan::io::dump data_var_context(empty_stream);
@@ -63,19 +68,20 @@ TEST(McmcStaticUniformDiagE, transition) {
     sampler(model, base_rng);
 
   sampler.z() = z_init;
-  sampler.init_hamiltonian(writer);
+  sampler.init_hamiltonian(writer, error_writer);
   sampler.set_nominal_stepsize(0.1);
   sampler.set_stepsize_jitter(0);
   sampler.sample_stepsize();
 
   stan::mcmc::sample init_sample(z_init.q, 0, 0);
 
-  stan::mcmc::sample s = sampler.transition(init_sample, writer);
+  stan::mcmc::sample s = sampler.transition(init_sample, writer, error_writer);
 
   EXPECT_FLOAT_EQ(0.27224374, s.cont_params()(0));
   EXPECT_FLOAT_EQ(-0.037058324, s.log_prob());
   EXPECT_FLOAT_EQ(0.9998666, s.accept_stat());
-  EXPECT_EQ("", output.str());
+  EXPECT_EQ("", output_stream.str());
+  EXPECT_EQ("", error_stream.str());
 }
 
 TEST(McmcStaticUniformDenseE, transition) {
@@ -85,8 +91,10 @@ TEST(McmcStaticUniformDenseE, transition) {
   z_init.q(0) = 1;
   z_init.p(0) = -1;
 
-  std::stringstream output;
-  stan::interface_callbacks::writer::stream_writer writer(output);
+  std::stringstream output_stream;
+  stan::interface_callbacks::writer::stream_writer writer(output_stream);
+  std::stringstream error_stream;
+  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
 
   std::fstream empty_stream("", std::fstream::in);
   stan::io::dump data_var_context(empty_stream);
@@ -96,19 +104,20 @@ TEST(McmcStaticUniformDenseE, transition) {
     sampler(model, base_rng);
 
   sampler.z() = z_init;
-  sampler.init_hamiltonian(writer);
+  sampler.init_hamiltonian(writer, error_writer);
   sampler.set_nominal_stepsize(0.1);
   sampler.set_stepsize_jitter(0);
   sampler.sample_stepsize();
 
   stan::mcmc::sample init_sample(z_init.q, 0, 0);
 
-  stan::mcmc::sample s = sampler.transition(init_sample, writer);
+  stan::mcmc::sample s = sampler.transition(init_sample, writer, error_writer);
 
   EXPECT_FLOAT_EQ(0.27224374, s.cont_params()(0));
   EXPECT_FLOAT_EQ(-0.037058324, s.log_prob());
   EXPECT_FLOAT_EQ(0.9998666, s.accept_stat());
-  EXPECT_EQ("", output.str());
+  EXPECT_EQ("", output_stream.str());
+  EXPECT_EQ("", error_stream.str());
 }
 
 TEST(McmcAdaptStaticUniformUnitE, transition) {
@@ -118,8 +127,10 @@ TEST(McmcAdaptStaticUniformUnitE, transition) {
   z_init.q(0) = 1;
   z_init.p(0) = -1;
 
-  std::stringstream output;
-  stan::interface_callbacks::writer::stream_writer writer(output);
+  std::stringstream output_stream;
+  stan::interface_callbacks::writer::stream_writer writer(output_stream);
+  std::stringstream error_stream;
+  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
 
   std::fstream empty_stream("", std::fstream::in);
   stan::io::dump data_var_context(empty_stream);
@@ -129,19 +140,20 @@ TEST(McmcAdaptStaticUniformUnitE, transition) {
     sampler(model, base_rng);
 
   sampler.z() = z_init;
-  sampler.init_hamiltonian(writer);
+  sampler.init_hamiltonian(writer, error_writer);
   sampler.set_nominal_stepsize(0.1);
   sampler.set_stepsize_jitter(0);
   sampler.sample_stepsize();
 
   stan::mcmc::sample init_sample(z_init.q, 0, 0);
 
-  stan::mcmc::sample s = sampler.transition(init_sample, writer);
+  stan::mcmc::sample s = sampler.transition(init_sample, writer, error_writer);
 
   EXPECT_FLOAT_EQ(0.27224374, s.cont_params()(0));
   EXPECT_FLOAT_EQ(-0.037058324, s.log_prob());
   EXPECT_FLOAT_EQ(0.9998666, s.accept_stat());
-  EXPECT_EQ("", output.str());
+  EXPECT_EQ("", output_stream.str());
+  EXPECT_EQ("", error_stream.str());
 }
 
 TEST(McmcAdaptStaticUniformDiagE, transition) {
@@ -151,8 +163,10 @@ TEST(McmcAdaptStaticUniformDiagE, transition) {
   z_init.q(0) = 1;
   z_init.p(0) = -1;
 
-  std::stringstream output;
-  stan::interface_callbacks::writer::stream_writer writer(output);
+  std::stringstream output_stream;
+  stan::interface_callbacks::writer::stream_writer writer(output_stream);
+  std::stringstream error_stream;
+  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
 
   std::fstream empty_stream("", std::fstream::in);
   stan::io::dump data_var_context(empty_stream);
@@ -162,19 +176,20 @@ TEST(McmcAdaptStaticUniformDiagE, transition) {
     sampler(model, base_rng);
 
   sampler.z() = z_init;
-  sampler.init_hamiltonian(writer);
+  sampler.init_hamiltonian(writer, error_writer);
   sampler.set_nominal_stepsize(0.1);
   sampler.set_stepsize_jitter(0);
   sampler.sample_stepsize();
 
   stan::mcmc::sample init_sample(z_init.q, 0, 0);
 
-  stan::mcmc::sample s = sampler.transition(init_sample, writer);
+  stan::mcmc::sample s = sampler.transition(init_sample, writer, error_writer);
 
   EXPECT_FLOAT_EQ(0.27224374, s.cont_params()(0));
   EXPECT_FLOAT_EQ(-0.037058324, s.log_prob());
   EXPECT_FLOAT_EQ(0.9998666, s.accept_stat());
-  EXPECT_EQ("", output.str());
+  EXPECT_EQ("", output_stream.str());
+  EXPECT_EQ("", error_stream.str());
 }
 
 TEST(McmcAdaptStaticUniformDenseE, transition) {
@@ -184,8 +199,10 @@ TEST(McmcAdaptStaticUniformDenseE, transition) {
   z_init.q(0) = 1;
   z_init.p(0) = -1;
 
-  std::stringstream output;
-  stan::interface_callbacks::writer::stream_writer writer(output);
+  std::stringstream output_stream;
+  stan::interface_callbacks::writer::stream_writer writer(output_stream);
+  std::stringstream error_stream;
+  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
 
   std::fstream empty_stream("", std::fstream::in);
   stan::io::dump data_var_context(empty_stream);
@@ -195,17 +212,18 @@ TEST(McmcAdaptStaticUniformDenseE, transition) {
     sampler(model, base_rng);
 
   sampler.z() = z_init;
-  sampler.init_hamiltonian(writer);
+  sampler.init_hamiltonian(writer, error_writer);
   sampler.set_nominal_stepsize(0.1);
   sampler.set_stepsize_jitter(0);
   sampler.sample_stepsize();
 
   stan::mcmc::sample init_sample(z_init.q, 0, 0);
 
-  stan::mcmc::sample s = sampler.transition(init_sample, writer);
+  stan::mcmc::sample s = sampler.transition(init_sample, writer, error_writer);
 
   EXPECT_FLOAT_EQ(0.27224374, s.cont_params()(0));
   EXPECT_FLOAT_EQ(-0.037058324, s.log_prob());
   EXPECT_FLOAT_EQ(0.9998666, s.accept_stat());
-  EXPECT_EQ("", output.str());
+  EXPECT_EQ("", output_stream.str());
+  EXPECT_EQ("", error_stream.str());
 }

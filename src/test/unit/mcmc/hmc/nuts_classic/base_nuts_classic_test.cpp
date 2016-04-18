@@ -53,14 +53,16 @@ namespace stan {
       }
 
       void init(ps_point& z,
-                stan::interface_callbacks::writer::base_writer& writer) {
+                interface_callbacks::writer::base_writer& info_writer,
+                interface_callbacks::writer::base_writer& error_writer) {
         z.V = 0;
       }
 
       void sample_p(ps_point& z, BaseRNG& rng) {};
 
       void update(ps_point& z,
-                  stan::interface_callbacks::writer::base_writer& writer) {
+                  interface_callbacks::writer::base_writer& info_writer,
+                  interface_callbacks::writer::base_writer& error_writer) {
         z.V += 500;
       }
 
@@ -151,8 +153,12 @@ TEST(McmcNutsBaseNutsClassic, build_tree) {
 
   std::stringstream output;
   stan::interface_callbacks::writer::stream_writer writer(output);
+  std::stringstream error_stream;
+  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
 
-  int n_valid = sampler.build_tree(3, rho, &z_init, z_propose, util, writer);
+
+  int n_valid = sampler.build_tree(3, rho, &z_init, z_propose, util,
+                                   writer, error_writer);
 
   EXPECT_EQ(8, n_valid);
 
@@ -168,6 +174,7 @@ TEST(McmcNutsBaseNutsClassic, build_tree) {
   EXPECT_EQ(init_momentum, sampler.z().p(0));
 
   EXPECT_EQ("", output.str());
+  EXPECT_EQ("", error_stream.str());
 }
 
 TEST(McmcNutsBaseNutsClassic, slice_criterion) {
@@ -202,26 +209,33 @@ TEST(McmcNutsBaseNutsClassic, slice_criterion) {
 
   std::stringstream output;
   stan::interface_callbacks::writer::stream_writer writer(output);
+  std::stringstream error_stream;
+  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
+
 
   int n_valid = 0;
 
   sampler.z().V = -750;
-  n_valid = sampler.build_tree(0, rho, &z_init, z_propose, util, writer);
+  n_valid = sampler.build_tree(0, rho, &z_init, z_propose, util,
+                               writer, error_writer);
 
   EXPECT_EQ(1, n_valid);
   EXPECT_EQ(0, sampler.divergent_);
 
   sampler.z().V = -250;
-  n_valid = sampler.build_tree(0, rho, &z_init, z_propose, util, writer);
+  n_valid = sampler.build_tree(0, rho, &z_init, z_propose, util,
+                               writer, error_writer);
 
   EXPECT_EQ(0, n_valid);
   EXPECT_EQ(0, sampler.divergent_);
 
   sampler.z().V = 750;
-  n_valid = sampler.build_tree(0, rho, &z_init, z_propose, util, writer);
+  n_valid = sampler.build_tree(0, rho, &z_init, z_propose, util,
+                               writer, error_writer);
 
   EXPECT_EQ(0, n_valid);
   EXPECT_EQ(1, sampler.divergent_);
 
   EXPECT_EQ("", output.str());
+  EXPECT_EQ("", error_stream.str());
 }

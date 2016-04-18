@@ -23,10 +23,14 @@ namespace stan {
 
       ~adapt_diag_e_nuts_classic() {}
 
-      sample transition(sample& init_sample,
-                        interface_callbacks::writer::base_writer& writer) {
-        sample s = diag_e_nuts_classic<Model, BaseRNG>::transition(init_sample,
-                                                                   writer);
+      sample
+      transition(sample& init_sample,
+                 interface_callbacks::writer::base_writer& info_writer,
+                 interface_callbacks::writer::base_writer& error_writer) {
+        sample s
+          = diag_e_nuts_classic<Model, BaseRNG>::transition(init_sample,
+                                                            info_writer,
+                                                            error_writer);
 
         if (this->adapt_flag_) {
           this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,
@@ -36,7 +40,7 @@ namespace stan {
                                                              this->z_.q);
 
           if (update) {
-            this->init_stepsize(writer);
+            this->init_stepsize(info_writer);
 
             this->stepsize_adaptation_.set_mu(log(10 * this->nom_epsilon_));
             this->stepsize_adaptation_.restart();
