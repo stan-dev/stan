@@ -1,15 +1,18 @@
-#include <gtest/gtest.h>
-
 #include <stan/interface_callbacks/writer/noop_writer.hpp>
-#include <stan/mcmc/hmc/hamiltonians/unit_e_point.hpp>
-#include <stan/mcmc/hmc/hamiltonians/diag_e_point.hpp>
-#include <stan/mcmc/hmc/hamiltonians/dense_e_point.hpp>
+#include <stan/mcmc/hmc/nuts/softabs_nuts.hpp>
 #include <stan/mcmc/hmc/nuts/unit_e_nuts.hpp>
 #include <stan/mcmc/hmc/nuts/diag_e_nuts.hpp>
 #include <stan/mcmc/hmc/nuts/dense_e_nuts.hpp>
-#include <stan/mcmc/hmc/nuts/softabs_nuts.hpp>
+#include <stan/mcmc/hmc/hamiltonians/unit_e_point.hpp>
+#include <stan/mcmc/hmc/hamiltonians/diag_e_point.hpp>
+#include <stan/mcmc/hmc/hamiltonians/dense_e_point.hpp>
+
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
+
 #include <boost/random/additive_combine.hpp>
+
+#include <gtest/gtest.h>
+
 
 typedef boost::ecuyer1988 rng_t;
 

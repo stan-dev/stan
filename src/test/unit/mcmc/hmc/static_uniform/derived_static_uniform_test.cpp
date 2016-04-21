@@ -1,15 +1,18 @@
+#include <stan/mcmc/hmc/static_uniform/softabs_static_uniform.hpp>
 #include <stan/mcmc/hmc/static_uniform/unit_e_static_uniform.hpp>
 #include <stan/mcmc/hmc/static_uniform/diag_e_static_uniform.hpp>
 #include <stan/mcmc/hmc/static_uniform/dense_e_static_uniform.hpp>
-#include <stan/mcmc/hmc/static_uniform/softabs_static_uniform.hpp>
 #include <stan/mcmc/hmc/static_uniform/adapt_unit_e_static_uniform.hpp>
 #include <stan/mcmc/hmc/static_uniform/adapt_diag_e_static_uniform.hpp>
 #include <stan/mcmc/hmc/static_uniform/adapt_dense_e_static_uniform.hpp>
 #include <stan/mcmc/hmc/static_uniform/adapt_softabs_static_uniform.hpp>
 #include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/interface_callbacks/writer/stream_writer.hpp>
+
 #include <test/test-models/good/mcmc/hmc/common/gauss.hpp>
+
 #include <boost/random/additive_combine.hpp>
+
 #include <gtest/gtest.h>
 
 typedef boost::ecuyer1988 rng_t;
