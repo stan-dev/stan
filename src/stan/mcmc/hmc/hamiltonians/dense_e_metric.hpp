@@ -17,7 +17,7 @@ namespace stan {
     class dense_e_metric
       : public base_hamiltonian<Model, dense_e_point, BaseRNG> {
     public:
-      explicit dense_e_metric(Model& model)
+      explicit dense_e_metric(const Model& model)
         : base_hamiltonian<Model, dense_e_point, BaseRNG>(model) {}
 
       ~dense_e_metric() {}
@@ -32,6 +32,10 @@ namespace stan {
 
       double phi(dense_e_point& z) {
         return this->V(z);
+      }
+
+      double dG_dt(dense_e_point& z) {
+        return 2 * T(z) - z.q.dot(z.g);
       }
 
       const Eigen::VectorXd dtau_dq(dense_e_point& z) {

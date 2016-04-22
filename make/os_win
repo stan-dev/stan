@@ -28,7 +28,7 @@ ifeq (g++,$(CC_TYPE))
   CFLAGS += -m$(BIT)
   CFLAGS += -Wno-unused-function
   CFLAGS += -Wno-uninitialized
-  CFLAGS += -Wno-unused-but-set
+  CFLAGS += -Wno-unused-but-set-variable
   LDLIBS += -static-libgcc
   LDLIBS += -static-libstdc++
 endif

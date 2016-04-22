@@ -13,7 +13,7 @@ namespace stan {
     template <class Model, class BaseRNG>
     class diag_e_metric: public base_hamiltonian<Model, diag_e_point, BaseRNG> {
     public:
-      explicit diag_e_metric(Model& model)
+      explicit diag_e_metric(const Model& model)
         : base_hamiltonian<Model, diag_e_point, BaseRNG>(model) {}
 
       ~diag_e_metric() {}
@@ -28,6 +28,10 @@ namespace stan {
 
       double phi(diag_e_point& z) {
         return this->V(z);
+      }
+
+      double dG_dt(diag_e_point& z) {
+        return 2 * T(z) - z.q.dot(z.g);
       }
 
       const Eigen::VectorXd dtau_dq(diag_e_point& z) {

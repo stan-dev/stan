@@ -1,23 +1,19 @@
 \part{Built-In Functions}\label{built-in-functions.part}
 
-
-
-
 \chapter{Void Functions}
 
 Stan does not technically support functions that do not return values.
 It does support two types of statements that look like functions, one
 for incrementing log probabilities and one for printing.
 Documentation on these functions is included here for completeness.
+The special keyword \code{void} is used for the return type of void
+functions. 
 
-Although it's not part of Stan's type language, in this chapter,
-\code{void} will be used for the return type.
+\section{Increment Log Probability (deprecated)}
 
-\section{Increment Log Probability}
-
-There is a special function \code{increment\_log\_prob} takes a single
-argument of any expression type \code{T}.
-%
+The increment log density statement, \code{increment\_log\_prob(...)}
+syntactically appears to be a function, but is treated as its own
+special statement.
 \begin{description}
   \fitem{void}{increment\_log\_prob}{T \farg{lp}}{Add \farg{lp} (or
     elements of \farg{lp} if \code{T} is a container type) to the
@@ -25,17 +21,25 @@ argument of any expression type \code{T}.
     function defined by a Stan model.}
 \end{description}
 %
-The expression \code{lp} can be of any expression type.  Specifically,
-it can be an integer or real primitive, a vector, row vector, or
-matrix, or an array of any type, including multidimensional arrays and
-arrays of matrices, vectors, or row vectors.  Vector arguments are
-included for convenience and have no speed advantage over adding
-values in a loop.
+As of Stan 2.10, the \code{increment\_log\_prob()} statement has been
+deprecated in favor of the \code{target~+=} syntax, with exactly the
+same behavior.
+%
+\begin{description}
+  \fitem{void}{target~+=}{T \farg{lp}}{Add \farg{lp} (or
+    elements of \farg{lp} if \code{T} is a container type) to the
+    total log probability accumulator returned by the log probability
+    function defined by a Stan model.}
+\end{description}
+%
 
-The full behavior of the \code{increment\_log\_prob} statement and its
-relation to sampling statements is described in
-\refsection{increment-log-prob}.
-
+In both cases, the expression \code{lp} can be of any expression type.
+Specifically, it can be an integer or real primitive, a vector, row
+vector, or matrix, or an array of any type, including multidimensional
+arrays and arrays of matrices, vectors, or row vectors.  Vector
+arguments are included for convenience and have no speed advantage
+over adding values in a loop.  See \refsection{increment-log-prob} for
+more information on \code{target +=} and \code{increment\_log\_prob}.
 
 \section{Print}
 
@@ -290,24 +294,31 @@ executed on the constrained parmeters, with each sampling statement
 of the model block execution, the value of the log probability
 accumulator is the log probability value returned by the Stan program.
 
-Stan provides a special built-in function \code{get\_lp} that takes no
+Stan provides a special built-in function \code{target()} that takes no
 arguments and returns the current value of the log probability
-accumulator.  This function is primarily useful for debugging
-purposes, where for instance, it may be used with a print statement to
-display the log probability accumulator at various stages of execution
-to see where it becomes ill defined.
+accumulator.%
+%
+\footnote{This function used to be called \code{get\_lp()}, but that
+  name has been deprecated; using it will print a warning.  The
+  function \code{get\_lp()} will be removed in a future release.}
+
+This function is primarily useful for debugging purposes, where for
+instance, it may be used with a print statement to display the log
+probability accumulator at various stages of execution to see where it
+becomes ill defined.
 
 \begin{description}
-  \fitem{real}{get\_lp}{}{
+  \fitem{real}{target}{}{
     Returns the current value of the log probability
     accumulator.}
+  \fitem{real}{get\_lp}{}{
+    Returns the current value of the log probability
+    accumulator; {\bfseries deprecated:} --- use \code{target()} instead).}
 \end{description}
 
-Like user-defined functions that end in \code{\_lp}, the log
-probability get function may only be used in the transformed parameter
-and model blocks, as well as in the bodies of functions with names
-that also end in \code{\_lp}.
-
+Both \code{target} and the deprecated \code{get\_lp} act like other
+functions ending in \code{\_lp}, meaning that they may only may only
+be used in the model block.
 
 \section{Logical Functions}
 
@@ -1103,6 +1114,11 @@ distribution function (and its complement).
 %
 
 \begin{description}
+  %
+  \fitem{real}{inc\_beta}{real \farg{alpha}, real \farg{beta}, real
+    \farg{x}}{ Returns the incomplete beta function up to \farg{x}
+    applied to \farg{alpha} and \farg{beta}.  See
+    \refsection{inc-beta-appendix} for a definition.  }
   %
   \fitem{real}{lbeta}{real \farg{alpha}, real \farg{beta}}{ 
     Returns the natural logarithm of the beta function applied to 
@@ -2528,7 +2544,7 @@ arbitrary subvector.
     starting at \farg{i}; i.e., elements \farg{i} through 
     through \farg{i} + \farg{n} - 1.}
 %
-  \fitem{row\_vector}{segment}{row\_vector \farg{v}, int \farg{i}, int
+  \fitem{row\_vector}{segment}{row\_vector \farg{rv}, int \farg{i}, int
     \farg{n}}{Return the row vector consisting of the \farg{n}
     elements of \farg{rv} starting at \farg{i}; i.e., elements
     \farg{i} through through \farg{i} + \farg{n} - 1.}
@@ -2930,12 +2946,18 @@ Number of components of \farg{v} less than \farg{v[s]}}
 \noindent
 For sparse matrices, for which many elements are zero, it is more
 efficient to use specialized representations to save memory and speed
-up matrix arithmetic (including derivative calculations).  Because of
-this speedup, it may even be useful to read in a dense matrix and convert
-it to a sparse matrix before multiplying it by a vector.  This chapter
-covers a very specific form of sparsity consisting of a sparse matrix
-multiplied by a dense vector;  for more general coding strategies for
-sparse data structures within Stan, see \refchapter{sparse-ragged}.
+up matrix arithmetic (including derivative calculations).  Given
+Stan's implementation, there is substantial space (memory) savings by
+using sparse matrices.  Because of the ease of optimizing dense matrix
+operations, speed improvements only arise at 90\% or even greater
+sparsity; below that level, dense matrices are faster but use more memory.  
+
+Because of this speedup and space savings, it may even be useful to
+read in a dense matrix and convert it to a sparse matrix before
+multiplying it by a vector.  This chapter covers a very specific form
+of sparsity consisting of a sparse matrix multiplied by a dense
+vector; for more general coding strategies for sparse data structures
+within Stan, see \refchapter{sparse-ragged}.
 
 \section{Compressed Row Storage}\label{CSR.section}
 
@@ -3030,10 +3052,13 @@ a single function.
 %
 \begin{description}
   \fitem{matrix}{csr\_to\_dense\_matrix}{int \farg{m}, int \farg{n},
-    matrix \farg{w}, int \farg{v}, int \farg{u}}{Return dense
-    $\mbox{\farg{m}} \times \mbox{\farg{n}}$ matrix with specified
-    values \farg{w}, column indices \farg{v}, and row starting indices
-    \farg{u}; see \refsection{CSR}.}
+    vector \farg{w}, int[] \farg{v}, int[] \farg{u}}{Return dense
+    $\mbox{\farg{m}} \times \mbox{\farg{n}}$ matrix with non-zero
+    matrix entries \farg{w}, column indices \farg{v}, and row starting
+    indices \farg{u}; the vector \farg{w} and arrays \farg{v} and
+    \farg{u} must all be the same size, and the arrays \farg{v} and
+    \farg{u} must have index values bounded by \farg{m} and \farg{n}.
+    See \refsection{CSR} for more details.}
 \end{description}
 
 \section{Sparse Matrix Arithmetic}

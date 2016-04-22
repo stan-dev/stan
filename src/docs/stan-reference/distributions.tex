@@ -108,7 +108,7 @@ model {
 generated quantities {
   vector[N_tilde] y_tilde;
   for (n in 1:N_tilde)
-    y_tilde[n] = normal_rng(alpha + beta * x[n], sigma);
+    y_tilde[n] = normal_rng(alpha + beta * x_tilde[n], sigma);
 }
 \end{stancode}
 %
@@ -708,9 +708,11 @@ c_{k})
 \right.
 \]
 %
-The $k=1$ and $k=K$ edge cases can be subsumed into the general definition
-by setting $c_0 = -\infty$ and $c_K = +\infty$ with
-$\mbox{logit}^{-1}(-\infty) = 0$ and $\mbox{logit}^{-1}(\infty) = 1$.
+The $k=K$ case is written with the redundant subtraction of zero to
+illustrate the parallelism of the cases; the $k=1$ and $k=K$ edge
+cases can be subsumed into the general definition by setting $c_0 =
+-\infty$ and $c_K = +\infty$ with $\mbox{logit}^{-1}(-\infty) = 0$ and
+$\mbox{logit}^{-1}(\infty) = 1$.
 
 \pitem{k}{ordered\_logistic}{eta, c}
 
@@ -1081,15 +1083,26 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
 %
 \fitem{real}{normal\_cdf}{reals \farg{y}, reals \farg{mu}, reals
   \farg{sigma}}{The cumulative normal distribution of \farg{y}
-  given location \farg{mu} and scale \farg{sigma}; normal\_cdf will underflow to 0 for $\frac{{y}-{\mu}}{{\sigma}}$ below -37.5 and overflow to 1 for $\frac{{y}-{\mu}}{{\sigma}}$ above 8.25}
+  given location \farg{mu} and scale \farg{sigma}; normal\_cdf will
+  underflow to 0 for $\frac{{y}-{\mu}}{{\sigma}}$ below -37.5 and
+  overflow to 1 for $\frac{{y}-{\mu}}{{\sigma}}$ above 8.25;  the
+  function \code{Phi\_approx} is more robust in the tails, but must be
+  scaled and translated for anything other than a unit normal.}
 %
 \fitem{real}{normal\_cdf\_log}{reals \farg{y}, reals \farg{mu}, reals
   \farg{sigma}}{The log of the cumulative normal distribution of \farg{y}
-  given location \farg{mu} and scale \farg{sigma}; normal\_cdf\_log will underflow to $-\infty$ for $\frac{{y}-{\mu}}{{\sigma}}$ below -37.5 and overflow to 0 for $\frac{{y}-{\mu}}{{\sigma}}$ above 8.25}
+  given location \farg{mu} and scale \farg{sigma}; normal\_cdf\_log
+  will underflow to $-\infty$ for $\frac{{y}-{\mu}}{{\sigma}}$ below
+  -37.5 and overflow to 0 for $\frac{{y}-{\mu}}{{\sigma}}$ above 8.25;
+ see above for discussion of \code{Phi\_approx} as an alternative.}
 %
 \fitem{real}{normal\_ccdf\_log}{reals \farg{y}, reals \farg{mu}, reals
   \farg{sigma}}{The log of the complementary cumulative normal distribution
-  of \farg{y} given location \farg{mu} and scale \farg{sigma}; normal\_ccdf\_log will overflow to 0 for $\frac{{y}-{\mu}}{{\sigma}}$ below -37.5 and underflow to $-\infty$ for $\frac{{y}-{\mu}}{{\sigma}}$ above 8.25}
+  of \farg{y} given location \farg{mu} and scale \farg{sigma};
+  normal\_ccdf\_log will overflow to 0 for
+  $\frac{{y}-{\mu}}{{\sigma}}$ below -37.5 and underflow to $-\infty$
+  for $\frac{{y}-{\mu}}{{\sigma}}$ above 8.25;
+  see above for discussion of \code{Phi\_approx} as an alternative.}
 \end{description}
 %
 \begin{description}
@@ -1933,9 +1946,10 @@ quantities block}
 \section{Wiener Diffusion Model Distributions}
 
 \subsubsection{Probability Density Function}
- If $\alpha \in \posreals$, $\tau \in \posreals$,
-    $\beta \in [0, 1]$ and $\delta \in \reals$,
- then for $y \in (0, \tau)$,
+
+If $\alpha \in \posreals$, $\tau \in \posreals$, $\beta \in [0, 1]$
+and $\delta \in \reals$, then for $y \in (0, \tau)$,
+%
 \[
 \distro{Wiener}(y|\alpha, \tau, \beta, \delta)
 =
@@ -1948,9 +1962,9 @@ quantities block}
 \phi \! \left(\frac{2k + \alpha \beta}{\sqrt{y - \tau}}\right)
 \!.
 \]
-
-where $\phi(x)$ denotes the standard
-normal density function \citep{Blurton2012}.
+%
+where $\phi(x)$ denotes the standard normal density function
+\citep{Blurton2012}.
 
 \pitem{y}{wiener}{alpha, tau, beta, delta}
 

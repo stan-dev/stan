@@ -1,42 +1,16 @@
 #ifndef STAN_LANG_GRAMMARS_PROGRAM_GRAMMAR_DEF_HPP
 #define STAN_LANG_GRAMMARS_PROGRAM_GRAMMAR_DEF_HPP
 
+#include <stan/lang/ast.hpp>
+#include <stan/lang/grammars/program_grammar.hpp>
+#include <stan/lang/grammars/semantic_actions.hpp>
 #include <boost/format.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/config/warning_disable.hpp>
-#include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/fusion/include/std_pair.hpp>
 #include <boost/spirit/home/support/iterators/line_pos_iterator.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
-#include <boost/spirit/include/phoenix_function.hpp>
-#include <boost/spirit/include/phoenix_fusion.hpp>
-#include <boost/spirit/include/phoenix_object.hpp>
-#include <boost/spirit/include/phoenix_operator.hpp>
-#include <boost/spirit/include/phoenix_stl.hpp>
 #include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/qi_numeric.hpp>
-#include <boost/spirit/include/support_multi_pass.hpp>
-#include <boost/spirit/include/version.hpp>
-#include <boost/tuple/tuple.hpp>
-#include <boost/variant/apply_visitor.hpp>
-#include <boost/variant/recursive_variant.hpp>
-
-#include <stan/lang/ast.hpp>
-#include <stan/lang/grammars/expression_grammar.hpp>
-#include <stan/lang/grammars/functions_grammar.hpp>
-#include <stan/lang/grammars/program_grammar.hpp>
-#include <stan/lang/grammars/statement_grammar.hpp>
-#include <stan/lang/grammars/var_decls_grammar.hpp>
-#include <stan/lang/grammars/whitespace_grammar.hpp>
-
-#include <cstddef>
 #include <iomanip>
-#include <iostream>
-#include <istream>
-#include <map>
-#include <set>
 #include <sstream>
-#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
@@ -48,7 +22,6 @@ namespace {
                       std::vector<stan::lang::statement> > type;
   };
 }
-
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::program,
                           (std::vector<stan::lang::function_decl_def>,
@@ -62,103 +35,8 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::program,
 
 
 namespace stan {
+
   namespace lang {
-
-    struct add_lp_var {
-      template <typename T>
-      struct result { typedef void type; };
-      void operator()(variable_map& vm) const {
-        vm.add("lp__",
-               base_var_decl("lp__", std::vector<expression>(), DOUBLE_T),
-               local_origin);  // lp acts as a local where defined
-        vm.add("params_r__",
-               base_var_decl("params_r__", std::vector<expression>(), VECTOR_T),
-               local_origin);  // lp acts as a local where defined
-      }
-    };
-    boost::phoenix::function<add_lp_var> add_lp_var_f;
-
-    struct remove_lp_var {
-      template <typename T>
-      struct result { typedef void type; };
-      void operator()(variable_map& vm) const {
-        vm.remove("lp__");
-        vm.remove("params_r__");
-      }
-    };
-    boost::phoenix::function<remove_lp_var> remove_lp_var_f;
-
-    struct program_error {
-      template <class> struct result;
-      template <typename F, typename T1, typename T2, typename T3,
-        typename T4, typename T5, typename T6, typename T7>
-      struct result<F(T1, T2, T3, T4, T5, T6, T7)> { typedef void type; };
-
-      template <class Iterator, class I>
-      void operator()(Iterator _begin, Iterator _end, Iterator _where,
-                      I const& _info, std::string msg, variable_map& vm,
-                      std::stringstream& error_msgs) const {
-        using boost::phoenix::construct;
-        using boost::phoenix::val;
-        using boost::spirit::get_line;
-        using boost::format;
-        using std::setw;
-
-        size_t idx_errline = get_line(_where);
-
-        error_msgs << msg << std::endl;
-
-        if (idx_errline > 0) {
-          error_msgs << "ERROR at line " << idx_errline
-                     << std::endl << std::endl;
-
-          std::basic_stringstream<char> sprogram;
-          sprogram << boost::make_iterator_range(_begin, _end);
-
-          // show error in context 2 lines before, 1 lines after
-          size_t idx_errcol = 0;
-          idx_errcol = get_column(_begin, _where) - 1;
-
-          std::string lineno = "";
-          format fmt_lineno("% 3d:    ");
-
-          std::string line_2before = "";
-          std::string line_before = "";
-          std::string line_err = "";
-          std::string line_after = "";
-
-          size_t idx_line = 0;
-          size_t idx_before = idx_errline - 1;
-          if (idx_before > 0) {
-              // read lines up to error line, save 2 most recently read
-              while (idx_before > idx_line) {
-                line_2before = line_before;
-                std::getline(sprogram, line_before);
-                idx_line++;
-              }
-              if (line_2before.length() > 0) {
-                lineno = str(fmt_lineno % (idx_before - 1) );
-                error_msgs << lineno << line_2before << std::endl;
-              }
-              lineno = str(fmt_lineno % idx_before);
-              error_msgs << lineno << line_before << std::endl;
-          }
-
-          std::getline(sprogram, line_err);
-          lineno = str(fmt_lineno % idx_errline);
-          error_msgs << lineno << line_err << std::endl
-                     << setw(idx_errcol + lineno.length()) << "^" << std::endl;
-
-          if (!sprogram.eof()) {
-            std::getline(sprogram, line_after);
-            lineno = str(fmt_lineno % (idx_errline+1));
-            error_msgs << lineno << line_after << std::endl;
-          }
-        }
-        error_msgs << std::endl;
-      }
-    };
-    boost::phoenix::function<program_error> program_error_f;
 
     template <typename Iterator>
     program_grammar<Iterator>::program_grammar(const std::string& model_name)
@@ -172,9 +50,6 @@ namespace stan {
           functions_g(var_map_, error_msgs_) {
         using boost::spirit::qi::eps;
         using boost::spirit::qi::lit;
-        using boost::spirit::qi::char_;
-        using boost::spirit::qi::_pass;
-        using boost::spirit::qi::lexeme;
         using boost::spirit::qi::on_error;
         using boost::spirit::qi::rethrow;
         using boost::spirit::qi::_1;
@@ -182,10 +57,8 @@ namespace stan {
         using boost::spirit::qi::_3;
         using boost::spirit::qi::_4;
 
-        // add model_name to var_map with special origin and no
-        var_map_.add(model_name,
-                     base_var_decl(),
-                     model_name_origin);
+        // add model_name to var_map with special origin
+        var_map_.add(model_name, base_var_decl(), model_name_origin);
 
         program_r.name("program");
         program_r
@@ -274,7 +147,7 @@ namespace stan {
           > end_var_decls_statements_r;
 
         on_error<rethrow>(program_r,
-                          program_error_f(_1, _2, _3, _4, "",
+                          program_error_f(_1, _2, _3,
                                           boost::phoenix::ref(var_map_),
                                           boost::phoenix::ref(error_msgs_)));
     }

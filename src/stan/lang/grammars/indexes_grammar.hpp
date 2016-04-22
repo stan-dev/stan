@@ -1,19 +1,20 @@
 #ifndef STAN_LANG_GRAMMARS_INDEXES_GRAMMAR_HPP
 #define STAN_LANG_GRAMMARS_INDEXES_GRAMMAR_HPP
 
-#include <boost/spirit/include/qi.hpp>
-
 #include <stan/lang/ast.hpp>
 #include <stan/lang/grammars/expression_grammar.hpp>
+#include <stan/lang/grammars/semantic_actions.hpp>
 #include <stan/lang/grammars/whitespace_grammar.hpp>
-
+#include <boost/spirit/include/qi.hpp>
 #include <string>
 #include <sstream>
 #include <vector>
 
 namespace stan {
+
   namespace lang {
 
+    // needed to break circularity of expression grammar including indexes
     template <typename Iterator>
     struct expression_grammar;
 
