@@ -23,7 +23,8 @@ namespace stan {
       { }
 
       sample transition(sample& init_sample,
-                        interface_callbacks::writer::base_writer& writer) {
+                        interface_callbacks::writer::base_writer& info_writer,
+                        interface_callbacks::writer::base_writer& error_writer) {
         this->seed(init_sample.cont_params());
         return sample(this->z_.q, - this->hamiltonian_.V(this->z_), 0);
       }

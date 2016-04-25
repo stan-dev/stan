@@ -31,12 +31,15 @@ namespace stan {
       }
 
       double dG_dt(diag_e_point& z,
-                   interface_callbacks::writer::base_writer& writer) {
+                   interface_callbacks::writer::base_writer& info_writer,
+                   interface_callbacks::writer::base_writer& error_writer) {
         return 2 * T(z) - z.q.dot(z.g);
       }
 
       const Eigen::VectorXd dtau_dq(
-        diag_e_point& z, interface_callbacks::writer::base_writer& writer) {
+        diag_e_point& z,
+        interface_callbacks::writer::base_writer& info_writer,
+        interface_callbacks::writer::base_writer& error_writer) {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 
@@ -45,7 +48,9 @@ namespace stan {
       }
 
       const Eigen::VectorXd dphi_dq(
-        diag_e_point& z, interface_callbacks::writer::base_writer& writer) {
+        diag_e_point& z,
+        interface_callbacks::writer::base_writer& info_writer,
+        interface_callbacks::writer::base_writer& error_writer) {
         return z.g;
       }
 

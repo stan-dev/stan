@@ -688,6 +688,38 @@ initialized rougly in $(0.14,7.4)$, variables constrained to fall
 between 0 and 1 are initialized with values roughly in $(0.12,0.88)$.
 
 
+\section{Divergent Transitions}
+
+When numerical issues arise during the evaluation of the parameter
+Jacobians or the model log density, an exception is raised in the
+underlying code and the current expansion of the Hamiltonian forward
+and backward in time is halted.  This is marked as a divergent
+transition in the interfaces;  for example, ShinyStan and RStan have
+special plotting facilities to highlight where divergent transitions
+arise.
+
+The primary cause of divergent transitions in Euclidean HMC (other
+than bugs in the code) is numerical instability in the leapfrog
+integrator used to simulate the Hamiltonian evaluation.  The
+fundamental problem is that a fixed step size is being multipled by
+the gradient at a particular point, to determine the next simulated
+point.  If the stepsize is too large, this can overshoot into
+ill-defined portions of the posterior.  
+
+\subsection{Diagnosing and Eliminating Divergences}
+
+In some cases, simply lowering the initial step size and increasing
+the target acceptance rate will keep the step size small enough that
+sampling can proceed.  
+
+The exact cause of each divergent transition is printed as a warning
+message in the output console.  This can be useful in cases where
+managing the step size is insufficient.  In such cases, a
+reparameterization is often required so that the posterior curvature
+is more manageable; see the funnel example in
+\refsection{reparameterization} for an example.
+
+
 \chapter{Optimization  Algorithms}%
 \label{optimization-algorithms.chapter}
 

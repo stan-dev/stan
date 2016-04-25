@@ -22,10 +22,13 @@ namespace stan {
 
       ~adapt_softabs_static_hmc() { }
 
-      sample transition(sample& init_sample,
-                        interface_callbacks::writer::base_writer& writer) {
+      sample transition(
+        sample& init_sample,
+        interface_callbacks::writer::base_writer& info_writer,
+        interface_callbacks::writer::base_writer& error_writer) {
         sample s = softabs_static_hmc<Model, BaseRNG>::transition(init_sample,
-                                                                 writer);
+                                                                  info_writer,
+                                                                  error_writer);
 
         if (this->adapt_flag_) {
           this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,

@@ -436,7 +436,7 @@ namespace stan {
 
         stan::services::sample::init_adapt(sampler_ptr, 0.8, 0.05, 0.75, 10,
                                            cont_params,
-                                           info_writer);
+                                           info_writer, err_writer);
         sampler_ptr->set_window_params(num_warmup, 75, 50, 25, info_writer);
           
         // Headers
@@ -456,7 +456,8 @@ namespace stan {
                                              s, model, base_rng,
                                              prefix, suffix, std::cout,
                                              startTransitionCallback,
-                                             info_writer);
+                                             info_writer,
+                                             err_writer);
 
         clock_t end = clock();
         warmDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;
@@ -476,7 +477,8 @@ namespace stan {
            s, model, base_rng,
            prefix, suffix, std::cout,
            startTransitionCallback,
-           info_writer);
+           info_writer,
+           err_writer);
           
         end = clock();
         sampleDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;

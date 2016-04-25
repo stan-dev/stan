@@ -62,28 +62,30 @@ TEST(McmcDiagEMetric, gradients) {
   funnel_model_namespace::funnel_model model(data_var_context, &model_output);
 
   stan::interface_callbacks::writer::stream_writer writer(metric_output);
+  std::stringstream error_stream;
+  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
+
   stan::mcmc::diag_e_metric<funnel_model_namespace::funnel_model, rng_t> metric(model);
 
   double epsilon = 1e-6;
 
-  metric.init(z, writer);
-
-  Eigen::VectorXd g1 = metric.dtau_dq(z, writer);
+  metric.init(z, writer, error_writer);
+  Eigen::VectorXd g1 = metric.dtau_dq(z, writer, error_writer);
 
   for (int i = 0; i < z.q.size(); ++i) {
 
     double delta = 0;
 
     z.q(i) += epsilon;
-    metric.update_potential(z, writer);
+    metric.update_potential(z, writer, error_writer);
     delta += metric.tau(z);
 
     z.q(i) -= 2 * epsilon;
-    metric.update_potential(z, writer);
+    metric.update_potential(z, writer, error_writer);
     delta -= metric.tau(z);
 
     z.q(i) += epsilon;
-    metric.update_potential(z, writer);
+    metric.update_potential(z, writer, error_writer);
 
     delta /= 2 * epsilon;
 
@@ -111,22 +113,22 @@ TEST(McmcDiagEMetric, gradients) {
 
   }
 
-  Eigen::VectorXd g3 = metric.dphi_dq(z, writer);
+  Eigen::VectorXd g3 = metric.dphi_dq(z, writer, error_writer);
 
   for (int i = 0; i < z.q.size(); ++i) {
 
     double delta = 0;
 
     z.q(i) += epsilon;
-    metric.update_potential(z, writer);
+    metric.update_potential(z, writer, error_writer);
     delta += metric.phi(z);
 
     z.q(i) -= 2 * epsilon;
-    metric.update_potential(z, writer);
+    metric.update_potential(z, writer, error_writer);
     delta -= metric.phi(z);
 
     z.q(i) += epsilon;
-    metric.update_potential(z, writer);
+    metric.update_potential(z, writer, error_writer);
 
     delta /= 2 * epsilon;
 
@@ -135,6 +137,7 @@ TEST(McmcDiagEMetric, gradients) {
   }
   EXPECT_EQ("", model_output.str());
   EXPECT_EQ("", metric_output.str());
+  EXPECT_EQ("", error_stream.str());
 }
 
 TEST(McmcDiagEMetric, streams) {

@@ -21,8 +21,10 @@ TEST(McmcStaticUniform, unit_e_transition) {
   z_init.q(0) = 1;
   z_init.p(0) = -1;
 
-  std::stringstream output;
-  stan::interface_callbacks::writer::stream_writer writer(output);
+  std::stringstream output_stream;
+  stan::interface_callbacks::writer::stream_writer writer(output_stream);
+  std::stringstream error_stream;
+  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
 
   std::fstream empty_stream("", std::fstream::in);
   stan::io::dump data_var_context(empty_stream);
@@ -32,19 +34,20 @@ TEST(McmcStaticUniform, unit_e_transition) {
     sampler(model, base_rng);
 
   sampler.z() = z_init;
-  sampler.init_hamiltonian(writer);
+  sampler.init_hamiltonian(writer, error_writer);
   sampler.set_nominal_stepsize(0.1);
   sampler.set_stepsize_jitter(0);
   sampler.sample_stepsize();
 
   stan::mcmc::sample init_sample(z_init.q, 0, 0);
 
-  stan::mcmc::sample s = sampler.transition(init_sample, writer);
+  stan::mcmc::sample s = sampler.transition(init_sample, writer, error_writer);
 
   EXPECT_FLOAT_EQ(0.27224374, s.cont_params()(0));
   EXPECT_FLOAT_EQ(-0.037058324, s.log_prob());
   EXPECT_FLOAT_EQ(0.9998666, s.accept_stat());
-  EXPECT_EQ("", output.str());
+  EXPECT_EQ("", output_stream.str());
+  EXPECT_EQ("", error_stream.str());
 }
 
 TEST(McmcStaticUniform, diag_e_transition) {
@@ -54,8 +57,10 @@ TEST(McmcStaticUniform, diag_e_transition) {
   z_init.q(0) = 1;
   z_init.p(0) = -1;
 
-  std::stringstream output;
-  stan::interface_callbacks::writer::stream_writer writer(output);
+  std::stringstream output_stream;
+  stan::interface_callbacks::writer::stream_writer writer(output_stream);
+  std::stringstream error_stream;
+  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
 
   std::fstream empty_stream("", std::fstream::in);
   stan::io::dump data_var_context(empty_stream);
@@ -65,19 +70,20 @@ TEST(McmcStaticUniform, diag_e_transition) {
     sampler(model, base_rng);
 
   sampler.z() = z_init;
-  sampler.init_hamiltonian(writer);
+  sampler.init_hamiltonian(writer, error_writer);
   sampler.set_nominal_stepsize(0.1);
   sampler.set_stepsize_jitter(0);
   sampler.sample_stepsize();
 
   stan::mcmc::sample init_sample(z_init.q, 0, 0);
 
-  stan::mcmc::sample s = sampler.transition(init_sample, writer);
+  stan::mcmc::sample s = sampler.transition(init_sample, writer, error_writer);
 
   EXPECT_FLOAT_EQ(0.27224374, s.cont_params()(0));
   EXPECT_FLOAT_EQ(-0.037058324, s.log_prob());
   EXPECT_FLOAT_EQ(0.9998666, s.accept_stat());
-  EXPECT_EQ("", output.str());
+  EXPECT_EQ("", output_stream.str());
+  EXPECT_EQ("", error_stream.str());
 }
 
 TEST(McmcStaticUniform, dense_e_transition) {
@@ -87,8 +93,10 @@ TEST(McmcStaticUniform, dense_e_transition) {
   z_init.q(0) = 1;
   z_init.p(0) = -1;
 
-  std::stringstream output;
-  stan::interface_callbacks::writer::stream_writer writer(output);
+  std::stringstream output_stream;
+  stan::interface_callbacks::writer::stream_writer writer(output_stream);
+  std::stringstream error_stream;
+  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
 
   std::fstream empty_stream("", std::fstream::in);
   stan::io::dump data_var_context(empty_stream);
@@ -98,19 +106,20 @@ TEST(McmcStaticUniform, dense_e_transition) {
     sampler(model, base_rng);
 
   sampler.z() = z_init;
-  sampler.init_hamiltonian(writer);
+  sampler.init_hamiltonian(writer, error_writer);
   sampler.set_nominal_stepsize(0.1);
   sampler.set_stepsize_jitter(0);
   sampler.sample_stepsize();
 
   stan::mcmc::sample init_sample(z_init.q, 0, 0);
 
-  stan::mcmc::sample s = sampler.transition(init_sample, writer);
+  stan::mcmc::sample s = sampler.transition(init_sample, writer, error_writer);
 
   EXPECT_FLOAT_EQ(0.27224374, s.cont_params()(0));
   EXPECT_FLOAT_EQ(-0.037058324, s.log_prob());
   EXPECT_FLOAT_EQ(0.9998666, s.accept_stat());
-  EXPECT_EQ("", output.str());
+  EXPECT_EQ("", output_stream.str());
+  EXPECT_EQ("", error_stream.str());
 }
 
 TEST(McmcStaticUniform, softabs_transition) {
@@ -122,6 +131,8 @@ TEST(McmcStaticUniform, softabs_transition) {
 
   std::stringstream output;
   stan::interface_callbacks::writer::stream_writer writer(output);
+  std::stringstream error_stream;
+  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
 
   std::fstream empty_stream("", std::fstream::in);
   stan::io::dump data_var_context(empty_stream);
@@ -131,14 +142,14 @@ TEST(McmcStaticUniform, softabs_transition) {
     sampler(model, base_rng);
 
   sampler.z() = z_init;
-  sampler.init_hamiltonian(writer);
+  sampler.init_hamiltonian(writer, error_writer);
   sampler.set_nominal_stepsize(0.1);
   sampler.set_stepsize_jitter(0);
   sampler.sample_stepsize();
 
   stan::mcmc::sample init_sample(z_init.q, 0, 0);
 
-  stan::mcmc::sample s = sampler.transition(init_sample, writer);
+  stan::mcmc::sample s = sampler.transition(init_sample, writer, error_writer);
 
   EXPECT_FLOAT_EQ(0.37006485, s.cont_params()(0));
   EXPECT_FLOAT_EQ(-0.068473995, s.log_prob());
@@ -153,8 +164,10 @@ TEST(McmcStaticUniform, adapt_unit_e_transition) {
   z_init.q(0) = 1;
   z_init.p(0) = -1;
 
-  std::stringstream output;
-  stan::interface_callbacks::writer::stream_writer writer(output);
+  std::stringstream output_stream;
+  stan::interface_callbacks::writer::stream_writer writer(output_stream);
+  std::stringstream error_stream;
+  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
 
   std::fstream empty_stream("", std::fstream::in);
   stan::io::dump data_var_context(empty_stream);
@@ -164,19 +177,20 @@ TEST(McmcStaticUniform, adapt_unit_e_transition) {
     sampler(model, base_rng);
 
   sampler.z() = z_init;
-  sampler.init_hamiltonian(writer);
+  sampler.init_hamiltonian(writer, error_writer);
   sampler.set_nominal_stepsize(0.1);
   sampler.set_stepsize_jitter(0);
   sampler.sample_stepsize();
 
   stan::mcmc::sample init_sample(z_init.q, 0, 0);
 
-  stan::mcmc::sample s = sampler.transition(init_sample, writer);
+  stan::mcmc::sample s = sampler.transition(init_sample, writer, error_writer);
 
   EXPECT_FLOAT_EQ(0.27224374, s.cont_params()(0));
   EXPECT_FLOAT_EQ(-0.037058324, s.log_prob());
   EXPECT_FLOAT_EQ(0.9998666, s.accept_stat());
-  EXPECT_EQ("", output.str());
+  EXPECT_EQ("", output_stream.str());
+  EXPECT_EQ("", error_stream.str());
 }
 
 TEST(McmcStaticUniform, adapt_diag_e_transition) {
@@ -186,8 +200,10 @@ TEST(McmcStaticUniform, adapt_diag_e_transition) {
   z_init.q(0) = 1;
   z_init.p(0) = -1;
 
-  std::stringstream output;
-  stan::interface_callbacks::writer::stream_writer writer(output);
+  std::stringstream output_stream;
+  stan::interface_callbacks::writer::stream_writer writer(output_stream);
+  std::stringstream error_stream;
+  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
 
   std::fstream empty_stream("", std::fstream::in);
   stan::io::dump data_var_context(empty_stream);
@@ -197,19 +213,20 @@ TEST(McmcStaticUniform, adapt_diag_e_transition) {
     sampler(model, base_rng);
 
   sampler.z() = z_init;
-  sampler.init_hamiltonian(writer);
+  sampler.init_hamiltonian(writer, error_writer);
   sampler.set_nominal_stepsize(0.1);
   sampler.set_stepsize_jitter(0);
   sampler.sample_stepsize();
 
   stan::mcmc::sample init_sample(z_init.q, 0, 0);
 
-  stan::mcmc::sample s = sampler.transition(init_sample, writer);
+  stan::mcmc::sample s = sampler.transition(init_sample, writer, error_writer);
 
   EXPECT_FLOAT_EQ(0.27224374, s.cont_params()(0));
   EXPECT_FLOAT_EQ(-0.037058324, s.log_prob());
   EXPECT_FLOAT_EQ(0.9998666, s.accept_stat());
-  EXPECT_EQ("", output.str());
+  EXPECT_EQ("", output_stream.str());
+  EXPECT_EQ("", error_stream.str());
 }
 
 TEST(McmcStaticUniform, adapt_dense_e_transition) {
@@ -219,8 +236,10 @@ TEST(McmcStaticUniform, adapt_dense_e_transition) {
   z_init.q(0) = 1;
   z_init.p(0) = -1;
 
-  std::stringstream output;
-  stan::interface_callbacks::writer::stream_writer writer(output);
+  std::stringstream output_stream;
+  stan::interface_callbacks::writer::stream_writer writer(output_stream);
+  std::stringstream error_stream;
+  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
 
   std::fstream empty_stream("", std::fstream::in);
   stan::io::dump data_var_context(empty_stream);
@@ -230,19 +249,20 @@ TEST(McmcStaticUniform, adapt_dense_e_transition) {
     sampler(model, base_rng);
 
   sampler.z() = z_init;
-  sampler.init_hamiltonian(writer);
+  sampler.init_hamiltonian(writer, error_writer);
   sampler.set_nominal_stepsize(0.1);
   sampler.set_stepsize_jitter(0);
   sampler.sample_stepsize();
 
   stan::mcmc::sample init_sample(z_init.q, 0, 0);
 
-  stan::mcmc::sample s = sampler.transition(init_sample, writer);
+  stan::mcmc::sample s = sampler.transition(init_sample, writer, error_writer);
 
   EXPECT_FLOAT_EQ(0.27224374, s.cont_params()(0));
   EXPECT_FLOAT_EQ(-0.037058324, s.log_prob());
   EXPECT_FLOAT_EQ(0.9998666, s.accept_stat());
-  EXPECT_EQ("", output.str());
+  EXPECT_EQ("", output_stream.str());
+  EXPECT_EQ("", error_stream.str());
 }
 
 TEST(McmcStaticUniform, adapt_softabs_e_transition) {
@@ -254,6 +274,8 @@ TEST(McmcStaticUniform, adapt_softabs_e_transition) {
 
   std::stringstream output;
   stan::interface_callbacks::writer::stream_writer writer(output);
+  std::stringstream error_stream;
+  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
 
   std::fstream empty_stream("", std::fstream::in);
   stan::io::dump data_var_context(empty_stream);
@@ -263,14 +285,14 @@ TEST(McmcStaticUniform, adapt_softabs_e_transition) {
     sampler(model, base_rng);
 
   sampler.z() = z_init;
-  sampler.init_hamiltonian(writer);
+  sampler.init_hamiltonian(writer, error_writer);
   sampler.set_nominal_stepsize(0.1);
   sampler.set_stepsize_jitter(0);
   sampler.sample_stepsize();
 
   stan::mcmc::sample init_sample(z_init.q, 0, 0);
 
-  stan::mcmc::sample s = sampler.transition(init_sample, writer);
+  stan::mcmc::sample s = sampler.transition(init_sample, writer, error_writer);
 
   EXPECT_FLOAT_EQ(0.37006485, s.cont_params()(0));
   EXPECT_FLOAT_EQ(-0.068473995, s.log_prob());

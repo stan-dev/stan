@@ -24,9 +24,9 @@ test/%.o : src/test/%_test.cpp
 ##
 # Rule for building a test executable
 ##
-test/%$(EXE) : test/%.o $(LIBGTEST) $(LIBCVODE)
+test/%$(EXE) : test/%.o $(LIBGTEST) $(LIBCVODES)
 	@mkdir -p $(dir $@)
-	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LIBCVODE)
+	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LIBCVODES)
 
 
 ##

@@ -52,12 +52,15 @@ namespace stan {
       double phi(ps_point& z) { return this->V(z); }
 
       double dG_dt(ps_point& z,
-                   interface_callbacks::writer::base_writer& writer) {
+                   interface_callbacks::writer::base_writer& info_writer,
+                   interface_callbacks::writer::base_writer& error_writer) {
         return 2;
       }
 
       const Eigen::VectorXd dtau_dq(
-        ps_point& z, interface_callbacks::writer::base_writer& writer) {
+        ps_point& z,
+        interface_callbacks::writer::base_writer& info_writer,
+        interface_callbacks::writer::base_writer& error_writer) {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 
@@ -67,7 +70,9 @@ namespace stan {
       }
 
       const Eigen::VectorXd dphi_dq(
-        ps_point& z, interface_callbacks::writer::base_writer& writer) {
+        ps_point& z,
+        interface_callbacks::writer::base_writer& info_writer,
+        interface_callbacks::writer::base_writer& error_writer) {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 
@@ -85,7 +90,8 @@ namespace stan {
       void evolve(typename Hamiltonian::PointType& z,
                   Hamiltonian& hamiltonian,
                   const double epsilon,
-                  stan::interface_callbacks::writer::base_writer& writer) {
+                  interface_callbacks::writer::base_writer& info_writer,
+                  interface_callbacks::writer::base_writer& error_writer) {
         z.q += epsilon * z.p;
       };
 

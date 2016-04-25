@@ -47,15 +47,17 @@ namespace stan {
       double get_max_deltaH() { return this->max_deltaH_; }
       double get_x_delta() { return this->x_delta_; }
 
-      sample transition(sample& init_sample,
-                        interface_callbacks::writer::base_writer& writer) {
+      sample
+      transition(sample& init_sample,
+                 interface_callbacks::writer::base_writer& info_writer,
+                 interface_callbacks::writer::base_writer& error_writer) {
         // Initialize the algorithm
         this->sample_stepsize();
 
         this->seed(init_sample.cont_params());
 
         this->hamiltonian_.sample_p(this->z_, this->rand_int_);
-        this->hamiltonian_.init(this->z_, writer);
+        this->hamiltonian_.init(this->z_, info_writer, error_writer);
 
         ps_point z_plus(this->z_);
         ps_point z_minus(z_plus);
@@ -63,7 +65,8 @@ namespace stan {
         ps_point z_sample(z_plus);
         ps_point z_propose(z_plus);
 
-        double sum_numer = this->hamiltonian_.dG_dt(this->z_, writer);
+        double sum_numer = this->hamiltonian_.dG_dt(this->z_,
+                                                    info_writer, error_writer);
         double sum_weight = 1;
 
         double H0 = this->hamiltonian_.H(this->z_);
@@ -85,14 +88,16 @@ namespace stan {
             valid_subtree
               = build_tree(this->depth_, z_propose,
                            sum_numer_subtree, sum_weight_subtree,
-                           H0, 1, n_leapfrog, sum_metro_prob, writer);
+                           H0, 1, n_leapfrog, sum_metro_prob,
+                           info_writer, error_writer);
             z_plus.ps_point::operator=(this->z_);
           } else {
             this->z_.ps_point::operator=(z_minus);
             valid_subtree
               = build_tree(this->depth_, z_propose,
                            sum_numer_subtree, sum_weight_subtree,
-                           H0, -1, n_leapfrog, sum_metro_prob, writer);
+                           H0, -1, n_leapfrog, sum_metro_prob,
+                           info_writer, error_writer);
             z_minus.ps_point::operator=(this->z_);
           }
 
@@ -145,12 +150,13 @@ namespace stan {
                      double& sum_numer, double& sum_weight,
                      double H0, double sign, int& n_leapfrog,
                      double& sum_metro_prob,
-                     interface_callbacks::writer::base_writer& writer) {
+                     interface_callbacks::writer::base_writer& info_writer,
+                     interface_callbacks::writer::base_writer& error_writer) {
         // Base case
         if (depth == 0) {
             this->integrator_.evolve(this->z_, this->hamiltonian_,
                                      sign * this->epsilon_,
-                                     writer);
+                                     info_writer, error_writer);
             ++n_leapfrog;
 
             double h = this->hamiltonian_.H(this->z_);
@@ -160,7 +166,9 @@ namespace stan {
             if ((h - H0) > this->max_deltaH_) this->divergent_ = true;
 
             double pi = exp(H0 - h);
-            sum_numer += pi * this->hamiltonian_.dG_dt(this->z_, writer);
+            sum_numer += pi * this->hamiltonian_.dG_dt(this->z_,
+                                                       info_writer,
+                                                       error_writer);
             sum_weight += pi;
             sum_metro_prob += pi > 1 ? 1 : pi;
 
@@ -177,7 +185,8 @@ namespace stan {
         bool valid_left
           = build_tree(depth - 1, z_propose,
                        sum_numer_left, sum_weight_left,
-                       H0, sign, n_leapfrog, sum_metro_prob, writer);
+                       H0, sign, n_leapfrog, sum_metro_prob,
+                       info_writer, error_writer);
 
         sum_numer += sum_numer_left;
         sum_weight += sum_weight_left;
@@ -191,7 +200,8 @@ namespace stan {
         bool valid_right
           = build_tree(depth - 1, z_propose_right,
                        sum_numer_right, sum_weight_right,
-                       H0, sign, n_leapfrog, sum_metro_prob, writer);
+                       H0, sign, n_leapfrog, sum_metro_prob,
+                       info_writer, error_writer);
 
         sum_numer += sum_numer_right;
         sum_weight += sum_weight_right;

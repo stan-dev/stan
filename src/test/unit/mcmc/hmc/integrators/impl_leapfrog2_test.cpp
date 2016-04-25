@@ -23,6 +23,9 @@ TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_energy_conservation) {
   std::stringstream model_output;
   std::stringstream metric_output;
   stan::interface_callbacks::writer::stream_writer writer(metric_output);
+  std::stringstream error_stream;
+  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
+
   gauss_model_namespace::gauss_model model(data_var_context, &model_output);
 
   stan::mcmc::impl_leapfrog<
@@ -35,7 +38,7 @@ TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_energy_conservation) {
   z.q(0) = 1;
   z.p(0) = 1;
 
-  metric.init(z, writer);
+  metric.init(z, writer, error_writer);
   double H0 = metric.H(z);
   double aveDeltaH = 0;
 
@@ -44,7 +47,7 @@ TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_energy_conservation) {
   size_t L = tau / epsilon;
 
   for (size_t n = 0; n < L; ++n) {
-    integrator.evolve(z, metric, epsilon, writer);
+    integrator.evolve(z, metric, epsilon, writer, error_writer);
 
     double deltaH = metric.H(z) - H0;
     aveDeltaH += (deltaH - aveDeltaH) / double(n + 1);
@@ -68,6 +71,8 @@ TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_symplecticness) {
   std::stringstream model_output;
   std::stringstream metric_output;
   stan::interface_callbacks::writer::stream_writer writer(metric_output);
+  std::stringstream error_stream;
+  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
 
   gauss_model_namespace::gauss_model model(data_var_context, &model_output);
 
@@ -100,11 +105,11 @@ TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_symplecticness) {
   size_t L = pi / epsilon;
 
   for (int i = 0; i < n_points; ++i)
-    metric.init(z.at(i), writer);
+    metric.init(z.at(i), writer, error_writer);
 
   for (size_t n = 0; n < L; ++n)
     for (int i = 0; i < n_points; ++i)
-      integrator.evolve(z.at(i), metric, epsilon, writer);
+      integrator.evolve(z.at(i), metric, epsilon, writer, error_writer);
 
   // Compute area of evolved shape using divergence theorem in 2D
   double area = 0;
@@ -155,6 +160,9 @@ TEST(McmcHmcIntegratorsImplLeapfrog, softabs_energy_conservation) {
   std::stringstream model_output;
   std::stringstream metric_output;
   stan::interface_callbacks::writer::stream_writer writer(metric_output);
+  std::stringstream error_stream;
+  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
+
   gauss_model_namespace::gauss_model model(data_var_context, &model_output);
 
   stan::mcmc::impl_leapfrog<
@@ -167,7 +175,7 @@ TEST(McmcHmcIntegratorsImplLeapfrog, softabs_energy_conservation) {
   z.q(0) = 1;
   z.p(0) = 1;
 
-  metric.init(z, writer);
+  metric.init(z, writer, error_writer);
   double H0 = metric.H(z);
   double aveDeltaH = 0;
 
@@ -176,7 +184,7 @@ TEST(McmcHmcIntegratorsImplLeapfrog, softabs_energy_conservation) {
   size_t L = tau / epsilon;
 
   for (size_t n = 0; n < L; ++n) {
-    integrator.evolve(z, metric, epsilon, writer);
+    integrator.evolve(z, metric, epsilon, writer, error_writer);
 
     double deltaH = metric.H(z) - H0;
     aveDeltaH += (deltaH - aveDeltaH) / double(n + 1);
@@ -200,6 +208,8 @@ TEST(McmcHmcIntegratorsImplLeapfrog, softabs_symplecticness) {
   std::stringstream model_output;
   std::stringstream metric_output;
   stan::interface_callbacks::writer::stream_writer writer(metric_output);
+  std::stringstream error_stream;
+  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
 
   gauss_model_namespace::gauss_model model(data_var_context, &model_output);
 
@@ -232,11 +242,11 @@ TEST(McmcHmcIntegratorsImplLeapfrog, softabs_symplecticness) {
   size_t L = pi / epsilon;
 
   for (int i = 0; i < n_points; ++i)
-    metric.init(z.at(i), writer);
+    metric.init(z.at(i), writer, error_writer);
 
   for (size_t n = 0; n < L; ++n)
     for (int i = 0; i < n_points; ++i)
-      integrator.evolve(z.at(i), metric, epsilon, writer);
+      integrator.evolve(z.at(i), metric, epsilon, writer, error_writer);
 
   // Compute area of evolved shape using divergence theorem in 2D
   double area = 0;

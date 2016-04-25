@@ -52,12 +52,17 @@ namespace stan {
       }
 
       double dG_dt(softabs_point& z,
-                   interface_callbacks::writer::base_writer& writer) {
-        return 2 * T(z) - z.q.dot(dtau_dq(z, writer) + dphi_dq(z, writer));
+                   interface_callbacks::writer::base_writer& info_writer,
+                   interface_callbacks::writer::base_writer& error_writer) {
+        return 2 * T(z)
+               - z.q.dot(dtau_dq(z, info_writer, error_writer)
+               + dphi_dq(z, info_writer, error_writer));
       }
 
       const Eigen::VectorXd dtau_dq(
-        softabs_point& z, interface_callbacks::writer::base_writer& writer) {
+        softabs_point& z,
+        interface_callbacks::writer::base_writer& info_writer,
+        interface_callbacks::writer::base_writer& error_writer) {
         Eigen::VectorXd a =    z.softabs_lambda_inv.cwiseProduct(
                                z.eigen_deco.eigenvectors().transpose() * z.p);
         Eigen::MatrixXd A =   a.asDiagonal()
@@ -78,8 +83,10 @@ namespace stan {
                    z.eigen_deco.eigenvectors().transpose() * z.p);
       }
 
-      const Eigen::VectorXd dphi_dq(softabs_point& z,
-        interface_callbacks::writer::base_writer& writer) {
+      const Eigen::VectorXd dphi_dq(
+        softabs_point& z,
+        interface_callbacks::writer::base_writer& info_writer,
+        interface_callbacks::writer::base_writer& error_writer) {
           Eigen::VectorXd a
             = z.softabs_lambda_inv.cwiseProduct(z.pseudo_j.diagonal());
           Eigen::MatrixXd A =  a.asDiagonal()
@@ -104,14 +111,18 @@ namespace stan {
         z.p = z.eigen_deco.eigenvectors() * a;
       }
 
-      void init(softabs_point& z,
-                interface_callbacks::writer::base_writer& writer) {
-        update_metric(z, writer);
-        update_metric_gradient(z, writer);
+      void init(
+        softabs_point& z,
+        interface_callbacks::writer::base_writer& info_writer,
+        interface_callbacks::writer::base_writer& error_writer) {
+        update_metric(z, info_writer, error_writer);
+        update_metric_gradient(z, info_writer, error_writer);
       }
 
-      void update_metric(softabs_point& z,
-                         interface_callbacks::writer::base_writer& writer) {
+      void update_metric(
+        softabs_point& z,
+        interface_callbacks::writer::base_writer& info_writer,
+        interface_callbacks::writer::base_writer& error_writer) {
         // Compute the Hessian
         stan::math::hessian<double>(
           softabs_fun<Model>(this->model_, 0), z.q, z.V, z.g, z.hessian);
@@ -153,7 +164,9 @@ namespace stan {
       }
 
       void update_metric_gradient(
-        softabs_point& z, interface_callbacks::writer::base_writer& writer) {
+        softabs_point& z,
+        interface_callbacks::writer::base_writer& info_writer,
+        interface_callbacks::writer::base_writer& error_writer) {
         // Compute the pseudo-Jacobian of the SoftAbs transform
         for (idx_t i = 0; i < z.q.size(); ++i) {
           for (idx_t j = 0; j <= i; ++j) {
@@ -186,8 +199,10 @@ namespace stan {
       }
 
       void update_gradients(
-        softabs_point& z, interface_callbacks::writer::base_writer& writer) {
-        update_metric_gradient(z, writer);
+        softabs_point& z,
+        interface_callbacks::writer::base_writer& info_writer,
+        interface_callbacks::writer::base_writer& error_writer) {
+        update_metric_gradient(z, info_writer, error_writer);
       }
     };
   }  // mcmc

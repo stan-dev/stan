@@ -28,7 +28,11 @@ TEST(McmcSoftAbs, sample_p) {
 
   std::stringstream model_output, metric_output;
   stan::interface_callbacks::writer::stream_writer writer(metric_output);
-  metric.update_metric(z, writer);
+
+  std::stringstream error_stream;
+  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
+
+  metric.update_metric(z, writer, error_writer);
 
   for (int i = 0; i < n_samples; ++i) {
     metric.sample_p(z, base_rng);
@@ -67,25 +71,28 @@ TEST(McmcSoftAbs, gradients) {
   std::stringstream model_output, metric_output;
   stan::interface_callbacks::writer::stream_writer writer(metric_output);
 
+  std::stringstream error_stream;
+  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
+
   funnel_model_namespace::funnel_model model(data_var_context, &model_output);
 
   stan::mcmc::softabs_metric<funnel_model_namespace::funnel_model, rng_t> metric(model);
 
   double epsilon = 1e-6;
 
-  metric.init(z, writer);
-  Eigen::VectorXd g1 = metric.dtau_dq(z, writer);
+  metric.init(z, writer, error_writer);
+  Eigen::VectorXd g1 = metric.dtau_dq(z, writer, error_writer);
 
   for (int i = 0; i < z.q.size(); ++i) {
 
     double delta = 0;
 
     z.q(i) += epsilon;
-    metric.init(z, writer);
+    metric.init(z, writer, error_writer);
     delta += metric.tau(z);
 
     z.q(i) -= 2 * epsilon;
-    metric.init(z, writer);
+    metric.init(z, writer, error_writer);
     delta -= metric.tau(z);
 
     z.q(i) += epsilon;
@@ -95,7 +102,7 @@ TEST(McmcSoftAbs, gradients) {
     EXPECT_NEAR(delta, g1(i), epsilon);
   }
 
-  metric.init(z, writer);
+  metric.init(z, writer, error_writer);
   Eigen::VectorXd g2 = metric.dtau_dp(z);
 
   for (int i = 0; i < z.q.size(); ++i) {
@@ -115,17 +122,17 @@ TEST(McmcSoftAbs, gradients) {
     EXPECT_NEAR(delta, g2(i), epsilon);
   }
 
-  Eigen::VectorXd g3 = metric.dphi_dq(z, writer);
+  Eigen::VectorXd g3 = metric.dphi_dq(z, writer, error_writer);
 
   for (int i = 0; i < z.q.size(); ++i) {
     double delta = 0;
 
     z.q(i) += epsilon;
-    metric.init(z, writer);
+    metric.init(z, writer, error_writer);
     delta += metric.phi(z);
 
     z.q(i) -= 2 * epsilon;
-    metric.init(z, writer);
+    metric.init(z, writer, error_writer);
     delta -= metric.phi(z);
 
     z.q(i) += epsilon;
@@ -137,6 +144,7 @@ TEST(McmcSoftAbs, gradients) {
 
   EXPECT_EQ("", model_output.str());
   EXPECT_EQ("", metric_output.str());
+  EXPECT_EQ("", error_stream.str());
 }
 
 TEST(McmcSoftAbs, streams) {

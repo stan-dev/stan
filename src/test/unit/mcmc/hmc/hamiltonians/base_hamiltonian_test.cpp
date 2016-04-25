@@ -13,16 +13,20 @@ TEST(BaseHamiltonian, update_potential_gradient) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
 
-  std::stringstream model_output, metric_output;
-
+  std::stringstream model_output;
   funnel_model_namespace::funnel_model model(data_var_context, &model_output);
 
   stan::mcmc::mock_hamiltonian<funnel_model_namespace::funnel_model, rng_t> metric(model);
   stan::mcmc::ps_point z(11);
   z.q.setOnes();
+
+  std::stringstream metric_output;
   stan::interface_callbacks::writer::stream_writer writer(metric_output);
 
-  metric.update_potential_gradient(z, writer);
+  std::stringstream error_stream;
+  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
+
+  metric.update_potential_gradient(z, writer, error_writer);
 
   EXPECT_FLOAT_EQ(10.73223197, z.V);
 
@@ -33,6 +37,7 @@ TEST(BaseHamiltonian, update_potential_gradient) {
 
   EXPECT_EQ("", model_output.str());
   EXPECT_EQ("", metric_output.str());
+  EXPECT_EQ("", error_stream.str());
 }
 
 TEST(BaseHamiltonian, streams) {
