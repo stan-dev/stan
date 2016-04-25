@@ -70,6 +70,10 @@ namespace stan {
         return 0;
       }
 
+      double score(Point& z) {
+        return 0;
+      }
+
     protected:
       const Model& model_;
 

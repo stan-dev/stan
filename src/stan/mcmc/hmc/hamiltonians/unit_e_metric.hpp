@@ -69,6 +69,13 @@ namespace stan {
 
         return stein;
       }
+
+      double score(unit_e_point& z) {
+        double sum = 0;
+        for (int n = 0; n < z.q.size(); ++n)
+          sum += z.g(n);
+        return sum / z.q.size();
+      }
     };
 
   }  // mcmc

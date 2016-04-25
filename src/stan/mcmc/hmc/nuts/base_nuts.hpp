@@ -24,7 +24,7 @@ namespace stan {
         : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
           depth_(0), max_depth_(5), max_deltaH_(1000),
           n_leapfrog_(0), divergent_(0), energy_(0),
-          stein1_(0), stein2_(0), stein3_(0) {
+          stein1_(0), stein2_(0), stein3_(0), score_(0) {
       }
 
       ~base_nuts() {}
@@ -124,6 +124,7 @@ namespace stan {
         this->stein1_ = this->hamiltonian_.stein(this->z_, 1, 0.5);
         this->stein2_ = this->hamiltonian_.stein(this->z_, 1, 0.25);
         this->stein3_ = this->hamiltonian_.stein(this->z_, 1, 0.1);
+        this->score_ = this->hamiltonian_.score(this->z_);
         return sample(this->z_.q, -this->z_.V, accept_prob);
       }
 
@@ -136,6 +137,7 @@ namespace stan {
         names.push_back("stein1__");
         names.push_back("stein2__");
         names.push_back("stein3__");
+        names.push_back("score__");
       }
 
       void get_sampler_params(std::vector<double>& values) {
@@ -147,6 +149,7 @@ namespace stan {
         values.push_back(this->stein1_);
         values.push_back(this->stein2_);
         values.push_back(this->stein3_);
+        values.push_back(this->score_);
       }
 
       bool compute_criterion(Eigen::VectorXd& p_sharp_minus,
@@ -232,6 +235,7 @@ namespace stan {
       double stein1_;
       double stein2_;
       double stein3_;
+      double score_;
     };
 
   }  // mcmc
