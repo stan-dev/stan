@@ -1,14 +1,17 @@
 #ifndef STAN_MCMC_HMC_HAMILTONIANS_SOFTABS_METRIC_HPP
 #define STAN_MCMC_HMC_HAMILTONIANS_SOFTABS_METRIC_HPP
 
-#include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/math/prim/mat/meta/index_type.hpp>
 #include <stan/math/mix/mat.hpp>
+
+// #include <Eigen/Cholesky>
+// #include <stan/math/prim/mat/fun/Eigen.hpp>
+// #include <stan/math/prim/mat/meta/index_type.hpp>
+
 #include <stan/mcmc/hmc/hamiltonians/base_hamiltonian.hpp>
 #include <stan/mcmc/hmc/hamiltonians/softabs_point.hpp>
+
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/normal_distribution.hpp>
-#include <Eigen/Cholesky>
 
 namespace stan {
   namespace mcmc {

@@ -1,17 +1,18 @@
+#include <stan/io/dump.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
+#include <stan/mcmc/hmc/hamiltonians/softabs_metric.hpp>
 #include <stan/mcmc/hmc/integrators/impl_leapfrog.hpp>
+#include <stan/mcmc/hmc/hamiltonians/unit_e_metric.hpp>
+#include <stan/mcmc/hmc/hamiltonians/diag_e_metric.hpp>
+
+#include <test/test-models/good/mcmc/hmc/integrators/command.hpp>
+#include <test/unit/util.hpp>
+
+#include <boost/random/additive_combine.hpp> // L'Ecuyer RNG
+
 #include <gtest/gtest.h>
 
 #include <sstream>
-#include <stan/interface_callbacks/writer/stream_writer.hpp>
-#include <test/test-models/good/mcmc/hmc/integrators/command.hpp>
-
-#include <stan/io/dump.hpp>
-
-#include <stan/mcmc/hmc/hamiltonians/unit_e_metric.hpp>
-#include <stan/mcmc/hmc/hamiltonians/diag_e_metric.hpp>
-#include <stan/mcmc/hmc/hamiltonians/softabs_metric.hpp>
-#include <boost/random/additive_combine.hpp> // L'Ecuyer RNG
-#include <test/unit/util.hpp>
 
 // namespace
 //************************************************************

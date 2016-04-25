@@ -1,13 +1,17 @@
-#include <string>
-#include <boost/random/additive_combine.hpp>
 #include <stan/io/dump.hpp>
-#include <test/unit/mcmc/hmc/mock_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/softabs_metric.hpp>
 #include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <stan/interface_callbacks/writer/noop_writer.hpp>
+
+#include <test/unit/mcmc/hmc/mock_hmc.hpp>
 #include <test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp>
 #include <test/unit/util.hpp>
+
+#include <boost/random/additive_combine.hpp>
+
 #include <gtest/gtest.h>
+
+#include <string>
 
 typedef boost::ecuyer1988 rng_t;
 
