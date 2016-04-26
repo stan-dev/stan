@@ -121,6 +121,10 @@ namespace stan {
           sample_writer_(values);
         }
 
+        void sample_newline() {
+          sample_writer_();
+        }
+
         /**
          * Prints additional info to the streams
          *

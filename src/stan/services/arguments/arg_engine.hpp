@@ -5,6 +5,7 @@
 
 #include <stan/services/arguments/arg_static.hpp>
 #include <stan/services/arguments/arg_nuts.hpp>
+#include <stan/services/arguments/arg_rb_nuts.hpp>
 #include <stan/services/arguments/arg_xhmc.hpp>
 
 namespace stan {
@@ -18,6 +19,7 @@ namespace stan {
 
         _values.push_back(new arg_static());
         _values.push_back(new arg_nuts());
+        _values.push_back(new arg_rb_nuts());
         // _values.push_back(new arg_xhmc());
 
         _default_cursor = 1;
