@@ -2854,7 +2854,7 @@ implies that the resulting matrix is square with the same number of
 rows as \farg{A}}
 %
 \fitem{matrix}{qr\_R}{matrix \farg{A}}{
-  The upper trapazoidal matrix in the fat QR decomposition of \farg{A},
+  The upper trapezoidal matrix in the fat QR decomposition of \farg{A},
   which implies that the resulting matrix has the same dimensions as
   \farg{A}}
 %
@@ -2862,9 +2862,9 @@ rows as \farg{A}}
 %
 Multiplying a column of an orthogonal matrix by $-1$ still results in 
 an orthogonal matrix, and you can multiply the corresponding row of 
-the upper trapazoidal matrix by $-1$ without changing the product. Thus,
+the upper trapezoidal matrix by $-1$ without changing the product. Thus,
 Stan adopts the normalization that the diagonal elements of the upper
-trapazoidal matrix are strictly positive and the columns of the 
+trapezoidal matrix are strictly positive and the columns of the 
 orthogonal matrix are reflected if necessary. The input matrix $A$ need
 not be square but must have at least as many rows as it has columns.
 Also, this QR decomposition algorithm does not utilize pivoting and 
