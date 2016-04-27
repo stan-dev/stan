@@ -17,8 +17,6 @@ namespace stan {
       explicit unit_e_metric(const Model& model)
         : base_hamiltonian<Model, unit_e_point, BaseRNG>(model) {}
 
-      ~unit_e_metric() {}
-
       double T(unit_e_point& z) {
         return 0.5 * z.p.squaredNorm();
       }
@@ -37,18 +35,18 @@ namespace stan {
         return 2 * T(z) - z.q.dot(z.g);
       }
 
-      const Eigen::VectorXd dtau_dq(
+      Eigen::VectorXd dtau_dq(
         unit_e_point& z,
         interface_callbacks::writer::base_writer& info_writer,
         interface_callbacks::writer::base_writer& error_writer) {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 
-      const Eigen::VectorXd dtau_dp(unit_e_point& z) {
+      Eigen::VectorXd dtau_dp(unit_e_point& z) {
         return z.p;
       }
 
-      const Eigen::VectorXd dphi_dq(
+      Eigen::VectorXd dphi_dq(
         unit_e_point& z,
         interface_callbacks::writer::base_writer& info_writer,
         interface_callbacks::writer::base_writer& error_writer) {

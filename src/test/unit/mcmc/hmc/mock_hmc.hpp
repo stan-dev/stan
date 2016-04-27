@@ -57,7 +57,7 @@ namespace stan {
         return 2;
       }
 
-      const Eigen::VectorXd dtau_dq(
+      Eigen::VectorXd dtau_dq(
         ps_point& z,
         interface_callbacks::writer::base_writer& info_writer,
         interface_callbacks::writer::base_writer& error_writer) {
@@ -65,11 +65,11 @@ namespace stan {
       }
 
       // Ensures that NUTS non-termination criterion is always true
-      const Eigen::VectorXd dtau_dp(ps_point& z) {
+      Eigen::VectorXd dtau_dp(ps_point& z) {
         return Eigen::VectorXd::Ones(this->model_.num_params_r());
       }
 
-      const Eigen::VectorXd dphi_dq(
+      Eigen::VectorXd dphi_dq(
         ps_point& z,
         interface_callbacks::writer::base_writer& info_writer,
         interface_callbacks::writer::base_writer& error_writer) {

@@ -43,15 +43,15 @@ namespace stan {
         interface_callbacks::writer::base_writer& error_writer) = 0;
 
       // tau = 0.5 p_{i} p_{j} Lambda^{ij} (q)
-      virtual const Eigen::VectorXd dtau_dq(
+      virtual Eigen::VectorXd dtau_dq(
         Point& z,
         interface_callbacks::writer::base_writer& info_writer,
         interface_callbacks::writer::base_writer& error_writer) = 0;
 
-      virtual const Eigen::VectorXd dtau_dp(Point& z) = 0;
+      virtual Eigen::VectorXd dtau_dp(Point& z) = 0;
 
       // phi = 0.5 * log | Lambda (q) | + V(q)
-      virtual const Eigen::VectorXd dphi_dq(
+      virtual Eigen::VectorXd dphi_dq(
         Point& z,
         interface_callbacks::writer::base_writer& info_writer,
         interface_callbacks::writer::base_writer& error_writer) = 0;
@@ -69,8 +69,7 @@ namespace stan {
         interface_callbacks::writer::base_writer& info_writer,
         interface_callbacks::writer::base_writer& error_writer) {
         try {
-          z.V = stan::model::log_prob_propto<true>(model_, z.q);
-          z.V *= -1;
+          z.V = -stan::model::log_prob_propto<true>(model_, z.q);
         } catch (const std::exception& e) {
           this->write_error_msg_(e, error_writer);
           z.V = std::numeric_limits<double>::infinity();
@@ -83,12 +82,12 @@ namespace stan {
         interface_callbacks::writer::base_writer& error_writer) {
         try {
           stan::model::gradient(model_, z.q, z.V, z.g, info_writer);
-          z.V *= -1;
+          z.V = -z.V;
         } catch (const std::exception& e) {
           this->write_error_msg_(e, error_writer);
           z.V = std::numeric_limits<double>::infinity();
         }
-        z.g *= -1;
+        z.g = -z.g;
       }
 
       void update_metric(

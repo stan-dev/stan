@@ -3,10 +3,6 @@
 
 #include <stan/math/mix/mat.hpp>
 
-// #include <Eigen/Cholesky>
-// #include <stan/math/prim/mat/fun/Eigen.hpp>
-// #include <stan/math/prim/mat/meta/index_type.hpp>
-
 #include <stan/mcmc/hmc/hamiltonians/base_hamiltonian.hpp>
 #include <stan/mcmc/hmc/hamiltonians/softabs_point.hpp>
 
@@ -39,8 +35,6 @@ namespace stan {
       explicit softabs_metric(const Model& model)
         : base_hamiltonian<Model, softabs_point, BaseRNG>(model) {}
 
-      ~softabs_metric() {}
-
       double T(softabs_point& z) {
         return this->tau(z) + 0.5 * z.log_det_metric;
       }
@@ -62,7 +56,7 @@ namespace stan {
                + dphi_dq(z, info_writer, error_writer));
       }
 
-      const Eigen::VectorXd dtau_dq(
+      Eigen::VectorXd dtau_dq(
         softabs_point& z,
         interface_callbacks::writer::base_writer& info_writer,
         interface_callbacks::writer::base_writer& error_writer) {
@@ -80,13 +74,13 @@ namespace stan {
          return 0.5 * b;
       }
 
-      const Eigen::VectorXd dtau_dp(softabs_point& z) {
+      Eigen::VectorXd dtau_dp(softabs_point& z) {
         return   z.eigen_deco.eigenvectors()
                * z.softabs_lambda_inv.cwiseProduct(
                    z.eigen_deco.eigenvectors().transpose() * z.p);
       }
 
-      const Eigen::VectorXd dphi_dq(
+      Eigen::VectorXd dphi_dq(
         softabs_point& z,
         interface_callbacks::writer::base_writer& info_writer,
         interface_callbacks::writer::base_writer& error_writer) {
@@ -130,9 +124,9 @@ namespace stan {
         stan::math::hessian<double>(
           softabs_fun<Model>(this->model_, 0), z.q, z.V, z.g, z.hessian);
 
-        z.V *= -1;
-        z.g *= -1;
-        z.hessian *= -1;
+        z.V = -z.V;
+        z.g = -z.g;
+        z.hessian = -z.hessian;
 
         // Compute the eigen decomposition of the Hessian,
         // then perform the SoftAbs transformation
@@ -146,11 +140,11 @@ namespace stan {
 
           // Thresholds defined such that the approximation
           // error is on the same order of double precision
-          if (std::fabs(alpha_lambda) < 1e-4) {
+          if (std::fabs(alpha_lambda) < lower_softabs_thresh) {
            softabs_lambda = (1.0
                              + (1.0 / 3.0) * alpha_lambda * alpha_lambda)
                              / z.alpha;
-          } else if (std::fabs(alpha_lambda) > 18) {
+          } else if (std::fabs(alpha_lambda) > upper_softabs_thresh) {
            softabs_lambda = std::fabs(lambda);
           } else {
            softabs_lambda = lambda / std::tanh(alpha_lambda);
@@ -176,17 +170,17 @@ namespace stan {
             double delta =   z.eigen_deco.eigenvalues()(i)
                            - z.eigen_deco.eigenvalues()(j);
 
-            if (std::fabs(delta) < 1e-10) {
+            if (std::fabs(delta) < jacobian_thresh) {
               double lambda = z.eigen_deco.eigenvalues()(i);
               double alpha_lambda = z.alpha * lambda;
 
               // Thresholds defined such that the approximation
               // error is on the same order of double precision
-              if (std::fabs(alpha_lambda) < 1e-4) {
+              if (std::fabs(alpha_lambda) < lower_softabs_thresh) {
                 z.pseudo_j(i, j) =   (2.0 / 3.0) * alpha_lambda
                                    * (1.0 -   (2.0 / 15.0)
                                             * alpha_lambda * alpha_lambda);
-              } else if (std::fabs(alpha_lambda) > 18) {
+              } else if (std::fabs(alpha_lambda) > upper_softabs_thresh) {
                 z.pseudo_j(i, j) = lambda > 0 ? 1 : -1;
               } else {
                 double sdx = std::sinh(alpha_lambda) / lambda;
@@ -207,7 +201,29 @@ namespace stan {
         interface_callbacks::writer::base_writer& error_writer) {
         update_metric_gradient(z, info_writer, error_writer);
       }
+
+      // Threshold below which a power series
+      // approximation of the softabs function is used
+      static double lower_softabs_thresh;
+
+      // Threshold above which an asymptotic
+      // approximation of the softabs function is used
+      static double upper_softabs_thresh;
+
+      // Threshold below which an exact derivative is
+      // used in the Jacobian calculation instead of
+      // finite differencing
+      static double jacobian_thresh;
     };
+
+    template <class Model, class BaseRNG>
+    double softabs_metric<Model, BaseRNG>::lower_softabs_thresh = 1e-4;
+
+    template <class Model, class BaseRNG>
+    double softabs_metric<Model, BaseRNG>::upper_softabs_thresh = 18;
+
+    template <class Model, class BaseRNG>
+    double softabs_metric<Model, BaseRNG>::jacobian_thresh = 1e-10;
   }  // mcmc
 }  // stan
 #endif

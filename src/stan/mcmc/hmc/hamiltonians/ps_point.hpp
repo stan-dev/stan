@@ -11,7 +11,9 @@ namespace stan {
   namespace mcmc {
     using Eigen::Dynamic;
 
-    // Point in a generic phase space
+    /**
+     * Point in a generic phase space
+     */
     class ps_point {
       friend class ps_point_test;
 

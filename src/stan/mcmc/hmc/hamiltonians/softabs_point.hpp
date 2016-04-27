@@ -6,9 +6,10 @@
 
 namespace stan {
   namespace mcmc {
-
-    // Point in a phase space with a base
-    // Riemannian manifold with SoftAbs metric
+    /**
+     * Point in a phase space with a base
+     * Riemannian manifold with SoftAbs metric
+     */
     class softabs_point: public ps_point {
     public:
       explicit softabs_point(int n):
@@ -21,28 +22,28 @@ namespace stan {
         softabs_lambda_inv(Eigen::VectorXd::Zero(n)),
         pseudo_j(Eigen::MatrixXd::Identity(n, n)) {}
 
-        // SoftAbs regularization parameter
-        double alpha;
+      // SoftAbs regularization parameter
+      double alpha;
 
-        Eigen::MatrixXd hessian;
+      Eigen::MatrixXd hessian;
 
-        // Eigendecomposition of the Hessian
-        Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eigen_deco;
+      // Eigendecomposition of the Hessian
+      Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eigen_deco;
 
-        // Log determinant of metric
-        double log_det_metric;
+      // Log determinant of metric
+      double log_det_metric;
 
-        // SoftAbs transformed eigenvalues of Hessian
-        Eigen::VectorXd softabs_lambda;
-        Eigen::VectorXd softabs_lambda_inv;
+      // SoftAbs transformed eigenvalues of Hessian
+      Eigen::VectorXd softabs_lambda;
+      Eigen::VectorXd softabs_lambda_inv;
 
-        // Psuedo-Jacobian of the eigenvalues
-        Eigen::MatrixXd pseudo_j;
+      // Psuedo-Jacobian of the eigenvalues
+      Eigen::MatrixXd pseudo_j;
 
-        virtual void
-        write_metric(stan::interface_callbacks::writer::base_writer& writer) {
-          writer("No free parameters for SoftAbs metric");
-        }
+      virtual void
+      write_metric(stan::interface_callbacks::writer::base_writer& writer) {
+        writer("No free parameters for SoftAbs metric");
+      }
     };
 
   }  // mcmc

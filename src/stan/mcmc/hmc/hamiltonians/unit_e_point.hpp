@@ -5,9 +5,10 @@
 
 namespace stan {
   namespace mcmc {
-
-    // Point in a phase space with a base
-    // Euclidean manifold with unit metric
+    /**
+     * Point in a phase space with a base
+     * Euclidean manifold with unit metric
+     */
     class unit_e_point: public ps_point {
     public:
       explicit unit_e_point(int n)
