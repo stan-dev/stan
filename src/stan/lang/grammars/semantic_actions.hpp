@@ -106,7 +106,7 @@ namespace stan {
     };
 
     /**
-     * This is the base class for ternary functors that are adapted to
+     * This is the base class for quinary functors that are adapted to
      * lazy semantic actions by boost::phoenix.  The base class deals
      * with the type dispatch required by Phoenix.
      *
