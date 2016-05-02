@@ -672,6 +672,9 @@ namespace stan {
     expr_type expression_type_vis::operator()(const index_op_sliced& e) const {
       return e.type_;
     }
+    expr_type expression_type_vis::operator()(const conditional_op& e) const {
+      return e.type_;
+    }
     expr_type expression_type_vis::operator()(const binary_op& e) const {
       return e.type_;
     }
@@ -689,8 +692,6 @@ namespace stan {
       expression_type_vis vis;
       return boost::apply_visitor(vis, expr_);
     }
-    // template <typename Expr>
-    // expression::expression(const Expr& expr) : expr_(expr) {  }
 
     expression::expression(const expression_t& expr) : expr_(expr) { }
     expression::expression(const nil& expr) : expr_(expr) { }
@@ -703,6 +704,7 @@ namespace stan {
     expression::expression(const fun& expr) : expr_(expr) { }
     expression::expression(const index_op& expr) : expr_(expr) { }
     expression::expression(const index_op_sliced& expr) : expr_(expr) { }
+    expression::expression(const conditional_op& expr) : expr_(expr) { }
     expression::expression(const binary_op& expr) : expr_(expr) { }
     expression::expression(const unary_op& expr) : expr_(expr) { }
 
@@ -772,6 +774,11 @@ namespace stan {
     }
     bool contains_var::operator()(const index_op_sliced& e) const {
       return boost::apply_visitor(*this, e.expr_.expr_);
+    }
+    bool contains_var::operator()(const conditional_op& e) const {
+      return boost::apply_visitor(*this, e.cond_.expr_)
+        || boost::apply_visitor(*this, e.true_val_.expr_)
+        || boost::apply_visitor(*this, e.false_val_.expr_);
     }
     bool contains_var::operator()(const binary_op& e) const {
       return boost::apply_visitor(*this, e.left.expr_)
@@ -869,6 +876,10 @@ namespace stan {
     bool contains_nonparam_var::operator()(const index_op_sliced& e) const {
       return boost::apply_visitor(*this, e.expr_.expr_);
     }
+    // fix-me!!!
+    bool contains_nonparam_var::operator()(const conditional_op& e) const {
+      return true;
+    }
     bool contains_nonparam_var::operator()(const binary_op& e) const {
       if (e.op == "||"
           || e.op == "&&"
@@ -916,6 +927,7 @@ namespace stan {
     bool is_nil_op::operator()(const index_op_sliced& /* x */) const {
       return false;
     }
+    bool is_nil_op::operator()(const conditional_op& /* x */) const { return false; }
     bool is_nil_op::operator()(const binary_op& /* x */) const { return false; }
     bool is_nil_op::operator()(const unary_op& /* x */) const { return false; }
 
@@ -1091,6 +1103,17 @@ namespace stan {
       type_ = indexed_type(expr_, idxs_);
     }
 
+    conditional_op::conditional_op() { }
+    conditional_op::conditional_op(const expression& cond,
+                                   const expression& true_val,
+                                   const expression& false_val)
+      : cond_(cond),
+        true_val_(true_val),
+        false_val_(false_val),
+        type_(promote_primitive(true_val_.expression_type(),
+                                  false_val_.expression_type())) {
+    }
+    
     binary_op::binary_op() { }
     binary_op::binary_op(const expression& left,
                          const std::string& op,
@@ -1726,6 +1749,11 @@ namespace stan {
     }
     bool var_occurs_vis::operator()(const index_op_sliced& e) const {
       return boost::apply_visitor(*this, e.expr_.expr_);
+    }
+    bool var_occurs_vis::operator()(const conditional_op& e) const {
+      return boost::apply_visitor(*this, e.cond_.expr_)
+        || boost::apply_visitor(*this, e.true_val_.expr_)
+        || boost::apply_visitor(*this, e.false_val_.expr_);
     }
     bool var_occurs_vis::operator()(const binary_op& e) const {
       return boost::apply_visitor(*this, e.left.expr_)

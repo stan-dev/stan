@@ -22,6 +22,7 @@ namespace stan {
     struct assignment;
     struct assgn;
     struct binary_op;
+    struct conditional_op;
     struct conditional_statement;
     struct distribution;
     struct double_var_decl;
@@ -211,9 +212,9 @@ namespace stan {
       expr_type operator()(const integrate_ode_cvode& e) const;
       expr_type operator()(const index_op& e) const;
       expr_type operator()(const index_op_sliced& e) const;
+      expr_type operator()(const conditional_op& e) const;
       expr_type operator()(const binary_op& e) const;
       expr_type operator()(const unary_op& e) const;
-      // template <typename T> expr_type operator()(const T& e) const;
     };
 
 
@@ -230,6 +231,7 @@ namespace stan {
                              boost::recursive_wrapper<fun>,
                              boost::recursive_wrapper<index_op>,
                              boost::recursive_wrapper<index_op_sliced>,
+                             boost::recursive_wrapper<conditional_op>,
                              boost::recursive_wrapper<binary_op>,
                              boost::recursive_wrapper<unary_op> >
       expression_t;
@@ -248,6 +250,7 @@ namespace stan {
       expression(const integrate_ode_cvode& expr);  // NOLINT(runtime/explicit)
       expression(const index_op& expr);  // NOLINT(runtime/explicit)
       expression(const index_op_sliced& expr);  // NOLINT(runtime/explicit)
+      expression(const conditional_op& expr);  // NOLINT(runtime/explicit)
       expression(const binary_op& expr);  // NOLINT(runtime/explicit)
       expression(const unary_op& expr);  // NOLINT(runtime/explicit)
       expression(const expression_t& expr_);  // NOLINT(runtime/explicit)
@@ -289,6 +292,7 @@ namespace stan {
       bool operator()(const fun& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const index_op& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const index_op_sliced& x) const;  // NOLINT
+      bool operator()(const conditional_op& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const binary_op& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const unary_op& x) const;  // NOLINT(runtime/explicit)
     };
@@ -412,6 +416,18 @@ namespace stan {
       void infer_type();
     };
 
+    struct conditional_op {
+      expression cond_;  // conditional - must be int val
+      expression true_val_;  
+      expression false_val_;  
+      expr_type type_;
+      conditional_op();
+      conditional_op(const expression& cond,
+                     const expression& true_val,
+                     const expression& false_val);
+    };
+      
+    
     struct binary_op {
       std::string op;
       expression left;
@@ -984,6 +1000,7 @@ namespace stan {
       bool operator()(const integrate_ode_cvode& e) const;
       bool operator()(const index_op& e) const;
       bool operator()(const index_op_sliced& e) const;
+      bool operator()(const conditional_op& e) const;
       bool operator()(const binary_op& e) const;
       bool operator()(const unary_op& e) const;
     };
@@ -1038,6 +1055,7 @@ namespace stan {
       bool operator()(const fun& e) const;
       bool operator()(const index_op& e) const;
       bool operator()(const index_op_sliced& e) const;
+      bool operator()(const conditional_op& e) const;
       bool operator()(const binary_op& e) const;
       bool operator()(const unary_op& e) const;
     };
@@ -1059,6 +1077,7 @@ namespace stan {
       bool operator()(const fun& e) const;
       bool operator()(const index_op& e) const;
       bool operator()(const index_op_sliced& e) const;
+      bool operator()(const conditional_op& e) const;
       bool operator()(const binary_op& e) const;
       bool operator()(const unary_op& e) const;
     };

@@ -8,6 +8,11 @@
 #include <string>
 #include <vector>
 
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::conditional_op,
+                          (stan::lang::expression, cond_)
+                          (stan::lang::expression, true_val_)
+                          (stan::lang::expression, false_val_) )
+
 namespace stan {
 
   namespace lang {
@@ -27,7 +32,16 @@ namespace stan {
       // _r1 : var_origin
 
       expression_r.name("expression");
-      expression_r
+      expression_r  %= conditional_op_r(_r1) || expression15_r(_r1);
+
+      conditional_op_r
+        %= expression15_r(_r1)
+        >> lit("?")
+        > expression_r(_r1)
+        > lit(":")
+        > expression_r(_r1);
+
+      expression15_r
         = expression14_r(_r1)[assign_lhs_f(_val, _1)]
         > *(lit("||")
             > expression14_r(_r1)

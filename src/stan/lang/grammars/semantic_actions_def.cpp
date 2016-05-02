@@ -1865,6 +1865,11 @@ namespace stan {
     bool data_only_expression::operator()(const index_op_sliced& x) const {
       return boost::apply_visitor(*this, x.expr_.expr_);
     }
+    bool data_only_expression::operator()(const conditional_op& x) const {
+      return boost::apply_visitor(*this, x.cond_.expr_)
+        && boost::apply_visitor(*this, x.true_val_.expr_)
+        && boost::apply_visitor(*this, x.false_val_.expr_);
+    }
     bool data_only_expression::operator()(const binary_op& x) const {
       return boost::apply_visitor(*this, x.left.expr_)
         && boost::apply_visitor(*this, x.right.expr_);

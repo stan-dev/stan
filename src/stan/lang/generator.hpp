@@ -184,6 +184,7 @@ namespace stan {
     void generate_idxs_user(const std::vector<idx>& idxs,
                             std::ostream& o);
 
+    // mm 2015-05-01: add op for ternary expression here?
     struct expression_visgen : public visgen {
       const bool user_facing_;
       explicit expression_visgen(std::ostream& o, bool user_facing)
@@ -342,6 +343,18 @@ namespace stan {
         }
         o_ << ')';
       }
+      void operator()(const conditional_op& expr) const {
+      // .... get casts right  ...
+      // somthing like:
+      //  indent <<  logical_expr <<  '?' <<  lvar <<  ':' << lvar << ';'
+        o_ << '(';
+        boost::apply_visitor(*this, expr.cond_.expr_);
+        o_ << '?' ;
+        boost::apply_visitor(*this, expr.true_val_.expr_);
+        o_ << ':' ;
+        boost::apply_visitor(*this, expr.false_val_.expr_);
+        o_ << ')';
+      }
       void operator()(const binary_op& expr) const {
         o_ << '(';
         boost::apply_visitor(*this, expr.left.expr_);
@@ -354,7 +367,8 @@ namespace stan {
         boost::apply_visitor(*this, expr.subject.expr_);
         o_ << ')';
       }
-    };
+
+    };     // close struct expression_visgen
 
     void generate_expression(const expression& e, bool user_facing,
                              std::ostream& o) {

@@ -661,6 +661,7 @@ namespace stan {
       bool operator()(const fun& x) const;
       bool operator()(const index_op& x) const;
       bool operator()(const index_op_sliced& x) const;
+      bool operator()(const conditional_op& x) const;
       bool operator()(const binary_op& x) const;
       bool operator()(const unary_op& x) const;
     };
