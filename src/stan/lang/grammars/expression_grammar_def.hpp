@@ -32,7 +32,9 @@ namespace stan {
       // _r1 : var_origin
 
       expression_r.name("expression");
-      expression_r  %= conditional_op_r(_r1) || expression15_r(_r1);
+      expression_r
+        %= conditional_op_r(_r1)
+           | expression15_r(_r1);
 
       conditional_op_r
         %= expression15_r(_r1)
