@@ -65,7 +65,8 @@ namespace stan {
         ps_point z_sample(z_plus);
         ps_point z_propose(z_plus);
 
-        double sum_numer = this->hamiltonian_.dG_dt(this->z_);
+        double sum_numer = this->hamiltonian_.dG_dt(this->z_,
+                                                    info_writer, error_writer);
         double sum_weight = 1;
 
         double H0 = this->hamiltonian_.H(this->z_);
@@ -165,7 +166,9 @@ namespace stan {
             if ((h - H0) > this->max_deltaH_) this->divergent_ = true;
 
             double pi = exp(H0 - h);
-            sum_numer += pi * this->hamiltonian_.dG_dt(this->z_);
+            sum_numer += pi * this->hamiltonian_.dG_dt(this->z_,
+                                                       info_writer,
+                                                       error_writer);
             sum_weight += pi;
             sum_metro_prob += pi > 1 ? 1 : pi;
 

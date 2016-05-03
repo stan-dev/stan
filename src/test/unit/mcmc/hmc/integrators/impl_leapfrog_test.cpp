@@ -1,25 +1,27 @@
-#include <stan/mcmc/hmc/integrators/expl_leapfrog.hpp>
+#include <stan/io/dump.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
+#include <stan/mcmc/hmc/hamiltonians/softabs_metric.hpp>
+#include <stan/mcmc/hmc/integrators/impl_leapfrog.hpp>
+#include <stan/mcmc/hmc/hamiltonians/unit_e_metric.hpp>
+#include <stan/mcmc/hmc/hamiltonians/diag_e_metric.hpp>
+
+#include <test/test-models/good/mcmc/hmc/integrators/command.hpp>
+#include <test/unit/util.hpp>
+
+#include <boost/random/additive_combine.hpp> // L'Ecuyer RNG
+
 #include <gtest/gtest.h>
 
 #include <sstream>
-#include <stan/interface_callbacks/writer/stream_writer.hpp>
-#include <test/test-models/good/mcmc/hmc/integrators/command.hpp>
-
-#include <stan/io/dump.hpp>
-
-#include <stan/mcmc/hmc/hamiltonians/unit_e_metric.hpp>
-#include <stan/mcmc/hmc/hamiltonians/diag_e_metric.hpp>
-#include <boost/random/additive_combine.hpp> // L'Ecuyer RNG
-#include <test/unit/util.hpp>
 
 // namespace
 //************************************************************
 
 typedef boost::ecuyer1988 rng_t;
 
-class McmcHmcIntegratorsExplLeapfrogF : public testing::Test {
+class McmcHmcIntegratorsImplLeapfrogF : public testing::Test {
 public:
-  McmcHmcIntegratorsExplLeapfrogF()
+  McmcHmcIntegratorsImplLeapfrogF()
     : writer(output),
       error_writer(error_output),
       unit_e_integrator(),
@@ -44,13 +46,17 @@ public:
   stan::interface_callbacks::writer::stream_writer error_writer;
 
   // integrator under test
-  stan::mcmc::expl_leapfrog<
+  stan::mcmc::impl_leapfrog<
     stan::mcmc::unit_e_metric<command_model_namespace::command_model, rng_t> >
   unit_e_integrator;
 
-  stan::mcmc::expl_leapfrog<
+  stan::mcmc::impl_leapfrog<
     stan::mcmc::diag_e_metric<command_model_namespace::command_model, rng_t> >
   diag_e_integrator;
+
+  stan::mcmc::impl_leapfrog<
+    stan::mcmc::softabs_metric<command_model_namespace::command_model, rng_t> >
+  softabs_integrator;
 
   // model
   command_model_namespace::command_model *model;
@@ -60,7 +66,7 @@ public:
   std::stringstream error_output;
 };
 
-TEST_F(McmcHmcIntegratorsExplLeapfrogF, begin_update_p) {
+TEST_F(McmcHmcIntegratorsImplLeapfrogF, begin_update_p) {
   // setup z
   stan::mcmc::unit_e_point z(1);
   z.V    =  1.99974742955684;
@@ -86,10 +92,39 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, begin_update_p) {
   EXPECT_NEAR(z.g(0),  1.99987371079118, 5e-14);
 
   EXPECT_EQ("", output.str());
-  EXPECT_EQ("", error_output.str());
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrogF, update_q) {
+TEST_F(McmcHmcIntegratorsImplLeapfrogF, softabs_begin_update_p) {
+  // setup z
+  stan::mcmc::softabs_point z(1);
+  z.V    =  1.99974742955684;
+  z.q(0) =  1.99987371079118;
+  z.p(0) = -1.58612292129732;
+  z.g(0) =  1.99987371079118;
+  EXPECT_NEAR(z.V,     1.99974742955684, 1e-15);
+  EXPECT_NEAR(z.q(0),  1.99987371079118, 1e-15);
+  EXPECT_NEAR(z.p(0), -1.58612292129732, 1e-15);
+  EXPECT_NEAR(z.g(0),  1.99987371079118, 1e-15);
+
+  // setup hamiltonian
+  stan::mcmc::softabs_metric<command_model_namespace::command_model,
+                            rng_t> hamiltonian(*model);
+
+  // setup epsilon
+  double epsilon = 0.1;
+
+  hamiltonian.init(z, writer, error_writer);
+
+  softabs_integrator.begin_update_p(z, hamiltonian, 0.5 * epsilon, writer, error_writer);
+  EXPECT_NEAR(z.V,     1.99974742955684, 5e-14);
+  EXPECT_NEAR(z.q(0),  1.99987371079118, 5e-14);
+  EXPECT_NEAR(z.p(0), -1.68611660683688, 5e-14);
+  EXPECT_NEAR(z.g(0),  1.99987371079118, 5e-14);
+
+  EXPECT_EQ("", output.str());
+}
+
+TEST_F(McmcHmcIntegratorsImplLeapfrogF, update_q) {
   // setup z
   stan::mcmc::unit_e_point z(1);
   z.V    =  1.99974742955684;
@@ -115,10 +150,39 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, update_q) {
   EXPECT_NEAR(z.g(0),  1.8312620501074919, 5e-14);
 
   EXPECT_EQ("", output.str());
-  EXPECT_EQ("", error_output.str());
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrogF, end_update_p) {
+TEST_F(McmcHmcIntegratorsImplLeapfrogF, softabs_update_q) {
+  // setup z
+  stan::mcmc::softabs_point z(1);
+  z.V    =  1.99974742955684;
+  z.q(0) =  1.99987371079118;
+  z.p(0) = -1.68611660683688;
+  z.g(0) =  1.99987371079118;
+  EXPECT_NEAR(z.V,     1.99974742955684, 1e-15);
+  EXPECT_NEAR(z.q(0),  1.99987371079118, 1e-15);
+  EXPECT_NEAR(z.p(0), -1.68611660683688, 1e-15);
+  EXPECT_NEAR(z.g(0),  1.99987371079118, 1e-15);
+
+  // setup hamiltonian
+  stan::mcmc::softabs_metric<command_model_namespace::command_model,
+                            rng_t> hamiltonian(*model);
+
+  // setup epsilon
+  double epsilon = 0.1;
+
+  hamiltonian.init(z, writer, error_writer);
+
+  softabs_integrator.update_q(z, hamiltonian, epsilon, writer, error_writer);
+  EXPECT_NEAR(z.V,     1.751181369457339, 5e-14);
+  EXPECT_NEAR(z.q(0),  1.8714600553884868, 5e-14);
+  EXPECT_NEAR(z.p(0), -1.68611660683688, 5e-14);
+  EXPECT_NEAR(z.g(0),  1.8714600553884868, 5e-14);
+
+  EXPECT_EQ("", output.str());
+}
+
+TEST_F(McmcHmcIntegratorsImplLeapfrogF, end_update_p) {
   // setup z
   stan::mcmc::unit_e_point z(1);
   z.V    =  1.39887860643153;
@@ -144,10 +208,39 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, end_update_p) {
   EXPECT_NEAR(z.g(0),  1.67264975797776, 5e-14);
 
   EXPECT_EQ("", output.str());
-  EXPECT_EQ("", error_output.str());
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_1) {
+TEST_F(McmcHmcIntegratorsImplLeapfrogF, softabs_end_update_p) {
+  // setup z
+  stan::mcmc::softabs_point z(1);
+  z.V    =  1.39887860643153;
+  z.q(0) =  1.67264975797776;
+  z.p(0) = -1.68611660683688;
+  z.g(0) =  1.67264975797776;
+  EXPECT_NEAR(z.V,     1.39887860643153, 1e-15);
+  EXPECT_NEAR(z.q(0),  1.67264975797776, 1e-15);
+  EXPECT_NEAR(z.p(0), -1.68611660683688, 1e-15);
+  EXPECT_NEAR(z.g(0),  1.67264975797776, 1e-15);
+
+  // setup hamiltonian
+  stan::mcmc::softabs_metric<command_model_namespace::command_model,
+                            rng_t> hamiltonian(*model);
+
+  // setup epsilon
+  double epsilon = 0.1;
+
+  hamiltonian.init(z, writer, error_writer);
+
+  softabs_integrator.end_update_p(z, hamiltonian, 0.5 * epsilon, writer, error_writer);
+  EXPECT_NEAR(z.V,     1.39887860643153, 5e-14);
+  EXPECT_NEAR(z.q(0),  1.67264975797776, 5e-14);
+  EXPECT_NEAR(z.p(0), -1.76974909473577, 5e-14);
+  EXPECT_NEAR(z.g(0),  1.67264975797776, 5e-14);
+
+  EXPECT_EQ("", output.str());
+}
+
+TEST_F(McmcHmcIntegratorsImplLeapfrogF, evolve_1) {
   // setup z
   stan::mcmc::unit_e_point z(1);
   z.V    =  1.99974742955684;
@@ -173,10 +266,9 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_1) {
   EXPECT_NEAR(z.g(0),  1.83126205010749, 5e-14);
 
   EXPECT_EQ("", output.str());
-  EXPECT_EQ("", error_output.str());
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_2) {
+TEST_F(McmcHmcIntegratorsImplLeapfrogF, evolve_2) {
   // setup z
   stan::mcmc::unit_e_point z(1);
   z.V    =  1.99974742955684;
@@ -202,10 +294,9 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_2) {
   EXPECT_NEAR(z.g(0),  2.06610501430439, 5e-14);
 
   EXPECT_EQ("", output.str());
-  EXPECT_EQ("", error_output.str());
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_3) {
+TEST_F(McmcHmcIntegratorsImplLeapfrogF, evolve_3) {
   // setup z
   stan::mcmc::unit_e_point z(1);
   z.V    =  1.99974742955684;
@@ -231,10 +322,9 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_3) {
   EXPECT_NEAR(z.g(0),  2.06610501430439, 5e-14);
 
   EXPECT_EQ("", output.str());
-  EXPECT_EQ("", error_output.str());
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_4) {
+TEST_F(McmcHmcIntegratorsImplLeapfrogF, evolve_4) {
   // setup z
   stan::mcmc::unit_e_point z(1);
   z.V    =  1.99974742955684;
@@ -260,10 +350,9 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_4) {
   EXPECT_NEAR(z.g(0),  1.43528066467474, 5e-14);
 
   EXPECT_EQ("", output.str());
-  EXPECT_EQ("", error_output.str());
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_5) {
+TEST_F(McmcHmcIntegratorsImplLeapfrogF, evolve_5) {
   // setup z
   stan::mcmc::unit_e_point z(1);
   z.V    =  1.99974742955684;
@@ -289,9 +378,8 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_5) {
   EXPECT_NEAR(z.g(0),  1.24660335198005, 5e-14);
 
   EXPECT_EQ("", output.str());
-  EXPECT_EQ("", error_output.str());
 }
-TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_6) {
+TEST_F(McmcHmcIntegratorsImplLeapfrogF, evolve_6) {
   // setup z
   stan::mcmc::unit_e_point z(1);
   z.V    =  1.99974742955684;
@@ -317,10 +405,9 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_6) {
   EXPECT_NEAR(z.g(0), -0.409204730680088, 5e-14);
 
   EXPECT_EQ("", output.str());
-  EXPECT_EQ("", error_output.str());
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_7) {
+TEST_F(McmcHmcIntegratorsImplLeapfrogF, evolve_7) {
   // setup z
   stan::mcmc::unit_e_point z(1);
   z.V    =  1.99974742955684;
@@ -346,10 +433,9 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_7) {
   EXPECT_NEAR(z.g(0),  -4.97752176966686, 5e-14);
 
   EXPECT_EQ("", output.str());
-  EXPECT_EQ("", error_output.str());
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_8) {
+TEST_F(McmcHmcIntegratorsImplLeapfrogF, evolve_8) {
   // setup z
   stan::mcmc::unit_e_point z(1);
   z.V    =  1.99974742955684;
@@ -375,10 +461,9 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_8) {
   EXPECT_NEAR(z.g(0),  3.73124965311523, 5e-14);
 
   EXPECT_EQ("", output.str());
-  EXPECT_EQ("", error_output.str());
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_9) {
+TEST_F(McmcHmcIntegratorsImplLeapfrogF, evolve_9) {
   // setup z
   stan::mcmc::diag_e_point z(1);
   z.V    =  0.807684865121721;
@@ -405,14 +490,57 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_9) {
   EXPECT_NEAR(z.g(0), -1.71246374711032, 5e-14);
 
   EXPECT_EQ("", output.str());
-  EXPECT_EQ("", error_output.str());
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrogF, streams) {
+TEST_F(McmcHmcIntegratorsImplLeapfrogF, softabs_evolve) {
+  // setup z
+  stan::mcmc::softabs_point z(1);
+  z.V    =  0.807684865121721;
+  z.q(0) =  1.27097196280777;
+  z.p(0) = -0.159996782671291;
+  z.g(0) =  1.27097196280777;
+  EXPECT_NEAR(z.V,     0.807684865121721, 1e-15);
+  EXPECT_NEAR(z.q(0),  1.27097196280777, 1e-15);
+  EXPECT_NEAR(z.p(0), -0.159996782671291, 1e-15);
+  EXPECT_NEAR(z.g(0),  1.27097196280777, 1e-15);
+
+  // setup hamiltonian
+  stan::mcmc::softabs_metric<command_model_namespace::command_model,
+                             rng_t> hamiltonian(*model);
+
+  // setup epsilon
+  double epsilon = 2.40769920051673;
+
+  hamiltonian.init(z, writer, error_writer);
+
+  softabs_integrator.evolve(z, hamiltonian, epsilon, writer, error_writer);
+  EXPECT_NEAR(z.V,     1.6709126162957251, 5e-14);
+  EXPECT_NEAR(z.q(0), -1.8280659814655078, 5e-14);
+  EXPECT_NEAR(z.p(0),  0.51066062899615283, 5e-14);
+  EXPECT_NEAR(z.g(0), -1.8280659814655078, 5e-14);
+
+  EXPECT_EQ("", output.str());
+}
+
+TEST_F(McmcHmcIntegratorsImplLeapfrogF, streams) {
   stan::test::capture_std_streams();
 
-  typedef stan::mcmc::expl_leapfrog<
+  typedef stan::mcmc::impl_leapfrog<
     stan::mcmc::unit_e_metric<command_model_namespace::command_model,rng_t> >
+    integrator;
+
+  EXPECT_NO_THROW(integrator i);
+
+  stan::test::reset_std_streams();
+  EXPECT_EQ("", stan::test::cout_ss.str());
+  EXPECT_EQ("", stan::test::cerr_ss.str());
+}
+
+TEST_F(McmcHmcIntegratorsImplLeapfrogF, softabs_streams) {
+  stan::test::capture_std_streams();
+
+  typedef stan::mcmc::impl_leapfrog<
+    stan::mcmc::softabs_metric<command_model_namespace::command_model, rng_t> >
     integrator;
 
   EXPECT_NO_THROW(integrator i);
