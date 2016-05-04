@@ -143,6 +143,7 @@ namespace stan {
       integrate_ode_r.name("expression");
       integrate_ode_r
         %= (lit("integrate_ode") >> no_skip[!char_("a-zA-Z0-9_")])
+        > eps[deprecate_integrate_ode_f(boost::phoenix::ref(error_msgs_))]
         > lit('(')
         > identifier_r          // system function name (function only)
         > lit(',')

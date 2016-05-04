@@ -506,6 +506,14 @@ namespace stan {
     extern boost::phoenix::function<set_no_op> set_no_op_f;
 
     // called from: term_grammar
+    struct deprecate_integrate_ode : phoenix_functor_unary<void> {
+      void operator()(std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<deprecate_integrate_ode>
+    deprecate_integrate_ode_f;
+
+    
+    // called from: term_grammar
     struct validate_integrate_ode : public phoenix_functor_quaternary<void> {
       void operator()(const integrate_ode& ode_fun,
                       const variable_map& var_map, bool& pass,

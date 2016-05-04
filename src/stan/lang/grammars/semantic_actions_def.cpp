@@ -1068,6 +1068,16 @@ namespace stan {
     boost::phoenix::function<set_no_op> set_no_op_f;
 
 
+    void deprecate_integrate_ode::operator()(std::ostream& error_msgs)
+      const {
+      error_msgs << "Warning: the integrate_ode() function is deprecated"
+                 << " in the Stan language;"
+                 << " use integrate_ode_rk45() instead."
+                 << std::endl;
+    }
+    boost::phoenix::function<deprecate_integrate_ode>
+    deprecate_integrate_ode_f;
+
 
     void validate_integrate_ode::operator()(const integrate_ode& ode_fun,
                                             const variable_map& var_map,
