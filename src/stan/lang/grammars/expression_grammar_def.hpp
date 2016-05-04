@@ -24,17 +24,15 @@ namespace stan {
         var_map_(var_map),
         error_msgs_(error_msgs),
         expression07_g(var_map, error_msgs, *this) {
-      using boost::spirit::qi::lit;
       using boost::spirit::qi::_1;
-      using boost::spirit::qi::labels::_r1;
+      using boost::spirit::qi::lit;
       using boost::spirit::qi::_val;
-
-      // _r1 : var_origin
+      using boost::spirit::qi::labels::_r1;
 
       expression_r.name("expression");
       expression_r
         %= conditional_op_r(_r1)
-           | expression15_r(_r1);
+        | expression15_r(_r1);
 
       conditional_op_r
         %= expression15_r(_r1)
@@ -44,7 +42,7 @@ namespace stan {
         > expression_r(_r1);
 
       expression15_r
-        = expression14_r(_r1)[assign_lhs_f(_val, _1)]
+        %= expression14_r(_r1)[assign_lhs_f(_val, _1)]
         > *(lit("||")
             > expression14_r(_r1)
               [binary_op_f(_val, _1, "||", "logical_or",
