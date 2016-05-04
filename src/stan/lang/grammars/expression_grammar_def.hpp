@@ -35,14 +35,14 @@ namespace stan {
         | expression15_r(_r1);
 
       conditional_op_r
-        %= expression15_r(_r1)
+        = expression15_r(_r1)
         >> lit("?")
         > expression_r(_r1)
         > lit(":")
         > expression_r(_r1);
 
       expression15_r
-        %= expression14_r(_r1)[assign_lhs_f(_val, _1)]
+        = expression14_r(_r1)[assign_lhs_f(_val, _1)]
         > *(lit("||")
             > expression14_r(_r1)
               [binary_op_f(_val, _1, "||", "logical_or",

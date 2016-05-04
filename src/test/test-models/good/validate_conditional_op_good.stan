@@ -6,6 +6,6 @@ model {
   x = 0;
   x = x && x;
   x = x == x || x;
-  //  x == x ? x : x;
+  //  x = x ? x : x;
   y ~ normal(0,1);
 }
