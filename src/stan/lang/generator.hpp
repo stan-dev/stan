@@ -255,7 +255,7 @@ namespace stan {
         o_ << ")";
       }
       void operator()(const integrate_ode& fx) const {
-        o_ << "integrate_ode("
+        o_ << "integrate_ode_rk45("
            << fx.system_function_name_
            << "_functor__(), ";
 
