@@ -3,9 +3,7 @@ parameters {
 }
 model {
   int x;
-  x = 0;
-  x = x && x;
-  x = x == x || x;
-  //  x = x ? x : x;
+  //  x = x && x;
+  x = x ? 1 : 2;
   y ~ normal(0,1);
 }

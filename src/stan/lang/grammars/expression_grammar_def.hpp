@@ -26,6 +26,7 @@ namespace stan {
         expression07_g(var_map, error_msgs, *this) {
       using boost::spirit::qi::_1;
       using boost::spirit::qi::lit;
+      using boost::spirit::qi::_pass;
       using boost::spirit::qi::_val;
       using boost::spirit::qi::labels::_r1;
 
@@ -34,12 +35,14 @@ namespace stan {
         %= conditional_op_r(_r1)
         | expression15_r(_r1);
 
+      expression_r.name("conditional op expression, cond ? t_val : f_val ");
       conditional_op_r
-        = expression15_r(_r1)
+        %= expression15_r(_r1)
         >> lit("?")
-        > expression_r(_r1)
-        > lit(":")
-        > expression_r(_r1);
+        >> expression_r(_r1)
+        >> lit(":")
+        >> expression_r(_r1)[validate_conditional_op_f(_val, _pass,
+                                                       boost::phoenix::ref(error_msgs))];
 
       expression15_r
         = expression14_r(_r1)[assign_lhs_f(_val, _1)]

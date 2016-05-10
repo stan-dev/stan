@@ -347,14 +347,16 @@ namespace stan {
       // .... get casts right  ...
       // somthing like:
       //  indent <<  logical_expr <<  '?' <<  lvar <<  ':' << lvar << ';'
-        o_ << '(';
-        boost::apply_visitor(*this, expr.cond_.expr_);
-        o_ << '?' ;
-        boost::apply_visitor(*this, expr.true_val_.expr_);
-        o_ << ':' ;
-        boost::apply_visitor(*this, expr.false_val_.expr_);
-        o_ << ')';
+        //        o_ << '(';
+        //        boost::apply_visitor(*this, expr.cond_.expr_);
+        //        o_ << '?' ;
+        //        boost::apply_visitor(*this, expr.true_val_.expr_);
+        //        o_ << ':' ;
+        //        boost::apply_visitor(*this, expr.false_val_.expr_);
+        //        o_ << ')';
       }
+
+
       void operator()(const binary_op& expr) const {
         o_ << '(';
         boost::apply_visitor(*this, expr.left.expr_);

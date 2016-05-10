@@ -392,7 +392,7 @@ namespace stan {
       fun();
       fun(std::string const& name,
           std::vector<expression> const& args);
-      void infer_type();  // FIXME: is this used anywhere?
+      //      void infer_type();  // FIXME: is this used anywhere?
     };
 
     size_t total_dims(const std::vector<std::vector<expression> >& dimss);
@@ -422,9 +422,6 @@ namespace stan {
       expression false_val_;  
       expr_type type_;
       conditional_op();
-      conditional_op(const expression& cond,
-                     const expression& true_val,
-                     const expression& false_val);
     };
       
     

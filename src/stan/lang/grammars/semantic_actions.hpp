@@ -216,6 +216,17 @@ namespace stan {
     };
     extern boost::phoenix::function<increment_size_t> increment_size_t_f;
 
+
+    // called from: expression_grammar
+    struct validate_conditional_op : public phoenix_functor_ternary<void> {
+      void operator()(conditional_op& cond_expr,
+                      bool& pass,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<validate_conditional_op>
+    validate_conditional_op_f;
+
+    
     // called from: expression_grammar
     struct binary_op_expr : public phoenix_functor_quinary<void> {
      void operator()(expression& expr1, const expression& expr2,

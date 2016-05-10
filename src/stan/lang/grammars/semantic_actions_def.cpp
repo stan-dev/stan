@@ -119,6 +119,62 @@ namespace stan {
     }
     boost::phoenix::function<increment_size_t> increment_size_t_f;
 
+
+    void validate_conditional_op::operator()(conditional_op& conditional_op,
+                                             bool& pass,
+                                             std::ostream& error_msgs) const {
+
+      pass = true;
+      expr_type cond_type = conditional_op.cond_.expression_type();
+      expr_type true_val_type = conditional_op.true_val_.expression_type();
+      base_expr_type true_val_base_type = true_val_type.base_type_;
+      expr_type false_val_type = conditional_op.false_val_.expression_type();
+      base_expr_type false_val_base_type = false_val_type.base_type_;
+      std::cout << "validate_conditional_op"
+                << " cond type: " << cond_type
+                << " true_val type: " << true_val_type
+                << " true_val base_type: " << true_val_base_type
+                << " false_val type: " << false_val_type
+                << " false_val base_type: " << false_val_base_type
+                << std::endl;
+
+
+      if (!cond_type.is_primitive()) {
+        error_msgs << "condition in ternary expression must be"
+                   << " primitive int or real;"
+                   << " found type=" << cond_type
+                   << std::endl;
+        pass = false;
+      }
+
+      bool types_compatible
+        = true_val_base_type == false_val_base_type
+        || (true_val_base_type == DOUBLE_T && false_val_base_type == INT_T)
+        || (true_val_base_type == INT_T && false_val_base_type == DOUBLE_T);
+
+      if (!types_compatible) {
+        error_msgs << "base type mismatch in ternary expression,"
+                   << " expression when true is: ";
+        write_base_expr_type(error_msgs, true_val_base_type);
+        error_msgs << "; expression when false is: ";
+        write_base_expr_type(error_msgs, false_val_base_type);
+        error_msgs << std::endl;
+        pass = false;
+      }
+
+      if (!pass) return;
+
+      conditional_op.type_ =
+        (true_val_base_type == false_val_base_type) ? true_val_base_type : DOUBLE_T;
+
+      std::cout << "conditional_op type: "
+                << conditional_op.type_
+                << std::endl;
+
+    }
+    boost::phoenix::function<validate_conditional_op>
+    validate_conditional_op_f;
+
     void binary_op_expr::operator()(expression& expr1, const expression& expr2,
                                     const std::string& op,
                                     const std::string& fun_name,

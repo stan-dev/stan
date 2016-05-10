@@ -9,6 +9,7 @@
 #include <cstddef>
 #include <limits>
 #include <climits>
+#include <istream>
 #include <iostream>
 #include <map>
 #include <set>
@@ -673,6 +674,9 @@ namespace stan {
       return e.type_;
     }
     expr_type expression_type_vis::operator()(const conditional_op& e) const {
+      std::cout << "expression_type_vis conditional_op, e.type: "
+                << e.type_
+                << std::endl;
       return e.type_;
     }
     expr_type expression_type_vis::operator()(const binary_op& e) const {
@@ -718,8 +722,6 @@ namespace stan {
         sum += 2;
       return sum;
     }
-
-
 
     printable::printable() : printable_("") { }
     printable::printable(const expression& expr) : printable_(expr) { }
@@ -776,6 +778,7 @@ namespace stan {
       return boost::apply_visitor(*this, e.expr_.expr_);
     }
     bool contains_var::operator()(const conditional_op& e) const {
+      std::cout << "contains_var conditional_op" << std::endl;
       return boost::apply_visitor(*this, e.cond_.expr_)
         || boost::apply_visitor(*this, e.true_val_.expr_)
         || boost::apply_visitor(*this, e.false_val_.expr_);
@@ -876,10 +879,12 @@ namespace stan {
     bool contains_nonparam_var::operator()(const index_op_sliced& e) const {
       return boost::apply_visitor(*this, e.expr_.expr_);
     }
-    // fix-me!!!
+
     bool contains_nonparam_var::operator()(const conditional_op& e) const {
+      std::cout << "contains_nonparam_var conditional_op" << std::endl;
       return true;
     }
+
     bool contains_nonparam_var::operator()(const binary_op& e) const {
       if (e.op == "||"
           || e.op == "&&"
@@ -1043,12 +1048,7 @@ namespace stan {
              std::vector<expression> const& args)
       : name_(name),
         args_(args) {
-      infer_type();
     }
-    void fun::infer_type() {
-      // TODO(carpenter): remove this useless function and any calls to it
-    }
-
 
     size_t total_dims(const std::vector<std::vector<expression> >& dimss) {
       size_t total = 0U;
@@ -1104,15 +1104,6 @@ namespace stan {
     }
 
     conditional_op::conditional_op() { }
-    conditional_op::conditional_op(const expression& cond,
-                                   const expression& true_val,
-                                   const expression& false_val)
-      : cond_(cond),
-        true_val_(true_val),
-        false_val_(false_val),
-        type_(promote_primitive(true_val_.expression_type(),
-                                  false_val_.expression_type())) {
-    }
     
     binary_op::binary_op() { }
     binary_op::binary_op(const expression& left,
@@ -1124,7 +1115,6 @@ namespace stan {
         type_(promote_primitive(left.expression_type(),
                                   right.expression_type())) {
     }
-
 
     unary_op::unary_op(char op,
                        expression const& subject)
