@@ -1,19 +1,19 @@
 /**
  * Performance test: logistic.
- * 
+ *
  * This test runs a simple logistic model 100 times with a fixed
  * seed. The test records to a csv file information about the current
  * build, whether the values match the expected known values, whether
  * values are identical between runs, and the runtime in seconds for
  * each of the 100 individual runs.
- * 
+ *
  * The output file is a csv file located at
  * test/performance/performance.csv.  If the file is empty, a header
  * line will be written.  If the file is not empty and the header line
  * of the file matches, a data row will be appended.  If the file is
  * not empty and the header line is different, a header row and a data
  * row will be appended.
- * 
+ *
  * Below are the test routines in this test.
  * 1. run: Runs the model 100 times. This test should always
  *    succeed. Test failure indicates that the model could not be run.
@@ -21,7 +21,7 @@
  *    iteration against known values. Test will succeed if the values
  *    match the known values; the test will fail otherwise.
  * 3. values_same_run_to_run: Compares the first run's final iteration
- *    against all runs' final iterations. Test will succeed if all the 
+ *    against all runs' final iterations. Test will succeed if all the
  *    values match; the test will fail otherwise.
  * 4. write_results_to_disk: Writes the results to disk. Test will
  *    succeed if writing to an empty file or to one with a matching
@@ -94,8 +94,8 @@ TEST_F(performance, run) {
                                                  "test/performance/logistic_output.csv",
                                                  0U);
     t = clock() - t;  // end timer
-    seconds_per_run[n] = static_cast<double>(t) / CLOCKS_PER_SEC; 
-    last_draws_per_run[n] 
+    seconds_per_run[n] = static_cast<double>(t) / CLOCKS_PER_SEC;
+    last_draws_per_run[n]
       = get_last_iteration_from_file("test/performance/logistic_output.csv");
   }
   SUCCEED();
@@ -103,41 +103,44 @@ TEST_F(performance, run) {
 
 // evaluate
 TEST_F(performance, values_from_tagged_version) {
-  int N_values = 8;
+  int N_values = 9;
   ASSERT_EQ(N_values, last_draws_per_run[0].size())
-    << "last tagged version, 2.5.0, had " << N_values << " elements";
-  
+    << "last tagged version, 2.9.0, had " << N_values << " elements";
+
   std::vector<double> first_run = last_draws_per_run[0];
-  EXPECT_FLOAT_EQ(-65.9431, first_run[0])
+  EXPECT_FLOAT_EQ(-65.241302, first_run[0])
     << "lp__: index 0";
 
-  EXPECT_FLOAT_EQ(0.99914801, first_run[1])
+  EXPECT_FLOAT_EQ(0.98944098, first_run[1])
     << "accept_stat__: index 1";
 
-  EXPECT_FLOAT_EQ(0.92122698, first_run[2])
+  EXPECT_FLOAT_EQ(1.3144701, first_run[2])
     << "stepsize__: index 2";
 
-  EXPECT_FLOAT_EQ(3, first_run[3])
+  EXPECT_FLOAT_EQ(1, first_run[3])
     << "treedepth__: index 3";
 
-  EXPECT_FLOAT_EQ(7, first_run[4])
+  EXPECT_FLOAT_EQ(3, first_run[4])
     << "n_leapfrog__: index 4";
 
   EXPECT_FLOAT_EQ(0, first_run[5])
-    << "n_divergent__: index 5";
+    << "divergent__: index 5";
 
-  EXPECT_FLOAT_EQ(1.4754699, first_run[6])
-    << "beta.1: index 6";
+  EXPECT_FLOAT_EQ(65.266701, first_run[6])
+    << "energy__: index 6";
 
-  EXPECT_FLOAT_EQ(-0.79085201, first_run[7])
-    << "beta.2: index 7";
-  
+  EXPECT_FLOAT_EQ(1.30007, first_run[7])
+    << "beta.1: index 7";
+
+  EXPECT_FLOAT_EQ(-0.57955098, first_run[8])
+    << "beta.2: index 8";
+
   matches_tagged_version = !HasNonfatalFailure();
 }
 
 TEST_F(performance, values_same_run_to_run) {
   int N_values = last_draws_per_run[0].size();
-  
+
   for (int i = 0; i < N_values; i++) {
     double expected_value = last_draws_per_run[0][i];
     for (int n = 1; n < N; n++) {
@@ -152,25 +155,25 @@ TEST_F(performance, values_same_run_to_run) {
 
 TEST_F(performance, check_output_is_same) {
   std::ifstream file_stream;
-  file_stream.open("test/performance/logistic_output.csv", 
+  file_stream.open("test/performance/logistic_output.csv",
                    std::ios_base::in);
   ASSERT_TRUE(file_stream.good());
 
   std::string line, expected;
 
   getline(file_stream, line);
-  expected = "# stan_version_major = " + stan::MAJOR_VERSION; 
+  expected = "# stan_version_major = " + stan::MAJOR_VERSION;
   ASSERT_EQ(expected, line);
   ASSERT_TRUE(file_stream.good());
 
 
   getline(file_stream, line);
-  expected = "# stan_version_minor = " + stan::MINOR_VERSION; 
+  expected = "# stan_version_minor = " + stan::MINOR_VERSION;
   ASSERT_EQ(expected, line);
   ASSERT_TRUE(file_stream.good());
 
   getline(file_stream, line);
-  expected = "# stan_version_patch = " + stan::PATCH_VERSION; 
+  expected = "# stan_version_patch = " + stan::PATCH_VERSION;
   ASSERT_EQ(expected, line);
   ASSERT_TRUE(file_stream.good());
 
@@ -179,7 +182,7 @@ TEST_F(performance, check_output_is_same) {
   ASSERT_TRUE(file_stream.good());
 
   getline(file_stream, line);
-  ASSERT_EQ("lp__,accept_stat__,stepsize__,treedepth__,n_leapfrog__,n_divergent__,beta.1,beta.2", line);
+  ASSERT_EQ("lp__,accept_stat__,stepsize__,treedepth__,n_leapfrog__,divergent__,energy__,beta.1,beta.2", line);
   ASSERT_TRUE(file_stream.good());
 
   getline(file_stream, line);
@@ -196,7 +199,7 @@ TEST_F(performance, write_results_to_disk) {
   // current date / time
   header << quote("date");
   line << quote(get_date());
-  
+
   // git hash
   header << "," << quote("git hash") << "," << quote("git date");
   line << "," << quote(get_git_hash()) << "," << quote(get_git_date());
@@ -208,7 +211,7 @@ TEST_F(performance, write_results_to_disk) {
   // matches tagged values
   header << "," << quote("matches tagged version");
   line << "," << quote(matches_tagged_version ? "yes" : "no");
-  
+
   // all values same
   header << "," << quote("all values same");
   line << "," << quote(all_values_same ? "yes" : "no");
@@ -225,16 +228,16 @@ TEST_F(performance, write_results_to_disk) {
   // append output to: test/performance/performance.csv
   bool write_header = false;
   std::fstream file_stream;
-  
-  file_stream.open("test/performance/performance.csv", 
+
+  file_stream.open("test/performance/performance.csv",
                    std::ios_base::in);
   if (file_stream.peek() == std::fstream::traits_type::eof()) {
     write_header = true;
   } else {
     std::string file_header;
     std::getline(file_stream, file_header);
-    
-    EXPECT_EQ(file_header, header.str()) 
+
+    EXPECT_EQ(file_header, header.str())
       << "header of file is different";
     if (file_header != header.str())
       write_header = true;

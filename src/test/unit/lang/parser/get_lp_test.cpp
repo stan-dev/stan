@@ -3,9 +3,11 @@
 
 TEST(langParser, illegalScope) { 
   test_throws("get_lp_bad_scope1",
-              "Functions suffixed with _lp only allowed in");
+              "Function target() or functions suffixed with _lp only"
+              " allowed in transformed parameter block, model block");
   test_throws("get_lp_bad_scope2",
-              "Functions suffixed with _lp only allowed in");
+              "Function target() or functions suffixed with _lp only"
+              " allowed in transformed parameter block, model block");
 }
 TEST(langParser, legal) {
   test_parsable("get_lp_good");

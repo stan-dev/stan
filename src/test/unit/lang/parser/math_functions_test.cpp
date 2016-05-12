@@ -141,6 +141,10 @@ TEST(lang_parser, if_else_math_function_signatures) {
   test_parsable("function-signatures/math/functions/if_else");
 }
 
+TEST(lang_parser, inc_beta_math_function_signatures) {
+  test_parsable("function-signatures/math/functions/inc_beta");
+}
+
 TEST(lang_parser, int_step_math_function_signatures) {
   test_parsable("function-signatures/math/functions/int_step");
 }

@@ -11,10 +11,12 @@ namespace stan {
     public:
       base_integrator() {}
 
-      virtual void evolve(typename Hamiltonian::PointType& z,
-                          Hamiltonian& hamiltonian,
-                          const double epsilon,
-                          interface_callbacks::writer::base_writer& writer) = 0;
+      virtual void
+      evolve(typename Hamiltonian::PointType& z,
+             Hamiltonian& hamiltonian,
+             const double epsilon,
+             interface_callbacks::writer::base_writer& info_writer,
+             interface_callbacks::writer::base_writer& error_writer) = 0;
     };
 
   }  // mcmc

@@ -1,9 +1,8 @@
 #ifndef STAN_LANG_GRAMMARS_WHITESPACE_GRAMMAR_DEF_HPP
 #define STAN_LANG_GRAMMARS_WHITESPACE_GRAMMAR_DEF_HPP
 
-#include <boost/spirit/include/qi.hpp>
-
 #include <stan/lang/grammars/whitespace_grammar.hpp>
+#include <boost/spirit/include/qi.hpp>
 
 namespace stan {
 
@@ -25,9 +24,5 @@ namespace stan {
     }
 
   }
-
 }
-
-
-
 #endif

@@ -7,24 +7,29 @@
 
 namespace stan {
   namespace mcmc {
-
-    // Hamiltonian Monte Carlo on a
-    // Euclidean manifold with unit metric,
-    // static integration time,
-    // and adaptive stepsize
+    /**
+     * Hamiltonian Monte Carlo implementation using the endpoint
+     * of trajectories with a static integration time with a
+     * Gaussian-Euclidean disintegration and unit metric and
+     * adaptive step size
+     */
     template <class Model, class BaseRNG>
     class adapt_unit_e_static_hmc : public unit_e_static_hmc<Model, BaseRNG>,
                                     public stepsize_adapter {
     public:
-      adapt_unit_e_static_hmc(Model &model, BaseRNG& rng)
+      adapt_unit_e_static_hmc(const Model& model, BaseRNG& rng)
         : unit_e_static_hmc<Model, BaseRNG>(model, rng) { }
 
       ~adapt_unit_e_static_hmc() { }
 
-      sample transition(sample& init_sample,
-                        interface_callbacks::writer::base_writer& writer) {
-        sample s = unit_e_static_hmc<Model, BaseRNG>::transition(init_sample,
-                                                                 writer);
+      sample
+      transition(sample& init_sample,
+                 interface_callbacks::writer::base_writer& info_writer,
+                 interface_callbacks::writer::base_writer& error_writer) {
+        sample s
+          = unit_e_static_hmc<Model, BaseRNG>::transition(init_sample,
+                                                          info_writer,
+                                                          error_writer);
 
         if (this->adapt_flag_) {
           this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,

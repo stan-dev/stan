@@ -55,12 +55,14 @@ TEST(parserFunctions,funsBad5) {
 
 TEST(parserFunctions,funsBad6) {
   test_throws("functions-bad6",
-              "Functions suffixed with _lp only allowed");
+              "Function target() or functions suffixed with _lp only"
+              " allowed in transformed parameter block, model block");
 }
 
 TEST(parserFunctions,funsBad7) {
   test_throws("functions-bad7",
-              "Functions suffixed with _lp only allowed");
+              "Function target() or functions suffixed with _lp only"
+              " allowed in transformed parameter block, model block");
 }
 
 TEST(parserFunctions,funsBad8) {

@@ -29,7 +29,8 @@ namespace stan {
                   const std::string& suffix,
                   std::ostream& o,
                   StartTransitionCallback& callback,
-                  interface_callbacks::writer::base_writer& writer) {
+                  interface_callbacks::writer::base_writer& info_writer,
+                  interface_callbacks::writer::base_writer& error_writer) {
         sample::generate_transitions<Model, RNG, StartTransitionCallback,
                                      SampleRecorder, DiagnosticRecorder,
                                      MessageRecorder>
@@ -38,7 +39,7 @@ namespace stan {
            mcmc_writer,
            init_s, model, base_rng,
            prefix, suffix, o,
-           callback, writer);
+           callback, info_writer, error_writer);
       }
 
     }

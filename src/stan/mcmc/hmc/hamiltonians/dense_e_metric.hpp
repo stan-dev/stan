@@ -17,10 +17,8 @@ namespace stan {
     class dense_e_metric
       : public base_hamiltonian<Model, dense_e_point, BaseRNG> {
     public:
-      explicit dense_e_metric(Model& model)
+      explicit dense_e_metric(const Model& model)
         : base_hamiltonian<Model, dense_e_point, BaseRNG>(model) {}
-
-      ~dense_e_metric() {}
 
       double T(dense_e_point& z) {
         return 0.5 * z.p.transpose() * z.mInv * z.p;
@@ -34,15 +32,27 @@ namespace stan {
         return this->V(z);
       }
 
-      const Eigen::VectorXd dtau_dq(dense_e_point& z) {
+      double dG_dt(dense_e_point& z,
+                   interface_callbacks::writer::base_writer& info_writer,
+                   interface_callbacks::writer::base_writer& error_writer) {
+        return 2 * T(z) - z.q.dot(z.g);
+      }
+
+      Eigen::VectorXd dtau_dq(
+        dense_e_point& z,
+        interface_callbacks::writer::base_writer& info_writer,
+        interface_callbacks::writer::base_writer& error_writer) {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 
-      const Eigen::VectorXd dtau_dp(dense_e_point& z) {
+      Eigen::VectorXd dtau_dp(dense_e_point& z) {
         return z.mInv * z.p;
       }
 
-      const Eigen::VectorXd dphi_dq(dense_e_point& z) {
+      Eigen::VectorXd dphi_dq(
+        dense_e_point& z,
+        interface_callbacks::writer::base_writer& info_writer,
+        interface_callbacks::writer::base_writer& error_writer) {
         return z.g;
       }
 

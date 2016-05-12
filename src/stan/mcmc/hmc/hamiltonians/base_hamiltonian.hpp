@@ -15,7 +15,7 @@ namespace stan {
     template <class Model, class Point, class BaseRNG>
     class base_hamiltonian {
     public:
-      explicit base_hamiltonian(Model& model)
+      explicit base_hamiltonian(const Model& model)
         : model_(model) {}
 
       ~base_hamiltonian() {}
@@ -36,35 +36,79 @@ namespace stan {
         return T(z) + V(z);
       }
 
-      // tau = 0.5 p_{i} p_{j} Lambda^{ij} (q)
-      virtual const Eigen::VectorXd dtau_dq(Point& z) = 0;
+      // The time derivative of the virial, G = \sum_{d = 1}^{D} q^{d} p_{d}.
+      virtual double dG_dt(
+        Point& z,
+        interface_callbacks::writer::base_writer& info_writer,
+        interface_callbacks::writer::base_writer& error_writer) = 0;
 
-      virtual const Eigen::VectorXd dtau_dp(Point& z) = 0;
+      // tau = 0.5 p_{i} p_{j} Lambda^{ij} (q)
+      virtual Eigen::VectorXd dtau_dq(
+        Point& z,
+        interface_callbacks::writer::base_writer& info_writer,
+        interface_callbacks::writer::base_writer& error_writer) = 0;
+
+      virtual Eigen::VectorXd dtau_dp(Point& z) = 0;
 
       // phi = 0.5 * log | Lambda (q) | + V(q)
-      virtual const Eigen::VectorXd dphi_dq(Point& z) = 0;
+      virtual Eigen::VectorXd dphi_dq(
+        Point& z,
+        interface_callbacks::writer::base_writer& info_writer,
+        interface_callbacks::writer::base_writer& error_writer) = 0;
 
       virtual void sample_p(Point& z, BaseRNG& rng) = 0;
 
-      virtual void init(Point& z,
-                        interface_callbacks::writer::base_writer& writer) {
-        this->update(z, writer);
+      void init(Point& z,
+                interface_callbacks::writer::base_writer& info_writer,
+                interface_callbacks::writer::base_writer& error_writer) {
+        this->update_potential_gradient(z, info_writer, error_writer);
       }
 
-      virtual void update(Point& z,
-                          interface_callbacks::writer::base_writer& writer) {
+      void update_potential(
+        Point& z,
+        interface_callbacks::writer::base_writer& info_writer,
+        interface_callbacks::writer::base_writer& error_writer) {
         try {
-          stan::model::gradient(model_, z.q, z.V, z.g, writer);
-          z.V *= -1;
+          z.V = -stan::model::log_prob_propto<true>(model_, z.q);
         } catch (const std::exception& e) {
-          this->write_error_msg_(e, writer);
+          this->write_error_msg_(e, error_writer);
           z.V = std::numeric_limits<double>::infinity();
         }
-        z.g *= -1;
+      }
+
+      void update_potential_gradient(
+        Point& z,
+        interface_callbacks::writer::base_writer& info_writer,
+        interface_callbacks::writer::base_writer& error_writer) {
+        try {
+          stan::model::gradient(model_, z.q, z.V, z.g, info_writer);
+          z.V = -z.V;
+        } catch (const std::exception& e) {
+          this->write_error_msg_(e, error_writer);
+          z.V = std::numeric_limits<double>::infinity();
+        }
+        z.g = -z.g;
+      }
+
+      void update_metric(
+        Point& z,
+        interface_callbacks::writer::base_writer& info_writer,
+        interface_callbacks::writer::base_writer& error_writer) {}
+
+      void update_metric_gradient(
+        Point& z,
+        interface_callbacks::writer::base_writer& info_writer,
+        interface_callbacks::writer::base_writer& error_writer) {}
+
+      void update_gradients(
+        Point& z,
+        interface_callbacks::writer::base_writer& info_writer,
+        interface_callbacks::writer::base_writer& error_writer) {
+        update_potential_gradient(z, info_writer, error_writer);
       }
 
     protected:
-      Model& model_;
+      const Model& model_;
 
       void write_error_msg_(const std::exception& e,
                             interface_callbacks::writer::base_writer& writer) {
