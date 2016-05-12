@@ -44,7 +44,7 @@ namespace stan {
     template void assign_lhs::operator()(expression&, const integrate_ode&)
       const;
     template void assign_lhs::operator()(expression&,
-                                         const integrate_ode_cvode&)
+                                         const integrate_ode_control&)
       const;
     template void assign_lhs::operator()(int&, const int&) const;
     template void assign_lhs::operator()(size_t&, const size_t&) const;
@@ -1068,23 +1068,22 @@ namespace stan {
     boost::phoenix::function<set_no_op> set_no_op_f;
 
 
-    void deprecate_integrate_ode::operator()(std::ostream& error_msgs)
+    void deprecated_integrate_ode::operator()(std::ostream& error_msgs)
       const {
       error_msgs << "Warning: the integrate_ode() function is deprecated"
-                 << " in the Stan language;"
-                 << " use integrate_ode_rk45() instead."
+                 << " in the Stan language; use integrate_ode_rk45() [non-stiff]"
+                 << " or integrate_ode_bdf() [stiff] instead."
                  << std::endl;
     }
-    boost::phoenix::function<deprecate_integrate_ode>
-    deprecate_integrate_ode_f;
+    boost::phoenix::function<deprecated_integrate_ode>
+    deprecated_integrate_ode_f;
 
-
-    void validate_integrate_ode::operator()(const integrate_ode& ode_fun,
-                                            const variable_map& var_map,
-                                            bool& pass,
-                                            std::ostream& error_msgs) const {
+    template <class T>
+    void validate_integrate_ode_non_control_args(const T& ode_fun,
+                                                 const variable_map& var_map,
+                                                 bool& pass,
+                                                 std::ostream& error_msgs) {
       pass = true;
-
       // test function argument type
       expr_type sys_result_type(DOUBLE_T, 1);
       std::vector<expr_type> sys_arg_types;
@@ -1096,7 +1095,8 @@ namespace stan {
       function_signature_t system_signature(sys_result_type, sys_arg_types);
       if (!function_signatures::instance()
           .is_defined(ode_fun.system_function_name_, system_signature)) {
-        error_msgs << "first argument to integrate_ode"
+        error_msgs << "first argument to " 
+                   << ode_fun.integration_function_name_
                    << " must be a function with signature"
                    << " (real, real[], real[], real[], int[]) : real[] ";
         pass = false;
@@ -1104,50 +1104,51 @@ namespace stan {
 
       // test regular argument types
       if (ode_fun.y0_.expression_type() != expr_type(DOUBLE_T, 1)) {
-        error_msgs << "second argument to integrate_ode must be type real[]"
-                   << " for intial system state"
-                   << "; found type="
+        error_msgs << "second argument to "
+                   << ode_fun.integration_function_name_
+                   << " must have type real[] for intial system state;"
+                   << " found type="
                    << ode_fun.y0_.expression_type()
                    << ". ";
         pass = false;
       }
       if (!ode_fun.t0_.expression_type().is_primitive()) {
-        error_msgs << "third argument to integrate_ode"
-                   << " must be type real or int"
-                   << " for initial time"
-                   << "; found type="
+        error_msgs << "third argument to "
+                   << ode_fun.integration_function_name_
+                   << " must have type real or int for initial time; found type="
                    << ode_fun.t0_.expression_type()
                    << ". ";
         pass = false;
       }
       if (ode_fun.ts_.expression_type() != expr_type(DOUBLE_T, 1)) {
-        error_msgs << "fourth argument to integrate_ode must be type real[]"
-                   << " for requested solution times"
-                   << "; found type="
+        error_msgs << "fourth argument to "
+                   << ode_fun.integration_function_name_
+                   << " must have type real[]"
+                   << " for requested solution times; found type="
                    << ode_fun.ts_.expression_type()
                    << ". ";
         pass = false;
       }
       if (ode_fun.theta_.expression_type() != expr_type(DOUBLE_T, 1)) {
-        error_msgs << "fifth argument to integrate_ode must be type real[]"
-                   << " for parameters"
-                   << "; found type="
+        error_msgs << "fifth argument to "
+                   << ode_fun.integration_function_name_
+                   << " must have type real[] for parameters; found type="
                    << ode_fun.theta_.expression_type()
                    << ". ";
         pass = false;
       }
       if (ode_fun.x_.expression_type() != expr_type(DOUBLE_T, 1)) {
-        error_msgs << "sixth argument to integrate_ode must be type real[]"
-                   << " for real data;"
-                   << " found type="
+        error_msgs << "sixth argument to "
+                   << ode_fun.integration_function_name_
+                   << " must have type real[] for real data; found type="
                    << ode_fun.x_.expression_type()
                    << ". ";
         pass = false;
       }
       if (ode_fun.x_int_.expression_type() != expr_type(INT_T, 1)) {
-        error_msgs << "seventh argument to integrate_ode must be type int[]"
-                   << " for integer data;"
-                   << " found type="
+        error_msgs << "seventh argument to "
+                   << ode_fun.integration_function_name_
+                   << " must have type int[] for integer data; found type="
                    << ode_fun.x_int_.expression_type()
                    << ". ";
         pass = false;
@@ -1155,159 +1156,96 @@ namespace stan {
 
       // test data-only variables do not have parameters (int locals OK)
       if (has_var(ode_fun.t0_, var_map)) {
-        error_msgs << "third argument to integrate_ode (initial times)"
+        error_msgs << "third argument to "
+                   << ode_fun.integration_function_name_
+                   << " (initial times)"
                    << " must be data only and not reference parameters";
         pass = false;
       }
       if (has_var(ode_fun.ts_, var_map)) {
-        error_msgs << "fourth argument to integrate_ode (solution times)"
+        error_msgs << "fourth argument to "
+                   << ode_fun.integration_function_name_
+                   << " (solution times)"
                    << " must be data only and not reference parameters";
         pass = false;
       }
       if (has_var(ode_fun.x_, var_map)) {
-        error_msgs << "fifth argument to integrate_ode (real data)"
+        error_msgs << "fifth argument to "
+                   << ode_fun.integration_function_name_
+                   << " (real data)"
                    << " must be data only and not reference parameters";
         pass = false;
       }
     }
+
+    void validate_integrate_ode::operator()(const integrate_ode& ode_fun,
+                                            const variable_map& var_map,
+                                            bool& pass,
+                                            std::ostream& error_msgs) const {
+      validate_integrate_ode_non_control_args(ode_fun, var_map, pass,
+                                              error_msgs);
+    }
     boost::phoenix::function<validate_integrate_ode> validate_integrate_ode_f;
 
-    void validate_integrate_ode_cvode::operator()(
-                      const integrate_ode_cvode& ode_fun,
+    void validate_integrate_ode_control::operator()(
+                      const integrate_ode_control& ode_fun,
                       const variable_map& var_map, bool& pass,
                       std::ostream& error_msgs) const {
-      pass = true;
-
-      // test function argument type
-      expr_type sys_result_type(DOUBLE_T, 1);
-      std::vector<expr_type> sys_arg_types;
-      sys_arg_types.push_back(expr_type(DOUBLE_T, 0));
-      sys_arg_types.push_back(expr_type(DOUBLE_T, 1));
-      sys_arg_types.push_back(expr_type(DOUBLE_T, 1));
-      sys_arg_types.push_back(expr_type(DOUBLE_T, 1));
-      sys_arg_types.push_back(expr_type(INT_T, 1));
-      function_signature_t system_signature(sys_result_type, sys_arg_types);
-      if (!function_signatures::instance()
-          .is_defined(ode_fun.system_function_name_, system_signature)) {
-        error_msgs << "first argument to integrate_ode_cvode"
-                   << " must be a function with signature"
-                   << " (real, real[], real[], real[], int[]) : real[] ";
-        pass = false;
-      }
-
-      // test regular argument types
-      if (ode_fun.y0_.expression_type() != expr_type(DOUBLE_T, 1)) {
-        error_msgs << "second argument to integrate_ode_cvode must be"
-                   << " type real[] for intial system state"
-                   << "; found type="
-                   << ode_fun.y0_.expression_type()
-                   << ". ";
-        pass = false;
-      }
-      if (!ode_fun.t0_.expression_type().is_primitive()) {
-        error_msgs << "third argument to integrate_ode_cvode"
-                   << " must be type real or int"
-                   << " for initial time"
-                   << "; found type="
-                   << ode_fun.t0_.expression_type()
-                   << ". ";
-        pass = false;
-      }
-      if (ode_fun.ts_.expression_type() != expr_type(DOUBLE_T, 1)) {
-        error_msgs << "fourth argument to integrate_ode_cvode must be"
-                   << " type real[] for requested solution times"
-                   << "; found type="
-                   << ode_fun.ts_.expression_type()
-                   << ". ";
-        pass = false;
-      }
-      if (ode_fun.theta_.expression_type() != expr_type(DOUBLE_T, 1)) {
-        error_msgs << "fifth argument to integrate_ode_cvode must be"
-                   << " type real[] for parameters"
-                   << "; found type="
-                   << ode_fun.theta_.expression_type()
-                   << ". ";
-        pass = false;
-      }
-      if (ode_fun.x_.expression_type() != expr_type(DOUBLE_T, 1)) {
-        error_msgs << "sixth argument to integrate_ode_cvode must be"
-                   << " type real[] for real data;"
-                   << " found type="
-                   << ode_fun.x_.expression_type()
-                   << ". ";
-        pass = false;
-      }
-      if (ode_fun.x_int_.expression_type() != expr_type(INT_T, 1)) {
-        error_msgs << "seventh argument to integrate_ode_cvode must be"
-                   << " type int[] for integer data;"
-                   << " found type="
-                   << ode_fun.x_int_.expression_type()
-                   << ". ";
-        pass = false;
-      }
+      validate_integrate_ode_non_control_args(ode_fun, var_map, pass,
+                                              error_msgs);
       if (!ode_fun.rel_tol_.expression_type().is_primitive()) {
-        error_msgs << "eight argument to integrate_ode_cvode"
-                   << " must be type real or int"
-                   << " for relative tolerance"
-                   << "; found type="
+        error_msgs << "eight argument to "
+                   << ode_fun.integration_function_name_
+                   << " (relative tolerance) must have type real or int;"
+                   << " found type="
                    << ode_fun.rel_tol_.expression_type()
                    << ". ";
         pass = false;
       }
       if (!ode_fun.abs_tol_.expression_type().is_primitive()) {
-        error_msgs << "ninth argument to integrate_ode_cvode"
-                   << " must be type real or int"
-                   << " for absolute tolerance"
-                   << "; found type="
+        error_msgs << "ninth argument to "
+                   << ode_fun.integration_function_name_
+                   << " (absolute tolerance) must have type real or int;"
+                   << " found type="
                    << ode_fun.abs_tol_.expression_type()
                    << ". ";
         pass = false;
       }
       if (!ode_fun.max_num_steps_.expression_type().is_primitive()) {
-        error_msgs << "tenth argument to integrate_ode_cvode"
-                   << " must be type real or int"
-                   << " for maximum number of steps"
-                   << "; found type="
+        error_msgs << "tenth argument to "
+                   << ode_fun.integration_function_name_
+                   << " (max steps) must have type real or int;"
+                   << " found type="
                    << ode_fun.max_num_steps_.expression_type()
                    << ". ";
         pass = false;
       }
 
       // test data-only variables do not have parameters (int locals OK)
-      if (has_var(ode_fun.t0_, var_map)) {
-        error_msgs << "third argument to integrate_ode_cvode (initial times)"
-                   << " must be data only and not reference parameters";
-        pass = false;
-      }
-      if (has_var(ode_fun.ts_, var_map)) {
-        error_msgs << "fourth argument to integrate_ode_cvode"
-                   << " (solution times) must be data only and not"
-                   << " reference parameters";
-        pass = false;
-      }
-      if (has_var(ode_fun.x_, var_map)) {
-        error_msgs << "fifth argument to integrate_ode_cvode (real data)"
-                   << " must be data only and not reference parameters";
-        pass = false;
-      }
       if (has_var(ode_fun.rel_tol_, var_map)) {
-        error_msgs << "eight argument to integrate_ode_cvode (real data)"
-                   << " must be data only and not reference parameters";
+        error_msgs << "eight argument to "
+                   << ode_fun.integration_function_name_
+                   << " (real data) must be data only"
+                   << " and not depend on parameters";
         pass = false;
       }
       if (has_var(ode_fun.abs_tol_, var_map)) {
-        error_msgs << "ninth argument to integrate_ode_cvode (real data)"
-                   << " must be data only and not reference parameters";
+        error_msgs << "ninth argument to "
+                   << ode_fun.integration_function_name_
+                   << " (real data) must be data only"
+                   << " and not depend parameters";
         pass = false;
       }
       if (has_var(ode_fun.max_num_steps_, var_map)) {
-        error_msgs << "tenth argument to integrate_ode_cvode (real data)"
-                   << " must be data only and not reference parameters";
+        error_msgs << "tenth argument to "
+                   << ode_fun.integration_function_name_
+                   << " (real data) must be data only"
+                   << " and not depend on parameters";
         pass = false;
       }
     }
-    boost::phoenix::function<validate_integrate_ode_cvode>
-    validate_integrate_ode_cvode_f;
+    boost::phoenix::function<validate_integrate_ode_control>
+    validate_integrate_ode_control_f;
 
     void set_fun_type_named::operator()(expression& fun_result, fun& fun,
                                         const var_origin& var_origin,
@@ -1853,7 +1791,7 @@ namespace stan {
       return boost::apply_visitor(*this, x.y0_.expr_)
         && boost::apply_visitor(*this, x.theta_.expr_);
     }
-    bool data_only_expression::operator()(const integrate_ode_cvode& x) const {
+    bool data_only_expression::operator()(const integrate_ode_control& x) const {
       return boost::apply_visitor(*this, x.y0_.expr_)
         && boost::apply_visitor(*this, x.theta_.expr_);
     }

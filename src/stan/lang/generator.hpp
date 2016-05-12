@@ -255,7 +255,8 @@ namespace stan {
         o_ << ")";
       }
       void operator()(const integrate_ode& fx) const {
-        o_ << "integrate_ode_rk45("
+        o_ << fx.integration_function_name_
+           << '('
            << fx.system_function_name_
            << "_functor__(), ";
 
@@ -277,8 +278,9 @@ namespace stan {
         generate_expression(fx.x_int_, o_);
         o_ << ", pstream__)";
       }
-      void operator()(const integrate_ode_cvode& fx) const {
-        o_ << "integrate_ode_cvode("
+      void operator()(const integrate_ode_control& fx) const {
+        o_ << fx.integration_function_name_
+           << '('
            << fx.system_function_name_
            << "_functor__(), ";
 

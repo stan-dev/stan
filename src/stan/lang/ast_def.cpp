@@ -660,7 +660,7 @@ namespace stan {
       return expr_type(DOUBLE_T, 2);
     }
     expr_type
-    expression_type_vis::operator()(const integrate_ode_cvode& e) const {
+    expression_type_vis::operator()(const integrate_ode_control& e) const {
       return expr_type(DOUBLE_T, 2);
     }
     expr_type expression_type_vis::operator()(const fun& e) const {
@@ -699,7 +699,7 @@ namespace stan {
     expression::expression(const array_literal& expr) : expr_(expr) { }
     expression::expression(const variable& expr) : expr_(expr) { }
     expression::expression(const integrate_ode& expr) : expr_(expr) { }
-    expression::expression(const integrate_ode_cvode& expr) : expr_(expr) { }
+    expression::expression(const integrate_ode_control& expr) : expr_(expr) { }
     expression::expression(const fun& expr) : expr_(expr) { }
     expression::expression(const index_op& expr) : expr_(expr) { }
     expression::expression(const index_op_sliced& expr) : expr_(expr) { }
@@ -762,7 +762,7 @@ namespace stan {
       return boost::apply_visitor(*this, e.y0_.expr_)
         || boost::apply_visitor(*this, e.theta_.expr_);
     }
-    bool contains_var::operator()(const integrate_ode_cvode& e) const {
+    bool contains_var::operator()(const integrate_ode_control& e) const {
       // only init state and params may contain vars
       return boost::apply_visitor(*this, e.y0_.expr_)
         || boost::apply_visitor(*this, e.theta_.expr_);
@@ -845,7 +845,8 @@ namespace stan {
       return boost::apply_visitor(*this, e.y0_.expr_)
         || boost::apply_visitor(*this, e.theta_.expr_);
     }
-    bool contains_nonparam_var::operator()(const integrate_ode_cvode& e) const {
+    bool contains_nonparam_var::operator()(const integrate_ode_control& e)
+      const {
       // if any vars, return true because integration will be nonlinear
       return boost::apply_visitor(*this, e.y0_.expr_)
         || boost::apply_visitor(*this, e.theta_.expr_);
@@ -908,7 +909,7 @@ namespace stan {
     bool is_nil_op::operator()(const integrate_ode& /* x */) const {
       return false;
     }
-    bool is_nil_op::operator()(const integrate_ode_cvode& /* x */) const {
+    bool is_nil_op::operator()(const integrate_ode_control& /* x */) const {
       return false;
     }
     bool is_nil_op::operator()(const fun& /* x */) const { return false; }
@@ -986,14 +987,16 @@ namespace stan {
     }
 
     integrate_ode::integrate_ode() { }
-    integrate_ode::integrate_ode(const std::string& system_function_name,
-                         const expression& y0,
-                         const expression& t0,
-                         const expression& ts,
-                         const expression& theta,
-                         const expression& x,
-                         const expression& x_int)
-      : system_function_name_(system_function_name),
+    integrate_ode::integrate_ode(const std::string& integration_function_name,
+                                 const std::string& system_function_name,
+                                 const expression& y0,
+                                 const expression& t0,
+                                 const expression& ts,
+                                 const expression& theta,
+                                 const expression& x,
+                                 const expression& x_int)
+      : integration_function_name_(integration_function_name),
+        system_function_name_(system_function_name),
         y0_(y0),
         t0_(t0),
         ts_(ts),
@@ -1002,19 +1005,21 @@ namespace stan {
         x_int_(x_int) {
     }
 
-    integrate_ode_cvode::integrate_ode_cvode() { }
-    integrate_ode_cvode::integrate_ode_cvode(
-                                       const std::string& system_function_name,
-                                       const expression& y0,
-                                       const expression& t0,
-                                       const expression& ts,
-                                       const expression& theta,
-                                       const expression& x,
-                                       const expression& x_int,
-                                       const expression& rel_tol,
-                                       const expression& abs_tol,
-                                       const expression& max_num_steps)
-      : system_function_name_(system_function_name),
+    integrate_ode_control::integrate_ode_control() { }
+    integrate_ode_control::integrate_ode_control(
+                                   const std::string& integration_function_name,
+                                   const std::string& system_function_name,
+                                   const expression& y0,
+                                   const expression& t0,
+                                   const expression& ts,
+                                   const expression& theta,
+                                   const expression& x,
+                                   const expression& x_int,
+                                   const expression& rel_tol,
+                                   const expression& abs_tol,
+                                   const expression& max_num_steps)
+      : integration_function_name_(integration_function_name),
+        system_function_name_(system_function_name),
         y0_(y0),
         t0_(t0),
         ts_(ts),
@@ -1717,8 +1722,8 @@ namespace stan {
     bool var_occurs_vis::operator()(const integrate_ode& e) const {
       return false;  // no refs persist out of integrate_ode() call
     }
-    bool var_occurs_vis::operator()(const integrate_ode_cvode& e) const {
-      return false;  // no refs persist out of integrate_ode_cvode() call
+    bool var_occurs_vis::operator()(const integrate_ode_control& e) const {
+      return false;  // no refs persist out of integrate_ode_control() call
     }
     bool var_occurs_vis::operator()(const index_op& e) const {
       // refs only persist out of expression, not indexes
