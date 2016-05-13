@@ -525,6 +525,16 @@ namespace stan {
     validate_integrate_ode_cvode_f;
 
     // called from: term_grammar
+    struct validate_integrate_function
+      : public phoenix_functor_quaternary<void> {
+      void operator()(const integrate_function& int_fun,
+                      const variable_map& var_map, bool& pass,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<validate_integrate_function>
+    validate_integrate_function_f;
+
+    // called from: term_grammar
     struct set_fun_type_named : public phoenix_functor_quinary<void> {
       void operator()(expression& fun_result, fun& fun,
                       const var_origin& var_origin, bool& pass,
@@ -658,6 +668,7 @@ namespace stan {
       bool operator()(const variable& x) const;
       bool operator()(const integrate_ode& x) const;
       bool operator()(const integrate_ode_cvode& x) const;
+      bool operator()(const integrate_function& x) const;
       bool operator()(const fun& x) const;
       bool operator()(const index_op& x) const;
       bool operator()(const index_op_sliced& x) const;

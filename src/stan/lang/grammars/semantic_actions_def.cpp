@@ -46,6 +46,8 @@ namespace stan {
     template void assign_lhs::operator()(expression&,
                                          const integrate_ode_cvode&)
       const;
+    template void assign_lhs::operator()(expression&, const integrate_function&)
+      const;
     template void assign_lhs::operator()(int&, const int&) const;
     template void assign_lhs::operator()(size_t&, const size_t&) const;
     template void assign_lhs::operator()(statement&, const statement&) const;
@@ -1299,6 +1301,16 @@ namespace stan {
     boost::phoenix::function<validate_integrate_ode_cvode>
     validate_integrate_ode_cvode_f;
 
+    void validate_integrate_function::operator()(
+                      const integrate_function& int_fun,
+                      const variable_map& var_map, bool& pass,
+                      std::ostream& error_msgs) const {
+      pass = true;
+      //FIXME: validation args
+    }
+    boost::phoenix::function<validate_integrate_function>
+    validate_integrate_function_f;
+
     void set_fun_type_named::operator()(expression& fun_result, fun& fun,
                                         const var_origin& var_origin,
                                         bool& pass,
@@ -1846,6 +1858,10 @@ namespace stan {
     bool data_only_expression::operator()(const integrate_ode_cvode& x) const {
       return boost::apply_visitor(*this, x.y0_.expr_)
         && boost::apply_visitor(*this, x.theta_.expr_);
+    }
+    bool data_only_expression::operator()(const integrate_function& x) const {
+      return boost::apply_visitor(*this, x.a_.expr_)
+        && boost::apply_visitor(*this, x.b_.expr_);
     }
     bool data_only_expression::operator()(const fun& x) const {
       for (size_t i = 0; i < x.args_.size(); ++i)

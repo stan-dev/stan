@@ -367,7 +367,7 @@ namespace stan {
       std::string system_function_name_;
       expression a_;  // lower limit
       expression b_;  // upper limit
-      expression param_;  // solution times
+      expression param_;  // additional parameter
       integrate_function();
       integrate_function(const std::string& system_function_name,
                 const expression& a,

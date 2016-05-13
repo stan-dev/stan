@@ -216,7 +216,7 @@ namespace stan {
       factor_r =
         integrate_ode_r(_r1)[assign_lhs_f(_val, _1)]
         | integrate_ode_cvode_r(_r1)[assign_lhs_f(_val, _1)]
-        | integrate_function_cvode_r(_r1)[assign_lhs_f(_val, _1)]
+        | integrate_function_r(_r1)[assign_lhs_f(_val, _1)]
         | (fun_r(_r1)[assign_lhs_f(_b, _1)]
            > eps[set_fun_type_named_f(_val, _b, _r1, _pass,
                                       boost::phoenix::ref(error_msgs_))])
