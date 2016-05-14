@@ -1071,9 +1071,9 @@ namespace stan {
     void deprecated_integrate_ode::operator()(std::ostream& error_msgs)
       const {
       error_msgs << "Warning: the integrate_ode() function is deprecated"
-                 << " in the Stan language; use integrate_ode_rk45() [non-stiff]"
-                 << " or integrate_ode_bdf() [stiff] instead."
-                 << std::endl;
+             << " in the Stan language; use integrate_ode_rk45() [non-stiff]"
+             << " or integrate_ode_bdf() [stiff] instead."
+             << std::endl;
     }
     boost::phoenix::function<deprecated_integrate_ode>
     deprecated_integrate_ode_f;
@@ -1095,7 +1095,7 @@ namespace stan {
       function_signature_t system_signature(sys_result_type, sys_arg_types);
       if (!function_signatures::instance()
           .is_defined(ode_fun.system_function_name_, system_signature)) {
-        error_msgs << "first argument to " 
+        error_msgs << "first argument to "
                    << ode_fun.integration_function_name_
                    << " must be a function with signature"
                    << " (real, real[], real[], real[], int[]) : real[] ";
@@ -1114,10 +1114,10 @@ namespace stan {
       }
       if (!ode_fun.t0_.expression_type().is_primitive()) {
         error_msgs << "third argument to "
-                   << ode_fun.integration_function_name_
-                   << " must have type real or int for initial time; found type="
-                   << ode_fun.t0_.expression_type()
-                   << ". ";
+               << ode_fun.integration_function_name_
+               << " must have type real or int for initial time; found type="
+               << ode_fun.t0_.expression_type()
+               << ". ";
         pass = false;
       }
       if (ode_fun.ts_.expression_type() != expr_type(DOUBLE_T, 1)) {
@@ -1791,7 +1791,8 @@ namespace stan {
       return boost::apply_visitor(*this, x.y0_.expr_)
         && boost::apply_visitor(*this, x.theta_.expr_);
     }
-    bool data_only_expression::operator()(const integrate_ode_control& x) const {
+    bool data_only_expression::operator()(const integrate_ode_control& x)
+      const {
       return boost::apply_visitor(*this, x.y0_.expr_)
         && boost::apply_visitor(*this, x.theta_.expr_);
     }

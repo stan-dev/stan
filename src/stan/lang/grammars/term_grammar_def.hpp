@@ -143,6 +143,35 @@ namespace stan {
                > eps[transpose_f(_val, _pass,
                                  boost::phoenix::ref(error_msgs_))]) );
 
+      integrate_ode_control_r.name("expression");
+      integrate_ode_control_r
+        %= ( (string("integrate_ode_rk45") >> no_skip[!char_("a-zA-Z0-9_")])
+             | (string("integrate_ode_bdf") >> no_skip[!char_("a-zA-Z0-9_")]) )
+        >> lit('(')              // >> allows backtracking to non-control
+        >> identifier_r          // system function name (function only)
+        >> lit(',')
+        >> expression_g(_r1)     // y0
+        >> lit(',')
+        >> expression_g(_r1)     // t0 (data only)
+        >> lit(',')
+        >> expression_g(_r1)     // ts (data only)
+        >> lit(',')
+        >> expression_g(_r1)     // theta
+        >> lit(',')
+        >> expression_g(_r1)     // x (data only)
+        >> lit(',')
+        >> expression_g(_r1)     // x_int (data only)
+        >> lit(',')
+        >> expression_g(_r1)     // relative tolerance (data only)
+        >> lit(',')
+        >> expression_g(_r1)     // absolute tolerance (data only)
+        >> lit(',')
+        >> expression_g(_r1)     // maximum number of steps (data only)
+        > lit(')')
+          [validate_integrate_ode_control_f(_val, boost::phoenix::ref(var_map_),
+                                            _pass,
+                                            boost::phoenix::ref(error_msgs_))];
+
       integrate_ode_r.name("expression");
       integrate_ode_r
         %= ( (string("integrate_ode_rk45") >> no_skip[!char_("a-zA-Z0-9_")])
@@ -167,39 +196,10 @@ namespace stan {
           [validate_integrate_ode_f(_val, boost::phoenix::ref(var_map_),
                                     _pass, boost::phoenix::ref(error_msgs_))];
 
-      integrate_ode_control_r.name("expression");
-      integrate_ode_control_r
-        %= ( (string("integrate_ode_rk45") >> no_skip[!char_("a-zA-Z0-9_")])
-             | (string("integrate_ode_bdf") >> no_skip[!char_("a-zA-Z0-9_")]) )
-        > lit('(')
-        > identifier_r          // system function name (function only)
-        > lit(',')
-        > expression_g(_r1)     // y0
-        > lit(',')
-        > expression_g(_r1)     // t0 (data only)
-        > lit(',')
-        > expression_g(_r1)     // ts (data only)
-        > lit(',')
-        > expression_g(_r1)     // theta
-        > lit(',')
-        > expression_g(_r1)     // x (data only)
-        > lit(',')
-        > expression_g(_r1)     // x_int (data only)
-        > lit(',')
-        > expression_g(_r1)     // relative tolerance (data only)
-        > lit(',')
-        > expression_g(_r1)     // absolute tolerance (data only)
-        > lit(',')
-        > expression_g(_r1)     // maximum number of steps (data only)
-        > lit(')')
-          [validate_integrate_ode_control_f(_val, boost::phoenix::ref(var_map_),
-                                            _pass,
-                                            boost::phoenix::ref(error_msgs_))];
-
       factor_r.name("expression");
       factor_r =
-        integrate_ode_r(_r1)[assign_lhs_f(_val, _1)]
-        | integrate_ode_control_r(_r1)[assign_lhs_f(_val, _1)]
+        integrate_ode_control_r(_r1)[assign_lhs_f(_val, _1)]
+        | integrate_ode_r(_r1)[assign_lhs_f(_val, _1)]
         | (fun_r(_r1)[assign_lhs_f(_b, _1)]
            > eps[set_fun_type_named_f(_val, _b, _r1, _pass,
                                       boost::phoenix::ref(error_msgs_))])

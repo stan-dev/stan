@@ -12,28 +12,24 @@ functions {
 }
 data {
   real y0[2];
-  real t0;
-  real ts[10];
   real x[1];   
   int x_int[0];
-  real y[10,2];
+  real t0;
 }
 parameters {
   real theta[1];
+  real ts[10];
   real<lower=0> sigma;
 }
 transformed parameters {
   real y_hat[10,2];
-  y_hat <- integrate_ode_cvode(harm_osc_ode,  // system
+  y_hat <- integrate_ode_rk45(harm_osc_ode,  // system
                      y0,            // initial state
                      t0,            // initial time
                      ts,            // solution times
                      theta,         // parameters
                      x,             // data
-                     x_int,         // integer data
-                     1e-10,         // relative tolerance
-                     1e-10,         // absolute tolerance
-                     1e6);          // maximum number of steps
+                     x_int, 0.01, 0.01, 10);        // integer data
   
 }
 model {
