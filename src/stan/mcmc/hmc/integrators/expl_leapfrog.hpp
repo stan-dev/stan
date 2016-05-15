@@ -13,23 +13,28 @@ namespace stan {
       expl_leapfrog()
         : base_leapfrog<Hamiltonian>() {}
 
-      void begin_update_p(typename Hamiltonian::PointType& z,
-                          Hamiltonian& hamiltonian,
-                          double epsilon) {
-        z.p -= epsilon * hamiltonian.dphi_dq(z);
+      void begin_update_p(
+        typename Hamiltonian::PointType& z,
+        Hamiltonian& hamiltonian, double epsilon,
+        interface_callbacks::writer::base_writer& info_writer,
+        interface_callbacks::writer::base_writer& error_writer) {
+        z.p -= epsilon * hamiltonian.dphi_dq(z, info_writer, error_writer);
       }
 
       void update_q(typename Hamiltonian::PointType& z,
-                    Hamiltonian& hamiltonian,
-                    double epsilon) {
-        Eigen::Map<Eigen::VectorXd> q(&(z.q[0]), z.q.size());
-        q += epsilon * hamiltonian.dtau_dp(z);
+                    Hamiltonian& hamiltonian, double epsilon,
+                    interface_callbacks::writer::base_writer& info_writer,
+                    interface_callbacks::writer::base_writer& error_writer) {
+        z.q += epsilon * hamiltonian.dtau_dp(z);
+        hamiltonian.update_potential_gradient(z, info_writer, error_writer);
       }
 
-      void end_update_p(typename Hamiltonian::PointType& z,
-                        Hamiltonian& hamiltonian,
-                        double epsilon) {
-        z.p -= epsilon * hamiltonian.dphi_dq(z);
+      void end_update_p(
+        typename Hamiltonian::PointType& z,
+        Hamiltonian& hamiltonian, double epsilon,
+        interface_callbacks::writer::base_writer& info_writer,
+        interface_callbacks::writer::base_writer& error_writer) {
+        z.p -= epsilon * hamiltonian.dphi_dq(z, info_writer, error_writer);
       }
     };
 
