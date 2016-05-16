@@ -674,9 +674,6 @@ namespace stan {
       return e.type_;
     }
     expr_type expression_type_vis::operator()(const conditional_op& e) const {
-      std::cout << "expression_type_vis conditional_op, e.type: "
-                << e.type_
-                << std::endl;
       return e.type_;
     }
     expr_type expression_type_vis::operator()(const binary_op& e) const {
@@ -778,7 +775,6 @@ namespace stan {
       return boost::apply_visitor(*this, e.expr_.expr_);
     }
     bool contains_var::operator()(const conditional_op& e) const {
-      std::cout << "contains_var conditional_op" << std::endl;
       return boost::apply_visitor(*this, e.cond_.expr_)
         || boost::apply_visitor(*this, e.true_val_.expr_)
         || boost::apply_visitor(*this, e.false_val_.expr_);
@@ -881,8 +877,11 @@ namespace stan {
     }
 
     bool contains_nonparam_var::operator()(const conditional_op& e) const {
-      std::cout << "contains_nonparam_var conditional_op" << std::endl;
-      return true;
+      if (has_non_param_var(e.cond_, var_map_)
+          || has_non_param_var(e.true_val_, var_map_)
+          || has_non_param_var(e.false_val_, var_map_))
+        return true;
+      return false;
     }
 
     bool contains_nonparam_var::operator()(const binary_op& e) const {
@@ -1104,6 +1103,15 @@ namespace stan {
     }
 
     conditional_op::conditional_op() { }
+    conditional_op::conditional_op(const expression& cond,
+                         const expression& true_val,
+                         const expression& false_val)
+      : cond_(cond),
+        true_val_(true_val),
+        false_val_(false_val),
+        type_(promote_primitive(true_val.expression_type(),
+                                  false_val.expression_type())) {
+    }
     
     binary_op::binary_op() { }
     binary_op::binary_op(const expression& left,

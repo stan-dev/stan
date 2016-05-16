@@ -422,6 +422,9 @@ namespace stan {
       expression false_val_;  
       expr_type type_;
       conditional_op();
+      conditional_op(const expression& cond,
+                     const expression& true_val,
+                     const expression& false_val);
     };
       
     

@@ -13,6 +13,7 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::conditional_op,
                           (stan::lang::expression, true_val_)
                           (stan::lang::expression, false_val_) )
 
+
 namespace stan {
 
   namespace lang {
@@ -34,6 +35,7 @@ namespace stan {
       expression_r
         %= conditional_op_r(_r1)
         | expression15_r(_r1);
+
 
       expression_r.name("conditional op expression, cond ? t_val : f_val ");
       conditional_op_r
@@ -92,7 +94,6 @@ namespace stan {
                  [binary_op_f(_val, _1, ">=", "logical_gt",
                               boost::phoenix::ref(error_msgs))]));
     }
-
   }
 }
 #endif
