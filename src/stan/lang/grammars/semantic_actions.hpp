@@ -451,6 +451,12 @@ namespace stan {
     extern boost::phoenix::function<validate_int_expr_warn>
     validate_int_expr_warn_f;
 
+    // called from: statement_grammar
+    struct deprecate_increment_log_prob : public phoenix_functor_unary<void> {
+      void operator()(std::stringstream& error_msgs) const;
+    };
+    extern boost::phoenix::function<deprecate_increment_log_prob>
+    deprecate_increment_log_prob_f;
 
     // called from: statement_grammar
     struct validate_allow_sample : public phoenix_functor_ternary {

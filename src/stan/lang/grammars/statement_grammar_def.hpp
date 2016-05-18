@@ -106,6 +106,7 @@ namespace stan {
         %= no_op_statement_r                        // key ";"
         | statement_seq_r(_r1, _r2, _r3)            // key "{"
         | increment_log_prob_statement_r(_r1, _r2)  // key "increment_log_prob"
+        | increment_target_statement_r(_r1, _r2)    // key "target"
         | for_statement_r(_r1, _r2, _r3)            // key "for"
         | while_statement_r(_r1, _r2, _r3)          // key "while"
         | statement_2_g(_r1, _r2, _r3)              // key "if"
@@ -136,13 +137,25 @@ namespace stan {
       increment_log_prob_statement_r.name("increment log prob statement");
       increment_log_prob_statement_r
         %= (lit("increment_log_prob") >> no_skip[!char_("a-zA-Z0-9_")])
-        > eps[ validate_allow_sample_f(_r1, _pass,
-                                       boost::phoenix::ref(error_msgs_)) ]
+        > eps[deprecate_increment_log_prob_f(boost::phoenix::ref(error_msgs_))]
+        > eps[validate_allow_sample_f(_r1, _pass,
+                                      boost::phoenix::ref(error_msgs_))]
         > lit('(')
         > expression_g(_r2)
           [validate_non_void_expression_f(_1, _pass,
                                           boost::phoenix::ref(error_msgs_))]
         > lit(')')
+        > lit(';');
+
+      // just variant syntax for increment_log_prob_r (see above)
+      increment_target_statement_r.name("increment target statement");
+      increment_target_statement_r
+        %= (lit("target") >> lit("+="))
+        > eps[validate_allow_sample_f(_r1, _pass,
+                                      boost::phoenix::ref(error_msgs_))]
+        > expression_g(_r2)
+          [validate_non_void_expression_f(_1, _pass,
+                                          boost::phoenix::ref(error_msgs_))]
         > lit(';');
 
       // _r1, _r2, _r3 same as statement_r

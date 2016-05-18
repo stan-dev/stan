@@ -12,7 +12,8 @@ typedef stan::mcmc::adapt_unit_e_nuts<Model, rng_t> sampler;
 class UiCommand : public testing::Test {
 public:
   UiCommand()
-    : writer(output) {}
+    : writer(output),
+      error_writer(error) {}
   
   void SetUp() {
     std::fstream empty_data_stream(std::string("").c_str());
@@ -55,12 +56,13 @@ public:
 
   std::stringstream model_output, output, error;
   stan::interface_callbacks::writer::stream_writer writer;
+  stan::interface_callbacks::writer::stream_writer error_writer;
 };
 
 TEST_F(UiCommand, init_adapt_z_0) {
   EXPECT_TRUE(stan::services::sample::init_adapt(sampler_ptr,
                                                  delta, gamma, kappa, t0,
-                                                 z_0, writer));
+                                                 z_0, writer, error_writer));
   EXPECT_FLOAT_EQ(0.125, sampler_ptr->get_nominal_stepsize());
 
   for (size_t n = 0; n < model->num_params_r(); n++) {
@@ -76,7 +78,7 @@ TEST_F(UiCommand, init_adapt_z_0) {
 TEST_F(UiCommand, init_adapt_z_init) {
   EXPECT_TRUE(stan::services::sample::init_adapt(sampler_ptr,
                                                  delta, gamma, kappa, t0,
-                                                 z_init, writer));
+                                                 z_init, writer, error_writer));
   EXPECT_FLOAT_EQ(0.25, sampler_ptr->get_nominal_stepsize());
   for (size_t n = 0; n < model->num_params_r(); n++) {
     EXPECT_FLOAT_EQ(z_init[n], sampler_ptr->z().q[n]);

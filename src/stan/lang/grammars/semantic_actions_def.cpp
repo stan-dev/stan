@@ -523,7 +523,8 @@ namespace stan {
 
     void deprecate_old_assignment_op::operator()(std::ostream& error_msgs)
       const {
-      error_msgs << "Warning (non-fatal): assignment operator <- deprecated;"
+      error_msgs << "Warning (non-fatal): assignment operator <- deprecated"
+                 << " in the Stan language;"
                  << " use = instead."
                  << std::endl;
     }
@@ -1034,6 +1035,17 @@ namespace stan {
     }
     boost::phoenix::function<validate_int_expr_warn> validate_int_expr_warn_f;
 
+    void deprecate_increment_log_prob::operator()(
+                                    std::stringstream& error_msgs) const {
+      error_msgs << "Warning (non-fatal): increment_log_prob(...);"
+                 << " is deprecated and will be removed in the future."
+                 << std::endl
+                 << "  Use target += ...; instead."
+                 << std::endl;
+    }
+    boost::phoenix::function<deprecate_increment_log_prob>
+    deprecate_increment_log_prob_f;
+
     void validate_allow_sample::operator()(const bool& allow_sample,
                                            bool& pass,
                                            std::stringstream& error_msgs)
@@ -1314,6 +1326,16 @@ namespace stan {
                                         const var_origin& var_origin,
                                         bool& pass,
                                         std::ostream& error_msgs) const {
+      if (fun.name_ == "get_lp")
+        error_msgs << "Warning (non-fatal): get_lp() function deprecated."
+                   << std::endl
+                   << "  It will be removed in a future release."
+                   << std::endl
+                   << "  Use target() instead."
+                   << std::endl;
+      if (fun.name_ == "target")
+        fun.name_ = "get_lp";  // for code gen and context validation
+
       std::vector<expr_type> arg_types;
       for (size_t i = 0; i < fun.args_.size(); ++i)
         arg_types.push_back(fun.args_[i].expression_type());
@@ -1346,17 +1368,21 @@ namespace stan {
         }
       }
 
-      if (has_lp_suffix(fun.name_)) {
+      if (has_lp_suffix(fun.name_) || fun.name_ == "target") {
+        // modified function_argument_origin to add _lp because
+        // that's only viable context
         if (!(var_origin == transformed_parameter_origin
               || var_origin == function_argument_origin_lp
               || var_origin == void_function_argument_origin_lp
               || var_origin == local_origin)) {
-          error_msgs << "Functions suffixed with _lp only allowed in"
-                     << " transformed parameter block, model block"
+          error_msgs << "Function target() or functions suffixed with _lp only"
+                     << " allowed in transformed parameter block, model block"
                      << std::endl
                      << "or the body of a function with suffix _lp."
                      << std::endl
-                     << "Found function = " << fun.name_ << " in block = ";
+                     << "Found function = "
+                     << (fun.name_ == "get_lp" ? "target or get_lp" : fun.name_)
+                     << " in block = ";
           print_var_origin(error_msgs, var_origin);
           error_msgs << std::endl;
           pass = false;
@@ -1376,7 +1402,8 @@ namespace stan {
       if (fun.name_ == "abs"
           && fun.args_.size() > 0
           && fun.args_[0].expression_type().is_primitive_double()) {
-        error_msgs << "Warning: Function abs(real) is deprecated."
+        error_msgs << "Warning: Function abs(real) is deprecated"
+                   << " in the Stan language."
                    << std::endl
                    << "         It will be removed in a future release."
                    << std::endl
@@ -1664,14 +1691,14 @@ namespace stan {
       std::string name = var_expr.name_;
       if (name == std::string("lp__")) {
         error_msgs << std::endl
-                   << "WARNING:"
+                   << "ERROR (fatal):  Use of lp__ is no longer supported."
                    << std::endl
-                   << "  Direct use of variable lp__ is deprecated"
-                   << " and will be removed in a future release."
+                   << "  Use target += ... statement to increment log density."
                    << std::endl
-                   << "  Please use increment_log_prob(u)"
-                   << " in place of of lp__ <- lp__ + u."
+                   << "  Use target() function to get log density."
                    << std::endl;
+        pass = false;
+        return;
       } else if (name == std::string("params_r__")) {
         error_msgs << std::endl << "WARNING:" << std::endl
                    << "  Direct access to params_r__ yields an inconsistent"
@@ -1939,6 +1966,7 @@ namespace stan {
       reserve("cov_matrix");
       reserve("corr_matrix");
 
+      reserve("target");
 
       reserve("model");
       reserve("data");

@@ -449,6 +449,7 @@ add("hypergeometric_lpmf", DOUBLE_T, INT_T, INT_T, INT_T, INT_T);
 add("hypergeometric_rng", INT_T, INT_T, INT_T, INT_T);
 add_binary("hypot");
 add("if_else", DOUBLE_T, INT_T, DOUBLE_T, DOUBLE_T);
+add("inc_beta", DOUBLE_T, DOUBLE_T, DOUBLE_T, DOUBLE_T);
 add("int_step", INT_T, DOUBLE_T);
 add("int_step", INT_T, INT_T);
 add_unary("inv");
@@ -1060,6 +1061,7 @@ for (size_t i = 0; i < base_types.size(); ++i) {
 }
 add_unary("tan");
 add_unary("tanh");
+add_nullary("target");  // converted to "get_lp" in term_grammar semantics
 add("tcrossprod", MATRIX_T, MATRIX_T);
 add_unary("tgamma");
 add("to_array_1d", expr_type(DOUBLE_T, 1), MATRIX_T);

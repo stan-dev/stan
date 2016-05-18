@@ -31,6 +31,25 @@ TEST(langParserStatementGrammar, validateAllowSample) {
               "Sampling statements (~) and increment_log_prob() are");
 }
 
+TEST(langParserStatementGrammar, targetIncrement) {
+  test_parsable("increment-target");
+}
+
+TEST(langParserStatementGrammar, targetReserved) {
+  test_throws("target-reserved",
+              "variable identifier (name) may not be reserved word");
+  test_throws("target-reserved",
+              "found identifier=target");
+}
+
+TEST(langParserStatementGrammar, deprecateIncrementLogProb) {
+  test_warning("deprecate-increment-log-prob",
+               "Warning (non-fatal): increment_log_prob(...);"
+               " is deprecated and will be removed in the future.");
+  test_warning("deprecate-increment-log-prob",
+               "  Use target += ...; instead.");
+}
+
 TEST(langParserStatementGrammarDef, jacobianAdjustmentWarning) {
   test_parsable("validate_jacobian_warning_good");
   test_warning("validate_jacobian_warning1",
@@ -81,5 +100,30 @@ TEST(langParserStatementGrammar, useCdfWithSamplingNotation) {
               "Only distribution names can be used with sampling (~) notation");
   test_throws("binomial_coefficient_sample",
               "Only distribution names can be used with sampling (~) notation");
+}
+
+TEST(langParserStatementGrammar, targetFunGetLpDeprecated) {
+  test_warning("get-lp-deprecate", 
+               "Warning (non-fatal): get_lp() function deprecated.");
+  test_warning("get-lp-deprecate", 
+  "  It will be removed in a future release.");
+  test_warning("get-lp-deprecate", 
+               "  Use target() instead.");
+  test_throws("get-lp-target-data",
+              "Function target() or functions suffixed with _lp only"
+              " allowed in transformed parameter block");
+  test_throws("get-lp-target-data",
+              "Found function = target or get_lp"
+              " in block = transformed data");
+  test_parsable("get-lp-target");
+}
+
+TEST(langParserStatementGrammar, removeLpDoubleUnderscore) {
+  test_throws("lp-error",
+              "ERROR (fatal):  Use of lp__ is no longer supported.");
+  test_throws("lp-error",
+              "  Use target += ... statement to increment log density.");
+  test_throws("lp-error",
+              "  Use target() function to get log density.");
 }
 
