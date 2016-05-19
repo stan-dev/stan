@@ -185,7 +185,6 @@ namespace stan {
     };
     extern boost::phoenix::function<is_prob_fun> is_prob_fun_f;
 
-
     // called from: expression07_grammar
     struct addition_expr3 : public phoenix_functor_ternary {
       void operator()(expression& expr1, const expression& expr2,
@@ -452,7 +451,7 @@ namespace stan {
     validate_int_expr_warn_f;
 
     // called from: statement_grammar
-    struct deprecate_increment_log_prob : public phoenix_functor_unary<void> {
+    struct deprecate_increment_log_prob : public phoenix_functor_unary {
       void operator()(std::stringstream& error_msgs) const;
     };
     extern boost::phoenix::function<deprecate_increment_log_prob>

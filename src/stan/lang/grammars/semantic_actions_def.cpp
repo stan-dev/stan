@@ -37,6 +37,27 @@ namespace stan {
         + new_suffix;
     }
 
+    bool deprecate_fun(const std::string& old_name, const std::string& new_name,
+                       fun& f, std::ostream& msgs) {
+      if (f.name_ != old_name) return false;
+      f.original_name_ = f.name_;
+      f.name_ = new_name;
+      msgs << "Warning: Function name '" << old_name << "' is deprecated"
+           << " and will be removed in a later release; please replace"
+           << " with '" << new_name << "'" << std::endl;
+      return true;
+    }
+
+    bool deprecate_suffix(const std::string& deprecated_suffix,
+                          const std::string& replacement, fun& f,
+                          std::ostream& msgs) {
+      if (!ends_with(deprecated_suffix, f.name_)) return false;
+      msgs << "Warning: Deprecated function '" << f.name_ << "';"
+           << " please replace suffix '" << deprecated_suffix
+           << "' with " << replacement << std::endl;
+      return true;
+    }
+
     bool validate_double_expr(const expression& expr,
                               std::stringstream& error_msgs) {
       if (!expr.expression_type().is_primitive_double()
@@ -86,8 +107,8 @@ namespace stan {
     template void assign_lhs::operator()(std::vector<idx>&,
                                          const std::vector<idx>&) const;
     template void assign_lhs::operator()(
-        std::vector<std::vector<expression> >&,
-        const std::vector<std::vector<expression> >&) const;
+                                         std::vector<std::vector<expression> >&,
+                                         const std::vector<std::vector<expression> >&) const;
     template void assign_lhs::operator()(fun&, const fun&) const;
     template void assign_lhs::operator()(variable&, const variable&) const;
 
@@ -167,8 +188,8 @@ namespace stan {
     boost::phoenix::function<binary_op_expr> binary_op_f;
 
     void validate_non_void_arg_function::operator()(const expr_type& arg_type,
-                                            bool& pass,
-                                            std::ostream& error_msgs) const {
+                                                    bool& pass,
+                                                    std::ostream& error_msgs) const {
       pass = !arg_type.is_void();
       if (!pass)
         error_msgs << "Functions cannot contain void argument types; "
@@ -219,11 +240,11 @@ namespace stan {
     set_allows_sampling_origin_f;
 
     void validate_declarations::operator()(bool& pass,
-                       std::set<std::pair<std::string,
-                                          function_signature_t> >& declared,
-                       std::set<std::pair<std::string,
-                                          function_signature_t> >& defined,
-                       std::ostream& error_msgs) const {
+                                           std::set<std::pair<std::string,
+                                           function_signature_t> >& declared,
+                                           std::set<std::pair<std::string,
+                                           function_signature_t> >& defined,
+                                           std::ostream& error_msgs) const {
       using std::set;
       using std::string;
       using std::pair;
@@ -242,12 +263,12 @@ namespace stan {
     boost::phoenix::function<validate_declarations> validate_declarations_f;
 
     bool fun_exists(const std::set<std::pair<std::string,
-                                             function_signature_t> >& existing,
+                    function_signature_t> >& existing,
                     const std::pair<std::string,
-                                    function_signature_t>& name_sig,
+                    function_signature_t>& name_sig,
                     bool name_only = true) {
       for (std::set<std::pair<std::string,
-                              function_signature_t> >::const_iterator it
+             function_signature_t> >::const_iterator it
              = existing.begin();
            it != existing.end();
            ++it)
@@ -259,23 +280,21 @@ namespace stan {
     }
 
     void add_function_signature::operator()(const function_decl_def& decl,
-              bool& pass,
-              std::set<std::pair<std::string,
-                                 function_signature_t> >& functions_declared,
-              std::set<std::pair<std::string,
-                                 function_signature_t> >& functions_defined,
-              std::ostream& error_msgs) const {
+        bool& pass,
+        std::set<std::pair<std::string, function_signature_t> >&
+                                            functions_declared,
+        std::set<std::pair<std::string, function_signature_t> >&
+                                            functions_defined,
+        std::ostream& error_msgs) const {
       // build up representations
       expr_type result_type(decl.return_type_.base_type_,
                             decl.return_type_.num_dims_);
       std::vector<expr_type> arg_types;
       for (size_t i = 0; i < decl.arg_decls_.size(); ++i)
-        arg_types.push_back(
-                            expr_type(decl.arg_decls_[i].arg_type_.base_type_,
+        arg_types.push_back(expr_type(decl.arg_decls_[i].arg_type_.base_type_,
                                       decl.arg_decls_[i].arg_type_.num_dims_));
       function_signature_t sig(result_type, arg_types);
       std::pair<std::string, function_signature_t> name_sig(decl.name_, sig);
-
       // check that not already declared if just declaration
       if (decl.body_.is_no_op_statement()
           && fun_exists(functions_declared, name_sig)) {
@@ -327,15 +346,20 @@ namespace stan {
         || stan::lang::returns_type(decl.return_type_, decl.body_,
                                     error_msgs);
       if (!pass) {
-        error_msgs << "Improper return in body of function.";
+        error_msgs << "Improper return in body of function." << std::endl;
         return;
       }
 
-      if (ends_with("_log", decl.name_)
+      if ((ends_with("_log", decl.name_)
+           || ends_with("_lpdf", decl.name_)
+           || ends_with("_lpmf", decl.name_)
+           || ends_with("_lcdf", decl.name_)
+           || ends_with("_lccdf", decl.name_))
           && !decl.return_type_.is_primitive_double()) {
         pass = false;
-        error_msgs << "Require real return type for functions"
-                   << " ending in _log.";
+        error_msgs << "Require real return type for probability functions"
+                   << " ending in _log, _lpdf, _lpmf, _lcdf, or _lccdf."
+                   << std::endl;
       }
     }
     boost::phoenix::function<validate_return_type> validate_return_type_f;
@@ -348,10 +372,10 @@ namespace stan {
 
     void unscope_variables::operator()(function_decl_def& decl,
                                        variable_map& vm) const {
-        vm.remove("lp__");
-        vm.remove("params_r__");
-        for (size_t i = 0; i < decl.arg_decls_.size(); ++i)
-          vm.remove(decl.arg_decls_[i].name_);
+      vm.remove("lp__");
+      vm.remove("params_r__");
+      for (size_t i = 0; i < decl.arg_decls_.size(); ++i)
+        vm.remove(decl.arg_decls_[i].name_);
     }
     boost::phoenix::function<unscope_variables> unscope_variables_f;
 
@@ -752,6 +776,13 @@ namespace stan {
     }
     boost::phoenix::function<validate_assignment> validate_assignment_f;
 
+    bool is_defined(const std::string& function_name,
+                    const std::vector<expr_type>& arg_types) {
+      expr_type ret_type(DOUBLE_T, 0);
+      function_signature_t sig(ret_type, arg_types);
+      return function_signatures::instance().is_defined(function_name, sig);
+    }
+                    
 
     bool is_double_return(const std::string& function_name,
                           const std::vector<expr_type>& arg_types,
@@ -776,10 +807,19 @@ namespace stan {
       for (size_t i = 0; i < s.dist_.args_.size(); ++i)
         arg_types.push_back(s.dist_.args_[i].expression_type());
       std::string function_name(s.dist_.family_);
-      std::string internal_function_name = function_name + "_log";
 
-      if ((internal_function_name.find("multiply_log")
-           != std::string::npos)
+      std::string internal_function_name;
+      if (is_defined(function_name + "_lpdf", arg_types)) {
+        internal_function_name = function_name + "_lpdf";
+      } else if (is_defined(function_name + "_lpmf", arg_types)) {
+        internal_function_name = function_name + "_lpmf";
+      } else {
+        internal_function_name = function_name + "_log";
+      }
+      std::cout << "internal_function_name = " << internal_function_name 
+                << std::endl;
+
+      if ((internal_function_name.find("multiply_log") != std::string::npos)
           || (internal_function_name.find("binomial_coefficient_log")
               != std::string::npos)) {
         error_msgs << "Only distribution names can be used with"
@@ -800,11 +840,6 @@ namespace stan {
         return;
       }
 
-      if (!is_double_return(internal_function_name, arg_types, error_msgs)) {
-        pass = false;
-        return;
-      }
-
       if (internal_function_name == "lkj_cov_log") {
         error_msgs << "Warning: the lkj_cov_log() sampling distribution"
                    << " is deprecated.  It will be removed in Stan 3."
@@ -813,6 +848,13 @@ namespace stan {
                    << " distribution on a correlation matrix"
                    << " and independent lognormals on the scales."
                    << std::endl << std::endl;
+      }
+
+      if (!is_double_return(internal_function_name, arg_types, error_msgs)) {
+        error_msgs << "require real scalar return type for"
+                   << " probability function." << std::endl;
+        pass = false;
+        return;
       }
 
       // test for LHS not being purely a variable
@@ -940,8 +982,8 @@ namespace stan {
     boost::phoenix::function<validate_sample> validate_sample_f;
 
     void expression_as_statement::operator()(bool& pass,
-                                       const stan::lang::expression& expr,
-                                       std::stringstream& error_msgs) const {
+                                             const stan::lang::expression& expr,
+                                             std::stringstream& error_msgs) const {
       static const bool user_facing = true;
       if (expr.expression_type() != VOID_T) {
         error_msgs << "Illegal statement beginning with non-void"
@@ -1036,7 +1078,7 @@ namespace stan {
     boost::phoenix::function<validate_int_expr_warn> validate_int_expr_warn_f;
 
     void deprecate_increment_log_prob::operator()(
-                                    std::stringstream& error_msgs) const {
+                                       std::stringstream& error_msgs) const {
       error_msgs << "Warning (non-fatal): increment_log_prob(...);"
                  << " is deprecated and will be removed in the future."
                  << std::endl
@@ -1186,9 +1228,9 @@ namespace stan {
     boost::phoenix::function<validate_integrate_ode> validate_integrate_ode_f;
 
     void validate_integrate_ode_cvode::operator()(
-                      const integrate_ode_cvode& ode_fun,
-                      const variable_map& var_map, bool& pass,
-                      std::ostream& error_msgs) const {
+                                                  const integrate_ode_cvode& ode_fun,
+                                                  const variable_map& var_map, bool& pass,
+                                                  std::ostream& error_msgs) const {
       pass = true;
 
       // test function argument type
@@ -1347,15 +1389,26 @@ namespace stan {
         return;
       }
 
-      // will only need these until stan-dev/math renames
+      // disjunction so only first match triggered
+      deprecate_fun("binomial_coefficient_log", "lchoose", fun, error_msgs)
+      || deprecate_fun("multiply_log", "lmultiply", fun, error_msgs)
+      || deprecate_suffix("_cdf_log", "'_lcdf'", fun, error_msgs)
+      || deprecate_suffix("_ccdf_log", "'_lccdf'", fun, error_msgs)
+      || deprecate_suffix("_log",
+              "'_lpdf' for density functions or '_lpmf' for mass functions",
+              fun, error_msgs);
+
+      // need old function names (_log) until math gets updated to new ones
       replace_suffix("_lpdf", "_log", fun);
       replace_suffix("_lpmf", "_log", fun);
       replace_suffix("_lcdf", "_cdf_log", fun);
       replace_suffix("_lccdf", "_ccdf_log", fun);
+      replace_suffix("lmultiply", "multiply_log", fun);
+      replace_suffix("lchoose", "binomial_coefficient_log", fun);
 
       if (has_rng_suffix(fun.name_)) {
-        if (!( var_origin == derived_origin
-               || var_origin == function_argument_origin_rng)) {
+        if (!(var_origin == derived_origin
+              || var_origin == function_argument_origin_rng)) {
           error_msgs << "random number generators only allowed in"
                      << " generated quantities block or"
                      << " user-defined functions with names ending in _rng"
