@@ -798,6 +798,19 @@ namespace stan {
             || et.base_type_ == DOUBLE_T);
     }
 
+    
+    std::string get_prob_fun(const std::string& dist_name,
+                             const std::vector<expr_type>& arg_types) {
+      if (function_signatures::instance().has_key(dist_name + "_log"))
+        return dist_name + "_log";
+      else if (function_signatures::instance().has_key(dist_name + "_lpdf"))
+        return dist_name + "_lpdf";
+      else if (function_signatures::instance().has_key(dist_name + "_lpmf"))
+        return dist_name + "_lpmf";
+      else
+        return "";
+      }
+
     void validate_sample::operator()(const sample& s,
                                      const variable_map& var_map, bool& pass,
                                      std::ostream& error_msgs) const {
@@ -808,16 +821,14 @@ namespace stan {
         arg_types.push_back(s.dist_.args_[i].expression_type());
       std::string function_name(s.dist_.family_);
 
-      std::string internal_function_name;
-      if (is_defined(function_name + "_lpdf", arg_types)) {
-        internal_function_name = function_name + "_lpdf";
-      } else if (is_defined(function_name + "_lpmf", arg_types)) {
-        internal_function_name = function_name + "_lpmf";
-      } else {
-        internal_function_name = function_name + "_log";
+      std::string internal_function_name =
+        get_prob_fun(function_name, arg_types);
+      if (internal_function_name.size() == 0) {
+        pass = false;
+        error_msgs << "Error: couldn't find distribution named "
+                   << function_name << std::endl;
+        return;
       }
-      std::cout << "internal_function_name = " << internal_function_name 
-                << std::endl;
 
       if ((internal_function_name.find("multiply_log") != std::string::npos)
           || (internal_function_name.find("binomial_coefficient_log")

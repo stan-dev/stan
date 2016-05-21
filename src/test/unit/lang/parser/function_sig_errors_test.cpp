@@ -15,9 +15,7 @@ TEST(langParser, functionSigErrorsFunKnown) {
 }
 TEST(langParser, functionSigErrorsSampUnknown) { 
   test_throws("signature_sampling_unknown",
-              "No matches for:",
-              "vector ~ foo_whatev(vector)",
-              "Distribution foo_whatev not found.");
+              "Error: couldn't find distribution named foo_whatev");
 }
 TEST(langParser, functionSigErrorsSampKnown) { 
   test_throws("signature_sampling_known",

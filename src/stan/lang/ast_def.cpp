@@ -482,6 +482,7 @@ namespace stan {
     function_signatures::function_signatures() {
 #include <stan/lang/function_signatures.h>  // NOLINT
     }
+
     std::set<std::string>
     function_signatures::key_set() const {
       using std::map;
@@ -497,8 +498,11 @@ namespace stan {
       return result;
     }
 
-    function_signatures* function_signatures::sigs_ = 0;
+    bool function_signatures::has_key(const std::string& key) const {
+      return sigs_map_.find(key) != sigs_map_.end();
+    }
 
+    function_signatures* function_signatures::sigs_ = 0;
 
     arg_decl::arg_decl() { }
     arg_decl::arg_decl(const expr_type& arg_type,

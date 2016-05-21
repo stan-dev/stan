@@ -7,5 +7,5 @@ parameters {
   real y;
 }
 model {
-  y ~ foo(3.5);
+  y ~ foo(3);
 }
