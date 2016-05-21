@@ -1,35 +1,121 @@
-//transformed data:
-//  int, int
-//  int, real
-//  real, int
-//  real, real
-//  vector, vector
-//  row_vector, row_vector
-//  matrix, matrix
-//
-//  + array types 1 & 2 dims
-
-parameters {
-  real y;
-}
-
-//transformed parameters or model:
-//  int, real
-//  real, int
-//  real, real
-//  vector, vector
-//  row_vector, row_vector
-//  matrix, matrix
-//  
-//  + array types 1 & 2 dims
-
-
-model {
+data {
   int x;
-  real z;
-  x = 0 ? x : 2;
-  z = 1 ? x : z;
+  real y;
+  vector[5] z;
+  row_vector[6] w;
+  matrix[5,6] m;
+}
+transformed data {
+  int tx;
+  real ty;
+  vector[5] tza;
+  vector[5] tzb;
+  vector[5] tzc;
+  row_vector[6] twa;
+  row_vector[6] twb;
+  row_vector[6] twc;
+  matrix[5,6] tma;
+  matrix[5,6] tmb;
+  matrix[5,6] tmc;
 
-  y ~ normal(0,1);
+  int tx1[2];
+  real tya1[2];
+  real tyb1[2];
+  real tyc1[2];
+  vector[5] tza1[2];
+  vector[5] tzb1[2];
+  row_vector[6] twa1[2];
+  row_vector[6] twb1[2];
+  row_vector[6] twc1[2];
+  matrix[5,6] tm1[2];
+
+  int txa2[2,3];
+  int txb2[2,3];
+  int txc2[2,3];
+  real tya2[2,2];
+  real tyb2[2,2];
+  vector[5] tza2[2,2];
+  vector[5] tzb2[2,2];
+  vector[5] tzc2[2,2];
+  row_vector[6] twa2[2,2];
+  row_vector[6] twb2[2,2];
+  matrix[5,6] tma2[2,2];
+  matrix[5,6] tmb2[2,2];
+  matrix[5,6] tmc2[2,2];
+
+  tx = x < 100 ? x : 100;   // t,f : int,int
+  ty = y > 100 ? 100 : y;   // t,f : int,real
+  ty = y < 100 ? y : 100;   // t,f : real,int
+  ty = y < 100 ? y : ty;   // t,f : real,real
+
+  tzc = x < 100 ? tza : tzb; // tf vector, vector
+  twc = x < 100 ? twa : twb; // tf row_vector, row_vector
+  tmc = x < 100 ? tma : tmb; // tf matrix, matrix
+
+  tx1 = x < 100 ? txa2[1] : txb2[2];   // t,f : int[2],int[2]
+  txc2 = x < 100 ? txa2 : txb2;   // t,f : int[2,2],int[2,2]
+  tyc1 = x < 100 ? tya1 : tyb1;   // t,f : real[2],real[2]
+  tya2 = x < 100 ? tya2 : tyb2;   // t,f : real[2,2],real[2,2]
+  twc1 = x < 100 ? twa1 : twb1; // tf row_vector, row_vector
+  twa2 = x < 100 ? twa2 : twb2; // tf row_vector[,], row_vector[,]
+  tm1 = x < 100 ? tma2[1] : tmb2[1]; // tf matrix[], matrix[]
+  tma2 = x < 100 ? tma2 : tmb2; // tf matrix[,], matrix[,]
+  
+  
+}
+parameters {
+  real p1;
+}
+transformed parameters {
+  real tp1;
+  vector[5] tpza;
+  vector[5] tpzb;
+  vector[5] tpzc;
+  row_vector[6] tpwa;
+  row_vector[6] tpwb;
+  row_vector[6] tpwc;
+  matrix[5,6] tpma;
+  matrix[5,6] tpmb;
+  matrix[5,6] tpmc;
+
+  real tpya1[2];
+  real tpyb1[2];
+  real tpyc1[2];
+  vector[5] tpza1[2];
+  vector[5] tpzb1[2];
+  row_vector[6] tpwa1[2];
+  row_vector[6] tpwb1[2];
+  row_vector[6] tpwc1[2];
+  matrix[5,6] tpm1[2];
+
+  real tpya2[2,2];
+  real tpyb2[2,2];
+  vector[5] tpza2[2,2];
+  vector[5] tpzb2[2,2];
+  vector[5] tpzc2[2,2];
+  row_vector[6] tpwa2[2,2];
+  row_vector[6] tpwb2[2,2];
+  matrix[5,6] tpma2[2,2];
+  matrix[5,6] tpmb2[2,2];
+  matrix[5,6] tpmc2[2,2];
+
+  tp1 = y < 100 ? x : y;   // t,f : int,real
+  tp1 = y < 100 ? y : x;   // t,f : real,int
+  tp1 = y < 100 ? y : p1;   // t,f : real,var
+  tp1 = y < 100 ? x : p1;   // t,f : int,var
+
+  tpzc = x < 100 ? tpza : tpzb; // tf vector, vector
+  tpwc = x < 100 ? tpwa : tpwb; // tf row_vector, row_vector
+  tpmc = x < 100 ? tpma : tpmb; // tf matrix, matrix
+
+  tpyc1 = x < 100 ? tpya1 : tpyb1;   // t,f : real[2],real[2]
+  tpya2 = x < 100 ? tpya2 : tpyb2;   // t,f : real[2,2],real[2,2]
+  tpwc1 = x < 100 ? tpwa1 : tpwb1; // tf row_vector, row_vector
+  tpwa2 = x < 100 ? tpwa2 : tpwb2; // tf row_vector[,], row_vector[,]
+  tpm1 = x < 100 ? tpma2[1] : tpmb2[1]; // tf matrix[], matrix[]
+  tpma2 = x < 100 ? tpma2 : tpmb2; // tf matrix[,], matrix[,]
+}  
+model {
+  p1 ~ normal(0,1);
 }
 
