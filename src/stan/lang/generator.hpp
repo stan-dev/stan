@@ -22,6 +22,9 @@ namespace stan {
     void generate_expression(const expression& e, std::ostream& o);
     void generate_expression(const expression& e, bool user_facing,
                              std::ostream& o);
+    void generate_bare_type(const expr_type& t,
+                            const std::string& scalar_t_name,
+                            std::ostream& out);
 
     const std::string EOL("\n");
     const std::string EOL2("\n\n");
@@ -184,7 +187,6 @@ namespace stan {
     void generate_idxs_user(const std::vector<idx>& idxs,
                             std::ostream& o);
 
-    // mm 2015-05-01: add op for ternary expression here?
     struct expression_visgen : public visgen {
       const bool user_facing_;
       explicit expression_visgen(std::ostream& o, bool user_facing)
@@ -343,18 +345,25 @@ namespace stan {
         }
         o_ << ')';
       }
+
       void operator()(const conditional_op& expr) const {
         // .... get casts right  ...
-        // expr.type_
-        //        o_ << '(';
-        boost::apply_visitor(*this, expr.cond_.expr_);
-        //        o_ << ')';
-        o_ << " ? " ;
-        boost::apply_visitor(*this, expr.true_val_.expr_);
-        o_ << " : " ;
-        boost::apply_visitor(*this, expr.false_val_.expr_);
+          o_ << '(';
+          generate_bare_type(expr.type_, "T__", o_);
+          o_ << '(';
+          boost::apply_visitor(*this, expr.cond_.expr_);
+          o_ << " ? " ;
+          generate_bare_type(expr.true_val_.expression_type(), "T__", o_);
+          o_ << '(';
+          boost::apply_visitor(*this, expr.true_val_.expr_);
+          o_ << ')';
+          o_ << " : " ;
+          generate_bare_type(expr.false_val_.expression_type(), "T__", o_);
+          o_ << '(';
+          boost::apply_visitor(*this, expr.false_val_.expr_);
+          o_ << ')';
+          o_ << ')';
       }
-
 
       void operator()(const binary_op& expr) const {
         o_ << '(';
