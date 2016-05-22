@@ -3764,7 +3764,7 @@ loop.  A bogus dummy return could be placed after the while loop in
 this case.  The rules for returns allow
 %
 \begin{stancode}
-real fancy_log(real x) {
+real log_fancy(real x) {
   if (x < 1e-30)
     return x;
   else if (x < 1e-14)

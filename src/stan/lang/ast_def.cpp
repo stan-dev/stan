@@ -440,6 +440,7 @@ namespace stan {
           match_index = i;
           num_matches = 1;
         } else if (promotions_ui == min_promotions) {
+          std::cout << std::endl;
           ++num_matches;
         }
       }
@@ -454,8 +455,8 @@ namespace stan {
                    << std::endl << std::endl;
       } else {
         error_msgs << "Ambiguous: "
-                   << num_matches << " matches for with "
-                   << min_promotions << " integer promotions: "
+                   << num_matches << " matches with "
+                   << min_promotions << " integer promotions for: "
                    << std::endl;
       }
       print_signature(display_name, args, sampling_error_style, error_msgs);
@@ -1909,6 +1910,38 @@ namespace stan {
       return idx != std::string::npos
         && idx == (s.size() - suffix.size());
     }
+
+   std::string get_cdf(const std::string& dist_name) {
+      if (function_signatures::instance().has_key(dist_name + "_cdf_log"))
+        return dist_name + "_cdf_log";
+      else if (function_signatures::instance().has_key(dist_name + "_lcdf"))
+        return dist_name + "_lcdf";
+      else
+        return dist_name + "_MISSING_log_cdf_OR_lcdf";
+    }
+
+    std::string get_ccdf(const std::string& dist_name) {
+      if (function_signatures::instance().has_key(dist_name + "_ccdf_log"))
+        return dist_name + "_ccdf_log";
+      else if (function_signatures::instance().has_key(dist_name + "_lccdf"))
+        return dist_name + "_lccdf";
+      else
+        return dist_name + "_MISSING_log_ccdf_OR_lccdf";
+    }
+
+    std::string get_prob_fun(const std::string& dist_name) {
+      if (function_signatures::instance().has_key(dist_name + "_log"))
+        return dist_name + "_log";
+      else if (function_signatures::instance().has_key(dist_name + "_lpdf"))
+        return dist_name + "_lpdf";
+      else if (function_signatures::instance().has_key(dist_name + "_lpmf"))
+        return dist_name + "_lpmf";
+      else
+        return dist_name + "_MISSING_log_OR_lpdf_OR_lcdf";
+    }
+
+
+
 
   }
 }

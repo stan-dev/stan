@@ -107,8 +107,8 @@ namespace stan {
     template void assign_lhs::operator()(std::vector<idx>&,
                                          const std::vector<idx>&) const;
     template void assign_lhs::operator()(
-                                         std::vector<std::vector<expression> >&,
-                                         const std::vector<std::vector<expression> >&) const;
+                         std::vector<std::vector<expression> >&,
+                         const std::vector<std::vector<expression> >&) const;
     template void assign_lhs::operator()(fun&, const fun&) const;
     template void assign_lhs::operator()(variable&, const variable&) const;
 
@@ -188,8 +188,8 @@ namespace stan {
     boost::phoenix::function<binary_op_expr> binary_op_f;
 
     void validate_non_void_arg_function::operator()(const expr_type& arg_type,
-                                                    bool& pass,
-                                                    std::ostream& error_msgs) const {
+                                            bool& pass,
+                                            std::ostream& error_msgs) const {
       pass = !arg_type.is_void();
       if (!pass)
         error_msgs << "Functions cannot contain void argument types; "
@@ -782,7 +782,6 @@ namespace stan {
       function_signature_t sig(ret_type, arg_types);
       return function_signatures::instance().is_defined(function_name, sig);
     }
-                    
 
     bool is_double_return(const std::string& function_name,
                           const std::vector<expr_type>& arg_types,
@@ -798,19 +797,6 @@ namespace stan {
             || et.base_type_ == DOUBLE_T);
     }
 
-    
-    std::string get_prob_fun(const std::string& dist_name,
-                             const std::vector<expr_type>& arg_types) {
-      if (function_signatures::instance().has_key(dist_name + "_log"))
-        return dist_name + "_log";
-      else if (function_signatures::instance().has_key(dist_name + "_lpdf"))
-        return dist_name + "_lpdf";
-      else if (function_signatures::instance().has_key(dist_name + "_lpmf"))
-        return dist_name + "_lpmf";
-      else
-        return "";
-      }
-
     void validate_sample::operator()(const sample& s,
                                      const variable_map& var_map, bool& pass,
                                      std::ostream& error_msgs) const {
@@ -821,8 +807,7 @@ namespace stan {
         arg_types.push_back(s.dist_.args_[i].expression_type());
       std::string function_name(s.dist_.family_);
 
-      std::string internal_function_name =
-        get_prob_fun(function_name, arg_types);
+      std::string internal_function_name = get_prob_fun(function_name);
       if (internal_function_name.size() == 0) {
         pass = false;
         error_msgs << "Error: couldn't find distribution named "
@@ -945,12 +930,13 @@ namespace stan {
         return;
       }
 
-      if (s.truncation_.has_low()) {
+      // make sure CDFs or CCDFs exist with conforming signature
+      // T[L, ]
+      if (s.truncation_.has_low() && !s.truncation_.has_high()) {
         std::vector<expr_type> arg_types_trunc(arg_types);
         arg_types_trunc[0] = s.truncation_.low_.expression_type();
-        std::string function_name_cdf(s.dist_.family_);
-        function_name_cdf += "_cdf_log";
-        if (!is_double_return(function_name_cdf, arg_types_trunc,
+        std::string function_name_ccdf = get_ccdf(s.dist_.family_);
+        if (!is_double_return(function_name_ccdf, arg_types_trunc,
                               error_msgs)) {
           error_msgs << "lower truncation not defined for specified"
                      << " arguments to "
@@ -958,7 +944,7 @@ namespace stan {
           pass = false;
           return;
         }
-        if (!is_double_return(function_name_cdf, arg_types, error_msgs)) {
+        if (!is_double_return(function_name_ccdf, arg_types, error_msgs)) {
           error_msgs << "lower bound in truncation type does not match"
                      << " sampled variate in distribution's type"
                      << std::endl;
@@ -966,11 +952,11 @@ namespace stan {
           return;
         }
       }
-      if (s.truncation_.has_high()) {
+      // T[, H]
+      if (!s.truncation_.has_low() && s.truncation_.has_high()) {
         std::vector<expr_type> arg_types_trunc(arg_types);
         arg_types_trunc[0] = s.truncation_.high_.expression_type();
-        std::string function_name_cdf(s.dist_.family_);
-        function_name_cdf += "_cdf_log";
+        std::string function_name_cdf = get_cdf(s.dist_.family_);
         if (!is_double_return(function_name_cdf, arg_types_trunc,
                               error_msgs)) {
           error_msgs << "upper truncation not defined for"
@@ -988,13 +974,35 @@ namespace stan {
           return;
         }
       }
+      // T[L, H]
+      if (s.truncation_.has_low() && s.truncation_.has_high()) {
+        std::vector<expr_type> arg_types_trunc(arg_types);
+        arg_types_trunc[0] = s.truncation_.low_.expression_type();
+        std::string function_name_cdf = get_cdf(s.dist_.family_);
+        if (!is_double_return(function_name_cdf, arg_types_trunc,
+                              error_msgs)) {
+          error_msgs << "lower truncation not defined for specified"
+                     << " arguments to "
+                     << s.dist_.family_ << std::endl;
+          pass = false;
+          return;
+        }
+        if (!is_double_return(function_name_cdf, arg_types, error_msgs)) {
+          error_msgs << "lower bound in truncation type does not match"
+                     << " sampled variate in distribution's type"
+                     << std::endl;
+          pass = false;
+          return;
+        }
+      }
+
       pass = true;
     }
     boost::phoenix::function<validate_sample> validate_sample_f;
 
     void expression_as_statement::operator()(bool& pass,
-                                             const stan::lang::expression& expr,
-                                             std::stringstream& error_msgs) const {
+                                     const stan::lang::expression& expr,
+                                     std::stringstream& error_msgs) const {
       static const bool user_facing = true;
       if (expr.expression_type() != VOID_T) {
         error_msgs << "Illegal statement beginning with non-void"
@@ -1239,9 +1247,9 @@ namespace stan {
     boost::phoenix::function<validate_integrate_ode> validate_integrate_ode_f;
 
     void validate_integrate_ode_cvode::operator()(
-                                                  const integrate_ode_cvode& ode_fun,
-                                                  const variable_map& var_map, bool& pass,
-                                                  std::ostream& error_msgs) const {
+                                      const integrate_ode_cvode& ode_fun,
+                                      const variable_map& var_map, bool& pass,
+                                      std::ostream& error_msgs) const {
       pass = true;
 
       // test function argument type

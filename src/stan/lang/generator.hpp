@@ -1791,8 +1791,6 @@ namespace stan {
       o << "]";
     }
 
-
-
     void generate_statement(statement const& s, int indent, std::ostream& o,
                             bool include_sampling, bool is_var,
                             bool is_fun_return);
@@ -1868,16 +1866,16 @@ namespace stan {
       }
       void operator()(sample const& x) const {
         if (!include_sampling_) return;
+        std::string prob_fun = get_prob_fun(x.dist_.family_);
         generate_indent(indent_, o_);
-        o_ << "lp_accum__.add(" << x.dist_.family_ << "_log<propto__>(";
+        o_ << "lp_accum__.add(" << prob_fun << "<propto__>(";
         generate_expression(x.expr_, o_);
         for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
           o_ << ", ";
           generate_expression(x.dist_.args_[i], o_);
         }
         bool is_user_defined
-          = is_user_defined_prob_function(x.dist_.family_ + "_log",
-                                          x.expr_, x.dist_.args_);
+          = is_user_defined_prob_function(prob_fun, x.expr_, x.dist_.args_);
         if (is_user_defined)
           o_ << ", pstream__";
         o_ << "));" << EOL;
@@ -1912,7 +1910,7 @@ namespace stan {
           // T[L,U]: -log_diff_exp(Dist_cdf_log(U|params),
           //                       Dist_cdf_log(L|Params))
           o_ << "lp_accum__.add(-log_diff_exp(";
-          o_ << x.dist_.family_ << "_cdf_log(";
+          o_ << get_cdf(x.dist_.family_) << "(";
           generate_expression(x.truncation_.high_.expr_, o_);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
             o_ << ", ";
@@ -1920,7 +1918,7 @@ namespace stan {
           }
           if (is_user_defined)
             o_ << ", pstream__";
-          o_ << "), " << x.dist_.family_ << "_cdf_log(";
+          o_ << "), " << get_cdf(x.dist_.family_) << "(";
           generate_expression(x.truncation_.low_.expr_, o_);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
             o_ << ", ";
@@ -1932,7 +1930,7 @@ namespace stan {
         } else if (!x.truncation_.has_low() && x.truncation_.has_high()) {
           // T[,U];  -Dist_cdf_log(U)
           o_ << "lp_accum__.add(-";
-          o_ << x.dist_.family_ << "_cdf_log(";
+          o_ << get_cdf(x.dist_.family_) << "(";
           generate_expression(x.truncation_.high_.expr_, o_);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
             o_ << ", ";
@@ -1944,7 +1942,7 @@ namespace stan {
         } else if (x.truncation_.has_low() && !x.truncation_.has_high()) {
           // T[L,]: -Dist_ccdf_log(L)
           o_ << "lp_accum__.add(-";
-          o_ << x.dist_.family_ << "_ccdf_log(";
+          o_ << get_ccdf(x.dist_.family_) << "(";
           generate_expression(x.truncation_.low_.expr_, o_);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
             o_ << ", ";

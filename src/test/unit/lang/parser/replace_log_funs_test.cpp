@@ -29,3 +29,6 @@ TEST(langParser, newProbFunSuffixes) {
 TEST(langParser, funsNewLSyntax) {
   test_parsable("fun-defs-lpdf");
 }
+TEST(langParser, userTruncation) {
+  test_parsable("user-distro-truncate");
+}

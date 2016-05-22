@@ -17,14 +17,14 @@ namespace stan {
 
     bool has_prob_suffix(const std::string& s);
 
-    void replace_suffix(const std::string& old_suffix, 
+    void replace_suffix(const std::string& old_suffix,
                         const std::string& new_suffix, fun& f);
-    
+
     bool validate_double_expr(const expression& expr,
                               std::stringstream& error_msgs);
 
     void set_fun_type(fun& fun, std::ostream& error_msgs);
-    
+
     int num_dimss(std::vector<std::vector<stan::lang::expression> >& dimss);
 
     /**

@@ -1077,6 +1077,13 @@ namespace stan {
     bool ends_with(const std::string& suffix,
                    const std::string& s);
 
+
+    std::string get_cdf(const std::string& dist_name);
+
+    std::string get_ccdf(const std::string& dist_name);
+
+    std::string get_prob_fun(const std::string& dist_name);
+
   }
 }
 #endif

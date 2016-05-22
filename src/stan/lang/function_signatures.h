@@ -76,10 +76,6 @@ for (size_t i = 0; i < int_vector_types.size(); i++)
       for (size_t l = 0; l < vector_types.size(); l++) {
         add("beta_binomial_ccdf_log", DOUBLE_T,
             int_vector_types[i], int_vector_types[j],
-	    vector_types[k], 
-            vector_types[l]);
-        add("beta_binomial_ccdf_log", DOUBLE_T,
-            int_vector_types[i], int_vector_types[j],
 	    vector_types[k], vector_types[l]);
         add("beta_binomial_cdf", DOUBLE_T,
             int_vector_types[i], int_vector_types[j],
