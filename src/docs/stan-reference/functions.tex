@@ -1226,24 +1226,28 @@ distribution function (and its complement).
     \end{cases}
     \]}
   %
-  \fitem{real}{binomial\_coefficient\_log}{real \farg{x}, real \farg{y}}{ 
-    Returns the natural logarithm of the binomial coefficient of
-    \farg{x} and \farg{y}. For non-negative integer inputs, the 
-    binomial coefficient function is written as
-    $\binom{x}{y}$ and pronounced ``\farg{x} choose \farg{y}.''  This
-    function generalizes to real numbers using the gamma function.
+  \fitem{real}{binomial\_coefficient\_log}{real \farg{x}, real
+    \farg{y}}{
+    {\it Warning:} This function is deprecated and should
+    be replaced with \code{lchoose}.
+
+    Returns the natural logarithm of the binomial coefficient
+    of \farg{x} and \farg{y}. For non-negative integer inputs, the
+    binomial coefficient function is written as $\binom{x}{y}$ and
+    pronounced ``\farg{x} choose \farg{y}.''  This function
+    generalizes to real numbers using the gamma function.
 
     For $0 \leq y \leq x$,
     \[
     \mbox{\code{binomial\_coefficient\_log}}(x,y)
-    = \log\Gamma(x+1) - \log\Gamma(y+1) - \log\Gamma(x-y+1)
+    = \log\Gamma(x+1) - \log\Gamma(y+1) - \log\Gamma(x-y+1).
     \]}
   %
   \fitem{real}{bessel\_first\_kind}{int \farg{v}, real \farg{x}}{
     Returns the Bessel function of the first kind with order \farg{v}
     applied to \farg{x}.
     \[
-    \mbox{\code{bessel\_first\_kind}}(v,x) =  J_v(x)
+    \mbox{\code{bessel\_first\_kind}}(v,x) =  J_v(x),
     \]
     where 
     %
@@ -1317,6 +1321,19 @@ distribution function (and its complement).
     (x)_n=\frac{\Gamma(x+1)}{\Gamma(x-n+1)}
     \]}
   %
+  \fitem{real}{lchoose}{real \farg{x}, real \farg{y}}{ Returns the
+    natural logarithm of the generalized binomial coefficient of
+    \farg{x} and \farg{y}. For non-negative integer inputs, the
+    binomial coefficient function is written as $\binom{x}{y}$ and
+    pronounced ``\farg{x} choose \farg{y}.''  This function
+    generalizes to real numbers using the gamma function.
+
+    For $0 \leq y \leq x$,
+    \[
+    \mbox{\code{binomial\_coefficient\_log}}(x,y)
+    = \log\Gamma(x+1) - \log\Gamma(y+1) - \log\Gamma(x-y+1).
+    \]}
+  %
   \fitem{real}{log\_falling\_factorial}{real \farg{x}, real \farg{n}}{
     Returns the log of the falling factorial of \farg{x} with power 
     \farg{n} defined for positive \farg{x} and real \farg{n}.
@@ -1379,9 +1396,25 @@ using more basic \Stan functions.
     \]}
   %
   \fitem{real}{multiply\_log}{real \farg{x}, real \farg{y}}{ 
-    Returns the product of \farg{x} and the natural logarithm of \farg{y}.
+    {\it Warning:} This function is deprecated and should be replaced
+    with \code{lmultiply}. 
+    
+    Returns the product of \farg{x} and the natural logarithm
+    of \farg{y}. 
     \[
     \mbox{\code{multiply\_log}}(x,y) = 
+    \begin{cases}
+      0 & \mbox{if } x = y = 0 \\
+      x \log y & \mbox{if } x, y \neq 0 \\
+      \mbox{NaN} & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitem{real}{lmultiply}{real \farg{x}, real \farg{y}}{ 
+    Returns the product of \farg{x} and the natural logarithm
+    of \farg{y}. 
+    \[
+    \mbox{\code{lmultiply}}(x,y) = 
     \begin{cases}
       0 & \mbox{if } x = y = 0 \\
       x \log y & \mbox{if } x, y \neq 0 \\
