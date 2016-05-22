@@ -51,6 +51,9 @@ transformed data {
   matrix[5,6] tmb2[2,2];
   matrix[5,6] tmc2[2,2];
 
+  tx = 1 ? 2 : 3;
+  ty = 1 ? 2.0 : 3.0;
+  
   tx = x < 100 ? x : 100;   // t,f : int,int
   ty = y > 100 ? 100 : y;   // t,f : int,real
   ty = y < 100 ? y : 100;   // t,f : real,int
@@ -130,6 +133,8 @@ transformed parameters {
   tpwc = x < 100 ? w : pw; // tf real/var row_vector
   tpmc = x < 100 ? m : pm; // tf real/var var matrix
 
+  tpyc1 = ya1;
+  
   tpyc1 = x < 100 ? tpya1 : tpyb1;   // t,f : var[2],var[2]
   tpyc1 = x < 100 ? ya1 : pya1;   // t,f : real[2],var[2]
 
