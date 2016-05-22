@@ -1,9 +1,17 @@
 data {
   int x;
   real y;
+  real ya1[2];
+  real ya2[2,2];
   vector[5] z;
+  vector[5] za1[2];
+  vector[5] za2[2,2];
   row_vector[6] w;
+  row_vector[6] wa1[2];
+  row_vector[6] wa2[2,2];
   matrix[5,6] m;
+  matrix[5,6] ma1[2];
+  matrix[5,6] ma2[2,2];
 }
 transformed data {
   int tx;
@@ -64,10 +72,20 @@ transformed data {
   
 }
 parameters {
-  real p1;
+  real py;
+  vector[5] pz;
+  row_vector[6] pw;
+  matrix[5,6] pm;
+
+  real pya1[2];
+  real pya2[2,2];
+  vector[5] pza1[2];
+  vector[5] pza2[2,2];
+  matrix[5,6] pma1[2];
+  matrix[5,6] pma2[2,2];
 }
 transformed parameters {
-  real tp1;
+  real tpy;
   vector[5] tpza;
   vector[5] tpzb;
   vector[5] tpzc;
@@ -99,23 +117,39 @@ transformed parameters {
   matrix[5,6] tpmb2[2,2];
   matrix[5,6] tpmc2[2,2];
 
-  tp1 = y < 100 ? x : y;   // t,f : int,real
-  tp1 = y < 100 ? y : x;   // t,f : real,int
-  tp1 = y < 100 ? y : p1;   // t,f : real,var
-  tp1 = y < 100 ? x : p1;   // t,f : int,var
+  tpy = y < 100 ? x : y;   // t,f : int,real
+  tpy = y < 100 ? y : x;   // t,f : real,int
+  tpy = y < 100 ? y : py;   // t,f : real,var
+  tpy = y < 100 ? x : py;   // t,f : int,var
 
-  tpzc = x < 100 ? tpza : tpzb; // tf vector, vector
-  tpwc = x < 100 ? tpwa : tpwb; // tf row_vector, row_vector
-  tpmc = x < 100 ? tpma : tpmb; // tf matrix, matrix
+  tpzc = x < 100 ? tpza : tpzb; // tf var vector
+  tpwc = x < 100 ? tpwa : tpwb; // tf var row_vector
+  tpmc = x < 100 ? tpma : tpmb; // tf var matrix
 
-  tpyc1 = x < 100 ? tpya1 : tpyb1;   // t,f : real[2],real[2]
-  tpya2 = x < 100 ? tpya2 : tpyb2;   // t,f : real[2,2],real[2,2]
-  tpwc1 = x < 100 ? tpwa1 : tpwb1; // tf row_vector, row_vector
-  tpwa2 = x < 100 ? tpwa2 : tpwb2; // tf row_vector[,], row_vector[,]
-  tpm1 = x < 100 ? tpma2[1] : tpmb2[1]; // tf matrix[], matrix[]
-  tpma2 = x < 100 ? tpma2 : tpmb2; // tf matrix[,], matrix[,]
+  tpzc = x < 100 ? z : pz; // tf real/var vector
+  tpwc = x < 100 ? w : pw; // tf real/var row_vector
+  tpmc = x < 100 ? m : pm; // tf real/var var matrix
+
+  tpyc1 = x < 100 ? tpya1 : tpyb1;   // t,f : var[2],var[2]
+  tpyc1 = x < 100 ? ya1 : pya1;   // t,f : real[2],var[2]
+
+  tpya2 = x < 100 ? tpya2 : tpyb2;   // t,f : var[2,2],var[2,2]
+  tpya2 = x < 100 ? ya2 : tpyb2;   // t,f : real[2,2],var[2,2]
+
+  tpwc1 = x < 100 ? tpwa1 : tpwb1; // tf var row_vector
+  tpwc1 = x < 100 ? wa1 : tpwb1; // tf real/var row_vector
+
+  tpwa2 = x < 100 ? tpwa2 : tpwb2; // tf var row_vector[,]
+  tpwa2 = x < 100 ? wa2 : tpwb2; // tf real/var row_vector[,]
+
+  tpm1 = x < 100 ? tpma2[1] : tpmb2[1]; // tf var matrix[]
+  tpm1 = x < 100 ? ma2[1] : tpmb2[1]; // tf real/var matrix[]
+
+  tpma2 = x < 100 ? tpma2 : tpmb2; // tf var matrix[,]
+  tpma2 = x < 100 ? ma2 : pma2; // tf real/var matrix[,]
+
 }  
 model {
-  p1 ~ normal(0,1);
+  py ~ normal(0,1);
 }
 

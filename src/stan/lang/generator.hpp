@@ -344,16 +344,15 @@ namespace stan {
         o_ << ')';
       }
       void operator()(const conditional_op& expr) const {
-      // .... get casts right  ...
-      // somthing like:
-      //  indent <<  logical_expr <<  '?' <<  lvar <<  ':' << lvar << ';'
+        // .... get casts right  ...
+        // expr.type_
         //        o_ << '(';
-        //        boost::apply_visitor(*this, expr.cond_.expr_);
-        //        o_ << '?' ;
-        //        boost::apply_visitor(*this, expr.true_val_.expr_);
-        //        o_ << ':' ;
-        //        boost::apply_visitor(*this, expr.false_val_.expr_);
+        boost::apply_visitor(*this, expr.cond_.expr_);
         //        o_ << ')';
+        o_ << " ? " ;
+        boost::apply_visitor(*this, expr.true_val_.expr_);
+        o_ << " : " ;
+        boost::apply_visitor(*this, expr.false_val_.expr_);
       }
 
 

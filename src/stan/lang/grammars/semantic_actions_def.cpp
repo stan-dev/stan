@@ -123,7 +123,6 @@ namespace stan {
     void validate_conditional_op::operator()(conditional_op& conditional_op,
                                              bool& pass,
                                              std::ostream& error_msgs) const {
-
       pass = true;
       expr_type cond_type = conditional_op.cond_.expression_type();
       if (!cond_type.is_primitive()) {
@@ -133,8 +132,6 @@ namespace stan {
                    << std::endl;
         pass = false;
       }
-
-      //  expr_type true_val_type = conditional_op.true_val_.expression_type();
       expr_type true_val_type(conditional_op.true_val_.expression_type().type(),
                               conditional_op.true_val_.expression_type().num_dims_);
       base_expr_type true_val_base_type = true_val_type.base_type_;
@@ -166,9 +163,13 @@ namespace stan {
         conditional_op.type_ = 
           (true_val_base_type == false_val_base_type) ? true_val_base_type : DOUBLE_T;
       }
-      //      std::cout << "conditional_op type: "
-      //                << conditional_op.type_
-      //                << std::endl;
+//      std::cout << "conditional_op type: "
+//                << conditional_op.type_
+//                << " true_val_ type: "
+//                << conditional_op.true_val_.expression_type()
+//                << " false_val_ type: "
+//                << conditional_op.false_val_.expression_type()
+//                << std::endl;
     }
     boost::phoenix::function<validate_conditional_op>
     validate_conditional_op_f;
