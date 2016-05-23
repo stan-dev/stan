@@ -3496,8 +3496,7 @@ data {
 Function definitions and declarations may appear in any order, subject
 to the condition that a function must be declared before it is used.
 Forward declarations are allowed in order to support recursive
-functions; see \refsection{function-overloading} for the precise rules
-governing declarations and definitions.
+functions.
 
 \section{Function Names}
 
@@ -3512,11 +3511,8 @@ real foo(real mu, real sigma);
 declares a function named \code{foo} with two argument variables of
 types \code{real} and \code{real}.  The arguments are named \code{mu}
 and \code{sigma}, but that is not part of the declaration.  Two
-functions may \emph{not} \, have the same name even if they have
-different sequences of argument types; see
-\refsection{function-overloading} for details.  A function may not
-have the same name and argument type sequence as another function,
-including a built-in function.
+user-defined functions may \emph{not} \, have the same name even if they have
+different sequences of argument types.
 
 \section{Calling Functions}
 
