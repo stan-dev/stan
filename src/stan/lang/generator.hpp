@@ -300,7 +300,7 @@ namespace stan {
         o_ << ", ";
 
         generate_expression(fx.x_int_, o_);
-        o_ << ", ";
+        o_ << ", pstream__, ";
 
         generate_expression(fx.rel_tol_, o_);
         o_ << ", ";
@@ -309,7 +309,7 @@ namespace stan {
         o_ << ", ";
 
         generate_expression(fx.max_num_steps_, o_);
-        o_ << ", pstream__)";
+        o_ << ")";
       }
       void operator()(const fun& fx) const {
         // first test if short-circuit op (binary && and || applied to
