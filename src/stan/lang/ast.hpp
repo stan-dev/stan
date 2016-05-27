@@ -1088,6 +1088,17 @@ namespace stan {
 
     std::string get_prob_fun(const std::string& dist_name);
 
+    bool has_prob_fun_suffix(const std::string& name);
+    std::string strip_prob_fun_suffix(const std::string& dist_fun);
+
+    bool has_cdf_suffix(const std::string& name);
+    std::string strip_cdf_suffix(const std::string& dist_fun);
+
+    bool has_ccdf_suffix(const std::string& name);
+    std::string strip_ccdf_suffix(const std::string& dist_fun);
+    
+    bool fun_name_exists(const std::string& name);
+
   }
 }
 #endif

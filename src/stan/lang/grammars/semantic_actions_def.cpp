@@ -320,15 +320,48 @@ namespace stan {
         pass = false;
         return;
       }
+      using std::string;
+
+      if (has_prob_fun_suffix(decl.name_)) {
+        std::string dist_name = strip_prob_fun_suffix(decl.name_);
+        if (fun_name_exists(dist_name + "_lpdf")
+            || fun_name_exists(dist_name + "_lpmf")
+            || fun_name_exists(dist_name + "_log")) {
+          error_msgs << "Parse Error.  Probability function already defined"
+                     << " for " << dist_name << std::endl;
+          pass = false;
+          return;
+        }
+      }
+      
+      if (has_cdf_suffix(decl.name_)) {
+        std::string dist_name = strip_cdf_suffix(decl.name_);
+        if (fun_name_exists(dist_name + "_cdf_log")
+            || fun_name_exists(dist_name + "_lcdf")) {
+          error_msgs << " Parse Error.  CDF already defined for "
+                     << dist_name << std::endl;
+          pass = false;
+          return;
+        }
+      }
+
+      if (has_ccdf_suffix(decl.name_)) {
+        std::string dist_name = strip_ccdf_suffix(decl.name_);
+        if (fun_name_exists(dist_name + "_ccdf_log")
+            || fun_name_exists(dist_name + "_lccdf")) {
+          error_msgs << " Parse Error.  CCDF already defined for "
+                     << dist_name << std::endl;
+          pass = false;
+          return;
+        }
+      }
 
       // add declaration in local sets and in parser function sigs
       if (functions_declared.find(name_sig) == functions_declared.end()) {
         functions_declared.insert(name_sig);
         function_signatures::instance()
-          .add(decl.name_,
-               result_type, arg_types);
-        function_signatures::instance()
-          .set_user_defined(name_sig);
+          .add(decl.name_, result_type, arg_types);
+        function_signatures::instance().set_user_defined(name_sig);
       }
 
       // add as definition if there's a body

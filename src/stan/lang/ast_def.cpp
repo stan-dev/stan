@@ -1954,6 +1954,52 @@ namespace stan {
       }
     }
 
+    bool has_prob_fun_suffix(const std::string& fname) {
+      return ends_with("_lpdf", fname) || ends_with("_lpmf", fname)
+        || ends_with("_log", fname);
+    }
+
+    std::string strip_prob_fun_suffix(const std::string& fname) {
+      if (ends_with("_lpdf",fname))
+        return fname.substr(0, fname.size() - 5);
+      else if (ends_with("_lpmf",fname))
+        return fname.substr(0, fname.size() - 5);
+      else if (ends_with("_log",fname))
+        return fname.substr(0, fname.size() - 4);
+      else
+        return fname;
+    }
+
+    bool has_cdf_suffix(const std::string& fname) {
+      return ends_with("_lcdf", fname) || ends_with("_cdf_log", fname);
+    }
+
+    std::string strip_cdf_suffix(const std::string& fname) {
+      if (ends_with("_lcdf",fname))
+        return fname.substr(0, fname.size() - 5);
+      else if (ends_with("_cdf_log",fname))
+        return fname.substr(0, fname.size() - 8);
+      else
+        return fname;
+    }
+
+    bool has_ccdf_suffix(const std::string& fname) {
+      return ends_with("_lccdf", fname) || ends_with("_ccdf_log", fname);
+    }
+
+    std::string strip_ccdf_suffix(const std::string& fname) {
+      if (ends_with("_lccdf",fname))
+        return fname.substr(0, fname.size() - 6);
+      else if (ends_with("_ccdf_log",fname))
+        return fname.substr(0, fname.size() - 9);
+      else 
+        return fname;
+    }
+
+
+    bool fun_name_exists(const std::string& name) {
+      return function_signatures::instance().has_key(name);
+    }
 
 
 
