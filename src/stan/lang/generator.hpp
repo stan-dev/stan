@@ -255,7 +255,10 @@ namespace stan {
         o_ << ")";
       }
       void operator()(const integrate_ode& fx) const {
-        o_ << "integrate_ode("
+        o_ << (fx.integration_function_name_ == "integrate_ode"
+               ? "integrate_ode_rk45"
+               : fx.integration_function_name_)
+           << '('
            << fx.system_function_name_
            << "_functor__(), ";
 
@@ -277,8 +280,9 @@ namespace stan {
         generate_expression(fx.x_int_, o_);
         o_ << ", pstream__)";
       }
-      void operator()(const integrate_ode_cvode& fx) const {
-        o_ << "integrate_ode_cvode("
+      void operator()(const integrate_ode_control& fx) const {
+        o_ << fx.integration_function_name_
+           << '('
            << fx.system_function_name_
            << "_functor__(), ";
 
@@ -298,7 +302,7 @@ namespace stan {
         o_ << ", ";
 
         generate_expression(fx.x_int_, o_);
-        o_ << ", ";
+        o_ << ", pstream__, ";
 
         generate_expression(fx.rel_tol_, o_);
         o_ << ", ";
@@ -307,7 +311,7 @@ namespace stan {
         o_ << ", ";
 
         generate_expression(fx.max_num_steps_, o_);
-        o_ << ", pstream__)";
+        o_ << ")";
       }
       void operator()(const fun& fx) const {
         // first test if short-circuit op (binary && and || applied to
