@@ -2107,82 +2107,6 @@ the actual data in order to assess the suitability of the model; see
 \citep[Chapter~6]{GelmanEtAl:2013} for more information on
 posterior predictive checks.
 
-\section{ODE Solver}\label{language-ode-solver.section}
-
-Stan provides a built-in ordinary differential equation solver.
-Although it looks like a function application, it is special in two
-ways.
-
-First, like PKBugs \citep{LunnEtAl:1999}, Stan's ODE solver takes a
-function specifying the system of equations as an argument.  Ordinary
-Stan functions do not allow functions as arguments.
-
-Second, the ODE solver expression restricts certain of its arguments
-to be data only expressions (i.e., they must not contain variables other
-than those declared in the data or transformed data block).  Ordinary
-Stan functions place no restriction on the origin of variables in
-their argument expressions.
-
-\subsection{Arguments}
-
-The arguments to the ODE solver function \code{integrate\_ode} are as
-follows:
-%
-\begin{enumerate}
-\item Function literal referring to a function specifying the system
-  of differential equations with signature
-\begin{quote}
-(real,real[],real[],real[],int[]):real[]
-\end{quote}
-The arguments represent (1) time, (2) system state, (3) parameters,
-(4) real data, and (5) integer data, and the return value contains the
-derivatives with respect to time of the state,
-\item initial state, type \code{real[]},
-\item initial time, type \code{int} or \code{real}, data only,
-\item solution times, type \code{real[]}, data only,
-\item parameters, type \code{real[]},
-\item real data, type \code{real[]}, data only, and
-\item integer data, type \code{int[]}, data only.
-\end{enumerate}
-%
-
-\subsection{Return Values}
-
-The return value for the ODE solver is an array of type
-\code{real[,]}, with values consisting of solutions at the specified
-times.
-
-\subsection{Sizes and Parallel Arrays}
-
-The sizes must match, and in particular, the following groups are of
-the same size:
-%
-\begin{itemize}
-\item state variables passed into the system function,
-  derivatives returned by the system function, initial state passed
-  into the solver, and rows of the return value of the solver,
-\item solution times and number of rows of the return value of the solver,
-\item parameters, real data and integer data passed to the solver will
-  be passed to the system function
-\end{itemize}
-%
-
-\subsection{Example}
-
-An example of a complete Stan program with a system definition and
-solver call is shown for data simulation in \reffigure{sho-sim} and
-estimation in \reffigure{sho-both}.
-
-\subsection{Gradients}
-
-Gradients are calculated by integrating the coupled system consisting
-of the original system state and derivatives of the original system
-with respect to the parameters and initial state.  The additional derivatives required
-for the coupled system are calculated by automatically differentiating
-the system with respect to the parameters.
-
-
-
 \section{Type Inference}
 
 Stan is strongly statically typed, meaning that the implementation
@@ -4592,6 +4516,10 @@ expression ::= numeric_literal
              | function_literal '(' ?expressions ')'
              | function_literal '(' expression ?('|' expression % ',') ')'
              | integrate_ode '(' function_literal (',' expression){6} ')'
+             | integrate_ode_rk45
+               '(' function_literal (',' expression){6|9} ')'
+             | integrate_ode_bdf
+               '(' function_literal (',' expression){6|9} ')'
              | '(' expression ')'
 
 index ::= ?(expression | expression ':' | ':' expression
@@ -4686,7 +4614,9 @@ suffixes: \code{\_lpdf}, \code{\_lpmf}, \code{\_lcdf}, or \code{\_lccdf}.
 
 \subsection{ODE Solver Argument Types and Origins}
 
-The \code{integrate\_ode} expression requires
+The \code{integrate\_ode}, \code{integrate\_ode\_rk45}, and
+\code{integrate\_ode\_bdf} functions may be used without control
+parameters;  in this case
 %
 \begin{itemize}
 \item its first argument to refer to a function with signature
@@ -4703,6 +4633,16 @@ The \code{integrate\_ode} expression requires
   containing any variables not originating in the data or transformed
   data blocks.
 \end{itemize}
+%
+The \code{integrate\_ode\_rk45} and \code{integrate\_ode\_bdf}
+functions may accept three additional arguments, which like the third,
+fourth, and sixth arguments, must be expressions free of parameter
+references.  The final three arguments must be assignable to types
+\begin{quote}
+\code{real}, \code{real}, \code{int}.
+\end{quote}
+
+
 
 \subsection{Indexes}
 

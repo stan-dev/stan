@@ -3215,3 +3215,175 @@ Convert the array \farg{a} (of any dimension up to 10) to a one-dimensional arra
 Convert the array \farg{a} (of any dimension up to 10) to a one-dimensional array in row-major order.}
 %
 \end{description}
+
+
+\chapter{Ordinary Differential Equation Solvers}
+\label{functions-ode-solver.chapter}
+
+Stan provides built-in ordinary differential equation (ODE) solvers.
+Although they look like function applications, the ODE solvers are
+special in two ways.
+
+First, the first argument to each of the solvers is a function
+specifying the ODE system as an argument, like PKBugs
+\citep{LunnEtAl:1999}. Ordinary Stan functions do not allow functions
+as arguments.
+
+Second, some of the arguments to the ODE solvers are restricted to
+data only expressions. These expressions must not contain variables
+other than those declared in the data or transformed data blocks.
+Ordinary Stan functions place no restriction on the origin of variables
+in their argument expressions.
+
+\section{Specifying an Ordinary Differential Equation as a Function}
+\label{functions-ode-function.section}
+
+A system of ODEs is specified as an ordinary function in Stan within
+the functions block. The ODE system function must have this function
+signature:
+%
+\begin{stancode}
+real[] ode(real time,
+           real[] state,
+           real[] theta,
+           real[] x_r,
+           int[] x_i)
+\end{stancode}
+%
+The ODE system function should return the derivative of the state
+with respect to time at the time provided. The length of the returned
+real array must match the length of the state input into the
+function.
+
+The arguments to this function are:
+\begin{itemize}
+\item \farg{time}, the time to evaluate the ODE system
+\item \farg{state}, the state of the ODE system at the time specified
+\item \farg{theta}, parameter values used to evaluate the ODE system
+\item \farg{x\_r}, data values used to evaluate the ODE system
+\item \farg{x\_i}, integer data values used to evaluate the ODE system.
+\end{itemize}
+%
+The ODE system function separates parameter values, \farg{theta}, from
+data values, \farg{x\_r}, for efficiency in computing the gradients of
+the ODE.
+
+\section{Non-Stiff Solver}
+
+\begin{description}
+  %
+  \fitemthreelines{real[]}{integrate\_ode\_rk45}%
+                  {function \farg{ode}, real[] \farg{initial\_state}}%
+                  {real \farg{initial\_time}, real[] \farg{times}}%
+                  {real[] \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
+                  {Solves the ODE system for the times provided
+                    using the Runge Kutta Dopri algorithm with the implementation
+                    from Boost.}
+ %
+ \fitemfourlines{real[]}{integrate\_ode\_rk45}%
+                {function \farg{ode}, real[] \farg{initial\_state}}%
+                {real \farg{initial\_time}, real[] \farg{times}}%
+                {real[] \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
+                {real \farg{rel\_tol}, real \farg{abs\_tol}, int \farg{max\_num\_steps}}%
+                {Solves the ODE system for the times provided using the Runge Kutta
+                  Dopri algorithm with the implementation from Boost with
+                  additional control parameters for the solver.}
+ %
+ \fitemthreelines{real[]}{integrate\_ode}%
+                 {function \farg{ode}, real[] \farg{initial\_state}}%
+                 {real \farg{initial\_time}, real[] \farg{times}}%
+                 {real[] \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
+                 {Deprecated. Solves the ODE system for the times provided with a
+                   non-stiff solver.  This calls the Runge Kutta Dopri algorithm.}
+  %
+\end{description}
+
+
+\section{Stiff Solver}
+
+\begin{description}
+  %
+  \fitemthreelines{real[]}{integrate\_ode\_bdf}%
+                  {function \farg{ode}, real[] \farg{initial\_state}}%
+                  {real \farg{initial\_time}, real[] \farg{times}}%
+                  {real[] \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
+                  {Solves the ODE system for the times provided using the backward
+                    differentiation formula (BDF) method with the implementation from
+                    CVODES.}
+ %
+ \fitemfourlines{real[]}{integrate\_ode\_bdf}%
+                {function \farg{ode}, real[] \farg{initial\_state}}%
+                {real \farg{initial\_time}, real[] \farg{times}}%
+                {real[] \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
+                {real \farg{rel\_tol}, real \farg{abs\_tol}, int \farg{max\_num\_steps}}%
+                {Solves the ODE system for the times provided using the backward
+                  differentiation formula (BDF) method with the implementation from
+                  CVODES with additional control parameters for the CVODES solver.}
+  %
+\end{description}
+
+\subsection{Arguments to the ODE Solvers}
+
+The arguments to the ODE solvers are as follows:
+%
+\begin{enumerate}
+\item \farg{ode}: function literal referring to a function specifying
+  the system of differential equations with signature described in
+  \refsection{functions-ode-function}:
+  \begin{quote}
+    (real,real[],real[],real[],int[]):real[]
+  \end{quote}
+  The arguments represent (1) time, (2) system state, (3) parameters,
+  (4) real data, and (5) integer data, and the return value contains the
+  derivatives with respect to time of the state,
+\item \farg{initial\_state}: initial state, type \code{real[]},
+\item \farg{initial\_time}: initial time, type \code{int} or \code{real}, data only,
+\item \farg{times}: solution times, type \code{real[]}, data only,
+\item \farg{theta}: parameters, type \code{real[]},
+\item \farg{x\_r}: real data, type \code{real[]}, data only, and
+\item \farg{x\_i}: integer data, type \code{int[]}, data only.
+\end{enumerate}
+
+For more fine-grained control of the ODE solvers, these parameters can
+also be provided:
+\begin{enumerate}
+  \addtocounter{enumi}{7}
+\item \farg{rel\_tol}: relative tolerance for the ODE
+  solver, type \code{real}, data only,
+\item \farg{abs\_tol}: absolute tolerance for the ODE
+  solver, type \code{real}, data only, and
+\item \farg{max\_num\_steps}: maximum number of steps to take in the
+  ODE solver, type \code{int}, data only.
+\end{enumerate}
+%
+
+\subsection{Return Values}
+
+The return value for the ODE solvers is an array of type
+\code{real[,]}, with values consisting of solutions at the specified
+times.
+
+\subsection{Sizes and Parallel Arrays}
+
+The sizes must match, and in particular, the following groups are of
+the same size:
+%
+\begin{itemize}
+\item state variables passed into the system function,
+  derivatives returned by the system function, initial state passed
+  into the solver, and rows of the return value of the solver,
+\item solution times and number of rows of the return value of the solver,
+\item parameters, real data and integer data passed to the solver will
+  be passed to the system function
+\end{itemize}
+%
+
+\subsection{Example}
+
+An example of a complete Stan program with a system definition and
+solver call is shown for data simulation in \reffigure{sho-sim} and
+estimation in \reffigure{sho-both}.
+
+
+
+

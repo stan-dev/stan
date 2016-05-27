@@ -15,7 +15,8 @@ TEST(langParser, functionSigErrorsFunKnown) {
 }
 TEST(langParser, functionSigErrorsSampUnknown) { 
   test_throws("signature_sampling_unknown",
-              "Error: couldn't find distribution named foo_whatev");
+              "Distribution foo_whatev not found."
+              " Require function with _lpdf or _lpmf or _log suffix");
 }
 TEST(langParser, functionSigErrorsSampKnown) { 
   test_throws("signature_sampling_known",
