@@ -211,6 +211,7 @@ namespace stan {
       origin = return_type.is_void()
         ? void_function_argument_origin
         : function_argument_origin;
+      pass = true;
     }
     boost::phoenix::function<set_void_function> set_void_function_f;
 
@@ -293,7 +294,12 @@ namespace stan {
       for (size_t i = 0; i < decl.arg_decls_.size(); ++i)
         arg_types.push_back(expr_type(decl.arg_decls_[i].arg_type_.base_type_,
                                       decl.arg_decls_[i].arg_type_.num_dims_));
+
+
+
       function_signature_t sig(result_type, arg_types);
+
+
       std::pair<std::string, function_signature_t> name_sig(decl.name_, sig);
       // check that not already declared if just declaration
       if (decl.body_.is_no_op_statement()
@@ -303,6 +309,7 @@ namespace stan {
         pass = false;
         return;
       }
+
 
       // check not already user defined
       if (fun_exists(functions_defined, name_sig)) {
@@ -320,7 +327,6 @@ namespace stan {
         pass = false;
         return;
       }
-      using std::string;
 
       if (has_prob_fun_suffix(decl.name_)) {
         std::string dist_name = strip_prob_fun_suffix(decl.name_);
@@ -328,12 +334,12 @@ namespace stan {
             || fun_name_exists(dist_name + "_lpmf")
             || fun_name_exists(dist_name + "_log")) {
           error_msgs << "Parse Error.  Probability function already defined"
-                     << " for " << dist_name << std::endl;
-          pass = false;
-          return;
+                      << " for " << dist_name << std::endl;
+           pass = false;
+           return;
         }
       }
-      
+
       if (has_cdf_suffix(decl.name_)) {
         std::string dist_name = strip_cdf_suffix(decl.name_);
         if (fun_name_exists(dist_name + "_cdf_log")

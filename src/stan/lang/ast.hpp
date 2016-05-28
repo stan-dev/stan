@@ -1096,7 +1096,7 @@ namespace stan {
 
     bool has_ccdf_suffix(const std::string& name);
     std::string strip_ccdf_suffix(const std::string& dist_fun);
-    
+
     bool fun_name_exists(const std::string& name);
 
   }

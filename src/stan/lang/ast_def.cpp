@@ -168,6 +168,8 @@ namespace stan {
     bool
     function_signatures::is_defined(const std::string& name,
                                     const function_signature_t& sig) {
+      if (sigs_map_.find(name) == sigs_map_.end())
+        return false;
       const std::vector<function_signature_t> sigs = sigs_map_[name];
       for (size_t i = 0; i < sigs.size(); ++i)
         if (sig.second  == sigs[i].second)
@@ -312,6 +314,7 @@ namespace stan {
     int function_signatures::get_signature_matches(const std::string& name,
                               const std::vector<expr_type>& args,
                               function_signature_t& signature) {
+      if (!has_key(name)) return 0;
       std::vector<function_signature_t> signatures = sigs_map_[name];
       size_t min_promotions = std::numeric_limits<size_t>::max();
       size_t num_matches = 0;
@@ -1949,9 +1952,8 @@ namespace stan {
         return dist_name + "_lpdf";
       else if (function_signatures::instance().has_key(dist_name + "_lpmf"))
         return dist_name + "_lpmf";
-      else {
+      else
         return dist_name;
-      }
     }
 
     bool has_prob_fun_suffix(const std::string& fname) {
@@ -1960,11 +1962,11 @@ namespace stan {
     }
 
     std::string strip_prob_fun_suffix(const std::string& fname) {
-      if (ends_with("_lpdf",fname))
+      if (ends_with("_lpdf", fname))
         return fname.substr(0, fname.size() - 5);
-      else if (ends_with("_lpmf",fname))
+      else if (ends_with("_lpmf", fname))
         return fname.substr(0, fname.size() - 5);
-      else if (ends_with("_log",fname))
+      else if (ends_with("_log", fname))
         return fname.substr(0, fname.size() - 4);
       else
         return fname;
@@ -1975,9 +1977,9 @@ namespace stan {
     }
 
     std::string strip_cdf_suffix(const std::string& fname) {
-      if (ends_with("_lcdf",fname))
+      if (ends_with("_lcdf", fname))
         return fname.substr(0, fname.size() - 5);
-      else if (ends_with("_cdf_log",fname))
+      else if (ends_with("_cdf_log", fname))
         return fname.substr(0, fname.size() - 8);
       else
         return fname;
@@ -1988,17 +1990,18 @@ namespace stan {
     }
 
     std::string strip_ccdf_suffix(const std::string& fname) {
-      if (ends_with("_lccdf",fname))
+      if (ends_with("_lccdf", fname))
         return fname.substr(0, fname.size() - 6);
-      else if (ends_with("_ccdf_log",fname))
+      else if (ends_with("_ccdf_log", fname))
         return fname.substr(0, fname.size() - 9);
-      else 
+      else
         return fname;
     }
 
 
     bool fun_name_exists(const std::string& name) {
-      return function_signatures::instance().has_key(name);
+      bool exists = function_signatures::instance().has_key(name);
+      return exists;
     }
 
 
