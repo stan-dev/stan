@@ -1,5 +1,5 @@
 functions {
-  real poisson_lpdf(int n, real x) {
+  real poisson_lpdf(real n, real x) {
     return -x^2;
   }
 }

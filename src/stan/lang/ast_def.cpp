@@ -1919,7 +1919,6 @@ namespace stan {
       return assignable;
     }
 
-
     bool ends_with(const std::string& suffix,
                    const std::string& s) {
       size_t idx = s.rfind(suffix);
@@ -1998,10 +1997,8 @@ namespace stan {
         return fname;
     }
 
-
     bool fun_name_exists(const std::string& name) {
-      bool exists = function_signatures::instance().has_key(name);
-      return exists;
+      return function_signatures::instance().has_key(name);
     }
 
 

@@ -4601,20 +4601,20 @@ namespace stan {
                            std::ostream& out) {
       bool is_rng = ends_with("_rng", fun.name_);
       bool is_lp = ends_with("_lp", fun.name_);
-      bool is_log = ends_with("_log", fun.name_);
-      std::string scalar_t_name
-        = fun_scalar_type(fun, is_lp);
+      bool is_pf = ends_with("_log", fun.name_)
+        || ends_with("_lpdf", fun.name_) || ends_with("_lpmf", fun.name_);
+      std::string scalar_t_name = fun_scalar_type(fun, is_lp);
 
-      generate_function_template_parameters(fun, is_rng, is_lp, is_log, out);
+      generate_function_template_parameters(fun, is_rng, is_lp, is_pf, out);
       generate_function_inline_return_type(fun, scalar_t_name, 0, out);
       generate_function_name(fun, out);
-      generate_function_arguments(fun, is_rng, is_lp, is_log, out);
+      generate_function_arguments(fun, is_rng, is_lp, is_pf, out);
       generate_function_body(fun, scalar_t_name, out);
 
       // need a second function def for default propto=false for _log
       // funs; but don't want duplicate def, so don't do it for
       // forward decl when body is no-op
-      if (is_log && !fun.body_.is_no_op_statement())
+      if (is_pf && !fun.body_.is_no_op_statement())
         generate_propto_default_function(fun, scalar_t_name, out);
       out << EOL;
     }
@@ -4626,40 +4626,30 @@ namespace stan {
 
       bool is_rng = ends_with("_rng", fun.name_);
       bool is_lp = ends_with("_lp", fun.name_);
-      bool is_log = ends_with("_log", fun.name_);
+      bool is_pf = ends_with("_log", fun.name_)
+        || ends_with("_lpdf", fun.name_) || ends_with("_lpmf", fun.name_);
       std::string scalar_t_name = fun_scalar_type(fun, is_lp);
 
-      out << EOL
-          << "struct ";
+      out << EOL << "struct ";
       generate_function_name(fun, out);
-      out << "_functor__ {"
-          << EOL;
+      out << "_functor__ {" << EOL;
 
       out << INDENT;
-      generate_function_template_parameters(fun, is_rng, is_lp, is_log, out);
+      generate_function_template_parameters(fun, is_rng, is_lp, is_pf, out);
 
       out << INDENT;
       generate_function_inline_return_type(fun, scalar_t_name, 1, out);
 
-      out <<  INDENT
-          << "operator()";
-      generate_function_arguments(fun, is_rng, is_lp, is_log, out);
-      out << " const {"
-          << EOL;
+      out <<  INDENT << "operator()";
+      generate_function_arguments(fun, is_rng, is_lp, is_pf, out);
+      out << " const {" << EOL;
 
-      out << INDENT2
-          << "return ";
+      out << INDENT2 << "return ";
       generate_function_name(fun, out);
-      generate_functor_arguments(fun, is_rng, is_lp, is_log, out);
-      out << ";"
-          << EOL;
-
-      out << INDENT
-          << "}"
-          << EOL;
-
-      out << "};"
-          << EOL2;
+      generate_functor_arguments(fun, is_rng, is_lp, is_pf, out);
+      out << ";" << EOL;
+      out << INDENT << "}"  << EOL;
+      out << "};" << EOL2;
     }
 
 

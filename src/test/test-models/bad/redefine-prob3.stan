@@ -1,8 +1,8 @@
 functions {
-  real foo_log(real y) {
+  real foo_log(int y) {
     return -y^2;
   }
-  real foo_lpmf(real y) {
+  real foo_lpmf(int y) {
     return y^2 / 2;
   }
 }

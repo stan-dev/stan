@@ -280,6 +280,43 @@ namespace stan {
       return false;
     }
 
+    void validate_prob_fun::operator()(std::string& fname, bool& pass,
+                                       std::ostream& error_msgs) const {
+      if (has_prob_fun_suffix(fname)) {
+        std::string dist_name = strip_prob_fun_suffix(fname);
+        if (!fun_name_exists(fname)  // catch redefines later avoid fwd
+            && (fun_name_exists(dist_name + "_lpdf")
+                || fun_name_exists(dist_name + "_lpmf")
+                || fun_name_exists(dist_name + "_log"))) {
+          error_msgs << "Parse Error.  Probability function already defined"
+                     << " for " << dist_name << std::endl;
+          pass = false;
+          return;
+        }
+      }
+      if (has_cdf_suffix(fname)) {
+        std::string dist_name = strip_cdf_suffix(fname);
+        if (fun_name_exists(dist_name + "_cdf_log")
+            || fun_name_exists(dist_name + "_lcdf")) {
+          error_msgs << " Parse Error.  CDF already defined for "
+                     << dist_name << std::endl;
+          pass = false;
+          return;
+        }
+      }
+      if (has_ccdf_suffix(fname)) {
+        std::string dist_name = strip_ccdf_suffix(fname);
+        if (fun_name_exists(dist_name + "_ccdf_log")
+            || fun_name_exists(dist_name + "_lccdf")) {
+          error_msgs << " Parse Error.  CCDF already defined for "
+                     << dist_name << std::endl;
+          pass = false;
+          return;
+        }
+      }
+    }
+    boost::phoenix::function<validate_prob_fun> validate_prob_fun_f;
+
     void add_function_signature::operator()(const function_decl_def& decl,
         bool& pass,
         std::set<std::pair<std::string, function_signature_t> >&
@@ -295,11 +332,7 @@ namespace stan {
         arg_types.push_back(expr_type(decl.arg_decls_[i].arg_type_.base_type_,
                                       decl.arg_decls_[i].arg_type_.num_dims_));
 
-
-
       function_signature_t sig(result_type, arg_types);
-
-
       std::pair<std::string, function_signature_t> name_sig(decl.name_, sig);
       // check that not already declared if just declaration
       if (decl.body_.is_no_op_statement()
@@ -309,7 +342,6 @@ namespace stan {
         pass = false;
         return;
       }
-
 
       // check not already user defined
       if (fun_exists(functions_defined, name_sig)) {
@@ -328,38 +360,20 @@ namespace stan {
         return;
       }
 
-      if (has_prob_fun_suffix(decl.name_)) {
-        std::string dist_name = strip_prob_fun_suffix(decl.name_);
-        if (fun_name_exists(dist_name + "_lpdf")
-            || fun_name_exists(dist_name + "_lpmf")
-            || fun_name_exists(dist_name + "_log")) {
-          error_msgs << "Parse Error.  Probability function already defined"
-                      << " for " << dist_name << std::endl;
-           pass = false;
-           return;
-        }
-      }
 
-      if (has_cdf_suffix(decl.name_)) {
-        std::string dist_name = strip_cdf_suffix(decl.name_);
-        if (fun_name_exists(dist_name + "_cdf_log")
-            || fun_name_exists(dist_name + "_lcdf")) {
-          error_msgs << " Parse Error.  CDF already defined for "
-                     << dist_name << std::endl;
-          pass = false;
-          return;
-        }
+      if (ends_with("_lpdf", decl.name_) && arg_types[0].base_type_ == INT_T) {
+        error_msgs << "Parse Error.  Probability density functions require"
+                   << " real variates (first argument)."
+                   << " Found type = " << arg_types[0] << std::endl;
+        pass = false;
+        return;
       }
-
-      if (has_ccdf_suffix(decl.name_)) {
-        std::string dist_name = strip_ccdf_suffix(decl.name_);
-        if (fun_name_exists(dist_name + "_ccdf_log")
-            || fun_name_exists(dist_name + "_lccdf")) {
-          error_msgs << " Parse Error.  CCDF already defined for "
-                     << dist_name << std::endl;
-          pass = false;
-          return;
-        }
+      if (ends_with("_lpmf", decl.name_) && arg_types[0].base_type_ != INT_T) {
+        error_msgs << "Parse Error.  Probability mass functions require"
+                   << " integer variates (first argument)."
+                   << " Found type = " << arg_types[0] << std::endl;
+        pass = false;
+        return;
       }
 
       // add declaration in local sets and in parser function sigs
@@ -377,6 +391,37 @@ namespace stan {
     }
     boost::phoenix::function<add_function_signature> add_function_signature_f;
 
+
+    void validate_pmf_pdf_variate::operator()(function_decl_def& decl,
+                                              bool& pass,
+                                              std::ostream& error_msgs)
+      const {
+      if (!has_prob_fun_suffix(decl.name_))
+        return;
+      if (decl.arg_decls_.size() == 0) {
+        error_msgs << "Parse Error.  Probability functions require"
+                   << " at least one argument." << std::endl;
+        pass = false;
+        return;
+      }
+      expr_type variate_type = decl.arg_decls_[0].arg_type_;
+      if (ends_with("_lpdf", decl.name_) && variate_type.base_type_ == INT_T) {
+        error_msgs << "Parse Error.  Probability density functions require"
+                   << " real variates (first argument)."
+                   << " Found type = " << variate_type << std::endl;
+        pass = false;
+        return;
+      }
+      if (ends_with("_lpmf", decl.name_) && variate_type.base_type_ != INT_T) {
+        error_msgs << "Parse Error.  Probability mass functions require"
+                   << " integer variates (first argument)."
+                   << " Found type = " << variate_type << std::endl;
+        pass = false;
+        return;
+      }
+    }
+    boost::phoenix::function<validate_pmf_pdf_variate>
+    validate_pmf_pdf_variate_f;
 
     void validate_return_type::operator()(function_decl_def& decl,
                                           bool& pass,

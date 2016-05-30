@@ -271,6 +271,22 @@ namespace stan {
     validate_return_type_f;
 
     // called from: functions_grammar
+    struct validate_pmf_pdf_variate : public phoenix_functor_ternary {
+      void operator()(function_decl_def& decl, bool& pass,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<validate_pmf_pdf_variate>
+    validate_pmf_pdf_variate_f;
+
+    // called from: functions_grammar
+    struct validate_prob_fun : public phoenix_functor_ternary {
+      void operator()(std::string& fname, bool& pass,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<validate_prob_fun> validate_prob_fun_f;
+
+
+    // called from: functions_grammar
     struct scope_lp : public phoenix_functor_unary {
       void operator()(variable_map& vm) const;
     };
