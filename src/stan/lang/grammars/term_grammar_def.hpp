@@ -78,6 +78,7 @@ namespace stan {
       using boost::spirit::qi::double_;
       using boost::spirit::qi::eps;
       using boost::spirit::qi::int_;
+      using boost::spirit::qi::hold;
       using boost::spirit::qi::lexeme;
       using boost::spirit::qi::lit;
       using boost::spirit::qi::no_skip;
@@ -117,17 +118,15 @@ namespace stan {
                       [logical_negate_expr_f(_val, _1,
                                              boost::phoenix::ref(error_msgs_))]
         | lit('+') >> negated_factor_r(_r1)[assign_lhs_f(_val, _1)]
-        | exponentiated_factor_r(_r1)[assign_lhs_f(_val, _1)]
-        | idx_factor_r(_r1)[assign_lhs_f(_val, _1)];
-
+        | exponentiated_factor_r(_r1)[assign_lhs_f(_val, _1)];
 
       exponentiated_factor_r.name("expression");
       exponentiated_factor_r
-        = (idx_factor_r(_r1)[assign_lhs_f(_val, _1)]
-           >> lit('^')
-           > negated_factor_r(_r1)
-             [exponentiation_f(_val, _1, _r1, _pass,
-                               boost::phoenix::ref(error_msgs_))]);
+        = idx_factor_r(_r1)[assign_lhs_f(_val, _1)]
+        >> -(lit('^')
+             > negated_factor_r(_r1)
+               [exponentiation_f(_val, _1, _r1, _pass,
+                                 boost::phoenix::ref(error_msgs_))]);
 
       idx_factor_r.name("expression");
       idx_factor_r
@@ -216,33 +215,38 @@ namespace stan {
       int_literal_r.name("integer literal");
       int_literal_r
         %= int_
-        >> !(lit('.')
-             | lit('e')
-             | lit('E'));
+        >> !(lit('.') | lit('e') | lit('E'));
 
       double_literal_r.name("real literal");
       double_literal_r
         %= double_;
 
-
       fun_r.name("function and argument expressions");
       fun_r
-        %= identifier_r
-        >> args_r(_r1);
-
+        %= (hold[identifier_r[is_prob_fun_f(_1, _pass)]] > prob_args_r(_r1))
+        | (identifier_r >> args_r(_r1));
 
       identifier_r.name("identifier");
       identifier_r
         %= lexeme[char_("a-zA-Z")
                   >> *char_("a-zA-Z0-9_.")];
 
+      prob_args_r.name("probability function arguments");
+      prob_args_r
+        %= (lit('(') >> lit(')'))
+        | hold[lit('(')
+               >> expression_g(_r1)
+               >> lit(')')]
+        | (lit('(')
+           >> expression_g(_r1)
+           >> lit('|')
+           >> (expression_g(_r1) % ',')
+           >> lit(')'));
 
       args_r.name("function arguments");
       args_r
         %= (lit('(') >> lit(')'))
-        | ((lit('(')
-            >> (expression_g(_r1) % ','))
-            > lit(')'));
+        | (lit('(') >> (expression_g(_r1) % ',') >> lit(')'));
 
       dim_r.name("array dimension (integer expression)");
       dim_r

@@ -3059,6 +3059,107 @@ generated quantities {
 Of course, the same could be done for the seemingly unrelated
 regressions in the previous section.
 
+\section{Applications of Pseudorandom Number Generation}
+
+The main application of pseudorandom number generator (PRNGs) is for
+posterior inference, including prediction and posterior predictive
+checks.  They can also be used for pure data simulation, which is like
+a posterior predictive check with no conditioning.  See
+\refsection{distributions-prng} for a description of their syntax and
+the scope of their usage.
+
+\subsection{Prediction}
+
+Consider predicting unobserved outcomes using linear
+regression.  Given predictors $x_1, \ldots, x_N$ and observed outcomes
+$y_1,\ldots,y_N$, and assuming a standard linear regression with
+intercept $\alpha$, slope $\beta$, and error scale $\sigma$, along with
+improper uniform priors, the posterior over the parameters given $x$
+and $y$ is
+%
+\[
+p(\alpha, \beta, \sigma \, | \, x, y) 
+\propto 
+\prod_{n=1}^N 
+  \distro{Normal}(y_n \, | \, \alpha + \beta x_n, \sigma).
+\]
+%
+For this model, the posterior predictive inference for a new outcome
+$\tilde{y}_m$ given a predictor $\tilde{x}_m$, conditioned on the
+observed data $x$ and $y$, is
+\[
+p(\tilde{y}_n \, | \, \tilde{x}_n, x, y)
+= \int_{(\alpha,\beta,\sigma)}
+  \distro{Normal}(\tilde{y}_n \, | \, \alpha + \beta \tilde{x}_n, \sigma)
+  \times
+  p(\alpha, \beta, \sigma \, | \, x, y) 
+  \
+  \mathrm{d}(\alpha,\beta,\sigma).
+\]
+%
+To code the posterior predictive inference in Stan, a standard linear
+regression is combined with a random number in the generated
+quantities block.
+%
+\begin{stancode}
+data {
+  int<lower=0> N;
+  vector[N] y;
+  vector[N] x;
+  int<lower=0> N_tilde;
+  vector[N_tilde] x_tilde;
+}
+parameters {
+  real alpha;
+  real beta;
+  real<lower=0> sigma;
+}
+model {
+  y ~ normal(alpha + beta * x, sigma);
+}
+generated quantities {
+  vector[N_tilde] y_tilde;
+  for (n in 1:N_tilde)
+    y_tilde[n] = normal_rng(alpha + beta * x_tilde[n], sigma);
+}
+\end{stancode}
+%
+Given observed predictors $x$ and outcomes $y$, \code{y\_tilde} will
+be drawn according to $p(\tilde{y} \, | \, \tilde{x}, y, x)$.  This
+means that, for example, the posterior mean for \code{y\_tilde} is the
+estimate of the outcome that minimizes expected square error
+(conditioned on the data and model, of course).
+
+\subsection{Posterior Predictive Checks}
+
+A good way to investigate the fit of a model to the data, a critical
+step in Bayesian data analysis, is to generate simulated data
+according to the parameters of the model.  This is carried out with
+exactly the same procedure as before, only the observed data
+predictors $x$ are used in place of new predictors $\tilde{x}$ for
+unobserved outcomes.  If the model fits the data well, the predictions
+for $\tilde{y}$ based on $x$ should match the observed data $y$.
+
+To code posterior predictive checks in Stan requires only a slight
+modification of the prediction code to use $x$ and $N$ in place of
+$\tilde{x}$ and $\tilde{N}$,
+%
+\begin{stancode}
+generated quantities {
+  vector[N] y_tilde;
+  for (n in 1:N)
+    y_tilde = normal_rng(alpha + beta * x[n], sigma);
+}
+\end{stancode}
+%
+\cite{GelmanEtAl:2013} recommend choosing several posterior draws
+$\tilde{y}^{(1)}, \ldots, \tilde{y}^{(M)}$ and plotting each of them
+alongside the data $y$ that was actually observed.  If the model fits
+well, the simulated $\tilde{y}$ will look like the actual data $y$.
+
+
+
+
 \chapter{Time-Series Models}
 
 \noindent
@@ -4412,11 +4513,11 @@ is
 \[
 \log \prod_{m=1}^M \mbox{Pr}[y_m > U]
 = \log \left( 1 - \Phi\left(\frac{y - \mu}{\sigma}\right)\right)^{M}
-= M \, \code{normal\_ccdf\_log}(y,\mu,\sigma),
+= M \, \code{normal\_lccdf}(y,\mu,\sigma),
 \]
 %
-where \code{normal\_ccdf\_log} is the log of complementary CDF
-(\Stan provides \code{<distr>\_ccdf\_log} for each distribution
+where \code{normal\_lccdf} is the log of complementary CDF
+(\Stan provides \code{<distr>\_lccdf} for each distribution
 implemented in \Stan).
 
 The following right-censored model assumes
@@ -4434,8 +4535,8 @@ parameters {
   real<lower=0> sigma;
 }
 model {
-  y_obs ~ normal(mu,sigma); 
-  target += N_cens * normal_ccdf_log(U,mu,sigma);
+  y_obs ~ normal(mu, sigma); 
+  target += N_cens * normal_lccdf(U | mu, sigma);
 }
 \end{stancode}
 %
@@ -4444,10 +4545,10 @@ used without truncation.  The log probability is directly incremented
 using the calculated log cumulative normal probability of the censored
 data items.
 
-For the left-censored data the CDF
-(\code{normal\_cdf\_log}) has to be used instead of complementary CDF.
-If the censoring point variable (\code{L}) is unknown,
-its declaration should be moved from the data to the parameters block. 
+For the left-censored data the CDF (\code{normal\_lcdf}) has to be
+used instead of complementary CDF.  If the censoring point variable
+(\code{L}) is unknown, its declaration should be moved from the data
+to the parameters block.
 %
 \begin{stancode}
 data {
@@ -4461,9 +4562,9 @@ parameters {
   real<lower=0> sigma;
 }
 model {
-  L ~ normal(mu,sigma);
-  y_obs ~ normal(mu,sigma);
-  target += N_cens * normal_cdf_log(L,mu,sigma);
+  L ~ normal(mu, sigma);
+  y_obs ~ normal(mu, sigma);
+  target += N_cens * normal_lcdf(L | mu, sigma);
 }
 \end{stancode}
 %
@@ -4566,8 +4667,8 @@ parameters {
   real y;
 }
 model {
-  target += log_sum_exp(log(0.3) + normal_log(y,-1,2),
-                        log(0.7) + normal_log(y,3,1));
+  target += log_sum_exp(log(0.3) + normal_lpdf(y | -1, 2),
+                        log(0.7) + normal_lpdf(y | 3, 1));
 }
 \end{stancode}
 %
@@ -4616,7 +4717,7 @@ model {
   for (n in 1:N) {
     for (k in 1:K) {
       ps[k] = log(theta[k]) 
-               + normal_log(y[n],mu[k],sigma[k]);
+               + normal_lpdf(y[n] | mu[k], sigma[k]);
     }
     target += log_sum_exp(ps);
   }
@@ -4653,9 +4754,9 @@ A proper mixture at the observation level is defined as
 \begin{stancode}
 for (n in 1:N) {
   target += log_sum_exp(log(lambda) 
-                          + normal_log(y[n], mu[1], sigma[1]),
+                          + normal_lpdf(y[n] | mu[1], sigma[1]),
                         log1m(lambda)
-                          + normal_log(y[n], mu[2], sigma[2]));
+                          + normal_lpdf(y[n] | mu[2], sigma[2]));
 \end{stancode}
 %
 or equivalently
@@ -4663,8 +4764,8 @@ or equivalently
 \begin{stancode}
 for (n in 1:N)
   target += log_mix(lambda, 
-                    normal_log(y[n], mu[1], sigma[1]),
-                    normal_log(y[n], mu[2], sigma[2])));
+                    normal_lpdf(y[n] | mu[1], sigma[1]),
+                    normal_lpdf(y[n] | mu[2], sigma[2])));
 \end{stancode}
 %
 This definition assumes that each observation $y_n$ may have arisen
@@ -4680,17 +4781,17 @@ vectorize the model.
 %
 \begin{stancode}
 target += log_sum_exp(log(lambda) 
-                        + normal_log(y, mu[1], sigma[1]),
+                        + normal_lpdf(y | mu[1], sigma[1]),
                       log1m(lambda)
-                        + normal_log(y, mu[2], sigma[2]));
+                        + normal_lpdf(y | mu[2], sigma[2]));
 \end{stancode}
 %
 or equivalently,
 %
 \begin{stancode}
 target += log_mix(lambda,
-                  normal_log(y, mu[1], sigma[1]),
-                  normal_log(y, mu[2], sigma[2]));
+                  normal_lpdf(y | mu[1], sigma[1]),
+                  normal_lpdf(y | mu[2], sigma[2]));
 \end{stancode}
 %
 This second definition implies that the entire sequence $y_1, \ldots, y_n$ of
@@ -4751,18 +4852,18 @@ data {
   int<lower=0> y[N];
 }
 parameters {
-  real<lower=0,upper=1> theta;
+  real<lower=0, upper=1> theta;
   real lambda;
 }
 model {
   for (n in 1:N) {
     if (y[n] == 0)
-      target += log_sum_exp(bernoulli_log(1,theta),
-                            bernoulli_log(0,theta) 
-                              + poisson_log(y[n],lambda));
+      target += log_sum_exp(bernoulli_lpmf(1 | theta),
+                            bernoulli_lpmf(0 | theta) 
+                              + poisson_lpmf(y[n] | lambda));
     else
-      target += bernoulli_log(0,theta)
-                  + poisson_log(y[n],lambda);
+      target += bernoulli_lpmf(0 | theta)
+                  + poisson_lpmf(y[n] | lambda);
   }
 }
 \end{stancode}
@@ -4822,8 +4923,8 @@ effect is equivalent to the direct definition of the log likelihood.
    if (y[n] == 0)
       target += log(theta);
     else
-      target += log1m(theta) + poisson_log(y[n], lambda)
-                - poisson_ccdf_log(0, lambda));
+      target += log1m(theta) + poisson_lpmf(y[n] | lambda)
+                - poisson_lccdf(0 | lambda));
 \end{stancode}
 
 Julian King pointed out that because
@@ -4835,7 +4936,7 @@ Julian King pointed out that because
 the CCDF in the else clause can be replaced with a simpler expression.
 %
 \begin{stancode}
-      target += log1m(theta) + poisson_log(y[n], lambda)
+      target += log1m(theta) + poisson_lpmf(y[n] | lambda)
                 - log1m_exp(-lambda));
 \end{stancode}
 %
@@ -5527,7 +5628,7 @@ transformed parameters {
   lp = rep_vector(log_unif, T);
   for (s in 1:T)
     for (t in 1:T)
-      lp[s] = lp[s] + poisson_log(D[t], if_else(t < s, e, l));
+      lp[s] = lp[s] + poisson_lpmf(D[t] | if_else(t < s, e, l));
 }
 model {
   e ~ exponential(r_e);
@@ -5560,8 +5661,8 @@ transformed parameters {
       lp_e[1] <- 0;
       lp_l[1] <- 0;
       for (t in 1:T) {
-        lp_e[t + 1] <- lp_e[t] + poisson_log(D[t], e);
-        lp_l[t + 1] <- lp_l[t] + poisson_log(D[t], l);
+        lp_e[t + 1] <- lp_e[t] + poisson_lpmf(D[t] | e);
+        lp_l[t + 1] <- lp_l[t] + poisson_lpmf(D[t] | l);
       }
       lp <- rep_vector(log_unif + lp_l[T + 1], T) + head(lp_e, T) - head(lp_l, T);
     }
@@ -5704,7 +5805,7 @@ for (s1 in 1:T)
   for (s2 in 1:T)
     for (t in 1:T)
       lp[s1,s2] = lp[s1,s2] 
-        + poisson_log(D[t], if_else(t < s1, e, if_else(t < s2, m, l)));
+        + poisson_lpmf(D[t] | if_else(t < s1, e, if_else(t < s2, m, l)));
 \end{stancode}
 %
 The matrix can then be converted back to a vector using
@@ -5938,7 +6039,7 @@ parameters $\phi$ and $p$.  In the model block, the log probability is
 incremented for each history based on its count.  This second step is
 similar to collecting Bernoulli observations into a binomial or
 categorical observations into a multinomial, only it is coded directly
-in the Stan program using \code{increment\_log\_prob} rather than
+in the Stan program using \code{target~+=} rather than
 being part of a built-in probability function.
 %
 \begin{figure}
@@ -7046,11 +7147,11 @@ model {
     phi[k] ~ dirichlet(beta);
   for (m in 1:M) 
     for (k in 1:K) 
-      gamma[m,k] = categorical_log(k,theta);
+      gamma[m,k] = categorical_lpmf(k | theta);
   for (n in 1:N)
     for (k in 1:K)
       gamma[doc[n],k] = gamma[doc[n],k] 
-                         + categorical_log(w[n],phi[k]);
+                         + categorical_lpmf(w[n] | phi[k]);
   for (m in 1:M)
     target += log_sum_exp(gamma[m]);
 }
@@ -8446,7 +8547,7 @@ log(y) ~ normal(mu,sigma);
 or as an increment to the log probability function, as in
 %
 \begin{stancode}
-target += normal_log(log(y), mu, sigma);
+target += normal_lpmf(log(y) | mu, sigma);
 \end{stancode}
 
 \subsubsection{Gamma and Inverse Gamma Distribution}\label{jacobian-adjustment.section}
@@ -9003,7 +9104,7 @@ transformed parameters {
 \section{Functions Accessing the Log Probability  Accumulator}
 
 Functions whose names end in \code{\_lp} are allowed to use sampling
-statements and \code{increment\_log\_prob()} statements; other
+statements and \code{target~+=} statements; other
 functions are not.  Because of this access, their use is restricted to
 the transformed parameters and model blocks.
 
@@ -9102,7 +9203,8 @@ multivariate normal draws for \code{x\_sim}.
 \section{User-Defined Probability Functions}
 
 Probability functions are distinguished in Stan by names ending in
-\code{\_log} and \code{real} return types.  
+\code{\_lpdf} for density functions and \code{\_lpmf} for mass
+functions; in both cases, they must have \code{real} return types.
 
 Suppose a model uses several unit normal distributions, for which
 there is not a specific overloaded density nor defaults in Stan.  So
@@ -9111,8 +9213,8 @@ them, a new density function may be defined and reused.
 %
 \begin{stancode}
 functions {
-  real unit_normal_log(real y) { 
-    return normal_log(y,0,1); 
+  real unit_normal_lpdf(real y) { 
+    return normal_lpdf(y | 0, 1); 
   }
 }
 ...
@@ -9124,24 +9226,31 @@ model {
 \end{stancode}
 %
 The ability to use the \code{unit\_normal} function as a density is
-keyed off its name ending in \code{\_log}.  
+keyed off its name ending in \code{\_lpdf} (names ending in
+\code{\_lpmf} for probabilty mass functions work the same way).  
 
-In general, if \code{foo\_log} is defined to consume $N + 1$ arguments,
-then
+In general, if \code{foo\_lpdf} is defined to consume $N + 1$
+arguments, then
 %
 \begin{stancode}
-y ~ foo(theta1,...,thetaN);
+y ~ foo(theta1, ..., thetaN);
 \end{stancode}
 %
 can be used as shorthand for 
 %
 \begin{stancode}
-target += foo_log(y,theta1,...,thetaN);
+target += foo_lpdf(y | theta1, ..., thetaN);
 \end{stancode}
 %
-As with the built-in functions, the suffix \code{\_log} is dropped and
+As with the built-in functions, the suffix \code{\_lpdf} is dropped and
 the first argument moves to the left of the sampling symbol (\Verb|~|)
-in the sampling statement.
+in the sampling statement.  
+
+Functions ending in \code{\_lpmf} (for probability mass functions),
+behave exactly the same way.  The difference is that the first
+argument of a density function (\code{\_lpdf}) must be continuous (not
+an integer or integer array), whereas the first argument of a mass
+function (\code{\_lpmf}) must be discrete (integer or integer array).
 
 
 \section{Overloading Functions}
@@ -9250,8 +9359,8 @@ as part of the Stan language, so there is no need to document them.
 \section{Summary of Function Types}
 
 Functions may have a void or non-void return type and they may or may
-not have one of the special suffixes, \code{\_log}, \code{\_lp}, or
-\code{\_rng}.
+not have one of the special suffixes, \code{\_lpdf}, \code{\_lpmf},
+\code{\_lp}, or \code{\_rng}.
 
 \subsection{Void vs. Non-Void Return}
 
@@ -9265,13 +9374,14 @@ arguments of a type that matches the declared return type.
 
 \subsection{Suffixed or Non-Suffixed}
 
-Only functions ending in \code{\_log} and with return type \code{real}
-may be used as probability functions in sampling statements. 
+Only functions ending in \code{\_lpmf} or \code{\_lpdf} and with
+return type \code{real} may be used as probability functions in
+sampling statements.
 
 Only functions ending in \code{\_lp} may access the log probability
-accumulator through sampling statements or
-\code{increment\_log\_prob()} statements.  Such functions may only be
-used in the transformed parameters or model blocks.
+accumulator through sampling statements or \code{target~+=}
+statements.  Such functions may only be used in the transformed
+parameters or model blocks.
 
 Only functions ending in \code{\_rng} may access the built-in
 pseudo-random number generators.  Such functions may only be used in

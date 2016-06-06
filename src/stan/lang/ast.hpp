@@ -178,6 +178,7 @@ namespace stan {
       bool is_defined(const std::string& name,
                       const function_signature_t& sig);
       std::set<std::string> key_set() const;
+      bool has_key(const std::string& key) const;
 
     private:
       function_signatures();
@@ -387,6 +388,7 @@ namespace stan {
 
     struct fun {
       std::string name_;
+      std::string original_name_;
       std::vector<expression> args_;
       expr_type type_;
       fun();
@@ -1078,6 +1080,24 @@ namespace stan {
 
     bool ends_with(const std::string& suffix,
                    const std::string& s);
+
+
+    std::string get_cdf(const std::string& dist_name);
+
+    std::string get_ccdf(const std::string& dist_name);
+
+    std::string get_prob_fun(const std::string& dist_name);
+
+    bool has_prob_fun_suffix(const std::string& name);
+    std::string strip_prob_fun_suffix(const std::string& dist_fun);
+
+    bool has_cdf_suffix(const std::string& name);
+    std::string strip_cdf_suffix(const std::string& dist_fun);
+
+    bool has_ccdf_suffix(const std::string& name);
+    std::string strip_ccdf_suffix(const std::string& dist_fun);
+
+    bool fun_name_exists(const std::string& name);
 
   }
 }
