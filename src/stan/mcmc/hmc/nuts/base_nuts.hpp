@@ -3,6 +3,7 @@
 
 #include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <stan/math/prim/scal/fun/log_sum_exp.hpp>
 #include <stan/mcmc/hmc/base_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 #include <algorithm>
@@ -61,7 +62,7 @@ namespace stan {
         Eigen::VectorXd p_sharp_plus = this->hamiltonian_.dtau_dp(this->z_);
         Eigen::VectorXd p_sharp_minus = this->hamiltonian_.dtau_dp(this->z_);
         Eigen::VectorXd rho = this->z_.p;
-        double sum_weight = 1;
+        double log_sum_weight = 0;  // log(exp(H0 - H0))
 
         double H0 = this->hamiltonian_.H(this->z_);
         int n_leapfrog = 0;
@@ -77,14 +78,15 @@ namespace stan {
           rho_subtree.setZero();
 
           bool valid_subtree = false;
-          double sum_weight_subtree = 0;
+          double log_sum_weight_subtree
+            = -std::numeric_limits<double>::infinity();
 
           if (this->rand_uniform_() > 0.5) {
             this->z_.ps_point::operator=(z_plus);
             valid_subtree
               = build_tree(this->depth_, rho_subtree, z_propose,
                            H0, 1, n_leapfrog,
-                           sum_weight_subtree, sum_metro_prob,
+                           log_sum_weight_subtree, sum_metro_prob,
                            info_writer, error_writer);
             z_plus.ps_point::operator=(this->z_);
             p_sharp_plus = this->hamiltonian_.dtau_dp(this->z_);
@@ -93,19 +95,21 @@ namespace stan {
             valid_subtree
               = build_tree(this->depth_, rho_subtree, z_propose,
                            H0, -1, n_leapfrog,
-                           sum_weight_subtree, sum_metro_prob,
+                           log_sum_weight_subtree, sum_metro_prob,
                            info_writer, error_writer);
             z_minus.ps_point::operator=(this->z_);
             p_sharp_minus = this->hamiltonian_.dtau_dp(this->z_);
           }
 
-          sum_weight += sum_weight_subtree;
           if (!valid_subtree) break;
+          log_sum_weight
+            = math::log_sum_exp(log_sum_weight, log_sum_weight_subtree);
 
           // Sample from an accepted subtree
           ++(this->depth_);
 
-          double accept_prob = sum_weight_subtree / sum_weight;
+          double accept_prob
+            = std::exp(log_sum_weight_subtree - log_sum_weight);
           if (this->rand_uniform_() < accept_prob)
             z_sample = z_propose;
 
@@ -153,7 +157,7 @@ namespace stan {
       // Returns number of valid points in the completed subtree
       int build_tree(int depth, Eigen::VectorXd& rho, ps_point& z_propose,
                      double H0, double sign, int& n_leapfrog,
-                     double& sum_weight, double& sum_metro_prob,
+                     double& log_sum_weight, double& sum_metro_prob,
                      interface_callbacks::writer::base_writer& info_writer,
                      interface_callbacks::writer::base_writer& error_writer) {
         // Base case
@@ -169,9 +173,12 @@ namespace stan {
 
             if ((h - H0) > this->max_deltaH_) this->divergent_ = true;
 
-            double pi = exp(H0 - h);
-            sum_weight += pi;
-            sum_metro_prob += pi > 1 ? 1 : pi;
+            log_sum_weight = math::log_sum_exp(log_sum_weight, H0 - h);
+
+            if (H0 - h > 0)
+              sum_metro_prob += 1;
+            else
+              sum_metro_prob += std::exp(H0 - h);
 
             z_propose = this->z_;
             rho += this->z_.p;
@@ -185,32 +192,34 @@ namespace stan {
         rho_subtree.setZero();
 
         // Build the left subtree
-        double sum_weight_left = 0;
+        double log_sum_weight_left = -std::numeric_limits<double>::infinity();
 
         bool valid_left
           = build_tree(depth - 1, rho_subtree, z_propose,
                        H0, sign, n_leapfrog,
-                       sum_weight_left, sum_metro_prob,
+                       log_sum_weight_left, sum_metro_prob,
                        info_writer, error_writer);
 
-        sum_weight += sum_weight_left;
         if (!valid_left) return false;
+        log_sum_weight
+          = math::log_sum_exp(log_sum_weight, log_sum_weight_left);
 
         // Build the right subtree
         ps_point z_propose_right(this->z_);
-        double sum_weight_right = 0;
+        double log_sum_weight_right = -std::numeric_limits<double>::infinity();
 
         bool valid_right
           = build_tree(depth - 1, rho_subtree, z_propose_right,
                        H0, sign, n_leapfrog,
-                       sum_weight_right, sum_metro_prob,
+                       log_sum_weight_right, sum_metro_prob,
                        info_writer, error_writer);
 
-        sum_weight += sum_weight_right;
         if (!valid_right) return false;
+        log_sum_weight
+          = math::log_sum_exp(log_sum_weight, log_sum_weight_right);
 
         // Multinomial sample from right subtree
-        double accept_prob = sum_weight_right / sum_weight;
+        double accept_prob = std::exp(log_sum_weight_right - log_sum_weight);
         if (this->rand_uniform_() < accept_prob)
           z_propose = z_propose_right;
 
