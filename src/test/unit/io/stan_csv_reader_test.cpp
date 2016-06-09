@@ -10,6 +10,7 @@ public:
   void SetUp () {
     blocker0_stream.open("src/test/unit/io/test_csv_files/blocker.0.csv");
     metadata1_stream.open("src/test/unit/io/test_csv_files/metadata1.csv");
+    metadata3_stream.open("src/test/unit/io/test_csv_files/metadata3.csv");
     header1_stream.open("src/test/unit/io/test_csv_files/header1.csv");
     adaptation1_stream.open("src/test/unit/io/test_csv_files/adaptation1.csv");
     samples1_stream.open("src/test/unit/io/test_csv_files/samples1.csv");
@@ -26,6 +27,7 @@ public:
   void TearDown() {
     blocker0_stream.close();
     metadata1_stream.close();
+    metadata3_stream.close();
     header1_stream.close();
     adaptation1_stream.close();
     samples1_stream.close();
@@ -42,12 +44,36 @@ public:
   std::ifstream blocker0_stream, epil0_stream;
   std::ifstream blocker_nondiag0_stream;
   std::ifstream metadata1_stream, header1_stream, adaptation1_stream, samples1_stream;
+  std::ifstream metadata3_stream;
   std::ifstream metadata2_stream, header2_stream, adaptation2_stream, samples2_stream;
+
 };
 
 TEST_F(StanIoStanCsvReader,read_metadata1) {
   stan::io::stan_csv_metadata metadata;
   EXPECT_TRUE(stan::io::stan_csv_reader::read_metadata(metadata1_stream, metadata, 0));
+  
+  EXPECT_EQ(2, metadata.stan_version_major);
+  EXPECT_EQ(9, metadata.stan_version_minor);
+  EXPECT_EQ(0, metadata.stan_version_patch);
+  
+  EXPECT_EQ("blocker_model", metadata.model);
+  EXPECT_EQ("../example-models/bugs_examples/vol1/blocker/blocker.data.R", metadata.data);
+  EXPECT_EQ("../example-models/bugs_examples/vol1/blocker/blocker.init.R", metadata.init);
+  EXPECT_FALSE(metadata.append_samples);
+  EXPECT_FALSE(metadata.save_warmup);
+  EXPECT_EQ(4085885484U, metadata.seed);
+  EXPECT_FALSE(metadata.random_seed);
+  EXPECT_EQ(1U, metadata.chain_id);
+  EXPECT_EQ(2000U, metadata.num_samples);
+  EXPECT_EQ(2000U, metadata.num_warmup);
+  EXPECT_EQ(2U, metadata.thin);
+  EXPECT_EQ("hmc", metadata.algorithm);
+  EXPECT_EQ("nuts", metadata.engine);
+}
+TEST_F(StanIoStanCsvReader,read_metadata3) {
+  stan::io::stan_csv_metadata metadata;
+  EXPECT_TRUE(stan::io::stan_csv_reader::read_metadata(metadata3_stream, metadata, 0));
   
   EXPECT_EQ(2, metadata.stan_version_major);
   EXPECT_EQ(9, metadata.stan_version_minor);

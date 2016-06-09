@@ -1,0 +1,37 @@
+# stan_version_major =2
+# stan_version_minor = 9
+# stan_version_patch =  0
+# model= blocker_model
+# method= sample (Default)
+#   sample
+#     num_samples = 2000
+#     num_warmup = 2000
+#     save_warmup = 0 (Default)
+#     thin = 2
+#     adapt
+#       engaged = 1 (Default)
+#       gamma = 0.050000000000000003 (Default)
+#       delta = 0.80000000000000004 (Default)
+#       kappa = 0.75 (Default)
+#       t0 = 10 (Default)
+#       init_buffer = 75 (Default)
+#       term_buffer = 50 (Default)
+#       window = 25 (Default)
+#     algorithm = hmc (Default)
+#       hmc
+#         engine = nuts (Default)
+#           nuts
+#             max_depth = 10 (Default)
+#         metric = diag_e (Default)
+#         stepsize = 1 (Default)
+#         stepsize_jitter = 0 (Default)
+# id = 0 (Default)
+# data
+#   file = ../example-models/bugs_examples/vol1/blocker/blocker.data.R
+# init = ../example-models/bugs_examples/vol1/blocker/blocker.init.R
+# random
+#   seed = 4085885484
+# output
+#   file = blocker.0.csv
+#   diagnostic_file =  (Default)
+#   refresh = 100 (Default)
