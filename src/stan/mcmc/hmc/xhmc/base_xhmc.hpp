@@ -16,17 +16,19 @@ namespace stan {
   namespace mcmc {
     /**
      * a1 and a2 are running averages of the form
-     *   a1 = ( \sum_{n \in N1} w_{n} f_{n} ) / ( \sum_{n \in N1}  w_{n} )
-     *   a2 = ( \sum_{n \in N2} w_{n} f_{n} ) / ( \sum_{n \in N2}  w_{n} )
+     *   \f$ a1 =   ( \sum_{n \in N1} w_{n} f_{n} )
+     *            / ( \sum_{n \in N1}  w_{n} ) \f$
+     *   \f$ a2 =   ( \sum_{n \in N2} w_{n} f_{n} )
+     *            / ( \sum_{n \in N2}  w_{n} ) \f$
      * and the weights are the respective normalizing constants
-     *   w1 = \sum_{n \in N1} w_{n}
-     *   w2 = \sum_{n \in N2} w_{n}.
+     *   \f$ w1 = \sum_{n \in N1} w_{n} \f$
+     *   \f$ w2 = \sum_{n \in N2} w_{n}. \f$
      *
      * This function returns the pooled average
-     *   sum_a =   ( \sum_{n \in N1 \cup N2} w_{n} f_{n} )
-     *           / ( \sum_{n \in N1 \cup N2}  w_{n} )
+     *   \f$ sum_a =   ( \sum_{n \in N1 \cup N2} w_{n} f_{n} )
+     *               / ( \sum_{n \in N1 \cup N2}  w_{n} ) \f$
      * and the pooled weights
-     *   log_sum_w = log(w1 + w2).
+     *   \f$ log_sum_w = log(w1 + w2). \f$
      *
      * @param a1 First running average, f1 / w1
      * @param log_w1 Log of first summed weight
