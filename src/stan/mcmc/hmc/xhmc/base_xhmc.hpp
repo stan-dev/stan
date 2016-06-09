@@ -33,7 +33,7 @@ namespace stan {
      * @param a1 First running average, f1 / w1
      * @param log_w1 Log of first summed weight
      * @param a2 Second running average
-     * @param low_w2 Log of second summed weight
+     * @param log_w2 Log of second summed weight
      * @param sum_a Average of input running averages
      * @param log_sum_w Log of summed input weights
     */
