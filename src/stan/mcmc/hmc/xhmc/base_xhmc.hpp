@@ -207,33 +207,33 @@ namespace stan {
                      interface_callbacks::writer::base_writer& error_writer) {
         // Base case
         if (depth == 0) {
-            this->integrator_.evolve(this->z_, this->hamiltonian_,
-                                     sign * this->epsilon_,
-                                     info_writer, error_writer);
-            ++n_leapfrog;
+          this->integrator_.evolve(this->z_, this->hamiltonian_,
+                                   sign * this->epsilon_,
+                                   info_writer, error_writer);
+          ++n_leapfrog;
 
-            double h = this->hamiltonian_.H(this->z_);
-            if (boost::math::isnan(h))
-              h = std::numeric_limits<double>::infinity();
+          double h = this->hamiltonian_.H(this->z_);
+          if (boost::math::isnan(h))
+            h = std::numeric_limits<double>::infinity();
 
-            if ((h - H0) > this->max_deltaH_) this->divergent_ = true;
+          if ((h - H0) > this->max_deltaH_) this->divergent_ = true;
 
-            double dG_dt = this->hamiltonian_.dG_dt(this->z_,
-                                                    info_writer,
-                                                    error_writer);
+          double dG_dt = this->hamiltonian_.dG_dt(this->z_,
+                                                  info_writer,
+                                                  error_writer);
 
-            stable_sum(ave, log_sum_weight,
-                       dG_dt, H0 - h,
-                       ave, log_sum_weight);
+          stable_sum(ave, log_sum_weight,
+                     dG_dt, H0 - h,
+                     ave, log_sum_weight);
 
-            if (H0 - h > 0)
-              sum_metro_prob += 1;
-            else
-              sum_metro_prob += std::exp(H0 - h);
+          if (H0 - h > 0)
+            sum_metro_prob += 1;
+          else
+            sum_metro_prob += std::exp(H0 - h);
 
-            z_propose = this->z_;
+          z_propose = this->z_;
 
-            return !this->divergent_;
+          return !this->divergent_;
         }
         // General recursion
 

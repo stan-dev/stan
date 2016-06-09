@@ -177,28 +177,28 @@ namespace stan {
                      interface_callbacks::writer::base_writer& error_writer) {
         // Base case
         if (depth == 0) {
-            this->integrator_.evolve(this->z_, this->hamiltonian_,
-                                     sign * this->epsilon_,
-                                     info_writer, error_writer);
-            ++n_leapfrog;
+          this->integrator_.evolve(this->z_, this->hamiltonian_,
+                                   sign * this->epsilon_,
+                                   info_writer, error_writer);
+          ++n_leapfrog;
 
-            double h = this->hamiltonian_.H(this->z_);
-            if (boost::math::isnan(h))
-              h = std::numeric_limits<double>::infinity();
+          double h = this->hamiltonian_.H(this->z_);
+          if (boost::math::isnan(h))
+            h = std::numeric_limits<double>::infinity();
 
-            if ((h - H0) > this->max_deltaH_) this->divergent_ = true;
+          if ((h - H0) > this->max_deltaH_) this->divergent_ = true;
 
-            log_sum_weight = math::log_sum_exp(log_sum_weight, H0 - h);
+          log_sum_weight = math::log_sum_exp(log_sum_weight, H0 - h);
 
-            if (H0 - h > 0)
-              sum_metro_prob += 1;
-            else
-              sum_metro_prob += std::exp(H0 - h);
+          if (H0 - h > 0)
+            sum_metro_prob += 1;
+          else
+            sum_metro_prob += std::exp(H0 - h);
 
-            z_propose = this->z_;
-            rho += this->z_.p;
+          z_propose = this->z_;
+          rho += this->z_.p;
 
-            return !this->divergent_;
+          return !this->divergent_;
         }
         // General recursion
         Eigen::VectorXd p_sharp_left = this->hamiltonian_.dtau_dp(this->z_);
