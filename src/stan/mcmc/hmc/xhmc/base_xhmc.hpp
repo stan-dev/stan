@@ -14,6 +14,27 @@
 
 namespace stan {
   namespace mcmc {
+    /**
+     * a1 and a2 are running averages of the form
+     *   a1 = ( \sum_{n \in N1} w_{n} f_{n} ) / ( \sum_{n \in N1}  w_{n} )
+     *   a2 = ( \sum_{n \in N2} w_{n} f_{n} ) / ( \sum_{n \in N2}  w_{n} )
+     * and the weights are the respective normalizing constants
+     *   w1 = \sum_{n \in N1} w_{n}
+     *   w2 = \sum_{n \in N2} w_{n}.
+     *
+     * This function returns the pooled average
+     *   sum_a =   ( \sum_{n \in N1 \cup N2} w_{n} f_{n} )
+     *           / ( \sum_{n \in N1 \cup N2}  w_{n} )
+     * and the pooled weights
+     *   log_sum_w = log(w1 + w2).
+     *
+     * @param a1 First running average, f1 / w1
+     * @param log_w1 Log of first summed weight
+     * @param a2 Second running average
+     * @param low_w2 Log of second summed weight
+     * @param sum_a Average of input running averages
+     * @param log_sum_w Log of summed input weights
+    */
     void stable_sum(double a1, double log_w1, double a2, double log_w2,
                     double& sum_a, double& log_sum_w) {
       if (log_w2 > log_w1) {
@@ -162,7 +183,22 @@ namespace stan {
         values.push_back(this->energy_);
       }
 
-      // Returns number of valid points in the completed subtree
+      /**
+       * Recursively build a new subtree to completion or until
+       * the subtree becomes invalid.  Returns validity of the
+       * resulting subtree.
+       *
+       * @param depth Depth of the desired subtree
+       * @param z_propose State proposed from subtree
+       * @param ave Weighted average of dG/dt across trajectory
+       * @param log_sum_weight Log of summed weights across trajectory
+       * @param H0 Hamiltonian of initial state
+       * @param sign Direction in time to built subtree
+       * @param n_leapfrog Summed number of leapfrog evaluations
+       * @param sum_metro_prob Summed Metropolis probabilities across trajectory
+       * @param info_writer Stream for information messages
+       * @param error_writer Stream for error messages
+      */
       int build_tree(int depth, ps_point& z_propose,
                      double& ave, double& log_sum_weight,
                      double H0, double sign, int& n_leapfrog,
@@ -233,15 +269,17 @@ namespace stan {
                    ave, log_sum_weight);
 
         // Multinomial sample from right subtree
-        double accept_prob = std::exp(log_sum_weight_right - log_sum_weight);
-        if (this->rand_uniform_() < accept_prob)
-          z_propose = z_propose_right;
-
         double ave_subtree;
         double log_sum_weight_subtree;
         stable_sum(ave_left,  log_sum_weight_left,
                    ave_right, log_sum_weight_right,
                    ave_subtree, log_sum_weight_subtree);
+
+        double accept_prob
+          = std::exp(log_sum_weight_right - log_sum_weight_subtree);
+        if (this->rand_uniform_() < accept_prob)
+          z_propose = z_propose_right;
+
         return std::fabs(ave_subtree) >= x_delta_;
       }
 

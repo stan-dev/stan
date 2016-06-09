@@ -154,7 +154,22 @@ namespace stan {
                && p_sharp_minus.dot(rho) > 0;
       }
 
-      // Returns number of valid points in the completed subtree
+      /**
+       * Recursively build a new subtree to completion or until
+       * the subtree becomes invalid.  Returns validity of the
+       * resulting subtree.
+       *
+       * @param depth Depth of the desired subtree
+       * @param rho Summed momentum across trajectory
+       * @param z_propose State proposed from subtree
+       * @param H0 Hamiltonian of initial state
+       * @param sign Direction in time to built subtree
+       * @param n_leapfrog Summed number of leapfrog evaluations
+       * @param log_sum_weight Log of summed weights across trajectory
+       * @param sum_metro_prob Summed Metropolis probabilities across trajectory
+       * @param info_writer Stream for information messages
+       * @param error_writer Stream for error messages
+      */
       int build_tree(int depth, Eigen::VectorXd& rho, ps_point& z_propose,
                      double H0, double sign, int& n_leapfrog,
                      double& log_sum_weight, double& sum_metro_prob,
@@ -201,8 +216,6 @@ namespace stan {
                        info_writer, error_writer);
 
         if (!valid_left) return false;
-        log_sum_weight
-          = math::log_sum_exp(log_sum_weight, log_sum_weight_left);
 
         // Build the right subtree
         ps_point z_propose_right(this->z_);
@@ -215,13 +228,21 @@ namespace stan {
                        info_writer, error_writer);
 
         if (!valid_right) return false;
-        log_sum_weight
-          = math::log_sum_exp(log_sum_weight, log_sum_weight_right);
 
         // Multinomial sample from right subtree
-        double accept_prob = std::exp(log_sum_weight_right - log_sum_weight);
-        if (this->rand_uniform_() < accept_prob)
+        double log_sum_weight_subtree
+          = math::log_sum_exp(log_sum_weight_left, log_sum_weight_right);
+        log_sum_weight
+          = math::log_sum_exp(log_sum_weight, log_sum_weight_subtree);
+
+        if (log_sum_weight_right > log_sum_weight_subtree) {
           z_propose = z_propose_right;
+        } else {
+          double accept_prob
+            = std::exp(log_sum_weight_right - log_sum_weight_subtree);
+          if (this->rand_uniform_() < accept_prob)
+            z_propose = z_propose_right;
+        }
 
         rho += rho_subtree;
         Eigen::VectorXd p_sharp_right = this->hamiltonian_.dtau_dp(this->z_);
