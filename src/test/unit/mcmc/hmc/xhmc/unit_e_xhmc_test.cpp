@@ -40,14 +40,14 @@ TEST(McmcUnitEXHMC, build_tree) {
 
   stan::mcmc::ps_point z_propose = z_init;
 
-  double sum_numer = 0;
-  double sum_weight = 0;
+  double ave = 0;
+  double log_sum_weight = -std::numeric_limits<double>::infinity();
 
   double H0 = -0.1;
   int n_leapfrog = 0;
   double sum_metro_prob = 0;
 
-  bool valid_subtree = sampler.build_tree(3, z_propose, sum_numer, sum_weight,
+  bool valid_subtree = sampler.build_tree(3, z_propose, ave, log_sum_weight,
                                           H0, 1, n_leapfrog,
                                           sum_metro_prob,
                                           writer, error_writer);
@@ -73,8 +73,8 @@ TEST(McmcUnitEXHMC, build_tree) {
   EXPECT_FLOAT_EQ(-1.1785525, z_propose.p(2));
 
   EXPECT_EQ(8, n_leapfrog);
-  EXPECT_FLOAT_EQ(1.5251483, sum_numer);
-  EXPECT_FLOAT_EQ(0.36134657, sum_weight);
+  EXPECT_FLOAT_EQ(4.2207355, ave);
+  EXPECT_FLOAT_EQ(std::log(0.36134657), log_sum_weight);
   EXPECT_FLOAT_EQ(0.36134657, sum_metro_prob);
 
   EXPECT_EQ("", output.str());

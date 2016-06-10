@@ -41,14 +41,14 @@ TEST(McmcSoftAbsNuts, build_tree) {
   stan::mcmc::ps_point z_propose = z_init;
 
   Eigen::VectorXd rho = z_init.p;
-  double sum_weight = 0;
+  double log_sum_weight = -std::numeric_limits<double>::infinity();
 
   double H0 = -0.1;
   int n_leapfrog = 0;
   double sum_metro_prob = 0;
 
   bool valid_subtree = sampler.build_tree(3, rho, z_propose,
-                                          H0, 1, n_leapfrog, sum_weight,
+                                          H0, 1, n_leapfrog, log_sum_weight,
                                           sum_metro_prob, writer, error_writer);
 
   EXPECT_EQ(0.1, sampler.get_nominal_stepsize());
@@ -68,7 +68,7 @@ TEST(McmcSoftAbsNuts, build_tree) {
   EXPECT_FLOAT_EQ(-1.5019561, sampler.z().p(2));
 
   EXPECT_EQ(8, n_leapfrog);
-  EXPECT_FLOAT_EQ(0.34310558, sum_weight);
+  EXPECT_FLOAT_EQ(std::log(0.34310558), log_sum_weight);
   EXPECT_FLOAT_EQ(0.34310558, sum_metro_prob);
 
   EXPECT_EQ("", output.str());
