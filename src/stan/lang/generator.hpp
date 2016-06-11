@@ -58,7 +58,7 @@ namespace stan {
                                  const size_t indent,
                                  std::ostream& o)  {
       generate_indent(indent, o);
-      o << "(void) " << name << ";   // dummy to suppress unused var warning";
+      o << "(void) " << name << ";  // dummy to suppress unused var warning";
       o << EOL;
     }
 
@@ -463,6 +463,14 @@ namespace stan {
       o << "}; // model" << EOL2;
     }
 
+    // use to disambiguate VectorXd(0) ctor from Scalar* alternative
+    void generate_eigen_index_expression(const expression& e,
+                                    std::ostream& o) {
+      o << "static_cast<Eigen::VectorXd::Index>(";
+      generate_expression(e.expr_, o);
+      o << ")";
+    }
+
     void generate_initializer(std::ostream& o,
                               const std::string& base_type,
                               const std::vector<expression>& dims,
@@ -477,13 +485,13 @@ namespace stan {
 
       o << '(';
       if (!is_nil(type_arg1)) {
-        generate_expression(type_arg1.expr_, o);
+        generate_eigen_index_expression(type_arg1, o);
         if (!is_nil(type_arg2)) {
           o << ',';
-          generate_expression(type_arg2.expr_, o);
+          generate_eigen_index_expression(type_arg2, o);
         }
       } else if (!is_nil(type_arg2.expr_)) {
-        generate_expression(type_arg2.expr_, o);
+        generate_eigen_index_expression(type_arg2, o);
       } else {
         o << '0';
       }
@@ -828,7 +836,8 @@ namespace stan {
                                      const std::string& read_type,
                                      const std::vector<expression>& read_args,
                                      const std::string& name,
-                                   const std::vector<expression>& dims)  const {
+                                     const std::vector<expression>& dims)
+      const {
         if (declare_vars_) {
           o_ << INDENT2;
           for (size_t i = 0; i < dims.size(); ++i) o_ << "vector<";
@@ -1356,13 +1365,13 @@ namespace stan {
             }
           } else if (ctor_args.size() == 1) {  // vector
             o_ << '(';
-            generate_expression(ctor_args[0], o_);
+            generate_eigen_index_expression(ctor_args[0], o_);
             o_ << ')';
           } else if (ctor_args.size() > 1) {  // matrix
             o_ << '(';
-            generate_expression(ctor_args[0], o_);
+            generate_eigen_index_expression(ctor_args[0], o_);
             o_ << ',';
-            generate_expression(ctor_args[1], o_);
+            generate_eigen_index_expression(ctor_args[1], o_);
             o_ << ')';
           }
         }
@@ -1382,11 +1391,11 @@ namespace stan {
           generate_void_statement(name);
           o_ << EOL;
         }
-        if (type == "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> "
-            || type == "Eigen::Matrix<T__,1,Eigen::Dynamic> "
-            || type == "Eigen::Matrix<T__,Eigen::Dynamic,1> ") {
+        if (type == "Eigen::Matrix<T__, Eigen::Dynamic, Eigen::Dynamic> "
+            || type == "Eigen::Matrix<T__, 1, Eigen::Dynamic> "
+            || type == "Eigen::Matrix<T__, Eigen::Dynamic, 1> ") {
           generate_indent(indents_, o_);
-          o_ << "stan::math::fill(" << name << ",DUMMY_VAR__);" << EOL;
+          o_ << "stan::math::fill(" << name << ", DUMMY_VAR__);" << EOL;
         }
       }
     };
@@ -2221,7 +2230,7 @@ namespace stan {
         << "const char* function__ = \"validate transformed params\";"
         << EOL;
       o << INDENT2
-        << "(void) function__; // dummy to suppress unused var warning"
+        << "(void) function__;  // dummy to suppress unused var warning"
         << EOL;
 
       generate_validate_var_decls(p.derived_decl_.first, 2, o);
