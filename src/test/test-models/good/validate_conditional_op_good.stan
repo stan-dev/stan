@@ -157,4 +157,17 @@ transformed parameters {
 model {
   py ~ normal(0,1);
 }
+generated quantities {
+  int gqx;
+  real gqy;
+  vector[5] gqza;
+  vector[5] gqzb;
+  vector[5] gqzc;
 
+  gqy = y < 100 ? x : y;   // t,f : int,real
+  gqy = y < 100 ? y : x;   // t,f : real,int
+
+  gqzc = x < 100 ? gqza : gqzb; // tf var vector
+
+
+}
