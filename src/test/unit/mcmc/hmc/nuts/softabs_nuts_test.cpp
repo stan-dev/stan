@@ -109,11 +109,11 @@ TEST(McmcSoftAbsNuts, transition) {
 
   stan::mcmc::sample s = sampler.transition(init_sample, writer, error_writer);
 
-  EXPECT_FLOAT_EQ(1, s.cont_params()(0));
-  EXPECT_FLOAT_EQ(-1, s.cont_params()(1));
-  EXPECT_FLOAT_EQ(1, s.cont_params()(2));
-  EXPECT_FLOAT_EQ(-1.5, s.log_prob());
-  EXPECT_FLOAT_EQ(0.99709648, s.accept_stat());
+  EXPECT_FLOAT_EQ(-0.13615179, s.cont_params()(0));
+  EXPECT_FLOAT_EQ(-0.53625083, s.cont_params()(1));
+  EXPECT_FLOAT_EQ(0.073073119, s.cont_params()(2));
+  EXPECT_FLOAT_EQ(-0.15572098, s.log_prob());
+  EXPECT_FLOAT_EQ(0.99829924, s.accept_stat());
   EXPECT_EQ("", output.str());
   EXPECT_EQ("", error_stream.str());
 }
