@@ -143,6 +143,8 @@ endif
 	@echo '  - cpplint       : runs cpplint.py on source files. requires python 2.7.'
 	@echo '                    cpplint is called using the CPPLINT variable:'
 	@echo '                      CPPLINT = $(CPPLINT)'
+	@echo '                    To set the version of python 2, set the PYTHON2 variable:'
+	@echo '                      PYTHON2 = $(PYTHON2)'
 	@echo ''
 	@echo 'Clean:'
 	@echo '  - clean         : Basic clean. Leaves doc and compiled libraries intact.'
