@@ -1112,7 +1112,7 @@ namespace stan {
         type_(promote_primitive(true_val.expression_type(),
                                   false_val.expression_type())) {
     }
-    
+
     binary_op::binary_op() { }
     binary_op::binary_op(const expression& left,
                          const std::string& op,
@@ -1199,6 +1199,9 @@ namespace stan {
       return boost::apply_visitor(v, idx.idx_);
     }
 
+    bool is_data_origin(const var_origin& vo) {
+      return vo == data_origin || vo == transformed_data_origin;
+    }
 
     void print_var_origin(std::ostream& o, const var_origin& vo) {
       if (vo == model_name_origin)

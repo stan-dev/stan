@@ -130,31 +130,59 @@ transformed parameters {
   tpmc = x < 100 ? tpma : tpmb; // tf var matrix
 
   tpzc = x < 100 ? z : pz; // tf real/var vector
+  tpzc = x < 100 ? pz : z; 
   tpwc = x < 100 ? w : pw; // tf real/var row_vector
+  tpwc = x < 100 ? pw : w; 
   tpmc = x < 100 ? m : pm; // tf real/var var matrix
+  tpmc = x < 100 ? pm : m; 
 
   tpyc1 = ya1;
   
   tpyc1 = x < 100 ? tpya1 : tpyb1;   // t,f : var[2],var[2]
+
   tpyc1 = x < 100 ? ya1 : pya1;   // t,f : real[2],var[2]
+  tpyc1 = x < 100 ? pya1 : ya1;   
 
   tpya2 = x < 100 ? tpya2 : tpyb2;   // t,f : var[2,2],var[2,2]
+
   tpya2 = x < 100 ? ya2 : tpyb2;   // t,f : real[2,2],var[2,2]
+  tpya2 = x < 100 ? tpya2 : ya2; 
 
   tpwc1 = x < 100 ? tpwa1 : tpwb1; // tf var row_vector
+
   tpwc1 = x < 100 ? wa1 : tpwb1; // tf real/var row_vector
+  tpwc1 = x < 100 ? tpwb1 : wa1;
 
   tpwa2 = x < 100 ? tpwa2 : tpwb2; // tf var row_vector[,]
+
   tpwa2 = x < 100 ? wa2 : tpwb2; // tf real/var row_vector[,]
+  tpwa2 = x < 100 ? tpwb2 : wa2;
 
   tpm1 = x < 100 ? tpma2[1] : tpmb2[1]; // tf var matrix[]
+
   tpm1 = x < 100 ? ma2[1] : tpmb2[1]; // tf real/var matrix[]
+  tpm1 = x < 100 ? tpmb2[1] : ma2[1];
 
   tpma2 = x < 100 ? tpma2 : tpmb2; // tf var matrix[,]
+
   tpma2 = x < 100 ? ma2 : pma2; // tf real/var matrix[,]
+  tpma2 = x < 100 ? pma2 : ma2; // tf real/var matrix[,]
 
 }  
 model {
   py ~ normal(0,1);
 }
+generated quantities {
+  int gqx;
+  real gqy;
+  vector[5] gqza;
+  vector[5] gqzb;
+  vector[5] gqzc;
 
+  gqy = y < 100 ? x : y;   // t,f : int,real
+  gqy = y < 100 ? y : x;   // t,f : real,int
+
+  gqzc = x < 100 ? gqza : gqzb; // tf var vector
+
+
+}
