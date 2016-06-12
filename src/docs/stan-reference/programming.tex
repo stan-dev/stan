@@ -3059,6 +3059,107 @@ generated quantities {
 Of course, the same could be done for the seemingly unrelated
 regressions in the previous section.
 
+\section{Applications of Pseudorandom Number Generation}
+
+The main application of pseudorandom number generator (PRNGs) is for
+posterior inference, including prediction and posterior predictive
+checks.  They can also be used for pure data simulation, which is like
+a posterior predictive check with no conditioning.  See
+\refsection{distributions-prng} for a description of their syntax and
+the scope of their usage.
+
+\subsection{Prediction}
+
+Consider predicting unobserved outcomes using linear
+regression.  Given predictors $x_1, \ldots, x_N$ and observed outcomes
+$y_1,\ldots,y_N$, and assuming a standard linear regression with
+intercept $\alpha$, slope $\beta$, and error scale $\sigma$, along with
+improper uniform priors, the posterior over the parameters given $x$
+and $y$ is
+%
+\[
+p(\alpha, \beta, \sigma \, | \, x, y) 
+\propto 
+\prod_{n=1}^N 
+  \distro{Normal}(y_n \, | \, \alpha + \beta x_n, \sigma).
+\]
+%
+For this model, the posterior predictive inference for a new outcome
+$\tilde{y}_m$ given a predictor $\tilde{x}_m$, conditioned on the
+observed data $x$ and $y$, is
+\[
+p(\tilde{y}_n \, | \, \tilde{x}_n, x, y)
+= \int_{(\alpha,\beta,\sigma)}
+  \distro{Normal}(\tilde{y}_n \, | \, \alpha + \beta \tilde{x}_n, \sigma)
+  \times
+  p(\alpha, \beta, \sigma \, | \, x, y) 
+  \
+  \mathrm{d}(\alpha,\beta,\sigma).
+\]
+%
+To code the posterior predictive inference in Stan, a standard linear
+regression is combined with a random number in the generated
+quantities block.
+%
+\begin{stancode}
+data {
+  int<lower=0> N;
+  vector[N] y;
+  vector[N] x;
+  int<lower=0> N_tilde;
+  vector[N_tilde] x_tilde;
+}
+parameters {
+  real alpha;
+  real beta;
+  real<lower=0> sigma;
+}
+model {
+  y ~ normal(alpha + beta * x, sigma);
+}
+generated quantities {
+  vector[N_tilde] y_tilde;
+  for (n in 1:N_tilde)
+    y_tilde[n] = normal_rng(alpha + beta * x_tilde[n], sigma);
+}
+\end{stancode}
+%
+Given observed predictors $x$ and outcomes $y$, \code{y\_tilde} will
+be drawn according to $p(\tilde{y} \, | \, \tilde{x}, y, x)$.  This
+means that, for example, the posterior mean for \code{y\_tilde} is the
+estimate of the outcome that minimizes expected square error
+(conditioned on the data and model, of course).
+
+\subsection{Posterior Predictive Checks}
+
+A good way to investigate the fit of a model to the data, a critical
+step in Bayesian data analysis, is to generate simulated data
+according to the parameters of the model.  This is carried out with
+exactly the same procedure as before, only the observed data
+predictors $x$ are used in place of new predictors $\tilde{x}$ for
+unobserved outcomes.  If the model fits the data well, the predictions
+for $\tilde{y}$ based on $x$ should match the observed data $y$.
+
+To code posterior predictive checks in Stan requires only a slight
+modification of the prediction code to use $x$ and $N$ in place of
+$\tilde{x}$ and $\tilde{N}$,
+%
+\begin{stancode}
+generated quantities {
+  vector[N] y_tilde;
+  for (n in 1:N)
+    y_tilde = normal_rng(alpha + beta * x[n], sigma);
+}
+\end{stancode}
+%
+\cite{GelmanEtAl:2013} recommend choosing several posterior draws
+$\tilde{y}^{(1)}, \ldots, \tilde{y}^{(M)}$ and plotting each of them
+alongside the data $y$ that was actually observed.  If the model fits
+well, the simulated $\tilde{y}$ will look like the actual data $y$.
+
+
+
+
 \chapter{Time-Series Models}
 
 \noindent
@@ -4412,11 +4513,11 @@ is
 \[
 \log \prod_{m=1}^M \mbox{Pr}[y_m > U]
 = \log \left( 1 - \Phi\left(\frac{y - \mu}{\sigma}\right)\right)^{M}
-= M \, \code{normal\_ccdf\_log}(y,\mu,\sigma),
+= M \, \code{normal\_lccdf}(y,\mu,\sigma),
 \]
 %
-where \code{normal\_ccdf\_log} is the log of complementary CDF
-(\Stan provides \code{<distr>\_ccdf\_log} for each distribution
+where \code{normal\_lccdf} is the log of complementary CDF
+(\Stan provides \code{<distr>\_lccdf} for each distribution
 implemented in \Stan).
 
 The following right-censored model assumes
@@ -4434,8 +4535,8 @@ parameters {
   real<lower=0> sigma;
 }
 model {
-  y_obs ~ normal(mu,sigma); 
-  target += N_cens * normal_ccdf_log(U,mu,sigma);
+  y_obs ~ normal(mu, sigma); 
+  target += N_cens * normal_lccdf(U | mu, sigma);
 }
 \end{stancode}
 %
@@ -4444,10 +4545,10 @@ used without truncation.  The log probability is directly incremented
 using the calculated log cumulative normal probability of the censored
 data items.
 
-For the left-censored data the CDF
-(\code{normal\_cdf\_log}) has to be used instead of complementary CDF.
-If the censoring point variable (\code{L}) is unknown,
-its declaration should be moved from the data to the parameters block. 
+For the left-censored data the CDF (\code{normal\_lcdf}) has to be
+used instead of complementary CDF.  If the censoring point variable
+(\code{L}) is unknown, its declaration should be moved from the data
+to the parameters block.
 %
 \begin{stancode}
 data {
@@ -4461,9 +4562,9 @@ parameters {
   real<lower=0> sigma;
 }
 model {
-  L ~ normal(mu,sigma);
-  y_obs ~ normal(mu,sigma);
-  target += N_cens * normal_cdf_log(L,mu,sigma);
+  L ~ normal(mu, sigma);
+  y_obs ~ normal(mu, sigma);
+  target += N_cens * normal_lcdf(L | mu, sigma);
 }
 \end{stancode}
 %
@@ -4566,8 +4667,8 @@ parameters {
   real y;
 }
 model {
-  target += log_sum_exp(log(0.3) + normal_log(y,-1,2),
-                        log(0.7) + normal_log(y,3,1));
+  target += log_sum_exp(log(0.3) + normal_lpdf(y | -1, 2),
+                        log(0.7) + normal_lpdf(y | 3, 1));
 }
 \end{stancode}
 %
@@ -4616,7 +4717,7 @@ model {
   for (n in 1:N) {
     for (k in 1:K) {
       ps[k] = log(theta[k]) 
-               + normal_log(y[n],mu[k],sigma[k]);
+               + normal_lpdf(y[n] | mu[k], sigma[k]);
     }
     target += log_sum_exp(ps);
   }
@@ -4653,9 +4754,9 @@ A proper mixture at the observation level is defined as
 \begin{stancode}
 for (n in 1:N) {
   target += log_sum_exp(log(lambda) 
-                          + normal_log(y[n], mu[1], sigma[1]),
+                          + normal_lpdf(y[n] | mu[1], sigma[1]),
                         log1m(lambda)
-                          + normal_log(y[n], mu[2], sigma[2]));
+                          + normal_lpdf(y[n] | mu[2], sigma[2]));
 \end{stancode}
 %
 or equivalently
@@ -4663,8 +4764,8 @@ or equivalently
 \begin{stancode}
 for (n in 1:N)
   target += log_mix(lambda, 
-                    normal_log(y[n], mu[1], sigma[1]),
-                    normal_log(y[n], mu[2], sigma[2])));
+                    normal_lpdf(y[n] | mu[1], sigma[1]),
+                    normal_lpdf(y[n] | mu[2], sigma[2])));
 \end{stancode}
 %
 This definition assumes that each observation $y_n$ may have arisen
@@ -4680,17 +4781,17 @@ vectorize the model.
 %
 \begin{stancode}
 target += log_sum_exp(log(lambda) 
-                        + normal_log(y, mu[1], sigma[1]),
+                        + normal_lpdf(y | mu[1], sigma[1]),
                       log1m(lambda)
-                        + normal_log(y, mu[2], sigma[2]));
+                        + normal_lpdf(y | mu[2], sigma[2]));
 \end{stancode}
 %
 or equivalently,
 %
 \begin{stancode}
 target += log_mix(lambda,
-                  normal_log(y, mu[1], sigma[1]),
-                  normal_log(y, mu[2], sigma[2]));
+                  normal_lpdf(y | mu[1], sigma[1]),
+                  normal_lpdf(y | mu[2], sigma[2]));
 \end{stancode}
 %
 This second definition implies that the entire sequence $y_1, \ldots, y_n$ of
@@ -4751,18 +4852,18 @@ data {
   int<lower=0> y[N];
 }
 parameters {
-  real<lower=0,upper=1> theta;
+  real<lower=0, upper=1> theta;
   real lambda;
 }
 model {
   for (n in 1:N) {
     if (y[n] == 0)
-      target += log_sum_exp(bernoulli_log(1,theta),
-                            bernoulli_log(0,theta) 
-                              + poisson_log(y[n],lambda));
+      target += log_sum_exp(bernoulli_lpmf(1 | theta),
+                            bernoulli_lpmf(0 | theta) 
+                              + poisson_lpmf(y[n] | lambda));
     else
-      target += bernoulli_log(0,theta)
-                  + poisson_log(y[n],lambda);
+      target += bernoulli_lpmf(0 | theta)
+                  + poisson_lpmf(y[n] | lambda);
   }
 }
 \end{stancode}
@@ -4822,8 +4923,8 @@ effect is equivalent to the direct definition of the log likelihood.
    if (y[n] == 0)
       target += log(theta);
     else
-      target += log1m(theta) + poisson_log(y[n], lambda)
-                - poisson_ccdf_log(0, lambda));
+      target += log1m(theta) + poisson_lpmf(y[n] | lambda)
+                - poisson_lccdf(0 | lambda));
 \end{stancode}
 
 Julian King pointed out that because
@@ -4835,7 +4936,7 @@ Julian King pointed out that because
 the CCDF in the else clause can be replaced with a simpler expression.
 %
 \begin{stancode}
-      target += log1m(theta) + poisson_log(y[n], lambda)
+      target += log1m(theta) + poisson_lpmf(y[n] | lambda)
                 - log1m_exp(-lambda));
 \end{stancode}
 %
@@ -5527,7 +5628,7 @@ transformed parameters {
   lp = rep_vector(log_unif, T);
   for (s in 1:T)
     for (t in 1:T)
-      lp[s] = lp[s] + poisson_log(D[t], if_else(t < s, e, l));
+      lp[s] = lp[s] + poisson_lpmf(D[t] | if_else(t < s, e, l));
 }
 model {
   e ~ exponential(r_e);
@@ -5560,8 +5661,8 @@ transformed parameters {
       lp_e[1] <- 0;
       lp_l[1] <- 0;
       for (t in 1:T) {
-        lp_e[t + 1] <- lp_e[t] + poisson_log(D[t], e);
-        lp_l[t + 1] <- lp_l[t] + poisson_log(D[t], l);
+        lp_e[t + 1] <- lp_e[t] + poisson_lpmf(D[t] | e);
+        lp_l[t + 1] <- lp_l[t] + poisson_lpmf(D[t] | l);
       }
       lp <- rep_vector(log_unif + lp_l[T + 1], T) + head(lp_e, T) - head(lp_l, T);
     }
@@ -5704,7 +5805,7 @@ for (s1 in 1:T)
   for (s2 in 1:T)
     for (t in 1:T)
       lp[s1,s2] = lp[s1,s2] 
-        + poisson_log(D[t], if_else(t < s1, e, if_else(t < s2, m, l)));
+        + poisson_lpmf(D[t] | if_else(t < s1, e, if_else(t < s2, m, l)));
 \end{stancode}
 %
 The matrix can then be converted back to a vector using
@@ -5938,7 +6039,7 @@ parameters $\phi$ and $p$.  In the model block, the log probability is
 incremented for each history based on its count.  This second step is
 similar to collecting Bernoulli observations into a binomial or
 categorical observations into a multinomial, only it is coded directly
-in the Stan program using \code{increment\_log\_prob} rather than
+in the Stan program using \code{target~+=} rather than
 being part of a built-in probability function.
 %
 \begin{figure}
@@ -7046,11 +7147,11 @@ model {
     phi[k] ~ dirichlet(beta);
   for (m in 1:M) 
     for (k in 1:K) 
-      gamma[m,k] = categorical_log(k,theta);
+      gamma[m,k] = categorical_lpmf(k | theta);
   for (n in 1:N)
     for (k in 1:K)
       gamma[doc[n],k] = gamma[doc[n],k] 
-                         + categorical_log(w[n],phi[k]);
+                         + categorical_lpmf(w[n] | phi[k]);
   for (m in 1:M)
     target += log_sum_exp(gamma[m]);
 }
@@ -8446,7 +8547,7 @@ log(y) ~ normal(mu,sigma);
 or as an increment to the log probability function, as in
 %
 \begin{stancode}
-target += normal_log(log(y), mu, sigma);
+target += normal_lpmf(log(y) | mu, sigma);
 \end{stancode}
 
 \subsubsection{Gamma and Inverse Gamma Distribution}\label{jacobian-adjustment.section}
@@ -9003,7 +9104,7 @@ transformed parameters {
 \section{Functions Accessing the Log Probability  Accumulator}
 
 Functions whose names end in \code{\_lp} are allowed to use sampling
-statements and \code{increment\_log\_prob()} statements; other
+statements and \code{target~+=} statements; other
 functions are not.  Because of this access, their use is restricted to
 the transformed parameters and model blocks.
 
@@ -9102,7 +9203,8 @@ multivariate normal draws for \code{x\_sim}.
 \section{User-Defined Probability Functions}
 
 Probability functions are distinguished in Stan by names ending in
-\code{\_log} and \code{real} return types.  
+\code{\_lpdf} for density functions and \code{\_lpmf} for mass
+functions; in both cases, they must have \code{real} return types.
 
 Suppose a model uses several unit normal distributions, for which
 there is not a specific overloaded density nor defaults in Stan.  So
@@ -9111,8 +9213,8 @@ them, a new density function may be defined and reused.
 %
 \begin{stancode}
 functions {
-  real unit_normal_log(real y) { 
-    return normal_log(y,0,1); 
+  real unit_normal_lpdf(real y) { 
+    return normal_lpdf(y | 0, 1); 
   }
 }
 ...
@@ -9124,24 +9226,31 @@ model {
 \end{stancode}
 %
 The ability to use the \code{unit\_normal} function as a density is
-keyed off its name ending in \code{\_log}.  
+keyed off its name ending in \code{\_lpdf} (names ending in
+\code{\_lpmf} for probabilty mass functions work the same way).  
 
-In general, if \code{foo\_log} is defined to consume $N + 1$ arguments,
-then
+In general, if \code{foo\_lpdf} is defined to consume $N + 1$
+arguments, then
 %
 \begin{stancode}
-y ~ foo(theta1,...,thetaN);
+y ~ foo(theta1, ..., thetaN);
 \end{stancode}
 %
 can be used as shorthand for 
 %
 \begin{stancode}
-target += foo_log(y,theta1,...,thetaN);
+target += foo_lpdf(y | theta1, ..., thetaN);
 \end{stancode}
 %
-As with the built-in functions, the suffix \code{\_log} is dropped and
+As with the built-in functions, the suffix \code{\_lpdf} is dropped and
 the first argument moves to the left of the sampling symbol (\Verb|~|)
-in the sampling statement.
+in the sampling statement.  
+
+Functions ending in \code{\_lpmf} (for probability mass functions),
+behave exactly the same way.  The difference is that the first
+argument of a density function (\code{\_lpdf}) must be continuous (not
+an integer or integer array), whereas the first argument of a mass
+function (\code{\_lpmf}) must be discrete (integer or integer array).
 
 
 \section{Overloading Functions}
@@ -9250,8 +9359,8 @@ as part of the Stan language, so there is no need to document them.
 \section{Summary of Function Types}
 
 Functions may have a void or non-void return type and they may or may
-not have one of the special suffixes, \code{\_log}, \code{\_lp}, or
-\code{\_rng}.
+not have one of the special suffixes, \code{\_lpdf}, \code{\_lpmf},
+\code{\_lp}, or \code{\_rng}.
 
 \subsection{Void vs. Non-Void Return}
 
@@ -9265,13 +9374,14 @@ arguments of a type that matches the declared return type.
 
 \subsection{Suffixed or Non-Suffixed}
 
-Only functions ending in \code{\_log} and with return type \code{real}
-may be used as probability functions in sampling statements. 
+Only functions ending in \code{\_lpmf} or \code{\_lpdf} and with
+return type \code{real} may be used as probability functions in
+sampling statements.
 
 Only functions ending in \code{\_lp} may access the log probability
-accumulator through sampling statements or
-\code{increment\_log\_prob()} statements.  Such functions may only be
-used in the transformed parameters or model blocks.
+accumulator through sampling statements or \code{target~+=}
+statements.  Such functions may only be used in the transformed
+parameters or model blocks.
 
 Only functions ending in \code{\_rng} may access the built-in
 pseudo-random number generators.  Such functions may only be used in
@@ -9328,16 +9438,38 @@ way to the base case, adding the following conditional clause.
 \chapter{Solving Differential Equations}\label{ode-solver.chapter}
 
 \noindent
-Stan provides a built-in mechanism for solving systems of ordinary
-different equations (ODEs).  The full specification can be found in
-\refsection{language-ode-solver}.  
+Stan provides a built-in mechanism for specifying and solving systems
+of ordinary differential equations (ODEs).  Stan provides two
+different integrators, one tuned for solving non-stiff systems and one
+for stiff systems.
+%
+\begin{itemize}
+\item \code{rk45}: a fourth and fifth order Runge-Kutta method for
+  non-stiff systems \citep{DormandPrince:1980,AhnertMulansky:2011}, and
+\item \code{bdf}: a variable-step, variable-order,
+  backward-differentiation formula implementation for stiff systems
+  \citep{CohenHindmarsh:1996,SerbanHindmarsh:2005}
+\end{itemize}
+%
+For a discussion of stiff ODE sytems, see \refsection{stiff-ode}.  In
+a nutshell, the stiff solvers are slower, but more robust;  how much
+so depends on the system and the region of parameter space.
+The function signatures for Stan's ODE solvers can be found in
+\refchapter{functions-ode-solver}.
 
 
-\section{Simple Harmonic Oscillator Example}
+\section{Example: Simple Harmonic Oscillator}
 
-This section details the simple harmonic oscillator, which is
-characterized by the following pair of 
-differential equations.
+As a concrete example of a system of ODEs, consider a harmonic
+oscillator, which is characterized by an equilibrium position and a
+restoring force proportional to the displacement with friction.  
+The system state will be a pair $y = (y_1, y_2)$ representing position
+and momentum (i.e., a point in phase space).  The change in the system
+with respect to time is given by the following differential equations.%
+%
+\footnote{This example is drawn from the documentation for the Boost
+  Numeric Odeint library \citep{AhnertMulansky:2011}, which Stan uses
+  to implement the \code{rk45} solver.}
 %
 \begin{equation}\label{ode-sho.equation}
 \frac{d}{dt} y_1 = y_2 
@@ -9345,33 +9477,31 @@ differential equations.
 \frac{d}{dt} y_2 = -y_1 - \theta y_2
 \end{equation}
 %
-The values of $y = (y_1,y_2)$ are a function of both time ($t$) and the
-value of the system parameter ($\theta$).
+The state equations implicitly define the system state at a given time
+as a function of an initial state, elapsed time since the initial
+state, and the system parameters.
 
 \subsection{Solutions Given Initial Conditions}
 
-Given a value of the parameter $\theta$ and an initial state $y(t_0)$
-at time $t_0$, it is possible to solve the equations numerically to
-calculate $y(t)$ for any given time $t$.  The rest of this chapter
-shows how Stan is able to provide the functionality to specify and
-solve a system of ODEs.
-
-
+Given a value of the system parameter $\theta$ and an initial state
+$y(t_0)$ at time $t_0$, it is possible to simulate the evolution of
+the solution numerically in order to calculate $y(t)$ for a specified
+sequence of times $t_0 < t_1 < t_2 < \cdots$.
 
 \section{Coding an ODE System}
 
-A system of ODEs is coded directly in Stan as a function.  For
-example, the simple harmonic oscillator given in
-\refequation{ode-sho}, can be coded using the following function in
-Stan (see \refchapter{functions-programming} for more information on
-coding user-defined functions).
+A system of ODEs is coded directly in Stan as a function with a
+strictly specified signature.  For example, the simple harmonic
+oscillator given in \refequation{ode-sho}, can be coded using the
+following function in Stan (see \refchapter{functions-programming} for
+more information on coding user-defined functions).
 %
 \begin{stancode}
-real[] sho(real t,
-           real[] y, 
-           real[] theta,
-           real[] x_r,
-           int[] x_i) {
+real[] sho(real t,        // time
+           real[] y,      // state
+           real[] theta,  // parameters
+           real[] x_r,    // data (real)
+           int[] x_i) {   // data (integer)
   real dydt[2];
   dydt[1] = y[2];
   dydt[2] = -y[1] - theta[1] * y[2];
@@ -9379,29 +9509,28 @@ real[] sho(real t,
 }
 \end{stancode}
 %
-The function takes in a time \code{t}, system state \code{y}, system
-parameters \code{theta}, along with real data in variable
-\code{x\_r} and integer data in variable \code{x\_i}.  It
-returns an array of derivatives of the system state with respect to
-time, evaluated at time \code{t} and state \code{y}.
+The function takes in a time \code{t} (a real value), a a system state
+\code{y} (real array), system parameters \code{theta} (a real array),
+along with real data in variable \code{x\_r} (a real array) and
+integer data in variable \code{x\_i} (an integer array).  The system
+function returns the array of derivatives of the system state with
+respect to time, evaluated at time \code{t} and state \code{y}.  The
+simple harmonic oscillator coded here does not have time-sensitive
+equations; that is, \code{t} does not show up in the definition of
+\code{dydt}.  The simple harmonic oscillator does not use real or
+integer data, either.  Nevertheless, these unused arguments must be
+included as arguments in the system function with exactly the
+signature shown above.
+
 
 \subsection{Strict Signature}
 
-All of the arguments to such a function must be provided in exactly
-the order shown above.  This may require passing in zero-length
-arrays for data or parameters if the system does not involve data or
+The function defining the system must have exactly these argument
+types and return type.  This may require passing in zero-length arrays
+for data or parameters if the system does not involve data or
 parameters.  A full example for the simple harmonic oscillator, which
-does not depend on any constant data variables, is provided in 
+does not depend on any constant data variables, is provided in
 \reffigure{sho-trajectory}.
-
-\subsection{Data versus Parameters}
-
-Unlike other functions, a function describing a system of ODEs is
-limited as to the origins of variables in its arguments.  In particular,
-the time \code{t}, real data \code{x}, and integer data \code{x\_int}
-must be expressions that only involve data or transformed data
-variables.  The initial state \code{y} or the parameters \code{theta}
-are the only arguments which may involve parameters.
 
 \subsection{Discontinuous ODE System Function}
 
@@ -9433,10 +9562,9 @@ system from measurements.
 
 \section{Measurement Error Models}
 
-The point of doing statistical estimation for differential equations
-is to estimate the parameters and/or initial state given noisy
-measurements of the system variables at a finite number of time
-points.
+Statistical models or differential equations may be used to estimate
+the parameters and/or initial state of a dynamic system given noisy
+measurements of the system state at a finite number of time points.
 
 For instance, suppose the simple harmonic oscillator has a parameter
 value of $\theta = 0.15$ and initial state $y(t=0) = (1,0)$.  Now
@@ -9494,7 +9622,7 @@ model {
 }
 generated quantities {
   real y_hat[T,2];
-  y_hat = integrate_ode(sho, y0, t0, ts, theta, x_r, x_i);
+  y_hat = integrate_ode_rk45(sho, y0, t0, ts, theta, x_r, x_i);
 
   // add measurement error
   for (t in 1:T) {
@@ -9510,20 +9638,22 @@ generated quantities {
   state \code{y0} are read in as data along with the initial time
   \code{t0} and observation times \code{ts}. The generated quantities
   block is used to solve the ODE for the specified times and then add
-  random measurement error, producing observations \code{y\_hat}.}\label{sho-sim.figure}
+  random measurement error, producing observations \code{y\_hat}.
+  Because the system is not stiff, the \code{rk45} solver is used.}\label{sho-sim.figure}
 \end{figure}
 
 This program illustrates the way in which the ODE solver is called in
 a Stan program,
 %
 \begin{stancode}
-y_hat = integrate_ode(sho, y0, t0, ts, theta, x_r, x_i);
+y_hat = integrate_ode_rk45(sho, y0, t0, ts, theta, x_r, x_i);
 \end{stancode}
 %
 This assigns the solutions to the system defined by function
 \code{sho}, given initial state \code{y0}, initial time \code{t0},
 requested solution times \code{ts}, parameters \code{theta}, real data
-\code{x}, and integer data \code{x\_int}.
+\code{x}, and integer data \code{x\_int}.  The call explicitly
+specifies the Runge-Kutta solver (for non-stiff systems).
 
 Here, the ODE solver is called in the generated quantities block to
 provide a $10 \times 2$ array of solutions \code{y\_hat} to
@@ -9531,6 +9661,16 @@ which measurement error is added using the normal pseudo-random number
 generating function \code{normal\_rng}.  The number of rows in the
 solution array is the same as the size of \code{ts}, the requested
 solution times.
+
+\subsection{Data versus Parameters}
+
+Unlike other functions, the integration functions for ODEs are limited
+as to the origins of variables in their arguments.  In particular, the
+time \code{t}, real data \code{x}, and integer data \code{x\_int} must
+be expressions that only involve data or transformed data variables.
+The initial state \code{y} or the parameters \code{theta} are the only
+arguments which may involve parameters.
+
 
 \subsection{Estimating System Parameters and Initial State}
 
@@ -9574,7 +9714,7 @@ model {
   sigma ~ cauchy(0,2.5);
   theta ~ normal(0,1);
   y0 ~ normal(0,1);
-  y_hat = integrate_ode(sho, y0, t0, ts, theta, x_r, x_i);
+  y_hat = integrate_ode_rk45(sho, y0, t0, ts, theta, x_r, x_i);
   for (t in 1:T)
     y[t] ~ normal(y_hat[t], sigma);
 }
@@ -9599,7 +9739,7 @@ array \code{y\_hat}, which is then used as the location in the
 observation noise model as follows.
 %
 \begin{stancode}
-y_hat = integrate_ode(sho, y0, t0, ts, theta, x_r, x_i);
+y_hat = integrate_ode_rk45(sho, y0, t0, ts, theta, x_r, x_i);
 for (t in 1:T)
   y[t] ~ normal(y_hat[t], sigma);
 \end{stancode}
@@ -9614,12 +9754,13 @@ observed data points for times $t = 1, ..., 10$ is sufficient to
 reliably estimate the ODE parameter, initial state, and noise scales.
 
 
-\section{Stiff ODEs}
+\section{Stiff ODEs}\label{stiff-ode.section}
 
-Stan's approach will not be efficient for stiff systems of ODEs,
-roughly characterized as systems presenting numerical difficulties for
-gradient-based stepwise solvers.  Stiffness typically arises due to high
-curvature in the solution space.%
+A stiff system of ordinary differential equations can be roughly
+characterized as systems presenting numerical difficulties for
+gradient-based stepwise solvers.  Stiffness typically arises due to
+varying curvature in the dimensions of the state, for instance one
+component evolving orders of magnitude more slowly than another.%
 %
 \footnote{Not coincidentally, high curvature in the posterior of a
   general Stan model poses the same kind of problem for Euclidean
@@ -9628,13 +9769,65 @@ curvature in the solution space.%
   numerical differential equation solver specialized for Hamiltonian
   systems with separable potential and kinetic energy terms.}
 %
-It will work, but can be slow enough to be impractical because the
-stepwise integrator used for the solutions will have to take very
-small steps to ensure adequate solution accuracy.  In the future, we hope to
-roll out a more efficient approach to stiff ODEs in which automatic
-differentiation can be applied to compute the Jacobian of the final
-coupled system of state variables and partials with respect to
-parameters.
+
+Stan provides a specialized solver for stiff ODEs
+\citep{CohenHindmarsh:1996,SerbanHindmarsh:2005}.  An ODE system is
+specified exactly the same way with a function of exactly the same
+signature.  The only difference is in the call to the integrator for
+the solution; the \code{rk45} suffix is replaced with \code{bdf}, as in
+%
+\begin{stancode}
+y_hat = integrate_ode_bdf(sho, y0, t0, ts, theta, x_r, x_i);
+\end{stancode}
+%
+
+Using the stiff (\code{bdf}) integrator on a system that is not stiff
+may be much slower than using the non-stiff (\code{rk45}) integrator;
+this is because it computes additional Jacobians to guide the
+integrator.  On the other hand, attempting to use the non-stiff
+integrator for a stiff system will fail due to requiring a small step
+size and too many steps.
+
+\section{Control Parameters for ODE Solving}
+
+The calls to the integrators shown above just used the default
+control settings.  Both the non-stiff and stiff integrators allow
+three additional arguments, all of which must be supplied if any of
+them is required.
+%
+\begin{stancode}
+y_hat = integrate_ode_bdf(sho, y0, t0, ts, theta, x_r, x_i,
+                          rel_tol, abs_tol, max_steps);
+\end{stancode}
+%
+The three control arguments are relative tolerance, absolute
+tolerance, and maximum number of steps.   The default values for
+relative and absolute tolerance are both \code{1e-6} ($10^{-6}$), and
+the default maximum number of steps is \code{1e6} ($10^6$).
+
+\subsection{Tolerance}
+
+The relative and absolute tolerance control the accuracy of the
+solutions generated by the integrator.  Relative tolerances are
+relative to the solution value, whereas absolute tolerances is the
+maximum absolute error allowed in a solution.  
+
+Smaller tolerances produce more accurate solutions.  Smaller
+tolerances also require more computation time.  
+
+\subsubsection{Sensitivity Analysis}
+
+The tolerances should be set low enough that setting them lower does
+not change the statistical properties of posterior samples generated
+by the Stan program.
+
+\subsection{Maximum Number of Steps}
+
+The maximum number of steps can be used to stop a runaway simulation.
+This can arise in MCMC when a bad jump is taken, particularly during
+warmup.  With the non-stiff solver, this may result in jumping into a
+stiff region of the parameter space, which would require a very small
+step size and very many steps to satisfy even modest tolerances.  
 
 
 \chapter{Problematic Posteriors}\label{problematic-posteriors.chapter}%

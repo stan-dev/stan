@@ -136,8 +136,17 @@
  \\[-30pt]\index{{\tt\bfseries #2 }!{\tt (#3):\,#1}|hyperpage}}
 
 \newcommand{\fitemtwolines}[5]{\item[\begin{minipage}{4.9in}{\tt
-      #1 {\bfseries #2}(#3, \\ \hspace*{132pt}#4\vspace*{8pt})}\end{minipage}]\mbox{ }
- \\[-10pt] #5\index{{\tt\bfseries #2 }!{\tt (#3 #4):\,#1}|hyperpage}}
+      #1 {\bfseries #2}(#3, \\ \hspace*{60pt}#4\vspace*{8pt})}\end{minipage}]\mbox{ }
+  \\[-10pt] #5\index{{\tt\bfseries #2 }!{\tt (#3 #4):\,#1}|hyperpage}}
+
+\newcommand{\fitemthreelines}[6]{\item[\begin{minipage}{4.9in}{\tt
+      #1 {\bfseries #2}(#3, \\ \hspace*{60pt}#4, \\ \hspace*{60pt}#5\vspace*{8pt})}\end{minipage}]\mbox{ }
+ \\[-10pt] #6\index{{\tt\bfseries #2 }!{\tt (#3, #4, #5):\,#1}|hyperpage}}
+
+\newcommand{\fitemfourlines}[7]{\item[\begin{minipage}{4.9in}{\tt
+      #1 {\bfseries #2}(#3, \\ \hspace*{60pt}#4, \\ \hspace*{60pt}#5, \\ \hspace*{60pt}#6\vspace*{8pt})}\end{minipage}]\mbox{ }
+ \\[-10pt] #7\index{{\tt\bfseries #2 }!{\tt (#3, #4, #5, #6):\,#1}|hyperpage}}
+
 
 \newcommand{\fitemindex}[5]{\item[\begin{minipage}{4.9in}{\tt #1 {\bfseries #2}(#3)}\end{minipage}]\mbox{ }
   \\[-10pt] #4\index{{\tt\bfseries #5 }!{\tt (#3):\,#1}|hyperpage}}

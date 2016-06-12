@@ -241,15 +241,66 @@ done with respect to binary release management or compatibility.  The
 source is tested so that it can be used under Windows, Mac OS X, and
 Linux.  
 
-Releases are numbered using a conventional major/minor/patch-level
-scheme.  For example, version 2.0.0 is the first major release of
-version 2 of Stan, whereas version 2.1.0 is the first minor feature
-release of version 2 of Stan.  Version 2.1.1 would be used for a patch
-that only fixes bugs in version 2.1.0 without adding any
-functionality.  All numbers increment one at a time.
-
 Instructions for installing Stan C++, CmdStan, RStan, and PyStan are
 managed separately and distributed with the associated product.
+
+\section{Versioning and Release Compatibility}\label{version-numbering.section}
+
+Stan version numbers follow the standard semantic version numbering
+pattern in which version numbers are of the form
+\code{Major.Minor.Patch}; for example version 2.9.1 is major release
+2, minor release 9, and patch release 1.  Semantic versioning signals
+important information about features and compatibiltiy for the Stan
+language and how it is used.   It does not provide information about
+underlying implementation;  changes in implementation do not affect
+version numbering in and of itself.
+
+See \refappendix{deprecated-features} for a list of currently
+deprecated features and instructions on how to upgrade them.
+
+\subsection{Major Version and Backward Compatiblity}
+
+A change in a library breaks backward compatibility if a program that
+worked in the previous version no longer works the same way in the
+current version.  For backward-compatibility breaking changes, the
+major version number is incremented.  When the major version is
+updated, the minor version reverts to 0.  Because breaking backward
+compatibility is such a disturbance for users, there are very few
+major releases.
+
+\subsection{Minor Version and Forward Compatibility}
+
+A change in a library introduces a new feature if a program that works
+in the current version will not work in a previous version; that is,
+it breaks forward compatibility.  When a version introduces a new
+feature without breaking backward compatibility, its minor version
+number is incremented.  Whenever the minor version is incremented, the
+patch level reverts to 0.  Most Stan releases increment the minor
+version. 
+
+\subsection{Bug Fixes and Patch Releases}
+
+If a release does not add new functionality or break backward
+compatibility, only its patch version is incremented.  Patch releases
+of Stan are made when an important bug is fixed before any new work is
+done.  Because Stan keeps its development branch clean, pending
+patches are easily rolled into minor releases.
+
+\section{Deprecating and Removing Features}\label{process-deprecation.section}
+
+Before a user-facing feature is removed from software, it is polite to
+deprecate it in order to maintain backward compatibility and provide
+suggestions for upgrading.  \refappendix{deprecated-features} provides
+a description of all of the deprecated features that are still
+available in Stan and how to replace them with up-to-date features.
+
+Eventually, deprecated features will be removed (aka retired).  As
+explained in \refsection{version-numbering}, removing deprecated
+features requires a major version number increment.  Stan 3.0.0 will
+retire most if not all of the currently deprecated features.
+
+
+
 
 \section{Availability of Current and Historical Archive Versions}
 
@@ -340,12 +391,20 @@ The managers of the development process have extensive industrial
 programming experience and have designed or contributed to other
 software systems that are still in production.
 
-Institutions at which the members of the Stan development team
-currently hold or previously held appointments include: the University
-of California, Berkeley, Carnegie-Mellon University, Columbia
-University, University College London, University of Warwick, Virginia
-Tech, the University of Washington, YouGov PLC, Toyota Technical
-Institute at Chicago, and Bell Laboratories.
+Institutions at which the members of the Stan development team hold
+appointments as of Stan release 2.9.0 include Columbia University,
+Adobe Creative Technologies Lab, University of Warwick, University of
+Toronto (Scarborough), Dartmouth Colloge, University of Washington,
+Lucidworks, CNRS (Paris), St. George's, University of London,
+University of Massachussetts (Amherst), Aalto University, and Novartis
+Pharma.
+
+the University of California,
+Berkeley, Carnegie-Mellon University, Columbia University, University
+College London, University of Warwick, Virginia Tech, the University
+of Washington, YouGov PLC, Toyota Technical Institute at Chicago, Bell
+Laboratories, University of Warwick, Dartmouth University, University
+of Washington, .
 
 \section{Physical and Logical Security}
 
