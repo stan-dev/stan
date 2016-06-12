@@ -50,7 +50,7 @@ namespace stan {
     struct sample;
     struct simplex_var_decl;
     struct integrate_ode;
-    struct integrate_ode_cvode;
+    struct integrate_ode_control;
     struct unit_vector_var_decl;
     struct statement;
     struct statements;
@@ -178,6 +178,7 @@ namespace stan {
       bool is_defined(const std::string& name,
                       const function_signature_t& sig);
       std::set<std::string> key_set() const;
+      bool has_key(const std::string& key) const;
 
     private:
       function_signatures();
@@ -208,7 +209,7 @@ namespace stan {
       expr_type operator()(const variable& e) const;
       expr_type operator()(const fun& e) const;
       expr_type operator()(const integrate_ode& e) const;
-      expr_type operator()(const integrate_ode_cvode& e) const;
+      expr_type operator()(const integrate_ode_control& e) const;
       expr_type operator()(const index_op& e) const;
       expr_type operator()(const index_op_sliced& e) const;
       expr_type operator()(const binary_op& e) const;
@@ -226,7 +227,7 @@ namespace stan {
                              boost::recursive_wrapper<array_literal>,
                              boost::recursive_wrapper<variable>,
                              boost::recursive_wrapper<integrate_ode>,
-                             boost::recursive_wrapper<integrate_ode_cvode>,
+                             boost::recursive_wrapper<integrate_ode_control>,
                              boost::recursive_wrapper<fun>,
                              boost::recursive_wrapper<index_op>,
                              boost::recursive_wrapper<index_op_sliced>,
@@ -245,7 +246,7 @@ namespace stan {
       expression(const variable& expr);  // NOLINT(runtime/explicit)
       expression(const fun& expr);  // NOLINT(runtime/explicit)
       expression(const integrate_ode& expr);  // NOLINT(runtime/explicit)
-      expression(const integrate_ode_cvode& expr);  // NOLINT(runtime/explicit)
+      expression(const integrate_ode_control& expr);  // NOLINT
       expression(const index_op& expr);  // NOLINT(runtime/explicit)
       expression(const index_op_sliced& expr);  // NOLINT(runtime/explicit)
       expression(const binary_op& expr);  // NOLINT(runtime/explicit)
@@ -285,7 +286,7 @@ namespace stan {
       bool operator()(const array_literal& x) const;  // NOLINT
       bool operator()(const variable& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const integrate_ode& x) const;  // NOLINT
-      bool operator()(const integrate_ode_cvode& x) const;  // NOLINT
+      bool operator()(const integrate_ode_control& x) const;  // NOLINT
       bool operator()(const fun& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const index_op& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const index_op_sliced& x) const;  // NOLINT
@@ -340,6 +341,7 @@ namespace stan {
     };
 
     struct integrate_ode {
+      std::string integration_function_name_;
       std::string system_function_name_;
       expression y0_;  // initial state
       expression t0_;  // initial time
@@ -348,16 +350,18 @@ namespace stan {
       expression x_;  // data
       expression x_int_;  // integer data
       integrate_ode();
-      integrate_ode(const std::string& system_function_name,
-                const expression& y0,
-                const expression& t0,
-                const expression& ts,
-                const expression& theta,
-                const expression& x,
-                const expression& x_int);
+      integrate_ode(const std::string& integration_function_name,
+                    const std::string& system_function_name,
+                    const expression& y0,
+                    const expression& t0,
+                    const expression& ts,
+                    const expression& theta,
+                    const expression& x,
+                    const expression& x_int);
     };
 
-    struct integrate_ode_cvode {
+    struct integrate_ode_control {
+      std::string integration_function_name_;
       std::string system_function_name_;
       expression y0_;  // initial state
       expression t0_;  // initial time
@@ -368,21 +372,23 @@ namespace stan {
       expression rel_tol_;  // relative tolerance
       expression abs_tol_;  // absolute tolerance
       expression max_num_steps_;  // max number of steps
-      integrate_ode_cvode();
-      integrate_ode_cvode(const std::string& system_function_name,
-                          const expression& y0,
-                          const expression& t0,
-                          const expression& ts,
-                          const expression& theta,
-                          const expression& x,
-                          const expression& x_int,
-                          const expression& rel_tol,
-                          const expression& abs_tol,
-                          const expression& max_num_steps);
+      integrate_ode_control();
+      integrate_ode_control(const std::string& integration_function_name,
+                            const std::string& system_function_name,
+                            const expression& y0,
+                            const expression& t0,
+                            const expression& ts,
+                            const expression& theta,
+                            const expression& x,
+                            const expression& x_int,
+                            const expression& rel_tol,
+                            const expression& abs_tol,
+                            const expression& max_num_steps);
     };
 
     struct fun {
       std::string name_;
+      std::string original_name_;
       std::vector<expression> args_;
       expr_type type_;
       fun();
@@ -981,7 +987,7 @@ namespace stan {
       bool operator()(const variable& e) const;
       bool operator()(const fun& e) const;
       bool operator()(const integrate_ode& e) const;
-      bool operator()(const integrate_ode_cvode& e) const;
+      bool operator()(const integrate_ode_control& e) const;
       bool operator()(const index_op& e) const;
       bool operator()(const index_op_sliced& e) const;
       bool operator()(const binary_op& e) const;
@@ -1034,7 +1040,7 @@ namespace stan {
       bool operator()(const array_literal& e) const;
       bool operator()(const variable& e) const;
       bool operator()(const integrate_ode& e) const;
-      bool operator()(const integrate_ode_cvode& e) const;
+      bool operator()(const integrate_ode_control& e) const;
       bool operator()(const fun& e) const;
       bool operator()(const index_op& e) const;
       bool operator()(const index_op_sliced& e) const;
@@ -1055,7 +1061,7 @@ namespace stan {
       bool operator()(const array_literal& e) const;
       bool operator()(const variable& e) const;
       bool operator()(const integrate_ode& e) const;
-      bool operator()(const integrate_ode_cvode& e) const;
+      bool operator()(const integrate_ode_control& e) const;
       bool operator()(const fun& e) const;
       bool operator()(const index_op& e) const;
       bool operator()(const index_op_sliced& e) const;
@@ -1074,6 +1080,24 @@ namespace stan {
 
     bool ends_with(const std::string& suffix,
                    const std::string& s);
+
+
+    std::string get_cdf(const std::string& dist_name);
+
+    std::string get_ccdf(const std::string& dist_name);
+
+    std::string get_prob_fun(const std::string& dist_name);
+
+    bool has_prob_fun_suffix(const std::string& name);
+    std::string strip_prob_fun_suffix(const std::string& dist_fun);
+
+    bool has_cdf_suffix(const std::string& name);
+    std::string strip_cdf_suffix(const std::string& dist_fun);
+
+    bool has_ccdf_suffix(const std::string& name);
+    std::string strip_ccdf_suffix(const std::string& dist_fun);
+
+    bool fun_name_exists(const std::string& name);
 
   }
 }

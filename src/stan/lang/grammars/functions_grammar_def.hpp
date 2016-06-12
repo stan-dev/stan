@@ -60,10 +60,15 @@ namespace stan {
       function_r
         %= bare_type_g[set_void_function_f(_1, _b, _pass,
                                            boost::phoenix::ref(error_msgs_))]
-        > identifier_r[set_allows_sampling_origin_f(_1, _a, _b)]
+        > identifier_r
+          [set_allows_sampling_origin_f(_1, _a, _b)]
+          [validate_prob_fun_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
         > lit('(')
         > arg_decls_r
         > close_arg_decls_r
+        > eps
+          [validate_pmf_pdf_variate_f(_val, _pass,
+                                      boost::phoenix::ref(error_msgs_))]
         > eps[scope_lp_f(boost::phoenix::ref(var_map_))]
         > statement_g(_a, _b, true)
         > eps[unscope_variables_f(_val, boost::phoenix::ref(var_map_))]

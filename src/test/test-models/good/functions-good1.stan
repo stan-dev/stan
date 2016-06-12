@@ -33,7 +33,7 @@ functions {
     return x * y - 2.0;
   }
 
-  real foo0_log() {
+  real foo0_log(int y) {
     return -5;
   }
   real foo1_log(real x) {
@@ -60,7 +60,7 @@ transformed data {
   c <- foo2(2,b);
   c <- foo2(2,3);
 
-  a <- foo0_log();
+  a <- foo0_log(2);
   b <- foo1_log(N[6]);
   c <- foo2_log(a,b);
   c <- foo2_log(a,1);
@@ -112,7 +112,8 @@ transformed parameters {
 
   phi3 <- foo2_lp(phi1,phi2);
 
-  phi1 <- foo0_log();
+  phi1 <- foo0_log(3);
+
   phi2 <- foo1_log(1);
   phi2 <- foo1_log(2.0);
   phi2 <- foo1_log(phi1);
@@ -173,7 +174,7 @@ model {
 
   psi3 <- foo2_lp(psi1,psi2);
 
-  psi1 <- foo0_log();
+  psi1 <- foo0_log(3);
   psi2 <- foo1_log(1);
   psi2 <- foo1_log(2.0);
   psi2 <- foo1_log(psi1);
@@ -208,7 +209,7 @@ generated quantities {
   z <- foo2(x,2);
   z <- foo2(1,2);
 
-  x <- foo0_log();
+  x <- foo0_log(3);
   y <- foo1_log(x);
   y <- foo1_log(1);
   z <- foo2_log(x,y);
