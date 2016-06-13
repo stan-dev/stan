@@ -2,4 +2,4 @@ PYTHON2 ?= python
 
 .PHONY: cpplint
 cpplint:
-        @$(PYTHON2) $(CPPLINT)/cpplint.py --output=vs7 --counting=detailed --root=src --extension=hpp,cpp --filter=-runtime/indentation_namespace,-readability/namespace,-legal/copyright,-whitespace/indent,-runtime/reference $(shell find src/stan -name '*.hpp' -o -name '*.cpp')
+	@$(PYTHON2) $(CPPLINT)/cpplint.py --output=vs7 --counting=detailed --root=src --extension=hpp,cpp --filter=-runtime/indentation_namespace,-readability/namespace,-legal/copyright,-whitespace/indent,-runtime/reference $(shell find src/stan -name '*.hpp' -o -name '*.cpp')
