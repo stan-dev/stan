@@ -344,6 +344,7 @@ TEST(langAst, solveOde) {
 
   integrate_ode so; // null ctor should work and not raise error
 
+  std::string integration_function_name = "bar";
   std::string system_function_name = "foo";
 
   variable y0("y0_var_name");
@@ -364,10 +365,13 @@ TEST(langAst, solveOde) {
   variable x_int("x_int_var_name");
   x.set_type(INT_T, 1);
 
+
   // example of instantiation
-  integrate_ode so2(system_function_name, y0, t0, ts, theta, x, x_int);
+  integrate_ode so2(integration_function_name, system_function_name,
+                    y0, t0, ts, theta, x, x_int);
 
   // dumb test to make sure we at least get the right types back
+  EXPECT_EQ(integration_function_name, so2.integration_function_name_);
   EXPECT_EQ(system_function_name, so2.system_function_name_);
   EXPECT_EQ(y0.type_, so2.y0_.expression_type());
   EXPECT_EQ(t0.type_, so2.t0_.expression_type());

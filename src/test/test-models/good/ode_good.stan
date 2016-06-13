@@ -25,12 +25,40 @@ parameters {
 transformed parameters {
   real y_hat[10,2];
   y_hat <- integrate_ode(harm_osc_ode,  // system
-                     y0,            // initial state
-                     t0,            // initial time
-                     ts,            // solution times
-                     theta,         // parameters
-                     x,             // data
-                     x_int);        // integer data
+                         y0,            // initial state
+                         t0,            // initial time
+                         ts,            // solution times
+                         theta,         // parameters
+                         x,             // data
+                         x_int);        // integer data
+  y_hat <- integrate_ode_rk45(harm_osc_ode,  // system
+                              y0,            // initial state
+                              t0,            // initial time
+                              ts,            // solution times
+                              theta,         // parameters
+                              x,             // data
+                              x_int);        // integer data
+  y_hat <- integrate_ode_bdf(harm_osc_ode,  // system
+                             y0,            // initial state
+                             t0,            // initial time
+                             ts,            // solution times
+                             theta,         // parameters
+                             x,             // data
+                             x_int);        // integer data
+  y_hat <- integrate_ode_rk45(harm_osc_ode,  // system
+                              y0,            // initial state
+                              t0,            // initial time
+                              ts,            // solution times
+                              theta,         // parameters
+                              x,             // data
+                              x_int, 0.01, 0.01, 10); // integer data
+  y_hat <- integrate_ode_bdf(harm_osc_ode,  // system
+                             y0,            // initial state
+                             t0,            // initial time
+                             ts,            // solution times
+                             theta,         // parameters
+                             x,             // data
+                             x_int, 0.01, 0.01, 10); // integer data
   
 }
 model {

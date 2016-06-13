@@ -67,7 +67,7 @@ namespace stan {
                                  const size_t indent,
                                  std::ostream& o)  {
       generate_indent(indent, o);
-      o << "(void) " << name << ";   // dummy to suppress unused var warning";
+      o << "(void) " << name << ";  // dummy to suppress unused var warning";
       o << EOL;
     }
 
@@ -266,7 +266,10 @@ namespace stan {
         o_ << ")";
       }
       void operator()(const integrate_ode& fx) const {
-        o_ << "integrate_ode("
+        o_ << (fx.integration_function_name_ == "integrate_ode"
+               ? "integrate_ode_rk45"
+               : fx.integration_function_name_)
+           << '('
            << fx.system_function_name_
            << "_functor__(), ";
 
@@ -288,8 +291,9 @@ namespace stan {
         generate_expression(fx.x_int_, o_);
         o_ << ", pstream__)";
       }
-      void operator()(const integrate_ode_cvode& fx) const {
-        o_ << "integrate_ode_cvode("
+      void operator()(const integrate_ode_control& fx) const {
+        o_ << fx.integration_function_name_
+           << '('
            << fx.system_function_name_
            << "_functor__(), ";
 
@@ -309,7 +313,7 @@ namespace stan {
         o_ << ", ";
 
         generate_expression(fx.x_int_, o_);
-        o_ << ", ";
+        o_ << ", pstream__, ";
 
         generate_expression(fx.rel_tol_, o_);
         o_ << ", ";
@@ -318,7 +322,7 @@ namespace stan {
         o_ << ", ";
 
         generate_expression(fx.max_num_steps_, o_);
-        o_ << ", pstream__)";
+        o_ << ")";
       }
       void operator()(const fun& fx) const {
         // first test if short-circuit op (binary && and || applied to
@@ -532,6 +536,14 @@ namespace stan {
       o << "}; // model" << EOL2;
     }
 
+    // use to disambiguate VectorXd(0) ctor from Scalar* alternative
+    void generate_eigen_index_expression(const expression& e,
+                                    std::ostream& o) {
+      o << "static_cast<Eigen::VectorXd::Index>(";
+      generate_expression(e.expr_, o);
+      o << ")";
+    }
+
     void generate_initializer(std::ostream& o,
                               const std::string& base_type,
                               const std::vector<expression>& dims,
@@ -546,13 +558,13 @@ namespace stan {
 
       o << '(';
       if (!is_nil(type_arg1)) {
-        generate_expression(type_arg1.expr_, o);
+        generate_eigen_index_expression(type_arg1, o);
         if (!is_nil(type_arg2)) {
           o << ',';
-          generate_expression(type_arg2.expr_, o);
+          generate_eigen_index_expression(type_arg2, o);
         }
       } else if (!is_nil(type_arg2.expr_)) {
-        generate_expression(type_arg2.expr_, o);
+        generate_eigen_index_expression(type_arg2, o);
       } else {
         o << '0';
       }
@@ -897,7 +909,8 @@ namespace stan {
                                      const std::string& read_type,
                                      const std::vector<expression>& read_args,
                                      const std::string& name,
-                                   const std::vector<expression>& dims)  const {
+                                     const std::vector<expression>& dims)
+      const {
         if (declare_vars_) {
           o_ << INDENT2;
           for (size_t i = 0; i < dims.size(); ++i) o_ << "vector<";
@@ -1428,13 +1441,13 @@ namespace stan {
             }
           } else if (ctor_args.size() == 1) {  // vector
             o_ << '(';
-            generate_expression(ctor_args[0], o_);
+            generate_eigen_index_expression(ctor_args[0], o_);
             o_ << ')';
           } else if (ctor_args.size() > 1) {  // matrix
             o_ << '(';
-            generate_expression(ctor_args[0], o_);
+            generate_eigen_index_expression(ctor_args[0], o_);
             o_ << ',';
-            generate_expression(ctor_args[1], o_);
+            generate_eigen_index_expression(ctor_args[1], o_);
             o_ << ')';
           }
         }
@@ -1454,11 +1467,11 @@ namespace stan {
           generate_void_statement(name);
           o_ << EOL;
         }
-        if (type == "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> "
-            || type == "Eigen::Matrix<T__,1,Eigen::Dynamic> "
-            || type == "Eigen::Matrix<T__,Eigen::Dynamic,1> ") {
+        if (type == "Eigen::Matrix<T__, Eigen::Dynamic, Eigen::Dynamic> "
+            || type == "Eigen::Matrix<T__, 1, Eigen::Dynamic> "
+            || type == "Eigen::Matrix<T__, Eigen::Dynamic, 1> ") {
           generate_indent(indents_, o_);
-          o_ << "stan::math::fill(" << name << ",DUMMY_VAR__);" << EOL;
+          o_ << "stan::math::fill(" << name << ", DUMMY_VAR__);" << EOL;
         }
       }
     };
@@ -1867,8 +1880,6 @@ namespace stan {
       o << "]";
     }
 
-
-
     void generate_statement(statement const& s, int indent, std::ostream& o,
                             bool include_sampling, bool is_var,
                             bool is_fun_return);
@@ -1945,16 +1956,16 @@ namespace stan {
       // can conditional_op expression be used in sampling statement?
       void operator()(sample const& x) const {
         if (!include_sampling_) return;
+        std::string prob_fun = get_prob_fun(x.dist_.family_);
         generate_indent(indent_, o_);
-        o_ << "lp_accum__.add(" << x.dist_.family_ << "_log<propto__>(";
+        o_ << "lp_accum__.add(" << prob_fun << "<propto__>(";
         generate_expression(x.expr_, o_);
         for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
           o_ << ", ";
           generate_expression(x.dist_.args_[i], o_);
         }
         bool is_user_defined
-          = is_user_defined_prob_function(x.dist_.family_ + "_log",
-                                          x.expr_, x.dist_.args_);
+          = is_user_defined_prob_function(prob_fun, x.expr_, x.dist_.args_);
         if (is_user_defined)
           o_ << ", pstream__";
         o_ << "));" << EOL;
@@ -1989,7 +2000,7 @@ namespace stan {
           // T[L,U]: -log_diff_exp(Dist_cdf_log(U|params),
           //                       Dist_cdf_log(L|Params))
           o_ << "lp_accum__.add(-log_diff_exp(";
-          o_ << x.dist_.family_ << "_cdf_log(";
+          o_ << get_cdf(x.dist_.family_) << "(";
           generate_expression(x.truncation_.high_.expr_, o_);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
             o_ << ", ";
@@ -1997,7 +2008,7 @@ namespace stan {
           }
           if (is_user_defined)
             o_ << ", pstream__";
-          o_ << "), " << x.dist_.family_ << "_cdf_log(";
+          o_ << "), " << get_cdf(x.dist_.family_) << "(";
           generate_expression(x.truncation_.low_.expr_, o_);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
             o_ << ", ";
@@ -2009,7 +2020,7 @@ namespace stan {
         } else if (!x.truncation_.has_low() && x.truncation_.has_high()) {
           // T[,U];  -Dist_cdf_log(U)
           o_ << "lp_accum__.add(-";
-          o_ << x.dist_.family_ << "_cdf_log(";
+          o_ << get_cdf(x.dist_.family_) << "(";
           generate_expression(x.truncation_.high_.expr_, o_);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
             o_ << ", ";
@@ -2021,7 +2032,7 @@ namespace stan {
         } else if (x.truncation_.has_low() && !x.truncation_.has_high()) {
           // T[L,]: -Dist_ccdf_log(L)
           o_ << "lp_accum__.add(-";
-          o_ << x.dist_.family_ << "_ccdf_log(";
+          o_ << get_ccdf(x.dist_.family_) << "(";
           generate_expression(x.truncation_.low_.expr_, o_);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
             o_ << ", ";
@@ -2296,7 +2307,7 @@ namespace stan {
         << "const char* function__ = \"validate transformed params\";"
         << EOL;
       o << INDENT2
-        << "(void) function__; // dummy to suppress unused var warning"
+        << "(void) function__;  // dummy to suppress unused var warning"
         << EOL;
 
       generate_validate_var_decls(p.derived_decl_.first, 2, o);
@@ -4685,20 +4696,20 @@ namespace stan {
                            std::ostream& out) {
       bool is_rng = ends_with("_rng", fun.name_);
       bool is_lp = ends_with("_lp", fun.name_);
-      bool is_log = ends_with("_log", fun.name_);
-      std::string scalar_t_name
-        = fun_scalar_type(fun, is_lp);
+      bool is_pf = ends_with("_log", fun.name_)
+        || ends_with("_lpdf", fun.name_) || ends_with("_lpmf", fun.name_);
+      std::string scalar_t_name = fun_scalar_type(fun, is_lp);
 
-      generate_function_template_parameters(fun, is_rng, is_lp, is_log, out);
+      generate_function_template_parameters(fun, is_rng, is_lp, is_pf, out);
       generate_function_inline_return_type(fun, scalar_t_name, 0, out);
       generate_function_name(fun, out);
-      generate_function_arguments(fun, is_rng, is_lp, is_log, out);
+      generate_function_arguments(fun, is_rng, is_lp, is_pf, out);
       generate_function_body(fun, scalar_t_name, out);
 
       // need a second function def for default propto=false for _log
       // funs; but don't want duplicate def, so don't do it for
       // forward decl when body is no-op
-      if (is_log && !fun.body_.is_no_op_statement())
+      if (is_pf && !fun.body_.is_no_op_statement())
         generate_propto_default_function(fun, scalar_t_name, out);
       out << EOL;
     }
@@ -4710,40 +4721,30 @@ namespace stan {
 
       bool is_rng = ends_with("_rng", fun.name_);
       bool is_lp = ends_with("_lp", fun.name_);
-      bool is_log = ends_with("_log", fun.name_);
+      bool is_pf = ends_with("_log", fun.name_)
+        || ends_with("_lpdf", fun.name_) || ends_with("_lpmf", fun.name_);
       std::string scalar_t_name = fun_scalar_type(fun, is_lp);
 
-      out << EOL
-          << "struct ";
+      out << EOL << "struct ";
       generate_function_name(fun, out);
-      out << "_functor__ {"
-          << EOL;
+      out << "_functor__ {" << EOL;
 
       out << INDENT;
-      generate_function_template_parameters(fun, is_rng, is_lp, is_log, out);
+      generate_function_template_parameters(fun, is_rng, is_lp, is_pf, out);
 
       out << INDENT;
       generate_function_inline_return_type(fun, scalar_t_name, 1, out);
 
-      out <<  INDENT
-          << "operator()";
-      generate_function_arguments(fun, is_rng, is_lp, is_log, out);
-      out << " const {"
-          << EOL;
+      out <<  INDENT << "operator()";
+      generate_function_arguments(fun, is_rng, is_lp, is_pf, out);
+      out << " const {" << EOL;
 
-      out << INDENT2
-          << "return ";
+      out << INDENT2 << "return ";
       generate_function_name(fun, out);
-      generate_functor_arguments(fun, is_rng, is_lp, is_log, out);
-      out << ";"
-          << EOL;
-
-      out << INDENT
-          << "}"
-          << EOL;
-
-      out << "};"
-          << EOL2;
+      generate_functor_arguments(fun, is_rng, is_lp, is_pf, out);
+      out << ";" << EOL;
+      out << INDENT << "}"  << EOL;
+      out << "};" << EOL2;
     }
 
 

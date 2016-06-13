@@ -5,9 +5,9 @@ TEST(parserFunctions, funsGood0) {
   test_parsable("validate_functions"); // tests proper definitions and use
 }
 
-TEST(parserFunctions, funsGood1) {
-  test_parsable("functions-good1");
-}
+// TEST(parserFunctions, funsGood1) {
+//   test_parsable("functions-good1");
+// }
 
 TEST(parserFunctions, funsGood2) {
   test_parsable("functions-good2");
@@ -112,5 +112,7 @@ TEST(parserFunctions,funsBad16) {
 
 TEST(parserFunctions,funsBad17) {
   test_throws("functions-bad17",
-              "Require real return type for functions ending in _log");
+              "Require real return type for probability functions"
+              " ending in _log, _lpdf, _lpmf, _lcdf, or _lccdf.");
 }
+
