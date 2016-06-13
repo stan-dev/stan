@@ -7,7 +7,7 @@
 #include <fstream>
 #include <boost/random/additive_combine.hpp>
 #include <stan/io/dump.hpp>
-#include <stan/services/io/write_iteration.hpp>
+#include <stan/old_services/io/write_iteration.hpp>
 #include <stan/interface_callbacks/writer/stream_writer.hpp>
 
 void expect_substring(const std::string& msg,
