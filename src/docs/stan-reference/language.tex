@@ -4628,6 +4628,7 @@ identifier ::= [a-zA-Z] [a-zA-Z0-9_]*
 expressions ::= expression % ','
 expression ::= numeric_literal
              | variable
+             | expression `?` expression `:` expression
              | expression infixOp expression
              | prefixOp expression
              | expression postfixOp
@@ -4740,7 +4741,7 @@ parameters;  in this case
 \begin{itemize}
 \item its first argument to refer to a function with signature
 \begin{quote}
- \code{(real,real[],real[],real[],int[]):real[]},
+ \code{(real,~real[],~real[],~real[],~int[])~:~real[]},
 \end{quote}
 \item the remaining six arguments must assignable to types
 \begin{quote}
@@ -4760,8 +4761,6 @@ references.  The final three arguments must be assignable to types
 \begin{quote}
 \code{real}, \code{real}, \code{int}.
 \end{quote}
-
-
 
 \subsection{Indexes}
 
