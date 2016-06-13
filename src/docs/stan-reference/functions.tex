@@ -494,7 +494,13 @@ are primarily provided for compatibility with BUGS and JAGS.
       x & \mbox{if } cond \neq 0 \\
       y & \mbox{otherwise}
     \end{cases}
-    \]}
+    \]
+    {\bfseries Warning:} This function should not be used.  Rather,
+    \code{if\_else(a,~b,~c)} should be replaced with the conditional
+    operator \code{a~?~b~:~c}.  The conditional operator also allows
+    more flexiblity in the types of \code{b} and \code{c}.  See
+    \refsection{conditional-operator} for full details of the
+    conditional operator.  }
   %
   \fitem{real}{step}{real \farg{x}}{
     Returns 1 if \farg{x} is positive and 0 otherwise.
