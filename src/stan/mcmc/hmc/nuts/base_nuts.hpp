@@ -102,8 +102,6 @@ namespace stan {
           }
 
           if (!valid_subtree) break;
-          log_sum_weight
-            = math::log_sum_exp(log_sum_weight, log_sum_weight_subtree);
 
           // Sample from an accepted subtree
           ++(this->depth_);
@@ -112,6 +110,18 @@ namespace stan {
             = std::exp(log_sum_weight_subtree - log_sum_weight);
           if (this->rand_uniform_() < accept_prob)
             z_sample = z_propose;
+
+          if (log_sum_weight_subtree > log_sum_weight) {
+            z_sample = z_propose;
+          } else {
+            double accept_prob
+              = std::exp(log_sum_weight_subtree - log_sum_weight);
+            if (this->rand_uniform_() < accept_prob)
+              z_sample = z_propose;
+          }
+
+          log_sum_weight
+            = math::log_sum_exp(log_sum_weight, log_sum_weight_subtree);
 
           // Break when NUTS criterion is not longer satisfied
           rho += rho_subtree;

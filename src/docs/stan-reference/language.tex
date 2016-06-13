@@ -1722,6 +1722,8 @@ tabular form in \reffigure{operator-precedence}.
 {\it Op.} & {\it Prec.} & {\it Assoc.} & {\it
   Placement} & {\it Description}
 \\ \hline \hline
+\code{?~:} & 10 & right & ternary infix & conditional
+\\ \hline
 \code{||} & 9 & left & binary infix & logical or
 \\ \hline
 \Verb|&&| & 8 & left & binary infix & logical and
@@ -1769,7 +1771,7 @@ tabular form in \reffigure{operator-precedence}.
 \code{[]} & 0 & left & prefix, wrap & array, matrix indexing
 \end{tabular}
 \end{center}
-\caption{\it Stan's unary and binary operators, with their
+\caption{\small\it Stan's unary, binary, and ternary operators, with their
   precedences, associativities, place in an expression, and a
   description.  The last two lines list the precedence of function
   application and array, matrix, and vector indexing. The operators are
@@ -1806,6 +1808,123 @@ For integer and reals,
 \mbox{\code{-n \textasciicircum\ 3}}
 is interpreted as \mbox{\code{-(n \textasciicircum\ 3)}}.
 
+
+\section{Conditional Operator}\label{conditional-operator.section}
+
+\subsection{Conditional Operator Syntax}
+
+The ternary conditional operator is unique in that it takes three
+arguments and uses a mixed syntax.  If \code{a} is an expression of
+type \code{int} and \code{b} and \code{c} are expressions that can be
+converted to one another (e.g., compared with \code{==}), then 
+%
+\begin{stancode}
+a ? b : c
+\end{stancode}
+%
+is an expression of the promoted type of \code{b} and \code{c}.  The
+only promotion allowed in Stan is from integer to real; if one
+argument is of type \code{int} and the other of type \code{real}, the
+conditional expression as a whole is of type \code{real}.  In all
+other cases, the arguments have to be of the same underlying Stan type
+(i.e., constraints don't count, only the shape) and the conditional
+expression is of that type.
+
+\subsubsection{Conditional Operator Precedence}
+
+The conditional operator is the most loosely binding operator, so its
+arguments rarely require parentheses for disambiguation.  For example,
+%
+\begin{stancode}
+a > 0 || b < 0 ? c + d : e - f
+\end{stancode}
+%
+is equivalent to the explicitly grouped version
+%
+\begin{stancode}
+(a > 0 || b < 0) ? (c + d) : (e - f)
+\end{stancode}
+%
+The latter is easier to read even if the parentheses are not strictly
+necessary.
+
+\subsubsection{Conditional Operator Associativity}
+
+The conditional operator is right associative, so that
+%
+\begin{stancode}
+a ? b : c ? d : e
+\end{stancode}
+%
+parses as if explicitly grouped as
+%
+\begin{stancode}
+a ? b : (c ? d : e)
+\end{stancode}
+%
+Again, the explicitly grouped version is easier to read.
+
+
+\subsection{Conditional Operator Semantics}
+
+Stan's conditional operator works very much like its C++ analogue.
+The first argument must be an expression denoting an integer.
+Typically this is a variable or a relation operator, as in the
+variable \code{a} in the example above.  Then there are two resulting
+arguments, the first being the result returned if the condition
+evaluates to true (i.e., non-zero) and the second if the condition
+evaluates to false (i.e., zero).  In the example above, the value
+\code{b} is returned if the condition evaluates to a non-zero value
+and \code{c} is returned if the condition evaluates to zero.
+
+\subsubsection{Lazy Evaluation of Results}
+
+The key property of the conditional operator that makes it so useful
+in high-performance computing is that it only evaluates the returned
+subexpression, not the alternative expression.  In other words, it is
+not like a typical function that evaluates its argument expressions
+eagerly in order to pass their values to the function.  Specifically,
+the conditional operator provides a substantial speedup over the
+built-in \code{if\_else} function, which, like other functions, evaluates
+all three of its arguments when it is called.  As usual, the saving is
+mostly in the derivatives that do not get computed rather than the
+basic function evaluation itself.
+
+\subsubsection{Promotion to Parameter}
+
+If one return expression is a data value (an expression involving only
+constants and variables defined in the data or transformed data
+block), and the other is not, then the ternary operator will promote
+the data value to a parameter value.  This can cause needless work
+calculating derivatives in some cases and be less efficient than a full
+\code{if}-\code{then} conditional statement.  For example,
+%
+\begin{stancode}
+data {
+  real x[10];
+  ...
+parameters {
+  real z[10];
+  ...
+model {
+  y ~ normal(cond ? x : z, sigma);
+  ...
+\end{stancode}
+%
+would be more efficiently (if not more transparently) coded as
+%
+\begin{stancode}
+if (cond)
+  y ~ normal(x, sigma);
+else
+  y ~ normal(z, sigma);
+\end{stancode}
+%
+The conditional statement, like the conditional operator, only
+evaluates one of the result statements.  In this case, the variable
+\code{x} will not be promoted to a parameter and thus not cause any
+needless work to be carried out when propagating the chain rule during
+derivative calculations.
 
 
 \section{Indexing}\label{language-indexing.section}
@@ -4509,6 +4628,7 @@ identifier ::= [a-zA-Z] [a-zA-Z0-9_]*
 expressions ::= expression % ','
 expression ::= numeric_literal
              | variable
+             | expression `?` expression `:` expression
              | expression infixOp expression
              | prefixOp expression
              | expression postfixOp
@@ -4621,7 +4741,7 @@ parameters;  in this case
 \begin{itemize}
 \item its first argument to refer to a function with signature
 \begin{quote}
- \code{(real,real[],real[],real[],int[]):real[]},
+ \code{(real,~real[],~real[],~real[],~int[])~:~real[]},
 \end{quote}
 \item the remaining six arguments must assignable to types
 \begin{quote}
@@ -4641,8 +4761,6 @@ references.  The final three arguments must be assignable to types
 \begin{quote}
 \code{real}, \code{real}, \code{int}.
 \end{quote}
-
-
 
 \subsection{Indexes}
 
