@@ -366,11 +366,13 @@ namespace stan {
       //    struct expr_type has members:
       //        base_expr_type base_type_;
       //        size_t num_dims_;
-      
+
       void operator()(const conditional_op& expr) const {
-        bool types_prim_match = (expr.type_.is_primitive() && expr.type_.base_type_ == INT_T)
+        bool types_prim_match = (expr.type_.is_primitive()
+                                 && expr.type_.base_type_ == INT_T)
           || (expr.type_.is_primitive()
-              && ( expr.true_val_.expression_type() == expr.false_val_.expression_type()));
+              && (expr.true_val_.expression_type()
+                  == expr.false_val_.expression_type()));
         bool types_prim_mismatch = !types_prim_match
           && expr.type_.is_primitive();
         o_ << "(";
@@ -418,7 +420,6 @@ namespace stan {
         boost::apply_visitor(*this, expr.subject.expr_);
         o_ << ')';
       }
-
     };     // close struct expression_visgen
 
     void generate_expression(const expression& e,

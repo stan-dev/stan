@@ -91,7 +91,7 @@ namespace stan {
     bool is_data_origin(const var_origin& vo);
     void print_var_origin(std::ostream& o, const var_origin& vo);
 
-    
+
     std::ostream& write_base_expr_type(std::ostream& o, base_expr_type type);
 
     struct expr_type {
@@ -312,7 +312,7 @@ namespace stan {
       bool operator()(const fun& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const index_op& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const index_op_sliced& x) const;  // NOLINT
-      bool operator()(const conditional_op& x) const;  // NOLINT(runtime/explicit)
+      bool operator()(const conditional_op& x) const;  // NOLINT
       bool operator()(const binary_op& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const unary_op& x) const;  // NOLINT(runtime/explicit)
     };
@@ -443,8 +443,8 @@ namespace stan {
 
     struct conditional_op {
       expression cond_;  // conditional - must be int val
-      expression true_val_;  
-      expression false_val_;  
+      expression true_val_;
+      expression false_val_;
       expr_type type_;
       var_origin origin_;
       conditional_op();
@@ -453,8 +453,7 @@ namespace stan {
                      const expression& false_val);
       bool is_data() const;
     };
-      
-    
+
     struct binary_op {
       std::string op;
       expression left;

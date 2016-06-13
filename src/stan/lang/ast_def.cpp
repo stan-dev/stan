@@ -948,7 +948,8 @@ namespace stan {
     bool is_nil_op::operator()(const index_op_sliced& /* x */) const {
       return false;
     }
-    bool is_nil_op::operator()(const conditional_op& /* x */) const { return false; }
+    bool is_nil_op::operator()(const conditional_op& /* x */) const {
+      return false; }
     bool is_nil_op::operator()(const binary_op& /* x */) const { return false; }
     bool is_nil_op::operator()(const unary_op& /* x */) const { return false; }
 

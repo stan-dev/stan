@@ -177,18 +177,25 @@ namespace stan {
                    << std::endl;
         pass = false;
       }
-      expr_type true_val_type(conditional_op.true_val_.expression_type().type(),
-                              conditional_op.true_val_.expression_type().num_dims_);
-      base_expr_type true_val_base_type = true_val_type.base_type_;
-      expr_type false_val_type(conditional_op.false_val_.expression_type().type(),
-                              conditional_op.false_val_.expression_type().num_dims_);
-      base_expr_type false_val_base_type = false_val_type.base_type_;
+      expr_type
+        true_val_type(conditional_op.true_val_.expression_type().type(),
+                      conditional_op.true_val_.expression_type().num_dims_);
+      base_expr_type
+        true_val_base_type = true_val_type.base_type_;
+      expr_type
+        false_val_type(conditional_op.false_val_.expression_type().type(),
+                       conditional_op.false_val_.expression_type().num_dims_);
+      base_expr_type
+        false_val_base_type = false_val_type.base_type_;
 
       bool types_compatible
-        = (true_val_type.is_primitive() && false_val_type.is_primitive()
+        = (true_val_type.is_primitive()
+           && false_val_type.is_primitive()
            && (true_val_base_type == false_val_base_type
-               || (true_val_base_type == DOUBLE_T && false_val_base_type == INT_T)
-               || (true_val_base_type == INT_T && false_val_base_type == DOUBLE_T)))
+               || (true_val_base_type == DOUBLE_T
+                   && false_val_base_type == INT_T)
+               || (true_val_base_type == INT_T
+                   && false_val_base_type == DOUBLE_T)))
         || (true_val_type == false_val_type);
 
       if (!types_compatible) {
@@ -205,8 +212,9 @@ namespace stan {
       if (!true_val_type.is_primitive()) {
         conditional_op.type_ = true_val_type;
       } else {
-        conditional_op.type_ = 
-          (true_val_base_type == false_val_base_type) ? true_val_base_type : DOUBLE_T;
+        conditional_op.type_ =
+          (true_val_base_type == false_val_base_type) ?
+          true_val_base_type : DOUBLE_T;
       }
     }
     boost::phoenix::function<validate_conditional_op>

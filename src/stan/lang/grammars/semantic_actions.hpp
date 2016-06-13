@@ -215,7 +215,7 @@ namespace stan {
     extern boost::phoenix::function<validate_conditional_op>
     validate_conditional_op_f;
 
-    
+
     // called from: expression_grammar
     struct binary_op_expr : public phoenix_functor_quinary {
      void operator()(expression& expr1, const expression& expr2,
