@@ -104,7 +104,7 @@ namespace stan {
     };
 
     /**
-     * This is the base class for ternary functors that are adapted to
+     * This is the base class for quinary functors that are adapted to
      * lazy semantic actions by boost::phoenix.  The base class deals
      * with the type dispatch required by Phoenix.
      */
@@ -204,6 +204,17 @@ namespace stan {
       void operator()(size_t& lhs) const;
     };
     extern boost::phoenix::function<increment_size_t> increment_size_t_f;
+
+
+    // called from: expression_grammar
+    struct validate_conditional_op : public phoenix_functor_ternary {
+      void operator()(conditional_op& cond_expr,
+                      bool& pass,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<validate_conditional_op>
+    validate_conditional_op_f;
+
 
     // called from: expression_grammar
     struct binary_op_expr : public phoenix_functor_quinary {
@@ -682,6 +693,7 @@ namespace stan {
       bool operator()(const fun& x) const;
       bool operator()(const index_op& x) const;
       bool operator()(const index_op_sliced& x) const;
+      bool operator()(const conditional_op& x) const;
       bool operator()(const binary_op& x) const;
       bool operator()(const unary_op& x) const;
     };
