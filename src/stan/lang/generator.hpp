@@ -359,14 +359,6 @@ namespace stan {
       }
 
 
-
-      //    struct conditional_op has members:
-      //       var_origin origin_;
-      //       expr_type type_;
-      //    struct expr_type has members:
-      //        base_expr_type base_type_;
-      //        size_t num_dims_;
-
       void operator()(const conditional_op& expr) const {
         bool types_prim_match = (expr.type_.is_primitive()
                                  && expr.type_.base_type_ == INT_T)

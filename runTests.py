@@ -14,7 +14,7 @@ import time
 
 winsfx = ".exe"
 testsfx = "_test.cpp"
-debug = True
+debug = False
 batchSize = 25
 
 def usage():

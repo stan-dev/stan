@@ -170,7 +170,7 @@ namespace stan {
                                              std::ostream& error_msgs) const {
       pass = true;
       expr_type cond_type = conditional_op.cond_.expression_type();
-      if (!cond_type.is_primitive()) {
+      if (!cond_type.is_primitive_int()) {
         error_msgs << "condition in ternary expression must be"
                    << " primitive int or real;"
                    << " found type=" << cond_type
