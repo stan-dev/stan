@@ -6,9 +6,10 @@
 
 namespace stan {
   namespace mcmc {
-
-    // Point in a phase space with a base
-    // Euclidean manifold with dense metric
+    /**
+     * Point in a phase space with a base
+     * Euclidean manifold with dense metric
+     */
     class dense_e_point: public ps_point {
     public:
       explicit dense_e_point(int n)

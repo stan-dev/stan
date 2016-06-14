@@ -9,6 +9,7 @@
 #include <cstddef>
 #include <limits>
 #include <climits>
+#include <istream>
 #include <iostream>
 #include <map>
 #include <set>
@@ -168,6 +169,8 @@ namespace stan {
     bool
     function_signatures::is_defined(const std::string& name,
                                     const function_signature_t& sig) {
+      if (sigs_map_.find(name) == sigs_map_.end())
+        return false;
       const std::vector<function_signature_t> sigs = sigs_map_[name];
       for (size_t i = 0; i < sigs.size(); ++i)
         if (sig.second  == sigs[i].second)
@@ -312,6 +315,7 @@ namespace stan {
     int function_signatures::get_signature_matches(const std::string& name,
                               const std::vector<expr_type>& args,
                               function_signature_t& signature) {
+      if (!has_key(name)) return 0;
       std::vector<function_signature_t> signatures = sigs_map_[name];
       size_t min_promotions = std::numeric_limits<size_t>::max();
       size_t num_matches = 0;
@@ -424,12 +428,17 @@ namespace stan {
       size_t min_promotions = std::numeric_limits<size_t>::max();
       size_t num_matches = 0;
 
-      std::string display_name
-        = (sampling_error_style && name.size() > 4)
-        ? name.substr(0, name.size() - 4)
-        : (is_operator(name)
-           ? ("operator" + fun_name_to_operator(name))
-           : name);
+      std::string display_name;
+      if (is_operator(name)) {
+        display_name = "operator" + fun_name_to_operator(name);
+      } else if (sampling_error_style && ends_with("_log", name)) {
+        display_name = name.substr(0, name.size() - 4);
+      } else if (sampling_error_style
+                 && (ends_with("_lpdf", name) || ends_with("_lcdf", name))) {
+        display_name = name.substr(0, name.size() - 5);
+      } else {
+        display_name = name;
+      }
 
       for (size_t i = 0; i < signatures.size(); ++i) {
         int promotions = num_promotions(args, signatures[i].second);
@@ -440,6 +449,7 @@ namespace stan {
           match_index = i;
           num_matches = 1;
         } else if (promotions_ui == min_promotions) {
+          std::cout << std::endl;
           ++num_matches;
         }
       }
@@ -454,8 +464,8 @@ namespace stan {
                    << std::endl << std::endl;
       } else {
         error_msgs << "Ambiguous: "
-                   << num_matches << " matches for with "
-                   << min_promotions << " integer promotions: "
+                   << num_matches << " matches with "
+                   << min_promotions << " integer promotions for: "
                    << std::endl;
       }
       print_signature(display_name, args, sampling_error_style, error_msgs);
@@ -463,7 +473,10 @@ namespace stan {
       if (signatures.size() == 0) {
         error_msgs << std::endl
                    << (sampling_error_style ? "Distribution " : "Function ")
-                   << display_name << " not found." << std::endl;
+                   << display_name << " not found.";
+        if (sampling_error_style)
+          error_msgs << " Require function with _lpdf or _lpmf or _log suffix";
+        error_msgs << std::endl;
       } else {
         error_msgs << std::endl
                    << "Available argument signatures for "
@@ -482,6 +495,7 @@ namespace stan {
     function_signatures::function_signatures() {
 #include <stan/lang/function_signatures.h>  // NOLINT
     }
+
     std::set<std::string>
     function_signatures::key_set() const {
       using std::map;
@@ -497,8 +511,11 @@ namespace stan {
       return result;
     }
 
-    function_signatures* function_signatures::sigs_ = 0;
+    bool function_signatures::has_key(const std::string& key) const {
+      return sigs_map_.find(key) != sigs_map_.end();
+    }
 
+    function_signatures* function_signatures::sigs_ = 0;
 
     arg_decl::arg_decl() { }
     arg_decl::arg_decl(const expr_type& arg_type,
@@ -660,7 +677,7 @@ namespace stan {
       return expr_type(DOUBLE_T, 2);
     }
     expr_type
-    expression_type_vis::operator()(const integrate_ode_cvode& e) const {
+    expression_type_vis::operator()(const integrate_ode_control& e) const {
       return expr_type(DOUBLE_T, 2);
     }
     expr_type expression_type_vis::operator()(const fun& e) const {
@@ -670,6 +687,9 @@ namespace stan {
       return e.type_;
     }
     expr_type expression_type_vis::operator()(const index_op_sliced& e) const {
+      return e.type_;
+    }
+    expr_type expression_type_vis::operator()(const conditional_op& e) const {
       return e.type_;
     }
     expr_type expression_type_vis::operator()(const binary_op& e) const {
@@ -689,8 +709,6 @@ namespace stan {
       expression_type_vis vis;
       return boost::apply_visitor(vis, expr_);
     }
-    // template <typename Expr>
-    // expression::expression(const Expr& expr) : expr_(expr) {  }
 
     expression::expression(const expression_t& expr) : expr_(expr) { }
     expression::expression(const nil& expr) : expr_(expr) { }
@@ -699,10 +717,11 @@ namespace stan {
     expression::expression(const array_literal& expr) : expr_(expr) { }
     expression::expression(const variable& expr) : expr_(expr) { }
     expression::expression(const integrate_ode& expr) : expr_(expr) { }
-    expression::expression(const integrate_ode_cvode& expr) : expr_(expr) { }
+    expression::expression(const integrate_ode_control& expr) : expr_(expr) { }
     expression::expression(const fun& expr) : expr_(expr) { }
     expression::expression(const index_op& expr) : expr_(expr) { }
     expression::expression(const index_op_sliced& expr) : expr_(expr) { }
+    expression::expression(const conditional_op& expr) : expr_(expr) { }
     expression::expression(const binary_op& expr) : expr_(expr) { }
     expression::expression(const unary_op& expr) : expr_(expr) { }
 
@@ -716,8 +735,6 @@ namespace stan {
         sum += 2;
       return sum;
     }
-
-
 
     printable::printable() : printable_("") { }
     printable::printable(const expression& expr) : printable_(expr) { }
@@ -762,7 +779,7 @@ namespace stan {
       return boost::apply_visitor(*this, e.y0_.expr_)
         || boost::apply_visitor(*this, e.theta_.expr_);
     }
-    bool contains_var::operator()(const integrate_ode_cvode& e) const {
+    bool contains_var::operator()(const integrate_ode_control& e) const {
       // only init state and params may contain vars
       return boost::apply_visitor(*this, e.y0_.expr_)
         || boost::apply_visitor(*this, e.theta_.expr_);
@@ -772,6 +789,11 @@ namespace stan {
     }
     bool contains_var::operator()(const index_op_sliced& e) const {
       return boost::apply_visitor(*this, e.expr_.expr_);
+    }
+    bool contains_var::operator()(const conditional_op& e) const {
+      return boost::apply_visitor(*this, e.cond_.expr_)
+        || boost::apply_visitor(*this, e.true_val_.expr_)
+        || boost::apply_visitor(*this, e.false_val_.expr_);
     }
     bool contains_var::operator()(const binary_op& e) const {
       return boost::apply_visitor(*this, e.left.expr_)
@@ -845,7 +867,8 @@ namespace stan {
       return boost::apply_visitor(*this, e.y0_.expr_)
         || boost::apply_visitor(*this, e.theta_.expr_);
     }
-    bool contains_nonparam_var::operator()(const integrate_ode_cvode& e) const {
+    bool contains_nonparam_var::operator()(const integrate_ode_control& e)
+      const {
       // if any vars, return true because integration will be nonlinear
       return boost::apply_visitor(*this, e.y0_.expr_)
         || boost::apply_visitor(*this, e.theta_.expr_);
@@ -869,6 +892,15 @@ namespace stan {
     bool contains_nonparam_var::operator()(const index_op_sliced& e) const {
       return boost::apply_visitor(*this, e.expr_.expr_);
     }
+
+    bool contains_nonparam_var::operator()(const conditional_op& e) const {
+      if (has_non_param_var(e.cond_, var_map_)
+          || has_non_param_var(e.true_val_, var_map_)
+          || has_non_param_var(e.false_val_, var_map_))
+        return true;
+      return false;
+    }
+
     bool contains_nonparam_var::operator()(const binary_op& e) const {
       if (e.op == "||"
           || e.op == "&&"
@@ -908,7 +940,7 @@ namespace stan {
     bool is_nil_op::operator()(const integrate_ode& /* x */) const {
       return false;
     }
-    bool is_nil_op::operator()(const integrate_ode_cvode& /* x */) const {
+    bool is_nil_op::operator()(const integrate_ode_control& /* x */) const {
       return false;
     }
     bool is_nil_op::operator()(const fun& /* x */) const { return false; }
@@ -916,6 +948,8 @@ namespace stan {
     bool is_nil_op::operator()(const index_op_sliced& /* x */) const {
       return false;
     }
+    bool is_nil_op::operator()(const conditional_op& /* x */) const {
+      return false; }
     bool is_nil_op::operator()(const binary_op& /* x */) const { return false; }
     bool is_nil_op::operator()(const unary_op& /* x */) const { return false; }
 
@@ -986,14 +1020,16 @@ namespace stan {
     }
 
     integrate_ode::integrate_ode() { }
-    integrate_ode::integrate_ode(const std::string& system_function_name,
-                         const expression& y0,
-                         const expression& t0,
-                         const expression& ts,
-                         const expression& theta,
-                         const expression& x,
-                         const expression& x_int)
-      : system_function_name_(system_function_name),
+    integrate_ode::integrate_ode(const std::string& integration_function_name,
+                                 const std::string& system_function_name,
+                                 const expression& y0,
+                                 const expression& t0,
+                                 const expression& ts,
+                                 const expression& theta,
+                                 const expression& x,
+                                 const expression& x_int)
+      : integration_function_name_(integration_function_name),
+        system_function_name_(system_function_name),
         y0_(y0),
         t0_(t0),
         ts_(ts),
@@ -1002,19 +1038,21 @@ namespace stan {
         x_int_(x_int) {
     }
 
-    integrate_ode_cvode::integrate_ode_cvode() { }
-    integrate_ode_cvode::integrate_ode_cvode(
-                                       const std::string& system_function_name,
-                                       const expression& y0,
-                                       const expression& t0,
-                                       const expression& ts,
-                                       const expression& theta,
-                                       const expression& x,
-                                       const expression& x_int,
-                                       const expression& rel_tol,
-                                       const expression& abs_tol,
-                                       const expression& max_num_steps)
-      : system_function_name_(system_function_name),
+    integrate_ode_control::integrate_ode_control() { }
+    integrate_ode_control::integrate_ode_control(
+                                   const std::string& integration_function_name,
+                                   const std::string& system_function_name,
+                                   const expression& y0,
+                                   const expression& t0,
+                                   const expression& ts,
+                                   const expression& theta,
+                                   const expression& x,
+                                   const expression& x_int,
+                                   const expression& rel_tol,
+                                   const expression& abs_tol,
+                                   const expression& max_num_steps)
+      : integration_function_name_(integration_function_name),
+        system_function_name_(system_function_name),
         y0_(y0),
         t0_(t0),
         ts_(ts),
@@ -1031,12 +1069,7 @@ namespace stan {
              std::vector<expression> const& args)
       : name_(name),
         args_(args) {
-      infer_type();
     }
-    void fun::infer_type() {
-      // TODO(carpenter): remove this useless function and any calls to it
-    }
-
 
     size_t total_dims(const std::vector<std::vector<expression> >& dimss) {
       size_t total = 0U;
@@ -1091,6 +1124,17 @@ namespace stan {
       type_ = indexed_type(expr_, idxs_);
     }
 
+    conditional_op::conditional_op() { }
+    conditional_op::conditional_op(const expression& cond,
+                         const expression& true_val,
+                         const expression& false_val)
+      : cond_(cond),
+        true_val_(true_val),
+        false_val_(false_val),
+        type_(promote_primitive(true_val.expression_type(),
+                                  false_val.expression_type())) {
+    }
+
     binary_op::binary_op() { }
     binary_op::binary_op(const expression& left,
                          const std::string& op,
@@ -1101,7 +1145,6 @@ namespace stan {
         type_(promote_primitive(left.expression_type(),
                                   right.expression_type())) {
     }
-
 
     unary_op::unary_op(char op,
                        expression const& subject)
@@ -1178,6 +1221,9 @@ namespace stan {
       return boost::apply_visitor(v, idx.idx_);
     }
 
+    bool is_data_origin(const var_origin& vo) {
+      return vo == data_origin || vo == transformed_data_origin;
+    }
 
     void print_var_origin(std::ostream& o, const var_origin& vo) {
       if (vo == model_name_origin)
@@ -1717,8 +1763,8 @@ namespace stan {
     bool var_occurs_vis::operator()(const integrate_ode& e) const {
       return false;  // no refs persist out of integrate_ode() call
     }
-    bool var_occurs_vis::operator()(const integrate_ode_cvode& e) const {
-      return false;  // no refs persist out of integrate_ode_cvode() call
+    bool var_occurs_vis::operator()(const integrate_ode_control& e) const {
+      return false;  // no refs persist out of integrate_ode_control() call
     }
     bool var_occurs_vis::operator()(const index_op& e) const {
       // refs only persist out of expression, not indexes
@@ -1726,6 +1772,11 @@ namespace stan {
     }
     bool var_occurs_vis::operator()(const index_op_sliced& e) const {
       return boost::apply_visitor(*this, e.expr_.expr_);
+    }
+    bool var_occurs_vis::operator()(const conditional_op& e) const {
+      return boost::apply_visitor(*this, e.cond_.expr_)
+        || boost::apply_visitor(*this, e.true_val_.expr_)
+        || boost::apply_visitor(*this, e.false_val_.expr_);
     }
     bool var_occurs_vis::operator()(const binary_op& e) const {
       return boost::apply_visitor(*this, e.left.expr_)
@@ -1898,13 +1949,89 @@ namespace stan {
       return assignable;
     }
 
-
     bool ends_with(const std::string& suffix,
                    const std::string& s) {
       size_t idx = s.rfind(suffix);
       return idx != std::string::npos
         && idx == (s.size() - suffix.size());
     }
+
+   std::string get_cdf(const std::string& dist_name) {
+      if (function_signatures::instance().has_key(dist_name + "_cdf_log"))
+        return dist_name + "_cdf_log";
+      else if (function_signatures::instance().has_key(dist_name + "_lcdf"))
+        return dist_name + "_lcdf";
+      else
+        return dist_name;
+    }
+
+    std::string get_ccdf(const std::string& dist_name) {
+      if (function_signatures::instance().has_key(dist_name + "_ccdf_log"))
+        return dist_name + "_ccdf_log";
+      else if (function_signatures::instance().has_key(dist_name + "_lccdf"))
+        return dist_name + "_lccdf";
+      else
+        return dist_name;
+    }
+
+    std::string get_prob_fun(const std::string& dist_name) {
+      if (function_signatures::instance().has_key(dist_name + "_log"))
+        return dist_name + "_log";
+      else if (function_signatures::instance().has_key(dist_name + "_lpdf"))
+        return dist_name + "_lpdf";
+      else if (function_signatures::instance().has_key(dist_name + "_lpmf"))
+        return dist_name + "_lpmf";
+      else
+        return dist_name;
+    }
+
+    bool has_prob_fun_suffix(const std::string& fname) {
+      return ends_with("_lpdf", fname) || ends_with("_lpmf", fname)
+        || ends_with("_log", fname);
+    }
+
+    std::string strip_prob_fun_suffix(const std::string& fname) {
+      if (ends_with("_lpdf", fname))
+        return fname.substr(0, fname.size() - 5);
+      else if (ends_with("_lpmf", fname))
+        return fname.substr(0, fname.size() - 5);
+      else if (ends_with("_log", fname))
+        return fname.substr(0, fname.size() - 4);
+      else
+        return fname;
+    }
+
+    bool has_cdf_suffix(const std::string& fname) {
+      return ends_with("_lcdf", fname) || ends_with("_cdf_log", fname);
+    }
+
+    std::string strip_cdf_suffix(const std::string& fname) {
+      if (ends_with("_lcdf", fname))
+        return fname.substr(0, fname.size() - 5);
+      else if (ends_with("_cdf_log", fname))
+        return fname.substr(0, fname.size() - 8);
+      else
+        return fname;
+    }
+
+    bool has_ccdf_suffix(const std::string& fname) {
+      return ends_with("_lccdf", fname) || ends_with("_ccdf_log", fname);
+    }
+
+    std::string strip_ccdf_suffix(const std::string& fname) {
+      if (ends_with("_lccdf", fname))
+        return fname.substr(0, fname.size() - 6);
+      else if (ends_with("_ccdf_log", fname))
+        return fname.substr(0, fname.size() - 9);
+      else
+        return fname;
+    }
+
+    bool fun_name_exists(const std::string& name) {
+      return function_signatures::instance().has_key(name);
+    }
+
+
 
   }
 }

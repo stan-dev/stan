@@ -101,7 +101,8 @@ namespace stan {
           if (equal != std::string::npos) {
             name = lhs.substr(0, equal);
             boost::trim(name);
-            value = lhs.substr(equal + 2, lhs.size());
+            value = lhs.substr(equal + 1, lhs.size());
+            boost::trim(value);
             boost::replace_first(value, " (Default)", "");
           } else {
             if (lhs.compare(" data") == 0) {

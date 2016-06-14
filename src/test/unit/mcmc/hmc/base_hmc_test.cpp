@@ -124,7 +124,7 @@ TEST(McmcBaseHMC, streams) {
   stan::interface_callbacks::writer::stream_writer writer(output);
 
   EXPECT_NO_THROW(sampler.write_sampler_state(writer));
-  EXPECT_EQ("Step size = 0.1\nNo free parameters for unit metric\n",
+  EXPECT_EQ("Step size = 0.1\n",
             output.str());
 
   stan::test::reset_std_streams();

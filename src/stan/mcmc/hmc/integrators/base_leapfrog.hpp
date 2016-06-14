@@ -20,12 +20,12 @@ namespace stan {
                   const double epsilon,
                   interface_callbacks::writer::base_writer& info_writer,
                   interface_callbacks::writer::base_writer& error_writer) {
-        begin_update_p(z, hamiltonian, 0.5 * epsilon);
-
-        update_q(z, hamiltonian, epsilon);
-        hamiltonian.update(z, info_writer, error_writer);
-
-        end_update_p(z, hamiltonian, 0.5 * epsilon);
+        begin_update_p(z, hamiltonian, 0.5 * epsilon,
+                       info_writer, error_writer);
+        update_q(z, hamiltonian, epsilon,
+                 info_writer, error_writer);
+        end_update_p(z, hamiltonian, 0.5 * epsilon,
+                     info_writer, error_writer);
       }
 
       void
@@ -73,7 +73,8 @@ namespace stan {
 
         double H0 = hamiltonian.H(z);
 
-        begin_update_p(z, hamiltonian, 0.5 * epsilon);
+        begin_update_p(z, hamiltonian, 0.5 * epsilon,
+                       info_writer, error_writer);
 
         double H1 = hamiltonian.H(z);
 
@@ -85,8 +86,7 @@ namespace stan {
             << std::setw(width) << std::left << (H1 - H0) / (epsilon * epsilon);
         info_writer(msg.str());
 
-        update_q(z, hamiltonian, epsilon);
-        hamiltonian.update(z, info_writer, error_writer);
+        update_q(z, hamiltonian, epsilon, info_writer, error_writer);
 
         double H2 = hamiltonian.H(z);
 
@@ -98,7 +98,7 @@ namespace stan {
             << std::setw(width) << std::left << (H2 - H0) / (epsilon * epsilon);
         info_writer(msg.str());
 
-        end_update_p(z, hamiltonian, 0.5 * epsilon);
+        end_update_p(z, hamiltonian, 0.5 * epsilon, info_writer, error_writer);
 
         double H3 = hamiltonian.H(z);
 
@@ -119,15 +119,23 @@ namespace stan {
         info_writer(msg.str());
       }
 
-      virtual void begin_update_p(typename Hamiltonian::PointType& z,
-                                  Hamiltonian& hamiltonian,
-                                  double epsilon) = 0;
-      virtual void update_q(typename Hamiltonian::PointType& z,
-                            Hamiltonian& hamiltonian,
-                            double epsilon) = 0;
-      virtual void end_update_p(typename Hamiltonian::PointType& z,
-                                Hamiltonian& hamiltonian,
-                                double epsilon) = 0;
+      virtual
+      void begin_update_p(
+        typename Hamiltonian::PointType& z,
+        Hamiltonian& hamiltonian, double epsilon,
+        interface_callbacks::writer::base_writer& info_writer,
+        interface_callbacks::writer::base_writer& error_writer) = 0;
+      virtual
+      void update_q(typename Hamiltonian::PointType& z,
+                    Hamiltonian& hamiltonian, double epsilon,
+                    interface_callbacks::writer::base_writer& info_writer,
+                    interface_callbacks::writer::base_writer& error_writer) = 0;
+      virtual
+      void end_update_p(
+        typename Hamiltonian::PointType& z,
+        Hamiltonian& hamiltonian, double epsilon,
+        interface_callbacks::writer::base_writer& info_writer,
+        interface_callbacks::writer::base_writer& error_writer) = 0;
     };
 
   }  // mcmc

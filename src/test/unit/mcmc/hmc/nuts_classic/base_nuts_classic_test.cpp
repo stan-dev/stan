@@ -38,17 +38,28 @@ namespace stan {
       double tau(ps_point& z) { return T(z); }
       double phi(ps_point& z) { return this->V(z); }
 
-      double dG_dt(ps_point& z) { return 2; }
+      double dG_dt(
+        ps_point& z,
+        interface_callbacks::writer::base_writer& info_writer,
+        interface_callbacks::writer::base_writer& error_writer) {
+        return 2;
+      }
 
-      const Eigen::VectorXd dtau_dq(ps_point& z) {
+      Eigen::VectorXd dtau_dq(
+        ps_point& z,
+        interface_callbacks::writer::base_writer& info_writer,
+        interface_callbacks::writer::base_writer& error_writer) {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 
-      const Eigen::VectorXd dtau_dp(ps_point& z) {
+      Eigen::VectorXd dtau_dp(ps_point& z) {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 
-      const Eigen::VectorXd dphi_dq(ps_point& z) {
+      Eigen::VectorXd dphi_dq(
+        ps_point& z,
+        interface_callbacks::writer::base_writer& info_writer,
+        interface_callbacks::writer::base_writer& error_writer) {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 
@@ -60,9 +71,10 @@ namespace stan {
 
       void sample_p(ps_point& z, BaseRNG& rng) {};
 
-      void update(ps_point& z,
-                  interface_callbacks::writer::base_writer& info_writer,
-                  interface_callbacks::writer::base_writer& error_writer) {
+      void update_potential_gradient(
+        ps_point& z,
+        interface_callbacks::writer::base_writer& info_writer,
+        interface_callbacks::writer::base_writer& error_writer) {
         z.V += 500;
       }
 

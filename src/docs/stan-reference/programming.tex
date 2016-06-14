@@ -232,14 +232,14 @@ obvious.  For instance, there is no need to have comments
 such as the following, which add nothing to the code.
 %
 \begin{stancode}
-y ~ normal(0,1);  // y has a unit normal distribution
+y ~ normal(0, 1);  // y has a unit normal distribution
 \end{stancode}
 %
 A Jacobian adjustment for a hand-coded transform might be worth
 commenting, as in the following example.
 %
 \begin{stancode}
-exp(y) ~ normal(0,1);
+exp(y) ~ normal(0, 1);
 // adjust for change of vars: y = log | d/dy exp(y) |
 target += y;
 \end{stancode}
@@ -501,7 +501,7 @@ A two-dimensional array is just an array of arrays, both conceptually
 and in terms of current implementation.  When an index is supplied to
 an array, it returns the value at that index.  When more than one
 index is supplied, this indexing operation is chained.  For example, if
-\code{a} is a two-dimensional array, then \code{a[m,n]} is just
+\code{a} is a two-dimensional array, then \code{a[m,~n]} is just
 a convenient shorthand for \code{a[m][n]}.
 
 
@@ -544,38 +544,38 @@ they are stored.  This also helps with memory locality.  This is
 column-major for matrices, so the following order is appropriate.
 %
 \begin{stancode}
-matrix[M,N] a;
+matrix[M, N] a;
 //...
 for (n in 1:N)
   for (m in 1:M)
-    // ... do something with a[m,n] ...
+    // ... do something with a[m, n] ...
 \end{stancode}
 %
 Arrays, on the other hand, should be traversed in row-major order
 (i.e., last index fastest), as in the following example.
 %
 \begin{stancode}
-real a[M,N];
+real a[M, N];
 // ...
 for (m in 1:M)
   for (n in 1:N)
-    // ... do something with a[m,n] ...
+    // ... do something with a[m, n] ...
 \end{stancode}
 %
-The first use of \code{a[m,n]} should bring \code{a[m]} into memory.
+The first use of \code{a[m,~n]} should bring \code{a[m]} into memory.
 Overall, traversing matrices is more efficient than traversing arrays.
 
 This is true even for arrays of matrices.  For example, the ideal
 order in which to traverse a two-dimensional array of matrices is
 %
 \begin{stancode}
-matrix[M,N] b[I,J];
+matrix[M, N] b[I, J];
 // ...
 for (i in 1:I)
   for (j in 1:J)
     for (n in 1:N)
       for (m in 1:M)
-        ... do something with b[i,j,m,n] ...
+        ... do something with b[i, j, m, n] ...
 \end{stancode}
 
 If \code{a} is a matrix, the notation \code{a[m]} picks out row
@@ -593,7 +593,7 @@ for (m in 1:M)
 is much more efficient than the pure matrix version
 %
 \begin{stancode}
-matrix b[M,N];
+matrix b[M, N];
 // ...
 for (m in 1:M)
    // ... do something with row vector b[m] ...
@@ -607,7 +607,7 @@ fastest.  So if I want to create a row of predictor-coefficient
 dot-products, it's more efficient to do this
 %
 \begin{stancode}
-matrix[N,K] x;    // predictors (aka covariates)
+matrix[N, k] x;    // predictors (aka covariates)
 // ...
 vector[K] beta;   // coeffs
 // ...
@@ -1161,7 +1161,7 @@ one predictor can be written directly using matrix notation.
 data {
   int<lower=0> N;   // number of data items
   int<lower=0> K;   // number of predictors
-  matrix[N,K] x;    // predictor matrix
+  matrix[N, k] x;    // predictor matrix
   vector[N] y;      // outcome vector
 }
 parameters {
@@ -1353,7 +1353,7 @@ real<lower=0> sigma;
 %
 and given a prior
 \begin{stancode}
-sigma ~ normal(0,1000);
+sigma ~ normal(0, 1000);
 \end{stancode}
 %
 gives \code{sigma} a half-normal prior, technically
@@ -1623,7 +1623,7 @@ parameters {
 }
 model {
   for (k in 1:K)
-    beta[k] ~ normal(0,5);
+    beta[k] ~ normal(0, 5);
   for (n in 1:N)
     y[n] ~ categorical(softmax(beta * x[n]));
 }
@@ -1645,7 +1645,7 @@ The first loop may be made more efficient by vectorizing the first
 loop by converting the matrix \code{beta} to a vector, 
 %
 \begin{stancode}
-to_vector(beta) ~ normal(0,5);
+to_vector(beta) ~ normal(0, 5);
 \end{stancode}
 
 
@@ -1821,7 +1821,7 @@ IRT models).  This is another way of achieving a symmetric prior.
 
 \section{Ordered Logistic and Probit Regression}\label{ordered-logistic.section}
 
-Ordered regression for an outcome $y_n \in \setlist{1,\ldots,K}$ with
+Ordered regression for an outcome $y_n \in \setlist{1,\ldots, k}$ with
 predictors $x_n \in \reals^D$ is determined by a single coefficient
 vector $\beta \in \reals^D$ along with a sequence of cutpoints $c \in
 \reals^{K-1}$ sorted so that $c_d < c_{d+1}$.  The discrete output is
@@ -1948,9 +1948,9 @@ parameters {
 }
 model {
   for (d in 1:D) {
-    mu[d] ~ normal(0,100);
+    mu[d] ~ normal(0, 100);
     for (l in 1:L)
-      beta[l,d] ~ normal(mu[d],sigma[d]);
+      beta[l,d] ~ normal(mu[d], sigma[d]);
   }
   for (n in 1:N)
     y[n] ~ bernoulli(inv_logit(x[n] * beta[ll[n]]));
@@ -1978,9 +1978,9 @@ The first optimization vectorizes the for-loop over \code{D} as
 %
 
 \begin{stancode}
-  mu ~ normal(0,100);
+  mu ~ normal(0, 100);
   for (l in 1:L)
-    beta[l] ~ normal(mu,sigma);
+    beta[l] ~ normal(mu, sigma);
 \end{stancode}
 %
 The declaration of \code{beta} as an array of vectors means that the
@@ -2151,9 +2151,9 @@ The model itself is as follows.
 
 \begin{stancode}
 model {
-  alpha ~ normal(0,1);         // informative true prior
-  beta ~ normal(0,1);          // informative true prior
-  delta ~ normal(.75,1);       // informative true prior
+  alpha ~ normal(0, 1);         // informative true prior
+  beta ~ normal(0, 1);          // informative true prior
+  delta ~ normal(0.75, 1);      // informative true prior
   for (n in 1:N)
     y[n] ~ bernoulli_logit(alpha[jj[n]] - beta[kk[n]] + delta);
 }
@@ -2215,13 +2215,13 @@ The parameters should be clearer after the model definition.
 %
 \begin{stancode}
 model {
-  alpha ~ normal(0,1);
-  beta ~ normal(0,sigma_beta);   
-  gamma ~ lognormal(0,sigma_gamma);
-  mu_beta ~ cauchy(0,5);
-  sigma_alpha ~ cauchy(0,5);
-  sigma_beta ~ cauchy(0,5);
-  sigma_gamma ~ cauchy(0,5);
+  alpha ~ normal(0, 1);
+  beta ~ normal(0,s igma_beta);   
+  gamma ~ lognormal(0, sigma_gamma);
+  mu_beta ~ cauchy(0, 5);
+  sigma_alpha ~ cauchy(0, 5);
+  sigma_beta ~ cauchy(0, 5);
+  sigma_gamma ~ cauchy(0, 5);
   for (n in 1:N)
     y[n] ~ bernoulli_logit(gamma[kk[n]] 
                            * (alpha[jj[n]] - (beta[kk[n]] + mu_beta)));
@@ -2247,8 +2247,8 @@ varying scales given hierarchically in this model.  They could also be
 given weakly informative non-hierarchical priors, such as
 %
 \begin{stancode}
-  beta ~ normal(0,5);
-  gamma ~ lognormal(0,2);
+  beta ~ normal(0, 5);
+  gamma ~ lognormal(0, 2);
 \end{stancode}
 %
 The point is that the \code{alpha} determines the scale and location
@@ -2396,7 +2396,7 @@ prior for independent coefficients, such as
 \mu_j \sim \distro{Normal}(0,5).
 \]
 Of course, if more is known about the expected coefficient values
-$\beta_{j,k}$, this information can be incorporated into the prior for
+$\beta_{j, k}$, this information can be incorporated into the prior for
 $\mu_k$.  
 
 For the prior on the covariance matrix, Gelman and Hill suggest using
@@ -2475,19 +2475,19 @@ data {
   int<lower=1> J;              // num groups
   int<lower=1> L;              // num group predictors
   int<lower=1,upper=J> jj[N];  // group for individual
-  matrix[N,K] x;               // individual predictors
+  matrix[N, k] x;               // individual predictors
   row_vector[L] u[J];          // group predictors
   vector[N] y;                 // outcomes
 }
 parameters {
   corr_matrix[K] Omega;        // prior correlation
   vector<lower=0>[K] tau;      // prior scale
-  matrix[L,K] gamma;           // group coeffs
+  matrix[L, k] gamma;           // group coeffs
   vector[K] beta[J];           // indiv coeffs by group
   real<lower=0> sigma;         // prediction error scale
 }
 model {
-  tau ~ cauchy(0,2.5);
+  tau ~ cauchy(0, 2.5);
   Omega ~ lkj_corr(2);
   to_vector(gamma) ~ normal(0, 5);
   {
@@ -2511,7 +2511,7 @@ because the correlation matrix \code{Omega} and scale vector
 \code{tau} are more natural to inspect in the output; to output
 \code{Sigma}, define it as a transformed parameter.  The function
 \code{quad\_form\_diag} is defined so that
-\code{quad\_form\_diag(Sigma,tau)} is equivalent to
+\code{quad\_form\_diag(Sigma,~tau)} is equivalent to
 \code{diag\_matrix(tau) * Sigma * diag\_matrix(tau)}, where
 \code{diag\_matrix(tau)} returns the matrix with \code{tau} on the
 diagonal and zeroes off diagonal; the version using
@@ -2541,7 +2541,7 @@ need to be solved and differentiated.
 %
 \begin{stancode}
   {
-    matrix[K,K] Sigma_beta;
+    matrix[K, K] Sigma_beta;
     Sigma_beta = quad_form_diag(Omega, tau);
     for (j in 1:J)
       beta[j] ~ multi_normal((u[j] * gamma)', Sigma_beta);
@@ -2578,7 +2578,7 @@ transformed parameters {
   beta = u * gamma + (diag_pre_multiply(tau,L_Omega) * z)';
 }
 model {
-  to_vector(z) ~ normal(0,1); 
+  to_vector(z) ~ normal(0, 1); 
   L_Omega ~ lkj_corr_cholesky(2);
   ...
 \end{stancode}  
@@ -2606,7 +2606,7 @@ factor of the final covariance matrix,
 where the diagonal pre-multiply compound operation is defined by 
 %
 \begin{stancode}
-diag_pre_multiply(a,b) = diag_matrix(a) * b
+diag_pre_multiply(a, b) = diag_matrix(a) * b
 \end{stancode}
 %
 The new variable \code{z} is declared as a matrix, the entries of
@@ -2622,14 +2622,14 @@ optimized model is as follows.
 %
 \begin{stancode}
 parameters {
-  matrix[K,J] z;
+  matrix[K, J] z;
   cholesky_factor_corr[K] L_Omega;  
   vector<lower=0;upper=pi()/2>[K] tau_unif;  
-  matrix[L,K] gamma;                         // group coeffs
+  matrix[L, K] gamma;                         // group coeffs
   real<lower=0> sigma;                       // prediction error scale
 }
 transformed parameters {
-  matrix[J,K] beta;
+  matrix[J, K] beta;
   vector<lower=0>[K] tau;     // prior scale
   for (k in 1:K) tau[k] = 2.5 * tan(tau_unif[k]);
   beta = u * gamma + (diag_pre_multiply(tau,L_Omega) * z)';
@@ -2640,9 +2640,9 @@ model {
     x_beta_jj[n] = x[n] * beta[jj[n]]';
   y ~ normal(x_beta_jj, sigma);
 
-  to_vector(z) ~ normal(0,1); 
+  to_vector(z) ~ normal(0, 1); 
   L_Omega ~ lkj_corr_cholesky(2);
-  to_vector(gamma) ~ normal(0,5);
+  to_vector(gamma) ~ normal(0, 5);
 }
 \end{stancode}
 
@@ -2652,18 +2652,18 @@ This model also reparameterizes the prior scale \code{tau} to avoid potential pr
 % \begin{stancode}
 % parameters {
 %   vector[3] mu;
-%   matrix[3,M] z;
+%   matrix[3, M] z;
 %   cholesky_factor_corr[3] L_Sigma;
 %   vector<lower=0>[3] sigma_Sigma;
 %   ...
 % transformed parameters {
 %   matrix[M,3] alpha;
 %   alpha 
-%     = transpose(rep_matrix(mu,M)
+%     = transpose(rep_matrix(mu, M)
 %                  + diag_pre_multiply(sigma_Sigma,L_Sigma) * z);
 %   ...
 % model {
-%   to_vector(z) ~ normal(0,1); 
+%   to_vector(z) ~ normal(0, 1); 
 %   gamma ~ normal(0, 5);
 %   sigma_Sigma ~ cauchy(0, 2.5);
 %   L_Sigma ~ lkj_corr_cholesky(3);
@@ -2713,7 +2713,7 @@ matrix \code{x\_new}.
 data {
   int<lower=1> K;
   int<lower=0> N;
-  matrix[N,K] x;       
+  matrix[N, K] x;       
   vector[N] y;     
 
   int<lower=0> N_new;
@@ -2823,7 +2823,7 @@ data {
   vector[K] y[N];
 }
 parameters {
-  matrix[K,J] beta;
+  matrix[K, J] beta;
   cov_matrix[K] Sigma;
 }
 model {
@@ -2846,13 +2846,13 @@ terms of Cholesky factors for efficiency and arithmetic stability.
 \begin{stancode}
 ...
 parameters {
-  matrix[K,J] beta;
+  matrix[K, J] beta;
   cholesky_factor_corr[K] L_Omega;
   vector<lower=0>[K] L_sigma;
 }
 model {
   vector[K] mu[N];
-  matrix[K,K] L_Sigma;
+  matrix[K, K] L_Sigma;
 
   for (n in 1:N)
     mu[n] = beta * x[n];
@@ -2897,7 +2897,7 @@ model (see the previous section),
 These are then put through the step function to produce a $K$-vector $z_n$
 of boolean values with elements defined by
 \[
-y_{n,k} = \mathrm{I}(z_{n,k} > 0),
+y_{n, k} = \mathrm{I}(z_{n, k} > 0),
 \]
 where $\mathrm{I}()$ is the indicator function taking the value 1 if its
 argument is true and 0 otherwise.
@@ -2999,7 +2999,7 @@ The parameters are declared as follows.
 %
 \begin{stancode}
 parameters {
-  matrix[D,K] beta;
+  matrix[D, K] beta;
   cholesky_factor_corr[D] L_Omega;
   vector<lower=0>[N_pos] z_pos;
   vector<upper=0>[N_neg] z_neg;
@@ -3058,6 +3058,107 @@ generated quantities {
 %
 Of course, the same could be done for the seemingly unrelated
 regressions in the previous section.
+
+\section{Applications of Pseudorandom Number Generation}
+
+The main application of pseudorandom number generator (PRNGs) is for
+posterior inference, including prediction and posterior predictive
+checks.  They can also be used for pure data simulation, which is like
+a posterior predictive check with no conditioning.  See
+\refsection{distributions-prng} for a description of their syntax and
+the scope of their usage.
+
+\subsection{Prediction}
+
+Consider predicting unobserved outcomes using linear
+regression.  Given predictors $x_1, \ldots, x_N$ and observed outcomes
+$y_1,\ldots,y_N$, and assuming a standard linear regression with
+intercept $\alpha$, slope $\beta$, and error scale $\sigma$, along with
+improper uniform priors, the posterior over the parameters given $x$
+and $y$ is
+%
+\[
+p(\alpha, \beta, \sigma \, | \, x, y) 
+\propto 
+\prod_{n=1}^N 
+  \distro{Normal}(y_n \, | \, \alpha + \beta x_n, \sigma).
+\]
+%
+For this model, the posterior predictive inference for a new outcome
+$\tilde{y}_m$ given a predictor $\tilde{x}_m$, conditioned on the
+observed data $x$ and $y$, is
+\[
+p(\tilde{y}_n \, | \, \tilde{x}_n, x, y)
+= \int_{(\alpha,\beta,\sigma)}
+  \distro{Normal}(\tilde{y}_n \, | \, \alpha + \beta \tilde{x}_n, \sigma)
+  \times
+  p(\alpha, \beta, \sigma \, | \, x, y) 
+  \
+  \mathrm{d}(\alpha,\beta,\sigma).
+\]
+%
+To code the posterior predictive inference in Stan, a standard linear
+regression is combined with a random number in the generated
+quantities block.
+%
+\begin{stancode}
+data {
+  int<lower=0> N;
+  vector[N] y;
+  vector[N] x;
+  int<lower=0> N_tilde;
+  vector[N_tilde] x_tilde;
+}
+parameters {
+  real alpha;
+  real beta;
+  real<lower=0> sigma;
+}
+model {
+  y ~ normal(alpha + beta * x, sigma);
+}
+generated quantities {
+  vector[N_tilde] y_tilde;
+  for (n in 1:N_tilde)
+    y_tilde[n] = normal_rng(alpha + beta * x_tilde[n], sigma);
+}
+\end{stancode}
+%
+Given observed predictors $x$ and outcomes $y$, \code{y\_tilde} will
+be drawn according to $p(\tilde{y} \, | \, \tilde{x}, y, x)$.  This
+means that, for example, the posterior mean for \code{y\_tilde} is the
+estimate of the outcome that minimizes expected square error
+(conditioned on the data and model, of course).
+
+\subsection{Posterior Predictive Checks}
+
+A good way to investigate the fit of a model to the data, a critical
+step in Bayesian data analysis, is to generate simulated data
+according to the parameters of the model.  This is carried out with
+exactly the same procedure as before, only the observed data
+predictors $x$ are used in place of new predictors $\tilde{x}$ for
+unobserved outcomes.  If the model fits the data well, the predictions
+for $\tilde{y}$ based on $x$ should match the observed data $y$.
+
+To code posterior predictive checks in Stan requires only a slight
+modification of the prediction code to use $x$ and $N$ in place of
+$\tilde{x}$ and $\tilde{N}$,
+%
+\begin{stancode}
+generated quantities {
+  vector[N] y_tilde;
+  for (n in 1:N)
+    y_tilde = normal_rng(alpha + beta * x[n], sigma);
+}
+\end{stancode}
+%
+\cite{GelmanEtAl:2013} recommend choosing several posterior draws
+$\tilde{y}^{(1)}, \ldots, \tilde{y}^{(M)}$ and plotting each of them
+alongside the data $y$ that was actually observed.  If the model fits
+well, the simulated $\tilde{y}$ will look like the actual data $y$.
+
+
+
 
 \chapter{Time-Series Models}
 
@@ -3296,7 +3397,7 @@ transformed parameters {
                      + beta1 * pow(sigma[t-1], 2));
 }
 model {
-  r ~ normal(mu,sigma);
+  r ~ normal(mu, sigma);
 }
 \end{stancode}
 %
@@ -3367,9 +3468,9 @@ transformed parameters {
                     - theta[2] * epsilon[t - 2] );
 }
 model {
-  mu ~ cauchy(0,2.5);
-  theta ~ cauchy(0,2.5);
-  sigma ~ cauchy(0,2.5);
+  mu ~ cauchy(0, 2.5);
+  theta ~ cauchy(0, 2.5);
+  sigma ~ cauchy(0, 2.5);
   for (t in 3:T)
     y[t] ~ normal(mu 
                   + theta[1] * epsilon[t - 1]
@@ -3463,11 +3564,11 @@ model {
     nu[t] = mu + phi * y[t-1] + theta * err[t-1];
     err[t] = y[t] - nu[t];
   }
-  mu ~ normal(0,10);         // priors
-  phi ~ normal(0,2);
-  theta ~ normal(0,2);
-  sigma ~ cauchy(0,5);
-  err ~ normal(0,sigma);    // likelihood
+  mu ~ normal(0, 10);         // priors
+  phi ~ normal(0, 2);
+  theta ~ normal(0, 2);
+  sigma ~ cauchy(0, 5);
+  err ~ normal(0, sigma);    // likelihood
 }
 \end{stancode}
 %
@@ -3494,15 +3595,15 @@ variables as follows.
 \begin{stancode}
 model {
   real err;
-  mu ~ normal(0,10);
-  phi ~ normal(0,2);
-  theta ~ normal(0,2);
-  sigma ~ cauchy(0,5);
+  mu ~ normal(0, 10);
+  phi ~ normal(0, 2);
+  theta ~ normal(0, 2);
+  sigma ~ cauchy(0, 5);
   err = y[1] - mu + phi * mu;
-  err ~ normal(0,sigma);
+  err ~ normal(0, sigma);
   for (t in 2:T) {
     err = y[t] - (mu + phi * y[t-1] + theta * err); 
-    err ~ normal(0,sigma);
+    err ~ normal(0, sigma);
   }
 }
 \end{stancode}
@@ -3603,8 +3704,8 @@ parameters {
 }
 model {
   phi ~ uniform(-1,1);
-  sigma ~ cauchy(0,5);
-  mu ~ cauchy(0,10);  
+  sigma ~ cauchy(0, 5);
+  mu ~ cauchy(0, 10);  
   h[1] ~ normal(mu, sigma / sqrt(1 - phi * phi));
   for (t in 2:T)
     h[t] ~ normal(mu + phi * (h[t - 1] -  mu), sigma);
@@ -3659,7 +3760,7 @@ parameter block.
 \begin{stancode}
 transformed parameters {
   vector[T] h;            // log volatility at time t
-  h = h_std * sigma;     // now h ~ normal(0,sigma)
+  h = h_std * sigma;     // now h ~ normal(0, sigma)
   h[1] = h[1] / sqrt(1 - phi * phi);  // rescale h[1]
   h = h + mu;
   for (t in 2:T)
@@ -3685,7 +3786,7 @@ single vectorized unit normal sampling statement.
 \begin{stancode}
 model {
   ...
-  h_std ~ normal(0,1);
+  h_std ~ normal(0, 1);
 \end{stancode}
 %
 Although the original model can take hundreds and sometimes thousands
@@ -3699,11 +3800,11 @@ time of the original iterations.
 
 A hidden Markov model (HMM) generates a sequence of $T$ output
 variables $y_t$ conditioned on a parallel sequence of latent
-categorical state variables $z_t \in \{1,\ldots,K\}$.  These
+categorical state variables $z_t \in \{1,\ldots, K\}$.  These
 ``hidden'' state variables are assumed to form a Markov chain so that
 $z_t$ is conditionally independent of other variables given $z_{t-1}$.
 This Markov chain is parameterized by a transition matrix $\theta$
-where $\theta_k$ is a $K$-simplex for $k \in \{1,\ldots,K\}$.  The
+where $\theta_k$ is a $K$-simplex for $k \in \{1,\ldots, K\}$.  The
 probability of transitioning to state $z_t$ from state $z_{t-1}$ is
 \[
 z_t \sim \distro{Categorical}(\theta_{z[t-1]}).
@@ -3797,11 +3898,11 @@ emission matrices.
 %
 \begin{stancode}
 transformed data {
-  int<lower=0> trans[K,K];
-  int<lower=0> emit[K,V];
+  int<lower=0> trans[K, K];
+  int<lower=0> emit[K, V];
   for (k1 in 1:K) 
     for (k2 in 1:K)
-      trans[k1,k2] = 0;
+      trans[k1, k2] = 0;
   for (t in 2:T)
     trans[z[t - 1], z[t]] = 1 + trans[z[t - 1], z[t]];
   for (k in 1:K)
@@ -3855,7 +3956,7 @@ transformed data {
   for (k in 1:K) 
     alpha_post[k] = alpha;
   for (t in 2:T)
-    alpha_post[z[t-1],z[t]] = alpha_post[z[t-1],z[t]] + 1;
+    alpha_post[z[t-1], z[t]] = alpha_post[z[t-1], z[t]] + 1;
   for (k in 1:K)
     beta_post[k] = beta;
   for (t in 1:T)
@@ -3912,25 +4013,25 @@ model {
  ...
   { 
     real acc[K];
-    real gamma[T_unsup,K];
+    real gamma[T_unsup, K];
     for (k in 1:K)
-      gamma[1,k] = log(phi[k,u[1]]);
+      gamma[1, k] = log(phi[k, u[1]]);
     for (t in 2:T_unsup) {
       for (k in 1:K) {
         for (j in 1:K)
-          acc[j] = gamma[t-1,j] + log(theta[j,k]) + log(phi[k,u[t]]);
-        gamma[t,k] = log_sum_exp(acc);
+          acc[j] = gamma[t-1, j] + log(theta[j, k]) + log(phi[k, u[t]]);
+        gamma[t, k] = log_sum_exp(acc);
       }
     }
     target += log_sum_exp(gamma[T_unsup]);
   }
 \end{stancode}
 %
-The forward values \code{gamma[t,k]} are defined to be the log
+The forward values \code{gamma[t,~k]} are defined to be the log
 marginal probability of the inputs \code{u[1],...,u[t]} up to time
 \code{t} and the latent state being equal to \code{k} at time
 \code{t}; the previous latent states are marginalized out.  The first
-row of \code{gamma} is initialized by setting \code{gamma[1,k]} equal
+row of \code{gamma} is initialized by setting \code{gamma[1,~k]} equal
 to the log probability of latent state \code{k} generating the first
 output \code{u[1]}; as before, the probability of the first latent
 state is not itself modeled.  For each subsequent time \code{t} and
@@ -3950,7 +4051,7 @@ clearer to keep their declaration near their use.
 
 \subsection{Predictive Inference}
 
-Given the transition and emission parameters, $\theta_{k,k'}$ and
+Given the transition and emission parameters, $\theta_{k, k'}$ and
 $\phi_{k,v}$ and an observation sequence $u_1,\ldots,u_T \in \{
 1,\ldots,V \}$, the Viterbi (dynamic programming) algorithm
 computes the state sequence which is most likely to have generated the
@@ -3969,28 +4070,28 @@ generated quantities {
   int<lower=1,upper=K> y_star[T_unsup];
   real log_p_y_star;
   { 
-    int back_ptr[T_unsup,K];
-    real best_logp[T_unsup,K];
+    int back_ptr[T_unsup, K];
+    real best_logp[T_unsup, K];
     real best_total_logp;
     for (k in 1:K)
-      best_logp[1,K] = log(phi[k,u[1]]);
+      best_logp[1, K] = log(phi[k, u[1]]);
     for (t in 2:T_unsup) {
       for (k in 1:K) {
-        best_logp[t,k] = negative_infinity();
+        best_logp[t, k] = negative_infinity();
         for (j in 1:K) {
           real logp;
-          logp = best_logp[t-1,j] 
-                  + log(theta[j,k]) + log(phi[k,u[t]]);
-          if (logp > best_logp[t,k]) {
-            back_ptr[t,k] = j;
-            best_logp[t,k] = logp;
+          logp = best_logp[t-1, j] 
+                  + log(theta[j, k]) + log(phi[k, u[t]]);
+          if (logp > best_logp[t, k]) {
+            back_ptr[t, k] = j;
+            best_logp[t, k] = logp;
           }
         }
       }
     }
     log_p_y_star = max(best_logp[T_unsup]);
     for (k in 1:K)
-      if (best_logp[T_unsup,k] == log_p_y_star)
+      if (best_logp[T_unsup, k] == log_p_y_star)
         y_star[T_unsup] = k;
     for (t in 1:(T_unsup - 1))
       y_star[T_unsup - t] = back_ptr[T_unsup - t + 1, 
@@ -4005,7 +4106,7 @@ local so they will not be output.  The variable \code{y\_star} will
 hold the label sequence with the highest probability given the input
 sequence \code{u}.  Unlike the forward algorithm, where the
 intermediate quantities were total probability, here they consist of
-the maximum probability \code{best\_logp[t,k]} for the sequence up to
+the maximum probability \code{best\_logp[t,~k]} for the sequence up to
 time \code{t} with final output category \code{k} for time \code{t},
 along with a backpointer to the source of the link.  Following the
 backpointers from the best final log probability for the final time
@@ -4074,9 +4175,9 @@ parameters {
 }
 model {
   for (n in 1:N_obs)
-    y_obs[n] ~ normal(mu,sigma);
+    y_obs[n] ~ normal(mu, sigma);
   for (n in 1:N_mis)
-    y_mis[n] ~ normal(mu,sigma);
+    y_mis[n] ~ normal(mu, sigma);
 }
 \end{stancode}
 %
@@ -4089,8 +4190,8 @@ ordinary parameters being estimated, the location \code{mu} and scale
 model would be to vectorize, so the body would be
 %
 \begin{stancode}
-   y_obs ~ normal(mu,sigma);
-   y_mis ~ normal(mu,sigma);
+   y_obs ~ normal(mu, sigma);
+   y_mis ~ normal(mu, sigma);
 \end{stancode}
 
 The model contains one loop over the observed data and one over the
@@ -4127,20 +4228,20 @@ parameters {
   real<lower=min_cov,upper=max_cov> cov;
 }
 transformed parameters {
-  matrix[2,2] sigma;
-  sigma[1,1] = var1;     sigma[1,2] = cov;
-  sigma[2,1] = cov;      sigma[2,2] = var2;
+  matrix[2,2] Sigma;
+  Sigma[1,1] = var1;     Sigma[1,2] = cov;
+  Sigma[2,1] = cov;      Sigma[2,2] = var2;
 }  
 model {
  for (n in 1:N)
-   y[n] ~ multi_normal(mu,sigma);
+   y[n] ~ multi_normal(mu, Sigma);
 }
 \end{stancode}
 %
 The variances are defined as data in variables \code{var1} and
 \code{var2}, whereas the covariance is defined as a parameter in
 variable \code{cov}.  The $2 \times 2$ covariance matrix
-\code{sigma} is defined as a transformed parameter, with the variances
+\code{Sigma} is defined as a transformed parameter, with the variances
 assigned to the two diagonal elements and the covariance to the two
 off-diagonal elements.
 
@@ -4183,13 +4284,13 @@ parameters {
 transformed parameters {
   cholesky_factor_cov[K] L;
   for (k in 1:K)
-    L[k,k] = 1;
+    L[k, k] = 1;
   { 
     int i;
     for (m in 2:K) {
       for (n in 1:(m - 1)) {
-        L[m,n] = L_lower[i];
-        L[n,m] = 0;
+        L[m, n] = L_lower[i];
+        L[n, m] = 0;
         i = i + 1;
       }
     }
@@ -4248,7 +4349,7 @@ parameters {
 } 
 model {
   for (n in 1:N)
-    y[n] ~ normal(mu,sigma) T[,U];
+    y[n] ~ normal(mu, sigma) T[,U];
 }
 \end{stancode}
 % 
@@ -4269,7 +4370,7 @@ sampled with the statement.
 %
 \begin{stancode}
 for (n in 1:N) 
-  y[n] ~ normal(mu,sigma) T[L,U];
+  y[n] ~ normal(mu, sigma) T[L,U];
 \end{stancode}
 %
 then if the value of \code{y[n]} is less than the value of \code{L}
@@ -4299,7 +4400,7 @@ are well behaved.
 \begin{stancode}
 parameters {
   real<upper=min(y)> L; // L < y[n]
-  real<lower=fmax(L,max(y))> U; // L < U; y[n] < U
+  real<lower=fmax(L, max(y))> U; // L < U; y[n] < U
 \end{stancode}
 %
 Note that for pairs of real numbers, the function \code{fmax} is used
@@ -4333,7 +4434,7 @@ model {
   L ~ ...;  
   U ~ ...;
   for (n in 1:N)
-    y[n] ~ normal(mu,sigma) T[L,U];
+    y[n] ~ normal(mu, sigma) T[L,U];
 }
 \end{stancode}
 %
@@ -4380,8 +4481,8 @@ parameters {
   real<lower=0> sigma;
 }
 model {
-  y_obs ~ normal(mu,sigma);
-  y_cens ~ normal(mu,sigma);
+  y_obs ~ normal(mu, sigma);
+  y_cens ~ normal(mu, sigma);
 }
 \end{stancode}
 %
@@ -4412,11 +4513,11 @@ is
 \[
 \log \prod_{m=1}^M \mbox{Pr}[y_m > U]
 = \log \left( 1 - \Phi\left(\frac{y - \mu}{\sigma}\right)\right)^{M}
-= M \, \code{normal\_ccdf\_log}(y,\mu,\sigma),
+= M \, \code{normal\_lccdf}(y,\mu,\sigma),
 \]
 %
-where \code{normal\_ccdf\_log} is the log of complementary CDF
-(\Stan provides \code{<distr>\_ccdf\_log} for each distribution
+where \code{normal\_lccdf} is the log of complementary CDF
+(\Stan provides \code{<distr>\_lccdf} for each distribution
 implemented in \Stan).
 
 The following right-censored model assumes
@@ -4434,8 +4535,8 @@ parameters {
   real<lower=0> sigma;
 }
 model {
-  y_obs ~ normal(mu,sigma); 
-  target += N_cens * normal_ccdf_log(U,mu,sigma);
+  y_obs ~ normal(mu, sigma); 
+  target += N_cens * normal_lccdf(U | mu, sigma);
 }
 \end{stancode}
 %
@@ -4444,10 +4545,10 @@ used without truncation.  The log probability is directly incremented
 using the calculated log cumulative normal probability of the censored
 data items.
 
-For the left-censored data the CDF
-(\code{normal\_cdf\_log}) has to be used instead of complementary CDF.
-If the censoring point variable (\code{L}) is unknown,
-its declaration should be moved from the data to the parameters block. 
+For the left-censored data the CDF (\code{normal\_lcdf}) has to be
+used instead of complementary CDF.  If the censoring point variable
+(\code{L}) is unknown, its declaration should be moved from the data
+to the parameters block.
 %
 \begin{stancode}
 data {
@@ -4461,9 +4562,9 @@ parameters {
   real<lower=0> sigma;
 }
 model {
-  L ~ normal(mu,sigma);
-  y_obs ~ normal(mu,sigma);
-  target += N_cens * normal_cdf_log(L,mu,sigma);
+  L ~ normal(mu, sigma);
+  y_obs ~ normal(mu, sigma);
+  target += N_cens * normal_lcdf(L | mu, sigma);
 }
 \end{stancode}
 %
@@ -4537,7 +4638,7 @@ The log sum of exponentials function is used to define mixtures on the
 log scale.  It is defined for two inputs by
 %
 \[
-\mbox{log\_sum\_exp}(a,b) = \log (\exp(a) + \exp(b)).
+\mbox{log\_sum\_exp}(a, b) = \log (\exp(a) + \exp(b)).
 \]
 %
 If $a$ and $b$ are probabilities on the log scale, then $\exp(a) +
@@ -4549,11 +4650,11 @@ in the exponentiation, by calculating the result as
 %
 \[
 \log(\exp(a) + \exp(b))
-= \max(a,b) + \log(\exp(a - \max(a,b)), \exp(b - \max(a,b))).
+= \max(a, b) + \log(\exp(a - \max(a, b)), \exp(b - \max(a, b))).
 \]
 %
-In this evaluation, one of the terms $a - \max(a,b)$ or $b -
-\max(a,b)$ is zero and the other is negative, thus eliminating the
+In this evaluation, one of the terms $a - \max(a, b)$ or $b -
+\max(a, b)$ is zero and the other is negative, thus eliminating the
 possibility of overflow or underflow in the leading term and eking the
 most arithmetic precision possible out of the operation.
 
@@ -4566,8 +4667,8 @@ parameters {
   real y;
 }
 model {
-  target += log_sum_exp(log(0.3) + normal_log(y,-1,2),
-                        log(0.7) + normal_log(y,3,1));
+  target += log_sum_exp(log(0.3) + normal_lpdf(y | -1, 2),
+                        log(0.7) + normal_lpdf(y | 3, 1));
 }
 \end{stancode}
 %
@@ -4611,12 +4712,12 @@ parameters {
 }
 model {
   real ps[K];              // temp for log component densities
-  sigma ~ cauchy(0,2.5);
-  mu ~ normal(0,10);
+  sigma ~ cauchy(0, 2.5);
+  mu ~ normal(0, 10);
   for (n in 1:N) {
     for (k in 1:K) {
       ps[k] = log(theta[k]) 
-               + normal_log(y[n],mu[k],sigma[k]);
+               + normal_lpdf(y[n] | mu[k], sigma[k]);
     }
     target += log_sum_exp(ps);
   }
@@ -4653,9 +4754,9 @@ A proper mixture at the observation level is defined as
 \begin{stancode}
 for (n in 1:N) {
   target += log_sum_exp(log(lambda) 
-                          + normal_log(y[n], mu[1], sigma[1]),
+                          + normal_lpdf(y[n] | mu[1], sigma[1]),
                         log1m(lambda)
-                          + normal_log(y[n], mu[2], sigma[2]));
+                          + normal_lpdf(y[n] | mu[2], sigma[2]));
 \end{stancode}
 %
 or equivalently
@@ -4663,8 +4764,8 @@ or equivalently
 \begin{stancode}
 for (n in 1:N)
   target += log_mix(lambda, 
-                    normal_log(y[n], mu[1], sigma[1]),
-                    normal_log(y[n], mu[2], sigma[2])));
+                    normal_lpdf(y[n] | mu[1], sigma[1]),
+                    normal_lpdf(y[n] | mu[2], sigma[2])));
 \end{stancode}
 %
 This definition assumes that each observation $y_n$ may have arisen
@@ -4680,17 +4781,17 @@ vectorize the model.
 %
 \begin{stancode}
 target += log_sum_exp(log(lambda) 
-                        + normal_log(y, mu[1], sigma[1]),
+                        + normal_lpdf(y | mu[1], sigma[1]),
                       log1m(lambda)
-                        + normal_log(y, mu[2], sigma[2]));
+                        + normal_lpdf(y | mu[2], sigma[2]));
 \end{stancode}
 %
 or equivalently,
 %
 \begin{stancode}
 target += log_mix(lambda,
-                  normal_log(y, mu[1], sigma[1]),
-                  normal_log(y, mu[2], sigma[2]));
+                  normal_lpdf(y | mu[1], sigma[1]),
+                  normal_lpdf(y | mu[2], sigma[2]));
 \end{stancode}
 %
 This second definition implies that the entire sequence $y_1, \ldots, y_n$ of
@@ -4751,31 +4852,27 @@ data {
   int<lower=0> y[N];
 }
 parameters {
-  real<lower=0,upper=1> theta;
+  real<lower=0, upper=1> theta;
   real lambda;
 }
 model {
   for (n in 1:N) {
     if (y[n] == 0)
-      target += log_sum_exp(bernoulli_log(1,theta),
-                            bernoulli_log(0,theta) 
-                              + poisson_log(y[n],lambda));
+      target += log_sum_exp(bernoulli_lpmf(1 | theta),
+                            bernoulli_lpmf(0 | theta) 
+                              + poisson_lpmf(y[n] | lambda));
     else
-      target += bernoulli_log(0,theta)
-                  + poisson_log(y[n],lambda);
+      target += bernoulli_lpmf(0 | theta)
+                  + poisson_lpmf(y[n] | lambda);
   }
 }
 \end{stancode}
 %
 The \code{log\_sum\_exp(lp1,lp2)} function adds the log probabilities
 on the linear scale; it is defined to be equal to \code{log(exp(lp1) +
-  exp(lp2))}, but is more arithmetically stable and faster.
-
-Although it might be tempting to try to use the \code{if\_else} syntax
-within the \code{target += ...} function, it is not recommended
-because \code{if\_else(c,e1,e2)} evaluates both \code{e1} and
-\code{e2} no matter what the value of \code{c} is, which leads to
-inefficiencies due to derivative calculations that are not needed.
+  exp(lp2))}, but is more arithmetically stable and faster.  This
+could also be written using the conditionla operator; see
+\refsection{conditional-operator}.
 
 \subsection{Hurdle Models}
 
@@ -4822,8 +4919,8 @@ effect is equivalent to the direct definition of the log likelihood.
    if (y[n] == 0)
       target += log(theta);
     else
-      target += log1m(theta) + poisson_log(y[n], lambda)
-                - poisson_ccdf_log(0, lambda));
+      target += log1m(theta) + poisson_lpmf(y[n] | lambda)
+                - poisson_lccdf(0 | lambda));
 \end{stancode}
 
 Julian King pointed out that because
@@ -4835,7 +4932,7 @@ Julian King pointed out that because
 the CCDF in the else clause can be replaced with a simpler expression.
 %
 \begin{stancode}
-      target += log1m(theta) + poisson_log(y[n], lambda)
+      target += log1m(theta) + poisson_lpmf(y[n] | lambda)
                 - log1m_exp(-lambda));
 \end{stancode}
 %
@@ -4991,9 +5088,9 @@ parameters {
 }
 model {
   y ~ normal(alpha + beta * x, sigma);
-  alpha ~ normal(0,10);  
-  beta ~ normal(0,10);
-  sigma ~ cauchy(0,5);
+  alpha ~ normal(0, 10);  
+  beta ~ normal(0, 10);
+  sigma ~ cauchy(0, 5);
 }
 \end{stancode}
 %
@@ -5282,7 +5379,7 @@ parameters {
   real theta;  // global treatment effect, log odds
 }
 model {
-  y ~ normal(theta,sigma);
+  y ~ normal(theta, sigma);
 }
 \end{stancode}
 %
@@ -5290,7 +5387,7 @@ The sampling statement for \code{y} is vectorized; it has the same
 effect as the following.
 \begin{stancode}
   for (j in 1:J)
-    y[j] ~ normal(theta,sigma[j]);
+    y[j] ~ normal(theta, sigma[j]);
 \end{stancode}
 %
 It is common to include a prior for \code{theta} in this model, but it
@@ -5313,10 +5410,10 @@ parameters {
   real<lower=0> tau;  // deviation of treatment effects
 }
 model {
-  y ~ normal(theta,sigma);
-  theta ~ normal(mu,tau);
-  mu ~ normal(0,10);
-  tau ~ cauchy(0,5);
+  y ~ normal(theta, sigma);
+  theta ~ normal(mu, tau);
+  mu ~ normal(0, 10);
+  tau ~ cauchy(0, 5);
 }
 \end{stancode}
 %
@@ -5405,7 +5502,7 @@ e & \sim & \distro{Exponential}(r_e)
 \\
 l & \sim & \distro{Exponential}(r_l)
 \\
-s & \sim & \distro{Uniform}(1,T)
+s & \sim & \distro{Uniform}(1, T)
 \\
 D_t & \sim & \distro{Poisson}(t < s \ ? \ e \ : \ l)
 \end{eqnarray*}
@@ -5443,7 +5540,8 @@ p(e,l,s,D)
 \\[3pt]
 & = & 
 \begin{array}[t]{l}
-\distro{Exponential}(e|r_e) \ \distro{Exponential}(l|r_l) \ \distro{Uniform}(s|1,T)
+\distro{Exponential}(e|r_e) \ \distro{Exponential}(l|r_l) \
+\distro{Uniform}(s|1, T)
 \\[3pt]
 \prod_{t=1}^T \distro{Poisson}(D_t | t < s \ ? \ e \ : \ l),
 \end{array}
@@ -5527,7 +5625,7 @@ transformed parameters {
   lp = rep_vector(log_unif, T);
   for (s in 1:T)
     for (t in 1:T)
-      lp[s] = lp[s] + poisson_log(D[t], if_else(t < s, e, l));
+      lp[s] = lp[s] + poisson_lpmf(D[t] | t < s ? e : l));
 }
 model {
   e ~ exponential(r_e);
@@ -5560,8 +5658,8 @@ transformed parameters {
       lp_e[1] <- 0;
       lp_l[1] <- 0;
       for (t in 1:T) {
-        lp_e[t + 1] <- lp_e[t] + poisson_log(D[t], e);
-        lp_l[t + 1] <- lp_l[t] + poisson_log(D[t], l);
+        lp_e[t + 1] <- lp_e[t] + poisson_lpmf(D[t] | e);
+        lp_l[t + 1] <- lp_l[t] + poisson_lpmf(D[t] | l);
       }
       lp <- rep_vector(log_unif + lp_l[T + 1], T) + head(lp_e, T) - head(lp_l, T);
     }
@@ -5704,7 +5802,7 @@ for (s1 in 1:T)
   for (s2 in 1:T)
     for (t in 1:T)
       lp[s1,s2] = lp[s1,s2] 
-        + poisson_log(D[t], if_else(t < s1, e, if_else(t < s2, m, l)));
+        + poisson_lpmf(D[t] | t < s1 ? e : (t < s2 ? m : l));
 \end{stancode}
 %
 The matrix can then be converted back to a vector using
@@ -5938,7 +6036,7 @@ parameters $\phi$ and $p$.  In the model block, the log probability is
 incremented for each history based on its count.  This second step is
 similar to collecting Bernoulli observations into a binomial or
 categorical observations into a multinomial, only it is coded directly
-in the Stan program using \code{increment\_log\_prob} rather than
+in the Stan program using \code{target~+=} rather than
 being part of a built-in probability function.
 %
 \begin{figure}
@@ -6006,7 +6104,7 @@ Stan,
 data {
   int<lower=2> T;
   int<lower=0> I;
-  int<lower=0,upper=1> y[I,T];
+  int<lower=0,upper=1> y[I, T];
 }
 \end{stancode}
 
@@ -6069,10 +6167,10 @@ transformed data {
     first[i] = first_capture(y[i]);
   for (i in 1:I)
     last[i] = last_capture(y[i]);
-  n_captured = rep_vector(0,T);
+  n_captured = rep_vector(0, T);
   for (t in 1:T)
     for (i in 1:I)
-      if (y[i,t]) 
+      if (y[i, t]) 
         n_captured[t] = n_captured[t] + 1;
 }
 \end{stancode}
@@ -6142,7 +6240,7 @@ model {
     if (first[i] > 0) {
       for (t in (first[i]+1):last[i]) {
         1 ~ bernoulli(phi[t-1]);
-        y[i,t] ~ bernoulli(p[t]);
+        y[i, t] ~ bernoulli(p[t]);
       }
       1 ~ bernoulli(chi[last[i]]);
     }
@@ -6162,7 +6260,7 @@ must survive between the first and last capture (i.e., no zombies).
 Note that the loop starts after the first capture, because all
 information in the CJS model is conditional on the first capture.
 
-In the inner loop, the observed capture status \code{y[i,t]} for
+In the inner loop, the observed capture status \code{y[i,~t]} for
 individual \code{i} at time \code{t} has a Bernoulli distribution
 based on the capture probability \code{p[t]} at time \code{t}.
 
@@ -6278,7 +6376,7 @@ for diagnostic procedures.
 
 The data for the model consists of $J$ raters (diagnostic tests), $I$
 items (patients), and $K$ categories (condition statuses) to annotate,
-with $y_{i,j} \in 1{:}K$ being the rating provided by rater $j$ for
+with $y_{i, j} \in 1{:}K$ being the rating provided by rater $j$ for
 item $i$.  In a diagnostic test setting for a particular condition,
 the raters are diagnostic procedures and often $K=2$, with values
 signaling the presence or absence of the condition.%
@@ -6313,14 +6411,14 @@ categorical distribution based on item prevalence,
 z_i \sim \distro{Categorical}(\pi).
 \]
 %
-The rating $y_{i,j}$ provided for item $i$ by rater $j$ is modeled as
+The rating $y_{i, j}$ provided for item $i$ by rater $j$ is modeled as
 a categorical response of rater $i$ to an item of category $z_i$,%
 %
 \footnote{In the subscript, $z[i]$ is written as $z_i$ to
   improve legibility.}
 %
 \[
-y_{i,j} \sim \distro{Categorical}(\theta_{j,\pi_{z[i]}}).
+y_{i, j} \sim \distro{Categorical}(\theta_{j,\pi_{z[i]}}).
 \]
 
 \subsubsection{Priors and Hierarchical Modeling}
@@ -6364,7 +6462,7 @@ p(z, y | \theta, \pi)
 \ = \
 \prod_{i=1}^I \left( \distro{Categorical}(z_i | \pi)
                      \prod_{j=1}^J
-                     \distro{Categorical}(y_{i,j}|\theta_{j,z[i]})
+                     \distro{Categorical}(y_{i, j}|\theta_{j, z[i]})
               \right).
 \]
 %
@@ -6375,7 +6473,7 @@ p(y | \theta, \pi)
 \prod_{i=1}^I \sum_{k=1}^K  
   \left( \distro{Categorical}(z_i | \pi)
          \prod_{j=1}^J
-         \distro{Categorical}(y_{i,j}|\theta_{j,z[i]})
+         \distro{Categorical}(y_{i, j}|\theta_{j, z[i]})
   \right).
 \]            
 %
@@ -6394,7 +6492,7 @@ probability function on the log scale,
 \sum_{i=1}^I \log \left( \sum_{k=1}^K \exp
   \left( \log \distro{Categorical}(z_i | \pi)
          + \sum_{j=1}^J
-         \log \distro{Categorical}(y_{i,j}|\theta_{j,z[i]})
+         \log \distro{Categorical}(y_{i, j}|\theta_{j, z[i]})
   \right) \right),
 \end{array}
 \]                            
@@ -6414,14 +6512,14 @@ data {
   int<lower=1> I;
   int<lower=1> J;
 
-  int<lower=1,upper=K> y[I,J];
+  int<lower=1,upper=K> y[I, J];
 
   vector<lower=0>[K] alpha;
   vector<lower=0>[K] beta[K];
 }
 parameters {
   simplex[K] pi;
-  simplex[K] theta[J,K];
+  simplex[K] theta[J, K];
 }
 transformed parameters {
   vector[K] log_q_z[I];
@@ -6429,15 +6527,15 @@ transformed parameters {
     log_q_z[i] = log(pi);
     for (j in 1:J)
       for (k in 1:K)
-        log_q_z[i,k] = log_q_z[i,k] 
-                        + log(theta[j,k,y[i,j]]);
+        log_q_z[i, k] = log_q_z[i, k] 
+                         + log(theta[j, k, y[i, j]]);
   }
 }
 model {
   pi ~ dirichlet(alpha);
   for (j in 1:J)
     for (k in 1:K)
-      theta[j,k] ~ dirichlet(beta[k]);
+      theta[j, k] ~ dirichlet(beta[k]);
 
   for (i in 1:I)
     target += log_sum_exp(log_q_z[i]);
@@ -6447,7 +6545,7 @@ model {
 \caption{\small\it Stan program for the rating (or diagnostic
   accuracy) model of \cite{DawidSkene:1979}. The model marginalizes
   out the discrete parameter $z$, storing the unnormalized conditional
-  probability $\log q(z_i=k|\theta,\pi)$ in\ \code{log\_q\_z[i,k]}.}%
+  probability $\log q(z_i=k|\theta,\pi)$ in\ \code{log\_q\_z[i,~k]}.}%
 \label{dawid-skene-model.figure}
 \end{figure}
 %
@@ -6495,12 +6593,12 @@ practical to declare the data as a $J \times K$ array of answers.
 data {
   int<lower=1> J;
   int<lower=1> K;
-  int<lower=0,upper=1> y[J,K];
+  int<lower=0,upper=1> y[J, K];
   ...
 model {
   for (j in 1:J)
     for (k in 1:K)
-      y[j,k] ~ bernoulli_logit(delta[k] * (alpha[j] - beta[k]));
+      y[j, k] ~ bernoulli_logit(delta[k] * (alpha[j] - beta[k]));
   ...
 \end{Verbatim}
 \end{quote}
@@ -6787,16 +6885,16 @@ parameters {
   vector[D] mu[K]; // cluster means
 }
 transformed parameters {
-  real<upper=0> soft_z[N,K]; // log unnormalized clusters
+  real<upper=0> soft_z[N, K]; // log unnormalized clusters
   for (n in 1:N)
     for (k in 1:K)
-      soft_z[n,k] = neg_log_K 
+      soft_z[n, k] = neg_log_K 
                      - 0.5 * dot_self(mu[k] - y[n]);
 }
 model {
   // prior
   for (k in 1:K)
-    mu[k] ~ normal(0,1);
+    mu[k] ~ normal(0, 1);
 
   // likelihood
   for (n in 1:N)
@@ -7040,23 +7138,23 @@ scale.
 %
 \begin{stancode}
 model {
-  real gamma[M,K];
+  real gamma[M, K];
   theta ~ dirichlet(alpha);
   for (k in 1:K)
     phi[k] ~ dirichlet(beta);
   for (m in 1:M) 
     for (k in 1:K) 
-      gamma[m,k] = categorical_log(k,theta);
+      gamma[m, k] = categorical_lpmf(k | theta);
   for (n in 1:N)
     for (k in 1:K)
-      gamma[doc[n],k] = gamma[doc[n],k] 
-                         + categorical_log(w[n],phi[k]);
+      gamma[doc[n], k] = gamma[doc[n], k] 
+                         + categorical_lpmf(w[n] | phi[k]);
   for (m in 1:M)
     target += log_sum_exp(gamma[m]);
 }
 \end{stancode}
 %
-The local variable \code{gamma[m,k]} represents the value
+The local variable \code{gamma[m, k]} represents the value
 \[
 \gamma_{m,k} = \log \distro{Categorical}(k|\theta)
 + \sum_{n=1}^{N_m} \log \distro{Categorical}(w_{m,n}|\phi_k).
@@ -7236,7 +7334,7 @@ model {
   for (n in 1:N) {
     real gamma[K];
     for (k in 1:K) 
-      gamma[k] = log(theta[doc[n],k]) + log(phi[k,w[n]]);
+      gamma[k] = log(theta[doc[n], k]) + log(phi[k, w[n]]);
     target += log_sum_exp(gamma));  // likeliho;
   }
 }
@@ -7290,7 +7388,7 @@ transformed parameters {
 }
 model {
   for (m in 1:M)
-    eta[m] ~ multi_normal(mu,Sigma);
+    eta[m] ~ multi_normal(mu, Sigma);
   ... model as before w/o prior for theta ...
 }
 \end{stancode}
@@ -7317,18 +7415,18 @@ transformed parameters {
   ... eta as above ...
   cov_matrix[K] Sigma;       // covariance matrix
   for (m in 1:K)
-    Sigma[m,m] = sigma[m] * sigma[m] * Omega[m,m];
+    Sigma[m, m] = sigma[m] * sigma[m] * Omega[m, m];
   for (m in 1:(K-1)) {
     for (n in (m+1):K) {
-      Sigma[m,n] = sigma[m] * sigma[n] * Omega[m,n];
-      Sigma[n,m] = Sigma[m,n];
+      Sigma[m, n] = sigma[m] * sigma[n] * Omega[m, n];
+      Sigma[n, m] = Sigma[m, n];
     }
   }
 }
 model {
-  mu ~ normal(0,5);       // vectorized, diffuse
+  mu ~ normal(0, 5);      // vectorized, diffuse
   Omega ~ lkj_corr(2.0);  // regularize to unit correlation
-  sigma ~ cauchy(0,5);    // half-Cauchy due to constraint
+  sigma ~ cauchy(0, 5);   // half-Cauchy due to constraint
   ... words sampled as above ...
 }
 \end{stancode}
@@ -7397,7 +7495,7 @@ $y_1,\ldots,y_N \in \reals$.  The defining feature of Gaussian
 processes is that the probability of a finite number of outputs $y$
 conditioned on their inputs $x$ is Gaussian,
 \[
-y \sim \distro{Normal}(m(x),k(x)),
+y \sim \distro{Normal}(m(x), k(x)),
 \] 
 where $m(x)$ is an $N$-vector and $k(x)$ is an $N \times N$
 covariance matrix.  The mean function $m : \reals^{N \times D}
@@ -7414,15 +7512,15 @@ A popular covariance function, which will be used in the
 implementations later in this chapter, is a generalized, squared
 exponential function,
 \[
-k(x)_{i,j}
+k(x)_{i, j}
 = \eta^2 
 \exp \left(
 - \rho^2 \sum_{d=1}^D (x_{i,d} - x_{j,d})^2
 \right)
-+ \delta_{i,j} \sigma^2,
++ \delta_{i, j} \sigma^2,
 \]
 where $\eta$, $\rho$, and $\sigma$ are hyperparameters defining the
-covariance function and where $\delta_{i,j}$ is the Kronecker delta
+covariance function and where $\delta_{i, j}$ is the Kronecker delta
 function with value 1 if $i = j$ and value 0 otherwise; note that this
 test is between the indexes $i$ and $j$, not between values $x_i$ and
 $x_j$. The addition of $\sigma^2$ on the diagonal is important
@@ -7480,14 +7578,14 @@ transformed data {
     mu[i] = 0;
   for (i in 1:N) 
     for (j in 1:N)
-      Sigma[i,j] = exp(-pow(x[i] - x[j],2)) 
-                    + if_else(i==j, 0.1, 0.0);
+      Sigma[i, j] = exp(-pow(x[i] - x[j], 2)) 
+                    + i == j ? 0.1 : 0.0;
 }
 parameters {
   vector[N] y;
 }
 model {
-  y ~ multi_normal(mu,Sigma);
+  y ~ multi_normal(mu, Sigma);
 }
 \end{stancode}
 %
@@ -7516,8 +7614,8 @@ data {
 }
 transformed data {
 ...
-      Sigma[i,j] = exp(-dot_self(x[i] - x[j])) 
-                    + if_else(i==j, 0.1, 0.0);
+      Sigma[i, j] = exp(-dot_self(x[i] - x[j]))
+                    + i == j ? 0.1 : 0.0;
 ...
 \end{stancode}
 %
@@ -7548,7 +7646,7 @@ $k(x)$, i.e., the lower-triangular matrix $L$ such that $LL^{\top} =
 k(x)$.  Then the transformed variable $\mu + Lz$ has the intended
 target distribution,
 \[
-\mu + Lz \sim \distro{Normal}(\mu,k(x)).
+\mu + Lz \sim \distro{Normal}(\mu, k(x)).
 \]
 
 This transform can be applied directly to Gaussian process
@@ -7567,7 +7665,7 @@ actual samples are defined as generated quantities.
 \begin{stancode}
 ...
 transformed data {
-  matrix[N,N] L;
+  matrix[N, N] L;
 ...
   L = cholesky_decompose(Sigma);
 }
@@ -7575,7 +7673,7 @@ parameters {
   vector[N] z;
 }
 model {
-  z ~ normal(0,1);
+  z ~ normal(0, 1);
 }
 generated quantities {
   vector[N] y;
@@ -7635,23 +7733,23 @@ transformed parameters {
   rho_sq = inv(inv_rho_sq);
 }
 model {
-  matrix[N,N] Sigma;
+  matrix[N, N] Sigma;
   // off-diagonal elements
   for (i in 1:(N-1)) {
     for (j in (i+1):N) {
-      Sigma[i,j] = eta_sq * exp(-rho_sq * pow(x[i] - x[j],2));
-      Sigma[j,i] = Sigma[i,j];
+      Sigma[i, j] = eta_sq * exp(-rho_sq * pow(x[i] - x[j],2));
+      Sigma[j, i] = Sigma[i, j];
     }
   }
   // diagonal elements
   for (k in 1:N)
-    Sigma[k,k] = eta_sq + sigma_sq;  // + jitter
+    Sigma[k, k] = eta_sq + sigma_sq;  // + jitter
 
-  eta_sq ~ cauchy(0,5);
-  inv_rho_sq ~ cauchy(0,5);
-  sigma_sq ~ cauchy(0,5);
+  eta_sq ~ cauchy(0, 5);
+  inv_rho_sq ~ cauchy(0, 5);
+  sigma_sq ~ cauchy(0, 5);
 
-  y ~ multi_normal(mu,Sigma);
+  y ~ multi_normal(mu, Sigma);
 }
 \end{stancode}
 %
@@ -7688,11 +7786,11 @@ For multivariate inputs $x \in \reals^D$, the squared exponential
 covariance function can be further generalized by fitting a precision
 parameter $\rho_d^2$ for each dimension $d$,
 \[
-k(x)_{i,j} = \eta^2 \exp 
+k(x)_{i, j} = \eta^2 \exp 
 \left(
 - \sum_{d=1}^D \rho_d^2 (x_{i,d} - x_{j,d})^2
 \right)
-+ \delta_{i,j}\sigma^2.
++ \delta_{i, j}\sigma^2.
 \]
 The estimation of $\rho$ was termed ``automatic relevance
 determination'' in \citep{Neal:1996}, because the larger $\rho_d$ is,
@@ -7786,8 +7884,8 @@ transformed data {
   for (i in 1:N) mu[i] = 0;
   for (i in 1:N) 
     for (j in 1:N)
-      Sigma[i,j] = exp(-pow(x[i] - x[j],2)) 
-                    + if_else(i==j, 0.1, 0.0);
+      Sigma[i, j] = exp(-pow(x[i] - x[j],2)) 
+                    + i == j ? 0.1 : 0.0;
 }
 parameters {
   vector[N2] y2;
@@ -7797,7 +7895,7 @@ model {
   for (n in 1:N1) y[n] = y1[n];
   for (n in 1:N2) y[N1 + n] = y2[n];
 
-  y ~ multi_normal(mu,Sigma);
+  y ~ multi_normal(mu, Sigma);
 }
 \end{stancode}
 %
@@ -7825,7 +7923,7 @@ This model could be sped up fairly substantially by computing the
 Cholesky factor of \code{Sigma} in the transformed data block
 \begin{stancode}
 transformed data {
-  matrix[N1+N2,N1+N2] L;
+  matrix[N1+N2, N1+N2] L;
 ...
   L = cholesky_decompose(Sigma);
 ...
@@ -7868,7 +7966,7 @@ is the matrix of covariances between inputs $x$ and $\tilde{x}$, which
 in the case of the generalized squared exponential covariance function
 would be
 \[
-K_{i,j} = \eta^2 \exp(-\rho^2 \sum_{d=1}^D (x_{i,d} -
+K_{i, j} = \eta^2 \exp(-\rho^2 \sum_{d=1}^D (x_{i,d} -
 \tilde{x}_{j,d})^2).
 \]
 There is no noise term including $\sigma^2$ because the indexes of
@@ -7890,33 +7988,33 @@ factor \code{L} is done in the transformed data block.
 \begin{stancode}
 transformed data {
   vector[N2] mu;
-  matrix[N2,N2] L;
+  matrix[N2, N2] L;
   { 
-    matrix[N1,N1] Sigma;
-    matrix[N2,N2] Omega;
-    matrix[N1,N2] K;
+    matrix[N1, N1] Sigma;
+    matrix[N2, N2] Omega;
+    matrix[N1, N2] K;
     
-    matrix[N2,N1] K_transpose_div_Sigma;
-    matrix[N2,N2] Tau;
+    matrix[N2, N1] K_transpose_div_Sigma;
+    matrix[N2, N2] Tau;
 
     for (i in 1:N1) 
       for (j in 1:N1)
-        Sigma[i,j] = exp(-pow(x1[i] - x1[j],2)) 
-          + if_else(i==j, 0.1, 0.0);
+        Sigma[i, j] = exp(-pow(x1[i] - x1[j], 2)) 
+          + i == j ? 0.1 : 0.0;
     for (i in 1:N2) 
       for (j in 1:N2)
-        Omega[i,j] = exp(-pow(x2[i] - x2[j],2)) 
-          + if_else(i==j, 0.1, 0.0); 
+        Omega[i, j] = exp(-pow(x2[i] - x2[j], 2)) 
+          + i==j ? 0.1 : 0.0; 
     for (i in 1:N1)
       for (j in 1:N2)
-        K[i,j] = exp(-pow(x1[i] - x2[j],2));
+        K[i, j] = exp(-pow(x1[i] - x2[j], 2));
     
     K_transpose_div_Sigma = K' / Sigma;
     mu = K_transpose_div_Sigma * y1; 
     Tau = Omega - K_transpose_div_Sigma * K;
     for (i in 1:(N2-1))
       for (j in (i+1):N2)
-        Tau[i,j] = Tau[j,i];
+        Tau[i, j] = Tau[j, i];
 
     L = cholesky_decompose(Tau);
   }
@@ -8023,7 +8121,7 @@ model {
   for (n in 1:N1) y[n] = y1[n];
   for (n in 1:N2) y[N1 + n] = y2[n];
 
-  y ~ multi_normal(mu,Sigma);
+  y ~ multi_normal(mu, Sigma);
   for (n in 1:N1)
     z1[n] ~ bernoulli_logit(y1[n]);
 }
@@ -8142,7 +8240,7 @@ way to smoothly map between them. For example, because
 latitude and longitude work on a modular basis (wrapping at $2\pi$
 radians in natural units), they do not produce a smooth map. 
 
-Like a bounded interval $(a,b)$, in geometric terms, a sphere is
+Like a bounded interval $(a, b)$, in geometric terms, a sphere is
 compact in that the distance between any two points is bounded.
 
 
@@ -8271,7 +8369,7 @@ model {
   alpha ~ ...
   beta ~ ...
   for (n in 1:N)
-    theta[n] ~ beta(alpha,beta);
+    theta[n] ~ beta(alpha, beta);
   ...
 \end{stancode}
 
@@ -8305,7 +8403,7 @@ model {
   phi ~ beta(1,1); // uniform on phi, could drop
   lambda ~ pareto(0.1,1.5);
   for (n in 1:N)
-    theta[n] ~ beta(alpha,beta);
+    theta[n] ~ beta(alpha, beta);
   ...
 \end{stancode}
 %
@@ -8324,7 +8422,7 @@ model {
   beta = lambda * (1 - phi);
 ...
   for (n in 1:N)
-    theta[n] ~ beta(alpha,beta);
+    theta[n] ~ beta(alpha, beta);
 ...
 }
 \end{stancode}
@@ -8403,7 +8501,7 @@ parameters {
   real<lower=0> y;
   ...
 model {
-  log(y) ~ normal(mu,sigma);
+  log(y) ~ normal(mu, sigma);
   target += -log(y);
   ...
 \end{stancode}
@@ -8418,7 +8516,7 @@ logarithm, as follows.
 model {
   real log_y;
   log_y = log(y);
-  log_y ~ normal(mu,sigma);
+  log_y ~ normal(mu, sigma);
   target += -log_y;
   ...
 \end{stancode}
@@ -8440,13 +8538,13 @@ Note that it does not matter whether the probability function is
 expressed using a sampling statement, such as
 %
 \begin{stancode}
-log(y) ~ normal(mu,sigma);
+log(y) ~ normal(mu, sigma);
 \end{stancode}
 %
 or as an increment to the log probability function, as in
 %
 \begin{stancode}
-target += normal_log(log(y), mu, sigma);
+target += normal_lpmf(log(y) | mu, sigma);
 \end{stancode}
 
 \subsubsection{Gamma and Inverse Gamma Distribution}\label{jacobian-adjustment.section}
@@ -8518,9 +8616,9 @@ parameters {
    ...
 transformed parameters {
   vector[K] v;     // transformed parameter
-  matrix[K,K] J;   // Jacobian matrix of transform
+  matrix[K, K] J;   // Jacobian matrix of transform
   ... compute v as a function of u ...
-  ... compute J[m,n] = d.v[m] / d.u[n] ...
+  ... compute J[m, n] = d.v[m] / d.u[n] ...
   target += log(fabs(determinant(J)));
   ...
 model {
@@ -8546,7 +8644,7 @@ transformed parameters {
   ...
   vector[K] J_diag;  // diagonals of Jacobian matrix
   ... 
-  ... compute J[k,k] = d.v[k] / d.u[k] ...
+  ... compute J[k, k] = d.v[k] / d.u[k] ...
   target += sum(log(J_diag));
   ...
 \end{stancode}
@@ -8757,7 +8855,7 @@ functions {
 ...
 generated quantities {
   real rdiff;
-  rdiff = relative_diff(alpha,beta);
+  rdiff = relative_diff(alpha, beta);
 }
 \end{stancode}
 %
@@ -8809,7 +8907,7 @@ functions {
     abs_diff = fabs(x - y);
     avg_scale = (fabs(x) + fabs(y)) / 2;
     if (abs_diff / avg_scale < min) 
-      reject("relative_diff below ",min);
+      reject("relative_diff below ", min);
     return abs_diff / avg_scale;
   }
 }
@@ -8877,12 +8975,12 @@ See Section~\refsection{reject-statements} for details.
 \\ \hline
 %
 \code{matrix} 
-& \code{matrix[M,N]} 
-& \code{matrix<lower=L>[M,N]}
+& \code{matrix[M,~N]} 
+& \code{matrix<lower=L>[M,~N]}
 \\
-& &  \code{matrix<upper=U>[M,N]}
+& &  \code{matrix<upper=U>[M,~N]}
 \\
-& &  \code{matrix<lower=L,upper=U>[M,N]}
+& &  \code{matrix<lower=L,upper=U>[M,~N]}
 \\[4pt]
 & & \code{cov\_matrix[K]}
 \\
@@ -8905,7 +9003,7 @@ See Section~\refsection{reject-statements} for details.
   types \code{cov\_matrix[K]}, \code{corr\_matrix[K]},
   \code{cholesky\_factor\_cov[K]}, and
   \code{cholesky\_factor\_corr[K]} are only assignable to matrices of
-  dimensions \code{matrix[K,K]} types. Stan also allows arrays of any
+  dimensions \code{matrix[K,~K]} types. Stan also allows arrays of any
   of these types, with slightly different declarations for function
   arguments and return types and variables.
 }\label{constrained-types.figure}
@@ -8975,7 +9073,7 @@ functions {
     print("rows=", rows(x), " cols=", cols(x));
     for (m in 1:rows(x))
       for (n in 1:m)
-        print("[", m, ",", n, "]=", x[m,n]);
+        print("[", m, ",", n, "]=", x[m, n]);
   }
 }
 \end{stancode}
@@ -9003,7 +9101,7 @@ transformed parameters {
 \section{Functions Accessing the Log Probability  Accumulator}
 
 Functions whose names end in \code{\_lp} are allowed to use sampling
-statements and \code{increment\_log\_prob()} statements; other
+statements and \code{target~+=} statements; other
 functions are not.  Because of this access, their use is restricted to
 the transformed parameters and model blocks.
 
@@ -9015,9 +9113,9 @@ translated and scaled coefficients; see
 \begin{stancode}
 functions {
   vector center_lp(vector beta_raw, real mu, real sigma) {
-    beta_raw ~ normal(0,1);
-    sigma ~ cauchy(0,5);
-    mu ~ cauchy(0,2.5);
+    beta_raw ~ normal(0, 1);
+    sigma ~ cauchy(0, 5);
+    mu ~ cauchy(0, 2.5);
     return sigma * beta_raw + mu;
   }
   ...
@@ -9054,11 +9152,11 @@ from a unit normal PRNG.
 %
 \begin{stancode}
 matrix predictors_rng(int N, int K) {
-  matrix[N,K] x;
+  matrix[N, K] x;
   for (n in 1:N) {
     x[n,1] = 1.0;  // intercept
     for (k in 2:K)
-      x[n,k] = normal_rng(0,1);
+      x[n, k] = normal_rng(0,1);
   }
   return x;
 }
@@ -9088,10 +9186,10 @@ parameters {
   real<lower=0> sigma;
   ...
 generated quantities {
-  matrix[N_sim,K] x_sim;
+  matrix[N_sim, K] x_sim;
   vector[N_sim] y_sim;
-  x_sim = predictors_rng(N_sim,K);
-  y_sim = regression_rng(beta,x_sim,sigma);
+  x_sim = predictors_rng(N_sim, K);
+  y_sim = regression_rng(beta, x_sim, sigma);
 }
 \end{stancode}
 %
@@ -9102,7 +9200,8 @@ multivariate normal draws for \code{x\_sim}.
 \section{User-Defined Probability Functions}
 
 Probability functions are distinguished in Stan by names ending in
-\code{\_log} and \code{real} return types.  
+\code{\_lpdf} for density functions and \code{\_lpmf} for mass
+functions; in both cases, they must have \code{real} return types.
 
 Suppose a model uses several unit normal distributions, for which
 there is not a specific overloaded density nor defaults in Stan.  So
@@ -9111,8 +9210,8 @@ them, a new density function may be defined and reused.
 %
 \begin{stancode}
 functions {
-  real unit_normal_log(real y) { 
-    return normal_log(y,0,1); 
+  real unit_normal_lpdf(real y) { 
+    return normal_lpdf(y | 0, 1); 
   }
 }
 ...
@@ -9124,24 +9223,31 @@ model {
 \end{stancode}
 %
 The ability to use the \code{unit\_normal} function as a density is
-keyed off its name ending in \code{\_log}.  
+keyed off its name ending in \code{\_lpdf} (names ending in
+\code{\_lpmf} for probabilty mass functions work the same way).  
 
-In general, if \code{foo\_log} is defined to consume $N + 1$ arguments,
-then
+In general, if \code{foo\_lpdf} is defined to consume $N + 1$
+arguments, then
 %
 \begin{stancode}
-y ~ foo(theta1,...,thetaN);
+y ~ foo(theta1, ..., thetaN);
 \end{stancode}
 %
 can be used as shorthand for 
 %
 \begin{stancode}
-target += foo_log(y,theta1,...,thetaN);
+target += foo_lpdf(y | theta1, ..., thetaN);
 \end{stancode}
 %
-As with the built-in functions, the suffix \code{\_log} is dropped and
+As with the built-in functions, the suffix \code{\_lpdf} is dropped and
 the first argument moves to the left of the sampling symbol (\Verb|~|)
-in the sampling statement.
+in the sampling statement.  
+
+Functions ending in \code{\_lpmf} (for probability mass functions),
+behave exactly the same way.  The difference is that the first
+argument of a density function (\code{\_lpdf}) must be continuous (not
+an integer or integer array), whereas the first argument of a mass
+function (\code{\_lpmf}) must be discrete (integer or integer array).
 
 
 \section{Overloading Functions}
@@ -9250,8 +9356,8 @@ as part of the Stan language, so there is no need to document them.
 \section{Summary of Function Types}
 
 Functions may have a void or non-void return type and they may or may
-not have one of the special suffixes, \code{\_log}, \code{\_lp}, or
-\code{\_rng}.
+not have one of the special suffixes, \code{\_lpdf}, \code{\_lpmf},
+\code{\_lp}, or \code{\_rng}.
 
 \subsection{Void vs. Non-Void Return}
 
@@ -9265,13 +9371,14 @@ arguments of a type that matches the declared return type.
 
 \subsection{Suffixed or Non-Suffixed}
 
-Only functions ending in \code{\_log} and with return type \code{real}
-may be used as probability functions in sampling statements. 
+Only functions ending in \code{\_lpmf} or \code{\_lpdf} and with
+return type \code{real} may be used as probability functions in
+sampling statements.
 
 Only functions ending in \code{\_lp} may access the log probability
-accumulator through sampling statements or
-\code{increment\_log\_prob()} statements.  Such functions may only be
-used in the transformed parameters or model blocks.
+accumulator through sampling statements or \code{target~+=}
+statements.  Such functions may only be used in the transformed
+parameters or model blocks.
 
 Only functions ending in \code{\_rng} may access the built-in
 pseudo-random number generators.  Such functions may only be used in
@@ -9328,16 +9435,38 @@ way to the base case, adding the following conditional clause.
 \chapter{Solving Differential Equations}\label{ode-solver.chapter}
 
 \noindent
-Stan provides a built-in mechanism for solving systems of ordinary
-different equations (ODEs).  The full specification can be found in
-\refsection{language-ode-solver}.  
+Stan provides a built-in mechanism for specifying and solving systems
+of ordinary differential equations (ODEs).  Stan provides two
+different integrators, one tuned for solving non-stiff systems and one
+for stiff systems.
+%
+\begin{itemize}
+\item \code{rk45}: a fourth and fifth order Runge-Kutta method for
+  non-stiff systems \citep{DormandPrince:1980,AhnertMulansky:2011}, and
+\item \code{bdf}: a variable-step, variable-order,
+  backward-differentiation formula implementation for stiff systems
+  \citep{CohenHindmarsh:1996,SerbanHindmarsh:2005}
+\end{itemize}
+%
+For a discussion of stiff ODE sytems, see \refsection{stiff-ode}.  In
+a nutshell, the stiff solvers are slower, but more robust;  how much
+so depends on the system and the region of parameter space.
+The function signatures for Stan's ODE solvers can be found in
+\refchapter{functions-ode-solver}.
 
 
-\section{Simple Harmonic Oscillator Example}
+\section{Example: Simple Harmonic Oscillator}
 
-This section details the simple harmonic oscillator, which is
-characterized by the following pair of 
-differential equations.
+As a concrete example of a system of ODEs, consider a harmonic
+oscillator, which is characterized by an equilibrium position and a
+restoring force proportional to the displacement with friction.  
+The system state will be a pair $y = (y_1, y_2)$ representing position
+and momentum (i.e., a point in phase space).  The change in the system
+with respect to time is given by the following differential equations.%
+%
+\footnote{This example is drawn from the documentation for the Boost
+  Numeric Odeint library \citep{AhnertMulansky:2011}, which Stan uses
+  to implement the \code{rk45} solver.}
 %
 \begin{equation}\label{ode-sho.equation}
 \frac{d}{dt} y_1 = y_2 
@@ -9345,33 +9474,31 @@ differential equations.
 \frac{d}{dt} y_2 = -y_1 - \theta y_2
 \end{equation}
 %
-The values of $y = (y_1,y_2)$ are a function of both time ($t$) and the
-value of the system parameter ($\theta$).
+The state equations implicitly define the system state at a given time
+as a function of an initial state, elapsed time since the initial
+state, and the system parameters.
 
 \subsection{Solutions Given Initial Conditions}
 
-Given a value of the parameter $\theta$ and an initial state $y(t_0)$
-at time $t_0$, it is possible to solve the equations numerically to
-calculate $y(t)$ for any given time $t$.  The rest of this chapter
-shows how Stan is able to provide the functionality to specify and
-solve a system of ODEs.
-
-
+Given a value of the system parameter $\theta$ and an initial state
+$y(t_0)$ at time $t_0$, it is possible to simulate the evolution of
+the solution numerically in order to calculate $y(t)$ for a specified
+sequence of times $t_0 < t_1 < t_2 < \cdots$.
 
 \section{Coding an ODE System}
 
-A system of ODEs is coded directly in Stan as a function.  For
-example, the simple harmonic oscillator given in
-\refequation{ode-sho}, can be coded using the following function in
-Stan (see \refchapter{functions-programming} for more information on
-coding user-defined functions).
+A system of ODEs is coded directly in Stan as a function with a
+strictly specified signature.  For example, the simple harmonic
+oscillator given in \refequation{ode-sho}, can be coded using the
+following function in Stan (see \refchapter{functions-programming} for
+more information on coding user-defined functions).
 %
 \begin{stancode}
-real[] sho(real t,
-           real[] y, 
-           real[] theta,
-           real[] x_r,
-           int[] x_i) {
+real[] sho(real t,        // time
+           real[] y,      // state
+           real[] theta,  // parameters
+           real[] x_r,    // data (real)
+           int[] x_i) {   // data (integer)
   real dydt[2];
   dydt[1] = y[2];
   dydt[2] = -y[1] - theta[1] * y[2];
@@ -9379,29 +9506,28 @@ real[] sho(real t,
 }
 \end{stancode}
 %
-The function takes in a time \code{t}, system state \code{y}, system
-parameters \code{theta}, along with real data in variable
-\code{x\_r} and integer data in variable \code{x\_i}.  It
-returns an array of derivatives of the system state with respect to
-time, evaluated at time \code{t} and state \code{y}.
+The function takes in a time \code{t} (a real value), a a system state
+\code{y} (real array), system parameters \code{theta} (a real array),
+along with real data in variable \code{x\_r} (a real array) and
+integer data in variable \code{x\_i} (an integer array).  The system
+function returns the array of derivatives of the system state with
+respect to time, evaluated at time \code{t} and state \code{y}.  The
+simple harmonic oscillator coded here does not have time-sensitive
+equations; that is, \code{t} does not show up in the definition of
+\code{dydt}.  The simple harmonic oscillator does not use real or
+integer data, either.  Nevertheless, these unused arguments must be
+included as arguments in the system function with exactly the
+signature shown above.
+
 
 \subsection{Strict Signature}
 
-All of the arguments to such a function must be provided in exactly
-the order shown above.  This may require passing in zero-length
-arrays for data or parameters if the system does not involve data or
+The function defining the system must have exactly these argument
+types and return type.  This may require passing in zero-length arrays
+for data or parameters if the system does not involve data or
 parameters.  A full example for the simple harmonic oscillator, which
-does not depend on any constant data variables, is provided in 
+does not depend on any constant data variables, is provided in
 \reffigure{sho-trajectory}.
-
-\subsection{Data versus Parameters}
-
-Unlike other functions, a function describing a system of ODEs is
-limited as to the origins of variables in its arguments.  In particular,
-the time \code{t}, real data \code{x}, and integer data \code{x\_int}
-must be expressions that only involve data or transformed data
-variables.  The initial state \code{y} or the parameters \code{theta}
-are the only arguments which may involve parameters.
 
 \subsection{Discontinuous ODE System Function}
 
@@ -9433,10 +9559,9 @@ system from measurements.
 
 \section{Measurement Error Models}
 
-The point of doing statistical estimation for differential equations
-is to estimate the parameters and/or initial state given noisy
-measurements of the system variables at a finite number of time
-points.
+Statistical models or differential equations may be used to estimate
+the parameters and/or initial state of a dynamic system given noisy
+measurements of the system state at a finite number of time points.
 
 For instance, suppose the simple harmonic oscillator has a parameter
 value of $\theta = 0.15$ and initial state $y(t=0) = (1,0)$.  Now
@@ -9494,7 +9619,7 @@ model {
 }
 generated quantities {
   real y_hat[T,2];
-  y_hat = integrate_ode(sho, y0, t0, ts, theta, x_r, x_i);
+  y_hat = integrate_ode_rk45(sho, y0, t0, ts, theta, x_r, x_i);
 
   // add measurement error
   for (t in 1:T) {
@@ -9510,20 +9635,22 @@ generated quantities {
   state \code{y0} are read in as data along with the initial time
   \code{t0} and observation times \code{ts}. The generated quantities
   block is used to solve the ODE for the specified times and then add
-  random measurement error, producing observations \code{y\_hat}.}\label{sho-sim.figure}
+  random measurement error, producing observations \code{y\_hat}.
+  Because the system is not stiff, the \code{rk45} solver is used.}\label{sho-sim.figure}
 \end{figure}
 
 This program illustrates the way in which the ODE solver is called in
 a Stan program,
 %
 \begin{stancode}
-y_hat = integrate_ode(sho, y0, t0, ts, theta, x_r, x_i);
+y_hat = integrate_ode_rk45(sho, y0, t0, ts, theta, x_r, x_i);
 \end{stancode}
 %
 This assigns the solutions to the system defined by function
 \code{sho}, given initial state \code{y0}, initial time \code{t0},
 requested solution times \code{ts}, parameters \code{theta}, real data
-\code{x}, and integer data \code{x\_int}.
+\code{x}, and integer data \code{x\_int}.  The call explicitly
+specifies the Runge-Kutta solver (for non-stiff systems).
 
 Here, the ODE solver is called in the generated quantities block to
 provide a $10 \times 2$ array of solutions \code{y\_hat} to
@@ -9531,6 +9658,16 @@ which measurement error is added using the normal pseudo-random number
 generating function \code{normal\_rng}.  The number of rows in the
 solution array is the same as the size of \code{ts}, the requested
 solution times.
+
+\subsection{Data versus Parameters}
+
+Unlike other functions, the integration functions for ODEs are limited
+as to the origins of variables in their arguments.  In particular, the
+time \code{t}, real data \code{x}, and integer data \code{x\_int} must
+be expressions that only involve data or transformed data variables.
+The initial state \code{y} or the parameters \code{theta} are the only
+arguments which may involve parameters.
+
 
 \subsection{Estimating System Parameters and Initial State}
 
@@ -9571,10 +9708,10 @@ parameters {
 }
 model {
   real y_hat[T,2];
-  sigma ~ cauchy(0,2.5);
-  theta ~ normal(0,1);
-  y0 ~ normal(0,1);
-  y_hat = integrate_ode(sho, y0, t0, ts, theta, x_r, x_i);
+  sigma ~ cauchy(0, 2.5);
+  theta ~ normal(0, 1);
+  y0 ~ normal(0, 1);
+  y_hat = integrate_ode_rk45(sho, y0, t0, ts, theta, x_r, x_i);
   for (t in 1:T)
     y[t] ~ normal(y_hat[t], sigma);
 }
@@ -9599,7 +9736,7 @@ array \code{y\_hat}, which is then used as the location in the
 observation noise model as follows.
 %
 \begin{stancode}
-y_hat = integrate_ode(sho, y0, t0, ts, theta, x_r, x_i);
+y_hat = integrate_ode_rk45(sho, y0, t0, ts, theta, x_r, x_i);
 for (t in 1:T)
   y[t] ~ normal(y_hat[t], sigma);
 \end{stancode}
@@ -9614,12 +9751,13 @@ observed data points for times $t = 1, ..., 10$ is sufficient to
 reliably estimate the ODE parameter, initial state, and noise scales.
 
 
-\section{Stiff ODEs}
+\section{Stiff ODEs}\label{stiff-ode.section}
 
-Stan's approach will not be efficient for stiff systems of ODEs,
-roughly characterized as systems presenting numerical difficulties for
-gradient-based stepwise solvers.  Stiffness typically arises due to high
-curvature in the solution space.%
+A stiff system of ordinary differential equations can be roughly
+characterized as systems presenting numerical difficulties for
+gradient-based stepwise solvers.  Stiffness typically arises due to
+varying curvature in the dimensions of the state, for instance one
+component evolving orders of magnitude more slowly than another.%
 %
 \footnote{Not coincidentally, high curvature in the posterior of a
   general Stan model poses the same kind of problem for Euclidean
@@ -9628,13 +9766,65 @@ curvature in the solution space.%
   numerical differential equation solver specialized for Hamiltonian
   systems with separable potential and kinetic energy terms.}
 %
-It will work, but can be slow enough to be impractical because the
-stepwise integrator used for the solutions will have to take very
-small steps to ensure adequate solution accuracy.  In the future, we hope to
-roll out a more efficient approach to stiff ODEs in which automatic
-differentiation can be applied to compute the Jacobian of the final
-coupled system of state variables and partials with respect to
-parameters.
+
+Stan provides a specialized solver for stiff ODEs
+\citep{CohenHindmarsh:1996,SerbanHindmarsh:2005}.  An ODE system is
+specified exactly the same way with a function of exactly the same
+signature.  The only difference is in the call to the integrator for
+the solution; the \code{rk45} suffix is replaced with \code{bdf}, as in
+%
+\begin{stancode}
+y_hat = integrate_ode_bdf(sho, y0, t0, ts, theta, x_r, x_i);
+\end{stancode}
+%
+
+Using the stiff (\code{bdf}) integrator on a system that is not stiff
+may be much slower than using the non-stiff (\code{rk45}) integrator;
+this is because it computes additional Jacobians to guide the
+integrator.  On the other hand, attempting to use the non-stiff
+integrator for a stiff system will fail due to requiring a small step
+size and too many steps.
+
+\section{Control Parameters for ODE Solving}
+
+The calls to the integrators shown above just used the default
+control settings.  Both the non-stiff and stiff integrators allow
+three additional arguments, all of which must be supplied if any of
+them is required.
+%
+\begin{stancode}
+y_hat = integrate_ode_bdf(sho, y0, t0, ts, theta, x_r, x_i,
+                          rel_tol, abs_tol, max_steps);
+\end{stancode}
+%
+The three control arguments are relative tolerance, absolute
+tolerance, and maximum number of steps.   The default values for
+relative and absolute tolerance are both \code{1e-6} ($10^{-6}$), and
+the default maximum number of steps is \code{1e6} ($10^6$).
+
+\subsection{Tolerance}
+
+The relative and absolute tolerance control the accuracy of the
+solutions generated by the integrator.  Relative tolerances are
+relative to the solution value, whereas absolute tolerances is the
+maximum absolute error allowed in a solution.  
+
+Smaller tolerances produce more accurate solutions.  Smaller
+tolerances also require more computation time.  
+
+\subsubsection{Sensitivity Analysis}
+
+The tolerances should be set low enough that setting them lower does
+not change the statistical properties of posterior samples generated
+by the Stan program.
+
+\subsection{Maximum Number of Steps}
+
+The maximum number of steps can be used to stop a runaway simulation.
+This can arise in MCMC when a bad jump is taken, particularly during
+warmup.  With the non-stiff solver, this may result in jumping into a
+stiff region of the parameter space, which would require a very small
+step size and very many steps to satisfy even modest tolerances.  
 
 
 \chapter{Problematic Posteriors}\label{problematic-posteriors.chapter}%
@@ -9720,12 +9910,12 @@ are at least two data points $y_n$ with distinct values.
 Consider an item-response theory model for students $j \in 1{:}J$ with
 abilities $\alpha_j$ and test items $i \in 1{:}I$ with difficulties
 $\beta_i$.  The observed data is an $I \times J$ array with entries
-$y_{i,j} \in \{ 0, 1 \}$ coded such that $y_{i,j} = 1$ indicates that
+$y_{i, j} \in \{ 0, 1 \}$ coded such that $y_{i, j} = 1$ indicates that
 student $j$ answered question $i$ correctly.  The sampling
 distribution for the data is
 %
 \[
-y_{i,j} \sim \distro{Bernoulli}(\mbox{logit}^{-1}(\alpha_j - \beta_i)).
+y_{i, j} \sim \distro{Bernoulli}(\mbox{logit}^{-1}(\alpha_j - \beta_i)).
 \]
 %
 For any constant $c$, the probability of $y$ is unchanged by adding a
@@ -9775,7 +9965,7 @@ nearly collinear.
 Consider adding a discrimination parameter $\delta_i$ for each
 question in an IRT model, with data sampling model
 \[
-y_{i,j} \sim \distro{Bernoulli}(\mbox{logit}^{-1}(\delta_i(\alpha_j - \beta_i))).
+y_{i, j} \sim \distro{Bernoulli}(\mbox{logit}^{-1}(\delta_i(\alpha_j - \beta_i))).
 \]
 For any constant $c \neq 0$, multiplying $\delta$ by $c$ and dividing
 $\alpha$ and $\beta$ by $c$ produces the same likelihood,
@@ -10391,8 +10581,8 @@ The second adds priors to the model block for \code{lambda1} and
 \code{lambda2} to the previous model.
 %
 \begin{stancode}
-  lambda1 ~ normal(0,10);
-  lambda2 ~ normal(0,10);
+  lambda1 ~ normal(0, 10);
+  lambda2 ~ normal(0, 10);
 \end{stancode}
 %
 The third involves a single location parameter, but no priors.
@@ -10546,8 +10736,8 @@ parameters {
   vector[9] x;
 }
 model {
-  y ~ normal(0,3);
-  x ~ normal(0,exp(y/2));
+  y ~ normal(0, 3);
+  x ~ normal(0, exp(y/2));
 }
 \end{stancode}
 %
@@ -10575,8 +10765,8 @@ transformed parameters {
   x = exp(y/2) * x_raw;
 }
 model {
-  y_raw ~ normal(0,1); // implies y ~ normal(0,3) 
-  x_raw ~ normal(0,1); // implies x ~ normal(0,exp(y/2))  
+  y_raw ~ normal(0, 1); // implies y ~ normal(0, 3) 
+  x_raw ~ normal(0, 1); // implies x ~ normal(0, exp(y/2))  
 }
 \end{stancode}
 %
@@ -10639,7 +10829,7 @@ parameters {
   ...
 }
 model {
-  beta ~ cauchy(mu,tau);
+  beta ~ cauchy(mu, tau);
   ...
 }
 \end{stancode}
@@ -10655,7 +10845,7 @@ parameters {
 }
 transformed parameters {
   real beta;
-  beta = mu + tau * tan(beta_unif);  // beta ~ cauchy(mu,tau)
+  beta = mu + tau * tan(beta_unif);  // beta ~ cauchy(mu, tau)
 }    
 model {
   beta_unif ~ uniform(-pi()/2, pi()/2);  // not necessary
@@ -10797,7 +10987,7 @@ parameters {
   vector[K] beta;
   ...
 model {
-  beta ~ normal(mu_beta,sigma_beta);
+  beta ~ normal(mu_beta, sigma_beta);
   ...
 \end{stancode}
 %
@@ -10835,10 +11025,10 @@ parameters {
   ...
 transformed parameters {
   vector[K] beta;
-  // implies: beta ~ normal(mu_beta,sigma_beta)
+  // implies: beta ~ normal(mu_beta, sigma_beta)
   beta = mu_beta + sigma_beta * beta_raw;
 model {
-  beta_raw ~ normal(0,1);  
+  beta_raw ~ normal(0, 1);  
   ...
 \end{stancode}
 %
@@ -10899,7 +11089,7 @@ parameters {
   vector[K] beta;
   ...
 model {
-  beta ~ multi_normal(mu,Sigma);
+  beta ~ multi_normal(mu, Sigma);
   ...
 \end{stancode}
 %
@@ -10921,7 +11111,7 @@ data {
   cov_matrix[K] Sigma;
   ...
 transformed data {
-  matrix[K,K] L;
+  matrix[K, K] L;
   L = cholesky_decompose(Sigma);
 }
 parameters {
@@ -10932,7 +11122,7 @@ transformed parameters {
   beta = mu + L * alpha; 
 }
 model {
-  alpha ~ normal(0,1); 
+  alpha ~ normal(0, 1); 
   // implies: beta ~ multi_normal(mu, Sigma)
   ...
 \end{stancode}
@@ -10963,7 +11153,7 @@ data {
   corr_matrix[K] Tau;
   ...
 transformed data {
-  matrix[K,K] L;
+  matrix[K, K] L;
   L = cholesky_decompose(Tau);
 }
 parameters {
@@ -10976,8 +11166,8 @@ transformed parameters {
   beta = mu + sigma .* (L * alpha);
 }
 model {
-  sigma ~ cauchy(0,5);
-  alpha ~ normal(0,1);
+  sigma ~ cauchy(0, 5);
+  alpha ~ normal(0, 1);
   // implies: beta ~ multi_normal(mu,
   //  diag_matrix(sigma) * L * L' * diag_matrix(sigma)))
   ...
@@ -11014,36 +11204,36 @@ data {
   int<lower=1> N;
   int<lower=1> K;
   int<lower=K+2> nu
-  matrix[K,K] L; // Cholesky factor of scale matrix
+  matrix[K, K] L; // Cholesky factor of scale matrix
   vector[K] mu;
-  matrix[N,K] y;
+  matrix[N, K] y;
   ...
 parameters {
   vector<lower=0>[K] c;
   vector[0.5 * K * (K - 1)] z;
   ...
 model {
-  matrix[K,K] A;
+  matrix[K, K] A;
   int count;
   count = 1;
   for (j in 1:(K-1)) {
     for (i in (j+1):K) {
-      A[i,j] = z[count];
+      A[i, j] = z[count];
       count = count + 1;
     }
     for (i in 1:(j - 1)) {
-      A[i,j] = 0.0;
+      A[i, j] = 0.0;
     }
-    A[j,j] = sqrt(c[j]);
+    A[j, j] = sqrt(c[j]);
   }
   for (i in 1:(K-1))
-    A[i,K] = 0;
-  A[K,K] = sqrt(c[K]);
+    A[i, K] = 0;
+  A[K, K] = sqrt(c[K]);
   
   for (i in 1:K)
     c[i] ~ chi_square(nu - i + 1);
 
-  z ~ normal(0,1);
+  z ~ normal(0, 1);
   // implies: L * A * A' * L' ~ wishart(nu, L * L')
   y ~ multi_normal_cholesky(mu, L * A);
   ...
@@ -11071,16 +11261,16 @@ We can slightly modify the above Stan code for this case:
 data {
   int<lower=1> K;
   int<lower=K+2> nu
-  matrix[K,K] L; // Cholesky factor of scale matrix
+  matrix[K, K] L; // Cholesky factor of scale matrix
   ...
 transformed data {
-  matrix[K,K] eye;
-  matrix[K,K] L_inv;
+  matrix[K, K] eye;
+  matrix[K, K] L_inv;
   for (j in 1:K) {
     for (i in 1:K) {
-      eye[i,j] = 0.0;
+      eye[i, j] = 0.0;
     }
-    eye[j,j] = 1.0;
+    eye[j, j] = 1.0;
   }
   L_inv = mdivide_left_tri_low(L, eye);
 }
@@ -11089,29 +11279,29 @@ parameters {
   vector[0.5 * K * (K - 1)] z;
   ...
 model {
-  matrix[K,K] A;
-  matrix[K,K] A_inv_L_inv;  
+  matrix[K, K] A;
+  matrix[K, K] A_inv_L_inv;  
   int count;
   count = 1;
   for (j in 1:(K-1)) {
     for (i in (j+1):K) {
-      A[i,j] = z[count];
+      A[i, j] = z[count];
       count = count + 1;
     }
     for (i in 1:(j - 1)) {
-      A[i,j] = 0.0;
+      A[i, j] = 0.0;
     }
-    A[j,j] = sqrt(c[j]);
+    A[j, j] = sqrt(c[j]);
   }
   for (i in 1:(K-1))
-    A[i,K] = 0;
-  A[K,K] = sqrt(c[K]);
+    A[i, K] = 0;
+  A[K, K] = sqrt(c[K]);
 
   A_inv_L_inv = mdivide_left_tri_low(A, L_inv);
   for (i in 1:K)
     c[i] ~ chi_square(nu - i + 1);
 
-  z ~ normal(0,1); // implies: crossprod(A_inv_L_inv) ~ 
+  z ~ normal(0, 1); // implies: crossprod(A_inv_L_inv) ~ 
   // inv_wishart(nu, L_inv' * L_inv)
   ...
 \end{stancode}
@@ -11140,7 +11330,7 @@ transformed parameters {
 }
 model {
   for (k in 1:K)
-    z[k] ~ normal(0,1); 
+    z[k] ~ normal(0, 1); 
   // implies: rho ~ dirichlet(0.5 * beta * ones)
   ...
 \end{stancode}
@@ -11214,7 +11404,7 @@ coefficients.
 data {
   int<lower=1> K;
   int<lower=1> N;
-  real x[K,N];
+  real x[K, N];
   real y[N];
 }
 parameters {
@@ -11225,7 +11415,7 @@ model {
     real gamma;  
     gamma = 0.0;
     for (k in 1:K)
-      gamma = gamma + x[n,k] * beta[k];
+      gamma = gamma + x[n, k] * beta[k];
     y[n] ~ normal(gamma,1);
   }
 }
@@ -11247,7 +11437,7 @@ parameters {
 }
 model {
   for (n in 1:N)
-    y[n] ~ normal(dot_product(x[n],beta), 1);
+    y[n] ~ normal(dot_product(x[n], beta), 1);
 }
 \end{stancode}
 %
@@ -11318,7 +11508,7 @@ probability function, as in the following example.
 data {
   int<lower=1> K;
   int<lower=1> N;
-  matrix[N,K] x;
+  matrix[N, K] x;
   vector[N] y;
 }
 parameters {
@@ -11404,7 +11594,7 @@ parameters {
   real<lower=0,upper=1> theta;
 }
 model {
-  theta ~ beta(alpha,beta);
+  theta ~ beta(alpha, beta);
   for (n in 1:N) 
     y[n] ~ bernoulli(theta);
 }
@@ -11415,8 +11605,8 @@ sufficient statistic for the chance of success \code{theta}.  The
 model may be recoded using the binomial distribution as follows.
 %
 \begin{stancode}
-    theta ~ beta(alpha,beta);
-    sum(y) ~ binomial(N,theta);
+    theta ~ beta(alpha, beta);
+    sum(y) ~ binomial(N, theta);
 \end{stancode}
 %
 Because truth is represented as one and falsehood as zero, the sum
@@ -11525,9 +11715,9 @@ parameters {
 }
 model {
   // priors
-  alpha ~ normal(0,10);    
-  beta ~ normal(0,10);
-  sigma ~ cauchy(0,5);
+  alpha ~ normal(0, 10);    
+  beta ~ normal(0, 10);
+  sigma ~ cauchy(0, 5);
   // likelihood
   for (n in 1:N)
     y[n] ~ normal(alpha + beta * x[n], sigma);
@@ -11557,9 +11747,9 @@ parameters {
   real<lower=0> sigma_std;
 }
 model {
-  alpha_std ~ normal(0,10);    
-  beta_std ~ normal(0,10);
-  sigma_std ~ cauchy(0,5);
+  alpha_std ~ normal(0, 10);    
+  beta_std ~ normal(0, 10);
+  sigma_std ~ cauchy(0, 5);
   for (n in 1:N)
     y_std[n] ~ normal(alpha_std + beta_std * x_std[n], 
                       sigma_std);

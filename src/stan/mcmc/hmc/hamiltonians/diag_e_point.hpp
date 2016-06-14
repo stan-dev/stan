@@ -6,9 +6,10 @@
 
 namespace stan {
   namespace mcmc {
-
-    // Point in a phase space with a base
-    // Euclidean manifold with diagonal metric
+    /**
+     * Point in a phase space with a base
+     * Euclidean manifold with diagonal metric
+     */
     class diag_e_point: public ps_point {
     public:
       explicit diag_e_point(int n)

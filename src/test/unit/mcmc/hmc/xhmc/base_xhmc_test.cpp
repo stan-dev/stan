@@ -34,31 +34,43 @@ namespace stan {
       double tau(ps_point& z) { return T(z); }
       double phi(ps_point& z) { return this->V(z); }
 
-      double dG_dt(ps_point& z) { return 2; }
+      double dG_dt(
+        ps_point& z,
+        interface_callbacks::writer::base_writer& info_writer,
+        interface_callbacks::writer::base_writer& error_writer) {
+        return 2;
+      }
 
-      const Eigen::VectorXd dtau_dq(ps_point& z) {
+      Eigen::VectorXd dtau_dq(
+        ps_point& z,
+        interface_callbacks::writer::base_writer& info_writer,
+        interface_callbacks::writer::base_writer& error_writer) {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 
-      const Eigen::VectorXd dtau_dp(ps_point& z) {
+      Eigen::VectorXd dtau_dp(ps_point& z) {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 
-      const Eigen::VectorXd dphi_dq(ps_point& z) {
+      Eigen::VectorXd dphi_dq(
+        ps_point& z,
+        interface_callbacks::writer::base_writer& info_writer,
+        interface_callbacks::writer::base_writer& error_writer) {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 
       void init(ps_point& z,
                 interface_callbacks::writer::base_writer& info_writer,
-                interface_callbacks::writer::base_writer& error_writer) {                
+                interface_callbacks::writer::base_writer& error_writer) {
         z.V = 0;
       }
 
       void sample_p(ps_point& z, BaseRNG& rng) {};
 
-      void update(ps_point& z,
-                  interface_callbacks::writer::base_writer& info_writer,
-                  interface_callbacks::writer::base_writer& error_writer) {                
+      void update_potential_gradient(
+        ps_point& z,
+        interface_callbacks::writer::base_writer& info_writer,
+        interface_callbacks::writer::base_writer& error_writer) {
         z.V += 500;
       }
 
@@ -141,8 +153,8 @@ TEST(McmcXHMCBaseXHMC, build_tree) {
 
   stan::mcmc::ps_point z_propose(model_size);
 
-  double sum_numer = 0;
-  double sum_weight = 0;
+  double ave = 0;
+  double log_sum_weight = -std::numeric_limits<double>::infinity();
 
   double H0 = -0.1;
   int n_leapfrog = 0;
@@ -163,7 +175,7 @@ TEST(McmcXHMCBaseXHMC, build_tree) {
 
 
   bool valid_subtree = sampler.build_tree(3, z_propose,
-                                          sum_numer, sum_weight,
+                                          ave, log_sum_weight,
                                           H0, 1, n_leapfrog,
                                           sum_metro_prob,
                                           writer, error_writer);
@@ -174,8 +186,8 @@ TEST(McmcXHMCBaseXHMC, build_tree) {
   EXPECT_EQ(init_momentum, sampler.z().p(0));
 
   EXPECT_EQ(8, n_leapfrog);
-  EXPECT_FLOAT_EQ(std::exp(H0) * 2 * n_leapfrog, sum_numer);
-  EXPECT_FLOAT_EQ(std::exp(H0) * n_leapfrog, sum_weight);
+  EXPECT_FLOAT_EQ(2, ave);
+  EXPECT_FLOAT_EQ(H0  + std::log(n_leapfrog), log_sum_weight);
   EXPECT_FLOAT_EQ(std::exp(H0) * n_leapfrog, sum_metro_prob);
 
   EXPECT_EQ("", output.str());
@@ -195,8 +207,8 @@ TEST(McmcXHMCBaseXHMC, divergence_test) {
 
   stan::mcmc::ps_point z_propose(model_size);
 
-  double sum_numer = 0;
-  double sum_weight = 0;
+  double ave = 0;
+  double log_sum_weight = -std::numeric_limits<double>::infinity();
 
   double H0 = -0.1;
   int n_leapfrog = 0;
@@ -220,7 +232,7 @@ TEST(McmcXHMCBaseXHMC, divergence_test) {
 
   sampler.z().V = -750;
   valid_subtree = sampler.build_tree(0, z_propose,
-                                     sum_numer, sum_weight,
+                                     ave, log_sum_weight,
                                      H0, 1, n_leapfrog,
                                      sum_metro_prob,
                                      writer, error_writer);
@@ -229,7 +241,7 @@ TEST(McmcXHMCBaseXHMC, divergence_test) {
 
   sampler.z().V = -250;
   valid_subtree = sampler.build_tree(0, z_propose,
-                                     sum_numer, sum_weight,
+                                     ave, log_sum_weight,
                                      H0, 1, n_leapfrog,
                                      sum_metro_prob,
                                      writer, error_writer);
@@ -239,7 +251,7 @@ TEST(McmcXHMCBaseXHMC, divergence_test) {
 
   sampler.z().V = 750;
   valid_subtree = sampler.build_tree(0, z_propose,
-                                     sum_numer, sum_weight,
+                                     ave, log_sum_weight,
                                      H0, 1, n_leapfrog,
                                      sum_metro_prob,
                                      writer, error_writer);

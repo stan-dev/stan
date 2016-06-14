@@ -41,14 +41,14 @@ TEST(McmcUnitENuts, build_tree) {
   stan::mcmc::ps_point z_propose = z_init;
 
   Eigen::VectorXd rho = z_init.p;
-  double sum_weight = 0;
+  double log_sum_weight = -std::numeric_limits<double>::infinity();
 
   double H0 = -0.1;
   int n_leapfrog = 0;
   double sum_metro_prob = 0;
 
   bool valid_subtree = sampler.build_tree(3, rho, z_propose,
-                                          H0, 1, n_leapfrog, sum_weight,
+                                          H0, 1, n_leapfrog, log_sum_weight,
                                           sum_metro_prob,
                                           writer, error_writer);
 
@@ -69,7 +69,7 @@ TEST(McmcUnitENuts, build_tree) {
   EXPECT_FLOAT_EQ(-1.4131583, sampler.z().p(2));
 
   EXPECT_EQ(8, n_leapfrog);
-  EXPECT_FLOAT_EQ(0.36134657, sum_weight);
+  EXPECT_FLOAT_EQ(std::log(0.36134657), log_sum_weight);
   EXPECT_FLOAT_EQ(0.36134657, sum_metro_prob);
 
   EXPECT_EQ("", output.str());
@@ -109,11 +109,11 @@ TEST(McmcUnitENuts, transition) {
 
   stan::mcmc::sample s = sampler.transition(init_sample, writer, error_writer);
 
-  EXPECT_FLOAT_EQ(1, s.cont_params()(0));
-  EXPECT_FLOAT_EQ(-1, s.cont_params()(1));
-  EXPECT_FLOAT_EQ(1, s.cont_params()(2));
-  EXPECT_FLOAT_EQ(-1.5, s.log_prob());
-  EXPECT_FLOAT_EQ(0.99629, s.accept_stat());
+  EXPECT_FLOAT_EQ(-0.30853021, s.cont_params()(0));
+  EXPECT_FLOAT_EQ(-0.44694126, s.cont_params()(1));
+  EXPECT_FLOAT_EQ(-0.073457584, s.cont_params()(2));
+  EXPECT_FLOAT_EQ(-0.1501717, s.log_prob());
+  EXPECT_FLOAT_EQ(0.99752671, s.accept_stat());
   EXPECT_EQ("", output_stream.str());
   EXPECT_EQ("", error_stream.str());
 }

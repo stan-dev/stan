@@ -25,8 +25,10 @@ model {
 }
 generated quantities {
   real y_hat[T,2];
-  y_hat <- integrate_ode_cvode(sho, y0, t0, ts, theta, x, x_int,
-                               1e-10, 1e-10, 1e6);
+  y_hat <- integrate_ode_rk45(sho, y0, t0, ts, theta, x, x_int,
+                              1e-10, 1e-10, 1e6);
+  y_hat <- integrate_ode_bdf(sho, y0, t0, ts, theta, x, x_int,
+                             1e-10, 1e-10, 1e6);
 
   // add measurement error
   for (t in 1:T) {

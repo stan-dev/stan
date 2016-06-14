@@ -1445,8 +1445,10 @@ other than constants.  Thus a variable may not be named \code{logit}
 or \code{add}, but it may be named \code{pi} or \code{e}.
 
 Variable names will also conflict with the names of distributions
-suffixed with \code{\_log}, \code{\_cdf}, \code{\_cdf\_log},
-and \code{\_ccdf\_log}, such as \code{normal\_cdf\_log}.
+suffixed with \code{\_lpdf}, \code{\_lpmf}, \code{\_lcdf}, and
+\code{\_lccdf}, \code{\_cdf}, and \code{\_ccdf}, such as
+\code{normal\_lcdf\_log}; this also holds for the deprecated forms
+\code{\_log}, \code{\_cdf\_log}, and \code{\_ccdf\_log},
 
 Using any of these variable names causes the \code{stanc} translator
 to halt and report the name and location of the variable causing the
@@ -1720,6 +1722,8 @@ tabular form in \reffigure{operator-precedence}.
 {\it Op.} & {\it Prec.} & {\it Assoc.} & {\it
   Placement} & {\it Description}
 \\ \hline \hline
+\code{?~:} & 10 & right & ternary infix & conditional
+\\ \hline
 \code{||} & 9 & left & binary infix & logical or
 \\ \hline
 \Verb|&&| & 8 & left & binary infix & logical and
@@ -1767,7 +1771,7 @@ tabular form in \reffigure{operator-precedence}.
 \code{[]} & 0 & left & prefix, wrap & array, matrix indexing
 \end{tabular}
 \end{center}
-\caption{\it Stan's unary and binary operators, with their
+\caption{\small\it Stan's unary, binary, and ternary operators, with their
   precedences, associativities, place in an expression, and a
   description.  The last two lines list the precedence of function
   application and array, matrix, and vector indexing. The operators are
@@ -1804,6 +1808,123 @@ For integer and reals,
 \mbox{\code{-n \textasciicircum\ 3}}
 is interpreted as \mbox{\code{-(n \textasciicircum\ 3)}}.
 
+
+\section{Conditional Operator}\label{conditional-operator.section}
+
+\subsection{Conditional Operator Syntax}
+
+The ternary conditional operator is unique in that it takes three
+arguments and uses a mixed syntax.  If \code{a} is an expression of
+type \code{int} and \code{b} and \code{c} are expressions that can be
+converted to one another (e.g., compared with \code{==}), then 
+%
+\begin{stancode}
+a ? b : c
+\end{stancode}
+%
+is an expression of the promoted type of \code{b} and \code{c}.  The
+only promotion allowed in Stan is from integer to real; if one
+argument is of type \code{int} and the other of type \code{real}, the
+conditional expression as a whole is of type \code{real}.  In all
+other cases, the arguments have to be of the same underlying Stan type
+(i.e., constraints don't count, only the shape) and the conditional
+expression is of that type.
+
+\subsubsection{Conditional Operator Precedence}
+
+The conditional operator is the most loosely binding operator, so its
+arguments rarely require parentheses for disambiguation.  For example,
+%
+\begin{stancode}
+a > 0 || b < 0 ? c + d : e - f
+\end{stancode}
+%
+is equivalent to the explicitly grouped version
+%
+\begin{stancode}
+(a > 0 || b < 0) ? (c + d) : (e - f)
+\end{stancode}
+%
+The latter is easier to read even if the parentheses are not strictly
+necessary.
+
+\subsubsection{Conditional Operator Associativity}
+
+The conditional operator is right associative, so that
+%
+\begin{stancode}
+a ? b : c ? d : e
+\end{stancode}
+%
+parses as if explicitly grouped as
+%
+\begin{stancode}
+a ? b : (c ? d : e)
+\end{stancode}
+%
+Again, the explicitly grouped version is easier to read.
+
+
+\subsection{Conditional Operator Semantics}
+
+Stan's conditional operator works very much like its C++ analogue.
+The first argument must be an expression denoting an integer.
+Typically this is a variable or a relation operator, as in the
+variable \code{a} in the example above.  Then there are two resulting
+arguments, the first being the result returned if the condition
+evaluates to true (i.e., non-zero) and the second if the condition
+evaluates to false (i.e., zero).  In the example above, the value
+\code{b} is returned if the condition evaluates to a non-zero value
+and \code{c} is returned if the condition evaluates to zero.
+
+\subsubsection{Lazy Evaluation of Results}
+
+The key property of the conditional operator that makes it so useful
+in high-performance computing is that it only evaluates the returned
+subexpression, not the alternative expression.  In other words, it is
+not like a typical function that evaluates its argument expressions
+eagerly in order to pass their values to the function.  Specifically,
+the conditional operator provides a substantial speedup over the
+built-in \code{if\_else} function, which, like other functions, evaluates
+all three of its arguments when it is called.  As usual, the saving is
+mostly in the derivatives that do not get computed rather than the
+basic function evaluation itself.
+
+\subsubsection{Promotion to Parameter}
+
+If one return expression is a data value (an expression involving only
+constants and variables defined in the data or transformed data
+block), and the other is not, then the ternary operator will promote
+the data value to a parameter value.  This can cause needless work
+calculating derivatives in some cases and be less efficient than a full
+\code{if}-\code{then} conditional statement.  For example,
+%
+\begin{stancode}
+data {
+  real x[10];
+  ...
+parameters {
+  real z[10];
+  ...
+model {
+  y ~ normal(cond ? x : z, sigma);
+  ...
+\end{stancode}
+%
+would be more efficiently (if not more transparently) coded as
+%
+\begin{stancode}
+if (cond)
+  y ~ normal(x, sigma);
+else
+  y ~ normal(z, sigma);
+\end{stancode}
+%
+The conditional statement, like the conditional operator, only
+evaluates one of the result statements.  In this case, the variable
+\code{x} will not be promoted to a parameter and thus not cause any
+needless work to be carried out when propagating the chain rule during
+derivative calculations.
 
 
 \section{Indexing}\label{language-indexing.section}
@@ -1985,10 +2106,10 @@ signature for the logarithm function can be expressed as
 \code{real log(real);}
 \end{quote}
 %
-and the signature for the \code{multiply\_log} function is
+and the signature for the \code{lmultiply} function is
 %
 \begin{quote}
-\code{real multiply\_log(real,real);}
+\code{real lmultiply(real,real);}
 \end{quote}
 %
 A function is uniquely determined by its name and its sequence of
@@ -2104,82 +2225,6 @@ informally using plots and formally by means of test statistics, to
 the actual data in order to assess the suitability of the model; see
 \citep[Chapter~6]{GelmanEtAl:2013} for more information on
 posterior predictive checks.
-
-\section{ODE Solver}\label{language-ode-solver.section}
-
-Stan provides a built-in ordinary differential equation solver.
-Although it looks like a function application, it is special in two
-ways.
-
-First, like PKBugs \citep{LunnEtAl:1999}, Stan's ODE solver takes a
-function specifying the system of equations as an argument.  Ordinary
-Stan functions do not allow functions as arguments.
-
-Second, the ODE solver expression restricts certain of its arguments
-to be data only expressions (i.e., they must not contain variables other
-than those declared in the data or transformed data block).  Ordinary
-Stan functions place no restriction on the origin of variables in
-their argument expressions.
-
-\subsection{Arguments}
-
-The arguments to the ODE solver function \code{integrate\_ode} are as
-follows:
-%
-\begin{enumerate}
-\item Function literal referring to a function specifying the system
-  of differential equations with signature
-\begin{quote}
-(real,real[],real[],real[],int[]):real[]
-\end{quote}
-The arguments represent (1) time, (2) system state, (3) parameters,
-(4) real data, and (5) integer data, and the return value contains the
-derivatives with respect to time of the state,
-\item initial state, type \code{real[]},
-\item initial time, type \code{int} or \code{real}, data only,
-\item solution times, type \code{real[]}, data only,
-\item parameters, type \code{real[]},
-\item real data, type \code{real[]}, data only, and
-\item integer data, type \code{int[]}, data only.
-\end{enumerate}
-%
-
-\subsection{Return Values}
-
-The return value for the ODE solver is an array of type
-\code{real[,]}, with values consisting of solutions at the specified
-times.
-
-\subsection{Sizes and Parallel Arrays}
-
-The sizes must match, and in particular, the following groups are of
-the same size:
-%
-\begin{itemize}
-\item state variables passed into the system function,
-  derivatives returned by the system function, initial state passed
-  into the solver, and rows of the return value of the solver,
-\item solution times and number of rows of the return value of the solver,
-\item parameters, real data and integer data passed to the solver will
-  be passed to the system function
-\end{itemize}
-%
-
-\subsection{Example}
-
-An example of a complete Stan program with a system definition and
-solver call is shown for data simulation in \reffigure{sho-sim} and
-estimation in \reffigure{sho-both}.
-
-\subsection{Gradients}
-
-Gradients are calculated by integrating the coupled system consisting
-of the original system state and derivatives of the original system
-with respect to the parameters and initial state.  The additional derivatives required
-for the coupled system are calculated by automatically differentiating
-the system with respect to the parameters.
-
-
 
 \section{Type Inference}
 
@@ -2689,7 +2734,7 @@ sampling statement could be expressed as a direct increment on the
 total log probability as
 %
 \begin{stancode}
-target += normal_log(y,mu,sigma);
+target += normal_lpdf(y,mu,sigma);
 \end{stancode}
 %
 See the subsection of \refsection{sampling-statements} discussing log
@@ -2698,20 +2743,30 @@ probability increments for a full explanation.
 In general, a sampling statement of the form
 %
 \begin{stancode}
-ex0 ~ dist(ex1,...,exN);
+y ~ dist(theta1, ..., thetaN);
 \end{stancode}
 %
-involving subexpressions \code{ex0} through \code{exN} (including the
-case where \code{N} is zero) will be well formed if and only if the
-corresponding assignment statement is well-formed,
+involving subexpressions \code{y1} and \code{theta1} through
+\code{thetaN} (including the case where \code{N} is zero) will be well
+formed if and only if the corresponding assignment statement is
+well-formed.  For densities allowing real \code{y} values, the log
+probability density function is used,
 %
 \begin{stancode}
-target += dist_log(ex0,ex1,...,exN);
+target += dist_lpdf(y | theta1, ..., thetaN);
 \end{stancode}
 %
-This will be well formed if and only if
-\code{dist\_log(ex0,ex1,...,exN)} is a well-formed function expression
-of type \code{real}.
+For those restricted to integer \code{y} values, the log probability
+mass function is used,
+%
+\begin{stancode}
+target += dist_lpmf(y | theta1, ..., thetaN);
+\end{stancode}
+%
+
+This will be well formed if and only if \code{dist\_lpdf(y, theta1,
+  ..., thetaN)} or \code{dist\_lpmf(y, theta1, ..., thetaN)} is a
+well-formed expression of type \code{real}.
 
 \subsection{Log Probability Increment vs.\ Sampling Statement}
 
@@ -2719,24 +2774,24 @@ Although both lead to the same sampling behavior in Stan, there is one
 critical difference between using the sampling statement, as in
 %
 \begin{stancode}
-y ~ normal(mu,sigma);
+y ~ normal(mu, sigma);
 \end{stancode}
 %
 and explicitly incrementing the log probability function, as in
 %
 \begin{stancode}
-target += normal_log(y,mu,sigma);
+target += normal_lpdf(y | mu,sigma);
 \end{stancode}
 %
 The sampling statement drops all the terms in the log probability
 function that are constant, whereas the explicit call to
-\code{normal\_log} adds all of the terms in the definition of the log
+\code{normal\_lpdf} adds all of the terms in the definition of the log
 normal probability function, including all of the constant normalizing
 terms.  Therefore, the explicit increment form can be used to recreate
 the exact log probability values for the model.  Otherwise, the
 sampling statement form will be faster if any of the input expressions,
 \code{y}, \code{mu}, or \code{sigma}, involve only constants, data
-variables or transformed data variables.
+variables, and transformed data variables.
 
 
 \subsection{User-Transformed Variables}
@@ -2750,7 +2805,7 @@ data {
 }
 // ...
 model {
-  log(y) ~ normal(mu,sigma);
+  log(y) ~ normal(mu, sigma);
 }
 \end{stancode}
 %
@@ -2820,9 +2875,9 @@ log\_diff\_exp operation as
 
 
 
-As in \BUGS and \JAGS, Stan allows probability functions to be
-truncated.  For example, a truncated unit normal distribution
-restricted to $(-0.5, 2.1)$ is encoded as follows.
+Stan allows probability functions to be truncated.  For example, a
+truncated unit normal distribution restricted to $(-0.5, 2.1)$ is
+encoded as follows.
 %
 \begin{stancode}
 y ~ normal(0,1) T[-0.5, 2.1];
@@ -2833,30 +2888,26 @@ the accumulated log probability.  For instance, this example has the
 same translation (up to arithmetic precision issues; see below) as
 %
 \begin{stancode}
-target += normal_log(y,0,1);
-target += -(log(normal_cdf(2.1,0,1) - normal_cdf(-0.5,0,1))));
+target += normal_lpdf(y | 0, 1);
+target += -log_diff_exp(normal_lcdf(2.1 | 0, 1),
+                        normal_lcdf(-0.5 | 0, 1));
 \end{stancode}
 %
-The function \code{normal\_cdf} represents the cumulative normal
-distribution function.  For example, \code{normal\_cdf(2.1,0,1)} evaluates to
+The function \code{normal\_lcdf} represents the cumulative normal
+distribution function.  For example, 
+\code{normal\_lcdf(2.1 | 0, 1)} evaluates to
 \[
-\int_{-\infty}^{2.1} \mbox{\sf Normal}(x|0,1) \, dx,
+\log \int_{-\infty}^{2.1} \mbox{\sf Normal}(x | 0, 1) \, \mathrm{d}x,
 \]
 %
-which is the probability a unit normal variable takes on values less
-than 2.1, or about 0.98.
+which is the log of the probability that a unit normal variable takes
+on a value less than 2.1, or about $\log 0.98$.
 
 Arithmetic precision is handled by working on the log scale and using
 Stan's log scale cdf implementations.  The logarithm of the cdf for
-the normal distribution is \code{normal\_cdf\_log} and the ccdf is
-\code{normal\_ccdf\_log}.  Stan's translation for the denominator
-introduced by truncation is equivalent to
-%
-\begin{stancode}
-target += -log_diff_exp(normal_cdf_log(2.1,0,1),
-                        normal_cdf_log(-0.5,0,1));
-\end{stancode}
-%
+the normal distribution is \code{normal\_lcdf} and the log of the ccdf
+is \code{normal\_lccdf}.  The function \code{log\_diff\_exp(a, b)} is
+equivalent to the less stable form \code{log(exp(a) - exp(b))}.
 
 As with constrained variable declarations, truncation can be one
 sided.  The density $p(x)$ can be truncated below by $a$ to define a
@@ -2870,7 +2921,7 @@ For example, the unit normal distribution truncated below at -0.5 would
 be represented as
 %
 \begin{stancode}
-y ~ normal(0,1) T[-0.5,];
+y ~ normal(0, 1) T[-0.5,];
 \end{stancode}
 %
 The truncation has the same effect as the following direct update to
@@ -2879,36 +2930,33 @@ the accumulated log probability (see the subsection of
 and sampling statements for more information).
 %
 \begin{stancode}
-target += normal_log(y, 0, 1);
-target += -log(1 - normal_cdf(-0.5, 0, 1));
+target += normal_lpdf(y | 0, 1);
+target += -normal_lccdf(-0.5 | 0, 1);
 \end{stancode}
 %
-The denominator (second line above) is implemented with the more
-efficient and stable version
-%
-\begin{stancode}
-target += -normal_ccdf_log(-0.5, 0, 1);
-\end{stancode}
+The \code{lccdf} function is the complementary cumulative distribution
+function (cdf);  if $F(x)$ is the cumulative distribution function for
+$x$, then $G(x) = 1 - F(x)$ is its complement.
 
 The density $p(x)$ can be truncated above by $b$ to define a density
 $p_{(,b)}(x)$ with support $(-\infty,b)$ by setting
 \[
 p_{(,b)}(x) = \frac{p(x)}
-                    {\int_{-\infty}^b p(x') \, dx'}.
+                    {\int_{-\infty}^b p(x') \, \mathrm{d}x'}.
 \]
 For example, the unit normal distribution truncated above at 2.1 would
 be represented as
 %
 \begin{stancode}
-y ~ normal(0,1) T[,2.1];
+y ~ normal(0, 1) T[,2.1];
 \end{stancode}
 %
 The truncation has the same effect as the following direct update to
 the accumulated log probability.
 %
 \begin{stancode}
-target += normal_log(y, 0, 1);
-target += -normal_cdf_log(2.1, 0, 1);
+target += normal_lpdf(y | 0, 1);
+target += -normal_lcdf(2.1 | 0, 1);
 \end{stancode}
 
 In all cases, the truncation is only well formed if the
@@ -2920,8 +2968,8 @@ appropriate log cumulative distribution functions are defined.%
 %
 \refpart{discrete-prob-functions} and
 \refpart{continuous-prob-functions} document the available discrete
-and continuous cumulative distribution functions.  Most distributions
-have cdf and ccdf functions.
+and continuous cumulative distribution functions; most univariate
+distributions have log cdf and log ccdf functions.
 
 For continuous distributions, truncation points must be expressions of
 type \code{int} or \code{real}.  For discrete distributions, truncation
@@ -2952,7 +3000,7 @@ is a well-formed for-loop statement.
 %
 \begin{stancode}
 for (n in 1:N) {
-  y[n] ~ normal(mu,sigma);
+  y[n] ~ normal(mu, sigma);
 }
 \end{stancode}
 %
@@ -3366,7 +3414,7 @@ if (x < 0)
 \subsection{Behavior of Reject Statements}
 
 Reject statements have the same behavior as exceptions thrown by
-built-in Stan functions.  For example, the \code{normal\_log} function
+built-in Stan functions.  For example, the \code{normal\_lpdf} function
 raises an exception if the input scale is not positive and finite.
 The effect of a reject statement depends on the program block in which
 the rejection occurs.
@@ -3491,8 +3539,7 @@ data {
 Function definitions and declarations may appear in any order, subject
 to the condition that a function must be declared before it is used.
 Forward declarations are allowed in order to support recursive
-functions; see \refsection{function-overloading} for the precise rules
-governing declarations and definitions.
+functions.
 
 \section{Function Names}
 
@@ -3507,11 +3554,8 @@ real foo(real mu, real sigma);
 declares a function named \code{foo} with two argument variables of
 types \code{real} and \code{real}.  The arguments are named \code{mu}
 and \code{sigma}, but that is not part of the declaration.  Two
-functions may \emph{not} \, have the same name even if they have
-different sequences of argument types; see
-\refsection{function-overloading} for details.  A function may not
-have the same name and argument type sequence as another function,
-including a built-in function.
+user-defined functions may \emph{not} \, have the same name even if they have
+different sequences of argument types.
 
 \section{Calling Functions}
 
@@ -3533,20 +3577,22 @@ accumulator, printing, or raising exceptions.
 
 \subsection{Probability Functions in Sampling Statements}
 
-Functions whose name ends in \code{\_log} may be used as probability
-functions and may be used in place of parameterized distributions on
-the right-hand-side of sampling statements.   There is no restriction
-on where such functions may be used.
+Functions whose name ends in \code{\_lpdf} or \code{\_lpmf} (density
+and mass functions) may be used as probability functions and may be
+used in place of parameterized distributions on the right-hand-side of
+sampling statements.  There is no restriction on where such functions
+may be used.
 
-\subsection{Restritions on Placement}
+\subsection{Restrictions on Placement}
 
 Functions of certain types are restricted on scope of usage.
 Functions whose names end in \code{\_lp} assume access to the log
 probability accumulator and are only available in the transformed
 parameter and model blocks.  Functions whose names end in \code{\_rng}
 assume access to the random number generator and may only be used
-within the generated quantities block.  See \refsection{function-bodies} for more
-information on these two special types of function.
+within the generated quantities block.  See
+\refsection{function-bodies} for more information on these two special
+types of function.
 
 \section{Unsized Argument Types}
 
@@ -3643,37 +3689,41 @@ error.
 
 \subsection{Definining Probability Functions for Sampling Statements}
 
-Functions whose names end in \code{\_log} can be used as probability
-functions in sampling statements.  As with the built-in functions, the
-first argument will appear on the left of the sampling
-statement operator (\Verb|~|) in the sampling statement and the other
-arguments follow.  For example, with a function declared with signature
+Functions whose names end in \code{\_lpdf} and \code{\_lpmf} (density
+and mass functions) can be used as probability functions in sampling
+statements.  As with the built-in functions, the first argument will
+appear on the left of the sampling statement operator (\Verb|~|) in
+the sampling statement and the other arguments follow.  For example,
+suppose a function returning the log of the density of \code{y} given
+parameter \code{theta} allows the use of the sampling statement is
+defined as follows.
 %
 \begin{stancode}
-real foo_log(real y, vector theta);
+real foo_lpdf(real y, vector theta) { ... }
 \end{stancode}
 %
-allows the use of
+Then the shorthand
 %
 \begin{stancode}
-real z;
-vector[K] phi;
-// ...
 z ~ foo(phi);
 \end{stancode}
 %
-to have the exact same effect as
+will have exactly the same effect
 %
 \begin{stancode}
-target += foo_log(z,phi);
+target += foo_lpdf(z | phi);
 \end{stancode}
 %
-so that functions that are going to be accessed as distributions
-should be defined on the log scale.
+Unlike built-in probability functions, user-defined
+probability functions like the example \code{foo} above will not
+automatically drop constant terms.
 
-Unlike built-in probability functions, user-defined probability
-functions like the example \code{foo} above will not automatically
-drop constant terms.
+The same syntax and shorthand works for log probability mass functions
+with suffixes \code{\_lpmf}.
+
+A function that is going to be accessed as distributions must return
+the log of the density or mass function it defines.
+
 
 \section{Parameters are Constant}
 
@@ -3753,7 +3803,7 @@ loop.  A bogus dummy return could be placed after the while loop in
 this case.  The rules for returns allow
 %
 \begin{stancode}
-real fancy_log(real x) {
+real log_fancy(real x) {
   if (x < 1e-30)
     return x;
   else if (x < 1e-14)
@@ -3792,63 +3842,6 @@ In a return statement within a void function's definition, the
 (\code{;}) rather than by the expression whose value is returned.
 
 
-\section{Overloading}\label{function-overloading.section}
-
-
-Many of Stan's built-in functions are overloaded, meaning that there
-are two functions with the same name, but different sequences of
-arguments.  Stan's function-definition language does not
-support overloading for user-defined functions.
-
-% TODO(carpenter): leaving this here for when I figure out overloading
-% ----------------------------------------------
-% For example, an overloaded unit-normal log density function might be
-% declared with an overload of the function \code{unit\_normal\_log},
-% giving it three signatures with one argument each.
-% %
-% \begin{stancode}
-% real unit_normal_log(real y);
-% real unit_normal_log(vector y);
-% real unit_normal_log(row_vector y);
-% \end{stancode}
-% %
-% The sequence of argument types must be distinct for each distinct
-% function; attempting to declare two functions with the same name
-% and argument type sequence will cause a compile-time error, even if
-% the return types or argument names are different.  For instance, it
-% would not be possible to add the following declaration to those
-% above.
-% %
-% \begin{stancode}
-% vector unit_normal_log(vector y);
-% \end{stancode}
-%
-%
-% \subsection{Overloading for Defaults}
-%
-% In order to write functions with default values, the function must be
-% overloaded; see \refsection{function-overloading} for more on
-% overloading.  Overloading comes with no guarantees that the overloaded
-% functions all share an underlying implementation.   For example, the function
-% \code{unit\_normal\_log} above could've just been named
-% \code{normal\_log} and used to overload the regular normal function
-% with default parameter values (0 location and 1 scale).
-
-% Functions are not called using named arguments, the options for
-% defaults are more limited than with named arguments in languages such
-% as R.  For example, it would not be possible to define two
-% two-argument normal density functions, one of which specified a
-% location and one of which specified a scale,
-% %
-% \begin{stancode}
-% real normal_log(real y, real mu);
-% real normal_log(real y, real sigma); // illegal
-% \end{stancode}
-% %
-% because they have the same argument-type sequence, (\code{real},
-% \code{real}).
-
-
 \section{Declarations}\label{forward-declarations.section}
 
 In general, functions must be declared before they are used.  Stan
@@ -3856,7 +3849,7 @@ supports forward declarations, which look like function definitions
 without bodies.  For example,
 %
 \begin{stancode}
-real unit_normal_log(real y);
+real unit_normal_lpdf(real y);
 \end{stancode}
 %
 declares a function named \code{unit\_normal\_log} that consumes a
@@ -3865,7 +3858,7 @@ function definition with a body simultaneously declares and defines
 the named function, as in
 %
 \begin{stancode}
-real unit_normal_log(real y) {
+real unit_normal_lpdf(real y) {
   return -0.5 * square(y);
 }
 \end{stancode}
@@ -4635,12 +4628,18 @@ identifier ::= [a-zA-Z] [a-zA-Z0-9_]*
 expressions ::= expression % ','
 expression ::= numeric_literal
              | variable
+             | expression `?` expression `:` expression
              | expression infixOp expression
              | prefixOp expression
              | expression postfixOp
              | expression '[' indexes ']'
              | function_literal '(' ?expressions ')'
+             | function_literal '(' expression ?('|' expression % ',') ')'
              | integrate_ode '(' function_literal (',' expression){6} ')'
+             | integrate_ode_rk45
+               '(' function_literal (',' expression){6|9} ')'
+             | integrate_ode_bdf
+               '(' function_literal (',' expression){6|9} ')'
              | '(' expression ')'
 
 index ::= ?(expression | expression ':' | ':' expression
@@ -4728,14 +4727,21 @@ Both the conditional if-then-else statement and while-loop statement
 require the expression denoting the condition to be a primitive type,
 integer or real.
 
+\subsection{Probability Function Naming}
+
+A probability function literal must have one of the following
+suffixes: \code{\_lpdf}, \code{\_lpmf}, \code{\_lcdf}, or \code{\_lccdf}.
+
 \subsection{ODE Solver Argument Types and Origins}
 
-The \code{integrate\_ode} expression requires
+The \code{integrate\_ode}, \code{integrate\_ode\_rk45}, and
+\code{integrate\_ode\_bdf} functions may be used without control
+parameters;  in this case
 %
 \begin{itemize}
 \item its first argument to refer to a function with signature
 \begin{quote}
- \code{(real,real[],real[],real[],int[]):real[]},
+ \code{(real,~real[],~real[],~real[],~int[])~:~real[]},
 \end{quote}
 \item the remaining six arguments must assignable to types
 \begin{quote}
@@ -4747,6 +4753,14 @@ The \code{integrate\_ode} expression requires
   containing any variables not originating in the data or transformed
   data blocks.
 \end{itemize}
+%
+The \code{integrate\_ode\_rk45} and \code{integrate\_ode\_bdf}
+functions may accept three additional arguments, which like the third,
+fourth, and sixth arguments, must be expressions free of parameter
+references.  The final three arguments must be assignable to types
+\begin{quote}
+\code{real}, \code{real}, \code{int}.
+\end{quote}
 
 \subsection{Indexes}
 
