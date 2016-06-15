@@ -449,7 +449,6 @@ namespace stan {
           match_index = i;
           num_matches = 1;
         } else if (promotions_ui == min_promotions) {
-          std::cout << std::endl;
           ++num_matches;
         }
       }
