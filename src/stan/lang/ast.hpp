@@ -22,6 +22,7 @@ namespace stan {
     struct assignment;
     struct assgn;
     struct binary_op;
+    struct break_continue_statement;
     struct conditional_op;
     struct conditional_statement;
     struct distribution;
@@ -793,12 +794,12 @@ namespace stan {
                      boost::recursive_wrapper<for_statement>,
                      boost::recursive_wrapper<conditional_statement>,
                      boost::recursive_wrapper<while_statement>,
+                     boost::recursive_wrapper<break_continue_statement>,
                      boost::recursive_wrapper<print_statement>,
                      boost::recursive_wrapper<reject_statement>,
                      boost::recursive_wrapper<return_statement>,
                      boost::recursive_wrapper<no_op_statement> >
       statement_t;
-
       statement_t statement_;
       size_t begin_line_;
       size_t end_line_;
@@ -815,6 +816,7 @@ namespace stan {
       statement(const for_statement& st);  // NOLINT(runtime/explicit)
       statement(const conditional_statement& st);  // NOLINT(runtime/explicit)
       statement(const while_statement& st);  // NOLINT(runtime/explicit)
+      statement(const break_continue_statement& st);  // NOLINT
       statement(const print_statement& st);  // NOLINT(runtime/explicit)
       statement(const reject_statement& st);  // NOLINT(runtime/explicit)
       statement(const no_op_statement& st);  // NOLINT(runtime/explicit)
@@ -834,6 +836,7 @@ namespace stan {
       bool operator()(const for_statement& st) const;  // NOLINT
       bool operator()(const conditional_statement& st) const;  // NOLINT
       bool operator()(const while_statement& st) const;  // NOLINT
+      bool operator()(const break_continue_statement& st) const;  // NOLINT
       bool operator()(const print_statement& st) const;  // NOLINT
       bool operator()(const reject_statement& st) const;  // NOLINT
       bool operator()(const no_op_statement& st) const;  // NOLINT
@@ -856,6 +859,7 @@ namespace stan {
       bool operator()(const for_statement& st) const;  // NOLINT
       bool operator()(const conditional_statement& st) const;  // NOLINT
       bool operator()(const while_statement& st) const;  // NOLINT
+      bool operator()(const break_continue_statement& st) const;  // NOLINT
       bool operator()(const print_statement& st) const;  // NOLINT
       bool operator()(const reject_statement& st) const;  // NOLINT
       bool operator()(const no_op_statement& st) const;  // NOLINT
@@ -897,6 +901,12 @@ namespace stan {
       while_statement();
       while_statement(const expression& condition,
                       const statement& body);
+    };
+
+    struct break_continue_statement {
+      std::string generate_;
+      break_continue_statement();
+      break_continue_statement(const std::string& generate);
     };
 
     struct print_statement {

@@ -2458,6 +2458,15 @@ namespace stan {
                                       variable_map&, bool&, const var_origin&,
                                       std::ostream&) const;
 
+    void validate_in_loop::operator()(bool in_loop, bool pass,
+                                        std::ostream& error_msgs) const {
+      pass = in_loop;
+      if (!pass)
+        error_msgs << "break or continue statements are only allowed"
+                   << " in the body of for loops or while loops."
+                   << std::endl;
+    }
+    boost::phoenix::function<validate_in_loop> validate_in_loop_f;
 
   }
 }

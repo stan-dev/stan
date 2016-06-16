@@ -2121,6 +2121,10 @@ namespace stan {
         generate_indent(indent_, o_);
         o_ << "}" << EOL;
       }
+      void operator()(const break_continue_statement& st) const {
+        generate_indent(indent_, o_);
+        o_ << st.generate_ << EOL;
+      }
       void operator()(const conditional_statement& x) const {
         for (size_t i = 0; i < x.conditions_.size(); ++i) {
           if (i == 0)
@@ -2162,6 +2166,9 @@ namespace stan {
       bool operator()(const for_statement& st) const  { return true; }
       bool operator()(const conditional_statement& st) const { return true; }
       bool operator()(const while_statement& st) const { return true; }
+      bool operator()(const break_continue_statement& st) const {
+        return true;
+      }
       bool operator()(const print_statement& st) const { return true; }
       bool operator()(const reject_statement& st) const { return true; }
       bool operator()(const no_op_statement& st) const { return true; }
