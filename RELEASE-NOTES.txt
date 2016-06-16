@@ -558,7 +558,7 @@ Documentation
   to Alexey Stukalov), negative binomial doc enhanced, new references,
   new discussion of hierarchical models referencing Betancourt and
   Girolami paper, 
-* Avraham Aadler was particularly useful in pointing out and fixing
+* Avraham Adler was particularly useful in pointing out and fixing
   documentation errors
 
 Bug Fixes
