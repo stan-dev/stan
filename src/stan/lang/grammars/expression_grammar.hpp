@@ -46,6 +46,19 @@ namespace stan {
                               expression(var_origin),
                               whitespace_grammar<Iterator> >
       expression14_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              expression(var_origin),
+                              whitespace_grammar<Iterator> >
+      expression15_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::locals<stan::lang::expression,
+                                                        stan::lang::expression,
+                                                        stan::lang::expression>,
+                              conditional_op(var_origin),
+                              whitespace_grammar<Iterator> >
+      conditional_op_r;
     };
 
   }

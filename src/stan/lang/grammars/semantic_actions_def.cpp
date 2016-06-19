@@ -164,6 +164,62 @@ namespace stan {
     }
     boost::phoenix::function<increment_size_t> increment_size_t_f;
 
+
+    void validate_conditional_op::operator()(conditional_op& conditional_op,
+                                             bool& pass,
+                                             std::ostream& error_msgs) const {
+      pass = true;
+      expr_type cond_type = conditional_op.cond_.expression_type();
+      if (!cond_type.is_primitive_int()) {
+        error_msgs << "condition in ternary expression must be"
+                   << " primitive int or real;"
+                   << " found type=" << cond_type
+                   << std::endl;
+        pass = false;
+      }
+      expr_type
+        true_val_type(conditional_op.true_val_.expression_type().type(),
+                      conditional_op.true_val_.expression_type().num_dims_);
+      base_expr_type
+        true_val_base_type = true_val_type.base_type_;
+      expr_type
+        false_val_type(conditional_op.false_val_.expression_type().type(),
+                       conditional_op.false_val_.expression_type().num_dims_);
+      base_expr_type
+        false_val_base_type = false_val_type.base_type_;
+
+      bool types_compatible
+        = (true_val_type.is_primitive()
+           && false_val_type.is_primitive()
+           && (true_val_base_type == false_val_base_type
+               || (true_val_base_type == DOUBLE_T
+                   && false_val_base_type == INT_T)
+               || (true_val_base_type == INT_T
+                   && false_val_base_type == DOUBLE_T)))
+        || (true_val_type == false_val_type);
+
+      if (!types_compatible) {
+        error_msgs << "base type mismatch in ternary expression,"
+                   << " expression when true is: ";
+        write_base_expr_type(error_msgs, true_val_base_type);
+        error_msgs << "; expression when false is: ";
+        write_base_expr_type(error_msgs, false_val_base_type);
+        error_msgs << std::endl;
+        pass = false;
+      }
+      if (!pass) return;
+
+      if (!true_val_type.is_primitive()) {
+        conditional_op.type_ = true_val_type;
+      } else {
+        conditional_op.type_ =
+          (true_val_base_type == false_val_base_type) ?
+          true_val_base_type : DOUBLE_T;
+      }
+    }
+    boost::phoenix::function<validate_conditional_op>
+    validate_conditional_op_f;
+
     void binary_op_expr::operator()(expression& expr1, const expression& expr2,
                                     const std::string& op,
                                     const std::string& fun_name,
@@ -1988,6 +2044,11 @@ namespace stan {
     }
     bool data_only_expression::operator()(const index_op_sliced& x) const {
       return boost::apply_visitor(*this, x.expr_.expr_);
+    }
+    bool data_only_expression::operator()(const conditional_op& x) const {
+      return boost::apply_visitor(*this, x.cond_.expr_)
+        && boost::apply_visitor(*this, x.true_val_.expr_)
+        && boost::apply_visitor(*this, x.false_val_.expr_);
     }
     bool data_only_expression::operator()(const binary_op& x) const {
       return boost::apply_visitor(*this, x.left.expr_)

@@ -20,8 +20,17 @@ namespace stan {
   namespace lang {
 
     void generate_expression(const expression& e, std::ostream& o);
-    void generate_expression(const expression& e, bool user_facing,
+    void generate_expression(const expression& e,
+                             bool user_facing,
                              std::ostream& o);
+    void generate_expression(const expression& e,
+                             bool user_facing,
+                             bool is_var,
+                             std::ostream& o);
+    void generate_bare_type(const expr_type& t,
+                            const std::string& scalar_t_name,
+                            std::ostream& out);
+
 
     const std::string EOL("\n");
     const std::string EOL2("\n\n");
@@ -58,7 +67,7 @@ namespace stan {
                                  const size_t indent,
                                  std::ostream& o)  {
       generate_indent(indent, o);
-      o << "(void) " << name << ";   // dummy to suppress unused var warning";
+      o << "(void) " << name << ";  // dummy to suppress unused var warning";
       o << EOL;
     }
 
@@ -186,9 +195,11 @@ namespace stan {
 
     struct expression_visgen : public visgen {
       const bool user_facing_;
-      explicit expression_visgen(std::ostream& o, bool user_facing)
+      const bool is_var_;
+      explicit expression_visgen(std::ostream& o, bool user_facing, bool is_var)
         : visgen(o),
-          user_facing_(user_facing) {
+          user_facing_(user_facing),
+          is_var_(is_var) {
       }
       void operator()(nil const& /*x*/) const {
         o_ << "nil";
@@ -346,6 +357,49 @@ namespace stan {
         }
         o_ << ')';
       }
+
+
+      void operator()(const conditional_op& expr) const {
+        bool types_prim_match = (expr.type_.is_primitive()
+                                 && expr.type_.base_type_ == INT_T)
+          || (expr.type_.is_primitive()
+              && (expr.true_val_.expression_type()
+                  == expr.false_val_.expression_type()));
+        bool types_prim_mismatch = !types_prim_match
+          && expr.type_.is_primitive();
+        o_ << "(";
+        boost::apply_visitor(*this, expr.cond_.expr_);
+        o_ << " ? ";
+        if (types_prim_match) {
+          boost::apply_visitor(*this, expr.true_val_.expr_);
+        } else if (types_prim_mismatch) {
+          o_ << "double(";
+          boost::apply_visitor(*this, expr.true_val_.expr_);
+          o_ << ")";
+        } else {
+          o_ << "stan::math::promote_scalar<"
+          << (is_var_ ? "T__" : "double")
+             << ">(";
+          boost::apply_visitor(*this, expr.true_val_.expr_);
+          o_ << ")";
+        }
+        o_ << " : ";
+        if (types_prim_match) {
+          boost::apply_visitor(*this, expr.false_val_.expr_);
+        } else if (types_prim_mismatch) {
+          o_ << "double(";
+          boost::apply_visitor(*this, expr.false_val_.expr_);
+          o_ << ")";
+        } else {
+          o_ << "stan::math::promote_scalar<"
+             << (is_var_ ? "T__" : "double")
+             << ">(";
+          boost::apply_visitor(*this, expr.false_val_.expr_);
+          o_ << ")";
+        }
+        o_ << " )";
+      }
+
       void operator()(const binary_op& expr) const {
         o_ << '(';
         boost::apply_visitor(*this, expr.left.expr_);
@@ -358,17 +412,28 @@ namespace stan {
         boost::apply_visitor(*this, expr.subject.expr_);
         o_ << ')';
       }
-    };
+    };     // close struct expression_visgen
 
-    void generate_expression(const expression& e, bool user_facing,
+    void generate_expression(const expression& e,
+                             bool user_facing,
+                             bool is_var,
                              std::ostream& o) {
-      expression_visgen vis(o, user_facing);
+      expression_visgen vis(o, user_facing, is_var);
+      boost::apply_visitor(vis, e.expr_);
+    }
+
+    void generate_expression(const expression& e,
+                             bool user_facing,
+                             std::ostream& o) {
+      static const bool is_var = false;  // default value
+      expression_visgen vis(o, user_facing, is_var);
       boost::apply_visitor(vis, e.expr_);
     }
 
     void generate_expression(const expression& e, std::ostream& o) {
       static const bool user_facing = false;  // default value
-      generate_expression(e, user_facing, o);
+      static const bool is_var = false;  // default value
+      generate_expression(e, user_facing, is_var, o);
     }
 
     static void print_string_literal(std::ostream& o,
@@ -431,6 +496,7 @@ namespace stan {
       o << "typedef" << " " << type << " " << abbrev << ";" << EOL;
     }
 
+
     void generate_typedefs(std::ostream& o) {
       generate_typedef("Eigen::Matrix<double,Eigen::Dynamic,1>", "vector_d", o);
       generate_typedef("Eigen::Matrix<double,1,Eigen::Dynamic>",
@@ -463,6 +529,14 @@ namespace stan {
       o << "}; // model" << EOL2;
     }
 
+    // use to disambiguate VectorXd(0) ctor from Scalar* alternative
+    void generate_eigen_index_expression(const expression& e,
+                                    std::ostream& o) {
+      o << "static_cast<Eigen::VectorXd::Index>(";
+      generate_expression(e.expr_, o);
+      o << ")";
+    }
+
     void generate_initializer(std::ostream& o,
                               const std::string& base_type,
                               const std::vector<expression>& dims,
@@ -477,13 +551,13 @@ namespace stan {
 
       o << '(';
       if (!is_nil(type_arg1)) {
-        generate_expression(type_arg1.expr_, o);
+        generate_eigen_index_expression(type_arg1, o);
         if (!is_nil(type_arg2)) {
           o << ',';
-          generate_expression(type_arg2.expr_, o);
+          generate_eigen_index_expression(type_arg2, o);
         }
       } else if (!is_nil(type_arg2.expr_)) {
-        generate_expression(type_arg2.expr_, o);
+        generate_eigen_index_expression(type_arg2, o);
       } else {
         o << '0';
       }
@@ -828,7 +902,8 @@ namespace stan {
                                      const std::string& read_type,
                                      const std::vector<expression>& read_args,
                                      const std::string& name,
-                                   const std::vector<expression>& dims)  const {
+                                     const std::vector<expression>& dims)
+      const {
         if (declare_vars_) {
           o_ << INDENT2;
           for (size_t i = 0; i < dims.size(); ++i) o_ << "vector<";
@@ -1166,6 +1241,9 @@ namespace stan {
     }
 
     // see member_var_decl_visgen cut & paste
+
+    // **************need this logic for conditional_op ***************
+
     struct local_var_decl_visgen : public visgen {
       int indents_;
       bool is_var_;
@@ -1356,13 +1434,13 @@ namespace stan {
             }
           } else if (ctor_args.size() == 1) {  // vector
             o_ << '(';
-            generate_expression(ctor_args[0], o_);
+            generate_eigen_index_expression(ctor_args[0], o_);
             o_ << ')';
           } else if (ctor_args.size() > 1) {  // matrix
             o_ << '(';
-            generate_expression(ctor_args[0], o_);
+            generate_eigen_index_expression(ctor_args[0], o_);
             o_ << ',';
-            generate_expression(ctor_args[1], o_);
+            generate_eigen_index_expression(ctor_args[1], o_);
             o_ << ')';
           }
         }
@@ -1382,11 +1460,11 @@ namespace stan {
           generate_void_statement(name);
           o_ << EOL;
         }
-        if (type == "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> "
-            || type == "Eigen::Matrix<T__,1,Eigen::Dynamic> "
-            || type == "Eigen::Matrix<T__,Eigen::Dynamic,1> ") {
+        if (type == "Eigen::Matrix<T__, Eigen::Dynamic, Eigen::Dynamic> "
+            || type == "Eigen::Matrix<T__, 1, Eigen::Dynamic> "
+            || type == "Eigen::Matrix<T__, Eigen::Dynamic, 1> ") {
           generate_indent(indents_, o_);
-          o_ << "stan::math::fill(" << name << ",DUMMY_VAR__);" << EOL;
+          o_ << "stan::math::fill(" << name << ", DUMMY_VAR__);" << EOL;
         }
       }
     };
@@ -1827,7 +1905,7 @@ namespace stan {
                                     false,
                                     o_);
         o_ << ", ";
-        generate_expression(x.expr_, o_);
+        generate_expression(x.expr_, false, is_var_, o_);
         o_ << ");" << EOL;
       }
       void operator()(const assgn& y) const {
@@ -1835,7 +1913,7 @@ namespace stan {
         o_ << "stan::model::assign(";
 
         expression var_expr(y.lhs_var_);
-        generate_expression(var_expr, o_);
+        generate_expression(var_expr, false, is_var_, o_);
         o_ << ", "
            << EOL;
 
@@ -1847,10 +1925,10 @@ namespace stan {
         generate_indent(indent_ + 3, o_);
         if (y.lhs_var_occurs_on_rhs()) {
           o_ << "stan::model::deep_copy(";
-          generate_expression(y.rhs_, o_);
+          generate_expression(y.rhs_, false, is_var_, o_);
           o_ << ")";
         } else {
-          generate_expression(y.rhs_, o_);
+          generate_expression(y.rhs_, false, is_var_, o_);
         }
 
         o_ << ", "
@@ -1865,9 +1943,10 @@ namespace stan {
       }
       void operator()(expression const& x) const {
         generate_indent(indent_, o_);
-        generate_expression(x, o_);
+        generate_expression(x, false, is_var_, o_);
         o_ << ";" << EOL;
       }
+      // can conditional_op expression be used in sampling statement?
       void operator()(sample const& x) const {
         if (!include_sampling_) return;
         std::string prob_fun = get_prob_fun(x.dist_.family_);
@@ -2221,7 +2300,7 @@ namespace stan {
         << "const char* function__ = \"validate transformed params\";"
         << EOL;
       o << INDENT2
-        << "(void) function__; // dummy to suppress unused var warning"
+        << "(void) function__;  // dummy to suppress unused var warning"
         << EOL;
 
       generate_validate_var_decls(p.derived_decl_.first, 2, o);
@@ -4356,6 +4435,13 @@ namespace stan {
       return true;
     }
 
+    std::string cond_op_scalar_type(const conditional_op& expr,
+                                bool is_data_origin) {
+      std::stringstream ss;
+      ss << "double";
+      return ss.str();
+    }
+
     std::string fun_scalar_type(const function_decl_def& fun,
                                 bool is_lp) {
       size_t num_args = fun.arg_decls_.size();
@@ -4392,6 +4478,8 @@ namespace stan {
         ss << ">::type";
       return ss.str();
     }
+    // copy/modify for conditional_op???
+
 
     bool needs_template_params(const function_decl_def& fun) {
       for (size_t i = 0; i < fun.arg_decls_.size(); ++i) {

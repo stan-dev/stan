@@ -67,3 +67,6 @@ TEST(langParserVarDeclsGrammarDef, constraintsInLocals) {
   test_throws("local_var_constraint3",
               "require unconstrained. found range constraint.");
 }
+TEST (langParserVarDeclsGrammarDef, zeroVecs) {
+  test_parsable("vector-zero");
+}
