@@ -25,7 +25,8 @@ public:
   int n_transition_called;
 };
 
-struct mock_callback {
+struct mock_callback
+  : public stan::interface_callbacks::interrupt::base_interrupt {
   int n;
   mock_callback() : n(0) { }
   
@@ -37,8 +38,8 @@ struct mock_callback {
 class StanServices : public testing::Test {
 public:
   StanServices()
-    : message_writer(message_output, "# "),
-      error_writer(error_output, "# ") { }
+    : message_writer(message_output),
+      error_writer(error_output) { }
   
   void SetUp() {
     model_output.str("");
@@ -58,10 +59,7 @@ public:
     writer_t sample_writer(sample_output, "# ");
     writer_t diagnostic_writer(diagnostic_output, "# ");
   
-    writer = new stan::services::sample::mcmc_writer<stan_model,
-                                                     writer_t,
-                                                     writer_t,
-                                                     writer_t>
+    writer = new stan::services::sample::mcmc_writer<stan_model>
       (sample_writer, diagnostic_writer, message_writer);
 
     base_rng.seed(123456);
@@ -78,10 +76,7 @@ public:
   
   mock_sampler* sampler;
   stan_model* model;
-  stan::services::sample::mcmc_writer<stan_model,
-                                      writer_t,
-                                      writer_t,
-                                      writer_t>* writer;
+  stan::services::sample::mcmc_writer<stan_model>* writer;
   rng_t base_rng;
 
   Eigen::VectorXd q;
@@ -109,16 +104,12 @@ TEST_F(StanServices, generate_transitions) {
   bool save = false;
   bool warmup = false;
   stan::mcmc::sample s(q, log_prob, stat);
-  std::string prefix = "";
-  std::string suffix = "\n";
-  std::stringstream ss;
   mock_callback callback;
 
-  stan::services::sample::generate_transitions(sampler,
+  stan::services::sample::generate_transitions(*sampler,
                                                num_iterations, start, finish,
                                                num_thin, refresh, save, warmup,
                                                *writer, s, *model, base_rng,
-                                               prefix, suffix, ss,
                                                callback,
                                                message_writer,
                                                error_writer);
@@ -126,12 +117,10 @@ TEST_F(StanServices, generate_transitions) {
   EXPECT_EQ(num_iterations, sampler->n_transition_called);
   EXPECT_EQ(num_iterations, callback.n);
 
-  EXPECT_EQ(expected_output, ss.str());
-
   EXPECT_EQ("", model_output.str());
   EXPECT_EQ("", sample_output.str());
   EXPECT_EQ("", diagnostic_output.str());
-  EXPECT_EQ("", message_output.str());
+  EXPECT_EQ(expected_output, message_output.str());
   EXPECT_EQ("", error_output.str());
 }
 

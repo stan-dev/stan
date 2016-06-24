@@ -24,7 +24,8 @@ public:
   int n_transition_called;
 };
 
-struct mock_callback {
+struct mock_callback
+  : public stan::interface_callbacks::interrupt::base_interrupt {
   int n;
   mock_callback() : n(0) { }
   
@@ -36,8 +37,8 @@ struct mock_callback {
 class StanServices : public testing::Test {
 public:
   StanServices()
-    : message_writer(message_output, "# "),
-      error_writer(error_output, "# ") { }
+    : message_writer(message_output),
+      error_writer(error_output) { }
   
   void SetUp() {
     model_output.str("");
@@ -57,10 +58,7 @@ public:
     writer_t sample_writer(sample_output, "# ");
     writer_t diagnostic_writer(diagnostic_output, "# ");
 
-    writer = new stan::services::sample::mcmc_writer<stan_model,
-                                                     writer_t,
-                                                     writer_t,
-                                                     writer_t>
+    writer = new stan::services::sample::mcmc_writer<stan_model>
       (sample_writer, diagnostic_writer, message_writer);
 
     base_rng.seed(123456);
@@ -77,10 +75,7 @@ public:
   
   mock_sampler* sampler;
   stan_model* model;
-  stan::services::sample::mcmc_writer<stan_model,
-                                      writer_t,
-                                      writer_t,
-                                      writer_t>* writer;
+  stan::services::sample::mcmc_writer<stan_model>* writer;
   rng_t base_rng;
 
   Eigen::VectorXd q;
@@ -105,30 +100,24 @@ TEST_F(StanServices, sample) {
   int refresh = 4;
   bool save = false;
   stan::mcmc::sample s(q, log_prob, stat);
-  std::string prefix = "";
-  std::string suffix = "\n";
-  std::stringstream ss;
   mock_callback callback;
 
-  stan::services::mcmc::sample(sampler,
+  stan::services::mcmc::sample(*sampler,
                                num_warmup, num_samples,
                                num_thin, refresh, save,
                                *writer, s, *model, base_rng,
-                               prefix, suffix, ss,
                                callback,
                                message_writer,
                                error_writer);
   
-
+  
   EXPECT_EQ(num_samples, sampler->n_transition_called);
   EXPECT_EQ(num_samples, callback.n);
-
-  EXPECT_EQ(expected_sample_output, ss.str());
 
   EXPECT_EQ("", model_output.str());
   EXPECT_EQ("", sample_output.str());
   EXPECT_EQ("", diagnostic_output.str());
-  EXPECT_EQ("", message_output.str());
+  EXPECT_EQ(expected_sample_output, message_output.str());
   EXPECT_EQ("", error_output.str());
 }
 

@@ -1,5 +1,5 @@
-#ifndef STAN_OLD_SERVICES_SAMPLE_MCMC_WRITER_HPP
-#define STAN_OLD_SERVICES_SAMPLE_MCMC_WRITER_HPP
+#ifndef STAN_SERVICES_SAMPLE_MCMC_WRITER_HPP
+#define STAN_SERVICES_SAMPLE_MCMC_WRITER_HPP
 
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/mcmc/sample.hpp>
@@ -17,33 +17,29 @@ namespace stan {
        * mcmc_writer writes out headers and samples
        *
        * @tparam Model Model class
-       * @tparam SampleWriter Class for recording samples
-       * @tparam DiagnosticWriter Class for diagnostic samples
        */
-      template <class Model,
-                class SampleWriter, class DiagnosticWriter,
-                class MessageWriter>
+      template <class Model>
       class mcmc_writer {
       private:
-        SampleWriter& sample_writer_;
-        DiagnosticWriter& diagnostic_writer_;
-        MessageWriter& message_writer_;
+        interface_callbacks::writer::base_writer& sample_writer_;
+        interface_callbacks::writer::base_writer& diagnostic_writer_;
+        interface_callbacks::writer::base_writer& message_writer_;
 
       public:
         /**
          * Constructor.
          *
-         * @param sample_writer samples are "written" to this stream (can abstract this?)
-         * @param diagnostic_writer diagnostic information is "written" to this stream
+         * @param sample_writer samples are "written" to this stream
+         * @param diagnostic_writer diagnostic info is "written" to this stream
          * @param message_writer messages are written to this stream
          *
          * @pre arguments == 0 if and only if they are not meant to be used
          * @post none
          * @sideeffects streams are stored in this object
          */
-        mcmc_writer(SampleWriter& sample_writer,
-                    DiagnosticWriter& diagnostic_writer,
-                    MessageWriter& message_writer)
+        mcmc_writer(interface_callbacks::writer::base_writer& sample_writer,
+                    interface_callbacks::writer::base_writer& diagnostic_writer,
+                    interface_callbacks::writer::base_writer& message_writer)
           : sample_writer_(sample_writer),
             diagnostic_writer_(diagnostic_writer),
             message_writer_(message_writer) {
@@ -68,12 +64,12 @@ namespace stan {
          *   with a newline at the end
          */
         void write_sample_names(stan::mcmc::sample& sample,
-                                stan::mcmc::base_mcmc* sampler,
+                                stan::mcmc::base_mcmc& sampler,
                                 Model& model) {
           std::vector<std::string> names;
 
           sample.get_sample_param_names(names);
-          sampler->get_sampler_param_names(names);
+          sampler.get_sampler_param_names(names);
           model.constrained_param_names(names, true, true);
 
           sample_writer_(names);
@@ -128,9 +124,9 @@ namespace stan {
          *
          * @param sampler sampler
          */
-        void write_adapt_finish(stan::mcmc::base_mcmc* sampler) {
+        void write_adapt_finish(stan::mcmc::base_mcmc& sampler) {
           sample_writer_("Adaptation terminated");
-          sampler->write_sampler_state(sample_writer_);
+          sampler.write_sampler_state(sample_writer_);
         }
 
 
@@ -147,17 +143,17 @@ namespace stan {
          *   separated names with newline at the end
          */
         void write_diagnostic_names(stan::mcmc::sample sample,
-                                    stan::mcmc::base_mcmc* sampler,
+                                    stan::mcmc::base_mcmc& sampler,
                                     Model& model) {
           std::vector<std::string> names;
 
           sample.get_sample_param_names(names);
-          sampler->get_sampler_param_names(names);
+          sampler.get_sampler_param_names(names);
 
           std::vector<std::string> model_names;
           model.unconstrained_param_names(model_names, false, false);
 
-          sampler->get_sampler_diagnostic_names(model_names, names);
+          sampler.get_sampler_diagnostic_names(model_names, names);
 
           diagnostic_writer_(names);
         }
@@ -175,12 +171,12 @@ namespace stan {
          *   and get_sampler_diagnostics()
          */
         void write_diagnostic_params(stan::mcmc::sample& sample,
-                                     stan::mcmc::base_mcmc* sampler) {
+                                     stan::mcmc::base_mcmc& sampler) {
           std::vector<double> values;
 
           sample.get_sample_params(values);
-          sampler->get_sampler_params(values);
-          sampler->get_sampler_diagnostics(values);
+          sampler.get_sampler_params(values);
+          sampler.get_sampler_diagnostics(values);
 
           diagnostic_writer_(values);
         }
@@ -200,9 +196,8 @@ namespace stan {
          * @sideeffects stream is updated with information about timing
          *
          */
-        template <class Writer>
         void write_timing(double warmDeltaT, double sampleDeltaT,
-                          Writer& writer) {
+                          interface_callbacks::writer::base_writer& writer) {
           std::string title(" Elapsed Time: ");
           std::stringstream ss;
 
