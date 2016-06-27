@@ -130,7 +130,7 @@ namespace stan {
         Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
         try {
           stan::model::gradient(model, cont_params, init_log_prob,
-                                init_grad);
+                                init_grad, writer);
         } catch (const std::exception& e) {
           io::write_error_msg(writer, e);
           writer();
