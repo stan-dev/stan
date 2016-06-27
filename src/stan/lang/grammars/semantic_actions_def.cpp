@@ -1582,12 +1582,9 @@ namespace stan {
       }
 
       if (fun.name_ == "if_else") {
-        error_msgs << "Warning: the if_else() function"
-                   << " is deprecated.  It will be removed in Stan 3."
-                   << std::endl
-                   << "Use the conditional operator '?:' instead "
-                   << "e.g. recode if_else(cond,x,y) as  cond ? x : y "
-                   << std::endl << std::endl;
+        error_msgs << "Warning (non-fatal): the if_else() function"
+                   << " is deprecated.  Use the conditional operator '?:' instead."
+                   << std::endl;
       }
 
       fun_result = fun;
