@@ -764,7 +764,7 @@ TEST_F(StanServices, initialize_state_source_inf) {
   EXPECT_EQ(0, rng.calls);
   std::stringstream expected_msg;
   expected_msg << "param_0 initialized to invalid value (" 
-               << std::numeric_limits<double>::infinity() << ")\n";
+               << std::numeric_limits<double>::infinity() << ")\n\n";
   EXPECT_EQ(expected_msg.str(), output.str());
   EXPECT_EQ(1, context_factory.calls);
   EXPECT_EQ("abcd", context_factory.last_call);
