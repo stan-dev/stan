@@ -7,6 +7,7 @@
 #include <stan/old_services/error_codes.hpp>
 #include <stan/old_services/sample/mcmc_writer.hpp>
 #include <stan/old_services/sample/generate_transitions.hpp>
+#include <stan/services/util/rng.hpp>
 
 namespace stan {
   namespace services {
@@ -26,13 +27,8 @@ namespace stan {
                       interface_callbacks::writer::base_writer& error_writer,
                       interface_callbacks::writer::base_writer& sample_writer,
                       interface_callbacks::writer::base_writer& diagnostic_writer) {
-        boost::ecuyer1988 rng(random_seed);
+        boost::ecuyer1988 rng = stan::services::util::rng(random_seed, chain);
         
-        // Advance generator to avoid process conflicts
-        static boost::uintmax_t DISCARD_STRIDE
-          = static_cast<boost::uintmax_t>(1) << 50;
-        rng.discard(DISCARD_STRIDE * (chain - 1));
-
         stan::io::random_var_context random_context(model, rng, init_radius);
         stan::io::chained_var_context context(init, random_context);
 

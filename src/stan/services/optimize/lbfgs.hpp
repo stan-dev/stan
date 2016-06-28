@@ -6,7 +6,7 @@
 #include <stan/io/random_var_context.hpp>
 #include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/model/util.hpp>
-#include <boost/random/additive_combine.hpp>  // L'Ecuyer RNG
+#include <stan/services/util/rng.hpp>
 #include <vector>
 
 #include <stan/optimization/bfgs.hpp>
@@ -65,12 +65,7 @@ namespace stan {
                 Interrupt& interrupt,
                 interface_callbacks::writer::base_writer& message_writer,
                 interface_callbacks::writer::base_writer& parameter_writer) {
-        boost::ecuyer1988 rng(random_seed);
-        
-        // Advance generator to avoid process conflicts
-        static boost::uintmax_t DISCARD_STRIDE
-          = static_cast<boost::uintmax_t>(1) << 50;
-        rng.discard(DISCARD_STRIDE * (chain - 1));
+        boost::ecuyer1988 rng = stan::services::util::rng(random_seed, chain);
 
         stan::io::random_var_context random_context(model, rng, init_radius);
         stan::io::chained_var_context context(init, random_context);
