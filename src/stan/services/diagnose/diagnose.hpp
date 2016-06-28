@@ -5,8 +5,10 @@
 #include <stan/io/chained_var_context.hpp>
 #include <stan/io/random_var_context.hpp>
 #include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/interface_callbacks/writer/chained_writer.hpp>
 #include <stan/model/util.hpp>
 #include <stan/services/util/rng.hpp>
+#include <stan/services/util/initialize.hpp>
 #include <vector>
 
 namespace stan {
@@ -48,25 +50,21 @@ namespace stan {
                    interface_callbacks::writer::base_writer& parameter_writer) {
         boost::ecuyer1988 rng = stan::services::util::rng(random_seed, chain);
 
-        stan::io::random_var_context random_context(model, rng, init_radius);
-        stan::io::chained_var_context context(init, random_context);
-        
-        std::vector<double> cont_vector;
         std::vector<int> disc_vector;
-        std::stringstream ss;
-        model.transform_inits(context,
-                              disc_vector,
-                              cont_vector,
-                              &ss);
-        message_writer(ss.str());
+        std::vector<double> cont_vector;
+        cont_vector = stan::services::util::initialize(model, init, rng, init_radius,
+                                                       message_writer);
 
         message_writer("TEST GRADIENT MODE");
 
+        stan::interface_callbacks::writer::chained_writer
+          writer(message_writer, parameter_writer);
+        
         int num_failed =
           stan::model::test_gradients<true, true>(model,
                                                   cont_vector, disc_vector,
                                                   epsilon, error,
-                                                  message_writer);
+                                                  writer);
 
         return num_failed;
       }
