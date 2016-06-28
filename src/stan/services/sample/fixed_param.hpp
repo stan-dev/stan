@@ -8,6 +8,7 @@
 #include <stan/old_services/sample/mcmc_writer.hpp>
 #include <stan/old_services/sample/generate_transitions.hpp>
 #include <stan/services/util/rng.hpp>
+#include <stan/services/util/initialize.hpp>
 
 namespace stan {
   namespace services {
@@ -28,18 +29,11 @@ namespace stan {
                       interface_callbacks::writer::base_writer& sample_writer,
                       interface_callbacks::writer::base_writer& diagnostic_writer) {
         boost::ecuyer1988 rng = stan::services::util::rng(random_seed, chain);
-        
-        stan::io::random_var_context random_context(model, rng, init_radius);
-        stan::io::chained_var_context context(init, random_context);
 
-        std::stringstream msg;
-        std::vector<double> cont_vector;
         std::vector<int> disc_vector;
-        model.transform_inits(context,
-                              disc_vector,
-                              cont_vector,
-                              &msg);
-        message_writer(msg.str());
+        std::vector<double> cont_vector;
+        cont_vector = stan::services::util::initialize(model, init, rng, init_radius,
+                                                       message_writer);
 
         stan::mcmc::fixed_param_sampler sampler;
         stan::services::sample::mcmc_writer<Model>
