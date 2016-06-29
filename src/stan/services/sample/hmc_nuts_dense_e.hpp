@@ -8,6 +8,8 @@
 #include <stan/old_services/error_codes.hpp>
 #include <stan/mcmc/hmc/nuts/dense_e_nuts.hpp>
 #include <stan/services/util/run_sampler.hpp>
+#include <stan/services/util/rng.hpp>
+#include <stan/services/util/initialize.hpp>
 
 namespace stan {
   namespace services {
@@ -55,13 +57,8 @@ namespace stan {
                            interface_callbacks::writer::base_writer& error_writer,
                            interface_callbacks::writer::base_writer& sample_writer,
                            interface_callbacks::writer::base_writer& diagnostic_writer) {
-        boost::ecuyer1988 rng(random_seed);
-        
-        // Advance generator to avoid process conflicts
-        static boost::uintmax_t DISCARD_STRIDE
-          = static_cast<boost::uintmax_t>(1) << 50;
-        rng.discard(DISCARD_STRIDE * (chain - 1));
-        
+        boost::ecuyer1988 rng = stan::services::util::rng(random_seed, chain);
+
         std::vector<int> disc_vector;
         std::vector<double> cont_vector;
         cont_vector = stan::services::util::initialize(model, init, rng, init_radius,

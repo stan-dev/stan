@@ -9,27 +9,27 @@ namespace stan {
   namespace services {
     namespace util {
       
-      template <class Model, class RNG>
-      void run_sampler(stan::mcmc::base_mcmc& sampler,
-                       Model& model,
-                       std::vector<double>& cont_vector,
-                       int num_warmup,
-                       int num_samples,
-                       int num_thin,
-                       int refresh,
-                       bool save_warmup,
-                       RNG& rng,
-                       interface_callbacks::interrupt::base_interrupt& interrupt,
-                       interface_callbacks::writer::base_writer& message_writer,
-                       interface_callbacks::writer::base_writer& error_writer,
-                       interface_callbacks::writer::base_writer& sample_writer,
-                       interface_callbacks::writer::base_writer& diagnostic_writer) {
+      template <class Sampler, class Model, class RNG>
+      void run_adaptive_sampler(Sampler& sampler,
+                                Model& model,
+                                std::vector<double>& cont_vector,
+                                int num_warmup,
+                                int num_samples,
+                                int num_thin,
+                                int refresh,
+                                bool save_warmup,
+                                RNG& rng,
+                                interface_callbacks::interrupt::base_interrupt& interrupt,
+                                interface_callbacks::writer::base_writer& message_writer,
+                                interface_callbacks::writer::base_writer& error_writer,
+                                interface_callbacks::writer::base_writer& sample_writer,
+                                interface_callbacks::writer::base_writer& diagnostic_writer) {
         Eigen::Map<Eigen::VectorXd> cont_params(cont_vector.data(), cont_vector.size());
 
         sampler.engage_adaptation();
         try {
           sampler.z().q = cont_params;
-          sampler.init_stepsize(message_writer);
+          sampler.init_stepsize(message_writer, error_writer);
         } catch (const std::exception& e) {
           message_writer("Exception initializing step size.");
           message_writer(e.what());
