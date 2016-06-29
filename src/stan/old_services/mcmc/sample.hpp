@@ -19,7 +19,7 @@ namespace stan {
                   int num_thin,
                   int refresh,
                   bool save,
-                  stan::services::sample::mcmc_writer<Model>&
+                  stan::services::sample::mcmc_writer&
                   mcmc_writer,
                   stan::mcmc::sample& init_s,
                   Model& model,

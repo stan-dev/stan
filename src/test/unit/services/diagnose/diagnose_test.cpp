@@ -32,5 +32,5 @@ TEST_F(ServicesDiagnose, diagnose) {
   EXPECT_TRUE(message_ss.str().find("TEST GRADIENT MODE") != std::string::npos);
   EXPECT_TRUE(message_ss.str().find("Log probability=3.218") != std::string::npos);
 
-  EXPECT_EQ("", parameter_ss.str());
+  EXPECT_TRUE(parameter_ss.str().find("Log probability=3.218") != std::string::npos);
 }

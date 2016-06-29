@@ -61,7 +61,7 @@ namespace stan {
           if (msg.str().length() > 0)
             message_writer(msg.str());
           
-          for (int i = 0; i < gradient.size(); ++i) {
+          for (size_t i = 0; i < gradient.size(); ++i) {
             if (gradient_ok && !boost::math::isfinite(gradient[i])) {
               message_writer("Rejecting initial value:");
               message_writer("  Gradient evaluated at the initial value "

@@ -36,7 +36,7 @@ namespace stan {
                                                        message_writer);
 
         stan::mcmc::fixed_param_sampler sampler;
-        stan::services::sample::mcmc_writer<Model>
+        stan::services::sample::mcmc_writer
           writer(sample_writer, diagnostic_writer, message_writer);
         Eigen::VectorXd cont_params(cont_vector.size());
         for (int i = 0; i < cont_vector.size(); i++)

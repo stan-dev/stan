@@ -18,7 +18,6 @@ namespace stan {
        *
        * @tparam Model Model class
        */
-      template <class Model>
       class mcmc_writer {
       private:
         interface_callbacks::writer::base_writer& sample_writer_;
@@ -63,6 +62,7 @@ namespace stan {
          * @sideeffects sample_stream_ is written to with comma separated values
          *   with a newline at the end
          */
+        template <class Model>        
         void write_sample_names(stan::mcmc::sample& sample,
                                 stan::mcmc::base_mcmc& sampler,
                                 Model& model) {
@@ -90,7 +90,7 @@ namespace stan {
          * @param sampler the sampler
          * @param model the model
          */
-        template <class RNG>
+        template <class Model, class RNG>
         void write_sample_params(RNG& rng,
                                  stan::mcmc::sample& sample,
                                  stan::mcmc::base_mcmc& sampler,
@@ -142,6 +142,7 @@ namespace stan {
          * @sideeffects diagnostic_stream_ is appended with comma
          *   separated names with newline at the end
          */
+        template <class Model>
         void write_diagnostic_names(stan::mcmc::sample sample,
                                     stan::mcmc::base_mcmc& sampler,
                                     Model& model) {

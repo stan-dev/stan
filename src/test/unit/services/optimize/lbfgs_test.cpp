@@ -84,7 +84,7 @@ TEST_F(ServicesOptimizeLbfgs, rosenbrock) {
                                                     message, 
                                                     parameter);
 
-  EXPECT_EQ("\nInitial log joint probability = -1\nOptimization terminated normally: \n  Convergence detected: relative gradient magnitude is below tolerance\n", message_ss.str());
+  EXPECT_EQ("Initial log joint probability = -1\nOptimization terminated normally: \n  Convergence detected: relative gradient magnitude is below tolerance\n", message_ss.str());
 
   ASSERT_EQ(3, parameter.names_.size());
   EXPECT_EQ("lp__", parameter.names_[0]);
