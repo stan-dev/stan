@@ -1,5 +1,5 @@
-#ifndef STAN_OLD_SERVICES_SAMPLE_GENERATE_TRANSITIONS_HPP
-#define STAN_OLD_SERVICES_SAMPLE_GENERATE_TRANSITIONS_HPP
+#ifndef STAN_SERVICES_UTIL_GENERATE_TRANSITIONS_HPP
+#define STAN_SERVICES_UTIL_GENERATE_TRANSITIONS_HPP
 
 #include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/interface_callbacks/interrupt/base_interrupt.hpp>
@@ -10,7 +10,7 @@
 
 namespace stan {
   namespace services {
-    namespace sample {
+    namespace util {
 
       template <class Model, class RNG>
       void generate_transitions(stan::mcmc::base_mcmc& sampler,
@@ -38,7 +38,7 @@ namespace stan {
               && (start + m + 1 == finish
                   || m == 0
                   || (m + 1) % refresh == 0))
-            info_writer(progress(m, start, finish, refresh, warmup));
+            info_writer(sample::progress(m, start, finish, refresh, warmup));
 
           init_s = sampler.transition(init_s, info_writer, error_writer);
 

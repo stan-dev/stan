@@ -5,7 +5,7 @@
 #include <stan/interface_callbacks/interrupt/base_interrupt.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/old_services/sample/mcmc_writer.hpp>
-#include <stan/old_services/sample/generate_transitions.hpp>
+#include <stan/services/util/generate_transitions.hpp>
 #include <string>
 
 namespace stan {
@@ -27,7 +27,7 @@ namespace stan {
                   interface_callbacks::interrupt::base_interrupt& callback,
                   interface_callbacks::writer::base_writer& info_writer,
                   interface_callbacks::writer::base_writer& error_writer) {
-        stan::services::sample::generate_transitions<Model, RNG>
+        stan::services::util::generate_transitions<Model, RNG>
           (sampler, num_samples, num_warmup, num_warmup + num_samples, num_thin,
            refresh, save, false,
            mcmc_writer,

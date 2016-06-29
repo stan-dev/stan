@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/old_services/sample/generate_transitions.hpp>
+#include <stan/services/util/generate_transitions.hpp>
 #include <test/test-models/good/services/test_lp.hpp>
 #include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/interface_callbacks/writer/stream_writer.hpp>
@@ -106,7 +106,7 @@ TEST_F(StanServices, generate_transitions) {
   stan::mcmc::sample s(q, log_prob, stat);
   mock_callback callback;
 
-  stan::services::sample::generate_transitions(*sampler,
+  stan::services::util::generate_transitions(*sampler,
                                                num_iterations, start, finish,
                                                num_thin, refresh, save, warmup,
                                                *writer, s, *model, base_rng,

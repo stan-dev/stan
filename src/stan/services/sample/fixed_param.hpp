@@ -6,7 +6,7 @@
 #include <stan/mcmc/fixed_param_sampler.hpp>
 #include <stan/old_services/error_codes.hpp>
 #include <stan/old_services/sample/mcmc_writer.hpp>
-#include <stan/old_services/sample/generate_transitions.hpp>
+#include <stan/services/util/generate_transitions.hpp>
 #include <stan/services/util/rng.hpp>
 #include <stan/services/util/initialize.hpp>
 
@@ -49,7 +49,7 @@ namespace stan {
         
         clock_t start = clock();
 
-        stan::services::sample::generate_transitions
+        stan::services::util::generate_transitions
           (sampler, num_samples, 0, num_samples, num_thin,
            refresh, true, false,
            writer,

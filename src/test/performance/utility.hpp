@@ -105,7 +105,7 @@
 #include <stan/old_services/mcmc/sample.hpp>
 #include <stan/old_services/mcmc/warmup.hpp>
 #include <stan/old_services/optimize/do_bfgs_optimize.hpp>
-#include <stan/old_services/sample/generate_transitions.hpp>
+#include <stan/services/util/generate_transitions.hpp>
 #include <stan/old_services/sample/init_adapt.hpp>
 #include <stan/old_services/sample/init_nuts.hpp>
 #include <stan/old_services/sample/init_static_hmc.hpp>
