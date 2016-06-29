@@ -1,5 +1,5 @@
-#ifndef STAN_SERVICES_UTIL_RUN_SAMPLER_HPP
-#define STAN_SERVICES_UTIL_RUN_SAMPLER_HPP
+#ifndef STAN_SERVICES_UTIL_RUN_ADAPTIVE_SAMPLER_HPP
+#define STAN_SERVICES_UTIL_RUN_ADAPTIVE_SAMPLER_HPP
 
 #include <stan/services/util/generate_transitions.hpp>
 #include <stan/old_services/sample/mcmc_writer.hpp>
@@ -25,6 +25,17 @@ namespace stan {
                        interface_callbacks::writer::base_writer& sample_writer,
                        interface_callbacks::writer::base_writer& diagnostic_writer) {
         Eigen::Map<Eigen::VectorXd> cont_params(cont_vector.data(), cont_vector.size());
+
+        sampler.engage_adaptation();
+        try {
+          sampler.z().q = cont_params;
+          sampler.init_stepsize(message_writer);
+        } catch (const std::exception& e) {
+          message_writer("Exception initializing step size.");
+          message_writer(e.what());
+          return;
+        }
+        
         services::sample::mcmc_writer
           writer(sample_writer, diagnostic_writer, message_writer);
         stan::mcmc::sample s(cont_params, 0, 0);
@@ -43,6 +54,9 @@ namespace stan {
         clock_t end = clock();
         double warm_delta_t = static_cast<double>(end - start) / CLOCKS_PER_SEC;
 
+        sampler.disengage_adaptation();
+        writer.write_adapt_finish(sampler);
+        
         start = clock();
         stan::services::util::generate_transitions
           (sampler, num_samples, num_warmup, num_warmup + num_samples, num_thin,
@@ -59,5 +73,4 @@ namespace stan {
     }
   }
 }
-
 #endif
