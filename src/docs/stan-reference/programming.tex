@@ -4853,7 +4853,7 @@ data {
 }
 parameters {
   real<lower=0, upper=1> theta;
-  real lambda;
+  real<lower=0> lambda;
 }
 model {
   for (n in 1:N) {
