@@ -4,6 +4,7 @@
 #include <stan/io/var_context.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
 #include <algorithm>
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -13,7 +14,7 @@ namespace stan {
     /**
      * This is an implementation of a var_context that initializes
      * the unconstrained values randomly. This is used for initialization.
-     */ 
+     */
     class random_var_context : public var_context {
     public:
       /**
@@ -74,7 +75,8 @@ namespace stan {
           for (size_t n = 0; n < num_unconstrained_; n++)
             unconstrained_params[n] = 0.0;
         } else {
-          boost::random::uniform_real_distribution<double> unif(-init_radius, init_radius);
+          boost::random::uniform_real_distribution<double>
+            unif(-init_radius, init_radius);
           for (size_t n = 0; n < num_unconstrained_; n++)
             unconstrained_params[n] = unif(rng);
         }
@@ -85,7 +87,7 @@ namespace stan {
                           unconstrained_params, int_params,
                           constrained_params,
                           false, false, 0);
-        
+
         vals_r_.resize(dims_.size());
         std::vector<double>::iterator start = constrained_params.begin();
 
@@ -98,13 +100,13 @@ namespace stan {
           start += size;
         }
       }
-      
+
       /**
        * Return <code>true</code> if the specified variable name is
        * defined. Will return <code>true</code> if the name matches
        * a parameter in the model.
        *
-       * @param name Name of variable.  
+       * @param name Name of variable.
        * @return <code>true</code> if the name is a parameter in the
        * model.
        */
@@ -121,7 +123,8 @@ namespace stan {
        *   var_context; an empty vector is returned otherwise
        */
       std::vector<double> vals_r(const std::string& name) const {
-        size_t index = std::find(names_.begin(), names_.end(), name) - names_.begin();
+        size_t index
+          = std::find(names_.begin(), names_.end(), name) - names_.begin();
         if (index >= names_.size()) {
           std::vector<double> empty_vals_r;
           return empty_vals_r;
@@ -137,7 +140,8 @@ namespace stan {
        *   is returned otherwise
        */
       std::vector<size_t> dims_r(const std::string& name) const {
-        size_t index = std::find(names_.begin(), names_.end(), name) - names_.begin();
+        size_t index
+          = std::find(names_.begin(), names_.end(), name) - names_.begin();
         if (index >= names_.size()) {
           std::vector<size_t> dims_r;
           return dims_r;

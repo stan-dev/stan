@@ -18,7 +18,8 @@ namespace stan {
                                      stan::io::var_context& init,
                                      RNG& rng,
                                      double init_radius,
-                                     interface_callbacks::writer::base_writer& message_writer) {
+                                     interface_callbacks::writer::base_writer&
+                                     message_writer) {
         std::vector<double> unconstrained;
         std::vector<int> disc_vector;
         std::stringstream msg;
@@ -29,7 +30,7 @@ namespace stan {
           stan::io::random_var_context random_context(model, rng, init_radius);
           stan::io::chained_var_context context(init, random_context);
           double log_prob(0);
-          
+
           model.transform_inits(context,
                                 disc_vector,
                                 unconstrained,
@@ -38,10 +39,11 @@ namespace stan {
             message_writer(msg.str());
           try {
             msg.str("");
-            log_prob = model.template log_prob<false, true>(unconstrained, disc_vector, &msg);
+            log_prob = model.template log_prob<false, true>
+              (unconstrained, disc_vector, &msg);
             if (msg.str().length() > 0)
               message_writer(msg.str());
-          } catch (std::exception& e){
+          } catch (std::exception& e) {
             message_writer();
             message_writer("Rejecting initial value:");
             message_writer("  Error evaluating the log probability "
@@ -51,29 +53,32 @@ namespace stan {
             message_writer("Rejecting initial value:");
             message_writer("  Log probability evaluates to log(0), "
                    "i.e. negative infinity.");
-            message_writer("  Stan can't start sampling from this initial value.");
+            message_writer("  Stan can't start sampling from this "
+                           "initial value.");
           }
           msg.str("");
           std::vector<double> gradient;
           bool gradient_ok = true;
-          log_prob = stan::model::log_prob_grad<true, true>(model, unconstrained, disc_vector,
-                                                gradient, &msg);
+          log_prob = stan::model::log_prob_grad<true, true>
+            (model, unconstrained, disc_vector,
+             gradient, &msg);
           if (msg.str().length() > 0)
             message_writer(msg.str());
-          
+
           for (size_t i = 0; i < gradient.size(); ++i) {
             if (gradient_ok && !boost::math::isfinite(gradient[i])) {
               message_writer("Rejecting initial value:");
               message_writer("  Gradient evaluated at the initial value "
                      "is not finite.");
-              message_writer("  Stan can't start sampling from this initial value.");
+              message_writer("  Stan can't start sampling from this "
+                             "initial value.");
               gradient_ok = false;
             }
           }
           if (gradient_ok)
             break;
         }
-        
+
         if (num_init_tries == MAX_INIT_TRIES) {
           message_writer();
           msg.str("");
@@ -84,12 +89,12 @@ namespace stan {
           message_writer(" Try specifying initial values,"
                          " reducing ranges of constrained values,"
                          " or reparameterizing the model.");
-          
+
           throw std::domain_error("");
         }
         return unconstrained;
       }
-      
+
     }
   }
 }

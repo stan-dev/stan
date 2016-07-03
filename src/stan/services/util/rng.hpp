@@ -9,7 +9,7 @@ namespace stan {
 
       boost::ecuyer1988 rng(unsigned int random_seed, unsigned int chain) {
         boost::ecuyer1988 rng(random_seed);
-        
+
         // Advance generator to avoid process conflicts
         static boost::uintmax_t DISCARD_STRIDE
           = static_cast<boost::uintmax_t>(1) << 50;
@@ -17,7 +17,7 @@ namespace stan {
 
         return rng;
       }
-      
+
     }
   }
 }

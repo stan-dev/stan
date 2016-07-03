@@ -28,7 +28,7 @@ struct mock_callback
   : public stan::interface_callbacks::interrupt::base_interrupt {
   int n;
   mock_callback() : n(0) { }
-  
+
   void operator()() {
     n++;
   }
@@ -39,26 +39,26 @@ public:
   StanServices()
     : message_writer(message_output),
       error_writer(error_output) { }
-  
+
   void SetUp() {
     model_output.str("");
     sample_output.str("");
     diagnostic_output.str("");
     message_output.str("");
     error_output.str("");
-    
+
     sampler = new mock_sampler();
 
     std::fstream empty_data_stream(std::string("").c_str());
     stan::io::dump empty_data_context(empty_data_stream);
     empty_data_stream.close();
-    
+
     model = new stan_model(empty_data_context, &model_output);
-    
+
     writer_t sample_writer(sample_output, "# ");
     writer_t diagnostic_writer(diagnostic_output, "# ");
 
-    writer = new stan::services::sample::mcmc_writer<stan_model>
+    writer = new stan::services::sample::mcmc_writer
       (sample_writer, diagnostic_writer, message_writer);
 
     base_rng.seed(123456);
@@ -72,7 +72,7 @@ public:
     delete model;
     delete writer;
   }
-  
+
   mock_sampler* sampler;
   stan_model* model;
   stan::services::sample::mcmc_writer<stan_model>* writer;
@@ -93,7 +93,7 @@ public:
 
 TEST_F(StanServices, sample) {
   std::string expected_sample_output = "Iteration: 31 / 80 [ 38%]  (Sampling)\nIteration: 34 / 80 [ 42%]  (Sampling)\nIteration: 38 / 80 [ 47%]  (Sampling)\nIteration: 42 / 80 [ 52%]  (Sampling)\nIteration: 46 / 80 [ 57%]  (Sampling)\nIteration: 50 / 80 [ 62%]  (Sampling)\nIteration: 54 / 80 [ 67%]  (Sampling)\nIteration: 58 / 80 [ 72%]  (Sampling)\nIteration: 62 / 80 [ 77%]  (Sampling)\nIteration: 66 / 80 [ 82%]  (Sampling)\nIteration: 70 / 80 [ 87%]  (Sampling)\nIteration: 74 / 80 [ 92%]  (Sampling)\nIteration: 78 / 80 [ 97%]  (Sampling)\nIteration: 80 / 80 [100%]  (Sampling)\n";
-  
+
   int num_warmup = 30;
   int num_samples = 50;
   int num_thin = 2;
@@ -109,8 +109,8 @@ TEST_F(StanServices, sample) {
                                callback,
                                message_writer,
                                error_writer);
-  
-  
+
+
   EXPECT_EQ(num_samples, sampler->n_transition_called);
   EXPECT_EQ(num_samples, callback.n);
 
@@ -120,4 +120,3 @@ TEST_F(StanServices, sample) {
   EXPECT_EQ(expected_sample_output, message_output.str());
   EXPECT_EQ("", error_output.str());
 }
-

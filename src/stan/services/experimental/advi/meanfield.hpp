@@ -3,7 +3,13 @@
 
 #include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/services/util/experimental_message.hpp>
-
+#include <stan/services/util/initialize.hpp>
+#include <stan/services/util/rng.hpp>
+#include <stan/io/var_context.hpp>
+#include <stan/variational/advi.hpp>
+#include <boost/random/additive_combine.hpp>
+#include <string>
+#include <vector>
 
 namespace stan {
   namespace services {
@@ -27,17 +33,18 @@ namespace stan {
                       int output_samples,
                       Interrupt& interrupt,
                       interface_callbacks::writer::base_writer& message_writer,
-                      interface_callbacks::writer::base_writer& parameter_writer,
-                      interface_callbacks::writer::base_writer& diagnostic_writer) {
+                      interface_callbacks::writer::base_writer&
+                      parameter_writer,
+                      interface_callbacks::writer::base_writer&
+                      diagnostic_writer) {
           stan::services::util::experimental_message(message_writer);
 
           boost::ecuyer1988 rng = stan::services::util::rng(random_seed, chain);
 
           std::vector<int> disc_vector;
-          std::vector<double> cont_vector;
-          cont_vector = stan::services::util::initialize(model, init, rng, init_radius,
-                                                         message_writer);
-
+          std::vector<double> cont_vector
+            = stan::services::util::initialize(model, init, rng, init_radius,
+                                               message_writer);
 
           std::vector<std::string> names;
           names.push_back("lp__");

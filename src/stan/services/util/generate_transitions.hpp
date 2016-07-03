@@ -26,7 +26,8 @@ namespace stan {
                                 stan::mcmc::sample& init_s,
                                 Model& model,
                                 RNG& base_rng,
-                                stan::interface_callbacks::interrupt::base_interrupt& callback,
+                           stan::interface_callbacks::interrupt::base_interrupt&
+                                callback,
                                 interface_callbacks::writer::base_writer&
                                 info_writer,
                                 interface_callbacks::writer::base_writer&

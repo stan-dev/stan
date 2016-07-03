@@ -5,13 +5,11 @@
 #include <stan/io/chained_var_context.hpp>
 #include <stan/io/random_var_context.hpp>
 #include <stan/interface_callbacks/writer/base_writer.hpp>
-#include <stan/model/util.hpp>
-#include <stan/services/util/rng.hpp>
-#include <stan/services/util/initialize.hpp>
-#include <vector>
-
 #include <stan/optimization/newton.hpp>
 #include <stan/old_services/error_codes.hpp>
+#include <stan/model/util.hpp>
+#include <stan/services/util/initialize.hpp>
+#include <stan/services/util/rng.hpp>
 #include <cmath>
 #include <limits>
 #include <string>
@@ -55,12 +53,12 @@ namespace stan {
         boost::ecuyer1988 rng = stan::services::util::rng(random_seed, chain);
 
         std::vector<int> disc_vector;
-        std::vector<double> cont_vector;
-        cont_vector = stan::services::util::initialize(model, init, rng, init_radius,
-                                                       message_writer);
+        std::vector<double> cont_vector
+          = stan::services::util::initialize(model, init, rng, init_radius,
+                                             message_writer);
 
         std::stringstream message;
-        
+
         double lp(0);
         try {
           lp = model.template log_prob<false, false>(cont_vector, disc_vector,
@@ -128,7 +126,6 @@ namespace stan {
           parameter_writer(values);
         }
         return stan::services::error_codes::OK;
-        
       }
 
     }

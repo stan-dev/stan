@@ -29,7 +29,7 @@ struct mock_callback
   : public stan::interface_callbacks::interrupt::base_interrupt {
   int n;
   mock_callback() : n(0) { }
-  
+
   void operator()() {
     n++;
   }
@@ -40,7 +40,7 @@ public:
   StanServices()
     : message_writer(message_output),
       error_writer(error_output) { }
-  
+
   void SetUp() {
     model_output.str("");
     sample_output.str("");
@@ -53,13 +53,13 @@ public:
     std::fstream empty_data_stream(std::string("").c_str());
     stan::io::dump empty_data_context(empty_data_stream);
     empty_data_stream.close();
-    
+
     model = new stan_model(empty_data_context, &model_output);
-    
+
     writer_t sample_writer(sample_output, "# ");
     writer_t diagnostic_writer(diagnostic_output, "# ");
 
-    writer = new stan::services::sample::mcmc_writer<stan_model>
+    writer = new stan::services::sample::mcmc_writer
       (sample_writer, diagnostic_writer, message_writer);
 
     base_rng.seed(123456);
@@ -73,7 +73,7 @@ public:
     delete model;
     delete writer;
   }
-  
+
   mock_sampler* sampler;
   stan_model* model;
   stan::services::sample::mcmc_writer<stan_model>* writer;
@@ -95,7 +95,7 @@ public:
 
 TEST_F(StanServices, warmup) {
   std::string expected_warmup_output =  "Iteration:  1 / 80 [  1%]  (Warmup)\nIteration:  4 / 80 [  5%]  (Warmup)\nIteration:  8 / 80 [ 10%]  (Warmup)\nIteration: 12 / 80 [ 15%]  (Warmup)\nIteration: 16 / 80 [ 20%]  (Warmup)\nIteration: 20 / 80 [ 25%]  (Warmup)\nIteration: 24 / 80 [ 30%]  (Warmup)\nIteration: 28 / 80 [ 35%]  (Warmup)\n";
-  
+
   int num_warmup = 30;
   int num_samples = 50;
   int num_thin = 2;
@@ -111,7 +111,7 @@ TEST_F(StanServices, warmup) {
                                callback,
                                message_writer,
                                error_writer);
-  
+
   EXPECT_EQ(num_warmup, sampler->n_transition_called);
   EXPECT_EQ(num_warmup, callback.n);
 
@@ -120,5 +120,3 @@ TEST_F(StanServices, warmup) {
   EXPECT_EQ("", diagnostic_output.str());
   EXPECT_EQ(expected_warmup_output, message_output.str());
 }
-
-

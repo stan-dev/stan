@@ -10,6 +10,7 @@
 #include <stan/services/util/run_sampler.hpp>
 #include <stan/services/util/rng.hpp>
 #include <stan/services/util/initialize.hpp>
+#include <vector>
 
 namespace stan {
   namespace services {
@@ -52,29 +53,35 @@ namespace stan {
                              double stepsize,
                              double stepsize_jitter,
                              double int_time,
-                             interface_callbacks::interrupt::base_interrupt& interrupt,
-                             interface_callbacks::writer::base_writer& message_writer,
-                             interface_callbacks::writer::base_writer& error_writer,
-                             interface_callbacks::writer::base_writer& sample_writer,
-                             interface_callbacks::writer::base_writer& diagnostic_writer) {
+                             interface_callbacks::interrupt::base_interrupt&
+                             interrupt,
+                             interface_callbacks::writer::base_writer&
+                             message_writer,
+                             interface_callbacks::writer::base_writer&
+                             error_writer,
+                             interface_callbacks::writer::base_writer&
+                             sample_writer,
+                             interface_callbacks::writer::base_writer&
+                             diagnostic_writer) {
         boost::ecuyer1988 rng = stan::services::util::rng(random_seed, chain);
 
         std::vector<int> disc_vector;
-        std::vector<double> cont_vector;
-        cont_vector = stan::services::util::initialize(model, init, rng, init_radius,
-                                                       message_writer);
-        
-        stan::mcmc::dense_e_static_hmc<Model, boost::ecuyer1988> sampler(model, rng);
+        std::vector<double> cont_vector
+          = stan::services::util::initialize(model, init, rng, init_radius,
+                                             message_writer);
+
+        stan::mcmc::dense_e_static_hmc<Model, boost::ecuyer1988>
+          sampler(model, rng);
         sampler.set_nominal_stepsize_and_T(stepsize, int_time);
         sampler.set_stepsize_jitter(stepsize_jitter);
-        
-        
+
+
         stan::services::util::run_sampler(sampler, model,
                                           cont_vector,
                                           num_warmup, num_samples, num_thin,
                                           refresh, save_warmup, rng,
                                           interrupt,
-                                          message_writer, error_writer, 
+                                          message_writer, error_writer,
                                           sample_writer, diagnostic_writer);
 
         return stan::services::error_codes::OK;

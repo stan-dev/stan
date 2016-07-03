@@ -9,6 +9,7 @@
 #include <stan/services/util/generate_transitions.hpp>
 #include <stan/services/util/rng.hpp>
 #include <stan/services/util/initialize.hpp>
+#include <vector>
 
 namespace stan {
   namespace services {
@@ -27,26 +28,27 @@ namespace stan {
                       interface_callbacks::writer::base_writer& message_writer,
                       interface_callbacks::writer::base_writer& error_writer,
                       interface_callbacks::writer::base_writer& sample_writer,
-                      interface_callbacks::writer::base_writer& diagnostic_writer) {
+                      interface_callbacks::writer::base_writer&
+                      diagnostic_writer) {
         boost::ecuyer1988 rng = stan::services::util::rng(random_seed, chain);
 
         std::vector<int> disc_vector;
-        std::vector<double> cont_vector;
-        cont_vector = stan::services::util::initialize(model, init, rng, init_radius,
-                                                       message_writer);
+        std::vector<double> cont_vector
+          = stan::services::util::initialize(model, init, rng, init_radius,
+                                             message_writer);
 
         stan::mcmc::fixed_param_sampler sampler;
         stan::services::sample::mcmc_writer
           writer(sample_writer, diagnostic_writer, message_writer);
         Eigen::VectorXd cont_params(cont_vector.size());
-        for (int i = 0; i < cont_vector.size(); i++)
-          cont_params(i) = cont_vector[i];
+        for (size_t i = 0; i < cont_vector.size(); i++)
+          cont_params[i] = cont_vector[i];
         stan::mcmc::sample s(cont_params, 0, 0);
 
         // Headers
         writer.write_sample_names(s, sampler, model);
         writer.write_diagnostic_names(s, sampler, model);
-        
+
         clock_t start = clock();
 
         stan::services::util::generate_transitions
@@ -62,7 +64,7 @@ namespace stan {
 
         return stan::services::error_codes::OK;
       }
-      
+
     }
   }
 }

@@ -6,12 +6,10 @@
 #include <stan/io/random_var_context.hpp>
 #include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/model/util.hpp>
-#include <stan/services/util/rng.hpp>
-#include <stan/services/util/initialize.hpp>
-#include <vector>
-
-#include <stan/optimization/bfgs.hpp>
 #include <stan/old_services/error_codes.hpp>
+#include <stan/optimization/bfgs.hpp>
+#include <stan/services/util/initialize.hpp>
+#include <stan/services/util/rng.hpp>
 #include <fstream>
 #include <iostream>
 #include <iomanip>
@@ -66,11 +64,11 @@ namespace stan {
                interface_callbacks::writer::base_writer& message_writer,
                interface_callbacks::writer::base_writer& parameter_writer) {
         boost::ecuyer1988 rng = stan::services::util::rng(random_seed, chain);
-        
+
         std::vector<int> disc_vector;
-        std::vector<double> cont_vector;
-        cont_vector = stan::services::util::initialize(model, init, rng, init_radius,
-                                                       message_writer);
+        std::vector<double> cont_vector
+          = stan::services::util::initialize(model, init, rng, init_radius,
+                                             message_writer);
 
         std::stringstream bfgs_ss;
         typedef stan::optimization::BFGSLineSearch
@@ -113,7 +111,7 @@ namespace stan {
           if (refresh > 0
               && (bfgs.iter_num() == 0
                   || (bfgs.iter_num() + 1 % refresh == 0)))
-            message_writer("    Iter " 
+            message_writer("    Iter "
                            "     log prob "
                            "       ||dx|| "
                            "     ||grad|| "
@@ -121,12 +119,12 @@ namespace stan {
                            "     alpha0 "
                            " # evals "
                            " Notes ");
-        
+
           ret = bfgs.step();
           lp = bfgs.logp();
           bfgs.params_r(cont_vector);
 
-          if (refresh > 0              
+          if (refresh > 0
               && (ret != 0
                   || !bfgs.note().empty()
                   || bfgs.iter_num() == 0
@@ -154,7 +152,7 @@ namespace stan {
             message_writer(bfgs_ss.str());
             bfgs_ss.str("");
           }
-          
+
           if (save_iterations) {
             std::vector<double> values;
             msg.str("");
@@ -164,7 +162,7 @@ namespace stan {
               message_writer(msg.str());
 
             values.insert(values.begin(), lp);
-            parameter_writer(values);            
+            parameter_writer(values);
           }
         }
 

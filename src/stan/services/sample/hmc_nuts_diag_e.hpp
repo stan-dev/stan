@@ -10,6 +10,7 @@
 #include <stan/services/util/run_sampler.hpp>
 #include <stan/services/util/rng.hpp>
 #include <stan/services/util/initialize.hpp>
+#include <vector>
 
 namespace stan {
   namespace services {
@@ -29,18 +30,23 @@ namespace stan {
                           double stepsize,
                           double stepsize_jitter,
                           int max_depth,
-                          interface_callbacks::interrupt::base_interrupt& interrupt,
-                          interface_callbacks::writer::base_writer& message_writer,
-                          interface_callbacks::writer::base_writer& error_writer,
-                          interface_callbacks::writer::base_writer& sample_writer,
-                          interface_callbacks::writer::base_writer& diagnostic_writer) {
+                          interface_callbacks::interrupt::base_interrupt&
+                          interrupt,
+                          interface_callbacks::writer::base_writer&
+                          message_writer,
+                          interface_callbacks::writer::base_writer&
+                          error_writer,
+                          interface_callbacks::writer::base_writer&
+                          sample_writer,
+                          interface_callbacks::writer::base_writer&
+                          diagnostic_writer) {
         boost::ecuyer1988 rng = stan::services::util::rng(random_seed, chain);
 
         std::vector<int> disc_vector;
-        std::vector<double> cont_vector;
-        cont_vector = stan::services::util::initialize(model, init, rng, init_radius,
-                                                       message_writer);
-        
+        std::vector<double> cont_vector
+          = stan::services::util::initialize(model, init, rng, init_radius,
+                                             message_writer);
+
         stan::mcmc::diag_e_nuts<Model, boost::ecuyer1988> sampler(model, rng);
         sampler.set_nominal_stepsize(stepsize);
         sampler.set_stepsize_jitter(stepsize_jitter);
@@ -51,7 +57,7 @@ namespace stan {
                                           num_warmup, num_samples, num_thin,
                                           refresh, save_warmup, rng,
                                           interrupt,
-                                          message_writer, error_writer, 
+                                          message_writer, error_writer,
                                           sample_writer, diagnostic_writer);
 
         return stan::services::error_codes::OK;

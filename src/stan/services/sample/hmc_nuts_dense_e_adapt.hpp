@@ -10,6 +10,7 @@
 #include <stan/services/util/run_adaptive_sampler.hpp>
 #include <stan/services/util/rng.hpp>
 #include <stan/services/util/initialize.hpp>
+#include <vector>
 
 namespace stan {
   namespace services {
@@ -59,19 +60,25 @@ namespace stan {
                                  unsigned int init_buffer,
                                  unsigned int term_buffer,
                                  unsigned int window,
-                                 interface_callbacks::interrupt::base_interrupt& interrupt,
-                                 interface_callbacks::writer::base_writer& message_writer,
-                                 interface_callbacks::writer::base_writer& error_writer,
-                                 interface_callbacks::writer::base_writer& sample_writer,
-                                 interface_callbacks::writer::base_writer& diagnostic_writer) {
+                                 interface_callbacks::interrupt::base_interrupt&
+                                 interrupt,
+                                 interface_callbacks::writer::base_writer&
+                                 message_writer,
+                                 interface_callbacks::writer::base_writer&
+                                 error_writer,
+                                 interface_callbacks::writer::base_writer&
+                                 sample_writer,
+                                 interface_callbacks::writer::base_writer&
+                                 diagnostic_writer) {
         boost::ecuyer1988 rng = stan::services::util::rng(random_seed, chain);
 
         std::vector<int> disc_vector;
-        std::vector<double> cont_vector;
-        cont_vector = stan::services::util::initialize(model, init, rng, init_radius,
-                                                       message_writer);
-        
-        stan::mcmc::adapt_dense_e_nuts<Model, boost::ecuyer1988> sampler(model, rng);
+        std::vector<double> cont_vector
+          = stan::services::util::initialize(model, init, rng, init_radius,
+                                             message_writer);
+
+        stan::mcmc::adapt_dense_e_nuts<Model, boost::ecuyer1988>
+          sampler(model, rng);
         sampler.set_nominal_stepsize(stepsize);
         sampler.set_stepsize_jitter(stepsize_jitter);
         sampler.set_max_depth(max_depth);
@@ -85,14 +92,16 @@ namespace stan {
 
         sampler.set_window_params(num_warmup, init_buffer, term_buffer,
                                   window, message_writer);
-        
+
         stan::services::util::run_adaptive_sampler(sampler, model,
                                                    cont_vector,
-                                                   num_warmup, num_samples, num_thin,
+                                                   num_warmup, num_samples,
+                                                   num_thin,
                                                    refresh, save_warmup, rng,
                                                    interrupt,
-                                                   message_writer, error_writer, 
-                                                   sample_writer, diagnostic_writer);
+                                                   message_writer, error_writer,
+                                                   sample_writer,
+                                                   diagnostic_writer);
 
         return stan::services::error_codes::OK;
       }

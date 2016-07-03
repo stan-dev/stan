@@ -51,15 +51,15 @@ namespace stan {
         boost::ecuyer1988 rng = stan::services::util::rng(random_seed, chain);
 
         std::vector<int> disc_vector;
-        std::vector<double> cont_vector;
-        cont_vector = stan::services::util::initialize(model, init, rng, init_radius,
-                                                       message_writer);
+        std::vector<double> cont_vector
+          = stan::services::util::initialize(model, init, rng, init_radius,
+                                             message_writer);
 
         message_writer("TEST GRADIENT MODE");
 
         stan::interface_callbacks::writer::chained_writer
           writer(message_writer, parameter_writer);
-        
+
         int num_failed =
           stan::model::test_gradients<true, true>(model,
                                                   cont_vector, disc_vector,

@@ -62,7 +62,7 @@ namespace stan {
          * @sideeffects sample_stream_ is written to with comma separated values
          *   with a newline at the end
          */
-        template <class Model>        
+        template <class Model>
         void write_sample_names(stan::mcmc::sample& sample,
                                 stan::mcmc::base_mcmc& sampler,
                                 Model& model) {
