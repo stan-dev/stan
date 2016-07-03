@@ -75,7 +75,7 @@ public:
 
   mock_sampler* sampler;
   stan_model* model;
-  stan::services::sample::mcmc_writer<stan_model>* writer;
+  stan::services::sample::mcmc_writer* writer;
   rng_t base_rng;
 
   Eigen::VectorXd q;
