@@ -522,42 +522,17 @@ The step function is often used in BUGS to perform conditional
 operations.  For instance, \code{step(a\,-\,b)} evaluates to 1 if
 \code{a} is greater than {b} and evaluates to 0 otherwise.  In Stan,
 the expression \code{step(a\,-\,b)} is more naturally coded directly
-in terms of the comparison operator, \code{(a\,>\,b)}.  
+in terms of the comparison operator, \code{(a\,>\,b)},
+which can be used with the conditional operator
+for efficient evaluation of the 
+log probability function and gradient:
+%
+\begin{stancode}
+y = a>b?x1:x2;
+\end{stancode}
+%
 
-The log probability function and gradient evaluations are more
-efficient in Stan when implemented using conditional statements than
-with mulitplications by step functions.  For example, if \code{y} is a
-\code{real} variable, and \code{c}, \code{x1}, and \code{x2} are
-scalar expressions (type \code{real} or \code{int}), then the
-assignment statements
-%
-\begin{stancode}
-y = x1 * step(c) + x2 * (1 - step(c));
-\end{stancode}
-%
-and
-%
-\begin{stancode}
-y = if_else(c > 0, x1, x2);
-\end{stancode}
-%
-are more efficiently written with the conditional statement
-%
-\begin{stancode}
-if (c > 0)
-  y = x1;
-else
-  y = x2;
-\end{stancode}
-%
-The reason the functional versions are slower is that they evaluate
-all of their arguments; the step function approach is particularly
-slow as it also introduces arithmetic operations.  The overhead will
-be more noticeable if \code{c}, \code{x1} or \code{x2}
-are parameters (including transformed parameters and local variables
-that depend on parameters) or if \code{x1} and \code{x2} are
-complicated expressions rather than constants or simple variables.  
-%
+
 \begin{description}
   %
   \fitem{int}{is\_inf}{real \farg{x}}{
