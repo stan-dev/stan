@@ -1,5 +1,5 @@
 #ifndef STAN_MCMC_HMC_NUTS_DIAG_E_XHMC_HPP
-#define STAN_MCMC_HMC_NUTS_DIAG_E_NUTS_HPP_E_XHMC_HPP
+#define STAN_MCMC_HMC_NUTS_DIAG_E_XHMC_HPP
 
 #include <stan/mcmc/hmc/xhmc/base_xhmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/diag_e_point.hpp>
