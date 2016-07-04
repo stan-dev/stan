@@ -484,24 +484,6 @@ are primarily provided for compatibility with BUGS and JAGS.
 %
 \begin{description}
   %
-  \fitem{real}{if\_else}{int \farg{cond}, real \farg{x}, real \farg{y}}{
-    Returns \farg{x} if \farg{cond} is non-zero and \farg{y} otherwise.
-    Stan's \code{if\_else} function does not short circuit---it
-    always evaluates both arguments \farg{x} and \farg{y}.
-    \[
-    \mbox{if\_else}(cond,x,y) = 
-    \begin{cases}
-      x & \mbox{if } cond \neq 0 \\
-      y & \mbox{otherwise}
-    \end{cases}
-    \]
-    {\bfseries Warning:} This function should not be used.  Rather,
-    \code{if\_else(a,~b,~c)} should be replaced with the conditional
-    operator \code{a~?~b~:~c}.  The conditional operator also allows
-    more flexiblity in the types of \code{b} and \code{c}.  See
-    \refsection{conditional-operator} for full details of the
-    conditional operator.  }
-  %
   \fitem{real}{step}{real \farg{x}}{
     Returns 1 if \farg{x} is positive and 0 otherwise.
     \[
@@ -514,23 +496,12 @@ are primarily provided for compatibility with BUGS and JAGS.
   %
 \end{description}
 %
-Both of these are step-like functions; see the warning in
-\refsection{step-functions} applied to expressions dependent on
-parameters. 
-
 The step function is often used in BUGS to perform conditional
 operations.  For instance, \code{step(a\,-\,b)} evaluates to 1 if
-\code{a} is greater than {b} and evaluates to 0 otherwise.  In Stan,
-the expression \code{step(a\,-\,b)} is more naturally coded directly
-in terms of the comparison operator, \code{(a\,>\,b)},
-which can be used with the conditional operator
-for efficient evaluation of the 
-log probability function and gradient:
-%
-\begin{stancode}
-y = a>b?x1:x2;
-\end{stancode}
-%
+\code{a} is greater than \code{b} and evaluates to 0 otherwise.
+\code{step} is a step-like functions; see the warning in
+\refsection{step-functions} applied to expressions dependent on
+parameters. 
 
 
 \begin{description}
