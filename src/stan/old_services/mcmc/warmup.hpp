@@ -3,7 +3,7 @@
 
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/interface_callbacks/interrupt/base_interrupt.hpp>
-#include <stan/services/sample/mcmc_writer.hpp>
+#include <stan/services/util/mcmc_writer.hpp>
 #include <stan/services/util/generate_transitions.hpp>
 #include <string>
 

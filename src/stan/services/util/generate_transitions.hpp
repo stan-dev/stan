@@ -4,7 +4,7 @@
 #include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/interface_callbacks/interrupt/base_interrupt.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
-#include <stan/services/sample/mcmc_writer.hpp>
+#include <stan/services/util/mcmc_writer.hpp>
 #include <stan/old_services/sample/progress.hpp>
 #include <string>
 
