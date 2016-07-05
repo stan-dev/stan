@@ -1,4 +1,4 @@
-#include <stan/old_services/sample/mcmc_writer.hpp>
+#include <stan/services/sample/mcmc_writer.hpp>
 #include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <stan/interface_callbacks/writer/noop_writer.hpp>
 #include <test/test-models/good/io_example.hpp>

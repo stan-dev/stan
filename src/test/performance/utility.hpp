@@ -17,7 +17,7 @@
 #include <stan/io/json/json_error.hpp>
 #include <stan/io/json/json_handler.hpp>
 #include <stan/io/json/json_parser.hpp>
-#include <stan/old_services/sample/mcmc_writer.hpp>
+#include <stan/services/sample/mcmc_writer.hpp>
 
 #include <stan/old_services/arguments/arg_adapt.hpp>
 #include <stan/old_services/arguments/arg_adapt_delta.hpp>
