@@ -6,7 +6,7 @@
 #include <boost/random/uniform_real_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <stan/model/util.hpp>
-#include <stan/old_services/error_codes.hpp>
+#include <stan/services/error_codes.hpp>
 #include <stan/io/array_var_context.hpp>
 #include <stan/io/chained_var_context.hpp>
 #include <stan/interface_callbacks/var_context_factory/var_context_factory.hpp>

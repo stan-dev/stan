@@ -4,7 +4,7 @@
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/interface_callbacks/interrupt/base_interrupt.hpp>
 #include <stan/mcmc/fixed_param_sampler.hpp>
-#include <stan/old_services/error_codes.hpp>
+#include <stan/services/error_codes.hpp>
 #include <stan/services/util/mcmc_writer.hpp>
 #include <stan/services/util/generate_transitions.hpp>
 #include <stan/services/util/rng.hpp>

@@ -7,7 +7,7 @@
 #include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/model/util.hpp>
 #include <stan/optimization/bfgs.hpp>
-#include <stan/old_services/error_codes.hpp>
+#include <stan/services/error_codes.hpp>
 #include <stan/services/util/initialize.hpp>
 #include <stan/services/util/rng.hpp>
 #include <fstream>

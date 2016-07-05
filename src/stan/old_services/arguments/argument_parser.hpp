@@ -3,7 +3,7 @@
 
 #include <stan/old_services/arguments/argument.hpp>
 #include <stan/old_services/arguments/arg_method.hpp>
-#include <stan/old_services/error_codes.hpp>
+#include <stan/services/error_codes.hpp>
 #include <cstring>
 #include <string>
 #include <vector>

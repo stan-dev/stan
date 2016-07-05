@@ -7,7 +7,7 @@
 #include <stan/io/dump.hpp>
 #include <stan/model/util.hpp>
 #include <stan/old_services/io/write_iteration.hpp>
-#include <stan/old_services/error_codes.hpp>
+#include <stan/services/error_codes.hpp>
 #include <stan/old_services/variational/print_progress.hpp>
 #include <stan/variational/families/normal_fullrank.hpp>
 #include <stan/variational/families/normal_meanfield.hpp>

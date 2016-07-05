@@ -3,7 +3,7 @@
 
 #include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/optimization/bfgs.hpp>
-#include <stan/old_services/error_codes.hpp>
+#include <stan/services/error_codes.hpp>
 #include <stan/old_services/io/do_print.hpp>
 #include <stan/old_services/io/write_iteration.hpp>
 #include <fstream>

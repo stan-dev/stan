@@ -5,7 +5,7 @@
 #include <stan/interface_callbacks/interrupt/base_interrupt.hpp>
 #include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/fixed_param_sampler.hpp>
-#include <stan/old_services/error_codes.hpp>
+#include <stan/services/error_codes.hpp>
 #include <stan/mcmc/hmc/static/adapt_unit_e_static_hmc.hpp>
 #include <stan/services/util/run_adaptive_sampler.hpp>
 #include <stan/services/util/rng.hpp>
