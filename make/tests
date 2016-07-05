@@ -153,7 +153,7 @@ src/test/unit/old_services/io/write_iteration_test.cpp: src/test/test-models/goo
 src/test/unit/old_services/mcmc/sample_test.cpp: src/test/test-models/good/services/test_lp.hpp
 src/test/unit/old_services/mcmc/warmup_test.cpp: src/test/test-models/good/services/test_lp.hpp
 src/test/unit/old_services/optimize/do_bfgs_optimize_test.cpp: src/test/test-models/good/optimization/rosenbrock.hpp
-src/test/unit/old_services/diagnose/diagnose_test.cpp : src/test/test-models/good/services/test_lp.hpp
+src/test/unit/services/diagnose/diagnose_test.cpp : src/test/test-models/good/services/test_lp.hpp
 src/test/unit/services/optimize/bfgs_test.cpp \
 src/test/unit/services/optimize/lbfgs_test.cpp \
 src/test/unit/services/optimize/newton_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
