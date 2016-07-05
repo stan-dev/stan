@@ -5,7 +5,6 @@
 #include <stan/interface_callbacks/interrupt/base_interrupt.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/services/util/mcmc_writer.hpp>
-#include <stan/old_services/sample/progress.hpp>
 #include <string>
 
 namespace stan {
@@ -38,8 +37,20 @@ namespace stan {
           if (refresh > 0
               && (start + m + 1 == finish
                   || m == 0
-                  || (m + 1) % refresh == 0))
-            info_writer(sample::progress(m, start, finish, refresh, warmup));
+                  || (m + 1) % refresh == 0)) {
+            int it_print_width
+              = std::ceil(std::log10(static_cast<double>(finish)));
+            std::stringstream message;
+            message << "Iteration: ";
+            message << std::setw(it_print_width) << m + 1 + start
+                    << " / " << finish;
+            message << " [" << std::setw(3)
+                    << static_cast<int>( (100.0 * (start + m + 1)) / finish )
+                    << "%] ";
+            message << (warmup ? " (Warmup)" : " (Sampling)");
+
+            info_writer(message.str());
+          }
 
           init_s = sampler.transition(init_s, info_writer, error_writer);
 
