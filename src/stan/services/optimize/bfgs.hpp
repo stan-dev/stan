@@ -16,7 +16,6 @@
 #include <string>
 #include <vector>
 
-
 namespace stan {
   namespace services {
     namespace optimize {
@@ -25,8 +24,9 @@ namespace stan {
        * Runs the BFGS algorithm for a model.
        *
        * @tparam Model A model implementation
+       * @tparam Interrupt type of interrupt
        *
-       * @param[in] model the Stan model instantiated with data
+       * @param model Input model to test (with data already instantiated)
        * @param init var context for initialization
        * @param random_seed random seed for the pseudo random number generator
        * @param chain chain id to advance the pseudo random number generator
@@ -36,6 +36,7 @@ namespace stan {
        * @param[in] tol_rel_obj
        * @param[in] tol_grad
        * @param[in] tol_rel_grad
+       * @param[in] tol_param
        * @param[in] num_iterations maximum number of iterations
        * @param[in] save_iterations indicates whether all the interations should
        *   be saved to the parameter_writer
@@ -43,6 +44,7 @@ namespace stan {
        * @param[out] interrupt interrupt callback to be called every iteration
        * @param[out] message_writer output for messages
        * @param[out] parameter_writer output for parameter values
+       *
        * @return stan::services::error_codes::OK (0) if successful
        */
       template <class Model, typename Interrupt>

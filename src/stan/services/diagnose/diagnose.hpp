@@ -28,8 +28,8 @@ namespace stan {
        * @param model Input model to test (with data already instantiated)
        * @param init var context for initialization
        * @param random_seed random seed for the pseudo random number generator
-       * @param init_radius radius to initialize
        * @param chain chain id to advance the pseudo random number generator
+       * @param init_radius radius to initialize
        * @param epsilon epsilon to use for finite differences
        * @param error amount of absolute error to allow
        * @param message_writer Writer callback for display output

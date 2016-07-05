@@ -25,17 +25,20 @@ namespace stan {
        * Runs the L-BFGS algorithm for a model.
        *
        * @tparam Model A model implementation
+       * @tparam Interrupt type of interrupt
        *
-       * @param[in] model the Stan model instantiated with data
+       * @param model Input model to test (with data already instantiated)
        * @param init var context for initialization
        * @param random_seed random seed for the pseudo random number generator
        * @param chain chain id to advance the pseudo random number generator
        * @param init_radius radius to initialize
+       * @param[in] history_size
        * @param[in] init_alpha
        * @param[in] tol_obj
        * @param[in] tol_rel_obj
        * @param[in] tol_grad
        * @param[in] tol_rel_grad
+       * @param[in] tol_param
        * @param[in] num_iterations maximum number of iterations
        * @param[in] save_iterations indicates whether all the interations should
        *   be saved to the parameter_writer

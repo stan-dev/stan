@@ -21,10 +21,12 @@ namespace stan {
        * metric without adapatation.
        *
        * @tparam Model Model class
-       * @tparam rng_t Random number generator class
-       * @param model Instance of model
-       * @param base_rng Instance of random number generator
-       * @param cont_params Initial value
+       *
+       * @param model Input model to test (with data already instantiated)
+       * @param init var context for initialization
+       * @param random_seed random seed for the pseudo random number generator
+       * @param chain chain id to advance the pseudo random number generator
+       * @param init_radius radius to initialize
        * @param num_warmup Number of warmup samples
        * @param num_samples Number of samples
        * @param num_thin Number to thin the samples
@@ -34,9 +36,10 @@ namespace stan {
        * @param stepsize_jitter uniform random jitter of stepsize
        * @param max_depth Maximum tree depth
        * @param interrupt Callback for interrupts
+       * @param message_writer Writer for messages
+       * @param error_writer Writer for messages
        * @param sample_writer Writer for draws
        * @param diagnostic_writer Writer for diagnostic information
-       * @param message_writer Writer for messages
        * @return error code; 0 if no error
        */
       template <class Model>
