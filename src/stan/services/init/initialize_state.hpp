@@ -134,7 +134,6 @@ namespace stan {
                                 init_grad, writer);
         } catch (const std::exception& e) {
           io::write_error_msg(writer, e);
-          writer();
           writer("Rejecting initial value:");
           writer("  Error evaluating the log probability "
                  "at the initial value.");

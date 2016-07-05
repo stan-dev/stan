@@ -437,17 +437,12 @@ namespace stan {
       try {
         stan::math::gradient(model_functional<M>(model, &ss), x, f, grad_f);
       } catch (std::exception& e) {
-        std::string msg = ss.str();
-        if (msg.length() > 1)
-          writer(msg.substr(0, msg.length() - 1));
+        if (ss.str().length() > 0)
+          writer(ss.str());
         throw;
       }
-      // FIXME(DL): remove blank line at the end of the gradient call
-      //            this assumes the last character is a newline
-      //            this matches the v2.8.0 behavior
-      std::string msg = ss.str();
-      if (msg.length() > 1)
-        writer(msg.substr(0, msg.length() - 1));
+        if (ss.str().length() > 0)
+          writer(ss.str());
     }
 
     template <class M>
