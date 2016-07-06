@@ -441,8 +441,8 @@ namespace stan {
           writer(ss.str());
         throw;
       }
-        if (ss.str().length() > 0)
-          writer(ss.str());
+      if (ss.str().length() > 0)
+        writer(ss.str());
     }
 
     template <class M>
