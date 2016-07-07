@@ -35,26 +35,28 @@ namespace stan {
        *   be saved
        * @param[out] interrupt interrupt callback to be called every iteration
        * @param[out] message_writer output for messages
+       * @param[out] init_writer Writer callback for unconstrained inits
        * @param[out] parameter_writer output for parameter values
        * @return stan::services::error_codes::OK (0) if successful
        */
       template <class Model, typename Interrupt>
       int newton(Model& model,
-                stan::io::var_context& init,
-                unsigned int random_seed,
-                unsigned int chain,
-                double init_radius,
-                int num_iterations,
-                bool save_iterations,
-                Interrupt& interrupt,
-                interface_callbacks::writer::base_writer& message_writer,
-                interface_callbacks::writer::base_writer& parameter_writer) {
+                 stan::io::var_context& init,
+                 unsigned int random_seed,
+                 unsigned int chain,
+                 double init_radius,
+                 int num_iterations,
+                 bool save_iterations,
+                 Interrupt& interrupt,
+                 interface_callbacks::writer::base_writer& message_writer,
+                 interface_callbacks::writer::base_writer& init_writer,
+                 interface_callbacks::writer::base_writer& parameter_writer) {
         boost::ecuyer1988 rng = stan::services::util::rng(random_seed, chain);
 
         std::vector<int> disc_vector;
         std::vector<double> cont_vector
           = stan::services::util::initialize(model, init, rng, init_radius,
-                                             message_writer);
+                                             message_writer, init_writer);
 
         std::stringstream message;
 

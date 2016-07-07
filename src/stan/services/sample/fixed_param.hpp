@@ -26,6 +26,8 @@ namespace stan {
                       int refresh,
                       interface_callbacks::interrupt::base_interrupt& interrupt,
                       interface_callbacks::writer::base_writer& message_writer,
+                      interface_callbacks::writer::base_writer&
+                      init_writer,
                       interface_callbacks::writer::base_writer& error_writer,
                       interface_callbacks::writer::base_writer& sample_writer,
                       interface_callbacks::writer::base_writer&
@@ -35,7 +37,7 @@ namespace stan {
         std::vector<int> disc_vector;
         std::vector<double> cont_vector
           = stan::services::util::initialize(model, init, rng, init_radius,
-                                             message_writer);
+                                             message_writer, init_writer);
 
         stan::mcmc::fixed_param_sampler sampler;
         stan::services::sample::mcmc_writer

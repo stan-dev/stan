@@ -45,6 +45,7 @@ namespace stan {
        * @param interrupt Callback for interrupts
        * @param message_writer Writer for messages
        * @param error_writer Writer for errors
+       * @param init_writer Writer callback for unconstrained inits
        * @param sample_writer Writer for draws
        * @param diagnostic_writer Writer for diagnostic information
        * @return error code; 0 if no error
@@ -77,6 +78,8 @@ namespace stan {
                                  interface_callbacks::writer::base_writer&
                                  error_writer,
                                  interface_callbacks::writer::base_writer&
+                                 init_writer,
+                                 interface_callbacks::writer::base_writer&
                                  sample_writer,
                                  interface_callbacks::writer::base_writer&
                                  diagnostic_writer) {
@@ -85,7 +88,7 @@ namespace stan {
         std::vector<int> disc_vector;
         std::vector<double> cont_vector
           = stan::services::util::initialize(model, init, rng, init_radius,
-                                             message_writer);
+                                             message_writer, init_writer);
 
         stan::mcmc::adapt_dense_e_nuts<Model, boost::ecuyer1988>
           sampler(model, rng);

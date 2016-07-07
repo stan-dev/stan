@@ -32,8 +32,12 @@ namespace stan {
                      int eval_elbo,
                      int output_samples,
                      Interrupt& interrupt,
-                     interface_callbacks::writer::base_writer& message_writer,
-                     interface_callbacks::writer::base_writer& parameter_writer,
+                     interface_callbacks::writer::base_writer&
+                     message_writer,
+                     interface_callbacks::writer::base_writer&
+                     init_writer,
+                     interface_callbacks::writer::base_writer&
+                     parameter_writer,
                      interface_callbacks::writer::base_writer&
                      diagnostic_writer) {
           stan::services::util::experimental_message(message_writer);
@@ -43,7 +47,7 @@ namespace stan {
           std::vector<int> disc_vector;
           std::vector<double> cont_vector
             = stan::services::util::initialize(model, init, rng, init_radius,
-                                               message_writer);
+                                               message_writer, init_writer);
 
 
           std::vector<std::string> names;

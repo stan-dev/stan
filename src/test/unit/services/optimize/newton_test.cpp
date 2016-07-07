@@ -49,11 +49,12 @@ class ServicesOptimizeNewton : public testing::Test {
 public:
   ServicesOptimizeNewton()
     : message(message_ss),
+      init(init_ss),
       parameter(parameter_ss),
       model(context, &model_ss) {}
 
-  std::stringstream message_ss, parameter_ss, model_ss;
-  stan::interface_callbacks::writer::stream_writer message;//, parameter;
+  std::stringstream message_ss, init_ss, parameter_ss, model_ss;
+  stan::interface_callbacks::writer::stream_writer message, init;
   values parameter;
   stan::io::empty_var_context context;
   stan_model model;
@@ -73,7 +74,8 @@ TEST_F(ServicesOptimizeNewton, rosenbrock) {
                                                      seed, chain, init_radius,
                                                      num_interations, save_iterations,
                                                      callback,
-                                                     message, 
+                                                     message,
+                                                     init,
                                                      parameter);
 
   EXPECT_EQ(0, return_code);
@@ -112,13 +114,16 @@ TEST_F(ServicesOptimizeNewton, rosenbrock_no_save_iterations) {
                                                      seed, chain, init_radius,
                                                      num_interations, save_iterations,
                                                      callback,
-                                                     message, 
+                                                     message,
+                                                     init,
                                                      parameter);
 
   EXPECT_EQ(0, return_code);
   EXPECT_TRUE(callback.n > 1);
   EXPECT_TRUE(message_ss.str().find("Initial log joint probability = -1") != std::string::npos);
   EXPECT_TRUE(message_ss.str().find("Iteration  1. Log joint probability =") != std::string::npos);
+
+  EXPECT_EQ("0,0\n", init_ss.str());
   
   ASSERT_EQ(3, parameter.names_.size());
   EXPECT_EQ("lp__", parameter.names_[0]);

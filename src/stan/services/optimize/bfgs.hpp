@@ -43,6 +43,7 @@ namespace stan {
        * @param[in] refresh how often to write output to message_writer
        * @param[out] interrupt interrupt callback to be called every iteration
        * @param[out] message_writer output for messages
+       * @param[out] init_writer Writer callback for unconstrained inits
        * @param[out] parameter_writer output for parameter values
        *
        * @return stan::services::error_codes::OK (0) if successful
@@ -64,13 +65,14 @@ namespace stan {
                int refresh,
                Interrupt& interrupt,
                interface_callbacks::writer::base_writer& message_writer,
+               interface_callbacks::writer::base_writer& init_writer,               
                interface_callbacks::writer::base_writer& parameter_writer) {
         boost::ecuyer1988 rng = stan::services::util::rng(random_seed, chain);
 
         std::vector<int> disc_vector;
         std::vector<double> cont_vector
           = stan::services::util::initialize(model, init, rng, init_radius,
-                                             message_writer);
+                                             message_writer, init_writer);
 
         std::stringstream bfgs_ss;
         typedef stan::optimization::BFGSLineSearch

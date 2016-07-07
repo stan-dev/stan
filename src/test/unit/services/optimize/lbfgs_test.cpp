@@ -49,11 +49,12 @@ class ServicesOptimizeLbfgs : public testing::Test {
 public:
   ServicesOptimizeLbfgs()
     : message(message_ss),
+      init(init_ss),
       parameter(parameter_ss),
       model(context, &model_ss) {}
 
-  std::stringstream message_ss, parameter_ss, model_ss;
-  stan::interface_callbacks::writer::stream_writer message;//, parameter;
+  std::stringstream message_ss, init_ss, parameter_ss, model_ss;
+  stan::interface_callbacks::writer::stream_writer message, init;
   values parameter;
   stan::io::empty_var_context context;
   stan_model model;
@@ -81,11 +82,14 @@ TEST_F(ServicesOptimizeLbfgs, rosenbrock) {
                                                     2000,
                                                     save_iterations, refresh,
                                                     callback,
-                                                    message, 
+                                                    message,
+                                                    init,
                                                     parameter);
 
   EXPECT_EQ("Initial log joint probability = -1\nOptimization terminated normally: \n  Convergence detected: relative gradient magnitude is below tolerance\n", message_ss.str());
 
+  EXPECT_EQ("0,0\n", init_ss.str());
+  
   ASSERT_EQ(3, parameter.names_.size());
   EXPECT_EQ("lp__", parameter.names_[0]);
   EXPECT_EQ("x", parameter.names_[1]);

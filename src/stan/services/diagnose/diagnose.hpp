@@ -33,6 +33,7 @@ namespace stan {
        * @param epsilon epsilon to use for finite differences
        * @param error amount of absolute error to allow
        * @param message_writer Writer callback for display output
+       * @param init_writer Writer callback for unconstrained inits
        * @param parameter_writer Writer callback for file output
        *
        * @return the number of parameters that are not within epsilon
@@ -47,13 +48,14 @@ namespace stan {
                    double epsilon,
                    double error,
                    interface_callbacks::writer::base_writer& message_writer,
+                   interface_callbacks::writer::base_writer& init_writer,
                    interface_callbacks::writer::base_writer& parameter_writer) {
         boost::ecuyer1988 rng = stan::services::util::rng(random_seed, chain);
 
         std::vector<int> disc_vector;
         std::vector<double> cont_vector
           = stan::services::util::initialize(model, init, rng, init_radius,
-                                             message_writer);
+                                             message_writer, init_writer);
 
         message_writer("TEST GRADIENT MODE");
 
