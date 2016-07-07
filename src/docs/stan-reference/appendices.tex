@@ -1254,6 +1254,24 @@ transform would use Cholesky factors rather than full correlation
 matrix types.
 \end{description}
 
+\section{\code{if\_else} Function}
+
+\begin{description}
+\item[Deprecated]The function \code{if\_else} is deprecated.  This function takes three arguments
+\code{a}, \code{b}, and \code{c}, where \code{a} is an \code{int} value and \code{b} and \code{c}
+are scalars. It returns \code{b} if \code{a} is non-zero and \code{c} otherwise.
+%
+\item[Replacement] Use the conditional operator which allows more flexiblity in the types of \code{b} and \code{c}.  See
+    \refsection{conditional-operator} for full details of the conditional operator.
+    Replace
+\begin{stancode}
+x = if_else(a,b,c);
+\end{stancode}
+ with
+\begin{stancode}
+x = a ? b : c;
+\end{stancode}
+\end{description}
 
 \chapter{Mathematical Functions}\label{math-functions.appendix}
 
