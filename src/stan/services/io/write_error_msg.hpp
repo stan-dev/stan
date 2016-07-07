@@ -17,7 +17,6 @@ namespace stan {
        */
       void write_error_msg(interface_callbacks::writer::base_writer& writer,
                            const std::exception& e) {
-        writer();
         writer("Informational Message: The current Metropolis"
                " proposal is about to be rejected because of"
                " the following issue:");
@@ -28,6 +27,7 @@ namespace stan {
         writer("but if this warning occurs often then your model"
                " may be either severely ill-conditioned or"
                " misspecified.");
+        writer();
       }
 
     }

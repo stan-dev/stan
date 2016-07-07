@@ -434,13 +434,15 @@ namespace stan {
                   Eigen::Matrix<double, Eigen::Dynamic, 1>& grad_f,
                   stan::interface_callbacks::writer::base_writer& writer) {
       std::stringstream ss;
-      stan::math::gradient(model_functional<M>(model, &ss), x, f, grad_f);
-      // FIXME(DL): remove blank line at the end of the gradient call
-      //            this assumes the last character is a newline
-      //            this matches the v2.8.0 behavior
-      std::string msg = ss.str();
-      if (msg.length() > 1)
-        writer(msg.substr(0, msg.length() - 1));
+      try {
+        stan::math::gradient(model_functional<M>(model, &ss), x, f, grad_f);
+      } catch (std::exception& e) {
+        if (ss.str().length() > 0)
+          writer(ss.str());
+        throw;
+      }
+      if (ss.str().length() > 0)
+        writer(ss.str());
     }
 
     template <class M>
