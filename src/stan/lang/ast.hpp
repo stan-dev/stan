@@ -52,6 +52,7 @@ namespace stan {
     struct simplex_var_decl;
     struct integrate_ode;
     struct integrate_ode_control;
+    struct generalCptModel_control;
     struct unit_vector_var_decl;
     struct statement;
     struct statements;
@@ -230,6 +231,7 @@ namespace stan {
       expr_type operator()(const fun& e) const;
       expr_type operator()(const integrate_ode& e) const;
       expr_type operator()(const integrate_ode_control& e) const;
+      expr_type operator()(const generalCptModel_control& e) const;
       expr_type operator()(const index_op& e) const;
       expr_type operator()(const index_op_sliced& e) const;
       expr_type operator()(const conditional_op& e) const;
@@ -248,6 +250,7 @@ namespace stan {
                              boost::recursive_wrapper<variable>,
                              boost::recursive_wrapper<integrate_ode>,
                              boost::recursive_wrapper<integrate_ode_control>,
+                             boost::recursive_wrapper<generalCptModel_control>
                              boost::recursive_wrapper<fun>,
                              boost::recursive_wrapper<index_op>,
                              boost::recursive_wrapper<index_op_sliced>,
@@ -268,6 +271,7 @@ namespace stan {
       expression(const fun& expr);  // NOLINT(runtime/explicit)
       expression(const integrate_ode& expr);  // NOLINT(runtime/explicit)
       expression(const integrate_ode_control& expr);  // NOLINT
+      expression(const generalCptModel_control& expr);
       expression(const index_op& expr);  // NOLINT(runtime/explicit)
       expression(const index_op_sliced& expr);  // NOLINT(runtime/explicit)
       expression(const conditional_op& expr);  // NOLINT(runtime/explicit)
@@ -309,6 +313,7 @@ namespace stan {
       bool operator()(const variable& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const integrate_ode& x) const;  // NOLINT
       bool operator()(const integrate_ode_control& x) const;  // NOLINT
+      bool operator()(const generalCptModel_control& x) const;
       bool operator()(const fun& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const index_op& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const index_op_sliced& x) const;  // NOLINT
@@ -408,6 +413,40 @@ namespace stan {
                             const expression& abs_tol,
                             const expression& max_num_steps);
     };
+    
+    struct generalCptModel_control {
+      std::string integration_function_name_;
+      std::string system_function_name_;
+      expression nCmt_; // number of compartments
+      expression pMatrix_; // matrix of parameters
+      expression time_; // time vector
+      expression amt_; // amount vector
+      expression rate_; // rate vector
+      expression ii_; // inter-dose interval vector
+      expression evid_; // event-type vector
+      expression cmt_; // compartment number vector
+      expression addl_; // additional dosing vector
+      expression ss_; // steady state vector
+      expression rel_tol_; // relative tolerance of cvode solver
+      expression abs_tol_; // absolute tolerance of cvode solver
+      expression max_num_steps_; // maximum number of steps of cvode solver
+      generalCptModel_control();
+      generalCptModel_control(const std::string& integration_function_name,
+                              const std::string& system_function_name,
+                              const expression& nCmt,
+                              const expression& pMatrix,
+                              const expression& time,
+                              const expression& amt,
+                              const expression& rate,
+                              const expression& ii,
+                              const expression& evid,
+                              const expression& cmt,
+                              const expression& addl,
+                              const expression& ss,
+                              const expression& rel_tol,
+                              const expression& abs_tol,
+                              const expression& max_num_steps);
+      };
 
     struct fun {
       std::string name_;
@@ -1008,6 +1047,7 @@ namespace stan {
       bool operator()(const fun& e) const;
       bool operator()(const integrate_ode& e) const;
       bool operator()(const integrate_ode_control& e) const;
+      bool operator()(const generalCptModel_control& e) const;
       bool operator()(const index_op& e) const;
       bool operator()(const index_op_sliced& e) const;
       bool operator()(const conditional_op& e) const;
@@ -1062,6 +1102,7 @@ namespace stan {
       bool operator()(const variable& e) const;
       bool operator()(const integrate_ode& e) const;
       bool operator()(const integrate_ode_control& e) const;
+      bool operator()(const generalCptModel_control& e) const;
       bool operator()(const fun& e) const;
       bool operator()(const index_op& e) const;
       bool operator()(const index_op_sliced& e) const;
@@ -1084,6 +1125,7 @@ namespace stan {
       bool operator()(const variable& e) const;
       bool operator()(const integrate_ode& e) const;
       bool operator()(const integrate_ode_control& e) const;
+      bool operator()(const generalCptModel_control& e) const;i
       bool operator()(const fun& e) const;
       bool operator()(const index_op& e) const;
       bool operator()(const index_op_sliced& e) const;
