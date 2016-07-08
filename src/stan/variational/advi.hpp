@@ -513,11 +513,16 @@ namespace stan {
         for (int i = 0; i < cont_params_.size(); ++i)
           cont_vector.at(i) = cont_params_(i);
         std::vector<int> disc_vector;
+        std::vector<double> values;
 
-        services::io::write_iteration(model_, rng_,
-                                      0, cont_vector, disc_vector,
-                                      message_writer,
-                                      parameter_writer);
+        std::stringstream msg;
+        model_.write_array(rng_, cont_vector, disc_vector, values,
+                           true, true, &msg);
+        if (msg.str().length() > 0)
+          message_writer(msg.str());
+        values.insert(values.begin(), 0);
+        parameter_writer(values);
+
         // Draw more samples from posterior and write on subsequent lines
         message_writer();
         std::stringstream ss;
@@ -531,10 +536,13 @@ namespace stan {
           for (int i = 0; i < cont_params_.size(); ++i) {
             cont_vector.at(i) = cont_params_(i);
           }
-          services::io::write_iteration(model_, rng_,
-                                        0, cont_vector, disc_vector,
-                                        message_writer,
-                                        parameter_writer);
+          msg.str("");
+          model_.write_array(rng_, cont_vector, disc_vector, values,
+                             true, true, &msg);
+          if (msg.str().length() > 0)
+            message_writer(msg.str());
+          values.insert(values.begin(), 0);
+          parameter_writer(values);
         }
         message_writer("COMPLETED.");
 
