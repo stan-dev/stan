@@ -18,6 +18,7 @@ namespace stan {
                                      stan::io::var_context& init,
                                      RNG& rng,
                                      double init_radius,
+                                     bool print_timing,
                                      interface_callbacks::writer::base_writer&
                                      message_writer,
                                      interface_callbacks::writer::base_writer&
@@ -61,9 +62,13 @@ namespace stan {
           msg.str("");
           std::vector<double> gradient;
           bool gradient_ok = true;
+          clock_t start_check = clock();
           log_prob = stan::model::log_prob_grad<true, true>
             (model, unconstrained, disc_vector,
              gradient, &msg);
+          clock_t end_check = clock();
+          double deltaT = static_cast<double>(end_check - start_check)
+            / CLOCKS_PER_SEC;
           if (msg.str().length() > 0)
             message_writer(msg.str());
 
@@ -76,6 +81,21 @@ namespace stan {
                              "initial value.");
               gradient_ok = false;
             }
+          }
+          if (gradient_ok && print_timing) {
+            msg.str("");
+            message_writer();
+            msg << "Gradient evaluation took " << deltaT << " seconds";
+            message_writer(msg.str());
+            msg.str("");
+            msg  << "1000 transitions using 10 leapfrog steps "
+                 << "per transition would take "
+                 << 1e4 * deltaT << " seconds.";
+            message_writer(msg.str());
+            msg.str("");
+            message_writer("Adjust your expectations accordingly!");
+            message_writer();
+            message_writer();
           }
           if (gradient_ok)
             break;

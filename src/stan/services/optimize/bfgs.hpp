@@ -65,13 +65,14 @@ namespace stan {
                int refresh,
                Interrupt& interrupt,
                interface_callbacks::writer::base_writer& message_writer,
-               interface_callbacks::writer::base_writer& init_writer,               
+               interface_callbacks::writer::base_writer& init_writer,
                interface_callbacks::writer::base_writer& parameter_writer) {
         boost::ecuyer1988 rng = stan::services::util::rng(random_seed, chain);
 
         std::vector<int> disc_vector;
         std::vector<double> cont_vector
           = stan::services::util::initialize(model, init, rng, init_radius,
+                                             false,
                                              message_writer, init_writer);
 
         std::stringstream bfgs_ss;

@@ -67,7 +67,7 @@ namespace stan {
         start = clock();
         stan::services::util::generate_transitions
           (sampler, num_samples, num_warmup, num_warmup + num_samples, num_thin,
-           refresh, true, true,
+           refresh, true, false,
            writer,
            s, model, rng,
            interrupt, message_writer, error_writer);

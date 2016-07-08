@@ -56,6 +56,7 @@ namespace stan {
         std::vector<int> disc_vector;
         std::vector<double> cont_vector
           = stan::services::util::initialize(model, init, rng, init_radius,
+                                             false,
                                              message_writer, init_writer);
 
         std::stringstream message;

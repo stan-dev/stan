@@ -88,6 +88,7 @@ namespace stan {
         std::vector<int> disc_vector;
         std::vector<double> cont_vector
           = stan::services::util::initialize(model, init, rng, init_radius,
+                                             true,
                                              message_writer, init_writer);
 
         stan::mcmc::adapt_dense_e_nuts<Model, boost::ecuyer1988>
