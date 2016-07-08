@@ -679,6 +679,9 @@ namespace stan {
     expression_type_vis::operator()(const integrate_ode_control& e) const {
       return expr_type(DOUBLE_T, 2);
     }
+    expr_type expression_type_vis::operator()(const generalCptModel_control& e) const {
+          return expr_type(MATRIX_T);
+    }
     expr_type expression_type_vis::operator()(const fun& e) const {
       return e.type_;
     }
@@ -717,6 +720,7 @@ namespace stan {
     expression::expression(const variable& expr) : expr_(expr) { }
     expression::expression(const integrate_ode& expr) : expr_(expr) { }
     expression::expression(const integrate_ode_control& expr) : expr_(expr) { }
+    expression::expression(const generalCptModel_control& expr) : expr_(expr) { }
     expression::expression(const fun& expr) : expr_(expr) { }
     expression::expression(const index_op& expr) : expr_(expr) { }
     expression::expression(const index_op_sliced& expr) : expr_(expr) { }
@@ -783,6 +787,14 @@ namespace stan {
       return boost::apply_visitor(*this, e.y0_.expr_)
         || boost::apply_visitor(*this, e.theta_.expr_);
     }
+    bool contains_var::operator()(const generalCptModel_control& e) const {
+      // pMatrix, time, amt, rate, and ii may contain vars
+      return (((boost::apply_visitor(*this, e.pMatrix_.expr_)
+        || boost::apply_visitor(*this, e.time_.expr_))
+        || boost::apply_visitor(*this, e.amt_.expr_))
+        || boost::apply_visitor(*this, e.rate_.expr_))
+        || boost::apply_visitor(*this, e.ii_.expr_);
+      }
     bool contains_var::operator()(const index_op& e) const {
       return boost::apply_visitor(*this, e.expr_.expr_);
     }
@@ -872,6 +884,15 @@ namespace stan {
       return boost::apply_visitor(*this, e.y0_.expr_)
         || boost::apply_visitor(*this, e.theta_.expr_);
     }
+    bool contains_nonparam_var::operator()(const generalCptModel_control& e) const {
+      // IS THIS USEFUL?
+      return ((((boost::apply_visitor(*this, e.pMatrix_.expr_)
+                  || boost::apply_visitor(*this, e.time_.expr_))
+                  || boost::apply_visitor(*this, e.amt_.expr_))
+                  || boost::apply_visitor(*this, e.rate_.expr_))
+                  || boost::apply_visitor(*this, e.ii_.expr_)
+                  || boost::apply_visitor(*this, e.nCmt_.expr_));
+      }
     bool contains_nonparam_var::operator()(const fun& e) const {
       // any function applied to non-linearly transformed var
       for (size_t i = 0; i < e.args_.size(); ++i)
@@ -940,6 +961,9 @@ namespace stan {
       return false;
     }
     bool is_nil_op::operator()(const integrate_ode_control& /* x */) const {
+      return false;
+    }
+    bool is_nil_op::operator()(const generalCptModel_control& /* x */) const {
       return false;
     }
     bool is_nil_op::operator()(const fun& /* x */) const { return false; }
@@ -1062,6 +1086,40 @@ namespace stan {
         abs_tol_(abs_tol),
         max_num_steps_(max_num_steps) {
     }
+
+    generalCptModel_control::generalCptModel_control() { }
+    generalCptModel_control::generalCptModel_control(
+                                               const std::string& integration_function_name,
+                                               const std::string& system_function_name,
+                                               const expression& nCmt,
+                                               const expression& pMatrix,
+                                               const expression& time,
+                                               const expression& amt,
+                                               const expression& rate,
+                                               const expression& ii,
+                                               const expression& evid,
+                                               const expression& cmt,
+                                               const expression& addl,
+                                               const expression& ss,
+                                               const expression& rel_tol,
+                                               const expression& abs_tol,
+                                               const expression& max_num_steps)
+      : integration_function_name_(integration_function_name), 
+      system_function_name_(system_function_name),
+      nCmt_(nCmt),
+      pMatrix_(pMatrix),
+      time_(time),
+      amt_(amt),
+      rate_(rate),
+      ii_(ii),
+      evid_(evid),
+      cmt_(cmt),
+      addl_(addl),
+      ss_(ss),
+      rel_tol_(rel_tol),
+      abs_tol_(abs_tol),
+      max_num_steps_(max_num_steps) {
+      }
 
     fun::fun() { }
     fun::fun(std::string const& name,
@@ -1764,6 +1822,9 @@ namespace stan {
     }
     bool var_occurs_vis::operator()(const integrate_ode_control& e) const {
       return false;  // no refs persist out of integrate_ode_control() call
+    }
+    bool var_occurs_vis::operator()(const generalCptModel_control& e) const {
+        return false;
     }
     bool var_occurs_vis::operator()(const index_op& e) const {
       // refs only persist out of expression, not indexes
