@@ -1169,3 +1169,11 @@ for (size_t i = 0; i < vector_types.size(); ++i) {
 add("wishart_log", DOUBLE_T, MATRIX_T, DOUBLE_T, MATRIX_T);
 add("wishart_lpdf", DOUBLE_T, MATRIX_T, DOUBLE_T, MATRIX_T);
 add("wishart_rng", MATRIX_T, DOUBLE_T, MATRIX_T);
+
+// function signatures for Torsten
+std::vector<expr_type> arg_types;
+arg_types.push_back(expr_type(VECTOR_T, 1U));
+for(int i_pmetrics = 0; i_pmetrics<4; i_pmetrics++){arg_types.push_back(vector_types[1]);}
+for(int i_pmetrics = 0; i_pmetrics<4; i_pmetrics++){arg_types.push_back(int_vector_types[1]);}
+add("PKModelTwoCpt", MATRIX_T, arg_types);
+add("PKModelOneCpt", MATRIX_T, arg_types);
