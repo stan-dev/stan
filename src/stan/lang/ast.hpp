@@ -250,7 +250,7 @@ namespace stan {
                              boost::recursive_wrapper<variable>,
                              boost::recursive_wrapper<integrate_ode>,
                              boost::recursive_wrapper<integrate_ode_control>,
-                             boost::recursive_wrapper<generalCptModel_control>
+                             boost::recursive_wrapper<generalCptModel_control>,
                              boost::recursive_wrapper<fun>,
                              boost::recursive_wrapper<index_op>,
                              boost::recursive_wrapper<index_op_sliced>,
@@ -1125,7 +1125,7 @@ namespace stan {
       bool operator()(const variable& e) const;
       bool operator()(const integrate_ode& e) const;
       bool operator()(const integrate_ode_control& e) const;
-      bool operator()(const generalCptModel_control& e) const;i
+      bool operator()(const generalCptModel_control& e) const;
       bool operator()(const fun& e) const;
       bool operator()(const index_op& e) const;
       bool operator()(const index_op_sliced& e) const;
