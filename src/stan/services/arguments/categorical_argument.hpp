@@ -68,7 +68,7 @@ namespace stan {
         bool good_arg = true;
         bool valid_arg = true;
 
-        while (good_arg) {
+        while (good_arg && valid_arg) {
           if (args.size() == 0)
             return valid_arg;
 
@@ -91,6 +91,9 @@ namespace stan {
           std::string val_name;
           std::string val;
           split_arg(cat_name, val_name, val);
+
+          if (val_name == this->name())
+            return false;
 
           if (_subarguments.size() == 0)
             valid_arg = true;

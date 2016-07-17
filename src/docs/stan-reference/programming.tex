@@ -4853,7 +4853,7 @@ data {
 }
 parameters {
   real<lower=0, upper=1> theta;
-  real lambda;
+  real<lower=0> lambda;
 }
 model {
   for (n in 1:N) {
@@ -5523,8 +5523,7 @@ c \ ? \ x_1 \ : \ x_2
 \ x_2 & \mbox{if } c \mbox{ is false (i.e., zero).}
 \end{cases}
 \]
-Although Stan itself does not currently support the conditional
-operator, it will in the future.
+As of version 2.10, Stan supports the conditional operator.
 
 
 \subsection{Marginalizing out the Discrete Parameter}

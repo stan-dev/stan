@@ -1,6 +1,85 @@
 STAN C++ RELEASE NOTES
 ======================================================================
 
+Note: these are the release nots for the stan-dev/stan repository.
+Further changes may arise at the interface level (stan-dev/{rstan,
+pystan, cmdstan}) and math library level (stan-dev/math).
+
+
+v2.10.0 (15 June 2016)
+======================================================================
+
+New Team Members
+--------------------------------------------------
+* Aki Vehtari (Aalto Uni) --- GPs, LOO, statistical modeling,
+  MATLAB
+* Rayleigh Lei (U. Michigan) --- vectorizing functions
+* Sebastian Weber (Novartis) --- diff eq models
+
+New User-Facing Features
+--------------------------------------------------
+* introduction of = for assignment; deprecating <- (#1819)
+* _lpdf, _lpmf, _lcdf, _lccdf and vertical bar notation
+  for probability mass, density, and cumulative distribution
+  functions; update user-defined function syntax; 
+  deprecate older forms (#1811)
+* target += lp to replace increment_log_prob(lp); target() to rpelace
+  log_prob() function;  remove lp__ variable access (#1800)
+* conditional (ternary) operator (#1125)
+* stiff diff eq solver CVODES from Sundials
+* add control parameters (tolerance, max iteraitons) to ODE solvers
+* rename ODE solvers based on algorithm, integrate_ode_rk45 
+  for existing non-stiff Runge-Kutta solver and integrate_ode_bdf
+  for the stiff backward differentiation form;  deprecate
+  the unmarked integrate_ode function (#1886)
+* limiting diff eq iterations in solvers (Boost/CVODES)
+* unit_vector as parameter (#1713) [it never worked in the past]
+* rename multiply_log and log_binomial_coefficient
+  to lmultiply and lchoose (also part of #1811)
+* incomplete beta function as inc_beta (#1540)
+
+New Internal Features
+--------------------------------------------------
+* exhaustive HMC (XHMC)
+* multinomial variant of NUTS (#1846)
+* simplified NUTS criterion (#1852)
+* uniform static HMC (#1849)
+* Riemannian HMC with SoftAbs (#304)
+* refactor semantic actions to header/implementation (#1795)
+* writer callback interface for algorithms (#1739)
+* error writer callbacks (#1836)
+* cleaner HMC diagnostic ouptut (#1790)
+* pull-request template on GitHub (#1794)
+* remove unused filename argument in parser (#1752)
+* remove unused lp_no_jacobian function (now controlled with
+  template params)
+* writer callback interface for HMC (#1680)
+
+Bug Fixes
+--------------------------------------------------
+* index slicing not compiling for matrices (#1754, #1810)
+* parsing too eager for reserved words (#1077)
+* CSV reader whitespace sensitivity (#1907)
+* delayed reject multinomial NUTS (#1906)
+* PYTHON2 variable for cpplint (#1912)
+* size zero vectors, row vectors, matrices (#1909)
+* overflowing transition probs in multinomial NUTS (#1904)
+* all the manual bug fixes (#1431, #1709, #1734, #1753,
+  #1826, #1874, #1879, #1890)
+* compiler fix for vector /. real to compile (#1883)
+* terminate infinite loops in optimization (#1896)
+* ADVI argument config failure (#1731)
+* double struct creation removed for forward-declaration
+  of user-defined functions bug (#1079)
+* clarify deprecation of <- is only in Stan, not R (#1819)
+* memory leaking with command getting in way of debug (#1293)
+* makefile dependencies for stanc (#1682)
+* remove NaN init for integers in place of min (negative)
+  value (#1766)
+* namespace pollution from log_mix removed (#1707)
+* message buffering reduced in ADVI
+* add pstream to user-defined CDFs supporting truncation (#1628)
+* initialization failure message clarification (#1736)
 
 v2.9.0 (3 Dec 2015)
 ======================================================================
