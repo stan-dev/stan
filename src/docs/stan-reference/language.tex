@@ -3273,6 +3273,123 @@ defines its own local block implicitly over the statement following it
 in which the loop variable is defined.  As far as Stan is concerned,
 these two uses of \code{n} are unrelated.
 
+\section{Break and Continue Statements}
+
+The one-token statements \code{continue} and \code{break} may be used
+within loops to alter control flow;  \code{continue} causes the next
+iteration of the loop to run immediately, whereas \code{break}
+terminates the loop and causes execution to resume after the loop.
+Both control structures must appear in loops.  Both \code{break} and
+\code{continue} scope to the most deeply nested loop, but pass through
+non-loop statements.
+
+Although these control statements may seem undesirable because of
+their goto-like behavior, their judicious use can greatly improve
+readability by reducing the level of nesting or eliminating bookeeping
+inside loops.
+
+\subsection{Break Statements}
+
+When a \code{break} statement is executed, the most deeply nested loop
+currently being executed is ended and execution picks up with the next
+statement after the loop.  For example, consider the following
+program:
+%
+\begin{stancode}
+while (1) {
+  if (n < 0) break;
+  foo(n);
+  n = n - 1;
+}
+\end{stancode}
+%
+The \code{while~(1)} loop is a ``forever'' loop, because \code{1} is
+the true value, so the test always succeeds.  Within the loop, if the
+value of \code{n} is less than 0, the loop terminates, otherwise it
+executes \code{foo(n)} and then decrements \code{n}.  The statement
+above does exactly the same thing as
+%
+\begin{stancode}
+while (n >= 0) {
+  foo(n);
+  n = n - 1;
+}
+\end{stancode}
+%
+This case is simply illustrative of the behavior; it is not a case
+where a \code{break} simplifies the loop.
+
+\subsection{Continue Statements}
+
+The \code{continue} statement ends the current operation of the loop
+and returns to the condition at the top of the loop.  Such loops are
+typically used to exclude some values from calculations.  For example,
+we could use the following loop to sum the positive values in the
+array \code{x},
+%
+\begin{stancode}
+real sum;
+sum = 0;
+for (n in 1:size(x)) {
+  if (x[n] <= 0) continue;
+  sum = sum + x[n];
+}
+\end{stancode}
+%
+When the continue statement is executed, control jumps back to the
+conditional part of the loop.  With while and for loops, this causes
+control to return to the conditional of the loop.  With for loops,
+this advances the loop variable, so the the above program will not go
+into an infinite loop when faced with an \code{x[n]} less than zero.
+Thus the above program could be rewritten with deeper nesting by
+reversing the conditional,
+%
+\begin{stancode}
+real sum;
+sum = 0;
+for (n in 1:size(x)) {
+  if (x[n] > 0)
+    sum = sum + x[n];
+}
+\end{stancode}
+%
+While the latter form may seem more readable in this simple case, the
+former has the main line of execution nested one level less deep.
+Instead, the conditional at the top finds cases to exclude and doesn't
+require the same level of nesting for code that's not excluded.  When
+there are several such exclusion conditions, the break or continue
+versions tend to be much easier to read.
+
+\subsection{Breaking and Continuing Nested Loops}
+
+If there is a loop nested within a loop, a \code{break} or
+\code{continue} statement only breaks out of the inner loop. So
+%
+\begin{stancode}
+while (cond1) {
+  ...
+  while (cond2) {
+    ...
+    if (cond3) break;
+    ...
+  }
+  // execution continues here after break
+  ...
+}
+\end{stancode}
+%
+If the break is triggered by \code{cond3} being true, execution will
+continue after the nested loop.
+
+As with break statements, continue statements go back to the top of
+the most deeply nested loop in which the \code{continue} appears.  
+
+Although break and continue must appear within loops, they may appear
+in nested statements within loops, such as within the conditionals
+shown above or within nested statements.  The break and continue
+statements jump past any control structure other than while-loops and
+for-loops.
+
 \section{Print Statements}\label{print-statements.section}
 
 Stan provides print statements that can print literal strings and the
@@ -4673,6 +4790,8 @@ atomic_statement_body
    | function_literal '(' expressions ')'
    | 'increment_log_prob' '(' expression ')'
    | 'target' '+=' expression
+   | 'break'
+   | 'continue'
    | 'print' '(' (expression | string_literal)* ')'
    | 'reject' '(' (expression | string_literal)* ')'
    | 'return' expression
@@ -4726,6 +4845,11 @@ literals cannot consist of only a period or only an exponent.
 Both the conditional if-then-else statement and while-loop statement
 require the expression denoting the condition to be a primitive type,
 integer or real.
+
+\subsection{Only Break and Continue in Loops}
+
+The \code{break} and \code{continue} statements may only be used
+within the body of a for-loop or while-loop.
 
 \subsection{Probability Function Naming}
 
