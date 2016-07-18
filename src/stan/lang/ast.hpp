@@ -906,7 +906,7 @@ namespace stan {
     struct break_continue_statement {
       std::string generate_;
       break_continue_statement();
-      break_continue_statement(const std::string& generate);
+      explicit break_continue_statement(const std::string& generate);
     };
 
     struct print_statement {

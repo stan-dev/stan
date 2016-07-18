@@ -784,7 +784,7 @@ namespace stan {
     extern boost::phoenix::function<add_var> add_var_f;
 
     struct validate_in_loop : public phoenix_functor_ternary {
-      void operator()(bool in_loop, bool pass, std::ostream& error_msgs) const;
+      void operator()(bool in_loop, bool& pass, std::ostream& error_msgs) const;
     };
     extern boost::phoenix::function<validate_in_loop> validate_in_loop_f;
 

@@ -94,7 +94,7 @@ namespace stan {
       while_statement_r;
 
       boost::spirit::qi::rule<Iterator,
-                              break_continue_statement(bool),
+                              break_continue_statement(bool),  // NOLINT
                               whitespace_grammar<Iterator> >
       break_continue_statement_r;
 

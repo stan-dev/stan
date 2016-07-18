@@ -2176,8 +2176,6 @@ namespace stan {
     };
 
 
-
-
     void generate_statement(const statement& s,
                             int indent,
                             std::ostream& o,

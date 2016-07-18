@@ -177,13 +177,13 @@ namespace stan {
         > statement_r(_r1, _r2, _r3, true)
           [add_while_body_f(_val, _1)];
 
-      // _r1 == _r4 from statement_r
+      // _r1 here == _r4 from statement_r
       break_continue_statement_r.name("break or continue statement");
       break_continue_statement_r
         %= (string("break") | string("continue"))
         > eps[validate_in_loop_f(_r1, _pass, boost::phoenix::ref(error_msgs_))]
         > lit(';');
-      
+
       // _r1, _r2, _r3 same as statement_r
       for_statement_r.name("for statement");
       for_statement_r
