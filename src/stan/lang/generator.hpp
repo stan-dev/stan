@@ -2123,7 +2123,7 @@ namespace stan {
       }
       void operator()(const break_continue_statement& st) const {
         generate_indent(indent_, o_);
-        o_ << st.generate_ << EOL;
+        o_ << st.generate_ << ";" << EOL;
       }
       void operator()(const conditional_statement& x) const {
         for (size_t i = 0; i < x.conditions_.size(); ++i) {
