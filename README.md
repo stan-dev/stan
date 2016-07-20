@@ -10,7 +10,7 @@
 * a full first- and higher-order automatic differentiation library based on C++ template overloads, and
 * a supporting fully-templated matrix, linear algebra, and probability special function library.
 
-[![DOI](https://zenodo.org/badge/19868/stan-dev/stan.svg)](https://zeno
+[![DOI](https://zenodo.org/badge/19868/stan-dev/stan.svg)](https://zenodo.org/badge/latestdoi/19868/stan-dev/stan)
 
 Home Page
 ---------
