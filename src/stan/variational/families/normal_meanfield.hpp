@@ -1,7 +1,7 @@
 #ifndef STAN_VARIATIONAL_NORMAL_MEANFIELD_HPP
 #define STAN_VARIATIONAL_NORMAL_MEANFIELD_HPP
 
-#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer/base_writer.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/mat/meta/get.hpp>
@@ -378,7 +378,7 @@ namespace stan {
                      Eigen::VectorXd& cont_params,
                      int n_monte_carlo_grad,
                      BaseRNG& rng,
-                     interface_callbacks::writer::base_writer& message_writer)
+                     callbacks::writer::base_writer& message_writer)
         const {
         static const char* function =
           "stan::variational::normal_meanfield::calc_grad";

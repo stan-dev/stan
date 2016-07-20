@@ -4,7 +4,7 @@
 #include <stan/io/var_context.hpp>
 #include <stan/io/chained_var_context.hpp>
 #include <stan/io/random_var_context.hpp>
-#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer/base_writer.hpp>
 #include <stan/model/util.hpp>
 #include <stan/optimization/bfgs.hpp>
 #include <stan/services/error_codes.hpp>
@@ -66,9 +66,9 @@ namespace stan {
                 bool save_iterations,
                 int refresh,
                 Interrupt& interrupt,
-                interface_callbacks::writer::base_writer& message_writer,
-                interface_callbacks::writer::base_writer& init_writer,
-                interface_callbacks::writer::base_writer& parameter_writer) {
+                callbacks::writer::base_writer& message_writer,
+                callbacks::writer::base_writer& init_writer,
+                callbacks::writer::base_writer& parameter_writer) {
         boost::ecuyer1988 rng = stan::services::util::rng(random_seed, chain);
 
         std::vector<int> disc_vector;

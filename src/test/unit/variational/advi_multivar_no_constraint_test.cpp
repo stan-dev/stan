@@ -1,6 +1,6 @@
 #include <test/test-models/good/variational/multivariate_no_constraint.hpp>
 #include <stan/variational/advi.hpp>
-#include <stan/interface_callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/writer/stream_writer.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 #include <vector>
@@ -26,7 +26,7 @@ TEST(advi_test, multivar_no_constraint_fullrank) {
   int n_monte_carlo_grad = 10;
   int n_grad_samples = 1e4;
   std::stringstream output;
-  stan::interface_callbacks::writer::stream_writer message_writer(output);
+  stan::callbacks::writer::stream_writer message_writer(output);
 
   // Dummy input
   Eigen::VectorXd cont_params = Eigen::VectorXd::Zero(2);
@@ -142,7 +142,7 @@ TEST(advi_test, multivar_no_constraint_meanfield) {
   // Other params
   int n_monte_carlo_grad = 10;
   std::stringstream output;
-  stan::interface_callbacks::writer::stream_writer message_writer(output);
+  stan::callbacks::writer::stream_writer message_writer(output);
 
   // Dummy input
   Eigen::VectorXd cont_params = Eigen::VectorXd::Zero(2);

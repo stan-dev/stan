@@ -1,13 +1,13 @@
 #ifndef STAN_SERVICES_UTIL_EXPERIMENTAL_MESSAGE_HPP
 #define STAN_SERVICES_UTIL_EXPERIMENTAL_MESSAGE_HPP
 
-#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer/base_writer.hpp>
 
 namespace stan {
   namespace services {
     namespace util {
 
-      void experimental_message(stan::interface_callbacks::writer::base_writer&
+      void experimental_message(stan::callbacks::writer::base_writer&
                                 message_writer) {
         message_writer("------------------------------"
                        "------------------------------");

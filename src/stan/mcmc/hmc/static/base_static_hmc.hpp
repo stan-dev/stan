@@ -1,7 +1,7 @@
 #ifndef STAN_MCMC_HMC_STATIC_BASE_STATIC_HMC_HPP
 #define STAN_MCMC_HMC_STATIC_BASE_STATIC_HMC_HPP
 
-#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/hmc/base_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
@@ -33,8 +33,8 @@ namespace stan {
 
       sample
       transition(sample& init_sample,
-                 interface_callbacks::writer::base_writer& info_writer,
-                 interface_callbacks::writer::base_writer& error_writer) {
+                 callbacks::writer::base_writer& info_writer,
+                 callbacks::writer::base_writer& error_writer) {
         this->sample_stepsize();
 
         this->seed(init_sample.cont_params());

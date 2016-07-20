@@ -20,12 +20,12 @@ namespace stan {
                        int refresh,
                        bool save_warmup,
                        RNG& rng,
-                       interface_callbacks::interrupt::base_interrupt&
+                       callbacks::interrupt::base_interrupt&
                        interrupt,
-                       interface_callbacks::writer::base_writer& message_writer,
-                       interface_callbacks::writer::base_writer& error_writer,
-                       interface_callbacks::writer::base_writer& sample_writer,
-                       interface_callbacks::writer::base_writer&
+                       callbacks::writer::base_writer& message_writer,
+                       callbacks::writer::base_writer& error_writer,
+                       callbacks::writer::base_writer& sample_writer,
+                       callbacks::writer::base_writer&
                        diagnostic_writer) {
         Eigen::Map<Eigen::VectorXd> cont_params(cont_vector.data(),
                                                 cont_vector.size());

@@ -1,13 +1,13 @@
-#ifndef STAN_INTERFACE_CALLBACKS_VAR_CONTEXT_FACTORY_DUMP_FACTORY_HPP
-#define STAN_INTERFACE_CALLBACKS_VAR_CONTEXT_FACTORY_DUMP_FACTORY_HPP
+#ifndef STAN_CALLBACKS_VAR_CONTEXT_FACTORY_DUMP_FACTORY_HPP
+#define STAN_CALLBACKS_VAR_CONTEXT_FACTORY_DUMP_FACTORY_HPP
 
-#include <stan/interface_callbacks/var_context_factory/var_context_factory.hpp>
+#include <stan/callbacks/var_context_factory/var_context_factory.hpp>
 #include <stan/io/dump.hpp>
 #include <fstream>
 #include <string>
 
 namespace stan {
-  namespace interface_callbacks {
+  namespace callbacks {
     namespace var_context_factory {
 
       // FIXME: Move to CmdStan

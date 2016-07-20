@@ -1,11 +1,11 @@
 #include <stan/old_services/variational/print_progress.hpp>
-#include <stan/interface_callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/writer/stream_writer.hpp>
 #include <gtest/gtest.h>
 #include <sstream>
 
 TEST(StanUi, progress) {
   std::stringstream out;
-  stan::interface_callbacks::writer::stream_writer writer(out);
+  stan::callbacks::writer::stream_writer writer(out);
   int m;
   int start;
   int finish;

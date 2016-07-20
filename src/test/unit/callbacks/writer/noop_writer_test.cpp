@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
 #include <boost/lexical_cast.hpp>
-#include <stan/interface_callbacks/writer/noop_writer.hpp>
+#include <stan/callbacks/writer/noop_writer.hpp>
 
 class StanInterfaceCallbacksNoopWriter: public ::testing::Test {
 public:
   void SetUp() { }
   void TearDown() { }
-  stan::interface_callbacks::writer::noop_writer writer;
+  stan::callbacks::writer::noop_writer writer;
 };
 
 TEST_F(StanInterfaceCallbacksNoopWriter, key_double) {

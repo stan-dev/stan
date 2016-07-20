@@ -1,7 +1,7 @@
 #ifndef STAN_OLD_SERVICES_SAMPLE_INIT_WINDOWED_ADAPT_HPP
 #define STAN_OLD_SERVICES_SAMPLE_INIT_WINDOWED_ADAPT_HPP
 
-#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/old_services/arguments/categorical_argument.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
@@ -18,8 +18,8 @@ namespace stan {
                           stan::services::categorical_argument* adapt,
                           unsigned int num_warmup,
                           const Eigen::VectorXd& cont_params,
-                          interface_callbacks::writer::base_writer& info_writer,
-                      interface_callbacks::writer::base_writer& error_writer) {
+                          callbacks::writer::base_writer& info_writer,
+                      callbacks::writer::base_writer& error_writer) {
         init_adapt<Sampler>(sampler, adapt, cont_params,
                             info_writer, error_writer);
 

@@ -20,9 +20,9 @@ namespace stan {
        */
       class mcmc_writer {
       private:
-        interface_callbacks::writer::base_writer& sample_writer_;
-        interface_callbacks::writer::base_writer& diagnostic_writer_;
-        interface_callbacks::writer::base_writer& message_writer_;
+        callbacks::writer::base_writer& sample_writer_;
+        callbacks::writer::base_writer& diagnostic_writer_;
+        callbacks::writer::base_writer& message_writer_;
 
       public:
         /**
@@ -36,9 +36,9 @@ namespace stan {
          * @post none
          * @sideeffects streams are stored in this object
          */
-        mcmc_writer(interface_callbacks::writer::base_writer& sample_writer,
-                    interface_callbacks::writer::base_writer& diagnostic_writer,
-                    interface_callbacks::writer::base_writer& message_writer)
+        mcmc_writer(callbacks::writer::base_writer& sample_writer,
+                    callbacks::writer::base_writer& diagnostic_writer,
+                    callbacks::writer::base_writer& message_writer)
           : sample_writer_(sample_writer),
             diagnostic_writer_(diagnostic_writer),
             message_writer_(message_writer) {
@@ -198,7 +198,7 @@ namespace stan {
          *
          */
         void write_timing(double warmDeltaT, double sampleDeltaT,
-                          interface_callbacks::writer::base_writer& writer) {
+                          callbacks::writer::base_writer& writer) {
           std::string title(" Elapsed Time: ");
           std::stringstream ss;
 

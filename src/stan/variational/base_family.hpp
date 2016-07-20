@@ -1,7 +1,7 @@
 #ifndef STAN_VARIATIONAL_BASE_FAMILY_HPP
 #define STAN_VARIATIONAL_BASE_FAMILY_HPP
 
-#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer/base_writer.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <algorithm>
 #include <ostream>
@@ -37,7 +37,7 @@ namespace stan {
                      Eigen::VectorXd& cont_params,
                      int n_monte_carlo_grad,
                      BaseRNG& rng,
-                     interface_callbacks::writer::base_writer& message_writer)
+                     callbacks::writer::base_writer& message_writer)
         const;
 
     protected:

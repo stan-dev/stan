@@ -1,6 +1,6 @@
 #include <stan/services/util/mcmc_writer.hpp>
-#include <stan/interface_callbacks/writer/stream_writer.hpp>
-#include <stan/interface_callbacks/writer/noop_writer.hpp>
+#include <stan/callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/writer/noop_writer.hpp>
 #include <test/test-models/good/io_example.hpp>
 
 #include <vector>
@@ -15,7 +15,7 @@
 
 #include <gtest/gtest.h>
 
-typedef stan::interface_callbacks::writer::stream_writer writer_t;
+typedef stan::callbacks::writer::stream_writer writer_t;
 
 TEST(StanIoMcmcWriter, write_sample_names) {
   
@@ -42,7 +42,7 @@ TEST(StanIoMcmcWriter, write_sample_names) {
   rng_t base_rng(0);
 
   
-  stan::interface_callbacks::writer::noop_writer sampler_writer;
+  stan::callbacks::writer::noop_writer sampler_writer;
   
   
   stan::mcmc::adapt_diag_e_nuts<io_example_model_namespace::io_example_model, rng_t>
@@ -95,7 +95,7 @@ TEST(StanIoMcmcWriter, write_sample_params) {
   typedef boost::ecuyer1988 rng_t;
   rng_t base_rng(0);
 
-  stan::interface_callbacks::writer::noop_writer sampler_writer;
+  stan::callbacks::writer::noop_writer sampler_writer;
   
   stan::mcmc::adapt_diag_e_nuts<io_example_model_namespace::io_example_model, rng_t>
     sampler(model, base_rng);
@@ -164,7 +164,7 @@ TEST(StanIoMcmcWriter, write_adapt_finish) {
   std::stringstream sample_stream;
   std::stringstream diagnostic_stream;
   std::stringstream message_stream;
-  stan::interface_callbacks::writer::stream_writer sampler_writer(sample_stream, "# ");
+  stan::callbacks::writer::stream_writer sampler_writer(sample_stream, "# ");
   
   stan::mcmc::adapt_diag_e_nuts<io_example_model_namespace::io_example_model, rng_t>
     sampler(model, base_rng);
@@ -254,7 +254,7 @@ TEST(StanIoMcmcWriter, write_diagnostic_names) {
   typedef boost::ecuyer1988 rng_t;
   rng_t base_rng(0);
 
-  stan::interface_callbacks::writer::noop_writer sampler_writer;  
+  stan::callbacks::writer::noop_writer sampler_writer;  
 
   stan::mcmc::adapt_diag_e_nuts<io_example_model_namespace::io_example_model, rng_t>
     sampler(model, base_rng);
@@ -308,7 +308,7 @@ TEST(StanIoMcmcWriter, write_diagnostic_params) {
   typedef boost::ecuyer1988 rng_t;
   rng_t base_rng(0);
 
-  stan::interface_callbacks::writer::noop_writer sampler_writer;
+  stan::callbacks::writer::noop_writer sampler_writer;
   
   stan::mcmc::adapt_diag_e_nuts<io_example_model_namespace::io_example_model, rng_t>
     sampler(model, base_rng);
@@ -381,7 +381,7 @@ TEST(StanIoMcmcWriter, write_timing) {
   typedef boost::ecuyer1988 rng_t;
   rng_t base_rng(0);
 
-  stan::interface_callbacks::writer::noop_writer sampler_writer;
+  stan::callbacks::writer::noop_writer sampler_writer;
   
   stan::mcmc::adapt_diag_e_nuts<io_example_model_namespace::io_example_model, rng_t>
     sampler(model, base_rng);

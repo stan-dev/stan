@@ -1,7 +1,7 @@
 #ifndef STAN_OLD_SERVICES_OPTIMIZE_DO_BFGS_OPTIMIZE_HPP
 #define STAN_OLD_SERVICES_OPTIMIZE_DO_BFGS_OPTIMIZE_HPP
 
-#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer/base_writer.hpp>
 #include <stan/optimization/bfgs.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/old_services/io/do_print.hpp>
@@ -23,8 +23,8 @@ namespace stan {
                            double &lp,
                            std::vector<double> &cont_vector,
                            std::vector<int> &disc_vector,
-                           interface_callbacks::writer::base_writer& output,
-                           interface_callbacks::writer::base_writer& info,
+                           callbacks::writer::base_writer& output,
+                           callbacks::writer::base_writer& info,
                            bool save_iterations,
                            int refresh,
                            StartIterationCallback& interrupt) {

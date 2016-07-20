@@ -1,14 +1,14 @@
 #include <stan/old_services/mcmc/warmup.hpp>
 #include <gtest/gtest.h>
 #include <test/test-models/good/services/test_lp.hpp>
-#include <stan/interface_callbacks/writer/base_writer.hpp>
-#include <stan/interface_callbacks/writer/stream_writer.hpp>
-#include <stan/interface_callbacks/interrupt/base_interrupt.hpp>
+#include <stan/callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/interrupt/base_interrupt.hpp>
 #include <boost/random/additive_combine.hpp>
 #include <sstream>
 
 typedef boost::ecuyer1988 rng_t;
-typedef stan::interface_callbacks::writer::stream_writer writer_t;
+typedef stan::callbacks::writer::stream_writer writer_t;
 
 class mock_sampler : public stan::mcmc::base_mcmc {
 public:
@@ -16,8 +16,8 @@ public:
     : base_mcmc(), n_transition_called(0) { }
 
   stan::mcmc::sample transition(stan::mcmc::sample& init_sample,
-                                stan::interface_callbacks::writer::base_writer& info_writer,
-                                stan::interface_callbacks::writer::base_writer& error_writer) {
+                                stan::callbacks::writer::base_writer& info_writer,
+                                stan::callbacks::writer::base_writer& error_writer) {
     n_transition_called++;
     return init_sample;
   }
@@ -26,7 +26,7 @@ public:
 };
 
 struct mock_callback
-  : public stan::interface_callbacks::interrupt::base_interrupt {
+  : public stan::callbacks::interrupt::base_interrupt {
   int n;
   mock_callback() : n(0) { }
 
@@ -88,8 +88,8 @@ public:
   std::stringstream diagnostic_output;
   std::stringstream message_output;
   std::stringstream error_output;
-  stan::interface_callbacks::writer::stream_writer message_writer;
-  stan::interface_callbacks::writer::stream_writer error_writer;
+  stan::callbacks::writer::stream_writer message_writer;
+  stan::callbacks::writer::stream_writer error_writer;
 };
 
 

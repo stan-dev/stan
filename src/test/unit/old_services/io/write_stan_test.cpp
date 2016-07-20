@@ -1,12 +1,12 @@
 #include <stan/old_services/io/write_stan.hpp>
-#include <stan/interface_callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/writer/stream_writer.hpp>
 #include <gtest/gtest.h>
 #include <sstream>
 #include <stan/version.hpp>
 
 TEST(StanUi, write_stan) {
   std::stringstream ss;
-  stan::interface_callbacks::writer::stream_writer writer(ss);
+  stan::callbacks::writer::stream_writer writer(ss);
   std::string expected_output;
   expected_output 
     = "stan_version_major = " + stan::MAJOR_VERSION + "\n"

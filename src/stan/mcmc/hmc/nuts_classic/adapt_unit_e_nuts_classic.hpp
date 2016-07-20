@@ -1,7 +1,7 @@
 #ifndef STAN_MCMC_HMC_NUTS_ADAPT_UNIT_E_NUTS_CLASSIC_HPP
 #define STAN_MCMC_HMC_NUTS_ADAPT_UNIT_E_NUTS_CLASSIC_HPP
 
-#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/hmc/nuts_classic/unit_e_nuts_classic.hpp>
 #include <stan/mcmc/stepsize_adapter.hpp>
 
@@ -24,8 +24,8 @@ namespace stan {
 
       sample
       transition(sample& init_sample,
-                 interface_callbacks::writer::base_writer& info_writer,
-                 interface_callbacks::writer::base_writer& error_writer) {
+                 callbacks::writer::base_writer& info_writer,
+                 callbacks::writer::base_writer& error_writer) {
         sample s
           = unit_e_nuts_classic<Model, BaseRNG>::transition(init_sample,
                                                             info_writer,

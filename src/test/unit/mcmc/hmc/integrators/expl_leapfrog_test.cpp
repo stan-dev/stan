@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 
 #include <sstream>
-#include <stan/interface_callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/writer/stream_writer.hpp>
 #include <test/test-models/good/mcmc/hmc/integrators/command.hpp>
 
 #include <stan/io/dump.hpp>
@@ -40,8 +40,8 @@ public:
     delete(model);
   }
 
-  stan::interface_callbacks::writer::stream_writer writer;
-  stan::interface_callbacks::writer::stream_writer error_writer;
+  stan::callbacks::writer::stream_writer writer;
+  stan::callbacks::writer::stream_writer error_writer;
 
   // integrator under test
   stan::mcmc::expl_leapfrog<

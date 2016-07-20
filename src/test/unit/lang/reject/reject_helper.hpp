@@ -8,7 +8,7 @@
 #include <boost/random/additive_combine.hpp>
 #include <stan/io/dump.hpp>
 #include <stan/old_services/io/write_iteration.hpp>
-#include <stan/interface_callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/writer/stream_writer.hpp>
 
 void expect_substring(const std::string& msg,
                       const std::string& expected_substring) {
@@ -39,7 +39,7 @@ void reject_test(const std::string& expected_msg1 = "",
     std::vector<double> cont_vector(model.num_params_r(), 0.0);
     std::vector<int> disc_vector;
     double lp = model.template log_prob<false,false>(cont_vector, disc_vector, &out);
-    stan::interface_callbacks::writer::stream_writer writer(out);
+    stan::callbacks::writer::stream_writer writer(out);
     write_iteration(model, base_rng, lp, cont_vector, disc_vector,
                     writer, writer);
   } catch (const E& e) {

@@ -2,8 +2,8 @@
 #define STAN_SERVICES_SAMPLE_HMC_STATIC_DIAG_E_ADAPT_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/interface_callbacks/interrupt/base_interrupt.hpp>
-#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/interrupt/base_interrupt.hpp>
+#include <stan/callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/fixed_param_sampler.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/mcmc/hmc/static/adapt_diag_e_static_hmc.hpp>
@@ -37,17 +37,17 @@ namespace stan {
                                   unsigned int init_buffer,
                                   unsigned int term_buffer,
                                   unsigned int window,
-                                interface_callbacks::interrupt::base_interrupt&
+                                callbacks::interrupt::base_interrupt&
                                   interrupt,
-                                  interface_callbacks::writer::base_writer&
+                                  callbacks::writer::base_writer&
                                   message_writer,
-                                  interface_callbacks::writer::base_writer&
+                                  callbacks::writer::base_writer&
                                   error_writer,
-                                  interface_callbacks::writer::base_writer&
+                                  callbacks::writer::base_writer&
                                   init_writer,
-                                  interface_callbacks::writer::base_writer&
+                                  callbacks::writer::base_writer&
                                   sample_writer,
-                                  interface_callbacks::writer::base_writer&
+                                  callbacks::writer::base_writer&
                                   diagnostic_writer) {
         boost::ecuyer1988 rng = stan::services::util::rng(random_seed, chain);
 

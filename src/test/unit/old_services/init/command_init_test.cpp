@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/interface_callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/writer/stream_writer.hpp>
 #include <test/test-models/good/services/test_lp.hpp>
 #include <boost/random/additive_combine.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_unit_e_nuts.hpp>
@@ -55,8 +55,8 @@ public:
   Eigen::VectorXd z_init;
 
   std::stringstream model_output, output, error;
-  stan::interface_callbacks::writer::stream_writer writer;
-  stan::interface_callbacks::writer::stream_writer error_writer;
+  stan::callbacks::writer::stream_writer writer;
+  stan::callbacks::writer::stream_writer error_writer;
 };
 
 TEST_F(UiCommand, init_adapt_z_0) {

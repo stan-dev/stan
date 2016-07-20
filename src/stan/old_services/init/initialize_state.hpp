@@ -9,8 +9,8 @@
 #include <stan/services/error_codes.hpp>
 #include <stan/io/array_var_context.hpp>
 #include <stan/io/chained_var_context.hpp>
-#include <stan/interface_callbacks/var_context_factory/var_context_factory.hpp>
-#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/var_context_factory/var_context_factory.hpp>
+#include <stan/callbacks/writer/base_writer.hpp>
 #include <stan/old_services/io/write_error_msg.hpp>
 #include <stan/math/prim/scal/fun/is_inf.hpp>
 #include <stan/math/prim/scal/fun/is_nan.hpp>
@@ -118,7 +118,7 @@ namespace stan {
       template <class Model>
       bool initialize_state_values(Eigen::VectorXd& cont_params,
                                    Model& model,
-                                   interface_callbacks::writer::base_writer&
+                                   callbacks::writer::base_writer&
                                    writer) {
         try {
           validate_unconstrained_initialization(cont_params, model);
@@ -174,7 +174,7 @@ namespace stan {
       template <class Model>
       bool initialize_state_zero(Eigen::VectorXd& cont_params,
                                  Model& model,
-                             interface_callbacks::writer::base_writer& writer) {
+                             callbacks::writer::base_writer& writer) {
         cont_params.setZero();
         return initialize_state_values(cont_params, model, writer);
       }
@@ -198,7 +198,7 @@ namespace stan {
                                    Eigen::VectorXd& cont_params,
                                    Model& model,
                                    RNG& base_rng,
-                             interface_callbacks::writer::base_writer& writer) {
+                             callbacks::writer::base_writer& writer) {
         int num_init_tries = -1;
 
         boost::random::uniform_real_distribution<double>
@@ -262,7 +262,7 @@ namespace stan {
                                               Eigen::VectorXd& cont_params,
                                               Model& model,
                                               RNG& base_rng,
-                               interface_callbacks::writer::base_writer& writer,
+                               callbacks::writer::base_writer& writer,
                                               ContextFactory& context_factory) {
         try {
           boost::random::uniform_real_distribution<double>
@@ -350,7 +350,7 @@ namespace stan {
                                    Eigen::VectorXd& cont_params,
                                    Model& model,
                                    RNG& base_rng,
-                                   interface_callbacks::writer::base_writer&
+                                   callbacks::writer::base_writer&
                                    writer,
                                    ContextFactory& context_factory,
                                    bool enable_random_init = false,
@@ -421,7 +421,7 @@ namespace stan {
                             Eigen::VectorXd& cont_params,
                             Model& model,
                             RNG& base_rng,
-                            interface_callbacks::writer::base_writer& writer,
+                            callbacks::writer::base_writer& writer,
                             ContextFactory& context_factory,
                             bool enable_random_init = false,
                             double init_r = 2) {

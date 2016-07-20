@@ -2,7 +2,7 @@
 #define STAN_SERVICES_SAMPLE_FIXED_PARAM_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/interface_callbacks/interrupt/base_interrupt.hpp>
+#include <stan/callbacks/interrupt/base_interrupt.hpp>
 #include <stan/mcmc/fixed_param_sampler.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/services/util/mcmc_writer.hpp>
@@ -24,13 +24,13 @@ namespace stan {
                       int num_samples,
                       int num_thin,
                       int refresh,
-                      interface_callbacks::interrupt::base_interrupt& interrupt,
-                      interface_callbacks::writer::base_writer& message_writer,
-                      interface_callbacks::writer::base_writer&
+                      callbacks::interrupt::base_interrupt& interrupt,
+                      callbacks::writer::base_writer& message_writer,
+                      callbacks::writer::base_writer&
                       init_writer,
-                      interface_callbacks::writer::base_writer& error_writer,
-                      interface_callbacks::writer::base_writer& sample_writer,
-                      interface_callbacks::writer::base_writer&
+                      callbacks::writer::base_writer& error_writer,
+                      callbacks::writer::base_writer& sample_writer,
+                      callbacks::writer::base_writer&
                       diagnostic_writer) {
         boost::ecuyer1988 rng = stan::services::util::rng(random_seed, chain);
 

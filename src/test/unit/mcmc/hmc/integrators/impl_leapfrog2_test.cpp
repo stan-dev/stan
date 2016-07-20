@@ -1,6 +1,6 @@
 #include <stan/io/dump.hpp>
 #include <stan/mcmc/hmc/hamiltonians/softabs_metric.hpp>
-#include <stan/interface_callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/writer/stream_writer.hpp>
 #include <stan/mcmc/hmc/hamiltonians/unit_e_metric.hpp>
 #include <stan/mcmc/hmc/integrators/impl_leapfrog.hpp>
 
@@ -23,9 +23,9 @@ TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_energy_conservation) {
 
   std::stringstream model_output;
   std::stringstream metric_output;
-  stan::interface_callbacks::writer::stream_writer writer(metric_output);
+  stan::callbacks::writer::stream_writer writer(metric_output);
   std::stringstream error_stream;
-  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
+  stan::callbacks::writer::stream_writer error_writer(error_stream);
 
   gauss_model_namespace::gauss_model model(data_var_context, &model_output);
 
@@ -71,9 +71,9 @@ TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_symplecticness) {
 
   std::stringstream model_output;
   std::stringstream metric_output;
-  stan::interface_callbacks::writer::stream_writer writer(metric_output);
+  stan::callbacks::writer::stream_writer writer(metric_output);
   std::stringstream error_stream;
-  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
+  stan::callbacks::writer::stream_writer error_writer(error_stream);
 
   gauss_model_namespace::gauss_model model(data_var_context, &model_output);
 
@@ -160,9 +160,9 @@ TEST(McmcHmcIntegratorsImplLeapfrog, softabs_energy_conservation) {
 
   std::stringstream model_output;
   std::stringstream metric_output;
-  stan::interface_callbacks::writer::stream_writer writer(metric_output);
+  stan::callbacks::writer::stream_writer writer(metric_output);
   std::stringstream error_stream;
-  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
+  stan::callbacks::writer::stream_writer error_writer(error_stream);
 
   gauss_model_namespace::gauss_model model(data_var_context, &model_output);
 
@@ -208,9 +208,9 @@ TEST(McmcHmcIntegratorsImplLeapfrog, softabs_symplecticness) {
 
   std::stringstream model_output;
   std::stringstream metric_output;
-  stan::interface_callbacks::writer::stream_writer writer(metric_output);
+  stan::callbacks::writer::stream_writer writer(metric_output);
   std::stringstream error_stream;
-  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
+  stan::callbacks::writer::stream_writer error_writer(error_stream);
 
   gauss_model_namespace::gauss_model model(data_var_context, &model_output);
 

@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/interface_callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/writer/stream_writer.hpp>
 #include <stan/old_services/optimize/do_bfgs_optimize.hpp>
 #include <stan/optimization/bfgs.hpp>
 #include <test/test-models/good/optimization/rosenbrock.hpp>
@@ -44,9 +44,9 @@ TEST(Services, do_bfgs_optimize__bfgs) {
 
   mock_callback callback;
 
-  stan::interface_callbacks::writer::stream_writer writer(out);
+  stan::callbacks::writer::stream_writer writer(out);
   std::stringstream info_ss;
-  stan::interface_callbacks::writer::stream_writer info(info_ss);
+  stan::callbacks::writer::stream_writer info(info_ss);
   return_code = stan::services::optimize::do_bfgs_optimize(model, bfgs, base_rng,
                                                            lp, cont_vector, disc_vector,
                                                            writer, info,
@@ -82,9 +82,9 @@ TEST(Services, do_bfgs_optimize__lbfgs) {
 
   mock_callback callback;
 
-  stan::interface_callbacks::writer::stream_writer writer(out);
+  stan::callbacks::writer::stream_writer writer(out);
   std::stringstream info_ss;
-  stan::interface_callbacks::writer::stream_writer info(info_ss);
+  stan::callbacks::writer::stream_writer info(info_ss);
   return_code = stan::services::optimize::do_bfgs_optimize(model, lbfgs, base_rng,
                                                            lp, cont_vector, disc_vector,
                                                            writer, info,

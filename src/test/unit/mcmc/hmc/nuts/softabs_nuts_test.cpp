@@ -1,4 +1,4 @@
-#include <stan/interface_callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/writer/stream_writer.hpp>
 #include <stan/mcmc/hmc/nuts/softabs_nuts.hpp>
 #include <boost/random/additive_combine.hpp>
 #include <test/test-models/good/mcmc/hmc/common/gauss3D.hpp>
@@ -21,9 +21,9 @@ TEST(McmcSoftAbsNuts, build_tree) {
   z_init.p(2) = -1;
 
   std::stringstream output;
-  stan::interface_callbacks::writer::stream_writer writer(output);
+  stan::callbacks::writer::stream_writer writer(output);
   std::stringstream error_stream;
-  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
+  stan::callbacks::writer::stream_writer error_writer(error_stream);
 
   std::fstream empty_stream("", std::fstream::in);
   stan::io::dump data_var_context(empty_stream);
@@ -87,9 +87,9 @@ TEST(McmcSoftAbsNuts, transition) {
   z_init.p(2) = -1;
 
   std::stringstream output;
-  stan::interface_callbacks::writer::stream_writer writer(output);
+  stan::callbacks::writer::stream_writer writer(output);
   std::stringstream error_stream;
-  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
+  stan::callbacks::writer::stream_writer error_writer(error_stream);
 
 
   std::fstream empty_stream("", std::fstream::in);

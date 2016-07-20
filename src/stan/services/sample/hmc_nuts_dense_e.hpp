@@ -2,8 +2,8 @@
 #define STAN_SERVICES_SAMPLE_HMC_NUTS_DENSE_E_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/interface_callbacks/interrupt/base_interrupt.hpp>
-#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/interrupt/base_interrupt.hpp>
+#include <stan/callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/fixed_param_sampler.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/mcmc/hmc/nuts/dense_e_nuts.hpp>
@@ -57,17 +57,17 @@ namespace stan {
                            double stepsize,
                            double stepsize_jitter,
                            int max_depth,
-                           interface_callbacks::interrupt::base_interrupt&
+                           callbacks::interrupt::base_interrupt&
                            interrupt,
-                           interface_callbacks::writer::base_writer&
+                           callbacks::writer::base_writer&
                            message_writer,
-                           interface_callbacks::writer::base_writer&
+                           callbacks::writer::base_writer&
                            error_writer,
-                           interface_callbacks::writer::base_writer&
+                           callbacks::writer::base_writer&
                            init_writer,
-                           interface_callbacks::writer::base_writer&
+                           callbacks::writer::base_writer&
                            sample_writer,
-                           interface_callbacks::writer::base_writer&
+                           callbacks::writer::base_writer&
                            diagnostic_writer) {
         boost::ecuyer1988 rng = stan::services::util::rng(random_seed, chain);
 

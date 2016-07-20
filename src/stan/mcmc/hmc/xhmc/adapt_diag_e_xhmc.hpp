@@ -1,7 +1,7 @@
 #ifndef STAN_MCMC_HMC_XHMC_ADAPT_DIAG_E_XHMC_HPP
 #define STAN_MCMC_HMC_XHMC_ADAPT_DIAG_E_XHMC_HPP
 
-#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/stepsize_var_adapter.hpp>
 #include <stan/mcmc/hmc/xhmc/diag_e_xhmc.hpp>
 
@@ -24,8 +24,8 @@ namespace stan {
 
       sample
       transition(sample& init_sample,
-                 interface_callbacks::writer::base_writer& info_writer,
-                 interface_callbacks::writer::base_writer& error_writer) {
+                 callbacks::writer::base_writer& info_writer,
+                 callbacks::writer::base_writer& error_writer) {
         sample s = diag_e_xhmc<Model, BaseRNG>::transition(init_sample,
                                                            info_writer,
                                                            error_writer);

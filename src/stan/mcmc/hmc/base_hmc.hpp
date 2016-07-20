@@ -1,7 +1,7 @@
 #ifndef STAN_MCMC_HMC_BASE_HMC_HPP
 #define STAN_MCMC_HMC_BASE_HMC_HPP
 
-#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
@@ -34,7 +34,7 @@ namespace stan {
           epsilon_jitter_(0.0) {}
 
       void
-      write_sampler_state(interface_callbacks::writer::base_writer& writer) {
+      write_sampler_state(callbacks::writer::base_writer& writer) {
         std::stringstream nominal_stepsize;
         nominal_stepsize << "Step size = " << get_nominal_stepsize();
         writer(nominal_stepsize.str());
@@ -55,14 +55,14 @@ namespace stan {
       }
 
       void
-      init_hamiltonian(interface_callbacks::writer::base_writer& info_writer,
-                       interface_callbacks::writer::base_writer& error_writer) {
+      init_hamiltonian(callbacks::writer::base_writer& info_writer,
+                       callbacks::writer::base_writer& error_writer) {
         this->hamiltonian_.init(this->z_, info_writer, error_writer);
       }
 
       void
-      init_stepsize(interface_callbacks::writer::base_writer& info_writer,
-                    interface_callbacks::writer::base_writer& error_writer) {
+      init_stepsize(callbacks::writer::base_writer& info_writer,
+                    callbacks::writer::base_writer& error_writer) {
         ps_point z_init(this->z_);
 
         // Skip initialization for extreme step sizes

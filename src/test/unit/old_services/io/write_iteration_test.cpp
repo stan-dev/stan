@@ -4,7 +4,7 @@
 #include <sstream>
 #include <boost/random/additive_combine.hpp>
 #include <test/unit/util.hpp>
-#include <stan/interface_callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/writer/stream_writer.hpp>
 
 typedef test_lp_model_namespace::test_lp_model Model;
 typedef boost::ecuyer1988 rng_t;
@@ -41,8 +41,8 @@ TEST_F(StanUi, write_iteration) {
   cont_vector.push_back(0);
 
   std::stringstream msg_ss, param_ss;
-  stan::interface_callbacks::writer::stream_writer msg_writer(msg_ss);
-  stan::interface_callbacks::writer::stream_writer param_writer(param_ss);
+  stan::callbacks::writer::stream_writer msg_writer(msg_ss);
+  stan::callbacks::writer::stream_writer param_writer(param_ss);
   stan::services::io::write_iteration(model, base_rng,
                                       lp, cont_vector, disc_vector,
                                       msg_writer, param_writer);

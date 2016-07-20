@@ -18,8 +18,8 @@ namespace stan {
         typename Hamiltonian::PointType& z,
         Hamiltonian& hamiltonian,
         double epsilon,
-        interface_callbacks::writer::base_writer& info_writer,
-        interface_callbacks::writer::base_writer& error_writer) {
+        callbacks::writer::base_writer& info_writer,
+        callbacks::writer::base_writer& error_writer) {
         hat_phi(z, hamiltonian, epsilon, info_writer, error_writer);
         hat_tau(z, hamiltonian, epsilon, this->max_num_fixed_point_,
                 info_writer, error_writer);
@@ -28,8 +28,8 @@ namespace stan {
       void update_q(typename Hamiltonian::PointType& z,
                     Hamiltonian& hamiltonian,
                     double epsilon,
-                    interface_callbacks::writer::base_writer& info_writer,
-                    interface_callbacks::writer::base_writer& error_writer) {
+                    callbacks::writer::base_writer& info_writer,
+                    callbacks::writer::base_writer& error_writer) {
         // hat{T} = dT/dp * d/dq
         Eigen::VectorXd q_init = z.q + 0.5 * epsilon * hamiltonian.dtau_dp(z);
         Eigen::VectorXd delta_q(z.q.size());
@@ -50,8 +50,8 @@ namespace stan {
         typename Hamiltonian::PointType& z,
         Hamiltonian& hamiltonian,
         double epsilon,
-        interface_callbacks::writer::base_writer& info_writer,
-        interface_callbacks::writer::base_writer& error_writer) {
+        callbacks::writer::base_writer& info_writer,
+        callbacks::writer::base_writer& error_writer) {
         hat_tau(z, hamiltonian, epsilon, 1, info_writer, error_writer);
         hat_phi(z, hamiltonian, epsilon, info_writer, error_writer);
       }
@@ -60,8 +60,8 @@ namespace stan {
       void hat_phi(typename Hamiltonian::PointType& z,
                    Hamiltonian& hamiltonian,
                    double epsilon,
-                   interface_callbacks::writer::base_writer& info_writer,
-                   interface_callbacks::writer::base_writer& error_writer) {
+                   callbacks::writer::base_writer& info_writer,
+                   callbacks::writer::base_writer& error_writer) {
         z.p -= epsilon * hamiltonian.dphi_dq(z, info_writer, error_writer);
       }
 
@@ -70,8 +70,8 @@ namespace stan {
                    Hamiltonian& hamiltonian,
                    double epsilon,
                    int num_fixed_point,
-                   interface_callbacks::writer::base_writer& info_writer,
-                   interface_callbacks::writer::base_writer& error_writer) {
+                   callbacks::writer::base_writer& info_writer,
+                   callbacks::writer::base_writer& error_writer) {
         Eigen::VectorXd p_init = z.p;
         Eigen::VectorXd delta_p(z.p.size());
 

@@ -1,7 +1,7 @@
 #ifndef STAN_OLD_SERVICES_IO_WRITE_ERROR_MSG_HPP
 #define STAN_OLD_SERVICES_IO_WRITE_ERROR_MSG_HPP
 
-#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer/base_writer.hpp>
 #include <ostream>
 #include <stdexcept>
 
@@ -15,7 +15,7 @@ namespace stan {
        * @param writer Writer callback
        * @param e Input exception
        */
-      void write_error_msg(interface_callbacks::writer::base_writer& writer,
+      void write_error_msg(callbacks::writer::base_writer& writer,
                            const std::exception& e) {
         writer("Informational Message: The current Metropolis"
                " proposal is about to be rejected because of"

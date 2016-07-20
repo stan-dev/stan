@@ -1,12 +1,12 @@
-#ifndef STAN_INTERFACE_CALLBACKS_WRITER_NOOP_WRITER_HPP
-#define STAN_INTERFACE_CALLBACKS_WRITER_NOOP_WRITER_HPP
+#ifndef STAN_CALLBACKS_WRITER_NOOP_WRITER_HPP
+#define STAN_CALLBACKS_WRITER_NOOP_WRITER_HPP
 
-#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer/base_writer.hpp>
 #include <string>
 #include <vector>
 
 namespace stan {
-  namespace interface_callbacks {
+  namespace callbacks {
     namespace writer {
 
       /**

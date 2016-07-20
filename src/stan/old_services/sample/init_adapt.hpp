@@ -1,7 +1,7 @@
 #ifndef STAN_OLD_SERVICES_SAMPLE_INIT_ADAPT_HPP
 #define STAN_OLD_SERVICES_SAMPLE_INIT_ADAPT_HPP
 
-#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/old_services/arguments/categorical_argument.hpp>
@@ -19,8 +19,8 @@ namespace stan {
                       const double kappa,
                       const double t0,
                       const Eigen::VectorXd& cont_params,
-                      interface_callbacks::writer::base_writer& info_writer,
-                      interface_callbacks::writer::base_writer& error_writer) {
+                      callbacks::writer::base_writer& info_writer,
+                      callbacks::writer::base_writer& error_writer) {
         const double epsilon = sampler->get_nominal_stepsize();
 
         sampler->get_stepsize_adaptation().set_mu(log(10 * epsilon));
@@ -46,8 +46,8 @@ namespace stan {
       bool init_adapt(stan::mcmc::base_mcmc* sampler,
                       categorical_argument* adapt,
                       const Eigen::VectorXd& cont_params,
-                      interface_callbacks::writer::base_writer& info_writer,
-                      interface_callbacks::writer::base_writer& error_writer) {
+                      callbacks::writer::base_writer& info_writer,
+                      callbacks::writer::base_writer& error_writer) {
         double delta
           = dynamic_cast<real_argument*>(adapt->arg("delta"))->value();
         double gamma

@@ -1,7 +1,7 @@
 #ifndef STAN_MCMC_HMC_NUTS_BASE_NUTS_HPP
 #define STAN_MCMC_HMC_NUTS_BASE_NUTS_HPP
 
-#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer/base_writer.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/math/prim/scal/fun/log_sum_exp.hpp>
 #include <stan/mcmc/hmc/base_hmc.hpp>
@@ -43,8 +43,8 @@ namespace stan {
 
       sample
       transition(sample& init_sample,
-                 interface_callbacks::writer::base_writer& info_writer,
-                 interface_callbacks::writer::base_writer& error_writer) {
+                 callbacks::writer::base_writer& info_writer,
+                 callbacks::writer::base_writer& error_writer) {
         // Initialize the algorithm
         this->sample_stepsize();
 
@@ -178,8 +178,8 @@ namespace stan {
       int build_tree(int depth, Eigen::VectorXd& rho, ps_point& z_propose,
                      double H0, double sign, int& n_leapfrog,
                      double& log_sum_weight, double& sum_metro_prob,
-                     interface_callbacks::writer::base_writer& info_writer,
-                     interface_callbacks::writer::base_writer& error_writer) {
+                     callbacks::writer::base_writer& info_writer,
+                     callbacks::writer::base_writer& error_writer) {
         // Base case
         if (depth == 0) {
           this->integrator_.evolve(this->z_, this->hamiltonian_,
