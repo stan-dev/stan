@@ -2,7 +2,7 @@
 #define STAN_SERVICES_SAMPLE_FIXED_PARAM_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/callbacks/interrupt/base_interrupt.hpp>
+#include <stan/callbacks/interrupt.hpp>
 #include <stan/mcmc/fixed_param_sampler.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/services/util/mcmc_writer.hpp>
@@ -24,7 +24,7 @@ namespace stan {
                       int num_samples,
                       int num_thin,
                       int refresh,
-                      callbacks::interrupt::base_interrupt& interrupt,
+                      callbacks::interrupt& interrupt,
                       callbacks::writer::base_writer& message_writer,
                       callbacks::writer::base_writer&
                       init_writer,

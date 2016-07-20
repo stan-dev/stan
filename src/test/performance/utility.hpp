@@ -16,7 +16,7 @@
 #include <stan/old_services/io/write_stan.hpp>
 #include <stan/old_services/io/write_model.hpp>
 #include <stan/io/empty_var_context.hpp>
-#include <stan/callbacks/interrupt/noop.hpp>
+#include <stan/callbacks/noop_interrupt.hpp>
 #include <stan/callbacks/var_context_factory/dump_factory.hpp>
 #include <stan/callbacks/writer/noop_writer.hpp>
 #include <stan/callbacks/writer/stream_writer.hpp>
@@ -229,7 +229,7 @@ namespace stan {
         std::fstream output_stream(output_file.c_str(), std::fstream::out);
         callbacks::writer::stream_writer sample_writer(output_stream, "# ");
         callbacks::writer::noop_writer diagnostic_writer;
-        callbacks::interrupt::noop interrupt;
+        callbacks::noop_interrupt interrupt;
         
         Model model(data_var_context, &std::cout);
         stan::services::io::write_stan(sample_writer);

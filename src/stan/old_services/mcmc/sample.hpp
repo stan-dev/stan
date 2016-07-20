@@ -2,7 +2,7 @@
 #define STAN_OLD_SERVICES_MCMC_SAMPLE_HPP
 
 #include <stan/callbacks/writer/base_writer.hpp>
-#include <stan/callbacks/interrupt/base_interrupt.hpp>
+#include <stan/callbacks/interrupt.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/services/util/mcmc_writer.hpp>
 #include <stan/services/util/generate_transitions.hpp>
@@ -24,7 +24,7 @@ namespace stan {
                   stan::mcmc::sample& init_s,
                   Model& model,
                   RNG& base_rng,
-                  callbacks::interrupt::base_interrupt& callback,
+                  callbacks::interrupt& callback,
                   callbacks::writer::base_writer& info_writer,
                   callbacks::writer::base_writer& error_writer) {
         stan::services::util::generate_transitions<Model, RNG>

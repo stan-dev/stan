@@ -25,7 +25,7 @@ public:
 };
 
 struct mock_callback
-  : public stan::callbacks::interrupt::base_interrupt {
+  : public stan::callbacks::interrupt {
   int n;
   mock_callback() : n(0) { }
 

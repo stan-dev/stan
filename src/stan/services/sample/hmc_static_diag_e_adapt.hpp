@@ -2,7 +2,7 @@
 #define STAN_SERVICES_SAMPLE_HMC_STATIC_DIAG_E_ADAPT_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/callbacks/interrupt/base_interrupt.hpp>
+#include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/fixed_param_sampler.hpp>
 #include <stan/services/error_codes.hpp>
@@ -37,7 +37,7 @@ namespace stan {
                                   unsigned int init_buffer,
                                   unsigned int term_buffer,
                                   unsigned int window,
-                                callbacks::interrupt::base_interrupt&
+                                callbacks::interrupt&
                                   interrupt,
                                   callbacks::writer::base_writer&
                                   message_writer,

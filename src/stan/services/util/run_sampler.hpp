@@ -20,7 +20,7 @@ namespace stan {
                        int refresh,
                        bool save_warmup,
                        RNG& rng,
-                       callbacks::interrupt::base_interrupt&
+                       callbacks::interrupt&
                        interrupt,
                        callbacks::writer::base_writer& message_writer,
                        callbacks::writer::base_writer& error_writer,

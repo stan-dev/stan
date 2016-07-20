@@ -3,7 +3,7 @@
 #include <test/test-models/good/services/test_lp.hpp>
 #include <stan/callbacks/writer/base_writer.hpp>
 #include <stan/callbacks/writer/stream_writer.hpp>
-#include <stan/callbacks/interrupt/base_interrupt.hpp>
+#include <stan/callbacks/interrupt.hpp>
 #include <boost/random/additive_combine.hpp>
 #include <sstream>
 
@@ -26,7 +26,7 @@ public:
 };
 
 struct mock_callback
-  : public stan::callbacks::interrupt::base_interrupt {
+  : public stan::callbacks::interrupt {
   int n;
   mock_callback() : n(0) { }
 
