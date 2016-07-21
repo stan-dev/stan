@@ -207,7 +207,8 @@ TEST(lang, generate_cpp) {
 
   EXPECT_EQ(1, count_matches("public:", output_str))
     << "generate_public_decl()";
-  EXPECT_EQ(1, count_matches(" " + model_name + "(", output_str))  
+  // FIXME(carpenter): change this again when the second ctor eliminated
+  EXPECT_EQ(2, count_matches(" " + model_name + "(", output_str))  
     << "generate_constructor()";
   EXPECT_EQ(1, count_matches("~" + model_name + "(", output_str))  
     << "generate_destructor()";

@@ -1515,12 +1515,12 @@ namespace stan {
 
       if (has_rng_suffix(fun.name_)) {
         if (!(var_origin == derived_origin
+              || var_origin == transformed_data_origin
               || var_origin == function_argument_origin_rng)) {
-          error_msgs << "random number generators only allowed in"
-                     << " generated quantities block or"
-                     << " user-defined functions with names ending in _rng"
-                     << "; found function=" << fun.name_
-                     << " in block=";
+          error_msgs << "ERROR: random number generators only allowed in"
+                     << " tranformed data block, generated quantities block"
+                     << " or user-defined functions with names ending in _rng"
+                     << "; found function=" << fun.name_ << " in block=";
           print_var_origin(error_msgs, var_origin);
           error_msgs << std::endl;
           pass = false;

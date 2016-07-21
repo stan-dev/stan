@@ -65,21 +65,6 @@ TEST(parserFunctions,funsBad7) {
               " allowed in transformed parameter block, model block");
 }
 
-TEST(parserFunctions,funsBad8) {
-  test_throws("functions-bad8",
-              "random number generators only allowed in");
-}
-
-TEST(parserFunctions,funsBad9) {
-  test_throws("functions-bad9",
-              "random number generators only allowed in");
-}
-
-TEST(parserFunctions,funsBad10) {
-  test_throws("functions-bad10",
-              "random number generators only allowed in");
-}
-
 TEST(parserFunctions,funsBad11) {
   test_throws("functions-bad11",
               "Sampling statements (~) and increment_log_prob()");
