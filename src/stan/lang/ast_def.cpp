@@ -1312,9 +1312,11 @@ namespace stan {
 
     double_var_decl::double_var_decl(range const& range,
                                      std::string const& name,
-                                     std::vector<expression> const& dims)
+                                     std::vector<expression> const& dims,
+                                     expression const& def)
       : base_var_decl(name, dims, DOUBLE_T),
-        range_(range)
+        range_(range),
+        def_(def)
     { }
 
     unit_vector_var_decl::unit_vector_var_decl()

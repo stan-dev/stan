@@ -597,10 +597,13 @@ namespace stan {
 
     struct double_var_decl : public base_var_decl {
       range range_;
+      expression def_;
       double_var_decl();
       double_var_decl(range const& range,
                       std::string const& name,
-                      std::vector<expression> const& dims);
+                      std::vector<expression> const& dims,
+                      expression const& def);
+
     };
 
     struct unit_vector_var_decl : public base_var_decl {
