@@ -20,9 +20,6 @@ namespace stan {
     void replace_suffix(const std::string& old_suffix,
                         const std::string& new_suffix, fun& f);
 
-    bool validate_double_expr(const expression& expr,
-                              std::stringstream& error_msgs);
-
     void set_fun_type(fun& fun, std::ostream& error_msgs);
 
     int num_dimss(std::vector<std::vector<stan::lang::expression> >& dimss);
@@ -759,6 +756,13 @@ namespace stan {
     };
     extern boost::phoenix::function<validate_int_data_expr>
     validate_int_data_expr_f;
+
+    struct validate_double_expr : public phoenix_functor_ternary {
+      void operator()(const expression& expr, bool& pass,
+                      std::stringstream& error_msgs) const;
+    };
+    extern boost::phoenix::function<validate_double_expr> validate_double_expr_f;
+    
 
     struct set_double_range_lower : public phoenix_functor_quaternary {
       void operator()(range& range, const expression& expr, bool& pass,

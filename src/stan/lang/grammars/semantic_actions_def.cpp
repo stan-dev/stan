@@ -58,16 +58,20 @@ namespace stan {
       return true;
     }
 
-    bool validate_double_expr(const expression& expr,
-                              std::stringstream& error_msgs) {
+    void validate_double_expr::operator()(const expression& expr,
+                              bool& pass,
+                              std::stringstream& error_msgs) 
+      const {
       if (!expr.expression_type().is_primitive_double()
           && !expr.expression_type().is_primitive_int()) {
         error_msgs << "expression denoting real required; found type="
                    << expr.expression_type() << std::endl;
-        return false;
+        pass = false;
+        return;
       }
-      return true;
+      pass = true;
     }
+    boost::phoenix::function<validate_double_expr> validate_double_expr_f;
 
     void set_fun_type(fun& fun, std::ostream& error_msgs) {
       std::vector<expr_type> arg_types;
@@ -2365,7 +2369,8 @@ namespace stan {
                                             std::stringstream& error_msgs)
       const {
       range.low_ = expr;
-      pass = validate_double_expr(expr, error_msgs);
+      validate_double_expr validator;
+      validator(expr, pass, error_msgs);
     }
     boost::phoenix::function<set_double_range_lower> set_double_range_lower_f;
 
@@ -2375,7 +2380,8 @@ namespace stan {
                                             std::stringstream& error_msgs)
       const {
       range.high_ = expr;
-      pass = validate_double_expr(expr, error_msgs);
+      validate_double_expr validator;
+      validator(expr, pass, error_msgs);
     }
     boost::phoenix::function<set_double_range_upper> set_double_range_upper_f;
 
@@ -2409,6 +2415,13 @@ namespace stan {
                    << std::endl;
         var_decl_result = var_decl;
         return;
+      }
+      if (var_decl.base_type_ == DOUBLE_T) {
+        std::cout << "DOUBLE decl, name: "
+                  << var_decl.name_
+                  << " # dims: "
+                  << var_decl.dims_.size()
+                  << std::endl;
       }
       pass = true;  // probably don't need to set true
       vm.add(var_decl.name_, var_decl, vo);

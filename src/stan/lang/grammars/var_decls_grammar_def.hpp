@@ -19,7 +19,9 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::int_var_decl,
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::double_var_decl,
                           (stan::lang::range, range_)
                           (std::string, name_)
-                          (std::vector<stan::lang::expression>, dims_) )
+                          (std::vector<stan::lang::expression>, dims_)
+                          (stan::lang::expression, def_)
+                          )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::vector_var_decl,
                           (stan::lang::range, range_)
@@ -175,7 +177,10 @@ namespace stan {
             >> no_skip[!char_("a-zA-Z0-9_")])
         > -range_brackets_double_r(_r1)
         > identifier_r
-        > opt_dims_r(_r1);
+        > opt_dims_r(_r1)
+        > -( lit('=')
+             > expression_g(_r1)
+             [validate_double_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))] ); 
 
       vector_decl_r.name("vector declaration");
       vector_decl_r
