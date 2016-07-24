@@ -70,3 +70,7 @@ TEST(langParserVarDeclsGrammarDef, constraintsInLocals) {
 TEST (langParserVarDeclsGrammarDef, zeroVecs) {
   test_parsable("vector-zero");
 }
+
+TEST(langParserVarDeclsGrammarDef, defDeclDoubleVar) {
+  test_parsable("declare-define-var-double");
+}
