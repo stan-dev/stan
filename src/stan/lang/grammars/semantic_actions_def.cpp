@@ -548,12 +548,12 @@ namespace stan {
     }
     boost::phoenix::function<set_omni_idx> set_omni_idx_f;
 
-    void validate_int_expression::operator()(const expression & e, bool& pass)
+    void validate_int_expr_silent::operator()(const expression & e, bool& pass)
       const {
       pass = e.expression_type().is_primitive_int();
     }
-    boost::phoenix::function<validate_int_expression>
-    validate_int_expression_f;
+    boost::phoenix::function<validate_int_expr_silent>
+    validate_int_expr_silent_f;
 
     void validate_ints_expression::operator()(const expression & e, bool& pass,
                                               std::ostream& error_msgs) const {
@@ -1229,7 +1229,7 @@ namespace stan {
     }
     boost::phoenix::function<remove_loop_identifier> remove_loop_identifier_f;
 
-    void validate_int_expr_warn::operator()(const expression& expr,
+    void validate_int_expr::operator()(const expression& expr,
                                             bool& pass,
                                             std::stringstream& error_msgs)
       const {
@@ -1238,7 +1238,7 @@ namespace stan {
         error_msgs << "expression denoting integer required; found type="
                    << expr.expression_type() << std::endl;
     }
-    boost::phoenix::function<validate_int_expr_warn> validate_int_expr_warn_f;
+    boost::phoenix::function<validate_int_expr> validate_int_expr_f;
 
     void deprecate_increment_log_prob::operator()(
                                        std::stringstream& error_msgs) const {
@@ -2306,20 +2306,6 @@ namespace stan {
     }
     boost::phoenix::function<empty_range> empty_range_f;
 
-
-    void validate_int_expr::operator()(const expression& expr,
-                                       bool& pass,
-                                       std::stringstream& error_msgs) const {
-      if (!expr.expression_type().is_primitive_int()) {
-        error_msgs << "expression denoting integer required; found type="
-                   << expr.expression_type() << std::endl;
-        pass = false;
-        return;
-      }
-      pass = true;
-    }
-    boost::phoenix::function<validate_int_expr> validate_int_expr_f;
-
     void set_int_range_lower::operator()(range& range,
                                          const expression& expr,
                                          bool& pass,
@@ -2421,6 +2407,8 @@ namespace stan {
                   << var_decl.name_
                   << " # dims: "
                   << var_decl.dims_.size()
+                  << " def: "
+                  << (var_decl.def_.expression_type().is_ill_formed() ? " no def " : " has def")
                   << std::endl;
       }
       pass = true;  // probably don't need to set true

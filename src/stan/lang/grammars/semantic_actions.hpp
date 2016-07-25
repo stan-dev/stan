@@ -321,11 +321,11 @@ namespace stan {
     extern boost::phoenix::function<set_omni_idx> set_omni_idx_f;
 
     // called from: indexes_grammar, statement_grammar
-    struct validate_int_expression : public phoenix_functor_binary {
+    struct validate_int_expr_silent : public phoenix_functor_binary {
       void operator()(const expression & e, bool& pass) const;
     };
-    extern boost::phoenix::function<validate_int_expression>
-    validate_int_expression_f;
+    extern boost::phoenix::function<validate_int_expr_silent>
+    validate_int_expr_silent_f;
 
     // called from: indexes_grammar
     struct validate_ints_expression : public phoenix_functor_ternary {
@@ -465,14 +465,6 @@ namespace stan {
     };
     extern boost::phoenix::function<remove_loop_identifier>
     remove_loop_identifier_f;
-
-    // called from: statement_grammar
-    struct validate_int_expr_warn : public phoenix_functor_ternary {
-      void operator()(const expression& expr, bool& pass,
-                      std::stringstream& error_msgs) const;
-    };
-    extern boost::phoenix::function<validate_int_expr_warn>
-    validate_int_expr_warn_f;
 
     // called from: statement_grammar
     struct deprecate_increment_log_prob : public phoenix_functor_unary {

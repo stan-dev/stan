@@ -558,16 +558,20 @@ namespace stan {
       void infer_type();
     };
 
-
     struct base_var_decl {
       std::string name_;
       std::vector<expression> dims_;
       base_expr_type base_type_;
+      expression def_;
       base_var_decl();
       base_var_decl(const base_expr_type& base_type);  // NOLINT
       base_var_decl(const std::string& name,
                     const std::vector<expression>& dims,
                     const base_expr_type& base_type);
+      base_var_decl(const std::string& name,
+                    const std::vector<expression>& dims,
+                    const base_expr_type& base_type,
+                    const expression& def);
     };
 
     struct variable_map {
@@ -597,13 +601,11 @@ namespace stan {
 
     struct double_var_decl : public base_var_decl {
       range range_;
-      expression def_;
       double_var_decl();
       double_var_decl(range const& range,
                       std::string const& name,
                       std::vector<expression> const& dims,
                       expression const& def);
-
     };
 
     struct unit_vector_var_decl : public base_var_decl {

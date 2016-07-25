@@ -1264,6 +1264,11 @@ namespace stan {
                                  const std::vector<expression>& dims,
                                  const base_expr_type& base_type)
       : name_(name), dims_(dims), base_type_(base_type) {  }
+    base_var_decl::base_var_decl(const std::string& name,
+                                 const std::vector<expression>& dims,
+                                 const base_expr_type& base_type,
+                                 const expression& def)
+      : name_(name), dims_(dims), base_type_(base_type), def_(def) {  }
 
     bool variable_map::exists(const std::string& name) const {
       return map_.find(name) != map_.end();
@@ -1314,9 +1319,8 @@ namespace stan {
                                      std::string const& name,
                                      std::vector<expression> const& dims,
                                      expression const& def)
-      : base_var_decl(name, dims, DOUBLE_T),
-        range_(range),
-        def_(def)
+      : base_var_decl(name, dims, DOUBLE_T, def),
+        range_(range)
     { }
 
     unit_vector_var_decl::unit_vector_var_decl()

@@ -220,11 +220,11 @@ namespace stan {
       range_r.name("range expression pair, colon");
       range_r
         %= expression_g(_r1)
-           [validate_int_expr_warn_f(_1, _pass,
+           [validate_int_expr_f(_1, _pass,
                                      boost::phoenix::ref(error_msgs_))]
         >> lit(':')
         >> expression_g(_r1)
-           [validate_int_expr_warn_f(_1, _pass,
+           [validate_int_expr_f(_1, _pass,
                                      boost::phoenix::ref(error_msgs_))];
 
       // this one comes before assgn_r to deal with simple assignment
@@ -278,7 +278,7 @@ namespace stan {
       // uses silent test because errors will be reported in sliced rules
       dims_r
         %= lit('[')
-        >> (expression_g(_r1)[validate_int_expression_f(_1, _pass)] % ',')
+        >> (expression_g(_r1)[validate_int_expr_silent_f(_1, _pass)] % ',')
         >> lit(']');
 
       // inherited  _r1 = true if samples allowed as statements

@@ -248,10 +248,11 @@ namespace stan {
         %= (lit('(') >> lit(')'))
         | (lit('(') >> (expression_g(_r1) % ',') >> lit(')'));
 
+      // mitzi: why no error message if array dim isn't int expr?
       dim_r.name("array dimension (integer expression)");
       dim_r
         %= expression_g(_r1)
-        >> eps[validate_int_expression_f(_val, _pass)];
+        >> eps[validate_int_expr_silent_f(_val, _pass)];
 
       dims_r.name("array dimensions");
       dims_r
