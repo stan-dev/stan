@@ -1515,12 +1515,12 @@ namespace stan {
 
       if (has_rng_suffix(fun.name_)) {
         if (!(var_origin == derived_origin
+              || var_origin == transformed_data_origin
               || var_origin == function_argument_origin_rng)) {
-          error_msgs << "random number generators only allowed in"
-                     << " generated quantities block or"
-                     << " user-defined functions with names ending in _rng"
-                     << "; found function=" << fun.name_
-                     << " in block=";
+          error_msgs << "ERROR: random number generators only allowed in"
+                     << " tranformed data block, generated quantities block"
+                     << " or user-defined functions with names ending in _rng"
+                     << "; found function=" << fun.name_ << " in block=";
           print_var_origin(error_msgs, var_origin);
           error_msgs << std::endl;
           pass = false;
@@ -1579,6 +1579,13 @@ namespace stan {
                    << " distribution on a correlation matrix"
                    << " and independent lognormals on the scales."
                    << std::endl << std::endl;
+      }
+
+      if (fun.name_ == "if_else") {
+        error_msgs << "Warning (non-fatal): the if_else() function"
+                   << " is deprecated.  "
+                   << "Use the conditional operator '?:' instead."
+                   << std::endl;
       }
 
       fun_result = fun;
@@ -2458,6 +2465,15 @@ namespace stan {
                                       variable_map&, bool&, const var_origin&,
                                       std::ostream&) const;
 
+    void validate_in_loop::operator()(bool in_loop, bool& pass,
+                                      std::ostream& error_msgs) const {
+      pass = in_loop;
+      if (!pass)
+        error_msgs << "ERROR: break and continue statements are only allowed"
+                   << " in the body of a for-loop or while-loop."
+                   << std::endl;
+    }
+    boost::phoenix::function<validate_in_loop> validate_in_loop_f;
 
   }
 }

@@ -484,24 +484,6 @@ are primarily provided for compatibility with BUGS and JAGS.
 %
 \begin{description}
   %
-  \fitem{real}{if\_else}{int \farg{cond}, real \farg{x}, real \farg{y}}{
-    Returns \farg{x} if \farg{cond} is non-zero and \farg{y} otherwise.
-    Stan's \code{if\_else} function does not short circuit---it
-    always evaluates both arguments \farg{x} and \farg{y}.
-    \[
-    \mbox{if\_else}(cond,x,y) = 
-    \begin{cases}
-      x & \mbox{if } cond \neq 0 \\
-      y & \mbox{otherwise}
-    \end{cases}
-    \]
-    {\bfseries Warning:} This function should not be used.  Rather,
-    \code{if\_else(a,~b,~c)} should be replaced with the conditional
-    operator \code{a~?~b~:~c}.  The conditional operator also allows
-    more flexiblity in the types of \code{b} and \code{c}.  See
-    \refsection{conditional-operator} for full details of the
-    conditional operator.  }
-  %
   \fitem{real}{step}{real \farg{x}}{
     Returns 1 if \farg{x} is positive and 0 otherwise.
     \[
@@ -514,50 +496,14 @@ are primarily provided for compatibility with BUGS and JAGS.
   %
 \end{description}
 %
-Both of these are step-like functions; see the warning in
+The step function is often used in BUGS to perform conditional
+operations.  For instance, \code{step(a\,-\,b)} evaluates to 1 if
+\code{a} is greater than \code{b} and evaluates to 0 otherwise.
+\code{step} is a step-like functions; see the warning in
 \refsection{step-functions} applied to expressions dependent on
 parameters. 
 
-The step function is often used in BUGS to perform conditional
-operations.  For instance, \code{step(a\,-\,b)} evaluates to 1 if
-\code{a} is greater than {b} and evaluates to 0 otherwise.  In Stan,
-the expression \code{step(a\,-\,b)} is more naturally coded directly
-in terms of the comparison operator, \code{(a\,>\,b)}.  
 
-The log probability function and gradient evaluations are more
-efficient in Stan when implemented using conditional statements than
-with mulitplications by step functions.  For example, if \code{y} is a
-\code{real} variable, and \code{c}, \code{x1}, and \code{x2} are
-scalar expressions (type \code{real} or \code{int}), then the
-assignment statements
-%
-\begin{stancode}
-y = x1 * step(c) + x2 * (1 - step(c));
-\end{stancode}
-%
-and
-%
-\begin{stancode}
-y = if_else(c > 0, x1, x2);
-\end{stancode}
-%
-are more efficiently written with the conditional statement
-%
-\begin{stancode}
-if (c > 0)
-  y = x1;
-else
-  y = x2;
-\end{stancode}
-%
-The reason the functional versions are slower is that they evaluate
-all of their arguments; the step function approach is particularly
-slow as it also introduces arithmetic operations.  The overhead will
-be more noticeable if \code{c}, \code{x1} or \code{x2}
-are parameters (including transformed parameters and local variables
-that depend on parameters) or if \code{x1} and \code{x2} are
-complicated expressions rather than constants or simple variables.  
-%
 \begin{description}
   %
   \fitem{int}{is\_inf}{real \farg{x}}{

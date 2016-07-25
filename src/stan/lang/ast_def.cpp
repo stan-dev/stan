@@ -449,7 +449,6 @@ namespace stan {
           match_index = i;
           num_matches = 1;
         } else if (promotions_ui == min_promotions) {
-          std::cout << std::endl;
           ++num_matches;
         }
       }
@@ -617,6 +616,15 @@ namespace stan {
     bool returns_type_vis::operator()(const while_statement& st) const  {
       // body must end in appropriate return
       return returns_type(return_type_, st.body_, error_msgs_);
+    }
+    bool returns_type_vis::operator()(const break_continue_statement& st)
+      const  {
+      // break/continue OK only as end of nested loop in void return
+      bool pass = (return_type_ == VOID_T);
+      if (!pass)
+        error_msgs_ << "statement " << st.generate_
+                    << " does not match return type";
+      return pass;
     }
     bool returns_type_vis::operator()(const
                                       conditional_statement& st) const  {
@@ -1583,6 +1591,8 @@ namespace stan {
     statement::statement(const expression& st) : statement_(st) { }
     statement::statement(const for_statement& st) : statement_(st) { }
     statement::statement(const while_statement& st) : statement_(st) { }
+    statement::statement(const break_continue_statement& st)
+      : statement_(st) { }
     statement::statement(const conditional_statement& st) : statement_(st) { }
     statement::statement(const print_statement& st) : statement_(st) { }
     statement::statement(const reject_statement& st) : statement_(st) { }
@@ -1622,6 +1632,11 @@ namespace stan {
     bool is_no_op_statement_vis::operator()(const while_statement& st) const {
       return false;
     }
+    bool
+    is_no_op_statement_vis::operator()(const break_continue_statement& st)
+      const {
+      return false;
+    }
     bool is_no_op_statement_vis::operator()(const print_statement& st) const {
       return false;
     }
@@ -1657,13 +1672,16 @@ namespace stan {
         statement_(stmt) {
     }
 
-    while_statement::while_statement() {
-    }
+    while_statement::while_statement() { }
     while_statement::while_statement(const expression& condition,
                                      const statement& body)
       : condition_(condition),
         body_(body) {
     }
+
+    break_continue_statement::break_continue_statement() { }
+    break_continue_statement::break_continue_statement(const std::string& s)
+      : generate_(s) { }
 
     conditional_statement::conditional_statement() {
     }
