@@ -272,7 +272,7 @@ TEST(McmcNutsBaseNuts, transition) {
 
   stan::mcmc::sample s = sampler.transition(init_sample, writer, error_writer);
 
-  EXPECT_EQ(-42, s.cont_params()(0));
+  EXPECT_EQ(31.5, s.cont_params()(0));
   EXPECT_EQ(0, s.log_prob());
   EXPECT_EQ(1, s.accept_stat());
   EXPECT_EQ("", output_stream.str());
