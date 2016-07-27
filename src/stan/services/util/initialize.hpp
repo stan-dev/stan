@@ -12,7 +12,6 @@ namespace stan {
   namespace services {
     namespace util {
 
-
       template <class Model, class RNG>
       std::vector<double> initialize(Model& model,
                                      stan::io::var_context& init,
@@ -27,19 +26,27 @@ namespace stan {
         std::vector<int> disc_vector;
         std::stringstream msg;
 
+        std::vector<std::string> init_names;
+        init.names_r(init_names);
+
         int MAX_INIT_TRIES = 100;
         int num_init_tries = 0;
         for (; num_init_tries < MAX_INIT_TRIES; num_init_tries++) {
-          stan::io::random_var_context random_context(model, rng, init_radius);
-          stan::io::chained_var_context context(init, random_context);
-          double log_prob(0);
+          if (init_names.size() == 0) {
+            stan::io::random_var_context random_context(model, rng, init_radius);
+            unconstrained = random_context.get_unconstrained();
+          } else {
+            stan::io::random_var_context random_context(model, rng, init_radius);
+            stan::io::chained_var_context context(init, random_context);
 
-          model.transform_inits(context,
-                                disc_vector,
-                                unconstrained,
-                                &msg);
-          if (msg.str().length() > 0)
-            message_writer(msg.str());
+            model.transform_inits(context,
+                                  disc_vector,
+                                  unconstrained,
+                                  &msg);
+            if (msg.str().length() > 0)
+              message_writer(msg.str());
+          }
+          double log_prob(0);
           try {
             msg.str("");
             log_prob = model.template log_prob<false, true>

@@ -48,7 +48,8 @@ namespace stan {
       template <class Model, class RNG>
       random_var_context(Model& model,
                          RNG& rng,
-                         double init_radius) {
+                         double init_radius)
+        : unconstrained_params_(model.num_params_r()) {
         size_t num_unconstrained_ = model.num_params_r();
         model.get_param_names(names_);
         model.get_dims(dims_);
@@ -70,21 +71,20 @@ namespace stan {
         dims_.erase(dims_.begin() + index, dims_.end());
         names_.erase(names_.begin() + index, names_.end());
 
-        std::vector<double> unconstrained_params(num_unconstrained_);
         if (init_radius <= std::numeric_limits<double>::min()) {
           for (size_t n = 0; n < num_unconstrained_; n++)
-            unconstrained_params[n] = 0.0;
+            unconstrained_params_[n] = 0.0;
         } else {
           boost::random::uniform_real_distribution<double>
             unif(-init_radius, init_radius);
           for (size_t n = 0; n < num_unconstrained_; n++)
-            unconstrained_params[n] = unif(rng);
+            unconstrained_params_[n] = unif(rng);
         }
 
         std::vector<double> constrained_params;
         std::vector<int> int_params;
         model.write_array(rng,
-                          unconstrained_params, int_params,
+                          unconstrained_params_, int_params,
                           constrained_params,
                           false, false, 0);
 
@@ -204,10 +204,15 @@ namespace stan {
         names.clear();
       }
 
+      std::vector<double> get_unconstrained() const {
+        return unconstrained_params_;
+      }
+
     private:
       std::vector<std::string> names_;
       std::vector<std::vector<size_t> > dims_;
       std::vector<std::vector<double> > vals_r_;
+      std::vector<double> unconstrained_params_;
     };
 
   }
