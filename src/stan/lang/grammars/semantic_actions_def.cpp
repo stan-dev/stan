@@ -1233,10 +1233,13 @@ namespace stan {
                                             bool& pass,
                                             std::stringstream& error_msgs)
       const {
-      pass = expr.expression_type().is_primitive_int();
-      if (!pass)
+      if (!expr.expression_type().is_primitive_int()) {
         error_msgs << "expression denoting integer required; found type="
                    << expr.expression_type() << std::endl;
+        pass = false;
+        return;
+      }
+      pass = true;
     }
     boost::phoenix::function<validate_int_expr> validate_int_expr_f;
 
