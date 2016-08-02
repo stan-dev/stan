@@ -117,8 +117,6 @@ namespace stan {
         throw located_exception<bad_exception>(s, "bad_exception");
       if (is_type<bad_typeid>(e))
         throw located_exception<bad_typeid>(s, "bad_typeid");
-      if (is_type<std::ios_base::failure>(e))
-        throw std::ios_base::failure(s);
       if (is_type<domain_error>(e))
         throw domain_error(s);
       if (is_type<invalid_argument>(e))

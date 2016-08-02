@@ -3703,7 +3703,7 @@ parameters {
   vector[T] h;                 // log volatility at time t
 }
 model {
-  phi ~ uniform(-1,1);
+  phi ~ uniform(-1, 1);
   sigma ~ cauchy(0, 5);
   mu ~ cauchy(0, 10);  
   h[1] ~ normal(mu, sigma / sqrt(1 - phi * phi));
@@ -4228,9 +4228,9 @@ parameters {
   real<lower=min_cov,upper=max_cov> cov;
 }
 transformed parameters {
-  matrix[2,2] Sigma;
-  Sigma[1,1] = var1;     Sigma[1,2] = cov;
-  Sigma[2,1] = cov;      Sigma[2,2] = var2;
+  matrix[2, 2] Sigma;
+  Sigma[1, 1] = var1;     Sigma[1, 2] = cov;
+  Sigma[2, 1] = cov;      Sigma[2, 2] = var2;
 }  
 model {
  for (n in 1:N)
@@ -8399,8 +8399,8 @@ transformed parameters {
   beta = lambda * (1 - phi);
   ...
 model {
-  phi ~ beta(1,1); // uniform on phi, could drop
-  lambda ~ pareto(0.1,1.5);
+  phi ~ beta(1, 1); // uniform on phi, could drop
+  lambda ~ pareto(0.1, 1.5);
   for (n in 1:N)
     theta[n] ~ beta(alpha, beta);
   ...
@@ -9141,8 +9141,9 @@ built-in functions and user-defined functions that end in
 \code{\_rng}, which includes all the built-in PRNG functions.  Only
 functions ending in \code{\_rng} are able access the built-in PRNG
 functions.  The use of functions ending in \code{\_rng} must therefore
-be restricted to the generated quantities block like other PRNG
-functions.
+be restricted to transformed data and generated quantities blocks like
+other PRNG functions; they may also be used in the bodies of other
+user-defined functions ending in \code{\_rng}.
 
 For example, the following function generates an $N \times K$ data
 matrix, the first column of which is filled with 1 values for the
@@ -9153,9 +9154,9 @@ from a unit normal PRNG.
 matrix predictors_rng(int N, int K) {
   matrix[N, K] x;
   for (n in 1:N) {
-    x[n,1] = 1.0;  // intercept
+    x[n, 1] = 1.0;  // intercept
     for (k in 2:K)
-      x[n, k] = normal_rng(0,1);
+      x[n, k] = normal_rng(0, 1);
   }
   return x;
 }
@@ -9381,7 +9382,8 @@ parameters or model blocks.
 
 Only functions ending in \code{\_rng} may access the built-in
 pseudo-random number generators.  Such functions may only be used in
-the generated quantities block.
+the generated quantities block or transformed data block, or in the
+bodies of other user-defined functions ending in \code{\_rng}.
 
 
 \section{Recursive Functions}
@@ -9622,8 +9624,8 @@ generated quantities {
 
   // add measurement error
   for (t in 1:T) {
-    y_hat[t,1] = y_hat[t,1] + normal_rng(0,0.1);
-    y_hat[t,2] = y_hat[t,2] + normal_rng(0,0.1);
+    y_hat[t, 1] = y_hat[t, 1] + normal_rng(0, 0.1);
+    y_hat[t, 2] = y_hat[t, 2] + normal_rng(0, 0.1);
   }
 }
 \end{stancode}
@@ -10935,7 +10937,7 @@ parameters {
   real beta;
   ...
 model {
-  beta ~ student_t(nu,0,1);
+  beta ~ student_t(nu, 0, 1);
   ...
 \end{stancode}
 %
@@ -11412,10 +11414,10 @@ parameters {
 model {
   for (n in 1:N) {
     real gamma;  
-    gamma = 0.0;
+    gamma = 0;
     for (k in 1:K)
       gamma = gamma + x[n, k] * beta[k];
-    y[n] ~ normal(gamma,1);
+    y[n] ~ normal(gamma, 1);
   }
 }
 \end{stancode}
