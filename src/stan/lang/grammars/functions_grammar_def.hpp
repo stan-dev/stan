@@ -70,7 +70,7 @@ namespace stan {
           [validate_pmf_pdf_variate_f(_val, _pass,
                                       boost::phoenix::ref(error_msgs_))]
         > eps[scope_lp_f(boost::phoenix::ref(var_map_))]
-        > statement_g(_a, _b, true)
+        > statement_g(_a, _b, true, false)
         > eps[unscope_variables_f(_val, boost::phoenix::ref(var_map_))]
         > eps[validate_return_type_f(_val, _pass,
                                      boost::phoenix::ref(error_msgs_))]

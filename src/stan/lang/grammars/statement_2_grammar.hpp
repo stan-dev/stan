@@ -15,10 +15,11 @@ namespace stan {
     template <typename Iterator>
     struct statement_grammar;
 
+    // for _r1, _r2, _r3, _r4 doc, see statement_grammar_def.hpp
     template <typename Iterator>
     struct statement_2_grammar
       : boost::spirit::qi::grammar<Iterator,
-                                   statement(bool, var_origin, bool),
+                                   statement(bool, var_origin, bool, bool),
                                    whitespace_grammar<Iterator> > {
       variable_map& var_map_;
       std::stringstream& error_msgs_;
@@ -30,12 +31,13 @@ namespace stan {
                           statement_grammar<Iterator>& sg);
 
       boost::spirit::qi::rule<Iterator,
-                              conditional_statement(bool, var_origin, bool),
+                              conditional_statement(bool, var_origin, bool,
+                                                    bool),
                               whitespace_grammar<Iterator> >
       conditional_statement_r;
 
       boost::spirit::qi::rule<Iterator,
-                              statement(bool, var_origin, bool),
+                              statement(bool, var_origin, bool, bool),
                               whitespace_grammar<Iterator> >
       statement_2_r;
     };

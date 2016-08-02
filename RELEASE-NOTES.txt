@@ -6,6 +6,19 @@ Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
 
+v2.11.0 (27 July 2016)
+======================================================================
+
+Bug Fixes
+--------------------------------------------------
+* fixed sampling bug introduced in v2.10.0 (#1979)
+* fixed compilation issue under clang++3.8 for rethrow_located and
+  ios_base::failure (#1937)
+* print() now prints when there is a rejection/exception in the model
+  block (#1936)
+* integer division by zero throws exception (#1974, math#321)
+
+
 v2.10.0 (15 June 2016)
 ======================================================================
 
