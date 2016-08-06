@@ -744,6 +744,25 @@ namespace stan {
       base_var_decl operator()(const corr_matrix_var_decl& x) const;
     };
 
+    struct var_decl_has_def_vis
+      : public boost::static_visitor<bool> {
+      var_decl_has_def_vis();
+      bool operator()(const nil& x) const;
+      bool operator()(const int_var_decl& x) const;
+      bool operator()(const double_var_decl& x) const;
+      bool operator()(const vector_var_decl& x) const;
+      bool operator()(const row_vector_var_decl& x) const;
+      bool operator()(const matrix_var_decl& x) const;
+      bool operator()(const simplex_var_decl& x) const;
+      bool operator()(const unit_vector_var_decl& x) const;
+      bool operator()(const ordered_var_decl& x) const;
+      bool operator()(const positive_ordered_var_decl& x) const;
+      bool operator()(const cholesky_factor_var_decl& x) const;
+      bool operator()(const cholesky_corr_var_decl& x) const;
+      bool operator()(const cov_matrix_var_decl& x) const;
+      bool operator()(const corr_matrix_var_decl& x) const;
+    };
+
     struct var_decl {
       typedef boost::variant<boost::recursive_wrapper<nil>,
                          boost::recursive_wrapper<int_var_decl>,
@@ -760,9 +779,7 @@ namespace stan {
                          boost::recursive_wrapper<cov_matrix_var_decl>,
                          boost::recursive_wrapper<corr_matrix_var_decl> >
       var_decl_t;
-
       var_decl_t decl_;
-
       var_decl();
 
       // template <typename Decl>
@@ -785,6 +802,7 @@ namespace stan {
 
       std::string name() const;
       base_var_decl base_decl() const;
+      bool has_def() const;
     };
 
     struct statement {

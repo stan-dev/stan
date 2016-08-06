@@ -19,7 +19,8 @@ namespace stan {
 
   namespace lang {
 
-    void generate_expression(const expression& e, std::ostream& o);
+    void generate_expression(const expression& e,
+                             std::ostream& o);
     void generate_expression(const expression& e,
                              bool user_facing,
                              std::ostream& o);
@@ -676,7 +677,14 @@ namespace stan {
                                  const std::string& base_type,
                                  const std::vector<expression>& dims,
                                  const expression& type_arg1 = expression(),
-                                 const expression& type_arg2 = expression()) {
+                                 const expression& type_arg2 = expression(),
+                                 const expression& definition = expression()) {
+      std::cout << " generate_initialization: " << var_name 
+                << " type: " << base_type
+                << " dims size: " << dims.size()
+                << " def: " << definition.expression_type()
+                << std::endl;
+
       // validate all dims are positive
       for (size_t i = 0; i < dims.size(); ++i)
         generate_validate_positive(var_name, dims[i], o);
@@ -685,11 +693,17 @@ namespace stan {
       if (!is_nil(type_arg2))
         generate_validate_positive(var_name, type_arg2, o);
 
-      // define variable with initializer
+      // initialize variable or use definition
       o << INDENT2
         << var_name << " = ";
-      generate_type(base_type, dims, dims.size(), o);
-      generate_initializer(o, base_type, dims, type_arg1, type_arg2);
+      if (is_nil(definition)) {
+        generate_type(base_type, dims, dims.size(), o);
+        generate_initializer(o, base_type, dims, type_arg1, type_arg2);
+      } else {
+        // access to user_facing and is_var?
+        generate_expression(definition, o);
+        o << ";" << EOL;
+      }
     }
 
     struct var_resizing_visgen : public visgen {
@@ -698,10 +712,10 @@ namespace stan {
       }
       void operator()(nil const& /*x*/) const { }  // dummy
       void operator()(int_var_decl const& x) const {
-        generate_initialization(o_, x.name_, "int", x.dims_);
+        generate_initialization(o_, x.name_, "int", x.dims_, nil(), nil(), x.def_);
       }
       void operator()(double_var_decl const& x) const {
-        generate_initialization(o_, x.name_, "double", x.dims_);
+        generate_initialization(o_, x.name_, "double", x.dims_, nil(), nil(), x.def_);
       }
       void operator()(vector_var_decl const& x) const {
         generate_initialization(o_, x.name_, "vector_d", x.dims_, x.M_);
@@ -1020,10 +1034,12 @@ namespace stan {
         << "> in__(params_r__,params_i__);" << EOL2;
       init_local_var_visgen vis(declare_vars, is_var, o);
       for (size_t i = 0; i < vs.size(); ++i)
-        boost::apply_visitor(vis, vs[i].decl_);
+        //        if (vs[i].has_def()) {
+        //          // ??
+        //        } else {
+          boost::apply_visitor(vis, vs[i].decl_);
+      //        }
     }
-
-
 
 
     void generate_public_decl(std::ostream& o) {
@@ -1059,7 +1075,6 @@ namespace stan {
           o_ << "}" << EOL;
         }
       }
-
       void generate_loop_var(const std::string& name,
                              size_t dims_size) const {
         o_ << name;
@@ -1069,8 +1084,11 @@ namespace stan {
       void operator()(nil const& /*x*/) const { }
       template <typename T>
       void basic_validate(T const& x) const {
-        if (!(x.range_.has_low() || x.range_.has_high()))
+        if (!(x.range_.has_low() || x.range_.has_high())) {
+          // std::cout << "basic_validate " << x.name_ << " unconstrained" << std::endl;
           return;  // unconstrained
+        }
+        // std::cout << "basic_validate " << x.name_ << " with constraints" << std::endl;
         generate_begin_for_dims(x.dims_);
         if (x.range_.has_low()) {
           generate_indent(indents_ + x.dims_.size(), o_);
@@ -1166,6 +1184,7 @@ namespace stan {
         generate_validate_var_decl(decls[i], indent, o);
     }
 
+    // add argument for array definition
     // see _var_decl_visgen cut & paste
     struct member_var_decl_visgen : public visgen {
       int indents_;
@@ -1214,7 +1233,8 @@ namespace stan {
       void operator()(matrix_var_decl const& x) const {
         declare_array(("matrix_d"), x.name_, x.dims_.size());
       }
-      void declare_array(std::string const& type, std::string const& name,
+      void declare_array(std::string const& type,
+                         std::string const& name,
                          size_t size) const {
         for (int i = 0; i < indents_; ++i)
           o_ << INDENT;
@@ -1241,8 +1261,7 @@ namespace stan {
     }
 
     // see member_var_decl_visgen cut & paste
-
-    // **************need this logic for conditional_op ***************
+    // need to define local_var_decl_define_visgen
 
     struct local_var_decl_visgen : public visgen {
       int indents_;
@@ -1260,14 +1279,14 @@ namespace stan {
       void operator()(nil const& /*x*/) const { }
       void operator()(int_var_decl const& x) const {
         std::vector<expression> ctor_args;
-        declare_array("int", ctor_args, x.name_, x.dims_);
+        declare_array("int", ctor_args, x.name_, x.dims_,x.def_);
       }
       void operator()(double_var_decl const& x) const {
         std::vector<expression> ctor_args;
         declare_array(is_fun_return_
                       ? "fun_scalar_t__"
                       : (is_var_ ? "T__" : "double"),
-                      ctor_args, x.name_, x.dims_);
+                      ctor_args, x.name_, x.dims_,x.def_);
       }
       void operator()(vector_var_decl const& x) const {
         std::vector<expression> ctor_args;
@@ -1448,12 +1467,18 @@ namespace stan {
       void declare_array(const std::string& type,
                          const std::vector<expression>& ctor_args,
                          const std::string& name,
-                         const std::vector<expression>& dims) const {
+                         const std::vector<expression>& dims,
+                         const expression& definition = expression()) const {
         // require double parens to counter "most vexing parse" problem
         generate_indent(indents_, o_);
         generate_type(type, dims.size());
         o_ << ' '  << name;
-        generate_init_args(type, ctor_args, dims, 0);
+        if (is_nil(definition)) {
+          generate_init_args(type, ctor_args, dims, 0);
+        } else {
+          o_ << " = ";
+          generate_expression(definition, o_);
+        }
         o_ << ';' << EOL;
         if (dims.size() == 0) {
           generate_indent(indents_, o_);
@@ -1559,7 +1584,9 @@ namespace stan {
       generate_local_var_init_nan_visgen vis(indent, is_var, is_fun_return,
                                              indent, o);
       for (size_t i = 0; i < vs.size(); ++i)
-        boost::apply_visitor(vis, vs[i].decl_);
+        if (!(vs[i].has_def())) {
+          boost::apply_visitor(vis, vs[i].decl_);
+        }
     }
 
 
@@ -1636,8 +1663,11 @@ namespace stan {
       generate_comment("initialize transformed variables to"
                        " avoid seg fault on val access",
                        indent, o);
-      for (size_t i = 0; i < vs.size(); ++i)
-        boost::apply_visitor(vis, vs[i].decl_);
+      for (size_t i = 0; i < vs.size(); ++i) {
+        if (!vs[i].has_def()) {
+          boost::apply_visitor(vis, vs[i].decl_);
+        }
+      }
     }
 
 
@@ -2042,6 +2072,7 @@ namespace stan {
         generate_expression(x.log_prob_, o_);
         o_ << ");" << EOL;
       }
+      // generate_local_var_decl - change to accomodate definitions
       void operator()(const statements& x) const {
         bool has_local_vars = x.local_decl_.size() > 0;
         size_t indent = has_local_vars ? (indent_ + 1) : indent_;
@@ -3101,12 +3132,13 @@ namespace stan {
         << EOL;
       o << INDENT2
         << "(void) DUMMY_VAR__;  // suppress unused var warning" << EOL2;
-      generate_init_vars(prog.derived_data_decl_.first, 2, o);
+      generate_init_vars(prog.derived_data_decl_.first, 2, o); 
       o << EOL;
 
       bool include_sampling = false;
       bool is_var = false;
       bool is_fun_return = false;
+      // need to fix generate_located_statements
       generate_located_statements(prog.derived_data_decl_.second,
                                   2, o, include_sampling, is_var,
                                   is_fun_return);
@@ -3133,7 +3165,7 @@ namespace stan {
       void operator()(int_var_decl const& x) const {
         generate_check_int(x.name_, x.dims_.size());
         var_size_validator_(x);
-        generate_declaration(x.name_, "int", x.dims_);
+        generate_declaration(x.name_, "int", x.dims_, nil(), nil(), x.def_);
         generate_buffer_loop("i", x.name_, x.dims_);
         generate_write_loop("integer(", x.name_, x.dims_);
       }
@@ -3165,7 +3197,7 @@ namespace stan {
       void operator()(double_var_decl const& x) const {
         generate_check_double(x.name_, x.dims_.size());
         var_size_validator_(x);
-        generate_declaration(x.name_, "double", x.dims_);
+        generate_declaration(x.name_, "double", x.dims_, nil(), nil(), x.def_);
         generate_buffer_loop("r", x.name_, x.dims_);
         generate_write_loop(function_args("scalar", x),
                             x.name_, x.dims_);
@@ -3283,13 +3315,19 @@ namespace stan {
                                 const std::string& base_type,
                                 const std::vector<expression>& dims,
                                 const expression& type_arg1 = expression(),
-                                const expression& type_arg2 = expression())
+                                const expression& type_arg2 = expression(),
+                                const expression& definition = expression())
       const {
         o_ << INDENT2;
         generate_type(base_type, dims, dims.size(), o_);
         o_ << ' ' << name;
-
-        generate_initializer(o_, base_type, dims, type_arg1, type_arg2);
+        if (is_nil(definition)) {
+          generate_initializer(o_, base_type, dims, type_arg1, type_arg2);
+        } else {
+          o_ << " = " ;
+          generate_expression(definition, o_);
+          o_ << ";" << EOL;
+        }
       }
       void generate_indent_num_dims(size_t base_indent,
                                     const std::vector<expression>& dims,
@@ -4779,6 +4817,7 @@ namespace stan {
       generate_destructor(model_name, out);
       // put back if ever need integer params
       // generate_set_param_ranges(prog.parameter_decl_, out);
+      
       generate_init_method(prog.parameter_decl_, out);
       generate_log_prob(prog, out);
       generate_param_names_method(prog, out);

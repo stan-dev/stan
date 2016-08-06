@@ -1545,6 +1545,64 @@ namespace stan {
       return x.base_type_;
     }
 
+    var_decl_has_def_vis::var_decl_has_def_vis() { }
+    bool var_decl_has_def_vis::operator()(const nil& /* x */)
+      const {
+      return false;  // should not be called
+    }
+    bool var_decl_has_def_vis::operator()(const int_var_decl& x)
+      const {
+      return !is_nil(x.def_);
+    }
+    bool var_decl_has_def_vis::operator()(const double_var_decl& x)
+      const {
+      return !is_nil(x.def_);
+    }
+    bool var_decl_has_def_vis::operator()(const vector_var_decl& x)
+      const {
+      return !is_nil(x.def_);
+    }
+    bool var_decl_has_def_vis::operator()(
+                                    const row_vector_var_decl& x) const {
+      return !is_nil(x.def_);
+    }
+    bool var_decl_has_def_vis::operator()(const matrix_var_decl& x)
+      const {
+      return !is_nil(x.def_);
+    }
+    bool var_decl_has_def_vis::operator()(
+                                    const unit_vector_var_decl& x) const {
+      return !is_nil(x.def_);
+    }
+    bool var_decl_has_def_vis::operator()(
+                                     const simplex_var_decl& x) const {
+      return !is_nil(x.def_);
+    }
+    bool var_decl_has_def_vis::operator()(
+                                     const ordered_var_decl& x) const {
+      return !is_nil(x.def_);
+    }
+    bool var_decl_has_def_vis::operator()(
+                             const positive_ordered_var_decl& x) const {
+      return !is_nil(x.def_);
+    }
+    bool var_decl_has_def_vis::operator()(
+                                     const cholesky_factor_var_decl& x) const {
+      return !is_nil(x.def_);
+    }
+    bool var_decl_has_def_vis::operator()(
+                                     const cholesky_corr_var_decl& x) const {
+      return !is_nil(x.def_);
+    }
+    bool var_decl_has_def_vis::operator()(
+                                     const cov_matrix_var_decl& x) const {
+      return !is_nil(x.def_);
+    }
+    bool var_decl_has_def_vis::operator()(
+                                     const corr_matrix_var_decl& x) const {
+      return !is_nil(x.def_);
+    }
+
 
 
    // can't template out in .cpp file
@@ -1574,6 +1632,10 @@ namespace stan {
       return boost::apply_visitor(var_decl_base_type_vis(), decl_);
     }
 
+    bool var_decl::has_def() const {
+      return boost::apply_visitor(var_decl_has_def_vis(), decl_);
+    }
+    
     statement::statement() : statement_(nil()) { }
 
     statement::statement(const statement_t& st) : statement_(st) { }
