@@ -829,13 +829,13 @@ for (size_t i = 0; i < int_vector_types.size(); ++i) {
     add("poisson_log", DOUBLE_T, int_vector_types[i],
 	vector_types[j]);
     add("poisson_lccdf", DOUBLE_T, int_vector_types[i],
-	vector_types[j]);
+    	vector_types[j]);
     add("poisson_lcdf", DOUBLE_T, int_vector_types[i],
-	vector_types[j]);
+    	vector_types[j]);
     add("poisson_lpmf", DOUBLE_T, int_vector_types[i],
-	vector_types[j]);
+    	vector_types[j]);
   }
- }
+}
 add("poisson_rng", INT_T, DOUBLE_T);
 for (size_t i = 0; i < int_vector_types.size(); ++i) {
   for (size_t j = 0; j < vector_types.size(); ++j) {
