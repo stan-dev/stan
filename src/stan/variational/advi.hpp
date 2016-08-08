@@ -592,5 +592,4 @@ namespace stan {
     };
   }  // variational
 }  // stan
-
 #endif
