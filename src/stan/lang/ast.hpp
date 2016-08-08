@@ -595,7 +595,8 @@ namespace stan {
       int_var_decl();
       int_var_decl(range const& range,
                    std::string const& name,
-                   std::vector<expression> const& dims);
+                   std::vector<expression> const& dims,
+                   expression const& def);
     };
 
 
@@ -647,7 +648,8 @@ namespace stan {
       vector_var_decl(range const& range,
                       expression const& M,
                       std::string const& name,
-                      std::vector<expression> const& dims);
+                      std::vector<expression> const& dims,
+                      expression const& def);
     };
 
     struct row_vector_var_decl : public base_var_decl {
@@ -657,7 +659,8 @@ namespace stan {
       row_vector_var_decl(range const& range,
                           expression const& N,
                           std::string const& name,
-                          std::vector<expression> const& dims);
+                          std::vector<expression> const& dims,
+                          expression const& def);
     };
 
     struct matrix_var_decl : public base_var_decl {

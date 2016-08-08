@@ -27,13 +27,15 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::vector_var_decl,
                           (stan::lang::range, range_)
                           (stan::lang::expression, M_)
                           (std::string, name_)
-                          (std::vector<stan::lang::expression>, dims_) )
+                          (std::vector<stan::lang::expression>, dims_)
+                          (stan::lang::expression, def_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::row_vector_var_decl,
                           (stan::lang::range, range_)
                           (stan::lang::expression, N_)
                           (std::string, name_)
-                          (std::vector<stan::lang::expression>, dims_) )
+                          (std::vector<stan::lang::expression>, dims_)
+                          (stan::lang::expression, def_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::matrix_var_decl,
                           (stan::lang::range, range_)
@@ -172,7 +174,7 @@ namespace stan {
         > opt_dims_r(_r1)
         > -( lit('=')
              > expression_g(_r1)
-             [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))] ); 
+             [validate_int_var_definition_f(_val, _1, _pass, boost::phoenix::ref(error_msgs_))] ); 
 
       double_decl_r.name("real declaration");
       double_decl_r
@@ -183,7 +185,7 @@ namespace stan {
         > opt_dims_r(_r1)
         > -( lit('=')
              > expression_g(_r1)
-             [validate_double_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))] ); 
+             [validate_double_var_definition_f(_val, _1, _pass, boost::phoenix::ref(error_msgs_))] ); 
 
       vector_decl_r.name("vector declaration");
       vector_decl_r
@@ -195,7 +197,10 @@ namespace stan {
         [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
         > lit(']')
         > identifier_r
-        > opt_dims_r(_r1);
+        > opt_dims_r(_r1)
+        > -( lit('=')
+             > expression_g(_r1)
+             [validate_vector_var_definition_f(_val, _1, _pass, boost::phoenix::ref(error_msgs_))] ); 
 
       row_vector_decl_r.name("row vector declaration");
       row_vector_decl_r
@@ -207,7 +212,10 @@ namespace stan {
         [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
         > lit(']')
         > identifier_r
-        > opt_dims_r(_r1);
+        > opt_dims_r(_r1)
+        > -( lit('=')
+             > expression_g(_r1)
+             [validate_row_vector_var_definition_f(_val, _1, _pass, boost::phoenix::ref(error_msgs_))] ); 
 
       matrix_decl_r.name("matrix declaration");
       matrix_decl_r

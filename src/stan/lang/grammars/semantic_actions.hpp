@@ -203,6 +203,47 @@ namespace stan {
     extern boost::phoenix::function<increment_size_t> increment_size_t_f;
 
 
+    // called from: var_decls_grammar
+    struct validate_int_var_definition : public phoenix_functor_quaternary {
+      void operator()(int_var_decl& int_var_decl,
+                      const expression& int_var_def,
+                      bool& pass,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<validate_int_var_definition>
+    validate_int_var_definition_f;
+
+    // called from: var_decls_grammar
+    struct validate_double_var_definition : public phoenix_functor_quaternary {
+      void operator()(double_var_decl& double_var_decl,
+                      const expression& double_var_def,
+                      bool& pass,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<validate_double_var_definition>
+    validate_double_var_definition_f;
+
+    // called from: var_decls_grammar
+    struct validate_vector_var_definition : public phoenix_functor_quaternary {
+      void operator()(vector_var_decl& vector_var_decl,
+                      const expression& vector_var_def,
+                      bool& pass,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<validate_vector_var_definition>
+    validate_vector_var_definition_f;
+
+    // called from: var_decls_grammar
+    struct validate_row_vector_var_definition : public phoenix_functor_quaternary {
+      void operator()(row_vector_var_decl& row_vector_var_decl,
+                      const expression& row_vector_var_def,
+                      bool& pass,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<validate_row_vector_var_definition>
+    validate_row_vector_var_definition_f;
+
+
     // called from: expression_grammar
     struct validate_conditional_op : public phoenix_functor_ternary {
       void operator()(conditional_op& cond_expr,

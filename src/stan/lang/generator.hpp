@@ -718,10 +718,10 @@ namespace stan {
         generate_initialization(o_, x.name_, "double", x.dims_, nil(), nil(), x.def_);
       }
       void operator()(vector_var_decl const& x) const {
-        generate_initialization(o_, x.name_, "vector_d", x.dims_, x.M_);
+        generate_initialization(o_, x.name_, "vector_d", x.dims_, x.M_, nil(), x.def_);
       }
       void operator()(row_vector_var_decl const& x) const {
-        generate_initialization(o_, x.name_, "row_vector_d", x.dims_, x.N_);
+        generate_initialization(o_, x.name_, "row_vector_d", x.dims_, x.N_, nil(), x.def_);
       }
       void operator()(unit_vector_var_decl const& x) const {
         generate_initialization(o_, x.name_, "vector_d", x.dims_, x.K_);
@@ -1034,11 +1034,7 @@ namespace stan {
         << "> in__(params_r__,params_i__);" << EOL2;
       init_local_var_visgen vis(declare_vars, is_var, o);
       for (size_t i = 0; i < vs.size(); ++i)
-        //        if (vs[i].has_def()) {
-        //          // ??
-        //        } else {
           boost::apply_visitor(vis, vs[i].decl_);
-      //        }
     }
 
 
@@ -1085,10 +1081,8 @@ namespace stan {
       template <typename T>
       void basic_validate(T const& x) const {
         if (!(x.range_.has_low() || x.range_.has_high())) {
-          // std::cout << "basic_validate " << x.name_ << " unconstrained" << std::endl;
           return;  // unconstrained
         }
-        // std::cout << "basic_validate " << x.name_ << " with constraints" << std::endl;
         generate_begin_for_dims(x.dims_);
         if (x.range_.has_low()) {
           generate_indent(indents_ + x.dims_.size(), o_);
@@ -1261,8 +1255,6 @@ namespace stan {
     }
 
     // see member_var_decl_visgen cut & paste
-    // need to define local_var_decl_define_visgen
-
     struct local_var_decl_visgen : public visgen {
       int indents_;
       bool is_var_;
@@ -1588,7 +1580,6 @@ namespace stan {
           boost::apply_visitor(vis, vs[i].decl_);
         }
     }
-
 
     // see member_var_decl_visgen cut & paste
     struct generate_init_vars_visgen : public visgen {
@@ -3121,7 +3112,7 @@ namespace stan {
       generate_member_var_inits(prog.data_decl_, o);
 
       o << EOL;
-      generate_comment("validate data", 2, o);
+      generate_comment("initialize data", 2, o);
       generate_validate_var_decls(prog.data_decl_, 2, o);
 
       generate_var_resizing(prog.derived_data_decl_.first, o);

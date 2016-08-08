@@ -1301,11 +1301,11 @@ namespace stan {
     int_var_decl::int_var_decl()
       : base_var_decl(INT_T)
     { }
-
     int_var_decl::int_var_decl(range const& range,
                                std::string const& name,
-                               std::vector<expression> const& dims)
-      : base_var_decl(name, dims, INT_T),
+                               std::vector<expression> const& dims,
+                               expression const& def)
+      : base_var_decl(name, dims, INT_T, def),
         range_(range)
     { }
 
@@ -1314,7 +1314,6 @@ namespace stan {
     double_var_decl::double_var_decl()
       : base_var_decl(DOUBLE_T)
     { }
-
     double_var_decl::double_var_decl(range const& range,
                                      std::string const& name,
                                      std::vector<expression> const& dims,
@@ -1363,29 +1362,31 @@ namespace stan {
     positive_ordered_var_decl::positive_ordered_var_decl(expression const& K,
                            std::string const& name,
                            std::vector<expression> const& dims)
-        : base_var_decl(name, dims, VECTOR_T),
-          K_(K) {
-      }
+      : base_var_decl(name, dims, VECTOR_T),
+        K_(K) {
+    }
 
     vector_var_decl::vector_var_decl() : base_var_decl(VECTOR_T) { }
 
     vector_var_decl::vector_var_decl(range const& range,
                                      expression const& M,
                                      std::string const& name,
-                                     std::vector<expression> const& dims)
-        : base_var_decl(name, dims, VECTOR_T),
-          range_(range),
-          M_(M) {
+                                     std::vector<expression> const& dims,
+                                     expression const& def)
+      : base_var_decl(name, dims, VECTOR_T, def),
+        range_(range),
+        M_(M) {
     }
 
     row_vector_var_decl::row_vector_var_decl() : base_var_decl(ROW_VECTOR_T) { }
     row_vector_var_decl::row_vector_var_decl(range const& range,
-                                        expression const& N,
-                                        std::string const& name,
-                                        std::vector<expression> const& dims)
-        : base_var_decl(name, dims, ROW_VECTOR_T),
-          range_(range),
-          N_(N) {
+                                             expression const& N,
+                                             std::string const& name,
+                                             std::vector<expression> const& dims,
+                                             expression const& def)
+      : base_var_decl(name, dims, ROW_VECTOR_T, def),
+        range_(range),
+        N_(N) {
     }
 
     matrix_var_decl::matrix_var_decl() : base_var_decl(MATRIX_T) { }

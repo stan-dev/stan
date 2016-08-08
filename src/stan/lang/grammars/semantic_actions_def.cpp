@@ -168,6 +168,111 @@ namespace stan {
     }
     boost::phoenix::function<increment_size_t> increment_size_t_f;
 
+    // validate_var_definition_f(_val, _pass, boost::phoenix::ref(error_msgs_))]
+    // see validate_conditional_op - types_compatible
+    // need to check that types are compatible
+    // dims are compatible (array)
+    void validate_int_var_definition::operator()(int_var_decl& int_var_decl,
+                                                 const expression& int_var_def,
+                                                 bool& pass,
+                                                 std::ostream& error_msgs) const {
+      pass = true;
+      if (!int_var_def.expression_type().is_primitive_int()) {
+        error_msgs << "expression denoting integer required; found type="
+                   << int_var_def.expression_type().type() << std::endl;
+        pass = false;
+      }
+      if (int_var_decl.dims_.size() !=
+          int_var_def.expression_type().num_dims_) {
+        error_msgs << "dims mismatch; expression must have "
+                   << int_var_decl.dims_.size()
+                   << " dimensions, found "
+                   << int_var_def.expression_type().num_dims_
+                   << " dimensions. " << std::endl;
+        pass = false;
+      }
+    }
+    boost::phoenix::function<validate_int_var_definition>
+    validate_int_var_definition_f;
+
+    void validate_double_var_definition::operator()(double_var_decl& double_var_decl,
+                                                 const expression& double_var_def,
+                                                 bool& pass,
+                                                 std::ostream& error_msgs) const {
+      pass = true;
+      if (!(double_var_def.expression_type().is_primitive_double()
+            || double_var_def.expression_type().is_primitive_int())) {
+        error_msgs << "expression denoting real or integer required; found type="
+                   << double_var_def.expression_type().type() << std::endl;
+        pass = false;
+      }
+      if (double_var_decl.dims_.size() !=
+          double_var_def.expression_type().num_dims_) {
+        error_msgs << "dims mismatch; expression must have "
+                   << double_var_decl.dims_.size()
+                   << " dimensions, found "
+                   << double_var_def.expression_type().num_dims_
+                   << " dimensions. " << std::endl;
+        pass = false;
+      }
+    }
+    boost::phoenix::function<validate_double_var_definition>
+    validate_double_var_definition_f;
+
+    void validate_vector_var_definition::operator()(vector_var_decl& vector_var_decl,
+                                                 const expression& vector_var_def,
+                                                 bool& pass,
+                                                 std::ostream& error_msgs) const {
+      pass = true;
+      std::cout << "vector var decl dims: " << vector_var_decl.dims_.size() << std::endl;
+      std::cout << "vector var def type: " << vector_var_def.expression_type() << std::endl;
+      std::cout << "vector var def dims: " << vector_var_def.expression_type().num_dims_ << std::endl;
+      
+//      if (!(vector_var_def.expression_type().type() == VECTOR_T)) {
+//        error_msgs << "expression denoting vector required; found type="
+//                   << vector_var_def.expression_type().type() << std::endl;
+//        pass = false;
+//      }
+//      if (vector_var_decl.dims_.size() !=
+//          vector_var_def.expression_type().num_dims_) {
+//        error_msgs << "dims mismatch; expression must have "
+//                   << vector_var_decl.dims_.size()
+//                   << " dimensions, found "
+//                   << vector_var_def.expression_type().num_dims_
+//                   << " dimensions. " << std::endl;
+//        pass = false;
+//      }
+    }
+    boost::phoenix::function<validate_vector_var_definition>
+    validate_vector_var_definition_f;
+
+    void validate_row_vector_var_definition::operator()(row_vector_var_decl& row_vector_var_decl,
+                                                 const expression& row_vector_var_def,
+                                                 bool& pass,
+                                                 std::ostream& error_msgs) const {
+      pass = true;
+      std::cout << "row_vector var decl dims: " << row_vector_var_decl.dims_.size() << std::endl;
+      std::cout << "row_vector var def type: " << row_vector_var_def.expression_type() << std::endl;
+      std::cout << "row_vector var def dims: " << row_vector_var_def.expression_type().num_dims_ << std::endl;
+      
+//      if (!(row_vector_var_def.expression_type().type() == ROW_VECTOR_T)) {
+//        error_msgs << "expression denoting row_vector required; found type="
+//                   << row_vector_var_def.expression_type().type() << std::endl;
+//        pass = false;
+//      }
+//      if (row_vector_var_decl.dims_.size() !=
+//          row_vector_var_def.expression_type().num_dims_) {
+//        error_msgs << "dims mismatch; expression must have "
+//                   << row_vector_var_decl.dims_.size()
+//                   << " dimensions, found "
+//                   << row_vector_var_def.expression_type().num_dims_
+//                   << " dimensions. " << std::endl;
+//        pass = false;
+//      }
+    }
+    boost::phoenix::function<validate_row_vector_var_definition>
+    validate_row_vector_var_definition_f;
+    
 
     void validate_conditional_op::operator()(conditional_op& conditional_op,
                                              bool& pass,
