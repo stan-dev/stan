@@ -6,9 +6,8 @@
 #include <stan/callbacks/writer/stream_writer.hpp>
 #include <stan/io/dump.hpp>
 #include <stan/model/util.hpp>
-#include <stan/old_services/io/write_iteration.hpp>
 #include <stan/services/error_codes.hpp>
-#include <stan/old_services/variational/print_progress.hpp>
+#include <stan/variational/print_progress.hpp>
 #include <stan/variational/families/normal_fullrank.hpp>
 #include <stan/variational/families/normal_meanfield.hpp>
 #include <boost/circular_buffer.hpp>
@@ -232,7 +231,7 @@ namespace stan {
           for (int iter_tune = 1; iter_tune <= adapt_iterations; ++iter_tune) {
             print_progress_m = eta_sequence_index
               * adapt_iterations + iter_tune;
-            services::variational
+            variational
               ::print_progress(print_progress_m, 0,
                                adapt_iterations * eta_sequence_size,
                                adapt_iterations, true, "", "", message_writer);

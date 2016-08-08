@@ -4,7 +4,6 @@
 #include <stan/callbacks/writer/base_writer.hpp>
 #include <stan/math/prim/scal/err/check_positive.hpp>
 #include <stan/math/prim/scal/err/check_nonnegative.hpp>
-#include <stan/old_services/io/do_print.hpp>
 #include <cmath>
 #include <iomanip>
 #include <iostream>
@@ -34,7 +33,7 @@ namespace stan {
                         const std::string& suffix,
                         callbacks::writer::base_writer& writer) {
       static const char* function =
-        "stan::services::variational::print_progress";
+        "stan::variational::print_progress";
 
       stan::math::check_positive(function,
                                  "Total number of iterations",
@@ -50,7 +49,8 @@ namespace stan {
                                  refresh);
 
       int it_print_width = std::ceil(std::log10(static_cast<double>(finish)));
-      if (io::do_print(m - 1, (start + m == finish), refresh)) {
+      if (refresh > 0
+          && (start + m == finish || m - 1 == 0 || m % refresh == 0)) {
         std::stringstream ss;
         ss << prefix;
         ss << "Iteration: ";
