@@ -3,7 +3,6 @@
 #include <stan/io/dump.hpp>
 #include <stan/callbacks/var_context_factory/var_context_factory.hpp>
 #include <stan/callbacks/writer/stream_writer.hpp>
-#include <stan/old_services/init/initialize_state.hpp>
 #include <stan/model/prob_grad.hpp>
 #include <stan/callbacks/writer/stream_writer.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>

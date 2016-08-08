@@ -13,8 +13,6 @@
 #include <stan/model/util.hpp>
 
 #include <stan/services/sample/hmc_nuts_diag_e_adapt.hpp>
-#include <stan/old_services/io/write_stan.hpp>
-#include <stan/old_services/io/write_model.hpp>
 #include <stan/io/empty_var_context.hpp>
 #include <stan/callbacks/noop_interrupt.hpp>
 #include <stan/callbacks/var_context_factory/dump_factory.hpp>
@@ -232,9 +230,6 @@ namespace stan {
         callbacks::noop_interrupt interrupt;
         
         Model model(data_var_context, &std::cout);
-        stan::services::io::write_stan(sample_writer);
-        stan::services::io::write_model(sample_writer, model.model_name());
-
         stan::io::empty_var_context init_context;
         double init_radius = 0;
         int id = 0;
