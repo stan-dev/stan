@@ -2,10 +2,10 @@ data {
   real b0;
 }
 transformed data {
-  real td_b1;
-  real td_b2 = b0;
-  real td_b3 = 4;
-  real td_b4 = 4.4;
+  real<lower=0,upper=1> td_b1;
+  real<lower=1,upper=2> td_b2 = b0;
+  real<lower=0> td_b3 = 4;
+  real<upper=1> td_b4 = 4.4;
   {
     real loc_td_a;
     real loc_td_b1 = b0;
