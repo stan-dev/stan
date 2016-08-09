@@ -1505,11 +1505,14 @@ namespace stan {
               "'_lpdf' for density functions or '_lpmf' for mass functions",
               fun, error_msgs);
 
-      // need old function names (_log) until math gets updated to new ones
-      replace_suffix("_lpdf", "_log", fun);
-      replace_suffix("_lpmf", "_log", fun);
-      replace_suffix("_lcdf", "_cdf_log", fun);
-      replace_suffix("_lccdf", "_ccdf_log", fun);
+      // use old function names for built-in prob funs
+      if (!function_signatures::instance().has_user_defined_key(fun.name_)) {
+        replace_suffix("_lpdf", "_log", fun);
+        replace_suffix("_lpmf", "_log", fun);
+        replace_suffix("_lcdf", "_cdf_log", fun);
+        replace_suffix("_lccdf", "_ccdf_log", fun);
+      }
+      // know these are not user-defined`x
       replace_suffix("lmultiply", "multiply_log", fun);
       replace_suffix("lchoose", "binomial_coefficient_log", fun);
 
