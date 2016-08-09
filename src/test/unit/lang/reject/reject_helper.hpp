@@ -37,7 +37,12 @@ void reject_test(const std::string& expected_msg1 = "",
     std::vector<double> cont_vector(model.num_params_r(), 0.0);
     std::vector<int> disc_vector;
     double lp = model.template log_prob<false,false>(cont_vector, disc_vector, &out);
+    (void) lp;
     stan::callbacks::writer::stream_writer writer(out);
+    std::vector<double> params;
+    std::stringstream ss;
+    model.write_array(base_rng, cont_vector, disc_vector,
+                      params, true, true, &ss);
   } catch (const E& e) {
     expect_substring(e.what(), expected_msg1);
     expect_substring(e.what(), expected_msg2);
