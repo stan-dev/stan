@@ -48,7 +48,8 @@ namespace stan {
       template <class Model, class RNG>
       random_var_context(Model& model,
                          RNG& rng,
-                         double init_radius)
+                         double init_radius,
+                         bool init_zero)
         : unconstrained_params_(model.num_params_r()) {
         size_t num_unconstrained_ = model.num_params_r();
         model.get_param_names(names_);
@@ -71,7 +72,7 @@ namespace stan {
         dims_.erase(dims_.begin() + index, dims_.end());
         names_.erase(names_.begin() + index, names_.end());
 
-        if (init_radius <= std::numeric_limits<double>::min()) {
+        if (init_zero) {
           for (size_t n = 0; n < num_unconstrained_; n++)
             unconstrained_params_[n] = 0.0;
         } else {

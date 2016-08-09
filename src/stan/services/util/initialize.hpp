@@ -26,17 +26,25 @@ namespace stan {
         std::vector<int> disc_vector;
         std::stringstream msg;
 
-        std::vector<std::string> init_names;
-        init.names_r(init_names);
-
-        int MAX_INIT_TRIES = 100;
+        bool is_fully_initialized = true;
+        bool any_initialized = false;
+        std::vector<std::string> param_names;
+        model.get_param_names(param_names);
+        for (size_t n = 0; n < param_names.size(); n++) {
+          is_fully_initialized &= init.contains_r(param_names[n]);
+          any_initialized |= init.contains_r(param_names[n]);
+        }
+        
+        bool init_zero = init_radius <= std::numeric_limits<double>::min();
+        
+        int MAX_INIT_TRIES = is_fully_initialized || init_zero ? 1 : 100;
         int num_init_tries = 0;
         for (; num_init_tries < MAX_INIT_TRIES; num_init_tries++) {
-          if (init_names.size() == 0) {
-            stan::io::random_var_context random_context(model, rng, init_radius);
+          if (!any_initialized) {
+            stan::io::random_var_context random_context(model, rng, init_radius, init_zero);
             unconstrained = random_context.get_unconstrained();
           } else {
-            stan::io::random_var_context random_context(model, rng, init_radius);
+            stan::io::random_var_context random_context(model, rng, init_radius, init_zero);
             stan::io::chained_var_context context(init, random_context);
 
             model.transform_inits(context,
@@ -58,6 +66,7 @@ namespace stan {
             message_writer("Rejecting initial value:");
             message_writer("  Error evaluating the log probability "
                    "at the initial value.");
+            continue;
           }
           if (!boost::math::isfinite(log_prob)) {
             message_writer("Rejecting initial value:");
@@ -65,6 +74,7 @@ namespace stan {
                    "i.e. negative infinity.");
             message_writer("  Stan can't start sampling from this "
                            "initial value.");
+            continue;
           }
           msg.str("");
           std::vector<double> gradient;
@@ -109,18 +119,20 @@ namespace stan {
         }
 
         if (num_init_tries == MAX_INIT_TRIES) {
-          message_writer();
-          msg.str("");
-          msg << "Initialization between (-" << init_radius
-              << ", " << init_radius << ") failed after "
-              << MAX_INIT_TRIES <<  " attempts. ";
-          message_writer(msg.str());
-          message_writer(" Try specifying initial values,"
-                         " reducing ranges of constrained values,"
-                         " or reparameterizing the model.");
-
+          if (!is_fully_initialized && !init_zero) {
+            message_writer();
+            msg.str("");
+            msg << "Initialization between (-" << init_radius
+                << ", " << init_radius << ") failed after "
+                << MAX_INIT_TRIES <<  " attempts. ";
+            message_writer(msg.str());
+            message_writer(" Try specifying initial values,"
+                           " reducing ranges of constrained values,"
+                           " or reparameterizing the model.");
+          }
           throw std::domain_error("");
         }
+
         init_writer(unconstrained);
         return unconstrained;
       }
