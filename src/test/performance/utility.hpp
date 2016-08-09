@@ -15,7 +15,6 @@
 #include <stan/services/sample/hmc_nuts_diag_e_adapt.hpp>
 #include <stan/io/empty_var_context.hpp>
 #include <stan/callbacks/noop_interrupt.hpp>
-#include <stan/callbacks/var_context_factory/dump_factory.hpp>
 #include <stan/callbacks/writer/noop_writer.hpp>
 #include <stan/callbacks/writer/stream_writer.hpp>
 #include <stan/callbacks/writer/base_writer.hpp>

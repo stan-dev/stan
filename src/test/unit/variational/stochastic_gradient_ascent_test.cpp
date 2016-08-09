@@ -1,7 +1,6 @@
 #include <ostream>
 #include <stan/io/var_context.hpp>
 #include <stan/io/dump.hpp>
-#include <stan/callbacks/var_context_factory/var_context_factory.hpp>
 #include <stan/callbacks/writer/stream_writer.hpp>
 #include <stan/model/prob_grad.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
@@ -210,30 +209,6 @@ public:
   int calls;
 };
 
-class mock_context_factory
-  : public stan::callbacks::var_context_factory::var_context_factory<stan::io::dump> {
-public:
-  mock_context_factory()
-    : calls(0),
-      last_call("") { }
-
-  void reset() {
-    calls = 0;
-    last_call = "";
-  }
-
-  stan::io::dump operator()(const std::string source) {
-    calls++;
-    last_call = source;
-    std::string txt = "a <- 0\nb <- 1\nc <- 2";
-    std::stringstream in(txt);
-    return stan::io::dump(in);
-  }
-
-  int calls;
-  std::string last_call;
-};
-
 
 class stochastic_gradient_ascent_test : public testing::Test {
 public:
@@ -247,7 +222,6 @@ public:
     model.reset();
     rng.reset();
     output.clear();
-    context_factory.reset();
   }
 
   std::string init;
@@ -256,7 +230,6 @@ public:
   mock_throwing_model throwing_model;
   mock_rng rng;
   std::stringstream output;
-  mock_context_factory context_factory;
   stan::callbacks::writer::stream_writer writer;
 };
 
