@@ -5,7 +5,9 @@
 #include <stan/io/random_var_context.hpp>
 #include <stan/io/chained_var_context.hpp>
 #include <stan/model/util.hpp>
+#include <limits>
 #include <sstream>
+#include <string>
 #include <vector>
 
 namespace stan {
@@ -34,17 +36,18 @@ namespace stan {
           is_fully_initialized &= init.contains_r(param_names[n]);
           any_initialized |= init.contains_r(param_names[n]);
         }
-        
+
         bool init_zero = init_radius <= std::numeric_limits<double>::min();
-        
+
         int MAX_INIT_TRIES = is_fully_initialized || init_zero ? 1 : 100;
         int num_init_tries = 0;
         for (; num_init_tries < MAX_INIT_TRIES; num_init_tries++) {
+          stan::io::random_var_context
+            random_context(model, rng, init_radius, init_zero);
+
           if (!any_initialized) {
-            stan::io::random_var_context random_context(model, rng, init_radius, init_zero);
             unconstrained = random_context.get_unconstrained();
           } else {
-            stan::io::random_var_context random_context(model, rng, init_radius, init_zero);
             stan::io::chained_var_context context(init, random_context);
 
             model.transform_inits(context,
