@@ -57,9 +57,9 @@ public:
   std::stringstream message_stream_;
   std::stringstream parameter_stream_;
   std::stringstream diagnostic_stream_;
-  stan::callbacks::writer::stream_writer message_writer;
-  stan::callbacks::writer::stream_writer parameter_writer;
-  stan::callbacks::writer::stream_writer diagnostic_writer;
+  stan::callbacks::stream_writer message_writer;
+  stan::callbacks::stream_writer parameter_writer;
+  stan::callbacks::stream_writer diagnostic_writer;
   
 private:
   stan_model *model_;

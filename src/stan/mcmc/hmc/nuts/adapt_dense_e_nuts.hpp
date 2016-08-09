@@ -1,7 +1,7 @@
 #ifndef STAN_MCMC_HMC_NUTS_ADAPT_DENSE_E_NUTS_HPP
 #define STAN_MCMC_HMC_NUTS_ADAPT_DENSE_E_NUTS_HPP
 
-#include <stan/callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer.hpp>
 #include <stan/mcmc/stepsize_covar_adapter.hpp>
 #include <stan/mcmc/hmc/nuts/dense_e_nuts.hpp>
 
@@ -24,8 +24,8 @@ namespace stan {
 
       sample
       transition(sample& init_sample,
-                 callbacks::writer::base_writer& info_writer,
-                 callbacks::writer::base_writer& error_writer) {
+                 callbacks::writer& info_writer,
+                 callbacks::writer& error_writer) {
         sample s = dense_e_nuts<Model, BaseRNG>::transition(init_sample,
                                                             info_writer,
                                                             error_writer);

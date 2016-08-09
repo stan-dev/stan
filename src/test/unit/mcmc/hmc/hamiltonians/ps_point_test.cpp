@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
-#include <stan/callbacks/writer/base_writer.hpp>
-#include <stan/callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/writer.hpp>
+#include <stan/callbacks/stream_writer.hpp>
 #include <test/unit/util.hpp>
 
 namespace stan {
@@ -64,7 +64,7 @@ namespace stan {
 
       ps_point point(2);
       std::stringstream out;
-      stan::callbacks::writer::stream_writer writer(out);
+      stan::callbacks::stream_writer writer(out);
       EXPECT_NO_THROW(point.write_metric(writer));
       EXPECT_EQ("", out.str());
 

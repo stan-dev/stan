@@ -1,7 +1,7 @@
 #ifndef STAN_SERVICES_EXPERIMENTAL_ADVI_MEANFIELD_HPP
 #define STAN_SERVICES_EXPERIMENTAL_ADVI_MEANFIELD_HPP
 
-#include <stan/callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer.hpp>
 #include <stan/services/util/experimental_message.hpp>
 #include <stan/services/util/initialize.hpp>
 #include <stan/services/util/rng.hpp>
@@ -32,13 +32,13 @@ namespace stan {
                       int eval_elbo,
                       int output_samples,
                       Interrupt& interrupt,
-                      callbacks::writer::base_writer&
+                      callbacks::writer&
                       message_writer,
-                      callbacks::writer::base_writer&
+                      callbacks::writer&
                       init_writer,
-                      callbacks::writer::base_writer&
+                      callbacks::writer&
                       parameter_writer,
-                      callbacks::writer::base_writer&
+                      callbacks::writer&
                       diagnostic_writer) {
           stan::services::util::experimental_message(message_writer);
 

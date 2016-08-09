@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <stan/io/empty_var_context.hpp>
 #include <test/test-models/good/services/test_lp.hpp>
-#include <stan/callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/stream_writer.hpp>
 
 class ServicesDiagnose : public testing::Test {
 public:
@@ -13,7 +13,7 @@ public:
       model(context, &model_ss) {}
 
   std::stringstream message_ss, init_ss, parameter_ss, model_ss;
-  stan::callbacks::writer::stream_writer message, init, parameter;
+  stan::callbacks::stream_writer message, init, parameter;
   stan::io::empty_var_context context;
   stan_model model;
 };

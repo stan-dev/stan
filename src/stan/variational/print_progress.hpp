@@ -1,7 +1,7 @@
 #ifndef STAN_VARIATIONAL_PRINT_PROGRESS_HPP
 #define STAN_VARIATIONAL_PRINT_PROGRESS_HPP
 
-#include <stan/callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer.hpp>
 #include <stan/math/prim/scal/err/check_positive.hpp>
 #include <stan/math/prim/scal/err/check_nonnegative.hpp>
 #include <cmath>
@@ -31,7 +31,7 @@ namespace stan {
                         bool tune,
                         const std::string& prefix,
                         const std::string& suffix,
-                        callbacks::writer::base_writer& writer) {
+                        callbacks::writer& writer) {
       static const char* function =
         "stan::variational::print_progress";
 

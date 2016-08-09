@@ -22,13 +22,13 @@ namespace stan {
                                 RNG& rng,
                                 callbacks::interrupt&
                                 interrupt,
-                                callbacks::writer::base_writer&
+                                callbacks::writer&
                                 message_writer,
-                                callbacks::writer::base_writer&
+                                callbacks::writer&
                                 error_writer,
-                                callbacks::writer::base_writer&
+                                callbacks::writer&
                                 sample_writer,
-                                callbacks::writer::base_writer&
+                                callbacks::writer&
                                 diagnostic_writer) {
         Eigen::Map<Eigen::VectorXd> cont_params(cont_vector.data(),
                                                 cont_vector.size());

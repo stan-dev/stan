@@ -1,10 +1,10 @@
 #include <stan/mcmc/var_adaptation.hpp>
-#include <stan/callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/stream_writer.hpp>
 #include <gtest/gtest.h>
 
 TEST(McmcVarAdaptation, learn_variance) {
   std::stringstream ss;
-  stan::callbacks::writer::stream_writer writer(ss);
+  stan::callbacks::stream_writer writer(ss);
   
   const int n = 10;
   Eigen::VectorXd q = Eigen::VectorXd::Zero(n);

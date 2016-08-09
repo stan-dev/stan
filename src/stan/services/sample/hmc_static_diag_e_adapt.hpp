@@ -3,7 +3,7 @@
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/callbacks/interrupt.hpp>
-#include <stan/callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer.hpp>
 #include <stan/mcmc/fixed_param_sampler.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/mcmc/hmc/static/adapt_diag_e_static_hmc.hpp>
@@ -39,15 +39,15 @@ namespace stan {
                                   unsigned int window,
                                 callbacks::interrupt&
                                   interrupt,
-                                  callbacks::writer::base_writer&
+                                  callbacks::writer&
                                   message_writer,
-                                  callbacks::writer::base_writer&
+                                  callbacks::writer&
                                   error_writer,
-                                  callbacks::writer::base_writer&
+                                  callbacks::writer&
                                   init_writer,
-                                  callbacks::writer::base_writer&
+                                  callbacks::writer&
                                   sample_writer,
-                                  callbacks::writer::base_writer&
+                                  callbacks::writer&
                                   diagnostic_writer) {
         boost::ecuyer1988 rng = stan::services::util::rng(random_seed, chain);
 

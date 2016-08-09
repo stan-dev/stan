@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <stan/io/empty_var_context.hpp>
 #include <test/test-models/good/optimization/rosenbrock.hpp>
-#include <stan/callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/stream_writer.hpp>
 
 struct mock_callback {
   int n;
@@ -15,13 +15,13 @@ struct mock_callback {
 
 
 class values
-  : public stan::callbacks::writer::stream_writer {
+  : public stan::callbacks::stream_writer {
 public:
   std::vector<std::string> names_;
   std::vector<std::vector<double> > states_;
 
   values(std::ostream& stream)
-    : stan::callbacks::writer::stream_writer(stream) {
+    : stan::callbacks::stream_writer(stream) {
   }
   
   /**
@@ -54,7 +54,7 @@ public:
       model(context, &model_ss) {}
 
   std::stringstream message_ss, init_ss, parameter_ss, model_ss;
-  stan::callbacks::writer::stream_writer message, init;
+  stan::callbacks::stream_writer message, init;
   values parameter;
   stan::io::empty_var_context context;
   stan_model model;

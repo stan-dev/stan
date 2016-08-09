@@ -1,7 +1,7 @@
 #ifndef STAN_MCMC_HMC_STATIC_ADAPT_UNIT_E_STATIC_HMC_HPP
 #define STAN_MCMC_HMC_STATIC_ADAPT_UNIT_E_STATIC_HMC_HPP
 
-#include <stan/callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer.hpp>
 #include <stan/mcmc/hmc/static/unit_e_static_hmc.hpp>
 #include <stan/mcmc/stepsize_adapter.hpp>
 
@@ -24,8 +24,8 @@ namespace stan {
 
       sample
       transition(sample& init_sample,
-                 callbacks::writer::base_writer& info_writer,
-                 callbacks::writer::base_writer& error_writer) {
+                 callbacks::writer& info_writer,
+                 callbacks::writer& error_writer) {
         sample s
           = unit_e_static_hmc<Model, BaseRNG>::transition(init_sample,
                                                           info_writer,

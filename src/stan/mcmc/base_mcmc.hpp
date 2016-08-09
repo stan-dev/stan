@@ -1,7 +1,7 @@
 #ifndef STAN_MCMC_BASE_MCMC_HPP
 #define STAN_MCMC_BASE_MCMC_HPP
 
-#include <stan/callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer.hpp>
 #include <stan/mcmc/sample.hpp>
 #include <ostream>
 #include <string>
@@ -18,15 +18,15 @@ namespace stan {
 
       virtual sample
       transition(sample& init_sample,
-                 callbacks::writer::base_writer& info_writer,
-                 callbacks::writer::base_writer& error_writer) = 0;
+                 callbacks::writer& info_writer,
+                 callbacks::writer& error_writer) = 0;
 
       virtual void get_sampler_param_names(std::vector<std::string>& names) {}
 
       virtual void get_sampler_params(std::vector<double>& values) {}
 
       virtual void
-      write_sampler_state(callbacks::writer::base_writer& writer) {}
+      write_sampler_state(callbacks::writer& writer) {}
 
       virtual void
       get_sampler_diagnostic_names(std::vector<std::string>& model_names,

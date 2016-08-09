@@ -2,8 +2,8 @@
 #define STAN_VARIATIONAL_ADVI_HPP
 
 #include <stan/math.hpp>
-#include <stan/callbacks/writer/base_writer.hpp>
-#include <stan/callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/writer.hpp>
+#include <stan/callbacks/stream_writer.hpp>
 #include <stan/io/dump.hpp>
 #include <stan/model/util.hpp>
 #include <stan/services/error_codes.hpp>
@@ -97,7 +97,7 @@ namespace stan {
        * that the variational distribution has somehow collapsed.
        */
       double calc_ELBO(const Q& variational,
-                       callbacks::writer::base_writer& message_writer)
+                       callbacks::writer& message_writer)
         const {
         static const char* function =
           "stan::variational::advi::calc_ELBO";
@@ -144,7 +144,7 @@ namespace stan {
        * @param message_writer writer for messages
        */
       void calc_ELBO_grad(const Q& variational, Q& elbo_grad,
-                          callbacks::writer::base_writer&
+                          callbacks::writer&
                           message_writer)
         const {
         static const char* function =
@@ -180,7 +180,7 @@ namespace stan {
        */
       double adapt_eta(Q& variational,
                        int adapt_iterations,
-                       callbacks::writer::base_writer& message_writer)
+                       callbacks::writer& message_writer)
         const {
         static const char* function = "stan::variational::advi::adapt_eta";
 
@@ -328,8 +328,8 @@ namespace stan {
                                       double eta,
                                       double tol_rel_obj,
                                       int max_iterations,
-                    callbacks::writer::base_writer& message_writer,
-                    callbacks::writer::base_writer& diagnostic_writer)
+                    callbacks::writer& message_writer,
+                    callbacks::writer& diagnostic_writer)
         const {
         static const char* function =
           "stan::variational::advi::stochastic_gradient_ascent";
@@ -485,9 +485,9 @@ namespace stan {
        */
       int run(double eta, bool adapt_engaged, int adapt_iterations,
               double tol_rel_obj, int max_iterations,
-              callbacks::writer::base_writer& message_writer,
-              callbacks::writer::base_writer& parameter_writer,
-              callbacks::writer::base_writer& diagnostic_writer)
+              callbacks::writer& message_writer,
+              callbacks::writer& parameter_writer,
+              callbacks::writer& diagnostic_writer)
         const {
         diagnostic_writer("iter,time_in_seconds,ELBO");
 

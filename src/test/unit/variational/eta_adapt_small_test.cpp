@@ -1,6 +1,6 @@
 #include <test/test-models/good/variational/eta_should_be_small.hpp>
 #include <stan/variational/advi.hpp>
-#include <stan/callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/stream_writer.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 #include <vector>
@@ -47,7 +47,7 @@ public:
   stan::variational::advi<stan_model, stan::variational::normal_fullrank, rng_t> *advi_fullrank_;
   std::stringstream model_stream_;
   std::stringstream message_stream_;
-  stan::callbacks::writer::stream_writer message_writer;
+  stan::callbacks::stream_writer message_writer;
   
   stan_model *model_;
   rng_t base_rng_;

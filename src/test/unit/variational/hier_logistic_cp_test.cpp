@@ -1,6 +1,6 @@
 #include <test/test-models/good/variational/hier_logistic_cp.hpp>
 #include <stan/variational/advi.hpp>
-#include <stan/callbacks/writer/noop_writer.hpp>
+#include <stan/callbacks/noop_writer.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 #include <vector>
@@ -39,7 +39,7 @@ TEST(advi_test, hier_logistic_cp_constraint_meanfield) {
                                                      100,
                                                      1);
 
-  stan::callbacks::writer::noop_writer writer;
+  stan::callbacks::noop_writer writer;
   
   test_advi.run(0.01, false, 50, 1, 2e4,
                 writer, writer, writer);

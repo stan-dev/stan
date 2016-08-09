@@ -1,8 +1,8 @@
 #include <stan/mcmc/hmc/static_uniform/base_static_uniform.hpp>
 
-#include <stan/callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer.hpp>
 
-#include <stan/callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/stream_writer.hpp>
 
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
 #include <boost/random/additive_combine.hpp>

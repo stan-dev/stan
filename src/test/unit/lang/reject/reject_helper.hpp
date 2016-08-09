@@ -7,7 +7,7 @@
 #include <fstream>
 #include <boost/random/additive_combine.hpp>
 #include <stan/io/dump.hpp>
-#include <stan/callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/stream_writer.hpp>
 
 void expect_substring(const std::string& msg,
                       const std::string& expected_substring) {
@@ -38,7 +38,7 @@ void reject_test(const std::string& expected_msg1 = "",
     std::vector<int> disc_vector;
     double lp = model.template log_prob<false,false>(cont_vector, disc_vector, &out);
     (void) lp;
-    stan::callbacks::writer::stream_writer writer(out);
+    stan::callbacks::stream_writer writer(out);
     std::vector<double> params;
     std::stringstream ss;
     model.write_array(base_rng, cont_vector, disc_vector,

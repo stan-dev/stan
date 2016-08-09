@@ -1,7 +1,7 @@
 #ifndef STAN_MCMC_HMC_INTEGRATORS_BASE_LEAPFROG_HPP
 #define STAN_MCMC_HMC_INTEGRATORS_BASE_LEAPFROG_HPP
 
-#include <stan/callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer.hpp>
 #include <stan/mcmc/hmc/integrators/base_integrator.hpp>
 #include <iostream>
 #include <iomanip>
@@ -18,8 +18,8 @@ namespace stan {
       void evolve(typename Hamiltonian::PointType& z,
                   Hamiltonian& hamiltonian,
                   const double epsilon,
-                  callbacks::writer::base_writer& info_writer,
-                  callbacks::writer::base_writer& error_writer) {
+                  callbacks::writer& info_writer,
+                  callbacks::writer& error_writer) {
         begin_update_p(z, hamiltonian, 0.5 * epsilon,
                        info_writer, error_writer);
         update_q(z, hamiltonian, epsilon,
@@ -32,8 +32,8 @@ namespace stan {
       verbose_evolve(typename Hamiltonian::PointType& z,
                      Hamiltonian& hamiltonian,
                      const double epsilon,
-                     callbacks::writer::base_writer& info_writer,
-                     callbacks::writer::base_writer& error_writer) {
+                     callbacks::writer& info_writer,
+                     callbacks::writer& error_writer) {
         std::stringstream msg;
         msg.precision(6);
 
@@ -123,19 +123,19 @@ namespace stan {
       void begin_update_p(
         typename Hamiltonian::PointType& z,
         Hamiltonian& hamiltonian, double epsilon,
-        callbacks::writer::base_writer& info_writer,
-        callbacks::writer::base_writer& error_writer) = 0;
+        callbacks::writer& info_writer,
+        callbacks::writer& error_writer) = 0;
       virtual
       void update_q(typename Hamiltonian::PointType& z,
                     Hamiltonian& hamiltonian, double epsilon,
-                    callbacks::writer::base_writer& info_writer,
-                    callbacks::writer::base_writer& error_writer) = 0;
+                    callbacks::writer& info_writer,
+                    callbacks::writer& error_writer) = 0;
       virtual
       void end_update_p(
         typename Hamiltonian::PointType& z,
         Hamiltonian& hamiltonian, double epsilon,
-        callbacks::writer::base_writer& info_writer,
-        callbacks::writer::base_writer& error_writer) = 0;
+        callbacks::writer& info_writer,
+        callbacks::writer& error_writer) = 0;
     };
 
   }  // mcmc

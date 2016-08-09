@@ -4,8 +4,8 @@
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/dense_e_metric.hpp>
 #include <test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp>
-#include <stan/callbacks/writer/stream_writer.hpp>
-#include <stan/callbacks/writer/noop_writer.hpp>
+#include <stan/callbacks/stream_writer.hpp>
+#include <stan/callbacks/noop_writer.hpp>
 #include <test/unit/util.hpp>
 #include <gtest/gtest.h>
 
@@ -60,9 +60,9 @@ TEST(McmcDenseEMetric, gradients) {
 
 
   std::stringstream model_output, metric_output;
-  stan::callbacks::writer::stream_writer writer(metric_output);
+  stan::callbacks::stream_writer writer(metric_output);
   std::stringstream error_stream;
-  stan::callbacks::writer::stream_writer error_writer(error_stream);
+  stan::callbacks::stream_writer error_writer(error_stream);
 
   funnel_model_namespace::funnel_model model(data_var_context, &model_output);
 
@@ -151,7 +151,7 @@ TEST(McmcDenseEMetric, streams) {
 
 
   stan::mcmc::mock_model model(q.size());
-  stan::callbacks::writer::noop_writer writer;
+  stan::callbacks::noop_writer writer;
 
   // typedef to use within Google Test macros
   typedef stan::mcmc::dense_e_metric<stan::mcmc::mock_model, rng_t> dense_e;

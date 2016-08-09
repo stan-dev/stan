@@ -1,5 +1,5 @@
 #include <stan/io/dump.hpp>
-#include <stan/callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/stream_writer.hpp>
 #include <stan/mcmc/hmc/hamiltonians/softabs_metric.hpp>
 #include <stan/mcmc/hmc/integrators/impl_leapfrog.hpp>
 #include <stan/mcmc/hmc/hamiltonians/unit_e_metric.hpp>
@@ -42,8 +42,8 @@ public:
     delete(model);
   }
 
-  stan::callbacks::writer::stream_writer writer;
-  stan::callbacks::writer::stream_writer error_writer;
+  stan::callbacks::stream_writer writer;
+  stan::callbacks::stream_writer error_writer;
 
   // integrator under test
   stan::mcmc::impl_leapfrog<

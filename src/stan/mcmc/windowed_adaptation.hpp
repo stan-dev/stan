@@ -1,7 +1,7 @@
 #ifndef STAN_MCMC_WINDOWED_ADAPTATION_HPP
 #define STAN_MCMC_WINDOWED_ADAPTATION_HPP
 
-#include <stan/callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer.hpp>
 #include <stan/mcmc/base_adaptation.hpp>
 #include <ostream>
 #include <string>
@@ -31,7 +31,7 @@ namespace stan {
                              unsigned int init_buffer,
                              unsigned int term_buffer,
                              unsigned int base_window,
-                             callbacks::writer::base_writer& writer) {
+                             callbacks::writer& writer) {
         if (num_warmup < 20) {
           writer("WARNING: No " + estimator_name_ + " estimation is");
           writer("         performed for num_warmup < 20");

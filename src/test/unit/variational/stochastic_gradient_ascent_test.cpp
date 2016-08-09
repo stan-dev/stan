@@ -1,7 +1,7 @@
 #include <ostream>
 #include <stan/io/var_context.hpp>
 #include <stan/io/dump.hpp>
-#include <stan/callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/stream_writer.hpp>
 #include <stan/model/prob_grad.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>
@@ -230,7 +230,7 @@ public:
   mock_throwing_model throwing_model;
   mock_rng rng;
   std::stringstream output;
-  stan::callbacks::writer::stream_writer writer;
+  stan::callbacks::stream_writer writer;
 };
 
 TEST_F(stochastic_gradient_ascent_test, initialize_state_zero_negative_infinity) {

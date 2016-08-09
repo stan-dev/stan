@@ -1,6 +1,6 @@
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
 #include <test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp>
-#include <stan/callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/stream_writer.hpp>
 #include <boost/random/additive_combine.hpp>
 #include <test/unit/util.hpp>
 #include <gtest/gtest.h>
@@ -21,10 +21,10 @@ TEST(BaseHamiltonian, update_potential_gradient) {
   z.q.setOnes();
 
   std::stringstream metric_output;
-  stan::callbacks::writer::stream_writer writer(metric_output);
+  stan::callbacks::stream_writer writer(metric_output);
 
   std::stringstream error_stream;
-  stan::callbacks::writer::stream_writer error_writer(error_stream);
+  stan::callbacks::stream_writer error_writer(error_stream);
 
   metric.update_potential_gradient(z, writer, error_writer);
 

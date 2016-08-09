@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <boost/lexical_cast.hpp>
-#include <stan/callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/stream_writer.hpp>
 
 class StanInterfaceCallbacksStreamWriter: public ::testing::Test {
 public:
@@ -14,8 +14,8 @@ public:
   void TearDown() { }
 
   std::stringstream ss;
-  stan::callbacks::writer::stream_writer writer;
-  stan::callbacks::writer::stream_writer writer_prefix;
+  stan::callbacks::stream_writer writer;
+  stan::callbacks::stream_writer writer_prefix;
 };
 
 TEST_F(StanInterfaceCallbacksStreamWriter, key_double) {

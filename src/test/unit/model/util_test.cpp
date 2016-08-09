@@ -5,7 +5,7 @@
 #include <stan/io/dump.hpp>
 #include <test/test-models/good/model/valid.hpp>
 #include <test/unit/util.hpp>
-#include <stan/callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/stream_writer.hpp>
 //#include <test/test-models/good/model/domain_fail.hpp>
 
 class TestModel_uniform_01 {
@@ -148,7 +148,7 @@ TEST(ModelUtil, gradient_writer) {
   data_stream.close();
 
   std::stringstream output;
-  stan::callbacks::writer::stream_writer writer(output);
+  stan::callbacks::stream_writer writer(output);
   valid_model_namespace::valid_model valid_model(data_var_context, &output);
   EXPECT_NO_THROW(stan::model::gradient(valid_model, x, f, g, writer));
   
@@ -374,7 +374,7 @@ TEST(ModelUtil, streams) {
   }
 
   try {
-    stan::callbacks::writer::stream_writer writer(out);
+    stan::callbacks::stream_writer writer(out);
     out.str("");
     stan::model::test_gradients<true, true, stan_model>(model, params_r, params_i, 1e-6, 1e-6,
                                                         writer);

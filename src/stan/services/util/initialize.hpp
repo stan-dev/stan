@@ -20,9 +20,9 @@ namespace stan {
                                      RNG& rng,
                                      double init_radius,
                                      bool print_timing,
-                                     callbacks::writer::base_writer&
+                                     callbacks::writer&
                                      message_writer,
-                                     callbacks::writer::base_writer&
+                                     callbacks::writer&
                                      init_writer) {
         std::vector<double> unconstrained;
         std::vector<int> disc_vector;

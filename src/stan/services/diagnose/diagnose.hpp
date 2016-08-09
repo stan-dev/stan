@@ -4,8 +4,8 @@
 #include <stan/io/var_context.hpp>
 #include <stan/io/chained_var_context.hpp>
 #include <stan/io/random_var_context.hpp>
-#include <stan/callbacks/writer/base_writer.hpp>
-#include <stan/callbacks/writer/chained_writer.hpp>
+#include <stan/callbacks/writer.hpp>
+#include <stan/callbacks/chained_writer.hpp>
 #include <stan/model/util.hpp>
 #include <stan/services/util/rng.hpp>
 #include <stan/services/util/initialize.hpp>
@@ -47,9 +47,9 @@ namespace stan {
                    double init_radius,
                    double epsilon,
                    double error,
-                   callbacks::writer::base_writer& message_writer,
-                   callbacks::writer::base_writer& init_writer,
-                   callbacks::writer::base_writer& parameter_writer) {
+                   callbacks::writer& message_writer,
+                   callbacks::writer& init_writer,
+                   callbacks::writer& parameter_writer) {
         boost::ecuyer1988 rng = stan::services::util::rng(random_seed, chain);
 
         std::vector<int> disc_vector;
@@ -60,7 +60,7 @@ namespace stan {
 
         message_writer("TEST GRADIENT MODE");
 
-        stan::callbacks::writer::chained_writer
+        stan::callbacks::chained_writer
           writer(message_writer, parameter_writer);
 
         int num_failed =

@@ -1,6 +1,6 @@
 #include <test/test-models/good/variational/gradient_warn.hpp>
 #include <stan/variational/advi.hpp>
-#include <stan/callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/stream_writer.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 #include <vector>
@@ -54,9 +54,9 @@ public:
   std::stringstream parameter_stream_;
   std::stringstream diagnostic_stream_;
 
-  stan::callbacks::writer::stream_writer message_writer;
-  stan::callbacks::writer::stream_writer parameter_writer;
-  stan::callbacks::writer::stream_writer diagnostic_writer;
+  stan::callbacks::stream_writer message_writer;
+  stan::callbacks::stream_writer parameter_writer;
+  stan::callbacks::stream_writer diagnostic_writer;
 
 private:
   stan_model *model_;

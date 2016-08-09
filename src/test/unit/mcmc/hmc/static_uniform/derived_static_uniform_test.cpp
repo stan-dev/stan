@@ -6,8 +6,8 @@
 #include <stan/mcmc/hmc/static_uniform/adapt_diag_e_static_uniform.hpp>
 #include <stan/mcmc/hmc/static_uniform/adapt_dense_e_static_uniform.hpp>
 #include <stan/mcmc/hmc/static_uniform/adapt_softabs_static_uniform.hpp>
-#include <stan/callbacks/writer/base_writer.hpp>
-#include <stan/callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/writer.hpp>
+#include <stan/callbacks/stream_writer.hpp>
 
 #include <test/test-models/good/mcmc/hmc/common/gauss.hpp>
 
@@ -25,9 +25,9 @@ TEST(McmcStaticUniform, unit_e_transition) {
   z_init.p(0) = -1;
 
   std::stringstream output_stream;
-  stan::callbacks::writer::stream_writer writer(output_stream);
+  stan::callbacks::stream_writer writer(output_stream);
   std::stringstream error_stream;
-  stan::callbacks::writer::stream_writer error_writer(error_stream);
+  stan::callbacks::stream_writer error_writer(error_stream);
 
   std::fstream empty_stream("", std::fstream::in);
   stan::io::dump data_var_context(empty_stream);
@@ -61,9 +61,9 @@ TEST(McmcStaticUniform, diag_e_transition) {
   z_init.p(0) = -1;
 
   std::stringstream output_stream;
-  stan::callbacks::writer::stream_writer writer(output_stream);
+  stan::callbacks::stream_writer writer(output_stream);
   std::stringstream error_stream;
-  stan::callbacks::writer::stream_writer error_writer(error_stream);
+  stan::callbacks::stream_writer error_writer(error_stream);
 
   std::fstream empty_stream("", std::fstream::in);
   stan::io::dump data_var_context(empty_stream);
@@ -97,9 +97,9 @@ TEST(McmcStaticUniform, dense_e_transition) {
   z_init.p(0) = -1;
 
   std::stringstream output_stream;
-  stan::callbacks::writer::stream_writer writer(output_stream);
+  stan::callbacks::stream_writer writer(output_stream);
   std::stringstream error_stream;
-  stan::callbacks::writer::stream_writer error_writer(error_stream);
+  stan::callbacks::stream_writer error_writer(error_stream);
 
   std::fstream empty_stream("", std::fstream::in);
   stan::io::dump data_var_context(empty_stream);
@@ -133,9 +133,9 @@ TEST(McmcStaticUniform, softabs_transition) {
   z_init.p(0) = -1;
 
   std::stringstream output;
-  stan::callbacks::writer::stream_writer writer(output);
+  stan::callbacks::stream_writer writer(output);
   std::stringstream error_stream;
-  stan::callbacks::writer::stream_writer error_writer(error_stream);
+  stan::callbacks::stream_writer error_writer(error_stream);
 
   std::fstream empty_stream("", std::fstream::in);
   stan::io::dump data_var_context(empty_stream);
@@ -168,9 +168,9 @@ TEST(McmcStaticUniform, adapt_unit_e_transition) {
   z_init.p(0) = -1;
 
   std::stringstream output_stream;
-  stan::callbacks::writer::stream_writer writer(output_stream);
+  stan::callbacks::stream_writer writer(output_stream);
   std::stringstream error_stream;
-  stan::callbacks::writer::stream_writer error_writer(error_stream);
+  stan::callbacks::stream_writer error_writer(error_stream);
 
   std::fstream empty_stream("", std::fstream::in);
   stan::io::dump data_var_context(empty_stream);
@@ -204,9 +204,9 @@ TEST(McmcStaticUniform, adapt_diag_e_transition) {
   z_init.p(0) = -1;
 
   std::stringstream output_stream;
-  stan::callbacks::writer::stream_writer writer(output_stream);
+  stan::callbacks::stream_writer writer(output_stream);
   std::stringstream error_stream;
-  stan::callbacks::writer::stream_writer error_writer(error_stream);
+  stan::callbacks::stream_writer error_writer(error_stream);
 
   std::fstream empty_stream("", std::fstream::in);
   stan::io::dump data_var_context(empty_stream);
@@ -240,9 +240,9 @@ TEST(McmcStaticUniform, adapt_dense_e_transition) {
   z_init.p(0) = -1;
 
   std::stringstream output_stream;
-  stan::callbacks::writer::stream_writer writer(output_stream);
+  stan::callbacks::stream_writer writer(output_stream);
   std::stringstream error_stream;
-  stan::callbacks::writer::stream_writer error_writer(error_stream);
+  stan::callbacks::stream_writer error_writer(error_stream);
 
   std::fstream empty_stream("", std::fstream::in);
   stan::io::dump data_var_context(empty_stream);
@@ -276,9 +276,9 @@ TEST(McmcStaticUniform, adapt_softabs_e_transition) {
   z_init.p(0) = -1;
 
   std::stringstream output;
-  stan::callbacks::writer::stream_writer writer(output);
+  stan::callbacks::stream_writer writer(output);
   std::stringstream error_stream;
-  stan::callbacks::writer::stream_writer error_writer(error_stream);
+  stan::callbacks::stream_writer error_writer(error_stream);
 
   std::fstream empty_stream("", std::fstream::in);
   stan::io::dump data_var_context(empty_stream);
