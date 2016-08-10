@@ -220,12 +220,12 @@ add("columns_dot_self", ROW_VECTOR_T, ROW_VECTOR_T);
 add("columns_dot_self", ROW_VECTOR_T, MATRIX_T);
 add_unary("cos");
 add_unary("cosh");
-add("cov_exp_quad",MATRIX_T,expr_type(DOUBLE_T, 1),DOUBLE_T,DOUBLE_T);
-add("cov_exp_quad",MATRIX_T,expr_type(VECTOR_T, 1),DOUBLE_T,DOUBLE_T);
-add("cov_exp_quad",MATRIX_T,expr_type(ROW_VECTOR_T, 1),DOUBLE_T,DOUBLE_T);
-add("cov_exp_quad",MATRIX_T,expr_type(DOUBLE_T, 1),expr_type(DOUBLE_T, 1),DOUBLE_T,DOUBLE_T);
-add("cov_exp_quad",MATRIX_T,expr_type(VECTOR_T, 1),expr_type(VECTOR_T, 1),DOUBLE_T,DOUBLE_T);
-add("cov_exp_quad",MATRIX_T,expr_type(ROW_VECTOR_T, 1),expr_type(ROW_VECTOR_T, 1),DOUBLE_T,DOUBLE_T);
+add("cov_exp_quad", MATRIX_T, expr_type(DOUBLE_T, 1U), DOUBLE_T, DOUBLE_T);
+add("cov_exp_quad", MATRIX_T, expr_type(VECTOR_T, 1U), DOUBLE_T, DOUBLE_T);
+add("cov_exp_quad", MATRIX_T, expr_type(ROW_VECTOR_T, 1U), DOUBLE_T, DOUBLE_T);
+add("cov_exp_quad", MATRIX_T, expr_type(DOUBLE_T, 1U), expr_type(DOUBLE_T, 1U), DOUBLE_T, DOUBLE_T);
+add("cov_exp_quad", MATRIX_T, expr_type(VECTOR_T, 1U), expr_type(VECTOR_T, 1U), DOUBLE_T, DOUBLE_T);
+add("cov_exp_quad", MATRIX_T, expr_type(ROW_VECTOR_T, 1U), expr_type(ROW_VECTOR_T, 1U), DOUBLE_T, DOUBLE_T);
 add("crossprod", MATRIX_T, MATRIX_T);
 add("csr_matrix_times_vector",VECTOR_T, INT_T, INT_T,
           VECTOR_T, expr_type(INT_T, 1U), expr_type(INT_T, 1U), VECTOR_T);
