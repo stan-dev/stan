@@ -54,6 +54,7 @@ transformed parameters {
   transformed_param_matrix <- cov_exp_quad(d_arr_1, d_arr_2, p_sigma, p_len);
   transformed_param_matrix <- cov_exp_quad(d_arr_1, d_arr_2, d_sigma, p_len);
   transformed_param_matrix <- cov_exp_quad(d_arr_1, d_arr_2, p_sigma, d_len);
+  transformed_param_matrix <- cov_exp_quad(d_arr_1, d_arr_2, d_sigma, d_len);
 
   transformed_param_matrix <- cov_exp_quad(d_arr_1, p_arr_2, p_sigma, p_len);
   transformed_param_matrix <- cov_exp_quad(d_arr_1, p_arr_2, d_sigma, p_len);
