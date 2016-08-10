@@ -1005,7 +1005,6 @@ add("sort_indices_desc", expr_type(INT_T, 1),
 add("sort_indices_desc", expr_type(INT_T, 1), VECTOR_T);
 add("sort_indices_desc", expr_type(INT_T, 1), ROW_VECTOR_T);
 add("squared_distance", DOUBLE_T, DOUBLE_T, DOUBLE_T);
-add("squared_distance",DOUBLE_T,expr_type(DOUBLE_T, 1),expr_type(DOUBLE_T, 1));
 add("squared_distance", DOUBLE_T, VECTOR_T, VECTOR_T);
 add("squared_distance", DOUBLE_T, ROW_VECTOR_T, ROW_VECTOR_T);
 add("squared_distance", DOUBLE_T, VECTOR_T, ROW_VECTOR_T);
