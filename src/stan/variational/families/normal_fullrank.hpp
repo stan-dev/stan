@@ -416,7 +416,7 @@ namespace stan {
                      Eigen::VectorXd& cont_params,
                      int n_monte_carlo_grad,
                      BaseRNG& rng,
-                     interface_callbacks::writer::base_writer& message_writer)
+                     callbacks::writer& message_writer)
         const {
         static const char* function =
           "stan::variational::normal_fullrank::calc_grad";

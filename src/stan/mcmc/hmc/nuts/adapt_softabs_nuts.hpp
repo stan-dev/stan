@@ -1,7 +1,7 @@
 #ifndef STAN_MCMC_HMC_NUTS_ADAPT_SOFTABS_NUTS_HPP
 #define STAN_MCMC_HMC_NUTS_ADAPT_SOFTABS_NUTS_HPP
 
-#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer.hpp>
 #include <stan/mcmc/hmc/nuts/softabs_nuts.hpp>
 #include <stan/mcmc/stepsize_adapter.hpp>
 
@@ -23,8 +23,8 @@ namespace stan {
 
       sample transition(
         sample& init_sample,
-        interface_callbacks::writer::base_writer& info_writer,
-        interface_callbacks::writer::base_writer& error_writer) {
+        callbacks::writer& info_writer,
+        callbacks::writer& error_writer) {
         sample s
           = softabs_nuts<Model, BaseRNG>::transition(init_sample,
                                                      info_writer, error_writer);

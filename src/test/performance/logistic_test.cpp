@@ -162,26 +162,6 @@ TEST_F(performance, check_output_is_same) {
   std::string line, expected;
 
   getline(file_stream, line);
-  expected = "# stan_version_major = " + stan::MAJOR_VERSION;
-  ASSERT_EQ(expected, line);
-  ASSERT_TRUE(file_stream.good());
-
-
-  getline(file_stream, line);
-  expected = "# stan_version_minor = " + stan::MINOR_VERSION;
-  ASSERT_EQ(expected, line);
-  ASSERT_TRUE(file_stream.good());
-
-  getline(file_stream, line);
-  expected = "# stan_version_patch = " + stan::PATCH_VERSION;
-  ASSERT_EQ(expected, line);
-  ASSERT_TRUE(file_stream.good());
-
-  getline(file_stream, line);
-  ASSERT_EQ("# model = logistic_model", line);
-  ASSERT_TRUE(file_stream.good());
-
-  getline(file_stream, line);
   ASSERT_EQ("lp__,accept_stat__,stepsize__,treedepth__,n_leapfrog__,divergent__,energy__,beta.1,beta.2", line);
   ASSERT_TRUE(file_stream.good());
 

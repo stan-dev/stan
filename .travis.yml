@@ -18,7 +18,7 @@ matrix:
   fast_finish: true
 
 env:
-  -  TESTFOLDER=src/test/unit/interface_callbacks
+  -  TESTFOLDER=src/test/unit/callbacks
   -  TESTFOLDER=src/test/unit/io
   -  TESTFOLDER=src/test/unit/lang
   -  TESTFOLDER=src/test/unit/mcmc
@@ -26,5 +26,6 @@ env:
   -  TESTFOLDER=src/test/unit/optimization
   -  TESTFOLDER=src/test/unit/services
   -  TESTFOLDER=src/test/unit/variational
+  -  TESTFOLDER=src/test/unit/version_test.cpp
 
 script: ./runTests.py $TESTFOLDER

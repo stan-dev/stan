@@ -1,7 +1,7 @@
 #ifndef STAN_MODEL_UTIL_HPP
 #define STAN_MODEL_UTIL_HPP
 
-#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer.hpp>
 #include <stan/math/fwd/scal/fun/square.hpp>
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
@@ -280,7 +280,7 @@ namespace stan {
                        std::vector<int>& params_i,
                        double epsilon,
                        double error,
-                       stan::interface_callbacks::writer::base_writer& writer) {
+                       stan::callbacks::writer& writer) {
       std::stringstream msg;
       std::vector<double> grad;
       double lp
@@ -432,7 +432,7 @@ namespace stan {
                   const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
                   double& f,
                   Eigen::Matrix<double, Eigen::Dynamic, 1>& grad_f,
-                  stan::interface_callbacks::writer::base_writer& writer) {
+                  stan::callbacks::writer& writer) {
       std::stringstream ss;
       try {
         stan::math::gradient(model_functional<M>(model, &ss), x, f, grad_f);
