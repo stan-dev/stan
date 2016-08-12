@@ -26,12 +26,10 @@ namespace stan {
                       int refresh,
                       callbacks::interrupt& interrupt,
                       callbacks::writer& message_writer,
-                      callbacks::writer&
-                      init_writer,
+                      callbacks::writer& init_writer,
                       callbacks::writer& error_writer,
                       callbacks::writer& sample_writer,
-                      callbacks::writer&
-                      diagnostic_writer) {
+                      callbacks::writer& diagnostic_writer) {
         boost::ecuyer1988 rng = stan::services::util::rng(random_seed, chain);
 
         std::vector<int> disc_vector;
