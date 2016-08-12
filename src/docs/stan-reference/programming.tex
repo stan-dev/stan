@@ -2533,6 +2533,13 @@ non-vectorized alternative:
     y[n] ~ normal(x[n] * beta[jj[n]], sigma);
 \end{stancode}
 %
+For equivalent performance to the vectorized version, but less typing, the entire block can be replaced with:
+%
+\begin{stancode}
+  y ~ normal(beta[jj] .* x,sigma);
+\end{stancode}
+%
+which takes advantage of indexing introduced in Stan version 2.9 (see \refchapter{multi-indexing}).
 
 The code in the Stan program above also builds up an array of vectors
 for the outcomes and for the multivariate normal, which provides a
@@ -2635,14 +2642,10 @@ transformed parameters {
   beta = u * gamma + (diag_pre_multiply(tau,L_Omega) * z)';
 }
 model {
-  vector[N] x_beta_jj;
-  for (n in 1:N)
-    x_beta_jj[n] = x[n] * beta[jj[n]]';
-  y ~ normal(x_beta_jj, sigma);
-
   to_vector(z) ~ normal(0, 1); 
   L_Omega ~ lkj_corr_cholesky(2);
   to_vector(gamma) ~ normal(0, 5);
+  y ~ normal(beta[jj] .* x, sigma);
 }
 \end{stancode}
 
