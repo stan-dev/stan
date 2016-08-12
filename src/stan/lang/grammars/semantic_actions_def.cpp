@@ -24,6 +24,24 @@ namespace stan {
 
   namespace lang {
 
+    /**
+     * Add qualifier "stan::math::" to nullary functions defined in the
+     * Stan language.  The original name is set to the name here and
+     * the name is converted to have the prefix.
+     *
+     * @param f Function to qualify.
+     */
+    void qualify_builtins(fun& f) {
+      if (f.args_.size() > 0) return;
+      if (f.name_ == "e" || f.name_ == "pi" || f.name_ == "log2"
+          || f.name_ == "log10" || f.name_ == "sqrt2"
+          || f.name_ == "not_a_number" || f.name_ == "positive_infinity"
+          || f.name_ == "negative_infinity" || f.name_ == "machine_precision") {
+        f.original_name_ = f.name_;
+        f.name_ = "stan::math::" + f.name_;
+      }
+    }
+
     bool has_prob_suffix(const std::string& s) {
       return ends_with("_lpdf", s) || ends_with("_lpmf", s)
         || ends_with("_lcdf", s) || ends_with("_lccdf", s);
@@ -1505,6 +1523,9 @@ namespace stan {
               "'_lpdf' for density functions or '_lpmf' for mass functions",
               fun, error_msgs);
 
+      // if fun is built-in nullary, add stan::math:: qualifier
+      qualify_builtins(fun);
+
       // use old function names for built-in prob funs
       if (!function_signatures::instance().has_user_defined_key(fun.name_)) {
         replace_suffix("_lpdf", "_log", fun);
@@ -2104,7 +2125,7 @@ namespace stan {
     }
 
     validate_identifier::validate_identifier() {
-      // Constant functions which can be used as identifiers
+      // constant functions which may be used as identifiers
       const_fun_name_set_.insert("pi");
       const_fun_name_set_.insert("e");
       const_fun_name_set_.insert("sqrt2");
@@ -2115,6 +2136,7 @@ namespace stan {
       const_fun_name_set_.insert("negative_infinity");
       const_fun_name_set_.insert("epsilon");
       const_fun_name_set_.insert("negative_epsilon");
+      const_fun_name_set_.insert("machine_precision");
 
       // illegal identifiers
       reserve("for");
