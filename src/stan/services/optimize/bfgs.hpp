@@ -3,6 +3,7 @@
 
 #include <stan/io/var_context.hpp>
 #include <stan/io/chained_var_context.hpp>
+#include <stan/callbacks/interrupt.hpp>
 #include <stan/io/random_var_context.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/model/util.hpp>
@@ -24,7 +25,6 @@ namespace stan {
        * Runs the BFGS algorithm for a model.
        *
        * @tparam Model A model implementation
-       * @tparam Interrupt type of interrupt
        *
        * @param model Input model to test (with data already instantiated)
        * @param init var context for initialization
@@ -48,7 +48,7 @@ namespace stan {
        *
        * @return stan::services::error_codes::OK (0) if successful
        */
-      template <class Model, typename Interrupt>
+      template <class Model>
       int bfgs(Model& model,
                stan::io::var_context& init,
                unsigned int random_seed,
@@ -63,7 +63,7 @@ namespace stan {
                int num_iterations,
                bool save_iterations,
                int refresh,
-               Interrupt& interrupt,
+               callbacks::interrupt& interrupt,
                callbacks::writer& message_writer,
                callbacks::writer& init_writer,
                callbacks::writer& parameter_writer) {

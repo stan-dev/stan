@@ -4,6 +4,7 @@
 #include <stan/io/var_context.hpp>
 #include <stan/io/chained_var_context.hpp>
 #include <stan/io/random_var_context.hpp>
+#include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/optimization/newton.hpp>
 #include <stan/services/error_codes.hpp>
@@ -23,7 +24,6 @@ namespace stan {
        * Runs the Newton algorithm for a model.
        *
        * @tparam Model A model implementation
-       * @tparam Interrupt callback for interrupts
        *
        * @param[in] model the Stan model instantiated with data
        * @param init var context for initialization
@@ -39,7 +39,7 @@ namespace stan {
        * @param[out] parameter_writer output for parameter values
        * @return stan::services::error_codes::OK (0) if successful
        */
-      template <class Model, typename Interrupt>
+      template <class Model>
       int newton(Model& model,
                  stan::io::var_context& init,
                  unsigned int random_seed,
@@ -47,7 +47,7 @@ namespace stan {
                  double init_radius,
                  int num_iterations,
                  bool save_iterations,
-                 Interrupt& interrupt,
+                 callbacks::interrupt& interrupt,
                  callbacks::writer& message_writer,
                  callbacks::writer& init_writer,
                  callbacks::writer& parameter_writer) {

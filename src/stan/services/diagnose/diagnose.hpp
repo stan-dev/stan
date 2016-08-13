@@ -4,6 +4,7 @@
 #include <stan/io/var_context.hpp>
 #include <stan/io/chained_var_context.hpp>
 #include <stan/io/random_var_context.hpp>
+#include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/callbacks/chained_writer.hpp>
 #include <stan/model/util.hpp>
@@ -32,6 +33,7 @@ namespace stan {
        * @param init_radius radius to initialize
        * @param epsilon epsilon to use for finite differences
        * @param error amount of absolute error to allow
+       * @param interrupt interrupt callback
        * @param message_writer Writer callback for display output
        * @param init_writer Writer callback for unconstrained inits
        * @param parameter_writer Writer callback for file output
@@ -47,6 +49,7 @@ namespace stan {
                    double init_radius,
                    double epsilon,
                    double error,
+                   callbacks::interrupt& interrupt,
                    callbacks::writer& message_writer,
                    callbacks::writer& init_writer,
                    callbacks::writer& parameter_writer) {
@@ -67,6 +70,7 @@ namespace stan {
           stan::model::test_gradients<true, true>(model,
                                                   cont_vector, disc_vector,
                                                   epsilon, error,
+                                                  interrupt,
                                                   writer);
 
         return num_failed;

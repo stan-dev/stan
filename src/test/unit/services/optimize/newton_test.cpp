@@ -3,8 +3,9 @@
 #include <stan/io/empty_var_context.hpp>
 #include <test/test-models/good/optimization/rosenbrock.hpp>
 #include <stan/callbacks/stream_writer.hpp>
+#include <stan/callbacks/noop_interrupt.hpp>
 
-struct mock_callback {
+struct mock_callback : public stan::callbacks::interrupt {
   int n;
   mock_callback() : n(0) { }
   
