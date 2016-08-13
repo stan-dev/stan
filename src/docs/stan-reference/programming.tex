@@ -2475,14 +2475,14 @@ data {
   int<lower=1> J;              // num groups
   int<lower=1> L;              // num group predictors
   int<lower=1,upper=J> jj[N];  // group for individual
-  matrix[N, k] x;               // individual predictors
+  matrix[N, K] x;               // individual predictors
   row_vector[L] u[J];          // group predictors
   vector[N] y;                 // outcomes
 }
 parameters {
   corr_matrix[K] Omega;        // prior correlation
   vector<lower=0>[K] tau;      // prior scale
-  matrix[L, k] gamma;           // group coeffs
+  matrix[L, K] gamma;           // group coeffs
   vector[K] beta[J];           // indiv coeffs by group
   real<lower=0> sigma;         // prediction error scale
 }
