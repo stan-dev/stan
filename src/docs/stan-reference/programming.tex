@@ -659,7 +659,7 @@ With multiple indexing, this can be coded in one line, leading to more
 efficient vectorized code.
 %
 \begin{stancode}
-y ~ normal(alpha[ii] + beta[ii] .* x, sigma);
+y ~ normal( rows_dot_product(alpha[ii] + beta[ii] , x), sigma);
 \end{stancode}
 %
 This latter version is equivalent in speed to the clunky assignment to
@@ -2536,7 +2536,7 @@ non-vectorized alternative:
 For equivalent performance to the vectorized version, but less typing, the entire block can be replaced with:
 %
 \begin{stancode}
-  y ~ normal(beta[jj] .* x,sigma);
+  y ~ normal( rows_dot_product(beta[jj] , x),sigma);
 \end{stancode}
 %
 which takes advantage of indexing introduced in Stan version 2.9 (see \refchapter{multi-indexing}).
