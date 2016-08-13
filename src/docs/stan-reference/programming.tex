@@ -2631,7 +2631,7 @@ optimized model is as follows.
 parameters {
   matrix[K, J] z;
   cholesky_factor_corr[K] L_Omega;  
-  vector<lower=0;upper=pi()/2>[K] tau_unif;  
+  vector<lower=0,upper=pi()/2>[K] tau_unif;  
   matrix[L, K] gamma;                         // group coeffs
   real<lower=0> sigma;                       // prediction error scale
 }
