@@ -15,7 +15,7 @@ transformed data {
 parameters {
   real par_a;
   real par_b1 = b0;
-  real par_b2 = 2.2;
+  real par_b2 = 2.3;
 }
 transformed parameters {
   real tpar_a;

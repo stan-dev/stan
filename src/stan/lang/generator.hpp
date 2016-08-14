@@ -31,7 +31,18 @@ namespace stan {
     void generate_bare_type(const expr_type& t,
                             const std::string& scalar_t_name,
                             std::ostream& out);
-
+    void generate_statement(const statement& s,
+                            int indent,
+                            std::ostream& o,
+                            bool include_sampling,
+                            bool is_var,
+                            bool is_fun_return);
+    void generate_statement(const std::vector<statement>& ss,
+                            int indent,
+                            std::ostream& o,
+                            bool include_sampling,
+                            bool is_var,
+                            bool is_fun_return);
 
     const std::string EOL("\n");
     const std::string EOL2("\n\n");
@@ -694,15 +705,18 @@ namespace stan {
         generate_validate_positive(var_name, type_arg2, o);
 
       // initialize variable or use definition
-      o << INDENT2
-        << var_name << " = ";
       if (is_nil(definition)) {
+        o << INDENT2
+          << var_name << " = ";
         generate_type(base_type, dims, dims.size(), o);
         generate_initializer(o, base_type, dims, type_arg1, type_arg2);
       } else {
-        // access to user_facing and is_var?
+        o << INDENT2
+          << "stan::math::assign("
+          << var_name
+          << ", ";
         generate_expression(definition, o);
-        o << ";" << EOL;
+        o << ");" << EOL;
       }
     }
 
@@ -792,7 +806,7 @@ namespace stan {
         for (size_t i = 0; i < dim_args.size(); ++i)
           read_args.push_back(dim_args[i]);
         generate_initialize_array(base_type, read_fun, read_args,
-                                  x.name_, x.dims_);
+                                    x.name_, x.dims_);
       }
       void operator()(const nil& /*x*/) const { }
       void operator()(const int_var_decl& x) const {
@@ -1024,6 +1038,7 @@ namespace stan {
       }
     };
 
+
     void generate_local_var_inits(std::vector<var_decl> vs,
                                   bool is_var,
                                   bool declare_vars,
@@ -1032,9 +1047,14 @@ namespace stan {
         << "stan::io::reader<"
         << (is_var ? "T__" : "double")
         << "> in__(params_r__,params_i__);" << EOL2;
-      init_local_var_visgen vis(declare_vars, is_var, o);
-      for (size_t i = 0; i < vs.size(); ++i)
-          boost::apply_visitor(vis, vs[i].decl_);
+      init_local_var_visgen vis_init(declare_vars, is_var, o);
+      for (size_t i = 0; i < vs.size(); ++i) {
+        if (vs[i].has_def()) {
+          generate_comment("assign definition",2,o);
+        } else {
+          boost::apply_visitor(vis_init, vs[i].decl_);
+        }
+      }
     }
 
 
@@ -1467,19 +1487,25 @@ namespace stan {
         o_ << ' '  << name;
         if (is_nil(definition)) {
           generate_init_args(type, ctor_args, dims, 0);
+          o_ << ';' << EOL;
         } else {
-          o_ << " = ";
+          o_ << ";" << EOL;
+          generate_indent(indents_, o_);
+          o_ << "stan::math::assign("
+             << name
+             << ", ";
           generate_expression(definition, o_);
+          o_ << ");" << EOL;
         }
-        o_ << ';' << EOL;
         if (dims.size() == 0) {
           generate_indent(indents_, o_);
           generate_void_statement(name);
           o_ << EOL;
         }
-        if (type == "Eigen::Matrix<T__, Eigen::Dynamic, Eigen::Dynamic> "
-            || type == "Eigen::Matrix<T__, 1, Eigen::Dynamic> "
-            || type == "Eigen::Matrix<T__, Eigen::Dynamic, 1> ") {
+        if (is_nil(definition) 
+            && ( type == "Eigen::Matrix<T__, Eigen::Dynamic, Eigen::Dynamic> "
+                 || type == "Eigen::Matrix<T__, 1, Eigen::Dynamic> "
+                 || type == "Eigen::Matrix<T__, Eigen::Dynamic, 1> ")) {
           generate_indent(indents_, o_);
           o_ << "stan::math::fill(" << name << ", DUMMY_VAR__);" << EOL;
         }
@@ -1576,9 +1602,8 @@ namespace stan {
       generate_local_var_init_nan_visgen vis(indent, is_var, is_fun_return,
                                              indent, o);
       for (size_t i = 0; i < vs.size(); ++i)
-        if (!(vs[i].has_def())) {
+        if (!vs[i].has_def())
           boost::apply_visitor(vis, vs[i].decl_);
-        }
     }
 
     // see member_var_decl_visgen cut & paste
@@ -1655,12 +1680,10 @@ namespace stan {
                        " avoid seg fault on val access",
                        indent, o);
       for (size_t i = 0; i < vs.size(); ++i) {
-        if (!vs[i].has_def()) {
+        if (!(vs[i].has_def()))
           boost::apply_visitor(vis, vs[i].decl_);
-        }
       }
     }
-
 
     struct validate_transformed_params_visgen : public visgen {
       int indents_;
@@ -1893,10 +1916,6 @@ namespace stan {
       }
       o << "]";
     }
-
-    void generate_statement(statement const& s, int indent, std::ostream& o,
-                            bool include_sampling, bool is_var,
-                            bool is_fun_return);
 
     struct statement_visgen : public visgen {
       size_t indent_;
@@ -2171,6 +2190,7 @@ namespace stan {
       }
     };
 
+
     struct is_numbered_statement_vis : public boost::static_visitor<bool> {
       bool operator()(const nil& st) const { return false; }
       bool operator()(const assignment& st) const { return true; }
@@ -2189,9 +2209,6 @@ namespace stan {
       bool operator()(const no_op_statement& st) const { return true; }
       bool operator()(const return_statement& st) const { return true; }
     };
-
-
-
 
     void generate_statement(const statement& s,
                             int indent,
@@ -3189,7 +3206,9 @@ namespace stan {
         generate_check_double(x.name_, x.dims_.size());
         var_size_validator_(x);
         generate_declaration(x.name_, "double", x.dims_, nil(), nil(), x.def_);
-        generate_buffer_loop("r", x.name_, x.dims_);
+        if (is_nil(x.def_)) {
+          generate_buffer_loop("r", x.name_, x.dims_);
+        }
         generate_write_loop(function_args("scalar", x),
                             x.name_, x.dims_);
       }
@@ -3315,9 +3334,11 @@ namespace stan {
         if (is_nil(definition)) {
           generate_initializer(o_, base_type, dims, type_arg1, type_arg2);
         } else {
-          o_ << " = " ;
-          generate_expression(definition, o_);
           o_ << ";" << EOL;
+          o_ << INDENT2;
+          o_ << "stan::math::assign(" << name << ", ";
+          generate_expression(definition, false, o_);
+          o_ << ");" << EOL;
         }
       }
       void generate_indent_num_dims(size_t base_indent,
