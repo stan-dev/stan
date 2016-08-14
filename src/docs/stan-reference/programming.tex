@@ -2496,12 +2496,8 @@ model {
       u_gamma[j] = u[j] * gamma;
     beta ~ multi_normal(u_gamma, quad_form_diag(Omega, tau));
   }
-  {
-    vector[N] x_beta_jj;
-    for (n in 1:N)
-      x_beta_jj[n] = x[n] * beta[jj[n]];
-    y ~ normal(x_beta_jj, sigma);
-  }
+  for (n in 1:N)
+    y[n] ~ normal(x[n] * beta[jj[n]], sigma);
 }
 \end{stancode}
 %
@@ -2521,19 +2517,14 @@ specialized matrix operations.
 
 \subsubsection{Optimization through Vectorization}
 
-The code in the Stan program above builds up a vector with entries
-\code{x\_beta\_jj[n]} of means using the predictor \code{x[n]} and
-group-level coefficient \code{beta[jj[n]]}.  A block is defined with
-brackets around it so that \code{x\_beta\_jj} can be declared as a
-local variable.  The vectorized code is equivalent to the simpler,
-non-vectorized alternative:
+The code in the Stan program above can be sped up dramatically by replacing:
 %
 \begin{stancode}
   for (n in 1:N)
     y[n] ~ normal(x[n] * beta[jj[n]], sigma);
 \end{stancode}
 %
-For equivalent performance to the vectorized version, but less typing, the entire block can be replaced with:
+with:
 %
 \begin{stancode}
   y ~ normal( rows_dot_product(beta[jj] , x),sigma);
