@@ -49,7 +49,7 @@ namespace stan {
        * gradients relative to the finite differences calculation.
        */
       struct error {
-        
+
         /**
          * Description of error: absolute error threshold
          *
@@ -69,7 +69,7 @@ namespace stan {
           if (error <= 0)
             throw std::invalid_argument("error must be greater than 0");
         }
-        
+
         /**
          * Default error value: 1e-6.
          *
@@ -79,7 +79,7 @@ namespace stan {
           return 1e-6;
         }
       };
-        
+
     }
   }
 }

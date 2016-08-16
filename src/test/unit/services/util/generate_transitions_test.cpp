@@ -12,8 +12,8 @@ namespace stan {
 
       class check_interrupt: public interrupt {
       public:
-        check_interrupt(int n, bool& called) : n_(n), 
-          counter_(0), called_(called) {
+        check_interrupt(int n, bool& called)
+          : called_(called), n_(n), counter_(0) {
           called_ = false;
         }
         void operator()() {
