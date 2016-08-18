@@ -151,7 +151,6 @@ endif
 	@echo '  - clean-manual  : Cleans temporary files from building the manual.'
 	@echo '  - clean-deps    : Removes dependency files for tests. If tests stop building,'
 	@echo '                    run this target.'
-	@echo '  - clean-cvodes  : Removes binaries built for CVODES'
 	@echo '  - clean-all     : Cleans up all of Stan.'
 	@echo ''
 	@echo 'Higher level targets:'
@@ -171,7 +170,7 @@ docs: manual doxygen
 # Clean up.
 ##
 MODEL_SPECS := $(shell find src/test -type f -name '*.stan')
-.PHONY: clean clean-demo clean-dox clean-manual clean-models clean-all clean-deps clean-cvodes
+.PHONY: clean clean-demo clean-dox clean-manual clean-models clean-all clean-deps
 clean:
 	$(RM) $(shell find src -type f -name '*.dSYM') $(shell find src -type f -name '*.d.*')
 	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%.hpp))
@@ -190,11 +189,7 @@ clean-deps:
 	@echo '  removing dependency files'
 	$(shell find . -type f -name '*.d' -exec rm {} +)
 
-clean-cvodes:
-	$(RM) $(wildcard $(CVODES)/lib/*)
-	$(RM) $(wildcard $(CVODES)/src/*/*.o)
-
-clean-all: clean clean-manual clean-deps clean-cvodes
+clean-all: clean clean-manual clean-deps clean-libraries
 	$(RM) -r test bin
 	@echo '  removing .o files'
 	$(shell find src -type f -name '*.o' -exec rm {} +)
