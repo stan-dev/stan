@@ -2584,11 +2584,11 @@ Stan's matrix concatenation operations \code{append\_col} and
   another row vector.}
 %
 \fitem{row\_vector}{append\_col}{real \farg{x}, row\_vector
-  \farg{y}}{Append \farg{x} to the tip of \farg{y}, returning
+  \farg{y}}{Append \farg{x} to the front of \farg{y}, returning
   another row vector.}
 %
 \fitem{row\_vector}{append\_col}{row\_vector \farg{x}, real \farg{y}}
-  {Append \farg{y} to the bottom of \farg{x}, returning
+  {Append \farg{y} to the end of \farg{x}, returning
   another row vector.}
 %
 \end{description}
@@ -2620,7 +2620,7 @@ Stan's matrix concatenation operations \code{append\_col} and
     another vector.}
 %
 \fitem{vector}{append\_row}{real \farg{x}, vector
-  \farg{y}}{Append \farg{x} to the tip of \farg{y}, returning
+  \farg{y}}{Append \farg{x} to the top of \farg{y}, returning
   another vector.}
 %
 \fitem{vector}{append\_row}{vector \farg{x}, real \farg{y}}
