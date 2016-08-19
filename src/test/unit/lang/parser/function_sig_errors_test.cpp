@@ -15,9 +15,8 @@ TEST(langParser, functionSigErrorsFunKnown) {
 }
 TEST(langParser, functionSigErrorsSampUnknown) { 
   test_throws("signature_sampling_unknown",
-              "No matches for:",
-              "vector ~ foo_whatev(vector)",
-              "Distribution foo_whatev not found.");
+              "Distribution foo_whatev not found."
+              " Require function with _lpdf or _lpmf or _log suffix");
 }
 TEST(langParser, functionSigErrorsSampKnown) { 
   test_throws("signature_sampling_known",

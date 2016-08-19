@@ -5,9 +5,9 @@ TEST(parserFunctions, funsGood0) {
   test_parsable("validate_functions"); // tests proper definitions and use
 }
 
-TEST(parserFunctions, funsGood1) {
-  test_parsable("functions-good1");
-}
+// TEST(parserFunctions, funsGood1) {
+//   test_parsable("functions-good1");
+// }
 
 TEST(parserFunctions, funsGood2) {
   test_parsable("functions-good2");
@@ -65,21 +65,6 @@ TEST(parserFunctions,funsBad7) {
               " allowed in transformed parameter block, model block");
 }
 
-TEST(parserFunctions,funsBad8) {
-  test_throws("functions-bad8",
-              "random number generators only allowed in");
-}
-
-TEST(parserFunctions,funsBad9) {
-  test_throws("functions-bad9",
-              "random number generators only allowed in");
-}
-
-TEST(parserFunctions,funsBad10) {
-  test_throws("functions-bad10",
-              "random number generators only allowed in");
-}
-
 TEST(parserFunctions,funsBad11) {
   test_throws("functions-bad11",
               "Sampling statements (~) and increment_log_prob()");
@@ -112,5 +97,7 @@ TEST(parserFunctions,funsBad16) {
 
 TEST(parserFunctions,funsBad17) {
   test_throws("functions-bad17",
-              "Require real return type for functions ending in _log");
+              "Require real return type for probability functions"
+              " ending in _log, _lpdf, _lpmf, _lcdf, or _lccdf.");
 }
+
