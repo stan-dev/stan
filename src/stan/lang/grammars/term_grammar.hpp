@@ -79,18 +79,15 @@ namespace stan {
                               whitespace_grammar<Iterator> >
       integrate_ode_r;
 
-
       boost::spirit::qi::rule<Iterator,
                               integrate_ode_control(var_origin),
                               whitespace_grammar<Iterator> >
       integrate_ode_control_r;
 
-
       boost::spirit::qi::rule<Iterator,
                               integrate_function(var_origin),
                               whitespace_grammar<Iterator> >
       integrate_function_r;
-
 
       boost::spirit::qi::rule<Iterator,
                               std::string(),
