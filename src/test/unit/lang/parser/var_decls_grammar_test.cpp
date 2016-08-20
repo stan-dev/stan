@@ -76,6 +76,21 @@ TEST(langParserVarDeclsGrammarDef, defDeclIntVar) {
   test_parsable("declare-define-var-int");
 }
 
+TEST(langParserVarDeclsGrammarDef, badDefDeclIntVar1) {
+  test_throws("declare-define-var-int-1",
+              "expression denoting integer required; found type=");
+}
+
+TEST(langParserVarDeclsGrammarDef, badDefDeclIntVar2) {
+  test_throws("declare-define-var-int-2",
+              "expression denoting integer required; found type=");
+}
+
+TEST(langParserVarDeclsGrammarDef, badDefDeclIntVar3) {
+  test_throws("declare-define-var-int-3",
+              "dims mismatch; expression must have");
+}
+
 TEST(langParserVarDeclsGrammarDef, defDeclDoubleVar) {
   test_parsable("declare-define-var-double");
 }

@@ -7,6 +7,7 @@ transformed data {
   real b = a;
   vector[7] td_b1;
   vector[7] td_b2 = b0;
+  vector<lower=0,upper=1>[7] td_b3 = b0;
   row_vector[7] td_c1;
   row_vector[7] td_c2 = c0;
   {

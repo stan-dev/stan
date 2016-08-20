@@ -224,24 +224,20 @@ namespace stan {
                                                  bool& pass,
                                                  std::ostream& error_msgs) const {
       pass = true;
-      std::cout << "vector var decl dims: " << vector_var_decl.dims_.size() << std::endl;
-      std::cout << "vector var def type: " << vector_var_def.expression_type() << std::endl;
-      std::cout << "vector var def dims: " << vector_var_def.expression_type().num_dims_ << std::endl;
-      
-//      if (!(vector_var_def.expression_type().type() == VECTOR_T)) {
-//        error_msgs << "expression denoting vector required; found type="
-//                   << vector_var_def.expression_type().type() << std::endl;
-//        pass = false;
-//      }
-//      if (vector_var_decl.dims_.size() !=
-//          vector_var_def.expression_type().num_dims_) {
-//        error_msgs << "dims mismatch; expression must have "
-//                   << vector_var_decl.dims_.size()
-//                   << " dimensions, found "
-//                   << vector_var_def.expression_type().num_dims_
-//                   << " dimensions. " << std::endl;
-//        pass = false;
-//      }
+      if (!(vector_var_def.expression_type().type() == VECTOR_T)) {
+        error_msgs << "expression denoting vector required; found type="
+                   << vector_var_def.expression_type().type() << std::endl;
+        pass = false;
+      }
+      if (vector_var_decl.dims_.size() !=
+          vector_var_def.expression_type().num_dims_) {
+        error_msgs << "dims mismatch; expression must have "
+                   << vector_var_decl.dims_.size()
+                   << " dimensions, found "
+                   << vector_var_def.expression_type().num_dims_
+                   << " dimensions. " << std::endl;
+        pass = false;
+      }
     }
     boost::phoenix::function<validate_vector_var_definition>
     validate_vector_var_definition_f;
@@ -251,24 +247,20 @@ namespace stan {
                                                  bool& pass,
                                                  std::ostream& error_msgs) const {
       pass = true;
-      std::cout << "row_vector var decl dims: " << row_vector_var_decl.dims_.size() << std::endl;
-      std::cout << "row_vector var def type: " << row_vector_var_def.expression_type() << std::endl;
-      std::cout << "row_vector var def dims: " << row_vector_var_def.expression_type().num_dims_ << std::endl;
-      
-//      if (!(row_vector_var_def.expression_type().type() == ROW_VECTOR_T)) {
-//        error_msgs << "expression denoting row_vector required; found type="
-//                   << row_vector_var_def.expression_type().type() << std::endl;
-//        pass = false;
-//      }
-//      if (row_vector_var_decl.dims_.size() !=
-//          row_vector_var_def.expression_type().num_dims_) {
-//        error_msgs << "dims mismatch; expression must have "
-//                   << row_vector_var_decl.dims_.size()
-//                   << " dimensions, found "
-//                   << row_vector_var_def.expression_type().num_dims_
-//                   << " dimensions. " << std::endl;
-//        pass = false;
-//      }
+      if (!(row_vector_var_def.expression_type().type() == ROW_VECTOR_T)) {
+        error_msgs << "expression denoting row_vector required; found type="
+                   << row_vector_var_def.expression_type().type() << std::endl;
+        pass = false;
+      }
+      if (row_vector_var_decl.dims_.size() !=
+          row_vector_var_def.expression_type().num_dims_) {
+        error_msgs << "dims mismatch; expression must have "
+                   << row_vector_var_decl.dims_.size()
+                  << " dimensions, found "
+                   << row_vector_var_def.expression_type().num_dims_
+                  << " dimensions. " << std::endl;
+        pass = false;
+      }
     }
     boost::phoenix::function<validate_row_vector_var_definition>
     validate_row_vector_var_definition_f;
@@ -2509,15 +2501,6 @@ namespace stan {
                    << std::endl;
         var_decl_result = var_decl;
         return;
-      }
-      if (var_decl.base_type_ == DOUBLE_T) {
-        std::cout << "DOUBLE decl, name: "
-                  << var_decl.name_
-                  << " # dims: "
-                  << var_decl.dims_.size()
-                  << " def: "
-                  << (var_decl.def_.expression_type().is_ill_formed() ? " no def " : " has def")
-                  << std::endl;
       }
       pass = true;  // probably don't need to set true
       vm.add(var_decl.name_, var_decl, vo);
