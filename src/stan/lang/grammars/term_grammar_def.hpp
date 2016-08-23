@@ -231,7 +231,7 @@ namespace stan {
         %= lexeme[char_("a-zA-Z")
                   >> *char_("a-zA-Z0-9_.")];
 
-      prob_args_r.name("probability function arguments");
+      prob_args_r.name("probability function argument");
       prob_args_r
         %= (lit('(') >> lit(')'))
         | hold[lit('(')
@@ -239,7 +239,9 @@ namespace stan {
                >> lit(')')]
         | (lit('(')
            >> expression_g(_r1)
-           >> lit('|')
+           >> (lit(',')
+               [require_vbar_f(_pass, boost::phoenix::ref(error_msgs_))]
+               | (eps > lit('|')))
            >> (expression_g(_r1) % ',')
            >> lit(')'));
 
