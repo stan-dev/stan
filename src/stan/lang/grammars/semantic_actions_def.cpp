@@ -569,10 +569,26 @@ namespace stan {
     boost::phoenix::function<validate_int_expression>
     validate_int_expression_f;
 
-    void validate_ints_expression::operator()(const expression & e, bool& pass,
+    void validate_int_expression_warn::operator()(const expression & e,
+                                                  bool& pass,
+                                                  std::ostream& error_msgs)
+      const {
+      if (e.expression_type().type() != INT_T) {
+        error_msgs << "ERROR:  Indexes must be expressions of integer type."
+                   << " found type = ";
+        write_base_expr_type(error_msgs, e.expression_type().type());
+        error_msgs << '.' << std::endl;
+      }
+      pass = e.expression_type().is_primitive_int();
+    };
+    boost::phoenix::function<validate_int_expression_warn>
+    validate_int_expression_warn_f;
+
+
+    void validate_ints_expression::operator()(const expression& e, bool& pass,
                                               std::ostream& error_msgs) const {
       if (e.expression_type().type() != INT_T) {
-        error_msgs << "index must be integer; found type=";
+        error_msgs << "ERROR:  Container index must be integer; found type=";
         write_base_expr_type(error_msgs, e.expression_type().type());
         error_msgs << std::endl;
         pass = false;
