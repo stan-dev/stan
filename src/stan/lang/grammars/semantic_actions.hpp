@@ -659,6 +659,11 @@ namespace stan {
     };
     extern boost::phoenix::function<set_var_type> set_var_type_f;
 
+    struct require_vbar : public phoenix_functor_binary {
+      void operator()(bool& pass, std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<require_vbar> require_vbar_f;
+
     struct validate_no_constraints_vis : public boost::static_visitor<bool> {
       std::stringstream& error_msgs_;
       explicit validate_no_constraints_vis(std::stringstream& error_msgs);

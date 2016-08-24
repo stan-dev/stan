@@ -1912,6 +1912,17 @@ namespace stan {
     }
     boost::phoenix::function<set_var_type> set_var_type_f;
 
+    void require_vbar::operator()(bool& pass, std::ostream& error_msgs) const {
+      pass = false;
+      error_msgs << "Probabilty functions with suffixes _lpdf, _lpmf,"
+                 << " _lcdf, and _lccdf," << std::endl
+                 << "require a vertical bar (|) between the first two"
+                 << " arguments." << std::endl;
+    }
+    boost::phoenix::function<require_vbar> require_vbar_f;
+
+
+
     validate_no_constraints_vis::validate_no_constraints_vis(
                                                std::stringstream& error_msgs)
       : error_msgs_(error_msgs) { }
