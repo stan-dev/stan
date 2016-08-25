@@ -60,7 +60,6 @@ TEST(langRethrowLocated, allExpected) {
   test_rethrow_located_nullary<std::bad_exception>("bad_exception");
   test_rethrow_located_nullary<std::bad_typeid>("bad_typeid");
 
-  test_rethrow_located<std::ios_base::failure>();
   test_rethrow_located<std::domain_error>();
   test_rethrow_located<std::invalid_argument>();
   test_rethrow_located<std::length_error>();

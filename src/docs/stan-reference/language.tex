@@ -2050,7 +2050,7 @@ single & n/a & row vector
 \code{a[is]} &
 multiple & n/a & matrix
 \\ \hline
-\code{a[is, js]} & single & single & real
+\code{a[i, j]} & single & single & real
 \\
 \code{a[i, js]} & single & multiple & row vector
 \\
@@ -2060,7 +2060,7 @@ multiple & n/a & matrix
 \end{tabular}
 \end{center}
 \caption{\small\it Special rules for reducing matrices based on
-  whether the argumnt is a single or multiple index.  Examples are for
+  whether the argument is a single or multiple index.  Examples are for
 a matrix \code{a}, with integer single indexes \code{i} and \code{j}
 and integer array multiple indexes \code{is} and \code{js}.  The same
 typing rules apply for all multiple indexes.}%
@@ -2477,7 +2477,7 @@ assignment statement evaluates the expression on the right-hand side
 and assigns it to the (indexed) variable on the left-hand side.  An
 example of a simple assignment is as follows.%
 %
-\footnote{In versions of Stan before 2.10.0, the operator \code{<-} was
+\footnote{In versions of Stan before 2.11.0, the operator \code{<-} was
   used for assignment rather than using the equal sign \code{=}.  The
   old operator \code{<-} is now deprecated and will print a warning.
   In the future, it will be removed.}

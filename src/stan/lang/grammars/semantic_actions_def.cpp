@@ -24,6 +24,24 @@ namespace stan {
 
   namespace lang {
 
+    /**
+     * Add qualifier "stan::math::" to nullary functions defined in the
+     * Stan language.  The original name is set to the name here and
+     * the name is converted to have the prefix.
+     *
+     * @param f Function to qualify.
+     */
+    void qualify_builtins(fun& f) {
+      if (f.args_.size() > 0) return;
+      if (f.name_ == "e" || f.name_ == "pi" || f.name_ == "log2"
+          || f.name_ == "log10" || f.name_ == "sqrt2"
+          || f.name_ == "not_a_number" || f.name_ == "positive_infinity"
+          || f.name_ == "negative_infinity" || f.name_ == "machine_precision") {
+        f.original_name_ = f.name_;
+        f.name_ = "stan::math::" + f.name_;
+      }
+    }
+
     bool has_prob_suffix(const std::string& s) {
       return ends_with("_lpdf", s) || ends_with("_lpmf", s)
         || ends_with("_lcdf", s) || ends_with("_lccdf", s);
@@ -1505,11 +1523,17 @@ namespace stan {
               "'_lpdf' for density functions or '_lpmf' for mass functions",
               fun, error_msgs);
 
-      // need old function names (_log) until math gets updated to new ones
-      replace_suffix("_lpdf", "_log", fun);
-      replace_suffix("_lpmf", "_log", fun);
-      replace_suffix("_lcdf", "_cdf_log", fun);
-      replace_suffix("_lccdf", "_ccdf_log", fun);
+      // if fun is built-in nullary, add stan::math:: qualifier
+      qualify_builtins(fun);
+
+      // use old function names for built-in prob funs
+      if (!function_signatures::instance().has_user_defined_key(fun.name_)) {
+        replace_suffix("_lpdf", "_log", fun);
+        replace_suffix("_lpmf", "_log", fun);
+        replace_suffix("_lcdf", "_cdf_log", fun);
+        replace_suffix("_lccdf", "_ccdf_log", fun);
+      }
+      // know these are not user-defined`x
       replace_suffix("lmultiply", "multiply_log", fun);
       replace_suffix("lchoose", "binomial_coefficient_log", fun);
 
@@ -1888,6 +1912,17 @@ namespace stan {
     }
     boost::phoenix::function<set_var_type> set_var_type_f;
 
+    void require_vbar::operator()(bool& pass, std::ostream& error_msgs) const {
+      pass = false;
+      error_msgs << "Probabilty functions with suffixes _lpdf, _lpmf,"
+                 << " _lcdf, and _lccdf," << std::endl
+                 << "require a vertical bar (|) between the first two"
+                 << " arguments." << std::endl;
+    }
+    boost::phoenix::function<require_vbar> require_vbar_f;
+
+
+
     validate_no_constraints_vis::validate_no_constraints_vis(
                                                std::stringstream& error_msgs)
       : error_msgs_(error_msgs) { }
@@ -2101,7 +2136,7 @@ namespace stan {
     }
 
     validate_identifier::validate_identifier() {
-      // Constant functions which can be used as identifiers
+      // constant functions which may be used as identifiers
       const_fun_name_set_.insert("pi");
       const_fun_name_set_.insert("e");
       const_fun_name_set_.insert("sqrt2");
@@ -2112,6 +2147,7 @@ namespace stan {
       const_fun_name_set_.insert("negative_infinity");
       const_fun_name_set_.insert("epsilon");
       const_fun_name_set_.insert("negative_epsilon");
+      const_fun_name_set_.insert("machine_precision");
 
       // illegal identifiers
       reserve("for");
