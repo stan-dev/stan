@@ -48,7 +48,7 @@ void test_rethrow_located_nullary(const std::string& original_type) {
 
 
 struct my_test_exception : public std::exception {
-  const std::string& what_;
+  const std::string what_;
   my_test_exception(const std::string& what) throw() : what_(what) { }
   ~my_test_exception() throw() { }
   const char* what() const throw() { return what_.c_str(); }
@@ -71,7 +71,6 @@ TEST(langRethrowLocated, allExpected) {
   test_rethrow_located<std::runtime_error>();
 
   test_rethrow_located_nullary<std::exception>("std::exception");
-
   test_rethrow_located_2<my_test_exception,std::exception>();
 }
 TEST(langRethrowLocated, locatedException) {
