@@ -71,7 +71,6 @@ TEST(langRethrowLocated, allExpected) {
   test_rethrow_located<std::runtime_error>();
 
   test_rethrow_located_nullary<std::exception>("std::exception");
-
   test_rethrow_located_2<my_test_exception,std::exception>();
 }
 TEST(langRethrowLocated, locatedException) {
