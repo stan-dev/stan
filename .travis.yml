@@ -27,4 +27,4 @@ env:
   -  TESTFOLDER=src/test/unit/services
   -  TESTFOLDER=src/test/unit/variational
 
-script: ./runTests.py -j4 $TESTFOLDER
+script: ./runTests.py -j2 $TESTFOLDER
