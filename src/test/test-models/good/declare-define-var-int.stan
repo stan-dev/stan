@@ -1,32 +1,25 @@
-data {
-  int a0;
-}
 transformed data {
-  int td_a;
-  int td_a1 = a0;
-  int td_a2 = 4;
+  int td1 = 1;     // int_d <- int_d
+  int tdIntArray1[7];
+  int tdIntArray2[7] = tdIntArray1;
+}
+transformed parameters {
+  real p1;
+  p1 = 1;
+  // local variables
   {
-    int loc_td_a;
-    int loc_td_a1 = a0;
-    int loc_td_a2 = 6;
+    int lp1 = 1;      // real_p <- int_d 
   }
 }
 model {
-  int model_a;
-  int model_a1 = a0;
-  {
-    int loc_model_a;
-    int loc_model_a1 = a0;
-    int loc_model_a2 = 4;
-  }
+  // local variables
+  int lm1 = 1;      // int_d <- int_d 
 }
 generated quantities {
-  int gq_a;
-  int gq_a1 = a0;
-  int gq_a2 = 9;
+  int gq1 = 1;     // int_d <- int_d
+  gq1 = 2;
   {
-    int loc_gq_a;
-    int loc_gq_a1 = a0;
-    int loc_gq_a2 = 6;
+    int lgq1 = 1;     // int_d <- int_d
+    lgq1 = 2;
   }
 }
