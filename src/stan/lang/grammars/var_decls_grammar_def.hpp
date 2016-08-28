@@ -119,7 +119,7 @@ namespace stan {
       // _r2 var_origin
       var_decl_r.name("variable declaration");
       var_decl_r
-        %= (int_decl_r(_r2)
+        = (int_decl_r(_r2)
             [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
                        boost::phoenix::ref(error_msgs))]
             | double_decl_r(_r2)
@@ -161,8 +161,9 @@ namespace stan {
             )
         > eps
           [validate_decl_constraints_f(_r1, _a, _val, _pass,
-                                       boost::phoenix::ref(error_msgs_))]
-
+                                       boost::phoenix::ref(error_msgs_)),
+           validate_definition_f(_r2, _val, _pass, 
+                                 boost::phoenix::ref(error_msgs_))]
         > lit(';');
 
       int_decl_r.name("integer declaration");
@@ -172,9 +173,8 @@ namespace stan {
         > -range_brackets_int_r(_r1)
         > identifier_r
         > opt_dims_r(_r1)
-        > -( lit('=')
-             > expression_g(_r1)
-             [validate_int_var_definition_f(_val, _1, _pass, boost::phoenix::ref(error_msgs_))] ); 
+        > opt_def_r(_r1);
+
 
       double_decl_r.name("real declaration");
       double_decl_r
@@ -183,9 +183,7 @@ namespace stan {
         > -range_brackets_double_r(_r1)
         > identifier_r
         > opt_dims_r(_r1)
-        > -( lit('=')
-             > expression_g(_r1)
-             [validate_double_var_definition_f(_val, _1, _pass, boost::phoenix::ref(error_msgs_))] ); 
+        > opt_def_r(_r1);
 
       vector_decl_r.name("vector declaration");
       vector_decl_r
@@ -330,7 +328,7 @@ namespace stan {
 
       opt_dims_r.name("array dimensions (optional)");
       opt_dims_r
-        %=  - dims_r(_r1);
+        %=  -dims_r(_r1);
 
       dims_r.name("array dimensions");
       dims_r
@@ -342,6 +340,15 @@ namespace stan {
            % ',')
         > lit(']');
 
+
+      opt_def_r.name("variable definition (optional)");
+      opt_def_r
+        %=  - def_r(_r1);
+
+      def_r
+        %= lit('=')
+        > (expression_g(_r1));
+      
       range_brackets_int_r.name("integer range expression pair, brackets");
       range_brackets_int_r
         = lit('<') [empty_range_f(_val, boost::phoenix::ref(error_msgs_))]

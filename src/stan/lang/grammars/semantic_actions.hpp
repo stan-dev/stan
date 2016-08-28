@@ -737,6 +737,13 @@ namespace stan {
     extern boost::phoenix::function<validate_decl_constraints>
     validate_decl_constraints_f;
 
+    // called from: var_decls_grammar
+    struct validate_definition : public phoenix_functor_quaternary {
+      void operator()(const var_origin& origin, const var_decl& var_decl,
+                      bool& pass, std::stringstream& error_msgs) const;
+    };
+    extern boost::phoenix::function<validate_definition>
+    validate_definition_f;
 
     struct validate_identifier : public phoenix_functor_ternary {
       std::set<std::string> reserved_word_set_;

@@ -420,6 +420,7 @@ namespace stan {
     }
     boost::phoenix::function<validate_declarations> validate_declarations_f;
 
+
     bool fun_exists(const std::set<std::pair<std::string,
                     function_signature_t> >& existing,
                     const std::pair<std::string,
@@ -2086,6 +2087,7 @@ namespace stan {
       return false;
     }
 
+
     data_only_expression::data_only_expression(std::stringstream& error_msgs,
                                                variable_map& var_map)
       : error_msgs_(error_msgs),
@@ -2182,6 +2184,58 @@ namespace stan {
     }
     boost::phoenix::function<validate_decl_constraints>
     validate_decl_constraints_f;
+
+    void validate_definition::operator()(const var_origin& origin,
+                                         const var_decl& var_decl,
+                                         bool& pass,
+                                         std::stringstream& error_msgs)
+      const {
+      if (!var_decl.has_def()) return;
+
+      // std::cout << " validate variable definition: " << var_decl.name()
+      //           << " origin: " << origin
+      //           << " decl type: " << var_decl.base_decl().base_type_
+      //           << " decl num dims: " << var_decl.dims().size()
+      //           << " def type: " << var_decl.def().expression_type()
+      //           << " def num dims: " << var_decl.def().total_dims()
+      //           << std::endl;
+
+      // validate that assigment is allowed in this block
+
+      // validate type
+      expr_type decl_type(var_decl.base_decl().base_type_,
+                          var_decl.dims().size());
+      expr_type def_type = var_decl.def().expression_type();
+
+      bool types_compatible
+        = (decl_type.is_primitive()
+           && def_type.is_primitive()
+           && (decl_type.type() == def_type.type()
+               || (decl_type.type() == DOUBLE_T
+                   && def_type.type() == INT_T)))
+        || (decl_type.type() == def_type.type());
+      if (!types_compatible) {
+        error_msgs << "variable definition base type mismatch,"
+                   << " variable declared as base type: ";
+        write_base_expr_type(error_msgs, decl_type.type());
+        error_msgs << "variable definition has base: ";
+        write_base_expr_type(error_msgs, def_type.type());
+        pass = false;
+      }
+      // validate dims
+      if (decl_type.num_dims() != def_type.num_dims()) {
+        error_msgs << "variable definition dimensions mismatch,"
+                   << " definition specifies "
+                   <<  decl_type.num_dims()
+                   << ", declaration specifies "
+                   << def_type.num_dims() ;
+        pass = false;
+      }
+      return;
+    }
+    boost::phoenix::function<validate_definition>
+    validate_definition_f;
+
 
     void validate_identifier::reserve(const std::string& w) {
       reserved_word_set_.insert(w);
@@ -2476,13 +2530,12 @@ namespace stan {
                              variable_map& vm, bool& pass, const var_origin& vo,
                              std::ostream& error_msgs) const {
       if (vm.exists(var_decl.name_)) {
-        // variable already exists
         pass = false;
         error_msgs << "duplicate declaration of variable, name="
                    << var_decl.name_;
 
         error_msgs << "; attempt to redeclare as ";
-        print_var_origin(error_msgs, vo);  // FIXME -- need original vo
+        print_var_origin(error_msgs, vo);
 
         error_msgs << "; original declaration as ";
         print_var_origin(error_msgs, vm.get_origin(var_decl.name_));
@@ -2502,7 +2555,7 @@ namespace stan {
         var_decl_result = var_decl;
         return;
       }
-      pass = true;  // probably don't need to set true
+      pass = true;
       vm.add(var_decl.name_, var_decl, vo);
       var_decl_result = var_decl;
     }

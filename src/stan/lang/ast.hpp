@@ -747,6 +747,25 @@ namespace stan {
       base_var_decl operator()(const corr_matrix_var_decl& x) const;
     };
 
+    struct var_decl_dims_vis
+      : public boost::static_visitor<std::vector<expression> > {
+      var_decl_dims_vis();
+      std::vector<expression> operator()(const nil& x) const;
+      std::vector<expression> operator()(const int_var_decl& x) const;
+      std::vector<expression> operator()(const double_var_decl& x) const;
+      std::vector<expression> operator()(const vector_var_decl& x) const;
+      std::vector<expression> operator()(const row_vector_var_decl& x) const;
+      std::vector<expression> operator()(const matrix_var_decl& x) const;
+      std::vector<expression> operator()(const simplex_var_decl& x) const;
+      std::vector<expression> operator()(const unit_vector_var_decl& x) const;
+      std::vector<expression> operator()(const ordered_var_decl& x) const;
+      std::vector<expression> operator()(const positive_ordered_var_decl& x) const;
+      std::vector<expression> operator()(const cholesky_factor_var_decl& x) const;
+      std::vector<expression> operator()(const cholesky_corr_var_decl& x) const;
+      std::vector<expression> operator()(const cov_matrix_var_decl& x) const;
+      std::vector<expression> operator()(const corr_matrix_var_decl& x) const;
+    };
+
     struct var_decl_has_def_vis
       : public boost::static_visitor<bool> {
       var_decl_has_def_vis();
@@ -766,6 +785,25 @@ namespace stan {
       bool operator()(const corr_matrix_var_decl& x) const;
     };
 
+    struct var_decl_def_vis
+      : public boost::static_visitor<expression> {
+      var_decl_def_vis();
+      expression operator()(const nil& x) const;
+      expression operator()(const int_var_decl& x) const;
+      expression operator()(const double_var_decl& x) const;
+      expression operator()(const vector_var_decl& x) const;
+      expression operator()(const row_vector_var_decl& x) const;
+      expression operator()(const matrix_var_decl& x) const;
+      expression operator()(const simplex_var_decl& x) const;
+      expression operator()(const unit_vector_var_decl& x) const;
+      expression operator()(const ordered_var_decl& x) const;
+      expression operator()(const positive_ordered_var_decl& x) const;
+      expression operator()(const cholesky_factor_var_decl& x) const;
+      expression operator()(const cholesky_corr_var_decl& x) const;
+      expression operator()(const cov_matrix_var_decl& x) const;
+      expression operator()(const corr_matrix_var_decl& x) const;
+    };
+    
     struct var_decl {
       typedef boost::variant<boost::recursive_wrapper<nil>,
                          boost::recursive_wrapper<int_var_decl>,
@@ -805,7 +843,9 @@ namespace stan {
 
       std::string name() const;
       base_var_decl base_decl() const;
+      std::vector<expression> dims() const;
       bool has_def() const;
+      expression def() const;
     };
 
     struct statement {
