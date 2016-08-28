@@ -330,6 +330,14 @@ namespace stan {
     extern boost::phoenix::function<validate_int_expression>
     validate_int_expression_f;
 
+    // called from: term_grammar
+    struct validate_int_expression_warn : public phoenix_functor_ternary {
+      void operator()(const expression & e, bool& pass,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<validate_int_expression_warn>
+    validate_int_expression_warn_f;
+
     // called from: indexes_grammar
     struct validate_ints_expression : public phoenix_functor_ternary {
       void operator()(const expression & e, bool& pass,
