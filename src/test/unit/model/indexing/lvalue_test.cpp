@@ -527,3 +527,20 @@ TEST(ModelIndexing, doubleToVar) {
   for (int j = 0; j < 3; ++j)
     EXPECT_FLOAT_EQ(c(1, j).val(), d(j));
 }
+TEST(ModelIndexing, resultSizeNegIndexing) {
+  using stan::model::assign;
+  using stan::model::cons_list;
+  using stan::model::index_min_max;
+  using stan::model::nil_index_list;
+  using std::vector;
+
+  vector<double> rhs;
+  rhs.push_back(2);
+  rhs.push_back(5);
+  rhs.push_back(-125);
+
+  vector<double> lhs;
+  assign(rhs, cons_list(index_min_max(1, 0), nil_index_list()), lhs);
+  EXPECT_EQ(0, lhs.size());
+}
+
