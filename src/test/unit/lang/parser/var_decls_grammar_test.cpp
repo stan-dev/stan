@@ -98,3 +98,7 @@ TEST(langParserVarDeclsGrammarDef, defDeclDoubleVar) {
 TEST(langParserVarDeclsGrammarDef, defDeclVecTypesVar) {
   test_parsable("declare-define-var-vec-types");
 }
+
+TEST(langParserVarDeclsGrammarDef, defDeclMatrixVar) {
+  test_parsable("declare-define-var-matrix");
+}
