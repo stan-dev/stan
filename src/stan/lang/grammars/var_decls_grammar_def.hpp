@@ -196,9 +196,7 @@ namespace stan {
         > lit(']')
         > identifier_r
         > opt_dims_r(_r1)
-        > -( lit('=')
-             > expression_g(_r1)
-             [validate_vector_var_definition_f(_val, _1, _pass, boost::phoenix::ref(error_msgs_))] ); 
+        > opt_def_r(_r1);
 
       row_vector_decl_r.name("row vector declaration");
       row_vector_decl_r
@@ -211,9 +209,7 @@ namespace stan {
         > lit(']')
         > identifier_r
         > opt_dims_r(_r1)
-        > -( lit('=')
-             > expression_g(_r1)
-             [validate_row_vector_var_definition_f(_val, _1, _pass, boost::phoenix::ref(error_msgs_))] ); 
+        > opt_def_r(_r1);
 
       matrix_decl_r.name("matrix declaration");
       matrix_decl_r
@@ -228,7 +224,8 @@ namespace stan {
           [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
         > lit(']')
         > identifier_r
-        > opt_dims_r(_r1);
+        > opt_dims_r(_r1)
+        > opt_def_r(_r1);
 
       unit_vector_decl_r.name("unit_vector declaration");
       unit_vector_decl_r

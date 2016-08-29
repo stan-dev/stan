@@ -1,25 +1,29 @@
+functions {
+  int foo() {
+    int lf1 = 1;
+    return lf1;
+  }
+}
 transformed data {
-  int td1 = 1;     // int_d <- int_d
-  int tdIntArray1[7];
-  int tdIntArray2[7] = tdIntArray1;
+  int td1 = 1;
+  int tdArray1[6,7];
+  int tdArray2[7] = tdArray1[1];
 }
 transformed parameters {
   real p1;
-  p1 = 1;
-  // local variables
   {
-    int lp1 = 1;      // real_p <- int_d 
+    int lp1 = 1;
   }
 }
 model {
   // local variables
-  int lm1 = 1;      // int_d <- int_d 
+  int lm1 = 1;
 }
 generated quantities {
-  int gq1 = 1;     // int_d <- int_d
+  int gq1 = 1;
   gq1 = 2;
   {
-    int lgq1 = 1;     // int_d <- int_d
+    int lgq1 = 1;
     lgq1 = 2;
   }
 }

@@ -9,98 +9,92 @@ TEST(langParserVarDeclsGrammarDef, addVar) {
   test_parsable("validate_add_var_good");
 }
 
- TEST(langParserVarDeclsGrammarDef, validateIntExpr) {
-   test_parsable("validate_validate_int_expr_good");
-   for (int i = 1; i <= 13; ++i) {
-     std::string model_name("validate_validate_int_expr_bad");
-     model_name += boost::lexical_cast<std::string>(i);
-     test_throws(model_name,
-                 "expression denoting integer required");
-   }
- }
+TEST(langParserVarDeclsGrammarDef, validateIntExpr) {
+  test_parsable("validate_validate_int_expr_good");
+  for (int i = 1; i <= 13; ++i) {
+    std::string model_name("validate_validate_int_expr_bad");
+    model_name += boost::lexical_cast<std::string>(i);
+    test_throws(model_name,
+                "expression denoting integer required");
+  }
+}
 
- TEST(langParserVarDeclsGrammarDef, setIntRangeLower) {
-   test_parsable("validate_set_int_range_lower_good");
-   test_throws("validate_set_int_range_lower_bad1",
-               "expression denoting integer required");
-   test_throws("validate_set_int_range_lower_bad2",
-               "expression denoting integer required");
-   test_throws("validate_set_int_range_lower_bad3",
-               "expression denoting integer required");
- }
+TEST(langParserVarDeclsGrammarDef, setIntRangeLower) {
+  test_parsable("validate_set_int_range_lower_good");
+  test_throws("validate_set_int_range_lower_bad1",
+              "expression denoting integer required");
+  test_throws("validate_set_int_range_lower_bad2",
+              "expression denoting integer required");
+  test_throws("validate_set_int_range_lower_bad3",
+              "expression denoting integer required");
+}
 
- TEST(langParserVarDeclsGrammarDef, setIntRangeUpper) {
-   test_parsable("validate_set_int_range_upper_good");
-   test_throws("validate_set_int_range_upper_bad1",
-               "expression denoting integer required");
-   test_throws("validate_set_int_range_upper_bad2",
-               "expression denoting integer required");
- }
+TEST(langParserVarDeclsGrammarDef, setIntRangeUpper) {
+  test_parsable("validate_set_int_range_upper_good");
+  test_throws("validate_set_int_range_upper_bad1",
+              "expression denoting integer required");
+  test_throws("validate_set_int_range_upper_bad2",
+              "expression denoting integer required");
+}
 
- TEST(langParserVarDeclsGrammarDef, setDoubleRangeLower) {
-   test_parsable("validate_set_double_range_lower_good");
-   test_throws("validate_set_double_range_lower_bad1",
-               "expression denoting real required");
-   test_throws("validate_set_double_range_lower_bad2",
-               "expression denoting real required");
- }
+TEST(langParserVarDeclsGrammarDef, setDoubleRangeLower) {
+  test_parsable("validate_set_double_range_lower_good");
+  test_throws("validate_set_double_range_lower_bad1",
+              "expression denoting real required");
+  test_throws("validate_set_double_range_lower_bad2",
+              "expression denoting real required");
+}
 
- TEST(langParserVarDeclsGrammarDef, setDoubleRangeUpper) {
-   test_parsable("validate_set_double_range_upper_good");
-   test_throws("validate_set_double_range_upper_bad1",
-               "expression denoting real required");
-   test_throws("validate_set_double_range_upper_bad2",
-               "expression denoting real required");
- }
+TEST(langParserVarDeclsGrammarDef, setDoubleRangeUpper) {
+  test_parsable("validate_set_double_range_upper_good");
+  test_throws("validate_set_double_range_upper_bad1",
+              "expression denoting real required");
+  test_throws("validate_set_double_range_upper_bad2",
+              "expression denoting real required");
+}
 
- TEST(langParserVarDeclsGrammarDef, parametersInLocals) {
-   // test_parsable("var-decls-in-functions");
-    test_throws("var-decl-bad-1",
-                "non-data variables not allowed in dimension declarations");
- }
+TEST(langParserVarDeclsGrammarDef, parametersInLocals) {
+  // test_parsable("var-decls-in-functions");
+  test_throws("var-decl-bad-1",
+              "non-data variables not allowed in dimension declarations");
+}
 
- TEST(langParserVarDeclsGrammarDef, constraintsInLocals) {
-   test_throws("local_var_constraint",
-               "require unconstrained. found range constraint.");
-   test_throws("local_var_constraint2",
-               "require unconstrained. found range constraint.");
-   test_throws("local_var_constraint3",
-               "require unconstrained. found range constraint.");
- }
+TEST(langParserVarDeclsGrammarDef, constraintsInLocals) {
+  test_throws("local_var_constraint",
+              "require unconstrained. found range constraint.");
+  test_throws("local_var_constraint2",
+              "require unconstrained. found range constraint.");
+  test_throws("local_var_constraint3",
+              "require unconstrained. found range constraint.");
+}
 
- TEST (langParserVarDeclsGrammarDef, zeroVecs) {
-   test_parsable("vector-zero");
- }
+TEST (langParserVarDeclsGrammarDef, zeroVecs) {
+  test_parsable("vector-zero");
+}
 
- TEST(langParserVarDeclsGrammarDef, defDeclIntVar) {
-   test_parsable("declare-define-var-int");
- }
+TEST(langParserVarDeclsGrammarDef, defDeclIntVar) {
+  test_parsable("declare-define-var-int");
+}
 
- TEST(langParserVarDeclsGrammarDef, badDefDeclIntVar1) {
-   test_throws("declare-define-var-int-1",
-               "variable definition base type mismatch");
- }
+TEST(langParserVarDeclsGrammarDef, badDefDeclIntVar1) {
+  test_throws("declare-define-var-int-1",
+              "variable definition base type mismatch");
+}
 
- TEST(langParserVarDeclsGrammarDef, badDefDeclIntVar2) {
-   test_throws("declare-define-var-int-2",
-               "variable definition base type mismatch");
- }
+TEST(langParserVarDeclsGrammarDef, badDefDeclIntVar2) {
+  test_throws("declare-define-var-int-2",
+              "variable definition base type mismatch");
+}
 
- TEST(langParserVarDeclsGrammarDef, badDefDeclIntVar3) {
-     test_throws("declare-define-var-int-3",
-                 "variable definition dimensions mismatch");
- }
+TEST(langParserVarDeclsGrammarDef, badDefDeclIntVar3) {
+  test_throws("declare-define-var-int-3",
+              "variable definition dimensions mismatch");
+}
 
- TEST(langParserVarDeclsGrammarDef, defDeclDoubleVar) {
-   test_parsable("declare-define-var-double");
- }
+TEST(langParserVarDeclsGrammarDef, defDeclDoubleVar) {
+  test_parsable("declare-define-var-double");
+}
 
- //TEST(langParserVarDeclsGrammarDef, defDeclDoubleVar) {
- //  test_throws("declare-define-var-double","whatevs");
- //}
-
- TEST(langParserVarDeclsGrammarDef, defDeclVecTypesVar) {
-   test_parsable("declare-define-var-vec-types");
- }
-
-
+TEST(langParserVarDeclsGrammarDef, defDeclVecTypesVar) {
+  test_parsable("declare-define-var-vec-types");
+}
