@@ -8,8 +8,10 @@ functions {
 transformed data {
   real td1 = 1;     // real_d <- int_d
   real td2 = 2.0;   // real_d <- real_d
-  real tdArray1[6,7];
-  real tdArray2[7] = tdArray1[1];
+
+  real td_a1[5];
+  real td_a2[5] = td_a1;  // real_arr_d <- real_arr_d
+
   // local variables
   {
     real ltd1 = 1;      // real_d <- int_d 

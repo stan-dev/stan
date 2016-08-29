@@ -6,8 +6,8 @@ functions {
 }
 transformed data {
   int td1 = 1;
-  int tdArray1[6,7];
-  int tdArray2[7] = tdArray1[1];
+  int td_a1[5];
+  int td_a2[5] = td_a1;
 }
 transformed parameters {
   real p1;
