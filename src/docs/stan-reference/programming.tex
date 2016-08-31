@@ -10647,13 +10647,14 @@ the wall) and keeping memory requirements within available bounds.
 
 The standard algorithm analyses in computer science measure efficiency
 asymptotically as a function of problem size (such as data, number of
-parameters, etc.) and typically does not consider constant factors.
-In practice, the constant factors are important; if run time can be
-cut in half or more, that's a huge gain. This chapter focuses on both
-the constant factors involved in efficiency (such as using built-in
-matrix operations as opposed to naive loops) and in asymptotic
-efficiency factors (such as using linear algorithms instead of
-quadratic algorithms in loops).
+parameters, etc.) and typically do not consider constant additive
+factors like startup times or multiplicative factors like speed of
+operations.  In practice, the constant factors are important; if run
+time can be cut in half or more, that's a huge gain. This chapter
+focuses on both the constant factors involved in efficiency (such as
+using built-in matrix operations as opposed to naive loops) and on
+asymptotic efficiency factors (such as using linear algorithms instead
+of quadratic algorithms in loops).
 
 
 \section{Efficiency for Probabilistic Models and Algorithms}
@@ -10682,7 +10683,7 @@ a Stan program or with initialization.
 A well-behaved Stan program will have low variance between runs with
 different random initializations and differently seeded random number
 generators.  But sometimes an algorithm can get stuck in one part of
-the posterior, typically due to high curvature.  Suck sticking almost
+the posterior, typically due to high curvature.  Such sticking almost
 always indicates the need to reparameterize the model.  Just throwing
 away Markov chains with apparently poor behavior (slow, or stuck) can
 lead to bias in posterior estimates.  This problem with getting stuck
@@ -10772,7 +10773,7 @@ initial values of the parameters to the solution is relevant.  For
 penalized maximum likelihood and variational inference, the solution
 of the iterative algorithm will be a single point, so this is all that
 matters.  For sampling, the relevant ``solution'' is the typical set,
-which is the the posterior volume where almost all draws from the
+which is the posterior volume where almost all draws from the
 posterior lies;  thus, the typical set contains almost all of the
 posterior probability mass.
 
