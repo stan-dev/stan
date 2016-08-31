@@ -25,17 +25,19 @@ namespace stan {
         var_map_(var_map),
         error_msgs_(error_msgs),
         expression07_g(var_map, error_msgs, *this) {
-      using boost::spirit::qi::_1;
+      using boost::spirit::qi::char_;
+      using boost::spirit::qi::eps;
       using boost::spirit::qi::lit;
+      using boost::spirit::qi::no_skip;
+      using boost::spirit::qi::_1;
       using boost::spirit::qi::_pass;
       using boost::spirit::qi::_val;
       using boost::spirit::qi::labels::_r1;
 
       expression_r.name("expression");
       expression_r
-        %= conditional_op_r(_r1)
-        | expression15_r(_r1);
-
+        %= (expression15_r(_r1) >> no_skip[!char_('?')] > eps)
+        | conditional_op_r(_r1);
 
       conditional_op_r.name("conditional op expression, cond ? t_val : f_val ");
       conditional_op_r

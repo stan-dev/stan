@@ -24,6 +24,24 @@ namespace stan {
 
   namespace lang {
 
+    /**
+     * Add qualifier "stan::math::" to nullary functions defined in the
+     * Stan language.  The original name is set to the name here and
+     * the name is converted to have the prefix.
+     *
+     * @param f Function to qualify.
+     */
+    void qualify_builtins(fun& f) {
+      if (f.args_.size() > 0) return;
+      if (f.name_ == "e" || f.name_ == "pi" || f.name_ == "log2"
+          || f.name_ == "log10" || f.name_ == "sqrt2"
+          || f.name_ == "not_a_number" || f.name_ == "positive_infinity"
+          || f.name_ == "negative_infinity" || f.name_ == "machine_precision") {
+        f.original_name_ = f.name_;
+        f.name_ = "stan::math::" + f.name_;
+      }
+    }
+
     bool has_prob_suffix(const std::string& s) {
       return ends_with("_lpdf", s) || ends_with("_lpmf", s)
         || ends_with("_lcdf", s) || ends_with("_lccdf", s);
@@ -551,10 +569,26 @@ namespace stan {
     boost::phoenix::function<validate_int_expression>
     validate_int_expression_f;
 
-    void validate_ints_expression::operator()(const expression & e, bool& pass,
+    void validate_int_expression_warn::operator()(const expression & e,
+                                                  bool& pass,
+                                                  std::ostream& error_msgs)
+      const {
+      if (e.expression_type().type() != INT_T) {
+        error_msgs << "ERROR:  Indexes must be expressions of integer type."
+                   << " found type = ";
+        write_base_expr_type(error_msgs, e.expression_type().type());
+        error_msgs << '.' << std::endl;
+      }
+      pass = e.expression_type().is_primitive_int();
+    };
+    boost::phoenix::function<validate_int_expression_warn>
+    validate_int_expression_warn_f;
+
+
+    void validate_ints_expression::operator()(const expression& e, bool& pass,
                                               std::ostream& error_msgs) const {
       if (e.expression_type().type() != INT_T) {
-        error_msgs << "index must be integer; found type=";
+        error_msgs << "ERROR:  Container index must be integer; found type=";
         write_base_expr_type(error_msgs, e.expression_type().type());
         error_msgs << std::endl;
         pass = false;
@@ -1505,6 +1539,9 @@ namespace stan {
               "'_lpdf' for density functions or '_lpmf' for mass functions",
               fun, error_msgs);
 
+      // if fun is built-in nullary, add stan::math:: qualifier
+      qualify_builtins(fun);
+
       // use old function names for built-in prob funs
       if (!function_signatures::instance().has_user_defined_key(fun.name_)) {
         replace_suffix("_lpdf", "_log", fun);
@@ -1891,6 +1928,17 @@ namespace stan {
     }
     boost::phoenix::function<set_var_type> set_var_type_f;
 
+    void require_vbar::operator()(bool& pass, std::ostream& error_msgs) const {
+      pass = false;
+      error_msgs << "Probabilty functions with suffixes _lpdf, _lpmf,"
+                 << " _lcdf, and _lccdf," << std::endl
+                 << "require a vertical bar (|) between the first two"
+                 << " arguments." << std::endl;
+    }
+    boost::phoenix::function<require_vbar> require_vbar_f;
+
+
+
     validate_no_constraints_vis::validate_no_constraints_vis(
                                                std::stringstream& error_msgs)
       : error_msgs_(error_msgs) { }
@@ -2104,7 +2152,7 @@ namespace stan {
     }
 
     validate_identifier::validate_identifier() {
-      // Constant functions which can be used as identifiers
+      // constant functions which may be used as identifiers
       const_fun_name_set_.insert("pi");
       const_fun_name_set_.insert("e");
       const_fun_name_set_.insert("sqrt2");
@@ -2115,6 +2163,7 @@ namespace stan {
       const_fun_name_set_.insert("negative_infinity");
       const_fun_name_set_.insert("epsilon");
       const_fun_name_set_.insert("negative_epsilon");
+      const_fun_name_set_.insert("machine_precision");
 
       // illegal identifiers
       reserve("for");
