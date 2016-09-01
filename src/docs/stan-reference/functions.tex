@@ -2697,8 +2697,60 @@ The cumulative sum of \farg{rv}}
 %
 \end{description}
 
+\section{Covariance Functions}\label{covariance.section}
 
+\subsection{Exponentiated quadratic covariance function}
 
+The exponentiated quadratic kernel defines the covariance between $f(x_i)$ and
+$f(x_j)$ where $f\colon \reals^D \mapsto \reals$ as a function of the squared
+Euclidian distance between $x_i \in \reals^D$ and $x_j \in \reals^D$:
+
+\[
+  \text{cov}(f(x_i), f(x_j)) = k(x_i, x_j) 
+= \sigma^2 
+\exp \left(
+	- \dfrac{1}{2l^2} \sum_{d=1}^D (x_{i,d} - x_{j,d})^2
+\right)
+\]
+
+\noindent with $\sigma$ and $l$ constrained to be positive.
+
+There are two variants of the exponentiated quadratic covariance function in
+Stan. One builds a covariance matrix, $K \in \reals^{N \times N}$ for $x_1,
+\dots, x_N$, where $K_{i,j} = k(x_i, x_j)$, which is necessarily symmetric and
+positive semidefinite by construction. There is a second variant of the
+exponentiated quadratic covariance function that builds a $K \in \reals^{N
+\times M}$ covariance matrix for $x_1, \dots, x_N$ and $x^\prime_1, \dots,
+x^\prime_M$, where $x_i \in \reals^D$ and $x^\prime_i \in \reals^D$ and
+$K_{i,j} = k(x_i, x^\prime_j)$.
+
+\begin{description}
+%
+\fitem{matrix}{cov\_exp\_quad}{row\_vectors \farg{x}, real \farg{sigma}, real
+\farg{l}}{ The covariance matrix with an exponentiated quadratic kernel of
+\farg{x}.}
+
+\fitem{matrix}{cov\_exp\_quad}{vectors \farg{x}, real \farg{sigma}, real
+\farg{l}}{ The covariance matrix with an exponentiated quadratic kernel of
+\farg{x}.}
+
+\fitem{matrix}{cov\_exp\_quad}{real[] \farg{x}, real \farg{sigma}, real
+\farg{l}}{ The covariance matrix with an exponentiated quadratic kernel of
+\farg{x}.}
+
+\fitemtwolines{matrix}{cov\_exp\_quad}{row\_vectors \farg{x1}, row\_vectors
+\farg{x2}}{real \farg{sigma}, real \farg{l}}{ The covariance matrix with an
+exponentiated quadratic kernel of \farg{x1} and \farg{x2}.}
+
+\fitemtwolines{matrix}{cov\_exp\_quad}{vectors \farg{x1}, vectors
+\farg{x2}}{real \farg{sigma}, real \farg{l}}{ The covariance matrix with an
+exponentiated quadratic kernel of \farg{x1} and \farg{x2}.}
+
+\fitemtwolines{matrix}{cov\_exp\_quad}{real[] \farg{x1}, real[]
+\farg{x2}}{real \farg{sigma}, real \farg{l}}{ The covariance matrix with an
+exponentiated quadratic kernel of \farg{x1} and \farg{x2}.}
+
+\end{description}
 
 \section{Linear Algebra Functions and Solvers}
 
