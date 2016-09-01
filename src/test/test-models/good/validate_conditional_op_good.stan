@@ -1,3 +1,17 @@
+functions {
+  real foo(real fa_x, int fa_y) {
+    real fl_x;
+    int fl_y;
+    fl_x = 1 ? fl_x : fl_y;
+    fl_y = 1 ? fl_y : 0;
+
+    fl_x = 1 ? fa_x : fl_x;
+    fl_y = 1 ? fa_y : fl_y;
+    
+    return 2.0;
+  }
+}
+
 data {
   int x;
   real y;
