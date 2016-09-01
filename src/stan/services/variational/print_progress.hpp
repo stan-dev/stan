@@ -2,8 +2,7 @@
 #define STAN_SERVICES_VARIATIONAL_PRINT_PROGRESS_HPP
 
 #include <stan/interface_callbacks/writer/base_writer.hpp>
-#include <stan/math/prim/scal/err/check_positive.hpp>
-#include <stan/math/prim/scal/err/check_nonnegative.hpp>
+#include <stan/math/prim/scal.hpp>
 #include <stan/services/io/do_print.hpp>
 #include <cmath>
 #include <iomanip>

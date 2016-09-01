@@ -2,8 +2,8 @@
 #define STAN_MCMC_HMC_HAMILTONIANS_BASE_HAMILTONIAN_HPP
 
 #include <stan/interface_callbacks/writer/base_writer.hpp>
-#include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/model/util.hpp>
+#include <Eigen/Dense>
 #include <iostream>
 #include <limits>
 #include <stdexcept>

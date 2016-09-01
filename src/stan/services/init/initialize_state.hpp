@@ -12,9 +12,7 @@
 #include <stan/interface_callbacks/var_context_factory/var_context_factory.hpp>
 #include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/services/io/write_error_msg.hpp>
-#include <stan/math/prim/scal/fun/is_inf.hpp>
-#include <stan/math/prim/scal/fun/is_nan.hpp>
-#include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/math/prim/mat.hpp>
 #include <cmath>
 #include <iostream>
 #include <limits>

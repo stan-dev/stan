@@ -4,8 +4,7 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <Eigen/Dense>
-#include <stan/math/prim/scal/err/check_equal.hpp>
-#include <stan/math/prim/mat/err/check_range.hpp>
+#include <stan/math/prim/mat.hpp>
 #include <stan/model/indexing/index.hpp>
 #include <stan/model/indexing/index_list.hpp>
 #include <stan/model/indexing/rvalue_at.hpp>

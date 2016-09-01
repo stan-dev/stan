@@ -1,9 +1,8 @@
 #ifndef STAN_MCMC_VAR_ADAPTATION_HPP
 #define STAN_MCMC_VAR_ADAPTATION_HPP
 
-#include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/math/prim/mat.hpp>
 #include <stan/mcmc/windowed_adaptation.hpp>
-#include <stan/math/prim/mat/fun/welford_var_estimator.hpp>
 #include <vector>
 
 namespace stan {
