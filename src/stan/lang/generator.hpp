@@ -360,17 +360,9 @@ namespace stan {
 
 
       void operator()(const conditional_op& expr) const {
-
-        std::cout << "conditional op, type: "
-                  << expr.type_
-                  << " has variable? "
-                  << expr.has_var_
-                  << std::endl;
-
-        bool types_prim_match = (expr.type_.is_primitive()
-                                 && expr.type_.base_type_ == INT_T)
-          || (!expr.has_var_
-              && expr.type_.is_primitive()
+        bool types_prim_match
+          = (expr.type_.is_primitive() && expr.type_.base_type_ == INT_T)
+          || (!expr.has_var_ && expr.type_.is_primitive()
               && (expr.true_val_.expression_type()
                   == expr.false_val_.expression_type()));
         o_ << "(";

@@ -71,8 +71,13 @@ transformed data {
   twa2 = x < 100 ? twa2 : twb2; // tf row_vector[,], row_vector[,]
   tm1 = x < 100 ? tma2[1] : tmb2[1]; // tf matrix[], matrix[]
   tma2 = x < 100 ? tma2 : tmb2; // tf matrix[,], matrix[,]
-  
-  
+
+  {
+    real abcd;
+    abcd = 1 ? abcd : 2.0;
+  }
+ 
+ 
 }
 parameters {
   real py;
@@ -168,9 +173,20 @@ transformed parameters {
   tpma2 = x < 100 ? ma2 : pma2; // tf real/var matrix[,]
   tpma2 = x < 100 ? pma2 : ma2; // tf real/var matrix[,]
 
+  {
+    real abcde;
+    abcde = 1 ? abcde : 2.0;
+  }
+
 }  
 model {
   py ~ normal(0,1);
+
+  {
+    real abcdefg;
+    abcdefg = 1 ? abcdefg : 2.0;
+  }
+
 }
 generated quantities {
   int gqx;
@@ -183,6 +199,11 @@ generated quantities {
   gqy = y < 100 ? y : x;   // t,f : real,int
 
   gqzc = x < 100 ? gqza : gqzb; // tf var vector
+
+  {
+    real abcdef;
+    abcdef = 1 ? abcdef : 2.0;
+  }
 
 
 }
