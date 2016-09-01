@@ -167,8 +167,12 @@ namespace stan {
 
     void validate_conditional_op::operator()(conditional_op& conditional_op,
                                              bool& pass,
+                                             const variable_map& var_map,
                                              std::ostream& error_msgs) const {
       pass = true;
+
+      conditional_op.has_var_ = has_var(conditional_op, var_map);
+
       expr_type cond_type = conditional_op.cond_.expression_type();
       if (!cond_type.is_primitive_int()) {
         error_msgs << "condition in ternary expression must be"

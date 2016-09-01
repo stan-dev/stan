@@ -1140,7 +1140,7 @@ namespace stan {
         true_val_(true_val),
         false_val_(false_val),
         type_(promote_primitive(true_val.expression_type(),
-                                  false_val.expression_type())) {
+                                false_val.expression_type())) {
     }
 
     binary_op::binary_op() { }

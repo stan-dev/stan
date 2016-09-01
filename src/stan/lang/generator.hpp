@@ -360,22 +360,24 @@ namespace stan {
 
 
       void operator()(const conditional_op& expr) const {
+
+        std::cout << "conditional op, type: "
+                  << expr.type_
+                  << " has variable? "
+                  << expr.has_var_
+                  << std::endl;
+
         bool types_prim_match = (expr.type_.is_primitive()
                                  && expr.type_.base_type_ == INT_T)
-          || (expr.type_.is_primitive()
+          || (!expr.has_var_
+              && expr.type_.is_primitive()
               && (expr.true_val_.expression_type()
                   == expr.false_val_.expression_type()));
-        bool types_prim_mismatch = !types_prim_match
-          && expr.type_.is_primitive();
         o_ << "(";
         boost::apply_visitor(*this, expr.cond_.expr_);
         o_ << " ? ";
         if (types_prim_match) {
           boost::apply_visitor(*this, expr.true_val_.expr_);
-        } else if (types_prim_mismatch) {
-          o_ << "double(";
-          boost::apply_visitor(*this, expr.true_val_.expr_);
-          o_ << ")";
         } else {
           o_ << "stan::math::promote_scalar<"
           << (is_var_ ? "T__" : "double")
@@ -386,10 +388,6 @@ namespace stan {
         o_ << " : ";
         if (types_prim_match) {
           boost::apply_visitor(*this, expr.false_val_.expr_);
-        } else if (types_prim_mismatch) {
-          o_ << "double(";
-          boost::apply_visitor(*this, expr.false_val_.expr_);
-          o_ << ")";
         } else {
           o_ << "stan::math::promote_scalar<"
              << (is_var_ ? "T__" : "double")
@@ -1241,9 +1239,6 @@ namespace stan {
     }
 
     // see member_var_decl_visgen cut & paste
-
-    // **************need this logic for conditional_op ***************
-
     struct local_var_decl_visgen : public visgen {
       int indents_;
       bool is_var_;
@@ -4438,13 +4433,6 @@ namespace stan {
         if (fun.arg_decls_[i].arg_type_.base_type_ != INT_T)
           return false;
       return true;
-    }
-
-    std::string cond_op_scalar_type(const conditional_op& expr,
-                                bool is_data_origin) {
-      std::stringstream ss;
-      ss << "double";
-      return ss.str();
     }
 
     std::string fun_scalar_type(const function_decl_def& fun,

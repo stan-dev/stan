@@ -447,12 +447,11 @@ namespace stan {
       expression true_val_;
       expression false_val_;
       expr_type type_;
-      var_origin origin_;
+      bool has_var_;
       conditional_op();
       conditional_op(const expression& cond,
                      const expression& true_val,
                      const expression& false_val);
-      bool is_data() const;
     };
 
     struct binary_op {
