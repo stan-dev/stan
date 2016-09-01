@@ -3072,13 +3072,31 @@ namespace stan {
     void generate_constructor(const program& prog,
                               const std::string& model_name,
                               std::ostream& o) {
+      // constructor without RNG or template parameter
+      // FIXME(carpenter): remove this and only call full ctor
       o << INDENT << model_name << "(stan::io::var_context& context__," << EOL;
-      o << INDENT << "    std::ostream* pstream__ = 0)"
-        << EOL;
-      o << INDENT2 << ": prob_grad(0) {"
-        << EOL;  // resize 0 with var_resizing
-      o << INDENT2 << "current_statement_begin__ = -1;"
-        << EOL2;
+      o << INDENT << "    std::ostream* pstream__ = 0)" << EOL;
+      o << INDENT2 << ": prob_grad(0) {" << EOL;
+      o << INDENT2 << "typedef boost::ecuyer1988 rng_t;" << EOL;
+      o << INDENT2 << "rng_t base_rng(0);  // 0 seed default" << EOL;
+      o << INDENT2 << "ctor_body(context__, base_rng, pstream__);" << EOL;
+      o << INDENT << "}" << EOL2;
+
+      // constructor with specified RNG
+      o << INDENT << "template <class RNG>" << EOL;
+      o << INDENT << model_name << "(stan::io::var_context& context__," << EOL;
+      o << INDENT << "    RNG& base_rng__," << EOL;
+      o << INDENT << "    std::ostream* pstream__ = 0)" << EOL;
+      o << INDENT2 << ": prob_grad(0) {" << EOL;
+      o << INDENT2 << "ctor_body(context__, base_rng__, pstream__);" << EOL;
+      o << INDENT << "}" << EOL2;
+
+      // body of constructor now in function
+      o << INDENT << "template <class RNG>" << EOL;
+      o << INDENT << "void ctor_body(stan::io::var_context& context__," << EOL;
+      o << INDENT << "               RNG& base_rng__," << EOL;
+      o << INDENT << "               std::ostream* pstream__) {" << EOL;
+      o << INDENT2 << "current_statement_begin__ = -1;" << EOL2;
       o << INDENT2 << "static const char* function__ = \""
         << model_name << "_namespace::" << model_name << "\";" << EOL;
       suppress_warning(INDENT2, "function__", o);

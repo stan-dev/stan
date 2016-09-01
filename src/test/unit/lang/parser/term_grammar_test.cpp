@@ -54,8 +54,6 @@ TEST(langParserTermGrammar, addExpressionDimssFun) {
 }
 
 TEST(langParserTermGrammar, setFunTypeNamed) {
-  test_throws("validate_set_fun_type_named_bad1",
-              "random number generators only allowed in generated quantities");
   test_parsable("validate_set_fun_type_named_good");
 }
 

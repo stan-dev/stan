@@ -166,9 +166,8 @@ namespace stan {
                                               name_sig) {
       return user_defined_set_.find(name_sig) != user_defined_set_.end();
     }
-    bool
-    function_signatures::is_defined(const std::string& name,
-                                    const function_signature_t& sig) {
+    bool function_signatures::is_defined(const std::string& name,
+                                         const function_signature_t& sig) {
       if (sigs_map_.find(name) == sigs_map_.end())
         return false;
       const std::vector<function_signature_t> sigs = sigs_map_[name];
@@ -177,6 +176,7 @@ namespace stan {
           return true;
       return false;
     }
+
     void function_signatures::add(const std::string& name,
                                    const expr_type& result_type,
                                    const std::vector<expr_type>& arg_types) {
@@ -487,7 +487,6 @@ namespace stan {
         }
         error_msgs << std::endl;
       }
-
       return expr_type();  // ill-formed dummy
     }
 
@@ -495,13 +494,27 @@ namespace stan {
 #include <stan/lang/function_signatures.h>  // NOLINT
     }
 
-    std::set<std::string>
-    function_signatures::key_set() const {
+    bool function_signatures::has_user_defined_key(const std::string& key)
+      const {
+      using std::pair;
+      using std::set;
+      using std::string;
+      for (set<pair<string, function_signature_t> >::const_iterator
+             it = user_defined_set_.begin();
+           it != user_defined_set_.end();
+           ++it) {
+        if (it->first == key)
+          return true;
+      }
+      return false;
+    }
+
+    std::set<std::string> function_signatures::key_set() const {
       using std::map;
       using std::set;
       using std::string;
       using std::vector;
-      set<std::string> result;
+      set<string> result;
       for (map<string, vector<function_signature_t> >::const_iterator
              it = sigs_map_.begin();
            it != sigs_map_.end();
