@@ -22,3 +22,9 @@ TEST(LangGrammarsIndexing, goodOmni2) {
 TEST(LangGrammarsIndexing, goodOmni3) {
   test_parsable("indexing/good-omni3");
 }
+TEST(LangGrammarsIndexing, badRealIdx) {
+  test_throws("real_idx",
+              "ERROR:  Container index must be integer; found type=real");
+  test_throws("real_idx",
+          "PARSER EXPECTED: <one or more container indexes followed by ']'>");
+}

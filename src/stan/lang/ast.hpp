@@ -198,6 +198,7 @@ namespace stan {
                                 function_signature_t& signature);
       bool is_defined(const std::string& name,
                       const function_signature_t& sig);
+      bool has_user_defined_key(const std::string& name) const;
       std::set<std::string> key_set() const;
       bool has_key(const std::string& key) const;
 

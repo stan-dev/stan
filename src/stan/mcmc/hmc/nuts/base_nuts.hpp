@@ -106,11 +106,6 @@ namespace stan {
           // Sample from an accepted subtree
           ++(this->depth_);
 
-          double accept_prob
-            = std::exp(log_sum_weight_subtree - log_sum_weight);
-          if (this->rand_uniform_() < accept_prob)
-            z_sample = z_propose;
-
           if (log_sum_weight_subtree > log_sum_weight) {
             z_sample = z_propose;
           } else {
