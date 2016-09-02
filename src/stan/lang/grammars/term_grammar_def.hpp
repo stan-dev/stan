@@ -23,6 +23,7 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::index_op_sliced,
                           (std::vector<stan::lang::idx>, idxs_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::integrate_ode,
+                          (std::string, integration_function_name_)
                           (std::string, system_function_name_)
                           (stan::lang::expression, y0_)
                           (stan::lang::expression, t0_)
@@ -31,7 +32,8 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::integrate_ode,
                           (stan::lang::expression, x_)
                           (stan::lang::expression, x_int_) )
 
-BOOST_FUSION_ADAPT_STRUCT(stan::lang::integrate_ode_cvode,
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::integrate_ode_control,
+                          (std::string, integration_function_name_)
                           (std::string, system_function_name_)
                           (stan::lang::expression, y0_)
                           (stan::lang::expression, t0_)
@@ -76,9 +78,11 @@ namespace stan {
       using boost::spirit::qi::double_;
       using boost::spirit::qi::eps;
       using boost::spirit::qi::int_;
+      using boost::spirit::qi::hold;
       using boost::spirit::qi::lexeme;
       using boost::spirit::qi::lit;
       using boost::spirit::qi::no_skip;
+      using boost::spirit::qi::string;
       using boost::spirit::qi::_pass;
       using boost::spirit::qi::_val;
       using boost::spirit::qi::labels::_r1;
@@ -114,17 +118,15 @@ namespace stan {
                       [logical_negate_expr_f(_val, _1,
                                              boost::phoenix::ref(error_msgs_))]
         | lit('+') >> negated_factor_r(_r1)[assign_lhs_f(_val, _1)]
-        | exponentiated_factor_r(_r1)[assign_lhs_f(_val, _1)]
-        | idx_factor_r(_r1)[assign_lhs_f(_val, _1)];
-
+        | exponentiated_factor_r(_r1)[assign_lhs_f(_val, _1)];
 
       exponentiated_factor_r.name("expression");
       exponentiated_factor_r
-        = (idx_factor_r(_r1)[assign_lhs_f(_val, _1)]
-           >> lit('^')
-           > negated_factor_r(_r1)
-             [exponentiation_f(_val, _1, _r1, _pass,
-                               boost::phoenix::ref(error_msgs_))]);
+        = idx_factor_r(_r1)[assign_lhs_f(_val, _1)]
+        >> -(lit('^')
+             > negated_factor_r(_r1)
+               [exponentiation_f(_val, _1, _r1, _pass,
+                                 boost::phoenix::ref(error_msgs_))]);
 
       idx_factor_r.name("expression");
       idx_factor_r
@@ -140,9 +142,41 @@ namespace stan {
                > eps[transpose_f(_val, _pass,
                                  boost::phoenix::ref(error_msgs_))]) );
 
+      integrate_ode_control_r.name("expression");
+      integrate_ode_control_r
+        %= ( (string("integrate_ode_rk45") >> no_skip[!char_("a-zA-Z0-9_")])
+             | (string("integrate_ode_bdf") >> no_skip[!char_("a-zA-Z0-9_")]) )
+        >> lit('(')              // >> allows backtracking to non-control
+        >> identifier_r          // system function name (function only)
+        >> lit(',')
+        >> expression_g(_r1)     // y0
+        >> lit(',')
+        >> expression_g(_r1)     // t0 (data only)
+        >> lit(',')
+        >> expression_g(_r1)     // ts (data only)
+        >> lit(',')
+        >> expression_g(_r1)     // theta
+        >> lit(',')
+        >> expression_g(_r1)     // x (data only)
+        >> lit(',')
+        >> expression_g(_r1)     // x_int (data only)
+        >> lit(',')
+        >> expression_g(_r1)     // relative tolerance (data only)
+        >> lit(',')
+        >> expression_g(_r1)     // absolute tolerance (data only)
+        >> lit(',')
+        >> expression_g(_r1)     // maximum number of steps (data only)
+        > lit(')')
+          [validate_integrate_ode_control_f(_val, boost::phoenix::ref(var_map_),
+                                            _pass,
+                                            boost::phoenix::ref(error_msgs_))];
+
       integrate_ode_r.name("expression");
       integrate_ode_r
-        %= (lit("integrate_ode") >> no_skip[!char_("a-zA-Z0-9_")])
+        %= ( (string("integrate_ode_rk45") >> no_skip[!char_("a-zA-Z0-9_")])
+             | (string("integrate_ode_bdf") >> no_skip[!char_("a-zA-Z0-9_")])
+             | (string("integrate_ode") >> no_skip[!char_("a-zA-Z0-9_")])
+               [deprecated_integrate_ode_f(boost::phoenix::ref(error_msgs_))] )
         > lit('(')
         > identifier_r          // system function name (function only)
         > lit(',')
@@ -157,43 +191,14 @@ namespace stan {
         > expression_g(_r1)     // x (data only)
         > lit(',')
         > expression_g(_r1)     // x_int (data only)
-        > lit(')') [validate_integrate_ode_f(_val,
-                                         boost::phoenix::ref(var_map_),
-                                         _pass,
-                                         boost::phoenix::ref(error_msgs_))];
-
-      integrate_ode_cvode_r.name("expression");
-      integrate_ode_cvode_r
-        %= (lit("integrate_ode_cvode") >> no_skip[!char_("a-zA-Z0-9_")])
-        > lit('(')
-        > identifier_r          // system function name (function only)
-        > lit(',')
-        > expression_g(_r1)     // y0
-        > lit(',')
-        > expression_g(_r1)     // t0 (data only)
-        > lit(',')
-        > expression_g(_r1)     // ts (data only)
-        > lit(',')
-        > expression_g(_r1)     // theta
-        > lit(',')
-        > expression_g(_r1)     // x (data only)
-        > lit(',')
-        > expression_g(_r1)     // x_int (data only)
-        > lit(',')
-        > expression_g(_r1)     // relative tolerance (data only)
-        > lit(',')
-        > expression_g(_r1)     // absolute tolerance (data only)
-        > lit(',')
-        > expression_g(_r1)     // maximum number of steps (data only)
         > lit(')')
-          [validate_integrate_ode_cvode_f(_val, boost::phoenix::ref(var_map_),
-                                          _pass,
-                                          boost::phoenix::ref(error_msgs_))];
+          [validate_integrate_ode_f(_val, boost::phoenix::ref(var_map_),
+                                    _pass, boost::phoenix::ref(error_msgs_))];
 
       factor_r.name("expression");
       factor_r =
-        integrate_ode_r(_r1)[assign_lhs_f(_val, _1)]
-        | integrate_ode_cvode_r(_r1)[assign_lhs_f(_val, _1)]
+        integrate_ode_control_r(_r1)[assign_lhs_f(_val, _1)]
+        | integrate_ode_r(_r1)[assign_lhs_f(_val, _1)]
         | (fun_r(_r1)[assign_lhs_f(_b, _1)]
            > eps[set_fun_type_named_f(_val, _b, _r1, _pass,
                                       boost::phoenix::ref(error_msgs_))])
@@ -210,33 +215,40 @@ namespace stan {
       int_literal_r.name("integer literal");
       int_literal_r
         %= int_
-        >> !(lit('.')
-             | lit('e')
-             | lit('E'));
+        >> !(lit('.') | lit('e') | lit('E'));
 
       double_literal_r.name("real literal");
       double_literal_r
         %= double_;
 
-
       fun_r.name("function and argument expressions");
       fun_r
-        %= identifier_r
-        >> args_r(_r1);
-
+        %= (hold[identifier_r[is_prob_fun_f(_1, _pass)]] > prob_args_r(_r1))
+        | (identifier_r >> args_r(_r1));
 
       identifier_r.name("identifier");
       identifier_r
         %= lexeme[char_("a-zA-Z")
                   >> *char_("a-zA-Z0-9_.")];
 
+      prob_args_r.name("probability function argument");
+      prob_args_r
+        %= (lit('(') >> lit(')'))
+        | hold[lit('(')
+               >> expression_g(_r1)
+               >> lit(')')]
+        | (lit('(')
+           >> expression_g(_r1)
+           >> (lit(',')
+               [require_vbar_f(_pass, boost::phoenix::ref(error_msgs_))]
+               | (eps > lit('|')))
+           >> (expression_g(_r1) % ',')
+           >> lit(')'));
 
       args_r.name("function arguments");
       args_r
         %= (lit('(') >> lit(')'))
-        | ((lit('(')
-            >> (expression_g(_r1) % ','))
-            > lit(')'));
+        | (lit('(') >> (expression_g(_r1) % ',') >> lit(')'));
 
       dim_r.name("array dimension (integer expression)");
       dim_r

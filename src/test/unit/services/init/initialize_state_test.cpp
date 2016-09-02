@@ -5,6 +5,7 @@
 #include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <stan/services/init/initialize_state.hpp>
 #include <stan/model/prob_grad.hpp>
+#include <stan/math/prim/mat.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
@@ -195,6 +196,7 @@ public:
   template <bool propto, bool jacobian_adjust_transforms, typename T>
   T log_prob(Eigen::Matrix<T,Eigen::Dynamic,1>& params_r,
              std::ostream* output_stream = 0) const {
+    
     templated_log_prob_calls++;
     throw std::domain_error("throwing within log_prob");
     return log_prob_return_value;
@@ -260,6 +262,24 @@ public:
   double log_prob_return_value;
 };
 
+
+// Mock Throwing Model throws exception with a print statement
+class mock_throwing_model_with_print: public mock_throwing_model {
+public:
+  mock_throwing_model_with_print(size_t num_params_r)
+    : mock_throwing_model(num_params_r) { }
+  
+  template <bool propto, bool jacobian_adjust_transforms, typename T>
+  T log_prob(Eigen::Matrix<T,Eigen::Dynamic,1>& params_r,
+             std::ostream* output_stream = 0) const {
+    if (output_stream)
+      stan::math::stan_print(output_stream, "foo");    
+    templated_log_prob_calls++;
+    throw std::domain_error("throwing within log_prob");
+    return log_prob_return_value;
+  }
+};
+
 class mock_rng {
 public:
   typedef double result_type;
@@ -318,6 +338,7 @@ public:
     model(3),
     inf_model(3),
     throwing_model(3),
+    throwing_model_with_print(3),
     writer(output) {}
 
   void SetUp() {
@@ -334,6 +355,7 @@ public:
   mock_model model;
   mock_inf_model inf_model;
   mock_throwing_model throwing_model;
+  mock_throwing_model_with_print throwing_model_with_print;
   mock_rng rng;
   std::stringstream output;
   mock_context_factory context_factory;
@@ -742,7 +764,7 @@ TEST_F(StanServices, initialize_state_source_inf) {
   EXPECT_EQ(0, rng.calls);
   std::stringstream expected_msg;
   expected_msg << "param_0 initialized to invalid value (" 
-               << std::numeric_limits<double>::infinity() << ")\n";
+               << std::numeric_limits<double>::infinity() << ")\n\n";
   EXPECT_EQ(expected_msg.str(), output.str());
   EXPECT_EQ(1, context_factory.calls);
   EXPECT_EQ("abcd", context_factory.last_call);
@@ -974,4 +996,37 @@ TEST_F(StanServices2, streams) {
   stan::test::reset_std_streams();
   EXPECT_EQ("", stan::test::cout_ss.str());
   EXPECT_EQ("", stan::test::cerr_ss.str());
+}
+
+
+TEST_F(StanServices, initialize_state_values_with_print) {
+  using stan::services::init::initialize_state_values;
+  throwing_model_with_print.log_prob_return_value =
+    -std::numeric_limits<double>::infinity();
+  EXPECT_FALSE(initialize_state_values(cont_params,
+                                       throwing_model_with_print,
+                                       writer));
+  ASSERT_EQ(3, cont_params.size());
+  EXPECT_FLOAT_EQ(0, cont_params[0]);
+  EXPECT_FLOAT_EQ(0, cont_params[1]);
+  EXPECT_FLOAT_EQ(0, cont_params[2]);
+  EXPECT_EQ(1, throwing_model_with_print.templated_log_prob_calls);
+  EXPECT_EQ(0, model.transform_inits_calls);
+  EXPECT_NE("", output.str()) << "expecting error message";
+  EXPECT_TRUE(output.str()
+              .find("foo\n")
+              != std::string::npos)
+    << "Expecting to find the output from the stan print call.";
+  EXPECT_TRUE(output.str()
+              .find("Rejecting initial value")
+              != std::string::npos);
+  EXPECT_TRUE(output.str()
+              .find("throwing within log_prob")
+              != std::string::npos)
+    << output.str();
+  EXPECT_TRUE(output.str()
+              .find("Error evaluating the log probability "
+                    "at the initial value.")
+              != std::string::npos)
+    << output.str();
 }

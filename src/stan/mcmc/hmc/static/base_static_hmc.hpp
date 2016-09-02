@@ -12,9 +12,10 @@
 
 namespace stan {
   namespace mcmc {
-
-    // Hamiltonian Monte Carlo
-    // with static integration time
+    /**
+     * Hamiltonian Monte Carlo implementation using the endpoint
+     * of trajectories with a static integration time
+     */
     template <class Model,
               template<class, class> class Hamiltonian,
               template<class> class Integrator,
@@ -22,7 +23,7 @@ namespace stan {
     class base_static_hmc
       : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     public:
-      base_static_hmc(Model &model, BaseRNG& rng)
+      base_static_hmc(const Model& model, BaseRNG& rng)
         : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
         T_(1), energy_(0) {
         update_L_();
@@ -30,14 +31,16 @@ namespace stan {
 
       ~base_static_hmc() {}
 
-      sample transition(sample& init_sample,
-                        interface_callbacks::writer::base_writer& writer) {
+      sample
+      transition(sample& init_sample,
+                 interface_callbacks::writer::base_writer& info_writer,
+                 interface_callbacks::writer::base_writer& error_writer) {
         this->sample_stepsize();
 
         this->seed(init_sample.cont_params());
 
         this->hamiltonian_.sample_p(this->z_, this->rand_int_);
-        this->hamiltonian_.init(this->z_, writer);
+        this->hamiltonian_.init(this->z_, info_writer, error_writer);
 
         ps_point z_init(this->z_);
 
@@ -46,7 +49,7 @@ namespace stan {
         for (int i = 0; i < L_; ++i)
           this->integrator_.evolve(this->z_, this->hamiltonian_,
                                    this->epsilon_,
-                                   writer);
+                                   info_writer, error_writer);
 
         double h = this->hamiltonian_.H(this->z_);
         if (boost::math::isnan(h)) h = std::numeric_limits<double>::infinity();

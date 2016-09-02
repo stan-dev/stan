@@ -25,7 +25,7 @@ C++11 = false
 ##
 # Set default compiler options.
 ## 
-CFLAGS = -I src -isystem $(EIGEN) -isystem $(BOOST) -isystem $(MATH) -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -pipe -I$(CVODE)/include
+CFLAGS = -I src -isystem $(EIGEN) -isystem $(BOOST) -isystem $(CVODES)/include -isystem $(MATH) -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -DFUSION_MAX_VECTOR_SIZE=12 -DNO_FPRINTF_OUTPUT -pipe 
 CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
 LDLIBS = 
 LDLIBS_STANC = -Lbin -lstanc
@@ -143,6 +143,8 @@ endif
 	@echo '  - cpplint       : runs cpplint.py on source files. requires python 2.7.'
 	@echo '                    cpplint is called using the CPPLINT variable:'
 	@echo '                      CPPLINT = $(CPPLINT)'
+	@echo '                    To set the version of python 2, set the PYTHON2 variable:'
+	@echo '                      PYTHON2 = $(PYTHON2)'
 	@echo ''
 	@echo 'Clean:'
 	@echo '  - clean         : Basic clean. Leaves doc and compiled libraries intact.'
@@ -187,7 +189,7 @@ clean-deps:
 	@echo '  removing dependency files'
 	$(shell find . -type f -name '*.d' -exec rm {} +)
 
-clean-all: clean clean-manual clean-deps
+clean-all: clean clean-manual clean-deps clean-libraries
 	$(RM) -r test bin
 	@echo '  removing .o files'
 	$(shell find src -type f -name '*.o' -exec rm {} +)

@@ -688,6 +688,41 @@ initialized rougly in $(0.14,7.4)$, variables constrained to fall
 between 0 and 1 are initialized with values roughly in $(0.12,0.88)$.
 
 
+\section{Divergent Transitions}
+
+The Hamiltonian Monte Carlo algorithms (HMC and NUTS) simulate the
+Hamiltonian (position and momentum) of a fictional particle
+representing parameter values.  This simulation is carried out by
+dividing the integration time into a number of smaller steps.  For
+each step, the momentum is followed to update position and the
+gradient is followed to update momentum.  If the posterior is highly
+curved, very small step sizes are required for this simulation of the
+Hamiltonian to be accurate.  When the step size is too large, the
+simulation diverges from the true Hamiltonian.
+
+The primary cause of divergent transitions in Euclidean HMC (other
+than bugs in the code) is highly varying posterior curvature, for
+which small step sizes are too inefficient in some regions and diverge
+in other regions.  If the step size is too small, the sampler becomes
+inefficient and halts before making a U-turn (hits the maximum tree
+depth in NUTS); if the step size is too large, the Hamiltonian
+simulation diverges.
+
+\subsection{Diagnosing and Eliminating Divergences}
+
+In some cases, simply lowering the initial step size and increasing
+the target acceptance rate will keep the step size small enough that
+sampling can proceed.  In other cases, a reparameterization is
+required so that the posterior curvature is more manageable; see the
+funnel example in \refsection{reparameterization} for an example.
+Before reparameterization, it may be helpful to plot the posterior
+draws, highlighting the divergent transitions to see where they arise.
+This is marked as a divergent transition in the interfaces; for
+example, ShinyStan and RStan have special plotting facilities to
+highlight where divergent transitions arise.
+
+
+
 \chapter{Optimization  Algorithms}%
 \label{optimization-algorithms.chapter}
 

@@ -21,13 +21,13 @@
 \begin{center}
 \begin{minipage}[t]{0.75\textwidth}
 \small
-Stan Development Team (2015)
+Stan Development Team (2016)
 {\it Stan Modeling Language: User's Guide and Reference Manual}. Version
 \stanversion.
 \vspace*{20pt}
 \mbox{ }
 \\
-Copyright \copyright \ 2011--2015, Stan Development Team.
+Copyright \copyright \ 2011--2016, Stan Development Team.
 \vspace*{28pt}
 \mbox{} \\
 This document is distributed under the Creative Commons Attribution 4.0
@@ -51,7 +51,7 @@ The Stan logo is distributed under the Creative Commons Attribution-NoDerivative
 
 \subsection*{Currently Active Developers}
 
-This the list of current developers in order of joining the
+This is the list of current developers in order of joining the
 development team (see the next section for former development team
 members).
 
@@ -65,6 +65,9 @@ members).
     probability functions, constraint transforms, manual, web design /
     maintenance, fundraising, support, training, Stan, Stan
     Math, CmdStan}
+\item Matt Hoffman \ (Adobe Creative Technologies Lab)
+\\ {\footnotesize NUTS, adaptation, autodiff, memory management,
+  (re)parameterization, optimization \Cpp}
 \item Daniel Lee \   (Columbia University)
 \\ {\footnotesize chief of engineering, CmdStan, builds, continuous
   integration, testing, templates, ODEs, autodiff,
@@ -101,7 +104,8 @@ members).
   GLMs, poststratification, autodiff, template metaprogramming, 
   training, Stan, Stan Math, RStan}
 \item Jonah Sol Gabry \ (Columbia University)
-\\ {\footnotesize multilevel modeling, training, RStan, RStanARM, ShinyStan}
+\\ {\footnotesize RStan, RStanARM, ShinyStan, multilevel modeling, 
+  model comparison (LOO), model visualization, training}
 \item Alp Kucukelbir \ (Columbia University)
 \\ {\footnotesize variational inference, Stan, CmdStan}
 \item Robert L. Grant \ (St. George's, University of London and
@@ -111,6 +115,15 @@ members).
 \\ {\footnotesize variational inference, Stan, CmdStan}
 \item Krzysztof Sakrejda \ (University of Massachusetts, Amherst)
 \\ {\footnotesize sparse matrix operations, Stan, Stan Math}
+\item Aki Vehtari \ (Aalto University)
+\\ {\footnotesize GPs, model comparison (WAIC, LOO), modeling,
+  algorithms, MatlabStan}
+\item Rayleigh Lei \ (University of Michigan)
+\\ {\footnotesize vectorization, ADVI, RStan, Stan, Stan Math}
+\item Sebastian Weber \ (Novartis Pharma)
+\\ {\footnotesize ODE solvers, Stan, Stan Math}
+\item Charles Margossian \ (Metrum LLC)
+\\ {\footnotesize ODE solvers, Stan, Stan Math}
 \end{itemize}
 
 \subsection*{Development Team Alumni}
@@ -119,9 +132,6 @@ These are developers who have made important contributions in the
 past, but are no longer contributing actively.
 
 \begin{itemize}
-\item Matt Hoffman \ (Adobe Creative Technologies Lab)
-\\ {\footnotesize NUTS, adaptation, autodiff, memory management,
-  (re)parameterization, optimization \Cpp}
 \item Michael Malecki \ (Crunch.io, YouGov plc)
 \\ {\footnotesize original design, modeling, logos, R}
 \item Peter Li \   (Columbia University)

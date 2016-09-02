@@ -22,6 +22,8 @@ namespace stan {
     struct assignment;
     struct assgn;
     struct binary_op;
+    struct break_continue_statement;
+    struct conditional_op;
     struct conditional_statement;
     struct distribution;
     struct double_var_decl;
@@ -50,7 +52,7 @@ namespace stan {
     struct sample;
     struct simplex_var_decl;
     struct integrate_ode;
-    struct integrate_ode_cvode;
+    struct integrate_ode_control;
     struct unit_vector_var_decl;
     struct statement;
     struct statements;
@@ -71,6 +73,25 @@ namespace stan {
     const int ROW_VECTOR_T = 4;
     const int MATRIX_T = 5;
     const int ILL_FORMED_T = 6;
+
+    typedef int var_origin;
+    const int model_name_origin = 0;
+    const int data_origin = 1;
+    const int transformed_data_origin = 2;
+    const int parameter_origin = 3;
+    const int transformed_parameter_origin = 4;
+    const int derived_origin = 5;
+    const int local_origin = 6;
+    const int function_argument_origin = 7;
+    const int function_argument_origin_lp = 8;
+    const int function_argument_origin_rng = 9;
+    const int void_function_argument_origin = 10;
+    const int void_function_argument_origin_lp = 11;
+    const int void_function_argument_origin_rng = 12;
+
+    bool is_data_origin(const var_origin& vo);
+    void print_var_origin(std::ostream& o, const var_origin& vo);
+
 
     std::ostream& write_base_expr_type(std::ostream& o, base_expr_type type);
 
@@ -178,7 +199,9 @@ namespace stan {
                                 function_signature_t& signature);
       bool is_defined(const std::string& name,
                       const function_signature_t& sig);
+      bool has_user_defined_key(const std::string& name) const;
       std::set<std::string> key_set() const;
+      bool has_key(const std::string& key) const;
 
     private:
       function_signatures();
@@ -209,12 +232,12 @@ namespace stan {
       expr_type operator()(const variable& e) const;
       expr_type operator()(const fun& e) const;
       expr_type operator()(const integrate_ode& e) const;
-      expr_type operator()(const integrate_ode_cvode& e) const;
+      expr_type operator()(const integrate_ode_control& e) const;
       expr_type operator()(const index_op& e) const;
       expr_type operator()(const index_op_sliced& e) const;
+      expr_type operator()(const conditional_op& e) const;
       expr_type operator()(const binary_op& e) const;
       expr_type operator()(const unary_op& e) const;
-      // template <typename T> expr_type operator()(const T& e) const;
     };
 
 
@@ -227,10 +250,11 @@ namespace stan {
                              boost::recursive_wrapper<array_literal>,
                              boost::recursive_wrapper<variable>,
                              boost::recursive_wrapper<integrate_ode>,
-                             boost::recursive_wrapper<integrate_ode_cvode>,
+                             boost::recursive_wrapper<integrate_ode_control>,
                              boost::recursive_wrapper<fun>,
                              boost::recursive_wrapper<index_op>,
                              boost::recursive_wrapper<index_op_sliced>,
+                             boost::recursive_wrapper<conditional_op>,
                              boost::recursive_wrapper<binary_op>,
                              boost::recursive_wrapper<unary_op> >
       expression_t;
@@ -246,9 +270,10 @@ namespace stan {
       expression(const variable& expr);  // NOLINT(runtime/explicit)
       expression(const fun& expr);  // NOLINT(runtime/explicit)
       expression(const integrate_ode& expr);  // NOLINT(runtime/explicit)
-      expression(const integrate_ode_cvode& expr);  // NOLINT(runtime/explicit)
+      expression(const integrate_ode_control& expr);  // NOLINT
       expression(const index_op& expr);  // NOLINT(runtime/explicit)
       expression(const index_op_sliced& expr);  // NOLINT(runtime/explicit)
+      expression(const conditional_op& expr);  // NOLINT(runtime/explicit)
       expression(const binary_op& expr);  // NOLINT(runtime/explicit)
       expression(const unary_op& expr);  // NOLINT(runtime/explicit)
       expression(const expression_t& expr_);  // NOLINT(runtime/explicit)
@@ -286,10 +311,11 @@ namespace stan {
       bool operator()(const array_literal& x) const;  // NOLINT
       bool operator()(const variable& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const integrate_ode& x) const;  // NOLINT
-      bool operator()(const integrate_ode_cvode& x) const;  // NOLINT
+      bool operator()(const integrate_ode_control& x) const;  // NOLINT
       bool operator()(const fun& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const index_op& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const index_op_sliced& x) const;  // NOLINT
+      bool operator()(const conditional_op& x) const;  // NOLINT
       bool operator()(const binary_op& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const unary_op& x) const;  // NOLINT(runtime/explicit)
     };
@@ -341,6 +367,7 @@ namespace stan {
     };
 
     struct integrate_ode {
+      std::string integration_function_name_;
       std::string system_function_name_;
       expression y0_;  // initial state
       expression t0_;  // initial time
@@ -349,16 +376,18 @@ namespace stan {
       expression x_;  // data
       expression x_int_;  // integer data
       integrate_ode();
-      integrate_ode(const std::string& system_function_name,
-                const expression& y0,
-                const expression& t0,
-                const expression& ts,
-                const expression& theta,
-                const expression& x,
-                const expression& x_int);
+      integrate_ode(const std::string& integration_function_name,
+                    const std::string& system_function_name,
+                    const expression& y0,
+                    const expression& t0,
+                    const expression& ts,
+                    const expression& theta,
+                    const expression& x,
+                    const expression& x_int);
     };
 
-    struct integrate_ode_cvode {
+    struct integrate_ode_control {
+      std::string integration_function_name_;
       std::string system_function_name_;
       expression y0_;  // initial state
       expression t0_;  // initial time
@@ -369,27 +398,29 @@ namespace stan {
       expression rel_tol_;  // relative tolerance
       expression abs_tol_;  // absolute tolerance
       expression max_num_steps_;  // max number of steps
-      integrate_ode_cvode();
-      integrate_ode_cvode(const std::string& system_function_name,
-                          const expression& y0,
-                          const expression& t0,
-                          const expression& ts,
-                          const expression& theta,
-                          const expression& x,
-                          const expression& x_int,
-                          const expression& rel_tol,
-                          const expression& abs_tol,
-                          const expression& max_num_steps);
+      integrate_ode_control();
+      integrate_ode_control(const std::string& integration_function_name,
+                            const std::string& system_function_name,
+                            const expression& y0,
+                            const expression& t0,
+                            const expression& ts,
+                            const expression& theta,
+                            const expression& x,
+                            const expression& x_int,
+                            const expression& rel_tol,
+                            const expression& abs_tol,
+                            const expression& max_num_steps);
     };
 
     struct fun {
       std::string name_;
+      std::string original_name_;
       std::vector<expression> args_;
       expr_type type_;
       fun();
       fun(std::string const& name,
           std::vector<expression> const& args);
-      void infer_type();  // FIXME: is this used anywhere?
+      //      void infer_type();  // FIXME: is this used anywhere?
     };
 
     size_t total_dims(const std::vector<std::vector<expression> >& dimss);
@@ -411,6 +442,18 @@ namespace stan {
       index_op(const expression& expr,
                const std::vector<std::vector<expression> >& dimss);
       void infer_type();
+    };
+
+    struct conditional_op {
+      expression cond_;  // conditional - must be int val
+      expression true_val_;
+      expression false_val_;
+      expr_type type_;
+      bool has_var_;
+      conditional_op();
+      conditional_op(const expression& cond,
+                     const expression& true_val,
+                     const expression& false_val);
     };
 
     struct binary_op {
@@ -517,22 +560,6 @@ namespace stan {
       void infer_type();
     };
 
-    typedef int var_origin;
-    const int model_name_origin = 0;
-    const int data_origin = 1;
-    const int transformed_data_origin = 2;
-    const int parameter_origin = 3;
-    const int transformed_parameter_origin = 4;
-    const int derived_origin = 5;
-    const int local_origin = 6;
-    const int function_argument_origin = 7;
-    const int function_argument_origin_lp = 8;
-    const int function_argument_origin_rng = 9;
-    const int void_function_argument_origin = 10;
-    const int void_function_argument_origin_lp = 11;
-    const int void_function_argument_origin_rng = 12;
-
-    void print_var_origin(std::ostream& o, const var_origin& vo);
 
     struct base_var_decl {
       std::string name_;
@@ -768,12 +795,12 @@ namespace stan {
                      boost::recursive_wrapper<for_statement>,
                      boost::recursive_wrapper<conditional_statement>,
                      boost::recursive_wrapper<while_statement>,
+                     boost::recursive_wrapper<break_continue_statement>,
                      boost::recursive_wrapper<print_statement>,
                      boost::recursive_wrapper<reject_statement>,
                      boost::recursive_wrapper<return_statement>,
                      boost::recursive_wrapper<no_op_statement> >
       statement_t;
-
       statement_t statement_;
       size_t begin_line_;
       size_t end_line_;
@@ -790,6 +817,7 @@ namespace stan {
       statement(const for_statement& st);  // NOLINT(runtime/explicit)
       statement(const conditional_statement& st);  // NOLINT(runtime/explicit)
       statement(const while_statement& st);  // NOLINT(runtime/explicit)
+      statement(const break_continue_statement& st);  // NOLINT
       statement(const print_statement& st);  // NOLINT(runtime/explicit)
       statement(const reject_statement& st);  // NOLINT(runtime/explicit)
       statement(const no_op_statement& st);  // NOLINT(runtime/explicit)
@@ -809,6 +837,7 @@ namespace stan {
       bool operator()(const for_statement& st) const;  // NOLINT
       bool operator()(const conditional_statement& st) const;  // NOLINT
       bool operator()(const while_statement& st) const;  // NOLINT
+      bool operator()(const break_continue_statement& st) const;  // NOLINT
       bool operator()(const print_statement& st) const;  // NOLINT
       bool operator()(const reject_statement& st) const;  // NOLINT
       bool operator()(const no_op_statement& st) const;  // NOLINT
@@ -831,6 +860,7 @@ namespace stan {
       bool operator()(const for_statement& st) const;  // NOLINT
       bool operator()(const conditional_statement& st) const;  // NOLINT
       bool operator()(const while_statement& st) const;  // NOLINT
+      bool operator()(const break_continue_statement& st) const;  // NOLINT
       bool operator()(const print_statement& st) const;  // NOLINT
       bool operator()(const reject_statement& st) const;  // NOLINT
       bool operator()(const no_op_statement& st) const;  // NOLINT
@@ -872,6 +902,12 @@ namespace stan {
       while_statement();
       while_statement(const expression& condition,
                       const statement& body);
+    };
+
+    struct break_continue_statement {
+      std::string generate_;
+      break_continue_statement();
+      explicit break_continue_statement(const std::string& generate);
     };
 
     struct print_statement {
@@ -982,9 +1018,10 @@ namespace stan {
       bool operator()(const variable& e) const;
       bool operator()(const fun& e) const;
       bool operator()(const integrate_ode& e) const;
-      bool operator()(const integrate_ode_cvode& e) const;
+      bool operator()(const integrate_ode_control& e) const;
       bool operator()(const index_op& e) const;
       bool operator()(const index_op_sliced& e) const;
+      bool operator()(const conditional_op& e) const;
       bool operator()(const binary_op& e) const;
       bool operator()(const unary_op& e) const;
     };
@@ -1035,14 +1072,30 @@ namespace stan {
       bool operator()(const array_literal& e) const;
       bool operator()(const variable& e) const;
       bool operator()(const integrate_ode& e) const;
-      bool operator()(const integrate_ode_cvode& e) const;
+      bool operator()(const integrate_ode_control& e) const;
       bool operator()(const fun& e) const;
       bool operator()(const index_op& e) const;
       bool operator()(const index_op_sliced& e) const;
+      bool operator()(const conditional_op& e) const;
       bool operator()(const binary_op& e) const;
       bool operator()(const unary_op& e) const;
     };
 
+    /**
+     * Returns true if the specified expression contains a variable
+     * that is defined as a parameter, defined as a transformed
+     * parameter, or is a local variable that is not an integer.
+     *
+     * <p>Compare to <code>has_nonparam_var</code>, which is similar,
+     * but excludes variables declared as parameters.
+     *
+     * @param e Expression to test.
+     * @param var_map Variable mapping for origin and types of
+     * variables.
+     * @return true if expression contains a variable defined as as a
+     * parameter, defined as a transformedparameter, or is a local
+     * variable that is not an integer.
+     */
     bool has_var(const expression& e,
                  const variable_map& var_map);
 
@@ -1056,14 +1109,30 @@ namespace stan {
       bool operator()(const array_literal& e) const;
       bool operator()(const variable& e) const;
       bool operator()(const integrate_ode& e) const;
-      bool operator()(const integrate_ode_cvode& e) const;
+      bool operator()(const integrate_ode_control& e) const;
       bool operator()(const fun& e) const;
       bool operator()(const index_op& e) const;
       bool operator()(const index_op_sliced& e) const;
+      bool operator()(const conditional_op& e) const;
       bool operator()(const binary_op& e) const;
       bool operator()(const unary_op& e) const;
     };
 
+    /**
+     * Returns true if the specified expression contains a variable
+     * that is defined as a transformed parameter, or is a local
+     * variable that is not an integer.
+     *
+     * <p>Compare to <code>has_var</code>, which is similar, but
+     * includes variables declared as parameters.
+     *
+     * @param e Expression to test.
+     * @param var_map Variable mapping for origin and types of
+     * variables.
+     * @return true if expression contains a variable defined as a
+     * transformed parameter, or is a local variable that is not
+     * an integer.
+     */
     bool has_non_param_var(const expression& e,
                            const variable_map& var_map);
 
@@ -1075,6 +1144,24 @@ namespace stan {
 
     bool ends_with(const std::string& suffix,
                    const std::string& s);
+
+
+    std::string get_cdf(const std::string& dist_name);
+
+    std::string get_ccdf(const std::string& dist_name);
+
+    std::string get_prob_fun(const std::string& dist_name);
+
+    bool has_prob_fun_suffix(const std::string& name);
+    std::string strip_prob_fun_suffix(const std::string& dist_fun);
+
+    bool has_cdf_suffix(const std::string& name);
+    std::string strip_cdf_suffix(const std::string& dist_fun);
+
+    bool has_ccdf_suffix(const std::string& name);
+    std::string strip_ccdf_suffix(const std::string& dist_fun);
+
+    bool fun_name_exists(const std::string& name);
 
   }
 }

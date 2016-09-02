@@ -7,23 +7,27 @@
 
 namespace stan {
   namespace mcmc {
-
-    // The No-U-Turn Sampler (NUTS) on a
-    // Euclidean manifold with unit metric
-    // and adaptive stepsize
-
+    /**
+     * The No-U-Turn sampler (NUTS) with multinomial sampling
+     * with a Gaussian-Euclidean disintegration and unit metric
+     * and adaptive step size
+     */
     template <class Model, class BaseRNG>
     class adapt_unit_e_nuts: public unit_e_nuts<Model, BaseRNG>,
                              public stepsize_adapter {
     public:
-      adapt_unit_e_nuts(Model &model, BaseRNG& rng)
+      adapt_unit_e_nuts(const Model& model, BaseRNG& rng)
         : unit_e_nuts<Model, BaseRNG>(model, rng) {}
 
       ~adapt_unit_e_nuts() {}
 
-      sample transition(sample& init_sample,
-                        interface_callbacks::writer::base_writer& writer) {
-        sample s = unit_e_nuts<Model, BaseRNG>::transition(init_sample, writer);
+      sample
+      transition(sample& init_sample,
+                 interface_callbacks::writer::base_writer& info_writer,
+                 interface_callbacks::writer::base_writer& error_writer) {
+        sample s = unit_e_nuts<Model, BaseRNG>::transition(init_sample,
+                                                           info_writer,
+                                                           error_writer);
 
         if (this->adapt_flag_)
           this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,

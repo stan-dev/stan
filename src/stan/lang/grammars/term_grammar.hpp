@@ -56,6 +56,11 @@ namespace stan {
                               whitespace_grammar<Iterator> >
       double_literal_r;
 
+      boost::spirit::qi::rule<Iterator,
+                              expression(var_origin),
+                              whitespace_grammar<Iterator> >
+      exponentiated_factor_r;
+
 
       boost::spirit::qi::rule<Iterator,
                               boost::spirit::qi::locals<variable, fun>,
@@ -75,9 +80,9 @@ namespace stan {
       integrate_ode_r;
 
       boost::spirit::qi::rule<Iterator,
-                              integrate_ode_cvode(var_origin),
+                              integrate_ode_control(var_origin),
                               whitespace_grammar<Iterator> >
-      integrate_ode_cvode_r;
+      integrate_ode_control_r;
 
 
       boost::spirit::qi::rule<Iterator,
@@ -103,11 +108,11 @@ namespace stan {
                               whitespace_grammar<Iterator> >
       negated_factor_r;
 
-
       boost::spirit::qi::rule<Iterator,
-                              expression(var_origin),
+                              std::vector<expression>(var_origin),
                               whitespace_grammar<Iterator> >
-      exponentiated_factor_r;
+      prob_args_r;
+
 
 
       boost::spirit::qi::rule<Iterator,

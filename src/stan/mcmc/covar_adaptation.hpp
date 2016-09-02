@@ -1,9 +1,8 @@
 #ifndef STAN_MCMC_COVAR_ADAPTATION_HPP
 #define STAN_MCMC_COVAR_ADAPTATION_HPP
 
-#include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/math/prim/mat.hpp>
 #include <stan/mcmc/windowed_adaptation.hpp>
-#include <stan/math/prim/mat/fun/welford_covar_estimator.hpp>
 #include <vector>
 
 namespace stan {

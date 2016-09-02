@@ -484,18 +484,6 @@ are primarily provided for compatibility with BUGS and JAGS.
 %
 \begin{description}
   %
-  \fitem{real}{if\_else}{int \farg{cond}, real \farg{x}, real \farg{y}}{
-    Returns \farg{x} if \farg{cond} is non-zero and \farg{y} otherwise.
-    Stan's \code{if\_else} function does not short circuit---it
-    always evaluates both arguments \farg{x} and \farg{y}.
-    \[
-    \mbox{if\_else}(cond,x,y) = 
-    \begin{cases}
-      x & \mbox{if } cond \neq 0 \\
-      y & \mbox{otherwise}
-    \end{cases}
-    \]}
-  %
   \fitem{real}{step}{real \farg{x}}{
     Returns 1 if \farg{x} is positive and 0 otherwise.
     \[
@@ -508,50 +496,14 @@ are primarily provided for compatibility with BUGS and JAGS.
   %
 \end{description}
 %
-Both of these are step-like functions; see the warning in
+The step function is often used in BUGS to perform conditional
+operations.  For instance, \code{step(a\,-\,b)} evaluates to 1 if
+\code{a} is greater than \code{b} and evaluates to 0 otherwise.
+\code{step} is a step-like functions; see the warning in
 \refsection{step-functions} applied to expressions dependent on
 parameters. 
 
-The step function is often used in BUGS to perform conditional
-operations.  For instance, \code{step(a\,-\,b)} evaluates to 1 if
-\code{a} is greater than {b} and evaluates to 0 otherwise.  In Stan,
-the expression \code{step(a\,-\,b)} is more naturally coded directly
-in terms of the comparison operator, \code{(a\,>\,b)}.  
 
-The log probability function and gradient evaluations are more
-efficient in Stan when implemented using conditional statements than
-with mulitplications by step functions.  For example, if \code{y} is a
-\code{real} variable, and \code{c}, \code{x1}, and \code{x2} are
-scalar expressions (type \code{real} or \code{int}), then the
-assignment statements
-%
-\begin{stancode}
-y = x1 * step(c) + x2 * (1 - step(c));
-\end{stancode}
-%
-and
-%
-\begin{stancode}
-y = if_else(c > 0, x1, x2);
-\end{stancode}
-%
-are more efficiently written with the conditional statement
-%
-\begin{stancode}
-if (c > 0)
-  y = x1;
-else
-  y = x2;
-\end{stancode}
-%
-The reason the functional versions are slower is that they evaluate
-all of their arguments; the step function approach is particularly
-slow as it also introduces arithmetic operations.  The overhead will
-be more noticeable if \code{c}, \code{x1} or \code{x2}
-are parameters (including transformed parameters and local variables
-that depend on parameters) or if \code{x1} and \code{x2} are
-complicated expressions rather than constants or simple variables.  
-%
 \begin{description}
   %
   \fitem{int}{is\_inf}{real \farg{x}}{
@@ -1226,24 +1178,28 @@ distribution function (and its complement).
     \end{cases}
     \]}
   %
-  \fitem{real}{binomial\_coefficient\_log}{real \farg{x}, real \farg{y}}{ 
-    Returns the natural logarithm of the binomial coefficient of
-    \farg{x} and \farg{y}. For non-negative integer inputs, the 
-    binomial coefficient function is written as
-    $\binom{x}{y}$ and pronounced ``\farg{x} choose \farg{y}.''  This
-    function generalizes to real numbers using the gamma function.
+  \fitem{real}{binomial\_coefficient\_log}{real \farg{x}, real
+    \farg{y}}{
+    {\it Warning:} This function is deprecated and should
+    be replaced with \code{lchoose}.
+
+    Returns the natural logarithm of the binomial coefficient
+    of \farg{x} and \farg{y}. For non-negative integer inputs, the
+    binomial coefficient function is written as $\binom{x}{y}$ and
+    pronounced ``\farg{x} choose \farg{y}.''  This function
+    generalizes to real numbers using the gamma function.
 
     For $0 \leq y \leq x$,
     \[
     \mbox{\code{binomial\_coefficient\_log}}(x,y)
-    = \log\Gamma(x+1) - \log\Gamma(y+1) - \log\Gamma(x-y+1)
+    = \log\Gamma(x+1) - \log\Gamma(y+1) - \log\Gamma(x-y+1).
     \]}
   %
   \fitem{real}{bessel\_first\_kind}{int \farg{v}, real \farg{x}}{
     Returns the Bessel function of the first kind with order \farg{v}
     applied to \farg{x}.
     \[
-    \mbox{\code{bessel\_first\_kind}}(v,x) =  J_v(x)
+    \mbox{\code{bessel\_first\_kind}}(v,x) =  J_v(x),
     \]
     where 
     %
@@ -1317,6 +1273,19 @@ distribution function (and its complement).
     (x)_n=\frac{\Gamma(x+1)}{\Gamma(x-n+1)}
     \]}
   %
+  \fitem{real}{lchoose}{real \farg{x}, real \farg{y}}{ Returns the
+    natural logarithm of the generalized binomial coefficient of
+    \farg{x} and \farg{y}. For non-negative integer inputs, the
+    binomial coefficient function is written as $\binom{x}{y}$ and
+    pronounced ``\farg{x} choose \farg{y}.''  This function
+    generalizes to real numbers using the gamma function.
+
+    For $0 \leq y \leq x$,
+    \[
+    \mbox{\code{binomial\_coefficient\_log}}(x,y)
+    = \log\Gamma(x+1) - \log\Gamma(y+1) - \log\Gamma(x-y+1).
+    \]}
+  %
   \fitem{real}{log\_falling\_factorial}{real \farg{x}, real \farg{n}}{
     Returns the log of the falling factorial of \farg{x} with power 
     \farg{n} defined for positive \farg{x} and real \farg{n}.
@@ -1379,9 +1348,25 @@ using more basic \Stan functions.
     \]}
   %
   \fitem{real}{multiply\_log}{real \farg{x}, real \farg{y}}{ 
-    Returns the product of \farg{x} and the natural logarithm of \farg{y}.
+    {\it Warning:} This function is deprecated and should be replaced
+    with \code{lmultiply}. 
+    
+    Returns the product of \farg{x} and the natural logarithm
+    of \farg{y}. 
     \[
     \mbox{\code{multiply\_log}}(x,y) = 
+    \begin{cases}
+      0 & \mbox{if } x = y = 0 \\
+      x \log y & \mbox{if } x, y \neq 0 \\
+      \mbox{NaN} & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitem{real}{lmultiply}{real \farg{x}, real \farg{y}}{ 
+    Returns the product of \farg{x} and the natural logarithm
+    of \farg{y}. 
+    \[
+    \mbox{\code{lmultiply}}(x,y) = 
     \begin{cases}
       0 & \mbox{if } x = y = 0 \\
       x \log y & \mbox{if } x, y \neq 0 \\
@@ -2544,7 +2529,7 @@ arbitrary subvector.
     starting at \farg{i}; i.e., elements \farg{i} through 
     through \farg{i} + \farg{n} - 1.}
 %
-  \fitem{row\_vector}{segment}{row\_vector \farg{v}, int \farg{i}, int
+  \fitem{row\_vector}{segment}{row\_vector \farg{rv}, int \farg{i}, int
     \farg{n}}{Return the row vector consisting of the \farg{n}
     elements of \farg{rv} starting at \farg{i}; i.e., elements
     \farg{i} through through \farg{i} + \farg{n} - 1.}
@@ -2598,6 +2583,14 @@ Stan's matrix concatenation operations \code{append\_col} and
   \farg{y}}{Combine row vectors \farg{x} and \farg{y} of any size into
   another row vector.}
 %
+\fitem{row\_vector}{append\_col}{real \farg{x}, row\_vector
+  \farg{y}}{Append \farg{x} to the front of \farg{y}, returning
+  another row vector.}
+%
+\fitem{row\_vector}{append\_col}{row\_vector \farg{x}, real \farg{y}}
+  {Append \farg{y} to the end of \farg{x}, returning
+  another row vector.}
+%
 \end{description}
 
 \subsubsection{Vertical concatenation}
@@ -2625,6 +2618,14 @@ Stan's matrix concatenation operations \code{append\_col} and
   \fitem{vector}{append\_row}{vector \farg{x}, vector
     \farg{y}}{Concatenate vectors \farg{x} and \farg{y} of any size into
     another vector.}
+%
+\fitem{vector}{append\_row}{real \farg{x}, vector
+  \farg{y}}{Append \farg{x} to the top of \farg{y}, returning
+  another vector.}
+%
+\fitem{vector}{append\_row}{vector \farg{x}, real \farg{y}}
+  {Append \farg{y} to the bottom of \farg{x}, returning
+  another vector.}
 %
 \end{description}
 
@@ -2696,8 +2697,60 @@ The cumulative sum of \farg{rv}}
 %
 \end{description}
 
+\section{Covariance Functions}\label{covariance.section}
 
+\subsection{Exponentiated quadratic covariance function}
 
+The exponentiated quadratic kernel defines the covariance between $f(x_i)$ and
+$f(x_j)$ where $f\colon \reals^D \mapsto \reals$ as a function of the squared
+Euclidian distance between $x_i \in \reals^D$ and $x_j \in \reals^D$:
+
+\[
+  \text{cov}(f(x_i), f(x_j)) = k(x_i, x_j) 
+= \sigma^2 
+\exp \left(
+	- \dfrac{1}{2l^2} \sum_{d=1}^D (x_{i,d} - x_{j,d})^2
+\right)
+\]
+
+\noindent with $\sigma$ and $l$ constrained to be positive.
+
+There are two variants of the exponentiated quadratic covariance function in
+Stan. One builds a covariance matrix, $K \in \reals^{N \times N}$ for $x_1,
+\dots, x_N$, where $K_{i,j} = k(x_i, x_j)$, which is necessarily symmetric and
+positive semidefinite by construction. There is a second variant of the
+exponentiated quadratic covariance function that builds a $K \in \reals^{N
+\times M}$ covariance matrix for $x_1, \dots, x_N$ and $x^\prime_1, \dots,
+x^\prime_M$, where $x_i \in \reals^D$ and $x^\prime_i \in \reals^D$ and
+$K_{i,j} = k(x_i, x^\prime_j)$.
+
+\begin{description}
+%
+\fitem{matrix}{cov\_exp\_quad}{row\_vectors \farg{x}, real \farg{sigma}, real
+\farg{l}}{ The covariance matrix with an exponentiated quadratic kernel of
+\farg{x}.}
+
+\fitem{matrix}{cov\_exp\_quad}{vectors \farg{x}, real \farg{sigma}, real
+\farg{l}}{ The covariance matrix with an exponentiated quadratic kernel of
+\farg{x}.}
+
+\fitem{matrix}{cov\_exp\_quad}{real[] \farg{x}, real \farg{sigma}, real
+\farg{l}}{ The covariance matrix with an exponentiated quadratic kernel of
+\farg{x}.}
+
+\fitemtwolines{matrix}{cov\_exp\_quad}{row\_vectors \farg{x1}, row\_vectors
+\farg{x2}}{real \farg{sigma}, real \farg{l}}{ The covariance matrix with an
+exponentiated quadratic kernel of \farg{x1} and \farg{x2}.}
+
+\fitemtwolines{matrix}{cov\_exp\_quad}{vectors \farg{x1}, vectors
+\farg{x2}}{real \farg{sigma}, real \farg{l}}{ The covariance matrix with an
+exponentiated quadratic kernel of \farg{x1} and \farg{x2}.}
+
+\fitemtwolines{matrix}{cov\_exp\_quad}{real[] \farg{x1}, real[]
+\farg{x2}}{real \farg{sigma}, real \farg{l}}{ The covariance matrix with an
+exponentiated quadratic kernel of \farg{x1} and \farg{x2}.}
+
+\end{description}
 
 \section{Linear Algebra Functions and Solvers}
 
@@ -2743,25 +2796,68 @@ the diagonal are ignored.
 
 \begin{description}
 %
-\fitem{row\_vector}{mdivide\_right\_tri\_low}{row\_vector \farg{B}, 
+\fitem{vector}{mdivide\_left\_tri\_low}{matrix \farg{A}, vector \farg{b}}{
+The left division of \farg{b} by a lower-triangular view of \farg{A};
+algebraically equivalent to the less efficient and stable form
+\code{inverse(tri(\farg{A})) * \farg{b}}, where \code{tri(\farg{A})}
+is the lower-triangular portion of \farg{A} with the above-diagonal
+entries set to zero.}
+%
+\fitem{matrix}{mdivide\_left\_tri\_low}{matrix \farg{A}, matrix \farg{B}}{
+The left division of \farg{B} by a triangular view of \farg{A};
+algebraically equivalent to the less efficient and stable form
+\code{inverse(tri(\farg{A})) * \farg{B}}, where \code{tri(\farg{A})}
+is the lower-triangular portion of \farg{A} with the above-diagonal
+entries set to zero.}
+%
+\fitem{row\_vector}{mdivide\_right\_tri\_low}{row\_vector \farg{b}, 
   matrix \farg{A}}{
-The right division of \farg{B} by \code{tri(\farg{A})}, a lower triangular
-view of \farg{A}; equivalently \code{\farg{B} * inverse(tri(\farg{A}))}}
+The right division of \farg{b} by a triangular view of 
+\farg{A};  algebraically equivalent to the less efficient and stable form
+\code{\farg{b} * inverse(tri(\farg{A}))},  where \code{tri(\farg{A})}
+is the lower-triangular portion of \farg{A} with the above-diagonal
+entries set to zero.}
 %
+\fitem{matrix}{mdivide\_right\_tri\_low}{matrix \farg{B}, matrix
+  \farg{A}}{
+The right division of \farg{B} by a triangular view of 
+\farg{A};  algebraically equivalent to the less efficient and stable form
+\code{\farg{B} * inverse(tri(\farg{A}))},  where \code{tri(\farg{A})}
+is the lower-triangular portion of \farg{A} with the above-diagonal
+entries set to zero.}
 %
-\fitem{matrix}{mdivide\_right\_tri\_low}{matrix \farg{B}, matrix \farg{A}}{
-The right division of \farg{B} by \code{tri(\farg{A})}, a lower triangular
-view of \farg{A}; equivalently \code{\farg{B} * inverse(tri(\farg{A}))}}
+\end{description}
+
+\subsection{Symmetric Positive-Definite Matrix-Division Functions}
+
+There are four division functions which are specialized for
+efficiency and stability for symmetric positive-definite matrix
+dividends.  If the matrix dividend argument is not symmetric and
+positive definite, these will reject and print warnings.
+
+\begin{description}
 %
-\fitem{vector}{mdivide\_left\_tri\_low}{matrix \farg{A}, vector \farg{B}}
-The left division of \farg{B} by a triangular view of
-\code{tri(\farg{A})}, a lower triangular view of \farg{A}; equivalently
-\code{inverse(tri(\farg{A})) * \farg{B}}
+\fitem{matrix}{mdivide\_left\_spd}{matrix \farg{A}, vector \farg{b}}{
+The left division of \farg{b} by the symmetric,
+positive-definite matrix \farg{A}; algebraically equivalent to the
+less efficient and stable form \code{inverse(\farg{A}) * \farg{b}}.}
 %
-\fitem{matrix}{mdivide\_left\_tri\_low}{matrix \farg{A}, matrix \farg{B}}
-The left division of \farg{B} by a triangular view of
-\code{tri(\farg{A})}, a lower triangular view of \farg{A}; equivalently
-\code{inverse(tri(\farg{A})) * \farg{B}}
+\fitem{vector}{mdivide\_left\_spd}{matrix \farg{A}, matrix \farg{B}}{
+The left division of \farg{B} by the symmetric,
+positive-definite matrix \farg{A}; algebraically equivalent to the
+less efficient and stable form \code{inverse(\farg{A}) * B}.}
+%
+\fitem{row\_vector}{mdivide\_right\_spd}{row\_vector \farg{b}, 
+  matrix \farg{A}}{
+The right division of \farg{b} by the symmetric, positive-definite
+matrix \farg{A};  algebraically equivalent to the less efficient
+and stable form \code{\farg{b} * inverse(\farg{A})}.}
+%
+\fitem{matrix}{mdivide\_right\_spd}{matrix \farg{B}, matrix \farg{A}}{
+The right division of \farg{B} by the symmetric, positive-definite
+matrix \farg{A};  algebraically equivalent to the less efficient
+and stable form \code{\farg{B} * inverse(\farg{A})}.}
+
 %
 \end{description}
 
@@ -2849,22 +2945,26 @@ eigenvalues of 0).
 \begin{description}
 %
 \fitem{matrix}{qr\_Q}{matrix \farg{A}}{
-The orthogonal matrix in the QR decomposition of \farg{A}}
+The orthogonal matrix in the fat QR decomposition of \farg{A}, which
+implies that the resulting matrix is square with the same number of
+rows as \farg{A}}
 %
 \fitem{matrix}{qr\_R}{matrix \farg{A}}{
-  The upper triangular matrix in the QR decomposition of \farg{A}}
+  The upper trapezoidal matrix in the fat QR decomposition of \farg{A},
+  which implies that the resulting matrix has the same dimensions as
+  \farg{A}}
 %
 \end{description}
 %
 Multiplying a column of an orthogonal matrix by $-1$ still results in 
 an orthogonal matrix, and you can multiply the corresponding row of 
-the upper triangular matrix by $-1$ without changing the product. Thus,
+the upper trapezoidal matrix by $-1$ without changing the product. Thus,
 Stan adopts the normalization that the diagonal elements of the upper
-triangular matrix are strictly positive and the columns of the 
-orthogonal matrix are rescaled if necessary. The input matrix $A$ need
+trapezoidal matrix are strictly positive and the columns of the 
+orthogonal matrix are reflected if necessary. The input matrix $A$ need
 not be square but must have at least as many rows as it has columns.
 Also, this QR decomposition algorithm does not utilize pivoting and 
-thus is faster but may be numerically unstable.
+thus is fast but may be numerically unstable.
 
 \subsubsection{Cholesky Decomposition}
 
@@ -2946,12 +3046,18 @@ Number of components of \farg{v} less than \farg{v[s]}}
 \noindent
 For sparse matrices, for which many elements are zero, it is more
 efficient to use specialized representations to save memory and speed
-up matrix arithmetic (including derivative calculations).  Because of
-this speedup, it may even be useful to read in a dense matrix and convert
-it to a sparse matrix before multiplying it by a vector.  This chapter
-covers a very specific form of sparsity consisting of a sparse matrix
-multiplied by a dense vector;  for more general coding strategies for
-sparse data structures within Stan, see \refchapter{sparse-ragged}.
+up matrix arithmetic (including derivative calculations).  Given
+Stan's implementation, there is substantial space (memory) savings by
+using sparse matrices.  Because of the ease of optimizing dense matrix
+operations, speed improvements only arise at 90\% or even greater
+sparsity; below that level, dense matrices are faster but use more memory.  
+
+Because of this speedup and space savings, it may even be useful to
+read in a dense matrix and convert it to a sparse matrix before
+multiplying it by a vector.  This chapter covers a very specific form
+of sparsity consisting of a sparse matrix multiplied by a dense
+vector; for more general coding strategies for sparse data structures
+within Stan, see \refchapter{sparse-ragged}.
 
 \section{Compressed Row Storage}\label{CSR.section}
 
@@ -3046,10 +3152,13 @@ a single function.
 %
 \begin{description}
   \fitem{matrix}{csr\_to\_dense\_matrix}{int \farg{m}, int \farg{n},
-    matrix \farg{w}, int \farg{v}, int \farg{u}}{Return dense
-    $\mbox{\farg{m}} \times \mbox{\farg{n}}$ matrix with specified
-    values \farg{w}, column indices \farg{v}, and row starting indices
-    \farg{u}; see \refsection{CSR}.}
+    vector \farg{w}, int[] \farg{v}, int[] \farg{u}}{Return dense
+    $\mbox{\farg{m}} \times \mbox{\farg{n}}$ matrix with non-zero
+    matrix entries \farg{w}, column indices \farg{v}, and row starting
+    indices \farg{u}; the vector \farg{w} and arrays \farg{v} and
+    \farg{u} must all be the same size, and the arrays \farg{v} and
+    \farg{u} must have index values bounded by \farg{m} and \farg{n}.
+    See \refsection{CSR} for more details.}
 \end{description}
 
 \section{Sparse Matrix Arithmetic}
@@ -3169,3 +3278,175 @@ Convert the array \farg{a} (of any dimension up to 10) to a one-dimensional arra
 Convert the array \farg{a} (of any dimension up to 10) to a one-dimensional array in row-major order.}
 %
 \end{description}
+
+
+\chapter{Ordinary Differential Equation Solvers}
+\label{functions-ode-solver.chapter}
+
+Stan provides built-in ordinary differential equation (ODE) solvers.
+Although they look like function applications, the ODE solvers are
+special in two ways.
+
+First, the first argument to each of the solvers is a function
+specifying the ODE system as an argument, like PKBugs
+\citep{LunnEtAl:1999}. Ordinary Stan functions do not allow functions
+as arguments.
+
+Second, some of the arguments to the ODE solvers are restricted to
+data only expressions. These expressions must not contain variables
+other than those declared in the data or transformed data blocks.
+Ordinary Stan functions place no restriction on the origin of variables
+in their argument expressions.
+
+\section{Specifying an Ordinary Differential Equation as a Function}
+\label{functions-ode-function.section}
+
+A system of ODEs is specified as an ordinary function in Stan within
+the functions block. The ODE system function must have this function
+signature:
+%
+\begin{stancode}
+real[] ode(real time,
+           real[] state,
+           real[] theta,
+           real[] x_r,
+           int[] x_i)
+\end{stancode}
+%
+The ODE system function should return the derivative of the state
+with respect to time at the time provided. The length of the returned
+real array must match the length of the state input into the
+function.
+
+The arguments to this function are:
+\begin{itemize}
+\item \farg{time}, the time to evaluate the ODE system
+\item \farg{state}, the state of the ODE system at the time specified
+\item \farg{theta}, parameter values used to evaluate the ODE system
+\item \farg{x\_r}, data values used to evaluate the ODE system
+\item \farg{x\_i}, integer data values used to evaluate the ODE system.
+\end{itemize}
+%
+The ODE system function separates parameter values, \farg{theta}, from
+data values, \farg{x\_r}, for efficiency in computing the gradients of
+the ODE.
+
+\section{Non-Stiff Solver}
+
+\begin{description}
+  %
+  \fitemthreelines{real[]}{integrate\_ode\_rk45}%
+                  {function \farg{ode}, real[] \farg{initial\_state}}%
+                  {real \farg{initial\_time}, real[] \farg{times}}%
+                  {real[] \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
+                  {Solves the ODE system for the times provided
+                    using the Runge Kutta Dopri algorithm with the implementation
+                    from Boost.}
+ %
+ \fitemfourlines{real[]}{integrate\_ode\_rk45}%
+                {function \farg{ode}, real[] \farg{initial\_state}}%
+                {real \farg{initial\_time}, real[] \farg{times}}%
+                {real[] \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
+                {real \farg{rel\_tol}, real \farg{abs\_tol}, int \farg{max\_num\_steps}}%
+                {Solves the ODE system for the times provided using the Runge Kutta
+                  Dopri algorithm with the implementation from Boost with
+                  additional control parameters for the solver.}
+ %
+ \fitemthreelines{real[]}{integrate\_ode}%
+                 {function \farg{ode}, real[] \farg{initial\_state}}%
+                 {real \farg{initial\_time}, real[] \farg{times}}%
+                 {real[] \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
+                 {Deprecated. Solves the ODE system for the times provided with a
+                   non-stiff solver.  This calls the Runge Kutta Dopri algorithm.}
+  %
+\end{description}
+
+
+\section{Stiff Solver}
+
+\begin{description}
+  %
+  \fitemthreelines{real[]}{integrate\_ode\_bdf}%
+                  {function \farg{ode}, real[] \farg{initial\_state}}%
+                  {real \farg{initial\_time}, real[] \farg{times}}%
+                  {real[] \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
+                  {Solves the ODE system for the times provided using the backward
+                    differentiation formula (BDF) method with the implementation from
+                    CVODES.}
+ %
+ \fitemfourlines{real[]}{integrate\_ode\_bdf}%
+                {function \farg{ode}, real[] \farg{initial\_state}}%
+                {real \farg{initial\_time}, real[] \farg{times}}%
+                {real[] \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
+                {real \farg{rel\_tol}, real \farg{abs\_tol}, int \farg{max\_num\_steps}}%
+                {Solves the ODE system for the times provided using the backward
+                  differentiation formula (BDF) method with the implementation from
+                  CVODES with additional control parameters for the CVODES solver.}
+  %
+\end{description}
+
+\subsection{Arguments to the ODE Solvers}
+
+The arguments to the ODE solvers are as follows:
+%
+\begin{enumerate}
+\item \farg{ode}: function literal referring to a function specifying
+  the system of differential equations with signature described in
+  \refsection{functions-ode-function}:
+  \begin{quote}
+    (real,real[],real[],real[],int[]):real[]
+  \end{quote}
+  The arguments represent (1) time, (2) system state, (3) parameters,
+  (4) real data, and (5) integer data, and the return value contains the
+  derivatives with respect to time of the state,
+\item \farg{initial\_state}: initial state, type \code{real[]},
+\item \farg{initial\_time}: initial time, type \code{int} or \code{real}, data only,
+\item \farg{times}: solution times, type \code{real[]}, data only,
+\item \farg{theta}: parameters, type \code{real[]},
+\item \farg{x\_r}: real data, type \code{real[]}, data only, and
+\item \farg{x\_i}: integer data, type \code{int[]}, data only.
+\end{enumerate}
+
+For more fine-grained control of the ODE solvers, these parameters can
+also be provided:
+\begin{enumerate}
+  \addtocounter{enumi}{7}
+\item \farg{rel\_tol}: relative tolerance for the ODE
+  solver, type \code{real}, data only,
+\item \farg{abs\_tol}: absolute tolerance for the ODE
+  solver, type \code{real}, data only, and
+\item \farg{max\_num\_steps}: maximum number of steps to take in the
+  ODE solver, type \code{int}, data only.
+\end{enumerate}
+%
+
+\subsection{Return Values}
+
+The return value for the ODE solvers is an array of type
+\code{real[,]}, with values consisting of solutions at the specified
+times.
+
+\subsection{Sizes and Parallel Arrays}
+
+The sizes must match, and in particular, the following groups are of
+the same size:
+%
+\begin{itemize}
+\item state variables passed into the system function,
+  derivatives returned by the system function, initial state passed
+  into the solver, and rows of the return value of the solver,
+\item solution times and number of rows of the return value of the solver,
+\item parameters, real data and integer data passed to the solver will
+  be passed to the system function
+\end{itemize}
+%
+
+\subsection{Example}
+
+An example of a complete Stan program with a system definition and
+solver call is shown for data simulation in \reffigure{sho-sim} and
+estimation in \reffigure{sho-both}.
+
+
+
+
