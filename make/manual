@@ -39,5 +39,5 @@ $(STAN)src/docs/stan-reference/stan-functions.txt: $(STAN)src/docs/stan-referenc
 MANUAL_FLAGS=
 
 %.pdf: %.tex
-	cd $(dir $@); latexmk -pdf -pdflatex="pdflatex -file-line-error" -use-make $(notdir $^)
+	cd $(dir $@); latexmk -pdf -pdflatex="pdflatex -file-line-error -shell-escape" -use-make $(notdir $^)
 

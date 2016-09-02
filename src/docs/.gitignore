@@ -11,4 +11,4 @@
 *.synctex.gz
 stan-reference/stan-reference.pdf
 stan-reference/stan-functions.txt
-
+_minted*/

@@ -20,6 +20,7 @@
 % \usepackage{index}
 % \newindex{funs}{fdx}{fns}{Functions}
 
+\usepackage{minted}
 \usepackage[T1]{fontenc} % needed for |
 \usepackage{amsmath}
 \usepackage{xspace}
@@ -127,7 +128,6 @@
 \newcommand{\refnote}[1]{Footnote~\ref{#1.footnote}}
 \newcommand{\refequation}[1]{Equation~(\ref{#1.equation})}
 
-
 % \textwidth = 5in
 \newcommand{\fitem}[4]{\item[\begin{minipage}{4.9in}{\tt #1 {\bfseries #2}(#3)}\end{minipage}]\mbox{ }
   \\[-10pt] #4\index{{\tt\bfseries #2 }!{\tt (#3):\,#1}|hyperpage}}
@@ -214,7 +214,10 @@
 
 
 % environment for Stan code
-\DefineVerbatimEnvironment{stancode}{Verbatim}{fontsize=\small,xleftmargin=2em}
+%\DefineVerbatimEnvironment{stancode}{Verbatim}{fontsize=\small,xleftmargin=2em}
+%\usemintedstyle{bw}
+\usemintedstyle{friendly}
+\newminted{stan}{fontsize=\small,xleftmargin=2em}
 
 \raggedbottom
 
