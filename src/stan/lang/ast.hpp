@@ -163,6 +163,7 @@ namespace stan {
                const expr_type& arg_type7);
       void add_nullary(const::std::string& name);
       void add_unary(const::std::string& name);
+      void add_unary_vectorized(const::std::string& name);
       void add_binary(const::std::string& name);
       void add_ternary(const::std::string& name);
       void add_quaternary(const::std::string& name);
