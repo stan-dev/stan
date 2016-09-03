@@ -78,7 +78,7 @@ namespace stan {
 
     void validate_double_expr::operator()(const expression& expr,
                               bool& pass,
-                              std::stringstream& error_msgs) 
+                              std::stringstream& error_msgs)
       const {
       if (!expr.expression_type().is_primitive_double()
           && !expr.expression_type().is_primitive_int()) {
@@ -2191,7 +2191,7 @@ namespace stan {
                    << " definition specifies "
                    <<  decl_type.num_dims()
                    << ", declaration specifies "
-                   << def_type.num_dims() ;
+                   << def_type.num_dims();
         pass = false;
       }
       return;

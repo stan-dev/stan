@@ -1407,10 +1407,10 @@ namespace stan {
 
     row_vector_var_decl::row_vector_var_decl() : base_var_decl(ROW_VECTOR_T) { }
     row_vector_var_decl::row_vector_var_decl(range const& range,
-                                             expression const& N,
-                                             std::string const& name,
-                                             std::vector<expression> const& dims,
-                                             expression const& def)
+                                           expression const& N,
+                                           std::string const& name,
+                                           std::vector<expression> const& dims,
+                                           expression const& def)
       : base_var_decl(name, dims, ROW_VECTOR_T, def),
         range_(range),
         N_(N) {
@@ -1418,16 +1418,16 @@ namespace stan {
 
     matrix_var_decl::matrix_var_decl() : base_var_decl(MATRIX_T) { }
     matrix_var_decl::matrix_var_decl(range const& range,
-                      expression const& M,
-                      expression const& N,
-                      std::string const& name,
-                      std::vector<expression> const& dims)
-        : base_var_decl(name, dims, MATRIX_T),
-          range_(range),
-          M_(M),
-          N_(N) {
+                                     expression const& M,
+                                     expression const& N,
+                                     std::string const& name,
+                                     std::vector<expression> const& dims,
+                                     expression const& def)
+      : base_var_decl(name, dims, MATRIX_T, def),
+        range_(range),
+        M_(M),
+        N_(N) {
     }
-
 
     cholesky_factor_var_decl::cholesky_factor_var_decl()
       : base_var_decl(MATRIX_T) {
@@ -1580,36 +1580,39 @@ namespace stan {
       const {
       return x.dims_;
     }
-    std::vector<expression> var_decl_dims_vis::operator()(const double_var_decl& x)
-      const {
-      return x.dims_;
-    }
-    std::vector<expression> var_decl_dims_vis::operator()(const vector_var_decl& x)
-      const {
-      return x.dims_;
-    }
     std::vector<expression> var_decl_dims_vis::operator()(
-                                    const row_vector_var_decl& x) const {
-      return x.dims_;
-    }
-    std::vector<expression> var_decl_dims_vis::operator()(const matrix_var_decl& x)
+                                          const double_var_decl& x)
       const {
       return x.dims_;
     }
     std::vector<expression> var_decl_dims_vis::operator()(
-                                    const unit_vector_var_decl& x) const {
+                                          const vector_var_decl& x)
+      const {
       return x.dims_;
     }
     std::vector<expression> var_decl_dims_vis::operator()(
-                                     const simplex_var_decl& x) const {
+                                          const row_vector_var_decl& x) const {
       return x.dims_;
     }
     std::vector<expression> var_decl_dims_vis::operator()(
-                                     const ordered_var_decl& x) const {
+                                          const matrix_var_decl& x)
+      const {
       return x.dims_;
     }
     std::vector<expression> var_decl_dims_vis::operator()(
-                             const positive_ordered_var_decl& x) const {
+                                          const unit_vector_var_decl& x) const {
+      return x.dims_;
+    }
+    std::vector<expression> var_decl_dims_vis::operator()(
+                                          const simplex_var_decl& x) const {
+      return x.dims_;
+    }
+    std::vector<expression> var_decl_dims_vis::operator()(
+                                          const ordered_var_decl& x) const {
+      return x.dims_;
+    }
+    std::vector<expression> var_decl_dims_vis::operator()(
+                                     const positive_ordered_var_decl& x) const {
       return x.dims_;
     }
     std::vector<expression> var_decl_dims_vis::operator()(
@@ -1777,15 +1780,15 @@ namespace stan {
     std::vector<expression> var_decl::dims() const {
       return boost::apply_visitor(var_decl_dims_vis(), decl_);
     }
-    
+
     bool var_decl::has_def() const {
       return boost::apply_visitor(var_decl_has_def_vis(), decl_);
     }
-    
+
     expression var_decl::def() const {
       return boost::apply_visitor(var_decl_def_vis(), decl_);
     }
-    
+
     statement::statement() : statement_(nil()) { }
 
     statement::statement(const statement_t& st) : statement_(st) { }

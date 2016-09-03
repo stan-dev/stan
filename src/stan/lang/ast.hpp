@@ -673,7 +673,8 @@ namespace stan {
                       expression const& M,
                       expression const& N,
                       std::string const& name,
-                      std::vector<expression> const& dims);
+                      std::vector<expression> const& dims,
+                      expression const& def);
     };
 
     struct cholesky_factor_var_decl : public base_var_decl {
@@ -760,8 +761,10 @@ namespace stan {
       std::vector<expression> operator()(const simplex_var_decl& x) const;
       std::vector<expression> operator()(const unit_vector_var_decl& x) const;
       std::vector<expression> operator()(const ordered_var_decl& x) const;
-      std::vector<expression> operator()(const positive_ordered_var_decl& x) const;
-      std::vector<expression> operator()(const cholesky_factor_var_decl& x) const;
+      std::vector<expression> operator()(
+                                  const positive_ordered_var_decl& x) const;
+      std::vector<expression> operator()(
+                                  const cholesky_factor_var_decl& x) const;
       std::vector<expression> operator()(const cholesky_corr_var_decl& x) const;
       std::vector<expression> operator()(const cov_matrix_var_decl& x) const;
       std::vector<expression> operator()(const corr_matrix_var_decl& x) const;
@@ -804,7 +807,7 @@ namespace stan {
       expression operator()(const cov_matrix_var_decl& x) const;
       expression operator()(const corr_matrix_var_decl& x) const;
     };
-    
+
     struct var_decl {
       typedef boost::variant<boost::recursive_wrapper<nil>,
                          boost::recursive_wrapper<int_var_decl>,

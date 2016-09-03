@@ -774,8 +774,8 @@ namespace stan {
       void operator()(const expression& expr, bool& pass,
                       std::stringstream& error_msgs) const;
     };
-    extern boost::phoenix::function<validate_double_expr> validate_double_expr_f;
-    
+    extern boost::phoenix::function<validate_double_expr>
+    validate_double_expr_f;
 
     struct set_double_range_lower : public phoenix_functor_quaternary {
       void operator()(range& range, const expression& expr, bool& pass,

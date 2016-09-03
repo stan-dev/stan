@@ -57,7 +57,7 @@ namespace stan {
                               std::vector<expression>(var_origin),
                               whitespace_grammar<Iterator> >
       dims_r;
-      
+
       boost::spirit::qi::rule<Iterator,
                               double_var_decl(var_origin),
                               whitespace_grammar<Iterator> >

@@ -162,7 +162,7 @@ namespace stan {
         > eps
           [validate_decl_constraints_f(_r1, _a, _val, _pass,
                                        boost::phoenix::ref(error_msgs_)),
-           validate_definition_f(_r2, _val, _pass, 
+           validate_definition_f(_r2, _val, _pass,
                                  boost::phoenix::ref(error_msgs_))]
         > lit(';');
 
@@ -345,7 +345,7 @@ namespace stan {
       def_r
         %= lit('=')
         > (expression_g(_r1));
-      
+
       range_brackets_int_r.name("integer range expression pair, brackets");
       range_brackets_int_r
         = lit('<') [empty_range_f(_val, boost::phoenix::ref(error_msgs_))]
