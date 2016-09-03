@@ -3,7 +3,7 @@
 
 #include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <stan/math/prim/scal/fun/log_sum_exp.hpp>
+#include <stan/math/prim/scal.hpp>
 #include <stan/mcmc/hmc/base_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 #include <algorithm>
@@ -105,11 +105,6 @@ namespace stan {
 
           // Sample from an accepted subtree
           ++(this->depth_);
-
-          double accept_prob
-            = std::exp(log_sum_weight_subtree - log_sum_weight);
-          if (this->rand_uniform_() < accept_prob)
-            z_sample = z_propose;
 
           if (log_sum_weight_subtree > log_sum_weight) {
             z_sample = z_propose;

@@ -372,22 +372,16 @@ namespace stan {
 
 
       void operator()(const conditional_op& expr) const {
-        bool types_prim_match = (expr.type_.is_primitive()
-                                 && expr.type_.base_type_ == INT_T)
-          || (expr.type_.is_primitive()
+        bool types_prim_match
+          = (expr.type_.is_primitive() && expr.type_.base_type_ == INT_T)
+          || (!expr.has_var_ && expr.type_.is_primitive()
               && (expr.true_val_.expression_type()
                   == expr.false_val_.expression_type()));
-        bool types_prim_mismatch = !types_prim_match
-          && expr.type_.is_primitive();
         o_ << "(";
         boost::apply_visitor(*this, expr.cond_.expr_);
         o_ << " ? ";
         if (types_prim_match) {
           boost::apply_visitor(*this, expr.true_val_.expr_);
-        } else if (types_prim_mismatch) {
-          o_ << "double(";
-          boost::apply_visitor(*this, expr.true_val_.expr_);
-          o_ << ")";
         } else {
           o_ << "stan::math::promote_scalar<"
           << (is_var_ ? "T__" : "double")
@@ -398,10 +392,6 @@ namespace stan {
         o_ << " : ";
         if (types_prim_match) {
           boost::apply_visitor(*this, expr.false_val_.expr_);
-        } else if (types_prim_mismatch) {
-          o_ << "double(";
-          boost::apply_visitor(*this, expr.false_val_.expr_);
-          o_ << ")";
         } else {
           o_ << "stan::math::promote_scalar<"
              << (is_var_ ? "T__" : "double")
@@ -2162,6 +2152,10 @@ namespace stan {
         generate_indent(indent_, o_);
         o_ << "}" << EOL;
       }
+      void operator()(const break_continue_statement& st) const {
+        generate_indent(indent_, o_);
+        o_ << st.generate_ << ";" << EOL;
+      }
       void operator()(const conditional_statement& x) const {
         for (size_t i = 0; i < x.conditions_.size(); ++i) {
           if (i == 0)
@@ -2204,6 +2198,9 @@ namespace stan {
       bool operator()(const for_statement& st) const  { return true; }
       bool operator()(const conditional_statement& st) const { return true; }
       bool operator()(const while_statement& st) const { return true; }
+      bool operator()(const break_continue_statement& st) const {
+        return true;
+      }
       bool operator()(const print_statement& st) const { return true; }
       bool operator()(const reject_statement& st) const { return true; }
       bool operator()(const no_op_statement& st) const { return true; }
@@ -3111,13 +3108,31 @@ namespace stan {
     void generate_constructor(const program& prog,
                               const std::string& model_name,
                               std::ostream& o) {
+      // constructor without RNG or template parameter
+      // FIXME(carpenter): remove this and only call full ctor
       o << INDENT << model_name << "(stan::io::var_context& context__," << EOL;
-      o << INDENT << "    std::ostream* pstream__ = 0)"
-        << EOL;
-      o << INDENT2 << ": prob_grad(0) {"
-        << EOL;  // resize 0 with var_resizing
-      o << INDENT2 << "current_statement_begin__ = -1;"
-        << EOL2;
+      o << INDENT << "    std::ostream* pstream__ = 0)" << EOL;
+      o << INDENT2 << ": prob_grad(0) {" << EOL;
+      o << INDENT2 << "typedef boost::ecuyer1988 rng_t;" << EOL;
+      o << INDENT2 << "rng_t base_rng(0);  // 0 seed default" << EOL;
+      o << INDENT2 << "ctor_body(context__, base_rng, pstream__);" << EOL;
+      o << INDENT << "}" << EOL2;
+
+      // constructor with specified RNG
+      o << INDENT << "template <class RNG>" << EOL;
+      o << INDENT << model_name << "(stan::io::var_context& context__," << EOL;
+      o << INDENT << "    RNG& base_rng__," << EOL;
+      o << INDENT << "    std::ostream* pstream__ = 0)" << EOL;
+      o << INDENT2 << ": prob_grad(0) {" << EOL;
+      o << INDENT2 << "ctor_body(context__, base_rng__, pstream__);" << EOL;
+      o << INDENT << "}" << EOL2;
+
+      // body of constructor now in function
+      o << INDENT << "template <class RNG>" << EOL;
+      o << INDENT << "void ctor_body(stan::io::var_context& context__," << EOL;
+      o << INDENT << "               RNG& base_rng__," << EOL;
+      o << INDENT << "               std::ostream* pstream__) {" << EOL;
+      o << INDENT2 << "current_statement_begin__ = -1;" << EOL2;
       o << INDENT2 << "static const char* function__ = \""
         << model_name << "_namespace::" << model_name << "\";" << EOL;
       suppress_warning(INDENT2, "function__", o);
@@ -4483,13 +4498,6 @@ namespace stan {
         if (fun.arg_decls_[i].arg_type_.base_type_ != INT_T)
           return false;
       return true;
-    }
-
-    std::string cond_op_scalar_type(const conditional_op& expr,
-                                bool is_data_origin) {
-      std::stringstream ss;
-      ss << "double";
-      return ss.str();
     }
 
     std::string fun_scalar_type(const function_decl_def& fun,

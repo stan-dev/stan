@@ -204,9 +204,10 @@ namespace stan {
 
 
     // called from: expression_grammar
-    struct validate_conditional_op : public phoenix_functor_ternary {
+    struct validate_conditional_op : public phoenix_functor_quaternary {
       void operator()(conditional_op& cond_expr,
                       bool& pass,
+                      const variable_map& var_map,
                       std::ostream& error_msgs) const;
     };
     extern boost::phoenix::function<validate_conditional_op>
@@ -326,6 +327,14 @@ namespace stan {
     };
     extern boost::phoenix::function<validate_int_expr_silent>
     validate_int_expr_silent_f;
+
+    // called from: term_grammar
+    struct validate_int_expression_warn : public phoenix_functor_ternary {
+      void operator()(const expression & e, bool& pass,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<validate_int_expression_warn>
+    validate_int_expression_warn_f;
 
     // called from: indexes_grammar
     struct validate_ints_expression : public phoenix_functor_ternary {
@@ -648,6 +657,11 @@ namespace stan {
     };
     extern boost::phoenix::function<set_var_type> set_var_type_f;
 
+    struct require_vbar : public phoenix_functor_binary {
+      void operator()(bool& pass, std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<require_vbar> require_vbar_f;
+
     struct validate_no_constraints_vis : public boost::static_visitor<bool> {
       std::stringstream& error_msgs_;
       explicit validate_no_constraints_vis(std::stringstream& error_msgs);
@@ -785,6 +799,11 @@ namespace stan {
         const;
     };
     extern boost::phoenix::function<add_var> add_var_f;
+
+    struct validate_in_loop : public phoenix_functor_ternary {
+      void operator()(bool in_loop, bool& pass, std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<validate_in_loop> validate_in_loop_f;
 
   }
 }

@@ -1,5 +1,6 @@
 data { 
   int d_int;
+  real d_real;
   matrix[d_int,d_int] d_matrix;
   row_vector[d_int] d_row_vector;
   vector[d_int] d_vector;
@@ -14,9 +15,11 @@ transformed data {
   transformed_data_matrix <- append_row(d_matrix, d_row_vector);
   transformed_data_matrix <- append_row(d_row_vector, d_row_vector);
   transformed_data_vector <- append_row(d_vector, d_vector);
+  transformed_data_vector <- append_row(d_real, d_vector);
+  transformed_data_vector <- append_row(d_vector, d_real);
 }
 parameters {
-  real y_p;
+  real p_real;
   matrix[d_int,d_int] p_matrix;
   row_vector[d_int] p_row_vector;
   vector[d_int] p_vector;
@@ -49,7 +52,17 @@ transformed parameters {
   transformed_param_vector <- append_row(d_vector, p_vector);
   transformed_param_vector <- append_row(p_vector, p_vector);
   transformed_param_vector <- append_row(d_vector, d_vector);
+  
+  transformed_param_vector <- append_row(p_real, d_vector);
+  transformed_param_vector <- append_row(d_real, p_vector);
+  transformed_param_vector <- append_row(p_real, p_vector);
+  transformed_param_vector <- append_row(d_real, d_vector);  
+  
+  transformed_param_vector <- append_row(p_vector, p_real);
+  transformed_param_vector <- append_row(d_vector, p_real);
+  transformed_param_vector <- append_row(p_vector, d_real);
+  transformed_param_vector <- append_row(d_vector, d_real);
 }
 model {  
-  y_p ~ normal(0,1);
+  p_real ~ normal(0,1);
 }

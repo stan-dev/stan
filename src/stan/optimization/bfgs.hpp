@@ -1,8 +1,7 @@
 #ifndef STAN_OPTIMIZATION_BFGS_HPP
 #define STAN_OPTIMIZATION_BFGS_HPP
 
-#include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/math/prim/mat/meta/index_type.hpp>
+#include <stan/math/prim/mat.hpp>
 #include <stan/model/util.hpp>
 #include <stan/optimization/bfgs_linesearch.hpp>
 #include <stan/optimization/bfgs_update.hpp>

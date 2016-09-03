@@ -186,6 +186,8 @@ add("append_col", MATRIX_T, VECTOR_T, MATRIX_T);
 add("append_col", MATRIX_T, MATRIX_T, VECTOR_T);
 add("append_col", MATRIX_T, VECTOR_T, VECTOR_T);
 add("append_col", ROW_VECTOR_T, ROW_VECTOR_T, ROW_VECTOR_T);
+add("append_col", ROW_VECTOR_T, DOUBLE_T, ROW_VECTOR_T);
+add("append_col", ROW_VECTOR_T, ROW_VECTOR_T, DOUBLE_T);
 add_unary("cbrt");
 add_unary("ceil");
 for (size_t i = 0; i < vector_types.size(); ++i) {
@@ -220,6 +222,12 @@ add("columns_dot_self", ROW_VECTOR_T, ROW_VECTOR_T);
 add("columns_dot_self", ROW_VECTOR_T, MATRIX_T);
 add_unary("cos");
 add_unary("cosh");
+add("cov_exp_quad", MATRIX_T, expr_type(DOUBLE_T, 1U), DOUBLE_T, DOUBLE_T);
+add("cov_exp_quad", MATRIX_T, expr_type(VECTOR_T, 1U), DOUBLE_T, DOUBLE_T);
+add("cov_exp_quad", MATRIX_T, expr_type(ROW_VECTOR_T, 1U), DOUBLE_T, DOUBLE_T);
+add("cov_exp_quad", MATRIX_T, expr_type(DOUBLE_T, 1U), expr_type(DOUBLE_T, 1U), DOUBLE_T, DOUBLE_T);
+add("cov_exp_quad", MATRIX_T, expr_type(VECTOR_T, 1U), expr_type(VECTOR_T, 1U), DOUBLE_T, DOUBLE_T);
+add("cov_exp_quad", MATRIX_T, expr_type(ROW_VECTOR_T, 1U), expr_type(ROW_VECTOR_T, 1U), DOUBLE_T, DOUBLE_T);
 add("crossprod", MATRIX_T, MATRIX_T);
 add("csr_matrix_times_vector",VECTOR_T, INT_T, INT_T,
           VECTOR_T, expr_type(INT_T, 1U), expr_type(INT_T, 1U), VECTOR_T);
@@ -604,9 +612,13 @@ add("max", DOUBLE_T, MATRIX_T);
 add("max", INT_T, INT_T, INT_T);
 add("mdivide_left", VECTOR_T, MATRIX_T, VECTOR_T);
 add("mdivide_left", MATRIX_T, MATRIX_T, MATRIX_T);
+add("mdivide_left_spd", VECTOR_T, MATRIX_T, VECTOR_T);
+add("mdivide_left_spd", MATRIX_T, MATRIX_T, MATRIX_T);
 add("mdivide_left_tri_low", MATRIX_T, MATRIX_T, MATRIX_T);
 add("mdivide_left_tri_low", VECTOR_T, MATRIX_T, VECTOR_T);
 add("mdivide_right", ROW_VECTOR_T, ROW_VECTOR_T, MATRIX_T);
+add("mdivide_right_spd", MATRIX_T, MATRIX_T, MATRIX_T);
+add("mdivide_right_spd", ROW_VECTOR_T, ROW_VECTOR_T, MATRIX_T);
 add("mdivide_right", MATRIX_T, MATRIX_T, MATRIX_T);
 add("mdivide_right_tri_low", ROW_VECTOR_T, ROW_VECTOR_T, MATRIX_T);
 add("mdivide_right_tri_low", MATRIX_T, MATRIX_T, MATRIX_T);
@@ -829,13 +841,13 @@ for (size_t i = 0; i < int_vector_types.size(); ++i) {
     add("poisson_log", DOUBLE_T, int_vector_types[i],
 	vector_types[j]);
     add("poisson_lccdf", DOUBLE_T, int_vector_types[i],
-	vector_types[j]);
+    	vector_types[j]);
     add("poisson_lcdf", DOUBLE_T, int_vector_types[i],
-	vector_types[j]);
+    	vector_types[j]);
     add("poisson_lpmf", DOUBLE_T, int_vector_types[i],
-	vector_types[j]);
+    	vector_types[j]);
   }
- }
+}
 add("poisson_rng", INT_T, DOUBLE_T);
 for (size_t i = 0; i < int_vector_types.size(); ++i) {
   for (size_t j = 0; j < vector_types.size(); ++j) {
@@ -880,6 +892,8 @@ add("append_row", MATRIX_T, ROW_VECTOR_T, MATRIX_T);
 add("append_row", MATRIX_T, MATRIX_T, ROW_VECTOR_T);
 add("append_row", MATRIX_T, ROW_VECTOR_T, ROW_VECTOR_T);
 add("append_row", VECTOR_T, VECTOR_T, VECTOR_T);
+add("append_row", VECTOR_T, DOUBLE_T, VECTOR_T);
+add("append_row", VECTOR_T, VECTOR_T, DOUBLE_T);
 for (size_t i = 0; i < base_types.size(); ++i) {
   add("rep_array", expr_type(base_types[i], 1), base_types[i], INT_T);
   add("rep_array", expr_type(base_types[i], 2), base_types[i], INT_T, INT_T);
@@ -998,6 +1012,7 @@ add("sort_indices_desc", expr_type(INT_T, 1),
     expr_type(DOUBLE_T, 1));
 add("sort_indices_desc", expr_type(INT_T, 1), VECTOR_T);
 add("sort_indices_desc", expr_type(INT_T, 1), ROW_VECTOR_T);
+add("squared_distance", DOUBLE_T, DOUBLE_T, DOUBLE_T);
 add("squared_distance", DOUBLE_T, VECTOR_T, VECTOR_T);
 add("squared_distance", DOUBLE_T, ROW_VECTOR_T, ROW_VECTOR_T);
 add("squared_distance", DOUBLE_T, VECTOR_T, ROW_VECTOR_T);

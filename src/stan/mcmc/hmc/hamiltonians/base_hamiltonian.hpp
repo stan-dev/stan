@@ -2,8 +2,8 @@
 #define STAN_MCMC_HMC_HAMILTONIANS_BASE_HAMILTONIAN_HPP
 
 #include <stan/interface_callbacks/writer/base_writer.hpp>
-#include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/model/util.hpp>
+#include <Eigen/Dense>
 #include <iostream>
 #include <limits>
 #include <stdexcept>
@@ -112,16 +112,15 @@ namespace stan {
 
       void write_error_msg_(const std::exception& e,
                             interface_callbacks::writer::base_writer& writer) {
-        writer();
         writer("Informational Message: The current Metropolis proposal "
                "is about to be rejected because of the following issue:");
         writer(e.what());
         writer("If this warning occurs sporadically, such as for highly "
                "constrained variable types like covariance matrices, then "
                "the sampler is fine,");
-        writer();
         writer("but if this warning occurs often then your model may be "
                "either severely ill-conditioned or misspecified.");
+        writer();
       }
     };
 

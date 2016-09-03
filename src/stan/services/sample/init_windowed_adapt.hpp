@@ -4,8 +4,8 @@
 #include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/services/arguments/categorical_argument.hpp>
-#include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/services/sample/init_adapt.hpp>
+#include <Eigen/Dense>
 #include <ostream>
 
 namespace stan {

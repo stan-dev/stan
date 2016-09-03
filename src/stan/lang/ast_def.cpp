@@ -166,9 +166,8 @@ namespace stan {
                                               name_sig) {
       return user_defined_set_.find(name_sig) != user_defined_set_.end();
     }
-    bool
-    function_signatures::is_defined(const std::string& name,
-                                    const function_signature_t& sig) {
+    bool function_signatures::is_defined(const std::string& name,
+                                         const function_signature_t& sig) {
       if (sigs_map_.find(name) == sigs_map_.end())
         return false;
       const std::vector<function_signature_t> sigs = sigs_map_[name];
@@ -177,6 +176,7 @@ namespace stan {
           return true;
       return false;
     }
+
     void function_signatures::add(const std::string& name,
                                    const expr_type& result_type,
                                    const std::vector<expr_type>& arg_types) {
@@ -487,7 +487,6 @@ namespace stan {
         }
         error_msgs << std::endl;
       }
-
       return expr_type();  // ill-formed dummy
     }
 
@@ -495,13 +494,27 @@ namespace stan {
 #include <stan/lang/function_signatures.h>  // NOLINT
     }
 
-    std::set<std::string>
-    function_signatures::key_set() const {
+    bool function_signatures::has_user_defined_key(const std::string& key)
+      const {
+      using std::pair;
+      using std::set;
+      using std::string;
+      for (set<pair<string, function_signature_t> >::const_iterator
+             it = user_defined_set_.begin();
+           it != user_defined_set_.end();
+           ++it) {
+        if (it->first == key)
+          return true;
+      }
+      return false;
+    }
+
+    std::set<std::string> function_signatures::key_set() const {
       using std::map;
       using std::set;
       using std::string;
       using std::vector;
-      set<std::string> result;
+      set<string> result;
       for (map<string, vector<function_signature_t> >::const_iterator
              it = sigs_map_.begin();
            it != sigs_map_.end();
@@ -616,6 +629,15 @@ namespace stan {
     bool returns_type_vis::operator()(const while_statement& st) const  {
       // body must end in appropriate return
       return returns_type(return_type_, st.body_, error_msgs_);
+    }
+    bool returns_type_vis::operator()(const break_continue_statement& st)
+      const  {
+      // break/continue OK only as end of nested loop in void return
+      bool pass = (return_type_ == VOID_T);
+      if (!pass)
+        error_msgs_ << "statement " << st.generate_
+                    << " does not match return type";
+      return pass;
     }
     bool returns_type_vis::operator()(const
                                       conditional_statement& st) const  {
@@ -1131,7 +1153,7 @@ namespace stan {
         true_val_(true_val),
         false_val_(false_val),
         type_(promote_primitive(true_val.expression_type(),
-                                  false_val.expression_type())) {
+                                false_val.expression_type())) {
     }
 
     binary_op::binary_op() { }
@@ -1778,6 +1800,8 @@ namespace stan {
     statement::statement(const expression& st) : statement_(st) { }
     statement::statement(const for_statement& st) : statement_(st) { }
     statement::statement(const while_statement& st) : statement_(st) { }
+    statement::statement(const break_continue_statement& st)
+      : statement_(st) { }
     statement::statement(const conditional_statement& st) : statement_(st) { }
     statement::statement(const print_statement& st) : statement_(st) { }
     statement::statement(const reject_statement& st) : statement_(st) { }
@@ -1817,6 +1841,11 @@ namespace stan {
     bool is_no_op_statement_vis::operator()(const while_statement& st) const {
       return false;
     }
+    bool
+    is_no_op_statement_vis::operator()(const break_continue_statement& st)
+      const {
+      return false;
+    }
     bool is_no_op_statement_vis::operator()(const print_statement& st) const {
       return false;
     }
@@ -1852,13 +1881,16 @@ namespace stan {
         statement_(stmt) {
     }
 
-    while_statement::while_statement() {
-    }
+    while_statement::while_statement() { }
     while_statement::while_statement(const expression& condition,
                                      const statement& body)
       : condition_(condition),
         body_(body) {
     }
+
+    break_continue_statement::break_continue_statement() { }
+    break_continue_statement::break_continue_statement(const std::string& s)
+      : generate_(s) { }
 
     conditional_statement::conditional_statement() {
     }

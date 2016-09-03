@@ -484,24 +484,6 @@ are primarily provided for compatibility with BUGS and JAGS.
 %
 \begin{description}
   %
-  \fitem{real}{if\_else}{int \farg{cond}, real \farg{x}, real \farg{y}}{
-    Returns \farg{x} if \farg{cond} is non-zero and \farg{y} otherwise.
-    Stan's \code{if\_else} function does not short circuit---it
-    always evaluates both arguments \farg{x} and \farg{y}.
-    \[
-    \mbox{if\_else}(cond,x,y) = 
-    \begin{cases}
-      x & \mbox{if } cond \neq 0 \\
-      y & \mbox{otherwise}
-    \end{cases}
-    \]
-    {\bfseries Warning:} This function should not be used.  Rather,
-    \code{if\_else(a,~b,~c)} should be replaced with the conditional
-    operator \code{a~?~b~:~c}.  The conditional operator also allows
-    more flexiblity in the types of \code{b} and \code{c}.  See
-    \refsection{conditional-operator} for full details of the
-    conditional operator.  }
-  %
   \fitem{real}{step}{real \farg{x}}{
     Returns 1 if \farg{x} is positive and 0 otherwise.
     \[
@@ -514,50 +496,14 @@ are primarily provided for compatibility with BUGS and JAGS.
   %
 \end{description}
 %
-Both of these are step-like functions; see the warning in
+The step function is often used in BUGS to perform conditional
+operations.  For instance, \code{step(a\,-\,b)} evaluates to 1 if
+\code{a} is greater than \code{b} and evaluates to 0 otherwise.
+\code{step} is a step-like functions; see the warning in
 \refsection{step-functions} applied to expressions dependent on
 parameters. 
 
-The step function is often used in BUGS to perform conditional
-operations.  For instance, \code{step(a\,-\,b)} evaluates to 1 if
-\code{a} is greater than {b} and evaluates to 0 otherwise.  In Stan,
-the expression \code{step(a\,-\,b)} is more naturally coded directly
-in terms of the comparison operator, \code{(a\,>\,b)}.  
 
-The log probability function and gradient evaluations are more
-efficient in Stan when implemented using conditional statements than
-with mulitplications by step functions.  For example, if \code{y} is a
-\code{real} variable, and \code{c}, \code{x1}, and \code{x2} are
-scalar expressions (type \code{real} or \code{int}), then the
-assignment statements
-%
-\begin{stancode}
-y = x1 * step(c) + x2 * (1 - step(c));
-\end{stancode}
-%
-and
-%
-\begin{stancode}
-y = if_else(c > 0, x1, x2);
-\end{stancode}
-%
-are more efficiently written with the conditional statement
-%
-\begin{stancode}
-if (c > 0)
-  y = x1;
-else
-  y = x2;
-\end{stancode}
-%
-The reason the functional versions are slower is that they evaluate
-all of their arguments; the step function approach is particularly
-slow as it also introduces arithmetic operations.  The overhead will
-be more noticeable if \code{c}, \code{x1} or \code{x2}
-are parameters (including transformed parameters and local variables
-that depend on parameters) or if \code{x1} and \code{x2} are
-complicated expressions rather than constants or simple variables.  
-%
 \begin{description}
   %
   \fitem{int}{is\_inf}{real \farg{x}}{
@@ -2637,6 +2583,14 @@ Stan's matrix concatenation operations \code{append\_col} and
   \farg{y}}{Combine row vectors \farg{x} and \farg{y} of any size into
   another row vector.}
 %
+\fitem{row\_vector}{append\_col}{real \farg{x}, row\_vector
+  \farg{y}}{Append \farg{x} to the front of \farg{y}, returning
+  another row vector.}
+%
+\fitem{row\_vector}{append\_col}{row\_vector \farg{x}, real \farg{y}}
+  {Append \farg{y} to the end of \farg{x}, returning
+  another row vector.}
+%
 \end{description}
 
 \subsubsection{Vertical concatenation}
@@ -2664,6 +2618,14 @@ Stan's matrix concatenation operations \code{append\_col} and
   \fitem{vector}{append\_row}{vector \farg{x}, vector
     \farg{y}}{Concatenate vectors \farg{x} and \farg{y} of any size into
     another vector.}
+%
+\fitem{vector}{append\_row}{real \farg{x}, vector
+  \farg{y}}{Append \farg{x} to the top of \farg{y}, returning
+  another vector.}
+%
+\fitem{vector}{append\_row}{vector \farg{x}, real \farg{y}}
+  {Append \farg{y} to the bottom of \farg{x}, returning
+  another vector.}
 %
 \end{description}
 
@@ -2735,8 +2697,60 @@ The cumulative sum of \farg{rv}}
 %
 \end{description}
 
+\section{Covariance Functions}\label{covariance.section}
 
+\subsection{Exponentiated quadratic covariance function}
 
+The exponentiated quadratic kernel defines the covariance between $f(x_i)$ and
+$f(x_j)$ where $f\colon \reals^D \mapsto \reals$ as a function of the squared
+Euclidian distance between $x_i \in \reals^D$ and $x_j \in \reals^D$:
+
+\[
+  \text{cov}(f(x_i), f(x_j)) = k(x_i, x_j) 
+= \sigma^2 
+\exp \left(
+	- \dfrac{1}{2l^2} \sum_{d=1}^D (x_{i,d} - x_{j,d})^2
+\right)
+\]
+
+\noindent with $\sigma$ and $l$ constrained to be positive.
+
+There are two variants of the exponentiated quadratic covariance function in
+Stan. One builds a covariance matrix, $K \in \reals^{N \times N}$ for $x_1,
+\dots, x_N$, where $K_{i,j} = k(x_i, x_j)$, which is necessarily symmetric and
+positive semidefinite by construction. There is a second variant of the
+exponentiated quadratic covariance function that builds a $K \in \reals^{N
+\times M}$ covariance matrix for $x_1, \dots, x_N$ and $x^\prime_1, \dots,
+x^\prime_M$, where $x_i \in \reals^D$ and $x^\prime_i \in \reals^D$ and
+$K_{i,j} = k(x_i, x^\prime_j)$.
+
+\begin{description}
+%
+\fitem{matrix}{cov\_exp\_quad}{row\_vectors \farg{x}, real \farg{sigma}, real
+\farg{l}}{ The covariance matrix with an exponentiated quadratic kernel of
+\farg{x}.}
+
+\fitem{matrix}{cov\_exp\_quad}{vectors \farg{x}, real \farg{sigma}, real
+\farg{l}}{ The covariance matrix with an exponentiated quadratic kernel of
+\farg{x}.}
+
+\fitem{matrix}{cov\_exp\_quad}{real[] \farg{x}, real \farg{sigma}, real
+\farg{l}}{ The covariance matrix with an exponentiated quadratic kernel of
+\farg{x}.}
+
+\fitemtwolines{matrix}{cov\_exp\_quad}{row\_vectors \farg{x1}, row\_vectors
+\farg{x2}}{real \farg{sigma}, real \farg{l}}{ The covariance matrix with an
+exponentiated quadratic kernel of \farg{x1} and \farg{x2}.}
+
+\fitemtwolines{matrix}{cov\_exp\_quad}{vectors \farg{x1}, vectors
+\farg{x2}}{real \farg{sigma}, real \farg{l}}{ The covariance matrix with an
+exponentiated quadratic kernel of \farg{x1} and \farg{x2}.}
+
+\fitemtwolines{matrix}{cov\_exp\_quad}{real[] \farg{x1}, real[]
+\farg{x2}}{real \farg{sigma}, real \farg{l}}{ The covariance matrix with an
+exponentiated quadratic kernel of \farg{x1} and \farg{x2}.}
+
+\end{description}
 
 \section{Linear Algebra Functions and Solvers}
 
@@ -2782,25 +2796,68 @@ the diagonal are ignored.
 
 \begin{description}
 %
-\fitem{row\_vector}{mdivide\_right\_tri\_low}{row\_vector \farg{B}, 
+\fitem{vector}{mdivide\_left\_tri\_low}{matrix \farg{A}, vector \farg{b}}{
+The left division of \farg{b} by a lower-triangular view of \farg{A};
+algebraically equivalent to the less efficient and stable form
+\code{inverse(tri(\farg{A})) * \farg{b}}, where \code{tri(\farg{A})}
+is the lower-triangular portion of \farg{A} with the above-diagonal
+entries set to zero.}
+%
+\fitem{matrix}{mdivide\_left\_tri\_low}{matrix \farg{A}, matrix \farg{B}}{
+The left division of \farg{B} by a triangular view of \farg{A};
+algebraically equivalent to the less efficient and stable form
+\code{inverse(tri(\farg{A})) * \farg{B}}, where \code{tri(\farg{A})}
+is the lower-triangular portion of \farg{A} with the above-diagonal
+entries set to zero.}
+%
+\fitem{row\_vector}{mdivide\_right\_tri\_low}{row\_vector \farg{b}, 
   matrix \farg{A}}{
-The right division of \farg{B} by \code{tri(\farg{A})}, a lower triangular
-view of \farg{A}; equivalently \code{\farg{B} * inverse(tri(\farg{A}))}}
+The right division of \farg{b} by a triangular view of 
+\farg{A};  algebraically equivalent to the less efficient and stable form
+\code{\farg{b} * inverse(tri(\farg{A}))},  where \code{tri(\farg{A})}
+is the lower-triangular portion of \farg{A} with the above-diagonal
+entries set to zero.}
 %
+\fitem{matrix}{mdivide\_right\_tri\_low}{matrix \farg{B}, matrix
+  \farg{A}}{
+The right division of \farg{B} by a triangular view of 
+\farg{A};  algebraically equivalent to the less efficient and stable form
+\code{\farg{B} * inverse(tri(\farg{A}))},  where \code{tri(\farg{A})}
+is the lower-triangular portion of \farg{A} with the above-diagonal
+entries set to zero.}
 %
-\fitem{matrix}{mdivide\_right\_tri\_low}{matrix \farg{B}, matrix \farg{A}}{
-The right division of \farg{B} by \code{tri(\farg{A})}, a lower triangular
-view of \farg{A}; equivalently \code{\farg{B} * inverse(tri(\farg{A}))}}
+\end{description}
+
+\subsection{Symmetric Positive-Definite Matrix-Division Functions}
+
+There are four division functions which are specialized for
+efficiency and stability for symmetric positive-definite matrix
+dividends.  If the matrix dividend argument is not symmetric and
+positive definite, these will reject and print warnings.
+
+\begin{description}
 %
-\fitem{vector}{mdivide\_left\_tri\_low}{matrix \farg{A}, vector \farg{B}}
-The left division of \farg{B} by a triangular view of
-\code{tri(\farg{A})}, a lower triangular view of \farg{A}; equivalently
-\code{inverse(tri(\farg{A})) * \farg{B}}
+\fitem{matrix}{mdivide\_left\_spd}{matrix \farg{A}, vector \farg{b}}{
+The left division of \farg{b} by the symmetric,
+positive-definite matrix \farg{A}; algebraically equivalent to the
+less efficient and stable form \code{inverse(\farg{A}) * \farg{b}}.}
 %
-\fitem{matrix}{mdivide\_left\_tri\_low}{matrix \farg{A}, matrix \farg{B}}
-The left division of \farg{B} by a triangular view of
-\code{tri(\farg{A})}, a lower triangular view of \farg{A}; equivalently
-\code{inverse(tri(\farg{A})) * \farg{B}}
+\fitem{vector}{mdivide\_left\_spd}{matrix \farg{A}, matrix \farg{B}}{
+The left division of \farg{B} by the symmetric,
+positive-definite matrix \farg{A}; algebraically equivalent to the
+less efficient and stable form \code{inverse(\farg{A}) * B}.}
+%
+\fitem{row\_vector}{mdivide\_right\_spd}{row\_vector \farg{b}, 
+  matrix \farg{A}}{
+The right division of \farg{b} by the symmetric, positive-definite
+matrix \farg{A};  algebraically equivalent to the less efficient
+and stable form \code{\farg{b} * inverse(\farg{A})}.}
+%
+\fitem{matrix}{mdivide\_right\_spd}{matrix \farg{B}, matrix \farg{A}}{
+The right division of \farg{B} by the symmetric, positive-definite
+matrix \farg{A};  algebraically equivalent to the less efficient
+and stable form \code{\farg{B} * inverse(\farg{A})}.}
+
 %
 \end{description}
 
