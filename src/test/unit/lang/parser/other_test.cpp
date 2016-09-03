@@ -104,6 +104,116 @@ TEST(lang_parser,parsable_test_bad_fun_name) {
                std::invalid_argument);
 }
 
+TEST(lang_parser,parsable_test_bad_cov_exp_quad_vec_rvec_data) {
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/lang/bad_cov_exp_quad_vec_rvec_data.stan"),
+               std::invalid_argument);
+}
+
+TEST(lang_parser,parsable_test_bad_cov_exp_quad_vec_arr_data) {
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/lang/bad_cov_exp_quad_vec_arr_data.stan"),
+               std::invalid_argument);
+}
+
+TEST(lang_parser,parsable_test_bad_cov_exp_quad_rvec_vec_data) {
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/lang/bad_cov_exp_quad_rvec_vec_data.stan"),
+               std::invalid_argument);
+}
+
+TEST(lang_parser,parsable_test_bad_cov_exp_quad_rvec_arr_data) {
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/lang/bad_cov_exp_quad_rvec_arr_data.stan"),
+               std::invalid_argument);
+}
+
+TEST(lang_parser,parsable_test_bad_cov_exp_quad_arr_vec_data) {
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/lang/bad_cov_exp_quad_arr_vec_data.stan"),
+               std::invalid_argument);
+}
+
+TEST(lang_parser,parsable_test_bad_cov_exp_quad_arr_rvec_data) {
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/lang/bad_cov_exp_quad_arr_rvec_data.stan"),
+               std::invalid_argument);
+}
+
+TEST(lang_parser,parsable_test_bad_cov_exp_quad_vec_rvec_param) {
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/lang/bad_cov_exp_quad_vec_rvec_param.stan"),
+               std::invalid_argument);
+}
+
+TEST(lang_parser,parsable_test_bad_cov_exp_quad_vec_arr_param) {
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/lang/bad_cov_exp_quad_vec_arr_param.stan"),
+               std::invalid_argument);
+}
+
+TEST(lang_parser,parsable_test_bad_cov_exp_quad_rvec_vec_param) {
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/lang/bad_cov_exp_quad_rvec_vec_param.stan"),
+               std::invalid_argument);
+}
+
+TEST(lang_parser,parsable_test_bad_cov_exp_quad_rvec_arr_param) {
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/lang/bad_cov_exp_quad_rvec_arr_param.stan"),
+               std::invalid_argument);
+}
+
+TEST(lang_parser,parsable_test_bad_cov_exp_quad_arr_vec_param) {
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/lang/bad_cov_exp_quad_arr_vec_param.stan"),
+               std::invalid_argument);
+}
+
+TEST(lang_parser,parsable_test_bad_cov_exp_quad_arr_rvec_param) {
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/lang/bad_cov_exp_quad_arr_rvec_param.stan"),
+               std::invalid_argument);
+}
+
+TEST(lang_parser,parsable_test_bad_cov_exp_quad_vec_data) {
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/lang/bad_cov_exp_quad_vec_data.stan"),
+               std::invalid_argument);
+}
+
+TEST(lang_parser,parsable_test_bad_cov_exp_quad_rvec_data) {
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/lang/bad_cov_exp_quad_rvec_data.stan"),
+               std::invalid_argument);
+}
+
+TEST(lang_parser,parsable_test_bad_cov_exp_quad_sigma_data) {
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/lang/bad_cov_exp_quad_sigma_data.stan"),
+               std::invalid_argument);
+}
+
+TEST(lang_parser,parsable_test_bad_cov_exp_quad_len_data) {
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/lang/bad_cov_exp_quad_len_data.stan"),
+               std::invalid_argument);
+}
+
+TEST(lang_parser,parsable_test_bad_cov_exp_quad_sigma_param) {
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/lang/bad_cov_exp_quad_sigma_param.stan"),
+               std::invalid_argument);
+}
+
+TEST(lang_parser,parsable_test_bad_cov_exp_quad_len_param) {
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/lang/bad_cov_exp_quad_len_param.stan"),
+               std::invalid_argument);
+}
+
+TEST(lang_parser,parsable_test_bad_cov_exp_quad_sigma_vec_param) {
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/lang/bad_cov_exp_quad_sigma_vec_param.stan"),
+               std::invalid_argument);
+}
+
+TEST(lang_parser,parsable_test_bad_cov_exp_quad_len_vec_param) {
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/lang/bad_cov_exp_quad_len_vec_param.stan"),
+               std::invalid_argument);
+}
+
+TEST(lang_parser,parsable_test_bad_cov_exp_quad_sigma_rvec_param) {
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/lang/bad_cov_exp_quad_sigma_rvec_param.stan"),
+               std::invalid_argument);
+}
+
+TEST(lang_parser,parsable_test_bad_cov_exp_quad_len_rvec_param) {
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/lang/bad_cov_exp_quad_len_rvec_param.stan"),
+               std::invalid_argument);
+}
+
 TEST(lang_parser,parsable_test_good_fun_name) {
   EXPECT_TRUE(is_parsable("src/test/test-models/bad/lang/good_fun_name.stan"));
 }

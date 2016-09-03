@@ -1,7 +1,7 @@
 #ifndef STAN__MCMC__MOCK__HMC__BETA
 #define STAN__MCMC__MOCK__HMC__BETA
 
-#include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/math/prim/mat.hpp>
 #include <stan/model/prob_grad.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 #include <stan/mcmc/hmc/hamiltonians/base_hamiltonian.hpp>

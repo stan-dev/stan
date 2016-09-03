@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <vector>
 #include <stan/model/indexing/lvalue.hpp>
-#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/mat.hpp>
 #include <gtest/gtest.h>
 
 using stan::model::nil_index_list;

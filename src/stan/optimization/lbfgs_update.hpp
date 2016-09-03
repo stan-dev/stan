@@ -1,7 +1,7 @@
 #ifndef STAN_OPTIMIZATION_LBFGS_UPDATE_HPP
 #define STAN_OPTIMIZATION_LBFGS_UPDATE_HPP
 
-#include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <Eigen/Dense>
 #include <boost/tuple/tuple.hpp>
 #include <boost/circular_buffer.hpp>
 #include <vector>
