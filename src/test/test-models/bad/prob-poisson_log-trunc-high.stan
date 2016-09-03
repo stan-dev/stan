@@ -8,7 +8,5 @@ parameters {
   real alpha;
 }
 model {
-  n ~ poisson_log(alpha) T[L, ];
   n ~ poisson_log(alpha) T[, U];
-  n ~ poisson_log(alpha) T[L, U];
 }
