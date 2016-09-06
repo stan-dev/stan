@@ -680,12 +680,6 @@ namespace stan {
                                  const expression& type_arg1 = expression(),
                                  const expression& type_arg2 = expression(),
                                  const expression& definition = expression()) {
-      std::cout << " generate_initialization: " << var_name
-                << " type: " << base_type
-                << " dims size: " << dims.size()
-                << " def: " << definition.expression_type()
-                << std::endl;
-
       // validate all dims are positive
       for (size_t i = 0; i < dims.size(); ++i)
         generate_validate_positive(var_name, dims[i], o);
@@ -700,13 +694,6 @@ namespace stan {
           << var_name << " = ";
         generate_type(base_type, dims, dims.size(), o);
         generate_initializer(o, base_type, dims, type_arg1, type_arg2);
-      } else {
-        o << INDENT2
-          << "stan::math::assign("
-          << var_name
-          << ", ";
-        generate_expression(definition, o);
-        o << ");" << EOL;
       }
     }
 
@@ -1044,11 +1031,7 @@ namespace stan {
         << "> in__(params_r__,params_i__);" << EOL2;
       init_local_var_visgen vis_init(declare_vars, is_var, o);
       for (size_t i = 0; i < vs.size(); ++i) {
-        if (vs[i].has_def()) {
-          generate_comment("assign definition", 2, o);
-        } else {
           boost::apply_visitor(vis_init, vs[i].decl_);
-        }
       }
     }
 
@@ -1482,16 +1465,8 @@ namespace stan {
         o_ << ' '  << name;
         if (is_nil(definition)) {
           generate_init_args(type, ctor_args, dims, 0);
-          o_ << ';' << EOL;
-        } else {
-          o_ << ";" << EOL;
-          generate_indent(indents_, o_);
-          o_ << "stan::math::assign("
-             << name
-             << ", ";
-          generate_expression(definition, o_);
-          o_ << ");" << EOL;
         }
+        o_ << ";" << EOL;
         if (dims.size() == 0) {
           generate_indent(indents_, o_);
           generate_void_statement(name);
@@ -1597,8 +1572,9 @@ namespace stan {
       generate_local_var_init_nan_visgen vis(indent, is_var, is_fun_return,
                                              indent, o);
       for (size_t i = 0; i < vs.size(); ++i)
-        if (!vs[i].has_def())
+        if (!vs[i].has_def()) {
           boost::apply_visitor(vis, vs[i].decl_);
+        }
     }
 
     // see member_var_decl_visgen cut & paste
@@ -1671,13 +1647,30 @@ namespace stan {
                             std::ostream& o) {
       generate_init_vars_visgen vis(indent, o);
       o << EOL;
-      generate_comment("initialize transformed variables to"
+      generate_comment("initialize undefined transformed variables to"
                        " avoid seg fault on val access",
                        indent, o);
       for (size_t i = 0; i < vs.size(); ++i) {
         if (!(vs[i].has_def()))
           boost::apply_visitor(vis, vs[i].decl_);
       }
+    }
+
+    void generate_define_vars(const std::vector<var_decl>& vs,
+                            int indent,
+                            std::ostream& o) {
+      generate_comment("assign variable definitions",
+                       indent, o);
+      for (size_t i = 0; i < vs.size(); ++i) {
+        if (vs[i].has_def()) {
+          generate_indent(indent, o);
+          o << "stan::math::assign("
+            << vs[i].name()
+            << ",";
+          generate_expression(vs[i].def(), false, o);
+          o << ");" << EOL;
+        }
+      }      
     }
 
     struct validate_transformed_params_visgen : public visgen {
@@ -2088,7 +2081,9 @@ namespace stan {
                                    is_var_, is_fun_return_);
           generate_local_var_init_nan(x.local_decl_, indent, o_,
                                       is_var_, is_fun_return_);
+          generate_define_vars(x.local_decl_,indent,o_);
         }
+        o_ << EOL;
 
         for (size_t i = 0; i < x.statements_.size(); ++i)
           generate_statement(x.statements_[i], indent, o_, include_sampling_,
@@ -2328,8 +2323,8 @@ namespace stan {
       generate_local_var_decls(p.derived_decl_.first, 2, o, is_var,
                                is_fun_return);
       generate_init_vars(p.derived_decl_.first, 2, o);
+      generate_define_vars(p.derived_decl_.first, 2, o);
       o << EOL;
-
 
       bool include_sampling = true;
       generate_located_statements(p.derived_decl_.second, 2, o,
@@ -3149,7 +3144,7 @@ namespace stan {
       generate_member_var_inits(prog.data_decl_, o);
 
       o << EOL;
-      generate_comment("initialize data", 2, o);
+      generate_comment("validate data variables, initialize if not defined", 2, o);
       generate_validate_var_decls(prog.data_decl_, 2, o);
 
       generate_var_resizing(prog.derived_data_decl_.first, o);
@@ -3161,6 +3156,7 @@ namespace stan {
       o << INDENT2
         << "(void) DUMMY_VAR__;  // suppress unused var warning" << EOL2;
       generate_init_vars(prog.derived_data_decl_.first, 2, o);
+      generate_define_vars(prog.derived_data_decl_.first, 2, o);
       o << EOL;
 
       bool include_sampling = false;
@@ -4379,7 +4375,7 @@ namespace stan {
       o << INDENT2 << "(void) DUMMY_VAR__;  // suppress unused var warning"
         << EOL2;
       generate_init_vars(prog.generated_decl_.first, 2, o);
-
+      generate_define_vars(prog.generated_decl_.first, 2, o);
       o << EOL;
       generate_located_statements(prog.generated_decl_.second, 2, o,
                                   include_sampling, is_var, is_fun_return);

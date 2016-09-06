@@ -1,5 +1,6 @@
 functions {
   matrix foo(matrix x) {
+    matrix[2,2] lf0;
     matrix[3,3] lf1 = x;
     return lf1;
   }
@@ -22,12 +23,15 @@ parameters {
 }
 transformed parameters {
   matrix[3,3] tp1 = par1;
+  matrix[3,3] tp2 = d1;
   {
-    matrix[3,3] loc_tp1 = d1;
+    matrix[3,3] loc_tp1 = par1;
+    matrix[3,3] loc_tp2 = d1;
   }
 }
 model {
   matrix[3,3] lm1 = d1;
+  matrix[3,3] lm2 = lm1;
 }
 generated quantities {
   matrix[3,3] gq1 = d1;
