@@ -1106,7 +1106,8 @@ namespace stan {
         std::vector<expr_type> arg_types_trunc(arg_types);
         arg_types_trunc[0] = s.truncation_.low_.expression_type();
         std::string function_name_ccdf = get_ccdf(s.dist_.family_);
-        if (!is_double_return(function_name_ccdf, arg_types_trunc,
+        if (function_name_ccdf == s.dist_.family_
+            || !is_double_return(function_name_ccdf, arg_types_trunc,
                               error_msgs)) {
           error_msgs << "lower truncation not defined for specified"
                      << " arguments to "
@@ -1127,8 +1128,9 @@ namespace stan {
         std::vector<expr_type> arg_types_trunc(arg_types);
         arg_types_trunc[0] = s.truncation_.high_.expression_type();
         std::string function_name_cdf = get_cdf(s.dist_.family_);
-        if (!is_double_return(function_name_cdf, arg_types_trunc,
-                              error_msgs)) {
+        if (function_name_cdf == s.dist_.family_
+            || !is_double_return(function_name_cdf, arg_types_trunc,
+                                 error_msgs)) {
           error_msgs << "upper truncation not defined for"
                      << " specified arguments to "
                      << s.dist_.family_ << std::endl;
@@ -1149,8 +1151,9 @@ namespace stan {
         std::vector<expr_type> arg_types_trunc(arg_types);
         arg_types_trunc[0] = s.truncation_.low_.expression_type();
         std::string function_name_cdf = get_cdf(s.dist_.family_);
-        if (!is_double_return(function_name_cdf, arg_types_trunc,
-                              error_msgs)) {
+        if (function_name_cdf == s.dist_.family_
+            || !is_double_return(function_name_cdf, arg_types_trunc,
+                                 error_msgs)) {
           error_msgs << "lower truncation not defined for specified"
                      << " arguments to "
                      << s.dist_.family_ << std::endl;
