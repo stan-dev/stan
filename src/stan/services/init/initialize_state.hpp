@@ -5,7 +5,7 @@
 #include <boost/random/additive_combine.hpp>  // L'Ecuyer RNG
 #include <boost/random/uniform_real_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
-#include <stan/model/util.hpp>
+#include <stan/model/gradient.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/io/array_var_context.hpp>
 #include <stan/io/chained_var_context.hpp>
