@@ -2,7 +2,8 @@
 #define STAN_MCMC_HMC_HAMILTONIANS_BASE_HAMILTONIAN_HPP
 
 #include <stan/interface_callbacks/writer/base_writer.hpp>
-#include <stan/model/util.hpp>
+#include <stan/model/gradient.hpp>
+#include <stan/model/log_prob_propto.hpp>
 #include <Eigen/Dense>
 #include <iostream>
 #include <limits>
