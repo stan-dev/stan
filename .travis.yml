@@ -28,4 +28,4 @@ env:
   -  TESTFOLDER=src/test/unit/variational
   -  TESTFOLDER=src/test/unit/version_test.cpp
 
-script: ./runTests.py $TESTFOLDER
+script: ./runTests.py -j2 $TESTFOLDER

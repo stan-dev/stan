@@ -1,24 +1,8 @@
 #ifndef STAN_MODEL_UTIL_HPP
 #define STAN_MODEL_UTIL_HPP
 
-#include <stan/callbacks/interrupt.hpp>
-#include <stan/callbacks/writer.hpp>
-#include <stan/math/fwd/scal/fun/square.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/math/rev/mat/fun/grad.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/mix/mat/functor/derivative.hpp>
-#include <stan/math/mix/mat/functor/grad_hessian.hpp>
-#include <stan/math/mix/mat/functor/grad_tr_mat_times_hessian.hpp>
-#include <stan/math/rev/mat/functor/gradient.hpp>
-#include <stan/math/fwd/mat/functor/gradient.hpp>
-#include <stan/math/mix/mat/functor/gradient_dot_vector.hpp>
-#include <stan/math/mix/mat/functor/hessian.hpp>
-#include <stan/math/mix/mat/functor/hessian_times_vector.hpp>
-#include <stan/math/fwd/mat/functor/jacobian.hpp>
-#include <stan/math/rev/mat/functor/jacobian.hpp>
-#include <stan/math/mix/mat/functor/partial_derivative.hpp>
+#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/math/mix/mat.hpp>
 #include <cmath>
 #include <iomanip>
 #include <iostream>

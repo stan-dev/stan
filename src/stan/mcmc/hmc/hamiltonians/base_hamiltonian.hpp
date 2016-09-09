@@ -4,6 +4,7 @@
 #include <stan/callbacks/writer.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/model/util.hpp>
+#include <Eigen/Dense>
 #include <iostream>
 #include <limits>
 #include <stdexcept>
