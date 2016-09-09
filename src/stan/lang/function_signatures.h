@@ -315,6 +315,7 @@ add("elt_multiply", ROW_VECTOR_T, ROW_VECTOR_T, ROW_VECTOR_T);
 add("elt_multiply", MATRIX_T, MATRIX_T, MATRIX_T);
 add_unary("erf");
 add_unary("erfc");
+add_unary("exp");
 add_unary_vectorized("exp");
 add_unary("exp2");
 for (size_t i = 0; i < vector_types.size(); ++i) {
