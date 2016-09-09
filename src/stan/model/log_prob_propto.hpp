@@ -97,7 +97,7 @@ namespace stan {
       stan::math::recover_memory();
       return lp;
     }
-    
+
   }
 }
 #endif

@@ -52,7 +52,7 @@ namespace stan {
         perturbed[k] = params_r[k];
       }
     }
-    
+
   }
 }
 #endif

@@ -95,7 +95,7 @@ namespace stan {
         throw;
       }
     }
-    
+
   }
 }
 #endif
