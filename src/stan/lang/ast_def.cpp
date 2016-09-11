@@ -286,7 +286,7 @@ namespace stan {
     }
     void function_signatures::add_unary_vectorized(const::std::string& 
     name) {
-      for (size_t i = 0; i < 5; ++i) {
+      for (size_t i = 0; i < 8; ++i) {
         add(name, expr_type(DOUBLE_T, i), expr_type(INT_T, i));
         add(name, expr_type(DOUBLE_T, i), expr_type(DOUBLE_T, i));
         add(name, expr_type(VECTOR_T, i), expr_type(VECTOR_T, i));
