@@ -20,7 +20,8 @@
 % \usepackage{index}
 % \newindex{funs}{fdx}{fns}{Functions}
 
-\usepackage{minted}
+% \usepackage{minted}
+\usepackage{listings}
 \usepackage[T1]{fontenc} % needed for |
 \usepackage{amsmath}
 \usepackage{xspace}
@@ -215,9 +216,10 @@
 
 % environment for Stan code
 %\DefineVerbatimEnvironment{stancode}{Verbatim}{fontsize=\small,xleftmargin=2em}
+\lstnewenvironment{stancode}[1][]{\lstset{basicstyle=\small\ttfamily,xleftmargin=2em,#1}}{}
 %\usemintedstyle{bw}
-\usemintedstyle{friendly}
-\newminted{stan}{fontsize=\small,xleftmargin=2em}
+%% \usemintedstyle{friendly}
+%% \newminted{stan}{fontsize=\small,xleftmargin=2em}
 
 \raggedbottom
 
