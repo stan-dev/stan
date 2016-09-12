@@ -1,7 +1,7 @@
 #ifndef STAN_MODEL_TEST_GRADIENTS_HPP
 #define STAN_MODEL_TEST_GRADIENTS_HPP
 
-#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer.hpp>
 #include <stan/model/finite_diff_grad.hpp>
 #include <stan/model/log_prob_grad.hpp>
 #include <cmath>
@@ -38,7 +38,7 @@ namespace stan {
                        std::vector<int>& params_i,
                        double epsilon,
                        double error,
-                       stan::interface_callbacks::writer::base_writer& writer) {
+                       stan::callbacks::writer& writer) {
       std::stringstream msg;
       std::vector<double> grad;
       double lp
