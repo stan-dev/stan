@@ -13,7 +13,6 @@ namespace stan {
          * Number of samples for Monte Carlo estimate of gradients.
          */
         struct gradient_samples {
-
           /**
            * Description of gradient_samples.
            *
@@ -49,7 +48,6 @@ namespace stan {
          * Number of Monte Carlo samples for estimate of ELBO.
          */
         struct elbo_samples {
-
           /**
            * Description of elbo_samples.
            *
@@ -85,7 +83,6 @@ namespace stan {
          * Maximum number of iterations to run ADVI.
          */
         struct max_iterations {
-
           /**
            * String description of the maximum number of iterations.
            *
@@ -122,7 +119,6 @@ namespace stan {
          * Relative tolerance parameter for convergence.
          */
         struct tol_rel_obj {
-
           /**
            * Description of tol_rel_obj.
            *
@@ -158,7 +154,6 @@ namespace stan {
          * Stepsize scaling parameter for variational inference
          */
         struct eta {
-
           /**
            * Description of eta.
            *
@@ -193,7 +188,6 @@ namespace stan {
          * Flag for eta adaptation.
          */
         struct adapt_engaged {
-
           /**
            * Description of adapt_engaged.
            *
@@ -225,7 +219,6 @@ namespace stan {
          * Number of iterations for eta adaptation.
          */
         struct adapt_iterations {
-
           /**
            * Description of adapt_iterations.
            *
@@ -261,7 +254,6 @@ namespace stan {
          * Evaluate ELBO every Nth iteration
          */
         struct eval_elbo {
-
           /**
            * Description of eval_elbo. Evaluate ELBO at every
            * <code>eval_elbo</code> iterations.
@@ -297,7 +289,6 @@ namespace stan {
          * Number of approximate posterior output draws to save.
          */
         struct output_draws {
-
           /**
            * Description of output_draws.
            *

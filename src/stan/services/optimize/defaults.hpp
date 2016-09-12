@@ -12,7 +12,6 @@ namespace stan {
        * Line search step size for first iteration.
        */
       struct init_alpha {
-
         /**
          * Description of init_alpha.
          *
@@ -47,14 +46,14 @@ namespace stan {
        * Convergence tolerance on absolute changes in objective function value.
        */
       struct tol_obj {
-
         /**
          * Description of tol_obj.
          *
          * @returns description
          */
         static std::string description() {
-          return "Convergence tolerance on absolute changes in objective function value.";
+          return "Convergence tolerance on absolute changes in objective "
+            "function value.";
         }
 
         /**
@@ -65,7 +64,8 @@ namespace stan {
          */
         static void validate(double tol_obj) {
           if (!(tol_obj >= 0))
-            throw std::invalid_argument("tol_obj must be greater than or equal to 0.");
+            throw std::invalid_argument("tol_obj must be greater "
+                                        "than or equal to 0.");
         }
 
         /**
@@ -82,25 +82,27 @@ namespace stan {
        * Convergence tolerance on relative changes in objective function value.
        */
       struct tol_rel_obj {
-
         /**
          * Description of tol_rel_obj.
          *
          * @returns description
          */
         static std::string description() {
-          return "Convergence tolerance on relative changes in objective function value.";
+          return "Convergence tolerance on relative changes in "
+            "objective function value.";
         }
 
         /**
-         * Validates tol_rel_obj; tol_rel_obj must be greater than or equal to 0.
+         * Validates tol_rel_obj; tol_rel_obj must be greater than or equal
+         * to 0.
          *
          * @param[in] tol_rel_obj argument to validate
          * @throw std::invalid argument if tol_rel_obj < 0
          */
         static void validate(double tol_rel_obj) {
           if (!(tol_rel_obj >= 0))
-            throw std::invalid_argument("tol_rel_obj must be greater than or equal to 0");
+            throw std::invalid_argument("tol_rel_obj must be greater "
+                                        "than or equal to 0");
         }
 
         /**
@@ -117,7 +119,6 @@ namespace stan {
        * Convergence tolerance on the norm of the gradient.
        */
       struct tol_grad {
-
         /**
          * Description of tol_grad.
          *
@@ -135,7 +136,8 @@ namespace stan {
          */
         static void validate(double tol_grad) {
           if (!(tol_grad >= 0))
-            throw std::invalid_argument("tol_grad must be greater than or equal to 0");
+            throw std::invalid_argument("tol_grad must be greater "
+                                        "than or equal to 0");
         }
 
         /**
@@ -153,7 +155,6 @@ namespace stan {
        * Convergence tolerance on the relative norm of the gradient.
        */
       struct tol_rel_grad {
-
         /**
          * Description of tol_rel_grad.
          *
@@ -164,14 +165,16 @@ namespace stan {
         }
 
         /**
-         * Validates tol_rel_grad; tol_rel_grad must be greater than or equal to 0.
+         * Validates tol_rel_grad; tol_rel_grad must be greater than
+         * or equal to 0.
          *
          * @param[in] tol_rel_grad argument to validate
          * @throw std::invalid argument if tol_rel_grad < 0
          */
         static void validate(double tol_rel_grad) {
           if (!(tol_rel_grad >= 0))
-            throw std::invalid_argument("tol_rel_grad must be greater than or equal to 0.");
+            throw std::invalid_argument("tol_rel_grad must be greater "
+                                        "than or equal to 0.");
         }
 
         /**
@@ -188,7 +191,6 @@ namespace stan {
        * Convergence tolerance on changes in parameter value.
        */
       struct tol_param {
-
         /**
          * Description of tol_param.
          *
@@ -223,7 +225,6 @@ namespace stan {
        * Amount of history to keep for L-BFGS.
        */
       struct history_size {
-
         /**
          * Description of history_size.
          *
@@ -258,7 +259,6 @@ namespace stan {
        * Total number of iterations.
        */
       struct iter {
-
         /**
          * Description of iter.
          *
@@ -293,7 +293,6 @@ namespace stan {
        * Save optimization interations to output.
        */
       struct save_iterations {
-
         /**
          * Description of save_iterations.
          *
@@ -320,7 +319,7 @@ namespace stan {
           return false;
         }
       };
-      
+
     }
   }
 }

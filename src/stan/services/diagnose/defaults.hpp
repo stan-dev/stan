@@ -12,7 +12,6 @@ namespace stan {
        * Epsilon is the finite differences stepsize.
        */
       struct epsilon {
-
         /**
          * Description of epsilon.
          *
@@ -49,7 +48,6 @@ namespace stan {
        * gradients relative to the finite differences calculation.
        */
       struct error {
-
         /**
          * Description of error.
          *

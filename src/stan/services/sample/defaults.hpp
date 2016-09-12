@@ -12,7 +12,6 @@ namespace stan {
        * Number of sampling iterations.
        */
       struct num_samples {
-
         /**
          * Description of num_samples.
          *
@@ -23,14 +22,16 @@ namespace stan {
         }
 
         /**
-         * Validates num_samples; num_samples must be greater than or equal to 0.
+         * Validates num_samples; num_samples must be greater than or
+         * equal to 0.
          *
          * @param[in] num_samples argument to validate
          * @throw std::invalid argument if num_samples < 0
          */
         static void validate(int num_samples) {
           if (!(num_samples >= 0))
-            throw std::invalid_argument("num_samples must be greater than or equal to 0.");
+            throw std::invalid_argument("num_samples must be greater "
+                                        "than or equal to 0.");
         }
 
         /**
@@ -42,12 +43,11 @@ namespace stan {
           return 1000;
         }
       };
-      
+
       /**
        * Number of warmup iterations.
        */
       struct num_warmup {
-
         /**
          * Description of num_warmup.
          *
@@ -84,7 +84,6 @@ namespace stan {
        * Save warmup iterations to output.
        */
       struct save_warmup {
-
         /**
          * Description of save_warmup.
          *
@@ -111,12 +110,11 @@ namespace stan {
           return false;
         }
       };
-      
+
       /**
        * Period between saved samples.
        */
       struct thin {
-
         /**
          * Description of thin.
          *
@@ -146,12 +144,11 @@ namespace stan {
           return 1;
         }
       };
-      
+
       /**
        * Indicates whether adaptation is engaged.
        */
       struct adaptation_engaged {
-
         /**
          * Description of adaptation_engaged.
          *
@@ -184,7 +181,6 @@ namespace stan {
        * Adaptation regularization scale.
        */
       struct gamma {
-
         /**
          * Description of gamma.
          *
@@ -219,7 +215,6 @@ namespace stan {
        * Adaptation relaxation exponent.
        */
       struct kappa {
-
         /**
          * Description of kappa.
          *
@@ -249,12 +244,11 @@ namespace stan {
           return 0.75;
         }
       };
-      
+
       /**
        * Adaptation iteration offset.
        */
       struct t0 {
-
         /**
          * Description of t0.
          *
@@ -289,7 +283,6 @@ namespace stan {
        * Width of initial fast adaptation interval.
        */
       struct init_buffer {
-
         /**
          * Description of init_buffer.
          *
@@ -321,7 +314,6 @@ namespace stan {
        * Width of final fast adaptation interval.
        */
       struct term_buffer {
-
         /**
          * Description of term_buffer.
          *
@@ -353,7 +345,6 @@ namespace stan {
        * Initial width of slow adaptation interval.
        */
       struct window {
-
         /**
          * Description of window.
          *
@@ -385,7 +376,6 @@ namespace stan {
        * Total integration time for Hamiltonian evolution.
        */
       struct int_time {
-
         /**
          * Description of int_time.
          *
@@ -420,7 +410,6 @@ namespace stan {
        * Maximum tree depth.
        */
       struct max_depth {
-
         /**
          * Description of max_depth.
          *
@@ -455,7 +444,6 @@ namespace stan {
        * Step size for discrete evolution
        */
       struct stepsize {
-
         /**
          * Description of stepsize.
          *
@@ -490,7 +478,6 @@ namespace stan {
        * Uniformly random jitter of the stepsize, in percent.
        */
       struct stepsize_jitter {
-
         /**
          * Description of stepsize_jitter.
          *
@@ -504,11 +491,13 @@ namespace stan {
          * Validates stepsize_jitter; stepsize_jitter must be between 0 and 1.
          *
          * @param[in] stepsize_jitter argument to validate
-         * @throw std::invalid argument if stepsize_jitter < 0 or stepsize_jitter > 1
+         * @throw std::invalid argument if stepsize_jitter < 0
+         *   or stepsize_jitter > 1
          */
         static void validate(double stepsize_jitter) {
           if (!(stepsize_jitter >= 0 && stepsize_jitter <= 1))
-            throw std::invalid_argument("stepsize_jitter must be between 0 and 1.");
+            throw std::invalid_argument("stepsize_jitter must be between "
+                                        "0 and 1.");
         }
 
         /**
@@ -521,8 +510,6 @@ namespace stan {
         }
       };
 
-
-      
     }
   }
 }
