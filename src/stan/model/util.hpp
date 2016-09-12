@@ -2,6 +2,7 @@
 #define STAN_MODEL_UTIL_HPP
 
 #include <stan/callbacks/writer.hpp>
+#include <stan/callbacks/interrupt.hpp>
 #include <stan/math/mix/mat.hpp>
 #include <cmath>
 #include <iomanip>
