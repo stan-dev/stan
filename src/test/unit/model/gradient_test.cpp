@@ -1,5 +1,5 @@
 #include <stan/model/gradient.hpp>
-#include <stan/interface_callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/stream_writer.hpp>
 #include <test/test-models/good/model/valid.hpp>
 #include <gtest/gtest.h>
 
@@ -42,7 +42,7 @@ TEST(ModelUtil, gradient_writer) {
   data_stream.close();
 
   std::stringstream output;
-  stan::interface_callbacks::writer::stream_writer writer(output);
+  stan::callbacks::stream_writer writer(output);
   valid_model_namespace::valid_model valid_model(data_var_context, &output);
   EXPECT_NO_THROW(stan::model::gradient(valid_model, x, f, g, writer));
   

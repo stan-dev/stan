@@ -28,6 +28,7 @@ namespace stan {
      * @param params_i Integer-valued parameter vector.
      * @param epsilon Real-valued scalar saying how much to perturb. Reasonable value is 1e-6.
      * @param error Real-valued scalar saying how much error to allow. Reasonable value is 1e-6.
+     * @param interrupt interrupt callback to be called at every iteration
      * @param writer Writer for messages
      * @return number of failed gradient comparisons versus allowed
      * error, so 0 if all gradients pass
@@ -38,6 +39,7 @@ namespace stan {
                        std::vector<int>& params_i,
                        double epsilon,
                        double error,
+                       stan::callbacks::interrupt& interrupt,
                        stan::callbacks::writer& writer) {
       std::stringstream msg;
       std::vector<double> grad;
@@ -54,6 +56,7 @@ namespace stan {
       finite_diff_grad<false,
                        true,
                        M>(model,
+                          interrupt,
                           params_r, params_i,
                           grad_fd, epsilon,
                           &msg);
