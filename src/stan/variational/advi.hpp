@@ -5,7 +5,7 @@
 #include <stan/callbacks/writer.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/io/dump.hpp>
-#include <stan/model/util.hpp>
+#include <stan/services/io/write_iteration.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/variational/print_progress.hpp>
 #include <stan/variational/families/normal_fullrank.hpp>

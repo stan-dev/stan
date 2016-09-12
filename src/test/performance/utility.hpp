@@ -10,7 +10,7 @@
 #include <boost/random/uniform_real_distribution.hpp>
 
 
-#include <stan/model/util.hpp>
+#include <stan/model/gradient.hpp>
 
 #include <stan/services/sample/hmc_nuts_diag_e_adapt.hpp>
 #include <stan/io/empty_var_context.hpp>
