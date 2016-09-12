@@ -14,23 +14,23 @@ namespace stan {
       struct epsilon {
 
         /**
-         * Description of epsilon: finite difference stepsize
+         * Description of epsilon.
          *
          * @returns description
          */
         static std::string description() {
-          return "finite difference stepsize";
+          return "Finite difference stepsize.";
         }
 
         /**
          * Validates epsilon; epsilon must be greater than 0.
          *
-         * @throw std::invalid_argument if epsilon is less than or
-         * equal to 0.
+         * @param[in] epsilon argument to validate
+         * @throw std::invalid_argument if epsilon <= 0
          */
         static void validate(double epsilon) {
-          if (epsilon <= 0)
-            throw std::invalid_argument("epsilon must be greater than 0");
+          if (!(epsilon > 0))
+            throw std::invalid_argument("epsilon must be greater than 0.");
         }
 
         /**
@@ -51,23 +51,23 @@ namespace stan {
       struct error {
 
         /**
-         * Description of error: absolute error threshold
+         * Description of error.
          *
          * @returns description
          */
         static std::string description() {
-          return "absolute error threshold";
+          return "Absolute error threshold.";
         }
 
         /**
          * Validates error; error must be greater than 0.
          *
-         * @throw std::invalid_argument if error is less than or
+         * @throw std::invalid_argument if error <= 0
          * equal to 0.
          */
         static void validate(double error) {
-          if (error <= 0)
-            throw std::invalid_argument("error must be greater than 0");
+          if (!(error > 0))
+            throw std::invalid_argument("error must be greater than 0.");
         }
 
         /**
