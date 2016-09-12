@@ -1,19 +1,15 @@
 #ifndef STAN_IO_DUMP_HPP
 #define STAN_IO_DUMP_HPP
 
+#include <stan/io/validate_zero_buf.hpp>
+#include <stan/io/var_context.hpp>
+#include <stan/math/prim/mat.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/throw_exception.hpp>
 #include <boost/type_traits/is_floating_point.hpp>
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/type_traits/is_arithmetic.hpp>
 #include <boost/utility/enable_if.hpp>
-
-#include <stan/io/validate_zero_buf.hpp>
-#include <stan/io/var_context.hpp>
-#include <stan/math/prim/scal/meta/index_type.hpp>
-#include <stan/math/prim/arr/meta/index_type.hpp>
-#include <stan/math/prim/mat/meta/index_type.hpp>
-
 #include <iostream>
 #include <limits>
 #include <map>
