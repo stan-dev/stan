@@ -14,3 +14,11 @@ TEST(langParserExpressionGrammarDef, absDeprecate) {
 TEST(langParserExpressionGrammarDef, conditionalOp) {
   test_parsable("validate_conditional_op_good");
 }
+
+TEST(langParserExpressionGrammarDef, conditionalOpBad1) {
+  test_throws("validate_conditional_op_bad-1","condition in ternary expression");
+}
+
+TEST(langParserExpressionGrammarDef, conditionalOpBad2) {
+  test_throws("validate_conditional_op_bad-2","base type mismatch");
+}

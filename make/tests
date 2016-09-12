@@ -81,10 +81,40 @@ endif
 ##
 # Target to verify code generated Stan programs
 # (.stan -> .hpp) are compilable
+#
+# Running:
+# > make test/integration/compile_models
+# will make sure everything in src/test/test-models/good/
+# compiles
 ##
 .PHONY: %.hpp-test
-src/test/test-models/good/%.hpp-test : src/test/test-models/good/%.hpp
-	$(COMPILE.c) -fsyntax-only -O0 $<
+src/test/test-models/good/%.hpp-test : src/test/test-models/good/%.hpp test/test-model-main.cpp
+	$(COMPILE.c) -O0 -include $< -o $(DEV_NULL) test/test-model-main.cpp
+
+test/test-model-main.cpp:
+	@mkdir -p test
+	@touch $@
+	@echo "int main() {" >> $@
+	@echo "  stan::io::var_context *data = NULL;" >> $@
+	@echo "  stan_model model(*data);" >> $@
+	@echo >> $@
+	@echo "  std::vector<stan::math::var> params;" >> $@
+	@echo "  std::vector<double> x_r;" >> $@
+	@echo "  std::vector<int> x_i;" >> $@
+	@echo >> $@
+	@echo "  model.log_prob<false, false>(params, x_i);" >> $@
+	@echo "  model.log_prob<false, true>(params, x_i);" >> $@
+	@echo "  model.log_prob<true, false>(params, x_i);" >> $@
+	@echo "  model.log_prob<true, true>(params, x_i);" >> $@
+	@echo "  model.log_prob<false, false>(x_r, x_i);" >> $@
+	@echo "  model.log_prob<false, true>(x_r, x_i);" >> $@
+	@echo "  model.log_prob<true, false>(x_r, x_i);" >> $@
+	@echo "  model.log_prob<true, true>(x_r, x_i);" >> $@
+	@echo >> $@
+	@echo "  return 0;" >> $@
+	@echo "}" >> $@
+	@echo >> $@
+
 
 .PHONY: HEADER_TESTS
 %.hpp-test : %.hpp test/dummy.cpp
@@ -141,7 +171,7 @@ src/test/unit/mcmc/hmc/nuts/softabs_nuts_test.cpp: src/test/test-models/good/mcm
 src/test/unit/mcmc/hmc/xhmc/unit_e_xhmc_test.cpp: src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
 src/test/unit/mcmc/hmc/xhmc/softabs_xhmc_test.cpp: src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
 src/test/unit/mcmc/hmc/static_uniform/derived_static_uniform_test.cpp: src/test/test-models/good/mcmc/hmc/common/gauss.hpp
-src/test/unit/model/util_test.cpp: src/test/test-models/good/model/valid.hpp src/test/test-models/good/model/domain_fail.hpp
+src/test/unit/model/finite_diff_grad_test.cpp src/test/unit/model/grad_hess_log_prob_test.cpp src/test/unit/model/grad_tr_mat_times_hessian_test.cpp src/test/unit/model/gradient_test.cpp src/test/unit/model/gradient_dot_vector_test.cpp src/test/unit/model/hessian_test.cpp src/test/unit/model/hessian_times_vector_test.cpp src/test/unit/model/log_prob_grad_test.cpp src/test/unit/model/test_gradients_test.cpp : src/test/test-models/good/model/valid.hpp
 src/test/unit/optimization/bfgs_linesearch_test.cpp: src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/optimization/bfgs_minimizer_test.cpp: src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/optimization/bfgs_test.cpp: src/test/test-models/good/optimization/rosenbrock.hpp
