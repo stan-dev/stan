@@ -1,6 +1,7 @@
 #ifndef STAN_SERVICES_UTIL_INITIALIZE_HPP
 #define STAN_SERVICES_UTIL_INITIALIZE_HPP
 
+#include <stan/callbacks/writer.hpp>
 #include <stan/io/var_context.hpp>
 #include <stan/io/random_var_context.hpp>
 #include <stan/io/chained_var_context.hpp>
