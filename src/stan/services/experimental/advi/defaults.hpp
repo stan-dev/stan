@@ -56,7 +56,7 @@ namespace stan {
            * @returns description
            */
           static std::string description() {
-            return "Number of Monte Carlo samples for estimate of ELBO.";
+            return "Number of Monte Carlo draws for estimate of ELBO.";
           }
 
           /**
