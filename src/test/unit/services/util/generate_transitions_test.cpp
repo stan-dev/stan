@@ -2,80 +2,18 @@
 #include <gtest/gtest.h>
 #include <stan/io/empty_var_context.hpp>
 #include <test/test-models/good/optimization/rosenbrock.hpp>
-#include <stan/callbacks/stream_writer.hpp>
-#include <stan/callbacks/noop_interrupt.hpp>
+#include <test/unit/instrumented_callbacks.hpp>
 #include <iostream>
 #include <exception>
-
-namespace stan {
-  namespace callbacks {
-
-      class check_interrupt: public interrupt {
-      public:
-        check_interrupt(int n, bool& called)
-          : called_(called), n_(n), counter_(0) {
-          called_ = false;
-        }
-        void operator()() {
-          counter_++;
-          if (counter_ > n_)
-            called_ = true;
-        }
-      private:
-        bool& called_;
-        unsigned int n_;
-        unsigned int counter_;
-      };
-  }
-}
-
-
-
-class memory_writer
-  : public stan::callbacks::stream_writer {
-public:
-  std::vector<std::string> names_;
-  std::vector<std::vector<double> > states_;
-
-  memory_writer(std::ostream& stream)
-    : stan::callbacks::stream_writer(stream) {
-  }
-
-  /**
-   * Writes a set of names.
-   *
-   * @param[in] names Names in a std::vector
-   */
-  void operator()(const std::vector<std::string>& names) {
-    names_ = names;
-  }
-
-  /**
-   * Writes a set of values.
-   *
-   * @param[in] state Values in a std::vector
-   */
-  void operator()(const std::vector<double>& state) {
-    states_.push_back(state);
-  }
-
-};
-
 
 class ServicesSamplesGenerateTransitions : public testing::Test {
 public:
   ServicesSamplesGenerateTransitions()
-    : message(message_ss),
-      init(init_ss),
-      error(error_ss),
-      parameter(parameter_ss),
-      diagnostic(diagnostic_ss),
-      model(context, &model_ss) {}
+    : model(context, &model_log) {}
 
-  std::stringstream message_ss, init_ss, parameter_ss, model_ss;
-  std::stringstream error_ss, diagnostic_ss;
-  stan::callbacks::stream_writer message, init, error;
-  memory_writer parameter, diagnostic;
+  std::stringstream model_log;
+  stan::test::unit::instrumented_writer message, init, error;
+  stan::test::unit::instrumented_writer parameter, diagnostic;
   stan::io::empty_var_context context;
   stan_model model;
 };
@@ -85,11 +23,10 @@ TEST_F(ServicesSamplesGenerateTransitions, rosenbrock) {
   unsigned int seed = 0;
   unsigned int chain = 1;
   double init_radius = 0;
-
   int refresh = 0;
-  bool called = false;
-  stan::callbacks::check_interrupt callback(10, called);
-  EXPECT_EQ(called, false);
+  int num_iterations = 10;
+  stan::test::unit::instrumented_interrupt interrupt;
+  EXPECT_EQ(interrupt.call_count(), 0);
 
   boost::ecuyer1988 rng = stan::services::util::rng(seed, chain);
 
@@ -107,28 +44,49 @@ TEST_F(ServicesSamplesGenerateTransitions, rosenbrock) {
     cont_params[i] = cont_vector[i];
   stan::mcmc::sample s(cont_params, 0, 0);
 
-  // Headers
   writer.write_sample_names(s, sampler, model);
   writer.write_diagnostic_names(s, sampler, model);
 
   stan::services::util::generate_transitions(
-    sampler, 20, 0, 20, 1, refresh, true, false, writer,
-    s, model, rng, callback, message, error);
+    sampler, num_iterations, 0, 20, 1, refresh, true, false, writer,
+    s, model, rng, interrupt, message, error);
 
-  EXPECT_EQ("", message_ss.str());
-  EXPECT_EQ("", error_ss.str());
-  EXPECT_EQ("lp__", parameter.names_[0]);
-  EXPECT_EQ("accept_stat__", parameter.names_[1]);
-  EXPECT_EQ("x", parameter.names_[2]);
-  EXPECT_EQ("y", parameter.names_[3]);
+  // Expect interrupt to be called once per iteration.
+  EXPECT_EQ(interrupt.call_count(), num_iterations);
 
-  for (size_t i=0; i < parameter.states_.size(); i++) {
-    for (size_t j=0; j < parameter.names_.size(); j++) {
-      EXPECT_FLOAT_EQ(0.0, parameter.states_[i][j]);
-    }
-  }
+  // Expect no messages, no init messages, and no error messages.
+  EXPECT_EQ(message.call_count(), 0);
+  EXPECT_EQ(init.call_count(), 0);
+  EXPECT_EQ(error.call_count(), 0);
 
-  EXPECT_EQ(called, true);
+  // Expect on call to set parameter names, and one set of output per
+  // iteration.
+  EXPECT_EQ(parameter.call_count("vector_string"), 1);
+  EXPECT_EQ(parameter.call_count("vector_double"), num_iterations);
+
+  std::vector<std::vector<std::string> > parameter_names;
+  parameter_names = parameter.vector_string_values();
+  EXPECT_EQ(parameter_names[0][0], "lp__");
+  EXPECT_EQ(parameter_names[0][1], "accept_stat__");
+  std::vector<std::vector<double> > parameter_values;
+  parameter_values = parameter.vector_double_values();
+
+  // Expect one parameter name per parameter value.
+  EXPECT_EQ(parameter_names[0].size(), parameter_values[0].size());
+
+  // Expect on call to set parameter names, and one set of output per
+  // iteration, not sure where the "+1" is coming from yet...
+  EXPECT_EQ(diagnostic.call_count("vector_string"), 1);
+  EXPECT_EQ(diagnostic.call_count("vector_double"), num_iterations + 1);
+  std::vector<std::vector<std::string> > diagnostic_names;
+  diagnostic_names = diagnostic.vector_string_values();
+  EXPECT_EQ(diagnostic_names[0][0], "lp__");
+  EXPECT_EQ(diagnostic_names[0][1], "accept_stat__");
+  std::vector<std::vector<double> > diagnostic_values;
+  diagnostic_values = diagnostic.vector_double_values();
+  EXPECT_EQ(diagnostic_names[0].size(), diagnostic_values[0].size());
+
+
 }
 
 

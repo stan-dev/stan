@@ -1,7 +1,7 @@
 #ifndef STAN_MODEL_UTIL_HPP
 #define STAN_MODEL_UTIL_HPP
 
-#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer.hpp>
 #include <stan/math/mix/mat.hpp>
 #include <cmath>
 #include <iomanip>
