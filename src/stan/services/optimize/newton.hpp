@@ -8,7 +8,6 @@
 #include <stan/callbacks/writer.hpp>
 #include <stan/optimization/newton.hpp>
 #include <stan/services/error_codes.hpp>
-#include <stan/model/util.hpp>
 #include <stan/services/util/initialize.hpp>
 #include <stan/services/util/rng.hpp>
 #include <cmath>

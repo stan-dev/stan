@@ -6,7 +6,6 @@
 #include <stan/io/random_var_context.hpp>
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/writer.hpp>
-#include <stan/model/util.hpp>
 #include <stan/optimization/bfgs.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/services/util/initialize.hpp>

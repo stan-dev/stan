@@ -4,7 +4,7 @@
 #include <stan/io/var_context.hpp>
 #include <stan/io/random_var_context.hpp>
 #include <stan/io/chained_var_context.hpp>
-#include <stan/model/util.hpp>
+#include <stan/model/log_prob_grad.hpp>
 #include <limits>
 #include <sstream>
 #include <string>

@@ -7,7 +7,7 @@
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/callbacks/chained_writer.hpp>
-#include <stan/model/util.hpp>
+#include <stan/model/test_gradients.hpp>
 #include <stan/services/util/rng.hpp>
 #include <stan/services/util/initialize.hpp>
 #include <vector>
