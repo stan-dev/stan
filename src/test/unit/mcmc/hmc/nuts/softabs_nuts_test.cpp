@@ -1,3 +1,4 @@
+#include <stan/math/rev/mat.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/mcmc/hmc/nuts/softabs_nuts.hpp>
 #include <boost/random/additive_combine.hpp>
