@@ -134,7 +134,7 @@ namespace stan {
          */
         static void validate(int thin) {
           if (!(thin > 0))
-            throwf std::invalid_argument("thin must be greater than 0.");
+            throw std::invalid_argument("thin must be greater than 0.");
         }
 
         /**
