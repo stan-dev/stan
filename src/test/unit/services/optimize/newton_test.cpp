@@ -1,4 +1,4 @@
-#include <stanf/services/optimize/newton.hpp>
+#include <stan/services/optimize/newton.hpp>
 #include <gtest/gtest.h>
 #include <stan/io/empty_var_context.hpp>
 #include <test/test-models/good/optimization/rosenbrock.hpp>

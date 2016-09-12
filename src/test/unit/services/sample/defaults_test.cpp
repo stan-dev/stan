@@ -36,7 +36,7 @@ TEST(sample_defaults, save_warmup) {
   EXPECT_NO_THROW(save_warmup::validate(false));
   EXPECT_NO_THROW(save_warmup::validate(true));
 
-  EXPECT_EQ(false, save_warmup::default_value());
+  EXPECT_FALSE(save_warmup::default_value());
 }
 
 TEST(sample_defaults, thin) {
@@ -61,7 +61,7 @@ TEST(sample_defaults, adaptation_engaged) {
   EXPECT_NO_THROW(adaptation_engaged::validate(false));
   EXPECT_NO_THROW(adaptation_engaged::validate(true));
 
-  EXPECT_EQ(true, adaptation_engaged::default_value());
+  EXPECT_TRUE(adaptation_engaged::default_value());
 }
 
 TEST(sample_defaults, gamma) {

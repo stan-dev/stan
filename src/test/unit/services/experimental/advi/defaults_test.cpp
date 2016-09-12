@@ -70,7 +70,7 @@ TEST(experimental_advi_defaults, adapt_engaged) {
   EXPECT_NO_THROW(adapt_engaged::validate(true));
   EXPECT_NO_THROW(adapt_engaged::validate(false));
 
-  EXPECT_EQ(true, adapt_engaged::default_value());
+  EXPECT_TRUE(adapt_engaged::default_value());
 }
 
 TEST(experimental_advi_defaults, adapt_iterations) {

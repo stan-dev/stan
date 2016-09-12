@@ -119,5 +119,5 @@ TEST(optimize_defaults, save_iterations) {
   EXPECT_NO_THROW(save_iterations::validate(false));
   EXPECT_NO_THROW(save_iterations::validate(true));
   
-  EXPECT_EQ(false, save_iterations::default_value());
+  EXPECT_FALSE(save_iterations::default_value());
 }
