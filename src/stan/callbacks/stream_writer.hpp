@@ -10,44 +10,43 @@ namespace stan {
   namespace callbacks {
 
     /**
-     * stream_writer writes to an std::ostream.
+     * <code>stream_writer</code> writes to an <code>std::ostream</code>.
      */
     class stream_writer : public writer {
     public:
       /**
        * Constructor.
        *
-       * @param output std::ostream to write to
-       * @param key_value_prefix String to write before lines
+       * @param[in, out] output std::ostream to write
+       * @param[in] key_value_prefix String to write before lines
        *   treated as comments.
        */
       stream_writer(std::ostream& output,
                     const std::string& key_value_prefix = ""):
-        output__(output), key_value_prefix__(key_value_prefix) {}
+        output_(output), key_value_prefix_(key_value_prefix) {}
 
       void operator()(const std::string& key, double value) {
-        output__ << key_value_prefix__ << key << " = " << value << std::endl;
+        output_ << key_value_prefix_ << key << " = " << value << std::endl;
       }
 
       void operator()(const std::string& key, int value) {
-        output__ << key_value_prefix__ << key << " = " << value << std::endl;
+        output_ << key_value_prefix_ << key << " = " << value << std::endl;
       }
 
       void operator()(const std::string& key, const std::string& value) {
-        output__ << key_value_prefix__ << key << " = " << value << std::endl;
+        output_ << key_value_prefix_ << key << " = " << value << std::endl;
       }
 
-      void operator()(const std::string& key,
-                      const double* values,
+      void operator()(const std::string& key, const double* values,
                       int n_values) {
         if (n_values == 0) return;
 
-        output__ << key_value_prefix__ << key << ": ";
+        output_ << key_value_prefix_ << key << ": ";
 
-        output__ << values[0];
+        output_ << values[0];
         for (int n = 1; n < n_values; ++n)
-          output__ << "," << values[n];
-        output__ << std::endl;
+          output_ << "," << values[n];
+        output_ << std::endl;
       }
 
       void operator()(const std::string& key,
@@ -55,13 +54,13 @@ namespace stan {
                       int n_rows, int n_cols) {
         if (n_rows == 0 || n_cols == 0) return;
 
-        output__ << key_value_prefix__ << key << std::endl;
+        output_ << key_value_prefix_ << key << std::endl;
 
         for (int i = 0; i < n_rows; ++i) {
-          output__ << key_value_prefix__ << values[i * n_cols];
+          output_ << key_value_prefix_ << values[i * n_cols];
           for (int j = 1; j < n_cols; ++j)
-            output__ << "," << values[i * n_cols + j];
-          output__ << std::endl;
+            output_ << "," << values[i * n_cols + j];
+          output_ << std::endl;
         }
       }
 
@@ -73,8 +72,8 @@ namespace stan {
 
         for (std::vector<std::string>::const_iterator it = names.begin();
              it != last; ++it)
-          output__ << *it << ",";
-        output__ << names.back() << std::endl;
+          output_ << *it << ",";
+        output_ << names.back() << std::endl;
       }
 
       void operator()(const std::vector<double>& state) {
@@ -85,21 +84,21 @@ namespace stan {
 
         for (std::vector<double>::const_iterator it = state.begin();
              it != last; ++it)
-          output__ << *it << ",";
-        output__ << state.back() << std::endl;
+          output_ << *it << ",";
+        output_ << state.back() << std::endl;
       }
 
       void operator()() {
-        output__ << key_value_prefix__ << std::endl;
+        output_ << key_value_prefix_ << std::endl;
       }
 
       void operator()(const std::string& message) {
-        output__ << key_value_prefix__ << message << std::endl;
+        output_ << key_value_prefix_ << message << std::endl;
       }
 
     private:
-      std::ostream& output__;
-      std::string key_value_prefix__;
+      std::ostream& output_;
+      std::string key_value_prefix_;
     };
 
   }

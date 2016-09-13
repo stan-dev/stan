@@ -6,13 +6,18 @@
 namespace stan {
   namespace callbacks {
 
-      class noop_interrupt: public interrupt {
-      public:
-        noop_interrupt() {}
-        void operator()() { }
-      };
+    /**
+     * No op interrupt.
+     *
+     * This is a trivial implementation of the interrupt that
+     * does nothing.
+     */
+    class noop_interrupt: public interrupt {
+    public:
+      noop_interrupt() {}
+      void operator()() { }
+    };
 
   }
 }
-
 #endif

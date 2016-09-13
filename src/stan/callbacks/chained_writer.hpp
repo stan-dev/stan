@@ -10,15 +10,19 @@ namespace stan {
   namespace callbacks {
 
     /**
-     * stream_writer writes to an std::ostream.
+     * <code>chained_writer</code> is an implementation that writes to
+     * multiple writers.
+     *
+     * For any given call to this writer, it will delegate to both writers
+     * provided in the constructor.
      */
     class chained_writer : public writer {
     public:
       /**
        * Constructor.
        *
-       * @param writer1 first writer
-       * @param writer2 second writer
+       * @param[in, out] writer1 first writer
+       * @param[in, out] writer2 second writer
        */
       chained_writer(writer& writer1,
                      writer& writer2)

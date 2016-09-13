@@ -9,11 +9,11 @@ namespace stan {
   namespace callbacks {
 
     /**
-     * writer is an abstract base class defining the interface
+     * <code>writer</code> is an abstract base class defining the interface
      * for Stan writer callbacks.
-     * 
+     *
      * The Stan API writes structured output to implementations of
-     * this class defined by a given interface.
+     * this class.
      */
     class writer {
     public:
@@ -23,8 +23,7 @@ namespace stan {
        * @param[in] key A string
        * @param[in] value A double value
        */
-      virtual void operator()(const std::string& key,
-                              double value) = 0;
+      virtual void operator()(const std::string& key, double value) = 0;
 
       /**
        * Writes a key, value pair.
@@ -32,8 +31,7 @@ namespace stan {
        * @param[in] key A string
        * @param[in] value An integer value
        */
-      virtual void operator()(const std::string& key,
-                              int value) = 0;
+      virtual void operator()(const std::string& key, int value) = 0;
 
       /**
        * Writes a key, value pair.
@@ -41,33 +39,31 @@ namespace stan {
        * @param[in] key A string
        * @param[in] value A string
        */
-      virtual void operator()(const std::string& key,
-                              const std::string& value) = 0;
+      virtual void operator()(const std::string& key, const std::string& value)
+      = 0;
 
       /**
        * Writes a key, value pair.
        *
        * @param[in] key A string
-       * @param[in] values A double array, typically used with
-       *   contiguous Eigen vectors
+       * @param[in] values A double array, typically used with contiguous Eigen
+       *   vectors
        * @param[in] n_values Length of the array
        */
-      virtual void operator()(const std::string& key,
-                              const double* values,
+      virtual void operator()(const std::string& key, const double* values,
                               int n_values) = 0;
 
       /**
        * Writes a key, value pair.
        *
        * @param[in] key A string
-       * @param[in] values A double array assumed to represent a 2d 
+       * @param[in] values A double array assumed to represent a 2d
        *   matrix stored in column major order, typically used with
        *   contiguous Eigen matrices
        * @param[in] n_rows Rows
        * @param[in] n_cols Columns
        */
-      virtual void operator()(const std::string& key,
-                              const double* values,
+      virtual void operator()(const std::string& key, const double* values,
                               int n_rows, int n_cols) = 0;
 
       /**
