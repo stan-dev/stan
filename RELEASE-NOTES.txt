@@ -1,10 +1,56 @@
 STAN C++ RELEASE NOTES
 ======================================================================
 
-Note: these are the release nots for the stan-dev/stan repository.
+Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+
+v2.12.0 (6 September 2016)
+======================================================================
+
+New Team Members
+--------------------------------------------------
+* Charles Margossian (Metrum Research Group, LLC) -- diff eq models
+
+Known, outstanding bugs
+--------------------------------------------------
+* Normalization for lower truncated discrete distributions is off
+  by one (#2054)
+
+Bug Fixes
+--------------------------------------------------
+* updated the math library to deal with g++6 errors
+  (math#348, math#345, math#327)
+* fixed issue with 1:0 indexing in array slicing producing
+  huge size (#1960)
+* allow variables to be named the same as unary functions
+  (#1459)
+* distributions without cumulative distribution functions are now
+  prevented from being used in truncation (#2052)
+* allow user-defined lpdf functions to be used in `target += `
+  expressions (#1944)
+* fixed duplicate function warning message (#1946)
+* fixed ternary operator generating C++ code that doesn't compile
+  (#2044)
+
+
+New User-Facing Features
+--------------------------------------------------
+* added mdivide_left_spd() and mdivide_right_spd() to the language
+  (#2016)
+* added cov_exp_quad() to the language (#1957)
+* added break and continue statements to the language (#1756)
+* added append_row() and append_col() to the language (#1347)
+* updated error message for missing `|` when using probability functions
+  (#2003)
+* updated parser/warning errors for new syntax (#1940)
+
+New Internal Features
+--------------------------------------------------
+* updated Travis CI config (#2033)
+* fixed segfault in lang test with g++-5.4 (#2030)
+* `make clean-all` cleans CVODES binaries (#2012)
 
 v2.11.0 (27 July 2016)
 ======================================================================

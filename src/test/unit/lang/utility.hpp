@@ -179,4 +179,20 @@ void expect_matches(int n,
   EXPECT_EQ(n, count_matches(target,model_cpp));
 }
 
+/**
+ * Thest that model of specified name in test/test-models/good
+ * has exactly the specified number of matches 
+ *
+ * @param[in] model_name Name of model file.
+ * @param[in] warning_msg Message to count.
+ * @param[in] n Expected number of message occurrences.
+ */
+void test_num_warnings(const std::string& model_name, 
+                       const std::string& warning_msg,
+                       int n) {
+  std::stringstream msgs;
+  EXPECT_TRUE(is_parsable_folder(model_name, "good", &msgs));
+  EXPECT_EQ(n, count_matches(warning_msg, msgs.str()));
+}
+
 #endif

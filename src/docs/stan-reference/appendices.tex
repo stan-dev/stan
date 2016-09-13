@@ -419,7 +419,7 @@ model {
 
 \begin{itemize}
 \item Stan does not yet support estimation of discrete parameters
-  (discrete data is supported).  We plan to eventually implement a
+  (discrete data is supported).  We may eventually implement a
   combination of Gibbs and slice sampling for discrete parameters, but
   we haven't done so yet.
 \item Stan has some distributions on covariance matrices that do not
@@ -1158,10 +1158,10 @@ or matrices), replace
 foo_log(y, ...)
 \end{stancode}
 %
-with the log probability density function
+with the log probability density function notation
 %
 \begin{stancode}
-foo_lpdf(y, ...).
+foo_lpdf(y | ...).
 \end{stancode}
 %
 If \code{y} must be an integer (including arrays),
@@ -1174,7 +1174,7 @@ foo_log(y, ...
 with the log probability mass function
 %
 \begin{stancode}
-foo_lpmf(y, ...).
+foo_lpmf(y | ...).
 \end{stancode}
 \end{description}
 
@@ -1187,9 +1187,9 @@ The log cumulative distribution and complementary cumulative
 distribution functions for a distribution \code{foo} are currently
 written as \code{foo\_cdf\_log} and \code{foo\_ccdf\_log}.  
 \item[Replacement]
-Replace \code{foo\_cdf\_log(...)} with \code{foo\_lcdf(...)}.
+Replace \code{foo\_cdf\_log(y, ...)} with \code{foo\_lcdf(y | ...)}.
 \\[4pt]
-Replace \code{foo\_ccdf\_log(...)} with \code{foo\_lccdf(...)}.
+Replace \code{foo\_ccdf\_log(y, ...)} with \code{foo\_lccdf(y | ...)}.
 \end{description}
 
 \section{\code{multiply\_log} and \code{binomial\_coefficient\_log} Functions}
@@ -1261,9 +1261,11 @@ matrix types.
 \code{a}, \code{b}, and \code{c}, where \code{a} is an \code{int} value and \code{b} and \code{c}
 are scalars. It returns \code{b} if \code{a} is non-zero and \code{c} otherwise.
 %
-\item[Replacement] Use the conditional operator which allows more flexiblity in the types of \code{b} and \code{c}.  See
-    \refsection{conditional-operator} for full details of the conditional operator.
-    Replace
+\item[Replacement] Use the conditional operator which allows more
+  flexiblity in the types of \code{b} and \code{c} and is much more
+  efficient in that it only evaluates whichever of \code{b} or
+  \code{c} is returned.  See \refsection{conditional-operator} for
+  full details of the conditional operator.  Replace
 \begin{stancode}
 x = if_else(a,b,c);
 \end{stancode}

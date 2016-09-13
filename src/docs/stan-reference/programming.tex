@@ -158,7 +158,7 @@ tests.
 
 Although Stan does not have a stepwise debugger or any unit testing
 framework in place, it does support the time-honored tradition of
-debug-by-printf.
+debug-by-printf.%
 %
 \footnote{The ``f'' is not a typo --- it's a historical artifact of
   the name of the \code{printf} function used for formatted printing
@@ -386,7 +386,12 @@ explore the tails of the distribution.
 
 \subsection{Upper and Lower Bounds}
 
-Variables may be declared with constraints
+Variables may be declared with constraints.  These constraints are not
+part of the underlying data type for a variable, but determine error
+checking in the transformed data, transformed parameter, and generated
+quantities block, and the transform from unconstrained to constrained
+space in the parameters block.
+
 All of the basic data types may be given lower and upper bounds using
 syntax such as
 %
@@ -1361,10 +1366,10 @@ gives \code{sigma} a half-normal prior, technically
 \[
 p(\sigma) 
 \ = \
-\frac{\distro{Normal}(\sigma|0,1000)}
-     {1 - \distro{NormalCDF}(0|0,1000)}
+\frac{\distro{Normal}(\sigma | 0, 1000)}
+     {1 - \distro{NormalCDF}(0 | 0, 1000)}
 \ \propto \
-\distro{Normal}(\sigma|0,1000),
+\distro{Normal}(\sigma | 0, 1000),
 \]
 %
 but Stan is able to avoid the calculation of the normal cumulative
@@ -2216,7 +2221,7 @@ The parameters should be clearer after the model definition.
 \begin{stancode}
 model {
   alpha ~ normal(0, 1);
-  beta ~ normal(0,s igma_beta);   
+  beta ~ normal(0, sigma_beta);   
   gamma ~ lognormal(0, sigma_gamma);
   mu_beta ~ cauchy(0, 5);
   sigma_alpha ~ cauchy(0, 5);
@@ -3822,10 +3827,7 @@ component indicators form a latent Markov chain.
 \subsection{Supervised Parameter Estimation}
 
 In the situation where the hidden states are known, the following
-naive model can be used to fit the parameters $\theta$ and $\phi$.%
-%
-\footnote{The program code is available in the Stan example model repository;
-see \url{https://github.com/stan-dev/example-models/tree/master/misc/gaussian-process}.}
+naive model can be used to fit the parameters $\theta$ and $\phi$.
 %
 \begin{stancode}
 data {
@@ -3883,7 +3885,7 @@ The naive HMM estimation model presented above can be sped up
 dramatically by replacing the loops over categorical distributions
 with a single multinomial distribution.%
 %
-\footnote{The model is available in the Stan example model repository;
+\footnote{The program is available in the Stan example model repository;
 see \url{http://mc-stan.org/documentation}.}
 %
 The data is declared as before, but now a transformed data blocks
@@ -3927,7 +3929,7 @@ up in the same way by computing sufficient statistics.
 
 With the Dirichlet-multinomial HMM, the posterior can be computed
 analytically because the Dirichlet is the conjugate prior to the
-multinomial.  The following example
+multinomial.  The following example%
 %
 \footnote{The program is available in the Stan example model repository;
 see \url{http://mc-stan.org/documentation}.}
@@ -4507,7 +4509,7 @@ is
 \[
 \log \prod_{m=1}^M \mbox{Pr}[y_m > U]
 = \log \left( 1 - \Phi\left(\frac{y - \mu}{\sigma}\right)\right)^{M}
-= M \, \code{normal\_lccdf}(y,\mu,\sigma),
+= M \, \code{normal\_lccdf}(y | \mu, \sigma),
 \]
 %
 where \code{normal\_lccdf} is the log of complementary CDF
@@ -5251,7 +5253,7 @@ data {
 parameters {
   real mu;
   real<lower=0> sigma_sq;
-  vector<lower=-0.5, upper=0.5>[5] y_err;
+  vector<lower=-0.5, upper=0.5>[N] y_err;
 }
 transformed parameters {
   real<lower=0> sigma;
@@ -5618,7 +5620,7 @@ transformed parameters {
   lp = rep_vector(log_unif, T);
   for (s in 1:T)
     for (t in 1:T)
-      lp[s] = lp[s] + poisson_lpmf(D[t] | t < s ? e : l));
+      lp[s] = lp[s] + poisson_lpmf(D[t] | t < s ? e : l);
 }
 model {
   e ~ exponential(r_e);
@@ -7997,7 +7999,7 @@ transformed data {
     for (i in 1:N2) 
       for (j in 1:N2)
         Omega[i, j] = exp(-pow(x2[i] - x2[j], 2)) 
-          + i==j ? 0.1 : 0.0; 
+          + (i == j ? 0.1 : 0.0);
     for (i in 1:N1)
       for (j in 1:N2)
         K[i, j] = exp(-pow(x1[i] - x2[j], 2));
@@ -9412,13 +9414,9 @@ directly translated to a recursive function definition.
 %
 The forward declaration of the function signature before it is defined
 is necessary so that the embedded use of \code{matrix\_pow} is
-well-defined when it is encountered.%
-%
-\footnote{A future version of Stan will allow self-recursive functions
-  to skip the forward declaration.}
-%
-It would be more efficient to not allow the recursion to go all the
-way to the base case, adding the following conditional clause.
+well-defined when it is encountered.  It would be more efficient to
+not allow the recursion to go all the way to the base case, adding the
+following conditional clause.
 %
 \begin{stancode}
     else if (n == 1)
@@ -10635,10 +10633,177 @@ is a clear indication that something is amiss in the model.
 
 
 
-\chapter{Optimizing \Stan Code}\label{optimization.chapter}
+\chapter{Optimizing \Stan Code for Efficiency}\label{optimization.chapter}
 \noindent
 This chapter provides a grab bag of techniques for optimizing \Stan
 code, including vectorization, sufficient statistics, and conjugacy.
+At a coarse level, efficiency involves both the amount of time
+required for a computation and the amount of memory required.  For
+practical applied statistical modeling, we are mainly concerned with
+reducing wall time (how long a program takes as measured by a clock on
+the wall) and keeping memory requirements within available bounds.
+
+\section{What is Efficiency?}
+
+The standard algorithm analyses in computer science measure efficiency
+asymptotically as a function of problem size (such as data, number of
+parameters, etc.) and typically do not consider constant additive
+factors like startup times or multiplicative factors like speed of
+operations.  In practice, the constant factors are important; if run
+time can be cut in half or more, that's a huge gain. This chapter
+focuses on both the constant factors involved in efficiency (such as
+using built-in matrix operations as opposed to naive loops) and on
+asymptotic efficiency factors (such as using linear algorithms instead
+of quadratic algorithms in loops).
+
+
+\section{Efficiency for Probabilistic Models and Algorithms}
+
+Stan programs express models which are intrinsically statistical in
+nature.  The algorithms applied to these models may or may not
+themselves be probabilistic.  For example, given an initial value for
+parameters (which may itself be given determinstically or generated
+randomly), Stan's optimization algorithm (L-BFGS) for penalized
+maximum likelihood estimation is purely deterministic.  Stan's
+sampling algorithms are based on Markov chain Monte Carlo algorithms,
+which are probabilistic by nature at every step.  Stan's variational
+inference algorithm (ADVI) is probabilistic despite being an
+optimization algorithm; the randomization lies in a nested Monte Carlo
+calculation for an expected gradient.
+
+With probabilistic algorithms, there will be variation in run times
+(and maybe memory usage) based on the randomization involved.  For
+example, by starting too far out in the tail, iterative algorithms
+underneath the hood, such as the solvers for ordinary differential
+equations, may take different numbers of steps.  Ideally this
+variation will be limited;  when there is a lot of variation it can be
+a sign that there is a problem with the model's parameterization in
+a Stan program or with initialization.
+
+A well-behaved Stan program will have low variance between runs with
+different random initializations and differently seeded random number
+generators.  But sometimes an algorithm can get stuck in one part of
+the posterior, typically due to high curvature.  Such sticking almost
+always indicates the need to reparameterize the model.  Just throwing
+away Markov chains with apparently poor behavior (slow, or stuck) can
+lead to bias in posterior estimates.  This problem with getting stuck
+can often be overcome by lowering the initial step size to avoid
+getting stuck during adaptation and increasing the target acceptance
+rate in order to target a lower step size.  This is because smaller
+step sizes allow Stan's gradient-based algorithms to better follow the
+curvature in the density or penalized maximum likelihood being fit.
+
+\section{Statistical vs.\  Computational Efficiency}
+
+There is a difference between pure computational efficiency and
+statistical efficiency for Stan programs fit with sampling-based
+algorithms.  Computational efficiency measures the amount of time or
+memory required for a given step in a calculation, such as an
+evaluation of a log posterior or penalized likelihood.  
+
+Statistical efficiency typically involves requiring fewer steps in
+algorithms by making the statistical formulation of a model better
+behaved.  The typical way to do this is by applying a change of
+variables (i.e., reparameterization) so that sampling algorithms mix
+better or optimization algorithms require less adaptation.
+
+\section{Model Conditioning and Curvature}
+
+Because Stan's algorithms (other than Riemannian Hamiltonian Monte
+Carlo) rely on step-based gradient-based approximations of the density
+(or penalized maximum likelihood) being fitted, posterior curvature
+not captured by this first-order appoximation plays a central role in
+determining the statistical efficiency of Stan's algorithms.
+
+A second-order approximation to curvature is provided by the
+Hessian, the matrix of second derivatives of the log density $\log
+p(\theta)$ with respect to the parameter vector $\theta$, defined
+as
+\[
+H(\theta) = \nabla \, \nabla \, \log p(\theta | y),
+\]
+so that
+\[
+H_{i, j}(\theta) = \frac{\partial^2 \log p(\theta | y)}
+                {\partial \theta_i \ \partial \theta_j}.
+\]
+For pure penalized maximum likelihood problems, the posterior log
+density $\log p(\theta | y)$ is replaced by the penalized likelihood
+function $\mathcal{L}(\theta) = \log p(y | \theta) - \lambda(\theta)$.
+
+\subsection{Condition Number and Adaptation}
+
+A good gauge of how difficult a problem the curvature presents is
+given by the condition number of the Hessian matrix $H$, which is the
+ratio of the largest to the smallest eigenvalue of $H$ (assuming the
+Hessian is positive definite).  This essentially measures the
+difference between the flattest direction of movement and the most
+curved.  Typically, the step size of a gradient-based algorithm is
+bounded by the most sharply curved direction.  With better conditioned
+log densities or penalized likelihood functions, it is easier for
+Stan's adaptation, especially the diagonal adaptations that are used
+as defaults.
+
+\subsection{Unit Scales without Correlation}
+
+Ideally, all parameters should be programmed so that they have unit
+scale and so that posterior correlation is reduced; together, these
+properties mean that there is no rotation or scaling required for
+optimal performance of Stan's algorithms.  For Hamiltonian Monte
+Carlo, this implies a unit mass matrix, which requires no adaptation
+as it is where the algorithm initializes.  Riemannian Hamiltonian
+Monte Carlo performs this conditioning on the fly at every step, but
+such conditioning is very expensive computationally.
+
+\subsection{Varying Curvature}
+
+In all but very simple models (such as multivariate normals), the
+Hessian will vary as $\theta$ varies.  As an example, see the
+illustration of Neal's funnel example in \reffigure{funnel}.  The more
+the curvature varies, the harder it is for all of the algorithms with
+fixed adaptation parameters (that is, everything but Riemannian
+Hamiltonian Monte Carlo) to find adaptations that cover the entire
+density well.  Many of the variable transforms proposed are aimed at
+improving the conditioning of the Hessian and/or making it more
+consistent across the relevant portions of the density (or penalized
+maximum likelihood function) being fit.
+
+For all of Stan's algorithms, the curvature along the path from the
+initial values of the parameters to the solution is relevant.  For
+penalized maximum likelihood and variational inference, the solution
+of the iterative algorithm will be a single point, so this is all that
+matters.  For sampling, the relevant ``solution'' is the typical set,
+which is the posterior volume where almost all draws from the
+posterior lies;  thus, the typical set contains almost all of the
+posterior probability mass.
+
+With sampling, the curvature may vary dramatically between the points
+on the path from the initialization point to the typical set and
+within the typical set.  This is why adaptation needs to run long
+enough to visit enough points in the typical set to get a good
+first-order estimate of the curvature within the typical set.  If
+adaptation is not run long enough, sampling within the typical set
+after adaptation will not be efficient.  We generally recommend at
+least one hundred iterations after the typical set is reached (and the
+first effective draw is ready to be realized).  Whether adaptation has
+run long enough can be measured by comparing the adaptation parameters
+derived from a set of diffuse initial parameter values.
+
+
+\subsection{Reparameterizing with a Change of Variables}
+
+Improving statistical efficiency is achieved by reparameterizing the
+model so that the same result may be calculated using a density or
+penalized maximum likelihood that is better conditioned.  Again, see
+the example of reparameterizing Neal's funnel in \reffigure{funnel}
+for an example, and also the examples in
+\refchapter{change-of-variables}.
+
+One has to be careful in using change-of-variables reparameterizations
+when using maximum likelihood estimation, because they can change the
+result if the Jacobian term is inadvertently included in the revised
+likelihood model.
+
 
 \section{Well-Specified Models}
 

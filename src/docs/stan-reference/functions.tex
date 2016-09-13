@@ -2697,8 +2697,60 @@ The cumulative sum of \farg{rv}}
 %
 \end{description}
 
+\section{Covariance Functions}\label{covariance.section}
 
+\subsection{Exponentiated quadratic covariance function}
 
+The exponentiated quadratic kernel defines the covariance between $f(x_i)$ and
+$f(x_j)$ where $f\colon \reals^D \mapsto \reals$ as a function of the squared
+Euclidian distance between $x_i \in \reals^D$ and $x_j \in \reals^D$:
+
+\[
+  \text{cov}(f(x_i), f(x_j)) = k(x_i, x_j) 
+= \sigma^2 
+\exp \left(
+	- \dfrac{1}{2l^2} \sum_{d=1}^D (x_{i,d} - x_{j,d})^2
+\right)
+\]
+
+\noindent with $\sigma$ and $l$ constrained to be positive.
+
+There are two variants of the exponentiated quadratic covariance function in
+Stan. One builds a covariance matrix, $K \in \reals^{N \times N}$ for $x_1,
+\dots, x_N$, where $K_{i,j} = k(x_i, x_j)$, which is necessarily symmetric and
+positive semidefinite by construction. There is a second variant of the
+exponentiated quadratic covariance function that builds a $K \in \reals^{N
+\times M}$ covariance matrix for $x_1, \dots, x_N$ and $x^\prime_1, \dots,
+x^\prime_M$, where $x_i \in \reals^D$ and $x^\prime_i \in \reals^D$ and
+$K_{i,j} = k(x_i, x^\prime_j)$.
+
+\begin{description}
+%
+\fitem{matrix}{cov\_exp\_quad}{row\_vectors \farg{x}, real \farg{sigma}, real
+\farg{l}}{ The covariance matrix with an exponentiated quadratic kernel of
+\farg{x}.}
+
+\fitem{matrix}{cov\_exp\_quad}{vectors \farg{x}, real \farg{sigma}, real
+\farg{l}}{ The covariance matrix with an exponentiated quadratic kernel of
+\farg{x}.}
+
+\fitem{matrix}{cov\_exp\_quad}{real[] \farg{x}, real \farg{sigma}, real
+\farg{l}}{ The covariance matrix with an exponentiated quadratic kernel of
+\farg{x}.}
+
+\fitemtwolines{matrix}{cov\_exp\_quad}{row\_vectors \farg{x1}, row\_vectors
+\farg{x2}}{real \farg{sigma}, real \farg{l}}{ The covariance matrix with an
+exponentiated quadratic kernel of \farg{x1} and \farg{x2}.}
+
+\fitemtwolines{matrix}{cov\_exp\_quad}{vectors \farg{x1}, vectors
+\farg{x2}}{real \farg{sigma}, real \farg{l}}{ The covariance matrix with an
+exponentiated quadratic kernel of \farg{x1} and \farg{x2}.}
+
+\fitemtwolines{matrix}{cov\_exp\_quad}{real[] \farg{x1}, real[]
+\farg{x2}}{real \farg{sigma}, real \farg{l}}{ The covariance matrix with an
+exponentiated quadratic kernel of \farg{x1} and \farg{x2}.}
+
+\end{description}
 
 \section{Linear Algebra Functions and Solvers}
 
@@ -2744,25 +2796,68 @@ the diagonal are ignored.
 
 \begin{description}
 %
-\fitem{row\_vector}{mdivide\_right\_tri\_low}{row\_vector \farg{B}, 
+\fitem{vector}{mdivide\_left\_tri\_low}{matrix \farg{A}, vector \farg{b}}{
+The left division of \farg{b} by a lower-triangular view of \farg{A};
+algebraically equivalent to the less efficient and stable form
+\code{inverse(tri(\farg{A})) * \farg{b}}, where \code{tri(\farg{A})}
+is the lower-triangular portion of \farg{A} with the above-diagonal
+entries set to zero.}
+%
+\fitem{matrix}{mdivide\_left\_tri\_low}{matrix \farg{A}, matrix \farg{B}}{
+The left division of \farg{B} by a triangular view of \farg{A};
+algebraically equivalent to the less efficient and stable form
+\code{inverse(tri(\farg{A})) * \farg{B}}, where \code{tri(\farg{A})}
+is the lower-triangular portion of \farg{A} with the above-diagonal
+entries set to zero.}
+%
+\fitem{row\_vector}{mdivide\_right\_tri\_low}{row\_vector \farg{b}, 
   matrix \farg{A}}{
-The right division of \farg{B} by \code{tri(\farg{A})}, a lower triangular
-view of \farg{A}; equivalently \code{\farg{B} * inverse(tri(\farg{A}))}}
+The right division of \farg{b} by a triangular view of 
+\farg{A};  algebraically equivalent to the less efficient and stable form
+\code{\farg{b} * inverse(tri(\farg{A}))},  where \code{tri(\farg{A})}
+is the lower-triangular portion of \farg{A} with the above-diagonal
+entries set to zero.}
 %
+\fitem{matrix}{mdivide\_right\_tri\_low}{matrix \farg{B}, matrix
+  \farg{A}}{
+The right division of \farg{B} by a triangular view of 
+\farg{A};  algebraically equivalent to the less efficient and stable form
+\code{\farg{B} * inverse(tri(\farg{A}))},  where \code{tri(\farg{A})}
+is the lower-triangular portion of \farg{A} with the above-diagonal
+entries set to zero.}
 %
-\fitem{matrix}{mdivide\_right\_tri\_low}{matrix \farg{B}, matrix \farg{A}}{
-The right division of \farg{B} by \code{tri(\farg{A})}, a lower triangular
-view of \farg{A}; equivalently \code{\farg{B} * inverse(tri(\farg{A}))}}
+\end{description}
+
+\subsection{Symmetric Positive-Definite Matrix-Division Functions}
+
+There are four division functions which are specialized for
+efficiency and stability for symmetric positive-definite matrix
+dividends.  If the matrix dividend argument is not symmetric and
+positive definite, these will reject and print warnings.
+
+\begin{description}
 %
-\fitem{vector}{mdivide\_left\_tri\_low}{matrix \farg{A}, vector \farg{B}}
-The left division of \farg{B} by a triangular view of
-\code{tri(\farg{A})}, a lower triangular view of \farg{A}; equivalently
-\code{inverse(tri(\farg{A})) * \farg{B}}
+\fitem{matrix}{mdivide\_left\_spd}{matrix \farg{A}, vector \farg{b}}{
+The left division of \farg{b} by the symmetric,
+positive-definite matrix \farg{A}; algebraically equivalent to the
+less efficient and stable form \code{inverse(\farg{A}) * \farg{b}}.}
 %
-\fitem{matrix}{mdivide\_left\_tri\_low}{matrix \farg{A}, matrix \farg{B}}
-The left division of \farg{B} by a triangular view of
-\code{tri(\farg{A})}, a lower triangular view of \farg{A}; equivalently
-\code{inverse(tri(\farg{A})) * \farg{B}}
+\fitem{vector}{mdivide\_left\_spd}{matrix \farg{A}, matrix \farg{B}}{
+The left division of \farg{B} by the symmetric,
+positive-definite matrix \farg{A}; algebraically equivalent to the
+less efficient and stable form \code{inverse(\farg{A}) * B}.}
+%
+\fitem{row\_vector}{mdivide\_right\_spd}{row\_vector \farg{b}, 
+  matrix \farg{A}}{
+The right division of \farg{b} by the symmetric, positive-definite
+matrix \farg{A};  algebraically equivalent to the less efficient
+and stable form \code{\farg{b} * inverse(\farg{A})}.}
+%
+\fitem{matrix}{mdivide\_right\_spd}{matrix \farg{B}, matrix \farg{A}}{
+The right division of \farg{B} by the symmetric, positive-definite
+matrix \farg{A};  algebraically equivalent to the less efficient
+and stable form \code{\farg{B} * inverse(\farg{A})}.}
+
 %
 \end{description}
 
