@@ -2477,7 +2477,7 @@ assignment statement evaluates the expression on the right-hand side
 and assigns it to the (indexed) variable on the left-hand side.  An
 example of a simple assignment is as follows.%
 %
-\footnote{In versions of Stan before 2.11.0, the operator \code{<-} was
+\footnote{In versions of Stan before 2.12.0, the operator \code{<-} was
   used for assignment rather than using the equal sign \code{=}.  The
   old operator \code{<-} is now deprecated and will print a warning.
   In the future, it will be removed.}
@@ -2736,7 +2736,7 @@ sampling statement could be expressed as a direct increment on the
 total log probability as
 %
 \begin{stancode}
-target += normal_lpdf(y,mu,sigma);
+target += normal_lpdf(y | mu, sigma);
 \end{stancode}
 %
 See the subsection of \refsection{sampling-statements} discussing log
@@ -2766,8 +2766,8 @@ target += dist_lpmf(y | theta1, ..., thetaN);
 \end{stancode}
 %
 
-This will be well formed if and only if \code{dist\_lpdf(y, theta1,
-  ..., thetaN)} or \code{dist\_lpmf(y, theta1, ..., thetaN)} is a
+This will be well formed if and only if \code{dist\_lpdf(y | theta1,
+  ..., thetaN)} or \code{dist\_lpmf(y | theta1, ..., thetaN)} is a
 well-formed expression of type \code{real}.
 
 \subsection{Log Probability Increment vs.\ Sampling Statement}
@@ -3823,7 +3823,8 @@ defined as follows.
 real foo_lpdf(real y, vector theta) { ... }
 \end{stancode}
 %
-Then the shorthand
+Note that for function definitions, the comma is used rather than the
+vertical bar.  Then the shorthand
 %
 \begin{stancode}
 z ~ foo(phi);
@@ -4768,11 +4769,11 @@ index ::= ?(expression | expression ':' | ':' expression
 
 indexes ::= index % ','
 
-numeric_literal ::= int_literal | real_literal
+numeric_literal ::= integer_literal | real_literal
 
-integer_literal ::= [0-9]*
+integer_literal ::= 0 | [1-9] [0-9]*
 
-real_literal ::= [0-9]* ?('.' [0-9]*) ?exp_literal
+real_literal ::= integer_literal ?('.' [0-9]*) ?exp_literal
 
 exp_literal ::= ('e' | 'E') integer_literal
 
