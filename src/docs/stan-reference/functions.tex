@@ -9,38 +9,6 @@ Documentation on these functions is included here for completeness.
 The special keyword \code{void} is used for the return type of void
 functions. 
 
-\section{Increment Log Probability (deprecated)}
-
-The increment log density statement, \code{increment\_log\_prob(...)}
-syntactically appears to be a function, but is treated as its own
-special statement.
-\begin{description}
-  \fitem{void}{increment\_log\_prob}{T \farg{lp}}{Add \farg{lp} (or
-    elements of \farg{lp} if \code{T} is a container type) to the
-    total log probability accumulator returned by the log probability
-    function defined by a Stan model.}
-\end{description}
-%
-As of Stan 2.10, the \code{increment\_log\_prob()} statement has been
-deprecated in favor of the \code{target~+=} syntax, with exactly the
-same behavior.
-%
-\begin{description}
-  \fitem{void}{target~+=}{T \farg{lp}}{Add \farg{lp} (or
-    elements of \farg{lp} if \code{T} is a container type) to the
-    total log probability accumulator returned by the log probability
-    function defined by a Stan model.}
-\end{description}
-%
-
-In both cases, the expression \code{lp} can be of any expression type.
-Specifically, it can be an integer or real primitive, a vector, row
-vector, or matrix, or an array of any type, including multidimensional
-arrays and arrays of matrices, vectors, or row vectors.  Vector
-arguments are included for convenience and have no speed advantage
-over adding values in a loop.  See \refsection{increment-log-prob} for
-more information on \code{target +=} and \code{increment\_log\_prob}.
-
 \section{Print}
 
 The \code{print} statement is unique among Stan's syntactic constructs
@@ -231,6 +199,118 @@ step functions applied to anything other than data.
 \noindent
 This chapter describes built-in functions that take zero or more real
 or integer arguments and return real values.  
+
+\section{Vectorization of Real-Valued Functions}\label{fun-vectorization.section}
+
+Although listed in this chapter, many of Stan's built-in functions are
+vectorized so that they may be applied to any argument type.  The
+vectorized form of these functions is not any faster than writing an
+explicit loop that iterates over the elements applying the
+function---it's just easier to read and write and less error prone.
+
+\subsection{Unary Function Vectorization}
+
+Many of Stan's unary functions can be applied to any argument type.
+For example, the exponential function, \code{exp}, can be applied to
+\code{real} arguments or arrays of \code{real} arguments.  Other than
+for integer arguments, the result type is the same as the argument
+type, including dimensionality and size.  Integer arguments are first
+promoted to real values, but the result will still have the same
+dimensionality and size as the argument.
+
+\subsubsection{Real and real array arguments}
+
+When applied to a simple real value, the result is a real value.  When
+applied to arrays, vectorized functions like \code{exp()} are defined
+elementwise.  For example,
+%
+\begin{stancode}
+// declare some variables for arguments
+real x0;
+real x1[5];
+real x2[4, 7];
+...
+// declare some variables for results
+real y0;
+real y1[5];
+real y2[4, 7];
+...
+// calculate and assign results
+y0 = exp(x0);
+y1 = exp(x1);
+y2 = exp(x2);
+\end{stancode}
+%
+When \code{exp} is applied to an array, it applies elementwise.  For
+example, the statement above,
+%
+\begin{stancode}
+y2 = exp(x2);
+\end{stancode}
+%
+produces the same result for \code{y2} as the explicit loop
+%
+\begin{stancode}
+for (i in 1:4)
+  for (j in 1:7)
+    y2[i, j] = exp(x2[i, j]);
+\end{stancode}
+%
+
+\subsubsection{Vector and matrix arguments}
+
+Vectorized functions also apply elementwise to vectors and matrices.
+For example,
+%
+\begin{stancode}
+vector[5] xv;
+row_vector[7] xrv;
+matrix[10, 20] xm;
+...
+vector[5] yv;
+row_vector[7] yrv;
+matrix[10, 20] ym;
+
+yv = exp(xv);
+yrv = exp(xrv);
+ym = exp(xm);
+\end{stancode}
+%
+
+Arrays of vectors and matrices work the same way.  For example,
+%
+\begin{stancode}
+matrix[17, 93] u[12];
+...
+matrix[17, 93] z[12];
+...
+z = exp(u);
+\end{stancode}
+%
+After this has been executed, \code{z[i,~j,~k]} will be equal to
+\code{exp(u[i,~j,~k])}.
+
+
+\subsubsection{Integer and integer array arguments}
+
+Integer arguments are promoted to real values in vectorized unary
+functions.  Thus if \code{n} is of type \code{int}, \code{exp(n)} is of
+type \code{real}.  Arrays work the same way, so that if \code{n2} is a
+one dimensional array of integers, then \code{exp(n2)} will be a
+one-dimensional array of reals with the same number of elements as
+\code{n2}.  For example,
+%
+\begin{stancode}
+int n1[23];
+...
+real z1[23];
+...
+z1 = exp(n1);
+\end{stancode}
+%
+It would be illegal to try to assign \code{exp(n1)} to an array of
+integers; the return type is a real array.
+
 
 \section{Mathematical Constants}\label{built-in-constants.section}
 
@@ -756,8 +836,7 @@ of these in the future, but as of now, there is no good workaround.
     \mbox{\code{square}}(x) = x^2
     \]}
   %
-  \fitem{real}{exp}{real \farg{x}}{
-    Returns the natural exponential of \farg{x}.
+  \fitemUnaryVec{exp}{natural exponential}{
     \[
     \mbox{\code{exp}}(x) \ = \ \exp(x)
     \ = \ e^x
@@ -2080,7 +2159,10 @@ Matrix transposition is represented using a postfix operator.
 \section{Elementwise Functions}
 
 Elementwise functions apply a function to each element of a vector or
-matrix, returning a result of the same shape as the argument.
+matrix, returning a result of the same shape as the argument.  There
+are many functions that are vectorized in addition to the ad hoc cases
+listed in this section;  see \refsection{fun-vectorization} for the
+general cases.
 
 \begin{description}
 %
@@ -2093,14 +2175,6 @@ The elementwise natural logarithm of \farg{x}}
 \fitem{matrix}{log}{matrix \farg{x}}{
 The elementwise natural logarithm of \farg{x}}
 %
-\fitem{vector}{exp}{vector \farg{x}}{
-The elementwise exponential of \farg{x}}
-%
-\fitem{row\_vector}{exp}{row\_vector \farg{x}}{
-The elementwise exponential of \farg{x}}
-%
-\fitem{matrix}{exp}{matrix \farg{x}}{
-The elementwise exponential of \farg{x}}
 \end{description}
 
 

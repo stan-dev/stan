@@ -154,6 +154,14 @@
   \\[-30pt] \index{{\tt\bfseries #4 }!{\tt (#3):\,#1}|hyperpage}}
 
 
+\newcommand{\fitemUnaryVec}[3]{
+  \fitem{R}{#1}{T \farg{x}}{Returns the #2 of \farg{x}, defined by #3
+    Applies elementwise to any scalar, vector, matrix, or array
+    argument type \code{T}; the return type is the same as the
+    argument type with \code{int} promoted to \code{real};
+    for details, see \refsection{fun-vectorization}.}
+}
+
 \newcommand{\fitemindexsort}[6]{\item[{\tt #1 {\bfseries #2}(#3)}]\mbox{ }
   \\[2pt] #4\index{{\tt\bfseries #6 }@{\tt\bfseries #5 }!{\tt
       (#3):\,#1}|hyperpage}}
