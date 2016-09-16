@@ -54,7 +54,8 @@ namespace stan {
         > eps[validate_declarations_f(_pass,
                                       boost::phoenix::ref(functions_declared_),
                                       boost::phoenix::ref(functions_defined_),
-                                      boost::phoenix::ref(error_msgs_), allow_undefined)];
+                                      boost::phoenix::ref(error_msgs_),
+                                      allow_undefined)];
 
       // locals: _a = allow sampling, _b = origin (function, rng/lp)
       function_r.name("function declaration or definition");

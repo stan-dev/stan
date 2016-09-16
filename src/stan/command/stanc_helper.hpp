@@ -52,8 +52,8 @@ void print_stanc_help(std::ostream* out_stream) {
                     "Output file for generated C++ code",
                     "default = \"$name.cpp\"");
 
-  print_help_option(out_stream, "allow_undefined", "", "If specified, do not fail if a function is declared but not defined");
-
+  print_help_option(out_stream, "allow_undefined", "",
+                    "Do not fail if a function is declared but not defined");
 }
 
 void delete_file(std::ostream* err_stream,
