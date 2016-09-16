@@ -51,6 +51,9 @@ void print_stanc_help(std::ostream* out_stream) {
   print_help_option(out_stream, "o", "file",
                     "Output file for generated C++ code",
                     "default = \"$name.cpp\"");
+
+  print_help_option(out_stream, "allow_undefined", "", "If specified, do not fail if a function is declared but not defined");
+
 }
 
 void delete_file(std::ostream* err_stream,
@@ -138,6 +141,9 @@ int stanc_helper(int argc, const char* argv[],
       }
     }
 
+    bool allow_undefined = false;
+    if (cmd.has_flag("allow_undefined"))
+      allow_undefined = true;
     stan::lang::program prog;
 
     std::fstream out(out_file_name.c_str(),
@@ -149,7 +155,7 @@ int stanc_helper(int argc, const char* argv[],
     }
 
     bool valid_model
-      = stan::lang::compile(err_stream, in, out, model_name);
+      = stan::lang::compile(err_stream, in, out, model_name, allow_undefined);
 
     out.close();
     if (!valid_model) {

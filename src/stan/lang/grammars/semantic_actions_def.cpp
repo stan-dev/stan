@@ -315,18 +315,21 @@ namespace stan {
                                            function_signature_t> >& declared,
                                            std::set<std::pair<std::string,
                                            function_signature_t> >& defined,
-                                           std::ostream& error_msgs) const {
+                                           std::ostream& error_msgs,
+                                           const bool allow_undefined) const {
       using std::set;
       using std::string;
       using std::pair;
       typedef set<pair<string, function_signature_t> >::iterator iterator_t;
-      for (iterator_t it = declared.begin(); it != declared.end(); ++it) {
-        if (defined.find(*it) == defined.end()) {
-          error_msgs <<"Function declared, but not defined."
-                     << " Function name=" << (*it).first
-                     << std::endl;
-          pass = false;
-          return;
+      if (!allow_undefined) {
+        for (iterator_t it = declared.begin(); it != declared.end(); ++it) {
+          if (defined.find(*it) == defined.end()) {
+            error_msgs <<"Function declared, but not defined."
+                       << " Function name=" << (*it).first
+                       << std::endl;
+            pass = false;
+            return;
+          }
         }
       }
       pass = true;

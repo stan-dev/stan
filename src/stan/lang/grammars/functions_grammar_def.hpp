@@ -27,7 +27,8 @@ namespace stan {
 
   template <typename Iterator>
   functions_grammar<Iterator>::functions_grammar(variable_map& var_map,
-                                                 std::stringstream& error_msgs)
+                                                 std::stringstream& error_msgs,
+                                                 const bool allow_undefined)
       : functions_grammar::base_type(functions_r),
         var_map_(var_map),
         functions_declared_(),
@@ -53,7 +54,7 @@ namespace stan {
         > eps[validate_declarations_f(_pass,
                                       boost::phoenix::ref(functions_declared_),
                                       boost::phoenix::ref(functions_defined_),
-                                      boost::phoenix::ref(error_msgs_))];
+                                      boost::phoenix::ref(error_msgs_), allow_undefined)];
 
       // locals: _a = allow sampling, _b = origin (function, rng/lp)
       function_r.name("function declaration or definition");
