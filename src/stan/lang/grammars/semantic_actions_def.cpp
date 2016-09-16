@@ -579,7 +579,7 @@ namespace stan {
         error_msgs << '.' << std::endl;
       }
       pass = e.expression_type().is_primitive_int();
-    };
+    }
     boost::phoenix::function<validate_int_expression_warn>
     validate_int_expression_warn_f;
 
