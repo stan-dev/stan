@@ -40,7 +40,7 @@ namespace stan {
 
     template <typename Iterator>
     program_grammar<Iterator>::program_grammar(const std::string& model_name,
-                                               const bool allow_undefined)
+                                               bool allow_undefined)
         : program_grammar::base_type(program_r),
           model_name_(model_name),
           var_map_(),

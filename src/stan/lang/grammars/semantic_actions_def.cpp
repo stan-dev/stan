@@ -316,7 +316,7 @@ namespace stan {
                                            std::set<std::pair<std::string,
                                            function_signature_t> >& defined,
                                            std::ostream& error_msgs,
-                                           const bool allow_undefined) const {
+                                           bool allow_undefined) const {
       using std::set;
       using std::string;
       using std::pair;

@@ -33,7 +33,7 @@ namespace stan {
 
       functions_grammar(variable_map& var_map,
                         std::stringstream& error_msgs,
-                        const bool allow_undefined = false);
+                        bool allow_undefined = false);
 
       boost::spirit::qi::rule<Iterator,
                               std::vector<function_decl_def>(),

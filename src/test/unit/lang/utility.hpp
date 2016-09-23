@@ -50,7 +50,7 @@ std::string file_name_to_model_name(const std::string& name) {
  */
 bool is_parsable(const std::string& file_name,
                  std::ostream* msgs = 0,
-                 const bool allow_undefined = false) {
+                 bool allow_undefined = false) {
   stan::lang::program prog;
   std::ifstream fs(file_name.c_str());
   std::string model_name = file_name_to_model_name(file_name);
@@ -74,7 +74,7 @@ bool is_parsable_folder(const std::string& model_name,
   path += "/";
   path += model_name;
   path += ".stan";
-  return is_parsable(path,msgs,false);
+  return is_parsable(path, msgs, false);
 }
 
 /** test that model with specified name in folder "good"

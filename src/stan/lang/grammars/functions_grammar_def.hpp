@@ -28,7 +28,7 @@ namespace stan {
   template <typename Iterator>
   functions_grammar<Iterator>::functions_grammar(variable_map& var_map,
                                                  std::stringstream& error_msgs,
-                                                 const bool allow_undefined)
+                                                 bool allow_undefined)
       : functions_grammar::base_type(functions_r),
         var_map_(var_map),
         functions_declared_(),

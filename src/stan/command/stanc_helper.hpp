@@ -141,13 +141,9 @@ int stanc_helper(int argc, const char* argv[],
       }
     }
 
-    bool allow_undefined = false;
-    if (cmd.has_flag("allow_undefined"))
-      allow_undefined = true;
-    stan::lang::program prog;
+    bool allow_undefined = cmd.has_flag("allow_undefined");
 
-    std::fstream out(out_file_name.c_str(),
-                     std::fstream::out);
+    std::fstream out(out_file_name.c_str(), std::fstream::out);
     if (out_stream) {
       *out_stream << "Model name=" << model_name << std::endl;
       *out_stream << "Input file=" << in_file_name << std::endl;

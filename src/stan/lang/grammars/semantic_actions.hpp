@@ -257,7 +257,7 @@ namespace stan {
                       std::set<std::pair<std::string,
                                          function_signature_t> >& defined,
                       std::ostream& error_msgs,
-                      const bool allow_undefined) const;
+                      bool allow_undefined) const;
     };
     extern boost::phoenix::function<validate_declarations>
     validate_declarations_f;
