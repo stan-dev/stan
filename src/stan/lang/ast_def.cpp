@@ -284,6 +284,16 @@ namespace stan {
     void function_signatures::add_unary(const::std::string& name) {
       add(name, DOUBLE_T, DOUBLE_T);
     }
+    void function_signatures::add_unary_vectorized(const::std::string&
+    name) {
+      for (size_t i = 0; i < 8; ++i) {
+        add(name, expr_type(DOUBLE_T, i), expr_type(INT_T, i));
+        add(name, expr_type(DOUBLE_T, i), expr_type(DOUBLE_T, i));
+        add(name, expr_type(VECTOR_T, i), expr_type(VECTOR_T, i));
+        add(name, expr_type(ROW_VECTOR_T, i), expr_type(ROW_VECTOR_T, i));
+        add(name, expr_type(MATRIX_T, i), expr_type(MATRIX_T, i));
+      }
+    }
     void function_signatures::add_binary(const::std::string& name) {
       add(name, DOUBLE_T, DOUBLE_T, DOUBLE_T);
     }
