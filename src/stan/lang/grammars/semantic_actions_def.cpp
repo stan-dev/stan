@@ -315,18 +315,21 @@ namespace stan {
                                            function_signature_t> >& declared,
                                            std::set<std::pair<std::string,
                                            function_signature_t> >& defined,
-                                           std::ostream& error_msgs) const {
+                                           std::ostream& error_msgs,
+                                           bool allow_undefined) const {
       using std::set;
       using std::string;
       using std::pair;
       typedef set<pair<string, function_signature_t> >::iterator iterator_t;
-      for (iterator_t it = declared.begin(); it != declared.end(); ++it) {
-        if (defined.find(*it) == defined.end()) {
-          error_msgs <<"Function declared, but not defined."
-                     << " Function name=" << (*it).first
-                     << std::endl;
-          pass = false;
-          return;
+      if (!allow_undefined) {
+        for (iterator_t it = declared.begin(); it != declared.end(); ++it) {
+          if (defined.find(*it) == defined.end()) {
+            error_msgs <<"Function declared, but not defined."
+                       << " Function name=" << (*it).first
+                       << std::endl;
+            pass = false;
+            return;
+          }
         }
       }
       pass = true;
@@ -576,7 +579,7 @@ namespace stan {
         error_msgs << '.' << std::endl;
       }
       pass = e.expression_type().is_primitive_int();
-    };
+    }
     boost::phoenix::function<validate_int_expression_warn>
     validate_int_expression_warn_f;
 

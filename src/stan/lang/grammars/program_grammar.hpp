@@ -31,7 +31,8 @@ namespace stan {
       statement_grammar<Iterator> statement_g;
       functions_grammar<Iterator> functions_g;
 
-      program_grammar(const std::string& model_name);
+      program_grammar(const std::string& model_name,
+                      bool allow_undefined = false);
 
       boost::spirit::qi::rule<Iterator,
                               std::vector<var_decl>(),
