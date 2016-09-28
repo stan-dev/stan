@@ -91,7 +91,7 @@ TEST_F(ServicesSampleHmcNutsDenseEAdapt, output_sizes) {
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
       
-  int return_code = stan::services::sample::hmc_nuts_dense_e_adapt(
+  stan::services::sample::hmc_nuts_dense_e_adapt(
       model, context, random_seed, chain, init_radius,
       num_warmup, num_samples, num_thin, save_warmup, refresh,
       stepsize, stepsize_jitter, max_depth, delta, gamma, kappa, t0,
@@ -195,7 +195,7 @@ TEST_F(ServicesSampleHmcNutsDenseEAdapt, output_regression) {
   EXPECT_EQ(interrupt.call_count(), 0);
 
       
-  int return_code = stan::services::sample::hmc_nuts_dense_e_adapt(
+  stan::services::sample::hmc_nuts_dense_e_adapt(
       model, context, random_seed, chain, init_radius,
       num_warmup, num_samples, num_thin, save_warmup, refresh,
       stepsize, stepsize_jitter, max_depth, delta, gamma, kappa, t0,
