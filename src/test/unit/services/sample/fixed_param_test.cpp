@@ -195,8 +195,8 @@ TEST_F(ServicesSamplesFixedParam, output_regression) {
 
   EXPECT_EQ("Elapsed Time:", message_values[0].substr(1,13));
   EXPECT_EQ("seconds (Warm-up)", message_values[0].substr(17,26));
-  EXPECT_EQ("seconds (Sampling)", message_values[1].substr(23,28));
-  EXPECT_EQ("seconds (Total)", message_values[2].substr(23,28));
+  EXPECT_EQ("seconds (Sampling)", message_values[1].substr(24,28));
+  EXPECT_EQ("seconds (Total)", message_values[2].substr(24,28));
 
   EXPECT_EQ(0, init_values.size());
   EXPECT_EQ(0, error_values.size());
