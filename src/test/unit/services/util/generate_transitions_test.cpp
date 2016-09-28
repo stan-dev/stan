@@ -1,8 +1,8 @@
-#include <stan/services/sample/fixed_param.hpp>
+#include <stan/services/util/generate_transitions.hpp>
 #include <gtest/gtest.h>
 #include <stan/io/empty_var_context.hpp>
 #include <test/test-models/good/optimization/rosenbrock.hpp>
-#include <test/unit/instrumented_callbacks.hpp>
+#include <test/unit/services/instrumented_callbacks.hpp>
 #include <iostream>
 #include <exception>
 
@@ -74,7 +74,7 @@ TEST_F(ServicesSamplesGenerateTransitions, rosenbrock) {
   // Expect one parameter name per parameter value.
   EXPECT_EQ(parameter_names[0].size(), parameter_values[0].size());
 
-  // Expect on call to set parameter names, and one set of output per
+  // Expect one call to set parameter names, and one set of output per
   // iteration, not sure where the "+1" is coming from yet...
   EXPECT_EQ(diagnostic.call_count("vector_string"), 1);
   EXPECT_EQ(diagnostic.call_count("vector_double"), num_iterations + 1);
