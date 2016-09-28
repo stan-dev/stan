@@ -19,7 +19,100 @@ public:
 };
 
 
-TEST_F(ServicesSamplesFixedParam, rosenbrock) {
+TEST_F(ServicesSamplesFixedParam, call_count) {
+  unsigned int seed = 0;
+  unsigned int chain = 1;
+  double init_radius = 0;
+  int num_iterations = 10;
+
+  int refresh = 0;
+  stan::test::unit::instrumented_interrupt interrupt;
+  EXPECT_EQ(interrupt.call_count(), 0);
+  
+  int return_code = stan::services::sample::fixed_param(model, context,
+                                                   seed, chain, init_radius,
+                                                   num_iterations,
+                                                   1,
+                                                   refresh,
+                                                   interrupt,
+                                                   message,
+                                                   init,
+                                                   error,
+                                                   parameter,
+                                                   diagnostic);
+  EXPECT_EQ(0, return_code);
+
+  std::vector<std::vector<std::string> > parameter_names;
+  parameter_names = parameter.vector_string_values();
+  std::vector<std::vector<double> > parameter_values;
+  parameter_values = parameter.vector_double_values();
+  std::vector<std::vector<std::string> > diagnostic_names;
+  diagnostic_names = diagnostic.vector_string_values();
+  std::vector<std::vector<double> > diagnostic_values;
+  diagnostic_values = diagnostic.vector_double_values();
+
+  // Expecatations of message call counts
+  EXPECT_EQ(num_iterations, interrupt.call_count());
+  EXPECT_EQ(1, parameter.call_count("vector_string"));
+  EXPECT_EQ(num_iterations, parameter.call_count("vector_double"));
+  EXPECT_EQ(1, diagnostic.call_count("vector_string"));
+  EXPECT_EQ(num_iterations, diagnostic.call_count("vector_double"));
+}
+
+
+TEST_F(ServicesSamplesFixedParam, output_sizes) {
+  unsigned int seed = 0;
+  unsigned int chain = 1;
+  double init_radius = 0;
+  int num_iterations = 10;
+
+  int refresh = 0;
+  stan::test::unit::instrumented_interrupt interrupt;
+  EXPECT_EQ(interrupt.call_count(), 0);
+  
+  stan::services::sample::fixed_param(model, context,
+                                                   seed, chain, init_radius,
+                                                   num_iterations,
+                                                   1,
+                                                   refresh,
+                                                   interrupt,
+                                                   message,
+                                                   init,
+                                                   error,
+                                                   parameter,
+                                                   diagnostic);
+
+  std::vector<std::vector<std::string> > parameter_names;
+  parameter_names = parameter.vector_string_values();
+  std::vector<std::vector<double> > parameter_values;
+  parameter_values = parameter.vector_double_values();
+  std::vector<std::vector<std::string> > diagnostic_names;
+  diagnostic_names = diagnostic.vector_string_values();
+  std::vector<std::vector<double> > diagnostic_values;
+  diagnostic_values = diagnostic.vector_double_values();
+
+  // Expectations of parameter parameter names.  
+  ASSERT_EQ(4, parameter_names[0].size());
+  EXPECT_EQ("lp__", parameter_names[0][0]);
+  EXPECT_EQ("accept_stat__", parameter_names[0][1]);
+  EXPECT_EQ("x", parameter_names[0][2]);
+  EXPECT_EQ("y", parameter_names[0][3]);
+
+  // Expect one name per parameter value.
+  EXPECT_EQ(parameter_names[0].size(), parameter_values[0].size());
+  EXPECT_EQ(diagnostic_names[0].size(), diagnostic_values[0].size());
+
+  // Expect one vector of parameter values per iterations
+  EXPECT_EQ(num_iterations, parameter_values.size());
+ 
+  // Expect one call to set parameter names, and one set of output per
+  // iteration.
+  EXPECT_EQ("lp__", diagnostic_names[0][0]);
+  EXPECT_EQ("accept_stat__", diagnostic_names[0][1]);
+}
+
+
+TEST_F(ServicesSamplesFixedParam, parameter_checks) {
   unsigned int seed = 0;
   unsigned int chain = 1;
   double init_radius = 0;
@@ -41,51 +134,14 @@ TEST_F(ServicesSamplesFixedParam, rosenbrock) {
                                                    parameter,
                                                    diagnostic);
 
-  // Expect interrupt to be called once per iteration.
-  EXPECT_EQ(num_iterations, interrupt.call_count());
-
-  // Expecatations of message call counts
-  // Expectations of messages
-
-  EXPECT_EQ("\n Elapsed Time: 0 seconds (Warm-up)\n", 
-    message_ss.str().substr(0,36));
-
-  EXPECT_EQ("0,0\n", init_ss.str());
-
-  // Expect on call to set parameter names, and one set of output per
-  // iteration.
-  EXPECT_EQ(parameter.call_count("vector_string"), 1);
-  EXPECT_EQ(parameter.call_count("vector_double"), num_iterations);
-
-  // Expectations of parameter parameter names.  
   std::vector<std::vector<std::string> > parameter_names;
   parameter_names = parameter.vector_string_values();
-  ASSERT_EQ(4, parameter_names_.size());
-  EXPECT_EQ("lp__", parameter_names[0][0]);
-  EXPECT_EQ("accept_stat__", parameter_names[0][1]);
-  EXPECT_EQ("x", parameter_names[0][2]);
-  EXPECT_EQ("y", parameter_names[0][3]);
-
   std::vector<std::vector<double> > parameter_values;
   parameter_values = parameter.vector_double_values();
-
-  // Expect one parameter name per parameter value.
-  EXPECT_EQ(parameter_names[0].size(), parameter_values[0].size());
-
-  // Expect one vector of parameter values per iterations
-  EXPECT_EQ(num_iterations, parameter_values.size());
- 
-  // Expect one call to set parameter names, and one set of output per
-  // iteration, not sure where the "+1" is coming from yet...
-  EXPECT_EQ(diagnostic.call_count("vector_string"), 1);
-  EXPECT_EQ(diagnostic.call_count("vector_double"), num_iterations + 1);
   std::vector<std::vector<std::string> > diagnostic_names;
   diagnostic_names = diagnostic.vector_string_values();
-  EXPECT_EQ(diagnostic_names[0][0], "lp__");
-  EXPECT_EQ(diagnostic_names[0][1], "accept_stat__");
   std::vector<std::vector<double> > diagnostic_values;
   diagnostic_values = diagnostic.vector_double_values();
-  EXPECT_EQ(diagnostic_names[0].size(), diagnostic_values[0].size());
 
   // Expect parameter values to stay at zero.
   EXPECT_DOUBLE_EQ(0.0, parameter_values.front()[1])
@@ -96,11 +152,54 @@ TEST_F(ServicesSamplesFixedParam, rosenbrock) {
     << "final memory_writer should be (0, 0)";
   EXPECT_DOUBLE_EQ(0.0, parameter_values.back()[2])
     << "final memory_writer should be (0, 0)";
-  EXPECT_DOUBLE_EQ(return_code, 0);
-
+  EXPECT_EQ(return_code, 0);
 
 }
 
+TEST_F(ServicesSamplesFixedParam, output_regression) {
+  unsigned int seed = 0;
+  unsigned int chain = 1;
+  double init_radius = 0;
+  int num_iterations = 10;
+
+  int refresh = 0;
+  stan::test::unit::instrumented_interrupt interrupt;
+  EXPECT_EQ(interrupt.call_count(), 0);
+  
+  stan::services::sample::fixed_param(model, context,
+                                                   seed, chain, init_radius,
+                                                   num_iterations,
+                                                   1,
+                                                   refresh,
+                                                   interrupt,
+                                                   message,
+                                                   init,
+                                                   error,
+                                                   parameter,
+                                                   diagnostic);
+
+  std::vector<std::vector<std::string> > parameter_names;
+  parameter_names = parameter.vector_string_values();
+  std::vector<std::vector<double> > parameter_values;
+  parameter_values = parameter.vector_double_values();
+  std::vector<std::vector<std::string> > diagnostic_names;
+  diagnostic_names = diagnostic.vector_string_values();
+  std::vector<std::vector<double> > diagnostic_values;
+  diagnostic_values = diagnostic.vector_double_values();
+  std::vector<std::string> message_values;
+  message_values = message.string_values();
+  std::vector<std::string> init_values;
+  init_values = init.string_values();
+  std::vector<std::string> error_values;
+  error_values = error.string_values();
+
+  EXPECT_EQ("Elapsed Time:", message_values[0].substr(1,13));
+  EXPECT_EQ("seconds (Warm-up)", message_values[0].substr(17,26));
+  EXPECT_EQ("seconds (Sampling)", message_values[1].substr(23,28));
+  EXPECT_EQ("seconds (Total)", message_values[2].substr(23,28));
+
+  EXPECT_EQ(0, init_values.size());
+  EXPECT_EQ(0, error_values.size());
 
 
-
+}
