@@ -1670,7 +1670,7 @@ namespace stan {
           generate_expression(vs[i].def(), false, o);
           o << ");" << EOL;
         }
-      }      
+      }
     }
 
     struct validate_transformed_params_visgen : public visgen {
@@ -2081,7 +2081,7 @@ namespace stan {
                                    is_var_, is_fun_return_);
           generate_local_var_init_nan(x.local_decl_, indent, o_,
                                       is_var_, is_fun_return_);
-          generate_define_vars(x.local_decl_,indent,o_);
+          generate_define_vars(x.local_decl_, indent, o_);
         }
         o_ << EOL;
 
@@ -3144,7 +3144,8 @@ namespace stan {
       generate_member_var_inits(prog.data_decl_, o);
 
       o << EOL;
-      generate_comment("validate data variables, initialize if not defined", 2, o);
+      generate_comment("validate data variables, initialize if not defined",
+                       2, o);
       generate_validate_var_decls(prog.data_decl_, 2, o);
 
       generate_var_resizing(prog.derived_data_decl_.first, o);
