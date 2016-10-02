@@ -91,9 +91,25 @@ TEST(langParserVarDeclsGrammarDef, badDefDeclIntVar3) {
               "variable definition dimensions mismatch");
 }
 
+TEST(langParserVarDeclsGrammarDef, badDefDeclIntVar4) {
+  test_throws("declare-define-var-int-4",
+              "variable definition dimensions mismatch");
+}
+
 TEST(langParserVarDeclsGrammarDef, defDeclDoubleVar) {
   test_parsable("declare-define-var-double");
 }
+
+TEST(langParserVarDeclsGrammarDef, badDefDeclDoubleVar1) {
+  test_throws("declare-define-var-double-1",
+              "variable definition dimensions mismatch");
+}
+
+TEST(langParserVarDeclsGrammarDef, badDefDeclDoubleVar2) {
+  test_throws("declare-define-var-double-2",
+              "variable definition base type mismatch");
+}
+
 
 TEST(langParserVarDeclsGrammarDef, defDeclVecTypesVar) {
   test_parsable("declare-define-var-vec-types");
