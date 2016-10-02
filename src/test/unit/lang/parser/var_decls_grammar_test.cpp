@@ -110,11 +110,20 @@ TEST(langParserVarDeclsGrammarDef, badDefDeclDoubleVar2) {
               "variable definition base type mismatch");
 }
 
-
 TEST(langParserVarDeclsGrammarDef, defDeclVecTypesVar) {
   test_parsable("declare-define-var-vec-types");
 }
 
+TEST(langParserVarDeclsGrammarDef, badDefDeclVec1) {
+  test_throws("declare-define-var-vec-1",
+              "variable definition base type mismatch");
+}
+
 TEST(langParserVarDeclsGrammarDef, defDeclMatrixVar) {
   test_parsable("declare-define-var-matrix");
+}
+
+TEST(langParserVarDeclsGrammarDef, badDefDeclMatrix1) {
+  test_throws("declare-define-var-matrix-1",
+              "variable definition base type mismatch");
 }

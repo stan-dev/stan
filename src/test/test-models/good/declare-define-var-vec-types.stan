@@ -1,3 +1,14 @@
+functions {
+  void foo1() {
+    vector[2] lf1;
+    vector[2] lf2 = lf1;
+  }
+  vector foo2(vector x) {
+    vector[2] lf1;
+    vector[2] lf2 = x;
+    return lf1 + lf2;
+  }
+}
 data {
   vector[7] b0;
   row_vector[7] c0;
