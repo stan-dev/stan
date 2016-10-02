@@ -1,5 +1,8 @@
+data {
+  real a1[2];
+}
 transformed data {
-  int td_a1[2] = 1;   // array <- scalar - bad
+  vector[2] td_a1 = a1;   // vector <- array - bad
 }
 parameters {
   real y;
@@ -7,3 +10,4 @@ parameters {
 model {
   y ~ normal(0,1);
 }
+
