@@ -110,6 +110,16 @@ TEST(langParserVarDeclsGrammarDef, badDefDeclDoubleVar2) {
               "variable definition base type mismatch");
 }
 
+TEST(langParserVarDeclsGrammarDef, badDefDeclDoubleVar3) {
+  test_throws("declare-define-var-double-3",
+              "variable definition not possible in this block");
+}
+
+TEST(langParserVarDeclsGrammarDef, badDefDeclDoubleVar4) {
+  test_throws("declare-define-var-double-4",
+              "variable definition not possible in this block");
+}
+
 TEST(langParserVarDeclsGrammarDef, defDeclVecTypesVar) {
   test_parsable("declare-define-var-vec-types");
 }
