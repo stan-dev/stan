@@ -938,7 +938,7 @@ TEST(io_reader,cholesky_factor_constrain) {
     theta.push_back(-static_cast<double>(i));
   stan::io::reader<double> reader(theta,theta_i);
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> L(reader.cholesky_factor_constrain(3U,3U));
-  EXPECT_TRUE(stan::math::check_cholesky_factor("test_cholesky_factor_constrain","L",L));
+  EXPECT_NO_THROW(stan::math::check_cholesky_factor("test_cholesky_factor_constrain","L",L));
   EXPECT_EQ(3,L.rows());
   EXPECT_EQ(3,L.cols());
   EXPECT_EQ(9,L.size());
@@ -951,7 +951,7 @@ TEST(io_reader,cholesky_factor_constrain_asymmetric) {
     theta.push_back(-static_cast<double>(i));
   stan::io::reader<double> reader(theta,theta_i);
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> L(reader.cholesky_factor_constrain(3U,2U));
-  EXPECT_TRUE(stan::math::check_cholesky_factor("test_cholesky_factor_constrain","L",L));
+  EXPECT_NO_THROW(stan::math::check_cholesky_factor("test_cholesky_factor_constrain","L",L));
   EXPECT_EQ(3,L.rows());
   EXPECT_EQ(2,L.cols());
   EXPECT_EQ(6,L.size());
@@ -965,7 +965,7 @@ TEST(io_reader,cholesky_factor_constrain_jacobian) {
   stan::io::reader<double> reader(theta,theta_i);
   double lp = 1.9;
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> L(reader.cholesky_factor_constrain(3U,3U,lp));
-  EXPECT_TRUE(stan::math::check_cholesky_factor("test_cholesky_factor_constrain","L",L));
+  EXPECT_NO_THROW(stan::math::check_cholesky_factor("test_cholesky_factor_constrain","L",L));
   EXPECT_EQ(3,L.rows());
   EXPECT_EQ(3,L.cols());
   EXPECT_EQ(9,L.size());
@@ -981,7 +981,7 @@ TEST(io_reader,cholesky_factor_constrain_jacobian_asymmetric) {
   stan::io::reader<double> reader(theta,theta_i);
   double lp = 1.9;
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> L(reader.cholesky_factor_constrain(4U,3U,lp));
-  EXPECT_TRUE(stan::math::check_cholesky_factor("test_cholesky_factor_constrain","L",L));
+  EXPECT_NO_THROW(stan::math::check_cholesky_factor("test_cholesky_factor_constrain","L",L));
   EXPECT_EQ(4,L.rows());
   EXPECT_EQ(3,L.cols());
   EXPECT_EQ(12,L.size());

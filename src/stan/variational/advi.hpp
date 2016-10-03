@@ -5,7 +5,6 @@
 #include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <stan/io/dump.hpp>
-#include <stan/model/util.hpp>
 #include <stan/services/io/write_iteration.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/services/variational/print_progress.hpp>

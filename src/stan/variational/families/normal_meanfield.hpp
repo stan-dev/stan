@@ -3,7 +3,7 @@
 
 #include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/math/prim/mat.hpp>
-#include <stan/model/util.hpp>
+#include <stan/model/gradient.hpp>
 #include <stan/variational/base_family.hpp>
 #include <algorithm>
 #include <ostream>
