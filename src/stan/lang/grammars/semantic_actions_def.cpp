@@ -319,18 +319,21 @@ namespace stan {
                                            function_signature_t> >& declared,
                                            std::set<std::pair<std::string,
                                            function_signature_t> >& defined,
-                                           std::ostream& error_msgs) const {
+                                           std::ostream& error_msgs,
+                                           bool allow_undefined) const {
       using std::set;
       using std::string;
       using std::pair;
       typedef set<pair<string, function_signature_t> >::iterator iterator_t;
-      for (iterator_t it = declared.begin(); it != declared.end(); ++it) {
-        if (defined.find(*it) == defined.end()) {
-          error_msgs <<"Function declared, but not defined."
-                     << " Function name=" << (*it).first
-                     << std::endl;
-          pass = false;
-          return;
+      if (!allow_undefined) {
+        for (iterator_t it = declared.begin(); it != declared.end(); ++it) {
+          if (defined.find(*it) == defined.end()) {
+            error_msgs <<"Function declared, but not defined."
+                       << " Function name=" << (*it).first
+                       << std::endl;
+            pass = false;
+            return;
+          }
         }
       }
       pass = true;
@@ -581,7 +584,7 @@ namespace stan {
         error_msgs << '.' << std::endl;
       }
       pass = e.expression_type().is_primitive_int();
-    };
+    }
     boost::phoenix::function<validate_int_expression_warn>
     validate_int_expression_warn_f;
 
@@ -1111,7 +1114,8 @@ namespace stan {
         std::vector<expr_type> arg_types_trunc(arg_types);
         arg_types_trunc[0] = s.truncation_.low_.expression_type();
         std::string function_name_ccdf = get_ccdf(s.dist_.family_);
-        if (!is_double_return(function_name_ccdf, arg_types_trunc,
+        if (function_name_ccdf == s.dist_.family_
+            || !is_double_return(function_name_ccdf, arg_types_trunc,
                               error_msgs)) {
           error_msgs << "lower truncation not defined for specified"
                      << " arguments to "
@@ -1132,8 +1136,9 @@ namespace stan {
         std::vector<expr_type> arg_types_trunc(arg_types);
         arg_types_trunc[0] = s.truncation_.high_.expression_type();
         std::string function_name_cdf = get_cdf(s.dist_.family_);
-        if (!is_double_return(function_name_cdf, arg_types_trunc,
-                              error_msgs)) {
+        if (function_name_cdf == s.dist_.family_
+            || !is_double_return(function_name_cdf, arg_types_trunc,
+                                 error_msgs)) {
           error_msgs << "upper truncation not defined for"
                      << " specified arguments to "
                      << s.dist_.family_ << std::endl;
@@ -1154,8 +1159,9 @@ namespace stan {
         std::vector<expr_type> arg_types_trunc(arg_types);
         arg_types_trunc[0] = s.truncation_.low_.expression_type();
         std::string function_name_cdf = get_cdf(s.dist_.family_);
-        if (!is_double_return(function_name_cdf, arg_types_trunc,
-                              error_msgs)) {
+        if (function_name_cdf == s.dist_.family_
+            || !is_double_return(function_name_cdf, arg_types_trunc,
+                                 error_msgs)) {
           error_msgs << "lower truncation not defined for specified"
                      << " arguments to "
                      << s.dist_.family_ << std::endl;

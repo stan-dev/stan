@@ -247,13 +247,14 @@ namespace stan {
     set_allows_sampling_origin_f;
 
     // called from: functions_grammar
-    struct validate_declarations : public phoenix_functor_quaternary {
+    struct validate_declarations : public phoenix_functor_quinary {
       void operator()(bool& pass,
                       std::set<std::pair<std::string,
                                          function_signature_t> >& declared,
                       std::set<std::pair<std::string,
                                          function_signature_t> >& defined,
-                      std::ostream& error_msgs) const;
+                      std::ostream& error_msgs,
+                      bool allow_undefined) const;
     };
     extern boost::phoenix::function<validate_declarations>
     validate_declarations_f;

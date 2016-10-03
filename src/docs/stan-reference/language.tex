@@ -1267,6 +1267,84 @@ available for indexing.  Similarly, \code{vector[,]} is the type of a
 two-dimensional array of vectors.
 
 
+\section{Compound Variable Declaration and Definition}
+
+Stan allows assignable variables to be declared and defined in a
+single statement.  Assignable variables are 
+%
+\begin{itemize}
+\item local variables, and
+\item variables declared in the transformed data,
+transformed parameters, or generated quantities blocks.
+\end{itemize}
+%
+For example, the statement
+%
+\begin{stancode}
+int N = 5;
+\end{stancode}
+%
+declares the variable \code{N} to be an integer scalar type and at the
+same time defines it to be the value of the expression \code{5}.  
+
+\subsection{Assignment Typing}
+
+The type of the expression on the right-hand side of the assignment
+must be assignable to the type of the variable being declared.  For
+example, it is legal to have
+%
+\begin{stancode}
+real sum = 0;
+\end{stancode}
+%
+even though \code{0} is of type \code{int} and \code{sum} is of type
+\code{real}, because integer-typed scalar expressions can be assigned
+to real-valued scalar variables.  In all other cases, the type of the
+expression on the right-hand side of the assignment must be identical
+to the type of the variable being declared.
+
+Any type may be assigned.  For example,
+%
+\begin{stancode}
+real matrix[3, 2] a = b;
+\end{stancode}
+%
+declares a matrix variable \code{a} and assigns it to the value of
+\code{b}, which must be of type \code{matrix} for the compound
+statement to be well formed.  The sizes of matrices are not part of
+their static typing and cannot be validated until run time.
+
+
+\subsection{Right-Hand Side Expressions}
+
+The right-hand side may be any expression which has a type which is
+assignable to the variable being declared.  For example,
+%
+\begin{stancode}
+real matrix[3, 2] a = 0.5 * (b + c);
+\end{stancode}
+%
+assigns the matrix variable \code{a} to half of the sum of \code{b}
+and \code{c}.  The only requirement on \code{b} and \code{c} is that
+the expression \code{b~+~c} be of type \code{matrix}.  For example,
+\code{b} could be of type \code{matrix} and \code{c} of type
+\code{real}, because adding a matrix to a scalar produces a matrix,
+and the multiplying by a scalar produces another matrix.
+
+The right-hand side expression can be a call to a user defined
+function, allowing general algorithms to be applied that might not be
+otherwise expressible as simple expressions (e.g., iterative or
+recursive algorithms).
+
+
+\subsection{Scope within Expressions}
+
+Any variable that is in scope and any function that is available in
+the block in which the compound declaration and definition appears may
+be used in the expression on the right-hand side of the compound
+declaration and definition statement. 
+
+
 \chapter{Expressions}
 
 \noindent
@@ -2477,7 +2555,7 @@ assignment statement evaluates the expression on the right-hand side
 and assigns it to the (indexed) variable on the left-hand side.  An
 example of a simple assignment is as follows.%
 %
-\footnote{In versions of Stan before 2.11.0, the operator \code{<-} was
+\footnote{In versions of Stan before 2.12.0, the operator \code{<-} was
   used for assignment rather than using the equal sign \code{=}.  The
   old operator \code{<-} is now deprecated and will print a warning.
   In the future, it will be removed.}
@@ -2605,19 +2683,20 @@ assignment statement's execution.
 
 
 
-\section{Log Probability Increment Statement}\label{increment-log-prob.section}
+\section{Increment Log Density}\label{increment-log-prob.section}
 
 The basis of Stan's execution is the evaluation of a log probability
-function for a given set of parameters; this function returns the log
-density of the posterior up to an additive constant.  Data and
-transformed data are fixed before the log density is evaluated.  The
-total log probability is initialized to zero.  Next, any log Jacobian
+function (specifically, a probability density function) for a given
+set of (real-valued) parameters; this function returns the log density
+of the posterior up to an additive constant.  Data and transformed
+data are fixed before the log density is evaluated.  The total log
+probability is initialized to zero.  Next, any log Jacobian
 adjustments accrued by the variable constraints are added to the log
 density (the Jacobian adjustment may be skipped for optimization).
 Sampling and log probability increment statements may add to the log
 density in the model block.  A log probability increment statement
-directly increments the log density with the value of an expression
-as follows.%
+directly increments the log density with the value of an expression as
+follows.%
 %
 \footnote{The current notation replaces two previous versions.
   Originally, a variable \code{lp\_\_} was directly exposed and
@@ -4712,7 +4791,7 @@ unsized_dims ::= '['  ','*  ']'
 {
 \small
 \begin{Verbatim}[fontsize=\small]
-var_decl ::= var_type variable ?dims
+var_decl ::= var_type variable ?dims ?('=' expression) ';'
 
 var_type ::= 'int' range_constraint
            | 'real' range_constraint
@@ -4839,6 +4918,15 @@ In the Stan grammar provided in this chapter, the expression \code{1
 \refsection{arithmetic-expressions}, Stan disambiguates between the
 meaning $1 + (2 \times 3)$ and the meaning $(1 + 2) \times 3$ based on
 operator precedences and associativities.
+
+\subsection{Typing of Compound Declaration and Definition}
+
+In a compound variable declaration and definition, the type of the
+right-hand side expression must be assignable to the variable being
+declared.  The assignability constraint restricts compound
+declarations and definitions to local variables and variables declared
+in the transformed data, transformed parameters, and generated
+quantities blocks.
 
 \subsection{Forms of Numbers}
 
