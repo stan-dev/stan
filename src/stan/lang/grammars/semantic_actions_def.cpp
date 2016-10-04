@@ -40,7 +40,7 @@ namespace stan {
      * the Stan language.  Sets original name of specified function to
      * name and add "stan::math::" namespace qualifier to name.
      *
-     * @param f[in, out] Function to qualify.
+     * @param[in, out] f Function to qualify.
      */
     void qualify_builtins(fun& f) {
       if (f.args_.size() > 0) return;
@@ -58,7 +58,7 @@ namespace stan {
      * specified function to name and add <code>stan::math::</code>
      * namespace qualifier to name.
      *
-     * @param f[in, out] Function to qualify.
+     * @param[in, out] f Function to qualify.
      */
     void qualify_cpp11_builtins(fun& f) {
       if (f.args_.size() == 1
