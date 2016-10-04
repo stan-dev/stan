@@ -4545,8 +4545,6 @@ namespace stan {
                                               const std::string& scalar_t_name,
                                               int indent,
                                               std::ostream& out) {
-      out << "inline"
-          << EOL;
       generate_indent(indent, out);
       generate_bare_type(fun.return_type_, scalar_t_name, out);
       out << EOL;
