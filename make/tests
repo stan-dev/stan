@@ -191,6 +191,8 @@ src/test/unit/services/sample/hmc_nuts_dense_e_adapt_test.cpp : src/test/test-mo
 src/test/unit/services/sample/hmc_nuts_dense_e_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/services/sample/hmc_nuts_diag_e_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/services/sample/hmc_nuts_diag_e_adapt_e_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
+src/test/unit/services/sample/hmc_nuts_unit_e_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
+src/test/unit/services/sample/hmc_nuts_unit_e_adapt_e_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/old_services/sample/generate_transitions_test.cpp: src/test/test-models/good/services/test_lp.hpp
 src/test/unit/old_services/sample/mcmc_writer_test.cpp: src/test/test-models/good/io_example.hpp
 src/test/unit/variational/advi_univar_no_constraint_test.cpp: src/test/test-models/good/variational/univariate_no_constraint.hpp
