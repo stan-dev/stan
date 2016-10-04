@@ -1,13 +1,13 @@
-#include <stan/services/sample/hmc_static_dense_e.hpp>
+#include <stan/services/sample/hmc_static_dense_e_adapt.hpp>
 #include <gtest/gtest.h>
 #include <stan/io/empty_var_context.hpp>
 #include <test/test-models/good/optimization/rosenbrock.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <iostream>
 
-class ServicesSampleHmcStaticDenseE : public testing::Test {
+class ServicesSampleHmcStaticDenseEAdapt : public testing::Test {
 public:
-  ServicesSampleHmcStaticDenseE()
+  ServicesSampleHmcStaticDenseEAdapt()
     : model(context, &model_log) {}
 
   std::stringstream model_log;
@@ -18,7 +18,7 @@ public:
 };
 
 
-TEST_F(ServicesSampleHmcStaticDenseE, call_count) {
+TEST_F(ServicesSampleHmcStaticDenseEAdapt, call_count) {
   unsigned int random_seed = 0;
   unsigned int chain = 1;
   double init_radius = 0;
@@ -30,13 +30,21 @@ TEST_F(ServicesSampleHmcStaticDenseE, call_count) {
   double stepsize = 0.1;
   double stepsize_jitter = 0;
   double int_time = 8;
+  double delta = .1;
+  double gamma = .1;
+  double kappa = .1;
+  double t0 = .1;
+  unsigned int init_buffer = 50;
+  unsigned int term_buffer = 50;
+  unsigned int window = 100;
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
       
-  int return_code = stan::services::sample::hmc_static_dense_e(
+  int return_code = stan::services::sample::hmc_static_dense_e_adapt(
       model, context, random_seed, chain, init_radius,
       num_warmup, num_samples, num_thin, save_warmup, refresh,
-      stepsize, stepsize_jitter, int_time, 
+      stepsize, stepsize_jitter, int_time, delta, gamma, kappa, t0,
+      init_buffer, term_buffer, window,
       interrupt, message, error, init,
       parameter, diagnostic);
  
@@ -61,7 +69,7 @@ TEST_F(ServicesSampleHmcStaticDenseE, call_count) {
 }
 
 
-TEST_F(ServicesSampleHmcStaticDenseE, output_sizes) {
+TEST_F(ServicesSampleHmcStaticDenseEAdapt, output_sizes) {
   unsigned int random_seed = 0;
   unsigned int chain = 1;
   double init_radius = 0;
@@ -73,13 +81,21 @@ TEST_F(ServicesSampleHmcStaticDenseE, output_sizes) {
   double stepsize = 0.1;
   double stepsize_jitter = 0;
   double int_time = 8;
+  double delta = .1;
+  double gamma = .1;
+  double kappa = .1;
+  double t0 = .1;
+  unsigned int init_buffer = 50;
+  unsigned int term_buffer = 50;
+  unsigned int window = 100;
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
       
-  stan::services::sample::hmc_static_dense_e(
+  stan::services::sample::hmc_static_dense_e_adapt(
       model, context, random_seed, chain, init_radius,
       num_warmup, num_samples, num_thin, save_warmup, refresh,
-      stepsize, stepsize_jitter, int_time,
+      stepsize, stepsize_jitter, int_time, delta, gamma, kappa, t0,
+      init_buffer, term_buffer, window,
       interrupt, message, error, init,
       parameter, diagnostic);
 
@@ -112,7 +128,7 @@ TEST_F(ServicesSampleHmcStaticDenseE, output_sizes) {
 }
 
 
-TEST_F(ServicesSampleHmcStaticDenseE, parameter_checks) {
+TEST_F(ServicesSampleHmcStaticDenseEAdapt, parameter_checks) {
   unsigned int random_seed = 0;
   unsigned int chain = 1;
   double init_radius = 0;
@@ -124,14 +140,22 @@ TEST_F(ServicesSampleHmcStaticDenseE, parameter_checks) {
   double stepsize = 0.1;
   double stepsize_jitter = 0;
   double int_time = 8;
+  double delta = .1;
+  double gamma = .1;
+  double kappa = .1;
+  double t0 = .1;
+  unsigned int init_buffer = 50;
+  unsigned int term_buffer = 50;
+  unsigned int window = 100;
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
       
-  int return_code = stan::services::sample::hmc_static_dense_e(
+  int return_code = stan::services::sample::hmc_static_dense_e_adapt(
       model, context, random_seed, chain, init_radius,
       num_warmup, num_samples, num_thin, save_warmup, refresh,
-      stepsize, stepsize_jitter, int_time,
+      stepsize, stepsize_jitter, int_time, delta, gamma, kappa, t0,
+      init_buffer, term_buffer, window,
       interrupt, message, error, init,
       parameter, diagnostic);
 
@@ -148,7 +172,7 @@ TEST_F(ServicesSampleHmcStaticDenseE, parameter_checks) {
 
 }
 
-TEST_F(ServicesSampleHmcStaticDenseE, output_regression) {
+TEST_F(ServicesSampleHmcStaticDenseEAdapt, output_regression) {
   unsigned int random_seed = 0;
   unsigned int chain = 1;
   double init_radius = 0;
@@ -160,14 +184,22 @@ TEST_F(ServicesSampleHmcStaticDenseE, output_regression) {
   double stepsize = 0.1;
   double stepsize_jitter = 0;
   double int_time = 8;
+  double delta = .1;
+  double gamma = .1;
+  double kappa = .1;
+  double t0 = .1;
+  unsigned int init_buffer = 50;
+  unsigned int term_buffer = 50;
+  unsigned int window = 100;
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
       
-  stan::services::sample::hmc_static_dense_e(
+  stan::services::sample::hmc_static_dense_e_adapt(
       model, context, random_seed, chain, init_radius,
       num_warmup, num_samples, num_thin, save_warmup, refresh,
-      stepsize, stepsize_jitter, int_time,
+      stepsize, stepsize_jitter, int_time, delta, gamma, kappa, t0,
+      init_buffer, term_buffer, window,
       interrupt, message, error, init,
       parameter, diagnostic);
 
