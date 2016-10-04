@@ -25,21 +25,55 @@ namespace stan {
   namespace lang {
 
     /**
-     * Add qualifier "stan::math::" to nullary functions defined in the
-     * Stan language.  The original name is set to the name here and
-     * the name is converted to have the prefix.
+     * Set original name of specified function to name and add 
+     * "stan::math::" namespace qualifier to name.
      *
-     * @param f Function to qualify.
+     * @param[in, out] f Function to qualify.
+     */
+    void qualify(fun& f) {
+      f.original_name_ = f.name_;
+      f.name_ = "stan::math::" + f.name_;
+    }
+
+    /**
+     * Add qualifier "stan::math::" to nullary functions defined in
+     * the Stan language.  Sets original name of specified function to
+     * name and add "stan::math::" namespace qualifier to name.
+     *
+     * @param[in, out] f Function to qualify.
      */
     void qualify_builtins(fun& f) {
       if (f.args_.size() > 0) return;
       if (f.name_ == "e" || f.name_ == "pi" || f.name_ == "log2"
           || f.name_ == "log10" || f.name_ == "sqrt2"
           || f.name_ == "not_a_number" || f.name_ == "positive_infinity"
-          || f.name_ == "negative_infinity" || f.name_ == "machine_precision") {
-        f.original_name_ = f.name_;
-        f.name_ = "stan::math::" + f.name_;
-      }
+          || f.name_ == "negative_infinity" || f.name_ == "machine_precision")
+        qualify(f);
+    }
+
+    /**
+     * Add namespace qualifier stan::math:: to specify Stan versions
+     * of functions to avoid ambiguities with versions defined in
+     * math.h in the top-level namespace.  Sets original name of
+     * specified function to name and add <code>stan::math::</code>
+     * namespace qualifier to name.
+     *
+     * @param[in, out] f Function to qualify.
+     */
+    void qualify_cpp11_builtins(fun& f) {
+      if (f.args_.size() == 1
+          && (f.name_ == "acosh"|| f.name_ == "asinh" || f.name_ == "atanh"
+              || f.name_ == "exp2" || f.name_ == "expm1" || f.name_ == "log1p"
+              || f.name_ == "log2" || f.name_ == "cbrt" || f.name_ == "erf"
+              || f.name_ == "erfc" || f.name_ == "tgamma" || f.name_ == "lgamma"
+              || f.name_ == "round" || f.name_ == "trunc"))
+          qualify(f);
+      else if (f.args_.size() == 2
+               && (f.name_ == "fdim" || f.name_ == "fmax" || f.name_ == "fmin"
+                   || f.name_ == "hypot"))
+        qualify(f);
+      else if (f.args_.size() == 3 && f.name_ == "fma")
+        qualify(f);
     }
 
     bool has_prob_suffix(const std::string& s) {
@@ -1541,8 +1575,9 @@ namespace stan {
               "'_lpdf' for density functions or '_lpmf' for mass functions",
               fun, error_msgs);
 
-      // if fun is built-in nullary, add stan::math:: qualifier
+      // add stan::math:: qualifier for built-in nullary and math.h
       qualify_builtins(fun);
+      qualify_cpp11_builtins(fun);
 
       // use old function names for built-in prob funs
       if (!function_signatures::instance().has_user_defined_key(fun.name_)) {
