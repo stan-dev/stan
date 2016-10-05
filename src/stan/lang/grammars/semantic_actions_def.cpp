@@ -110,16 +110,20 @@ namespace stan {
       return true;
     }
 
-    bool validate_double_expr(const expression& expr,
-                              std::stringstream& error_msgs) {
+    void validate_double_expr::operator()(const expression& expr,
+                              bool& pass,
+                              std::stringstream& error_msgs)
+      const {
       if (!expr.expression_type().is_primitive_double()
           && !expr.expression_type().is_primitive_int()) {
         error_msgs << "expression denoting real required; found type="
                    << expr.expression_type() << std::endl;
-        return false;
+        pass = false;
+        return;
       }
-      return true;
+      pass = true;
     }
+    boost::phoenix::function<validate_double_expr> validate_double_expr_f;
 
     void set_fun_type(fun& fun, std::ostream& error_msgs) {
       std::vector<expr_type> arg_types;
@@ -370,6 +374,7 @@ namespace stan {
     }
     boost::phoenix::function<validate_declarations> validate_declarations_f;
 
+
     bool fun_exists(const std::set<std::pair<std::string,
                     function_signature_t> >& existing,
                     const std::pair<std::string,
@@ -595,12 +600,12 @@ namespace stan {
     }
     boost::phoenix::function<set_omni_idx> set_omni_idx_f;
 
-    void validate_int_expression::operator()(const expression & e, bool& pass)
+    void validate_int_expr_silent::operator()(const expression & e, bool& pass)
       const {
       pass = e.expression_type().is_primitive_int();
     }
-    boost::phoenix::function<validate_int_expression>
-    validate_int_expression_f;
+    boost::phoenix::function<validate_int_expr_silent>
+    validate_int_expr_silent_f;
 
     void validate_int_expression_warn::operator()(const expression & e,
                                                   bool& pass,
@@ -1295,16 +1300,19 @@ namespace stan {
     }
     boost::phoenix::function<remove_loop_identifier> remove_loop_identifier_f;
 
-    void validate_int_expr_warn::operator()(const expression& expr,
+    void validate_int_expr::operator()(const expression& expr,
                                             bool& pass,
                                             std::stringstream& error_msgs)
       const {
-      pass = expr.expression_type().is_primitive_int();
-      if (!pass)
+      if (!expr.expression_type().is_primitive_int()) {
         error_msgs << "expression denoting integer required; found type="
                    << expr.expression_type() << std::endl;
+        pass = false;
+        return;
+      }
+      pass = true;
     }
-    boost::phoenix::function<validate_int_expr_warn> validate_int_expr_warn_f;
+    boost::phoenix::function<validate_int_expr> validate_int_expr_f;
 
     void deprecate_increment_log_prob::operator()(
                                        std::stringstream& error_msgs) const {
@@ -2077,6 +2085,7 @@ namespace stan {
       return false;
     }
 
+
     data_only_expression::data_only_expression(std::stringstream& error_msgs,
                                                variable_map& var_map)
       : error_msgs_(error_msgs),
@@ -2173,6 +2182,64 @@ namespace stan {
     }
     boost::phoenix::function<validate_decl_constraints>
     validate_decl_constraints_f;
+
+    void validate_definition::operator()(const var_origin& origin,
+                                         const var_decl& var_decl,
+                                         bool& pass,
+                                         std::stringstream& error_msgs)
+      const {
+      if (!var_decl.has_def()) return;
+
+      // std::cout << " validate variable definition: " << var_decl.name()
+      //           << " origin: " << origin
+      //           << " decl type: " << var_decl.base_decl().base_type_
+      //           << " decl num dims: " << var_decl.dims().size()
+      //           << " def type: " << var_decl.def().expression_type()
+      //           << " def num dims: " << var_decl.def().total_dims()
+      //           << std::endl;
+
+      // validate that assigment is allowed in this block
+      if (origin == data_origin
+          || origin == parameter_origin) {
+        error_msgs << "variable definition not possible in this block"
+                   << std::endl;
+        pass = false;
+      }
+
+      // validate type
+      expr_type decl_type(var_decl.base_decl().base_type_,
+                          var_decl.dims().size());
+      expr_type def_type = var_decl.def().expression_type();
+
+      bool types_compatible
+        = (decl_type.is_primitive()
+           && def_type.is_primitive()
+           && (decl_type.type() == def_type.type()
+               || (decl_type.type() == DOUBLE_T
+                   && def_type.type() == INT_T)))
+        || (decl_type.type() == def_type.type());
+      if (!types_compatible) {
+        error_msgs << "variable definition base type mismatch,"
+                   << " variable declared as base type: ";
+        write_base_expr_type(error_msgs, decl_type.type());
+        error_msgs << "variable definition has base: ";
+        write_base_expr_type(error_msgs, def_type.type());
+        pass = false;
+      }
+      // validate dims
+      if (decl_type.num_dims() != def_type.num_dims()) {
+        error_msgs << "variable definition dimensions mismatch,"
+                   << " definition specifies "
+                   <<  decl_type.num_dims()
+                   << ", declaration specifies "
+                   << def_type.num_dims();
+        pass = false;
+      }
+      return;
+    }
+    boost::phoenix::function<validate_definition>
+    validate_definition_f;
+
 
     void validate_identifier::reserve(const std::string& w) {
       reserved_word_set_.insert(w);
@@ -2398,20 +2465,6 @@ namespace stan {
     }
     boost::phoenix::function<empty_range> empty_range_f;
 
-
-    void validate_int_expr::operator()(const expression& expr,
-                                       bool& pass,
-                                       std::stringstream& error_msgs) const {
-      if (!expr.expression_type().is_primitive_int()) {
-        error_msgs << "expression denoting integer required; found type="
-                   << expr.expression_type() << std::endl;
-        pass = false;
-        return;
-      }
-      pass = true;
-    }
-    boost::phoenix::function<validate_int_expr> validate_int_expr_f;
-
     void set_int_range_lower::operator()(range& range,
                                          const expression& expr,
                                          bool& pass,
@@ -2461,7 +2514,8 @@ namespace stan {
                                             std::stringstream& error_msgs)
       const {
       range.low_ = expr;
-      pass = validate_double_expr(expr, error_msgs);
+      validate_double_expr validator;
+      validator(expr, pass, error_msgs);
     }
     boost::phoenix::function<set_double_range_lower> set_double_range_lower_f;
 
@@ -2471,7 +2525,8 @@ namespace stan {
                                             std::stringstream& error_msgs)
       const {
       range.high_ = expr;
-      pass = validate_double_expr(expr, error_msgs);
+      validate_double_expr validator;
+      validator(expr, pass, error_msgs);
     }
     boost::phoenix::function<set_double_range_upper> set_double_range_upper_f;
 
@@ -2480,13 +2535,12 @@ namespace stan {
                              variable_map& vm, bool& pass, const var_origin& vo,
                              std::ostream& error_msgs) const {
       if (vm.exists(var_decl.name_)) {
-        // variable already exists
         pass = false;
         error_msgs << "duplicate declaration of variable, name="
                    << var_decl.name_;
 
         error_msgs << "; attempt to redeclare as ";
-        print_var_origin(error_msgs, vo);  // FIXME -- need original vo
+        print_var_origin(error_msgs, vo);
 
         error_msgs << "; original declaration as ";
         print_var_origin(error_msgs, vm.get_origin(var_decl.name_));
@@ -2506,7 +2560,7 @@ namespace stan {
         var_decl_result = var_decl;
         return;
       }
-      pass = true;  // probably don't need to set true
+      pass = true;
       vm.add(var_decl.name_, var_decl, vo);
       var_decl_result = var_decl;
     }
