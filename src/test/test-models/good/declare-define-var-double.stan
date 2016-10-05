@@ -38,9 +38,9 @@ transformed parameters {
     real lp1 = 1;      // real_p <- int_d 
     real lp2 = 2.0;    // real_p <- real_d
     real lp3 = tp2;      // real_p <- real_p
-      real lp4[6];
-      real lp5[6] = lp4;
-      lp3 = lp1 + lp2;
+    real lp4[6];
+    real lp5[6] = lp4;
+    lp3 = lp1 + lp2;
   }
 }
 model {

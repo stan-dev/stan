@@ -1306,7 +1306,7 @@ to the type of the variable being declared.
 Any type may be assigned.  For example,
 %
 \begin{stancode}
-real matrix[3, 2] a = b;
+matrix[3, 2] a = b;
 \end{stancode}
 %
 declares a matrix variable \code{a} and assigns it to the value of
@@ -1321,7 +1321,7 @@ The right-hand side may be any expression which has a type which is
 assignable to the variable being declared.  For example,
 %
 \begin{stancode}
-real matrix[3, 2] a = 0.5 * (b + c);
+matrix[3, 2] a = 0.5 * (b + c);
 \end{stancode}
 %
 assigns the matrix variable \code{a} to half of the sum of \code{b}
