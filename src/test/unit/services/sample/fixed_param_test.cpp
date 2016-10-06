@@ -193,13 +193,11 @@ TEST_F(ServicesSamplesFixedParam, output_regression) {
   std::vector<std::string> error_values;
   error_values = error.string_values();
 
-  EXPECT_EQ("Elapsed Time:", message_values[0].substr(1,13));
-  EXPECT_EQ("seconds (Warm-up)", message_values[0].substr(17,17));
-  EXPECT_EQ("seconds (Sampling)", message_values[1].substr(23,18));
-  EXPECT_EQ("seconds (Total)", message_values[2].substr(23,15));
+  EXPECT_NE(std::string::npos, message_values[0].find("Elapsed Time:"));
+  EXPECT_NE(std::string::npos, message_values[0].find("seconds (Warm-up)"));
+  EXPECT_NE(std::string::npos, message_values[1].find("seconds (Sampling)"));
+  EXPECT_NE(std::string::npos, message_values[2].find("seconds (Total)"));
 
   EXPECT_EQ(0, init_values.size());
   EXPECT_EQ(0, error_values.size());
-
-
 }
