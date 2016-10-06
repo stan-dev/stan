@@ -30,16 +30,16 @@ TEST_F(ServicesSamplesFixedParam, call_count) {
   EXPECT_EQ(interrupt.call_count(), 0);
   
   int return_code = stan::services::sample::fixed_param(model, context,
-                                                   seed, chain, init_radius,
-                                                   num_iterations,
-                                                   1,
-                                                   refresh,
-                                                   interrupt,
-                                                   message,
-                                                   init,
-                                                   error,
-                                                   parameter,
-                                                   diagnostic);
+                                                        seed, chain, init_radius,
+                                                        num_iterations,
+                                                        1,
+                                                        refresh,
+                                                        interrupt,
+                                                        message,
+                                                        init,
+                                                        error,
+                                                        parameter,
+                                                        diagnostic);
   EXPECT_EQ(0, return_code);
 
   std::vector<std::vector<std::string> > parameter_names;
@@ -71,16 +71,16 @@ TEST_F(ServicesSamplesFixedParam, output_sizes) {
   EXPECT_EQ(interrupt.call_count(), 0);
   
   stan::services::sample::fixed_param(model, context,
-                                                   seed, chain, init_radius,
-                                                   num_iterations,
-                                                   1,
-                                                   refresh,
-                                                   interrupt,
-                                                   message,
-                                                   init,
-                                                   error,
-                                                   parameter,
-                                                   diagnostic);
+                                      seed, chain, init_radius,
+                                      num_iterations,
+                                      1,
+                                      refresh,
+                                      interrupt,
+                                      message,
+                                      init,
+                                      error,
+                                      parameter,
+                                      diagnostic);
 
   std::vector<std::vector<std::string> > parameter_names;
   parameter_names = parameter.vector_string_values();
@@ -123,16 +123,16 @@ TEST_F(ServicesSamplesFixedParam, parameter_checks) {
   EXPECT_EQ(interrupt.call_count(), 0);
   
   int return_code = stan::services::sample::fixed_param(model, context,
-                                                   seed, chain, init_radius,
-                                                   num_iterations,
-                                                   1,
-                                                   refresh,
-                                                   interrupt,
-                                                   message,
-                                                   init,
-                                                   error,
-                                                   parameter,
-                                                   diagnostic);
+                                                        seed, chain, init_radius,
+                                                        num_iterations,
+                                                        1,
+                                                        refresh,
+                                                        interrupt,
+                                                        message,
+                                                        init,
+                                                        error,
+                                                        parameter,
+                                                        diagnostic);
 
   std::vector<std::vector<std::string> > parameter_names;
   parameter_names = parameter.vector_string_values();
@@ -167,16 +167,16 @@ TEST_F(ServicesSamplesFixedParam, output_regression) {
   EXPECT_EQ(interrupt.call_count(), 0);
   
   stan::services::sample::fixed_param(model, context,
-                                                   seed, chain, init_radius,
-                                                   num_iterations,
-                                                   1,
-                                                   refresh,
-                                                   interrupt,
-                                                   message,
-                                                   init,
-                                                   error,
-                                                   parameter,
-                                                   diagnostic);
+                                      seed, chain, init_radius,
+                                      num_iterations,
+                                      1,
+                                      refresh,
+                                      interrupt,
+                                      message,
+                                      init,
+                                      error,
+                                      parameter,
+                                      diagnostic);
 
   std::vector<std::vector<std::string> > parameter_names;
   parameter_names = parameter.vector_string_values();
