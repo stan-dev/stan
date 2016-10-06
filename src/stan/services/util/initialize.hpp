@@ -15,6 +15,45 @@ namespace stan {
   namespace services {
     namespace util {
 
+      /**
+       * Returns a valid initial value of the parameters of the model
+       * on the unconstrained scale.
+       *
+       * For identical inputs (model, init, rng, init_radius), this
+       * function will produce the same initialization.
+       *
+       * Initialization first tries to use the provided
+       * <code>stan::io::var_context</code>, then it will generate
+       * random uniform values from -init_radius to +init_radius for missing
+       * parameters.
+       *
+       * When the <code>var_context</code> provides all variables or
+       * the init_radius is 0, this function will only evaluate the
+       * log probability of the model with the unconstrained
+       * parameters once to see if it's valid.
+       *
+       * When at least some of the initialization is random, it will
+       * randomly initialize until it finds a set of unconstrained
+       * parameters that are valid or it hits <code>MAX_INIT_TRIES =
+       * 100</code> (hard-coded).
+       *
+       * Valid initialization is defined as a finite, non-NaN value
+       * for the evaluation of the log probability and all its
+       * gradients.
+       *
+       * @param[in] model the model
+       * @param[in] init a var_context with initial values
+       * @param[in,out] rng random number generator
+       * @param[in] init_radius the radius for generating random values.
+       *   A value of 0 indicates that the unconstrained parameters (not
+       *   provided by init) should be initialized with 0.
+       * @param[in] print_timing indicates whether a timing message should
+       *   be printed to message_writer
+       * @param[out] message_writer message writer
+       * @param[out] init_writer init writer (on the unconstrained scale)
+       * @throws std::domain_error if the model could not be initialized
+       * @return valid unconstrained parameters for the model
+       */
       template <class Model, class RNG>
       std::vector<double> initialize(Model& model,
                                      stan::io::var_context& init,
