@@ -1166,7 +1166,7 @@ one predictor can be written directly using matrix notation.
 data {
   int<lower=0> N;   // number of data items
   int<lower=0> K;   // number of predictors
-  matrix[N, k] x;    // predictor matrix
+  matrix[N, K] x;   // predictor matrix
   vector[N] y;      // outcome vector
 }
 parameters {
@@ -1226,6 +1226,78 @@ singled out because there's one fewer multiplications; it should not
 make that much of a difference to speed, though, so the choice should
 be based on clarity.
 
+\section{The QR Reparameterization}\label{QR-reparameterization.section}
+In the previous example, the linear predictor can be written as
+$\eta = x \beta$, where $\eta$ is a $N$-vector of predictions, 
+$x$ is a $N \times K$ matrix, and $\beta$ is a $K$-vector of coefficients.
+Presuming $N \geq K$, we can exploit the fact that any design matrix, $x$
+can be decomposed using the thin QR decomposition into an orthogonal matrix
+$Q$ and an upper-triangular matrix $R$, i.e. $x = Q R$. See \ref{QR-decomposition}
+for more information on the QR decomposition but note that \code{qr\_Q} and 
+\code{qr\_R} implement the fat QR decomposition so here we thin it by including
+only $K$ columns in $Q$ and $K$ rows in $R$. Also, in practice, it is best to
+write $x = Q^\ast R^\ast$ where $Q^\ast = Q \times \sqrt{n - 1}$ and 
+$R^\ast = \frac{1}{\sqrt{n - 1}} R$. Thus, we can equivalently write 
+$\eta = x \beta = Q R \beta = Q^\ast R^\ast \beta$. If we let 
+$\theta = R^\ast \beta$, then we have $\eta = Q^\ast \theta$ and 
+$\beta = R^{\ast^{-1}} \theta$. In that case, the previous Stan program becomes
+%
+\begin{stancode}
+data {
+  int<lower=0> N;   // number of data items
+  int<lower=0> K;   // number of predictors
+  matrix[N, K] x;   // predictor matrix
+  vector[N] y;      // outcome vector
+}
+transformed data {
+  matrix[N, K] Q_ast;
+  matrix[K, K] R_ast;
+  matrix[K, K] R_ast_inverse;
+  // thin and scale the QR decomposition
+  Q_ast = qr_Q(x)[, 1:K] * sqrt(n - 1);
+  R_ast = qr_R(x)[1:K, ] / sqrt(n - 1);
+  R_ast_inverse = inverse(R_ast);
+}
+parameters {
+  real alpha;           // intercept
+  vector[K] theta;      // coefficients on Q_ast
+  real<lower=0> sigma;  // error scale
+}
+model {
+  y ~ normal(Q_ast * theta + alpha, sigma);  // likelihood
+}
+generated quantities {
+  vector[K] beta;
+  beta = R_ast_inverse * theta; // coefficients on x
+}
+\end{stancode}
+%
+Since this Stan program generates equivalent predictions for $y$ and
+the same posterior distribution for $\alpha$, $\beta$, and $\sigma$
+as the previous Stan program, many wonder why the version with this
+QR reparameterization performs so much better in practice, often both in
+terms of wall time and in terms of effective sample size. The reasoning 
+is three-fold:
+\begin{enumerate}
+ \item The columns of $Q^\ast$ are orthogonal whereas the columns of 
+   $x$ generally are not. Thus, it is easier for a Markov Chain to move
+   around in $\theta$-space than in $\beta$-space.
+ \item The columns of $Q^\ast$ have the same scale whereas the columns
+   of $x$ generally do not. Thus, a Hamiltonian Monte Carlo algorithm
+   can move around the parameter space with a smaller number of larger
+   steps
+ \item Since the covariance matrix for the columns of $Q\ast$ is an
+   identity matrix, $\theta$ typically has a reasonable scale if the
+   units of $y$ are also reasonable. This also helps HMC move efficiently
+   without compromising numerical accuracy.
+\end{enumerate}
+Consequently, this QR reparameterization is recommended for linear and
+generalized linear models in Stan whenever $K > 1$ and you do not have an
+informative prior on the \emph{location} of $\beta$. It can also be
+worthwhile to subtract the mean from each column of $x$ before obtaining
+the QR decomposition, which does not affect the posterior distribution of
+$\theta$ or $\beta$ but does affect $\alpha$ and allows you to interpret
+$\alpha$ as the expectation of $y$ in a linear model.
 
 \section{Priors for Coefficients and Scales}\label{regression-priors.section}
 
@@ -1235,7 +1307,15 @@ in hierarchical models are discussed in
 \refsection{hierarchical-priors} and multivariate parameters in
 \refsection{multivariate-hierarchical-priors}. There is also a
 discussion of priors used to identify models in
-\refsection{priors-for-identification}.
+\refsection{priors-for-identification}. 
+
+However, as described in \refsection{QR-reparameterization}, if you do 
+not have an informative prior on the \emph{location} of the regression 
+coefficients, then you are better off reparameterizing your model so 
+that the regression coefficients are a generated quantity. In that case,
+it usually does not matter very much what prior is used on on the
+reparameterized regression coefficients and almost any weakly informative
+prior that scales with the outcome will do.
 
 \subsection{Background Reading}
 
@@ -1499,8 +1579,7 @@ data {
 }
 ...
 model {
-  for (n in 1:N)
-    y[n] ~ student_t(nu, alpha + beta * x[n], sigma);
+  y ~ student_t(nu, alpha + beta * x, sigma);
 }
 \end{stancode}
 %
