@@ -10,6 +10,28 @@ namespace stan {
   namespace services {
     namespace util {
 
+      /**
+       * Runs the sampler without adaptation.
+       *
+       * @tparam Sampler Type of adaptive sampler.
+       * @tparam Model Type of model
+       * @tparam RNG Type of random number generator
+       * @param[in,out] sampler the mcmc sampler to use on the model
+       * @param[in] model the model concept to use for computing log probability
+       * @param[in] cont_vector initial parameter values
+       * @param[in] num_warmup number of warmup draws
+       * @param[in] num_samples number of post warmup draws
+       * @param[in] num_thin number to thin the draws. Must be greater than or equal to 1.
+       * @param[in] refresh controls output to the <code>message_writer</code>
+       * @param[in] save_warmup indicates whether the warmup draws should be sent
+       *   to the sample writer
+       * @param[in,out] rng random number generator
+       * @param[out] interrupt interrupt callback
+       * @param[out] message_writer writer for messages
+       * @param[out] error_writer writer for error messages
+       * @param[out] sample_writer writer for draws
+       * @param[out] diagnostic_writer writer for diagnostic information
+       */
       template <class Sampler, class Model, class RNG>
       void run_adaptive_sampler(Sampler& sampler,
                                 Model& model,

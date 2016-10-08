@@ -13,6 +13,8 @@ namespace stan {
       /**
        * Runs the sampler without adaptation.
        *
+       * @tparam Model Type of model
+       * @tparam RNG Type of random number generator
        * @param[in,out] sampler the mcmc sampler to use on the model
        * @param[in] model the model concept to use for computing log probability
        * @param[in] cont_vector initial parameter values
