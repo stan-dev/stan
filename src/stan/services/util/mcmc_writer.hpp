@@ -236,8 +236,8 @@ namespace stan {
           write_timing(warmDeltaT, sampleDeltaT, message_writer_);
         }
       };
+
     }
   }
 }
-
 #endif
