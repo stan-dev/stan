@@ -1061,10 +1061,12 @@ namespace stan {
       expression expr_;
       distribution dist_;
       range truncation_;
+      bool is_discrete_;
       sample();
       sample(expression& e,
              distribution& dist);
       bool is_ill_formed() const;
+      bool is_discrete() const;
     };
 
     struct assignment {

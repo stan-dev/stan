@@ -2012,58 +2012,79 @@ namespace stan {
              << EOL;
         }
         // generate log denominator for case where bounds test pass
-        if (x.truncation_.has_low() || x.truncation_.has_high()) {
-          generate_indent(indent_, o_);
-          o_ << "else ";
-        }
-        // rest of code for three cases: T[L,H], T[L,], T[,H]
+        if (x.truncation_.has_low() || x.truncation_.has_high())
+          generate_truncation(x, is_user_defined);
+      }
+
+      void generate_truncation(sample const& x, bool is_user_defined) const {
+        std::stringstream sso_lp;
+        generate_indent(indent_, o_);
         if (x.truncation_.has_low() && x.truncation_.has_high()) {
           // T[L,U]: -log_diff_exp(Dist_cdf_log(U|params),
           //                       Dist_cdf_log(L|Params))
-          o_ << "lp_accum__.add(-log_diff_exp(";
-          o_ << get_cdf(x.dist_.family_) << "(";
-          generate_expression(x.truncation_.high_.expr_, o_);
+          sso_lp << "-log_diff_exp(";
+          sso_lp << get_cdf(x.dist_.family_) << "(";
+          generate_expression(x.truncation_.high_.expr_, sso_lp);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
-            o_ << ", ";
-            generate_expression(x.dist_.args_[i], o_);
+            sso_lp << ", ";
+            generate_expression(x.dist_.args_[i], sso_lp);
           }
           if (is_user_defined)
-            o_ << ", pstream__";
-          o_ << "), " << get_cdf(x.dist_.family_) << "(";
-          generate_expression(x.truncation_.low_.expr_, o_);
+            sso_lp << ", pstream__";
+          sso_lp << "), " << get_cdf(x.dist_.family_) << "(";
+          generate_expression(x.truncation_.low_.expr_, sso_lp);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
-            o_ << ", ";
-            generate_expression(x.dist_.args_[i], o_);
+            sso_lp << ", ";
+            generate_expression(x.dist_.args_[i], sso_lp);
           }
           if (is_user_defined)
-            o_ << ", pstream__";
-          o_ << ")));" << EOL;
+            sso_lp << ", pstream__";
+          sso_lp << ")));" << EOL;
         } else if (!x.truncation_.has_low() && x.truncation_.has_high()) {
           // T[,U];  -Dist_cdf_log(U)
-          o_ << "lp_accum__.add(-";
-          o_ << get_cdf(x.dist_.family_) << "(";
-          generate_expression(x.truncation_.high_.expr_, o_);
+          sso_lp << "lp_accum__.add(-";
+          sso_lp << get_cdf(x.dist_.family_) << "(";
+          generate_expression(x.truncation_.high_.expr_, sso_lp);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
-            o_ << ", ";
-            generate_expression(x.dist_.args_[i], o_);
+            sso_lp << ", ";
+            generate_expression(x.dist_.args_[i], sso_lp);
           }
           if (is_user_defined)
-            o_ << ", pstream__";
-          o_ << "));" << EOL;
+            sso_lp << ", pstream__";
+          sso_lp << "));" << EOL;
         } else if (x.truncation_.has_low() && !x.truncation_.has_high()) {
           // T[L,]: -Dist_ccdf_log(L)
-          o_ << "lp_accum__.add(-";
-          o_ << get_ccdf(x.dist_.family_) << "(";
+          sso_lp << "lp_accum__.add(-";
+          sso_lp << get_ccdf(x.dist_.family_) << "(";
+          generate_expression(x.truncation_.low_.expr_, sso_lp);
+          for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
+            sso_lp << ", ";
+            generate_expression(x.dist_.args_[i], sso_lp);
+          }
+          if (is_user_defined)
+            sso_lp << ", pstream__";
+          sso_lp << "));" << EOL;
+        }
+        o_ << "else" << std::endl << INDENT2;
+        o_ << "lp_accum__.add(";
+
+        if (x.is_discrete() && x.truncation_.has_low()) {
+          o_ << "log_sum_exp(" << sso_lp.str() << ", ";
+          // generate adjustment for lower-bound off by 1 due to log CCDF
+          o_ << x.dist_.family_ << "(";
           generate_expression(x.truncation_.low_.expr_, o_);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
             o_ << ", ";
             generate_expression(x.dist_.args_[i], o_);
           }
-          if (is_user_defined)
-            o_ << ", pstream__";
-          o_ << "));" << EOL;
+          o_ << "))";
+        } else {
+          o_ << sso_lp.str();
         }
+
+        o_ << ");" << std::endl;
       }
+
       void operator()(const increment_log_prob_statement& x) const {
         generate_indent(indent_, o_);
         o_ << "lp_accum__.add(";

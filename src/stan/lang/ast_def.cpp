@@ -1966,6 +1966,9 @@ namespace stan {
                && expr_.expression_type()
                   != truncation_.high_.expression_type());
     }
+    bool sample::is_discrete() const {
+      return is_discrete_;
+    }
 
     assignment::assignment() {
     }
