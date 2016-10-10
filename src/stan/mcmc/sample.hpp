@@ -46,7 +46,7 @@ namespace stan {
         names.push_back("accept_stat__");
       }
 
-      static void get_sample_params(std::vector<double>& values) {
+      void get_sample_params(std::vector<double>& values) {
         values.push_back(log_prob_);
         values.push_back(accept_stat_);
       }
