@@ -1019,24 +1019,24 @@ namespace stan {
         arg_types.push_back(s.dist_.args_[i].expression_type());
       // FIXME(carpenter): still not picking up user-defined _log discretes
       std::string function_name(s.dist_.family_);
-      s.is_discrete_
-        = ends_with("_lpdf", function_name)
-        || function_name == "bernoulli_log"
-        || function_name == "bernoulli_logit_log"
-        || function_name == "binomial_log"
-        || function_name == "binomial_logit_log"
-        || function_name == "beta_binomial_log"
-        || function_name == "hypergeometric_log"
-        || function_name == "categorical_log"
-        || function_name == "ordered_logistic_log"
-        || function_name == "neg_binomial_log"
-        || function_name == "neg_binomial_2_log"
-        || function_name == "neg_binomial_2_log_log"
-        || function_name == "poisson_log"
-        || function_name == "poisson_log_log"
-        || function_name == "multinomial_log";
-
       std::string internal_function_name = get_prob_fun(function_name);
+      s.is_discrete_
+        = ends_with("_lpmf", internal_function_name)  // user defined
+        || internal_function_name == "bernoulli_log"
+        || internal_function_name == "bernoulli_logit_log"
+        || internal_function_name == "binomial_log"
+        || internal_function_name == "binomial_logit_log"
+        || internal_function_name == "beta_binomial_log"
+        || internal_function_name == "hypergeometric_log"
+        || internal_function_name == "categorical_log"
+        || internal_function_name == "ordered_logistic_log"
+        || internal_function_name == "neg_binomial_log"
+        || internal_function_name == "neg_binomial_2_log"
+        || internal_function_name == "neg_binomial_2_log_log"
+        || internal_function_name == "poisson_log"
+        || internal_function_name == "poisson_log_log"
+        || internal_function_name == "multinomial_log";
+
       if (internal_function_name.size() == 0) {
         pass = false;
         error_msgs << "Error: couldn't find distribution named "

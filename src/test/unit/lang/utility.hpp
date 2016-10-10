@@ -12,6 +12,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include <stan/lang/ast.hpp>
+#include <stan/lang/compiler.hpp>
 #include <stan/lang/parser.hpp>
 #include <stan/lang/generator.hpp>
 #include <stan/lang/grammars/program_grammar.hpp>
@@ -88,8 +89,6 @@ void test_parsable(const std::string& model_name) {
     EXPECT_TRUE(is_parsable_folder(model_name, "good"));
   }
 }
-
-
 
 /** test that model with specified name in folder "bad" throws
  * an exception containing the second arg as a substring
@@ -179,6 +178,29 @@ void expect_matches(int n,
                     const std::string& target) {
   std::string model_cpp = model_to_cpp(stan_code);
   EXPECT_EQ(n, count_matches(target,model_cpp));
+}
+
+std::string get_file_name(const std::string& folder,
+                          const std::string& model_name) {
+  std::string path("src/test/test-models/");
+  path += folder;
+  path += "/";
+  path += model_name;
+  path += ".stan";
+  return path;
+}
+
+void expect_match(const std::string& model_name,
+                  const std::string& target,
+                  bool allow_undefined = false) {
+  std::stringstream msgs;
+  std::string file_name = get_file_name("good", model_name);
+  std::ifstream file_stream(file_name);
+  std::stringstream cpp_out_stream;
+  stan::lang::compile(&msgs, file_stream, cpp_out_stream,
+                      model_name, allow_undefined);
+  std::string cpp_out = cpp_out_stream.str();
+  EXPECT_TRUE(count_matches(target, cpp_out) > 0);
 }
 
 /**
