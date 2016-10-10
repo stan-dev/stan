@@ -41,12 +41,12 @@ namespace stan {
         return accept_stat_;
       }
 
-      void get_sample_param_names(std::vector<std::string>& names) {
+      static void get_sample_param_names(std::vector<std::string>& names) {
         names.push_back("lp__");
         names.push_back("accept_stat__");
       }
 
-      void get_sample_params(std::vector<double>& values) {
+      static void get_sample_params(std::vector<double>& values) {
         values.push_back(log_prob_);
         values.push_back(accept_stat_);
       }
