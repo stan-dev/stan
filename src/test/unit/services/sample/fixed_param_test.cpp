@@ -36,8 +36,8 @@ TEST_F(ServicesSamplesFixedParam, call_count) {
                                                         refresh,
                                                         interrupt,
                                                         message,
-                                                        init,
                                                         error,
+                                                        init,
                                                         parameter,
                                                         diagnostic);
   EXPECT_EQ(0, return_code);
@@ -77,8 +77,8 @@ TEST_F(ServicesSamplesFixedParam, output_sizes) {
                                       refresh,
                                       interrupt,
                                       message,
-                                      init,
                                       error,
+                                      init,
                                       parameter,
                                       diagnostic);
 
@@ -129,8 +129,8 @@ TEST_F(ServicesSamplesFixedParam, parameter_checks) {
                                                         refresh,
                                                         interrupt,
                                                         message,
-                                                        init,
                                                         error,
+                                                        init,
                                                         parameter,
                                                         diagnostic);
 
@@ -173,8 +173,8 @@ TEST_F(ServicesSamplesFixedParam, output_regression) {
                                       refresh,
                                       interrupt,
                                       message,
-                                      init,
                                       error,
+                                      init,
                                       parameter,
                                       diagnostic);
 
