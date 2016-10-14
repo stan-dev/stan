@@ -42,24 +42,24 @@ transformed data {
   row_vector[2] trans_x4w[3,4,5];
   matrix[2,3] trans_x5w[3,4,5];
 
-  transformed_data_matrix <- log(d_matrix);
-  transformed_data_vector <- log(d_vector);
-  transformed_data_row_vector <- log(d_row_vector);
-  trans_x3y <- log(x3y);
-  trans_x4y <- log(x4y);
-  trans_x5y <- log(x5y);
+  transformed_data_matrix <- sin(d_matrix);
+  transformed_data_vector <- sin(d_vector);
+  transformed_data_row_vector <- sin(d_row_vector);
+  trans_x3y <- sin(x3y);
+  trans_x4y <- sin(x4y);
+  trans_x5y <- sin(x5y);
 
-  trans_x2z <- log(x1z);
-  trans_x2z <- log(x2z);
-  trans_x3z <- log(x3z);
-  trans_x4z <- log(x4z);
-  trans_x5z <- log(x5z);
+  trans_x2z <- sin(x1z);
+  trans_x2z <- sin(x2z);
+  trans_x3z <- sin(x3z);
+  trans_x4z <- sin(x4z);
+  trans_x5z <- sin(x5z);
 
-  trans_x2w <- log(x1w);
-  trans_x2w <- log(x2w);
-  trans_x3w <- log(x3w);
-  trans_x4w <- log(x4w);
-  trans_x5w <- log(x5w);
+  trans_x2w <- sin(x1w);
+  trans_x2w <- sin(x2w);
+  trans_x3w <- sin(x3w);
+  trans_x4w <- sin(x4w);
+  trans_x5w <- sin(x5w);
 }
 parameters {
   real p_real;
@@ -101,26 +101,26 @@ transformed parameters {
   row_vector[2] trans_p_x4w[3,4,5];
   matrix[2,3] trans_p_x5w[3,4,5];
 
-  transformed_param_matrix <- log(d_matrix);
-  transformed_param_vector <- log(d_vector);
-  transformed_param_row_vector <- log(d_row_vector);
-  transformed_param_matrix <- log(p_matrix);
-  transformed_param_vector <- log(p_vector);
-  transformed_param_row_vector <- log(p_row_vector);
+  transformed_param_matrix <- sin(d_matrix);
+  transformed_param_vector <- sin(d_vector);
+  transformed_param_row_vector <- sin(d_row_vector);
+  transformed_param_matrix <- sin(p_matrix);
+  transformed_param_vector <- sin(p_vector);
+  transformed_param_row_vector <- sin(p_row_vector);
 
-  trans_p_x3y <- log(p_x3y);
-  trans_p_x4y <- log(p_x4y);
-  trans_p_x5y <- log(p_x5y);
+  trans_p_x3y <- sin(p_x3y);
+  trans_p_x4y <- sin(p_x4y);
+  trans_p_x5y <- sin(p_x5y);
 
-  trans_p_x2z <- log(p_x2z);
-  trans_p_x3z <- log(p_x3z);
-  trans_p_x4z <- log(p_x4z);
-  trans_p_x5z <- log(p_x5z);
+  trans_p_x2z <- sin(p_x2z);
+  trans_p_x3z <- sin(p_x3z);
+  trans_p_x4z <- sin(p_x4z);
+  trans_p_x5z <- sin(p_x5z);
 
-  trans_p_x2w <- log(p_x2w);
-  trans_p_x3w <- log(p_x3w);
-  trans_p_x4w <- log(p_x4w);
-  trans_p_x5w <- log(p_x5w);
+  trans_p_x2w <- sin(p_x2w);
+  trans_p_x3w <- sin(p_x3w);
+  trans_p_x4w <- sin(p_x4w);
+  trans_p_x5w <- sin(p_x5w);
 }
 model {  
   y_p ~ normal(0,1);

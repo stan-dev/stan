@@ -22,9 +22,8 @@ std::vector<expr_type> primitive_types;
 primitive_types.push_back(INT_T);
 primitive_types.push_back(DOUBLE_T);
 
-add_unary("abs");
-add("abs", INT_T, INT_T);
-add_unary("acos");
+add_unary_vectorized("abs");
+add_unary_vectorized("acos");
 add_unary("acosh");
 for (size_t i = 0; i < base_types.size(); ++i) {
   add("add", base_types[i], base_types[i], base_types[i]);
@@ -38,9 +37,9 @@ add("add", MATRIX_T, DOUBLE_T, MATRIX_T);
 for (size_t i = 0; i < base_types.size(); ++i) {
   add("add", base_types[i], base_types[i]);
 }
-add_unary("asin");
-add_unary("asinh");
-add_unary("atan");
+add_unary_vectorized("asin");
+add_unary_vectorized("asinh");
+add_unary_vectorized("atan");
 add_binary("atan2");
 add_unary("atanh");
 for (size_t i = 0; i < int_vector_types.size(); ++i)
@@ -188,8 +187,8 @@ add("append_col", MATRIX_T, VECTOR_T, VECTOR_T);
 add("append_col", ROW_VECTOR_T, ROW_VECTOR_T, ROW_VECTOR_T);
 add("append_col", ROW_VECTOR_T, DOUBLE_T, ROW_VECTOR_T);
 add("append_col", ROW_VECTOR_T, ROW_VECTOR_T, DOUBLE_T);
-add_unary("cbrt");
-add_unary("ceil");
+add_unary_vectorized("cbrt");
+add_unary_vectorized("ceil");
 for (size_t i = 0; i < vector_types.size(); ++i) {
   for (size_t j = 0; j < vector_types.size(); ++j) {
       add("chi_square_ccdf_log", DOUBLE_T, vector_types[i],
@@ -220,8 +219,8 @@ add("columns_dot_product", ROW_VECTOR_T, MATRIX_T, MATRIX_T);
 add("columns_dot_self", ROW_VECTOR_T, VECTOR_T);
 add("columns_dot_self", ROW_VECTOR_T, ROW_VECTOR_T);
 add("columns_dot_self", ROW_VECTOR_T, MATRIX_T);
-add_unary("cos");
-add_unary("cosh");
+add_unary_vectorized("cos");
+add_unary_vectorized("cosh");
 add("cov_exp_quad", MATRIX_T, expr_type(DOUBLE_T, 1U), DOUBLE_T, DOUBLE_T);
 add("cov_exp_quad", MATRIX_T, expr_type(VECTOR_T, 1U), DOUBLE_T, DOUBLE_T);
 add("cov_exp_quad", MATRIX_T, expr_type(ROW_VECTOR_T, 1U), DOUBLE_T, DOUBLE_T);
@@ -247,7 +246,7 @@ add("diag_post_multiply", MATRIX_T, MATRIX_T, ROW_VECTOR_T);
 add("diag_pre_multiply", MATRIX_T, VECTOR_T, MATRIX_T);
 add("diag_pre_multiply", MATRIX_T, ROW_VECTOR_T, MATRIX_T);
 add("diagonal", VECTOR_T, MATRIX_T);
-add_unary("digamma");
+add_unary_vectorized("digamma");
 for (size_t i = 0; i < 8; ++i) {
   add("dims", expr_type(INT_T, 1), expr_type(INT_T, i));
   add("dims", expr_type(INT_T, 1), expr_type(DOUBLE_T, i));
@@ -313,8 +312,8 @@ add("elt_divide", MATRIX_T, DOUBLE_T, MATRIX_T);
 add("elt_multiply", VECTOR_T, VECTOR_T, VECTOR_T);
 add("elt_multiply", ROW_VECTOR_T, ROW_VECTOR_T, ROW_VECTOR_T);
 add("elt_multiply", MATRIX_T, MATRIX_T, MATRIX_T);
-add_unary("erf");
-add_unary("erfc");
+add_unary_vectorized("erf");
+add_unary_vectorized("erfc");
 add_unary_vectorized("exp");
 add_unary("exp2");
 for (size_t i = 0; i < vector_types.size(); ++i) {
@@ -340,7 +339,7 @@ for (size_t i = 0; i < vector_types.size(); ++i) {
   }
 }
 add_ternary("exp_mod_normal_rng");
-add_unary("expm1");
+add_unary_vectorized("expm1");
 for (size_t i = 0; i < vector_types.size(); ++i) {
   for (size_t j = 0; j < vector_types.size(); ++j) {
       add("exponential_ccdf_log", DOUBLE_T, vector_types[i], vector_types[j]);
@@ -356,7 +355,7 @@ add_unary("exponential_rng");
 add_unary("fabs");
 add_binary("falling_factorial");
 add_binary("fdim");
-add_unary("floor");
+add_unary_vectorized("floor");
 add_ternary("fma");
 add_binary("fmax");
 add_binary("fmin");
@@ -453,7 +452,7 @@ add("if_else", DOUBLE_T, INT_T, DOUBLE_T, DOUBLE_T);
 add("inc_beta", DOUBLE_T, DOUBLE_T, DOUBLE_T, DOUBLE_T);
 add("int_step", INT_T, DOUBLE_T);
 add("int_step", INT_T, INT_T);
-add_unary("inv");
+add_unary_vectorized("inv");
 for (size_t i = 0; i < vector_types.size(); ++i) {
   for (size_t j = 0; j < vector_types.size(); ++j) {
     add("inv_chi_square_ccdf_log", DOUBLE_T, vector_types[i], vector_types[j]);
@@ -466,7 +465,7 @@ for (size_t i = 0; i < vector_types.size(); ++i) {
   }
 }
 add_unary("inv_chi_square_rng");
-add_unary("inv_cloglog");
+add_unary_vectorized("inv_cloglog");
 for (size_t i = 0; i < vector_types.size(); ++i) {
   for (size_t j = 0; j < vector_types.size(); ++j) {
     for (size_t k = 0; k < vector_types.size(); ++k) {
@@ -488,10 +487,10 @@ for (size_t i = 0; i < vector_types.size(); ++i) {
   }
 }
 add_binary("inv_gamma_rng");
-add_unary("inv_logit");
-add_unary("inv_Phi");
-add_unary("inv_sqrt");
-add_unary("inv_square");
+add_unary_vectorized("inv_logit");
+add_unary_vectorized("inv_Phi");
+add_unary_vectorized("inv_sqrt");
+add_unary_vectorized("inv_square");
 add("inv_wishart_log", DOUBLE_T, MATRIX_T, DOUBLE_T, MATRIX_T);
 add("inv_wishart_lpdf", DOUBLE_T, MATRIX_T, DOUBLE_T, MATRIX_T);
 add("inv_wishart_rng", MATRIX_T, DOUBLE_T, MATRIX_T);
@@ -511,17 +510,14 @@ add("lkj_corr_rng", MATRIX_T, INT_T, DOUBLE_T);
 add("lkj_cov_log", DOUBLE_T, MATRIX_T, VECTOR_T, VECTOR_T, DOUBLE_T);
 add("lmgamma", DOUBLE_T, INT_T, DOUBLE_T);
 add_binary("lmultiply");
-add_unary("log");
-add("log", VECTOR_T, VECTOR_T);
-add("log", ROW_VECTOR_T, ROW_VECTOR_T);
-add("log", MATRIX_T, MATRIX_T);
+add_unary_vectorized("log");
 add_nullary("log10");
-add_unary("log10");
-add_unary("log1m");
-add_unary("log1m_exp");
+add_unary_vectorized("log10");
+add_unary_vectorized("log1m");
+add_unary_vectorized("log1m_exp");
 add_unary("log1m_inv_logit");
 add_unary("log1p");
-add_unary("log1p_exp");
+add_unary_vectorized("log1p_exp");
 add_nullary("log2");
 add_unary("log2");
 add("log_determinant", DOUBLE_T, MATRIX_T);
@@ -824,7 +820,7 @@ for (size_t i = 0; i < vector_types.size(); ++i) {
   }
 }
 add_ternary("pareto_type_2_rng");
-add_unary("Phi");
+add_unary_vectorized("Phi");
 add_unary("Phi_approx");
 add_nullary("pi");
 for (size_t i = 0; i < int_vector_types.size(); ++i) {
@@ -911,7 +907,7 @@ add("rep_matrix", MATRIX_T, ROW_VECTOR_T, INT_T);
 add("rep_row_vector", ROW_VECTOR_T, DOUBLE_T, INT_T);
 add("rep_vector", VECTOR_T, DOUBLE_T, INT_T);
 add_binary("rising_factorial");
-add_unary("round");
+add_unary_vectorized("round");
 add("row", ROW_VECTOR_T, MATRIX_T, INT_T);
 add("rows", INT_T, VECTOR_T);
 add("rows", INT_T, ROW_VECTOR_T);
@@ -957,9 +953,9 @@ for (size_t i = 0; i < base_types.size(); ++i) {
   add("segment", expr_type(base_types[i], 3U),
       expr_type(base_types[i], 3U), INT_T, INT_T);
 }
-add_unary("sin");
+add_unary_vectorized("sin");
 add("singular_values", VECTOR_T, MATRIX_T);
-add_unary("sinh");
+add_unary_vectorized("sinh");
 // size() is polymorphic over arrays, so start i at 1
 for (size_t i = 1; i < 8; ++i) {
   add("size", INT_T, expr_type(INT_T, i));
@@ -1014,9 +1010,9 @@ add("squared_distance", DOUBLE_T, VECTOR_T, VECTOR_T);
 add("squared_distance", DOUBLE_T, ROW_VECTOR_T, ROW_VECTOR_T);
 add("squared_distance", DOUBLE_T, VECTOR_T, ROW_VECTOR_T);
 add("squared_distance", DOUBLE_T, ROW_VECTOR_T, VECTOR_T);
-add_unary("sqrt");
+add_unary_vectorized("sqrt");
 add_nullary("sqrt2");
-add_unary("square");
+add_unary_vectorized("square");
 add_unary("step");
 for (size_t i = 0; i < vector_types.size(); ++i) {
   for (size_t j = 0; j < vector_types.size(); ++j) {
@@ -1067,11 +1063,11 @@ for (size_t i = 0; i < base_types.size(); ++i) {
   add("tail", expr_type(base_types[i], 3U),
       expr_type(base_types[i], 3U), INT_T);
 }
-add_unary("tan");
-add_unary("tanh");
+add_unary_vectorized("tan");
+add_unary_vectorized("tanh");
 add_nullary("target");  // converted to "get_lp" in term_grammar semantics
 add("tcrossprod", MATRIX_T, MATRIX_T);
-add_unary("tgamma");
+add_unary_vectorized("tgamma");
 add("to_array_1d", expr_type(DOUBLE_T, 1), MATRIX_T);
 add("to_array_1d", expr_type(DOUBLE_T, 1), VECTOR_T);
 add("to_array_1d", expr_type(DOUBLE_T, 1), ROW_VECTOR_T);
