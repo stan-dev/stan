@@ -16,7 +16,7 @@ generated quantities {
   int ns[3];
 
   n <- bernoulli_rng(0.5);
-  // n <- bernoulli_logit_rng(0.0);
+  n <- bernoulli_logit_rng(0.0);
   n <- binomial_rng(15,0.3);
   // n <- binomial_logit_rng(15,-1.2);
   n <- beta_binomial_rng(42, 0.3, 1.9);
