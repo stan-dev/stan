@@ -61,6 +61,7 @@ for (size_t i = 0; i < int_vector_types.size(); ++i)
 	vector_types[j]);
   }
 add("bernoulli_rng", INT_T, DOUBLE_T);
+add("bernoulli_logit_rng", INT_T, DOUBLE_T);
 for (size_t i = 0; i < int_vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j) {
     add("bernoulli_logit_log", DOUBLE_T, int_vector_types[i], 

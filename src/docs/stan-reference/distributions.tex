@@ -354,7 +354,12 @@ If $\alpha \in \reals$, then for $c \in \setlist{0,1}$,
   \code{inv\_logit(\farg{alpha})}}
 %
 \end{description}
-
+%
+\begin{description}
+\fitem{int}{bernoulli\_logit\_rng}{real \farg{alpha}}{Generate a Bernoulli
+  variate with chance of success $\mbox{logit}^{-1}(\alpha)$; may only be used in
+  generated quantities block}
+\end{description}
 
 
 \chapter{Bounded Discrete Distributions}\label{betafun.chapter}
