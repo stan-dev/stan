@@ -11,7 +11,7 @@
 #include <string>
 
 
-void print_version(std::ostream* out_stream) {
+inline void print_version(std::ostream* out_stream) {
   if (!out_stream) return;
   *out_stream << "stanc version "
               << stan::MAJOR_VERSION
@@ -25,7 +25,7 @@ void print_version(std::ostream* out_stream) {
 /**
  * Prints the Stan compiler (stanc) help.
  */
-void print_stanc_help(std::ostream* out_stream) {
+inline void print_stanc_help(std::ostream* out_stream) {
   using stan::io::print_help_option;
 
   if (!out_stream) return;
@@ -56,8 +56,8 @@ void print_stanc_help(std::ostream* out_stream) {
                     "Do not fail if a function is declared but not defined");
 }
 
-void delete_file(std::ostream* err_stream,
-                 const std::string& file_name) {
+inline void delete_file(std::ostream* err_stream,
+                        const std::string& file_name) {
   int deleted = std::remove(file_name.c_str());
   if (deleted != 0 && file_name.size() > 0)
     if (err_stream)
@@ -66,8 +66,8 @@ void delete_file(std::ostream* err_stream,
 }
 
 
-int stanc_helper(int argc, const char* argv[],
-                 std::ostream* out_stream, std::ostream* err_stream) {
+inline int stanc_helper(int argc, const char* argv[],
+                        std::ostream* out_stream, std::ostream* err_stream) {
   static const int SUCCESS_RC = 0;
   static const int EXCEPTION_RC = -1;
   static const int PARSE_FAIL_RC = -2;

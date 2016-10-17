@@ -84,7 +84,7 @@ namespace stan {
      * @param[in] line Line number in Stan source program where
      * exception originated.
      */
-    void rethrow_located(const std::exception& e, int line) {
+    inline void rethrow_located(const std::exception& e, int line) {
       using std::bad_alloc;          // -> exception
       using std::bad_cast;           // -> exception
       using std::bad_exception;      // -> exception
