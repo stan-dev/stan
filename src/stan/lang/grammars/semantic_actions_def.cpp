@@ -1017,25 +1017,10 @@ namespace stan {
       arg_types.push_back(s.expr_.expression_type());
       for (size_t i = 0; i < s.dist_.args_.size(); ++i)
         arg_types.push_back(s.dist_.args_[i].expression_type());
-      // FIXME(carpenter): still not picking up user-defined _log discretes
       std::string function_name(s.dist_.family_);
       std::string internal_function_name = get_prob_fun(function_name);
-      s.is_discrete_
-        = ends_with("_lpmf", internal_function_name)  // user defined
-        || internal_function_name == "bernoulli_log"
-        || internal_function_name == "bernoulli_logit_log"
-        || internal_function_name == "binomial_log"
-        || internal_function_name == "binomial_logit_log"
-        || internal_function_name == "beta_binomial_log"
-        || internal_function_name == "hypergeometric_log"
-        || internal_function_name == "categorical_log"
-        || internal_function_name == "ordered_logistic_log"
-        || internal_function_name == "neg_binomial_log"
-        || internal_function_name == "neg_binomial_2_log"
-        || internal_function_name == "neg_binomial_2_log_log"
-        || internal_function_name == "poisson_log"
-        || internal_function_name == "poisson_log_log"
-        || internal_function_name == "multinomial_log";
+      s.is_discrete_ = function_signatures::instance()
+        .discrete_first_arg(internal_function_name);
 
       if (internal_function_name.size() == 0) {
         pass = false;
