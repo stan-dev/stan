@@ -3046,7 +3046,7 @@ truncated unit normal distributions restricted to $[-0.5, 2.1]$
 can be coded with the following sampling statement.
 %
 \begin{stancode}
-y ~ normal(0,1) T[-0.5, 2.1];
+y ~ normal(0, 1) T[-0.5, 2.1];
 \end{stancode}
 %
 Truncated distributions are translated as an additional term in the
@@ -3104,7 +3104,7 @@ stable form of \code{log(exp(a) + exp(b))}.
 For truncating with only a lower bound, the upper limit is left blank.
 %
 \begin{stancode}
-y ~ normal(0,1) T[-0.5, ];
+y ~ normal(0, 1) T[-0.5, ];
 \end{stancode}
 %
 This truncated sampling statement has the same behavior as the
@@ -3147,7 +3147,7 @@ To truncate with only an upper bound, the lower bound is left blank.
 The upper truncated sampling statement
 %
 \begin{stancode}
-y ~ normal(0,1) T[ , 2.1];
+y ~ normal(0, 1) T[ , 2.1];
 \end{stancode}
 %
 produces the same result as the following code.
