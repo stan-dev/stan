@@ -4,11 +4,13 @@ STAN_MAJOR := $(shell grep "\#define STAN_MAJOR" $(STAN)src/stan/version.hpp | s
 STAN_MINOR := $(shell grep "\#define STAN_MINOR" $(STAN)src/stan/version.hpp | sed -e 's/.*STAN_MINOR \(.*\)/\1/')
 STAN_PATCH := $(shell grep "\#define STAN_PATCH" $(STAN)src/stan/version.hpp | sed -e 's/.*STAN_PATCH \(.*\)/\1/')
 VERSION_STRING := $(STAN_MAJOR).$(STAN_MINOR).$(STAN_PATCH)
+MANUAL_STAN_PROGRAMS := $(shell find $(STAN)src/docs/stan-reference -type f -name '*.stan')
 
 manual: $(STAN)src/docs/stan-reference/stan-reference.pdf $(STAN)src/docs/stan-reference/stan-functions.txt
 	@mkdir -p doc/
 	$(foreach artifact, $^, cp $(artifact) doc/$(basename $(notdir $(artifact)))-$(VERSION_STRING)$(suffix $(artifact));)
 
+$(STAN)src/docs/stan-reference/stan-reference.pdf : $(MANUAL_STAN_PROGRAMS)
 
 $(STAN)src/docs/stan-reference/stan-functions.txt: $(STAN)src/docs/stan-reference/stan-reference.pdf
 	@echo '  building $@'
@@ -40,4 +42,23 @@ MANUAL_FLAGS=
 
 %.pdf: %.tex
 	cd $(dir $@); latexmk -pdf -pdflatex="pdflatex -file-line-error -shell-escape" -use-make $(notdir $^)
+
+##
+# Target to verify code generated Stan programs
+# (.stan -> .hpp) are compilable
+#
+# Running:
+# > make test-manual
+# will make sure every Stan program in src/docs/stan-reference
+# compiles
+##
+$(patsubst %.stan,%.hpp,$(MANUAL_STAN_PROGRAMS)) : %.hpp : %.stan test/test-models/stanc$(EXE)
+	$(WINE) test/test-models/stanc$(EXE) --o=$@ $<
+
+.PHONY: test-manual
+test-manual: $(patsubst %.stan,%.hpp,$(MANUAL_STAN_PROGRAMS))
+	@echo
+	@echo
+	@echo
+	@echo "All the Stan programs in the Stan manual can be built"
 

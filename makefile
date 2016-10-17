@@ -134,10 +134,12 @@ endif
 	@echo ''
 	@echo '  Header tests'
 	@echo '  - test-headers  : tests all source headers to ensure they are compilable and'
-	@echo '                     include enough header files.'
+	@echo '                    include enough header files.'
 	@echo ''
 	@echo '  To run a single header test, add "-test" to the end of the file name.'
 	@echo '  Example: make src/stan/math/constants.hpp-test'
+	@echo '  - test-manual   : tests all the standalone Stan programs can be compiled'
+	@echo '                    by stanc.'
 	@echo ''
 	@echo '  Cpplint'
 	@echo '  - cpplint       : runs cpplint.py on source files. requires python 2.7.'
@@ -184,6 +186,7 @@ clean-dox:
 clean-manual:
 	rm -rf doc
 	cd src/docs/stan-reference; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
+	$(RM) $(wildcard $(MANUAL_STAN_PROGRAMS:%.stan=%.hpp))
 
 clean-deps:
 	@echo '  removing dependency files'
