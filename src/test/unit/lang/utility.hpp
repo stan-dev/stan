@@ -195,11 +195,12 @@ void expect_match(const std::string& model_name,
                   bool allow_undefined = false) {
   std::stringstream msgs;
   std::string file_name = get_file_name("good", model_name);
-  std::ifstream file_stream(file_name);
+  std::ifstream file_stream(file_name.c_str());
   std::stringstream cpp_out_stream;
   stan::lang::compile(&msgs, file_stream, cpp_out_stream,
                       model_name, allow_undefined);
   std::string cpp_out = cpp_out_stream.str();
+  file_stream.close();
   EXPECT_TRUE(count_matches(target, cpp_out) > 0);
 }
 
