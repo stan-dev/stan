@@ -1186,9 +1186,20 @@ add("wishart_lpdf", DOUBLE_T, MATRIX_T, DOUBLE_T, MATRIX_T);
 add("wishart_rng", MATRIX_T, DOUBLE_T, MATRIX_T);
 
 // function signatures for Torsten
-std::vector<expr_type> arg_types;
-arg_types.push_back(expr_type(VECTOR_T, 1U));
-for(int i_pmetrics = 0; i_pmetrics<4; i_pmetrics++){arg_types.push_back(vector_types[1]);}
-for(int i_pmetrics = 0; i_pmetrics<4; i_pmetrics++){arg_types.push_back(int_vector_types[1]);}
-add("PKModelTwoCpt", MATRIX_T, arg_types);
-add("PKModelOneCpt", MATRIX_T, arg_types);
+std::vector<expr_type> arg_types_PKcpt;
+arg_types_PKcpt.push_back(expr_type(VECTOR_T, 1U));
+for(int i = 0; i < 4; i++)
+arg_types_PKcpt.push_back(vector_types[1]);
+for(int i = 0; i < 4; i++)
+arg_types_PKcpt.push_back(int_vector_types[1]);
+add("PKModelTwoCpt", MATRIX_T, arg_types_PKcpt);
+add("PKModelOneCpt", MATRIX_T, arg_types_PKcpt);
+
+std::vector<expr_type> arg_types_linCpt;
+arg_types_linCpt.push_back(MATRIX_T);
+arg_types_linCpt.push_back(expr_type(VECTOR_T, 1U));
+for(int i = 0; i < 4; i++)
+arg_types_linCpt.push_back(vector_types[1]);
+for(int i = 0; i < 4; i++)
+arg_types_linCpt.push_back(int_vector_types[1]);
+add("linCptModel", MATRIX_T, arg_types_linCpt);
