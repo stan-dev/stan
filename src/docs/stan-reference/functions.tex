@@ -147,8 +147,7 @@ This is a no-op.
 
 \begin{description}
 %
-\fitem{int}{abs}{int \farg{x}}{
-  Returns the absolute value of \farg{x}. 
+  \fitemUnaryVec{abs}{absolute value of \farg{x}}{
   \[\mbox{abs}(x) = |x|\]}
 %
 \fitemnobody{int}{int\_step}{int \farg{x}}
@@ -681,10 +680,7 @@ as \code{x~+~y} and \code{-x}, respectively.
 
 \begin{description}
 %
-  \fitem{real}{abs}{real \farg{x}}{     
-    Returns the absolute value of \farg{x}\,;
-    this function is deprecated and will be removed in the future;
-    please use \code{fabs} instead.
+  \fitemUnaryVec{abs}{absolute value of \farg{x}\,; this function is deprecated and will be removed in the future; please use \code{fabs} instead}{
     \[
     \mbox{\code{abs}}(x) = |x|
     \]}
@@ -771,25 +767,17 @@ of these in the future, but as of now, there is no good workaround.
 
 \begin{description}
   %
-  \fitem{real}{floor}{real \farg{x}}{
-    Returns the floor of \farg{x}, which is the largest integer less
-    than or equal to \farg{x}, converted to a real value;
-    see warning at start of \refsection{step-functions}.
+  \fitemUnaryVec{floor}{floor of \farg{x}, which is the largest integer less than or equal to \farg{x}, converted to a real value; see warning at start of \refsection{step-functions}}{
     \[
     \mbox{\code{floor}}(x) = \lfloor x \rfloor
     \]}
   %
-  \fitem{real}{ceil}{real \farg{x}}{
-    Returns the ceiling of \farg{x}, which is the smallest integer greater
-    than or equal to \farg{x}, converted to a real value;
-    see warning at start of \refsection{step-functions}.
+  \fitemUnaryVec{ceil}{ceiling of \farg{x}, which is the smallest integer greater than or equal to \farg{x}, converted to a real value; see warning at start of \refsection{step-functions}}{
     \[
     \mbox{\code{ceil}}(x) = \lceil x\rceil
     \]}
   %
-  \fitem{real}{round}{real \farg{x}}{
-    Returns the nearest integer to \farg{x}, converted to a real value;
-    see warning at start of \refsection{step-functions}.
+  \fitemUnaryVec{round}{nearest integer to \farg{x}, converted to a real value; see warning at start of \refsection{step-functions}}{
     \[
     \mbox{\code{round}}(x) = 
     \begin{cases}
@@ -814,8 +802,7 @@ of these in the future, but as of now, there is no good workaround.
 %
 \begin{description}
   %
-  \fitem{real}{sqrt}{real \farg{x}}{
-    Returns the square root of \farg{x}.
+  \fitemUnaryVec{sqrt}{square root of \farg{x}}{
     \[
     \mbox{\code{sqrt}}(x) = 
     \begin{cases}
@@ -824,19 +811,17 @@ of these in the future, but as of now, there is no good workaround.
     \end{cases}
     \]}
   %
-  \fitem{real}{cbrt}{real \farg{x}}{
-    Returns the cube root of \farg{x}
+  \fitemUnaryVec{cbrt}{cube root of \farg{x}}{
     \[
     \mbox{\code{cbrt}}(x) = \sqrt[3]{x}
     \]}
   %
-  \fitem{real}{square}{real \farg{x}}{
-    Returns the square of \farg{x}.
+  \fitemUnaryVec{square}{square of \farg{x}}{
     \[
     \mbox{\code{square}}(x) = x^2
     \]}
   %
-  \fitemUnaryVec{exp}{natural exponential}{
+  \fitemUnaryVec{exp}{natural exponential of \farg{x}}{
     \[
     \mbox{\code{exp}}(x) \ = \ \exp(x)
     \ = \ e^x
@@ -848,8 +833,7 @@ of these in the future, but as of now, there is no good workaround.
     \mbox{\code{exp2}}(x) = 2^x
     \]}
   %
-  \fitem{real}{log}{real \farg{x}}{
-    Returns the natural logarithm of \farg{x}.
+  \fitemUnaryVec{log}{natural logarithm of \farg{x}}{
     \[
     \mbox{\code{log}}(x) = \log x =
     \begin{cases}
@@ -868,8 +852,7 @@ of these in the future, but as of now, there is no good workaround.
     \end{cases}
     \]}
   %
-  \fitem{real}{log10}{real \farg{x}}{
-    Returns the base-10 logarithm of \farg{x}.
+  \fitemUnaryVec{log10}{base-10 logarithm of \farg{x}}{
     \[
     \mbox{\code{log10}}(x) = 
     \begin{cases}
@@ -884,8 +867,7 @@ of these in the future, but as of now, there is no good workaround.
     \mbox{\code{pow}}(x,y) = x^y
     \]}
   %
-  \fitem{real}{inv}{real \farg{x}}{
-    Returns the inverse of \farg{x}.
+  \fitemUnaryVec{inv}{inverse of \farg{x}}{
     \[
     \mbox{\code{inv}}(x) = \frac{1}{x}
     \]}    
@@ -924,26 +906,22 @@ of these in the future, but as of now, there is no good workaround.
     \end{cases}
     \]}
   %
-  \fitem{real}{cos}{real \farg{x}}{
-    Returns the cosine of the angle \farg{x} (in radians).
+  \fitemUnaryVec{cos}{cosine of the angle \farg{x} (in radians)}{
     \[
     \mbox{\code{cos}}(x) = \cos(x)
     \]}
   %
-  \fitem{real}{sin}{real \farg{x}}{
-    Returns the sine of the angle \farg{x} (in radians).
+  \fitemUnaryVec{sin}{sine of the angle \farg{x} (in radians)}{
     \[
     \mbox{\code{sin}}(x) = \sin(x)
     \]}
   %
-  \fitem{real}{tan}{real \farg{x}}{
-    Returns the tangent of the angle \farg{x} (in radians).
+  \fitemUnaryVec{tan}{tangent of the angle \farg{x} (in radians)}{
     \[
     \mbox{tan}(x) = \tan(x)
     \]}
   %
-  \fitem{real}{acos}{real \farg{x}}{
-    Returns the principal arc (inverse) cosine (in radians) of \farg{x}.
+  \fitemUnaryVec{acos}{principal arc (inverse) cosine (in radians) of \farg{x}}{
     \[
     \mbox{\code{acos}}(x) = 
     \begin{cases}
@@ -952,8 +930,7 @@ of these in the future, but as of now, there is no good workaround.
     \end{cases}
     \]}
   %
-  \fitem{real}{asin}{real \farg{x}}{
-    Returns the principal arc (inverse) sine (in radians) of \farg{x}.
+  \fitemUnaryVec{asin}{principal arc (inverse) sine (in radians) of \farg{x}}{
     \[
     \mbox{\code{asin}}(x) = 
     \begin{cases}
@@ -962,8 +939,7 @@ of these in the future, but as of now, there is no good workaround.
     \end{cases}
     \]}
   %
-  \fitem{real}{atan}{real \farg{x}}{
-    Returns the principal arc (inverse) tangent (in radians) of \farg{x}.
+  \fitemUnaryVec{atan}{principal arc (inverse) tangent (in radians) of \farg{x}}{
     \[
     \mbox{\code{atan}}(x) = \arctan(x)
     \]}
@@ -982,20 +958,17 @@ of these in the future, but as of now, there is no good workaround.
 %
 \begin{description}
   %
-  \fitem{real}{cosh}{real \farg{x}}{
-    Returns the hyperbolic cosine of \farg{x} (in radians).
+  \fitemUnaryVec{cosh}{hyperbolic cosine of \farg{x} (in radians)}{
     \[
     \mbox{\code{cosh}}(x) = \cosh(x)
     \]}
   %
-  \fitem{real}{sinh}{real \farg{x}}{
-    Returns the hyperbolic sine of \farg{x} (in radians).
+  \fitemUnaryVec{sinh}{hyperbolic sine of \farg{x} (in radians)}{
     \[
     \mbox{\code{sinh}}(x) = \sinh(x)
     \]}
   %
-  \fitem{real}{tanh}{real \farg{x}}{
-    Returns the hyperbolic tangent of \farg{x} (in radians).
+  \fitemUnaryVec{tanh}{hyperbolic tangent of \farg{x} (in radians)}{
     \[
     \mbox{\code{tanh}}(x) = \tanh(x)
     \]}
@@ -1078,20 +1051,17 @@ distribution function (and its complement).
 %
 \begin{description}
   %
-  \fitem{real}{erf}{real \farg{x}}{
-    Returns the error function, also known as the Gauss error function, of \farg{x}.
+  \fitemUnaryVec{erf}{error function, also known as the Gauss error function, of \farg{x}}{
     \[
     \mbox{\code{erf}}(x) = \frac{2}{\sqrt{\pi}}\int_0^x e^{-t^2}dt
     \]}
   %
-  \fitem{real}{erfc}{real \farg{x}}{
-    Returns the complementary error function of \farg{x}.
+  \fitemUnaryVec{erfc}{complementary error function of \farg{x}}{
     \[
     \mbox{\code{erfc}}(x) = \frac{2}{\sqrt{\pi}}\int_x^\infty e^{-t^2}dt
     \]}
   %
-  \fitemindexsort{real}{Phi}{real \farg{x}}{
-    Returns the unit normal cumulative distribution function of \farg{x}.
+  \fitemUnaryVec{Phi}{unit normal cumulative distribution function of \farg{x}}{
     \[
     \mbox{\code{Phi}}(x) = \frac{1}{\sqrt{2\pi}} \int_{0}^{x} e^{-t^2/2} dt
     \]}{Phi}{phi}
@@ -1163,11 +1133,7 @@ distribution function (and its complement).
     See \refsection{beta-appendix} for definition of $\mbox{B}(\alpha, \beta)$.
   }
   %
-  \fitem{real}{tgamma}{real \farg{x}}{
-    Returns the gamma function applied to \farg{x}.  The gamma function 
-    is the generalization of the factorial function to continuous variables,
-    defined so that $\Gamma(n+1) = n!$.  The function is defined for
-    positive numbers and non-integral negative numbers.
+  \fitemUnaryVec{tgamma}{gamma function applied to \farg{x}.  The gamma function  is the generalization of the factorial function to continuous variables, defined so that $\Gamma(n+1) = n!$.  The function is defined for positive numbers and non-integral negative numbers}{
     \[
     \mbox{\code{tgamma}}(x) 
     = 
@@ -1193,10 +1159,7 @@ distribution function (and its complement).
     %
     See \refsection{gamma-appendix} for definition of $\Gamma(x)$.}
   %
-  \fitem{real}{digamma}{real \farg{x}}{
-    Returns the digamma function applied to \farg{x}.  The digamma function is the
-    derivative of the natural logarithm of the Gamma function.  The function is defined 
-    for positive numbers and non-integral negative numbers.
+  \fitemUnaryVec{digamma}{digamma function applied to \farg{x}.  The digamma function is the derivative of the natural logarithm of the Gamma function.  The function is defined  for positive numbers and non-integral negative numbers}{
     \[
     \mbox{\code{digamma}}(x) 
     = 
@@ -1414,8 +1377,7 @@ using more basic \Stan functions.
 %
 \begin{description}
   %
-  \fitem{real}{expm1}{real \farg{x}}{
-    Returns the natural exponential of \farg{x} minus 1.
+  \fitemUnaryVec{expm1}{natural exponential of \farg{x} minus 1}{
     \[
     \mbox{\code{expm1}}(x) = e^x - 1
     \]}
@@ -1463,8 +1425,7 @@ using more basic \Stan functions.
     \end{cases}
     \]}
   %
-  \fitem{real}{log1m}{real \farg{x}}{
-    Returns the natural logarithm of 1 minus \farg{x}.
+  \fitemUnaryVec{log1m}{natural logarithm of 1 minus \farg{x}}{
     \[
     \mbox{\code{log1m}}(x) = 
     \begin{cases}
@@ -2163,19 +2124,6 @@ matrix, returning a result of the same shape as the argument.  There
 are many functions that are vectorized in addition to the ad hoc cases
 listed in this section;  see \refsection{fun-vectorization} for the
 general cases.
-
-\begin{description}
-%
-\fitem{vector}{log}{vector \farg{x}}{
-The elementwise natural logarithm of \farg{x}}
-%
-\fitem{row\_vector}{log}{row\_vector \farg{x}}{
-The elementwise natural logarithm of \farg{x}}
-%
-\fitem{matrix}{log}{matrix \farg{x}}{
-The elementwise natural logarithm of \farg{x}}
-%
-\end{description}
 
 
 
