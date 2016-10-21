@@ -5,8 +5,7 @@ data {
 
 transformed data {
 	matrix[d_int,d_int] transformed_data_matrix;
-	
-	transformed_data_matrix <- matrix_exp(d_matrix);
+	transformed_data_matrix = matrix_exp(d_matrix);
 }
 
 parameters {
@@ -17,8 +16,8 @@ parameters {
 transformed parameters {
 	matrix[d_int,d_int] transformed_param_matrix;
 	
-	transformed_param_matrix <- matrix_exp(p_matrix);
-	transformed_param_matrix <- matrix_exp(d_matrix);
+	transformed_param_matrix = matrix_exp(p_matrix);
+	transformed_param_matrix = matrix_exp(d_matrix);
 }
 
 model {

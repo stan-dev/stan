@@ -2719,6 +2719,20 @@ The cumulative sum of \farg{rv}}
 %
 \end{description}
 
+\subsection{Matrix Exponential}
+The exponential of the matrix $A$ is formally defined by the convergent power series:
+%
+\[
+e^A = \sum_{n=0}^{\infty} \dfrac{A^n}{n!}
+\]
+
+\begin{description}
+%
+\fitem{matrix}{matrix\_exp}{matrix \farg{A}}{
+The matrix exponential of \farg{A}}
+%
+\end{description}
+
 \section{Covariance Functions}\label{covariance.section}
 
 \subsection{Exponentiated quadratic covariance function}
@@ -3007,7 +3021,7 @@ positive-definite matrix \farg{A}}
 \end{description}
 
 \subsubsection{Singular Value Decomposition}
-
+decomp
 Stan only provides functions for the singular values, not for the
 singular vectors involved in a singular value decomposition (SVD).
 
@@ -3017,6 +3031,8 @@ singular vectors involved in a singular value decomposition (SVD).
 The singular values of \farg{A} in descending order}
 %
 \end{description}
+
+\subsubsection{Matrix Exponential}
 
 
 \section{Sort Functions}
