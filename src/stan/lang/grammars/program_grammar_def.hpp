@@ -39,7 +39,8 @@ namespace stan {
   namespace lang {
 
     template <typename Iterator>
-    program_grammar<Iterator>::program_grammar(const std::string& model_name)
+    program_grammar<Iterator>::program_grammar(const std::string& model_name,
+                                               bool allow_undefined)
         : program_grammar::base_type(program_r),
           model_name_(model_name),
           var_map_(),
@@ -47,7 +48,7 @@ namespace stan {
           expression_g(var_map_, error_msgs_),
           var_decls_g(var_map_, error_msgs_),
           statement_g(var_map_, error_msgs_),
-          functions_g(var_map_, error_msgs_) {
+          functions_g(var_map_, error_msgs_, allow_undefined) {
         using boost::spirit::qi::eps;
         using boost::spirit::qi::lit;
         using boost::spirit::qi::on_error;
