@@ -9,38 +9,6 @@ Documentation on these functions is included here for completeness.
 The special keyword \code{void} is used for the return type of void
 functions. 
 
-\section{Increment Log Probability (deprecated)}
-
-The increment log density statement, \code{increment\_log\_prob(...)}
-syntactically appears to be a function, but is treated as its own
-special statement.
-\begin{description}
-  \fitem{void}{increment\_log\_prob}{T \farg{lp}}{Add \farg{lp} (or
-    elements of \farg{lp} if \code{T} is a container type) to the
-    total log probability accumulator returned by the log probability
-    function defined by a Stan model.}
-\end{description}
-%
-As of Stan 2.10, the \code{increment\_log\_prob()} statement has been
-deprecated in favor of the \code{target~+=} syntax, with exactly the
-same behavior.
-%
-\begin{description}
-  \fitem{void}{target~+=}{T \farg{lp}}{Add \farg{lp} (or
-    elements of \farg{lp} if \code{T} is a container type) to the
-    total log probability accumulator returned by the log probability
-    function defined by a Stan model.}
-\end{description}
-%
-
-In both cases, the expression \code{lp} can be of any expression type.
-Specifically, it can be an integer or real primitive, a vector, row
-vector, or matrix, or an array of any type, including multidimensional
-arrays and arrays of matrices, vectors, or row vectors.  Vector
-arguments are included for convenience and have no speed advantage
-over adding values in a loop.  See \refsection{increment-log-prob} for
-more information on \code{target +=} and \code{increment\_log\_prob}.
-
 \section{Print}
 
 The \code{print} statement is unique among Stan's syntactic constructs
@@ -179,8 +147,7 @@ This is a no-op.
 
 \begin{description}
 %
-\fitem{int}{abs}{int \farg{x}}{
-  Returns the absolute value of \farg{x}. 
+  \fitemUnaryVec{abs}{absolute value of \farg{x}}{
   \[\mbox{abs}(x) = |x|\]}
 %
 \fitemnobody{int}{int\_step}{int \farg{x}}
@@ -231,6 +198,118 @@ step functions applied to anything other than data.
 \noindent
 This chapter describes built-in functions that take zero or more real
 or integer arguments and return real values.  
+
+\section{Vectorization of Real-Valued Functions}\label{fun-vectorization.section}
+
+Although listed in this chapter, many of Stan's built-in functions are
+vectorized so that they may be applied to any argument type.  The
+vectorized form of these functions is not any faster than writing an
+explicit loop that iterates over the elements applying the
+function---it's just easier to read and write and less error prone.
+
+\subsection{Unary Function Vectorization}
+
+Many of Stan's unary functions can be applied to any argument type.
+For example, the exponential function, \code{exp}, can be applied to
+\code{real} arguments or arrays of \code{real} arguments.  Other than
+for integer arguments, the result type is the same as the argument
+type, including dimensionality and size.  Integer arguments are first
+promoted to real values, but the result will still have the same
+dimensionality and size as the argument.
+
+\subsubsection{Real and real array arguments}
+
+When applied to a simple real value, the result is a real value.  When
+applied to arrays, vectorized functions like \code{exp()} are defined
+elementwise.  For example,
+%
+\begin{stancode}
+// declare some variables for arguments
+real x0;
+real x1[5];
+real x2[4, 7];
+...
+// declare some variables for results
+real y0;
+real y1[5];
+real y2[4, 7];
+...
+// calculate and assign results
+y0 = exp(x0);
+y1 = exp(x1);
+y2 = exp(x2);
+\end{stancode}
+%
+When \code{exp} is applied to an array, it applies elementwise.  For
+example, the statement above,
+%
+\begin{stancode}
+y2 = exp(x2);
+\end{stancode}
+%
+produces the same result for \code{y2} as the explicit loop
+%
+\begin{stancode}
+for (i in 1:4)
+  for (j in 1:7)
+    y2[i, j] = exp(x2[i, j]);
+\end{stancode}
+%
+
+\subsubsection{Vector and matrix arguments}
+
+Vectorized functions also apply elementwise to vectors and matrices.
+For example,
+%
+\begin{stancode}
+vector[5] xv;
+row_vector[7] xrv;
+matrix[10, 20] xm;
+...
+vector[5] yv;
+row_vector[7] yrv;
+matrix[10, 20] ym;
+
+yv = exp(xv);
+yrv = exp(xrv);
+ym = exp(xm);
+\end{stancode}
+%
+
+Arrays of vectors and matrices work the same way.  For example,
+%
+\begin{stancode}
+matrix[17, 93] u[12];
+...
+matrix[17, 93] z[12];
+...
+z = exp(u);
+\end{stancode}
+%
+After this has been executed, \code{z[i,~j,~k]} will be equal to
+\code{exp(u[i,~j,~k])}.
+
+
+\subsubsection{Integer and integer array arguments}
+
+Integer arguments are promoted to real values in vectorized unary
+functions.  Thus if \code{n} is of type \code{int}, \code{exp(n)} is of
+type \code{real}.  Arrays work the same way, so that if \code{n2} is a
+one dimensional array of integers, then \code{exp(n2)} will be a
+one-dimensional array of reals with the same number of elements as
+\code{n2}.  For example,
+%
+\begin{stancode}
+int n1[23];
+...
+real z1[23];
+...
+z1 = exp(n1);
+\end{stancode}
+%
+It would be illegal to try to assign \code{exp(n1)} to an array of
+integers; the return type is a real array.
+
 
 \section{Mathematical Constants}\label{built-in-constants.section}
 
@@ -601,10 +680,7 @@ as \code{x~+~y} and \code{-x}, respectively.
 
 \begin{description}
 %
-  \fitem{real}{abs}{real \farg{x}}{     
-    Returns the absolute value of \farg{x}\,;
-    this function is deprecated and will be removed in the future;
-    please use \code{fabs} instead.
+  \fitemUnaryVec{abs}{absolute value of \farg{x}\,; this function is deprecated and will be removed in the future; please use \code{fabs} instead}{
     \[
     \mbox{\code{abs}}(x) = |x|
     \]}
@@ -691,25 +767,17 @@ of these in the future, but as of now, there is no good workaround.
 
 \begin{description}
   %
-  \fitem{real}{floor}{real \farg{x}}{
-    Returns the floor of \farg{x}, which is the largest integer less
-    than or equal to \farg{x}, converted to a real value;
-    see warning at start of \refsection{step-functions}.
+  \fitemUnaryVec{floor}{floor of \farg{x}, which is the largest integer less than or equal to \farg{x}, converted to a real value; see warning at start of \refsection{step-functions}}{
     \[
     \mbox{\code{floor}}(x) = \lfloor x \rfloor
     \]}
   %
-  \fitem{real}{ceil}{real \farg{x}}{
-    Returns the ceiling of \farg{x}, which is the smallest integer greater
-    than or equal to \farg{x}, converted to a real value;
-    see warning at start of \refsection{step-functions}.
+  \fitemUnaryVec{ceil}{ceiling of \farg{x}, which is the smallest integer greater than or equal to \farg{x}, converted to a real value; see warning at start of \refsection{step-functions}}{
     \[
     \mbox{\code{ceil}}(x) = \lceil x\rceil
     \]}
   %
-  \fitem{real}{round}{real \farg{x}}{
-    Returns the nearest integer to \farg{x}, converted to a real value;
-    see warning at start of \refsection{step-functions}.
+  \fitemUnaryVec{round}{nearest integer to \farg{x}, converted to a real value; see warning at start of \refsection{step-functions}}{
     \[
     \mbox{\code{round}}(x) = 
     \begin{cases}
@@ -734,8 +802,7 @@ of these in the future, but as of now, there is no good workaround.
 %
 \begin{description}
   %
-  \fitem{real}{sqrt}{real \farg{x}}{
-    Returns the square root of \farg{x}.
+  \fitemUnaryVec{sqrt}{square root of \farg{x}}{
     \[
     \mbox{\code{sqrt}}(x) = 
     \begin{cases}
@@ -744,20 +811,17 @@ of these in the future, but as of now, there is no good workaround.
     \end{cases}
     \]}
   %
-  \fitem{real}{cbrt}{real \farg{x}}{
-    Returns the cube root of \farg{x}
+  \fitemUnaryVec{cbrt}{cube root of \farg{x}}{
     \[
     \mbox{\code{cbrt}}(x) = \sqrt[3]{x}
     \]}
   %
-  \fitem{real}{square}{real \farg{x}}{
-    Returns the square of \farg{x}.
+  \fitemUnaryVec{square}{square of \farg{x}}{
     \[
     \mbox{\code{square}}(x) = x^2
     \]}
   %
-  \fitem{real}{exp}{real \farg{x}}{
-    Returns the natural exponential of \farg{x}.
+  \fitemUnaryVec{exp}{natural exponential of \farg{x}}{
     \[
     \mbox{\code{exp}}(x) \ = \ \exp(x)
     \ = \ e^x
@@ -769,8 +833,7 @@ of these in the future, but as of now, there is no good workaround.
     \mbox{\code{exp2}}(x) = 2^x
     \]}
   %
-  \fitem{real}{log}{real \farg{x}}{
-    Returns the natural logarithm of \farg{x}.
+  \fitemUnaryVec{log}{natural logarithm of \farg{x}}{
     \[
     \mbox{\code{log}}(x) = \log x =
     \begin{cases}
@@ -789,8 +852,7 @@ of these in the future, but as of now, there is no good workaround.
     \end{cases}
     \]}
   %
-  \fitem{real}{log10}{real \farg{x}}{
-    Returns the base-10 logarithm of \farg{x}.
+  \fitemUnaryVec{log10}{base-10 logarithm of \farg{x}}{
     \[
     \mbox{\code{log10}}(x) = 
     \begin{cases}
@@ -805,8 +867,7 @@ of these in the future, but as of now, there is no good workaround.
     \mbox{\code{pow}}(x,y) = x^y
     \]}
   %
-  \fitem{real}{inv}{real \farg{x}}{
-    Returns the inverse of \farg{x}.
+  \fitemUnaryVec{inv}{inverse of \farg{x}}{
     \[
     \mbox{\code{inv}}(x) = \frac{1}{x}
     \]}    
@@ -845,26 +906,22 @@ of these in the future, but as of now, there is no good workaround.
     \end{cases}
     \]}
   %
-  \fitem{real}{cos}{real \farg{x}}{
-    Returns the cosine of the angle \farg{x} (in radians).
+  \fitemUnaryVec{cos}{cosine of the angle \farg{x} (in radians)}{
     \[
     \mbox{\code{cos}}(x) = \cos(x)
     \]}
   %
-  \fitem{real}{sin}{real \farg{x}}{
-    Returns the sine of the angle \farg{x} (in radians).
+  \fitemUnaryVec{sin}{sine of the angle \farg{x} (in radians)}{
     \[
     \mbox{\code{sin}}(x) = \sin(x)
     \]}
   %
-  \fitem{real}{tan}{real \farg{x}}{
-    Returns the tangent of the angle \farg{x} (in radians).
+  \fitemUnaryVec{tan}{tangent of the angle \farg{x} (in radians)}{
     \[
     \mbox{tan}(x) = \tan(x)
     \]}
   %
-  \fitem{real}{acos}{real \farg{x}}{
-    Returns the principal arc (inverse) cosine (in radians) of \farg{x}.
+  \fitemUnaryVec{acos}{principal arc (inverse) cosine (in radians) of \farg{x}}{
     \[
     \mbox{\code{acos}}(x) = 
     \begin{cases}
@@ -873,8 +930,7 @@ of these in the future, but as of now, there is no good workaround.
     \end{cases}
     \]}
   %
-  \fitem{real}{asin}{real \farg{x}}{
-    Returns the principal arc (inverse) sine (in radians) of \farg{x}.
+  \fitemUnaryVec{asin}{principal arc (inverse) sine (in radians) of \farg{x}}{
     \[
     \mbox{\code{asin}}(x) = 
     \begin{cases}
@@ -883,8 +939,7 @@ of these in the future, but as of now, there is no good workaround.
     \end{cases}
     \]}
   %
-  \fitem{real}{atan}{real \farg{x}}{
-    Returns the principal arc (inverse) tangent (in radians) of \farg{x}.
+  \fitemUnaryVec{atan}{principal arc (inverse) tangent (in radians) of \farg{x}}{
     \[
     \mbox{\code{atan}}(x) = \arctan(x)
     \]}
@@ -903,20 +958,17 @@ of these in the future, but as of now, there is no good workaround.
 %
 \begin{description}
   %
-  \fitem{real}{cosh}{real \farg{x}}{
-    Returns the hyperbolic cosine of \farg{x} (in radians).
+  \fitemUnaryVec{cosh}{hyperbolic cosine of \farg{x} (in radians)}{
     \[
     \mbox{\code{cosh}}(x) = \cosh(x)
     \]}
   %
-  \fitem{real}{sinh}{real \farg{x}}{
-    Returns the hyperbolic sine of \farg{x} (in radians).
+  \fitemUnaryVec{sinh}{hyperbolic sine of \farg{x} (in radians)}{
     \[
     \mbox{\code{sinh}}(x) = \sinh(x)
     \]}
   %
-  \fitem{real}{tanh}{real \farg{x}}{
-    Returns the hyperbolic tangent of \farg{x} (in radians).
+  \fitemUnaryVec{tanh}{hyperbolic tangent of \farg{x} (in radians)}{
     \[
     \mbox{\code{tanh}}(x) = \tanh(x)
     \]}
@@ -999,20 +1051,17 @@ distribution function (and its complement).
 %
 \begin{description}
   %
-  \fitem{real}{erf}{real \farg{x}}{
-    Returns the error function, also known as the Gauss error function, of \farg{x}.
+  \fitemUnaryVec{erf}{error function, also known as the Gauss error function, of \farg{x}}{
     \[
     \mbox{\code{erf}}(x) = \frac{2}{\sqrt{\pi}}\int_0^x e^{-t^2}dt
     \]}
   %
-  \fitem{real}{erfc}{real \farg{x}}{
-    Returns the complementary error function of \farg{x}.
+  \fitemUnaryVec{erfc}{complementary error function of \farg{x}}{
     \[
     \mbox{\code{erfc}}(x) = \frac{2}{\sqrt{\pi}}\int_x^\infty e^{-t^2}dt
     \]}
   %
-  \fitemindexsort{real}{Phi}{real \farg{x}}{
-    Returns the unit normal cumulative distribution function of \farg{x}.
+  \fitemUnaryVec{Phi}{unit normal cumulative distribution function of \farg{x}}{
     \[
     \mbox{\code{Phi}}(x) = \frac{1}{\sqrt{2\pi}} \int_{0}^{x} e^{-t^2/2} dt
     \]}{Phi}{phi}
@@ -1084,11 +1133,7 @@ distribution function (and its complement).
     See \refsection{beta-appendix} for definition of $\mbox{B}(\alpha, \beta)$.
   }
   %
-  \fitem{real}{tgamma}{real \farg{x}}{
-    Returns the gamma function applied to \farg{x}.  The gamma function 
-    is the generalization of the factorial function to continuous variables,
-    defined so that $\Gamma(n+1) = n!$.  The function is defined for
-    positive numbers and non-integral negative numbers.
+  \fitemUnaryVec{tgamma}{gamma function applied to \farg{x}.  The gamma function  is the generalization of the factorial function to continuous variables, defined so that $\Gamma(n+1) = n!$.  The function is defined for positive numbers and non-integral negative numbers}{
     \[
     \mbox{\code{tgamma}}(x) 
     = 
@@ -1114,10 +1159,7 @@ distribution function (and its complement).
     %
     See \refsection{gamma-appendix} for definition of $\Gamma(x)$.}
   %
-  \fitem{real}{digamma}{real \farg{x}}{
-    Returns the digamma function applied to \farg{x}.  The digamma function is the
-    derivative of the natural logarithm of the Gamma function.  The function is defined 
-    for positive numbers and non-integral negative numbers.
+  \fitemUnaryVec{digamma}{digamma function applied to \farg{x}.  The digamma function is the derivative of the natural logarithm of the Gamma function.  The function is defined  for positive numbers and non-integral negative numbers}{
     \[
     \mbox{\code{digamma}}(x) 
     = 
@@ -1335,8 +1377,7 @@ using more basic \Stan functions.
 %
 \begin{description}
   %
-  \fitem{real}{expm1}{real \farg{x}}{
-    Returns the natural exponential of \farg{x} minus 1.
+  \fitemUnaryVec{expm1}{natural exponential of \farg{x} minus 1}{
     \[
     \mbox{\code{expm1}}(x) = e^x - 1
     \]}
@@ -1384,8 +1425,7 @@ using more basic \Stan functions.
     \end{cases}
     \]}
   %
-  \fitem{real}{log1m}{real \farg{x}}{
-    Returns the natural logarithm of 1 minus \farg{x}.
+  \fitemUnaryVec{log1m}{natural logarithm of 1 minus \farg{x}}{
     \[
     \mbox{\code{log1m}}(x) = 
     \begin{cases}
@@ -2080,28 +2120,10 @@ Matrix transposition is represented using a postfix operator.
 \section{Elementwise Functions}
 
 Elementwise functions apply a function to each element of a vector or
-matrix, returning a result of the same shape as the argument.
-
-\begin{description}
-%
-\fitem{vector}{log}{vector \farg{x}}{
-The elementwise natural logarithm of \farg{x}}
-%
-\fitem{row\_vector}{log}{row\_vector \farg{x}}{
-The elementwise natural logarithm of \farg{x}}
-%
-\fitem{matrix}{log}{matrix \farg{x}}{
-The elementwise natural logarithm of \farg{x}}
-%
-\fitem{vector}{exp}{vector \farg{x}}{
-The elementwise exponential of \farg{x}}
-%
-\fitem{row\_vector}{exp}{row\_vector \farg{x}}{
-The elementwise exponential of \farg{x}}
-%
-\fitem{matrix}{exp}{matrix \farg{x}}{
-The elementwise exponential of \farg{x}}
-\end{description}
+matrix, returning a result of the same shape as the argument.  There
+are many functions that are vectorized in addition to the ad hoc cases
+listed in this section;  see \refsection{fun-vectorization} for the
+general cases.
 
 
 
@@ -2940,7 +2962,7 @@ eigenvalues of 0).
 %   the self-adjoint view of a matrix.}
 %
 
-\subsubsection{QR Decomposition}
+\subsubsection{QR Decomposition}\label{QR-decomposition}
 
 \begin{description}
 %

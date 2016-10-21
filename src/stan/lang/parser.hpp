@@ -59,7 +59,8 @@ namespace stan {
     inline bool parse(std::ostream* output_stream,
                       std::istream& input,
                       const std::string& model_name,
-                      program& result) {
+                      program& result,
+                      const bool allow_undefined = false) {
       using boost::spirit::multi_pass;
       using boost::spirit::make_default_multi_pass;
       using std::istreambuf_iterator;
@@ -82,7 +83,7 @@ namespace stan {
       lp_iterator fwd_begin = lp_iterator(stan_string.begin());
       lp_iterator fwd_end = lp_iterator(stan_string.end());
 
-      program_grammar<lp_iterator> prog_grammar(model_name);
+      program_grammar<lp_iterator> prog_grammar(model_name, allow_undefined);
       whitespace_grammar<lp_iterator> whitesp_grammar;
 
       bool parse_succeeded = false;

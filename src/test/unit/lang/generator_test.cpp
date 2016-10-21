@@ -1,6 +1,6 @@
 #include <iostream>
 #include <sstream>
-#include <boost/random/additive_combine.hpp> // L'Ecuyer RNG
+#include <boost/random/additive_combine.hpp>
 #include <stan/lang/ast_def.cpp>
 #include <stan/lang/generator.hpp>
 #include <stan/io/dump.hpp>

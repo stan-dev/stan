@@ -39,6 +39,10 @@ TEST(parserFunctions, funsBad2) {
   test_throws("functions-bad2","Function declared, but not defined");
 }
 
+TEST(parserFunctions, funsBad2_good) {
+  is_parsable("src/test/test-models/bad/functions-bad2.stan",0, true);
+}
+
 TEST(parserFunctions, funsBad3) {
   test_throws("functions-bad3","SYNTAX ERROR, MESSAGE(S) FROM PARSER:");
 }
