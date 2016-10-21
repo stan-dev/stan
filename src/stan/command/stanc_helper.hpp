@@ -54,6 +54,8 @@ void print_stanc_help(std::ostream* out_stream) {
 
   print_help_option(out_stream, "allow_undefined", "",
                     "Do not fail if a function is declared but not defined");
+  print_help_option(out_stream, "functions_only", "",
+                    "Only generate C++ for functions block and instantiate function templates with doubles");
 }
 
 void delete_file(std::ostream* err_stream,
@@ -142,6 +144,7 @@ int stanc_helper(int argc, const char* argv[],
     }
 
     bool allow_undefined = cmd.has_flag("allow_undefined");
+    bool functions_only = cmd.has_flag("functions_only");
 
     std::fstream out(out_file_name.c_str(), std::fstream::out);
     if (out_stream) {
@@ -151,7 +154,7 @@ int stanc_helper(int argc, const char* argv[],
     }
 
     bool valid_model
-      = stan::lang::compile(err_stream, in, out, model_name, allow_undefined);
+      = stan::lang::compile(err_stream, in, out, model_name, allow_undefined, functions_only);
 
     out.close();
     if (!valid_model) {
