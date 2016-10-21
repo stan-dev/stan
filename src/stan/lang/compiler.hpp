@@ -40,7 +40,7 @@ namespace stan {
       if (!functions_only) 
         generate_cpp(prog, model_name, cpp_out);
       else
-        generate_functions_cpp(prog, model_name, cpp_out);
+        generate_functions_cpp(prog, cpp_out);
       return true;
     }
 
