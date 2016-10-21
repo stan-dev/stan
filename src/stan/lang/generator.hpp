@@ -4635,7 +4635,26 @@ namespace stan {
       out << fun.name_;
     }
 
-
+    /**
+     * Generate arguments for the declaration or definition of a
+     * Stan function to be used as a templated function.
+     *
+     * Template arguments are numbered and followed by a double
+     * underscore (T0__&, T1__&, ...).  For RNG functions
+     * generate an argument that is a reference to the RNG type (RNG&), for
+     * log probability functions generate an argument with references to
+     * T_LP__ and T_lp_accum__, finally generate an argument that is a
+     * pointer to an ostream for output.
+     *
+     * @param[in] fun function AST object
+     * @param[in] is_rng indicate whether the function is a random
+     *            number generator.
+     * @param[in] is_lp indicate whether the function is a log
+     *            probability function.
+     * @param[in] is_log FIXME: unused!
+     * @param[in, out] out output stream to which function definition
+     * is written
+     */
     void generate_function_arguments(const function_decl_def& fun,
                                      bool is_rng,
                                      bool is_lp,
@@ -4665,6 +4684,54 @@ namespace stan {
       out << ")";
     }
 
+    /**
+     * Generate arguments for the declaration or definition of a
+     * Stan function to be used as a doubles-only function.
+     *
+     * Template arguments are all replaced with `double`.  INT_T arguments 
+     * are treated as before in generate_function_arguments().  For RNG functions
+     * generate an argument that is a reference to the RNG type (RNG&), for
+     * log probability functions generate an argument with references to
+     * T_LP__ and T_lp_accum__, finally generate an argument that is a
+     * pointer to an ostream for output.
+     *
+     * @param[in] fun function AST object
+     * @param[in] is_rng indicate whether the function is a random
+     *            number generator.
+     * @param[in] is_lp indicate whether the function is a log
+     *            probability function.
+     * @param[in] is_log FIXME: unused!
+     * @param[in, out] out output stream to which function definition
+     * is written
+     */
+    void generate_function_double_arguments(const function_decl_def& fun,
+                                     bool is_rng,
+                                     bool is_lp,
+                                     bool is_log,
+                                     std::ostream& out) {
+      // arguments
+      out << "(";
+      for (size_t i = 0; i < fun.arg_decls_.size(); ++i) {
+        std::string template_type_i = "double";
+        generate_arg_decl(true, true, fun.arg_decls_[i], template_type_i, out);
+        if (i + 1 < fun.arg_decls_.size()) {
+          out << "," << EOL << INDENT;
+          for (size_t i = 0; i <= fun.name_.size(); ++i)
+            out << " ";
+        }
+      }
+      if ((is_rng || is_lp) && fun.arg_decls_.size() > 0)
+        out << ", ";
+      if (is_rng)
+        out << "RNG& base_rng__";
+      else if (is_lp)
+        out << "double& lp__, double& lp_accum__";
+      if (is_rng || is_lp || fun.arg_decls_.size() > 0)
+        out << ", ";
+      out << "std::ostream* pstream__";
+      out << ")";
+    }
+
     void generate_functor_arguments(const function_decl_def& fun,
                                     bool is_rng,
                                     bool is_lp,
@@ -4688,7 +4755,6 @@ namespace stan {
       out << "pstream__";
       out << ")";
     }
-
 
 
     void generate_function_body(const function_decl_def& fun,
@@ -4788,6 +4854,40 @@ namespace stan {
       out << EOL;
     }
 
+    /**
+     * Generate the specified function for doubles-only arguments 
+     * and optionally its default for
+     * propto=false for functions ending in _log.
+     *
+     * Exact behavior differs for unmarked functions, and functions
+     * ending in one of "_rng", "_lp", or "_log".
+     *
+     * @param[in] fun function AST object
+     * @param[in, out] out output stream to which function definition
+     * is written
+     */
+    void generate_doubles_function(const function_decl_def& fun,
+                           std::ostream& out) {
+      bool is_rng = ends_with("_rng", fun.name_);
+      bool is_lp = ends_with("_lp", fun.name_);
+      bool is_pf = ends_with("_log", fun.name_)
+        || ends_with("_lpdf", fun.name_) || ends_with("_lpmf", fun.name_);
+
+      std::string scalar_t_name = "double";
+      generate_function_template_parameters(fun, is_rng, is_lp, is_pf, out);
+      generate_function_inline_return_type(fun, scalar_t_name, 0, out);
+      generate_function_name(fun, out);
+      generate_function_arguments(fun, is_rng, is_lp, is_pf, out);
+      generate_function_body(fun, scalar_t_name, out);
+
+      // need a second function def for default propto=false for _log
+      // funs; but don't want duplicate def, so don't do it for
+      // forward decl when body is no-op
+      if (is_pf && !fun.body_.is_no_op_statement())
+        generate_propto_default_function(fun, scalar_t_name, out);
+      out << EOL;
+    }
+
     void generate_function_functor(const function_decl_def& fun,
                                    std::ostream& out) {
       if (fun.body_.is_no_op_statement())
@@ -4830,6 +4930,13 @@ namespace stan {
       }
     }
 
+    void generate_doubles_functions(const std::vector<function_decl_def>& funs,
+                            std::ostream& out) {
+      for (size_t i = 0; i < funs.size(); ++i) {
+        generate_doubles_function(funs[i], out);
+      }
+    }
+
     void generate_member_var_decls_all(const program& prog,
                                        std::ostream& out) {
       generate_member_var_decls(prog.data_decl_, 1, out);
@@ -4869,6 +4976,20 @@ namespace stan {
       generate_constrained_param_names_method(prog, out);
       generate_unconstrained_param_names_method(prog, out);
       generate_end_class_decl(out);
+      generate_end_namespace(out);
+      generate_model_typedef(model_name, out);
+    }
+
+    void generate_functions_cpp(const program& prog,
+                      const std::string& model_name,
+                      std::ostream& out) {
+      generate_version_comment(out);
+      generate_includes(out);
+      generate_start_namespace(model_name, out);
+      generate_usings(out);
+      generate_typedefs(out);
+      generate_globals(out);
+      generate_doubles_functions(prog.function_decl_defs_, out);
       generate_end_namespace(out);
       generate_model_typedef(model_name, out);
     }

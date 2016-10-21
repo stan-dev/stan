@@ -30,13 +30,17 @@ namespace stan {
                  std::istream& stan_lang_in,
                  std::ostream& cpp_out,
                  const std::string& model_name,
-                 const bool allow_undefined = false) {
+                 const bool allow_undefined = false,
+                 const bool functions_only = false) {
       program prog;
       bool parsed_ok = parse(msgs, stan_lang_in,
                              model_name, prog, allow_undefined);
       if (!parsed_ok)
         return false;  // syntax error in program
-      generate_cpp(prog, model_name, cpp_out);
+      if (!functions_only) 
+        generate_cpp(prog, model_name, cpp_out);
+      else
+        generate_functions_cpp(prog, model_name, cpp_out);
       return true;
     }
 
