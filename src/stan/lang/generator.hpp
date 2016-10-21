@@ -4872,11 +4872,16 @@ namespace stan {
         || ends_with("_lpdf", fun.name_) || ends_with("_lpmf", fun.name_);
 
       out << "template ";
-      std::string scalar_t_name = "double";
-      generate_function_inline_return_type(fun, scalar_t_name, 0, out);
+      generate_function_inline_return_type(fun, "double", 0, out);
       generate_function_name(fun, out);
       generate_function_doubles_arguments(fun, is_rng, is_lp, is_pf, out);
       out << ";" << EOL2;
+    }
+
+    void generate_function_typedef(const std::string& name_space,
+        const std::string& function_name, std::ostream& out) {
+      out << "typedef " << namespace << "::" << function_name
+          << function_name << ";" << EOL2;
     }
 
     void generate_function_functor(const function_decl_def& fun,
@@ -4918,6 +4923,13 @@ namespace stan {
       for (size_t i = 0; i < funs.size(); ++i) {
         generate_function(funs[i], out);
         generate_function_functor(funs[i], out);
+      }
+    }
+
+    void generate_function_typedefs(const std::vector<function_decl_def>& funs,
+      const std::string name_space, std::ostream& out) {
+      for (size_t i = 0; i < funs.size(); ++i) {
+        generate_function_typedef(names_space, funs[i].name, out);
       }
     }
 
@@ -4978,7 +4990,6 @@ namespace stan {
     }
 
     void generate_functions_cpp(const program& prog,
-                      const std::string& model_name,
                       std::ostream& out) {
       generate_version_comment(out);
       generate_includes(out);
@@ -4987,8 +4998,9 @@ namespace stan {
       generate_typedefs(out);
       generate_globals(out);
       generate_functions(prog.function_decl_defs_, out);
-      generate_end_namespace(out);
       generate_doubles_function_instantiations(prog.function_decl_defs_, out);
+      generate_end_namespace(out);
+      generate_function_typedefs(prog.function_decl.defs_, "stan", out);
     }
 
   }
