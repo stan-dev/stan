@@ -4704,7 +4704,7 @@ namespace stan {
      * @param[in, out] out output stream to which function definition
      * is written
      */
-    void generate_function_double_arguments(const function_decl_def& fun,
+    void generate_function_doubles_arguments(const function_decl_def& fun,
                                      bool is_rng,
                                      bool is_lp,
                                      bool is_log,
@@ -4855,9 +4855,7 @@ namespace stan {
     }
 
     /**
-     * Generate the specified function for doubles-only arguments 
-     * and optionally its default for
-     * propto=false for functions ending in _log.
+     * Generate the specified template initialization for doubles-only arguments 
      *
      * Exact behavior differs for unmarked functions, and functions
      * ending in one of "_rng", "_lp", or "_log".
@@ -4866,26 +4864,19 @@ namespace stan {
      * @param[in, out] out output stream to which function definition
      * is written
      */
-    void generate_doubles_function(const function_decl_def& fun,
+    void generate_doubles_function_instantiation(const function_decl_def& fun,
                            std::ostream& out) {
       bool is_rng = ends_with("_rng", fun.name_);
       bool is_lp = ends_with("_lp", fun.name_);
       bool is_pf = ends_with("_log", fun.name_)
         || ends_with("_lpdf", fun.name_) || ends_with("_lpmf", fun.name_);
 
+      out << "template ";
       std::string scalar_t_name = "double";
-      generate_function_template_parameters(fun, is_rng, is_lp, is_pf, out);
       generate_function_inline_return_type(fun, scalar_t_name, 0, out);
       generate_function_name(fun, out);
-      generate_function_arguments(fun, is_rng, is_lp, is_pf, out);
-      generate_function_body(fun, scalar_t_name, out);
-
-      // need a second function def for default propto=false for _log
-      // funs; but don't want duplicate def, so don't do it for
-      // forward decl when body is no-op
-      if (is_pf && !fun.body_.is_no_op_statement())
-        generate_propto_default_function(fun, scalar_t_name, out);
-      out << EOL;
+      generate_function_doubles_arguments(fun, is_rng, is_lp, is_pf, out);
+      out << ";" << EOL2;
     }
 
     void generate_function_functor(const function_decl_def& fun,
@@ -4930,10 +4921,16 @@ namespace stan {
       }
     }
 
-    void generate_doubles_functions(const std::vector<function_decl_def>& funs,
+    /**
+     * For each function generate the instantiation.
+     * @param[in] funs vector of functions to generate template
+     *            instantiations for.
+     * @param[in, out] out stream to write generated code to.
+     */
+    void generate_doubles_function_instantiations(const std::vector<function_decl_def>& funs,
                             std::ostream& out) {
       for (size_t i = 0; i < funs.size(); ++i) {
-        generate_doubles_function(funs[i], out);
+        generate_doubles_function_instantiation(funs[i], out);
       }
     }
 
@@ -4985,13 +4982,13 @@ namespace stan {
                       std::ostream& out) {
       generate_version_comment(out);
       generate_includes(out);
-      generate_start_namespace(model_name, out);
+      generate_start_namespace("stan", out);
       generate_usings(out);
       generate_typedefs(out);
       generate_globals(out);
-      generate_doubles_functions(prog.function_decl_defs_, out);
+      generate_functions(prog.function_decl_defs_, out);
       generate_end_namespace(out);
-      generate_model_typedef(model_name, out);
+      generate_doubles_function_instantiations(prog.function_decl_defs_, out);
     }
 
   }
