@@ -142,10 +142,15 @@ TEST_MODELS := $(shell find src/test/test-models -type f -name '*.stan')
 $(patsubst %.stan,%.hpp,$(TEST_MODELS)) : %.hpp : %.stan test/test-models/stanc$(EXE)
 	$(WINE) test/test-models/stanc$(EXE) --o=$@ $<
 
+FUN_TEST_MODELS := $(shell find src/test/test-models -type f -name 'double_functions.stan')
+$(patsubst %.stan,%-fun.hpp,$(FUN_TEST_MODELS)) : %-fun.hpp : %.stan test/test-models/stanc$(EXE)
+	$(WINE) test/test-models/stanc$(EXE) --functions_only --o=$@ $<
+
 ##
 # Explicitly specify dependencies for tests that depend on the generated C++ of Stan programs.
 ##
 src/test/performance/logistic_test.cpp: src/test/test-models/performance/logistic.hpp
+src/test/unit/lang/generator_functions_only_test.cpp: src/test/test-models/good/double_functions-fun.hpp
 src/test/unit/lang/generator_test.cpp: src/test/test-models/good/lang/test_lp.hpp
 src/test/unit/lang/parser_generator_test.cpp: $(patsubst %.stan,%.hpp,$(shell find src/test/test-models/good/parser-generator -type f -name '*.stan'))
 src/test/unit/lang/reject/reject_func_call_generated_quantities_test.cpp: src/test/test-models/good/lang/reject_func_call_generated_quantities.hpp
