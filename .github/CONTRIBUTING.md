@@ -4,6 +4,14 @@ The instructions for contributors including the Git process, the testing process
 
 * [Stan Developer Process](https://github.com/stan-dev/stan/wiki)
 
+## Stan Manual Issues
+
+If you would like to make a suggestion for fixing a typo or unclear part of the manual, please make a comment on the currently open next manual issue (it will be numbered by current release followed by `++`) and we will fix it in the next release after the current release:
+
+* [Next Manual Issue](https://github.com/stan-dev/stan/issues?utf8=✓&q=is%3Aopen%20label%3ABug%20%22next%20manual%22%20label%3ADocumentation)
+
+This is easier for us than having to deal with a typo pull request, though we will gladly take those, too.
+
 ## Submitting an Issue
 
 If you want to report a bug or request a feature, the right place to do this is on each individual project's issue tracker.  Please first search to see if the issue has already been reported, and if you need to report a new issue, click on the `New` button in the upper right corner.
