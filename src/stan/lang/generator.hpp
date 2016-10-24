@@ -4880,7 +4880,7 @@ namespace stan {
 
     void generate_function_typedef(const std::string& name_space,
         const std::string& function_name, std::ostream& out) {
-      out << "typedef " << namespace << "::" << function_name
+      out << "typedef " << name_space << "::" << function_name
           << function_name << ";" << EOL2;
     }
 
@@ -4929,7 +4929,7 @@ namespace stan {
     void generate_function_typedefs(const std::vector<function_decl_def>& funs,
       const std::string name_space, std::ostream& out) {
       for (size_t i = 0; i < funs.size(); ++i) {
-        generate_function_typedef(names_space, funs[i].name, out);
+        generate_function_typedef(name_space, funs[i].name_, out);
       }
     }
 
@@ -5000,7 +5000,7 @@ namespace stan {
       generate_functions(prog.function_decl_defs_, out);
       generate_doubles_function_instantiations(prog.function_decl_defs_, out);
       generate_end_namespace(out);
-      generate_function_typedefs(prog.function_decl.defs_, "stan", out);
+      generate_function_typedefs(prog.function_decl_defs_, "stan", out);
     }
 
   }
