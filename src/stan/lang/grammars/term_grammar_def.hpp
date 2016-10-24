@@ -147,7 +147,7 @@ namespace stan {
         %= ( (string("integrate_ode_rk45") >> no_skip[!char_("a-zA-Z0-9_")])
              | (string("integrate_ode_bdf") >> no_skip[!char_("a-zA-Z0-9_")]) )
         >> lit('(')              // >> allows backtracking to non-control
-        >> identifier_r          // 1) system function name (function only) 
+        >> identifier_r          // 1) system function name (function only)
         >> lit(',')
         >> expression_g(_r1)     // 2) y0
         >> lit(',')
