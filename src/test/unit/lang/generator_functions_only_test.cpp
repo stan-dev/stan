@@ -7,9 +7,11 @@ class DoublesFunctions : public testing::Test { };
 
 
 TEST_F(DoublesFunctions, f01) {
-  double out;
-  out = f01(1);
-  EXPECT_EQ(2, out);
+  double result;
+  result = f01(1, &std::cout);
+  EXPECT_EQ(2, result);
+  result = f01(3, &std::cout);
+  EXPECT_EQ(6, result);
 }
 
 
