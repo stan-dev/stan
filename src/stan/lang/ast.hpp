@@ -202,6 +202,7 @@ namespace stan {
       bool has_user_defined_key(const std::string& name) const;
       std::set<std::string> key_set() const;
       bool has_key(const std::string& key) const;
+      bool discrete_first_arg(const std::string& name) const;
 
     private:
       function_signatures();
@@ -1061,10 +1062,12 @@ namespace stan {
       expression expr_;
       distribution dist_;
       range truncation_;
+      bool is_discrete_;
       sample();
       sample(expression& e,
              distribution& dist);
       bool is_ill_formed() const;
+      bool is_discrete() const;
     };
 
     struct assignment {

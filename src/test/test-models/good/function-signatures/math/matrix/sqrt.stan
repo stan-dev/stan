@@ -42,24 +42,24 @@ transformed data {
   row_vector[2] trans_x4w[3,4,5];
   matrix[2,3] trans_x5w[3,4,5];
 
-  transformed_data_matrix <- log(d_matrix);
-  transformed_data_vector <- log(d_vector);
-  transformed_data_row_vector <- log(d_row_vector);
-  trans_x3y <- log(x3y);
-  trans_x4y <- log(x4y);
-  trans_x5y <- log(x5y);
+  transformed_data_matrix <- sqrt(d_matrix);
+  transformed_data_vector <- sqrt(d_vector);
+  transformed_data_row_vector <- sqrt(d_row_vector);
+  trans_x3y <- sqrt(x3y);
+  trans_x4y <- sqrt(x4y);
+  trans_x5y <- sqrt(x5y);
 
-  trans_x2z <- log(x1z);
-  trans_x2z <- log(x2z);
-  trans_x3z <- log(x3z);
-  trans_x4z <- log(x4z);
-  trans_x5z <- log(x5z);
+  trans_x2z <- sqrt(x1z);
+  trans_x2z <- sqrt(x2z);
+  trans_x3z <- sqrt(x3z);
+  trans_x4z <- sqrt(x4z);
+  trans_x5z <- sqrt(x5z);
 
-  trans_x2w <- log(x1w);
-  trans_x2w <- log(x2w);
-  trans_x3w <- log(x3w);
-  trans_x4w <- log(x4w);
-  trans_x5w <- log(x5w);
+  trans_x2w <- sqrt(x1w);
+  trans_x2w <- sqrt(x2w);
+  trans_x3w <- sqrt(x3w);
+  trans_x4w <- sqrt(x4w);
+  trans_x5w <- sqrt(x5w);
 }
 parameters {
   real p_real;
@@ -101,26 +101,26 @@ transformed parameters {
   row_vector[2] trans_p_x4w[3,4,5];
   matrix[2,3] trans_p_x5w[3,4,5];
 
-  transformed_param_matrix <- log(d_matrix);
-  transformed_param_vector <- log(d_vector);
-  transformed_param_row_vector <- log(d_row_vector);
-  transformed_param_matrix <- log(p_matrix);
-  transformed_param_vector <- log(p_vector);
-  transformed_param_row_vector <- log(p_row_vector);
+  transformed_param_matrix <- sqrt(d_matrix);
+  transformed_param_vector <- sqrt(d_vector);
+  transformed_param_row_vector <- sqrt(d_row_vector);
+  transformed_param_matrix <- sqrt(p_matrix);
+  transformed_param_vector <- sqrt(p_vector);
+  transformed_param_row_vector <- sqrt(p_row_vector);
 
-  trans_p_x3y <- log(p_x3y);
-  trans_p_x4y <- log(p_x4y);
-  trans_p_x5y <- log(p_x5y);
+  trans_p_x3y <- sqrt(p_x3y);
+  trans_p_x4y <- sqrt(p_x4y);
+  trans_p_x5y <- sqrt(p_x5y);
 
-  trans_p_x2z <- log(p_x2z);
-  trans_p_x3z <- log(p_x3z);
-  trans_p_x4z <- log(p_x4z);
-  trans_p_x5z <- log(p_x5z);
+  trans_p_x2z <- sqrt(p_x2z);
+  trans_p_x3z <- sqrt(p_x3z);
+  trans_p_x4z <- sqrt(p_x4z);
+  trans_p_x5z <- sqrt(p_x5z);
 
-  trans_p_x2w <- log(p_x2w);
-  trans_p_x3w <- log(p_x3w);
-  trans_p_x4w <- log(p_x4w);
-  trans_p_x5w <- log(p_x5w);
+  trans_p_x2w <- sqrt(p_x2w);
+  trans_p_x3w <- sqrt(p_x3w);
+  trans_p_x4w <- sqrt(p_x4w);
+  trans_p_x5w <- sqrt(p_x5w);
 }
 model {  
   y_p ~ normal(0,1);

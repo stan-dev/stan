@@ -1009,7 +1009,7 @@ namespace stan {
             || et.base_type_ == DOUBLE_T);
     }
 
-    void validate_sample::operator()(const sample& s,
+    void validate_sample::operator()(sample& s,
                                      const variable_map& var_map, bool& pass,
                                      std::ostream& error_msgs) const {
       static const bool user_facing = true;
@@ -1018,8 +1018,10 @@ namespace stan {
       for (size_t i = 0; i < s.dist_.args_.size(); ++i)
         arg_types.push_back(s.dist_.args_[i].expression_type());
       std::string function_name(s.dist_.family_);
-
       std::string internal_function_name = get_prob_fun(function_name);
+      s.is_discrete_ = function_signatures::instance()
+        .discrete_first_arg(internal_function_name);
+
       if (internal_function_name.size() == 0) {
         pass = false;
         error_msgs << "Error: couldn't find distribution named "

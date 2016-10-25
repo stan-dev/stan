@@ -2907,154 +2907,295 @@ target += - log(fabs(y));
 
 \subsection{Truncated Distributions}
 
-A density function $p(x)$ may be truncated to an interval $(a,b)$ to
-define a new density $p_{(a,b)}\!(x)$ by setting
+Stan supports truncating distributions with lower bounds, upper
+bounds, or both.
+
+\subsubsection{Truncating with lower and upper bounds}
+
+A probability density function $p(x)$ for a continuous distribution
+may be truncated to an interval $[a,b]$ to define a new density
+$p_{[a,b]}(x)$ with support $[a,b]$ by setting
 %
 \[
-p_{\!(a,b)\!}(x) = \frac{p(x)}
-                  {\int_a^b p(x') \, dx'}.
+p_{[a,b]}(x)
+= \frac{p(x)}
+       {\int_a^b p(u) \, du}.
 \]
+%
+A probability mass function $p(x)$ for a discrete distribution may be
+truncated to the closed interval $[a,b]$ by
+\[
+p_{[a,b]}(x) = \frac{p(x)}
+                  {\sum_{u = a}^b p(u)}.
+\]
+
+\subsubsection{Truncating with a lower bound}
+
+A probability density function $p(x)$ can be truncated to $[a, \infty]$ by
+defining
+%
+\[
+p_{[a,\infty]}(x)
+= \frac{p(x)}
+       {\int_a^{\infty} p(u) \, du}.
+\]
+%
+A probability mass function $p(x)$ is truncated to $[a, \infty]$ by
+defining 
+%
+\[
+p_{[a,\infty]}(x) = \frac{p(x)}
+                  {\sum_{a <= u} p(u)}.
+\]
+
+\subsubsection{Truncating with an upper bound}
+
+A probability density function $p(x)$ can be truncated to $[-\infty, b]$ by
+defining
+%
+\[
+p_{[-\infty,b]}(x)
+= \frac{p(x)}
+       {\int_{-\infty}^b p(u) \, du}.
+\]
+%
+A probability mass function $p(x)$ is truncated to $[-\infty, b]$ by
+defining 
+%
+\[
+p_{[-\infty,b]}(x) = \frac{p(x)}
+                  {\sum_{u <= b} p(u)}.
+\]
+
+
+\subsubsection{Cumulative distribution functions}
+
 Given a probability function $p_X(x)$ for a random variable $X$, its
 cumulative distribution function (cdf) $F_X(x)$ is defined to be the
-probability that $X \leq a$.  For continuous random variables, this is
+probability that $X \leq x$,
+%
 \[
-F_X(x) = \int_{-\infty}^{x} p_X(x') \, dx',
+F_X(x) = \mbox{Pr}[X \leq x].
 \]
-whereas for discrete variables, it's
+The upper-case variable $X$ is the random variable whereas the
+lower-case variable $x$ is just an ordinary bound variable.  For
+continuous random variables, the definition of the cdf works out to
 \[
-F_X(x) = \sum_{n \leq x} p_X(x).
+F_X(x) \ = \ \int_{-\infty}^{x} p_X(u) \, du,
+\]
+For discrete variables, the cdf is defined to include the upper bound
+given by the argument,
+\[
+F_X(x) = \sum_{u \leq x} p_X(u).
 \]
 %
-The complementary cumulative distribution function (ccdf) is $1 -
-F_X(x)$.
 
-Cumulative distribution functions are useful for defining truncated
-distributions, because
+\subsubsection{Complementary cumulative distribution functions}
+
+The complementary cumulative distribution function (ccdf) in both the
+continuous and discrete cases is given by
 \[
-\int_a^b p(x') \, dx' = F(b) - F(a),
+F^C_X(x)
+\ = \ \mbox{Pr}[X > x]
+\ = \ 1 - F_X(x).
 \]
-so that
+Unlike the cdf, the ccdf is exclusive of the bound, hence the event
+$X > x$ rather than the cdf's event $X \leq x$.
+
+For continous distributions, the ccdf works out to 
 \[
-p_{\!(a,b)\!}(x) = \frac{p_X(x)}
-                  {F(b) - F(a)}.
+F^C_X(x)
+\ = \ 1 - \int_{-\infty}^x p_X(u) \, du
+\ = \ \int_x^{\infty} p_X(u) \, du.
 \]
-On the log scale,
+The lower boundary can be included in the integration bounds because
+it is a single point on a line and hence has no probability mass.
+For the discrete case, the lower bound must be excluded in the
+summation explicitly by summing over $u > x$,
 \[
-\log p_{\!(a,b)\!}(x)
-\ = \
-\log p_X(x)
-- \log \left( F(b) - F(a) \right).
+F^C_X(x)
+\ = \ 1 - \sum_{u \leq x} p_X(u)
+\ = \ \sum_{u > x} p_X(u).
 \]
-The denominator is more stably computed using Stan's
-log\_diff\_exp operation as
-\begin{eqnarray*}
-\log \left( F(b) - F(a) \right)
-& = & \log \left( \exp(\log F(b)) - \exp(\log F(a)) \right)
-\\[6pt]
-& = & \mbox{log\_diff\_exp}\!\left( \log F(b), \log F(a) \right).
-\end{eqnarray*}
 
 
+Cumulative distribution functions provide the necessary integral
+calculations to define truncated distributions.  For truncation with
+lower and upper bounds, the denominator is defined by
+\[
+\int_a^b p(u) \, du = F_X(b) - F_X(a).
+\]
+This allows truncated distributions to be defined as
+\[
+p_{[a,b]}(x) = \frac{p_X(x)}
+                  {F_X(b) - F_X(a)}.
+\]
+
+For discrete distributions, a slightly more complicated form is
+required to explicitly insert the lower truncation point, which is
+otherwise excluded from $F_X(b) - F_X(a)$,
+\[
+p_{[a,b]}(x) = \frac{p_X(x)}
+                  {F_X(b) - F_X(a) + p_X(a)}.
+\]
+
+\subsubsection{Truncation with lower and upper bounds in Stan}
 
 Stan allows probability functions to be truncated.  For example, a
-truncated unit normal distribution restricted to $(-0.5, 2.1)$ is
-encoded as follows.
+truncated unit normal distributions restricted to $[-0.5, 2.1]$
+can be coded with the following sampling statement.
 %
 \begin{stancode}
-y ~ normal(0,1) T[-0.5, 2.1];
+y ~ normal(0, 1) T[-0.5, 2.1];
 \end{stancode}
 %
-Truncated distributions are translated as an addition summation for
-the accumulated log probability.  For instance, this example has the
-same translation (up to arithmetic precision issues; see below) as
+Truncated distributions are translated as an additional term in the
+accumulated log density function plus error checking to make sure the
+variate in the sampling statement is within the bounds of the
+truncation.
+
+In general, the truncation bounds and parameters may be parameters or
+local variables.
+
+Because the example above involves a continuous distribution, it
+behaves the same way as the following more verbose form.
+%
+\begin{stancode}
+y ~ normal(0, 1);
+if (y < -0.5 || y > 2.1)
+  target += negative_infinity();
+else
+  target += -log_diff_exp(normal_lcdf(2.1 | 0, 1),
+                          normal_lcdf(-0.5 | 0, 1));
+\end{stancode}
+%
+Because a Stan program defines a log density function, all
+calculations are on the log scale.  The function \code{normal\_lcdf}
+is the log of the cumulative normal distribution function and the
+function \code{log\_diff\_exp(a, b)} is a more arithmetically stable
+form of \code{log(exp(a) - exp(b))}.
+
+For a discrete distribution, another term is necessary in the
+denominator to account for the excluded boundary.  The truncated
+discrete distribution
+%
+\begin{stancode}
+y ~ poisson(3.7) T[2, 10];
+\end{stancode}
+%
+behaves in the same way as the following code.
+%
+\begin{stancode}
+y ~ poisson(3.7);
+if (y < 2 || y > 10) 
+  target += negative_infinity();
+else
+  target += -log_sum_exp(poisson_lpmf(2 | 3.7),
+                         log_diff_exp(poisson_lcdf(10 | 3.7),
+                                      poisson_lcdf(2 | 3.7)));
+\end{stancode}
+%
+Recall that \code{log\_sum\_exp(a, b)} is just the arithmetically
+stable form of \code{log(exp(a) + exp(b))}.
+
+
+\subsubsection{Truncation with lower bounds in Stan}
+
+For truncating with only a lower bound, the upper limit is left blank.
+%
+\begin{stancode}
+y ~ normal(0, 1) T[-0.5, ];
+\end{stancode}
+%
+This truncated sampling statement has the same behavior as the
+following code.
+%
+\begin{stancode}
+y ~ normal(0, 1);
+if (y < -0.5)
+  target += negative_infinity();
+else
+  target += -normal_lccdf(-0.5 | 0, 1);
+\end{stancode}
+%
+The \code{normal\_lccdf} function is the normal complementary cumulative
+distribution function.
+
+As with lower and upper truncation, the discrete case requires a more
+complicated denominator to add back in the probability mass for the
+lower bound.  Thus
+%
+\begin{stancode}
+y ~ poisson(3.7) T[2, ];
+\end{stancode}
+%
+behaves the same way as
+%
+\begin{stancode}
+y ~ poisson(3.7);
+if (y < 2)
+  target += negative_infinity();
+else
+  target += -log_sum_exp(poisson_lpdf(2 | 3.7),
+                         poisson_lccdf(2 | 3.7));
+\end{stancode}
+
+
+\subsubsection{Truncation with upper bounds in Stan}
+
+To truncate with only an upper bound, the lower bound is left blank.  
+The upper truncated sampling statement
+%
+\begin{stancode}
+y ~ normal(0, 1) T[ , 2.1];
+\end{stancode}
+%
+produces the same result as the following code.
 %
 \begin{stancode}
 target += normal_lpdf(y | 0, 1);
-target += -log_diff_exp(normal_lcdf(2.1 | 0, 1),
-                        normal_lcdf(-0.5 | 0, 1));
-\end{stancode}
-%
-The function \code{normal\_lcdf} represents the cumulative normal
-distribution function.  For example, 
-\code{normal\_lcdf(2.1 | 0, 1)} evaluates to
-\[
-\log \int_{-\infty}^{2.1} \mbox{\sf Normal}(x | 0, 1) \, \mathrm{d}x,
-\]
-%
-which is the log of the probability that a unit normal variable takes
-on a value less than 2.1, or about $\log 0.98$.
-
-Arithmetic precision is handled by working on the log scale and using
-Stan's log scale cdf implementations.  The logarithm of the cdf for
-the normal distribution is \code{normal\_lcdf} and the log of the ccdf
-is \code{normal\_lccdf}.  The function \code{log\_diff\_exp(a, b)} is
-equivalent to the less stable form \code{log(exp(a) - exp(b))}.
-
-As with constrained variable declarations, truncation can be one
-sided.  The density $p(x)$ can be truncated below by $a$ to define a
-density $p_{(a,)}(x)$ with support $(a,\infty)$ by setting
-%
-\[
-p_{(a,)}(x) = \frac{p(x)}
-                 {\int_a^{\infty} p(x') \, dx'}.
-\]
-For example, the unit normal distribution truncated below at -0.5 would
-be represented as
-%
-\begin{stancode}
-y ~ normal(0, 1) T[-0.5,];
-\end{stancode}
-%
-The truncation has the same effect as the following direct update to
-the accumulated log probability (see the subsection of
-\refsection{sampling-statements} contrasting log probability increment
-and sampling statements for more information).
-%
-\begin{stancode}
-target += normal_lpdf(y | 0, 1);
-target += -normal_lccdf(-0.5 | 0, 1);
-\end{stancode}
-%
-The \code{lccdf} function is the complementary cumulative distribution
-function (cdf);  if $F(x)$ is the cumulative distribution function for
-$x$, then $G(x) = 1 - F(x)$ is its complement.
-
-The density $p(x)$ can be truncated above by $b$ to define a density
-$p_{(,b)}(x)$ with support $(-\infty,b)$ by setting
-\[
-p_{(,b)}(x) = \frac{p(x)}
-                    {\int_{-\infty}^b p(x') \, \mathrm{d}x'}.
-\]
-For example, the unit normal distribution truncated above at 2.1 would
-be represented as
-%
-\begin{stancode}
-y ~ normal(0, 1) T[,2.1];
-\end{stancode}
-%
-The truncation has the same effect as the following direct update to
-the accumulated log probability.
-%
-\begin{stancode}
-target += normal_lpdf(y | 0, 1);
-target += -normal_lcdf(2.1 | 0, 1);
+if (y > 2.1)
+  target += negative_infinity();
+else 
+  target += -normal_lcdf(2.1 | 0, 1);
 \end{stancode}
 
-In all cases, the truncation is only well formed if the
-appropriate log cumulative distribution functions are defined.%
+With only an upper bound, the discrete case does not need a boundary
+adjustment.  The upper-truncated sampling statement
 %
-\footnote{Although most distributions have cdfs and ccdfs implemented,
-  some cumulative distribution functions and their gradients present
-  computational challenges because they lack simple, analytic forms.}
+\begin{stancode}
+y ~ poisson(3.7) T[ , 10];
+\end{stancode}
 %
+behaves the same way as the following code.
+%
+\begin{stancode}
+y ~ poisson(3.7);
+if (y > 10)
+  target += negative_infinity();
+else 
+  target += -poisson_lcdf(10 | 3.7);
+\end{stancode}
+
+\subsubsection{Cumulative distributions must be defined}
+
+In all cases, the truncation is only well formed if the appropriate
+log density or mass function and necessary log cumulative distribution
+functions are defined.  Not every distribution built into Stan has log
+cdf and log ccdfs defined, nor will every user-defined distribution.
 \refpart{discrete-prob-functions} and
 \refpart{continuous-prob-functions} document the available discrete
 and continuous cumulative distribution functions; most univariate
 distributions have log cdf and log ccdf functions.
 
+
+\subsubsection{Type constraints on bounds}
+
 For continuous distributions, truncation points must be expressions of
 type \code{int} or \code{real}.  For discrete distributions, truncation
 points must be expressions of type \code{int}.
+
+\subsubsection{Variates outside of truncation bounds}
 
 For a truncated sampling statement, if the value sampled is not within
 the bounds specified by the truncation expression, the result is zero
@@ -3683,10 +3824,10 @@ it.
 %
 The conceptual issue is that the prior does not integrate to one over
 the admissible parameter space; it integrates to one over all real
-numbers and integrates to something less than one over $(a,b)$; in these
+numbers and integrates to something less than one over $[a,b]$; in these
 simple univariate cases, we can overcome that with the T[,] notation,
 which essentially divides by whatever the prior integrates to over
-$(a,b)$.  
+$[a,b]$.  
 
 This problem is exactly the same problem as you would get using reject
 statements to enforce complicated inequalities on multivariate
