@@ -1066,7 +1066,6 @@ namespace stan {
         pass = false;
         return;
       }
-
       // test for LHS not being purely a variable
       if (has_non_param_var(s.expr_, var_map)) {
         error_msgs << "Warning (non-fatal):"
@@ -1074,8 +1073,8 @@ namespace stan {
                    << "Left-hand side of sampling statement (~) may contain a"
                    << " non-linear transform of a parameter or local variable."
                    << std::endl
-                   << "If so, you need to call increment_log_prob() with"
-                   << " the log absolute determinant of the Jacobian of"
+                   << "If it does, you need to include a target += statement"
+                   << " with the log absolute determinant of the Jacobian of"
                    << " the transform."
                    << std::endl
                    << "Left-hand-side of sampling statement:"
