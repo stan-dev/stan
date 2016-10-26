@@ -139,7 +139,7 @@ test/unit/multiple_translation_units%.o : src/test/unit/multiple_translation_uni
 
 test/unit/libmultiple.so : test/unit/multiple_translation_units1.o test/unit/multiple_translation_units2.o
 	@mkdir -p $(dir $@)
-	$(CC) -shared $(OUTPUT_OPTION) $^
+	$(CC) $(CFLAGS) -shared $(OUTPUT_OPTION) $^
 
 src/test/unit/multiple_translation_units_test.cpp : test/unit/libmultiple.so
 
