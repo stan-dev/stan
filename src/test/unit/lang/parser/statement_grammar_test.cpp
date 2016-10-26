@@ -53,17 +53,23 @@ TEST(langParserStatementGrammar, deprecateIncrementLogProb) {
 TEST(langParserStatementGrammarDef, jacobianAdjustmentWarning) {
   test_parsable("validate_jacobian_warning_good");
   test_warning("validate_jacobian_warning1",
-               "If so, you need to call increment_log_prob() with the log");
+               "you need to include a target += statement with"
+               " the log absolute determinant of the Jacobian of the transform.");
   test_warning("validate_jacobian_warning2",
-               "If so, you need to call increment_log_prob() with the log");
+               "you need to include a target += statement with"
+               " the log absolute determinant of the Jacobian of the transform.");
   test_warning("validate_jacobian_warning3",
-               "If so, you need to call increment_log_prob() with the log");
+               "you need to include a target += statement with"
+               " the log absolute determinant of the Jacobian of the transform.");
   test_warning("validate_jacobian_warning4",
-               "If so, you need to call increment_log_prob() with the log");
+               "you need to include a target += statement with"
+               " the log absolute determinant of the Jacobian of the transform.");
   test_warning("validate_jacobian_warning5",
-               "If so, you need to call increment_log_prob() with the log");
+               "you need to include a target += statement with"
+               " the log absolute determinant of the Jacobian of the transform.");
   test_warning("validate_jacobian_warning6",
-               "If so, you need to call increment_log_prob() with the log");
+               "you need to include a target += statement with"
+               " the log absolute determinant of the Jacobian of the transform.");
 }
 
 TEST(langParserStatementGrammarDef, jacobianUserFacing) {
