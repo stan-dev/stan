@@ -1400,7 +1400,7 @@ namespace stan {
           .is_defined(ode_fun.system_function_name_, system_signature)) {
         error_msgs << "first argument to "
                    << ode_fun.integration_function_name_
-                   << " must be a function with signature"
+                   << " must be the name of a function with signature"
                    << " (real, real[], real[], real[], int[]) : real[] ";
         pass = false;
       }
@@ -1417,10 +1417,11 @@ namespace stan {
       }
       if (!ode_fun.t0_.expression_type().is_primitive()) {
         error_msgs << "third argument to "
-               << ode_fun.integration_function_name_
-               << " must have type real or int for initial time; found type="
-               << ode_fun.t0_.expression_type()
-               << ". ";
+                   << ode_fun.integration_function_name_
+                   << " must have type real or int for initial time;"
+                   << " found type="
+                   << ode_fun.t0_.expression_type()
+                   << ". ";
         pass = false;
       }
       if (ode_fun.ts_.expression_type() != expr_type(DOUBLE_T, 1)) {
@@ -1473,7 +1474,7 @@ namespace stan {
         pass = false;
       }
       if (has_var(ode_fun.x_, var_map)) {
-        error_msgs << "fifth argument to "
+        error_msgs << "sixth argument to "
                    << ode_fun.integration_function_name_
                    << " (real data)"
                    << " must be data only and not reference parameters";
@@ -1497,7 +1498,7 @@ namespace stan {
       validate_integrate_ode_non_control_args(ode_fun, var_map, pass,
                                               error_msgs);
       if (!ode_fun.rel_tol_.expression_type().is_primitive()) {
-        error_msgs << "eight argument to "
+        error_msgs << "eighth argument to "
                    << ode_fun.integration_function_name_
                    << " (relative tolerance) must have type real or int;"
                    << " found type="
@@ -1528,21 +1529,21 @@ namespace stan {
       if (has_var(ode_fun.rel_tol_, var_map)) {
         error_msgs << "eight argument to "
                    << ode_fun.integration_function_name_
-                   << " (real data) must be data only"
+                   << " (relative tolerance) must be data only"
                    << " and not depend on parameters";
         pass = false;
       }
       if (has_var(ode_fun.abs_tol_, var_map)) {
         error_msgs << "ninth argument to "
                    << ode_fun.integration_function_name_
-                   << " (real data) must be data only"
+                   << " (absolute tolerance ) must be data only"
                    << " and not depend parameters";
         pass = false;
       }
       if (has_var(ode_fun.max_num_steps_, var_map)) {
         error_msgs << "tenth argument to "
                    << ode_fun.integration_function_name_
-                   << " (real data) must be data only"
+                   << " (max steps) must be data only"
                    << " and not depend on parameters";
         pass = false;
       }
