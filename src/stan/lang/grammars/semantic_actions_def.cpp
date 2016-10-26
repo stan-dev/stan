@@ -2491,7 +2491,7 @@ namespace stan {
                    << std::endl;
         pass = false;
         return;
-      } 
+      }
 
       if (var_origin != local_origin) {
         data_only_expression vis(error_msgs, var_map);
