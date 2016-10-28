@@ -73,11 +73,13 @@ TEST(commandStancHelper, readOnlyOK) {
   std::stringstream err;
   int rc = run_helper("test/test-models/temp-bar.stan", out, err);
 
-  EXPECT_EQ(0, rc);
+  EXPECT_EQ(0, rc)
+    << "out=" << out.str() << std::endl << "err=" << err.str() << std::endl;
   expect_find(out.str(), "Model name=temp_bar_model");
   expect_find(out.str(), "Input file=test/test-models/temp-bar.stan");
   expect_find(out.str(), "Output file=temp_bar_model.cpp");
-  EXPECT_EQ(0, err.str().size());
+  EXPECT_EQ(0, err.str().size())
+    << "error=" << err.str() << std::endl;
 
   delete_file(&err, "test/test-models/temp-bar.stan");
   delete_file(&err, "bar_model.cpp");
