@@ -10,7 +10,11 @@
 #include <stdexcept>
 #include <string>
 
-
+/**
+ * Print the version of stanc with major, minor and patch.
+ * 
+ * @param[in, out] out_stream stream to which version is written.
+ */
 void print_version(std::ostream* out_stream) {
   if (!out_stream) return;
   *out_stream << "stanc version "
@@ -24,6 +28,8 @@ void print_version(std::ostream* out_stream) {
 
 /**
  * Prints the Stan compiler (stanc) help.
+ *
+ * @param[in, out] out_stream stream to which help is written
  */
 void print_stanc_help(std::ostream* out_stream) {
   using stan::io::print_help_option;
@@ -56,16 +62,41 @@ void print_stanc_help(std::ostream* out_stream) {
                     "Do not fail if a function is declared but not defined");
 }
 
+/**
+ * Delte the file at the specified path, writing messages to error
+ * stream if not possible.  Do nothing on zero size file name input.
+ * Only write to error stream if it is non-null.
+ *
+ * @param[in, out] err_stream stream to which error messages are
+ * written
+ * @param[in] file_name path of file
+ */
 void delete_file(std::ostream* err_stream,
                  const std::string& file_name) {
-  int deleted = std::remove(file_name.c_str());
-  if (deleted != 0 && file_name.size() > 0)
+  if (file_name.size() == 0)
+    return;
+  int return_code = std::remove(file_name.c_str());
+  if (return_code != 0)
     if (err_stream)
       *err_stream << "Could not remove output file=" << file_name
                   << std::endl;
 }
 
-
+/**
+ * Invoke the stanc command on the specified argument list, writing
+ * output and error messages to the specified streams, return a return
+ * code.
+ *
+ * <p>The return codes are: 0 for success, -1 for an exception,
+ * -2 is parsing failed, and -3 if there are invalid arguments.
+ *
+ * @param[in] argc number of arguments
+ * @param[in] argv arguments
+ * @parma[in, out] out_stream stream to which output is written
+ * @param[in, out] err_stream stream to which error messages are
+ * written 
+ * @return return code
+ */
 int stanc_helper(int argc, const char* argv[],
                  std::ostream* out_stream, std::ostream* err_stream) {
   static const int SUCCESS_RC = 0;
@@ -94,7 +125,7 @@ int stanc_helper(int argc, const char* argv[],
     }
     std::string in_file_name;
     cmd.bare(0, in_file_name);
-    std::fstream in(in_file_name.c_str());
+    std::ifstream in(in_file_name.c_str());
 
     std::string model_name;
     if (cmd.has_key("name")) {
@@ -125,6 +156,7 @@ int stanc_helper(int argc, const char* argv[],
       cmd.val("o", out_file_name);
     } else {
       out_file_name = model_name;
+      // TODO(carpenter): shouldn't this be .hpp without a main()?
       out_file_name += ".cpp";
     }
 
