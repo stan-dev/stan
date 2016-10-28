@@ -13,7 +13,7 @@
 /**
  * Print the version of stanc with major, minor and patch.
  * 
- * @param[in, out] out_stream stream to which version is written.
+ * @param[in,out] out_stream stream to which version is written.
  */
 void print_version(std::ostream* out_stream) {
   if (!out_stream) return;
@@ -29,7 +29,7 @@ void print_version(std::ostream* out_stream) {
 /**
  * Prints the Stan compiler (stanc) help.
  *
- * @param[in, out] out_stream stream to which help is written
+ * @param[in,out] out_stream stream to which help is written
  */
 void print_stanc_help(std::ostream* out_stream) {
   using stan::io::print_help_option;
@@ -67,7 +67,7 @@ void print_stanc_help(std::ostream* out_stream) {
  * stream if not possible.  Do nothing on zero size file name input.
  * Only write to error stream if it is non-null.
  *
- * @param[in, out] err_stream stream to which error messages are
+ * @param[in,out] err_stream stream to which error messages are
  * written
  * @param[in] file_name path of file
  */
@@ -92,8 +92,8 @@ void delete_file(std::ostream* err_stream,
  *
  * @param[in] argc number of arguments
  * @param[in] argv arguments
- * @parma[in, out] out_stream stream to which output is written
- * @param[in, out] err_stream stream to which error messages are
+ * @param[in,out] out_stream stream to which output is written
+ * @param[in,out] err_stream stream to which error messages are
  * written 
  * @return return code
  */
