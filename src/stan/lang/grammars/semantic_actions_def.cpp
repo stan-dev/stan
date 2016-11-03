@@ -25,21 +25,55 @@ namespace stan {
   namespace lang {
 
     /**
-     * Add qualifier "stan::math::" to nullary functions defined in the
-     * Stan language.  The original name is set to the name here and
-     * the name is converted to have the prefix.
+     * Set original name of specified function to name and add 
+     * "stan::math::" namespace qualifier to name.
      *
-     * @param f Function to qualify.
+     * @param[in, out] f Function to qualify.
+     */
+    void qualify(fun& f) {
+      f.original_name_ = f.name_;
+      f.name_ = "stan::math::" + f.name_;
+    }
+
+    /**
+     * Add qualifier "stan::math::" to nullary functions defined in
+     * the Stan language.  Sets original name of specified function to
+     * name and add "stan::math::" namespace qualifier to name.
+     *
+     * @param[in, out] f Function to qualify.
      */
     void qualify_builtins(fun& f) {
       if (f.args_.size() > 0) return;
       if (f.name_ == "e" || f.name_ == "pi" || f.name_ == "log2"
           || f.name_ == "log10" || f.name_ == "sqrt2"
           || f.name_ == "not_a_number" || f.name_ == "positive_infinity"
-          || f.name_ == "negative_infinity" || f.name_ == "machine_precision") {
-        f.original_name_ = f.name_;
-        f.name_ = "stan::math::" + f.name_;
-      }
+          || f.name_ == "negative_infinity" || f.name_ == "machine_precision")
+        qualify(f);
+    }
+
+    /**
+     * Add namespace qualifier stan::math:: to specify Stan versions
+     * of functions to avoid ambiguities with versions defined in
+     * math.h in the top-level namespace.  Sets original name of
+     * specified function to name and add <code>stan::math::</code>
+     * namespace qualifier to name.
+     *
+     * @param[in, out] f Function to qualify.
+     */
+    void qualify_cpp11_builtins(fun& f) {
+      if (f.args_.size() == 1
+          && (f.name_ == "acosh"|| f.name_ == "asinh" || f.name_ == "atanh"
+              || f.name_ == "exp2" || f.name_ == "expm1" || f.name_ == "log1p"
+              || f.name_ == "log2" || f.name_ == "cbrt" || f.name_ == "erf"
+              || f.name_ == "erfc" || f.name_ == "tgamma" || f.name_ == "lgamma"
+              || f.name_ == "round" || f.name_ == "trunc"))
+          qualify(f);
+      else if (f.args_.size() == 2
+               && (f.name_ == "fdim" || f.name_ == "fmax" || f.name_ == "fmin"
+                   || f.name_ == "hypot"))
+        qualify(f);
+      else if (f.args_.size() == 3 && f.name_ == "fma")
+        qualify(f);
     }
 
     bool has_prob_suffix(const std::string& s) {
@@ -76,16 +110,20 @@ namespace stan {
       return true;
     }
 
-    bool validate_double_expr(const expression& expr,
-                              std::stringstream& error_msgs) {
+    void validate_double_expr::operator()(const expression& expr,
+                              bool& pass,
+                              std::stringstream& error_msgs)
+      const {
       if (!expr.expression_type().is_primitive_double()
           && !expr.expression_type().is_primitive_int()) {
         error_msgs << "expression denoting real required; found type="
                    << expr.expression_type() << std::endl;
-        return false;
+        pass = false;
+        return;
       }
-      return true;
+      pass = true;
     }
+    boost::phoenix::function<validate_double_expr> validate_double_expr_f;
 
     void set_fun_type(fun& fun, std::ostream& error_msgs) {
       std::vector<expr_type> arg_types;
@@ -315,23 +353,27 @@ namespace stan {
                                            function_signature_t> >& declared,
                                            std::set<std::pair<std::string,
                                            function_signature_t> >& defined,
-                                           std::ostream& error_msgs) const {
+                                           std::ostream& error_msgs,
+                                           bool allow_undefined) const {
       using std::set;
       using std::string;
       using std::pair;
       typedef set<pair<string, function_signature_t> >::iterator iterator_t;
-      for (iterator_t it = declared.begin(); it != declared.end(); ++it) {
-        if (defined.find(*it) == defined.end()) {
-          error_msgs <<"Function declared, but not defined."
-                     << " Function name=" << (*it).first
-                     << std::endl;
-          pass = false;
-          return;
+      if (!allow_undefined) {
+        for (iterator_t it = declared.begin(); it != declared.end(); ++it) {
+          if (defined.find(*it) == defined.end()) {
+            error_msgs <<"Function declared, but not defined."
+                       << " Function name=" << (*it).first
+                       << std::endl;
+            pass = false;
+            return;
+          }
         }
       }
       pass = true;
     }
     boost::phoenix::function<validate_declarations> validate_declarations_f;
+
 
     bool fun_exists(const std::set<std::pair<std::string,
                     function_signature_t> >& existing,
@@ -558,12 +600,12 @@ namespace stan {
     }
     boost::phoenix::function<set_omni_idx> set_omni_idx_f;
 
-    void validate_int_expression::operator()(const expression & e, bool& pass)
+    void validate_int_expr_silent::operator()(const expression & e, bool& pass)
       const {
       pass = e.expression_type().is_primitive_int();
     }
-    boost::phoenix::function<validate_int_expression>
-    validate_int_expression_f;
+    boost::phoenix::function<validate_int_expr_silent>
+    validate_int_expr_silent_f;
 
     void validate_int_expression_warn::operator()(const expression & e,
                                                   bool& pass,
@@ -576,7 +618,7 @@ namespace stan {
         error_msgs << '.' << std::endl;
       }
       pass = e.expression_type().is_primitive_int();
-    };
+    }
     boost::phoenix::function<validate_int_expression_warn>
     validate_int_expression_warn_f;
 
@@ -967,7 +1009,7 @@ namespace stan {
             || et.base_type_ == DOUBLE_T);
     }
 
-    void validate_sample::operator()(const sample& s,
+    void validate_sample::operator()(sample& s,
                                      const variable_map& var_map, bool& pass,
                                      std::ostream& error_msgs) const {
       static const bool user_facing = true;
@@ -976,8 +1018,10 @@ namespace stan {
       for (size_t i = 0; i < s.dist_.args_.size(); ++i)
         arg_types.push_back(s.dist_.args_[i].expression_type());
       std::string function_name(s.dist_.family_);
-
       std::string internal_function_name = get_prob_fun(function_name);
+      s.is_discrete_ = function_signatures::instance()
+        .discrete_first_arg(internal_function_name);
+
       if (internal_function_name.size() == 0) {
         pass = false;
         error_msgs << "Error: couldn't find distribution named "
@@ -1022,7 +1066,6 @@ namespace stan {
         pass = false;
         return;
       }
-
       // test for LHS not being purely a variable
       if (has_non_param_var(s.expr_, var_map)) {
         error_msgs << "Warning (non-fatal):"
@@ -1030,8 +1073,8 @@ namespace stan {
                    << "Left-hand side of sampling statement (~) may contain a"
                    << " non-linear transform of a parameter or local variable."
                    << std::endl
-                   << "If so, you need to call increment_log_prob() with"
-                   << " the log absolute determinant of the Jacobian of"
+                   << "If it does, you need to include a target += statement"
+                   << " with the log absolute determinant of the Jacobian of"
                    << " the transform."
                    << std::endl
                    << "Left-hand-side of sampling statement:"
@@ -1106,7 +1149,8 @@ namespace stan {
         std::vector<expr_type> arg_types_trunc(arg_types);
         arg_types_trunc[0] = s.truncation_.low_.expression_type();
         std::string function_name_ccdf = get_ccdf(s.dist_.family_);
-        if (!is_double_return(function_name_ccdf, arg_types_trunc,
+        if (function_name_ccdf == s.dist_.family_
+            || !is_double_return(function_name_ccdf, arg_types_trunc,
                               error_msgs)) {
           error_msgs << "lower truncation not defined for specified"
                      << " arguments to "
@@ -1127,8 +1171,9 @@ namespace stan {
         std::vector<expr_type> arg_types_trunc(arg_types);
         arg_types_trunc[0] = s.truncation_.high_.expression_type();
         std::string function_name_cdf = get_cdf(s.dist_.family_);
-        if (!is_double_return(function_name_cdf, arg_types_trunc,
-                              error_msgs)) {
+        if (function_name_cdf == s.dist_.family_
+            || !is_double_return(function_name_cdf, arg_types_trunc,
+                                 error_msgs)) {
           error_msgs << "upper truncation not defined for"
                      << " specified arguments to "
                      << s.dist_.family_ << std::endl;
@@ -1149,8 +1194,9 @@ namespace stan {
         std::vector<expr_type> arg_types_trunc(arg_types);
         arg_types_trunc[0] = s.truncation_.low_.expression_type();
         std::string function_name_cdf = get_cdf(s.dist_.family_);
-        if (!is_double_return(function_name_cdf, arg_types_trunc,
-                              error_msgs)) {
+        if (function_name_cdf == s.dist_.family_
+            || !is_double_return(function_name_cdf, arg_types_trunc,
+                                 error_msgs)) {
           error_msgs << "lower truncation not defined for specified"
                      << " arguments to "
                      << s.dist_.family_ << std::endl;
@@ -1255,16 +1301,19 @@ namespace stan {
     }
     boost::phoenix::function<remove_loop_identifier> remove_loop_identifier_f;
 
-    void validate_int_expr_warn::operator()(const expression& expr,
+    void validate_int_expr::operator()(const expression& expr,
                                             bool& pass,
                                             std::stringstream& error_msgs)
       const {
-      pass = expr.expression_type().is_primitive_int();
-      if (!pass)
+      if (!expr.expression_type().is_primitive_int()) {
         error_msgs << "expression denoting integer required; found type="
                    << expr.expression_type() << std::endl;
+        pass = false;
+        return;
+      }
+      pass = true;
     }
-    boost::phoenix::function<validate_int_expr_warn> validate_int_expr_warn_f;
+    boost::phoenix::function<validate_int_expr> validate_int_expr_f;
 
     void deprecate_increment_log_prob::operator()(
                                        std::stringstream& error_msgs) const {
@@ -1351,7 +1400,7 @@ namespace stan {
           .is_defined(ode_fun.system_function_name_, system_signature)) {
         error_msgs << "first argument to "
                    << ode_fun.integration_function_name_
-                   << " must be a function with signature"
+                   << " must be the name of a function with signature"
                    << " (real, real[], real[], real[], int[]) : real[] ";
         pass = false;
       }
@@ -1368,10 +1417,11 @@ namespace stan {
       }
       if (!ode_fun.t0_.expression_type().is_primitive()) {
         error_msgs << "third argument to "
-               << ode_fun.integration_function_name_
-               << " must have type real or int for initial time; found type="
-               << ode_fun.t0_.expression_type()
-               << ". ";
+                   << ode_fun.integration_function_name_
+                   << " must have type real or int for initial time;"
+                   << " found type="
+                   << ode_fun.t0_.expression_type()
+                   << ". ";
         pass = false;
       }
       if (ode_fun.ts_.expression_type() != expr_type(DOUBLE_T, 1)) {
@@ -1424,7 +1474,7 @@ namespace stan {
         pass = false;
       }
       if (has_var(ode_fun.x_, var_map)) {
-        error_msgs << "fifth argument to "
+        error_msgs << "sixth argument to "
                    << ode_fun.integration_function_name_
                    << " (real data)"
                    << " must be data only and not reference parameters";
@@ -1448,7 +1498,7 @@ namespace stan {
       validate_integrate_ode_non_control_args(ode_fun, var_map, pass,
                                               error_msgs);
       if (!ode_fun.rel_tol_.expression_type().is_primitive()) {
-        error_msgs << "eight argument to "
+        error_msgs << "eighth argument to "
                    << ode_fun.integration_function_name_
                    << " (relative tolerance) must have type real or int;"
                    << " found type="
@@ -1479,21 +1529,21 @@ namespace stan {
       if (has_var(ode_fun.rel_tol_, var_map)) {
         error_msgs << "eight argument to "
                    << ode_fun.integration_function_name_
-                   << " (real data) must be data only"
+                   << " (relative tolerance) must be data only"
                    << " and not depend on parameters";
         pass = false;
       }
       if (has_var(ode_fun.abs_tol_, var_map)) {
         error_msgs << "ninth argument to "
                    << ode_fun.integration_function_name_
-                   << " (real data) must be data only"
+                   << " (absolute tolerance ) must be data only"
                    << " and not depend parameters";
         pass = false;
       }
       if (has_var(ode_fun.max_num_steps_, var_map)) {
         error_msgs << "tenth argument to "
                    << ode_fun.integration_function_name_
-                   << " (real data) must be data only"
+                   << " (max steps) must be data only"
                    << " and not depend on parameters";
         pass = false;
       }
@@ -1535,8 +1585,9 @@ namespace stan {
               "'_lpdf' for density functions or '_lpmf' for mass functions",
               fun, error_msgs);
 
-      // if fun is built-in nullary, add stan::math:: qualifier
+      // add stan::math:: qualifier for built-in nullary and math.h
       qualify_builtins(fun);
+      qualify_cpp11_builtins(fun);
 
       // use old function names for built-in prob funs
       if (!function_signatures::instance().has_user_defined_key(fun.name_)) {
@@ -2036,6 +2087,7 @@ namespace stan {
       return false;
     }
 
+
     data_only_expression::data_only_expression(std::stringstream& error_msgs,
                                                variable_map& var_map)
       : error_msgs_(error_msgs),
@@ -2132,6 +2184,64 @@ namespace stan {
     }
     boost::phoenix::function<validate_decl_constraints>
     validate_decl_constraints_f;
+
+    void validate_definition::operator()(const var_origin& origin,
+                                         const var_decl& var_decl,
+                                         bool& pass,
+                                         std::stringstream& error_msgs)
+      const {
+      if (!var_decl.has_def()) return;
+
+      // std::cout << " validate variable definition: " << var_decl.name()
+      //           << " origin: " << origin
+      //           << " decl type: " << var_decl.base_decl().base_type_
+      //           << " decl num dims: " << var_decl.dims().size()
+      //           << " def type: " << var_decl.def().expression_type()
+      //           << " def num dims: " << var_decl.def().total_dims()
+      //           << std::endl;
+
+      // validate that assigment is allowed in this block
+      if (origin == data_origin
+          || origin == parameter_origin) {
+        error_msgs << "variable definition not possible in this block"
+                   << std::endl;
+        pass = false;
+      }
+
+      // validate type
+      expr_type decl_type(var_decl.base_decl().base_type_,
+                          var_decl.dims().size());
+      expr_type def_type = var_decl.def().expression_type();
+
+      bool types_compatible
+        = (decl_type.is_primitive()
+           && def_type.is_primitive()
+           && (decl_type.type() == def_type.type()
+               || (decl_type.type() == DOUBLE_T
+                   && def_type.type() == INT_T)))
+        || (decl_type.type() == def_type.type());
+      if (!types_compatible) {
+        error_msgs << "variable definition base type mismatch,"
+                   << " variable declared as base type: ";
+        write_base_expr_type(error_msgs, decl_type.type());
+        error_msgs << "variable definition has base: ";
+        write_base_expr_type(error_msgs, def_type.type());
+        pass = false;
+      }
+      // validate dims
+      if (decl_type.num_dims() != def_type.num_dims()) {
+        error_msgs << "variable definition dimensions mismatch,"
+                   << " definition specifies "
+                   <<  decl_type.num_dims()
+                   << ", declaration specifies "
+                   << def_type.num_dims();
+        pass = false;
+      }
+      return;
+    }
+    boost::phoenix::function<validate_definition>
+    validate_definition_f;
+
 
     void validate_identifier::reserve(const std::string& w) {
       reserved_word_set_.insert(w);
@@ -2357,20 +2467,6 @@ namespace stan {
     }
     boost::phoenix::function<empty_range> empty_range_f;
 
-
-    void validate_int_expr::operator()(const expression& expr,
-                                       bool& pass,
-                                       std::stringstream& error_msgs) const {
-      if (!expr.expression_type().is_primitive_int()) {
-        error_msgs << "expression denoting integer required; found type="
-                   << expr.expression_type() << std::endl;
-        pass = false;
-        return;
-      }
-      pass = true;
-    }
-    boost::phoenix::function<validate_int_expr> validate_int_expr_f;
-
     void set_int_range_lower::operator()(range& range,
                                          const expression& expr,
                                          bool& pass,
@@ -2420,7 +2516,8 @@ namespace stan {
                                             std::stringstream& error_msgs)
       const {
       range.low_ = expr;
-      pass = validate_double_expr(expr, error_msgs);
+      validate_double_expr validator;
+      validator(expr, pass, error_msgs);
     }
     boost::phoenix::function<set_double_range_lower> set_double_range_lower_f;
 
@@ -2430,7 +2527,8 @@ namespace stan {
                                             std::stringstream& error_msgs)
       const {
       range.high_ = expr;
-      pass = validate_double_expr(expr, error_msgs);
+      validate_double_expr validator;
+      validator(expr, pass, error_msgs);
     }
     boost::phoenix::function<set_double_range_upper> set_double_range_upper_f;
 
@@ -2439,13 +2537,12 @@ namespace stan {
                              variable_map& vm, bool& pass, const var_origin& vo,
                              std::ostream& error_msgs) const {
       if (vm.exists(var_decl.name_)) {
-        // variable already exists
         pass = false;
         error_msgs << "duplicate declaration of variable, name="
                    << var_decl.name_;
 
         error_msgs << "; attempt to redeclare as ";
-        print_var_origin(error_msgs, vo);  // FIXME -- need original vo
+        print_var_origin(error_msgs, vo);
 
         error_msgs << "; original declaration as ";
         print_var_origin(error_msgs, vm.get_origin(var_decl.name_));
@@ -2465,7 +2562,7 @@ namespace stan {
         var_decl_result = var_decl;
         return;
       }
-      pass = true;  // probably don't need to set true
+      pass = true;
       vm.add(var_decl.name_, var_decl, vo);
       var_decl_result = var_decl;
     }

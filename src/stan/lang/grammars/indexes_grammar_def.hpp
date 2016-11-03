@@ -105,7 +105,7 @@ namespace stan {
 
       int_expression_r.name("integer expression");
       int_expression_r
-        %= expression_g(_r1)[validate_int_expression_f(_1, _pass)];
+        %= expression_g(_r1)[validate_int_expr_silent_f(_1, _pass)];
     }
 
   }

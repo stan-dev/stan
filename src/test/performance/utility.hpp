@@ -91,7 +91,7 @@
 #include <stan/mcmc/hmc/nuts/adapt_diag_e_nuts.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_dense_e_nuts.hpp>
 
-#include <stan/model/util.hpp>
+#include <stan/model/gradient.hpp>
 
 #include <stan/optimization/newton.hpp>
 #include <stan/optimization/bfgs.hpp>
