@@ -26,6 +26,34 @@ TEST(commandStancHelper, printStancHelp) {
   expect_find(ss.str(), "OPTIONS:");
 }
 
+bool create_test_file(const std::string& path, const std::string& program) {
+  std::string cmd = "echo ";
+  cmd += program;
+  cmd += " > ";
+  cmd += path;
+  int return_code = system(cmd.c_str());
+  return return_code == 0;
+}
+
+bool create_test_file() {
+  std::string program
+    = "parameters { real y; } model { y ~ normal(0, 1); }";
+  return create_test_file("test/test-models/temp-bar.stan", program);
+}
+
+TEST(commandStancHelper, deleteFile) {
+  if (!create_test_file()) return;
+  std::stringstream ss;
+  delete_file(&ss, "test/test-models/temp-bar.stan");
+  // test there's no error message
+  EXPECT_EQ(0, ss.str().size());
+  // and then test the file stream can't be opened
+  std::fstream fs;
+  fs.open("test/test-models/temp-bar.stan", std::fstream::in);
+  EXPECT_FALSE(fs.is_open());
+  fs.close();
+}
+
 int run_helper(const std::string& path,
                std::ostream& out, std::ostream& err) {
   int argc = 2;
