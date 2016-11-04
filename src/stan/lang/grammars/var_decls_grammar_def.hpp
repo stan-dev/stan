@@ -190,10 +190,7 @@ namespace stan {
         %= (lit("vector")
             >> no_skip[!char_("a-zA-Z0-9_")])
         > -range_brackets_double_r(_r1)
-        > lit('[')
-        > expression_g(_r1)
-        [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
-        > lit(']')
+        > dim1_r(_r1)
         > identifier_r
         > opt_dims_r(_r1)
         > opt_def_r(_r1);
@@ -203,10 +200,7 @@ namespace stan {
         %= (lit("row_vector")
             >> no_skip[!char_("a-zA-Z0-9_")])
         > -range_brackets_double_r(_r1)
-        > lit('[')
-        > expression_g(_r1)
-        [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
-        > lit(']')
+        > dim1_r(_r1)
         > identifier_r
         > opt_dims_r(_r1)
         > opt_def_r(_r1);
@@ -217,11 +211,7 @@ namespace stan {
             >> no_skip[!char_("a-zA-Z0-9_")])
         > -range_brackets_double_r(_r1)
         > lit('[')
-        > expression_g(_r1)
-          [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
-        > lit(',')
-        > expression_g(_r1)
-          [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
+        > int_data_expr_r(_r1) > lit(',') > int_data_expr_r(_r1)
         > lit(']')
         > identifier_r
         > opt_dims_r(_r1)
@@ -231,10 +221,7 @@ namespace stan {
       unit_vector_decl_r
         %= (lit("unit_vector")
             >> no_skip[!char_("a-zA-Z0-9_")])
-        > lit('[')
-        > expression_g(_r1)
-          [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
-        > lit(']')
+        > dim1_r(_r1)
         > identifier_r
         > opt_dims_r(_r1);
 
@@ -242,10 +229,7 @@ namespace stan {
       simplex_decl_r
         %= (lit("simplex")
             >> no_skip[!char_("a-zA-Z0-9_")])
-        > lit('[')
-        > expression_g(_r1)
-          [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
-        > lit(']')
+        > dim1_r(_r1)
         > identifier_r
         > opt_dims_r(_r1);
 
@@ -253,10 +237,7 @@ namespace stan {
       ordered_decl_r
         %= (lit("ordered")
             >> no_skip[!char_("a-zA-Z0-9_")])
-        > lit('[')
-        > expression_g(_r1)
-          [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
-        > lit(']')
+        > dim1_r(_r1)
         > identifier_r
         > opt_dims_r(_r1);
 
@@ -264,10 +245,7 @@ namespace stan {
       positive_ordered_decl_r
         %= (lit("positive_ordered")
             >> no_skip[!char_("a-zA-Z0-9_")])
-        > lit('[')
-        > expression_g(_r1)
-          [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
-        > lit(']')
+        > dim1_r(_r1)
         > identifier_r
         > opt_dims_r(_r1);
 
@@ -277,12 +255,8 @@ namespace stan {
         %= (lit("cholesky_factor_cov")
             >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('[')
-        > expression_g(_r1)
-          [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
-        > -(lit(',')
-            > expression_g(_r1)
-            [validate_int_expr_f(_1, _pass,
-                                   boost::phoenix::ref(error_msgs_))])
+        > int_data_expr_r(_r1)
+        > -(lit(',') > int_data_expr_r(_r1))
         > lit(']')
         > identifier_r
         > opt_dims_r(_r1)
@@ -294,10 +268,7 @@ namespace stan {
       cholesky_corr_decl_r
         %= (lit("cholesky_factor_corr")
             >> no_skip[!char_("a-zA-Z0-9_")])
-        > lit('[')
-        > expression_g(_r1)
-          [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
-        > lit(']')
+        > dim1_r(_r1)
         > identifier_r
         > opt_dims_r(_r1);
 
@@ -305,10 +276,7 @@ namespace stan {
       cov_matrix_decl_r
         %= (lit("cov_matrix")
             >> no_skip[!char_("a-zA-Z0-9_")])
-        > lit('[')
-        > expression_g(_r1)
-          [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
-        > lit(']')
+        > dim1_r(_r1)
         > identifier_r
         > opt_dims_r(_r1);
 
@@ -316,35 +284,31 @@ namespace stan {
       corr_matrix_decl_r
         %= (lit("corr_matrix")
             >> no_skip[!char_("a-zA-Z0-9_")])
-        > lit('[')
-        > expression_g(_r1)
-          [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
-        > lit(']')
+        > dim1_r(_r1)
         > identifier_r
         > opt_dims_r(_r1);
 
-      opt_dims_r.name("array dimensions (optional)");
-      opt_dims_r
-        %=  -dims_r(_r1);
-
-      dims_r.name("array dimensions");
-      dims_r
-        %= lit('[')
-        > (expression_g(_r1)
+      int_data_expr_r.name("integer data expression");
+      int_data_expr_r
+        %= expression_g(_r1)
            [validate_int_data_expr_f(_1, _r1, _pass,
                                      boost::phoenix::ref(var_map_),
-                                     boost::phoenix::ref(error_msgs_))]
-           % ',')
-        > lit(']');
+                                     boost::phoenix::ref(error_msgs_))];
 
+      dim1_r.name("size declaration: integer (data-only) in square brackets");
+      dim1_r %= lit('[') > int_data_expr_r(_r1) > lit(']');
+
+      dims_r.name("array dimensions");
+      dims_r %= lit('[') > (int_data_expr_r(_r1) % ',') > lit(']');
+
+      opt_dims_r.name("array dimensions (optional)");
+      opt_dims_r %=  -dims_r(_r1);
 
       opt_def_r.name("variable definition (optional)");
-      opt_def_r
-        %=  - def_r(_r1);
+      opt_def_r %= -def_r(_r1);
 
-      def_r
-        %= lit('=')
-        > (expression_g(_r1));
+      def_r.name("variable definition");
+      def_r %= lit('=') > expression_g(_r1);
 
       range_brackets_int_r.name("integer range expression pair, brackets");
       range_brackets_int_r

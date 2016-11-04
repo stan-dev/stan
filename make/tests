@@ -160,6 +160,22 @@ $(patsubst %.stan,%.hpp,$(TEST_MODELS)) : %.hpp : %.stan test/test-models/stanc$
 	$(WINE) test/test-models/stanc$(EXE) --o=$@ $<
 
 ##
+# src/test/unit/lang/stanc_helper_test.cpp requires files to be read-only.
+##
+.PHONY: change-file-permissions
+change-file-permissions: 
+ifeq ($(OS_TYPE),win)
+	attrib +r src\\test\\test-models\\good\\stanc_helper.stan
+	attrib +r src\\test\\test-models\\bad\\stanc_helper.stan
+else
+	chmod 444 src/test/test-models/*/stanc_helper.stan
+endif
+
+src/test/unit/lang/stanc_helper_test.cpp: change-file-permissions
+
+
+
+##
 # Explicitly specify dependencies for tests that depend on the generated C++ of Stan programs.
 ##
 src/test/performance/logistic_test.cpp: src/test/test-models/performance/logistic.hpp
