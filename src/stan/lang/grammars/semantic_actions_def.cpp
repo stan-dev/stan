@@ -2192,14 +2192,6 @@ namespace stan {
       const {
       if (!var_decl.has_def()) return;
 
-      // std::cout << " validate variable definition: " << var_decl.name()
-      //           << " origin: " << origin
-      //           << " decl type: " << var_decl.base_decl().base_type_
-      //           << " decl num dims: " << var_decl.dims().size()
-      //           << " def type: " << var_decl.def().expression_type()
-      //           << " def num dims: " << var_decl.def().total_dims()
-      //           << std::endl;
-
       // validate that assigment is allowed in this block
       if (origin == data_origin
           || origin == parameter_origin) {
@@ -2498,15 +2490,19 @@ namespace stan {
                    << expr.expression_type()
                    << std::endl;
         pass = false;
-      } else if (var_origin != local_origin) {
+        return;
+      }
+
+      if (var_origin != local_origin) {
         data_only_expression vis(error_msgs, var_map);
         bool only_data_dimensions = boost::apply_visitor(vis, expr.expr_);
         pass = only_data_dimensions;
-      } else {
-        // don't need to check data vs. parameter in dimensions for
-        // local variable declarations
-        pass = true;
+        return;
       }
+
+      // don't need to check data vs. parameter in dimensions for
+      // local variable declarations
+      pass = true;
     }
     boost::phoenix::function<validate_int_data_expr> validate_int_data_expr_f;
 

@@ -17,7 +17,7 @@ TEST(langParserStatementGrammar, validateIntExpr2) {
   test_throws("validate_int_expr2_bad2",
               "expression denoting integer required");
   test_throws("validate_int_expr2_bad3",
-              "expression denoting integer required");
+              "dimension declaration requires expression denoting integer");
   test_throws("validate_int_expr2_bad4",
               "expression denoting integer required");
 }
