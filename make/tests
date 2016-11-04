@@ -148,8 +148,8 @@ $(patsubst %.stan,%.hpp,$(TEST_MODELS)) : %.hpp : %.stan test/test-models/stanc$
 .PHONY: change-file-permissions
 change-file-permissions: 
 ifeq ($(OS_TYPE),win)
-	attrib +r src\test\test-models\good\stanc_helper.stan
-	attrib +r src\test\test-models\bad\stanc_helper.stan
+	attrib +r src\\test\\test-models\\good\\stanc_helper.stan
+	attrib +r src\\test\\test-models\\bad\\stanc_helper.stan
 else
 	chmod 444 src/test/test-models/*/stanc_helper.stan
 endif
