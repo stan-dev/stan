@@ -1,1072 +1,6 @@
-\part{Programming Techniques}\label{programming-techniques.part}
+\part{Example Models and Programming Techniques}\label{programming-techniques.part}
 
 
-\chapter{Model Building as Software Development}
-
-\noindent
-Developing a statistical model in Stan means writing a Stan program
-and is thus a kind of software development process.  Developing
-software is hard.  Very hard.  So many things can go wrong because
-there are so many moving parts and combinations of parts.
-
-Software development practices are designed to mitigate the problems
-caused by the inherent complexity of writing computer programs.
-Unfortunately, many methodologies veer off into dogma, bean counting,
-or both.  A couple we can recommend that provide solid, practical
-advice for developers are \citep{HuntThomas:99} and
-\citep{McConnell:2004}.  This section tries to summarize some of their
-advice.
-
-\section{Use Version Control}
-
-Version control software, such as Subversion or Git, should be in
-place before starting to code.%
-%
-\footnote{Stan started using Subversion (SVN), then switched to the
-  much more feature-rich Git package.  Git does everything SVN does
-  and a whole lot more.  The price is a steeper learning curve.  For
-  individual or very-small-team development, SVN is just fine.}
-%
-It may seem like a big investment to learn version control, but it's
-well worth it to be able to type a single command to revert to a
-previously working version or to get the difference between the
-current version and an old version.  It's even better when you need
-to share work with others, even on a paper---work can be done
-independently and then automatically merged.  See
-\refchapter{software-development} for information on how Stan itself
-is developed.
-
-
-\section{Make it Reproducible}
-
-Rather than entering commands on the command-line when running models
-(or entering commands directly into an interactive programming
-language like R or Python), try writing scripts to run the data
-through the models and produce whatever posterior analysis you need.
-Scripts can be written for the shell, R, or Python.  Whatever language
-a script is in, it should be self contained and not depend on global
-variables having been set, other data being read in, etc.  
-
-See \refchapter{reproducibility} for complete information on
-reproducibility in Stan and its interfaces.
-
-\subsection{Scripts are Good Documentation}
-
-It may seem like overkill if running the project is only a single line
-of code, but the script provides not only a way to run the code, but
-also a form of concrete documentation for what is run. 
-
-
-\subsection{Randomization and Saving Seeds}
-
-Randomness defeats reproducibility.  MCMC methods are conceptually
-randomized.  Stan's samplers involve random initializations as well as
-randomization during each iteration (e.g., Hamiltonian Monte Carlo
-generates a random momentum in each iteration).
-
-Computers are deterministic.  There is no real randomness, just
-pseudo-random number generators.  These operate by generating a
-sequence of random numbers based on a ``seed.''  Stan (and other
-languages like R) can use time-based methods to generate a seed based
-on the time and date, or seeds can be provided to Stan (or R) in the
-form of integers.  Stan writes out the seed used to generate the
-data as well as the version number of the Stan software so that
-results can be reproduced at a later date.%
-%
-\footnote{This also requires fixing compilers and hardware, because
-  floating-point arithmetic does not have an absolutely fixed behavior
-  across operating systems, hardware configurations, or compilers.}
-
-
-
-\section{Make it Readable}
-
-Treating programs and scripts like other forms of writing for an
-audience provides an important perspective on how the code will be
-used.  Not only might others want to read a program or model, the
-developer will want to read it later.  One of the motivations of
-Stan's design was to make models self-documenting in terms of variable
-usage (e.g., data versus parameter), types (e.g., covariance matrix
-vs. unconstrained matrix) and sizes.  
-
-A large part of readability is consistency.  Particularly in naming
-and layout.  Not only of programs themselves, but the directories and
-files in which they're stored.
-
-Readability of code is not just about comments (see
-Section~\refsection{comments-programming} for commenting
-recommendations and syntax in Stan).
-
-It is surprising how often the solution to a debugging or design
-problem occurs when trying to explain enough about the problem to
-someone else to get help.  This can be on a mailing list, but it works
-best person-to-person.  Finding the solution to your own problem when
-explaining it to someone else happens so frequently in software
-development that the listener is called a ``rubber ducky,'' because
-they only have to nod along.%
-%
-\footnote{Research has shown an actual rubber ducky won't work.  For
-  some reason, the rubber ducky must actually be capable of
-  understanding the explanation.}
-
-
-\section{Explore the Data}
-
-Although this should go without saying, don't just fit data blindly.
-Look at the data you actually have to understand its properties.  If
-you're doing a logistic regression, is it separable?  If you're
-building a multilevel model, do the basic outcomes vary by level?  If
-you're fitting a linear regression, see whether such a model makes
-sense by scatterplotting $x$ vs. $y$.
-
-\section{Design Top-Down, Code Bottom-Up}
-
-Software projects are almost always designed top-down from one or more
-intended use cases.  Good software coding, on the other hand, is
-typically done bottom-up.  
-
-The motivation for top-down design is obvious.  The motivation for
-bottom-up development is that it is much easier to develop software
-using components that have been thoroughly tested.  Although Stan has
-no built-in support for either modularity or testing, many of the same
-principles apply.  
-
-The way the developers of Stan themselves build models is to start as
-simply as possibly, then build up. This is true even if we have a
-complicated model in mind as the end goal, and even if we have a very
-good idea of the model we eventually want to fit.  Rather than
-building a hierarchical model with multiple interactions, covariance
-priors, or other complicated structure, start simple.  Build just a
-simple regression with fixed (and fairly tight) priors.  Then add
-interactions or additional levels.  One at a time.  Make sure that
-these do the right thing.  Then expand.
-
-\section{Fit Simulated Data}
-
-One of the best ways to make sure your model is doing the right thing
-computationally is to generate simulated (i.e., ``fake'') data with
-known parameter values, then see if the model can recover these
-parameters from the data.  If not, there is very little hope that it
-will do the right thing with data from the wild.  
-
-There are fancier ways to do this, where you can do things like run
-$\chi^2$ tests on marginal statistics or follow the paradigm
-introduced in \citep{CookGelmanRubin:2006}, which involves interval
-tests.  
-
-\section{Debug by Print}
-
-Although Stan does not have a stepwise debugger or any unit testing
-framework in place, it does support the time-honored tradition of
-debug-by-printf.%
-%
-\footnote{The ``f'' is not a typo --- it's a historical artifact of
-  the name of the \code{printf} function used for formatted printing
-  in C.} 
-
-Stan supports print statements with one or more string or expression
-arguments.  Because Stan is an imperative language, variables can have
-different values at different points in the execution of a program.
-Print statements can be invaluable for debugging, especially for a
-language like Stan with no stepwise debugger.
-
-For instance, to print the value of variables \code{y} and
-\code{z}, use the following statement.
-%
-\begin{stancode}
-print("y=", y, " z=", z);
-\end{stancode}
-%
-This print statement prints the string ``y='' followed by the value of
-\code{y}, followed by the string `` z=''
-(with the leading space), followed by the value of the variable
-\code{z}.
-
-Each print statement is followed by a new line.  The specific ASCII
-character(s) generated to create a new line are platform specific.
-
-Arbitrary expressions can be used.  For example, the statement
-\begin{stancode}
-print("1+1=", 1+1);
-\end{stancode}
-%
-will print ``1 + 1 = 2'' followed by a new line.
-
-Print statements may be used anywhere other statements may be used,
-but their behavior in terms of frequency depends on how often the
-block they are in is evaluated.  See \refsection{print-statements} for
-more information on the syntax and evaluation of print statements.
-
-
-
-\section{Comments}\label{comments-programming.section}
-
-\subsection{Code Never Lies}
-
-The machine does what the code says, not what the documentation says.
-Documentation, on the other hand, might not match the code.  Code
-documentation easily rots as the code evolves if the documentation is
-not well maintained.  
-
-Thus it is always preferable to write readable code as opposed to
-documenting unreadable code.  Every time you write a piece of
-documentation, ask yourself if there's a way to write the code in such
-a way as to make the documentation unnecessary.
-
-
-\subsection{Comment Styles in Stan}
-
-Stan supports \Cpp-style comments; see \refsection{comments} for full
-details.  The recommended style is to use line-based comments for
-short comments on the code or to comment out one or more
-lines of code.  Bracketed comments are then reserved for long
-documentation comments.  The reason for this convention is that
-bracketed comments cannot be wrapped inside of bracketed comments.
-
-\subsection{What Not to Comment}
-
-When commenting code, it is usually safe to assume that you are 
-writing the comments for other programmers who understand the basics 
-of the programming language in use.  In other words, don't comment the
-obvious.  For instance, there is no need to have comments
-such as the following, which add nothing to the code.
-%
-\begin{stancode}
-y ~ normal(0, 1);  // y has a unit normal distribution
-\end{stancode}
-%
-A Jacobian adjustment for a hand-coded transform might be worth
-commenting, as in the following example.
-%
-\begin{stancode}
-exp(y) ~ normal(0, 1);
-// adjust for change of vars: y = log | d/dy exp(y) |
-target += y;
-\end{stancode}
-%
-It's an art form to empathize with a future code reader and decide
-what they will or won't know (or remember) about statistics and Stan.
-
-\subsection{What to Comment}
-
-It can help to document variable declarations if variables are given
-generic names like \code{N}, \code{mu}, and \code{sigma}.  For
-example, some data variable declarations in an item-response model
-might be usefully commented as follows.
-%
-\begin{stancode}
-int<lower=1> N;   // number of observations
-int<lower=1> I;   // number of students
-int<lower=1> J;   // number of test questions
-\end{stancode}
-%
-The alternative is to use longer names that do not require comments.
-%
-\begin{stancode}
-int<lower=1> n_obs;
-int<lower=1> n_students;
-int<lower=1> n_questions;
-\end{stancode}
-%
-Both styles are reasonable and which one to adopt is mostly a matter of
-taste (mostly because sometimes models come with their own naming
-conventions which should be followed so as not to confuse readers of
-the code familiar with the statistical conventions).
-
-Some code authors like big blocks of comments at the top explaining
-the purpose of the model, who wrote it, copyright and licensing
-information, and so on.  The following bracketed comment is an
-example of a conventional style for large comment blocks.
-%
-\begin{stancode}
-/*
- * Item-Response Theory PL3 Model
- * -----------------------------------------------------
- * Copyright: Joe Schmoe  <joe@schmoe.com>
- * Date:  19 September 2012
- * License: GPLv3
- */
-
-data {
-  // ...
-\end{stancode}
-%
-The use of leading asterisks helps readers understand the scope of the
-comment.  The problem with including dates or other volatile
-information in comments is that they can easily get out of synch with
-the reality of the code.  A misleading comment or one that is wrong is
-worse than no comment at all!
-
-
-\chapter{Data Types}
-
-\noindent
-This chapter discusses the data types available for variable
-declarations and expression values in Stan.  Variable types are
-important for declaring parameters, checking data consistency, calling
-functions, and assigning values to variables.
-
-In Stan, every expression and variable declaration has an associated
-type that is determined statically (i.e., when the program is
-compiled).  Sizes of vectors, matrices, and arrays, on the other hand,
-are determined dynamically (i.e., when the program is run).  This is
-very different than a language like R, which lets you assign a string
-to a variable and then later assign a matrix to it.
-
-Expressions may be primitive, such as variables or constants, or they
-may be composed of other components, such as a function or operator
-applied to arguments.  
-
-This chapter concentrates on the basic data types and how they are
-declared, assigned, and used.  The following chapter provides a
-detailed comparison of the differences among the container types:
-arrays, vectors, and matrices.
-
-\section{Basic Data Types}
-
-Arguments for built-in and user-defined functions and local variables
-are required to be basic data types, meaning an unconstrained
-primitive, vector, or matrix type or an array of such.
-
-\subsection{Primitive Types}
-
-Stan provides two primitive data types, \code{real} for continuous
-values and \code{int} for integer values.
-
-\subsection{Vector and Matrix Types}
-Stan provides three matrix-based data types, \code{vector} for column
-vectors, \code{row\_vector} for row vectors, and \code{matrix} for
-matrices.
-
-\subsection{Array Types}
-
-Any type (including the constrained types discussed in the next
-section) can be made into an array type by declaring array arguments.
-For example,
-%
-\begin{stancode}
-real x[10];
-matrix[3,3] m[6,7];
-\end{stancode}
-%
-declares \code{x} to be a one-dimensional array of size 10 containing
-real values, and declares \code{m} to be a two-dimensional array of
-size $6 \times 7$ containing values that are $3 \times 3$ matrices.
-
-
-\section{Constrained Data Types}
-
-Declarations of variables other than local variables may be provided
-with constraints.  Each constrained data type corresponds to a basic
-data type with constraints.
-
-Constraints provide error checking for variables defined in the \code{data},
-\code{transformed data}, \code{transformed parameters}, and 
-\code{generated quantities} blocks.
-
-Constraints are critical for variables declared in the
-\code{parameters} block, where they determine the transformation from
-constrained variables (those satisfying the declared constraint) to
-unconstrained variables (those ranging over all of $\mathbb{R}^n$).
-
-It is worth calling out the most important aspect of constrained data
-types: 
-%
-\begin{quote}
-\it
-The model must have support (non-zero density) at every value of the
-parameters that meets their declared constraints.
-\end{quote}
-%
-If the declared parameter constraints are less strict than the
-support, the samplers and optimizers may have any of a number of
-pathologies including just getting stuck, failure to initialize,
-excessive Metropolis rejection, or biased samples due to inability to
-explore the tails of the distribution.
-
-\subsection{Upper and Lower Bounds}
-
-Variables may be declared with constraints.  These constraints are not
-part of the underlying data type for a variable, but determine error
-checking in the transformed data, transformed parameter, and generated
-quantities block, and the transform from unconstrained to constrained
-space in the parameters block.
-
-All of the basic data types may be given lower and upper bounds using
-syntax such as
-%
-\begin{stancode}
-int<lower=1> N;
-real<upper=0> log_p;
-vector<lower=-1,upper=1>[3,3] corr;
-\end{stancode}
-
-\subsection{Structured Vectors}
-
-There are also special data types for structured vectors.  These are
-\code{ordered} for a vector of values ordered in increasing order, and
-\code{positive\_ordered} for a vector of positive values ordered in
-increasing order.  
-
-There is also a type \code{simplex} for vectors of non-negative values
-that sum to one, and \code{unit\_vector} for vectors of values whose
-squares sum to one.
-
-\subsection{Structured Matrices}
-
-Symmetric, positive-definite matrices have the type
-\code{cov\_matrix}.  Correlation matrices, which are symmetric
-positive-definite matrices with unit diagonals, have the type
-\code{corr\_matrix}.
-
-There is also a pair of Cholesky factor types.  The first,
-\code{cholesky\_factor\_cov}, is for Cholesky factors of symmetric,
-positive definite matrices, which amounts to being a lower-triangular
-matrix with positive diagonal elements.  The second, and
-\code{cholesky\_factor\_corr}, is for Cholesky factors of correlation
-matrices, which amounts to being a lower-triangular matrix with
-positive diagonal elements, where additionally each row is a unit
-vector (i.e., has Euclidean length 1).  Using Cholesky factor types
-can be much more efficient than the full correlation or covariance
-matrices because they are easier to factor and scale.
-
-
-
-\section{Assignment and Argument Passing}
-
-\subsection{Assignment}
-
-Constrained data values may be assigned to unconstrained variables of
-matching basic type and vice-versa.   Matching is interpreted strictly
-as having the same basic type and number of array dimensions.
-Constraints are not considered, but basic data types are.  
-
-Arrays cannot be assigned to vectors and vice-versa.  Similarly,
-vectors cannot be assigned to matrices and vice-versa, even if their
-dimensions conform.  \refchapter{containers} provides more information
-on the distinctions between vectors and arrays and when each is
-appropriate.
-
-\subsection{Function Invocation}
-
-Passing arguments to functions in Stan works just like assignment to
-basic types.  Stan functions are only specified for the basic data
-types of their arguments, including array dimensionality, but not for
-sizes or constraints.  Of course, functions often check constraints as
-part of their behavior.  
-
-
-
-\chapter{Containers: Arrays, Vectors, and Matrices}\label{containers.chapter}
-
-\noindent
-Stan provides three types of container objects: arrays, vectors, and
-matrices.  The three types are not interchangeable.  Vectors, matrices,
-and arrays are not assignable to one another, even if their dimensions
-are identical.  A $3 \times 4$ matrix is a different kind of object in
-Stan than a $3 \times 4$ array. 
-
-\section{Vectors and Matrices}
-
-Vectors and matrices are more limited kinds of data structures than
-arrays.  Vectors are intrinsically one-dimensional collections of
-reals, whereas matrices are intrinsically two dimensional. 
-
-The intention of using matrix types is to call out their usage in the
-code.  There are three situations in Stan where {\it only} vectors and
-matrices may be used,
-%
-\begin{itemize}
-\item matrix arithmetic operations (e.g., matrix multiplication)
-\item linear algebra functions (e.g., eigenvalues and determinants),
-  and
-\item multivariate function parameters and outcomes (e.g.,
-  multivariate normal distribution arguments).
-\end{itemize}
-%
-
-Vectors and matrices cannot be typed to return integer values.  They
-are restricted to \code{real} values.%
-%
-\footnote{This may change if Stan is called upon to do complicated
-  integer matrix operations or boolean matrix operations.  Integers
-  are not appropriate inputs for linear algebra functions.}
-
-\section{Arrays}
-
-Arrays, on the other hand, are intrinsically one-dimensional
-collections of other kinds of objects.  The values in an array can be
-any type, so that arrays may contain values that are simple reals or
-integers, vectors, matrices, or other arrays.  Arrays are the only way
-to store sequences of integers, and some functions in Stan, such as
-discrete distributions, require integer arguments. 
-
-
-A two-dimensional array is just an array of arrays, both conceptually
-and in terms of current implementation.  When an index is supplied to
-an array, it returns the value at that index.  When more than one
-index is supplied, this indexing operation is chained.  For example, if
-\code{a} is a two-dimensional array, then \code{a[m,~n]} is just
-a convenient shorthand for \code{a[m][n]}.
-
-
-\section{Efficiency Considerations}
-
-One of the motivations for Stan's underlying design is efficiency.
-
-The underlying matrix and linear algebra operations are implemented in
-terms of data types from the Eigen \Cpp library.  By having vectors
-and matrices as basic types, no conversion is necessary when invoking
-matrix operations or calling linear algebra functions.  
-
-Arrays, on the other hand, are implemented as instances of the \Cpp \ 
-\code{std::vector} class (not to be confused with Eigen's
-\code{Eigen::Vector} class or Stan vectors).  By implementing arrays
-this way, indexing is very efficient because values can be returned by
-reference rather than copied by value.
-
-\subsection{Matrices vs.\ Two-Dimensional Arrays}
-
-In Stan models, there are a few minor efficiency considerations in
-deciding between a two-dimensional array and a matrix, which may seem
-interchangeable at first glance.  
-
-First, matrices use a bit less memory than two-dimensional arrays.
-This is because they don't store a sequence of arrays, but just the
-data and the two dimensions.  
-
-Second, matrices store their data in column-major order.  Furthermore,
-all of the data in a matrix is guaranteed to be contiguous in memory.
-This is an important consideration for optimized code because bringing
-in data from memory to cache is much more expensive than performing
-arithmetic operations with contemporary CPUs.  Arrays, on the other
-hand, only guarantee that the values of primitive types are contiguous
-in memory; otherwise, they hold copies of their values (which are
-returned by reference wherever possible).
-
-Third, both data structures are best traversed in the order in which
-they are stored.  This also helps with memory locality.  This is
-column-major for matrices, so the following order is appropriate.
-%
-\begin{stancode}
-matrix[M, N] a;
-//...
-for (n in 1:N)
-  for (m in 1:M)
-    // ... do something with a[m, n] ...
-\end{stancode}
-%
-Arrays, on the other hand, should be traversed in row-major order
-(i.e., last index fastest), as in the following example.
-%
-\begin{stancode}
-real a[M, N];
-// ...
-for (m in 1:M)
-  for (n in 1:N)
-    // ... do something with a[m, n] ...
-\end{stancode}
-%
-The first use of \code{a[m,~n]} should bring \code{a[m]} into memory.
-Overall, traversing matrices is more efficient than traversing arrays.
-
-This is true even for arrays of matrices.  For example, the ideal
-order in which to traverse a two-dimensional array of matrices is
-%
-\begin{stancode}
-matrix[M, N] b[I, J];
-// ...
-for (i in 1:I)
-  for (j in 1:J)
-    for (n in 1:N)
-      for (m in 1:M)
-        ... do something with b[i, j, m, n] ...
-\end{stancode}
-
-If \code{a} is a matrix, the notation \code{a[m]} picks out row
-\code{m} of that matrix.  This is a rather inefficient operation for
-matrices.  If indexing of vectors is needed, it is much better to
-declare an array of vectors.  That is, this
-%
-\begin{stancode}
-row_vector[N] b[M];
-// ...
-for (m in 1:M)
-   ... do something with row vector b[m] ...
-\end{stancode}
-%
-is much more efficient than the pure matrix version
-%
-\begin{stancode}
-matrix b[M, N];
-// ...
-for (m in 1:M)
-   // ... do something with row vector b[m] ...
-\end{stancode}
-%
-Similarly, indexing an array of column vectors is more efficient than
-using the \code{col} function to pick out a column of a matrix.
-
-In contrast, whatever can be done as pure matrix algebra will be the
-fastest.  So if I want to create a row of predictor-coefficient
-dot-products, it's more efficient to do this
-%
-\begin{stancode}
-matrix[N, k] x;    // predictors (aka covariates)
-// ...
-vector[K] beta;   // coeffs
-// ...
-vector[N] y_hat;  // linear prediction
-// ...
-y_hat = x * beta;
-\end{stancode}
-%
-than it is to do this
-%
-\begin{stancode}
-row_vector[K] x[N];    // predictors (aka covariates)
-// ...
-vector[K] beta;   // coeffs
-...
-vector[N] y_hat;  // linear prediction
-...
-for (n in 1:N)
-  y_hat[n] = x[n] * beta;
-\end{stancode}
-
-\subsection{(Row) Vectors vs. One-Dimensional Arrays}
-
-For use purely as a container, there is really nothing to decide among
-vectors, row vectors and one-dimensional arrays.  The
-\code{Eigen::Vector} template specialization and the
-\code{std::vector} template class are implemented very similarly as
-containers of \code{double} values (the type \code{real} in Stan).
-Only arrays in Stan are allowed to store integer values.
-
-
-
-\chapter{Multiple Indexing and Range Indexing}\label{multi-indexing.chapter}
-
-\noindent
-Stan allows multiple indexes to be provided for containers (i.e.,
-arrays, vectors, and matrices) in a single position, using either an
-array of integer indexes or range bounds.  This allows many models to
-be vectorized.  For instance, consider the likelihood for a varying-slope,
-varying-intercept hierarchical linear regression, which could be coded
-as
-%
-\begin{stancode}
-for (n in 1:N)
-  y[n] ~ normal(alpha[ii[n]] + beta[ii[n]] * x[n], sigma);
-\end{stancode}
-%
-With multiple indexing, this can be coded in one line, leading to more
-efficient vectorized code.
-%
-\begin{stancode}
-y ~ normal( rows_dot_product(alpha[ii] + beta[ii] , x), sigma);
-\end{stancode}
-%
-This latter version is equivalent in speed to the clunky assignment to
-a local variable.
-%
-\begin{stancode}
-{ 
-  vector[N] mu;
-  for (n in 1:N)
-    mu[n] = alpha[ii[n]] + beta[ii[n]] * x[n];
-  y ~ normal(mu, sigma);
-}
-\end{stancode}
-
-\section{Multiple Indexing}
-
-The following is the simplest concrete example of multiple indexing
-with an array of integers;  the ellipses stand for code defining the
-variables as indicated in the comments.
-%
-\begin{stancode}
-int c[3];     
-...             // define: c == (5, 9, 7)
-int idxs[4];   
-...             // define: idxs == (3, 3, 1, 2)
-int d[4];
-d = c[idxs];   // result: d == (7, 7, 5, 9)
-\end{stancode}
-%
-
-In general, the multiple indexed expression \code{c[idxs]} is defined
-as follows, assuming \code{idxs} is of size \code{K}.
-%
-\begin{stancode}
-c[idxs] = ( c[idxs[1]], c[idxs[2]], ..., c[idxs[K]] )
-\end{stancode}
-%
-Thus \code{c[idxs]} is of the same size as \code{idxs}, which is
-\code{K} in this example.
-
-Multiple indexing can also be used with multi-dimensional arrays.  For
-example, consider the following.
-%
-\begin{stancode}
-int c[2, 3];   
-...            // define: c = ((1, 3, 5), ((7, 11, 13))
-int idxs[4];
-...            // define: idxs = (2, 2, 1, 2)
-int d[4, 3]
-d = c[idxs];  // result: d = ((7, 11, 13), (7, 11, 13),
-               //              (1, 3, 5), (7, 11, 13))
-\end{stancode}
-%
-That is, putting an index in the first position acts exactly the same
-way as defined above.  The fact that the values are themselves arrays
-makes no difference---the result is still defined by \code{c[idxs][j] ==
-  c[idxs[j]]}.
-
-Multiple indexing may also be used in the second position of a
-multi-dimensional array.  Continuing the above example, consider a
-single index in the first position and a multiple index in the second.
-%
-\begin{stancode}
-int e[4];
-e = c[2, idxs];  // result:  c[2] = (7, 11, 13)
-                  // result:  e = (11, 11, 7, 11)
-\end{stancode}
-%
-The single index is applied, the one-dimensional result is determined,
-then the multiple index is applied to the result.  That is,
-\code{c[2,idxs]} evaluates to the same value as \code{c[2][idxs]}. 
-
-Multiple indexing can apply to more than one position of a
-multi-dimensional array.  For instance, consider the following
-%
-\begin{stancode}
-int c[2, 3];   
-...                    // define: c = ((1, 3, 5), (7, 11, 13))
-int idxs1[3];
-...                    // define: idxs1 = (2, 2, 1)
-int idxs2[2]; 
-...                    // define: idxs2 = (1, 3)
-int d[3, 2];
-d = c[idxs1, idxs2];  // result: d = ((7, 13), (7, 13), (1, 5))
-\end{stancode}
-%
-With multiple indexes, we no longer have \code{c[idxs1,~idxs2]} being
-the same as \code{c[idxs1][idxs2]}.  Rather, the entry \code{d[i,~j]}
-after executing the above is given by
-%
-\begin{stancode}
-d[i, j] == c[idxs1, idxs2][i, j] = c[idxs1[i], idxs2[j]]
-\end{stancode}
-%
-This example illustrates the operation of multiple indexing in the
-general case: a multiple index like \code{idxs1} converts an index
-\code{i} used on the result (here, \code{c[idxs1, idxs2]}) to index
-\code{idxs1[i]} in the variable being indexed (here, \code{c}).  In
-contrast, a single index just returns the value at that index, thus
-reducing dimensionality by one in the result.
-
-\section{Slicing with Range Indexes}
-
-Slicing returns a contiguous slice of a one-dimensional array, a
-contiguous sub-block of a two-dimensional array, and so on.
-Semantically, it is just a special form of multiple indexing.
-
-\subsection{Lower and Upper Bound Indexes}
-
-For instance, consider supplying an upper and lower bound for an
-index.
-%
-\begin{stancode}
-int c[7];
-...
-int d[4];
-d = c[3:6];  // result: d == (c[3], c[4], c[5], c[6])
-\end{stancode}
-%
-The range index \code{3:6} behaves semantically just like the multiple
-index \code{(3, 4, 5, 6)}.  In terms of implementation, the sliced
-upper and/or lower bounded indices are faster and use less memory 
-because they do not explicitly create a multiple index, but rather use
-a direct loop.  They are also easier to read, so should be preferred
-over multiple indexes where applicable.
-
-\subsection{Lower or Upper Bound Indexes}
-
-It is also possible to supply just a lower bound, or just an upper
-bound.  Writing \code{c[3:]} is just shorthand for
-\code{c[3:size(c)]}.  Writing \code{c[:5]} is just shorthand for 
-\code{c[1:5]}.  
-
-\subsection{Full Range Indexes}
-
-Finally, it is possible to write a range index that covers the entire
-range of an array, either by including just the range symbol
-(\code{:}) as the index or leaving the index position empty. In both
-cases, \code{c[]} and \code{c[:]} are equal to \code{c[1:size(c)]},
-which in turn is just equal to \code{c}.
-
-\section{Multiple Indexing on the Left of Assignments}
-
-Multiple expressions may be used on the left-hand side of an
-assignment statement, where they work exactly the same way as on the
-right-hand side in terms of picking out entries of a container.  
-For example, consider the following.
-%
-\begin{stancode}
-int a[3];
-int c[2];
-int idxs[2];
-...             // define: a == (1, 2, 3);  c == (5, 9)
-                //         idxs = (3,2)
-a[idxs] = c;   // result: a == (1, 9, 5)
-\end{stancode}
-%
-The result above can be worked out by noting that the assignment sets
-\code{a[idxs[1]]} (\code{a[3]}) to \code{c[1]} (\code{5}) and
-\code{a[idxs[2]]} (\code{a[2]}) to \code{c[2]} (\code{9}). 
-
-The same principle applies when there are many multiple indexes, as
-in the following example.
-%
-\begin{stancode}
-int a[5, 7];
-int c[2, 2];
-...
-a[2:3, 5:6] = c;  // result: a[2, 5] == c[1, 1];  a[2, 6] == c[1, 2]
-                   //         a[3, 5] == c[2, 1];  a[3, 6] == c[2, 2]
-\end{stancode}
-%
-As in the one-dimensional case, the right-hand side is written into
-the slice, block, or general chunk picked out by the left-hand side.
-
-Usage on the left-hand side allows the full generality of multiple
-indexing, with single indexes reducing dimensionality and multiple
-indexes maintaining dimensionality while rearranging, slicing, or
-blocking.  For example, it is valid to assign to a segment of a row of
-an array as follows.
-%
-\begin{stancode}
-int a[10, 13];
-int c[2];
-...
-a[4, 2:3] = c;  // result:  a[4, 2] == c[1];  a[4, 3] == c[2]
-\end{stancode}
-
-\subsection{Assign-by-Value and Aliasing}
-
-Aliasing issues arise when there are references to the same data
-structure on the right-hand and left-hand side of an assignment.  For
-example, consider the array \code{a} in the following code fragment.
-%
-\begin{stancode}
-int a[3];
-...                // define: a == (5, 6, 7)
-a[2:3] = a[1:2];
-...                // result: a == (5, 5, 6) 
-\end{stancode}
-%
-The reason the value of \code{a} after the assignment is $(5,5,6)$
-rather than $(5,5,5)$ is that Stan behaves as if the right-hand side
-expression is evaluated to a fresh copy.   As another example,
-consider the following.
-%
-\begin{stancode}
-int a[3];
-int idxs[3];
-...            // define idxs = (2, 1, 3)
-a[idxs] = a;
-\end{stancode}
-%
-In this case, it is evident why the right-hand side needs to be copied
-before the assignment.
-
-It is tempting (but wrong) to think of the assignment \code{a[2:3] =
-  a[1:2]} as executing the following assignments.
-%
-\begin{stancode}
-...                // define: a = (5, 6, 7)
-a[2] = a[1];      // result: a = (5, 5, 7)
-a[3] = a[2];      // result: a = (5, 5, 5)!
-\end{stancode}
-%
-This produces a different result than executing the assignment because
-\code{a[2]}'s value changes before it is used.
-
-
-\section{Multiple Indexes with Vectors and Matrices}
-
-Mulitple indexes can be supplied to vectors and matrices as well as
-arrays of vectors and matrices.
-
-\subsection{Vectors}
-
-Vectors and row vectors behave exactly the same way as arrays with
-multiple indexes.  If \code{v} is a vector, then \code{v[3]} is a
-scalar real value, whereas \code{v[2:4]} is a vector of size 3
-containing the elements \code{v[2]}, \code{v[3]}, and \code{v[4]}.
-
-The only subtlety with vectors is in inferring the return type when
-there are multiple indexes. For example, consider the following
-minimal example.
-%
-\begin{stancode}
-vector[5] v[3];
-int idxs[7];
-...
-vector[7] u;
-u = v[2, idxs];
-
-real w[7];
-w = v[idxs, 2];
-\end{stancode}
-%
-The key is understanding that a single index always reduces
-dimensionality, whereas a multiple index never does.  The dimensions
-with multiple indexes (and unindexed dimensions) determine the indexed
-expression's type.  In the example above, because \code{v} is an array
-of vectors, \code{v[2,~idxs]} reduces the array dimension but doesn't
-reduce the vector dimension, so the result is a vector.  In contrast,
-\code{v[idxs,~2]} does not reduce the array dimension, but does reduce
-the vector dimension (to a scalar), so the result type for \code{w} is
-an array of reals.  In both cases, the size of the multiple index
-(here, 7) determines the size of the result.
-
-\subsection{Matrices}
-
-Matrices are a bit trickier because they have two dimensions, but the
-underlying principle of type inference is the same---multiple indexes
-leave dimensions in place, whereas single indexes reduce them.  The
-following code shows how this works for multiple indexing of matrices.
-%
-\begin{stancode}
-matrix[5,7] m;
-...
-row_vector[3] rv;
-rv = m[4, 3:5];    // result is 1 x 3
-...
-vector[4] v;
-v = m[2:5, 3];     // result is 3 x 1
-...
-matrix[3, 4] m2;
-m2 = m[1:3, 2:5];  // result is 3 x 4
-\end{stancode}
-%
-The key is realizing that any position with a multiple index or
-bounded index remains in play in the result, whereas any dimension
-with a single index is replaced with 1 in the resulting dimensions.
-Then the type of the result can be read off of the resulting
-dimensionality as indicated in the comments above.
-
-\subsection{Matrices with One Multiple Index}
-
-If matrices receive a single multiple index, the result is a matrix.
-So if \code{m} is a matrix, so is \code{m[2:4]}.  In contrast,
-supplying a single index, \code{m[3]}, produces a row vector result.
-That is, \code{m[3]} produces the same result as \code{m[3,~]} 
-or \code{m[3,~1:cols(m)]}. 
-
-\subsection{Arrays of Vectors or Matrices}
-
-With arrays of matrices, vectors, and row vectors, the basic access
-rules remain exactly the same: single indexes reduce dimensionality
-and multiple indexes redirect indexes.  For example, consider the
-following example.
-%
-\begin{stancode}
-matrix[3, 4] m[5, 7];
-...
-matrix[3, 4] a[2];
-a = m[1, 2:3];  // knock off first array dimension
-a = m[3:4, 5];  // knock off second array dimension
-\end{stancode}
-%
-In both assignments, the multiple index knocks off an array dimension,
-but it's different in both cases.  In the first case, \code{a[i] ==
-  m[1, i + 1]}, whereas in the second case, \code{a[i] == m[i + 2,
-  5]}.
-
-Continuing the previous example, consider the following.
-%
-\begin{stancode}
-...
-vector[2] b;
-b = a[1, 3, 2:3, 2];
-\end{stancode}
-%
-Here, the two array dimensions are reduced as is the column dimension
-of the matrix, leaving only a row dimension index, hence the result is
-a vector.  In this case, \code{b[j] == a[1, 3, 1 + j, 2]}.
-
-This last example illustrates an important point: if there is a
-lower-bounded index, such as \code{2:3}, with lower bound 2, then the
-lower bound minus one is added to the index, as seen in the \code{1 +
-  j} expression above.
-
-Continuing further, consider continuing with the following.
-%
-\begin{stancode}
-...
-row_vector[3] c[2];
-c = a[4:5, 3, 1, 2: ];
-\end{stancode}
-%
-Here, the first array dimension is reduced, leaving a single array
-dimension, and the row index of the matrix is reduced, leaving a row
-vector.  For indexing, the values are given by
-\code{c[i, j] == a[i + 3, 3, 1, j + 1]}
-
-
-\section{Matrices with Parameters and Constants}
-
-Suppose you have a $3 x 3$ matrix and know that two entries are zero but the
-others are parameters.  Such a situation arises in missing data
-situations and in problems with fixed structural parameters.
-
-Suppose a $3 \times 3$ matrix is known to be zero at indexes $[1,2]$
-and $[1,3]$.  The indexes for parameters are included in a ``melted''
-data-frame or database format.
-
-\begin{stancode}
-transformed data {
-  int<lower=1, upper=3> ii[7];
-  int<lower=1, upper=3> jj[7];
-  ii[1] = 1;  jj[1] = 1;
-  ii[2] = 2;  jj[2] = 1;   // skip [1, 2] and [1, 3]
-  ii[3] = 3;  jj[3] = 1;
-  ii[4] = 2;  jj[4] = 2;
-  ii[5] = 3;  jj[5] = 2;
-  ii[6] = 2;  jj[6] = 3;
-  ii[7] = 3;  jj[7] = 3;
-}
-\end{stancode}
-%
-The seven remaining parameters are declared as a vector.
-%
-\begin{stancode}
-parameters {
-  vector[7] A_raw;
-}
-\end{stancode}
-%
-Then the full matrix \code{A} is constructed in the model block as a
-local variable.
-%
-\begin{stancode}
-model {
-  matrix[3, 3] A;
-  A[ii, jj] = A_raw;
-  A[1, 2] = 0;
-  A[1, 3] = 0;
-}
-\end{stancode}
-
-This may seem like overkill in this setting, but in more general
-settings, the matrix size, vector size, and the \code{ii} and
-\code{jj} array and size can be coded up as data along with the values
-to fill in for the constant entries.  Similar techniques can be used
-to build up matrices with ad-hoc constraints, such as a handful of
-entries known to be positive.
 
 
 \chapter{Regression Models}
@@ -2071,7 +1005,7 @@ The declaration of \code{beta} as an array of vectors means that the
 expression \code{beta[l]} denotes a vector.  Although \code{beta}
 could have been declared as a matrix, an array of vectors (or a
 two-dimensional array) is more efficient for accessing rows; see
-\refchapter{containers} for more information on the efficiency
+\refsection{indexingefficiency} for more information on the efficiency
 tradeoffs among arrays, vectors, and matrices.
 
 This model can be further sped up and at the same time made more
@@ -11815,6 +10749,429 @@ the data; if the sizes are very small, the simple vectorization may be
 faster, but for moderate to large sized groups, the full expansion
 should be faster.
 
+\section{Multiple Indexing and Range Indexing}
+
+Stan allows multiple indexes to be provided for containers (i.e.,
+arrays, vectors, and matrices) in a single position, using either an
+array of integer indexes or range bounds.  This allows many models to
+be vectorized.  For instance, consider the likelihood for a varying-slope,
+varying-intercept hierarchical linear regression, which could be coded
+as
+%
+\begin{stancode}
+for (n in 1:N)
+  y[n] ~ normal(alpha[ii[n]] + beta[ii[n]] * x[n], sigma);
+\end{stancode}
+%
+With multiple indexing, this can be coded in one line, leading to more
+efficient vectorized code.
+%
+\begin{stancode}
+y ~ normal( rows_dot_product(alpha[ii] + beta[ii] , x), sigma);
+\end{stancode}
+%
+This latter version is equivalent in speed to the clunky assignment to
+a local variable.
+%
+\begin{stancode}
+{ 
+  vector[N] mu;
+  for (n in 1:N)
+    mu[n] = alpha[ii[n]] + beta[ii[n]] * x[n];
+  y ~ normal(mu, sigma);
+}
+\end{stancode}
+
+\subsection{Multiple Indexing}
+
+The following is the simplest concrete example of multiple indexing
+with an array of integers;  the ellipses stand for code defining the
+variables as indicated in the comments.
+%
+\begin{stancode}
+int c[3];     
+...             // define: c == (5, 9, 7)
+int idxs[4];   
+...             // define: idxs == (3, 3, 1, 2)
+int d[4];
+d = c[idxs];   // result: d == (7, 7, 5, 9)
+\end{stancode}
+%
+
+In general, the multiple indexed expression \code{c[idxs]} is defined
+as follows, assuming \code{idxs} is of size \code{K}.
+%
+\begin{stancode}
+c[idxs] = ( c[idxs[1]], c[idxs[2]], ..., c[idxs[K]] )
+\end{stancode}
+%
+Thus \code{c[idxs]} is of the same size as \code{idxs}, which is
+\code{K} in this example.
+
+Multiple indexing can also be used with multi-dimensional arrays.  For
+example, consider the following.
+%
+\begin{stancode}
+int c[2, 3];   
+...            // define: c = ((1, 3, 5), ((7, 11, 13))
+int idxs[4];
+...            // define: idxs = (2, 2, 1, 2)
+int d[4, 3]
+d = c[idxs];  // result: d = ((7, 11, 13), (7, 11, 13),
+               //              (1, 3, 5), (7, 11, 13))
+\end{stancode}
+%
+That is, putting an index in the first position acts exactly the same
+way as defined above.  The fact that the values are themselves arrays
+makes no difference---the result is still defined by \code{c[idxs][j] ==
+  c[idxs[j]]}.
+
+Multiple indexing may also be used in the second position of a
+multi-dimensional array.  Continuing the above example, consider a
+single index in the first position and a multiple index in the second.
+%
+\begin{stancode}
+int e[4];
+e = c[2, idxs];  // result:  c[2] = (7, 11, 13)
+                  // result:  e = (11, 11, 7, 11)
+\end{stancode}
+%
+The single index is applied, the one-dimensional result is determined,
+then the multiple index is applied to the result.  That is,
+\code{c[2,idxs]} evaluates to the same value as \code{c[2][idxs]}. 
+
+Multiple indexing can apply to more than one position of a
+multi-dimensional array.  For instance, consider the following
+%
+\begin{stancode}
+int c[2, 3];   
+...                    // define: c = ((1, 3, 5), (7, 11, 13))
+int idxs1[3];
+...                    // define: idxs1 = (2, 2, 1)
+int idxs2[2]; 
+...                    // define: idxs2 = (1, 3)
+int d[3, 2];
+d = c[idxs1, idxs2];  // result: d = ((7, 13), (7, 13), (1, 5))
+\end{stancode}
+%
+With multiple indexes, we no longer have \code{c[idxs1,~idxs2]} being
+the same as \code{c[idxs1][idxs2]}.  Rather, the entry \code{d[i,~j]}
+after executing the above is given by
+%
+\begin{stancode}
+d[i, j] == c[idxs1, idxs2][i, j] = c[idxs1[i], idxs2[j]]
+\end{stancode}
+%
+This example illustrates the operation of multiple indexing in the
+general case: a multiple index like \code{idxs1} converts an index
+\code{i} used on the result (here, \code{c[idxs1, idxs2]}) to index
+\code{idxs1[i]} in the variable being indexed (here, \code{c}).  In
+contrast, a single index just returns the value at that index, thus
+reducing dimensionality by one in the result.
+
+\subsection{Slicing with Range Indexes}
+
+Slicing returns a contiguous slice of a one-dimensional array, a
+contiguous sub-block of a two-dimensional array, and so on.
+Semantically, it is just a special form of multiple indexing.
+
+\subsubsection{Lower and Upper Bound Indexes}
+
+For instance, consider supplying an upper and lower bound for an
+index.
+%
+\begin{stancode}
+int c[7];
+...
+int d[4];
+d = c[3:6];  // result: d == (c[3], c[4], c[5], c[6])
+\end{stancode}
+%
+The range index \code{3:6} behaves semantically just like the multiple
+index \code{(3, 4, 5, 6)}.  In terms of implementation, the sliced
+upper and/or lower bounded indices are faster and use less memory 
+because they do not explicitly create a multiple index, but rather use
+a direct loop.  They are also easier to read, so should be preferred
+over multiple indexes where applicable.
+
+\subsubsection{Lower or Upper Bound Indexes}
+
+It is also possible to supply just a lower bound, or just an upper
+bound.  Writing \code{c[3:]} is just shorthand for
+\code{c[3:size(c)]}.  Writing \code{c[:5]} is just shorthand for 
+\code{c[1:5]}.  
+
+\subsubsection{Full Range Indexes}
+
+Finally, it is possible to write a range index that covers the entire
+range of an array, either by including just the range symbol
+(\code{:}) as the index or leaving the index position empty. In both
+cases, \code{c[]} and \code{c[:]} are equal to \code{c[1:size(c)]},
+which in turn is just equal to \code{c}.
+
+\subsection{Multiple Indexing on the Left of Assignments}
+
+Multiple expressions may be used on the left-hand side of an
+assignment statement, where they work exactly the same way as on the
+right-hand side in terms of picking out entries of a container.  
+For example, consider the following.
+%
+\begin{stancode}
+int a[3];
+int c[2];
+int idxs[2];
+...             // define: a == (1, 2, 3);  c == (5, 9)
+                //         idxs = (3,2)
+a[idxs] = c;   // result: a == (1, 9, 5)
+\end{stancode}
+%
+The result above can be worked out by noting that the assignment sets
+\code{a[idxs[1]]} (\code{a[3]}) to \code{c[1]} (\code{5}) and
+\code{a[idxs[2]]} (\code{a[2]}) to \code{c[2]} (\code{9}). 
+
+The same principle applies when there are many multiple indexes, as
+in the following example.
+%
+\begin{stancode}
+int a[5, 7];
+int c[2, 2];
+...
+a[2:3, 5:6] = c;  // result: a[2, 5] == c[1, 1];  a[2, 6] == c[1, 2]
+                   //         a[3, 5] == c[2, 1];  a[3, 6] == c[2, 2]
+\end{stancode}
+%
+As in the one-dimensional case, the right-hand side is written into
+the slice, block, or general chunk picked out by the left-hand side.
+
+Usage on the left-hand side allows the full generality of multiple
+indexing, with single indexes reducing dimensionality and multiple
+indexes maintaining dimensionality while rearranging, slicing, or
+blocking.  For example, it is valid to assign to a segment of a row of
+an array as follows.
+%
+\begin{stancode}
+int a[10, 13];
+int c[2];
+...
+a[4, 2:3] = c;  // result:  a[4, 2] == c[1];  a[4, 3] == c[2]
+\end{stancode}
+
+\subsubsection{Assign-by-Value and Aliasing}
+
+Aliasing issues arise when there are references to the same data
+structure on the right-hand and left-hand side of an assignment.  For
+example, consider the array \code{a} in the following code fragment.
+%
+\begin{stancode}
+int a[3];
+...                // define: a == (5, 6, 7)
+a[2:3] = a[1:2];
+...                // result: a == (5, 5, 6) 
+\end{stancode}
+%
+The reason the value of \code{a} after the assignment is $(5,5,6)$
+rather than $(5,5,5)$ is that Stan behaves as if the right-hand side
+expression is evaluated to a fresh copy.   As another example,
+consider the following.
+%
+\begin{stancode}
+int a[3];
+int idxs[3];
+...            // define idxs = (2, 1, 3)
+a[idxs] = a;
+\end{stancode}
+%
+In this case, it is evident why the right-hand side needs to be copied
+before the assignment.
+
+It is tempting (but wrong) to think of the assignment \code{a[2:3] =
+  a[1:2]} as executing the following assignments.
+%
+\begin{stancode}
+...                // define: a = (5, 6, 7)
+a[2] = a[1];      // result: a = (5, 5, 7)
+a[3] = a[2];      // result: a = (5, 5, 5)!
+\end{stancode}
+%
+This produces a different result than executing the assignment because
+\code{a[2]}'s value changes before it is used.
+
+
+\subsection{Multiple Indexes with Vectors and Matrices}
+
+Mulitple indexes can be supplied to vectors and matrices as well as
+arrays of vectors and matrices.
+
+\subsubsection{Vectors}
+
+Vectors and row vectors behave exactly the same way as arrays with
+multiple indexes.  If \code{v} is a vector, then \code{v[3]} is a
+scalar real value, whereas \code{v[2:4]} is a vector of size 3
+containing the elements \code{v[2]}, \code{v[3]}, and \code{v[4]}.
+
+The only subtlety with vectors is in inferring the return type when
+there are multiple indexes. For example, consider the following
+minimal example.
+%
+\begin{stancode}
+vector[5] v[3];
+int idxs[7];
+...
+vector[7] u;
+u = v[2, idxs];
+
+real w[7];
+w = v[idxs, 2];
+\end{stancode}
+%
+The key is understanding that a single index always reduces
+dimensionality, whereas a multiple index never does.  The dimensions
+with multiple indexes (and unindexed dimensions) determine the indexed
+expression's type.  In the example above, because \code{v} is an array
+of vectors, \code{v[2,~idxs]} reduces the array dimension but doesn't
+reduce the vector dimension, so the result is a vector.  In contrast,
+\code{v[idxs,~2]} does not reduce the array dimension, but does reduce
+the vector dimension (to a scalar), so the result type for \code{w} is
+an array of reals.  In both cases, the size of the multiple index
+(here, 7) determines the size of the result.
+
+\subsubsection{Matrices}
+
+Matrices are a bit trickier because they have two dimensions, but the
+underlying principle of type inference is the same---multiple indexes
+leave dimensions in place, whereas single indexes reduce them.  The
+following code shows how this works for multiple indexing of matrices.
+%
+\begin{stancode}
+matrix[5,7] m;
+...
+row_vector[3] rv;
+rv = m[4, 3:5];    // result is 1 x 3
+...
+vector[4] v;
+v = m[2:5, 3];     // result is 3 x 1
+...
+matrix[3, 4] m2;
+m2 = m[1:3, 2:5];  // result is 3 x 4
+\end{stancode}
+%
+The key is realizing that any position with a multiple index or
+bounded index remains in play in the result, whereas any dimension
+with a single index is replaced with 1 in the resulting dimensions.
+Then the type of the result can be read off of the resulting
+dimensionality as indicated in the comments above.
+
+\subsubsection{Matrices with One Multiple Index}
+
+If matrices receive a single multiple index, the result is a matrix.
+So if \code{m} is a matrix, so is \code{m[2:4]}.  In contrast,
+supplying a single index, \code{m[3]}, produces a row vector result.
+That is, \code{m[3]} produces the same result as \code{m[3,~]} 
+or \code{m[3,~1:cols(m)]}. 
+
+\subsubsection{Arrays of Vectors or Matrices}
+
+With arrays of matrices, vectors, and row vectors, the basic access
+rules remain exactly the same: single indexes reduce dimensionality
+and multiple indexes redirect indexes.  For example, consider the
+following example.
+%
+\begin{stancode}
+matrix[3, 4] m[5, 7];
+...
+matrix[3, 4] a[2];
+a = m[1, 2:3];  // knock off first array dimension
+a = m[3:4, 5];  // knock off second array dimension
+\end{stancode}
+%
+In both assignments, the multiple index knocks off an array dimension,
+but it's different in both cases.  In the first case, \code{a[i] ==
+  m[1, i + 1]}, whereas in the second case, \code{a[i] == m[i + 2,
+  5]}.
+
+Continuing the previous example, consider the following.
+%
+\begin{stancode}
+...
+vector[2] b;
+b = a[1, 3, 2:3, 2];
+\end{stancode}
+%
+Here, the two array dimensions are reduced as is the column dimension
+of the matrix, leaving only a row dimension index, hence the result is
+a vector.  In this case, \code{b[j] == a[1, 3, 1 + j, 2]}.
+
+This last example illustrates an important point: if there is a
+lower-bounded index, such as \code{2:3}, with lower bound 2, then the
+lower bound minus one is added to the index, as seen in the \code{1 +
+  j} expression above.
+
+Continuing further, consider continuing with the following.
+%
+\begin{stancode}
+...
+row_vector[3] c[2];
+c = a[4:5, 3, 1, 2: ];
+\end{stancode}
+%
+Here, the first array dimension is reduced, leaving a single array
+dimension, and the row index of the matrix is reduced, leaving a row
+vector.  For indexing, the values are given by
+\code{c[i, j] == a[i + 3, 3, 1, j + 1]}
+
+
+\subsection{Matrices with Parameters and Constants}
+
+Suppose you have a $3 x 3$ matrix and know that two entries are zero but the
+others are parameters.  Such a situation arises in missing data
+situations and in problems with fixed structural parameters.
+
+Suppose a $3 \times 3$ matrix is known to be zero at indexes $[1,2]$
+and $[1,3]$.  The indexes for parameters are included in a ``melted''
+data-frame or database format.
+
+\begin{stancode}
+transformed data {
+  int<lower=1, upper=3> ii[7];
+  int<lower=1, upper=3> jj[7];
+  ii[1] = 1;  jj[1] = 1;
+  ii[2] = 2;  jj[2] = 1;   // skip [1, 2] and [1, 3]
+  ii[3] = 3;  jj[3] = 1;
+  ii[4] = 2;  jj[4] = 2;
+  ii[5] = 3;  jj[5] = 2;
+  ii[6] = 2;  jj[6] = 3;
+  ii[7] = 3;  jj[7] = 3;
+}
+\end{stancode}
+%
+The seven remaining parameters are declared as a vector.
+%
+\begin{stancode}
+parameters {
+  vector[7] A_raw;
+}
+\end{stancode}
+%
+Then the full matrix \code{A} is constructed in the model block as a
+local variable.
+%
+\begin{stancode}
+model {
+  matrix[3, 3] A;
+  A[ii, jj] = A_raw;
+  A[1, 2] = 0;
+  A[1, 3] = 0;
+}
+\end{stancode}
+
+This may seem like overkill in this setting, but in more general
+settings, the matrix size, vector size, and the \code{ii} and
+\code{jj} array and size can be coded up as data along with the values
+to fill in for the constant entries.  Similar techniques can be used
+to build up matrices with ad-hoc constraints, such as a handful of
+entries known to be positive.
+
+
 \section{Exploiting Sufficient Statistics}
 
 In some cases, models can be recoded to exploit sufficient statistics
@@ -12109,6 +11466,136 @@ the transformed model, to
     y_std ~ normal(alpha_std + beta_std * x_std, sigma_std);
 \end{stancode}
 
+\section{Data type and indexing efficiency}\label{indexingefficiency.section}
+
+The underlying matrix and linear algebra operations are implemented in
+terms of data types from the Eigen \Cpp library.  By having vectors
+and matrices as basic types, no conversion is necessary when invoking
+matrix operations or calling linear algebra functions.  
+
+Arrays, on the other hand, are implemented as instances of the \Cpp \ 
+\code{std::vector} class (not to be confused with Eigen's
+\code{Eigen::Vector} class or Stan vectors).  By implementing arrays
+this way, indexing is very efficient because values can be returned by
+reference rather than copied by value.
+
+\subsection{Matrices vs.\ Two-Dimensional Arrays}
+
+In Stan models, there are a few minor efficiency considerations in
+deciding between a two-dimensional array and a matrix, which may seem
+interchangeable at first glance.  
+
+First, matrices use a bit less memory than two-dimensional arrays.
+This is because they don't store a sequence of arrays, but just the
+data and the two dimensions.  
+
+Second, matrices store their data in column-major order.  Furthermore,
+all of the data in a matrix is guaranteed to be contiguous in memory.
+This is an important consideration for optimized code because bringing
+in data from memory to cache is much more expensive than performing
+arithmetic operations with contemporary CPUs.  Arrays, on the other
+hand, only guarantee that the values of primitive types are contiguous
+in memory; otherwise, they hold copies of their values (which are
+returned by reference wherever possible).
+
+Third, both data structures are best traversed in the order in which
+they are stored.  This also helps with memory locality.  This is
+column-major for matrices, so the following order is appropriate.
+%
+\begin{stancode}
+matrix[M, N] a;
+//...
+for (n in 1:N)
+  for (m in 1:M)
+    // ... do something with a[m, n] ...
+\end{stancode}
+%
+Arrays, on the other hand, should be traversed in row-major order
+(i.e., last index fastest), as in the following example.
+%
+\begin{stancode}
+real a[M, N];
+// ...
+for (m in 1:M)
+  for (n in 1:N)
+    // ... do something with a[m, n] ...
+\end{stancode}
+%
+The first use of \code{a[m,~n]} should bring \code{a[m]} into memory.
+Overall, traversing matrices is more efficient than traversing arrays.
+
+This is true even for arrays of matrices.  For example, the ideal
+order in which to traverse a two-dimensional array of matrices is
+%
+\begin{stancode}
+matrix[M, N] b[I, J];
+// ...
+for (i in 1:I)
+  for (j in 1:J)
+    for (n in 1:N)
+      for (m in 1:M)
+        ... do something with b[i, j, m, n] ...
+\end{stancode}
+
+If \code{a} is a matrix, the notation \code{a[m]} picks out row
+\code{m} of that matrix.  This is a rather inefficient operation for
+matrices.  If indexing of vectors is needed, it is much better to
+declare an array of vectors.  That is, this
+%
+\begin{stancode}
+row_vector[N] b[M];
+// ...
+for (m in 1:M)
+   ... do something with row vector b[m] ...
+\end{stancode}
+%
+is much more efficient than the pure matrix version
+%
+\begin{stancode}
+matrix b[M, N];
+// ...
+for (m in 1:M)
+   // ... do something with row vector b[m] ...
+\end{stancode}
+%
+Similarly, indexing an array of column vectors is more efficient than
+using the \code{col} function to pick out a column of a matrix.
+
+In contrast, whatever can be done as pure matrix algebra will be the
+fastest.  So if I want to create a row of predictor-coefficient
+dot-products, it's more efficient to do this
+%
+\begin{stancode}
+matrix[N, k] x;    // predictors (aka covariates)
+// ...
+vector[K] beta;   // coeffs
+// ...
+vector[N] y_hat;  // linear prediction
+// ...
+y_hat = x * beta;
+\end{stancode}
+%
+than it is to do this
+%
+\begin{stancode}
+row_vector[K] x[N];    // predictors (aka covariates)
+// ...
+vector[K] beta;   // coeffs
+...
+vector[N] y_hat;  // linear prediction
+...
+for (n in 1:N)
+  y_hat[n] = x[n] * beta;
+\end{stancode}
+
+\subsection{(Row) Vectors vs. One-Dimensional Arrays}
+
+For use purely as a container, there is really nothing to decide among
+vectors, row vectors and one-dimensional arrays.  The
+\code{Eigen::Vector} template specialization and the
+\code{std::vector} template class are implemented very similarly as
+containers of \code{double} values (the type \code{real} in Stan).
+Only arrays in Stan are allowed to store integer values.
 
 
 \chapter{Reproducibility}\label{reproducibility.chapter}
@@ -12166,3 +11653,306 @@ the same down to the bit level.
 The compiler and compiler settings can also be an issue.  There is a
 nice discussion of the issues and how to control reproducibility in
 Intel's proprietary compiler by \cite{CordenKreitzer:2014}.
+
+\chapter{Model Building as Software Development}
+
+\noindent
+Developing a statistical model in Stan means writing a Stan program
+and is thus a kind of software development process.  Developing
+software is hard.  Very hard.  So many things can go wrong because
+there are so many moving parts and combinations of parts.
+
+Software development practices are designed to mitigate the problems
+caused by the inherent complexity of writing computer programs.
+Unfortunately, many methodologies veer off into dogma, bean counting,
+or both.  A couple we can recommend that provide solid, practical
+advice for developers are \citep{HuntThomas:99} and
+\citep{McConnell:2004}.  This section tries to summarize some of their
+advice.
+
+\section{Use Version Control}
+
+Version control software, such as Subversion or Git, should be in
+place before starting to code.%
+%
+\footnote{Stan started using Subversion (SVN), then switched to the
+  much more feature-rich Git package.  Git does everything SVN does
+  and a whole lot more.  The price is a steeper learning curve.  For
+  individual or very-small-team development, SVN is just fine.}
+%
+It may seem like a big investment to learn version control, but it's
+well worth it to be able to type a single command to revert to a
+previously working version or to get the difference between the
+current version and an old version.  It's even better when you need
+to share work with others, even on a paper---work can be done
+independently and then automatically merged.  See
+\refchapter{software-development} for information on how Stan itself
+is developed.
+
+
+\section{Make it Reproducible}
+
+Rather than entering commands on the command-line when running models
+(or entering commands directly into an interactive programming
+language like R or Python), try writing scripts to run the data
+through the models and produce whatever posterior analysis you need.
+Scripts can be written for the shell, R, or Python.  Whatever language
+a script is in, it should be self contained and not depend on global
+variables having been set, other data being read in, etc.  
+
+See \refchapter{reproducibility} for complete information on
+reproducibility in Stan and its interfaces.
+
+\subsection{Scripts are Good Documentation}
+
+It may seem like overkill if running the project is only a single line
+of code, but the script provides not only a way to run the code, but
+also a form of concrete documentation for what is run. 
+
+
+\subsection{Randomization and Saving Seeds}
+
+Randomness defeats reproducibility.  MCMC methods are conceptually
+randomized.  Stan's samplers involve random initializations as well as
+randomization during each iteration (e.g., Hamiltonian Monte Carlo
+generates a random momentum in each iteration).
+
+Computers are deterministic.  There is no real randomness, just
+pseudo-random number generators.  These operate by generating a
+sequence of random numbers based on a ``seed.''  Stan (and other
+languages like R) can use time-based methods to generate a seed based
+on the time and date, or seeds can be provided to Stan (or R) in the
+form of integers.  Stan writes out the seed used to generate the
+data as well as the version number of the Stan software so that
+results can be reproduced at a later date.%
+%
+\footnote{This also requires fixing compilers and hardware, because
+  floating-point arithmetic does not have an absolutely fixed behavior
+  across operating systems, hardware configurations, or compilers.}
+
+
+
+\section{Make it Readable}
+
+Treating programs and scripts like other forms of writing for an
+audience provides an important perspective on how the code will be
+used.  Not only might others want to read a program or model, the
+developer will want to read it later.  One of the motivations of
+Stan's design was to make models self-documenting in terms of variable
+usage (e.g., data versus parameter), types (e.g., covariance matrix
+vs. unconstrained matrix) and sizes.  
+
+A large part of readability is consistency.  Particularly in naming
+and layout.  Not only of programs themselves, but the directories and
+files in which they're stored.
+
+Readability of code is not just about comments (see
+Section~\refsection{comments-programming} for commenting
+recommendations and syntax in Stan).
+
+It is surprising how often the solution to a debugging or design
+problem occurs when trying to explain enough about the problem to
+someone else to get help.  This can be on a mailing list, but it works
+best person-to-person.  Finding the solution to your own problem when
+explaining it to someone else happens so frequently in software
+development that the listener is called a ``rubber ducky,'' because
+they only have to nod along.%
+%
+\footnote{Research has shown an actual rubber ducky won't work.  For
+  some reason, the rubber ducky must actually be capable of
+  understanding the explanation.}
+
+
+\section{Explore the Data}
+
+Although this should go without saying, don't just fit data blindly.
+Look at the data you actually have to understand its properties.  If
+you're doing a logistic regression, is it separable?  If you're
+building a multilevel model, do the basic outcomes vary by level?  If
+you're fitting a linear regression, see whether such a model makes
+sense by scatterplotting $x$ vs. $y$.
+
+\section{Design Top-Down, Code Bottom-Up}
+
+Software projects are almost always designed top-down from one or more
+intended use cases.  Good software coding, on the other hand, is
+typically done bottom-up.  
+
+The motivation for top-down design is obvious.  The motivation for
+bottom-up development is that it is much easier to develop software
+using components that have been thoroughly tested.  Although Stan has
+no built-in support for either modularity or testing, many of the same
+principles apply.  
+
+The way the developers of Stan themselves build models is to start as
+simply as possibly, then build up. This is true even if we have a
+complicated model in mind as the end goal, and even if we have a very
+good idea of the model we eventually want to fit.  Rather than
+building a hierarchical model with multiple interactions, covariance
+priors, or other complicated structure, start simple.  Build just a
+simple regression with fixed (and fairly tight) priors.  Then add
+interactions or additional levels.  One at a time.  Make sure that
+these do the right thing.  Then expand.
+
+\section{Fit Simulated Data}
+
+One of the best ways to make sure your model is doing the right thing
+computationally is to generate simulated (i.e., ``fake'') data with
+known parameter values, then see if the model can recover these
+parameters from the data.  If not, there is very little hope that it
+will do the right thing with data from the wild.  
+
+There are fancier ways to do this, where you can do things like run
+$\chi^2$ tests on marginal statistics or follow the paradigm
+introduced in \citep{CookGelmanRubin:2006}, which involves interval
+tests.  
+
+\section{Debug by Print}
+
+Although Stan does not have a stepwise debugger or any unit testing
+framework in place, it does support the time-honored tradition of
+debug-by-printf.%
+%
+\footnote{The ``f'' is not a typo --- it's a historical artifact of
+  the name of the \code{printf} function used for formatted printing
+  in C.} 
+
+Stan supports print statements with one or more string or expression
+arguments.  Because Stan is an imperative language, variables can have
+different values at different points in the execution of a program.
+Print statements can be invaluable for debugging, especially for a
+language like Stan with no stepwise debugger.
+
+For instance, to print the value of variables \code{y} and
+\code{z}, use the following statement.
+%
+\begin{stancode}
+print("y=", y, " z=", z);
+\end{stancode}
+%
+This print statement prints the string ``y='' followed by the value of
+\code{y}, followed by the string `` z=''
+(with the leading space), followed by the value of the variable
+\code{z}.
+
+Each print statement is followed by a new line.  The specific ASCII
+character(s) generated to create a new line are platform specific.
+
+Arbitrary expressions can be used.  For example, the statement
+\begin{stancode}
+print("1+1=", 1+1);
+\end{stancode}
+%
+will print ``1 + 1 = 2'' followed by a new line.
+
+Print statements may be used anywhere other statements may be used,
+but their behavior in terms of frequency depends on how often the
+block they are in is evaluated.  See \refsection{print-statements} for
+more information on the syntax and evaluation of print statements.
+
+
+
+\section{Comments}\label{comments-programming.section}
+
+\subsection{Code Never Lies}
+
+The machine does what the code says, not what the documentation says.
+Documentation, on the other hand, might not match the code.  Code
+documentation easily rots as the code evolves if the documentation is
+not well maintained.  
+
+Thus it is always preferable to write readable code as opposed to
+documenting unreadable code.  Every time you write a piece of
+documentation, ask yourself if there's a way to write the code in such
+a way as to make the documentation unnecessary.
+
+
+\subsection{Comment Styles in Stan}
+
+Stan supports \Cpp-style comments; see \refsection{comments} for full
+details.  The recommended style is to use line-based comments for
+short comments on the code or to comment out one or more
+lines of code.  Bracketed comments are then reserved for long
+documentation comments.  The reason for this convention is that
+bracketed comments cannot be wrapped inside of bracketed comments.
+
+\subsection{What Not to Comment}
+
+When commenting code, it is usually safe to assume that you are 
+writing the comments for other programmers who understand the basics 
+of the programming language in use.  In other words, don't comment the
+obvious.  For instance, there is no need to have comments
+such as the following, which add nothing to the code.
+%
+\begin{stancode}
+y ~ normal(0, 1);  // y has a unit normal distribution
+\end{stancode}
+%
+A Jacobian adjustment for a hand-coded transform might be worth
+commenting, as in the following example.
+%
+\begin{stancode}
+exp(y) ~ normal(0, 1);
+// adjust for change of vars: y = log | d/dy exp(y) |
+target += y;
+\end{stancode}
+%
+It's an art form to empathize with a future code reader and decide
+what they will or won't know (or remember) about statistics and Stan.
+
+\subsection{What to Comment}
+
+It can help to document variable declarations if variables are given
+generic names like \code{N}, \code{mu}, and \code{sigma}.  For
+example, some data variable declarations in an item-response model
+might be usefully commented as follows.
+%
+\begin{stancode}
+int<lower=1> N;   // number of observations
+int<lower=1> I;   // number of students
+int<lower=1> J;   // number of test questions
+\end{stancode}
+%
+The alternative is to use longer names that do not require comments.
+%
+\begin{stancode}
+int<lower=1> n_obs;
+int<lower=1> n_students;
+int<lower=1> n_questions;
+\end{stancode}
+%
+Both styles are reasonable and which one to adopt is mostly a matter of
+taste (mostly because sometimes models come with their own naming
+conventions which should be followed so as not to confuse readers of
+the code familiar with the statistical conventions).
+
+Some code authors like big blocks of comments at the top explaining
+the purpose of the model, who wrote it, copyright and licensing
+information, and so on.  The following bracketed comment is an
+example of a conventional style for large comment blocks.
+%
+\begin{stancode}
+/*
+ * Item-Response Theory PL3 Model
+ * -----------------------------------------------------
+ * Copyright: Joe Schmoe  <joe@schmoe.com>
+ * Date:  19 September 2012
+ * License: GPLv3
+ */
+
+data {
+  // ...
+\end{stancode}
+%
+The use of leading asterisks helps readers understand the scope of the
+comment.  The problem with including dates or other volatile
+information in comments is that they can easily get out of synch with
+the reality of the code.  A misleading comment or one that is wrong is
+worse than no comment at all!
+
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "stan-reference"
+%%% End:
