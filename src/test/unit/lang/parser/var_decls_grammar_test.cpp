@@ -15,7 +15,14 @@ TEST(langParserVarDeclsGrammarDef, validateIntExpr) {
     std::string model_name("validate_validate_int_expr_bad");
     model_name += boost::lexical_cast<std::string>(i);
     test_throws(model_name,
-                "expression denoting integer required");
+                "dimension declaration requires expression"
+                " denoting integer; found type=real");
+  }
+  for (int i = 1; i <= 14; ++i) {
+    std::string model_name("data_index/non_data_index");
+    model_name += boost::lexical_cast<std::string>(i);
+    test_throws(model_name,
+                "non-data variables not allowed in dimension declarations");
   }
 }
 
