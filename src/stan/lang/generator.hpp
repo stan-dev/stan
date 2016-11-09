@@ -214,7 +214,8 @@ namespace stan {
       const bool user_facing_;
       const bool is_var_;
       const bool is_fun_return_;
-      explicit expression_visgen(std::ostream& o, bool user_facing, bool is_var, bool is_fun_return)
+      explicit expression_visgen(std::ostream& o, bool user_facing,
+                                 bool is_var, bool is_fun_return)
         : visgen(o),
           user_facing_(user_facing),
           is_var_(is_var),
