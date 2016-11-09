@@ -220,6 +220,7 @@ namespace stan {
     }
     boost::phoenix::function<increment_size_t> increment_size_t_f;
 
+
     void validate_conditional_op::operator()(conditional_op& conditional_op,
                                              const var_origin& var_origin,
                                              bool& pass,

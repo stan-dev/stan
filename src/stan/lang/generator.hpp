@@ -28,11 +28,6 @@ namespace stan {
                              bool user_facing,
                              bool is_var,
                              std::ostream& o);
-    void generate_expression(const expression& e,
-                             bool user_facing,
-                             bool is_var,
-                             bool is_fun_return,
-                             std::ostream& o);
     void generate_bare_type(const expr_type& t,
                             const std::string& scalar_t_name,
                             std::ostream& out);
@@ -213,13 +208,11 @@ namespace stan {
     struct expression_visgen : public visgen {
       const bool user_facing_;
       const bool is_var_;
-      const bool is_fun_return_;
       explicit expression_visgen(std::ostream& o, bool user_facing,
-                                 bool is_var, bool is_fun_return)
+                                 bool is_var)
         : visgen(o),
           user_facing_(user_facing),
-          is_var_(is_var),
-          is_fun_return_(is_fun_return) {
+          is_var_(is_var) {
       }
       void operator()(nil const& /*x*/) const {
         o_ << "nil";
@@ -378,13 +371,22 @@ namespace stan {
         o_ << ')';
       }
 
-
       void operator()(const conditional_op& expr) const {
         bool types_prim_match
           = (expr.type_.is_primitive() && expr.type_.base_type_ == INT_T)
           || (!expr.has_var_ && expr.type_.is_primitive()
               && (expr.true_val_.expression_type()
                   == expr.false_val_.expression_type()));
+
+        std::stringstream ss;
+        if (expr.var_origin_ > local_origin) {
+          ss << "fun_scalar_t__";
+        } else if (is_var_) {
+          ss << "T__";
+        } else {
+            ss << "double";
+        }
+
         o_ << "(";
         boost::apply_visitor(*this, expr.cond_.expr_);
         o_ << " ? ";
@@ -392,8 +394,7 @@ namespace stan {
           boost::apply_visitor(*this, expr.true_val_.expr_);
         } else {
           o_ << "stan::math::promote_scalar<"
-             << (expr.var_origin_ > local_origin ?
-            "fun_return_scalar_t__" : (expr.has_var_ ? "T__" : "double"))
+             << ss.str()
              << ">(";
           boost::apply_visitor(*this, expr.true_val_.expr_);
           o_ << ")";
@@ -403,8 +404,7 @@ namespace stan {
           boost::apply_visitor(*this, expr.false_val_.expr_);
         } else {
           o_ << "stan::math::promote_scalar<"
-             << (expr.var_origin_ > local_origin ?
-            "fun_return_scalar_t__" : (expr.has_var_ ? "T__" : "double"))
+             << ss.str()
              << ">(";
           boost::apply_visitor(*this, expr.false_val_.expr_);
           o_ << ")";
@@ -429,17 +429,8 @@ namespace stan {
     void generate_expression(const expression& e,
                              bool user_facing,
                              bool is_var,
-                             bool is_fun_return,
                              std::ostream& o) {
-      expression_visgen vis(o, user_facing, is_var, is_fun_return);
-      boost::apply_visitor(vis, e.expr_);
-    }
-    void generate_expression(const expression& e,
-                             bool user_facing,
-                             bool is_var,
-                             std::ostream& o) {
-      static const bool is_fun_return = false;  // default value
-      expression_visgen vis(o, user_facing, is_var, is_fun_return);
+      expression_visgen vis(o, user_facing, is_var);
       boost::apply_visitor(vis, e.expr_);
     }
 
@@ -448,16 +439,14 @@ namespace stan {
                              bool user_facing,
                              std::ostream& o) {
       static const bool is_var = false;  // default value
-      static const bool is_fun_return = false;  // default value
-      expression_visgen vis(o, user_facing, is_var, is_fun_return);
+      expression_visgen vis(o, user_facing, is_var);
       boost::apply_visitor(vis, e.expr_);
     }
 
     void generate_expression(const expression& e, std::ostream& o) {
       static const bool user_facing = false;  // default value
       static const bool is_var = false;  // default value
-      static const bool is_fun_return = false;  // default value
-      generate_expression(e, user_facing, is_var, is_fun_return, o);
+      generate_expression(e, user_facing, is_var, o);
     }
 
     static void print_string_literal(std::ostream& o,
