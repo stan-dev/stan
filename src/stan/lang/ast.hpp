@@ -451,6 +451,7 @@ namespace stan {
       expression false_val_;
       expr_type type_;
       bool has_var_;
+      var_origin var_origin_;
       conditional_op();
       conditional_op(const expression& cond,
                      const expression& true_val,

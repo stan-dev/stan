@@ -28,6 +28,11 @@ namespace stan {
                              bool user_facing,
                              bool is_var,
                              std::ostream& o);
+    void generate_expression(const expression& e,
+                             bool user_facing,
+                             bool is_var,
+                             bool is_fun_return,
+                             std::ostream& o);
     void generate_bare_type(const expr_type& t,
                             const std::string& scalar_t_name,
                             std::ostream& out);
@@ -208,10 +213,12 @@ namespace stan {
     struct expression_visgen : public visgen {
       const bool user_facing_;
       const bool is_var_;
-      explicit expression_visgen(std::ostream& o, bool user_facing, bool is_var)
+      const bool is_fun_return_;
+      explicit expression_visgen(std::ostream& o, bool user_facing, bool is_var, bool is_fun_return)
         : visgen(o),
           user_facing_(user_facing),
-          is_var_(is_var) {
+          is_var_(is_var),
+          is_fun_return_(is_fun_return) {
       }
       void operator()(nil const& /*x*/) const {
         o_ << "nil";
@@ -384,7 +391,8 @@ namespace stan {
           boost::apply_visitor(*this, expr.true_val_.expr_);
         } else {
           o_ << "stan::math::promote_scalar<"
-          << (is_var_ ? "T__" : "double")
+             << (expr.var_origin_ > local_origin ?
+            "fun_return_scalar_t__" : (expr.has_var_ ? "T__" : "double"))
              << ">(";
           boost::apply_visitor(*this, expr.true_val_.expr_);
           o_ << ")";
@@ -394,7 +402,8 @@ namespace stan {
           boost::apply_visitor(*this, expr.false_val_.expr_);
         } else {
           o_ << "stan::math::promote_scalar<"
-             << (is_var_ ? "T__" : "double")
+             << (expr.var_origin_ > local_origin ?
+            "fun_return_scalar_t__" : (expr.has_var_ ? "T__" : "double"))
              << ">(";
           boost::apply_visitor(*this, expr.false_val_.expr_);
           o_ << ")";
@@ -419,23 +428,35 @@ namespace stan {
     void generate_expression(const expression& e,
                              bool user_facing,
                              bool is_var,
+                             bool is_fun_return,
                              std::ostream& o) {
-      expression_visgen vis(o, user_facing, is_var);
+      expression_visgen vis(o, user_facing, is_var, is_fun_return);
       boost::apply_visitor(vis, e.expr_);
     }
+    void generate_expression(const expression& e,
+                             bool user_facing,
+                             bool is_var,
+                             std::ostream& o) {
+      static const bool is_fun_return = false;  // default value
+      expression_visgen vis(o, user_facing, is_var, is_fun_return);
+      boost::apply_visitor(vis, e.expr_);
+    }
+
 
     void generate_expression(const expression& e,
                              bool user_facing,
                              std::ostream& o) {
       static const bool is_var = false;  // default value
-      expression_visgen vis(o, user_facing, is_var);
+      static const bool is_fun_return = false;  // default value
+      expression_visgen vis(o, user_facing, is_var, is_fun_return);
       boost::apply_visitor(vis, e.expr_);
     }
 
     void generate_expression(const expression& e, std::ostream& o) {
       static const bool user_facing = false;  // default value
       static const bool is_var = false;  // default value
-      generate_expression(e, user_facing, is_var, o);
+      static const bool is_fun_return = false;  // default value
+      generate_expression(e, user_facing, is_var, is_fun_return, o);
     }
 
     static void print_string_literal(std::ostream& o,
