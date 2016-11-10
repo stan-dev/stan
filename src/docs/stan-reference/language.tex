@@ -1,1329 +1,6 @@
 \part{Stan Modeling Language}
 
 
-\chapter{Statements}
-
-\noindent
-The blocks of a Stan program (see \refchapter{blocks}) are made up of
-variable declarations and statements.  Unlike programs in \BUGS, the
-declarations and statements making up a Stan program are executed in
-the order in which they are written.  Variables must be defined to
-have some value (as well as declared to have some type) before they
-are used --- if they do not, the behavior is undefined.
-
-The basis of Stan's execution is the evaluation of a log probability
-function (specifically, a probability density function) for a given
-set of (real-valued) parameters. Log probability function can be
-constructed by using assignment statements.  Statements may be grouped
-into sequences and into for-each loops.  In addition, Stan allows
-local variables to be declared in blocks and also allows an empty
-statement consisting only of a semicolon.
-
-
-\section{Assignment Statement}\label{assignment-statement.section}
-
-An assignment statement consists of a variable (possibly multivariate
-with indexing information) and an expression.  Executing an
-assignment statement evaluates the expression on the right-hand side
-and assigns it to the (indexed) variable on the left-hand side.  An
-example of a simple assignment is as follows.%
-%
-\footnote{In versions of Stan before 2.12.0, the operator \code{<-} was
-  used for assignment rather than using the equal sign \code{=}.  The
-  old operator \code{<-} is now deprecated and will print a warning.
-  In the future, it will be removed.}
-%
-\begin{quote}
-\code{n = 0;}
-\end{quote}
-%
-Executing this statement assigns the value of the expression \code{0},
-which is the integer zero, to the variable \code{n}.  For an assignment
-to be well formed, the type of the expression on the right-hand side
-should be compatible with the type of the (indexed) variable on the
-left-hand side.  For the above example, because \code{0} is an
-expression of type \code{int}, the variable \code{n} must be declared
-as being of type \code{int} or of type \code{real}.  If the variable
-is of type \code{real}, the integer zero is promoted to a
-floating-point zero and assigned to the variable.  After the
-assignment statement executes, the variable \code{n} will have the
-value zero (either as an integer or a floating-point value, depending on
-its type).
-
-Syntactically, every assignment statement must be followed by a
-semicolon.  Otherwise, whitespace between the tokens does not matter
-(the tokens here being the left-hand-side (indexed) variable, the
-assignment operator, the right-hand-side expression and the
-semicolon).
-
-Because the right-hand side is evaluated first, it is possible to
-increment a variable in Stan just as in \Cpp and other programming
-languages by writing
-%
-\begin{quote}
-\code{n = n + 1;}
-\end{quote}
-%
-Such self assignments are not allowed in \BUGS, because they induce a
-cycle into the directed graphical model.
-
-The left-hand side of an assignment may contain indices for array,
-matrix, or vector data structures.  For instance, if \code{Sigma} is
-of type \code{matrix}, then
-%
-\begin{quote}
-\code{Sigma[1,1] = 1.0;}
-\end{quote}
-%
-sets the value in the first column of the first row of \code{Sigma} to one.
-
-Assignments can involve complex objects of any type.  If \code{Sigma}
-and \code{Omega} are matrices and \code{sigma} is a vector, then the
-following assignment statement, in which the expression and variable
-are both of type \code{matrix}, is well formed.
-%
-\begin{stancode}
-Sigma
-  = diag_matrix(sigma)
-     * Omega
-     * diag_matrix(sigma);
-\end{stancode}
-%
-This example also illustrates the preferred form of splitting a
-complex assignment statement and its expression across lines.
-
-Assignments to subcomponents of larger multi-variate data structures
-are supported by Stan.  For example, \code{a} is an array of type
-\code{real[~,~]} and \code{b} is an array of type \code{real[]}, then
-the following two statements are both well-formed.
-%
-\begin{stancode}
-a[3] = b;
-b = a[4];
-\end{stancode}
-%
-Similarly, if \code{x} is a variable declared to have type
-\code{row\_vector} and \code{Y} is a variable declared as type
-\code{matrix}, then the following sequence of statements to swap the
-first two rows of \code{Y} is well formed.
-%
-\begin{stancode}
-x = Y[1];
-Y[1] = Y[2];
-Y[2] = x;
-\end{stancode}
-%
-
-\subsection{Lvalue Summary}
-
-The expressions that are legal left-hand sides of assignment
-statements are known as ``lvalues.''  In Stan, there are only two
-kinds of legal lvalues,
-%
-\begin{itemize}
-\item a variable, or
-\item a variable with one or more indices.
-\end{itemize}
-%
-To be used as an lvalue, an indexed variable must have at least as
-many dimensions as the number of indices provided.  An array of real
-or integer types has as many dimensions as it is declared for.  A
-matrix has two dimensions and a vector or row vector one dimension;
-this also holds for the constrained types, covariance and correlation
-matrices and their Cholesky factors and ordered, positive ordered, and
-simplex vectors.  An array of matrices has two more dimensions than
-the array and an array of vectors or row vectors has one more
-dimension than the array.  Note that the number of indices can be less
-than the number of dimensions of the variable, meaning that the right
-hand side must itself be multidimensional to match the remaining
-dimensions.
-
-\subsection{Multiple Indexes}
-
-Multiple indexes, as described in
-\refsection{language-multi-indexing}, are also permitted on the
-left-hand side of assignments.  Indexing on the left side works
-exactly as it does for expressions, with multiple indexes preserving
-index positions and single indexes reducing them.    The type on the
-left side must still match the type on the right side.
-
-\subsubsection{Aliasing}
-
-All assignment is carried out as if the right-hand side is copied
-before the assignment.  This resolves any potential aliasing issues
-arising from he right-hand side changing in the middle of an
-assignment statement's execution.
-
-
-
-\section{Increment Log Density}\label{increment-log-prob.section}
-
-The basis of Stan's execution is the evaluation of a log probability
-function (specifically, a probability density function) for a given
-set of (real-valued) parameters; this function returns the log density
-of the posterior up to an additive constant.  Data and transformed
-data are fixed before the log density is evaluated.  The total log
-probability is initialized to zero.  Next, any log Jacobian
-adjustments accrued by the variable constraints are added to the log
-density (the Jacobian adjustment may be skipped for optimization).
-Sampling and log probability increment statements may add to the log
-density in the model block.  A log probability increment statement
-directly increments the log density with the value of an expression as
-follows.%
-%
-\footnote{The current notation replaces two previous versions.
-  Originally, a variable \code{lp\_\_} was directly exposed and
-  manipulated;  this is no longer allowed.  The original statement
-  syntax for \code{target += u} was \code{increment\_log\_prob(u)},
-  but this form has been deprecated and will be removed in Stan 3.}
-%
-\begin{stancode}
-target += -0.5 * y * y;
-\end{stancode}
-%
-The keyword \code{target} here is actually not a variable, and may not
-be accessed as such (though see below on how to access the value of
-target through a special function).
-
-In this example, the unnormalized log probability of a unit normal
-variable $y$ is added to the total log probability.  In the general
-case, the argument can be any expression.%
-%
-\footnote{Writing this model with the expression \code{-0.5 * y * y}
-  is more efficient than with the equivalent expression \code{y * y /
-    -2} because multiplication is more efficient than division; in
-  both cases, the negation is rolled into the numeric literal
-  (\code{-0.5} and \code{-2}).  Writing \code{square(y)} instead of
-  \code{y * y} would be even more efficient because the derivatives
-  can be precomputed, reducing the memory and number of operations
-  required for automatic differentiation.}
-
-An entire Stan model can be implemented this way.  For instance, the
-following model will draw a single variable according to a unit normal
-probability.
-%
-\begin{stancode}
-parameters {
-  real y;
-}
-model {
-  target += -0.5 * y * y;
-}
-\end{stancode}
-%
-This model defines a log probability function
-%
-\[
-\log p(y) = - \, \frac{y^2}{2} - \log Z
-\]
-%
-where $Z$ is a normalizing constant that does not depend on $y$.  The
-constant $Z$ is conventionally written this way because on the linear
-scale,
-\[
-p(y) = \frac{1}{Z} \exp\left(-\frac{y^2}{2}\right).
-\]
-which is typically written without reference to $Z$ as
-\[
-p(y) \propto \exp\left(-\frac{y^2}{2}\right).
-\]
-
-Stan only requires models to be defined up to a constant that does not
-depend on the parameters.  This is convenient because often the
-normalizing constant $Z$ is either time-consuming to compute or
-intractable to evaluate.
-
-\subsubsection{Vectorization}
-
-The \code{target += ...} statement accepts an argument in place of
-\code{...} for any expression type, including integers, reals,
-vectors, row vectors, matrices, and arrays of any dimensionality,
-including arrays of vectors and matrices.   For container arguments,
-their sum will be added to the total log density.
-
-\subsection{Accessing the Log Density}
-
-To increment the log density returned by the model by some value
-\code{u}, use the following statement.%
-%
-\footnote{Originally, Stan provided direct access to the log density
-  through a variable \code{lp\_\_} and then later through the
-  \code{increment\_log\_prob()} statement, but the first has been
-  removed and the latter deprecated.}
-%
-\begin{stancode}
-target += u;
-\end{stancode}
-%
-In general, \code{u} can be any expression;  if it is a container, the
-log density will be incremented by the sum of the elements in the
-container.
-
-To access accumulated log density up to the current execution point,
-the function \code{get\_lp()} may be used.%
-%
-\footnote{The value of \code{lp\_\_} will only hold the Jacobian until
-  the end of the execution because it is not used in either
-  \code{increment\_log\_prob(u)} or \code{target += u}.}
-
-
-\section{Sampling Statements}\label{sampling-statements.section}
-
-Stan supports writing probability statements also in sampling
-notation, such as
-%
-\begin{stancode}
-y ~ normal(mu,sigma);
-\end{stancode}
-%
-The name ``sampling statement'' is meant to be suggestive, not
-interpreted literally.  Conceptually, the variable \code{y}, which may
-be an unknown parameter or known, modeled data, is being declared
-to have the distribution indicated by the right-hand side of the
-sampling statement.
-
-Executing such a statement does not perform any sampling.  In Stan, a
-sampling statement is merely a notational convenience.  The above
-sampling statement could be expressed as a direct increment on the
-total log probability as
-%
-\begin{stancode}
-target += normal_lpdf(y | mu, sigma);
-\end{stancode}
-
-In general, a sampling statement of the form
-%
-\begin{stancode}
-y ~ dist(theta1, ..., thetaN);
-\end{stancode}
-%
-involving subexpressions \code{y1} and \code{theta1} through
-\code{thetaN} (including the case where \code{N} is zero) will be well
-formed if and only if the corresponding assignment statement is
-well-formed.  For densities allowing real \code{y} values, the log
-probability density function is used,
-%
-\begin{stancode}
-target += dist_lpdf(y | theta1, ..., thetaN);
-\end{stancode}
-%
-For those restricted to integer \code{y} values, the log probability
-mass function is used,
-%
-\begin{stancode}
-target += dist_lpmf(y | theta1, ..., thetaN);
-\end{stancode}
-%
-
-This will be well formed if and only if \code{dist\_lpdf(y | theta1,
-  ..., thetaN)} or \code{dist\_lpmf(y | theta1, ..., thetaN)} is a
-well-formed expression of type \code{real}.
-
-\subsection{Log Probability Increment vs.\ Sampling Statement}
-
-Although both lead to the same sampling behavior in Stan, there is one
-critical difference between using the sampling statement, as in
-%
-\begin{stancode}
-y ~ normal(mu, sigma);
-\end{stancode}
-%
-and explicitly incrementing the log probability function, as in
-%
-\begin{stancode}
-target += normal_lpdf(y | mu,sigma);
-\end{stancode}
-%
-The sampling statement drops all the terms in the log probability
-function that are constant, whereas the explicit call to
-\code{normal\_lpdf} adds all of the terms in the definition of the log
-normal probability function, including all of the constant normalizing
-terms.  Therefore, the explicit increment form can be used to recreate
-the exact log probability values for the model.  Otherwise, the
-sampling statement form will be faster if any of the input expressions,
-\code{y}, \code{mu}, or \code{sigma}, involve only constants, data
-variables, and transformed data variables.
-
-
-\subsection{User-Transformed Variables}
-
-The left-hand side of a sampling statement may be a complex
-expression.  For instance, it is legal syntactically to write
-%
-\begin{stancode}
-data {
-  real<lower=0> y;
-}
-// ...
-model {
-  log(y) ~ normal(mu, sigma);
-}
-\end{stancode}
-%
-Unfortunately, this is not enough to properly model \code{y} as having
-a lognormal distribution.  The log Jacobian of the transform must be
-added to the log probability accumulator to account for the
-differential change in scale (see \refsection{change-of-variables} for
-full definitions).  For the case above, the following adjustment will
-account for the log transform.%
-%
-\footnote{Because $\log | \frac{d}{dy} \log y | = \log | 1/y | = - \log
-  |y|$;  see \refsection{change-of-variables}.}
-%
-\begin{stancode}
-target += - log(fabs(y));
-\end{stancode}
-%
-
-\subsection{Truncated Distributions}
-
-Stan supports truncating distributions with lower bounds, upper
-bounds, or both.
-
-\subsubsection{Truncating with lower and upper bounds}
-
-A probability density function $p(x)$ for a continuous distribution
-may be truncated to an interval $[a,b]$ to define a new density
-$p_{[a,b]}(x)$ with support $[a,b]$ by setting
-%
-\[
-p_{[a,b]}(x)
-= \frac{p(x)}
-       {\int_a^b p(u) \, du}.
-\]
-%
-A probability mass function $p(x)$ for a discrete distribution may be
-truncated to the closed interval $[a,b]$ by
-\[
-p_{[a,b]}(x) = \frac{p(x)}
-                  {\sum_{u = a}^b p(u)}.
-\]
-
-\subsubsection{Truncating with a lower bound}
-
-A probability density function $p(x)$ can be truncated to $[a, \infty]$ by
-defining
-%
-\[
-p_{[a,\infty]}(x)
-= \frac{p(x)}
-       {\int_a^{\infty} p(u) \, du}.
-\]
-%
-A probability mass function $p(x)$ is truncated to $[a, \infty]$ by
-defining 
-%
-\[
-p_{[a,\infty]}(x) = \frac{p(x)}
-                  {\sum_{a <= u} p(u)}.
-\]
-
-\subsubsection{Truncating with an upper bound}
-
-A probability density function $p(x)$ can be truncated to $[-\infty, b]$ by
-defining
-%
-\[
-p_{[-\infty,b]}(x)
-= \frac{p(x)}
-       {\int_{-\infty}^b p(u) \, du}.
-\]
-%
-A probability mass function $p(x)$ is truncated to $[-\infty, b]$ by
-defining 
-%
-\[
-p_{[-\infty,b]}(x) = \frac{p(x)}
-                  {\sum_{u <= b} p(u)}.
-\]
-
-
-\subsubsection{Cumulative distribution functions}
-
-Given a probability function $p_X(x)$ for a random variable $X$, its
-cumulative distribution function (cdf) $F_X(x)$ is defined to be the
-probability that $X \leq x$,
-%
-\[
-F_X(x) = \mbox{Pr}[X \leq x].
-\]
-The upper-case variable $X$ is the random variable whereas the
-lower-case variable $x$ is just an ordinary bound variable.  For
-continuous random variables, the definition of the cdf works out to
-\[
-F_X(x) \ = \ \int_{-\infty}^{x} p_X(u) \, du,
-\]
-For discrete variables, the cdf is defined to include the upper bound
-given by the argument,
-\[
-F_X(x) = \sum_{u \leq x} p_X(u).
-\]
-%
-
-\subsubsection{Complementary cumulative distribution functions}
-
-The complementary cumulative distribution function (ccdf) in both the
-continuous and discrete cases is given by
-\[
-F^C_X(x)
-\ = \ \mbox{Pr}[X > x]
-\ = \ 1 - F_X(x).
-\]
-Unlike the cdf, the ccdf is exclusive of the bound, hence the event
-$X > x$ rather than the cdf's event $X \leq x$.
-
-For continous distributions, the ccdf works out to 
-\[
-F^C_X(x)
-\ = \ 1 - \int_{-\infty}^x p_X(u) \, du
-\ = \ \int_x^{\infty} p_X(u) \, du.
-\]
-The lower boundary can be included in the integration bounds because
-it is a single point on a line and hence has no probability mass.
-For the discrete case, the lower bound must be excluded in the
-summation explicitly by summing over $u > x$,
-\[
-F^C_X(x)
-\ = \ 1 - \sum_{u \leq x} p_X(u)
-\ = \ \sum_{u > x} p_X(u).
-\]
-
-
-Cumulative distribution functions provide the necessary integral
-calculations to define truncated distributions.  For truncation with
-lower and upper bounds, the denominator is defined by
-\[
-\int_a^b p(u) \, du = F_X(b) - F_X(a).
-\]
-This allows truncated distributions to be defined as
-\[
-p_{[a,b]}(x) = \frac{p_X(x)}
-                  {F_X(b) - F_X(a)}.
-\]
-
-For discrete distributions, a slightly more complicated form is
-required to explicitly insert the lower truncation point, which is
-otherwise excluded from $F_X(b) - F_X(a)$,
-\[
-p_{[a,b]}(x) = \frac{p_X(x)}
-                  {F_X(b) - F_X(a) + p_X(a)}.
-\]
-
-\subsubsection{Truncation with lower and upper bounds in Stan}
-
-Stan allows probability functions to be truncated.  For example, a
-truncated unit normal distributions restricted to $[-0.5, 2.1]$
-can be coded with the following sampling statement.
-%
-\begin{stancode}
-y ~ normal(0, 1) T[-0.5, 2.1];
-\end{stancode}
-%
-Truncated distributions are translated as an additional term in the
-accumulated log density function plus error checking to make sure the
-variate in the sampling statement is within the bounds of the
-truncation.
-
-In general, the truncation bounds and parameters may be parameters or
-local variables.
-
-Because the example above involves a continuous distribution, it
-behaves the same way as the following more verbose form.
-%
-\begin{stancode}
-y ~ normal(0, 1);
-if (y < -0.5 || y > 2.1)
-  target += negative_infinity();
-else
-  target += -log_diff_exp(normal_lcdf(2.1 | 0, 1),
-                          normal_lcdf(-0.5 | 0, 1));
-\end{stancode}
-%
-Because a Stan program defines a log density function, all
-calculations are on the log scale.  The function \code{normal\_lcdf}
-is the log of the cumulative normal distribution function and the
-function \code{log\_diff\_exp(a, b)} is a more arithmetically stable
-form of \code{log(exp(a) - exp(b))}.
-
-For a discrete distribution, another term is necessary in the
-denominator to account for the excluded boundary.  The truncated
-discrete distribution
-%
-\begin{stancode}
-y ~ poisson(3.7) T[2, 10];
-\end{stancode}
-%
-behaves in the same way as the following code.
-%
-\begin{stancode}
-y ~ poisson(3.7);
-if (y < 2 || y > 10) 
-  target += negative_infinity();
-else
-  target += -log_sum_exp(poisson_lpmf(2 | 3.7),
-                         log_diff_exp(poisson_lcdf(10 | 3.7),
-                                      poisson_lcdf(2 | 3.7)));
-\end{stancode}
-%
-Recall that \code{log\_sum\_exp(a, b)} is just the arithmetically
-stable form of \code{log(exp(a) + exp(b))}.
-
-
-\subsubsection{Truncation with lower bounds in Stan}
-
-For truncating with only a lower bound, the upper limit is left blank.
-%
-\begin{stancode}
-y ~ normal(0, 1) T[-0.5, ];
-\end{stancode}
-%
-This truncated sampling statement has the same behavior as the
-following code.
-%
-\begin{stancode}
-y ~ normal(0, 1);
-if (y < -0.5)
-  target += negative_infinity();
-else
-  target += -normal_lccdf(-0.5 | 0, 1);
-\end{stancode}
-%
-The \code{normal\_lccdf} function is the normal complementary cumulative
-distribution function.
-
-As with lower and upper truncation, the discrete case requires a more
-complicated denominator to add back in the probability mass for the
-lower bound.  Thus
-%
-\begin{stancode}
-y ~ poisson(3.7) T[2, ];
-\end{stancode}
-%
-behaves the same way as
-%
-\begin{stancode}
-y ~ poisson(3.7);
-if (y < 2)
-  target += negative_infinity();
-else
-  target += -log_sum_exp(poisson_lpdf(2 | 3.7),
-                         poisson_lccdf(2 | 3.7));
-\end{stancode}
-
-
-\subsubsection{Truncation with upper bounds in Stan}
-
-To truncate with only an upper bound, the lower bound is left blank.  
-The upper truncated sampling statement
-%
-\begin{stancode}
-y ~ normal(0, 1) T[ , 2.1];
-\end{stancode}
-%
-produces the same result as the following code.
-%
-\begin{stancode}
-target += normal_lpdf(y | 0, 1);
-if (y > 2.1)
-  target += negative_infinity();
-else 
-  target += -normal_lcdf(2.1 | 0, 1);
-\end{stancode}
-
-With only an upper bound, the discrete case does not need a boundary
-adjustment.  The upper-truncated sampling statement
-%
-\begin{stancode}
-y ~ poisson(3.7) T[ , 10];
-\end{stancode}
-%
-behaves the same way as the following code.
-%
-\begin{stancode}
-y ~ poisson(3.7);
-if (y > 10)
-  target += negative_infinity();
-else 
-  target += -poisson_lcdf(10 | 3.7);
-\end{stancode}
-
-\subsubsection{Cumulative distributions must be defined}
-
-In all cases, the truncation is only well formed if the appropriate
-log density or mass function and necessary log cumulative distribution
-functions are defined.  Not every distribution built into Stan has log
-cdf and log ccdfs defined, nor will every user-defined distribution.
-\refpart{discrete-prob-functions} and
-\refpart{continuous-prob-functions} document the available discrete
-and continuous cumulative distribution functions; most univariate
-distributions have log cdf and log ccdf functions.
-
-
-\subsubsection{Type constraints on bounds}
-
-For continuous distributions, truncation points must be expressions of
-type \code{int} or \code{real}.  For discrete distributions, truncation
-points must be expressions of type \code{int}.
-
-\subsubsection{Variates outside of truncation bounds}
-
-For a truncated sampling statement, if the value sampled is not within
-the bounds specified by the truncation expression, the result is zero
-probability and the entire statement adds $-\infty$ to the total log
-probability, which in turn results in the sample being rejected; see
-the subsection of \refsection{truncated-data} discussing constraints
-and out-of-bounds returns for programming strategies to keep
-all values within bounds.
-
-\subsubsection{Vectorizing Truncated Distributions}
-
-Stan does not (yet) support vectorization of distribution functions
-with truncation.
-
-
-\section{For Loops}
-
-Suppose
-\code{N} is a variable of type \code{int}, \code{y} is a
-one-dimensional array of type \code{real[]}, and \code{mu} and
-\code{sigma} are variables of type \code{real}.  Furthermore, suppose
-that \code{n} has not been defined as a variable. Then the following
-is a well-formed for-loop statement.
-%
-\begin{stancode}
-for (n in 1:N) {
-  y[n] ~ normal(mu, sigma);
-}
-\end{stancode}
-%
-The loop variable is \code{n}, the loop bounds are the values in the
-range \code{1:N}, and the body is the statement following the
-loop bounds.
-
-\subsection{Loop Variable Typing and Scope}
-
-The bounds in a for loop must be integers.  Unlike in \R, the loop is
-always interpreted as an upward counting loop.  The range \code{L:H}
-will cause the loop to execute the loop with the loop variable taking
-on all integer values greater than or equal to \code{L} and less than
-or equal to \code{H}.  For example, the loop \code{for (n in 2:5)}
-will cause the body of the for loop to be executed with \code{n} equal
-to 2, 3, 4, and 5, in order.  The variable and bound \code{for (n in
-  5:2)} will not execute anything because there are no integers
-greater than or equal to 5 and less than or equal to 2.
-
-\subsection{Order Sensitivity and Repeated Variables}
-
-Unlike in \BUGS, Stan allows variables to be reassigned.  For
-example, the variable \code{theta} in the following program is
-reassigned in each iteration of the loop.
-%
-\begin{stancode}
-for (n in 1:N) {
-  theta = inv_logit(alpha + x[n] * beta);
-  y[n] ~ bernoulli(theta);
-}
-\end{stancode}
-%
-Such reassignment is not permitted in \BUGS.  In \BUGS, for loops are
-declarative, defining plates in directed graphical model notation,
-which can be thought of as repeated substructures in the graphical
-model.  Therefore, it is illegal in \BUGS or \JAGS to have a for loop
-that repeatedly reassigns a value to a variable.%
-%
-\footnote{A programming idiom in \BUGS code simulates
-a local variable by replacing \code{theta} in the above example with
-\code{theta[n]}, effectively creating \code{N} different variables,
-\code{theta[1]}, \ldots, \code{theta[N]}.  Of course, this is not a
-hack if the value of \code{theta[n]} is required for all \code{n}.}
-
-In Stan, assignments are executed in the order they are encountered.
-As a consequence, the following Stan program has a very different
-interpretation than the previous one.
-%
-\begin{stancode}
-for (n in 1:N) {
-  y[n] ~ bernoulli(theta);
-  theta = inv_logit(alpha + x[n] * beta);
-}
-\end{stancode}
-%
-In this program, \code{theta} is assigned after it is used in the
-probability statement.  This presupposes it was defined before the
-first loop iteration (otherwise behavior is undefined), and then each
-loop uses the assignment from the previous iteration.
-
-Stan loops may be used to accumulate values.  Thus it is possible to
-sum the values of an array directly using code such as the
-following.
-%
-\begin{stancode}
-total = 0.0;
-for (n in 1:N)
-  total = total + x[n];
-\end{stancode}
-%
-After the for loop is executed, the variable \code{total} will hold
-the sum of the elements in the array \code{x}.  This example was
-purely pedagogical; it is easier and more efficient to write
-%
-\begin{stancode}
-total = sum(x);
-\end{stancode}
-
-A variable inside (or outside) a loop may even be reassigned multiple
-times, as in the following legal code.
-%
-\begin{stancode}
-for (n in 1:100) {
-  y = y + y * epsilon;
-  epsilon = epsilon / 2.0;
-  y = y + y * epsilon;
-}
-\end{stancode}
-
-\section{Conditional Statements}
-
-Stan supports full conditional statements using
-the same if-then-else syntax as \Cpp.  The general format is
-%
-\begin{stancode}
-if (condition1)
-  statement1
-else if (condition2)
-  statement2
-// ...
-else if (conditionN-1)
-  statementN-1
-else
-  statementN
-\end{stancode}
-%
-There must be a single leading \code{if} clause, which may be followed
-by any number of \code{else if} clauses, all of which may be
-optionally followed by an \code{else} clause.  Each condition must be
-a real or integer value, with non-zero values interpreted as true and
-the zero value as false.
-
-The entire sequence of if-then-else clauses forms a single conditional
-statement for evaluation.  The conditions are evaluated in order
-until one of the conditions evaluates to a non-zero value, at which
-point its corresponding statement is executed and the conditional
-statement finishes execution.  If none of the conditions evaluates to
-a non-zero value and there is a final else clause, its statement is
-executed.
-
-\section{While Statements}
-
-Stan supports standard while loops using the same syntax as \Cpp.  The
-general format is as follows.
-%
-\begin{stancode}
-while (condition)
-  body
-\end{stancode}
-%
-The condition must be an integer or real expression and the body can
-be any statement (or sequence of statements in curly braces).
-
-Evaluation of a while loop starts by evaluating the condition.  If the
-condition evaluates to a false (zero) value, the execution of the loop
-terminates and control moves to the position after the loop.  If the
-loop's condition evaluates to a true (non-zero) value, the body statement is
-executed, then the whole loop is executed again.  Thus the loop is
-continually executed as long as the condition evaluates to a true value.
-
-
-\section{Statement Blocks and Local Variable Declarations}
-
-Just as parentheses may be used to group expressions, curly brackets
-may be used to group a sequence of zero or more statements into a
-statement block.  At the beginning of each block, local variables may be
-declared that are scoped over the rest of the statements in the block.
-
-\subsection{Blocks in For Loops}
-
-Blocks are often used to group a sequence of statements together to be
-used in the body of a for loop.  Because the body of a for loop can be
-any statement, for loops with bodies consisting of a single statement
-can be written as follows.
-%
-\begin{stancode}
-for (n in 1:N)
-  y[n] ~ normal(mu,sigma);
-\end{stancode}
-%
-To put multiple statements inside the body of a for loop, a block is
-used, as in the following example.
-%
-\begin{stancode}
-for (n in 1:N) {
-  lambda[n] ~ gamma(alpha,beta);
-  y[n] ~ poisson(lambda[n]);
-}
-\end{stancode}
-%
-The open curly bracket (\code{\{}) is the first character of the block
-and the close curly bracket (\code{\}}) is the last character.
-
-Because whitespace is ignored in Stan, the following program will
-not compile.
-%
-\begin{stancode}
-for (n in 1:N)
-  y[n] ~ normal(mu,sigma);
-  z[n] ~ normal(mu,sigma); // ERROR!
-\end{stancode}
-%
-The problem is that the body of the for loop is taken to be the
-statement directly following it, which is
-\Verb|y[n] ~ normal(mu,sigma)|.  This leaves the probability statement for
-\code{z[n]} hanging, as is clear from the following equivalent
-program.
-%
-\begin{stancode}
-for (n in 1:N) {
-  y[n] ~ normal(mu,sigma);
-}
-z[n] ~ normal(mu,sigma); // ERROR!
-\end{stancode}
-%
-Neither of these programs will compile. If the loop variable \code{n}
-was defined before the for loop, the for-loop declaration will raise
-an error.  If the loop variable \code{n} was not defined before the
-for loop, then the use of the expression \code{z[n]} will raise an
-error.
-
-\subsection{Local Variable Declarations}
-
-A for loop has a statement as a body.  It is often convenient in
-writing programs to be able to define a local variable that will be
-used temporarily and then forgotten.  For instance, the for loop
-example of repeated assignment should use a local variable for maximum
-clarity and efficiency, as in the following example.
-%
-\begin{stancode}
-for (n in 1:N) {
-  real theta;
-  theta = inv_logit(alpha + x[n] * beta);
-  y[n] ~ bernoulli(theta);
-}
-\end{stancode}
-%
-The local variable \code{theta} is declared here inside the for loop.
-The scope of a local variable is just the block in which it is
-defined.  Thus \code{theta} is available for use inside the for loop,
-but not outside of it.  As in other situations, Stan does not allow
-variable hiding.  So it is illegal to declare a local variable
-\code{theta} if the variable theta is already defined in the scope of
-the for loop.  For instance, the following is not legal.
-%
-\begin{stancode}
-for (m in 1:M) {
-  real theta;
-  for (n in 1:N) {
-    real theta; // ERROR!
-    theta = inv_logit(alpha + x[m,n] * beta);
-    y[m,n] ~ bernoulli(theta);
-// ...
-\end{stancode}
-%
-The compiler will flag the second declaration of \code{theta} with a
-message that it is already defined.
-
-\subsection{No Constraints on Local Variables}
-
-Local variables may not have constraints on their declaration.  The
-only types that may be used are
-%
-\begin{quote}
-\code{int}, \code{real},
-\code{vector[K]}, \code{row\_vector[K]}, and \code{matrix[M,N]}.
-\end{quote}
-
-\subsection{Blocks within Blocks}
-
-A block is itself a statement, so anywhere a sequence of statements is
-allowed, one or more of the statements may be a block.  For instance,
-in a for loop, it is legal to have the following
-%
-\begin{stancode}
-for (m in 1:M) {
-  {
-     int n;
-     n = 2 * m;
-     sum = sum + n
-  }
-  for (n in 1:N)
-    sum = sum + x[m,n];
-}
-\end{stancode}
-%
-The variable declaration \code{int n;} is the first element of an
-embedded block and so has scope within that block.  The for loop
-defines its own local block implicitly over the statement following it
-in which the loop variable is defined.  As far as Stan is concerned,
-these two uses of \code{n} are unrelated.
-
-\section{Break and Continue Statements}
-
-The one-token statements \code{continue} and \code{break} may be used
-within loops to alter control flow;  \code{continue} causes the next
-iteration of the loop to run immediately, whereas \code{break}
-terminates the loop and causes execution to resume after the loop.
-Both control structures must appear in loops.  Both \code{break} and
-\code{continue} scope to the most deeply nested loop, but pass through
-non-loop statements.
-
-Although these control statements may seem undesirable because of
-their goto-like behavior, their judicious use can greatly improve
-readability by reducing the level of nesting or eliminating bookeeping
-inside loops.
-
-\subsection{Break Statements}
-
-When a \code{break} statement is executed, the most deeply nested loop
-currently being executed is ended and execution picks up with the next
-statement after the loop.  For example, consider the following
-program:
-%
-\begin{stancode}
-while (1) {
-  if (n < 0) break;
-  foo(n);
-  n = n - 1;
-}
-\end{stancode}
-%
-The \code{while~(1)} loop is a ``forever'' loop, because \code{1} is
-the true value, so the test always succeeds.  Within the loop, if the
-value of \code{n} is less than 0, the loop terminates, otherwise it
-executes \code{foo(n)} and then decrements \code{n}.  The statement
-above does exactly the same thing as
-%
-\begin{stancode}
-while (n >= 0) {
-  foo(n);
-  n = n - 1;
-}
-\end{stancode}
-%
-This case is simply illustrative of the behavior; it is not a case
-where a \code{break} simplifies the loop.
-
-\subsection{Continue Statements}
-
-The \code{continue} statement ends the current operation of the loop
-and returns to the condition at the top of the loop.  Such loops are
-typically used to exclude some values from calculations.  For example,
-we could use the following loop to sum the positive values in the
-array \code{x},
-%
-\begin{stancode}
-real sum;
-sum = 0;
-for (n in 1:size(x)) {
-  if (x[n] <= 0) continue;
-  sum = sum + x[n];
-}
-\end{stancode}
-%
-When the continue statement is executed, control jumps back to the
-conditional part of the loop.  With while and for loops, this causes
-control to return to the conditional of the loop.  With for loops,
-this advances the loop variable, so the the above program will not go
-into an infinite loop when faced with an \code{x[n]} less than zero.
-Thus the above program could be rewritten with deeper nesting by
-reversing the conditional,
-%
-\begin{stancode}
-real sum;
-sum = 0;
-for (n in 1:size(x)) {
-  if (x[n] > 0)
-    sum = sum + x[n];
-}
-\end{stancode}
-%
-While the latter form may seem more readable in this simple case, the
-former has the main line of execution nested one level less deep.
-Instead, the conditional at the top finds cases to exclude and doesn't
-require the same level of nesting for code that's not excluded.  When
-there are several such exclusion conditions, the break or continue
-versions tend to be much easier to read.
-
-\subsection{Breaking and Continuing Nested Loops}
-
-If there is a loop nested within a loop, a \code{break} or
-\code{continue} statement only breaks out of the inner loop. So
-%
-\begin{stancode}
-while (cond1) {
-  ...
-  while (cond2) {
-    ...
-    if (cond3) break;
-    ...
-  }
-  // execution continues here after break
-  ...
-}
-\end{stancode}
-%
-If the break is triggered by \code{cond3} being true, execution will
-continue after the nested loop.
-
-As with break statements, continue statements go back to the top of
-the most deeply nested loop in which the \code{continue} appears.  
-
-Although break and continue must appear within loops, they may appear
-in nested statements within loops, such as within the conditionals
-shown above or within nested statements.  The break and continue
-statements jump past any control structure other than while-loops and
-for-loops.
-
-\section{Print Statements}\label{print-statements.section}
-
-Stan provides print statements that can print literal strings and the
-values of expressions.  Print statements accept any number of
-arguments.  Consider the following for-each statement with a print
-statement in its body.
-%
-\begin{stancode}
-for (n in 1:N) { print("loop iteration: ", n); ... }
-\end{stancode}
-%
-The print statement will execute every time the body of the loop does.
-Each time the loop body is executed, it will print the string ``loop iteration:
-'' (with the trailing space), followed by the value of the expression
-\code{n}, followed by a new line.
-
-\subsection{Print Content}
-
-The text printed by a print statement varies based on its content.  A
-literal (i.e., quoted) string in a print statement always prints
-exactly that string (without the quotes).  Expressions in print
-statements result in the value of the expression being printed.
-But how the value of the expression is formatted will depend on its type.
-
-Printing a simple \code{real} or \code{int} typed variable always
-prints the variable's value.%
-%
-\footnote{The adjoint component is always zero during execution for
-  the algorithmic differentiation variables used to implement
-  parameters, transformed parameters, and local variables in the model.}
-%
-For array, vector, and matrix variables, the print format uses
-brackets.  For example, a 3-vector will print as
-%
-\begin{stancode}
-[1,2,3]
-\end{stancode}
-%
-and a $2 \times 3$-matrix as
-%
-\begin{stancode}
-[[1,2,3],[4,5,6]]
-\end{stancode}
-%
-
-Printing a more readable version of arrays or matrices can be done
-with loops.  An example is the print statement in the following
-transformed data block.
-%
-\begin{stancode}
-transformed data {
-  matrix[2,2] u;
-  u[1,1] = 1.0;  u[1,2] = 4.0;
-  u[2,1] = 9.0;  u[2,2] = 16.0;
-  for (n in 1:2)
-    print("u[", n, "] = ", u[n]);
-}
-\end{stancode}
-%
-This print statement executes twice, printing the following two lines
-of output.
-%
-\begin{stancode}
-u[1] = [1,4]
-u[2] = [9,16]
-\end{stancode}
-
-
-
-\subsection{Print Frequency}
-
-Printing for a print statement happens every time it is executed.  The
-\code{transformed data} block is executed once per chain, the
-\code{transformed parameter} and \code{model} blocks once per leapfrog
-step, and the \code{generated quantities} block once per iteration.
-
-\subsection{String Literals}
-
-String literals begin and end with a double quote character
-(\Verb|"|).  The characters between the double quote characters may be
-the space character or any visible ASCII character, with the exception
-of the backslash character (\Verb|\|) and double quote character
-(\Verb|"|).  The full list of visible ASCII characters is as follows.
-%
-\begin{quote}
-\begin{Verbatim}
-a b c d e f g h i j k l m n o p q r s t u v w x y z
-A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
-0 1 2 3 4 5 6 7 8 9 0 ~ @ # $ % ^ & * _ ' ` - + = {
-} [ ] ( ) < > | / ! ? . , ; :
-\end{Verbatim}
-\end{quote}
-%$ to fix AUXTeX highlighting
-
-\subsection{Debug by \code{print}}
-
-Because Stan is an imperative language, print statements can be very
-useful for debugging.  They can be used to display the values of
-variables or expressions at various points in the execution of a
-program.  They are particularly useful for spotting problematic
-not-a-number of infinite values, both of which will be printed.
-
-It is particularly useful to print the value of the log probability
-accumulator (see \refsection{get-lp}), as in the following example.
-%
-\begin{stancode}
-vector[2] y;
-y[1] = 1;
-print("lp before =",get_lp());
-y ~ normal(0,1); // bug!  y[2] not defined
-print("lp after =",get_lp());
-\end{stancode}
-%
-The example has a bug in that \code{y[2]} is not defined before the
-vector \code{y} is used in the sampling statement.  By printing the
-value of the log probability accumulator before and after each
-sampling statement, it's possible to isolate where the log probability
-becomes ill-defined (i.e., becomes not-a-number).
-
-\section{Reject Statements}\label{reject-statements.section}
-
-The Stan \code{reject} statement provides a mechanism to
-report errors or problematic values encountered during program
-execution and either halt processing or reject samples or optimization
-iterations.
-
-Like the \code{print} statement, the reject statement accepts
-any number of quoted string literals or Stan expressions as arguments.
-
-Reject statements are typically embedded in a conditional
-statement in order to detect variables in illegal states.  For
-example, the following code handles the case where a variable \code{x}'s
-value is negative.
-%
-\begin{stancode}
-if (x < 0)
-  reject("x must not be negative; found x=", x);
-\end{stancode}
-
-\subsection{Behavior of Reject Statements}
-
-Reject statements have the same behavior as exceptions thrown by
-built-in Stan functions.  For example, the \code{normal\_lpdf} function
-raises an exception if the input scale is not positive and finite.
-The effect of a reject statement depends on the program block in which
-the rejection occurs.
-
-In all cases of rejection, the interface accessing the Stan
-program should print the arguments to the reject statement.
-
-\subsubsection{Rejections in Functions}
-
-Rejections in user-defined functions are just passed to the
-calling function or program block.  Reject statements can be used in
-functions to validate the function arguments, allowing user-defined
-functions to fully emulate built-in function behavior.  It is better
-to find out earlier rather than later when there is a problem.
-
-\subsubsection{Fatal Exception Contexts}
-
-In both the transformed data block and generated quantities block,
-rejections are fatal.  This is because if initialization fails or if
-generating output fails, there is no way to recover values.
-
-Reject statements placed in the transformed data block can be used
-to validate both the data and transformed data (if any).  This allows
-more complicated constraints to be enforced that can be specified with
-Stan's constrained variable declarations.
-
-
-\subsubsection{Recoverable Rejection Contexts}
-
-Rejections in the transformed parameters and model blocks are
-not in and of themselves instantly fatal.  The result has the same
-effect as assigning a $-\infty$ log probability, which causes
-rejection of the current proposal in MCMC samplers and adjustment of
-search parameters in optimization.
-
-If the log probability function results in a rejection every time it is
-called, the containing application (MCMC sampler or optimization)
-should diagnose this problem and terminate with an appropriate error
-message.  To aid in diagnosing problems, the message for each
-reject statement will be printed as a result of executing it.
-
-
-\subsection{Rejection is not for Constraints}
-
-Rejection should be used for error handling, not defining arbitrary
-constraints.  Consider the following errorful Stan program.
-%
-\begin{stancode}
-parameters {
-  real a;
-  real<lower=a> b;
-  real<lower=a, upper=b> theta;
-  ...
-model {
-  // **wrong** needs explicit truncation
-  theta ~ normal(0, 1); 
-  ...
-\end{stancode}
-%
-This program is wrong because its truncation bounds on \code{theta}
-depend on parameters, and thus need to be accounted for using an
-explicit truncation on the distribution.  This is the right way to do
-it.  
-%
-\begin{stancode}
-  theta ~ normal(0, 1) T[a,b];
-\end{stancode}
-%
-The conceptual issue is that the prior does not integrate to one over
-the admissible parameter space; it integrates to one over all real
-numbers and integrates to something less than one over $[a,b]$; in these
-simple univariate cases, we can overcome that with the T[,] notation,
-which essentially divides by whatever the prior integrates to over
-$[a,b]$.  
-
-This problem is exactly the same problem as you would get using reject
-statements to enforce complicated inequalities on multivariate
-functions.  In this case, it is wrong to try to deal with truncation
-through constraints.
-%
-\begin{stancode}
-  if (theta < a || theta > b)
-    reject("theta not in (a, b)");
-  // still **wrong**, needs T[a,b]
-  theta ~ normal(0, 1);
-\end{stancode} 
-%
-In this case, the prior integrates to something less than one over the
-region of the parameter space where the complicated inequalities are
-satisfied. But we don't generally know what value the prior integrates
-to, so we can't increment the log probability function to compensate.
-
-Even if this adjustment to a proper probability model may seem like
-``no big deal'' in particular models where the amount of truncated
-posterior density is negligible or constant, we can't sample from that
-truncated posterior efficiently.  Programs need to use one-to-one
-mappings that guarantee the constraints are satisfied and only use
-reject statements to raise errors or help with debugging.
-
 
 \chapter{Data Types and Variable Declarations}\label{data-types.chapter}
 
@@ -3657,6 +2334,1331 @@ TEST GRADIENT MODE
 Even though finite differences calculates the right gradient of 0,
 automatic differentiation follows the chain rule and produces a
 not-a-number output.
+
+\chapter{Statements}
+
+\noindent
+The blocks of a Stan program (see \refchapter{blocks}) are made up of
+variable declarations and statements.  Unlike programs in \BUGS, the
+declarations and statements making up a Stan program are executed in
+the order in which they are written.  Variables must be defined to
+have some value (as well as declared to have some type) before they
+are used --- if they do not, the behavior is undefined.
+
+The basis of Stan's execution is the evaluation of a log probability
+function (specifically, a probability density function) for a given
+set of (real-valued) parameters. Log probability function can be
+constructed by using assignment statements.  Statements may be grouped
+into sequences and into for-each loops.  In addition, Stan allows
+local variables to be declared in blocks and also allows an empty
+statement consisting only of a semicolon.
+
+
+\section{Assignment Statement}\label{assignment-statement.section}
+
+An assignment statement consists of a variable (possibly multivariate
+with indexing information) and an expression.  Executing an
+assignment statement evaluates the expression on the right-hand side
+and assigns it to the (indexed) variable on the left-hand side.  An
+example of a simple assignment is as follows.%
+%
+\footnote{In versions of Stan before 2.12.0, the operator \code{<-} was
+  used for assignment rather than using the equal sign \code{=}.  The
+  old operator \code{<-} is now deprecated and will print a warning.
+  In the future, it will be removed.}
+%
+\begin{quote}
+\code{n = 0;}
+\end{quote}
+%
+Executing this statement assigns the value of the expression \code{0},
+which is the integer zero, to the variable \code{n}.  For an assignment
+to be well formed, the type of the expression on the right-hand side
+should be compatible with the type of the (indexed) variable on the
+left-hand side.  For the above example, because \code{0} is an
+expression of type \code{int}, the variable \code{n} must be declared
+as being of type \code{int} or of type \code{real}.  If the variable
+is of type \code{real}, the integer zero is promoted to a
+floating-point zero and assigned to the variable.  After the
+assignment statement executes, the variable \code{n} will have the
+value zero (either as an integer or a floating-point value, depending on
+its type).
+
+Syntactically, every assignment statement must be followed by a
+semicolon.  Otherwise, whitespace between the tokens does not matter
+(the tokens here being the left-hand-side (indexed) variable, the
+assignment operator, the right-hand-side expression and the
+semicolon).
+
+Because the right-hand side is evaluated first, it is possible to
+increment a variable in Stan just as in \Cpp and other programming
+languages by writing
+%
+\begin{quote}
+\code{n = n + 1;}
+\end{quote}
+%
+Such self assignments are not allowed in \BUGS, because they induce a
+cycle into the directed graphical model.
+
+The left-hand side of an assignment may contain indices for array,
+matrix, or vector data structures.  For instance, if \code{Sigma} is
+of type \code{matrix}, then
+%
+\begin{quote}
+\code{Sigma[1,1] = 1.0;}
+\end{quote}
+%
+sets the value in the first column of the first row of \code{Sigma} to one.
+
+Assignments can involve complex objects of any type.  If \code{Sigma}
+and \code{Omega} are matrices and \code{sigma} is a vector, then the
+following assignment statement, in which the expression and variable
+are both of type \code{matrix}, is well formed.
+%
+\begin{stancode}
+Sigma
+  = diag_matrix(sigma)
+     * Omega
+     * diag_matrix(sigma);
+\end{stancode}
+%
+This example also illustrates the preferred form of splitting a
+complex assignment statement and its expression across lines.
+
+Assignments to subcomponents of larger multi-variate data structures
+are supported by Stan.  For example, \code{a} is an array of type
+\code{real[~,~]} and \code{b} is an array of type \code{real[]}, then
+the following two statements are both well-formed.
+%
+\begin{stancode}
+a[3] = b;
+b = a[4];
+\end{stancode}
+%
+Similarly, if \code{x} is a variable declared to have type
+\code{row\_vector} and \code{Y} is a variable declared as type
+\code{matrix}, then the following sequence of statements to swap the
+first two rows of \code{Y} is well formed.
+%
+\begin{stancode}
+x = Y[1];
+Y[1] = Y[2];
+Y[2] = x;
+\end{stancode}
+%
+
+\subsection{Lvalue Summary}
+
+The expressions that are legal left-hand sides of assignment
+statements are known as ``lvalues.''  In Stan, there are only two
+kinds of legal lvalues,
+%
+\begin{itemize}
+\item a variable, or
+\item a variable with one or more indices.
+\end{itemize}
+%
+To be used as an lvalue, an indexed variable must have at least as
+many dimensions as the number of indices provided.  An array of real
+or integer types has as many dimensions as it is declared for.  A
+matrix has two dimensions and a vector or row vector one dimension;
+this also holds for the constrained types, covariance and correlation
+matrices and their Cholesky factors and ordered, positive ordered, and
+simplex vectors.  An array of matrices has two more dimensions than
+the array and an array of vectors or row vectors has one more
+dimension than the array.  Note that the number of indices can be less
+than the number of dimensions of the variable, meaning that the right
+hand side must itself be multidimensional to match the remaining
+dimensions.
+
+\subsection{Multiple Indexes}
+
+Multiple indexes, as described in
+\refsection{language-multi-indexing}, are also permitted on the
+left-hand side of assignments.  Indexing on the left side works
+exactly as it does for expressions, with multiple indexes preserving
+index positions and single indexes reducing them.    The type on the
+left side must still match the type on the right side.
+
+\subsubsection{Aliasing}
+
+All assignment is carried out as if the right-hand side is copied
+before the assignment.  This resolves any potential aliasing issues
+arising from he right-hand side changing in the middle of an
+assignment statement's execution.
+
+
+
+\section{Increment Log Density}\label{increment-log-prob.section}
+
+The basis of Stan's execution is the evaluation of a log probability
+function (specifically, a probability density function) for a given
+set of (real-valued) parameters; this function returns the log density
+of the posterior up to an additive constant.  Data and transformed
+data are fixed before the log density is evaluated.  The total log
+probability is initialized to zero.  Next, any log Jacobian
+adjustments accrued by the variable constraints are added to the log
+density (the Jacobian adjustment may be skipped for optimization).
+Sampling and log probability increment statements may add to the log
+density in the model block.  A log probability increment statement
+directly increments the log density with the value of an expression as
+follows.%
+%
+\footnote{The current notation replaces two previous versions.
+  Originally, a variable \code{lp\_\_} was directly exposed and
+  manipulated;  this is no longer allowed.  The original statement
+  syntax for \code{target += u} was \code{increment\_log\_prob(u)},
+  but this form has been deprecated and will be removed in Stan 3.}
+%
+\begin{stancode}
+target += -0.5 * y * y;
+\end{stancode}
+%
+The keyword \code{target} here is actually not a variable, and may not
+be accessed as such (though see below on how to access the value of
+target through a special function).
+
+In this example, the unnormalized log probability of a unit normal
+variable $y$ is added to the total log probability.  In the general
+case, the argument can be any expression.%
+%
+\footnote{Writing this model with the expression \code{-0.5 * y * y}
+  is more efficient than with the equivalent expression \code{y * y /
+    -2} because multiplication is more efficient than division; in
+  both cases, the negation is rolled into the numeric literal
+  (\code{-0.5} and \code{-2}).  Writing \code{square(y)} instead of
+  \code{y * y} would be even more efficient because the derivatives
+  can be precomputed, reducing the memory and number of operations
+  required for automatic differentiation.}
+
+An entire Stan model can be implemented this way.  For instance, the
+following model will draw a single variable according to a unit normal
+probability.
+%
+\begin{stancode}
+parameters {
+  real y;
+}
+model {
+  target += -0.5 * y * y;
+}
+\end{stancode}
+%
+This model defines a log probability function
+%
+\[
+\log p(y) = - \, \frac{y^2}{2} - \log Z
+\]
+%
+where $Z$ is a normalizing constant that does not depend on $y$.  The
+constant $Z$ is conventionally written this way because on the linear
+scale,
+\[
+p(y) = \frac{1}{Z} \exp\left(-\frac{y^2}{2}\right).
+\]
+which is typically written without reference to $Z$ as
+\[
+p(y) \propto \exp\left(-\frac{y^2}{2}\right).
+\]
+
+Stan only requires models to be defined up to a constant that does not
+depend on the parameters.  This is convenient because often the
+normalizing constant $Z$ is either time-consuming to compute or
+intractable to evaluate.
+
+\subsubsection{Vectorization}
+
+The \code{target += ...} statement accepts an argument in place of
+\code{...} for any expression type, including integers, reals,
+vectors, row vectors, matrices, and arrays of any dimensionality,
+including arrays of vectors and matrices.   For container arguments,
+their sum will be added to the total log density.
+
+\subsection{Accessing the Log Density}
+
+To increment the log density returned by the model by some value
+\code{u}, use the following statement.%
+%
+\footnote{Originally, Stan provided direct access to the log density
+  through a variable \code{lp\_\_} and then later through the
+  \code{increment\_log\_prob()} statement, but the first has been
+  removed and the latter deprecated.}
+%
+\begin{stancode}
+target += u;
+\end{stancode}
+%
+In general, \code{u} can be any expression;  if it is a container, the
+log density will be incremented by the sum of the elements in the
+container.
+
+To access accumulated log density up to the current execution point,
+the function \code{get\_lp()} may be used.%
+%
+\footnote{The value of \code{lp\_\_} will only hold the Jacobian until
+  the end of the execution because it is not used in either
+  \code{increment\_log\_prob(u)} or \code{target += u}.}
+
+
+\section{Sampling Statements}\label{sampling-statements.section}
+
+Stan supports writing probability statements also in sampling
+notation, such as
+%
+\begin{stancode}
+y ~ normal(mu,sigma);
+\end{stancode}
+%
+The name ``sampling statement'' is meant to be suggestive, not
+interpreted literally.  Conceptually, the variable \code{y}, which may
+be an unknown parameter or known, modeled data, is being declared
+to have the distribution indicated by the right-hand side of the
+sampling statement.
+
+Executing such a statement does not perform any sampling.  In Stan, a
+sampling statement is merely a notational convenience.  The above
+sampling statement could be expressed as a direct increment on the
+total log probability as
+%
+\begin{stancode}
+target += normal_lpdf(y | mu, sigma);
+\end{stancode}
+
+In general, a sampling statement of the form
+%
+\begin{stancode}
+y ~ dist(theta1, ..., thetaN);
+\end{stancode}
+%
+involving subexpressions \code{y1} and \code{theta1} through
+\code{thetaN} (including the case where \code{N} is zero) will be well
+formed if and only if the corresponding assignment statement is
+well-formed.  For densities allowing real \code{y} values, the log
+probability density function is used,
+%
+\begin{stancode}
+target += dist_lpdf(y | theta1, ..., thetaN);
+\end{stancode}
+%
+For those restricted to integer \code{y} values, the log probability
+mass function is used,
+%
+\begin{stancode}
+target += dist_lpmf(y | theta1, ..., thetaN);
+\end{stancode}
+%
+
+This will be well formed if and only if \code{dist\_lpdf(y | theta1,
+  ..., thetaN)} or \code{dist\_lpmf(y | theta1, ..., thetaN)} is a
+well-formed expression of type \code{real}.
+
+\subsection{Log Probability Increment vs.\ Sampling Statement}
+
+Although both lead to the same sampling behavior in Stan, there is one
+critical difference between using the sampling statement, as in
+%
+\begin{stancode}
+y ~ normal(mu, sigma);
+\end{stancode}
+%
+and explicitly incrementing the log probability function, as in
+%
+\begin{stancode}
+target += normal_lpdf(y | mu,sigma);
+\end{stancode}
+%
+The sampling statement drops all the terms in the log probability
+function that are constant, whereas the explicit call to
+\code{normal\_lpdf} adds all of the terms in the definition of the log
+normal probability function, including all of the constant normalizing
+terms.  Therefore, the explicit increment form can be used to recreate
+the exact log probability values for the model.  Otherwise, the
+sampling statement form will be faster if any of the input expressions,
+\code{y}, \code{mu}, or \code{sigma}, involve only constants, data
+variables, and transformed data variables.
+
+
+\subsection{User-Transformed Variables}
+
+The left-hand side of a sampling statement may be a complex
+expression.  For instance, it is legal syntactically to write
+%
+\begin{stancode}
+data {
+  real<lower=0> y;
+}
+// ...
+model {
+  log(y) ~ normal(mu, sigma);
+}
+\end{stancode}
+%
+Unfortunately, this is not enough to properly model \code{y} as having
+a lognormal distribution.  The log Jacobian of the transform must be
+added to the log probability accumulator to account for the
+differential change in scale (see \refsection{change-of-variables} for
+full definitions).  For the case above, the following adjustment will
+account for the log transform.%
+%
+\footnote{Because $\log | \frac{d}{dy} \log y | = \log | 1/y | = - \log
+  |y|$;  see \refsection{change-of-variables}.}
+%
+\begin{stancode}
+target += - log(fabs(y));
+\end{stancode}
+%
+
+\subsection{Truncated Distributions}
+
+Stan supports truncating distributions with lower bounds, upper
+bounds, or both.
+
+\subsubsection{Truncating with lower and upper bounds}
+
+A probability density function $p(x)$ for a continuous distribution
+may be truncated to an interval $[a,b]$ to define a new density
+$p_{[a,b]}(x)$ with support $[a,b]$ by setting
+%
+\[
+p_{[a,b]}(x)
+= \frac{p(x)}
+       {\int_a^b p(u) \, du}.
+\]
+%
+A probability mass function $p(x)$ for a discrete distribution may be
+truncated to the closed interval $[a,b]$ by
+\[
+p_{[a,b]}(x) = \frac{p(x)}
+                  {\sum_{u = a}^b p(u)}.
+\]
+
+\subsubsection{Truncating with a lower bound}
+
+A probability density function $p(x)$ can be truncated to $[a, \infty]$ by
+defining
+%
+\[
+p_{[a,\infty]}(x)
+= \frac{p(x)}
+       {\int_a^{\infty} p(u) \, du}.
+\]
+%
+A probability mass function $p(x)$ is truncated to $[a, \infty]$ by
+defining 
+%
+\[
+p_{[a,\infty]}(x) = \frac{p(x)}
+                  {\sum_{a <= u} p(u)}.
+\]
+
+\subsubsection{Truncating with an upper bound}
+
+A probability density function $p(x)$ can be truncated to $[-\infty, b]$ by
+defining
+%
+\[
+p_{[-\infty,b]}(x)
+= \frac{p(x)}
+       {\int_{-\infty}^b p(u) \, du}.
+\]
+%
+A probability mass function $p(x)$ is truncated to $[-\infty, b]$ by
+defining 
+%
+\[
+p_{[-\infty,b]}(x) = \frac{p(x)}
+                  {\sum_{u <= b} p(u)}.
+\]
+
+
+\subsubsection{Cumulative distribution functions}
+
+Given a probability function $p_X(x)$ for a random variable $X$, its
+cumulative distribution function (cdf) $F_X(x)$ is defined to be the
+probability that $X \leq x$,
+%
+\[
+F_X(x) = \mbox{Pr}[X \leq x].
+\]
+The upper-case variable $X$ is the random variable whereas the
+lower-case variable $x$ is just an ordinary bound variable.  For
+continuous random variables, the definition of the cdf works out to
+\[
+F_X(x) \ = \ \int_{-\infty}^{x} p_X(u) \, du,
+\]
+For discrete variables, the cdf is defined to include the upper bound
+given by the argument,
+\[
+F_X(x) = \sum_{u \leq x} p_X(u).
+\]
+%
+
+\subsubsection{Complementary cumulative distribution functions}
+
+The complementary cumulative distribution function (ccdf) in both the
+continuous and discrete cases is given by
+\[
+F^C_X(x)
+\ = \ \mbox{Pr}[X > x]
+\ = \ 1 - F_X(x).
+\]
+Unlike the cdf, the ccdf is exclusive of the bound, hence the event
+$X > x$ rather than the cdf's event $X \leq x$.
+
+For continous distributions, the ccdf works out to 
+\[
+F^C_X(x)
+\ = \ 1 - \int_{-\infty}^x p_X(u) \, du
+\ = \ \int_x^{\infty} p_X(u) \, du.
+\]
+The lower boundary can be included in the integration bounds because
+it is a single point on a line and hence has no probability mass.
+For the discrete case, the lower bound must be excluded in the
+summation explicitly by summing over $u > x$,
+\[
+F^C_X(x)
+\ = \ 1 - \sum_{u \leq x} p_X(u)
+\ = \ \sum_{u > x} p_X(u).
+\]
+
+
+Cumulative distribution functions provide the necessary integral
+calculations to define truncated distributions.  For truncation with
+lower and upper bounds, the denominator is defined by
+\[
+\int_a^b p(u) \, du = F_X(b) - F_X(a).
+\]
+This allows truncated distributions to be defined as
+\[
+p_{[a,b]}(x) = \frac{p_X(x)}
+                  {F_X(b) - F_X(a)}.
+\]
+
+For discrete distributions, a slightly more complicated form is
+required to explicitly insert the lower truncation point, which is
+otherwise excluded from $F_X(b) - F_X(a)$,
+\[
+p_{[a,b]}(x) = \frac{p_X(x)}
+                  {F_X(b) - F_X(a) + p_X(a)}.
+\]
+
+\subsubsection{Truncation with lower and upper bounds in Stan}
+
+Stan allows probability functions to be truncated.  For example, a
+truncated unit normal distributions restricted to $[-0.5, 2.1]$
+can be coded with the following sampling statement.
+%
+\begin{stancode}
+y ~ normal(0, 1) T[-0.5, 2.1];
+\end{stancode}
+%
+Truncated distributions are translated as an additional term in the
+accumulated log density function plus error checking to make sure the
+variate in the sampling statement is within the bounds of the
+truncation.
+
+In general, the truncation bounds and parameters may be parameters or
+local variables.
+
+Because the example above involves a continuous distribution, it
+behaves the same way as the following more verbose form.
+%
+\begin{stancode}
+y ~ normal(0, 1);
+if (y < -0.5 || y > 2.1)
+  target += negative_infinity();
+else
+  target += -log_diff_exp(normal_lcdf(2.1 | 0, 1),
+                          normal_lcdf(-0.5 | 0, 1));
+\end{stancode}
+%
+Because a Stan program defines a log density function, all
+calculations are on the log scale.  The function \code{normal\_lcdf}
+is the log of the cumulative normal distribution function and the
+function \code{log\_diff\_exp(a, b)} is a more arithmetically stable
+form of \code{log(exp(a) - exp(b))}.
+
+For a discrete distribution, another term is necessary in the
+denominator to account for the excluded boundary.  The truncated
+discrete distribution
+%
+\begin{stancode}
+y ~ poisson(3.7) T[2, 10];
+\end{stancode}
+%
+behaves in the same way as the following code.
+%
+\begin{stancode}
+y ~ poisson(3.7);
+if (y < 2 || y > 10) 
+  target += negative_infinity();
+else
+  target += -log_sum_exp(poisson_lpmf(2 | 3.7),
+                         log_diff_exp(poisson_lcdf(10 | 3.7),
+                                      poisson_lcdf(2 | 3.7)));
+\end{stancode}
+%
+Recall that \code{log\_sum\_exp(a, b)} is just the arithmetically
+stable form of \code{log(exp(a) + exp(b))}.
+
+
+\subsubsection{Truncation with lower bounds in Stan}
+
+For truncating with only a lower bound, the upper limit is left blank.
+%
+\begin{stancode}
+y ~ normal(0, 1) T[-0.5, ];
+\end{stancode}
+%
+This truncated sampling statement has the same behavior as the
+following code.
+%
+\begin{stancode}
+y ~ normal(0, 1);
+if (y < -0.5)
+  target += negative_infinity();
+else
+  target += -normal_lccdf(-0.5 | 0, 1);
+\end{stancode}
+%
+The \code{normal\_lccdf} function is the normal complementary cumulative
+distribution function.
+
+As with lower and upper truncation, the discrete case requires a more
+complicated denominator to add back in the probability mass for the
+lower bound.  Thus
+%
+\begin{stancode}
+y ~ poisson(3.7) T[2, ];
+\end{stancode}
+%
+behaves the same way as
+%
+\begin{stancode}
+y ~ poisson(3.7);
+if (y < 2)
+  target += negative_infinity();
+else
+  target += -log_sum_exp(poisson_lpdf(2 | 3.7),
+                         poisson_lccdf(2 | 3.7));
+\end{stancode}
+
+
+\subsubsection{Truncation with upper bounds in Stan}
+
+To truncate with only an upper bound, the lower bound is left blank.  
+The upper truncated sampling statement
+%
+\begin{stancode}
+y ~ normal(0, 1) T[ , 2.1];
+\end{stancode}
+%
+produces the same result as the following code.
+%
+\begin{stancode}
+target += normal_lpdf(y | 0, 1);
+if (y > 2.1)
+  target += negative_infinity();
+else 
+  target += -normal_lcdf(2.1 | 0, 1);
+\end{stancode}
+
+With only an upper bound, the discrete case does not need a boundary
+adjustment.  The upper-truncated sampling statement
+%
+\begin{stancode}
+y ~ poisson(3.7) T[ , 10];
+\end{stancode}
+%
+behaves the same way as the following code.
+%
+\begin{stancode}
+y ~ poisson(3.7);
+if (y > 10)
+  target += negative_infinity();
+else 
+  target += -poisson_lcdf(10 | 3.7);
+\end{stancode}
+
+\subsubsection{Cumulative distributions must be defined}
+
+In all cases, the truncation is only well formed if the appropriate
+log density or mass function and necessary log cumulative distribution
+functions are defined.  Not every distribution built into Stan has log
+cdf and log ccdfs defined, nor will every user-defined distribution.
+\refpart{discrete-prob-functions} and
+\refpart{continuous-prob-functions} document the available discrete
+and continuous cumulative distribution functions; most univariate
+distributions have log cdf and log ccdf functions.
+
+
+\subsubsection{Type constraints on bounds}
+
+For continuous distributions, truncation points must be expressions of
+type \code{int} or \code{real}.  For discrete distributions, truncation
+points must be expressions of type \code{int}.
+
+\subsubsection{Variates outside of truncation bounds}
+
+For a truncated sampling statement, if the value sampled is not within
+the bounds specified by the truncation expression, the result is zero
+probability and the entire statement adds $-\infty$ to the total log
+probability, which in turn results in the sample being rejected; see
+the subsection of \refsection{truncated-data} discussing constraints
+and out-of-bounds returns for programming strategies to keep
+all values within bounds.
+
+\subsubsection{Vectorizing Truncated Distributions}
+
+Stan does not (yet) support vectorization of distribution functions
+with truncation.
+
+
+\section{For Loops}
+
+Suppose
+\code{N} is a variable of type \code{int}, \code{y} is a
+one-dimensional array of type \code{real[]}, and \code{mu} and
+\code{sigma} are variables of type \code{real}.  Furthermore, suppose
+that \code{n} has not been defined as a variable. Then the following
+is a well-formed for-loop statement.
+%
+\begin{stancode}
+for (n in 1:N) {
+  y[n] ~ normal(mu, sigma);
+}
+\end{stancode}
+%
+The loop variable is \code{n}, the loop bounds are the values in the
+range \code{1:N}, and the body is the statement following the
+loop bounds.
+
+\subsection{Loop Variable Typing and Scope}
+
+The bounds in a for loop must be integers.  Unlike in \R, the loop is
+always interpreted as an upward counting loop.  The range \code{L:H}
+will cause the loop to execute the loop with the loop variable taking
+on all integer values greater than or equal to \code{L} and less than
+or equal to \code{H}.  For example, the loop \code{for (n in 2:5)}
+will cause the body of the for loop to be executed with \code{n} equal
+to 2, 3, 4, and 5, in order.  The variable and bound \code{for (n in
+  5:2)} will not execute anything because there are no integers
+greater than or equal to 5 and less than or equal to 2.
+
+\subsection{Order Sensitivity and Repeated Variables}
+
+Unlike in \BUGS, Stan allows variables to be reassigned.  For
+example, the variable \code{theta} in the following program is
+reassigned in each iteration of the loop.
+%
+\begin{stancode}
+for (n in 1:N) {
+  theta = inv_logit(alpha + x[n] * beta);
+  y[n] ~ bernoulli(theta);
+}
+\end{stancode}
+%
+Such reassignment is not permitted in \BUGS.  In \BUGS, for loops are
+declarative, defining plates in directed graphical model notation,
+which can be thought of as repeated substructures in the graphical
+model.  Therefore, it is illegal in \BUGS or \JAGS to have a for loop
+that repeatedly reassigns a value to a variable.%
+%
+\footnote{A programming idiom in \BUGS code simulates
+a local variable by replacing \code{theta} in the above example with
+\code{theta[n]}, effectively creating \code{N} different variables,
+\code{theta[1]}, \ldots, \code{theta[N]}.  Of course, this is not a
+hack if the value of \code{theta[n]} is required for all \code{n}.}
+
+In Stan, assignments are executed in the order they are encountered.
+As a consequence, the following Stan program has a very different
+interpretation than the previous one.
+%
+\begin{stancode}
+for (n in 1:N) {
+  y[n] ~ bernoulli(theta);
+  theta = inv_logit(alpha + x[n] * beta);
+}
+\end{stancode}
+%
+In this program, \code{theta} is assigned after it is used in the
+probability statement.  This presupposes it was defined before the
+first loop iteration (otherwise behavior is undefined), and then each
+loop uses the assignment from the previous iteration.
+
+Stan loops may be used to accumulate values.  Thus it is possible to
+sum the values of an array directly using code such as the
+following.
+%
+\begin{stancode}
+total = 0.0;
+for (n in 1:N)
+  total = total + x[n];
+\end{stancode}
+%
+After the for loop is executed, the variable \code{total} will hold
+the sum of the elements in the array \code{x}.  This example was
+purely pedagogical; it is easier and more efficient to write
+%
+\begin{stancode}
+total = sum(x);
+\end{stancode}
+
+A variable inside (or outside) a loop may even be reassigned multiple
+times, as in the following legal code.
+%
+\begin{stancode}
+for (n in 1:100) {
+  y = y + y * epsilon;
+  epsilon = epsilon / 2.0;
+  y = y + y * epsilon;
+}
+\end{stancode}
+
+\section{Conditional Statements}
+
+Stan supports full conditional statements using
+the same if-then-else syntax as \Cpp.  The general format is
+%
+\begin{stancode}
+if (condition1)
+  statement1
+else if (condition2)
+  statement2
+// ...
+else if (conditionN-1)
+  statementN-1
+else
+  statementN
+\end{stancode}
+%
+There must be a single leading \code{if} clause, which may be followed
+by any number of \code{else if} clauses, all of which may be
+optionally followed by an \code{else} clause.  Each condition must be
+a real or integer value, with non-zero values interpreted as true and
+the zero value as false.
+
+The entire sequence of if-then-else clauses forms a single conditional
+statement for evaluation.  The conditions are evaluated in order
+until one of the conditions evaluates to a non-zero value, at which
+point its corresponding statement is executed and the conditional
+statement finishes execution.  If none of the conditions evaluates to
+a non-zero value and there is a final else clause, its statement is
+executed.
+
+\section{While Statements}
+
+Stan supports standard while loops using the same syntax as \Cpp.  The
+general format is as follows.
+%
+\begin{stancode}
+while (condition)
+  body
+\end{stancode}
+%
+The condition must be an integer or real expression and the body can
+be any statement (or sequence of statements in curly braces).
+
+Evaluation of a while loop starts by evaluating the condition.  If the
+condition evaluates to a false (zero) value, the execution of the loop
+terminates and control moves to the position after the loop.  If the
+loop's condition evaluates to a true (non-zero) value, the body statement is
+executed, then the whole loop is executed again.  Thus the loop is
+continually executed as long as the condition evaluates to a true value.
+
+
+\section{Statement Blocks and Local Variable Declarations}
+
+Just as parentheses may be used to group expressions, curly brackets
+may be used to group a sequence of zero or more statements into a
+statement block.  At the beginning of each block, local variables may be
+declared that are scoped over the rest of the statements in the block.
+
+\subsection{Blocks in For Loops}
+
+Blocks are often used to group a sequence of statements together to be
+used in the body of a for loop.  Because the body of a for loop can be
+any statement, for loops with bodies consisting of a single statement
+can be written as follows.
+%
+\begin{stancode}
+for (n in 1:N)
+  y[n] ~ normal(mu,sigma);
+\end{stancode}
+%
+To put multiple statements inside the body of a for loop, a block is
+used, as in the following example.
+%
+\begin{stancode}
+for (n in 1:N) {
+  lambda[n] ~ gamma(alpha,beta);
+  y[n] ~ poisson(lambda[n]);
+}
+\end{stancode}
+%
+The open curly bracket (\code{\{}) is the first character of the block
+and the close curly bracket (\code{\}}) is the last character.
+
+Because whitespace is ignored in Stan, the following program will
+not compile.
+%
+\begin{stancode}
+for (n in 1:N)
+  y[n] ~ normal(mu,sigma);
+  z[n] ~ normal(mu,sigma); // ERROR!
+\end{stancode}
+%
+The problem is that the body of the for loop is taken to be the
+statement directly following it, which is
+\Verb|y[n] ~ normal(mu,sigma)|.  This leaves the probability statement for
+\code{z[n]} hanging, as is clear from the following equivalent
+program.
+%
+\begin{stancode}
+for (n in 1:N) {
+  y[n] ~ normal(mu,sigma);
+}
+z[n] ~ normal(mu,sigma); // ERROR!
+\end{stancode}
+%
+Neither of these programs will compile. If the loop variable \code{n}
+was defined before the for loop, the for-loop declaration will raise
+an error.  If the loop variable \code{n} was not defined before the
+for loop, then the use of the expression \code{z[n]} will raise an
+error.
+
+\subsection{Local Variable Declarations}
+
+A for loop has a statement as a body.  It is often convenient in
+writing programs to be able to define a local variable that will be
+used temporarily and then forgotten.  For instance, the for loop
+example of repeated assignment should use a local variable for maximum
+clarity and efficiency, as in the following example.
+%
+\begin{stancode}
+for (n in 1:N) {
+  real theta;
+  theta = inv_logit(alpha + x[n] * beta);
+  y[n] ~ bernoulli(theta);
+}
+\end{stancode}
+%
+The local variable \code{theta} is declared here inside the for loop.
+The scope of a local variable is just the block in which it is
+defined.  Thus \code{theta} is available for use inside the for loop,
+but not outside of it.  As in other situations, Stan does not allow
+variable hiding.  So it is illegal to declare a local variable
+\code{theta} if the variable theta is already defined in the scope of
+the for loop.  For instance, the following is not legal.
+%
+\begin{stancode}
+for (m in 1:M) {
+  real theta;
+  for (n in 1:N) {
+    real theta; // ERROR!
+    theta = inv_logit(alpha + x[m,n] * beta);
+    y[m,n] ~ bernoulli(theta);
+// ...
+\end{stancode}
+%
+The compiler will flag the second declaration of \code{theta} with a
+message that it is already defined.
+
+\subsection{No Constraints on Local Variables}
+
+Local variables may not have constraints on their declaration.  The
+only types that may be used are
+%
+\begin{quote}
+\code{int}, \code{real},
+\code{vector[K]}, \code{row\_vector[K]}, and \code{matrix[M,N]}.
+\end{quote}
+
+\subsection{Blocks within Blocks}
+
+A block is itself a statement, so anywhere a sequence of statements is
+allowed, one or more of the statements may be a block.  For instance,
+in a for loop, it is legal to have the following
+%
+\begin{stancode}
+for (m in 1:M) {
+  {
+     int n;
+     n = 2 * m;
+     sum = sum + n
+  }
+  for (n in 1:N)
+    sum = sum + x[m,n];
+}
+\end{stancode}
+%
+The variable declaration \code{int n;} is the first element of an
+embedded block and so has scope within that block.  The for loop
+defines its own local block implicitly over the statement following it
+in which the loop variable is defined.  As far as Stan is concerned,
+these two uses of \code{n} are unrelated.
+
+\section{Break and Continue Statements}
+
+The one-token statements \code{continue} and \code{break} may be used
+within loops to alter control flow;  \code{continue} causes the next
+iteration of the loop to run immediately, whereas \code{break}
+terminates the loop and causes execution to resume after the loop.
+Both control structures must appear in loops.  Both \code{break} and
+\code{continue} scope to the most deeply nested loop, but pass through
+non-loop statements.
+
+Although these control statements may seem undesirable because of
+their goto-like behavior, their judicious use can greatly improve
+readability by reducing the level of nesting or eliminating bookeeping
+inside loops.
+
+\subsection{Break Statements}
+
+When a \code{break} statement is executed, the most deeply nested loop
+currently being executed is ended and execution picks up with the next
+statement after the loop.  For example, consider the following
+program:
+%
+\begin{stancode}
+while (1) {
+  if (n < 0) break;
+  foo(n);
+  n = n - 1;
+}
+\end{stancode}
+%
+The \code{while~(1)} loop is a ``forever'' loop, because \code{1} is
+the true value, so the test always succeeds.  Within the loop, if the
+value of \code{n} is less than 0, the loop terminates, otherwise it
+executes \code{foo(n)} and then decrements \code{n}.  The statement
+above does exactly the same thing as
+%
+\begin{stancode}
+while (n >= 0) {
+  foo(n);
+  n = n - 1;
+}
+\end{stancode}
+%
+This case is simply illustrative of the behavior; it is not a case
+where a \code{break} simplifies the loop.
+
+\subsection{Continue Statements}
+
+The \code{continue} statement ends the current operation of the loop
+and returns to the condition at the top of the loop.  Such loops are
+typically used to exclude some values from calculations.  For example,
+we could use the following loop to sum the positive values in the
+array \code{x},
+%
+\begin{stancode}
+real sum;
+sum = 0;
+for (n in 1:size(x)) {
+  if (x[n] <= 0) continue;
+  sum = sum + x[n];
+}
+\end{stancode}
+%
+When the continue statement is executed, control jumps back to the
+conditional part of the loop.  With while and for loops, this causes
+control to return to the conditional of the loop.  With for loops,
+this advances the loop variable, so the the above program will not go
+into an infinite loop when faced with an \code{x[n]} less than zero.
+Thus the above program could be rewritten with deeper nesting by
+reversing the conditional,
+%
+\begin{stancode}
+real sum;
+sum = 0;
+for (n in 1:size(x)) {
+  if (x[n] > 0)
+    sum = sum + x[n];
+}
+\end{stancode}
+%
+While the latter form may seem more readable in this simple case, the
+former has the main line of execution nested one level less deep.
+Instead, the conditional at the top finds cases to exclude and doesn't
+require the same level of nesting for code that's not excluded.  When
+there are several such exclusion conditions, the break or continue
+versions tend to be much easier to read.
+
+\subsection{Breaking and Continuing Nested Loops}
+
+If there is a loop nested within a loop, a \code{break} or
+\code{continue} statement only breaks out of the inner loop. So
+%
+\begin{stancode}
+while (cond1) {
+  ...
+  while (cond2) {
+    ...
+    if (cond3) break;
+    ...
+  }
+  // execution continues here after break
+  ...
+}
+\end{stancode}
+%
+If the break is triggered by \code{cond3} being true, execution will
+continue after the nested loop.
+
+As with break statements, continue statements go back to the top of
+the most deeply nested loop in which the \code{continue} appears.  
+
+Although break and continue must appear within loops, they may appear
+in nested statements within loops, such as within the conditionals
+shown above or within nested statements.  The break and continue
+statements jump past any control structure other than while-loops and
+for-loops.
+
+\section{Print Statements}\label{print-statements.section}
+
+Stan provides print statements that can print literal strings and the
+values of expressions.  Print statements accept any number of
+arguments.  Consider the following for-each statement with a print
+statement in its body.
+%
+\begin{stancode}
+for (n in 1:N) { print("loop iteration: ", n); ... }
+\end{stancode}
+%
+The print statement will execute every time the body of the loop does.
+Each time the loop body is executed, it will print the string ``loop iteration:
+'' (with the trailing space), followed by the value of the expression
+\code{n}, followed by a new line.
+
+\subsection{Print Content}
+
+The text printed by a print statement varies based on its content.  A
+literal (i.e., quoted) string in a print statement always prints
+exactly that string (without the quotes).  Expressions in print
+statements result in the value of the expression being printed.
+But how the value of the expression is formatted will depend on its type.
+
+Printing a simple \code{real} or \code{int} typed variable always
+prints the variable's value.%
+%
+\footnote{The adjoint component is always zero during execution for
+  the algorithmic differentiation variables used to implement
+  parameters, transformed parameters, and local variables in the model.}
+%
+For array, vector, and matrix variables, the print format uses
+brackets.  For example, a 3-vector will print as
+%
+\begin{stancode}
+[1,2,3]
+\end{stancode}
+%
+and a $2 \times 3$-matrix as
+%
+\begin{stancode}
+[[1,2,3],[4,5,6]]
+\end{stancode}
+%
+
+Printing a more readable version of arrays or matrices can be done
+with loops.  An example is the print statement in the following
+transformed data block.
+%
+\begin{stancode}
+transformed data {
+  matrix[2,2] u;
+  u[1,1] = 1.0;  u[1,2] = 4.0;
+  u[2,1] = 9.0;  u[2,2] = 16.0;
+  for (n in 1:2)
+    print("u[", n, "] = ", u[n]);
+}
+\end{stancode}
+%
+This print statement executes twice, printing the following two lines
+of output.
+%
+\begin{stancode}
+u[1] = [1,4]
+u[2] = [9,16]
+\end{stancode}
+
+
+
+\subsection{Print Frequency}
+
+Printing for a print statement happens every time it is executed.  The
+\code{transformed data} block is executed once per chain, the
+\code{transformed parameter} and \code{model} blocks once per leapfrog
+step, and the \code{generated quantities} block once per iteration.
+
+\subsection{String Literals}
+
+String literals begin and end with a double quote character
+(\Verb|"|).  The characters between the double quote characters may be
+the space character or any visible ASCII character, with the exception
+of the backslash character (\Verb|\|) and double quote character
+(\Verb|"|).  The full list of visible ASCII characters is as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+a b c d e f g h i j k l m n o p q r s t u v w x y z
+A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+0 1 2 3 4 5 6 7 8 9 0 ~ @ # $ % ^ & * _ ' ` - + = {
+} [ ] ( ) < > | / ! ? . , ; :
+\end{Verbatim}
+\end{quote}
+%$ to fix AUXTeX highlighting
+
+\subsection{Debug by \code{print}}
+
+Because Stan is an imperative language, print statements can be very
+useful for debugging.  They can be used to display the values of
+variables or expressions at various points in the execution of a
+program.  They are particularly useful for spotting problematic
+not-a-number of infinite values, both of which will be printed.
+
+It is particularly useful to print the value of the log probability
+accumulator (see \refsection{get-lp}), as in the following example.
+%
+\begin{stancode}
+vector[2] y;
+y[1] = 1;
+print("lp before =",get_lp());
+y ~ normal(0,1); // bug!  y[2] not defined
+print("lp after =",get_lp());
+\end{stancode}
+%
+The example has a bug in that \code{y[2]} is not defined before the
+vector \code{y} is used in the sampling statement.  By printing the
+value of the log probability accumulator before and after each
+sampling statement, it's possible to isolate where the log probability
+becomes ill-defined (i.e., becomes not-a-number).
+
+\section{Reject Statements}\label{reject-statements.section}
+
+The Stan \code{reject} statement provides a mechanism to
+report errors or problematic values encountered during program
+execution and either halt processing or reject samples or optimization
+iterations.
+
+Like the \code{print} statement, the reject statement accepts
+any number of quoted string literals or Stan expressions as arguments.
+
+Reject statements are typically embedded in a conditional
+statement in order to detect variables in illegal states.  For
+example, the following code handles the case where a variable \code{x}'s
+value is negative.
+%
+\begin{stancode}
+if (x < 0)
+  reject("x must not be negative; found x=", x);
+\end{stancode}
+
+\subsection{Behavior of Reject Statements}
+
+Reject statements have the same behavior as exceptions thrown by
+built-in Stan functions.  For example, the \code{normal\_lpdf} function
+raises an exception if the input scale is not positive and finite.
+The effect of a reject statement depends on the program block in which
+the rejection occurs.
+
+In all cases of rejection, the interface accessing the Stan
+program should print the arguments to the reject statement.
+
+\subsubsection{Rejections in Functions}
+
+Rejections in user-defined functions are just passed to the
+calling function or program block.  Reject statements can be used in
+functions to validate the function arguments, allowing user-defined
+functions to fully emulate built-in function behavior.  It is better
+to find out earlier rather than later when there is a problem.
+
+\subsubsection{Fatal Exception Contexts}
+
+In both the transformed data block and generated quantities block,
+rejections are fatal.  This is because if initialization fails or if
+generating output fails, there is no way to recover values.
+
+Reject statements placed in the transformed data block can be used
+to validate both the data and transformed data (if any).  This allows
+more complicated constraints to be enforced that can be specified with
+Stan's constrained variable declarations.
+
+
+\subsubsection{Recoverable Rejection Contexts}
+
+Rejections in the transformed parameters and model blocks are
+not in and of themselves instantly fatal.  The result has the same
+effect as assigning a $-\infty$ log probability, which causes
+rejection of the current proposal in MCMC samplers and adjustment of
+search parameters in optimization.
+
+If the log probability function results in a rejection every time it is
+called, the containing application (MCMC sampler or optimization)
+should diagnose this problem and terminate with an appropriate error
+message.  To aid in diagnosing problems, the message for each
+reject statement will be printed as a result of executing it.
+
+
+\subsection{Rejection is not for Constraints}
+
+Rejection should be used for error handling, not defining arbitrary
+constraints.  Consider the following errorful Stan program.
+%
+\begin{stancode}
+parameters {
+  real a;
+  real<lower=a> b;
+  real<lower=a, upper=b> theta;
+  ...
+model {
+  // **wrong** needs explicit truncation
+  theta ~ normal(0, 1); 
+  ...
+\end{stancode}
+%
+This program is wrong because its truncation bounds on \code{theta}
+depend on parameters, and thus need to be accounted for using an
+explicit truncation on the distribution.  This is the right way to do
+it.  
+%
+\begin{stancode}
+  theta ~ normal(0, 1) T[a,b];
+\end{stancode}
+%
+The conceptual issue is that the prior does not integrate to one over
+the admissible parameter space; it integrates to one over all real
+numbers and integrates to something less than one over $[a,b]$; in these
+simple univariate cases, we can overcome that with the T[,] notation,
+which essentially divides by whatever the prior integrates to over
+$[a,b]$.  
+
+This problem is exactly the same problem as you would get using reject
+statements to enforce complicated inequalities on multivariate
+functions.  In this case, it is wrong to try to deal with truncation
+through constraints.
+%
+\begin{stancode}
+  if (theta < a || theta > b)
+    reject("theta not in (a, b)");
+  // still **wrong**, needs T[a,b]
+  theta ~ normal(0, 1);
+\end{stancode} 
+%
+In this case, the prior integrates to something less than one over the
+region of the parameter space where the complicated inequalities are
+satisfied. But we don't generally know what value the prior integrates
+to, so we can't increment the log probability function to compensate.
+
+Even if this adjustment to a proper probability model may seem like
+``no big deal'' in particular models where the amount of truncated
+posterior density is negligible or constant, we can't sample from that
+truncated posterior efficiently.  Programs need to use one-to-one
+mappings that guarantee the constraints are satisfied and only use
+reject statements to raise errors or help with debugging.
+
+
 
 \chapter{Program Blocks}\label{blocks.chapter}
 
