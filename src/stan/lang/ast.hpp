@@ -90,6 +90,9 @@ namespace stan {
     const int void_function_argument_origin_rng = 12;
 
     bool is_data_origin(const var_origin& vo);
+
+    bool is_fun_origin(const var_origin& vo);
+    
     void print_var_origin(std::ostream& o, const var_origin& vo);
 
 
@@ -1235,6 +1238,7 @@ namespace stan {
     std::string strip_ccdf_suffix(const std::string& dist_fun);
 
     bool fun_name_exists(const std::string& name);
+
 
   }
 }

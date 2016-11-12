@@ -379,7 +379,7 @@ namespace stan {
                   == expr.false_val_.expression_type()));
 
         std::stringstream ss;
-        if (expr.var_origin_ > local_origin) {
+        if (is_fun_origin(expr.var_origin_)) {
           ss << "fun_scalar_t__";
         } else if (is_var_context_) {
           ss << "T__";

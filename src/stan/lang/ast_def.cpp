@@ -1277,6 +1277,15 @@ namespace stan {
       return vo == data_origin || vo == transformed_data_origin;
     }
 
+    bool is_fun_origin(const var_origin& vo) {
+      return vo == function_argument_origin
+        || vo == function_argument_origin_lp
+        || vo == function_argument_origin_rng
+        || vo == void_function_argument_origin
+        || vo == void_function_argument_origin_lp
+        || vo == void_function_argument_origin_rng;
+    }
+
     void print_var_origin(std::ostream& o, const var_origin& vo) {
       if (vo == model_name_origin)
         o << "model name";
