@@ -719,7 +719,7 @@ namespace stan {
     expr_type expression_type_vis::operator()(const double_literal& e) const {
       return e.type_;
     }
-    expr_type expression_type_vis::operator()(const array_literal& e) const {
+    expr_type expression_type_vis::operator()(const array_expr& e) const {
       return e.type_;
     }
     expr_type expression_type_vis::operator()(const variable& e) const {
@@ -766,7 +766,7 @@ namespace stan {
     expression::expression(const nil& expr) : expr_(expr) { }
     expression::expression(const int_literal& expr) : expr_(expr) { }
     expression::expression(const double_literal& expr) : expr_(expr) { }
-    expression::expression(const array_literal& expr) : expr_(expr) { }
+    expression::expression(const array_expr& expr) : expr_(expr) { }
     expression::expression(const variable& expr) : expr_(expr) { }
     expression::expression(const integrate_ode& expr) : expr_(expr) { }
     expression::expression(const integrate_ode_control& expr) : expr_(expr) { }
@@ -808,7 +808,7 @@ namespace stan {
     bool contains_var::operator()(const double_literal& e) const {
       return false;
     }
-    bool contains_var::operator()(const array_literal& e) const {
+    bool contains_var::operator()(const array_expr& e) const {
       for (size_t i = 0; i < e.args_.size(); ++i)
         if (boost::apply_visitor(*this, e.args_[i].expr_))
           return true;
@@ -903,7 +903,7 @@ namespace stan {
     bool contains_nonparam_var::operator()(const double_literal& e) const {
       return false;
     }
-    bool contains_nonparam_var::operator()(const array_literal& e) const {
+    bool contains_nonparam_var::operator()(const array_expr& e) const {
       for (size_t i = 0; i < e.args_.size(); ++i)
         if (boost::apply_visitor(*this, e.args_[i].expr_))
           return true;
@@ -986,7 +986,7 @@ namespace stan {
     bool is_nil_op::operator()(const double_literal& /* x */) const {
       return false;
     }
-    bool is_nil_op::operator()(const array_literal& /* x */)
+    bool is_nil_op::operator()(const array_expr& /* x */)
       const { return false; }
     bool is_nil_op::operator()(const variable& /* x */) const { return false; }
     bool is_nil_op::operator()(const integrate_ode& /* x */) const {
@@ -1050,15 +1050,15 @@ namespace stan {
     }
 
 
-    array_literal::array_literal()
+    array_expr::array_expr()
       : args_(),
         type_(DOUBLE_T, 1U) {
     }
-    array_literal::array_literal(const std::vector<expression>& args)
+    array_expr::array_expr(const std::vector<expression>& args)
       : args_(args),
         type_() {  // ill-formed w/o help
     }
-    array_literal& array_literal::operator=(const array_literal& al) {
+    array_expr& array_expr::operator=(const array_expr& al) {
       args_ = al.args_;
       type_ = al.type_;
       return *this;
@@ -2012,8 +2012,8 @@ namespace stan {
     bool var_occurs_vis::operator()(const double_literal& e) const {
       return false;
     }
-    bool var_occurs_vis::operator()(const array_literal& e) const {
-      return false;  // TODO(carpenter): update for array_literal
+    bool var_occurs_vis::operator()(const array_expr& e) const {
+      return false;  // TODO(carpenter): update for array_expr
     }
     bool var_occurs_vis::operator()(const variable& e) const {
       return var_name_ == e.name_;

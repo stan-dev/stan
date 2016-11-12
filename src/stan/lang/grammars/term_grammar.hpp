@@ -39,6 +39,10 @@ namespace stan {
                               whitespace_grammar<Iterator> >
       args_r;
 
+      boost::spirit::qi::rule<Iterator,
+                              array_expr(var_origin),
+                              whitespace_grammar<Iterator> >
+      array_expr_r;
 
       boost::spirit::qi::rule<Iterator,
                               expression(var_origin),

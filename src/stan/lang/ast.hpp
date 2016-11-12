@@ -18,7 +18,7 @@ namespace stan {
     struct nil { };
 
     // components of abstract syntax tree
-    struct array_literal;
+    struct array_expr;
     struct assignment;
     struct assgn;
     struct binary_op;
@@ -229,7 +229,7 @@ namespace stan {
       expr_type operator()(const nil& e) const;
       expr_type operator()(const int_literal& e) const;
       expr_type operator()(const double_literal& e) const;
-      expr_type operator()(const array_literal& e) const;
+      expr_type operator()(const array_expr& e) const;
       expr_type operator()(const variable& e) const;
       expr_type operator()(const fun& e) const;
       expr_type operator()(const integrate_ode& e) const;
@@ -248,7 +248,7 @@ namespace stan {
       typedef boost::variant<boost::recursive_wrapper<nil>,
                              boost::recursive_wrapper<int_literal>,
                              boost::recursive_wrapper<double_literal>,
-                             boost::recursive_wrapper<array_literal>,
+                             boost::recursive_wrapper<array_expr>,
                              boost::recursive_wrapper<variable>,
                              boost::recursive_wrapper<integrate_ode>,
                              boost::recursive_wrapper<integrate_ode_control>,
@@ -267,7 +267,7 @@ namespace stan {
       expression(const nil& expr);  // NOLINT(runtime/explicit)
       expression(const int_literal& expr);  // NOLINT(runtime/explicit)
       expression(const double_literal& expr);  // NOLINT(runtime/explicit)
-      expression(const array_literal& expr);  // NOLINT(runtime/explicit)
+      expression(const array_expr& expr);  // NOLINT(runtime/explicit)
       expression(const variable& expr);  // NOLINT(runtime/explicit)
       expression(const fun& expr);  // NOLINT(runtime/explicit)
       expression(const integrate_ode& expr);  // NOLINT(runtime/explicit)
@@ -309,7 +309,7 @@ namespace stan {
       bool operator()(const nil& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const int_literal& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const double_literal& x) const;  // NOLINT
-      bool operator()(const array_literal& x) const;  // NOLINT
+      bool operator()(const array_expr& x) const;  // NOLINT
       bool operator()(const variable& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const integrate_ode& x) const;  // NOLINT
       bool operator()(const integrate_ode_control& x) const;  // NOLINT
@@ -350,12 +350,12 @@ namespace stan {
       double_literal& operator=(const double_literal& dl);
     };
 
-    struct array_literal {
+    struct array_expr {
       std::vector<expression> args_;
       expr_type type_;
-      array_literal();
-      array_literal(const std::vector<expression>& args);  // NOLINT
-      array_literal& operator=(const array_literal& al);
+      array_expr();
+      array_expr(const std::vector<expression>& args);  // NOLINT
+      array_expr& operator=(const array_expr& al);
     };
 
     struct variable {
@@ -1086,7 +1086,7 @@ namespace stan {
       bool operator()(const nil& e) const;
       bool operator()(const int_literal& e) const;
       bool operator()(const double_literal& e) const;
-      bool operator()(const array_literal& e) const;
+      bool operator()(const array_expr& e) const;
       bool operator()(const variable& e) const;
       bool operator()(const fun& e) const;
       bool operator()(const integrate_ode& e) const;
@@ -1141,7 +1141,7 @@ namespace stan {
       bool operator()(const nil& e) const;
       bool operator()(const int_literal& e) const;
       bool operator()(const double_literal& e) const;
-      bool operator()(const array_literal& e) const;
+      bool operator()(const array_expr& e) const;
       bool operator()(const variable& e) const;
       bool operator()(const integrate_ode& e) const;
       bool operator()(const integrate_ode_control& e) const;
@@ -1178,7 +1178,7 @@ namespace stan {
       bool operator()(const nil& e) const;
       bool operator()(const int_literal& e) const;
       bool operator()(const double_literal& e) const;
-      bool operator()(const array_literal& e) const;
+      bool operator()(const array_expr& e) const;
       bool operator()(const variable& e) const;
       bool operator()(const integrate_ode& e) const;
       bool operator()(const integrate_ode_control& e) const;

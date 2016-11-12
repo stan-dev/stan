@@ -49,6 +49,9 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::fun,
                           (std::string, name_)
                           (std::vector<stan::lang::expression>, args_) )
 
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::array_expr,
+                          (std::vector<stan::lang::expression>, args_) )
+
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::int_literal,
                           (int, val_)
                           (stan::lang::expr_type, type_))
@@ -74,6 +77,7 @@ namespace stan {
       using boost::spirit::qi::_1;
       using boost::spirit::qi::_a;
       using boost::spirit::qi::_b;
+      using boost::spirit::qi::_c;
       using boost::spirit::qi::char_;
       using boost::spirit::qi::double_;
       using boost::spirit::qi::eps;
