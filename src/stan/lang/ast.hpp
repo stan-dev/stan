@@ -92,7 +92,7 @@ namespace stan {
     bool is_data_origin(const var_origin& vo);
 
     bool is_fun_origin(const var_origin& vo);
-    
+
     void print_var_origin(std::ostream& o, const var_origin& vo);
 
 
