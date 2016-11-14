@@ -1,0 +1,1394 @@
+\part{Inference}
+
+\chapter{Bayesian Data Analysis}\label{bayesian.chapter}
+
+\noindent
+\cite{GelmanEtAl:2013} provide the following
+characterization of Bayesian data analysis.
+%
+\begin{quote}
+  By Bayesian data analysis, we mean practical methods for making
+  inferences from data using probability models for quantities we
+  observe and about which we wish to learn.
+\end{quote}
+%
+They go on to describe how Bayesian statistics differs from
+frequentist approaches.
+%
+\begin{quote}
+  The essential characteristic of Bayesian methods is their explicit
+  use of probability for quantifying uncertainty in inferences based
+  on statistical analysis.
+\end{quote}
+%
+Because they view probability as the limit of relative frequencies of
+observations, strict frequentists forbid probability statements about
+parameters.  Parameters are considered fixed, not random.
+
+Bayesians also treat parameters as fixed but unknown.  But unlike
+frequentists, they make use of both prior distributions over
+parameters and posterior distributions over parameters.  These prior
+and posterior probabilities and posterior predictive probabilities are
+intended to characterize knowledge about the parameters and future
+observables.  Posterior distributions form the basis of Bayesian
+inference, as described below.
+
+\section{Bayesian Modeling}
+
+\citep{GelmanEtAl:2013} break applied Bayesian modeling
+into the following three steps.
+%
+\begin{enumerate}
+\item  Set up a full probability model for all observable and
+  unobservable quantities.  This model should be consistent with
+  existing knowledge of the data being modeled and how it was
+  collected.
+\item Calculate the posterior probability of unknown quantities
+  conditioned on observed quantities.  The unknowns may include
+  unobservable quantities such as parameters and potentially
+  observable quantities such as predictions for future observations.
+\item Evaluate the model fit to the data.  This includes evaluating
+  the implications of the posterior.
+\end{enumerate}
+%
+Typically, this cycle will be repeated until a sufficient fit is
+achieved in the third step.  \Stan automates the calculations involved
+in the second and third steps.
+
+\section{Bayesian Inference}
+
+\subsection{Basic Quantities}
+
+The mechanics of Bayesian inference follow directly from Bayes's rule.
+To fix notation, let $y$ represent observed quantities such as data
+and let $\theta$ represent unknown quantities such as parameters and
+future observations.  Both $y$ and $\theta$ will be modeled as random.
+Let $x$ represent known, but unmodeled quantities such as constants,
+hyperparameters, and predictors.
+
+\subsection{Probability Functions}
+
+The probability function $p(y,\theta)$ is the joint probability
+function of the data $y$ and parameters $\theta$.  The constants and
+predictors $x$ are implicitly understood as being part of the
+conditioning.  The conditional probability function $p(y|\theta)$ of
+the data $y$ given parameters $\theta$ and constants $x$ is called the
+sampling probability function; it is also called the likelihood
+function when viewed as a function of $\theta$ for fixed $y$ and $x$.
+
+The probability function $p(\theta)$ over the parameters given the
+constants $x$ is called the prior because it characterizes the probability
+of the parameters before any data is observed.  The conditional
+probability function $p(\theta|y)$ is called the posterior because
+it characterizes the probability of parameters given observed data $y$
+and constants $x$.
+
+\subsection{Bayes's Rule}
+
+The technical apparatus of Bayesian inference hinges on the following
+chain of equations, known in various forms as Bayes's rule (where
+again, the constants $x$ are implicit).
+%
+\[
+\begin{array}{rcll}
+p(\theta|y)  & =  & \displaystyle \frac{p(\theta,y)}{p(y)}
+& \mbox{{} \ \ \ \ \ [definition of  conditional probability]}
+\\[16pt]
+& = & \displaystyle \frac{p(y|\theta) \, p(\theta)}{p(y)}
+& \mbox{{} \ \ \ \ \ [chain rule]}
+\\[16pt]
+& = & \displaystyle \frac{p(y|\theta) \, p(\theta)}
+                        {\int_{\Theta} p(y,\theta) \, d\theta}
+& \mbox{{} \ \ \ \ \ [law of total probability]}
+\\[16pt]
+& = & \displaystyle \frac{p(y|\theta) \, p(\theta)}
+                        {\int_{\Theta} p(y|\theta) \, p(\theta) \, d\theta}
+& \mbox{{} \ \ \ \ \ [chain rule]}
+\\[16pt]
+& \propto & \displaystyle p(y|\theta) \, p(\theta)
+& \mbox{{} \ \ \ \ \ [$y$ is fixed]}
+\end{array}
+\]
+%
+Bayes's rule ``inverts'' the probability of the posterior
+$p(\theta|y)$, expressing it solely in terms of the likelihood
+$p(y|\theta)$ and prior $p(\theta)$ (again, with constants and
+predictors $x$ implicit).  The last step is important for \Stan, which
+only requires probability functions to be characterized up to a
+constant multiplier.
+
+\subsection{Predictive Inference}
+
+The uncertainty in the estimation of parameters $\theta$ from the data
+$y$ (given the model) is characterized by the posterior $p(\theta|y)$.
+The posterior is thus crucial for Bayesian predictive inference.
+
+If $\tilde{y}$ is taken to represent new, perhaps as yet unknown,
+observations, along with corresponding constants and predictors
+$\tilde{x}$, then the posterior predictive probability function is
+given by
+%
+\[
+p(\tilde{y}|y)
+= \int_{\Theta} p(\tilde{y}|\theta)
+                \, p(\theta|y) \, d\theta.
+\]
+Here, both the original constants and predictors $x$ and the new
+constants and predictors $\tilde{x}$ are implicit.  Like the posterior
+itself, predictive inference is characterized probabilistically.
+Rather than using a point estimate of the parameters $\theta$,
+predictions are made based on averaging the predictions over a range
+of $\theta$ weighted by the posterior probability $p(\theta|y)$ of
+$\theta$ given data $y$ (and constants $x$).
+
+The posterior may also be used to estimate event probabilities.  For
+instance, the probability that a parameter $\theta_k$ is greater than
+zero is characterized probabilistically by
+%
+\[
+\mbox{Pr}[\theta_k > 0]
+= \int_{\Theta} \mbox{I}(\theta_k > 0) \, p(\theta|y) \, d\theta.
+\]
+%
+The indicator function, $\mbox{I}(\phi)$, evaluates to one if the
+proposition $\phi$ is true and evaluates to zero otherwise.
+
+Comparisons involving future observables may be carried out in
+the same way.  For example, the probability that $\tilde{y}_n >
+\tilde{y}_{n'}$ can be characterized using the posterior predictive
+probability function as
+\[
+\mbox{Pr}[\tilde{y}_n > \tilde{y}_{n'}]
+= \int_{\Theta} \int_{Y} \mbox{I}(\tilde{y}_n > \tilde{y}_{n'}) \,
+p(\tilde{y}|\theta) p(\theta|y) \, d\tilde{y} \, d\theta.
+\]
+
+
+\subsection{Posterior Predictive Checking}
+
+After the parameters are fit to data, they can be used to simulate a
+new data set by running the model inferences in the forward
+direction.  These replicated data sets can then be compared to the
+original data either visually or statistically to assess model fit
+\citep[Chapter 6]{GelmanEtAl:2013}.
+
+In Stan, posterior simulations can be generated in two ways.  The
+first approach is to treat the predicted variables as parameters and
+then define their distributions in the model block.  The second
+approach, which also works for discrete variables, is to generate
+replicated data using random-number generators in the generated
+quantities block.
+
+
+
+\chapter{Markov Chain Monte Carlo Sampling}\label{mcmc.chapter}
+
+\noindent
+\Stan uses Markov chain Monte Carlo (\MCMC) techniques to
+generate samples from the posterior distribution for inference.
+
+
+\section{Monte Carlo Sampling}
+
+Monte Carlo methods were developed to numerically approximate
+integrals that are not tractable analytically but for which evaluation
+of the function being integrated is tractable
+\citep{MetropolisUlam:1949}.
+
+For example, the mean $\mu$ of a probability density $p(\theta)$ is
+defined by the integral
+\[
+\mu = \int_{\Theta} \, \theta \times p(\theta) \, d\theta.
+\]
+For even a moderately complex Bayesian model, the posterior density
+$p(\theta|y)$ leads to an integral that is impossible to evaluate
+analytically.  The posterior also depends on the constants and
+predictors $x$, but from here, they will just be elided and taken as
+given.
+
+Now suppose it is possible to draw independent samples from
+$p(\theta)$ and let $\theta^{(1)},\theta^{(2)},\ldots,\theta^{(N)}$ be
+$N$ such samples.  A Monte Carlo estimate $\hat{\mu}$ of the mean
+$\mu$ of $p(\theta)$ is given by the sample average,
+\[
+\hat{\mu} = \frac{1}{N} \sum_{n=1}^N \theta^{(n)}.
+\]
+
+If the probability function $p(\theta)$ has a finite mean and
+variance, the law of large numbers ensures the Monte Carlo estimate
+converges to the correct value as the number of samples increases,
+\[
+\lim_{N \rightarrow \infty} \hat{\mu} = \mu.
+\]
+Assuming finite mean and variance, estimation error is governed by the
+central limit theorem, so that estimation error decreases as the
+square root of $N$,
+\[
+|\mu - \hat{\mu}| \propto \frac{1}{\sqrt{N}}.
+\]
+Therefore, estimating a mean to an extra decimal place of accuracy
+requires one hundred times more samples; adding two decimal places
+means ten thousand times as many samples.  This makes Monte Carlo
+methods more useful for rough estimates to within a few decimal places
+than highly precise estimates.  In practical applications, there is no
+point estimating a quantity beyond the uncertainty of the data sample
+on which it is based, so this lack of many decimal places of accuracy
+is rarely a problem in practice for statistical models.
+
+
+\section{Markov Chain Monte Carlo Sampling}
+
+Markov chain Monte Carlo (\MCMC) methods were developed for situations
+in which it is not straightforward to draw independent samples
+\citep{Metropolis:1953}.
+
+A Markov chain is a sequence of random variables $\theta^{(1)},
+\theta^{(2)},\ldots$ where each variable is conditionally independent
+of all other variables given the value of the previous value.  Thus if
+$\theta = \theta^{(1)}, \theta^{(2)},\ldots, \theta^{(N)}$, then
+\[
+p(\theta) = p(\theta^{(1)}) \prod_{n=2}^N p(\theta^{(n)}|\theta^{(n-1)}).
+\]
+Stan uses Hamiltonian Monte Carlo to generate a next state in a manner
+described in \refchapter{hmc}.
+
+The Markov chains \Stan and other \MCMC samplers generate are ergodic
+in the sense required by the Markov chain central limit theorem,
+meaning roughly that there is a reasonable chance of reaching
+one value of $\theta$ from another.  The Markov chains are also
+stationary, meaning that the transition probabilities do not change at
+different positions in the chain, so that for $n, n' \geq 0$, the
+probability function $p(\theta^{(n+1)}|\theta^{(n)})$ is the same as
+$p(\theta^{(n'+1)}|\theta^{(n')})$ (following the convention of
+overloading random and bound variables and picking out a probability
+function by its arguments).
+
+Stationary Markov chains have an equilibrium distribution on states in
+which each has the same marginal probability function, so that
+$p(\theta^{(n)})$ is the same probability function as
+$p(\theta^{(n+1)})$.  In \Stan, this equilibrium distribution
+$p(\theta^{(n)})$ is the probability function $p(\theta)$ being
+sampled, typically a Bayesian posterior density.
+
+Using \MCMC methods introduces two difficulties that are not faced by
+independent sample Monte Carlo methods.  The first problem is determining
+when a randomly initialized Markov chain has converged to its
+equilibrium distribution.  The second problem is that the draws from a
+Markov chain are correlated, and thus the central limit theorem's
+bound on estimation error no longer applies.  These problems are
+addressed in the next two sections.
+
+
+\section{Initialization and Convergence Monitoring}\label{convergence.section}
+
+A Markov chain generates samples from the target distribution only
+after it has converged to equilibrium.  Unfortunately, this is only
+guaranteed in the limit in theory.  In practice, diagnostics must be
+applied to monitor whether the Markov chain(s) have converged.
+
+\subsection{Potential Scale Reduction}
+
+One way to monitor whether a chain has converged to the equilibrium
+distribution is to compare its behavior to other randomly initialized
+chains.  This is the motivation for the \cite{GelmanRubin:1992}
+potential scale reduction statistic, $\hat{R}$.  The $\hat{R}$
+statistic measures the ratio of the average variance of samples within
+each chain to the variance of the pooled samples across chains; if all
+chains are at equilibrium, these will be the same and $\hat{R}$ will
+be one.  If the chains have not converged to a common distribution,
+the $\hat{R}$ statistic will be greater than one.
+
+Gelman and Rubin's recommendation is that the independent Markov
+chains be initialized with diffuse starting values for the parameters
+and sampled until all values for $\hat{R}$ are below 1.1.  \Stan
+allows users to specify initial values for parameters and it is also
+able to draw diffuse random initializations itself.
+
+The $\hat{R}$ statistic is defined for a set of $M$ Markov chains,
+$\theta_m$, each of which has $N$ samples $\theta^{(n)}_m$.  The
+between-sample variance estimate is
+\[
+B
+= \frac{N}{M-1} \, \sum_{m=1}^M (\bar{\theta}^{(\bullet)}_{m} - \bar{\theta}^{(\bullet)}_{\bullet})^2,
+\]
+%
+where
+%
+\[
+\bar{\theta}_m^{(\bullet)}
+= \frac{1}{N} \sum_{n = 1}^N \theta_m^{(n)}
+\ \ \ \ \
+\mbox{and}
+\ \ \ \ \
+\bar{\theta}^{(\bullet)}_{\bullet}
+= \frac{1}{M} \, \sum_{m=1}^M \bar{\theta}_m^{(\bullet)}.
+\]
+%
+The within-sample variance is
+\[
+W
+= \frac{1}{M} \, \sum_{m=1}^M s_m^2,
+\]
+where
+\[
+s_m^2 = \frac{1}{N-1} \, \sum_{n=1}^N (\theta^{(n)}_m - \bar{\theta}^{(\bullet)}_m)^2.
+\]
+%
+The variance estimator is
+\[
+\widehat{\mbox{var}}^{+}\!(\theta|y)
+= \frac{N-1}{N}\, W \, + \, \frac{1}{N} \, B.
+\]
+%
+Finally, the potential scale reduction statistic is defined by
+\[
+\hat{R}
+\, = \,
+\sqrt{\frac{\widehat{\mbox{var}}^{+}\!(\theta|y)}{W}}.
+\]
+
+\subsection{Generalized $\hat{R}$ for Ragged Chains}
+
+Now suppose that each chain may have a different number of samples.
+Let $N_m$ be the number of samples in chain $m$.  Now the formula for
+the within-chain mean for chain $m$ uses the size of the chain, $N_m$,
+\[
+\bar{\theta}_m^{(\bullet)}
+= \frac{1}{N_m} \sum_{n = 1}^N \theta^{(m)}_n,
+\]
+as does the within-chain variance estimate,
+\[
+s_m^2 = \frac{1}{N_m-1} \, \sum_{n=1}^{N_m} (\theta^{(n)}_m - \bar{\theta}^{(\bullet)}_m)^2.
+\]
+The terms that average over chains, such as
+$\bar{\theta}^{(\bullet)}_{\bullet}$, $B$, and $W$, have the same
+definition as before to ensure that each chain has the same effect on
+the estimate.  If the averages were weighted by size, a single long
+chain would dominate the statistics and defeat the purpose of
+monitoring convergence with multiple chains.
+
+Because it contains the term $N$, the estimate $\widehat{var}^{+}$
+must be generalized.  By expanding the first term,
+\[
+\frac{N-1}{N}\, W \,
+\ = \
+\frac{N-1}{N} \frac{1}{M} \, \sum_{m=1}^M
+\frac{1}{N-1} \, \sum_{n=1}^N (\theta^{(n)}_m -
+\bar{\theta}^{(\bullet)}_m)^2
+\ = \
+\frac{1}{M}
+\sum_{m=1}^M
+\frac{1}{N}
+\sum_{n=1}^N (\theta^{(n)}_m -
+\bar{\theta}^{(\bullet)}_m)^2,
+\]
+and the second term,
+\[
+\frac{1}{N}\, B
+\ = \
+\frac{1}{M-1} \, \sum_{m=1}^M (\bar{\theta}^{(\bullet)}_{m} - \bar{\theta}^{(\bullet)}_{\bullet})^2.
+\]
+the variance estimator naturally generalizes to
+\[
+\widehat{\mbox{var}}^{+}\!(\theta|y)
+=
+\frac{1}{M}
+\sum_{m=1}^M
+\frac{1}{N_m}
+\sum_{n=1}^{N_m} (\theta^{(n)}_m -
+\bar{\theta}^{(\bullet)}_m)^2
++
+\frac{1}{M-1} \, \sum_{m=1}^M (\bar{\theta}^{(\bullet)}_{m} -
+\bar{\theta}^{(\bullet)}_{\bullet})^2.
+\]
+%
+If the chains are all the same length, this definition is equivalent
+to the one in the last section.  This generalized variance estimator
+and the within-chains variance estimates may be plugged directly into
+the formula for $\hat{R}$ from the previous section.
+
+
+\subsection{Split $\hat{R}$ for Detecting Non-Stationarity}
+
+Before calculating the potential-scale-reduction statistic $\hat{R}$,
+each chain may be split into two halves.  This provides an additional
+means to detect non-stationarity in the chains.  If one chain involves
+gradually increasing values and one involves gradually decreasing
+values, they have not mixed well, but they can have $\hat{R}$ values
+near unity.  In this case, splitting each chain into two parts leads
+to $\hat{R}$ values substantially greater than 1 because the first
+half of each chain has not mixed with the second half.
+
+
+\subsection{Convergence is Global}
+
+A question that often arises is whether it is acceptable to monitor
+convergence of only a subset of the parameters or generated
+quantities.  The short answer is ``no,'' but this is elaborated
+further in this section.
+
+For example, consider the value \code{lp\_\_}, which is the log
+posterior density (up to a constant) It is a mistake to declare
+convergence in any practical sense if \code{lp\_\_} has not converged,
+because different chains are really in different parts of the space.
+Yet measuring convergence for \code{lp\_\_} is particularly tricky, as
+noted below.
+
+\subsubsection{Asymptotics and transience vs.\ equilibrium}
+
+Markov chain convergence is a global property in the sense that it
+does not depend on the choice of function of the parameters that is
+monitored.  There is no hard cutoff between pre-convergence
+``transience'' and post-convergence ``equilibrium.''  What happens is
+that as the number of states in the chain approaches infinity, the
+distribution of possible states in the chain approaches the target
+distribution and in that limit the expected value of the Monte Carlo
+estimator of any integrable function converges to the true
+expectation. There is nothing like warmup here, because in the limit,
+the effects of initial state are completely washed out.
+
+\subsubsection{Multivariate convergence of functions}
+
+The $\hat{R}$ statistic considers the composition of a Markov chain
+and a function, and if the Markov chain has converged then each Markov
+chain and function composition will have converged. Multivariate
+functions converge when all of their margins have converged by the
+Cramer-Wold theorem.
+
+The transformation from unconstrained space to constrained space is
+just another function, so does not effect convergence.
+
+Different functions may have different autocorrelations, but if the
+Markov chain has equilibrated then all Markov chain plus function
+compositions should be consistent with convergence. Formally, any
+function that appears inconsistent is of concern and although it would
+be unreasonable to test every function, \code{lp\_\_} and other
+measured quantities should at least be consistent.
+
+The obvious difference in \code{lp\_\_} is that it tends to vary
+quickly with position and is consequently susceptible to outliers.
+
+\subsubsection{Finite numbers of states}
+
+The question is what happens for finite numbers of states? If we can
+prove a strong geometric ergodicity property (which depends on the
+sampler and the target distribution), then one can show that there
+exists a finite time after which the chain forgets its initial state
+with a large probability. This is both the autocorrelation time and
+the warmup time.  But even if you can show it exists and is finite
+(which is nigh impossible) you can't compute an actual value
+analytically.
+
+So what we do in practice is hope that the finite number of draws is
+large enough for the expectations to be reasonably accurate. Removing
+warmup iterations improves the accuracy of the expectations but there
+is no guarantee that removing any finite number of samples will be
+enough.
+
+\subsubsection{Why inconsistent $\hat{R}$?}
+
+There are two things to worry about here.
+
+Firstly, as noted above, for any finite number of draws, there will
+always be some residual effect of the initial state, which typically
+manifests as some small (or large if the autocorrelation time is huge)
+probability of having a large outlier. Functions robust to such
+outliers (say, quantiles) will appear more stable and have better
+$\hat{R}$. Functions vulnerable to such outliers may show fragility.
+
+Secondly, use of the $\hat{R}$ statistic makes very strong
+assumptions. In particular, it assumes that the functions being
+considered are Gaussian or it only uses the first two moments and
+assumes some kind of independence.  The point is that strong
+assumptions are made that do not always hold. In particular, the
+distribution for the log posterior density (\code{lp\_\_}) almost
+never looks Gaussian, instead it features long tails that can lead to
+large $\hat{R}$ even in the large $N$ limit.  Tweaks to $\hat{R}$,
+such as using quantiles in place of raw values, have the flavor of
+making the samples of interest more Gaussian and hence the $\hat{R}$
+statistic more accurate.
+
+\subsubsection{Final words on convergence monitoring}
+
+``Convergence'' is a global property and holds for all integrable
+functions at once, but employing the $\hat{R}$ statistic requires
+additional assumptions and thus may not work for all functions equally
+well.
+
+Note that if you just compare the expectations between chains then we
+can rely on the Markov chain asymptotics for Gaussian distributions
+and can apply the standard tests.
+
+
+
+\section{Effective Sample Size}\label{effective-sample-size.section}
+
+The second technical difficulty posed by \MCMC methods is that the
+samples will typically be autocorrelated within a chain.  This
+increases the uncertainty of the estimation of posterior quantities of
+interest, such as means, variances or quantiles.
+
+A nice introductory reference for analyzing MCMC results in general
+and effective sample size in particular is \citep{Geyer:2011}.  The
+particular calculations used by Stan follow those for split-$\hat{R}$,
+which involve both cross-chain (mean) and within-chain calculations
+(autocorrelation); they were introduced in this manual and explained
+in more detail in \citep{GelmanEtAl:2013}.
+
+\subsection{Definition of Effective Sample Size}
+
+The amount by which autocorrelation within the chains increases
+uncertainty in estimates can be measured by effective sample size
+({\sc ess}).  Given independent samples, the central limit theorem
+bounds uncertainty in estimates based on the number of samples $N$.
+Given dependent samples, the number of independent samples is replaced
+with the effective sample size $N_{\mbox{\scriptsize eff}}$, which is
+the number of independent samples with the same estimation power as
+the $N$ autocorrelated samples.  For example, estimation error is
+proportional to $1/\sqrt{N_{\mbox{\scriptsize eff}}}$ rather than
+$1/\sqrt{N}$.
+
+The effective sample size of a sequence is defined in terms of the
+autocorrelations within the sequence at different lags.  The
+autocorrelation $\rho_t$ at lag $t \geq 0$ for a chain with joint
+probability function $p(\theta)$ with mean $\mu$ and variance
+$\sigma^2$ is defined to be
+\[
+\rho_t
+=
+\frac{1}{\sigma^2} \, \int_{\Theta} (\theta^{(n)} - \mu)
+(\theta^{(n+t)} - \mu) \, p(\theta) \, d\theta.
+\]
+This is just the correlation between the two chains offset by $t$
+positions.  Because we know $\theta^{(n)}$ and $\theta^{(n+t)}$ have
+the same marginal distribution in an \MCMC setting, multiplying the
+two difference terms and reducing yields
+\[
+\rho_t
+=
+\frac{1}{\sigma^2} \, \int_{\Theta} \theta^{(n)} \, \theta^{(n+t)} \, p(\theta) \, d\theta.
+\]
+
+The effective sample size of $N$ samples generated by a process with
+autocorrelations $\rho_t$ is defined by
+\[
+N_{\mbox{\scriptsize eff}}
+\ = \
+\frac{N}{\sum_{t = -\infty}^{\infty} \rho_t}
+\ = \
+\frac{N}{1 + 2 \sum_{t = 1}^{\infty} \rho_t}.
+\]
+
+\subsection{Estimation of Effective Sample Size}
+
+In practice, the probability function in question cannot be tractably
+integrated and thus the autocorrelation cannot be calculated, nor the
+effective sample size.  Instead, these quantities must be estimated
+from the samples themselves.  The rest of this section describes a
+variogram-based estimator for autocorrelations, and hence effective sample
+size, based on multiple chains. For simplicity, each chain
+$\theta_m$ will be assumed to be of length $N$.
+
+One way to estimate the effective sample size is based on the
+variograms $V_t$ at lag $t \in \setlist{0,1\ldots}$.  The variograms are
+defined as follows for (univariate) samples $\theta_m^{(n)}$, where $m \in
+\setlist{1,\ldots,M}$ is the chain, and $N_m$ is the number of samples
+in chain $m$.
+\[
+V_t =
+\frac{1}{M}
+\,
+\sum_{m=1}^M
+\
+\left(
+\frac{1}{N_m - t}
+\sum_{n=t+1}^{N_m}
+\left(
+\theta_m^{(n)} - \theta_m^{(n-t)}
+\right)^2
+\right).
+\]
+%
+The variogram along with the multi-chain variance estimate
+$\widehat{\mbox{var}}^{+}$ introduced in the previous section can be
+used to estimate the autocorrelation at lag $t$ as
+\[
+\hat{\rho}_t
+= 1 - \frac{\displaystyle V_t}{
+            \displaystyle 2 \, \widehat{\mbox{var}}^{+}}.
+\]
+If the chains have not converged, the variance estimator
+$\widehat{\mbox{var}}^{+}$ will overestimate variance,
+leading to an overestimate of autocorrelation and an underestimate
+effective sample size.
+
+Because of the noise in the correlation estimates $\hat{\rho}_t$ as $t$
+increases, typically only the initial estimates of $\hat{\rho}_t$
+where $\hat{\rho}_t > 0$ will be used.  Setting $T'$ to be the
+first lag such that $\rho_{T' + 1} < 0$,
+%
+\[
+T' = \arg\min_t \ \hat{\rho}_{t+1} < 0,
+\]
+the effective sample size estimator is defined as
+\[
+\hat{N}_{\mbox{\scriptsize eff}}
+=
+\frac{1}{2}
+\,
+\frac{MN}
+     {1 + \sum_{t=1}^{T'} \hat{\rho}_t}.
+\]
+%
+Exact autocorrelations can happen only on odd lags \citep{Geyer:2011}.
+By summing over pairs, the paired autocorrelation is guaranteed to be
+positive modulo estimator noise.  This is the motivation behind the
+many termination criterion of \cite{Geyer:2011}. Stan does not (yet)
+do the paired expectations because NUTS almost by construction avoids
+the negative autocorrelation regime.  Thus terminating at the first
+negative autocorrelation is a reasonable approximation for stopping
+when the noise in the autocorrelation estimator dominates.
+
+Stan carries out the autocorrelation computations for all lags
+simultaneously using Eigen's fast Fourier transform (FFT) package with
+appropriate padding; see \citep{Geyer:2011} for more detail on using
+FFT for autocorrelation calculations.
+
+
+\subsection{Thinning Samples}
+
+In the typical situation, the autocorrelation, $\rho_t$, decreases as
+the lag, $t$, increases.  When this happens, thinning the samples will
+reduce the autocorrelation.  For instance, consider generating one
+thousand samples in one of the following two ways.
+%
+\begin{enumerate}
+\item Generate 1000 samples after convergence and save all of
+  them.
+\item Generate 10,000 samples after convergence and save every tenth
+  sample.
+\end{enumerate}
+%
+Even though both produce one thousand samples, the second approach
+with thinning will produce more effective samples.  That's because the
+autocorrelation $\rho_t$ for the thinned sequence is equivalent to
+$\rho_{10t}$ in the unthinned samples, so the sum of the autocorrelations
+will be lower and thus the effective sample size higher.
+
+On the other hand, if memory and data storage are no object, saving all
+ten thousand samples will have a higher effective sample size than
+thinning to one thousand samples.
+
+
+\chapter{Penalized Maximum Likelihood Point Estimation}\label{mle.chapter}
+
+\noindent
+This chapter defines the workhorses of non-Bayesian estimation,
+maximum likelihood and penalized maximum likelihood, and relates them
+to Bayesian point estimation based on posterior means, medians, and
+modes.  Such estimates are called ``point estimates'' because they
+are composed of a single value for the model parameters $\theta$
+rather than a posterior distribution.
+
+Stan's optimizer can be used to implement (penalized) maximum
+likelihood estimation for any likelihood function and penalty function
+that can be coded in Stan's modeling language.  Stan's optimizer can
+also be used for point estimation in Bayesian settings based on
+posterior modes.  Stan's Markov chain Monte Carlo samplers can be used
+to implement point inference in Bayesian models based on posterior
+means or medians.
+
+\section{Maximum Likelihood Estimation}\label{mle.section}
+
+Given a likelihood function $p(y|\theta)$ and a fixed data vector $y$,
+the maximum likelihood estimate (MLE) is the parameter vector $\hat{\theta}$
+that maximizes the likelihood, i.e.,
+\[
+\hat{\theta} = \mbox{argmax}_{\theta} \ p(y|\theta).
+\]
+It is usually more convenient to work on the log scale.
+An equivalent%
+%
+\footnote{The equivalence follows from the fact that densities are
+  positive and the log function is strictly monotonic, i.e.,
+  $p(y|\theta) \geq 0$ and for all $a, b > 0$, $\log a > \log b$ if and
+  only if $a > b$.}
+%
+formulation of the MLE is
+%
+\[
+\hat{\theta} = \mbox{argmax}_{\theta} \ \log p(y|\theta).
+\]
+
+\subsection{Existence of Maximum Likelihood Estimates}
+
+Because not all functions have unique maximum values, maximum
+likelihood estimates are not guaranteed to exist.  As discussed in
+\refchapter{problematic-posteriors}, this situation can arise when
+%
+\begin{itemize}
+\item there is more than one point that maximizes the likelihood function,
+\item the likelihood function is unbounded, or
+\item the likelihood function is bounded by an asymptote that is never
+  reached for legal parameter values.
+\end{itemize}
+%
+These problems persist with the penalized maximum likelihood estimates
+discussed in the next section, and Bayesian posterior modes as
+discussed in the following section.
+
+
+\subsection{Example: Linear Regression}
+
+Consider an ordinary linear regression problem with an $N$-dimensional
+vector of observations $y$, an $(N \times K)$-dimensional data matrix
+$x$ of predictors, a $K$-dimensional parameter vector $\beta$ of
+regression coefficients, and a real-valued noise scale $\sigma > 0$,
+with log likelihood function
+\[
+\log p(y|\beta,x) = \sum_{n=1}^N \log \distro{Normal}(y_n|x_n \beta,
+\sigma).
+\]
+%
+The maximum likelihood estimate for $\theta = (\beta,\sigma)$ is just
+\[
+(\hat{\beta},\hat{\sigma})
+\ = \
+\mbox{argmax}_{\beta,\sigma}
+\log p(y|\beta,\sigma,x) = \sum_{n=1}^N \log \distro{Normal}(y_n|x_n \beta, \sigma).
+\]
+
+\subsubsection{Squared Error}
+
+A little algebra on the log likelihood function shows that the
+marginal maximum likelihood estimate $\hat{\theta} =
+(\hat{\beta},\hat{\sigma})$ can be equivalently formulated for
+$\hat{\beta}$ in terms of least squares.  That is, $\hat{\beta}$ is
+the value for the coefficient vector that minimizes the sum of squared
+prediction errors,
+%
+\[
+\hat{\beta}
+\ = \
+\mbox{argmin}_{\beta} \sum_{n=1}^N (y_n - x_n \beta)^2
+\ = \
+\mbox{argmin}_{\beta} (y - x \beta)^{\top} (y - x\beta).
+\]
+%
+The residual error for data item $n$ is the difference between the
+actual value and predicted value, $y_n - x_n \hat{\beta}$.  The
+maximum likelihood estimate for the noise scale, $\hat{\sigma}$ is
+just the square root of the average squared residual,
+\[
+\hat{\sigma}^2
+\ = \
+\frac{1}{N} \sum_{n=1}^N \left( y_n - x_n \hat{\beta} \right)^2
+\ = \
+\frac{1}{N} (y - x \hat{\beta})^{\top} (y - x\hat{\beta}).
+\]
+
+\subsubsection{Minimizing Squared Error in Stan}
+
+The squared error approach to linear regression can be directly coded
+in Stan with the following model.
+%
+\begin{stancode}
+data {
+  int<lower=0> N;
+  int<lower=1> K;
+  vector[N] y;
+  matrix[N,K] x;
+}
+parameters {
+  vector[K] beta;
+}
+transformed parameters {
+  real<lower=0> squared_error;
+  squared_error = dot_self(y - x * beta);
+}
+model {
+  target += -squared_error;
+}
+generated quantities {
+  real<lower=0> sigma_squared;
+  sigma_squared = squared_error / N;
+}
+\end{stancode}
+%
+Running Stan's optimizer on this model produces the MLE for the linear
+regression by directly minimizing the sum of squared errors and using
+that to define the noise scale as a generated quantity.
+
+By replacing \code{N} with \code{N-1} in the denominator of the
+definition of \code{sigma\_squared}, the more commonly supplied
+unbiased estimate of $\sigma^2$ can be calculated; see
+\refsection{estimation-bias} for a definition of estimation bias and a
+discussion of estimating variance.
+
+
+
+\section{Penalized Maximum Likelihood Estimation}
+
+There is nothing special about a likelihood function as far as the
+ability to perform optimization is concerned.  It is common among
+non-Bayesian statisticians to add so-called ``penalty'' functions
+to log likelihoods and optimize the new function.  The penalized
+maximum likelihood estimator for a log likelihood function
+$\log p(y|\theta)$ and penalty function $r(\theta)$ is defined to be
+\[
+\hat{\theta} = \mbox{argmax}_{\theta} \log p(y|\theta) - r(\theta).
+\]
+The penalty function $r(\theta)$ is negated in the maximization so
+that the estimate $\hat{\theta}$ balances maximizing the log
+likelihood and minimizing the penalty.  Penalization is sometimes
+called ``regularization.''
+
+
+\subsection{Examples}\label{penalized-mle-examples}
+
+\subsubsection{Ridge Regression}
+
+Ridge regression \citep{HoerlKennard:1970} is based on penalizing the
+Euclidean length of the coefficient vector $\beta$. The ridge penalty
+function is
+%
+\[
+r(\beta)
+\ = \
+\lambda \, \sum_{k=1}^K \beta_k^2
+\ = \
+\lambda \, \beta^{\top} \beta,
+\]
+%
+where $\lambda$ is a constant tuning parameter that determines the
+magnitude of the penalty.
+
+
+Therefore, the penalized maximum likelihood estimate for ridge
+regression is just
+%
+\[
+(\hat{\beta},\hat{\sigma})
+\ = \
+\mbox{argmax}_{\beta,\sigma} \,
+ \sum_{n=1}^N \log \distro{Normal}(y_n|x_n \beta, \sigma) - \lambda
+ \sum_{k=1}^K \beta_k^2
+\]
+%
+The ridge penalty is sometimes called L2 regularization or shrinkage,
+because of its relation to the L2 norm.
+
+Like the basic MLE for linear regression, the ridge regression
+estimate for the coefficients $\beta$ can also be formulated in terms
+of least squares,
+%
+\[
+\hat{\beta}
+\ = \
+\mbox{argmin}_{\beta} \, \sum_{n=1}^N (y_n - x_n \beta)^2 + \sum_{k=1}^K \beta_k^2
+\ = \
+\mbox{argmin}_{\beta} \, (y - x\beta)^{\top} (y - x\beta) +
+\lambda \beta^{\top} \beta.
+\]
+
+The effect of adding the ridge penalty function is that the ridge
+regression estimate for $\beta$ is a vector of shorter length, or in
+other words, $\hat{\beta}$ is shrunk.  The ridge estimate does not
+necessarily have a smaller absolute $\beta_k$ for each $k$, nor does
+the coefficient vector necessarily point in the same direction as the
+maximum likelihood estimate.
+
+In Stan, adding the ridge penalty involves adding its magnitude as a
+data variable and the penalty itself to the model block,
+%
+\begin{stancode}
+data {
+  // ...
+  real<lower=0> lambda;
+}
+// ...
+model {
+  // ...
+  target += - lambda * dot_self(beta);
+}
+\end{stancode}
+%
+The noise term calculation remains the same.
+
+\subsubsection{The Lasso}
+
+The lasso \citep{Tibshirani:1996} is an alternative to ridge
+regression that applies a penalty based on the sum of the absolute
+coefficients, rather than the sum of their squares,
+\[
+r(\beta) = \lambda \sum_{k=1}^K | \beta_k |.
+\]
+The lasso is also called L1 shrinkage due to its relation to the L1
+norm, which is also known as taxicab distance or Manhattan distance.
+
+Because the derivative of the penalty does not depend on the value of
+the $\beta_k$,
+\[
+\frac{d}{d\beta_k} \lambda \sum_{k=1}^K | \beta_k | =
+\mbox{signum}(\beta_k),
+\]
+it has the effect of shrinking parameters all the way to 0 in maximum
+likelihood estimates.  Thus it can be used for variable selection as
+well as just shrinkage.%
+%
+\footnote{In practice, Stan's gradient-based optimizers are not
+  guaranteed to produce exact zero values; see
+  \cite{LangfordEtAl:2009} for a discussion of getting exactly zero
+  values with gradient descent.}
+%
+The lasso can be implemented in Stan just as easily as ridge
+regression, with the magnitude declared as data and the penalty added
+to the model block,
+%
+\begin{stancode}
+data {
+  // ...
+  real<lower=0> lambda;
+}
+// ...
+model {
+  // ...
+  for (k in 1:K)
+    target += - lambda * fabs(beta[k]);
+}
+\end{stancode}
+
+\subsubsection{The Elastic Net}
+
+The naive elastic net \citep{ZouHastie:2005} involves a weighted
+average of ridge and lasso penalties, with a penalty function
+\[
+r(\beta)
+= \lambda_1 \sum_{k=1}^K |\beta_k|
++ \lambda_2 \sum_{k=1}^K \beta_k^2.
+\]
+The naive elastic net combines properties of both ridge regression and
+the lasso, providing both identification and variable selection.
+
+The naive elastic net can be implemented directly in Stan by combining
+implementations of ridge regression and the lasso, as
+%
+\begin{stancode}
+data {
+  real<lower=0> lambda1;
+  real<lower=0> lambda2;
+  // ...
+}
+// ...
+model {
+  // ...
+  for (k in 1:K)
+    target += -lambda1 * fabs(beta[k]);
+  target += -lambda2 * dot_self(beta);
+}
+\end{stancode}
+%
+Note that the signs are negative in the program because $r(\beta)$ is
+a penalty function.
+
+The elastic net \citep{ZouHastie:2005} involves adjusting the final estimate for
+$\beta$ based on the fit $\hat{\beta}$ produced by the naive elastic
+net.  The elastic net estimate is
+\[
+\hat{\beta} = (1 + \lambda_2) \beta^*
+\]
+where $\beta^{*}$ is the naive elastic net estimate.
+
+To implement the elastic net in Stan, the data, parameter, and model
+blocks are the same as for the naive elastic net.  In addition, the
+elastic net estimate is calculated in the generated quantities block.
+%
+\begin{stancode}
+generated quantities {
+  vector[K] beta_elastic_net;
+  // ...
+  beta_elastic_net = (1 + lambda2) * beta;
+}
+\end{stancode}
+%
+The error scale also needs to be calculated in the generated
+quantities block based on the elastic net coefficients
+\code{beta\_elastic\_net}.
+
+
+\subsubsection{Other Penalized Regressions}
+
+It is also common to use penalty functions that bias the coefficient
+estimates toward values other than 0, as in the estimators of
+\cite{JamesStein:1961}.  Penalty functions can also be used to bias
+estimates toward population means; see
+\citep{EfronMorris:1975,Efron:2012}.  This latter approach is similar
+to the hierarchical models commonly employed in Bayesian statistics.
+
+
+\section{Estimation Error, Bias, and Variance}\label{estimation-bias.section}
+
+An estimate $\hat{\theta}$ depends on the particular data $y$ and
+either the log likelihood function, $\log p(y|\theta)$, penalized log
+likelihood function $\log p(y|\theta) - r(\theta)$, or log probability
+function $\log p(y,\theta) = \log p(y,\theta) + \log p(\theta)$.  In
+this section, the notation $\hat{\theta}$ is overloaded to indicate
+the estimator, which is an implicit function of the data and
+(penalized) likelihood or probability function.
+
+\subsection{Estimation Error}
+
+For a particular observed data set $y$ generated according to true
+parameters $\theta$, the estimation error is the difference between
+the estimated value and true value of the parameter,
+\[
+\mbox{err}(\hat{\theta}) = \hat{\theta} - \theta.
+\]
+%
+
+\subsection{Estimation Bias}
+
+For a particular true parameter value $\theta$ and a likelihood
+function $p(y|\theta)$, the expected estimation error averaged over
+possible data sets $y$ according to their density under the likelihood
+is
+%
+\[
+\mathbb{E}_{p(y|\theta)}[\hat{\theta}]
+\ = \
+\int \left( \mbox{argmax}_{\theta'} p(y|\theta') \right) p(y|\theta) dy.
+\]
+
+An estimator's bias is the expected estimation error,
+%
+\[
+\mathbb{E}_{p(y|\theta)}[\hat{\theta} - \theta]
+\ = \
+\mathbb{E}_{p(y|\theta)}[\hat{\theta}] - \theta
+\]
+%
+The bias is a multivariate quantity with the same dimensions as
+$\theta$.  An estimator is unbiased if its expected estimation error
+is zero and biased otherwise.
+
+\subsubsection{Example: Estimating a Normal Distribution}
+
+Suppose a data set of observations $y_n$ for $n \in 1{:}N$ drawn from
+a normal distribution.  This presupposes a model $y_n \sim
+\distro{Normal}(\mu,\sigma)$, where both $\mu$ and $\sigma > 0$ are
+parameters.  The log likelihood is just
+\[
+\log p(y|\mu,\sigma) = \sum_{n=1}^N \log
+\distro{Normal}(y_n|\mu,\sigma).
+\]
+The maximum likelihood estimator for $\mu$ is just the sample mean,
+i.e., the average of the samples,
+\[
+\hat{\mu} = \frac{1}{N} \sum_{n=1}^N y_n.
+\]
+The maximum likelihood estimate for the mean is unbiased.
+
+The maximum likelihood estimator for the variance $\sigma^2$ is the
+average of the squared difference from the mean,
+\[
+\hat{\sigma}^2 = \frac{1}{N} \sum_{n=1}^N (y_n - \hat{\mu})^2.
+\]
+The maximum likelihood for the variance is biased on the low side,
+i.e.,
+%
+\[
+\mathbb{E}_{p(y|\mu,\sigma)}[\hat{\sigma}^2] < \sigma.
+\]
+%
+The reason for this bias is that the maximum likelihood estimate is
+based on the difference from the estimated mean $\hat{\mu}$.  Plugging
+in the actual mean can lead to larger sum of squared differences;  if
+$\mu \neq \hat{\mu}$, then
+\[
+\frac{1}{N} \sum_{n=1}^N (y_n - \mu)^2
+>
+\frac{1}{N} \sum_{n=1}^N (y_n - \hat{\mu})^2.
+\]
+
+An alternative estimate for the variance is the sample variance, which
+is defined by
+\[
+\hat{\mu} = \frac{1}{N-1} \sum_{n=1}^N (y_n - \hat{\mu})^2.
+\]
+This value is larger than the maximum likelihood estimate by a factor
+of $N/(N-1)$.
+
+
+\subsection{Estimation Variance}
+
+The variance of component $k$ of an estimator $\hat{\theta}$ is
+computed like any other variance, as the expected squared difference
+from its expectation,
+%
+\[
+\mbox{var}_{p(y|\theta})[\hat{\theta}_k]
+\ = \
+\mathbb{E}_{p(y|\theta})[\, (\hat{\theta}_k -
+\mathbb{E}_{p(y|\theta)}[\hat{\theta}_k])^2 \,].
+\]
+%
+The full $K \times K$ covariance matrix for the estimator is thus
+defined, as usual, by
+%
+\[
+\mbox{covar}_{p(y|\theta)}[\hat{\theta}]
+\ = \
+\mathbb{E}_{p(y|\theta})[\, (\hat{\theta} - \mathbb{E}[\hat{\theta}]) \,
+                         (\hat{\theta} -
+                         \mathbb{E}[\hat{\theta}])^{\top} \, ].
+\]
+
+Continuing the example of estimating the mean and variance of a normal
+distribution based on sample data, the maximum likelihood estimator
+(i.e., the sample mean) is the unbiased estimator for the mean $\mu$
+with the lowest variance; the Gauss-Markov theorem establishes this
+result in some generality for least-squares estimation, or
+equivalently, maximum likelihood estimation under an assumption of
+normal noise; see \citep[Section~3.2.2]{HastieTibshiraniFriedman:2009}.
+
+\chapter{Bayesian Point Estimation}
+
+There are three common approaches to Bayesian point estimation based
+on the posterior $p(\theta|y)$ of parameters $\theta$ given observed
+data $y$: the mode (maximum), the mean, and the median.
+
+\section{Posterior Mode Estimation}
+
+This section covers estimates based on the parameters $\theta$ that
+maximize the posterior density, and the next sections continue with
+discussions of the mean and median.
+
+An estimate based on a model's posterior mode can be defined by
+%
+\[
+\hat{\theta} = \mbox{argmax}_{\theta} \, p(\theta|y).
+\]
+%
+When it exists, $\hat{\theta}$ maximizes the posterior density of the
+parameters given the data.  The posterior mode is sometimes called the
+``maximum a posteriori'' (MAP) estimate.
+
+As discussed in \refchapter{problematic-posteriors} and
+\refsection{mle}, a unique posterior mode might not
+exist---there may be no value that maximizes the posterior mode or
+there may be more than one.  In these cases, the posterior mode
+estimate is undefined.  Stan's optimizer, like most optimizers, will
+have problems in these situations.  It may also return a locally
+maximal value that is not the global maximum.
+
+In cases where there is a posterior mode, it will correspond to a
+penalized maximum likelihood estimate with a penalty function equal to
+the negation of the log prior.  This is because Bayes's rule,
+\[
+p(\theta|y) = \frac{p(y|\theta) \, p(\theta)}{p(y)},
+\]
+ensures that
+%
+\begin{eqnarray*}
+\mbox{argmax}_{\theta} \ p(\theta|y)
+& = &
+\mbox{argmax}_{\theta} \ \frac{p(y|\theta) \, p(\theta)}{p(y)}
+\\[6pt]
+& = &
+\mbox{argmax}_{\theta} \ p(y|\theta) \, p(\theta),
+\end{eqnarray*}
+%
+and the positiveness of densities and the strict monotonicity of log
+ensure that
+\[
+\mbox{argmax}_{\theta} \ p(y|\theta) \, p(\theta)
+\ = \
+\mbox{argmax}_{\theta} \ \log p(y|\theta) + \log p(\theta).
+\]
+%
+
+In the case where the prior (proper or improper) is uniform, the
+posterior mode is equivalent to the maximum likelihood estimate.
+
+For most commonly used penalty functions, there are probabilistic
+equivalents.  For example, the ridge penalty function corresponds to a
+normal prior on coefficients and the lasso to a Laplace prior.  The
+reverse is always true---a negative prior can always be treated as a
+penalty function.
+
+
+
+\section{Posterior Mean Estimation}
+
+A standard Bayesian approach to point estimation is to use the
+posterior mean (assuming it exists), defined by
+%
+\[
+\hat{\theta} = \int \theta \, p(\theta|y) \, d\theta.
+\]
+%
+The posterior mean is often called {\it the}\ Bayesian estimator,
+because it's the estimator that minimizes the expected square error of
+the estimate.
+
+An estimate of the posterior mean for each parameter is returned by
+Stan's interfaces;  see the RStan, CmdStan, and PyStan user's guides
+for details on the interfaces and data formats.
+
+Posterior means exist in many situations where posterior
+modes do not exist.  For example, in the $\distro{Beta}(0.1, 0.1)$
+case, there is no posterior mode, but posterior mean is well defined
+with value 0.5.
+
+A situation where posterior means fail to exist but posterior modes do
+exist is with a posterior with a Cauchy distribution
+$\distro{Cauchy}(\mu,\tau)$.  The posterior mode is $\mu$, but the
+integral expressing the posterior mean diverges.  Such diffuse priors
+rarely arise in practical modeling applications; even with a Cauchy
+Cauchy prior for some parameters, data will provide enough constraints
+that the posterior is better behaved and means exist.
+
+Sometimes when posterior means exist, they are not meaningful, as in
+the case of a multimodal posterior arising from a mixture model or in
+the case of a uniform distribution on a closed interval.
+
+
+\section{Posterior Median Estimation}
+
+The posterior median (i.e., 50th percentile or 0.5 quantile) is
+another popular point estimate reported for Bayesian models.  The
+posterior median minimizes the expected absolute error of estimates.
+These estimates are returned in the various Stan interfaces;  see the
+RStan, PyStan and CmdStan user's guides for more information on
+format.
+
+Although posterior medians may fail to be meaningful, they often exist
+even where posterior means do not, as in the Cauchy distribution.
+
+
+
+\chapter{Variational Inference}\label{vi-advanced.chapter}
+
+\noindent
+\Stan implements an automatic variational inference algorithm that leverages
+the transformations from \refchapter{variable-transforms}.
+
+Classical variational inference algorithms are difficult to
+derive. We must first define the family of approximating
+densities, and then calculate model-specific quantities relative
+to that family to solve the variational optimization problem.  Both
+steps require expert knowledge.  The resulting algorithm is tied to
+both the model and the chosen approximation.
+
+We begin by briefly describing the classical variational inference framework.
+For a thorough exposition, please refer to
+\citet{Jordan:1999,Wainwright-Jordan:2008}; for a textbook presentation, please
+see \citet{Bishop:2006}. We follow with a high-level description of Automatic
+Differentiation Variational Inference (ADVI). For more details, see
+\citep{Kucukelbir:2015}.
+
+
+\section{Classical Variational Inference}
+
+Variational inference approximates the
+posterior $p(\theta \, | \, y)$ with a simple, parameterized distribution
+$q(\theta \, | \, \phi)$. It matches the approximation to the
+true posterior by minimizing the Kullback-Leibler (KL) divergence,
+%
+\[
+  \phi^* = \argmin_\phi
+  \KL{q(\theta \, | \, \phi) }{ p(\theta \mid y)}.
+\]
+%
+Typically the KL divergence lacks an analytic, closed-form solution.
+Instead we maximize a proxy to the KL divergence, the evidence lower bound
+(ELBO)
+%
+\[
+  \mathcal{L} (\phi)
+  =
+  \E_{q (\theta)} \big[ \log p (y,\theta) \big]
+  -
+  \E_{q (\theta)} \big[ \log q (\theta\, | \,\phi) \big].
+\]
+%
+The first term is an expectation of the log
+joint density under the approximation, and the second is the entropy of the
+variational density. Maximizing the ELBO minimizes the KL
+divergence \citep{Jordan:1999,Bishop:2006}.
+
+
+\section{Automatic Variational Inference}
+
+ADVI maximizes the ELBO in the real-coordinate space. \Stan transforms the
+parameters from (potentially) constrained domains to
+the real-coordinate space. We denote the combined transformation as
+$T:\theta \to \zeta$, with the $\zeta$ variables living in $\mathbb{R}^K$.
+The variational objective (ELBO) becomes
+%
+\[
+  \mathcal{L}(\phi)
+  =
+  \E_{q(\zeta\,|\,\phi)}
+  \bigg[
+  \log p (y, T^{-1}(\zeta))
+  +
+  \log \big| \det J_{T^{-1}}(\zeta) \big|
+  \bigg]
+  -
+  \E_{q (\zeta\, | \,\phi)} \big[ \log q (\zeta\, | \,\phi) \big].
+\]
+%
+Since the $\zeta$ variables live in the real-coordinate space, we can choose a
+fixed family for the variational distribution. We choose a fully-factorized
+Gaussian,
+%
+\[
+  q(\zeta \, | \, \phi)
+  =
+  \distro{Normal}\left(\zeta \, | \, \mu, \sigma\right)
+  =
+  \prod_{k=1}^K
+  \distro{Normal}
+  \left(\zeta_k \, | \, \mu_k, \sigma_k\right),
+\]
+%
+where the vector
+$\phi = (\mu_{1},\cdots,\mu_{K}, \sigma_ {1},\cdots,\sigma_{K})$
+concatenates the mean and standard deviation of each Gaussian factor.
+This reflects the ``mean-field'' assumption in classical variational
+inference algorithms; we will refer to this particular decomposition
+as the \texttt{meanfield} option.
+
+The transformation $T$ maps the support of the parameters to the real
+coordinate space. Thus, its inverse $T^{-1}$ maps back to the support of the
+latent variables. This implicitly defines the variational approximation in the
+original latent variable space as
+%
+\[
+\distro{Normal} \left(T(\theta) \, | \, \mu, \sigma\right)
+\big| \det J_{T}(\theta) \big|.
+\]
+This is, in general, not a Gaussian distribution.
+This choice may call to mind the Laplace approximation
+technique, where a second-order Taylor expansion around the
+maximum-a-posteriori estimate gives a Gaussian approximation to the
+posterior. However, they are not the same \citep{Kucukelbir:2015}.
+
+The variational objective (ELBO) that we maximize is,
+\[
+  \mathcal{L}(\phi)
+  =
+  \E_{q(\zeta\, | \,\phi)}
+  \bigg[
+  \log p (y, T^{-1}(\zeta))
+  +
+  \log \big| \det J_{T^{-1}}(\zeta) \big|
+  \bigg]
+  +
+  \sum_{k=1}^K \log \sigma_k,
+\]
+where we plug in the analytic form for the Gaussian entropy and drop all terms
+that do not depend on $\phi$. We discuss how we perform the maximization in
+\refchapter{vi-algorithms}.
+

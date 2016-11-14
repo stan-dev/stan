@@ -19,18 +19,30 @@ namespace stan {
 
   namespace lang {
 
-    void generate_expression(const expression& e, std::ostream& o);
+    void generate_expression(const expression& e,
+                             std::ostream& o);
     void generate_expression(const expression& e,
                              bool user_facing,
                              std::ostream& o);
     void generate_expression(const expression& e,
                              bool user_facing,
-                             bool is_var,
+                             bool is_var_context,
                              std::ostream& o);
     void generate_bare_type(const expr_type& t,
                             const std::string& scalar_t_name,
                             std::ostream& out);
-
+    void generate_statement(const statement& s,
+                            int indent,
+                            std::ostream& o,
+                            bool include_sampling,
+                            bool is_var_context,
+                            bool is_fun_return);
+    void generate_statement(const std::vector<statement>& ss,
+                            int indent,
+                            std::ostream& o,
+                            bool include_sampling,
+                            bool is_var_context,
+                            bool is_fun_return);
 
     const std::string EOL("\n");
     const std::string EOL2("\n\n");
@@ -195,11 +207,12 @@ namespace stan {
 
     struct expression_visgen : public visgen {
       const bool user_facing_;
-      const bool is_var_;
-      explicit expression_visgen(std::ostream& o, bool user_facing, bool is_var)
+      const bool is_var_context_;
+      explicit expression_visgen(std::ostream& o, bool user_facing,
+                                 bool is_var_context)
         : visgen(o),
           user_facing_(user_facing),
-          is_var_(is_var) {
+          is_var_context_(is_var_context) {
       }
       void operator()(nil const& /*x*/) const {
         o_ << "nil";
@@ -358,13 +371,22 @@ namespace stan {
         o_ << ')';
       }
 
-
       void operator()(const conditional_op& expr) const {
         bool types_prim_match
           = (expr.type_.is_primitive() && expr.type_.base_type_ == INT_T)
           || (!expr.has_var_ && expr.type_.is_primitive()
               && (expr.true_val_.expression_type()
                   == expr.false_val_.expression_type()));
+
+        std::stringstream ss;
+        if (is_fun_origin(expr.var_origin_)) {
+          ss << "fun_scalar_t__";
+        } else if (is_var_context_) {
+          ss << "T__";
+        } else {
+            ss << "double";
+        }
+
         o_ << "(";
         boost::apply_visitor(*this, expr.cond_.expr_);
         o_ << " ? ";
@@ -372,7 +394,7 @@ namespace stan {
           boost::apply_visitor(*this, expr.true_val_.expr_);
         } else {
           o_ << "stan::math::promote_scalar<"
-          << (is_var_ ? "T__" : "double")
+             << ss.str()
              << ">(";
           boost::apply_visitor(*this, expr.true_val_.expr_);
           o_ << ")";
@@ -382,7 +404,7 @@ namespace stan {
           boost::apply_visitor(*this, expr.false_val_.expr_);
         } else {
           o_ << "stan::math::promote_scalar<"
-             << (is_var_ ? "T__" : "double")
+             << ss.str()
              << ">(";
           boost::apply_visitor(*this, expr.false_val_.expr_);
           o_ << ")";
@@ -406,24 +428,25 @@ namespace stan {
 
     void generate_expression(const expression& e,
                              bool user_facing,
-                             bool is_var,
+                             bool is_var_context,
                              std::ostream& o) {
-      expression_visgen vis(o, user_facing, is_var);
+      expression_visgen vis(o, user_facing, is_var_context);
       boost::apply_visitor(vis, e.expr_);
     }
+
 
     void generate_expression(const expression& e,
                              bool user_facing,
                              std::ostream& o) {
-      static const bool is_var = false;  // default value
-      expression_visgen vis(o, user_facing, is_var);
+      static const bool is_var_context = false;  // default value
+      expression_visgen vis(o, user_facing, is_var_context);
       boost::apply_visitor(vis, e.expr_);
     }
 
     void generate_expression(const expression& e, std::ostream& o) {
       static const bool user_facing = false;  // default value
-      static const bool is_var = false;  // default value
-      generate_expression(e, user_facing, is_var, o);
+      static const bool is_var_context = false;  // default value
+      generate_expression(e, user_facing, is_var_context, o);
     }
 
     static void print_string_literal(std::ostream& o,
@@ -666,7 +689,8 @@ namespace stan {
                                  const std::string& base_type,
                                  const std::vector<expression>& dims,
                                  const expression& type_arg1 = expression(),
-                                 const expression& type_arg2 = expression()) {
+                                 const expression& type_arg2 = expression(),
+                                 const expression& definition = expression()) {
       // validate all dims are positive
       for (size_t i = 0; i < dims.size(); ++i)
         generate_validate_positive(var_name, dims[i], o);
@@ -675,11 +699,13 @@ namespace stan {
       if (!is_nil(type_arg2))
         generate_validate_positive(var_name, type_arg2, o);
 
-      // define variable with initializer
-      o << INDENT2
-        << var_name << " = ";
-      generate_type(base_type, dims, dims.size(), o);
-      generate_initializer(o, base_type, dims, type_arg1, type_arg2);
+      // initialize variable or use definition
+      if (is_nil(definition)) {
+        o << INDENT2
+          << var_name << " = ";
+        generate_type(base_type, dims, dims.size(), o);
+        generate_initializer(o, base_type, dims, type_arg1, type_arg2);
+      }
     }
 
     struct var_resizing_visgen : public visgen {
@@ -688,16 +714,20 @@ namespace stan {
       }
       void operator()(nil const& /*x*/) const { }  // dummy
       void operator()(int_var_decl const& x) const {
-        generate_initialization(o_, x.name_, "int", x.dims_);
+        generate_initialization(o_, x.name_, "int", x.dims_,
+                                nil(), nil(), x.def_);
       }
       void operator()(double_var_decl const& x) const {
-        generate_initialization(o_, x.name_, "double", x.dims_);
+        generate_initialization(o_, x.name_, "double", x.dims_, nil(),
+                                nil(), x.def_);
       }
       void operator()(vector_var_decl const& x) const {
-        generate_initialization(o_, x.name_, "vector_d", x.dims_, x.M_);
+        generate_initialization(o_, x.name_, "vector_d", x.dims_, x.M_,
+                                nil(), x.def_);
       }
       void operator()(row_vector_var_decl const& x) const {
-        generate_initialization(o_, x.name_, "row_vector_d", x.dims_, x.N_);
+        generate_initialization(o_, x.name_, "row_vector_d", x.dims_, x.N_,
+                                nil(), x.def_);
       }
       void operator()(unit_vector_var_decl const& x) const {
         generate_initialization(o_, x.name_, "vector_d", x.dims_, x.K_);
@@ -712,7 +742,8 @@ namespace stan {
         generate_initialization(o_, x.name_, "vector_d", x.dims_, x.K_);
       }
       void operator()(matrix_var_decl const& x) const {
-        generate_initialization(o_, x.name_, "matrix_d", x.dims_, x.M_, x.N_);
+        generate_initialization(o_, x.name_, "matrix_d",
+                                x.dims_, x.M_, x.N_, x.def_);
       }
       void operator()(cholesky_factor_var_decl const& x) const {
         generate_initialization(o_, x.name_, "matrix_d", x.dims_, x.M_, x.N_);
@@ -739,13 +770,13 @@ namespace stan {
 
     struct init_local_var_visgen : public visgen {
       const bool declare_vars_;
-      const bool is_var_;
+      const bool is_var_context_;
       init_local_var_visgen(bool declare_vars,
-                            bool is_var,
+                            bool is_var_context,
                             std::ostream& o)
         : visgen(o),
           declare_vars_(declare_vars),
-          is_var_(is_var) {
+          is_var_context_(is_var_context) {
       }
       template <typename D>
       void generate_initialize_array_bounded(const D& x,
@@ -768,7 +799,7 @@ namespace stan {
         for (size_t i = 0; i < dim_args.size(); ++i)
           read_args.push_back(dim_args[i]);
         generate_initialize_array(base_type, read_fun, read_args,
-                                  x.name_, x.dims_);
+                                    x.name_, x.dims_);
       }
       void operator()(const nil& /*x*/) const { }
       void operator()(const int_var_decl& x) const {
@@ -778,14 +809,14 @@ namespace stan {
       void operator()(const double_var_decl& x) const {
         std::vector<expression> read_args;
         generate_initialize_array_bounded(x,
-                                          is_var_ ? "T__" : "double",
+                                          is_var_context_ ? "T__" : "double",
                                           "scalar", read_args);
       }
       void operator()(const vector_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.M_);
         generate_initialize_array_bounded(x,
-                                          is_var_
+                                          is_var_context_
                                           ? "Eigen::Matrix"
                                           "<T__,Eigen::Dynamic,1> "
                                           : "vector_d",
@@ -795,7 +826,7 @@ namespace stan {
         std::vector<expression> read_args;
         read_args.push_back(x.N_);
         generate_initialize_array_bounded(x,
-                                          is_var_
+                                          is_var_context_
                                           ? "Eigen::Matrix"
                                           "<T__,1,Eigen::Dynamic> "
                                           : "row_vector_d",
@@ -806,7 +837,7 @@ namespace stan {
         read_args.push_back(x.M_);
         read_args.push_back(x.N_);
         generate_initialize_array_bounded(x,
-                                          is_var_
+                                          is_var_context_
                                           ? "Eigen::Matrix"
                                           "<T__,Eigen::Dynamic,Eigen::Dynamic> "
                                           : "matrix_d",
@@ -815,7 +846,7 @@ namespace stan {
       void operator()(const unit_vector_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.K_);
-        generate_initialize_array(is_var_
+        generate_initialize_array(is_var_context_
                                   ? "Eigen::Matrix"
                                   "<T__,Eigen::Dynamic,1> "
                                   : "vector_d",
@@ -824,7 +855,7 @@ namespace stan {
       void operator()(const simplex_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.K_);
-        generate_initialize_array(is_var_
+        generate_initialize_array(is_var_context_
                                   ? "Eigen::Matrix"
                                   "<T__,Eigen::Dynamic,1> "
                                   : "vector_d",
@@ -833,7 +864,7 @@ namespace stan {
       void operator()(const ordered_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.K_);
-        generate_initialize_array(is_var_
+        generate_initialize_array(is_var_context_
                                   ? "Eigen::Matrix"
                                   "<T__,Eigen::Dynamic,1> "
                                   : "vector_d",
@@ -842,7 +873,7 @@ namespace stan {
       void operator()(const positive_ordered_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.K_);
-        generate_initialize_array(is_var_
+        generate_initialize_array(is_var_context_
                                   ? "Eigen::Matrix"
                                   "<T__,Eigen::Dynamic,1> "
                                   : "vector_d",
@@ -853,7 +884,7 @@ namespace stan {
         std::vector<expression> read_args;
         read_args.push_back(x.M_);
         read_args.push_back(x.N_);
-        generate_initialize_array(is_var_
+        generate_initialize_array(is_var_context_
                                   ? "Eigen::Matrix"
                                   "<T__,Eigen::Dynamic,Eigen::Dynamic> "
                                   : "matrix_d",
@@ -863,7 +894,7 @@ namespace stan {
       void operator()(const cholesky_corr_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.K_);
-        generate_initialize_array(is_var_
+        generate_initialize_array(is_var_context_
                                   ? "Eigen::Matrix"
                                   "<T__,Eigen::Dynamic,Eigen::Dynamic> "
                                   : "matrix_d",
@@ -873,7 +904,7 @@ namespace stan {
       void operator()(const cov_matrix_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.K_);
-        generate_initialize_array(is_var_
+        generate_initialize_array(is_var_context_
                                   ? "Eigen::Matrix"
                                   "<T__,Eigen::Dynamic,Eigen::Dynamic> "
                                   : "matrix_d",
@@ -882,7 +913,7 @@ namespace stan {
       void operator()(const corr_matrix_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.K_);
-        generate_initialize_array(is_var_
+        generate_initialize_array(is_var_context_
                                   ? "Eigen::Matrix"
                                   "<T__,Eigen::Dynamic,Eigen::Dynamic> "
                                   : "matrix_d",
@@ -1000,20 +1031,20 @@ namespace stan {
       }
     };
 
+
     void generate_local_var_inits(std::vector<var_decl> vs,
-                                  bool is_var,
+                                  bool is_var_context,
                                   bool declare_vars,
                                   std::ostream& o) {
       o << INDENT2
         << "stan::io::reader<"
-        << (is_var ? "T__" : "double")
+        << (is_var_context ? "T__" : "double")
         << "> in__(params_r__,params_i__);" << EOL2;
-      init_local_var_visgen vis(declare_vars, is_var, o);
-      for (size_t i = 0; i < vs.size(); ++i)
-        boost::apply_visitor(vis, vs[i].decl_);
+      init_local_var_visgen vis_init(declare_vars, is_var_context, o);
+      for (size_t i = 0; i < vs.size(); ++i) {
+          boost::apply_visitor(vis_init, vs[i].decl_);
+      }
     }
-
-
 
 
     void generate_public_decl(std::ostream& o) {
@@ -1049,7 +1080,6 @@ namespace stan {
           o_ << "}" << EOL;
         }
       }
-
       void generate_loop_var(const std::string& name,
                              size_t dims_size) const {
         o_ << name;
@@ -1059,8 +1089,9 @@ namespace stan {
       void operator()(nil const& /*x*/) const { }
       template <typename T>
       void basic_validate(T const& x) const {
-        if (!(x.range_.has_low() || x.range_.has_high()))
+        if (!(x.range_.has_low() || x.range_.has_high())) {
           return;  // unconstrained
+        }
         generate_begin_for_dims(x.dims_);
         if (x.range_.has_low()) {
           generate_indent(indents_ + x.dims_.size(), o_);
@@ -1156,6 +1187,7 @@ namespace stan {
         generate_validate_var_decl(decls[i], indent, o);
     }
 
+    // add argument for array definition
     // see _var_decl_visgen cut & paste
     struct member_var_decl_visgen : public visgen {
       int indents_;
@@ -1204,7 +1236,8 @@ namespace stan {
       void operator()(matrix_var_decl const& x) const {
         declare_array(("matrix_d"), x.name_, x.dims_.size());
       }
-      void declare_array(std::string const& type, std::string const& name,
+      void declare_array(std::string const& type,
+                         std::string const& name,
                          size_t size) const {
         for (int i = 0; i < indents_; ++i)
           o_ << INDENT;
@@ -1233,35 +1266,35 @@ namespace stan {
     // see member_var_decl_visgen cut & paste
     struct local_var_decl_visgen : public visgen {
       int indents_;
-      bool is_var_;
+      bool is_var_context_;
       bool is_fun_return_;
       local_var_decl_visgen(int indents,
-                            bool is_var,
+                            bool is_var_context,
                             bool is_fun_return,
                             std::ostream& o)
         : visgen(o),
           indents_(indents),
-          is_var_(is_var),
+          is_var_context_(is_var_context),
           is_fun_return_(is_fun_return) {
       }
       void operator()(nil const& /*x*/) const { }
       void operator()(int_var_decl const& x) const {
         std::vector<expression> ctor_args;
-        declare_array("int", ctor_args, x.name_, x.dims_);
+        declare_array("int", ctor_args, x.name_, x.dims_, x.def_);
       }
       void operator()(double_var_decl const& x) const {
         std::vector<expression> ctor_args;
         declare_array(is_fun_return_
                       ? "fun_scalar_t__"
-                      : (is_var_ ? "T__" : "double"),
-                      ctor_args, x.name_, x.dims_);
+                      : (is_var_context_ ? "T__" : "double"),
+                      ctor_args, x.name_, x.dims_, x.def_);
       }
       void operator()(vector_var_decl const& x) const {
         std::vector<expression> ctor_args;
         ctor_args.push_back(x.M_);
         declare_array(is_fun_return_
                       ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
-                      : (is_var_
+                      : (is_var_context_
                          ? "Eigen::Matrix<T__,Eigen::Dynamic,1> " : "vector_d"),
                       ctor_args, x.name_, x.dims_);
       }
@@ -1270,7 +1303,7 @@ namespace stan {
         ctor_args.push_back(x.N_);
         declare_array(is_fun_return_
                       ? "Eigen::Matrix<fun_scalar_t__,1,Eigen::Dynamic> "
-                      : (is_var_
+                      : (is_var_context_
                          ? "Eigen::Matrix<T__,1,Eigen::Dynamic> "
                          : "row_vector_d"),
                       ctor_args, x.name_, x.dims_);
@@ -1282,7 +1315,7 @@ namespace stan {
         declare_array(is_fun_return_
                       ? "Eigen::Matrix<fun_scalar_t__,"
                       "Eigen::Dynamic,Eigen::Dynamic> "
-                      : (is_var_
+                      : (is_var_context_
                          ? "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> "
                          : "matrix_d"),
                       ctor_args, x.name_, x.dims_);
@@ -1292,7 +1325,7 @@ namespace stan {
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
                       ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
-                      : (is_var_
+                      : (is_var_context_
                          ? "Eigen::Matrix<T__,Eigen::Dynamic,1> " : "vector_d"),
                       ctor_args, x.name_, x.dims_);
       }
@@ -1301,7 +1334,7 @@ namespace stan {
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
                       ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
-                      : (is_var_
+                      : (is_var_context_
                          ? "Eigen::Matrix<T__,Eigen::Dynamic,1> " : "vector_d"),
                       ctor_args, x.name_, x.dims_);
       }
@@ -1310,7 +1343,7 @@ namespace stan {
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
                       ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
-                      : (is_var_
+                      : (is_var_context_
                          ? "Eigen::Matrix<T__,Eigen::Dynamic,1> " : "vector_d"),
                       ctor_args, x.name_, x.dims_);
       }
@@ -1319,7 +1352,7 @@ namespace stan {
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
                       ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
-                      : (is_var_
+                      : (is_var_context_
                          ? "Eigen::Matrix<T__,Eigen::Dynamic,1> " : "vector_d"),
                       ctor_args, x.name_, x.dims_);
       }
@@ -1330,7 +1363,7 @@ namespace stan {
         declare_array(is_fun_return_
                       ? "Eigen::Matrix<fun_scalar_t__,"
                       "Eigen::Dynamic,Eigen::Dynamic> "
-                      : (is_var_
+                      : (is_var_context_
                          ? "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> "
                          : "matrix_d"),
                       ctor_args, x.name_, x.dims_);
@@ -1339,7 +1372,7 @@ namespace stan {
         std::vector<expression> ctor_args;
         ctor_args.push_back(x.K_);
         ctor_args.push_back(x.K_);
-        declare_array(is_var_
+        declare_array(is_var_context_
                       ? "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> "
                       : "matrix_d",
                       ctor_args, x.name_, x.dims_);
@@ -1351,7 +1384,7 @@ namespace stan {
         declare_array(is_fun_return_
                       ? "Eigen::Matrix<fun_scalar_t__,"
                       "Eigen::Dynamic,Eigen::Dynamic> "
-                      : (is_var_
+                      : (is_var_context_
                          ? "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> "
                          : "matrix_d"),
                       ctor_args, x.name_, x.dims_);
@@ -1363,7 +1396,7 @@ namespace stan {
         declare_array(is_fun_return_
                       ? "Eigen::Matrix<fun_scalar_t__,"
                       "Eigen::Dynamic,Eigen::Dynamic> "
-                      : (is_var_
+                      : (is_var_context_
                          ? "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> "
                          : "matrix_d"),
                       ctor_args, x.name_, x.dims_);
@@ -1435,21 +1468,25 @@ namespace stan {
       void declare_array(const std::string& type,
                          const std::vector<expression>& ctor_args,
                          const std::string& name,
-                         const std::vector<expression>& dims) const {
+                         const std::vector<expression>& dims,
+                         const expression& definition = expression()) const {
         // require double parens to counter "most vexing parse" problem
         generate_indent(indents_, o_);
         generate_type(type, dims.size());
         o_ << ' '  << name;
-        generate_init_args(type, ctor_args, dims, 0);
-        o_ << ';' << EOL;
+        if (is_nil(definition)) {
+          generate_init_args(type, ctor_args, dims, 0);
+        }
+        o_ << ";" << EOL;
         if (dims.size() == 0) {
           generate_indent(indents_, o_);
           generate_void_statement(name);
           o_ << EOL;
         }
-        if (type == "Eigen::Matrix<T__, Eigen::Dynamic, Eigen::Dynamic> "
-            || type == "Eigen::Matrix<T__, 1, Eigen::Dynamic> "
-            || type == "Eigen::Matrix<T__, Eigen::Dynamic, 1> ") {
+        if (is_nil(definition)
+            && (type == "Eigen::Matrix<T__, Eigen::Dynamic, Eigen::Dynamic> "
+                 || type == "Eigen::Matrix<T__, 1, Eigen::Dynamic> "
+                 || type == "Eigen::Matrix<T__, Eigen::Dynamic, 1> ")) {
           generate_indent(indents_, o_);
           o_ << "stan::math::fill(" << name << ", DUMMY_VAR__);" << EOL;
         }
@@ -1459,9 +1496,9 @@ namespace stan {
     void generate_local_var_decls(const std::vector<var_decl>& vs,
                                   int indent,
                                   std::ostream& o,
-                                  bool is_var,
+                                  bool is_var_context,
                                   bool is_fun_return) {
-      local_var_decl_visgen vis(indent, is_var, is_fun_return, o);
+      local_var_decl_visgen vis(indent, is_var_context, is_fun_return, o);
       for (size_t i = 0; i < vs.size(); ++i)
         boost::apply_visitor(vis, vs[i].decl_);
     }
@@ -1470,17 +1507,17 @@ namespace stan {
 
     struct generate_local_var_init_nan_visgen : public visgen {
       const bool declare_vars_;
-      const bool is_var_;
+      const bool is_var_context_;
       const bool is_fun_return_;
       const int indent_;
       generate_local_var_init_nan_visgen(bool declare_vars,
-                                         bool is_var,
+                                         bool is_var_context,
                                          bool is_fun_return,
                                          int indent,
                                          std::ostream& o)
         : visgen(o),
           declare_vars_(declare_vars),
-          is_var_(is_var),
+          is_var_context_(is_var_context),
           is_fun_return_(is_fun_return),
           indent_(indent) {
       }
@@ -1530,7 +1567,7 @@ namespace stan {
       void generate_init(const T& x) const {
         generate_indent(indent_, o_);
         o_ << "stan::math::initialize(" << x.name_ << ", "
-           << (is_var_
+           << (is_var_context_
                ? "DUMMY_VAR__"
                : "std::numeric_limits<double>::quiet_NaN()")
            << ");"
@@ -1541,14 +1578,15 @@ namespace stan {
     void generate_local_var_init_nan(const std::vector<var_decl>& vs,
                                      int indent,
                                      std::ostream& o,
-                                     bool is_var,
+                                     bool is_var_context,
                                      bool is_fun_return) {
-      generate_local_var_init_nan_visgen vis(indent, is_var, is_fun_return,
-                                             indent, o);
+      generate_local_var_init_nan_visgen vis(indent, is_var_context,
+                                             is_fun_return, indent, o);
       for (size_t i = 0; i < vs.size(); ++i)
-        boost::apply_visitor(vis, vs[i].decl_);
+        if (!vs[i].has_def()) {
+          boost::apply_visitor(vis, vs[i].decl_);
+        }
     }
-
 
     // see member_var_decl_visgen cut & paste
     struct generate_init_vars_visgen : public visgen {
@@ -1620,13 +1658,31 @@ namespace stan {
                             std::ostream& o) {
       generate_init_vars_visgen vis(indent, o);
       o << EOL;
-      generate_comment("initialize transformed variables to"
+      generate_comment("initialize undefined transformed variables to"
                        " avoid seg fault on val access",
                        indent, o);
-      for (size_t i = 0; i < vs.size(); ++i)
-        boost::apply_visitor(vis, vs[i].decl_);
+      for (size_t i = 0; i < vs.size(); ++i) {
+        if (!(vs[i].has_def()))
+          boost::apply_visitor(vis, vs[i].decl_);
+      }
     }
 
+    void generate_define_vars(const std::vector<var_decl>& vs,
+                            int indent,
+                            std::ostream& o) {
+      generate_comment("assign variable definitions",
+                       indent, o);
+      for (size_t i = 0; i < vs.size(); ++i) {
+        if (vs[i].has_def()) {
+          generate_indent(indent, o);
+          o << "stan::math::assign("
+            << vs[i].name()
+            << ",";
+          generate_expression(vs[i].def(), false, o);
+          o << ");" << EOL;
+        }
+      }
+    }
 
     struct validate_transformed_params_visgen : public visgen {
       int indents_;
@@ -1860,24 +1916,20 @@ namespace stan {
       o << "]";
     }
 
-    void generate_statement(statement const& s, int indent, std::ostream& o,
-                            bool include_sampling, bool is_var,
-                            bool is_fun_return);
-
     struct statement_visgen : public visgen {
       size_t indent_;
       bool include_sampling_;
-      bool is_var_;
+      bool is_var_context_;
       bool is_fun_return_;
       statement_visgen(size_t indent,
                        bool include_sampling,
-                       bool is_var,
+                       bool is_var_context,
                        bool is_fun_return,
                        std::ostream& o)
         : visgen(o),
           indent_(indent),
           include_sampling_(include_sampling),
-          is_var_(is_var),
+          is_var_context_(is_var_context),
           is_fun_return_(is_fun_return) {
       }
       void operator()(nil const& /*x*/) const {
@@ -1892,7 +1944,7 @@ namespace stan {
                                     false,
                                     o_);
         o_ << ", ";
-        generate_expression(x.expr_, false, is_var_, o_);
+        generate_expression(x.expr_, false, is_var_context_, o_);
         o_ << ");" << EOL;
       }
       void operator()(const assgn& y) const {
@@ -1900,7 +1952,7 @@ namespace stan {
         o_ << "stan::model::assign(";
 
         expression var_expr(y.lhs_var_);
-        generate_expression(var_expr, false, is_var_, o_);
+        generate_expression(var_expr, false, is_var_context_, o_);
         o_ << ", "
            << EOL;
 
@@ -1912,10 +1964,10 @@ namespace stan {
         generate_indent(indent_ + 3, o_);
         if (y.lhs_var_occurs_on_rhs()) {
           o_ << "stan::model::deep_copy(";
-          generate_expression(y.rhs_, false, is_var_, o_);
+          generate_expression(y.rhs_, false, is_var_context_, o_);
           o_ << ")";
         } else {
-          generate_expression(y.rhs_, false, is_var_, o_);
+          generate_expression(y.rhs_, false, is_var_context_, o_);
         }
 
         o_ << ", "
@@ -1930,10 +1982,9 @@ namespace stan {
       }
       void operator()(expression const& x) const {
         generate_indent(indent_, o_);
-        generate_expression(x, false, is_var_, o_);
+        generate_expression(x, false, is_var_context_, o_);
         o_ << ";" << EOL;
       }
-      // can conditional_op expression be used in sampling statement?
       void operator()(sample const& x) const {
         if (!include_sampling_) return;
         std::string prob_fun = get_prob_fun(x.dist_.family_);
@@ -1971,64 +2022,88 @@ namespace stan {
              << EOL;
         }
         // generate log denominator for case where bounds test pass
-        if (x.truncation_.has_low() || x.truncation_.has_high()) {
-          generate_indent(indent_, o_);
-          o_ << "else ";
-        }
-        // rest of code for three cases: T[L,H], T[L,], T[,H]
+        if (x.truncation_.has_low() || x.truncation_.has_high())
+          generate_truncation(x, is_user_defined, prob_fun);
+      }
+
+      void generate_truncation(sample const& x, bool is_user_defined,
+                               const std::string& prob_fun) const {
+        std::stringstream sso_lp;
+        generate_indent(indent_, o_);
         if (x.truncation_.has_low() && x.truncation_.has_high()) {
           // T[L,U]: -log_diff_exp(Dist_cdf_log(U|params),
           //                       Dist_cdf_log(L|Params))
-          o_ << "lp_accum__.add(-log_diff_exp(";
-          o_ << get_cdf(x.dist_.family_) << "(";
-          generate_expression(x.truncation_.high_.expr_, o_);
+          sso_lp << "log_diff_exp(";
+          sso_lp << get_cdf(x.dist_.family_) << "(";
+          generate_expression(x.truncation_.high_.expr_, sso_lp);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
-            o_ << ", ";
-            generate_expression(x.dist_.args_[i], o_);
+            sso_lp << ", ";
+            generate_expression(x.dist_.args_[i], sso_lp);
           }
           if (is_user_defined)
-            o_ << ", pstream__";
-          o_ << "), " << get_cdf(x.dist_.family_) << "(";
-          generate_expression(x.truncation_.low_.expr_, o_);
+            sso_lp << ", pstream__";
+          sso_lp << "), " << get_cdf(x.dist_.family_) << "(";
+          generate_expression(x.truncation_.low_.expr_, sso_lp);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
-            o_ << ", ";
-            generate_expression(x.dist_.args_[i], o_);
+            sso_lp << ", ";
+            generate_expression(x.dist_.args_[i], sso_lp);
           }
           if (is_user_defined)
-            o_ << ", pstream__";
-          o_ << ")));" << EOL;
+            sso_lp << ", pstream__";
+          sso_lp << "))";
+
         } else if (!x.truncation_.has_low() && x.truncation_.has_high()) {
           // T[,U];  -Dist_cdf_log(U)
-          o_ << "lp_accum__.add(-";
-          o_ << get_cdf(x.dist_.family_) << "(";
-          generate_expression(x.truncation_.high_.expr_, o_);
+          sso_lp << get_cdf(x.dist_.family_) << "(";
+          generate_expression(x.truncation_.high_.expr_, sso_lp);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
-            o_ << ", ";
-            generate_expression(x.dist_.args_[i], o_);
+            sso_lp << ", ";
+            generate_expression(x.dist_.args_[i], sso_lp);
           }
           if (is_user_defined)
-            o_ << ", pstream__";
-          o_ << "));" << EOL;
+            sso_lp << ", pstream__";
+          sso_lp << ")";
+
         } else if (x.truncation_.has_low() && !x.truncation_.has_high()) {
           // T[L,]: -Dist_ccdf_log(L)
-          o_ << "lp_accum__.add(-";
-          o_ << get_ccdf(x.dist_.family_) << "(";
+          sso_lp << get_ccdf(x.dist_.family_) << "(";
+          generate_expression(x.truncation_.low_.expr_, sso_lp);
+          for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
+            sso_lp << ", ";
+            generate_expression(x.dist_.args_[i], sso_lp);
+          }
+          if (is_user_defined)
+            sso_lp << ", pstream__";
+          sso_lp << ")";
+        }
+
+        o_ << "else lp_accum__.add(-";
+
+        if (x.is_discrete() && x.truncation_.has_low()) {
+          o_ << "log_sum_exp(" << sso_lp.str() << ", ";
+          // generate adjustment for lower-bound off by 1 due to log CCDF
+          o_ << prob_fun << "(";
           generate_expression(x.truncation_.low_.expr_, o_);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
             o_ << ", ";
             generate_expression(x.dist_.args_[i], o_);
           }
-          if (is_user_defined)
-            o_ << ", pstream__";
-          o_ << "));" << EOL;
+          if (is_user_defined) o_ << ", pstream__";
+          o_ << "))";
+        } else {
+          o_ << sso_lp.str();
         }
+
+        o_ << ");" << std::endl;
       }
+
       void operator()(const increment_log_prob_statement& x) const {
         generate_indent(indent_, o_);
         o_ << "lp_accum__.add(";
         generate_expression(x.log_prob_, o_);
         o_ << ");" << EOL;
       }
+      // generate_local_var_decl - change to accomodate definitions
       void operator()(const statements& x) const {
         bool has_local_vars = x.local_decl_.size() > 0;
         size_t indent = has_local_vars ? (indent_ + 1) : indent_;
@@ -2036,14 +2111,16 @@ namespace stan {
           generate_indent(indent_, o_);
           o_ << "{" << EOL;
           generate_local_var_decls(x.local_decl_, indent, o_,
-                                   is_var_, is_fun_return_);
+                                   is_var_context_, is_fun_return_);
           generate_local_var_init_nan(x.local_decl_, indent, o_,
-                                      is_var_, is_fun_return_);
+                                      is_var_context_, is_fun_return_);
+          generate_define_vars(x.local_decl_, indent, o_);
         }
+        o_ << EOL;
 
         for (size_t i = 0; i < x.statements_.size(); ++i)
           generate_statement(x.statements_[i], indent, o_, include_sampling_,
-                             is_var_, is_fun_return_);
+                             is_var_context_, is_fun_return_);
         if (has_local_vars) {
           generate_indent(indent_, o_);
           o_ << "}" << EOL;
@@ -2094,7 +2171,7 @@ namespace stan {
         generate_expression(x.range_.high_, o_);
         o_ << "; ++" << x.variable_ << ") {" << EOL;
         generate_statement(x.statement_, indent_ + 1, o_, include_sampling_,
-                           is_var_, is_fun_return_);
+                           is_var_context_, is_fun_return_);
         generate_indent(indent_, o_);
         o_ << "}" << EOL;
       }
@@ -2104,7 +2181,7 @@ namespace stan {
         generate_expression(x.condition_, o_);
         o_ << ")) {" << EOL;
         generate_statement(x.body_, indent_+1, o_, include_sampling_,
-                           is_var_, is_fun_return_);
+                           is_var_context_, is_fun_return_);
         generate_indent(indent_, o_);
         o_ << "}" << EOL;
       }
@@ -2122,7 +2199,7 @@ namespace stan {
           generate_expression(x.conditions_[i], o_);
           o_ << ")) {" << EOL;
           generate_statement(x.bodies_[i], indent_ + 1, o_, include_sampling_,
-                             is_var_, is_fun_return_);
+                             is_var_context_, is_fun_return_);
           generate_indent(indent_, o_);
           o_ << '}';
         }
@@ -2130,7 +2207,7 @@ namespace stan {
           o_ << " else {" << EOL;
           generate_statement(x.bodies_[x.bodies_.size()-1], indent_ + 1,
                              o_, include_sampling_,
-                             is_var_, is_fun_return_);
+                             is_var_context_, is_fun_return_);
           generate_indent(indent_, o_);
           o_ << '}';
         }
@@ -2139,6 +2216,7 @@ namespace stan {
       void operator()(const no_op_statement& /*x*/) const {
       }
     };
+
 
     struct is_numbered_statement_vis : public boost::static_visitor<bool> {
       bool operator()(const nil& st) const { return false; }
@@ -2162,12 +2240,11 @@ namespace stan {
       bool operator()(const return_statement& st) const { return true; }
     };
 
-
     void generate_statement(const statement& s,
                             int indent,
                             std::ostream& o,
                             bool include_sampling,
-                            bool is_var,
+                            bool is_var_context,
                             bool is_fun_return) {
       is_numbered_statement_vis vis_is_numbered;
       if (boost::apply_visitor(vis_is_numbered, s.statement_)) {
@@ -2175,7 +2252,8 @@ namespace stan {
         o << "current_statement_begin__ = " <<  s.begin_line_ << ";"
           << EOL;
       }
-      statement_visgen vis(indent, include_sampling, is_var, is_fun_return, o);
+      statement_visgen vis(indent, include_sampling, is_var_context,
+                           is_fun_return, o);
       boost::apply_visitor(vis, s.statement_);
     }
 
@@ -2184,9 +2262,10 @@ namespace stan {
                              int indent,
                              std::ostream& o,
                              bool include_sampling,
-                             bool is_var,
+                             bool is_var_context,
                              bool is_fun_return) {
-      statement_visgen vis(indent, include_sampling, is_var, is_fun_return, o);
+      statement_visgen vis(indent, include_sampling, is_var_context,
+                           is_fun_return, o);
       for (size_t i = 0; i < ss.size(); ++i)
         boost::apply_visitor(vis, ss[i].statement_);
     }
@@ -2221,11 +2300,11 @@ namespace stan {
                                     int indent,
                                     std::ostream& o,
                                     bool include_sampling,
-                                    bool is_var,
+                                    bool is_var_context,
                                     bool is_fun_return) {
       generate_try(indent, o);
       generate_statement(s, indent+1, o, include_sampling,
-                         is_var, is_fun_return);
+                         is_var_context, is_fun_return);
       generate_catch_throw_located(indent, o);
     }
 
@@ -2233,12 +2312,12 @@ namespace stan {
                                      int indent,
                                      std::ostream& o,
                                      bool include_sampling,
-                                     bool is_var,
+                                     bool is_var_context,
                                      bool is_fun_return) {
       generate_try(indent, o);
       for (size_t i = 0; i < ss.size(); ++i)
         generate_statement(ss[i], indent + 1, o, include_sampling,
-                           is_var, is_fun_return);
+                           is_var_context, is_fun_return);
       generate_catch_throw_located(indent, o);
     }
 
@@ -2268,23 +2347,24 @@ namespace stan {
       o << INDENT2 << "stan::math::accumulator<T__> lp_accum__;"
         << EOL2;
 
-      bool is_var = true;
+      bool is_var_context = true;
       bool is_fun_return = false;
 
       generate_comment("model parameters", 2, o);
-      generate_local_var_inits(p.parameter_decl_, is_var, true, o);
+      generate_local_var_inits(p.parameter_decl_, is_var_context, true, o);
       o << EOL;
 
       generate_comment("transformed parameters", 2, o);
-      generate_local_var_decls(p.derived_decl_.first, 2, o, is_var,
+      generate_local_var_decls(p.derived_decl_.first, 2, o, is_var_context,
                                is_fun_return);
       generate_init_vars(p.derived_decl_.first, 2, o);
+      generate_define_vars(p.derived_decl_.first, 2, o);
       o << EOL;
-
 
       bool include_sampling = true;
       generate_located_statements(p.derived_decl_.second, 2, o,
-                                  include_sampling, is_var, is_fun_return);
+                                  include_sampling, is_var_context,
+                                  is_fun_return);
       o << EOL;
 
       generate_validate_transformed_params(p.derived_decl_.first, 2, o);
@@ -2302,7 +2382,7 @@ namespace stan {
 
 
       generate_located_statement(p.statement_, 2, o, include_sampling,
-                                 is_var, is_fun_return);
+                                 is_var_context, is_fun_return);
 
 
       o << EOL;
@@ -3100,7 +3180,8 @@ namespace stan {
       generate_member_var_inits(prog.data_decl_, o);
 
       o << EOL;
-      generate_comment("validate data", 2, o);
+      generate_comment("validate data variables, initialize if not defined",
+                       2, o);
       generate_validate_var_decls(prog.data_decl_, 2, o);
 
       generate_var_resizing(prog.derived_data_decl_.first, o);
@@ -3112,13 +3193,15 @@ namespace stan {
       o << INDENT2
         << "(void) DUMMY_VAR__;  // suppress unused var warning" << EOL2;
       generate_init_vars(prog.derived_data_decl_.first, 2, o);
+      generate_define_vars(prog.derived_data_decl_.first, 2, o);
       o << EOL;
 
       bool include_sampling = false;
-      bool is_var = false;
+      bool is_var_context = false;
       bool is_fun_return = false;
+      // need to fix generate_located_statements
       generate_located_statements(prog.derived_data_decl_.second,
-                                  2, o, include_sampling, is_var,
+                                  2, o, include_sampling, is_var_context,
                                   is_fun_return);
 
       o << EOL;
@@ -3143,7 +3226,7 @@ namespace stan {
       void operator()(int_var_decl const& x) const {
         generate_check_int(x.name_, x.dims_.size());
         var_size_validator_(x);
-        generate_declaration(x.name_, "int", x.dims_);
+        generate_declaration(x.name_, "int", x.dims_, nil(), nil(), x.def_);
         generate_buffer_loop("i", x.name_, x.dims_);
         generate_write_loop("integer(", x.name_, x.dims_);
       }
@@ -3175,8 +3258,10 @@ namespace stan {
       void operator()(double_var_decl const& x) const {
         generate_check_double(x.name_, x.dims_.size());
         var_size_validator_(x);
-        generate_declaration(x.name_, "double", x.dims_);
-        generate_buffer_loop("r", x.name_, x.dims_);
+        generate_declaration(x.name_, "double", x.dims_, nil(), nil(), x.def_);
+        if (is_nil(x.def_)) {
+          generate_buffer_loop("r", x.name_, x.dims_);
+        }
         generate_write_loop(function_args("scalar", x),
                             x.name_, x.dims_);
       }
@@ -3293,13 +3378,21 @@ namespace stan {
                                 const std::string& base_type,
                                 const std::vector<expression>& dims,
                                 const expression& type_arg1 = expression(),
-                                const expression& type_arg2 = expression())
+                                const expression& type_arg2 = expression(),
+                                const expression& definition = expression())
       const {
         o_ << INDENT2;
         generate_type(base_type, dims, dims.size(), o_);
         o_ << ' ' << name;
-
-        generate_initializer(o_, base_type, dims, type_arg1, type_arg2);
+        if (is_nil(definition)) {
+          generate_initializer(o_, base_type, dims, type_arg1, type_arg2);
+        } else {
+          o_ << ";" << EOL;
+          o_ << INDENT2;
+          o_ << "stan::math::assign(" << name << ", ";
+          generate_expression(definition, false, o_);
+          o_ << ");" << EOL;
+        }
       }
       void generate_indent_num_dims(size_t base_indent,
                                     const std::vector<expression>& dims,
@@ -4287,14 +4380,15 @@ namespace stan {
       o << INDENT2 <<  "double lp__ = 0.0;" << EOL;
       suppress_warning(INDENT2, "lp__", o);
       o << INDENT2 << "stan::math::accumulator<double> lp_accum__;" << EOL2;
-      bool is_var = false;
+      bool is_var_context = false;
       bool is_fun_return = false;
-      generate_local_var_decls(prog.derived_decl_.first, 2, o, is_var,
+      generate_local_var_decls(prog.derived_decl_.first, 2, o, is_var_context,
                                is_fun_return);
       o << EOL;
       bool include_sampling = false;
       generate_located_statements(prog.derived_decl_.second, 2, o,
-                                  include_sampling, is_var, is_fun_return);
+                                  include_sampling, is_var_context,
+                                  is_fun_return);
       o << EOL;
 
       generate_comment("validate transformed parameters", 2, o);
@@ -4310,7 +4404,7 @@ namespace stan {
         << EOL;
       generate_comment("declare and define generated quantities", 2, o);
       generate_local_var_decls(prog.generated_decl_.first, 2, o,
-                               is_var, is_fun_return);
+                               is_var_context, is_fun_return);
 
       o << EOL;
       o << INDENT2
@@ -4319,10 +4413,11 @@ namespace stan {
       o << INDENT2 << "(void) DUMMY_VAR__;  // suppress unused var warning"
         << EOL2;
       generate_init_vars(prog.generated_decl_.first, 2, o);
-
+      generate_define_vars(prog.generated_decl_.first, 2, o);
       o << EOL;
       generate_located_statements(prog.generated_decl_.second, 2, o,
-                                  include_sampling, is_var, is_fun_return);
+                                  include_sampling, is_var_context,
+                                  is_fun_return);
       o << EOL;
 
       generate_comment("validate generated quantities", 2, o);
@@ -4635,7 +4730,7 @@ namespace stan {
           << INDENT
           << "(void) propto__;"
           << EOL;
-      bool is_var = false;
+      bool is_var_context = false;
       bool is_fun_return = true;
       bool include_sampling = true;
       out << INDENT
@@ -4643,7 +4738,8 @@ namespace stan {
           << EOL;
 
       generate_located_statement(fun.body_, 1, out,
-                                 include_sampling, is_var, is_fun_return);
+                                 include_sampling, is_var_context,
+                                 is_fun_return);
 
       out << "}"
           << EOL;
