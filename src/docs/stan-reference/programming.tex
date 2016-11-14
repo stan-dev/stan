@@ -9955,9 +9955,13 @@ generated quantities {
   vector[2] y_hat[T];
   matrix[2, 2] A;
   
-  A[1, 1] = 0;  A[1, 2] = 1;  A[2, 1] = -1;  A[2, 2] = -theta[1];
+  A[1, 1] = 0;
+  A[1, 2] = 1;
+  A[2, 1] = - 1;
+  A[2, 2] = - theta[1];
   
-  for (t in 1:T) {    y_hat[t] = matrix_exp((t-1)*A) * y0;  }
+  for (t in 1:T)
+    y_hat[t] = matrix_exp((t - 1) * A) * y0;
   
   // add measurement error
   for (t in 1:T) {
