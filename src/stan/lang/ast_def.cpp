@@ -788,7 +788,7 @@ namespace stan {
       return sum;
     }
 
-    printable::printable() : printable_("") { }
+    printable::printable() : printable_(std::string()) { }
     printable::printable(const expression& expr) : printable_(expr) { }
     printable::printable(const std::string& msg) : printable_(msg) { }
     printable::printable(const printable_t& printable)
