@@ -786,10 +786,7 @@ of these in the future, but as of now, there is no good workaround.
     \end{cases}
     \]}
   %
-  \fitem{real}{trunc}{real \farg{x}}{
-    Returns the integer nearest to but no larger in magnitude than \farg{x},
-    converted to a double value;
-    see warning at start of \refsection{step-functions}.
+  \fitemUnaryVec{trunc}{integer nearest to but no larger in magnitude than \farg{x}, converted to a double value; see warning at start of \refsection{step-functions}}{
     \[
     \mbox{\code{trunc}}(x) = \lfloor x \rfloor
     \]
@@ -827,8 +824,7 @@ of these in the future, but as of now, there is no good workaround.
     \ = \ e^x
     \]}
   %
-  \fitem{real}{exp2}{real \farg{x}}{
-    Returns the base-2 exponential of \farg{x}.
+  \fitemUnaryVec{exp2}{base-2 exponential of \farg{x}}{
     \[
     \mbox{\code{exp2}}(x) = 2^x
     \]}
@@ -842,8 +838,7 @@ of these in the future, but as of now, there is no good workaround.
     \end{cases}
     \]}
   %
-  \fitem{real}{log2}{real \farg{x}}{
-    Returns the base-2 logarithm of \farg{x}.
+  \fitemUnaryVec{log2}{base-2 logarithm of \farg{x}}{
     \[
     \mbox{\code{log2}}(x) = 
     \begin{cases}
@@ -872,8 +867,7 @@ of these in the future, but as of now, there is no good workaround.
     \mbox{\code{inv}}(x) = \frac{1}{x}
     \]}    
   %
-  \fitem{real}{inv\_sqrt}{real \farg{x}}{
-    Returns the inverse of the square root of \farg{x}.
+  \fitemUnaryVec{inv\_sqrt}{inverse of the square root of \farg{x}}{
     \[
     \mbox{\code{inv\_sqrt}}(x) = 
     \begin{cases}
@@ -882,8 +876,7 @@ of these in the future, but as of now, there is no good workaround.
     \end{cases}
     \]}
   %
-  \fitem{real}{inv\_square}{real \farg{x}}{
-    Returns the inverse of the square of \farg{x}.
+  \fitemUnaryVec{inv\_square}{inverse of the square of \farg{x}}{
     \[
     \mbox{\code{inv\_square}}(x) = \frac{1}{x^2}
     \]}
@@ -991,8 +984,7 @@ of these in the future, but as of now, there is no good workaround.
     \mbox{\code{asinh}}(x) = \sinh^{-1}(x)
     \]}
   %
-  \fitem{real}{atanh}{real \farg{x}}{
-    Returns the inverse hyperbolic tangent (in radians) of \farg{x}.
+  \fitemUnaryVec{atanh}{inverse hyperbolic tangent (in radians) of \farg{x}}{
     \[
     \mbox{\code{atanh}}(x) = 
     \begin{cases}
@@ -1013,8 +1005,7 @@ commonly used as a link function (see \refsection{Phi-function}).
 %
 \begin{description}
   %
-  \fitem{real}{logit}{real \farg{x}}{
-    Returns the log odds, or logit, function applied to \farg{x}.
+  \fitemUnaryVec{logit}{log odds, or logit, function applied to \farg{x}}{
     \[
     \mbox{\code{logit}}(x) = 
     \begin{cases}
@@ -1024,15 +1015,12 @@ commonly used as a link function (see \refsection{Phi-function}).
     \]
   }
   %
-  \fitem{real}{inv\_logit}{real \farg{y}}{
-    Returns the logistic sigmoid function applied to \farg{y}.
+  \fitemUnaryVec{inv\_logit}{logistic sigmoid function applied to \farg{y}}{
     \[
     \mbox{\code{inv\_logit}}(y) = \frac{1}{1 + \exp(-y)}
     \]}
   %
-  \fitem{real}{inv\_cloglog}{real \farg{y}}{
-    Returns the inverse of the complementary log-log function 
-    applied to \farg{y}.
+  \fitemUnaryVec{inv\_cloglog}{inverse of the complementary log-log function  applied to \farg{y}}{
     \[
     \mbox{\code{inv\_cloglog}}(y) = 1 - \exp \! \left( - \exp(y) \right)
     \]}
@@ -1064,23 +1052,20 @@ distribution function (and its complement).
   \fitemUnaryVec{Phi}{unit normal cumulative distribution function of \farg{x}}{
     \[
     \mbox{\code{Phi}}(x) = \frac{1}{\sqrt{2\pi}} \int_{0}^{x} e^{-t^2/2} dt
-    \]}{Phi}{phi}
+    \]}
   %
-  \fitemindexsort{real}{inv\_Phi}{real \farg{p}}{
-    Returns the standard normal inverse cumulative distribution function of 
-    \farg{p}, otherwise known as the quantile function, which satisfies
+  \fitemUnaryVec{inv\_Phi}{standard normal inverse cumulative distribution function of \farg{p}, otherwise known as the quantile function}{
     \[
     \mbox{\code{Phi(inv\_Phi(p))}} = p
-    \]}{inv\_Phi}{inv\_phi}
+    \]}
   %  
-  \fitemindexsort{real}{Phi\_approx}{real \farg{x}}{
-    Returns a fast approximation of the unit normal cumulative distribution 
+  \fitemUnaryVec{Phi\_approx}{fast approximation of the unit normal cumulative distribution 
     function of \farg{x}. This approximation has a maximum absolute error 
     of 0.00014 and may be used instead of \code{Phi} for probit regression.  See
-    \citep{BowlingEtAl:2009} for details.  
+    \citep{BowlingEtAl:2009} for details.}{  
     \[
     \mbox{\code{Phi\_approx}}(x) = \mbox{logit}^{-1}(0.07056 \, x^3 + 1.5976 \, x)
-    \]}{Phi\_approx}{phi\_approx}
+    \]}
 \end{description}
 
 \subsection{Other Probability-Related Functions}
@@ -1170,9 +1155,7 @@ distribution function (and its complement).
     \]
     See \refsection{gamma-appendix} for definition of $\Gamma(x)$.}
   %
-  \fitem{real}{trigamma}{real \farg{x}}{
-    Returns the trigamma function applied to \farg{x}.  The trigamma function is the
-    second derivative of the natural logarithm of the Gamma function.
+  \fitemUnaryVec{trigamma}{trigamma function applied to \farg{x}.  The trigamma function is the second derivative of the natural logarithm of the Gamma function}{
     \[
     \mbox{\code{trigamma}}(x) 
     = 
@@ -1415,8 +1398,7 @@ using more basic \Stan functions.
     \end{cases}
     \]}
   %
-  \fitem{real}{log1p}{real \farg{x}}{
-    Returns the natural logarithm of 1 plus \farg{x}.
+  \fitemUnaryVec{log1p}{natural logarithm of 1 plus \farg{x}}{
     \[
     \mbox{\code{log1p}}(x) = 
     \begin{cases}
@@ -1434,15 +1416,12 @@ using more basic \Stan functions.
     \end{cases}
     \]}
   %
-  \fitem{real}{log1p\_exp}{real \farg{x}}{ 
-    Returns the natural logarithm of one plus the natural exponentiation 
-    of \farg{x}.
+  \fitemUnaryVec{log1p\_exp}{natural logarithm of one plus the natural exponentiation of \farg{x}}{
     \[
     \mbox{\code{log1p\_exp}}(x) = \log(1+\exp(x))
     \]}
   %
-  \fitem{real}{log1m\_exp}{real \farg{x}}{ Returns the natural
-    logarithm of one minus the natural exponentiation of \farg{x}.
+  \fitemUnaryVec{log1m\_exp}{logarithm of one minus the natural exponentiation of \farg{x}}{
     \[
     \mbox{\code{log1m\_exp}}(x) = 
     \begin{cases}
@@ -1483,15 +1462,13 @@ using more basic \Stan functions.
     \mbox{\code{log\_sum\_exp}}(x,y) = \log(\exp(x)+\exp(y)) 
     \]}
   %
-  \fitem{real}{log\_inv\_logit}{real \farg{x}}{
-    Returns the natural logarithm of the inverse logit function of \farg{x}.
+  \fitemUnaryVec{log\_inv\_logit}{natural logarithm of the inverse logit function of \farg{x}}{
     \[
     \mbox{\code{log\_inv\_logit}}(x) = \log \, \mbox{logit}^{-1}(x)
     \]
   See \refsection{link-functions} for a definition of inverse logit.}
   %
-  \fitem{real}{log1m\_inv\_logit}{real \farg{x}}{
-    Returns the natural logarithm of 1 minus the inverse logit function of \farg{x}.
+  \fitemUnaryVec{log1m\_inv\_logit}{natural logarithm of 1 minus the inverse logit function of \farg{x}}{
     \[
     \mbox{\code{log1m\_inv\_logit}}(x) = \log(1 - \mbox{logit}^{-1}(x))
     \]

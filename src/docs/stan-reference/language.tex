@@ -1,327 +1,4 @@
-\part{Modeling Language Reference}
-
-\chapter{Execution of a Stan Program}
-
-\noindent
-This chapter provides a sketch of how a compiled Stan model is
-executed using sampling.  Optimization shares the same data reading
-and initialization steps, but then does optimization rather than sampling.
-
-This sketch is elaborated in the following chapters of this part,
-which cover variable declarations, expressions, statements, and blocks
-in more detail.
-
-
-\section{Reading and Transforming Data}
-
-The reading and transforming data steps are the same for sampling,
-optimization and diagnostics.
-
-\subsection{Read Data}
-
-The first step of execution is to read data into memory.   Data may be
-read in through file (in CmdStan) or through memory (RStan and
-PyStan);  see their respective manuals for details.%
-%
-\footnote{The \Cpp code underlying Stan is flexible enough to allow
-  data to be read from memory or file.  Calls from \R, for instance,
-  can be configured to read data from file or directly from \R's
-  memory.}
-%
-All of the variables declared in the \code{data} block will be read.
-If a variable cannot be read, the program will halt with a message
-indicating which data variable is missing.
-
-After each variable is read, if it has a declared constraint, the
-constraint is validated.  For example, if a variable \code{N} is
-declared as \code{int<lower=0>}, after \code{N} is read, it will be tested
-to make sure it is greater than or equal to zero.  If a variable
-violates its declared constraint, the program will halt with a warning
-message indicating which variable contains an illegal value, the value
-that was read, and the constraint that was declared.
-
-\subsection{Define Transformed Data}
-
-After data is read into the model, the transformed data variable
-statements are executed in order to define the transformed data
-variables.  As the statements execute, declared constraints on
-variables are not enforced.
-
-Transformed data variables are initialized with real values set to
-\code{NaN} and integer values set to the smallest integer (large
-absolute value negative number).
-
-After the statements are executed, all declared constraints on
-transformed data variables are validated.  If the validation fails,
-execution halts and the variable's name, value and constraints are
-displayed.
-
-\section{Initialization}
-
-Initialization is the same for sampling, optimization, and diagnosis
-
-\subsection{User-Supplied Initial Values}
-
-If there are user-supplied initial values for parameters, these are
-read using the same input mechanism and same file format as data
-reads.  Any constraints declared on the parameters are validated for
-the initial values.  If a variable's value violates its declared
-constraint, the program halts and a diagnostic message is printed.
-
-After being read, initial values are transformed to unconstrained
-values that will be used to initialize the sampler.
-
-\subsubsection{Boundary Values are Problematic}
-
-Because of the way Stan defines its transforms from the constrained to
-the unconstrained space, initializing parameters on the boundaries of
-their constraints is usually problematic.  For instance, with a
-constraint
-%
-\begin{stancode}
-parameters {
-  real<lower=0,upper=1> theta;
-  // ...
-}
-\end{stancode}
-%
-an initial value of 0 for \code{theta} leads to an unconstrained value
-of $-\infty$, whereas a value of 1 leads to an unconstrained value of
-$+\infty$.  While this will be inverse transformed back correctly
-given the behavior of floating point arithmetic, the Jacobian will be
-infinite and the log probability function will fail and raise an
-exception.
-
-\subsection{Random Initial Values}
-
-If there are no user-supplied initial values, the default
-initialization strategy is to initialize the unconstrained parameters
-directly with values drawn uniformly from the interval $(-2,2)$.  The
-bounds of this initialization can be changed but it is always
-symmetric around 0. The value of 0 is special in that it represents
-the median of the initialization.  An unconstrained value of 0
-corresponds to different parameter values depending on the constraints
-declared on the parameters.
-
-An unconstrained real does not involve any transform, so an initial
-value of 0 for the unconstrained parameters is also a value of 0 for
-the constrained parameters.
-
-For parameters that are bounded below at 0, the initial value of 0 on
-the unconstrained scale corresponds to $\exp(0) = 1$ on the
-constrained scale.  A value of -2 corresponds to $\exp(-2) = .13$ and
-a value of 2 corresponds to $\exp(2) = 7.4$.
-
-For parameters bounded above and below, the initial value of 0 on the
-unconstrained scale corresponds to a value at the midpoint of the
-constraint interval.  For probability parameters, bounded below by 0
-and above by 1, the transform is the inverse logit, so that an initial
-unconstrained value of 0 corresponds to a constrained value of 0.5, -2
-corresponds to 0.12 and 2 to 0.88.  Bounds other than 0 and 1 are
-just scaled and translated.
-
-Simplexes with initial values of 0 on the unconstrained basis
-correspond to symmetric values on the constrained values (i.e., each
-value is $1/K$ in a $K$-simplex).
-
-Cholesky factors for positive-definite matrices are initialized to 1
-on the diagonal and 0 elsewhere;  this is because the diagonal is log
-transformed and the below-diagonal values are unconstrained.
-
-The initial values for other parameters can be determined from the
-transform that is applied.  The transforms are all described in full
-detail in \refchapter{variable-transforms}.
-
-\subsection{Zero Initial Values}
-
-The initial values may all be set to 0 on the unconstrained scale.
-This can be helpful for diagnosis, and may also be a good starting
-point for sampling.  Once a model is running, multiple chains with
-more diffuse starting points can help diagnose problems with
-convergence; see \refsection{convergence} for more information on
-convergence monitoring.
-
-
-
-
-
-\section{Sampling}
-
-Sampling is based on simulating the Hamiltonian of a particle with a
-starting position equal to the current parameter values and an initial
-momentum (kinetic energy) generated randomly.  The potential energy at
-work on the particle is taken to be the negative log (unnormalized) total
-probability function defined by the model.  In the usual approach to
-implementing \HMC, the Hamiltonian dynamics of the particle is
-simulated using the leapfrog integrator, which discretizes the smooth
-path of the particle into a number of small time steps called leapfrog
-steps.
-
-\subsection{Leapfrog Steps}
-
-For each leapfrog step, the negative log probability function and its
-gradient need to be evaluated at the position corresponding to the
-current parameter values (a more detailed sketch is provided in the
-next section).  These are used to update the momentum based on the
-gradient and the position based on the momentum.
-
-For simple models, only a few leapfrog steps with large step sizes are
-needed.  For models with complex posterior geometries, many small
-leapfrog steps may be needed to accurately model the path of the
-parameters.
-
-If the user specifies the number of leapfrog steps (i.e., chooses to
-use standard \HMC), that number of leapfrog steps are simulated.  If
-the user has not specified the number of leapfrog steps, the No-U-Turn
-sampler (\NUTS) will determine the number of leapfrog steps adaptively
-\citep{Hoffman-Gelman:2011, Hoffman-Gelman:2014}.
-
-\subsection{Log Probability and Gradient Calculation}
-
-During each leapfrog step, the log probability function and its
-gradient must be calculated.  This is where most of the time in the
-Stan algorithm is spent.  This log probability function, which is
-used by the sampling algorithm, is defined over the unconstrained
-parameters.
-
-The first step of the calculation requires the inverse transform of
-the unconstrained parameter values back to the constrained parameters
-in terms of which the model is defined.  There is no error checking
-required because the inverse transform is a total function on every point
-in whose range satisfies the constraints.
-
-Because the probability statements in the model are defined in terms
-of constrained parameters, the log Jacobian of the inverse transform
-must be added to the accumulated log probability.
-
-Next, the transformed parameter statements are executed.  After they
-complete, any constraints declared for the transformed parameters are
-checked.  If the constraints are violated, the model will halt with a
-diagnostic error message.
-
-The final step in the log probability function calculation is to
-execute the statements defined in the model block.
-
-As the log probability function executes, it accumulates an in-memory
-representation of the expression tree used to calculate the log
-probability.  This includes all of the transformed parameter
-operations and all of the Jacobian adjustments.  This tree is then
-used to evaluate the gradients by propagating partial derivatives
-backward along the expression graph.  The gradient calculations
-account for the majority of the cycles consumed by a Stan program.
-
-\subsection{Metropolis Accept/Reject}
-
-A standard Metropolis accept/reject step is required to retain detailed
-balance and ensure samples are marginally distributed according to the
-probability function defined by the model.  This Metropolis adjustment
-is based on comparing log probabilities, here defined by the
-Hamiltonian, which is the sum of the potential (negative log
-probability) and kinetic (squared momentum) energies.  In theory, the
-Hamiltonian is invariant over the path of the particle and rejection
-should never occur.  In practice, the probability of rejection is
-determined by the accuracy of the leapfrog approximation to the true
-trajectory of the parameters.
-
-If step sizes are small, very few updates will be rejected, but many
-steps will be required to move the same distance.  If step sizes are
-large, more updates will be rejected, but fewer steps will be required
-to move the same distance.  Thus a balance between effort and
-rejection rate is required.  If the user has not specified a step
-size, Stan will tune the step size during warmup sampling to achieve
-a desired rejection rate (thus balancing rejection versus number of
-steps).
-
-If the proposal is accepted, the parameters are updated to their new
-values.  Otherwise, the sample is the current set of parameter values.
-
-
-\section{Optimization}
-
-Optimization runs very much like sampling in that it starts by reading
-the data and then initializing parameters.  Unlike sampling, it
-produces a deterministic output which requires no further analysis
-other than to verify that the optimizer itself converged to a
-posterior mode.  The output for optimization is also similar to that
-for sampling.
-
-
-\section{Variational Inference}
-
-Variational inference also runs similar to sampling. It begins by reading the
-data and initializing the algorithm. The initial variational approximation is a
-random draw from the standard normal distribution in the unconstrained
-(real-coordinate) space. Again, similar to sampling, it outputs samples from the
-approximate posterior once the algorithm has decided that it has converged.
-Thus, the tools we use for analyzing the result of Stan's sampling routines can
-also be used for variational inference.
-
-
-
-\section{Model Diagnostics}
-
-Model diagnostics are like sampling and optimization in that they
-depend on a model's data being read and its parameters being
-initialized.  The user's guides for the interfaces (RStan, PyStan,
-CmdStan) provide more details on the diagnostics available; as of Stan
-2.0, that's just gradients on the unconstrained scale and log
-probabilities.
-
-\section{Output}
-
-For each final sample (not counting samples during warmup or samples
-that are thinned), there is an output stage of writing the samples.
-
-\subsection{Generated Quantities}
-
-Before generating any output, the statements in the generated quantities
-block are executed.  This can be used for any forward simulation based
-on parameters of the model.  Or it may be used to transform parameters
-to an appropriate form for output.
-
-After the generated quantities statements execute, the constraints
-declared on generated quantities variables are validated.   If these
-constraints are violated, the program will terminate with a diagnostic message.
-
-\subsection{Write}
-
-The final step is to write the actual values.  The values of all
-variables declared as parameters, transformed parameters, or generated
-quantities are written.  Local variables are not written, nor is the
-data or transformed data.  All values are written in their constrained
-forms, that is the form that is used in the model definitions.
-
-In the executable form of a Stan models, parameters, transformed
-parameters, and generated quantities are written to a file in
-comma-separated value (\acronym{csv}) notation with a header defining
-the names of the parameters (including indices for multivariate
-parameters).%
-\footnote{In the \R version of Stan, the values may either be
-written to a \acronym{csv} file or directly back to \R's memory.}
-
-% PSEUDOCODE FOR STAN MODEL
-% \begin{verbatim}
-% read data into memory
-% validate data constraints
-% execute transformed data statements
-% validate transformed data constraints
-% read and inverse transform initial parameter values
-%     (OR randomly initialize)
-% for each sample desired:
-%     if warming up and adapting, adapt step size
-%     randomly initialize momentum
-%     for each leapfrog step:
-%         calculate log probability and gradient
-%         increment momentum by half step-size times gradient
-%         increment parameters by step-size times momentum
-%         calculate log probability and gradient
-%         increment momentum by half step-size times gradient
-%     if not rejected by Metropolis condition:
-%         update parameters to new values
-%         execute transformed parameters statement
-%         validate transformed parameters constraints
-%         write parameters, transformed parameters, generated quantities
-% \end{verbatim}
+\part{Stan Modeling Language}
 
 
 
@@ -358,38 +35,127 @@ invocations of the program.
 
 \section{Overview of Data Types}
 
-\subsection{Basic Data Types}
+%%%
+Arguments for built-in and user-defined functions and local variables
+are required to be basic data types, meaning an unconstrained
+primitive, vector, or matrix type or an array of such.
 
-The primitive Stan data types are \code{real} for continuous scalar
-quantities and \code{int} for integer values.  The compound data
-types include \code{vector} (of real values), \code{row\_vector} (of
-real values), and \code{matrix} (of real values).
+Passing arguments to functions in Stan works just like assignment to
+basic types.  Stan functions are only specified for the basic data
+types of their arguments, including array dimensionality, but not for
+sizes or constraints.  Of course, functions often check constraints as
+part of their behavior.  
+
+\subsection{Primitive Types}
+
+Stan provides two primitive data types, \code{real} for continuous
+values and \code{int} for integer values.
+
+\subsection{Vector and Matrix Types}
+Stan provides three matrix-based data types, \code{vector} for column
+vectors, \code{row\_vector} for row vectors, and \code{matrix} for
+matrices.
+
+\subsection{Array Types}
+
+Any type (including the constrained types discussed in the next
+section) can be made into an array type by declaring array arguments.
+For example,
+%
+\begin{stancode}
+real x[10];
+matrix[3,3] m[6,7];
+\end{stancode}
+%
+declares \code{x} to be a one-dimensional array of size 10 containing
+real values, and declares \code{m} to be a two-dimensional array of
+size $6 \times 7$ containing values that are $3 \times 3$ matrices.
+
+% \subsection{Basic Data Types}
+
+% The primitive Stan data types are \code{real} for continuous scalar
+% quantities and \code{int} for integer values.  The compound data
+% types include \code{vector} (of real values), \code{row\_vector} (of
+% real values), and \code{matrix} (of real values).
 
 \subsection{Constrained Data Types}
 
-Integer or real types may be constrained with lower bounds, upper
-bounds, or both.  There are four constrained vector data types,
-\code{simplex} for unit simplexes, \code{unit\_vector} for unit-length
-vectors, \code{ordered} for ordered vectors of scalars and
-\code{positive\_ordered} for vectors of positive ordered scalars.
-There are specialized matrix data types \code{corr\_matrix} and
-\code{cov\_matrix} for correlation matrices (symmetric, positive
-definite, unit diagonal) and covariance matrices (symmetric, positive
-definite).  The type \code{cholesky\_factor\_cov} is for Cholesky
-factors of covariance matrices (lower triangular, positive diagonal,
-product with own transpose is a covariance matrix).  The type
-\code{cholesky\_factor\_corr} is for Cholesky factors of correlation
-matrices (lower triangular, positive diagonal, unit-length rows).
+Declarations of variables other than local variables may be provided
+with constraints.  These constraints are not part of the underlying
+data type for a variable, but determine error checking in the
+transformed data, transformed parameter, and generated quantities
+block, and the transform from unconstrained to constrained space in
+the parameters block.
 
-\subsection{Arrays}
+All of the basic data types may be given lower and upper bounds using
+syntax such as
+%
+\begin{stancode}
+int<lower=1> N;
+real<upper=0> log_p;
+vector<lower=-1,upper=1>[3,3] corr;
+\end{stancode}
 
-Stan supports arrays of arbitrary order of any of the basic data
-types or constrained basic data types.  This includes
-three-dimensional arrays of integers, one-dimensional arrays of
-positive reals, four-dimensional arrays of simplexes, one-dimensional
-arrays of row vectors, and so on.
+There are also special data types for structured vectors and
+matrices.
+% There are four constrained vector data types, \code{simplex}
+% for unit simplexes, \code{unit\_vector} for unit-length vectors,
+% \code{ordered} for ordered vectors of scalars and
+% \code{positive\_ordered} for vectors of positive ordered
+% scalars. There are specialized matrix data types \code{corr\_matrix}
+% and \code{cov\_matrix} for correlation matrices (symmetric, positive
+% definite, unit diagonal) and covariance matrices (symmetric, positive
+% definite).  The type \code{cholesky\_factor\_cov} is for Cholesky
+% factors of covariance matrices (lower triangular, positive diagonal,
+% product with own transpose is a covariance matrix).  The type
+% \code{cholesky\_factor\_corr} is for Cholesky factors of correlation
+% matrices (lower triangular, positive diagonal, unit-length rows).
 
+Constraints provide error checking for variables defined in the \code{data},
+\code{transformed data}, \code{transformed parameters}, and 
+\code{generated quantities} blocks.
+%
+Constraints are critical for variables declared in the
+\code{parameters} block, where they determine the transformation from
+constrained variables (those satisfying the declared constraint) to
+unconstrained variables (those ranging over all of $\mathbb{R}^n$).
 
+It is worth calling out the most important aspect of constrained data
+types: 
+%
+\begin{quote}
+\it
+The model must have support (non-zero density) at every value of the
+parameters that meets their declared constraints.
+\end{quote}
+%
+If the declared parameter constraints are less strict than the
+support, the samplers and optimizers may have any of a number of
+pathologies including just getting stuck, failure to initialize,
+excessive Metropolis rejection, or biased samples due to inability to
+explore the tails of the distribution.
+
+% Integer or real types may be constrained with lower bounds, upper
+% bounds, or both.  There are four constrained vector data types,
+% \code{simplex} for unit simplexes, \code{unit\_vector} for unit-length
+% vectors, \code{ordered} for ordered vectors of scalars and
+% \code{positive\_ordered} for vectors of positive ordered scalars.
+% There are specialized matrix data types \code{corr\_matrix} and
+% \code{cov\_matrix} for correlation matrices (symmetric, positive
+% definite, unit diagonal) and covariance matrices (symmetric, positive
+% definite).  The type \code{cholesky\_factor\_cov} is for Cholesky
+% factors of covariance matrices (lower triangular, positive diagonal,
+% product with own transpose is a covariance matrix).  The type
+% \code{cholesky\_factor\_corr} is for Cholesky factors of correlation
+% matrices (lower triangular, positive diagonal, unit-length rows).
+
+% \subsection{Arrays}
+
+% Stan supports arrays of arbitrary order of any of the basic data
+% types or constrained basic data types.  This includes
+% three-dimensional arrays of integers, one-dimensional arrays of
+% positive reals, four-dimensional arrays of simplexes, one-dimensional
+% arrays of row vectors, and so on.
 
 \section{Primitive Numerical Data Types}\label{numerical-data-types.section}
 
@@ -583,14 +349,46 @@ ranging between the minimum and maximum value of \code{y}.  As shown
 in the example code, the functions \code{min()} and \code{max()} may
 be applied to containers such as arrays.
 
-
 \section{Vector and Matrix Data Types}
 
-\subsection{Values}
+Stan provides three types of container objects: arrays, vectors, and
+matrices. Vectors and matrices are more limited kinds of data
+structures than arrays.  Vectors are intrinsically one-dimensional
+collections of reals, whereas matrices are intrinsically two
+dimensional.  Vectors, matrices, and arrays are not assignable to one
+another, even if their dimensions are identical.  A $3 \times 4$
+matrix is a different kind of object in Stan than a $3 \times 4$
+array.
 
-Vectors, row vectors, and matrices contain real values.  Arrays, on
-the other hand, may contain any kind of value, including integers and
-structured values like vectors.
+The intention of using matrix types is to call out their usage in the
+code.  There are three situations in Stan where {\it only} vectors and
+matrices may be used,
+%
+\begin{itemize}
+\item matrix arithmetic operations (e.g., matrix multiplication)
+\item linear algebra functions (e.g., eigenvalues and determinants),
+  and
+\item multivariate function parameters and outcomes (e.g.,
+  multivariate normal distribution arguments).
+\end{itemize}
+%
+
+Vectors and matrices cannot be typed to return integer values.  They
+are restricted to \code{real} values.%
+%
+\footnote{This may change if Stan is called upon to do complicated
+  integer matrix operations or boolean matrix operations.  Integers
+  are not appropriate inputs for linear algebra functions.}
+
+% \subsection{Values}
+
+% Vectors, row vectors, and matrices contain real values.  Arrays, on
+% the other hand, may contain any kind of value, including integers and
+% structured values like vectors.
+
+% Arrays cannot be assigned to vectors and vice-versa.  Similarly,
+% vectors cannot be assigned to matrices and vice-versa, even if their
+% dimensions conform.
 
 \subsection{Indexing from 1}
 
@@ -600,7 +398,6 @@ algebra as well as their implementations in the statistical software
 packages \R, \MATLAB, \BUGS, and \JAGS.  General computer programming
 languages, on the other hand, such as \Cpp and Python, index arrays
 starting from zero.
-
 
 \subsection{Vectors}
 
@@ -620,9 +417,6 @@ declaration of a 3-vector of non-negative values.
 vector<lower=0>[3] u;
 \end{stancode}
 %
-
-
-
 
 \subsection{Unit Simplexes}
 
@@ -850,7 +644,9 @@ $M \times N$.
 \subsection{Assigning Constrained Variables}
 
 Constrained variables of all types may be assigned to other variables
-of the same unconstrained type and vice-versa.  For instance, a
+of the same unconstrained type and vice-versa.  Matching is interpreted strictly
+as having the same basic type and number of array dimensions.
+Constraints are not considered, but basic data types are. For instance, a
 variable declared to be \code{real<lower=0,upper=1>} could be assigned
 to a variable declared as \code{real} and vice-versa.  Similarly, a
 variable declared as \code{matrix[3,3]} may be assigned to a variable
@@ -931,10 +727,21 @@ quantities.
 
 \section{Array Data Types}\label{array-data-types.section}
 
-Stan supports arrays of arbitrary dimension.  An array's elements may
-be any of the basic data types, that is univariate integers,
-univariate reals, vectors, row vectors matrices, including all of the
-constrained forms.
+Stan supports arrays of arbitrary dimension.  The values in an array
+can be any type, so that arrays may contain values that are simple
+reals or integers, vectors, matrices, or other arrays.  Arrays are the
+only way to store sequences of integers, and some functions in Stan,
+such as discrete distributions, require integer arguments.
+
+A two-dimensional array is just an array of arrays, both conceptually
+and in terms of current implementation.  When an index is supplied to
+an array, it returns the value at that index.  When more than one
+index is supplied, this indexing operation is chained.  For example, if
+\code{a} is a two-dimensional array, then \code{a[m,~n]} is just
+a convenient shorthand for \code{a[m][n]}.
+%
+Vectors, matrices, and arrays are not assignable to one another, even
+if their dimensions are identical.
 
 \subsection{Declaring Array Variables}
 
@@ -1343,7 +1150,6 @@ Any variable that is in scope and any function that is available in
 the block in which the compound declaration and definition appears may
 be used in the expression on the right-hand side of the compound
 declaration and definition statement. 
-
 
 \chapter{Expressions}
 
@@ -2050,7 +1856,7 @@ the third row of the matrix denoted by \code{m[1,2]}.  Finally,
 third row and fourth column of the matrix that is found at the first
 row and second column of the array \code{m}.
 
-\section{Multiple Indexing}\label{language-multi-indexing.section}
+\section{Multiple Indexing and Range Indexing}\label{language-multi-indexing.section}
 
 In addition to single integer indexes, as described in
 \refsection{language-indexing}, Stan supports multiple indexing.
@@ -2529,8 +2335,6 @@ Even though finite differences calculates the right gradient of 0,
 automatic differentiation follows the chain rule and produces a
 not-a-number output.
 
-
-
 \chapter{Statements}
 
 \noindent
@@ -2541,11 +2345,14 @@ the order in which they are written.  Variables must be defined to
 have some value (as well as declared to have some type) before they
 are used --- if they do not, the behavior is undefined.
 
-Like \BUGS, Stan has two kinds of atomic statements, assignment
-statements and sampling statements.  Also like \BUGS, statements may
-be grouped into sequences and into for-each loops.  In addition, Stan
-allows local variables to be declared in blocks and also allows an
-empty statement consisting only of a semicolon.
+The basis of Stan's execution is the evaluation of a log probability
+function (specifically, a probability density function) for a given
+set of (real-valued) parameters. Log probability function can be
+constructed by using assignment statements.  Statements may be grouped
+into sequences and into for-each loops.  In addition, Stan allows
+local variables to be declared in blocks and also allows an empty
+statement consisting only of a semicolon.
+
 
 \section{Assignment Statement}\label{assignment-statement.section}
 
@@ -2796,8 +2603,8 @@ the function \code{get\_lp()} may be used.%
 
 \section{Sampling Statements}\label{sampling-statements.section}
 
-Like \BUGS and \JAGS, Stan supports probability statements in
-sampling notation, such as
+Stan supports writing probability statements also in sampling
+notation, such as
 %
 \begin{stancode}
 y ~ normal(mu,sigma);
@@ -2817,9 +2624,6 @@ total log probability as
 \begin{stancode}
 target += normal_lpdf(y | mu, sigma);
 \end{stancode}
-%
-See the subsection of \refsection{sampling-statements} discussing log
-probability increments for a full explanation.
 
 In general, a sampling statement of the form
 %
@@ -3704,6 +3508,7 @@ A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
 } [ ] ( ) < > | / ! ? . , ; :
 \end{Verbatim}
 \end{quote}
+%$ to fix AUXTeX highlighting
 
 \subsection{Debug by \code{print}}
 
@@ -3852,386 +3657,6 @@ posterior density is negligible or constant, we can't sample from that
 truncated posterior efficiently.  Programs need to use one-to-one
 mappings that guarantee the constraints are satisfied and only use
 reject statements to raise errors or help with debugging.
-
-\chapter{User-Defined Functions}\label{functions.chapter}%
-%
-\noindent
-Stan allows users to define their own functions.  The basic syntax is
-a simplified version of that used in C and \Cpp.  This chapter
-specifies how functions are declared, defined, and used in Stan; see
-\refchapter{functions-programming} for a more programming-oriented
-perspective.
-
-\section{Function-Definition Block}
-
-User-defined functions appear in a special function-definition block
-before all of the other program blocks.
-%
-\begin{stancode}
-functions {
-   // ... function declarations and definitions ...
-}
-data {
-  // ...
-\end{stancode}
-%
-Function definitions and declarations may appear in any order, subject
-to the condition that a function must be declared before it is used.
-Forward declarations are allowed in order to support recursive
-functions.
-
-\section{Function Names}
-
-The rules for function naming and function-argument naming are the
-same as for other variables; see \refsection{variables} for more
-information on valid identifiers.  For example,
-%
-\begin{stancode}
-real foo(real mu, real sigma);
-\end{stancode}
-%
-declares a function named \code{foo} with two argument variables of
-types \code{real} and \code{real}.  The arguments are named \code{mu}
-and \code{sigma}, but that is not part of the declaration.  Two
-user-defined functions may \emph{not} \, have the same name even if they have
-different sequences of argument types.
-
-\section{Calling Functions}
-
-All function arguments are mandatory---there are no default values.
-
-\subsection{Functions as Expressions}
-
-Functions with non-void return types are called just like any other
-built-in function in Stan---they are applied to appropriately typed
-arguments to produce an expression, which has a value when executed.
-
-\subsection{Functions as Statements}
-
-Functions with void return types may be applied to arguments and used
-as statements.  These act like sampling statements or print
-statements.  Such uses are only appropriate for functions that act
-through side effects, such as incrementing the log probability
-accumulator, printing, or raising exceptions.
-
-\subsection{Probability Functions in Sampling Statements}
-
-Functions whose name ends in \code{\_lpdf} or \code{\_lpmf} (density
-and mass functions) may be used as probability functions and may be
-used in place of parameterized distributions on the right-hand-side of
-sampling statements.  There is no restriction on where such functions
-may be used.
-
-\subsection{Restrictions on Placement}
-
-Functions of certain types are restricted on scope of usage.
-Functions whose names end in \code{\_lp} assume access to the log
-probability accumulator and are only available in the transformed
-parameter and model blocks.  Functions whose names end in \code{\_rng}
-assume access to the random number generator and may only be used
-within the generated quantities block, transformed data block, and
-within user-defined functions ending in \code{\_rng}.  See
-\refsection{function-bodies} for more information on these two special
-types of function.
-
-\section{Unsized Argument Types}
-
-Stan's functions all have declared types for both arguments and
-returned value.  As with built-in functions, user-defined functions are
-only declared for base argument type and dimensionality.  This
-requires a different syntax than for declaring other variables.  The
-choice of language was made so that return types and argument types
-could use the same declaration syntax.
-
-The type \code{void} may not be used as an argument type, only a
-return type for a function with side effects.
-
-
-\subsection{Base Variable Type Declaration}
-
-The base variable types are \code{integer}, \code{real},
-\code{vector}, \code{row\_vector}, and \code{matrix}.  No lower-bound
-or upper-bound constraints are allowed (e.g., \code{real<lower=0>} is
-illegal).  Specialized types are also not allowed (e.g.,
-\code{simplex} is illegal) .
-
-\subsection{Dimensionality Declaration}
-
-Arguments and return types may be arrays, and these are indicated with
-optional brackets and commas as would be used for indexing.  For
-example, \code{int} denotes a single integer argument or return,
-whereas \code{real[\,]} indicates a one-dimensional array of reals,
-\code{real[\,,\,]} a two-dimensional array and \code{real[\,,\,,\,]} a
-three-dimensional array; whitespace is optional, as usual.
-
-The dimensions for vectors and matrices are not included, so that
-\code{matrix} is the type of a single matrix argument or return type.
-Thus if a variable is declared as \code{matrix a}, then \code{a} has
-two indexing dimensions, so that \code{a[1]} is a row vector and
-\code{a[1,1]} a real value.  Matrices implicitly have two indexing
-dimensions.  The type declaration \code{matrix[,]~b} specifies that
-\code{b} is a two-dimensional array of matrices, for a total of four
-indexing dimensions, with \code{b[1,1,1,1]} picking out a real value.
-
-\subsection{Dimensionality Checks and Exceptions}
-
-Function argument and return types are not themselves checked for
-dimensionality.  A matrix of any size may be passed in as a matrix
-argument.  Nevertheless, a user-defined function might call a function
-(such as a multivariate normal density) that itself does
-dimensionality checks.
-
-Dimensions of function return values will be checked if they're
-assigned to a previously declared variable.  They may also be checked
-if they are used as the argument to a function.
-
-Any errors raised by calls to functions inside user functions or
-return type mismatches are simply passed on;  this typically results
-in a warning message and rejection of a proposal during sampling or
-optimization.
-
-\section{Function Bodies}\label{function-bodies.section}
-
-The body of a function is bounded by curly braces (\code{\{} and
-\code{\}}).  The body may contain local variable declarations at the
-top of the function body's block and these scope the same way as local
-variables used in any other statement block.
-
-The only restrictions on statements in function bodies are external,
-and determine whether the log probability accumulator or random
-number generators are available;  see the rest of this section for details.
-
-\subsection{Random Number Generating Functions}
-
-Functions that call random number generating functions in their bodies
-must have a name that ends in \code{\_rng}; attempts to use
-random-number generators in other functions leads to a compile-time
-error.
-
-Like other random number generating functions, user-defined functions
-with names that end in \code{\_rng} may be used only in the generated
-quantities block and transformed data block, or within the bodies of
-user-defined functions ending in \code{\_rng}.  An attempt to use such
-a function elsewhere results in a compile-time error.
-
-\subsection{Log Probability Access in Functions}
-
-Functions that include sampling statements or log probability
-increment statements must have a name that ends in \code{\_lp}.
-Attempts to use sampling statements or increment log probability
-statements in other functions leads to a compile-time error.
-
-Like the target log density increment statement and sampling
-statements, user-defined functions with names that end in \code{\_lp}
-may only be used in blocks where the log probability accumulator is
-accessible, namely the transformed parameters and model blocks.  An
-attempt to use such a function elsewhere results in a compile-time
-error.
-
-\subsection{Definining Probability Functions for Sampling Statements}
-
-Functions whose names end in \code{\_lpdf} and \code{\_lpmf} (density
-and mass functions) can be used as probability functions in sampling
-statements.  As with the built-in functions, the first argument will
-appear on the left of the sampling statement operator (\Verb|~|) in
-the sampling statement and the other arguments follow.  For example,
-suppose a function returning the log of the density of \code{y} given
-parameter \code{theta} allows the use of the sampling statement is
-defined as follows.
-%
-\begin{stancode}
-real foo_lpdf(real y, vector theta) { ... }
-\end{stancode}
-%
-Note that for function definitions, the comma is used rather than the
-vertical bar.  Then the shorthand
-%
-\begin{stancode}
-z ~ foo(phi);
-\end{stancode}
-%
-will have exactly the same effect
-%
-\begin{stancode}
-target += foo_lpdf(z | phi);
-\end{stancode}
-%
-Unlike built-in probability functions, user-defined
-probability functions like the example \code{foo} above will not
-automatically drop constant terms.
-
-The same syntax and shorthand works for log probability mass functions
-with suffixes \code{\_lpmf}.
-
-A function that is going to be accessed as distributions must return
-the log of the density or mass function it defines.
-
-
-\section{Parameters are Constant}
-
-Within function definition bodies, the parameters may be used like any
-other variable.  But the parameters are constant in the sense that
-they can't be assigned to (i.e., can't appear on the left side of an
-assignment (\code{=}) statement.  In other words, their value remains
-constant throughout the function body.  Attempting to assign a value
-to a function parameter value will raise a compile-time error.%
-%
-\footnote{Despite being declared constant and appearing to have a
-  pass-by-value syntax in Stan, the implementation of the language
-  passes function arguments by constant reference in C++.}
-
-Local variables may be declared at the top of the function block and
-scope as usual.
-
-\section{Return Value}\label{function-returns.section}
-
-Non-void functions must have a return statement that returns an
-appropriately typed expression.   If the expression in a return
-statement does not have the same type as the return type declared for
-the function, a compile-time error is raised.
-
-Void functions may use \code{return} only without an argument, but
-return statements are not mandatory.
-
-\subsection{Return Guarantee Required}
-
-Unlike \Cpp, Stan enforces a syntactic guarantee for non-void
-functions that ensures control will leave a non-void function through
-an appropriately typed return statement or because an exception is
-raised in the execution of the function.  To enforce this condition,
-functions must have a return statement as the last statement in their
-body.  This notion of last is defined recursively in terms of
-statements that qualify as bodies for functions.  The base case is that
-%
-\begin{itemize}
-\item a return statement qualifies,
-\end{itemize}
-%
-and the recursive cases are that
-%
-\begin{itemize}
-\item a sequence of statements qualifies if its last statement
-  qualifies,
-\item a for loop or while loop qualifies if its body qualifies, and
-\item a conditional statement qualifies if it has a default else
-  clause and all of its body statements qualify.
-\end{itemize}
-%
-These rules disqualify
-%
-\begin{stancode}
-real foo(real x) {
-  if (x > 2) return 1.0;
-  else if (x <= 2) return -1.0;
-}
-\end{stancode}
-%
-because there is no default \code{else} clause, and
-disqualify
-%
-\begin{stancode}
-real foo(real x) {
-  real y;
-  y = x;
-  while (x < 10) {
-    if (x > 0) return x;
-    y = x / 2;
-  }
-}
-\end{stancode}
-%
-beause the return statement is not the last statement in the while
-loop.  A bogus dummy return could be placed after the while loop in
-this case.  The rules for returns allow
-%
-\begin{stancode}
-real log_fancy(real x) {
-  if (x < 1e-30)
-    return x;
-  else if (x < 1e-14)
-    return x * x;
-  else
-    return log(x);
-}
-\end{stancode}
-%
-because there's a default else clause and each condition body has
-return as its final statement.
-
-
-\section{Void Functions as Statements}
-
-\subsection{Void Functions}
-
-A function can be declared without a return value by using \code{void}
-in place of a return type.  Note that the type \code{void} may only be
-used as a return type---arguments may not be declared to be of type
-\code{void}.
-
-\subsection{Usage as Statement}
-
-A void function may be used as a statement after the function is
-declared;  see \refsection{forward-declarations} for rules on declaration.
-
-Because there is no return, such a usage is only for side effects,
-such as incrementing the log probability function, printing, or
-raising an error.
-
-\subsection{Special Return Statements}
-
-In a return statement within a void function's definition, the
-\code{return} keyword is followed immediately by a semicolon
-(\code{;}) rather than by the expression whose value is returned.
-
-
-\section{Declarations}\label{forward-declarations.section}
-
-In general, functions must be declared before they are used.  Stan
-supports forward declarations, which look like function definitions
-without bodies.  For example,
-%
-\begin{stancode}
-real unit_normal_lpdf(real y);
-\end{stancode}
-%
-declares a function named \code{unit\_normal\_log} that consumes a
-single real-valued input and produces a real-valued output.  A
-function definition with a body simultaneously declares and defines
-the named function, as in
-%
-\begin{stancode}
-real unit_normal_lpdf(real y) {
-  return -0.5 * square(y);
-}
-\end{stancode}
-%
-
-A user-defined Stan function may be declared and then later defined,
-or just defined without being declared.  No other combination of
-declaration and definition is legal, so that, for instance, a function
-may not be declared more than once, nor may it be defined more than
-once.  If there is a declaration, there must be a definition.  These
-rules together ensure that all the declared functions are eventually
-defined.
-
-\subsection{Recursive Functions}
-
-Forward declarations allow the definition of self-recursive or
-mutually recursive functions.  For instance, consider the following
-code to compute Fibonacci numbers.
-%
-\begin{stancode}
-int fib(int n);
-
-int fib(int n) {
-  if (n < 2) return n;
-  else return fib(n-1) + fib(n-2);
-}
-\end{stancode}
-%
-Without the forward declaration in the first line, the body of the
-definition would not compile.
-
 
 
 
@@ -4868,275 +4293,706 @@ on the declared generated quantity variables are validated.
 All variables declared as generated quantities are printed as part of
 the output.
 
-\chapter{Modeling Language Syntax}
-
-\noindent
-This chapter defines the basic syntax of the Stan modeling language
-using a Backus-Naur form (\BNF) grammar plus extra-grammatical
-constraints on function typing and operator precedence and
-associativity.
-
-
-\section{BNF Grammars}
-
-\subsection{Syntactic Conventions}
-
-In the following \BNF grammars, literal strings are indicated in
-single quotes (\Verb|'|).  Grammar non-terminals are unquoted strings.
-A prefix question mark (\code{?A}) indicates optionality of \code{A}.
-A postfixed Kleene star (\code{A*}) indicates zero or more occurrences
-of \code{A}.  The notation \code{A \% B}, following the Boost Spirit
-parser library's notation, is shorthand for \code{?(A (B A)*)}, i.e.,
-any number of \code{A} (including zero), separated by \code{B}.  A
-postfixed, curly-braced number indicates a fixed number of repetions;
-e.g., \code{A\{6\}} is equivalent to a sequence of six copies of \code{A}.
-
-\subsection{Programs}
-
-{\small
-\begin{Verbatim}
-program ::= ?functions ?data ?tdata ?params ?tparams model ?generated
-
-functions ::= 'functions' function_decls
-data ::= 'data' var_decls
-tdata ::= 'transformed data' var_decls_statements
-params ::= 'parameters' var_decls
-tparams ::= 'transformed parameters' var_decls_statements
-model ::= 'model' statement
-generated ::= 'generated quantities' var_decls_statements
-
-function_decls ::= '{' function_decl* '}'
-var_decls ::= '{' var_decl* '}'
-var_decls_statements ::= '{' var_decl* statement* '}'
-\end{Verbatim}
-}
-
-\subsection{Function Declarations}
-
-{
-\small
-\begin{Verbatim}[fontsize=\small]
-function_decl ::= unsized_return_type identifier '(' unsized_types ')'
-                 statement
-
-unsized_return_type ::= 'void' | unsized_type
-unsized_type ::= (basic_type ?unsized_dims)
-unsized_types ::= unsized_type % ','
-basic_type ::= 'int' | 'real' | 'vector' | 'row_vector' | 'matrix'
-unsized_dims ::= '['  ','*  ']'
-\end{Verbatim}
-}
-
-\subsection{Variable Declarations}
-
-{
-\small
-\begin{Verbatim}[fontsize=\small]
-var_decl ::= var_type variable ?dims ?('=' expression) ';'
-
-var_type ::= 'int' range_constraint
-           | 'real' range_constraint
-           | 'vector' range_constraint '[' expression ']'
-           | 'ordered' '[' expression ']'
-           | 'positive_ordered' '[' expression ']'
-           | 'simplex' '[' expression ']'
-           | 'unit_vector' '[' expression ']'
-           | 'row_vector' range_constraint '[' expression ']'
-           | 'matrix' range_constraint '[' expression ',' expression ']'
-           | 'cholesky_factor_corr' '[' expression ']'
-           | 'cholesky_factor_cov' '[' expression ?(',' expression) ']'
-           | 'corr_matrix' '[' expression ']'
-           | 'cov_matrix' '[' expression ']'
-
-range_constraint ::= ?('<' range '>')
-
-range ::= 'lower' '=' expression ',' 'upper' = expression
-        | 'lower' '=' expression
-        | 'upper' '=' expression
-
-dims ::= '['  expressions ']'
-
-variable ::= identifier
-
-identifier ::= [a-zA-Z] [a-zA-Z0-9_]*
-\end{Verbatim}
-}
-
-\subsection{Expressions}
-
-{
-\small
-\begin{Verbatim}[fontsize=\small]
-expressions ::= expression % ','
-expression ::= numeric_literal
-             | variable
-             | expression `?` expression `:` expression
-             | expression infixOp expression
-             | prefixOp expression
-             | expression postfixOp
-             | expression '[' indexes ']'
-             | function_literal '(' ?expressions ')'
-             | function_literal '(' expression ?('|' expression % ',') ')'
-             | integrate_ode '(' function_literal (',' expression){6} ')'
-             | integrate_ode_rk45
-               '(' function_literal (',' expression){6|9} ')'
-             | integrate_ode_bdf
-               '(' function_literal (',' expression){6|9} ')'
-             | '(' expression ')'
-
-index ::= ?(expression | expression ':' | ':' expression
-            | expression ':' expression)
-
-indexes ::= index % ','
-
-numeric_literal ::= integer_literal | real_literal
-
-integer_literal ::= 0 | [1-9] [0-9]*
-
-real_literal ::= integer_literal ?('.' [0-9]*) ?exp_literal
-
-exp_literal ::= ('e' | 'E') integer_literal
-
-function_literal ::= identifier
-\end{Verbatim}
-}
-
-\subsection{Statements}
-
-{
-\small
-\begin{Verbatim}[fontsize=\small]
-statement ::= atomic_statement | nested_statement
-
-atomic_statement ::= atomic_statement_body ';'
-atomic_statement_body
-::=  lhs ('=' | '<-') expression
-   | expression '~' identifier '(' expressions ')' ?truncation
-   | function_literal '(' expressions ')'
-   | 'increment_log_prob' '(' expression ')'
-   | 'target' '+=' expression
-   | 'break'
-   | 'continue'
-   | 'print' '(' (expression | string_literal)* ')'
-   | 'reject' '(' (expression | string_literal)* ')'
-   | 'return' expression
-   | ''
-
-string_literal ::= '"' char* '"'
-
-truncation ::= 'T' '[' ?expression ',' ?expression ']'
-
-lhs ::= identifier ?('[' indexes ']')
-
-nested_statement
-::=
-  | 'if' '(' expression ')' statement
-    ('else' 'if' '(' expression ')' statement)*
-    ?('else' statement)
-  | 'while' '(' expression ')' statement
-  | 'for' '(' identifier 'in' expression ':' expression ')' statement
-  | '{' var_decl* statement+ '}'
-\end{Verbatim}
+\chapter{User-Defined Functions}\label{functions.chapter}%
 %
+\noindent
+Stan allows users to define their own functions.  The basic syntax is
+a simplified version of that used in C and \Cpp.  This chapter
+specifies how functions are declared, defined, and used in Stan; see
+\refchapter{functions-programming} for a more programming-oriented
+perspective.
+
+\section{Function-Definition Block}
+
+User-defined functions appear in a special function-definition block
+before all of the other program blocks.
+%
+\begin{stancode}
+functions {
+   // ... function declarations and definitions ...
 }
+data {
+  // ...
+\end{stancode}
+%
+Function definitions and declarations may appear in any order, subject
+to the condition that a function must be declared before it is used.
+Forward declarations are allowed in order to support recursive
+functions.
 
-\section{Extra-Grammatical Constraints}
+\section{Function Names}
 
-\subsection{Type Constraints}
+The rules for function naming and function-argument naming are the
+same as for other variables; see \refsection{variables} for more
+information on valid identifiers.  For example,
+%
+\begin{stancode}
+real foo(real mu, real sigma);
+\end{stancode}
+%
+declares a function named \code{foo} with two argument variables of
+types \code{real} and \code{real}.  The arguments are named \code{mu}
+and \code{sigma}, but that is not part of the declaration.  Two
+user-defined functions may \emph{not} \, have the same name even if they have
+different sequences of argument types.
 
-A well-formed Stan program must satisfy the type constraints imposed
-by functions and distributions.  For example, the binomial
-distribution requires an integer total count parameter and integer
-variate and when truncated would require integer truncation points.
-If these constraints are violated, the program will be rejected during
-parsing with an error message indicating the location of the problem.
-For information on argument types, see \refpart{built-in-functions}.
+\section{Calling Functions}
 
-\subsection{Operator Precedence and Associativity}
+All function arguments are mandatory---there are no default values.
 
-In the Stan grammar provided in this chapter, the expression \code{1
-  + 2 * 3} has two parses.  As described in
-\refsection{arithmetic-expressions}, Stan disambiguates between the
-meaning $1 + (2 \times 3)$ and the meaning $(1 + 2) \times 3$ based on
-operator precedences and associativities.
+\subsection{Functions as Expressions}
 
-\subsection{Typing of Compound Declaration and Definition}
+Functions with non-void return types are called just like any other
+built-in function in Stan---they are applied to appropriately typed
+arguments to produce an expression, which has a value when executed.
 
-In a compound variable declaration and definition, the type of the
-right-hand side expression must be assignable to the variable being
-declared.  The assignability constraint restricts compound
-declarations and definitions to local variables and variables declared
-in the transformed data, transformed parameters, and generated
-quantities blocks.
+\subsection{Functions as Statements}
 
-\subsection{Forms of Numbers}
+Functions with void return types may be applied to arguments and used
+as statements.  These act like sampling statements or print
+statements.  Such uses are only appropriate for functions that act
+through side effects, such as incrementing the log probability
+accumulator, printing, or raising exceptions.
 
-Integer literals longer than one digit may not start with 0 and real
-literals cannot consist of only a period or only an exponent.
+\subsection{Probability Functions in Sampling Statements}
 
-\subsection{Conditional Arguments}
+Functions whose name ends in \code{\_lpdf} or \code{\_lpmf} (density
+and mass functions) may be used as probability functions and may be
+used in place of parameterized distributions on the right-hand-side of
+sampling statements.  There is no restriction on where such functions
+may be used.
 
-Both the conditional if-then-else statement and while-loop statement
-require the expression denoting the condition to be a primitive type,
-integer or real.
+\subsection{Restrictions on Placement}
 
-\subsection{Only Break and Continue in Loops}
+Functions of certain types are restricted on scope of usage.
+Functions whose names end in \code{\_lp} assume access to the log
+probability accumulator and are only available in the transformed
+parameter and model blocks.  Functions whose names end in \code{\_rng}
+assume access to the random number generator and may only be used
+within the generated quantities block, transformed data block, and
+within user-defined functions ending in \code{\_rng}.  See
+\refsection{function-bodies} for more information on these two special
+types of function.
 
-The \code{break} and \code{continue} statements may only be used
-within the body of a for-loop or while-loop.
+\section{Unsized Argument Types}
 
-\subsection{PRNG Function Locations}
+Stan's functions all have declared types for both arguments and
+returned value.  As with built-in functions, user-defined functions are
+only declared for base argument type and dimensionality.  This
+requires a different syntax than for declaring other variables.  The
+choice of language was made so that return types and argument types
+could use the same declaration syntax.
 
-Functions ending in \code{\_rng} may only be called in the transformed
-data and generated quantities block, and within the bodies of
-user-defined functions with names ending in \code{\_rng}.
+The type \code{void} may not be used as an argument type, only a
+return type for a function with side effects.
 
-\subsection{Probability Function Naming}
 
-A probability function literal must have one of the following
-suffixes: \code{\_lpdf}, \code{\_lpmf}, \code{\_lcdf}, or \code{\_lccdf}.
+\subsection{Base Variable Type Declaration}
 
-\subsection{ODE Solver Argument Types and Origins}
+The base variable types are \code{integer}, \code{real},
+\code{vector}, \code{row\_vector}, and \code{matrix}.  No lower-bound
+or upper-bound constraints are allowed (e.g., \code{real<lower=0>} is
+illegal).  Specialized types are also not allowed (e.g.,
+\code{simplex} is illegal) .
 
-The \code{integrate\_ode}, \code{integrate\_ode\_rk45}, and
-\code{integrate\_ode\_bdf} functions may be used without control
-parameters;  in this case
+\subsection{Dimensionality Declaration}
+
+Arguments and return types may be arrays, and these are indicated with
+optional brackets and commas as would be used for indexing.  For
+example, \code{int} denotes a single integer argument or return,
+whereas \code{real[\,]} indicates a one-dimensional array of reals,
+\code{real[\,,\,]} a two-dimensional array and \code{real[\,,\,,\,]} a
+three-dimensional array; whitespace is optional, as usual.
+
+The dimensions for vectors and matrices are not included, so that
+\code{matrix} is the type of a single matrix argument or return type.
+Thus if a variable is declared as \code{matrix a}, then \code{a} has
+two indexing dimensions, so that \code{a[1]} is a row vector and
+\code{a[1,1]} a real value.  Matrices implicitly have two indexing
+dimensions.  The type declaration \code{matrix[,]~b} specifies that
+\code{b} is a two-dimensional array of matrices, for a total of four
+indexing dimensions, with \code{b[1,1,1,1]} picking out a real value.
+
+\subsection{Dimensionality Checks and Exceptions}
+
+Function argument and return types are not themselves checked for
+dimensionality.  A matrix of any size may be passed in as a matrix
+argument.  Nevertheless, a user-defined function might call a function
+(such as a multivariate normal density) that itself does
+dimensionality checks.
+
+Dimensions of function return values will be checked if they're
+assigned to a previously declared variable.  They may also be checked
+if they are used as the argument to a function.
+
+Any errors raised by calls to functions inside user functions or
+return type mismatches are simply passed on;  this typically results
+in a warning message and rejection of a proposal during sampling or
+optimization.
+
+\section{Function Bodies}\label{function-bodies.section}
+
+The body of a function is bounded by curly braces (\code{\{} and
+\code{\}}).  The body may contain local variable declarations at the
+top of the function body's block and these scope the same way as local
+variables used in any other statement block.
+
+The only restrictions on statements in function bodies are external,
+and determine whether the log probability accumulator or random
+number generators are available;  see the rest of this section for details.
+
+\subsection{Random Number Generating Functions}
+
+Functions that call random number generating functions in their bodies
+must have a name that ends in \code{\_rng}; attempts to use
+random-number generators in other functions leads to a compile-time
+error.
+
+Like other random number generating functions, user-defined functions
+with names that end in \code{\_rng} may be used only in the generated
+quantities block and transformed data block, or within the bodies of
+user-defined functions ending in \code{\_rng}.  An attempt to use such
+a function elsewhere results in a compile-time error.
+
+\subsection{Log Probability Access in Functions}
+
+Functions that include sampling statements or log probability
+increment statements must have a name that ends in \code{\_lp}.
+Attempts to use sampling statements or increment log probability
+statements in other functions leads to a compile-time error.
+
+Like the target log density increment statement and sampling
+statements, user-defined functions with names that end in \code{\_lp}
+may only be used in blocks where the log probability accumulator is
+accessible, namely the transformed parameters and model blocks.  An
+attempt to use such a function elsewhere results in a compile-time
+error.
+
+\subsection{Definining Probability Functions for Sampling Statements}
+
+Functions whose names end in \code{\_lpdf} and \code{\_lpmf} (density
+and mass functions) can be used as probability functions in sampling
+statements.  As with the built-in functions, the first argument will
+appear on the left of the sampling statement operator (\Verb|~|) in
+the sampling statement and the other arguments follow.  For example,
+suppose a function returning the log of the density of \code{y} given
+parameter \code{theta} allows the use of the sampling statement is
+defined as follows.
+%
+\begin{stancode}
+real foo_lpdf(real y, vector theta) { ... }
+\end{stancode}
+%
+Note that for function definitions, the comma is used rather than the
+vertical bar.  Then the shorthand
+%
+\begin{stancode}
+z ~ foo(phi);
+\end{stancode}
+%
+will have exactly the same effect
+%
+\begin{stancode}
+target += foo_lpdf(z | phi);
+\end{stancode}
+%
+Unlike built-in probability functions, user-defined
+probability functions like the example \code{foo} above will not
+automatically drop constant terms.
+
+The same syntax and shorthand works for log probability mass functions
+with suffixes \code{\_lpmf}.
+
+A function that is going to be accessed as distributions must return
+the log of the density or mass function it defines.
+
+
+\section{Parameters are Constant}
+
+Within function definition bodies, the parameters may be used like any
+other variable.  But the parameters are constant in the sense that
+they can't be assigned to (i.e., can't appear on the left side of an
+assignment (\code{=}) statement.  In other words, their value remains
+constant throughout the function body.  Attempting to assign a value
+to a function parameter value will raise a compile-time error.%
+%
+\footnote{Despite being declared constant and appearing to have a
+  pass-by-value syntax in Stan, the implementation of the language
+  passes function arguments by constant reference in C++.}
+
+Local variables may be declared at the top of the function block and
+scope as usual.
+
+\section{Return Value}\label{function-returns.section}
+
+Non-void functions must have a return statement that returns an
+appropriately typed expression.   If the expression in a return
+statement does not have the same type as the return type declared for
+the function, a compile-time error is raised.
+
+Void functions may use \code{return} only without an argument, but
+return statements are not mandatory.
+
+\subsection{Return Guarantee Required}
+
+Unlike \Cpp, Stan enforces a syntactic guarantee for non-void
+functions that ensures control will leave a non-void function through
+an appropriately typed return statement or because an exception is
+raised in the execution of the function.  To enforce this condition,
+functions must have a return statement as the last statement in their
+body.  This notion of last is defined recursively in terms of
+statements that qualify as bodies for functions.  The base case is that
 %
 \begin{itemize}
-\item its first argument to refer to a function with signature
-\begin{quote}
- \code{(real,~real[],~real[],~real[],~int[])~:~real[]},
-\end{quote}
-\item the remaining six arguments must assignable to types
-\begin{quote}
-  \code{real[]}, \code{real}, \code{real[]}, \code{real[]},
-\code{real[]}, and \code{int[]}
-\end{quote}
- respectively, and
-\item the third, fourth, and sixth arguments must be expressions not
-  containing any variables not originating in the data or transformed
-  data blocks.
+\item a return statement qualifies,
 \end{itemize}
 %
-The \code{integrate\_ode\_rk45} and \code{integrate\_ode\_bdf}
-functions may accept three additional arguments, which like the third,
-fourth, and sixth arguments, must be expressions free of parameter
-references.  The final three arguments must be assignable to types
-\begin{quote}
-\code{real}, \code{real}, \code{int}.
-\end{quote}
+and the recursive cases are that
+%
+\begin{itemize}
+\item a sequence of statements qualifies if its last statement
+  qualifies,
+\item a for loop or while loop qualifies if its body qualifies, and
+\item a conditional statement qualifies if it has a default else
+  clause and all of its body statements qualify.
+\end{itemize}
+%
+These rules disqualify
+%
+\begin{stancode}
+real foo(real x) {
+  if (x > 2) return 1.0;
+  else if (x <= 2) return -1.0;
+}
+\end{stancode}
+%
+because there is no default \code{else} clause, and
+disqualify
+%
+\begin{stancode}
+real foo(real x) {
+  real y;
+  y = x;
+  while (x < 10) {
+    if (x > 0) return x;
+    y = x / 2;
+  }
+}
+\end{stancode}
+%
+beause the return statement is not the last statement in the while
+loop.  A bogus dummy return could be placed after the while loop in
+this case.  The rules for returns allow
+%
+\begin{stancode}
+real log_fancy(real x) {
+  if (x < 1e-30)
+    return x;
+  else if (x < 1e-14)
+    return x * x;
+  else
+    return log(x);
+}
+\end{stancode}
+%
+because there's a default else clause and each condition body has
+return as its final statement.
 
-\subsection{Indexes}
 
-Standalone expressions used as indexes must denote either an integer
-(\code{int}) or an integer array (\code{int[]}).  Expressions
-participating in range indexes (e.g., \code{a} and \code{b} in
-\code{a~:~b}) must denote integers (\code{int}).
+\section{Void Functions as Statements}
 
-A second condition is that there not be more indexes provided than
-dimensions of the underlying expression (in general) or variable (on
-the left side of assignments) being indexed.  A vector or row vector
-adds 1 to the array dimension and a matrix adds 2.  That is, the type
-\code{matrix[\,,\,,\,]}, a three-dimensional array of matrices, has five
-index positions: three for the array, one for the row of the matrix
-and one for the column.
+\subsection{Void Functions}
+
+A function can be declared without a return value by using \code{void}
+in place of a return type.  Note that the type \code{void} may only be
+used as a return type---arguments may not be declared to be of type
+\code{void}.
+
+\subsection{Usage as Statement}
+
+A void function may be used as a statement after the function is
+declared;  see \refsection{forward-declarations} for rules on declaration.
+
+Because there is no return, such a usage is only for side effects,
+such as incrementing the log probability function, printing, or
+raising an error.
+
+\subsection{Special Return Statements}
+
+In a return statement within a void function's definition, the
+\code{return} keyword is followed immediately by a semicolon
+(\code{;}) rather than by the expression whose value is returned.
+
+
+\section{Declarations}\label{forward-declarations.section}
+
+In general, functions must be declared before they are used.  Stan
+supports forward declarations, which look like function definitions
+without bodies.  For example,
+%
+\begin{stancode}
+real unit_normal_lpdf(real y);
+\end{stancode}
+%
+declares a function named \code{unit\_normal\_log} that consumes a
+single real-valued input and produces a real-valued output.  A
+function definition with a body simultaneously declares and defines
+the named function, as in
+%
+\begin{stancode}
+real unit_normal_lpdf(real y) {
+  return -0.5 * square(y);
+}
+\end{stancode}
+%
+
+A user-defined Stan function may be declared and then later defined,
+or just defined without being declared.  No other combination of
+declaration and definition is legal, so that, for instance, a function
+may not be declared more than once, nor may it be defined more than
+once.  If there is a declaration, there must be a definition.  These
+rules together ensure that all the declared functions are eventually
+defined.
+
+\subsection{Recursive Functions}
+
+Forward declarations allow the definition of self-recursive or
+mutually recursive functions.  For instance, consider the following
+code to compute Fibonacci numbers.
+%
+\begin{stancode}
+int fib(int n);
+
+int fib(int n) {
+  if (n < 2) return n;
+  else return fib(n-1) + fib(n-2);
+}
+\end{stancode}
+%
+Without the forward declaration in the first line, the body of the
+definition would not compile.
+
+
+
+\chapter{Execution of a Stan Program}
+
+\noindent
+This chapter provides a sketch of how a compiled Stan model is
+executed using sampling.  Optimization shares the same data reading
+and initialization steps, but then does optimization rather than sampling.
+
+This sketch is elaborated in the following chapters of this part,
+which cover variable declarations, expressions, statements, and blocks
+in more detail.
+
+
+\section{Reading and Transforming Data}
+
+The reading and transforming data steps are the same for sampling,
+optimization and diagnostics.
+
+\subsection{Read Data}
+
+The first step of execution is to read data into memory.   Data may be
+read in through file (in CmdStan) or through memory (RStan and
+PyStan);  see their respective manuals for details.%
+%
+\footnote{The \Cpp code underlying Stan is flexible enough to allow
+  data to be read from memory or file.  Calls from \R, for instance,
+  can be configured to read data from file or directly from \R's
+  memory.}
+%
+All of the variables declared in the \code{data} block will be read.
+If a variable cannot be read, the program will halt with a message
+indicating which data variable is missing.
+
+After each variable is read, if it has a declared constraint, the
+constraint is validated.  For example, if a variable \code{N} is
+declared as \code{int<lower=0>}, after \code{N} is read, it will be tested
+to make sure it is greater than or equal to zero.  If a variable
+violates its declared constraint, the program will halt with a warning
+message indicating which variable contains an illegal value, the value
+that was read, and the constraint that was declared.
+
+\subsection{Define Transformed Data}
+
+After data is read into the model, the transformed data variable
+statements are executed in order to define the transformed data
+variables.  As the statements execute, declared constraints on
+variables are not enforced.
+
+Transformed data variables are initialized with real values set to
+\code{NaN} and integer values set to the smallest integer (large
+absolute value negative number).
+
+After the statements are executed, all declared constraints on
+transformed data variables are validated.  If the validation fails,
+execution halts and the variable's name, value and constraints are
+displayed.
+
+\section{Initialization}
+
+Initialization is the same for sampling, optimization, and diagnosis
+
+\subsection{User-Supplied Initial Values}
+
+If there are user-supplied initial values for parameters, these are
+read using the same input mechanism and same file format as data
+reads.  Any constraints declared on the parameters are validated for
+the initial values.  If a variable's value violates its declared
+constraint, the program halts and a diagnostic message is printed.
+
+After being read, initial values are transformed to unconstrained
+values that will be used to initialize the sampler.
+
+\subsubsection{Boundary Values are Problematic}
+
+Because of the way Stan defines its transforms from the constrained to
+the unconstrained space, initializing parameters on the boundaries of
+their constraints is usually problematic.  For instance, with a
+constraint
+%
+\begin{stancode}
+parameters {
+  real<lower=0,upper=1> theta;
+  // ...
+}
+\end{stancode}
+%
+an initial value of 0 for \code{theta} leads to an unconstrained value
+of $-\infty$, whereas a value of 1 leads to an unconstrained value of
+$+\infty$.  While this will be inverse transformed back correctly
+given the behavior of floating point arithmetic, the Jacobian will be
+infinite and the log probability function will fail and raise an
+exception.
+
+\subsection{Random Initial Values}
+
+If there are no user-supplied initial values, the default
+initialization strategy is to initialize the unconstrained parameters
+directly with values drawn uniformly from the interval $(-2,2)$.  The
+bounds of this initialization can be changed but it is always
+symmetric around 0. The value of 0 is special in that it represents
+the median of the initialization.  An unconstrained value of 0
+corresponds to different parameter values depending on the constraints
+declared on the parameters.
+
+An unconstrained real does not involve any transform, so an initial
+value of 0 for the unconstrained parameters is also a value of 0 for
+the constrained parameters.
+
+For parameters that are bounded below at 0, the initial value of 0 on
+the unconstrained scale corresponds to $\exp(0) = 1$ on the
+constrained scale.  A value of -2 corresponds to $\exp(-2) = .13$ and
+a value of 2 corresponds to $\exp(2) = 7.4$.
+
+For parameters bounded above and below, the initial value of 0 on the
+unconstrained scale corresponds to a value at the midpoint of the
+constraint interval.  For probability parameters, bounded below by 0
+and above by 1, the transform is the inverse logit, so that an initial
+unconstrained value of 0 corresponds to a constrained value of 0.5, -2
+corresponds to 0.12 and 2 to 0.88.  Bounds other than 0 and 1 are
+just scaled and translated.
+
+Simplexes with initial values of 0 on the unconstrained basis
+correspond to symmetric values on the constrained values (i.e., each
+value is $1/K$ in a $K$-simplex).
+
+Cholesky factors for positive-definite matrices are initialized to 1
+on the diagonal and 0 elsewhere;  this is because the diagonal is log
+transformed and the below-diagonal values are unconstrained.
+
+The initial values for other parameters can be determined from the
+transform that is applied.  The transforms are all described in full
+detail in \refchapter{variable-transforms}.
+
+\subsection{Zero Initial Values}
+
+The initial values may all be set to 0 on the unconstrained scale.
+This can be helpful for diagnosis, and may also be a good starting
+point for sampling.  Once a model is running, multiple chains with
+more diffuse starting points can help diagnose problems with
+convergence; see \refsection{convergence} for more information on
+convergence monitoring.
+
+
+
+
+
+\section{Sampling}
+
+Sampling is based on simulating the Hamiltonian of a particle with a
+starting position equal to the current parameter values and an initial
+momentum (kinetic energy) generated randomly.  The potential energy at
+work on the particle is taken to be the negative log (unnormalized) total
+probability function defined by the model.  In the usual approach to
+implementing \HMC, the Hamiltonian dynamics of the particle is
+simulated using the leapfrog integrator, which discretizes the smooth
+path of the particle into a number of small time steps called leapfrog
+steps.
+
+\subsection{Leapfrog Steps}
+
+For each leapfrog step, the negative log probability function and its
+gradient need to be evaluated at the position corresponding to the
+current parameter values (a more detailed sketch is provided in the
+next section).  These are used to update the momentum based on the
+gradient and the position based on the momentum.
+
+For simple models, only a few leapfrog steps with large step sizes are
+needed.  For models with complex posterior geometries, many small
+leapfrog steps may be needed to accurately model the path of the
+parameters.
+
+If the user specifies the number of leapfrog steps (i.e., chooses to
+use standard \HMC), that number of leapfrog steps are simulated.  If
+the user has not specified the number of leapfrog steps, the No-U-Turn
+sampler (\NUTS) will determine the number of leapfrog steps adaptively
+\citep{Hoffman-Gelman:2011, Hoffman-Gelman:2014}.
+
+\subsection{Log Probability and Gradient Calculation}
+
+During each leapfrog step, the log probability function and its
+gradient must be calculated.  This is where most of the time in the
+Stan algorithm is spent.  This log probability function, which is
+used by the sampling algorithm, is defined over the unconstrained
+parameters.
+
+The first step of the calculation requires the inverse transform of
+the unconstrained parameter values back to the constrained parameters
+in terms of which the model is defined.  There is no error checking
+required because the inverse transform is a total function on every point
+in whose range satisfies the constraints.
+
+Because the probability statements in the model are defined in terms
+of constrained parameters, the log Jacobian of the inverse transform
+must be added to the accumulated log probability.
+
+Next, the transformed parameter statements are executed.  After they
+complete, any constraints declared for the transformed parameters are
+checked.  If the constraints are violated, the model will halt with a
+diagnostic error message.
+
+The final step in the log probability function calculation is to
+execute the statements defined in the model block.
+
+As the log probability function executes, it accumulates an in-memory
+representation of the expression tree used to calculate the log
+probability.  This includes all of the transformed parameter
+operations and all of the Jacobian adjustments.  This tree is then
+used to evaluate the gradients by propagating partial derivatives
+backward along the expression graph.  The gradient calculations
+account for the majority of the cycles consumed by a Stan program.
+
+\subsection{Metropolis Accept/Reject}
+
+A standard Metropolis accept/reject step is required to retain detailed
+balance and ensure samples are marginally distributed according to the
+probability function defined by the model.  This Metropolis adjustment
+is based on comparing log probabilities, here defined by the
+Hamiltonian, which is the sum of the potential (negative log
+probability) and kinetic (squared momentum) energies.  In theory, the
+Hamiltonian is invariant over the path of the particle and rejection
+should never occur.  In practice, the probability of rejection is
+determined by the accuracy of the leapfrog approximation to the true
+trajectory of the parameters.
+
+If step sizes are small, very few updates will be rejected, but many
+steps will be required to move the same distance.  If step sizes are
+large, more updates will be rejected, but fewer steps will be required
+to move the same distance.  Thus a balance between effort and
+rejection rate is required.  If the user has not specified a step
+size, Stan will tune the step size during warmup sampling to achieve
+a desired rejection rate (thus balancing rejection versus number of
+steps).
+
+If the proposal is accepted, the parameters are updated to their new
+values.  Otherwise, the sample is the current set of parameter values.
+
+
+\section{Optimization}
+
+Optimization runs very much like sampling in that it starts by reading
+the data and then initializing parameters.  Unlike sampling, it
+produces a deterministic output which requires no further analysis
+other than to verify that the optimizer itself converged to a
+posterior mode.  The output for optimization is also similar to that
+for sampling.
+
+
+\section{Variational Inference}
+
+Variational inference also runs similar to sampling. It begins by reading the
+data and initializing the algorithm. The initial variational approximation is a
+random draw from the standard normal distribution in the unconstrained
+(real-coordinate) space. Again, similar to sampling, it outputs samples from the
+approximate posterior once the algorithm has decided that it has converged.
+Thus, the tools we use for analyzing the result of Stan's sampling routines can
+also be used for variational inference.
+
+
+
+\section{Model Diagnostics}
+
+Model diagnostics are like sampling and optimization in that they
+depend on a model's data being read and its parameters being
+initialized.  The user's guides for the interfaces (RStan, PyStan,
+CmdStan) provide more details on the diagnostics available; as of Stan
+2.0, that's just gradients on the unconstrained scale and log
+probabilities.
+
+\section{Output}
+
+For each final sample (not counting samples during warmup or samples
+that are thinned), there is an output stage of writing the samples.
+
+\subsection{Generated Quantities}
+
+Before generating any output, the statements in the generated quantities
+block are executed.  This can be used for any forward simulation based
+on parameters of the model.  Or it may be used to transform parameters
+to an appropriate form for output.
+
+After the generated quantities statements execute, the constraints
+declared on generated quantities variables are validated.   If these
+constraints are violated, the program will terminate with a diagnostic message.
+
+\subsection{Write}
+
+The final step is to write the actual values.  The values of all
+variables declared as parameters, transformed parameters, or generated
+quantities are written.  Local variables are not written, nor is the
+data or transformed data.  All values are written in their constrained
+forms, that is the form that is used in the model definitions.
+
+In the executable form of a Stan models, parameters, transformed
+parameters, and generated quantities are written to a file in
+comma-separated value (\acronym{csv}) notation with a header defining
+the names of the parameters (including indices for multivariate
+parameters).%
+\footnote{In the \R version of Stan, the values may either be
+written to a \acronym{csv} file or directly back to \R's memory.}
+
+% PSEUDOCODE FOR STAN MODEL
+% \begin{verbatim}
+% read data into memory
+% validate data constraints
+% execute transformed data statements
+% validate transformed data constraints
+% read and inverse transform initial parameter values
+%     (OR randomly initialize)
+% for each sample desired:
+%     if warming up and adapting, adapt step size
+%     randomly initialize momentum
+%     for each leapfrog step:
+%         calculate log probability and gradient
+%         increment momentum by half step-size times gradient
+%         increment parameters by step-size times momentum
+%         calculate log probability and gradient
+%         increment momentum by half step-size times gradient
+%     if not rejected by Metropolis condition:
+%         update parameters to new values
+%         execute transformed parameters statement
+%         validate transformed parameters constraints
+%         write parameters, transformed parameters, generated quantities
+% \end{verbatim}
