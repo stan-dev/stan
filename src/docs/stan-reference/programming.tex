@@ -2303,6 +2303,8 @@ real w[7];
 w = v[idxs, 2];
 \end{stancode}
 %
+
+
 The key is understanding that a single index always reduces
 dimensionality, whereas a multiple index never does.  The dimensions
 with multiple indexes (and unindexed dimensions) determine the indexed
@@ -2313,6 +2315,7 @@ reduce the vector dimension, so the result is a vector.  In contrast,
 the vector dimension (to a scalar), so the result type for \code{w} is
 an array of reals.  In both cases, the size of the multiple index
 (here, 7) determines the size of the result.
+
 
 \subsection{Matrices}
 
