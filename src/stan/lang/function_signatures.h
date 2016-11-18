@@ -598,6 +598,7 @@ for (size_t i = 0; i < vector_types.size(); ++i) {
 }
 add_binary("lognormal_rng");
 add_nullary("machine_precision");
+add("matrix_exp", MATRIX_T, MATRIX_T);
 add("max", INT_T, expr_type(INT_T, 1));
 add("max", DOUBLE_T, expr_type(DOUBLE_T, 1));
 add("max", DOUBLE_T, VECTOR_T);
