@@ -7438,6 +7438,89 @@ constants).  This means that, in general, there's no way to use the
 \code{integrate\_ode} function to accept a parameter for the initial
 time and thus no way in general to estimate the initial time of an ODE
 system from measurements.
+
+\section{Solving a System of Linear ODEs using a Matrix Exponential}
+
+The solution to $\frac{d}{dt} y = ay$ is $y = y_0e^{at}$, where the constant
+$y_0$ is determined by boundary conditions. We can extend this solution
+to the vector case:
+
+\begin{equation}\label{ode.linODEs}
+\frac{d}{dt}y = A y
+\end{equation}
+
+where $y$ is now a vector of length $n$ and $A$ is an $n$ by $n$ matrix. The
+solution is then given by:
+\begin{equation}\label{ode.linOEs.sln}
+y = e^{tA}y_0
+\end{equation}
+where the matrix exponential is formally defined by the convergent power series:
+
+\begin{equation}\label{ode.matrix_exp.def}
+e^{tA} = \sum_{n=0}^{\infty} \dfrac{tA^n}{n!} = I + tA + \frac{t^2A^2}{2!} + ...
+\end{equation}
+
+We can apply this technique to the simple harmonic oscillator example, by
+setting
+
+\begin{equation}\label{ode.sho_matrix}
+  y = \left[\begin{array}{c}
+        y_1 \\
+        y_2 \\
+        \end{array}\right] \ \ \ \ \ 
+   A = \left[\begin{array}{cc}
+	0 & 1 \\
+	-1 & -\theta \\
+	\end{array}\right]
+\end{equation}
+
+The Stan model to simulate noisy observations using a matrix exponential function
+is given by \reffigure{sho-sim-me}. Note that because we are performing matrix
+operations, we declare \code{y0} and \code{y\_hat} as vectors, instead of using arrays,
+as in the previous example code (\reffigure{sho-sim}). \\
+
+In general, computing a matrix exponential will be more efficient than using a numerical
+solver. We can however only apply this technique to systems of \underline{linear} ODEs.
+%
+\begin{figure}
+\begin{stancode}
+data {
+  int<lower=1> T;
+  vector[2] y0;
+  real ts[T];
+  real theta[1];
+}
+model {
+}
+generated quantities {
+  vector[2] y_hat[T];
+  matrix[2, 2] A;
+  
+  A[1, 1] = 0;
+  A[1, 2] = 1;
+  A[2, 1] = -1;
+  A[2, 2] = -theta[1];
+  
+  for (t in 1:T)
+    y_hat[t] = matrix_exp((t - 1) * A) * y0;
+  
+  // add measurement error
+  for (t in 1:T) {
+    y_hat[t, 1] = y_hat[t, 1] + normal_rng(0, 0.1);
+    y_hat[t, 2] = y_hat[t, 2] + normal_rng(0, 0.1);
+  }
+}
+\end{stancode}
+\vspace*{-0.2in}
+\caption{\small\it Stan program to simulate noisy measurements from a
+  simple harmonic oscillator.  The system of linear differential equations is
+  coded as a matrix. The system parameters \code{theta} and initial
+  state \code{y0} are read in as data along  observation times \code{ts}. 
+  The generated quantities block is used to solve the ODE for the specified
+  times and then add random measurement error, producing observations 
+  \code{y\_hat}. Because the ODEs are linear, we can use the \code{matrix\_exp}
+  function to solve the system. }\label{sho-sim-me.figure}
+\end{figure}
   
 
 \section{Measurement Error Models}
