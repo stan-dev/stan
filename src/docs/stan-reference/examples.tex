@@ -1425,17 +1425,25 @@ and Hill, we decompose our prior into a scale and a matrix, but are
 able to do so in a more natural way based on the actual variable
 scales and a correlation matrix.  Specifically, we define 
 \[
-\Sigma = \mbox{diag\_matrix}(\tau) \, \Omega \, \mbox{diag\_matrix}(\tau),
+\Sigma = \mbox{diag\_matrix}(\tau) \ \Omega \ \mbox{diag\_matrix}(\tau),
 \]
 where $\Omega$ is a correlation matrix and $\tau$ is the vector of
-coefficient scales.  
+coefficient scales.   This mapping from scale vector $\tau$ and
+correlation matrix $\Omega$ can be inverted, using
+\[
+\tau_k = \sqrt{\, \Sigma_{k,k}}
+\]
+and
+\[
+\Omega_{i, j} = \frac{\Sigma_{i, j}}{\tau_i \, \tau_j}.
+\]
 
 The components of the scale vector $\tau$ can be given any reasonable
 prior for scales, but we recommend something weakly informative like a
 half-Cauchy distribution with a small scale, such as
 \[
 \tau_k \sim \distro{Cauchy}(0, 2.5) 
-\mbox{ for } k \in 1{:}J \mbox{ and  } \tau_k > 0.
+\mbox{ for } k \in 1{:}K \mbox{ constrained by } \tau_k > 0.
 \]
 As for the prior means, if there is information about the scale of
 variation of coefficients across groups, it should be incorporated
@@ -1446,7 +1454,7 @@ intercept) may themselves be given a hierarchical prior.
 Our final recommendation is to give the correlation matrix $\Omega$ an
 LKJ prior with shape $\nu \geq 1$,
 \[
-\Omega \sim \distro{LKJcorr}(\nu).
+\Omega \sim \distro{LKJCorr}(\nu).
 \]
 The LKJ correlation distribution is defined in
 \refsection{lkj-correlation}, but the basic idea for modeling is that
@@ -1539,10 +1547,16 @@ The code in the Stan program above can be sped up dramatically by replacing:
     y[n] ~ normal(x[n] * beta[jj[n]], sigma);
 \end{stancode}
 %
-with:
+with a redeclaration of \code{beta} and a revised model block sampling
+statement. 
 %
 \begin{stancode}
-  y ~ normal( rows_dot_product(beta[jj] , x),sigma);
+parameters {
+  matrix[J, K] beta;
+...
+model {
+  y ~ normal(rows_dot_product(x, beta[jj]), sigma);
+  ...
 \end{stancode}
 %
 which takes advantage of indexing introduced in Stan version 2.9 (see \refsection{language-multi-indexing}).
@@ -3655,12 +3669,14 @@ log\_sum\_exp function is that it can prevent underflow and overflow
 in the exponentiation, by calculating the result as
 %
 \[
-\log(\exp(a) + \exp(b))
-= \max(a, b) + \log(\exp(a - \max(a, b)), \exp(b - \max(a, b))).
+\log\left( \exp(a) + \exp(b)\right)
+= c
+  + \log \left( \exp(a - c) + \exp(b - c) \right),
 \]
 %
-In this evaluation, one of the terms $a - \max(a, b)$ or $b -
-\max(a, b)$ is zero and the other is negative, thus eliminating the
+where $c = \max(a, b)$.
+In this evaluation, one of the terms, $a - c$ or $b -
+c$, is zero and the other is negative, thus eliminating the
 possibility of overflow or underflow in the leading term and eking the
 most arithmetic precision possible out of the operation.
 
@@ -3810,7 +3826,134 @@ p(y \, | \, \lambda, \mu, \sigma)
 \]
 
 
+\section{Inferences Supported by
+  Mixtures}\label{mixture-inference.section}
 
+In many mixture models, the mixture components are exchangeable in the
+model and thus not identifiable.  This arises if the parameters of the
+mixture components have exchangeable priors and the mixture ratio gets
+a uniform prior so that the parameters of the mixture components are
+also exchangeable in the likelihood.
+
+\subsection{Mixtures with Unidentifiable Components}
+
+As an example, consider the normal mixture from the previous section,
+which provides an exchangeable prior on the pairs of parameters
+$(\mu_1, \sigma_1)$ and $(\mu_2, \sigma_2)$,
+%
+\begin{eqnarray*}
+\mu_1, \mu_2 & \sim & \distro{Normal}(0, 10)
+\\[8pt]
+\sigma_1, \sigma_2 & \sim & \distro{HalfNormal}(0, 10)
+\end{eqnarray*}
+%
+The prior on the mixture ratio is uniform,
+%
+\[
+\lambda \sim \distro{Uniform}(0, 1),
+\]
+%
+so that with the likelihood
+%
+\[
+p(y_n \, | \, \mu, \sigma) 
+= \lambda \, \distro{Normal}(y_n \, | \, \mu_1, \sigma_1) 
++ (1 - \lambda) \, \distro{Normal}(y_n \, | \, \mu_2, \sigma_2),
+\]
+%
+the joint distribution $p(y, \mu, \sigma, \lambda)$ is exchangelable
+in the parameters $(\mu_1, \sigma_1)$ and $(\mu_2, \sigma_2)$ with
+$\lambda$ flipping to $1 - \lambda$.%
+%
+\footnote{Imposing a constraint such as $\theta < 0.5$ will resolve
+  the symmetry, but fundamentally changes the model and its posterior
+  inferences.} 
+
+\subsection{Inference under Label Switching}
+
+In cases where the mixture components are not identifiable, it can be
+difficult to diagnose convergence of sampling or optimization
+algorithms because the labels will switch, or be permuted, in
+different MCMC chains or different optimization runs.  Luckily,
+posterior inferences which do not refer to specific component labels
+are invariant under label switching and may be used directly.  This
+subsection considers a pair of examples.
+
+\subsubsection{Predictive likelihood}
+
+Predictive likelihood for a new observation $\tilde{y}$ given the
+complete parameter vector $\theta$ will be
+%
+\[
+p(\tilde{y} \, | \, y)
+= 
+\int_{\theta}
+p(\tilde{y} \, | \, \theta)
+\, p(\theta | y)
+\, \mbox{d}\theta.
+\]
+%
+The normal mixture example from the previous section, with $\theta =
+(\mu, \sigma, \lambda)$, shows that the likelihood returns the same
+density under label switching and thus the predictive inference is
+sound.  In Stan, that predictive inference can be done either by
+computing $p(\tilde{y} \, | \, y)$, which is more efficient
+statistically in terms of effective sample size, or simulating draws
+of $\tilde{y}$, which is easier to plug into other inferences.  Both
+approaches can be coded directly in the generated quantities block of
+the program.  Here's an example of the direct (non-sampling) approach.
+%
+\begin{stancode}
+data {
+  int<lower = 0> N_tilde;
+  vector[N_tilde] y_tilde;
+  ...
+generated quantities {
+  vector[N_tilde] log_p_y_tilde;
+  for (n in 1:N_tilde)
+    log_p_y_tilde[n]
+      = log_mix(lambda,
+                normal_lpdf(y_tilde[n] | mu[1], sigma[1])
+                normal_lpdf(y_tilde[n] | mu[2], sigma[2]));
+}
+\end{stancode}
+%
+It is a bit of a bother afterwards, because the logarithm function
+isn't linear and hence doesn't distribute through averages (Jensen's
+inequality shows which way the inequality goes).  The right thing to
+do is to apply \code{log\_sum\_exp} of the posterior draws of
+\code{log\_p\_y\_tilde}.  The average log predictive density is then
+given by subtracting \code{log(N\_new)}.
+
+
+\subsubsection{Clustering and similarity}
+
+Often a mixture model will be applied to a clustering problem and
+there might be two data items $y_i$ and $y_j$ for which there is a
+question of whether they arose from the same mixture component.  If we
+take $z_i$ and $z_j$ to be the component responsibility discrete
+variables, then the quantity of interest is $z_i = z_j$, which can be
+summarized as an event probability
+%
+\[
+\mbox{Pr}[z_i = z_j \, | \, y]
+=
+\int_{\theta}
+\frac{\sum_{k=0}^1 p(z_i=k, z_j = k, y_i, y_j \, | \, \theta)}
+     {\sum_{k=0}^1 \sum_{m=0}^1 p(z_i = k, z_j = m, y_i, y_j \, | \,
+       \theta)}
+\
+p(\theta \, | \, y)
+\
+\mbox{d}\theta.
+\]
+%
+As with other event probabilities, this can be calculated in the
+generated quantities block either by sampling $z_i$ and $z_j$ and
+using the indicator function on their equality, or by computing the
+term inside the integral as a generated quantity.  As with predicitve
+liklihood, working in expectation is more statistically efficient than
+sampling.
 
 \section{Zero-Inflated and Hurdle Models}\label{zero-inflated.section}
 
@@ -3877,7 +4020,7 @@ model {
 The \code{log\_sum\_exp(lp1,lp2)} function adds the log probabilities
 on the linear scale; it is defined to be equal to \code{log(exp(lp1) +
   exp(lp2))}, but is more arithmetically stable and faster.  This
-could also be written using the conditionla operator; see
+could also be written using the conditionlal operator; see
 \refsection{conditional-operator}.
 
 \subsection{Hurdle Models}
@@ -4363,8 +4506,8 @@ transformed data {
     y[j] = log(r_t[j]) - log(n_t[j] - r_t[j])
             - (log(r_c[j]) - log(n_c[j] - r_c[j]);
   for (j in 1:J)
-    sigma[j] = sqrt(1.0/r_t[i] + 1.0/(n_t[i] - r_t[i])
-                     + 1.0/r_c[i] + 1.0/(n_c[i] - r_c[i]));
+    sigma[j] = sqrt(1 / r_t[j] + 1 / (n_t[j] - r_t[j])
+                     + 1 / r_c[j] + 1 / (n_c[j] - r_c[j]));
 }
 \end{stancode}
 %
@@ -4580,19 +4723,20 @@ Stan operates on the log scale and thus requires the log likelihood,
 \log p(D | e,l)
 \\[3pt]
 \mbox{ } \ \ = \
-\begin{array}[t]{l}
 \mbox{log\_sum\_exp}_{s=1}^T 
-\left( \log \distro{Uniform}(s | 1,T) \right.
+\begin{array}[t]{l}
+\big(
+ \log \distro{Uniform}(s \, | \, 1, T)
 \\[3pt]
-{} \hspace*{12pt} + \left. \sum_{t=1}^T \log \distro{Poisson}(D_t | t < s \ ?
-\ e \ : \ l) \right),
+{} \hspace*{4pt} + \sum_{t=1}^T \log \distro{Poisson}(D_t \, | \, t < s \ ?
+\ e \ : \ l) \big),
 \end{array}
 \]
 %
 where the log sum of exponents function is defined by
 \[
-\mbox{log\_sum\_exp}_{n=1}^N \alpha_n
-=
+\mbox{log\_sum\_exp}_{n=1}^N \, \alpha_n
+\ = \
 \log \sum_{n=1}^N \mbox{exp}(\alpha_n).
 \]
 %
@@ -4673,7 +4817,7 @@ transformed parameters {
 %
 As should be obvious from looking at it, it has linear complexity in
 \code{T} rather than quadratic.  The result for the mining-disaster
-data is about 20 times faster;  the improvement will be stepper for
+data is about 20 times faster;  the improvement will be greater for
 larger \code{T}.
 
 The key to understanding Wiklendt's dynamic programming version is to
@@ -5442,10 +5586,11 @@ and
 \[
 \theta_{j,k} \sim \distro{Dirichlet}(\beta_k)
 \]
-with fixed hyperparameters $\alpha$ and $\beta$.  The prior for
-$\theta_{j,k}$ must be allowed to vary in $k$, so that, for instance,
-$\beta_{k,k}$ is large enough to allow the prior to favor
-better-than-chance annotators over random or adversarial ones.
+with fixed hyperparameters $\alpha$ (a vector) and $\beta$ (a matrix
+or array of vectors).  The prior for $\theta_{j,k}$ must be allowed to
+vary in $k$, so that, for instance, $\beta_{k,k}$ is large enough to
+allow the prior to favor better-than-chance annotators over random or
+adversarial ones.
 
 Because there are $J$ coders, it would be natural to extend the model
 to include a hierarchical prior for $\beta$ and to partially pool the

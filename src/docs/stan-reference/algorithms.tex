@@ -536,8 +536,11 @@ in one of two ways, either
 \end{itemize}
 %
 Rather than using a standard Metropolis step, the final parameter
-value is selected with slice sampling along the final evolution step
-(i.e., the second half of iterations generated).
+value is selected via multinomail sampling with a bias toward the
+second half of the steps in the trajectory \citep{Betancourt:2016}.%
+%
+\footnote{Stan previously used slice sampling along the trajectory,
+  following the original NUTS paper of \cite{Hoffman-Gelman:2014}.}
 
 Configuring the no-U-turn sample involves putting a cap on the depth
 of the trees that it evaluates during each iteration.   This is
