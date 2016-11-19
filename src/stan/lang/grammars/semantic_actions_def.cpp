@@ -220,7 +220,9 @@ namespace stan {
     }
     boost::phoenix::function<increment_size_t> increment_size_t_f;
 
+
     void validate_conditional_op::operator()(conditional_op& conditional_op,
+                                             const var_origin& var_origin,
                                              bool& pass,
                                              const variable_map& var_map,
                                              std::ostream& error_msgs) const {
@@ -267,6 +269,7 @@ namespace stan {
         conditional_op.type_ = true_val_type;
 
       conditional_op.has_var_ = has_var(conditional_op, var_map);
+      conditional_op.var_origin_ = var_origin;
       pass = true;
     }
     boost::phoenix::function<validate_conditional_op>
