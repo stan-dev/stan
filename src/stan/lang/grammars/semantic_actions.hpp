@@ -564,6 +564,17 @@ namespace stan {
     extern boost::phoenix::function<set_fun_type_named> set_fun_type_named_f;
 
     // called from: term_grammar
+    struct set_array_expr_type : public phoenix_functor_quinary {
+      void operator()(expression& e, 
+                      array_expr& array_expr,
+                      const var_origin& var_origin,
+                      bool& pass,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<set_array_expr_type> set_array_expr_type_f;
+
+
+    // called from: term_grammar
     struct exponentiation_expr : public phoenix_functor_quinary {
       void operator()(expression& expr1, const expression& expr2,
                       const var_origin& var_origin, bool& pass,
@@ -690,7 +701,7 @@ namespace stan {
       bool operator()(const nil& /*e*/) const;
       bool operator()(const int_literal& /*x*/) const;
       bool operator()(const double_literal& /*x*/) const;
-      bool operator()(const array_literal& x) const;
+      bool operator()(const array_expr& x) const;
       bool operator()(const variable& x) const;
       bool operator()(const integrate_ode& x) const;
       bool operator()(const integrate_ode_control& x) const;

@@ -223,7 +223,7 @@ namespace stan {
         if (num_str.find_first_of("eE.") == std::string::npos)
           o_ << ".0";  // trailing 0 to ensure C++ makes it a double
       }
-      void operator()(const array_literal& x) const {
+      void operator()(const array_expr& x) const {
         o_ << "stan::math::new_array<";
         generate_type("foobar",
                       x.args_,
