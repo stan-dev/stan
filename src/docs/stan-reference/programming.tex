@@ -45,12 +45,21 @@ ways.%
 
 \section{Reparameterizations}
 
-Reparameterizations may be implemented straightforwardly.  For
-example, the Beta distribution is parameterized by two positive count
-parameters $\alpha, \beta > 0$.  The following example illustrates a
-hierarchical Stan model with a vector of parameters \code{theta} are
-drawn i.i.d.\ for a Beta distribution whose parameters are themselves
-drawn from a hyperprior distribution.
+Reparameterizations may be implemented directly using the transformed
+parameters block or just in the model block.
+
+\subsection{Beta and Dirichlet Priors}
+
+The beta and Dirichlet distributions may both be reparameterized from
+a vector of counts to use a mean and total count.
+
+\subsubsection{Beta Distribution}
+
+For example, the Beta distribution is parameterized by two positive
+count parameters $\alpha, \beta > 0$.  The following example
+illustrates a hierarchical Stan model with a vector of parameters
+\code{theta} are drawn i.i.d.\ for a Beta distribution whose
+parameters are themselves drawn from a hyperprior distribution.
 %
 \begin{stancode}
 parameters {
@@ -133,15 +142,170 @@ can be defined in the transformed parameter block and then used in the
 model.  
 
 
-\subsection{Jacobians not Necessary}
+\subsubsection{Jacobians not Necessary}
 
 Because the transformed parameters are being used, rather than given a
 distribution, there is no need to apply a Jacobian adjustment for the
 transform.  For example, in the beta distribution example,
 \code{alpha} and \code{beta} have the correct posterior distribution.  
 
+\subsubsection{Dirichlet Priors}
 
+The same thing can be done with a Dirichlet, replacing the mean for
+the Beta, which is a probability value, with a simplex.  Assume there
+are $K > 0$ dimensions being considered ($K=1$ is trivial and $K=2$
+reduces to the beta distribution case).  The traditional prior is
+%
+\begin{stancode}
+parameters {
+  vector[K] alpha;
+  simplex[K] theta[N];
+  ...
+model {
+  alpha ~ ...;
+  for (n in 1:N)
+    theta[n] ~ dirichlet(alpha);
+}
+\end{stancode}
+%
+This provides essentially $K$ degrees of freedom, one for each
+dimension of \code{alpha}, and it is not obvious how to specify a
+reasonable prior for \code{alpha}.  
 
+An alternative coding is to use the mean, which is a simplex, and a
+total count.
+%
+\begin{stancode}
+parameters {
+  simplex[K] phi;
+  real<lower=0> kappa;
+  simplex[K] theta[N];
+  ...
+transformed parameters {
+  vector[K] alpha = kappa * theta;
+  ...
+}
+model {
+  phi ~ ...;
+  kappa ~ ...;
+  for (n in 1:N)
+    theta[n] ~ dirichlet(alpha);
+\end{stancode}
+%
+Now it is much easier to formulate priors, because \code{phi} is the
+expected value of \code{theta} and \code{kappa} (minus \code{K}) is
+the strength of the prior mean measured in number of prior observations.
+
+\subsection{Transforming Unconstrained Priors: Probit and Logit}
+
+If the variable $u$ has a  distribution, then
+$\mbox{logit}(u)$ is distributed as $\distro{Logistic}(0, 1)$.  This
+is because inverse logit is the cumulative distribution function (cdf)
+for the logistic distribution, so that the logit function itself is
+the inverse cdf and thus maps a uniform draw in $(0, 1)$ to a
+logistically-distributed quantity.  
+
+Things work the same way for the probit case: if $u$ has a
+$\distro{Uniform}(0, 1)$ distribution, then $\Phi^{-1}(u)$ has a
+$\distro{Normal}(0, 1)$ distribution.  The other way around, if $v$
+has a $\distro{Normal}(0, 1)$ distribution, then $\Phi(v)$ has a
+$\distro{Uniform}(0, 1)$ distribution.
+
+In order to use the probit and logistic as priors on variables
+constrained to $(0, 1)$, create an unconstrained variable and
+transform it appropriately.  For comparison, the following Stan
+program fragment declares a $(0, 1)$-constrained parameter
+\code{theta} and gives it a beta prior, then uses it as a parameter in
+a distribution (here using \code{foo} as a placeholder).
+%
+\begin{stancode}
+parameters {
+  real<lower = 0, upper = 1> theta;
+...
+model {
+  theta ~ beta(a, b);
+  ...
+  y ~ foo(theta);
+...
+\end{stancode}
+%
+If the variables \code{a} and \code{b} are one, then this imposes
+a uniform distribution \code{theta}.  If \code{a} and \code{b} are
+both less than one, then the density on \code{theta} has a U shape,
+whereas if they are both greater than one, the density of \code{theta}
+has an inverted-U or more bell-like shape.
+
+Roughly the same result can be achieved with unbounded parameters that
+are probit or inverse-logit-transformed.  For example,
+%
+\begin{stancode}
+parameters {
+  real theta_raw;
+...
+transformed parameters {
+  real<lower = 0, upper = 1> theta = inv_logit(theta_raw);
+...
+model {
+  theta_unc ~ logistic(mu, sigma);
+  ...
+  y ~ foo(theta);
+...
+\end{stancode}
+%
+In this model, an unconstrained parameter \code{theta\_raw} gets a
+logistic prior, and then the transformed parameter \code{theta} is
+defined to be the inverse logit of \code{theta\_raw}.  In this
+parameterization, \code{inv\_logit(mu)} is the mean of the implied
+prior on \code{theta}.  The prior distribution on \code{theta} will be
+flat if \code{sigma} is one and \code{mu} is zero, and will be
+U-shaped if \code{sigma} is larger than one and bell shaped if
+\code{sigma} is less than one.
+
+When moving from a variable in $(0, 1)$ to a simplex, the same trick
+may be performed using the softmax function, which is a multinomial
+generalization of the inverse logit function.  First, consider a
+simplex parameter with a Dirichlet prior.
+%
+\begin{stancode}
+parameters {
+  simplex[K] theta;
+...
+model {
+  theta ~ dirichlet(a);
+  ...
+  y ~ foo(theta);
+\end{stancode}
+%
+Now \code{a} is a vector with \code{K} rows, but it has the same shape
+properties as the pair \code{a} and \code{b} for a beta; the beta
+distribution is just the distribution of the first component of a
+Dirichlet with parameter vector $[a b]^{\top}$.  To formulate an
+unconstrained prior, the exact same strategy works as for the beta.
+%
+\begin{stancode}
+parameters {
+  vector[K] theta_raw;
+...
+transformed parameters {
+  simplex[K] theta = softmax(theta_raw);
+...
+model {
+  theta_raw ~ multi_normal_cholesky(mu, L_Sigma);
+\end{stancode}
+%
+The multivariate normal is used for convenience and efficiency with
+its Cholesky-factor parameterization.  Now the mean is controlled by
+\code{softmax(mu)}, but we have additional control of covariance
+through \code{L\_Sigma} at the expense of having on the order of $K^2$
+parameters in the prior rather than order $K$.  If no covariance is
+desired, the number of parameters can be reduced back to $K$ using a
+vectorized normal distribution as follows.
+%
+\begin{stancode}
+  theta_raw ~ normal(mu, sigma);
+\end{stancode}
+%
+where either or both of \code{mu} and \code{sigma} can be vectors.  
 
 \section{Changes of Variables}
 
@@ -372,7 +536,7 @@ model {
   ...
 \end{stancode}
 %
-The adjustment in the the log Jacobian detemrinant of the transform
+The adjustment in the the log Jacobian determinant of the transform
 mapping $\alpha_{\mathrm{raw}}$ to $\alpha = L +
 \exp(\alpha_{\mathrm{raw}})$.  The details are simple in this case
 because the Jacobian is diagonal; see
@@ -917,7 +1081,7 @@ model {
 %
 The ability to use the \code{unit\_normal} function as a density is
 keyed off its name ending in \code{\_lpdf} (names ending in
-\code{\_lpmf} for probabilty mass functions work the same way).  
+\code{\_lpmf} for probability mass functions work the same way).  
 
 In general, if \code{foo\_lpdf} is defined to consume $N + 1$
 arguments, then
@@ -1895,8 +2059,75 @@ is a clear indication that something is amiss in the model.
 
 \chapter{Matrices, Vectors, and Arrays}
 
+\noindent
+This chapter provides pointers as to how to choose among the various
+matrix, vector, and array data structures provided by Stan.
 
-\section{Data type and indexing efficiency}\label{indexingefficiency.section}
+\section{Basic Motivation}
+
+Stan provides two basic scalar types, \code{int} and \code{real}, and
+three basic linear algebra types, \code{vector}, \code{row\_vector},
+and \code{matrix}.  Then Stan allows arrays to be of any dimension and
+contain any type of element (though that type must be declared and
+must be the same for all elements).
+
+This leaves us in the awkward situation of having three
+one-dimensional containers, as exemplified by the following
+declarations.
+%
+\begin{stancode}
+real a[N];
+vector[N] a;
+row_vector[N] a;
+\end{stancode}
+%
+These distinctions matter.  Matrix types, like vector and row vector,
+are required for linear algebra operations.  There is no automatic
+promotion of arrays to vectors because the target, row vector or
+column vector, is ambiguous.  Similarly, row vectors are separated
+from column vectors because multiplying a row vector by a column
+vector produces a scalar, whereas multiplying in the opposite order
+produces a matrix.  
+
+The following code fragment shows all four ways to declare a
+two-dimensional container of size $M \times N$.
+%
+\begin{stancode}
+real b[M, N];          // b[m] : real[]     (efficient)
+vector[N] b[M];        // b[m] : vector     (efficient)
+row_vector[N] b[M];    // b[m] : row_vector (efficient)
+matrix[M, N] b;        // b[m] : row_vector (inefficient)
+\end{stancode}
+%
+The main differences among these choices involve efficiency for
+various purposes and the type of \code{b[m]}, which is shown in
+comments to the right of the declarations.  Thus the only way to
+efficiently iterate over row vectors is to use the third declaration,
+but if you need linear algebra on matrices, but the only way to use
+matrix operations is to use the fourth declaration. 
+
+The inefficiencies due to any manual reshaping of containers is
+usually slight compared to what else is going on in a Stan program
+(typically a lot of gradient calculations).
+
+
+\section{Fixed Sizes and Indexing out of Bounds}
+
+Stan's matrices, vectors, and array variables are sized when they are
+declared and may not be dynamically resized.  Function arguments do
+not have sizes, but these sizes are fixed when the function is called
+and the container is instantiated.  Also, declarations may be inside
+loops and thus may change over the course of running a program, but
+each time a declaration is visited, it declares a fixed size object.
+
+When an index is provided that is out of bounds, Stan throws a
+rejection error and computation on the current log density and
+gradient evaluation is halted and the algorithm is left to clean up
+the error.  All of Stan's containers check the sizes of all indexes.
+
+
+
+\section{Data Type and Indexing Efficiency}\label{indexingefficiency.section}
 
 The underlying matrix and linear algebra operations are implemented in
 terms of data types from the Eigen \Cpp library.  By having vectors
@@ -2028,7 +2259,88 @@ containers of \code{double} values (the type \code{real} in Stan).
 Only arrays in Stan are allowed to store integer values.
 
 
-\chapter{Multiple Indexing and Range Indexing}
+\section{Memory Locality}
+
+The key to understanding efficiency of matrix and vector
+representations is memory locality and reference passing versus
+copying.
+
+\subsection{Memory Locality}
+
+CPUs on computers bring in memory in blocks through layers of caches.
+Fetching from memory is \emph{much}\ slower than performing arithmetic
+operations.  The only way to make container operations fast is to
+respect memory locality and access elements that are close together in
+memory sequentially in the program.
+
+\subsection{Matrices}
+
+Matrices are stored internally in column-major order.  That is, an $M
+\times N$ matrix stores its elements in the order
+\[
+(1,1), (2, 1), \ldots, (M, 1), (1, 2), \ldots, (M, 2), \ldots, (1, N),
+\ldots, (M, N).
+\]
+%
+This means that it's much more efficient to write loops over matrices
+column by column, as in the following example.
+%
+\begin{stancode}
+matrix[M, N] a;
+...
+for (n in 1:N)
+  for (m in 1:M)
+     ... do something with a[m, n] ...
+\end{stancode}
+
+It also follows that pulling a row out of a matrix is not memory
+local, as it has to stride over the whole sequence of values.  It also
+requires a copy operation into a new data structure as it is not
+stored internally as a unit in a matrix.  For sequential access to row
+vectors in a matrix, it is much better to use an array of row vectors,
+as in the following example.
+%
+\begin{stancode}
+row_vector[N] a[M];
+...
+for (m in 1:M)
+  ... do something with row vector a[m] ...
+\end{stancode}
+%
+Even if what is done involves a function call, the row vector
+\code{a[m]} will not have to be copied.
+
+\subsection{Arrays}
+
+Arrays are stored internally following their data structure.  That
+means a two dimensional array is stored in row-major order.  Thus it
+is efficient to pull out a ``row'' of a two-dimensional array.
+%
+\begin{stancode}
+real a[M, N];
+...
+for (m in 1:M)
+  ... do something with a[m] ...
+\end{stancode}
+
+A difference with matrices is that the entries \code{a[m]} in the two
+dimensional array are not necessarily adjacent in memory, so there are
+no guarantees on iterating over all the elements in a two-dimensional
+array will provide memory locality across the ``rows.''
+
+\section{Converting among Matrix, Vector, and Array Types}
+
+There is no automatic conversion among matrices, vectors, and arrays
+in Stan.  But there are a wide range of conversion functions to
+convert a matrix into a vector, or a multi-dimensional array into a
+one-dimensional array, or convert a vector to an array.  See
+\refchapter{mixed-operations} for complete details on the available conversion
+operators as well as \refchapter{multi-indexing} for some
+reshaping operations involving multiple indexing and range indexing.
+
+
+
+\chapter{Multiple Indexing and Range Indexing}\label{multi-indexing.chapter}
 
 Stan allows multiple indexes to be provided for containers (i.e.,
 arrays, vectors, and matrices) in a single position, using either an
@@ -2278,7 +2590,7 @@ This produces a different result than executing the assignment because
 
 \section{Multiple Indexes with Vectors and Matrices}
 
-Mulitple indexes can be supplied to vectors and matrices as well as
+Multiple indexes can be supplied to vectors and matrices as well as
 arrays of vectors and matrices.
 
 \subsection{Vectors}
@@ -2481,7 +2793,7 @@ of quadratic algorithms in loops).
 Stan programs express models which are intrinsically statistical in
 nature.  The algorithms applied to these models may or may not
 themselves be probabilistic.  For example, given an initial value for
-parameters (which may itself be given determinstically or generated
+parameters (which may itself be given deterministically or generated
 randomly), Stan's optimization algorithm (L-BFGS) for penalized
 maximum likelihood estimation is purely deterministic.  Stan's
 sampling algorithms are based on Markov chain Monte Carlo algorithms,
@@ -2531,7 +2843,7 @@ better or optimization algorithms require less adaptation.
 Because Stan's algorithms (other than Riemannian Hamiltonian Monte
 Carlo) rely on step-based gradient-based approximations of the density
 (or penalized maximum likelihood) being fitted, posterior curvature
-not captured by this first-order appoximation plays a central role in
+not captured by this first-order approximation plays a central role in
 determining the statistical efficiency of Stan's algorithms.
 
 A second-order approximation to curvature is provided by the
@@ -3565,12 +3877,12 @@ sampling model.
 \begin{stancode}
 data {
   int<lower=0> N;
-  int<lower=0,upper=1> y[N];
+  int<lower=0, upper=1> y[N];
   real<lower=0> alpha;
   real<lower=0> beta;
 }
 parameters {
-  real<lower=0,upper=1> theta;
+  real<lower=0, upper=1> theta;
 }
 model {
   theta ~ beta(alpha, beta);
@@ -3591,6 +3903,29 @@ model may be recoded using the binomial distribution as follows.
 Because truth is represented as one and falsehood as zero, the sum
 \code{sum(y)} of a binary vector \code{y} is equal to the number of
 positive outcomes out of a total of \code{N} trials.  
+
+This can be generalized to other discrete cases (one wouldn't expect
+continuous observations to be duplicated if they are random).  Suppose
+there are only $K$ possible discrete outcomes, $z_1, \ldots, z_K$, but
+there are $N$ observations, where $N$ is much larger than $K$.  If
+$f_k$ is the frequency of outcome $z_k$, then the entire likelihood
+with distribution \code{foo} can be coded as follows.
+%
+\begin{stancode}
+for (k in 1:K)
+  target += f[k] * foo_lpmf(z[k] | ...);
+\end{stancode}
+%
+where the ellipses are the parameters of the log probability mass
+function for distribution \code{foo} (there's no distribution called
+``foo''; this is just a placeholder for any discrete distribution
+name).
+
+The resulting program looks like a ``weighted'' regression, but here
+the weights \code{f[k]} are counts and thus sufficient statistics for
+the pmf and simply amount to an alternative, more efficient coding of
+the same likelihood.  For efficiency, the frequencies \code{f[k]}
+should be counted once in the transformed data block and stored.
 
 
 \section{Aggregating Common Subexpressions}
@@ -3652,7 +3987,7 @@ sample mean of the values is far away from 0 (on the scale of the values),
 then it can be more efficient to standardize the outputs $y_n$ and
 predictors $x_n$.  The data is first centered by subtracting the
 sample mean, and then scaled by dividing by the sample deviation.
-Thus a data point $u$ is standardized is standardized with respect to
+Thus a data point $u$ is standardized with respect to
 a vector $y$  by the function $\mbox{z}_y$, defined by
 \[
 \mbox{z}_y(u) = \frac{u - \bar{y}}{\mbox{sd}(y)}
