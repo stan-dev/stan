@@ -271,7 +271,7 @@ parameters {
   simplex[K] theta;
 ...
 model {
-  theta ~ dirichleta(a);
+  theta ~ dirichlet(a);
   ...
   y ~ foo(theta);
 \end{stancode}
@@ -536,7 +536,7 @@ model {
   ...
 \end{stancode}
 %
-The adjustment in the the log Jacobian detemrinant of the transform
+The adjustment in the the log Jacobian determinant of the transform
 mapping $\alpha_{\mathrm{raw}}$ to $\alpha = L +
 \exp(\alpha_{\mathrm{raw}})$.  The details are simple in this case
 because the Jacobian is diagonal; see
@@ -1081,7 +1081,7 @@ model {
 %
 The ability to use the \code{unit\_normal} function as a density is
 keyed off its name ending in \code{\_lpdf} (names ending in
-\code{\_lpmf} for probabilty mass functions work the same way).  
+\code{\_lpmf} for probability mass functions work the same way).  
 
 In general, if \code{foo\_lpdf} is defined to consume $N + 1$
 arguments, then
@@ -2590,7 +2590,7 @@ This produces a different result than executing the assignment because
 
 \section{Multiple Indexes with Vectors and Matrices}
 
-Mulitple indexes can be supplied to vectors and matrices as well as
+Multiple indexes can be supplied to vectors and matrices as well as
 arrays of vectors and matrices.
 
 \subsection{Vectors}
@@ -2793,7 +2793,7 @@ of quadratic algorithms in loops).
 Stan programs express models which are intrinsically statistical in
 nature.  The algorithms applied to these models may or may not
 themselves be probabilistic.  For example, given an initial value for
-parameters (which may itself be given determinstically or generated
+parameters (which may itself be given deterministically or generated
 randomly), Stan's optimization algorithm (L-BFGS) for penalized
 maximum likelihood estimation is purely deterministic.  Stan's
 sampling algorithms are based on Markov chain Monte Carlo algorithms,
@@ -2843,7 +2843,7 @@ better or optimization algorithms require less adaptation.
 Because Stan's algorithms (other than Riemannian Hamiltonian Monte
 Carlo) rely on step-based gradient-based approximations of the density
 (or penalized maximum likelihood) being fitted, posterior curvature
-not captured by this first-order appoximation plays a central role in
+not captured by this first-order approximation plays a central role in
 determining the statistical efficiency of Stan's algorithms.
 
 A second-order approximation to curvature is provided by the

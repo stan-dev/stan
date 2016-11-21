@@ -84,7 +84,7 @@ In general, Stan allows the arguments to distributions such as
 vectors or arrays, they have to be the same size.  If any of the other
 arguments is a scalar, it is reused for each vector entry.  See
 \refsection{vectorization} for more information on vectorization of
-probabilty functions.
+probability functions.
 
 The other reason this works is that Stan's arithmetic operators are
 overloaded to perform matrix arithmetic on matrices.  In this case,
@@ -250,7 +250,7 @@ prior that scales with the outcome will do.
 
 \subsection{Background Reading}
 
-See \citep{Gelman:2006} for more an overview of choices for priors for
+See \citep{Gelman:2006} for an overview of choices for priors for
 scale parameters, \citep{ChungEtAl:2013} for an overview of choices
 for scale priors in penalized maximum likelihood estimates, and
 \cite{GelmanJakulinPittauEtAl:2008} for a discussion of prior choice
@@ -399,8 +399,8 @@ then we know the answer is going to be somewhere in the one to three
 meter range.  That gives us information around which to form a weakly
 informative prior.
 
-Similarly, logistic regression with predictors on the standard scale
-(roughly zero mean, unit variance), then it is unlikely to have a
+Similarly, a logistic regression with predictors on the standard scale
+(roughly zero mean, unit variance) is unlikely to have a
 coefficient that's larger than five in absolute value.  In these
 cases, it makes sense to provide a weakly informative prior such as
 $\distro{Normal}(0,5)$ for such a coefficient.
@@ -1795,7 +1795,7 @@ this is both inefficient and leads to biased posterior estimates.
 Instead, the conditions causing overflow, such as trying to generate a
 negative binomial random variate with a mean of $2^{31}$.  These must
 be intercepted and dealt with, typically be reparameterizing or
-reimplementing the random number geneator using real values rather
+reimplementing the random number generator using real values rather
 than integers, which are upper-bounded by $2^{31} - 1$ in Stan.
   
 
@@ -2661,7 +2661,7 @@ generated from the model, the simulation can sometimes find modes for
 creates a multiple mode problem in the posterior and also causes the
 NUTS tree depth to get very large (often above 10). Adding the
 constraint both improves the accuracy of the posterior and
-dramatically reduces the treedepth, which speeds up the simulation
+dramatically reduces the tree depth, which speeds up the simulation
 considerably (typically by much more than an order of magnitude).
 
 Further, unless one thinks that the process is really non-stationary,
@@ -3861,7 +3861,7 @@ p(y_n \, | \, \mu, \sigma)
 + (1 - \lambda) \, \distro{Normal}(y_n \, | \, \mu_2, \sigma_2),
 \]
 %
-the joint distribution $p(y, \mu, \sigma, \lambda)$ is exchangelable
+the joint distribution $p(y, \mu, \sigma, \lambda)$ is exchangeable
 in the parameters $(\mu_1, \sigma_1)$ and $(\mu_2, \sigma_2)$ with
 $\lambda$ flipping to $1 - \lambda$.%
 %
@@ -3951,8 +3951,8 @@ p(\theta \, | \, y)
 As with other event probabilities, this can be calculated in the
 generated quantities block either by sampling $z_i$ and $z_j$ and
 using the indicator function on their equality, or by computing the
-term inside the integral as a generated quantity.  As with predicitve
-liklihood, working in expectation is more statistically efficient than
+term inside the integral as a generated quantity.  As with predictive
+likelihood, working in expectation is more statistically efficient than
 sampling.
 
 \section{Zero-Inflated and Hurdle Models}\label{zero-inflated.section}
@@ -4020,7 +4020,7 @@ model {
 The \code{log\_sum\_exp(lp1,lp2)} function adds the log probabilities
 on the linear scale; it is defined to be equal to \code{log(exp(lp1) +
   exp(lp2))}, but is more arithmetically stable and faster.  This
-could also be written using the conditionlal operator; see
+could also be written using the conditional operator; see
 \refsection{conditional-operator}.
 
 \subsection{Hurdle Models}
@@ -4172,7 +4172,7 @@ In contrast to mixture models, which create mixtures at the
 observation level, model averaging creates mixtures over the
 posteriors of models separately fit with the entire data set.  In this
 situation, the priors work as expected when fitting the models
-indepdently, with the posteriors being based on the complete observed
+independently, with the posteriors being based on the complete observed
 data $y$.
 
 If different models are expected to account for different
@@ -6112,7 +6112,7 @@ enough or the data is not cleanly separated.
 The other problem with clustering models is that their posteriors are
 highly multimodal.  One form of multimodality is the
 non-identifiability leading to index swapping.  But even without
-the index problems the posteriors are highly mulitmodal.
+the index problems the posteriors are highly multimodal.
 
 Bayesian inference fails in cases of high multimodality because there
 is no way to visit all of the modes in the posterior in appropriate
@@ -6485,7 +6485,7 @@ model {
     real gamma[K];
     for (k in 1:K) 
       gamma[k] = log(theta[doc[n], k]) + log(phi[k, w[n]]);
-    target += log_sum_exp(gamma));  // likeliho;
+    target += log_sum_exp(gamma));  // likelihood;
   }
 }
 \end{stancode}
@@ -7476,7 +7476,7 @@ for stiff systems.
   \citep{CohenHindmarsh:1996,SerbanHindmarsh:2005}
 \end{itemize}
 %
-For a discussion of stiff ODE sytems, see \refsection{stiff-ode}.  In
+For a discussion of stiff ODE systems, see \refsection{stiff-ode}.  In
 a nutshell, the stiff solvers are slower, but more robust;  how much
 so depends on the system and the region of parameter space.
 The function signatures for Stan's ODE solvers can be found in

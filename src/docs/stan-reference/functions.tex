@@ -372,7 +372,7 @@ arithmetic on the current hardware platform}
 The basic purpose of a Stan program is to compute a log probability
 function and its derivatives.  The log probability function in a Stan
 model outputs the log density on the unconstrained scale.  A log
-probabilty accumulator starts at zero and is then incremented in
+probability accumulator starts at zero and is then incremented in
 various ways by a Stan program.  The variables are first transformed
 from unconstrained to constrained, and the log Jacobian determinant
 added to the log probability accumulator.  Then the model block is
@@ -3127,14 +3127,14 @@ with a padded value at the end to guarantee that
 u(A)[n+1] - u(A)[n]
 \]
 is the number of non-zero elements in row $n$ of the matrix (here $2$, $0$,
-$1$, and $3$). Note that because the second row has no non-zero elments both
+$1$, and $3$). Note that because the second row has no non-zero elements both
 the second and third elements of $u(A)$ correspond to the third element of
 $w(A)$, which is $52$. The values $(w(A), \, v(A), \, u(A))$ are sufficient 
 to reconstruct $A$.
 
 The values are structured so that there is a real value and integer
 column index for each non-zero entry in the array, plus one integer
-for each row of the matrix, pluse one for padding.  There is also
+for each row of the matrix, plus one for padding.  There is also
 underlying storage for internal container pointers and sizes.  The
 total memory usage is roughly $12 K + M$ bytes plus a small constant
 overhead, which is often considerably fewer bytes than the $M \times N$
@@ -3149,7 +3149,7 @@ Conversion functions between dense and sparse matrices are provided.
 
 \subsection{Dense to Sparse Conversion}
 
-Converting a desne matrix $m$ to a sparse representation produces a
+Converting a dense matrix $m$ to a sparse representation produces a
 vector $w$ and two integer arrays, $u$ and $v$.
 
 \begin{description}
@@ -3157,7 +3157,7 @@ vector $w$ and two integer arrays, $u$ and $v$.
   \fitem{vector}{csr\_extract\_w}{matrix \farg{a}}{ Return non-zero
     values in matrix \farg{a}; see \refsection{CSR}.}
 %
-  \fitem{int[]}{csr\_extract\_v}{matrix \farg{a}}{Return colum
+  \fitem{int[]}{csr\_extract\_v}{matrix \farg{a}}{Return column
     indices for values in \code{csr\_extract\_w(\farg{a})}; see
     \refsection{CSR}.}
 %
@@ -3191,7 +3191,7 @@ a single function.
 
 The only supported operation is the multiplication of a sparse matrix
 $A$ and a dense vector $b$ to produce a dense vector $A\,b$.
-Multipying a dense row vector $b$ and a sparse matrix $A$ 
+Multiplying a dense row vector $b$ and a sparse matrix $A$ 
 can be coded using transposition as
 \[
 b \, A = (A^{\top} \, b^{\top})^{\top},

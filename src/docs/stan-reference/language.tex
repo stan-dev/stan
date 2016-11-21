@@ -1565,7 +1565,7 @@ multiplied by a (column) vector, which produces a \code{real} value.
 
 Stan provides elementwise matrix division and multiplication
 operations, \code{a~.*~b} and \code{a~./b}.  These provide a shorthand
-to replace loops, but are not intrinsicially more efficient than a
+to replace loops, but are not intrinsically more efficient than a
 version programmed with an elementwise calculations and assignments in
 a loop.  For example, given declarations,
 %
@@ -2269,7 +2269,7 @@ promoted to type \code{real} if necessary (see the subsection on type
 promotion in \refsection{function-application} for an exact
 specification of Stan's integer-to-real type-promotion rule).
 
-In general, matrix operations return the lowest inferrable type.  For
+In general, matrix operations return the lowest inferable type.  For
 example, \code{row\_vector~*~vector} returns a value of type
 \code{real}, which is declared in the function documentation and index
 as \code{real~operator*(row\_vector,vector)}.
@@ -2307,7 +2307,7 @@ Algebraically, the sampling statement in the model could be reduced to
 \end{stancode}
 %
 and it would seem the model should produce unit normal samples for
-\code{x}.  But rather than cancelling, the expression \code{sqrt(x -
+\code{x}.  But rather than canceling, the expression \code{sqrt(x -
   x)} causes a problem for derivatives.  The cause is the mechanistic
 evaluation of the chain rule,
 %
@@ -2325,7 +2325,7 @@ evaluation of the chain rule,
 & = & \mbox{NaN}.
 \end{eqnarray*}
 %
-Rather than the $x - x$ cancelling out, it introduces a 0 into the
+Rather than the $x - x$ canceling out, it introduces a 0 into the
 numerator and denominator of the chain-rule evaluation.
 
 The only way to avoid this kind problem is to be careful to do the
@@ -3337,7 +3337,7 @@ non-loop statements.
 
 Although these control statements may seem undesirable because of
 their goto-like behavior, their judicious use can greatly improve
-readability by reducing the level of nesting or eliminating bookeeping
+readability by reducing the level of nesting or eliminating bookkeeping
 inside loops.
 
 \subsection{Break Statements}
@@ -4494,7 +4494,7 @@ accessible, namely the transformed parameters and model blocks.  An
 attempt to use such a function elsewhere results in a compile-time
 error.
 
-\subsection{Definining Probability Functions for Sampling Statements}
+\subsection{Defining Probability Functions for Sampling Statements}
 
 Functions whose names end in \code{\_lpdf} and \code{\_lpmf} (density
 and mass functions) can be used as probability functions in sampling
@@ -4606,7 +4606,7 @@ real foo(real x) {
 }
 \end{stancode}
 %
-beause the return statement is not the last statement in the while
+because the return statement is not the last statement in the while
 loop.  A bogus dummy return could be placed after the while loop in
 this case.  The rules for returns allow
 %
