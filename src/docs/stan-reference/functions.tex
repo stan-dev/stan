@@ -123,6 +123,15 @@ The integer quotient of the dividend \farg{x} and divisor \farg{y}
 \]
 }
 %
+\fitem{int}{operator\%}{int \farg{x}, int \farg{y}}{\farg{x} modulo
+  \farg{y}, which is the remainder after dividing \farg{x} by \farg{y}, 
+\[
+\mbox{\code{operator\%}}(x, y)
+\ = \ x \ \mbox{mod} \ y
+\ = \ x - y * \lfloor x / y \rfloor
+\]
+}
+%
 \end{description}
 
 \subsection{Unary Prefix Operators}
@@ -131,7 +140,7 @@ The integer quotient of the dividend \farg{x} and divisor \farg{y}
 \fitem{int}{operator-}{int \farg{x}}{
 The negation of the subtrahend \farg{x}
 \[ 
-\mbox{\code{operator-}}(x) = (-x)
+\mbox{\code{operator-}}(x) = -x
 }
 \]
 %
@@ -363,7 +372,7 @@ arithmetic on the current hardware platform}
 The basic purpose of a Stan program is to compute a log probability
 function and its derivatives.  The log probability function in a Stan
 model outputs the log density on the unconstrained scale.  A log
-probabilty accumulator starts at zero and is then incremented in
+probability accumulator starts at zero and is then incremented in
 various ways by a Stan program.  The variables are first transformed
 from unconstrained to constrained, and the log Jacobian determinant
 added to the log probability accumulator.  Then the model block is
@@ -756,10 +765,10 @@ as \code{x~+~y} and \code{-x}, respectively.
 {\it Warning:}\ Rounding functions convert real values to integers.
 Because the output is an integer, any gradient information resulting
 from functions applied to the integer is not passed to the real value
-it was derived from.  With MCMC sampling using HMC or NUTS, the
-Metropolis/slice procedure will correct for any error due to poor
-gradient calculations, but the result is likely to be reduced
-acceptance probabilities and less efficient sampling.
+it was derived from.  With MCMC sampling using HMC or NUTS, the MCMC
+acceptance procedure will correct for any error due to poor gradient
+calculations, but the result is likely to be reduced acceptance
+probabilities and less efficient sampling.
 
 The rounding functions cannot be used as indices to arrays because
 they return real values.  Stan may introduce integer-valued versions
@@ -966,8 +975,7 @@ of these in the future, but as of now, there is no good workaround.
     \mbox{\code{tanh}}(x) = \tanh(x)
     \]}
   %
-  \fitem{real}{acosh}{real \farg{x}}{
-    Returns the inverse hyperbolic cosine (in radians) of \farg{x}.
+  \fitemUnaryVec{acosh}{inverse hyperbolic cosine (in radians)}{
     %
     \[
     \mbox{\code{acosh}}(x) = 
@@ -977,8 +985,7 @@ of these in the future, but as of now, there is no good workaround.
     \end{cases}
     \]}
   %
-  \fitem{real}{asinh}{real \farg{x}}{
-    Returns the inverse hyperbolic cosine (in radians) of \farg{x}.
+  \fitemUnaryVec{asinh}{inverse hyperbolic cosine (in radians)}{
     %
     \[
     \mbox{\code{asinh}}(x) = \sinh^{-1}(x)
@@ -1015,14 +1022,15 @@ commonly used as a link function (see \refsection{Phi-function}).
     \]
   }
   %
-  \fitemUnaryVec{inv\_logit}{logistic sigmoid function applied to \farg{y}}{
+  \fitemUnaryVec{inv\_logit}{logistic sigmoid function applied to \farg{x}}{
     \[
-    \mbox{\code{inv\_logit}}(y) = \frac{1}{1 + \exp(-y)}
+    \mbox{\code{inv\_logit}}(x) = \frac{1}{1 + \exp(-x)}
     \]}
   %
-  \fitemUnaryVec{inv\_cloglog}{inverse of the complementary log-log function  applied to \farg{y}}{
+  \fitemUnaryVec{inv\_cloglog}{inverse of the complementary log-log
+    function applied to \farg{x}}{
     \[
-    \mbox{\code{inv\_cloglog}}(y) = 1 - \exp \! \left( - \exp(y) \right)
+    \mbox{\code{inv\_cloglog}}(x) = 1 - \exp \! \left( - \exp(x) \right)
     \]}
   %
 \end{description}
@@ -3119,14 +3127,14 @@ with a padded value at the end to guarantee that
 u(A)[n+1] - u(A)[n]
 \]
 is the number of non-zero elements in row $n$ of the matrix (here $2$, $0$,
-$1$, and $3$). Note that because the second row has no non-zero elments both
+$1$, and $3$). Note that because the second row has no non-zero elements both
 the second and third elements of $u(A)$ correspond to the third element of
 $w(A)$, which is $52$. The values $(w(A), \, v(A), \, u(A))$ are sufficient 
 to reconstruct $A$.
 
 The values are structured so that there is a real value and integer
 column index for each non-zero entry in the array, plus one integer
-for each row of the matrix, pluse one for padding.  There is also
+for each row of the matrix, plus one for padding.  There is also
 underlying storage for internal container pointers and sizes.  The
 total memory usage is roughly $12 K + M$ bytes plus a small constant
 overhead, which is often considerably fewer bytes than the $M \times N$
@@ -3141,7 +3149,7 @@ Conversion functions between dense and sparse matrices are provided.
 
 \subsection{Dense to Sparse Conversion}
 
-Converting a desne matrix $m$ to a sparse representation produces a
+Converting a dense matrix $m$ to a sparse representation produces a
 vector $w$ and two integer arrays, $u$ and $v$.
 
 \begin{description}
@@ -3149,7 +3157,7 @@ vector $w$ and two integer arrays, $u$ and $v$.
   \fitem{vector}{csr\_extract\_w}{matrix \farg{a}}{ Return non-zero
     values in matrix \farg{a}; see \refsection{CSR}.}
 %
-  \fitem{int[]}{csr\_extract\_v}{matrix \farg{a}}{Return colum
+  \fitem{int[]}{csr\_extract\_v}{matrix \farg{a}}{Return column
     indices for values in \code{csr\_extract\_w(\farg{a})}; see
     \refsection{CSR}.}
 %
@@ -3183,7 +3191,7 @@ a single function.
 
 The only supported operation is the multiplication of a sparse matrix
 $A$ and a dense vector $b$ to produce a dense vector $A\,b$.
-Multipying a dense row vector $b$ and a sparse matrix $A$ 
+Multiplying a dense row vector $b$ and a sparse matrix $A$ 
 can be coded using transposition as
 \[
 b \, A = (A^{\top} \, b^{\top})^{\top},
@@ -3202,7 +3210,7 @@ sparse matrix.
 
 
 
-\chapter{Mixed Operations}
+\chapter{Mixed Operations}\label{mixed-operations.chapter}
 
 These functions perform conversions between Stan containers matrix,
 vector, row vector and arrays.
@@ -3322,11 +3330,8 @@ the functions block. The ODE system function must have this function
 signature:
 %
 \begin{stancode}
-real[] ode(real time,
-           real[] state,
-           real[] theta,
-           real[] x_r,
-           int[] x_i)
+real[] ode(real time, real[] state, real[] theta,
+           real[] x_r, int[] x_i)
 \end{stancode}
 %
 The ODE system function should return the derivative of the state
@@ -3351,7 +3356,7 @@ the ODE.
 
 \begin{description}
   %
-  \fitemthreelines{real[]}{integrate\_ode\_rk45}%
+  \fitemthreelines{real[~,~]}{integrate\_ode\_rk45}%
                   {function \farg{ode}, real[] \farg{initial\_state}}%
                   {real \farg{initial\_time}, real[] \farg{times}}%
                   {real[] \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
@@ -3359,7 +3364,7 @@ the ODE.
                     using the Runge Kutta Dopri algorithm with the implementation
                     from Boost.}
  %
- \fitemfourlines{real[]}{integrate\_ode\_rk45}%
+ \fitemfourlines{real[~,~]}{integrate\_ode\_rk45}%
                 {function \farg{ode}, real[] \farg{initial\_state}}%
                 {real \farg{initial\_time}, real[] \farg{times}}%
                 {real[] \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
@@ -3368,7 +3373,7 @@ the ODE.
                   Dopri algorithm with the implementation from Boost with
                   additional control parameters for the solver.}
  %
- \fitemthreelines{real[]}{integrate\_ode}%
+ \fitemthreelines{real[~,~]}{integrate\_ode}%
                  {function \farg{ode}, real[] \farg{initial\_state}}%
                  {real \farg{initial\_time}, real[] \farg{times}}%
                  {real[] \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
