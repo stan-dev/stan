@@ -689,17 +689,30 @@ as \code{x~+~y} and \code{-x}, respectively.
 
 \begin{description}
 %
-  \fitemUnaryVec{abs}{absolute value of \farg{x}\,; this function is deprecated and will be removed in the future; please use \code{fabs} instead}{
+
+  \fitemUnaryVec{fabs}{absolute value of \farg{x}}{
     \[
     \mbox{\code{abs}}(x) = |x|
-    \]}
+    \]
+    See the warning at start of \refsection{step-functions} for
+    application to parameters.
+  }
   %
-  \fitem{real}{fabs}{real \farg{x}}{
-    Returns the absolute value of \farg{x};  
-    see warning at start of \refsection{step-functions}.
+
+  \fitem{real}{abs}{real \farg{x}}{ Returns the absolute value of
+    \farg{x}, defined by
     \[
-    \mbox{\code{fabs}}(x) = |x|
-    \]}
+    \mbox{\code{abs}}(x) = |x|
+    \]
+    See the warning at start of \refsection{step-functions} for
+    application to parameters.
+  }
+  \fitem{int}{abs}{int \farg{x}}{ Returns the absolute value of
+    \farg{x}, defined by
+    \[
+    \mbox{\code{abs}}(x) = |x|
+    \]
+  }
   %
   \fitem{real}{fdim}{real \farg{x}, real \farg{y}}{
     Returns the positive difference between \farg{x} and \farg{y}, 
@@ -1139,8 +1152,8 @@ distribution function (and its complement).
     See \refsection{gamma-appendix} for definition of $\Gamma(x)$.
   }
   %
-  \fitem{real}{lgamma}{real \farg{x}}{
-    Returns the natural logarithm of the gamma function applied to \farg{x}.
+  \fitemUnaryVec{real}{lgamma}{natural logarithm of the gamma function
+    applied to \farg{x}.}{
     \[
     \mbox{\code{lgamma}}(x) 
     = 
@@ -1149,8 +1162,7 @@ distribution function (and its complement).
       \textrm{error} & \mbox{otherwise}
     \end{cases}
     \]
-    %
-    See \refsection{gamma-appendix} for definition of $\Gamma(x)$.}
+  }
   %
   \fitemUnaryVec{digamma}{digamma function applied to \farg{x}.  The digamma function is the derivative of the natural logarithm of the Gamma function.  The function is defined  for positive numbers and non-integral negative numbers}{
     \[
