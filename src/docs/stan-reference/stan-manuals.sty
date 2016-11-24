@@ -155,12 +155,12 @@
 
 
 \newcommand{\fitemUnaryVec}[3]{
-  \fitem{R}{#1}{T \farg{x}}{Returns the #2 of \farg{x}, defined by #3
-    Applies elementwise to any scalar, vector, matrix, or array
-    argument type \code{T}; the return type is the same as the
-    argument type with \code{int} promoted to \code{real};
-    for details, see \refsection{fun-vectorization}.}
+  \fitem{R}{#1}{T \farg{x}}{Returns the (elementwise) #2, #3
+    for any argument type \code{T};  see
+    \refsection{fun-vectorization} for details including return type
+    \code{R}.} 
 }
+
 
 \newcommand{\fitemindexsort}[6]{\item[{\tt #1 {\bfseries #2}(#3)}]\mbox{ }
   \\[2pt] #4\index{{\tt\bfseries #6 }@{\tt\bfseries #5 }!{\tt
@@ -170,15 +170,18 @@
 
 \newcommand{\farg}[1]{{\tt\slshape #1}}
 
-\newcommand{\pitem}[3]{\subsubsection{Sampling Statement}
+\newcommand{\pitemImpl}[4]{\subsubsection{Sampling Statement}
 \begin{description}
 \item {\tt \farg{#1} \textasciitilde\ {\bfseries #2}(\farg{#3});}
   \\
-  Increment log probability with {\tt #2\_log(\farg{#1}, \farg{#3})},
+  Increment log probability with {\tt #2\_#4(\farg{#1}, \farg{#3})},
   dropping constant additive terms; \refsection{sampling-statements}
   explains sampling statements.%
 \index{{\tt\bfseries #2 }!sampling statement|hyperpage}
 \end{description}}
+
+\newcommand{\pitem}[3]{\pitemImpl{#1}{#2}{#3}{lpdf}}
+\newcommand{\pitemdisc}[3]{\pitemImpl{#1}{#2}{#3}{lpmf}}
 
 \newcommand{\indentarrow}{ \rotatebox[origin=c]{180}{\ensuremath{\Lsh}} }
 

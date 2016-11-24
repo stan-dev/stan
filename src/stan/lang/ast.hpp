@@ -90,6 +90,9 @@ namespace stan {
     const int void_function_argument_origin_rng = 12;
 
     bool is_data_origin(const var_origin& vo);
+
+    bool is_fun_origin(const var_origin& vo);
+
     void print_var_origin(std::ostream& o, const var_origin& vo);
 
 
@@ -202,6 +205,7 @@ namespace stan {
       bool has_user_defined_key(const std::string& name) const;
       std::set<std::string> key_set() const;
       bool has_key(const std::string& key) const;
+      bool discrete_first_arg(const std::string& name) const;
 
     private:
       function_signatures();
@@ -450,6 +454,7 @@ namespace stan {
       expression false_val_;
       expr_type type_;
       bool has_var_;
+      var_origin var_origin_;
       conditional_op();
       conditional_op(const expression& cond,
                      const expression& true_val,
@@ -1061,10 +1066,12 @@ namespace stan {
       expression expr_;
       distribution dist_;
       range truncation_;
+      bool is_discrete_;
       sample();
       sample(expression& e,
              distribution& dist);
       bool is_ill_formed() const;
+      bool is_discrete() const;
     };
 
     struct assignment {
@@ -1231,6 +1238,7 @@ namespace stan {
     std::string strip_ccdf_suffix(const std::string& dist_fun);
 
     bool fun_name_exists(const std::string& name);
+
 
   }
 }

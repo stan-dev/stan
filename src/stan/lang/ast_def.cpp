@@ -153,6 +153,7 @@ namespace stan {
         sigs_ = new function_signatures;
       return *sigs_;
     }
+
     void
     function_signatures::set_user_defined(const
                                           std::pair<std::string,
@@ -160,12 +161,14 @@ namespace stan {
                                           name_sig) {
       user_defined_set_.insert(name_sig);
     }
+
     bool
     function_signatures::is_user_defined(const std::pair<std::string,
                                                          function_signature_t>&
                                               name_sig) {
       return user_defined_set_.find(name_sig) != user_defined_set_.end();
     }
+
     bool function_signatures::is_defined(const std::string& name,
                                          const function_signature_t& sig) {
       if (sigs_map_.find(name) == sigs_map_.end())
@@ -175,6 +178,24 @@ namespace stan {
         if (sig.second  == sigs[i].second)
           return true;
       return false;
+    }
+
+    bool function_signatures::discrete_first_arg(const std::string& fun)
+      const {
+      using std::map;
+      using std::string;
+      using std::vector;
+      map<string, vector<function_signature_t> >::const_iterator it
+        = sigs_map_.find(fun);
+      if (it == sigs_map_.end())
+        return false;
+      const vector<function_signature_t> sigs = it->second;
+      for (size_t i = 0; i < sigs.size(); ++i) {
+        if (sigs[i].second.size() == 0
+            || sigs[i].second[0].base_type_ != INT_T)
+          return false;
+      }
+      return true;
     }
 
     void function_signatures::add(const std::string& name,
@@ -767,7 +788,7 @@ namespace stan {
       return sum;
     }
 
-    printable::printable() : printable_("") { }
+    printable::printable() : printable_(std::string()) { }
     printable::printable(const expression& expr) : printable_(expr) { }
     printable::printable(const std::string& msg) : printable_(msg) { }
     printable::printable(const printable_t& printable)
@@ -1254,6 +1275,15 @@ namespace stan {
 
     bool is_data_origin(const var_origin& vo) {
       return vo == data_origin || vo == transformed_data_origin;
+    }
+
+    bool is_fun_origin(const var_origin& vo) {
+      return vo == function_argument_origin
+        || vo == function_argument_origin_lp
+        || vo == function_argument_origin_rng
+        || vo == void_function_argument_origin
+        || vo == void_function_argument_origin_lp
+        || vo == void_function_argument_origin_rng;
     }
 
     void print_var_origin(std::ostream& o, const var_origin& vo) {
@@ -1965,6 +1995,9 @@ namespace stan {
           || (truncation_.has_high()
                && expr_.expression_type()
                   != truncation_.high_.expression_type());
+    }
+    bool sample::is_discrete() const {
+      return is_discrete_;
     }
 
     assignment::assignment() {

@@ -204,8 +204,9 @@ namespace stan {
 
 
     // called from: expression_grammar
-    struct validate_conditional_op : public phoenix_functor_quaternary {
+    struct validate_conditional_op : public phoenix_functor_quinary {
       void operator()(conditional_op& cond_expr,
+                      const var_origin& var_origin,
                       bool& pass,
                       const variable_map& var_map,
                       std::ostream& error_msgs) const;
@@ -428,7 +429,7 @@ namespace stan {
 
     // called from: statement_grammar
     struct validate_sample : public phoenix_functor_quaternary {
-      void operator()(const sample& s, const variable_map& var_map,
+      void operator()(sample& s, const variable_map& var_map,
                       bool& pass, std::ostream& error_msgs) const;
     };
     extern boost::phoenix::function<validate_sample> validate_sample_f;
