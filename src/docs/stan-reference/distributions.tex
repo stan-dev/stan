@@ -283,7 +283,7 @@ If $\theta \in [0,1]$, then for $y \in \setlist{0,1}$,
 \right.
 \]
 
-\pitem{y}{bernoulli}{theta}
+\pitemdisc{y}{bernoulli}{theta}
 
 \subsubsection{Stan Functions}
 
@@ -343,7 +343,7 @@ If $\alpha \in \reals$, then for $c \in \setlist{0,1}$,
 \right.
 \]
 
-\pitem{y}{bernoulli\_logit}{alpha}
+\pitemdisc{y}{bernoulli\_logit}{alpha}
 
 \subsubsection{Stan Functions}
 
@@ -401,7 +401,7 @@ Suppose $N \in \nats$ and $\theta \in [0,1]$, and $n \in
 \]
 
 
-\pitem{n}{binomial}{N, theta}
+\pitemdisc{n}{binomial}{N, theta}
 
 \subsubsection{Stan Functions}
 
@@ -474,7 +474,7 @@ Suppose $N \in \nats$, $\alpha \in \reals$, and $n \in
 - \frac{N - n}{\mbox{logit}^{-1}(\alpha)}
 \]
 
-\pitem{n}{binomial\_logit}{N, alpha}
+\pitemdisc{n}{binomial\_logit}{N, alpha}
 
 \subsubsection{Stan Functions}
 
@@ -509,7 +509,7 @@ where the beta function $\Betafun(u,v)$ is defined for $u \in
 = \frac{\Gamma(u) \ \Gamma(v)}{\Gamma(u + v)}.
 \]
 
-\pitem{n}{beta\_binomial}{N, alpha, beta}
+\pitemdisc{n}{beta\_binomial}{N, alpha, beta}
 
 \subsubsection{Stan Functions}
 
@@ -566,7 +566,7 @@ then for $n \in \setlist{\max(0,N-b),\ldots,\min(a,N)}$,
 \]
 
 
-\pitem{n}{hypergeometric}{N, a, b}
+\pitemdisc{n}{hypergeometric}{N, a, b}
 
 \subsubsection{Stan Functions}
 
@@ -612,8 +612,8 @@ In addition, Stan provides a log-odds scaled categorical distribution,
 See \refsection{softmax} for the definition of the softmax function.
 
 
-\pitem{y}{categorical}{theta}
-\pitem{y}{categorical\_logit}{beta}
+\pitemdisc{y}{categorical}{theta}
+\pitemdisc{y}{categorical\_logit}{beta}
 
 
 \subsubsection{Stan Functions}
@@ -676,7 +676,7 @@ cases can be subsumed into the general definition by setting $c_0 =
 -\infty$ and $c_K = +\infty$ with $\mbox{logit}^{-1}(-\infty) = 0$ and
 $\mbox{logit}^{-1}(\infty) = 1$.
 
-\pitem{k}{ordered\_logistic}{eta, c}
+\pitemdisc{k}{ordered\_logistic}{eta, c}
 
 
 \subsubsection{Stan Functions}
@@ -755,7 +755,7 @@ The mean and variance of a random variable $y \sim
 \mbox{Var}[Y] = \frac{\alpha}{\beta^2} (\beta + 1).
 \]
 
-\pitem{n}{neg\_binomial}{alpha, beta}
+\pitemdisc{n}{neg\_binomial}{alpha, beta}
 
 \subsubsection{Stan Functions}
 
@@ -822,7 +822,7 @@ that of the Poisson with mean $\mu$.  So the inverse of parameter
 $\phi$ controls the overdispersion, scaled by the square of the mean,
 $\mu^2$.
 
-\pitem{y}{neg\_binomial\_2}{mu, phi}
+\pitemdisc{y}{neg\_binomial\_2}{mu, phi}
 
 \subsubsection{Stan Functions}
 
@@ -872,7 +872,7 @@ This alternative may be used for sampling, as a function, and for
 random number generation, but as of yet, there are no CDFs implemented
 for it.
 
-\pitem{y}{neg\_binomial\_2\_log}{eta, phi}
+\pitemdisc{y}{neg\_binomial\_2\_log}{eta, phi}
 
 \section{Stan Functions}
 
@@ -906,7 +906,7 @@ If $\lambda \in \posreals$, then for $n \in \nats$,
 \exp(-\lambda).
 \]
 
-\pitem{n}{poisson}{lambda}
+\pitemdisc{n}{poisson}{lambda}
 
 \subsubsection{Stan Functions}
 
@@ -949,7 +949,7 @@ If $\alpha \in \reals$, then for $n \in \nats$,
 \exp \left(n\alpha - \exp(\alpha) \right).
 \]
 
-\pitem{n}{poisson\_log}{alpha}
+\pitemdisc{n}{poisson\_log}{alpha}
 
 \subsubsection{Stan Functions}
 
@@ -989,7 +989,7 @@ where the multinomial coefficient is defined by
 = \frac{N!}{\prod_{k=1}^K y_k!}.
 \]
 
-\pitem{y}{multinomial}{theta}
+\pitemdisc{y}{multinomial}{theta}
 
 \subsubsection{Stan Functions}
 
@@ -1522,12 +1522,12 @@ y^{\nu/2 - 1}
 
 If $\nu \in \posreals$, then for $y \in \posreals$,
 \[
-\distro{InvChiSquare}(y|\nu)
+\distro{InvChiSquare}(y \, | \, \nu)
 =
 \frac{2^{-\nu/2}}
    {\Gamma(\nu / 2)}
 \,
-y^{-(\nu/2 - 1)}
+y^{-\nu/2 - 1}
 \,
 \exp\! \left( \! - \, \frac{1}{2} \, \frac{1}{y} \right)
 .
@@ -2286,7 +2286,6 @@ vectorized, so it allows arrays of row vectors or vectors as
 arguments; see \refsection{prob-vectorization} for a description of
 vectorization.
 
-
 \begin{description}
 %
   \fitem{real}{multi\_normal\_lpdf}{vectors \farg{y} | vectors
@@ -2310,7 +2309,11 @@ vectorization.
     \farg{mu} and covariance matrix \farg{Sigma}}
 %
 \end{description}
-%
+
+Although there is a direct multi-normal RNG function, if more than one
+result is required, it's much more efficient to Cholesky factor the
+covariance matrix and call \code{multi\_normal\_cholesky\_rng};  see \refsection{multi-normal-cholesky-fun}.
+
 \begin{description}
 \fitem{vector}{multi\_normal\_rng}{vector \farg{mu}, matrix
   \farg{Sigma}}{Generate a multivariate normal variate with location
@@ -2361,7 +2364,7 @@ If $K \in \nats$, $\mu \in \reals^K$, and $\Omega \in \reals^{K \times
 
 
 
-\section{Multivariate Normal Distribution, Cholesky Parameterization}
+\section{Multivariate Normal Distribution, Cholesky Parameterization}\label{multi-normal-cholesky-fun.section}
 
 \subsubsection{Probability Density Function}
 

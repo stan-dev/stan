@@ -492,7 +492,7 @@ MCMC convergence time is roughly equivalent to the autocorrelation
 time.  Because HMC (and NUTS) chains tend to be lowly autocorrelated
 they also tend to converge quite rapidly.
 
-This only applies wehn there is uniformity of curvature across the
+This only applies when there is uniformity of curvature across the
 posterior, an assumption which is violated in many complex models.
 Quite often, the tails have large curvature while the bulk of the
 posterior mass is relatively well-behaved; in other words, warmup is slow
@@ -536,8 +536,11 @@ in one of two ways, either
 \end{itemize}
 %
 Rather than using a standard Metropolis step, the final parameter
-value is selected with slice sampling along the final evolution step
-(i.e., the second half of iterations generated).
+value is selected via multinomial sampling with a bias toward the
+second half of the steps in the trajectory \citep{Betancourt:2016}.%
+%
+\footnote{Stan previously used slice sampling along the trajectory,
+  following the original NUTS paper of \cite{Hoffman-Gelman:2014}.}
 
 Configuring the no-U-turn sample involves putting a cap on the depth
 of the trees that it evaluates during each iteration.   This is
@@ -607,7 +610,7 @@ declare any parameters, instead putting anything parameter-like in the
 data block.  Nevertheless, it is possible to include parameters for
 fixed-parameters sampling and initialize them in any of the usual ways
 (randomly, fixed to zero on the unconstrained scale, or with
-user-specified values).  For exmaple, \code{theta} in the example
+user-specified values).  For example, \code{theta} in the example
 above could be declared as a parameter and initialized as a parameter.
 
 
@@ -684,7 +687,7 @@ Because zero is chosen to be a reasonable default initial value for
 most parameters, the interval around zero provides a fairly diffuse
 starting point. For instance, unconstrained variables are initialized
 randomly in $(-2,2)$, variables constrained to be positive are
-initialized rougly in $(0.14,7.4)$, variables constrained to fall
+initialized roughly in $(0.14,7.4)$, variables constrained to fall
 between 0 and 1 are initialized with values roughly in $(0.12,0.88)$.
 
 
@@ -1953,7 +1956,7 @@ and stream progress is configurable.
 \subsection{Convergence Monitoring}
 
 Convergence monitoring in (L-)BFGS is controlled by a number of
-tolerance values, any one of which being satisified causes the
+tolerance values, any one of which being satisfied causes the
 algorithm to terminate with a solution. Any of the convergence tests
 can be disabled by setting its corresponding tolerance parameter to
 zero.  The tests for convergence are as follows.
