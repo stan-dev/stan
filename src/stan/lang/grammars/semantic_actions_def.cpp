@@ -222,7 +222,9 @@ namespace stan {
     }
     boost::phoenix::function<increment_size_t> increment_size_t_f;
 
+
     void validate_conditional_op::operator()(conditional_op& conditional_op,
+                                             const var_origin& var_origin,
                                              bool& pass,
                                              const variable_map& var_map,
                                              std::ostream& error_msgs) const {
@@ -269,6 +271,7 @@ namespace stan {
         conditional_op.type_ = true_val_type;
 
       conditional_op.has_var_ = has_var(conditional_op, var_map);
+      conditional_op.var_origin_ = var_origin;
       pass = true;
     }
     boost::phoenix::function<validate_conditional_op>
@@ -1607,7 +1610,7 @@ namespace stan {
               || var_origin == transformed_data_origin
               || var_origin == function_argument_origin_rng)) {
           error_msgs << "ERROR: random number generators only allowed in"
-                     << " tranformed data block, generated quantities block"
+                     << " transformed data block, generated quantities block"
                      << " or user-defined functions with names ending in _rng"
                      << "; found function=" << fun.name_ << " in block=";
           print_var_origin(error_msgs, var_origin);
