@@ -356,6 +356,7 @@ namespace stan {
     struct array_expr {
       std::vector<expression> args_;
       expr_type type_;
+      bool has_var_;
       array_expr();
       array_expr(const std::vector<expression>& args);  // NOLINT
       array_expr& operator=(const array_expr& al);

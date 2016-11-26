@@ -227,7 +227,7 @@ namespace stan {
       void operator()(const array_expr& x) const {
         std::stringstream ss;
         x.type_.base_type_ == DOUBLE_T ?
-          (is_var_context_ ? ss << "T__" : ss << "double" ) :
+          (x.has_var_ && is_var_context_ ? ss << "T__" : ss << "double" ) :
           ss << x.args_[0].expression_type();
 
         o_ << "stan::math::array_builder<";

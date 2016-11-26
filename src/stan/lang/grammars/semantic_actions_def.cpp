@@ -1687,7 +1687,7 @@ namespace stan {
 
     void set_array_expr_type::operator()(expression& e, 
                       array_expr& array_expr,
-                      const var_origin& var_origin,
+                      const variable_map& var_map,
                       bool& pass,
                       std::ostream& error_msgs) const {
       if (array_expr.args_.size() == 0) {
@@ -1726,6 +1726,7 @@ namespace stan {
       }
       ++et.num_dims_;
       array_expr.type_ = et;
+      array_expr.has_var_ = has_var(array_expr, var_map);
       e = array_expr;
       pass = true;
     };
