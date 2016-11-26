@@ -225,12 +225,17 @@ namespace stan {
           o_ << ".0";  // trailing 0 to ensure C++ makes it a double
       }
       void operator()(const array_expr& x) const {
-        o_ << "stan::math::new_array<";
-        generate_type("foobar",
+        std::stringstream ss;
+        x.type_.base_type_ == DOUBLE_T ?
+          (is_var_context_ ? ss << "T__" : ss << "double" ) :
+          ss << x.args_[0].expression_type();
+
+        o_ << "stan::math::array_builder<";
+        generate_type(ss.str(),
                       x.args_,
-                      x.args_.size(),
+                      x.type_.num_dims_ - 1,
                       o_);
-        o_ << ">()";
+        o_ << " >()";
         for (size_t i = 0; i < x.args_.size(); ++i) {
           o_ << ".add(";
           generate_expression(x.args_[i], o_);
