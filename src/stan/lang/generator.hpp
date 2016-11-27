@@ -225,15 +225,29 @@ namespace stan {
           o_ << ".0";  // trailing 0 to ensure C++ makes it a double
       }
       void operator()(const array_expr& x) const {
+        std::stringstream ssDouble;
+        if (is_fun_origin(x.var_origin_)) {
+          ssDouble << "fun_scalar_t__";
+        } else if (is_var_context_) {
+          ssDouble << "T__";
+        } else {
+            ssDouble << "double";
+        }
+
         std::stringstream ss;
         x.type_.base_type_ == DOUBLE_T ?
-          (x.has_var_ && is_var_context_ ? ss << "T__" : ss << "double" ) :
-          ss << x.args_[0].expression_type();
+          ss << ssDouble.str() : ss << x.args_[0].expression_type();
 
+        o_ << "static_cast<";
+        generate_type(ss.str(),
+                      x.args_,
+                      x.type_.num_dims_,
+                      o_);
+        o_ << " >(";
         o_ << "stan::math::array_builder<";
         generate_type(ss.str(),
                       x.args_,
-                      x.type_.num_dims_ - 1,
+                      x.type_.num_dims_ - 1, 
                       o_);
         o_ << " >()";
         for (size_t i = 0; i < x.args_.size(); ++i) {
@@ -242,7 +256,9 @@ namespace stan {
           o_ << ")";
         }
         o_ << ".array()";
+        o_ << ")";
       }
+      
       void operator()(const variable& v) const { o_ << v.name_; }
       void operator()(int n) const {   // NOLINT
         o_ << static_cast<long>(n);    // NOLINT
@@ -705,12 +721,12 @@ namespace stan {
         generate_validate_positive(var_name, type_arg2, o);
 
       // initialize variable or use definition
-      if (is_nil(definition)) {
-        o << INDENT2
-          << var_name << " = ";
-        generate_type(base_type, dims, dims.size(), o);
-        generate_initializer(o, base_type, dims, type_arg1, type_arg2);
-      }
+      //      if (is_nil(definition)) {
+      o << INDENT2
+        << var_name << " = ";
+      generate_type(base_type, dims, dims.size(), o);
+      generate_initializer(o, base_type, dims, type_arg1, type_arg2);
+        //      }
     }
 
     struct var_resizing_visgen : public visgen {
@@ -1479,19 +1495,20 @@ namespace stan {
         generate_indent(indents_, o_);
         generate_type(type, dims.size());
         o_ << ' '  << name;
-        if (is_nil(definition)) {
-          generate_init_args(type, ctor_args, dims, 0);
-        }
+        //        if (is_nil(definition)) {
+        generate_init_args(type, ctor_args, dims, 0);
+        //        }
         o_ << ";" << EOL;
         if (dims.size() == 0) {
           generate_indent(indents_, o_);
           generate_void_statement(name);
           o_ << EOL;
         }
-        if (is_nil(definition)
-            && (type == "Eigen::Matrix<T__, Eigen::Dynamic, Eigen::Dynamic> "
-                 || type == "Eigen::Matrix<T__, 1, Eigen::Dynamic> "
-                 || type == "Eigen::Matrix<T__, Eigen::Dynamic, 1> ")) {
+        //        if (is_nil(definition)
+        //            && (type == "Eigen::Matrix<T__, Eigen::Dynamic, Eigen::Dynamic> "
+        if (type == "Eigen::Matrix<T__, Eigen::Dynamic, Eigen::Dynamic> "
+            || type == "Eigen::Matrix<T__, 1, Eigen::Dynamic> "
+            || type == "Eigen::Matrix<T__, Eigen::Dynamic, 1> ") {
           generate_indent(indents_, o_);
           o_ << "stan::math::fill(" << name << ", DUMMY_VAR__);" << EOL;
         }
@@ -1587,10 +1604,10 @@ namespace stan {
                                      bool is_fun_return) {
       generate_local_var_init_nan_visgen vis(indent, is_var_context,
                                              is_fun_return, indent, o);
-      for (size_t i = 0; i < vs.size(); ++i)
-        if (!vs[i].has_def()) {
-          boost::apply_visitor(vis, vs[i].decl_);
-        }
+      for (size_t i = 0; i < vs.size(); ++i) {
+        //if (!vs[i].has_def()) 
+        boost::apply_visitor(vis, vs[i].decl_);
+      }
     }
 
     // see member_var_decl_visgen cut & paste
@@ -1667,8 +1684,8 @@ namespace stan {
                        " avoid seg fault on val access",
                        indent, o);
       for (size_t i = 0; i < vs.size(); ++i) {
-        if (!(vs[i].has_def()))
-          boost::apply_visitor(vis, vs[i].decl_);
+        // if (!(vs[i].has_def()))
+        boost::apply_visitor(vis, vs[i].decl_);
       }
     }
 
@@ -3389,9 +3406,8 @@ namespace stan {
         o_ << INDENT2;
         generate_type(base_type, dims, dims.size(), o_);
         o_ << ' ' << name;
-        if (is_nil(definition)) {
-          generate_initializer(o_, base_type, dims, type_arg1, type_arg2);
-        } else {
+        generate_initializer(o_, base_type, dims, type_arg1, type_arg2);
+        if (!is_nil(definition)) {
           o_ << ";" << EOL;
           o_ << INDENT2;
           o_ << "stan::math::assign(" << name << ", ";

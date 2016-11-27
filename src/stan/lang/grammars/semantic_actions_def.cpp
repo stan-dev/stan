@@ -1687,7 +1687,7 @@ namespace stan {
 
     void set_array_expr_type::operator()(expression& e, 
                       array_expr& array_expr,
-                      const variable_map& var_map,
+                      const var_origin& var_origin,
                       bool& pass,
                       std::ostream& error_msgs) const {
       if (array_expr.args_.size() == 0) {
@@ -1726,7 +1726,7 @@ namespace stan {
       }
       ++et.num_dims_;
       array_expr.type_ = et;
-      array_expr.has_var_ = has_var(array_expr, var_map);
+      array_expr.var_origin_ = var_origin;
       e = array_expr;
       pass = true;
     };
@@ -2268,7 +2268,7 @@ namespace stan {
         error_msgs << "variable definition base type mismatch,"
                    << " variable declared as base type: ";
         write_base_expr_type(error_msgs, decl_type.type());
-        error_msgs << "variable definition has base: ";
+        error_msgs << " variable definition has base: ";
         write_base_expr_type(error_msgs, def_type.type());
         pass = false;
       }

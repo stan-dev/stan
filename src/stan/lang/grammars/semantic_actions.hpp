@@ -568,7 +568,7 @@ namespace stan {
     struct set_array_expr_type : public phoenix_functor_quinary {
       void operator()(expression& e, 
                       array_expr& array_expr,
-                      const variable_map& var_map,
+                      const var_origin& var_origin,
                       bool& pass,
                       std::ostream& error_msgs) const;
     };
