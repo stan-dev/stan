@@ -3377,7 +3377,7 @@ namespace stan {
         generate_type(base_type, dims, dims.size(), o_);
         o_ << ' ' << name;
         generate_initializer(o_, base_type, dims, type_arg1, type_arg2);
-        if (! is_nil(definition)) {
+        if (!is_nil(definition)) {
           o_ << ";" << EOL;
           o_ << INDENT2;
           o_ << "stan::math::assign(" << name << ", ";
