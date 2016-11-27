@@ -689,8 +689,7 @@ namespace stan {
                                  const std::string& base_type,
                                  const std::vector<expression>& dims,
                                  const expression& type_arg1 = expression(),
-                                 const expression& type_arg2 = expression(),
-                                 const expression& definition = expression()) {
+                                 const expression& type_arg2 = expression()) {
       // validate all dims are positive
       for (size_t i = 0; i < dims.size(); ++i)
         generate_validate_positive(var_name, dims[i], o);
@@ -699,13 +698,11 @@ namespace stan {
       if (!is_nil(type_arg2))
         generate_validate_positive(var_name, type_arg2, o);
 
-      // initialize variable or use definition
-      if (is_nil(definition)) {
-        o << INDENT2
-          << var_name << " = ";
-        generate_type(base_type, dims, dims.size(), o);
-        generate_initializer(o, base_type, dims, type_arg1, type_arg2);
-      }
+      // initialize variable
+      o << INDENT2
+        << var_name << " = ";
+      generate_type(base_type, dims, dims.size(), o);
+      generate_initializer(o, base_type, dims, type_arg1, type_arg2);
     }
 
     struct var_resizing_visgen : public visgen {
@@ -715,19 +712,19 @@ namespace stan {
       void operator()(nil const& /*x*/) const { }  // dummy
       void operator()(int_var_decl const& x) const {
         generate_initialization(o_, x.name_, "int", x.dims_,
-                                nil(), nil(), x.def_);
+                                nil(), nil());
       }
       void operator()(double_var_decl const& x) const {
         generate_initialization(o_, x.name_, "double", x.dims_, nil(),
-                                nil(), x.def_);
+                                nil());
       }
       void operator()(vector_var_decl const& x) const {
         generate_initialization(o_, x.name_, "vector_d", x.dims_, x.M_,
-                                nil(), x.def_);
+                                nil());
       }
       void operator()(row_vector_var_decl const& x) const {
         generate_initialization(o_, x.name_, "row_vector_d", x.dims_, x.N_,
-                                nil(), x.def_);
+                                nil());
       }
       void operator()(unit_vector_var_decl const& x) const {
         generate_initialization(o_, x.name_, "vector_d", x.dims_, x.K_);
@@ -743,7 +740,7 @@ namespace stan {
       }
       void operator()(matrix_var_decl const& x) const {
         generate_initialization(o_, x.name_, "matrix_d",
-                                x.dims_, x.M_, x.N_, x.def_);
+                                x.dims_, x.M_, x.N_);
       }
       void operator()(cholesky_factor_var_decl const& x) const {
         generate_initialization(o_, x.name_, "matrix_d", x.dims_, x.M_, x.N_);
@@ -1474,19 +1471,16 @@ namespace stan {
         generate_indent(indents_, o_);
         generate_type(type, dims.size());
         o_ << ' '  << name;
-        if (is_nil(definition)) {
-          generate_init_args(type, ctor_args, dims, 0);
-        }
+        generate_init_args(type, ctor_args, dims, 0);
         o_ << ";" << EOL;
         if (dims.size() == 0) {
           generate_indent(indents_, o_);
           generate_void_statement(name);
           o_ << EOL;
         }
-        if (is_nil(definition)
-            && (type == "Eigen::Matrix<T__, Eigen::Dynamic, Eigen::Dynamic> "
-                 || type == "Eigen::Matrix<T__, 1, Eigen::Dynamic> "
-                 || type == "Eigen::Matrix<T__, Eigen::Dynamic, 1> ")) {
+        if (type == "Eigen::Matrix<T__, Eigen::Dynamic, Eigen::Dynamic> "
+            || type == "Eigen::Matrix<T__, 1, Eigen::Dynamic> "
+            || type == "Eigen::Matrix<T__, Eigen::Dynamic, 1> ") {
           generate_indent(indents_, o_);
           o_ << "stan::math::fill(" << name << ", DUMMY_VAR__);" << EOL;
         }
@@ -1582,10 +1576,9 @@ namespace stan {
                                      bool is_fun_return) {
       generate_local_var_init_nan_visgen vis(indent, is_var_context,
                                              is_fun_return, indent, o);
-      for (size_t i = 0; i < vs.size(); ++i)
-        if (!vs[i].has_def()) {
-          boost::apply_visitor(vis, vs[i].decl_);
-        }
+      for (size_t i = 0; i < vs.size(); ++i) {
+        boost::apply_visitor(vis, vs[i].decl_);
+      }
     }
 
     // see member_var_decl_visgen cut & paste
@@ -1662,8 +1655,7 @@ namespace stan {
                        " avoid seg fault on val access",
                        indent, o);
       for (size_t i = 0; i < vs.size(); ++i) {
-        if (!(vs[i].has_def()))
-          boost::apply_visitor(vis, vs[i].decl_);
+        boost::apply_visitor(vis, vs[i].decl_);
       }
     }
 
@@ -3384,9 +3376,8 @@ namespace stan {
         o_ << INDENT2;
         generate_type(base_type, dims, dims.size(), o_);
         o_ << ' ' << name;
-        if (is_nil(definition)) {
-          generate_initializer(o_, base_type, dims, type_arg1, type_arg2);
-        } else {
+        generate_initializer(o_, base_type, dims, type_arg1, type_arg2);
+        if (! is_nil(definition)) {
           o_ << ";" << EOL;
           o_ << INDENT2;
           o_ << "stan::math::assign(" << name << ", ";
