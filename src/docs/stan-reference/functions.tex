@@ -1240,6 +1240,21 @@ distribution function (and its complement).
     = \log\Gamma(x+1) - \log\Gamma(y+1) - \log\Gamma(x-y+1).
     \]}
   %
+  \fitem{int}{choose}{real \farg{x}, real \farg{y}}{
+    Returns the binomial coefficient of \farg{x} and \farg{y}. For 
+    non-negative integer inputs, the binomial coefficient function 
+    is written as $\binom{x}{y}$ and pronounced ``\farg{x} choose 
+    \farg{y}.'' In its the antilog of the \code{lchoose} function
+    but returns an integer rather than a real number with no
+    non-zero decimal places.
+    
+    For $0 \leq y \leq x$, the binomial coefficient function can be
+    defined via the factorial function
+    \[
+    \mbox{\code{choose}}(x,y)
+    = \frac{x!}{\left(y!\right)\left(x - y\right)!}.
+    \]}
+  %  
   \fitem{real}{bessel\_first\_kind}{int \farg{v}, real \farg{x}}{
     Returns the Bessel function of the first kind with order \farg{v}
     applied to \farg{x}.
