@@ -1661,6 +1661,7 @@ namespace stan {
 
     void generate_define_vars(const std::vector<var_decl>& vs,
                             int indent,
+                            bool is_var_context,
                             std::ostream& o) {
       generate_comment("assign variable definitions",
                        indent, o);
@@ -1670,7 +1671,7 @@ namespace stan {
           o << "stan::math::assign("
             << vs[i].name()
             << ",";
-          generate_expression(vs[i].def(), false, o);
+          generate_expression(vs[i].def(), false, is_var_context, o);
           o << ");" << EOL;
         }
       }
@@ -2106,7 +2107,7 @@ namespace stan {
                                    is_var_context_, is_fun_return_);
           generate_local_var_init_nan(x.local_decl_, indent, o_,
                                       is_var_context_, is_fun_return_);
-          generate_define_vars(x.local_decl_, indent, o_);
+          generate_define_vars(x.local_decl_, indent, is_var_context_, o_);
         }
         o_ << EOL;
 
@@ -2350,7 +2351,7 @@ namespace stan {
       generate_local_var_decls(p.derived_decl_.first, 2, o, is_var_context,
                                is_fun_return);
       generate_init_vars(p.derived_decl_.first, 2, o);
-      generate_define_vars(p.derived_decl_.first, 2, o);
+      generate_define_vars(p.derived_decl_.first, 2, is_var_context, o);
       o << EOL;
 
       bool include_sampling = true;
@@ -3185,12 +3186,13 @@ namespace stan {
       o << INDENT2
         << "(void) DUMMY_VAR__;  // suppress unused var warning" << EOL2;
       generate_init_vars(prog.derived_data_decl_.first, 2, o);
-      generate_define_vars(prog.derived_data_decl_.first, 2, o);
-      o << EOL;
 
       bool include_sampling = false;
       bool is_var_context = false;
       bool is_fun_return = false;
+      generate_define_vars(prog.derived_data_decl_.first, 2, is_var_context, o);
+      o << EOL;
+
       // need to fix generate_located_statements
       generate_located_statements(prog.derived_data_decl_.second,
                                   2, o, include_sampling, is_var_context,
@@ -4404,7 +4406,7 @@ namespace stan {
       o << INDENT2 << "(void) DUMMY_VAR__;  // suppress unused var warning"
         << EOL2;
       generate_init_vars(prog.generated_decl_.first, 2, o);
-      generate_define_vars(prog.generated_decl_.first, 2, o);
+      generate_define_vars(prog.generated_decl_.first, 2, is_var_context, o);
       o << EOL;
       generate_located_statements(prog.generated_decl_.second, 2, o,
                                   include_sampling, is_var_context,
