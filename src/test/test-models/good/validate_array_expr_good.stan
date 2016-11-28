@@ -1,5 +1,6 @@
 functions {
   real[] f1(real y) {
+    real x = 1 ? y : 2;
     return  {1.0, 2.0, y};
   }
   int[] f2(int y) {
@@ -15,36 +16,32 @@ data {
   int<lower=0,upper=1> y[N];
 } 
 transformed data {
-  vector[7] b0;
-  row_vector[7] c0;
-  real td_x;
-  real td_y;
-  real td_z;
   int td_ar_int_dim1[3] = {1, 2, 3};
-  //  real td_ar_real_dim2[2,3];
-  //  td_ar_real_dim2 = { {1.0, 2*2, 3^2}, {4.0, 5.0, 6.0} };
-  //  real td_ar_real_dim1[3] = {1.0, 2*2, 3^2};
-  //  real td_ar_real_dim1_s1[1] = {td_z};
-  //  real td_ar_real_dim1_s4[4] = {1.1, 2.0, 3.0}; // cannot check length
-  //  real td_ar_real_dim1_s3[3] = {1.1, 2.0, 3.0, 4.0, 5.0}; // cannot check length
-
+  real td_ar_real_dim1_1[1] = { 1.0 };
+  real td_ar_real_dim1_2[2] = { 1.1, 2.1 };
+  real td_ar_real_dim1_3[3] = { 1.2, 2.2, 2.3 };
+  real td_ar_real_dim2_23[2,3] = {{1.2,2.2,2.3},{4.2,5.2,6.2}};
+  real yy = 0;
+  real xx = 1 ? yy : 2;
 }
 parameters {
   real<lower=0,upper=1> theta;
 } 
 transformed parameters {
-  real tp_x;
-  real tp_y;
-  real tp_z;
-  real tp_ar_real_dim1[3];
-  //  real tp_ar_real_dim2[2,3];
-  tp_ar_real_dim1 = {1.0, 2*2, 3^2};
-  tp_ar_real_dim1 = {tp_x,tp_y,tp_z};
-  tp_ar_real_dim1 = f1(tp_z);
+  real x = 1.1;
+  real tp_ar_real_dim1_1[1] = {x};
+  real tp_ar_real_dim1_2[2] = {theta, x};
+  real tp_ar_real_dim1_3[3] = { 1.0*4.5, x*4.5, 2.2^4.5};
+  real z = 1 ? yy : 2;
 }
 model {
   theta ~ beta(1,1);
   for (n in 1:N) 
     y[n] ~ bernoulli(theta);
-  print({1.0, 2.0, 3.0});
+}
+generated quantities {
+  real w = 1 ? yy : 2;
+  real gq_ar_real_dim1_1[1] = {x};
+  real gq_ar_real_dim1_2[2] = {theta, x};
+  real gq_ar_real_dim1_3[3] = { 1.0*4.5, x*4.5, 2.2^4.5};
 }

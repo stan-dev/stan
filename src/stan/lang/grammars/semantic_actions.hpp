@@ -565,11 +565,12 @@ namespace stan {
     extern boost::phoenix::function<set_fun_type_named> set_fun_type_named_f;
 
     // called from: term_grammar
-    struct set_array_expr_type : public phoenix_functor_quinary {
+    struct set_array_expr_type : public phoenix_functor_senary {
       void operator()(expression& e, 
                       array_expr& array_expr,
                       const var_origin& var_origin,
                       bool& pass,
+                      const variable_map& var_map,
                       std::ostream& error_msgs) const;
     };
     extern boost::phoenix::function<set_array_expr_type> set_array_expr_type_f;

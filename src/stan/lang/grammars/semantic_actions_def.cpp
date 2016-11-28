@@ -1689,6 +1689,7 @@ namespace stan {
                       array_expr& array_expr,
                       const var_origin& var_origin,
                       bool& pass,
+                      const variable_map& var_map,
                       std::ostream& error_msgs) const {
       if (array_expr.args_.size() == 0) {
         // shouldn't occur, because of % operator used to construct it
@@ -1727,6 +1728,7 @@ namespace stan {
       ++et.num_dims_;
       array_expr.type_ = et;
       array_expr.var_origin_ = var_origin;
+      array_expr.has_var_ = has_var(array_expr, var_map);
       e = array_expr;
       pass = true;
     };

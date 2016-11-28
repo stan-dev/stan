@@ -225,10 +225,15 @@ namespace stan {
           o_ << ".0";  // trailing 0 to ensure C++ makes it a double
       }
       void operator()(const array_expr& x) const {
+        std::cout << "is_var_context_ " << is_var_context_
+                  << " var origin ";
+        print_var_origin(std::cout, x.var_origin_);
+        std::cout << " var " << x.args_[0].expression_type() << std::endl;
+          
         std::stringstream ssDouble;
         if (is_fun_origin(x.var_origin_)) {
           ssDouble << "fun_scalar_t__";
-        } else if (is_var_context_) {
+        } else if (x.has_var_ && !(x.var_origin_ == derived_origin)) {
           ssDouble << "T__";
         } else {
             ssDouble << "double";
@@ -393,6 +398,11 @@ namespace stan {
       }
 
       void operator()(const conditional_op& expr) const {
+        std::cout << "is_var_context_ " << is_var_context_
+                  << " var origin ";
+        print_var_origin(std::cout, expr.var_origin_);
+        std::cout << std::endl;
+        
         bool types_prim_match
           = (expr.type_.is_primitive() && expr.type_.base_type_ == INT_T)
           || (!expr.has_var_ && expr.type_.is_primitive()
@@ -1691,7 +1701,7 @@ namespace stan {
           o << "stan::math::assign("
             << vs[i].name()
             << ",";
-          generate_expression(vs[i].def(), false, o);
+          generate_expression(vs[i].def(), o);
           o << ");" << EOL;
         }
       }

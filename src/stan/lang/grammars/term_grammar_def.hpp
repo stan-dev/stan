@@ -214,6 +214,7 @@ namespace stan {
         | double_literal_r[assign_lhs_f(_val, _1)]
         | (array_expr_r(_r1)[assign_lhs_f(_c, _1)]
            > eps[set_array_expr_type_f(_val, _c, _r1, _pass,
+                                       boost::phoenix::ref(var_map_),
                                        boost::phoenix::ref(error_msgs_))])
         | (lit('(')
            > expression_g(_r1)[assign_lhs_f(_val, _1)]
