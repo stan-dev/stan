@@ -544,7 +544,7 @@ namespace stan {
 
     // use to disambiguate VectorXd(0) ctor from Scalar* alternative
     void generate_eigen_index_expression(const expression& e,
-                                    std::ostream& o) {
+                                         std::ostream& o) {
       o << "static_cast<Eigen::VectorXd::Index>(";
       generate_expression(e.expr_, o);
       o << ")";
@@ -1660,9 +1660,9 @@ namespace stan {
     }
 
     void generate_define_vars(const std::vector<var_decl>& vs,
-                            int indent,
-                            bool is_var_context,
-                            std::ostream& o) {
+                              int indent,
+                              bool is_var_context,
+                              std::ostream& o) {
       generate_comment("assign variable definitions",
                        indent, o);
       for (size_t i = 0; i < vs.size(); ++i) {
