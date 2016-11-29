@@ -14,20 +14,18 @@ namespace stan {
     typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> matrix_d;
     typedef Eigen::Matrix<double, Eigen::Dynamic, 1> vector_d;
 
-    namespace {
-      // Negates any positive eigenvalues in H so that H is negative
-      // definite, and then solves Hu = g and stores the result into
-      // g. Avoids problems due to non-log-concave distributions.
-      void make_negative_definite_and_solve(matrix_d& H, vector_d& g) {
-        Eigen::SelfAdjointEigenSolver<matrix_d> solver(H);
-        matrix_d eigenvectors = solver.eigenvectors();
-        vector_d eigenvalues = solver.eigenvalues();
-        vector_d eigenprojections = eigenvectors.transpose() * g;
-        for (int i = 0; i < g.size(); i++) {
-          eigenprojections[i] = -eigenprojections[i] / fabs(eigenvalues[i]);
-        }
-        g = eigenvectors * eigenprojections;
+    // Negates any positive eigenvalues in H so that H is negative
+    // definite, and then solves Hu = g and stores the result into
+    // g. Avoids problems due to non-log-concave distributions.
+    void make_negative_definite_and_solve(matrix_d& H, vector_d& g) {
+      Eigen::SelfAdjointEigenSolver<matrix_d> solver(H);
+      matrix_d eigenvectors = solver.eigenvectors();
+      vector_d eigenvalues = solver.eigenvalues();
+      vector_d eigenprojections = eigenvectors.transpose() * g;
+      for (int i = 0; i < g.size(); i++) {
+        eigenprojections[i] = -eigenprojections[i] / fabs(eigenvalues[i]);
       }
+      g = eigenvectors * eigenprojections;
     }
 
     template <typename M>
