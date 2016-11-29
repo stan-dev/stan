@@ -6,6 +6,7 @@ TEST(langParserTermGrammar, array_expr) {
   test_throws("validate_array_expr_bad1", "base type mismatch");
   test_throws("validate_array_expr_bad2", "dimension mismatch");
   test_throws("validate_array_expr_bad3", "ERROR");
+  test_throws("validate_array_expr_bad3a", "ERROR");
 }
 
 TEST(langParserTermGrammar, infixExponentiation) {
