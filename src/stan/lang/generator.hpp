@@ -225,15 +225,10 @@ namespace stan {
           o_ << ".0";  // trailing 0 to ensure C++ makes it a double
       }
       void operator()(const array_expr& x) const {
-        std::cout << "is_var_context_ " << is_var_context_
-                  << " var origin ";
-        print_var_origin(std::cout, x.var_origin_);
-        std::cout << " var " << x.args_[0].expression_type() << std::endl;
-          
         std::stringstream ssDouble;
         if (is_fun_origin(x.var_origin_)) {
           ssDouble << "fun_scalar_t__";
-        } else if (x.has_var_ && !(x.var_origin_ == derived_origin)) {
+        } else if (is_var_context_ && x.has_var_) {
           ssDouble << "T__";
         } else {
             ssDouble << "double";
@@ -398,11 +393,6 @@ namespace stan {
       }
 
       void operator()(const conditional_op& expr) const {
-        std::cout << "is_var_context_ " << is_var_context_
-                  << " var origin ";
-        print_var_origin(std::cout, expr.var_origin_);
-        std::cout << std::endl;
-        
         bool types_prim_match
           = (expr.type_.is_primitive() && expr.type_.base_type_ == INT_T)
           || (!expr.has_var_ && expr.type_.is_primitive()
@@ -1691,8 +1681,9 @@ namespace stan {
     }
 
     void generate_define_vars(const std::vector<var_decl>& vs,
-                            int indent,
-                            std::ostream& o) {
+                              int indent,
+                              bool is_var_context,
+                              std::ostream& o) {
       generate_comment("assign variable definitions",
                        indent, o);
       for (size_t i = 0; i < vs.size(); ++i) {
@@ -1701,7 +1692,7 @@ namespace stan {
           o << "stan::math::assign("
             << vs[i].name()
             << ",";
-          generate_expression(vs[i].def(), o);
+          generate_expression(vs[i].def(), false, is_var_context, o);
           o << ");" << EOL;
         }
       }
@@ -2137,7 +2128,7 @@ namespace stan {
                                    is_var_context_, is_fun_return_);
           generate_local_var_init_nan(x.local_decl_, indent, o_,
                                       is_var_context_, is_fun_return_);
-          generate_define_vars(x.local_decl_, indent, o_);
+          generate_define_vars(x.local_decl_, indent, is_var_context_, o_);
         }
         o_ << EOL;
 
@@ -2381,7 +2372,7 @@ namespace stan {
       generate_local_var_decls(p.derived_decl_.first, 2, o, is_var_context,
                                is_fun_return);
       generate_init_vars(p.derived_decl_.first, 2, o);
-      generate_define_vars(p.derived_decl_.first, 2, o);
+      generate_define_vars(p.derived_decl_.first, 2, is_var_context, o);
       o << EOL;
 
       bool include_sampling = true;
@@ -3216,13 +3207,14 @@ namespace stan {
       o << INDENT2
         << "(void) DUMMY_VAR__;  // suppress unused var warning" << EOL2;
       generate_init_vars(prog.derived_data_decl_.first, 2, o);
-      generate_define_vars(prog.derived_data_decl_.first, 2, o);
-      o << EOL;
 
       bool include_sampling = false;
       bool is_var_context = false;
       bool is_fun_return = false;
-      // need to fix generate_located_statements
+      generate_define_vars(prog.derived_data_decl_.first, 2, is_var_context, o);
+      o << EOL;
+
+      // need to fix generate_located_statements // mm: remove this comment?
       generate_located_statements(prog.derived_data_decl_.second,
                                   2, o, include_sampling, is_var_context,
                                   is_fun_return);
@@ -4435,7 +4427,7 @@ namespace stan {
       o << INDENT2 << "(void) DUMMY_VAR__;  // suppress unused var warning"
         << EOL2;
       generate_init_vars(prog.generated_decl_.first, 2, o);
-      generate_define_vars(prog.generated_decl_.first, 2, o);
+      generate_define_vars(prog.generated_decl_.first, 2, is_var_context, o);
       o << EOL;
       generate_located_statements(prog.generated_decl_.second, 2, o,
                                   include_sampling, is_var_context,
