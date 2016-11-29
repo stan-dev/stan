@@ -566,7 +566,7 @@ namespace stan {
 
     // called from: term_grammar
     struct set_array_expr_type : public phoenix_functor_senary {
-      void operator()(expression& e, 
+      void operator()(expression& e,
                       array_expr& array_expr,
                       const var_origin& var_origin,
                       bool& pass,
@@ -574,7 +574,6 @@ namespace stan {
                       std::ostream& error_msgs) const;
     };
     extern boost::phoenix::function<set_array_expr_type> set_array_expr_type_f;
-
 
     // called from: term_grammar
     struct exponentiation_expr : public phoenix_functor_quinary {

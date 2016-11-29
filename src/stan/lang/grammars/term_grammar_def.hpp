@@ -286,7 +286,6 @@ namespace stan {
         >> expression_g(_r1) % ','
         >> lit('}');
     }
-      
   }
 }
 #endif

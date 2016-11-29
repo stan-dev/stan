@@ -1685,7 +1685,7 @@ namespace stan {
     }
     boost::phoenix::function<set_fun_type_named> set_fun_type_named_f;
 
-    void set_array_expr_type::operator()(expression& e, 
+    void set_array_expr_type::operator()(expression& e,
                       array_expr& array_expr,
                       const var_origin& var_origin,
                       bool& pass,
@@ -1731,7 +1731,7 @@ namespace stan {
       array_expr.has_var_ = has_var(array_expr, var_map);
       e = array_expr;
       pass = true;
-    };
+    }
     boost::phoenix::function<set_array_expr_type> set_array_expr_type_f;
 
     void exponentiation_expr::operator()(expression& expr1,

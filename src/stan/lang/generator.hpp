@@ -247,7 +247,7 @@ namespace stan {
         o_ << "stan::math::array_builder<";
         generate_type(ss.str(),
                       x.args_,
-                      x.type_.num_dims_ - 1, 
+                      x.type_.num_dims_ - 1,
                       o_);
         o_ << " >()";
         for (size_t i = 0; i < x.args_.size(); ++i) {
@@ -258,7 +258,7 @@ namespace stan {
         o_ << ".array()";
         o_ << ")";
       }
-      
+
       void operator()(const variable& v) const { o_ << v.name_; }
       void operator()(int n) const {   // NOLINT
         o_ << static_cast<long>(n);    // NOLINT
