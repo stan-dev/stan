@@ -23,7 +23,7 @@ public:
   boost::ecuyer1988 rng;
 };
 
-TEST_F(ServicesUtilInitialize, radius_zero__print_false) {
+TEST_F(ServicesUtilInitialize, radius_zero_print_false) {
   std::vector<double> params;
     
   double init_radius = 0;
@@ -43,7 +43,7 @@ TEST_F(ServicesUtilInitialize, radius_zero__print_false) {
   EXPECT_EQ(params[1], init.vector_double_values()[0][1]);
 }
   
-TEST_F(ServicesUtilInitialize, radius_zero__print_true) {
+TEST_F(ServicesUtilInitialize, radius_zero_print_true) {
   std::vector<double> params;
     
   double init_radius = 0;
@@ -63,7 +63,7 @@ TEST_F(ServicesUtilInitialize, radius_zero__print_true) {
   EXPECT_EQ(params[1], init.vector_double_values()[0][1]);
 }
 
-TEST_F(ServicesUtilInitialize, radius_two__print_false) {
+TEST_F(ServicesUtilInitialize, radius_two_print_false) {
   std::vector<double> params;
     
   double init_radius = 2;
@@ -85,7 +85,7 @@ TEST_F(ServicesUtilInitialize, radius_two__print_false) {
   EXPECT_EQ(params[1], init.vector_double_values()[0][1]);
 }
 
-TEST_F(ServicesUtilInitialize, radius_two__print_true) {
+TEST_F(ServicesUtilInitialize, radius_two_print_true) {
   std::vector<double> params;
     
   double init_radius = 2;
@@ -107,7 +107,7 @@ TEST_F(ServicesUtilInitialize, radius_two__print_true) {
   EXPECT_EQ(params[1], init.vector_double_values()[0][1]);
 }
 
-TEST_F(ServicesUtilInitialize, full_init__print_false) {
+TEST_F(ServicesUtilInitialize, full_init_print_false) {
   std::vector<std::string> names_r;
   std::vector<double> values_r;
   std::vector<std::vector<size_t> > dim_r;
@@ -139,7 +139,7 @@ TEST_F(ServicesUtilInitialize, full_init__print_false) {
   EXPECT_EQ(params[1], init.vector_double_values()[0][1]);
 }
 
-TEST_F(ServicesUtilInitialize, full_init__print_true) {
+TEST_F(ServicesUtilInitialize, full_init_print_true) {
   std::vector<std::string> names_r;
   std::vector<double> values_r;
   std::vector<std::vector<size_t> > dim_r;
@@ -190,63 +190,63 @@ namespace test {
       log_prob_return_value = 0.0;
     }
 
-    template <bool propto__, bool jacobian__, typename T__>
-    T__ log_prob(std::vector<T__>& params_r__,
-                 std::vector<int>& params_i__,
-                 std::ostream* pstream__ = 0) const {
+    template <bool propto_, bool jacobian_, typename T_>
+    T_ log_prob(std::vector<T_>& params_r_,
+                 std::vector<int>& params_i_,
+                 std::ostream* pstream_ = 0) const {
       ++templated_log_prob_calls;
       throw std::domain_error("throwing within log_prob");
       return log_prob_return_value;
     }
 
-    void transform_inits(const stan::io::var_context& context__,
-                         std::vector<int>& params_i__,
-                         std::vector<double>& params_r__,
-                         std::ostream* pstream__) const {
+    void transform_inits(const stan::io::var_context& context_,
+                         std::vector<int>& params_i_,
+                         std::vector<double>& params_r_,
+                         std::ostream* pstream_) const {
       ++transform_inits_calls;
-      for (size_t n = 0; n < params_r__.size(); ++n) {
-        params_r__[n] = n;
+      for (size_t n = 0; n < params_r_.size(); ++n) {
+        params_r_[n] = n;
       }
     }
 
-    void get_dims(std::vector<std::vector<size_t> >& dimss__) const {
-      dimss__.resize(0);
+    void get_dims(std::vector<std::vector<size_t> >& dimss_) const {
+      dimss_.resize(0);
       std::vector<size_t> scalar_dim;
-      dimss__.push_back(scalar_dim);
+      dimss_.push_back(scalar_dim);
     }
 
-    void constrained_param_names(std::vector<std::string>& param_names__,
-                                 bool include_tparams__ = true,
-                                 bool include_gqs__ = true) const {
-      param_names__.push_back("theta");
+    void constrained_param_names(std::vector<std::string>& param_names_,
+                                 bool include_tparams_ = true,
+                                 bool include_gqs_ = true) const {
+      param_names_.push_back("theta");
     }
 
     void get_param_names(std::vector<std::string>& names) const {
       constrained_param_names(names);
     }
 
-    void unconstrained_param_names(std::vector<std::string>& param_names__,
-                                   bool include_tparams__ = true,
-                                   bool include_gqs__ = true) const {
-      param_names__.clear();
-      for (size_t n = 0; n < num_params_r__; ++n) {
+    void unconstrained_param_names(std::vector<std::string>& param_names_,
+                                   bool include_tparams_ = true,
+                                   bool include_gqs_ = true) const {
+      param_names_.clear();
+      for (size_t n = 0; n < num_params_r_; ++n) {
         std::stringstream param_name;
         param_name << "param_" << n;
-        param_names__.push_back(param_name.str());
+        param_names_.push_back(param_name.str());
       }
     }
     template <typename RNG>
-    void write_array(RNG& base_rng__,
-                     std::vector<double>& params_r__,
-                     std::vector<int>& params_i__,
-                     std::vector<double>& vars__,
-                     bool include_tparams__ = true,
-                     bool include_gqs__ = true,
-                     std::ostream* pstream__ = 0) const {
+    void write_array(RNG& base_rng_,
+                     std::vector<double>& params_r_,
+                     std::vector<int>& params_i_,
+                     std::vector<double>& vars_,
+                     bool include_tparams_ = true,
+                     bool include_gqs_ = true,
+                     std::ostream* pstream_ = 0) const {
       ++write_array_calls;
-      vars__.resize(0);
-      for (size_t i = 0; i < params_r__.size(); ++i)
-        vars__.push_back(params_r__[i]);
+      vars_.resize(0);
+      for (size_t i = 0; i < params_r_.size(); ++i)
+        vars_.push_back(params_r_[i]);
     }
 
     mutable int templated_log_prob_calls;

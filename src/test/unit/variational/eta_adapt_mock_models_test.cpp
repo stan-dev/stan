@@ -37,58 +37,58 @@ public:
     return log_prob_return_value;
   }
 
-  void transform_inits(const stan::io::var_context& context__,
-                       Eigen::VectorXd& params_r__,
+  void transform_inits(const stan::io::var_context& context_,
+                       Eigen::VectorXd& params_r_,
                        std::ostream* out) const {
     transform_inits_calls++;
-    for (int n = 0; n < params_r__.size(); n++) {
-      params_r__[n] = n;
+    for (int n = 0; n < params_r_.size(); n++) {
+      params_r_[n] = n;
     }
   }
 
-  void get_dims(std::vector<std::vector<size_t> >& dimss__) const {
-    dimss__.resize(0);
+  void get_dims(std::vector<std::vector<size_t> >& dimss_) const {
+    dimss_.resize(0);
     std::vector<size_t> scalar_dim;
-    dimss__.push_back(scalar_dim);
-    dimss__.push_back(scalar_dim);
-    dimss__.push_back(scalar_dim);
+    dimss_.push_back(scalar_dim);
+    dimss_.push_back(scalar_dim);
+    dimss_.push_back(scalar_dim);
   }
 
-  void constrained_param_names(std::vector<std::string>& param_names__,
-                               bool include_tparams__ = true,
-                               bool include_gqs__ = true) const {
-    param_names__.push_back("a");
-    param_names__.push_back("b");
-    param_names__.push_back("c");
+  void constrained_param_names(std::vector<std::string>& param_names_,
+                               bool include_tparams_ = true,
+                               bool include_gqs_ = true) const {
+    param_names_.push_back("a");
+    param_names_.push_back("b");
+    param_names_.push_back("c");
   }
 
   void get_param_names(std::vector<std::string>& names) const {
     constrained_param_names(names);
   }
 
-  void unconstrained_param_names(std::vector<std::string>& param_names__,
-                                 bool include_tparams__ = true,
-                                 bool include_gqs__ = true) const {
-    param_names__.clear();
-    for (size_t n = 0; n < num_params_r__; n++) {
+  void unconstrained_param_names(std::vector<std::string>& param_names_,
+                                 bool include_tparams_ = true,
+                                 bool include_gqs_ = true) const {
+    param_names_.clear();
+    for (size_t n = 0; n < num_params_r_; n++) {
       std::stringstream param_name;
       param_name << "param_" << n;
-      param_names__.push_back(param_name.str());
+      param_names_.push_back(param_name.str());
     }
   }
 
   template <typename RNG>
-  void write_array(RNG& base_rng__,
-                   std::vector<double>& params_r__,
-                   std::vector<int>& params_i__,
-                   std::vector<double>& vars__,
-                   bool include_tparams__ = true,
-                   bool include_gqs__ = true,
-                   std::ostream* pstream__ = 0) const {
+  void write_array(RNG& base_rng_,
+                   std::vector<double>& params_r_,
+                   std::vector<int>& params_i_,
+                   std::vector<double>& vars_,
+                   bool include_tparams_ = true,
+                   bool include_gqs_ = true,
+                   std::ostream* pstream_ = 0) const {
      write_array_calls++;
-     vars__.resize(0);
-     for (size_t i = 0; i < params_r__.size(); i++)
-       vars__.push_back(params_r__[i]);
+     vars_.resize(0);
+     for (size_t i = 0; i < params_r_.size(); i++)
+       vars_.push_back(params_r_[i]);
   }
 
   mutable int templated_log_prob_calls;
@@ -123,58 +123,58 @@ public:
     return log_prob_return_value;
   }
 
-  void transform_inits(const stan::io::var_context& context__,
-                       Eigen::VectorXd& params_r__,
+  void transform_inits(const stan::io::var_context& context_,
+                       Eigen::VectorXd& params_r_,
                        std::ostream* out) const {
     transform_inits_calls++;
-    for (int n = 0; n < params_r__.size(); n++) {
-      params_r__[n] = n;
+    for (int n = 0; n < params_r_.size(); n++) {
+      params_r_[n] = n;
     }
   }
 
-  void get_dims(std::vector<std::vector<size_t> >& dimss__) const {
-    dimss__.resize(0);
+  void get_dims(std::vector<std::vector<size_t> >& dimss_) const {
+    dimss_.resize(0);
     std::vector<size_t> scalar_dim;
-    dimss__.push_back(scalar_dim);
-    dimss__.push_back(scalar_dim);
-    dimss__.push_back(scalar_dim);
+    dimss_.push_back(scalar_dim);
+    dimss_.push_back(scalar_dim);
+    dimss_.push_back(scalar_dim);
   }
 
-  void constrained_param_names(std::vector<std::string>& param_names__,
-                               bool include_tparams__ = true,
-                               bool include_gqs__ = true) const {
-    param_names__.push_back("a");
-    param_names__.push_back("b");
-    param_names__.push_back("c");
+  void constrained_param_names(std::vector<std::string>& param_names_,
+                               bool include_tparams_ = true,
+                               bool include_gqs_ = true) const {
+    param_names_.push_back("a");
+    param_names_.push_back("b");
+    param_names_.push_back("c");
   }
 
   void get_param_names(std::vector<std::string>& names) const {
     constrained_param_names(names);
   }
 
-  void unconstrained_param_names(std::vector<std::string>& param_names__,
-                                 bool include_tparams__ = true,
-                                 bool include_gqs__ = true) const {
-    param_names__.clear();
-    for (size_t n = 0; n < num_params_r__; n++) {
+  void unconstrained_param_names(std::vector<std::string>& param_names_,
+                                 bool include_tparams_ = true,
+                                 bool include_gqs_ = true) const {
+    param_names_.clear();
+    for (size_t n = 0; n < num_params_r_; n++) {
       std::stringstream param_name;
       param_name << "param_" << n;
-      param_names__.push_back(param_name.str());
+      param_names_.push_back(param_name.str());
     }
   }
 
   template <typename RNG>
-  void write_array(RNG& base_rng__,
-                   std::vector<double>& params_r__,
-                   std::vector<int>& params_i__,
-                   std::vector<double>& vars__,
-                   bool include_tparams__ = true,
-                   bool include_gqs__ = true,
-                   std::ostream* pstream__ = 0) const {
+  void write_array(RNG& base_rng_,
+                   std::vector<double>& params_r_,
+                   std::vector<int>& params_i_,
+                   std::vector<double>& vars_,
+                   bool include_tparams_ = true,
+                   bool include_gqs_ = true,
+                   std::ostream* pstream_ = 0) const {
      write_array_calls++;
-     vars__.resize(0);
-     for (size_t i = 0; i < params_r__.size(); i++)
-       vars__.push_back(params_r__[i]);
+     vars_.resize(0);
+     for (size_t i = 0; i < params_r_.size(); i++)
+       vars_.push_back(params_r_[i]);
   }
 
   mutable int templated_log_prob_calls;

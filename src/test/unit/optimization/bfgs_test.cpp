@@ -249,7 +249,7 @@ TEST(OptimizationBfgs, ModelAdaptor_fevals) {
   EXPECT_FLOAT_EQ(mod.fevals(), 0);
 }
 
-TEST(OptimizationBfgs, ModelAdaptor_operator_parens__matrix_double) {
+TEST(OptimizationBfgs, ModelAdaptor_operator_parens_matrix_double) {
   Eigen::Matrix<double,Eigen::Dynamic,1> cont_vector(2);
   cont_vector[0] = -1; cont_vector[1] = 1;
   std::vector<int> disc_vector;
@@ -270,7 +270,7 @@ TEST(OptimizationBfgs, ModelAdaptor_operator_parens__matrix_double) {
   EXPECT_FLOAT_EQ(mod(cont_vector,f), 0);
 }
 
-TEST(OptimizationBfgs, ModelAdaptor_operator_parens__matrix_double_matrix) {
+TEST(OptimizationBfgs, ModelAdaptor_operator_parens_matrix_double_matrix) {
   Eigen::Matrix<double,Eigen::Dynamic,1> cont_vector(2);
   cont_vector[0] = -1; cont_vector[1] = 1;
   std::vector<int> disc_vector;

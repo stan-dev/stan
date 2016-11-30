@@ -1,5 +1,5 @@
-#ifndef STAN__MCMC__MOCK__HMC__BETA
-#define STAN__MCMC__MOCK__HMC__BETA
+#ifndef STAN_MCMC_MOCK_HMC_BETA
+#define STAN_MCMC_MOCK_HMC_BETA
 
 #include <stan/math/prim/mat.hpp>
 #include <stan/model/prob_grad.hpp>

@@ -1,5 +1,5 @@
-#ifndef TEST__PERFORMANCE__UTILITY_HPP
-#define TEST__PERFORMANCE__UTILITY_HPP
+#ifndef TEST_PERFORMANCE_UTILITY_HPP
+#define TEST_PERFORMANCE_UTILITY_HPP
 
 #include <stdexcept>
 #include <boost/algorithm/string.hpp>

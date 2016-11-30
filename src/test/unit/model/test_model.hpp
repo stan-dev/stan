@@ -6,26 +6,26 @@
 
 class TestModel_uniform_01 {
 public:
-  template <bool propto__, bool jacobian__, typename T__>
-  T__ log_prob(std::vector<T__>& params_r__,
-               std::vector<int>& params_i__,
-               std::ostream* pstream__ = 0) const {
-    T__ lp__(0.0);
-    stan::math::accumulator<T__> lp_accum__;
+  template <bool propto, bool jacobian, typename T>
+  T log_prob(std::vector<T>& params_r,
+             std::vector<int>& params_i,
+             std::ostream* pstream_ = 0) const {
+    T lp(0.0);
+    stan::math::accumulator<T> lp_accum;
     
     // model parameters
-    stan::io::reader<T__> in__(params_r__,params_i__);
+    stan::io::reader<T> in(params_r, params_i);
     
-    T__ y;
-    if (jacobian__)
-      y = in__.scalar_lub_constrain(0,1,lp__);
+    T y;
+    if (jacobian)
+      y = in.scalar_lub_constrain(0,1,lp);
     else
-      y = in__.scalar_lub_constrain(0,1);
+      y = in.scalar_lub_constrain(0,1);
     
-    lp_accum__.add(stan::math::uniform_log<propto__>(y, 0, 1));
-    lp_accum__.add(lp__);
+    lp_accum.add(stan::math::uniform_log<propto>(y, 0, 1));
+    lp_accum.add(lp);
 
-    return lp_accum__.sum();
+    return lp_accum.sum();
   }
 };
 

@@ -16,33 +16,33 @@ namespace stan {
      */
     class prob_grad {
     protected:
-      size_t num_params_r__;
-      std::vector<std::pair<int, int> > param_ranges_i__;
+      size_t num_params_r_;
+      std::vector<std::pair<int, int> > param_ranges_i_;
 
     public:
       explicit prob_grad(size_t num_params_r)
-        : num_params_r__(num_params_r),
-          param_ranges_i__(std::vector<std::pair<int, int> >(0)) {
+        : num_params_r_(num_params_r),
+          param_ranges_i_(std::vector<std::pair<int, int> >(0)) {
       }
 
       prob_grad(size_t num_params_r,
                 std::vector<std::pair<int, int> >& param_ranges_i)
-        : num_params_r__(num_params_r),
-          param_ranges_i__(param_ranges_i) {
+        : num_params_r_(num_params_r),
+          param_ranges_i_(param_ranges_i) {
       }
 
       virtual ~prob_grad() { }
 
       inline size_t num_params_r() const {
-        return num_params_r__;
+        return num_params_r_;
       }
 
       inline size_t num_params_i() const {
-        return param_ranges_i__.size();
+        return param_ranges_i_.size();
       }
 
       inline std::pair<int, int> param_range_i(size_t idx) const {
-        return param_ranges_i__[idx];
+        return param_ranges_i_[idx];
       }
     };
   }

@@ -566,15 +566,15 @@ namespace stan {
     boost::phoenix::function<validate_return_type> validate_return_type_f;
 
     void scope_lp::operator()(variable_map& vm) const {
-      vm.add("lp__", DOUBLE_T, local_origin);
-      vm.add("params_r__", VECTOR_T, local_origin);
+      vm.add("lp_", DOUBLE_T, local_origin);
+      vm.add("params_r_", VECTOR_T, local_origin);
     }
     boost::phoenix::function<scope_lp> scope_lp_f;
 
     void unscope_variables::operator()(function_decl_def& decl,
                                        variable_map& vm) const {
-      vm.remove("lp__");
-      vm.remove("params_r__");
+      vm.remove("lp_");
+      vm.remove("params_r_");
       for (size_t i = 0; i < decl.arg_decls_.size(); ++i)
         vm.remove(decl.arg_decls_[i].name_);
     }
@@ -659,18 +659,18 @@ namespace stan {
 
 
     void add_lp_var::operator()(variable_map& vm) const {
-      vm.add("lp__",
-             base_var_decl("lp__", std::vector<expression>(), DOUBLE_T),
+      vm.add("lp_",
+             base_var_decl("lp_", std::vector<expression>(), DOUBLE_T),
              local_origin);  // lp acts as a local where defined
-      vm.add("params_r__",
-             base_var_decl("params_r__", std::vector<expression>(), VECTOR_T),
+      vm.add("params_r_",
+             base_var_decl("params_r_", std::vector<expression>(), VECTOR_T),
              local_origin);  // lp acts as a local where defined
     }
     boost::phoenix::function<add_lp_var> add_lp_var_f;
 
     void remove_lp_var::operator()(variable_map& vm) const {
-      vm.remove("lp__");
-      vm.remove("params_r__");
+      vm.remove("lp_");
+      vm.remove("params_r_");
     }
     boost::phoenix::function<remove_lp_var> remove_lp_var_f;
 
@@ -2007,13 +2007,13 @@ namespace stan {
                    << std::endl;
         pass = false;
         return;
-      } else if (name == std::string("params_r__")) {
+      } else if (name == std::string("params_r_")) {
         error_msgs << std::endl << "WARNING:" << std::endl
-                   << "  Direct access to params_r__ yields an inconsistent"
+                   << "  Direct access to params_r_ yields an inconsistent"
                    << " statistical model in isolation and no guarantee is"
                    << " made that this model will yield valid inferences."
                    << std::endl
-                   << "  Moreover, access to params_r__ is unsupported"
+                   << "  Moreover, access to params_r_ is unsupported"
                    << " and the variable may be removed without notice."
                    << std::endl;
       }
