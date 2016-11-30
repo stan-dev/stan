@@ -233,19 +233,33 @@ namespace stan {
         } else {
             ssDouble << "double";
         }
-
-        std::stringstream ss;
-        x.type_.base_type_ == DOUBLE_T ?
-          ss << ssDouble.str() : ss << x.args_[0].expression_type();
-
+        std::stringstream ssType;
+        switch (x.type_.base_type_) {
+        case INT_T :
+          ssType << "int";
+          break;
+        case DOUBLE_T :
+          ssType << ssDouble.str();
+          break;
+        case VECTOR_T :
+          ssType << "vector_d";
+          break;
+        case ROW_VECTOR_T :
+          ssType << "row_vector_d";
+          break;
+        case MATRIX_T :
+          ssType << "matrix_d";
+          break;
+        }
+        
         o_ << "static_cast<";
-        generate_type(ss.str(),
+        generate_type(ssType.str(),
                       x.args_,
                       x.type_.num_dims_,
                       o_);
         o_ << " >(";
         o_ << "stan::math::array_builder<";
-        generate_type(ss.str(),
+        generate_type(ssType.str(),
                       x.args_,
                       x.type_.num_dims_ - 1,
                       o_);
