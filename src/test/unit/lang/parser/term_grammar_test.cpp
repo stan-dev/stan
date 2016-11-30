@@ -4,6 +4,7 @@
 TEST(langParserTermGrammar, array_expr) {
   test_parsable("validate_array_expr_good");
   test_parsable("validate_array_expr_big");
+  test_parsable("validate_array_expr_container");
   test_throws("validate_array_expr_bad1", "base type mismatch");
   test_throws("validate_array_expr_bad2", "dimension mismatch");
   test_throws("validate_array_expr_bad3", "ERROR");
