@@ -674,14 +674,14 @@ namespace stan {
     }
     boost::phoenix::function<remove_lp_var> remove_lp_var_f;
 
-    void program_error::operator()(pos_iterator_t _begin, pos_iterator_t _end,
-                                   pos_iterator_t _where, variable_map& vm,
+    void program_error::operator()(pos_iterator_t begin, pos_iterator_t end,
+                                   pos_iterator_t where, variable_map& vm,
                                    std::stringstream& error_msgs) const {
       using boost::spirit::get_line;
       using boost::format;
       using std::setw;
 
-      size_t idx_errline = get_line(_where);
+      size_t idx_errline = get_line(where);
 
       error_msgs << std::endl;
 
@@ -690,11 +690,11 @@ namespace stan {
                    << std::endl << std::endl;
 
         std::basic_stringstream<char> sprogram;
-        sprogram << boost::make_iterator_range(_begin, _end);
+        sprogram << boost::make_iterator_range(begin, end);
 
         // show error in context 2 lines before, 1 lines after
         size_t idx_errcol = 0;
-        idx_errcol = get_column(_begin, _where) - 1;
+        idx_errcol = get_column(begin, where) - 1;
 
         std::string lineno = "";
         format fmt_lineno("% 3d:    ");

@@ -55,49 +55,49 @@ TEST(OptimizationBfgs, rosenbrock_bfgs_termconds) {
   EXPECT_EQ("", out.str());
   int ret;
 
-  bfgs._conv_opts.maxIts = 1e9;
-  bfgs._conv_opts.tolAbsX = 0;
-  bfgs._conv_opts.tolAbsF = 0;
-  bfgs._conv_opts.tolRelF = 0;
-  bfgs._conv_opts.tolAbsGrad = 0;
-  bfgs._conv_opts.tolRelGrad = 0;
+  bfgs.conv_opts_.maxIts = 1e9;
+  bfgs.conv_opts_.tolAbsX = 0;
+  bfgs.conv_opts_.tolAbsF = 0;
+  bfgs.conv_opts_.tolRelF = 0;
+  bfgs.conv_opts_.tolAbsGrad = 0;
+  bfgs.conv_opts_.tolRelGrad = 0;
 
-  bfgs._conv_opts.maxIts = 5;
+  bfgs.conv_opts_.maxIts = 5;
   bfgs.initialize(cont_vector);
   while (0 == (ret = bfgs.step()));
   EXPECT_EQ(ret,stan::optimization::TERM_MAXIT);
-  EXPECT_EQ(bfgs.iter_num(),bfgs._conv_opts.maxIts);
-  bfgs._conv_opts.maxIts = 1e9;
+  EXPECT_EQ(bfgs.iter_num(),bfgs.conv_opts_.maxIts);
+  bfgs.conv_opts_.maxIts = 1e9;
 
-  bfgs._conv_opts.tolAbsX = 1e-8;
+  bfgs.conv_opts_.tolAbsX = 1e-8;
   bfgs.initialize(cont_vector);
   while (0 == (ret = bfgs.step()));
   EXPECT_EQ(ret,stan::optimization::TERM_ABSX);
-  bfgs._conv_opts.tolAbsX = 0;
+  bfgs.conv_opts_.tolAbsX = 0;
 
-  bfgs._conv_opts.tolAbsF = 1e-12;
+  bfgs.conv_opts_.tolAbsF = 1e-12;
   bfgs.initialize(cont_vector);
   while (0 == (ret = bfgs.step()));
   EXPECT_EQ(ret,stan::optimization::TERM_ABSF);
-  bfgs._conv_opts.tolAbsF = 0;
+  bfgs.conv_opts_.tolAbsF = 0;
 
-  bfgs._conv_opts.tolRelF = 1e+4;
+  bfgs.conv_opts_.tolRelF = 1e+4;
   bfgs.initialize(cont_vector);
   while (0 == (ret = bfgs.step()));
   EXPECT_EQ(ret,stan::optimization::TERM_RELF);
-  bfgs._conv_opts.tolRelF = 0;
+  bfgs.conv_opts_.tolRelF = 0;
 
-  bfgs._conv_opts.tolAbsGrad = 1e-8;
+  bfgs.conv_opts_.tolAbsGrad = 1e-8;
   bfgs.initialize(cont_vector);
   while (0 == (ret = bfgs.step()));
   EXPECT_EQ(ret,stan::optimization::TERM_ABSGRAD);
-  bfgs._conv_opts.tolAbsGrad = 0;
+  bfgs.conv_opts_.tolAbsGrad = 0;
 
-  bfgs._conv_opts.tolRelGrad = 1e+3;
+  bfgs.conv_opts_.tolRelGrad = 1e+3;
   bfgs.initialize(cont_vector);
   while (0 == (ret = bfgs.step()));
   EXPECT_EQ(ret,stan::optimization::TERM_RELGRAD);
-  bfgs._conv_opts.tolRelGrad = 0;
+  bfgs.conv_opts_.tolRelGrad = 0;
 }
 
 TEST(OptimizationBfgs, rosenbrock_lbfgs_convergence) {
@@ -149,49 +149,49 @@ TEST(OptimizationBfgs, rosenbrock_lbfgs_termconds) {
   EXPECT_EQ("", out.str());
   int ret;
 
-  bfgs._conv_opts.maxIts = 1e9;
-  bfgs._conv_opts.tolAbsX = 0;
-  bfgs._conv_opts.tolAbsF = 0;
-  bfgs._conv_opts.tolRelF = 0;
-  bfgs._conv_opts.tolAbsGrad = 0;
-  bfgs._conv_opts.tolRelGrad = 0;
+  bfgs.conv_opts_.maxIts = 1e9;
+  bfgs.conv_opts_.tolAbsX = 0;
+  bfgs.conv_opts_.tolAbsF = 0;
+  bfgs.conv_opts_.tolRelF = 0;
+  bfgs.conv_opts_.tolAbsGrad = 0;
+  bfgs.conv_opts_.tolRelGrad = 0;
 
-  bfgs._conv_opts.maxIts = 5;
+  bfgs.conv_opts_.maxIts = 5;
   bfgs.initialize(cont_vector);
   while (0 == (ret = bfgs.step()));
   EXPECT_EQ(ret,stan::optimization::TERM_MAXIT);
-  EXPECT_EQ(bfgs.iter_num(),bfgs._conv_opts.maxIts);
-  bfgs._conv_opts.maxIts = 1e9;
+  EXPECT_EQ(bfgs.iter_num(),bfgs.conv_opts_.maxIts);
+  bfgs.conv_opts_.maxIts = 1e9;
 
-  bfgs._conv_opts.tolAbsX = 1e-8;
+  bfgs.conv_opts_.tolAbsX = 1e-8;
   bfgs.initialize(cont_vector);
   while (0 == (ret = bfgs.step()));
   EXPECT_EQ(ret,stan::optimization::TERM_ABSX);
-  bfgs._conv_opts.tolAbsX = 0;
+  bfgs.conv_opts_.tolAbsX = 0;
 
-  bfgs._conv_opts.tolAbsF = 1e-12;
+  bfgs.conv_opts_.tolAbsF = 1e-12;
   bfgs.initialize(cont_vector);
   while (0 == (ret = bfgs.step()));
   EXPECT_EQ(ret,stan::optimization::TERM_ABSF);
-  bfgs._conv_opts.tolAbsF = 0;
+  bfgs.conv_opts_.tolAbsF = 0;
 
-  bfgs._conv_opts.tolRelF = 1e+4;
+  bfgs.conv_opts_.tolRelF = 1e+4;
   bfgs.initialize(cont_vector);
   while (0 == (ret = bfgs.step()));
   EXPECT_EQ(ret,stan::optimization::TERM_RELF);
-  bfgs._conv_opts.tolRelF = 0;
+  bfgs.conv_opts_.tolRelF = 0;
 
-  bfgs._conv_opts.tolAbsGrad = 1e-8;
+  bfgs.conv_opts_.tolAbsGrad = 1e-8;
   bfgs.initialize(cont_vector);
   while (0 == (ret = bfgs.step()));
   EXPECT_EQ(ret,stan::optimization::TERM_ABSGRAD);
-  bfgs._conv_opts.tolAbsGrad = 0;
+  bfgs.conv_opts_.tolAbsGrad = 0;
 
-  bfgs._conv_opts.tolRelGrad = 1e+3;
+  bfgs.conv_opts_.tolRelGrad = 1e+3;
   bfgs.initialize(cont_vector);
   while (0 == (ret = bfgs.step()));
   EXPECT_EQ(ret,stan::optimization::TERM_RELGRAD);
-  bfgs._conv_opts.tolRelGrad = 0;
+  bfgs.conv_opts_.tolRelGrad = 0;
 }
 
 TEST(OptimizationBfgs, ConvergenceOptions) {

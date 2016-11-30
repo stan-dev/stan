@@ -71,13 +71,13 @@ namespace stan {
         typedef stan::optimization::BFGSLineSearch
           <Model, stan::optimization::BFGSUpdate_HInv<> > Optimizer;
         Optimizer bfgs(model, cont_vector, disc_vector, &bfgs_ss);
-        bfgs._ls_opts.alpha0 = init_alpha;
-        bfgs._conv_opts.tolAbsF = tol_obj;
-        bfgs._conv_opts.tolRelF = tol_rel_obj;
-        bfgs._conv_opts.tolAbsGrad = tol_grad;
-        bfgs._conv_opts.tolRelGrad = tol_rel_grad;
-        bfgs._conv_opts.tolAbsX = tol_param;
-        bfgs._conv_opts.maxIts = num_iterations;
+        bfgs.ls_opts_.alpha0 = init_alpha;
+        bfgs.conv_opts_.tolAbsF = tol_obj;
+        bfgs.conv_opts_.tolRelF = tol_rel_obj;
+        bfgs.conv_opts_.tolAbsGrad = tol_grad;
+        bfgs.conv_opts_.tolRelGrad = tol_rel_grad;
+        bfgs.conv_opts_.tolAbsX = tol_param;
+        bfgs.conv_opts_.maxIts = num_iterations;
 
         double lp = bfgs.logp();
 

@@ -360,8 +360,8 @@ namespace stan {
 
     // called from: program_grammar
     struct program_error : public phoenix_functor_quinary {
-      void operator()(pos_iterator_t _begin, pos_iterator_t _end,
-                      pos_iterator_t _where, variable_map& vm,
+      void operator()(pos_iterator_t begin, pos_iterator_t end,
+                      pos_iterator_t where, variable_map& vm,
                       std::stringstream& error_msgs) const;
     };
     extern boost::phoenix::function<program_error> program_error_f;
