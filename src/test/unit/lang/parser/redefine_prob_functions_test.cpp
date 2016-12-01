@@ -35,4 +35,10 @@ TEST(langParser, lpdfReal) {
               "Parse Error.  Probability density functions require"
               " real variates (first argument). Found type = int");
 }
-
+TEST(langParser, badArgs) {
+  test_throws("prob-fun-args-no-bar",
+              "Probabilty functions with suffixes _lpdf, _lpmf,"
+                  " _lcdf, and _lccdf,",
+              "require a vertical bar (|) between the first two"
+                  " arguments.");
+}

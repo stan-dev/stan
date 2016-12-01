@@ -14,24 +14,28 @@
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::int_var_decl,
                           (stan::lang::range, range_)
                           (std::string, name_)
-                          (std::vector<stan::lang::expression>, dims_) )
+                          (std::vector<stan::lang::expression>, dims_)
+                          (stan::lang::expression, def_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::double_var_decl,
                           (stan::lang::range, range_)
                           (std::string, name_)
-                          (std::vector<stan::lang::expression>, dims_) )
+                          (std::vector<stan::lang::expression>, dims_)
+                          (stan::lang::expression, def_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::vector_var_decl,
                           (stan::lang::range, range_)
                           (stan::lang::expression, M_)
                           (std::string, name_)
-                          (std::vector<stan::lang::expression>, dims_) )
+                          (std::vector<stan::lang::expression>, dims_)
+                          (stan::lang::expression, def_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::row_vector_var_decl,
                           (stan::lang::range, range_)
                           (stan::lang::expression, N_)
                           (std::string, name_)
-                          (std::vector<stan::lang::expression>, dims_) )
+                          (std::vector<stan::lang::expression>, dims_)
+                          (stan::lang::expression, def_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::matrix_var_decl,
                           (stan::lang::range, range_)
@@ -115,7 +119,7 @@ namespace stan {
       // _r2 var_origin
       var_decl_r.name("variable declaration");
       var_decl_r
-        %= (int_decl_r(_r2)
+        = (int_decl_r(_r2)
             [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
                        boost::phoenix::ref(error_msgs))]
             | double_decl_r(_r2)
@@ -157,8 +161,9 @@ namespace stan {
             )
         > eps
           [validate_decl_constraints_f(_r1, _a, _val, _pass,
-                                       boost::phoenix::ref(error_msgs_))]
-
+                                       boost::phoenix::ref(error_msgs_)),
+           validate_definition_f(_r2, _val, _pass,
+                                 boost::phoenix::ref(error_msgs_))]
         > lit(';');
 
       int_decl_r.name("integer declaration");
@@ -167,7 +172,9 @@ namespace stan {
             >> no_skip[!char_("a-zA-Z0-9_")])
         > -range_brackets_int_r(_r1)
         > identifier_r
-        > opt_dims_r(_r1);
+        > opt_dims_r(_r1)
+        > opt_def_r(_r1);
+
 
       double_decl_r.name("real declaration");
       double_decl_r
@@ -175,31 +182,28 @@ namespace stan {
             >> no_skip[!char_("a-zA-Z0-9_")])
         > -range_brackets_double_r(_r1)
         > identifier_r
-        > opt_dims_r(_r1);
+        > opt_dims_r(_r1)
+        > opt_def_r(_r1);
 
       vector_decl_r.name("vector declaration");
       vector_decl_r
         %= (lit("vector")
             >> no_skip[!char_("a-zA-Z0-9_")])
         > -range_brackets_double_r(_r1)
-        > lit('[')
-        > expression_g(_r1)
-        [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
-        > lit(']')
+        > dim1_r(_r1)
         > identifier_r
-        > opt_dims_r(_r1);
+        > opt_dims_r(_r1)
+        > opt_def_r(_r1);
 
       row_vector_decl_r.name("row vector declaration");
       row_vector_decl_r
         %= (lit("row_vector")
             >> no_skip[!char_("a-zA-Z0-9_")])
         > -range_brackets_double_r(_r1)
-        > lit('[')
-        > expression_g(_r1)
-        [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
-        > lit(']')
+        > dim1_r(_r1)
         > identifier_r
-        > opt_dims_r(_r1);
+        > opt_dims_r(_r1)
+        > opt_def_r(_r1);
 
       matrix_decl_r.name("matrix declaration");
       matrix_decl_r
@@ -207,23 +211,17 @@ namespace stan {
             >> no_skip[!char_("a-zA-Z0-9_")])
         > -range_brackets_double_r(_r1)
         > lit('[')
-        > expression_g(_r1)
-          [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
-        > lit(',')
-        > expression_g(_r1)
-          [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
+        > int_data_expr_r(_r1) > lit(',') > int_data_expr_r(_r1)
         > lit(']')
         > identifier_r
-        > opt_dims_r(_r1);
+        > opt_dims_r(_r1)
+        > opt_def_r(_r1);
 
       unit_vector_decl_r.name("unit_vector declaration");
       unit_vector_decl_r
         %= (lit("unit_vector")
             >> no_skip[!char_("a-zA-Z0-9_")])
-        > lit('[')
-        > expression_g(_r1)
-          [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
-        > lit(']')
+        > dim1_r(_r1)
         > identifier_r
         > opt_dims_r(_r1);
 
@@ -231,10 +229,7 @@ namespace stan {
       simplex_decl_r
         %= (lit("simplex")
             >> no_skip[!char_("a-zA-Z0-9_")])
-        > lit('[')
-        > expression_g(_r1)
-          [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
-        > lit(']')
+        > dim1_r(_r1)
         > identifier_r
         > opt_dims_r(_r1);
 
@@ -242,10 +237,7 @@ namespace stan {
       ordered_decl_r
         %= (lit("ordered")
             >> no_skip[!char_("a-zA-Z0-9_")])
-        > lit('[')
-        > expression_g(_r1)
-          [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
-        > lit(']')
+        > dim1_r(_r1)
         > identifier_r
         > opt_dims_r(_r1);
 
@@ -253,10 +245,7 @@ namespace stan {
       positive_ordered_decl_r
         %= (lit("positive_ordered")
             >> no_skip[!char_("a-zA-Z0-9_")])
-        > lit('[')
-        > expression_g(_r1)
-          [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
-        > lit(']')
+        > dim1_r(_r1)
         > identifier_r
         > opt_dims_r(_r1);
 
@@ -266,12 +255,8 @@ namespace stan {
         %= (lit("cholesky_factor_cov")
             >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('[')
-        > expression_g(_r1)
-          [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
-        > -(lit(',')
-            > expression_g(_r1)
-            [validate_int_expr_f(_1, _pass,
-                                   boost::phoenix::ref(error_msgs_))])
+        > int_data_expr_r(_r1)
+        > -(lit(',') > int_data_expr_r(_r1))
         > lit(']')
         > identifier_r
         > opt_dims_r(_r1)
@@ -283,10 +268,7 @@ namespace stan {
       cholesky_corr_decl_r
         %= (lit("cholesky_factor_corr")
             >> no_skip[!char_("a-zA-Z0-9_")])
-        > lit('[')
-        > expression_g(_r1)
-          [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
-        > lit(']')
+        > dim1_r(_r1)
         > identifier_r
         > opt_dims_r(_r1);
 
@@ -294,10 +276,7 @@ namespace stan {
       cov_matrix_decl_r
         %= (lit("cov_matrix")
             >> no_skip[!char_("a-zA-Z0-9_")])
-        > lit('[')
-        > expression_g(_r1)
-          [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
-        > lit(']')
+        > dim1_r(_r1)
         > identifier_r
         > opt_dims_r(_r1);
 
@@ -305,26 +284,31 @@ namespace stan {
       corr_matrix_decl_r
         %= (lit("corr_matrix")
             >> no_skip[!char_("a-zA-Z0-9_")])
-        > lit('[')
-        > expression_g(_r1)
-          [validate_int_expr_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
-        > lit(']')
+        > dim1_r(_r1)
         > identifier_r
         > opt_dims_r(_r1);
 
-      opt_dims_r.name("array dimensions (optional)");
-      opt_dims_r
-        %=  - dims_r(_r1);
-
-      dims_r.name("array dimensions");
-      dims_r
-        %= lit('[')
-        > (expression_g(_r1)
+      int_data_expr_r.name("integer data expression");
+      int_data_expr_r
+        %= expression_g(_r1)
            [validate_int_data_expr_f(_1, _r1, _pass,
                                      boost::phoenix::ref(var_map_),
-                                     boost::phoenix::ref(error_msgs_))]
-           % ',')
-        > lit(']');
+                                     boost::phoenix::ref(error_msgs_))];
+
+      dim1_r.name("size declaration: integer (data-only) in square brackets");
+      dim1_r %= lit('[') > int_data_expr_r(_r1) > lit(']');
+
+      dims_r.name("array dimensions");
+      dims_r %= lit('[') > (int_data_expr_r(_r1) % ',') > lit(']');
+
+      opt_dims_r.name("array dimensions (optional)");
+      opt_dims_r %=  -dims_r(_r1);
+
+      opt_def_r.name("variable definition (optional)");
+      opt_def_r %= -def_r(_r1);
+
+      def_r.name("variable definition");
+      def_r %= lit('=') > expression_g(_r1);
 
       range_brackets_int_r.name("integer range expression pair, brackets");
       range_brackets_int_r

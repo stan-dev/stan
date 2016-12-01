@@ -1,10 +1,93 @@
 STAN C++ RELEASE NOTES
 ======================================================================
 
-Note: these are the release nots for the stan-dev/stan repository.
+Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v2.13.0 (25 November 2016)
+======================================================================
+
+New Team Members
+--------------------------------------------------
+* Thel Seraphim (Columbia University) -- Stan and Math libraries
+* Vincent Picaud (CEA, France) -- MathematicaStan
+
+Bug Fixes
+--------------------------------------------------
+* generated code for lower truncation fixed for discrete variables (#2054)
+* typo in error messages for RNGs only allowed in transformed data
+  block (#2124)
+* variables ending in _lpdf are now allowed (#2123)
+* cov_exp_quad() not compiling in C++ (#2113)
+* conditional operator in functions not compiling in C++ (#2101)
+* off-by-one error in error message for integrate_ode_bdf() fixed (#2073)
+
+New User-Facing Features
+--------------------------------------------------
+* vectorization of unary functions (#2119, #2037)
+* bernoulli_logit_rng() added to language (#2084)
+* Jacobian warning now suggests `target +=` (#2066)
+* matrix_exp() function now available (#2043)
+* compound declaration / definition statements (#1951)
+
+New Internal Features
+--------------------------------------------------
+* user-defined functions can be declared and not defined (#2068)
+
+Documentation
+--------------------------------------------------
+* manaul reorganization (#1599)
+* line too long (#2121)
+* added integer % operator documentation (#2065)
+* lots more (#2051)
+
+
+v2.12.0 (6 September 2016)
+======================================================================
+
+New Team Members
+--------------------------------------------------
+* Charles Margossian (Metrum Research Group, LLC) -- diff eq models
+
+Known, outstanding bugs
+--------------------------------------------------
+* Normalization for lower truncated discrete distributions is off
+  by one (#2054)
+
+Bug Fixes
+--------------------------------------------------
+* updated the math library to deal with g++6 errors
+  (math#348, math#345, math#327)
+* fixed issue with 1:0 indexing in array slicing producing
+  huge size (#1960)
+* allow variables to be named the same as unary functions
+  (#1459)
+* distributions without cumulative distribution functions are now
+  prevented from being used in truncation (#2052)
+* allow user-defined lpdf functions to be used in `target += `
+  expressions (#1944)
+* fixed duplicate function warning message (#1946)
+* fixed ternary operator generating C++ code that doesn't compile
+  (#2044)
+
+
+New User-Facing Features
+--------------------------------------------------
+* added mdivide_left_spd() and mdivide_right_spd() to the language
+  (#2016)
+* added cov_exp_quad() to the language (#1957)
+* added break and continue statements to the language (#1756)
+* added append_row() and append_col() to the language (#1347)
+* updated error message for missing `|` when using probability functions
+  (#2003)
+* updated parser/warning errors for new syntax (#1940)
+
+New Internal Features
+--------------------------------------------------
+* updated Travis CI config (#2033)
+* fixed segfault in lang test with g++-5.4 (#2030)
+* `make clean-all` cleans CVODES binaries (#2012)
 
 v2.11.0 (27 July 2016)
 ======================================================================

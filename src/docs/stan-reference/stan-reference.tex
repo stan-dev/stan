@@ -1,3 +1,6 @@
+% for printing two-up in traditional style with all
+% chapters, part markers, etc. opening on right, use:
+%\documentclass[10pt,twoside,openright]{book}
 \documentclass[10pt,openany]{book}
 \usepackage{stan-manuals}
 
@@ -5,11 +8,10 @@
 
 \pagestyle{plain}
 
-\newcommand{\stanversion}{2.11.0}
+\newcommand{\stanversion}{2.13.0}
 
 \frontmatter
 \include{title}
-%\include{abstract}
 \tableofcontents
 \include{preface}
 \include{acknowledgements}
@@ -19,15 +21,14 @@
 \mainmatter
 \setcounter{page}{\thesavepage}
 \include{introduction}
-% \include{commands}
-\include{programming}
 \include{language}
+\include{examples}
+\include{programming}
+\include{inference}
+\include{algorithms}
 \include{functions}
 \include{distributions}
-\include{advanced}
-\include{algorithms}
 \include{process}
-\include{contributed}
 
 \appendix
 \include{appendices}

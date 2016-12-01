@@ -56,14 +56,15 @@ namespace stan {
     }
 
     /**
-     * Return size of specified min-max index.
+     * Return size of specified min - max index.  If the maximum value
+     * index is less than the minimun index, the size will be zero.
      *
      * @param[in] idx Input index (from 1).
      * @param[in] size Size of container (ignored).
      * @return Size of result.
      */
     inline int rvalue_index_size(const index_min_max& idx, int size) {
-      return idx.max_ - idx.min_ + 1;
+      return (idx.max_ < idx.min_) ? 0 : (idx.max_ - idx.min_ + 1);
     }
 
   }

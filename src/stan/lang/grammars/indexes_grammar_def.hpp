@@ -46,8 +46,11 @@ namespace stan {
       indexes_r.name("indexes (zero or more)");
       indexes_r
         %=  lit("[")
-        > (index_r(_r1) % ',')
-        > lit("]");
+        >> (index_r(_r1) % ',')
+        > close_indexes_r;
+
+      close_indexes_r.name("one or more container indexes followed by ']'");
+      close_indexes_r %= lit(']');
 
       index_r.name("index expression, one of: "
                    " int, int[], int:, :int, int:int, :)");
@@ -102,7 +105,7 @@ namespace stan {
 
       int_expression_r.name("integer expression");
       int_expression_r
-        %= expression_g(_r1)[validate_int_expression_f(_1, _pass)];
+        %= expression_g(_r1)[validate_int_expr_silent_f(_1, _pass)];
     }
 
   }

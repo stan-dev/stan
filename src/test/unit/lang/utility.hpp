@@ -12,6 +12,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include <stan/lang/ast.hpp>
+#include <stan/lang/compiler.hpp>
 #include <stan/lang/parser.hpp>
 #include <stan/lang/generator.hpp>
 #include <stan/lang/grammars/program_grammar.hpp>
@@ -46,14 +47,16 @@ std::string file_name_to_model_name(const std::string& name) {
  *
  * @param file_name  Filepath of model file
  * @param msgs Expected error message (default: none)
+ * @param allow_undefined Boolean to permit undefined functions (default: false)
  */
 bool is_parsable(const std::string& file_name,
-                 std::ostream* msgs = 0) {
+                 std::ostream* msgs = 0,
+                 bool allow_undefined = false) {
   stan::lang::program prog;
   std::ifstream fs(file_name.c_str());
   std::string model_name = file_name_to_model_name(file_name);
   bool parsable
-    = stan::lang::parse(msgs, fs, model_name, prog);
+    = stan::lang::parse(msgs, fs, model_name, prog, allow_undefined);
   return parsable;
 }
 
@@ -72,7 +75,7 @@ bool is_parsable_folder(const std::string& model_name,
   path += "/";
   path += model_name;
   path += ".stan";
-  return is_parsable(path,msgs);
+  return is_parsable(path, msgs, false);
 }
 
 /** test that model with specified name in folder "good"
@@ -86,8 +89,6 @@ void test_parsable(const std::string& model_name) {
     EXPECT_TRUE(is_parsable_folder(model_name, "good"));
   }
 }
-
-
 
 /** test that model with specified name in folder "bad" throws
  * an exception containing the second arg as a substring
@@ -177,6 +178,46 @@ void expect_matches(int n,
                     const std::string& target) {
   std::string model_cpp = model_to_cpp(stan_code);
   EXPECT_EQ(n, count_matches(target,model_cpp));
+}
+
+std::string get_file_name(const std::string& folder,
+                          const std::string& model_name) {
+  std::string path("src/test/test-models/");
+  path += folder;
+  path += "/";
+  path += model_name;
+  path += ".stan";
+  return path;
+}
+
+void expect_match(const std::string& model_name,
+                  const std::string& target,
+                  bool allow_undefined = false) {
+  std::stringstream msgs;
+  std::string file_name = get_file_name("good", model_name);
+  std::ifstream file_stream(file_name.c_str());
+  std::stringstream cpp_out_stream;
+  stan::lang::compile(&msgs, file_stream, cpp_out_stream,
+                      model_name, allow_undefined);
+  std::string cpp_out = cpp_out_stream.str();
+  file_stream.close();
+  EXPECT_TRUE(count_matches(target, cpp_out) > 0);
+}
+
+/**
+ * Thest that model of specified name in test/test-models/good
+ * has exactly the specified number of matches 
+ *
+ * @param[in] model_name Name of model file.
+ * @param[in] warning_msg Message to count.
+ * @param[in] n Expected number of message occurrences.
+ */
+void test_num_warnings(const std::string& model_name, 
+                       const std::string& warning_msg,
+                       int n) {
+  std::stringstream msgs;
+  EXPECT_TRUE(is_parsable_folder(model_name, "good", &msgs));
+  EXPECT_EQ(n, count_matches(warning_msg, msgs.str()));
 }
 
 #endif

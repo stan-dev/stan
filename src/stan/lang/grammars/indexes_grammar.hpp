@@ -41,6 +41,11 @@ namespace stan {
                               whitespace_grammar<Iterator> >
       index_r;
 
+      boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::unused_type,
+                              whitespace_grammar<Iterator> >
+      close_indexes_r;
+
 
       boost::spirit::qi::rule<Iterator,
                               uni_idx(var_origin),

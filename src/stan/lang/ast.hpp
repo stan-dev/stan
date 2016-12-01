@@ -90,6 +90,9 @@ namespace stan {
     const int void_function_argument_origin_rng = 12;
 
     bool is_data_origin(const var_origin& vo);
+
+    bool is_fun_origin(const var_origin& vo);
+
     void print_var_origin(std::ostream& o, const var_origin& vo);
 
 
@@ -184,6 +187,7 @@ namespace stan {
                const expr_type& arg_type7);
       void add_nullary(const::std::string& name);
       void add_unary(const::std::string& name);
+      void add_unary_vectorized(const::std::string& name);
       void add_binary(const::std::string& name);
       void add_ternary(const::std::string& name);
       void add_quaternary(const::std::string& name);
@@ -201,6 +205,7 @@ namespace stan {
       bool has_user_defined_key(const std::string& name) const;
       std::set<std::string> key_set() const;
       bool has_key(const std::string& key) const;
+      bool discrete_first_arg(const std::string& name) const;
 
     private:
       function_signatures();
@@ -448,12 +453,12 @@ namespace stan {
       expression true_val_;
       expression false_val_;
       expr_type type_;
-      var_origin origin_;
+      bool has_var_;
+      var_origin var_origin_;
       conditional_op();
       conditional_op(const expression& cond,
                      const expression& true_val,
                      const expression& false_val);
-      bool is_data() const;
     };
 
     struct binary_op {
@@ -560,16 +565,20 @@ namespace stan {
       void infer_type();
     };
 
-
     struct base_var_decl {
       std::string name_;
       std::vector<expression> dims_;
       base_expr_type base_type_;
+      expression def_;
       base_var_decl();
       base_var_decl(const base_expr_type& base_type);  // NOLINT
       base_var_decl(const std::string& name,
                     const std::vector<expression>& dims,
                     const base_expr_type& base_type);
+      base_var_decl(const std::string& name,
+                    const std::vector<expression>& dims,
+                    const base_expr_type& base_type,
+                    const expression& def);
     };
 
     struct variable_map {
@@ -593,7 +602,8 @@ namespace stan {
       int_var_decl();
       int_var_decl(range const& range,
                    std::string const& name,
-                   std::vector<expression> const& dims);
+                   std::vector<expression> const& dims,
+                   expression const& def);
     };
 
 
@@ -602,7 +612,8 @@ namespace stan {
       double_var_decl();
       double_var_decl(range const& range,
                       std::string const& name,
-                      std::vector<expression> const& dims);
+                      std::vector<expression> const& dims,
+                      expression const& def);
     };
 
     struct unit_vector_var_decl : public base_var_decl {
@@ -644,7 +655,8 @@ namespace stan {
       vector_var_decl(range const& range,
                       expression const& M,
                       std::string const& name,
-                      std::vector<expression> const& dims);
+                      std::vector<expression> const& dims,
+                      expression const& def);
     };
 
     struct row_vector_var_decl : public base_var_decl {
@@ -654,7 +666,8 @@ namespace stan {
       row_vector_var_decl(range const& range,
                           expression const& N,
                           std::string const& name,
-                          std::vector<expression> const& dims);
+                          std::vector<expression> const& dims,
+                          expression const& def);
     };
 
     struct matrix_var_decl : public base_var_decl {
@@ -666,7 +679,8 @@ namespace stan {
                       expression const& M,
                       expression const& N,
                       std::string const& name,
-                      std::vector<expression> const& dims);
+                      std::vector<expression> const& dims,
+                      expression const& def);
     };
 
     struct cholesky_factor_var_decl : public base_var_decl {
@@ -741,6 +755,65 @@ namespace stan {
       base_var_decl operator()(const corr_matrix_var_decl& x) const;
     };
 
+    struct var_decl_dims_vis
+      : public boost::static_visitor<std::vector<expression> > {
+      var_decl_dims_vis();
+      std::vector<expression> operator()(const nil& x) const;
+      std::vector<expression> operator()(const int_var_decl& x) const;
+      std::vector<expression> operator()(const double_var_decl& x) const;
+      std::vector<expression> operator()(const vector_var_decl& x) const;
+      std::vector<expression> operator()(const row_vector_var_decl& x) const;
+      std::vector<expression> operator()(const matrix_var_decl& x) const;
+      std::vector<expression> operator()(const simplex_var_decl& x) const;
+      std::vector<expression> operator()(const unit_vector_var_decl& x) const;
+      std::vector<expression> operator()(const ordered_var_decl& x) const;
+      std::vector<expression> operator()(
+                                  const positive_ordered_var_decl& x) const;
+      std::vector<expression> operator()(
+                                  const cholesky_factor_var_decl& x) const;
+      std::vector<expression> operator()(const cholesky_corr_var_decl& x) const;
+      std::vector<expression> operator()(const cov_matrix_var_decl& x) const;
+      std::vector<expression> operator()(const corr_matrix_var_decl& x) const;
+    };
+
+    struct var_decl_has_def_vis
+      : public boost::static_visitor<bool> {
+      var_decl_has_def_vis();
+      bool operator()(const nil& x) const;
+      bool operator()(const int_var_decl& x) const;
+      bool operator()(const double_var_decl& x) const;
+      bool operator()(const vector_var_decl& x) const;
+      bool operator()(const row_vector_var_decl& x) const;
+      bool operator()(const matrix_var_decl& x) const;
+      bool operator()(const simplex_var_decl& x) const;
+      bool operator()(const unit_vector_var_decl& x) const;
+      bool operator()(const ordered_var_decl& x) const;
+      bool operator()(const positive_ordered_var_decl& x) const;
+      bool operator()(const cholesky_factor_var_decl& x) const;
+      bool operator()(const cholesky_corr_var_decl& x) const;
+      bool operator()(const cov_matrix_var_decl& x) const;
+      bool operator()(const corr_matrix_var_decl& x) const;
+    };
+
+    struct var_decl_def_vis
+      : public boost::static_visitor<expression> {
+      var_decl_def_vis();
+      expression operator()(const nil& x) const;
+      expression operator()(const int_var_decl& x) const;
+      expression operator()(const double_var_decl& x) const;
+      expression operator()(const vector_var_decl& x) const;
+      expression operator()(const row_vector_var_decl& x) const;
+      expression operator()(const matrix_var_decl& x) const;
+      expression operator()(const simplex_var_decl& x) const;
+      expression operator()(const unit_vector_var_decl& x) const;
+      expression operator()(const ordered_var_decl& x) const;
+      expression operator()(const positive_ordered_var_decl& x) const;
+      expression operator()(const cholesky_factor_var_decl& x) const;
+      expression operator()(const cholesky_corr_var_decl& x) const;
+      expression operator()(const cov_matrix_var_decl& x) const;
+      expression operator()(const corr_matrix_var_decl& x) const;
+    };
+
     struct var_decl {
       typedef boost::variant<boost::recursive_wrapper<nil>,
                          boost::recursive_wrapper<int_var_decl>,
@@ -757,9 +830,7 @@ namespace stan {
                          boost::recursive_wrapper<cov_matrix_var_decl>,
                          boost::recursive_wrapper<corr_matrix_var_decl> >
       var_decl_t;
-
       var_decl_t decl_;
-
       var_decl();
 
       // template <typename Decl>
@@ -782,6 +853,9 @@ namespace stan {
 
       std::string name() const;
       base_var_decl base_decl() const;
+      std::vector<expression> dims() const;
+      bool has_def() const;
+      expression def() const;
     };
 
     struct statement {
@@ -992,10 +1066,12 @@ namespace stan {
       expression expr_;
       distribution dist_;
       range truncation_;
+      bool is_discrete_;
       sample();
       sample(expression& e,
              distribution& dist);
       bool is_ill_formed() const;
+      bool is_discrete() const;
     };
 
     struct assignment {
@@ -1081,6 +1157,21 @@ namespace stan {
       bool operator()(const unary_op& e) const;
     };
 
+    /**
+     * Returns true if the specified expression contains a variable
+     * that is defined as a parameter, defined as a transformed
+     * parameter, or is a local variable that is not an integer.
+     *
+     * <p>Compare to <code>has_nonparam_var</code>, which is similar,
+     * but excludes variables declared as parameters.
+     *
+     * @param e Expression to test.
+     * @param var_map Variable mapping for origin and types of
+     * variables.
+     * @return true if expression contains a variable defined as as a
+     * parameter, defined as a transformedparameter, or is a local
+     * variable that is not an integer.
+     */
     bool has_var(const expression& e,
                  const variable_map& var_map);
 
@@ -1103,6 +1194,21 @@ namespace stan {
       bool operator()(const unary_op& e) const;
     };
 
+    /**
+     * Returns true if the specified expression contains a variable
+     * that is defined as a transformed parameter, or is a local
+     * variable that is not an integer.
+     *
+     * <p>Compare to <code>has_var</code>, which is similar, but
+     * includes variables declared as parameters.
+     *
+     * @param e Expression to test.
+     * @param var_map Variable mapping for origin and types of
+     * variables.
+     * @return true if expression contains a variable defined as a
+     * transformed parameter, or is a local variable that is not
+     * an integer.
+     */
     bool has_non_param_var(const expression& e,
                            const variable_map& var_map);
 
@@ -1132,6 +1238,7 @@ namespace stan {
     std::string strip_ccdf_suffix(const std::string& dist_fun);
 
     bool fun_name_exists(const std::string& name);
+
 
   }
 }

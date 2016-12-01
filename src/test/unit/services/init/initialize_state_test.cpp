@@ -5,7 +5,7 @@
 #include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <stan/services/init/initialize_state.hpp>
 #include <stan/model/prob_grad.hpp>
-#include <stan/math/prim/mat/fun/stan_print.hpp>
+#include <stan/math/prim/mat.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
