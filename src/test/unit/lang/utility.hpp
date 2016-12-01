@@ -1,5 +1,5 @@
-#ifndef TEST__UNIT__LANG__PARSER__UTILITY_HPP
-#define TEST__UNIT__LANG__PARSER__UTILITY_HPP
+#ifndef TEST_UNIT_LANG_PARSER_UTILITY_HPP
+#define TEST_UNIT_LANG_PARSER_UTILITY_HPP
 
 #include <gtest/gtest.h>
 #include <iostream>
@@ -177,7 +177,8 @@ void expect_matches(int n,
                     const std::string& stan_code,
                     const std::string& target) {
   std::string model_cpp = model_to_cpp(stan_code);
-  EXPECT_EQ(n, count_matches(target,model_cpp));
+  EXPECT_EQ(n, count_matches(target, model_cpp))
+    << "looking for: " << target;
 }
 
 std::string get_file_name(const std::string& folder,
@@ -201,7 +202,8 @@ void expect_match(const std::string& model_name,
                       model_name, allow_undefined);
   std::string cpp_out = cpp_out_stream.str();
   file_stream.close();
-  EXPECT_TRUE(count_matches(target, cpp_out) > 0);
+  EXPECT_TRUE(count_matches(target, cpp_out) > 0)
+    << "looking for: " << target;
 }
 
 /**
@@ -217,7 +219,8 @@ void test_num_warnings(const std::string& model_name,
                        int n) {
   std::stringstream msgs;
   EXPECT_TRUE(is_parsable_folder(model_name, "good", &msgs));
-  EXPECT_EQ(n, count_matches(warning_msg, msgs.str()));
+  EXPECT_EQ(n, count_matches(warning_msg, msgs.str()))
+    << "looking for: " << warning_msg;
 }
-
 #endif
+
