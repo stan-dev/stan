@@ -28,7 +28,9 @@ TEST(commandStancHelper, printStancHelp) {
 
 bool create_test_file(const std::string& path, const std::string& program) {
   std::string cmd = "echo ";
+  cmd += "\"";
   cmd += program;
+  cmd += "\"";
   cmd += " > ";
   cmd += path;
   int return_code = system(cmd.c_str());
