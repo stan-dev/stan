@@ -1646,8 +1646,6 @@ namespace stan {
       local_var_decl_visgen vis_decl(indent, is_var_context, is_fun_return, o);
       generate_local_var_init_nan_visgen vis_init(is_var_context, indent, o);
       generate_init_vars_visgen vis_filler(indent, o);
-      generate_indent(indent, o);
-      o << "// generate local var decls" << EOL;
       for (size_t i = 0; i < vs.size(); ++i) {
         boost::apply_visitor(vis_decl, vs[i].decl_);
         boost::apply_visitor(vis_init, vs[i].decl_);
@@ -1657,12 +1655,11 @@ namespace stan {
           o << "stan::math::assign("
             << vs[i].name()
             << ",";
-          generate_expression(vs[i].def(), o);
+          generate_expression(vs[i].def(), false, is_var_context, o);
           o << ");" << EOL;
         }
-        generate_indent(indent, o);
       }
-      o << "// done generate local var decls" << EOL;
+      o << EOL;
     }
 
 
@@ -2369,8 +2366,8 @@ namespace stan {
       generate_comment("transformed parameters", 2, o);
       generate_local_var_decls(p.derived_decl_.first, 2, o, is_var_context,
                                is_fun_return);
-      generate_init_vars(p.derived_decl_.first, 2, o);
-      generate_define_vars(p.derived_decl_.first, 2, is_var_context, o);
+      //      generate_local_var_inits(p.derived_decl_.first, is_var_context, true, o);
+      //      generate_init_vars(p.derived_decl_.first, 2, o);
       o << EOL;
 
       bool include_sampling = true;
@@ -3199,10 +3196,9 @@ namespace stan {
       generate_member_var_inits(prog.data_decl_, o);
 
       o << EOL;
-      generate_comment("validate data variables, initialize if not defined",
-                       2, o);
+      generate_comment("validate, data variables", 2, o);
       generate_validate_var_decls(prog.data_decl_, 2, o);
-
+      generate_comment("initialize data variables", 2, o);
       generate_var_resizing(prog.derived_data_decl_.first, o);
       o << EOL;
 
@@ -4881,15 +4877,11 @@ namespace stan {
       generate_private_decl(out);
       generate_member_var_decls_all(prog, out);
       generate_public_decl(out);
-      out << " // before generate_constructor method " << std::endl;
       generate_constructor(prog, model_name, out);
-      out << " // before generate_destructor method " << std::endl;
       generate_destructor(model_name, out);
       // put back if ever need integer params
       // generate_set_param_ranges(prog.parameter_decl_, out);
-      out << " // before generate init_method " << std::endl;
       generate_init_method(prog.parameter_decl_, out);
-      out << " // before generate log_prob " << std::endl;
       generate_log_prob(prog, out);
       generate_param_names_method(prog, out);
       generate_dims_method(prog, out);
