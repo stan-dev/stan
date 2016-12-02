@@ -1665,7 +1665,7 @@ model {
   to_vector(z) ~ normal(0, 1); 
   L_Omega ~ lkj_corr_cholesky(2);
   to_vector(gamma) ~ normal(0, 5);
-  y ~ normal(beta[jj] .* x, sigma);
+  y ~ normal(rows_dot_product(beta[jj] , x), sigma);
 }
 \end{stancode}
 
