@@ -873,7 +873,6 @@ namespace stan {
       }
       void operator()(simplex_var_decl const& x) const {
         generate_initialization(o_, x.name_, "vector_d", x.dims_, x.K_, nil());
-
       }
       void operator()(ordered_var_decl const& x) const {
         generate_initialization(o_, x.name_, "vector_d", x.dims_, x.K_, nil());
@@ -2112,7 +2111,7 @@ namespace stan {
         generate_expression(x.log_prob_, o_);
         o_ << ");" << EOL;
       }
-      // generate_local_var_decl - change to accomodate definitions
+
       void operator()(const statements& x) const {
         bool has_local_vars = x.local_decl_.size() > 0;
         size_t indent = has_local_vars ? (indent_ + 1) : indent_;
@@ -2121,12 +2120,8 @@ namespace stan {
           o_ << "{" << EOL;
           generate_local_var_decls(x.local_decl_, indent, o_,
                                    is_var_context_, is_fun_return_);
-          //    generate_local_var_init_nan(x.local_decl_, indent, o_,
-          //                                      is_var_context_, is_fun_return_);
-          //          generate_define_vars(x.local_decl_, indent, is_var_context_, o_);
         }
         o_ << EOL;
-
         for (size_t i = 0; i < x.statements_.size(); ++i)
           generate_statement(x.statements_[i], indent, o_, include_sampling_,
                              is_var_context_, is_fun_return_);
@@ -2135,6 +2130,7 @@ namespace stan {
           o_ << "}" << EOL;
         }
       }
+
       void operator()(const print_statement& ps) const {
         generate_indent(indent_, o_);
         o_ << "if (pstream__) {" << EOL;
@@ -2366,8 +2362,6 @@ namespace stan {
       generate_comment("transformed parameters", 2, o);
       generate_local_var_decls(p.derived_decl_.first, 2, o, is_var_context,
                                is_fun_return);
-      //      generate_local_var_inits(p.derived_decl_.first, is_var_context, true, o);
-      //      generate_init_vars(p.derived_decl_.first, 2, o);
       o << EOL;
 
       bool include_sampling = true;
@@ -3283,7 +3277,8 @@ namespace stan {
       void operator()(row_vector_var_decl const& x) const {
         generate_check_double(x.name_, x.dims_.size() + 1);
         var_size_validator_(x);
-        generate_declaration(x.name_, "row_vector_d", x.dims_, x.N_, nil(), x.def_);
+        generate_declaration(x.name_, "row_vector_d", x.dims_, x.N_, nil(),
+                             x.def_);
         generate_buffer_loop("r", x.name_, x.dims_, x.N_);
         generate_write_loop(function_args("row_vector", x),
                             x.name_, x.dims_);
@@ -4731,7 +4726,8 @@ namespace stan {
           << EOL;
       // use this dummy for inits
       out << INDENT2
-        << "fun_scalar_t__ DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());"
+          << "fun_scalar_t__ "
+          << "DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());"
         << EOL;
       out << INDENT2 << "(void) DUMMY_VAR__;  // suppress unused var warning"
         << EOL2;
