@@ -224,20 +224,55 @@ namespace stan {
         if (num_str.find_first_of("eE.") == std::string::npos)
           o_ << ".0";  // trailing 0 to ensure C++ makes it a double
       }
-      void operator()(const array_literal& x) const {
-        o_ << "stan::math::new_array<";
-        generate_type("foobar",
+      void operator()(const array_expr& x) const {
+        std::stringstream ssDouble;
+        if (is_fun_origin(x.var_origin_)) {
+          ssDouble << "fun_scalar_t__";
+        } else if (is_var_context_ && x.has_var_) {
+          ssDouble << "T__";
+        } else {
+            ssDouble << "double";
+        }
+        std::stringstream ssType;
+        switch (x.type_.base_type_) {
+        case INT_T :
+          ssType << "int";
+          break;
+        case DOUBLE_T :
+          ssType << ssDouble.str();
+          break;
+        case VECTOR_T :
+          ssType << "vector_d";
+          break;
+        case ROW_VECTOR_T :
+          ssType << "row_vector_d";
+          break;
+        case MATRIX_T :
+          ssType << "matrix_d";
+          break;
+        }
+        
+        o_ << "static_cast<";
+        generate_type(ssType.str(),
                       x.args_,
-                      x.args_.size(),
+                      x.type_.num_dims_,
                       o_);
-        o_ << ">()";
+        o_ << " >(";
+        o_ << "stan::math::array_builder<";
+        generate_type(ssType.str(),
+                      x.args_,
+                      x.type_.num_dims_ - 1,
+                      o_);
+        o_ << " >()";
         for (size_t i = 0; i < x.args_.size(); ++i) {
           o_ << ".add(";
           generate_expression(x.args_[i], o_);
           o_ << ")";
         }
         o_ << ".array()";
+        o_ << ")";
       }
+
       void operator()(const variable& v) const { o_ << v.name_; }
       void operator()(int n) const {   // NOLINT
         o_ << static_cast<long>(n);    // NOLINT
