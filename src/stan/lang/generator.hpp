@@ -266,7 +266,7 @@ namespace stan {
         o_ << " >()";
         for (size_t i = 0; i < x.args_.size(); ++i) {
           o_ << ".add(";
-          generate_expression(x.args_[i], o_);
+          generate_expression(x.args_[i], user_facing_, is_var_context_, o_);
           o_ << ")";
         }
         o_ << ".array()";
