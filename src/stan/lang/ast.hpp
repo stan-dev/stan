@@ -1,8 +1,44 @@
 #ifndef STAN_LANG_AST_HPP
 #define STAN_LANG_AST_HPP
 
-#include <boost/variant/recursive_variant.hpp>
+#include <stan/lang/ast/base_expr_type.hpp>
+#include <stan/lang/ast/expr_type.hpp>
+#include <stan/lang/ast/nil.hpp>
+#include <stan/lang/ast/printable.hpp>
+#include <stan/lang/ast/var_origin.hpp>
 
+#include <stan/lang/ast/fun/infer_type_indexing.hpp>
+#include <stan/lang/ast/fun/is_data_origin.hpp>
+#include <stan/lang/ast/fun/is_fun_origin.hpp>
+#include <stan/lang/ast/fun/print_var_origin.hpp>
+#include <stan/lang/ast/fun/total_dims.hpp>
+#include <stan/lang/ast/fun/write_base_expr_type.hpp>
+#include <stan/lang/ast/fun/is_nil.hpp>
+#include <stan/lang/ast/fun/is_nil_vis.hpp>
+#include <stan/lang/ast/fun/operator_stream_expr_type.hpp>
+#include <stan/lang/ast/fun/promote_primitive.hpp>
+
+#include <stan/lang/ast/sigs/function_signature_t.hpp>
+#include <stan/lang/ast/sigs/function_signatures.hpp>
+
+#include <stan/lang/ast/node/array_expr.hpp>
+#include <stan/lang/ast/node/conditional_op.hpp>
+#include <stan/lang/ast/node/distribution.hpp>
+#include <stan/lang/ast/node/double_literal.hpp>
+#include <stan/lang/ast/node/expression.hpp>
+#include <stan/lang/ast/node/expression_type_vis.hpp>
+#include <stan/lang/ast/node/fun.hpp>
+#include <stan/lang/ast/node/index_op.hpp>
+#include <stan/lang/ast/node/integrate_ode.hpp>
+#include <stan/lang/ast/node/integrate_ode_control.hpp>
+#include <stan/lang/ast/node/int_literal.hpp>
+#include <stan/lang/ast/node/statements.hpp>
+#include <stan/lang/ast/node/variable.hpp>
+#include <stan/lang/ast/node/variable_dims.hpp>
+
+
+// ======================================================
+#include <boost/variant/recursive_variant.hpp>
 #include <map>
 #include <set>
 #include <string>
@@ -12,10 +48,6 @@
 namespace stan {
 
   namespace lang {
-
-    /** Placeholder struct for boost::variant default ctors
-     */
-    struct nil { };
 
     // components of abstract syntax tree
     struct array_expr;
@@ -64,404 +96,6 @@ namespace stan {
     struct vector_var_decl;
     struct while_statement;
 
-    // forward declarable enum hack (can't fwd-decl enum)
-    typedef int base_expr_type;
-    const int VOID_T = 0;
-    const int INT_T = 1;
-    const int DOUBLE_T = 2;
-    const int VECTOR_T = 3;
-    const int ROW_VECTOR_T = 4;
-    const int MATRIX_T = 5;
-    const int ILL_FORMED_T = 6;
-
-    typedef int var_origin;
-    const int model_name_origin = 0;
-    const int data_origin = 1;
-    const int transformed_data_origin = 2;
-    const int parameter_origin = 3;
-    const int transformed_parameter_origin = 4;
-    const int derived_origin = 5;
-    const int local_origin = 6;
-    const int function_argument_origin = 7;
-    const int function_argument_origin_lp = 8;
-    const int function_argument_origin_rng = 9;
-    const int void_function_argument_origin = 10;
-    const int void_function_argument_origin_lp = 11;
-    const int void_function_argument_origin_rng = 12;
-
-    bool is_data_origin(const var_origin& vo);
-
-    bool is_fun_origin(const var_origin& vo);
-
-    void print_var_origin(std::ostream& o, const var_origin& vo);
-
-
-    std::ostream& write_base_expr_type(std::ostream& o, base_expr_type type);
-
-    struct expr_type {
-      base_expr_type base_type_;
-      size_t num_dims_;
-      expr_type();
-      expr_type(const base_expr_type base_type);  // NOLINT(runtime/explicit)
-      expr_type(const base_expr_type base_type,
-                size_t num_dims);
-      bool operator==(const expr_type& et) const;
-      bool operator!=(const expr_type& et) const;
-      bool operator<(const expr_type& et) const;
-      bool operator<=(const expr_type& et) const;
-      bool operator>(const expr_type& et) const;
-      bool operator>=(const expr_type& et) const;
-      bool is_primitive() const;
-      bool is_primitive_int() const;
-      bool is_primitive_double() const;
-      bool is_ill_formed() const;
-      bool is_void() const;
-      base_expr_type type() const;
-      size_t num_dims() const;
-    };
-
-
-    std::ostream& operator<<(std::ostream& o, const expr_type& et);
-
-    expr_type promote_primitive(const expr_type& et);
-
-    expr_type promote_primitive(const expr_type& et1,
-                                const expr_type& et2);
-
-    typedef std::pair<expr_type, std::vector<expr_type> > function_signature_t;
-
-    class function_signatures {
-    public:
-      static function_signatures& instance();
-      static void reset_sigs();
-      void set_user_defined(const std::pair<std::string, function_signature_t>&
-                            name_sig);
-      bool is_user_defined(const std::pair<std::string, function_signature_t>&
-                           name_sig);
-      void add(const std::string& name,
-               const expr_type& result_type,
-               const std::vector<expr_type>& arg_types);
-      void add(const std::string& name,
-               const expr_type& result_type);
-      void add(const std::string& name,
-               const expr_type& result_type,
-               const expr_type& arg_type);
-      void add(const std::string& name,
-               const expr_type& result_type,
-               const expr_type& arg_type1,
-               const expr_type& arg_type2);
-      void add(const std::string& name,
-               const expr_type& result_type,
-               const expr_type& arg_type1,
-               const expr_type& arg_type2,
-               const expr_type& arg_type3);
-      void add(const std::string& name,
-               const expr_type& result_type,
-               const expr_type& arg_type1,
-               const expr_type& arg_type2,
-               const expr_type& arg_type3,
-               const expr_type& arg_type4);
-      void add(const std::string& name,
-               const expr_type& result_type,
-               const expr_type& arg_type1,
-               const expr_type& arg_type2,
-               const expr_type& arg_type3,
-               const expr_type& arg_type4,
-               const expr_type& arg_type5);
-      void add(const std::string& name,
-               const expr_type& result_type,
-               const expr_type& arg_type1,
-               const expr_type& arg_type2,
-               const expr_type& arg_type3,
-               const expr_type& arg_type4,
-               const expr_type& arg_type5,
-               const expr_type& arg_type6);
-      void add(const std::string& name,
-               const expr_type& result_type,
-               const expr_type& arg_type1,
-               const expr_type& arg_type2,
-               const expr_type& arg_type3,
-               const expr_type& arg_type4,
-               const expr_type& arg_type5,
-               const expr_type& arg_type6,
-               const expr_type& arg_type7);
-      void add_nullary(const::std::string& name);
-      void add_unary(const::std::string& name);
-      void add_unary_vectorized(const::std::string& name);
-      void add_binary(const::std::string& name);
-      void add_ternary(const::std::string& name);
-      void add_quaternary(const::std::string& name);
-      int num_promotions(const std::vector<expr_type>& call_args,
-                         const std::vector<expr_type>& sig_args);
-      expr_type get_result_type(const std::string& name,
-                                const std::vector<expr_type>& args,
-                                std::ostream& error_msgs,
-                                bool sampling_error_style = false);
-      int get_signature_matches(const std::string& name,
-                                const std::vector<expr_type>& args,
-                                function_signature_t& signature);
-      bool is_defined(const std::string& name,
-                      const function_signature_t& sig);
-      bool has_user_defined_key(const std::string& name) const;
-      std::set<std::string> key_set() const;
-      bool has_key(const std::string& key) const;
-      bool discrete_first_arg(const std::string& name) const;
-
-    private:
-      function_signatures();
-      function_signatures(const function_signatures& fs);
-      std::map<std::string, std::vector<function_signature_t> > sigs_map_;
-      std::set<std::pair<std::string, function_signature_t> > user_defined_set_;
-      static function_signatures* sigs_;  // init below outside of class
-    };
-
-    struct statements {
-      std::vector<var_decl> local_decl_;
-      std::vector<statement> statements_;
-      statements();
-      statements(const std::vector<var_decl>& local_decl,
-                 const std::vector<statement>& stmts);
-    };
-
-    struct distribution {
-      std::string family_;
-      std::vector<expression> args_;
-    };
-
-    struct expression_type_vis : public boost::static_visitor<expr_type> {
-      expr_type operator()(const nil& e) const;
-      expr_type operator()(const int_literal& e) const;
-      expr_type operator()(const double_literal& e) const;
-      expr_type operator()(const array_expr& e) const;
-      expr_type operator()(const variable& e) const;
-      expr_type operator()(const fun& e) const;
-      expr_type operator()(const integrate_ode& e) const;
-      expr_type operator()(const integrate_ode_control& e) const;
-      expr_type operator()(const index_op& e) const;
-      expr_type operator()(const index_op_sliced& e) const;
-      expr_type operator()(const conditional_op& e) const;
-      expr_type operator()(const binary_op& e) const;
-      expr_type operator()(const unary_op& e) const;
-    };
-
-
-    struct expression;
-
-    struct expression {
-      typedef boost::variant<boost::recursive_wrapper<nil>,
-                             boost::recursive_wrapper<int_literal>,
-                             boost::recursive_wrapper<double_literal>,
-                             boost::recursive_wrapper<array_expr>,
-                             boost::recursive_wrapper<variable>,
-                             boost::recursive_wrapper<integrate_ode>,
-                             boost::recursive_wrapper<integrate_ode_control>,
-                             boost::recursive_wrapper<fun>,
-                             boost::recursive_wrapper<index_op>,
-                             boost::recursive_wrapper<index_op_sliced>,
-                             boost::recursive_wrapper<conditional_op>,
-                             boost::recursive_wrapper<binary_op>,
-                             boost::recursive_wrapper<unary_op> >
-      expression_t;
-
-      expression();
-      expression(const expression& e);
-
-      // template <typename Expr> expression(const Expr& expr);
-      expression(const nil& expr);  // NOLINT(runtime/explicit)
-      expression(const int_literal& expr);  // NOLINT(runtime/explicit)
-      expression(const double_literal& expr);  // NOLINT(runtime/explicit)
-      expression(const array_expr& expr);  // NOLINT(runtime/explicit)
-      expression(const variable& expr);  // NOLINT(runtime/explicit)
-      expression(const fun& expr);  // NOLINT(runtime/explicit)
-      expression(const integrate_ode& expr);  // NOLINT(runtime/explicit)
-      expression(const integrate_ode_control& expr);  // NOLINT
-      expression(const index_op& expr);  // NOLINT(runtime/explicit)
-      expression(const index_op_sliced& expr);  // NOLINT(runtime/explicit)
-      expression(const conditional_op& expr);  // NOLINT(runtime/explicit)
-      expression(const binary_op& expr);  // NOLINT(runtime/explicit)
-      expression(const unary_op& expr);  // NOLINT(runtime/explicit)
-      expression(const expression_t& expr_);  // NOLINT(runtime/explicit)
-
-      expr_type expression_type() const;
-      int total_dims() const;
-
-      expression& operator+=(const expression& rhs);
-      expression& operator-=(const expression& rhs);
-      expression& operator*=(const expression& rhs);
-      expression& operator/=(const expression& rhs);
-
-      expression_t expr_;
-    };
-
-
-    struct printable {
-      typedef boost::variant<boost::recursive_wrapper<std::string>,
-                             boost::recursive_wrapper<expression> >
-      printable_t;
-
-      printable();
-      printable(const expression& expression);  // NOLINT(runtime/explicit)
-      printable(const std::string& msg);  // NOLINT(runtime/explicit)
-      printable(const printable_t& printable);  // NOLINT(runtime/explicit)
-      printable(const printable& printable);  // NOLINT(runtime/explicit)
-
-      printable_t printable_;
-    };
-
-    struct is_nil_op : public boost::static_visitor<bool> {
-      bool operator()(const nil& x) const;  // NOLINT(runtime/explicit)
-      bool operator()(const int_literal& x) const;  // NOLINT(runtime/explicit)
-      bool operator()(const double_literal& x) const;  // NOLINT
-      bool operator()(const array_expr& x) const;  // NOLINT
-      bool operator()(const variable& x) const;  // NOLINT(runtime/explicit)
-      bool operator()(const integrate_ode& x) const;  // NOLINT
-      bool operator()(const integrate_ode_control& x) const;  // NOLINT
-      bool operator()(const fun& x) const;  // NOLINT(runtime/explicit)
-      bool operator()(const index_op& x) const;  // NOLINT(runtime/explicit)
-      bool operator()(const index_op_sliced& x) const;  // NOLINT
-      bool operator()(const conditional_op& x) const;  // NOLINT
-      bool operator()(const binary_op& x) const;  // NOLINT(runtime/explicit)
-      bool operator()(const unary_op& x) const;  // NOLINT(runtime/explicit)
-    };
-
-    bool is_nil(const expression& e);
-
-    struct variable_dims {
-      std::string name_;
-      std::vector<expression> dims_;
-      variable_dims();
-      variable_dims(std::string const& name,
-                    std::vector<expression> const& dims);
-    };
-
-
-    struct int_literal {
-      int val_;
-      expr_type type_;
-      int_literal();
-      int_literal(int val);  // NOLINT(runtime/explicit)
-      int_literal(const int_literal& il);  // NOLINT(runtime/explicit)
-      int_literal& operator=(const int_literal& il);
-    };
-
-
-    struct double_literal {
-      double val_;
-      expr_type type_;
-      double_literal();
-      double_literal(double val);  // NOLINT(runtime/explicit)
-      double_literal& operator=(const double_literal& dl);
-    };
-
-    struct array_expr {
-      std::vector<expression> args_;
-      expr_type type_;
-      bool has_var_;
-      var_origin var_origin_;
-      array_expr();
-      array_expr(const std::vector<expression>& args);  // NOLINT
-      array_expr& operator=(const array_expr& al);
-    };
-
-    struct variable {
-      std::string name_;
-      expr_type type_;
-      variable();
-      variable(std::string name);  // NOLINT(runtime/explicit)
-      void set_type(const base_expr_type& base_type,
-                    size_t num_dims);
-    };
-
-    struct integrate_ode {
-      std::string integration_function_name_;
-      std::string system_function_name_;
-      expression y0_;  // initial state
-      expression t0_;  // initial time
-      expression ts_;  // solution times
-      expression theta_;  // params
-      expression x_;  // data
-      expression x_int_;  // integer data
-      integrate_ode();
-      integrate_ode(const std::string& integration_function_name,
-                    const std::string& system_function_name,
-                    const expression& y0,
-                    const expression& t0,
-                    const expression& ts,
-                    const expression& theta,
-                    const expression& x,
-                    const expression& x_int);
-    };
-
-    struct integrate_ode_control {
-      std::string integration_function_name_;
-      std::string system_function_name_;
-      expression y0_;  // initial state
-      expression t0_;  // initial time
-      expression ts_;  // solution times
-      expression theta_;  // params
-      expression x_;  // data
-      expression x_int_;  // integer data
-      expression rel_tol_;  // relative tolerance
-      expression abs_tol_;  // absolute tolerance
-      expression max_num_steps_;  // max number of steps
-      integrate_ode_control();
-      integrate_ode_control(const std::string& integration_function_name,
-                            const std::string& system_function_name,
-                            const expression& y0,
-                            const expression& t0,
-                            const expression& ts,
-                            const expression& theta,
-                            const expression& x,
-                            const expression& x_int,
-                            const expression& rel_tol,
-                            const expression& abs_tol,
-                            const expression& max_num_steps);
-    };
-
-    struct fun {
-      std::string name_;
-      std::string original_name_;
-      std::vector<expression> args_;
-      expr_type type_;
-      fun();
-      fun(std::string const& name,
-          std::vector<expression> const& args);
-      //      void infer_type();  // FIXME: is this used anywhere?
-    };
-
-    size_t total_dims(const std::vector<std::vector<expression> >& dimss);
-
-    expr_type infer_type_indexing(const base_expr_type& expr_base_type,
-                                  size_t num_expr_dims,
-                                  size_t num_index_dims);
-
-    expr_type infer_type_indexing(const expression& expr,
-                                  size_t num_index_dims);
-
-
-    struct index_op {
-      expression expr_;
-      std::vector<std::vector<expression> > dimss_;
-      expr_type type_;
-      index_op();
-      // vec of vec for e.g., e[1,2][3][4,5,6]
-      index_op(const expression& expr,
-               const std::vector<std::vector<expression> >& dimss);
-      void infer_type();
-    };
-
-    struct conditional_op {
-      expression cond_;  // conditional - must be int val
-      expression true_val_;
-      expression false_val_;
-      expr_type type_;
-      bool has_var_;
-      var_origin var_origin_;
-      conditional_op();
-      conditional_op(const expression& cond,
-                     const expression& true_val,
-                     const expression& false_val);
-    };
 
     struct binary_op {
       std::string op;

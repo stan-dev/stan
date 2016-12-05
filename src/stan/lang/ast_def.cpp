@@ -19,7 +19,6 @@
 #include <vector>
 
 namespace stan {
-
   namespace lang {
 
     std::ostream& write_base_expr_type(std::ostream& o, base_expr_type type) {
@@ -981,32 +980,46 @@ namespace stan {
       return boost::apply_visitor(vis, e.expr_);
     }
 
-    bool is_nil_op::operator()(const nil& /*x*/) const { return true; }
-    bool is_nil_op::operator()(const int_literal& /*x*/) const { return false; }
-    bool is_nil_op::operator()(const double_literal& /* x */) const {
+    bool is_nil_vis::operator()(const nil& /*x*/) const {
+      return true;
+    }
+    bool is_nil_vis::operator()(const int_literal& /*x*/) const {
       return false;
     }
-    bool is_nil_op::operator()(const array_expr& /* x */)
+    bool is_nil_vis::operator()(const double_literal& /* x */) const {
+      return false;
+    }
+    bool is_nil_vis::operator()(const array_expr& /* x */)
       const { return false; }
-    bool is_nil_op::operator()(const variable& /* x */) const { return false; }
-    bool is_nil_op::operator()(const integrate_ode& /* x */) const {
+    bool is_nil_vis::operator()(const variable& /* x */) const {
       return false;
     }
-    bool is_nil_op::operator()(const integrate_ode_control& /* x */) const {
+    bool is_nil_vis::operator()(const integrate_ode& /* x */) const {
       return false;
     }
-    bool is_nil_op::operator()(const fun& /* x */) const { return false; }
-    bool is_nil_op::operator()(const index_op& /* x */) const { return false; }
-    bool is_nil_op::operator()(const index_op_sliced& /* x */) const {
+    bool is_nil_vis::operator()(const integrate_ode_control& /* x */) const {
       return false;
     }
-    bool is_nil_op::operator()(const conditional_op& /* x */) const {
+    bool is_nil_vis::operator()(const fun& /* x */) const {
+      return false;
+    }
+    bool is_nil_vis::operator()(const index_op& /* x */) const {
+      return false;
+    }
+    bool is_nil_vis::operator()(const index_op_sliced& /* x */) const {
+      return false;
+    }
+    bool is_nil_vis::operator()(const conditional_op& /* x */) const {
       return false; }
-    bool is_nil_op::operator()(const binary_op& /* x */) const { return false; }
-    bool is_nil_op::operator()(const unary_op& /* x */) const { return false; }
+    bool is_nil_vis::operator()(const binary_op& /* x */) const {
+      return false;
+    }
+    bool is_nil_vis::operator()(const unary_op& /* x */) const {
+      return false;
+    }
 
     bool is_nil(const expression& e) {
-      is_nil_op ino;
+      is_nil_vis ino;
       return boost::apply_visitor(ino, e.expr_);
     }
 
