@@ -27,8 +27,8 @@ void test_throw(T1& lhs, const I& idxs, const T2& rhs) {
 }
 
 template <typename T1, typename I, typename T2>
-void test_throw_de(T1& lhs, const I& idxs, const T2& rhs) {
-  EXPECT_THROW(stan::model::assign(lhs, idxs, rhs), std::domain_error);
+void test_throw_ia(T1& lhs, const I& idxs, const T2& rhs) {
+  EXPECT_THROW(stan::model::assign(lhs, idxs, rhs), std::invalid_argument);
 }
 
 
@@ -99,13 +99,13 @@ TEST(ModelIndexing, lvalueMulti) {
   assign(x, index_list(index_min(9)), y);
   EXPECT_FLOAT_EQ(y[0], x[8]);
   EXPECT_FLOAT_EQ(y[1], x[9]);
-  test_throw_de(x, index_list(index_min(0)), y);
+  test_throw_ia(x, index_list(index_min(0)), y);
 
   assign(x, index_list(index_max(2)), y);
   EXPECT_FLOAT_EQ(y[0], x[0]);
   EXPECT_FLOAT_EQ(y[1], x[1]);
   EXPECT_FLOAT_EQ(2, x[2]);
-  test_throw_de(x, index_list(index_max(10)), y);
+  test_throw_ia(x, index_list(index_max(10)), y);
   
   vector<int> ns;
   ns.push_back(4);
@@ -121,7 +121,7 @@ TEST(ModelIndexing, lvalueMulti) {
   test_throw(x, index_list(index_multi(ns)), y);
 
   ns.push_back(3);
-  test_throw_de(x, index_list(index_multi(ns)), y);
+  test_throw_ia(x, index_list(index_multi(ns)), y);
 }
 
 TEST(ModelIndexing, lvalueMultiMulti) {
@@ -147,8 +147,8 @@ TEST(ModelIndexing, lvalueMultiMulti) {
     for (int j = 0; j < 3; ++j)
       EXPECT_FLOAT_EQ(ys[i][j], xs[8 + i][j]);
 
-  test_throw_de(xs, index_list(index_min(7), index_max(3)), ys);
-  test_throw_de(xs, index_list(index_min(9), index_max(2)), ys);
+  test_throw_ia(xs, index_list(index_min(7), index_max(3)), ys);
+  test_throw_ia(xs, index_list(index_min(9), index_max(2)), ys);
 }
 
 TEST(ModelIndexing, lvalueUniMulti) {
@@ -171,7 +171,7 @@ TEST(ModelIndexing, lvalueUniMulti) {
 
   test_throw(xs, index_list(index_uni(0), index_min_max(3, 5)), ys);
   test_throw(xs, index_list(index_uni(11), index_min_max(3, 5)), ys);
-  test_throw_de(xs, index_list(index_uni(4), index_min_max(2, 5)), ys);
+  test_throw_ia(xs, index_list(index_uni(4), index_min_max(2, 5)), ys);
 
 }
 
@@ -193,7 +193,7 @@ TEST(ModelIndexing, lvalueMultiUni) {
   for (int j = 0; j < 3; ++j)
     EXPECT_FLOAT_EQ(ys[j], xs[j + 4][7]);
 
-  test_throw_de(xs, index_list(index_min_max(3, 6), index_uni(7)), ys);
+  test_throw_ia(xs, index_list(index_min_max(3, 6), index_uni(7)), ys);
   test_throw(xs, index_list(index_min_max(4, 6), index_uni(0)), ys);
   test_throw(xs, index_list(index_min_max(4, 6), index_uni(30)), ys);
 }
@@ -228,7 +228,7 @@ TEST(ModelIndexing, lvalueVecMulti) {
   EXPECT_FLOAT_EQ(ys(0), xs(2));
   EXPECT_FLOAT_EQ(ys(1), xs(3));
   EXPECT_FLOAT_EQ(ys(2), xs(4));
-  test_throw_de(xs, index_list(index_min(0)), ys);
+  test_throw_ia(xs, index_list(index_min(0)), ys);
 
   xs << 0, 1, 2, 3, 4;
   vector<int> ns;
@@ -248,7 +248,7 @@ TEST(ModelIndexing, lvalueVecMulti) {
 
   ns[ns.size() - 1] = 3;
   ns.push_back(1);
-  test_throw_de(xs, index_list(index_multi(ns)), ys);
+  test_throw_ia(xs, index_list(index_multi(ns)), ys);
 } 
 
 TEST(ModelIndexing, lvalueRowVecMulti) {
@@ -260,8 +260,8 @@ TEST(ModelIndexing, lvalueRowVecMulti) {
   EXPECT_FLOAT_EQ(ys(0), xs(2));
   EXPECT_FLOAT_EQ(ys(1), xs(3));
   EXPECT_FLOAT_EQ(ys(2), xs(4));
-  test_throw_de(xs, index_list(index_min(2)), ys);
-  test_throw_de(xs, index_list(index_min(0)), ys);
+  test_throw_ia(xs, index_list(index_min(2)), ys);
+  test_throw_ia(xs, index_list(index_min(0)), ys);
 
   xs << 0, 1, 2, 3, 4;
   vector<int> ns;
@@ -281,7 +281,7 @@ TEST(ModelIndexing, lvalueRowVecMulti) {
 
   ns[ns.size() - 1] = 3;
   ns.push_back(1);
-  test_throw_de(xs, index_list(index_multi(ns)), ys);
+  test_throw_ia(xs, index_list(index_multi(ns)), ys);
 }  
 
 TEST(ModelIndexing, lvalueMatrixUni) {
@@ -318,13 +318,13 @@ TEST(ModelIndexing, lvalueMatrixMulti) {
   for (int i = 0; i < 2; ++i)
     for (int j = 0; j < 4; ++j)
       EXPECT_FLOAT_EQ(y(i, j), x(i + 1, j));
-  test_throw_de(x, index_list(index_min(1)), y);
+  test_throw_ia(x, index_list(index_min(1)), y);
 
   
   MatrixXd z(1,2);
   z << 10, 20;
-  test_throw_de(x, index_list(index_min(1)), z);
-  test_throw_de(x, index_list(index_min(2)), z);
+  test_throw_ia(x, index_list(index_min(1)), z);
+  test_throw_ia(x, index_list(index_min(2)), z);
 
 }
 
@@ -363,7 +363,7 @@ TEST(ModelIndexing, lvalueMatrixUniMulti) {
   test_throw(x, index_list(index_uni(0), index_min_max(2,4)), y);
   test_throw(x, index_list(index_uni(5), index_min_max(2,4)), y);
   test_throw(x, index_list(index_uni(2), index_min_max(0,2)), y);
-  test_throw_de(x, index_list(index_uni(2), index_min_max(2,5)), y);
+  test_throw_ia(x, index_list(index_uni(2), index_min_max(2,5)), y);
 
   vector<int> ns;
   ns.push_back(4);
@@ -381,7 +381,7 @@ TEST(ModelIndexing, lvalueMatrixUniMulti) {
   test_throw(x, index_list(index_uni(3), index_multi(ns)), y);
 
   ns.push_back(2);
-  test_throw_de(x, index_list(index_uni(3), index_multi(ns)), y);
+  test_throw_ia(x, index_list(index_uni(3), index_multi(ns)), y);
 }
 
 TEST(ModelIndexing, lvalueMatrixMultiUni) {
@@ -401,7 +401,7 @@ TEST(ModelIndexing, lvalueMatrixMultiUni) {
   test_throw(x, index_list(index_min_max(2,3), index_uni(0)), y);
   test_throw(x, index_list(index_min_max(2,3), index_uni(5)), y);
   test_throw(x, index_list(index_min_max(0,1), index_uni(4)), y);
-  test_throw_de(x, index_list(index_min_max(1,3), index_uni(4)), y);
+  test_throw_ia(x, index_list(index_min_max(1,3), index_uni(4)), y);
 
   vector<int> ns;
   ns.push_back(3);
@@ -417,7 +417,7 @@ TEST(ModelIndexing, lvalueMatrixMultiUni) {
   test_throw(x, index_list(index_multi(ns), index_uni(3)), y);
 
   ns.push_back(2);
-  test_throw_de(x, index_list(index_multi(ns), index_uni(3)), y);
+  test_throw_ia(x, index_list(index_multi(ns), index_uni(3)), y);
 }
 
 TEST(ModelIndexing, lvalueMatrixMultiMulti) {
@@ -440,9 +440,9 @@ TEST(ModelIndexing, lvalueMatrixMultiMulti) {
   EXPECT_FLOAT_EQ(y(1,1), x(2,2));
   EXPECT_FLOAT_EQ(y(1,2), x(2,3));
 
-  test_throw_de(x, index_list(index_min_max(2,3), index_min(0)), y);
-  test_throw_de(x, index_list(index_min_max(2,3), index_min(10)), y);
-  test_throw_de(x, index_list(index_min_max(1,3), index_min(2)), y);
+  test_throw_ia(x, index_list(index_min_max(2,3), index_min(0)), y);
+  test_throw_ia(x, index_list(index_min_max(2,3), index_min(10)), y);
+  test_throw_ia(x, index_list(index_min_max(1,3), index_min(2)), y);
 
   x <<
     0.0, 0.1, 0.2, 0.3,
