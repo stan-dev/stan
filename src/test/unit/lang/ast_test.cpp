@@ -21,6 +21,13 @@ using stan::lang::ROW_VECTOR_T;
 using stan::lang::MATRIX_T;
 using std::vector;
 
+TEST(langAst, discreteFirstArg) {
+  // true if first argument to function is always discrete
+  EXPECT_TRUE(function_signatures::instance()
+              .discrete_first_arg("poisson_log"));
+  EXPECT_FALSE(function_signatures::instance()
+              .discrete_first_arg("normal_log"));
+}
 
 TEST(langAst, printSignature) {
   std::vector<expr_type> arg_types;
