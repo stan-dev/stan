@@ -223,7 +223,9 @@ namespace stan {
 
       fun_r.name("function and argument expressions");
       fun_r
-        %= (hold[identifier_r[is_prob_fun_f(_1, _pass)]] > prob_args_r(_r1))
+        %= (hold[identifier_r[is_prob_fun_f(_1, _pass)]]
+            >> &lit('(')
+            > prob_args_r(_r1))
         | (identifier_r >> args_r(_r1));
 
       identifier_r.name("identifier");

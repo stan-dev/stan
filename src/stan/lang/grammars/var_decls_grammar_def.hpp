@@ -42,7 +42,8 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::matrix_var_decl,
                           (stan::lang::expression, M_)
                           (stan::lang::expression, N_)
                           (std::string, name_)
-                          (std::vector<stan::lang::expression>, dims_) )
+                          (std::vector<stan::lang::expression>, dims_)
+                          (stan::lang::expression, def_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::unit_vector_var_decl,
                           (stan::lang::expression, K_)

@@ -1608,7 +1608,7 @@ namespace stan {
               || var_origin == transformed_data_origin
               || var_origin == function_argument_origin_rng)) {
           error_msgs << "ERROR: random number generators only allowed in"
-                     << " tranformed data block, generated quantities block"
+                     << " transformed data block, generated quantities block"
                      << " or user-defined functions with names ending in _rng"
                      << "; found function=" << fun.name_ << " in block=";
           print_var_origin(error_msgs, var_origin);

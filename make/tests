@@ -188,7 +188,7 @@ src/test/unit/mcmc/hmc/nuts/softabs_nuts_test.cpp: src/test/test-models/good/mcm
 src/test/unit/mcmc/hmc/xhmc/unit_e_xhmc_test.cpp: src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
 src/test/unit/mcmc/hmc/xhmc/softabs_xhmc_test.cpp: src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
 src/test/unit/mcmc/hmc/static_uniform/derived_static_uniform_test.cpp: src/test/test-models/good/mcmc/hmc/common/gauss.hpp
-src/test/unit/model/finite_diff_grad_test.cpp src/test/unit/model/grad_hess_log_prob_test.cpp src/test/unit/model/grad_tr_mat_times_hessian_test.cpp src/test/unit/model/gradient_test.cpp src/test/unit/model/gradient_dot_vector_test.cpp src/test/unit/model/hessian_test.cpp src/test/unit/model/hessian_times_vector_test.cpp src/test/unit/model/log_prob_grad_test.cpp src/test/unit/model/test_gradients_test.cpp : src/test/test-models/good/model/valid.hpp
+src/test/unit/model/finite_diff_grad_test.cpp src/test/unit/model/grad_hess_log_prob_test.cpp src/test/unit/model/grad_tr_mat_times_hessian_test.cpp src/test/unit/model/gradient_dot_vector_test.cpp src/test/unit/model/gradient_test.cpp src/test/unit/model/hessian_test.cpp src/test/unit/model/hessian_times_vector_test.cpp src/test/unit/model/log_prob_grad_test.cpp src/test/unit/model/log_prob_propto_test.cpp src/test/unit/model/model_functional_test.cpp src/test/unit/model/test_gradients_test.cpp : src/test/test-models/good/model/valid.hpp
 src/test/unit/optimization/bfgs_linesearch_test.cpp: src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/optimization/bfgs_minimizer_test.cpp: src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/optimization/bfgs_test.cpp: src/test/test-models/good/optimization/rosenbrock.hpp
