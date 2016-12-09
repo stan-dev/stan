@@ -732,8 +732,9 @@ namespace stan {
     expression_type_vis::operator()(const integrate_ode_control& e) const {
       return expr_type(DOUBLE_T, 2);
     }
-    expr_type expression_type_vis::operator()(const generalCptModel_control& e) const {
-          return expr_type(MATRIX_T);
+    expr_type
+    expression_type_vis::operator()(const generalCptModel_control& e) const {
+      return expr_type(MATRIX_T);
     }
     expr_type expression_type_vis::operator()(const fun& e) const {
       return e.type_;
@@ -847,7 +848,7 @@ namespace stan {
         || boost::apply_visitor(*this, e.amt_.expr_))
         || boost::apply_visitor(*this, e.rate_.expr_))
         || boost::apply_visitor(*this, e.ii_.expr_);
-      }
+    }    
     bool contains_var::operator()(const index_op& e) const {
       return boost::apply_visitor(*this, e.expr_.expr_);
     }
@@ -937,14 +938,15 @@ namespace stan {
       return boost::apply_visitor(*this, e.y0_.expr_)
         || boost::apply_visitor(*this, e.theta_.expr_);
     }
-    bool contains_nonparam_var::operator()(const generalCptModel_control& e) const {
+    bool contains_nonparam_var::operator()(const generalCptModel_control& e)
+      const {
       // IS THIS USEFUL?
       return ((((boost::apply_visitor(*this, e.pMatrix_.expr_)
                   || boost::apply_visitor(*this, e.time_.expr_))
                   || boost::apply_visitor(*this, e.amt_.expr_))
                   || boost::apply_visitor(*this, e.rate_.expr_))
                   || boost::apply_visitor(*this, e.ii_.expr_)
-                  || boost::apply_visitor(*this, e.nCmt_.expr_));
+                  || boost::apply_visitor(*this, e.nCmt_.expr_));      
       }
     bool contains_nonparam_var::operator()(const fun& e) const {
       // any function applied to non-linearly transformed var
@@ -1172,7 +1174,7 @@ namespace stan {
       rel_tol_(rel_tol),
       abs_tol_(abs_tol),
       max_num_steps_(max_num_steps) {
-      }
+    }
 
     fun::fun() { }
     fun::fun(std::string const& name,
@@ -2098,7 +2100,7 @@ namespace stan {
       return false;  // no refs persist out of integrate_ode_control() call
     }
     bool var_occurs_vis::operator()(const generalCptModel_control& e) const {
-        return false;
+      return false;  // no refs persist out of generalCptModel_control() call
     }
     bool var_occurs_vis::operator()(const index_op& e) const {
       // refs only persist out of expression, not indexes

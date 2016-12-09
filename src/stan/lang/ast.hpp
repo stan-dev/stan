@@ -278,7 +278,7 @@ namespace stan {
       expression(const fun& expr);  // NOLINT(runtime/explicit)
       expression(const integrate_ode& expr);  // NOLINT(runtime/explicit)
       expression(const integrate_ode_control& expr);  // NOLINT
-      expression(const generalCptModel_control& expr);
+      expression(const generalCptModel_control& expr);  // NOLINT
       expression(const index_op& expr);  // NOLINT(runtime/explicit)
       expression(const index_op_sliced& expr);  // NOLINT(runtime/explicit)
       expression(const conditional_op& expr);  // NOLINT(runtime/explicit)
@@ -320,7 +320,7 @@ namespace stan {
       bool operator()(const variable& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const integrate_ode& x) const;  // NOLINT
       bool operator()(const integrate_ode_control& x) const;  // NOLINT
-      bool operator()(const generalCptModel_control& x) const;
+      bool operator()(const generalCptModel_control& x) const;  // NOLINT
       bool operator()(const fun& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const index_op& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const index_op_sliced& x) const;  // NOLINT
@@ -420,23 +420,23 @@ namespace stan {
                             const expression& abs_tol,
                             const expression& max_num_steps);
     };
-    
+
     struct generalCptModel_control {
       std::string integration_function_name_;
       std::string system_function_name_;
-      expression nCmt_; // number of compartments
-      expression pMatrix_; // matrix of parameters
-      expression time_; // time vector
-      expression amt_; // amount vector
-      expression rate_; // rate vector
-      expression ii_; // inter-dose interval vector
-      expression evid_; // event-type vector
-      expression cmt_; // compartment number vector
-      expression addl_; // additional dosing vector
-      expression ss_; // steady state vector
-      expression rel_tol_; // relative tolerance of cvode solver
-      expression abs_tol_; // absolute tolerance of cvode solver
-      expression max_num_steps_; // maximum number of steps of cvode solver
+      expression nCmt_;  // number of compartments
+      expression pMatrix_;  // parameters container
+      expression time_;
+      expression amt_;
+      expression rate_;
+      expression ii_;
+      expression evid_;
+      expression cmt_;
+      expression addl_;
+      expression ss_;
+      expression rel_tol_;  // relative tolerance
+      expression abs_tol_;  // absolute tolerance
+      expression max_num_steps_;  // max number of steps
       generalCptModel_control();
       generalCptModel_control(const std::string& integration_function_name,
                               const std::string& system_function_name,
@@ -453,7 +453,7 @@ namespace stan {
                               const expression& rel_tol,
                               const expression& abs_tol,
                               const expression& max_num_steps);
-      };
+    };
 
     struct fun {
       std::string name_;

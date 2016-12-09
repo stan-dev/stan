@@ -155,7 +155,9 @@ namespace stan {
     template void assign_lhs::operator()(expression&,
                                          const integrate_ode_control&)
       const;
-    template void assign_lhs::operator()(expression&, const generalCptModel_control&) const;
+    template void assign_lhs::operator()(expression&,
+                                         const generalCptModel_control&)
+      const;
     template void assign_lhs::operator()(int&, const int&) const;
     template void assign_lhs::operator()(size_t&, const size_t&) const;
     template void assign_lhs::operator()(statement&, const statement&) const;
@@ -1555,61 +1557,61 @@ namespace stan {
     boost::phoenix::function<validate_integrate_ode_control>
     validate_integrate_ode_control_f;
     
-  void validate_generalCptModel_control::operator()(
-                                                    const generalCptModel_control& ode_fun,
-                                                    const variable_map& var_map,
-                                                    bool& pass,
-                                                    std::ostream& error_msgs) const {
-          pass = true;
+    template <class T>
+    void validate_generalCptModel(const T& ode_fun,
+                                  const variable_map& var_map,
+                                  bool& pass,
+                                  std::ostream& error_msgs) {
+      pass = true;
           
-          // test function argument type
-          expr_type sys_result_type(DOUBLE_T, 1);
-          std::vector<expr_type> sys_arg_types;
-          sys_arg_types.push_back(expr_type(DOUBLE_T, 0));
-          sys_arg_types.push_back(expr_type(DOUBLE_T, 1));
-          sys_arg_types.push_back(expr_type(DOUBLE_T, 1));
-          sys_arg_types.push_back(expr_type(DOUBLE_T, 1));
-          sys_arg_types.push_back(expr_type(INT_T, 1));
-          function_signature_t system_signature(sys_result_type, sys_arg_types);
-          if (!function_signatures::instance()
-              .is_defined(ode_fun.system_function_name_, system_signature)) {
-              error_msgs << "first argument to generalCptModel"
-              << " must be a function with signature"
-              << " (real, real[], real[], real[], int[]) : real[] ";
-              pass = false;
-          }
-          
-          // test regular argument types
-          if (ode_fun.nCmt_.expression_type() != INT_T) {
-              error_msgs << "second argument to "
-                         << ode_fun.integration_function_name_
-                         << " must be type int"
-                         << " for nCmt (number of compartments)"
-                         << "; found type="
-                         << ode_fun.nCmt_.expression_type()
-                         << ". ";
-              pass = false;
-          }
-          if (ode_fun.pMatrix_.expression_type() != expr_type(VECTOR_T, 1)) {
-              error_msgs << "third argument to "
-                         << ode_fun.integration_function_name_
-                         << " must be type vector[]"
-                         << " for parameter matrix"
-                         << "; found type="
-                         << ode_fun.pMatrix_.expression_type()
-                         << ". ";
-              pass = false;
-          }
-          if (ode_fun.time_.expression_type() != expr_type(DOUBLE_T, 1)) {
-              error_msgs << "fourth argument to "
-                         << ode_fun.integration_function_name_
-                         << " must be type real[]"
-                         << "for time"
-                         << "; found type="
-                         << ode_fun.time_.expression_type()
-                         << ". ";
-              pass = false;
-          }
+      // test function argument type
+      expr_type sys_result_type(DOUBLE_T, 1);
+      std::vector<expr_type> sys_arg_types;
+      sys_arg_types.push_back(expr_type(DOUBLE_T, 0));
+      sys_arg_types.push_back(expr_type(DOUBLE_T, 1));
+      sys_arg_types.push_back(expr_type(DOUBLE_T, 1));
+      sys_arg_types.push_back(expr_type(DOUBLE_T, 1));
+      sys_arg_types.push_back(expr_type(INT_T, 1));
+      function_signature_t system_signature(sys_result_type, sys_arg_types);
+      if (!function_signatures::instance()
+        .is_defined(ode_fun.system_function_name_, system_signature)) {
+        error_msgs << "first argument to generalCptModel"
+                   << " must be a function with signature"
+                    << " (real, real[], real[], real[], int[]) : real[] ";
+        pass = false;
+      }
+
+      // test regular argument types
+      if (ode_fun.nCmt_.expression_type() != INT_T) {
+        error_msgs << "second argument to "
+                   << ode_fun.integration_function_name_
+                   << " must be type int"
+                   << " for nCmt (number of compartments)"
+                   << "; found type="
+                   << ode_fun.nCmt_.expression_type()
+                   << ". ";
+        pass = false;
+      }
+      if (ode_fun.pMatrix_.expression_type() != expr_type(DOUBLE_T, 2)) {
+        error_msgs << "third argument to "
+                   << ode_fun.integration_function_name_
+                   << " must be type real[ , ]"
+                   << " for parameter matrix"
+                   << "; found type="
+                   << ode_fun.pMatrix_.expression_type()
+                   << ". ";
+        pass = false;
+      }
+      if (ode_fun.time_.expression_type() != expr_type(DOUBLE_T, 1)) {
+        error_msgs << "fourth argument to "
+                   << ode_fun.integration_function_name_
+                   << " must be type real[]"
+                   << "for time"
+                   << "; found type="
+                   << ode_fun.time_.expression_type()
+                   << ". ";
+        pass = false;
+      }
           if (ode_fun.amt_.expression_type() != expr_type(DOUBLE_T, 1)) {
               error_msgs << "fifth argument to "
                          << ode_fun.integration_function_name_
@@ -1768,9 +1770,17 @@ namespace stan {
                          << " must be data only and not reference parameters";
               pass = false;
           }
-      }
-      boost::phoenix::function<validate_generalCptModel_control>
-      validate_generalCptModel_control_f;
+    }
+    
+    void validate_generalCptModel_control::operator()(
+      const generalCptModel_control& ode_fun,
+      const variable_map& var_map,
+      bool& pass,
+      std::ostream& error_msgs) const {
+      validate_generalCptModel(ode_fun, var_map, pass, error_msgs);
+    }
+    boost::phoenix::function<validate_generalCptModel_control>
+    validate_generalCptModel_control_f;
 
     void set_fun_type_named::operator()(expression& fun_result, fun& fun,
                                         const var_origin& var_origin,
@@ -2349,18 +2359,19 @@ namespace stan {
       return boost::apply_visitor(*this, x.y0_.expr_)
         && boost::apply_visitor(*this, x.theta_.expr_);
     }
-    bool data_only_expression::operator()(const generalCptModel_control& x) const {
-      return (((boost::apply_visitor(*this, x.pMatrix_.expr_)
-                && boost::apply_visitor(*this, x.time_.expr_))
-                && boost::apply_visitor(*this, x.amt_.expr_))
-                && boost::apply_visitor(*this, x.rate_.expr_))
-                && boost::apply_visitor(*this, x.ii_.expr_);
-      } // include all arguments with a template
     bool data_only_expression::operator()(const integrate_ode_control& x)
       const {
       return boost::apply_visitor(*this, x.y0_.expr_)
         && boost::apply_visitor(*this, x.theta_.expr_);
     }
+    bool data_only_expression::operator()(const generalCptModel_control& x)
+      const {
+      return (((boost::apply_visitor(*this, x.pMatrix_.expr_)
+                && boost::apply_visitor(*this, x.time_.expr_))
+                && boost::apply_visitor(*this, x.amt_.expr_))
+                && boost::apply_visitor(*this, x.rate_.expr_))
+                && boost::apply_visitor(*this, x.ii_.expr_);
+    } // include all arguments with a template
     bool data_only_expression::operator()(const fun& x) const {
       for (size_t i = 0; i < x.args_.size(); ++i)
         if (!boost::apply_visitor(*this, x.args_[i].expr_))

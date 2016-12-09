@@ -345,42 +345,42 @@ namespace stan {
 
         generate_expression(fx.nCmt_, o_);
         o_ << ", ";
-            
+
         generate_expression(fx.pMatrix_, o_);
         o_ << ", ";
-            
+
         generate_expression(fx.time_, o_);
         o_ << ", ";
-            
+
         generate_expression(fx.amt_, o_);
         o_ << ", ";
-            
+
         generate_expression(fx.rate_, o_);
         o_ << ", ";
-            
+        
         generate_expression(fx.ii_, o_);
         o_ << ", ";
-            
+        
         generate_expression(fx.evid_, o_);
         o_ << ", ";
-            
+        
         generate_expression(fx.cmt_, o_);
         o_ << ", ";
-            
+        
         generate_expression(fx.addl_, o_);
         o_ << ", ";
-            
+        
         generate_expression(fx.ss_, o_);
         o_ << ", ";
-            
+
         generate_expression(fx.rel_tol_, o_);
         o_ << ", ";
-            
+
         generate_expression(fx.abs_tol_, o_);
         o_ << ", ";
-            
+
         generate_expression(fx.max_num_steps_, o_);
-        o_ << ") ";
+        o_ << ")";
       }
       void operator()(const fun& fx) const {
         // first test if short-circuit op (binary && and || applied to

@@ -215,38 +215,39 @@ namespace stan {
         generalCptModel_control_r.name("expression");
         generalCptModel_control_r
          %= ( (string("generalCptModel_bdf") >> no_skip[!char_("a-zA-Z0-9_")])
-              | (string("generalCptModel_rk45") >> no_skip[!char_("a-zA-Z0-9_")])
-              | (string("generalCptModel_sa") >> no_skip[!char_("a-zA-Z0-9_")]) )
-         > lit('(')
-         > identifier_r        // system function name (function only)
+              | (string("generalCptModel_rk45") >> no_skip[!char_("a-zA-Z0-9_")]) )
+         > lit('(')            // >> allows backtracking to non-control
+         > identifier_r        // 1) system function name (function only)
          > lit(',')
-         > expression_g(_r1)   // nCmt
+         > expression_g(_r1)   // 2) nCmt
          > lit(',')
-         > expression_g(_r1)   // pMatrix
+         > expression_g(_r1)   // 3) pMatrix
          > lit(',')
-         > expression_g(_r1)   // time
+         > expression_g(_r1)   // 4) time
          > lit(',')
-         > expression_g(_r1)   // amt
+         > expression_g(_r1)   // 5) amt
          > lit(',')
-         > expression_g(_r1)   // rate
+         > expression_g(_r1)   // 6) rate
          > lit(',')
-         > expression_g(_r1)   // ii
+         > expression_g(_r1)   // 7) ii
          > lit(',')
-         > expression_g(_r1)   // evid (data only)
+         > expression_g(_r1)   // 8) evid (data only)
          > lit(',')
-         > expression_g(_r1)   // cmt (data only)
+         > expression_g(_r1)   // 9) cmt (data only)
          > lit(',')
-         > expression_g(_r1)   // addl (data only)
+         > expression_g(_r1)   // 10) addl (data only)
          > lit(',')
-         > expression_g(_r1)   // ss (data only)
+         > expression_g(_r1)   // 11) ss (data only)
          > lit(',')
-         > expression_g(_r1)   // relative tolerance (data only)
+         > expression_g(_r1)   // 12) relative tolerance (data only)
          > lit(',')
-         > expression_g(_r1)   // absolute tolerance (data only)
+         > expression_g(_r1)   // 13) absolute tolerance (data only)
          > lit(',')
-         > expression_g(_r1)   // maximum number of steps
-         > lit(')') [validate_generalCptModel_control_f(_val, boost::phoenix::ref(var_map_),
-                                                      _pass, boost::phoenix::ref(error_msgs_))];
+         > expression_g(_r1)   // 14) maximum number of steps
+         > lit(')')
+           [validate_generalCptModel_control_f(_val, boost::phoenix::ref(var_map_),
+                                               _pass,
+                                               boost::phoenix::ref(error_msgs_))];
 
       factor_r.name("expression");
       factor_r =

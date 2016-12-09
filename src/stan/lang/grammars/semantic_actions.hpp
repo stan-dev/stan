@@ -555,16 +555,16 @@ namespace stan {
     };
     extern boost::phoenix::function<validate_integrate_ode_control>
     validate_integrate_ode_control_f;
-
+    
     // called from: term_grammar
-    struct validate_generalCptModel_control 
+    struct validate_generalCptModel_control
       : public phoenix_functor_quaternary {
       void operator()(const generalCptModel_control& ode_fun,
                       const variable_map& var_map, bool& pass,
                       std::ostream& error_msgs) const;
-      };
-      extern boost::phoenix::function<validate_generalCptModel_control>
-      validate_generalCptModel_control_f;
+    };
+    extern boost::phoenix::function<validate_generalCptModel_control>
+    validate_generalCptModel_control_f;
 
     // called from: term_grammar
     struct set_fun_type_named : public phoenix_functor_quinary {
