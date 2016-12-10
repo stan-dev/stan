@@ -13,6 +13,8 @@
 #include <stan/lang/ast/fun/print_var_origin.hpp>
 #include <stan/lang/ast/fun/total_dims.hpp>
 #include <stan/lang/ast/fun/write_base_expr_type.hpp>
+#include <stan/lang/ast/fun/is_multi_index.hpp>
+#include <stan/lang/ast/fun/is_multi_index_vis.hpp>
 #include <stan/lang/ast/fun/is_nil.hpp>
 #include <stan/lang/ast/fun/is_nil_vis.hpp>
 #include <stan/lang/ast/fun/operator_stream_expr_type.hpp>
@@ -22,17 +24,29 @@
 #include <stan/lang/ast/sigs/function_signatures.hpp>
 
 #include <stan/lang/ast/node/array_expr.hpp>
+#include <stan/lang/ast/node/base_var_decl.hpp>
+#include <stan/lang/ast/node/binary_op.hpp>
 #include <stan/lang/ast/node/conditional_op.hpp>
 #include <stan/lang/ast/node/distribution.hpp>
 #include <stan/lang/ast/node/double_literal.hpp>
 #include <stan/lang/ast/node/expression.hpp>
 #include <stan/lang/ast/node/expression_type_vis.hpp>
 #include <stan/lang/ast/node/fun.hpp>
+#include <stan/lang/ast/node/idx.hpp>
 #include <stan/lang/ast/node/index_op.hpp>
+#include <stan/lang/ast/node/index_op_sliced.hpp>
 #include <stan/lang/ast/node/integrate_ode.hpp>
 #include <stan/lang/ast/node/integrate_ode_control.hpp>
 #include <stan/lang/ast/node/int_literal.hpp>
+#include <stan/lang/ast/node/lb_idx.hpp>
+#include <stan/lang/ast/node/lub_idx.hpp>
+#include <stan/lang/ast/node/multi_idx.hpp>
+#include <stan/lang/ast/node/omni_idx.hpp>
+#include <stan/lang/ast/node/range.hpp>
 #include <stan/lang/ast/node/statements.hpp>
+#include <stan/lang/ast/node/ub_idx.hpp>
+#include <stan/lang/ast/node/unary_op.hpp>
+#include <stan/lang/ast/node/uni_idx.hpp>
 #include <stan/lang/ast/node/variable.hpp>
 #include <stan/lang/ast/node/variable_dims.hpp>
 
@@ -96,127 +110,6 @@ namespace stan {
     struct vector_var_decl;
     struct while_statement;
 
-
-    struct binary_op {
-      std::string op;
-      expression left;
-      expression right;
-      expr_type type_;
-      binary_op();
-      binary_op(const expression& left,
-                const std::string& op,
-                const expression& right);
-    };
-
-    struct unary_op {
-      char op;
-      expression subject;
-      expr_type type_;
-      unary_op(char op,
-               expression const& subject);
-    };
-
-    struct range {
-      expression low_;
-      expression high_;
-      range();
-      range(expression const& low,
-            expression const& high);
-      bool has_low() const;
-      bool has_high() const;
-    };
-
-    struct uni_idx {
-      expression idx_;
-      uni_idx();
-      uni_idx(const expression& idx);  // NOLINT(runtime/explicit)
-    };
-    struct multi_idx {
-      expression idxs_;
-      multi_idx();
-      multi_idx(const expression& idxs);  // NOLINT(runtime/explicit)
-    };
-    struct omni_idx {
-      omni_idx();
-    };
-    struct lb_idx {
-      expression lb_;
-      lb_idx();
-      lb_idx(const expression& lb);  // NOLINT(runtime/explicit)
-    };
-    struct ub_idx {
-      expression ub_;
-      ub_idx();
-      ub_idx(const expression& ub);  // NOLINT(runtime/explicit)
-    };
-    struct lub_idx {
-      expression lb_;
-      expression ub_;
-      lub_idx();
-      lub_idx(const expression& lb,
-              const expression& ub);
-    };
-
-    struct idx {
-      typedef boost::variant<boost::recursive_wrapper<uni_idx>,
-                             boost::recursive_wrapper<multi_idx>,
-                             boost::recursive_wrapper<omni_idx>,
-                             boost::recursive_wrapper<lb_idx>,
-                             boost::recursive_wrapper<ub_idx>,
-                             boost::recursive_wrapper<lub_idx> >
-      idx_t;
-
-      idx();
-
-      idx(const uni_idx& i);  // NOLINT(runtime/explicit)
-      idx(const multi_idx& i);  // NOLINT(runtime/explicit)
-      idx(const omni_idx& i);  // NOLINT(runtime/explicit)
-      idx(const lb_idx& i);  // NOLINT(runtime/explicit)
-      idx(const ub_idx& i);  // NOLINT(runtime/explicit)
-      idx(const lub_idx& i);  // NOLINT(runtime/explicit)
-
-      idx_t idx_;
-    };
-
-    struct is_multi_index_vis : public boost::static_visitor<bool> {
-      is_multi_index_vis();
-      bool operator()(const uni_idx& i) const;
-      bool operator()(const multi_idx& i) const;
-      bool operator()(const omni_idx& i) const;
-      bool operator()(const lb_idx& i) const;
-      bool operator()(const ub_idx& i) const;
-      bool operator()(const lub_idx& i) const;
-    };
-
-    bool is_multi_index(const idx& idx);
-
-    struct index_op_sliced {
-      expression expr_;
-      std::vector<idx> idxs_;
-      expr_type type_;
-      index_op_sliced();
-      // vec of vec for e.g., e[1,2][3][4,5,6]
-      index_op_sliced(const expression& expr,
-                      const std::vector<idx>& idxs);
-      void infer_type();
-    };
-
-    struct base_var_decl {
-      std::string name_;
-      std::vector<expression> dims_;
-      base_expr_type base_type_;
-      expression def_;
-      base_var_decl();
-      base_var_decl(const base_expr_type& base_type);  // NOLINT
-      base_var_decl(const std::string& name,
-                    const std::vector<expression>& dims,
-                    const base_expr_type& base_type);
-      base_var_decl(const std::string& name,
-                    const std::vector<expression>& dims,
-                    const base_expr_type& base_type,
-                    const expression& def);
-    };
-
     struct variable_map {
       typedef std::pair<base_var_decl, var_origin> range_t;
 
@@ -229,7 +122,6 @@ namespace stan {
                const base_var_decl& base_decl,
                const var_origin& vo);
       void remove(const std::string& name);
-
       std::map<std::string, range_t> map_;
     };
 
