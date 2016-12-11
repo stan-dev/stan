@@ -8,7 +8,6 @@ namespace stan {
      * AST structure for representing all legal indexes.
      */
     struct omni_idx {
-
       /**
        * Construct an omni-index.
        */

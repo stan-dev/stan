@@ -23,7 +23,7 @@ namespace stan {
        * upper bound.
        */
       expression high_;
-      
+
       /**
        * Construct a default range object.
        */

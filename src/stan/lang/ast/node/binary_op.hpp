@@ -13,7 +13,6 @@ namespace stan {
      * and left and right arguments.
      */
     struct binary_op {
-
       /**
        * String representation of the operation.
        */

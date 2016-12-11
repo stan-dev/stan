@@ -19,7 +19,7 @@ namespace stan {
        * Construct a default lower-bound index (nil valued).
        */
       lb_idx();
-      
+
       /**
        * Construct a lower-bound index with specified lower bound.
        *

@@ -11,7 +11,7 @@ namespace stan {
        * Multiple indexes (array of integers).
        */
       expression idxs_;
-     
+
       /**
        * Construct a default (nil) multi-index.
        */

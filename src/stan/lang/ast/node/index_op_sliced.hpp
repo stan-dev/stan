@@ -18,7 +18,7 @@ namespace stan {
        * Expression being indexed.
        */
       expression expr_;
-      
+
       /**
        * Sequence of indexes.
        */

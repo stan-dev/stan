@@ -18,7 +18,6 @@ namespace stan {
      * index. 
      */
     struct idx {
-
       /**
        * Variant type for the six index types.
        */

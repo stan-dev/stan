@@ -19,7 +19,7 @@ namespace stan {
        * Construct a default unary index.
        */
       uni_idx();
-      
+
       /**
        * Construct a unary index with the specified value.
        *

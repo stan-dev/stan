@@ -17,7 +17,6 @@ namespace stan {
      * index or a single index.
      */
     struct is_multi_index_vis : public boost::static_visitor<bool> {
-
       /**
        * Construct a multi-index visitor.
        */
