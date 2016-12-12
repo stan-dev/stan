@@ -565,7 +565,7 @@ namespace stan {
       : arg_type_(arg_type),
         name_(name) {
     }
-    base_var_decl arg_decl::base_variable_declaration() {
+    base_var_decl arg_decl::base_variable_declaration() const {
       std::vector<expression> dims;
       for (size_t i = 0; i < arg_type_.num_dims_; ++i)
         dims.push_back(expression(int_literal(0)));  // dummy value 0
@@ -795,62 +795,62 @@ namespace stan {
     printable::printable(const printable& printable)
       : printable_(printable.printable_) { }
 
-    contains_var::contains_var(const variable_map& var_map)
+    has_var_vis::has_var_vis(const variable_map& var_map)
       : var_map_(var_map) {
     }
-    bool contains_var::operator()(const nil& e) const {
+    bool has_var_vis::operator()(const nil& e) const {
       return false;
     }
-    bool contains_var::operator()(const int_literal& e) const {
+    bool has_var_vis::operator()(const int_literal& e) const {
       return false;
     }
-    bool contains_var::operator()(const double_literal& e) const {
+    bool has_var_vis::operator()(const double_literal& e) const {
       return false;
     }
-    bool contains_var::operator()(const array_expr& e) const {
+    bool has_var_vis::operator()(const array_expr& e) const {
       for (size_t i = 0; i < e.args_.size(); ++i)
         if (boost::apply_visitor(*this, e.args_[i].expr_))
           return true;
       return false;
     }
-    bool contains_var::operator()(const variable& e) const {
+    bool has_var_vis::operator()(const variable& e) const {
       var_origin vo = var_map_.get_origin(e.name_);
       return vo == parameter_origin
         || vo == transformed_parameter_origin
         || (vo == local_origin && e.type_.base_type_ != INT_T);
     }
-    bool contains_var::operator()(const fun& e) const {
+    bool has_var_vis::operator()(const fun& e) const {
       for (size_t i = 0; i < e.args_.size(); ++i)
         if (boost::apply_visitor(*this, e.args_[i].expr_))
           return true;
       return false;
     }
-    bool contains_var::operator()(const integrate_ode& e) const {
+    bool has_var_vis::operator()(const integrate_ode& e) const {
       // only init state and params may contain vars
       return boost::apply_visitor(*this, e.y0_.expr_)
         || boost::apply_visitor(*this, e.theta_.expr_);
     }
-    bool contains_var::operator()(const integrate_ode_control& e) const {
+    bool has_var_vis::operator()(const integrate_ode_control& e) const {
       // only init state and params may contain vars
       return boost::apply_visitor(*this, e.y0_.expr_)
         || boost::apply_visitor(*this, e.theta_.expr_);
     }
-    bool contains_var::operator()(const index_op& e) const {
+    bool has_var_vis::operator()(const index_op& e) const {
       return boost::apply_visitor(*this, e.expr_.expr_);
     }
-    bool contains_var::operator()(const index_op_sliced& e) const {
+    bool has_var_vis::operator()(const index_op_sliced& e) const {
       return boost::apply_visitor(*this, e.expr_.expr_);
     }
-    bool contains_var::operator()(const conditional_op& e) const {
+    bool has_var_vis::operator()(const conditional_op& e) const {
       return boost::apply_visitor(*this, e.cond_.expr_)
         || boost::apply_visitor(*this, e.true_val_.expr_)
         || boost::apply_visitor(*this, e.false_val_.expr_);
     }
-    bool contains_var::operator()(const binary_op& e) const {
+    bool has_var_vis::operator()(const binary_op& e) const {
       return boost::apply_visitor(*this, e.left.expr_)
         || boost::apply_visitor(*this, e.right.expr_);
     }
-    bool contains_var::operator()(const unary_op& e) const {
+    bool has_var_vis::operator()(const unary_op& e) const {
         return boost::apply_visitor(*this, e.subject.expr_);
     }
 
@@ -884,47 +884,46 @@ namespace stan {
         || name == "transpose";
     }
 
-    bool has_var(const expression& e,
-                 const variable_map& var_map) {
-      contains_var vis(var_map);
+    bool has_var(const expression& e, const variable_map& var_map) {
+      has_var_vis vis(var_map);
       return boost::apply_visitor(vis, e.expr_);
     }
 
-    contains_nonparam_var::contains_nonparam_var(const variable_map& var_map)
+    has_non_param_var_vis::has_non_param_var_vis(const variable_map& var_map)
       : var_map_(var_map) {
     }
-    bool contains_nonparam_var::operator()(const nil& e) const {
+    bool has_non_param_var_vis::operator()(const nil& e) const {
       return false;
     }
-    bool contains_nonparam_var::operator()(const int_literal& e) const {
+    bool has_non_param_var_vis::operator()(const int_literal& e) const {
       return false;
     }
-    bool contains_nonparam_var::operator()(const double_literal& e) const {
+    bool has_non_param_var_vis::operator()(const double_literal& e) const {
       return false;
     }
-    bool contains_nonparam_var::operator()(const array_expr& e) const {
+    bool has_non_param_var_vis::operator()(const array_expr& e) const {
       for (size_t i = 0; i < e.args_.size(); ++i)
         if (boost::apply_visitor(*this, e.args_[i].expr_))
           return true;
       return false;
     }
-    bool contains_nonparam_var::operator()(const variable& e) const {
+    bool has_non_param_var_vis::operator()(const variable& e) const {
       var_origin vo = var_map_.get_origin(e.name_);
       return (vo == transformed_parameter_origin
               || vo == local_origin);
     }
-    bool contains_nonparam_var::operator()(const integrate_ode& e) const {
+    bool has_non_param_var_vis::operator()(const integrate_ode& e) const {
       // if any vars, return true because integration will be nonlinear
       return boost::apply_visitor(*this, e.y0_.expr_)
         || boost::apply_visitor(*this, e.theta_.expr_);
     }
-    bool contains_nonparam_var::operator()(const integrate_ode_control& e)
+    bool has_non_param_var_vis::operator()(const integrate_ode_control& e)
       const {
       // if any vars, return true because integration will be nonlinear
       return boost::apply_visitor(*this, e.y0_.expr_)
         || boost::apply_visitor(*this, e.theta_.expr_);
     }
-    bool contains_nonparam_var::operator()(const fun& e) const {
+    bool has_non_param_var_vis::operator()(const fun& e) const {
       // any function applied to non-linearly transformed var
       for (size_t i = 0; i < e.args_.size(); ++i)
         if (boost::apply_visitor(*this, e.args_[i].expr_))
@@ -937,14 +936,14 @@ namespace stan {
       }
       return false;
     }
-    bool contains_nonparam_var::operator()(const index_op& e) const {
+    bool has_non_param_var_vis::operator()(const index_op& e) const {
       return boost::apply_visitor(*this, e.expr_.expr_);
     }
-    bool contains_nonparam_var::operator()(const index_op_sliced& e) const {
+    bool has_non_param_var_vis::operator()(const index_op_sliced& e) const {
       return boost::apply_visitor(*this, e.expr_.expr_);
     }
 
-    bool contains_nonparam_var::operator()(const conditional_op& e) const {
+    bool has_non_param_var_vis::operator()(const conditional_op& e) const {
       if (has_non_param_var(e.cond_, var_map_)
           || has_non_param_var(e.true_val_, var_map_)
           || has_non_param_var(e.false_val_, var_map_))
@@ -952,7 +951,7 @@ namespace stan {
       return false;
     }
 
-    bool contains_nonparam_var::operator()(const binary_op& e) const {
+    bool has_non_param_var_vis::operator()(const binary_op& e) const {
       if (e.op == "||"
           || e.op == "&&"
           || e.op == "=="
@@ -969,14 +968,14 @@ namespace stan {
         return has_var(e.left, var_map_) && has_var(e.right, var_map_);
       return false;
     }
-    bool contains_nonparam_var::operator()(const unary_op& e) const {
+    bool has_non_param_var_vis::operator()(const unary_op& e) const {
       // only negation, which is linear, so recurse
       return has_non_param_var(e.subject, var_map_);
     }
 
     bool has_non_param_var(const expression& e,
                            const variable_map& var_map) {
-      contains_nonparam_var vis(var_map);
+      has_non_param_var_vis vis(var_map);
       return boost::apply_visitor(vis, e.expr_);
     }
 
@@ -1927,15 +1926,11 @@ namespace stan {
       : log_prob_(log_prob) {
     }
 
-    for_statement::for_statement() {
-    }
-    for_statement::for_statement(std::string& variable,
-                                 range& range,
-                                 statement& stmt)
-      : variable_(variable),
-        range_(range),
-        statement_(stmt) {
-    }
+    for_statement::for_statement() { }
+    for_statement::for_statement(const std::string& variable,
+                                 const range& range,
+                                 const statement& stmt)
+      : variable_(variable), range_(range), statement_(stmt) { }
 
     while_statement::while_statement() { }
     while_statement::while_statement(const expression& condition,
