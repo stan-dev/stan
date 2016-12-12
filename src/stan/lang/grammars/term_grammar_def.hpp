@@ -164,25 +164,25 @@ namespace stan {
         %= ( (string("integrate_ode_rk45") >> no_skip[!char_("a-zA-Z0-9_")])
              | (string("integrate_ode_bdf") >> no_skip[!char_("a-zA-Z0-9_")]) )
         >> lit('(')              // >> allows backtracking to non-control
-        >> identifier_r          // system function name (function only)
+        >> identifier_r          // 1) system function name (function only)
         >> lit(',')
-        >> expression_g(_r1)     // y0
+        >> expression_g(_r1)     // 2) y0
         >> lit(',')
-        >> expression_g(_r1)     // t0 (data only)
+        >> expression_g(_r1)     // 3) t0 (data only)
         >> lit(',')
-        >> expression_g(_r1)     // ts (data only)
+        >> expression_g(_r1)     // 4) ts (data only)
         >> lit(',')
-        >> expression_g(_r1)     // theta
+        >> expression_g(_r1)     // 5) theta
         >> lit(',')
-        >> expression_g(_r1)     // x (data only)
+        >> expression_g(_r1)     // 6) x (data only)
         >> lit(',')
-        >> expression_g(_r1)     // x_int (data only)
+        >> expression_g(_r1)     // 7) x_int (data only)
         >> lit(',')
-        >> expression_g(_r1)     // relative tolerance (data only)
+        >> expression_g(_r1)     // 8) relative tolerance (data only)
         >> lit(',')
-        >> expression_g(_r1)     // absolute tolerance (data only)
+        >> expression_g(_r1)     // 9) absolute tolerance (data only)
         >> lit(',')
-        >> expression_g(_r1)     // maximum number of steps (data only)
+        >> expression_g(_r1)     // 10) maximum number of steps (data only)
         > lit(')')
           [validate_integrate_ode_control_f(_val, boost::phoenix::ref(var_map_),
                                             _pass,
@@ -195,19 +195,19 @@ namespace stan {
              | (string("integrate_ode") >> no_skip[!char_("a-zA-Z0-9_")])
                [deprecated_integrate_ode_f(boost::phoenix::ref(error_msgs_))] )
         > lit('(')
-        > identifier_r          // system function name (function only)
+        > identifier_r          // 1) system function name (function only)
         > lit(',')
-        > expression_g(_r1)     // y0
+        > expression_g(_r1)     // 2) y0
         > lit(',')
-        > expression_g(_r1)     // t0 (data only)
+        > expression_g(_r1)     // 3) t0 (data only)
         > lit(',')
-        > expression_g(_r1)     // ts (data only)
+        > expression_g(_r1)     // 4) ts (data only)
         > lit(',')
-        > expression_g(_r1)     // theta
+        > expression_g(_r1)     // 5) theta
         > lit(',')
-        > expression_g(_r1)     // x (data only)
+        > expression_g(_r1)     // 6) x (data only)
         > lit(',')
-        > expression_g(_r1)     // x_int (data only)
+        > expression_g(_r1)     // 7) x_int (data only)
         > lit(')')
           [validate_integrate_ode_f(_val, boost::phoenix::ref(var_map_),
                                     _pass, boost::phoenix::ref(error_msgs_))];
@@ -215,38 +215,40 @@ namespace stan {
         generalCptModel_control_r.name("expression");
         generalCptModel_control_r
          %= ( (string("generalCptModel_bdf") >> no_skip[!char_("a-zA-Z0-9_")])
-              | (string("generalCptModel_rk45") >> no_skip[!char_("a-zA-Z0-9_")])
-              | (string("generalCptModel_sa") >> no_skip[!char_("a-zA-Z0-9_")]) )
-         > lit('(')
-         > identifier_r        // system function name (function only)
+              | (string("generalCptModel_rk45")
+                >> no_skip[!char_("a-zA-Z0-9_")]) )
+         > lit('(')            // >> allows backtracking to non-control
+         > identifier_r        // 1) system function name (function only)
          > lit(',')
-         > expression_g(_r1)   // nCmt
+         > expression_g(_r1)   // 2) nCmt
          > lit(',')
-         > expression_g(_r1)   // pMatrix
+         > expression_g(_r1)   // 3) pMatrix
          > lit(',')
-         > expression_g(_r1)   // time
+         > expression_g(_r1)   // 4) time
          > lit(',')
-         > expression_g(_r1)   // amt
+         > expression_g(_r1)   // 5) amt
          > lit(',')
-         > expression_g(_r1)   // rate
+         > expression_g(_r1)   // 6) rate
          > lit(',')
-         > expression_g(_r1)   // ii
+         > expression_g(_r1)   // 7) ii
          > lit(',')
-         > expression_g(_r1)   // evid (data only)
+         > expression_g(_r1)   // 8) evid (data only)
          > lit(',')
-         > expression_g(_r1)   // cmt (data only)
+         > expression_g(_r1)   // 9) cmt (data only)
          > lit(',')
-         > expression_g(_r1)   // addl (data only)
+         > expression_g(_r1)   // 10) addl (data only)
          > lit(',')
-         > expression_g(_r1)   // ss (data only)
+         > expression_g(_r1)   // 11) ss (data only)
          > lit(',')
-         > expression_g(_r1)   // relative tolerance (data only)
+         > expression_g(_r1)   // 12) relative tolerance (data only)
          > lit(',')
-         > expression_g(_r1)   // absolute tolerance (data only)
+         > expression_g(_r1)   // 13) absolute tolerance (data only)
          > lit(',')
-         > expression_g(_r1)   // maximum number of steps
-         > lit(')') [validate_generalCptModel_control_f(_val, boost::phoenix::ref(var_map_),
-                                                      _pass, boost::phoenix::ref(error_msgs_))];
+         > expression_g(_r1)   // 14) maximum number of steps
+         > lit(')')
+           [validate_generalCptModel_control_f(_val,
+             boost::phoenix::ref(var_map_), _pass,
+             boost::phoenix::ref(error_msgs_))];
 
       factor_r.name("expression");
       factor_r =
@@ -277,7 +279,9 @@ namespace stan {
 
       fun_r.name("function and argument expressions");
       fun_r
-        %= (hold[identifier_r[is_prob_fun_f(_1, _pass)]] > prob_args_r(_r1))
+        %= (hold[identifier_r[is_prob_fun_f(_1, _pass)]]
+            >> &lit('(')
+            > prob_args_r(_r1))
         | (identifier_r >> args_r(_r1));
 
       identifier_r.name("identifier");
@@ -304,10 +308,11 @@ namespace stan {
         %= (lit('(') >> lit(')'))
         | (lit('(') >> (expression_g(_r1) % ',') >> lit(')'));
 
+      // mitzi: why no error message if array dim isn't int expr?
       dim_r.name("array dimension (integer expression)");
       dim_r
         %= expression_g(_r1)
-        >> eps[validate_int_expression_f(_val, _pass)];
+        >> eps[validate_int_expr_silent_f(_val, _pass)];
 
       dims_r.name("array dimensions");
       dims_r

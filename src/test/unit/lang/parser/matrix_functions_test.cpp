@@ -155,6 +155,10 @@ TEST(lang_parser, division_matrix_function_signatures) {
   test_parsable("function-signatures/math/matrix/matrix_division");
 }
 
+TEST(lang_parser, matrix_exp_matrix_function_signatures) {
+    test_parsable("function-signatures/math/matrix/matrix_exp");
+}
+
 TEST(lang_parser, max_matrix_function_signatures) {
   test_parsable("function-signatures/math/matrix/max");
 }

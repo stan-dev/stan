@@ -91,6 +91,9 @@ namespace stan {
     const int void_function_argument_origin_rng = 12;
 
     bool is_data_origin(const var_origin& vo);
+
+    bool is_fun_origin(const var_origin& vo);
+
     void print_var_origin(std::ostream& o, const var_origin& vo);
 
 
@@ -185,6 +188,7 @@ namespace stan {
                const expr_type& arg_type7);
       void add_nullary(const::std::string& name);
       void add_unary(const::std::string& name);
+      void add_unary_vectorized(const::std::string& name);
       void add_binary(const::std::string& name);
       void add_ternary(const::std::string& name);
       void add_quaternary(const::std::string& name);
@@ -202,6 +206,7 @@ namespace stan {
       bool has_user_defined_key(const std::string& name) const;
       std::set<std::string> key_set() const;
       bool has_key(const std::string& key) const;
+      bool discrete_first_arg(const std::string& name) const;
 
     private:
       function_signatures();
@@ -273,7 +278,7 @@ namespace stan {
       expression(const fun& expr);  // NOLINT(runtime/explicit)
       expression(const integrate_ode& expr);  // NOLINT(runtime/explicit)
       expression(const integrate_ode_control& expr);  // NOLINT
-      expression(const generalCptModel_control& expr);
+      expression(const generalCptModel_control& expr);  // NOLINT
       expression(const index_op& expr);  // NOLINT(runtime/explicit)
       expression(const index_op_sliced& expr);  // NOLINT(runtime/explicit)
       expression(const conditional_op& expr);  // NOLINT(runtime/explicit)
@@ -315,7 +320,7 @@ namespace stan {
       bool operator()(const variable& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const integrate_ode& x) const;  // NOLINT
       bool operator()(const integrate_ode_control& x) const;  // NOLINT
-      bool operator()(const generalCptModel_control& x) const;
+      bool operator()(const generalCptModel_control& x) const;  // NOLINT
       bool operator()(const fun& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const index_op& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const index_op_sliced& x) const;  // NOLINT
@@ -415,23 +420,23 @@ namespace stan {
                             const expression& abs_tol,
                             const expression& max_num_steps);
     };
-    
+
     struct generalCptModel_control {
       std::string integration_function_name_;
       std::string system_function_name_;
-      expression nCmt_; // number of compartments
-      expression pMatrix_; // matrix of parameters
-      expression time_; // time vector
-      expression amt_; // amount vector
-      expression rate_; // rate vector
-      expression ii_; // inter-dose interval vector
-      expression evid_; // event-type vector
-      expression cmt_; // compartment number vector
-      expression addl_; // additional dosing vector
-      expression ss_; // steady state vector
-      expression rel_tol_; // relative tolerance of cvode solver
-      expression abs_tol_; // absolute tolerance of cvode solver
-      expression max_num_steps_; // maximum number of steps of cvode solver
+      expression nCmt_;  // number of compartments
+      expression pMatrix_;  // parameters container
+      expression time_;
+      expression amt_;
+      expression rate_;
+      expression ii_;
+      expression evid_;
+      expression cmt_;
+      expression addl_;
+      expression ss_;
+      expression rel_tol_;  // relative tolerance
+      expression abs_tol_;  // absolute tolerance
+      expression max_num_steps_;  // max number of steps
       generalCptModel_control();
       generalCptModel_control(const std::string& integration_function_name,
                               const std::string& system_function_name,
@@ -448,7 +453,7 @@ namespace stan {
                               const expression& rel_tol,
                               const expression& abs_tol,
                               const expression& max_num_steps);
-      };
+    };
 
     struct fun {
       std::string name_;
@@ -488,6 +493,7 @@ namespace stan {
       expression false_val_;
       expr_type type_;
       bool has_var_;
+      var_origin var_origin_;
       conditional_op();
       conditional_op(const expression& cond,
                      const expression& true_val,
@@ -598,16 +604,20 @@ namespace stan {
       void infer_type();
     };
 
-
     struct base_var_decl {
       std::string name_;
       std::vector<expression> dims_;
       base_expr_type base_type_;
+      expression def_;
       base_var_decl();
       base_var_decl(const base_expr_type& base_type);  // NOLINT
       base_var_decl(const std::string& name,
                     const std::vector<expression>& dims,
                     const base_expr_type& base_type);
+      base_var_decl(const std::string& name,
+                    const std::vector<expression>& dims,
+                    const base_expr_type& base_type,
+                    const expression& def);
     };
 
     struct variable_map {
@@ -631,7 +641,8 @@ namespace stan {
       int_var_decl();
       int_var_decl(range const& range,
                    std::string const& name,
-                   std::vector<expression> const& dims);
+                   std::vector<expression> const& dims,
+                   expression const& def);
     };
 
 
@@ -640,7 +651,8 @@ namespace stan {
       double_var_decl();
       double_var_decl(range const& range,
                       std::string const& name,
-                      std::vector<expression> const& dims);
+                      std::vector<expression> const& dims,
+                      expression const& def);
     };
 
     struct unit_vector_var_decl : public base_var_decl {
@@ -682,7 +694,8 @@ namespace stan {
       vector_var_decl(range const& range,
                       expression const& M,
                       std::string const& name,
-                      std::vector<expression> const& dims);
+                      std::vector<expression> const& dims,
+                      expression const& def);
     };
 
     struct row_vector_var_decl : public base_var_decl {
@@ -692,7 +705,8 @@ namespace stan {
       row_vector_var_decl(range const& range,
                           expression const& N,
                           std::string const& name,
-                          std::vector<expression> const& dims);
+                          std::vector<expression> const& dims,
+                          expression const& def);
     };
 
     struct matrix_var_decl : public base_var_decl {
@@ -704,7 +718,8 @@ namespace stan {
                       expression const& M,
                       expression const& N,
                       std::string const& name,
-                      std::vector<expression> const& dims);
+                      std::vector<expression> const& dims,
+                      expression const& def);
     };
 
     struct cholesky_factor_var_decl : public base_var_decl {
@@ -779,6 +794,65 @@ namespace stan {
       base_var_decl operator()(const corr_matrix_var_decl& x) const;
     };
 
+    struct var_decl_dims_vis
+      : public boost::static_visitor<std::vector<expression> > {
+      var_decl_dims_vis();
+      std::vector<expression> operator()(const nil& x) const;
+      std::vector<expression> operator()(const int_var_decl& x) const;
+      std::vector<expression> operator()(const double_var_decl& x) const;
+      std::vector<expression> operator()(const vector_var_decl& x) const;
+      std::vector<expression> operator()(const row_vector_var_decl& x) const;
+      std::vector<expression> operator()(const matrix_var_decl& x) const;
+      std::vector<expression> operator()(const simplex_var_decl& x) const;
+      std::vector<expression> operator()(const unit_vector_var_decl& x) const;
+      std::vector<expression> operator()(const ordered_var_decl& x) const;
+      std::vector<expression> operator()(
+                                  const positive_ordered_var_decl& x) const;
+      std::vector<expression> operator()(
+                                  const cholesky_factor_var_decl& x) const;
+      std::vector<expression> operator()(const cholesky_corr_var_decl& x) const;
+      std::vector<expression> operator()(const cov_matrix_var_decl& x) const;
+      std::vector<expression> operator()(const corr_matrix_var_decl& x) const;
+    };
+
+    struct var_decl_has_def_vis
+      : public boost::static_visitor<bool> {
+      var_decl_has_def_vis();
+      bool operator()(const nil& x) const;
+      bool operator()(const int_var_decl& x) const;
+      bool operator()(const double_var_decl& x) const;
+      bool operator()(const vector_var_decl& x) const;
+      bool operator()(const row_vector_var_decl& x) const;
+      bool operator()(const matrix_var_decl& x) const;
+      bool operator()(const simplex_var_decl& x) const;
+      bool operator()(const unit_vector_var_decl& x) const;
+      bool operator()(const ordered_var_decl& x) const;
+      bool operator()(const positive_ordered_var_decl& x) const;
+      bool operator()(const cholesky_factor_var_decl& x) const;
+      bool operator()(const cholesky_corr_var_decl& x) const;
+      bool operator()(const cov_matrix_var_decl& x) const;
+      bool operator()(const corr_matrix_var_decl& x) const;
+    };
+
+    struct var_decl_def_vis
+      : public boost::static_visitor<expression> {
+      var_decl_def_vis();
+      expression operator()(const nil& x) const;
+      expression operator()(const int_var_decl& x) const;
+      expression operator()(const double_var_decl& x) const;
+      expression operator()(const vector_var_decl& x) const;
+      expression operator()(const row_vector_var_decl& x) const;
+      expression operator()(const matrix_var_decl& x) const;
+      expression operator()(const simplex_var_decl& x) const;
+      expression operator()(const unit_vector_var_decl& x) const;
+      expression operator()(const ordered_var_decl& x) const;
+      expression operator()(const positive_ordered_var_decl& x) const;
+      expression operator()(const cholesky_factor_var_decl& x) const;
+      expression operator()(const cholesky_corr_var_decl& x) const;
+      expression operator()(const cov_matrix_var_decl& x) const;
+      expression operator()(const corr_matrix_var_decl& x) const;
+    };
+
     struct var_decl {
       typedef boost::variant<boost::recursive_wrapper<nil>,
                          boost::recursive_wrapper<int_var_decl>,
@@ -795,9 +869,7 @@ namespace stan {
                          boost::recursive_wrapper<cov_matrix_var_decl>,
                          boost::recursive_wrapper<corr_matrix_var_decl> >
       var_decl_t;
-
       var_decl_t decl_;
-
       var_decl();
 
       // template <typename Decl>
@@ -820,6 +892,9 @@ namespace stan {
 
       std::string name() const;
       base_var_decl base_decl() const;
+      std::vector<expression> dims() const;
+      bool has_def() const;
+      expression def() const;
     };
 
     struct statement {
@@ -1030,10 +1105,12 @@ namespace stan {
       expression expr_;
       distribution dist_;
       range truncation_;
+      bool is_discrete_;
       sample();
       sample(expression& e,
              distribution& dist);
       bool is_ill_formed() const;
+      bool is_discrete() const;
     };
 
     struct assignment {
@@ -1203,6 +1280,7 @@ namespace stan {
     std::string strip_ccdf_suffix(const std::string& dist_fun);
 
     bool fun_name_exists(const std::string& name);
+
 
   }
 }

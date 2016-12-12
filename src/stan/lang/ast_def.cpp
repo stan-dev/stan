@@ -153,6 +153,7 @@ namespace stan {
         sigs_ = new function_signatures;
       return *sigs_;
     }
+
     void
     function_signatures::set_user_defined(const
                                           std::pair<std::string,
@@ -160,12 +161,14 @@ namespace stan {
                                           name_sig) {
       user_defined_set_.insert(name_sig);
     }
+
     bool
     function_signatures::is_user_defined(const std::pair<std::string,
                                                          function_signature_t>&
                                               name_sig) {
       return user_defined_set_.find(name_sig) != user_defined_set_.end();
     }
+
     bool function_signatures::is_defined(const std::string& name,
                                          const function_signature_t& sig) {
       if (sigs_map_.find(name) == sigs_map_.end())
@@ -175,6 +178,24 @@ namespace stan {
         if (sig.second  == sigs[i].second)
           return true;
       return false;
+    }
+
+    bool function_signatures::discrete_first_arg(const std::string& fun)
+      const {
+      using std::map;
+      using std::string;
+      using std::vector;
+      map<string, vector<function_signature_t> >::const_iterator it
+        = sigs_map_.find(fun);
+      if (it == sigs_map_.end())
+        return false;
+      const vector<function_signature_t> sigs = it->second;
+      for (size_t i = 0; i < sigs.size(); ++i) {
+        if (sigs[i].second.size() == 0
+            || sigs[i].second[0].base_type_ != INT_T)
+          return false;
+      }
+      return true;
     }
 
     void function_signatures::add(const std::string& name,
@@ -283,6 +304,16 @@ namespace stan {
     }
     void function_signatures::add_unary(const::std::string& name) {
       add(name, DOUBLE_T, DOUBLE_T);
+    }
+    void function_signatures::add_unary_vectorized(const::std::string&
+    name) {
+      for (size_t i = 0; i < 8; ++i) {
+        add(name, expr_type(DOUBLE_T, i), expr_type(INT_T, i));
+        add(name, expr_type(DOUBLE_T, i), expr_type(DOUBLE_T, i));
+        add(name, expr_type(VECTOR_T, i), expr_type(VECTOR_T, i));
+        add(name, expr_type(ROW_VECTOR_T, i), expr_type(ROW_VECTOR_T, i));
+        add(name, expr_type(MATRIX_T, i), expr_type(MATRIX_T, i));
+      }
     }
     void function_signatures::add_binary(const::std::string& name) {
       add(name, DOUBLE_T, DOUBLE_T, DOUBLE_T);
@@ -701,8 +732,9 @@ namespace stan {
     expression_type_vis::operator()(const integrate_ode_control& e) const {
       return expr_type(DOUBLE_T, 2);
     }
-    expr_type expression_type_vis::operator()(const generalCptModel_control& e) const {
-          return expr_type(MATRIX_T);
+    expr_type
+    expression_type_vis::operator()(const generalCptModel_control& e) const {
+      return expr_type(MATRIX_T);
     }
     expr_type expression_type_vis::operator()(const fun& e) const {
       return e.type_;
@@ -742,7 +774,8 @@ namespace stan {
     expression::expression(const variable& expr) : expr_(expr) { }
     expression::expression(const integrate_ode& expr) : expr_(expr) { }
     expression::expression(const integrate_ode_control& expr) : expr_(expr) { }
-    expression::expression(const generalCptModel_control& expr) : expr_(expr) { }
+    expression::expression(const generalCptModel_control& expr)
+      : expr_(expr) { }
     expression::expression(const fun& expr) : expr_(expr) { }
     expression::expression(const index_op& expr) : expr_(expr) { }
     expression::expression(const index_op_sliced& expr) : expr_(expr) { }
@@ -761,7 +794,7 @@ namespace stan {
       return sum;
     }
 
-    printable::printable() : printable_("") { }
+    printable::printable() : printable_(std::string()) { }
     printable::printable(const expression& expr) : printable_(expr) { }
     printable::printable(const std::string& msg) : printable_(msg) { }
     printable::printable(const printable_t& printable)
@@ -816,7 +849,7 @@ namespace stan {
         || boost::apply_visitor(*this, e.amt_.expr_))
         || boost::apply_visitor(*this, e.rate_.expr_))
         || boost::apply_visitor(*this, e.ii_.expr_);
-      }
+    }
     bool contains_var::operator()(const index_op& e) const {
       return boost::apply_visitor(*this, e.expr_.expr_);
     }
@@ -906,7 +939,8 @@ namespace stan {
       return boost::apply_visitor(*this, e.y0_.expr_)
         || boost::apply_visitor(*this, e.theta_.expr_);
     }
-    bool contains_nonparam_var::operator()(const generalCptModel_control& e) const {
+    bool contains_nonparam_var::operator()(const generalCptModel_control& e)
+      const {
       // IS THIS USEFUL?
       return ((((boost::apply_visitor(*this, e.pMatrix_.expr_)
                   || boost::apply_visitor(*this, e.time_.expr_))
@@ -1111,22 +1145,22 @@ namespace stan {
 
     generalCptModel_control::generalCptModel_control() { }
     generalCptModel_control::generalCptModel_control(
-                                               const std::string& integration_function_name,
-                                               const std::string& system_function_name,
-                                               const expression& nCmt,
-                                               const expression& pMatrix,
-                                               const expression& time,
-                                               const expression& amt,
-                                               const expression& rate,
-                                               const expression& ii,
-                                               const expression& evid,
-                                               const expression& cmt,
-                                               const expression& addl,
-                                               const expression& ss,
-                                               const expression& rel_tol,
-                                               const expression& abs_tol,
-                                               const expression& max_num_steps)
-      : integration_function_name_(integration_function_name), 
+                               const std::string& integration_function_name,
+                               const std::string& system_function_name,
+                               const expression& nCmt,
+                               const expression& pMatrix,
+                               const expression& time,
+                               const expression& amt,
+                               const expression& rate,
+                               const expression& ii,
+                               const expression& evid,
+                               const expression& cmt,
+                               const expression& addl,
+                               const expression& ss,
+                               const expression& rel_tol,
+                               const expression& abs_tol,
+                               const expression& max_num_steps)
+      : integration_function_name_(integration_function_name),
       system_function_name_(system_function_name),
       nCmt_(nCmt),
       pMatrix_(pMatrix),
@@ -1141,7 +1175,7 @@ namespace stan {
       rel_tol_(rel_tol),
       abs_tol_(abs_tol),
       max_num_steps_(max_num_steps) {
-      }
+    }
 
     fun::fun() { }
     fun::fun(std::string const& name,
@@ -1304,6 +1338,15 @@ namespace stan {
       return vo == data_origin || vo == transformed_data_origin;
     }
 
+    bool is_fun_origin(const var_origin& vo) {
+      return vo == function_argument_origin
+        || vo == function_argument_origin_lp
+        || vo == function_argument_origin_rng
+        || vo == void_function_argument_origin
+        || vo == void_function_argument_origin_lp
+        || vo == void_function_argument_origin_rng;
+    }
+
     void print_var_origin(std::ostream& o, const var_origin& vo) {
       if (vo == model_name_origin)
         o << "model name";
@@ -1344,31 +1387,42 @@ namespace stan {
                                  const std::vector<expression>& dims,
                                  const base_expr_type& base_type)
       : name_(name), dims_(dims), base_type_(base_type) {  }
+    base_var_decl::base_var_decl(const std::string& name,
+                                 const std::vector<expression>& dims,
+                                 const base_expr_type& base_type,
+                                 const expression& def)
+      : name_(name), dims_(dims), base_type_(base_type), def_(def) {  }
 
     bool variable_map::exists(const std::string& name) const {
       return map_.find(name) != map_.end();
     }
+
     base_var_decl variable_map::get(const std::string& name) const {
       if (!exists(name))
         throw std::invalid_argument("variable does not exist");
       return map_.find(name)->second.first;
     }
+
     base_expr_type variable_map::get_base_type(const std::string& name) const {
       return get(name).base_type_;
     }
+
     size_t variable_map::get_num_dims(const std::string& name) const {
       return get(name).dims_.size();
     }
+
     var_origin variable_map::get_origin(const std::string& name) const {
       if (!exists(name))
         throw std::invalid_argument("variable does not exist");
       return map_.find(name)->second.second;
     }
+
     void variable_map::add(const std::string& name,
                            const base_var_decl& base_decl,
                            const var_origin& vo) {
       map_[name] = range_t(base_decl, vo);
     }
+
     void variable_map::remove(const std::string& name) {
       map_.erase(name);
     }
@@ -1376,24 +1430,23 @@ namespace stan {
     int_var_decl::int_var_decl()
       : base_var_decl(INT_T)
     { }
-
     int_var_decl::int_var_decl(range const& range,
                                std::string const& name,
-                               std::vector<expression> const& dims)
-      : base_var_decl(name, dims, INT_T),
+                               std::vector<expression> const& dims,
+                               expression const& def)
+      : base_var_decl(name, dims, INT_T, def),
         range_(range)
     { }
-
 
 
     double_var_decl::double_var_decl()
       : base_var_decl(DOUBLE_T)
     { }
-
     double_var_decl::double_var_decl(range const& range,
                                      std::string const& name,
-                                     std::vector<expression> const& dims)
-      : base_var_decl(name, dims, DOUBLE_T),
+                                     std::vector<expression> const& dims,
+                                     expression const& def)
+      : base_var_decl(name, dims, DOUBLE_T, def),
         range_(range)
     { }
 
@@ -1437,43 +1490,45 @@ namespace stan {
     positive_ordered_var_decl::positive_ordered_var_decl(expression const& K,
                            std::string const& name,
                            std::vector<expression> const& dims)
-        : base_var_decl(name, dims, VECTOR_T),
-          K_(K) {
-      }
+      : base_var_decl(name, dims, VECTOR_T),
+        K_(K) {
+    }
 
     vector_var_decl::vector_var_decl() : base_var_decl(VECTOR_T) { }
 
     vector_var_decl::vector_var_decl(range const& range,
                                      expression const& M,
                                      std::string const& name,
-                                     std::vector<expression> const& dims)
-        : base_var_decl(name, dims, VECTOR_T),
-          range_(range),
-          M_(M) {
+                                     std::vector<expression> const& dims,
+                                     expression const& def)
+      : base_var_decl(name, dims, VECTOR_T, def),
+        range_(range),
+        M_(M) {
     }
 
     row_vector_var_decl::row_vector_var_decl() : base_var_decl(ROW_VECTOR_T) { }
     row_vector_var_decl::row_vector_var_decl(range const& range,
-                                        expression const& N,
-                                        std::string const& name,
-                                        std::vector<expression> const& dims)
-        : base_var_decl(name, dims, ROW_VECTOR_T),
-          range_(range),
-          N_(N) {
+                                           expression const& N,
+                                           std::string const& name,
+                                           std::vector<expression> const& dims,
+                                           expression const& def)
+      : base_var_decl(name, dims, ROW_VECTOR_T, def),
+        range_(range),
+        N_(N) {
     }
 
     matrix_var_decl::matrix_var_decl() : base_var_decl(MATRIX_T) { }
     matrix_var_decl::matrix_var_decl(range const& range,
-                      expression const& M,
-                      expression const& N,
-                      std::string const& name,
-                      std::vector<expression> const& dims)
-        : base_var_decl(name, dims, MATRIX_T),
-          range_(range),
-          M_(M),
-          N_(N) {
+                                     expression const& M,
+                                     expression const& N,
+                                     std::string const& name,
+                                     std::vector<expression> const& dims,
+                                     expression const& def)
+      : base_var_decl(name, dims, MATRIX_T, def),
+        range_(range),
+        M_(M),
+        N_(N) {
     }
-
 
     cholesky_factor_var_decl::cholesky_factor_var_decl()
       : base_var_decl(MATRIX_T) {
@@ -1513,8 +1568,6 @@ namespace stan {
         : base_var_decl(name, dims, MATRIX_T),
           K_(K) {
     }
-
-
 
 
     name_vis::name_vis() { }
@@ -1619,6 +1672,183 @@ namespace stan {
       return x.base_type_;
     }
 
+    var_decl_dims_vis::var_decl_dims_vis() { }
+    std::vector<expression> var_decl_dims_vis::operator()(const nil& /* x */)
+      const {
+      return std::vector<expression>();  // should not be called
+    }
+    std::vector<expression> var_decl_dims_vis::operator()(const int_var_decl& x)
+      const {
+      return x.dims_;
+    }
+    std::vector<expression> var_decl_dims_vis::operator()(
+                                          const double_var_decl& x)
+      const {
+      return x.dims_;
+    }
+    std::vector<expression> var_decl_dims_vis::operator()(
+                                          const vector_var_decl& x)
+      const {
+      return x.dims_;
+    }
+    std::vector<expression> var_decl_dims_vis::operator()(
+                                          const row_vector_var_decl& x) const {
+      return x.dims_;
+    }
+    std::vector<expression> var_decl_dims_vis::operator()(
+                                          const matrix_var_decl& x)
+      const {
+      return x.dims_;
+    }
+    std::vector<expression> var_decl_dims_vis::operator()(
+                                          const unit_vector_var_decl& x) const {
+      return x.dims_;
+    }
+    std::vector<expression> var_decl_dims_vis::operator()(
+                                          const simplex_var_decl& x) const {
+      return x.dims_;
+    }
+    std::vector<expression> var_decl_dims_vis::operator()(
+                                          const ordered_var_decl& x) const {
+      return x.dims_;
+    }
+    std::vector<expression> var_decl_dims_vis::operator()(
+                                     const positive_ordered_var_decl& x) const {
+      return x.dims_;
+    }
+    std::vector<expression> var_decl_dims_vis::operator()(
+                                     const cholesky_factor_var_decl& x) const {
+      return x.dims_;
+    }
+    std::vector<expression> var_decl_dims_vis::operator()(
+                                     const cholesky_corr_var_decl& x) const {
+      return x.dims_;
+    }
+    std::vector<expression> var_decl_dims_vis::operator()(
+                                     const cov_matrix_var_decl& x) const {
+      return x.dims_;
+    }
+    std::vector<expression> var_decl_dims_vis::operator()(
+                                     const corr_matrix_var_decl& x) const {
+      return x.dims_;
+    }
+
+    var_decl_has_def_vis::var_decl_has_def_vis() { }
+    bool var_decl_has_def_vis::operator()(const nil& /* x */)
+      const {
+      return false;  // should not be called
+    }
+    bool var_decl_has_def_vis::operator()(const int_var_decl& x)
+      const {
+      return !is_nil(x.def_);
+    }
+    bool var_decl_has_def_vis::operator()(const double_var_decl& x)
+      const {
+      return !is_nil(x.def_);
+    }
+    bool var_decl_has_def_vis::operator()(const vector_var_decl& x)
+      const {
+      return !is_nil(x.def_);
+    }
+    bool var_decl_has_def_vis::operator()(
+                                    const row_vector_var_decl& x) const {
+      return !is_nil(x.def_);
+    }
+    bool var_decl_has_def_vis::operator()(const matrix_var_decl& x)
+      const {
+      return !is_nil(x.def_);
+    }
+    bool var_decl_has_def_vis::operator()(
+                                    const unit_vector_var_decl& x) const {
+      return !is_nil(x.def_);
+    }
+    bool var_decl_has_def_vis::operator()(
+                                     const simplex_var_decl& x) const {
+      return !is_nil(x.def_);
+    }
+    bool var_decl_has_def_vis::operator()(
+                                     const ordered_var_decl& x) const {
+      return !is_nil(x.def_);
+    }
+    bool var_decl_has_def_vis::operator()(
+                             const positive_ordered_var_decl& x) const {
+      return !is_nil(x.def_);
+    }
+    bool var_decl_has_def_vis::operator()(
+                                     const cholesky_factor_var_decl& x) const {
+      return !is_nil(x.def_);
+    }
+    bool var_decl_has_def_vis::operator()(
+                                     const cholesky_corr_var_decl& x) const {
+      return !is_nil(x.def_);
+    }
+    bool var_decl_has_def_vis::operator()(
+                                     const cov_matrix_var_decl& x) const {
+      return !is_nil(x.def_);
+    }
+    bool var_decl_has_def_vis::operator()(
+                                     const corr_matrix_var_decl& x) const {
+      return !is_nil(x.def_);
+    }
+
+
+    var_decl_def_vis::var_decl_def_vis() { }
+    expression var_decl_def_vis::operator()(const nil& /* x */)
+      const {
+      return expression();  // should not be called
+    }
+    expression var_decl_def_vis::operator()(const int_var_decl& x)
+      const {
+      return x.def_;
+    }
+    expression var_decl_def_vis::operator()(const double_var_decl& x)
+      const {
+      return x.def_;
+    }
+    expression var_decl_def_vis::operator()(const vector_var_decl& x)
+      const {
+      return x.def_;
+    }
+    expression var_decl_def_vis::operator()(
+                                   const row_vector_var_decl& x) const {
+      return x.def_;
+    }
+    expression var_decl_def_vis::operator()(const matrix_var_decl& x)
+      const {
+      return x.def_;
+    }
+    expression var_decl_def_vis::operator()(
+                                   const unit_vector_var_decl& x) const {
+     return x.def_;
+    }
+    expression var_decl_def_vis::operator()(
+                                   const simplex_var_decl& x) const {
+      return x.def_;
+    }
+    expression var_decl_def_vis::operator()(
+                                   const ordered_var_decl& x) const {
+      return x.def_;
+    }
+    expression var_decl_def_vis::operator()(
+                                   const positive_ordered_var_decl& x) const {
+      return x.def_;
+    }
+    expression var_decl_def_vis::operator()(
+                                   const cholesky_factor_var_decl& x) const {
+      return x.def_;
+    }
+    expression var_decl_def_vis::operator()(
+                                   const cholesky_corr_var_decl& x) const {
+      return x.def_;
+    }
+    expression var_decl_def_vis::operator()(
+                                   const cov_matrix_var_decl& x) const {
+      return x.def_;
+    }
+    expression var_decl_def_vis::operator()(
+                                   const corr_matrix_var_decl& x) const {
+      return x.def_;
+    }
 
 
    // can't template out in .cpp file
@@ -1646,6 +1876,18 @@ namespace stan {
 
     base_var_decl var_decl::base_decl() const {
       return boost::apply_visitor(var_decl_base_type_vis(), decl_);
+    }
+
+    std::vector<expression> var_decl::dims() const {
+      return boost::apply_visitor(var_decl_dims_vis(), decl_);
+    }
+
+    bool var_decl::has_def() const {
+      return boost::apply_visitor(var_decl_has_def_vis(), decl_);
+    }
+
+    expression var_decl::def() const {
+      return boost::apply_visitor(var_decl_def_vis(), decl_);
     }
 
     statement::statement() : statement_(nil()) { }
@@ -1815,6 +2057,9 @@ namespace stan {
                && expr_.expression_type()
                   != truncation_.high_.expression_type());
     }
+    bool sample::is_discrete() const {
+      return is_discrete_;
+    }
 
     assignment::assignment() {
     }
@@ -1856,7 +2101,7 @@ namespace stan {
       return false;  // no refs persist out of integrate_ode_control() call
     }
     bool var_occurs_vis::operator()(const generalCptModel_control& e) const {
-        return false;
+      return false;  // no refs persist out of generalCptModel_control() call
     }
     bool var_occurs_vis::operator()(const index_op& e) const {
       // refs only persist out of expression, not indexes
