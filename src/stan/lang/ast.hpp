@@ -7,12 +7,6 @@
 #include <stan/lang/ast/var_origin.hpp>
 #include <stan/lang/ast/variable_map.hpp>
 
-#include <stan/lang/ast/fun/fun_name_exists.hpp>
-#include <stan/lang/ast/fun/get_cdf.hpp>
-#include <stan/lang/ast/fun/get_ccdf.hpp>
-#include <stan/lang/ast/fun/get_prob_fun.hpp>
-#include <stan/lang/ast/fun/has_ccdf_suffix.hpp>
-#include <stan/lang/ast/fun/has_cdf_suffix.hpp>
 #include <stan/lang/ast/fun/has_non_param_var_vis.hpp>
 #include <stan/lang/ast/fun/has_prob_fun_suffix.hpp>
 #include <stan/lang/ast/fun/has_var_vis.hpp>
@@ -31,26 +25,32 @@
 #include <stan/lang/ast/fun/var_occurs_vis.hpp>
 
 #include <stan/lang/ast/fun/ends_with.hpp>
+#include <stan/lang/ast/fun/fun_name_exists.hpp>
 #include <stan/lang/ast/fun/generate_expression.hpp>
+#include <stan/lang/ast/fun/get_cdf.hpp>
+#include <stan/lang/ast/fun/get_ccdf.hpp>
+#include <stan/lang/ast/fun/get_prob_fun.hpp>
+#include <stan/lang/ast/fun/has_ccdf_suffix.hpp>
+#include <stan/lang/ast/fun/has_cdf_suffix.hpp>
 #include <stan/lang/ast/fun/has_lp_suffix.hpp>
 #include <stan/lang/ast/fun/has_non_param_var.hpp>
 #include <stan/lang/ast/fun/has_rng_suffix.hpp>
 #include <stan/lang/ast/fun/has_var.hpp>
 #include <stan/lang/ast/fun/indexed_type.hpp>
 #include <stan/lang/ast/fun/infer_type_indexing.hpp>
+#include <stan/lang/ast/fun/is_assignable.hpp>
 #include <stan/lang/ast/fun/is_data_origin.hpp>
 #include <stan/lang/ast/fun/is_fun_origin.hpp>
-#include <stan/lang/ast/fun/is_user_defined.hpp>
-#include <stan/lang/ast/fun/is_user_defined_prob_function.hpp>
-#include <stan/lang/ast/fun/print_var_origin.hpp>
-#include <stan/lang/ast/fun/total_dims.hpp>
-#include <stan/lang/ast/fun/write_base_expr_type.hpp>
-#include <stan/lang/ast/fun/is_assignable.hpp>
 #include <stan/lang/ast/fun/is_multi_index.hpp>
 #include <stan/lang/ast/fun/is_nil.hpp>
+#include <stan/lang/ast/fun/is_user_defined.hpp>
+#include <stan/lang/ast/fun/is_user_defined_prob_function.hpp>
 #include <stan/lang/ast/fun/operator_stream_expr_type.hpp>
+#include <stan/lang/ast/fun/print_var_origin.hpp>
 #include <stan/lang/ast/fun/promote_primitive.hpp>
 #include <stan/lang/ast/fun/returns_type.hpp>
+#include <stan/lang/ast/fun/total_dims.hpp>
+#include <stan/lang/ast/fun/write_base_expr_type.hpp>
 
 #include <stan/lang/ast/sigs/function_signature_t.hpp>
 #include <stan/lang/ast/sigs/function_signatures.hpp>
@@ -93,8 +93,8 @@
 #include <stan/lang/ast/node/omni_idx.hpp>
 #include <stan/lang/ast/node/ordered_var_decl.hpp>
 #include <stan/lang/ast/node/positive_ordered_var_decl.hpp>
-#include <stan/lang/ast/node/printable.hpp>
 #include <stan/lang/ast/node/print_statement.hpp>
+#include <stan/lang/ast/node/printable.hpp>
 #include <stan/lang/ast/node/program.hpp>
 #include <stan/lang/ast/node/range.hpp>
 #include <stan/lang/ast/node/reject_statement.hpp>
