@@ -357,19 +357,19 @@ namespace stan {
 
         generate_expression(fx.rate_, o_);
         o_ << ", ";
-        
+
         generate_expression(fx.ii_, o_);
         o_ << ", ";
-        
+
         generate_expression(fx.evid_, o_);
         o_ << ", ";
-        
+
         generate_expression(fx.cmt_, o_);
         o_ << ", ";
-        
+
         generate_expression(fx.addl_, o_);
         o_ << ", ";
-        
+
         generate_expression(fx.ss_, o_);
         o_ << ", ";
 

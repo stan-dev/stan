@@ -1556,14 +1556,14 @@ namespace stan {
     }
     boost::phoenix::function<validate_integrate_ode_control>
     validate_integrate_ode_control_f;
-    
+
     template <class T>
     void validate_generalCptModel(const T& ode_fun,
                                   const variable_map& var_map,
                                   bool& pass,
                                   std::ostream& error_msgs) {
       pass = true;
-          
+
       // test function argument type
       expr_type sys_result_type(DOUBLE_T, 1);
       std::vector<expr_type> sys_arg_types;
@@ -1713,7 +1713,7 @@ namespace stan {
                          << ". ";
               pass = false;
           }
-          
+
           // test data-only variables do not have parameters (int locals OK)
           if (has_var(ode_fun.nCmt_, var_map)) {
               error_msgs << "second argument to "
@@ -1772,7 +1772,7 @@ namespace stan {
               pass = false;
           }
     }
-    
+
     void validate_generalCptModel_control::operator()(
       const generalCptModel_control& ode_fun,
       const variable_map& var_map,
@@ -2372,7 +2372,7 @@ namespace stan {
                 && boost::apply_visitor(*this, x.amt_.expr_))
                 && boost::apply_visitor(*this, x.rate_.expr_))
                 && boost::apply_visitor(*this, x.ii_.expr_);
-    } // include all arguments with a template
+    }  // include all arguments with a template
     bool data_only_expression::operator()(const fun& x) const {
       for (size_t i = 0; i < x.args_.size(); ++i)
         if (!boost::apply_visitor(*this, x.args_[i].expr_))

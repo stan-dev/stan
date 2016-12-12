@@ -555,7 +555,7 @@ namespace stan {
     };
     extern boost::phoenix::function<validate_integrate_ode_control>
     validate_integrate_ode_control_f;
-    
+
     // called from: term_grammar
     struct validate_generalCptModel_control
       : public phoenix_functor_quaternary {

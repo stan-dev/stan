@@ -83,7 +83,7 @@ namespace stan {
                               integrate_ode_control(var_origin),
                               whitespace_grammar<Iterator> >
       integrate_ode_control_r;
-      
+
       boost::spirit::qi::rule<Iterator,
                               generalCptModel_control(var_origin),
                               whitespace_grammar<Iterator> >

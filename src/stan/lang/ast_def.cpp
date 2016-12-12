@@ -774,7 +774,8 @@ namespace stan {
     expression::expression(const variable& expr) : expr_(expr) { }
     expression::expression(const integrate_ode& expr) : expr_(expr) { }
     expression::expression(const integrate_ode_control& expr) : expr_(expr) { }
-    expression::expression(const generalCptModel_control& expr) : expr_(expr) { }
+    expression::expression(const generalCptModel_control& expr)
+      : expr_(expr) { }
     expression::expression(const fun& expr) : expr_(expr) { }
     expression::expression(const index_op& expr) : expr_(expr) { }
     expression::expression(const index_op_sliced& expr) : expr_(expr) { }
@@ -848,7 +849,7 @@ namespace stan {
         || boost::apply_visitor(*this, e.amt_.expr_))
         || boost::apply_visitor(*this, e.rate_.expr_))
         || boost::apply_visitor(*this, e.ii_.expr_);
-    }    
+    }
     bool contains_var::operator()(const index_op& e) const {
       return boost::apply_visitor(*this, e.expr_.expr_);
     }
@@ -946,7 +947,7 @@ namespace stan {
                   || boost::apply_visitor(*this, e.amt_.expr_))
                   || boost::apply_visitor(*this, e.rate_.expr_))
                   || boost::apply_visitor(*this, e.ii_.expr_)
-                  || boost::apply_visitor(*this, e.nCmt_.expr_));      
+                  || boost::apply_visitor(*this, e.nCmt_.expr_));
       }
     bool contains_nonparam_var::operator()(const fun& e) const {
       // any function applied to non-linearly transformed var
@@ -1144,22 +1145,22 @@ namespace stan {
 
     generalCptModel_control::generalCptModel_control() { }
     generalCptModel_control::generalCptModel_control(
-                                               const std::string& integration_function_name,
-                                               const std::string& system_function_name,
-                                               const expression& nCmt,
-                                               const expression& pMatrix,
-                                               const expression& time,
-                                               const expression& amt,
-                                               const expression& rate,
-                                               const expression& ii,
-                                               const expression& evid,
-                                               const expression& cmt,
-                                               const expression& addl,
-                                               const expression& ss,
-                                               const expression& rel_tol,
-                                               const expression& abs_tol,
-                                               const expression& max_num_steps)
-      : integration_function_name_(integration_function_name), 
+                               const std::string& integration_function_name,
+                               const std::string& system_function_name,
+                               const expression& nCmt,
+                               const expression& pMatrix,
+                               const expression& time,
+                               const expression& amt,
+                               const expression& rate,
+                               const expression& ii,
+                               const expression& evid,
+                               const expression& cmt,
+                               const expression& addl,
+                               const expression& ss,
+                               const expression& rel_tol,
+                               const expression& abs_tol,
+                               const expression& max_num_steps)
+      : integration_function_name_(integration_function_name),
       system_function_name_(system_function_name),
       nCmt_(nCmt),
       pMatrix_(pMatrix),

@@ -215,7 +215,8 @@ namespace stan {
         generalCptModel_control_r.name("expression");
         generalCptModel_control_r
          %= ( (string("generalCptModel_bdf") >> no_skip[!char_("a-zA-Z0-9_")])
-              | (string("generalCptModel_rk45") >> no_skip[!char_("a-zA-Z0-9_")]) )
+              | (string("generalCptModel_rk45")
+                >> no_skip[!char_("a-zA-Z0-9_")]) )
          > lit('(')            // >> allows backtracking to non-control
          > identifier_r        // 1) system function name (function only)
          > lit(',')
@@ -245,9 +246,9 @@ namespace stan {
          > lit(',')
          > expression_g(_r1)   // 14) maximum number of steps
          > lit(')')
-           [validate_generalCptModel_control_f(_val, boost::phoenix::ref(var_map_),
-                                               _pass,
-                                               boost::phoenix::ref(error_msgs_))];
+           [validate_generalCptModel_control_f(_val,
+             boost::phoenix::ref(var_map_), _pass,
+             boost::phoenix::ref(error_msgs_))];
 
       factor_r.name("expression");
       factor_r =
