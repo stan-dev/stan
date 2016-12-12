@@ -39,18 +39,20 @@ transformed data {
 
   x_data = generalCptModel_rk45(ode, nCmt, theta_data, time, amt, rate, ii, evid,
     cmt, addl, ss, 1e-8, 1e-8, 1e8);
-  // x_data = generalCptModel_rk45(sho, nCmt, theta_data[0], time, amt, rate, ii, 
-  //   evid, cmt, addl, ss, 1e-8, 1e-8, 1e8);
-  
+  x_data = generalCptModel_rk45(ode, nCmt, theta_data[0], time, amt, rate, ii, 
+     evid, cmt, addl, ss, 1e-8, 1e-8, 1e8);
+
   x_data = generalCptModel_bdf(ode, nCmt, theta_data, time, amt, rate, ii, evid,
+    cmt, addl, ss, 1e-8, 1e-8, 1e8);
+  x_data = generalCptModel_bdf(ode, nCmt, theta_data[0], time, amt, rate, ii, evid,
     cmt, addl, ss, 1e-8, 1e-8, 1e8);
 }
 
 parameters {
   real y_p;
 
-real y0_p[2];
-real theta_p[1];
+  real y0_p[2];
+  real theta_p[1];
 }
 
 transformed parameters {
@@ -60,10 +62,12 @@ transformed parameters {
 
   x_para = generalCptModel_rk45(ode, nCmt, theta_parm, time, amt, rate, ii, evid,
     cmt, addl, ss, 1e-8, 1e-8, 1e8);
-  // x_para = generalCptModel_rk45(ode, nCmt, theta_parm[0], time, amt, rate, ii, 
-  //   evid, cmt, addl, ss, 1e-8, 1e-8, 1e8);
-  
+  x_para = generalCptModel_rk45(ode, nCmt, theta_parm[0], time, amt, rate, ii, evid,
+    cmt, addl, ss, 1e-8, 1e-8, 1e8);
+
   x_para = generalCptModel_bdf(ode, nCmt, theta_parm, time, amt, rate, ii, evid,
+    cmt, addl, ss, 1e-8, 1e-8, 1e8);
+  x_para = generalCptModel_bdf(ode, nCmt, theta_parm[0], time, amt, rate, ii, evid,
     cmt, addl, ss, 1e-8, 1e-8, 1e8);
 }
 

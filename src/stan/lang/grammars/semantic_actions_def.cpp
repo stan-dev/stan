@@ -1592,10 +1592,11 @@ namespace stan {
                    << ". ";
         pass = false;
       }
-      if (ode_fun.pMatrix_.expression_type() != expr_type(DOUBLE_T, 2)) {
+      if ((ode_fun.pMatrix_.expression_type() != expr_type(DOUBLE_T, 2))
+        && (ode_fun.pMatrix_.expression_type() != expr_type(DOUBLE_T, 1))) {
         error_msgs << "third argument to "
                    << ode_fun.integration_function_name_
-                   << " must be type real[ , ]"
+                   << " must be type real[ ] or real[ , ]"
                    << " for parameter matrix"
                    << "; found type="
                    << ode_fun.pMatrix_.expression_type()
