@@ -217,7 +217,8 @@ namespace stan {
       printable_r.name("printable");
       printable_r
         %= printable_string_r
-        | expression_g(_r1);
+        | expression_g(_r1)
+          [non_void_expression_f(_1, _pass, boost::phoenix::ref(error_msgs_))];
 
       printable_string_r.name("printable quoted string");
       printable_string_r

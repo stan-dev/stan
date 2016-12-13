@@ -807,6 +807,11 @@ namespace stan {
     };
     extern boost::phoenix::function<validate_in_loop> validate_in_loop_f;
 
+    struct non_void_expression : public phoenix_functor_ternary {
+      void operator()(const expression& e, bool& pass,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<non_void_expression> non_void_expression_f;
   }
 }
 #endif

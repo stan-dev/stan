@@ -2619,6 +2619,17 @@ namespace stan {
     }
     boost::phoenix::function<validate_in_loop> validate_in_loop_f;
 
+    void non_void_expression::operator()(const expression& e, bool& pass,
+                                         std::ostream& error_msgs) const {
+      // ill-formed shouldn't be possible, but just in case
+      pass = e.expression_type().type() != VOID_T
+        && e.expression_type().type() != ILL_FORMED_T;
+      if (!pass)
+        error_msgs << "ERROR:  expected printable (non-void) expression."
+                   << std::endl;
+    }
+    boost::phoenix::function<non_void_expression> non_void_expression_f;
+
   }
 }
 
