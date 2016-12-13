@@ -155,6 +155,8 @@ namespace stan {
     template void assign_lhs::operator()(expression&,
                                          const integrate_ode_control&)
       const;
+    template void assign_lhs::operator()(array_expr&,
+                                         const array_expr&) const;
     template void assign_lhs::operator()(int&, const int&) const;
     template void assign_lhs::operator()(size_t&, const size_t&) const;
     template void assign_lhs::operator()(statement&, const statement&) const;
@@ -1683,6 +1685,55 @@ namespace stan {
     }
     boost::phoenix::function<set_fun_type_named> set_fun_type_named_f;
 
+    void set_array_expr_type::operator()(expression& e,
+                      array_expr& array_expr,
+                      const var_origin& var_origin,
+                      bool& pass,
+                      const variable_map& var_map,
+                      std::ostream& error_msgs) const {
+      if (array_expr.args_.size() == 0) {
+        // shouldn't occur, because of % operator used to construct it
+        error_msgs << "array expression size 0, but must be > 0";
+        array_expr.type_ = expr_type(ILL_FORMED_T);
+        pass = false;
+        return;
+      }
+      expr_type et;
+      et = array_expr.args_[0].expression_type();
+      for (size_t i = 1; i < array_expr.args_.size(); ++i) {
+        expr_type et_next;
+        et_next = array_expr.args_[i].expression_type();
+        if (et.num_dims_ != et_next.num_dims_) {
+          error_msgs << "expressions for elements of array must have"
+                     << " same array sizes; found"
+                     << " previous type=" << et
+                     << "; type at position " << i << "=" << et_next;
+          array_expr.type_ = expr_type(ILL_FORMED_T);
+          pass = false;
+          return;
+        }
+        if ((et.base_type_ == INT_T && et_next.base_type_ == DOUBLE_T)
+            || (et.base_type_ == DOUBLE_T && et_next.base_type_ == INT_T)) {
+          et.base_type_ = DOUBLE_T;
+        } else if (et.base_type_ != et_next.base_type_) {
+          error_msgs << "expressions for elements of array must have"
+                     << " the same or promotable types; found"
+                     << " previous type=" << et
+                     << "; type at position " << i << "=" << et_next;
+          array_expr.type_ = expr_type(ILL_FORMED_T);
+          pass = false;
+          return;
+        }
+      }
+      ++et.num_dims_;
+      array_expr.type_ = et;
+      array_expr.var_origin_ = var_origin;
+      array_expr.has_var_ = has_var(array_expr, var_map);
+      e = array_expr;
+      pass = true;
+    }
+    boost::phoenix::function<set_array_expr_type> set_array_expr_type_f;
+
     void exponentiation_expr::operator()(expression& expr1,
                                          const expression& expr2,
                                          const var_origin& var_origin,
@@ -2105,7 +2156,7 @@ namespace stan {
     bool data_only_expression::operator()(const double_literal& /*x*/) const {
       return true;
     }
-    bool data_only_expression::operator()(const array_literal& x) const {
+    bool data_only_expression::operator()(const array_expr& x) const {
       for (size_t i = 0; i < x.args_.size(); ++i)
         if (!boost::apply_visitor(*this, x.args_[i].expr_))
           return false;
@@ -2219,7 +2270,7 @@ namespace stan {
         error_msgs << "variable definition base type mismatch,"
                    << " variable declared as base type: ";
         write_base_expr_type(error_msgs, decl_type.type());
-        error_msgs << "variable definition has base: ";
+        error_msgs << " variable definition has base: ";
         write_base_expr_type(error_msgs, def_type.type());
         pass = false;
       }

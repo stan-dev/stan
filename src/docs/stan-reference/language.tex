@@ -1487,6 +1487,127 @@ encoding, such as ASCII itself, UTF-8, or Latin1.  It is up to user
 shells and editors to display them properly.
 
 
+\section{Array Expressions}
+
+Curly braces may be wrapped around a sequence of expressions to
+produce an array expression.  For example, the expression
+\Verb|{ 1, 10, 100 }| denotes an integer array of three elements with
+values 1, 10, and 100.  This syntax is particularly convenient to
+define small arrays in a single line, as follows.
+%
+\begin{stancode}
+int a[3] = { 1, 10, 100 };
+\end{stancode}
+%
+
+The values may be compound expressions, so it is legal to write
+\Verb|{ 2 * 3, 1 + 4 }|.  It is also possible to write two dimensional
+arrays directly, as in the following example.
+%
+\begin{stancode}
+int b[2, 3] = { { 1, 2, 3 }, { 4, 5, 6 } };
+\end{stancode}
+%
+This way, \code{b[1]} is \Verb|{ 1, 2, 3 }| and \code{b[2]} is 
+\Verb|{ 4, 5, 6 }|.
+
+Whitespace is always interchangeable in Stan, so the above can be laid
+out as follows to more clearly indicate the row and column structure
+of the resulting two dimensional array.
+%
+\begin{stancode}
+int b[2, 3] = { { 1, 2, 3 },
+                { 4, 5, 6 } };
+\end{stancode}
+%
+
+\subsection{Array Expresison Types}
+
+Any type of expression may be used within braces to form an array
+expression.  In the simplest case, all of the elements will be of the
+same type and the result will be an array of elements of that type.
+For example, the elements of the array can be vectors, in which case
+the result is an array of vectors.
+%
+\begin{stancode}
+vector[3] b;
+vector[3] c;
+...
+vector[3] d[2] = { b, c };
+\end{stancode}
+%
+The elements may also be a mixture of \code{int} and \code{real} typed
+expressions, in which case the result is an array of real values.
+%
+\begin{stancode}
+real b[2] = { 1, 1.9 };
+\end{stancode}
+%
+
+\subsection{Restrictions on Values}
+
+There are some restrictions on how array expressions may be used that
+arise from their types being calculated bottom up and the basic data
+type and assignment rules of Stan.
+
+\subsubsection{Rectangular array expressions only}
+
+Although it is tempting to try to define a ragged array expression,
+all Stan data types are rectangular (or boxes or other
+higher-dimensional generalizations).  Thus the following nested array
+expression will cause an error when it tries to create a
+non-rectanguar array.
+%
+\begin{stancode}
+{ { 1, 2, 3 }, { 4, 5 } }  // compile time error: size mismatch
+\end{stancode}
+%
+This may appear to be OK, because it is creating a two-dimensional
+integer array (\code{int[~,~]}) out of two one-dimensional array
+integer arrays (\code{int[~]}).  But it is not allowed because the two
+one-dimensional arrays are not the same size.  If the elements are
+array expressions, this can be diagnosed at compile time.  If one or
+both expressions is a variable, then that won't be caught until
+runtime.  
+%
+\begin{stancode}
+{ { 1, 2, 3 }, m }  // runtime error if m not size 3
+\end{stancode}
+
+
+\subsubsection{No empty array expressions}
+
+Because there is no way to infer the type of the result, the empty
+array expression (\Verb|{ }|) is not allowed.  This does not sacrifice
+expressive power, because a declaration is sufficient to initialize a
+zero-element array.
+%
+\begin{stancode}
+int a[0];   // a is fully defined as zero element array
+\end{stancode}
+
+
+\subsubsection{Integer only array expressions}
+
+If an array expression contains only integer elements, such as 
+\Verb|{ 1, 2, 3 }|, then the result type will be an integer array,
+\code{int[]}.  This means that the following will \emph{not}\ be
+legal. 
+%
+\begin{stancode}
+real a[2] = { -3, 12 };  // error: int[] can't be assigned to real[]
+\end{stancode}
+%
+Integer arrays may not be assigned to real values.  However, this
+problem is easily sidestepped by using real literal expressions.  
+%
+\begin{stancode}
+real a[2] = { -3.0, 12.0 };
+\end{stancode}
+%
+Now the types match and the assignment is allowed.
+
+
 \section{Parentheses for Grouping}
 
 Any expression wrapped in parentheses is also an expression. Like in
@@ -2360,6 +2481,8 @@ TEST GRADIENT MODE
 Even though finite differences calculates the right gradient of 0,
 automatic differentiation follows the chain rule and produces a
 not-a-number output.
+
+
 
 \chapter{Statements}
 

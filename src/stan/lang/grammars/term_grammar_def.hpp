@@ -49,6 +49,9 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::fun,
                           (std::string, name_)
                           (std::vector<stan::lang::expression>, args_) )
 
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::array_expr,
+                          (std::vector<stan::lang::expression>, args_) )
+
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::int_literal,
                           (int, val_)
                           (stan::lang::expr_type, type_))
@@ -74,6 +77,7 @@ namespace stan {
       using boost::spirit::qi::_1;
       using boost::spirit::qi::_a;
       using boost::spirit::qi::_b;
+      using boost::spirit::qi::_c;
       using boost::spirit::qi::char_;
       using boost::spirit::qi::double_;
       using boost::spirit::qi::eps;
@@ -208,6 +212,10 @@ namespace stan {
                                 _pass)])
         | int_literal_r[assign_lhs_f(_val, _1)]
         | double_literal_r[assign_lhs_f(_val, _1)]
+        | (array_expr_r(_r1)[assign_lhs_f(_c, _1)]
+           > eps[set_array_expr_type_f(_val, _c, _r1, _pass,
+                                       boost::phoenix::ref(var_map_),
+                                       boost::phoenix::ref(error_msgs_))])
         | (lit('(')
            > expression_g(_r1)[assign_lhs_f(_val, _1)]
            > lit(')'));
@@ -271,8 +279,13 @@ namespace stan {
         > !lit('(');    // negative lookahead to prevent failure in
                         // fun to try to evaluate as variable [cleaner
                         // error msgs]
-    }
 
+      array_expr_r.name("expression");
+      array_expr_r
+        %=  lit('{')
+        >> expression_g(_r1) % ','
+        >> lit('}');
+    }
   }
 }
 #endif

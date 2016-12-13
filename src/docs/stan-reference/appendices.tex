@@ -665,6 +665,7 @@ identifier ::= [a-zA-Z] [a-zA-Z0-9_]*
 expressions ::= expression % ','
 expression ::= numeric_literal
              | variable
+             | '{' expressions '}'
              | expression `?` expression `:` expression
              | expression infixOp expression
              | prefixOp expression
@@ -763,6 +764,13 @@ declared.  The assignability constraint restricts compound
 declarations and definitions to local variables and variables declared
 in the transformed data, transformed parameters, and generated
 quantities blocks.
+
+\subsection{Typing of Array Expressions}
+
+The types of expressions used for elements in array expressions
+(\Verb|'{' expressions '}'|) must all be of the same type or a mixture
+of \code{int} and \code{real} types (in which case the result is
+promoted to be of type \code{real}).
 
 \subsection{Forms of Numbers}
 

@@ -188,6 +188,7 @@ namespace stan {
       }
     }
 
+    // this generates base type for multi-dim expr
     void generate_type(const std::string& base_type,
                        const std::vector<expression>& /*dims*/,
                        size_t end,
@@ -197,6 +198,66 @@ namespace stan {
       for (size_t i = 0; i < end; ++i) {
         if (i > 0) o << ' ';
         o << '>';
+      }
+    }
+
+    /**
+     * Generate correct C++ type for expressions which contain a 
+     * Stan <code>real</code> variable according to context in
+     * which expression is used and expression contents.
+     *
+     * @param vo expression origin block
+     * @param has_var  does expression contains a variable?
+     * @param is_var_context true when in auto-diff context
+     * @param o generated typename
+     */
+    void generate_real_var_type(const var_origin& vo,
+                                bool has_var,
+                                bool is_var_context,
+                                std::ostream& o) {
+      if (is_fun_origin(vo)) {
+        o << "fun_scalar_t__";
+      } else if (is_var_context && has_var) {
+        o << "T__";
+      } else {
+        o << "double";
+      }
+    }
+
+    /**
+     * Generate correct C++ type for array expressions
+     * according to context in which expression is used.
+     * Generated typename may be embedded in angle brackets,
+     * add trailing space accordingly.
+     *
+     * @param base_type expression base type
+     * @param real_var_type context-dependent <code>real</code> type
+     * @param is_var_context true when in auto-diff context
+     * @param o generated typename
+     */
+    void generate_array_var_type(const base_expr_type base_type,
+                                 const std::string& real_var_type,
+                                 bool is_var_context,
+                                 std::ostream& o) {
+      switch (base_type) {
+      case INT_T :
+        o << "int";
+        break;
+      case DOUBLE_T :
+        o << real_var_type;
+        break;
+      case VECTOR_T :
+        o << (is_var_context ?
+              "Eigen::Matrix<T__,Eigen::Dynamic,1> " :"vector_d");
+        break;
+      case ROW_VECTOR_T :
+        o << (is_var_context ?
+              "Eigen::Matrix<T__,1,Eigen::Dynamic> " : "row_vector_d");
+        break;
+      case MATRIX_T :
+        o << (is_var_context ?
+              "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> " : "matrix_d");
+        break;
       }
     }
 
@@ -224,19 +285,32 @@ namespace stan {
         if (num_str.find_first_of("eE.") == std::string::npos)
           o_ << ".0";  // trailing 0 to ensure C++ makes it a double
       }
-      void operator()(const array_literal& x) const {
-        o_ << "stan::math::new_array<";
-        generate_type("foobar",
+      void operator()(const array_expr& x) const {
+        std::stringstream ssRealType;
+        generate_real_var_type(x.var_origin_, x.has_var_, is_var_context_,
+                               ssRealType);
+        std::stringstream ssArrayType;
+        generate_array_var_type(x.type_.base_type_, ssRealType.str(),
+                                is_var_context_, ssArrayType);
+        o_ << "static_cast<";
+        generate_type(ssArrayType.str(),
                       x.args_,
-                      x.args_.size(),
+                      x.type_.num_dims_,
                       o_);
-        o_ << ">()";
+        o_ << " >(";
+        o_ << "stan::math::array_builder<";
+        generate_type(ssArrayType.str(),
+                      x.args_,
+                      x.type_.num_dims_ - 1,
+                      o_);
+        o_ << " >()";
         for (size_t i = 0; i < x.args_.size(); ++i) {
           o_ << ".add(";
-          generate_expression(x.args_[i], o_);
+          generate_expression(x.args_[i], user_facing_, is_var_context_, o_);
           o_ << ")";
         }
         o_ << ".array()";
+        o_ << ")";
       }
       void operator()(const variable& v) const { o_ << v.name_; }
       void operator()(int n) const {   // NOLINT
@@ -379,13 +453,8 @@ namespace stan {
                   == expr.false_val_.expression_type()));
 
         std::stringstream ss;
-        if (is_fun_origin(expr.var_origin_)) {
-          ss << "fun_scalar_t__";
-        } else if (is_var_context_) {
-          ss << "T__";
-        } else {
-            ss << "double";
-        }
+        generate_real_var_type(expr.var_origin_, expr.has_var_,
+                               is_var_context_, ss);
 
         o_ << "(";
         boost::apply_visitor(*this, expr.cond_.expr_);
@@ -1068,6 +1137,8 @@ namespace stan {
                                   : "matrix_d",
                                   "corr_matrix", read_args, x.name_, x.dims_);
       }
+
+
       void generate_initialize_array(const std::string& var_type,
                                      const std::string& read_type,
                                      const std::vector<expression>& read_args,
