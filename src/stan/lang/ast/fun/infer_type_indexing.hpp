@@ -5,7 +5,7 @@
 
 #include <stan/lang/ast/base_expr_type.hpp>
 #include <stan/lang/ast/expr_type.hpp>
-#include <vector>
+#include <cstddef>
 
 namespace stan {
   namespace lang {
@@ -24,7 +24,7 @@ namespace stan {
      * @return expression type of indexed expression
      */
     expr_type infer_type_indexing(const base_expr_type& base_type,
-                                  size_t dims, size_t num_indexes);
+                                  std::size_t dims, std::size_t num_indexes);
 
 
 
@@ -37,8 +37,8 @@ namespace stan {
      * @param num_indexes number of indexes provided
      * @return expression type of indexed expression
      */
-    expr_type infer_type_indexing(const expression& expr, size_t num_indexes);
-
+    expr_type infer_type_indexing(const expression& expr,
+                                  std::size_t num_indexes);
   }
 }
 #endif
