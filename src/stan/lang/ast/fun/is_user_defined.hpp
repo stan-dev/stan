@@ -14,7 +14,7 @@ namespace stan {
      * Return true if the specified function was declared in the
      * functions block.
      *
-     * @param[in] fun function
+     * @param[in] fx function with arguments
      */
     bool is_user_defined(const fun& fx);
 

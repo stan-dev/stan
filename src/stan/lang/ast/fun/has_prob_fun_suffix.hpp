@@ -10,7 +10,7 @@ namespace stan {
      * Return true if the function with the specified name has a
      * suffix indicating it is a probability function.
      *
-     * @param[in] function name
+     * @param[in] name function name
      * @return true if function anme has a suffix indicating it is a
      * probability function
      */

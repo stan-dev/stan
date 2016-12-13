@@ -37,7 +37,7 @@ namespace stan {
        * and indices.
        *
        * @param expr expression being indexed
-       * @param sequence of sequences of expressions
+       * @param dimss sequence of sequences of expressions
        */
       index_op(const expression& expr,
                const std::vector<std::vector<expression> >& dimss);

@@ -65,7 +65,7 @@ namespace stan {
        * Construct a variable declaration with the specified
        * basic declaration.
        *
-       * @param variable declaration
+       * @param decl variable declaration
        */
       var_decl(const nil& decl);  // NOLINT(runtime/explicit)
 
@@ -73,7 +73,7 @@ namespace stan {
        * Construct a variable declaration with the specified
        * basic declaration.  
        *
-       * @param variable declaration
+       * @param decl variable declaration
        */
       var_decl(const int_var_decl& decl);  // NOLINT(runtime/explicit)
 
@@ -81,7 +81,7 @@ namespace stan {
        * Construct a variable declaration with the specified
        * basic declaration.  
        *
-       * @param variable declaration
+       * @param decl variable declaration
        */
       var_decl(const double_var_decl& decl);  // NOLINT(runtime/explicit)
 
@@ -89,7 +89,7 @@ namespace stan {
        * Construct a variable declaration with the specified
        * basic declaration.  
        *
-       * @param variable declaration
+       * @param decl variable declaration
        */
       var_decl(const vector_var_decl& decl);  // NOLINT(runtime/explicit)
 
@@ -97,7 +97,7 @@ namespace stan {
        * Construct a variable declaration with the specified
        * basic declaration.  
        *
-       * @param variable declaration
+       * @param decl variable declaration
        */
       var_decl(const row_vector_var_decl& decl);  // NOLINT(runtime/explicit)
 
@@ -105,7 +105,7 @@ namespace stan {
        * Construct a variable declaration with the specified
        * basic declaration.  
        *
-       * @param variable declaration
+       * @param decl variable declaration
        */
       var_decl(const matrix_var_decl& decl);  // NOLINT(runtime/explicit)
 
@@ -113,7 +113,7 @@ namespace stan {
        * Construct a variable declaration with the specified
        * basic declaration.  
        *
-       * @param variable declaration
+       * @param decl variable declaration
        */
       var_decl(const simplex_var_decl& decl);  // NOLINT(runtime/explicit)
 
@@ -121,7 +121,7 @@ namespace stan {
        * Construct a variable declaration with the specified
        * basic declaration.  
        *
-       * @param variable declaration
+       * @param decl variable declaration
        */
       var_decl(const unit_vector_var_decl& decl);  // NOLINT(runtime/explicit)
 
@@ -129,7 +129,7 @@ namespace stan {
        * Construct a variable declaration with the specified
        * basic declaration.  
        *
-       * @param variable declaration
+       * @param decl variable declaration
        */
       var_decl(const ordered_var_decl& decl);  // NOLINT(runtime/explicit)
 
@@ -137,7 +137,7 @@ namespace stan {
        * Construct a variable declaration with the specified
        * basic declaration.  
        *
-       * @param variable declaration
+       * @param decl variable declaration
        */
       var_decl(const positive_ordered_var_decl& decl);  // NOLINT
 
@@ -145,7 +145,7 @@ namespace stan {
        * Construct a variable declaration with the specified
        * basic declaration.  
        *
-       * @param variable declaration
+       * @param decl variable declaration
        */
       var_decl(const cholesky_factor_var_decl& decl);  // NOLINT
 
@@ -153,7 +153,7 @@ namespace stan {
        * Construct a variable declaration with the specified
        * basic declaration.  
        *
-       * @param variable declaration
+       * @param decl variable declaration
        */
       var_decl(const cholesky_corr_var_decl& decl);  // NOLINT(runtime/explicit)
 
@@ -161,7 +161,7 @@ namespace stan {
        * Construct a variable declaration with the specified
        * basic declaration.  
        *
-       * @param variable declaration
+       * @param decl variable declaration
        */
       var_decl(const cov_matrix_var_decl& decl);  // NOLINT(runtime/explicit)
 
@@ -169,7 +169,7 @@ namespace stan {
        * Construct a variable declaration with the specified
        * basic declaration.  
        *
-       * @param variable declaration
+       * @param decl variable declaration
        */
       var_decl(const corr_matrix_var_decl& decl);  // NOLINT(runtime/explicit)
 

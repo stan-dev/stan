@@ -1970,23 +1970,20 @@ namespace stan {
     }
 
     program::program() { }
-    program::program(const std::vector<function_decl_def>& function_decl_defs,
-                     const std::vector<var_decl>& data_decl,
-                     const std::pair<std::vector<var_decl>,
-                     std::vector<statement> >& derived_data_decl,
-                     const std::vector<var_decl>& parameter_decl,
-                     const std::pair<std::vector<var_decl>,
-                     std::vector<statement> >& derived_decl,
-                     const statement& st,
-                     const std::pair<std::vector<var_decl>,
-                     std::vector<statement> >& generated_decl)
-      : function_decl_defs_(function_decl_defs),
-        data_decl_(data_decl),
-        derived_data_decl_(derived_data_decl),
-        parameter_decl_(parameter_decl),
-        derived_decl_(derived_decl),
-        statement_(st),
-        generated_decl_(generated_decl) {
+    program::program(const function_decls_t& functions,
+                     const var_decls_t& data,
+                     const var_decls_statements_t& transformed_data,
+                     const var_decls_t& parameters,
+                     const var_decls_statements_t& transformed_parameters,
+                     const statement& model,
+                     const var_decls_statements_t& generated_quantities)
+      : function_decl_defs_(functions),
+        data_decl_(data),
+        derived_data_decl_(transformed_data),
+        parameter_decl_(parameters),
+        derived_decl_(transformed_parameters),
+        statement_(model),
+        generated_decl_(generated_quantities) {
     }
 
     sample::sample() {

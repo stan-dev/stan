@@ -30,7 +30,7 @@ namespace stan {
        * range constraint, name, dimensions, and definition.
        *
        * @param range optional upper and lower bound constraints
-       * @param variable name
+       * @param name variable name
        * @param dims array dimensions
        * @param def definition
        */

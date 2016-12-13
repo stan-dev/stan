@@ -64,7 +64,7 @@ namespace stan {
        * @param st statement
        * @return false
        */
-      bool operator()(const increment_log_prob_statement& t) const;
+      bool operator()(const increment_log_prob_statement& st) const;
 
       /**
        * Return true if the specified statement is a no-op statement.

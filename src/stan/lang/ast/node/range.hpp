@@ -33,10 +33,9 @@ namespace stan {
        * Construct a range object with the specified bounds.
        *
        * @param low lower bound
-       * @0param high upper bound
+       * @param high upper bound
        */
-      range(expression const& low,
-            expression const& high);
+      range(expression const& low, expression const& high);
 
       /**
        * Return true if the lower bound is non-nil.

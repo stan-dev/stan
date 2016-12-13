@@ -16,6 +16,11 @@ namespace stan {
      */
     struct program {
       /**
+       * Type of a sequence of function declarations.
+       */
+      typedef std::vector<function_decl_def> function_decls_t;
+
+      /**
        * Type of a sequence of variable declarations.
        */
       typedef std::vector<var_decl> var_decls_t;
@@ -46,7 +51,7 @@ namespace stan {
        * @param[in] model model block
        * @param[in] generated_quantities generated quantities block
        */
-      program(const std::vector<function_decl_def>& functions,
+      program(const function_decls_t& functions,
               const var_decls_t& data,
               const var_decls_statements_t& transformed_data,
               const var_decls_t& parameters,

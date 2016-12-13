@@ -20,7 +20,7 @@ namespace stan {
      * @param base_type base type of expression being indexed
      * @param dims number of dimensions of the expression being
      * indexed 
-     * @param number of indexes provided
+     * @param num_indexes number of indexes provided
      * @return expression type of indexed expression
      */
     expr_type infer_type_indexing(const base_expr_type& base_type,
