@@ -30,12 +30,15 @@ namespace stan {
        * @param random_seed random seed for the pseudo random number generator
        * @param chain chain id to advance the pseudo random number generator
        * @param init_radius radius to initialize
-       * @param[in] init_alpha
-       * @param[in] tol_obj
-       * @param[in] tol_rel_obj
-       * @param[in] tol_grad
-       * @param[in] tol_rel_grad
-       * @param[in] tol_param
+       * @param[in] init_alpha line search step size for first iteration
+       * @param[in] tol_obj convergence tolerance on absolute changes in
+       *   objective function value
+       * @param[in] tol_rel_obj convergence tolerance on relative changes
+       *   in objective function value
+       * @param[in] tol_grad convergence tolerance on the norm of the gradient
+       * @param[in] tol_rel_grad convergence tolerance on the relative norm of
+       *   the gradient
+       * @param[in] tol_param convergence tolerance on changes in parameter value
        * @param[in] num_iterations maximum number of iterations
        * @param[in] save_iterations indicates whether all the interations should
        *   be saved to the parameter_writer

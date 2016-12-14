@@ -1,6 +1,7 @@
 #ifndef STAN_SERVICES_EXPERIMENTAL_ADVI_FULLRANK_HPP
 #define STAN_SERVICES_EXPERIMENTAL_ADVI_FULLRANK_HPP
 
+#include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/services/util/experimental_message.hpp>
 #include <stan/services/util/initialize.hpp>
@@ -16,6 +17,31 @@ namespace stan {
     namespace experimental {
       namespace advi {
 
+        /**
+         * Runs fullrank ADVI.
+         *
+         * @tparam Model A model implementation
+         *
+         * @param model Input model to test (with data already instantiated)
+         * @param init var context for initialization
+         * @param random_seed random seed for the pseudo random number generator
+         * @param chain chain id to advance the pseudo random number generator
+         * @param init_radius radius to initialize
+         * @param grad_samples number of samples for Monte Carlo estimate of gradients
+         * @param elbo_samples number of samples for Monte Carlo estimate of ELBO
+         * @param max_iterations maximum number of iterations
+         * @param tol_rel_obj convergence tolerance on the relative norm of the objective
+         * @param eta stepsize scaling parameter for variational inference
+         * @param adapt_engaged adaptation engaged?
+         * @param adapt_iterations number of iterations for eta adaptation
+         * @param eval_elbo evaluate ELBO every Nth iteration
+         * @param output_samples number of posterior samples to draw and save
+         * @param[out] interrupt interrupt callback to be called every iteration
+         * @param[out] message_writer output for messages
+         * @param[out] init_writer Writer callback for unconstrained inits
+         * @param[out] parameter_writer output for parameter values
+         * @return stan::services::error_codes::OK if successful
+         */
         template <class Model, typename Interrupt>
         int fullrank(Model& model,
                      stan::io::var_context& init,
@@ -31,7 +57,7 @@ namespace stan {
                      int adapt_iterations,
                      int eval_elbo,
                      int output_samples,
-                     Interrupt& interrupt,
+                     callbacks::interrupt& interrupt,
                      callbacks::writer&
                      message_writer,
                      callbacks::writer&
