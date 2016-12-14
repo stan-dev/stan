@@ -44,8 +44,7 @@ namespace stan {
        * @param[out] message_writer output for messages
        * @param[out] init_writer Writer callback for unconstrained inits
        * @param[out] parameter_writer output for parameter values
-       *
-       * @return stan::services::error_codes::OK (0) if successful
+       * @return stan::services::error_codes::OK if successful
        */
       template <class Model>
       int bfgs(Model& model,

@@ -7,6 +7,14 @@ namespace stan {
   namespace services {
     namespace util {
 
+      /**
+       * Creates a pseudo random number generator from a random seed
+       * and a chain.
+       *
+       * @param[in] random_seed the random seed
+       * @param[in] chain the chain id
+       * @return a boost::ecuyer1988 instance
+       */
       boost::ecuyer1988 rng(unsigned int random_seed, unsigned int chain) {
         boost::ecuyer1988 rng(random_seed);
 

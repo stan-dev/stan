@@ -15,6 +15,31 @@ namespace stan {
   namespace services {
     namespace sample {
 
+      /**
+       * Runs the fixed parameter sampler.
+       *
+       * The fixed parameter sampler sets the parameters randomly once
+       * on the unconstrained scale, then runs the model for the number
+       * of iterations specified with the parameters fixed.
+       *
+       * @tparam Model Model class
+       *
+       * @param model Input model to test (with data already instantiated)
+       * @param init var context for initialization
+       * @param random_seed random seed for the pseudo random number generator
+       * @param chain chain id to advance the pseudo random number generator
+       * @param init_radius radius to initialize
+       * @param num_samples Number of samples
+       * @param num_thin Number to thin the samples
+       * @param refresh Controls the output
+       * @param interrupt Callback for interrupts
+       * @param message_writer Writer for messages
+       * @param error_writer Writer for errors
+       * @param init_writer Writer callback for unconstrained inits
+       * @param sample_writer Writer for draws
+       * @param diagnostic_writer Writer for diagnostic information
+       * @return stan::services::error_codes::OK if successful
+       */
       template <class Model>
       int fixed_param(Model& model,
                       stan::io::var_context& init,

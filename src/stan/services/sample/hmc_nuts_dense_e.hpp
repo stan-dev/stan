@@ -18,7 +18,7 @@ namespace stan {
 
       /**
        * Runs HMC with NUTS with dense Euclidean
-       * metric without adapatation.
+       * metric without adaptation.
        *
        * @tparam Model Model class
        *
@@ -41,7 +41,7 @@ namespace stan {
        * @param init_writer Writer callback for unconstrained inits
        * @param sample_writer Writer for draws
        * @param diagnostic_writer Writer for diagnostic information
-       * @return error code; 0 if no error
+       * @return stan::services::error_codes::OK if successful
        */
       template <class Model>
       int hmc_nuts_dense_e(Model& model,

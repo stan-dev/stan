@@ -17,8 +17,8 @@ namespace stan {
     namespace sample {
 
       /**
-       * Runs HMC with NUTS with dense Euclidean
-       * metric without adapatation.
+       * Runs static HMC with dense Euclidean
+       * metric without adaptation.
        *
        * @tparam Model Model class
        *
@@ -34,14 +34,14 @@ namespace stan {
        * @param refresh Controls the output
        * @param stepsize initial stepsize for discrete evolution
        * @param stepsize_jitter uniform random jitter of stepsize
-       * @param int_time
+       * @param int_time integration time
        * @param interrupt Callback for interrupts
        * @param message_writer Writer for messages
        * @param error_writer Writer for errors
        * @param init_writer Writer callback for unconstrained inits
        * @param sample_writer Writer for draws
        * @param diagnostic_writer Writer for diagnostic information
-       * @return error code; 0 if no error
+       * @return stan::services::error_codes::OK if successful
        */
       template <class Model>
       int hmc_static_dense_e(Model& model,

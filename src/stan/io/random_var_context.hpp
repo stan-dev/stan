@@ -41,9 +41,10 @@ namespace stan {
        * @param model instantiated model to generate variables for
        * @param[in,out] rng pseudo-random number generator
        * @param[in] init_radius the unconstrained variables are uniform draws
-       *   from -init_radius to init_radius. If this is 0, the unconstrained
-       *   values are set to 0. If the init_radius is non-zero, it is expected
-       *   to be greater than 0.
+       *   from -init_radius to init_radius.
+       * @param[in] init_zero indicates whether all unconstrained variables
+       *   should be initialized at 0. When init_zero is false, init_radius
+       *   must be greater than 0.
        */
       template <class Model, class RNG>
       random_var_context(Model& model,

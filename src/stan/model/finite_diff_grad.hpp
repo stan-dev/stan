@@ -20,7 +20,8 @@ namespace stan {
      * log probability.
      * @tparam M Class of model.
      * @param model Model.
-     * @param interrupt interrupt callback to be called at every iteration
+     * @param interrupt interrupt callback to be called before calculating
+     *   the finite differences for each parameter.
      * @param params_r Real-valued parameters.
      * @param params_i Integer-valued parameters.
      * @param[out] grad Vector into which gradient is written.

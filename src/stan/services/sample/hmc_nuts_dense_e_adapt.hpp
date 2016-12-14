@@ -18,7 +18,7 @@ namespace stan {
 
       /**
        * Runs HMC with NUTS with dense Euclidean
-       * metric without adapatation.
+       * metric with adaptation.
        *
        * @tparam Model Model class
        *
@@ -35,20 +35,20 @@ namespace stan {
        * @param stepsize initial stepsize for discrete evolution
        * @param stepsize_jitter uniform random jitter of stepsize
        * @param max_depth Maximum tree depth
-       * @param delta
-       * @param gamma
-       * @param kappa
-       * @param t0
-       * @param init_buffer
-       * @param term_buffer
-       * @param window
+       * @param delta adaptation target acceptance statistic
+       * @param gamma adaptation regularization scale
+       * @param kappa adaptation relaxation exponent
+       * @param t0 adaptation iteration offset
+       * @param init_buffer width of initial fast adaptation interval
+       * @param term_buffer width of final fast adaptation interval
+       * @param window initial width of slow adaptation interval
        * @param interrupt Callback for interrupts
        * @param message_writer Writer for messages
        * @param error_writer Writer for errors
        * @param init_writer Writer callback for unconstrained inits
        * @param sample_writer Writer for draws
        * @param diagnostic_writer Writer for diagnostic information
-       * @return error code; 0 if no error
+       * @return stan::services::error_codes::OK if successful
        */
       template <class Model>
       int hmc_nuts_dense_e_adapt(Model& model,
