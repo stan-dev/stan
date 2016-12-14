@@ -1,6 +1,7 @@
 #ifndef STAN_LANG_AST_FUN_TOTAL_DIMS_HPP
 #define STAN_LANG_AST_FUN_TOTAL_DIMS_HPP
 
+#include <cstddef>
 #include <vector>
 
 namespace stan {
@@ -14,7 +15,7 @@ namespace stan {
      *
      * @param dimss vector of vector of dimension expressions
      */
-    size_t total_dims(const std::vector<std::vector<expression> >& dimss);
+    std::size_t total_dims(const std::vector<std::vector<expression> >& dimss);
 
   }
 }

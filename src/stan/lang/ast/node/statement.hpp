@@ -2,7 +2,7 @@
 #define STAN_LANG_AST_NODE_STATEMENT_HPP
 
 #include <boost/variant/recursive_variant.hpp>
-#include <vector>
+#include <cstddef>
 
 namespace stan {
   namespace lang {
@@ -196,12 +196,12 @@ namespace stan {
       /**
        * The line in the source code where the statement begins.
        */
-      size_t begin_line_;
+      std::size_t begin_line_;
 
       /**
        * The line in the source code where the statement ends.
        */
-      size_t end_line_;
+      std::size_t end_line_;
     };
   }
 }

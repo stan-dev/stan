@@ -3,6 +3,7 @@
 
 #include <stan/lang/ast/var_origin.hpp>
 #include <stan/lang/ast/node/base_var_decl.hpp>
+#include <cstddef>
 #include <map>
 #include <string>
 #include <utility>
@@ -59,7 +60,7 @@ namespace stan {
        * @throw std::invalid_argument if the variable has not been
        * declared 
        */
-      size_t get_num_dims(const std::string& name) const;
+      std::size_t get_num_dims(const std::string& name) const;
 
       /**
        * Return the origin of the variable declaration for the

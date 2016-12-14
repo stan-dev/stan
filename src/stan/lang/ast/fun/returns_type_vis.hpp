@@ -3,6 +3,7 @@
 
 #include <stan/lang/ast/expr_type.hpp>
 #include <boost/variant/static_visitor.hpp>
+#include <ostream>
 
 namespace stan {
   namespace lang {

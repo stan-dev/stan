@@ -2,7 +2,7 @@
 #define STAN_LANG_AST_EXPR_TYPE_HPP
 
 #include <stan/lang/ast/base_expr_type.hpp>
-#include <vector>  // only included for size_t typedef
+#include <cstddef>
 
 namespace stan {
   namespace lang {
@@ -20,7 +20,7 @@ namespace stan {
       /**
        * The number of array dimensions.
        */
-      size_t num_dims_;
+      std::size_t num_dims_;
 
       /**
        * Construct an empty expression type.
@@ -43,7 +43,7 @@ namespace stan {
        * @param num_dims number of dimensions
        */
       expr_type(const base_expr_type base_type,
-                size_t num_dims);
+                std::size_t num_dims);
 
       /**
        * Return true if the specified expression type is equal to this
@@ -157,7 +157,7 @@ namespace stan {
        *
        * @return number of dimensions for this type
        */
-      size_t num_dims() const;
+      std::size_t num_dims() const;
     };
 
   }
