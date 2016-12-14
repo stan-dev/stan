@@ -43,7 +43,7 @@ namespace stan {
          * @param[out] diagnostic_writer output for diagnostic values
          * @return stan::services::error_codes::OK if successful
          */
-        template <class Model, typename Interrupt>
+        template <class Model>
         int fullrank(Model& model,
                      stan::io::var_context& init,
                      unsigned int random_seed,
