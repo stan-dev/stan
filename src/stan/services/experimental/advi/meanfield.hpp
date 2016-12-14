@@ -40,6 +40,7 @@ namespace stan {
          * @param[out] message_writer output for messages
          * @param[out] init_writer Writer callback for unconstrained inits
          * @param[out] parameter_writer output for parameter values
+         * @param[out] diagnostic_writer output for diagnostic values
          * @return stan::services::error_codes::OK if successful
          */
         template <class Model>
