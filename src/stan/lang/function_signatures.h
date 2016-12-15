@@ -22,7 +22,8 @@ std::vector<expr_type> primitive_types;
 primitive_types.push_back(INT_T);
 primitive_types.push_back(DOUBLE_T);
 
-add_unary_vectorized("abs");
+add("abs", INT_T, INT_T);
+add("abs", DOUBLE_T, DOUBLE_T);
 add_unary_vectorized("acos");
 add_unary_vectorized("acosh");
 for (size_t i = 0; i < base_types.size(); ++i) {
@@ -210,6 +211,7 @@ for (size_t i = 0; i < vector_types.size(); ++i) {
 }
 add_unary("chi_square_rng");
 add("cholesky_decompose", MATRIX_T, MATRIX_T);
+add("choose", INT_T, INT_T, INT_T);
 add("col", VECTOR_T, MATRIX_T, INT_T);
 add("cols", INT_T, VECTOR_T);
 add("cols", INT_T, ROW_VECTOR_T);
@@ -353,7 +355,7 @@ for (size_t i = 0; i < vector_types.size(); ++i) {
   }
 }
 add_unary("exponential_rng");
-add_unary("fabs");
+add_unary_vectorized("fabs");
 add_binary("falling_factorial");
 add_binary("fdim");
 add_unary_vectorized("floor");
@@ -501,7 +503,7 @@ add("is_inf", INT_T, DOUBLE_T);
 add("is_nan", INT_T, DOUBLE_T);
 add_binary("lbeta");
 add_binary("lchoose");
-add_unary("lgamma");
+add_unary_vectorized("lgamma");
 add("lkj_corr_cholesky_log", DOUBLE_T, MATRIX_T, DOUBLE_T);
 add("lkj_corr_cholesky_lpdf", DOUBLE_T, MATRIX_T, DOUBLE_T);
 add("lkj_corr_cholesky_rng", MATRIX_T, INT_T, DOUBLE_T);
@@ -598,6 +600,7 @@ for (size_t i = 0; i < vector_types.size(); ++i) {
 }
 add_binary("lognormal_rng");
 add_nullary("machine_precision");
+add("matrix_exp", MATRIX_T, MATRIX_T);
 add("max", INT_T, expr_type(INT_T, 1));
 add("max", DOUBLE_T, expr_type(DOUBLE_T, 1));
 add("max", DOUBLE_T, VECTOR_T);

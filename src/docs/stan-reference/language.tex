@@ -64,7 +64,7 @@ For example,
 %
 \begin{stancode}
 real x[10];
-matrix[3,3] m[6,7];
+matrix[3, 3] m[6, 7];
 \end{stancode}
 %
 declares \code{x} to be a one-dimensional array of size 10 containing
@@ -91,9 +91,9 @@ All of the basic data types may be given lower and upper bounds using
 syntax such as
 %
 \begin{stancode}
-int<lower=1> N;
-real<upper=0> log_p;
-vector<lower=-1,upper=1>[3,3] corr;
+int<lower = 1> N;
+real<upper = 0> log_p;
+vector<lower = -1, upper = 1>[3] rho;
 \end{stancode}
 
 There are also special data types for structured vectors and
@@ -187,7 +187,7 @@ numbers.  Stan roughly%
   \code{double} types in \Cpp.  Precise details of rounding will depend
   on the compiler and hardware architecture on which the code is run.}
 %
-follows the {\sc ieee} 754 standard for floating-point computation.
+follows the IEEE 754 standard for floating-point computation.
 The range of a 64-bit number is roughly $\pm 2^{1022}$, which is
 slightly larger than $\pm 10^{307}$.  It is a good idea to stay well
 away from such extreme values in Stan models as they are prone to
@@ -198,9 +198,35 @@ of accuracy.  But when they are combined, the result often has less
 accuracy.  In some cases, the difference in accuracy between two
 operands and their result is large.
 
-There are three special real values used to represent (1) error
-conditions, (2) positive infinity, and (3) negative infinity.  The
-error value is referred to as ``not a number.''
+There are three special real values used to represent (1) not-a-number
+value for error conditions, (2) positive infinity for overflow, and
+(3) negative infinity for overflow.  The behavior of these special
+numbers follows standard IEEE 754 behavior.  
+
+\subsubsection{Not-a-number}
+
+The not-a-number value propagates.  If an argument to a real-valued
+function is not-a-number, it either rejects (an exception in the
+underlying C++) or returns not-a-number itself.  For boolean-valued
+comparison operators, if one of the arguments is not-a-number, the
+return value is always zero (i.e., false).
+
+\subsubsection{Infinite values}
+
+Positive infinity is greater than all numbers other than itself and
+not-a-number; negative infinity is similarly smaller.  Adding an
+infinite value to a finite value returns the infinite value.  Dividing
+a finite number by an infinite value returns zero; dividing an
+infinite number by a finite number returns the infinite number of
+appropriate sign.  Dividing a finite number by zero returns positive
+infinity. Dividing two infinite numbers produces a not-a-number value
+as does subtracting two infinite numbers.  Some functions are
+sensitive to infinite values; for example, the exponential function
+returns zero if given negative infinity and positive infinity if given
+positive infinity.  Often the gradients will break down when values
+are infinite, making these boundary conditions less useful than they
+may appear at first.
+
 
 \subsection{Promoting Integers to Reals}
 
@@ -524,8 +550,8 @@ Matrices are declared with the keyword \code{matrix} along with a
 number of rows and number of columns.  For example,
 %
 \begin{stancode}
-matrix[3,3] A;
-matrix[M,N] B;
+matrix[3, 3] A;
+matrix[M, N] B;
 \end{stancode}
 %
 declares \code{A} to be a $3 \times 3$ matrix and \code{B} to be a $M
@@ -537,7 +563,7 @@ Matrices may also be declared with constraints, as in this ($3 \times $4)
 matrix of non-positive values.
 %
 \begin{stancode}
-matrix<upper=0>[3,4] B;
+matrix<upper=0>[3, 4] B;
 \end{stancode}
 %
 
@@ -547,7 +573,7 @@ Rows of a matrix can be assigned by indexing the left-hand side of an
 assignment statement. For example, this is possible.
 %
 \begin{stancode}
-matrix[M,N] a;
+matrix[M, N] a;
 row_vector[N] b;
 // ...
 a[1] = b;
@@ -624,10 +650,10 @@ of a covariance matrix.  This is often more convenient or more
 efficient than representing covariance matrices directly.
 
 A Cholesky factor $L$ is an $M \times N$ lower-triangular matrix (if
-$m < n$ then $L[m,n] =0$) with a positive diagonal ($L[k,k] = 0$) and
-$M \geq N$.  If $L$ is a Cholesky factor, then $\Sigma = L \, L^{\top}$
-is a covariance matrix.  Furthermore, every covariance matrix has a
-Cholesky factorization.
+$m < n$ then $L[m, n] =0$) with a strictly positive diagonal ($L[k, k]
+> 0$) and $M \geq N$.  If $L$ is a Cholesky factor, then $\Sigma = L
+\, L^{\top}$ is a covariance matrix.  Furthermore, every covariance
+matrix has a Cholesky factorization.
 
 The typical case of a square Cholesky factor may be declared with a
 single dimension,
@@ -637,8 +663,8 @@ cholesky_factor_cov[4] L;
 \end{stancode}
 %
 In general, two dimensions may be declared, with the above being equal to
-\code{cholesky\_factor\_cov[4,4]}.  The
-type \code{cholesky\_factor\_cov[M,N]} may be used for the general
+\code{cholesky\_factor\_cov[4,~4]}.  The
+type \code{cholesky\_factor\_cov[M,~N]} may be used for the general
 $M \times N$.
 
 \subsection{Assigning Constrained Variables}
@@ -649,7 +675,7 @@ as having the same basic type and number of array dimensions.
 Constraints are not considered, but basic data types are. For instance, a
 variable declared to be \code{real<lower=0,upper=1>} could be assigned
 to a variable declared as \code{real} and vice-versa.  Similarly, a
-variable declared as \code{matrix[3,3]} may be assigned to a variable
+variable declared as \code{matrix[3,~3]} may be assigned to a variable
 declared as \code{cov\_matrix[3]} or
 \code{cholesky\_factor\_cov[3]}, and vice-versa.
 
@@ -681,31 +707,31 @@ transformed parameters {
 
 If \code{v} is a column vector or row vector, then \code{v[2]} is the
 second element in the vector.  If \code{m} is a matrix, then
-\code{m[2,3]} is the value in the second row and third column.
+\code{m[2,~3]} is the value in the second row and third column.
 
 Providing a matrix with a single index returns the specified row.  For
 instance, if \code{m} is a matrix, then \code{m[2]} is the second row.
 This allows Stan blocks such as
 %
 \begin{stancode}
-matrix[M,N] m;
+matrix[M, N] m;
 row_vector[N] v;
 real x;
 // ...
 v = m[2];
-x = v[3];   // x == m[2][3] == m[2,3]
+x = v[3];   // x == m[2][3] == m[2, 3]
 \end{stancode}
 %
 The type of \code{m[2]} is \code{row\_vector} because it is the second
 row of \code{m}.  Thus it is possible to write \code{m[2][3]} instead
-of \code{m[2,3]} to access the third element in the second row.  When
-given a choice, the form \code{m[2,3]} is preferred.%
+of \code{m[2,~3]} to access the third element in the second row.  When
+given a choice, the form \code{m[2,~3]} is preferred.%
 %
 \footnote{As of Stan version 1.0, the form
-  \code{m[2,3]} is more efficient because it does not require the
+  \code{m[2,~3]} is more efficient because it does not require the
   creation and use of an intermediate expression template for
   \code{m[2]}.  In later versions, explicit calls to \code{m[2][3]}
-  may be optimized to be as efficient as \code{m[2,3]} by the Stan
+  may be optimized to be as efficient as \code{m[2,~3]} by the Stan
   compiler.\label{array-index-style.footnote}}
 
 
@@ -758,14 +784,14 @@ A two-dimensional array of real values with three rows and four columns is
 declared with the following.
 %
 \begin{stancode}
-real a[3,4];
+real a[3, 4];
 \end{stancode}
 %
 A three-dimensional array \code{z} of positive reals with five rows, four
 columns, and two shelves can be declared as follows.
 %
 \begin{stancode}
-real<lower=0> z[5,4,2];
+real<lower=0> z[5, 4, 2];
 \end{stancode}
 %
 
@@ -775,19 +801,19 @@ Arrays may also be declared to contain vectors.  For example,
 vector[7] mu[3];
 \end{stancode}
 %
-declares \code{mu} to be a 3-dimensional array of 7-vectors.
-Arrays may also contain matrices.  The example
+declares \code{mu} to be an array of size 3 containing vectors with 7
+elements.  Arrays may also contain matrices.  The example
 %
 \begin{stancode}
-matrix[7,2] mu[15,12];
+matrix[7, 2] mu[15, 12];
 \end{stancode}
 %
-declares a $15 \times 12$-dimensional array of $7 \times 2$ matrices.
+declares a 15 by 12 array of $7 \times 2$ matrices.
 Any of the constrained types may also be used in arrays, as in the
 declaration
 %
 \begin{stancode}
-cholesky_factor_cov[5,6] mu[2,3,4];
+cholesky_factor_cov[5, 6] mu[2, 3, 4];
 \end{stancode}
 %
 of a $2 \times 3 \times 4$ array of $5 \times 6$ Cholesky factors of
@@ -797,16 +823,16 @@ covariance matrices.
 
 If \code{x} is a 1-dimensional array of length 5, then \code{x[1]} is
 the first element in the array and \code{x[5]} is the last.  For a $3
-\times 4$ array \code{y} of two dimensions, \code{y[1,1]} is the first
-element and \code{y[3,4]} the last element.  For a three-dimensional
-array \code{z}, the first element is \code{z[1,1,1]}, and so on.
+\times 4$ array \code{y} of two dimensions, \code{y[1,~1]} is the first
+element and \code{y[3,~4]} the last element.  For a three-dimensional
+array \code{z}, the first element is \code{z[1,~1,~1]}, and so on.
 
 Subarrays of arrays may be accessed by providing fewer than the full
 number of indexes.  For example, suppose \code{y} is a two-dimensional
 array with three rows and four columns.  Then \code{y[3]} is
 one-dimensional array of length four.  This means that \code{y[3][1]}
-may be used instead of \code{y[3,1]} to access the value of the first
-column of the third row of \code{y}.  The form \code{y[3,1]} is the
+may be used instead of \code{y[3,~1]} to access the value of the first
+column of the third row of \code{y}.  The form \code{y[3,~1]} is the
 preferred form (see \refnote{array-index-style} in this chapter).
 
 \subsection{Assigning}
@@ -816,14 +842,14 @@ variables.  Similar to the behavior of matrices, Stan allows blocks
 such as
 %
 \begin{stancode}
-real w[9,10,11];
-real x[10,11];
+real w[9, 10, 11];
+real x[10, 11];
 real y[11];
 real z;
 // ...
 x = w[5];
-y = x[4];  // y == w[5][4] == w[5,4]
-z = y[3];  // z == w[5][4][3] == w[5,4,3]
+y = x[4];  // y == w[5][4] == w[5, 4]
+z = y[3];  // z == w[5][4][3] == w[5, 4, 3]
 \end{stancode}
 %
 
@@ -834,7 +860,7 @@ Arrays of vectors and matrices are accessed in the same way as arrays
 of doubles.  Consider the following vector and scalar declarations.
 %
 \begin{stancode}
-vector[5] a[4,3];
+vector[5] a[3, 4];
 vector[5] b[4];
 vector[5] c;
 real x;
@@ -844,10 +870,10 @@ With these declarations, the following assignments are legal.
 %
 \begin{stancode}
 b = a[1];      // result is array of vectors
-c = a[1,3];    // result is vector
+c = a[1, 3];    // result is vector
 c = b[3];      //   same result as above
-x = a[1,3,5];  // result is scalar
-x = b[3,5];    //   same result as above
+x = a[1, 3, 5];  // result is scalar
+x = b[3, 5];    //   same result as above
 x = c[5];      //   same result as above
 \end{stancode}
 %
@@ -857,9 +883,9 @@ behave the same way in terms of indexing.
 Consider the following matrix, vector and scalar declarations.
 %
 \begin{stancode}
-matrix[6,5] d[3,4];
-matrix[6,5] e[4];
-matrix[6,5] f;
+matrix[6, 5] d[3, 4];
+matrix[6, 5] e[4];
+matrix[6, 5] f;
 row_vector[5] g;
 real x;
 \end{stancode}
@@ -920,7 +946,7 @@ For example, vectors cannot be assigned to arrays or vice-versa.
 %
 \begin{stancode}
 real a[4];
-vector b[4];
+vector[4] b;
 row_vector c[4];
 // ...
 a = b; // illegal assignment of vector to array
@@ -1070,7 +1096,7 @@ types will be written without size information.  For instance,
 \code{real[]} is the type of one-dimensional array of reals and
 \code{matrix} is the type of matrices.  The three-dimensional integer
 array type is written as \code{int[\, , \, ,]}, indicating the number slots
-available for indexing.  Similarly, \code{vector[,]} is the type of a
+available for indexing.  Similarly, \code{vector[~,~]} is the type of a
 two-dimensional array of vectors.
 
 
@@ -1461,6 +1487,127 @@ encoding, such as ASCII itself, UTF-8, or Latin1.  It is up to user
 shells and editors to display them properly.
 
 
+\section{Array Expressions}
+
+Curly braces may be wrapped around a sequence of expressions to
+produce an array expression.  For example, the expression
+\Verb|{ 1, 10, 100 }| denotes an integer array of three elements with
+values 1, 10, and 100.  This syntax is particularly convenient to
+define small arrays in a single line, as follows.
+%
+\begin{stancode}
+int a[3] = { 1, 10, 100 };
+\end{stancode}
+%
+
+The values may be compound expressions, so it is legal to write
+\Verb|{ 2 * 3, 1 + 4 }|.  It is also possible to write two dimensional
+arrays directly, as in the following example.
+%
+\begin{stancode}
+int b[2, 3] = { { 1, 2, 3 }, { 4, 5, 6 } };
+\end{stancode}
+%
+This way, \code{b[1]} is \Verb|{ 1, 2, 3 }| and \code{b[2]} is 
+\Verb|{ 4, 5, 6 }|.
+
+Whitespace is always interchangeable in Stan, so the above can be laid
+out as follows to more clearly indicate the row and column structure
+of the resulting two dimensional array.
+%
+\begin{stancode}
+int b[2, 3] = { { 1, 2, 3 },
+                { 4, 5, 6 } };
+\end{stancode}
+%
+
+\subsection{Array Expresison Types}
+
+Any type of expression may be used within braces to form an array
+expression.  In the simplest case, all of the elements will be of the
+same type and the result will be an array of elements of that type.
+For example, the elements of the array can be vectors, in which case
+the result is an array of vectors.
+%
+\begin{stancode}
+vector[3] b;
+vector[3] c;
+...
+vector[3] d[2] = { b, c };
+\end{stancode}
+%
+The elements may also be a mixture of \code{int} and \code{real} typed
+expressions, in which case the result is an array of real values.
+%
+\begin{stancode}
+real b[2] = { 1, 1.9 };
+\end{stancode}
+%
+
+\subsection{Restrictions on Values}
+
+There are some restrictions on how array expressions may be used that
+arise from their types being calculated bottom up and the basic data
+type and assignment rules of Stan.
+
+\subsubsection{Rectangular array expressions only}
+
+Although it is tempting to try to define a ragged array expression,
+all Stan data types are rectangular (or boxes or other
+higher-dimensional generalizations).  Thus the following nested array
+expression will cause an error when it tries to create a
+non-rectanguar array.
+%
+\begin{stancode}
+{ { 1, 2, 3 }, { 4, 5 } }  // compile time error: size mismatch
+\end{stancode}
+%
+This may appear to be OK, because it is creating a two-dimensional
+integer array (\code{int[~,~]}) out of two one-dimensional array
+integer arrays (\code{int[~]}).  But it is not allowed because the two
+one-dimensional arrays are not the same size.  If the elements are
+array expressions, this can be diagnosed at compile time.  If one or
+both expressions is a variable, then that won't be caught until
+runtime.  
+%
+\begin{stancode}
+{ { 1, 2, 3 }, m }  // runtime error if m not size 3
+\end{stancode}
+
+
+\subsubsection{No empty array expressions}
+
+Because there is no way to infer the type of the result, the empty
+array expression (\Verb|{ }|) is not allowed.  This does not sacrifice
+expressive power, because a declaration is sufficient to initialize a
+zero-element array.
+%
+\begin{stancode}
+int a[0];   // a is fully defined as zero element array
+\end{stancode}
+
+
+\subsubsection{Integer only array expressions}
+
+If an array expression contains only integer elements, such as 
+\Verb|{ 1, 2, 3 }|, then the result type will be an integer array,
+\code{int[]}.  This means that the following will \emph{not}\ be
+legal. 
+%
+\begin{stancode}
+real a[2] = { -3, 12 };  // error: int[] can't be assigned to real[]
+\end{stancode}
+%
+Integer arrays may not be assigned to real values.  However, this
+problem is easily sidestepped by using real literal expressions.  
+%
+\begin{stancode}
+real a[2] = { -3.0, 12.0 };
+\end{stancode}
+%
+Now the types match and the assignment is allowed.
+
+
 \section{Parentheses for Grouping}
 
 Any expression wrapped in parentheses is also an expression. Like in
@@ -1539,7 +1686,7 @@ multiplied by a (column) vector, which produces a \code{real} value.
 
 Stan provides elementwise matrix division and multiplication
 operations, \code{a~.*~b} and \code{a~./b}.  These provide a shorthand
-to replace loops, but are not intrinsicially more efficient than a
+to replace loops, but are not intrinsically more efficient than a
 version programmed with an elementwise calculations and assignments in
 a loop.  For example, given declarations,
 %
@@ -1845,7 +1992,7 @@ type \code{row\_vector}.
 
 Stan supports mixed indexing of arrays and their vector, row vector
 or matrix values.  For example, if \code{m} is of type
-\code{matrix[,]}, a two-dimensional array of matrices, then
+\code{matrix[~,~]}, a two-dimensional array of matrices, then
 \code{m[1]} refers to the first row of the array, which is a
 one-dimensional array of matrices.  More than one index may be used,
 so that \code{m[1,2]} is of type \code{matrix} and denotes the matrix
@@ -2161,8 +2308,8 @@ A full implementation type consists of a primitive implementation type
 and an integer array dimensionality greater than or equal to zero.
 These will be written to emphasize their array-like nature.  For
 example, \code{int[]} has an array dimensionality of 1, \code{int} an
-array dimensionality of 0, and \code{int[,,]} an array dimensionality
-of 3. The implementation type \code{matrix[,,]} has a total of five
+array dimensionality of 0, and \code{int[~,~,]} an array dimensionality
+of 3. The implementation type \code{matrix[~,~,~]} has a total of five
 dimensions and takes up to five indices, three from the array and two
 from the matrix.
 
@@ -2174,9 +2321,9 @@ three-dimensional array of matrices.
 matrix[M, N] a[I, J, K];
 \end{stancode}
 %
-The matrix \code{a} is indexed as \code{a[i,j,k,m,n]} with the array
-indices first, followed by the matrix indices, with \code{a[i,j,k]}
-being a matrix and \code{a[i,j,k,m]} being a row vector.
+The matrix \code{a} is indexed as \code{a[i,~j,~k,~m,~n]} with the array
+indices first, followed by the matrix indices, with \code{a[i,~j,~k]}
+being a matrix and \code{a[i,~j,~k,~m]} being a row vector.
 
 \subsection{Type Inference Rules}
 
@@ -2208,7 +2355,7 @@ variables.%
 \subsubsection{Indexing}
 
 If \code{x} is an expression of total dimensionality greater than or
-equal to $N$, then the type of expression \code{e[i1,...,iN]} is the
+equal to $N$, then the type of expression \code{e[i1,~...,~iN]} is the
 same as that of \code{e[i1]...[iN]}, so it suffices to define the type
 of a singly-indexed function.  Suppose \code{e} is an expression and
 \code{i} is an expression of primitive type \code{int}.  Then
@@ -2243,7 +2390,7 @@ promoted to type \code{real} if necessary (see the subsection on type
 promotion in \refsection{function-application} for an exact
 specification of Stan's integer-to-real type-promotion rule).
 
-In general, matrix operations return the lowest inferrable type.  For
+In general, matrix operations return the lowest inferable type.  For
 example, \code{row\_vector~*~vector} returns a value of type
 \code{real}, which is declared in the function documentation and index
 as \code{real~operator*(row\_vector,vector)}.
@@ -2281,7 +2428,7 @@ Algebraically, the sampling statement in the model could be reduced to
 \end{stancode}
 %
 and it would seem the model should produce unit normal samples for
-\code{x}.  But rather than cancelling, the expression \code{sqrt(x -
+\code{x}.  But rather than canceling, the expression \code{sqrt(x -
   x)} causes a problem for derivatives.  The cause is the mechanistic
 evaluation of the chain rule,
 %
@@ -2299,7 +2446,7 @@ evaluation of the chain rule,
 & = & \mbox{NaN}.
 \end{eqnarray*}
 %
-Rather than the $x - x$ cancelling out, it introduces a 0 into the
+Rather than the $x - x$ canceling out, it introduces a 0 into the
 numerator and denominator of the chain-rule evaluation.
 
 The only way to avoid this kind problem is to be careful to do the
@@ -2335,6 +2482,8 @@ Even though finite differences calculates the right gradient of 0,
 automatic differentiation follows the chain rule and produces a
 not-a-number output.
 
+
+
 \chapter{Statements}
 
 \noindent
@@ -2362,7 +2511,7 @@ assignment statement evaluates the expression on the right-hand side
 and assigns it to the (indexed) variable on the left-hand side.  An
 example of a simple assignment is as follows.%
 %
-\footnote{In versions of Stan before 2.12.0, the operator \code{<-} was
+\footnote{In versions of Stan before 2.13.1, the operator \code{<-} was
   used for assignment rather than using the equal sign \code{=}.  The
   old operator \code{<-} is now deprecated and will print a warning.
   In the future, it will be removed.}
@@ -2406,7 +2555,7 @@ matrix, or vector data structures.  For instance, if \code{Sigma} is
 of type \code{matrix}, then
 %
 \begin{quote}
-\code{Sigma[1,1] = 1.0;}
+\code{Sigma[1, 1] = 1.0;}
 \end{quote}
 %
 sets the value in the first column of the first row of \code{Sigma} to one.
@@ -2717,19 +2866,19 @@ bounds, or both.
 \subsubsection{Truncating with lower and upper bounds}
 
 A probability density function $p(x)$ for a continuous distribution
-may be truncated to an interval $[a,b]$ to define a new density
-$p_{[a,b]}(x)$ with support $[a,b]$ by setting
+may be truncated to an interval $[a, b]$ to define a new density
+$p_{[a, b]}(x)$ with support $[a, b]$ by setting
 %
 \[
-p_{[a,b]}(x)
+p_{[a, b]}(x)
 = \frac{p(x)}
        {\int_a^b p(u) \, du}.
 \]
 %
 A probability mass function $p(x)$ for a discrete distribution may be
-truncated to the closed interval $[a,b]$ by
+truncated to the closed interval $[a, b]$ by
 \[
-p_{[a,b]}(x) = \frac{p(x)}
+p_{[a, b]}(x) = \frac{p(x)}
                   {\sum_{u = a}^b p(u)}.
 \]
 
@@ -2739,7 +2888,7 @@ A probability density function $p(x)$ can be truncated to $[a, \infty]$ by
 defining
 %
 \[
-p_{[a,\infty]}(x)
+p_{[a, \infty]}(x)
 = \frac{p(x)}
        {\int_a^{\infty} p(u) \, du}.
 \]
@@ -2748,7 +2897,7 @@ A probability mass function $p(x)$ is truncated to $[a, \infty]$ by
 defining 
 %
 \[
-p_{[a,\infty]}(x) = \frac{p(x)}
+p_{[a, \infty]}(x) = \frac{p(x)}
                   {\sum_{a <= u} p(u)}.
 \]
 
@@ -2758,7 +2907,7 @@ A probability density function $p(x)$ can be truncated to $[-\infty, b]$ by
 defining
 %
 \[
-p_{[-\infty,b]}(x)
+p_{[-\infty, b]}(x)
 = \frac{p(x)}
        {\int_{-\infty}^b p(u) \, du}.
 \]
@@ -3205,8 +3354,8 @@ not compile.
 %
 \begin{stancode}
 for (n in 1:N)
-  y[n] ~ normal(mu,sigma);
-  z[n] ~ normal(mu,sigma); // ERROR!
+  y[n] ~ normal(mu, sigma);
+  z[n] ~ normal(mu, sigma); // ERROR!
 \end{stancode}
 %
 The problem is that the body of the for loop is taken to be the
@@ -3217,9 +3366,9 @@ program.
 %
 \begin{stancode}
 for (n in 1:N) {
-  y[n] ~ normal(mu,sigma);
+  y[n] ~ normal(mu, sigma);
 }
-z[n] ~ normal(mu,sigma); // ERROR!
+z[n] ~ normal(mu, sigma); // ERROR!
 \end{stancode}
 %
 Neither of these programs will compile. If the loop variable \code{n}
@@ -3257,8 +3406,8 @@ for (m in 1:M) {
   real theta;
   for (n in 1:N) {
     real theta; // ERROR!
-    theta = inv_logit(alpha + x[m,n] * beta);
-    y[m,n] ~ bernoulli(theta);
+    theta = inv_logit(alpha + x[m, n] * beta);
+    y[m, n] ~ bernoulli(theta);
 // ...
 \end{stancode}
 %
@@ -3272,7 +3421,7 @@ only types that may be used are
 %
 \begin{quote}
 \code{int}, \code{real},
-\code{vector[K]}, \code{row\_vector[K]}, and \code{matrix[M,N]}.
+\code{vector[K]}, \code{row\_vector[K]}, and \code{matrix[M, N]}.
 \end{quote}
 
 \subsection{Blocks within Blocks}
@@ -3289,7 +3438,7 @@ for (m in 1:M) {
      sum = sum + n
   }
   for (n in 1:N)
-    sum = sum + x[m,n];
+    sum = sum + x[m, n];
 }
 \end{stancode}
 %
@@ -3311,7 +3460,7 @@ non-loop statements.
 
 Although these control statements may seem undesirable because of
 their goto-like behavior, their judicious use can greatly improve
-readability by reducing the level of nesting or eliminating bookeeping
+readability by reducing the level of nesting or eliminating bookkeeping
 inside loops.
 
 \subsection{Break Statements}
@@ -3451,13 +3600,13 @@ For array, vector, and matrix variables, the print format uses
 brackets.  For example, a 3-vector will print as
 %
 \begin{stancode}
-[1,2,3]
+[1, 2, 3]
 \end{stancode}
 %
 and a $2 \times 3$-matrix as
 %
 \begin{stancode}
-[[1,2,3],[4,5,6]]
+[[1, 2, 3], [4, 5, 6]]
 \end{stancode}
 %
 
@@ -3467,9 +3616,9 @@ transformed data block.
 %
 \begin{stancode}
 transformed data {
-  matrix[2,2] u;
-  u[1,1] = 1.0;  u[1,2] = 4.0;
-  u[2,1] = 9.0;  u[2,2] = 16.0;
+  matrix[2, 2] u;
+  u[1, 1] = 1.0;   u[1, 2] = 4.0;
+  u[2, 1] = 9.0;   u[2, 2] = 16.0;
   for (n in 1:2)
     print("u[", n, "] = ", u[n]);
 }
@@ -3479,11 +3628,15 @@ This print statement executes twice, printing the following two lines
 of output.
 %
 \begin{stancode}
-u[1] = [1,4]
-u[2] = [9,16]
+u[1] = [1, 4]
+u[2] = [9, 16]
 \end{stancode}
 
+\subsection{Non-void Input}
 
+The input type to a print function cannot be void.  In particular, it
+can't be the result of a user-defined void function.  All other types
+are allowed as arguments to the print function.
 
 \subsection{Print Frequency}
 
@@ -3524,9 +3677,9 @@ accumulator (see \refsection{get-lp}), as in the following example.
 \begin{stancode}
 vector[2] y;
 y[1] = 1;
-print("lp before =",get_lp());
-y ~ normal(0,1); // bug!  y[2] not defined
-print("lp after =",get_lp());
+print("lp before =", target());
+y ~ normal(0,1);  // bug!  y[2] not defined
+print("lp after =", target());
 \end{stancode}
 %
 The example has a bug in that \code{y[2]} is not defined before the
@@ -3624,15 +3777,15 @@ explicit truncation on the distribution.  This is the right way to do
 it.  
 %
 \begin{stancode}
-  theta ~ normal(0, 1) T[a,b];
+  theta ~ normal(0, 1) T[a, b];
 \end{stancode}
 %
 The conceptual issue is that the prior does not integrate to one over
 the admissible parameter space; it integrates to one over all real
-numbers and integrates to something less than one over $[a,b]$; in these
-simple univariate cases, we can overcome that with the T[,] notation,
-which essentially divides by whatever the prior integrates to over
-$[a,b]$.  
+numbers and integrates to something less than one over $[a ,b]$; in
+these simple univariate cases, we can overcome that with the
+\code{T[~,~]} notation, which essentially divides by whatever the
+prior integrates to over $[a, b]$.
 
 This problem is exactly the same problem as you would get using reject
 statements to enforce complicated inequalities on multivariate
@@ -3977,13 +4130,13 @@ parameters {
 }
 transformed parameters {
   real<lower=0> sigma_y;    // derived quantity (param)
-  sigma_y = pow(tau_y,-0.5);
+  sigma_y = pow(tau_y, -0.5);
 }
 model {
-  tau_y ~ gamma(alpha,beta);
-  mu_y ~ normal(mu_mu,sigma_mu);
+  tau_y ~ gamma(alpha, beta);
+  mu_y ~ normal(mu_mu, sigma_mu);
   for (n in 1:N)
-    y[n] ~ normal(mu_y,sigma_y);
+    y[n] ~ normal(mu_y, sigma_y);
 }
 generated quantities {
   real variance_y;       // derived quantity (transform)
@@ -4400,18 +4553,18 @@ illegal).  Specialized types are also not allowed (e.g.,
 Arguments and return types may be arrays, and these are indicated with
 optional brackets and commas as would be used for indexing.  For
 example, \code{int} denotes a single integer argument or return,
-whereas \code{real[\,]} indicates a one-dimensional array of reals,
-\code{real[\,,\,]} a two-dimensional array and \code{real[\,,\,,\,]} a
+whereas \code{real[~]} indicates a one-dimensional array of reals,
+\code{real[~,~]} a two-dimensional array and \code{real[~,~,~]} a
 three-dimensional array; whitespace is optional, as usual.
 
 The dimensions for vectors and matrices are not included, so that
 \code{matrix} is the type of a single matrix argument or return type.
 Thus if a variable is declared as \code{matrix a}, then \code{a} has
 two indexing dimensions, so that \code{a[1]} is a row vector and
-\code{a[1,1]} a real value.  Matrices implicitly have two indexing
+\code{a[1,~1]} a real value.  Matrices implicitly have two indexing
 dimensions.  The type declaration \code{matrix[,]~b} specifies that
 \code{b} is a two-dimensional array of matrices, for a total of four
-indexing dimensions, with \code{b[1,1,1,1]} picking out a real value.
+indexing dimensions, with \code{b[1,~1,~1,~1]} picking out a real value.
 
 \subsection{Dimensionality Checks and Exceptions}
 
@@ -4468,7 +4621,7 @@ accessible, namely the transformed parameters and model blocks.  An
 attempt to use such a function elsewhere results in a compile-time
 error.
 
-\subsection{Definining Probability Functions for Sampling Statements}
+\subsection{Defining Probability Functions for Sampling Statements}
 
 Functions whose names end in \code{\_lpdf} and \code{\_lpmf} (density
 and mass functions) can be used as probability functions in sampling
@@ -4580,7 +4733,7 @@ real foo(real x) {
 }
 \end{stancode}
 %
-beause the return statement is not the last statement in the while
+because the return statement is not the last statement in the while
 loop.  A bogus dummy return could be placed after the while loop in
 this case.  The rules for returns allow
 %

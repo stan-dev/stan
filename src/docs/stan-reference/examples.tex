@@ -84,7 +84,7 @@ In general, Stan allows the arguments to distributions such as
 vectors or arrays, they have to be the same size.  If any of the other
 arguments is a scalar, it is reused for each vector entry.  See
 \refsection{vectorization} for more information on vectorization of
-probabilty functions.
+probability functions.
 
 The other reason this works is that Stan's arithmetic operators are
 overloaded to perform matrix arithmetic on matrices.  In this case,
@@ -250,7 +250,7 @@ prior that scales with the outcome will do.
 
 \subsection{Background Reading}
 
-See \citep{Gelman:2006} for more an overview of choices for priors for
+See \citep{Gelman:2006} for an overview of choices for priors for
 scale parameters, \citep{ChungEtAl:2013} for an overview of choices
 for scale priors in penalized maximum likelihood estimates, and
 \cite{GelmanJakulinPittauEtAl:2008} for a discussion of prior choice
@@ -399,8 +399,8 @@ then we know the answer is going to be somewhere in the one to three
 meter range.  That gives us information around which to form a weakly
 informative prior.
 
-Similarly, logistic regression with predictors on the standard scale
-(roughly zero mean, unit variance), then it is unlikely to have a
+Similarly, a logistic regression with predictors on the standard scale
+(roughly zero mean, unit variance) is unlikely to have a
 coefficient that's larger than five in absolute value.  In these
 cases, it makes sense to provide a weakly informative prior such as
 $\distro{Normal}(0,5)$ for such a coefficient.
@@ -1425,17 +1425,25 @@ and Hill, we decompose our prior into a scale and a matrix, but are
 able to do so in a more natural way based on the actual variable
 scales and a correlation matrix.  Specifically, we define 
 \[
-\Sigma = \mbox{diag\_matrix}(\tau) \, \Omega \, \mbox{diag\_matrix}(\tau),
+\Sigma = \mbox{diag\_matrix}(\tau) \ \Omega \ \mbox{diag\_matrix}(\tau),
 \]
 where $\Omega$ is a correlation matrix and $\tau$ is the vector of
-coefficient scales.  
+coefficient scales.   This mapping from scale vector $\tau$ and
+correlation matrix $\Omega$ can be inverted, using
+\[
+\tau_k = \sqrt{\, \Sigma_{k,k}}
+\]
+and
+\[
+\Omega_{i, j} = \frac{\Sigma_{i, j}}{\tau_i \, \tau_j}.
+\]
 
 The components of the scale vector $\tau$ can be given any reasonable
 prior for scales, but we recommend something weakly informative like a
 half-Cauchy distribution with a small scale, such as
 \[
 \tau_k \sim \distro{Cauchy}(0, 2.5) 
-\mbox{ for } k \in 1{:}J \mbox{ and  } \tau_k > 0.
+\mbox{ for } k \in 1{:}K \mbox{ constrained by } \tau_k > 0.
 \]
 As for the prior means, if there is information about the scale of
 variation of coefficients across groups, it should be incorporated
@@ -1446,7 +1454,7 @@ intercept) may themselves be given a hierarchical prior.
 Our final recommendation is to give the correlation matrix $\Omega$ an
 LKJ prior with shape $\nu \geq 1$,
 \[
-\Omega \sim \distro{LKJcorr}(\nu).
+\Omega \sim \distro{LKJCorr}(\nu).
 \]
 The LKJ correlation distribution is defined in
 \refsection{lkj-correlation}, but the basic idea for modeling is that
@@ -1539,10 +1547,16 @@ The code in the Stan program above can be sped up dramatically by replacing:
     y[n] ~ normal(x[n] * beta[jj[n]], sigma);
 \end{stancode}
 %
-with:
+with a redeclaration of \code{beta} and a revised model block sampling
+statement. 
 %
 \begin{stancode}
-  y ~ normal( rows_dot_product(beta[jj] , x),sigma);
+parameters {
+  matrix[J, K] beta;
+...
+model {
+  y ~ normal(rows_dot_product(x, beta[jj]), sigma);
+  ...
 \end{stancode}
 %
 which takes advantage of indexing introduced in Stan version 2.9 (see \refsection{language-multi-indexing}).
@@ -1651,7 +1665,7 @@ model {
   to_vector(z) ~ normal(0, 1); 
   L_Omega ~ lkj_corr_cholesky(2);
   to_vector(gamma) ~ normal(0, 5);
-  y ~ normal(beta[jj] .* x, sigma);
+  y ~ normal(rows_dot_product(beta[jj] , x), sigma);
 }
 \end{stancode}
 
@@ -1781,7 +1795,7 @@ this is both inefficient and leads to biased posterior estimates.
 Instead, the conditions causing overflow, such as trying to generate a
 negative binomial random variate with a mean of $2^{31}$.  These must
 be intercepted and dealt with, typically be reparameterizing or
-reimplementing the random number geneator using real values rather
+reimplementing the random number generator using real values rather
 than integers, which are upper-bounded by $2^{31} - 1$ in Stan.
   
 
@@ -2647,7 +2661,7 @@ generated from the model, the simulation can sometimes find modes for
 creates a multiple mode problem in the posterior and also causes the
 NUTS tree depth to get very large (often above 10). Adding the
 constraint both improves the accuracy of the posterior and
-dramatically reduces the treedepth, which speeds up the simulation
+dramatically reduces the tree depth, which speeds up the simulation
 considerably (typically by much more than an order of magnitude).
 
 Further, unless one thinks that the process is really non-stationary,
@@ -3655,12 +3669,14 @@ log\_sum\_exp function is that it can prevent underflow and overflow
 in the exponentiation, by calculating the result as
 %
 \[
-\log(\exp(a) + \exp(b))
-= \max(a, b) + \log(\exp(a - \max(a, b)), \exp(b - \max(a, b))).
+\log\left( \exp(a) + \exp(b)\right)
+= c
+  + \log \left( \exp(a - c) + \exp(b - c) \right),
 \]
 %
-In this evaluation, one of the terms $a - \max(a, b)$ or $b -
-\max(a, b)$ is zero and the other is negative, thus eliminating the
+where $c = \max(a, b)$.
+In this evaluation, one of the terms, $a - c$ or $b -
+c$, is zero and the other is negative, thus eliminating the
 possibility of overflow or underflow in the leading term and eking the
 most arithmetic precision possible out of the operation.
 
@@ -3810,7 +3826,134 @@ p(y \, | \, \lambda, \mu, \sigma)
 \]
 
 
+\section{Inferences Supported by
+  Mixtures}\label{mixture-inference.section}
 
+In many mixture models, the mixture components are exchangeable in the
+model and thus not identifiable.  This arises if the parameters of the
+mixture components have exchangeable priors and the mixture ratio gets
+a uniform prior so that the parameters of the mixture components are
+also exchangeable in the likelihood.
+
+\subsection{Mixtures with Unidentifiable Components}
+
+As an example, consider the normal mixture from the previous section,
+which provides an exchangeable prior on the pairs of parameters
+$(\mu_1, \sigma_1)$ and $(\mu_2, \sigma_2)$,
+%
+\begin{eqnarray*}
+\mu_1, \mu_2 & \sim & \distro{Normal}(0, 10)
+\\[8pt]
+\sigma_1, \sigma_2 & \sim & \distro{HalfNormal}(0, 10)
+\end{eqnarray*}
+%
+The prior on the mixture ratio is uniform,
+%
+\[
+\lambda \sim \distro{Uniform}(0, 1),
+\]
+%
+so that with the likelihood
+%
+\[
+p(y_n \, | \, \mu, \sigma) 
+= \lambda \, \distro{Normal}(y_n \, | \, \mu_1, \sigma_1) 
++ (1 - \lambda) \, \distro{Normal}(y_n \, | \, \mu_2, \sigma_2),
+\]
+%
+the joint distribution $p(y, \mu, \sigma, \lambda)$ is exchangeable
+in the parameters $(\mu_1, \sigma_1)$ and $(\mu_2, \sigma_2)$ with
+$\lambda$ flipping to $1 - \lambda$.%
+%
+\footnote{Imposing a constraint such as $\theta < 0.5$ will resolve
+  the symmetry, but fundamentally changes the model and its posterior
+  inferences.} 
+
+\subsection{Inference under Label Switching}
+
+In cases where the mixture components are not identifiable, it can be
+difficult to diagnose convergence of sampling or optimization
+algorithms because the labels will switch, or be permuted, in
+different MCMC chains or different optimization runs.  Luckily,
+posterior inferences which do not refer to specific component labels
+are invariant under label switching and may be used directly.  This
+subsection considers a pair of examples.
+
+\subsubsection{Predictive likelihood}
+
+Predictive likelihood for a new observation $\tilde{y}$ given the
+complete parameter vector $\theta$ will be
+%
+\[
+p(\tilde{y} \, | \, y)
+= 
+\int_{\theta}
+p(\tilde{y} \, | \, \theta)
+\, p(\theta | y)
+\, \mbox{d}\theta.
+\]
+%
+The normal mixture example from the previous section, with $\theta =
+(\mu, \sigma, \lambda)$, shows that the likelihood returns the same
+density under label switching and thus the predictive inference is
+sound.  In Stan, that predictive inference can be done either by
+computing $p(\tilde{y} \, | \, y)$, which is more efficient
+statistically in terms of effective sample size, or simulating draws
+of $\tilde{y}$, which is easier to plug into other inferences.  Both
+approaches can be coded directly in the generated quantities block of
+the program.  Here's an example of the direct (non-sampling) approach.
+%
+\begin{stancode}
+data {
+  int<lower = 0> N_tilde;
+  vector[N_tilde] y_tilde;
+  ...
+generated quantities {
+  vector[N_tilde] log_p_y_tilde;
+  for (n in 1:N_tilde)
+    log_p_y_tilde[n]
+      = log_mix(lambda,
+                normal_lpdf(y_tilde[n] | mu[1], sigma[1])
+                normal_lpdf(y_tilde[n] | mu[2], sigma[2]));
+}
+\end{stancode}
+%
+It is a bit of a bother afterwards, because the logarithm function
+isn't linear and hence doesn't distribute through averages (Jensen's
+inequality shows which way the inequality goes).  The right thing to
+do is to apply \code{log\_sum\_exp} of the posterior draws of
+\code{log\_p\_y\_tilde}.  The average log predictive density is then
+given by subtracting \code{log(N\_new)}.
+
+
+\subsubsection{Clustering and similarity}
+
+Often a mixture model will be applied to a clustering problem and
+there might be two data items $y_i$ and $y_j$ for which there is a
+question of whether they arose from the same mixture component.  If we
+take $z_i$ and $z_j$ to be the component responsibility discrete
+variables, then the quantity of interest is $z_i = z_j$, which can be
+summarized as an event probability
+%
+\[
+\mbox{Pr}[z_i = z_j \, | \, y]
+=
+\int_{\theta}
+\frac{\sum_{k=0}^1 p(z_i=k, z_j = k, y_i, y_j \, | \, \theta)}
+     {\sum_{k=0}^1 \sum_{m=0}^1 p(z_i = k, z_j = m, y_i, y_j \, | \,
+       \theta)}
+\
+p(\theta \, | \, y)
+\
+\mbox{d}\theta.
+\]
+%
+As with other event probabilities, this can be calculated in the
+generated quantities block either by sampling $z_i$ and $z_j$ and
+using the indicator function on their equality, or by computing the
+term inside the integral as a generated quantity.  As with predictive
+likelihood, working in expectation is more statistically efficient than
+sampling.
 
 \section{Zero-Inflated and Hurdle Models}\label{zero-inflated.section}
 
@@ -3877,7 +4020,7 @@ model {
 The \code{log\_sum\_exp(lp1,lp2)} function adds the log probabilities
 on the linear scale; it is defined to be equal to \code{log(exp(lp1) +
   exp(lp2))}, but is more arithmetically stable and faster.  This
-could also be written using the conditionla operator; see
+could also be written using the conditional operator; see
 \refsection{conditional-operator}.
 
 \subsection{Hurdle Models}
@@ -4029,7 +4172,7 @@ In contrast to mixture models, which create mixtures at the
 observation level, model averaging creates mixtures over the
 posteriors of models separately fit with the entire data set.  In this
 situation, the priors work as expected when fitting the models
-indepdently, with the posteriors being based on the complete observed
+independently, with the posteriors being based on the complete observed
 data $y$.
 
 If different models are expected to account for different
@@ -4363,8 +4506,8 @@ transformed data {
     y[j] = log(r_t[j]) - log(n_t[j] - r_t[j])
             - (log(r_c[j]) - log(n_c[j] - r_c[j]);
   for (j in 1:J)
-    sigma[j] = sqrt(1.0/r_t[i] + 1.0/(n_t[i] - r_t[i])
-                     + 1.0/r_c[i] + 1.0/(n_c[i] - r_c[i]));
+    sigma[j] = sqrt(1 / r_t[j] + 1 / (n_t[j] - r_t[j])
+                     + 1 / r_c[j] + 1 / (n_c[j] - r_c[j]));
 }
 \end{stancode}
 %
@@ -4580,19 +4723,20 @@ Stan operates on the log scale and thus requires the log likelihood,
 \log p(D | e,l)
 \\[3pt]
 \mbox{ } \ \ = \
-\begin{array}[t]{l}
 \mbox{log\_sum\_exp}_{s=1}^T 
-\left( \log \distro{Uniform}(s | 1,T) \right.
+\begin{array}[t]{l}
+\big(
+ \log \distro{Uniform}(s \, | \, 1, T)
 \\[3pt]
-{} \hspace*{12pt} + \left. \sum_{t=1}^T \log \distro{Poisson}(D_t | t < s \ ?
-\ e \ : \ l) \right),
+{} \hspace*{4pt} + \sum_{t=1}^T \log \distro{Poisson}(D_t \, | \, t < s \ ?
+\ e \ : \ l) \big),
 \end{array}
 \]
 %
 where the log sum of exponents function is defined by
 \[
-\mbox{log\_sum\_exp}_{n=1}^N \alpha_n
-=
+\mbox{log\_sum\_exp}_{n=1}^N \, \alpha_n
+\ = \
 \log \sum_{n=1}^N \mbox{exp}(\alpha_n).
 \]
 %
@@ -4673,7 +4817,7 @@ transformed parameters {
 %
 As should be obvious from looking at it, it has linear complexity in
 \code{T} rather than quadratic.  The result for the mining-disaster
-data is about 20 times faster;  the improvement will be stepper for
+data is about 20 times faster;  the improvement will be greater for
 larger \code{T}.
 
 The key to understanding Wiklendt's dynamic programming version is to
@@ -5442,10 +5586,11 @@ and
 \[
 \theta_{j,k} \sim \distro{Dirichlet}(\beta_k)
 \]
-with fixed hyperparameters $\alpha$ and $\beta$.  The prior for
-$\theta_{j,k}$ must be allowed to vary in $k$, so that, for instance,
-$\beta_{k,k}$ is large enough to allow the prior to favor
-better-than-chance annotators over random or adversarial ones.
+with fixed hyperparameters $\alpha$ (a vector) and $\beta$ (a matrix
+or array of vectors).  The prior for $\theta_{j,k}$ must be allowed to
+vary in $k$, so that, for instance, $\beta_{k,k}$ is large enough to
+allow the prior to favor better-than-chance annotators over random or
+adversarial ones.
 
 Because there are $J$ coders, it would be natural to extend the model
 to include a hierarchical prior for $\beta$ and to partially pool the
@@ -5967,7 +6112,7 @@ enough or the data is not cleanly separated.
 The other problem with clustering models is that their posteriors are
 highly multimodal.  One form of multimodality is the
 non-identifiability leading to index swapping.  But even without
-the index problems the posteriors are highly mulitmodal.
+the index problems the posteriors are highly multimodal.
 
 Bayesian inference fails in cases of high multimodality because there
 is no way to visit all of the modes in the posterior in appropriate
@@ -6340,7 +6485,7 @@ model {
     real gamma[K];
     for (k in 1:K) 
       gamma[k] = log(theta[doc[n], k]) + log(phi[k, w[n]]);
-    target += log_sum_exp(gamma));  // likeliho;
+    target += log_sum_exp(gamma));  // likelihood;
   }
 }
 \end{stancode}
@@ -7331,7 +7476,7 @@ for stiff systems.
   \citep{CohenHindmarsh:1996,SerbanHindmarsh:2005}
 \end{itemize}
 %
-For a discussion of stiff ODE sytems, see \refsection{stiff-ode}.  In
+For a discussion of stiff ODE systems, see \refsection{stiff-ode}.  In
 a nutshell, the stiff solvers are slower, but more robust;  how much
 so depends on the system and the region of parameter space.
 The function signatures for Stan's ODE solvers can be found in
@@ -7438,6 +7583,89 @@ constants).  This means that, in general, there's no way to use the
 \code{integrate\_ode} function to accept a parameter for the initial
 time and thus no way in general to estimate the initial time of an ODE
 system from measurements.
+
+\section{Solving a System of Linear ODEs using a Matrix Exponential}
+
+The solution to $\frac{d}{dt} y = ay$ is $y = y_0e^{at}$, where the constant
+$y_0$ is determined by boundary conditions. We can extend this solution
+to the vector case:
+
+\begin{equation}\label{ode.linODEs}
+\frac{d}{dt}y = A y
+\end{equation}
+
+where $y$ is now a vector of length $n$ and $A$ is an $n$ by $n$ matrix. The
+solution is then given by:
+\begin{equation}\label{ode.linOEs.sln}
+y = e^{tA}y_0
+\end{equation}
+where the matrix exponential is formally defined by the convergent power series:
+
+\begin{equation}\label{ode.matrix_exp.def}
+e^{tA} = \sum_{n=0}^{\infty} \dfrac{tA^n}{n!} = I + tA + \frac{t^2A^2}{2!} + ...
+\end{equation}
+
+We can apply this technique to the simple harmonic oscillator example, by
+setting
+
+\begin{equation}\label{ode.sho_matrix}
+  y = \left[\begin{array}{c}
+        y_1 \\
+        y_2 \\
+        \end{array}\right] \ \ \ \ \ 
+   A = \left[\begin{array}{cc}
+	0 & 1 \\
+	-1 & -\theta \\
+	\end{array}\right]
+\end{equation}
+
+The Stan model to simulate noisy observations using a matrix exponential function
+is given by \reffigure{sho-sim-me}. Note that because we are performing matrix
+operations, we declare \code{y0} and \code{y\_hat} as vectors, instead of using arrays,
+as in the previous example code (\reffigure{sho-sim}). \\
+
+In general, computing a matrix exponential will be more efficient than using a numerical
+solver. We can however only apply this technique to systems of \underline{linear} ODEs.
+%
+\begin{figure}
+\begin{stancode}
+data {
+  int<lower=1> T;
+  vector[2] y0;
+  real ts[T];
+  real theta[1];
+}
+model {
+}
+generated quantities {
+  vector[2] y_hat[T];
+  matrix[2, 2] A;
+  
+  A[1, 1] = 0;
+  A[1, 2] = 1;
+  A[2, 1] = -1;
+  A[2, 2] = -theta[1];
+  
+  for (t in 1:T)
+    y_hat[t] = matrix_exp((t - 1) * A) * y0;
+  
+  // add measurement error
+  for (t in 1:T) {
+    y_hat[t, 1] = y_hat[t, 1] + normal_rng(0, 0.1);
+    y_hat[t, 2] = y_hat[t, 2] + normal_rng(0, 0.1);
+  }
+}
+\end{stancode}
+\vspace*{-0.2in}
+\caption{\small\it Stan program to simulate noisy measurements from a
+  simple harmonic oscillator.  The system of linear differential equations is
+  coded as a matrix. The system parameters \code{theta} and initial
+  state \code{y0} are read in as data along  observation times \code{ts}. 
+  The generated quantities block is used to solve the ODE for the specified
+  times and then add random measurement error, producing observations 
+  \code{y\_hat}. Because the ODEs are linear, we can use the \code{matrix\_exp}
+  function to solve the system. }\label{sho-sim-me.figure}
+\end{figure}
   
 
 \section{Measurement Error Models}

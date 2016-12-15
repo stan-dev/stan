@@ -399,3 +399,152 @@ TEST(langGenerator, fills) {
                  " model { }",
                  "stan::math::fill(a, std::numeric_limits<int>::min());\n");
 }
+
+
+TEST(langGenerator, genRealVars) {
+  using stan::lang::var_origin;
+  using stan::lang::transformed_data_origin;
+  using stan::lang::function_argument_origin;
+  var_origin td_origin = transformed_data_origin;
+  var_origin fun_origin = function_argument_origin;
+  std::stringstream o;
+
+  o.str(std::string());
+  stan::lang::generate_real_var_type(td_origin, true, true, o);
+  EXPECT_EQ(1, count_matches("T__", o.str()));
+
+  o.str(std::string());
+  stan::lang::generate_real_var_type(td_origin, false, true, o);
+  EXPECT_EQ(1, count_matches("double", o.str()));
+
+  o.str(std::string());
+  stan::lang::generate_real_var_type(td_origin, true, false, o);
+  EXPECT_EQ(1, count_matches("double", o.str()));
+
+  o.str(std::string());
+  stan::lang::generate_real_var_type(td_origin, false, false, o);
+  EXPECT_EQ(1, count_matches("double", o.str()));
+
+  o.str(std::string());
+  stan::lang::generate_real_var_type(fun_origin, true, true, o);
+  EXPECT_EQ(1, count_matches("fun_scalar_t__", o.str()));
+
+  o.str(std::string());
+  stan::lang::generate_real_var_type(fun_origin, false, true, o);
+  EXPECT_EQ(1, count_matches("fun_scalar_t__", o.str()));
+
+  o.str(std::string());
+  stan::lang::generate_real_var_type(fun_origin, true, false, o);
+  EXPECT_EQ(1, count_matches("fun_scalar_t__", o.str()));
+
+  o.str(std::string());
+  stan::lang::generate_real_var_type(fun_origin, false, false, o);
+  EXPECT_EQ(1, count_matches("fun_scalar_t__", o.str()));
+}
+
+TEST(langGenerator, genArrayVars) {
+  using stan::lang::base_expr_type;
+  using stan::lang::INT_T;
+  using stan::lang::DOUBLE_T;
+  using stan::lang::VECTOR_T;
+  using stan::lang::ROW_VECTOR_T;
+  using stan::lang::MATRIX_T;
+  using stan::lang::var_origin;
+  using stan::lang::transformed_data_origin;
+  using stan::lang::function_argument_origin;
+  var_origin td_origin = transformed_data_origin;
+  var_origin fun_origin = function_argument_origin;
+  std::stringstream ssReal;
+  std::stringstream o;
+
+  ssReal.str(std::string());
+  o.str(std::string());
+  stan::lang::generate_real_var_type(td_origin, true, true, ssReal);
+  stan::lang::generate_array_var_type(DOUBLE_T,ssReal.str(),true,o);
+  EXPECT_EQ(1, count_matches("T__", o.str()));
+
+  ssReal.str(std::string());
+  o.str(std::string());
+  stan::lang::generate_real_var_type(td_origin, false, true, ssReal);
+  stan::lang::generate_array_var_type(DOUBLE_T,ssReal.str(),true,o);
+  EXPECT_EQ(1, count_matches("double", o.str()));
+
+  ssReal.str(std::string());
+  o.str(std::string());
+  stan::lang::generate_real_var_type(td_origin, true, false, ssReal);
+  stan::lang::generate_array_var_type(DOUBLE_T,ssReal.str(),true,o);
+  EXPECT_EQ(1, count_matches("double", o.str()));
+
+  ssReal.str(std::string());
+  o.str(std::string());
+  stan::lang::generate_real_var_type(td_origin, false, false, ssReal);
+  stan::lang::generate_array_var_type(DOUBLE_T,ssReal.str(),true,o);
+  EXPECT_EQ(1, count_matches("double", o.str()));
+
+  ssReal.str(std::string());
+  o.str(std::string());
+  stan::lang::generate_real_var_type(fun_origin, true, true, ssReal);
+  stan::lang::generate_array_var_type(DOUBLE_T,ssReal.str(),true,o);
+  EXPECT_EQ(1, count_matches("fun_scalar_t__", o.str()));
+
+  ssReal.str(std::string());
+  o.str(std::string());
+  stan::lang::generate_real_var_type(fun_origin, false, true, ssReal);
+  stan::lang::generate_array_var_type(DOUBLE_T,ssReal.str(),true,o);
+  EXPECT_EQ(1, count_matches("fun_scalar_t__", o.str()));
+
+  ssReal.str(std::string());
+  o.str(std::string());
+  stan::lang::generate_real_var_type(fun_origin, true, false, ssReal);
+  stan::lang::generate_array_var_type(DOUBLE_T,ssReal.str(),true,o);
+  EXPECT_EQ(1, count_matches("fun_scalar_t__", o.str()));
+
+  ssReal.str(std::string());
+  o.str(std::string());
+  stan::lang::generate_real_var_type(fun_origin, false, false, ssReal);
+  stan::lang::generate_array_var_type(DOUBLE_T,ssReal.str(),true,o);
+  EXPECT_EQ(1, count_matches("fun_scalar_t__", o.str()));
+
+  ssReal.str(std::string());
+  o.str(std::string());
+  stan::lang::generate_array_var_type(INT_T,ssReal.str(),true,o);
+  EXPECT_EQ(1, count_matches("int", o.str()));
+
+  ssReal.str(std::string());
+  o.str(std::string());
+  stan::lang::generate_array_var_type(INT_T,ssReal.str(),false,o);
+  EXPECT_EQ(1, count_matches("int", o.str()));
+
+  ssReal.str(std::string());
+  o.str(std::string());
+  stan::lang::generate_array_var_type(VECTOR_T,ssReal.str(),true,o);
+  EXPECT_EQ(1, count_matches("Eigen::Matrix<T__,Eigen::Dynamic,1> ", o.str()));
+
+  ssReal.str(std::string());
+  o.str(std::string());
+  stan::lang::generate_array_var_type(VECTOR_T,ssReal.str(),false,o);
+  EXPECT_EQ(1, count_matches("vector_d", o.str()));
+
+  ssReal.str(std::string());
+  o.str(std::string());
+  stan::lang::generate_array_var_type(ROW_VECTOR_T,ssReal.str(),true,o);
+  EXPECT_EQ(1, count_matches("Eigen::Matrix<T__,1,Eigen::Dynamic> ", o.str()));
+
+  ssReal.str(std::string());
+  o.str(std::string());
+  stan::lang::generate_array_var_type(ROW_VECTOR_T,ssReal.str(),false,o);
+  EXPECT_EQ(1, count_matches("row_vector_d", o.str()));
+
+  ssReal.str(std::string());
+  o.str(std::string());
+  stan::lang::generate_array_var_type(MATRIX_T,ssReal.str(),true,o);
+  EXPECT_EQ(1, count_matches("Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> ", o.str()));
+
+  ssReal.str(std::string());
+  o.str(std::string());
+  stan::lang::generate_array_var_type(MATRIX_T,ssReal.str(),false,o);
+  EXPECT_EQ(1, count_matches("matrix_d", o.str()));
+}
+
+
+  
