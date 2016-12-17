@@ -32,7 +32,7 @@ namespace stan {
        *
        * @param name variable name
        */
-      variable(std::string name);  // NOLINT(runtime/explicit)
+      variable(const std::string& name);  // NOLINT(runtime/explicit)
 
       /**
        * Set the type of the variable to the expression type

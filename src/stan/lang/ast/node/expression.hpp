@@ -2,6 +2,21 @@
 #define STAN_LANG_AST_NODE_EXPRESSION_HPP
 
 #include <stan/lang/ast/expr_type.hpp>
+
+// #include <stan/lang/ast/node/nil.hpp>
+// #include <stan/lang/ast/node/int_literal.hpp>
+// #include <stan/lang/ast/node/double_literal.hpp>
+// #include <stan/lang/ast/node/array_expr.hpp>
+// #include <stan/lang/ast/node/variable.hpp>
+// #include <stan/lang/ast/node/fun.hpp>
+// #include <stan/lang/ast/node/integrate_ode.hpp>
+// #include <stan/lang/ast/node/integrate_ode_control.hpp>
+// #include <stan/lang/ast/node/index_op.hpp>
+// #include <stan/lang/ast/node/index_op_sliced.hpp>
+// #include <stan/lang/ast/node/conditional_op.hpp>
+// #include <stan/lang/ast/node/binary_op.hpp>
+// #include <stan/lang/ast/node/unary_op.hpp>
+
 #include <boost/variant/recursive_variant.hpp>
 #include <string>
 #include <vector>
