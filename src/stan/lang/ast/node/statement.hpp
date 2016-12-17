@@ -54,7 +54,7 @@ namespace stan {
 
       /**
        * Construct a statement from the specified raw variant type
-       * wrapper. 
+       * wrapper.
        *
        * @param st statement variant type
        */
@@ -203,6 +203,7 @@ namespace stan {
        */
       std::size_t end_line_;
     };
+
   }
 }
 #endif

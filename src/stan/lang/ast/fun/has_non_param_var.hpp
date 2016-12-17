@@ -9,11 +9,13 @@ namespace stan {
 
     /**
      * Returns true if the specified expression contains a variable
-     * that is defined as a transformed parameter, or is a local
-     * variable that is not an integer.
+     * that requires a Jacobian warning.  This is either a transformed
+     * variable or a local variable or a non-linear function of a
+     * parameter.
      *
      * <p>Compare to <code>has_var</code>, which is similar, but
-     * includes variables declared as parameters.
+     * just tests for inclusion of variables declared in the
+     * parameters, transformed parameters, or model block.
      *
      * @param e Expression to test.
      * @param var_map Variable mapping for origin and types of

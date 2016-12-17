@@ -4,6 +4,7 @@
 #include <stan/lang/ast/expr_type.hpp>
 #include <stan/lang/ast/var_origin.hpp>
 #include <stan/lang/ast/node/expression.hpp>
+#include <vector>
 
 namespace stan {
   namespace lang {
@@ -33,7 +34,7 @@ namespace stan {
 
       /**
        * Origin of this array expression.
-       * 
+       *
        */
       // TODO(carpenter): rename to "array_expr_origin_"
       var_origin var_origin_;
@@ -45,7 +46,7 @@ namespace stan {
 
       /**
        * Construct an array expression from the specified sequence of
-       * expressions. 
+       * expressions.
        *
        * @param args sequence of arguments
        */
