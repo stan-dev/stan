@@ -144,3 +144,13 @@ TEST(langParserVarDeclsGrammarDef, badDefDeclMatrix1) {
   test_throws("declare-define-var-matrix-1",
               "variable definition base type mismatch");
 }
+
+TEST(langParserVarDeclsGrammarDef, defDeclConstrainedVectorVar) {
+  test_parsable("declare-define-var-constrained-vector");
+}
+
+TEST(langParserVarDeclsGrammarDef, defDeclConstrainedMatrixVar) {
+  test_parsable("declare-define-var-constrained-matrix");
+}
+
+
