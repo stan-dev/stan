@@ -48,43 +48,51 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::matrix_var_decl,
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::unit_vector_var_decl,
                           (stan::lang::expression, K_)
                           (std::string, name_)
-                          (std::vector<stan::lang::expression>, dims_) )
+                          (std::vector<stan::lang::expression>, dims_)
+                          (stan::lang::expression, def_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::simplex_var_decl,
                           (stan::lang::expression, K_)
                           (std::string, name_)
-                          (std::vector<stan::lang::expression>, dims_) )
+                          (std::vector<stan::lang::expression>, dims_) 
+                          (stan::lang::expression, def_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::ordered_var_decl,
                           (stan::lang::expression, K_)
                           (std::string, name_)
-                          (std::vector<stan::lang::expression>, dims_) )
+                          (std::vector<stan::lang::expression>, dims_)
+                          (stan::lang::expression, def_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::positive_ordered_var_decl,
                           (stan::lang::expression, K_)
                           (std::string, name_)
-                          (std::vector<stan::lang::expression>, dims_) )
+                          (std::vector<stan::lang::expression>, dims_)
+                          (stan::lang::expression, def_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::cholesky_factor_var_decl,
                           (stan::lang::expression, M_)
                           (stan::lang::expression, N_)
                           (std::string, name_)
-                          (std::vector<stan::lang::expression>, dims_) )
+                          (std::vector<stan::lang::expression>, dims_)
+                          (stan::lang::expression, def_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::cholesky_corr_var_decl,
                           (stan::lang::expression, K_)
                           (std::string, name_)
-                          (std::vector<stan::lang::expression>, dims_) )
+                          (std::vector<stan::lang::expression>, dims_)
+                          (stan::lang::expression, def_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::cov_matrix_var_decl,
                           (stan::lang::expression, K_)
                           (std::string, name_)
-                          (std::vector<stan::lang::expression>, dims_) )
+                          (std::vector<stan::lang::expression>, dims_)
+                          (stan::lang::expression, def_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::corr_matrix_var_decl,
                           (stan::lang::expression, K_)
                           (std::string, name_)
-                          (std::vector<stan::lang::expression>, dims_) )
+                          (std::vector<stan::lang::expression>, dims_)
+                          (stan::lang::expression, def_) )
 
 namespace stan {
 
@@ -224,7 +232,8 @@ namespace stan {
             >> no_skip[!char_("a-zA-Z0-9_")])
         > dim1_r(_r1)
         > identifier_r
-        > opt_dims_r(_r1);
+        > opt_dims_r(_r1)
+        > opt_def_r(_r1);
 
       simplex_decl_r.name("simplex declaration");
       simplex_decl_r
@@ -232,7 +241,8 @@ namespace stan {
             >> no_skip[!char_("a-zA-Z0-9_")])
         > dim1_r(_r1)
         > identifier_r
-        > opt_dims_r(_r1);
+        > opt_dims_r(_r1)
+        > opt_def_r(_r1);
 
       ordered_decl_r.name("ordered declaration");
       ordered_decl_r
@@ -240,7 +250,8 @@ namespace stan {
             >> no_skip[!char_("a-zA-Z0-9_")])
         > dim1_r(_r1)
         > identifier_r
-        > opt_dims_r(_r1);
+        > opt_dims_r(_r1)
+        > opt_def_r(_r1);
 
       positive_ordered_decl_r.name("positive_ordered declaration");
       positive_ordered_decl_r
@@ -248,7 +259,8 @@ namespace stan {
             >> no_skip[!char_("a-zA-Z0-9_")])
         > dim1_r(_r1)
         > identifier_r
-        > opt_dims_r(_r1);
+        > opt_dims_r(_r1)
+        > opt_def_r(_r1);
 
       cholesky_factor_decl_r.name("cholesky factor for symmetric,"
                                   " positive-def declaration");
@@ -261,6 +273,7 @@ namespace stan {
         > lit(']')
         > identifier_r
         > opt_dims_r(_r1)
+        > opt_def_r(_r1)
         > eps
         [copy_square_cholesky_dimension_if_necessary_f(_val)];
 
@@ -271,7 +284,8 @@ namespace stan {
             >> no_skip[!char_("a-zA-Z0-9_")])
         > dim1_r(_r1)
         > identifier_r
-        > opt_dims_r(_r1);
+        > opt_dims_r(_r1)
+        > opt_def_r(_r1);
 
       cov_matrix_decl_r.name("covariance matrix declaration");
       cov_matrix_decl_r
@@ -279,7 +293,8 @@ namespace stan {
             >> no_skip[!char_("a-zA-Z0-9_")])
         > dim1_r(_r1)
         > identifier_r
-        > opt_dims_r(_r1);
+        > opt_dims_r(_r1)
+        > opt_def_r(_r1);
 
       corr_matrix_decl_r.name("correlation matrix declaration");
       corr_matrix_decl_r
@@ -287,7 +302,8 @@ namespace stan {
             >> no_skip[!char_("a-zA-Z0-9_")])
         > dim1_r(_r1)
         > identifier_r
-        > opt_dims_r(_r1);
+        > opt_dims_r(_r1)
+        > opt_def_r(_r1);
 
       int_data_expr_r.name("integer data expression");
       int_data_expr_r

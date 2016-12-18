@@ -12,8 +12,10 @@ namespace stan {
 
     simplex_var_decl::simplex_var_decl(expression const& K,
                                        std::string const& name,
-                                       std::vector<expression> const& dims)
-      : base_var_decl(name, dims, VECTOR_T),  K_(K) { }
+                                       std::vector<expression> const& dims,
+                                       expression const& def)
+
+      : base_var_decl(name, dims, VECTOR_T, def),  K_(K) { }
 
   }
 }

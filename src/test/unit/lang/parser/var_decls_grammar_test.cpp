@@ -150,7 +150,7 @@ TEST(langParserVarDeclsGrammarDef, defDeclConstrainedVectorVar) {
 }
 
 TEST(langParserVarDeclsGrammarDef, defDeclConstrainedMatrixVar) {
-  test_parsable("declare-define-var-constrained-matrix");
+   test_parsable("declare-define-var-constrained-matrix");
 }
 
 
