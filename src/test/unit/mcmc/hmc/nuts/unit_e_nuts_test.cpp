@@ -80,7 +80,6 @@ TEST(McmcUnitENuts, build_tree_test) {
   EXPECT_EQ("", error_stream.str());
 }
 
-
 TEST(McmcUnitENuts, tree_boundary_test) {
   rng_t base_rng(4839294);
 
