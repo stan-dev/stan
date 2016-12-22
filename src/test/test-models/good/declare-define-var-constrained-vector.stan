@@ -44,16 +44,13 @@ transformed data {
   print("td_positive_ordered2 = ", td_positive_ordered2);
   print("td_positive_ordered_ar = ", td_positive_ordered_ar);
 }
-parameters {
-  matrix<lower = 0, upper = 1>[d, d] p_m;
-}
 transformed parameters {
   simplex[d] tp_simplex1 = d_simplex;
   simplex[d] tp_simplex2 = d_simplex_ar[1];
   simplex[d] tp_simplex_ar3[d] = d_simplex_ar;
 
   simplex[d] tp_simplex4 = tp_simplex1;
-  simplex[d] tp_simplex5 = p_m[, 1];
+  simplex[d] tp_simplex5 = d_simplex_ar[1];
   simplex[d] tp_simplex_ar6[d] = tp_simplex_ar3;
 
   unit_vector[d] tp_unit_vector1 = d_unit_vector;
@@ -61,7 +58,7 @@ transformed parameters {
   unit_vector[d] tp_unit_vector_ar3[d] = d_unit_vector_ar;
 
   unit_vector[d] tp_unit_vector4 = tp_unit_vector1;
-  unit_vector[d] tp_unit_vector5 = p_m[, 1];
+  unit_vector[d] tp_unit_vector5 = tp_unit_vector_ar3[2];
   unit_vector[d] tp_unit_vector_ar6[d] = tp_unit_vector_ar3;
 
   ordered[d] tp_ordered1 = d_ordered;
@@ -69,7 +66,7 @@ transformed parameters {
   ordered[d] tp_ordered_ar3[d] = d_ordered_ar;
 
   ordered[d] tp_ordered4 = tp_ordered1;
-  ordered[d] tp_ordered5 = p_m[, 1];
+  ordered[d] tp_ordered5 = tp_ordered_ar3[3];
   ordered[d] tp_ordered_ar6[d] = tp_ordered_ar3;
 
   positive_ordered[d] tp_positive_ordered1 = d_positive_ordered;
@@ -77,7 +74,7 @@ transformed parameters {
   positive_ordered[d] tp_positive_ordered_ar3[d] = d_positive_ordered_ar;
 
   positive_ordered[d] tp_positive_ordered4 = tp_positive_ordered1;
-  positive_ordered[d] tp_positive_ordered5 = p_m[, 1];
+  positive_ordered[d] tp_positive_ordered5 = tp_positive_ordered_ar3[1];
   positive_ordered[d] tp_positive_ordered_ar6[d] = tp_positive_ordered_ar3;
 
   print("tp_simplex1 = ", tp_simplex1);
