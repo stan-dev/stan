@@ -60,10 +60,11 @@ namespace stan {
         ps_point z_propose(z_plus);
 
         Eigen::VectorXd p_sharp_plus = this->hamiltonian_.dtau_dp(this->z_);
-        Eigen::VectorXd p_sharp_minus = this->hamiltonian_.dtau_dp(this->z_);
+        Eigen::VectorXd p_sharp_dummy = p_sharp_plus;
+        Eigen::VectorXd p_sharp_minus = p_sharp_plus;
         Eigen::VectorXd rho = this->z_.p;
-        double log_sum_weight = 0;  // log(exp(H0 - H0))
 
+        double log_sum_weight = 0;  // log(exp(H0 - H0))
         double H0 = this->hamiltonian_.H(this->z_);
         int n_leapfrog = 0;
         double sum_metro_prob = 1;  // exp(H0 - H0)
@@ -74,8 +75,7 @@ namespace stan {
 
         while (this->depth_ < this->max_depth_) {
           // Build a new subtree in a random direction
-          Eigen::VectorXd rho_subtree(rho.size());
-          rho_subtree.setZero();
+          Eigen::VectorXd rho_subtree = Eigen::VectorXd::Zero(rho.size());
 
           bool valid_subtree = false;
           double log_sum_weight_subtree
@@ -84,21 +84,21 @@ namespace stan {
           if (this->rand_uniform_() > 0.5) {
             this->z_.ps_point::operator=(z_plus);
             valid_subtree
-              = build_tree(this->depth_, rho_subtree, z_propose,
+              = build_tree(this->depth_, z_propose,
+                           p_sharp_dummy, p_sharp_plus, rho_subtree, 
                            H0, 1, n_leapfrog,
                            log_sum_weight_subtree, sum_metro_prob,
                            info_writer, error_writer);
             z_plus.ps_point::operator=(this->z_);
-            p_sharp_plus = this->hamiltonian_.dtau_dp(this->z_);
           } else {
             this->z_.ps_point::operator=(z_minus);
             valid_subtree
-              = build_tree(this->depth_, rho_subtree, z_propose,
+              = build_tree(this->depth_, z_propose,
+                           p_sharp_dummy, p_sharp_minus, rho_subtree,
                            H0, -1, n_leapfrog,
                            log_sum_weight_subtree, sum_metro_prob,
                            info_writer, error_writer);
             z_minus.ps_point::operator=(this->z_);
-            p_sharp_minus = this->hamiltonian_.dtau_dp(this->z_);
           }
 
           if (!valid_subtree) break;
@@ -165,8 +165,10 @@ namespace stan {
        * resulting subtree.
        *
        * @param depth Depth of the desired subtree
-       * @param rho Summed momentum across trajectory
        * @param z_propose State proposed from subtree
+       * @param p_sharp_left p_sharp from left boundary of returned tree
+       * @param p_shart_right p_sharp from the right boundary of returned tree
+       * @param rho Summed momentum across trajectory
        * @param H0 Hamiltonian of initial state
        * @param sign Direction in time to built subtree
        * @param n_leapfrog Summed number of leapfrog evaluations
@@ -175,7 +177,10 @@ namespace stan {
        * @param info_writer Stream for information messages
        * @param error_writer Stream for error messages
       */
-      bool build_tree(int depth, Eigen::VectorXd& rho, ps_point& z_propose,
+      bool build_tree(int depth, ps_point& z_propose,
+                      Eigen::VectorXd& p_sharp_left,
+                      Eigen::VectorXd& p_sharp_right,
+                      Eigen::VectorXd& rho,
                       double H0, double sign, int& n_leapfrog,
                       double& log_sum_weight, double& sum_metro_prob,
                       interface_callbacks::writer::base_writer& info_writer,
@@ -203,20 +208,21 @@ namespace stan {
           z_propose = this->z_;
           rho += this->z_.p;
 
+          p_sharp_left = this->hamiltonian_.dtau_dp(this->z_);
+          p_sharp_right = p_sharp_left;
+
           return !this->divergent_;
         }
         // General recursion
+        Eigen::VectorXd p_sharp_dummy(this->z_.p.size());
 
         // Build the left subtree
         double log_sum_weight_left = -std::numeric_limits<double>::infinity();
-
-        Eigen::VectorXd rho_left(rho.size());
-        rho_left.setZero();
-
-        Eigen::VectorXd p_sharp_left = this->hamiltonian_.dtau_dp(this->z_);
+        Eigen::VectorXd rho_left = Eigen::VectorXd::Zero(rho.size());
 
         bool valid_left
-          = build_tree(depth - 1, rho_left, z_propose,
+          = build_tree(depth - 1, z_propose,
+                       p_sharp_left, p_sharp_dummy, rho_left,
                        H0, sign, n_leapfrog,
                        log_sum_weight_left, sum_metro_prob,
                        info_writer, error_writer);
@@ -227,12 +233,11 @@ namespace stan {
         ps_point z_propose_right(this->z_);
 
         double log_sum_weight_right = -std::numeric_limits<double>::infinity();
-
-        Eigen::VectorXd rho_right(rho.size());
-        rho_right.setZero();
+        Eigen::VectorXd rho_right = Eigen::VectorXd::Zero(rho.size());
 
         bool valid_right
-          = build_tree(depth - 1, rho_right, z_propose_right,
+          = build_tree(depth - 1, z_propose_right,
+                       p_sharp_dummy, p_sharp_right, rho_right,
                        H0, sign, n_leapfrog,
                        log_sum_weight_right, sum_metro_prob,
                        info_writer, error_writer);
@@ -257,7 +262,6 @@ namespace stan {
         Eigen::VectorXd rho_subtree = rho_left + rho_right;
         rho += rho_subtree;
 
-        Eigen::VectorXd p_sharp_right = this->hamiltonian_.dtau_dp(this->z_);
         return compute_criterion(p_sharp_left, p_sharp_right, rho_subtree);
       }
 
