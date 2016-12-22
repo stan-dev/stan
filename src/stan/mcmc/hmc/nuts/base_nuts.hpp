@@ -85,7 +85,7 @@ namespace stan {
             this->z_.ps_point::operator=(z_plus);
             valid_subtree
               = build_tree(this->depth_, z_propose,
-                           p_sharp_dummy, p_sharp_plus, rho_subtree, 
+                           p_sharp_dummy, p_sharp_plus, rho_subtree,
                            H0, 1, n_leapfrog,
                            log_sum_weight_subtree, sum_metro_prob,
                            info_writer, error_writer);
@@ -152,9 +152,9 @@ namespace stan {
         values.push_back(this->energy_);
       }
 
-      bool compute_criterion(Eigen::VectorXd& p_sharp_minus,
-                             Eigen::VectorXd& p_sharp_plus,
-                             Eigen::VectorXd& rho) {
+      virtual bool compute_criterion(Eigen::VectorXd& p_sharp_minus,
+                                     Eigen::VectorXd& p_sharp_plus,
+                                     Eigen::VectorXd& rho) {
         return    p_sharp_plus.dot(rho) > 0
                && p_sharp_minus.dot(rho) > 0;
       }
