@@ -166,7 +166,7 @@ namespace stan {
        * @param depth Depth of the desired subtree
        * @param z_propose State proposed from subtree
        * @param p_sharp_left p_sharp from left boundary of returned tree
-       * @param p_shart_right p_sharp from the right boundary of returned tree
+       * @param p_sharp_right p_sharp from the right boundary of returned tree
        * @param rho Summed momentum across trajectory
        * @param H0 Hamiltonian of initial state
        * @param sign Direction in time to built subtree
