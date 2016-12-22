@@ -45,7 +45,6 @@ namespace stan {
                                const std::string& name,
                                const std::vector<expression>& dims,
                                expression const& def);
-
     };
   }
 }
