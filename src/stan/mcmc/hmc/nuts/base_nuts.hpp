@@ -206,16 +206,17 @@ namespace stan {
           return !this->divergent_;
         }
         // General recursion
-        Eigen::VectorXd p_sharp_left = this->hamiltonian_.dtau_dp(this->z_);
-
-        Eigen::VectorXd rho_subtree(rho.size());
-        rho_subtree.setZero();
 
         // Build the left subtree
         double log_sum_weight_left = -std::numeric_limits<double>::infinity();
 
+        Eigen::VectorXd rho_left(rho.size());
+        rho_left.setZero();
+
+        Eigen::VectorXd p_sharp_left = this->hamiltonian_.dtau_dp(this->z_);
+
         bool valid_left
-          = build_tree(depth - 1, rho_subtree, z_propose,
+          = build_tree(depth - 1, rho_left, z_propose,
                        H0, sign, n_leapfrog,
                        log_sum_weight_left, sum_metro_prob,
                        info_writer, error_writer);
@@ -224,10 +225,14 @@ namespace stan {
 
         // Build the right subtree
         ps_point z_propose_right(this->z_);
+
         double log_sum_weight_right = -std::numeric_limits<double>::infinity();
 
+        Eigen::VectorXd rho_right(rho.size());
+        rho_right.setZero();
+
         bool valid_right
-          = build_tree(depth - 1, rho_subtree, z_propose_right,
+          = build_tree(depth - 1, rho_right, z_propose_right,
                        H0, sign, n_leapfrog,
                        log_sum_weight_right, sum_metro_prob,
                        info_writer, error_writer);
@@ -249,7 +254,9 @@ namespace stan {
             z_propose = z_propose_right;
         }
 
+        Eigen::VectorXd rho_subtree = rho_left + rho_right;
         rho += rho_subtree;
+
         Eigen::VectorXd p_sharp_right = this->hamiltonian_.dtau_dp(this->z_);
         return compute_criterion(p_sharp_left, p_sharp_right, rho_subtree);
       }
