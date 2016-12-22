@@ -76,7 +76,6 @@ namespace stan {
         while (this->depth_ < this->max_depth_) {
           // Build a new subtree in a random direction
           Eigen::VectorXd rho_subtree = Eigen::VectorXd::Zero(rho.size());
-
           bool valid_subtree = false;
           double log_sum_weight_subtree
             = -std::numeric_limits<double>::infinity();
