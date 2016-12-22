@@ -70,7 +70,7 @@ namespace stan {
 
         // Build a trajectory until the NUTS criterion is no longer satisfied
         this->depth_ = 0;
-        this->divergent_ = 0;
+        this->divergent_ = false;
 
         while (this->depth_ < this->max_depth_) {
           // Build a new subtree in a random direction
@@ -118,7 +118,7 @@ namespace stan {
           log_sum_weight
             = math::log_sum_exp(log_sum_weight, log_sum_weight_subtree);
 
-          // Break when NUTS criterion is not longer satisfied
+          // Break when NUTS criterion is no longer satisfied
           rho += rho_subtree;
           if (!compute_criterion(p_sharp_minus, p_sharp_plus, rho))
             break;
@@ -175,11 +175,11 @@ namespace stan {
        * @param info_writer Stream for information messages
        * @param error_writer Stream for error messages
       */
-      int build_tree(int depth, Eigen::VectorXd& rho, ps_point& z_propose,
-                     double H0, double sign, int& n_leapfrog,
-                     double& log_sum_weight, double& sum_metro_prob,
-                     interface_callbacks::writer::base_writer& info_writer,
-                     interface_callbacks::writer::base_writer& error_writer) {
+      bool build_tree(int depth, Eigen::VectorXd& rho, ps_point& z_propose,
+                      double H0, double sign, int& n_leapfrog,
+                      double& log_sum_weight, double& sum_metro_prob,
+                      interface_callbacks::writer::base_writer& info_writer,
+                      interface_callbacks::writer::base_writer& error_writer) {
         // Base case
         if (depth == 0) {
           this->integrator_.evolve(this->z_, this->hamiltonian_,
@@ -266,7 +266,7 @@ namespace stan {
       double max_deltaH_;
 
       int n_leapfrog_;
-      int divergent_;
+      bool divergent_;
       double energy_;
     };
 
