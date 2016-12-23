@@ -11,9 +11,10 @@ namespace stan {
     unit_vector_var_decl::unit_vector_var_decl() : base_var_decl(VECTOR_T) { }
 
     unit_vector_var_decl::unit_vector_var_decl(expression const& K,
-                                       std::string const& name,
-                                       std::vector<expression> const& dims)
-      : base_var_decl(name, dims, VECTOR_T),  K_(K) { }
+                                          std::string const& name,
+                                          std::vector<expression> const& dims,
+                                          expression const& def)
+      : base_var_decl(name, dims, VECTOR_T, def),  K_(K) { }
 
   }
 }

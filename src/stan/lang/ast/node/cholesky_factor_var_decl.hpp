@@ -38,11 +38,13 @@ namespace stan {
        * @param N number of columns
        * @param name variable name
        * @param dims array dimension sizes
+       * @param def defition of variable
        */
       cholesky_factor_var_decl(const expression& M,
                                const expression& N,
                                const std::string& name,
-                               const std::vector<expression>& dims);
+                               const std::vector<expression>& dims,
+                               expression const& def);
     };
   }
 }

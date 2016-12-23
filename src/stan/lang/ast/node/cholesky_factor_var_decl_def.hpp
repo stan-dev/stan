@@ -14,10 +14,10 @@ namespace stan {
     cholesky_factor_var_decl::cholesky_factor_var_decl(expression const& M,
                                        expression const& N,
                                        std::string const& name,
-                                       std::vector<expression> const& dims)
-      : base_var_decl(name, dims, MATRIX_T), M_(M), N_(N) { }
+                                       std::vector<expression> const& dims,
+                                       expression const& def)
 
-
+      : base_var_decl(name, dims, MATRIX_T, def), M_(M), N_(N) { }
 
   }
 }

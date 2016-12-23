@@ -30,10 +30,12 @@ namespace stan {
        * @param K size of unit vector
        * @param name variable name
        * @param dims array dimension sizes
+       * @param def definition
        */
       unit_vector_var_decl(const expression& K,
                            const std::string& name,
-                           const std::vector<expression>& dims);
+                           const std::vector<expression>& dims,
+                           expression const& def);
     };
   }
 }
