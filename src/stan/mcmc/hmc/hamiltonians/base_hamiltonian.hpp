@@ -71,7 +71,7 @@ namespace stan {
         interface_callbacks::writer::base_writer& error_writer) {
         try {
           z.V = -stan::model::log_prob_propto<true>(model_, z.q);
-        } catch (const std::exception& e) {
+        } catch(const std::domain_error& e) {
           this->write_error_msg_(e, error_writer);
           z.V = std::numeric_limits<double>::infinity();
         }
@@ -84,7 +84,7 @@ namespace stan {
         try {
           stan::model::gradient(model_, z.q, z.V, z.g, info_writer);
           z.V = -z.V;
-        } catch (const std::exception& e) {
+        } catch (const std::domain_error& e) {
           this->write_error_msg_(e, error_writer);
           z.V = std::numeric_limits<double>::infinity();
         }
