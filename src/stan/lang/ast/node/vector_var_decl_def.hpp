@@ -10,10 +10,10 @@ namespace stan {
 
     vector_var_decl::vector_var_decl() : base_var_decl(VECTOR_T) { }
 
-    vector_var_decl::vector_var_decl(range const& range, expression const& M,
-                                     std::string const& name,
-                                     std::vector<expression> const& dims,
-                                     expression const& def)
+    vector_var_decl::vector_var_decl(const range& range, const expression& M,
+                                     const std::string& name,
+                                     const std::vector<expression>& dims,
+                                     const expression& def)
       : base_var_decl(name, dims, VECTOR_T, def), range_(range), M_(M) {  }
 
   }

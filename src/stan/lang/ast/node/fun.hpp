@@ -48,7 +48,7 @@ namespace stan {
        * @param name name of function
        * @param args sequence of arguments to function
        */
-      fun(std::string const& name, std::vector<expression> const& args);
+      fun(const std::string& name, const std::vector<expression>& args);
     };
 
   }

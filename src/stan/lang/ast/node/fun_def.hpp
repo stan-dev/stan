@@ -10,7 +10,7 @@ namespace stan {
 
     fun::fun() { }
 
-    fun::fun(std::string const& name, std::vector<expression> const& args)
+    fun::fun(const std::string& name, const std::vector<expression>& args)
       : name_(name), args_(args) { }
 
   }

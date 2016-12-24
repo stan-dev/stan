@@ -35,7 +35,7 @@ namespace stan {
       unit_vector_var_decl(const expression& K,
                            const std::string& name,
                            const std::vector<expression>& dims,
-                           expression const& def);
+                           const expression& def);
     };
   }
 }
