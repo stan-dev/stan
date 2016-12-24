@@ -120,23 +120,31 @@ namespace stan {
                                    writer) {
         try {
           validate_unconstrained_initialization(cont_params, model);
-        } catch (const std::exception& e) {
+        } catch (const std::domain_error& e) {
           writer(e.what());
           writer();
           return false;
+        } catch (const std::exception& e) {
+          writer(e.what());
+          writer();
+          throw;
         }
         double init_log_prob;
         Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
         try {
           stan::model::gradient(model, cont_params, init_log_prob,
                                 init_grad, writer);
-        } catch (const std::exception& e) {
+        } catch (const std::domain_error& e) {
           io::write_error_msg(writer, e);
           writer("Rejecting initial value:");
           writer("  Error evaluating the log probability "
                  "at the initial value.");
           writer();
           return false;
+        } catch (const std::exception& e) {
+          writer(e.what());
+          writer();
+          throw;
         }
         if (!boost::math::isfinite(init_log_prob)) {
           writer("Rejecting initial value:");
