@@ -10,11 +10,11 @@ namespace stan {
 
     matrix_var_decl::matrix_var_decl() : base_var_decl(MATRIX_T) { }
 
-    matrix_var_decl::matrix_var_decl(range const& range, expression const& M,
-                                     expression const& N,
-                                     std::string const& name,
-                                     std::vector<expression> const& dims,
-                                     expression const& def)
+    matrix_var_decl::matrix_var_decl(const range& range, const expression& M,
+                                     const expression& N,
+                                     const std::string& name,
+                                     const std::vector<expression>& dims,
+                                     const expression& def)
       : base_var_decl(name, dims, MATRIX_T, def), range_(range), M_(M), N_(N) {
     }
 

@@ -11,10 +11,10 @@ namespace stan {
     positive_ordered_var_decl::positive_ordered_var_decl()
       : base_var_decl(VECTOR_T) { }
 
-    positive_ordered_var_decl::positive_ordered_var_decl(expression const& K,
-                                        std::string const& name,
-                                        std::vector<expression> const& dims,
-                                        expression const& def)
+    positive_ordered_var_decl::positive_ordered_var_decl(const expression& K,
+                                        const std::string& name,
+                                        const std::vector<expression>& dims,
+                                        const expression& def)
 
       : base_var_decl(name, dims, VECTOR_T, def), K_(K) { }
 

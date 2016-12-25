@@ -42,11 +42,11 @@ namespace stan {
        * @param dims number of array dimensions
        * @param def definition
        */
-      row_vector_var_decl(range const& range,
-                          expression const& N,
-                          std::string const& name,
-                          std::vector<expression> const& dims,
-                          expression const& def);
+      row_vector_var_decl(const range& range,
+                          const expression& N,
+                          const std::string& name,
+                          const std::vector<expression>& dims,
+                          const expression& def);
     };
   }
 }

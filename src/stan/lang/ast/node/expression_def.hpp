@@ -53,12 +53,12 @@ namespace stan {
       return *this;
     }
 
-    expression& expression::operator*=(expression const& rhs) {
+    expression& expression::operator*=(const expression& rhs) {
       expr_ = binary_op(expr_, "*", rhs);
       return *this;
     }
 
-    expression& expression::operator/=(expression const& rhs) {
+    expression& expression::operator/=(const expression& rhs) {
       expr_ = binary_op(expr_, "/", rhs);
       return *this;
     }

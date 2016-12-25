@@ -10,9 +10,9 @@ namespace stan {
 
     int_var_decl::int_var_decl() : base_var_decl(INT_T) { }
 
-    int_var_decl::int_var_decl(range const& range, std::string const& name,
-                               std::vector<expression> const& dims,
-                               expression const& def)
+    int_var_decl::int_var_decl(const range& range, const std::string& name,
+                               const std::vector<expression>& dims,
+                               const expression& def)
       : base_var_decl(name, dims, INT_T, def), range_(range) { }
 
   }

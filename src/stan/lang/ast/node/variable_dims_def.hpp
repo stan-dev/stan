@@ -10,8 +10,8 @@ namespace stan {
 
     variable_dims::variable_dims() { }
 
-    variable_dims::variable_dims(std::string const& name,
-                                 std::vector<expression> const& dims)
+    variable_dims::variable_dims(const std::string& name,
+                                 const std::vector<expression>& dims)
       : name_(name), dims_(dims) { }
 
   }

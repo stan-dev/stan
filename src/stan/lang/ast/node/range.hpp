@@ -35,7 +35,7 @@ namespace stan {
        * @param low lower bound
        * @param high upper bound
        */
-      range(expression const& low, expression const& high);
+      range(const expression& low, const expression& high);
 
       /**
        * Return true if the lower bound is non-nil.

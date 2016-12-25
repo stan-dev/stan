@@ -8,7 +8,7 @@ namespace stan {
 
     range::range() { }
 
-    range::range(expression const& low, expression const& high)
+    range::range(const expression& low, const expression& high)
       : low_(low), high_(high) {  }
 
     bool range::has_low() const {
