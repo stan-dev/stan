@@ -40,7 +40,7 @@ WINE =
 # Library locations
 ##
 STAN ?= 
-MATH ?= lib/stan_math/
+MATH ?= lib/stan_math_2.14.0/
 -include $(MATH)make/libraries
 
 ##
