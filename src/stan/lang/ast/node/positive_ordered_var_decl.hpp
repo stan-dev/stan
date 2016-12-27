@@ -35,7 +35,7 @@ namespace stan {
       positive_ordered_var_decl(const expression& K,
                                 const std::string& name,
                                 const std::vector<expression>& dims,
-                                expression const& def);
+                                const expression& def);
     };
 
   }

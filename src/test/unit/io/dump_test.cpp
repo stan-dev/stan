@@ -139,6 +139,73 @@ TEST(io_dump, reader_doubles) {
   test_list("b12",vs,"b12 <- c(-5.0, -2.12, 3.0, 0.0)");
 }
 
+TEST(io_dump, read_zero_ints) {
+  std::vector<int> vs;
+  test_list("a",vs,"a <- integer()");
+  test_list("a",vs,"a <- integer(0)");
+
+  vs.clear();
+  for (int i = 0; i < 4; i++) vs.push_back(0);
+  test_list("a",vs,"a <- integer(4)");
+  test_list("a",vs,"a <- integer(4 )");
+}
+
+TEST(io_dump, read_zero_doubles) {
+  std::vector<double> vs;
+  test_list("a",vs,"a <- double()");
+  test_list("a",vs,"a <- double(0)");
+
+  vs.clear();
+  for (int i = 0; i < 4; i++) vs.push_back(0);
+  test_list("a",vs,"a <- double(4)");
+  test_list("a",vs,"a <- double(4 )");
+}
+
+TEST(io_dump, integer_zero_ints_in_structure) {
+  std::vector<int> expected_vals;
+  for (int i = 1; i <= 4; ++i)
+    expected_vals.push_back(0);
+  std::vector<size_t> expected_dims;
+  expected_dims.push_back(2U);
+  expected_dims.push_back(2U);
+
+  std::string txt = "foo <- structure(integer(4), .Dim = c(2, 2))";
+  std::stringstream in(txt);
+  stan::io::dump_reader reader(in);
+  test_list2(reader,"foo",expected_vals,expected_dims);
+
+  std::string txt2 = "foo <- structure(integer(0), .Dim = c(2, 2, 0))";
+  std::vector<size_t> expected_dims2(expected_dims);
+  std::vector<int> expected_vals2;
+  expected_dims2.push_back(0U);
+  std::stringstream in2(txt2);
+  stan::io::dump_reader reader2(in2);
+  test_list2(reader2,"foo",expected_vals2,expected_dims2);
+}
+
+TEST(io_dump, integer_zero_doubles_in_structure) {
+  std::vector<double> expected_vals;
+  for (int i = 1; i <= 4; ++i)
+    expected_vals.push_back(0);
+  std::vector<size_t> expected_dims;
+  expected_dims.push_back(2U);
+  expected_dims.push_back(2U);
+
+  std::string txt = "foo <- structure(double(4), .Dim = c(2, 2))";
+  std::stringstream in(txt);
+  stan::io::dump_reader reader(in);
+  test_list2(reader,"foo",expected_vals,expected_dims);
+
+  std::string txt2 = "foo <- structure(double(0), .Dim = c(2, 2, 0))";
+  std::vector<size_t> expected_dims2(expected_dims);
+  std::vector<int> expected_vals2;
+  expected_dims2.push_back(0U);
+  std::stringstream in2(txt2);
+  stan::io::dump_reader reader2(in2);
+  test_list2(reader2,"foo",expected_vals2,expected_dims2);
+}
+
+
 TEST(io_dump, reader_ints) {
   std::vector<int> vs;
   test_list("a",vs,"a <- c()");
@@ -599,6 +666,7 @@ TEST(io_dump, double_too_small) {
 }
 
 
+
 /* syntax errors */
 
 TEST(io_dump, bad_syntax_seq) {
@@ -611,4 +679,23 @@ TEST(io_dump, bad_syntax_seq2) {
 
 TEST(io_dump, bad_syntax_struct) {
   test_exception("a <- structure(1:2, .Dim = c(2,3) ");
+}
+
+TEST(io_dump, bad_syntax_zero_array) {
+  test_exception("a <- integer(-3)");
+  test_exception("a <- integer(-3.2)");
+  test_exception("a <- double(-3)");
+  test_exception("a <- double(-3.2)");
+  test_exception("a <- structure(integer(-3), .Dim = c(2,0))");
+  test_exception("a <- structure(integer(-3], .Dim = c(2,0))");
+  test_exception("a <- structure(integer(3.2), .Dim = c(2,0))");
+  test_exception("a <- structure(double(-3), .Dim = c(2,0))");
+  test_exception("a <- structure(double(-3.2), .Dim = c(2,0))");
+}
+
+TEST(io_dump, too_large_zero_array) {
+  test_exception("a <- integer(999918446744073709551616L)");
+  test_exception("a <- double(999918446744073709551616L)");
+  test_exception("a <- structure(integer(999918446744073709551616L), .Dim = c(2,3))");
+  test_exception("a <- structure(double(999918446744073709551616L), .Dim = c(2,3))");
 }
