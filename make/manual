@@ -31,6 +31,7 @@ $(STAN)src/docs/stan-reference/stan-functions.txt: $(STAN)src/docs/stan-referenc
 	sed 's/{//g' | \
 	sed 's/\\textasciicircum/\^/g' | \
 	sed 's/\\textbackslash /\\/g' | \
+        sed 's/\\nobreakspace//g' | \
 	sed 's/@.*(/;(/g' | \
 	sed 's/ ;/;/g' | \
 	sed 's/^phi/Phi/g' | \

@@ -99,7 +99,7 @@ namespace stan {
       o << "} // namespace" << EOL2;
     }
 
-    void generate_comment(std::string const& msg, int indent,
+    void generate_comment(const std::string& msg, int indent,
                           std::ostream& o) {
       generate_indent(indent, o);
       o << "// " << msg        << EOL;
@@ -188,6 +188,7 @@ namespace stan {
       }
     }
 
+    // this generates base type for multi-dim expr
     void generate_type(const std::string& base_type,
                        const std::vector<expression>& /*dims*/,
                        size_t end,
@@ -197,6 +198,66 @@ namespace stan {
       for (size_t i = 0; i < end; ++i) {
         if (i > 0) o << ' ';
         o << '>';
+      }
+    }
+
+    /**
+     * Generate correct C++ type for expressions which contain a 
+     * Stan <code>real</code> variable according to context in
+     * which expression is used and expression contents.
+     *
+     * @param vo expression origin block
+     * @param has_var  does expression contains a variable?
+     * @param is_var_context true when in auto-diff context
+     * @param o generated typename
+     */
+    void generate_real_var_type(const var_origin& vo,
+                                bool has_var,
+                                bool is_var_context,
+                                std::ostream& o) {
+      if (is_fun_origin(vo)) {
+        o << "fun_scalar_t__";
+      } else if (is_var_context && has_var) {
+        o << "T__";
+      } else {
+        o << "double";
+      }
+    }
+
+    /**
+     * Generate correct C++ type for array expressions
+     * according to context in which expression is used.
+     * Generated typename may be embedded in angle brackets,
+     * add trailing space accordingly.
+     *
+     * @param base_type expression base type
+     * @param real_var_type context-dependent <code>real</code> type
+     * @param is_var_context true when in auto-diff context
+     * @param o generated typename
+     */
+    void generate_array_var_type(const base_expr_type base_type,
+                                 const std::string& real_var_type,
+                                 bool is_var_context,
+                                 std::ostream& o) {
+      switch (base_type) {
+      case INT_T :
+        o << "int";
+        break;
+      case DOUBLE_T :
+        o << real_var_type;
+        break;
+      case VECTOR_T :
+        o << (is_var_context ?
+              "Eigen::Matrix<T__,Eigen::Dynamic,1> " :"vector_d");
+        break;
+      case ROW_VECTOR_T :
+        o << (is_var_context ?
+              "Eigen::Matrix<T__,1,Eigen::Dynamic> " : "row_vector_d");
+        break;
+      case MATRIX_T :
+        o << (is_var_context ?
+              "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> " : "matrix_d");
+        break;
       }
     }
 
@@ -214,7 +275,7 @@ namespace stan {
           user_facing_(user_facing),
           is_var_context_(is_var_context) {
       }
-      void operator()(nil const& /*x*/) const {
+      void operator()(const nil& /*x*/) const {
         o_ << "nil";
       }
       void operator()(const int_literal& n) const { o_ << n.val_; }
@@ -224,19 +285,32 @@ namespace stan {
         if (num_str.find_first_of("eE.") == std::string::npos)
           o_ << ".0";  // trailing 0 to ensure C++ makes it a double
       }
-      void operator()(const array_literal& x) const {
-        o_ << "stan::math::new_array<";
-        generate_type("foobar",
+      void operator()(const array_expr& x) const {
+        std::stringstream ssRealType;
+        generate_real_var_type(x.var_origin_, x.has_var_, is_var_context_,
+                               ssRealType);
+        std::stringstream ssArrayType;
+        generate_array_var_type(x.type_.base_type_, ssRealType.str(),
+                                is_var_context_, ssArrayType);
+        o_ << "static_cast<";
+        generate_type(ssArrayType.str(),
                       x.args_,
-                      x.args_.size(),
+                      x.type_.num_dims_,
                       o_);
-        o_ << ">()";
+        o_ << " >(";
+        o_ << "stan::math::array_builder<";
+        generate_type(ssArrayType.str(),
+                      x.args_,
+                      x.type_.num_dims_ - 1,
+                      o_);
+        o_ << " >()";
         for (size_t i = 0; i < x.args_.size(); ++i) {
           o_ << ".add(";
-          generate_expression(x.args_[i], o_);
+          generate_expression(x.args_[i], user_facing_, is_var_context_, o_);
           o_ << ")";
         }
         o_ << ".array()";
+        o_ << ")";
       }
       void operator()(const variable& v) const { o_ << v.name_; }
       void operator()(int n) const {   // NOLINT
@@ -379,13 +453,8 @@ namespace stan {
                   == expr.false_val_.expression_type()));
 
         std::stringstream ss;
-        if (is_fun_origin(expr.var_origin_)) {
-          ss << "fun_scalar_t__";
-        } else if (is_var_context_) {
-          ss << "T__";
-        } else {
-            ss << "double";
-        }
+        generate_real_var_type(expr.var_origin_, expr.has_var_,
+                               is_var_context_, ss);
 
         o_ << "(";
         boost::apply_visitor(*this, expr.cond_.expr_);
@@ -621,58 +690,58 @@ namespace stan {
         : visgen(o),
           indent_(indent) {
       }
-      void operator()(nil const& /*x*/) const { }
-      void operator()(int_var_decl const& x) const {
+      void operator()(const nil& /*x*/) const { }
+      void operator()(const int_var_decl& x) const {
         generate_indent(indent_, o_);
         o_ << "stan::math::fill(" << x.name_
            << ", std::numeric_limits<int>::min());"
            << EOL;
       }
-      void operator()(double_var_decl const& x) const {
+      void operator()(const double_var_decl& x) const {
         generate_indent(indent_, o_);
         o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
-      void operator()(vector_var_decl const& x) const {
+      void operator()(const vector_var_decl& x) const {
         generate_indent(indent_, o_);
         o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
-      void operator()(row_vector_var_decl const& x) const {
+      void operator()(const row_vector_var_decl& x) const {
         generate_indent(indent_, o_);
         o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
-      void operator()(matrix_var_decl const& x) const {
+      void operator()(const matrix_var_decl& x) const {
         generate_indent(indent_, o_);
         o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
-      void operator()(unit_vector_var_decl const& x) const {
+      void operator()(const unit_vector_var_decl& x) const {
         generate_indent(indent_, o_);
         o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
-      void operator()(simplex_var_decl const& x) const {
+      void operator()(const simplex_var_decl& x) const {
         generate_indent(indent_, o_);
         o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
-      void operator()(ordered_var_decl const& x) const {
+      void operator()(const ordered_var_decl& x) const {
         generate_indent(indent_, o_);
         o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
-      void operator()(positive_ordered_var_decl const& x) const {
+      void operator()(const positive_ordered_var_decl& x) const {
         generate_indent(indent_, o_);
         o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
-      void operator()(cholesky_factor_var_decl const& x) const {
+      void operator()(const cholesky_factor_var_decl& x) const {
         generate_indent(indent_, o_);
         o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
-      void operator()(cholesky_corr_var_decl const& x) const {
+      void operator()(const cholesky_corr_var_decl& x) const {
         generate_indent(indent_, o_);
         o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
-      void operator()(cov_matrix_var_decl const& x) const {
+      void operator()(const cov_matrix_var_decl& x) const {
         generate_indent(indent_, o_);
         o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
-      void operator()(corr_matrix_var_decl const& x) const {
+      void operator()(const corr_matrix_var_decl& x) const {
         generate_indent(indent_, o_);
         o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
@@ -763,54 +832,54 @@ namespace stan {
         : visgen(o),
           stage_(stage) {
       }
-      void operator()(nil const& /*x*/) const { }  // dummy
-      void operator()(int_var_decl const& x) const {
+      void operator()(const nil& /*x*/) const { }  // dummy
+      void operator()(const int_var_decl& x) const {
         generate_validate_context_size(o_, stage_, x.name_, "int", x.dims_);
       }
-      void operator()(double_var_decl const& x) const {
+      void operator()(const double_var_decl& x) const {
         generate_validate_context_size(o_, stage_, x.name_, "double", x.dims_);
       }
-      void operator()(vector_var_decl const& x) const {
+      void operator()(const vector_var_decl& x) const {
         generate_validate_context_size(o_, stage_, x.name_, "vector_d",
                                        x.dims_, x.M_);
       }
-      void operator()(row_vector_var_decl const& x) const {
+      void operator()(const row_vector_var_decl& x) const {
         generate_validate_context_size(o_, stage_, x.name_, "row_vector_d",
                                        x.dims_, x.N_);
       }
-      void operator()(unit_vector_var_decl const& x) const {
+      void operator()(const unit_vector_var_decl& x) const {
         generate_validate_context_size(o_, stage_, x.name_, "vector_d",
                                        x.dims_, x.K_);
       }
-      void operator()(simplex_var_decl const& x) const {
+      void operator()(const simplex_var_decl& x) const {
         generate_validate_context_size(o_, stage_, x.name_, "vector_d",
                                        x.dims_, x.K_);
       }
-      void operator()(ordered_var_decl const& x) const {
+      void operator()(const ordered_var_decl& x) const {
         generate_validate_context_size(o_, stage_, x.name_, "vector_d",
                                        x.dims_, x.K_);
       }
-      void operator()(positive_ordered_var_decl const& x) const {
+      void operator()(const positive_ordered_var_decl& x) const {
         generate_validate_context_size(o_, stage_, x.name_, "vector_d",
                                        x.dims_, x.K_);
       }
-      void operator()(matrix_var_decl const& x) const {
+      void operator()(const matrix_var_decl& x) const {
         generate_validate_context_size(o_, stage_, x.name_, "matrix_d",
                                        x.dims_, x.M_, x.N_);
       }
-      void operator()(cholesky_factor_var_decl const& x) const {
+      void operator()(const cholesky_factor_var_decl& x) const {
         generate_validate_context_size(o_, stage_, x.name_, "matrix_d",
                                        x.dims_, x.M_, x.N_);
       }
-      void operator()(cholesky_corr_var_decl const& x) const {
+      void operator()(const cholesky_corr_var_decl& x) const {
         generate_validate_context_size(o_, stage_, x.name_, "matrix_d",
                                        x.dims_, x.K_, x.K_);
       }
-      void operator()(cov_matrix_var_decl const& x) const {
+      void operator()(const cov_matrix_var_decl& x) const {
         generate_validate_context_size(o_, stage_, x.name_, "matrix_d",
                                        x.dims_, x.K_, x.K_);
       }
-      void operator()(corr_matrix_var_decl const& x) const {
+      void operator()(const corr_matrix_var_decl& x) const {
         generate_validate_context_size(o_, stage_, x.name_, "matrix_d",
                                        x.dims_, x.K_, x.K_);
       }
@@ -853,47 +922,47 @@ namespace stan {
       explicit var_resizing_visgen(std::ostream& o)
         : visgen(o) {
       }
-      void operator()(nil const& /*x*/) const { }  // dummy
-      void operator()(int_var_decl const& x) const {
+      void operator()(const nil& /*x*/) const { }  // dummy
+      void operator()(const int_var_decl& x) const {
         generate_initialization(o_, x.name_, "int", x.dims_,
                                 nil(), nil());
       }
-      void operator()(double_var_decl const& x) const {
+      void operator()(const double_var_decl& x) const {
         generate_initialization(o_, x.name_, "double", x.dims_, nil(), nil());
       }
-      void operator()(vector_var_decl const& x) const {
+      void operator()(const vector_var_decl& x) const {
         generate_initialization(o_, x.name_, "vector_d", x.dims_, x.M_, nil());
       }
-      void operator()(row_vector_var_decl const& x) const {
+      void operator()(const row_vector_var_decl& x) const {
         generate_initialization(o_, x.name_, "row_vector_d", x.dims_, x.N_,
                                 nil());
       }
-      void operator()(unit_vector_var_decl const& x) const {
+      void operator()(const unit_vector_var_decl& x) const {
         generate_initialization(o_, x.name_, "vector_d", x.dims_, x.K_, nil());
       }
-      void operator()(simplex_var_decl const& x) const {
+      void operator()(const simplex_var_decl& x) const {
         generate_initialization(o_, x.name_, "vector_d", x.dims_, x.K_, nil());
       }
-      void operator()(ordered_var_decl const& x) const {
+      void operator()(const ordered_var_decl& x) const {
         generate_initialization(o_, x.name_, "vector_d", x.dims_, x.K_, nil());
       }
-      void operator()(positive_ordered_var_decl const& x) const {
+      void operator()(const positive_ordered_var_decl& x) const {
         generate_initialization(o_, x.name_, "vector_d", x.dims_, x.K_, nil());
       }
-      void operator()(matrix_var_decl const& x) const {
+      void operator()(const matrix_var_decl& x) const {
         generate_initialization(o_, x.name_, "matrix_d",
                                 x.dims_, x.M_, x.N_);
       }
-      void operator()(cholesky_factor_var_decl const& x) const {
+      void operator()(const cholesky_factor_var_decl& x) const {
         generate_initialization(o_, x.name_, "matrix_d", x.dims_, x.M_, x.N_);
       }
-      void operator()(cholesky_corr_var_decl const& x) const {
+      void operator()(const cholesky_corr_var_decl& x) const {
         generate_initialization(o_, x.name_, "matrix_d", x.dims_, x.K_, x.K_);
       }
-      void operator()(cov_matrix_var_decl const& x) const {
+      void operator()(const cov_matrix_var_decl& x) const {
         generate_initialization(o_, x.name_, "matrix_d", x.dims_, x.K_, x.K_);
       }
-      void operator()(corr_matrix_var_decl const& x) const {
+      void operator()(const corr_matrix_var_decl& x) const {
         generate_initialization(o_, x.name_, "matrix_d", x.dims_, x.K_, x.K_);
       }
     };
@@ -1068,6 +1137,8 @@ namespace stan {
                                   : "matrix_d",
                                   "corr_matrix", read_args, x.name_, x.dims_);
       }
+
+
       void generate_initialize_array(const std::string& var_type,
                                      const std::string& read_type,
                                      const std::vector<expression>& read_args,
@@ -1234,9 +1305,9 @@ namespace stan {
         for (size_t i = 0; i < dims_size; ++i)
           o_ << "[k" << i << "__]";
       }
-      void operator()(nil const& /*x*/) const { }
+      void operator()(const nil& /*x*/) const { }
       template <typename T>
-      void basic_validate(T const& x) const {
+      void basic_validate(const T& x) const {
         if (!(x.range_.has_low() || x.range_.has_high())) {
           return;  // unconstrained
         }
@@ -1265,19 +1336,19 @@ namespace stan {
         }
         generate_end_for_dims(x.dims_.size());
       }
-      void operator()(int_var_decl const& x) const {
+      void operator()(const int_var_decl& x) const {
         basic_validate(x);
       }
-      void operator()(double_var_decl const& x) const {
+      void operator()(const double_var_decl& x) const {
         basic_validate(x);
       }
-      void operator()(vector_var_decl const& x) const {
+      void operator()(const vector_var_decl& x) const {
         basic_validate(x);
       }
-      void operator()(row_vector_var_decl const& x) const {
+      void operator()(const row_vector_var_decl& x) const {
         basic_validate(x);
       }
-      void operator()(matrix_var_decl const& x) const {
+      void operator()(const matrix_var_decl& x) const {
         basic_validate(x);
       }
       template <typename T>
@@ -1294,28 +1365,28 @@ namespace stan {
            << EOL;
         generate_end_for_dims(x.dims_.size());
       }
-      void operator()(unit_vector_var_decl const& x) const {
+      void operator()(const unit_vector_var_decl& x) const {
         nonbasic_validate(x, "unit_vector");
       }
-      void operator()(simplex_var_decl const& x) const {
+      void operator()(const simplex_var_decl& x) const {
         nonbasic_validate(x, "simplex");
       }
-      void operator()(ordered_var_decl const& x) const {
+      void operator()(const ordered_var_decl& x) const {
         nonbasic_validate(x, "ordered");
       }
-      void operator()(positive_ordered_var_decl const& x) const {
+      void operator()(const positive_ordered_var_decl& x) const {
         nonbasic_validate(x, "positive_ordered");
       }
-      void operator()(cholesky_factor_var_decl const& x) const {
+      void operator()(const cholesky_factor_var_decl& x) const {
         nonbasic_validate(x, "cholesky_factor");
       }
-      void operator()(cholesky_corr_var_decl const& x) const {
+      void operator()(const cholesky_corr_var_decl& x) const {
         nonbasic_validate(x, "cholesky_factor_corr");
       }
-      void operator()(cov_matrix_var_decl const& x) const {
+      void operator()(const cov_matrix_var_decl& x) const {
         nonbasic_validate(x, "cov_matrix");
       }
-      void operator()(corr_matrix_var_decl const& x) const {
+      void operator()(const corr_matrix_var_decl& x) const {
         nonbasic_validate(x, "corr_matrix");
       }
     };
@@ -1343,48 +1414,48 @@ namespace stan {
         : visgen(o),
           indents_(indents) {
       }
-      void operator()(nil const& /*x*/) const { }
-      void operator()(int_var_decl const& x) const {
+      void operator()(const nil& /*x*/) const { }
+      void operator()(const int_var_decl& x) const {
         declare_array("int", x.name_, x.dims_.size());
       }
-      void operator()(double_var_decl const& x) const {
+      void operator()(const double_var_decl& x) const {
         declare_array("double", x.name_, x.dims_.size());
       }
-      void operator()(unit_vector_var_decl const& x) const {
+      void operator()(const unit_vector_var_decl& x) const {
         declare_array(("vector_d"), x.name_, x.dims_.size());
       }
-      void operator()(simplex_var_decl const& x) const {
+      void operator()(const simplex_var_decl& x) const {
         declare_array(("vector_d"), x.name_, x.dims_.size());
       }
-      void operator()(ordered_var_decl const& x) const {
+      void operator()(const ordered_var_decl& x) const {
         declare_array(("vector_d"), x.name_, x.dims_.size());
       }
-      void operator()(positive_ordered_var_decl const& x) const {
+      void operator()(const positive_ordered_var_decl& x) const {
         declare_array(("vector_d"), x.name_, x.dims_.size());
       }
-      void operator()(cholesky_factor_var_decl const& x) const {
+      void operator()(const cholesky_factor_var_decl& x) const {
         declare_array(("matrix_d"), x.name_, x.dims_.size());
       }
       void operator()(const cholesky_corr_var_decl& x) const {
         declare_array(("matrix_d"), x.name_, x.dims_.size());
       }
-      void operator()(cov_matrix_var_decl const& x) const {
+      void operator()(const cov_matrix_var_decl& x) const {
         declare_array(("matrix_d"), x.name_, x.dims_.size());
       }
-      void operator()(corr_matrix_var_decl const& x) const {
+      void operator()(const corr_matrix_var_decl& x) const {
         declare_array(("matrix_d"), x.name_, x.dims_.size());
       }
-      void operator()(vector_var_decl const& x) const {
+      void operator()(const vector_var_decl& x) const {
         declare_array(("vector_d"), x.name_, x.dims_.size());
       }
-      void operator()(row_vector_var_decl const& x) const {
+      void operator()(const row_vector_var_decl& x) const {
         declare_array(("row_vector_d"), x.name_, x.dims_.size());
       }
-      void operator()(matrix_var_decl const& x) const {
+      void operator()(const matrix_var_decl& x) const {
         declare_array(("matrix_d"), x.name_, x.dims_.size());
       }
-      void declare_array(std::string const& type,
-                         std::string const& name,
+      void declare_array(const std::string& type,
+                         const std::string& name,
                          size_t size) const {
         for (int i = 0; i < indents_; ++i)
           o_ << INDENT;
@@ -1424,19 +1495,19 @@ namespace stan {
           is_var_context_(is_var_context),
           is_fun_return_(is_fun_return) {
       }
-      void operator()(nil const& /*x*/) const { }
-      void operator()(int_var_decl const& x) const {
+      void operator()(const nil& /*x*/) const { }
+      void operator()(const int_var_decl& x) const {
         std::vector<expression> ctor_args;
         declare_array("int", ctor_args, x.name_, x.dims_);
       }
-      void operator()(double_var_decl const& x) const {
+      void operator()(const double_var_decl& x) const {
         std::vector<expression> ctor_args;
         declare_array(is_fun_return_
                       ? "fun_scalar_t__"
                       : (is_var_context_ ? "T__" : "double"),
                       ctor_args, x.name_, x.dims_);
       }
-      void operator()(vector_var_decl const& x) const {
+      void operator()(const vector_var_decl& x) const {
         std::vector<expression> ctor_args;
         ctor_args.push_back(x.M_);
         declare_array(is_fun_return_
@@ -1445,7 +1516,7 @@ namespace stan {
                          ? "Eigen::Matrix<T__,Eigen::Dynamic,1> " : "vector_d"),
                       ctor_args, x.name_, x.dims_);
       }
-      void operator()(row_vector_var_decl const& x) const {
+      void operator()(const row_vector_var_decl& x) const {
         std::vector<expression> ctor_args;
         ctor_args.push_back(x.N_);
         declare_array(is_fun_return_
@@ -1455,7 +1526,7 @@ namespace stan {
                          : "row_vector_d"),
                       ctor_args, x.name_, x.dims_);
       }
-      void operator()(matrix_var_decl const& x) const {
+      void operator()(const matrix_var_decl& x) const {
         std::vector<expression> ctor_args;
         ctor_args.push_back(x.M_);
         ctor_args.push_back(x.N_);
@@ -1467,7 +1538,7 @@ namespace stan {
                          : "matrix_d"),
                       ctor_args, x.name_, x.dims_);
       }
-      void operator()(unit_vector_var_decl const& x) const {
+      void operator()(const unit_vector_var_decl& x) const {
         std::vector<expression> ctor_args;
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
@@ -1476,7 +1547,7 @@ namespace stan {
                          ? "Eigen::Matrix<T__,Eigen::Dynamic,1> " : "vector_d"),
                       ctor_args, x.name_, x.dims_);
       }
-      void operator()(simplex_var_decl const& x) const {
+      void operator()(const simplex_var_decl& x) const {
         std::vector<expression> ctor_args;
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
@@ -1485,7 +1556,7 @@ namespace stan {
                          ? "Eigen::Matrix<T__,Eigen::Dynamic,1> " : "vector_d"),
                       ctor_args, x.name_, x.dims_);
       }
-      void operator()(ordered_var_decl const& x) const {
+      void operator()(const ordered_var_decl& x) const {
         std::vector<expression> ctor_args;
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
@@ -1494,7 +1565,7 @@ namespace stan {
                          ? "Eigen::Matrix<T__,Eigen::Dynamic,1> " : "vector_d"),
                       ctor_args, x.name_, x.dims_);
       }
-      void operator()(positive_ordered_var_decl const& x) const {
+      void operator()(const positive_ordered_var_decl& x) const {
         std::vector<expression> ctor_args;
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
@@ -1503,7 +1574,7 @@ namespace stan {
                          ? "Eigen::Matrix<T__,Eigen::Dynamic,1> " : "vector_d"),
                       ctor_args, x.name_, x.dims_);
       }
-      void operator()(cholesky_factor_var_decl const& x) const {
+      void operator()(const cholesky_factor_var_decl& x) const {
         std::vector<expression> ctor_args;
         ctor_args.push_back(x.M_);
         ctor_args.push_back(x.N_);
@@ -1524,7 +1595,7 @@ namespace stan {
                       : "matrix_d",
                       ctor_args, x.name_, x.dims_);
       }
-      void operator()(cov_matrix_var_decl const& x) const {
+      void operator()(const cov_matrix_var_decl& x) const {
         std::vector<expression> ctor_args;
         ctor_args.push_back(x.K_);
         ctor_args.push_back(x.K_);
@@ -1536,7 +1607,7 @@ namespace stan {
                          : "matrix_d"),
                       ctor_args, x.name_, x.dims_);
       }
-      void operator()(corr_matrix_var_decl const& x) const {
+      void operator()(const corr_matrix_var_decl& x) const {
         std::vector<expression> ctor_args;
         ctor_args.push_back(x.K_);
         ctor_args.push_back(x.K_);
@@ -1699,70 +1770,70 @@ namespace stan {
         : visgen(o),
           indents_(indents)
       { }
-      void operator()(nil const& /*x*/) const { }
-      void operator()(int_var_decl const& x) const {
+      void operator()(const nil& /*x*/) const { }
+      void operator()(const int_var_decl& x) const {
         std::vector<expression> dims(x.dims_);
         validate_array(x.name_, dims, 0);
       }
-      void operator()(double_var_decl const& x) const {
+      void operator()(const double_var_decl& x) const {
         std::vector<expression> dims(x.dims_);
         validate_array(x.name_, dims, 0);
       }
-      void operator()(vector_var_decl const& x) const {
+      void operator()(const vector_var_decl& x) const {
         std::vector<expression> dims(x.dims_);
         dims.push_back(x.M_);
         validate_array(x.name_, dims, 1);
       }
-      void operator()(unit_vector_var_decl const& x) const {
+      void operator()(const unit_vector_var_decl& x) const {
         std::vector<expression> dims(x.dims_);
         dims.push_back(x.K_);
         validate_array(x.name_, dims, 1);
       }
-      void operator()(simplex_var_decl const& x) const {
+      void operator()(const simplex_var_decl& x) const {
         std::vector<expression> dims(x.dims_);
         dims.push_back(x.K_);
         validate_array(x.name_, dims, 1);
       }
-      void operator()(ordered_var_decl const& x) const {
+      void operator()(const ordered_var_decl& x) const {
         std::vector<expression> dims(x.dims_);
         dims.push_back(x.K_);
         validate_array(x.name_, dims, 1);
       }
-      void operator()(positive_ordered_var_decl const& x) const {
+      void operator()(const positive_ordered_var_decl& x) const {
         std::vector<expression> dims(x.dims_);
         dims.push_back(x.K_);
         validate_array(x.name_, dims, 1);
       }
-      void operator()(row_vector_var_decl const& x) const {
+      void operator()(const row_vector_var_decl& x) const {
         std::vector<expression> dims(x.dims_);
         dims.push_back(x.N_);
         validate_array(x.name_, dims, 1);
       }
-      void operator()(matrix_var_decl const& x) const {
-        std::vector<expression> dims(x.dims_);
-        dims.push_back(x.M_);
-        dims.push_back(x.N_);
-        validate_array(x.name_, dims, 2);
-      }
-      void operator()(cholesky_factor_var_decl const& x) const {
+      void operator()(const matrix_var_decl& x) const {
         std::vector<expression> dims(x.dims_);
         dims.push_back(x.M_);
         dims.push_back(x.N_);
         validate_array(x.name_, dims, 2);
       }
-      void operator()(cholesky_corr_var_decl const& x) const {
+      void operator()(const cholesky_factor_var_decl& x) const {
+        std::vector<expression> dims(x.dims_);
+        dims.push_back(x.M_);
+        dims.push_back(x.N_);
+        validate_array(x.name_, dims, 2);
+      }
+      void operator()(const cholesky_corr_var_decl& x) const {
         std::vector<expression> dims(x.dims_);
         dims.push_back(x.K_);
         dims.push_back(x.K_);
         validate_array(x.name_, dims, 2);
       }
-      void operator()(cov_matrix_var_decl const& x) const {
+      void operator()(const cov_matrix_var_decl& x) const {
         std::vector<expression> dims(x.dims_);
         dims.push_back(x.K_);
         dims.push_back(x.K_);
         validate_array(x.name_, dims, 2);
       }
-      void operator()(corr_matrix_var_decl const& x) const {
+      void operator()(const corr_matrix_var_decl& x) const {
         std::vector<expression> dims(x.dims_);
         dims.push_back(x.K_);
         dims.push_back(x.K_);
@@ -1940,9 +2011,9 @@ namespace stan {
           is_var_context_(is_var_context),
           is_fun_return_(is_fun_return) {
       }
-      void operator()(nil const& /*x*/) const {
+      void operator()(const nil& /*x*/) const {
       }
-      void operator()(assignment const& x) const {
+      void operator()(const assignment& x) const {
         generate_indent(indent_, o_);
         o_ << "stan::math::assign(";
         generate_indexed_expr<true>(x.var_dims_.name_,
@@ -1988,12 +2059,12 @@ namespace stan {
         o_ << ");"
            << EOL;
       }
-      void operator()(expression const& x) const {
+      void operator()(const expression& x) const {
         generate_indent(indent_, o_);
         generate_expression(x, false, is_var_context_, o_);
         o_ << ";" << EOL;
       }
-      void operator()(sample const& x) const {
+      void operator()(const sample& x) const {
         if (!include_sampling_) return;
         std::string prob_fun = get_prob_fun(x.dist_.family_);
         generate_indent(indent_, o_);
@@ -2034,7 +2105,7 @@ namespace stan {
           generate_truncation(x, is_user_defined, prob_fun);
       }
 
-      void generate_truncation(sample const& x, bool is_user_defined,
+      void generate_truncation(const sample& x, bool is_user_defined,
                                const std::string& prob_fun) const {
         std::stringstream sso_lp;
         generate_indent(indent_, o_);
@@ -2328,7 +2399,7 @@ namespace stan {
 
 
 
-    void generate_log_prob(program const& p,
+    void generate_log_prob(const program& p,
                            std::ostream& o) {
       o << EOL;
       o << INDENT << "template <bool propto__, bool jacobian__, typename T__>"
@@ -2418,8 +2489,8 @@ namespace stan {
           var_size_validator_(var_size_validating_visgen(o,
                                                     "data initialization")) {
       }
-      void operator()(nil const& /*x*/) const { }  // dummy
-      void operator()(int_var_decl const& x) const {
+      void operator()(const nil& /*x*/) const { }  // dummy
+      void operator()(const int_var_decl& x) const {
         std::vector<expression> dims = x.dims_;
         var_size_validator_(x);
         var_resizer_(x);
@@ -2450,7 +2521,7 @@ namespace stan {
         }
       }
       // minor changes to int_var_decl
-      void operator()(double_var_decl const& x) const {
+      void operator()(const double_var_decl& x) const {
         std::vector<expression> dims = x.dims_;
         var_size_validator_(x);
         var_resizer_(x);
@@ -2481,7 +2552,7 @@ namespace stan {
         }
       }
       // extra outer loop around double_var_decl
-      void operator()(vector_var_decl const& x) const {
+      void operator()(const vector_var_decl& x) const {
         std::vector<expression> dims = x.dims_;
         var_resizer_(x);
         var_size_validator_(x);
@@ -2519,7 +2590,7 @@ namespace stan {
         o_ << INDENT2 << "}" << EOL;
       }
       // change variable name from vector_var_decl
-      void operator()(row_vector_var_decl const& x) const {
+      void operator()(const row_vector_var_decl& x) const {
         std::vector<expression> dims = x.dims_;
         var_size_validator_(x);
         var_resizer_(x);
@@ -2557,7 +2628,7 @@ namespace stan {
         o_ << INDENT2 << "}" << EOL;
       }
       // same as simplex
-      void operator()(unit_vector_var_decl const& x) const {
+      void operator()(const unit_vector_var_decl& x) const {
         std::vector<expression> dims = x.dims_;
         var_size_validator_(x);
         var_resizer_(x);
@@ -2595,7 +2666,7 @@ namespace stan {
         o_ << INDENT2 << "}" << EOL;
       }
       // diff name of dims from vector
-      void operator()(simplex_var_decl const& x) const {
+      void operator()(const simplex_var_decl& x) const {
         std::vector<expression> dims = x.dims_;
         var_size_validator_(x);
         var_resizer_(x);
@@ -2633,7 +2704,7 @@ namespace stan {
         o_ << INDENT2 << "}" << EOL;
       }
       // same as simplex
-      void operator()(ordered_var_decl const& x) const {
+      void operator()(const ordered_var_decl& x) const {
         std::vector<expression> dims = x.dims_;
         var_size_validator_(x);
         var_resizer_(x);
@@ -2671,7 +2742,7 @@ namespace stan {
         o_ << INDENT2 << "}" << EOL;
       }
       // same as simplex
-      void operator()(positive_ordered_var_decl const& x) const {
+      void operator()(const positive_ordered_var_decl& x) const {
         std::vector<expression> dims = x.dims_;
         var_size_validator_(x);
         var_resizer_(x);
@@ -2709,7 +2780,7 @@ namespace stan {
         o_ << INDENT2 << "}" << EOL;
       }
       // extra loop and different accessor vs. vector
-      void operator()(matrix_var_decl const& x) const {
+      void operator()(const matrix_var_decl& x) const {
         std::vector<expression> dims = x.dims_;
         var_size_validator_(x);
         var_resizer_(x);
@@ -2752,7 +2823,7 @@ namespace stan {
         o_ << INDENT3 << "}" << EOL;
         o_ << INDENT2 << "}" << EOL;
       }
-      void operator()(corr_matrix_var_decl const& x) const {
+      void operator()(const corr_matrix_var_decl& x) const {
         // FIXME: cut-and-paste of cov_matrix,
         //        very slightly different from matrix
         std::vector<expression> dims = x.dims_;
@@ -2796,7 +2867,7 @@ namespace stan {
         o_ << INDENT3 << "}" << EOL;
         o_ << INDENT2 << "}" << EOL;
       }
-      void operator()(cholesky_factor_var_decl const& x) const {
+      void operator()(const cholesky_factor_var_decl& x) const {
         // FIXME: cut and paste of cov_matrix
         std::vector<expression> dims = x.dims_;
         var_size_validator_(x);
@@ -2845,7 +2916,7 @@ namespace stan {
         o_ << INDENT3 << "}" << EOL;
         o_ << INDENT2 << "}" << EOL;
       }
-      void operator()(cholesky_corr_var_decl const& x) const {
+      void operator()(const cholesky_corr_var_decl& x) const {
         // FIXME: cut and paste of cholesky_factor_var_decl
         std::vector<expression> dims = x.dims_;
         var_size_validator_(x);
@@ -2894,7 +2965,7 @@ namespace stan {
         o_ << INDENT3 << "}" << EOL;
         o_ << INDENT2 << "}" << EOL;
       }
-      void operator()(cov_matrix_var_decl const& x) const {
+      void operator()(const cov_matrix_var_decl& x) const {
         std::vector<expression> dims = x.dims_;
         var_size_validator_(x);
         var_resizer_(x);
@@ -3223,8 +3294,8 @@ namespace stan {
         : visgen(o),
           var_size_validator_(o, "initialization") {
       }
-      void operator()(nil const& /*x*/) const { }  // dummy
-      void operator()(int_var_decl const& x) const {
+      void operator()(const nil& /*x*/) const { }  // dummy
+      void operator()(const int_var_decl& x) const {
         generate_check_int(x.name_, x.dims_.size());
         var_size_validator_(x);
         generate_declaration(x.name_, "int", x.dims_, nil(), nil(), x.def_);
@@ -3256,7 +3327,7 @@ namespace stan {
         return ss.str();
       }
 
-      void operator()(double_var_decl const& x) const {
+      void operator()(const double_var_decl& x) const {
         generate_check_double(x.name_, x.dims_.size());
         var_size_validator_(x);
         generate_declaration(x.name_, "double", x.dims_, nil(), nil(), x.def_);
@@ -3266,7 +3337,7 @@ namespace stan {
         generate_write_loop(function_args("scalar", x),
                             x.name_, x.dims_);
       }
-      void operator()(vector_var_decl const& x) const {
+      void operator()(const vector_var_decl& x) const {
         generate_check_double(x.name_, x.dims_.size() + 1);
         var_size_validator_(x);
         generate_declaration(x.name_, "vector_d", x.dims_, x.M_, nil(), x.def_);
@@ -3274,7 +3345,7 @@ namespace stan {
         generate_write_loop(function_args("vector", x),
                             x.name_, x.dims_);
       }
-      void operator()(row_vector_var_decl const& x) const {
+      void operator()(const row_vector_var_decl& x) const {
         generate_check_double(x.name_, x.dims_.size() + 1);
         var_size_validator_(x);
         generate_declaration(x.name_, "row_vector_d", x.dims_, x.N_, nil(),
@@ -3283,7 +3354,7 @@ namespace stan {
         generate_write_loop(function_args("row_vector", x),
                             x.name_, x.dims_);
       }
-      void operator()(matrix_var_decl const& x) const {
+      void operator()(const matrix_var_decl& x) const {
         generate_check_double(x.name_, x.dims_.size() + 2);
         var_size_validator_(x);
         generate_declaration(x.name_, "matrix_d", x.dims_, x.M_, x.N_, x.def_);
@@ -3291,56 +3362,56 @@ namespace stan {
         generate_write_loop(function_args("matrix", x),
                             x.name_, x.dims_);
       }
-      void operator()(unit_vector_var_decl const& x) const {
+      void operator()(const unit_vector_var_decl& x) const {
         generate_check_double(x.name_, x.dims_.size() + 1);
         var_size_validator_(x);
         generate_declaration(x.name_, "vector_d", x.dims_, x.K_, nil(), x.def_);
         generate_buffer_loop("r", x.name_, x.dims_, x.K_);
         generate_write_loop("unit_vector_unconstrain(", x.name_, x.dims_);
       }
-      void operator()(simplex_var_decl const& x) const {
+      void operator()(const simplex_var_decl& x) const {
         generate_check_double(x.name_, x.dims_.size() + 1);
         var_size_validator_(x);
         generate_declaration(x.name_, "vector_d", x.dims_, x.K_, nil(), x.def_);
         generate_buffer_loop("r", x.name_, x.dims_, x.K_);
         generate_write_loop("simplex_unconstrain(", x.name_, x.dims_);
       }
-      void operator()(ordered_var_decl const& x) const {
+      void operator()(const ordered_var_decl& x) const {
         generate_check_double(x.name_, x.dims_.size() + 1);
         var_size_validator_(x);
         generate_declaration(x.name_, "vector_d", x.dims_, x.K_, nil(), x.def_);
         generate_buffer_loop("r", x.name_, x.dims_, x.K_);
         generate_write_loop("ordered_unconstrain(", x.name_, x.dims_);
       }
-      void operator()(positive_ordered_var_decl const& x) const {
+      void operator()(const positive_ordered_var_decl& x) const {
         generate_check_double(x.name_, x.dims_.size() + 1);
         var_size_validator_(x);
         generate_declaration(x.name_, "vector_d", x.dims_, x.K_, nil(), x.def_);
         generate_buffer_loop("r", x.name_, x.dims_, x.K_);
         generate_write_loop("positive_ordered_unconstrain(", x.name_, x.dims_);
       }
-      void operator()(cholesky_factor_var_decl const& x) const {
+      void operator()(const cholesky_factor_var_decl& x) const {
         generate_check_double(x.name_, x.dims_.size() + 2);
         var_size_validator_(x);
         generate_declaration(x.name_, "matrix_d", x.dims_, x.M_, x.N_, x.def_);
         generate_buffer_loop("r", x.name_, x.dims_, x.M_, x.N_);
         generate_write_loop("cholesky_factor_unconstrain(", x.name_, x.dims_);
       }
-      void operator()(cholesky_corr_var_decl const& x) const {
+      void operator()(const cholesky_corr_var_decl& x) const {
         generate_check_double(x.name_, x.dims_.size() + 2);
         var_size_validator_(x);
         generate_declaration(x.name_, "matrix_d", x.dims_, x.K_, x.K_, x.def_);
         generate_buffer_loop("r", x.name_, x.dims_, x.K_, x.K_);
         generate_write_loop("cholesky_corr_unconstrain(", x.name_, x.dims_);
       }
-      void operator()(cov_matrix_var_decl const& x) const {
+      void operator()(const cov_matrix_var_decl& x) const {
         generate_check_double(x.name_, x.dims_.size() + 2);
         var_size_validator_(x);
         generate_declaration(x.name_, "matrix_d", x.dims_, x.K_, x.K_, x.def_);
         generate_buffer_loop("r", x.name_, x.dims_, x.K_, x.K_);
         generate_write_loop("cov_matrix_unconstrain(", x.name_, x.dims_);
       }
-      void operator()(corr_matrix_var_decl const& x) const {
+      void operator()(const corr_matrix_var_decl& x) const {
         generate_check_double(x.name_, x.dims_.size() + 2);
         var_size_validator_(x);
         generate_declaration(x.name_, "matrix_d", x.dims_, x.K_, x.K_, x.def_);

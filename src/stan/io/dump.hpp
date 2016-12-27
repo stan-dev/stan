@@ -56,6 +56,15 @@ namespace stan {
      * a string such as "1." or "0.9e-5" represents a floating
      * point value.
      *
+     * <p>The dump reader treats "integer(x)" as an array of zeros
+     * (type being integer and length x), where x any non-negative
+     * integers and x can be omitted to indicate zero-length.
+     * So the following are all legitimate: * "x <- integer()",
+     * "x <- integer(0) ", and "x <- integer(3)". For array of zeros
+     * of type double, we can replace the above "integer" with "double".
+     * This is mainly for the purpose of supporting zero-size arrays
+     * such as "x <- structure(integer(0), .Dim = c(2, 0))".
+     *
      * <p>For dumping, arrays are indexed in last-index major fashion,
      * which corresponds to column-major order for matrices
      * represented as two-dimensional arrays.  As a result, the first
@@ -75,7 +84,7 @@ namespace stan {
      *
      * definitions ::= definition+
      *
-     * definition ::= name ("->" | '=') value optional_semicolon
+     * definition ::= name ("<-" | '=') value optional_semicolon
      *
      * name ::= char*
      *        | ''' char* '''
@@ -85,14 +94,23 @@ namespace stan {
      *
      * value<T> ::= T
      *            | seq<T>
-     *            | 'struct' '(' seq<T> ',' ".Dim" '=' seq<int> ')'
+     *            | zero_array<T>
+     *            | "structure" '(' seq<T> ',' ".Dim" '=' seq<int> ')'
+     *            | "structure" '(' zero_array<T> ',' ".Dim" '=' seq<int> ')'
      *
      * seq<int> ::= int ':' int
      *            | cseq<int>
      *
      * seq<double> ::= cseq<double>
      *
-     * cseq<T> ::= 'c' '(' T % ',' ')'
+     * cseq<T> ::= 'c' '(' vseq<T> ')'
+     *
+     * vseq<T> ::= T
+     *           | T ',' vseq<T>
+     *
+     * zero_array<integer> ::= "integer"<non negative int?>
+     *
+     * zero_array<double> ::= "double"<non negative int?>
      *
      */
     class dump_reader {
@@ -330,6 +348,38 @@ namespace stan {
         return scan_number(negate_val);
       }
 
+      bool scan_zero_integers() {
+        if (!scan_char('(')) return false;
+        if (scan_char(')')) {
+          dims_.push_back(0U);
+          return true;
+        }
+        int s = scan_int();
+        if (s < 0) return false;
+        for (int i = 0; i < s; ++i) {
+          stack_i_.push_back(0);
+        }
+        if (!scan_char(')')) return false;
+        dims_.push_back(s);
+        return true;
+      }
+
+      bool scan_zero_doubles() {
+        if (!scan_char('(')) return false;
+        if (scan_char(')')) {
+          dims_.push_back(0U);
+          return true;
+        }
+        int s = scan_int();
+        if (s < 0) return false;
+        for (int i = 0; i < s; ++i) {
+          stack_r_.push_back(0);
+        }
+        if (!scan_char(')')) return false;
+        dims_.push_back(s);
+        return true;
+      }
+
 
       bool scan_seq_value() {
         if (!scan_char('(')) return false;
@@ -347,7 +397,11 @@ namespace stan {
 
       bool scan_struct_value() {
         if (!scan_char('(')) return false;
-        if (scan_char('c')) {
+        if (scan_chars("integer")) {
+          scan_zero_integers();
+        } else if (scan_chars("double")) {
+          scan_zero_doubles();
+        } else if (scan_char('c')) {
           scan_seq_value();
         } else {
           int start = scan_int();
@@ -396,6 +450,10 @@ namespace stan {
       bool scan_value() {
         if (scan_char('c'))
           return scan_seq_value();
+        if (scan_chars("integer"))
+          return scan_zero_integers();
+        if (scan_chars("double"))
+          return scan_zero_doubles();
         if (scan_chars("structure"))
           return scan_struct_value();
         scan_number();
