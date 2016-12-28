@@ -16,6 +16,8 @@ namespace stan {
       interrupt() {}
       virtual void operator()() {
       }
+
+      virtual ~interrupt() {}
     };
 
   }
