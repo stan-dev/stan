@@ -15,7 +15,7 @@ namespace stan {
         /**
          * Description of num_samples.
          *
-         * @returns description
+         * @return description
          */
         static std::string description() {
           return "Number of sampling iterations.";
@@ -37,7 +37,7 @@ namespace stan {
         /**
          * Default num_samples: 1000.
          *
-         * @returns default
+         * @return default
          */
         static int default_value() {
           return 1000;
@@ -51,7 +51,7 @@ namespace stan {
         /**
          * Description of num_warmup.
          *
-         * @returns description
+         * @return description
          */
         static std::string description() {
           return "Number of warmup iterations.";
@@ -73,7 +73,7 @@ namespace stan {
         /**
          * Default num_warmup: 1000.
          *
-         * @returns default
+         * @return default
          */
         static int default_value() {
           return 1000;
@@ -87,7 +87,7 @@ namespace stan {
         /**
          * Description of save_warmup.
          *
-         * @returns description
+         * @return description
          */
         static std::string description() {
           return "Save warmup iterations to output.";
@@ -104,7 +104,7 @@ namespace stan {
         /**
          * Default save_warmup: false.
          *
-         * @returns default
+         * @return default
          */
         static bool default_value() {
           return false;
@@ -118,7 +118,7 @@ namespace stan {
         /**
          * Description of thin.
          *
-         * @returns description
+         * @return description
          */
         static std::string description() {
           return "Period between saved samples.";
@@ -138,7 +138,7 @@ namespace stan {
         /**
          * Default thin: 1.
          *
-         * @returns default
+         * @return default
          */
         static int default_value() {
           return 1;
@@ -152,7 +152,7 @@ namespace stan {
         /**
          * Description of adaptation_engaged.
          *
-         * @returns description
+         * @return description
          */
         static std::string description() {
           return "Indicates whether adaptation is engaged.";
@@ -169,7 +169,7 @@ namespace stan {
         /**
          * Default adaptation_engaged: true.
          *
-         * @returns default
+         * @return default
          */
         static bool default_value() {
           return true;
@@ -184,7 +184,7 @@ namespace stan {
         /**
          * Description of gamma.
          *
-         * @returns description
+         * @return description
          */
         static std::string description() {
           return "Adaptation regularization scale.";
@@ -204,7 +204,7 @@ namespace stan {
         /**
          * Default gamma: 0.05.
          *
-         * @returns default
+         * @return default
          */
         static double default_value() {
           return 0.05;
@@ -218,7 +218,7 @@ namespace stan {
         /**
          * Description of kappa.
          *
-         * @returns description
+         * @return description
          */
         static std::string description() {
           return "Adaptation relaxation exponent.";
@@ -238,7 +238,7 @@ namespace stan {
         /**
          * Default kappa: 0.75.
          *
-         * @returns default
+         * @return default
          */
         static double default_value() {
           return 0.75;
@@ -252,7 +252,7 @@ namespace stan {
         /**
          * Description of t0.
          *
-         * @returns description
+         * @return description
          */
         static std::string description() {
           return "Adaptation iteration offset.";
@@ -272,7 +272,7 @@ namespace stan {
         /**
          * Default t0: 10.
          *
-         * @returns default
+         * @return default
          */
         static double default_value() {
           return 10;
@@ -286,7 +286,7 @@ namespace stan {
         /**
          * Description of init_buffer.
          *
-         * @returns description
+         * @return description
          */
         static std::string description() {
           return "Width of initial fast adaptation interval.";
@@ -303,7 +303,7 @@ namespace stan {
         /**
          * Default init_buffer: 75.
          *
-         * @returns default
+         * @return default
          */
         static unsigned int default_value() {
           return 75;
@@ -317,7 +317,7 @@ namespace stan {
         /**
          * Description of term_buffer.
          *
-         * @returns description
+         * @return description
          */
         static std::string description() {
           return "Width of final fast adaptation interval.";
@@ -334,7 +334,7 @@ namespace stan {
         /**
          * Default term_buffer: 50
          *
-         * @returns default
+         * @return default
          */
         static unsigned int default_value() {
           return 50;
@@ -348,7 +348,7 @@ namespace stan {
         /**
          * Description of window.
          *
-         * @returns description
+         * @return description
          */
         static std::string description() {
           return "Initial width of slow adaptation interval.";
@@ -365,7 +365,7 @@ namespace stan {
         /**
          * Default window: 25.
          *
-         * @returns default
+         * @return default
          */
         static unsigned int default_value() {
           return 25;
@@ -379,7 +379,7 @@ namespace stan {
         /**
          * Description of int_time.
          *
-         * @returns description
+         * @return description
          */
         static std::string description() {
           return "Total integration time for Hamiltonian evolution.";
@@ -399,7 +399,7 @@ namespace stan {
         /**
          * Default int_time: 2 * pi.
          *
-         * @returns default
+         * @return default
          */
         static double default_value() {
           return 6.28318530717959;
@@ -413,7 +413,7 @@ namespace stan {
         /**
          * Description of max_depth.
          *
-         * @returns description
+         * @return description
          */
         static std::string description() {
           return "Maximum tree depth.";
@@ -433,7 +433,7 @@ namespace stan {
         /**
          * Default max_depth: 10.
          *
-         * @returns default
+         * @return default
          */
         static int default_value() {
           return 10;
@@ -447,7 +447,7 @@ namespace stan {
         /**
          * Description of stepsize.
          *
-         * @returns description
+         * @return description
          */
         static std::string description() {
           return "Step size for discrete evolution.";
@@ -467,7 +467,7 @@ namespace stan {
         /**
          * Default stepsize: 1.
          *
-         * @returns default
+         * @return default
          */
         static double default_value() {
           return 1;
@@ -481,7 +481,7 @@ namespace stan {
         /**
          * Description of stepsize_jitter.
          *
-         * @returns description
+         * @return description
          */
         static std::string description() {
           return "Uniformly random jitter of the stepsize, in percent.";
@@ -503,7 +503,7 @@ namespace stan {
         /**
          * Default stepsize_jitter: 0.
          *
-         * @returns default
+         * @return default
          */
         static double default_value() {
           return 0;

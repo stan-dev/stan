@@ -16,7 +16,7 @@ namespace stan {
           /**
            * Description of gradient_samples.
            *
-           * @returns description
+           * @return description
            */
           static std::string description() {
             return "Number of Monte Carlo draws for computing the gradient.";
@@ -37,7 +37,7 @@ namespace stan {
           /**
            * Default number of gradient_samples: 1.
            *
-           * @returns default
+           * @return default
            */
           static int default_value() {
             return 1;
@@ -51,7 +51,7 @@ namespace stan {
           /**
            * Description of elbo_samples.
            *
-           * @returns description
+           * @return description
            */
           static std::string description() {
             return "Number of Monte Carlo draws for estimate of ELBO.";
@@ -72,7 +72,7 @@ namespace stan {
           /**
            * Default elbo_samples: 100.
            *
-           * @returns default
+           * @return default
            */
           static int default_value() {
             return 100;
@@ -86,7 +86,7 @@ namespace stan {
           /**
            * String description of the maximum number of iterations.
            *
-           * @returns description
+           * @return description
            */
           static std::string description() {
             return "Maximum number of ADVI iterations.";
@@ -107,7 +107,7 @@ namespace stan {
           /**
            * Default max_iterations: 10000.
            *
-           * @returns default
+           * @return default
            */
           static int default_value() {
             return 10000;
@@ -122,7 +122,7 @@ namespace stan {
           /**
            * Description of tol_rel_obj.
            *
-           * @returns description
+           * @return description
            */
           static std::string description() {
             return "Relative tolerance parameter for convergence.";
@@ -143,7 +143,7 @@ namespace stan {
           /**
            * Default tol_rel_obj: 0.01.
            *
-           * @returns default
+           * @return default
            */
           static double default_value() {
             return 0.01;
@@ -157,7 +157,7 @@ namespace stan {
           /**
            * Description of eta.
            *
-           * @returns description
+           * @return description
            */
           static std::string description() {
             return "Stepsize scaling parameter.";
@@ -177,7 +177,7 @@ namespace stan {
           /**
            * Default.
            *
-           * @returns default
+           * @return default
            */
           static double default_value() {
             return 1.0;
@@ -191,7 +191,7 @@ namespace stan {
           /**
            * Description of adapt_engaged.
            *
-           * @returns description
+           * @return description
            */
           static std::string description() {
             return "Boolean flag for eta adaptation.";
@@ -208,7 +208,7 @@ namespace stan {
           /**
            * Default value: true.
            *
-           * @returns default
+           * @return default
            */
           static bool default_value() {
             return true;
@@ -222,7 +222,7 @@ namespace stan {
           /**
            * Description of adapt_iterations.
            *
-           * @returns description
+           * @return description
            */
           static std::string description() {
             return "Number of iterations for eta adaptation.";
@@ -243,7 +243,7 @@ namespace stan {
           /**
            * Default adapt_iterations.
            *
-           * @returns default
+           * @return default
            */
           static int default_value() {
             return 50;
@@ -258,7 +258,7 @@ namespace stan {
            * Description of eval_elbo. Evaluate ELBO at every
            * <code>eval_elbo</code> iterations.
            *
-           * @returns description
+           * @return description
            */
           static std::string description() {
             return "Number of interations between ELBO evaluations";
@@ -278,7 +278,7 @@ namespace stan {
           /**
            * Default eval_elbo; defaults to 100.
            *
-           * @returns default
+           * @return default
            */
           static int default_value() {
             return 100;
@@ -292,7 +292,7 @@ namespace stan {
           /**
            * Description of output_draws.
            *
-           * @returns description
+           * @return description
            */
           static std::string description() {
             return "Number of approximate posterior output draws to save.";
@@ -313,7 +313,7 @@ namespace stan {
           /**
            * Default output_samples; defaults to 1000.
            *
-           * @returns default
+           * @return default
            */
           static int default_value() {
             return 1000;

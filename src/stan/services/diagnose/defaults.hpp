@@ -15,7 +15,7 @@ namespace stan {
         /**
          * Description of epsilon.
          *
-         * @returns description
+         * @return description
          */
         static std::string description() {
           return "Finite difference stepsize.";
@@ -35,7 +35,7 @@ namespace stan {
         /**
          * Default error value: 1e-6.
          *
-         * @returns default
+         * @return default
          */
         static double default_value() {
           return 1e-6;
@@ -51,7 +51,7 @@ namespace stan {
         /**
          * Description of error.
          *
-         * @returns description
+         * @return description
          */
         static std::string description() {
           return "Absolute error threshold.";
@@ -71,7 +71,7 @@ namespace stan {
         /**
          * Default error value: 1e-6.
          *
-         * @returns default
+         * @return default
          */
         static double default_value() {
           return 1e-6;

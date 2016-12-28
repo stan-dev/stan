@@ -15,7 +15,7 @@ namespace stan {
         /**
          * Description of init_alpha.
          *
-         * @returns description
+         * @return description
          */
         static std::string description() {
           return "Line search step size for first iteration.";
@@ -35,7 +35,7 @@ namespace stan {
         /**
          * Default init_alpha: 0.001.
          *
-         * @returns default
+         * @return default
          */
         static double default_value() {
           return 0.001;
@@ -49,7 +49,7 @@ namespace stan {
         /**
          * Description of tol_obj.
          *
-         * @returns description
+         * @return description
          */
         static std::string description() {
           return "Convergence tolerance on absolute changes in objective "
@@ -71,7 +71,7 @@ namespace stan {
         /**
          * Default tol_obj: 1e-12.
          *
-         * @returns default
+         * @return default
          */
         static double default_value() {
           return 1e-12;
@@ -85,7 +85,7 @@ namespace stan {
         /**
          * Description of tol_rel_obj.
          *
-         * @returns description
+         * @return description
          */
         static std::string description() {
           return "Convergence tolerance on relative changes in "
@@ -108,7 +108,7 @@ namespace stan {
         /**
          * Default tol_rel_obj: 10000.
          *
-         * @returns default
+         * @return default
          */
         static double default_value() {
           return 10000;
@@ -122,7 +122,7 @@ namespace stan {
         /**
          * Description of tol_grad.
          *
-         * @returns description
+         * @return description
          */
         static std::string description() {
           return "Convergence tolerance on the norm of the gradient.";
@@ -143,7 +143,7 @@ namespace stan {
         /**
          * Default tol_grad: 1e-8.
          *
-         * @returns default
+         * @return default
          */
         static double default_value() {
           return 1e-8;
@@ -158,7 +158,7 @@ namespace stan {
         /**
          * Description of tol_rel_grad.
          *
-         * @returns description
+         * @return description
          */
         static std::string description() {
           return "Convergence tolerance on the relative norm of the gradient.";
@@ -180,7 +180,7 @@ namespace stan {
         /**
          * Default tol_rel_grad: 10000000
          *
-         * @returns default
+         * @return default
          */
         static double default_value() {
           return 10000000;
@@ -194,7 +194,7 @@ namespace stan {
         /**
          * Description of tol_param.
          *
-         * @returns description
+         * @return description
          */
         static std::string description() {
           return "Convergence tolerance on changes in parameter value.";
@@ -214,7 +214,7 @@ namespace stan {
         /**
          * Default tol_param: 1e-08.
          *
-         * @returns default
+         * @return default
          */
         static double default_value() {
           return 1e-08;
@@ -228,7 +228,7 @@ namespace stan {
         /**
          * Description of history_size.
          *
-         * @returns description
+         * @return description
          */
         static std::string description() {
           return "Amount of history to keep for L-BFGS.";
@@ -248,7 +248,7 @@ namespace stan {
         /**
          * Default history_size: 5.
          *
-         * @returns default
+         * @return default
          */
         static int default_value() {
           return 5;
@@ -262,7 +262,7 @@ namespace stan {
         /**
          * Description of iter.
          *
-         * @returns description
+         * @return description
          */
         static std::string description() {
           return "Total number of iterations.";
@@ -282,7 +282,7 @@ namespace stan {
         /**
          * Default iter: 2000
          *
-         * @returns default
+         * @return default
          */
         static int default_value() {
           return 2000;
@@ -296,7 +296,7 @@ namespace stan {
         /**
          * Description of save_iterations.
          *
-         * @returns description
+         * @return description
          */
         static std::string description() {
           return "Save optimization interations to output.";
@@ -313,7 +313,7 @@ namespace stan {
         /**
          * Default save_iterations: false
          *
-         * @returns default
+         * @return default
          */
         static bool default_value() {
           return false;
