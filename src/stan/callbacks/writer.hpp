@@ -9,11 +9,9 @@ namespace stan {
   namespace callbacks {
 
     /**
-     * <code>writer</code> is an abstract base class defining the interface
-     * for Stan writer callbacks.
-     *
-     * The Stan API writes structured output to implementations of
-     * this class.
+     * <code>writer</code> is a base class defining the interface
+     * for Stan writer callbacks. The base class can be used as a
+     * no op implementation.
      */
     class writer {
     public:
@@ -48,10 +46,7 @@ namespace stan {
       }
 
       /**
-       * Destructor.
-       *
-       * Virtual destructor to avoid compiler warnings
-       *
+       * Virtual destructor.
        */
       virtual ~writer() {}
     };

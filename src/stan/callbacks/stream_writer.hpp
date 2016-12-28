@@ -10,21 +10,31 @@ namespace stan {
   namespace callbacks {
 
     /**
-     * <code>stream_writer</code> writes to an <code>std::ostream</code>.
+     * <code>stream_writer</code> is an implementation
+     * of <code>writer</code> that writes to a stream.
      */
     class stream_writer : public writer {
     public:
       /**
-       * Constructor.
+       * Constructs a stream writer with an output stream
+       * and an optional prefix for comments.
        *
-       * @param[in, out] output std::ostream to write
-       * @param[in] key_value_prefix String to write before lines
-       *   treated as comments.
+       * @param[in, out] output stream to write
+       * @param[in] comment_prefix string to stream before
+       *   each comment line. Default is "".
        */
       stream_writer(std::ostream& output,
-                    const std::string& key_value_prefix = ""):
-        output_(output), key_value_prefix_(key_value_prefix) {}
+                    const std::string& comment_prefix = ""):
+        output_(output), comment_prefix_(comment_prefix) {}
 
+      /**
+       * Writes a set of names on a single line in csv format followed
+       * by a newline.
+       *
+       * Note: the names are not escaped.
+       *
+       * @param[in] names Names in a std::vector
+       */
       void operator()(const std::vector<std::string>& names) {
         if (names.empty()) return;
 
@@ -37,6 +47,14 @@ namespace stan {
         output_ << names.back() << std::endl;
       }
 
+      /**
+       * Writes a set of values in csv format followed by a newline.
+       *
+       * Note: the precision of the output is determined by the settings
+       *  of the stream on construction.
+       *
+       * @param[in] state Values in a std::vector
+       */
       void operator()(const std::vector<double>& state) {
         if (state.empty()) return;
 
@@ -49,17 +67,31 @@ namespace stan {
         output_ << state.back() << std::endl;
       }
 
+      /**
+       * Writes the comment_prefix to the stream followed by a newline.
+       */
       void operator()() {
-        output_ << key_value_prefix_ << std::endl;
+        output_ << comment_prefix_ << std::endl;
       }
 
+      /**
+       * Writes the comment_prefix then the message followed by a newline.
+       *
+       * @param[in] message A string
+       */
       void operator()(const std::string& message) {
-        output_ << key_value_prefix_ << message << std::endl;
+        output_ << comment_prefix_ << message << std::endl;
       }
 
     private:
+      /**
+       * Output stream
+       */
       std::ostream& output_;
-      std::string key_value_prefix_;
+      /**
+       * Comment prefix to use when printing comments: strings and blank lines
+       */
+      std::string comment_prefix_;
     };
 
   }

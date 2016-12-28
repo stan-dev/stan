@@ -11,15 +11,15 @@ namespace stan {
 
     /**
      * <code>tee_writer</code> is an implementation that writes to
-     * multiple writers.
+     * two writers.
      *
-     * For any given call to this writer, it will delegate to both writers
+     * For any call to this writer, it will tee the call to both writers
      * provided in the constructor.
      */
     class tee_writer : public writer {
     public:
       /**
-       * Constructor.
+       * Constructor accepting two writers.
        *
        * @param[in, out] writer1 first writer
        * @param[in, out] writer2 second writer
@@ -50,7 +50,13 @@ namespace stan {
       }
 
     private:
+      /**
+       * The first writer
+       */
       writer& writer1_;
+      /**
+       * The second writer
+       */
       writer& writer2_;
     };
 

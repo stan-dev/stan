@@ -5,7 +5,7 @@ namespace stan {
   namespace callbacks {
 
     /**
-     * <code>interrupt</code> is an abstract base class defining the interface
+     * <code>interrupt</code> is a base class defining the interface
      * for Stan interrupt callbacks.
      *
      * The interrupt is called from within Stan algorithms to allow
@@ -13,10 +13,19 @@ namespace stan {
      */
     class interrupt {
     public:
-      interrupt() {}
+
+      /**
+       * Callback function.
+       *
+       * This function is called by the algorithms allowing the interfaces
+       * to break when necessary.
+       */
       virtual void operator()() {
       }
 
+      /**
+       * Virtual destructor.
+       */
       virtual ~interrupt() {}
     };
 
