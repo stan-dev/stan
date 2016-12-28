@@ -25,45 +25,6 @@ namespace stan {
                     const std::string& key_value_prefix = ""):
         output_(output), key_value_prefix_(key_value_prefix) {}
 
-      void operator()(const std::string& key, double value) {
-        output_ << key_value_prefix_ << key << " = " << value << std::endl;
-      }
-
-      void operator()(const std::string& key, int value) {
-        output_ << key_value_prefix_ << key << " = " << value << std::endl;
-      }
-
-      void operator()(const std::string& key, const std::string& value) {
-        output_ << key_value_prefix_ << key << " = " << value << std::endl;
-      }
-
-      void operator()(const std::string& key, const double* values,
-                      int n_values) {
-        if (n_values == 0) return;
-
-        output_ << key_value_prefix_ << key << ": ";
-
-        output_ << values[0];
-        for (int n = 1; n < n_values; ++n)
-          output_ << "," << values[n];
-        output_ << std::endl;
-      }
-
-      void operator()(const std::string& key,
-                      const double* values,
-                      int n_rows, int n_cols) {
-        if (n_rows == 0 || n_cols == 0) return;
-
-        output_ << key_value_prefix_ << key << std::endl;
-
-        for (int i = 0; i < n_rows; ++i) {
-          output_ << key_value_prefix_ << values[i * n_cols];
-          for (int j = 1; j < n_cols; ++j)
-            output_ << "," << values[i * n_cols + j];
-          output_ << std::endl;
-        }
-      }
-
       void operator()(const std::vector<std::string>& names) {
         if (names.empty()) return;
 

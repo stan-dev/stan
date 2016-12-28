@@ -29,36 +29,6 @@ namespace stan {
         : writer1_(writer1), writer2_(writer2) {
       }
 
-
-      void operator()(const std::string& key, double value) {
-        writer1_(key, value);
-        writer2_(key, value);
-      }
-
-      void operator()(const std::string& key, int value) {
-        writer1_(key, value);
-        writer2_(key, value);
-      }
-
-      void operator()(const std::string& key, const std::string& value) {
-        writer1_(key, value);
-        writer2_(key, value);
-      }
-
-      void operator()(const std::string& key,
-                      const double* values,
-                      int n_values) {
-        writer1_(key, values, n_values);
-        writer2_(key, values, n_values);
-      }
-
-      void operator()(const std::string& key,
-                      const double* values,
-                      int n_rows, int n_cols) {
-        writer1_(key, values, n_rows, n_cols);
-        writer2_(key, values, n_rows, n_cols);
-      }
-
       void operator()(const std::vector<std::string>& names) {
         writer1_(names);
         writer2_(names);
