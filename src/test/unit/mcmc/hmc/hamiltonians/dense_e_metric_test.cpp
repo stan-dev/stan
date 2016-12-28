@@ -5,7 +5,7 @@
 #include <stan/mcmc/hmc/hamiltonians/dense_e_metric.hpp>
 #include <test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp>
 #include <stan/callbacks/stream_writer.hpp>
-#include <stan/callbacks/noop_writer.hpp>
+#include <stan/callbacks/writer.hpp>
 #include <test/unit/util.hpp>
 #include <gtest/gtest.h>
 
@@ -151,7 +151,7 @@ TEST(McmcDenseEMetric, streams) {
 
 
   stan::mcmc::mock_model model(q.size());
-  stan::callbacks::noop_writer writer;
+  stan::callbacks::writer writer;
 
   // typedef to use within Google Test macros
   typedef stan::mcmc::dense_e_metric<stan::mcmc::mock_model, rng_t> dense_e;

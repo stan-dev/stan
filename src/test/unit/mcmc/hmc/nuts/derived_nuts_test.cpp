@@ -1,4 +1,3 @@
-#include <stan/callbacks/noop_writer.hpp>
 #include <stan/mcmc/hmc/nuts/softabs_nuts.hpp>
 #include <stan/mcmc/hmc/nuts/unit_e_nuts.hpp>
 #include <stan/mcmc/hmc/nuts/diag_e_nuts.hpp>

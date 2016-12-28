@@ -14,8 +14,7 @@
 
 #include <stan/services/sample/hmc_nuts_diag_e_adapt.hpp>
 #include <stan/io/empty_var_context.hpp>
-#include <stan/callbacks/noop_interrupt.hpp>
-#include <stan/callbacks/noop_writer.hpp>
+#include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/callbacks/writer.hpp>
 
@@ -50,7 +49,7 @@ namespace stan {
             hasError(err_code != 0),
             header(),
             body()
-        { 
+        {
           size_t end_of_header = output.find("\n\n");
           if (end_of_header == std::string::npos)
             end_of_header = 0;
@@ -59,8 +58,8 @@ namespace stan {
           header = output.substr(0, end_of_header);
           body = output.substr(end_of_header);
         }
-  
-        run_command_output() 
+
+        run_command_output()
           : command(),
             output(),
             time(0),
@@ -83,23 +82,23 @@ namespace stan {
         return os;
       }
 
-      /** 
+      /**
        * Runs the command provided and returns the system output
        * as a string.
-       * 
+       *
        * @param command A command that can be run from the shell
        * @return the system output of the command
-       */  
+       */
       run_command_output run_command(std::string command) {
         using boost::posix_time::ptime;
         using boost::posix_time::microsec_clock;
-  
+
         FILE *in;
-        std::string new_command = command + " 2>&1"; 
+        std::string new_command = command + " 2>&1";
         // captures both cout amd err
-  
+
         in = popen(command.c_str(), "r");
-  
+
         if(!in) {
           std::string err_msg;
           err_msg = "Fatal error with popen; could not execute: \"";
@@ -107,7 +106,7 @@ namespace stan {
           err_msg+= "\"";
           throw std::runtime_error(err_msg.c_str());
         }
-  
+
         std::string output;
         char buf[1024];
         size_t count;
@@ -123,7 +122,7 @@ namespace stan {
           err_code >>= 8;
 
         return run_command_output(command, output,
-                                  (time_end - time_start).total_milliseconds(), 
+                                  (time_end - time_start).total_milliseconds(),
                                   err_code);
       }
 
@@ -131,7 +130,7 @@ namespace stan {
       std::vector<double> get_last_iteration_from_file(const char* filename) {
         std::vector<double> draw;
         const char comment = '#';
-        
+
         std::ifstream file_stream(filename);
         std::string line;
         std::string last_values;
@@ -139,18 +138,18 @@ namespace stan {
           if (line.length() > 0 && line[0] != comment)
             last_values = line;
         }
-        
+
         std::stringstream values_stream(last_values);
         std::vector<std::string> values;
         std::string value;
         while (std::getline(values_stream, value, ','))
           values.push_back(value);
-        
+
         draw.resize(values.size());
         for (size_t n = 0; n < draw.size(); ++n) {
           draw[n] = atof(values[n].c_str());
         }
-        
+
         return draw;
       }
 
@@ -173,21 +172,21 @@ namespace stan {
       }
 
       std::string get_git_date() {
-        run_command_output git_date_command 
+        run_command_output git_date_command
           = run_command("git log --format=%ct -1");
         if (git_date_command.hasError)
           return "NA";
         boost::trim(git_date_command.body);
-  
+
         long timestamp = atol(git_date_command.body.c_str());
         std::time_t git_date(timestamp);
-  
+
         std::stringstream date_ss;
         date_ss << std::ctime(&git_date);
-        
+
         std::string date;
         date = date_ss.str();
-        
+
         boost::trim(date);
         return date;
       }
@@ -195,13 +194,13 @@ namespace stan {
       std::string get_date() {
         std::time_t curr_date;
         time(&curr_date);
-        
+
         std::stringstream date_ss;
         date_ss << std::ctime(&curr_date);
-        
+
         std::string date;
         date = date_ss.str();
-        
+
         boost::trim(date);
         return date;
       }
@@ -220,14 +219,14 @@ namespace stan {
         data_stream.close();
 
         // Sample output
-        callbacks::noop_writer init_writer;
+        callbacks::writer init_writer;
         callbacks::stream_writer info(std::cout, "# ");
         callbacks::stream_writer err(std::cerr);
         std::fstream output_stream(output_file.c_str(), std::fstream::out);
         callbacks::stream_writer sample_writer(output_stream, "# ");
-        callbacks::noop_writer diagnostic_writer;
-        callbacks::noop_interrupt interrupt;
-        
+        callbacks::writer diagnostic_writer;
+        callbacks::interrupt interrupt;
+
         Model model(data_var_context, &std::cout);
         stan::io::empty_var_context init_context;
         double init_radius = 0;

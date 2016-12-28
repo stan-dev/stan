@@ -1,5 +1,5 @@
 #include <stan/callbacks/stream_writer.hpp>
-#include <stan/callbacks/noop_interrupt.hpp>
+#include <stan/callbacks/interrupt.hpp>
 #include <stan/model/test_gradients.hpp>
 #include <test/test-models/good/model/valid.hpp>
 #include <test/unit/util.hpp>
@@ -17,7 +17,7 @@ TEST(ModelUtil, streams) {
   std::vector<double> params_r(1);
   std::vector<int> params_i(0);
   std::vector<double> gradient;
-  stan::callbacks::noop_interrupt interrupt;
+  stan::callbacks::interrupt interrupt;
 
   std::stringstream out;
 

@@ -14,7 +14,8 @@ namespace stan {
     class interrupt {
     public:
       interrupt() {}
-      virtual void operator()() = 0;
+      virtual void operator()() {
+      }
     };
 
   }

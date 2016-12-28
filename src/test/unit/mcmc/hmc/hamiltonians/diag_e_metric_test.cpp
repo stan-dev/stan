@@ -4,7 +4,6 @@
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/diag_e_metric.hpp>
 #include <stan/callbacks/stream_writer.hpp>
-#include <stan/callbacks/noop_writer.hpp>
 #include <test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp>
 #include <test/unit/util.hpp>
 #include <gtest/gtest.h>

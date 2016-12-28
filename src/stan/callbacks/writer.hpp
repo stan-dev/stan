@@ -22,26 +22,30 @@ namespace stan {
        *
        * @param[in] names Names in a std::vector
        */
-      virtual void operator()(const std::vector<std::string>& names) = 0;
+      virtual void operator()(const std::vector<std::string>& names) {
+      }
 
       /**
        * Writes a set of values.
        *
        * @param[in] state Values in a std::vector
        */
-      virtual void operator()(const std::vector<double>& state) = 0;
+      virtual void operator()(const std::vector<double>& state) {
+      }
 
       /**
        * Writes blank input.
        */
-      virtual void operator()() = 0;
+      virtual void operator()() {
+      }
 
       /**
        * Writes a string.
        *
        * @param[in] message A string
        */
-      virtual void operator()(const std::string& message) = 0;
+      virtual void operator()(const std::string& message) {
+      }
 
       /**
        * Destructor.

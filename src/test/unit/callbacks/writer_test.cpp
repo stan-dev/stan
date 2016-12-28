@@ -1,15 +1,15 @@
 #include <gtest/gtest.h>
 #include <boost/lexical_cast.hpp>
-#include <stan/callbacks/noop_writer.hpp>
+#include <stan/callbacks/writer.hpp>
 
-class StanInterfaceCallbacksNoopWriter: public ::testing::Test {
+class StanInterfaceCallbacksWriter: public ::testing::Test {
 public:
   void SetUp() { }
   void TearDown() { }
-  stan::callbacks::noop_writer writer;
+  stan::callbacks::writer writer;
 };
 
-TEST_F(StanInterfaceCallbacksNoopWriter, double_vector) {
+TEST_F(StanInterfaceCallbacksWriter, double_vector) {
   const int N = 5;
   std::vector<double> x;
     for (int n = 0; n < N; ++n) x.push_back(n);
@@ -17,7 +17,7 @@ TEST_F(StanInterfaceCallbacksNoopWriter, double_vector) {
   EXPECT_NO_THROW(writer(x));
 }
 
-TEST_F(StanInterfaceCallbacksNoopWriter, string_vector) {
+TEST_F(StanInterfaceCallbacksWriter, string_vector) {
   const int N = 5;
   std::vector<std::string> x;
     for (int n = 0; n < N; ++n)
@@ -26,10 +26,10 @@ TEST_F(StanInterfaceCallbacksNoopWriter, string_vector) {
   EXPECT_NO_THROW(writer(x));
 }
 
-TEST_F(StanInterfaceCallbacksNoopWriter, null) {
+TEST_F(StanInterfaceCallbacksWriter, null) {
   EXPECT_NO_THROW(writer());
 }
 
-TEST_F(StanInterfaceCallbacksNoopWriter, string) {
+TEST_F(StanInterfaceCallbacksWriter, string) {
   EXPECT_NO_THROW(writer("message"));
 }

@@ -3,12 +3,11 @@
 #include <stan/io/empty_var_context.hpp>
 #include <test/test-models/good/optimization/rosenbrock.hpp>
 #include <stan/callbacks/stream_writer.hpp>
-#include <stan/callbacks/noop_interrupt.hpp>
 
 struct mock_callback : public stan::callbacks::interrupt {
   int n;
   mock_callback() : n(0) { }
-  
+
   void operator()() {
     n++;
   }
@@ -24,7 +23,7 @@ public:
   values(std::ostream& stream)
     : stan::callbacks::stream_writer(stream) {
   }
-  
+
   /**
    * Writes a set of names.
    *
@@ -70,7 +69,7 @@ TEST_F(ServicesOptimizeNewton, rosenbrock) {
   int num_interations = 1000;
   bool save_iterations = true;
   mock_callback callback;
-  
+
   int return_code = stan::services::optimize::newton(model, context,
                                                      seed, chain, init_radius,
                                                      num_interations, save_iterations,
@@ -82,7 +81,7 @@ TEST_F(ServicesOptimizeNewton, rosenbrock) {
   EXPECT_EQ(0, return_code);
   EXPECT_TRUE(message_ss.str().find("Initial log joint probability = -1") != std::string::npos);
   EXPECT_TRUE(message_ss.str().find("Iteration  1. Log joint probability =") != std::string::npos);
-  
+
   ASSERT_EQ(3, parameter.names_.size());
   EXPECT_EQ("lp__", parameter.names_[0]);
   EXPECT_EQ("x", parameter.names_[1]);
@@ -109,7 +108,7 @@ TEST_F(ServicesOptimizeNewton, rosenbrock_no_save_iterations) {
   int num_interations = 1000;
   bool save_iterations = false;
   mock_callback callback;
-  
+
   int return_code = stan::services::optimize::newton(model, context,
                                                      seed, chain, init_radius,
                                                      num_interations, save_iterations,
@@ -123,7 +122,7 @@ TEST_F(ServicesOptimizeNewton, rosenbrock_no_save_iterations) {
   EXPECT_TRUE(message_ss.str().find("Iteration  1. Log joint probability =") != std::string::npos);
 
   EXPECT_EQ("0,0\n", init_ss.str());
-  
+
   ASSERT_EQ(3, parameter.names_.size());
   EXPECT_EQ("lp__", parameter.names_[0]);
   EXPECT_EQ("x", parameter.names_[1]);

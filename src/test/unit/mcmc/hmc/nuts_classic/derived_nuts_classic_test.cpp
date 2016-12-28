@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 
-#include <stan/callbacks/noop_writer.hpp>
 #include <stan/mcmc/hmc/hamiltonians/unit_e_point.hpp>
 #include <stan/mcmc/hmc/hamiltonians/diag_e_point.hpp>
 #include <stan/mcmc/hmc/hamiltonians/dense_e_point.hpp>

@@ -2,7 +2,7 @@
 #include <test/unit/model/test_model.hpp>
 #include <test/test-models/good/model/valid.hpp>
 #include <test/unit/util.hpp>
-#include <stan/callbacks/noop_interrupt.hpp>
+#include <stan/callbacks/interrupt.hpp>
 #include <gtest/gtest.h>
 
 TEST(ModelUtil, finite_diff_grad__false_false) {
@@ -10,14 +10,14 @@ TEST(ModelUtil, finite_diff_grad__false_false) {
   std::vector<double> params_r(1);
   std::vector<int> params_i(0);
   std::vector<double> gradient;
-  stan::callbacks::noop_interrupt interrupt;
-  
+  stan::callbacks::interrupt interrupt;
+
   for (int i = 0; i < 10; i++) {
     params_r[0] = (i-5.0) * 10;
-    
+
     stan::model::finite_diff_grad<false,false,TestModel_uniform_01>
       (model, interrupt, params_r, params_i, gradient);
-    
+
     ASSERT_EQ(1U, gradient.size());
     EXPECT_FLOAT_EQ(0.0, gradient[0]);
   }
@@ -27,19 +27,19 @@ TEST(ModelUtil, finite_diff_grad__false_true) {
   std::vector<double> params_r(1);
   std::vector<int> params_i(0);
   std::vector<double> gradient;
-  stan::callbacks::noop_interrupt interrupt;
-  
+  stan::callbacks::interrupt interrupt;
+
   for (int i = 0; i < 10; i++) {
     double x = (i - 5.0) * 10;
     params_r[0] = x;
 
     stan::model::finite_diff_grad<false,true,TestModel_uniform_01>
       (model, interrupt, params_r, params_i, gradient);
-    
+
     ASSERT_EQ(1U, gradient.size());
-    
+
     // derivative of the transform
-    double expected_gradient = -std::tanh(0.5 * x);    
+    double expected_gradient = -std::tanh(0.5 * x);
     EXPECT_FLOAT_EQ(expected_gradient, gradient[0]);
   }
 }
@@ -49,17 +49,17 @@ TEST(ModelUtil, finite_diff_grad__true_false) {
   std::vector<double> params_r(1);
   std::vector<int> params_i(0);
   std::vector<double> gradient;
-  stan::callbacks::noop_interrupt interrupt;
-  
+  stan::callbacks::interrupt interrupt;
+
   for (int i = 0; i < 10; i++) {
     double x = (i - 5.0) * 10;
     params_r[0] = x;
 
     stan::model::finite_diff_grad<true,false,TestModel_uniform_01>
       (model, interrupt, params_r, params_i, gradient);
-    
+
     ASSERT_EQ(1U, gradient.size());
-    
+
     EXPECT_FLOAT_EQ(0.0, gradient[0]);
   }
 }
@@ -69,18 +69,18 @@ TEST(ModelUtil, finite_diff_grad__true_true) {
   std::vector<double> params_r(1);
   std::vector<int> params_i(0);
   std::vector<double> gradient;
-  stan::callbacks::noop_interrupt interrupt;
-  
+  stan::callbacks::interrupt interrupt;
+
   for (int i = 0; i < 10; i++) {
     double x = (i - 5.0) * 10;
     params_r[0] = x;
 
     stan::model::finite_diff_grad<true,true,TestModel_uniform_01>
       (model, interrupt, params_r, params_i, gradient);
-    
+
     ASSERT_EQ(1U, gradient.size());
-    
-    double expected_gradient = -std::tanh(0.5 * x);    
+
+    double expected_gradient = -std::tanh(0.5 * x);
     EXPECT_FLOAT_EQ(expected_gradient, gradient[0]);
   }
 }
@@ -96,7 +96,7 @@ TEST(ModelUtil, streams) {
   std::vector<double> params_r(1);
   std::vector<int> params_i(0);
   std::vector<double> gradient;
-  stan::callbacks::noop_interrupt interrupt;
+  stan::callbacks::interrupt interrupt;
 
   std::stringstream out;
 
