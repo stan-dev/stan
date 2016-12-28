@@ -19,12 +19,11 @@ namespace stan {
     public:
       /**
        * Destructor.
-       *
        */
       ~random_var_context() {}
 
       /**
-       * Constructor.
+       * Constructs a random var_context.
        *
        * On construction, this var_context will generate random
        * numbers on the unconstrained scale for the model provided.
@@ -34,11 +33,9 @@ namespace stan {
        * Stan program and does not generate values for transformed parameters
        * or generated quantities.
        *
-       * @tparam Model a generated Stan program or a class that follows
-       *   that template
-       * @tparam RNG Random number generator type. Typically
-       *   boost::ecuyer1988
-       * @param model instantiated model to generate variables for
+       * @tparam Model Model class
+       * @tparam RNG Random number generator type
+       * @param[in] model instantiated model to generate variables for
        * @param[in,out] rng pseudo-random number generator
        * @param[in] init_radius the unconstrained variables are uniform draws
        *   from -init_radius to init_radius.
@@ -60,26 +57,26 @@ namespace stan {
         std::vector<std::string> constrained_params_names;
         model.constrained_param_names(constrained_params_names, false, false);
         size_t keep = constrained_params_names.size();
-        size_t index = 0;
+        size_t i = 0;
         size_t num = 0;
-        for (index = 0; index < dims_.size(); index++) {
+        for (i = 0; i < dims_.size(); ++i) {
           size_t size = 1;
-          for (size_t n = 0; n < dims_[index].size(); n++)
-            size *= dims_[index][n];
+          for (size_t n = 0; n < dims_[i].size(); ++n)
+            size *= dims_[i][n];
           num += size;
           if (num > keep)
             break;
         }
-        dims_.erase(dims_.begin() + index, dims_.end());
-        names_.erase(names_.begin() + index, names_.end());
+        dims_.erase(dims_.begin() + i, dims_.end());
+        names_.erase(names_.begin() + i, names_.end());
 
         if (init_zero) {
-          for (size_t n = 0; n < num_unconstrained_; n++)
+          for (size_t n = 0; n < num_unconstrained_; ++n)
             unconstrained_params_[n] = 0.0;
         } else {
           boost::random::uniform_real_distribution<double>
             unif(-init_radius, init_radius);
-          for (size_t n = 0; n < num_unconstrained_; n++)
+          for (size_t n = 0; n < num_unconstrained_; ++n)
             unconstrained_params_[n] = unif(rng);
         }
 
@@ -93,9 +90,9 @@ namespace stan {
         vals_r_.resize(dims_.size());
         std::vector<double>::iterator start = constrained_params.begin();
 
-        for (size_t i = 0; i < dims_.size(); i++) {
+        for (size_t i = 0; i < dims_.size(); ++i) {
           size_t size = 1;
-          for (size_t j = 0; j < dims_[i].size(); j++)
+          for (size_t j = 0; j < dims_[i].size(); ++j)
             size *= dims_[i][j];
           vals_r_[i] = std::vector<double>(start,
                                            start + size);
@@ -125,13 +122,13 @@ namespace stan {
        *   var_context; an empty vector is returned otherwise
        */
       std::vector<double> vals_r(const std::string& name) const {
-        size_t index
-          = std::find(names_.begin(), names_.end(), name) - names_.begin();
-        if (index >= names_.size()) {
+        std::vector<std::string>::const_iterator loc
+          = std::find(names_.begin(), names_.end(), name);
+        if (loc == names_.end()) {
           std::vector<double> empty_vals_r;
           return empty_vals_r;
         }
-        return vals_r_[index];
+        return vals_r_[loc - names_.begin()];
       }
 
       /**
@@ -186,7 +183,7 @@ namespace stan {
       }
 
       /**
-       * Return a list of the names of the floating point variables in
+       * Fill a list of the names of the floating point variables in
        * the context. This will return the names of the parameters in
        * the model.
        *
@@ -197,7 +194,7 @@ namespace stan {
       }
 
       /**
-       * Return a list of the names of the integer variables in
+       * Fill a list of the names of the integer variables in
        * the context. This context has no variables.
        *
        * @param names Vector to store the list of names in.
@@ -211,10 +208,24 @@ namespace stan {
       }
 
     private:
+      /**
+       * Parameter names in the model
+       */
       std::vector<std::string> names_;
+      /**
+       * Dimensions of parameters in the model
+       */
       std::vector<std::vector<size_t> > dims_;
-      std::vector<std::vector<double> > vals_r_;
+      /**
+       * Random parameter values of the model in the
+       * unconstrained space
+       */
       std::vector<double> unconstrained_params_;
+      /**
+       * Random parameter values of the model in the
+       * constrained space
+       */
+      std::vector<std::vector<double> > vals_r_;
     };
 
   }

@@ -16,9 +16,8 @@ namespace stan {
     public:
       /**
        * Destructor
-       *
        */
-      ~empty_var_context() {}
+      virtual ~empty_var_context() {}
 
       /**
        * Return <code>true</code> if the specified variable name is
@@ -32,7 +31,7 @@ namespace stan {
       }
 
       /**
-       * Always returns an empty vector. 
+       * Always returns an empty vector.
        *
        * @param name Name of variable.
        * @return empty vector
@@ -43,7 +42,7 @@ namespace stan {
       }
 
       /**
-       * Always returns an empty vector. 
+       * Always returns an empty vector.
        *
        * @param name Name of variable.
        * @return empty vector
@@ -88,8 +87,8 @@ namespace stan {
       }
 
       /**
-       * Return a list of the names of the floating point variables in
-       * the context. This contet has no variables.
+       * Fill a list of the names of the floating point variables in
+       * the context. This context has no variables.
        *
        * @param names Vector to store the list of names in.
        */
@@ -98,7 +97,7 @@ namespace stan {
       }
 
       /**
-       * Return a list of the names of the integer variables in
+       * Fill a list of the names of the integer variables in
        * the context. This context has no variables.
        *
        * @param names Vector to store the list of names in.

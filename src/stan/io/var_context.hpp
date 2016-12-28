@@ -11,7 +11,7 @@ namespace stan {
   namespace io {
 
     /**
-     * A <code>var_reader</code> reads array variables of integer and
+     * A <code>var_context</code> reads array variables of integer and
      * floating point type by name and dimension.
      *
      * <p>An array's dimensionality is described by a sequence of
@@ -96,7 +96,7 @@ namespace stan {
       virtual std::vector<size_t> dims_i(const std::string& name) const = 0;
 
       /**
-       * Return a list of the names of the floating point variables in
+       * Fill a list of the names of the floating point variables in
        * the context.
        *
        * @param names Vector to store the list of names in.
@@ -104,7 +104,7 @@ namespace stan {
       virtual void names_r(std::vector<std::string>& names) const = 0;
 
       /**
-       * Return a list of the names of the integer variables in
+       * Fill a list of the names of the integer variables in
        * the context.
        *
        * @param names Vector to store the list of names in.
