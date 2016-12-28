@@ -546,5 +546,8 @@ TEST(langGenerator, genArrayVars) {
   EXPECT_EQ(1, count_matches("matrix_d", o.str()));
 }
 
-
   
+TEST(lang,checkVectorSize) {
+  test_throws("vector_size_lt_zero",
+              "require non-negative size for container");
+}
