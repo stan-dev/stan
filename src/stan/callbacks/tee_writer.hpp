@@ -1,5 +1,5 @@
-#ifndef STAN_CALLBACKS_CHAINED_WRITER_HPP
-#define STAN_CALLBACKS_CHAINED_WRITER_HPP
+#ifndef STAN_CALLBACKS_TEE_WRITER_HPP
+#define STAN_CALLBACKS_TEE_WRITER_HPP
 
 #include <stan/callbacks/writer.hpp>
 #include <ostream>
@@ -10,13 +10,13 @@ namespace stan {
   namespace callbacks {
 
     /**
-     * <code>chained_writer</code> is an implementation that writes to
+     * <code>tee_writer</code> is an implementation that writes to
      * multiple writers.
      *
      * For any given call to this writer, it will delegate to both writers
      * provided in the constructor.
      */
-    class chained_writer : public writer {
+    class tee_writer : public writer {
     public:
       /**
        * Constructor.
@@ -24,8 +24,8 @@ namespace stan {
        * @param[in, out] writer1 first writer
        * @param[in, out] writer2 second writer
        */
-      chained_writer(writer& writer1,
-                     writer& writer2)
+      tee_writer(writer& writer1,
+                 writer& writer2)
         : writer1_(writer1), writer2_(writer2) {
       }
 

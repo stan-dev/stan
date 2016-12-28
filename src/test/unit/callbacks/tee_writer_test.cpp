@@ -1,4 +1,4 @@
-#include <stan/callbacks/chained_writer.hpp>
+#include <stan/callbacks/tee_writer.hpp>
 #include <gtest/gtest.h>
 
 namespace test {
@@ -26,34 +26,34 @@ namespace test {
   };
 }
 
-class StanCallbacksChainedWriter : public ::testing::Test {
+class StanCallbacksTeeWriter : public ::testing::Test {
 public:
-  StanCallbacksChainedWriter()
+  StanCallbacksTeeWriter()
     : writer1(), writer2(),
-      chained_writer(writer1, writer2) { }
+      tee_writer(writer1, writer2) { }
 
   test::mock_writer writer1, writer2;
-  stan::callbacks::chained_writer chained_writer;
+  stan::callbacks::tee_writer tee_writer;
 };
 
-TEST_F(StanCallbacksChainedWriter, names) {
+TEST_F(StanCallbacksTeeWriter, names) {
   std::vector<std::string> names;
 
-  chained_writer(names);
+  tee_writer(names);
   EXPECT_EQ(1, writer1.N);
   EXPECT_EQ(1, writer2.N);
 }
 
-TEST_F(StanCallbacksChainedWriter, state) {
+TEST_F(StanCallbacksTeeWriter, state) {
   std::vector<double> state;
 
-  chained_writer(state);
+  tee_writer(state);
   EXPECT_EQ(1, writer1.N);
   EXPECT_EQ(1, writer2.N);
 }
 
-TEST_F(StanCallbacksChainedWriter, message) {
-  chained_writer("message");
+TEST_F(StanCallbacksTeeWriter, message) {
+  tee_writer("message");
   EXPECT_EQ(1, writer1.N);
   EXPECT_EQ(1, writer2.N);
 }

@@ -6,7 +6,7 @@
 #include <stan/io/random_var_context.hpp>
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/writer.hpp>
-#include <stan/callbacks/chained_writer.hpp>
+#include <stan/callbacks/tee_writer.hpp>
 #include <stan/model/test_gradients.hpp>
 #include <stan/services/util/rng.hpp>
 #include <stan/services/util/initialize.hpp>
@@ -63,7 +63,7 @@ namespace stan {
 
         message_writer("TEST GRADIENT MODE");
 
-        stan::callbacks::chained_writer
+        stan::callbacks::tee_writer
           writer(message_writer, parameter_writer);
 
         int num_failed =
