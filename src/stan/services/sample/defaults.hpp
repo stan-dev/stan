@@ -13,7 +13,7 @@ namespace stan {
        */
       struct num_samples {
         /**
-         * Description of num_samples.
+         * Return the string description of num_samples.
          *
          * @return description
          */
@@ -26,18 +26,19 @@ namespace stan {
          * equal to 0.
          *
          * @param[in] num_samples argument to validate
-         * @throw std::invalid argument if num_samples < 0
+         * @throw std::invalid_argument unless num_samples is greater
+         *   than or equal to zero
          */
         static void validate(int num_samples) {
           if (!(num_samples >= 0))
-            throw std::invalid_argument("num_samples must be greater "
-                                        "than or equal to 0.");
+            throw std::invalid_argument("num_samples must be greater"
+                                        " than or equal to 0.");
         }
 
         /**
-         * Default num_samples: 1000.
+         * Return the default num_samples value.
          *
-         * @return default
+         * @return 1000
          */
         static int default_value() {
           return 1000;
@@ -49,7 +50,7 @@ namespace stan {
        */
       struct num_warmup {
         /**
-         * Description of num_warmup.
+         * Return the string description of num_warmup.
          *
          * @return description
          */
@@ -62,18 +63,19 @@ namespace stan {
          * equal to 0.
          *
          * @param[in] num_warmup argument to validate
-         * @throw std::invalid argument if num_warmup < 0
+         * @throw std::invalid_argument unless num_warmup is greater than
+         *   or equal to zero
          */
         static void validate(int num_warmup) {
           if (!(num_warmup >= 0))
-            throw std::invalid_argument("num_warmup must be greater "
-                                        "than or equal to 0.");
+            throw std::invalid_argument("num_warmup must be greater"
+                                        " than or equal to 0.");
         }
 
         /**
-         * Default num_warmup: 1000.
+         * Return the default num_warmup value.
          *
-         * @return default
+         * @return 1000
          */
         static int default_value() {
           return 1000;
@@ -85,7 +87,7 @@ namespace stan {
        */
       struct save_warmup {
         /**
-         * Description of save_warmup.
+         * Return the string description of save_warmup.
          *
          * @return description
          */
@@ -102,9 +104,9 @@ namespace stan {
         }
 
         /**
-         * Default save_warmup: false.
+         * Return the default save_warmup value.
          *
-         * @return default
+         * @return false
          */
         static bool default_value() {
           return false;
@@ -116,7 +118,7 @@ namespace stan {
        */
       struct thin {
         /**
-         * Description of thin.
+         * Return the string description of thin.
          *
          * @return description
          */
@@ -128,7 +130,7 @@ namespace stan {
          * Validates thin; thin must be greater than 0.
          *
          * @param[in] thin argument to validate
-         * @throw std::invalid argument if thin <= 0
+         * @throw std::invalid_argument unless thin is greater than zero
          */
         static void validate(int thin) {
           if (!(thin > 0))
@@ -136,9 +138,9 @@ namespace stan {
         }
 
         /**
-         * Default thin: 1.
+         * Return the default thin value.
          *
-         * @return default
+         * @return 1
          */
         static int default_value() {
           return 1;
@@ -150,7 +152,7 @@ namespace stan {
        */
       struct adaptation_engaged {
         /**
-         * Description of adaptation_engaged.
+         * Return the string description of adaptation_engaged.
          *
          * @return description
          */
@@ -159,7 +161,7 @@ namespace stan {
         }
 
         /**
-         * Validates adaptation_engaged. This is a noop.
+         * Validates adaptation_engaged. This is a no op.
          *
          * @param[in] adaptation_engaged argument to validate
          */
@@ -167,9 +169,9 @@ namespace stan {
         }
 
         /**
-         * Default adaptation_engaged: true.
+         * Return the default adaptation_engaged value.
          *
-         * @return default
+         * @return true
          */
         static bool default_value() {
           return true;
@@ -182,7 +184,7 @@ namespace stan {
        */
       struct gamma {
         /**
-         * Description of gamma.
+         * Return the string description of gamma.
          *
          * @return description
          */
@@ -194,7 +196,7 @@ namespace stan {
          * Validates gamma; gamma must be greater than 0.
          *
          * @param[in] gamma argument to validate
-         * @throw std::invalid argument if gamma <= 0
+         * @throw std::invalid_argument unless gamma is greater than zero
          */
         static void validate(double gamma) {
           if (!(gamma > 0))
@@ -202,9 +204,9 @@ namespace stan {
         }
 
         /**
-         * Default gamma: 0.05.
+         * Return the default gamma value.
          *
-         * @return default
+         * @return 0.05
          */
         static double default_value() {
           return 0.05;
@@ -216,7 +218,7 @@ namespace stan {
        */
       struct kappa {
         /**
-         * Description of kappa.
+         * Return the string description of kappa.
          *
          * @return description
          */
@@ -228,7 +230,7 @@ namespace stan {
          * Validates kappa; kappa must be greater than 0.
          *
          * @param[in] kappa argument to validate
-         * @throw std::invalid argument if kappa <= 0
+         * @throw std::invalid_argument unless kappa is greater than zero
          */
         static void validate(double kappa) {
           if (!(kappa > 0))
@@ -236,9 +238,9 @@ namespace stan {
         }
 
         /**
-         * Default kappa: 0.75.
+         * Return the default kappa value.
          *
-         * @return default
+         * @return 0.75
          */
         static double default_value() {
           return 0.75;
@@ -250,7 +252,7 @@ namespace stan {
        */
       struct t0 {
         /**
-         * Description of t0.
+         * Return the description of t0.
          *
          * @return description
          */
@@ -262,7 +264,7 @@ namespace stan {
          * Validates t0; t0 must be greater than 0.
          *
          * @param[in] t0 argument to validate
-         * @throw std::invalid argument if t0 <= 0
+         * @throw std::invalid_argument unless t0 is greater than zero
          */
         static void validate(double t0) {
           if (!(t0 > 0))
@@ -270,9 +272,9 @@ namespace stan {
         }
 
         /**
-         * Default t0: 10.
+         * Return the default t0 value.
          *
-         * @return default
+         * @return 10
          */
         static double default_value() {
           return 10;
@@ -284,7 +286,7 @@ namespace stan {
        */
       struct init_buffer {
         /**
-         * Description of init_buffer.
+         * Return the string description of init_buffer.
          *
          * @return description
          */
@@ -293,7 +295,7 @@ namespace stan {
         }
 
         /**
-         * Validates init_buffer. This is a noop.
+         * Validates init_buffer. This is a no op.
          *
          * @param[in] init_buffer argument to validate
          */
@@ -301,9 +303,9 @@ namespace stan {
         }
 
         /**
-         * Default init_buffer: 75.
+         * Return the default init_buffer value.
          *
-         * @return default
+         * @return 75
          */
         static unsigned int default_value() {
           return 75;
@@ -315,7 +317,7 @@ namespace stan {
        */
       struct term_buffer {
         /**
-         * Description of term_buffer.
+         * Return the string description of term_buffer.
          *
          * @return description
          */
@@ -332,9 +334,9 @@ namespace stan {
         }
 
         /**
-         * Default term_buffer: 50
+         * Return the default term_buffer value.
          *
-         * @return default
+         * @return 50
          */
         static unsigned int default_value() {
           return 50;
@@ -346,7 +348,7 @@ namespace stan {
        */
       struct window {
         /**
-         * Description of window.
+         * Return the string description of window.
          *
          * @return description
          */
@@ -355,7 +357,7 @@ namespace stan {
         }
 
         /**
-         * Validates window. This is a noop.
+         * Validates window. This is a no op.
          *
          * @param[in] window argument to validate
          */
@@ -363,9 +365,9 @@ namespace stan {
         }
 
         /**
-         * Default window: 25.
+         * Return the default window value.
          *
-         * @return default
+         * @return 25
          */
         static unsigned int default_value() {
           return 25;
@@ -377,7 +379,7 @@ namespace stan {
        */
       struct int_time {
         /**
-         * Description of int_time.
+         * Return the string description of int_time.
          *
          * @return description
          */
@@ -389,7 +391,7 @@ namespace stan {
          * Validates int_time. int_time must be greater than 0.
          *
          * @param[in] int_time argument to validate
-         * @throw std::invalid argument if int_time <= 0
+         * @throw std::invalid_argument unless int_time is greater than zero
          */
         static void validate(double int_time) {
           if (!(int_time > 0))
@@ -397,9 +399,9 @@ namespace stan {
         }
 
         /**
-         * Default int_time: 2 * pi.
+         * Return the default int_time value.
          *
-         * @return default
+         * @return 2 * pi
          */
         static double default_value() {
           return 6.28318530717959;
@@ -411,7 +413,7 @@ namespace stan {
        */
       struct max_depth {
         /**
-         * Description of max_depth.
+         * Return the string description of max_depth.
          *
          * @return description
          */
@@ -423,7 +425,7 @@ namespace stan {
          * Validates max_depth; max_depth must be greater than 0.
          *
          * @param[in] max_depth argument to validate
-         * @throw std::invalid argument if max_depth <= 0
+         * @throw std::invalid_argument unless max_depth is greater than zero
          */
         static void validate(int max_depth) {
           if (!(max_depth > 0))
@@ -431,9 +433,9 @@ namespace stan {
         }
 
         /**
-         * Default max_depth: 10.
+         * Return the default max_depth value.
          *
-         * @return default
+         * @return 10
          */
         static int default_value() {
           return 10;
@@ -445,7 +447,7 @@ namespace stan {
        */
       struct stepsize {
         /**
-         * Description of stepsize.
+         * Return the string description of stepsize.
          *
          * @return description
          */
@@ -457,7 +459,7 @@ namespace stan {
          * Validates stepsize; stepsize must be greater than 0.
          *
          * @param[in] stepsize argument to validate
-         * @throw std::invalid argument if stepsize <= 0
+         * @throw std::invalid_argument unless stepsize is greater than zero
          */
         static void validate(double stepsize) {
           if (!(stepsize > 0))
@@ -465,9 +467,9 @@ namespace stan {
         }
 
         /**
-         * Default stepsize: 1.
+         * Return the default stepsize value.
          *
-         * @return default
+         * @return 1
          */
         static double default_value() {
           return 1;
@@ -479,7 +481,7 @@ namespace stan {
        */
       struct stepsize_jitter {
         /**
-         * Description of stepsize_jitter.
+         * Return the string description of stepsize_jitter.
          *
          * @return description
          */
@@ -491,19 +493,19 @@ namespace stan {
          * Validates stepsize_jitter; stepsize_jitter must be between 0 and 1.
          *
          * @param[in] stepsize_jitter argument to validate
-         * @throw std::invalid argument if stepsize_jitter < 0
-         *   or stepsize_jitter > 1
+         * @throw std::invalid_argument unless stepsize_jitter is between 0 and
+         *   1, inclusive
          */
         static void validate(double stepsize_jitter) {
           if (!(stepsize_jitter >= 0 && stepsize_jitter <= 1))
-            throw std::invalid_argument("stepsize_jitter must be between "
-                                        "0 and 1.");
+            throw std::invalid_argument("stepsize_jitter must be between"
+                                        " 0 and 1.");
         }
 
         /**
-         * Default stepsize_jitter: 0.
+         * Return the default stepsize_jitter value.
          *
-         * @return default
+         * @return 0
          */
         static double default_value() {
           return 0;

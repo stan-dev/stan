@@ -13,7 +13,7 @@ namespace stan {
        */
       struct epsilon {
         /**
-         * Description of epsilon.
+         * Return the string description of epsilon.
          *
          * @return description
          */
@@ -25,7 +25,7 @@ namespace stan {
          * Validates epsilon; epsilon must be greater than 0.
          *
          * @param[in] epsilon argument to validate
-         * @throw std::invalid_argument if epsilon <= 0
+         * @throw std::invalid_argument unless epsilon is greater than zero
          */
         static void validate(double epsilon) {
           if (!(epsilon > 0))
@@ -33,9 +33,9 @@ namespace stan {
         }
 
         /**
-         * Default error value: 1e-6.
+         * Return the default epsilon value.
          *
-         * @return default
+         * @return 1e-6
          */
         static double default_value() {
           return 1e-6;
@@ -49,7 +49,7 @@ namespace stan {
        */
       struct error {
         /**
-         * Description of error.
+         * Return the string description of error.
          *
          * @return description
          */
@@ -60,7 +60,7 @@ namespace stan {
         /**
          * Validates error; error must be greater than 0.
          *
-         * @throw std::invalid_argument if error <= 0
+         * @throw std::invalid_argument unless error is greater than zero
          * equal to 0.
          */
         static void validate(double error) {
@@ -69,9 +69,9 @@ namespace stan {
         }
 
         /**
-         * Default error value: 1e-6.
+         * Return the default error value.
          *
-         * @return default
+         * @return 1e-6
          */
         static double default_value() {
           return 1e-6;

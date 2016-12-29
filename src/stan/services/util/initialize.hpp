@@ -107,16 +107,16 @@ namespace stan {
           } catch (std::exception& e) {
             message_writer();
             message_writer("Rejecting initial value:");
-            message_writer("  Error evaluating the log probability "
-                   "at the initial value.");
+            message_writer("  Error evaluating the log probability"
+                   " at the initial value.");
             continue;
           }
           if (!boost::math::isfinite(log_prob)) {
             message_writer("Rejecting initial value:");
-            message_writer("  Log probability evaluates to log(0), "
-                   "i.e. negative infinity.");
-            message_writer("  Stan can't start sampling from this "
-                           "initial value.");
+            message_writer("  Log probability evaluates to log(0),"
+                           " i.e. negative infinity.");
+            message_writer("  Stan can't start sampling from this"
+                           " initial value.");
             continue;
           }
           msg.str("");
@@ -135,10 +135,10 @@ namespace stan {
           for (size_t i = 0; i < gradient.size(); ++i) {
             if (gradient_ok && !boost::math::isfinite(gradient[i])) {
               message_writer("Rejecting initial value:");
-              message_writer("  Gradient evaluated at the initial value "
-                     "is not finite.");
-              message_writer("  Stan can't start sampling from this "
-                             "initial value.");
+              message_writer("  Gradient evaluated at the initial value"
+                             " is not finite.");
+              message_writer("  Stan can't start sampling from this"
+                             " initial value.");
               gradient_ok = false;
             }
           }
@@ -148,9 +148,9 @@ namespace stan {
             msg << "Gradient evaluation took " << deltaT << " seconds";
             message_writer(msg.str());
             msg.str("");
-            msg  << "1000 transitions using 10 leapfrog steps "
-                 << "per transition would take "
-                 << 1e4 * deltaT << " seconds.";
+            msg  << "1000 transitions using 10 leapfrog steps"
+                 << " per transition would take"
+                 << " " << 1e4 * deltaT << " seconds.";
             message_writer(msg.str());
             msg.str("");
             message_writer("Adjust your expectations accordingly!");
@@ -166,8 +166,8 @@ namespace stan {
             message_writer();
             msg.str("");
             msg << "Initialization between (-" << init_radius
-                << ", " << init_radius << ") failed after "
-                << MAX_INIT_TRIES <<  " attempts. ";
+                << ", " << init_radius << ") failed after"
+                << " " << MAX_INIT_TRIES <<  " attempts. ";
             message_writer(msg.str());
             message_writer(" Try specifying initial values,"
                            " reducing ranges of constrained values,"

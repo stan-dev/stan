@@ -24,7 +24,6 @@ namespace stan {
        * Runs the BFGS algorithm for a model.
        *
        * @tparam Model A model implementation
-       *
        * @param model Input model to test (with data already instantiated)
        * @param init var context for initialization
        * @param random_seed random seed for the pseudo random number generator
@@ -47,7 +46,7 @@ namespace stan {
        * @param[out] message_writer output for messages
        * @param[out] init_writer Writer callback for unconstrained inits
        * @param[out] parameter_writer output for parameter values
-       * @return stan::services::error_codes::OK if successful
+       * @return error_codes::OK if successful
        */
       template <class Model>
       int bfgs(Model& model,
@@ -68,13 +67,13 @@ namespace stan {
                callbacks::writer& message_writer,
                callbacks::writer& init_writer,
                callbacks::writer& parameter_writer) {
-        boost::ecuyer1988 rng = stan::services::util::rng(random_seed, chain);
+        boost::ecuyer1988 rng = util::rng(random_seed, chain);
 
         std::vector<int> disc_vector;
         std::vector<double> cont_vector
-          = stan::services::util::initialize(model, init, rng, init_radius,
-                                             false,
-                                             message_writer, init_writer);
+          = util::initialize(model, init, rng, init_radius,
+                             false,
+                             message_writer, init_writer);
 
         std::stringstream bfgs_ss;
         typedef stan::optimization::BFGSLineSearch
@@ -116,15 +115,15 @@ namespace stan {
           interrupt();
           if (refresh > 0
               && (bfgs.iter_num() == 0
-                  || (bfgs.iter_num() + 1 % refresh == 0)))
-            message_writer("    Iter "
-                           "     log prob "
-                           "       ||dx|| "
-                           "     ||grad|| "
-                           "      alpha "
-                           "     alpha0 "
-                           " # evals "
-                           " Notes ");
+                  || ((bfgs.iter_num() + 1) % refresh == 0)))
+            message_writer("    Iter"
+                           "      log prob"
+                           "        ||dx||"
+                           "      ||grad||"
+                           "       alpha"
+                           "      alpha0"
+                           "  # evals"
+                           "  Notes ");
 
           ret = bfgs.step();
           lp = bfgs.logp();
@@ -134,7 +133,7 @@ namespace stan {
               && (ret != 0
                   || !bfgs.note().empty()
                   || bfgs.iter_num() == 0
-                  || (bfgs.iter_num() + 1 % refresh == 0))) {
+                  || ((bfgs.iter_num() + 1) % refresh == 0))) {
             msg.str("");
             msg << " " << std::setw(7) << bfgs.iter_num() << " ";
             msg << " " << std::setw(12) << std::setprecision(6)
@@ -164,6 +163,7 @@ namespace stan {
             msg.str("");
             model.write_array(rng, cont_vector, disc_vector, values,
                               true, true, &msg);
+            // This if is here to match the pre-refactor behavior
             if (msg.str().length() > 0)
               message_writer(msg.str());
 
@@ -186,10 +186,10 @@ namespace stan {
         int return_code;
         if (ret >= 0) {
           message_writer("Optimization terminated normally: ");
-          return_code = stan::services::error_codes::OK;
+          return_code = error_codes::OK;
         } else {
           message_writer("Optimization terminated with error: ");
-          return_code = stan::services::error_codes::SOFTWARE;
+          return_code = error_codes::SOFTWARE;
         }
         message_writer("  " + bfgs.get_code_string(ret));
 

@@ -75,7 +75,6 @@ namespace stan {
           sample_writer_(names);
         }
 
-
         /**
          * Outputs samples. First outputs the values of the sample params
          * from a stan::mcmc::sample, then outputs the values of the sampler
@@ -129,7 +128,6 @@ namespace stan {
           sampler.write_sampler_state(sample_writer_);
         }
 
-
         /**
          * Print diagnostic names
          *
@@ -182,7 +180,6 @@ namespace stan {
           diagnostic_writer_(values);
         }
 
-
         /**
          * Internal method
          *
@@ -201,7 +198,6 @@ namespace stan {
                           callbacks::writer& writer) {
           std::string title(" Elapsed Time: ");
           std::stringstream ss;
-
 
           writer();
 
@@ -222,7 +218,6 @@ namespace stan {
 
           writer();
         }
-
 
         /**
          * Print timing information to all streams

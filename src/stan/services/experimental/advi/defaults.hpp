@@ -14,7 +14,7 @@ namespace stan {
          */
         struct gradient_samples {
           /**
-           * Description of gradient_samples.
+           * Return the string description of gradient_samples.
            *
            * @return description
            */
@@ -26,18 +26,19 @@ namespace stan {
            * Validates gradient_samples; must be greater than 0.
            *
            * @param[in] gradient_samples argument to validate
-           * @throw std::invalid_argument if gradient_samples <= 0
+           * @throw std::invalid_argument unless gradient_samples is greater
+           *   than zero
            */
           static void validate(int gradient_samples) {
             if (!(gradient_samples > 0))
-              throw std::invalid_argument("gradient_samples must be greater "
-                                          "than 0.");
+              throw std::invalid_argument("gradient_samples must be greater"
+                                          " than 0.");
           }
 
           /**
-           * Default number of gradient_samples: 1.
+           * Return the default number of gradient_samples.
            *
-           * @return default
+           * @return 1
            */
           static int default_value() {
             return 1;
@@ -49,7 +50,7 @@ namespace stan {
          */
         struct elbo_samples {
           /**
-           * Description of elbo_samples.
+           * Return the string description of elbo_samples.
            *
            * @return description
            */
@@ -61,18 +62,19 @@ namespace stan {
            * Validates elbo_samples; must be greater than 0.
            *
            * @param[in] elbo_samples argument to validate
-           * @throw std::invalid_argument if elbo_samples <= 0
+           * @throw std::invalid_argument unless elbo_samples is greater than
+           *   zero
            */
           static void validate(double elbo_samples) {
             if (!(elbo_samples > 0))
-              throw std::invalid_argument("elbo_samples must be greater "
-                                          "than 0.");
+              throw std::invalid_argument("elbo_samples must be greater"
+                                          " than 0.");
           }
 
           /**
-           * Default elbo_samples: 100.
+           * Return the default elbo_samples value.
            *
-           * @return default
+           * @return 100
            */
           static int default_value() {
             return 100;
@@ -96,12 +98,13 @@ namespace stan {
            * Validates max_iterations; max_iterations must be greater than 0.
            *
            * @param[in] max_iterations argument to validate
-           * @throw std::invalid_argument if max_iterations <= 0
+           * @throw std::invalid_argument unless max_iterations is greater
+           *    than zero
            */
           static void validate(int max_iterations) {
             if (!(max_iterations > 0))
-              throw std::invalid_argument("max_iterations must be greater "
-                                          "than 0.");
+              throw std::invalid_argument("max_iterations must be greater"
+                                          " than 0.");
           }
 
           /**
@@ -120,7 +123,7 @@ namespace stan {
          */
         struct tol_rel_obj {
           /**
-           * Description of tol_rel_obj.
+           * Return the string description of tol_rel_obj.
            *
            * @return description
            */
@@ -132,18 +135,19 @@ namespace stan {
            * Validates tol_rel_obj; must be greater than 0.
            *
            * @param[in] tol_rel_obj argument to validate
-           * @throw std::invalid_argument if tol_rel_obj <= 0
+           * @throw std::invalid_argument unless tol_rel_obj is greater than
+           *   zero
            */
           static void validate(double tol_rel_obj) {
             if (!(tol_rel_obj > 0))
-              throw std::invalid_argument("tol_rel_obj must be greater "
-                                          "than 0.");
+              throw std::invalid_argument("tol_rel_obj must be greater"
+                                          " than 0.");
           }
 
           /**
-           * Default tol_rel_obj: 0.01.
+           * Return the default tol_rel_obj value.
            *
-           * @return default
+           * @return 0.01
            */
           static double default_value() {
             return 0.01;
@@ -155,7 +159,7 @@ namespace stan {
          */
         struct eta {
           /**
-           * Description of eta.
+           * Return the string description of eta.
            *
            * @return description
            */
@@ -167,7 +171,7 @@ namespace stan {
            * Validates eta; must be greater than 0.
            *
            * @param[in] eta argument to validate
-           * @throw std::invalid_argument if eta <= 0
+           * @throw std::invalid_argument unless eta is greater than zero
            */
           static void validate(double eta) {
             if (!(eta > 0))
@@ -175,9 +179,9 @@ namespace stan {
           }
 
           /**
-           * Default.
+           * Return the default eta value.
            *
-           * @return default
+           * @return 1.0
            */
           static double default_value() {
             return 1.0;
@@ -189,7 +193,7 @@ namespace stan {
          */
         struct adapt_engaged {
           /**
-           * Description of adapt_engaged.
+           * Return the string description of adapt_engaged.
            *
            * @return description
            */
@@ -206,9 +210,9 @@ namespace stan {
           }
 
           /**
-           * Default value: true.
+           * Return the default adapt_engaged value.
            *
-           * @return default
+           * @return true
            */
           static bool default_value() {
             return true;
@@ -220,7 +224,7 @@ namespace stan {
          */
         struct adapt_iterations {
           /**
-           * Description of adapt_iterations.
+           * Return the string description of adapt_iterations.
            *
            * @return description
            */
@@ -232,18 +236,19 @@ namespace stan {
            * Validates adapt_iterations; must be greater than 0.
            *
            * @param[in] adapt_iterations argument to validate
-           * @throw std::invalid_argument if adapt_iterations <= 0
+           * @throw std::invalid_argument unless adapt_iterations is
+           *   greater than zero
            */
           static void validate(int adapt_iterations) {
             if (!(adapt_iterations > 0))
-              throw std::invalid_argument("adapt_iterations must be greater "
-                                          "than 0.");
+              throw std::invalid_argument("adapt_iterations must be greater"
+                                          " than 0.");
           }
 
           /**
-           * Default adapt_iterations.
+           * Return the default adapt_iterations value.
            *
-           * @return default
+           * @return 50
            */
           static int default_value() {
             return 50;
@@ -255,8 +260,8 @@ namespace stan {
          */
         struct eval_elbo {
           /**
-           * Description of eval_elbo. Evaluate ELBO at every
-           * <code>eval_elbo</code> iterations.
+           * Return the string description of eval_elbo. Evaluate
+           * ELBO at every <code>eval_elbo</code> iterations.
            *
            * @return description
            */
@@ -268,7 +273,7 @@ namespace stan {
            * Validates eval_elbo; must be greater than 0.
            *
            * @param[in] eval_elbo argument to validate
-           * @throw std::invalid_argument if eval_elbo <= 0
+           * @throw std::invalid_argument unless eval_elbo is greater than zero
            */
           static void validate(int eval_elbo) {
             if (!(eval_elbo > 0))
@@ -276,9 +281,9 @@ namespace stan {
           }
 
           /**
-           * Default eval_elbo; defaults to 100.
+           * Return the default eval_elbo value.
            *
-           * @return default
+           * @return 100
            */
           static int default_value() {
             return 100;
@@ -290,7 +295,7 @@ namespace stan {
          */
         struct output_draws {
           /**
-           * Description of output_draws.
+           * Return the string description of output_draws.
            *
            * @return description
            */
@@ -299,21 +304,22 @@ namespace stan {
           }
 
           /**
-           * Validates outpu_draws; must be greater than or equal to 0.
+           * Validates output_draws; must be greater than or equal to 0.
            *
            * @param[in] output_draws argument to validate
-           * @throw std::invalid_argument if output_draws < 0
+           * @throw std::invalid_argument unless output_draws is greater than
+           *   or equal to zero
            */
           static void validate(int output_draws) {
             if (!(output_draws >= 0))
-              throw std::invalid_argument("output_draws must be greater than "
-                                          "or equal to 0.");
+              throw std::invalid_argument("output_draws must be greater than"
+                                          " or equal to 0.");
           }
 
           /**
-           * Default output_samples; defaults to 1000.
+           * Return the default output_samples value.
            *
-           * @return default
+           * @return 1000
            */
           static int default_value() {
             return 1000;

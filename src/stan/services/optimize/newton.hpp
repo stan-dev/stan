@@ -23,7 +23,6 @@ namespace stan {
        * Runs the Newton algorithm for a model.
        *
        * @tparam Model A model implementation
-       *
        * @param[in] model the Stan model instantiated with data
        * @param init var context for initialization
        * @param random_seed random seed for the pseudo random number generator
@@ -36,7 +35,7 @@ namespace stan {
        * @param[out] message_writer output for messages
        * @param[out] init_writer Writer callback for unconstrained inits
        * @param[out] parameter_writer output for parameter values
-       * @return stan::services::error_codes::OK if successful
+       * @return error_codes::OK if successful
        */
       template <class Model>
       int newton(Model& model,
@@ -50,13 +49,13 @@ namespace stan {
                  callbacks::writer& message_writer,
                  callbacks::writer& init_writer,
                  callbacks::writer& parameter_writer) {
-        boost::ecuyer1988 rng = stan::services::util::rng(random_seed, chain);
+        boost::ecuyer1988 rng = util::rng(random_seed, chain);
 
         std::vector<int> disc_vector;
         std::vector<double> cont_vector
-          = stan::services::util::initialize(model, init, rng, init_radius,
-                                             false,
-                                             message_writer, init_writer);
+          = util::initialize(model, init, rng, init_radius,
+                             false,
+                             message_writer, init_writer);
 
         std::stringstream message;
 
@@ -107,8 +106,8 @@ namespace stan {
 
           message.str("");
           message << "Iteration "
-                  << std::setw(2) << (m + 1) << ". "
-                  << "Log joint probability = " << std::setw(10) << lp
+                  << std::setw(2) << (m + 1) << "."
+                  << " Log joint probability = " << std::setw(10) << lp
                   << ". Improved by " << (lp - lastlp) << ".";
           message_writer(message.str());
 
@@ -126,7 +125,7 @@ namespace stan {
           values.insert(values.begin(), lp);
           parameter_writer(values);
         }
-        return stan::services::error_codes::OK;
+        return error_codes::OK;
       }
 
     }

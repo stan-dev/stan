@@ -13,7 +13,7 @@ namespace stan {
        */
       struct init_alpha {
         /**
-         * Description of init_alpha.
+         * Return the string description of init_alpha.
          *
          * @return description
          */
@@ -25,7 +25,7 @@ namespace stan {
          * Validates init_alpha; init_alpha must be greater than 0.
          *
          * @param[in] init_alpha argument to validate
-         * @throw std::invalid argument if init_alpha <= 0
+         * @throw std::invalid_argument unless init_alpha is greater than zero
          */
         static void validate(double init_alpha) {
           if (!(init_alpha > 0))
@@ -33,9 +33,9 @@ namespace stan {
         }
 
         /**
-         * Default init_alpha: 0.001.
+         * Return the default init_alpha value.
          *
-         * @return default
+         * @return 0.001
          */
         static double default_value() {
           return 0.001;
@@ -47,31 +47,32 @@ namespace stan {
        */
       struct tol_obj {
         /**
-         * Description of tol_obj.
+         * Return the string description of tol_obj.
          *
          * @return description
          */
         static std::string description() {
-          return "Convergence tolerance on absolute changes in objective "
-            "function value.";
+          return "Convergence tolerance on absolute changes in objective"
+            " function value.";
         }
 
         /**
          * Validates tol_obj; tol_obj must be greater than or equal to 0.
          *
          * @param[in] tol_obj argument to validate
-         * @throw std::invalid argument if tol_obj < 0
+         * @throw std::invalid_argument unless tol_obj is greater than or equal
+         *   to zero
          */
         static void validate(double tol_obj) {
           if (!(tol_obj >= 0))
-            throw std::invalid_argument("tol_obj must be greater "
-                                        "than or equal to 0.");
+            throw std::invalid_argument("tol_obj must be greater"
+                                        " than or equal to 0.");
         }
 
         /**
-         * Default tol_obj: 1e-12.
+         * Return the default tol_obj value.
          *
-         * @return default
+         * @return 1e-12
          */
         static double default_value() {
           return 1e-12;
@@ -83,13 +84,13 @@ namespace stan {
        */
       struct tol_rel_obj {
         /**
-         * Description of tol_rel_obj.
+         * Return the string description of tol_rel_obj.
          *
          * @return description
          */
         static std::string description() {
-          return "Convergence tolerance on relative changes in "
-            "objective function value.";
+          return "Convergence tolerance on relative changes in"
+            " objective function value.";
         }
 
         /**
@@ -97,18 +98,19 @@ namespace stan {
          * to 0.
          *
          * @param[in] tol_rel_obj argument to validate
-         * @throw std::invalid argument if tol_rel_obj < 0
+         * @throw std::invalid_argument unless tol_rel_obj is greater than or
+         *   equal to zero
          */
         static void validate(double tol_rel_obj) {
           if (!(tol_rel_obj >= 0))
-            throw std::invalid_argument("tol_rel_obj must be greater "
-                                        "than or equal to 0");
+            throw std::invalid_argument("tol_rel_obj must be greater"
+                                        " than or equal to 0");
         }
 
         /**
-         * Default tol_rel_obj: 10000.
+         * Return the default tol_rel_obj value.
          *
-         * @return default
+         * @return 10000
          */
         static double default_value() {
           return 10000;
@@ -120,7 +122,7 @@ namespace stan {
        */
       struct tol_grad {
         /**
-         * Description of tol_grad.
+         * Return the string description of tol_grad.
          *
          * @return description
          */
@@ -132,18 +134,19 @@ namespace stan {
          * Validates tol_grad; tol_grad must be greater than or equal to 0.
          *
          * @param[in] tol_grad argument to validate
-         * @throw std::invalid argument if tol_grad < 0
+         * @throw std::invalid_argument unless tol_grad is greater than or
+         *   equal to zero
          */
         static void validate(double tol_grad) {
           if (!(tol_grad >= 0))
-            throw std::invalid_argument("tol_grad must be greater "
-                                        "than or equal to 0");
+            throw std::invalid_argument("tol_grad must be greater"
+                                        " than or equal to 0");
         }
 
         /**
-         * Default tol_grad: 1e-8.
+         * Return the default tol_grad value.
          *
-         * @return default
+         * @return 1e-8
          */
         static double default_value() {
           return 1e-8;
@@ -156,7 +159,7 @@ namespace stan {
        */
       struct tol_rel_grad {
         /**
-         * Description of tol_rel_grad.
+         * Return the string description of tol_rel_grad.
          *
          * @return description
          */
@@ -169,18 +172,19 @@ namespace stan {
          * or equal to 0.
          *
          * @param[in] tol_rel_grad argument to validate
-         * @throw std::invalid argument if tol_rel_grad < 0
+         * @throw std::invalid_argument unless tol_rel_grad is greater than or
+         *   equal to zero
          */
         static void validate(double tol_rel_grad) {
           if (!(tol_rel_grad >= 0))
-            throw std::invalid_argument("tol_rel_grad must be greater "
-                                        "than or equal to 0.");
+            throw std::invalid_argument("tol_rel_grad must be greater"
+                                        " than or equal to 0.");
         }
 
         /**
-         * Default tol_rel_grad: 10000000
+         * Return the default tol_rel_grad value.
          *
-         * @return default
+         * @return 10000000
          */
         static double default_value() {
           return 10000000;
@@ -192,7 +196,7 @@ namespace stan {
        */
       struct tol_param {
         /**
-         * Description of tol_param.
+         * Return the string description of tol_param.
          *
          * @return description
          */
@@ -204,7 +208,8 @@ namespace stan {
          * Validates tol_param; tol_param must be greater than or equal to 0.
          *
          * @param[in] tol_param argument to validate
-         * @throw std::invalid argument if tol_param < 0
+         * @throw std::invalid_argument unless tol_param is greater than or equal
+         *   to zero
          */
         static void validate(double tol_param) {
           if (!(tol_param >= 0))
@@ -212,9 +217,9 @@ namespace stan {
         }
 
         /**
-         * Default tol_param: 1e-08.
+         * Return the default tol_param.
          *
-         * @return default
+         * @return 1e-08
          */
         static double default_value() {
           return 1e-08;
@@ -226,7 +231,7 @@ namespace stan {
        */
       struct history_size {
         /**
-         * Description of history_size.
+         * Return the string description of history_size.
          *
          * @return description
          */
@@ -238,7 +243,8 @@ namespace stan {
          * Validates history_size; history_size must be greater than 0.
          *
          * @param[in] history_size argument to validate
-         * @throw std::invalid argument if history_size <= 0
+         * @throw std::invalid_argument unless history_size is greater than
+         *   zero
          */
         static void validate(int history_size) {
           if (!(history_size > 0))
@@ -246,9 +252,9 @@ namespace stan {
         }
 
         /**
-         * Default history_size: 5.
+         * Return the default history_size value.
          *
-         * @return default
+         * @return 5
          */
         static int default_value() {
           return 5;
@@ -260,7 +266,7 @@ namespace stan {
        */
       struct iter {
         /**
-         * Description of iter.
+         * Return the string description of iter.
          *
          * @return description
          */
@@ -272,7 +278,7 @@ namespace stan {
          * Validates iter; iter must be greater than 0.
          *
          * @param[in] iter argument to validate
-         * @throw std::invalid argument if iter <= 0
+         * @throw std::invalid_argument unless iter is greater than zero
          */
         static void validate(int iter) {
           if (!(iter > 0))
@@ -280,9 +286,9 @@ namespace stan {
         }
 
         /**
-         * Default iter: 2000
+         * Return the default iter value.
          *
-         * @return default
+         * @return 2000
          */
         static int default_value() {
           return 2000;
@@ -294,7 +300,7 @@ namespace stan {
        */
       struct save_iterations {
         /**
-         * Description of save_iterations.
+         * Return the string description of save_iterations.
          *
          * @return description
          */
@@ -311,9 +317,9 @@ namespace stan {
         }
 
         /**
-         * Default save_iterations: false
+         * Return the default save_iterations value.
          *
-         * @return default
+         * @return false
          */
         static bool default_value() {
           return false;

@@ -21,7 +21,6 @@ namespace stan {
          * Runs fullrank ADVI.
          *
          * @tparam Model A model implementation
-         *
          * @param model Input model to test (with data already instantiated)
          * @param init var context for initialization
          * @param random_seed random seed for the pseudo random number generator
@@ -41,7 +40,7 @@ namespace stan {
          * @param[out] init_writer Writer callback for unconstrained inits
          * @param[out] parameter_writer output for parameter values
          * @param[out] diagnostic_writer output for diagnostic values
-         * @return stan::services::error_codes::OK if successful
+         * @return error_codes::OK if successful
          */
         template <class Model>
         int fullrank(Model& model,
@@ -59,24 +58,19 @@ namespace stan {
                      int eval_elbo,
                      int output_samples,
                      callbacks::interrupt& interrupt,
-                     callbacks::writer&
-                     message_writer,
-                     callbacks::writer&
-                     init_writer,
-                     callbacks::writer&
-                     parameter_writer,
-                     callbacks::writer&
-                     diagnostic_writer) {
-          stan::services::util::experimental_message(message_writer);
+                     callbacks::writer& message_writer,
+                     callbacks::writer& init_writer,
+                     callbacks::writer& parameter_writer,
+                     callbacks::writer& diagnostic_writer) {
+          util::experimental_message(message_writer);
 
-          boost::ecuyer1988 rng = stan::services::util::rng(random_seed, chain);
+          boost::ecuyer1988 rng = util::rng(random_seed, chain);
 
           std::vector<int> disc_vector;
           std::vector<double> cont_vector
-            = stan::services::util::initialize(model, init, rng, init_radius,
-                                               true,
-                                               message_writer, init_writer);
-
+            = util::initialize(model, init, rng, init_radius,
+                               true,
+                               message_writer, init_writer);
 
           std::vector<std::string> names;
           names.push_back("lp__");

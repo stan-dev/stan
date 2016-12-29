@@ -74,12 +74,12 @@ namespace stan {
         writer.write_diagnostic_names(s, sampler, model);
 
         clock_t start = clock();
-        stan::services::util::generate_transitions
-          (sampler, num_warmup, 0, num_warmup + num_samples, num_thin,
-           refresh, save_warmup, true,
-           writer,
-           s, model, rng,
-           interrupt, message_writer, error_writer);
+        util::generate_transitions(sampler, num_warmup, 0,
+                                   num_warmup + num_samples, num_thin,
+                                   refresh, save_warmup, true,
+                                   writer,
+                                   s, model, rng,
+                                   interrupt, message_writer, error_writer);
         clock_t end = clock();
         double warm_delta_t = static_cast<double>(end - start) / CLOCKS_PER_SEC;
 
@@ -87,12 +87,12 @@ namespace stan {
         writer.write_adapt_finish(sampler);
 
         start = clock();
-        stan::services::util::generate_transitions
-          (sampler, num_samples, num_warmup, num_warmup + num_samples, num_thin,
-           refresh, true, false,
-           writer,
-           s, model, rng,
-           interrupt, message_writer, error_writer);
+        util::generate_transitions(sampler, num_samples, num_warmup,
+                                   num_warmup + num_samples, num_thin,
+                                   refresh, true, false,
+                                   writer,
+                                   s, model, rng,
+                                   interrupt, message_writer, error_writer);
         end = clock();
         double sample_delta_t
           = static_cast<double>(end - start) / CLOCKS_PER_SEC;

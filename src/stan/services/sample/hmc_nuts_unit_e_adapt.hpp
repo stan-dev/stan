@@ -21,7 +21,6 @@ namespace stan {
        * metric with adaptation.
        *
        * @tparam Model Model class
-       *
        * @param model Input model to test (with data already instantiated)
        * @param init var context for initialization
        * @param random_seed random seed for the pseudo random number generator
@@ -45,7 +44,7 @@ namespace stan {
        * @param init_writer Writer callback for unconstrained inits
        * @param sample_writer Writer for draws
        * @param diagnostic_writer Writer for diagnostic information
-       * @return stan::services::error_codes::OK if successful
+       * @return error_codes::OK if successful
        */
       template <class Model>
       int hmc_nuts_unit_e_adapt(Model& model,
@@ -77,13 +76,13 @@ namespace stan {
                                 sample_writer,
                                 callbacks::writer&
                                 diagnostic_writer) {
-        boost::ecuyer1988 rng = stan::services::util::rng(random_seed, chain);
+        boost::ecuyer1988 rng = util::rng(random_seed, chain);
 
         std::vector<int> disc_vector;
         std::vector<double> cont_vector
-          = stan::services::util::initialize(model, init, rng, init_radius,
-                                             true,
-                                             message_writer, init_writer);
+          = util::initialize(model, init, rng, init_radius,
+                             true,
+                             message_writer, init_writer);
 
         stan::mcmc::adapt_unit_e_nuts<Model, boost::ecuyer1988>
           sampler(model, rng);
@@ -91,24 +90,23 @@ namespace stan {
         sampler.set_stepsize_jitter(stepsize_jitter);
         sampler.set_max_depth(max_depth);
 
-
         sampler.get_stepsize_adaptation().set_mu(log(10 * stepsize));
         sampler.get_stepsize_adaptation().set_delta(delta);
         sampler.get_stepsize_adaptation().set_gamma(gamma);
         sampler.get_stepsize_adaptation().set_kappa(kappa);
         sampler.get_stepsize_adaptation().set_t0(t0);
 
-        stan::services::util::run_adaptive_sampler(sampler, model,
-                                                   cont_vector,
-                                                   num_warmup, num_samples,
-                                                   num_thin,
-                                                   refresh, save_warmup, rng,
-                                                   interrupt,
-                                                   message_writer, error_writer,
-                                                   sample_writer,
-                                                   diagnostic_writer);
+        util::run_adaptive_sampler(sampler, model,
+                                   cont_vector,
+                                   num_warmup, num_samples,
+                                   num_thin,
+                                   refresh, save_warmup, rng,
+                                   interrupt,
+                                   message_writer, error_writer,
+                                   sample_writer,
+                                   diagnostic_writer);
 
-        return stan::services::error_codes::OK;
+        return error_codes::OK;
       }
 
     }

@@ -20,7 +20,7 @@ namespace stan {
                                 const int refresh,
                                 const bool save,
                                 const bool warmup,
-                                stan::services::sample::mcmc_writer&
+                                sample::mcmc_writer&
                                 mcmc_writer,
                                 stan::mcmc::sample& init_s,
                                 Model& model,

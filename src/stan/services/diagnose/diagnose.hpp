@@ -25,7 +25,6 @@ namespace stan {
        * outputs to the message_writer.
        *
        * @tparam Model A model implementation
-       *
        * @param model Input model to test (with data already instantiated)
        * @param init var context for initialization
        * @param random_seed random seed for the pseudo random number generator
@@ -37,7 +36,6 @@ namespace stan {
        * @param message_writer Writer callback for display output
        * @param init_writer Writer callback for unconstrained inits
        * @param parameter_writer Writer callback for file output
-       *
        * @return the number of parameters that are not within epsilon
        * of the finite difference calculation
        */
@@ -53,13 +51,13 @@ namespace stan {
                    callbacks::writer& message_writer,
                    callbacks::writer& init_writer,
                    callbacks::writer& parameter_writer) {
-        boost::ecuyer1988 rng = stan::services::util::rng(random_seed, chain);
+        boost::ecuyer1988 rng = util::rng(random_seed, chain);
 
         std::vector<int> disc_vector;
         std::vector<double> cont_vector
-          = stan::services::util::initialize(model, init, rng, init_radius,
-                                             false,
-                                             message_writer, init_writer);
+          = util::initialize(model, init, rng, init_radius,
+                             false,
+                             message_writer, init_writer);
 
         message_writer("TEST GRADIENT MODE");
 
