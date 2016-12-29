@@ -234,9 +234,9 @@ TEST(McmcNutsBaseNuts, rho_aggregation_test) {
   sampler.z() = z_init;
 
   std::stringstream output;
-  stan::interface_callbacks::writer::stream_writer writer(output);
+  stan::callbacks::stream_writer writer(output);
   std::stringstream error_stream;
-  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
+  stan::callbacks::stream_writer error_writer(error_stream);
 
 
   sampler.build_tree(3, z_propose,
