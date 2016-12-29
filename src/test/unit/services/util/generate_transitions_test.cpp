@@ -40,7 +40,7 @@ TEST_F(ServicesSamplesGenerateTransitions, call_counting) {
                                        message, diagnostic);
 
   stan::mcmc::fixed_param_sampler sampler;
-  stan::services::sample::mcmc_writer
+  stan::services::util::mcmc_writer
     writer(parameter, diagnostic, message);
   Eigen::VectorXd cont_params(cont_vector.size());
   for (size_t i = 0; i < cont_vector.size(); i++)
@@ -104,7 +104,7 @@ TEST_F(ServicesSamplesGenerateTransitions, output_sizes) {
                                        message, diagnostic);
 
   stan::mcmc::fixed_param_sampler sampler;
-  stan::services::sample::mcmc_writer
+  stan::services::util::mcmc_writer
     writer(parameter, diagnostic, message);
   Eigen::VectorXd cont_params(cont_vector.size());
   for (size_t i = 0; i < cont_vector.size(); i++)
@@ -141,5 +141,3 @@ TEST_F(ServicesSamplesGenerateTransitions, output_sizes) {
   EXPECT_EQ(diagnostic_names[0].size(), diagnostic_values[0].size());
 
 }
-
-

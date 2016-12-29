@@ -63,7 +63,7 @@ namespace stan {
                              message_writer, init_writer);
 
         stan::mcmc::fixed_param_sampler sampler;
-        sample::mcmc_writer
+        util::mcmc_writer
           writer(sample_writer, diagnostic_writer, message_writer);
         Eigen::VectorXd cont_params(cont_vector.size());
         for (size_t i = 0; i < cont_vector.size(); i++)

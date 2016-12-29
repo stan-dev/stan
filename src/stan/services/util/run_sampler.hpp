@@ -50,7 +50,7 @@ namespace stan {
                        diagnostic_writer) {
         Eigen::Map<Eigen::VectorXd> cont_params(cont_vector.data(),
                                                 cont_vector.size());
-        services::sample::mcmc_writer
+        services::util::mcmc_writer
           writer(sample_writer, diagnostic_writer, message_writer);
         stan::mcmc::sample s(cont_params, 0, 0);
 

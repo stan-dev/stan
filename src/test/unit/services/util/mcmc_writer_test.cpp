@@ -10,12 +10,12 @@ public:
   ServicesUtil()
     : mcmc_writer(sample_writer, diagnostic_writer, message_writer),
       model(context, &model_log) { }
-  
+
   stan::test::unit::instrumented_writer sample_writer, diagnostic_writer, message_writer;
-  stan::services::sample::mcmc_writer mcmc_writer;
+  stan::services::util::mcmc_writer mcmc_writer;
   std::stringstream model_log;
   stan::io::empty_var_context context;
-  stan_model model;  
+  stan_model model;
 };
 
 TEST_F(ServicesUtil, constructor) {
@@ -45,7 +45,7 @@ public:
     n_get_sampler_diagnostic_names = 0;
     n_get_sampler_diagnostics = 0;
   }
-  
+
   stan::mcmc::sample
   transition(stan::mcmc::sample& init_sample,
              stan::callbacks::writer& info_writer,
@@ -81,7 +81,7 @@ TEST_F(ServicesUtil, write_sample_names) {
   Eigen::VectorXd x = Eigen::VectorXd::Zero(2);
   stan::mcmc::sample sample(x, 1, 2);
   mock_sampler sampler;
-  
+
   mcmc_writer.write_sample_names(sample, sampler, model);
   EXPECT_EQ(1, sample_writer.call_count());
   EXPECT_EQ(1, sample_writer.call_count("vector_string"));
@@ -94,7 +94,7 @@ TEST_F(ServicesUtil, write_sample_params) {
   Eigen::VectorXd x = Eigen::VectorXd::Zero(2);
   stan::mcmc::sample sample(x, 1, 2);
   mock_sampler sampler;
-  
+
   mcmc_writer.write_sample_params(rng, sample, sampler, model);
   EXPECT_EQ(1, sample_writer.call_count());
   EXPECT_EQ(1, sample_writer.call_count("vector_double"));
@@ -104,7 +104,7 @@ TEST_F(ServicesUtil, write_sample_params) {
 
 TEST_F(ServicesUtil, write_adapt_finish) {
   mock_sampler sampler;
-  
+
   mcmc_writer.write_adapt_finish(sampler);
   EXPECT_EQ(1, sample_writer.call_count());
   EXPECT_EQ(1, sample_writer.call_count("string"));
@@ -116,7 +116,7 @@ TEST_F(ServicesUtil, write_diagnostic_names) {
   Eigen::VectorXd x = Eigen::VectorXd::Zero(2);
   stan::mcmc::sample sample(x, 1, 2);
   mock_sampler sampler;
-  
+
   mcmc_writer.write_diagnostic_names(sample, sampler, model);
   EXPECT_EQ(0, sample_writer.call_count());
   EXPECT_EQ(1, diagnostic_writer.call_count());
@@ -128,7 +128,7 @@ TEST_F(ServicesUtil, write_diagnostic_params) {
   Eigen::VectorXd x = Eigen::VectorXd::Zero(2);
   stan::mcmc::sample sample(x, 1, 2);
   mock_sampler sampler;
-  
+
   mcmc_writer.write_diagnostic_params(sample, sampler);
   EXPECT_EQ(0, sample_writer.call_count());
   EXPECT_EQ(1, diagnostic_writer.call_count());

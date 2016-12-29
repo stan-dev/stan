@@ -18,7 +18,7 @@ namespace stan {
       namespace advi {
 
         /**
-         * Runs fullrank ADVI.
+         * Runs full rank ADVI.
          *
          * @tparam Model A model implementation
          * @param model Input model to test (with data already instantiated)
@@ -85,13 +85,8 @@ namespace stan {
           stan::variational::advi<Model,
                                   stan::variational::normal_fullrank,
                                   boost::ecuyer1988>
-            cmd_advi(model,
-                     cont_params,
-                     rng,
-                     grad_samples,
-                     elbo_samples,
-                     eval_elbo,
-                     output_samples);
+            cmd_advi(model, cont_params, rng, grad_samples,
+                     elbo_samples, eval_elbo, output_samples);
           cmd_advi.run(eta, adapt_engaged, adapt_iterations,
                        tol_rel_obj, max_iterations,
                        message_writer, parameter_writer, diagnostic_writer);

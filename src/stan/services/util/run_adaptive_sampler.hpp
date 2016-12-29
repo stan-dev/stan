@@ -65,7 +65,7 @@ namespace stan {
           return;
         }
 
-        services::sample::mcmc_writer
+        services::util::mcmc_writer
           writer(sample_writer, diagnostic_writer, message_writer);
         stan::mcmc::sample s(cont_params, 0, 0);
 

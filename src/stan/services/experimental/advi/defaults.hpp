@@ -1,5 +1,5 @@
-#ifndef STAN_SERVICES_DIAGNOSE_DEFAULTS_HPP
-#define STAN_SERVICES_DIAGNOSE_DEFAULTS_HPP
+#ifndef STAN_SERVICES_EXPERIMENTAL_ADVI_DEFAULTS_HPP
+#define STAN_SERVICES_EXPERIMENTAL_ADVI_DEFAULTS_HPP
 
 #include <stdexcept>
 #include <string>
@@ -86,7 +86,7 @@ namespace stan {
          */
         struct max_iterations {
           /**
-           * String description of the maximum number of iterations.
+           * Return the string description of max_iterations.
            *
            * @return description
            */
@@ -108,9 +108,9 @@ namespace stan {
           }
 
           /**
-           * Default max_iterations: 10000.
+           * Return the default max_iterations value.
            *
-           * @return default
+           * @return 10000
            */
           static int default_value() {
             return 10000;

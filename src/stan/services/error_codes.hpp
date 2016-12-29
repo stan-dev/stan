@@ -1,5 +1,5 @@
-#ifndef STAN_OLD_SERVICES_ERROR_CODES_HPP
-#define STAN_OLD_SERVICES_ERROR_CODES_HPP
+#ifndef STAN_SERVICES_ERROR_CODES_HPP
+#define STAN_SERVICES_ERROR_CODES_HPP
 
 namespace stan {
   namespace services {

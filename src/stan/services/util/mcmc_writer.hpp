@@ -1,5 +1,5 @@
-#ifndef STAN_SERVICES_SAMPLE_MCMC_WRITER_HPP
-#define STAN_SERVICES_SAMPLE_MCMC_WRITER_HPP
+#ifndef STAN_SERVICES_UTIL_MCMC_WRITER_HPP
+#define STAN_SERVICES_UTIL_MCMC_WRITER_HPP
 
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/mcmc/sample.hpp>
@@ -11,7 +11,7 @@
 
 namespace stan {
   namespace services {
-    namespace sample {
+    namespace util {
 
       /**
        * mcmc_writer writes out headers and samples
