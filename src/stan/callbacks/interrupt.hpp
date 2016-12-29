@@ -13,7 +13,6 @@ namespace stan {
      */
     class interrupt {
     public:
-
       /**
        * Callback function.
        *
