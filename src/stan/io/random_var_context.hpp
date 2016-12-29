@@ -203,6 +203,11 @@ namespace stan {
         names.clear();
       }
 
+      /**
+       * Return the random initialization on the unconstrained scale.
+       *
+       * @return the unconstrained parameters
+       */
       std::vector<double> get_unconstrained() const {
         return unconstrained_params_;
       }
