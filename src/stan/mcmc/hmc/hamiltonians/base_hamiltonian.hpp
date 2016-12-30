@@ -39,24 +39,21 @@ namespace stan {
       }
 
       // The time derivative of the virial, G = \sum_{d = 1}^{D} q^{d} p_{d}.
-      virtual double dG_dt(
-        Point& z,
-        callbacks::writer& info_writer,
-        callbacks::writer& error_writer) = 0;
+      virtual double dG_dt(Point& z,
+                           callbacks::writer& info_writer,
+                           callbacks::writer& error_writer) = 0;
 
       // tau = 0.5 p_{i} p_{j} Lambda^{ij} (q)
-      virtual Eigen::VectorXd dtau_dq(
-        Point& z,
-        callbacks::writer& info_writer,
-        callbacks::writer& error_writer) = 0;
+      virtual Eigen::VectorXd dtau_dq(Point& z,
+                                      callbacks::writer& info_writer,
+                                      callbacks::writer& error_writer) = 0;
 
       virtual Eigen::VectorXd dtau_dp(Point& z) = 0;
 
       // phi = 0.5 * log | Lambda (q) | + V(q)
-      virtual Eigen::VectorXd dphi_dq(
-        Point& z,
-        callbacks::writer& info_writer,
-        callbacks::writer& error_writer) = 0;
+      virtual Eigen::VectorXd dphi_dq(Point& z,
+                                      callbacks::writer& info_writer,
+                                      callbacks::writer& error_writer) = 0;
 
       virtual void sample_p(Point& z, BaseRNG& rng) = 0;
 
@@ -66,10 +63,9 @@ namespace stan {
         this->update_potential_gradient(z, info_writer, error_writer);
       }
 
-      void update_potential(
-        Point& z,
-        callbacks::writer& info_writer,
-        callbacks::writer& error_writer) {
+      void update_potential(Point& z,
+                            callbacks::writer& info_writer,
+                            callbacks::writer& error_writer) {
         try {
           z.V = -stan::model::log_prob_propto<true>(model_, z.q);
         } catch (const std::exception& e) {
@@ -78,10 +74,9 @@ namespace stan {
         }
       }
 
-      void update_potential_gradient(
-        Point& z,
-        callbacks::writer& info_writer,
-        callbacks::writer& error_writer) {
+      void update_potential_gradient(Point& z,
+                                     callbacks::writer& info_writer,
+                                     callbacks::writer& error_writer) {
         try {
           stan::model::gradient(model_, z.q, z.V, z.g, info_writer);
           z.V = -z.V;
@@ -92,20 +87,17 @@ namespace stan {
         z.g = -z.g;
       }
 
-      void update_metric(
-        Point& z,
-        callbacks::writer& info_writer,
-        callbacks::writer& error_writer) {}
+      void update_metric(Point& z,
+                         callbacks::writer& info_writer,
+                         callbacks::writer& error_writer) {}
 
-      void update_metric_gradient(
-        Point& z,
-        callbacks::writer& info_writer,
-        callbacks::writer& error_writer) {}
+      void update_metric_gradient(Point& z,
+                                  callbacks::writer& info_writer,
+                                  callbacks::writer& error_writer) {}
 
-      void update_gradients(
-        Point& z,
-        callbacks::writer& info_writer,
-        callbacks::writer& error_writer) {
+      void update_gradients(Point& z,
+                            callbacks::writer& info_writer,
+                            callbacks::writer& error_writer) {
         update_potential_gradient(z, info_writer, error_writer);
       }
 

@@ -54,42 +54,40 @@ namespace stan {
                + dphi_dq(z, info_writer, error_writer));
       }
 
-      Eigen::VectorXd dtau_dq(
-        softabs_point& z,
-        callbacks::writer& info_writer,
-        callbacks::writer& error_writer) {
-        Eigen::VectorXd a =    z.softabs_lambda_inv.cwiseProduct(
-                               z.eigen_deco.eigenvectors().transpose() * z.p);
-        Eigen::MatrixXd A =   a.asDiagonal()
-                            * z.eigen_deco.eigenvectors().transpose();
+      Eigen::VectorXd dtau_dq(softabs_point& z,
+                              callbacks::writer& info_writer,
+                              callbacks::writer& error_writer) {
+        Eigen::VectorXd a = z.softabs_lambda_inv
+          .cwiseProduct(z.eigen_deco.eigenvectors().transpose() * z.p);
+        Eigen::MatrixXd A = a.asDiagonal()
+          * z.eigen_deco.eigenvectors().transpose();
         Eigen::MatrixXd B = z.pseudo_j.selfadjointView<Eigen::Lower>() * A;
         Eigen::MatrixXd C = A.transpose() * B;
 
          Eigen::VectorXd b(z.q.size());
-         stan::math::grad_tr_mat_times_hessian(
-           softabs_fun<Model>(this->model_, 0), z.q, C, b);
+         stan::math::grad_tr_mat_times_hessian(softabs_fun<Model>
+                                               (this->model_, 0), z.q, C, b);
 
          return 0.5 * b;
       }
 
       Eigen::VectorXd dtau_dp(softabs_point& z) {
-        return   z.eigen_deco.eigenvectors()
-               * z.softabs_lambda_inv.cwiseProduct(
-                   z.eigen_deco.eigenvectors().transpose() * z.p);
+        return z.eigen_deco.eigenvectors()
+          * z.softabs_lambda_inv
+          .cwiseProduct(z.eigen_deco.eigenvectors().transpose() * z.p);
       }
 
-      Eigen::VectorXd dphi_dq(
-        softabs_point& z,
-        callbacks::writer& info_writer,
-        callbacks::writer& error_writer) {
-          Eigen::VectorXd a
-            = z.softabs_lambda_inv.cwiseProduct(z.pseudo_j.diagonal());
-          Eigen::MatrixXd A =  a.asDiagonal()
-                             * z.eigen_deco.eigenvectors().transpose();
-          Eigen::MatrixXd B = z.eigen_deco.eigenvectors() * A;
+      Eigen::VectorXd dphi_dq(softabs_point& z,
+                              callbacks::writer& info_writer,
+                              callbacks::writer& error_writer) {
+        Eigen::VectorXd a
+          = z.softabs_lambda_inv.cwiseProduct(z.pseudo_j.diagonal());
+        Eigen::MatrixXd A = a.asDiagonal()
+          * z.eigen_deco.eigenvectors().transpose();
+        Eigen::MatrixXd B = z.eigen_deco.eigenvectors() * A;
 
-          stan::math::grad_tr_mat_times_hessian(
-            softabs_fun<Model>(this->model_, 0), z.q, B, a);
+        stan::math::grad_tr_mat_times_hessian(softabs_fun<Model>
+                                              (this->model_, 0), z.q, B, a);
 
           return - 0.5 * a + z.g;
       }
@@ -106,21 +104,20 @@ namespace stan {
         z.p = z.eigen_deco.eigenvectors() * a;
       }
 
-      void init(
-        softabs_point& z,
-        callbacks::writer& info_writer,
-        callbacks::writer& error_writer) {
+      void init(softabs_point& z,
+                callbacks::writer& info_writer,
+                callbacks::writer& error_writer) {
         update_metric(z, info_writer, error_writer);
         update_metric_gradient(z, info_writer, error_writer);
       }
 
-      void update_metric(
-        softabs_point& z,
-        callbacks::writer& info_writer,
-        callbacks::writer& error_writer) {
+      void update_metric(softabs_point& z,
+                         callbacks::writer& info_writer,
+                         callbacks::writer& error_writer) {
         // Compute the Hessian
-        stan::math::hessian<double>(
-          softabs_fun<Model>(this->model_, 0), z.q, z.V, z.g, z.hessian);
+        stan::math::hessian<double>(softabs_fun<Model>
+                                    (this->model_, 0), z.q, z.V, z.g,
+                                    z.hessian);
 
         z.V = -z.V;
         z.g = -z.g;
@@ -158,10 +155,9 @@ namespace stan {
          z.log_det_metric += std::log(z.softabs_lambda(i));
       }
 
-      void update_metric_gradient(
-        softabs_point& z,
-        callbacks::writer& info_writer,
-        callbacks::writer& error_writer) {
+      void update_metric_gradient(softabs_point& z,
+                                  callbacks::writer& info_writer,
+                                  callbacks::writer& error_writer) {
         // Compute the pseudo-Jacobian of the SoftAbs transform
         for (idx_t i = 0; i < z.q.size(); ++i) {
           for (idx_t j = 0; j <= i; ++j) {
@@ -193,10 +189,9 @@ namespace stan {
         }
       }
 
-      void update_gradients(
-        softabs_point& z,
-        callbacks::writer& info_writer,
-        callbacks::writer& error_writer) {
+      void update_gradients(softabs_point& z,
+                            callbacks::writer& info_writer,
+                            callbacks::writer& error_writer) {
         update_metric_gradient(z, info_writer, error_writer);
       }
 
