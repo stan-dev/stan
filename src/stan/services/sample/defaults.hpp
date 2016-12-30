@@ -96,7 +96,7 @@ namespace stan {
         }
 
         /**
-         * Validates save_warmup. This is a noop.
+         * Validates save_warmup. This is a no-op.
          *
          * @param[in] save_warmup argument to validate
          */
@@ -326,7 +326,7 @@ namespace stan {
         }
 
         /**
-         * Validates term_buffer. This is a noop.
+         * Validates term_buffer. This is a no-op.
          *
          * @param[in] term_buffer argument to validate
          */

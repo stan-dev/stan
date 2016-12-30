@@ -202,7 +202,7 @@ namespace stan {
           }
 
           /**
-           * Validates adapt_engaged. This is a noop.
+           * Validates adapt_engaged. This is a no-op.
            *
            * @param[in] adapt_engaged argument to validate
            */

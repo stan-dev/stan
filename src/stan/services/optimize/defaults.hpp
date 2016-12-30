@@ -309,7 +309,7 @@ namespace stan {
         }
 
         /**
-         * Validates save_iterations. This is a noop.
+         * Validates save_iterations. This is a no-op.
          *
          * @param[in] save_iterations argument to validate
          */

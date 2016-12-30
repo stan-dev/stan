@@ -11,7 +11,7 @@ namespace stan {
     /**
      * <code>writer</code> is a base class defining the interface
      * for Stan writer callbacks. The base class can be used as a
-     * no op implementation.
+     * no-op implementation.
      */
     class writer {
     public:
