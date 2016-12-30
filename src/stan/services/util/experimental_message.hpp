@@ -11,7 +11,7 @@ namespace stan {
        * Writes an experimental message to the writer.
        * All experimental algorithms should call this function.
        *
-       * @param message_writer writer for experimental algorithm message
+       * @param[in,out] message_writer writer for experimental algorithm message
        */
       void experimental_message(stan::callbacks::writer&
                                 message_writer) {

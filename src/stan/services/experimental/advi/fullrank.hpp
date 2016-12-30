@@ -21,41 +21,37 @@ namespace stan {
          * Runs full rank ADVI.
          *
          * @tparam Model A model implementation
-         * @param model Input model to test (with data already instantiated)
-         * @param init var context for initialization
-         * @param random_seed random seed for the pseudo random number generator
-         * @param chain chain id to advance the pseudo random number generator
-         * @param init_radius radius to initialize
-         * @param grad_samples number of samples for Monte Carlo estimate of gradients
-         * @param elbo_samples number of samples for Monte Carlo estimate of ELBO
-         * @param max_iterations maximum number of iterations
-         * @param tol_rel_obj convergence tolerance on the relative norm of the objective
-         * @param eta stepsize scaling parameter for variational inference
-         * @param adapt_engaged adaptation engaged?
-         * @param adapt_iterations number of iterations for eta adaptation
-         * @param eval_elbo evaluate ELBO every Nth iteration
-         * @param output_samples number of posterior samples to draw and save
-         * @param[out] interrupt interrupt callback to be called every iteration
-         * @param[out] message_writer output for messages
-         * @param[out] init_writer Writer callback for unconstrained inits
-         * @param[out] parameter_writer output for parameter values
-         * @param[out] diagnostic_writer output for diagnostic values
+         * @param[in] model Input model to test (with data already instantiated)
+         * @param[in] init var context for initialization
+         * @param[in] random_seed random seed for the random number generator
+         * @param[in] chain chain id to advance the random number generator
+         * @param[in] init_radius radius to initialize
+         * @param[in] grad_samples number of samples for Monte Carlo estimate
+         *   of gradients
+         * @param[in] elbo_samples number of samples for Monte Carlo estimate
+         *   of ELBO
+         * @param[in] max_iterations maximum number of iterations
+         * @param[in] tol_rel_obj convergence tolerance on the relative norm of
+         *   the objective
+         * @param[in] eta stepsize scaling parameter for variational inference
+         * @param[in] adapt_engaged adaptation engaged?
+         * @param[in] adapt_iterations number of iterations for eta adaptation
+         * @param[in] eval_elbo evaluate ELBO every Nth iteration
+         * @param[in] output_samples number of posterior samples to draw and
+         *   save
+         * @param[in,out] interrupt callback to be called every iteration
+         * @param[in,out] message_writer output for messages
+         * @param[in,out] init_writer Writer callback for unconstrained inits
+         * @param[in,out] parameter_writer output for parameter values
+         * @param[in,out] diagnostic_writer output for diagnostic values
          * @return error_codes::OK if successful
          */
         template <class Model>
-        int fullrank(Model& model,
-                     stan::io::var_context& init,
-                     unsigned int random_seed,
-                     unsigned int chain,
-                     double init_radius,
-                     int grad_samples,
-                     int elbo_samples,
-                     int max_iterations,
-                     double tol_rel_obj,
-                     double eta,
-                     bool adapt_engaged,
-                     int adapt_iterations,
-                     int eval_elbo,
+        int fullrank(Model& model, stan::io::var_context& init,
+                     unsigned int random_seed, unsigned int chain,
+                     double init_radius, int grad_samples, int elbo_samples,
+                     int max_iterations, double tol_rel_obj, double eta,
+                     bool adapt_engaged, int adapt_iterations, int eval_elbo,
                      int output_samples,
                      callbacks::interrupt& interrupt,
                      callbacks::writer& message_writer,
@@ -68,8 +64,7 @@ namespace stan {
 
           std::vector<int> disc_vector;
           std::vector<double> cont_vector
-            = util::initialize(model, init, rng, init_radius,
-                               true,
+            = util::initialize(model, init, rng, init_radius, true,
                                message_writer, init_writer);
 
           std::vector<std::string> names;

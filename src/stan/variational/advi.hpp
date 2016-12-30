@@ -30,27 +30,27 @@ namespace stan {
      * ascent to maximize the Evidence Lower Bound for a given model
      * and variational family.
      *
-     * @tparam Model                 class of model
-     * @tparam Q                     class of variational distribution
-     * @tparam BaseRNG               class of random number generator
+     * @tparam Model class of model
+     * @tparam Q class of variational distribution
+     * @tparam BaseRNG class of random number generator
      */
     template <class Model, class Q, class BaseRNG>
     class advi {
     public:
       /**
        * Constructor
-       * 
-       * @param  m                    stan model
-       * @param  cont_params          initialization of continuous parameters
-       * @param  rng                  random number generator
-       * @param  n_monte_carlo_grad   number of samples for gradient computation
-       * @param  n_monte_carlo_elbo   number of samples for ELBO computation
-       * @param  eval_elbo            evaluate ELBO at every "eval_elbo" iters
-       * @param  n_posterior_samples  number of samples to draw from posterior
-       * @throw  std::runtime_error   if n_monte_carlo_grad is not positive
-       * @throw  std::runtime_error   if n_monte_carlo_elbo is not positive
-       * @throw  std::runtime_error   if eval_elbo is not positive
-       * @throw  std::runtime_error   if n_posterior_samples is not positive
+       *
+       * @param[in] m stan model
+       * @param[in] cont_params initialization of continuous parameters
+       * @param[in,out] rng random number generator
+       * @param[in] n_monte_carlo_grad number of samples for gradient computation
+       * @param[in] n_monte_carlo_elbo number of samples for ELBO computation
+       * @param[in] eval_elbo evaluate ELBO at every "eval_elbo" iters
+       * @param[in] n_posterior_samples number of samples to draw from posterior
+       * @throw std::runtime_error if n_monte_carlo_grad is not positive
+       * @throw std::runtime_error if n_monte_carlo_elbo is not positive
+       * @throw std::runtime_error if eval_elbo is not positive
+       * @throw std::runtime_error if n_posterior_samples is not positive
        */
       advi(Model& m,
            Eigen::VectorXd& cont_params,
@@ -169,9 +169,9 @@ namespace stan {
        * Heuristic grid search to adapt eta to the scale of the problem.
        *
        * @param[in] variational initial variational distribution.
-       * @param adapt_iterations number of iterations to spend doing stochastic
+       * @param[in] adapt_iterations number of iterations to spend doing stochastic
        * gradient ascent at each proposed eta value.
-       * @param message_writer writer for messages
+       * @param[in,out] message_writer writer for messages
        * @return adapted (tuned) value of eta via heuristic grid search
        * @throw std::domain_error If either (a) the initial ELBO cannot be
        * computed at the initial variational distribution, (b) all step-size
@@ -315,11 +315,11 @@ namespace stan {
        * Runs stochastic gradient ascent with an adaptive stepsize sequence.
        *
        * @param[in,out] variational initia variational distribution
-       * @param eta stepsize scaling parameter
-       * @param tol_rel_obj relative tolerance parameter for convergence
-       * @param max_iterations max number of iterations to run algorithm
-       * @param message_writer writer for mesasges
-       * @param diagnostic_writer writer for diagnostic information
+       * @param[in] eta stepsize scaling parameter
+       * @param[in] tol_rel_obj relative tolerance parameter for convergence
+       * @param[in] max_iterations max number of iterations to run algorithm
+       * @param[in,out] message_writer writer for mesasges
+       * @param[in,out] diagnostic_writer writer for diagnostic information
        * @throw std::domain_error If the ELBO or its gradient is ever
        * non-finite, at any iteration
        */
@@ -327,8 +327,8 @@ namespace stan {
                                       double eta,
                                       double tol_rel_obj,
                                       int max_iterations,
-                    callbacks::writer& message_writer,
-                    callbacks::writer& diagnostic_writer)
+                                      callbacks::writer& message_writer,
+                                      callbacks::writer& diagnostic_writer)
         const {
         static const char* function =
           "stan::variational::advi::stochastic_gradient_ascent";
@@ -473,15 +473,16 @@ namespace stan {
       /**
        * Runs ADVI and writes to output.
        *
-       * @param  eta              eta parameter of stepsize sequence
-       * @param  adapt_engaged    boolean flag for eta adaptation
-       * @param  adapt_iterations number of iterations for eta adaptation
-       * @param  tol_rel_obj      relative tolerance parameter for convergence
-       * @param  max_iterations   max number of iterations to run algorithm
-       * @param  message_writer   writer for messages
-       * @param  parameter_writer   writer for parameters (typically to file)
-       * @param  diagnostic_writer writer for diagnostic information
-       */
+       * @param[in] eta eta parameter of stepsize sequence
+       * @param[in] adapt_engaged boolean flag for eta adaptation
+       * @param[in] adapt_iterations number of iterations for eta adaptation
+       * @param[in] tol_rel_obj relative tolerance parameter for convergence
+       * @param[in] max_iterations max number of iterations to run algorithm
+       * @param[in,out] message_writer writer for messages
+       * @param[in,out] parameter_writer writer for parameters
+       *   (typically to file)
+       * @param[in,out] diagnostic_writer writer for diagnostic information
+      */
       int run(double eta, bool adapt_engaged, int adapt_iterations,
               double tol_rel_obj, int max_iterations,
               callbacks::writer& message_writer,
@@ -552,8 +553,8 @@ namespace stan {
       /**
        * Compute the median of a circular buffer.
        *
-       * @param  cb circular buffer with some number of values in it.
-       * @return    median of values in circular buffer.
+       * @param[in] cb circular buffer with some number of values in it.
+       * @return median of values in circular buffer.
        */
       double circ_buff_median(const boost::circular_buffer<double>& cb) const {
         // FIXME: naive implementation; creates a copy as a vector
@@ -571,9 +572,9 @@ namespace stan {
       /**
        * Compute the relative difference between two double values.
        *
-       * @param  prev previous value
-       * @param  curr current value
-       * @return      absolutely value of relative difference
+       * @param[in] prev previous value
+       * @param[in] curr current value
+       * @return  absolutely value of relative difference
        */
       double rel_difference(double prev, double curr) const {
         return std::fabs((curr - prev) / prev);

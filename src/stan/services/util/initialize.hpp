@@ -49,8 +49,8 @@ namespace stan {
        *   provided by init) should be initialized with 0.
        * @param[in] print_timing indicates whether a timing message should
        *   be printed to message_writer
-       * @param[out] message_writer message writer
-       * @param[out] init_writer init writer (on the unconstrained scale)
+       * @param[in,out] message_writer message writer
+       * @param[in,out] init_writer init writer (on the unconstrained scale)
        * @throws std::domain_error if the model could not be initialized
        * @return valid unconstrained parameters for the model
        */

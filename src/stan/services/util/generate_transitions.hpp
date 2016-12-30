@@ -16,41 +16,36 @@ namespace stan {
        *
        * @tparam Model model class
        * @tparam RNG random number generator class
-       * @param sampler MCMC sampler used to generate transitions
-       * @param num_iterations number of MCMC transitions
-       * @param start starting iteration number used for printing messages
-       * @param finish end iteration number used for printing messages
-       * @param num_thin when save is true, a draw will be written to the
+       * @param[in,out] sampler MCMC sampler used to generate transitions
+       * @param[in] num_iterations number of MCMC transitions
+       * @param[in] start starting iteration number used for printing messages
+       * @param[in] finish end iteration number used for printing messages
+       * @param[in] num_thin when save is true, a draw will be written to the
        *   mcmc_writer every num_thin iterations
-       * @param refresh number of iterations to print a message. If
+       * @param[in] refresh number of iterations to print a message. If
        *   refresh is zero, iteration number messages will not be printed
-       * @param save if save is true, the transitions will be written
+       * @param[in] save if save is true, the transitions will be written
        *   to the mcmc_writer. If false, transitions will not be written
-       * @param warmup indicates whether these transitions are warmup. Used
+       * @param[in] warmup indicates whether these transitions are warmup. Used
        *   for printing iteration number messages
-       * @param mcmc_writer writer to handle mcmc otuput
+       * @param[in,out] mcmc_writer writer to handle mcmc otuput
        * @param[in,out] init_s starts as the initial unconstrained parameter
-       *   values. When the function completes, this will have the final iteration's
-       *   unconstrained parameter values
-       * @param model model
-       * @param base_rng random number generator
-       * @param callback interrupt callback called once an iteration
-       * @param info_writer writer for informational messages
-       * @param error_writer writer for error messages
+       *   values. When the function completes, this will have the final
+       *   iteration's unconstrained parameter values
+       * @param[in] model model
+       * @param[in,out] base_rng random number generator
+       * @param[in,out] callback interrupt callback called once an iteration
+       * @param[in,out] info_writer writer for informational messages
+       * @param[in,out] error_writer writer for error messages
        */
       template <class Model, class RNG>
       void generate_transitions(stan::mcmc::base_mcmc& sampler,
-                                const int num_iterations,
-                                const int start,
-                                const int finish,
-                                const int num_thin,
-                                const int refresh,
-                                const bool save,
-                                const bool warmup,
+                                int num_iterations, int start,
+                                int finish, int num_thin, int refresh,
+                                bool save, bool warmup,
                                 util::mcmc_writer& mcmc_writer,
                                 stan::mcmc::sample& init_s,
-                                Model& model,
-                                RNG& base_rng,
+                                Model& model, RNG& base_rng,
                                 callbacks::interrupt& callback,
                                 callbacks::writer& info_writer,
                                 callbacks::writer& error_writer) {

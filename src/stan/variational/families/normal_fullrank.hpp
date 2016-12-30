@@ -18,7 +18,7 @@ namespace stan {
      */
     class normal_fullrank : public base_family {
     private:
-      /** 
+      /**
        * Mean vector.
        */
       Eigen::VectorXd mu_;
@@ -36,7 +36,7 @@ namespace stan {
 
       /**
        * Raise a domain exception if the specified vector contains
-       * not-a-number values. 
+       * not-a-number values.
        *
        * @param[in] mu Mean vector.
        * @throw std::domain_error If the mean vector contains NaN
@@ -156,8 +156,8 @@ namespace stan {
 
       /**
        * Set the Cholesky factor to the specified value.
-       * 
-       * @param L_chol Cholesky factor of covariance matrix.
+       *
+       * @param[in] L_chol Cholesky factor of covariance matrix.
        * @throw std::domain_error  If the specified matrix is not
        * square, is not lower triangular, if its size does not match
        * the dimensionality of this approximation, or if it contains
@@ -210,7 +210,7 @@ namespace stan {
        * specified approximation.
        *
        * @param[in] rhs Approximation from which to gather the mean and
-       * covariance. 
+       * covariance.
        * @return This approximation after assignment.
        * @throw std::domain_error If the dimensionality of the specified
        * approximation does not match this approximation's dimensionality.
@@ -231,9 +231,9 @@ namespace stan {
        * the specified approximation to this approximation.
        *
        * @param[in] rhs Approximation from which to gather the mean and
-       * covariance. 
+       * covariance.
        * @return This approximation after adding the specified
-       * approximation. 
+       * approximation.
        * @throw std::domain_error If the dimensionality of the specified
        * approximation does not match this approximation's dimensionality.
        */
@@ -309,10 +309,10 @@ namespace stan {
       }
 
       /**
-       * Returns the mean vector for this approximation.  
-       * 
+       * Returns the mean vector for this approximation.
+       *
        * See: <code>mu()</code>.
-       * 
+       *
        * @return Mean vector for this approximation.
        */
       const Eigen::VectorXd& mean() const {

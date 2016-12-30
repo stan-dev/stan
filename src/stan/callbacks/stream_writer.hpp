@@ -83,6 +83,11 @@ namespace stan {
         output_ << comment_prefix_ << message << std::endl;
       }
 
+      /**
+       * Virtual destructor
+       */
+      virtual ~stream_writer() {}
+
     private:
       /**
        * Output stream

@@ -208,8 +208,8 @@ namespace stan {
          * Validates tol_param; tol_param must be greater than or equal to 0.
          *
          * @param[in] tol_param argument to validate
-         * @throw std::invalid_argument unless tol_param is greater than or equal
-         *   to zero
+         * @throw std::invalid_argument unless tol_param is greater than or
+         *    equal to zero
          */
         static void validate(double tol_param) {
           if (!(tol_param >= 0))

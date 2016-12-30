@@ -22,19 +22,21 @@ namespace stan {
      * @tparam jacobian_adjust_transform True if the log absolute
      * Jacobian determinant of inverse parameter transforms is added to the
      * log probability.
-     * @tparam M Class of model.
-     * @param model Model.
-     * @param params_r Real-valued parameter vector.
-     * @param params_i Integer-valued parameter vector.
-     * @param epsilon Real-valued scalar saying how much to perturb. Reasonable value is 1e-6.
-     * @param error Real-valued scalar saying how much error to allow. Reasonable value is 1e-6.
-     * @param interrupt interrupt callback to be called at every iteration
-     * @param writer Writer for messages
+     * @tparam Model Class of model.
+     * @param[in] model Model.
+     * @param[in] params_r Real-valued parameter vector.
+     * @param[in] params_i Integer-valued parameter vector.
+     * @param[in] epsilon Real-valued scalar saying how much to perturb.
+     *   Reasonable value is 1e-6.
+     * @param[in] error Real-valued scalar saying how much error to allow.
+     *   Reasonable value is 1e-6.
+     * @param[in,out] interrupt callback to be called at every iteration
+     * @param[in,out] writer Writer for messages
      * @return number of failed gradient comparisons versus allowed
      * error, so 0 if all gradients pass
      */
-    template <bool propto, bool jacobian_adjust_transform, class M>
-    int test_gradients(const M& model,
+    template <bool propto, bool jacobian_adjust_transform, class Model>
+    int test_gradients(const Model& model,
                        std::vector<double>& params_r,
                        std::vector<int>& params_i,
                        double epsilon,
@@ -43,23 +45,17 @@ namespace stan {
                        stan::callbacks::writer& writer) {
       std::stringstream msg;
       std::vector<double> grad;
-      double lp
-        = log_prob_grad<propto, jacobian_adjust_transform>(model,
-                                                           params_r,
-                                                           params_i,
-                                                           grad,
-                                                           &msg);
+      double lp = log_prob_grad<propto, jacobian_adjust_transform>(model,
+                                                                   params_r,
+                                                                   params_i,
+                                                                   grad,
+                                                                   &msg);
       if (msg.str().length() > 0)
         writer(msg.str());
 
       std::vector<double> grad_fd;
-      finite_diff_grad<false,
-                       true,
-                       M>(model,
-                          interrupt,
-                          params_r, params_i,
-                          grad_fd, epsilon,
-                          &msg);
+      finite_diff_grad<false, true, Model>(model, interrupt, params_r, params_i,
+                                           grad_fd, epsilon, &msg);
       if (msg.str().length() > 0)
         writer(msg.str());
 
@@ -98,4 +94,3 @@ namespace stan {
   }
 }
 #endif
-

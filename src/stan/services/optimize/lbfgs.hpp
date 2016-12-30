@@ -24,11 +24,11 @@ namespace stan {
        * Runs the L-BFGS algorithm for a model.
        *
        * @tparam Model A model implementation
-       * @param model Input model to test (with data already instantiated)
-       * @param init var context for initialization
-       * @param random_seed random seed for the pseudo random number generator
-       * @param chain chain id to advance the pseudo random number generator
-       * @param init_radius radius to initialize
+       * @param[in] model Input model to test (with data already instantiated)
+       * @param[in] init var context for initialization
+       * @param[in] random_seed random seed for the random number generator
+       * @param[in] chain chain id to advance the pseudo random number generator
+       * @param[in] init_radius radius to initialize
        * @param[in] history_size amount of history to keep for L-BFGS
        * @param[in] init_alpha line search step size for first iteration
        * @param[in] tol_obj convergence tolerance on absolute changes in
@@ -38,33 +38,25 @@ namespace stan {
        * @param[in] tol_grad convergence tolerance on the norm of the gradient
        * @param[in] tol_rel_grad convergence tolerance on the relative norm of
        *   the gradient
-       * @param[in] tol_param convergence tolerance on changes in parameter value
+       * @param[in] tol_param convergence tolerance on changes in parameter
+       *   value
        * @param[in] num_iterations maximum number of iterations
        * @param[in] save_iterations indicates whether all the interations should
        *   be saved to the parameter_writer
        * @param[in] refresh how often to write output to message_writer
-       * @param[out] interrupt interrupt callback to be called every iteration
-       * @param[out] message_writer output for messages
-       * @param[out] init_writer Writer callback for unconstrained inits
-       * @param[out] parameter_writer output for parameter values
+       * @param[in,out] interrupt callback to be called every iteration
+       * @param[in,out] message_writer output for messages
+       * @param[in,out] init_writer Writer callback for unconstrained inits
+       * @param[in,out] parameter_writer output for parameter values
        * @return error_codes::OK if successful
        */
       template <class Model>
-      int lbfgs(Model& model,
-                stan::io::var_context& init,
-                unsigned int random_seed,
-                unsigned int chain,
-                double init_radius,
-                int history_size,
-                double init_alpha,
-                double tol_obj,
-                double tol_rel_obj,
-                double tol_grad,
-                double tol_rel_grad,
-                double tol_param,
-                int num_iterations,
-                bool save_iterations,
-                int refresh,
+      int lbfgs(Model& model, stan::io::var_context& init,
+                unsigned int random_seed, unsigned int chain,
+                double init_radius, int history_size, double init_alpha,
+                double tol_obj, double tol_rel_obj, double tol_grad,
+                double tol_rel_grad, double tol_param, int num_iterations,
+                bool save_iterations, int refresh,
                 callbacks::interrupt& interrupt,
                 callbacks::writer& message_writer,
                 callbacks::writer& init_writer,
@@ -73,8 +65,7 @@ namespace stan {
 
         std::vector<int> disc_vector;
         std::vector<double> cont_vector
-          = util::initialize(model, init, rng, init_radius,
-                             false,
+          = util::initialize(model, init, rng, init_radius, false,
                              message_writer, init_writer);
 
         std::stringstream lbfgs_ss;

@@ -49,6 +49,8 @@ namespace stan {
         writer2_(message);
       }
 
+      virtual ~tee_writer() {}
+
     private:
       /**
        * The first writer

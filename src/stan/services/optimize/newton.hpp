@@ -24,26 +24,23 @@ namespace stan {
        *
        * @tparam Model A model implementation
        * @param[in] model the Stan model instantiated with data
-       * @param init var context for initialization
-       * @param random_seed random seed for the pseudo random number generator
-       * @param chain chain id to advance the pseudo random number generator
-       * @param init_radius radius to initialize
+       * @param[in] init var context for initialization
+       * @param[in] random_seed random seed for the random number generator
+       * @param[in] chain chain id to advance the pseudo random number generator
+       * @param[in] init_radius radius to initialize
        * @param[in] num_iterations maximum number of iterations
        * @param[in] save_iterations indicates whether all the interations should
        *   be saved
-       * @param[out] interrupt interrupt callback to be called every iteration
-       * @param[out] message_writer output for messages
-       * @param[out] init_writer Writer callback for unconstrained inits
-       * @param[out] parameter_writer output for parameter values
+       * @param[in,out] interrupt callback to be called every iteration
+       * @param[in,out] message_writer output for messages
+       * @param[in,out] init_writer Writer callback for unconstrained inits
+       * @param[in,out] parameter_writer output for parameter values
        * @return error_codes::OK if successful
        */
       template <class Model>
-      int newton(Model& model,
-                 stan::io::var_context& init,
-                 unsigned int random_seed,
-                 unsigned int chain,
-                 double init_radius,
-                 int num_iterations,
+      int newton(Model& model, stan::io::var_context& init,
+                 unsigned int random_seed, unsigned int chain,
+                 double init_radius, int num_iterations,
                  bool save_iterations,
                  callbacks::interrupt& interrupt,
                  callbacks::writer& message_writer,
@@ -53,8 +50,7 @@ namespace stan {
 
         std::vector<int> disc_vector;
         std::vector<double> cont_vector
-          = util::initialize(model, init, rng, init_radius,
-                             false,
+          = util::initialize(model, init, rng, init_radius, false,
                              message_writer, init_writer);
 
         std::stringstream message;

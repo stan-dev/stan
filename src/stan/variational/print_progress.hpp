@@ -15,14 +15,14 @@ namespace stan {
     /**
      * Helper function for printing progress for variational inference
      *
-     * @param m       total number of iterations
-     * @param start   starting iteration
-     * @param finish  final iteration
-     * @param refresh how frequently we want to print an update
-     * @param tune    boolean indicates tuning vs. variational inference
-     * @param prefix  prefix string
-     * @param suffix  suffix string
-     * @param writer  writer
+     * @param[in] m       total number of iterations
+     * @param[in] start   starting iteration
+     * @param[in] finish  final iteration
+     * @param[in] refresh how frequently we want to print an update
+     * @param[in] tune    boolean indicates tuning vs. variational inference
+     * @param[in] prefix  prefix string
+     * @param[in] suffix  suffix string
+     * @param[in,out] writer  writer
      */
     void print_progress(int m,
                         int start,

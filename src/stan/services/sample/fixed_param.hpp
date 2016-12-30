@@ -23,31 +23,27 @@ namespace stan {
        * of iterations specified with the parameters fixed.
        *
        * @tparam Model Model class
-       * @param model Input model to test (with data already instantiated)
-       * @param init var context for initialization
-       * @param random_seed random seed for the pseudo random number generator
-       * @param chain chain id to advance the pseudo random number generator
-       * @param init_radius radius to initialize
-       * @param num_samples Number of samples
-       * @param num_thin Number to thin the samples
-       * @param refresh Controls the output
-       * @param interrupt Callback for interrupts
-       * @param message_writer Writer for messages
-       * @param error_writer Writer for errors
-       * @param init_writer Writer callback for unconstrained inits
-       * @param sample_writer Writer for draws
-       * @param diagnostic_writer Writer for diagnostic information
+       * @param[in] model Input model to test (with data already instantiated)
+       * @param[in] init var context for initialization
+       * @param[in] random_seed random seed for the random number generator
+       * @param[in] chain chain id to advance the pseudo random number generator
+       * @param[in] init_radius radius to initialize
+       * @param[in] num_samples Number of samples
+       * @param[in] num_thin Number to thin the samples
+       * @param[in] refresh Controls the output
+       * @param[in,out] interrupt Callback for interrupts
+       * @param[in,out] message_writer Writer for messages
+       * @param[in,out] error_writer Writer for errors
+       * @param[in,out] init_writer Writer callback for unconstrained inits
+       * @param[in,out] sample_writer Writer for draws
+       * @param[in,out] diagnostic_writer Writer for diagnostic information
        * @return error_codes::OK if successful
        */
       template <class Model>
-      int fixed_param(Model& model,
-                      stan::io::var_context& init,
-                      unsigned int random_seed,
-                      unsigned int chain,
-                      double init_radius,
-                      int num_samples,
-                      int num_thin,
-                      int refresh,
+      int fixed_param(Model& model, stan::io::var_context& init,
+                      unsigned int random_seed, unsigned int chain,
+                      double init_radius, int num_samples,
+                      int num_thin, int refresh,
                       callbacks::interrupt& interrupt,
                       callbacks::writer& message_writer,
                       callbacks::writer& error_writer,
@@ -58,8 +54,7 @@ namespace stan {
 
         std::vector<int> disc_vector;
         std::vector<double> cont_vector
-          = util::initialize(model, init, rng, init_radius,
-                             false,
+          = util::initialize(model, init, rng, init_radius, false,
                              message_writer, init_writer);
 
         stan::mcmc::fixed_param_sampler sampler;
@@ -76,12 +71,10 @@ namespace stan {
 
         clock_t start = clock();
 
-        util::generate_transitions
-          (sampler, num_samples, 0, num_samples, num_thin,
-           refresh, true, false,
-           writer,
-           s, model, rng,
-           interrupt, message_writer, error_writer);
+        util::generate_transitions(sampler, num_samples, 0, num_samples,
+                                   num_thin, refresh, true, false, writer,
+                                   s, model, rng, interrupt, message_writer,
+                                   error_writer);
         clock_t end = clock();
 
         double sampleDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;

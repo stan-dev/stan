@@ -25,28 +25,24 @@ namespace stan {
        * outputs to the message_writer.
        *
        * @tparam Model A model implementation
-       * @param model Input model to test (with data already instantiated)
-       * @param init var context for initialization
-       * @param random_seed random seed for the pseudo random number generator
-       * @param chain chain id to advance the pseudo random number generator
-       * @param init_radius radius to initialize
-       * @param epsilon epsilon to use for finite differences
-       * @param error amount of absolute error to allow
-       * @param interrupt interrupt callback
-       * @param message_writer Writer callback for display output
-       * @param init_writer Writer callback for unconstrained inits
-       * @param parameter_writer Writer callback for file output
+       * @param[in] model Input model to test (with data already instantiated)
+       * @param[in] init var context for initialization
+       * @param[in] random_seed random seed for the random number generator
+       * @param[in] chain chain id to advance the pseudo random number generator
+       * @param[in] init_radius radius to initialize
+       * @param[in] epsilon epsilon to use for finite differences
+       * @param[in] error amount of absolute error to allow
+       * @param[in,out] interrupt interrupt callback
+       * @param[in,out] message_writer Writer callback for display output
+       * @param[in,out] init_writer Writer callback for unconstrained inits
+       * @param[in,out] parameter_writer Writer callback for file output
        * @return the number of parameters that are not within epsilon
        * of the finite difference calculation
        */
       template <class Model>
-      int diagnose(Model& model,
-                   stan::io::var_context& init,
-                   unsigned int random_seed,
-                   unsigned int chain,
-                   double init_radius,
-                   double epsilon,
-                   double error,
+      int diagnose(Model& model, stan::io::var_context& init,
+                   unsigned int random_seed, unsigned int chain,
+                   double init_radius, double epsilon, double error,
                    callbacks::interrupt& interrupt,
                    callbacks::writer& message_writer,
                    callbacks::writer& init_writer,
@@ -64,12 +60,10 @@ namespace stan {
         stan::callbacks::tee_writer
           writer(message_writer, parameter_writer);
 
-        int num_failed =
-          stan::model::test_gradients<true, true>(model,
-                                                  cont_vector, disc_vector,
-                                                  epsilon, error,
-                                                  interrupt,
-                                                  writer);
+        int num_failed
+          = stan::model::test_gradients<true, true>(model, cont_vector,
+                                                    disc_vector, epsilon, error,
+                                                    interrupt, writer);
 
         return num_failed;
       }
