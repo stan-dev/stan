@@ -61,30 +61,30 @@ namespace stan {
 
       int num_failed = 0;
 
-      msg.str("");
-      msg << " Log probability=" << lp;
+      std::stringstream lp_msg;
+      lp_msg << " Log probability=" << lp;
 
       writer();
-      writer(msg.str());
+      writer(lp_msg.str());
       writer();
 
-      msg.str("");
-      msg << std::setw(10) << "param idx"
-          << std::setw(16) << "value"
-          << std::setw(16) << "model"
-          << std::setw(16) << "finite diff"
-          << std::setw(16) << "error";
+      std::stringstream header;
+      header << std::setw(10) << "param idx"
+             << std::setw(16) << "value"
+             << std::setw(16) << "model"
+             << std::setw(16) << "finite diff"
+             << std::setw(16) << "error";
 
-      writer(msg.str());
+      writer(header.str());
 
       for (size_t k = 0; k < params_r.size(); k++) {
-        msg.str("");
-        msg << std::setw(10) << k
-            << std::setw(16) << params_r[k]
-            << std::setw(16) << grad[k]
-            << std::setw(16) << grad_fd[k]
-            << std::setw(16) << (grad[k] - grad_fd[k]);
-        writer(msg.str());
+        std::stringstream line;
+        line << std::setw(10) << k
+             << std::setw(16) << params_r[k]
+             << std::setw(16) << grad[k]
+             << std::setw(16) << grad_fd[k]
+             << std::setw(16) << (grad[k] - grad_fd[k]);
+        writer(line.str());
         if (std::fabs(grad[k] - grad_fd[k]) > error)
           num_failed++;
       }

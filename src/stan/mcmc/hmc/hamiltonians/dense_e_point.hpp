@@ -27,9 +27,8 @@ namespace stan {
       void
       write_metric(stan::callbacks::writer& writer) {
         writer("Elements of inverse mass matrix:");
-        std::stringstream mInv_ss;
         for (int i = 0; i < mInv.rows(); ++i) {
-          mInv_ss.str("");
+          std::stringstream mInv_ss;
           mInv_ss << mInv(i, 0);
           for (int j = 1; j < mInv.cols(); ++j)
             mInv_ss << ", " << mInv(i, j);

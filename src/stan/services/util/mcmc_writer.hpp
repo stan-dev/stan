@@ -174,24 +174,22 @@ namespace stan {
         void write_timing(double warmDeltaT, double sampleDeltaT,
                           callbacks::writer& writer) {
           std::string title(" Elapsed Time: ");
-          std::stringstream ss;
-
           writer();
 
-          ss.str("");
-          ss << title << warmDeltaT << " seconds (Warm-up)";
-          writer(ss.str());
+          std::stringstream ss1;
+          ss1 << title << warmDeltaT << " seconds (Warm-up)";
+          writer(ss1.str());
 
-          ss.str("");
-          ss << std::string(title.size(), ' ') << sampleDeltaT
-             << " seconds (Sampling)";
-          writer(ss.str());
+          std::stringstream ss2;
+          ss2 << std::string(title.size(), ' ') << sampleDeltaT
+              << " seconds (Sampling)";
+          writer(ss2.str());
 
-          ss.str("");
-          ss << std::string(title.size(), ' ')
-             << warmDeltaT + sampleDeltaT
-             << " seconds (Total)";
-          writer(ss.str());
+          std::stringstream ss3;
+          ss3 << std::string(title.size(), ' ')
+              << warmDeltaT + sampleDeltaT
+              << " seconds (Total)";
+          writer(ss3.str());
 
           writer();
         }

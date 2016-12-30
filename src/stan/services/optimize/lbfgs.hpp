@@ -83,9 +83,9 @@ namespace stan {
 
         double lp = lbfgs.logp();
 
-        std::stringstream msg;
-        msg << "Initial log joint probability = " << lp;
-        message_writer(msg.str());
+        std::stringstream initial_msg;
+        initial_msg << "Initial log joint probability = " << lp;
+        message_writer(initial_msg.str());
 
         std::vector<std::string> names;
         names.push_back("lp__");
@@ -94,7 +94,7 @@ namespace stan {
 
         if (save_iterations) {
           std::vector<double> values;
-          msg.str("");
+          std::stringstream msg;
           model.write_array(rng, cont_vector, disc_vector, values,
                             true, true, &msg);
           if (msg.str().length() > 0)
@@ -128,7 +128,7 @@ namespace stan {
                   || !lbfgs.note().empty()
                   || lbfgs.iter_num() == 0
                   || ((lbfgs.iter_num() + 1) % refresh == 0))) {
-            msg.str("");
+            std::stringstream msg;
             msg << " " << std::setw(7) << lbfgs.iter_num() << " ";
             msg << " " << std::setw(12) << std::setprecision(6)
                 << lp << " ";
@@ -153,7 +153,7 @@ namespace stan {
 
           if (save_iterations) {
             std::vector<double> values;
-            msg.str("");
+            std::stringstream msg;
             model.write_array(rng, cont_vector, disc_vector, values,
                               true, true, &msg);
             if (msg.str().length() > 0)
@@ -166,7 +166,7 @@ namespace stan {
 
         if (!save_iterations) {
           std::vector<double> values;
-          msg.str("");
+          std::stringstream msg;
           model.write_array(rng, cont_vector, disc_vector, values,
                             true, true, &msg);
           if (msg.str().length() > 0)

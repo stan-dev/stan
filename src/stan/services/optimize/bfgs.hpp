@@ -81,9 +81,9 @@ namespace stan {
 
         double lp = bfgs.logp();
 
-        std::stringstream msg;
-        msg << "Initial log joint probability = " << lp;
-        message_writer(msg.str());
+        std::stringstream initial_msg;
+        initial_msg << "Initial log joint probability = " << lp;
+        message_writer(initial_msg.str());
 
         std::vector<std::string> names;
         names.push_back("lp__");
@@ -92,7 +92,7 @@ namespace stan {
 
         if (save_iterations) {
           std::vector<double> values;
-          msg.str("");
+          std::stringstream msg;
           model.write_array(rng, cont_vector, disc_vector, values,
                             true, true, &msg);
           if (msg.str().length() > 0)
@@ -126,7 +126,7 @@ namespace stan {
                   || !bfgs.note().empty()
                   || bfgs.iter_num() == 0
                   || ((bfgs.iter_num() + 1) % refresh == 0))) {
-            msg.str("");
+            std::stringstream msg;
             msg << " " << std::setw(7) << bfgs.iter_num() << " ";
             msg << " " << std::setw(12) << std::setprecision(6)
                 << lp << " ";
@@ -142,7 +142,6 @@ namespace stan {
                 << bfgs.grad_evals() << " ";
             msg << " " << bfgs.note() << " ";
             message_writer(msg.str());
-            msg.str("");
           }
 
           if (bfgs_ss.str().length() > 0) {
@@ -152,7 +151,7 @@ namespace stan {
 
           if (save_iterations) {
             std::vector<double> values;
-            msg.str("");
+            std::stringstream msg;
             model.write_array(rng, cont_vector, disc_vector, values,
                               true, true, &msg);
             // This if is here to match the pre-refactor behavior
@@ -166,7 +165,7 @@ namespace stan {
 
         if (!save_iterations) {
           std::vector<double> values;
-          msg.str("");
+          std::stringstream msg;
           model.write_array(rng, cont_vector, disc_vector, values,
                             true, true, &msg);
           if (msg.str().length() > 0)

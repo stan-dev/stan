@@ -53,10 +53,10 @@ namespace stan {
           = util::initialize(model, init, rng, init_radius, false,
                              message_writer, init_writer);
 
-        std::stringstream message;
 
         double lp(0);
         try {
+          std::stringstream message;
           lp = model.template log_prob<false, false>(cont_vector, disc_vector,
                                                      &message);
           message_writer(message.str());
@@ -75,9 +75,9 @@ namespace stan {
           lp = -std::numeric_limits<double>::infinity();
         }
 
-        message.str("");
-        message << "Initial log joint probability = " << lp;
-        message_writer(message.str());
+        std::stringstream msg;
+        msg << "Initial log joint probability = " << lp;
+        message_writer(msg.str());
 
         std::vector<std::string> names;
         names.push_back("lp__");
@@ -100,12 +100,12 @@ namespace stan {
           lastlp = lp;
           lp = stan::optimization::newton_step(model, cont_vector, disc_vector);
 
-          message.str("");
-          message << "Iteration "
-                  << std::setw(2) << (m + 1) << "."
-                  << " Log joint probability = " << std::setw(10) << lp
-                  << ". Improved by " << (lp - lastlp) << ".";
-          message_writer(message.str());
+          std::stringstream msg2;
+          msg2 << "Iteration "
+               << std::setw(2) << (m + 1) << "."
+               << " Log joint probability = " << std::setw(10) << lp
+               << ". Improved by " << (lp - lastlp) << ".";
+          message_writer(msg2.str());
 
           if (std::fabs(lp - lastlp) <= 1e-8)
             break;

@@ -66,7 +66,6 @@ namespace stan {
                                      init_writer) {
         std::vector<double> unconstrained;
         std::vector<int> disc_vector;
-        std::stringstream msg;
 
         bool is_fully_initialized = true;
         bool any_initialized = false;
@@ -90,6 +89,7 @@ namespace stan {
           } else {
             stan::io::chained_var_context context(init, random_context);
 
+            std::stringstream msg;
             model.transform_inits(context,
                                   disc_vector,
                                   unconstrained,
@@ -99,7 +99,7 @@ namespace stan {
           }
           double log_prob(0);
           try {
-            msg.str("");
+            std::stringstream msg;
             log_prob = model.template log_prob<false, true>
               (unconstrained, disc_vector, &msg);
             if (msg.str().length() > 0)
@@ -119,18 +119,18 @@ namespace stan {
                            " initial value.");
             continue;
           }
-          msg.str("");
+          std::stringstream log_prob_msg;
           std::vector<double> gradient;
           bool gradient_ok = true;
           clock_t start_check = clock();
           log_prob = stan::model::log_prob_grad<true, true>
             (model, unconstrained, disc_vector,
-             gradient, &msg);
+             gradient, &log_prob_msg);
           clock_t end_check = clock();
           double deltaT = static_cast<double>(end_check - start_check)
             / CLOCKS_PER_SEC;
-          if (msg.str().length() > 0)
-            message_writer(msg.str());
+          if (log_prob_msg.str().length() > 0)
+            message_writer(log_prob_msg.str());
 
           for (size_t i = 0; i < gradient.size(); ++i) {
             if (gradient_ok && !boost::math::isfinite(gradient[i])) {
@@ -143,16 +143,17 @@ namespace stan {
             }
           }
           if (gradient_ok && print_timing) {
-            msg.str("");
             message_writer();
-            msg << "Gradient evaluation took " << deltaT << " seconds";
-            message_writer(msg.str());
-            msg.str("");
-            msg  << "1000 transitions using 10 leapfrog steps"
+            std::stringstream msg1;
+            msg1 << "Gradient evaluation took " << deltaT << " seconds";
+            message_writer(msg1.str());
+
+            std::stringstream msg2;
+            msg2 << "1000 transitions using 10 leapfrog steps"
                  << " per transition would take"
                  << " " << 1e4 * deltaT << " seconds.";
-            message_writer(msg.str());
-            msg.str("");
+            message_writer(msg2.str());
+
             message_writer("Adjust your expectations accordingly!");
             message_writer();
             message_writer();
@@ -164,7 +165,7 @@ namespace stan {
         if (num_init_tries == MAX_INIT_TRIES) {
           if (!is_fully_initialized && !init_zero) {
             message_writer();
-            msg.str("");
+            std::stringstream msg;
             msg << "Initialization between (-" << init_radius
                 << ", " << init_radius << ") failed after"
                 << " " << MAX_INIT_TRIES <<  " attempts. ";

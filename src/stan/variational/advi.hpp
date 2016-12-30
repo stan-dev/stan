@@ -535,11 +535,11 @@ namespace stan {
           for (int i = 0; i < cont_params_.size(); ++i) {
             cont_vector.at(i) = cont_params_(i);
           }
-          msg.str("");
+          std::stringstream msg2;
           model_.write_array(rng_, cont_vector, disc_vector, values,
-                             true, true, &msg);
-          if (msg.str().length() > 0)
-            message_writer(msg.str());
+                             true, true, &msg2);
+          if (msg2.str().length() > 0)
+            message_writer(msg2.str());
           values.insert(values.begin(), 0);
           parameter_writer(values);
         }
