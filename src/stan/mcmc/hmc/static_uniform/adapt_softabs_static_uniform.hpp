@@ -23,10 +23,9 @@ namespace stan {
 
       ~adapt_softabs_static_uniform() { }
 
-      sample transition(
-        sample& init_sample,
-        callbacks::writer& info_writer,
-        callbacks::writer& error_writer) {
+      sample transition(sample& init_sample,
+                        callbacks::writer& info_writer,
+                        callbacks::writer& error_writer) {
         sample s
           = softabs_static_uniform<Model, BaseRNG>::transition(init_sample,
                                                                info_writer,

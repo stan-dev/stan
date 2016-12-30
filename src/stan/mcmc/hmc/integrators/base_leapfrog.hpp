@@ -120,22 +120,20 @@ namespace stan {
       }
 
       virtual
-      void begin_update_p(
-        typename Hamiltonian::PointType& z,
-        Hamiltonian& hamiltonian, double epsilon,
-        callbacks::writer& info_writer,
-        callbacks::writer& error_writer) = 0;
+      void begin_update_p(typename Hamiltonian::PointType& z,
+                          Hamiltonian& hamiltonian, double epsilon,
+                          callbacks::writer& info_writer,
+                          callbacks::writer& error_writer) = 0;
       virtual
       void update_q(typename Hamiltonian::PointType& z,
                     Hamiltonian& hamiltonian, double epsilon,
                     callbacks::writer& info_writer,
                     callbacks::writer& error_writer) = 0;
       virtual
-      void end_update_p(
-        typename Hamiltonian::PointType& z,
-        Hamiltonian& hamiltonian, double epsilon,
-        callbacks::writer& info_writer,
-        callbacks::writer& error_writer) = 0;
+      void end_update_p(typename Hamiltonian::PointType& z,
+                        Hamiltonian& hamiltonian, double epsilon,
+                        callbacks::writer& info_writer,
+                        callbacks::writer& error_writer) = 0;
     };
 
   }  // mcmc
