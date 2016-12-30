@@ -57,7 +57,8 @@ namespace stan {
           writer(init_buffer_msg.str());
 
           std::stringstream adapt_window_msg;
-          adapt_window_msg << "           adapt_window = " << adapt_base_window_;
+          adapt_window_msg << "           adapt_window = "
+                           << adapt_base_window_;
           writer(adapt_window_msg.str());
 
           std::stringstream term_buffer_msg;
