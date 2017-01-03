@@ -1,7 +1,7 @@
 #include <stan/services/util/generate_transitions.hpp>
 #include <stan/services/sample/fixed_param.hpp>
 #include <stan/services/util/initialize.hpp>
-#include <stan/services/util/rng.hpp>
+#include <stan/services/util/create_rng.hpp>
 #include <gtest/gtest.h>
 #include <stan/io/empty_var_context.hpp>
 #include <test/test-models/good/optimization/rosenbrock.hpp>
@@ -31,7 +31,7 @@ TEST_F(ServicesSamplesGenerateTransitions, call_counting) {
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
-  boost::ecuyer1988 rng = stan::services::util::rng(seed, chain);
+  boost::ecuyer1988 rng = stan::services::util::create_rng(seed, chain);
 
   std::vector<int> disc_vector;
   std::vector<double> cont_vector
@@ -95,7 +95,7 @@ TEST_F(ServicesSamplesGenerateTransitions, output_sizes) {
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
-  boost::ecuyer1988 rng = stan::services::util::rng(seed, chain);
+  boost::ecuyer1988 rng = stan::services::util::create_rng(seed, chain);
 
   std::vector<int> disc_vector;
   std::vector<double> cont_vector

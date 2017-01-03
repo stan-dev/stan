@@ -5,7 +5,7 @@
 #include <stan/callbacks/writer.hpp>
 #include <stan/services/util/experimental_message.hpp>
 #include <stan/services/util/initialize.hpp>
-#include <stan/services/util/rng.hpp>
+#include <stan/services/util/create_rng.hpp>
 #include <stan/io/var_context.hpp>
 #include <stan/variational/advi.hpp>
 #include <boost/random/additive_combine.hpp>
@@ -60,7 +60,7 @@ namespace stan {
                      callbacks::writer& diagnostic_writer) {
           util::experimental_message(message_writer);
 
-          boost::ecuyer1988 rng = util::rng(random_seed, chain);
+          boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
 
           std::vector<int> disc_vector;
           std::vector<double> cont_vector
@@ -72,8 +72,7 @@ namespace stan {
           model.constrained_param_names(names, true, true);
           parameter_writer(names);
 
-          Eigen::VectorXd cont_params;
-          cont_params.resize(cont_vector.size());
+          Eigen::VectorXd cont_params(cont_vector.size());
           for (size_t n = 0; n < cont_vector.size(); n++)
             cont_params[n] = cont_vector[n];
 
@@ -92,5 +91,4 @@ namespace stan {
     }
   }
 }
-
 #endif

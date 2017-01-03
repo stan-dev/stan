@@ -16,6 +16,11 @@ namespace stan {
     class writer {
     public:
       /**
+       * Virtual destructor.
+       */
+      virtual ~writer() {}
+
+      /**
        * Writes a set of names.
        *
        * @param[in] names Names in a std::vector
@@ -44,11 +49,6 @@ namespace stan {
        */
       virtual void operator()(const std::string& message) {
       }
-
-      /**
-       * Virtual destructor.
-       */
-      virtual ~writer() {}
     };
 
   }

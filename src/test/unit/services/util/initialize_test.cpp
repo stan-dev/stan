@@ -5,7 +5,7 @@
 #include <test/test-models/good/services/test_lp.hpp>
 #include <stan/io/empty_var_context.hpp>
 #include <stan/io/array_var_context.hpp>
-#include <stan/services/util/rng.hpp>
+#include <stan/services/util/create_rng.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
 
 class ServicesUtilInitialize : public testing::Test {
@@ -13,7 +13,7 @@ public:
   ServicesUtilInitialize()
     : model(empty_context, &model_ss),
       message(message_ss),
-      rng(stan::services::util::rng(0, 1)) {}
+      rng(stan::services::util::create_rng(0, 1)) {}
 
   stan::io::empty_var_context empty_context;
   std::stringstream model_ss, message_ss;

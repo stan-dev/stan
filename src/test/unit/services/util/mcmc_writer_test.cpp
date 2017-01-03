@@ -3,7 +3,7 @@
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <test/test-models/good/services/test_lp.hpp>
 #include <stan/io/empty_var_context.hpp>
-#include <stan/services/util/rng.hpp>
+#include <stan/services/util/create_rng.hpp>
 
 class ServicesUtil : public ::testing::Test {
 public:
@@ -90,7 +90,7 @@ TEST_F(ServicesUtil, write_sample_names) {
 }
 
 TEST_F(ServicesUtil, write_sample_params) {
-  boost::ecuyer1988 rng = stan::services::util::rng(0, 1);
+  boost::ecuyer1988 rng = stan::services::util::create_rng(0, 1);
   Eigen::VectorXd x = Eigen::VectorXd::Zero(2);
   stan::mcmc::sample sample(x, 1, 2);
   mock_sampler sampler;

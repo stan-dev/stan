@@ -115,9 +115,8 @@ namespace stan {
                          callbacks::writer& info_writer,
                          callbacks::writer& error_writer) {
         // Compute the Hessian
-        stan::math::hessian<double>(softabs_fun<Model>
-                                    (this->model_, 0), z.q, z.V, z.g,
-                                    z.hessian);
+        stan::math::hessian<double>(softabs_fun<Model>(this->model_, 0),
+                                    z.q, z.V, z.g, z.hessian);
 
         z.V = -z.V;
         z.g = -z.g;

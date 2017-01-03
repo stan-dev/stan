@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <test/test-models/good/services/test_lp.hpp>
 #include <stan/io/empty_var_context.hpp>
-#include <stan/services/util/rng.hpp>
+#include <stan/services/util/create_rng.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_unit_e_nuts.hpp>
@@ -11,7 +11,7 @@ class ServicesUtil : public testing::Test {
 public:
   ServicesUtil()
     : model(context, &model_log),
-      rng(stan::services::util::rng(0, 1)),
+      rng(stan::services::util::create_rng(0, 1)),
       sampler(model, rng),
       num_warmup(0),
       num_samples(0),

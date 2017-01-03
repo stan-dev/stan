@@ -8,7 +8,7 @@
 #include <stan/services/error_codes.hpp>
 #include <stan/mcmc/hmc/static/dense_e_static_hmc.hpp>
 #include <stan/services/util/run_sampler.hpp>
-#include <stan/services/util/rng.hpp>
+#include <stan/services/util/create_rng.hpp>
 #include <stan/services/util/initialize.hpp>
 #include <vector>
 
@@ -56,7 +56,7 @@ namespace stan {
                              callbacks::writer& init_writer,
                              callbacks::writer& sample_writer,
                              callbacks::writer& diagnostic_writer) {
-        boost::ecuyer1988 rng = util::rng(random_seed, chain);
+        boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
 
         std::vector<int> disc_vector;
         std::vector<double> cont_vector

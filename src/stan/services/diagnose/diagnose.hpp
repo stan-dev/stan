@@ -8,7 +8,7 @@
 #include <stan/callbacks/writer.hpp>
 #include <stan/callbacks/tee_writer.hpp>
 #include <stan/model/test_gradients.hpp>
-#include <stan/services/util/rng.hpp>
+#include <stan/services/util/create_rng.hpp>
 #include <stan/services/util/initialize.hpp>
 #include <vector>
 
@@ -47,7 +47,7 @@ namespace stan {
                    callbacks::writer& message_writer,
                    callbacks::writer& init_writer,
                    callbacks::writer& parameter_writer) {
-        boost::ecuyer1988 rng = util::rng(random_seed, chain);
+        boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
 
         std::vector<int> disc_vector;
         std::vector<double> cont_vector
@@ -57,8 +57,7 @@ namespace stan {
 
         message_writer("TEST GRADIENT MODE");
 
-        stan::callbacks::tee_writer
-          writer(message_writer, parameter_writer);
+        stan::callbacks::tee_writer writer(message_writer, parameter_writer);
 
         int num_failed
           = stan::model::test_gradients<true, true>(model, cont_vector,

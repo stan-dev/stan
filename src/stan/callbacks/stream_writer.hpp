@@ -28,6 +28,11 @@ namespace stan {
         output_(output), comment_prefix_(comment_prefix) {}
 
       /**
+       * Virtual destructor
+       */
+      virtual ~stream_writer() {}
+
+      /**
        * Writes a set of names on a single line in csv format followed
        * by a newline.
        *
@@ -36,15 +41,7 @@ namespace stan {
        * @param[in] names Names in a std::vector
        */
       void operator()(const std::vector<std::string>& names) {
-        if (names.empty()) return;
-
-        std::vector<std::string>::const_iterator last = names.end();
-        --last;
-
-        for (std::vector<std::string>::const_iterator it = names.begin();
-             it != last; ++it)
-          output_ << *it << ",";
-        output_ << names.back() << std::endl;
+        write_vector(names);
       }
 
       /**
@@ -56,15 +53,7 @@ namespace stan {
        * @param[in] state Values in a std::vector
        */
       void operator()(const std::vector<double>& state) {
-        if (state.empty()) return;
-
-        std::vector<double>::const_iterator last = state.end();
-        --last;
-
-        for (std::vector<double>::const_iterator it = state.begin();
-             it != last; ++it)
-          output_ << *it << ",";
-        output_ << state.back() << std::endl;
+        write_vector(state);
       }
 
       /**
@@ -83,20 +72,37 @@ namespace stan {
         output_ << comment_prefix_ << message << std::endl;
       }
 
-      /**
-       * Virtual destructor
-       */
-      virtual ~stream_writer() {}
-
     private:
       /**
        * Output stream
        */
       std::ostream& output_;
+
       /**
        * Comment prefix to use when printing comments: strings and blank lines
        */
       std::string comment_prefix_;
+
+      /**
+       * Writes a set of values in csv format followed by a newline.
+       *
+       * Note: the precision of the output is determined by the settings
+       *  of the stream on construction.
+       *
+       * @param[in] v Values in a std::vector
+       */
+      template <class T>
+      void write_vector(const std::vector<T>& v) {
+        if (v.empty()) return;
+
+        typename std::vector<T>::const_iterator last = v.end();
+        --last;
+
+        for (typename std::vector<T>::const_iterator it = v.begin();
+             it != last; ++it)
+          output_ << *it << ",";
+        output_ << v.back() << std::endl;
+      }
     };
 
   }

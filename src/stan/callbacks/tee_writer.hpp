@@ -29,6 +29,8 @@ namespace stan {
         : writer1_(writer1), writer2_(writer2) {
       }
 
+      virtual ~tee_writer() {}
+
       void operator()(const std::vector<std::string>& names) {
         writer1_(names);
         writer2_(names);
@@ -48,8 +50,6 @@ namespace stan {
         writer1_(message);
         writer2_(message);
       }
-
-      virtual ~tee_writer() {}
 
     private:
       /**

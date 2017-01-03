@@ -18,11 +18,6 @@ namespace stan {
     class random_var_context : public var_context {
     public:
       /**
-       * Destructor.
-       */
-      ~random_var_context() {}
-
-      /**
        * Constructs a random var_context.
        *
        * On construction, this var_context will generate random
@@ -87,18 +82,13 @@ namespace stan {
                           constrained_params,
                           false, false, 0);
 
-        vals_r_.resize(dims_.size());
-        std::vector<double>::iterator start = constrained_params.begin();
-
-        for (size_t i = 0; i < dims_.size(); ++i) {
-          size_t size = 1;
-          for (size_t j = 0; j < dims_[i].size(); ++j)
-            size *= dims_[i][j];
-          vals_r_[i] = std::vector<double>(start,
-                                           start + size);
-          start += size;
-        }
+        vals_r_ = constrained_to_vals_r(constrained_params, dims_);
       }
+
+      /**
+       * Destructor.
+       */
+      ~random_var_context() {}
 
       /**
        * Return <code>true</code> if the specified variable name is
@@ -124,10 +114,8 @@ namespace stan {
       std::vector<double> vals_r(const std::string& name) const {
         std::vector<std::string>::const_iterator loc
           = std::find(names_.begin(), names_.end(), name);
-        if (loc == names_.end()) {
-          std::vector<double> empty_vals_r;
-          return empty_vals_r;
-        }
+        if (loc == names_.end())
+           return std::vector<double>();
         return vals_r_[loc - names_.begin()];
       }
 
@@ -139,13 +127,11 @@ namespace stan {
        *   is returned otherwise
        */
       std::vector<size_t> dims_r(const std::string& name) const {
-        size_t index
-          = std::find(names_.begin(), names_.end(), name) - names_.begin();
-        if (index >= names_.size()) {
-          std::vector<size_t> dims_r;
-          return dims_r;
-        }
-        return dims_[index];
+        std::vector<std::string>::const_iterator loc
+          = std::find(names_.begin(), names_.end(), name);
+        if (loc == names_.end())
+          return std::vector<size_t>();
+        return dims_[loc - names_.begin()];
       }
 
       /**
@@ -231,6 +217,42 @@ namespace stan {
        * constrained space
        */
       std::vector<std::vector<double> > vals_r_;
+
+      /**
+       * Computes the size of a variable based on the dim provided.
+       *
+       * @param dim dimension of the variable
+       * @return total size of the variable
+       */
+      size_t dim_size(const std::vector<size_t>& dim) {
+        size_t size = 1;
+        for (size_t j = 0; j < dim.size(); ++j)
+          size *= dim[j];
+        return size;
+      }
+
+      /**
+       * Returns a vector of constrained values in the format expected
+       * out of the vals_r() function.
+       *
+       * @param[in] constrained constrained parameter values
+       * @param[in] dims dimensions of each of the parameter values
+       * @return constrained values reshaped to be returned in the vals_r
+       *   function
+       */
+      std::vector<std::vector<double> >
+      constrained_to_vals_r(const std::vector<double>& constrained,
+                            const std::vector<std::vector<size_t> >& dims) {
+        std::vector<std::vector<double> > vals_r(dims.size());
+
+        std::vector<double>::const_iterator start = constrained.begin();
+        for (size_t i = 0; i < dims.size(); ++i) {
+          size_t size = dim_size(dims[i]);
+          vals_r[i] = std::vector<double>(start, start + size);
+          start += size;
+        }
+        return vals_r;
+      }
     };
 
   }

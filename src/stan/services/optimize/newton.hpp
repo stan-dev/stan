@@ -9,7 +9,7 @@
 #include <stan/optimization/newton.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/services/util/initialize.hpp>
-#include <stan/services/util/rng.hpp>
+#include <stan/services/util/create_rng.hpp>
 #include <cmath>
 #include <limits>
 #include <string>
@@ -46,7 +46,7 @@ namespace stan {
                  callbacks::writer& message_writer,
                  callbacks::writer& init_writer,
                  callbacks::writer& parameter_writer) {
-        boost::ecuyer1988 rng = util::rng(random_seed, chain);
+        boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
 
         std::vector<int> disc_vector;
         std::vector<double> cont_vector

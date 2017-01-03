@@ -37,8 +37,7 @@ namespace stan {
        * @return empty vector
        */
       std::vector<double> vals_r(const std::string& name) const {
-        std::vector<double> vals_r;
-        return vals_r;
+        return std::vector<double>();
       }
 
       /**
@@ -48,8 +47,7 @@ namespace stan {
        * @return empty vector
        */
       std::vector<size_t> dims_r(const std::string& name) const {
-        std::vector<size_t> dims_r;
-        return dims_r;
+        return std::vector<size_t>();
       }
 
       /**
@@ -70,8 +68,7 @@ namespace stan {
        * @return empty vector
        */
       std::vector<int> vals_i(const std::string& name) const {
-        std::vector<int> vals_i;
-        return vals_i;
+        return std::vector<int>();
       }
 
       /**
@@ -82,8 +79,7 @@ namespace stan {
        * @return empty vector
        */
       std::vector<size_t> dims_i(const std::string& name) const {
-        std::vector<size_t> dims_i;
-        return dims_i;
+        return std::vector<size_t>();
       }
 
       /**
