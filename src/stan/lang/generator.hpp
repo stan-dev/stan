@@ -666,7 +666,7 @@ namespace stan {
                                     const expression& expr,
                                     const int indents,
                                     std::ostream& o) {
-      generate_indent(indents,o);
+      generate_indent(indents, o);
       o << "validate_non_negative_index(\"" << var_name << "\", ";
       print_quoted_expression(o, expr);
       o << ", ";
