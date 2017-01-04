@@ -3042,6 +3042,9 @@ namespace stan {
       }
       void operator()(const nil& /*x*/) const { }
       void operator()(const int_var_decl& x) const {
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
+          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+        }
         generate_increment_i(x.dims_);
         // for loop for ranges
         for (size_t i = 0; i < x.dims_.size(); ++i) {
@@ -3065,23 +3068,38 @@ namespace stan {
         }
       }
       void operator()(const double_var_decl& x) const {
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
+          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+        }
         generate_increment(x.dims_);
       }
       void operator()(const vector_var_decl& x) const {
         generate_validate_positive(x.name_, x.M_, 2, o_);
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
+          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+        }
         generate_increment(x.M_, x.dims_);
       }
       void operator()(const row_vector_var_decl& x) const {
         generate_validate_positive(x.name_, x.N_, 2, o_);
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
+          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+        }
         generate_increment(x.N_, x.dims_);
       }
       void operator()(const matrix_var_decl& x) const {
         generate_validate_positive(x.name_, x.M_, 2, o_);
         generate_validate_positive(x.name_, x.N_, 2, o_);
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
+          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+        }
         generate_increment(x.M_, x.N_, x.dims_);
       }
       void operator()(const unit_vector_var_decl& x) const {
         generate_validate_positive(x.name_, x.K_, 2, o_);
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
+          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+        }
         o_ << INDENT2 << "num_params_r__ += (";
         generate_expression(x.K_, o_);
         o_ << ")";
@@ -3094,6 +3112,9 @@ namespace stan {
       void operator()(const simplex_var_decl& x) const {
         // only K-1 vals
         generate_validate_positive(x.name_, x.K_, 2, o_);
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
+          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+        }
         o_ << INDENT2 << "num_params_r__ += (";
         generate_expression(x.K_, o_);
         o_ << " - 1)";
@@ -3105,15 +3126,24 @@ namespace stan {
       }
       void operator()(const ordered_var_decl& x) const {
         generate_validate_positive(x.name_, x.K_, 2, o_);
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
+          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+        }
         generate_increment(x.K_, x.dims_);
       }
       void operator()(const positive_ordered_var_decl& x) const {
         generate_validate_positive(x.name_, x.K_, 2, o_);
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
+          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+        }
         generate_increment(x.K_, x.dims_);
       }
       void operator()(const cholesky_factor_var_decl& x) const {
         generate_validate_positive(x.name_, x.M_, 2, o_);
         generate_validate_positive(x.name_, x.N_, 2, o_);
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
+          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+        }
         o_ << INDENT2 << "num_params_r__ += ((";
         // N * (N + 1) / 2  +  (M - N) * M
         generate_expression(x.N_, o_);
@@ -3134,6 +3164,9 @@ namespace stan {
       }
       void operator()(const cholesky_corr_var_decl& x) const {
         generate_validate_positive(x.name_, x.K_, 2, o_);
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
+          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+        }
         // FIXME: cut and paste ofcorr_matrix_var_decl
         o_ << INDENT2 << "num_params_r__ += ((";
         generate_expression(x.K_, o_);
@@ -3148,6 +3181,9 @@ namespace stan {
       }
       void operator()(const cov_matrix_var_decl& x) const {
         generate_validate_positive(x.name_, x.K_, 2, o_);
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
+          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+        }
         // (K * (K - 1))/2 + K  ?? define fun(K) = ??
         o_ << INDENT2 << "num_params_r__ += ((";
         generate_expression(x.K_, o_);
@@ -3164,6 +3200,9 @@ namespace stan {
       }
       void operator()(const corr_matrix_var_decl& x) const {
         generate_validate_positive(x.name_, x.K_, 2, o_);
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
+          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+        }
         o_ << INDENT2 << "num_params_r__ += ((";
         generate_expression(x.K_, o_);
         o_ << " * (";
