@@ -202,7 +202,7 @@ namespace stan {
     }
 
     /**
-<     * Generate correct C++ type for expressions which contain a 
+     * Generate correct C++ type for expressions which contain a 
      * Stan <code>real</code> variable according to context in
      * which expression is used and expression contents.
      *
@@ -650,6 +650,18 @@ namespace stan {
       o << ';' << EOL;
     }
 
+    /**
+     * Generate call to stan_math lib function validate_non_negative_index
+     * which will throw an informative error if dim size is < 0
+     * 
+     * This check should precede the variable declaration in order to
+     * avoid bad alloc runtime error.
+     *
+     * @param var_name variable name
+     * @param expr declared dim size expression
+     * @param indents indentation level
+     * @param o output stream for generated code
+     */
     void generate_validate_positive(const std::string& var_name,
                                     const expression& expr,
                                     const int indents,
