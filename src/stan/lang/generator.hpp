@@ -656,7 +656,14 @@ namespace stan {
      * 
      * This check should precede the variable declaration in order to
      * avoid bad alloc runtime error.
-     *
+     * Called by 
+     *   generate_validate_context_size - data variables
+     *   generate_initialization - transformed data declarations
+     *   generate_var_resiszing - initializes transformed data variables
+     *   generate_local_var_decls - local variables, transformed parameters
+     *                              write array, generated quantities
+     *   generate_set_param_ranges - parameter variables
+     *   
      * @param var_name variable name
      * @param expr declared dim size expression
      * @param indents indentation level
@@ -674,7 +681,9 @@ namespace stan {
       o << ");" << EOL;
     }
 
-    // only generates the test
+    /*
+     * generates data variable validation and declaration in ctor_body
+     */
     void generate_validate_context_size(std::ostream& o,
                                         const std::string& stage,
                                         const std::string& var_name,
@@ -684,11 +693,13 @@ namespace stan {
                                           = expression(),
                                         const expression& type_arg2
                                           = expression()) {
-      // validate all dims are positive
+      // check array dimensions
       for (size_t i = 0; i < dims.size(); ++i)
         generate_validate_positive(var_name, dims[i], 2, o);
+      // check vector, row_vector, and matrix rows
       if (!is_nil(type_arg1))
         generate_validate_positive(var_name, type_arg1, 2, o);
+      // check matrix cols
       if (!is_nil(type_arg2))
         generate_validate_positive(var_name, type_arg2, 2, o);
 
@@ -904,17 +915,22 @@ namespace stan {
 
 
 
+    /*
+     * generates variable declaration
+     */
     void generate_initialization(std::ostream& o,
                                  const std::string& var_name,
                                  const std::string& base_type,
                                  const std::vector<expression>& dims,
                                  const expression& type_arg1 = expression(),
                                  const expression& type_arg2 = expression()) {
-      // validate all dims are positive
+      // check array dimensions
       for (size_t i = 0; i < dims.size(); ++i)
         generate_validate_positive(var_name, dims[i], 2, o);
+      // check vector, row_vector, and matrix rows
       if (!is_nil(type_arg1))
         generate_validate_positive(var_name, type_arg1, 2, o);
+      // check matrix cols
       if (!is_nil(type_arg2))
         generate_validate_positive(var_name, type_arg2, 2, o);
 
@@ -1488,7 +1504,9 @@ namespace stan {
         boost::apply_visitor(vis, vs[i].decl_);
     }
 
-    // see member_var_decl_visgen cut & paste
+    /*
+     * generates local data variable declaration
+     */
     struct local_var_decl_visgen : public visgen {
       int indents_;
       bool is_var_context_;
@@ -1703,6 +1721,7 @@ namespace stan {
                          const std::string& name,
                          const std::vector<expression>& dims,
                          const expression& definition = expression()) const {
+        // check array dimensions
         for (size_t i = 0; i < dims.size(); ++i)
           generate_validate_positive(name, dims[i], indents_, o_);
         // require double parens to counter "most vexing parse" problem
@@ -3275,6 +3294,12 @@ namespace stan {
       }
     };
 
+    /*
+     * Generate statements in ctor_body which cumulatively determine
+     * the size required for the vector of param ranges and the
+     * range for each parameter in the model by iterating over the
+     * list of parameter variable declarations
+     */
     void generate_set_param_ranges(const std::vector<var_decl>& var_decls,
                                    std::ostream& o) {
       o << INDENT2 << "num_params_r__ = 0U;" << EOL;
