@@ -153,4 +153,7 @@ TEST(langParserVarDeclsGrammarDef, defDeclConstrainedMatrixVar) {
    test_parsable("declare-define-var-constrained-matrix");
 }
 
-
+TEST(langParserVarDeclsGrammarDef, badDefParamBlock) {
+  test_throws("declare-define-param-block",
+              "variable definition not possible in this block");
+}
