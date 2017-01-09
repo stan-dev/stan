@@ -1,5 +1,5 @@
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
-#include <stan/interface_callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/stream_writer.hpp>
 #include <stan/mcmc/hmc/nuts_classic/base_nuts_classic.hpp>
 #include <stan/mcmc/hmc/integrators/expl_leapfrog.hpp>
 #include <boost/random/additive_combine.hpp>
@@ -40,15 +40,15 @@ namespace stan {
 
       double dG_dt(
         ps_point& z,
-        interface_callbacks::writer::base_writer& info_writer,
-        interface_callbacks::writer::base_writer& error_writer) {
+        callbacks::writer& info_writer,
+        callbacks::writer& error_writer) {
         return 2;
       }
 
       Eigen::VectorXd dtau_dq(
         ps_point& z,
-        interface_callbacks::writer::base_writer& info_writer,
-        interface_callbacks::writer::base_writer& error_writer) {
+        callbacks::writer& info_writer,
+        callbacks::writer& error_writer) {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 
@@ -58,14 +58,14 @@ namespace stan {
 
       Eigen::VectorXd dphi_dq(
         ps_point& z,
-        interface_callbacks::writer::base_writer& info_writer,
-        interface_callbacks::writer::base_writer& error_writer) {
+        callbacks::writer& info_writer,
+        callbacks::writer& error_writer) {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 
       void init(ps_point& z,
-                interface_callbacks::writer::base_writer& info_writer,
-                interface_callbacks::writer::base_writer& error_writer) {
+                callbacks::writer& info_writer,
+                callbacks::writer& error_writer) {
         z.V = 0;
       }
 
@@ -73,8 +73,8 @@ namespace stan {
 
       void update_potential_gradient(
         ps_point& z,
-        interface_callbacks::writer::base_writer& info_writer,
-        interface_callbacks::writer::base_writer& error_writer) {
+        callbacks::writer& info_writer,
+        callbacks::writer& error_writer) {
         z.V += 500;
       }
 
@@ -164,9 +164,9 @@ TEST(McmcNutsBaseNutsClassic, build_tree) {
   sampler.z() = z_init;
 
   std::stringstream output;
-  stan::interface_callbacks::writer::stream_writer writer(output);
+  stan::callbacks::stream_writer writer(output);
   std::stringstream error_stream;
-  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
+  stan::callbacks::stream_writer error_writer(error_stream);
 
 
   int n_valid = sampler.build_tree(3, rho, &z_init, z_propose, util,
@@ -220,9 +220,9 @@ TEST(McmcNutsBaseNutsClassic, slice_criterion) {
   sampler.z() = z_init;
 
   std::stringstream output;
-  stan::interface_callbacks::writer::stream_writer writer(output);
+  stan::callbacks::stream_writer writer(output);
   std::stringstream error_stream;
-  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
+  stan::callbacks::stream_writer error_writer(error_stream);
 
 
   int n_valid = 0;

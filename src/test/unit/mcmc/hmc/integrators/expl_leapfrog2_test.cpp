@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 
 #include <sstream>
-#include <stan/interface_callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/stream_writer.hpp>
 #include <test/test-models/good/mcmc/hmc/integrators/gauss.hpp>
 
 #include <stan/io/dump.hpp>
@@ -22,9 +22,9 @@ TEST(McmcHmcIntegratorsExplLeapfrog, energy_conservation) {
 
   std::stringstream model_output;
   std::stringstream metric_output;
-  stan::interface_callbacks::writer::stream_writer writer(metric_output);
+  stan::callbacks::stream_writer writer(metric_output);
   std::stringstream error_stream;
-  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
+  stan::callbacks::stream_writer error_writer(error_stream);
 
   gauss_model_namespace::gauss_model model(data_var_context, &model_output);
 
@@ -72,9 +72,9 @@ TEST(McmcHmcIntegratorsExplLeapfrog, symplecticness) {
   std::stringstream model_output;
   std::stringstream metric_output;
 
-  stan::interface_callbacks::writer::stream_writer writer(metric_output);
+  stan::callbacks::stream_writer writer(metric_output);
   std::stringstream error_stream;
-  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
+  stan::callbacks::stream_writer error_writer(error_stream);
 
 
   gauss_model_namespace::gauss_model model(data_var_context, &model_output);
