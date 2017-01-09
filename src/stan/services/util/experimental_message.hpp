@@ -18,8 +18,9 @@ namespace stan {
         message_writer("------------------------------"
                        "------------------------------");
         message_writer("EXPERIMENTAL ALGORITHM:");
-        message_writer("  - please expect frequent updates to the procedure");
-        message_writer("  - please expect unexpected inference results");
+        message_writer("  This procedure has not been thoroughly tested"
+                       " and may be unstable");
+        message_writer("  or buggy. The interface is subject to change.");
         message_writer("------------------------------"
                        "------------------------------");
         message_writer();
