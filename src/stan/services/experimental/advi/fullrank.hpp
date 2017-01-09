@@ -72,9 +72,9 @@ namespace stan {
           model.constrained_param_names(names, true, true);
           parameter_writer(names);
 
-          Eigen::VectorXd cont_params(cont_vector.size());
-          for (size_t n = 0; n < cont_vector.size(); n++)
-            cont_params[n] = cont_vector[n];
+          Eigen::VectorXd cont_params
+            = Eigen::Map<Eigen::VectorXd>(&cont_vector[0],
+                                          cont_vector.size(), 1);
 
           stan::variational::advi<Model,
                                   stan::variational::normal_fullrank,
