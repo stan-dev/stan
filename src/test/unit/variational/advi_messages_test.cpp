@@ -1,6 +1,6 @@
 #include <test/test-models/good/variational/univariate_no_constraint.hpp>
 #include <stan/variational/advi.hpp>
-#include <stan/interface_callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/stream_writer.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 #include <vector>
@@ -60,9 +60,9 @@ public:
   std::stringstream message_stream_;
   std::stringstream parameter_stream_;
   std::stringstream diagnostic_stream_;
-  stan::interface_callbacks::writer::stream_writer message_writer;
-  stan::interface_callbacks::writer::stream_writer parameter_writer;
-  stan::interface_callbacks::writer::stream_writer diagnostic_writer;
+  stan::callbacks::stream_writer message_writer;
+  stan::callbacks::stream_writer parameter_writer;
+  stan::callbacks::stream_writer diagnostic_writer;
   
 private:
   stan_model *model_;

@@ -1,6 +1,7 @@
 #ifndef STAN_MODEL_FINITE_DIFF_GRAD_HPP
 #define STAN_MODEL_FINITE_DIFF_GRAD_HPP
 
+#include <stan/callbacks/interrupt.hpp>
 #include <iostream>
 #include <vector>
 
@@ -19,6 +20,8 @@ namespace stan {
      * log probability.
      * @tparam M Class of model.
      * @param model Model.
+     * @param interrupt interrupt callback to be called before calculating
+     *   the finite differences for each parameter.
      * @param params_r Real-valued parameters.
      * @param params_i Integer-valued parameters.
      * @param[out] grad Vector into which gradient is written.
@@ -27,6 +30,7 @@ namespace stan {
      */
     template <bool propto, bool jacobian_adjust_transform, class M>
     void finite_diff_grad(const M& model,
+                          stan::callbacks::interrupt& interrupt,
                           std::vector<double>& params_r,
                           std::vector<int>& params_i,
                           std::vector<double>& grad,
@@ -35,6 +39,7 @@ namespace stan {
       std::vector<double> perturbed(params_r);
       grad.resize(params_r.size());
       for (size_t k = 0; k < params_r.size(); k++) {
+        interrupt();
         perturbed[k] += epsilon;
         double logp_plus
           = model

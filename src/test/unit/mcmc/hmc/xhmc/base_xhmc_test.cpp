@@ -1,5 +1,5 @@
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
-#include <stan/interface_callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/stream_writer.hpp>
 #include <stan/mcmc/hmc/xhmc/base_xhmc.hpp>
 #include <stan/mcmc/hmc/integrators/expl_leapfrog.hpp>
 #include <boost/random/additive_combine.hpp>
@@ -36,15 +36,15 @@ namespace stan {
 
       double dG_dt(
         ps_point& z,
-        interface_callbacks::writer::base_writer& info_writer,
-        interface_callbacks::writer::base_writer& error_writer) {
+        callbacks::writer& info_writer,
+        callbacks::writer& error_writer) {
         return 2;
       }
 
       Eigen::VectorXd dtau_dq(
         ps_point& z,
-        interface_callbacks::writer::base_writer& info_writer,
-        interface_callbacks::writer::base_writer& error_writer) {
+        callbacks::writer& info_writer,
+        callbacks::writer& error_writer) {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 
@@ -54,14 +54,14 @@ namespace stan {
 
       Eigen::VectorXd dphi_dq(
         ps_point& z,
-        interface_callbacks::writer::base_writer& info_writer,
-        interface_callbacks::writer::base_writer& error_writer) {
+        callbacks::writer& info_writer,
+        callbacks::writer& error_writer) {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 
       void init(ps_point& z,
-                interface_callbacks::writer::base_writer& info_writer,
-                interface_callbacks::writer::base_writer& error_writer) {
+                callbacks::writer& info_writer,
+                callbacks::writer& error_writer) {
         z.V = 0;
       }
 
@@ -69,8 +69,8 @@ namespace stan {
 
       void update_potential_gradient(
         ps_point& z,
-        interface_callbacks::writer::base_writer& info_writer,
-        interface_callbacks::writer::base_writer& error_writer) {
+        callbacks::writer& info_writer,
+        callbacks::writer& error_writer) {
         z.V += 500;
       }
 
@@ -169,9 +169,9 @@ TEST(McmcXHMCBaseXHMC, build_tree) {
   sampler.z() = z_init;
 
   std::stringstream output;
-  stan::interface_callbacks::writer::stream_writer writer(output);
+  stan::callbacks::stream_writer writer(output);
   std::stringstream error_stream;
-  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
+  stan::callbacks::stream_writer error_writer(error_stream);
 
 
   bool valid_subtree = sampler.build_tree(3, z_propose,
@@ -223,9 +223,9 @@ TEST(McmcXHMCBaseXHMC, divergence_test) {
   sampler.z() = z_init;
 
   std::stringstream output;
-  stan::interface_callbacks::writer::stream_writer writer(output);
+  stan::callbacks::stream_writer writer(output);
   std::stringstream error_stream;
-  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
+  stan::callbacks::stream_writer error_writer(error_stream);
 
 
   bool valid_subtree = 0;
@@ -283,9 +283,9 @@ TEST(McmcXHMCBaseXHMC, transition) {
   sampler.z() = z_init;
 
   std::stringstream output_stream;
-  stan::interface_callbacks::writer::stream_writer writer(output_stream);
+  stan::callbacks::stream_writer writer(output_stream);
   std::stringstream error_stream;
-  stan::interface_callbacks::writer::stream_writer error_writer(error_stream);
+  stan::callbacks::stream_writer error_writer(error_stream);
 
   stan::mcmc::sample init_sample(z_init.q, 0, 0);
 

@@ -1,7 +1,7 @@
 #ifndef STAN_MCMC_HMC_INTEGRATORS_BASE_INTEGRATOR_HPP
 #define STAN_MCMC_HMC_INTEGRATORS_BASE_INTEGRATOR_HPP
 
-#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer.hpp>
 
 namespace stan {
   namespace mcmc {
@@ -15,8 +15,8 @@ namespace stan {
       evolve(typename Hamiltonian::PointType& z,
              Hamiltonian& hamiltonian,
              const double epsilon,
-             interface_callbacks::writer::base_writer& info_writer,
-             interface_callbacks::writer::base_writer& error_writer) = 0;
+             callbacks::writer& info_writer,
+             callbacks::writer& error_writer) = 0;
     };
 
   }  // mcmc

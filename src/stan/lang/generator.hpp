@@ -650,7 +650,40 @@ namespace stan {
       o << ';' << EOL;
     }
 
-    // only generates the test
+    /**
+     * Generate call to stan_math lib function validate_non_negative_index
+     * which will throw an informative error if dim size is < 0
+     * 
+     * This check should precede the variable declaration in order to
+     * avoid bad alloc runtime error.
+     * Called by 
+     *   generate_validate_context_size - data variables
+     *   generate_initialization - transformed data declarations
+     *   generate_var_resiszing - initializes transformed data variables
+     *   generate_local_var_decls - local variables, transformed parameters
+     *                              write array, generated quantities
+     *   generate_set_param_ranges - parameter variables
+     *   
+     * @param var_name variable name
+     * @param expr declared dim size expression
+     * @param indents indentation level
+     * @param o output stream for generated code
+     */
+    void generate_validate_positive(const std::string& var_name,
+                                    const expression& expr,
+                                    const int indents,
+                                    std::ostream& o) {
+      generate_indent(indents, o);
+      o << "validate_non_negative_index(\"" << var_name << "\", ";
+      print_quoted_expression(o, expr);
+      o << ", ";
+      generate_expression(expr, o);
+      o << ");" << EOL;
+    }
+
+    /*
+     * generates data variable validation and declaration in ctor_body
+     */
     void generate_validate_context_size(std::ostream& o,
                                         const std::string& stage,
                                         const std::string& var_name,
@@ -660,6 +693,16 @@ namespace stan {
                                           = expression(),
                                         const expression& type_arg2
                                           = expression()) {
+      // check array dimensions
+      for (size_t i = 0; i < dims.size(); ++i)
+        generate_validate_positive(var_name, dims[i], 2, o);
+      // check vector, row_vector, and matrix rows
+      if (!is_nil(type_arg1))
+        generate_validate_positive(var_name, type_arg1, 2, o);
+      // check matrix cols
+      if (!is_nil(type_arg2))
+        generate_validate_positive(var_name, type_arg2, 2, o);
+
       o << INDENT2
         << "context__.validate_dims("
         << '"' << stage << '"'
@@ -746,21 +789,6 @@ namespace stan {
         o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
     };
-
-    void generate_init_vars(const std::vector<var_decl>& vs,
-                            int indent,
-                            std::ostream& o) {
-      generate_init_vars_visgen vis(indent, o);
-      o << EOL;
-      generate_comment("initialize undefined transformed variables to"
-                       " avoid seg fault on val access",
-                       indent, o);
-      for (size_t i = 0; i < vs.size(); ++i) {
-        if (!vs[i].has_def()) {
-          boost::apply_visitor(vis, vs[i].decl_);
-        }
-      }
-    }
 
     struct generate_local_var_init_nan_visgen : public visgen {
       const bool is_var_context_;
@@ -886,30 +914,25 @@ namespace stan {
     };
 
 
-    void generate_validate_positive(const std::string& var_name,
-                                    const expression& expr,
-                                    std::ostream& o) {
-      o << INDENT2;
-      o << "validate_non_negative_index(\"" << var_name << "\", ";
-      print_quoted_expression(o, expr);
-      o << ", ";
-      generate_expression(expr, o);
-      o << ");" << EOL;
-    }
 
+    /*
+     * generates variable declaration
+     */
     void generate_initialization(std::ostream& o,
                                  const std::string& var_name,
                                  const std::string& base_type,
                                  const std::vector<expression>& dims,
                                  const expression& type_arg1 = expression(),
                                  const expression& type_arg2 = expression()) {
-      // validate all dims are positive
+      // check array dimensions
       for (size_t i = 0; i < dims.size(); ++i)
-        generate_validate_positive(var_name, dims[i], o);
+        generate_validate_positive(var_name, dims[i], 2, o);
+      // check vector, row_vector, and matrix rows
       if (!is_nil(type_arg1))
-        generate_validate_positive(var_name, type_arg1, o);
+        generate_validate_positive(var_name, type_arg1, 2, o);
+      // check matrix cols
       if (!is_nil(type_arg2))
-        generate_validate_positive(var_name, type_arg2, o);
+        generate_validate_positive(var_name, type_arg2, 2, o);
 
       // initialize variable
       o << INDENT2
@@ -1481,7 +1504,9 @@ namespace stan {
         boost::apply_visitor(vis, vs[i].decl_);
     }
 
-    // see member_var_decl_visgen cut & paste
+    /*
+     * generates local data variable declaration
+     */
     struct local_var_decl_visgen : public visgen {
       int indents_;
       bool is_var_context_;
@@ -1509,6 +1534,7 @@ namespace stan {
       }
       void operator()(const vector_var_decl& x) const {
         std::vector<expression> ctor_args;
+        generate_validate_positive(x.name_, x.M_, indents_, o_);
         ctor_args.push_back(x.M_);
         declare_array(is_fun_return_
                       ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
@@ -1518,6 +1544,7 @@ namespace stan {
       }
       void operator()(const row_vector_var_decl& x) const {
         std::vector<expression> ctor_args;
+        generate_validate_positive(x.name_, x.N_, indents_, o_);
         ctor_args.push_back(x.N_);
         declare_array(is_fun_return_
                       ? "Eigen::Matrix<fun_scalar_t__,1,Eigen::Dynamic> "
@@ -1528,6 +1555,8 @@ namespace stan {
       }
       void operator()(const matrix_var_decl& x) const {
         std::vector<expression> ctor_args;
+        generate_validate_positive(x.name_, x.M_, indents_, o_);
+        generate_validate_positive(x.name_, x.N_, indents_, o_);
         ctor_args.push_back(x.M_);
         ctor_args.push_back(x.N_);
         declare_array(is_fun_return_
@@ -1540,6 +1569,7 @@ namespace stan {
       }
       void operator()(const unit_vector_var_decl& x) const {
         std::vector<expression> ctor_args;
+        generate_validate_positive(x.name_, x.K_, indents_, o_);
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
                       ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
@@ -1549,6 +1579,7 @@ namespace stan {
       }
       void operator()(const simplex_var_decl& x) const {
         std::vector<expression> ctor_args;
+        generate_validate_positive(x.name_, x.K_, indents_, o_);
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
                       ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
@@ -1558,6 +1589,7 @@ namespace stan {
       }
       void operator()(const ordered_var_decl& x) const {
         std::vector<expression> ctor_args;
+        generate_validate_positive(x.name_, x.K_, indents_, o_);
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
                       ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
@@ -1567,6 +1599,7 @@ namespace stan {
       }
       void operator()(const positive_ordered_var_decl& x) const {
         std::vector<expression> ctor_args;
+        generate_validate_positive(x.name_, x.K_, indents_, o_);
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
                       ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
@@ -1576,6 +1609,8 @@ namespace stan {
       }
       void operator()(const cholesky_factor_var_decl& x) const {
         std::vector<expression> ctor_args;
+        generate_validate_positive(x.name_, x.M_, indents_, o_);
+        generate_validate_positive(x.name_, x.N_, indents_, o_);
         ctor_args.push_back(x.M_);
         ctor_args.push_back(x.N_);
         declare_array(is_fun_return_
@@ -1588,6 +1623,7 @@ namespace stan {
       }
       void operator()(const cholesky_corr_var_decl& x) const {
         std::vector<expression> ctor_args;
+        generate_validate_positive(x.name_, x.K_, indents_, o_);
         ctor_args.push_back(x.K_);
         ctor_args.push_back(x.K_);
         declare_array(is_var_context_
@@ -1597,6 +1633,7 @@ namespace stan {
       }
       void operator()(const cov_matrix_var_decl& x) const {
         std::vector<expression> ctor_args;
+        generate_validate_positive(x.name_, x.K_, indents_, o_);
         ctor_args.push_back(x.K_);
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
@@ -1609,6 +1646,7 @@ namespace stan {
       }
       void operator()(const corr_matrix_var_decl& x) const {
         std::vector<expression> ctor_args;
+        generate_validate_positive(x.name_, x.K_, indents_, o_);
         ctor_args.push_back(x.K_);
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
@@ -1629,14 +1667,9 @@ namespace stan {
           o_ << ">";
         }
       }
-
       void generate_void_statement(const std::string& name) const {
         o_ << "(void) " << name << ";  // dummy to suppress unused var warning";
       }
-
-      // var_decl     -> type[0] name init_args[0] ;
-      // init_args[k] -> ctor_args  if no dims left
-      // init_args[k] -> ( dim[k] , ( type[k+1] init_args[k+1] ) )
       void generate_init_args(const std::string& type,
                               const std::vector<expression>& ctor_args,
                               const std::vector<expression>& dims,
@@ -1688,6 +1721,9 @@ namespace stan {
                          const std::string& name,
                          const std::vector<expression>& dims,
                          const expression& definition = expression()) const {
+        // check array dimensions
+        for (size_t i = 0; i < dims.size(); ++i)
+          generate_validate_positive(name, dims[i], indents_, o_);
         // require double parens to counter "most vexing parse" problem
         generate_indent(indents_, o_);
         generate_type(type, dims.size());
@@ -2554,8 +2590,8 @@ namespace stan {
       // extra outer loop around double_var_decl
       void operator()(const vector_var_decl& x) const {
         std::vector<expression> dims = x.dims_;
-        var_resizer_(x);
         var_size_validator_(x);
+        var_resizer_(x);
         o_ << INDENT2
            << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
         o_ << INDENT2 << "pos__ = 0;" << EOL;
@@ -3037,6 +3073,9 @@ namespace stan {
       }
       void operator()(const nil& /*x*/) const { }
       void operator()(const int_var_decl& x) const {
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
+          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+        }
         generate_increment_i(x.dims_);
         // for loop for ranges
         for (size_t i = 0; i < x.dims_.size(); ++i) {
@@ -3060,18 +3099,38 @@ namespace stan {
         }
       }
       void operator()(const double_var_decl& x) const {
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
+          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+        }
         generate_increment(x.dims_);
       }
       void operator()(const vector_var_decl& x) const {
+        generate_validate_positive(x.name_, x.M_, 2, o_);
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
+          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+        }
         generate_increment(x.M_, x.dims_);
       }
       void operator()(const row_vector_var_decl& x) const {
+        generate_validate_positive(x.name_, x.N_, 2, o_);
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
+          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+        }
         generate_increment(x.N_, x.dims_);
       }
       void operator()(const matrix_var_decl& x) const {
+        generate_validate_positive(x.name_, x.M_, 2, o_);
+        generate_validate_positive(x.name_, x.N_, 2, o_);
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
+          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+        }
         generate_increment(x.M_, x.N_, x.dims_);
       }
       void operator()(const unit_vector_var_decl& x) const {
+        generate_validate_positive(x.name_, x.K_, 2, o_);
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
+          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+        }
         o_ << INDENT2 << "num_params_r__ += (";
         generate_expression(x.K_, o_);
         o_ << ")";
@@ -3083,6 +3142,10 @@ namespace stan {
       }
       void operator()(const simplex_var_decl& x) const {
         // only K-1 vals
+        generate_validate_positive(x.name_, x.K_, 2, o_);
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
+          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+        }
         o_ << INDENT2 << "num_params_r__ += (";
         generate_expression(x.K_, o_);
         o_ << " - 1)";
@@ -3093,12 +3156,25 @@ namespace stan {
         o_ << ";" << EOL;
       }
       void operator()(const ordered_var_decl& x) const {
+        generate_validate_positive(x.name_, x.K_, 2, o_);
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
+          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+        }
         generate_increment(x.K_, x.dims_);
       }
       void operator()(const positive_ordered_var_decl& x) const {
+        generate_validate_positive(x.name_, x.K_, 2, o_);
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
+          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+        }
         generate_increment(x.K_, x.dims_);
       }
       void operator()(const cholesky_factor_var_decl& x) const {
+        generate_validate_positive(x.name_, x.M_, 2, o_);
+        generate_validate_positive(x.name_, x.N_, 2, o_);
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
+          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+        }
         o_ << INDENT2 << "num_params_r__ += ((";
         // N * (N + 1) / 2  +  (M - N) * M
         generate_expression(x.N_, o_);
@@ -3118,6 +3194,10 @@ namespace stan {
         o_ << ";" << EOL;
       }
       void operator()(const cholesky_corr_var_decl& x) const {
+        generate_validate_positive(x.name_, x.K_, 2, o_);
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
+          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+        }
         // FIXME: cut and paste ofcorr_matrix_var_decl
         o_ << INDENT2 << "num_params_r__ += ((";
         generate_expression(x.K_, o_);
@@ -3131,6 +3211,10 @@ namespace stan {
         o_ << ";" << EOL;
       }
       void operator()(const cov_matrix_var_decl& x) const {
+        generate_validate_positive(x.name_, x.K_, 2, o_);
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
+          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+        }
         // (K * (K - 1))/2 + K  ?? define fun(K) = ??
         o_ << INDENT2 << "num_params_r__ += ((";
         generate_expression(x.K_, o_);
@@ -3146,6 +3230,10 @@ namespace stan {
         o_ << ";" << EOL;
       }
       void operator()(const corr_matrix_var_decl& x) const {
+        generate_validate_positive(x.name_, x.K_, 2, o_);
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
+          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+        }
         o_ << INDENT2 << "num_params_r__ += ((";
         generate_expression(x.K_, o_);
         o_ << " * (";
@@ -3206,6 +3294,12 @@ namespace stan {
       }
     };
 
+    /*
+     * Generate statements in ctor_body which cumulatively determine
+     * the size required for the vector of param ranges and the
+     * range for each parameter in the model by iterating over the
+     * list of parameter variable declarations
+     */
     void generate_set_param_ranges(const std::vector<var_decl>& var_decls,
                                    std::ostream& o) {
       o << INDENT2 << "num_params_r__ = 0U;" << EOL;
@@ -3281,7 +3375,7 @@ namespace stan {
       generate_validate_var_decls(prog.derived_data_decl_.first, 2, o);
 
       o << EOL;
-      generate_comment("set parameter ranges", 2, o);
+      generate_comment("validate, set parameter ranges", 2, o);
       generate_set_param_ranges(prog.parameter_decl_, o);
       // o << EOL << INDENT2 << "set_param_ranges();" << EOL;
 
