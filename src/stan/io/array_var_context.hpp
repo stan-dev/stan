@@ -13,14 +13,12 @@ namespace stan {
 
   namespace io {
 
-    namespace {
-      template<typename T>
-      T product(std::vector<T> dims) {
-         T y = 1;
-         for (size_t i = 0; i < dims.size(); ++i)
-           y *= dims[i];
-         return y;
-       }
+    template<typename T>
+    T product(std::vector<T> dims) {
+      T y = 1;
+      for (size_t i = 0; i < dims.size(); ++i)
+        y *= dims[i];
+      return y;
     }
 
     /**

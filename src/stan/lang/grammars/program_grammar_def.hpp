@@ -15,13 +15,11 @@
 #include <utility>
 #include <vector>
 
-namespace {
-  // hack to pass pair into macro below to adapt; in namespace to hide
-  struct DUMMY_STRUCT {
-    typedef std::pair<std::vector<stan::lang::var_decl>,
-                      std::vector<stan::lang::statement> > type;
-  };
-}
+// hack to pass pair into macro below to adapt; in namespace to hide
+struct DUMMY_STRUCT {
+  typedef std::pair<std::vector<stan::lang::var_decl>,
+                    std::vector<stan::lang::statement> > type;
+};
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::program,
                           (std::vector<stan::lang::function_decl_def>,
