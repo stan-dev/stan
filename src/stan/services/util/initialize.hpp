@@ -174,7 +174,7 @@ namespace stan {
                            " reducing ranges of constrained values,"
                            " or reparameterizing the model.");
           }
-          throw std::domain_error("");
+          throw std::domain_error("Initialization failed.");
         }
 
         init_writer(unconstrained);
