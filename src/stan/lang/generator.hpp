@@ -1,6 +1,32 @@
 #ifndef STAN_LANG_GENERATOR_HPP
 #define STAN_LANG_GENERATOR_HPP
 
+
+// FIXME(carpenter): move into AST
+#include <stan/lang/generator/has_lb.hpp>
+#include <stan/lang/generator/has_lub.hpp>
+#include <stan/lang/generator/has_ub.hpp>
+
+// FIXME(carpenter): move into general utilities
+#include <stan/lang/generator/to_string.hpp>
+
+#include <stan/lang/generator/expression_visgen.hpp>
+#include <stan/lang/generator/visgen.hpp>
+
+#include <stan/lang/generator/constants.hpp>
+#include <stan/lang/generator/generate_array_var_type.hpp>
+#include <stan/lang/generator/generate_comment.hpp>
+#include <stan/lang/generator/generate_indent.hpp>
+#include <stan/lang/generator/generate_end_namespace.hpp>
+#include <stan/lang/generator/generate_indexed_expr.hpp>
+#include <stan/lang/generator/generate_indexed_expr_user.hpp>
+#include <stan/lang/generator/generate_quoted_string.hpp>
+#include <stan/lang/generator/generate_real_var_type.hpp>
+#include <stan/lang/generator/generate_start_namespace.hpp>
+#include <stan/lang/generator/generate_type.hpp>
+#include <stan/lang/generator/generate_void_statement.hpp>
+
+
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -19,481 +45,24 @@ namespace stan {
 
   namespace lang {
 
-    void generate_expression(const expression& e,
+    void generate_expression(const expression& e, std::ostream& o);
+    void generate_expression(const expression& e, bool user_facing,
                              std::ostream& o);
-    void generate_expression(const expression& e,
-                             bool user_facing,
-                             std::ostream& o);
-    void generate_expression(const expression& e,
-                             bool user_facing,
-                             bool is_var_context,
-                             std::ostream& o);
+    void generate_expression(const expression& e, bool user_facing,
+                             bool is_var_context, std::ostream& o);
     void generate_bare_type(const expr_type& t,
                             const std::string& scalar_t_name,
                             std::ostream& out);
-    void generate_statement(const statement& s,
-                            int indent,
-                            std::ostream& o,
-                            bool include_sampling,
-                            bool is_var_context,
+    void generate_statement(const statement& s, int indent, std::ostream& o,
+                            bool include_sampling, bool is_var_context,
                             bool is_fun_return);
-    void generate_statement(const std::vector<statement>& ss,
-                            int indent,
-                            std::ostream& o,
-                            bool include_sampling,
-                            bool is_var_context,
-                            bool is_fun_return);
+    void generate_statement(const std::vector<statement>& ss, int indent,
+                            std::ostream& o, bool include_sampling,
+                            bool is_var_context, bool is_fun_return);
+    void generate_idxs(const std::vector<idx>& idxs, std::ostream& o);
+    void generate_idxs_user(const std::vector<idx>& idxs, std::ostream& o);
 
-    const std::string EOL("\n");
-    const std::string EOL2("\n\n");
-    const std::string INDENT("    ");
-    const std::string INDENT2("        ");
-    const std::string INDENT3("            ");
 
-    template <typename D>
-    bool has_lub(const D& x) {
-      return !is_nil(x.range_.low_.expr_) && !is_nil(x.range_.high_.expr_);
-    }
-    template <typename D>
-    bool has_ub(const D& x) {
-      return is_nil(x.range_.low_.expr_) && !is_nil(x.range_.high_.expr_);
-    }
-    template <typename D>
-    bool has_lb(const D& x) {
-      return !is_nil(x.range_.low_.expr_) && is_nil(x.range_.high_.expr_);
-    }
-
-    template <typename T>
-    std::string to_string(T i) {
-      std::stringstream ss;
-      ss << i;
-      return ss.str();
-    }
-
-    void generate_indent(size_t indent, std::ostream& o) {
-      for (size_t k = 0; k < indent; ++k)
-        o << INDENT;
-    }
-
-    void generate_void_statement(const std::string& name,
-                                 const size_t indent,
-                                 std::ostream& o)  {
-      generate_indent(indent, o);
-      o << "(void) " << name << ";  // dummy to suppress unused var warning";
-      o << EOL;
-    }
-
-    /** generic visitor with output for extension */
-    struct visgen {
-      typedef void result_type;
-      std::ostream& o_;
-      explicit visgen(std::ostream& o) : o_(o) { }
-    };
-
-    void generate_start_namespace(std::string name,
-                                  std::ostream& o) {
-      o << "namespace " << name << "_namespace {" << EOL2;
-    }
-
-    void generate_end_namespace(std::ostream& o) {
-      o << "} // namespace" << EOL2;
-    }
-
-    void generate_comment(const std::string& msg, int indent,
-                          std::ostream& o) {
-      generate_indent(indent, o);
-      o << "// " << msg        << EOL;
-    }
-
-    /**
-     * Print a the specified string to the specified output stream,
-     * wrapping in double quotes (") and replacing all double quotes
-     * in the input with apostrophes (').  For example, if the input
-     * string is <tt>ab"cde"fg</tt> then the string
-     * <tt>"ab'cde'fg"</tt> is streamed to the output stream.
-     *
-     * @param s String to output
-     * @param o Output stream
-     */
-    void generate_quoted_string(const std::string& s,
-                                std::ostream& o) {
-      o << '"';
-      for (size_t i = 0; i < s.size(); ++i) {
-        o << ((s[i] == '"') ? '\'' : s[i]);
-      }
-      o << '"';
-    }
-
-    void generate_indexed_expr_user(const std::string& expr,
-                                    const std::vector<expression> indexes,
-                                    base_expr_type base_type,
-                                    std::ostream& o) {
-      static const bool user_facing = true;
-      o << expr;
-      if (indexes.size() == 0) return;
-      o << '[';
-      for (size_t i = 0; i < indexes.size(); ++i) {
-        if (i > 0) o << ", ";
-        generate_expression(indexes[i], user_facing, o);
-      }
-      o << ']';
-    }
-
-    template <bool isLHS>
-    void generate_indexed_expr(const std::string& expr,
-                               const std::vector<expression> indexes,
-                               base_expr_type base_type,  // may have more dims
-                               size_t e_num_dims,  // array dims
-                               bool user_facing,
-                               std::ostream& o) {
-      if (user_facing) {
-        generate_indexed_expr_user(expr, indexes, base_type, o);
-        return;
-      }
-      size_t ai_size = indexes.size();
-      if (ai_size == 0) {
-        // no indexes
-        o << expr;
-        return;
-      }
-      if (ai_size <= (e_num_dims + 1) || base_type != MATRIX_T) {
-        for (size_t n = 0; n < ai_size; ++n)
-          o << (isLHS ? "get_base1_lhs(" : "get_base1(");
-        o << expr;
-        for (size_t n = 0; n < ai_size; ++n) {
-          o << ',';
-          generate_expression(indexes[n], user_facing, o);
-          o << ',';
-          generate_quoted_string(expr, o);
-          o << ',' << (n+1) << ')';
-        }
-      } else {
-        for (size_t n = 0; n < ai_size - 1; ++n)
-          o << (isLHS ? "get_base1_lhs(" : "get_base1(");
-        o << expr;
-        for (size_t n = 0; n < ai_size - 2; ++n) {
-          o << ',';
-          generate_expression(indexes[n], user_facing, o);
-          o << ',';
-          generate_quoted_string(expr, o);
-          o << ',' << (n+1) << ')';
-        }
-        o << ',';
-        generate_expression(indexes[ai_size - 2U], user_facing, o);
-        o << ',';
-        generate_expression(indexes[ai_size - 1U], user_facing, o);
-        o << ',';
-        generate_quoted_string(expr, o);
-        o << ',' << (ai_size-1U) << ')';
-      }
-    }
-
-    // this generates base type for multi-dim expr
-    void generate_type(const std::string& base_type,
-                       const std::vector<expression>& /*dims*/,
-                       size_t end,
-                       std::ostream& o) {
-      for (size_t i = 0; i < end; ++i) o << "std::vector<";
-      o << base_type;
-      for (size_t i = 0; i < end; ++i) {
-        if (i > 0) o << ' ';
-        o << '>';
-      }
-    }
-
-    /**
-     * Generate correct C++ type for expressions which contain a 
-     * Stan <code>real</code> variable according to context in
-     * which expression is used and expression contents.
-     *
-     * @param vo expression origin block
-     * @param has_var  does expression contains a variable?
-     * @param is_var_context true when in auto-diff context
-     * @param o generated typename
-     */
-    void generate_real_var_type(const var_origin& vo,
-                                bool has_var,
-                                bool is_var_context,
-                                std::ostream& o) {
-      if (is_fun_origin(vo)) {
-        o << "fun_scalar_t__";
-      } else if (is_var_context && has_var) {
-        o << "T__";
-      } else {
-        o << "double";
-      }
-    }
-
-    /**
-     * Generate correct C++ type for array expressions
-     * according to context in which expression is used.
-     * Generated typename may be embedded in angle brackets,
-     * add trailing space accordingly.
-     *
-     * @param base_type expression base type
-     * @param real_var_type context-dependent <code>real</code> type
-     * @param is_var_context true when in auto-diff context
-     * @param o generated typename
-     */
-    void generate_array_var_type(const base_expr_type base_type,
-                                 const std::string& real_var_type,
-                                 bool is_var_context,
-                                 std::ostream& o) {
-      switch (base_type) {
-      case INT_T :
-        o << "int";
-        break;
-      case DOUBLE_T :
-        o << real_var_type;
-        break;
-      case VECTOR_T :
-        o << (is_var_context ?
-              "Eigen::Matrix<T__,Eigen::Dynamic,1> " :"vector_d");
-        break;
-      case ROW_VECTOR_T :
-        o << (is_var_context ?
-              "Eigen::Matrix<T__,1,Eigen::Dynamic> " : "row_vector_d");
-        break;
-      case MATRIX_T :
-        o << (is_var_context ?
-              "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> " : "matrix_d");
-        break;
-      }
-    }
-
-    void generate_idxs(const std::vector<idx>& idxs,
-                       std::ostream& o);
-    void generate_idxs_user(const std::vector<idx>& idxs,
-                            std::ostream& o);
-
-    struct expression_visgen : public visgen {
-      const bool user_facing_;
-      const bool is_var_context_;
-      explicit expression_visgen(std::ostream& o, bool user_facing,
-                                 bool is_var_context)
-        : visgen(o),
-          user_facing_(user_facing),
-          is_var_context_(is_var_context) {
-      }
-      void operator()(const nil& /*x*/) const {
-        o_ << "nil";
-      }
-      void operator()(const int_literal& n) const { o_ << n.val_; }
-      void operator()(const double_literal& x) const {
-        std::string num_str = boost::lexical_cast<std::string>(x.val_);
-        o_ << num_str;
-        if (num_str.find_first_of("eE.") == std::string::npos)
-          o_ << ".0";  // trailing 0 to ensure C++ makes it a double
-      }
-      void operator()(const array_expr& x) const {
-        std::stringstream ssRealType;
-        generate_real_var_type(x.var_origin_, x.has_var_, is_var_context_,
-                               ssRealType);
-        std::stringstream ssArrayType;
-        generate_array_var_type(x.type_.base_type_, ssRealType.str(),
-                                is_var_context_, ssArrayType);
-        o_ << "static_cast<";
-        generate_type(ssArrayType.str(),
-                      x.args_,
-                      x.type_.num_dims_,
-                      o_);
-        o_ << " >(";
-        o_ << "stan::math::array_builder<";
-        generate_type(ssArrayType.str(),
-                      x.args_,
-                      x.type_.num_dims_ - 1,
-                      o_);
-        o_ << " >()";
-        for (size_t i = 0; i < x.args_.size(); ++i) {
-          o_ << ".add(";
-          generate_expression(x.args_[i], user_facing_, is_var_context_, o_);
-          o_ << ")";
-        }
-        o_ << ".array()";
-        o_ << ")";
-      }
-      void operator()(const variable& v) const { o_ << v.name_; }
-      void operator()(int n) const {   // NOLINT
-        o_ << static_cast<long>(n);    // NOLINT
-      }
-      void operator()(double x) const { o_ << x; }
-      void operator()(const std::string& x) const { o_ << x; }  // identifiers
-      void operator()(const index_op& x) const {
-        std::stringstream expr_o;
-        generate_expression(x.expr_, expr_o);
-        std::string expr_string = expr_o.str();
-        std::vector<expression> indexes;
-        size_t e_num_dims = x.expr_.expression_type().num_dims_;
-        base_expr_type base_type = x.expr_.expression_type().base_type_;
-        for (size_t i = 0; i < x.dimss_.size(); ++i)
-          for (size_t j = 0; j < x.dimss_[i].size(); ++j)
-            indexes.push_back(x.dimss_[i][j]);  // wasteful copy, could use refs
-        generate_indexed_expr<false>(expr_string, indexes, base_type,
-                                     e_num_dims, user_facing_, o_);
-      }
-      void operator()(const index_op_sliced& x) const {
-        if (x.idxs_.size() == 0) {
-          generate_expression(x.expr_, user_facing_, o_);
-          return;
-        }
-        if (user_facing_) {
-          generate_expression(x.expr_, user_facing_, o_);
-          generate_idxs_user(x.idxs_, o_);
-          return;
-        }
-        o_ << "stan::model::rvalue(";
-        generate_expression(x.expr_, o_);
-        o_ << ", ";
-        generate_idxs(x.idxs_, o_);
-        o_ << ", ";
-        o_ << '"';
-        bool user_facing = true;
-        generate_expression(x.expr_, user_facing, o_);
-        o_ << '"';
-        o_ << ")";
-      }
-      void operator()(const integrate_ode& fx) const {
-        o_ << (fx.integration_function_name_ == "integrate_ode"
-               ? "integrate_ode_rk45"
-               : fx.integration_function_name_)
-           << '('
-           << fx.system_function_name_
-           << "_functor__(), ";
-
-        generate_expression(fx.y0_, o_);
-        o_ << ", ";
-
-        generate_expression(fx.t0_, o_);
-        o_ << ", ";
-
-        generate_expression(fx.ts_, o_);
-        o_ << ", ";
-
-        generate_expression(fx.theta_, o_);
-        o_ << ", ";
-
-        generate_expression(fx.x_, o_);
-        o_ << ", ";
-
-        generate_expression(fx.x_int_, o_);
-        o_ << ", pstream__)";
-      }
-      void operator()(const integrate_ode_control& fx) const {
-        o_ << fx.integration_function_name_
-           << '('
-           << fx.system_function_name_
-           << "_functor__(), ";
-
-        generate_expression(fx.y0_, o_);
-        o_ << ", ";
-
-        generate_expression(fx.t0_, o_);
-        o_ << ", ";
-
-        generate_expression(fx.ts_, o_);
-        o_ << ", ";
-
-        generate_expression(fx.theta_, o_);
-        o_ << ", ";
-
-        generate_expression(fx.x_, o_);
-        o_ << ", ";
-
-        generate_expression(fx.x_int_, o_);
-        o_ << ", pstream__, ";
-
-        generate_expression(fx.rel_tol_, o_);
-        o_ << ", ";
-
-        generate_expression(fx.abs_tol_, o_);
-        o_ << ", ";
-
-        generate_expression(fx.max_num_steps_, o_);
-        o_ << ")";
-      }
-      void operator()(const fun& fx) const {
-        // first test if short-circuit op (binary && and || applied to
-        // primitives; overloads are eager, not short-circuiting)
-        if (fx.name_ == "logical_or" || fx.name_ == "logical_and") {
-          o_ << "(primitive_value(";
-          boost::apply_visitor(*this, fx.args_[0].expr_);
-          o_ << ") " << ((fx.name_ == "logical_or") ? "||" : "&&")
-             << " primitive_value(";
-          boost::apply_visitor(*this, fx.args_[1].expr_);
-          o_ << "))";
-          return;
-        }
-        o_ << fx.name_ << '(';
-        for (size_t i = 0; i < fx.args_.size(); ++i) {
-          if (i > 0) o_ << ',';
-          boost::apply_visitor(*this, fx.args_[i].expr_);
-        }
-        if (fx.args_.size() > 0
-            && (has_rng_suffix(fx.name_) || has_lp_suffix(fx.name_)))
-          o_ << ", ";
-        if (has_rng_suffix(fx.name_))
-          o_ << "base_rng__";
-        if (has_lp_suffix(fx.name_))
-          o_ << "lp__, lp_accum__";
-        if (is_user_defined(fx)) {
-          if (fx.args_.size() > 0
-              || has_rng_suffix(fx.name_)
-              || has_lp_suffix(fx.name_))
-            o_ << ", ";
-          o_ << "pstream__";
-        }
-        o_ << ')';
-      }
-
-      void operator()(const conditional_op& expr) const {
-        bool types_prim_match
-          = (expr.type_.is_primitive() && expr.type_.base_type_ == INT_T)
-          || (!expr.has_var_ && expr.type_.is_primitive()
-              && (expr.true_val_.expression_type()
-                  == expr.false_val_.expression_type()));
-
-        std::stringstream ss;
-        generate_real_var_type(expr.var_origin_, expr.has_var_,
-                               is_var_context_, ss);
-
-        o_ << "(";
-        boost::apply_visitor(*this, expr.cond_.expr_);
-        o_ << " ? ";
-        if (types_prim_match) {
-          boost::apply_visitor(*this, expr.true_val_.expr_);
-        } else {
-          o_ << "stan::math::promote_scalar<"
-             << ss.str()
-             << ">(";
-          boost::apply_visitor(*this, expr.true_val_.expr_);
-          o_ << ")";
-        }
-        o_ << " : ";
-        if (types_prim_match) {
-          boost::apply_visitor(*this, expr.false_val_.expr_);
-        } else {
-          o_ << "stan::math::promote_scalar<"
-             << ss.str()
-             << ">(";
-          boost::apply_visitor(*this, expr.false_val_.expr_);
-          o_ << ")";
-        }
-        o_ << " )";
-      }
-
-      void operator()(const binary_op& expr) const {
-        o_ << '(';
-        boost::apply_visitor(*this, expr.left.expr_);
-        o_ << ' ' << expr.op << ' ';
-        boost::apply_visitor(*this, expr.right.expr_);
-        o_ << ')';
-      }
-      void operator()(const unary_op& expr) const {
-        o_ << expr.op << '(';
-        boost::apply_visitor(*this, expr.subject.expr_);
-        o_ << ')';
-      }
-    };     // close struct expression_visgen
 
     void generate_expression(const expression& e,
                              bool user_facing,
@@ -653,17 +222,17 @@ namespace stan {
     /**
      * Generate call to stan_math lib function validate_non_negative_index
      * which will throw an informative error if dim size is < 0
-     * 
+     *
      * This check should precede the variable declaration in order to
      * avoid bad alloc runtime error.
-     * Called by 
+     * Called by
      *   generate_validate_context_size - data variables
      *   generate_initialization - transformed data declarations
      *   generate_var_resiszing - initializes transformed data variables
      *   generate_local_var_decls - local variables, transformed parameters
      *                              write array, generated quantities
      *   generate_set_param_ranges - parameter variables
-     *   
+     *
      * @param var_name variable name
      * @param expr declared dim size expression
      * @param indents indentation level
