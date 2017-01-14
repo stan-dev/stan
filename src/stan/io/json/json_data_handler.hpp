@@ -20,19 +20,17 @@ namespace stan {
 
   namespace json {
 
-    namespace {
-      typedef
-      std::map<std::string,
-               std::pair<std::vector<double>,
-                         std::vector<size_t> > >
-      vars_map_r;
+    typedef
+    std::map<std::string,
+             std::pair<std::vector<double>,
+                       std::vector<size_t> > >
+    vars_map_r;
 
-      typedef
-      std::map<std::string,
-               std::pair<std::vector<int>,
-                         std::vector<size_t> > >
-      vars_map_i;
-    }
+    typedef
+    std::map<std::string,
+             std::pair<std::vector<int>,
+                       std::vector<size_t> > >
+    vars_map_i;
 
     /**
      * A <code>json_data_handler</code> is an implementation of a
