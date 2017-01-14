@@ -20,11 +20,6 @@ namespace stan {
      */
     struct local_var_decl_visgen : public visgen {
       /**
-       * Indentation level.
-       */
-      int indent_;
-
-      /**
        * true if generation is in a variable context.
        */
       bool is_var_context_;
@@ -49,7 +44,7 @@ namespace stan {
        */
       local_var_decl_visgen(int indent, bool is_var_context,
                             bool is_fun_return, std::ostream& o)
-        : visgen(o), indent_(indent), is_var_context_(is_var_context),
+        : visgen(indent, o), is_var_context_(is_var_context),
           is_fun_return_(is_fun_return) {  }
 
       /**
@@ -76,7 +71,7 @@ namespace stan {
        *
        * @param[in] type basic type (int, var, or double)
        * @param[in] ctor_args arguments for basic type constructor
-       * @param[in] dimension sizes
+       * @param[in] dims dimension sizes
        * @param[in] dim number of dimensions
        */
       void generate_init_args(const std::string& type,

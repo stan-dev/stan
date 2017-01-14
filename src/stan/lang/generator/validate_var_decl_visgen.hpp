@@ -16,11 +16,6 @@ namespace stan {
 
     struct validate_var_decl_visgen : public visgen {
       /**
-       * The indentation level for the generation.
-       */
-      int indent_;
-
-      /**
        * Construct a variable declaration validating visitor with the
        * specified indentation level writing to the specified stream.
        *
@@ -28,7 +23,7 @@ namespace stan {
        * @param[in,out] o stream for generating
        */
       validate_var_decl_visgen(int indent, std::ostream& o)
-        : visgen(o), indent_(indent) {  }
+        : visgen(indent, o) {  }
 
       /**
        * Generate the openings of a sequence of zero or more for loops
@@ -113,6 +108,7 @@ namespace stan {
        *
        * @tparam T declaration type
        * @param[in] x declaration
+       * @param[in] type_name name of type to check
        */
       template <typename T>
       void nonbasic_validate(const T& x,

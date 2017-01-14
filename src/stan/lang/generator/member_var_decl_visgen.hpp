@@ -14,11 +14,6 @@ namespace stan {
      */
     struct member_var_decl_visgen : public visgen {
       /**
-       * Indentation level for generating.
-       */
-      int indent_;
-
-      /**
        * Construct a member variable declaration visitor at the
        * specified indentation level writing to the specified stream.
        *
@@ -26,7 +21,7 @@ namespace stan {
        * @param[in,out] o stream for generating
        */
       member_var_decl_visgen(int indent, std::ostream& o)
-        : visgen(o), indent_(indent) {  }
+        : visgen(indent, o) { }
 
       /**
        * Generate the array declaration for the specified generated

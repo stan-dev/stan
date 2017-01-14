@@ -15,26 +15,20 @@ namespace stan {
      */
     struct init_vars_visgen : public visgen {
       /**
-       * Indentation level.
-       */
-      int indent_;
-
-      /**
        * Construct a variable initialization visitor for generation
        * with the specified indentation level and stream.
        *
-       * @param indent indentation level
-       * @param o stream for generating
+       * @param[in] indent indentation level
+       * @param[in,out] o stream for generating
        */
-      init_vars_visgen(int indent, std::ostream& o)
-        : visgen(o), indent_(indent) {  }
+      init_vars_visgen(int indent, std::ostream& o) : visgen(indent, o) { }
 
       /**
        * Generate code to fill the specified container with dummy
        * variable values.
        *
        * @tparam T type of variable declaration
-       * @param x variable declaration
+       * @param[in] x variable declaration
        */
       template <typename T>
       void fill_real(const T& x) const {

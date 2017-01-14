@@ -19,11 +19,6 @@ namespace stan {
      */
     struct validate_transformed_params_visgen : public visgen {
       /**
-       * Indentation level.
-       */
-      int indent_;
-
-      /**
        * Construct a visitor for validating transformed parameters
        * with the specified indentation level and writing to the
        * specified stream.
@@ -32,7 +27,7 @@ namespace stan {
        * @param[in,out] o stream for generating
        */
       validate_transformed_params_visgen(int indent, std::ostream& o)
-        : visgen(o), indent_(indent) { }
+        : visgen(indent, o) { }
 
       /**
        * Generate code to validate the array component of the variable

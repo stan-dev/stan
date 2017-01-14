@@ -20,8 +20,9 @@ namespace stan {
      * with the specified name, type, dimension sizes, and optional
      * matrix/vector size declarations.
      *
-     * @param[in,out] stream for generating
+     * @param[in,out] o stream for generating
      * @param[in] var_name name of variable being initialized
+     * @param[in] base_type base type of variable
      * @param[in] dims dimension sizes
      * @param[in] type_arg1 optional vector/row-vector size or matrix
      * rows

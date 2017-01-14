@@ -20,11 +20,6 @@ namespace stan {
       const bool is_var_context_;
 
       /**
-       * Indentation depth.
-       */
-      const int indent_;
-
-      /**
        * Construct a local variable initializer in the specified
        * context at the specified indentation level and writing to the
        * specified stream.
@@ -32,11 +27,11 @@ namespace stan {
        * @param[in] is_var_context true if generation is in variable
        * context
        * @param[in] indent indentation level
-       * @param[in,out] stream for generating
+       * @param[in,out] o stream for generating
        */
       local_var_init_nan_visgen(bool is_var_context, int indent,
                                 std::ostream& o)
-        : visgen(o), is_var_context_(is_var_context), indent_(indent) {  }
+        : visgen(indent, o), is_var_context_(is_var_context) { }
 
       /**
        * Initialize the variable or its contained elements to

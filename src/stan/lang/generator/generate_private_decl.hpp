@@ -12,7 +12,7 @@ namespace stan {
      * Generate the private declaration scope for a class to the
      * specified stream.
      *
-     * @param[in,out] stream for generating
+     * @param[in,out] o stream for generating
      */
     void generate_private_decl(std::ostream& o) {
       o << "private:" << EOL;

@@ -14,7 +14,7 @@ namespace stan {
      * specified stream.
      *
      * @param[in] type type for which using statement is geneated
-     * @param[in,out] stream for generation
+     * @param[in,out] o stream for generation
      */
     void generate_using(const std::string& type, std::ostream& o) {
       o << "using " << type << ";" << EOL;

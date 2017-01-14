@@ -36,7 +36,7 @@ namespace stan {
        * stream.
        *
        * @param[in] declare_vars true if variables need to be declared
-       * @param[in] is_var_context_ true if generation is in a
+       * @param[in] is_var_context true if generation is in a
        * variable context
        * @param[in,out] o stream for generating
        */

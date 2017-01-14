@@ -15,7 +15,7 @@ namespace stan {
      * terminate with a nil index properly.
      *
      * @param[in] pos position in list to generate next
-     * @param[in] i multiple indexes to generate
+     * @param[in] idxs multiple indexes to generate
      * @param[in,out] o stream for generating
      */
     void generate_idxs(size_t pos, const std::vector<idx>& idxs,
@@ -34,7 +34,7 @@ namespace stan {
     /**
      * Generate the specified multiple indexes on the specified stream.
      *
-     * @param[in] i multiple indexes to generate
+     * @param[in] idxs multiple indexes to generate
      * @param[in,out] o stream for generating
      */
     void generate_idxs(const std::vector<idx>& idxs, std::ostream& o) {

@@ -2,6 +2,7 @@
 #define STAN_LANG_GENERATOR_VISGEN_HPP
 
 #include <stan/lang/ast.hpp>
+#include <ostream>
 
 namespace stan {
   namespace lang {
@@ -18,17 +19,34 @@ namespace stan {
 
       /**
        * Construct a varint type visitor for generation to the
-       * specified output stream.  The specified output stream must
-       * remain in scope as long as this object is created.
+       * specified output stream, with indentation level zero.  The
+       * specified output stream must remain in scope in order to use
+       * this object.
        *
-       * @param[in] o output stream to store by reference for generation
+       * @param[in,out] o output stream to store by reference for generation
        */
-      explicit visgen(std::ostream& o) : o_(o) { }
+      explicit visgen(std::ostream& o) : indent_(0), o_(o) { }
+
+      /**
+       * Construct a varint type visitor for generation to the
+       * specified output stream at the specified indentation level.
+       * The specified output stream must remain in scope in order to
+       * use this object.
+       *
+       * @param[in] indent indentation level
+       * @param[in,out] o output stream to store by reference for generation
+       */
+      explicit visgen(int indent, std::ostream& o) : indent_(0), o_(o) { }
 
       /**
        * Base destructor does nothing.  Specialize in subclasses.
        */
       virtual ~visgen() { }
+
+      /**
+       * Indentation level.
+       */
+      int indent_;
 
       /**
        * Reference to output stream for generation.
