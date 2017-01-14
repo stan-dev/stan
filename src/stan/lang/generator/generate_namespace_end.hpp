@@ -1,6 +1,7 @@
-#ifndef STAN_LANG_GENERATOR_GENERATE_END_NAMESPACE_HPP
-#define STAN_LANG_GENERATOR_GENERATE_END_NAMESPACE_HPP
+#ifndef STAN_LANG_GENERATOR_GENERATE_NAMESPACE_END_HPP
+#define STAN_LANG_GENERATOR_GENERATE_NAMESPACE_END_HPP
 
+#include <stan/lang/generator/constants.hpp>
 #include <ostream>
 
 namespace stan {
@@ -11,7 +12,7 @@ namespace stan {
      *
      * @param[in, out] o stream for generating
      */
-    void generate_end_namespace(std::ostream& o) {
+    void generate_namespace_end(std::ostream& o) {
       o << "}" << EOL2;
     }
 

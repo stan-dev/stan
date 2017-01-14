@@ -1,5 +1,5 @@
-#ifndef STAN_LANG_GENERATOR_GENERATE_START_NAMESPACE_HPP
-#define STAN_LANG_GENERATOR_GENERATE_START_NAMESPACE_HPP
+#ifndef STAN_LANG_GENERATOR_GENERATE_NAMESPACE_START_HPP
+#define STAN_LANG_GENERATOR_GENERATE_NAMESPACE_START_HPP
 
 #include <ostream>
 #include <string>
@@ -14,7 +14,7 @@ namespace stan {
      * @param[in] name name of namespace
      * @param[in,out] o stream for generating
      */
-    void generate_start_namespace(const std::string& name, std::ostream& o) {
+    void generate_namespace_start(const std::string& name, std::ostream& o) {
       o << "namespace " << name << "_namespace {" << EOL2;
     }
 
