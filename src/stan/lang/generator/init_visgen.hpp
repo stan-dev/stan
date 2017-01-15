@@ -3,7 +3,11 @@
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
+#include <stan/lang/generator/has_lb.hpp>
+#include <stan/lang/generator/has_lub.hpp>
+#include <stan/lang/generator/has_ub.hpp>
 #include <stan/lang/generator/generate_indent.hpp>
+#include <stan/lang/generator/generate_initializer.hpp>
 #include <stan/lang/generator/generate_type.hpp>
 #include <stan/lang/generator/var_size_validating_visgen.hpp>
 #include <stan/lang/generator/visgen.hpp>

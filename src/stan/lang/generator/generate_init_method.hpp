@@ -3,6 +3,7 @@
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
+#include <stan/lang/generator/generate_initializer.hpp>
 #include <stan/lang/generator/init_visgen.hpp>
 #include <boost/variant/apply_visitor.hpp>
 #include <ostream>

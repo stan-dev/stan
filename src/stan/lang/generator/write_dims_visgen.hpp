@@ -2,6 +2,8 @@
 #define STAN_LANG_GENERATOR_WRITE_DIMS_VISGEN_HPP
 
 #include <stan/lang/ast.hpp>
+#include <stan/lang/generator/constants.hpp>
+#include <stan/lang/generator/visgen.hpp>
 #include <ostream>
 #include <vector>
 

@@ -2,6 +2,7 @@
 #define STAN_LANG_GENERATOR_IDX_VISGEN_HPP
 
 #include <stan/lang/ast.hpp>
+#include <stan/lang/generator/visgen.hpp>
 #include <ostream>
 
 namespace stan {

@@ -3,6 +3,7 @@
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
+#include <stan/lang/generator/generate_include.hpp>
 #include <ostream>
 
 namespace stan {

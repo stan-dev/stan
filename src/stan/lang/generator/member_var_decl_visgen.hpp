@@ -2,6 +2,7 @@
 #define STAN_LANG_GENERATOR_MEMBER_VAR_DECL_VISGEN_HPP
 
 #include <stan/lang/ast.hpp>
+#include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/visgen.hpp>
 #include <ostream>
 #include <string>

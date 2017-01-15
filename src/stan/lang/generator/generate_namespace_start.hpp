@@ -1,6 +1,7 @@
 #ifndef STAN_LANG_GENERATOR_GENERATE_NAMESPACE_START_HPP
 #define STAN_LANG_GENERATOR_GENERATE_NAMESPACE_START_HPP
 
+#include <stan/lang/generator/constants.hpp>
 #include <ostream>
 #include <string>
 
