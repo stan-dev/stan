@@ -37,12 +37,13 @@ namespace stan {
     const int transformed_parameter_origin = 4;
 
     /**
-     * The origin of the variable is ???.
+     * The origin of the variable is generated quantities.
      */
     const int derived_origin = 5;
 
     /**
-     * The origin of the variable is as a local variable
+     * The origin of the variable is as a local variable.
+     * Holds for model block as well as nested blocks.
      */
     const int local_origin = 6;
 
