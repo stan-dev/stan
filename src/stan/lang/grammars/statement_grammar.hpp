@@ -136,7 +136,7 @@ namespace stan {
       identifier_r;
 
       boost::spirit::qi::rule<Iterator,
-                              std::vector<var_decl>(),
+                              std::vector<var_decl>(var_origin),
                               whitespace_grammar<Iterator> >
       local_var_decls_r;
 
