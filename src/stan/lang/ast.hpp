@@ -4,6 +4,7 @@
 #include <stan/lang/ast/base_expr_type.hpp>
 #include <stan/lang/ast/expr_type.hpp>
 #include <stan/lang/ast/nil.hpp>
+#include <stan/lang/ast/scope_access.hpp>
 #include <stan/lang/ast/var_origin.hpp>
 #include <stan/lang/ast/variable_map.hpp>
 
