@@ -41,7 +41,7 @@ namespace stan {
                        const char* name = "ANON",
                        int depth = 0) {
       x.resize(y.rows(), y.cols());
-      for (size_t i = 0; i < y.size(); ++i)
+      for (int i = 0; i < y.size(); ++i)
         assign(x(i), nil_index_list(), y(i), name, depth + 1);
     }
 
@@ -59,7 +59,7 @@ namespace stan {
     /**
      * Assign the specified Eigen vector at the specified single index
      * to the specified value.
-     * 
+     *
      * Types: vec[uni] <- scalar
      *
      * @tparam T Type of assigned vector scalar.
@@ -84,7 +84,7 @@ namespace stan {
     /**
      * Assign the specified Eigen vector at the specified single index
      * to the specified value.
-     * 
+     *
      * Types:  row_vec[uni] <- scalar
      *
      * @tparam T Type of assigned row vector scalar.
@@ -109,7 +109,7 @@ namespace stan {
     /**
      * Assign the specified Eigen vector at the specified multiple
      * index to the specified value.
-     * 
+     *
      * Types:  vec[multi] <- vec
      *
      * @tparam T Type of assigned vector scalar.
@@ -143,7 +143,7 @@ namespace stan {
     /**
      * Assign the specified Eigen row vector at the specified multiple
      * index to the specified value.
-     * 
+     *
      * Types:   row_vec[multi] <- row_vec
      *
      * @tparam T Scalar type for assigned row vector.
@@ -178,7 +178,7 @@ namespace stan {
     /**
      * Assign the specified Eigen matrix at the specified single index
      * to the specified row vector value.
-     * 
+     *
      * Types:  mat[uni] = rowvec
      *
      * @tparam T Assigned matrix scalar type.
@@ -210,7 +210,7 @@ namespace stan {
     /**
      * Assign the specified Eigen matrix at the specified multiple
      * index to the specified matrix value.
-     * 
+     *
      * Types:  mat[multi] = mat
      *
      * @tparam T Assigned matrix scalar type.
@@ -250,7 +250,7 @@ namespace stan {
     /**
      * Assign the specified Eigen matrix at the specified pair of
      * single indexes to the specified scalar value.
-     * 
+     *
      * Types:  mat[single, single] = scalar
      *
      * @tparam T Matrix scalar type.
@@ -279,13 +279,13 @@ namespace stan {
     /**
      * Assign the specified Eigen matrix at the specified single and
      * multiple index to the specified row vector.
-     * 
+     *
      * Types:  mat[uni, multi] = rowvec
      *
      * @tparam T Assigned matrix scalar type.
      * @tparam I Multi-index type.
      * @tparam U Value row vector scalar type (must be assignable to
-     * T). 
+     * T).
      * @param[in] x Matrix variable to be assigned.
      * @param[in] idxs Sequence of single and multiple index (from 1).
      * @param[in] y Value row vector.
@@ -318,7 +318,7 @@ namespace stan {
     /**
      * Assign the specified Eigen matrix at the specified multiple and
      * single index to the specified vector.
-     * 
+     *
      * Types:  mat[multi, uni] = vec
      *
      * @tparam T Assigned matrix scalar type.
@@ -357,7 +357,7 @@ namespace stan {
     /**
      * Assign the specified Eigen matrix at the specified pair of
      * multiple indexes to the specified matrix.
-     * 
+     *
      * Types:  mat[multi, multi] = mat
      *
      * @tparam T Assigned matrix scalar type.
@@ -408,17 +408,17 @@ namespace stan {
      * index list beginning with a single index to the specified value.
      *
      * This function operates recursively to carry out the tail
-     * indexing. 
-     * 
+     * indexing.
+     *
      * Types:  x[uni | L] = y
      *
      * @tparam T Assigned vector member type.
      * @tparam L Type of tail of index list.
      * @tparam U Value scalar type (must be assignable to indexed
-     * variable). 
+     * variable).
      * @param[in] x Array variable to be assigned.
      * @param[in] idxs List of indexes beginning with single index
-     * (from 1). 
+     * (from 1).
      * @param[in] y Value.
      * @param[in] name Name of variable (default "ANON").
      * @param[in] depth Indexing depth (default 0).
@@ -440,18 +440,18 @@ namespace stan {
      * index list beginning with a multiple index to the specified value.
      *
      * This function operates recursively to carry out the tail
-     * indexing. 
-     * 
+     * indexing.
+     *
      * Types:  x[multi | L] = y
      *
      * @tparam T Assigned vector member type.
      * @tparam I Type of multiple index heading index list.
      * @tparam L Type of tail of index list.
      * @tparam U Value scalar type (must be assignable to indexed
-     * variable). 
+     * variable).
      * @param[in] x Array variable to be assigned.
      * @param[in] idxs List of indexes beginning with multiple index
-     * (from 1). 
+     * (from 1).
      * @param[in] y Value.
      * @param[in] name Name of variable (default "ANON").
      * @param[in] depth Indexing depth (default 0).
