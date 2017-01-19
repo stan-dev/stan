@@ -73,13 +73,13 @@ namespace stan {
           <Model, stan::optimization::LBFGSUpdate<> > Optimizer;
         Optimizer lbfgs(model, cont_vector, disc_vector, &lbfgs_ss);
         lbfgs.get_qnupdate().set_history_size(history_size);
-        lbfgs._ls_opts.alpha0 = init_alpha;
-        lbfgs._conv_opts.tolAbsF = tol_obj;
-        lbfgs._conv_opts.tolRelF = tol_rel_obj;
-        lbfgs._conv_opts.tolAbsGrad = tol_grad;
-        lbfgs._conv_opts.tolRelGrad = tol_rel_grad;
-        lbfgs._conv_opts.tolAbsX = tol_param;
-        lbfgs._conv_opts.maxIts = num_iterations;
+        lbfgs.ls_opts_.alpha0 = init_alpha;
+        lbfgs.conv_opts_.tolAbsF = tol_obj;
+        lbfgs.conv_opts_.tolRelF = tol_rel_obj;
+        lbfgs.conv_opts_.tolAbsGrad = tol_grad;
+        lbfgs.conv_opts_.tolRelGrad = tol_rel_grad;
+        lbfgs.conv_opts_.tolAbsX = tol_param;
+        lbfgs.conv_opts_.maxIts = num_iterations;
 
         double lp = lbfgs.logp();
 

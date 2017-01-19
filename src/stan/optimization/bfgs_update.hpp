@@ -35,12 +35,12 @@ namespace stan {
                                         - rhok * sk * yk.transpose();
         if (reset) {
           B0fact = yk.squaredNorm()/skyk;
-          _Hk.noalias() = ((1.0/B0fact)*Hupd)*Hupd.transpose();
+          Hk_.noalias() = ((1.0/B0fact)*Hupd)*Hupd.transpose();
         } else {
           B0fact = 1.0;
-          _Hk = Hupd*_Hk*Hupd.transpose();
+          Hk_ = Hupd*Hk_*Hupd.transpose();
         }
-        _Hk.noalias() += rhok*sk*sk.transpose();
+        Hk_.noalias() += rhok*sk*sk.transpose();
         return B0fact;
       }
 
@@ -53,11 +53,11 @@ namespace stan {
        * @param[in] gk Gradient direction.
        **/
       inline void search_direction(VectorT &pk, const VectorT &gk) const {
-        pk.noalias() = -(_Hk*gk);
+        pk.noalias() = -(Hk_*gk);
       }
 
     private:
-      HessianT _Hk;
+      HessianT Hk_;
     };
   }
 }

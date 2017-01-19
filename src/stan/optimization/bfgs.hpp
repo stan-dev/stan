@@ -73,46 +73,46 @@ namespace stan {
       typedef Eigen::Matrix<Scalar, DimAtCompile, DimAtCompile> HessianT;
 
     protected:
-      FunctorType &_func;
-      VectorT _gk, _gk_1, _xk_1, _xk, _pk, _pk_1;
-      Scalar _fk, _fk_1, _alphak_1;
-      Scalar _alpha, _alpha0;
-      size_t _itNum;
-      std::string _note;
-      QNUpdateType _qn;
+      FunctorType &func_;
+      VectorT gk_, gk_1_, xk_1_, xk_, pk_, pk_1_;
+      Scalar fk_, fk_1_, alphak_1_;
+      Scalar alpha_, alpha0_;
+      size_t itNum_;
+      std::string note_;
+      QNUpdateType qn_;
 
     public:
-      LSOptions<Scalar> _ls_opts;
-      ConvergenceOptions<Scalar> _conv_opts;
+      LSOptions<Scalar> ls_opts_;
+      ConvergenceOptions<Scalar> conv_opts_;
 
-      QNUpdateType &get_qnupdate() { return _qn; }
-      const QNUpdateType &get_qnupdate() const { return _qn; }
+      QNUpdateType &get_qnupdate() { return qn_; }
+      const QNUpdateType &get_qnupdate() const { return qn_; }
 
-      const Scalar &curr_f() const { return _fk; }
-      const VectorT &curr_x() const { return _xk; }
-      const VectorT &curr_g() const { return _gk; }
-      const VectorT &curr_p() const { return _pk; }
+      const Scalar &curr_f() const { return fk_; }
+      const VectorT &curr_x() const { return xk_; }
+      const VectorT &curr_g() const { return gk_; }
+      const VectorT &curr_p() const { return pk_; }
 
-      const Scalar &prev_f() const { return _fk_1; }
-      const VectorT &prev_x() const { return _xk_1; }
-      const VectorT &prev_g() const { return _gk_1; }
-      const VectorT &prev_p() const { return _pk_1; }
-      Scalar prev_step_size() const { return _pk_1.norm()*_alphak_1; }
+      const Scalar &prev_f() const { return fk_1_; }
+      const VectorT &prev_x() const { return xk_1_; }
+      const VectorT &prev_g() const { return gk_1_; }
+      const VectorT &prev_p() const { return pk_1_; }
+      Scalar prev_step_size() const { return pk_1_.norm()*alphak_1_; }
 
       inline Scalar rel_grad_norm() const {
-        return -_pk.dot(_gk) / std::max(std::fabs(_fk), _conv_opts.fScale);
+        return -pk_.dot(gk_) / std::max(std::fabs(fk_), conv_opts_.fScale);
       }
       inline Scalar rel_obj_decrease() const {
-        return std::fabs(_fk_1 - _fk) / std::max(std::fabs(_fk_1),
-                                                 std::max(std::fabs(_fk),
-                                                          _conv_opts.fScale));
+        return std::fabs(fk_1_ - fk_) / std::max(std::fabs(fk_1_),
+                                                 std::max(std::fabs(fk_),
+                                                          conv_opts_.fScale));
       }
 
-      const Scalar &alpha0() const { return _alpha0; }
-      const Scalar &alpha() const { return _alpha; }
-      const size_t iter_num() const { return _itNum; }
+      const Scalar &alpha0() const { return alpha0_; }
+      const Scalar &alpha() const { return alpha_; }
+      const size_t iter_num() const { return itNum_; }
 
-      const std::string &note() const { return _note; }
+      const std::string &note() const { return note_; }
 
       std::string get_code_string(int retCode) {
         switch (retCode) {
@@ -144,19 +144,19 @@ namespace stan {
         }
       }
 
-      explicit BFGSMinimizer(FunctorType &f) : _func(f) { }
+      explicit BFGSMinimizer(FunctorType &f) : func_(f) { }
 
       void initialize(const VectorT &x0) {
         int ret;
-        _xk = x0;
-        ret = _func(_xk, _fk, _gk);
+        xk_ = x0;
+        ret = func_(xk_, fk_, gk_);
         if (ret) {
           throw std::runtime_error("Error evaluating initial BFGS point.");
         }
-        _pk = -_gk;
+        pk_ = -gk_;
 
-        _itNum = 0;
-        _note = "";
+        itNum_ = 0;
+        note_ = "";
       }
 
       int step() {
@@ -165,43 +165,43 @@ namespace stan {
         int retCode(0);
         int resetB(0);
 
-        _itNum++;
+        itNum_++;
 
-        if (_itNum == 1) {
+        if (itNum_ == 1) {
           resetB = 1;
-          _note = "";
+          note_ = "";
         } else {
           resetB = 0;
-          _note = "";
+          note_ = "";
         }
 
         while (true) {
           if (resetB) {
             // Reset the Hessian approximation
-            _pk.noalias() = -_gk;
+            pk_.noalias() = -gk_;
           }
 
           // Get an initial guess for the step size (alpha)
-          if (_itNum > 1 && resetB != 2) {
+          if (itNum_ > 1 && resetB != 2) {
             // use cubic interpolation based on the previous step
-            _alpha0 = _alpha = std::min(1.0,
-                                        1.01*CubicInterp(_gk_1.dot(_pk_1),
-                                                         _alphak_1,
-                                                         _fk - _fk_1,
-                                                         _gk.dot(_pk_1),
-                                                         _ls_opts.minAlpha,
+            alpha0_ = alpha_ = std::min(1.0,
+                                        1.01*CubicInterp(gk_1_.dot(pk_1_),
+                                                         alphak_1_,
+                                                         fk_ - fk_1_,
+                                                         gk_.dot(pk_1_),
+                                                         ls_opts_.minAlpha,
                                                          1.0));
           } else {
             // On the first step (or, after a reset) use the default step size
-            _alpha0 = _alpha = _ls_opts.alpha0;
+            alpha0_ = alpha_ = ls_opts_.alpha0;
           }
 
           // Perform the line search.  If successful, the results are in the
-          // variables: _xk_1, _fk_1 and _gk_1.
-          retCode = WolfeLineSearch(_func, _alpha, _xk_1, _fk_1, _gk_1,
-                                    _pk, _xk, _fk, _gk,
-                                    _ls_opts.c1, _ls_opts.c2,
-                                    _ls_opts.minAlpha);
+          // variables: xk_1_, fk_1_ and gk_1_.
+          retCode = WolfeLineSearch(func_, alpha_, xk_1_, fk_1_, gk_1_,
+                                    pk_, xk_, fk_, gk_,
+                                    ls_opts_.c1, ls_opts_.c2,
+                                    ls_opts_.minAlpha);
           if (retCode) {
             // Line search failed...
             if (resetB) {
@@ -212,7 +212,7 @@ namespace stan {
             } else {
               // try resetting the Hessian approximation
               resetB = 2;
-              _note += "LS failed, Hessian reset";
+              note_ += "LS failed, Hessian reset";
               continue;
             }
           } else {
@@ -221,48 +221,48 @@ namespace stan {
         }
 
         // Swap things so that k is the most recent iterate
-        std::swap(_fk, _fk_1);
-        _xk.swap(_xk_1);
-        _gk.swap(_gk_1);
-        _pk.swap(_pk_1);
+        std::swap(fk_, fk_1_);
+        xk_.swap(xk_1_);
+        gk_.swap(gk_1_);
+        pk_.swap(pk_1_);
 
-        sk.noalias() = _xk - _xk_1;
-        yk.noalias() = _gk - _gk_1;
+        sk.noalias() = xk_ - xk_1_;
+        yk.noalias() = gk_ - gk_1_;
 
-        gradNorm = _gk.norm();
+        gradNorm = gk_.norm();
         stepNorm = sk.norm();
 
         // Update QN approximation
         if (resetB) {
           // If the QN approximation was reset, automatically scale it
           // and update the step-size accordingly
-          Scalar B0fact = _qn.update(yk, sk, true);
-          _pk_1 /= B0fact;
-          _alphak_1 = _alpha*B0fact;
+          Scalar B0fact = qn_.update(yk, sk, true);
+          pk_1_ /= B0fact;
+          alphak_1_ = alpha_*B0fact;
         } else {
-          _qn.update(yk, sk);
-          _alphak_1 = _alpha;
+          qn_.update(yk, sk);
+          alphak_1_ = alpha_;
         }
         // Compute search direction for next step
-        _qn.search_direction(_pk, _gk);
+        qn_.search_direction(pk_, gk_);
 
         // Check for convergence
-        if (std::fabs(_fk_1 - _fk) < _conv_opts.tolAbsF) {
+        if (std::fabs(fk_1_ - fk_) < conv_opts_.tolAbsF) {
           // Objective function improvement wasn't sufficient
           retCode = TERM_ABSF;
-        } else if (gradNorm < _conv_opts.tolAbsGrad) {
+        } else if (gradNorm < conv_opts_.tolAbsGrad) {
           retCode = TERM_ABSGRAD;  // Gradient norm was below threshold
-        } else if (stepNorm < _conv_opts.tolAbsX) {
+        } else if (stepNorm < conv_opts_.tolAbsX) {
           retCode = TERM_ABSX;  // Change in x was too small
-        } else if (_itNum >= _conv_opts.maxIts) {
+        } else if (itNum_ >= conv_opts_.maxIts) {
           retCode = TERM_MAXIT;  // Max number of iterations hit
         } else if (rel_obj_decrease()
-                 < _conv_opts.tolRelF
+                 < conv_opts_.tolRelF
                  * std::numeric_limits<Scalar>::epsilon()) {
           // Relative improvement in objective function wasn't sufficient
           retCode = TERM_RELF;
         } else if (rel_grad_norm()
-                   < _conv_opts.tolRelGrad
+                   < conv_opts_.tolRelGrad
                    * std::numeric_limits<Scalar>::epsilon()) {
           // Relative gradient norm was below threshold
           retCode = TERM_RELGRAD;
@@ -279,7 +279,7 @@ namespace stan {
         initialize(x0);
         while (!(retcode = step()))
           continue;
-        x0 = _xk;
+        x0 = xk_;
         return retcode;
       }
     };

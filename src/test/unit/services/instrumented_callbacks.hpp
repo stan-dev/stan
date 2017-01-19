@@ -1,5 +1,5 @@
-#ifndef TEST__UNIT__INSTRUMENTED_CALLBACKS_HPP
-#define TEST__UNIT__INSTRUMENTED_CALLBACKS_HPP
+#ifndef TEST_UNIT_INSTRUMENTED_CALLBACKS_HPP
+#define TEST_UNIT_INSTRUMENTED_CALLBACKS_HPP
 
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/callbacks/writer.hpp>

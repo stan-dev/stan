@@ -22,7 +22,7 @@ namespace stan {
       // NOLINTNEXTLINE(build/include_what_you_use)
       typedef boost::tuple<Scalar, VectorT, VectorT> UpdateT;
 
-      explicit LBFGSUpdate(size_t L = 5) : _buf(L) {}
+      explicit LBFGSUpdate(size_t L = 5) : buf_(L) {}
 
       /**
        * Set the number of inverse Hessian updates to keep.
@@ -30,7 +30,7 @@ namespace stan {
        * @param L New size of buffer.
        **/
       void set_history_size(size_t L) {
-        _buf.rset_capacity(L);
+        buf_.rset_capacity(L);
       }
 
       /**
@@ -51,16 +51,16 @@ namespace stan {
         Scalar B0fact;
         if (reset) {
           B0fact = yk.squaredNorm()/skyk;
-          _buf.clear();
+          buf_.clear();
         } else {
           B0fact = 1.0;
         }
 
         // New updates are pushed to the "back" of the circular buffer
         Scalar invskyk = 1.0/skyk;
-        _gammak = skyk/yk.squaredNorm();
-        _buf.push_back();
-        _buf.back() = boost::tie(invskyk, yk, sk);
+        gammak_ = skyk/yk.squaredNorm();
+        buf_.push_back();
+        buf_.back() = boost::tie(invskyk, yk, sk);
 
         return B0fact;
       }
@@ -74,7 +74,7 @@ namespace stan {
        * @param[in] gk Gradient direction.
        **/
       inline void search_direction(VectorT &pk, const VectorT &gk) const {
-        std::vector<Scalar> alphas(_buf.size());
+        std::vector<Scalar> alphas(buf_.size());
         typename
           boost::circular_buffer<UpdateT>::const_reverse_iterator buf_rit;
         typename boost::circular_buffer<UpdateT>::const_iterator buf_it;
@@ -82,8 +82,8 @@ namespace stan {
         typename std::vector<Scalar>::reverse_iterator alpha_rit;
 
         pk.noalias() = -gk;
-        for (buf_rit = _buf.rbegin(), alpha_rit = alphas.rbegin();
-             buf_rit != _buf.rend();
+        for (buf_rit = buf_.rbegin(), alpha_rit = alphas.rbegin();
+             buf_rit != buf_.rend();
              buf_rit++, alpha_rit++) {
           Scalar alpha;
           const Scalar &rhoi(boost::get<0>(*buf_rit));
@@ -94,9 +94,9 @@ namespace stan {
           pk -= alpha * yi;
           *alpha_rit = alpha;
         }
-        pk *= _gammak;
-        for (buf_it = _buf.begin(), alpha_it = alphas.begin();
-             buf_it != _buf.end();
+        pk *= gammak_;
+        for (buf_it = buf_.begin(), alpha_it = alphas.begin();
+             buf_it != buf_.end();
              buf_it++, alpha_it++) {
           Scalar beta;
           const Scalar &rhoi(boost::get<0>(*buf_it));
@@ -109,8 +109,8 @@ namespace stan {
       }
 
     protected:
-      boost::circular_buffer<UpdateT> _buf;
-      Scalar _gammak;
+      boost::circular_buffer<UpdateT> buf_;
+      Scalar gammak_;
     };
   }
 }

@@ -202,7 +202,7 @@ namespace stan {
     }
 
     /**
-     * Generate correct C++ type for expressions which contain a 
+     * Generate correct C++ type for expressions which contain a
      * Stan <code>real</code> variable according to context in
      * which expression is used and expression contents.
      *
@@ -216,9 +216,9 @@ namespace stan {
                                 bool is_var_context,
                                 std::ostream& o) {
       if (is_fun_origin(vo)) {
-        o << "fun_scalar_t__";
+        o << "fun_scalar_t_";
       } else if (is_var_context && has_var) {
-        o << "T__";
+        o << "T_";
       } else {
         o << "double";
       }
@@ -248,15 +248,15 @@ namespace stan {
         break;
       case VECTOR_T :
         o << (is_var_context ?
-              "Eigen::Matrix<T__,Eigen::Dynamic,1> " :"vector_d");
+              "Eigen::Matrix<T_,Eigen::Dynamic,1> " :"vector_d");
         break;
       case ROW_VECTOR_T :
         o << (is_var_context ?
-              "Eigen::Matrix<T__,1,Eigen::Dynamic> " : "row_vector_d");
+              "Eigen::Matrix<T_,1,Eigen::Dynamic> " : "row_vector_d");
         break;
       case MATRIX_T :
         o << (is_var_context ?
-              "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> " : "matrix_d");
+              "Eigen::Matrix<T_,Eigen::Dynamic,Eigen::Dynamic> " : "matrix_d");
         break;
       }
     }
@@ -358,7 +358,7 @@ namespace stan {
                : fx.integration_function_name_)
            << '('
            << fx.system_function_name_
-           << "_functor__(), ";
+           << "_functor_(), ";
 
         generate_expression(fx.y0_, o_);
         o_ << ", ";
@@ -376,13 +376,13 @@ namespace stan {
         o_ << ", ";
 
         generate_expression(fx.x_int_, o_);
-        o_ << ", pstream__)";
+        o_ << ", pstream_)";
       }
       void operator()(const integrate_ode_control& fx) const {
         o_ << fx.integration_function_name_
            << '('
            << fx.system_function_name_
-           << "_functor__(), ";
+           << "_functor_(), ";
 
         generate_expression(fx.y0_, o_);
         o_ << ", ";
@@ -400,7 +400,7 @@ namespace stan {
         o_ << ", ";
 
         generate_expression(fx.x_int_, o_);
-        o_ << ", pstream__, ";
+        o_ << ", pstream_, ";
 
         generate_expression(fx.rel_tol_, o_);
         o_ << ", ";
@@ -432,15 +432,15 @@ namespace stan {
             && (has_rng_suffix(fx.name_) || has_lp_suffix(fx.name_)))
           o_ << ", ";
         if (has_rng_suffix(fx.name_))
-          o_ << "base_rng__";
+          o_ << "base_rng_";
         if (has_lp_suffix(fx.name_))
-          o_ << "lp__, lp_accum__";
+          o_ << "lp_, lp_accum_";
         if (is_user_defined(fx)) {
           if (fx.args_.size() > 0
               || has_rng_suffix(fx.name_)
               || has_lp_suffix(fx.name_))
             o_ << ", ";
-          o_ << "pstream__";
+          o_ << "pstream_";
         }
         o_ << ')';
       }
@@ -653,17 +653,17 @@ namespace stan {
     /**
      * Generate call to stan_math lib function validate_non_negative_index
      * which will throw an informative error if dim size is < 0
-     * 
+     *
      * This check should precede the variable declaration in order to
      * avoid bad alloc runtime error.
-     * Called by 
+     * Called by
      *   generate_validate_context_size - data variables
      *   generate_initialization - transformed data declarations
      *   generate_var_resiszing - initializes transformed data variables
      *   generate_local_var_decls - local variables, transformed parameters
      *                              write array, generated quantities
      *   generate_set_param_ranges - parameter variables
-     *   
+     *
      * @param var_name variable name
      * @param expr declared dim size expression
      * @param indents indentation level
@@ -704,11 +704,11 @@ namespace stan {
         generate_validate_positive(var_name, type_arg2, 2, o);
 
       o << INDENT2
-        << "context__.validate_dims("
+        << "context_.validate_dims("
         << '"' << stage << '"'
         << ", " << '"' << var_name << '"'
         << ", " << '"' << base_type << '"'
-        << ", context__.to_vec(";
+        << ", context_.to_vec(";
       for (size_t i = 0; i < dims.size(); ++i) {
         if (i > 0) o << ",";
         generate_expression(dims[i].expr_, o);
@@ -742,51 +742,51 @@ namespace stan {
       }
       void operator()(const double_var_decl& x) const {
         generate_indent(indent_, o_);
-        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
+        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR_);" << EOL;
       }
       void operator()(const vector_var_decl& x) const {
         generate_indent(indent_, o_);
-        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
+        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR_);" << EOL;
       }
       void operator()(const row_vector_var_decl& x) const {
         generate_indent(indent_, o_);
-        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
+        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR_);" << EOL;
       }
       void operator()(const matrix_var_decl& x) const {
         generate_indent(indent_, o_);
-        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
+        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR_);" << EOL;
       }
       void operator()(const unit_vector_var_decl& x) const {
         generate_indent(indent_, o_);
-        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
+        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR_);" << EOL;
       }
       void operator()(const simplex_var_decl& x) const {
         generate_indent(indent_, o_);
-        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
+        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR_);" << EOL;
       }
       void operator()(const ordered_var_decl& x) const {
         generate_indent(indent_, o_);
-        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
+        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR_);" << EOL;
       }
       void operator()(const positive_ordered_var_decl& x) const {
         generate_indent(indent_, o_);
-        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
+        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR_);" << EOL;
       }
       void operator()(const cholesky_factor_var_decl& x) const {
         generate_indent(indent_, o_);
-        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
+        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR_);" << EOL;
       }
       void operator()(const cholesky_corr_var_decl& x) const {
         generate_indent(indent_, o_);
-        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
+        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR_);" << EOL;
       }
       void operator()(const cov_matrix_var_decl& x) const {
         generate_indent(indent_, o_);
-        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
+        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR_);" << EOL;
       }
       void operator()(const corr_matrix_var_decl& x) const {
         generate_indent(indent_, o_);
-        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
+        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR_);" << EOL;
       }
     };
 
@@ -847,7 +847,7 @@ namespace stan {
         generate_indent(indent_, o_);
         o_ << "stan::math::initialize(" << x.name_ << ", "
            << (is_var_context_
-               ? "DUMMY_VAR__"
+               ? "DUMMY_VAR_"
                : "std::numeric_limits<double>::quiet_NaN()")
            << ");"
            << EOL;
@@ -1050,7 +1050,7 @@ namespace stan {
       void operator()(const double_var_decl& x) const {
         std::vector<expression> read_args;
         generate_initialize_array_bounded(x,
-                                          is_var_context_ ? "T__" : "double",
+                                          is_var_context_ ? "T_" : "double",
                                           "scalar", read_args);
       }
       void operator()(const vector_var_decl& x) const {
@@ -1059,7 +1059,7 @@ namespace stan {
         generate_initialize_array_bounded(x,
                                           is_var_context_
                                           ? "Eigen::Matrix"
-                                          "<T__,Eigen::Dynamic,1> "
+                                          "<T_,Eigen::Dynamic,1> "
                                           : "vector_d",
                                           "vector", read_args);
       }
@@ -1069,7 +1069,7 @@ namespace stan {
         generate_initialize_array_bounded(x,
                                           is_var_context_
                                           ? "Eigen::Matrix"
-                                          "<T__,1,Eigen::Dynamic> "
+                                          "<T_,1,Eigen::Dynamic> "
                                           : "row_vector_d",
                                           "row_vector", read_args);
       }
@@ -1080,7 +1080,7 @@ namespace stan {
         generate_initialize_array_bounded(x,
                                           is_var_context_
                                           ? "Eigen::Matrix"
-                                          "<T__,Eigen::Dynamic,Eigen::Dynamic> "
+                                          "<T_,Eigen::Dynamic,Eigen::Dynamic> "
                                           : "matrix_d",
                                           "matrix", read_args);
       }
@@ -1089,7 +1089,7 @@ namespace stan {
         read_args.push_back(x.K_);
         generate_initialize_array(is_var_context_
                                   ? "Eigen::Matrix"
-                                  "<T__,Eigen::Dynamic,1> "
+                                  "<T_,Eigen::Dynamic,1> "
                                   : "vector_d",
                                   "unit_vector", read_args, x.name_, x.dims_);
       }
@@ -1098,7 +1098,7 @@ namespace stan {
         read_args.push_back(x.K_);
         generate_initialize_array(is_var_context_
                                   ? "Eigen::Matrix"
-                                  "<T__,Eigen::Dynamic,1> "
+                                  "<T_,Eigen::Dynamic,1> "
                                   : "vector_d",
                                   "simplex", read_args, x.name_, x.dims_);
       }
@@ -1107,7 +1107,7 @@ namespace stan {
         read_args.push_back(x.K_);
         generate_initialize_array(is_var_context_
                                   ? "Eigen::Matrix"
-                                  "<T__,Eigen::Dynamic,1> "
+                                  "<T_,Eigen::Dynamic,1> "
                                   : "vector_d",
                                   "ordered", read_args, x.name_, x.dims_);
       }
@@ -1116,7 +1116,7 @@ namespace stan {
         read_args.push_back(x.K_);
         generate_initialize_array(is_var_context_
                                   ? "Eigen::Matrix"
-                                  "<T__,Eigen::Dynamic,1> "
+                                  "<T_,Eigen::Dynamic,1> "
                                   : "vector_d",
                                   "positive_ordered", read_args,
                                   x.name_, x.dims_);
@@ -1127,7 +1127,7 @@ namespace stan {
         read_args.push_back(x.N_);
         generate_initialize_array(is_var_context_
                                   ? "Eigen::Matrix"
-                                  "<T__,Eigen::Dynamic,Eigen::Dynamic> "
+                                  "<T_,Eigen::Dynamic,Eigen::Dynamic> "
                                   : "matrix_d",
                                   "cholesky_factor", read_args,
                                   x.name_, x.dims_);
@@ -1137,7 +1137,7 @@ namespace stan {
         read_args.push_back(x.K_);
         generate_initialize_array(is_var_context_
                                   ? "Eigen::Matrix"
-                                  "<T__,Eigen::Dynamic,Eigen::Dynamic> "
+                                  "<T_,Eigen::Dynamic,Eigen::Dynamic> "
                                   : "matrix_d",
                                   "cholesky_corr", read_args, x.name_, x.dims_);
       }
@@ -1147,7 +1147,7 @@ namespace stan {
         read_args.push_back(x.K_);
         generate_initialize_array(is_var_context_
                                   ? "Eigen::Matrix"
-                                  "<T__,Eigen::Dynamic,Eigen::Dynamic> "
+                                  "<T_,Eigen::Dynamic,Eigen::Dynamic> "
                                   : "matrix_d",
                                   "cov_matrix", read_args, x.name_, x.dims_);
       }
@@ -1156,7 +1156,7 @@ namespace stan {
         read_args.push_back(x.K_);
         generate_initialize_array(is_var_context_
                                   ? "Eigen::Matrix"
-                                  "<T__,Eigen::Dynamic,Eigen::Dynamic> "
+                                  "<T_,Eigen::Dynamic,Eigen::Dynamic> "
                                   : "matrix_d",
                                   "corr_matrix", read_args, x.name_, x.dims_);
       }
@@ -1179,25 +1179,25 @@ namespace stan {
 
         if (dims.size() == 0) {
           generate_void_statement(name, 2, o_);
-          o_ << INDENT2 << "if (jacobian__)" << EOL;
+          o_ << INDENT2 << "if (jacobian_)" << EOL;
 
           // w Jacobian
           generate_indent(3, o_);
-          o_ << name << " = in__." << read_type  << "_constrain(";
+          o_ << name << " = in_." << read_type  << "_constrain(";
           for (size_t j = 0; j < read_args.size(); ++j) {
             if (j > 0) o_ << ",";
             generate_expression(read_args[j], o_);
           }
           if (read_args.size() > 0)
             o_ << ",";
-          o_ << "lp__";
+          o_ << "lp_";
           o_ << ");" << EOL;
 
           o_ << INDENT2 << "else" << EOL;
 
           // w/o Jacobian
           generate_indent(3, o_);
-          o_ << name << " = in__." << read_type  << "_constrain(";
+          o_ << name << " = in_." << read_type  << "_constrain(";
           for (size_t j = 0; j < read_args.size(); ++j) {
             if (j > 0) o_ << ",";
             generate_expression(read_args[j], o_);
@@ -1209,37 +1209,37 @@ namespace stan {
           std::string name_dims(name);
           for (size_t i = 0; i < dims.size(); ++i) {
             generate_indent(i + 2, o_);
-            o_ << "size_t dim_"  << name << "_" << i << "__ = ";
+            o_ << "size_t dim_"  << name << "_" << i << "_ = ";
             generate_expression(dims[i], o_);
             o_ << ";" << EOL;
 
             if (i < dims.size() - 1) {
               generate_indent(i + 2, o_);
               o_ << name_dims << ".resize(dim" << "_"
-                 << name << "_" << i << "__);"
+                 << name << "_" << i << "_);"
                  << EOL;
-              name_dims.append("[k_").append(to_string(i)).append("__]");
+              name_dims.append("[k_").append(to_string(i)).append("_]");
             }
 
             generate_indent(i + 2, o_);
             if (i == dims.size() - 1) {
               o_ << name_dims << ".reserve(dim_" << name
-                 << "_" << i << "__);" << EOL;
+                 << "_" << i << "_);" << EOL;
               generate_indent(i + 2, o_);
             }
 
-            o_ << "for (size_t k_" << i << "__ = 0;"
-               << " k_" << i << "__ < dim_" << name << "_" << i << "__;"
-               << " ++k_" << i << "__) {" << EOL;
+            o_ << "for (size_t k_" << i << "_ = 0;"
+               << " k_" << i << "_ < dim_" << name << "_" << i << "_;"
+               << " ++k_" << i << "_) {" << EOL;
 
             // if on the last loop, push read element into array
             if (i == dims.size() - 1) {
               generate_indent(i + 3, o_);
-              o_ << "if (jacobian__)" << EOL;
+              o_ << "if (jacobian_)" << EOL;
 
               // w Jacobian
               generate_indent(i + 4, o_);
-              o_ << name_dims << ".push_back(in__."
+              o_ << name_dims << ".push_back(in_."
                  << read_type << "_constrain(";
               for (size_t j = 0; j < read_args.size(); ++j) {
                 if (j > 0) o_ << ",";
@@ -1247,7 +1247,7 @@ namespace stan {
               }
               if (read_args.size() > 0)
                 o_ << ",";
-              o_ << "lp__";
+              o_ << "lp_";
               o_ << "));" << EOL;
 
               generate_indent(i + 3, o_);
@@ -1255,7 +1255,7 @@ namespace stan {
 
               // w/o Jacobian
               generate_indent(i + 4, o_);
-              o_ << name_dims << ".push_back(in__."
+              o_ << name_dims << ".push_back(in_."
                  << read_type << "_constrain(";
               for (size_t j = 0; j < read_args.size(); ++j) {
                 if (j > 0) o_ << ",";
@@ -1281,8 +1281,8 @@ namespace stan {
                                   std::ostream& o) {
       o << INDENT2
         << "stan::io::reader<"
-        << (is_var_context ? "T__" : "double")
-        << "> in__(params_r__,params_i__);" << EOL2;
+        << (is_var_context ? "T_" : "double")
+        << "> in_(params_r_,params_i_);" << EOL2;
       init_local_var_visgen vis_init(declare_vars, is_var_context, o);
       for (size_t i = 0; i < vs.size(); ++i) {
           boost::apply_visitor(vis_init, vs[i].decl_);
@@ -1309,11 +1309,11 @@ namespace stan {
         const {
         for (size_t i = 0; i < dims.size(); ++i) {
           generate_indent(indents_+i, o_);
-          o_ << "for (int k" << i << "__ = 0;"
-             << " k" << i << "__ < ";
+          o_ << "for (int k" << i << "_ = 0;"
+             << " k" << i << "_ < ";
           generate_expression(dims[i].expr_, o_);
           o_ << ";";
-          o_ << " ++k" << i << "__) {" << EOL;
+          o_ << " ++k" << i << "_) {" << EOL;
         }
       }
       void generate_end_for_dims(size_t dims_size) const {
@@ -1326,7 +1326,7 @@ namespace stan {
                              size_t dims_size) const {
         o_ << name;
         for (size_t i = 0; i < dims_size; ++i)
-          o_ << "[k" << i << "__]";
+          o_ << "[k" << i << "_]";
       }
       void operator()(const nil& /*x*/) const { }
       template <typename T>
@@ -1337,7 +1337,7 @@ namespace stan {
         generate_begin_for_dims(x.dims_);
         if (x.range_.has_low()) {
           generate_indent(indents_ + x.dims_.size(), o_);
-          o_ << "check_greater_or_equal(function__,";
+          o_ << "check_greater_or_equal(function_,";
           o_ << "\"";
           generate_loop_var(x.name_, x.dims_.size());
           o_ << "\",";
@@ -1348,7 +1348,7 @@ namespace stan {
         }
         if (x.range_.has_high()) {
           generate_indent(indents_ + x.dims_.size(), o_);
-          o_ << "check_less_or_equal(function__,";
+          o_ << "check_less_or_equal(function_,";
           o_ << "\"";
           generate_loop_var(x.name_, x.dims_.size());
           o_ << "\",";
@@ -1379,7 +1379,7 @@ namespace stan {
                              const std::string& type_name) const {
         generate_begin_for_dims(x.dims_);
         generate_indent(indents_ + x.dims_.size(), o_);
-        o_ << "stan::math::check_" << type_name << "(function__,";
+        o_ << "stan::math::check_" << type_name << "(function_,";
         o_ << "\"";
         generate_loop_var(x.name_, x.dims_.size());
         o_ << "\",";
@@ -1528,8 +1528,8 @@ namespace stan {
       void operator()(const double_var_decl& x) const {
         std::vector<expression> ctor_args;
         declare_array(is_fun_return_
-                      ? "fun_scalar_t__"
-                      : (is_var_context_ ? "T__" : "double"),
+                      ? "fun_scalar_t_"
+                      : (is_var_context_ ? "T_" : "double"),
                       ctor_args, x.name_, x.dims_);
       }
       void operator()(const vector_var_decl& x) const {
@@ -1537,9 +1537,9 @@ namespace stan {
         generate_validate_positive(x.name_, x.M_, indents_, o_);
         ctor_args.push_back(x.M_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
+                      ? "Eigen::Matrix<fun_scalar_t_,Eigen::Dynamic,1> "
                       : (is_var_context_
-                         ? "Eigen::Matrix<T__,Eigen::Dynamic,1> " : "vector_d"),
+                         ? "Eigen::Matrix<T_,Eigen::Dynamic,1> " : "vector_d"),
                       ctor_args, x.name_, x.dims_);
       }
       void operator()(const row_vector_var_decl& x) const {
@@ -1547,9 +1547,9 @@ namespace stan {
         generate_validate_positive(x.name_, x.N_, indents_, o_);
         ctor_args.push_back(x.N_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<fun_scalar_t__,1,Eigen::Dynamic> "
+                      ? "Eigen::Matrix<fun_scalar_t_,1,Eigen::Dynamic> "
                       : (is_var_context_
-                         ? "Eigen::Matrix<T__,1,Eigen::Dynamic> "
+                         ? "Eigen::Matrix<T_,1,Eigen::Dynamic> "
                          : "row_vector_d"),
                       ctor_args, x.name_, x.dims_);
       }
@@ -1560,10 +1560,10 @@ namespace stan {
         ctor_args.push_back(x.M_);
         ctor_args.push_back(x.N_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<fun_scalar_t__,"
+                      ? "Eigen::Matrix<fun_scalar_t_,"
                       "Eigen::Dynamic,Eigen::Dynamic> "
                       : (is_var_context_
-                         ? "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> "
+                         ? "Eigen::Matrix<T_,Eigen::Dynamic,Eigen::Dynamic> "
                          : "matrix_d"),
                       ctor_args, x.name_, x.dims_);
       }
@@ -1572,9 +1572,9 @@ namespace stan {
         generate_validate_positive(x.name_, x.K_, indents_, o_);
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
+                      ? "Eigen::Matrix<fun_scalar_t_,Eigen::Dynamic,1> "
                       : (is_var_context_
-                         ? "Eigen::Matrix<T__,Eigen::Dynamic,1> " : "vector_d"),
+                         ? "Eigen::Matrix<T_,Eigen::Dynamic,1> " : "vector_d"),
                       ctor_args, x.name_, x.dims_);
       }
       void operator()(const simplex_var_decl& x) const {
@@ -1582,9 +1582,9 @@ namespace stan {
         generate_validate_positive(x.name_, x.K_, indents_, o_);
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
+                      ? "Eigen::Matrix<fun_scalar_t_,Eigen::Dynamic,1> "
                       : (is_var_context_
-                         ? "Eigen::Matrix<T__,Eigen::Dynamic,1> " : "vector_d"),
+                         ? "Eigen::Matrix<T_,Eigen::Dynamic,1> " : "vector_d"),
                       ctor_args, x.name_, x.dims_);
       }
       void operator()(const ordered_var_decl& x) const {
@@ -1592,9 +1592,9 @@ namespace stan {
         generate_validate_positive(x.name_, x.K_, indents_, o_);
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
+                      ? "Eigen::Matrix<fun_scalar_t_,Eigen::Dynamic,1> "
                       : (is_var_context_
-                         ? "Eigen::Matrix<T__,Eigen::Dynamic,1> " : "vector_d"),
+                         ? "Eigen::Matrix<T_,Eigen::Dynamic,1> " : "vector_d"),
                       ctor_args, x.name_, x.dims_);
       }
       void operator()(const positive_ordered_var_decl& x) const {
@@ -1602,9 +1602,9 @@ namespace stan {
         generate_validate_positive(x.name_, x.K_, indents_, o_);
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
+                      ? "Eigen::Matrix<fun_scalar_t_,Eigen::Dynamic,1> "
                       : (is_var_context_
-                         ? "Eigen::Matrix<T__,Eigen::Dynamic,1> " : "vector_d"),
+                         ? "Eigen::Matrix<T_,Eigen::Dynamic,1> " : "vector_d"),
                       ctor_args, x.name_, x.dims_);
       }
       void operator()(const cholesky_factor_var_decl& x) const {
@@ -1614,10 +1614,10 @@ namespace stan {
         ctor_args.push_back(x.M_);
         ctor_args.push_back(x.N_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<fun_scalar_t__,"
+                      ? "Eigen::Matrix<fun_scalar_t_,"
                       "Eigen::Dynamic,Eigen::Dynamic> "
                       : (is_var_context_
-                         ? "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> "
+                         ? "Eigen::Matrix<T_,Eigen::Dynamic,Eigen::Dynamic> "
                          : "matrix_d"),
                       ctor_args, x.name_, x.dims_);
       }
@@ -1627,7 +1627,7 @@ namespace stan {
         ctor_args.push_back(x.K_);
         ctor_args.push_back(x.K_);
         declare_array(is_var_context_
-                      ? "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> "
+                      ? "Eigen::Matrix<T_,Eigen::Dynamic,Eigen::Dynamic> "
                       : "matrix_d",
                       ctor_args, x.name_, x.dims_);
       }
@@ -1637,10 +1637,10 @@ namespace stan {
         ctor_args.push_back(x.K_);
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<fun_scalar_t__,"
+                      ? "Eigen::Matrix<fun_scalar_t_,"
                       "Eigen::Dynamic,Eigen::Dynamic> "
                       : (is_var_context_
-                         ? "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> "
+                         ? "Eigen::Matrix<T_,Eigen::Dynamic,Eigen::Dynamic> "
                          : "matrix_d"),
                       ctor_args, x.name_, x.dims_);
       }
@@ -1650,10 +1650,10 @@ namespace stan {
         ctor_args.push_back(x.K_);
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<fun_scalar_t__,"
+                      ? "Eigen::Matrix<fun_scalar_t_,"
                       "Eigen::Dynamic,Eigen::Dynamic> "
                       : (is_var_context_
-                         ? "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> "
+                         ? "Eigen::Matrix<T_,Eigen::Dynamic,Eigen::Dynamic> "
                          : "matrix_d"),
                       ctor_args, x.name_, x.dims_);
       }
@@ -1683,7 +1683,7 @@ namespace stan {
             generate_init_args(type, ctor_args, dims, dim + 1);
             o_ << ')';  // close(2)
           } else if (type == "var") {
-            o_ << ", DUMMY_VAR__";
+            o_ << ", DUMMY_VAR_";
           } else if (type == "int") {
             o_ << ", 0";
           } else if (type == "double") {
@@ -1699,7 +1699,7 @@ namespace stan {
             } else if (type == "double") {
               o_ << "(0.0)";
             } else if (type == "var") {
-              o_ << "(DUMMY_VAR__)";
+              o_ << "(DUMMY_VAR_)";
             } else {
               // shouldn't hit this, either
             }
@@ -1735,11 +1735,11 @@ namespace stan {
           generate_void_statement(name);
           o_ << EOL;
         }
-        if (type == "Eigen::Matrix<T__, Eigen::Dynamic, Eigen::Dynamic> "
-            || type == "Eigen::Matrix<T__, 1, Eigen::Dynamic> "
-            || type == "Eigen::Matrix<T__, Eigen::Dynamic, 1> ") {
+        if (type == "Eigen::Matrix<T_, Eigen::Dynamic, Eigen::Dynamic> "
+            || type == "Eigen::Matrix<T_, 1, Eigen::Dynamic> "
+            || type == "Eigen::Matrix<T_, Eigen::Dynamic, 1> ") {
           generate_indent(indents_, o_);
-          o_ << "stan::math::fill(" << name << ", DUMMY_VAR__);" << EOL;
+          o_ << "stan::math::fill(" << name << ", DUMMY_VAR_);" << EOL;
         }
       }
     };
@@ -1882,35 +1882,35 @@ namespace stan {
 
         for (size_t k = 0; k < dims.size(); ++k) {
           generate_indent(indents_ + k, o_);
-          o_ << "for (int i" << k << "__ = 0; i" << k << "__ < ";
+          o_ << "for (int i" << k << "_ = 0; i" << k << "_ < ";
           generate_expression(dims[k], o_);
-          o_ << "; ++i" << k << "__) {" << EOL;
+          o_ << "; ++i" << k << "_) {" << EOL;
         }
 
         generate_indent(indents_ + dims.size(), o_);
         o_ << "if (stan::math::is_uninitialized(" << name;
         for (size_t k = 0; k < non_matrix_dims; ++k)
-          o_ << "[i" << k << "__]";
+          o_ << "[i" << k << "_]";
         if (matrix_dims > 0) {
-          o_ << "(i" << non_matrix_dims << "__";
+          o_ << "(i" << non_matrix_dims << "_";
           if (matrix_dims > 1)
-            o_ << ",i" << (non_matrix_dims + 1) << "__";
+            o_ << ",i" << (non_matrix_dims + 1) << "_";
           o_ << ')';
         }
         o_ << ")) {" << EOL;
         generate_indent(indents_ + dims.size() + 1, o_);
-        o_ << "std::stringstream msg__;" << EOL;
+        o_ << "std::stringstream msg_;" << EOL;
         generate_indent(indents_ + dims.size() + 1, o_);
-        o_ << "msg__ << \"Undefined transformed parameter: "
+        o_ << "msg_ << \"Undefined transformed parameter: "
            << name << "\"";
         for (size_t k = 0; k < dims.size(); ++k) {
           o_ << " << '['";
-          o_ << " << i" << k << "__";
+          o_ << " << i" << k << "_";
           o_ << " << ']'";
         }
         o_ << ';' << EOL;
         generate_indent(indents_ + dims.size() + 1, o_);
-        o_ << "throw std::runtime_error(msg__.str());" << EOL;
+        o_ << "throw std::runtime_error(msg_.str());" << EOL;
 
         generate_indent(indents_ + dims.size(), o_);
         o_ << "}" << EOL;
@@ -2104,7 +2104,7 @@ namespace stan {
         if (!include_sampling_) return;
         std::string prob_fun = get_prob_fun(x.dist_.family_);
         generate_indent(indent_, o_);
-        o_ << "lp_accum__.add(" << prob_fun << "<propto__>(";
+        o_ << "lp_accum_.add(" << prob_fun << "<propto_>(";
         generate_expression(x.expr_, o_);
         for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
           o_ << ", ";
@@ -2113,7 +2113,7 @@ namespace stan {
         bool is_user_defined
           = is_user_defined_prob_function(prob_fun, x.expr_, x.dist_.args_);
         if (is_user_defined)
-          o_ << ", pstream__";
+          o_ << ", pstream_";
         o_ << "));" << EOL;
         // rest of impl is for truncation
         // test variable is within truncation interval
@@ -2123,7 +2123,7 @@ namespace stan {
           generate_expression(x.expr_,  o_);
           o_ << " < ";
           generate_expression(x.truncation_.low_.expr_, o_);
-          o_ << ") lp_accum__.add(-std::numeric_limits<double>::infinity());"
+          o_ << ") lp_accum_.add(-std::numeric_limits<double>::infinity());"
              << EOL;
         }
         if (x.truncation_.has_high()) {
@@ -2133,7 +2133,7 @@ namespace stan {
           generate_expression(x.expr_, o_);
           o_ << " > ";
           generate_expression(x.truncation_.high_.expr_, o_);
-          o_ << ") lp_accum__.add(-std::numeric_limits<double>::infinity());"
+          o_ << ") lp_accum_.add(-std::numeric_limits<double>::infinity());"
              << EOL;
         }
         // generate log denominator for case where bounds test pass
@@ -2156,7 +2156,7 @@ namespace stan {
             generate_expression(x.dist_.args_[i], sso_lp);
           }
           if (is_user_defined)
-            sso_lp << ", pstream__";
+            sso_lp << ", pstream_";
           sso_lp << "), " << get_cdf(x.dist_.family_) << "(";
           generate_expression(x.truncation_.low_.expr_, sso_lp);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
@@ -2164,7 +2164,7 @@ namespace stan {
             generate_expression(x.dist_.args_[i], sso_lp);
           }
           if (is_user_defined)
-            sso_lp << ", pstream__";
+            sso_lp << ", pstream_";
           sso_lp << "))";
 
         } else if (!x.truncation_.has_low() && x.truncation_.has_high()) {
@@ -2176,7 +2176,7 @@ namespace stan {
             generate_expression(x.dist_.args_[i], sso_lp);
           }
           if (is_user_defined)
-            sso_lp << ", pstream__";
+            sso_lp << ", pstream_";
           sso_lp << ")";
 
         } else if (x.truncation_.has_low() && !x.truncation_.has_high()) {
@@ -2188,11 +2188,11 @@ namespace stan {
             generate_expression(x.dist_.args_[i], sso_lp);
           }
           if (is_user_defined)
-            sso_lp << ", pstream__";
+            sso_lp << ", pstream_";
           sso_lp << ")";
         }
 
-        o_ << "else lp_accum__.add(-";
+        o_ << "else lp_accum_.add(-";
 
         if (x.is_discrete() && x.truncation_.has_low()) {
           o_ << "log_sum_exp(" << sso_lp.str() << ", ";
@@ -2203,7 +2203,7 @@ namespace stan {
             o_ << ", ";
             generate_expression(x.dist_.args_[i], o_);
           }
-          if (is_user_defined) o_ << ", pstream__";
+          if (is_user_defined) o_ << ", pstream_";
           o_ << "))";
         } else {
           o_ << sso_lp.str();
@@ -2214,7 +2214,7 @@ namespace stan {
 
       void operator()(const increment_log_prob_statement& x) const {
         generate_indent(indent_, o_);
-        o_ << "lp_accum__.add(";
+        o_ << "lp_accum_.add(";
         generate_expression(x.log_prob_, o_);
         o_ << ");" << EOL;
       }
@@ -2240,36 +2240,36 @@ namespace stan {
 
       void operator()(const print_statement& ps) const {
         generate_indent(indent_, o_);
-        o_ << "if (pstream__) {" << EOL;
+        o_ << "if (pstream_) {" << EOL;
         for (size_t i = 0; i < ps.printables_.size(); ++i) {
           generate_indent(indent_ + 1, o_);
-          o_ << "stan_print(pstream__,";
+          o_ << "stan_print(pstream_,";
           generate_printable(ps.printables_[i], o_);
           o_ << ");" << EOL;
         }
         generate_indent(indent_ + 1, o_);
-        o_ << "*pstream__ << std::endl;" << EOL;
+        o_ << "*pstream_ << std::endl;" << EOL;
         generate_indent(indent_, o_);
         o_ << '}' << EOL;
       }
       void operator()(const reject_statement& ps) const {
         generate_indent(indent_, o_);
-        o_ << "std::stringstream errmsg_stream__;" << EOL;
+        o_ << "std::stringstream errmsg_stream_;" << EOL;
         for (size_t i = 0; i < ps.printables_.size(); ++i) {
           generate_indent(indent_, o_);
-          o_ << "errmsg_stream__ << ";
+          o_ << "errmsg_stream_ << ";
           generate_printable(ps.printables_[i], o_);
           o_ << ";" << EOL;
         }
         generate_indent(indent_, o_);
-        o_ << "throw std::domain_error(errmsg_stream__.str());" << EOL;
+        o_ << "throw std::domain_error(errmsg_stream_.str());" << EOL;
       }
       void operator()(const return_statement& rs) const {
         generate_indent(indent_, o_);
         o_ << "return ";
         if (!rs.return_value_.expression_type().is_ill_formed()
             && !rs.return_value_.expression_type().is_void()) {
-          o_ << "stan::math::promote_scalar<fun_return_scalar_t__>(";
+          o_ << "stan::math::promote_scalar<fun_return_scalar_t_>(";
           generate_expression(rs.return_value_, o_);
           o_ << ")";
         }
@@ -2361,7 +2361,7 @@ namespace stan {
       is_numbered_statement_vis vis_is_numbered;
       if (boost::apply_visitor(vis_is_numbered, s.statement_)) {
         generate_indent(indent, o);
-        o << "current_statement_begin__ = " <<  s.begin_line_ << ";"
+        o << "current_statement_begin_ = " <<  s.begin_line_ << ";"
           << EOL;
       }
       statement_visgen vis(indent, include_sampling, is_var_context,
@@ -2395,7 +2395,7 @@ namespace stan {
       o << "} catch (const std::exception& e) {"
         << EOL;
       generate_indent(indent + 1, o);
-      o << "stan::lang::rethrow_located(e,current_statement_begin__);"
+      o << "stan::lang::rethrow_located(e,current_statement_begin_);"
         << EOL;
       generate_comment("Next line prevents compiler griping about no return",
                        indent + 1, o);
@@ -2438,25 +2438,25 @@ namespace stan {
     void generate_log_prob(const program& p,
                            std::ostream& o) {
       o << EOL;
-      o << INDENT << "template <bool propto__, bool jacobian__, typename T__>"
+      o << INDENT << "template <bool propto_, bool jacobian_, typename T_>"
         << EOL;
-      o << INDENT << "T__ log_prob(vector<T__>& params_r__,"
+      o << INDENT << "T_ log_prob(vector<T_>& params_r_,"
         << EOL;
-      o << INDENT << "             vector<int>& params_i__,"
+      o << INDENT << "            vector<int>& params_i_,"
         << EOL;
-      o << INDENT << "             std::ostream* pstream__ = 0) const {"
+      o << INDENT << "            std::ostream* pstream_ = 0) const {"
         << EOL2;
 
       // use this dummy for inits
       o << INDENT2
-        << "T__ DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());"
+        << "T_ DUMMY_VAR_(std::numeric_limits<double>::quiet_NaN());"
         << EOL;
-      o << INDENT2 << "(void) DUMMY_VAR__;  // suppress unused var warning"
+      o << INDENT2 << "(void) DUMMY_VAR_;  // suppress unused var warning"
         << EOL2;
 
-      o << INDENT2 << "T__ lp__(0.0);"
+      o << INDENT2 << "T_ lp_(0.0);"
         << EOL;
-      o << INDENT2 << "stan::math::accumulator<T__> lp_accum__;"
+      o << INDENT2 << "stan::math::accumulator<T_> lp_accum_;"
         << EOL2;
 
       bool is_var_context = true;
@@ -2479,10 +2479,10 @@ namespace stan {
 
       generate_validate_transformed_params(p.derived_decl_.first, 2, o);
       o << INDENT2
-        << "const char* function__ = \"validate transformed params\";"
+        << "const char* function_ = \"validate transformed params\";"
         << EOL;
       o << INDENT2
-        << "(void) function__;  // dummy to suppress unused var warning"
+        << "(void) function_;  // dummy to suppress unused var warning"
         << EOL;
 
       generate_validate_var_decls(p.derived_decl_.first, 2, o);
@@ -2496,8 +2496,8 @@ namespace stan {
 
 
       o << EOL;
-      o << INDENT2 << "lp_accum__.add(lp__);" << EOL;
-      o << INDENT2 << "return lp_accum__.sum();" << EOL2;
+      o << INDENT2 << "lp_accum_.add(lp_);" << EOL;
+      o << INDENT2 << "return lp_accum_.sum();" << EOL2;
       o << INDENT << "} // log_prob()" << EOL2;
 
       o << INDENT
@@ -2531,26 +2531,26 @@ namespace stan {
         var_size_validator_(x);
         var_resizer_(x);
         o_ << INDENT2
-           << "vals_i__ = context__.vals_i(\"" << x.name_ << "\");" << EOL;
-        o_ << INDENT2 << "pos__ = 0;" << EOL;
+           << "vals_i_ = context_.vals_i(\"" << x.name_ << "\");" << EOL;
+        o_ << INDENT2 << "pos_ = 0;" << EOL;
         size_t indentation = 1;
         for (size_t dim_up = 0U; dim_up < dims.size(); ++dim_up) {
           size_t dim = dims.size() - dim_up - 1U;
           ++indentation;
           generate_indent(indentation, o_);
-          o_ << "size_t " << x.name_ << "_limit_" << dim << "__ = ";
+          o_ << "size_t " << x.name_ << "_limit_" << dim << "_ = ";
           generate_expression(dims[dim], o_);
           o_ << ";" << EOL;
           generate_indent(indentation, o_);
-          o_ << "for (size_t i_" << dim << "__ = 0; i_"
-             << dim << "__ < " << x.name_ << "_limit_" << dim
-             << "__; ++i_" << dim << "__) {" << EOL;
+          o_ << "for (size_t i_" << dim << "_ = 0; i_"
+             << dim << "_ < " << x.name_ << "_limit_" << dim
+             << "_; ++i_" << dim << "_) {" << EOL;
         }
         generate_indent(indentation+1, o_);
         o_ << x.name_;
         for (size_t dim = 0; dim < dims.size(); ++dim)
-          o_ << "[i_" << dim << "__]";
-        o_ << " = vals_i__[pos__++];" << EOL;
+          o_ << "[i_" << dim << "_]";
+        o_ << " = vals_i_[pos_++];" << EOL;
         for (size_t dim = 0; dim < dims.size(); ++dim) {
           generate_indent(dims.size() + 1 - dim, o_);
           o_ << "}" << EOL;
@@ -2562,26 +2562,26 @@ namespace stan {
         var_size_validator_(x);
         var_resizer_(x);
         o_ << INDENT2
-           << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
-        o_ << INDENT2 << "pos__ = 0;" << EOL;
+           << "vals_r_ = context_.vals_r(\"" << x.name_ << "\");" << EOL;
+        o_ << INDENT2 << "pos_ = 0;" << EOL;
         size_t indentation = 1;
         for (size_t dim_up = 0U; dim_up < dims.size(); ++dim_up) {
           size_t dim = dims.size() - dim_up - 1U;
           ++indentation;
           generate_indent(indentation, o_);
-          o_ << "size_t " << x.name_ << "_limit_" << dim << "__ = ";
+          o_ << "size_t " << x.name_ << "_limit_" << dim << "_ = ";
           generate_expression(dims[dim], o_);
           o_ << ";" << EOL;
           generate_indent(indentation, o_);
-          o_ << "for (size_t i_" << dim << "__ = 0; i_" << dim << "__ < "
-             << x.name_ << "_limit_" << dim << "__; ++i_" << dim << "__) {"
+          o_ << "for (size_t i_" << dim << "_ = 0; i_" << dim << "_ < "
+             << x.name_ << "_limit_" << dim << "_; ++i_" << dim << "_) {"
              << EOL;
         }
         generate_indent(indentation+1, o_);
         o_ << x.name_;
         for (size_t dim = 0; dim < dims.size(); ++dim)
-          o_ << "[i_" << dim << "__]";
-        o_ << " = vals_r__[pos__++];" << EOL;
+          o_ << "[i_" << dim << "_]";
+        o_ << " = vals_r_[pos_++];" << EOL;
         for (size_t dim = 0; dim < dims.size(); ++dim) {
           generate_indent(dims.size() + 1 - dim, o_);
           o_ << "}" << EOL;
@@ -2593,32 +2593,32 @@ namespace stan {
         var_size_validator_(x);
         var_resizer_(x);
         o_ << INDENT2
-           << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
-        o_ << INDENT2 << "pos__ = 0;" << EOL;
-        o_ << INDENT2 << "size_t " << x.name_ << "_i_vec_lim__ = ";
+           << "vals_r_ = context_.vals_r(\"" << x.name_ << "\");" << EOL;
+        o_ << INDENT2 << "pos_ = 0;" << EOL;
+        o_ << INDENT2 << "size_t " << x.name_ << "_i_vec_lim_ = ";
         generate_expression(x.M_, o_);
         o_ << ";" << EOL;
-        o_ << INDENT2 << "for (size_t " << "i_vec__ = 0; " << "i_vec__ < "
-           << x.name_ << "_i_vec_lim__; ++i_vec__) {" << EOL;
+        o_ << INDENT2 << "for (size_t " << "i_vec_ = 0; " << "i_vec_ < "
+           << x.name_ << "_i_vec_lim_; ++i_vec_) {" << EOL;
         size_t indentation = 2;
         for (size_t dim_up = 0U; dim_up < dims.size(); ++dim_up) {
           size_t dim = dims.size() - dim_up - 1U;
           ++indentation;
           generate_indent(indentation, o_);
-          o_ << "size_t " << x.name_ << "_limit_" << dim << "__ = ";
+          o_ << "size_t " << x.name_ << "_limit_" << dim << "_ = ";
           generate_expression(dims[dim], o_);
           o_ << ";" << EOL;
           generate_indent(indentation, o_);
-          o_ << "for (size_t i_" << dim << "__ = 0; i_" << dim << "__ < "
-             << x.name_ << "_limit_" << dim << "__; ++i_" << dim << "__) {"
+          o_ << "for (size_t i_" << dim << "_ = 0; i_" << dim << "_ < "
+             << x.name_ << "_limit_" << dim << "_; ++i_" << dim << "_) {"
              << EOL;
         }
         generate_indent(indentation+1, o_);
         o_ << x.name_;
         for (size_t dim = 0; dim < dims.size(); ++dim)
-          o_ << "[i_" << dim << "__]";
-        o_ << "[i_vec__]";
-        o_ << " = vals_r__[pos__++];" << EOL;
+          o_ << "[i_" << dim << "_]";
+        o_ << "[i_vec_]";
+        o_ << " = vals_r_[pos_++];" << EOL;
         for (size_t dim = 0; dim < dims.size(); ++dim) {
           generate_indent(dims.size() + 2 - dim, o_);
           o_ << "}" << EOL;
@@ -2631,32 +2631,32 @@ namespace stan {
         var_size_validator_(x);
         var_resizer_(x);
         o_ << INDENT2
-           << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
-        o_ << INDENT2 << "pos__ = 0;" << EOL;
-        o_ << INDENT2 << "size_t " << x.name_ << "_i_vec_lim__ = ";
+           << "vals_r_ = context_.vals_r(\"" << x.name_ << "\");" << EOL;
+        o_ << INDENT2 << "pos_ = 0;" << EOL;
+        o_ << INDENT2 << "size_t " << x.name_ << "_i_vec_lim_ = ";
         generate_expression(x.N_, o_);
         o_ << ";" << EOL;
-        o_ << INDENT2 << "for (size_t " << "i_vec__ = 0; " << "i_vec__ < "
-           << x.name_ << "_i_vec_lim__; ++i_vec__) {" << EOL;
+        o_ << INDENT2 << "for (size_t " << "i_vec_ = 0; " << "i_vec_ < "
+           << x.name_ << "_i_vec_lim_; ++i_vec_) {" << EOL;
         size_t indentation = 2;
         for (size_t dim_up = 0U; dim_up < dims.size(); ++dim_up) {
           size_t dim = dims.size() - dim_up - 1U;
           ++indentation;
           generate_indent(indentation, o_);
-          o_ << "size_t " << x.name_ << "_limit_" << dim << "__ = ";
+          o_ << "size_t " << x.name_ << "_limit_" << dim << "_ = ";
           generate_expression(dims[dim], o_);
           o_ << ";" << EOL;
           generate_indent(indentation, o_);
-          o_ << "for (size_t i_" << dim << "__ = 0; i_" << dim << "__ < "
-             << x.name_ << "_limit_" << dim << "__; ++i_" << dim << "__) {"
+          o_ << "for (size_t i_" << dim << "_ = 0; i_" << dim << "_ < "
+             << x.name_ << "_limit_" << dim << "_; ++i_" << dim << "_) {"
              << EOL;
         }
         generate_indent(indentation+1, o_);
         o_ << x.name_;
         for (size_t dim = 0; dim < dims.size(); ++dim)
-          o_ << "[i_" << dim << "__]";
-        o_ << "[i_vec__]";
-        o_ << " = vals_r__[pos__++];" << EOL;
+          o_ << "[i_" << dim << "_]";
+        o_ << "[i_vec_]";
+        o_ << " = vals_r_[pos_++];" << EOL;
         for (size_t dim = 0; dim < dims.size(); ++dim) {
           generate_indent(dims.size() + 2 - dim, o_);
           o_ << "}" << EOL;
@@ -2669,32 +2669,32 @@ namespace stan {
         var_size_validator_(x);
         var_resizer_(x);
         o_ << INDENT2
-           << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
-        o_ << INDENT2 << "pos__ = 0;" << EOL;
-        o_ << INDENT2 << "size_t " << x.name_ << "_i_vec_lim__ = ";
+           << "vals_r_ = context_.vals_r(\"" << x.name_ << "\");" << EOL;
+        o_ << INDENT2 << "pos_ = 0;" << EOL;
+        o_ << INDENT2 << "size_t " << x.name_ << "_i_vec_lim_ = ";
         generate_expression(x.K_, o_);
         o_ << ";" << EOL;
-        o_ << INDENT2 << "for (size_t " << "i_vec__ = 0; " << "i_vec__ < "
-           << x.name_ << "_i_vec_lim__; ++i_vec__) {" << EOL;
+        o_ << INDENT2 << "for (size_t " << "i_vec_ = 0; " << "i_vec_ < "
+           << x.name_ << "_i_vec_lim_; ++i_vec_) {" << EOL;
         size_t indentation = 2;
         for (size_t dim_up = 0U; dim_up < dims.size(); ++dim_up) {
           size_t dim = dims.size() - dim_up - 1U;
           ++indentation;
           generate_indent(indentation, o_);
-          o_ << "size_t " << x.name_ << "_limit_" << dim << "__ = ";
+          o_ << "size_t " << x.name_ << "_limit_" << dim << "_ = ";
           generate_expression(dims[dim], o_);
           o_ << ";" << EOL;
           generate_indent(indentation, o_);
-          o_ << "for (size_t i_" << dim << "__ = 0; i_" << dim << "__ < "
-             << x.name_ << "_limit_" << dim << "__; ++i_" << dim << "__) {"
+          o_ << "for (size_t i_" << dim << "_ = 0; i_" << dim << "_ < "
+             << x.name_ << "_limit_" << dim << "_; ++i_" << dim << "_) {"
              << EOL;
         }
         generate_indent(indentation+1, o_);
         o_ << x.name_;
         for (size_t dim = 0; dim < dims.size(); ++dim)
-          o_ << "[i_" << dim << "__]";
-        o_ << "[i_vec__]";
-        o_ << " = vals_r__[pos__++];" << EOL;
+          o_ << "[i_" << dim << "_]";
+        o_ << "[i_vec_]";
+        o_ << " = vals_r_[pos_++];" << EOL;
         for (size_t dim = 0; dim < dims.size(); ++dim) {
           generate_indent(dims.size() + 2 - dim, o_);
           o_ << "}" << EOL;
@@ -2707,32 +2707,32 @@ namespace stan {
         var_size_validator_(x);
         var_resizer_(x);
         o_ << INDENT2
-           << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
-        o_ << INDENT2 << "pos__ = 0;" << EOL;
-        o_ << INDENT2 << "size_t " << x.name_ << "_i_vec_lim__ = ";
+           << "vals_r_ = context_.vals_r(\"" << x.name_ << "\");" << EOL;
+        o_ << INDENT2 << "pos_ = 0;" << EOL;
+        o_ << INDENT2 << "size_t " << x.name_ << "_i_vec_lim_ = ";
         generate_expression(x.K_, o_);
         o_ << ";" << EOL;
-        o_ << INDENT2 << "for (size_t " << "i_vec__ = 0; " << "i_vec__ < "
-           << x.name_ << "_i_vec_lim__; ++i_vec__) {" << EOL;
+        o_ << INDENT2 << "for (size_t " << "i_vec_ = 0; " << "i_vec_ < "
+           << x.name_ << "_i_vec_lim_; ++i_vec_) {" << EOL;
         size_t indentation = 2;
         for (size_t dim_up = 0U; dim_up < dims.size(); ++dim_up) {
           size_t dim = dims.size() - dim_up - 1U;
           ++indentation;
           generate_indent(indentation, o_);
-          o_ << "size_t " << x.name_ << "_limit_" << dim << "__ = ";
+          o_ << "size_t " << x.name_ << "_limit_" << dim << "_ = ";
           generate_expression(dims[dim], o_);
           o_ << ";" << EOL;
           generate_indent(indentation, o_);
-          o_ << "for (size_t i_" << dim << "__ = 0; i_" << dim << "__ < "
-             << x.name_ << "_limit_" << dim << "__; ++i_" << dim << "__) {"
+          o_ << "for (size_t i_" << dim << "_ = 0; i_" << dim << "_ < "
+             << x.name_ << "_limit_" << dim << "_; ++i_" << dim << "_) {"
              << EOL;
         }
         generate_indent(indentation+1, o_);
         o_ << x.name_;
         for (size_t dim = 0; dim < dims.size(); ++dim)
-          o_ << "[i_" << dim << "__]";
-        o_ << "[i_vec__]";
-        o_ << " = vals_r__[pos__++];" << EOL;
+          o_ << "[i_" << dim << "_]";
+        o_ << "[i_vec_]";
+        o_ << " = vals_r_[pos_++];" << EOL;
         for (size_t dim = 0; dim < dims.size(); ++dim) {
           generate_indent(dims.size() + 2 - dim, o_);
           o_ << "}" << EOL;
@@ -2745,32 +2745,32 @@ namespace stan {
         var_size_validator_(x);
         var_resizer_(x);
         o_ << INDENT2
-           << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
-        o_ << INDENT2 << "pos__ = 0;" << EOL;
-        o_ << INDENT2 << "size_t " << x.name_ << "_i_vec_lim__ = ";
+           << "vals_r_ = context_.vals_r(\"" << x.name_ << "\");" << EOL;
+        o_ << INDENT2 << "pos_ = 0;" << EOL;
+        o_ << INDENT2 << "size_t " << x.name_ << "_i_vec_lim_ = ";
         generate_expression(x.K_, o_);
         o_ << ";" << EOL;
-        o_ << INDENT2 << "for (size_t " << "i_vec__ = 0; " << "i_vec__ < "
-           << x.name_ << "_i_vec_lim__; ++i_vec__) {" << EOL;
+        o_ << INDENT2 << "for (size_t " << "i_vec_ = 0; " << "i_vec_ < "
+           << x.name_ << "_i_vec_lim_; ++i_vec_) {" << EOL;
         size_t indentation = 2;
         for (size_t dim_up = 0U; dim_up < dims.size(); ++dim_up) {
           size_t dim = dims.size() - dim_up - 1U;
           ++indentation;
           generate_indent(indentation, o_);
-          o_ << "size_t " << x.name_ << "_limit_" << dim << "__ = ";
+          o_ << "size_t " << x.name_ << "_limit_" << dim << "_ = ";
           generate_expression(dims[dim], o_);
           o_ << ";" << EOL;
           generate_indent(indentation, o_);
-          o_ << "for (size_t i_" << dim << "__ = 0; i_" << dim << "__ < "
-             << x.name_ << "_limit_" << dim << "__; ++i_" << dim << "__) {"
+          o_ << "for (size_t i_" << dim << "_ = 0; i_" << dim << "_ < "
+             << x.name_ << "_limit_" << dim << "_; ++i_" << dim << "_) {"
              << EOL;
         }
         generate_indent(indentation+1, o_);
         o_ << x.name_;
         for (size_t dim = 0; dim < dims.size(); ++dim)
-          o_ << "[i_" << dim << "__]";
-        o_ << "[i_vec__]";
-        o_ << " = vals_r__[pos__++];" << EOL;
+          o_ << "[i_" << dim << "_]";
+        o_ << "[i_vec_]";
+        o_ << " = vals_r_[pos_++];" << EOL;
         for (size_t dim = 0; dim < dims.size(); ++dim) {
           generate_indent(dims.size() + 2 - dim, o_);
           o_ << "}" << EOL;
@@ -2783,32 +2783,32 @@ namespace stan {
         var_size_validator_(x);
         var_resizer_(x);
         o_ << INDENT2
-           << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
-        o_ << INDENT2 << "pos__ = 0;" << EOL;
-        o_ << INDENT2 << "size_t " << x.name_ << "_i_vec_lim__ = ";
+           << "vals_r_ = context_.vals_r(\"" << x.name_ << "\");" << EOL;
+        o_ << INDENT2 << "pos_ = 0;" << EOL;
+        o_ << INDENT2 << "size_t " << x.name_ << "_i_vec_lim_ = ";
         generate_expression(x.K_, o_);
         o_ << ";" << EOL;
-        o_ << INDENT2 << "for (size_t " << "i_vec__ = 0; " << "i_vec__ < "
-           << x.name_ << "_i_vec_lim__; ++i_vec__) {" << EOL;
+        o_ << INDENT2 << "for (size_t " << "i_vec_ = 0; " << "i_vec_ < "
+           << x.name_ << "_i_vec_lim_; ++i_vec_) {" << EOL;
         size_t indentation = 2;
         for (size_t dim_up = 0U; dim_up < dims.size(); ++dim_up) {
           size_t dim = dims.size() - dim_up - 1U;
           ++indentation;
           generate_indent(indentation, o_);
-          o_ << "size_t " << x.name_ << "_limit_" << dim << "__ = ";
+          o_ << "size_t " << x.name_ << "_limit_" << dim << "_ = ";
           generate_expression(dims[dim], o_);
           o_ << ";" << EOL;
           generate_indent(indentation, o_);
-          o_ << "for (size_t i_" << dim << "__ = 0; i_" << dim << "__ < "
-             << x.name_ << "_limit_" << dim << "__; ++i_" << dim << "__) {"
+          o_ << "for (size_t i_" << dim << "_ = 0; i_" << dim << "_ < "
+             << x.name_ << "_limit_" << dim << "_; ++i_" << dim << "_) {"
              << EOL;
         }
         generate_indent(indentation+1, o_);
         o_ << x.name_;
         for (size_t dim = 0; dim < dims.size(); ++dim)
-          o_ << "[i_" << dim << "__]";
-        o_ << "[i_vec__]";
-        o_ << " = vals_r__[pos__++];" << EOL;
+          o_ << "[i_" << dim << "_]";
+        o_ << "[i_vec_]";
+        o_ << " = vals_r_[pos_++];" << EOL;
         for (size_t dim = 0; dim < dims.size(); ++dim) {
           generate_indent(dims.size() + 2 - dim, o_);
           o_ << "}" << EOL;
@@ -2820,38 +2820,38 @@ namespace stan {
         std::vector<expression> dims = x.dims_;
         var_size_validator_(x);
         var_resizer_(x);
-        o_ << INDENT2 << "vals_r__ = context__.vals_r(\""
+        o_ << INDENT2 << "vals_r_ = context_.vals_r(\""
            << x.name_ << "\");" << EOL;
-        o_ << INDENT2 << "pos__ = 0;" << EOL;
-        o_ << INDENT2 << "size_t " << x.name_ << "_m_mat_lim__ = ";
+        o_ << INDENT2 << "pos_ = 0;" << EOL;
+        o_ << INDENT2 << "size_t " << x.name_ << "_m_mat_lim_ = ";
         generate_expression(x.M_, o_);
         o_ << ";" << EOL;
-        o_ << INDENT2 << "size_t " << x.name_ << "_n_mat_lim__ = ";
+        o_ << INDENT2 << "size_t " << x.name_ << "_n_mat_lim_ = ";
         generate_expression(x.N_, o_);
         o_ << ";" << EOL;
-        o_ << INDENT2 << "for (size_t " << "n_mat__ = 0; " << "n_mat__ < "
-           << x.name_ << "_n_mat_lim__; ++n_mat__) {" << EOL;
-        o_ << INDENT3 << "for (size_t " << "m_mat__ = 0; " << "m_mat__ < "
-           << x.name_ << "_m_mat_lim__; ++m_mat__) {" << EOL;
+        o_ << INDENT2 << "for (size_t " << "n_mat_ = 0; " << "n_mat_ < "
+           << x.name_ << "_n_mat_lim_; ++n_mat_) {" << EOL;
+        o_ << INDENT3 << "for (size_t " << "m_mat_ = 0; " << "m_mat_ < "
+           << x.name_ << "_m_mat_lim_; ++m_mat_) {" << EOL;
         size_t indentation = 3;
         for (size_t dim_up = 0U; dim_up < dims.size(); ++dim_up) {
           size_t dim = dims.size() - dim_up - 1U;
           ++indentation;
           generate_indent(indentation, o_);
-          o_ << "size_t " << x.name_ << "_limit_" << dim << "__ = ";
+          o_ << "size_t " << x.name_ << "_limit_" << dim << "_ = ";
           generate_expression(dims[dim], o_);
           o_ << ";" << EOL;
           generate_indent(indentation, o_);
-          o_ << "for (size_t i_" << dim << "__ = 0; i_" << dim << "__ < "
-             << x.name_ << "_limit_" << dim << "__; ++i_" << dim << "__) {"
+          o_ << "for (size_t i_" << dim << "_ = 0; i_" << dim << "_ < "
+             << x.name_ << "_limit_" << dim << "_; ++i_" << dim << "_) {"
              << EOL;
         }
         generate_indent(indentation+1, o_);
         o_ << x.name_;
         for (size_t dim = 0; dim < dims.size(); ++dim)
-          o_ << "[i_" << dim << "__]";
-        o_ << "(m_mat__,n_mat__)";
-        o_ << " = vals_r__[pos__++];" << EOL;
+          o_ << "[i_" << dim << "_]";
+        o_ << "(m_mat_,n_mat_)";
+        o_ << " = vals_r_[pos_++];" << EOL;
         for (size_t dim = 0; dim < dims.size(); ++dim) {
           generate_indent(dims.size() + 2 - dim, o_);
           o_ << "}" << EOL;
@@ -2866,36 +2866,36 @@ namespace stan {
         var_size_validator_(x);
         var_resizer_(x);
         o_ << INDENT2
-           << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
-        o_ << INDENT2 << "pos__ = 0;" << EOL;
-        o_ << INDENT2 << "size_t " << x.name_ << "_k_mat_lim__ = ";
+           << "vals_r_ = context_.vals_r(\"" << x.name_ << "\");" << EOL;
+        o_ << INDENT2 << "pos_ = 0;" << EOL;
+        o_ << INDENT2 << "size_t " << x.name_ << "_k_mat_lim_ = ";
         generate_expression(x.K_, o_);
         o_ << ";" << EOL;
         o_ << INDENT2
-           << "for (size_t " << "n_mat__ = 0; " << "n_mat__ < " << x.name_
-           << "_k_mat_lim__; ++n_mat__) {" << EOL;
+           << "for (size_t " << "n_mat_ = 0; " << "n_mat_ < " << x.name_
+           << "_k_mat_lim_; ++n_mat_) {" << EOL;
         o_ << INDENT3
-           << "for (size_t " << "m_mat__ = 0; " << "m_mat__ < " << x.name_
-           << "_k_mat_lim__; ++m_mat__) {" << EOL;
+           << "for (size_t " << "m_mat_ = 0; " << "m_mat_ < " << x.name_
+           << "_k_mat_lim_; ++m_mat_) {" << EOL;
         size_t indentation = 3;
         for (size_t dim_up = 0U; dim_up < dims.size(); ++dim_up) {
           size_t dim = dims.size() - dim_up - 1U;
           ++indentation;
           generate_indent(indentation, o_);
-          o_ << "size_t " << x.name_ << "_limit_" << dim << "__ = ";
+          o_ << "size_t " << x.name_ << "_limit_" << dim << "_ = ";
           generate_expression(dims[dim], o_);
           o_ << ";" << EOL;
           generate_indent(indentation, o_);
-          o_ << "for (size_t i_" << dim << "__ = 0; i_" << dim << "__ < "
-             << x.name_ << "_limit_" << dim << "__; ++i_" << dim << "__) {"
+          o_ << "for (size_t i_" << dim << "_ = 0; i_" << dim << "_ < "
+             << x.name_ << "_limit_" << dim << "_; ++i_" << dim << "_) {"
              << EOL;
         }
         generate_indent(indentation+1, o_);
         o_ << x.name_;
         for (size_t dim = 0; dim < dims.size(); ++dim)
-          o_ << "[i_" << dim << "__]";
-        o_ << "(m_mat__,n_mat__)";
-        o_ << " = vals_r__[pos__++];" << EOL;
+          o_ << "[i_" << dim << "_]";
+        o_ << "(m_mat_,n_mat_)";
+        o_ << " = vals_r_[pos_++];" << EOL;
         for (size_t dim = 0; dim < dims.size(); ++dim) {
           generate_indent(dims.size() + 2 - dim, o_);
           o_ << "}" << EOL;
@@ -2908,42 +2908,42 @@ namespace stan {
         std::vector<expression> dims = x.dims_;
         var_size_validator_(x);
         var_resizer_(x);
-        o_ << INDENT2 << "vals_r__ = context__.vals_r(\""
+        o_ << INDENT2 << "vals_r_ = context_.vals_r(\""
            << x.name_ << "\");" << EOL;
-        o_ << INDENT2 << "pos__ = 0;" << EOL;
+        o_ << INDENT2 << "pos_ = 0;" << EOL;
 
-        o_ << INDENT2 << "size_t " << x.name_ << "_m_mat_lim__ = ";
+        o_ << INDENT2 << "size_t " << x.name_ << "_m_mat_lim_ = ";
         generate_expression(x.M_, o_);
         o_ << ";" << EOL;
 
-        o_ << INDENT2 << "size_t " << x.name_ << "_n_mat_lim__ = ";
+        o_ << INDENT2 << "size_t " << x.name_ << "_n_mat_lim_ = ";
         generate_expression(x.N_, o_);
         o_ << ";" << EOL;
 
-        o_ << INDENT2 << "for (size_t " << "n_mat__ = 0; " << "n_mat__ < "
-           << x.name_ << "_n_mat_lim__; ++n_mat__) {" << EOL;
-        o_ << INDENT3 << "for (size_t " << "m_mat__ = 0; " << "m_mat__ < "
-           << x.name_ << "_m_mat_lim__; ++m_mat__) {" << EOL;
+        o_ << INDENT2 << "for (size_t " << "n_mat_ = 0; " << "n_mat_ < "
+           << x.name_ << "_n_mat_lim_; ++n_mat_) {" << EOL;
+        o_ << INDENT3 << "for (size_t " << "m_mat_ = 0; " << "m_mat_ < "
+           << x.name_ << "_m_mat_lim_; ++m_mat_) {" << EOL;
 
         size_t indentation = 3;
         for (size_t dim_up = 0U; dim_up < dims.size(); ++dim_up) {
           size_t dim = dims.size() - dim_up - 1U;
           ++indentation;
           generate_indent(indentation, o_);
-          o_ << "size_t " << x.name_ << "_limit_" << dim << "__ = ";
+          o_ << "size_t " << x.name_ << "_limit_" << dim << "_ = ";
           generate_expression(dims[dim], o_);
           o_ << ";" << EOL;
           generate_indent(indentation, o_);
-          o_ << "for (size_t i_" << dim << "__ = 0; i_" << dim << "__ < "
-             << x.name_ << "_limit_" << dim << "__; ++i_" << dim << "__) {"
+          o_ << "for (size_t i_" << dim << "_ = 0; i_" << dim << "_ < "
+             << x.name_ << "_limit_" << dim << "_; ++i_" << dim << "_) {"
              << EOL;
         }
         generate_indent(indentation+1, o_);
         o_ << x.name_;
         for (size_t dim = 0; dim < dims.size(); ++dim)
-          o_ << "[i_" << dim << "__]";
-        o_ << "(m_mat__,n_mat__)";
-        o_ << " = vals_r__[pos__++];" << EOL;
+          o_ << "[i_" << dim << "_]";
+        o_ << "(m_mat_,n_mat_)";
+        o_ << " = vals_r_[pos_++];" << EOL;
         for (size_t dim = 0; dim < dims.size(); ++dim) {
           generate_indent(dims.size() + 2 - dim, o_);
           o_ << "}" << EOL;
@@ -2957,42 +2957,42 @@ namespace stan {
         std::vector<expression> dims = x.dims_;
         var_size_validator_(x);
         var_resizer_(x);
-        o_ << INDENT2 << "vals_r__ = context__.vals_r(\""
+        o_ << INDENT2 << "vals_r_ = context_.vals_r(\""
            << x.name_ << "\");" << EOL;
-        o_ << INDENT2 << "pos__ = 0;" << EOL;
+        o_ << INDENT2 << "pos_ = 0;" << EOL;
 
-        o_ << INDENT2 << "size_t " << x.name_ << "_m_mat_lim__ = ";
+        o_ << INDENT2 << "size_t " << x.name_ << "_m_mat_lim_ = ";
         generate_expression(x.K_, o_);
         o_ << ";" << EOL;
 
-        o_ << INDENT2 << "size_t " << x.name_ << "_n_mat_lim__ = ";
+        o_ << INDENT2 << "size_t " << x.name_ << "_n_mat_lim_ = ";
         generate_expression(x.K_, o_);
         o_ << ";" << EOL;
 
-        o_ << INDENT2 << "for (size_t " << "n_mat__ = 0; " << "n_mat__ < "
-           << x.name_ << "_n_mat_lim__; ++n_mat__) {" << EOL;
-        o_ << INDENT3 << "for (size_t " << "m_mat__ = 0; " << "m_mat__ < "
-           << x.name_ << "_m_mat_lim__; ++m_mat__) {" << EOL;
+        o_ << INDENT2 << "for (size_t " << "n_mat_ = 0; " << "n_mat_ < "
+           << x.name_ << "_n_mat_lim_; ++n_mat_) {" << EOL;
+        o_ << INDENT3 << "for (size_t " << "m_mat_ = 0; " << "m_mat_ < "
+           << x.name_ << "_m_mat_lim_; ++m_mat_) {" << EOL;
 
         size_t indentation = 3;
         for (size_t dim_up = 0U; dim_up < dims.size(); ++dim_up) {
           size_t dim = dims.size() - dim_up - 1U;
           ++indentation;
           generate_indent(indentation, o_);
-          o_ << "size_t " << x.name_ << "_limit_" << dim << "__ = ";
+          o_ << "size_t " << x.name_ << "_limit_" << dim << "_ = ";
           generate_expression(dims[dim], o_);
           o_ << ";" << EOL;
           generate_indent(indentation, o_);
-          o_ << "for (size_t i_" << dim << "__ = 0; i_" << dim << "__ < "
-             << x.name_ << "_limit_" << dim << "__; ++i_" << dim << "__) {"
+          o_ << "for (size_t i_" << dim << "_ = 0; i_" << dim << "_ < "
+             << x.name_ << "_limit_" << dim << "_; ++i_" << dim << "_) {"
              << EOL;
         }
         generate_indent(indentation+1, o_);
         o_ << x.name_;
         for (size_t dim = 0; dim < dims.size(); ++dim)
-          o_ << "[i_" << dim << "__]";
-        o_ << "(m_mat__,n_mat__)";
-        o_ << " = vals_r__[pos__++];" << EOL;
+          o_ << "[i_" << dim << "_]";
+        o_ << "(m_mat_,n_mat_)";
+        o_ << " = vals_r_[pos_++];" << EOL;
         for (size_t dim = 0; dim < dims.size(); ++dim) {
           generate_indent(dims.size() + 2 - dim, o_);
           o_ << "}" << EOL;
@@ -3005,35 +3005,35 @@ namespace stan {
         std::vector<expression> dims = x.dims_;
         var_size_validator_(x);
         var_resizer_(x);
-        o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");"
+        o_ << INDENT2 << "vals_r_ = context_.vals_r(\"" << x.name_ << "\");"
            << EOL;
-        o_ << INDENT2 << "pos__ = 0;" << EOL;
-        o_ << INDENT2 << "size_t " << x.name_ << "_k_mat_lim__ = ";
+        o_ << INDENT2 << "pos_ = 0;" << EOL;
+        o_ << INDENT2 << "size_t " << x.name_ << "_k_mat_lim_ = ";
         generate_expression(x.K_, o_);
         o_ << ";" << EOL;
-        o_ << INDENT2 << "for (size_t " << "n_mat__ = 0; " << "n_mat__ < "
-           << x.name_ << "_k_mat_lim__; ++n_mat__) {" << EOL;
-        o_ << INDENT3 << "for (size_t " << "m_mat__ = 0; " << "m_mat__ < "
-           << x.name_ << "_k_mat_lim__; ++m_mat__) {" << EOL;
+        o_ << INDENT2 << "for (size_t " << "n_mat_ = 0; " << "n_mat_ < "
+           << x.name_ << "_k_mat_lim_; ++n_mat_) {" << EOL;
+        o_ << INDENT3 << "for (size_t " << "m_mat_ = 0; " << "m_mat_ < "
+           << x.name_ << "_k_mat_lim_; ++m_mat_) {" << EOL;
         size_t indentation = 3;
         for (size_t dim_up = 0U; dim_up < dims.size(); ++dim_up) {
           size_t dim = dims.size() - dim_up - 1U;
           ++indentation;
           generate_indent(indentation, o_);
-          o_ << "size_t " << x.name_ << "_limit_" << dim << "__ = ";
+          o_ << "size_t " << x.name_ << "_limit_" << dim << "_ = ";
           generate_expression(dims[dim], o_);
           o_ << ";" << EOL;
           generate_indent(indentation, o_);
-          o_ << "for (size_t i_" << dim << "__ = 0; i_" << dim << "__ < "
-             << x.name_ << "_limit_" << dim << "__; ++i_" << dim << "__) {"
+          o_ << "for (size_t i_" << dim << "_ = 0; i_" << dim << "_ < "
+             << x.name_ << "_limit_" << dim << "_; ++i_" << dim << "_) {"
              << EOL;
         }
         generate_indent(indentation+1, o_);
         o_ << x.name_;
         for (size_t dim = 0; dim < dims.size(); ++dim)
-          o_ << "[i_" << dim << "__]";
-        o_ << "(m_mat__,n_mat__)";
-        o_ << " = vals_r__[pos__++];" << EOL;
+          o_ << "[i_" << dim << "_]";
+        o_ << "(m_mat_,n_mat_)";
+        o_ << " = vals_r_[pos_++];" << EOL;
         for (size_t dim = 0; dim < dims.size(); ++dim) {
           generate_indent(dims.size() + 2 - dim, o_);
           o_ << "}" << EOL;
@@ -3080,14 +3080,14 @@ namespace stan {
         // for loop for ranges
         for (size_t i = 0; i < x.dims_.size(); ++i) {
           generate_indent(i + 2, o_);
-          o_ << "for (size_t i_" << i << "__ = 0; ";
-          o_ << "i_" << i << "__ < ";
+          o_ << "for (size_t i_" << i << "_ = 0; ";
+          o_ << "i_" << i << "_ < ";
           generate_expression(x.dims_[i], o_);
-          o_ << "; ++i_" << i << "__) {" << EOL;
+          o_ << "; ++i_" << i << "_) {" << EOL;
         }
         // add range
         generate_indent(x.dims_.size() + 2, o_);
-        o_ << "param_ranges_i__.push_back(std::pair<int, int>(";
+        o_ << "param_ranges_i_.push_back(std::pair<int, int>(";
         generate_expression(x.range_.low_, o_);
         o_ << ", ";
         generate_expression(x.range_.high_, o_);
@@ -3131,7 +3131,7 @@ namespace stan {
         for (size_t i = 0; i < x.dims_.size(); ++i) {
           generate_validate_positive(x.name_, x.dims_[i], 2, o_);
         }
-        o_ << INDENT2 << "num_params_r__ += (";
+        o_ << INDENT2 << "num_params_r_ += (";
         generate_expression(x.K_, o_);
         o_ << ")";
         for (size_t i = 0; i < x.dims_.size(); ++i) {
@@ -3146,7 +3146,7 @@ namespace stan {
         for (size_t i = 0; i < x.dims_.size(); ++i) {
           generate_validate_positive(x.name_, x.dims_[i], 2, o_);
         }
-        o_ << INDENT2 << "num_params_r__ += (";
+        o_ << INDENT2 << "num_params_r_ += (";
         generate_expression(x.K_, o_);
         o_ << " - 1)";
         for (size_t i = 0; i < x.dims_.size(); ++i) {
@@ -3175,7 +3175,7 @@ namespace stan {
         for (size_t i = 0; i < x.dims_.size(); ++i) {
           generate_validate_positive(x.name_, x.dims_[i], 2, o_);
         }
-        o_ << INDENT2 << "num_params_r__ += ((";
+        o_ << INDENT2 << "num_params_r_ += ((";
         // N * (N + 1) / 2  +  (M - N) * M
         generate_expression(x.N_, o_);
         o_ << " * (";
@@ -3199,7 +3199,7 @@ namespace stan {
           generate_validate_positive(x.name_, x.dims_[i], 2, o_);
         }
         // FIXME: cut and paste ofcorr_matrix_var_decl
-        o_ << INDENT2 << "num_params_r__ += ((";
+        o_ << INDENT2 << "num_params_r_ += ((";
         generate_expression(x.K_, o_);
         o_ << " * (";
         generate_expression(x.K_, o_);
@@ -3216,7 +3216,7 @@ namespace stan {
           generate_validate_positive(x.name_, x.dims_[i], 2, o_);
         }
         // (K * (K - 1))/2 + K  ?? define fun(K) = ??
-        o_ << INDENT2 << "num_params_r__ += ((";
+        o_ << INDENT2 << "num_params_r_ += ((";
         generate_expression(x.K_, o_);
         o_ << " * (";
         generate_expression(x.K_, o_);
@@ -3234,7 +3234,7 @@ namespace stan {
         for (size_t i = 0; i < x.dims_.size(); ++i) {
           generate_validate_positive(x.name_, x.dims_[i], 2, o_);
         }
-        o_ << INDENT2 << "num_params_r__ += ((";
+        o_ << INDENT2 << "num_params_r_ += ((";
         generate_expression(x.K_, o_);
         o_ << " * (";
         generate_expression(x.K_, o_);
@@ -3248,10 +3248,10 @@ namespace stan {
       // cut-and-paste from next for r
       void generate_increment_i(std::vector<expression> dims) const {
         if (dims.size() == 0) {
-          o_ << INDENT2 << "++num_params_i__;" << EOL;
+          o_ << INDENT2 << "++num_params_i_;" << EOL;
           return;
         }
-        o_ << INDENT2 << "num_params_r__ += ";
+        o_ << INDENT2 << "num_params_r_ += ";
         for (size_t i = 0; i < dims.size(); ++i) {
           if (i > 0) o_ << " * ";
           generate_expression(dims[i], o_);
@@ -3260,10 +3260,10 @@ namespace stan {
       }
       void generate_increment(std::vector<expression> dims) const {
         if (dims.size() == 0) {
-          o_ << INDENT2 << "++num_params_r__;" << EOL;
+          o_ << INDENT2 << "++num_params_r_;" << EOL;
           return;
         }
-        o_ << INDENT2 << "num_params_r__ += ";
+        o_ << INDENT2 << "num_params_r_ += ";
         for (size_t i = 0; i < dims.size(); ++i) {
           if (i > 0) o_ << " * ";
           generate_expression(dims[i], o_);
@@ -3272,7 +3272,7 @@ namespace stan {
       }
       void generate_increment(expression K,
                               std::vector<expression> dims) const {
-        o_ << INDENT2 << "num_params_r__ += ";
+        o_ << INDENT2 << "num_params_r_ += ";
         generate_expression(K, o_);
         for (size_t i = 0; i < dims.size(); ++i) {
           o_ << " * ";
@@ -3282,7 +3282,7 @@ namespace stan {
       }
       void generate_increment(expression M, expression N,
                               std::vector<expression> dims) const {
-        o_ << INDENT2 << "num_params_r__ += ";
+        o_ << INDENT2 << "num_params_r_ += ";
         generate_expression(M, o_);
         o_ << " * ";
         generate_expression(N, o_);
@@ -3302,8 +3302,8 @@ namespace stan {
      */
     void generate_set_param_ranges(const std::vector<var_decl>& var_decls,
                                    std::ostream& o) {
-      o << INDENT2 << "num_params_r__ = 0U;" << EOL;
-      o << INDENT2 << "param_ranges_i__.clear();" << EOL;
+      o << INDENT2 << "num_params_r_ = 0U;" << EOL;
+      o << INDENT2 << "param_ranges_i_.clear();" << EOL;
       set_param_ranges_visgen vis(o);
       for (size_t i = 0; i < var_decls.size(); ++i)
         boost::apply_visitor(vis, var_decls[i].decl_);
@@ -3314,41 +3314,41 @@ namespace stan {
                               std::ostream& o) {
       // constructor without RNG or template parameter
       // FIXME(carpenter): remove this and only call full ctor
-      o << INDENT << model_name << "(stan::io::var_context& context__," << EOL;
-      o << INDENT << "    std::ostream* pstream__ = 0)" << EOL;
+      o << INDENT << model_name << "(stan::io::var_context& context_," << EOL;
+      o << INDENT << "    std::ostream* pstream_ = 0)" << EOL;
       o << INDENT2 << ": prob_grad(0) {" << EOL;
       o << INDENT2 << "typedef boost::ecuyer1988 rng_t;" << EOL;
       o << INDENT2 << "rng_t base_rng(0);  // 0 seed default" << EOL;
-      o << INDENT2 << "ctor_body(context__, base_rng, pstream__);" << EOL;
+      o << INDENT2 << "ctor_body(context_, base_rng, pstream_);" << EOL;
       o << INDENT << "}" << EOL2;
 
       // constructor with specified RNG
       o << INDENT << "template <class RNG>" << EOL;
-      o << INDENT << model_name << "(stan::io::var_context& context__," << EOL;
-      o << INDENT << "    RNG& base_rng__," << EOL;
-      o << INDENT << "    std::ostream* pstream__ = 0)" << EOL;
+      o << INDENT << model_name << "(stan::io::var_context& context_," << EOL;
+      o << INDENT << "    RNG& base_rng_," << EOL;
+      o << INDENT << "    std::ostream* pstream_ = 0)" << EOL;
       o << INDENT2 << ": prob_grad(0) {" << EOL;
-      o << INDENT2 << "ctor_body(context__, base_rng__, pstream__);" << EOL;
+      o << INDENT2 << "ctor_body(context_, base_rng_, pstream_);" << EOL;
       o << INDENT << "}" << EOL2;
 
       // body of constructor now in function
       o << INDENT << "template <class RNG>" << EOL;
-      o << INDENT << "void ctor_body(stan::io::var_context& context__," << EOL;
-      o << INDENT << "               RNG& base_rng__," << EOL;
-      o << INDENT << "               std::ostream* pstream__) {" << EOL;
-      o << INDENT2 << "current_statement_begin__ = -1;" << EOL2;
-      o << INDENT2 << "static const char* function__ = \""
+      o << INDENT << "void ctor_body(stan::io::var_context& context_," << EOL;
+      o << INDENT << "               RNG& base_rng_," << EOL;
+      o << INDENT << "               std::ostream* pstream_) {" << EOL;
+      o << INDENT2 << "current_statement_begin_ = -1;" << EOL2;
+      o << INDENT2 << "static const char* function_ = \""
         << model_name << "_namespace::" << model_name << "\";" << EOL;
-      suppress_warning(INDENT2, "function__", o);
-      o << INDENT2 << "size_t pos__;" << EOL;
-      suppress_warning(INDENT2, "pos__", o);
-      o << INDENT2 << "std::vector<int> vals_i__;" << EOL;
-      o << INDENT2 << "std::vector<double> vals_r__;" << EOL;
+      suppress_warning(INDENT2, "function_", o);
+      o << INDENT2 << "size_t pos_;" << EOL;
+      suppress_warning(INDENT2, "pos_", o);
+      o << INDENT2 << "std::vector<int> vals_i_;" << EOL;
+      o << INDENT2 << "std::vector<double> vals_r_;" << EOL;
 
       o << INDENT2
-        << "double DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());"
+        << "double DUMMY_VAR_(std::numeric_limits<double>::quiet_NaN());"
         << EOL;
-      o << INDENT2 << "(void) DUMMY_VAR__;  // suppress unused var warning"
+      o << INDENT2 << "(void) DUMMY_VAR_;  // suppress unused var warning"
         << EOL2;
 
       o << INDENT2 << "// initialize member variables" << EOL;
@@ -3519,7 +3519,7 @@ namespace stan {
         o_ << "try {"
            << EOL
            << INDENT3
-           << "writer__." << write_method_name;
+           << "writer_." << write_method_name;
         generate_name_dims(var_name, dims.size());
         o_ << ");"
            << EOL
@@ -3539,7 +3539,7 @@ namespace stan {
                               size_t num_dims) const {
         o_ << name;
         for (size_t i = 0; i < num_dims; ++i)
-          o_ << "[i" << i << "__]";
+          o_ << "[i" << i << "_]";
       }
       void generate_declaration(const std::string& name,
                                 const std::string& base_type,
@@ -3574,67 +3574,67 @@ namespace stan {
         int extra_indent = is_matrix ? 2U : is_vector ? 1U : 0U;
         if (is_matrix) {
           generate_indent(indent, o_);
-          o_ << "for (int j2__ = 0U; j2__ < ";
+          o_ << "for (int j2_ = 0U; j2_ < ";
           generate_expression(dim2.expr_, o_);
-          o_ << "; ++j2__)" << EOL;
+          o_ << "; ++j2_)" << EOL;
 
           generate_indent(indent+1, o_);
-          o_ << "for (int j1__ = 0U; j1__ < ";
+          o_ << "for (int j1_ = 0U; j1_ < ";
           generate_expression(dim1.expr_, o_);
-          o_ << "; ++j1__)" << EOL;
+          o_ << "; ++j1_)" << EOL;
         } else if (is_vector) {
           generate_indent(indent, o_);
-          o_ << "for (int j1__ = 0U; j1__ < ";
+          o_ << "for (int j1_ = 0U; j1_ < ";
           generate_expression(dim1.expr_, o_);
-          o_ << "; ++j1__)" << EOL;
+          o_ << "; ++j1_)" << EOL;
         }
         for (size_t i = 0; i < size; ++i) {
           size_t idx = size - i - 1;
           generate_indent(i + indent + extra_indent, o_);
-          o_ << "for (int i" << idx << "__ = 0U; i" << idx << "__ < ";
+          o_ << "for (int i" << idx << "_ = 0U; i" << idx << "_ < ";
           generate_expression(dims[idx].expr_, o_);
-          o_ << "; ++i" << idx << "__)" << EOL;
+          o_ << "; ++i" << idx << "_)" << EOL;
         }
         generate_indent_num_dims(2U, dims, dim1, dim2);
         o_ << name;
         for (size_t i = 0; i < dims.size(); ++i)
-          o_ << "[i" << i << "__]";
+          o_ << "[i" << i << "_]";
         if (is_matrix)
-          o_ << "(j1__,j2__)";
+          o_ << "(j1_,j2_)";
         else if (is_vector)
-          o_ << "(j1__)";
-        o_ << " = vals_" << base_type << "__[pos__++];" << EOL;
+          o_ << "(j1_)";
+        o_ << " = vals_" << base_type << "_[pos_++];" << EOL;
       }
       void generate_dims_loop_fwd(const std::vector<expression>& dims,
                                   int indent = 2U) const {
         size_t size = dims.size();
         for (size_t i = 0; i < size; ++i) {
           generate_indent(i + indent, o_);
-          o_ << "for (int i" << i << "__ = 0U; i" << i << "__ < ";
+          o_ << "for (int i" << i << "_ = 0U; i" << i << "_ < ";
           generate_expression(dims[i].expr_, o_);
-          o_ << "; ++i" << i << "__)" << EOL;
+          o_ << "; ++i" << i << "_)" << EOL;
         }
         generate_indent(2U + dims.size(), o_);
       }
       void generate_check_int(const std::string& name, size_t /*n*/) const {
         o_ << EOL << INDENT2
-           << "if (!(context__.contains_i(\"" << name << "\")))"
+           << "if (!(context_.contains_i(\"" << name << "\")))"
            << EOL << INDENT3
            << "throw std::runtime_error(\"variable " << name << " missing\");"
            << EOL;
-        o_ << INDENT2 << "vals_i__ = context__.vals_i(\"" << name << "\");"
+        o_ << INDENT2 << "vals_i_ = context_.vals_i(\"" << name << "\");"
            << EOL;
-        o_ << INDENT2 << "pos__ = 0U;" << EOL;
+        o_ << INDENT2 << "pos_ = 0U;" << EOL;
       }
       void generate_check_double(const std::string& name, size_t /*n*/) const {
         o_ << EOL << INDENT2
-           << "if (!(context__.contains_r(\"" << name << "\")))"
+           << "if (!(context_.contains_r(\"" << name << "\")))"
            << EOL << INDENT3
            << "throw std::runtime_error(\"variable " << name << " missing\");"
            << EOL;
         o_ << INDENT2
-           << "vals_r__ = context__.vals_r(\"" << name << "\");" << EOL;
-        o_ << INDENT2 << "pos__ = 0U;" << EOL;
+           << "vals_r_ = context_.vals_r(\"" << name << "\");" << EOL;
+        o_ << INDENT2 << "pos_ = 0U;" << EOL;
       }
     };
 
@@ -3643,29 +3643,29 @@ namespace stan {
                               std::ostream& o) {
       o << EOL;
       o << INDENT
-        << "void transform_inits(const stan::io::var_context& context__,"
+        << "void transform_inits(const stan::io::var_context& context_,"
         << EOL;
-      o << INDENT << "                     std::vector<int>& params_i__,"
+      o << INDENT << "                     std::vector<int>& params_i_,"
         << EOL;
-      o << INDENT << "                     std::vector<double>& params_r__,"
+      o << INDENT << "                     std::vector<double>& params_r_,"
         << EOL;
-      o << INDENT << "                     std::ostream* pstream__) const {"
+      o << INDENT << "                     std::ostream* pstream_) const {"
         << EOL;
       o << INDENT2 << "stan::io::writer<double> "
-        << "writer__(params_r__,params_i__);"
+        << "writer_(params_r_,params_i_);"
         << EOL;
-      o << INDENT2 << "size_t pos__;" << EOL;
-      o << INDENT2 << "(void) pos__; // dummy call to supress warning" << EOL;
-      o << INDENT2 << "std::vector<double> vals_r__;" << EOL;
-      o << INDENT2 << "std::vector<int> vals_i__;"
+      o << INDENT2 << "size_t pos_;" << EOL;
+      o << INDENT2 << "(void) pos_; // dummy call to supress warning" << EOL;
+      o << INDENT2 << "std::vector<double> vals_r_;" << EOL;
+      o << INDENT2 << "std::vector<int> vals_i_;"
         << EOL;
       generate_init_visgen vis(o);
       for (size_t i = 0; i < vs.size(); ++i)
         boost::apply_visitor(vis, vs[i].decl_);
 
       o << EOL
-        << INDENT2 << "params_r__ = writer__.data_r();" << EOL;
-      o << INDENT2 << "params_i__ = writer__.data_i();" << EOL;
+        << INDENT2 << "params_r_ = writer_.data_r();" << EOL;
+      o << INDENT2 << "params_i_ = writer_.data_i();" << EOL;
       o << INDENT << "}" << EOL2;
 
       o << INDENT
@@ -3674,11 +3674,11 @@ namespace stan {
         << "                     "
         << "Eigen::Matrix<double,Eigen::Dynamic,1>& params_r," << EOL;
       o << INDENT
-        << "                     std::ostream* pstream__) const {" << EOL;
+        << "                     std::ostream* pstream_) const {" << EOL;
       o << INDENT << "  std::vector<double> params_r_vec;" << EOL;
       o << INDENT << "  std::vector<int> params_i_vec;" << EOL;
       o << INDENT
-        << "  transform_inits(context, params_i_vec, params_r_vec, pstream__);"
+        << "  transform_inits(context, params_i_vec, params_r_vec, pstream_);"
         << EOL;
       o << INDENT << "  params_r.resize(params_r_vec.size());" << EOL;
       o << INDENT << "  for (int i = 0; i < params_r.size(); ++i)" << EOL;
@@ -3761,19 +3761,19 @@ namespace stan {
       generate_dims_array(const std::vector<expression>& matrix_dims_exprs,
                           const std::vector<expression>& array_dims_exprs)
         const {
-        o_ << INDENT2 << "dims__.resize(0);" << EOL;
+        o_ << INDENT2 << "dims_.resize(0);" << EOL;
         for (size_t i = 0; i < array_dims_exprs.size(); ++i) {
-          o_ << INDENT2 << "dims__.push_back(";
+          o_ << INDENT2 << "dims_.push_back(";
           generate_expression(array_dims_exprs[i].expr_, o_);
           o_ << ");" << EOL;
         }
         // cut and paste above with matrix_dims_exprs
         for (size_t i = 0; i < matrix_dims_exprs.size(); ++i) {
-          o_ << INDENT2 << "dims__.push_back(";
+          o_ << INDENT2 << "dims_.push_back(";
           generate_expression(matrix_dims_exprs[i].expr_, o_);
           o_ << ");" << EOL;
         }
-        o_ << INDENT2 << "dimss__.push_back(dims__);" << EOL;
+        o_ << INDENT2 << "dimss_.push_back(dims_);" << EOL;
       }
     };
 
@@ -3781,11 +3781,11 @@ namespace stan {
                               std::ostream& o) {
       write_dims_visgen vis(o);
       o << EOL << INDENT
-        << "void get_dims(std::vector<std::vector<size_t> >& dimss__) const {"
+        << "void get_dims(std::vector<std::vector<size_t> >& dimss_) const {"
         << EOL;
 
-      o << INDENT2 << "dimss__.resize(0);" << EOL;
-      o << INDENT2 << "std::vector<size_t> dims__;" << EOL;
+      o << INDENT2 << "dimss_.resize(0);" << EOL;
+      o << INDENT2 << "std::vector<size_t> dims_;" << EOL;
 
       // parameters
       for (size_t i = 0; i < prog.parameter_decl_.size(); ++i) {
@@ -3851,7 +3851,7 @@ namespace stan {
       void
       generate_param_names(const std::string& name) const {
         o_ << INDENT2
-           << "names__.push_back(\"" << name << "\");"
+           << "names_.push_back(\"" << name << "\");"
            << EOL;
       }
     };
@@ -3861,11 +3861,11 @@ namespace stan {
                                      std::ostream& o) {
       write_param_names_visgen vis(o);
       o << EOL << INDENT
-        << "void get_param_names(std::vector<std::string>& names__) const {"
+        << "void get_param_names(std::vector<std::string>& names_) const {"
         << EOL;
 
       o << INDENT2
-        << "names__.resize(0);"
+        << "names_.resize(0);"
         << EOL;
 
       // parameters
@@ -3968,24 +3968,24 @@ namespace stan {
 
         for (size_t i = combo_dims.size(); i-- > 0; ) {
           generate_indent(1 + combo_dims.size() - i, o_);
-          o_ << "for (int k_" << i << "__ = 1;"
-             << " k_" << i << "__ <= ";
+          o_ << "for (int k_" << i << "_ = 1;"
+             << " k_" << i << "_ <= ";
           generate_expression(combo_dims[i].expr_, o_);
-          o_ << "; ++k_" << i << "__) {" << EOL;  // begin (1)
+          o_ << "; ++k_" << i << "_) {" << EOL;  // begin (1)
         }
 
         generate_indent(2 + combo_dims.size(), o_);
-        o_ << "param_name_stream__.str(std::string());" << EOL;
+        o_ << "param_name_stream_.str(std::string());" << EOL;
 
         generate_indent(2 + combo_dims.size(), o_);
-        o_ << "param_name_stream__ << \"" << name << '"';
+        o_ << "param_name_stream_ << \"" << name << '"';
 
         for (size_t i = 0; i < combo_dims.size(); ++i)
-          o_ << " << '.' << k_" << i << "__";
+          o_ << " << '.' << k_" << i << "_";
         o_ << ';' << EOL;
 
         generate_indent(2 + combo_dims.size(), o_);
-        o_ << "param_names__.push_back(param_name_stream__.str());" << EOL;
+        o_ << "param_names_.push_back(param_name_stream_.str());" << EOL;
 
         // end for loop dims
         for (size_t i = 0; i < combo_dims.size(); ++i) {
@@ -4000,13 +4000,13 @@ namespace stan {
                                                  std::ostream& o) {
       o << EOL << INDENT
         << "void constrained_param_names("
-        << "std::vector<std::string>& param_names__,"
+        << "std::vector<std::string>& param_names_,"
         << EOL << INDENT
-        << "                             bool include_tparams__ = true,"
+        << "                             bool include_tparams_ = true,"
         << EOL << INDENT
-        << "                             bool include_gqs__ = true) const {"
+        << "                             bool include_gqs_ = true) const {"
         << EOL << INDENT2
-        << "std::stringstream param_name_stream__;" << EOL;
+        << "std::stringstream param_name_stream_;" << EOL;
 
       constrained_param_names_visgen vis(o);
       // parameters
@@ -4015,7 +4015,7 @@ namespace stan {
       }
 
       o << EOL << INDENT2
-        << "if (!include_gqs__ && !include_tparams__) return;"
+        << "if (!include_gqs_ && !include_tparams_) return;"
         << EOL;
 
       // transformed parameters
@@ -4024,7 +4024,7 @@ namespace stan {
       }
 
       o << EOL << INDENT2
-        << "if (!include_gqs__) return;"
+        << "if (!include_gqs_) return;"
         << EOL;
 
       // generated quantities
@@ -4150,24 +4150,24 @@ namespace stan {
 
         for (size_t i = combo_dims.size(); i-- > 0; ) {
           generate_indent(1 + combo_dims.size() - i, o_);
-          o_ << "for (int k_" << i << "__ = 1;"
-             << " k_" << i << "__ <= ";
+          o_ << "for (int k_" << i << "_ = 1;"
+             << " k_" << i << "_ <= ";
           generate_expression(combo_dims[i].expr_, o_);
-          o_ << "; ++k_" << i << "__) {" << EOL;  // begin (1)
+          o_ << "; ++k_" << i << "_) {" << EOL;  // begin (1)
         }
 
         generate_indent(2 + combo_dims.size(), o_);
-        o_ << "param_name_stream__.str(std::string());" << EOL;
+        o_ << "param_name_stream_.str(std::string());" << EOL;
 
         generate_indent(2 + combo_dims.size(), o_);
-        o_ << "param_name_stream__ << \"" << name << '"';
+        o_ << "param_name_stream_ << \"" << name << '"';
 
         for (size_t i = 0; i < combo_dims.size(); ++i)
-          o_ << " << '.' << k_" << i << "__";
+          o_ << " << '.' << k_" << i << "_";
         o_ << ';' << EOL;
 
         generate_indent(2 + combo_dims.size(), o_);
-        o_ << "param_names__.push_back(param_name_stream__.str());" << EOL;
+        o_ << "param_names_.push_back(param_name_stream_.str());" << EOL;
 
         // end for loop dims
         for (size_t i = 0; i < combo_dims.size(); ++i) {
@@ -4182,13 +4182,13 @@ namespace stan {
                                                    std::ostream& o) {
       o << EOL << INDENT
         << "void unconstrained_param_names("
-        << "std::vector<std::string>& param_names__,"
+        << "std::vector<std::string>& param_names_,"
         << EOL << INDENT
-        << "                               bool include_tparams__ = true,"
+        << "                               bool include_tparams_ = true,"
         << EOL << INDENT
-        << "                               bool include_gqs__ = true) const {"
+        << "                               bool include_gqs_ = true) const {"
         << EOL << INDENT2
-        << "std::stringstream param_name_stream__;" << EOL;
+        << "std::stringstream param_name_stream_;" << EOL;
 
       unconstrained_param_names_visgen vis(o);
       // parameters
@@ -4197,7 +4197,7 @@ namespace stan {
       }
 
       o << EOL << INDENT2
-        << "if (!include_gqs__ && !include_tparams__) return;"
+        << "if (!include_gqs_ && !include_tparams_) return;"
         << EOL;
 
       // transformed parameters
@@ -4206,7 +4206,7 @@ namespace stan {
       }
 
       o << EOL << INDENT2
-        << "if (!include_gqs__) return;"
+        << "if (!include_gqs_) return;"
         << EOL;
 
       // generated quantities
@@ -4331,7 +4331,7 @@ namespace stan {
         if (dims.size() == 0) {
           generate_indent(2, o_);
           o_ << var_type << " ";
-          o_ << name << " = in__." << read_type  << "_constrain(";
+          o_ << name << " = in_." << read_type  << "_constrain(";
           for (size_t j = 0; j < read_args.size(); ++j) {
             if (j > 0) o_ << ",";
             generate_expression(read_args[j], o_);
@@ -4347,22 +4347,22 @@ namespace stan {
         std::string name_dims(name);
         for (size_t i = 0; i < dims.size(); ++i) {
           generate_indent(i + 2, o_);
-          o_ << "size_t dim_"  << name << "_" << i << "__ = ";
+          o_ << "size_t dim_"  << name << "_" << i << "_ = ";
           generate_expression(dims[i], o_);
           o_ << ";" << EOL;
           if (i < dims.size() - 1) {
             generate_indent(i + 2, o_);
-            o_ << name_dims << ".resize(dim_" << name << "_" << i << "__);"
+            o_ << name_dims << ".resize(dim_" << name << "_" << i << "_);"
                << EOL;
-            name_dims.append("[k_").append(to_string(i)).append("__]");
+            name_dims.append("[k_").append(to_string(i)).append("_]");
           }
           generate_indent(i + 2, o_);
-          o_ << "for (size_t k_" << i << "__ = 0;"
-             << " k_" << i << "__ < dim_" << name << "_" << i << "__;"
-             << " ++k_" << i << "__) {" << EOL;
+          o_ << "for (size_t k_" << i << "_ = 0;"
+             << " k_" << i << "_ < dim_" << name << "_" << i << "_;"
+             << " ++k_" << i << "_) {" << EOL;
           if (i == dims.size() - 1) {
             generate_indent(i + 3, o_);
-            o_ << name_dims << ".push_back(in__." << read_type << "_constrain(";
+            o_ << name_dims << ".push_back(in_." << read_type << "_constrain(";
             for (size_t j = 0; j < read_args.size(); ++j) {
               if (j > 0) o_ << ",";
               generate_expression(read_args[j], o_);
@@ -4461,7 +4461,7 @@ namespace stan {
           dims.push_back(matdims[i]);
 
         if (dims.size() == 0) {
-          o_ << INDENT2 << "vars__.push_back(" << name << ");" << EOL;
+          o_ << INDENT2 << "vars_.push_back(" << name << ");" << EOL;
           return;
         }
 
@@ -4469,26 +4469,26 @@ namespace stan {
         for (size_t i = dims.size(); i > 0; ) {
           --i;
           generate_indent((dims.size() - i) + 1, o_);
-          o_ << "for (int k_" << i << "__ = 0;"
-             << " k_" << i << "__ < ";
+          o_ << "for (int k_" << i << "_ = 0;"
+             << " k_" << i << "_ < ";
           generate_expression(dims[i], o_);
-          o_ << "; ++k_" << i << "__) {" << EOL;
+          o_ << "; ++k_" << i << "_) {" << EOL;
         }
 
         generate_indent(dims.size() + 2, o_);
-        o_ << "vars__.push_back(" << name;
+        o_ << "vars_.push_back(" << name;
         if (arraydims.size() > 0) {
           o_ << '[';
           for (size_t i = 0; i < arraydims.size(); ++i) {
             if (i > 0) o_ << "][";
-            o_ << "k_" << i << "__";
+            o_ << "k_" << i << "_";
           }
           o_ << ']';
         }
         if (matdims.size() > 0) {
-          o_ << "(k_" << arraydims.size() << "__";
+          o_ << "(k_" << arraydims.size() << "_";
           if (matdims.size() > 1)
-            o_ << ", k_" << (arraydims.size() + 1) << "__";
+            o_ << ", k_" << (arraydims.size() + 1) << "_";
           o_ << ")";
         }
         o_ << ");" << EOL;
@@ -4505,20 +4505,20 @@ namespace stan {
                                      const std::string& model_name,
                                      std::ostream& o) {
       o << INDENT << "template <typename RNG>" << EOL;
-      o << INDENT << "void write_array(RNG& base_rng__," << EOL;
-      o << INDENT << "                 std::vector<double>& params_r__," << EOL;
-      o << INDENT << "                 std::vector<int>& params_i__," << EOL;
-      o << INDENT << "                 std::vector<double>& vars__," << EOL;
-      o << INDENT << "                 bool include_tparams__ = true," << EOL;
-      o << INDENT << "                 bool include_gqs__ = true," << EOL;
+      o << INDENT << "void write_array(RNG& base_rng_," << EOL;
+      o << INDENT << "                 std::vector<double>& params_r_," << EOL;
+      o << INDENT << "                 std::vector<int>& params_i_," << EOL;
+      o << INDENT << "                 std::vector<double>& vars_," << EOL;
+      o << INDENT << "                 bool include_tparams_ = true," << EOL;
+      o << INDENT << "                 bool include_gqs_ = true," << EOL;
       o << INDENT
-        << "                 std::ostream* pstream__ = 0) const {" << EOL;
-      o << INDENT2 << "vars__.resize(0);" << EOL;
+        << "                 std::ostream* pstream_ = 0) const {" << EOL;
+      o << INDENT2 << "vars_.resize(0);" << EOL;
       o << INDENT2
-        << "stan::io::reader<double> in__(params_r__,params_i__);"<< EOL;
-      o << INDENT2 << "static const char* function__ = \""
+        << "stan::io::reader<double> in_(params_r_,params_i_);"<< EOL;
+      o << INDENT2 << "static const char* function_ = \""
         << model_name << "_namespace::write_array\";" << EOL;
-      suppress_warning(INDENT2, "function__", o);
+      suppress_warning(INDENT2, "function_", o);
 
       // declares, reads, and sets parameters
       generate_comment("read-transform, write parameters", 2, o);
@@ -4534,17 +4534,17 @@ namespace stan {
         boost::apply_visitor(vis_writer, prog.parameter_decl_[i].decl_);
       o << EOL;
 
-      o << INDENT2 << "if (!include_tparams__) return;"
+      o << INDENT2 << "if (!include_tparams_) return;"
         << EOL;
       generate_comment("declare and define transformed parameters", 2, o);
-      o << INDENT2 <<  "double lp__ = 0.0;" << EOL;
-      suppress_warning(INDENT2, "lp__", o);
-      o << INDENT2 << "stan::math::accumulator<double> lp_accum__;" << EOL2;
+      o << INDENT2 <<  "double lp_ = 0.0;" << EOL;
+      suppress_warning(INDENT2, "lp_", o);
+      o << INDENT2 << "stan::math::accumulator<double> lp_accum_;" << EOL2;
 
       o << INDENT2
-        << "double DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());"
+        << "double DUMMY_VAR_(std::numeric_limits<double>::quiet_NaN());"
         << EOL;
-      o << INDENT2 << "(void) DUMMY_VAR__;  // suppress unused var warning"
+      o << INDENT2 << "(void) DUMMY_VAR_;  // suppress unused var warning"
         << EOL2;
 
       bool is_var_context = false;
@@ -4567,7 +4567,7 @@ namespace stan {
         boost::apply_visitor(vis_writer, prog.derived_decl_.first[i].decl_);
       o << EOL;
 
-      o << INDENT2 << "if (!include_gqs__) return;"
+      o << INDENT2 << "if (!include_gqs_) return;"
         << EOL;
       generate_comment("declare and define generated quantities", 2, o);
       generate_local_var_decls(prog.generated_decl_.first, 2, o,
@@ -4721,7 +4721,7 @@ namespace stan {
             num_generated_params = 0;
             ++num_open_brackets;
           }
-          ss << "T" << i << "__";
+          ss << "T" << i << "_";
           ++num_generated_params;
         }
       }
@@ -4729,7 +4729,7 @@ namespace stan {
         if (num_generated_params > 0)
           ss << ", ";
         // set threshold at 4 so always room for one more param at end
-        ss << "T_lp__";
+        ss << "T_lp_";
       }
       for (int i = 0; i < num_open_brackets; ++i)
         ss << ">::type";
@@ -4765,7 +4765,7 @@ namespace stan {
           if (fun.arg_decls_[i].arg_type_.base_type_ != INT_T) {
             if (continuing_tps)
               out << ", ";
-            out << "typename T" << i << "__";
+            out << "typename T" << i << "_";
             continuing_tps = true;
           }
         }
@@ -4777,7 +4777,7 @@ namespace stan {
         } else if (is_lp) {
           if (continuing_tps)
             out << ", ";
-          out << "typename T_lp__, typename T_lp_accum__";
+          out << "typename T_lp_, typename T_lp_accum_";
           continuing_tps = true;
         }
         out << ">" << EOL;
@@ -4786,7 +4786,7 @@ namespace stan {
           // nullary RNG case
           out << "template <class RNG>" << EOL;
         } else if (is_lp) {
-          out << "template <typename T_lp__, typename T_lp_accum__>"
+          out << "template <typename T_lp_, typename T_lp_accum_>"
               << EOL;
         } else if (is_log) {
           out << "template <bool propto>"
@@ -4819,7 +4819,7 @@ namespace stan {
       out << "(";
       for (size_t i = 0; i < fun.arg_decls_.size(); ++i) {
         std::string template_type_i
-          = "T" + boost::lexical_cast<std::string>(i) + "__";
+          = "T" + boost::lexical_cast<std::string>(i) + "_";
         generate_arg_decl(true, true, fun.arg_decls_[i], template_type_i, out);
         if (i + 1 < fun.arg_decls_.size()) {
           out << "," << EOL << INDENT;
@@ -4830,12 +4830,12 @@ namespace stan {
       if ((is_rng || is_lp) && fun.arg_decls_.size() > 0)
         out << ", ";
       if (is_rng)
-        out << "RNG& base_rng__";
+        out << "RNG& base_rng_";
       else if (is_lp)
-        out << "T_lp__& lp__, T_lp_accum__& lp_accum__";
+        out << "T_lp_& lp_, T_lp_accum_& lp_accum_";
       if (is_rng || is_lp || fun.arg_decls_.size() > 0)
         out << ", ";
-      out << "std::ostream* pstream__";
+      out << "std::ostream* pstream_";
       out << ")";
     }
 
@@ -4854,12 +4854,12 @@ namespace stan {
       if ((is_rng || is_lp) && fun.arg_decls_.size() > 0)
         out << ", ";
       if (is_rng)
-        out << "base_rng__";
+        out << "base_rng_";
       else if (is_lp)
-        out << "lp__, lp_accum__";
+        out << "lp_, lp_accum_";
       if (is_rng || is_lp || fun.arg_decls_.size() > 0)
         out << ", ";
-      out << "pstream__";
+      out << "pstream_";
       out << ")";
     }
 
@@ -4875,32 +4875,32 @@ namespace stan {
       }
       out << " {" << EOL;
       out << INDENT
-          << "typedef " << scalar_t_name << " fun_scalar_t__;"
+          << "typedef " << scalar_t_name << " fun_scalar_t_;"
           << EOL;
       out << INDENT
           << "typedef "
           << ((fun.return_type_.base_type_ == INT_T)
-              ? "int" : "fun_scalar_t__")
-          << " fun_return_scalar_t__;"
+              ? "int" : "fun_scalar_t_")
+          << " fun_return_scalar_t_;"
           << EOL;
       out << INDENT
-          << "const static bool propto__ = true;"
+          << "const static bool propto_ = true;"
           << EOL
           << INDENT
-          << "(void) propto__;"
+          << "(void) propto_;"
           << EOL;
       // use this dummy for inits
       out << INDENT2
-          << "fun_scalar_t__ "
-          << "DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());"
+          << "fun_scalar_t_ "
+          << "DUMMY_VAR_(std::numeric_limits<double>::quiet_NaN());"
         << EOL;
-      out << INDENT2 << "(void) DUMMY_VAR__;  // suppress unused var warning"
+      out << INDENT2 << "(void) DUMMY_VAR_;  // suppress unused var warning"
         << EOL2;
       bool is_var_context = false;
       bool is_fun_return = true;
       bool include_sampling = true;
       out << INDENT
-          << "int current_statement_begin__ = -1;"
+          << "int current_statement_begin_ = -1;"
           << EOL;
 
       generate_located_statement(fun.body_, 1, out,
@@ -4922,7 +4922,7 @@ namespace stan {
       }
       if (fun.arg_decls_.size() > 0)
         out << ", ";
-      out << "pstream__";
+      out << "pstream_";
       out << ");" << EOL;
       out << "}" << EOL;
     }
@@ -4983,7 +4983,7 @@ namespace stan {
 
       out << EOL << "struct ";
       generate_function_name(fun, out);
-      out << "_functor__ {" << EOL;
+      out << "_functor_ {" << EOL;
 
       out << INDENT;
       generate_function_template_parameters(fun, is_rng, is_lp, is_pf, out);
@@ -5019,7 +5019,7 @@ namespace stan {
     }
 
     void generate_globals(std::ostream& out) {
-      out << "static int current_statement_begin__;"
+      out << "static int current_statement_begin_;"
           << EOL2;
     }
 

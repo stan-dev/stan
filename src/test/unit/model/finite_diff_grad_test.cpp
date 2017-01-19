@@ -5,7 +5,7 @@
 #include <stan/callbacks/interrupt.hpp>
 #include <gtest/gtest.h>
 
-TEST(ModelUtil, finite_diff_grad__false_false) {
+TEST(ModelUtil, finite_diff_grad_false_false) {
   TestModel_uniform_01 model;
   std::vector<double> params_r(1);
   std::vector<int> params_i(0);
@@ -22,7 +22,7 @@ TEST(ModelUtil, finite_diff_grad__false_false) {
     EXPECT_FLOAT_EQ(0.0, gradient[0]);
   }
 }
-TEST(ModelUtil, finite_diff_grad__false_true) {
+TEST(ModelUtil, finite_diff_grad_false_true) {
   TestModel_uniform_01 model;
   std::vector<double> params_r(1);
   std::vector<int> params_i(0);
@@ -44,7 +44,7 @@ TEST(ModelUtil, finite_diff_grad__false_true) {
   }
 }
 
-TEST(ModelUtil, finite_diff_grad__true_false) {
+TEST(ModelUtil, finite_diff_grad_true_false) {
   TestModel_uniform_01 model;
   std::vector<double> params_r(1);
   std::vector<int> params_i(0);
@@ -64,7 +64,7 @@ TEST(ModelUtil, finite_diff_grad__true_false) {
   }
 }
 
-TEST(ModelUtil, finite_diff_grad__true_true) {
+TEST(ModelUtil, finite_diff_grad_true_true) {
   TestModel_uniform_01 model;
   std::vector<double> params_r(1);
   std::vector<int> params_i(0);

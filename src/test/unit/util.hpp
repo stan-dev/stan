@@ -1,5 +1,5 @@
-#ifndef TEST__UNIT__UTIL_HPP
-#define TEST__UNIT__UTIL_HPP
+#ifndef TEST_UNIT_UTIL_HPP
+#define TEST_UNIT_UTIL_HPP
 
 #include <string>
 

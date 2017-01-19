@@ -55,13 +55,13 @@ void test_pg_count(const std::string& program_name,
 
 TEST(unitLang, simpleTest) {
   test_pg("user-function-struct-const", 
-          "operator()(const T0__& x, std::ostream* pstream__) const {");
+          "operator()(const T0_& x, std::ostream* pstream_) const {");
 }     
              
 TEST(unitLang, odeTest) {
   std::string expected;
   expected = "stan::math::assign(y_hat, "
-    "integrate_ode_rk45(sho_functor__(), y0, t0, ts, theta, x, x_int, pstream__));";
+    "integrate_ode_rk45(sho_functor_(), y0, t0, ts, theta, x, x_int, pstream_));";
   test_pg("ode", expected);
   test_pg_count("ode", expected, 1);
 }
