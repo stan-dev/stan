@@ -36,7 +36,7 @@ namespace stan {
        * @param[in] indent indentation level
        * @param[in,out] o output stream to store by reference for generation
        */
-      explicit visgen(int indent, std::ostream& o) : indent_(0), o_(o) { }
+      explicit visgen(int indent, std::ostream& o) : indent_(indent), o_(o) { }
 
       /**
        * Base destructor does nothing.  Specialize in subclasses.
