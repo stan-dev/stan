@@ -326,7 +326,7 @@ TEST(McmcSoftAbsNuts, transition_test) {
   EXPECT_FLOAT_EQ(-0.86902142, s.cont_params()(1));
   EXPECT_FLOAT_EQ(1.6008, s.cont_params()(2));
   EXPECT_FLOAT_EQ(-3.5239484, s.log_prob());
-  EXPECT_FLOAT_EQ(0.99709648, s.accept_stat());
+  EXPECT_FLOAT_EQ(0.99690288, s.accept_stat());
   EXPECT_EQ("", output.str());
   EXPECT_EQ("", error_stream.str());
 }
