@@ -63,8 +63,8 @@ namespace stan {
 
     bool has_non_param_var_vis::operator()(const variable& e) const {
       var_origin vo = var_map_.get_origin(e.name_);
-      return vo == transformed_parameter_origin
-        || vo == local_origin;
+      return vo.program_block_ == transformed_parameter_origin
+        || vo.program_block_ == local_origin;
     }
 
     bool has_non_param_var_vis::operator()(const integrate_ode& e) const {

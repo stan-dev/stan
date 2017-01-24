@@ -31,9 +31,9 @@ namespace stan {
 
     bool has_var_vis::operator()(const variable& e) const {
       var_origin vo = var_map_.get_origin(e.name_);
-      return vo == parameter_origin
-        || vo == transformed_parameter_origin
-        || (vo == local_origin && e.type_.base_type_ != INT_T);
+      return vo.program_block_ == parameter_origin
+        || vo.program_block_ == transformed_parameter_origin
+        || (vo.program_block_ == local_origin && e.type_.base_type_ != INT_T);
     }
 
     bool has_var_vis::operator()(const fun& e) const {

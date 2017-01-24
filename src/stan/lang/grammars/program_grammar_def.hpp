@@ -55,9 +55,10 @@ namespace stan {
         using boost::spirit::qi::_2;
         using boost::spirit::qi::_3;
         using boost::spirit::qi::_4;
+        using boost::spirit::qi::labels::_a;
 
         // add model_name to var_map with special origin
-        var_map_.add(model_name, base_var_decl(), model_name_origin);
+        var_map_.add(model_name, base_var_decl(), var_origin(model_name_origin));
 
         program_r.name("program");
         program_r
@@ -74,7 +75,8 @@ namespace stan {
         model_r.name("model declaration (or perhaps an earlier block)");
         model_r
           %= lit("model")
-          > statement_g(true, local_origin, false, false);
+          > eps[set_var_origin_f(_a, model_name_origin)]
+          > statement_g(true, _a, false, false);
 
         end_var_decls_r.name(
             "one of the following:\n"
@@ -105,7 +107,8 @@ namespace stan {
         data_var_decls_r
           %= (lit("data")
               > lit('{'))
-          >  var_decls_g(true, data_origin)  // +constraints
+          > eps[set_var_origin_f(_a, data_origin)]
+          >  var_decls_g(true, _a)  // +constraints
           > end_var_decls_r;
 
         derived_data_var_decls_r.name("transformed data block");
@@ -113,18 +116,20 @@ namespace stan {
           %= ((lit("transformed")
                >> lit("data"))
               > lit('{'))
-          > var_decls_g(true, transformed_data_origin)  // -constraints
-          > ((statement_g(false, transformed_data_origin, false, false)
-              > *statement_g(false, transformed_data_origin, false, false)
+          > eps[set_var_origin_f(_a, transformed_data_origin)]
+          > var_decls_g(true, _a)  // -constraints
+          > ((statement_g(false, _a, false, false)
+              > *statement_g(false, _a, false, false)
               > end_var_definitions_r)
-             | (*statement_g(false, transformed_data_origin, false, false)
+             | (*statement_g(false, _a, false, false)
                 > end_var_decls_statements_r));
 
         param_var_decls_r.name("parameter variable declarations");
         param_var_decls_r
           %= (lit("parameters")
               > lit('{'))
-          > var_decls_g(true, parameter_origin)  // +constraints
+          > eps[set_var_origin_f(_a, parameter_origin)]
+          > var_decls_g(true, _a)  // +constraints
           > end_var_decls_r;
 
         derived_var_decls_r.name("derived variable declarations");
@@ -132,8 +137,9 @@ namespace stan {
           %= (lit("transformed")
               > lit("parameters")
               > lit('{'))
-          > var_decls_g(true, transformed_parameter_origin)
-          > *statement_g(false, transformed_parameter_origin, false, false)
+          > eps[set_var_origin_f(_a, transformed_parameter_origin)]
+          > var_decls_g(true, _a)
+          > *statement_g(false, _a, false, false)
           > end_var_decls_statements_r;
 
         generated_var_decls_r.name("generated variable declarations");
@@ -141,8 +147,9 @@ namespace stan {
           %= (lit("generated")
               > lit("quantities")
               > lit('{'))
-          > var_decls_g(true, derived_origin)
-          > *statement_g(false, derived_origin, false, false)
+          > eps[set_var_origin_f(_a, derived_origin)]
+          > var_decls_g(true, _a)
+          > *statement_g(false, _a, false, false)
           > end_var_decls_statements_r;
 
         on_error<rethrow>(program_r,

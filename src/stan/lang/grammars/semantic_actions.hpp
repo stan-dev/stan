@@ -242,7 +242,7 @@ namespace stan {
     // called from: functions_grammar
     struct set_allows_sampling_origin : public phoenix_functor_ternary {
       void operator()(const std::string& identifier, bool& allow_sampling,
-                      int& origin) const;
+                      var_origin& origin) const;
     };
     extern boost::phoenix::function<set_allows_sampling_origin>
     set_allows_sampling_origin_f;
@@ -776,7 +776,7 @@ namespace stan {
     extern boost::phoenix::function<set_int_range_upper> set_int_range_upper_f;
 
     struct validate_int_data_expr : public phoenix_functor_quinary {
-      void operator()(const expression& expr, int var_origin, bool& pass,
+      void operator()(const expression& expr, var_origin var_origin, bool& pass,
                       variable_map& var_map, std::stringstream& error_msgs)
         const;
     };
@@ -823,6 +823,13 @@ namespace stan {
                       std::ostream& error_msgs) const;
     };
     extern boost::phoenix::function<non_void_expression> non_void_expression_f;
+
+    struct set_var_origin : public phoenix_functor_binary {
+      void operator()(var_origin& vo, const origin_block& program_block) const;
+    };
+    extern boost::phoenix::function<set_var_origin> set_var_origin_f;
+
+
   }
 }
 #endif

@@ -41,7 +41,7 @@ namespace stan {
       functions_r;
 
       boost::spirit::qi::rule<Iterator,
-                              boost::spirit::qi::locals<bool, int>,
+                              boost::spirit::qi::locals<bool, var_origin>,
                               function_decl_def(),
                               whitespace_grammar<Iterator> >
       function_r;
