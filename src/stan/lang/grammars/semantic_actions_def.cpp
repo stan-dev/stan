@@ -926,12 +926,13 @@ namespace stan {
       }
 
       // enforce constancy of function args
-      if (lhs_block == function_argument_origin
-          || lhs_block == function_argument_origin_lp
-          || lhs_block == function_argument_origin_rng
-          || lhs_block == void_function_argument_origin
-          || lhs_block == void_function_argument_origin_lp
-          || lhs_block == void_function_argument_origin_rng) {
+      if (!lhs_origin.is_local_
+          && (lhs_block == function_argument_origin
+              || lhs_block == function_argument_origin_lp
+              || lhs_block == function_argument_origin_rng
+              || lhs_block == void_function_argument_origin
+              || lhs_block == void_function_argument_origin_lp
+              || lhs_block == void_function_argument_origin_rng)) {
         error_msgs << "Illegal to assign to function argument variables."
                    << std::endl
                    << "Use local variables instead."
@@ -1628,7 +1629,7 @@ namespace stan {
         if (!(var_origin.program_block_ == transformed_parameter_origin
               || var_origin.program_block_ == function_argument_origin_lp
               || var_origin.program_block_ == void_function_argument_origin_lp
-              || var_origin.program_block_ == local_origin)) {
+              || var_origin.program_block_ == model_name_origin)) {
           error_msgs << "Function target() or functions suffixed with _lp only"
                      << " allowed in transformed parameter block, model block"
                      << std::endl
@@ -2166,9 +2167,15 @@ namespace stan {
     }
     bool data_only_expression::operator()(const variable& x) const {
       var_origin origin = var_map_.get_origin(x.name_);
-      bool is_data = (origin.program_block_ == data_origin)
+      bool is_data = origin.is_local_
+        || (origin.program_block_ == data_origin)
         || (origin.program_block_ == transformed_data_origin)
-        || (origin.program_block_ == local_origin);
+        || (origin.program_block_ == function_argument_origin)
+        || (origin.program_block_ == function_argument_origin_lp)
+        || (origin.program_block_ == function_argument_origin_rng)
+        || (origin.program_block_ == void_function_argument_origin)
+        || (origin.program_block_ == void_function_argument_origin_lp)
+        || (origin.program_block_ == void_function_argument_origin_rng);
       if (!is_data) {
         error_msgs_ << "non-data variables not allowed"
                     << " in dimension declarations."
@@ -2603,11 +2610,13 @@ namespace stan {
         var_decl_result = var_decl;
         return;
       }
-      if ((vo.program_block_ == parameter_origin || vo.program_block_ == transformed_parameter_origin)
-          && var_decl.base_type_ == INT_T) {
+      if ((!vo.is_local_ &&
+           (vo.program_block_ == parameter_origin
+            || vo.program_block_ == transformed_parameter_origin)
+           && var_decl.base_type_ == INT_T)) {
         pass = false;
-        error_msgs << "integer parameters or transformed parameters"
-                   << " are not allowed; "
+        error_msgs << "parameters or transformed parameters"
+                   << " cannot be integer or integer array; "
                    << " found declared type int, parameter name="
                    << var_decl.name_
                    << std::endl;
@@ -2689,6 +2698,22 @@ namespace stan {
       vo = var_origin(program_block);
     }
     boost::phoenix::function<set_var_origin> set_var_origin_f;
+
+    void set_var_origin_local::operator()(var_origin& vo,
+                                    const origin_block& program_block)
+      const {
+      vo = var_origin(program_block, true);
+    }
+    boost::phoenix::function<set_var_origin_local> set_var_origin_local_f;
+
+    void reset_var_origin::operator()(var_origin& vo,
+                                      const var_origin& vo_enclosing)
+      const {
+      origin_block enclosing_block = vo_enclosing.program_block_;
+      vo = var_origin(enclosing_block, true);
+    }
+    boost::phoenix::function<reset_var_origin> reset_var_origin_f;
+
 
   }
 }

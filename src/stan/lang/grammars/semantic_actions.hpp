@@ -829,6 +829,17 @@ namespace stan {
     };
     extern boost::phoenix::function<set_var_origin> set_var_origin_f;
 
+    struct set_var_origin_local : public phoenix_functor_binary {
+      void operator()(var_origin& vo, const origin_block& program_block) const;
+    };
+    extern boost::phoenix::function<set_var_origin_local> set_var_origin_local_f;
+
+    struct reset_var_origin : public phoenix_functor_binary {
+      void operator()(var_origin& vo, const var_origin& vo_enclosing) const;
+    };
+    extern boost::phoenix::function<reset_var_origin> reset_var_origin_f;
+
+
 
   }
 }

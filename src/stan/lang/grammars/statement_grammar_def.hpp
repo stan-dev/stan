@@ -87,6 +87,7 @@ namespace stan {
       using boost::spirit::qi::raw;
 
       using boost::spirit::qi::labels::_a;
+      using boost::spirit::qi::labels::_b;
       using boost::spirit::qi::labels::_r1;
       using boost::spirit::qi::labels::_r2;
       using boost::spirit::qi::labels::_r3;
@@ -131,8 +132,9 @@ namespace stan {
       statement_seq_r.name("sequence of statements");
       statement_seq_r
         %= lit('{')
-        > local_var_decls_r(_r2)[assign_lhs_f(_a, _1)]
-        > *statement_r(_r1, _r2, _r3, _r4)
+        > eps[reset_var_origin_f(_b, _r2)]
+        > local_var_decls_r(_b)[assign_lhs_f(_a, _1)]
+        > *statement_r(_r1, _b, _r3, _r4)
         > lit('}')
         > eps[unscope_locals_f(_a, boost::phoenix::ref(var_map_))];
 

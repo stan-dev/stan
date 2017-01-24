@@ -58,7 +58,7 @@ namespace stan {
         using boost::spirit::qi::labels::_a;
 
         // add model_name to var_map with special origin
-        var_map_.add(model_name, base_var_decl(), var_origin(model_name_origin));
+        var_map_.add(model_name, base_var_decl(), var_origin(model_name_origin, true));
 
         program_r.name("program");
         program_r
@@ -75,7 +75,7 @@ namespace stan {
         model_r.name("model declaration (or perhaps an earlier block)");
         model_r
           %= lit("model")
-          > eps[set_var_origin_f(_a, model_name_origin)]
+          > eps[set_var_origin_local_f(_a, model_name_origin)]
           > statement_g(true, _a, false, false);
 
         end_var_decls_r.name(
@@ -108,7 +108,7 @@ namespace stan {
           %= (lit("data")
               > lit('{'))
           > eps[set_var_origin_f(_a, data_origin)]
-          >  var_decls_g(true, _a)  // +constraints
+          >  var_decls_g(true, _a)
           > end_var_decls_r;
 
         derived_data_var_decls_r.name("transformed data block");
@@ -117,7 +117,7 @@ namespace stan {
                >> lit("data"))
               > lit('{'))
           > eps[set_var_origin_f(_a, transformed_data_origin)]
-          > var_decls_g(true, _a)  // -constraints
+          > var_decls_g(true, _a)
           > ((statement_g(false, _a, false, false)
               > *statement_g(false, _a, false, false)
               > end_var_definitions_r)
@@ -129,7 +129,7 @@ namespace stan {
           %= (lit("parameters")
               > lit('{'))
           > eps[set_var_origin_f(_a, parameter_origin)]
-          > var_decls_g(true, _a)  // +constraints
+          > var_decls_g(true, _a)
           > end_var_decls_r;
 
         derived_var_decls_r.name("derived variable declarations");

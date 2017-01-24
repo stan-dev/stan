@@ -5,7 +5,7 @@ TEST(langParserVarDeclsGrammarDef, addVar) {
   test_throws("validate_add_var_bad1",
               "duplicate declaration of variable");
   test_throws("validate_add_var_bad2",
-              "integer parameters or transformed parameters are not allowed");
+              "parameters or transformed parameters cannot be integer or integer array");
   test_parsable("validate_add_var_good");
 }
 
