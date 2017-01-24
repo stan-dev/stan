@@ -21,6 +21,7 @@ parameters {
   real y;
 }
 model {
-  real c = relative_diff(a,b,mx,mn);
+  real c;
+  c = relative_diff(a,b,mx,mn);
   y ~ normal(0,1);
 }
