@@ -463,8 +463,10 @@ namespace stan {
     extern boost::phoenix::function<add_while_body> add_while_body_f;
 
     // called from: statement_grammar
-    struct add_loop_identifier : public phoenix_functor_quinary {
-      void operator()(const std::string& name, std::string& name_local,
+    struct add_loop_identifier : public phoenix_functor_senary {
+      void operator()(const std::string& name,
+                      std::string& name_local,
+                      const var_origin& origin,
                       bool& pass, variable_map& vm,
                       std::stringstream& error_msgs) const;
     };
@@ -832,7 +834,8 @@ namespace stan {
     struct set_var_origin_local : public phoenix_functor_binary {
       void operator()(var_origin& vo, const origin_block& program_block) const;
     };
-    extern boost::phoenix::function<set_var_origin_local> set_var_origin_local_f;
+    extern boost::phoenix::function<set_var_origin_local>
+    set_var_origin_local_f;
 
     struct reset_var_origin : public phoenix_functor_binary {
       void operator()(var_origin& vo, const var_origin& vo_enclosing) const;

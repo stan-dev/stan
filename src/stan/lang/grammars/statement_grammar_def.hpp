@@ -190,7 +190,7 @@ namespace stan {
       for_statement_r
         %= (lit("for") >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('(')
-        > identifier_r[add_loop_identifier_f(_1, _a, _pass,
+        > identifier_r[add_loop_identifier_f(_1, _a, _r2, _pass,
                                          boost::phoenix::ref(var_map_),
                                          boost::phoenix::ref(error_msgs_))]
         > lit("in")

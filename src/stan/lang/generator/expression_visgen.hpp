@@ -45,8 +45,8 @@ namespace stan {
 
       void operator()(const array_expr& x) const {
         std::stringstream ssRealType;
-        generate_real_var_type(x.array_expr_origin_, x.has_var_, is_var_context_,
-                               ssRealType);
+        generate_real_var_type(x.array_expr_origin_, x.has_var_,
+                               is_var_context_, ssRealType);
         std::stringstream ssArrayType;
         generate_array_var_type(x.type_.base_type_, ssRealType.str(),
                                 is_var_context_, ssArrayType);

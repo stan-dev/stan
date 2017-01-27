@@ -157,3 +157,7 @@ TEST(langParserVarDeclsGrammarDef, badDefParamBlock) {
   test_throws("declare-define-param-block",
               "variable definition not possible in this block");
 }
+
+TEST(langParserVarDeclsGrammarDef, gqLocalRngFunCall) {
+   test_parsable("declare-define-gq-local-rng");
+}

@@ -1290,6 +1290,7 @@ namespace stan {
 
     void add_loop_identifier::operator()(const std::string& name,
                                          std::string& name_local,
+                                         const var_origin& origin,
                                          bool& pass, variable_map& vm,
                                          std::stringstream& error_msgs) const {
       name_local = name;
@@ -1299,7 +1300,7 @@ namespace stan {
                    << " variable name=\"" << name << "\"" << std::endl;
       else
         vm.add(name, base_var_decl(name, std::vector<expression>(), INT_T),
-               local_origin);  // loop var acts like local
+               var_origin(origin.program_block_, true));
     }
     boost::phoenix::function<add_loop_identifier> add_loop_identifier_f;
 

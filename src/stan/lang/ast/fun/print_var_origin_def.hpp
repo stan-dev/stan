@@ -34,7 +34,7 @@ namespace stan {
       else if (vo.program_block_ == void_function_argument_origin_rng)
         o << "void function argument '_rng' suffixed";
       else
-        o << "UNKNOWN ORIGIN=" << vo.program_block_ ;
+        o << "UNKNOWN ORIGIN=" << vo.program_block_;
     }
 
   }
