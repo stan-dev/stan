@@ -665,6 +665,7 @@ identifier ::= [a-zA-Z] [a-zA-Z0-9_]*
 expressions ::= expression % ','
 expression ::= numeric_literal
              | variable
+             | '{' expressions '}'
              | expression `?` expression `:` expression
              | expression infixOp expression
              | prefixOp expression
@@ -764,6 +765,13 @@ declarations and definitions to local variables and variables declared
 in the transformed data, transformed parameters, and generated
 quantities blocks.
 
+\subsection{Typing of Array Expressions}
+
+The types of expressions used for elements in array expressions
+(\Verb|'{' expressions '}'|) must all be of the same type or a mixture
+of \code{int} and \code{real} types (in which case the result is
+promoted to be of type \code{real}).
+
 \subsection{Forms of Numbers}
 
 Integer literals longer than one digit may not start with 0 and real
@@ -774,6 +782,10 @@ literals cannot consist of only a period or only an exponent.
 Both the conditional if-then-else statement and while-loop statement
 require the expression denoting the condition to be a primitive type,
 integer or real.
+
+\subsection{Print Arguments}
+
+The arguments to a print statement cannot be void.
 
 \subsection{Only Break and Continue in Loops}
 
