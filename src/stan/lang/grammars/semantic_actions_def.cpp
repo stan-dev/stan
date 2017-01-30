@@ -224,7 +224,7 @@ namespace stan {
 
 
     void validate_conditional_op::operator()(conditional_op& conditional_op,
-                                             const var_origin& var_origin,
+                                             const var_origin& vo,
                                              bool& pass,
                                              const variable_map& var_map,
                                              std::ostream& error_msgs) const {
@@ -271,7 +271,7 @@ namespace stan {
         conditional_op.type_ = true_val_type;
 
       conditional_op.has_var_ = has_var(conditional_op, var_map);
-      conditional_op.var_origin_ = var_origin;
+      conditional_op.var_origin_ = vo;
       pass = true;
     }
     boost::phoenix::function<validate_conditional_op>
@@ -805,7 +805,7 @@ namespace stan {
     validate_void_return_allowed_f;
 
     void identifier_to_var::operator()(const std::string& name,
-                                       const var_origin& origin_allowed,
+                                       const var_origin& origin,
                                        variable& v,  bool& pass,
                                        const variable_map& vm,
                                        std::ostream& error_msgs) const {
@@ -818,7 +818,7 @@ namespace stan {
       var_origin lhs_origin = vm.get_origin(name);
       origin_block lhs_block = lhs_origin.program_block_;
       if (lhs_block != local_origin
-          && lhs_block != origin_allowed.program_block_) {
+          && lhs_block != origin.program_block_) {
         pass = false;
         return;
       }
@@ -898,7 +898,7 @@ namespace stan {
     boost::phoenix::function<validate_assgn> validate_assgn_f;
 
     void validate_assignment::operator()(assignment& a,
-                                         const var_origin& origin_allowed,
+                                         const var_origin& origin,
                                          bool& pass, variable_map& vm,
                                          std::ostream& error_msgs) const {
       // validate existence
@@ -916,7 +916,7 @@ namespace stan {
       var_origin lhs_origin = vm.get_origin(name);
       origin_block lhs_block = lhs_origin.program_block_;
       if (lhs_block != local_origin
-          && lhs_block != origin_allowed.program_block_) {
+          && lhs_block != origin.program_block_) {
         error_msgs << "attempt to assign variable in wrong block."
                    << " left-hand-side variable origin=";
         print_var_origin(error_msgs, lhs_origin);
@@ -1561,7 +1561,7 @@ namespace stan {
     validate_integrate_ode_control_f;
 
     void set_fun_type_named::operator()(expression& fun_result, fun& fun,
-                                        const var_origin& var_origin,
+                                        const var_origin& vo,
                                         bool& pass,
                                         std::ostream& error_msgs) const {
       if (fun.name_ == "get_lp")
@@ -1610,14 +1610,14 @@ namespace stan {
       replace_suffix("lchoose", "binomial_coefficient_log", fun);
 
       if (has_rng_suffix(fun.name_)) {
-        if (!(var_origin.program_block_ == derived_origin
-              || var_origin.program_block_ == transformed_data_origin
-              || var_origin.program_block_ == function_argument_origin_rng)) {
+        if (!(vo.program_block_ == derived_origin
+              || vo.program_block_ == transformed_data_origin
+              || vo.program_block_ == function_argument_origin_rng)) {
           error_msgs << "ERROR: random number generators only allowed in"
                      << " transformed data block, generated quantities block"
                      << " or user-defined functions with names ending in _rng"
                      << "; found function=" << fun.name_ << " in block=";
-          print_var_origin(error_msgs, var_origin);
+          print_var_origin(error_msgs, vo);
           error_msgs << std::endl;
           pass = false;
           return;
@@ -1627,10 +1627,10 @@ namespace stan {
       if (has_lp_suffix(fun.name_) || fun.name_ == "target") {
         // modified function_argument_origin to add _lp because
         // that's only viable context
-        if (!(var_origin.program_block_ == transformed_parameter_origin
-              || var_origin.program_block_ == function_argument_origin_lp
-              || var_origin.program_block_ == void_function_argument_origin_lp
-              || var_origin.program_block_ == model_name_origin)) {
+        if (!(vo.program_block_ == transformed_parameter_origin
+              || vo.program_block_ == function_argument_origin_lp
+              || vo.program_block_ == void_function_argument_origin_lp
+              || vo.program_block_ == model_name_origin)) {
           error_msgs << "Function target() or functions suffixed with _lp only"
                      << " allowed in transformed parameter block, model block"
                      << std::endl
@@ -1639,7 +1639,7 @@ namespace stan {
                      << "Found function = "
                      << (fun.name_ == "get_lp" ? "target or get_lp" : fun.name_)
                      << " in block = ";
-          print_var_origin(error_msgs, var_origin);
+          print_var_origin(error_msgs, vo);
           error_msgs << std::endl;
           pass = false;
           return;
@@ -1691,7 +1691,7 @@ namespace stan {
 
     void set_array_expr_type::operator()(expression& e,
                       array_expr& array_expr,
-                      const var_origin& var_origin,
+                      const var_origin& vo,
                       bool& pass,
                       const variable_map& var_map,
                       std::ostream& error_msgs) const {
@@ -1731,7 +1731,7 @@ namespace stan {
       }
       ++et.num_dims_;
       array_expr.type_ = et;
-      array_expr.array_expr_origin_ = var_origin;
+      array_expr.array_expr_origin_ = vo;
       array_expr.has_var_ = has_var(array_expr, var_map);
       e = array_expr;
       pass = true;
@@ -1740,7 +1740,7 @@ namespace stan {
 
     void exponentiation_expr::operator()(expression& expr1,
                                          const expression& expr2,
-                                         const var_origin& var_origin,
+                                         const var_origin& vo,
                                          bool& pass,
                                          std::ostream& error_msgs) const {
       if (!expr1.expression_type().is_primitive()
@@ -1751,7 +1751,7 @@ namespace stan {
                    << " by "
                    << expr2.expression_type()
                    << " in block=";
-        print_var_origin(error_msgs, var_origin);
+        print_var_origin(error_msgs, vo);
         error_msgs << std::endl;
         pass = false;
         return;
@@ -2544,7 +2544,8 @@ namespace stan {
     boost::phoenix::function<set_int_range_upper> set_int_range_upper_f;
 
     void validate_int_data_expr::operator()(const expression& expr,
-                                            var_origin var_origin, bool& pass,
+                                            const var_origin& vo,
+                                            bool& pass,
                                             variable_map& var_map,
                                             std::stringstream& error_msgs)
       const {
@@ -2557,7 +2558,7 @@ namespace stan {
         return;
       }
 
-      if (var_origin.program_block_ != local_origin) {
+      if (!vo.is_local_) {
         data_only_expression vis(error_msgs, var_map);
         bool only_data_dimensions = boost::apply_visitor(vis, expr.expr_);
         pass = only_data_dimensions;

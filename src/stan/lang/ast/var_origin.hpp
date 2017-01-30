@@ -24,31 +24,33 @@ namespace stan {
       bool is_local_;
 
       /**
-       * Construct an empty var_origin
+       * No arg constructor, defaults:
+       * program_block_ : model_name_origin
+       * is_local_ : false
        */
       var_origin();
 
       /**
        * Construct an origin for variable in a specified block
        *
-       * @param program_block - enclosing program block
+       * @param program_block enclosing program block
        */
-      var_origin(const origin_block program_block);  // NOLINT(runtime/explicit)
+      var_origin(const origin_block& program_block);  // NOLINT(runtime/explicit)
 
       /**
        * Construct an origin for a variable in specified outer program block,
        * specify whether or not variable is in local program block 
        *
-       * @param program_block - enclosing program block
-       * @param is_local - flags whether or not in a local block
+       * @param program_block enclosing program block
+       * @param is_local flags whether or not in a local block
        */
-      var_origin(const origin_block program_block,
-                 const bool is_local);  // NOLINT(runtime/explicit)
+      var_origin(const origin_block& program_block,
+                 const bool& is_local);
 
       /**
        * Return true if declared in a local block.
        *
-       * @return bool if declared in a local block.
+       * @return value of is_local_
        */
       bool is_local() const;
     };

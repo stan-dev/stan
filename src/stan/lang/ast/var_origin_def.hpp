@@ -10,11 +10,11 @@ namespace stan {
     var_origin::var_origin()
       : program_block_(model_name_origin), is_local_(false) { }
 
-    var_origin::var_origin(const origin_block program_block)
+    var_origin::var_origin(const origin_block& program_block)
       : program_block_(program_block), is_local_(false) { }
 
-    var_origin::var_origin(const origin_block program_block,
-                           const bool is_local)
+    var_origin::var_origin(const origin_block& program_block,
+                           const bool& is_local)
       : program_block_(program_block), is_local_(is_local) { }
 
   }
