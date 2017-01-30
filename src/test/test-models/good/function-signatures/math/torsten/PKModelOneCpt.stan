@@ -101,6 +101,25 @@ transformed parameters {
   x_parm = PKModelOneCpt(time, amt, rate, ii, evid, cmt, addl, ss,
                         theta_data, biovar_data, tlag_parm[0]);
 
+  // expression types for last three arguments:
+  // data, data, data
+  x_parm = PKModelOneCpt(time, amt, rate, ii, evid, cmt, addl, ss,
+                        theta_data, biovar_data, tlag_data);
+  x_parm = PKModelOneCpt(time, amt, rate, ii, evid, cmt, addl, ss,
+                        theta_data[0], biovar_data, tlag_data);
+  x_parm = PKModelOneCpt(time, amt, rate, ii, evid, cmt, addl, ss,
+                        theta_data[0], biovar_data[0], tlag_data);
+  x_parm = PKModelOneCpt(time, amt, rate, ii, evid, cmt, addl, ss,
+                        theta_data[0], biovar_data[0], tlag_data[0]);
+  x_parm = PKModelOneCpt(time, amt, rate, ii, evid, cmt, addl, ss,
+                        theta_data[0], biovar_data, tlag_data[0]);
+  x_parm = PKModelOneCpt(time, amt, rate, ii, evid, cmt, addl, ss,
+                        theta_data, biovar_data[0], tlag_data);
+  x_parm = PKModelOneCpt(time, amt, rate, ii, evid, cmt, addl, ss,
+                        theta_data, biovar_data[0], tlag_data[0]);
+  x_parm = PKModelOneCpt(time, amt, rate, ii, evid, cmt, addl, ss,
+                        theta_data, biovar_data, tlag_data[0]);
+
   
   // expression types for last three arguments:
   // parm, data, parm
@@ -157,7 +176,7 @@ transformed parameters {
   x_parm = PKModelOneCpt(time, amt, rate, ii, evid, cmt, addl, ss,
                         theta_parm, biovar_parm[0], tlag_data[0]);
   x_parm = PKModelOneCpt(time, amt, rate, ii, evid, cmt, addl, ss,
-                        theta_parm, biovar_parm, tlag_data[0]);  
+                        theta_parm, biovar_parm, tlag_data[0]);
   
 }
 

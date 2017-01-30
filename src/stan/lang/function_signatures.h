@@ -1240,6 +1240,33 @@ add("PKModelOneCpt", MATRIX_T, arg_types_212);
 add("PKModelOneCpt", MATRIX_T, arg_types_211);
 add("PKModelOneCpt", MATRIX_T, arg_types_221);
 
+add("PKModelTwoCpt", MATRIX_T, arg_types_222);
+add("PKModelTwoCpt", MATRIX_T, arg_types_122);
+add("PKModelTwoCpt", MATRIX_T, arg_types_112);
+add("PKModelTwoCpt", MATRIX_T, arg_types_111);
+add("PKModelTwoCpt", MATRIX_T, arg_types_121);
+add("PKModelTwoCpt", MATRIX_T, arg_types_212);
+add("PKModelTwoCpt", MATRIX_T, arg_types_211);
+add("PKModelTwoCpt", MATRIX_T, arg_types_221);
+
+arg_types_222[8] = expr_type(MATRIX_T, 1U);
+arg_types_122[8] = MATRIX_T; 
+arg_types_112[8] = MATRIX_T;
+arg_types_111[8] = MATRIX_T;
+arg_types_121[8] = MATRIX_T;
+arg_types_212[8] = expr_type(MATRIX_T, 1U);
+arg_types_211[8] = expr_type(MATRIX_T, 1U);
+arg_types_221[8] = expr_type(MATRIX_T, 1U);
+
+add("linOdeModel", MATRIX_T, arg_types_222);
+add("linOdeModel", MATRIX_T, arg_types_122);
+add("linOdeModel", MATRIX_T, arg_types_112);
+add("linOdeModel", MATRIX_T, arg_types_111);
+add("linOdeModel", MATRIX_T, arg_types_121);
+add("linOdeModel", MATRIX_T, arg_types_212);
+add("linOdeModel", MATRIX_T, arg_types_211);
+add("linOdeModel", MATRIX_T, arg_types_221);
+
 /*
 std::vector<expr_type> arg_types_PKcpt_1;
 std::vector<expr_type> arg_types_PKcpt_2;
