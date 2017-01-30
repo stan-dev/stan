@@ -1565,7 +1565,7 @@ namespace stan {
                                   bool& pass,
                                   std::ostream& error_msgs) {
       pass = true;
-      
+
       // test function argument type
       expr_type sys_result_type(DOUBLE_T, 1);
       std::vector<expr_type> sys_arg_types;
@@ -1582,7 +1582,7 @@ namespace stan {
                  << " (real, real[], real[], real[], int[]) : real[] ";
       pass = false;
       }
-      
+
       // test regular argument types
       if (ode_fun.nCmt_.expression_type() != INT_T) {
         error_msgs << "second argument to "
@@ -1737,7 +1737,7 @@ namespace stan {
                    << ". ";
         pass = false;
       }
-      
+
       // test data-only variables do not have parameters (int locals OK)
       if (has_var(ode_fun.nCmt_, var_map)) {
         error_msgs << "second argument to "
@@ -1805,7 +1805,7 @@ namespace stan {
       validate_generalOdeModel(ode_fun, var_map, pass, error_msgs);
     }
     boost::phoenix::function<validate_generalOdeModel_control>
-    validate_generalOdeModel_control_f;    
+    validate_generalOdeModel_control_f;
 
     void set_fun_type_named::operator()(expression& fun_result, fun& fun,
                                         const var_origin& var_origin,

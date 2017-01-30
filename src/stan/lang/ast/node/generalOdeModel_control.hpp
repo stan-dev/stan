@@ -64,7 +64,7 @@ namespace stan {
        * Number of additional doses (array of int).
        */
       expression addl_;
-      
+
       /**
        * Steady State boolean at event (array of int).
        */
