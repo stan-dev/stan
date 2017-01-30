@@ -5,6 +5,22 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v2.14.0 (26 December 2016)
+======================================================================
+
+Bug Fixes
+--------------------------------------------------
+* NUTS sampler broken (#2179)
+* seralization issues with RStan v2.13.1 (#2179)
+* printing result of a void function parses, but doesnt' compile (#2168)
+* compound declare/define not working for all types (#2163)
+
+Other
+--------------------------------------------------
+* Update Stan Math Library to v2.14.0
+* make use of const references consistent (#2186)
+
+
 v2.13.1 (3 December 2016)
 ======================================================================
 

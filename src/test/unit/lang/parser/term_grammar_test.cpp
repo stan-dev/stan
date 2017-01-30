@@ -1,6 +1,16 @@
 #include <gtest/gtest.h>
 #include <test/unit/lang/utility.hpp>
 
+TEST(langParserTermGrammar, array_expr) {
+  test_parsable("validate_array_expr_big");
+  test_parsable("validate_array_expr_primitives");
+  test_parsable("validate_array_expr_containers");
+  test_throws("validate_array_expr_bad1", "base type mismatch");
+  test_throws("validate_array_expr_bad2", "dimension mismatch");
+  test_throws("validate_array_expr_bad3", "ERROR");
+  test_throws("validate_array_expr_bad3a", "ERROR");
+}
+
 TEST(langParserTermGrammar, infixExponentiation) {
   test_parsable("validate_exponentiation_good");
   test_parsable("validate_exponentiation_precedence");
