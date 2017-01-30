@@ -557,14 +557,14 @@ namespace stan {
     validate_integrate_ode_control_f;
 
     // called from: term_grammar
-    struct validate_generalCptModel_control
+    struct validate_generalOdeModel_control
       : public phoenix_functor_quaternary {
-      void operator()(const generalCptModel_control& ode_fun,
+      void operator()(const generalOdeModel_control& ode_fun,
                       const variable_map& var_map, bool& pass,
                       std::ostream& error_msgs) const;
     };
-    extern boost::phoenix::function<validate_generalCptModel_control>
-    validate_generalCptModel_control_f;
+    extern boost::phoenix::function<validate_generalOdeModel_control>
+    validate_generalOdeModel_control_f;
 
     // called from: term_grammar
     struct set_fun_type_named : public phoenix_functor_quinary {
@@ -573,6 +573,17 @@ namespace stan {
                       std::ostream& error_msgs) const;
     };
     extern boost::phoenix::function<set_fun_type_named> set_fun_type_named_f;
+
+    // called from: term_grammar
+    struct set_array_expr_type : public phoenix_functor_senary {
+      void operator()(expression& e,
+                      array_expr& array_expr,
+                      const var_origin& var_origin,
+                      bool& pass,
+                      const variable_map& var_map,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<set_array_expr_type> set_array_expr_type_f;
 
     // called from: term_grammar
     struct exponentiation_expr : public phoenix_functor_quinary {
@@ -701,11 +712,11 @@ namespace stan {
       bool operator()(const nil& /*e*/) const;
       bool operator()(const int_literal& /*x*/) const;
       bool operator()(const double_literal& /*x*/) const;
-      bool operator()(const array_literal& x) const;
+      bool operator()(const array_expr& x) const;
       bool operator()(const variable& x) const;
       bool operator()(const integrate_ode& x) const;
       bool operator()(const integrate_ode_control& x) const;
-      bool operator()(const generalCptModel_control& x) const;
+      bool operator()(const generalOdeModel_control& x) const;
       bool operator()(const fun& x) const;
       bool operator()(const index_op& x) const;
       bool operator()(const index_op_sliced& x) const;
@@ -818,6 +829,11 @@ namespace stan {
     };
     extern boost::phoenix::function<validate_in_loop> validate_in_loop_f;
 
+    struct non_void_expression : public phoenix_functor_ternary {
+      void operator()(const expression& e, bool& pass,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<non_void_expression> non_void_expression_f;
   }
 }
 #endif

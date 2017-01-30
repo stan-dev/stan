@@ -45,11 +45,10 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::integrate_ode_control,
                           (stan::lang::expression, abs_tol_)
                           (stan::lang::expression, max_num_steps_) )
 
-BOOST_FUSION_ADAPT_STRUCT(stan::lang::generalCptModel_control,
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::generalOdeModel_control,
                           (std::string, integration_function_name_)
                           (std::string, system_function_name_)
                           (stan::lang::expression, nCmt_)
-                          (stan::lang::expression, pMatrix_)
                           (stan::lang::expression, time_)
                           (stan::lang::expression, amt_)
                           (stan::lang::expression, rate_)
@@ -58,12 +57,18 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::generalCptModel_control,
                           (stan::lang::expression, cmt_)
                           (stan::lang::expression, addl_)
                           (stan::lang::expression, ss_)
+                          (stan::lang::expression, pMatrix_)
+                          (stan::lang::expression, biovar_)
+                          (stan::lang::expression, tlag_)
                           (stan::lang::expression, rel_tol_)
                           (stan::lang::expression, abs_tol_)
                           (stan::lang::expression, max_num_steps_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::fun,
                           (std::string, name_)
+                          (std::vector<stan::lang::expression>, args_) )
+
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::array_expr,
                           (std::vector<stan::lang::expression>, args_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::int_literal,
@@ -91,6 +96,7 @@ namespace stan {
       using boost::spirit::qi::_1;
       using boost::spirit::qi::_a;
       using boost::spirit::qi::_b;
+      using boost::spirit::qi::_c;
       using boost::spirit::qi::char_;
       using boost::spirit::qi::double_;
       using boost::spirit::qi::eps;
@@ -212,33 +218,37 @@ namespace stan {
           [validate_integrate_ode_f(_val, boost::phoenix::ref(var_map_),
                                     _pass, boost::phoenix::ref(error_msgs_))];
 
-        generalCptModel_control_r.name("expression");
-        generalCptModel_control_r
-         %= ( (string("generalCptModel_bdf") >> no_skip[!char_("a-zA-Z0-9_")])
-              | (string("generalCptModel_rk45")
+        generalOdeModel_control_r.name("expression");
+        generalOdeModel_control_r
+         %= ( (string("generalOdeModel_bdf") >> no_skip[!char_("a-zA-Z0-9_")])
+              | (string("generalOdeModel_rk45")
                 >> no_skip[!char_("a-zA-Z0-9_")]) )
          > lit('(')            // >> allows backtracking to non-control
          > identifier_r        // 1) system function name (function only)
          > lit(',')
          > expression_g(_r1)   // 2) nCmt
          > lit(',')
-         > expression_g(_r1)   // 3) pMatrix
+         > expression_g(_r1)   // 3) time
          > lit(',')
-         > expression_g(_r1)   // 4) time
+         > expression_g(_r1)   // 4) amt
          > lit(',')
-         > expression_g(_r1)   // 5) amt
+         > expression_g(_r1)   // 5) rate
          > lit(',')
-         > expression_g(_r1)   // 6) rate
+         > expression_g(_r1)   // 6) ii
          > lit(',')
-         > expression_g(_r1)   // 7) ii
+         > expression_g(_r1)   // 7) evid (data only)
          > lit(',')
-         > expression_g(_r1)   // 8) evid (data only)
+         > expression_g(_r1)   // 8) cmt (data only)
          > lit(',')
-         > expression_g(_r1)   // 9) cmt (data only)
+         > expression_g(_r1)   // 9) addl (data only)
          > lit(',')
-         > expression_g(_r1)   // 10) addl (data only)
+         > expression_g(_r1)   // 10) ss (data only)
          > lit(',')
-         > expression_g(_r1)   // 11) ss (data only)
+         > expression_g(_r1)   // 11) pMatrix
+         > lit(',')
+         > expression_g(_r1)   // 12) biovar
+         > lit(',')
+         > expression_g(_r1)   // 13) tlag
          > lit(',')
          > expression_g(_r1)   // 12) relative tolerance (data only)
          > lit(',')
@@ -246,7 +256,7 @@ namespace stan {
          > lit(',')
          > expression_g(_r1)   // 14) maximum number of steps
          > lit(')')
-           [validate_generalCptModel_control_f(_val,
+           [validate_generalOdeModel_control_f(_val,
              boost::phoenix::ref(var_map_), _pass,
              boost::phoenix::ref(error_msgs_))];
 
@@ -254,7 +264,7 @@ namespace stan {
       factor_r =
         integrate_ode_control_r(_r1)[assign_lhs_f(_val, _1)]
         | integrate_ode_r(_r1)[assign_lhs_f(_val, _1)]
-        | generalCptModel_control_r(_r1)[assign_lhs_f(_val, _1)]
+        | generalOdeModel_control_r(_r1)[assign_lhs_f(_val, _1)]
         | (fun_r(_r1)[assign_lhs_f(_b, _1)]
            > eps[set_fun_type_named_f(_val, _b, _r1, _pass,
                                       boost::phoenix::ref(error_msgs_))])
@@ -264,6 +274,10 @@ namespace stan {
                                 _pass)])
         | int_literal_r[assign_lhs_f(_val, _1)]
         | double_literal_r[assign_lhs_f(_val, _1)]
+        | (array_expr_r(_r1)[assign_lhs_f(_c, _1)]
+           > eps[set_array_expr_type_f(_val, _c, _r1, _pass,
+                                       boost::phoenix::ref(var_map_),
+                                       boost::phoenix::ref(error_msgs_))])
         | (lit('(')
            > expression_g(_r1)[assign_lhs_f(_val, _1)]
            > lit(')'));
@@ -327,8 +341,13 @@ namespace stan {
         > !lit('(');    // negative lookahead to prevent failure in
                         // fun to try to evaluate as variable [cleaner
                         // error msgs]
-    }
 
+      array_expr_r.name("expression");
+      array_expr_r
+        %=  lit('{')
+        >> expression_g(_r1) % ','
+        >> lit('}');
+    }
   }
 }
 #endif

@@ -1187,7 +1187,87 @@ add("wishart_rng", MATRIX_T, DOUBLE_T, MATRIX_T);
  * TORSTEN: function signatures
  ****************************************/
  
-// PKCptModel
+std::vector<expr_type> data_arg_types;
+for (int i = 0; i < 4; i++)
+  data_arg_types.push_back(vector_types[1]);
+for (int i = 0; i < 4; i++)
+  data_arg_types.push_back(int_vector_types[1]);
+
+std::vector<expr_type> arg_types_222 = data_arg_types;
+for (int i = 0; i < 3; i++)
+  arg_types_222.push_back(expr_type(DOUBLE_T, 2U));
+
+std::vector<expr_type> arg_types_122 = data_arg_types;
+arg_types_122.push_back(expr_type(DOUBLE_T, 1U));
+arg_types_122.push_back(expr_type(DOUBLE_T, 2U));
+arg_types_122.push_back(expr_type(DOUBLE_T, 2U));
+
+std::vector<expr_type> arg_types_112 = data_arg_types;
+arg_types_112.push_back(expr_type(DOUBLE_T, 1U));
+arg_types_112.push_back(expr_type(DOUBLE_T, 1U));
+arg_types_112.push_back(expr_type(DOUBLE_T, 2U));
+
+std::vector<expr_type> arg_types_111 = data_arg_types;
+for (int i = 0; i < 3; i++)
+  arg_types_111.push_back(expr_type(DOUBLE_T, 1U));
+
+std::vector<expr_type> arg_types_121 = data_arg_types;
+arg_types_121.push_back(expr_type(DOUBLE_T, 1U));
+arg_types_121.push_back(expr_type(DOUBLE_T, 2U));
+arg_types_121.push_back(expr_type(DOUBLE_T, 1U));
+
+std::vector<expr_type> arg_types_212 = data_arg_types;
+arg_types_212.push_back(expr_type(DOUBLE_T, 2U));
+arg_types_212.push_back(expr_type(DOUBLE_T, 1U));
+arg_types_212.push_back(expr_type(DOUBLE_T, 2U));
+
+std::vector<expr_type> arg_types_211 = data_arg_types;
+arg_types_211.push_back(expr_type(DOUBLE_T, 2U));
+arg_types_211.push_back(expr_type(DOUBLE_T, 1U));
+arg_types_211.push_back(expr_type(DOUBLE_T, 1U));
+
+std::vector<expr_type> arg_types_221 = data_arg_types;
+arg_types_221.push_back(expr_type(DOUBLE_T, 2U));
+arg_types_221.push_back(expr_type(DOUBLE_T, 2U));
+arg_types_221.push_back(expr_type(DOUBLE_T, 1U));
+
+add("PKModelOneCpt", MATRIX_T, arg_types_222);
+add("PKModelOneCpt", MATRIX_T, arg_types_122);
+add("PKModelOneCpt", MATRIX_T, arg_types_112);
+add("PKModelOneCpt", MATRIX_T, arg_types_111);
+add("PKModelOneCpt", MATRIX_T, arg_types_121);
+add("PKModelOneCpt", MATRIX_T, arg_types_212);
+add("PKModelOneCpt", MATRIX_T, arg_types_211);
+add("PKModelOneCpt", MATRIX_T, arg_types_221);
+
+add("PKModelTwoCpt", MATRIX_T, arg_types_222);
+add("PKModelTwoCpt", MATRIX_T, arg_types_122);
+add("PKModelTwoCpt", MATRIX_T, arg_types_112);
+add("PKModelTwoCpt", MATRIX_T, arg_types_111);
+add("PKModelTwoCpt", MATRIX_T, arg_types_121);
+add("PKModelTwoCpt", MATRIX_T, arg_types_212);
+add("PKModelTwoCpt", MATRIX_T, arg_types_211);
+add("PKModelTwoCpt", MATRIX_T, arg_types_221);
+
+arg_types_222[8] = expr_type(MATRIX_T, 1U);
+arg_types_122[8] = MATRIX_T; 
+arg_types_112[8] = MATRIX_T;
+arg_types_111[8] = MATRIX_T;
+arg_types_121[8] = MATRIX_T;
+arg_types_212[8] = expr_type(MATRIX_T, 1U);
+arg_types_211[8] = expr_type(MATRIX_T, 1U);
+arg_types_221[8] = expr_type(MATRIX_T, 1U);
+
+add("linOdeModel", MATRIX_T, arg_types_222);
+add("linOdeModel", MATRIX_T, arg_types_122);
+add("linOdeModel", MATRIX_T, arg_types_112);
+add("linOdeModel", MATRIX_T, arg_types_111);
+add("linOdeModel", MATRIX_T, arg_types_121);
+add("linOdeModel", MATRIX_T, arg_types_212);
+add("linOdeModel", MATRIX_T, arg_types_211);
+add("linOdeModel", MATRIX_T, arg_types_221);
+
+/*
 std::vector<expr_type> arg_types_PKcpt_1;
 std::vector<expr_type> arg_types_PKcpt_2;
 arg_types_PKcpt_1.push_back(expr_type(DOUBLE_T, 2U));
@@ -1233,4 +1313,4 @@ for(int i = 0; i < 4; i++) {
 add("linCptModel", MATRIX_T, arg_types_linCpt_1);
 add("linCptModel", MATRIX_T, arg_types_linCpt_2);
 add("linCptModel", MATRIX_T, arg_types_linCpt_3);
-add("linCptModel", MATRIX_T, arg_types_linCpt_4);
+add("linCptModel", MATRIX_T, arg_types_linCpt_4); */
