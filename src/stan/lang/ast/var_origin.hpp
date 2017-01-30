@@ -35,7 +35,8 @@ namespace stan {
        *
        * @param program_block enclosing program block
        */
-      var_origin(const origin_block& program_block);  // NOLINT(runtime/explicit)
+      var_origin(const
+                 origin_block& program_block);   // NOLINT(runtime/explicit)
 
       /**
        * Construct an origin for a variable in specified outer program block,
