@@ -13,8 +13,8 @@ data {
 
 transformed data {
   matrix[nCmt, nCmt] K_data[nt];
-  real biovar_data[nCmt, nt];
-  real tlag_data[nCmt, nt];
+  real biovar_data[nt, nCmt];
+  real tlag_data[nt, nCmt];
   matrix[nt, nCmt] x_data;
 
   x_data = linOdeModel(time, amt, rate, ii, evid, cmt, addl, ss,
@@ -41,8 +41,8 @@ parameters {
 
 transformed parameters {
   matrix[nCmt, nCmt] K_parm[nt];
-  real biovar_parm[nCmt, nt];
-  real tlag_parm[nCmt, nt];
+  real biovar_parm[nt, nCmt];
+  real tlag_parm[nt, nCmt];
   matrix[nt, nCmt] x_parm;
 
   // expression types for last three arguments:

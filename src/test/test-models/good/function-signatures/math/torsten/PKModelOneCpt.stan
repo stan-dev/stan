@@ -1,6 +1,8 @@
 data {
   int<lower = 1> nt;
+  int<lower = 1> nCmt;
   int<lower = 1> cmt[nt];
+  int<lower = 1> nTheta;
   int evid[nt];
   int addl[nt];
   int ss[nt];
@@ -11,10 +13,10 @@ data {
 }
 
 transformed data {
-  real theta_data[3, nt];
-  real biovar_data[2, nt];
-  real tlag_data[2, nt];
-  matrix[nt, 2] x_data;
+  real theta_data[nt, nTheta];
+  real biovar_data[nt, nCmt];
+  real tlag_data[nt, nCmt];
+  matrix[nt, nCmt] x_data;
 
   x_data = PKModelOneCpt(time, amt, rate, ii, evid, cmt, addl, ss,
                         theta_data, biovar_data, tlag_data);
@@ -39,10 +41,10 @@ parameters {
 }
 
 transformed parameters {
-  real theta_parm[3, nt];
-  real biovar_parm[2, nt];
-  real tlag_parm[2, nt];
-  matrix[nt, 2] x_parm;
+  real theta_parm[nt, nTheta];
+  real biovar_parm[nt, nCmt];
+  real tlag_parm[nt, nCmt];
+  matrix[nt, nCmt] x_parm;
 
   // expression types for last three arguments:
   // parm, parm, parm

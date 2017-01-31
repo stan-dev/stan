@@ -31,11 +31,11 @@ int x_int[0];
 }
 
 transformed data {
-  int nCmt;
-  real theta_data[nTheta, nt];
-  real biovar_data[nCmt, nt];
-  real tlag_data[nCmt, nt];
-  matrix[nt, 2] x_data;
+  int nCmt = 2;
+  real theta_data[nt, nTheta];
+  real biovar_data[nt, nCmt];
+  real tlag_data[nt, nCmt];
+  matrix[nt, nCmt] x_data;
 
   nCmt = 2;
 
@@ -86,10 +86,10 @@ parameters {
 }
 
 transformed parameters {
-  real theta_parm[nTheta, nt];
-  real biovar_parm[nCmt, nt];
-  real tlag_parm[nCmt, nt];
-  matrix[nt, 2] x_parm;
+  real theta_parm[nt, nTheta];
+  real biovar_parm[nt, nCmt];
+  real tlag_parm[nt, nCmt];
+  matrix[nt, nCmt] x_parm;
 
   // RK45
   x_parm = generalOdeModel_rk45(ode, nCmt, time, amt, rate, ii, evid, cmt,
