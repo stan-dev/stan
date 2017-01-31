@@ -49,9 +49,24 @@ namespace stan {
       cov_matrix_decl_r;
 
       boost::spirit::qi::rule<Iterator,
+                              expression(var_origin),
+                              whitespace_grammar<Iterator> >
+      def_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              expression(var_origin),
+                              whitespace_grammar<Iterator> >
+      int_data_expr_r;
+
+      boost::spirit::qi::rule<Iterator,
                               std::vector<expression>(var_origin),
                               whitespace_grammar<Iterator> >
       dims_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              expression(var_origin),
+                              whitespace_grammar<Iterator> >
+      dim1_r;
 
       boost::spirit::qi::rule<Iterator,
                               double_var_decl(var_origin),
@@ -77,6 +92,12 @@ namespace stan {
                               matrix_var_decl(var_origin),
                               whitespace_grammar<Iterator> >
       matrix_decl_r;
+
+
+      boost::spirit::qi::rule<Iterator,
+                              expression(var_origin),
+                              whitespace_grammar<Iterator> >
+      opt_def_r;
 
       boost::spirit::qi::rule<Iterator,
                               std::vector<expression>(var_origin),
