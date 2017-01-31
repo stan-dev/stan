@@ -7,7 +7,8 @@ namespace stan {
   namespace lang {
 
     bool is_data_origin(const var_origin& vo) {
-      return vo == data_origin || vo == transformed_data_origin;
+      return vo.program_block_ == data_origin
+        || vo.program_block_ == transformed_data_origin;
     }
 
   }

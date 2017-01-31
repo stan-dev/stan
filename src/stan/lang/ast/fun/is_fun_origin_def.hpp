@@ -7,12 +7,12 @@ namespace stan {
   namespace lang {
 
     bool is_fun_origin(const var_origin& vo) {
-      return vo == function_argument_origin
-        || vo == function_argument_origin_lp
-        || vo == function_argument_origin_rng
-        || vo == void_function_argument_origin
-        || vo == void_function_argument_origin_lp
-        || vo == void_function_argument_origin_rng;
+      return vo.program_block_ == function_argument_origin
+        || vo.program_block_ == function_argument_origin_lp
+        || vo.program_block_ == function_argument_origin_rng
+        || vo.program_block_ == void_function_argument_origin
+        || vo.program_block_ == void_function_argument_origin_lp
+        || vo.program_block_ == void_function_argument_origin_rng;
     }
 
   }

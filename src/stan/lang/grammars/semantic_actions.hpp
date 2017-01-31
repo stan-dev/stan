@@ -206,7 +206,7 @@ namespace stan {
     // called from: expression_grammar
     struct validate_conditional_op : public phoenix_functor_quinary {
       void operator()(conditional_op& cond_expr,
-                      const var_origin& var_origin,
+                      const var_origin& vo,
                       bool& pass,
                       const variable_map& var_map,
                       std::ostream& error_msgs) const;
@@ -242,7 +242,7 @@ namespace stan {
     // called from: functions_grammar
     struct set_allows_sampling_origin : public phoenix_functor_ternary {
       void operator()(const std::string& identifier, bool& allow_sampling,
-                      int& origin) const;
+                      var_origin& origin) const;
     };
     extern boost::phoenix::function<set_allows_sampling_origin>
     set_allows_sampling_origin_f;
@@ -406,7 +406,7 @@ namespace stan {
 
     // called from: statement_grammar
     struct identifier_to_var : public phoenix_functor_senary {
-      void operator()(const std::string& name, const var_origin& origin_allowed,
+      void operator()(const std::string& name, const var_origin& origin,
                       variable& v, bool& pass, const variable_map& vm,
                       std::ostream& error_msgs) const;
     };
@@ -421,7 +421,7 @@ namespace stan {
 
     // called from: statement_grammar
     struct validate_assignment : public phoenix_functor_quinary {
-      void operator()(assignment& a, const var_origin& origin_allowed,
+      void operator()(assignment& a, const var_origin& origin,
                       bool& pass, variable_map& vm, std::ostream& error_msgs)
         const;
     };
@@ -463,8 +463,10 @@ namespace stan {
     extern boost::phoenix::function<add_while_body> add_while_body_f;
 
     // called from: statement_grammar
-    struct add_loop_identifier : public phoenix_functor_quinary {
-      void operator()(const std::string& name, std::string& name_local,
+    struct add_loop_identifier : public phoenix_functor_senary {
+      void operator()(const std::string& name,
+                      std::string& name_local,
+                      const var_origin& origin,
                       bool& pass, variable_map& vm,
                       std::stringstream& error_msgs) const;
     };
@@ -559,7 +561,7 @@ namespace stan {
     // called from: term_grammar
     struct set_fun_type_named : public phoenix_functor_quinary {
       void operator()(expression& fun_result, fun& fun,
-                      const var_origin& var_origin, bool& pass,
+                      const var_origin& vo, bool& pass,
                       std::ostream& error_msgs) const;
     };
     extern boost::phoenix::function<set_fun_type_named> set_fun_type_named_f;
@@ -568,7 +570,7 @@ namespace stan {
     struct set_array_expr_type : public phoenix_functor_senary {
       void operator()(expression& e,
                       array_expr& array_expr,
-                      const var_origin& var_origin,
+                      const var_origin& vo,
                       bool& pass,
                       const variable_map& var_map,
                       std::ostream& error_msgs) const;
@@ -578,7 +580,7 @@ namespace stan {
     // called from: term_grammar
     struct exponentiation_expr : public phoenix_functor_quinary {
       void operator()(expression& expr1, const expression& expr2,
-                      const var_origin& var_origin, bool& pass,
+                      const var_origin& vo, bool& pass,
                       std::ostream& error_msgs) const;
     };
     extern boost::phoenix::function<exponentiation_expr> exponentiation_f;
@@ -776,7 +778,7 @@ namespace stan {
     extern boost::phoenix::function<set_int_range_upper> set_int_range_upper_f;
 
     struct validate_int_data_expr : public phoenix_functor_quinary {
-      void operator()(const expression& expr, int var_origin, bool& pass,
+      void operator()(const expression& expr, const var_origin& vo, bool& pass,
                       variable_map& var_map, std::stringstream& error_msgs)
         const;
     };
@@ -823,6 +825,25 @@ namespace stan {
                       std::ostream& error_msgs) const;
     };
     extern boost::phoenix::function<non_void_expression> non_void_expression_f;
+
+    struct set_var_origin : public phoenix_functor_binary {
+      void operator()(var_origin& vo, const origin_block& program_block) const;
+    };
+    extern boost::phoenix::function<set_var_origin> set_var_origin_f;
+
+    struct set_var_origin_local : public phoenix_functor_binary {
+      void operator()(var_origin& vo, const origin_block& program_block) const;
+    };
+    extern boost::phoenix::function<set_var_origin_local>
+    set_var_origin_local_f;
+
+    struct reset_var_origin : public phoenix_functor_binary {
+      void operator()(var_origin& vo, const var_origin& vo_enclosing) const;
+    };
+    extern boost::phoenix::function<reset_var_origin> reset_var_origin_f;
+
+
+
   }
 }
 #endif
