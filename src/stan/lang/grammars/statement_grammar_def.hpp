@@ -87,6 +87,7 @@ namespace stan {
       using boost::spirit::qi::raw;
 
       using boost::spirit::qi::labels::_a;
+      using boost::spirit::qi::labels::_b;
       using boost::spirit::qi::labels::_r1;
       using boost::spirit::qi::labels::_r2;
       using boost::spirit::qi::labels::_r3;
@@ -100,7 +101,6 @@ namespace stan {
       //   _r2 source of variables allowed for assignments
       //   _r3 true if return_r allowed
       //   _r4 true if in loop (allowing break/continue)
-
       // raw[ ] just to wrap to get line numbers
       statement_r.name("statement");
       statement_r
@@ -132,13 +132,14 @@ namespace stan {
       statement_seq_r.name("sequence of statements");
       statement_seq_r
         %= lit('{')
-        > local_var_decls_r[assign_lhs_f(_a, _1)]
-        > *statement_r(_r1, _r2, _r3, _r4)
+        > eps[reset_var_origin_f(_b, _r2)]
+        > local_var_decls_r(_b)[assign_lhs_f(_a, _1)]
+        > *statement_r(_r1, _b, _r3, _r4)
         > lit('}')
         > eps[unscope_locals_f(_a, boost::phoenix::ref(var_map_))];
 
       local_var_decls_r
-        %= var_decls_g(false, local_origin);  // - constants
+        %= var_decls_g(false, _r1);  // - constants
 
       // inherited  _r1 = true if samples allowed as statements
       increment_log_prob_statement_r.name("increment log prob statement");
@@ -189,7 +190,7 @@ namespace stan {
       for_statement_r
         %= (lit("for") >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('(')
-        > identifier_r[add_loop_identifier_f(_1, _a, _pass,
+        > identifier_r[add_loop_identifier_f(_1, _a, _r2, _pass,
                                          boost::phoenix::ref(var_map_),
                                          boost::phoenix::ref(error_msgs_))]
         > lit("in")

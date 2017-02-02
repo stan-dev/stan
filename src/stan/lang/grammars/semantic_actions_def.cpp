@@ -224,7 +224,7 @@ namespace stan {
 
 
     void validate_conditional_op::operator()(conditional_op& conditional_op,
-                                             const var_origin& var_origin,
+                                             const var_origin& vo,
                                              bool& pass,
                                              const variable_map& var_map,
                                              std::ostream& error_msgs) const {
@@ -271,7 +271,7 @@ namespace stan {
         conditional_op.type_ = true_val_type;
 
       conditional_op.has_var_ = has_var(conditional_op, var_map);
-      conditional_op.var_origin_ = var_origin;
+      conditional_op.var_origin_ = vo;
       pass = true;
     }
     boost::phoenix::function<validate_conditional_op>
@@ -322,32 +322,32 @@ namespace stan {
         return;
       }
       origin = return_type.is_void()
-        ? void_function_argument_origin
-        : function_argument_origin;
+        ? var_origin(void_function_argument_origin)
+        : var_origin(function_argument_origin);
       pass = true;
     }
     boost::phoenix::function<set_void_function> set_void_function_f;
 
     void set_allows_sampling_origin::operator()(const std::string& identifier,
                                                 bool& allow_sampling,
-                                                int& origin) const {
+                                                var_origin& origin) const {
       bool is_void_function_origin
-        = (origin == void_function_argument_origin);
+        = (origin.program_block_ == void_function_argument_origin);
       if (ends_with("_lp", identifier)) {
         allow_sampling = true;
         origin = is_void_function_origin
-          ? void_function_argument_origin_lp
-          : function_argument_origin_lp;
+          ? var_origin(void_function_argument_origin_lp)
+          : var_origin(function_argument_origin_lp);
       } else if (ends_with("_rng", identifier)) {
         allow_sampling = false;
         origin = is_void_function_origin
-          ? void_function_argument_origin_rng
-          : function_argument_origin_rng;
+          ? var_origin(void_function_argument_origin_rng)
+          : var_origin(function_argument_origin_rng);
       } else {
         allow_sampling = false;
         origin = is_void_function_origin
-          ? void_function_argument_origin
-          : function_argument_origin;
+          ? var_origin(void_function_argument_origin)
+          : var_origin(function_argument_origin);
       }
     }
     boost::phoenix::function<set_allows_sampling_origin>
@@ -774,9 +774,9 @@ namespace stan {
 
     void validate_return_allowed::operator()(var_origin origin, bool& pass,
                                              std::ostream& error_msgs) const {
-      if (origin != function_argument_origin
-          && origin != function_argument_origin_lp
-          && origin != function_argument_origin_rng) {
+      if (origin.program_block_ != function_argument_origin
+          && origin.program_block_ != function_argument_origin_lp
+          && origin.program_block_ != function_argument_origin_rng) {
         error_msgs << "Returns only allowed from function bodies."
                    << std::endl;
         pass = false;
@@ -790,9 +790,9 @@ namespace stan {
                                                   bool& pass,
                                                   std::ostream& error_msgs)
       const {
-      if (origin != void_function_argument_origin
-          && origin != void_function_argument_origin_lp
-          && origin != void_function_argument_origin_rng) {
+      if (origin.program_block_ != void_function_argument_origin
+          && origin.program_block_ != void_function_argument_origin_lp
+          && origin.program_block_ != void_function_argument_origin_rng) {
         error_msgs << "Void returns only allowed from function"
                    << " bodies of void return type."
                    << std::endl;
@@ -805,7 +805,7 @@ namespace stan {
     validate_void_return_allowed_f;
 
     void identifier_to_var::operator()(const std::string& name,
-                                       const var_origin& origin_allowed,
+                                       const var_origin& origin,
                                        variable& v,  bool& pass,
                                        const variable_map& vm,
                                        std::ostream& error_msgs) const {
@@ -816,18 +816,19 @@ namespace stan {
       }
       // validate origin
       var_origin lhs_origin = vm.get_origin(name);
-      if (lhs_origin != local_origin
-          && lhs_origin != origin_allowed) {
+      origin_block lhs_block = lhs_origin.program_block_;
+      if (lhs_block != local_origin
+          && lhs_block != origin.program_block_) {
         pass = false;
         return;
       }
       // enforce constancy of function args
-      if (lhs_origin == function_argument_origin
-          || lhs_origin == function_argument_origin_lp
-          || lhs_origin == function_argument_origin_rng
-          || lhs_origin == void_function_argument_origin
-          || lhs_origin == void_function_argument_origin_lp
-          || lhs_origin == void_function_argument_origin_rng) {
+      if (lhs_block == function_argument_origin
+          || lhs_block == function_argument_origin_lp
+          || lhs_block == function_argument_origin_rng
+          || lhs_block == void_function_argument_origin
+          || lhs_block == void_function_argument_origin_lp
+          || lhs_block == void_function_argument_origin_rng) {
         pass = false;
         return;
       }
@@ -897,7 +898,7 @@ namespace stan {
     boost::phoenix::function<validate_assgn> validate_assgn_f;
 
     void validate_assignment::operator()(assignment& a,
-                                         const var_origin& origin_allowed,
+                                         const var_origin& origin,
                                          bool& pass, variable_map& vm,
                                          std::ostream& error_msgs) const {
       // validate existence
@@ -913,8 +914,9 @@ namespace stan {
 
       // validate origin
       var_origin lhs_origin = vm.get_origin(name);
-      if (lhs_origin != local_origin
-          && lhs_origin != origin_allowed) {
+      origin_block lhs_block = lhs_origin.program_block_;
+      if (lhs_block != local_origin
+          && lhs_block != origin.program_block_) {
         error_msgs << "attempt to assign variable in wrong block."
                    << " left-hand-side variable origin=";
         print_var_origin(error_msgs, lhs_origin);
@@ -924,12 +926,13 @@ namespace stan {
       }
 
       // enforce constancy of function args
-      if (lhs_origin == function_argument_origin
-          || lhs_origin == function_argument_origin_lp
-          || lhs_origin == function_argument_origin_rng
-          || lhs_origin == void_function_argument_origin
-          || lhs_origin == void_function_argument_origin_lp
-          || lhs_origin == void_function_argument_origin_rng) {
+      if (!lhs_origin.is_local_
+          && (lhs_block == function_argument_origin
+              || lhs_block == function_argument_origin_lp
+              || lhs_block == function_argument_origin_rng
+              || lhs_block == void_function_argument_origin
+              || lhs_block == void_function_argument_origin_lp
+              || lhs_block == void_function_argument_origin_rng)) {
         error_msgs << "Illegal to assign to function argument variables."
                    << std::endl
                    << "Use local variables instead."
@@ -1287,6 +1290,7 @@ namespace stan {
 
     void add_loop_identifier::operator()(const std::string& name,
                                          std::string& name_local,
+                                         const var_origin& origin,
                                          bool& pass, variable_map& vm,
                                          std::stringstream& error_msgs) const {
       name_local = name;
@@ -1296,7 +1300,7 @@ namespace stan {
                    << " variable name=\"" << name << "\"" << std::endl;
       else
         vm.add(name, base_var_decl(name, std::vector<expression>(), INT_T),
-               local_origin);  // loop var acts like local
+               var_origin(origin.program_block_, true));
     }
     boost::phoenix::function<add_loop_identifier> add_loop_identifier_f;
 
@@ -1557,7 +1561,7 @@ namespace stan {
     validate_integrate_ode_control_f;
 
     void set_fun_type_named::operator()(expression& fun_result, fun& fun,
-                                        const var_origin& var_origin,
+                                        const var_origin& vo,
                                         bool& pass,
                                         std::ostream& error_msgs) const {
       if (fun.name_ == "get_lp")
@@ -1606,14 +1610,14 @@ namespace stan {
       replace_suffix("lchoose", "binomial_coefficient_log", fun);
 
       if (has_rng_suffix(fun.name_)) {
-        if (!(var_origin == derived_origin
-              || var_origin == transformed_data_origin
-              || var_origin == function_argument_origin_rng)) {
+        if (!(vo.program_block_ == derived_origin
+              || vo.program_block_ == transformed_data_origin
+              || vo.program_block_ == function_argument_origin_rng)) {
           error_msgs << "ERROR: random number generators only allowed in"
                      << " transformed data block, generated quantities block"
                      << " or user-defined functions with names ending in _rng"
                      << "; found function=" << fun.name_ << " in block=";
-          print_var_origin(error_msgs, var_origin);
+          print_var_origin(error_msgs, vo);
           error_msgs << std::endl;
           pass = false;
           return;
@@ -1623,10 +1627,10 @@ namespace stan {
       if (has_lp_suffix(fun.name_) || fun.name_ == "target") {
         // modified function_argument_origin to add _lp because
         // that's only viable context
-        if (!(var_origin == transformed_parameter_origin
-              || var_origin == function_argument_origin_lp
-              || var_origin == void_function_argument_origin_lp
-              || var_origin == local_origin)) {
+        if (!(vo.program_block_ == transformed_parameter_origin
+              || vo.program_block_ == function_argument_origin_lp
+              || vo.program_block_ == void_function_argument_origin_lp
+              || vo.program_block_ == model_name_origin)) {
           error_msgs << "Function target() or functions suffixed with _lp only"
                      << " allowed in transformed parameter block, model block"
                      << std::endl
@@ -1635,7 +1639,7 @@ namespace stan {
                      << "Found function = "
                      << (fun.name_ == "get_lp" ? "target or get_lp" : fun.name_)
                      << " in block = ";
-          print_var_origin(error_msgs, var_origin);
+          print_var_origin(error_msgs, vo);
           error_msgs << std::endl;
           pass = false;
           return;
@@ -1687,7 +1691,7 @@ namespace stan {
 
     void set_array_expr_type::operator()(expression& e,
                       array_expr& array_expr,
-                      const var_origin& var_origin,
+                      const var_origin& vo,
                       bool& pass,
                       const variable_map& var_map,
                       std::ostream& error_msgs) const {
@@ -1727,7 +1731,7 @@ namespace stan {
       }
       ++et.num_dims_;
       array_expr.type_ = et;
-      array_expr.var_origin_ = var_origin;
+      array_expr.array_expr_origin_ = vo;
       array_expr.has_var_ = has_var(array_expr, var_map);
       e = array_expr;
       pass = true;
@@ -1736,7 +1740,7 @@ namespace stan {
 
     void exponentiation_expr::operator()(expression& expr1,
                                          const expression& expr2,
-                                         const var_origin& var_origin,
+                                         const var_origin& vo,
                                          bool& pass,
                                          std::ostream& error_msgs) const {
       if (!expr1.expression_type().is_primitive()
@@ -1747,7 +1751,7 @@ namespace stan {
                    << " by "
                    << expr2.expression_type()
                    << " in block=";
-        print_var_origin(error_msgs, var_origin);
+        print_var_origin(error_msgs, vo);
         error_msgs << std::endl;
         pass = false;
         return;
@@ -2164,9 +2168,15 @@ namespace stan {
     }
     bool data_only_expression::operator()(const variable& x) const {
       var_origin origin = var_map_.get_origin(x.name_);
-      bool is_data = (origin == data_origin)
-        || (origin == transformed_data_origin)
-        || (origin == local_origin);
+      bool is_data = origin.is_local_
+        || (origin.program_block_ == data_origin)
+        || (origin.program_block_ == transformed_data_origin)
+        || (origin.program_block_ == function_argument_origin)
+        || (origin.program_block_ == function_argument_origin_lp)
+        || (origin.program_block_ == function_argument_origin_rng)
+        || (origin.program_block_ == void_function_argument_origin)
+        || (origin.program_block_ == void_function_argument_origin_lp)
+        || (origin.program_block_ == void_function_argument_origin_rng);
       if (!is_data) {
         error_msgs_ << "non-data variables not allowed"
                     << " in dimension declarations."
@@ -2247,8 +2257,8 @@ namespace stan {
       if (!var_decl.has_def()) return;
 
       // validate that assigment is allowed in this block
-      if (origin == data_origin
-          || origin == parameter_origin) {
+      if (origin.program_block_ == data_origin
+          || origin.program_block_ == parameter_origin) {
         error_msgs << "variable definition not possible in this block"
                    << std::endl;
         pass = false;
@@ -2534,7 +2544,8 @@ namespace stan {
     boost::phoenix::function<set_int_range_upper> set_int_range_upper_f;
 
     void validate_int_data_expr::operator()(const expression& expr,
-                                            int var_origin, bool& pass,
+                                            const var_origin& vo,
+                                            bool& pass,
                                             variable_map& var_map,
                                             std::stringstream& error_msgs)
       const {
@@ -2547,7 +2558,7 @@ namespace stan {
         return;
       }
 
-      if (var_origin != local_origin) {
+      if (!vo.is_local_) {
         data_only_expression vis(error_msgs, var_map);
         bool only_data_dimensions = boost::apply_visitor(vis, expr.expr_);
         pass = only_data_dimensions;
@@ -2601,11 +2612,13 @@ namespace stan {
         var_decl_result = var_decl;
         return;
       }
-      if ((vo == parameter_origin || vo == transformed_parameter_origin)
-          && var_decl.base_type_ == INT_T) {
+      if ((!vo.is_local_ &&
+           (vo.program_block_ == parameter_origin
+            || vo.program_block_ == transformed_parameter_origin)
+           && var_decl.base_type_ == INT_T)) {
         pass = false;
-        error_msgs << "integer parameters or transformed parameters"
-                   << " are not allowed; "
+        error_msgs << "parameters or transformed parameters"
+                   << " cannot be integer or integer array; "
                    << " found declared type int, parameter name="
                    << var_decl.name_
                    << std::endl;
@@ -2680,6 +2693,29 @@ namespace stan {
                    << std::endl;
     }
     boost::phoenix::function<non_void_expression> non_void_expression_f;
+
+    void set_var_origin::operator()(var_origin& vo,
+                                    const origin_block& program_block)
+      const {
+      vo = var_origin(program_block);
+    }
+    boost::phoenix::function<set_var_origin> set_var_origin_f;
+
+    void set_var_origin_local::operator()(var_origin& vo,
+                                    const origin_block& program_block)
+      const {
+      vo = var_origin(program_block, true);
+    }
+    boost::phoenix::function<set_var_origin_local> set_var_origin_local_f;
+
+    void reset_var_origin::operator()(var_origin& vo,
+                                      const var_origin& vo_enclosing)
+      const {
+      origin_block enclosing_block = vo_enclosing.program_block_;
+      vo = var_origin(enclosing_block, true);
+    }
+    boost::phoenix::function<reset_var_origin> reset_var_origin_f;
+
 
   }
 }

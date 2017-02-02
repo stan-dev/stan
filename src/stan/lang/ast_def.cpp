@@ -7,6 +7,7 @@
 #include <stan/lang/ast.hpp>
 
 #include <stan/lang/ast/expr_type_def.hpp>
+#include <stan/lang/ast/var_origin_def.hpp>
 #include <stan/lang/ast/variable_map_def.hpp>
 
 #include <stan/lang/ast/fun/ends_with_def.hpp>

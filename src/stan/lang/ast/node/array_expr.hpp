@@ -36,8 +36,7 @@ namespace stan {
        * Origin of this array expression.
        *
        */
-      // TODO(carpenter): rename to "array_expr_origin_"
-      var_origin var_origin_;
+      var_origin array_expr_origin_;
 
       /**
        * Construct a default array expression.

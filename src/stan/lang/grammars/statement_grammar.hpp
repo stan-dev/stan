@@ -136,7 +136,7 @@ namespace stan {
       identifier_r;
 
       boost::spirit::qi::rule<Iterator,
-                              std::vector<var_decl>(),
+                              std::vector<var_decl>(var_origin),
                               whitespace_grammar<Iterator> >
       local_var_decls_r;
 
@@ -171,7 +171,8 @@ namespace stan {
       statement_sub_r;
 
       boost::spirit::qi::rule<Iterator,
-                              boost::spirit::qi::locals<std::vector<var_decl> >,
+                              boost::spirit::qi::locals<std::vector<var_decl>,
+                                                        var_origin>,
                               statements(bool, var_origin, bool, bool),
                               whitespace_grammar<Iterator> >
       statement_seq_r;
