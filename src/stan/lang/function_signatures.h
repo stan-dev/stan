@@ -1084,6 +1084,7 @@ add("to_array_2d", expr_type(DOUBLE_T, 2), MATRIX_T);
 add("to_matrix", MATRIX_T, MATRIX_T);
 add("to_matrix", MATRIX_T, VECTOR_T);
 add("to_matrix", MATRIX_T, ROW_VECTOR_T);
+add("to_matrix", MATRIX_T, expr_type(DOUBLE_T, 1), INT_T, INT_T);
 add("to_matrix", MATRIX_T, expr_type(DOUBLE_T, 2));
 add("to_matrix", MATRIX_T, expr_type(INT_T, 2));
 add("to_row_vector", ROW_VECTOR_T, MATRIX_T);
