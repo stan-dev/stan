@@ -17,6 +17,30 @@ namespace stan {
                            const bool& is_local)
       : program_block_(program_block), is_local_(is_local) { }
 
+    bool var_origin::is_void_function_origin() const {
+      return program_block_ == void_function_argument_origin
+        || program_block_ == void_function_argument_origin_lp
+        || program_block_ == void_function_argument_origin_rng;
+    }
+
+    bool var_origin::is_non_void_function_origin() const {
+      return program_block_ == function_argument_origin
+        || program_block_ == function_argument_origin_lp
+        || program_block_ == function_argument_origin_rng;
+    }
+
+    bool var_origin::allows_lp() const {
+      return program_block_ == model_name_origin
+        || program_block_ == function_argument_origin_lp
+        || program_block_ == void_function_argument_origin_lp;
+    }
+
+    bool var_origin::allows_rng() const {
+      return program_block_ == derived_origin
+        || program_block_ == function_argument_origin_rng
+        || program_block_ == void_function_argument_origin_rng;
+    }
+
   }
 }
 #endif

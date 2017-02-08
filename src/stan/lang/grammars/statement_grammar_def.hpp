@@ -91,57 +91,56 @@ namespace stan {
       using boost::spirit::qi::labels::_r1;
       using boost::spirit::qi::labels::_r2;
       using boost::spirit::qi::labels::_r3;
-      using boost::spirit::qi::labels::_r4;
 
       using boost::phoenix::begin;
       using boost::phoenix::end;
 
-      // inherited features
-      //   _r1 true if sample_r allowed
-      //   _r2 source of variables allowed for assignments
-      //   _r3 true if return_r allowed
-      //   _r4 true if in loop (allowing break/continue)
+      // inherited features _r1, _r2, _r3
+      //   _r1 var_origin
+      //   _r2 true if return_r allowed
+      //   _r3 true if in loop (allowing break/continue)
       // raw[ ] just to wrap to get line numbers
       statement_r.name("statement");
       statement_r
-        = raw[statement_sub_r(_r1, _r2, _r3, _r4)[assign_lhs_f(_val, _1)]]
+        = raw[statement_sub_r(_r1, _r2, _r3)[assign_lhs_f(_val, _1)]]
         [add_line_number_f(_val, begin(_1), end(_1))];
 
       statement_sub_r.name("statement");
       statement_sub_r
         %= no_op_statement_r                        // key ";"
-        | statement_seq_r(_r1, _r2, _r3, _r4)       // key "{"
-        | increment_log_prob_statement_r(_r1, _r2)  // key "increment_log_prob"
-        | increment_target_statement_r(_r1, _r2)    // key "target"
-        | for_statement_r(_r1, _r2, _r3)            // key "for"
-        | while_statement_r(_r1, _r2, _r3)          // key "while"
-        | break_continue_statement_r(_r4)           // key "break", "continue"
-        | statement_2_g(_r1, _r2, _r3, _r4)         // key "if"
-        | print_statement_r(_r2)                    // key "print"
-        | reject_statement_r(_r2)                   // key "reject"
-        | return_statement_r(_r2)                   // key "return"
-        | void_return_statement_r(_r2)              // key "return"
-        | assignment_r(_r2)                         // lvalue "<-"
-        | assgn_r(_r2)                              // var[idxs] <- expr
-        | sample_r(_r1, _r2)                        // expression "~"
-        | expression_g(_r2)                         // expression
+        | statement_seq_r(_r1, _r2, _r3)            // key "{"
+        | increment_log_prob_statement_r(_r1)       // key "increment_log_prob"
+        | increment_target_statement_r(_r1)         // key "target"
+        | for_statement_r(_r1, _r2)                 // key "for"
+        | while_statement_r(_r1, _r2)               // key "while"
+        | break_continue_statement_r(_r3)           // key "break", "continue"
+        | statement_2_g(_r1, _r2, _r3)              // key "if"
+        | print_statement_r(_r1)                    // key "print"
+        | reject_statement_r(_r1)                   // key "reject"
+        | return_statement_r(_r1)                   // key "return"
+        | void_return_statement_r(_r1)              // key "return"
+        | assignment_r(_r1)                         // lvalue "<-"
+        | assgn_r(_r1)                              // var[idxs] <- expr
+        | sample_r(_r1)                             // expression "~"
+        | expression_g(_r1)                         // expression
         [expression_as_statement_f(_pass, _1,
                                    boost::phoenix::ref(error_msgs_))];
 
-      // _r1, _r2, _r3, _r4 same as statement_r
+      // inherited features _r1, _r2, _r3
+      // _r1 = var_origin,  _r2 = true if allows return_r, _r3 = true if in loop
       statement_seq_r.name("sequence of statements");
       statement_seq_r
         %= lit('{')
-        > eps[reset_var_origin_f(_b, _r2)]
+        > eps[reset_var_origin_f(_b, _r1)]
         > local_var_decls_r(_b)[assign_lhs_f(_a, _1)]
-        > *statement_r(_r1, _b, _r3, _r4)
+        > *statement_r(_b, _r2, _r3)
         > lit('}')
         > eps[unscope_locals_f(_a, boost::phoenix::ref(var_map_))];
 
       local_var_decls_r
         %= var_decls_g(false, _r1);  // - constants
 
-      // inherited  _r1 = true if samples allowed as statements
+      // inherited feature _r1 = var_origin
       increment_log_prob_statement_r.name("increment log prob statement");
       increment_log_prob_statement_r
         %= (lit("increment_log_prob") >> no_skip[!char_("a-zA-Z0-9_")])
@@ -149,57 +148,61 @@ namespace stan {
         > eps[validate_allow_sample_f(_r1, _pass,
                                       boost::phoenix::ref(error_msgs_))]
         > lit('(')
-        > expression_g(_r2)
+        > expression_g(_r1)
           [validate_non_void_expression_f(_1, _pass,
                                           boost::phoenix::ref(error_msgs_))]
         > lit(')')
         > lit(';');
 
       // just variant syntax for increment_log_prob_r (see above)
+      // inherited feature _r1 = var_origin
       increment_target_statement_r.name("increment target statement");
       increment_target_statement_r
         %= (lit("target") >> lit("+="))
         > eps[validate_allow_sample_f(_r1, _pass,
                                       boost::phoenix::ref(error_msgs_))]
-        > expression_g(_r2)
+        > expression_g(_r1)
           [validate_non_void_expression_f(_1, _pass,
                                           boost::phoenix::ref(error_msgs_))]
         > lit(';');
 
-      // _r1, _r2, _r3, same as statement_r
+      // inherited features _r1, _r2
+      // _r1 = var_origin,  _r2 = true if allows return_r
       while_statement_r.name("while statement");
       while_statement_r
         = (lit("while") >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('(')
-        > expression_g(_r2)
+        > expression_g(_r1)
           [add_while_condition_f(_val, _1, _pass,
                                  boost::phoenix::ref(error_msgs_))]
         > lit(')')
-        > statement_r(_r1, _r2, _r3, true)
+        > statement_r(_r1, _r2, true)
           [add_while_body_f(_val, _1)];
 
-      // _r1 here == _r4 from statement_r
+      // _r1 = true if in loop
       break_continue_statement_r.name("break or continue statement");
       break_continue_statement_r
         %= (string("break") | string("continue"))
         > eps[validate_in_loop_f(_r1, _pass, boost::phoenix::ref(error_msgs_))]
         > lit(';');
 
-      // _r1, _r2, _r3 same as statement_r
+      // inherited features _r1, _r2
+      // _r1 = var_origin,  _r2 = true if allows return_r
       for_statement_r.name("for statement");
       for_statement_r
         %= (lit("for") >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('(')
-        > identifier_r[add_loop_identifier_f(_1, _a, _r2, _pass,
+        > identifier_r[add_loop_identifier_f(_1, _a, _r1, _pass,
                                          boost::phoenix::ref(var_map_),
                                          boost::phoenix::ref(error_msgs_))]
         > lit("in")
-        > range_r(_r2)
+        > range_r(_r1)
         > lit(')')
-        > statement_r(_r1, _r2, _r3, true)
+        > statement_r(_r1, _r2, true)
         > eps
         [remove_loop_identifier_f(_a, boost::phoenix::ref(var_map_))];
 
+      // inherited feature _r1 = var_origin
       print_statement_r.name("print statement");
       print_statement_r
         %= (lit("print") >> no_skip[!char_("a-zA-Z0-9_")])
@@ -207,7 +210,7 @@ namespace stan {
         > (printable_r(_r1) % ',')
         > lit(')');
 
-      // reject
+      // inherited feature _r1 = var_origin
       reject_statement_r.name("reject statement");
       reject_statement_r
         %= (lit("reject") >> no_skip[!char_("a-zA-Z0-9_")])
@@ -215,6 +218,7 @@ namespace stan {
         > (printable_r(_r1) % ',')
         > lit(')');
 
+      // inherited feature _r1 = var_origin
       printable_r.name("printable");
       printable_r
         %= printable_string_r
@@ -232,6 +236,7 @@ namespace stan {
         %= (lexeme[char_("a-zA-Z")
                    >> *char_("a-zA-Z0-9_.")]);
 
+      // inherited feature _r1 = var_origin
       range_r.name("range expression pair, colon");
       range_r
         %= expression_g(_r1)
@@ -242,6 +247,7 @@ namespace stan {
            [validate_int_expr_f(_1, _pass,
                                      boost::phoenix::ref(error_msgs_))];
 
+      // inherited feature _r1 = var_origin
       // this one comes before assgn_r to deal with simple assignment
       assignment_r.name("variable assignment by expression");
       assignment_r
@@ -253,6 +259,7 @@ namespace stan {
                                  boost::phoenix::ref(error_msgs_))]
         > lit(';');
 
+      // inherited feature _r1 = var_origin
       assgn_r.name("indexed variable assginment statement");
       assgn_r
         %= var_r(_r1)
@@ -268,6 +275,7 @@ namespace stan {
            [deprecate_old_assignment_op_f(boost::phoenix::ref(error_msgs_))]
         | (lit("=") >> no_skip[!char_("=")]);
 
+      // inherited feature _r1 = var_origin
       var_r.name("variable for left-hand side of assignment");
       var_r
         = identifier_r
@@ -276,19 +284,23 @@ namespace stan {
                                boost::phoenix::ref(error_msgs_))];
 
       // separate rule for name on expectation failure
+      // inherited feature _r1 = var_origin
       expression_rhs_r.name("expression assignable to left-hand side");
       expression_rhs_r
         %= expression_g(_r1);
 
+      // inherited feature _r1 = var_origin
       var_lhs_r.name("variable and array dimensions");
       var_lhs_r
         %= identifier_r
         >> opt_dims_r(_r1);
 
+      // inherited feature _r1 = var_origin
       opt_dims_r.name("array dimensions (optional)");
       opt_dims_r
         %=  *dims_r(_r1);
 
+      // inherited feature _r1 = var_origin
       dims_r.name("array dimensions");
       // uses silent test because errors will be reported in sliced rules
       dims_r
@@ -296,21 +308,22 @@ namespace stan {
         >> (expression_g(_r1)[validate_int_expr_silent_f(_1, _pass)] % ',')
         >> lit(']');
 
-      // inherited  _r1 = true if samples allowed as statements
+      // inherited  _r1 = var_origin
       sample_r.name("distribution of expression");
       sample_r
-        %= (expression_g(_r2)
+        %= (expression_g(_r1)
             >> lit('~'))
         > eps
           [validate_allow_sample_f(_r1, _pass,
                                    boost::phoenix::ref(error_msgs_))]
-        > distribution_r(_r2)
-        > -truncation_range_r(_r2)
+        > distribution_r(_r1)
+        > -truncation_range_r(_r1)
         > lit(';')
         > eps
           [validate_sample_f(_val, boost::phoenix::ref(var_map_),
                              _pass, boost::phoenix::ref(error_msgs_))];
 
+      // inherited feature _r1 = var_origin
       distribution_r.name("distribution and parameters");
       distribution_r
         %= (identifier_r
@@ -318,6 +331,7 @@ namespace stan {
             >> -(expression_g(_r1) % ','))
         > lit(')');
 
+      // inherited feature _r1 = var_origin
       truncation_range_r.name("range pair");
       truncation_range_r
         %= lit('T')
@@ -327,7 +341,7 @@ namespace stan {
         > -expression_g(_r1)
         > lit(']');
 
-      // _r1 = allow sampling, _r2 = var origin
+      // inherited feature _r1 = var_origin
       return_statement_r.name("return statement");
       return_statement_r
         %= (lit("return") >> no_skip[!char_("a-zA-Z0-9_")])
@@ -335,7 +349,7 @@ namespace stan {
         >> lit(';') [validate_return_allowed_f(_r1, _pass,
                                        boost::phoenix::ref(error_msgs_))];
 
-      // _r1 = var origin
+      // inherited feature _r1 = var_origin
       void_return_statement_r.name("void return statement");
       void_return_statement_r
         = lit("return")[set_void_return_f(_val)]  // = expression()]

@@ -329,23 +329,17 @@ namespace stan {
     boost::phoenix::function<set_void_function> set_void_function_f;
 
     void set_allows_sampling_origin::operator()(const std::string& identifier,
-                                                bool& allow_sampling,
                                                 var_origin& origin) const {
-      bool is_void_function_origin
-        = (origin.program_block_ == void_function_argument_origin);
       if (ends_with("_lp", identifier)) {
-        allow_sampling = true;
-        origin = is_void_function_origin
+        origin = origin.is_void_function_origin()
           ? var_origin(void_function_argument_origin_lp)
           : var_origin(function_argument_origin_lp);
       } else if (ends_with("_rng", identifier)) {
-        allow_sampling = false;
-        origin = is_void_function_origin
+        origin = origin.is_void_function_origin()
           ? var_origin(void_function_argument_origin_rng)
           : var_origin(function_argument_origin_rng);
       } else {
-        allow_sampling = false;
-        origin = is_void_function_origin
+        origin = origin.is_void_function_origin()
           ? var_origin(void_function_argument_origin)
           : var_origin(function_argument_origin);
       }
@@ -774,9 +768,7 @@ namespace stan {
 
     void validate_return_allowed::operator()(var_origin origin, bool& pass,
                                              std::ostream& error_msgs) const {
-      if (origin.program_block_ != function_argument_origin
-          && origin.program_block_ != function_argument_origin_lp
-          && origin.program_block_ != function_argument_origin_rng) {
+      if (!origin.is_non_void_function_origin()) {
         error_msgs << "Returns only allowed from function bodies."
                    << std::endl;
         pass = false;
@@ -790,9 +782,7 @@ namespace stan {
                                                   bool& pass,
                                                   std::ostream& error_msgs)
       const {
-      if (origin.program_block_ != void_function_argument_origin
-          && origin.program_block_ != void_function_argument_origin_lp
-          && origin.program_block_ != void_function_argument_origin_rng) {
+      if (!origin.is_void_function_origin()) {
         error_msgs << "Void returns only allowed from function"
                    << " bodies of void return type."
                    << std::endl;
@@ -1335,15 +1325,15 @@ namespace stan {
     boost::phoenix::function<deprecate_increment_log_prob>
     deprecate_increment_log_prob_f;
 
-    void validate_allow_sample::operator()(const bool& allow_sample,
+    void validate_allow_sample::operator()(const var_origin& vo,
                                            bool& pass,
                                            std::stringstream& error_msgs)
       const {
-      pass = allow_sample;
+      pass = vo.allows_lp();
       if (!pass)
         error_msgs << "Sampling statements (~) and increment_log_prob() are"
                    << std::endl
-                   << "only allowed in the model block."
+                   << "only allowed in the model block or lp functions."
                    << std::endl;
     }
     boost::phoenix::function<validate_allow_sample> validate_allow_sample_f;
