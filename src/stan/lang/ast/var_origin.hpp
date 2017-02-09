@@ -53,6 +53,21 @@ namespace stan {
                  const bool& is_local);
 
       /**
+       * Return true when declared in data block.
+       *
+       * @return true for data origin block types
+       */
+      bool is_data_origin() const;
+
+      /**
+       * Return true when declared in top-level of parameter or
+       * transformed parameter block.
+       *
+       * @return true for parameter origin block types
+       */
+      bool is_parameter_origin() const;
+
+      /**
        * Return true when declared in void_function_argument_origin block.
        *
        * @return true for void function origin block types
@@ -65,6 +80,14 @@ namespace stan {
        * @return true for void function origin block types
        */
       bool is_non_void_function_origin() const;
+
+      /**
+       * Return true when program block allows assignment to variables
+       * i.e., not data or parameter block
+       *
+       * @return true when program block allows access to LP
+       */
+      bool allows_assignment() const;
 
       /**
        * Return true when program block allows access to LP

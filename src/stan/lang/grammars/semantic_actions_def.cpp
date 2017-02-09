@@ -110,6 +110,15 @@ namespace stan {
       return true;
     }
 
+    bool is_function_arg_origin(const origin_block block) {
+      return block == function_argument_origin
+        || block == function_argument_origin_lp
+        || block == function_argument_origin_rng
+        || block == void_function_argument_origin
+        || block == void_function_argument_origin_lp
+        || block == void_function_argument_origin_rng;
+    }
+
     void validate_double_expr::operator()(const expression& expr,
                               bool& pass,
                               std::stringstream& error_msgs)
@@ -813,12 +822,7 @@ namespace stan {
         return;
       }
       // enforce constancy of function args
-      if (lhs_block == function_argument_origin
-          || lhs_block == function_argument_origin_lp
-          || lhs_block == function_argument_origin_rng
-          || lhs_block == void_function_argument_origin
-          || lhs_block == void_function_argument_origin_lp
-          || lhs_block == void_function_argument_origin_rng) {
+      if (is_function_arg_origin(lhs_block)) {
         pass = false;
         return;
       }
@@ -917,12 +921,7 @@ namespace stan {
 
       // enforce constancy of function args
       if (!lhs_origin.is_local_
-          && (lhs_block == function_argument_origin
-              || lhs_block == function_argument_origin_lp
-              || lhs_block == function_argument_origin_rng
-              || lhs_block == void_function_argument_origin
-              || lhs_block == void_function_argument_origin_lp
-              || lhs_block == void_function_argument_origin_rng)) {
+          && is_function_arg_origin(lhs_block)) {
         error_msgs << "Illegal to assign to function argument variables."
                    << std::endl
                    << "Use local variables instead."
@@ -1600,9 +1599,7 @@ namespace stan {
       replace_suffix("lchoose", "binomial_coefficient_log", fun);
 
       if (has_rng_suffix(fun.name_)) {
-        if (!(vo.program_block_ == derived_origin
-              || vo.program_block_ == transformed_data_origin
-              || vo.program_block_ == function_argument_origin_rng)) {
+        if (!(vo.allows_rng())) {
           error_msgs << "ERROR: random number generators only allowed in"
                      << " transformed data block, generated quantities block"
                      << " or user-defined functions with names ending in _rng"
@@ -1615,12 +1612,7 @@ namespace stan {
       }
 
       if (has_lp_suffix(fun.name_) || fun.name_ == "target") {
-        // modified function_argument_origin to add _lp because
-        // that's only viable context
-        if (!(vo.program_block_ == transformed_parameter_origin
-              || vo.program_block_ == function_argument_origin_lp
-              || vo.program_block_ == void_function_argument_origin_lp
-              || vo.program_block_ == model_name_origin)) {
+        if (!(vo.allows_lp())) {
           error_msgs << "Function target() or functions suffixed with _lp only"
                      << " allowed in transformed parameter block, model block"
                      << std::endl
@@ -2158,15 +2150,7 @@ namespace stan {
     }
     bool data_only_expression::operator()(const variable& x) const {
       var_origin origin = var_map_.get_origin(x.name_);
-      bool is_data = origin.is_local_
-        || (origin.program_block_ == data_origin)
-        || (origin.program_block_ == transformed_data_origin)
-        || (origin.program_block_ == function_argument_origin)
-        || (origin.program_block_ == function_argument_origin_lp)
-        || (origin.program_block_ == function_argument_origin_rng)
-        || (origin.program_block_ == void_function_argument_origin)
-        || (origin.program_block_ == void_function_argument_origin_lp)
-        || (origin.program_block_ == void_function_argument_origin_rng);
+      bool is_data = origin.is_data_origin();
       if (!is_data) {
         error_msgs_ << "non-data variables not allowed"
                     << " in dimension declarations."
@@ -2247,8 +2231,7 @@ namespace stan {
       if (!var_decl.has_def()) return;
 
       // validate that assigment is allowed in this block
-      if (origin.program_block_ == data_origin
-          || origin.program_block_ == parameter_origin) {
+      if (origin.allows_assignment()) {
         error_msgs << "variable definition not possible in this block"
                    << std::endl;
         pass = false;
@@ -2602,10 +2585,8 @@ namespace stan {
         var_decl_result = var_decl;
         return;
       }
-      if ((!vo.is_local_ &&
-           (vo.program_block_ == parameter_origin
-            || vo.program_block_ == transformed_parameter_origin)
-           && var_decl.base_type_ == INT_T)) {
+      if (vo.is_parameter_origin()
+           && var_decl.base_type_ == INT_T) {
         pass = false;
         error_msgs << "parameters or transformed parameters"
                    << " cannot be integer or integer array; "
@@ -2705,7 +2686,6 @@ namespace stan {
       vo = var_origin(enclosing_block, true);
     }
     boost::phoenix::function<reset_var_origin> reset_var_origin_f;
-
 
   }
 }
