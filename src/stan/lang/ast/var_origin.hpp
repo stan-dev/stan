@@ -68,6 +68,34 @@ namespace stan {
       bool is_parameter_origin() const;
 
       /**
+       * Return true when declared in top-level parameter block
+       *
+       * @return true for top-level parameter block
+       */
+      bool is_non_local_parameter_origin() const;
+
+      /**
+       * Return true when declared in top-level transformed parameter block
+       *
+       * @return true for top-level transformed parameter block
+       */
+      bool is_non_local_transformed_parameter_origin() const;
+      /**
+       * Return false when declared in transformed parameter block
+       * or local block.
+       *
+       * @return true for non-parameter block types
+       */
+      bool is_non_parameter_origin() const;
+
+      /**
+       * Return true when declared in any function argument block.
+       *
+       * @return true for function origin block types
+       */
+      bool is_fun_origin() const;
+
+      /**
        * Return true when declared in void_function_argument_origin block.
        *
        * @return true for void function origin block types
@@ -90,12 +118,18 @@ namespace stan {
       bool allows_assignment() const;
 
       /**
-       * Return true when program block allows access to LP
-       * i.e., model block or lp function
+       * Return true when program block allows access to LP function
        *
-       * @return true when program block allows access to LP
+       * @return true when program block allows access to LP function
        */
-      bool allows_lp() const;
+      bool allows_lp_fun() const;
+
+      /**
+       * Return true when program block allows access to LP statement
+       *
+       * @return true when program block allows access to LP statement
+       */
+      bool allows_lp_stmt() const;
 
       /**
        * Return true when program block allows access to RNG

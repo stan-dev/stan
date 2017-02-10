@@ -27,8 +27,6 @@
 #include <stan/lang/ast/fun/indexed_type_def.hpp>
 #include <stan/lang/ast/fun/infer_type_indexing_def.hpp>
 #include <stan/lang/ast/fun/is_assignable_def.hpp>
-#include <stan/lang/ast/fun/is_data_origin_def.hpp>
-#include <stan/lang/ast/fun/is_fun_origin_def.hpp>
 #include <stan/lang/ast/fun/is_multi_index_def.hpp>
 #include <stan/lang/ast/fun/is_multi_index_vis_def.hpp>
 #include <stan/lang/ast/fun/is_nil_def.hpp>

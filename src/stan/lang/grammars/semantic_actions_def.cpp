@@ -1328,7 +1328,7 @@ namespace stan {
                                            bool& pass,
                                            std::stringstream& error_msgs)
       const {
-      pass = vo.allows_lp();
+      pass = vo.allows_lp_stmt();
       if (!pass)
         error_msgs << "Sampling statements (~) and increment_log_prob() are"
                    << std::endl
@@ -1612,7 +1612,7 @@ namespace stan {
       }
 
       if (has_lp_suffix(fun.name_) || fun.name_ == "target") {
-        if (!(vo.allows_lp())) {
+        if (!(vo.allows_lp_fun())) {
           error_msgs << "Function target() or functions suffixed with _lp only"
                      << " allowed in transformed parameter block, model block"
                      << std::endl
@@ -2231,7 +2231,7 @@ namespace stan {
       if (!var_decl.has_def()) return;
 
       // validate that assigment is allowed in this block
-      if (origin.allows_assignment()) {
+      if (!origin.allows_assignment()) {
         error_msgs << "variable definition not possible in this block"
                    << std::endl;
         pass = false;

@@ -29,10 +29,33 @@ namespace stan {
         || (program_block_ == void_function_argument_origin_rng);
     }
 
+    bool var_origin::is_non_local_parameter_origin() const {
+      return  !is_local_
+        && program_block_ == parameter_origin;
+    }
+    bool var_origin::is_non_local_transformed_parameter_origin() const {
+      return  !is_local_
+        && program_block_ == transformed_parameter_origin;
+    }
+
+    bool var_origin::is_non_parameter_origin() const {
+      return  program_block_ == transformed_parameter_origin
+        || program_block_ == local_origin;
+    }
+
     bool var_origin::is_parameter_origin() const {
       return !is_local_
         && (program_block_ == parameter_origin
             || program_block_ == transformed_parameter_origin);
+    }
+
+    bool var_origin::is_fun_origin() const {
+      return program_block_ == function_argument_origin
+        || program_block_ == function_argument_origin_lp
+        || program_block_ == function_argument_origin_rng
+        || program_block_ == void_function_argument_origin
+        || program_block_ == void_function_argument_origin_lp
+        || program_block_ == void_function_argument_origin_rng;
     }
 
     bool var_origin::is_void_function_origin() const {
@@ -53,9 +76,15 @@ namespace stan {
     }
 
 
-    bool var_origin::allows_lp() const {
+    bool var_origin::allows_lp_fun() const {
       return program_block_ == model_name_origin
         || program_block_ == transformed_parameter_origin
+        || program_block_ == function_argument_origin_lp
+        || program_block_ == void_function_argument_origin_lp;
+    }
+
+    bool var_origin::allows_lp_stmt() const {
+      return program_block_ == model_name_origin
         || program_block_ == function_argument_origin_lp
         || program_block_ == void_function_argument_origin_lp;
     }

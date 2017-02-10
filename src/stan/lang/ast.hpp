@@ -40,8 +40,6 @@
 #include <stan/lang/ast/fun/indexed_type.hpp>
 #include <stan/lang/ast/fun/infer_type_indexing.hpp>
 #include <stan/lang/ast/fun/is_assignable.hpp>
-#include <stan/lang/ast/fun/is_data_origin.hpp>
-#include <stan/lang/ast/fun/is_fun_origin.hpp>
 #include <stan/lang/ast/fun/is_multi_index.hpp>
 #include <stan/lang/ast/fun/is_nil.hpp>
 #include <stan/lang/ast/fun/is_user_defined.hpp>
