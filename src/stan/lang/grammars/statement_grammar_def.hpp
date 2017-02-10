@@ -90,31 +90,29 @@ namespace stan {
       using boost::spirit::qi::labels::_b;
       using boost::spirit::qi::labels::_r1;
       using boost::spirit::qi::labels::_r2;
-      using boost::spirit::qi::labels::_r3;
 
       using boost::phoenix::begin;
       using boost::phoenix::end;
 
-      // inherited features _r1, _r2, _r3
+      // inherited features _r1, _r2
       //   _r1 var_origin
-      //   _r2 true if return_r allowed
-      //   _r3 true if in loop (allowing break/continue)
+      //   _r2 true if in loop (allowing break/continue)
       // raw[ ] just to wrap to get line numbers
       statement_r.name("statement");
       statement_r
-        = raw[statement_sub_r(_r1, _r2, _r3)[assign_lhs_f(_val, _1)]]
+        = raw[statement_sub_r(_r1, _r2)[assign_lhs_f(_val, _1)]]
         [add_line_number_f(_val, begin(_1), end(_1))];
 
       statement_sub_r.name("statement");
       statement_sub_r
         %= no_op_statement_r                        // key ";"
-        | statement_seq_r(_r1, _r2, _r3)            // key "{"
+        | statement_seq_r(_r1, _r2)                 // key "{"
         | increment_log_prob_statement_r(_r1)       // key "increment_log_prob"
         | increment_target_statement_r(_r1)         // key "target"
-        | for_statement_r(_r1, _r2)                 // key "for"
-        | while_statement_r(_r1, _r2)               // key "while"
-        | break_continue_statement_r(_r3)           // key "break", "continue"
-        | statement_2_g(_r1, _r2, _r3)              // key "if"
+        | for_statement_r(_r1)                      // key "for"
+        | while_statement_r(_r1)                    // key "while"
+        | break_continue_statement_r(_r2)           // key "break", "continue"
+        | statement_2_g(_r1, _r2)                   // key "if"
         | print_statement_r(_r1)                    // key "print"
         | reject_statement_r(_r1)                   // key "reject"
         | return_statement_r(_r1)                   // key "return"
@@ -126,14 +124,14 @@ namespace stan {
         [expression_as_statement_f(_pass, _1,
                                    boost::phoenix::ref(error_msgs_))];
 
-      // inherited features _r1, _r2, _r3
-      // _r1 = var_origin,  _r2 = true if allows return_r, _r3 = true if in loop
+      // inherited features _r1, _r2
+      // _r1 = var_origin,  _r2 = true if in loop
       statement_seq_r.name("sequence of statements");
       statement_seq_r
         %= lit('{')
         > eps[reset_var_origin_f(_b, _r1)]
         > local_var_decls_r(_b)[assign_lhs_f(_a, _1)]
-        > *statement_r(_b, _r2, _r3)
+        > *statement_r(_b, _r2)
         > lit('}')
         > eps[unscope_locals_f(_a, boost::phoenix::ref(var_map_))];
 
@@ -166,8 +164,7 @@ namespace stan {
                                           boost::phoenix::ref(error_msgs_))]
         > lit(';');
 
-      // inherited features _r1, _r2
-      // _r1 = var_origin,  _r2 = true if allows return_r
+      // inherited feature _r1 = var_origin
       while_statement_r.name("while statement");
       while_statement_r
         = (lit("while") >> no_skip[!char_("a-zA-Z0-9_")])
@@ -176,7 +173,7 @@ namespace stan {
           [add_while_condition_f(_val, _1, _pass,
                                  boost::phoenix::ref(error_msgs_))]
         > lit(')')
-        > statement_r(_r1, _r2, true)
+        > statement_r(_r1, true)
           [add_while_body_f(_val, _1)];
 
       // _r1 = true if in loop
@@ -186,8 +183,7 @@ namespace stan {
         > eps[validate_in_loop_f(_r1, _pass, boost::phoenix::ref(error_msgs_))]
         > lit(';');
 
-      // inherited features _r1, _r2
-      // _r1 = var_origin,  _r2 = true if allows return_r
+      // inherited feature _r1 = var_origin
       for_statement_r.name("for statement");
       for_statement_r
         %= (lit("for") >> no_skip[!char_("a-zA-Z0-9_")])
@@ -198,7 +194,7 @@ namespace stan {
         > lit("in")
         > range_r(_r1)
         > lit(')')
-        > statement_r(_r1, _r2, true)
+        > statement_r(_r1, true)
         > eps
         [remove_loop_identifier_f(_a, boost::phoenix::ref(var_map_))];
 

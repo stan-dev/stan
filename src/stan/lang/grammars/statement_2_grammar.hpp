@@ -15,14 +15,13 @@ namespace stan {
     template <typename Iterator>
     struct statement_grammar;
 
-    // inherited features from statement_g: _r1, _r2, _r3
+    // inherited features from statement_g: _r1, _r2
     //   _r1 var_origin
-    //   _r2 true if return_r allowed
-    //   _r3 true if in loop (allowing break/continue)
+    //   _r2 true if in loop (allowing break/continue)
     template <typename Iterator>
     struct statement_2_grammar
       : boost::spirit::qi::grammar<Iterator,
-                                   statement(var_origin, bool, bool),
+                                   statement(var_origin, bool),
                                    whitespace_grammar<Iterator> > {
       variable_map& var_map_;
       std::stringstream& error_msgs_;
@@ -34,12 +33,12 @@ namespace stan {
                           statement_grammar<Iterator>& sg);
 
       boost::spirit::qi::rule<Iterator,
-                              conditional_statement(var_origin, bool, bool),
+                              conditional_statement(var_origin, bool),
                               whitespace_grammar<Iterator> >
       conditional_statement_r;
 
       boost::spirit::qi::rule<Iterator,
-                              statement(var_origin, bool, bool),
+                              statement(var_origin, bool),
                               whitespace_grammar<Iterator> >
       statement_2_r;
     };

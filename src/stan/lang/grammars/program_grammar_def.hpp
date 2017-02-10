@@ -54,7 +54,6 @@ namespace stan {
         using boost::spirit::qi::_1;
         using boost::spirit::qi::_2;
         using boost::spirit::qi::_3;
-        using boost::spirit::qi::_4;
         using boost::spirit::qi::labels::_a;
 
         // add model_name to var_map with special origin
@@ -77,7 +76,7 @@ namespace stan {
         model_r
           %= lit("model")
           > eps[set_var_origin_local_f(_a, model_name_origin)]
-          > statement_g(_a, false, false);
+          > statement_g(_a, false);
 
         end_var_decls_r.name(
             "one of the following:\n"
@@ -119,10 +118,10 @@ namespace stan {
               > lit('{'))
           > eps[set_var_origin_f(_a, transformed_data_origin)]
           > var_decls_g(true, _a)
-          > ((statement_g(_a, false, false)
-              > *statement_g(_a, false, false)
+          > ((statement_g(_a, false)
+              > *statement_g(_a, false)
               > end_var_definitions_r)
-             | (*statement_g(_a, false, false)
+             | (*statement_g(_a, false)
                 > end_var_decls_statements_r));
 
         param_var_decls_r.name("parameter variable declarations");
@@ -140,7 +139,7 @@ namespace stan {
               > lit('{'))
           > eps[set_var_origin_f(_a, transformed_parameter_origin)]
           > var_decls_g(true, _a)
-          > *statement_g(_a, false, false)
+          > *statement_g(_a, false)
           > end_var_decls_statements_r;
 
         generated_var_decls_r.name("generated variable declarations");
@@ -150,7 +149,7 @@ namespace stan {
               > lit('{'))
           > eps[set_var_origin_f(_a, derived_origin)]
           > var_decls_g(true, _a)
-          > *statement_g(_a, false, false)
+          > *statement_g(_a, false)
           > end_var_decls_statements_r;
 
         on_error<rethrow>(program_r,
