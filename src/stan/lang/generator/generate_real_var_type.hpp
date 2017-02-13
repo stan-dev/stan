@@ -12,7 +12,7 @@ namespace stan {
      * <code>real</code> variable according to context in which
      * expression is used and expression contents.
      *
-     * @param[in] vo expression origin block
+     * @param[in] var_scope expression origin block
      * @param[in] has_var  does expression contains a variable?
      * @param[in] is_var_context true when in auto-diff context
      * @param[in,out] o generated typename
