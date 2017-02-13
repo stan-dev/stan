@@ -8,13 +8,13 @@ namespace stan {
   namespace lang {
 
     /**
-     * Write a user-readable version of the specified variable to
-     * origin to the specified output stream.
+     * Write a user-readable version of the specified variable scope
+     * to the specified output stream.
      *
      * @param o output stream
-     * @param vo variable origin
+     * @param var_scope variable scope
      */
-    void print_scope(std::ostream& o, const scope& vo);
+    void print_scope(std::ostream& o, const scope& var_scope);
 
   }
 }

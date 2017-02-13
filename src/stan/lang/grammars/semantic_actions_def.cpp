@@ -110,15 +110,6 @@ namespace stan {
       return true;
     }
 
-    bool is_function_arg_origin(const origin_block block) {
-      return block == function_argument_origin
-        || block == function_argument_origin_lp
-        || block == function_argument_origin_rng
-        || block == void_function_argument_origin
-        || block == void_function_argument_origin_lp
-        || block == void_function_argument_origin_rng;
-    }
-
     void validate_double_expr::operator()(const expression& expr,
                               bool& pass,
                               std::stringstream& error_msgs)
@@ -340,15 +331,15 @@ namespace stan {
     void set_allows_sampling_origin::operator()(const std::string& identifier,
                                                 scope& var_scope) const {
       if (ends_with("_lp", identifier)) {
-        var_scope = var_scope.is_void_function_origin()
+        var_scope = var_scope.void_fun()
           ? scope(void_function_argument_origin_lp)
           : scope(function_argument_origin_lp);
       } else if (ends_with("_rng", identifier)) {
-        var_scope = var_scope.is_void_function_origin()
+        var_scope = var_scope.void_fun()
           ? scope(void_function_argument_origin_rng)
           : scope(function_argument_origin_rng);
       } else {
-        var_scope = var_scope.is_void_function_origin()
+        var_scope = var_scope.void_fun()
           ? scope(void_function_argument_origin)
           : scope(function_argument_origin);
       }
@@ -777,7 +768,7 @@ namespace stan {
 
     void validate_return_allowed::operator()(scope var_scope, bool& pass,
                                              std::ostream& error_msgs) const {
-      if (!var_scope.is_non_void_function_origin()) {
+      if (!var_scope.non_void_fun()) {
         error_msgs << "Returns only allowed from function bodies."
                    << std::endl;
         pass = false;
@@ -791,7 +782,7 @@ namespace stan {
                                                   bool& pass,
                                                   std::ostream& error_msgs)
       const {
-      if (!var_scope.is_void_function_origin()) {
+      if (!var_scope.void_fun()) {
         error_msgs << "Void returns only allowed from function"
                    << " bodies of void return type."
                    << std::endl;
@@ -810,20 +801,20 @@ namespace stan {
                                        std::ostream& error_msgs) const {
       // validate existence
       if (!vm.exists(name)) {
-        pass = false;
+        pass = false;   // MM: no error message?  see validate_assignment below
         return;
       }
-      // validate origin
+
+      // validate scope matches declaration scope or is nested in
       scope lhs_origin = vm.get_scope(name);
-      origin_block lhs_block = lhs_origin.program_block_;
-      if (lhs_block != local_origin
-          && lhs_block != var_scope.program_block_) {
+      if (lhs_origin.program_block() != var_scope.program_block()
+          && lhs_origin.program_block() != local_origin) { // MM:  why not test is_local()?
         pass = false;
         return;
       }
       // enforce constancy of function args
-      if (is_function_arg_origin(lhs_block)) {
-        pass = false;
+      if (lhs_origin.fun()) {
+        pass = false;   // MM: no error message?  see validate_assignment below
         return;
       }
       v = variable(name);
@@ -906,11 +897,10 @@ namespace stan {
         return;
       }
 
-      // validate origin
+      // validate scope matches declaration scope or is nested in
       scope lhs_origin = vm.get_scope(name);
-      origin_block lhs_block = lhs_origin.program_block_;
-      if (lhs_block != local_origin
-          && lhs_block != var_scope.program_block_) {
+      if (lhs_origin.program_block() != var_scope.program_block()
+          && lhs_origin.program_block() != local_origin) { // MM:  why not test is_local()?
         error_msgs << "attempt to assign variable in wrong block."
                    << " left-hand-side variable origin=";
         print_scope(error_msgs, lhs_origin);
@@ -920,8 +910,8 @@ namespace stan {
       }
 
       // enforce constancy of function args
-      if (!lhs_origin.is_local_
-          && is_function_arg_origin(lhs_block)) {
+      if (!lhs_origin.is_local()
+          && lhs_origin.fun()) {
         error_msgs << "Illegal to assign to function argument variables."
                    << std::endl
                    << "Use local variables instead."
@@ -1289,7 +1279,7 @@ namespace stan {
                    << " variable name=\"" << name << "\"" << std::endl;
       else
         vm.add(name, base_var_decl(name, std::vector<expression>(), INT_T),
-               scope(var_scope.program_block_, true));
+               scope(var_scope.program_block(), true));
     }
     boost::phoenix::function<add_loop_identifier> add_loop_identifier_f;
 
@@ -2150,7 +2140,7 @@ namespace stan {
     }
     bool data_only_expression::operator()(const variable& x) const {
       scope var_scope = var_map_.get_scope(x.name_);
-      bool is_data = var_scope.is_data_origin();
+      bool is_data = var_scope.allows_size();
       if (!is_data) {
         error_msgs_ << "non-data variables not allowed"
                     << " in dimension declarations."
@@ -2531,7 +2521,7 @@ namespace stan {
         return;
       }
 
-      if (!var_scope.is_local_) {
+      if (!var_scope.is_local()) {
         data_only_expression vis(error_msgs, var_map);
         bool only_data_dimensions = boost::apply_visitor(vis, expr.expr_);
         pass = only_data_dimensions;
@@ -2585,7 +2575,7 @@ namespace stan {
         var_decl_result = var_decl;
         return;
       }
-      if (var_scope.is_parameter_origin()
+      if (var_scope.par_or_tpar()
            && var_decl.base_type_ == INT_T) {
         pass = false;
         error_msgs << "parameters or transformed parameters"
@@ -2682,7 +2672,7 @@ namespace stan {
     void reset_var_scope::operator()(scope& var_scope,
                                       const scope& scope_enclosing)
       const {
-      origin_block enclosing_block = scope_enclosing.program_block_;
+      origin_block enclosing_block = scope_enclosing.program_block();
       var_scope= scope(enclosing_block, true);
     }
     boost::phoenix::function<reset_var_scope> reset_var_scope_f;

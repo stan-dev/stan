@@ -32,9 +32,8 @@ namespace stan {
 
     bool has_var_vis::operator()(const variable& e) const {
       scope var_scope = var_map_.get_scope(e.name_);
-      return var_scope.is_non_local_parameter_origin()
-        || var_scope.is_non_local_transformed_parameter_origin()
-        || (var_scope.is_local_ && e.type_.base_type_ != INT_T);
+      return var_scope.par_or_tpar()
+        || (var_scope.is_local() && e.type_.base_type_ != INT_T);
     }
 
     bool has_var_vis::operator()(const fun& e) const {

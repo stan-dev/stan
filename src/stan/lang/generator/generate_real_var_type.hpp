@@ -21,7 +21,7 @@ namespace stan {
                                 bool has_var,
                                 bool is_var_context,
                                 std::ostream& o) {
-      if (var_scope.is_fun_origin())
+      if (var_scope.fun())
         o << "fun_scalar_t__";
       else if (is_var_context && has_var)
         o << "T__";

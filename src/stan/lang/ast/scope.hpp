@@ -13,7 +13,7 @@ namespace stan {
      * Var_map records program block where variable declared.
      * Grammar rules check allowed constructs in (enclosing) block.
      */
-    struct scope {
+    class scope {
       /**
        * Outermost enclosing program block.
        */
@@ -24,17 +24,17 @@ namespace stan {
        */
       bool is_local_;
 
-
+    public:
       /**
        * No arg constructor, defaults:
-       * program_block_ : model_name_origin
-       * is_local : false
+       * - \p program_block_ : model_name_origin
+       * - \p is_local_ : \c false
        */
       scope();
 
       /**
-       * Construct an origin for variable in a specified block
-       * is_local : false
+       * Construct an origin for variable in a specified block.
+       * Default \c is_local is \c false, i.e., not in a local block.
        *
        * @param program_block enclosing program block
        */
@@ -42,72 +42,65 @@ namespace stan {
                  origin_block& program_block);   // NOLINT(runtime/explicit)
 
       /**
-       * Construct an origin for a variable in specified outer program block,
-       * specify whether or not variable is in local program block,
-       * all other bool flags false
+       * Construct scope for a variable in specified outer program block,
+       * specify whether or not variable is declared in a local block.
        *
        * @param program_block enclosing program block
-       * @param is_local flags whether or not in a local block
+       * @param is_local true if declared in a local block
        */
       scope(const origin_block& program_block,
                  const bool& is_local);
 
       /**
-       * Return true when declared in data block.
+       * Return value for outermost enclosing program block.
        *
-       * @return true for data origin block types
+       * @return program_block enclosing program block
        */
-      bool is_data_origin() const;
+      origin_block program_block() const;
 
       /**
-       * Return true when declared in top-level of parameter or
-       * transformed parameter block.
+       * Return true when innermost scope is local block.
        *
-       * @return true for parameter origin block types
+       * @return true when scope is in local block.
        */
-      bool is_parameter_origin() const;
+      bool is_local() const;
 
       /**
-       * Return true when declared in top-level parameter block
+       * Flags scopes where parameter variables are declared,
+       * i.e., top-level of parameter or transformed parameter block.
        *
-       * @return true for top-level parameter block
+       * @return true for top-level parameter origin block types
        */
-      bool is_non_local_parameter_origin() const;
+      bool par_or_tpar() const;
 
       /**
-       * Return true when declared in top-level transformed parameter block
-       *
-       * @return true for top-level transformed parameter block
-       */
-      bool is_non_local_transformed_parameter_origin() const;
-      /**
-       * Return false when declared in transformed parameter block
+       * Return true when declared in transformed parameter block
        * or local block.
        *
        * @return true for non-parameter block types
        */
-      bool is_non_parameter_origin() const;
+      bool tpar_or_local() const;
 
       /**
-       * Return true when declared in any function argument block.
+       * Return true when declared as function argument.
        *
        * @return true for function origin block types
        */
-      bool is_fun_origin() const;
+      bool fun() const;
 
       /**
-       * Return true when declared in void_function_argument_origin block.
+       * Return true when declared as argument to non-void function.
+       *
+       * @return true for non void function origin block types
+       */
+      bool non_void_fun() const;
+
+      /**
+       * Return true when declared as argument to void function.
        *
        * @return true for void function origin block types
        */
-      bool is_void_function_origin() const;
-
-      /**
-       * Return true when enclosing block is void function type
-       *
-       * @return true for void function origin block types
-       */
-      bool is_non_void_function_origin() const;
+      bool void_fun() const;
 
       /**
        * Return true when program block allows assignment to variables
@@ -138,6 +131,18 @@ namespace stan {
        * @return true when program block allows access to RNG
        */
       bool allows_rng() const;
+
+      /**
+       * Returns true for origin blocks where size-denoting expression
+       * declarations are allowed.  Origin blocks not allowed:
+       *  - parameters
+       *  - transformed parameters
+       *  - generated quantities
+       *
+       * @return true if origin block allows size-denoting variable declaration.
+       */
+      bool allows_size() const;
+
     };
 
   }
