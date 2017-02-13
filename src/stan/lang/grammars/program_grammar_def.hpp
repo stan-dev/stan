@@ -58,7 +58,7 @@ namespace stan {
 
         // add model_name to var_map with special origin
         var_map_.add(model_name, base_var_decl(),
-                     var_origin(model_name_origin, true));
+                     scope(model_name_origin, true));
 
         program_r.name("program");
         program_r
@@ -75,7 +75,7 @@ namespace stan {
         model_r.name("model declaration (or perhaps an earlier block)");
         model_r
           %= lit("model")
-          > eps[set_var_origin_local_f(_a, model_name_origin)]
+          > eps[set_var_scope_local_f(_a, model_name_origin)]
           > statement_g(_a, false);
 
         end_var_decls_r.name(
@@ -107,7 +107,7 @@ namespace stan {
         data_var_decls_r
           %= (lit("data")
               > lit('{'))
-          > eps[set_var_origin_f(_a, data_origin)]
+          > eps[set_var_scope_f(_a, data_origin)]
           >  var_decls_g(true, _a)
           > end_var_decls_r;
 
@@ -116,7 +116,7 @@ namespace stan {
           %= ((lit("transformed")
                >> lit("data"))
               > lit('{'))
-          > eps[set_var_origin_f(_a, transformed_data_origin)]
+          > eps[set_var_scope_f(_a, transformed_data_origin)]
           > var_decls_g(true, _a)
           > ((statement_g(_a, false)
               > *statement_g(_a, false)
@@ -128,7 +128,7 @@ namespace stan {
         param_var_decls_r
           %= (lit("parameters")
               > lit('{'))
-          > eps[set_var_origin_f(_a, parameter_origin)]
+          > eps[set_var_scope_f(_a, parameter_origin)]
           > var_decls_g(true, _a)
           > end_var_decls_r;
 
@@ -137,7 +137,7 @@ namespace stan {
           %= (lit("transformed")
               > lit("parameters")
               > lit('{'))
-          > eps[set_var_origin_f(_a, transformed_parameter_origin)]
+          > eps[set_var_scope_f(_a, transformed_parameter_origin)]
           > var_decls_g(true, _a)
           > *statement_g(_a, false)
           > end_var_decls_statements_r;
@@ -147,7 +147,7 @@ namespace stan {
           %= (lit("generated")
               > lit("quantities")
               > lit('{'))
-          > eps[set_var_origin_f(_a, derived_origin)]
+          > eps[set_var_scope_f(_a, derived_origin)]
           > var_decls_g(true, _a)
           > *statement_g(_a, false)
           > end_var_decls_statements_r;

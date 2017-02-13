@@ -2,7 +2,7 @@
 #define STAN_LANG_AST_NODE_CONDITIONAL_OP_HPP
 
 #include <stan/lang/ast/expr_type.hpp>
-#include <stan/lang/ast/var_origin.hpp>
+#include <stan/lang/ast/scope.hpp>
 #include <stan/lang/ast/node/expression.hpp>
 
 namespace stan {
@@ -40,9 +40,9 @@ namespace stan {
       bool has_var_;
 
       /**
-       * Origin of this conditional operator expression.
+       * Scope of this conditional operator expression.
        */
-      var_origin var_origin_;
+      scope scope_;
 
       /**
        * Construct a default conditional operator expression.

@@ -1,5 +1,5 @@
-#ifndef STAN_LANG_AST_VAR_ORIGIN_HPP
-#define STAN_LANG_AST_VAR_ORIGIN_HPP
+#ifndef STAN_LANG_AST_SCOPE_HPP
+#define STAN_LANG_AST_SCOPE_HPP
 
 
 #include <stan/lang/ast/origin_block.hpp>
@@ -13,7 +13,7 @@ namespace stan {
      * Var_map records program block where variable declared.
      * Grammar rules check allowed constructs in (enclosing) block.
      */
-    struct var_origin {
+    struct scope {
       /**
        * Outermost enclosing program block.
        */
@@ -30,7 +30,7 @@ namespace stan {
        * program_block_ : model_name_origin
        * is_local : false
        */
-      var_origin();
+      scope();
 
       /**
        * Construct an origin for variable in a specified block
@@ -38,7 +38,7 @@ namespace stan {
        *
        * @param program_block enclosing program block
        */
-      var_origin(const
+      scope(const
                  origin_block& program_block);   // NOLINT(runtime/explicit)
 
       /**
@@ -49,7 +49,7 @@ namespace stan {
        * @param program_block enclosing program block
        * @param is_local flags whether or not in a local block
        */
-      var_origin(const origin_block& program_block,
+      scope(const origin_block& program_block,
                  const bool& is_local);
 
       /**

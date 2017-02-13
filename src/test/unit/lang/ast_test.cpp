@@ -61,14 +61,14 @@ TEST(langAst, hasVar) {
   using stan::lang::parameter_origin;
   using stan::lang::transformed_parameter_origin;
   using stan::lang::unary_op;
-  using stan::lang::var_origin;
+  using stan::lang::scope;
   using stan::lang::variable;
   using stan::lang::variable_map;
 
   variable_map vm;
   vector<expression> dims;
   base_var_decl alpha_decl = base_var_decl("alpha",dims,DOUBLE_T);
-  var_origin alpha_origin = parameter_origin;
+  scope alpha_origin = parameter_origin;
   vm.add("alpha", alpha_decl, alpha_origin);
   
   variable v("alpha");

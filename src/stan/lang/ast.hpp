@@ -5,7 +5,7 @@
 #include <stan/lang/ast/expr_type.hpp>
 #include <stan/lang/ast/nil.hpp>
 #include <stan/lang/ast/origin_block.hpp>
-#include <stan/lang/ast/var_origin.hpp>
+#include <stan/lang/ast/scope.hpp>
 #include <stan/lang/ast/variable_map.hpp>
 
 #include <stan/lang/ast/fun/has_non_param_var_vis.hpp>
@@ -45,7 +45,7 @@
 #include <stan/lang/ast/fun/is_user_defined.hpp>
 #include <stan/lang/ast/fun/is_user_defined_prob_function.hpp>
 #include <stan/lang/ast/fun/operator_stream_expr_type.hpp>
-#include <stan/lang/ast/fun/print_var_origin.hpp>
+#include <stan/lang/ast/fun/print_scope.hpp>
 #include <stan/lang/ast/fun/promote_primitive.hpp>
 #include <stan/lang/ast/fun/returns_type.hpp>
 #include <stan/lang/ast/fun/total_dims.hpp>

@@ -17,11 +17,11 @@ namespace stan {
      * @param[in] is_var_context true when in auto-diff context
      * @param[in,out] o generated typename
      */
-    void generate_real_var_type(const var_origin& vo,
+    void generate_real_var_type(const scope& var_scope,
                                 bool has_var,
                                 bool is_var_context,
                                 std::ostream& o) {
-      if (vo.is_fun_origin())
+      if (var_scope.is_fun_origin())
         o << "fun_scalar_t__";
       else if (is_var_context && has_var)
         o << "T__";

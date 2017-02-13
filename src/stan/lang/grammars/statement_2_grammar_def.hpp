@@ -32,14 +32,12 @@ namespace stan {
       using boost::spirit::qi::labels::_r1;
       using boost::spirit::qi::labels::_r2;
 
-      // inherited features from statement_g: _r1, _r2
-      //   _r1 var_origin
+      //   _r1 var_scope
       //   _r2 true if in loop (allowing break/continue)
       statement_2_r.name("statement");
       statement_2_r %= conditional_statement_r(_r1, _r2);
 
-      // inherited features
-      //   _r1 var_origin
+      //   _r1 var_scope
       //   _r2 true if in loop (allowing break/continue)
       conditional_statement_r.name("if-else statement");
       conditional_statement_r

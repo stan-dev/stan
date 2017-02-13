@@ -1,12 +1,12 @@
-#ifndef STAN_LANG_AST_FUN_PRINT_VAR_ORIGIN_DEF_HPP
-#define STAN_LANG_AST_FUN_PRINT_VAR_ORIGIN_DEF_HPP
+#ifndef STAN_LANG_AST_FUN_PRINT_SCOPE_DEF_HPP
+#define STAN_LANG_AST_FUN_PRINT_SCOPE_DEF_HPP
 
 #include <stan/lang/ast.hpp>
 
 namespace stan {
   namespace lang {
 
-    void print_var_origin(std::ostream& o, const var_origin& vo) {
+    void print_scope(std::ostream& o, const scope& vo) {
       if (vo.program_block_ == model_name_origin)
         o << "model name";
       else if (vo.program_block_ == data_origin)

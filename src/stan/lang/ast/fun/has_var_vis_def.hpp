@@ -31,10 +31,10 @@ namespace stan {
     }
 
     bool has_var_vis::operator()(const variable& e) const {
-      var_origin vo = var_map_.get_origin(e.name_);
-      return vo.is_non_local_parameter_origin()
-        || vo.is_non_local_transformed_parameter_origin()
-        || (vo.is_local_ && e.type_.base_type_ != INT_T);
+      scope var_scope = var_map_.get_scope(e.name_);
+      return var_scope.is_non_local_parameter_origin()
+        || var_scope.is_non_local_transformed_parameter_origin()
+        || (var_scope.is_local_ && e.type_.base_type_ != INT_T);
     }
 
     bool has_var_vis::operator()(const fun& e) const {

@@ -399,11 +399,11 @@ TEST(langGenerator, fills) {
 
 
 TEST(langGenerator, genRealVars) {
-  using stan::lang::var_origin;
+  using stan::lang::scope;
   using stan::lang::transformed_data_origin;
   using stan::lang::function_argument_origin;
-  var_origin td_origin = transformed_data_origin;
-  var_origin fun_origin = function_argument_origin;
+  scope td_origin = transformed_data_origin;
+  scope fun_origin = function_argument_origin;
   std::stringstream o;
 
   o.str(std::string());
@@ -446,11 +446,11 @@ TEST(langGenerator, genArrayVars) {
   using stan::lang::VECTOR_T;
   using stan::lang::ROW_VECTOR_T;
   using stan::lang::MATRIX_T;
-  using stan::lang::var_origin;
+  using stan::lang::scope;
   using stan::lang::transformed_data_origin;
   using stan::lang::function_argument_origin;
-  var_origin td_origin = transformed_data_origin;
-  var_origin fun_origin = function_argument_origin;
+  scope td_origin = transformed_data_origin;
+  scope fun_origin = function_argument_origin;
   std::stringstream ssReal;
   std::stringstream o;
 

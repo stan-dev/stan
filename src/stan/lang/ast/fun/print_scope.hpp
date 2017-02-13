@@ -1,7 +1,7 @@
-#ifndef STAN_LANG_AST_FUN_PRINT_VAR_ORIGIN_HPP
-#define STAN_LANG_AST_FUN_PRINT_VAR_ORIGIN_HPP
+#ifndef STAN_LANG_AST_FUN_PRINT_SCOPE_HPP
+#define STAN_LANG_AST_FUN_PRINT_SCOPE_HPP
 
-#include <stan/lang/ast/var_origin.hpp>
+#include <stan/lang/ast/scope.hpp>
 #include <ostream>
 
 namespace stan {
@@ -14,7 +14,7 @@ namespace stan {
      * @param o output stream
      * @param vo variable origin
      */
-    void print_var_origin(std::ostream& o, const var_origin& vo);
+    void print_scope(std::ostream& o, const scope& vo);
 
   }
 }
