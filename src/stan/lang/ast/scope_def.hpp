@@ -31,7 +31,7 @@ namespace stan {
         && (program_block_ == parameter_origin
             || program_block_ == transformed_parameter_origin);
     }
-        
+
     bool scope::tpar_or_local() const {
       return  program_block_ == transformed_parameter_origin
         || program_block_ == local_origin;

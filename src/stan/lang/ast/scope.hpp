@@ -142,7 +142,6 @@ namespace stan {
        * @return true if origin block allows size-denoting variable declaration.
        */
       bool allows_size() const;
-
     };
 
   }

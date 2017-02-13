@@ -808,7 +808,7 @@ namespace stan {
       // validate scope matches declaration scope or is nested in
       scope lhs_origin = vm.get_scope(name);
       if (lhs_origin.program_block() != var_scope.program_block()
-          && lhs_origin.program_block() != local_origin) { // MM:  why not test is_local()?
+          && lhs_origin.program_block() != local_origin) {  // MM is_local()
         pass = false;
         return;
       }
@@ -900,7 +900,7 @@ namespace stan {
       // validate scope matches declaration scope or is nested in
       scope lhs_origin = vm.get_scope(name);
       if (lhs_origin.program_block() != var_scope.program_block()
-          && lhs_origin.program_block() != local_origin) { // MM:  why not test is_local()?
+          && lhs_origin.program_block() != local_origin) {  // MM: is_local()
         error_msgs << "attempt to assign variable in wrong block."
                    << " left-hand-side variable origin=";
         print_scope(error_msgs, lhs_origin);
@@ -2558,7 +2558,8 @@ namespace stan {
 
     template <typename T>
     void add_var::operator()(var_decl& var_decl_result, const T& var_decl,
-                             variable_map& vm, bool& pass, const scope& var_scope,
+                             variable_map& vm, bool& pass,
+                             const scope& var_scope,
                              std::ostream& error_msgs) const {
       if (vm.exists(var_decl.name_)) {
         pass = false;
@@ -2658,14 +2659,14 @@ namespace stan {
     void set_var_scope::operator()(scope& var_scope,
                                     const origin_block& program_block)
       const {
-      var_scope= scope(program_block);
+      var_scope = scope(program_block);
     }
     boost::phoenix::function<set_var_scope> set_var_scope_f;
 
     void set_var_scope_local::operator()(scope& var_scope,
                                     const origin_block& program_block)
       const {
-      var_scope= scope(program_block, true);
+      var_scope = scope(program_block, true);
     }
     boost::phoenix::function<set_var_scope_local> set_var_scope_local_f;
 
@@ -2673,7 +2674,7 @@ namespace stan {
                                       const scope& scope_enclosing)
       const {
       origin_block enclosing_block = scope_enclosing.program_block();
-      var_scope= scope(enclosing_block, true);
+      var_scope = scope(enclosing_block, true);
     }
     boost::phoenix::function<reset_var_scope> reset_var_scope_f;
 

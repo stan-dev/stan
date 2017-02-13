@@ -777,8 +777,9 @@ namespace stan {
     extern boost::phoenix::function<set_int_range_upper> set_int_range_upper_f;
 
     struct validate_int_data_expr : public phoenix_functor_quinary {
-      void operator()(const expression& expr, const scope& var_scope, bool& pass,
-                      variable_map& var_map, std::stringstream& error_msgs)
+      void operator()(const expression& expr, const scope& var_scope,
+                      bool& pass, variable_map& var_map,
+                      std::stringstream& error_msgs)
         const;
     };
     extern boost::phoenix::function<validate_int_data_expr>
@@ -826,12 +827,14 @@ namespace stan {
     extern boost::phoenix::function<non_void_expression> non_void_expression_f;
 
     struct set_var_scope : public phoenix_functor_binary {
-      void operator()(scope& var_scope, const origin_block& program_block) const;
+      void operator()(scope& var_scope, const origin_block& program_block)
+        const;
     };
     extern boost::phoenix::function<set_var_scope> set_var_scope_f;
 
     struct set_var_scope_local : public phoenix_functor_binary {
-      void operator()(scope& var_scope, const origin_block& program_block) const;
+      void operator()(scope& var_scope, const origin_block& program_block)
+        const;
     };
     extern boost::phoenix::function<set_var_scope_local>
     set_var_scope_local_f;
