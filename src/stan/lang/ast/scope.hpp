@@ -59,11 +59,19 @@ namespace stan {
       origin_block program_block() const;
 
       /**
-       * Return true when innermost scope is local block.
+       * Return true when declared in a nested (local) block,
+       * enclosing block can be any \c origin_block value.
        *
-       * @return true when scope is in local block.
+       * @return true when scope is nested (local) block.
        */
       bool is_local() const;
+
+      /**
+       * Return true when declared in \c local_origin block.
+       *
+       * @return true when scope is \c local_origin block.
+       */
+      bool local() const;
 
       /**
        * Flags scopes where parameter variables are declared,

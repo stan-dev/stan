@@ -26,6 +26,10 @@ namespace stan {
       return is_local_;
     }
 
+    bool scope::local() const {
+      return program_block_ == local_origin;
+    }
+
     bool scope::par_or_tpar() const {
       return !is_local_
         && (program_block_ == parameter_origin
@@ -87,32 +91,15 @@ namespace stan {
 
     bool scope::allows_size() const {
       return is_local_
-        || (program_block_ == data_origin)
-        || (program_block_ == transformed_data_origin)
-        || (program_block_ == function_argument_origin)
-        || (program_block_ == function_argument_origin_lp)
-        || (program_block_ == function_argument_origin_rng)
-        || (program_block_ == void_function_argument_origin)
-        || (program_block_ == void_function_argument_origin_lp)
-        || (program_block_ == void_function_argument_origin_rng);
+        || program_block_ == data_origin
+        || program_block_ == transformed_data_origin
+        || program_block_ == function_argument_origin
+        || program_block_ == function_argument_origin_lp
+        || program_block_ == function_argument_origin_rng
+        || program_block_ == void_function_argument_origin
+        || program_block_ == void_function_argument_origin_lp
+        || program_block_ == void_function_argument_origin_rng;
     }
-
-
   }
 }
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

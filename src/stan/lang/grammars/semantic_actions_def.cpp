@@ -801,20 +801,20 @@ namespace stan {
                                        std::ostream& error_msgs) const {
       // validate existence
       if (!vm.exists(name)) {
-        pass = false;   // MM: no error message?  see validate_assignment below
+        pass = false;
         return;
       }
 
-      // validate scope matches declaration scope or is nested in
+      // validate scope matches declaration scope, disallow decls in model block
       scope lhs_origin = vm.get_scope(name);
       if (lhs_origin.program_block() != var_scope.program_block()
-          && lhs_origin.program_block() != local_origin) {  // MM is_local()
+          && !lhs_origin.local()) {
         pass = false;
         return;
       }
       // enforce constancy of function args
       if (lhs_origin.fun()) {
-        pass = false;   // MM: no error message?  see validate_assignment below
+        pass = false;
         return;
       }
       v = variable(name);
@@ -897,10 +897,10 @@ namespace stan {
         return;
       }
 
-      // validate scope matches declaration scope or is nested in
+      // validate scope matches declaration scope, disallow decls in model block
       scope lhs_origin = vm.get_scope(name);
       if (lhs_origin.program_block() != var_scope.program_block()
-          && lhs_origin.program_block() != local_origin) {  // MM: is_local()
+          && !lhs_origin.local()) {
         error_msgs << "attempt to assign variable in wrong block."
                    << " left-hand-side variable origin=";
         print_scope(error_msgs, lhs_origin);
@@ -2664,14 +2664,14 @@ namespace stan {
     boost::phoenix::function<set_var_scope> set_var_scope_f;
 
     void set_var_scope_local::operator()(scope& var_scope,
-                                    const origin_block& program_block)
+                                         const origin_block& program_block)
       const {
       var_scope = scope(program_block, true);
     }
     boost::phoenix::function<set_var_scope_local> set_var_scope_local_f;
 
     void reset_var_scope::operator()(scope& var_scope,
-                                      const scope& scope_enclosing)
+                                     const scope& scope_enclosing)
       const {
       origin_block enclosing_block = scope_enclosing.program_block();
       var_scope = scope(enclosing_block, true);
