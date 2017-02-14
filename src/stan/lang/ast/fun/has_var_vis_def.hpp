@@ -55,6 +55,17 @@ namespace stan {
         || boost::apply_visitor(*this, e.theta_.expr_);
     }
 
+    bool has_var_vis::operator()(const generalOdeModel_control& e) const {
+      // only init state and params may contain vars
+      return ((((((boost::apply_visitor(*this, e.time_.expr_)
+        || boost::apply_visitor(*this, e.amt_.expr_))
+        || boost::apply_visitor(*this, e.rate_.expr_))
+        || boost::apply_visitor(*this, e.ii_.expr_))
+        || boost::apply_visitor(*this, e.pMatrix_.expr_))
+        || boost::apply_visitor(*this, e.biovar_.expr_))
+        || boost::apply_visitor(*this, e.tlag_.expr_));
+   }
+
     bool has_var_vis::operator()(const index_op& e) const {
       return boost::apply_visitor(*this, e.expr_.expr_);
     }

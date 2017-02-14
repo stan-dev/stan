@@ -114,4 +114,7 @@
 #include <stan/lang/ast/node/vector_var_decl.hpp>
 #include <stan/lang/ast/node/while_statement.hpp>
 
+// Edits for Torsten
+#include <stan/lang/ast/node/generalOdeModel_control.hpp>
+
 #endif

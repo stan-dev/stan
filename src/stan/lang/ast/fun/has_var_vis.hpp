@@ -15,6 +15,7 @@ namespace stan {
     struct fun;
     struct integrate_ode;
     struct integrate_ode_control;
+    struct generalOdeModel_control;
     struct index_op;
     struct index_op_sliced;
     struct conditional_op;
@@ -94,6 +95,15 @@ namespace stan {
        * @return true if expression contains a non-data variable
        */
       bool operator()(const integrate_ode_control& e) const;
+
+      /**
+       * Return true if the specified expression contains a non-data
+       * variable. 
+       *
+       * @param e expression
+       * @return true if expression contains a non-data variable
+       */
+      bool operator()(const generalOdeModel_control& e) const;
 
       /**
        * Return true if the specified expression contains a non-data

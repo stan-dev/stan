@@ -14,6 +14,7 @@ namespace stan {
     struct fun;
     struct integrate_ode;
     struct integrate_ode_control;
+    struct generalOdeModel_control;
     struct index_op;
     struct index_op_sliced;
     struct conditional_op;
@@ -32,6 +33,7 @@ namespace stan {
       bool operator()(const variable& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const integrate_ode& x) const;  // NOLINT
       bool operator()(const integrate_ode_control& x) const;  // NOLINT
+      bool operator()(const generalOdeModel_control& x) const;  // NOLINT
       bool operator()(const fun& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const index_op& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const index_op_sliced& x) const;  // NOLINT

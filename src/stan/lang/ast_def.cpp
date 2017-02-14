@@ -110,4 +110,7 @@
 
 #include <stan/lang/ast/sigs/function_signatures_def.hpp>
 
+// Edits for Torsten
+#include <stan/lang/ast/node/generalOdeModel_control_def.hpp>
+
 #endif

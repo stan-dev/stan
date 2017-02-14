@@ -32,6 +32,7 @@ namespace stan {
     struct fun;
     struct integrate_ode;
     struct integrate_ode_control;
+    struct generalOdeModel_control;
     struct index_op;
     struct index_op_sliced;
     struct conditional_op;
@@ -46,6 +47,7 @@ namespace stan {
                              boost::recursive_wrapper<variable>,
                              boost::recursive_wrapper<integrate_ode>,
                              boost::recursive_wrapper<integrate_ode_control>,
+                             boost::recursive_wrapper<generalOdeModel_control>,
                              boost::recursive_wrapper<fun>,
                              boost::recursive_wrapper<index_op>,
                              boost::recursive_wrapper<index_op_sliced>,
@@ -66,6 +68,7 @@ namespace stan {
       expression(const fun& expr);  // NOLINT(runtime/explicit)
       expression(const integrate_ode& expr);  // NOLINT(runtime/explicit)
       expression(const integrate_ode_control& expr);  // NOLINT
+      expression(const generalOdeModel_control& expr);  // NOLINT
       expression(const index_op& expr);  // NOLINT(runtime/explicit)
       expression(const index_op_sliced& expr);  // NOLINT(runtime/explicit)
       expression(const conditional_op& expr);  // NOLINT(runtime/explicit)

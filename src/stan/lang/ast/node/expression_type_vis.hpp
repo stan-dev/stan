@@ -15,6 +15,7 @@ namespace stan {
     struct fun;
     struct integrate_ode;
     struct integrate_ode_control;
+    struct generalOdeModel_control;
     struct index_op;
     struct index_op_sliced;
     struct conditional_op;
@@ -34,6 +35,7 @@ namespace stan {
       expr_type operator()(const fun& e) const;
       expr_type operator()(const integrate_ode& e) const;
       expr_type operator()(const integrate_ode_control& e) const;
+      expr_type operator()(const generalOdeModel_control& e) const;
       expr_type operator()(const index_op& e) const;
       expr_type operator()(const index_op_sliced& e) const;
       expr_type operator()(const conditional_op& e) const;

@@ -31,6 +31,9 @@ namespace stan {
 
     expression::expression(const integrate_ode_control& expr) : expr_(expr) { }
 
+    expression::expression(const generalOdeModel_control& expr) : expr_(expr)
+      { }
+
     expression::expression(const fun& expr) : expr_(expr) { }
 
     expression::expression(const index_op& expr) : expr_(expr) { }

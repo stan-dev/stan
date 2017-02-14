@@ -45,6 +45,10 @@ namespace stan {
       return false;  // no refs persist out of integrate_ode_control() call
     }
 
+    bool var_occurs_vis::operator()(const generalOdeModel_control& e) const {
+      return false;  // no refs persist out of generalOdeModel_control() call
+    }
+
     bool var_occurs_vis::operator()(const index_op& e) const {
       // refs only persist out of expression, not indexes
       return boost::apply_visitor(*this, e.expr_.expr_);

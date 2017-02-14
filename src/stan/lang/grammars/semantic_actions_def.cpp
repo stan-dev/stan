@@ -155,6 +155,9 @@ namespace stan {
     template void assign_lhs::operator()(expression&,
                                          const integrate_ode_control&)
       const;
+    template void assign_lhs::operator()(expression&,
+                                         const generalOdeModel_control&)
+      const;
     template void assign_lhs::operator()(array_expr&,
                                          const array_expr&) const;
     template void assign_lhs::operator()(int&, const int&) const;
@@ -1556,6 +1559,254 @@ namespace stan {
     boost::phoenix::function<validate_integrate_ode_control>
     validate_integrate_ode_control_f;
 
+    template <class T>
+    void validate_generalOdeModel(const T& ode_fun,
+                                  const variable_map& var_map,
+                                  bool& pass,
+                                  std::ostream& error_msgs) {
+      pass = true;
+
+      // test function argument type
+      expr_type sys_result_type(DOUBLE_T, 1);
+      std::vector<expr_type> sys_arg_types;
+      sys_arg_types.push_back(expr_type(DOUBLE_T, 0));
+      sys_arg_types.push_back(expr_type(DOUBLE_T, 1));
+      sys_arg_types.push_back(expr_type(DOUBLE_T, 1));
+      sys_arg_types.push_back(expr_type(DOUBLE_T, 1));
+      sys_arg_types.push_back(expr_type(INT_T, 1));
+      function_signature_t system_signature(sys_result_type, sys_arg_types);
+      if (!function_signatures::instance()
+            .is_defined(ode_fun.system_function_name_, system_signature)) {
+      error_msgs << "first argument to generalOdeModel"
+                 << " must be a function with signature"
+                 << " (real, real[], real[], real[], int[]) : real[] ";
+      pass = false;
+      }
+
+      // test regular argument types
+      if (ode_fun.nCmt_.expression_type() != INT_T) {
+        error_msgs << "second argument to "
+                   << ode_fun.integration_function_name_
+                   << " must be type int"
+                   << " for nCmt (number of compartments)"
+                   << "; found type="
+                   << ode_fun.nCmt_.expression_type()
+                   << ". ";
+        pass = false;
+      }
+      if (ode_fun.time_.expression_type() != expr_type(DOUBLE_T, 1)) {
+        error_msgs << "third argument to "
+                   << ode_fun.integration_function_name_
+                   << " must be type real[]"
+                   << "for time"
+                   << "; found type="
+                   << ode_fun.time_.expression_type()
+                   << ". ";
+        pass = false;
+      }
+      if (ode_fun.amt_.expression_type() != expr_type(DOUBLE_T, 1)) {
+        error_msgs << "fourth argument to "
+                   << ode_fun.integration_function_name_
+                   << " must be type real[]"
+                   << "for amount"
+                   << "; found type="
+                   << ode_fun.amt_.expression_type()
+                   << ". ";
+        pass = false;
+      }
+      if (ode_fun.rate_.expression_type() != expr_type(DOUBLE_T, 1)) {
+        error_msgs << "fifth argument to "
+                   << ode_fun.integration_function_name_
+                   << " must be type real[]"
+                   << "for rate"
+                   << "; found type="
+                   << ode_fun.rate_.expression_type()
+                   << ". ";
+        pass = false;
+      }
+      if (ode_fun.ii_.expression_type() != expr_type(DOUBLE_T, 1)) {
+        error_msgs << "sixth argument to "
+                   << ode_fun.integration_function_name_
+                   << " must be type real[]"
+                   << "for inter-dose interval"
+                   << "; found type="
+                   << ode_fun.ii_.expression_type()
+                   << ". ";
+        pass = false;
+      }
+      if (ode_fun.evid_.expression_type() != expr_type(INT_T, 1)) {
+        error_msgs << "seventh argument to "
+                   << ode_fun.integration_function_name_
+                   << " must be type int[]"
+                   << "for evid (event ID)"
+                   << "; found type="
+                   << ode_fun.evid_.expression_type()
+                   << ". ";
+        pass = false;
+      }
+      if (ode_fun.cmt_.expression_type() != expr_type(INT_T, 1)) {
+        error_msgs << "eighth argument to "
+                   << ode_fun.integration_function_name_
+                   << " must be type int[]"
+                   << "for cmt (compartment)"
+                   << "; found type="
+                   << ode_fun.cmt_.expression_type()
+                   << ". ";
+        pass = false;
+      }
+      if (ode_fun.addl_.expression_type() != expr_type(INT_T, 1)) {
+        error_msgs << "ninth argument to "
+                   << ode_fun.integration_function_name_
+                   << " must be type int[]"
+                   << "for addl (additional dose)"
+                   << "; found type="
+                   << ode_fun.addl_.expression_type()
+                   << ". ";
+        pass = false;
+      }
+      if (ode_fun.ss_.expression_type() != expr_type(INT_T, 1)) {
+        error_msgs << "tenth argument to "
+                   << ode_fun.integration_function_name_
+                   << " must be type int[]"
+                   << "for ss (steady state)"
+                   << "; found type="
+                   << ode_fun.ss_.expression_type()
+                   << ". ";
+        pass = false;
+      }
+      if ((ode_fun.pMatrix_.expression_type() != expr_type(DOUBLE_T, 2))
+        && (ode_fun.pMatrix_.expression_type() != expr_type(DOUBLE_T, 1))) {
+        error_msgs << "eleventh argument to "
+                   << ode_fun.integration_function_name_
+                   << " must be type real[ ] or real[ , ]"
+                   << " for the ODE parameters"
+                   << "; found type="
+                   << ode_fun.pMatrix_.expression_type()
+                   << ". ";
+        pass = false;
+      }
+      if ((ode_fun.biovar_.expression_type() != expr_type(DOUBLE_T, 2))
+        && (ode_fun.biovar_.expression_type() != expr_type(DOUBLE_T, 1))) {
+        error_msgs << "twelth argument to "
+                   << ode_fun.integration_function_name_
+                   << " must be type real[ ] or real[ , ]"
+                   << " for the bio-variability"
+                   << "; found type="
+                   << ode_fun.biovar_.expression_type()
+                   << ". ";
+        pass = false;
+      }
+      if ((ode_fun.tlag_.expression_type() != expr_type(DOUBLE_T, 2))
+            && (ode_fun.tlag_.expression_type() != expr_type(DOUBLE_T, 1))) {
+        error_msgs << "thirteenth argument to "
+                   << ode_fun.integration_function_name_
+                   << " must be type real[ ] or real[ , ]"
+                   << " for the lag times"
+                   << "; found type="
+                   << ode_fun.tlag_.expression_type()
+                   << ". ";
+        pass = false;
+      }
+      if (!ode_fun.rel_tol_.expression_type().is_primitive()) {
+        error_msgs << "fourteenth argument to "
+                   << ode_fun.integration_function_name_
+                   << " must be type real or int"
+                   << " for relative tolerance"
+                   << "; found type="
+                   << ode_fun.rel_tol_.expression_type()
+                   << ". ";
+        pass = false;
+      }
+      if (!ode_fun.abs_tol_.expression_type().is_primitive()) {
+        error_msgs << "fifthteenth argument to "
+                   << ode_fun.integration_function_name_
+                   << " must be type real or int"
+                   << " for absolute tolerance"
+                   << "; found type="
+                   << ode_fun.abs_tol_.expression_type()
+                   << ". ";
+        pass = false;
+      }
+      if (!ode_fun.max_num_steps_.expression_type().is_primitive()) {
+        error_msgs << "sixteenth argument to "
+                   << ode_fun.integration_function_name_
+                   << " must be type real or int"
+                   << " for maximum number of steps"
+                   << "; found type="
+                   << ode_fun.max_num_steps_.expression_type()
+                   << ". ";
+        pass = false;
+      }
+
+      // test data-only variables do not have parameters (int locals OK)
+      if (has_var(ode_fun.nCmt_, var_map)) {
+        error_msgs << "second argument to "
+                   << ode_fun.integration_function_name_
+                   << " for number of compartments"
+                   << " must be data only and not reference parameters";
+        pass = false;
+      }
+      if (has_var(ode_fun.evid_, var_map)) {
+        error_msgs << "seventh argument to "
+                   << ode_fun.integration_function_name_
+                   << " for event ID (evid)"
+                   << " must be data only and not reference parameters";
+        pass = false;
+      }
+      if (has_var(ode_fun.cmt_, var_map)) {
+        error_msgs << "eighth argument to "
+                   << ode_fun.integration_function_name_
+                   << " for compartment number (cmt)"
+                   << " must be data only and not reference parameters";
+        pass = false;
+      }
+      if (has_var(ode_fun.addl_, var_map)) {
+        error_msgs << "ninth argument to "
+                   << ode_fun.integration_function_name_
+                   << " for additional dose (addl)"
+                   << " must be data only and not reference parameters";
+        pass = false;
+      }
+      if (has_var(ode_fun.ss_, var_map)) {
+        error_msgs << "tenth argument to "
+                   << ode_fun.integration_function_name_
+                   << " for steady state approximation (ss)"
+                   << " must be data only and not reference parameters";
+        pass = false;
+      }
+      if (has_var(ode_fun.rel_tol_, var_map)) {
+        error_msgs << "fourteenth argument to "
+                   << ode_fun.integration_function_name_
+                   << " for relative tolerance"
+                   << " must be data only and not reference parameters";
+        pass = false;
+      }
+      if (has_var(ode_fun.abs_tol_, var_map)) {
+        error_msgs << "fifthteenth argument to "
+                   << ode_fun.integration_function_name_
+                   << " for absolute tolerance"
+                   << " must be data only and not reference parameters";
+        pass = false;
+      }
+      if (has_var(ode_fun.max_num_steps_, var_map)) {
+        error_msgs << "sixteenth argument to "
+                   << ode_fun.integration_function_name_
+                   << " for maximum number of steps"
+                   << " must be data only and not reference parameters";
+        pass = false;
+      }
+    }
+
+    void validate_generalOdeModel_control::operator()(
+        const generalOdeModel_control& ode_fun,
+        const variable_map& var_map,
+        bool& pass,
+        std::ostream& error_msgs) const {
+      validate_generalOdeModel(ode_fun, var_map, pass, error_msgs);
+    }
+    boost::phoenix::function<validate_generalOdeModel_control>
+    validate_generalOdeModel_control_f;
+
     void set_fun_type_named::operator()(expression& fun_result, fun& fun,
                                         const var_origin& var_origin,
                                         bool& pass,
@@ -2187,6 +2438,16 @@ namespace stan {
       return boost::apply_visitor(*this, x.y0_.expr_)
         && boost::apply_visitor(*this, x.theta_.expr_);
     }
+    bool data_only_expression::operator()(const generalOdeModel_control& x)
+      const {
+      return ((((((boost::apply_visitor(*this, x.time_.expr_)
+        && boost::apply_visitor(*this, x.amt_.expr_)))
+        && boost::apply_visitor(*this, x.rate_.expr_)
+        && boost::apply_visitor(*this, x.ii_.expr_))
+        && boost::apply_visitor(*this, x.pMatrix_.expr_))
+        && boost::apply_visitor(*this, x.biovar_.expr_))
+        && boost::apply_visitor(*this, x.tlag_.expr_));
+    }  // include all arguments with a template type
     bool data_only_expression::operator()(const fun& x) const {
       for (size_t i = 0; i < x.args_.size(); ++i)
         if (!boost::apply_visitor(*this, x.args_[i].expr_))
