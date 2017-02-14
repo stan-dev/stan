@@ -327,7 +327,7 @@ TEST(McmcUnitENuts, transition_test) {
   EXPECT_FLOAT_EQ(-0.74208695, s.cont_params()(1));
   EXPECT_FLOAT_EQ( 1.5202962, s.cont_params()(2));
   EXPECT_FLOAT_EQ(-3.1828632, s.log_prob());
-  EXPECT_FLOAT_EQ(0.99629009, s.accept_stat());
+  EXPECT_FLOAT_EQ(0.99604273, s.accept_stat());
   EXPECT_EQ("", output_stream.str());
   EXPECT_EQ("", error_stream.str());
 }
