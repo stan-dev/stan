@@ -63,7 +63,7 @@ namespace stan {
 
     bool has_non_param_var_vis::operator()(const variable& e) const {
       scope var_scope = var_map_.get_scope(e.name_);
-      return var_scope.tpar_or_local();
+      return var_scope.tpar();
     }
 
     bool has_non_param_var_vis::operator()(const integrate_ode& e) const {

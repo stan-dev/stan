@@ -57,9 +57,8 @@ TEST(langAst, hasVar) {
   using stan::lang::base_var_decl;
   using stan::lang::binary_op;
   using stan::lang::expression;
-  using stan::lang::local_origin;
+  using stan::lang::model_name_origin;
   using stan::lang::parameter_origin;
-  using stan::lang::transformed_parameter_origin;
   using stan::lang::unary_op;
   using stan::lang::scope;
   using stan::lang::variable;
@@ -78,7 +77,7 @@ TEST(langAst, hasVar) {
 
   vm.add("beta", 
          base_var_decl("beta", vector<expression>(), INT_T),
-         local_origin);
+         model_name_origin);
   variable v_beta("beta");
   v_beta.set_type(INT_T, 0U);
   expression e_beta(v_beta);

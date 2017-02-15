@@ -297,10 +297,10 @@ namespace stan {
 
 
     // called from: functions_grammar
-    struct scope_lp : public phoenix_functor_unary {
+    struct scope_params : public phoenix_functor_unary {
       void operator()(variable_map& vm) const;
     };
-    extern boost::phoenix::function<scope_lp> scope_lp_f;
+    extern boost::phoenix::function<scope_params> scope_params_f;
 
     // called from: functions_grammar
     struct unscope_variables : public phoenix_functor_binary {
@@ -346,16 +346,16 @@ namespace stan {
     validate_ints_expression_f;
 
     // called from: program_grammar
-    struct add_lp_var : public phoenix_functor_unary {
+    struct add_params_var : public phoenix_functor_unary {
       void operator()(variable_map& vm) const;
     };
-    extern boost::phoenix::function<add_lp_var> add_lp_var_f;
+    extern boost::phoenix::function<add_params_var> add_params_var_f;
 
     // called from: program_grammar
-    struct remove_lp_var : public phoenix_functor_unary {
+    struct remove_params_var : public phoenix_functor_unary {
       void operator()(variable_map& vm) const;
     };
-    extern boost::phoenix::function<remove_lp_var> remove_lp_var_f;
+    extern boost::phoenix::function<remove_params_var> remove_params_var_f;
 
     // called from: program_grammar
     struct program_error : public phoenix_functor_quinary {

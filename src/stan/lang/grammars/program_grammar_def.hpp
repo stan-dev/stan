@@ -66,10 +66,10 @@ namespace stan {
           > -data_var_decls_r
           > -derived_data_var_decls_r
           > -param_var_decls_r
-          > eps[add_lp_var_f(boost::phoenix::ref(var_map_))]
+          > eps[add_params_var_f(boost::phoenix::ref(var_map_))]
           > -derived_var_decls_r
           > model_r
-          > eps[remove_lp_var_f(boost::phoenix::ref(var_map_))]
+          > eps[remove_params_var_f(boost::phoenix::ref(var_map_))]
           > -generated_var_decls_r;
 
         model_r.name("model declaration (or perhaps an earlier block)");

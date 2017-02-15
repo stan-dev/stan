@@ -19,8 +19,6 @@ namespace stan {
         o << "transformed parameter";
       else if (var_scope.program_block() == derived_origin)
         o << "generated quantities";
-      else if (var_scope.program_block() == local_origin)
-        o << "local";
       else if (var_scope.program_block() == function_argument_origin)
         o << "function argument";
       else if (var_scope.program_block() == function_argument_origin_lp)

@@ -67,13 +67,6 @@ namespace stan {
       bool is_local() const;
 
       /**
-       * Return true when declared in \c local_origin block.
-       *
-       * @return true when scope is \c local_origin block.
-       */
-      bool local() const;
-
-      /**
        * Flags scopes where parameter variables are declared,
        * i.e., top-level of parameter or transformed parameter block.
        *
@@ -82,12 +75,11 @@ namespace stan {
       bool par_or_tpar() const;
 
       /**
-       * Return true when declared in transformed parameter block
-       * or local block.
+       * Return true when declared in transformed parameter block.
        *
-       * @return true for non-parameter block types
+       * @return true for transformed parameter origin block
        */
-      bool tpar_or_local() const;
+      bool tpar() const;
 
       /**
        * Return true when declared as function argument.
@@ -126,19 +118,19 @@ namespace stan {
       bool allows_lp_fun() const;
 
       /**
-       * Return true when program block allows access to LP statement
-       *
-       * @return true when program block allows access to LP statement
-       */
-      bool allows_lp_stmt() const;
-
-      /**
        * Return true when program block allows access to RNG
        * i.e., transformed data block or rng function
        *
        * @return true when program block allows access to RNG
        */
       bool allows_rng() const;
+
+      /**
+       * Return true when program block allows access to sampling statement
+       *
+       * @return true when program block allows access to sampling statement
+       */
+      bool allows_sampling() const;
 
       /**
        * Returns true for origin blocks where size-denoting expression

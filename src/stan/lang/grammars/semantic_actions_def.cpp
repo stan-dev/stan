@@ -559,15 +559,14 @@ namespace stan {
     }
     boost::phoenix::function<validate_return_type> validate_return_type_f;
 
-    void scope_lp::operator()(variable_map& vm) const {
-      vm.add("lp__", DOUBLE_T, local_origin);
-      vm.add("params_r__", VECTOR_T, local_origin);
+    // TODO(morris): remove if params_r__ no longer used
+    void scope_params::operator()(variable_map& vm) const {
+      vm.add("params_r__", VECTOR_T, parameter_origin);
     }
-    boost::phoenix::function<scope_lp> scope_lp_f;
+    boost::phoenix::function<scope_params> scope_params_f;
 
     void unscope_variables::operator()(function_decl_def& decl,
                                        variable_map& vm) const {
-      vm.remove("lp__");
       vm.remove("params_r__");
       for (size_t i = 0; i < decl.arg_decls_.size(); ++i)
         vm.remove(decl.arg_decls_[i].name_);
@@ -577,7 +576,6 @@ namespace stan {
     void add_fun_var::operator()(arg_decl& decl, bool& pass, variable_map& vm,
                                  std::ostream& error_msgs) const {
       if (vm.exists(decl.name_)) {
-        // variable already exists
         pass = false;
         error_msgs << "duplicate declaration of variable, name="
                    << decl.name_
@@ -652,21 +650,17 @@ namespace stan {
     validate_ints_expression_f;
 
 
-    void add_lp_var::operator()(variable_map& vm) const {
-      vm.add("lp__",
-             base_var_decl("lp__", std::vector<expression>(), DOUBLE_T),
-             local_origin);  // lp acts as a local where defined
+    void add_params_var::operator()(variable_map& vm) const {
       vm.add("params_r__",
              base_var_decl("params_r__", std::vector<expression>(), VECTOR_T),
-             local_origin);  // lp acts as a local where defined
+             parameter_origin);  // acts like a parameter
     }
-    boost::phoenix::function<add_lp_var> add_lp_var_f;
+    boost::phoenix::function<add_params_var> add_params_var_f;
 
-    void remove_lp_var::operator()(variable_map& vm) const {
-      vm.remove("lp__");
+    void remove_params_var::operator()(variable_map& vm) const {
       vm.remove("params_r__");
     }
-    boost::phoenix::function<remove_lp_var> remove_lp_var_f;
+    boost::phoenix::function<remove_params_var> remove_params_var_f;
 
     void program_error::operator()(pos_iterator_t _begin, pos_iterator_t _end,
                                    pos_iterator_t _where, variable_map& vm,
@@ -805,10 +799,9 @@ namespace stan {
         return;
       }
 
-      // validate scope matches declaration scope, disallow decls in model block
+      // validate scope matches declaration scope
       scope lhs_origin = vm.get_scope(name);
-      if (lhs_origin.program_block() != var_scope.program_block()
-          && !lhs_origin.local()) {
+      if (lhs_origin.program_block() != var_scope.program_block()) {
         pass = false;
         return;
       }
@@ -897,10 +890,9 @@ namespace stan {
         return;
       }
 
-      // validate scope matches declaration scope, disallow decls in model block
+      // validate scope matches declaration scope
       scope lhs_origin = vm.get_scope(name);
-      if (lhs_origin.program_block() != var_scope.program_block()
-          && !lhs_origin.local()) {
+      if (lhs_origin.program_block() != var_scope.program_block()) {
         error_msgs << "attempt to assign variable in wrong block."
                    << " left-hand-side variable origin=";
         print_scope(error_msgs, lhs_origin);
@@ -1318,7 +1310,7 @@ namespace stan {
                                            bool& pass,
                                            std::stringstream& error_msgs)
       const {
-      pass = var_scope.allows_lp_stmt();
+      pass = var_scope.allows_sampling();
       if (!pass)
         error_msgs << "Sampling statements (~) and increment_log_prob() are"
                    << std::endl

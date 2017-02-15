@@ -26,19 +26,14 @@ namespace stan {
       return is_local_;
     }
 
-    bool scope::local() const {
-      return program_block_ == local_origin;
-    }
-
     bool scope::par_or_tpar() const {
       return !is_local_
         && (program_block_ == parameter_origin
             || program_block_ == transformed_parameter_origin);
     }
 
-    bool scope::tpar_or_local() const {
-      return  program_block_ == transformed_parameter_origin
-        || program_block_ == local_origin;
+    bool scope::tpar() const {
+      return  program_block_ == transformed_parameter_origin;
     }
 
     bool scope::fun() const {
@@ -67,7 +62,6 @@ namespace stan {
                || program_block_ == parameter_origin);
     }
 
-
     bool scope::allows_lp_fun() const {
       return program_block_ == model_name_origin
         || program_block_ == transformed_parameter_origin
@@ -75,18 +69,17 @@ namespace stan {
         || program_block_ == void_function_argument_origin_lp;
     }
 
-    bool scope::allows_lp_stmt() const {
-      return program_block_ == model_name_origin
-        || program_block_ == function_argument_origin_lp
-        || program_block_ == void_function_argument_origin_lp;
-    }
-
-
     bool scope::allows_rng() const {
       return program_block_ == derived_origin
         || program_block_ == transformed_data_origin
         || program_block_ == function_argument_origin_rng
         || program_block_ == void_function_argument_origin_rng;
+    }
+
+    bool scope::allows_sampling() const {
+      return program_block_ == model_name_origin
+        || program_block_ == function_argument_origin_lp
+        || program_block_ == void_function_argument_origin_lp;
     }
 
     bool scope::allows_size() const {
