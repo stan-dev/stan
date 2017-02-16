@@ -31,36 +31,35 @@ namespace stan {
       using boost::spirit::qi::_val;
       using boost::spirit::qi::labels::_r1;
       using boost::spirit::qi::labels::_r2;
-      using boost::spirit::qi::labels::_r3;
-      using boost::spirit::qi::labels::_r4;
 
-      // _r1 true if sample_r allowed (inherited)
-      // _r2 source of variables allowed for assignments
-      // set to true if sample_r are allowed
+      //   _r1 var_scope
+      //   _r2 true if in loop (allowing break/continue)
       statement_2_r.name("statement");
-      statement_2_r %= conditional_statement_r(_r1, _r2, _r3, _r4);
+      statement_2_r %= conditional_statement_r(_r1, _r2);
 
+      //   _r1 var_scope
+      //   _r2 true if in loop (allowing break/continue)
       conditional_statement_r.name("if-else statement");
       conditional_statement_r
         = (lit("if")  >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('(')
-        > expression_g(_r2)
+        > expression_g(_r1)
           [add_conditional_condition_f(_val, _1, _pass,
                                        boost::phoenix::ref(error_msgs_))]
         > lit(')')
-        > statement_g(_r1, _r2, _r3, _r4)
+        > statement_g(_r1, _r2)
           [add_conditional_body_f(_val, _1)]
         > * (((lit("else") >> no_skip[!char_("a-zA-Z0-9_")])
               >> (lit("if")  >> no_skip[!char_("a-zA-Z0-9_")]))
              > lit('(')
-             > expression_g(_r2)
+             > expression_g(_r1)
                [add_conditional_condition_f(_val, _1, _pass,
                                             boost::phoenix::ref(error_msgs_))]
              > lit(')')
-             > statement_g(_r1, _r2, _r3, _r4)
+             > statement_g(_r1, _r2)
                [add_conditional_body_f(_val, _1)])
         > -((lit("else") >> no_skip[!char_("a-zA-Z0-9_")])
-            > statement_g(_r1, _r2, _r3, _r4)
+            > statement_g(_r1, _r2)
               [add_conditional_body_f(_val, _1)]);
     }
 

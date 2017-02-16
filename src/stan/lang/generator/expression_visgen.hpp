@@ -45,7 +45,7 @@ namespace stan {
 
       void operator()(const array_expr& x) const {
         std::stringstream ssRealType;
-        generate_real_var_type(x.array_expr_origin_, x.has_var_,
+        generate_real_var_type(x.array_expr_scope_, x.has_var_,
                                is_var_context_, ssRealType);
         std::stringstream ssArrayType;
         generate_array_var_type(x.type_.base_type_, ssRealType.str(),
@@ -198,7 +198,7 @@ namespace stan {
                   == expr.false_val_.expression_type()));
 
         std::stringstream ss;
-        generate_real_var_type(expr.var_origin_, expr.has_var_,
+        generate_real_var_type(expr.scope_, expr.has_var_,
                                is_var_context_, ss);
 
         o_ << "(";
