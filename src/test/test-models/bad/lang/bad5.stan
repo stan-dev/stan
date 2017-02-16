@@ -1,4 +1,4 @@
-derived data {
+transformed data {
   real y;
   y <- lp__;
 }
