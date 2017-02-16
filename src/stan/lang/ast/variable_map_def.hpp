@@ -25,7 +25,7 @@ namespace stan {
       return get(name).dims_.size();
     }
 
-    var_origin variable_map::get_origin(const std::string& name) const {
+    scope variable_map::get_scope(const std::string& name) const {
       if (!exists(name))
         throw std::invalid_argument("variable does not exist");
       return map_.find(name)->second.second;
@@ -33,8 +33,8 @@ namespace stan {
 
     void variable_map::add(const std::string& name,
                            const base_var_decl& base_decl,
-                           const var_origin& vo) {
-      map_[name] = range_t(base_decl, vo);
+                           const scope& scope_decl) {
+      map_[name] = range_t(base_decl, scope_decl);
     }
 
     void variable_map::remove(const std::string& name) {

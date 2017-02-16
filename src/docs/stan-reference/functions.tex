@@ -3239,18 +3239,8 @@ sparse matrix.
 
 \chapter{Mixed Operations}\label{mixed-operations.chapter}
 
-These functions perform conversions between Stan containers matrix,
+\noindent These functions perform conversions between Stan containers matrix,
 vector, row vector and arrays.
-
-Whenever a conversion implies reduction of dimensionality (like
-converting a matrix to a vector or a two dimensional array to a one
-dimensional array), the conversion is proceed in row-major order when
-the input is an array and in column-major order when the input is a
-vector, a row vector or a matrix.
-
-If the dimensionality is preserved (like when converting a matrix to a
-two dimensional array), then the indexes are also fully preserved
-which implies easy reversibility of the operation.
 
 \begin{description}
 %
@@ -3262,6 +3252,10 @@ Convert the column vector \farg{v} to a \code{size(\farg{v})} by 1 matrix.}
 %
 \fitem{matrix}{to\_matrix}{row\_vector \farg{v}}{
 Convert the row vector \farg{v} to a 1 by \code{size(\farg{v})} matrix.}
+%
+\fitem{matrix}{to\_matrix}{real[] \farg{a}, int \farg{m}, int \farg{n}}{
+Convert a one-dimensional array \farg{a} to a matrix with \farg{m} rows and
+\farg{n} columns filled in column-major order. }
 %
 \fitem{matrix}{to\_matrix}{real[,] \farg{a}}{
 Convert the two dimensional array \farg{a} to a matrix with the same

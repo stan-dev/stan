@@ -7,6 +7,7 @@
 #include <stan/lang/ast.hpp>
 
 #include <stan/lang/ast/expr_type_def.hpp>
+#include <stan/lang/ast/scope_def.hpp>
 #include <stan/lang/ast/variable_map_def.hpp>
 
 #include <stan/lang/ast/fun/ends_with_def.hpp>
@@ -26,8 +27,6 @@
 #include <stan/lang/ast/fun/indexed_type_def.hpp>
 #include <stan/lang/ast/fun/infer_type_indexing_def.hpp>
 #include <stan/lang/ast/fun/is_assignable_def.hpp>
-#include <stan/lang/ast/fun/is_data_origin_def.hpp>
-#include <stan/lang/ast/fun/is_fun_origin_def.hpp>
 #include <stan/lang/ast/fun/is_multi_index_def.hpp>
 #include <stan/lang/ast/fun/is_multi_index_vis_def.hpp>
 #include <stan/lang/ast/fun/is_nil_def.hpp>
@@ -36,7 +35,7 @@
 #include <stan/lang/ast/fun/is_user_defined_def.hpp>
 #include <stan/lang/ast/fun/is_user_defined_prob_function_def.hpp>
 #include <stan/lang/ast/fun/name_vis_def.hpp>
-#include <stan/lang/ast/fun/print_var_origin_def.hpp>
+#include <stan/lang/ast/fun/print_scope_def.hpp>
 #include <stan/lang/ast/fun/promote_primitive_def.hpp>
 #include <stan/lang/ast/fun/returns_type_def.hpp>
 #include <stan/lang/ast/fun/returns_type_vis_def.hpp>

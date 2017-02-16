@@ -12,16 +12,16 @@ namespace stan {
      * <code>real</code> variable according to context in which
      * expression is used and expression contents.
      *
-     * @param[in] vo expression origin block
+     * @param[in] var_scope expression origin block
      * @param[in] has_var  does expression contains a variable?
      * @param[in] is_var_context true when in auto-diff context
      * @param[in,out] o generated typename
      */
-    void generate_real_var_type(const var_origin& vo,
+    void generate_real_var_type(const scope& var_scope,
                                 bool has_var,
                                 bool is_var_context,
                                 std::ostream& o) {
-      if (is_fun_origin(vo))
+      if (var_scope.fun())
         o << "fun_scalar_t__";
       else if (is_var_context && has_var)
         o << "T__";

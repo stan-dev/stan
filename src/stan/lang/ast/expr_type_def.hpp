@@ -14,7 +14,8 @@ namespace stan {
     expr_type::expr_type(const base_expr_type base_type)
       : base_type_(base_type), num_dims_(0) { }
 
-    expr_type::expr_type(const base_expr_type base_type, size_t num_dims)
+    expr_type::expr_type(const base_expr_type base_type,
+                         std::size_t num_dims)
       : base_type_(base_type), num_dims_(num_dims) {  }
 
     bool expr_type::operator==(const expr_type& et) const {

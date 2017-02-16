@@ -67,7 +67,7 @@ namespace stan {
         double log_sum_weight = 0;  // log(exp(H0 - H0))
         double H0 = this->hamiltonian_.H(this->z_);
         int n_leapfrog = 0;
-        double sum_metro_prob = 1;  // exp(H0 - H0)
+        double sum_metro_prob = 0;
 
         // Build a trajectory until the NUTS criterion is no longer satisfied
         this->depth_ = 0;
@@ -128,7 +128,7 @@ namespace stan {
         // Compute average acceptance probabilty across entire trajectory,
         // even over subtrees that may have been rejected
         double accept_prob
-          = sum_metro_prob / static_cast<double>(n_leapfrog + 1);
+          = sum_metro_prob / static_cast<double>(n_leapfrog);
 
         this->z_.ps_point::operator=(z_sample);
         this->energy_ = this->hamiltonian_.H(this->z_);
