@@ -30,8 +30,7 @@ TEST(prog_reader, zero) {
   std::cout << std::endl << "HISTORY:" << std::endl;
   reader.print_history(std::cout);
 
-  stan::io::program_reader::dumps_t evs = reader.include_stack(3);
-  std::string dump = stan::io::program_reader::render(evs);
+  std::string dump = reader.include_trace(3);
   std::cout << std::endl << "INCLUDE DUMP:" << std::endl << dump << std::endl;
 }
 
@@ -59,8 +58,7 @@ TEST(prog_reader, one) {
   std::cout << std::endl << "HISTORY:" << std::endl;
   reader.print_history(std::cout);
 
-  stan::io::program_reader::dumps_t evs = reader.include_stack(3);
-  std::string dump = stan::io::program_reader::render(evs);
+  std::string dump = reader.include_trace(3);
   std::cout << std::endl << "INCLUDE DUMP:" << std::endl << dump << std::endl;
 
 }
