@@ -21,9 +21,9 @@ namespace stan {
       std::vector<expression> args_;
 
       /**
-       * Expression type.
+       * Number of rows in the column vector (its size).
        */
-      expr_type type_;
+      expression N_;
 
       /**
        * True if there is a variable within any of the expressions
@@ -49,7 +49,7 @@ namespace stan {
        *
        * @param args sequence of arguments
        */
-      vector_expr(const std::vector<expression>& args);  // NOLINT
+      vector_expr(const std::vector<expression>& args, const expression& N);
 
       /**
        * Assign specified vector expression to this vector expression.

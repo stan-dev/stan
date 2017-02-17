@@ -157,8 +157,8 @@ namespace stan {
       const;
     template void assign_lhs::operator()(array_expr&,
                                          const array_expr&) const;
-    template void assign_lhs::operator()(row_vector_expr&,
-                                         const row_vector_expr&) const;
+    template void assign_lhs::operator()(matrix_expr&,
+                                         const matrix_expr&) const;
     template void assign_lhs::operator()(vector_expr&,
                                          const vector_expr&) const;
     template void assign_lhs::operator()(int&, const int&) const;
@@ -2134,7 +2134,7 @@ namespace stan {
           return false;
       return true;
     }
-    bool data_only_expression::operator()(const row_vector_expr& x) const {
+    bool data_only_expression::operator()(const matrix_expr& x) const {
       for (size_t i = 0; i < x.args_.size(); ++i)
         if (!boost::apply_visitor(*this, x.args_[i].expr_))
           return false;

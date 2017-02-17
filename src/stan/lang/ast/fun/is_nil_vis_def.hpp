@@ -22,7 +22,7 @@ namespace stan {
       return false;
     }
 
-    bool is_nil_vis::operator()(const row_vector_expr& /* x */) const {
+    bool is_nil_vis::operator()(const matrix_expr& /* x */) const {
       return false;
     }
 

@@ -7,14 +7,15 @@
 namespace stan {
   namespace lang {
 
-    vector_expr::vector_expr() : args_(), type_(VECTOR_T, 1U) {  }
+    vector_expr::vector_expr() : args_(), N_() {  }
 
-    vector_expr::vector_expr(const std::vector<expression>& args)
-      : args_(args), type_() { }
+    vector_expr::vector_expr(const std::vector<expression>& args,
+                             const expression& N) 
+      : args_(args), N_(N){ }
 
-    vector_expr& vector_expr::operator=(const vector_expr& al) {
-      args_ = al.args_;
-      type_ = al.type_;
+    vector_expr& vector_expr::operator=(const vector_expr& ve) {
+      args_ = ve.args_;
+      N_ = ve.N_;
       return *this;
     }
 

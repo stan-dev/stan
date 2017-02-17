@@ -11,7 +11,7 @@ namespace stan {
     struct int_literal;
     struct double_literal;
     struct array_expr;
-    struct row_vector_expr;
+    struct matrix_expr;
     struct vector_expr;
     struct variable;
     struct fun;
@@ -77,7 +77,7 @@ namespace stan {
        * @param e expression
        * @return true if expression contains a non-data variable
        */
-      bool operator()(const row_vector_expr& e) const;
+      bool operator()(const matrix_expr& e) const;
 
       /**
        * Return true if the specified expression contains a non-data

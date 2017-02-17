@@ -1,0 +1,71 @@
+#ifndef STAN_LANG_AST_NODE_MATRIX_EXPR_HPP
+#define STAN_LANG_AST_NODE_MATRIX_EXPR_HPP
+
+#include <stan/lang/ast/expr_type.hpp>
+#include <stan/lang/ast/scope.hpp>
+#include <stan/lang/ast/node/expression.hpp>
+#include <vector>
+
+namespace stan {
+  namespace lang {
+
+    struct expresssion;
+
+    /**
+     * Structure to hold a matrix expression.
+     */
+    struct matrix_expr {
+      /**
+       * Sequence of expressions for matrix values.
+       */
+      std::vector<expression> args_;
+
+      /**
+       * Number of rows.
+       */
+      expression M_;
+
+      /**
+       * Number of columns.
+       */
+      expression N_;
+
+      /**
+       * True if there is a variable within any of the expressions
+       * that is a parameter, transformed parameter, or non-integer
+       * local variable.
+       */
+      bool has_var_;
+
+      /**
+       * Scope of this matrix expression.
+       *
+       */
+      scope matrix_expr_scope_;
+
+      /**
+       * Construct a default matrix expression.
+       */
+      matrix_expr();
+
+      /**
+       * Construct an matrix expression from the specified sequence of
+       * expressions.
+       *
+       * @param args sequence of arguments
+       */
+      matrix_expr(const std::vector<expression>& args, const expression& M,
+                  const expression& N);
+
+      /**
+       * Assign specified matrix expression to this matrix expression.
+       *
+       * @param al new matrix expression value
+       * @return reference to value
+       */
+      matrix_expr& operator=(const matrix_expr& me);
+    };
+
+  }
+}
+#endif

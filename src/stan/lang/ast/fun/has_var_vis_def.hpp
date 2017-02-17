@@ -30,7 +30,7 @@ namespace stan {
       return false;
     }
 
-    bool has_var_vis::operator()(const row_vector_expr& e) const {
+    bool has_var_vis::operator()(const matrix_expr& e) const {
       for (size_t i = 0; i < e.args_.size(); ++i)
         if (boost::apply_visitor(*this, e.args_[i].expr_))
           return true;

@@ -64,7 +64,7 @@ namespace stan {
        * @param[in] e expression
        * @return true if contains a variable not declared as a parameter
        */
-      bool operator()(const row_vector_expr& e) const;
+      bool operator()(const matrix_expr& e) const;
 
       /**
        * Return true if the specified expression contains a variable

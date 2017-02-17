@@ -14,7 +14,7 @@ namespace stan {
     struct int_literal;
     struct double_literal;
     struct array_expr;
-    struct row_vector_expr;
+    struct matrix_expr;
     struct vector_expr;
     struct variable;
     struct fun;
@@ -31,7 +31,7 @@ namespace stan {
                              boost::recursive_wrapper<int_literal>,
                              boost::recursive_wrapper<double_literal>,
                              boost::recursive_wrapper<array_expr>,
-                             boost::recursive_wrapper<row_vector_expr>,
+                             boost::recursive_wrapper<matrix_expr>,
                              boost::recursive_wrapper<vector_expr>,
                              boost::recursive_wrapper<variable>,
                              boost::recursive_wrapper<integrate_ode>,
@@ -52,7 +52,7 @@ namespace stan {
       expression(const int_literal& expr);  // NOLINT(runtime/explicit)
       expression(const double_literal& expr);  // NOLINT(runtime/explicit)
       expression(const array_expr& expr);  // NOLINT(runtime/explicit)
-      expression(const row_vector_expr& expr);  // NOLINT(runtime/explicit)
+      expression(const matrix_expr& expr);  // NOLINT(runtime/explicit)
       expression(const vector_expr& expr);  // NOLINT(runtime/explicit)
       expression(const variable& expr);  // NOLINT(runtime/explicit)
       expression(const fun& expr);  // NOLINT(runtime/explicit)
