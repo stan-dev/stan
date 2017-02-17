@@ -22,6 +22,14 @@ namespace stan {
       return e.type_;
     }
 
+    expr_type expression_type_vis::operator()(const row_vector_expr& e) const {
+      return e.type_;
+    }
+
+    expr_type expression_type_vis::operator()(const vector_expr& e) const {
+      return e.type_;
+    }
+
     expr_type expression_type_vis::operator()(const variable& e) const {
       return e.type_;
     }

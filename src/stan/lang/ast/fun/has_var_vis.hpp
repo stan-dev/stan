@@ -11,6 +11,8 @@ namespace stan {
     struct int_literal;
     struct double_literal;
     struct array_expr;
+    struct row_vector_expr;
+    struct vector_expr;
     struct variable;
     struct fun;
     struct integrate_ode;
@@ -67,6 +69,24 @@ namespace stan {
        * @return true if expression contains a non-data variable
        */
       bool operator()(const array_expr& e) const;
+
+      /**
+       * Return true if the specified expression contains a non-data
+       * variable. 
+       *
+       * @param e expression
+       * @return true if expression contains a non-data variable
+       */
+      bool operator()(const row_vector_expr& e) const;
+
+      /**
+       * Return true if the specified expression contains a non-data
+       * variable. 
+       *
+       * @param e expression
+       * @return true if expression contains a non-data variable
+       */
+      bool operator()(const vector_expr& e) const;
 
       /**
        * Return true if the specified expression contains a non-data

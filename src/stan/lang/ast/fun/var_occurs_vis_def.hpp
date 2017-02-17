@@ -23,7 +23,24 @@ namespace stan {
     }
 
     bool var_occurs_vis::operator()(const array_expr& e) const {
-      return false;  // TODO(carpenter): update for array_expr
+      for (size_t i = 0; i < e.args_.size(); ++i)
+        if (boost::apply_visitor(*this, e.args_[i].expr_))
+          return true;
+      return false;
+    }
+
+    bool var_occurs_vis::operator()(const row_vector_expr& e) const {
+      for (size_t i = 0; i < e.args_.size(); ++i)
+        if (boost::apply_visitor(*this, e.args_[i].expr_))
+          return true;
+      return false;
+    }
+
+    bool var_occurs_vis::operator()(const vector_expr& e) const {
+      for (size_t i = 0; i < e.args_.size(); ++i)
+        if (boost::apply_visitor(*this, e.args_[i].expr_))
+          return true;
+      return false;
     }
 
     bool var_occurs_vis::operator()(const variable& e) const {

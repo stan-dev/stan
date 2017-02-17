@@ -98,6 +98,7 @@
 #include <stan/lang/ast/node/range.hpp>
 #include <stan/lang/ast/node/reject_statement.hpp>
 #include <stan/lang/ast/node/return_statement.hpp>
+#include <stan/lang/ast/node/row_vector_expr.hpp>
 #include <stan/lang/ast/node/row_vector_var_decl.hpp>
 #include <stan/lang/ast/node/sample.hpp>
 #include <stan/lang/ast/node/simplex_var_decl.hpp>
@@ -110,6 +111,7 @@
 #include <stan/lang/ast/node/variable.hpp>
 #include <stan/lang/ast/node/variable_dims.hpp>
 #include <stan/lang/ast/node/var_decl.hpp>
+#include <stan/lang/ast/node/vector_expr.hpp>
 #include <stan/lang/ast/node/vector_var_decl.hpp>
 #include <stan/lang/ast/node/while_statement.hpp>
 

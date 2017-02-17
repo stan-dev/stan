@@ -52,6 +52,9 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::fun,
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::array_expr,
                           (std::vector<stan::lang::expression>, args_) )
 
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::vector_expr,
+                          (std::vector<stan::lang::expression>, args_) )
+
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::int_literal,
                           (int, val_)
                           (stan::lang::expr_type, type_))

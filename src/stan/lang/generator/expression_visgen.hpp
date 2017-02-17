@@ -68,6 +68,14 @@ namespace stan {
         o_ << ")";
       }
 
+      void operator()(const row_vector_expr& x) const {
+        o_ << " row_vector_expr " ;
+      }
+
+      void operator()(const vector_expr& x) const {
+        o_ << " vector_expr " ;
+      }
+
       void operator()(const variable& v) const { o_ << v.name_; }
 
       void operator()(int n) const {   // NOLINT
