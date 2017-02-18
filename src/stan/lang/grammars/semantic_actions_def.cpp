@@ -159,8 +159,8 @@ namespace stan {
                                          const array_expr&) const;
     template void assign_lhs::operator()(matrix_expr&,
                                          const matrix_expr&) const;
-    template void assign_lhs::operator()(vector_expr&,
-                                         const vector_expr&) const;
+    template void assign_lhs::operator()(row_vector_expr&,
+                                         const row_vector_expr&) const;
     template void assign_lhs::operator()(int&, const int&) const;
     template void assign_lhs::operator()(size_t&, const size_t&) const;
     template void assign_lhs::operator()(statement&, const statement&) const;
@@ -1706,6 +1706,64 @@ namespace stan {
     }
     boost::phoenix::function<set_array_expr_type> set_array_expr_type_f;
 
+    void set_matrix_expr_type::operator()(expression& e,
+                      matrix_expr& matrix_expr,
+                      const scope& var_scope,
+                      bool& pass,
+                      const variable_map& var_map,
+                      std::ostream& error_msgs) const {
+      std::cout << " set matrix_expr_type " << std::endl;
+      if (matrix_expr.args_.size() == 0) {
+        // shouldn't occur, because of % operator used to construct it
+        error_msgs << "matrix expression size 0, but must be > 0";
+        pass = false;
+        return;
+      }
+      expr_type et;
+      for (size_t i = 0; i < matrix_expr.args_.size(); ++i) {
+        et = matrix_expr.args_[i].expression_type();
+        if (! (et.base_type_ == INT_T || et.base_type_ == DOUBLE_T) ) {
+          error_msgs << "matrix expression elements must type int or real, found ";
+          write_base_expr_type(error_msgs, et.base_type_);
+          pass = false;
+          return;
+        }
+      }
+      e = matrix_expr;
+      pass = true;
+    }
+    boost::phoenix::function<set_matrix_expr_type> set_matrix_expr_type_f;
+
+    void set_row_vector_expr_type::operator()(expression& e,
+                      row_vector_expr& rve,
+                      const scope& var_scope,
+                      bool& pass,
+                      const variable_map& var_map,
+                      std::ostream& error_msgs) const {
+      std::cout << " set row_vector_expr_type " << std::endl;
+      expression eTmp = expression(rve);
+      std::cout << " eTmp.expression_type() " << eTmp.expression_type() << std::endl;
+      if (rve.args_.size() == 0) {
+        // shouldn't occur, because of % operator used to construct it
+        error_msgs << "vector expression size 0, but must be > 0";
+        pass = false;
+        return;
+      }
+      expr_type et;
+      for (size_t i = 0; i < rve.args_.size(); ++i) {
+        et = rve.args_[i].expression_type();
+        if (! (et.base_type_ == INT_T || et.base_type_ == DOUBLE_T) ) {
+          error_msgs << "vector expression elements must type int or real, found ";
+          write_base_expr_type(error_msgs, et.base_type_);
+          pass = false;
+          return;
+        }
+      }
+      e = expression(rve);
+      pass = true;
+    }
+    boost::phoenix::function<set_row_vector_expr_type> set_row_vector_expr_type_f;
+
     void exponentiation_expr::operator()(expression& expr1,
                                          const expression& expr2,
                                          const scope& var_scope,
@@ -2140,7 +2198,7 @@ namespace stan {
           return false;
       return true;
     }
-    bool data_only_expression::operator()(const vector_expr& x) const {
+    bool data_only_expression::operator()(const row_vector_expr& x) const {
       for (size_t i = 0; i < x.args_.size(); ++i)
         if (!boost::apply_visitor(*this, x.args_[i].expr_))
           return false;

@@ -45,10 +45,14 @@ namespace stan {
       array_expr_r;
 
       boost::spirit::qi::rule<Iterator,
-                              vector_expr(scope),
+                              matrix_expr(scope),
                               whitespace_grammar<Iterator> >
-      vec_expr_r;
+      matrix_expr_r;
 
+      boost::spirit::qi::rule<Iterator,
+                              row_vector_expr(scope),
+                              whitespace_grammar<Iterator> >
+      row_vector_expr_r;
 
       boost::spirit::qi::rule<Iterator,
                               expression(scope),
@@ -74,7 +78,9 @@ namespace stan {
 
       boost::spirit::qi::rule<Iterator,
                               boost::spirit::qi::locals<variable, fun,
-                                                        array_expr>,
+                                                        array_expr,
+                                                        matrix_expr,
+                                                        row_vector_expr>,
                               expression(scope),
                               whitespace_grammar<Iterator> >
       factor_r;

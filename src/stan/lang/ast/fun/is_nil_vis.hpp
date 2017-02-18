@@ -11,7 +11,7 @@ namespace stan {
     struct double_literal;
     struct array_expr;
     struct matrix_expr;
-    struct vector_expr;
+    struct row_vector_expr;
     struct variable;
     struct fun;
     struct integrate_ode;
@@ -32,7 +32,7 @@ namespace stan {
       bool operator()(const double_literal& x) const;  // NOLINT
       bool operator()(const array_expr& x) const;  // NOLINT
       bool operator()(const matrix_expr& x) const;  // NOLINT
-      bool operator()(const vector_expr& x) const;  // NOLINT
+      bool operator()(const row_vector_expr& x) const;  // NOLINT
       bool operator()(const variable& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const integrate_ode& x) const;  // NOLINT
       bool operator()(const integrate_ode_control& x) const;  // NOLINT

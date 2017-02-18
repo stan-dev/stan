@@ -27,7 +27,7 @@ namespace stan {
 
     expression::expression(const matrix_expr& expr) : expr_(expr) { }
 
-    expression::expression(const vector_expr& expr) : expr_(expr) { }
+    expression::expression(const row_vector_expr& expr) : expr_(expr) { }
 
     expression::expression(const variable& expr) : expr_(expr) { }
 

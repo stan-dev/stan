@@ -1,10 +1,14 @@
 #include <gtest/gtest.h>
 #include <test/unit/lang/utility.hpp>
 
+TEST(langParserTermGrammar, vector_expr) {
+  test_parsable("parser-generator/row_vector_expr_terms");
+}
+
 TEST(langParserTermGrammar, array_expr) {
-  test_parsable("validate_array_expr_big");
-  test_parsable("validate_array_expr_primitives");
-  test_parsable("validate_array_expr_containers");
+  test_parsable("parser-generator/validate_array_expr_big");
+  test_parsable("parser-generator/validate_array_expr_primitives");
+  test_parsable("parser-generator/validate_array_expr_containers");
   test_throws("validate_array_expr_bad1", "base type mismatch");
   test_throws("validate_array_expr_bad2", "dimension mismatch");
   test_throws("validate_array_expr_bad3", "ERROR");

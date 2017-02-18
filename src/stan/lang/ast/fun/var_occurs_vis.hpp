@@ -12,7 +12,7 @@ namespace stan {
     struct double_literal;
     struct array_expr;
     struct matrix_expr;
-    struct vector_expr;
+    struct row_vector_expr;
     struct variable;
     struct fun;
     struct integrate_ode;
@@ -87,7 +87,7 @@ namespace stan {
        * @return true if the variable occurs in any of the array
        * expression elements
        */
-      bool operator()(const vector_expr& e) const;
+      bool operator()(const row_vector_expr& e) const;
 
       /**
        * Return true if the variable occurs in the specified

@@ -36,7 +36,7 @@ namespace stan {
       return false;
     }
 
-    bool var_occurs_vis::operator()(const vector_expr& e) const {
+    bool var_occurs_vis::operator()(const row_vector_expr& e) const {
       for (size_t i = 0; i < e.args_.size(); ++i)
         if (boost::apply_visitor(*this, e.args_[i].expr_))
           return true;
