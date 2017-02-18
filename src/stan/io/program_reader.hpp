@@ -123,34 +123,31 @@ namespace stan {
       typedef std::vector<dump_t> dumps_t;
 
       /**
-       * Return the sequence of path/line number pairs identifying
-       * where the target line number came from.
+       * Return the include trace of the path and line numbers leading
+       * to the specified line of text in the concatenated program.
        *
-       * @param[in] target_line_num line number in concatenated
-       * program file
+       * @param[in] target line number in concatenated program file
        * @return sequence of files and positions for includes
        */
-      dumps_t include_stack(int target_line_num) const {
+      dumps_t include_stack(int target) const {
         dumps_t result;
-        std::string local_file;  // file currently in
-        int local_line_num;      // where local line num started
-        int global_line_num;     // where global line num started
-        for (size_t hist_pos = 0; hist_pos < history_.size(); ++hist_pos) {
-          if (history_[hist_pos].action_ == "start"
-              || history_[hist_pos].action_ == "restart" ) {
-            local_file = history_[hist_pos].path_;
-            local_line_num = history_[hist_pos].line_num_;
-            global_line_num = history_[hist_pos].concat_line_num_;
-          } else if (history_[hist_pos].action_ == "end") {
-            if (target_line_num < history_[hist_pos].concat_line_num_) {
-              int n = target_line_num - global_line_num + local_line_num;
-              result.push_back(dump_t(local_file, n));
-              break;
-            }
+        std::string file = "ERROR: UNINITIALIZED";
+        int file_start = -1;
+        int concat_start = -1;
+        for (size_t i = 0; i < history_.size(); ++i) {
+          if (target <= history_[i].concat_line_num_) {
+            int line = file_start + target - concat_start;
+            result.push_back(dump_t(file, line));
+            break;
+          } else if (history_[i].action_ == "start"
+                     || history_[i].action_ == "restart" ) {
+            file = history_[i].path_;
+            file_start = history_[i].line_num_;
+            concat_start = history_[i].concat_line_num_;
+          } else if (history_[i].action_ == "end") {
             result.pop_back();
-          } else if (history_[hist_pos].action_ == "include") {
-            result.push_back(dump_t(local_file,
-                                    history_[hist_pos].line_num_));
+          } else if (history_[i].action_ == "include") {
+            result.push_back(dump_t(file, history_[i].line_num_ + 1));
           }
         }
         return result;
@@ -198,12 +195,12 @@ namespace stan {
           std::string line = read_line(in);
           if (line.empty()) {
             // ends initial out of loop start event
-            history_.push_back(preproc_event(concat_line_num, line_num,
+            history_.push_back(preproc_event(concat_line_num, line_num - 1,
                                              "end", path));
             break;
           } else if (starts_with("#include ", line)) {
             std::string incl_path = include_path(line);
-            history_.push_back(preproc_event(concat_line_num, line_num,
+            history_.push_back(preproc_event(concat_line_num, line_num - 1,
                                              "include", incl_path));
             bool found_path = false;
             for (size_t i = 0; i < search_path.size(); ++i) {
