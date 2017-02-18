@@ -41,46 +41,40 @@ namespace stan {
     const int derived_origin = 5;
 
     /**
-     * The origin of the variable is as a local variable.
-     * Holds for model block as well as nested blocks.
-     */
-    const int local_origin = 6;
-
-    /**
      * The variable arose as a function argument to a non-void
      * function that does not end in _lp or _rng.
      */
-    const int function_argument_origin = 7;
+    const int function_argument_origin = 6;
 
     /**
      * The variable arose as an argument to a non-void function with
      * the _lp suffix.
      */
-    const int function_argument_origin_lp = 8;
+    const int function_argument_origin_lp = 7;
 
     /**
      * The variable arose as an argument to a non-void function with
      * the _rng suffix.
      */
-    const int function_argument_origin_rng = 9;
+    const int function_argument_origin_rng = 8;
 
     /**
      * The variable arose as an argument to a function returning void
      * that does not have the _lp or _rng suffix.
      */
-    const int void_function_argument_origin = 10;
+    const int void_function_argument_origin = 9;
 
     /**
      * The variable arose as an argument to a function returning void
      * with _lp suffix.  function returning void
      */
-    const int void_function_argument_origin_lp = 11;
+    const int void_function_argument_origin_lp = 10;
 
     /**
      * The variable arose as an argument to a function returning void
      * with an _rng suffix.
      */
-    const int void_function_argument_origin_rng = 12;
+    const int void_function_argument_origin_rng = 11;
 
   }
 }

@@ -1,7 +1,7 @@
 data {
    real y;
 }
-derived data {
+transformed data {
    real z;
    
    y <- 10.0;
