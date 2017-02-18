@@ -7,15 +7,13 @@
 namespace stan {
   namespace lang {
 
-    row_vector_expr::row_vector_expr() : args_(), N_() { }
+    row_vector_expr::row_vector_expr() : args_() { }
 
-    row_vector_expr::row_vector_expr(const std::vector<expression>& args,
-                             const expression& N) 
-      : args_(args), N_(N) { }
+    row_vector_expr::row_vector_expr(const std::vector<expression>& args)
+      : args_(args) { }
 
     row_vector_expr& row_vector_expr::operator=(const row_vector_expr& ve) {
       args_ = ve.args_;
-      N_ = ve.N_;
       return *this;
     }
 

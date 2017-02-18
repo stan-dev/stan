@@ -73,7 +73,20 @@ namespace stan {
       }
 
       void operator()(const row_vector_expr& x) const {
-        o_ << " row_vector_expr " ;
+        // generate proper type for row_vector - not array of said
+        std::stringstream ssRealType;
+        generate_real_var_type(x.row_vector_expr_scope_, x.has_var_,
+                               is_var_context_, ssRealType);
+        o_ << "stan::math::to_row_vector(stan::math::array_builder<";
+        generate_type(ssRealType.str(), x.args_, 0, o_);
+        o_ << " >()";
+        for (size_t i = 0; i < x.args_.size(); ++i) {
+          o_ << ".add(";
+          generate_expression(x.args_[i], user_facing_, is_var_context_, o_);
+          o_ << ")";
+        }
+        o_ << ".array()";
+        o_ << ")";
       }
 
       void operator()(const variable& v) const { o_ << v.name_; }

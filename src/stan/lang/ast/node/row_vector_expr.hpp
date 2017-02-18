@@ -21,11 +21,6 @@ namespace stan {
       std::vector<expression> args_;
 
       /**
-       * Row vector size.
-       */
-      expression N_;
-
-      /**
        * True if there is a variable within any of the expressions
        * that is a parameter, transformed parameter, or non-integer
        * local variable.
@@ -49,7 +44,7 @@ namespace stan {
        *
        * @param args sequence of arguments
        */
-      row_vector_expr(const std::vector<expression>& args, const expression& N);
+      row_vector_expr(const std::vector<expression>& args);
 
       /**
        * Assign specified row_vector expression to this row_vector expression.

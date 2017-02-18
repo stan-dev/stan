@@ -1740,26 +1740,23 @@ namespace stan {
                       bool& pass,
                       const variable_map& var_map,
                       std::ostream& error_msgs) const {
-      std::cout << " set row_vector_expr_type " << std::endl;
-      expression eTmp = expression(rve);
-      std::cout << " eTmp.expression_type() " << eTmp.expression_type() << std::endl;
       if (rve.args_.size() == 0) {
         // shouldn't occur, because of % operator used to construct it
         error_msgs << "vector expression size 0, but must be > 0";
         pass = false;
         return;
       }
-      expr_type et;
       for (size_t i = 0; i < rve.args_.size(); ++i) {
-        et = rve.args_[i].expression_type();
-        if (! (et.base_type_ == INT_T || et.base_type_ == DOUBLE_T) ) {
-          error_msgs << "vector expression elements must type int or real, found ";
-          write_base_expr_type(error_msgs, et.base_type_);
+        if (! rve.args_[i].expression_type().is_primitive()) {
+          error_msgs << "vector expression elements must primitive (real or int); found "
+                     << rve.args_[i].expression_type() << std::endl;
           pass = false;
           return;
         }
       }
-      e = expression(rve);
+      rve.row_vector_expr_scope_ = var_scope;
+      rve.has_var_ = has_var(rve, var_map);
+      e = rve;
       pass = true;
     }
     boost::phoenix::function<set_row_vector_expr_type> set_row_vector_expr_type_f;

@@ -3,6 +3,8 @@
 
 TEST(langParserTermGrammar, vector_expr) {
   test_parsable("parser-generator/row_vector_expr_terms");
+  test_throws("row_vector_expr_bad1",
+              "vector expression elements must primitive");
 }
 
 TEST(langParserTermGrammar, array_expr) {
