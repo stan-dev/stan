@@ -577,26 +577,15 @@ namespace stan {
     extern boost::phoenix::function<set_array_expr_type> set_array_expr_type_f;
 
     // called from: term_grammar
-    struct set_matrix_expr_type : public phoenix_functor_senary {
+    struct set_vec_expr_type : public phoenix_functor_senary {
       void operator()(expression& e,
-                      matrix_expr& matrix_expr,
+                      row_vector_expr& vec_expr,
                       const scope& var_scope,
                       bool& pass,
                       const variable_map& var_map,
                       std::ostream& error_msgs) const;
     };
-    extern boost::phoenix::function<set_matrix_expr_type> set_matrix_expr_type_f;
-
-    // called from: term_grammar
-    struct set_row_vector_expr_type : public phoenix_functor_senary {
-      void operator()(expression& e,
-                      row_vector_expr& rve,
-                      const scope& var_scope,
-                      bool& pass,
-                      const variable_map& var_map,
-                      std::ostream& error_msgs) const;
-    };
-    extern boost::phoenix::function<set_row_vector_expr_type> set_row_vector_expr_type_f;
+    extern boost::phoenix::function<set_vec_expr_type> set_vec_expr_type_f;
 
     // called from: term_grammar
     struct exponentiation_expr : public phoenix_functor_quinary {

@@ -44,7 +44,7 @@ namespace stan {
        *
        * @param args sequence of arguments
        */
-      row_vector_expr(const std::vector<expression>& args);
+      row_vector_expr(const std::vector<expression>& args);  // NOLINT
 
       /**
        * Assign specified row_vector expression to this row_vector expression.

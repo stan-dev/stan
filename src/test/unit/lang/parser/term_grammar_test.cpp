@@ -4,7 +4,13 @@
 TEST(langParserTermGrammar, vector_expr) {
   test_parsable("parser-generator/row_vector_expr_terms");
   test_throws("row_vector_expr_bad1",
-              "vector expression elements must primitive");
+              "variable definition base type mismatch");
+}
+
+TEST(langParserTermGrammar, matrix_expr) {
+  test_parsable("parser-generator/matrix_expr_terms");
+  //  test_throws("matrix_expr_bad1",
+  //              "variable definition base type mismatch");
 }
 
 TEST(langParserTermGrammar, array_expr) {

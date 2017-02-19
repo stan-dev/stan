@@ -55,9 +55,6 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::array_expr,
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::row_vector_expr,
                           (std::vector<stan::lang::expression>, args_) )
 
-BOOST_FUSION_ADAPT_STRUCT(stan::lang::matrix_expr,
-                          (std::vector<stan::lang::expression>, args_) )
-
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::int_literal,
                           (int, val_)
                           (stan::lang::expr_type, type_))
@@ -85,7 +82,6 @@ namespace stan {
       using boost::spirit::qi::_b;
       using boost::spirit::qi::_c;
       using boost::spirit::qi::_d;
-      using boost::spirit::qi::_e;
       using boost::spirit::qi::char_;
       using boost::spirit::qi::double_;
       using boost::spirit::qi::eps;
@@ -224,14 +220,10 @@ namespace stan {
            > eps[set_array_expr_type_f(_val, _c, _r1, _pass,
                                        boost::phoenix::ref(var_map_),
                                        boost::phoenix::ref(error_msgs_))])
-        | (matrix_expr_r(_r1)[assign_lhs_f(_d, _1)]
-           > eps[set_matrix_expr_type_f(_val, _d, _r1, _pass,
-                                       boost::phoenix::ref(var_map_),
-                                       boost::phoenix::ref(error_msgs_))])
-        | (row_vector_expr_r(_r1)[assign_lhs_f(_e, _1)]
-           > eps[set_row_vector_expr_type_f(_val, _e, _r1, _pass,
-                                       boost::phoenix::ref(var_map_),
-                                       boost::phoenix::ref(error_msgs_))])
+        | (vec_expr_r(_r1)[assign_lhs_f(_d, _1)]
+           > eps[set_vec_expr_type_f(_val, _d, _r1, _pass,
+                                     boost::phoenix::ref(var_map_),
+                                     boost::phoenix::ref(error_msgs_))])
         | (lit('(')
            > expression_g(_r1)[assign_lhs_f(_val, _1)]
            > lit(')'));
@@ -276,7 +268,6 @@ namespace stan {
         %= (lit('(') >> lit(')'))
         | (lit('(') >> (expression_g(_r1) % ',') >> lit(')'));
 
-      // mitzi: why no error message if array dim isn't int expr?
       dim_r.name("array dimension (integer expression)");
       dim_r
         %= expression_g(_r1)
@@ -296,24 +287,17 @@ namespace stan {
                         // fun to try to evaluate as variable [cleaner
                         // error msgs]
 
-      matrix_expr_r.name("matrix expression");
-      matrix_expr_r
-        %=  lit('[')
-        >> row_vector_expr_r(_r1) % ','
-        >> lit(']');
-
-      row_vector_expr_r.name("row vector expression");
-      row_vector_expr_r
-        %=  lit('[')
-        >> expression_g(_r1) % ','
-        >> lit(']');
-
       array_expr_r.name("array expression");
       array_expr_r
         %=  lit('{')
         >> expression_g(_r1) % ','
         >> lit('}');
 
+      vec_expr_r.name("row vector or matrix expression");
+      vec_expr_r
+        %=  lit('[')
+        >> expression_g(_r1) % ','
+        >> lit(']');
 
     }
   }
