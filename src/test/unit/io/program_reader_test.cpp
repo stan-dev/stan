@@ -14,8 +14,6 @@ std::vector<std::string> create_search_path() {
 }
 
 TEST(prog_reader, zero) {
-  using std::vector;
-  using std::string;
   std::stringstream ss;
   ss << "parameters {\n"
      << "  real y;\n"
@@ -24,19 +22,17 @@ TEST(prog_reader, zero) {
      << "  y ~ normal(0, 1);\n"
      << "}\n"
      << "";
-
-  vector<string> search_path = create_search_path();
-
-  stan::io::program_reader reader(ss, "str_test0", search_path);
-
-  std::cout << std::endl << "SURVEY SAYS:" << std::endl;
-  std::cout << reader.program_stream().rdbuf();
-  std::cout << std::endl << "HISTORY:" << std::endl;
-  reader.print_history(std::cout);
-
-  std::string dump = reader.include_trace(4);
-  std::cout << std::endl << "INCLUDE DUMP:" << std::endl << dump << std::endl;
+  std::vector<std::string> search_path = create_search_path();
+  stan::io::program_reader reader(ss, "foo", search_path);
+  // EXPECT_EQ("in file 'foo' at line 1\n", reader.include_trace(1));
+  // EXPECT_EQ("in file 'foo' at line 2\n", reader.include_trace(2));
+  // EXPECT_EQ("in file 'foo' at line 3\n", reader.include_trace(3));
+  // EXPECT_EQ("in file 'foo' at line 4\n", reader.include_trace(4));
+  // EXPECT_EQ("in file 'foo' at line 5\n", reader.include_trace(5));
+  // EXPECT_EQ("in file 'foo' at line 6\n", reader.include_trace(6));
+  EXPECT_EQ("in file 'foo' at line 7\n", reader.include_trace(7));
 }
+
 
 
 TEST(prog_reader, one) {
@@ -64,20 +60,31 @@ TEST(prog_reader, one) {
     std::cout << "INCLUDE DUMP(" << i << ") : " << std::endl
               << dump << std::endl;
   }
-
-/*
-
- 1 functions {            // top at 1
- 2  int foo() {           // incl at 1, from top at 2
- 3    return 1;           // incl at 2, from top at 2
- 4  }                     // incl at 3, from top at 2
- 5 }                      // top at 3
- 6 parameters {           // params at 1, from top at 4
- 7   real y;              // params at 2, from top at 4
- 8 }                      // params at 3, from top at 4
- 9 model {                // top at 4
-10 }                      // top at 5
-
-*/
-
 }
+
+
+TEST(prog_reader, two) {
+  using std::vector;
+  using std::string;
+  std::stringstream ss;
+  ss << "functions {\n"
+     << "#include incl_rec.stan\n"
+     << "}\n"
+     << "model { }\n";
+
+  vector<string> search_path = create_search_path();
+
+  stan::io::program_reader reader(ss, "my_path_is_a_string", search_path);
+
+  std::cout << std::endl << "SURVEY SAYS:" << std::endl;
+  std::cout << reader.program_stream().rdbuf();
+  std::cout << std::endl << "HISTORY:" << std::endl;
+  reader.print_history(std::cout);
+
+  for (int i = 1; i <= 10; ++i) {
+    std::string dump = reader.include_trace(i);
+    std::cout << "INCLUDE DUMP(" << i << ") : " << std::endl
+              << dump << std::endl;
+  }
+}
+

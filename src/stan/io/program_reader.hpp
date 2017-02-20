@@ -86,14 +86,21 @@ namespace stan {
        */
       std::string include_trace(int target_line_num) const {
         const dumps_t x = include_stack(target_line_num);
+        if (x.size() < 1) {
+          std::stringstream ss;
+          ss << "Target line number " << target_line_num << " not found."
+             << std::endl;
+          return ss.str();
+        }
         std::stringstream ss;
         ss << "in file '" << x[x.size() - 1].first
            << "' at line " << x[x.size() - 1].second
            << std::endl;
-        for (size_t i = x.size() - 1; i-- > 0; )
+        for (size_t i = x.size() - 1; i-- > 0; ) {
           ss << "included from file '" << x[i].first
              << "' at line " << x[i].second
              << std::endl;
+        }
         return ss.str();
       }
 
@@ -138,7 +145,7 @@ namespace stan {
           if (target <= history_[i].concat_line_num_) {
             int line = file_start + target - concat_start;
             result.push_back(dump_t(file, line));
-            break;
+            return result;
           } else if (history_[i].action_ == "start"
                      || history_[i].action_ == "restart" ) {
             file = history_[i].path_;
@@ -150,7 +157,7 @@ namespace stan {
             result.push_back(dump_t(file, history_[i].line_num_ + 1));
           }
         }
-        return result;
+        return dumps_t();
       }
 
       /**
@@ -170,7 +177,6 @@ namespace stan {
         return line.substr(start, end - start);
       }
 
-      // TODO(carpenter): need try/catch to guarantee closure of stream
       /**
        * Read the rest of a program from the specified input stream in
        * the specified path, with the specified search path for
@@ -191,7 +197,6 @@ namespace stan {
                 int& concat_line_num) {
         history_.push_back(preproc_event(concat_line_num, 0, "start", path));
         for (int line_num = 1; ; ++line_num) {
-          std::cout << path << " (" << line_num << ")" << std::endl;
           std::string line = read_line(in);
           if (line.empty()) {
             // ends initial out of loop start event
