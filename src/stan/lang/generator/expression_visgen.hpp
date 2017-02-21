@@ -72,9 +72,9 @@ namespace stan {
         std::stringstream ssRealType;
         generate_real_var_type(x.matrix_expr_scope_, x.has_var_,
                                is_var_context_, ssRealType);
-        o_ << "stan::math::to_vector(stan::math::array_builder<std::vector<";
+        o_ << "stan::math::to_matrix(stan::math::array_builder<std::vector<";
         generate_type(ssRealType.str(), x.args_, 0, o_);
-        o_ << " > >()";
+        o_ << "> >()";
         for (size_t i = 0; i < x.args_.size(); ++i) {
           o_ << ".add(";
           generate_expression(x.args_[i], user_facing_, is_var_context_, o_);
