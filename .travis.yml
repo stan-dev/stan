@@ -4,7 +4,6 @@ sudo: false
 
 os:
   - linux
-  - osx
   
 compiler:
   - clang
@@ -16,9 +15,6 @@ before_script: echo "CC=$CXX" > make/local
 
 matrix:
   fast_finish: true
-  exclude:
-    - os: osx
-      compiler: gcc
 
 env:
   -  TESTFOLDER=src/test/unit/callbacks
