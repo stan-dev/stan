@@ -23,4 +23,5 @@ model {
 generated quantities {
   vector[3] gq_v1 = [1, x, y]';
   row_vector[3] gq_rv1 = [1, x, y];
+  row_vector[3] gq_rv2 = [1, x, z];
 }

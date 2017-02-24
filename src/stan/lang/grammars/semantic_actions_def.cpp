@@ -1720,7 +1720,7 @@ namespace stan {
       }
       expr_type et = vec_expr.args_[0].expression_type();
       if (!(et.is_primitive() || et.type() == ROW_VECTOR_T)) {
-          error_msgs << "matrix expression elements must be row_vector_type "
+          error_msgs << "matrix expression elements must be type row_vector "
                      << "and vector expression elements must be int or real, "
                      << "but found element of type "
                      << et << std::endl;
@@ -1731,7 +1731,7 @@ namespace stan {
       for (size_t i = 1; i < vec_expr.args_.size(); ++i) {
         if (is_matrix) {
           if (! (vec_expr.args_[i].expression_type() == ROW_VECTOR_T)) {
-            error_msgs << "matrix expression elements must be type row_vector "
+            error_msgs << "matrix expression elements must be type row_vector, "
                        << "but found element of type "
                        << vec_expr.args_[i].expression_type() << std::endl;
             pass = false;
@@ -1739,8 +1739,8 @@ namespace stan {
           }
         } else {
           if (! (vec_expr.args_[i].expression_type().is_primitive())) {
-            error_msgs << "row vector expression elements must be type primitive "
-                       << "but found element of type "
+            error_msgs << "row vector expression elements must be primitive "
+                       << "type (int or real), but found element of type "
                        << vec_expr.args_[i].expression_type() << std::endl;
             pass = false;
             return;

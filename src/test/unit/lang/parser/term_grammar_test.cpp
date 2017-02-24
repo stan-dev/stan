@@ -2,21 +2,33 @@
 #include <test/unit/lang/utility.hpp>
 
 TEST(langParserTermGrammar, vector_expr) {
-  test_parsable("parser-generator/row_vector_expr_terms");
+  test_parsable("vec-expr/row_vector_expr_terms");
   test_throws("row_vector_expr_bad1",
               "variable definition base type mismatch");
+  test_throws("row_vector_expr_bad2",
+              "row vector expression elements must be primitive");
+  test_throws("row_vector_expr_bad3",
+              "PARSER EXPECTED: <expression>");
 }
 
 TEST(langParserTermGrammar, matrix_expr) {
-  test_parsable("parser-generator/matrix_expr_terms");
-  //  test_throws("matrix_expr_bad1",
-  //              "variable definition base type mismatch");
+  test_parsable("vec-expr/matrix_expr_terms");
+  test_throws("matrix_expr_bad1",
+              "variable definition base type mismatch");
+  test_throws("matrix_expr_bad2",
+              "matrix expression elements must be type row_vector");
+  test_throws("matrix_expr_bad3",
+              "matrix expression elements must be type row_vector");
+  test_throws("matrix_expr_bad4",
+              "found element of type matrix");
+  test_throws("matrix_expr_bad5",
+              "PARSER EXPECTED: <expression>");
 }
 
 TEST(langParserTermGrammar, array_expr) {
-  test_parsable("parser-generator/validate_array_expr_big");
-  test_parsable("parser-generator/validate_array_expr_primitives");
-  test_parsable("parser-generator/validate_array_expr_containers");
+  test_parsable("array-expr/validate_array_expr_big");
+  test_parsable("array-expr/validate_array_expr_primitives");
+  test_parsable("array-expr/validate_array_expr_containers");
   test_throws("validate_array_expr_bad1", "base type mismatch");
   test_throws("validate_array_expr_bad2", "dimension mismatch");
   test_throws("validate_array_expr_bad3", "ERROR");
