@@ -72,6 +72,7 @@ namespace stan {
         std::stringstream ssRealType;
         generate_real_var_type(x.matrix_expr_scope_, x.has_var_,
                                is_var_context_, ssRealType);
+        // to_matrix arg is std::vector of row vectors (Eigen::Matrix<T, 1, C>)
         o_ << "stan::math::to_matrix(stan::math::array_builder<Eigen::Matrix<";
         generate_type(ssRealType.str(), x.args_, 0, o_);
         o_ << ", 1, Eigen::Dynamic> >()";
@@ -89,6 +90,7 @@ namespace stan {
         std::stringstream ssRealType;
         generate_real_var_type(x.row_vector_expr_scope_, x.has_var_,
                                is_var_context_, ssRealType);
+        // to_row_vector arg is std::vector of type T
         o_ << "stan::math::to_row_vector(stan::math::array_builder<";
         generate_type(ssRealType.str(), x.args_, 0, o_);
         o_ << " >()";
