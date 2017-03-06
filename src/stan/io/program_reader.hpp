@@ -42,6 +42,16 @@ namespace stan {
     public:
 
       /**
+       * A path/position pair.
+       */
+      typedef std::pair<std::string, int> dump_t;
+
+      /**
+       * Sequence of path/position pairs.
+       */
+      typedef std::vector<dump_t> dumps_t;
+
+      /**
        * Construct a program reader from the specified stream derived
        * from the specified name or path, and a sequence of paths to
        * search for include files.  The paths should be directories.
@@ -83,14 +93,17 @@ namespace stan {
        *
        * @param target_line_num line number in concatenated program
        * @return include trace for the line number
+       * @throw std::runtime_exception if the include stack is empty
+       * or the target line number is less than 1
        */
       std::string include_trace(int target_line_num) const {
         const dumps_t x = include_stack(target_line_num);
-        if (x.size() < 1) {
+        if (x.size() < 1 || target_line_num < 1) {
           std::stringstream ss;
           ss << "Target line number " << target_line_num << " not found."
              << std::endl;
-          return ss.str();
+          std::string error_msg = ss.str();
+          throw std::runtime_error(error_msg);
         }
         std::stringstream ss;
         ss << "in file '" << x[x.size() - 1].first
@@ -103,31 +116,6 @@ namespace stan {
         }
         return ss.str();
       }
-
-      // temp to print the history out for debugging
-      void print_history(std::ostream& out) {
-        for (size_t i = 0; i < history_.size(); ++i)
-          out << i << ". (" << history_[i].concat_line_num_
-              << ", " << history_[i].line_num_
-              << ", " << history_[i].action_
-              << ", " << history_[i].path_ << ")"
-              << std::endl;
-      }
-
-
-    private:
-      std::stringstream program_;
-      std::vector<preproc_event> history_;
-
-      /**
-       * A path/position pair.
-       */
-      typedef std::pair<std::string, int> dump_t;
-
-      /**
-       * Sequence of path/position pairs.
-       */
-      typedef std::vector<dump_t> dumps_t;
 
       /**
        * Return the include trace of the path and line numbers leading
@@ -152,6 +140,7 @@ namespace stan {
             file_start = history_[i].line_num_;
             concat_start = history_[i].concat_line_num_;
           } else if (history_[i].action_ == "end") {
+            if (result.size() == 0) break;
             result.pop_back();
           } else if (history_[i].action_ == "include") {
             result.push_back(dump_t(file, history_[i].line_num_ + 1));
@@ -159,6 +148,21 @@ namespace stan {
         }
         return dumps_t();
       }
+
+      // TODO(carpenter): remove this debug function before releasing
+      void print_history(std::ostream& out) {
+        for (size_t i = 0; i < history_.size(); ++i)
+          out << i << ". (" << history_[i].concat_line_num_
+              << ", " << history_[i].line_num_
+              << ", " << history_[i].action_
+              << ", " << history_[i].path_ << ")"
+              << std::endl;
+      }
+
+
+    private:
+      std::stringstream program_;
+      std::vector<preproc_event> history_;
 
       /**
        * Returns the characters following <code>#include</code> on

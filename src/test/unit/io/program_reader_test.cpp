@@ -15,22 +15,23 @@ std::vector<std::string> create_search_path() {
 
 TEST(prog_reader, zero) {
   std::stringstream ss;
-  ss << "parameters {\n"
-     << "  real y;\n"
-     << "}\n"
-     << "model {\n"
-     << "  y ~ normal(0, 1);\n"
-     << "}\n"
-     << "";
+  ss << "parameters {\n"            // 1
+     << "  real y;\n"               // 2
+     << "}\n"                       // 3
+     << "model {\n"                 // 4
+     << "  y ~ normal(0, 1);\n"     // 5
+     << "}\n"                       // 6
+     << "";                         // 7 (nothing on line)
+
   std::vector<std::string> search_path = create_search_path();
   stan::io::program_reader reader(ss, "foo", search_path);
-  // EXPECT_EQ("in file 'foo' at line 1\n", reader.include_trace(1));
-  // EXPECT_EQ("in file 'foo' at line 2\n", reader.include_trace(2));
-  // EXPECT_EQ("in file 'foo' at line 3\n", reader.include_trace(3));
-  // EXPECT_EQ("in file 'foo' at line 4\n", reader.include_trace(4));
-  // EXPECT_EQ("in file 'foo' at line 5\n", reader.include_trace(5));
-  // EXPECT_EQ("in file 'foo' at line 6\n", reader.include_trace(6));
-  EXPECT_EQ("in file 'foo' at line 7\n", reader.include_trace(7));
+  EXPECT_EQ("in file 'foo' at line 1\n", reader.include_trace(1));
+  EXPECT_EQ("in file 'foo' at line 2\n", reader.include_trace(2));
+  EXPECT_EQ("in file 'foo' at line 3\n", reader.include_trace(3));
+  EXPECT_EQ("in file 'foo' at line 4\n", reader.include_trace(4));
+  EXPECT_EQ("in file 'foo' at line 5\n", reader.include_trace(5));
+  EXPECT_EQ("in file 'foo' at line 6\n", reader.include_trace(6));
+  EXPECT_THROW(reader.include_trace(7), std::runtime_error);
 }
 
 
