@@ -1,3 +1,11 @@
+functions {
+
+  matrix foo() {
+    matrix[3,2] result = [ [ 1, 2], [ 3, 4], [5, 6] ];
+    return result;
+  }
+
+}
 transformed data {
   real td_d1 = 1;
   real td_d2 = 2;
@@ -6,6 +14,7 @@ transformed data {
   td_rv2 = [ 10, 100 ];
   td_mat32 = [ [ 1, 2], [ 3, 4], [5, 6] ];
   td_mat32 = [ td_rv2, td_rv2, td_rv2];
+  td_mat32 = foo();
 }
 parameters {
   real p_z;
