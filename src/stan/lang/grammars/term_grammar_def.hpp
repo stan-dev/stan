@@ -298,7 +298,6 @@ namespace stan {
         %=  lit('[')
         >> expression_g(_r1) % ','
         >> lit(']');
-
     }
   }
 }
