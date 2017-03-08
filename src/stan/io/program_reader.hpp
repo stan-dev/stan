@@ -11,8 +11,6 @@
 #include <string>
 #include <vector>
 
-#include <iostream>  // TODO(carpenter): remove this line
-
 namespace stan {
   namespace io {
 
@@ -31,6 +29,10 @@ namespace stan {
                     const std::string& action, const std::string& path)
         : concat_line_num_(concat_line_num), line_num_(line_num),
           action_(action), path_(path) { }
+      void print(std::ostream& out) {
+        out << "(" << concat_line_num_ << ", " << line_num_
+            << ", " << action_ << ", " << path_ << ")";
+      }
     };
 
     /**
@@ -42,25 +44,24 @@ namespace stan {
     public:
 
       /**
-       * A path/position pair.
+       * A pair for holding a path and a line number.
        */
-      typedef std::pair<std::string, int> dump_t;
+      typedef std::pair<std::string, int> path_line_t;
 
       /**
-       * Sequence of path/position pairs.
+       * Orered sequence of path and line number pairs.
        */
-      typedef std::vector<dump_t> dumps_t;
+      typedef std::vector<path_line_t> trace_t;
 
       /**
        * Construct a program reader from the specified stream derived
        * from the specified name or path, and a sequence of paths to
        * search for include files.  The paths should be directories.
        *
-       * <p>It is up to the caller that created the input stream to
-       * close it.
+       * <p>Calling this method does not close the specified input stream.
        *
-       * @param[in] in stream from which to read
-       * @param[in] name name or path attached to stream
+       * @param[in] in stream from which to start reading
+       * @param[in] name name path or name attached to stream
        * @param[in] search_path ordered sequence of directory names to
        * search for included files
        */
@@ -71,18 +72,60 @@ namespace stan {
       }
 
       /**
-       * Return a stream from which to read the concatenated program.
-       * Modifying the stream will modify the underlying class.
+       * Return a string representing the concatenated program.  This
+       * string may be wrapped in a <code>std::stringstream</code> for
+       * reading.
        *
        * @return stream for program
        */
-      std::stringstream& program_stream() {
-        return program_;
+      std::string program() const {
+        return program_.str();
       }
 
       /**
-       * Return the include message for the target line number.  This
-       * will take the form
+       * Return the include trace of the path and line numbers leading
+       * to the specified line of text in the concatenated program.
+       *
+       * @param[in] target line number in concatenated program file
+       * @return sequence of files and positions for includes
+       */
+      trace_t trace(int target) const {
+        trace_t result;
+        std::string file = "ERROR: UNINITIALIZED";
+        int file_start = -1;
+        int concat_start = -1;
+        for (size_t i = 0; i < history_.size(); ++i) {
+          if (target <= history_[i].concat_line_num_) {
+            int line = file_start + target - concat_start;
+            result.push_back(path_line_t(file, line));
+            return result;
+          } else if (history_[i].action_ == "start"
+                     || history_[i].action_ == "restart" ) {
+            file = history_[i].path_;
+            file_start = history_[i].line_num_;
+            concat_start = history_[i].concat_line_num_;
+          } else if (history_[i].action_ == "end") {
+            if (result.size() == 0) break;
+            result.pop_back();
+          } else if (history_[i].action_ == "include") {
+            result.push_back(path_line_t(file, history_[i].line_num_ + 1));
+          }
+        }
+        throw std::runtime_error("foo");
+      }
+
+      // TODO(carpenter): remove this debug function before releasing
+      void print_history(std::ostream& out) {
+        for (size_t i = 0; i < history_.size(); ++i) {
+          out << i << ". ";
+          history_[i].print(out);
+          out << std::endl;
+        }
+      }
+
+      /**
+       * Return a string rendering of the specified include trace.
+       * The returned string will take the form:
        *
        * <pre>
        * in file '<file>' at line <num>
@@ -93,15 +136,12 @@ namespace stan {
        *
        * @param target_line_num line number in concatenated program
        * @return include trace for the line number
-       * @throw std::runtime_exception if the include stack is empty
-       * or the target line number is less than 1
+       * @throw std::runtime_exception if the trace is empty
        */
-      std::string include_trace(int target_line_num) const {
-        const dumps_t x = include_stack(target_line_num);
-        if (x.size() < 1 || target_line_num < 1) {
+      static std::string trace_to_string(const trace_t& x) {
+        if (x.size() < 1) {
           std::stringstream ss;
-          ss << "Target line number " << target_line_num << " not found."
-             << std::endl;
+          ss << "Trace is empty" << std::endl;
           std::string error_msg = ss.str();
           throw std::runtime_error(error_msg);
         }
@@ -116,49 +156,6 @@ namespace stan {
         }
         return ss.str();
       }
-
-      /**
-       * Return the include trace of the path and line numbers leading
-       * to the specified line of text in the concatenated program.
-       *
-       * @param[in] target line number in concatenated program file
-       * @return sequence of files and positions for includes
-       */
-      dumps_t include_stack(int target) const {
-        dumps_t result;
-        std::string file = "ERROR: UNINITIALIZED";
-        int file_start = -1;
-        int concat_start = -1;
-        for (size_t i = 0; i < history_.size(); ++i) {
-          if (target <= history_[i].concat_line_num_) {
-            int line = file_start + target - concat_start;
-            result.push_back(dump_t(file, line));
-            return result;
-          } else if (history_[i].action_ == "start"
-                     || history_[i].action_ == "restart" ) {
-            file = history_[i].path_;
-            file_start = history_[i].line_num_;
-            concat_start = history_[i].concat_line_num_;
-          } else if (history_[i].action_ == "end") {
-            if (result.size() == 0) break;
-            result.pop_back();
-          } else if (history_[i].action_ == "include") {
-            result.push_back(dump_t(file, history_[i].line_num_ + 1));
-          }
-        }
-        return dumps_t();
-      }
-
-      // TODO(carpenter): remove this debug function before releasing
-      void print_history(std::ostream& out) {
-        for (size_t i = 0; i < history_.size(); ++i)
-          out << i << ". (" << history_[i].concat_line_num_
-              << ", " << history_[i].line_num_
-              << ", " << history_[i].action_
-              << ", " << history_[i].path_ << ")"
-              << std::endl;
-      }
-
 
     private:
       std::stringstream program_;
