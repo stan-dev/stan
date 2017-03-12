@@ -9,31 +9,36 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace stan {
   namespace io {
 
-    /**
-     * Structure to hold preprocessing events, which hold (a) line
-     * number in concatenated program after includes, (b) line number
-     * in the stream from which the text is read, (c) a string-based
-     * action, and (d) a path to the current file.
-     */
-    struct preproc_event {
-      int concat_line_num_;
-      int line_num_;
-      std::string action_;
-      std::string path_;
-      preproc_event(int concat_line_num, int line_num,
-                    const std::string& action, const std::string& path)
-        : concat_line_num_(concat_line_num), line_num_(line_num),
-          action_(action), path_(path) { }
-      void print(std::ostream& out) {
-        out << "(" << concat_line_num_ << ", " << line_num_
-            << ", " << action_ << ", " << path_ << ")";
-      }
-    };
+    namespace internal {
+      /**
+       * Structure to hold preprocessing events, which consist of (a)
+       * line number in concatenated program after includes, (b) line
+       * number in the stream from which the text is read, (c) a
+       * string-based action, and (d) a path to the current file.
+       */
+      struct preproc_event {
+        int concat_line_num_;
+        int line_num_;
+        std::string action_;
+        std::string path_;
+
+        preproc_event(int concat_line_num, int line_num,
+                      const std::string& action, const std::string& path)
+          : concat_line_num_(concat_line_num), line_num_(line_num),
+            action_(action), path_(path) { }
+
+        void print(std::ostream& out) {
+          out << "(" << concat_line_num_ << ", " << line_num_
+              << ", " << action_ << ", " << path_ << ")";
+        }
+      };
+    }
 
     /**
      * A <code>program_reader</code> reads a Stan program and unpacks
@@ -42,7 +47,6 @@ namespace stan {
      */
     class program_reader {
     public:
-
       /**
        * A pair for holding a path and a line number.
        */
@@ -85,11 +89,15 @@ namespace stan {
       /**
        * Return the include trace of the path and line numbers leading
        * to the specified line of text in the concatenated program.
+       * The top of the stack is the most recently read path.
        *
        * @param[in] target line number in concatenated program file
        * @return sequence of files and positions for includes
        */
       trace_t trace(int target) const {
+        if (target < 1)
+          throw std::runtime_error("trace() argument target must be"
+                                   " greater than 1");
         trace_t result;
         std::string file = "ERROR: UNINITIALIZED";
         int file_start = -1;
@@ -111,16 +119,7 @@ namespace stan {
             result.push_back(path_line_t(file, history_[i].line_num_ + 1));
           }
         }
-        throw std::runtime_error("foo");
-      }
-
-      // TODO(carpenter): remove this debug function before releasing
-      void print_history(std::ostream& out) {
-        for (size_t i = 0; i < history_.size(); ++i) {
-          out << i << ". ";
-          history_[i].print(out);
-          out << std::endl;
-        }
+        throw std::runtime_error("ran beyond end of program in trace()");
       }
 
       /**
@@ -159,7 +158,7 @@ namespace stan {
 
     private:
       std::stringstream program_;
-      std::vector<preproc_event> history_;
+      std::vector<internal::preproc_event> history_;
 
       /**
        * Returns the characters following <code>#include</code> on
@@ -196,6 +195,7 @@ namespace stan {
       void read(std::istream& in, const std::string& path,
                 const std::vector<std::string>& search_path,
                 int& concat_line_num) {
+        using internal::preproc_event;
         history_.push_back(preproc_event(concat_line_num, 0, "start", path));
         for (int line_num = 1; ; ++line_num) {
           std::string line = read_line(in);
@@ -236,7 +236,6 @@ namespace stan {
           }
         }
       }
-
     };
 
   }
