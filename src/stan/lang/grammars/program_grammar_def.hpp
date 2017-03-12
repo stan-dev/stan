@@ -15,13 +15,11 @@
 #include <utility>
 #include <vector>
 
-namespace {
-  // hack to pass pair into macro below to adapt; in namespace to hide
-  struct DUMMY_STRUCT {
-    typedef std::pair<std::vector<stan::lang::var_decl>,
-                      std::vector<stan::lang::statement> > type;
-  };
-}
+// hack to pass pair into macro below to adapt; in namespace to hide
+struct DUMMY_STRUCT {
+  typedef std::pair<std::vector<stan::lang::var_decl>,
+                    std::vector<stan::lang::statement> > type;
+};
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::program,
                           (std::vector<stan::lang::function_decl_def>,
@@ -56,10 +54,11 @@ namespace stan {
         using boost::spirit::qi::_1;
         using boost::spirit::qi::_2;
         using boost::spirit::qi::_3;
-        using boost::spirit::qi::_4;
+        using boost::spirit::qi::labels::_a;
 
         // add model_name to var_map with special origin
-        var_map_.add(model_name, base_var_decl(), model_name_origin);
+        var_map_.add(model_name, base_var_decl(),
+                     scope(model_name_origin, true));
 
         program_r.name("program");
         program_r
@@ -67,16 +66,17 @@ namespace stan {
           > -data_var_decls_r
           > -derived_data_var_decls_r
           > -param_var_decls_r
-          > eps[add_lp_var_f(boost::phoenix::ref(var_map_))]
+          > eps[add_params_var_f(boost::phoenix::ref(var_map_))]
           > -derived_var_decls_r
           > model_r
-          > eps[remove_lp_var_f(boost::phoenix::ref(var_map_))]
+          > eps[remove_params_var_f(boost::phoenix::ref(var_map_))]
           > -generated_var_decls_r;
 
         model_r.name("model declaration (or perhaps an earlier block)");
         model_r
           %= lit("model")
-          > statement_g(true, local_origin, false, false);
+          > eps[set_var_scope_local_f(_a, model_name_origin)]
+          > statement_g(_a, false);
 
         end_var_decls_r.name(
             "one of the following:\n"
@@ -107,7 +107,8 @@ namespace stan {
         data_var_decls_r
           %= (lit("data")
               > lit('{'))
-          >  var_decls_g(true, data_origin)  // +constraints
+          > eps[set_var_scope_f(_a, data_origin)]
+          >  var_decls_g(true, _a)
           > end_var_decls_r;
 
         derived_data_var_decls_r.name("transformed data block");
@@ -115,18 +116,20 @@ namespace stan {
           %= ((lit("transformed")
                >> lit("data"))
               > lit('{'))
-          > var_decls_g(true, transformed_data_origin)  // -constraints
-          > ((statement_g(false, transformed_data_origin, false, false)
-              > *statement_g(false, transformed_data_origin, false, false)
+          > eps[set_var_scope_f(_a, transformed_data_origin)]
+          > var_decls_g(true, _a)
+          > ((statement_g(_a, false)
+              > *statement_g(_a, false)
               > end_var_definitions_r)
-             | (*statement_g(false, transformed_data_origin, false, false)
+             | (*statement_g(_a, false)
                 > end_var_decls_statements_r));
 
         param_var_decls_r.name("parameter variable declarations");
         param_var_decls_r
           %= (lit("parameters")
               > lit('{'))
-          > var_decls_g(true, parameter_origin)  // +constraints
+          > eps[set_var_scope_f(_a, parameter_origin)]
+          > var_decls_g(true, _a)
           > end_var_decls_r;
 
         derived_var_decls_r.name("derived variable declarations");
@@ -134,8 +137,9 @@ namespace stan {
           %= (lit("transformed")
               > lit("parameters")
               > lit('{'))
-          > var_decls_g(true, transformed_parameter_origin)
-          > *statement_g(false, transformed_parameter_origin, false, false)
+          > eps[set_var_scope_f(_a, transformed_parameter_origin)]
+          > var_decls_g(true, _a)
+          > *statement_g(_a, false)
           > end_var_decls_statements_r;
 
         generated_var_decls_r.name("generated variable declarations");
@@ -143,8 +147,9 @@ namespace stan {
           %= (lit("generated")
               > lit("quantities")
               > lit('{'))
-          > var_decls_g(true, derived_origin)
-          > *statement_g(false, derived_origin, false, false)
+          > eps[set_var_scope_f(_a, derived_origin)]
+          > var_decls_g(true, _a)
+          > *statement_g(_a, false)
           > end_var_decls_statements_r;
 
         on_error<rethrow>(program_r,

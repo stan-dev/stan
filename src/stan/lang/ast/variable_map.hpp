@@ -1,7 +1,7 @@
 #ifndef STAN_LANG_AST_VARIABLE_MAP_HPP
 #define STAN_LANG_AST_VARIABLE_MAP_HPP
 
-#include <stan/lang/ast/var_origin.hpp>
+#include <stan/lang/ast/scope.hpp>
 #include <stan/lang/ast/node/base_var_decl.hpp>
 #include <cstddef>
 #include <map>
@@ -12,14 +12,13 @@ namespace stan {
   namespace lang {
 
     /**
-     * A map from function names to their base declarations and their
-     * origin.  
+     * A map from function names to their base declarations and their scope.
      */
     struct variable_map {
       /**
-       * A variable type and the origin of its declaration.
+       * A variable type and the scope of its declaration.
        */
-      typedef std::pair<base_var_decl, var_origin> range_t;
+      typedef std::pair<base_var_decl, scope> range_t;
 
       /**
        * Return true if a variable has been declared with the
@@ -63,29 +62,29 @@ namespace stan {
       std::size_t get_num_dims(const std::string& name) const;
 
       /**
-       * Return the origin of the variable declaration for the
+       * Return the scope in which the variable is declared for the
        * variable with the specified name.
        *
        * @param name variable name
-       * @return origin for the variable
+       * @return scope of the variable
        * @throw std::invalid_argument if the variable has not been
        * declared 
        */
-      var_origin get_origin(const std::string& name) const;
+      scope get_scope(const std::string& name) const;
 
       /**
        * Add the specified declaration for a variable with the
-       * specified name originating in the specified block.  Will
-       * destructively overwrite the declaration of an existing
-       * variable if called with a new declaration and origin. 
+       * specified name in the specified scope.
+       * Destructively overwrites the declaration of an existing
+       * variable if called with a new declaration and scope. 
        *
        * @param name variable name
        * @param base_decl variable declaration
-       * @param vo origin
+       * @param scope_decl declaration scope 
        */
       void add(const std::string& name,
                const base_var_decl& base_decl,
-               const var_origin& vo);
+               const scope& scope_decl);
 
       /**
        * Remove the declaraiton for the variable with the specified

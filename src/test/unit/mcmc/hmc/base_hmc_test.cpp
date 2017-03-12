@@ -1,5 +1,5 @@
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
-#include <stan/interface_callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/stream_writer.hpp>
 #include <stan/mcmc/hmc/base_hmc.hpp>
 #include <boost/random/additive_combine.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -23,8 +23,8 @@ namespace stan {
       { }
 
       sample transition(sample& init_sample,
-                        interface_callbacks::writer::base_writer& info_writer,
-                        interface_callbacks::writer::base_writer& error_writer) {
+                        callbacks::writer& info_writer,
+                        callbacks::writer& error_writer) {
         this->seed(init_sample.cont_params());
         return sample(this->z_.q, - this->hamiltonian_.V(this->z_), 0);
       }
@@ -121,7 +121,7 @@ TEST(McmcBaseHMC, streams) {
   stan::mcmc::mock_hmc sampler(model, base_rng);
 
   std::stringstream output;
-  stan::interface_callbacks::writer::stream_writer writer(output);
+  stan::callbacks::stream_writer writer(output);
 
   EXPECT_NO_THROW(sampler.write_sampler_state(writer));
   EXPECT_EQ("Step size = 0.1\n",

@@ -46,12 +46,12 @@ namespace stan {
        * @param dims array dimension sizes
        * @param def defition of variable
        */
-      matrix_var_decl(range const& range,
-                      expression const& M,
-                      expression const& N,
-                      std::string const& name,
-                      std::vector<expression> const& dims,
-                      expression const& def);
+      matrix_var_decl(const range& range,
+                      const expression& M,
+                      const expression& N,
+                      const std::string& name,
+                      const std::vector<expression>& dims,
+                      const expression& def);
     };
   }
 }

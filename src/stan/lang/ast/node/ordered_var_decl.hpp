@@ -30,10 +30,12 @@ namespace stan {
        * @param K size of ordered vector
        * @param name variable name
        * @param dims array dimension sizes
+       * @param def definition
        */
       ordered_var_decl(const expression& K,
                        const std::string& name,
-                       const std::vector<expression>& dims);
+                       const std::vector<expression>& dims,
+                       const expression& def);
     };
 
   }

@@ -31,10 +31,12 @@ namespace stan {
        * @param K number of rows and columns
        * @param name variable name
        * @param dims array dimension sizes
+       * @param def defition of variable
        */
       cov_matrix_var_decl(const expression& K,
                           const std::string& name,
-                          const std::vector<expression>& dims);
+                          const std::vector<expression>& dims,
+                          const expression& def);
     };
   }
 }
