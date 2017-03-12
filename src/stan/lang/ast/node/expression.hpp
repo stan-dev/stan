@@ -68,7 +68,6 @@ namespace stan {
       expr_type expression_type() const;
       int total_dims() const;
 
-      // TODO(morris): are these implemented?
       expression& operator+=(const expression& rhs);
       expression& operator-=(const expression& rhs);
       expression& operator*=(const expression& rhs);

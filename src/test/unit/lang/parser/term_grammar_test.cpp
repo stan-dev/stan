@@ -6,7 +6,7 @@ TEST(langParserTermGrammar, vector_expr) {
   test_throws("row_vector_expr_bad1",
               "variable definition base type mismatch");
   test_throws("row_vector_expr_bad2",
-              "row vector expression elements must be primitive");
+              "Row vector expression elements must be int or real");
   test_throws("row_vector_expr_bad3",
               "PARSER EXPECTED: <expression>");
 }
@@ -16,9 +16,9 @@ TEST(langParserTermGrammar, matrix_expr) {
   test_throws("matrix_expr_bad1",
               "variable definition base type mismatch");
   test_throws("matrix_expr_bad2",
-              "matrix expression elements must be type row_vector");
+              "Matrix expression elements must be type row_vector");
   test_throws("matrix_expr_bad3",
-              "matrix expression elements must be type row_vector");
+              "Matrix expression elements must be type row_vector");
   test_throws("matrix_expr_bad4",
               "found element of type matrix");
   test_throws("matrix_expr_bad5",

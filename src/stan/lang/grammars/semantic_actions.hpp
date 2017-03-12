@@ -566,7 +566,7 @@ namespace stan {
     extern boost::phoenix::function<set_fun_type_named> set_fun_type_named_f;
 
     // called from: term_grammar
-    struct set_array_expr_type : public phoenix_functor_senary {
+    struct infer_array_expr_type : public phoenix_functor_senary {
       void operator()(expression& e,
                       array_expr& array_expr,
                       const scope& var_scope,
@@ -574,10 +574,11 @@ namespace stan {
                       const variable_map& var_map,
                       std::ostream& error_msgs) const;
     };
-    extern boost::phoenix::function<set_array_expr_type> set_array_expr_type_f;
+    extern boost::phoenix::function<infer_array_expr_type>
+    infer_array_expr_type_f;
 
     // called from: term_grammar
-    struct set_vec_expr_type : public phoenix_functor_senary {
+    struct infer_vec_or_matrix_expr_type : public phoenix_functor_senary {
       void operator()(expression& e,
                       row_vector_expr& vec_expr,
                       const scope& var_scope,
@@ -585,7 +586,8 @@ namespace stan {
                       const variable_map& var_map,
                       std::ostream& error_msgs) const;
     };
-    extern boost::phoenix::function<set_vec_expr_type> set_vec_expr_type_f;
+    extern boost::phoenix::function<infer_vec_or_matrix_expr_type>
+    infer_vec_or_matrix_expr_type_f;
 
     // called from: term_grammar
     struct exponentiation_expr : public phoenix_functor_quinary {

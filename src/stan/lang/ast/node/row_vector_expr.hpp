@@ -44,15 +44,15 @@ namespace stan {
        *
        * @param args sequence of arguments
        */
-      row_vector_expr(const std::vector<expression>& args);  // NOLINT
+      explicit row_vector_expr(const std::vector<expression>& args);
 
       /**
        * Assign specified row_vector expression to this row_vector expression.
        *
-       * @param al new row_vector expression value
+       * @param ve new row_vector expression value
        * @return reference to value
        */
-      row_vector_expr& operator=(const row_vector_expr& al);
+      row_vector_expr& operator=(const row_vector_expr& ve);
     };
 
   }

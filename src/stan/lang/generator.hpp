@@ -46,6 +46,7 @@
 // generation functions, starts from geneate_cpp
 #include <stan/lang/generator/generate_arg_decl.hpp>
 #include <stan/lang/generator/generate_array_var_type.hpp>
+#include <stan/lang/generator/generate_array_builder_adds.hpp>
 #include <stan/lang/generator/generate_bare_type.hpp>
 #include <stan/lang/generator/generate_catch_throw_located.hpp>
 #include <stan/lang/generator/generate_class_decl.hpp>

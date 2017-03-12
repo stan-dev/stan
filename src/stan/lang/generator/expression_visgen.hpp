@@ -18,6 +18,10 @@ namespace stan {
     void generate_expression(const expression& e, bool user_facing,
                              bool is_var_context, std::ostream& o);
 
+    void generate_array_builder_adds(const std::vector<expression>& elements,
+                                     bool user_facing, bool is_var_context,
+                                     std::ostream& o);
+
     void generate_idxs(const std::vector<idx>& idxs, std::ostream& o);
 
     void generate_idxs_user(const std::vector<idx>& idxs, std::ostream& o);
@@ -59,11 +63,7 @@ namespace stan {
                       x.type_.num_dims_ - 1,
                       o_);
         o_ << " >()";
-        for (size_t i = 0; i < x.args_.size(); ++i) {
-          o_ << ".add(";
-          generate_expression(x.args_[i], user_facing_, is_var_context_, o_);
-          o_ << ")";
-        }
+        generate_array_builder_adds(x.args_, user_facing_, is_var_context_, o_);
         o_ << ".array()";
         o_ << ")";
       }
@@ -76,11 +76,7 @@ namespace stan {
         o_ << "stan::math::to_matrix(stan::math::array_builder<Eigen::Matrix<";
         generate_type(ssRealType.str(), x.args_, 0, o_);
         o_ << ", 1, Eigen::Dynamic> >()";
-        for (size_t i = 0; i < x.args_.size(); ++i) {
-          o_ << ".add(";
-          generate_expression(x.args_[i], user_facing_, is_var_context_, o_);
-          o_ << ")";
-        }
+        generate_array_builder_adds(x.args_, user_facing_, is_var_context_, o_);
         o_ << ".array()";
         o_ << ")";
       }
@@ -94,11 +90,7 @@ namespace stan {
         o_ << "stan::math::to_row_vector(stan::math::array_builder<";
         generate_type(ssRealType.str(), x.args_, 0, o_);
         o_ << " >()";
-        for (size_t i = 0; i < x.args_.size(); ++i) {
-          o_ << ".add(";
-          generate_expression(x.args_[i], user_facing_, is_var_context_, o_);
-          o_ << ")";
-        }
+        generate_array_builder_adds(x.args_, user_facing_, is_var_context_, o_);
         o_ << ".array()";
         o_ << ")";
       }

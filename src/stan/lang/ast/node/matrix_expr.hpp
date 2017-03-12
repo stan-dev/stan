@@ -54,7 +54,7 @@ namespace stan {
        *
        * @param args sequence of arguments
        */
-      matrix_expr(const std::vector<expression>& args);  // NOLINT
+      explicit matrix_expr(const std::vector<expression>& args);
 
       /**
        * Assign specified matrix expression to this matrix expression.

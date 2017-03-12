@@ -217,11 +217,11 @@ namespace stan {
         | int_literal_r[assign_lhs_f(_val, _1)]
         | double_literal_r[assign_lhs_f(_val, _1)]
         | (array_expr_r(_r1)[assign_lhs_f(_c, _1)]
-           > eps[set_array_expr_type_f(_val, _c, _r1, _pass,
+           > eps[infer_array_expr_type_f(_val, _c, _r1, _pass,
                                        boost::phoenix::ref(var_map_),
                                        boost::phoenix::ref(error_msgs_))])
         | (vec_expr_r(_r1)[assign_lhs_f(_d, _1)]
-           > eps[set_vec_expr_type_f(_val, _d, _r1, _pass,
+           > eps[infer_vec_or_matrix_expr_type_f(_val, _d, _r1, _pass,
                                      boost::phoenix::ref(var_map_),
                                      boost::phoenix::ref(error_msgs_))])
         | (lit('(')

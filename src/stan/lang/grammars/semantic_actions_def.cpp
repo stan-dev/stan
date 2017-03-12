@@ -1657,7 +1657,7 @@ namespace stan {
     }
     boost::phoenix::function<set_fun_type_named> set_fun_type_named_f;
 
-    void set_array_expr_type::operator()(expression& e,
+    void infer_array_expr_type::operator()(expression& e,
                       array_expr& array_expr,
                       const scope& var_scope,
                       bool& pass,
@@ -1665,7 +1665,7 @@ namespace stan {
                       std::ostream& error_msgs) const {
       if (array_expr.args_.size() == 0) {
         // shouldn't occur, because of % operator used to construct it
-        error_msgs << "array expression found size 0, must be > 0";
+        error_msgs << "Array expression found size 0, must be > 0";
         array_expr.type_ = expr_type(ILL_FORMED_T);
         pass = false;
         return;
@@ -1676,7 +1676,7 @@ namespace stan {
         expr_type et_next;
         et_next = array_expr.args_[i].expression_type();
         if (et.num_dims_ != et_next.num_dims_) {
-          error_msgs << "expressions for elements of array must have"
+          error_msgs << "Expressions for elements of array must have"
                      << " same array sizes; found"
                      << " previous type=" << et
                      << "; type at position " << i << "=" << et_next;
@@ -1688,7 +1688,7 @@ namespace stan {
             || (et.base_type_ == DOUBLE_T && et_next.base_type_ == INT_T)) {
           et.base_type_ = DOUBLE_T;
         } else if (et.base_type_ != et_next.base_type_) {
-          error_msgs << "expressions for elements of array must have"
+          error_msgs << "Expressions for elements of array must have"
                      << " the same or promotable types; found"
                      << " previous type=" << et
                      << "; type at position " << i << "=" << et_next;
@@ -1704,9 +1704,9 @@ namespace stan {
       e = array_expr;
       pass = true;
     }
-    boost::phoenix::function<set_array_expr_type> set_array_expr_type_f;
+    boost::phoenix::function<infer_array_expr_type> infer_array_expr_type_f;
 
-    void set_vec_expr_type::operator()(expression& e,
+    void infer_vec_or_matrix_expr_type::operator()(expression& e,
                                        row_vector_expr& vec_expr,
                                        const scope& var_scope,
                                        bool& pass,
@@ -1714,37 +1714,35 @@ namespace stan {
                                        std::ostream& error_msgs) const {
       if (vec_expr.args_.size() == 0) {
         // shouldn't occur, because of % operator used to construct it
-        error_msgs << "vector or matrix expression found size 0, must be > 0";
+        error_msgs << "Vector or matrix expression found size 0, must be > 0";
         pass = false;
         return;
       }
       expr_type et = vec_expr.args_[0].expression_type();
       if (!(et.is_primitive() || et.type() == ROW_VECTOR_T)) {
-          error_msgs << "matrix expression elements must be type row_vector "
-                     << "and vector expression elements must be int or real, "
-                     << "but found element of type "
+          error_msgs << "Matrix expression elements must be type row_vector "
+                     << "and row vector expression elements must be int "
+                     << "or real, but found element of type "
                      << et << std::endl;
           pass = false;
           return;
       }
       bool is_matrix = et.type() == ROW_VECTOR_T;
       for (size_t i = 1; i < vec_expr.args_.size(); ++i) {
-        if (is_matrix) {
-          if (!(vec_expr.args_[i].expression_type() == ROW_VECTOR_T)) {
-            error_msgs << "matrix expression elements must be type row_vector, "
-                       << "but found element of type "
-                       << vec_expr.args_[i].expression_type() << std::endl;
-            pass = false;
-            return;
-          }
-        } else {
-          if (!(vec_expr.args_[i].expression_type().is_primitive())) {
-            error_msgs << "row vector expression elements must be primitive "
-                       << "type (int or real), but found element of type "
-                       << vec_expr.args_[i].expression_type() << std::endl;
-            pass = false;
-            return;
-          }
+        if (is_matrix &&
+            !(vec_expr.args_[i].expression_type() == ROW_VECTOR_T)) {
+          error_msgs << "Matrix expression elements must be type row_vector, "
+                     << "but found element of type "
+                     << vec_expr.args_[i].expression_type() << std::endl;
+          pass = false;
+          return;
+        } else if (!(is_matrix) &&
+                   !(vec_expr.args_[i].expression_type().is_primitive())) {
+          error_msgs << "Row vector expression elements must be int or real, "
+                     << "but found element of type "
+                     << vec_expr.args_[i].expression_type() << std::endl;
+          pass = false;
+          return;
         }
       }
       if (is_matrix) {
@@ -1760,7 +1758,8 @@ namespace stan {
       }
       pass = true;
     }
-    boost::phoenix::function<set_vec_expr_type> set_vec_expr_type_f;
+    boost::phoenix::function<infer_vec_or_matrix_expr_type>
+    infer_vec_or_matrix_expr_type_f;
 
     void exponentiation_expr::operator()(expression& expr1,
                                          const expression& expr2,

@@ -74,7 +74,7 @@ namespace stan {
        * expression.
        *
        * @param[in] e expression
-       * @return true if the variable occurs in any of the array
+       * @return true if the variable occurs in any of the matrix
        * expression elements
        */
       bool operator()(const matrix_expr& e) const;
@@ -84,7 +84,7 @@ namespace stan {
        * expression.
        *
        * @param[in] e expression
-       * @return true if the variable occurs in any of the array
+       * @return true if the variable occurs in any of the row_vector
        * expression elements
        */
       bool operator()(const row_vector_expr& e) const;
