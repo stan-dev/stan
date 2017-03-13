@@ -13,7 +13,7 @@ namespace stan {
      * which generates chain of calls to math lib array_builder add function
      * for each of the contained elements.
      *
-     * @param[in] vector of expression elements to generate
+     * @param[in] elements vector of expression elements to generate
      * @param[in] user_facing true if generation is to read by user, false
      * for code generation in C++
      * @param[in] is_var_context true if generation in parameter var
