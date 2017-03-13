@@ -542,3 +542,14 @@ TEST(langGenerator, genArrayVars) {
   stan::lang::generate_array_var_type(MATRIX_T,ssReal.str(),false,o);
   EXPECT_EQ(1, count_matches("matrix_d", o.str()));
 }
+
+TEST(genArrayBuilderAdds, addScalars) {
+  stan::lang::expression e_d3(stan::lang::double_literal(3));
+  std::vector<stan::lang::expression> elts;
+  elts.push_back(e_d3);
+  elts.push_back(e_d3);
+  elts.push_back(e_d3);
+  std::stringstream o2;
+  stan::lang::generate_array_builder_adds(elts, true, false, o2);
+  EXPECT_EQ(3, count_matches(".add(", o2.str()));
+}
