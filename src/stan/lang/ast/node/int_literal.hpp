@@ -28,7 +28,6 @@ namespace stan {
        * @param val value of literal
        */
       explicit int_literal(int val);
-
     };
 
   }
