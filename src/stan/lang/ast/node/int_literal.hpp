@@ -27,23 +27,10 @@ namespace stan {
        *
        * @param val value of literal
        */
-      int_literal(int val);  // NOLINT(runtime/explicit)
+      explicit int_literal(int val);
 
-      /**
-       * Copy constructor.
-       *
-       * @param il value
-       */
-      int_literal(const int_literal& il);  // NOLINT(runtime/explicit)
-
-      /**
-       * Assignment for int literals.
-       *
-       * @param il new value
-       * @return reference to literal assigned
-       */
-      int_literal& operator=(const int_literal& il);
     };
+
   }
 }
 #endif
