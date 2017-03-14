@@ -11,10 +11,6 @@ namespace stan {
 
     row_vector_expr::row_vector_expr(const std::vector<expression>& args)
       : args_(args) { }
-
-    row_vector_expr& row_vector_expr::operator=(const row_vector_expr& ve) {
-      args_ = ve.args_;
-      return *this;
     }
 
   }

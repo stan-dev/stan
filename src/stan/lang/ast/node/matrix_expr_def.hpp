@@ -12,11 +12,6 @@ namespace stan {
     matrix_expr::matrix_expr(const std::vector<expression>& args)
       : args_(args) { }
 
-    matrix_expr& matrix_expr::operator=(const matrix_expr& me) {
-      args_ = me.args_;
-      return *this;
-    }
-
   }
 }
 #endif

@@ -49,15 +49,7 @@ namespace stan {
        *
        * @param args sequence of arguments
        */
-      array_expr(const std::vector<expression>& args);  // NOLINT
-
-      /**
-       * Assign specified array expression to this array expression.
-       *
-       * @param al new array expression value
-       * @return reference to value
-       */
-      array_expr& operator=(const array_expr& al);
+      explicit array_expr(const std::vector<expression>& args);
     };
 
   }

@@ -55,14 +55,6 @@ namespace stan {
        * @param args sequence of arguments
        */
       explicit matrix_expr(const std::vector<expression>& args);
-
-      /**
-       * Assign specified matrix expression to this matrix expression.
-       *
-       * @param me new matrix expression value
-       * @return reference to value
-       */
-      matrix_expr& operator=(const matrix_expr& me);
     };
 
   }
