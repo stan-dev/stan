@@ -11,7 +11,6 @@ namespace stan {
 
     array_expr::array_expr(const std::vector<expression>& args)
       : args_(args), type_() { }
-    }
 
   }
 }

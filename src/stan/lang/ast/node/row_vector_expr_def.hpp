@@ -11,7 +11,6 @@ namespace stan {
 
     row_vector_expr::row_vector_expr(const std::vector<expression>& args)
       : args_(args) { }
-    }
 
   }
 }
