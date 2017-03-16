@@ -1,5 +1,5 @@
-#ifndef STAN_LANG_AST_NODE_ARRAY_EXPR_HPP
-#define STAN_LANG_AST_NODE_ARRAY_EXPR_HPP
+#ifndef STAN_LANG_AST_NODE_MATRIX_EXPR_HPP
+#define STAN_LANG_AST_NODE_MATRIX_EXPR_HPP
 
 #include <stan/lang/ast/expr_type.hpp>
 #include <stan/lang/ast/scope.hpp>
@@ -12,18 +12,23 @@ namespace stan {
     struct expresssion;
 
     /**
-     * Structure to hold an array expression.
+     * Structure to hold a matrix expression.
      */
-    struct array_expr {
+    struct matrix_expr {
       /**
-       * Sequence of expressions for array values.
+       * Sequence of expressions for matrix values.
        */
       std::vector<expression> args_;
 
       /**
-       * Type of array.
+       * Number of rows.
        */
-      expr_type type_;
+      expression M_;
+
+      /**
+       * Number of columns.
+       */
+      expression N_;
 
       /**
        * True if there is a variable within any of the expressions
@@ -33,23 +38,23 @@ namespace stan {
       bool has_var_;
 
       /**
-       * Scope of this array expression.
+       * Scope of this matrix expression.
        *
        */
-      scope array_expr_scope_;
+      scope matrix_expr_scope_;
 
       /**
-       * Construct a default array expression.
+       * Construct a default matrix expression.
        */
-      array_expr();
+      matrix_expr();
 
       /**
-       * Construct an array expression from the specified sequence of
+       * Construct an matrix expression from the specified sequence of
        * expressions.
        *
        * @param args sequence of arguments
        */
-      explicit array_expr(const std::vector<expression>& args);
+      explicit matrix_expr(const std::vector<expression>& args);
     };
 
   }

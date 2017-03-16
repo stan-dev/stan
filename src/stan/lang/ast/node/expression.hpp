@@ -3,20 +3,6 @@
 
 #include <stan/lang/ast/expr_type.hpp>
 
-// #include <stan/lang/ast/node/nil.hpp>
-// #include <stan/lang/ast/node/int_literal.hpp>
-// #include <stan/lang/ast/node/double_literal.hpp>
-// #include <stan/lang/ast/node/array_expr.hpp>
-// #include <stan/lang/ast/node/variable.hpp>
-// #include <stan/lang/ast/node/fun.hpp>
-// #include <stan/lang/ast/node/integrate_ode.hpp>
-// #include <stan/lang/ast/node/integrate_ode_control.hpp>
-// #include <stan/lang/ast/node/index_op.hpp>
-// #include <stan/lang/ast/node/index_op_sliced.hpp>
-// #include <stan/lang/ast/node/conditional_op.hpp>
-// #include <stan/lang/ast/node/binary_op.hpp>
-// #include <stan/lang/ast/node/unary_op.hpp>
-
 #include <boost/variant/recursive_variant.hpp>
 #include <string>
 #include <vector>
@@ -28,6 +14,8 @@ namespace stan {
     struct int_literal;
     struct double_literal;
     struct array_expr;
+    struct matrix_expr;
+    struct row_vector_expr;
     struct variable;
     struct fun;
     struct integrate_ode;
@@ -43,6 +31,8 @@ namespace stan {
                              boost::recursive_wrapper<int_literal>,
                              boost::recursive_wrapper<double_literal>,
                              boost::recursive_wrapper<array_expr>,
+                             boost::recursive_wrapper<matrix_expr>,
+                             boost::recursive_wrapper<row_vector_expr>,
                              boost::recursive_wrapper<variable>,
                              boost::recursive_wrapper<integrate_ode>,
                              boost::recursive_wrapper<integrate_ode_control>,
@@ -62,6 +52,8 @@ namespace stan {
       expression(const int_literal& expr);  // NOLINT(runtime/explicit)
       expression(const double_literal& expr);  // NOLINT(runtime/explicit)
       expression(const array_expr& expr);  // NOLINT(runtime/explicit)
+      expression(const matrix_expr& expr);  // NOLINT(runtime/explicit)
+      expression(const row_vector_expr& expr);  // NOLINT(runtime/explicit)
       expression(const variable& expr);  // NOLINT(runtime/explicit)
       expression(const fun& expr);  // NOLINT(runtime/explicit)
       expression(const integrate_ode& expr);  // NOLINT(runtime/explicit)
