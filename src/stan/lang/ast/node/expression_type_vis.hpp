@@ -11,6 +11,8 @@ namespace stan {
     struct int_literal;
     struct double_literal;
     struct array_expr;
+    struct matrix_expr;
+    struct row_vector_expr;
     struct variable;
     struct fun;
     struct integrate_ode;
@@ -30,6 +32,8 @@ namespace stan {
       expr_type operator()(const int_literal& e) const;
       expr_type operator()(const double_literal& e) const;
       expr_type operator()(const array_expr& e) const;
+      expr_type operator()(const matrix_expr& e) const;
+      expr_type operator()(const row_vector_expr& e) const;
       expr_type operator()(const variable& e) const;
       expr_type operator()(const fun& e) const;
       expr_type operator()(const integrate_ode& e) const;

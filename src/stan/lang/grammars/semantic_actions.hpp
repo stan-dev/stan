@@ -566,7 +566,7 @@ namespace stan {
     extern boost::phoenix::function<set_fun_type_named> set_fun_type_named_f;
 
     // called from: term_grammar
-    struct set_array_expr_type : public phoenix_functor_senary {
+    struct infer_array_expr_type : public phoenix_functor_senary {
       void operator()(expression& e,
                       array_expr& array_expr,
                       const scope& var_scope,
@@ -574,7 +574,20 @@ namespace stan {
                       const variable_map& var_map,
                       std::ostream& error_msgs) const;
     };
-    extern boost::phoenix::function<set_array_expr_type> set_array_expr_type_f;
+    extern boost::phoenix::function<infer_array_expr_type>
+    infer_array_expr_type_f;
+
+    // called from: term_grammar
+    struct infer_vec_or_matrix_expr_type : public phoenix_functor_senary {
+      void operator()(expression& e,
+                      row_vector_expr& vec_expr,
+                      const scope& var_scope,
+                      bool& pass,
+                      const variable_map& var_map,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<infer_vec_or_matrix_expr_type>
+    infer_vec_or_matrix_expr_type_f;
 
     // called from: term_grammar
     struct exponentiation_expr : public phoenix_functor_quinary {
@@ -704,6 +717,8 @@ namespace stan {
       bool operator()(const int_literal& /*x*/) const;
       bool operator()(const double_literal& /*x*/) const;
       bool operator()(const array_expr& x) const;
+      bool operator()(const matrix_expr& x) const;
+      bool operator()(const row_vector_expr& x) const;
       bool operator()(const variable& x) const;
       bool operator()(const integrate_ode& x) const;
       bool operator()(const integrate_ode_control& x) const;
