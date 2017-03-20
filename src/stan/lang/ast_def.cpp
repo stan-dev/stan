@@ -92,6 +92,8 @@
 #include <stan/lang/ast/node/range_def.hpp>
 #include <stan/lang/ast/node/reject_statement_def.hpp>
 #include <stan/lang/ast/node/return_statement_def.hpp>
+#include <stan/lang/ast/node/matrix_expr_def.hpp>
+#include <stan/lang/ast/node/row_vector_expr_def.hpp>
 #include <stan/lang/ast/node/row_vector_var_decl_def.hpp>
 #include <stan/lang/ast/node/sample_def.hpp>
 #include <stan/lang/ast/node/simplex_var_decl_def.hpp>

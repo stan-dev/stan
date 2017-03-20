@@ -1487,7 +1487,66 @@ encoding, such as ASCII itself, UTF-8, or Latin1.  It is up to user
 shells and editors to display them properly.
 
 
-\section{Array Expressions}
+\section{Vector, Matrix, and Array Expressions}
+
+Expressions for the Stan container objects arrays, vectors, and
+matrices can be constructed via a sequence of expressions
+enclosed in either curly braces for arrays, or square brackets for
+vectors and matrices.
+
+\subsection{Vector Expressions}
+
+Square brackets may be wrapped around a sequence of comma separated
+primitive expressions to produce a row vector expression.   For
+example, the expression \Verb|[ 1, 10, 100 ]| denotes a row vector of
+three elements with real values 1.0, 10.0, and 100.0.
+Applying the transpose operator to a row vector expression produces 
+a vector expression.
+This syntax provides a way declare and define small vectors a single line, as follows.
+
+%
+\begin{stancode}
+row_vector[2] rv2=  [ 1, 2 ];
+vector[3] v3 = [ 3, 4, 5 ]';
+\end{stancode}
+%
+
+The vector expression values may be compound expressions
+or variable names,  so it is legal to write 
+\Verb|[ 2 * 3, 1 + 4]|  or \Verb|[ x, y ]|, providing that \Verb|x|
+and \Verb|y| are primitive variables.
+
+\subsection{Matrix Expressions}
+
+A matrix expression consists of square brackets wrapped
+around a sequence of comma separated row vector expressions.
+This syntax provides a way declare and define a matrix in a single
+line, as follows.
+
+%
+\begin{stancode}
+matrix[3,2] m1 = [ [ 1, 2 ], [ 3, 4 ], [5, 6 ] ];
+\end{stancode}
+%
+
+Any expression denoting a row vector can be used in a matrix expression.
+For example, the following code is valid:
+
+%
+\begin{stancode}
+vector[2] vX = [ 1, 10 ]';
+row_vector[2] vY = [ 100, 1000 ];
+matrix[3,2] m2 = [ vX', vY, [ 1, 2 ]  ];
+\end{stancode}
+%
+
+\subsubsection{No empty vector or matrix expressions}
+
+The empty expression \Verb|[ ]| is ambiguous and therefore is not
+allowed and similarly expressions such as \Verb|[ [ ] ]| or
+\Verb|[ [ ], [ ] ]| are not allowed.
+
+\subsection{Array Expressions}
 
 Curly braces may be wrapped around a sequence of expressions to
 produce an array expression.  For example, the expression
@@ -1501,7 +1560,7 @@ int a[3] = { 1, 10, 100 };
 %
 
 The values may be compound expressions, so it is legal to write
-\Verb|{ 2 * 3, 1 + 4 }|.  It is also possible to write two dimensional
+\Verb|{ 2 * 3, 1 + 4 }|. It is also possible to write two dimensional
 arrays directly, as in the following example.
 %
 \begin{stancode}
@@ -1521,7 +1580,7 @@ int b[2, 3] = { { 1, 2, 3 },
 \end{stancode}
 %
 
-\subsection{Array Expresison Types}
+\subsection{Array Expression Types}
 
 Any type of expression may be used within braces to form an array
 expression.  In the simplest case, all of the elements will be of the
@@ -1556,7 +1615,7 @@ Although it is tempting to try to define a ragged array expression,
 all Stan data types are rectangular (or boxes or other
 higher-dimensional generalizations).  Thus the following nested array
 expression will cause an error when it tries to create a
-non-rectanguar array.
+non-rectangular array.
 %
 \begin{stancode}
 { { 1, 2, 3 }, { 4, 5 } }  // compile time error: size mismatch
@@ -1624,7 +1683,7 @@ parentheses, this grouping may be made explicit with the expression
   3} has \code{1 + 2} as a subexpression and evaluates to 9.
 
 
-\section{Arithmetic and Matrix Expressions}\label{arithmetic-expressions.section}
+\section{Arithmetic and Matrix Operations on Expressions}\label{arithmetic-expressions.section}
 
 For integer and real-valued expressions, Stan supports the basic
 binary arithmetic operations of addition (\code{+}), subtraction

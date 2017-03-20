@@ -25,6 +25,10 @@ namespace stan {
 
     expression::expression(const array_expr& expr) : expr_(expr) { }
 
+    expression::expression(const matrix_expr& expr) : expr_(expr) { }
+
+    expression::expression(const row_vector_expr& expr) : expr_(expr) { }
+
     expression::expression(const variable& expr) : expr_(expr) { }
 
     expression::expression(const integrate_ode& expr) : expr_(expr) { }
