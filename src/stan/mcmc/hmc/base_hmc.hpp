@@ -22,9 +22,38 @@ namespace stan {
               class BaseRNG>
     class base_hmc : public base_mcmc {
     public:
+
       base_hmc(const Model &model, BaseRNG& rng)
         : base_mcmc(),
           z_(model.num_params_r()),
+          integrator_(),
+          hamiltonian_(model),
+          rand_int_(rng),
+          rand_uniform_(rand_int_),
+          nom_epsilon_(0.1),
+          epsilon_(nom_epsilon_),
+          epsilon_jitter_(0.0) {}
+
+      /** 
+       * specialized constructor for specified diag mass matrix
+       */
+      base_hmc(const Model &model, BaseRNG& rng, Eigen::VectorXd inv_mass_matrix)
+        : base_mcmc(),
+          z_(model.num_params_r(), inv_mass_matrix),
+          integrator_(),
+          hamiltonian_(model),
+          rand_int_(rng),
+          rand_uniform_(rand_int_),
+          nom_epsilon_(0.1),
+          epsilon_(nom_epsilon_),
+          epsilon_jitter_(0.0) {}
+
+      /** 
+       * specialized constructor for specified dense mass matrix
+       */
+      base_hmc(const Model &model, BaseRNG& rng, Eigen::MatrixXd inv_mass_matrix)
+        : base_mcmc(),
+          z_(model.num_params_r(), inv_mass_matrix),
           integrator_(),
           hamiltonian_(model),
           rand_int_(rng),

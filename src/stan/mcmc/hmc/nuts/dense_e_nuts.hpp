@@ -19,6 +19,15 @@ namespace stan {
       dense_e_nuts(const Model& model, BaseRNG& rng)
         : base_nuts<Model, dense_e_metric, expl_leapfrog,
                     BaseRNG>(model, rng) { }
+
+      /** 
+       * specialized constructor for specified dense mass matrix
+       */
+      dense_e_nuts(const Model& model, BaseRNG& rng,
+                   Eigen::MatrixXd inv_mass_matrix)
+        : base_nuts<Model, dense_e_metric, expl_leapfrog,
+                    BaseRNG>(model, rng, inv_mass_matrix) { }
+
     };
 
   }  // mcmc
