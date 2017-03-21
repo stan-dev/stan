@@ -36,8 +36,9 @@ namespace stan {
           this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,
                                                     s.accept_stat());
 
-          bool update = this->var_adaptation_.learn_variance(this->z_.mInv,
-                                                             this->z_.q);
+          bool update = this->var_adaptation_.learn_variance(
+                                              this->z_.inv_mass_matrix_,
+                                              this->z_.q);
           if (update) {
             this->init_stepsize(info_writer, error_writer);
             this->stepsize_adaptation_.set_mu(log(10 * this->nom_epsilon_));

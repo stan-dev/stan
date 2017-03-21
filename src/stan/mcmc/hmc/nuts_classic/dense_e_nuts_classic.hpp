@@ -20,12 +20,14 @@ namespace stan {
                           expl_leapfrog, BaseRNG>(model, rng) { }
 
       // Note that the points don't need to be swapped
-      // here since start.mInv = finish.mInv
+      // here since start.inv_mass_matrix_ = finish.inv_mass_matrix_
       bool compute_criterion(ps_point& start,
                              dense_e_point& finish,
                              Eigen::VectorXd& rho) {
-        return finish.p.transpose() * finish.mInv * (rho - finish.p) > 0
-               && start.p.transpose() * finish.mInv * (rho - start.p)  > 0;
+        return
+          finish.p.transpose() * finish.inv_mass_matrix_ * (rho - finish.p) > 0
+          &&
+          start.p.transpose() * finish.inv_mass_matrix_ * (rho - start.p)  > 0;
       }
     };
 

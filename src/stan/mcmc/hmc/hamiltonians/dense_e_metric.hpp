@@ -20,7 +20,7 @@ namespace stan {
         : base_hamiltonian<Model, dense_e_point, BaseRNG>(model) {}
 
       double T(dense_e_point& z) {
-        return 0.5 * z.p.transpose() * z.mInv * z.p;
+        return 0.5 * z.p.transpose() * z.inv_mass_matrix_ * z.p;
       }
 
       double tau(dense_e_point& z) {
@@ -44,7 +44,7 @@ namespace stan {
       }
 
       Eigen::VectorXd dtau_dp(dense_e_point& z) {
-        return z.mInv * z.p;
+        return z.inv_mass_matrix_ * z.p;
       }
 
       Eigen::VectorXd dphi_dq(dense_e_point& z,
@@ -63,7 +63,7 @@ namespace stan {
         for (idx_t i = 0; i < u.size(); ++i)
           u(i) = rand_dense_gaus();
 
-        z.p = z.mInv.llt().matrixL().solve(u);
+        z.p = z.inv_mass_matrix_.llt().matrixL().solve(u);
       }
     };
 
