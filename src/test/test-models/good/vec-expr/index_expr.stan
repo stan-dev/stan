@@ -1,8 +1,8 @@
 functions {
   void foo(int N) {
-    real res[10];
-    res[ 1 : 10 ] = 3;
-    }
+    int c[4];
+    int d[3];
+    c[2:10] = d;
   }
 }
 model {}
