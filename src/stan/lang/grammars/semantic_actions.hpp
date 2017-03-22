@@ -297,10 +297,11 @@ namespace stan {
 
 
     // called from: functions_grammar
-    struct scope_params : public phoenix_functor_unary {
-      void operator()(variable_map& vm) const;
+    struct set_fun_params_scope : public phoenix_functor_binary {
+      void operator()(scope& var_scope, variable_map& vm) const;
     };
-    extern boost::phoenix::function<scope_params> scope_params_f;
+    extern boost::phoenix::function<set_fun_params_scope>
+    set_fun_params_scope_f;
 
     // called from: functions_grammar
     struct unscope_variables : public phoenix_functor_binary {
@@ -404,12 +405,13 @@ namespace stan {
     validate_void_return_allowed_f;
 
     // called from: statement_grammar
-    struct identifier_to_var : public phoenix_functor_senary {
+    struct validate_lhs_var_assgn : public phoenix_functor_senary {
       void operator()(const std::string& name, const scope& var_scope,
                       variable& v, bool& pass, const variable_map& vm,
                       std::ostream& error_msgs) const;
     };
-    extern boost::phoenix::function<identifier_to_var> identifier_to_var_f;
+    extern boost::phoenix::function<validate_lhs_var_assgn>
+    validate_lhs_var_assgn_f;
 
     // called from: statement_grammar
     struct validate_assgn : public phoenix_functor_ternary {
@@ -858,6 +860,12 @@ namespace stan {
       void operator()(scope& var_scope, const scope& scope_enclosing) const;
     };
     extern boost::phoenix::function<reset_var_scope> reset_var_scope_f;
+
+    // handle trace messages as needed for debugging
+    struct trace : public phoenix_functor_unary {
+      void operator()(const std::string& msg) const;
+    };
+    extern boost::phoenix::function<trace> trace_f;
 
 
 
