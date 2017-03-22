@@ -563,11 +563,13 @@ namespace stan {
     }
     boost::phoenix::function<validate_return_type> validate_return_type_f;
 
-    // TODO(morris): remove if params_r__ no longer used
-    void scope_params::operator()(variable_map& vm) const {
+    void set_fun_params_scope::operator()(scope& var_scope, variable_map& vm)
+      const {
+      var_scope = scope(var_scope.program_block(), true);
+      // TODO(morris): remove if params_r__ no longer used
       vm.add("params_r__", VECTOR_T, parameter_origin);
     }
-    boost::phoenix::function<scope_params> scope_params_f;
+    boost::phoenix::function<set_fun_params_scope> set_fun_params_scope_f;
 
     void unscope_variables::operator()(function_decl_def& decl,
                                        variable_map& vm) const {
@@ -792,7 +794,7 @@ namespace stan {
     boost::phoenix::function<validate_void_return_allowed>
     validate_void_return_allowed_f;
 
-    void identifier_to_var::operator()(const std::string& name,
+    void validate_lhs_var_assgn::operator()(const std::string& name,
                                        const scope& var_scope,
                                        variable& v,  bool& pass,
                                        const variable_map& vm,
@@ -802,15 +804,14 @@ namespace stan {
         pass = false;
         return;
       }
-
       // validate scope matches declaration scope
       scope lhs_origin = vm.get_scope(name);
       if (lhs_origin.program_block() != var_scope.program_block()) {
         pass = false;
         return;
       }
-      // enforce constancy of function args
-      if (lhs_origin.fun()) {
+      // variable is function arg, can't assign to
+      if (lhs_origin.fun() && !lhs_origin.is_local()) {
         pass = false;
         return;
       }
@@ -818,7 +819,7 @@ namespace stan {
       v.set_type(vm.get_base_type(name), vm.get_num_dims(name));
       pass = true;
     }
-    boost::phoenix::function<identifier_to_var> identifier_to_var_f;
+    boost::phoenix::function<validate_lhs_var_assgn> validate_lhs_var_assgn_f;
 
     void validate_assgn::operator()(const assgn& a, bool& pass,
                                     std::ostream& error_msgs) const {
@@ -2740,6 +2741,10 @@ namespace stan {
       var_scope = scope(enclosing_block, true);
     }
     boost::phoenix::function<reset_var_scope> reset_var_scope_f;
+
+    void trace::operator()(const std::string& msg) const {
+    }
+    boost::phoenix::function<trace> trace_f;
 
   }
 }

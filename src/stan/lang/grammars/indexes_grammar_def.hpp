@@ -43,6 +43,7 @@ namespace stan {
       using boost::spirit::qi::_1;
       using boost::spirit::qi::_pass;
 
+      //   _r1 var scope
       indexes_r.name("indexes (zero or more)");
       indexes_r
         %=  lit("[")
@@ -52,8 +53,9 @@ namespace stan {
       close_indexes_r.name("one or more container indexes followed by ']'");
       close_indexes_r %= lit(']');
 
+      //   _r1 var scope
       index_r.name("index expression, one of: "
-                   " int, int[], int:, :int, int:int, :)");
+                   "(int, int[], int:, :int, int:int, :)");
       index_r
         %= lub_index_r(_r1)
         | lb_index_r(_r1)
@@ -62,47 +64,48 @@ namespace stan {
         | ub_index_r(_r1)
         | omni_index_r(_r1);
 
-      lub_index_r.name("index expression, one of: "
-                       " int, int[], int:, :int, int:int, :)");
+      //   _r1 var scope
+      lub_index_r.name("index expression int:int");
       lub_index_r
         %= int_expression_r(_r1)
         >> lit(":")
         >> int_expression_r(_r1)
         > eps;
 
-      lb_index_r.name("index expression, one of: "
-                      " int, int[], int:, :int, int:int, :)");
+      //   _r1 var scope
+      lb_index_r.name("index expression int:");
       lb_index_r
         %= int_expression_r(_r1)
         >> lit(":")
         > eps;
 
-      uni_index_r.name("index expression, one of: "
-                       " int, int[], int:, :int, int:int, :)");
+      //   _r1 var scope
+      uni_index_r.name("index expression int");
       uni_index_r
         %= int_expression_r(_r1);
 
-      multi_index_r.name("index expression, one of: "
-                         " int, int[], int:, :int, int:int, :)");
+      //   _r1 var scope
+      multi_index_r.name("index expression int[]");
       multi_index_r
         %= expression_g(_r1)
            [validate_ints_expression_f(_1, _pass,
                                        boost::phoenix::ref(error_msgs_))]
         > eps;
 
-      ub_index_r.name("index expression, one of: "
-                      " int, int[], int:, :int, int:int, :)");
+      //   _r1 var scope
+      ub_index_r.name("index expression :int");
       ub_index_r
         %= lit(":")
         >> int_expression_r(_r1)
         > eps;
 
-      omni_index_r.name("index expression, one of: "
-                        " int, int[], int:, :int, int:int, :)");
+      //   _r1 var scope
+      omni_index_r.name("index expression :");
       omni_index_r
         = lit(":")[set_omni_idx_f(_val)]
         |  eps[set_omni_idx_f(_val)];
 
+      //   _r1 var scope
       int_expression_r.name("integer expression");
       int_expression_r
         %= expression_g(_r1)[validate_int_expr_silent_f(_1, _pass)];
