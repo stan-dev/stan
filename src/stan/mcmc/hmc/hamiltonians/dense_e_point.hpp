@@ -33,7 +33,7 @@ namespace stan {
        * with specified inverse mass matrix.
        *
        * @param n number of dimensions
-       * @param inverse_mass_matrix initial mass matrix
+       * @param inv_mass_matrix initial mass matrix
        */
       dense_e_point(int n, Eigen::MatrixXd inv_mass_matrix)
         : ps_point(n), inv_mass_matrix_(n, n) {

@@ -33,7 +33,7 @@ namespace stan {
        * with specified vector of diagonal elements of inverse mass matrix.
        *
        * @param n number of dimensions
-       * @param inverse_mass_matrix diagonal elements of initial mass matrix
+       * @param inv_mass_matrix diagonal elements of initial mass matrix
        */
       diag_e_point(int n, Eigen::VectorXd inv_mass_matrix)
         : ps_point(n), inv_mass_matrix_(n) {

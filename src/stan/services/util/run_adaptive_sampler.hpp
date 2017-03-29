@@ -11,7 +11,7 @@ namespace stan {
     namespace util {
 
       /**
-       * Runs the sampler without adaptation.
+       * Runs the sampler with adaptation.
        *
        * @tparam Sampler Type of adaptive sampler.
        * @tparam Model Type of model

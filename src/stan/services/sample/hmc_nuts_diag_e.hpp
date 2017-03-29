@@ -10,6 +10,7 @@
 #include <stan/services/util/run_sampler.hpp>
 #include <stan/services/util/create_rng.hpp>
 #include <stan/services/util/initialize.hpp>
+#include <stan/services/util/validate_diag_mass_matrix.hpp>
 #include <vector>
 
 namespace stan {
@@ -17,8 +18,7 @@ namespace stan {
     namespace sample {
 
       /**
-       * Runs HMC with NUTS with diagonal Euclidean
-       * metric without adaptation.
+       * Runs HMC with NUTS without adaptation using diagonal Euclidean metric.
        *
        * @tparam Model Model class
        * @param[in] model Input model to test (with data already instantiated)
@@ -82,7 +82,7 @@ namespace stan {
        * @tparam Model Model class
        * @param[in] model Input model to test (with data already instantiated)
        * @param[in] init var context for initialization
-       * @param[in] init var context for mass matrix
+       * @param[in] init_mass_matrix var context for mass matrix
        * @param[in] random_seed random seed for the random number generator
        * @param[in] chain chain id to advance the pseudo random number generator
        * @param[in] init_radius radius to initialize
@@ -117,14 +117,18 @@ namespace stan {
                           callbacks::writer& sample_writer,
                           callbacks::writer& diagnostic_writer) {
         boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
-
         std::vector<int> disc_vector;
         std::vector<double> cont_vector
           = util::initialize(model, init, rng, init_radius, true,
                              message_writer, init_writer);
 
+        Eigen::VectorXd inv_mass_matrix
+          = util::validate_diag_mass_matrix(init_mass_matrix,
+                                            model.num_params_r(),
+                                            error_writer);
+
         stan::mcmc::diag_e_nuts<Model, boost::ecuyer1988>
-          sampler(model, rng, init_mass_matrix);
+          sampler(model, rng, inv_mass_matrix);
         sampler.set_nominal_stepsize(stepsize);
         sampler.set_stepsize_jitter(stepsize_jitter);
         sampler.set_max_depth(max_depth);

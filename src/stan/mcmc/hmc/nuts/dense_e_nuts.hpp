@@ -27,7 +27,6 @@ namespace stan {
                    Eigen::MatrixXd inv_mass_matrix)
         : base_nuts<Model, dense_e_metric, expl_leapfrog,
                     BaseRNG>(model, rng, inv_mass_matrix) { }
-
     };
 
   }  // mcmc

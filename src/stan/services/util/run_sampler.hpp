@@ -62,6 +62,10 @@ namespace stan {
         clock_t end = clock();
         double warm_delta_t = static_cast<double>(end - start) / CLOCKS_PER_SEC;
 
+        std::cout << "warmup, no adaptation" << std::endl;
+        writer.write_adapt_finish(sampler);
+
+
         start = clock();
         util::generate_transitions(sampler, num_samples, num_warmup,
                                    num_warmup + num_samples, num_thin,
