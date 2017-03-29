@@ -27,7 +27,7 @@ namespace stan {
                                 const::size_t num_params,
                                 stan::callbacks::writer& error_writer) {
         try {
-          init_mass_matrix.validate_dims("inv mass matrix", "mass_matrix",
+          init_mass_matrix.validate_dims("validate diag mass matrix", "mass_matrix",
                                          "vector_d",
                                          init_mass_matrix.to_vec(num_params));
         } catch (const std::domain_error& e) {
@@ -38,14 +38,14 @@ namespace stan {
         mass_matrix = init_mass_matrix.vals_r("mass_matrix");
         Eigen::VectorXd inv_mass_matrix(num_params);
         try {
-          for (size_t i=0; i < num_params; ++i) {
+          for (size_t i=0; i < num_params; i++) {
             stan::math::check_finite("validate_diag_mass_matrix",
                                      "mass_matrix",
                                      mass_matrix[i]);
             stan::math::check_positive("validate_diag_mass_matrix",
                                        "mass_matrix",
                                        mass_matrix[i]);
-            inv_mass_matrix << mass_matrix[i];
+            inv_mass_matrix(i) = mass_matrix[i];
           }
         } catch (const std::domain_error& e) {
           error_writer("Inverse mass matrix diag vector contains bad value.");
