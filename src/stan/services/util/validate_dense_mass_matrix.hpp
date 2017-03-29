@@ -3,6 +3,7 @@
 
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/var_context.hpp>
+#include <stan/math/prim/mat.hpp>
 #include <limits>
 #include <sstream>
 #include <string>
@@ -33,7 +34,7 @@ namespace stan {
           error_writer("Cannot get mass matrix from input file");
           throw std::domain_error("Initialization failure");
         }
-        Eigen::VectorXd mass_matrix(num_params, num_params);
+        Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> mass_matrix(num_params, num_params);
         size_t num_elements = num_params * num_params;
         std::vector<double> dense_vals(num_elements);
         dense_vals = init_mass_matrix.vals_r("mass_matrix");
@@ -42,23 +43,15 @@ namespace stan {
             mass_matrix(ij) = dense_vals[ij];
           }
         }
-        try {
-          const char* function = "check_symmetric";
-          const char* name = "inverse_mass_matrix";
-          stan::math::check_positive_finite(function, name, mass_matrix);
-        } catch (const std::domain_error& e) {
-          error_writer("Inverse mass matrix not symmetric.");
-          throw std::domain_error("Initialization failure");
-        }
-        try {
-          const char* function = "check_pos_definite";
-          const char* name = "inverse_mass_matrix";
-          stan::math::check_positive_finite(function, name, mass_matrix);
-        } catch (const std::domain_error& e) {
-          error_writer("Inverse mass matrix not positive definite.");
-          throw std::domain_error("Initialization failure");
-        }
-        return mass_matrix;
+        // what is correct test?  this results in compiler error
+        // try {
+        //   stan::math::check_pos_definite("check_pos_definite", "mass_matrix",
+        //                                  mass_matrix);
+        // } catch (const std::domain_error& e) {
+        //   error_writer("Inverse mass matrix not positive definite.");
+        //   throw std::domain_error("Initialization failure");
+        // }
+        return Eigen::MatrixXd(mass_matrix);
       }
 
     }

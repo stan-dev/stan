@@ -3,6 +3,7 @@
 
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/var_context.hpp>
+#include <stan/math/prim/scal.hpp>
 #include <limits>
 #include <sstream>
 #include <string>
@@ -33,22 +34,25 @@ namespace stan {
           error_writer("Cannot get mass matrix from input file");
           throw std::domain_error("Initialization failure");
         }
-        Eigen::VectorXd mass_matrix(num_params);
-        std::vector<double> diag_vals(num_params);
-        diag_vals = init_mass_matrix.vals_r("mass_matrix");
-        for (size_t i = 0; i < num_params; ++i) {
-          mass_matrix[i] = diag_vals[i];
-        }
+        std::vector<double> mass_matrix(num_params);
+        mass_matrix = init_mass_matrix.vals_r("mass_matrix");
+        Eigen::VectorXd inv_mass_matrix(num_params);
         try {
-          const char* function = "check_positive_finite";
-          const char* name = "inverse_mass_matrix";
-          stan::math::check_positive_finite(function, name, mass_matrix);
+          for (size_t i=0; i < num_params; ++i) {
+            stan::math::check_finite("validate_diag_mass_matrix",
+                                     "mass_matrix",
+                                     mass_matrix[i]);
+            stan::math::check_positive("validate_diag_mass_matrix",
+                                       "mass_matrix",
+                                       mass_matrix[i]);
+            inv_mass_matrix << mass_matrix[i];
+          }
         } catch (const std::domain_error& e) {
           error_writer("Inverse mass matrix diag vector contains bad value.");
           error_writer("All diagonal elements must be positive and finite.");
           throw std::domain_error("Initialization failure");
         }
-        return mass_matrix;
+        return inv_mass_matrix;
       }
 
     }
