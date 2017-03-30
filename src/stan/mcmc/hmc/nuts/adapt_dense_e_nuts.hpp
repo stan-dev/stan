@@ -16,9 +16,17 @@ namespace stan {
     class adapt_dense_e_nuts : public dense_e_nuts<Model, BaseRNG>,
                                public stepsize_covar_adapter {
     public:
-        adapt_dense_e_nuts(const Model& model, BaseRNG& rng)
-          : dense_e_nuts<Model, BaseRNG>(model, rng),
-          stepsize_covar_adapter(model.num_params_r()) {}
+      adapt_dense_e_nuts(const Model& model, BaseRNG& rng)
+        : dense_e_nuts<Model, BaseRNG>(model, rng),
+        stepsize_covar_adapter(model.num_params_r()) {}
+      
+      /** 
+       * specialized constructor for specified dense mass matrix
+       */
+      adapt_dense_e_nuts(const Model& model, BaseRNG& rng,
+                         Eigen::MatrixXd inv_mass_matrix)
+        : dense_e_nuts<Model, BaseRNG>(model, rng, inv_mass_matrix),
+        stepsize_covar_adapter(model.num_params_r()) {}
 
       ~adapt_dense_e_nuts() {}
 

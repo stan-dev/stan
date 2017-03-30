@@ -24,7 +24,7 @@ namespace stan {
        */
       Eigen::VectorXd
       validate_diag_mass_matrix(stan::io::var_context& init_mass_matrix,
-                                const::size_t num_params,
+                                const::size_t& num_params,
                                 stan::callbacks::writer& error_writer) {
         try {
           init_mass_matrix.validate_dims("validate diag mass matrix", "mass_matrix",

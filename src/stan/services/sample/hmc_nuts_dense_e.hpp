@@ -125,9 +125,9 @@ namespace stan {
           = util::validate_dense_mass_matrix(init_mass_matrix,
                                              model.num_params_r(),
                                              error_writer);
-
         stan::mcmc::dense_e_nuts<Model, boost::ecuyer1988>
           sampler(model, rng, inv_mass_matrix);
+
         sampler.set_nominal_stepsize(stepsize);
         sampler.set_stepsize_jitter(stepsize_jitter);
         sampler.set_max_depth(max_depth);
