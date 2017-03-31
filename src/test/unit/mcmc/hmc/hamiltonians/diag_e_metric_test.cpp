@@ -152,9 +152,9 @@ TEST(McmcDiagEMetric, streams) {
   stan::mcmc::mock_model model(q.size());
 
   // typedef to use within Google Test macros
-  typedef stan::mcmc::diag_e_metric<stan::mcmc::mock_model, rng_t> dense_e;
+  typedef stan::mcmc::diag_e_metric<stan::mcmc::mock_model, rng_t> diag_e;
 
-  EXPECT_NO_THROW(dense_e metric(model));
+  EXPECT_NO_THROW(diag_e metric(model));
 
   stan::test::reset_std_streams();
   EXPECT_EQ("", stan::test::cout_ss.str());

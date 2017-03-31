@@ -4,8 +4,8 @@
 #include <stan/io/empty_var_context.hpp>
 #include <test/test-models/good/mcmc/hmc/common/gauss3D.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
+#include <test/unit/services/check_adaptation.hpp>
 #include <iostream>
-#include <boost/algorithm/string.hpp>
 
 /** 
  * Use model with 3 params, fix seed, set mass matrix
@@ -22,26 +22,6 @@ public:
   stan::io::empty_var_context context;
   stan_model model;
 };
-
-void check_adaptation(const size_t& num_params,
-                      const std::vector<double>& diag_vals,
-                      stan::test::unit::instrumented_writer& report) {
-  std::vector<std::string> param_strings = report.string_values();
-  size_t offset = 0;
-  for (size_t i = 0; i < param_strings.size(); i++) {
-    offset++;
-    if (param_strings[i].find("Diagonal elements of inverse mass matrix:")
-        != std::string::npos) {
-      break;
-    }
-  }
-  std::vector<std::string> strs;
-  boost::split(strs, param_strings[offset], boost::is_any_of(", "), boost::token_compress_on);
-  EXPECT_EQ(num_params, strs.size());
-  for (size_t j = 0; j < num_params; j++) {
-    ASSERT_NEAR(diag_vals[j], std::stod(strs[j]), 0.05);
-  }
-}
 
 TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, no_adapt) {
   unsigned int random_seed = 12345;
@@ -75,7 +55,7 @@ TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, no_adapt) {
     parameter, diagnostic);
 
   EXPECT_EQ(0, return_code);
-  check_adaptation(3, diag_vals, parameter);
+  stan::test::unit::check_adaptation(3, diag_vals, parameter, 0.05);
 }
 
 TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, skip_adapt) {
@@ -118,7 +98,7 @@ TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, skip_adapt) {
     parameter, diagnostic);
 
   EXPECT_EQ(0, return_code);
-  check_adaptation(3, diag_vals, parameter);
+  stan::test::unit::check_adaptation(3, diag_vals, parameter, 0.05);
 }
 
 
@@ -169,5 +149,5 @@ TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, continue_adapt) {
   for (size_t i=0; i<3; i++) {
     diag_vals[i] = 1.00;
   }
-  check_adaptation(3, diag_vals, parameter);
+  stan::test::unit::check_adaptation(3, diag_vals, parameter, 0.05);
 }

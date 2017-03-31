@@ -4,8 +4,8 @@
 #include <stan/io/empty_var_context.hpp>
 #include <test/test-models/good/mcmc/hmc/common/gauss3D.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
+#include <test/unit/services/check_adaptation.hpp>
 #include <iostream>
-#include <boost/algorithm/string.hpp>
 
 /** 
  * Use model with 3 params, fix seed, set mass matrix
@@ -22,30 +22,6 @@ public:
   stan::io::empty_var_context context;
   stan_model model;
 };
-
-void check_adaptation(const size_t& num_params,
-                      const std::vector<double>& dense_vals,
-                      stan::test::unit::instrumented_writer& report) {
-
-  std::vector<std::string> param_strings = report.string_values();
-  size_t offset = 0;
-  for (size_t i = 0; i < param_strings.size(); i++) {
-    offset++;
-    if (param_strings[i].find("Elements of inverse mass matrix:")
-        != std::string::npos) {
-      break;
-    }
-  }
-  for (size_t i = offset, ij=0 ; i < offset + num_params; i++) {
-      std::vector<std::string> strs;
-      boost::split(strs, param_strings[i], boost::is_any_of(", "), boost::token_compress_on);
-      EXPECT_EQ(num_params, strs.size());
-      for (size_t j = 0; j < num_params; ij++, j++) {
-        //        std::cout << " ij " << ij << " " << dense_vals[ij] << " " << strs[j] << std::endl;
-        ASSERT_NEAR(dense_vals[ij], std::stod(strs[j]), 0.05);
-      }
-  }
-}
 
 TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, no_adapt) {
   unsigned int random_seed = 12345;
@@ -88,7 +64,7 @@ TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, no_adapt) {
   EXPECT_EQ(0, return_code);
 
   // check returned mass matrix
-  check_adaptation(3, dense_vals, parameter);
+  stan::test::unit::check_adaptation(3, dense_vals, parameter, 0.05);
 }
 
 
@@ -140,7 +116,7 @@ TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, skip_adapt) {
     parameter, diagnostic);
 
   EXPECT_EQ(0, return_code);
-  check_adaptation(3, dense_vals, parameter);
+  stan::test::unit::check_adaptation(3, dense_vals, parameter, 0.05);
 }
 
 // run model for 2000 iterations, starting w/ dense matrix from running 250
@@ -200,5 +176,5 @@ TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, continue_adapt) {
   dense_vals[0] = 1.00;
   dense_vals[4] = 1.00;
   dense_vals[8] = 1.00;
-  check_adaptation(3, dense_vals, parameter);
+  stan::test::unit::check_adaptation(3, dense_vals, parameter, 0.05);
 }
