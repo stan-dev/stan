@@ -21,6 +21,14 @@ namespace stan {
         : diag_e_static_hmc<Model, BaseRNG>(model, rng),
         stepsize_var_adapter(model.num_params_r()) {}
 
+      /** 
+       * specialized constructor for specified diag mass matrix
+       */
+      adapt_diag_e_static_hmc(const Model& model, BaseRNG& rng,
+                              Eigen::VectorXd& inv_mass_matrix)
+        : diag_e_static_hmc<Model, BaseRNG>(model, rng, inv_mass_matrix),
+        stepsize_var_adapter(model.num_params_r()) {}
+
       ~adapt_diag_e_static_hmc() {}
 
       sample

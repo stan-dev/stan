@@ -29,6 +29,28 @@ namespace stan {
         update_L_();
       }
 
+      /** 
+       * specialized constructor for specified diag mass matrix
+       */
+      base_static_hmc(const Model& model, BaseRNG& rng,
+                      Eigen::VectorXd& inv_mass_matrix)
+        : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng,
+                                                            inv_mass_matrix),
+        T_(1), energy_(0) {
+        update_L_();
+      }
+
+      /** 
+       * specialized constructor for specified dense mass matrix
+       */
+      base_static_hmc(const Model& model, BaseRNG& rng,
+                      Eigen::MatrixXd& inv_mass_matrix)
+        : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng,
+                                                            inv_mass_matrix),
+        T_(1), energy_(0) {
+        update_L_();
+      }
+      
       ~base_static_hmc() {}
 
       sample

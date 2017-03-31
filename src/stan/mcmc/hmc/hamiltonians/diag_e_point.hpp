@@ -35,7 +35,7 @@ namespace stan {
        * @param n number of dimensions
        * @param inv_mass_matrix diagonal elements of initial mass matrix
        */
-      diag_e_point(int n, Eigen::VectorXd inv_mass_matrix)
+      diag_e_point(int n, Eigen::VectorXd& inv_mass_matrix)
         : ps_point(n), inv_mass_matrix_(n) {
         fast_vector_copy_<double>(inv_mass_matrix_, inv_mass_matrix);
       }

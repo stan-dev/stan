@@ -18,7 +18,7 @@ namespace stan {
     namespace sample {
 
       /**
-       * Runs static HMC without adaptation using dense Euclidean metric.
+       * Runs static HMC with adaptation using dense Euclidean metric.
        *
        * @tparam Model Model class
        * @param[in] model Input model to test (with data already instantiated)
@@ -97,7 +97,7 @@ namespace stan {
       }
 
       /**
-       * Runs static HMC without adaptation using dense Euclidean metric
+       * Runs static HMC with adaptation using dense Euclidean metric
        * with a pre-specified mass matrix.
        *
        * @tparam Model Model class
@@ -181,7 +181,7 @@ namespace stan {
                                    sample_writer, diagnostic_writer);
 
         return error_codes::OK;
-      }
+     }
 
     }
   }

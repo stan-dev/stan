@@ -19,14 +19,6 @@ namespace stan {
         base_nuts_classic<Model, dense_e_metric,
                           expl_leapfrog, BaseRNG>(model, rng) { }
 
-      /** 
-       * specialized constructor for specified dense mass matrix
-       */
-      dense_e_nuts_classic(const Model& model, BaseRNG& rng,
-                           Eigen::MatrixXd inv_mass_matrix)
-        : base_nuts_classic<Model, dense_e_metric, expl_leapfrog,
-                            BaseRNG>(model, rng, inv_mass_matrix) { }
-
       // Note that the points don't need to be swapped
       // here since start.inv_mass_matrix_ = finish.inv_mass_matrix_
       bool compute_criterion(ps_point& start,

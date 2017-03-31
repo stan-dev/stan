@@ -35,7 +35,7 @@ namespace stan {
        * @param n number of dimensions
        * @param inv_mass_matrix initial mass matrix
        */
-      dense_e_point(int n, Eigen::MatrixXd inv_mass_matrix)
+      dense_e_point(int n, Eigen::MatrixXd& inv_mass_matrix)
         : ps_point(n), inv_mass_matrix_(n, n) {
         fast_matrix_copy_<double>(inv_mass_matrix_, inv_mass_matrix);
       }

@@ -121,6 +121,7 @@ namespace stan {
         std::vector<double> cont_vector
           = util::initialize(model, init, rng, init_radius, true,
                              message_writer, init_writer);
+
         Eigen::MatrixXd inv_mass_matrix
           = util::validate_dense_mass_matrix(init_mass_matrix,
                                              model.num_params_r(),
