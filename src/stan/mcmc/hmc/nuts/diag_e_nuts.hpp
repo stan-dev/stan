@@ -20,6 +20,8 @@ namespace stan {
         : base_nuts<Model, diag_e_metric, expl_leapfrog,
                     BaseRNG>(model, rng) { }
 
+      // ******** TODO HERE:  method to set dense inv_mass_matrix
+      // this method will be called when initializing sampler
       /** 
        * specialized constructor for specified diag mass matrix
        */
