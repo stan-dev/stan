@@ -1,4 +1,5 @@
 #include <stan/services/util/create_rng.hpp>
+#include <stan/services/util/create_ident_diag_mass_matrix.hpp>
 #include <gtest/gtest.h>
 
 TEST(rng, initialize_with_seed) {

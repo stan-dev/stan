@@ -21,6 +21,15 @@ namespace stan {
         : dense_e_static_hmc<Model, BaseRNG>(model, rng),
         stepsize_covar_adapter(model.num_params_r()) { }
 
+      /** 
+       * specialized constructor for specified dense mass matrix
+       */
+      adapt_dense_e_static_hmc(const Model& model, BaseRNG& rng,
+                               Eigen::MatrixXd& inv_mass_matrix)
+        : dense_e_static_hmc<Model, BaseRNG>(model, rng, inv_mass_matrix),
+        stepsize_covar_adapter(model.num_params_r()) { }
+
+
       ~adapt_dense_e_static_hmc() { }
 
       sample

@@ -23,6 +23,98 @@ public:
   stan_model model;
 };
 
+TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, no_adapt_ident) {
+  unsigned int random_seed = 12345;
+  unsigned int chain = 1;
+  double init_radius = 2;
+  int num_warmup = 0;
+  int num_samples = 2;
+  int num_thin = 1;
+  bool save_warmup = false;
+  int refresh = 0;
+  double stepsize = 1;
+  double stepsize_jitter = 0;
+  int max_depth = 10;
+  stan::test::unit::instrumented_interrupt interrupt;
+  EXPECT_EQ(interrupt.call_count(), 0);
+
+  int return_code =
+    stan::services::sample::hmc_nuts_dense_e(
+    model, context, random_seed, chain, init_radius,
+    num_warmup, num_samples, num_thin, save_warmup, refresh,
+    stepsize, stepsize_jitter, max_depth,
+    interrupt, message, error, init,
+    parameter, diagnostic);
+  EXPECT_EQ(0, return_code);
+
+  stan::io::dump dmp = 
+    stan::services::util::create_ident_dense_mass_matrix(3);
+  stan::io::var_context& inv_mass_matrix = dmp;
+  std::vector<double> dense_vals
+    = inv_mass_matrix.vals_r("mass_matrix");
+  // check returned mass matrix
+  stan::test::unit::check_adaptation(3, 3, dense_vals, parameter, 0.05);
+}
+
+
+TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, ident_adapt_250) {
+  unsigned int random_seed = 12345;
+  unsigned int chain = 1;
+  double init_radius = 2;
+  int num_warmup = 250;
+  int num_samples = 0;
+  int num_thin = 1;
+  bool save_warmup = false;
+  int refresh = 0;
+  double stepsize = 1;
+  double stepsize_jitter = 0;
+  int max_depth = 10;
+  double delta = .8;
+  double gamma = .05;
+  double kappa = .75;
+  double t0 = 10;
+  unsigned int init_buffer = 75;
+  unsigned int term_buffer = 50;
+  unsigned int window = 25;
+  stan::test::unit::instrumented_interrupt interrupt;
+  EXPECT_EQ(interrupt.call_count(), 0);
+
+  int return_code =
+    stan::services::sample::hmc_nuts_dense_e_adapt(
+    model, context, random_seed, chain, init_radius,
+    num_warmup, num_samples, num_thin, save_warmup, refresh,
+    stepsize, stepsize_jitter, max_depth, delta, gamma, kappa, t0,
+    init_buffer, term_buffer, window,
+    interrupt, message, error, init,
+    parameter, diagnostic);
+  EXPECT_EQ(0, return_code);
+
+  // extremely brittle test!
+  // ident_adapt_250
+  // captured result of running sampler w/ ident mass matrix
+  // seed 12345,  warmup 250
+  // reported values:
+  // Step size = 0.904111
+  // Elements of inverse mass matrix:
+  // 1.21622, -0.0271004, 0.00515814
+  // -0.0271004, 0.59758, -0.0153581
+  // 0.00515814, -0.0153581, 0.863086
+  std::vector<double> dense_vals;
+  dense_vals.push_back(1.21622);
+  dense_vals.push_back(-0.0271004);
+  dense_vals.push_back(0.00515814);
+  dense_vals.push_back(-0.0271004);
+  dense_vals.push_back(0.59758);
+  dense_vals.push_back(-0.0153581);
+  dense_vals.push_back(0.00515814);
+  dense_vals.push_back(-0.0153581);
+  dense_vals.push_back(0.863086);
+  // check returned mass matrix
+  stan::test::unit::check_adaptation(3, 3, dense_vals, parameter, 0.1);
+
+}
+
+
 TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, no_adapt) {
   unsigned int random_seed = 12345;
   unsigned int chain = 1;
@@ -64,7 +156,7 @@ TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, no_adapt) {
   EXPECT_EQ(0, return_code);
 
   // check returned mass matrix
-  stan::test::unit::check_adaptation(3, dense_vals, parameter, 0.05);
+  stan::test::unit::check_adaptation(3, 3, dense_vals, parameter, 0.05);
 }
 
 
@@ -116,7 +208,7 @@ TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, skip_adapt) {
     parameter, diagnostic);
 
   EXPECT_EQ(0, return_code);
-  stan::test::unit::check_adaptation(3, dense_vals, parameter, 0.05);
+  stan::test::unit::check_adaptation(3, 3, dense_vals, parameter, 0.05);
 }
 
 // run model for 2000 iterations, starting w/ dense matrix from running 250
@@ -176,5 +268,5 @@ TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, continue_adapt) {
   dense_vals[0] = 1.00;
   dense_vals[4] = 1.00;
   dense_vals[8] = 1.00;
-  stan::test::unit::check_adaptation(3, dense_vals, parameter, 0.05);
+  stan::test::unit::check_adaptation(3, 3, dense_vals, parameter, 0.05);
 }

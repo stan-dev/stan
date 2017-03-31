@@ -27,7 +27,9 @@ namespace stan {
        */
       dense_e_static_hmc(const Model& model, BaseRNG& rng,
                          Eigen::MatrixXd& inv_mass_matrix)
-        : dense_e_static_hmc<Model, BaseRNG>(model, rng, inv_mass_matrix) { }
+        : base_static_hmc<Model, dense_e_metric,
+                          expl_leapfrog, BaseRNG>(model, rng,
+                                                  inv_mass_matrix) { }
 
     };
 

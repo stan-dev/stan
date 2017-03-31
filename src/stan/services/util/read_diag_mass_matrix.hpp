@@ -27,18 +27,17 @@ namespace stan {
                             size_t num_params,
                             stan::callbacks::writer& error_writer) {
         try {
-          init_mass_matrix.read_dims("read diag mass matrix", "mass_matrix",
-                                     "vector_d",
-                                     init_mass_matrix.to_vec(num_params));
+          init_mass_matrix.validate_dims("read diag mass matrix", "mass_matrix",
+                                         "vector_d",
+                                         init_mass_matrix.to_vec(num_params));
         } catch (const std::domain_error& e) {
           error_writer("Cannot get mass matrix from input file");
           throw std::domain_error("Initialization failure");
         }
-        std::vector<double> mass_matrix(num_params) =
-          init_mass_matrix.vals_r("mass_matrix");
+        std::vector<double> diag_vals = init_mass_matrix.vals_r("mass_matrix");
         Eigen::VectorXd inv_mass_matrix(num_params);
         for (size_t i=0; i < num_params; i++) {
-          inv_mass_matrix(i) = mass_matrix[i];
+          inv_mass_matrix(i) = diag_vals[i];
         }
         return inv_mass_matrix;
       }
