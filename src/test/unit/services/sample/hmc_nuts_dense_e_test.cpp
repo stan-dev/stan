@@ -1,4 +1,3 @@
-#include <stan/services/sample/hmc_nuts_dense_e_adapt.hpp>
 #include <stan/services/sample/hmc_nuts_dense_e.hpp>
 #include <gtest/gtest.h>
 #include <stan/io/empty_var_context.hpp>

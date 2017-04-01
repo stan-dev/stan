@@ -2,6 +2,7 @@
 #define STAN_SERVICES_SAMPLE_HMC_STATIC_DENSE_E_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/math/prim/mat.hpp>
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/mcmc/fixed_param_sampler.hpp>
@@ -141,7 +142,7 @@ namespace stan {
           util::create_ident_dense_mass_matrix(model.num_params_r());
         stan::io::var_context& ident_mass_matrix = dmp;
 
-        return hmc_nuts_dense_e(model, init, ident_mass_matrix,
+        return hmc_static_dense_e(model, init, ident_mass_matrix,
                                 random_seed, chain, init_radius, num_warmup,
                                 num_samples, num_thin, save_warmup, refresh,
                                 stepsize, stepsize_jitter, int_time,
