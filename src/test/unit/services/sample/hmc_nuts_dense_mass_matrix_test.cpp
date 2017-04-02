@@ -8,7 +8,10 @@
 #include <iostream>
 
 /** 
- * Use model with 3 params, fix seed, set mass matrix
+ * Use 3-param model test-models/good/mcmc/hmc/common/gauss3D
+ * fix seed 12345, test against specified inv mass matrix
+ * Tests crafted by running samplers with test config
+ * to capture resulting inverse mass matrix values.
  */
 
 class ServicesSampleHmcNutsDenseEMassMatrix : public testing::Test {
@@ -23,7 +26,7 @@ public:
   stan_model model;
 };
 
-TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, no_adapt_ident) {
+TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, ident_no_adapt) {
   unsigned int random_seed = 12345;
   unsigned int chain = 1;
   double init_radius = 2;
@@ -39,12 +42,25 @@ TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, no_adapt_ident) {
   EXPECT_EQ(interrupt.call_count(), 0);
 
   int return_code =
-    stan::services::sample::hmc_nuts_dense_e(
-    model, context, random_seed, chain, init_radius,
-    num_warmup, num_samples, num_thin, save_warmup, refresh,
-    stepsize, stepsize_jitter, max_depth,
-    interrupt, message, error, init,
-    parameter, diagnostic);
+    stan::services::sample::hmc_nuts_dense_e(model,
+                                             context,
+                                             random_seed,
+                                             chain,
+                                             init_radius,
+                                             num_warmup,
+                                             num_samples,
+                                             num_thin,
+                                             save_warmup,
+                                             refresh,
+                                             stepsize,
+                                             stepsize_jitter,
+                                             max_depth,
+                                             interrupt,
+                                             message,
+                                             error,
+                                             init,
+                                             parameter,
+                                             diagnostic);
   EXPECT_EQ(0, return_code);
 
   stan::io::dump dmp = 
@@ -55,7 +71,6 @@ TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, no_adapt_ident) {
   // check returned mass matrix
   stan::test::unit::check_adaptation(3, 3, dense_vals, parameter, 0.05);
 }
-
 
 TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, ident_adapt_250) {
   unsigned int random_seed = 12345;
@@ -79,23 +94,37 @@ TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, ident_adapt_250) {
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
+  // run sampler with ident mass matrix, 250 warmups
   int return_code =
-    stan::services::sample::hmc_nuts_dense_e_adapt(
-    model, context, random_seed, chain, init_radius,
-    num_warmup, num_samples, num_thin, save_warmup, refresh,
-    stepsize, stepsize_jitter, max_depth, delta, gamma, kappa, t0,
-    init_buffer, term_buffer, window,
-    interrupt, message, error, init,
-    parameter, diagnostic);
+    stan::services::sample::hmc_nuts_dense_e_adapt(model,
+                                                   context,
+                                                   random_seed,
+                                                   chain,
+                                                   init_radius,
+                                                   num_warmup,
+                                                   num_samples,
+                                                   num_thin,
+                                                   save_warmup,
+                                                   refresh,
+                                                   stepsize,
+                                                   stepsize_jitter,
+                                                   max_depth,
+                                                   delta,
+                                                   gamma,
+                                                   kappa,
+                                                   t0,
+                                                   init_buffer,
+                                                   term_buffer,
+                                                   window,
+                                                   interrupt,
+                                                   message,
+                                                   error,
+                                                   init,
+                                                   parameter,
+                                                   diagnostic);
   EXPECT_EQ(0, return_code);
 
-  // extremely brittle test!
-  // ident_adapt_250
-  // captured result of running sampler w/ ident mass matrix
-  // seed 12345,  warmup 250
-  // reported values:
-  // Step size = 0.904111
-  // Elements of inverse mass matrix:
+  // result of running adaptive sampler w/ ident mass matrix:
   // 1.21622, -0.0271004, 0.00515814
   // -0.0271004, 0.59758, -0.0153581
   // 0.00515814, -0.0153581, 0.863086
@@ -109,13 +138,10 @@ TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, ident_adapt_250) {
   dense_vals.push_back(0.00515814);
   dense_vals.push_back(-0.0153581);
   dense_vals.push_back(0.863086);
-  // check returned mass matrix
   stan::test::unit::check_adaptation(3, 3, dense_vals, parameter, 0.1);
-
 }
 
-
-TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, no_adapt) {
+TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, use_mass_matrix_no_adapt) {
   unsigned int random_seed = 12345;
   unsigned int chain = 1;
   double init_radius = 2;
@@ -130,37 +156,45 @@ TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, no_adapt) {
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
-  // mass matrix from 250 warmups, seed = 12345
-  // resulting step size: 0.60
   std::string txt =
     "mass_matrix <- structure(c("
     "0.640211, 0.156096, -0.374048, "
     "0.156096, 1.41239, -0.0412753, "
     "-0.374048, -0.0412753, 1.29567 "
     "), .Dim  = c(3,3))";
-
   std::stringstream in(txt);
   stan::io::dump dump(in);
   stan::io::var_context& inv_mass_matrix = dump;
-  size_t num_elements = 9;
-  std::vector<double> dense_vals(num_elements);
-  dense_vals = inv_mass_matrix.vals_r("mass_matrix");
 
   int return_code =
-    stan::services::sample::hmc_nuts_dense_e(
-    model, context, inv_mass_matrix, random_seed, chain, init_radius,
-    num_warmup, num_samples, num_thin, save_warmup, refresh,
-    stepsize, stepsize_jitter, max_depth,
-    interrupt, message, error, init,
-    parameter, diagnostic);
+    stan::services::sample::hmc_nuts_dense_e(model,
+                                             context,
+                                             inv_mass_matrix,
+                                             random_seed,
+                                             chain,
+                                             init_radius,
+                                             num_warmup,
+                                             num_samples,
+                                             num_thin,
+                                             save_warmup,
+                                             refresh,
+                                             stepsize,
+                                             stepsize_jitter,
+                                             max_depth,
+                                             interrupt,
+                                             message,
+                                             error,
+                                             init,
+                                             parameter,
+                                             diagnostic);
   EXPECT_EQ(0, return_code);
 
-  // check returned mass matrix
+  std::vector<double> dense_vals(9);
+  dense_vals = inv_mass_matrix.vals_r("mass_matrix");
   stan::test::unit::check_adaptation(3, 3, dense_vals, parameter, 0.05);
 }
 
-
-TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, skip_adapt) {
+TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, use_mass_matrix_skip_adapt) {
   unsigned int random_seed = 12345;
   unsigned int chain = 1;
   double init_radius = 2;
@@ -182,38 +216,135 @@ TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, skip_adapt) {
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
-  // mass matrix from 250 warmups, seed = 12345
-  // resulting step size: 0.60
   std::string txt =
     "mass_matrix <- structure(c("
     "0.640211, 0.156096, -0.374048, "
     "0.156096, 1.41239, -0.0412753, "
     "-0.374048, -0.0412753, 1.29567 "
     "), .Dim  = c(3,3))";
-
   std::stringstream in(txt);
   stan::io::dump dump(in);
   stan::io::var_context& inv_mass_matrix = dump;
-  size_t num_elements = 9;
-  std::vector<double> dense_vals(num_elements);
-  dense_vals = inv_mass_matrix.vals_r("mass_matrix");
 
   int return_code =
-    stan::services::sample::hmc_nuts_dense_e_adapt(
-    model, context, inv_mass_matrix, random_seed, chain, init_radius,
-    num_warmup, num_samples, num_thin, save_warmup, refresh,
-    stepsize, stepsize_jitter, max_depth, delta, gamma, kappa, t0,
-    init_buffer, term_buffer, window,
-    interrupt, message, error, init,
-    parameter, diagnostic);
+    stan::services::sample::hmc_nuts_dense_e_adapt(model,
+                                                   context,
+                                                   inv_mass_matrix,
+                                                   random_seed,
+                                                   chain,
+                                                   init_radius,
+                                                   num_warmup,
+                                                   num_samples,
+                                                   num_thin,
+                                                   save_warmup,
+                                                   refresh,
+                                                   stepsize,
+                                                   stepsize_jitter,
+                                                   max_depth,
+                                                   delta,
+                                                   gamma,
+                                                   kappa,
+                                                   t0,
+                                                   init_buffer,
+                                                   term_buffer,
+                                                   window,
+                                                   interrupt,
+                                                   message,
+                                                   error,
+                                                   init,
+                                                   parameter,
+                                                   diagnostic);
 
   EXPECT_EQ(0, return_code);
+
+  std::vector<double> dense_vals(9);
+  dense_vals = inv_mass_matrix.vals_r("mass_matrix");
   stan::test::unit::check_adaptation(3, 3, dense_vals, parameter, 0.05);
 }
 
-// run model for 2000 iterations, starting w/ dense matrix from running 250
-// at this point, all 3 params should be very close to 1
-TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, continue_adapt) {
+// run model for 300 iterations, starting w/ non-ident mass matrix
+// mass matrix should change but evolve to identity matrix
+TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, use_mass_matrix_continue_300) {
+  unsigned int random_seed = 12345;
+  unsigned int chain = 1;
+  double init_radius = 2;
+  int num_warmup = 300;
+  int num_samples = 0;
+  int num_thin = 5;
+  bool save_warmup = false;
+  int refresh = 0;
+  double stepsize = 1;
+  double stepsize_jitter = 0;
+  int max_depth = 10;
+  double delta = .8;
+  double gamma = .05;
+  double kappa = .75;
+  double t0 = 10;
+  unsigned int init_buffer = 75;
+  unsigned int term_buffer = 50;
+  unsigned int window = 25;
+  stan::test::unit::instrumented_interrupt interrupt;
+  EXPECT_EQ(interrupt.call_count(), 0);
+
+  std::string txt =
+    "mass_matrix <- structure(c("
+    "0.640211, 0.156096, -0.374048, "
+    "0.156096, 1.41239, -0.0412753, "
+    "-0.374048, -0.0412753, 1.29567 "
+    "), .Dim  = c(3,3))";
+  std::stringstream in(txt);
+  stan::io::dump dump(in);
+  stan::io::var_context& inv_mass_matrix = dump;
+
+  int return_code =
+    stan::services::sample::hmc_nuts_dense_e_adapt(model,
+                                                   context,
+                                                   inv_mass_matrix,
+                                                   random_seed,
+                                                   chain,
+                                                   init_radius,
+                                                   num_warmup,
+                                                   num_samples,
+                                                   num_thin,
+                                                   save_warmup,
+                                                   refresh,
+                                                   stepsize,
+                                                   stepsize_jitter,
+                                                   max_depth,
+                                                   delta,
+                                                   gamma,
+                                                   kappa,
+                                                   t0,
+                                                   init_buffer,
+                                                   term_buffer,
+                                                   window,
+                                                   interrupt,
+                                                   message,
+                                                   error,
+                                                   init,
+                                                   parameter,
+                                                   diagnostic);
+
+  EXPECT_EQ(0, return_code);
+
+  // check mass matrix has evolved
+  std::vector<double> input_diag_vals(9);
+  input_diag_vals = inv_mass_matrix.vals_r("mass_matrix");
+  stan::test::unit::check_different(3, 3, input_diag_vals, parameter, 0.001);
+
+  // check mass matrix has not evolved to identity matrix
+  stan::io::dump dmp = 
+    stan::services::util::create_ident_dense_mass_matrix(3);
+  stan::io::var_context& ident_mass_matrix = dmp;
+  std::vector<double> ident_dense_vals
+    = ident_mass_matrix.vals_r("mass_matrix");
+  stan::test::unit::check_different(3, 3, ident_dense_vals, parameter, 0.001);
+
+}
+
+// run model for 2000 iterations, starting w/ non-ident mass matrix
+// resulting mass matrix should be very close to identity matrix
+TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, use_mass_matrix_continue_2000) {
   unsigned int random_seed = 12345;
   unsigned int chain = 1;
   double init_radius = 2;
@@ -235,8 +366,6 @@ TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, continue_adapt) {
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
-  // mass matrix from 250 warmups, seed = 12345
-  // resulting step size: 0.60
   std::string txt =
     "mass_matrix <- structure(c("
     "0.640211, 0.156096, -0.374048, "
@@ -249,24 +378,41 @@ TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, continue_adapt) {
   stan::io::var_context& inv_mass_matrix = dump;
 
   int return_code =
-    stan::services::sample::hmc_nuts_dense_e_adapt(
-    model, context, inv_mass_matrix, random_seed, chain, init_radius,
-    num_warmup, num_samples, num_thin, save_warmup, refresh,
-    stepsize, stepsize_jitter, max_depth, delta, gamma, kappa, t0,
-    init_buffer, term_buffer, window,
-    interrupt, message, error, init,
-    parameter, diagnostic);
+    stan::services::sample::hmc_nuts_dense_e_adapt(model,
+                                                   context,
+                                                   inv_mass_matrix,
+                                                   random_seed,
+                                                   chain,
+                                                   init_radius,
+                                                   num_warmup,
+                                                   num_samples,
+                                                   num_thin,
+                                                   save_warmup,
+                                                   refresh,
+                                                   stepsize,
+                                                   stepsize_jitter,
+                                                   max_depth,
+                                                   delta,
+                                                   gamma,
+                                                   kappa,
+                                                   t0,
+                                                   init_buffer,
+                                                   term_buffer,
+                                                   window,
+                                                   interrupt,
+                                                   message,
+                                                   error,
+                                                   init,
+                                                   parameter,
+                                                   diagnostic);
 
   EXPECT_EQ(0, return_code);
 
   // 2000 warmup steps should push matrix to ident
-  std::vector<double> dense_vals(9);
-  for (size_t i=0; i<9; i++) {
-    dense_vals[i] = 0.00;
-  }
-  // diagonals are 1
-  dense_vals[0] = 1.00;
-  dense_vals[4] = 1.00;
-  dense_vals[8] = 1.00;
+  stan::io::dump dmp = 
+    stan::services::util::create_ident_dense_mass_matrix(3);
+  stan::io::var_context& result_mass_matrix = dmp;
+  std::vector<double> dense_vals
+    = result_mass_matrix.vals_r("mass_matrix");
   stan::test::unit::check_adaptation(3, 3, dense_vals, parameter, 0.05);
 }
