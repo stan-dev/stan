@@ -31,7 +31,8 @@ namespace stan {
           init_mass_matrix.validate_dims("read diag mass matrix", "mass_matrix",
                                          "vector_d",
                                          init_mass_matrix.to_vec(num_params));
-          std::vector<double> diag_vals = init_mass_matrix.vals_r("mass_matrix");
+          std::vector<double> diag_vals =
+            init_mass_matrix.vals_r("mass_matrix");
           for (size_t i=0; i < num_params; i++) {
             inv_mass_matrix(i) = diag_vals[i];
           }

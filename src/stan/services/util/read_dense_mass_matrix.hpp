@@ -31,7 +31,8 @@ namespace stan {
           init_mass_matrix.validate_dims("read dense mass matrix",
                            "mass_matrix", "matrix",
                            init_mass_matrix.to_vec(num_params, num_params));
-          std::vector<double> dense_vals = init_mass_matrix.vals_r("mass_matrix");
+          std::vector<double> dense_vals =
+            init_mass_matrix.vals_r("mass_matrix");
           inv_mass_matrix =
             stan::math::to_matrix(dense_vals, num_params, num_params);
         } catch (const std::exception& e) {
