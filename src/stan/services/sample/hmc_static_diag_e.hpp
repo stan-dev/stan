@@ -12,6 +12,7 @@
 #include <stan/services/util/initialize.hpp>
 #include <stan/services/util/create_ident_diag_mass_matrix.hpp>
 #include <stan/services/util/read_diag_mass_matrix.hpp>
+#include <stan/services/util/validate_diag_mass_matrix.hpp>
 
 #include <vector>
 
@@ -67,19 +68,15 @@ namespace stan {
           = util::initialize(model, init, rng, init_radius, true,
                              message_writer, init_writer);
 
-
         Eigen::VectorXd inv_mass_matrix;
         try {
-          inv_mass_matrix = 
+          inv_mass_matrix =
             util::read_diag_mass_matrix(init_mass_matrix, model.num_params_r(),
                                         error_writer);
+          util::validate_diag_mass_matrix(inv_mass_matrix, error_writer);
         } catch (const std::domain_error& e) {
-          error_writer("Cannot read inverse mass matrix from inputs.");
           return error_codes::CONFIG;
         }
-
-
-
 
         stan::mcmc::diag_e_static_hmc<Model, boost::ecuyer1988>
           sampler(model, rng, inv_mass_matrix);
@@ -133,8 +130,7 @@ namespace stan {
                             callbacks::writer& init_writer,
                             callbacks::writer& sample_writer,
                             callbacks::writer& diagnostic_writer) {
-
-        stan::io::dump dmp = 
+        stan::io::dump dmp =
           util::create_ident_diag_mass_matrix(model.num_params_r());
         stan::io::var_context& ident_mass_matrix = dmp;
 
@@ -144,7 +140,6 @@ namespace stan {
                                  stepsize, stepsize_jitter, int_time,
                                  interrupt, message_writer, error_writer,
                                  init_writer, sample_writer, diagnostic_writer);
-
       }
 
     }

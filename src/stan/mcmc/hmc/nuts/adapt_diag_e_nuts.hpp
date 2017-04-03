@@ -19,7 +19,7 @@ namespace stan {
       adapt_diag_e_nuts(const Model& model, BaseRNG& rng)
         : diag_e_nuts<Model, BaseRNG>(model, rng),
         stepsize_var_adapter(model.num_params_r()) {}
-      
+
       /** 
        * specialized constructor for specified diag mass matrix
        */

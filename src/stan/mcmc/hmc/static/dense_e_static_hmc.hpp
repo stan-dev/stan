@@ -30,7 +30,6 @@ namespace stan {
         : base_static_hmc<Model, dense_e_metric,
                           expl_leapfrog, BaseRNG>(model, rng,
                                                   inv_mass_matrix) { }
-
     };
 
   }  // mcmc

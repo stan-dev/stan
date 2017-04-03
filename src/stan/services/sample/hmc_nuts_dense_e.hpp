@@ -13,6 +13,7 @@
 #include <stan/services/util/initialize.hpp>
 #include <stan/services/util/create_ident_dense_mass_matrix.hpp>
 #include <stan/services/util/read_dense_mass_matrix.hpp>
+#include <stan/services/util/validate_dense_mass_matrix.hpp>
 #include <vector>
 
 namespace stan {
@@ -26,7 +27,7 @@ namespace stan {
        * @tparam Model Model class
        * @param[in] model Input model to test (with data already instantiated)
        * @param[in] init var context for initialization
-       * @param[in] inv_mass_matrix dense mass matrix (must be positive definite)
+       * @param[in] init_mass_matrix dense mass matrix (must be positive definite)
        * @param[in] random_seed random seed for the random number generator
        * @param[in] chain chain id to advance the pseudo random number generator
        * @param[in] init_radius radius to initialize
@@ -69,18 +70,11 @@ namespace stan {
 
         Eigen::MatrixXd inv_mass_matrix;
         try {
-          inv_mass_matrix = 
+          inv_mass_matrix =
             util::read_dense_mass_matrix(init_mass_matrix, model.num_params_r(),
                                          error_writer);
+          util::validate_dense_mass_matrix(inv_mass_matrix, error_writer);
         } catch (const std::domain_error& e) {
-          error_writer("Cannot read inverse mass matrix from inputs.");
-          return error_codes::CONFIG;
-        }
-        try {
-          stan::math::check_pos_definite("check_pos_definite", "inv_mass_matrix",
-                                         inv_mass_matrix);
-        } catch (const std::domain_error& e) {
-          error_writer("Inverse mass matrix not positive definite.");
           return error_codes::CONFIG;
         }
 
@@ -123,7 +117,7 @@ namespace stan {
        * @param[in,out] sample_writer Writer for draws
        * @param[in,out] diagnostic_writer Writer for diagnostic information
        * @return error_codes::OK if successful
-       * 
+       *
        */
       template <class Model>
       int hmc_nuts_dense_e(Model& model, stan::io::var_context& init,
@@ -138,8 +132,7 @@ namespace stan {
                            callbacks::writer& init_writer,
                            callbacks::writer& sample_writer,
                            callbacks::writer& diagnostic_writer) {
-        
-        stan::io::dump dmp = 
+        stan::io::dump dmp =
           util::create_ident_dense_mass_matrix(model.num_params_r());
         stan::io::var_context& ident_mass_matrix = dmp;
 

@@ -48,7 +48,6 @@ namespace stan {
         depth_(0), max_depth_(5), max_deltaH_(1000),
         n_leapfrog_(0), divergent_(0), energy_(0) {
       }
-      
 
       ~base_nuts() {}
 

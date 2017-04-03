@@ -18,7 +18,6 @@ namespace stan {
        */
       stan::io::dump
       create_ident_dense_mass_matrix(size_t num_params) {
-
         Eigen::MatrixXd inv_mass_matrix(num_params, num_params);
         inv_mass_matrix.setIdentity();
         size_t num_elements = num_params * num_params;

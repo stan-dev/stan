@@ -50,7 +50,7 @@ namespace stan {
         T_(1), energy_(0) {
         update_L_();
       }
-      
+
       ~base_static_hmc() {}
 
       sample

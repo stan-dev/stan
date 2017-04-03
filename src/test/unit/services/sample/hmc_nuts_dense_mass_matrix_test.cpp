@@ -1,11 +1,11 @@
 #include <stan/services/sample/hmc_nuts_dense_e_adapt.hpp>
 #include <stan/services/sample/hmc_nuts_dense_e.hpp>
-#include <gtest/gtest.h>
 #include <stan/io/empty_var_context.hpp>
 #include <test/test-models/good/mcmc/hmc/common/gauss3D.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <test/unit/services/check_adaptation.hpp>
 #include <iostream>
+#include <gtest/gtest.h>
 
 /** 
  * Use 3-param model test-models/good/mcmc/hmc/common/gauss3D

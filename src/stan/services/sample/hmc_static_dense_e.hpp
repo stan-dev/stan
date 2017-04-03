@@ -13,6 +13,7 @@
 #include <stan/services/util/initialize.hpp>
 #include <stan/services/util/create_ident_dense_mass_matrix.hpp>
 #include <stan/services/util/read_dense_mass_matrix.hpp>
+#include <stan/services/util/validate_dense_mass_matrix.hpp>
 #include <vector>
 
 namespace stan {
@@ -69,18 +70,11 @@ namespace stan {
 
         Eigen::MatrixXd inv_mass_matrix;
         try {
-          inv_mass_matrix = 
+          inv_mass_matrix =
             util::read_dense_mass_matrix(init_mass_matrix, model.num_params_r(),
                                          error_writer);
+          util::validate_dense_mass_matrix(inv_mass_matrix, error_writer);
         } catch (const std::domain_error& e) {
-          error_writer("Cannot read inverse mass matrix from inputs.");
-          return error_codes::CONFIG;
-        }
-        try {
-          stan::math::check_pos_definite("check_pos_definite", "inv_mass_matrix",
-                                         inv_mass_matrix);
-        } catch (const std::domain_error& e) {
-          error_writer("Inverse mass matrix not positive definite.");
           return error_codes::CONFIG;
         }
 
@@ -138,7 +132,7 @@ namespace stan {
                              callbacks::writer& init_writer,
                              callbacks::writer& sample_writer,
                              callbacks::writer& diagnostic_writer) {
-        stan::io::dump dmp = 
+        stan::io::dump dmp =
           util::create_ident_dense_mass_matrix(model.num_params_r());
         stan::io::var_context& ident_mass_matrix = dmp;
 

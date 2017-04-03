@@ -27,11 +27,11 @@ namespace stan {
                                  size_t num_params,
                                  stan::callbacks::writer& error_writer) {
         try {
-          init_mass_matrix.validate_dims("read dense mass matrix", "mass_matrix",
-                           "matrix",
+          init_mass_matrix.validate_dims("read dense mass matrix",
+                           "mass_matrix", "matrix",
                            init_mass_matrix.to_vec(num_params, num_params));
         } catch (const std::domain_error& e) {
-          error_writer("Cannot get mass matrix from input file");
+          error_writer("Cannot read mass matrix from input file");
           throw std::domain_error("Initialization failure");
         }
 

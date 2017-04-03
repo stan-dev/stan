@@ -19,7 +19,7 @@ namespace stan {
       adapt_dense_e_nuts(const Model& model, BaseRNG& rng)
         : dense_e_nuts<Model, BaseRNG>(model, rng),
         stepsize_covar_adapter(model.num_params_r()) {}
-      
+
       /** 
        * specialized constructor for specified dense mass matrix
        */
