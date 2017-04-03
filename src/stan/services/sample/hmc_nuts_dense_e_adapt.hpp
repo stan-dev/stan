@@ -11,9 +11,7 @@
 #include <stan/services/util/run_adaptive_sampler.hpp>
 #include <stan/services/util/create_rng.hpp>
 #include <stan/services/util/initialize.hpp>
-#include <stan/services/util/create_ident_dense_mass_matrix.hpp>
-#include <stan/services/util/read_dense_mass_matrix.hpp>
-#include <stan/services/util/validate_dense_mass_matrix.hpp>
+#include <stan/services/util/mass_matrix.hpp>
 #include <vector>
 
 namespace stan {

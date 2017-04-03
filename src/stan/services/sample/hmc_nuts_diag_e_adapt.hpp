@@ -10,9 +10,7 @@
 #include <stan/services/util/run_adaptive_sampler.hpp>
 #include <stan/services/util/create_rng.hpp>
 #include <stan/services/util/initialize.hpp>
-#include <stan/services/util/create_ident_diag_mass_matrix.hpp>
-#include <stan/services/util/read_diag_mass_matrix.hpp>
-#include <stan/services/util/validate_diag_mass_matrix.hpp>
+#include <stan/services/util/mass_matrix.hpp>
 #include <vector>
 
 namespace stan {
