@@ -40,9 +40,9 @@ namespace stan {
         }
 
         if (init_buffer + base_window + term_buffer > num_warmup) {
-          writer("WARNING: The initial buffer, adaptation window, "
-                 "and terminal buffer");
-          writer("         overflow the total number of warmup iterations.");
+          writer("WARNING: There aren't enough warmup iterations to fit the");
+          writer("         three stages of adaptation as currently"
+                 + std::string(" configured."));
 
           num_warmup_ = num_warmup;
           adapt_init_buffer_ = 0.15 * num_warmup;
@@ -50,7 +50,8 @@ namespace stan {
           adapt_base_window_
             = num_warmup - (adapt_init_buffer_ + adapt_term_buffer_);
 
-          writer("         Defaulting to a 15%/75%/10% partition,");
+          writer("         Reducing each adaptation stage to 15%/75%/10% of");
+          writer("         the given number of warmup iterations:");
 
           std::stringstream init_buffer_msg;
           init_buffer_msg << "           init_buffer = " << adapt_init_buffer_;
