@@ -21,16 +21,6 @@ namespace stan {
       std::vector<expression> args_;
 
       /**
-       * Number of rows.
-       */
-      expression M_;
-
-      /**
-       * Number of columns.
-       */
-      expression N_;
-
-      /**
        * True if there is a variable within any of the expressions
        * that is a parameter, transformed parameter, or non-integer
        * local variable.
