@@ -76,7 +76,9 @@ namespace stan {
       std::ostringstream buf;
       buf << input.rdbuf();
       std::string stan_string = buf.str();
-
+      if (!is_nonempty(stan_string)) 
+        *output_stream << std::endl << "WARNING: empty program" << std::endl;
+      
       typedef std::string::const_iterator input_iterator;
       typedef boost::spirit::line_pos_iterator<input_iterator> lp_iterator;
 
