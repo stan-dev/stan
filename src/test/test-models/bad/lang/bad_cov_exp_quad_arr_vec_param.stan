@@ -12,7 +12,7 @@ parameters {
 transformed parameters {
   matrix[N_2, N_1] transformed_params_matrix;
 
-  transformed_params_matrix <- cov_exp_qud(d_arr_2, d_vec_1, d_sigma, d_len);
+  transformed_params_matrix <- cov_exp_quad(d_arr_2, d_vec_1, d_sigma, d_len);
 }
 parameters {
   real y;
