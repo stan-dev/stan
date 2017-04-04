@@ -416,12 +416,12 @@ TEST_F(ServicesSampleHmcStaticDenseEMassMatrix, use_mass_matrix_continue_2000) {
   input_diag_vals = inv_mass_matrix.vals_r("mass_matrix");
   stan::test::unit::check_different(3, 3, input_diag_vals, parameter, 0.0005);
 
-  // 2000 warmups closer to converge, 6x more error margin than hmc
+  // 2000 warmups, need more error margin than for nuts
   stan::io::dump dmp = 
     stan::services::util::create_ident_dense_mass_matrix(3);
   stan::io::var_context& result_mass_matrix = dmp;
   std::vector<double> dense_vals
     = result_mass_matrix.vals_r("mass_matrix");
-  stan::test::unit::check_adaptation(3, 3, dense_vals, parameter, 0.12);
+  stan::test::unit::check_adaptation(3, 3, dense_vals, parameter, 0.2);
 
 }
