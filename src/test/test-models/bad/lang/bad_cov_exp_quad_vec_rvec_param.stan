@@ -10,9 +10,9 @@ parameters {
   row_vector[K] d_rvec_1[N_2]; // bad mixed Eigen vector types
 }
 transformed parameters {
-  matrix[N_2, N_1] transformed_params_matrix;
+  matrix[N_1, N_2] transformed_params_matrix;
 
-  transformed_params_matrix <- cov_exp_quad(d_rvec_2, d_vec_1, d_sigma, d_len);
+  transformed_params_matrix = cov_exp_quad(d_vec_1, d_rvec_1, d_sigma, d_len);
 }
 parameters {
   real y;

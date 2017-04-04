@@ -10,7 +10,7 @@ data {
 transformed data {
   matrix[N_2, N_1] transformed_data_matrix;
 
-  transformed_data_matrix <- cov_exp_quad(d_rvec_2, d_vec_1, d_sigma, d_len);
+  transformed_data_matrix = cov_exp_quad(d_rvec_1, d_vec_1, d_sigma, d_len);
 }
 parameters {
   real y;
