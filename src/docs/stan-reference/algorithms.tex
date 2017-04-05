@@ -412,13 +412,13 @@ discussion of step-size jittering.
 
 \subsection{Euclidean Metric}
 
-All HMC implementations in \Stan utilize quadratic kinetic energy
+All HMC implementations in Stan utilize quadratic kinetic energy
 functions which are specified up to the choice of a symmetric,
 positive-definite matrix known as a \textit{mass matrix} or, more
 formally, a \textit{metric} \citep{Betancourt-Stein:2011}.
 
 If the metric is constant then the resulting implementation is known
-as \textit{Euclidean} HMC.  \Stan allows for three Euclidean HMC
+as \textit{Euclidean} HMC.  Stan allows for three Euclidean HMC
 implementations,
 %
 \begin{itemize}
@@ -731,7 +731,7 @@ highlight where divergent transitions arise.
 \noindent
 To avoid having to deal with constraints while simulating the
 Hamiltonian dynamics during sampling, every (multivariate) parameter
-in a \Stan model is transformed to an unconstrained variable behind
+in a Stan model is transformed to an unconstrained variable behind
 the scenes by the model compiler.  The transform is based on the
 constraints, if any, in the parameter's definition.  Scalars or the
 scalar values in vectors, row vectors or matrices may be constrained
@@ -741,7 +741,7 @@ may be constrained to be correlation matrices or covariance matrices.
 This chapter provides a definition of the transforms used for each
 type of variable.
 
-\Stan converts models to \Cpp classes which define probability
+Stan converts models to \Cpp classes which define probability
 functions with support on all of $\reals^K$, where $K$ is the number
 of unconstrained parameters needed to define the constrained
 parameters defined in the program.  The \Cpp classes also include
@@ -761,7 +761,7 @@ subset of values for which it has non-zero density,
 If $f$ is a total function defined on the support of $X$, then $Y =
 f(X)$ is a new random variable.  This section shows how to compute the
 probability density function of $Y$ for well-behaved transforms $f$.
-The rest of the chapter details the transforms used by \Stan.
+The rest of the chapter details the transforms used by Stan.
 
 
 
@@ -838,7 +838,7 @@ variable.
 
 \section{Lower Bounded Scalar}\label{lower-bound-transform.section}
 
-\Stan uses a logarithmic transform for lower and upper bounds.
+Stan uses a logarithmic transform for lower and upper bounds.
 
 \subsection{Lower Bound Transform}
 
@@ -877,7 +877,7 @@ p_Y(y)
 
 \section{Upper Bounded Scalar}
 
-\Stan uses a negated logarithmic transform for upper bounds.
+Stan uses a negated logarithmic transform for upper bounds.
 
 \subsection{Upper Bound Transform}
 
@@ -918,7 +918,7 @@ p_Y(y)
 
 \section{Lower and Upper Bounded Scalar}\label{logit-transform-jacobian.section}
 
-For lower and upper-bounded variables, \Stan uses a scaled and
+For lower and upper-bounded variables, Stan uses a scaled and
 translated log-odds transform.
 
 \subsection{Log Odds and the Logistic Sigmoid}
@@ -945,7 +945,7 @@ The derivative of the logistic sigmoid is
 
 \subsection{Lower and Upper Bounds Transform}
 
-For variables constrained to be in the open interval $(a,b)$, \Stan
+For variables constrained to be in the open interval $(a,b)$, Stan
 uses a scaled and translated log-odds transform.  If variable $X$ is
 declared to have lower bound $a$ and upper bound $b$, then it is
 transformed to a new variable $Y$, where
@@ -1012,7 +1012,7 @@ for $k \in \setlist{1,\ldots,K-1}$.
 
 \subsection{Ordered Transform}
 
-\Stan's transform follows the constraint directly.  It maps an
+Stan's transform follows the constraint directly.  It maps an
 increasing vector $x \in \reals^{K}$ to an unconstrained vector $y \in
 \reals^K$ by setting
 %
@@ -1367,7 +1367,7 @@ definite, so that for every non-zero $K$-vector $a$,
 \[
 a^{\top} x a > 0.
 \]
-To deal with this rather complicated constraint, \Stan implements the
+To deal with this rather complicated constraint, Stan implements the
 transform of \cite{LewandowskiKurowickaJoe:2009}.  The number of free
 parameters required to specify a $K \times K$ correlation matrix is $\binom{K}{2}$.
 
@@ -1413,7 +1413,7 @@ and $j$ are regressed on all variables $i'$ such that $i'< i$.
 In the case of $i=1$, there are no earlier variables,
 so $z_{1,j}$ is just the Pearson correlation between $i$ and $j$.
 
-In \Stan, the \LKJ transform is reformulated in terms of a Cholesky factor $w$
+In Stan, the \LKJ transform is reformulated in terms of a Cholesky factor $w$
 of the final correlation matrix, defined for $1 \leq i,j \leq K$ by
 %
 \[
@@ -1535,12 +1535,12 @@ covariance matrix.
 
 \subsection{Covariance Matrix Transform}
 
-\Stan's covariance transform is based on a Cholesky decomposition
+Stan's covariance transform is based on a Cholesky decomposition
 composed with a log transform of the positive-constrained diagonal
 elements.%
 %
 \footnote{An alternative to the transform in this section, which can
-  be coded directly in \Stan, is to parameterize a covariance matrix
+  be coded directly in Stan, is to parameterize a covariance matrix
   as a scaled correlation matrix.  An arbitrary $K \times K$
   covariance matrix $\Sigma$ can be expressed in terms of a $K$-vector
   $\sigma$ and correlation matrix $\Omega$ as
@@ -2091,7 +2091,7 @@ one is more efficient.
 \chapter{Variational Inference}\label{vi-algorithms.chapter}
 
 \noindent
-\Stan implements an automatic variational inference algorithm, called
+Stan implements an automatic variational inference algorithm, called
 Automatic Differentiation Variational Inference (ADVI)
 \citep{Kucukelbir:2015}. In this chapter, we describe the specifics of
 how ADVI maximizes the variational objective. For a high-level
@@ -2105,7 +2105,7 @@ variational objective using automatic differentiation and Monte Carlo
 integration. The algorithm ascends these gradients using an adaptive
 stepsize sequence. We evaluate the ELBO also using Monte Carlo
 integration and measure convergence similar to the relative tolerance
-scheme in \Stan's optimization feature.
+scheme in Stan's optimization feature.
 
 \subsection{Monte Carlo Approximation of the ELBO}
 
@@ -2139,7 +2139,7 @@ optimization.  Specifically, ADVI heuristically determines a rolling
 window over which it computes the average and the median change of the
 ELBO. Should either number fall below a threshold, denoted by
 \texttt{tol\_rel\_obj}, we consider the algorithm to have
-converged. The change in ELBO is calculated the same way as in \Stan's
+converged. The change in ELBO is calculated the same way as in Stan's
 optimization module.
 
 

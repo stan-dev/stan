@@ -21,19 +21,19 @@
 \begin{center}
 \begin{minipage}[t]{0.75\textwidth}
 \small
-Stan Development Team (2016)
+Stan Development Team (2017)
 {\it Stan Modeling Language: User's Guide and Reference Manual}. Version
 \stanversion.
 \vspace*{20pt}
 \mbox{ }
 \\
-Copyright \copyright \ 2011--2016, Stan Development Team.
+Copyright \copyright \ 2011--2017, Stan Development Team.
 \vspace*{28pt}
 \mbox{} \\
 This document is distributed under the Creative Commons Attribution 4.0
-International License (CC BY 4.0).  For full details, see
+International License (CC BY-ND 4.0).  For full details, see
 \begin{center}
-\url{https://creativecommons.org/licenses/by/4.0/legalcode}
+\url{https://creativecommons.org/licenses/by-nd/4.0/legalcode}
 \end{center}
 The Stan logo is distributed under the Creative Commons Attribution-NoDerivatives
 4.0 International License (CC BY-ND 4.0).  For full details, see
@@ -57,75 +57,59 @@ members).
 
 \begin{itemize}
 \item Andrew Gelman \ (Columbia University)
-\\ {\footnotesize chief of staff, chief of marketing, chief of
-  fundraising, chief of modeling, max marginal likelihood,
-  expectation propagation,  posterior analysis, RStan, RStanARM, Stan}
-\item Bob Carpenter \ (Columbia University) \\ {\footnotesize language
-    design, parsing, code generation, autodiff, templating, ODEs,
-    probability functions, constraint transforms, manual, web design /
-    maintenance, fundraising, support, training, Stan, Stan
-    Math, CmdStan}
-\item Daniel Lee \   (Columbia University)
-\\ {\footnotesize chief of engineering, CmdStan, builds, continuous
-  integration, testing, templates, ODEs, autodiff,
-  posterior analysis, probability functions, error handling,
-  refactoring, training, Stan, Stan Math, CmdStan, RStan, PyStan}
+\\ {\footnotesize Stan, RStan, RStanArm}
+\item Bob Carpenter \ (Columbia University) \\ {\footnotesize Stan
+    Math, Stan, CmdStan}
+\item Daniel Lee \   (Stan Group, Inc.)
+\\ {\footnotesize Stan Math, Stan, CmdStan, RStan, PyStan, dev ops}
 \item Ben Goodrich \   (Columbia University)
-\\ {\footnotesize RStan, multivariate probability functions, matrix algebra,
-  (re)parameterization, constraint transforms, modeling, R, \Cpp,
-  training, Stan, Stan Math,  RStan, RStanARM}
+\\ {\footnotesize Stan Math, Stan, RStan, RStanArm}
 \item Michael Betancourt \ (University of Warwick) \\
-  {\footnotesize chief of smooth manifolds, MCMC, Riemannian HMC,
-    geometry, analysis and measure theory, ODEs, CmdStan, CDFs,
-    autodiff, transformations, refactoring, modeling, adaptation, variational
-    inference, logos, web design, training, Stan, Stan Math, CmdStan}
-\item Marcus Brubaker \   (University of Toronto, Scarborough)
-\\ {\footnotesize chief of optimization, code efficiency, matrix
-  algebra, multivariate distributions, \Cpp, Stan, Stan Math, CmdStan}
+  {\footnotesize Stan Math, Stan, CmdStan}
+\item Marcus Brubaker \   (York University)
+\\ {\footnotesize Stan Math}
 \item Jiqiang Guo \   (NPD Group)
-\\ {\footnotesize modeling, Stan, RStan}
-\item Allen Riddell \   (Dartmouth College)
-\\ {\footnotesize PyStan}
+\\ {\footnotesize Stan Math, Stan, RStan}
+\item Allen Riddell \   (Indiana University)
+\\ {\footnotesize PyStan, dev ops}
 \item Marco Inacio \   (University of S\~{a}o Paulo/UFSCar)
-\\ {\footnotesize functions and distributions, Stan, Stan Math}
+\\ {\footnotesize Stan Math, Stan}
 \item Jeffrey Arnold \   (University of Washington)
-\\ {\footnotesize emacs mode, pretty printing, manual}
+\\ {\footnotesize Emacs Mode, Pygments mode}
+\item Mitzi Morris \   (Consultant, New York)
+\\ {\footnotesize Stan Math, Stan, CmdStan, dev ops}
 \item Rob J.\ Goedman \ (Consultant, La Jolla, California)
-\\ {\footnotesize parsing, Stan, Stan.jl}
+\\ {\footnotesize Stan, Stan.jl}
 \item Brian Lau \ (CNRS, Paris)
 \\ {\footnotesize MatlabStan}
-\item Mitzi Morris \   (Lucidworks)
-\\ {\footnotesize parsing, testing, JSON, Stan, Stan Math}
 \item Rob Trangucci \   (Columbia University)
-\\ {\footnotesize max marginal likelihood, multilevel modeling and
-  GLMs, poststratification, autodiff, template metaprogramming, 
-  training, Stan, Stan Math, RStan}
+\\ {\footnotesize Stan Math, Stan, RStan}
 \item Jonah Sol Gabry \ (Columbia University)
-\\ {\footnotesize RStan, RStanARM, ShinyStan, multilevel modeling, 
-  model comparison (LOO), model visualization, training}
-\item Alp Kucukelbir \ (Columbia University)
-\\ {\footnotesize variational inference, Stan, CmdStan}
-\item Robert L. Grant \ (St. George's, University of London and
-  Kingston University)
+\\ {\footnotesize RStan, RStanArm, ShinyStan, Loo, BayesPlot}
+\item Alp Kucukelbir \ (Columbia University, Fero Labs)
+\\ {\footnotesize Stan, CmdStan}
+\item Robert L. Grant \ (Consultant, London)
 \\ {\footnotesize StataStan}
-\item Dustin Tran \ (Harvard University)
-\\ {\footnotesize variational inference, Stan, CmdStan}
+\item Dustin Tran \ (Columbia University)
+\\ {\footnotesize Stan, CmdStan}
 \item Krzysztof Sakrejda \ (University of Massachusetts, Amherst)
-\\ {\footnotesize sparse matrix operations, Stan, Stan Math}
-\item Aki Vehtari \ (Aalto University) \\ {\footnotesize GPs, model
-    comparison (LOO, WAIC), modeling, priors, variable selection, max
-    marginal likelihood, expectation propagation, algorithms,
-    MatlabStan}
+\\ {\footnotesize Stan Math, Stan}
+\item Aki Vehtari \ (Aalto University) \\ {\footnotesize Stan Math,
+    Stan, MatlabStan, RStan, Loo, BayesPlot}
 \item Rayleigh Lei \ (University of Michigan)
-\\ {\footnotesize vectorization, ADVI, RStan, Stan, Stan Math}
+\\ {\footnotesize Stan Math, Stan, RStan}
 \item Sebastian Weber \ (Novartis Pharma)
-\\ {\footnotesize ODE solvers, Stan, Stan Math}
+\\ {\footnotesize Stan Math, Stan}
 \item Charles Margossian \ (Metrum LLC)
-\\ {\footnotesize ODE solvers, Stan, Stan Math}
+\\ {\footnotesize Stan Math, Stan}
 \item Thel Seraphim \ (Columbia University)
-\\ {\footnotesize Stan Math}
+\\ {\footnotesize Stan Math, Stan}
 \item Vincent Picaud \ (CEA, France)
 \\ {\footnotesize MathematicaStan}
+\item Imad Ali \ (Columbia Univesity)
+\\ {\footnotesize RStan, RStanArm}
+\item Sean Talts \ (Dual Space, LLC)
+\\ {\footnotesize Stan Math, Stan, dev ops}
 \end{itemize}
 
 \subsection*{Development Team Alumni}
@@ -135,14 +119,12 @@ past, but are no longer contributing actively.
 
 \begin{itemize}
 \item Matt Hoffman \ (Adobe Creative Technologies Lab)
-\\ {\footnotesize NUTS, adaptation, autodiff, memory management,
-  (re)parameterization, optimization \Cpp}
+\\ {\footnotesize Stan Math, Stan, CmdStan}
 \item Michael Malecki \ (Crunch.io, YouGov plc)
-\\ {\footnotesize original design, modeling, logos, R}
+\\ {\footnotesize software and graphical design}
 \item Peter Li \   (Columbia University)
-\\ {\footnotesize RNGs, higher-order autodiff, ensemble sampling,
-  Metropolis, example models, \Cpp}
+\\ {\footnotesize Stan Math, Stan}
 \item Yuanjun Guo \ (Columbia University)
-\\ {\footnotesize dense mass matrix estimation, \Cpp}
+\\ {\footnotesize Stan}
 \end{itemize}
 
