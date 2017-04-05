@@ -3,7 +3,7 @@
 
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/var_context.hpp>
-#include <stan/math/prim/mat.hpp>
+#include <Eigen/Dense>
 #include <limits>
 #include <sstream>
 #include <string>
