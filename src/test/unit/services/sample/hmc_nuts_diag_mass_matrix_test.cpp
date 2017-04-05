@@ -68,7 +68,7 @@ TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, ident_no_adapt) {
   stan::io::var_context& inv_mass_matrix = dmp;
   std::vector<double> diag_vals
     = inv_mass_matrix.vals_r("mass_matrix");
-  stan::test::unit::check_adaptation(3, diag_vals, parameter, 0.05);
+  stan::test::unit::check_adaptation(3, diag_vals, parameter, 0.2);
 }
 
 TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, ident_adapt_250) {
@@ -130,7 +130,7 @@ TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, ident_adapt_250) {
   diag_vals.push_back(0.929061);
   diag_vals.push_back(0.823316);
   diag_vals.push_back(0.643094);
-  stan::test::unit::check_adaptation(3, diag_vals, parameter, 0.1);
+  stan::test::unit::check_adaptation(3, diag_vals, parameter, 0.2);
 }
 
 TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, use_mass_matrix_no_adapt) {
@@ -181,7 +181,7 @@ TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, use_mass_matrix_no_adapt) {
   // check results against initial vals (stan::io::var_context inv_mass_matrix)
   std::vector<double> diag_vals(3);
   diag_vals = inv_mass_matrix.vals_r("mass_matrix");
-  stan::test::unit::check_adaptation(3, diag_vals, parameter, 0.05);
+  stan::test::unit::check_adaptation(3, diag_vals, parameter, 0.2);
 }
 
 TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, use_mass_matrix_skip_adapt) {
@@ -247,5 +247,5 @@ TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, use_mass_matrix_skip_adapt) {
   // check results against initial vals (stan::io::var_context inv_mass_matrix)
   std::vector<double> diag_vals(3);
   diag_vals = inv_mass_matrix.vals_r("mass_matrix");
-  stan::test::unit::check_adaptation(3, diag_vals, parameter, 0.05);
+  stan::test::unit::check_adaptation(3, diag_vals, parameter, 0.2);
 }

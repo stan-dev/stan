@@ -200,20 +200,21 @@ src/test/unit/old_services/mcmc/sample_test.cpp: src/test/test-models/good/servi
 src/test/unit/old_services/mcmc/warmup_test.cpp: src/test/test-models/good/services/test_lp.hpp
 src/test/unit/old_services/optimize/do_bfgs_optimize_test.cpp: src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/services/diagnose/diagnose_test.cpp : src/test/test-models/good/services/test_lp.hpp
-src/test/unit/services/optimize/bfgs_test.cpp \
-src/test/unit/services/optimize/lbfgs_test.cpp \
+src/test/unit/services/optimize/bfgs_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
+src/test/unit/services/optimize/lbfgs_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/services/optimize/newton_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/services/experimental/advi/fullrank_test.cpp src/test/unit/services/experimental/advi/meanfield_test.cpp : src/test/test-models/good/services/test_lp.hpp
+src/test/unit/services/sample/fixed_param_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/services/sample/hmc_nuts_dense_e_adapt_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/services/sample/hmc_nuts_dense_e_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/services/sample/hmc_nuts_diag_e_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
-src/test/unit/services/sample/hmc_nuts_diag_e_adapt_e_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
+src/test/unit/services/sample/hmc_nuts_diag_e_adapt_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/services/sample/hmc_nuts_unit_e_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
-src/test/unit/services/sample/hmc_nuts_unit_e_adapt_e_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
+src/test/unit/services/sample/hmc_nuts_unit_e_adapt_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/services/sample/hmc_static_dense_e_adapt_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/services/sample/hmc_static_dense_e_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/services/sample/hmc_static_diag_e_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
-src/test/unit/services/sample/hmc_static_diag_e_adapt_e_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
+src/test/unit/services/sample/hmc_static_diag_e_adapt_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/services/sample/hmc_static_unit_e_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/services/sample/hmc_nuts_dense_mass_matrix_test.cpp : src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
 src/test/unit/services/sample/hmc_nuts_diag_mass_matrix_test.cpp : src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp

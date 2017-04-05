@@ -70,7 +70,7 @@ TEST_F(ServicesSampleHmcStaticDenseEMassMatrix, ident_no_adapt) {
   std::vector<double> dense_vals
     = inv_mass_matrix.vals_r("mass_matrix");
   // check returned mass matrix
-  stan::test::unit::check_adaptation(3, dense_vals, parameter, 0.05);
+  stan::test::unit::check_adaptation(3, dense_vals, parameter, 0.2);
 }
 
 TEST_F(ServicesSampleHmcStaticDenseEMassMatrix, ident_adapt_250) {
@@ -139,7 +139,7 @@ TEST_F(ServicesSampleHmcStaticDenseEMassMatrix, ident_adapt_250) {
   dense_vals.push_back(-0.12395);
   dense_vals.push_back(-0.051543);
   dense_vals.push_back(0.8274);
-  stan::test::unit::check_adaptation(3, 3, dense_vals, parameter, 0.1);
+  stan::test::unit::check_adaptation(3, 3, dense_vals, parameter, 0.2);
 }
 
 TEST_F(ServicesSampleHmcStaticDenseEMassMatrix, use_mass_matrix_no_adapt) {
@@ -193,7 +193,7 @@ TEST_F(ServicesSampleHmcStaticDenseEMassMatrix, use_mass_matrix_no_adapt) {
 
   std::vector<double> dense_vals(3);
   dense_vals = inv_mass_matrix.vals_r("mass_matrix");
-  stan::test::unit::check_adaptation(3, dense_vals, parameter, 0.1);
+  stan::test::unit::check_adaptation(3, dense_vals, parameter, 0.2);
 }
 
 TEST_F(ServicesSampleHmcStaticDenseEMassMatrix, use_mass_matrix_skip_adapt) {
@@ -261,6 +261,6 @@ TEST_F(ServicesSampleHmcStaticDenseEMassMatrix, use_mass_matrix_skip_adapt) {
 
   std::vector<double> dense_vals(9);
   dense_vals = inv_mass_matrix.vals_r("mass_matrix");
-  stan::test::unit::check_adaptation(3, 3, dense_vals, parameter, 0.05);
+  stan::test::unit::check_adaptation(3, 3, dense_vals, parameter, 0.2);
 }
 
