@@ -3950,10 +3950,12 @@ generation.
 
 \subsection{Optionality and Ordering}
 
-All of the blocks other than the \code{model} block are optional.  The
-blocks that occur must occur in the order presented in the skeletal
-program above.  Within each block, both declarations and statements
-are optional, subject to the restriction that the declarations come
+All of the blocks are optional.  A consequence of this is that the
+empty string is a valid Stan program, although it will trigger a
+warning message from the Stan compiler.  The Stan program blocks
+that occur must occur in the order presented in the skeletal program
+above.  Within each block, both declarations and statements are
+optional, subject to the  restriction that the declarations come
 before the statements.
 
 \subsection{Variable Scope}
