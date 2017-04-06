@@ -158,6 +158,7 @@ make that much of a difference to speed, though, so the choice should
 be based on clarity.
 
 \section{The QR Reparameterization}\label{QR-reparameterization.section}
+
 In the previous example, the linear predictor can be written as
 $\eta = x \beta$, where $\eta$ is a $N$-vector of predictions, 
 $x$ is a $N \times K$ matrix, and $\beta$ is a $K$-vector of coefficients.
@@ -204,31 +205,34 @@ generated quantities {
 \end{stancode}
 %
 Since this Stan program generates equivalent predictions for $y$ and
-the same posterior distribution for $\alpha$, $\beta$, and $\sigma$
-as the previous Stan program, many wonder why the version with this
-QR reparameterization performs so much better in practice, often both in
-terms of wall time and in terms of effective sample size. The reasoning 
-is three-fold:
+the same posterior distribution for $\alpha$, $\beta$, and $\sigma$ as
+the previous Stan program, many wonder why the version with this QR
+reparameterization performs so much better in practice, often both in
+terms of wall time and in terms of effective sample size. The
+reasoning is threefold:
+%
 \begin{enumerate}
- \item The columns of $Q^\ast$ are orthogonal whereas the columns of 
-   $x$ generally are not. Thus, it is easier for a Markov Chain to move
-   around in $\theta$-space than in $\beta$-space.
- \item The columns of $Q^\ast$ have the same scale whereas the columns
-   of $x$ generally do not. Thus, a Hamiltonian Monte Carlo algorithm
-   can move around the parameter space with a smaller number of larger
-   steps
- \item Since the covariance matrix for the columns of $Q\ast$ is an
-   identity matrix, $\theta$ typically has a reasonable scale if the
-   units of $y$ are also reasonable. This also helps HMC move efficiently
-   without compromising numerical accuracy.
+\item The columns of $Q^\ast$ are orthogonal whereas the columns of
+  $x$ generally are not. Thus, it is easier for a Markov Chain to move
+  around in $\theta$-space than in $\beta$-space.
+\item The columns of $Q^\ast$ have the same scale whereas the columns
+  of $x$ generally do not. Thus, a Hamiltonian Monte Carlo algorithm
+  can move around the parameter space with a smaller number of larger
+  steps
+\item Since the covariance matrix for the columns of $Q\ast$ is an
+  identity matrix, $\theta$ typically has a reasonable scale if the
+  units of $y$ are also reasonable. This also helps HMC move
+  efficiently without compromising numerical accuracy.
 \end{enumerate}
+%
 Consequently, this QR reparameterization is recommended for linear and
-generalized linear models in Stan whenever $K > 1$ and you do not have an
-informative prior on the \emph{location} of $\beta$. It can also be
-worthwhile to subtract the mean from each column of $x$ before obtaining
-the QR decomposition, which does not affect the posterior distribution of
-$\theta$ or $\beta$ but does affect $\alpha$ and allows you to interpret
-$\alpha$ as the expectation of $y$ in a linear model.
+generalized linear models in Stan whenever $K > 1$ and you do not have
+an informative prior on the \emph{location} of $\beta$. It can also be
+worthwhile to subtract the mean from each column of $x$ before
+obtaining the QR decomposition, which does not affect the posterior
+distribution of $\theta$ or $\beta$ but does affect $\alpha$ and
+allows you to interpret $\alpha$ as the expectation of $y$ in a linear
+model.
 
 \section{Priors for Coefficients and Scales}\label{regression-priors.section}
 
@@ -719,16 +723,16 @@ parameters {
 %
 and then these are transformed to parameters to use in the model.
 First, a transformed data block is added before the parameters block
-to define a column vector of zero values,
+to define a row vector of zero values,
 %
 \begin{stancode}
 transformed data {
-  vector[D] zeros;
-  zeros = rep_vector(0, D);
+  row_vector[D] zeros;
+  zeros = rep_row_vector(0, D);
 }
 \end{stancode}
 %
-and then these are appended to \code{beta\_row} to produce the
+which can then be appended to \code{beta\_row} to produce the
 coefficient matrix \code{beta},
 %
 \begin{stancode}
@@ -738,9 +742,9 @@ transformed parameters {
 }
 \end{stancode}
 %
-See \refsection{matrix-broadcast} for a definition of \code{rep\_vector} and
-\refsection{matrix-concatenation} for a definition of
-\code{append\_col}.
+See \refsection{matrix-broadcast} for a definition of
+\code{rep\_row\_vector} and \refsection{matrix-concatenation} for a
+definition of \code{append\_row}.
 
 This is not quite the same model as using $K$-vectors as parameters,
 because now the prior only applies to $(K-1)$-vectors.  In practice,
@@ -2202,7 +2206,7 @@ $\tilde{x}$ and $\tilde{N}$,
 generated quantities {
   vector[N] y_tilde;
   for (n in 1:N)
-    y_tilde = normal_rng(alpha + beta * x[n], sigma);
+    y_tilde[n] = normal_rng(alpha + beta * x[n], sigma);
 }
 \end{stancode}
 %

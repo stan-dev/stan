@@ -3166,7 +3166,7 @@ y ~ poisson(3.7);
 if (y < 2)
   target += negative_infinity();
 else
-  target += -log_sum_exp(poisson_lpdf(2 | 3.7),
+  target += -log_sum_exp(poisson_lpmf(2 | 3.7),
                          poisson_lccdf(2 | 3.7));
 \end{stancode}
 

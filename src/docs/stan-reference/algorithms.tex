@@ -694,14 +694,58 @@ between 0 and 1 are initialized with values roughly in $(0.12,0.88)$.
 \section{Divergent Transitions}
 
 The Hamiltonian Monte Carlo algorithms (HMC and NUTS) simulate the
-Hamiltonian (position and momentum) of a fictional particle
-representing parameter values.  This simulation is carried out by
-dividing the integration time into a number of smaller steps.  For
-each step, the momentum is followed to update position and the
-gradient is followed to update momentum.  If the posterior is highly
-curved, very small step sizes are required for this simulation of the
-Hamiltonian to be accurate.  When the step size is too large, the
-simulation diverges from the true Hamiltonian.
+trajectory of a fictitious particle representing parameter values when
+subject to a potential energy field, the value of which at a point is
+the negative log posterior density (up to a constant that does not
+depend on location).  Random momentum is imparted independently in
+each direction, by drawing from a standard normal distribution.  The
+Hamiltonian is defined to be the sum of the potential energy and
+kinetic energy of the system. The key feature of the Hamiltonian is
+that it is conserved along the trajectory the particle moves.
+
+In Stan, we use the leapfrog algorithm to simulate the path of a
+particle along the trajectory defined by the initial random momentum
+and the potential energy field.  This is done by alternating updates
+of the position based on the momentum and the momentum based on the
+position.  The momentum updates involve the potential energy and are
+applied along the gradient.  This is essentially a stepwise
+(discretized) first-order approximation of the trajectory.
+\cite{LeimkuhlerReich:2004} provide details and error analysis for the
+leapfrog algorithm.
+
+A divergence arises when the simulated Hamiltonian trajectory departs
+from the true trajectory as measured by departure of the Hamiltonian
+value from its initial value.  When this divergence is too high,%
+%
+\footnote{The current default threshold is a factor of $10^3$, whereas
+  when the leapfrog integrator is working properly, the divergences
+  will be around $10^{-7}$ or so and do not compound due to the
+  symplectic nature of the leapfrog integrator.}
+%
+the simulation has gone off the rails and cannot be trusted.  The
+positions along the simulated trajectory after the Hamiltonian
+diverges will never be selected as the next draw of the MCMC
+algorithm, potentially reducing Hamiltonian Monte Carlo to a simple
+random walk and biasing estimates by not being able to thoroughly
+explore the posterior distribution.  \cite{Betancourt:2016b} provides
+details of the theory, computation, and practical implications of
+divergent transitions in Hamiltonian Monte Carlo.  
+
+The Stan interfaces report divergences as warnings and provide ways to
+access which iterations encountered divergences.  ShinyStan provides
+visualizations that highlight the starting point of divergent
+transitions to diagnose where the divergences arise in parameter
+space.  A common location is in the neck of the funnel in a centered
+parameterization (as in the funnel example discussed in
+\refsection{reparameterization}). 
+
+If the posterior is highly curved, very small step sizes are required
+for this gradient-based simulation of the Hamiltonian to be accurate.
+When the step size is too large (relative to the curvature), the
+simulation diverges from the true Hamiltonian.  This definition is
+imprecise in the same way that stiffness for a differential equation
+is imprecise; both are defined by the way they cause traditional
+stepwise algorithms to diverge from where they should be.
 
 The primary cause of divergent transitions in Euclidean HMC (other
 than bugs in the code) is highly varying posterior curvature, for
@@ -710,6 +754,7 @@ in other regions.  If the step size is too small, the sampler becomes
 inefficient and halts before making a U-turn (hits the maximum tree
 depth in NUTS); if the step size is too large, the Hamiltonian
 simulation diverges.
+
 
 \subsection{Diagnosing and Eliminating Divergences}
 
