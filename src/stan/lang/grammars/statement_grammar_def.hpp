@@ -123,7 +123,7 @@ namespace stan {
         [expression_as_statement_f(_pass, _1,
                                    boost::phoenix::ref(error_msgs_))];
 
-      // _r1 = var scope,  _r2 = true if in loop
+      // _r1 = var scope,  _r2 = true if in loop,  _a var_decls, _b local scope
       statement_seq_r.name("sequence of statements");
       statement_seq_r
         %= lit('{')
@@ -273,7 +273,7 @@ namespace stan {
       var_r.name("variable for left-hand side of assignment");
       var_r
         = identifier_r
-          [identifier_to_var_f(_1, _r1, _val,  _pass,
+          [validate_lhs_var_assgn_f(_1, _r1, _val,  _pass,
                                boost::phoenix::ref(var_map_),
                                boost::phoenix::ref(error_msgs_))];
 
