@@ -5,7 +5,7 @@
 \chapter{Licensing}\label{licensing.appendix}
 
 \noindent
-\Stan and its two dependent libraries, Boost and Eigen, are
+Stan and its two dependent libraries, Boost and Eigen, are
 distributed under liberal freedom-respecting%
 %
 \footnote{The link
@@ -17,17 +17,17 @@ licenses approved by the Open Source Initiative.%
 \footnote{See \url{http://opensource.org}.}  
 
 In particular, the licenses for Stan and its dependent libraries have
-no ``copyleft'' provisions requiring applications of \Stan to be
+no ``copyleft'' provisions requiring applications of Stan to be
 open source if they are redistributed.
 
 This chapter describes the licenses for the tools that are distributed
-with \Stan.  The next chapter explains some of the build tools that
-are not distributed with \Stan, but are required to build and run
-\Stan models.
+with Stan.  The next chapter explains some of the build tools that
+are not distributed with Stan, but are required to build and run
+Stan models.
 
-\section{\Stan's License}
+\section{Stan's License}
 
-\Stan is distributed under the BSD 3-clause license (BSD New).
+Stan is distributed under the BSD 3-clause license (BSD New).
 %
 \begin{quote}
 \url{http://www.opensource.org/licenses/BSD-3-Clause}
@@ -118,7 +118,7 @@ you can look for similar structures in these examples.
 \begin{itemize}
 \item \BUGS is interpreted; Stan is compiled in two steps, first a
   model is is translated to templated C++ and then to a
-  platform-specific executable.  \Stan, unlike \BUGS, allows the user
+  platform-specific executable.  Stan, unlike \BUGS, allows the user
   to directly program in C++, but we do not describe how to do this in
   this Stan manual (see the getting started with \Cpp section of
   \url{http://mc-stan.org} for more information on using Stan directly
@@ -148,9 +148,9 @@ you can look for similar structures in these examples.
 \item In \BUGS, the order in which statements are written does not
   matter.  They are executed according to the directed graphical model
   so that variables are always defined when needed.  A side effect of
-  the direct execution of \Stan's modeling language is that statements
+  the direct execution of Stan's modeling language is that statements
   execute in the order in which they are written.  For instance, the
-  following \Stan program, which sets \code{mu} before using it to
+  following Stan program, which sets \code{mu} before using it to
   sample \code{y}.
 %
 \begin{stancode}
@@ -165,7 +165,7 @@ mu = a + b * x;
 lp += normal_log(mu,sigma);
 \end{stancode}
 %
-Contrast this with the \Stan program
+Contrast this with the Stan program
 %
 \begin{stancode}
 y ~ normal(mu,sigma)

@@ -52,7 +52,7 @@ into the following three steps.
 \end{enumerate}
 %
 Typically, this cycle will be repeated until a sufficient fit is
-achieved in the third step.  \Stan automates the calculations involved
+achieved in the third step.  Stan automates the calculations involved
 in the second and third steps.
 
 \section{Bayesian Inference}
@@ -113,7 +113,7 @@ p(\theta|y)  & =  & \displaystyle \frac{p(\theta,y)}{p(y)}
 Bayes's rule ``inverts'' the probability of the posterior
 $p(\theta|y)$, expressing it solely in terms of the likelihood
 $p(y|\theta)$ and prior $p(\theta)$ (again, with constants and
-predictors $x$ implicit).  The last step is important for \Stan, which
+predictors $x$ implicit).  The last step is important for Stan, which
 only requires probability functions to be characterized up to a
 constant multiplier.
 
@@ -184,7 +184,7 @@ quantities block.
 \chapter{Markov Chain Monte Carlo Sampling}\label{mcmc.chapter}
 
 \noindent
-\Stan uses Markov chain Monte Carlo (\MCMC) techniques to
+Stan uses Markov chain Monte Carlo (\MCMC) techniques to
 generate samples from the posterior distribution for inference.
 
 
@@ -252,7 +252,7 @@ p(\theta) = p(\theta^{(1)}) \prod_{n=2}^N p(\theta^{(n)}|\theta^{(n-1)}).
 Stan uses Hamiltonian Monte Carlo to generate a next state in a manner
 described in \refchapter{hmc}.
 
-The Markov chains \Stan and other \MCMC samplers generate are ergodic
+The Markov chains Stan and other \MCMC samplers generate are ergodic
 in the sense required by the Markov chain central limit theorem,
 meaning roughly that there is a reasonable chance of reaching
 one value of $\theta$ from another.  The Markov chains are also
@@ -266,7 +266,7 @@ function by its arguments).
 Stationary Markov chains have an equilibrium distribution on states in
 which each has the same marginal probability function, so that
 $p(\theta^{(n)})$ is the same probability function as
-$p(\theta^{(n+1)})$.  In \Stan, this equilibrium distribution
+$p(\theta^{(n+1)})$.  In Stan, this equilibrium distribution
 $p(\theta^{(n)})$ is the probability function $p(\theta)$ being
 sampled, typically a Bayesian posterior density.
 
@@ -300,7 +300,7 @@ the $\hat{R}$ statistic will be greater than one.
 
 Gelman and Rubin's recommendation is that the independent Markov
 chains be initialized with diffuse starting values for the parameters
-and sampled until all values for $\hat{R}$ are below 1.1.  \Stan
+and sampled until all values for $\hat{R}$ are below 1.1.  Stan
 allows users to specify initial values for parameters and it is also
 able to draw diffuse random initializations itself.
 
@@ -1270,7 +1270,7 @@ even where posterior means do not, as in the Cauchy distribution.
 \chapter{Variational Inference}\label{vi-advanced.chapter}
 
 \noindent
-\Stan implements an automatic variational inference algorithm that leverages
+Stan implements an automatic variational inference algorithm that leverages
 the transformations from \refchapter{variable-transforms}.
 
 Classical variational inference algorithms are difficult to
@@ -1320,7 +1320,7 @@ divergence \citep{Jordan:1999,Bishop:2006}.
 
 \section{Automatic Variational Inference}
 
-ADVI maximizes the ELBO in the real-coordinate space. \Stan transforms the
+ADVI maximizes the ELBO in the real-coordinate space. Stan transforms the
 parameters from (potentially) constrained domains to
 the real-coordinate space. We denote the combined transformation as
 $T:\theta \to \zeta$, with the $\zeta$ variables living in $\mathbb{R}^K$.

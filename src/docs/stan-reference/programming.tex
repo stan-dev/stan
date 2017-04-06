@@ -551,7 +551,7 @@ taking into account the dependencies.
 \label{custom-probability-functions.chapter}
 
 \noindent
-Custom distributions may also be implemented directly within \Stan's
+Custom distributions may also be implemented directly within Stan's
 programming language.  The only thing that is needed is to increment
 the total log probability.  The rest of the chapter provides two
 examples.
@@ -601,7 +601,7 @@ model {
 The single scalar parameter \code{y} is declared as lying in the
 interval \code{(-1,1)}.  The total log probability is
 incremented with the joint log probability of all parameters, i.e.,
-$\log \distro{Triangle}(y|-1,1)$.  This value is coded in \Stan as
+$\log \distro{Triangle}(y|-1,1)$.  This value is coded in Stan as
 \code{log1m(fabs(y))}.  The function \code{log1m} is is defined so
 that \code{log1m(x)} has the same value as \code{log(1.0-x)}, but the
 computation is faster, more accurate, and more stable.
@@ -629,13 +629,13 @@ sample properly.%
 %
 \footnote{The problem is the (extremely!) light tails of the triangle
   distribution.  The standard \HMC and \NUTS samplers can't get into the
-  corners of the triangle properly.  Because the \Stan code declares
+  corners of the triangle properly.  Because the Stan code declares
   \code{y} to be of type \code{real<lower=-1,upper=1>}, the inverse logit
   transform is applied to the unconstrained variable and its log
   absolute derivative added to the log probability.  The resulting
   distribution on the logit-transformed \code{y} is well behaved.  See
   \refchapter{variable-transforms} for more information on the
-  transforms used by \Stan.}
+  transforms used by Stan.}
 
 \subsection{Exponential Distribution}
 
@@ -744,34 +744,64 @@ this is enforced.
 
 \subsection{Reject Statements}
 
-The Stan reject statement provides a mechanism to report errors or problematic
-values encountered during program execution.
-It accepts any number of quoted string literals or Stan expressions as arguments.
-This statement is typically embedded in a conditional statement in order to
-detect bad or illegal outcomes of some processing step.
+The Stan reject statement provides a mechanism to report errors or
+problematic values encountered during program execution.  It accepts
+any number of quoted string literals or Stan expressions as arguments.
+This statement is typically embedded in a conditional statement in
+order to detect bad or illegal outcomes of some processing step.
 
-To illustrate the use of this statement, we modify the user-defined
-relative difference function example from Section~\refsection{basic-functions}
-so that rejection happens if the relative difference is less than
-some limit.
+\subsubsection{Catching errors}
+
+Rejection is used to flag errors that arise in inputs or in program
+state.  It is far better to fail early with a localized informative
+error message than to run into problems much further downstream (as in
+rejecting a state or failing to compute a derivative).  
+
+The most common errors that are coded is to test that all of the
+arguments to a function are legal.  The following function takes a
+square root of its input, so requires non-negative inputs; it is coded
+to guard against illegal inputs.
 %
 \begin{stancode}
-functions {
-  real relative_diff(real x, real y, real min) {
-    real abs_diff;
-    real avg_scale;
-    abs_diff = fabs(x - y);
-    avg_scale = (fabs(x) + fabs(y)) / 2;
-    if (abs_diff / avg_scale < min) 
-      reject("relative_diff below ", min);
-    return abs_diff / avg_scale;
-  }
+real dbl_sqrt(real x) {
+  if (!(x >= 0))
+    reject("dblsqrt(x): x must be positive; found x = ", x);
+  return 2 * sqrt(x);
 }
 \end{stancode}
+%
+The negation of the positive test is important, because it also
+catches the case where \code{x} is a not-a-number value.  If the
+condition had been coded as \code{(x~<~0)} it would not catch the
+not-a-number case, though it could be written as
+\code{(x~<~0~||~is\_nan(x))}.  The positive infinite case is allowed
+through, but could also be checked with the \Verb/is_inf(x)/ function.
+The square root function does not itself reject, but some downstream
+consumer of \code{dbl\_sqrt(-2)} would be likely to raise an error, at
+which point the origin of the illegal input requires detective work.
+Or even worse, as Matt Simpson pointed out in the GitHub comments, the
+function could go into an infinite loop if it starts with an infinite
+value and tries to reduce it by arithmetic, likely consuming all
+available memory and crashing an interface.  Much better to catch
+errors early and report on their origin.
 
-The effect of rejection depends on the program block
-in which the function was invoked.
-See Section~\refsection{reject-statements} for details.
+The effect of rejection depends on the program block in which the
+rejection is executed.  In transformed data, rejections cause the
+program to fail to load.  In transformed parameters or in the model
+block, rejections cause the current state to be rejected in the
+Metropolis sense.%
+%
+\footnote{Just because this makes it possible to code a rejection
+  sampler does not make it a good idea.  Rejections break
+  differentiability and the smooth exploration of the posterior.  In
+  Hamiltonian Monte Carlo, it can cause the sampler to be reduced to a
+  diffusive random walk.}
+%
+In generated quantities, rejections cause execution to halt because
+there is no way to recover and generate the remaining parameters, so
+extra care should be taken in calling functions in the generated
+quantities block.  See Section~\refsection{reject-statements} for full
+details about the reject statement.
 
 \subsection{Type Declarations for Functions}
 
@@ -2764,9 +2794,9 @@ entries known to be positive.
 
 
 
-\chapter{Optimizing \Stan Code for Efficiency}\label{optimization.chapter}
+\chapter{Optimizing Stan Code for Efficiency}\label{optimization.chapter}
 \noindent
-This chapter provides a grab bag of techniques for optimizing \Stan
+This chapter provides a grab bag of techniques for optimizing Stan
 code, including vectorization, sufficient statistics, and conjugacy.
 At a coarse level, efficiency involves both the amount of time
 required for a computation and the amount of memory required.  For
@@ -3304,11 +3334,15 @@ centering in hierarchical models fit with Hamiltonian Monte Carlo.
 
 \subsection{Non-Centered Parameterization}
 
-When there is a lot of data, such a hierarchical model can be made
-much more efficient by shifting the data's correlation with the
-parameters to the hyperparameters. Similar to the funnel example, this
-will be much more efficient in terms of effective sample size when
-there is not much data (see \citep{Betancourt-Girolami:2013}).
+Sometimes the group-level effects do not constrain the hierarchical
+distribution tightly.  Examples arise when there is not many groups,
+or when the inter-group variation is high.  In such cases,
+hierarchical models can be made much more efficient by shifting the
+data's correlation with the parameters to the hyperparameters. Similar
+to the funnel example, this will be much more efficient in terms of
+effective sample size when there is not much data (see
+\citep{Betancourt-Girolami:2013}), and in more extreme cases will be
+necessary to achieve convergence.
 %
 \begin{stancode}
 parameters {
@@ -3360,6 +3394,8 @@ that is distributed chi-squared with $K$ degrees of freedom. However,
 for large $K$, the computational gains of this reparameterization may
 be overwhelmed by the computational cost of specifying $K$ primitive
 parameters just to obtain one transformed parameter to use in a model.
+
+
 
 \subsection{Multivariate Reparameterizations}
 
@@ -3631,15 +3667,15 @@ model {
 
 \subsection{Gradient Bottleneck}
 
-\Stan spends the vast majority of its time computing the gradient of
+Stan spends the vast majority of its time computing the gradient of
 the log probability function, making gradients the obvious target for
-optimization.  \Stan's gradient calculations with algorithmic
+optimization.  Stan's gradient calculations with algorithmic
 differentiation require a template expression to be allocated%
 %
-\footnote{\Stan uses its own arena-based allocation, so allocation and
+\footnote{Stan uses its own arena-based allocation, so allocation and
   deallocation are faster than with a raw call to \code{new}.}
 %
-and constructed for each subexpression of a \Stan program involving
+and constructed for each subexpression of a Stan program involving
 parameters or transformed parameters.  This section defines
 optimization strategies based on vectorizing these subexpressions to
 reduce the work done during algorithmic differentiation.
@@ -3742,7 +3778,7 @@ replaced with a transpose and multiply, as in
 The relative inefficiency of the transpose and multiply approach is
 that the transposition operator allocates a new vector into which the
 result of the transposition is copied.  This consumes both time
-and memory\footnote{Future versions of \Stan may remove this inefficiency
+and memory\footnote{Future versions of Stan may remove this inefficiency
 by more fully exploiting expression templates inside the Eigen
 \Cpp matrix library.  This will require enhancing Eigen to deal
 with mixed-type arguments, such as the type \code{double} used
@@ -3815,7 +3851,7 @@ The result of the matrix-vector multiplication \code{x * beta} in the
 model block is a vector of the same length as \code{y}.  
 
 The probability function documentation in \refpart{built-in-functions}
-indicates which of \Stan's probability functions support
+indicates which of Stan's probability functions support
 vectorization; see \refsection{prob-vectorization} for more
 information.  Vectorized probability functions accept either vector or
 scalar inputs for all arguments, with the only restriction being that
