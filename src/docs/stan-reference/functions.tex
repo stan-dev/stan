@@ -41,13 +41,13 @@ documented in \refsection{print-statements}.
 \chapter{Integer-Valued Basic Functions}
 
 \noindent
-This chapter describes \Stan's built-in function that take various
+This chapter describes Stan's built-in function that take various
 types of arguments and return results of type integer.
 
 
 \section{Integer-Valued Arithmetic Operators}\label{int-arithmetic.section}
 
-\Stan's arithmetic is based on standard double-precision \Cpp integer and
+Stan's arithmetic is based on standard double-precision \Cpp integer and
 floating-point arithmetic.  If the arguments to an arithmetic operator
 are both integers, as in \code{2~+~2}, integer arithmetic is used.  If
 one argument is an integer and the other a floating-point value, as in
@@ -60,7 +60,7 @@ sum or product of two integers overflows the maximum integer
 representable, the result is an undesirable wraparound behavior at the
 bit level.  If the integers were first promoted to real numbers, they
 would not overflow a floating-point representation.  There are no
-extra checks in \Stan to flag overflows, so it is up to the user to
+extra checks in Stan to flag overflows, so it is up to the user to
 make sure it does not occur.
 
 Secondly, because the set of integers is not closed under division and
@@ -90,7 +90,7 @@ divide-by-zero does not occur.
 
 Operators are described using the \Cpp syntax.  For instance, the
 binary operator of addition, written \code{X + Y}, would have the
-\Stan signature \code{int operator+(int,int)} indicating it takes
+Stan signature \code{int operator+(int,int)} indicating it takes
 two real arguments and returns a real value.
 
 \begin{description}
@@ -324,7 +324,7 @@ integers; the return type is a real array.
 
 Constants are represented as functions with no arguments and must be
 called as such.  For instance, the mathematical constant $\pi$ must be
-written in a \Stan program as \code{pi()}.
+written in a Stan program as \code{pi()}.
 
 %
 \begin{description}
@@ -616,7 +616,7 @@ to parameters; see \refsection{step-functions} for details.
 
 The arithmetic operators are presented using \Cpp notation.  For
 instance \code{operator+(x,y)} refers to the binary addition operator
-and \code{operator-(x)} to the unary negation operator.  In \Stan
+and \code{operator-(x)} to the unary negation operator.  In Stan
 programs, these are written using the usual infix and prefix notations
 as \code{x~+~y} and \code{-x}, respectively.
 
@@ -1070,23 +1070,23 @@ distribution function (and its complement).
     \mbox{\code{erfc}}(x) = \frac{2}{\sqrt{\pi}}\int_x^\infty e^{-t^2}dt
     \]}
   %
-  \fitemUnaryVec{Phi}{unit normal cumulative distribution function of \farg{x}}{
+  \fitemUnaryVecSort{Phi}{unit normal cumulative distribution function of \farg{x}}{
     \[
     \mbox{\code{Phi}}(x) = \frac{1}{\sqrt{2\pi}} \int_{0}^{x} e^{-t^2/2} dt
-    \]}
+    \]}{phi}
   %
   \fitemUnaryVec{inv\_Phi}{standard normal inverse cumulative distribution function of \farg{p}, otherwise known as the quantile function}{
     \[
     \mbox{\code{Phi(inv\_Phi(p))}} = p
     \]}
   %  
-  \fitemUnaryVec{Phi\_approx}{fast approximation of the unit normal cumulative distribution 
+  \fitemUnaryVecSort{Phi\_approx}{fast approximation of the unit normal cumulative distribution 
     function of \farg{x}. This approximation has a maximum absolute error 
     of 0.00014 and may be used instead of \code{Phi} for probit regression.  See
     \citep{BowlingEtAl:2009} for details.}{  
     \[
     \mbox{\code{Phi\_approx}}(x) = \mbox{logit}^{-1}(0.07056 \, x^3 + 1.5976 \, x)
-    \]}
+    \]}{phi\_approx}
 \end{description}
 
 \subsection{Other Probability-Related Functions}
@@ -1139,7 +1139,12 @@ distribution function (and its complement).
     See \refsection{beta-appendix} for definition of $\mbox{B}(\alpha, \beta)$.
   }
   %
-  \fitemUnaryVec{tgamma}{gamma function applied to \farg{x}.  The gamma function  is the generalization of the factorial function to continuous variables, defined so that $\Gamma(n+1) = n!$.  The function is defined for positive numbers and non-integral negative numbers}{
+  \fitemUnaryVec{tgamma}{gamma function applied to \farg{x}.  The
+    gamma function is the generalization of the factorial function to
+    continuous variables, defined so that $\Gamma(n+1) = n!$.  See
+    \refsection{gamma-appendix} for a full definition of $\Gamma(x)$.
+    The function is defined for positive numbers and non-integral
+    negative numbers,}{
     \[
     \mbox{\code{tgamma}}(x) 
     = 
@@ -1149,11 +1154,10 @@ distribution function (and its complement).
     \end{cases}
     \]
     % 
-    See \refsection{gamma-appendix} for definition of $\Gamma(x)$.
   }
   %
-  \fitemUnaryVec{real}{lgamma}{natural logarithm of the gamma function
-    applied to \farg{x}.}{
+  \fitemUnaryVec{lgamma}{natural logarithm of the gamma function
+    applied to \farg{x},}{
     \[
     \mbox{\code{lgamma}}(x) 
     = 
@@ -1391,7 +1395,7 @@ distribution function (and its complement).
 The functions in this section are equivalent in theory to combinations
 of other functions.  In practice, they are implemented to be more
 efficient and more numerically stable than defining them directly
-using more basic \Stan functions.
+using more basic Stan functions.
 %
 \begin{description}
   %
@@ -1917,9 +1921,9 @@ in the matrix \farg{x}}
 
 \section{Matrix Arithmetic Operators}\label{matrix-arithmetic-operators.section}
 
-\Stan supports the basic matrix operations using infix, prefix and
+Stan supports the basic matrix operations using infix, prefix and
 postfix operations.  This section lists the operations supported by
-\Stan along with their argument and result types.
+Stan along with their argument and result types.
 
 \subsection{Negation Prefix Operators}
 
@@ -2469,6 +2473,28 @@ matrix with diagonal \farg{x}}
 %
 \end{description}
 
+Although the \code{diag\_matrix} function is available, it is unlikely
+to ever show up in an efficient Stan program.  For exmaple, rather
+than converting a diagonal to a full matrix for use as a covariance
+matrix,
+%
+\begin{stancode}
+y ~ multi_normal(mu, diag_matrix(square(sigma)));
+\end{stancode}
+%
+it is much more efficient to just use a univariate normal, which
+produces the same density,
+%
+\begin{stancode}
+y ~ normal(mu, sigma);
+\end{stancode}
+%
+
+Rather than writing \code{m~*~diag\_matrix(v)} where \code{m} is a
+matrix and \code{v} is a vector, it is much more efficient to write
+\code{diag\_post\_multiply(m,~v)} (and similarly for pre-multiplication).
+By the same topken, it is better to use \code{quad\_form\_diag(m,~v)}
+rather than \code{quad\_form(m,~diag\_matrix(v))}.
 
 
 \section{Slicing and Blocking Functions}
@@ -2788,8 +2814,15 @@ exponentiated quadratic kernel of \farg{x1} and \farg{x2}.}
 
 \section{Linear Algebra Functions and Solvers}
 
-\subsection{Matrix Division Infix Operators}
-%
+\subsection{Matrix Division Operators and Functions}
+
+In general, it is much more efficient and also more arithmetically
+stable to use matrix division than to multiply by an inverse.  There
+are specialized forms for lower triangular matrices and for symmetric,
+positive-definite matrices.
+
+\subsubsection{Matrix division operators}
+
 \begin{description}
 %
 \fitem{row\_vector}{operator/}{row\_vector \farg{b}, matrix \farg{A}}{
@@ -2810,7 +2843,7 @@ The left division of \farg{B} by \farg{A}; equivalently
 %
 \end{description}
 
-\subsection{Lower-Triangular Matrix-Division Functions}
+\subsubsection{Lower-triangular matrix division functions}
 
 There are four division functions which use lower triangular views of
 a matrix.  The lower triangular view of a matrix $\mbox{tri}(A)$ is
@@ -2862,13 +2895,14 @@ entries set to zero.}
 %
 \end{description}
 
-\subsection{Symmetric Positive-Definite Matrix-Division Functions}
+
+\subsection{Symmetric positive-definite matrix division functions}
 
 There are four division functions which are specialized for
 efficiency and stability for symmetric positive-definite matrix
 dividends.  If the matrix dividend argument is not symmetric and
 positive definite, these will reject and print warnings.
-
+%
 \begin{description}
 %
 \fitem{matrix}{mdivide\_left\_spd}{matrix \farg{A}, vector \farg{b}}{
@@ -2937,6 +2971,16 @@ The log of the absolute value of the determinant of \farg{A}}
 \end{description}
 
 \subsubsection{Inverses}
+
+It is almost never a good idea to use matrix inverses directly because
+they are both inefficient and arithmetically unstable compared to the
+alternatives.  Rather than inverting a matrix \code{m} and
+post-multiplying by a vector or matrix \code{a}, as in
+\code{inv(m)~*~a}, it is better to code this using matrix division, as
+in \code{m~\textbackslash~a}.  The pre-multiplication case is similar,
+with \code{b~*~inv(m)} being more efficiently coded as as
+\code{a~/~m}.  There are also useful special cases for triangular and
+symmetric, positive-definite matrices that use more efficient solvers.
 
 \begin{description}
 %
@@ -3261,10 +3305,10 @@ Convert a one-dimensional array \farg{a} to a matrix with \farg{m} rows and
 Convert the two dimensional array \farg{a} to a matrix with the same
 dimensions and indexing order.}
 %
-\fitem{matrix}{to\_matrix}{int[,] \farg{a}}{
-Convert the two dimensional array \farg{a} to a matrix with the same
-dimensions and indexing order.}
-%
+\fitem{matrix}{to\_matrix}{int[,] \farg{a}}{ Convert the two
+  dimensional array \farg{a} to a matrix with the same dimensions and
+  indexing order.  If any of the dimensions of \farg{a} are zero, the
+  result will be a $0 \times 0$ matrix.}
 %
 %
 \fitem{vector}{to\_vector}{matrix \farg{m}}{
