@@ -1,5 +1,5 @@
-#ifndef STAN_MCMC_HMC_NUTS_UNIT_E_NUTS_CLASSIC_HPP
-#define STAN_MCMC_HMC_NUTS_UNIT_E_NUTS_CLASSIC_HPP
+#ifndef STAN_MCMC_HMC_NUTS_CLASSIC_UNIT_E_NUTS_CLASSIC_HPP
+#define STAN_MCMC_HMC_NUTS_CLASSIC_UNIT_E_NUTS_CLASSIC_HPP
 
 #include <stan/mcmc/hmc/nuts_classic/base_nuts_classic.hpp>
 #include <stan/mcmc/hmc/hamiltonians/unit_e_point.hpp>
