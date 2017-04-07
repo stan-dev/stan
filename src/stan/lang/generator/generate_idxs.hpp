@@ -41,7 +41,6 @@ namespace stan {
       generate_idxs(0, idxs, o);
     }
 
-
   }
 }
 #endif

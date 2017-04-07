@@ -297,10 +297,11 @@ namespace stan {
 
 
     // called from: functions_grammar
-    struct scope_params : public phoenix_functor_unary {
-      void operator()(variable_map& vm) const;
+    struct set_fun_params_scope : public phoenix_functor_binary {
+      void operator()(scope& var_scope, variable_map& vm) const;
     };
-    extern boost::phoenix::function<scope_params> scope_params_f;
+    extern boost::phoenix::function<set_fun_params_scope>
+    set_fun_params_scope_f;
 
     // called from: functions_grammar
     struct unscope_variables : public phoenix_functor_binary {
@@ -404,12 +405,13 @@ namespace stan {
     validate_void_return_allowed_f;
 
     // called from: statement_grammar
-    struct identifier_to_var : public phoenix_functor_senary {
+    struct validate_lhs_var_assgn : public phoenix_functor_senary {
       void operator()(const std::string& name, const scope& var_scope,
                       variable& v, bool& pass, const variable_map& vm,
                       std::ostream& error_msgs) const;
     };
-    extern boost::phoenix::function<identifier_to_var> identifier_to_var_f;
+    extern boost::phoenix::function<validate_lhs_var_assgn>
+    validate_lhs_var_assgn_f;
 
     // called from: statement_grammar
     struct validate_assgn : public phoenix_functor_ternary {
@@ -566,7 +568,7 @@ namespace stan {
     extern boost::phoenix::function<set_fun_type_named> set_fun_type_named_f;
 
     // called from: term_grammar
-    struct set_array_expr_type : public phoenix_functor_senary {
+    struct infer_array_expr_type : public phoenix_functor_senary {
       void operator()(expression& e,
                       array_expr& array_expr,
                       const scope& var_scope,
@@ -574,7 +576,20 @@ namespace stan {
                       const variable_map& var_map,
                       std::ostream& error_msgs) const;
     };
-    extern boost::phoenix::function<set_array_expr_type> set_array_expr_type_f;
+    extern boost::phoenix::function<infer_array_expr_type>
+    infer_array_expr_type_f;
+
+    // called from: term_grammar
+    struct infer_vec_or_matrix_expr_type : public phoenix_functor_senary {
+      void operator()(expression& e,
+                      row_vector_expr& vec_expr,
+                      const scope& var_scope,
+                      bool& pass,
+                      const variable_map& var_map,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<infer_vec_or_matrix_expr_type>
+    infer_vec_or_matrix_expr_type_f;
 
     // called from: term_grammar
     struct exponentiation_expr : public phoenix_functor_quinary {
@@ -704,6 +719,8 @@ namespace stan {
       bool operator()(const int_literal& /*x*/) const;
       bool operator()(const double_literal& /*x*/) const;
       bool operator()(const array_expr& x) const;
+      bool operator()(const matrix_expr& x) const;
+      bool operator()(const row_vector_expr& x) const;
       bool operator()(const variable& x) const;
       bool operator()(const integrate_ode& x) const;
       bool operator()(const integrate_ode_control& x) const;
@@ -843,6 +860,12 @@ namespace stan {
       void operator()(scope& var_scope, const scope& scope_enclosing) const;
     };
     extern boost::phoenix::function<reset_var_scope> reset_var_scope_f;
+
+    // handle trace messages as needed for debugging
+    struct trace : public phoenix_functor_unary {
+      void operator()(const std::string& msg) const;
+    };
+    extern boost::phoenix::function<trace> trace_f;
 
 
 

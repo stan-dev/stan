@@ -1102,24 +1102,6 @@ comparison or boolean operation, as follows.
 if (x != 0) ...
 \end{stancode}
 
-% \subsection{Functional \code{ifelse} versus Conditionals}
-% don't actually want this until we get proper short-circuiting conditionals!
-
-% If possible, the functional form \code{ifelse} is preferred to full
-% conditionals.  For example, the following block
-% %
-% \begin{stancode}
-% if (cond)
-%   x <- foo(y);
-% else 
-%   x <- bar(z);
-% \end{stancode}
-% %
-% should be recoded as follows.
-% %
-% \begin{stancode}
-% x <- ifelse(foo(y), bar(z));
-% \end{stancode}
 
 \section{Functions}
 

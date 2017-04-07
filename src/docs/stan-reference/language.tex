@@ -1,7 +1,6 @@
 \part{Stan Modeling Language}
 
 
-
 \chapter{Data Types and Variable Declarations}\label{data-types.chapter}
 
 \noindent
@@ -1012,7 +1011,29 @@ same restrictions as for vector and matrix sizes apply, namely that
 the size is declared with an integer-denoting expression that does not
 contain any parameters, transformed parameters, or generated quantities.
 
+\subsection{Size Zero Arrays}
 
+If any of an array's dimensions is size zero, the entire array will be
+of size zero.  That is, if we declare
+%
+\begin{stancode}
+real a[3, 0];
+\end{stancode}
+%
+then the resulting size of \code{a} is zero and querying any of its
+dimensions at run time will result in the value zero.  Declared as
+above, \code{a[1]} will be a size-zero one-dimensional array.  For
+comparison, declaring
+%
+\begin{stancode}
+real b[0, 3];
+\end{stancode}
+%
+also produces an array with an overall size of zero, but in this case,
+there is no way to index legally into \code{b}, because \code{b[0]} is
+undefined.  The array will behave at run time as if it's a $0 \times
+0$ array.  For example, the result of \code{to\_matrix(b)} will be a
+$0 \times 0$ matrix, not a $0 \times 3$ matrix.
 
 
 \section{Variable Types vs.\ Constraints and Sizes}
@@ -1487,7 +1508,66 @@ encoding, such as ASCII itself, UTF-8, or Latin1.  It is up to user
 shells and editors to display them properly.
 
 
-\section{Array Expressions}
+\section{Vector, Matrix, and Array Expressions}
+
+Expressions for the Stan container objects arrays, vectors, and
+matrices can be constructed via a sequence of expressions
+enclosed in either curly braces for arrays, or square brackets for
+vectors and matrices.
+
+\subsection{Vector Expressions}
+
+Square brackets may be wrapped around a sequence of comma separated
+primitive expressions to produce a row vector expression.   For
+example, the expression \Verb|[ 1, 10, 100 ]| denotes a row vector of
+three elements with real values 1.0, 10.0, and 100.0.
+Applying the transpose operator to a row vector expression produces 
+a vector expression.
+This syntax provides a way declare and define small vectors a single line, as follows.
+
+%
+\begin{stancode}
+row_vector[2] rv2=  [ 1, 2 ];
+vector[3] v3 = [ 3, 4, 5 ]';
+\end{stancode}
+%
+
+The vector expression values may be compound expressions
+or variable names,  so it is legal to write 
+\Verb|[ 2 * 3, 1 + 4]|  or \Verb|[ x, y ]|, providing that \Verb|x|
+and \Verb|y| are primitive variables.
+
+\subsection{Matrix Expressions}
+
+A matrix expression consists of square brackets wrapped
+around a sequence of comma separated row vector expressions.
+This syntax provides a way declare and define a matrix in a single
+line, as follows.
+
+%
+\begin{stancode}
+matrix[3,2] m1 = [ [ 1, 2 ], [ 3, 4 ], [5, 6 ] ];
+\end{stancode}
+%
+
+Any expression denoting a row vector can be used in a matrix expression.
+For example, the following code is valid:
+
+%
+\begin{stancode}
+vector[2] vX = [ 1, 10 ]';
+row_vector[2] vY = [ 100, 1000 ];
+matrix[3,2] m2 = [ vX', vY, [ 1, 2 ]  ];
+\end{stancode}
+%
+
+\subsubsection{No empty vector or matrix expressions}
+
+The empty expression \Verb|[ ]| is ambiguous and therefore is not
+allowed and similarly expressions such as \Verb|[ [ ] ]| or
+\Verb|[ [ ], [ ] ]| are not allowed.
+
+\subsection{Array Expressions}
 
 Curly braces may be wrapped around a sequence of expressions to
 produce an array expression.  For example, the expression
@@ -1501,7 +1581,7 @@ int a[3] = { 1, 10, 100 };
 %
 
 The values may be compound expressions, so it is legal to write
-\Verb|{ 2 * 3, 1 + 4 }|.  It is also possible to write two dimensional
+\Verb|{ 2 * 3, 1 + 4 }|. It is also possible to write two dimensional
 arrays directly, as in the following example.
 %
 \begin{stancode}
@@ -1521,7 +1601,7 @@ int b[2, 3] = { { 1, 2, 3 },
 \end{stancode}
 %
 
-\subsection{Array Expresison Types}
+\subsection{Array Expression Types}
 
 Any type of expression may be used within braces to form an array
 expression.  In the simplest case, all of the elements will be of the
@@ -1556,7 +1636,7 @@ Although it is tempting to try to define a ragged array expression,
 all Stan data types are rectangular (or boxes or other
 higher-dimensional generalizations).  Thus the following nested array
 expression will cause an error when it tries to create a
-non-rectanguar array.
+non-rectangular array.
 %
 \begin{stancode}
 { { 1, 2, 3 }, { 4, 5 } }  // compile time error: size mismatch
@@ -1624,7 +1704,7 @@ parentheses, this grouping may be made explicit with the expression
   3} has \code{1 + 2} as a subexpression and evaluates to 9.
 
 
-\section{Arithmetic and Matrix Expressions}\label{arithmetic-expressions.section}
+\section{Arithmetic and Matrix Operations on Expressions}\label{arithmetic-expressions.section}
 
 For integer and real-valued expressions, Stan supports the basic
 binary arithmetic operations of addition (\code{+}), subtraction
@@ -1914,12 +1994,9 @@ The key property of the conditional operator that makes it so useful
 in high-performance computing is that it only evaluates the returned
 subexpression, not the alternative expression.  In other words, it is
 not like a typical function that evaluates its argument expressions
-eagerly in order to pass their values to the function.  Specifically,
-the conditional operator provides a substantial speedup over the
-built-in \code{if\_else} function, which, like other functions, evaluates
-all three of its arguments when it is called.  As usual, the saving is
-mostly in the derivatives that do not get computed rather than the
-basic function evaluation itself.
+eagerly in order to pass their values to the function.  As usual, the
+saving is mostly in the derivatives that do not get computed rather
+than the unnecessary function evaluation itself.
 
 \subsubsection{Promotion to Parameter}
 
@@ -3089,7 +3166,7 @@ y ~ poisson(3.7);
 if (y < 2)
   target += negative_infinity();
 else
-  target += -log_sum_exp(poisson_lpdf(2 | 3.7),
+  target += -log_sum_exp(poisson_lpmf(2 | 3.7),
                          poisson_lccdf(2 | 3.7));
 \end{stancode}
 
