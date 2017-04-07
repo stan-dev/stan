@@ -22,68 +22,68 @@ data {
 }
 
 model {
-  m <- m;
-  rv <- m[1];
-  s <- m[1,2];
-  s <- m[1][2];
+  m = m;
+  rv = m[1];
+  s = m[1,2];
+  s = m[1][2];
 
-  rv <- rv;
-  s <- rv[1];
+  rv = rv;
+  s = rv[1];
 
-  s <- s;
+  s = s;
 
-  m <- m_a[1];
-  rv <- m_a[1,1];
-  s <- m_a[1,1,1];
+  m = m_a[1];
+  rv = m_a[1,1];
+  s = m_a[1,1,1];
 
-  rv <- rv_a[1];
-  s <- rv_a[1,1];
+  rv = rv_a[1];
+  s = rv_a[1,1];
 
-  s <- s_a[1];
+  s = s_a[1];
 
-  m_a <- m_aa[1];
-  m <- m_aa[1,1];
-  rv <- m_aa[1,1,1];
-  s <- m_aa[1,1,1,1];
+  m_a = m_aa[1];
+  m = m_aa[1,1];
+  rv = m_aa[1,1,1];
+  s = m_aa[1,1,1,1];
 
-  rv_a <- rv_aa[1];
-  rv <- rv_aa[1,1];
-  s <- rv_aa[1,1,1];
+  rv_a = rv_aa[1];
+  rv = rv_aa[1,1];
+  s = rv_aa[1,1,1];
   
-  s_a <- s_aa[1];
-  s <- s_aa[1,1];
+  s_a = s_aa[1];
+  s = s_aa[1,1];
 
 
-  m <- m;
-  m[1] <- rv;
-  m[1,2] <- s;
-  // not on LHS: m[1][2] <- s;
+  m = m;
+  m[1] = rv;
+  m[1,2] = s;
+  // not on LHS: m[1][2] = s;
 
-  rv <- rv;
-  rv[1] <- s;
+  rv = rv;
+  rv[1] = s;
 
-  s <- s;
+  s = s;
 
-  m_a[1] <- m;
-  m_a[1,1] <- rv;
-  m_a[1,1,1] <- s;
+  m_a[1] = m;
+  m_a[1,1] = rv;
+  m_a[1,1,1] = s;
 
-  rv_a[1] <- rv;
-  rv_a[1,1] <- s;
+  rv_a[1] = rv;
+  rv_a[1,1] = s;
 
-  s_a[1] <- s;
+  s_a[1] = s;
 
-  m_aa[1] <- m_a;
-  m_aa[1,1] <- m;
-  m_aa[1,1,1] <- rv;
-  m_aa[1,1,1,1] <- s;
+  m_aa[1] = m_a;
+  m_aa[1,1] = m;
+  m_aa[1,1,1] = rv;
+  m_aa[1,1,1,1] = s;
 
-  rv_aa[1] <- rv_a;
-  rv_aa[1,1] <- rv;
-  rv_aa[1,1,1] <- s;
+  rv_aa[1] = rv_a;
+  rv_aa[1,1] = rv;
+  rv_aa[1,1,1] = s;
   
-  s_aa[1] <- s_a;
-  s_aa[1,1] <- s;
+  s_aa[1] = s_a;
+  s_aa[1,1] = s;
 
 
 
