@@ -1,6 +1,6 @@
 transformed data {
   real y;
-  y <- pi();
+  y = pi();
 }
 model {
 }

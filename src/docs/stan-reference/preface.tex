@@ -1,9 +1,9 @@
 \chapter*{Preface}
 \addcontentsline{toc}{chapter}{Preface}
 
-\section*{Why \Stan?}
+\section*{Why Stan?}
 
-We did not set out to build \Stan as it currently exists.  We set out to
+We did not set out to build Stan as it currently exists.  We set out to
 apply full Bayesian inference to the sort of multilevel generalized
 linear models discussed in Part II of \citep{GelmanHill:2007}.  These
 models are structured with grouped and interacted predictors at
@@ -31,7 +31,7 @@ not even necessarily possible without some kind of adaptation rather
 than tuning of the proposals. 
  
 
-\section*{The Path to \Stan}
+\section*{The Path to Stan}
 
 We were at the same time starting to hear more and more about
 Hamiltonian Monte Carlo (\HMC) and its ability to overcome some of the
@@ -73,7 +73,7 @@ libraries --- it doesn't support mixed operations of algorithmic
 differentiation variables and primitives like \code{double}.
 
 At this point (Spring 2011), we were happily fitting models coded 
-directly in \Cpp on top of the pre-release versions of the \Stan API. 
+directly in \Cpp on top of the pre-release versions of the Stan API. 
 Seeing how well this all worked, we set our sights on the generality 
 and ease of use of \BUGS.  So we designed a modeling language in which 
 statisticians could write their models in familiar notation that could 
@@ -118,9 +118,9 @@ differently scaled parameters could only mix as quickly as their most
 constrained parameter allowed.
 
 We thought we were home free at this point.  But when we measured the
-speed of some \BUGS examples versus \Stan, we were very disappointed.
+speed of some \BUGS examples versus Stan, we were very disappointed.
 The very first example model, Rats, ran more than an order of
-magnitude faster in \JAGS than in \Stan.  Rats is a tough test case
+magnitude faster in \JAGS than in Stan.  Rats is a tough test case
 because the conjugate priors and lack of posterior correlations make
 it an ideal candidate for efficient Gibbs sampling.  But we thought
 the efficiency of compilation might compensate for the lack of ideal
@@ -146,7 +146,7 @@ invariant.  Gibbs sampling, on the other hand, is scale invariant, but
 not rotation invariant.
 
 We were still using a unit mass matrix in the simulated Hamiltonian
-dynamics.  The last tweak to \Stan before version 1.0 was to estimate
+dynamics.  The last tweak to Stan before version 1.0 was to estimate
 a diagonal mass matrix during warmup; this has since been upgraded to
 a full mass matrix in version 1.2.  Both these extensions go a bit
 beyond the \NUTS paper on {\it arXiv}.  Using a mass matrix sped up
@@ -218,10 +218,10 @@ the true posterior and which forms of models can be fit efficiently,
 scalably, and reliably.
 
 
-\section*{\Stan's Future}
+\section*{Stan's Future}
 
 We're not done. There's still an enormous amount of work to do to
-improve \Stan.  Some older, higher-level goals are in a standalone
+improve Stan.  Some older, higher-level goals are in a standalone
 to-do list:
 %
 \begin{quote}
@@ -256,23 +256,23 @@ large-scale data problems.
 \section*{You Can Help}
 
 Please let us know if you have comments about this manual or
-suggestions for \Stan.  We're especially interested in hearing about
-models you've fit or had problems fitting with \Stan.  The best way to
-communicate with the \Stan team about user issues is through the
+suggestions for Stan.  We're especially interested in hearing about
+models you've fit or had problems fitting with Stan.  The best way to
+communicate with the Stan team about user issues is through the
 following user's group.
 %
 \begin{quote}
 \url{http://groups.google.com/group/stan-users}
 \end{quote}
 %
-For reporting bugs or requesting features, \Stan's issue tracker is at
+For reporting bugs or requesting features, Stan's issue tracker is at
 the following location.
 %
 \begin{quote}
 \url{https://github.com/stan-dev/stan/issues}
 \end{quote}
 
-One of the main reasons \Stan is freedom-respecting, open-source
+One of the main reasons Stan is freedom-respecting, open-source
 software%
 %
 \footnote{See \refappendix{licensing} for more information on Stan's
@@ -294,6 +294,6 @@ To contact the project developers off the mailing lists, send email to
 \end{quote}
 
 \vspace*{12pt}
-\mbox{ } \hfill {\it The \Stan Development Team}
+\mbox{ } \hfill {\it The Stan Development Team}
 \\
 \mbox{ } \hfill \today

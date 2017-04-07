@@ -412,13 +412,13 @@ discussion of step-size jittering.
 
 \subsection{Euclidean Metric}
 
-All HMC implementations in \Stan utilize quadratic kinetic energy
+All HMC implementations in Stan utilize quadratic kinetic energy
 functions which are specified up to the choice of a symmetric,
 positive-definite matrix known as a \textit{mass matrix} or, more
 formally, a \textit{metric} \citep{Betancourt-Stein:2011}.
 
 If the metric is constant then the resulting implementation is known
-as \textit{Euclidean} HMC.  \Stan allows for three Euclidean HMC
+as \textit{Euclidean} HMC.  Stan allows for three Euclidean HMC
 implementations,
 %
 \begin{itemize}
@@ -694,14 +694,58 @@ between 0 and 1 are initialized with values roughly in $(0.12,0.88)$.
 \section{Divergent Transitions}
 
 The Hamiltonian Monte Carlo algorithms (HMC and NUTS) simulate the
-Hamiltonian (position and momentum) of a fictional particle
-representing parameter values.  This simulation is carried out by
-dividing the integration time into a number of smaller steps.  For
-each step, the momentum is followed to update position and the
-gradient is followed to update momentum.  If the posterior is highly
-curved, very small step sizes are required for this simulation of the
-Hamiltonian to be accurate.  When the step size is too large, the
-simulation diverges from the true Hamiltonian.
+trajectory of a fictitious particle representing parameter values when
+subject to a potential energy field, the value of which at a point is
+the negative log posterior density (up to a constant that does not
+depend on location).  Random momentum is imparted independently in
+each direction, by drawing from a standard normal distribution.  The
+Hamiltonian is defined to be the sum of the potential energy and
+kinetic energy of the system. The key feature of the Hamiltonian is
+that it is conserved along the trajectory the particle moves.
+
+In Stan, we use the leapfrog algorithm to simulate the path of a
+particle along the trajectory defined by the initial random momentum
+and the potential energy field.  This is done by alternating updates
+of the position based on the momentum and the momentum based on the
+position.  The momentum updates involve the potential energy and are
+applied along the gradient.  This is essentially a stepwise
+(discretized) first-order approximation of the trajectory.
+\cite{LeimkuhlerReich:2004} provide details and error analysis for the
+leapfrog algorithm.
+
+A divergence arises when the simulated Hamiltonian trajectory departs
+from the true trajectory as measured by departure of the Hamiltonian
+value from its initial value.  When this divergence is too high,%
+%
+\footnote{The current default threshold is a factor of $10^3$, whereas
+  when the leapfrog integrator is working properly, the divergences
+  will be around $10^{-7}$ or so and do not compound due to the
+  symplectic nature of the leapfrog integrator.}
+%
+the simulation has gone off the rails and cannot be trusted.  The
+positions along the simulated trajectory after the Hamiltonian
+diverges will never be selected as the next draw of the MCMC
+algorithm, potentially reducing Hamiltonian Monte Carlo to a simple
+random walk and biasing estimates by not being able to thoroughly
+explore the posterior distribution.  \cite{Betancourt:2016b} provides
+details of the theory, computation, and practical implications of
+divergent transitions in Hamiltonian Monte Carlo.  
+
+The Stan interfaces report divergences as warnings and provide ways to
+access which iterations encountered divergences.  ShinyStan provides
+visualizations that highlight the starting point of divergent
+transitions to diagnose where the divergences arise in parameter
+space.  A common location is in the neck of the funnel in a centered
+parameterization (as in the funnel example discussed in
+\refsection{reparameterization}). 
+
+If the posterior is highly curved, very small step sizes are required
+for this gradient-based simulation of the Hamiltonian to be accurate.
+When the step size is too large (relative to the curvature), the
+simulation diverges from the true Hamiltonian.  This definition is
+imprecise in the same way that stiffness for a differential equation
+is imprecise; both are defined by the way they cause traditional
+stepwise algorithms to diverge from where they should be.
 
 The primary cause of divergent transitions in Euclidean HMC (other
 than bugs in the code) is highly varying posterior curvature, for
@@ -710,6 +754,7 @@ in other regions.  If the step size is too small, the sampler becomes
 inefficient and halts before making a U-turn (hits the maximum tree
 depth in NUTS); if the step size is too large, the Hamiltonian
 simulation diverges.
+
 
 \subsection{Diagnosing and Eliminating Divergences}
 
@@ -731,7 +776,7 @@ highlight where divergent transitions arise.
 \noindent
 To avoid having to deal with constraints while simulating the
 Hamiltonian dynamics during sampling, every (multivariate) parameter
-in a \Stan model is transformed to an unconstrained variable behind
+in a Stan model is transformed to an unconstrained variable behind
 the scenes by the model compiler.  The transform is based on the
 constraints, if any, in the parameter's definition.  Scalars or the
 scalar values in vectors, row vectors or matrices may be constrained
@@ -741,7 +786,7 @@ may be constrained to be correlation matrices or covariance matrices.
 This chapter provides a definition of the transforms used for each
 type of variable.
 
-\Stan converts models to \Cpp classes which define probability
+Stan converts models to \Cpp classes which define probability
 functions with support on all of $\reals^K$, where $K$ is the number
 of unconstrained parameters needed to define the constrained
 parameters defined in the program.  The \Cpp classes also include
@@ -761,7 +806,7 @@ subset of values for which it has non-zero density,
 If $f$ is a total function defined on the support of $X$, then $Y =
 f(X)$ is a new random variable.  This section shows how to compute the
 probability density function of $Y$ for well-behaved transforms $f$.
-The rest of the chapter details the transforms used by \Stan.
+The rest of the chapter details the transforms used by Stan.
 
 
 
@@ -838,7 +883,7 @@ variable.
 
 \section{Lower Bounded Scalar}\label{lower-bound-transform.section}
 
-\Stan uses a logarithmic transform for lower and upper bounds.
+Stan uses a logarithmic transform for lower and upper bounds.
 
 \subsection{Lower Bound Transform}
 
@@ -877,7 +922,7 @@ p_Y(y)
 
 \section{Upper Bounded Scalar}
 
-\Stan uses a negated logarithmic transform for upper bounds.
+Stan uses a negated logarithmic transform for upper bounds.
 
 \subsection{Upper Bound Transform}
 
@@ -918,7 +963,7 @@ p_Y(y)
 
 \section{Lower and Upper Bounded Scalar}\label{logit-transform-jacobian.section}
 
-For lower and upper-bounded variables, \Stan uses a scaled and
+For lower and upper-bounded variables, Stan uses a scaled and
 translated log-odds transform.
 
 \subsection{Log Odds and the Logistic Sigmoid}
@@ -945,7 +990,7 @@ The derivative of the logistic sigmoid is
 
 \subsection{Lower and Upper Bounds Transform}
 
-For variables constrained to be in the open interval $(a,b)$, \Stan
+For variables constrained to be in the open interval $(a,b)$, Stan
 uses a scaled and translated log-odds transform.  If variable $X$ is
 declared to have lower bound $a$ and upper bound $b$, then it is
 transformed to a new variable $Y$, where
@@ -1012,7 +1057,7 @@ for $k \in \setlist{1,\ldots,K-1}$.
 
 \subsection{Ordered Transform}
 
-\Stan's transform follows the constraint directly.  It maps an
+Stan's transform follows the constraint directly.  It maps an
 increasing vector $x \in \reals^{K}$ to an unconstrained vector $y \in
 \reals^K$ by setting
 %
@@ -1367,7 +1412,7 @@ definite, so that for every non-zero $K$-vector $a$,
 \[
 a^{\top} x a > 0.
 \]
-To deal with this rather complicated constraint, \Stan implements the
+To deal with this rather complicated constraint, Stan implements the
 transform of \cite{LewandowskiKurowickaJoe:2009}.  The number of free
 parameters required to specify a $K \times K$ correlation matrix is $\binom{K}{2}$.
 
@@ -1413,7 +1458,7 @@ and $j$ are regressed on all variables $i'$ such that $i'< i$.
 In the case of $i=1$, there are no earlier variables,
 so $z_{1,j}$ is just the Pearson correlation between $i$ and $j$.
 
-In \Stan, the \LKJ transform is reformulated in terms of a Cholesky factor $w$
+In Stan, the \LKJ transform is reformulated in terms of a Cholesky factor $w$
 of the final correlation matrix, defined for $1 \leq i,j \leq K$ by
 %
 \[
@@ -1535,12 +1580,12 @@ covariance matrix.
 
 \subsection{Covariance Matrix Transform}
 
-\Stan's covariance transform is based on a Cholesky decomposition
+Stan's covariance transform is based on a Cholesky decomposition
 composed with a log transform of the positive-constrained diagonal
 elements.%
 %
 \footnote{An alternative to the transform in this section, which can
-  be coded directly in \Stan, is to parameterize a covariance matrix
+  be coded directly in Stan, is to parameterize a covariance matrix
   as a scaled correlation matrix.  An arbitrary $K \times K$
   covariance matrix $\Sigma$ can be expressed in terms of a $K$-vector
   $\sigma$ and correlation matrix $\Omega$ as
@@ -2091,7 +2136,7 @@ one is more efficient.
 \chapter{Variational Inference}\label{vi-algorithms.chapter}
 
 \noindent
-\Stan implements an automatic variational inference algorithm, called
+Stan implements an automatic variational inference algorithm, called
 Automatic Differentiation Variational Inference (ADVI)
 \citep{Kucukelbir:2015}. In this chapter, we describe the specifics of
 how ADVI maximizes the variational objective. For a high-level
@@ -2105,7 +2150,7 @@ variational objective using automatic differentiation and Monte Carlo
 integration. The algorithm ascends these gradients using an adaptive
 stepsize sequence. We evaluate the ELBO also using Monte Carlo
 integration and measure convergence similar to the relative tolerance
-scheme in \Stan's optimization feature.
+scheme in Stan's optimization feature.
 
 \subsection{Monte Carlo Approximation of the ELBO}
 
@@ -2139,7 +2184,7 @@ optimization.  Specifically, ADVI heuristically determines a rolling
 window over which it computes the average and the median change of the
 ELBO. Should either number fall below a threshold, denoted by
 \texttt{tol\_rel\_obj}, we consider the algorithm to have
-converged. The change in ELBO is calculated the same way as in \Stan's
+converged. The change in ELBO is calculated the same way as in Stan's
 optimization module.
 
 
