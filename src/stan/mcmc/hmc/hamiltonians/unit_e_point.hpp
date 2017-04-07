@@ -15,7 +15,7 @@ namespace stan {
         : ps_point(n) {}
     };
 
-    void write_metric(stan::interface_callbacks::writer::base_writer& writer) {
+    void write_metric(stan::callbacks::writer& writer) {
       writer("No free parameters for unit metric");
     }
 

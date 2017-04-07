@@ -1,8 +1,7 @@
 #ifndef STAN_MCMC_HMC_HAMILTONIANS_DENSE_E_METRIC_HPP
 #define STAN_MCMC_HMC_HAMILTONIANS_DENSE_E_METRIC_HPP
 
-#include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/math/prim/mat/meta/index_type.hpp>
+#include <stan/math/prim/mat.hpp>
 #include <stan/mcmc/hmc/hamiltonians/base_hamiltonian.hpp>
 #include <stan/mcmc/hmc/hamiltonians/dense_e_point.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -33,15 +32,14 @@ namespace stan {
       }
 
       double dG_dt(dense_e_point& z,
-                   interface_callbacks::writer::base_writer& info_writer,
-                   interface_callbacks::writer::base_writer& error_writer) {
+                   callbacks::writer& info_writer,
+                   callbacks::writer& error_writer) {
         return 2 * T(z) - z.q.dot(z.g);
       }
 
-      Eigen::VectorXd dtau_dq(
-        dense_e_point& z,
-        interface_callbacks::writer::base_writer& info_writer,
-        interface_callbacks::writer::base_writer& error_writer) {
+      Eigen::VectorXd dtau_dq(dense_e_point& z,
+                              callbacks::writer& info_writer,
+                              callbacks::writer& error_writer) {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 
@@ -49,10 +47,9 @@ namespace stan {
         return z.mInv * z.p;
       }
 
-      Eigen::VectorXd dphi_dq(
-        dense_e_point& z,
-        interface_callbacks::writer::base_writer& info_writer,
-        interface_callbacks::writer::base_writer& error_writer) {
+      Eigen::VectorXd dphi_dq(dense_e_point& z,
+                              callbacks::writer& info_writer,
+                              callbacks::writer& error_writer) {
         return z.g;
       }
 

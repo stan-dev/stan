@@ -1,8 +1,7 @@
 #ifndef STAN_MCMC_SAMPLE_HPP
 #define STAN_MCMC_SAMPLE_HPP
 
-#include <stan/math/prim/mat/fun/Eigen.hpp>
-
+#include <Eigen/Dense>
 #include <vector>
 #include <string>
 
@@ -42,7 +41,7 @@ namespace stan {
         return accept_stat_;
       }
 
-      void get_sample_param_names(std::vector<std::string>& names) {
+      static void get_sample_param_names(std::vector<std::string>& names) {
         names.push_back("lp__");
         names.push_back("accept_stat__");
       }

@@ -1,7 +1,7 @@
 #ifndef STAN_MCMC_WINDOWED_ADAPTATION_HPP
 #define STAN_MCMC_WINDOWED_ADAPTATION_HPP
 
-#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer.hpp>
 #include <stan/mcmc/base_adaptation.hpp>
 #include <ostream>
 #include <string>
@@ -31,7 +31,7 @@ namespace stan {
                              unsigned int init_buffer,
                              unsigned int term_buffer,
                              unsigned int base_window,
-                             interface_callbacks::writer::base_writer& writer) {
+                             callbacks::writer& writer) {
         if (num_warmup < 20) {
           writer("WARNING: No " + estimator_name_ + " estimation is");
           writer("         performed for num_warmup < 20");
@@ -40,9 +40,9 @@ namespace stan {
         }
 
         if (init_buffer + base_window + term_buffer > num_warmup) {
-          writer("WARNING: The initial buffer, adaptation window, "
-                 "and terminal buffer");
-          writer("         overflow the total number of warmup iterations.");
+          writer("WARNING: There aren't enough warmup iterations to fit the");
+          writer("         three stages of adaptation as currently"
+                 + std::string(" configured."));
 
           num_warmup_ = num_warmup;
           adapt_init_buffer_ = 0.15 * num_warmup;
@@ -50,19 +50,21 @@ namespace stan {
           adapt_base_window_
             = num_warmup - (adapt_init_buffer_ + adapt_term_buffer_);
 
-          writer("         Defaulting to a 15%/75%/10% partition,");
+          writer("         Reducing each adaptation stage to 15%/75%/10% of");
+          writer("         the given number of warmup iterations:");
 
-          std::stringstream msg;
-          msg << "           init_buffer = " << adapt_init_buffer_;
-          writer(msg.str());
+          std::stringstream init_buffer_msg;
+          init_buffer_msg << "           init_buffer = " << adapt_init_buffer_;
+          writer(init_buffer_msg.str());
 
-          msg.str("");
-          msg << "           adapt_window = " << adapt_base_window_;
-          writer(msg.str());
+          std::stringstream adapt_window_msg;
+          adapt_window_msg << "           adapt_window = "
+                           << adapt_base_window_;
+          writer(adapt_window_msg.str());
 
-          msg.str("");
-          msg << "           term_buffer = " << adapt_term_buffer_;
-          writer(msg.str());
+          std::stringstream term_buffer_msg;
+          term_buffer_msg << "           term_buffer = " << adapt_term_buffer_;
+          writer(term_buffer_msg.str());
 
           writer();
           return;

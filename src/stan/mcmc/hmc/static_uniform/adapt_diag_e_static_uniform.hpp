@@ -25,8 +25,8 @@ namespace stan {
 
       sample
       transition(sample& init_sample,
-                 interface_callbacks::writer::base_writer& info_writer,
-                 interface_callbacks::writer::base_writer& error_writer) {
+                 callbacks::writer& info_writer,
+                 callbacks::writer& error_writer) {
         sample s
           = diag_e_static_uniform<Model, BaseRNG>::transition(init_sample,
                                                               info_writer,

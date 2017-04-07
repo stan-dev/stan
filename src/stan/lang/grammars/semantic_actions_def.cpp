@@ -25,21 +25,55 @@ namespace stan {
   namespace lang {
 
     /**
-     * Add qualifier "stan::math::" to nullary functions defined in the
-     * Stan language.  The original name is set to the name here and
-     * the name is converted to have the prefix.
+     * Set original name of specified function to name and add 
+     * "stan::math::" namespace qualifier to name.
      *
-     * @param f Function to qualify.
+     * @param[in, out] f Function to qualify.
+     */
+    void qualify(fun& f) {
+      f.original_name_ = f.name_;
+      f.name_ = "stan::math::" + f.name_;
+    }
+
+    /**
+     * Add qualifier "stan::math::" to nullary functions defined in
+     * the Stan language.  Sets original name of specified function to
+     * name and add "stan::math::" namespace qualifier to name.
+     *
+     * @param[in, out] f Function to qualify.
      */
     void qualify_builtins(fun& f) {
       if (f.args_.size() > 0) return;
       if (f.name_ == "e" || f.name_ == "pi" || f.name_ == "log2"
           || f.name_ == "log10" || f.name_ == "sqrt2"
           || f.name_ == "not_a_number" || f.name_ == "positive_infinity"
-          || f.name_ == "negative_infinity" || f.name_ == "machine_precision") {
-        f.original_name_ = f.name_;
-        f.name_ = "stan::math::" + f.name_;
-      }
+          || f.name_ == "negative_infinity" || f.name_ == "machine_precision")
+        qualify(f);
+    }
+
+    /**
+     * Add namespace qualifier stan::math:: to specify Stan versions
+     * of functions to avoid ambiguities with versions defined in
+     * math.h in the top-level namespace.  Sets original name of
+     * specified function to name and add <code>stan::math::</code>
+     * namespace qualifier to name.
+     *
+     * @param[in, out] f Function to qualify.
+     */
+    void qualify_cpp11_builtins(fun& f) {
+      if (f.args_.size() == 1
+          && (f.name_ == "acosh"|| f.name_ == "asinh" || f.name_ == "atanh"
+              || f.name_ == "exp2" || f.name_ == "expm1" || f.name_ == "log1p"
+              || f.name_ == "log2" || f.name_ == "cbrt" || f.name_ == "erf"
+              || f.name_ == "erfc" || f.name_ == "tgamma" || f.name_ == "lgamma"
+              || f.name_ == "round" || f.name_ == "trunc"))
+          qualify(f);
+      else if (f.args_.size() == 2
+               && (f.name_ == "fdim" || f.name_ == "fmax" || f.name_ == "fmin"
+                   || f.name_ == "hypot"))
+        qualify(f);
+      else if (f.args_.size() == 3 && f.name_ == "fma")
+        qualify(f);
     }
 
     bool has_prob_suffix(const std::string& s) {
@@ -76,16 +110,20 @@ namespace stan {
       return true;
     }
 
-    bool validate_double_expr(const expression& expr,
-                              std::stringstream& error_msgs) {
+    void validate_double_expr::operator()(const expression& expr,
+                              bool& pass,
+                              std::stringstream& error_msgs)
+      const {
       if (!expr.expression_type().is_primitive_double()
           && !expr.expression_type().is_primitive_int()) {
         error_msgs << "expression denoting real required; found type="
                    << expr.expression_type() << std::endl;
-        return false;
+        pass = false;
+        return;
       }
-      return true;
+      pass = true;
     }
+    boost::phoenix::function<validate_double_expr> validate_double_expr_f;
 
     void set_fun_type(fun& fun, std::ostream& error_msgs) {
       std::vector<expr_type> arg_types;
@@ -117,8 +155,12 @@ namespace stan {
     template void assign_lhs::operator()(expression&,
                                          const integrate_ode_control&)
       const;
-    template void assign_lhs::operator()(expression&, const integrate_function&)
-      const;
+    template void assign_lhs::operator()(array_expr&,
+                                         const array_expr&) const;
+    template void assign_lhs::operator()(matrix_expr&,
+                                         const matrix_expr&) const;
+    template void assign_lhs::operator()(row_vector_expr&,
+                                         const row_vector_expr&) const;
     template void assign_lhs::operator()(int&, const int&) const;
     template void assign_lhs::operator()(size_t&, const size_t&) const;
     template void assign_lhs::operator()(statement&, const statement&) const;
@@ -186,9 +228,10 @@ namespace stan {
 
 
     void validate_conditional_op::operator()(conditional_op& conditional_op,
+                                             const scope& var_scope,
                                              bool& pass,
+                                             const variable_map& var_map,
                                              std::ostream& error_msgs) const {
-      pass = true;
       expr_type cond_type = conditional_op.cond_.expression_type();
       if (!cond_type.is_primitive_int()) {
         error_msgs << "condition in ternary expression must be"
@@ -196,27 +239,21 @@ namespace stan {
                    << " found type=" << cond_type
                    << std::endl;
         pass = false;
+        return;
       }
-      expr_type
-        true_val_type(conditional_op.true_val_.expression_type().type(),
-                      conditional_op.true_val_.expression_type().num_dims_);
-      base_expr_type
-        true_val_base_type = true_val_type.base_type_;
-      expr_type
-        false_val_type(conditional_op.false_val_.expression_type().type(),
-                       conditional_op.false_val_.expression_type().num_dims_);
-      base_expr_type
-        false_val_base_type = false_val_type.base_type_;
 
+      expr_type true_val_type = conditional_op.true_val_.expression_type();
+      base_expr_type true_val_base_type = true_val_type.base_type_;
+      expr_type false_val_type = conditional_op.false_val_.expression_type();
+      base_expr_type false_val_base_type = false_val_type.base_type_;
       bool types_compatible
-        = (true_val_type.is_primitive()
-           && false_val_type.is_primitive()
+        = (true_val_type == false_val_type)
+        || (true_val_type.is_primitive() && false_val_type.is_primitive()
            && (true_val_base_type == false_val_base_type
                || (true_val_base_type == DOUBLE_T
                    && false_val_base_type == INT_T)
                || (true_val_base_type == INT_T
-                   && false_val_base_type == DOUBLE_T)))
-        || (true_val_type == false_val_type);
+                   && false_val_base_type == DOUBLE_T)));
 
       if (!types_compatible) {
         error_msgs << "base type mismatch in ternary expression,"
@@ -226,16 +263,20 @@ namespace stan {
         write_base_expr_type(error_msgs, false_val_base_type);
         error_msgs << std::endl;
         pass = false;
+        return;
       }
-      if (!pass) return;
 
-      if (!true_val_type.is_primitive()) {
+      if (true_val_type.is_primitive())
+        conditional_op.type_
+          = (true_val_base_type == false_val_base_type)
+          ? true_val_base_type
+          : DOUBLE_T;
+      else
         conditional_op.type_ = true_val_type;
-      } else {
-        conditional_op.type_ =
-          (true_val_base_type == false_val_base_type) ?
-          true_val_base_type : DOUBLE_T;
-      }
+
+      conditional_op.has_var_ = has_var(conditional_op, var_map);
+      conditional_op.scope_ = var_scope;
+      pass = true;
     }
     boost::phoenix::function<validate_conditional_op>
     validate_conditional_op_f;
@@ -276,7 +317,7 @@ namespace stan {
     validate_non_void_arg_f;
 
     void set_void_function:: operator()(const expr_type& return_type,
-                                        var_origin& origin, bool& pass,
+                                        scope& var_scope, bool& pass,
                                         std::ostream& error_msgs) const {
       if (return_type.is_void() && return_type.num_dims() > 0) {
         error_msgs << "Void return type may not have dimensions declared."
@@ -284,33 +325,27 @@ namespace stan {
         pass = false;
         return;
       }
-      origin = return_type.is_void()
-        ? void_function_argument_origin
-        : function_argument_origin;
+      var_scope = return_type.is_void()
+        ? scope(void_function_argument_origin)
+        : scope(function_argument_origin);
       pass = true;
     }
     boost::phoenix::function<set_void_function> set_void_function_f;
 
     void set_allows_sampling_origin::operator()(const std::string& identifier,
-                                                bool& allow_sampling,
-                                                int& origin) const {
-      bool is_void_function_origin
-        = (origin == void_function_argument_origin);
+                                                scope& var_scope) const {
       if (ends_with("_lp", identifier)) {
-        allow_sampling = true;
-        origin = is_void_function_origin
-          ? void_function_argument_origin_lp
-          : function_argument_origin_lp;
+        var_scope = var_scope.void_fun()
+          ? scope(void_function_argument_origin_lp)
+          : scope(function_argument_origin_lp);
       } else if (ends_with("_rng", identifier)) {
-        allow_sampling = false;
-        origin = is_void_function_origin
-          ? void_function_argument_origin_rng
-          : function_argument_origin_rng;
+        var_scope = var_scope.void_fun()
+          ? scope(void_function_argument_origin_rng)
+          : scope(function_argument_origin_rng);
       } else {
-        allow_sampling = false;
-        origin = is_void_function_origin
-          ? void_function_argument_origin
-          : function_argument_origin;
+        var_scope = var_scope.void_fun()
+          ? scope(void_function_argument_origin)
+          : scope(function_argument_origin);
       }
     }
     boost::phoenix::function<set_allows_sampling_origin>
@@ -321,23 +356,27 @@ namespace stan {
                                            function_signature_t> >& declared,
                                            std::set<std::pair<std::string,
                                            function_signature_t> >& defined,
-                                           std::ostream& error_msgs) const {
+                                           std::ostream& error_msgs,
+                                           bool allow_undefined) const {
       using std::set;
       using std::string;
       using std::pair;
       typedef set<pair<string, function_signature_t> >::iterator iterator_t;
-      for (iterator_t it = declared.begin(); it != declared.end(); ++it) {
-        if (defined.find(*it) == defined.end()) {
-          error_msgs <<"Function declared, but not defined."
-                     << " Function name=" << (*it).first
-                     << std::endl;
-          pass = false;
-          return;
+      if (!allow_undefined) {
+        for (iterator_t it = declared.begin(); it != declared.end(); ++it) {
+          if (defined.find(*it) == defined.end()) {
+            error_msgs <<"Function declared, but not defined."
+                       << " Function name=" << (*it).first
+                       << std::endl;
+            pass = false;
+            return;
+          }
         }
       }
       pass = true;
     }
     boost::phoenix::function<validate_declarations> validate_declarations_f;
+
 
     bool fun_exists(const std::set<std::pair<std::string,
                     function_signature_t> >& existing,
@@ -524,15 +563,16 @@ namespace stan {
     }
     boost::phoenix::function<validate_return_type> validate_return_type_f;
 
-    void scope_lp::operator()(variable_map& vm) const {
-      vm.add("lp__", DOUBLE_T, local_origin);
-      vm.add("params_r__", VECTOR_T, local_origin);
+    void set_fun_params_scope::operator()(scope& var_scope, variable_map& vm)
+      const {
+      var_scope = scope(var_scope.program_block(), true);
+      // TODO(morris): remove if params_r__ no longer used
+      vm.add("params_r__", VECTOR_T, parameter_origin);
     }
-    boost::phoenix::function<scope_lp> scope_lp_f;
+    boost::phoenix::function<set_fun_params_scope> set_fun_params_scope_f;
 
     void unscope_variables::operator()(function_decl_def& decl,
                                        variable_map& vm) const {
-      vm.remove("lp__");
       vm.remove("params_r__");
       for (size_t i = 0; i < decl.arg_decls_.size(); ++i)
         vm.remove(decl.arg_decls_[i].name_);
@@ -542,13 +582,12 @@ namespace stan {
     void add_fun_var::operator()(arg_decl& decl, bool& pass, variable_map& vm,
                                  std::ostream& error_msgs) const {
       if (vm.exists(decl.name_)) {
-        // variable already exists
         pass = false;
         error_msgs << "duplicate declaration of variable, name="
                    << decl.name_
                    << "; attempt to redeclare as function argument"
                    << "; original declaration as ";
-        print_var_origin(error_msgs, vm.get_origin(decl.name_));
+        print_scope(error_msgs, vm.get_scope(decl.name_));
         error_msgs << std::endl;
         return;
       }
@@ -564,17 +603,33 @@ namespace stan {
     }
     boost::phoenix::function<set_omni_idx> set_omni_idx_f;
 
-    void validate_int_expression::operator()(const expression & e, bool& pass)
+    void validate_int_expr_silent::operator()(const expression & e, bool& pass)
       const {
       pass = e.expression_type().is_primitive_int();
     }
-    boost::phoenix::function<validate_int_expression>
-    validate_int_expression_f;
+    boost::phoenix::function<validate_int_expr_silent>
+    validate_int_expr_silent_f;
 
-    void validate_ints_expression::operator()(const expression & e, bool& pass,
+    void validate_int_expression_warn::operator()(const expression & e,
+                                                  bool& pass,
+                                                  std::ostream& error_msgs)
+      const {
+      if (e.expression_type().type() != INT_T) {
+        error_msgs << "ERROR:  Indexes must be expressions of integer type."
+                   << " found type = ";
+        write_base_expr_type(error_msgs, e.expression_type().type());
+        error_msgs << '.' << std::endl;
+      }
+      pass = e.expression_type().is_primitive_int();
+    }
+    boost::phoenix::function<validate_int_expression_warn>
+    validate_int_expression_warn_f;
+
+
+    void validate_ints_expression::operator()(const expression& e, bool& pass,
                                               std::ostream& error_msgs) const {
       if (e.expression_type().type() != INT_T) {
-        error_msgs << "index must be integer; found type=";
+        error_msgs << "ERROR:  Container index must be integer; found type=";
         write_base_expr_type(error_msgs, e.expression_type().type());
         error_msgs << std::endl;
         pass = false;
@@ -601,21 +656,17 @@ namespace stan {
     validate_ints_expression_f;
 
 
-    void add_lp_var::operator()(variable_map& vm) const {
-      vm.add("lp__",
-             base_var_decl("lp__", std::vector<expression>(), DOUBLE_T),
-             local_origin);  // lp acts as a local where defined
+    void add_params_var::operator()(variable_map& vm) const {
       vm.add("params_r__",
              base_var_decl("params_r__", std::vector<expression>(), VECTOR_T),
-             local_origin);  // lp acts as a local where defined
+             parameter_origin);  // acts like a parameter
     }
-    boost::phoenix::function<add_lp_var> add_lp_var_f;
+    boost::phoenix::function<add_params_var> add_params_var_f;
 
-    void remove_lp_var::operator()(variable_map& vm) const {
-      vm.remove("lp__");
+    void remove_params_var::operator()(variable_map& vm) const {
       vm.remove("params_r__");
     }
-    boost::phoenix::function<remove_lp_var> remove_lp_var_f;
+    boost::phoenix::function<remove_params_var> remove_params_var_f;
 
     void program_error::operator()(pos_iterator_t _begin, pos_iterator_t _end,
                                    pos_iterator_t _where, variable_map& vm,
@@ -715,11 +766,9 @@ namespace stan {
     boost::phoenix::function<deprecate_old_assignment_op>
     deprecate_old_assignment_op_f;
 
-    void validate_return_allowed::operator()(var_origin origin, bool& pass,
+    void validate_return_allowed::operator()(scope var_scope, bool& pass,
                                              std::ostream& error_msgs) const {
-      if (origin != function_argument_origin
-          && origin != function_argument_origin_lp
-          && origin != function_argument_origin_rng) {
+      if (!var_scope.non_void_fun()) {
         error_msgs << "Returns only allowed from function bodies."
                    << std::endl;
         pass = false;
@@ -729,13 +778,11 @@ namespace stan {
     }
     boost::phoenix::function<validate_return_allowed> validate_return_allowed_f;
 
-    void validate_void_return_allowed::operator()(var_origin origin,
+    void validate_void_return_allowed::operator()(scope var_scope,
                                                   bool& pass,
                                                   std::ostream& error_msgs)
       const {
-      if (origin != void_function_argument_origin
-          && origin != void_function_argument_origin_lp
-          && origin != void_function_argument_origin_rng) {
+      if (!var_scope.void_fun()) {
         error_msgs << "Void returns only allowed from function"
                    << " bodies of void return type."
                    << std::endl;
@@ -747,8 +794,8 @@ namespace stan {
     boost::phoenix::function<validate_void_return_allowed>
     validate_void_return_allowed_f;
 
-    void identifier_to_var::operator()(const std::string& name,
-                                       const var_origin& origin_allowed,
+    void validate_lhs_var_assgn::operator()(const std::string& name,
+                                       const scope& var_scope,
                                        variable& v,  bool& pass,
                                        const variable_map& vm,
                                        std::ostream& error_msgs) const {
@@ -757,20 +804,14 @@ namespace stan {
         pass = false;
         return;
       }
-      // validate origin
-      var_origin lhs_origin = vm.get_origin(name);
-      if (lhs_origin != local_origin
-          && lhs_origin != origin_allowed) {
+      // validate scope matches declaration scope
+      scope lhs_origin = vm.get_scope(name);
+      if (lhs_origin.program_block() != var_scope.program_block()) {
         pass = false;
         return;
       }
-      // enforce constancy of function args
-      if (lhs_origin == function_argument_origin
-          || lhs_origin == function_argument_origin_lp
-          || lhs_origin == function_argument_origin_rng
-          || lhs_origin == void_function_argument_origin
-          || lhs_origin == void_function_argument_origin_lp
-          || lhs_origin == void_function_argument_origin_rng) {
+      // variable is function arg, can't assign to
+      if (lhs_origin.fun() && !lhs_origin.is_local()) {
         pass = false;
         return;
       }
@@ -778,7 +819,7 @@ namespace stan {
       v.set_type(vm.get_base_type(name), vm.get_num_dims(name));
       pass = true;
     }
-    boost::phoenix::function<identifier_to_var> identifier_to_var_f;
+    boost::phoenix::function<validate_lhs_var_assgn> validate_lhs_var_assgn_f;
 
     void validate_assgn::operator()(const assgn& a, bool& pass,
                                     std::ostream& error_msgs) const {
@@ -840,7 +881,7 @@ namespace stan {
     boost::phoenix::function<validate_assgn> validate_assgn_f;
 
     void validate_assignment::operator()(assignment& a,
-                                         const var_origin& origin_allowed,
+                                         const scope& var_scope,
                                          bool& pass, variable_map& vm,
                                          std::ostream& error_msgs) const {
       // validate existence
@@ -854,25 +895,20 @@ namespace stan {
         return;
       }
 
-      // validate origin
-      var_origin lhs_origin = vm.get_origin(name);
-      if (lhs_origin != local_origin
-          && lhs_origin != origin_allowed) {
+      // validate scope matches declaration scope
+      scope lhs_origin = vm.get_scope(name);
+      if (lhs_origin.program_block() != var_scope.program_block()) {
         error_msgs << "attempt to assign variable in wrong block."
                    << " left-hand-side variable origin=";
-        print_var_origin(error_msgs, lhs_origin);
+        print_scope(error_msgs, lhs_origin);
         error_msgs << std::endl;
         pass = false;
         return;
       }
 
       // enforce constancy of function args
-      if (lhs_origin == function_argument_origin
-          || lhs_origin == function_argument_origin_lp
-          || lhs_origin == function_argument_origin_rng
-          || lhs_origin == void_function_argument_origin
-          || lhs_origin == void_function_argument_origin_lp
-          || lhs_origin == void_function_argument_origin_rng) {
+      if (!lhs_origin.is_local()
+          && lhs_origin.fun()) {
         error_msgs << "Illegal to assign to function argument variables."
                    << std::endl
                    << "Use local variables instead."
@@ -957,7 +993,7 @@ namespace stan {
             || et.base_type_ == DOUBLE_T);
     }
 
-    void validate_sample::operator()(const sample& s,
+    void validate_sample::operator()(sample& s,
                                      const variable_map& var_map, bool& pass,
                                      std::ostream& error_msgs) const {
       static const bool user_facing = true;
@@ -966,8 +1002,10 @@ namespace stan {
       for (size_t i = 0; i < s.dist_.args_.size(); ++i)
         arg_types.push_back(s.dist_.args_[i].expression_type());
       std::string function_name(s.dist_.family_);
-
       std::string internal_function_name = get_prob_fun(function_name);
+      s.is_discrete_ = function_signatures::instance()
+        .discrete_first_arg(internal_function_name);
+
       if (internal_function_name.size() == 0) {
         pass = false;
         error_msgs << "Error: couldn't find distribution named "
@@ -1012,7 +1050,6 @@ namespace stan {
         pass = false;
         return;
       }
-
       // test for LHS not being purely a variable
       if (has_non_param_var(s.expr_, var_map)) {
         error_msgs << "Warning (non-fatal):"
@@ -1020,8 +1057,8 @@ namespace stan {
                    << "Left-hand side of sampling statement (~) may contain a"
                    << " non-linear transform of a parameter or local variable."
                    << std::endl
-                   << "If so, you need to call increment_log_prob() with"
-                   << " the log absolute determinant of the Jacobian of"
+                   << "If it does, you need to include a target += statement"
+                   << " with the log absolute determinant of the Jacobian of"
                    << " the transform."
                    << std::endl
                    << "Left-hand-side of sampling statement:"
@@ -1096,7 +1133,8 @@ namespace stan {
         std::vector<expr_type> arg_types_trunc(arg_types);
         arg_types_trunc[0] = s.truncation_.low_.expression_type();
         std::string function_name_ccdf = get_ccdf(s.dist_.family_);
-        if (!is_double_return(function_name_ccdf, arg_types_trunc,
+        if (function_name_ccdf == s.dist_.family_
+            || !is_double_return(function_name_ccdf, arg_types_trunc,
                               error_msgs)) {
           error_msgs << "lower truncation not defined for specified"
                      << " arguments to "
@@ -1117,8 +1155,9 @@ namespace stan {
         std::vector<expr_type> arg_types_trunc(arg_types);
         arg_types_trunc[0] = s.truncation_.high_.expression_type();
         std::string function_name_cdf = get_cdf(s.dist_.family_);
-        if (!is_double_return(function_name_cdf, arg_types_trunc,
-                              error_msgs)) {
+        if (function_name_cdf == s.dist_.family_
+            || !is_double_return(function_name_cdf, arg_types_trunc,
+                                 error_msgs)) {
           error_msgs << "upper truncation not defined for"
                      << " specified arguments to "
                      << s.dist_.family_ << std::endl;
@@ -1139,8 +1178,9 @@ namespace stan {
         std::vector<expr_type> arg_types_trunc(arg_types);
         arg_types_trunc[0] = s.truncation_.low_.expression_type();
         std::string function_name_cdf = get_cdf(s.dist_.family_);
-        if (!is_double_return(function_name_cdf, arg_types_trunc,
-                              error_msgs)) {
+        if (function_name_cdf == s.dist_.family_
+            || !is_double_return(function_name_cdf, arg_types_trunc,
+                                 error_msgs)) {
           error_msgs << "lower truncation not defined for specified"
                      << " arguments to "
                      << s.dist_.family_ << std::endl;
@@ -1226,6 +1266,7 @@ namespace stan {
 
     void add_loop_identifier::operator()(const std::string& name,
                                          std::string& name_local,
+                                         const scope& var_scope,
                                          bool& pass, variable_map& vm,
                                          std::stringstream& error_msgs) const {
       name_local = name;
@@ -1235,7 +1276,7 @@ namespace stan {
                    << " variable name=\"" << name << "\"" << std::endl;
       else
         vm.add(name, base_var_decl(name, std::vector<expression>(), INT_T),
-               local_origin);  // loop var acts like local
+               scope(var_scope.program_block(), true));
     }
     boost::phoenix::function<add_loop_identifier> add_loop_identifier_f;
 
@@ -1245,16 +1286,19 @@ namespace stan {
     }
     boost::phoenix::function<remove_loop_identifier> remove_loop_identifier_f;
 
-    void validate_int_expr_warn::operator()(const expression& expr,
+    void validate_int_expr::operator()(const expression& expr,
                                             bool& pass,
                                             std::stringstream& error_msgs)
       const {
-      pass = expr.expression_type().is_primitive_int();
-      if (!pass)
+      if (!expr.expression_type().is_primitive_int()) {
         error_msgs << "expression denoting integer required; found type="
                    << expr.expression_type() << std::endl;
+        pass = false;
+        return;
+      }
+      pass = true;
     }
-    boost::phoenix::function<validate_int_expr_warn> validate_int_expr_warn_f;
+    boost::phoenix::function<validate_int_expr> validate_int_expr_f;
 
     void deprecate_increment_log_prob::operator()(
                                        std::stringstream& error_msgs) const {
@@ -1267,15 +1311,15 @@ namespace stan {
     boost::phoenix::function<deprecate_increment_log_prob>
     deprecate_increment_log_prob_f;
 
-    void validate_allow_sample::operator()(const bool& allow_sample,
+    void validate_allow_sample::operator()(const scope& var_scope,
                                            bool& pass,
                                            std::stringstream& error_msgs)
       const {
-      pass = allow_sample;
+      pass = var_scope.allows_sampling();
       if (!pass)
         error_msgs << "Sampling statements (~) and increment_log_prob() are"
                    << std::endl
-                   << "only allowed in the model block."
+                   << "only allowed in the model block or lp functions."
                    << std::endl;
     }
     boost::phoenix::function<validate_allow_sample> validate_allow_sample_f;
@@ -1341,7 +1385,7 @@ namespace stan {
           .is_defined(ode_fun.system_function_name_, system_signature)) {
         error_msgs << "first argument to "
                    << ode_fun.integration_function_name_
-                   << " must be a function with signature"
+                   << " must be the name of a function with signature"
                    << " (real, real[], real[], real[], int[]) : real[] ";
         pass = false;
       }
@@ -1358,10 +1402,11 @@ namespace stan {
       }
       if (!ode_fun.t0_.expression_type().is_primitive()) {
         error_msgs << "third argument to "
-               << ode_fun.integration_function_name_
-               << " must have type real or int for initial time; found type="
-               << ode_fun.t0_.expression_type()
-               << ". ";
+                   << ode_fun.integration_function_name_
+                   << " must have type real or int for initial time;"
+                   << " found type="
+                   << ode_fun.t0_.expression_type()
+                   << ". ";
         pass = false;
       }
       if (ode_fun.ts_.expression_type() != expr_type(DOUBLE_T, 1)) {
@@ -1414,7 +1459,7 @@ namespace stan {
         pass = false;
       }
       if (has_var(ode_fun.x_, var_map)) {
-        error_msgs << "fifth argument to "
+        error_msgs << "sixth argument to "
                    << ode_fun.integration_function_name_
                    << " (real data)"
                    << " must be data only and not reference parameters";
@@ -1438,7 +1483,7 @@ namespace stan {
       validate_integrate_ode_non_control_args(ode_fun, var_map, pass,
                                               error_msgs);
       if (!ode_fun.rel_tol_.expression_type().is_primitive()) {
-        error_msgs << "eight argument to "
+        error_msgs << "eighth argument to "
                    << ode_fun.integration_function_name_
                    << " (relative tolerance) must have type real or int;"
                    << " found type="
@@ -1469,21 +1514,21 @@ namespace stan {
       if (has_var(ode_fun.rel_tol_, var_map)) {
         error_msgs << "eight argument to "
                    << ode_fun.integration_function_name_
-                   << " (real data) must be data only"
+                   << " (relative tolerance) must be data only"
                    << " and not depend on parameters";
         pass = false;
       }
       if (has_var(ode_fun.abs_tol_, var_map)) {
         error_msgs << "ninth argument to "
                    << ode_fun.integration_function_name_
-                   << " (real data) must be data only"
+                   << " (absolute tolerance ) must be data only"
                    << " and not depend parameters";
         pass = false;
       }
       if (has_var(ode_fun.max_num_steps_, var_map)) {
         error_msgs << "tenth argument to "
                    << ode_fun.integration_function_name_
-                   << " (real data) must be data only"
+                   << " (max steps) must be data only"
                    << " and not depend on parameters";
         pass = false;
       }
@@ -1491,18 +1536,8 @@ namespace stan {
     boost::phoenix::function<validate_integrate_ode_control>
     validate_integrate_ode_control_f;
 
-    void validate_integrate_function::operator()(
-                      const integrate_function& int_fun,
-                      const variable_map& var_map, bool& pass,
-                      std::ostream& error_msgs) const {
-      pass = true;
-      //FIXME: validation args
-    }
-    boost::phoenix::function<validate_integrate_function>
-    validate_integrate_function_f;
-
     void set_fun_type_named::operator()(expression& fun_result, fun& fun,
-                                        const var_origin& var_origin,
+                                        const scope& var_scope,
                                         bool& pass,
                                         std::ostream& error_msgs) const {
       if (fun.name_ == "get_lp")
@@ -1535,8 +1570,9 @@ namespace stan {
               "'_lpdf' for density functions or '_lpmf' for mass functions",
               fun, error_msgs);
 
-      // if fun is built-in nullary, add stan::math:: qualifier
+      // add stan::math:: qualifier for built-in nullary and math.h
       qualify_builtins(fun);
+      qualify_cpp11_builtins(fun);
 
       // use old function names for built-in prob funs
       if (!function_signatures::instance().has_user_defined_key(fun.name_)) {
@@ -1550,14 +1586,12 @@ namespace stan {
       replace_suffix("lchoose", "binomial_coefficient_log", fun);
 
       if (has_rng_suffix(fun.name_)) {
-        if (!(var_origin == derived_origin
-              || var_origin == transformed_data_origin
-              || var_origin == function_argument_origin_rng)) {
+        if (!(var_scope.allows_rng())) {
           error_msgs << "ERROR: random number generators only allowed in"
-                     << " tranformed data block, generated quantities block"
+                     << " transformed data block, generated quantities block"
                      << " or user-defined functions with names ending in _rng"
                      << "; found function=" << fun.name_ << " in block=";
-          print_var_origin(error_msgs, var_origin);
+          print_scope(error_msgs, var_scope);
           error_msgs << std::endl;
           pass = false;
           return;
@@ -1565,12 +1599,7 @@ namespace stan {
       }
 
       if (has_lp_suffix(fun.name_) || fun.name_ == "target") {
-        // modified function_argument_origin to add _lp because
-        // that's only viable context
-        if (!(var_origin == transformed_parameter_origin
-              || var_origin == function_argument_origin_lp
-              || var_origin == void_function_argument_origin_lp
-              || var_origin == local_origin)) {
+        if (!(var_scope.allows_lp_fun())) {
           error_msgs << "Function target() or functions suffixed with _lp only"
                      << " allowed in transformed parameter block, model block"
                      << std::endl
@@ -1579,7 +1608,7 @@ namespace stan {
                      << "Found function = "
                      << (fun.name_ == "get_lp" ? "target or get_lp" : fun.name_)
                      << " in block = ";
-          print_var_origin(error_msgs, var_origin);
+          print_scope(error_msgs, var_scope);
           error_msgs << std::endl;
           pass = false;
           return;
@@ -1629,9 +1658,113 @@ namespace stan {
     }
     boost::phoenix::function<set_fun_type_named> set_fun_type_named_f;
 
+    void infer_array_expr_type::operator()(expression& e,
+                      array_expr& array_expr,
+                      const scope& var_scope,
+                      bool& pass,
+                      const variable_map& var_map,
+                      std::ostream& error_msgs) const {
+      if (array_expr.args_.size() == 0) {
+        // shouldn't occur, because of % operator used to construct it
+        error_msgs << "Array expression found size 0, must be > 0";
+        array_expr.type_ = expr_type(ILL_FORMED_T);
+        pass = false;
+        return;
+      }
+      expr_type et;
+      et = array_expr.args_[0].expression_type();
+      for (size_t i = 1; i < array_expr.args_.size(); ++i) {
+        expr_type et_next;
+        et_next = array_expr.args_[i].expression_type();
+        if (et.num_dims_ != et_next.num_dims_) {
+          error_msgs << "Expressions for elements of array must have"
+                     << " same array sizes; found"
+                     << " previous type=" << et
+                     << "; type at position " << i << "=" << et_next;
+          array_expr.type_ = expr_type(ILL_FORMED_T);
+          pass = false;
+          return;
+        }
+        if ((et.base_type_ == INT_T && et_next.base_type_ == DOUBLE_T)
+            || (et.base_type_ == DOUBLE_T && et_next.base_type_ == INT_T)) {
+          et.base_type_ = DOUBLE_T;
+        } else if (et.base_type_ != et_next.base_type_) {
+          error_msgs << "Expressions for elements of array must have"
+                     << " the same or promotable types; found"
+                     << " previous type=" << et
+                     << "; type at position " << i << "=" << et_next;
+          array_expr.type_ = expr_type(ILL_FORMED_T);
+          pass = false;
+          return;
+        }
+      }
+      ++et.num_dims_;
+      array_expr.type_ = et;
+      array_expr.array_expr_scope_ = var_scope;
+      array_expr.has_var_ = has_var(array_expr, var_map);
+      e = array_expr;
+      pass = true;
+    }
+    boost::phoenix::function<infer_array_expr_type> infer_array_expr_type_f;
+
+    void infer_vec_or_matrix_expr_type::operator()(expression& e,
+                                       row_vector_expr& vec_expr,
+                                       const scope& var_scope,
+                                       bool& pass,
+                                       const variable_map& var_map,
+                                       std::ostream& error_msgs) const {
+      if (vec_expr.args_.size() == 0) {
+        // shouldn't occur, because of % operator used to construct it
+        error_msgs << "Vector or matrix expression found size 0, must be > 0";
+        pass = false;
+        return;
+      }
+      expr_type et = vec_expr.args_[0].expression_type();
+      if (!(et.is_primitive() || et.type() == ROW_VECTOR_T)) {
+          error_msgs << "Matrix expression elements must be type row_vector "
+                     << "and row vector expression elements must be int "
+                     << "or real, but found element of type "
+                     << et << std::endl;
+          pass = false;
+          return;
+      }
+      bool is_matrix = et.type() == ROW_VECTOR_T;
+      for (size_t i = 1; i < vec_expr.args_.size(); ++i) {
+        if (is_matrix &&
+            !(vec_expr.args_[i].expression_type() == ROW_VECTOR_T)) {
+          error_msgs << "Matrix expression elements must be type row_vector, "
+                     << "but found element of type "
+                     << vec_expr.args_[i].expression_type() << std::endl;
+          pass = false;
+          return;
+        } else if (!(is_matrix) &&
+                   !(vec_expr.args_[i].expression_type().is_primitive())) {
+          error_msgs << "Row vector expression elements must be int or real, "
+                     << "but found element of type "
+                     << vec_expr.args_[i].expression_type() << std::endl;
+          pass = false;
+          return;
+        }
+      }
+      if (is_matrix) {
+        // create matrix expr object
+        matrix_expr me = matrix_expr(vec_expr.args_);
+        me.matrix_expr_scope_ = var_scope;
+        me.has_var_ = has_var(me, var_map);
+        e = me;
+      } else {
+        vec_expr.row_vector_expr_scope_ = var_scope;
+        vec_expr.has_var_ = has_var(vec_expr, var_map);
+        e = vec_expr;
+      }
+      pass = true;
+    }
+    boost::phoenix::function<infer_vec_or_matrix_expr_type>
+    infer_vec_or_matrix_expr_type_f;
+
     void exponentiation_expr::operator()(expression& expr1,
                                          const expression& expr2,
-                                         const var_origin& var_origin,
+                                         const scope& var_scope,
                                          bool& pass,
                                          std::ostream& error_msgs) const {
       if (!expr1.expression_type().is_primitive()
@@ -1642,7 +1775,7 @@ namespace stan {
                    << " by "
                    << expr2.expression_type()
                    << " in block=";
-        print_var_origin(error_msgs, var_origin);
+        print_scope(error_msgs, var_scope);
         error_msgs << std::endl;
         pass = false;
         return;
@@ -1924,6 +2057,17 @@ namespace stan {
     }
     boost::phoenix::function<set_var_type> set_var_type_f;
 
+    void require_vbar::operator()(bool& pass, std::ostream& error_msgs) const {
+      pass = false;
+      error_msgs << "Probabilty functions with suffixes _lpdf, _lpmf,"
+                 << " _lcdf, and _lccdf," << std::endl
+                 << "require a vertical bar (|) between the first two"
+                 << " arguments." << std::endl;
+    }
+    boost::phoenix::function<require_vbar> require_vbar_f;
+
+
+
     validate_no_constraints_vis::validate_no_constraints_vis(
                                                std::stringstream& error_msgs)
       : error_msgs_(error_msgs) { }
@@ -2025,6 +2169,7 @@ namespace stan {
       return false;
     }
 
+
     data_only_expression::data_only_expression(std::stringstream& error_msgs,
                                                variable_map& var_map)
       : error_msgs_(error_msgs),
@@ -2039,24 +2184,34 @@ namespace stan {
     bool data_only_expression::operator()(const double_literal& /*x*/) const {
       return true;
     }
-    bool data_only_expression::operator()(const array_literal& x) const {
+    bool data_only_expression::operator()(const array_expr& x) const {
+      for (size_t i = 0; i < x.args_.size(); ++i)
+        if (!boost::apply_visitor(*this, x.args_[i].expr_))
+          return false;
+      return true;
+    }
+    bool data_only_expression::operator()(const matrix_expr& x) const {
+      for (size_t i = 0; i < x.args_.size(); ++i)
+        if (!boost::apply_visitor(*this, x.args_[i].expr_))
+          return false;
+      return true;
+    }
+    bool data_only_expression::operator()(const row_vector_expr& x) const {
       for (size_t i = 0; i < x.args_.size(); ++i)
         if (!boost::apply_visitor(*this, x.args_[i].expr_))
           return false;
       return true;
     }
     bool data_only_expression::operator()(const variable& x) const {
-      var_origin origin = var_map_.get_origin(x.name_);
-      bool is_data = (origin == data_origin)
-        || (origin == transformed_data_origin)
-        || (origin == local_origin);
+      scope var_scope = var_map_.get_scope(x.name_);
+      bool is_data = var_scope.allows_size();
       if (!is_data) {
         error_msgs_ << "non-data variables not allowed"
                     << " in dimension declarations."
                     << std::endl
                     << "     found variable=" << x.name_
                     << "; declared in block=";
-        print_var_origin(error_msgs_, origin);
+        print_scope(error_msgs_, var_scope);
         error_msgs_ << std::endl;
       }
       return is_data;
@@ -2069,10 +2224,6 @@ namespace stan {
       const {
       return boost::apply_visitor(*this, x.y0_.expr_)
         && boost::apply_visitor(*this, x.theta_.expr_);
-    }
-    bool data_only_expression::operator()(const integrate_function& x) const {
-      return boost::apply_visitor(*this, x.a_.expr_)
-        && boost::apply_visitor(*this, x.b_.expr_);
     }
     bool data_only_expression::operator()(const fun& x) const {
       for (size_t i = 0; i < x.args_.size(); ++i)
@@ -2125,6 +2276,55 @@ namespace stan {
     }
     boost::phoenix::function<validate_decl_constraints>
     validate_decl_constraints_f;
+
+    void validate_definition::operator()(const scope& var_scope,
+                                         const var_decl& var_decl,
+                                         bool& pass,
+                                         std::stringstream& error_msgs)
+      const {
+      if (!var_decl.has_def()) return;
+
+      // validate that assigment is allowed in this block
+      if (!var_scope.allows_assignment()) {
+        error_msgs << "variable definition not possible in this block"
+                   << std::endl;
+        pass = false;
+      }
+
+      // validate type
+      expr_type decl_type(var_decl.base_decl().base_type_,
+                          var_decl.dims().size());
+      expr_type def_type = var_decl.def().expression_type();
+
+      bool types_compatible
+        = (decl_type.is_primitive()
+           && def_type.is_primitive()
+           && (decl_type.type() == def_type.type()
+               || (decl_type.type() == DOUBLE_T
+                   && def_type.type() == INT_T)))
+        || (decl_type.type() == def_type.type());
+      if (!types_compatible) {
+        error_msgs << "variable definition base type mismatch,"
+                   << " variable declared as base type: ";
+        write_base_expr_type(error_msgs, decl_type.type());
+        error_msgs << " variable definition has base: ";
+        write_base_expr_type(error_msgs, def_type.type());
+        pass = false;
+      }
+      // validate dims
+      if (decl_type.num_dims() != def_type.num_dims()) {
+        error_msgs << "variable definition dimensions mismatch,"
+                   << " definition specifies "
+                   <<  decl_type.num_dims()
+                   << ", declaration specifies "
+                   << def_type.num_dims();
+        pass = false;
+      }
+      return;
+    }
+    boost::phoenix::function<validate_definition>
+    validate_definition_f;
+
 
     void validate_identifier::reserve(const std::string& w) {
       reserved_word_set_.insert(w);
@@ -2350,20 +2550,6 @@ namespace stan {
     }
     boost::phoenix::function<empty_range> empty_range_f;
 
-
-    void validate_int_expr::operator()(const expression& expr,
-                                       bool& pass,
-                                       std::stringstream& error_msgs) const {
-      if (!expr.expression_type().is_primitive_int()) {
-        error_msgs << "expression denoting integer required; found type="
-                   << expr.expression_type() << std::endl;
-        pass = false;
-        return;
-      }
-      pass = true;
-    }
-    boost::phoenix::function<validate_int_expr> validate_int_expr_f;
-
     void set_int_range_lower::operator()(range& range,
                                          const expression& expr,
                                          bool& pass,
@@ -2385,7 +2571,8 @@ namespace stan {
     boost::phoenix::function<set_int_range_upper> set_int_range_upper_f;
 
     void validate_int_data_expr::operator()(const expression& expr,
-                                            int var_origin, bool& pass,
+                                            const scope& var_scope,
+                                            bool& pass,
                                             variable_map& var_map,
                                             std::stringstream& error_msgs)
       const {
@@ -2395,15 +2582,19 @@ namespace stan {
                    << expr.expression_type()
                    << std::endl;
         pass = false;
-      } else if (var_origin != local_origin) {
+        return;
+      }
+
+      if (!var_scope.is_local()) {
         data_only_expression vis(error_msgs, var_map);
         bool only_data_dimensions = boost::apply_visitor(vis, expr.expr_);
         pass = only_data_dimensions;
-      } else {
-        // don't need to check data vs. parameter in dimensions for
-        // local variable declarations
-        pass = true;
+        return;
       }
+
+      // don't need to check data vs. parameter in dimensions for
+      // local variable declarations
+      pass = true;
     }
     boost::phoenix::function<validate_int_data_expr> validate_int_data_expr_f;
 
@@ -2413,7 +2604,8 @@ namespace stan {
                                             std::stringstream& error_msgs)
       const {
       range.low_ = expr;
-      pass = validate_double_expr(expr, error_msgs);
+      validate_double_expr validator;
+      validator(expr, pass, error_msgs);
     }
     boost::phoenix::function<set_double_range_lower> set_double_range_lower_f;
 
@@ -2423,87 +2615,88 @@ namespace stan {
                                             std::stringstream& error_msgs)
       const {
       range.high_ = expr;
-      pass = validate_double_expr(expr, error_msgs);
+      validate_double_expr validator;
+      validator(expr, pass, error_msgs);
     }
     boost::phoenix::function<set_double_range_upper> set_double_range_upper_f;
 
     template <typename T>
     void add_var::operator()(var_decl& var_decl_result, const T& var_decl,
-                             variable_map& vm, bool& pass, const var_origin& vo,
+                             variable_map& vm, bool& pass,
+                             const scope& var_scope,
                              std::ostream& error_msgs) const {
       if (vm.exists(var_decl.name_)) {
-        // variable already exists
         pass = false;
         error_msgs << "duplicate declaration of variable, name="
                    << var_decl.name_;
 
         error_msgs << "; attempt to redeclare as ";
-        print_var_origin(error_msgs, vo);  // FIXME -- need original vo
+        print_scope(error_msgs, var_scope);
 
         error_msgs << "; original declaration as ";
-        print_var_origin(error_msgs, vm.get_origin(var_decl.name_));
+        print_scope(error_msgs, vm.get_scope(var_decl.name_));
 
         error_msgs << std::endl;
         var_decl_result = var_decl;
         return;
       }
-      if ((vo == parameter_origin || vo == transformed_parameter_origin)
-          && var_decl.base_type_ == INT_T) {
+      if (var_scope.par_or_tpar()
+           && var_decl.base_type_ == INT_T) {
         pass = false;
-        error_msgs << "integer parameters or transformed parameters"
-                   << " are not allowed; "
+        error_msgs << "parameters or transformed parameters"
+                   << " cannot be integer or integer array; "
                    << " found declared type int, parameter name="
                    << var_decl.name_
                    << std::endl;
         var_decl_result = var_decl;
         return;
       }
-      pass = true;  // probably don't need to set true
-      vm.add(var_decl.name_, var_decl, vo);
+      pass = true;
+      vm.add(var_decl.name_, var_decl, var_scope);
       var_decl_result = var_decl;
     }
     boost::phoenix::function<add_var> add_var_f;
 
     template void add_var::operator()(var_decl&, const int_var_decl&,
-                                      variable_map&, bool&, const var_origin&,
+                                      variable_map&, bool&, const scope&,
                                       std::ostream&) const;
     template void add_var::operator()(var_decl&, const double_var_decl&,
-                                      variable_map&, bool&, const var_origin&,
+                                      variable_map&, bool&, const scope&,
                                       std::ostream&) const;
     template void add_var::operator()(var_decl&, const vector_var_decl&,
-                                      variable_map&, bool&, const var_origin&,
+                                      variable_map&, bool&, const scope&,
                                       std::ostream&) const;
     template void add_var::operator()(var_decl&, const row_vector_var_decl&,
-                                      variable_map&, bool&, const var_origin&,
+                                      variable_map&, bool&, const scope&,
                                       std::ostream&) const;
     template void add_var::operator()(var_decl&, const matrix_var_decl&,
-                                      variable_map&, bool&, const var_origin&,
+                                      variable_map&, bool&, const scope&,
                                       std::ostream&) const;
     template void add_var::operator()(var_decl&, const simplex_var_decl&,
-                                      variable_map&, bool&, const var_origin&,
+                                      variable_map&, bool&, const scope&,
                                       std::ostream&) const;
     template void add_var::operator()(var_decl&, const unit_vector_var_decl&,
-                                      variable_map&, bool&, const var_origin&,
+                                      variable_map&, bool&, const scope&,
                                       std::ostream&) const;
     template void add_var::operator()(var_decl&, const ordered_var_decl&,
-                                      variable_map&, bool&, const var_origin&,
+                                      variable_map&, bool&, const scope&,
                                       std::ostream&) const;
     template void add_var::operator()(var_decl&,
                                       const positive_ordered_var_decl&,
-                                      variable_map&, bool&, const var_origin&,
+                                      variable_map&, bool&, const scope&,
                                       std::ostream&) const;
     template void add_var::operator()(var_decl&,
                                       const cholesky_factor_var_decl&,
-                                      variable_map&, bool&, const var_origin&,
+                                      variable_map&, bool&, const scope&,
                                       std::ostream&) const;
     template void add_var::operator()(var_decl&, const cholesky_corr_var_decl&,
-                                      variable_map&, bool&, const var_origin&,
+                                      variable_map&, bool&, const scope&,
                                       std::ostream&) const;
     template void add_var::operator()(var_decl&, const cov_matrix_var_decl&,
-                                      variable_map&, bool&, const var_origin&,
+                                      variable_map&, bool&, const scope&,
                                       std::ostream&) const;
     template void add_var::operator()(var_decl&, const corr_matrix_var_decl&,
-                                      variable_map&, bool&, const var_origin&,
+                                      variable_map&, bool&, const scope&,
                                       std::ostream&) const;
 
     void validate_in_loop::operator()(bool in_loop, bool& pass,
@@ -2515,6 +2708,43 @@ namespace stan {
                    << std::endl;
     }
     boost::phoenix::function<validate_in_loop> validate_in_loop_f;
+
+    void non_void_expression::operator()(const expression& e, bool& pass,
+                                         std::ostream& error_msgs) const {
+      // ill-formed shouldn't be possible, but just in case
+      pass = e.expression_type().type() != VOID_T
+        && e.expression_type().type() != ILL_FORMED_T;
+      if (!pass)
+        error_msgs << "ERROR:  expected printable (non-void) expression."
+                   << std::endl;
+    }
+    boost::phoenix::function<non_void_expression> non_void_expression_f;
+
+    void set_var_scope::operator()(scope& var_scope,
+                                    const origin_block& program_block)
+      const {
+      var_scope = scope(program_block);
+    }
+    boost::phoenix::function<set_var_scope> set_var_scope_f;
+
+    void set_var_scope_local::operator()(scope& var_scope,
+                                         const origin_block& program_block)
+      const {
+      var_scope = scope(program_block, true);
+    }
+    boost::phoenix::function<set_var_scope_local> set_var_scope_local_f;
+
+    void reset_var_scope::operator()(scope& var_scope,
+                                     const scope& scope_enclosing)
+      const {
+      origin_block enclosing_block = scope_enclosing.program_block();
+      var_scope = scope(enclosing_block, true);
+    }
+    boost::phoenix::function<reset_var_scope> reset_var_scope_f;
+
+    void trace::operator()(const std::string& msg) const {
+    }
+    boost::phoenix::function<trace> trace_f;
 
   }
 }

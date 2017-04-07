@@ -31,37 +31,44 @@ namespace stan {
       statement_grammar<Iterator> statement_g;
       functions_grammar<Iterator> functions_g;
 
-      program_grammar(const std::string& model_name);
+      program_grammar(const std::string& model_name,
+                      bool allow_undefined = false);
 
       boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::locals<scope>,
                               std::vector<var_decl>(),
                               whitespace_grammar<Iterator> >
       data_var_decls_r;
 
       boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::locals<scope>,
                               std::pair<std::vector<var_decl>,
                                         std::vector<statement> >(),
                               whitespace_grammar<Iterator> >
       derived_data_var_decls_r;
 
       boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::locals<scope>,
                               std::pair<std::vector<var_decl>,
                                         std::vector<statement> >(),
                               whitespace_grammar<Iterator> >
       derived_var_decls_r;
 
       boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::locals<scope>,
                               std::pair<std::vector<var_decl>,
                                         std::vector<statement> >(),
                               whitespace_grammar<Iterator> >
       generated_var_decls_r;
 
       boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::locals<scope>,
                               statement(),
                               whitespace_grammar<Iterator> >
       model_r;
 
       boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::locals<scope>,
                               std::vector<var_decl>(),
                               whitespace_grammar<Iterator> >
       param_var_decls_r;

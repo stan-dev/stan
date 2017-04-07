@@ -32,7 +32,8 @@ namespace stan {
       bare_type_grammar<Iterator> bare_type_g;
 
       functions_grammar(variable_map& var_map,
-                        std::stringstream& error_msgs);
+                        std::stringstream& error_msgs,
+                        bool allow_undefined = false);
 
       boost::spirit::qi::rule<Iterator,
                               std::vector<function_decl_def>(),
@@ -40,7 +41,7 @@ namespace stan {
       functions_r;
 
       boost::spirit::qi::rule<Iterator,
-                              boost::spirit::qi::locals<bool, int>,
+                              boost::spirit::qi::locals<scope>,
                               function_decl_def(),
                               whitespace_grammar<Iterator> >
       function_r;

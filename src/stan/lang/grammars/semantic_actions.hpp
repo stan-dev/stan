@@ -20,9 +20,6 @@ namespace stan {
     void replace_suffix(const std::string& old_suffix,
                         const std::string& new_suffix, fun& f);
 
-    bool validate_double_expr(const expression& expr,
-                              std::stringstream& error_msgs);
-
     void set_fun_type(fun& fun, std::ostream& error_msgs);
 
     int num_dimss(std::vector<std::vector<stan::lang::expression> >& dimss);
@@ -207,9 +204,11 @@ namespace stan {
 
 
     // called from: expression_grammar
-    struct validate_conditional_op : public phoenix_functor_ternary {
+    struct validate_conditional_op : public phoenix_functor_quinary {
       void operator()(conditional_op& cond_expr,
+                      const scope& var_scope,
                       bool& pass,
+                      const variable_map& var_map,
                       std::ostream& error_msgs) const;
     };
     extern boost::phoenix::function<validate_conditional_op>
@@ -235,27 +234,27 @@ namespace stan {
 
     // called from: functions_grammar
     struct set_void_function : public phoenix_functor_quaternary {
-      void operator()(const expr_type& return_type, var_origin& origin,
+      void operator()(const expr_type& return_type, scope& var_scope,
                       bool& pass, std::ostream& error_msgs) const;
     };
     extern boost::phoenix::function<set_void_function> set_void_function_f;
 
     // called from: functions_grammar
-    struct set_allows_sampling_origin : public phoenix_functor_ternary {
-      void operator()(const std::string& identifier, bool& allow_sampling,
-                      int& origin) const;
+    struct set_allows_sampling_origin : public phoenix_functor_binary {
+      void operator()(const std::string& identifier, scope& var_scope) const;
     };
     extern boost::phoenix::function<set_allows_sampling_origin>
     set_allows_sampling_origin_f;
 
     // called from: functions_grammar
-    struct validate_declarations : public phoenix_functor_quaternary {
+    struct validate_declarations : public phoenix_functor_quinary {
       void operator()(bool& pass,
                       std::set<std::pair<std::string,
                                          function_signature_t> >& declared,
                       std::set<std::pair<std::string,
                                          function_signature_t> >& defined,
-                      std::ostream& error_msgs) const;
+                      std::ostream& error_msgs,
+                      bool allow_undefined) const;
     };
     extern boost::phoenix::function<validate_declarations>
     validate_declarations_f;
@@ -298,10 +297,11 @@ namespace stan {
 
 
     // called from: functions_grammar
-    struct scope_lp : public phoenix_functor_unary {
-      void operator()(variable_map& vm) const;
+    struct set_fun_params_scope : public phoenix_functor_binary {
+      void operator()(scope& var_scope, variable_map& vm) const;
     };
-    extern boost::phoenix::function<scope_lp> scope_lp_f;
+    extern boost::phoenix::function<set_fun_params_scope>
+    set_fun_params_scope_f;
 
     // called from: functions_grammar
     struct unscope_variables : public phoenix_functor_binary {
@@ -324,11 +324,19 @@ namespace stan {
     extern boost::phoenix::function<set_omni_idx> set_omni_idx_f;
 
     // called from: indexes_grammar, statement_grammar
-    struct validate_int_expression : public phoenix_functor_binary {
+    struct validate_int_expr_silent : public phoenix_functor_binary {
       void operator()(const expression & e, bool& pass) const;
     };
-    extern boost::phoenix::function<validate_int_expression>
-    validate_int_expression_f;
+    extern boost::phoenix::function<validate_int_expr_silent>
+    validate_int_expr_silent_f;
+
+    // called from: term_grammar
+    struct validate_int_expression_warn : public phoenix_functor_ternary {
+      void operator()(const expression & e, bool& pass,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<validate_int_expression_warn>
+    validate_int_expression_warn_f;
 
     // called from: indexes_grammar
     struct validate_ints_expression : public phoenix_functor_ternary {
@@ -339,16 +347,16 @@ namespace stan {
     validate_ints_expression_f;
 
     // called from: program_grammar
-    struct add_lp_var : public phoenix_functor_unary {
+    struct add_params_var : public phoenix_functor_unary {
       void operator()(variable_map& vm) const;
     };
-    extern boost::phoenix::function<add_lp_var> add_lp_var_f;
+    extern boost::phoenix::function<add_params_var> add_params_var_f;
 
     // called from: program_grammar
-    struct remove_lp_var : public phoenix_functor_unary {
+    struct remove_params_var : public phoenix_functor_unary {
       void operator()(variable_map& vm) const;
     };
-    extern boost::phoenix::function<remove_lp_var> remove_lp_var_f;
+    extern boost::phoenix::function<remove_params_var> remove_params_var_f;
 
     // called from: program_grammar
     struct program_error : public phoenix_functor_quinary {
@@ -382,7 +390,7 @@ namespace stan {
 
     // called from: statement_grammar
     struct validate_return_allowed : public phoenix_functor_ternary {
-      void operator()(var_origin origin, bool& pass, std::ostream& error_msgs)
+      void operator()(scope var_scope, bool& pass, std::ostream& error_msgs)
         const;
     };
     extern boost::phoenix::function<validate_return_allowed>
@@ -390,19 +398,20 @@ namespace stan {
 
     // called from: statement_grammar
     struct validate_void_return_allowed : public phoenix_functor_ternary {
-      void operator()(var_origin origin, bool& pass, std::ostream& error_msgs)
+      void operator()(scope var_scope, bool& pass, std::ostream& error_msgs)
         const;
     };
     extern boost::phoenix::function<validate_void_return_allowed>
     validate_void_return_allowed_f;
 
     // called from: statement_grammar
-    struct identifier_to_var : public phoenix_functor_senary {
-      void operator()(const std::string& name, const var_origin& origin_allowed,
+    struct validate_lhs_var_assgn : public phoenix_functor_senary {
+      void operator()(const std::string& name, const scope& var_scope,
                       variable& v, bool& pass, const variable_map& vm,
                       std::ostream& error_msgs) const;
     };
-    extern boost::phoenix::function<identifier_to_var> identifier_to_var_f;
+    extern boost::phoenix::function<validate_lhs_var_assgn>
+    validate_lhs_var_assgn_f;
 
     // called from: statement_grammar
     struct validate_assgn : public phoenix_functor_ternary {
@@ -413,7 +422,7 @@ namespace stan {
 
     // called from: statement_grammar
     struct validate_assignment : public phoenix_functor_quinary {
-      void operator()(assignment& a, const var_origin& origin_allowed,
+      void operator()(assignment& a, const scope& var_scope,
                       bool& pass, variable_map& vm, std::ostream& error_msgs)
         const;
     };
@@ -421,7 +430,7 @@ namespace stan {
 
     // called from: statement_grammar
     struct validate_sample : public phoenix_functor_quaternary {
-      void operator()(const sample& s, const variable_map& var_map,
+      void operator()(sample& s, const variable_map& var_map,
                       bool& pass, std::ostream& error_msgs) const;
     };
     extern boost::phoenix::function<validate_sample> validate_sample_f;
@@ -455,8 +464,10 @@ namespace stan {
     extern boost::phoenix::function<add_while_body> add_while_body_f;
 
     // called from: statement_grammar
-    struct add_loop_identifier : public phoenix_functor_quinary {
-      void operator()(const std::string& name, std::string& name_local,
+    struct add_loop_identifier : public phoenix_functor_senary {
+      void operator()(const std::string& name,
+                      std::string& name_local,
+                      const scope& var_scope,
                       bool& pass, variable_map& vm,
                       std::stringstream& error_msgs) const;
     };
@@ -470,14 +481,6 @@ namespace stan {
     remove_loop_identifier_f;
 
     // called from: statement_grammar
-    struct validate_int_expr_warn : public phoenix_functor_ternary {
-      void operator()(const expression& expr, bool& pass,
-                      std::stringstream& error_msgs) const;
-    };
-    extern boost::phoenix::function<validate_int_expr_warn>
-    validate_int_expr_warn_f;
-
-    // called from: statement_grammar
     struct deprecate_increment_log_prob : public phoenix_functor_unary {
       void operator()(std::stringstream& error_msgs) const;
     };
@@ -486,7 +489,7 @@ namespace stan {
 
     // called from: statement_grammar
     struct validate_allow_sample : public phoenix_functor_ternary {
-      void operator()(const bool& allow_sample, bool& pass,
+      void operator()(const scope& var_scope, bool& pass,
                       std::stringstream& error_msgs) const;
     };
     extern boost::phoenix::function<validate_allow_sample>
@@ -569,15 +572,39 @@ namespace stan {
     // called from: term_grammar
     struct set_fun_type_named : public phoenix_functor_quinary {
       void operator()(expression& fun_result, fun& fun,
-                      const var_origin& var_origin, bool& pass,
+                      const scope& var_scope, bool& pass,
                       std::ostream& error_msgs) const;
     };
     extern boost::phoenix::function<set_fun_type_named> set_fun_type_named_f;
 
     // called from: term_grammar
+    struct infer_array_expr_type : public phoenix_functor_senary {
+      void operator()(expression& e,
+                      array_expr& array_expr,
+                      const scope& var_scope,
+                      bool& pass,
+                      const variable_map& var_map,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<infer_array_expr_type>
+    infer_array_expr_type_f;
+
+    // called from: term_grammar
+    struct infer_vec_or_matrix_expr_type : public phoenix_functor_senary {
+      void operator()(expression& e,
+                      row_vector_expr& vec_expr,
+                      const scope& var_scope,
+                      bool& pass,
+                      const variable_map& var_map,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<infer_vec_or_matrix_expr_type>
+    infer_vec_or_matrix_expr_type_f;
+
+    // called from: term_grammar
     struct exponentiation_expr : public phoenix_functor_quinary {
       void operator()(expression& expr1, const expression& expr2,
-                      const var_origin& var_origin, bool& pass,
+                      const scope& var_scope, bool& pass,
                       std::ostream& error_msgs) const;
     };
     extern boost::phoenix::function<exponentiation_expr> exponentiation_f;
@@ -669,6 +696,11 @@ namespace stan {
     };
     extern boost::phoenix::function<set_var_type> set_var_type_f;
 
+    struct require_vbar : public phoenix_functor_binary {
+      void operator()(bool& pass, std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<require_vbar> require_vbar_f;
+
     struct validate_no_constraints_vis : public boost::static_visitor<bool> {
       std::stringstream& error_msgs_;
       explicit validate_no_constraints_vis(std::stringstream& error_msgs);
@@ -696,7 +728,9 @@ namespace stan {
       bool operator()(const nil& /*e*/) const;
       bool operator()(const int_literal& /*x*/) const;
       bool operator()(const double_literal& /*x*/) const;
-      bool operator()(const array_literal& x) const;
+      bool operator()(const array_expr& x) const;
+      bool operator()(const matrix_expr& x) const;
+      bool operator()(const row_vector_expr& x) const;
       bool operator()(const variable& x) const;
       bool operator()(const integrate_ode& x) const;
       bool operator()(const integrate_ode_control& x) const;
@@ -718,6 +752,13 @@ namespace stan {
     extern boost::phoenix::function<validate_decl_constraints>
     validate_decl_constraints_f;
 
+    // called from: var_decls_grammar
+    struct validate_definition : public phoenix_functor_quaternary {
+      void operator()(const scope& var_scope, const var_decl& var_decl,
+                      bool& pass, std::stringstream& error_msgs) const;
+    };
+    extern boost::phoenix::function<validate_definition>
+    validate_definition_f;
 
     struct validate_identifier : public phoenix_functor_ternary {
       std::set<std::string> reserved_word_set_;
@@ -764,12 +805,20 @@ namespace stan {
     extern boost::phoenix::function<set_int_range_upper> set_int_range_upper_f;
 
     struct validate_int_data_expr : public phoenix_functor_quinary {
-      void operator()(const expression& expr, int var_origin, bool& pass,
-                      variable_map& var_map, std::stringstream& error_msgs)
+      void operator()(const expression& expr, const scope& var_scope,
+                      bool& pass, variable_map& var_map,
+                      std::stringstream& error_msgs)
         const;
     };
     extern boost::phoenix::function<validate_int_data_expr>
     validate_int_data_expr_f;
+
+    struct validate_double_expr : public phoenix_functor_ternary {
+      void operator()(const expression& expr, bool& pass,
+                      std::stringstream& error_msgs) const;
+    };
+    extern boost::phoenix::function<validate_double_expr>
+    validate_double_expr_f;
 
     struct set_double_range_lower : public phoenix_functor_quaternary {
       void operator()(range& range, const expression& expr, bool& pass,
@@ -788,7 +837,7 @@ namespace stan {
     struct add_var : public phoenix_functor_senary {
       template <typename T>
       void operator()(var_decl& var_decl_result, const T& var_decl,
-                      variable_map& vm, bool& pass, const var_origin& vo,
+                      variable_map& vm, bool& pass, const scope& var_scope,
                       std::ostream& error_msgs)
         const;
     };
@@ -798,6 +847,38 @@ namespace stan {
       void operator()(bool in_loop, bool& pass, std::ostream& error_msgs) const;
     };
     extern boost::phoenix::function<validate_in_loop> validate_in_loop_f;
+
+    struct non_void_expression : public phoenix_functor_ternary {
+      void operator()(const expression& e, bool& pass,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<non_void_expression> non_void_expression_f;
+
+    struct set_var_scope : public phoenix_functor_binary {
+      void operator()(scope& var_scope, const origin_block& program_block)
+        const;
+    };
+    extern boost::phoenix::function<set_var_scope> set_var_scope_f;
+
+    struct set_var_scope_local : public phoenix_functor_binary {
+      void operator()(scope& var_scope, const origin_block& program_block)
+        const;
+    };
+    extern boost::phoenix::function<set_var_scope_local>
+    set_var_scope_local_f;
+
+    struct reset_var_scope : public phoenix_functor_binary {
+      void operator()(scope& var_scope, const scope& scope_enclosing) const;
+    };
+    extern boost::phoenix::function<reset_var_scope> reset_var_scope_f;
+
+    // handle trace messages as needed for debugging
+    struct trace : public phoenix_functor_unary {
+      void operator()(const std::string& msg) const;
+    };
+    extern boost::phoenix::function<trace> trace_f;
+
+
 
   }
 }

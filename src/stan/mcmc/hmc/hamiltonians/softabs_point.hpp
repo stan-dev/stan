@@ -1,7 +1,7 @@
 #ifndef STAN_MCMC_HMC_HAMILTONIANS_SOFTABS_POINT_HPP
 #define STAN_MCMC_HMC_HAMILTONIANS_SOFTABS_POINT_HPP
 
-#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 
 namespace stan {
@@ -41,7 +41,7 @@ namespace stan {
       Eigen::MatrixXd pseudo_j;
 
       virtual void
-      write_metric(stan::interface_callbacks::writer::base_writer& writer) {
+      write_metric(stan::callbacks::writer& writer) {
         writer("No free parameters for SoftAbs metric");
       }
     };

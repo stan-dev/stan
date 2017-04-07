@@ -55,6 +55,10 @@ TEST(lang_parser, columns_dot_self_matrix_function_signatures) {
   test_parsable("function-signatures/math/matrix/columns_dot_self");
 }
 
+TEST(lang_parser, cov_exp_quad_matrix_function_signatures) {
+  test_parsable("function-signatures/math/matrix/cov_exp_quad");
+}
+
 TEST(lang_parser, crossprod_matrix_function_signatures) {
   test_parsable("function-signatures/math/matrix/crossprod");
 }
@@ -149,6 +153,10 @@ TEST(lang_parser, log_sum_exp_matrix_function_signatures) {
 
 TEST(lang_parser, division_matrix_function_signatures) {
   test_parsable("function-signatures/math/matrix/matrix_division");
+}
+
+TEST(lang_parser, matrix_exp_matrix_function_signatures) {
+    test_parsable("function-signatures/math/matrix/matrix_exp");
 }
 
 TEST(lang_parser, max_matrix_function_signatures) {
