@@ -524,8 +524,16 @@ namespace stan {
     extern boost::phoenix::function<set_no_op> set_no_op_f;
 
     // called from: term_grammar
+    struct validate_integrate_1d
+      : public phoenix_functor_quaternary {
+      void operator()(const integrate_1d& int_fun,
+                      const variable_map& var_map, bool& pass,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<validate_integrate_1d>
+    validate_integrate_1d_f;
 
-
+    // called from: term_grammar
     struct deprecated_integrate_ode : phoenix_functor_unary {
       void operator()(std::ostream& error_msgs) const;
     };
@@ -558,16 +566,6 @@ namespace stan {
     };
     extern boost::phoenix::function<validate_integrate_ode_control>
     validate_integrate_ode_control_f;
-
-    // called from: term_grammar
-    struct validate_integrate_function
-      : public phoenix_functor_quaternary {
-      void operator()(const integrate_function& int_fun,
-                      const variable_map& var_map, bool& pass,
-                      std::ostream& error_msgs) const;
-    };
-    extern boost::phoenix::function<validate_integrate_function>
-    validate_integrate_function_f;
 
     // called from: term_grammar
     struct set_fun_type_named : public phoenix_functor_quinary {
@@ -734,7 +732,7 @@ namespace stan {
       bool operator()(const variable& x) const;
       bool operator()(const integrate_ode& x) const;
       bool operator()(const integrate_ode_control& x) const;
-      bool operator()(const integrate_function& x) const;
+      bool operator()(const integrate_1d& x) const;
       bool operator()(const fun& x) const;
       bool operator()(const index_op& x) const;
       bool operator()(const index_op_sliced& x) const;

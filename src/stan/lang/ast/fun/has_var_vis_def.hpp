@@ -57,6 +57,12 @@ namespace stan {
       return false;
     }
 
+    bool has_var_vis::operator()(const integrate_1d& e) const {
+      // only init state and params may contain vars
+      return boost::apply_visitor(*this, e.a_.expr_)
+        || boost::apply_visitor(*this, e.b_.expr_);
+    }
+
     bool has_var_vis::operator()(const integrate_ode& e) const {
       // only init state and params may contain vars
       return boost::apply_visitor(*this, e.y0_.expr_)

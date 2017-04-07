@@ -25,7 +25,7 @@ namespace stan {
   namespace lang {
 
     /**
-     * Set original name of specified function to name and add 
+     * Set original name of specified function to name and add
      * "stan::math::" namespace qualifier to name.
      *
      * @param[in, out] f Function to qualify.
@@ -150,6 +150,8 @@ namespace stan {
     template void assign_lhs::operator()(expression&, const double_literal&)
       const;
     template void assign_lhs::operator()(expression&, const int_literal&) const;
+    template void assign_lhs::operator()(expression&, const integrate_1d&)
+      const;
     template void assign_lhs::operator()(expression&, const integrate_ode&)
       const;
     template void assign_lhs::operator()(expression&,
@@ -1355,6 +1357,15 @@ namespace stan {
     }
     boost::phoenix::function<set_no_op> set_no_op_f;
 
+    void validate_integrate_1d::operator()(
+                      const integrate_1d& ode_fun,
+                      const variable_map& var_map, bool& pass,
+                      std::ostream& error_msgs) const {
+      pass = true;
+      //FIXME: validation args
+    }
+    boost::phoenix::function<validate_integrate_1d>
+    validate_integrate_1d_f;
 
     void deprecated_integrate_ode::operator()(std::ostream& error_msgs)
       const {
@@ -2215,6 +2226,10 @@ namespace stan {
         error_msgs_ << std::endl;
       }
       return is_data;
+    }
+    bool data_only_expression::operator()(const integrate_1d& x) const {
+      return boost::apply_visitor(*this, x.a_.expr_)
+        && boost::apply_visitor(*this, x.b_.expr_);
     }
     bool data_only_expression::operator()(const integrate_ode& x) const {
       return boost::apply_visitor(*this, x.y0_.expr_)
