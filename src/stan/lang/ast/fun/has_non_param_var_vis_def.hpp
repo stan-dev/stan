@@ -86,6 +86,12 @@ namespace stan {
         || boost::apply_visitor(*this, e.b_.expr_);
     }
 
+    bool has_non_param_var_vis::operator()(const integrate_1d_grad& e) const {
+      // if any vars, return true because integration will be nonlinear
+      return boost::apply_visitor(*this, e.a_.expr_)
+        || boost::apply_visitor(*this, e.b_.expr_);
+    }
+
     bool has_non_param_var_vis::operator()(const integrate_ode& e) const {
       // if any vars, return true because integration will be nonlinear
       return boost::apply_visitor(*this, e.y0_.expr_)

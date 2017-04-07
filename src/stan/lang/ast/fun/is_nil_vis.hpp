@@ -15,6 +15,7 @@ namespace stan {
     struct variable;
     struct fun;
     struct integrate_1d;
+    struct integrate_1d_grad;
     struct integrate_ode;
     struct integrate_ode_control;
     struct index_op;
@@ -36,6 +37,7 @@ namespace stan {
       bool operator()(const row_vector_expr& x) const;  // NOLINT
       bool operator()(const variable& x) const;  // NOLINT(runtime/explicit)
       bool operator()(const integrate_1d& x) const;  // NOLINT
+      bool operator()(const integrate_1d_grad& x) const;  // NOLINT
       bool operator()(const integrate_ode& x) const;  // NOLINT
       bool operator()(const integrate_ode_control& x) const;  // NOLINT
       bool operator()(const fun& x) const;  // NOLINT(runtime/explicit)

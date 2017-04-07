@@ -100,6 +100,15 @@ namespace stan {
        * @param[in] e expression
        * @return true if contains a variable not declared as a parameter
        */
+      bool operator()(const integrate_1d_grad& e) const;
+
+      /**
+       * Return true if the specified expression contains a variable
+       * not declared as a parameter.
+       *
+       * @param[in] e expression
+       * @return true if contains a variable not declared as a parameter
+       */
       bool operator()(const integrate_ode& e) const;
 
       /**

@@ -29,6 +29,14 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::integrate_1d,
                           (stan::lang::expression, b_)
                           (stan::lang::expression, param_) )
 
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::integrate_1d_grad,
+                          (std::string, integration_function_name_)
+                          (std::string, system_function_1_name_)
+                          (std::string, system_function_2_name_)
+                          (stan::lang::expression, a_)
+                          (stan::lang::expression, b_)
+                          (stan::lang::expression, param_) )
+
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::integrate_ode,
                           (std::string, integration_function_name_)
                           (std::string, system_function_name_)
@@ -174,6 +182,25 @@ namespace stan {
                                    _pass,
                                    boost::phoenix::ref(error_msgs_))];
 
+      integrate_1d_grad_r.name("expression");
+      integrate_1d_grad_r
+        %= ( (string("integrate_1d_grad") >> no_skip[!char_("a-zA-Z0-9_")])
+             | (string("integrate_1d_grad") >> no_skip[!char_("a-zA-Z0-9_")]) )
+        > lit('(')
+        > identifier_r          // system function 1 name (function only)
+        > lit(',')
+        > identifier_r          // system function 2 name (function only)
+        > lit(',')
+        > expression_g(_r1)     // a
+        > lit(',')
+        > expression_g(_r1)     // b
+        > lit(',')
+        > expression_g(_r1)     // param
+        > lit(')')
+          [validate_integrate_1d_grad_f(_val, boost::phoenix::ref(var_map_),
+                                   _pass,
+                                   boost::phoenix::ref(error_msgs_))];
+
       integrate_ode_control_r.name("expression");
       integrate_ode_control_r
         %= ( (string("integrate_ode_rk45") >> no_skip[!char_("a-zA-Z0-9_")])
@@ -232,6 +259,7 @@ namespace stan {
         integrate_ode_control_r(_r1)[assign_lhs_f(_val, _1)]
         | integrate_ode_r(_r1)[assign_lhs_f(_val, _1)]
         | integrate_1d_r(_r1)[assign_lhs_f(_val, _1)]
+        | integrate_1d_grad_r(_r1)[assign_lhs_f(_val, _1)]
         | (fun_r(_r1)[assign_lhs_f(_b, _1)]
            > eps[set_fun_type_named_f(_val, _b, _r1, _pass,
                                       boost::phoenix::ref(error_msgs_))])

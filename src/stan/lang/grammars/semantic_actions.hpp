@@ -534,6 +534,16 @@ namespace stan {
     validate_integrate_1d_f;
 
     // called from: term_grammar
+    struct validate_integrate_1d_grad
+      : public phoenix_functor_quaternary {
+      void operator()(const integrate_1d_grad& int_fun,
+                      const variable_map& var_map, bool& pass,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<validate_integrate_1d_grad>
+    validate_integrate_1d_grad_f;
+
+    // called from: term_grammar
     struct deprecated_integrate_ode : phoenix_functor_unary {
       void operator()(std::ostream& error_msgs) const;
     };
@@ -733,6 +743,7 @@ namespace stan {
       bool operator()(const integrate_ode& x) const;
       bool operator()(const integrate_ode_control& x) const;
       bool operator()(const integrate_1d& x) const;
+      bool operator()(const integrate_1d_grad& x) const;
       bool operator()(const fun& x) const;
       bool operator()(const index_op& x) const;
       bool operator()(const index_op_sliced& x) const;

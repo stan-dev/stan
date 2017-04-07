@@ -58,6 +58,10 @@ namespace stan {
       return false;  // no refs persist out of integrate_1d() call
     }
 
+    bool var_occurs_vis::operator()(const integrate_1d_grad& e) const {
+      return false;  // no refs persist out of integrate_1_gradd() call
+    }
+
     bool var_occurs_vis::operator()(const integrate_ode& e) const {
       return false;  // no refs persist out of integrate_ode() call
     }

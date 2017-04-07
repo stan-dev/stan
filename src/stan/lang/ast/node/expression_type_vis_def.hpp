@@ -38,6 +38,10 @@ namespace stan {
       return DOUBLE_T;
     }
 
+    expr_type expression_type_vis::operator()(const integrate_1d_grad& e) const {
+      return DOUBLE_T;
+    }
+
     expr_type expression_type_vis::operator()(const integrate_ode& e) const {
       return expr_type(DOUBLE_T, 2);
     }

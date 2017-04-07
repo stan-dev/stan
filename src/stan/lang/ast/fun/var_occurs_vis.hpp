@@ -16,6 +16,7 @@ namespace stan {
     struct variable;
     struct fun;
     struct integrate_1d;
+    struct integrate_1d_grad;
     struct integrate_ode;
     struct integrate_ode_control;
     struct index_op;
@@ -116,6 +117,15 @@ namespace stan {
        * @return true if the variable occurs in the arguments
        */
       bool operator()(const integrate_1d& e) const;
+
+      /**
+       * Return true if the variable occurs in the specified
+       * expression.
+       *
+       * @param[in] e expression
+       * @return true if the variable occurs in the arguments
+       */
+      bool operator()(const integrate_1d_grad& e) const;
 
       /**
        * Return true if the variable occurs in the specified

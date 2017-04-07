@@ -91,6 +91,11 @@ namespace stan {
       integrate_1d_r;
 
       boost::spirit::qi::rule<Iterator,
+                              integrate_1d_grad(scope),
+                              whitespace_grammar<Iterator> >
+      integrate_1d_grad_r;
+
+      boost::spirit::qi::rule<Iterator,
                               integrate_ode(scope),
                               whitespace_grammar<Iterator> >
       integrate_ode_r;
