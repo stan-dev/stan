@@ -19,7 +19,7 @@ namespace stan {
      * @param in input stream
      * @return next line from stream or empty string if empty
      */
-    std::string read_line(std::istream& in) {
+    inline std::string read_line(std::istream& in) {
       std::stringstream ss;
       while (true) {
         int c = in.get();

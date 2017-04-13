@@ -1,6 +1,7 @@
 #ifndef STAN_LANG_GRAMMARS_SEMANTIC_ACTIONS_DEF_CPP
 #define STAN_LANG_GRAMMARS_SEMANTIC_ACTIONS_DEF_CPP
 
+#include <stan/io/program_reader.hpp>
 #include <stan/lang/ast.hpp>
 #include <stan/lang/grammars/iterator_typedefs.hpp>
 #include <stan/lang/grammars/semantic_actions.hpp>
@@ -25,7 +26,7 @@ namespace stan {
   namespace lang {
 
     /**
-     * Set original name of specified function to name and add 
+     * Set original name of specified function to name and add
      * "stan::math::" namespace qualifier to name.
      *
      * @param[in, out] f Function to qualify.
@@ -668,30 +669,33 @@ namespace stan {
     }
     boost::phoenix::function<remove_params_var> remove_params_var_f;
 
-    void program_error::operator()(pos_iterator_t _begin, pos_iterator_t _end,
-                                   pos_iterator_t _where, variable_map& vm,
-                                   std::stringstream& error_msgs) const {
+    void program_error::operator()(pos_iterator_t begin, pos_iterator_t end,
+                                   pos_iterator_t where, variable_map& vm,
+                                   std::stringstream& error_msgs,
+                                   const io::program_reader& reader) const {
       using boost::spirit::get_line;
       using boost::format;
       using std::setw;
 
-      size_t idx_errline = get_line(_where);
-
-      error_msgs << std::endl;
-
+      size_t idx_errline = get_line(where);
       if (idx_errline > 0) {
-        error_msgs << "ERROR at line " << idx_errline
-                   << std::endl << std::endl;
+        io::program_reader::trace_t trace = reader.trace(idx_errline);
+        std::string trace_str = io::program_reader::trace_to_string(trace);
+        error_msgs << "Error " << trace_str << std::endl;
+        error_msgs << "  Error context, with error position marked by ^"
+                   << std::endl
+                   << "  ----------------------------------------------"
+                   << std::endl;
 
         std::basic_stringstream<char> sprogram;
-        sprogram << boost::make_iterator_range(_begin, _end);
+        sprogram << boost::make_iterator_range(begin, end);
 
         // show error in context 2 lines before, 1 lines after
         size_t idx_errcol = 0;
-        idx_errcol = get_column(_begin, _where) - 1;
+        idx_errcol = get_column(begin, where) - 1;
 
         std::string lineno = "";
-        format fmt_lineno("% 3d:    ");
+        // format fmt_lineno("% 5d:    ");
 
         std::string line_2before = "";
         std::string line_before = "";
@@ -708,21 +712,25 @@ namespace stan {
             idx_line++;
           }
           if (line_2before.length() > 0) {
-            lineno = str(fmt_lineno % (idx_before - 1) );
+            // lineno = str(fmt_lineno % (idx_before - 1) );
+            lineno = "  error -2: ";
             error_msgs << lineno << line_2before << std::endl;
           }
-          lineno = str(fmt_lineno % idx_before);
+          // lineno = str(fmt_lineno % idx_before);
+          lineno = "  error -1: ";
           error_msgs << lineno << line_before << std::endl;
         }
 
         std::getline(sprogram, line_err);
-        lineno = str(fmt_lineno % idx_errline);
+        // lineno = str(fmt_lineno % idx_errline);
+        lineno = "     error: ";
         error_msgs << lineno << line_err << std::endl
                    << setw(idx_errcol + lineno.length()) << "^" << std::endl;
 
         if (!sprogram.eof()) {
           std::getline(sprogram, line_after);
-          lineno = str(fmt_lineno % (idx_errline+1));
+          // lineno = str(fmt_lineno % (idx_errline+1));
+          lineno = "  error +1: ";
           error_msgs << lineno << line_after << std::endl;
         }
       }

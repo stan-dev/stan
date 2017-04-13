@@ -9,10 +9,11 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 /**
  * Print the version of stanc with major, minor and patch.
- * 
+ *
  * @param[in,out] out_stream stream to which version is written.
  */
 void print_version(std::ostream* out_stream) {
@@ -94,7 +95,7 @@ void delete_file(std::ostream* err_stream,
  * @param[in] argv arguments
  * @param[in,out] out_stream stream to which output is written
  * @param[in,out] err_stream stream to which error messages are
- * written 
+ * written
  * @return return code
  */
 int stanc_helper(int argc, const char* argv[],
@@ -182,8 +183,11 @@ int stanc_helper(int argc, const char* argv[],
       *out_stream << "Output file=" << out_file_name << std::endl;
     }
 
+    std::vector<std::string> include_paths;
+    include_paths.push_back("");
     bool valid_model
-      = stan::lang::compile(err_stream, in, out, model_name, allow_undefined);
+      = stan::lang::compile(err_stream, in, out, model_name,
+                            allow_undefined, in_file_name, include_paths);
 
     out.close();
     if (!valid_model) {

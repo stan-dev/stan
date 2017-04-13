@@ -1,6 +1,7 @@
 #ifndef STAN_LANG_GRAMMARS_PROGRAM_GRAMMAR_HPP
 #define STAN_LANG_GRAMMARS_PROGRAM_GRAMMAR_HPP
 
+#include <stan/io/program_reader.hpp>
 #include <stan/lang/ast.hpp>
 #include <stan/lang/grammars/whitespace_grammar.hpp>
 #include <stan/lang/grammars/expression_grammar.hpp>
@@ -24,6 +25,7 @@ namespace stan {
                                    program(),
                                    whitespace_grammar<Iterator> > {
       std::string model_name_;
+      const io::program_reader& reader_;
       variable_map var_map_;
       std::stringstream error_msgs_;
       expression_grammar<Iterator> expression_g;
@@ -32,6 +34,7 @@ namespace stan {
       functions_grammar<Iterator> functions_g;
 
       program_grammar(const std::string& model_name,
+                      const io::program_reader& reader,
                       bool allow_undefined = false);
 
       boost::spirit::qi::rule<Iterator,
