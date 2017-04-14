@@ -2588,7 +2588,7 @@ assignment statement evaluates the expression on the right-hand side
 and assigns it to the (indexed) variable on the left-hand side.  An
 example of a simple assignment is as follows.%
 %
-\footnote{In versions of Stan before 2.14.0, the operator \code{<-} was
+\footnote{In versions of Stan before 2.15.0, the operator \code{<-} was
   used for assignment rather than using the equal sign \code{=}.  The
   old operator \code{<-} is now deprecated and will print a warning.
   In the future, it will be removed.}
@@ -3968,10 +3968,12 @@ generation.
 
 \subsection{Optionality and Ordering}
 
-All of the blocks other than the \code{model} block are optional.  The
-blocks that occur must occur in the order presented in the skeletal
-program above.  Within each block, both declarations and statements
-are optional, subject to the restriction that the declarations come
+All of the blocks are optional.  A consequence of this is that the
+empty string is a valid Stan program, although it will trigger a
+warning message from the Stan compiler.  The Stan program blocks
+that occur must occur in the order presented in the skeletal program
+above.  Within each block, both declarations and statements are
+optional, subject to the  restriction that the declarations come
 before the statements.
 
 \subsection{Variable Scope}

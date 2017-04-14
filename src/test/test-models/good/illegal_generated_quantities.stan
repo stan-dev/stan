@@ -6,6 +6,5 @@ model {
 }
 generated quantities {
   real<lower=0> x;
-
-  x <- -1;
+  x = -1;
 }
