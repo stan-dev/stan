@@ -1,5 +1,5 @@
-#ifndef STAN_MCMC_HMC_NUTS_ADAPT_DIAG_E_NUTS_CLASSIC_HPP
-#define STAN_MCMC_HMC_NUTS_ADAPT_DIAG_E_NUTS_CLASSIC_HPP
+#ifndef STAN_MCMC_HMC_NUTS_CLASSIC_ADAPT_DIAG_E_NUTS_CLASSIC_HPP
+#define STAN_MCMC_HMC_NUTS_CLASSIC_ADAPT_DIAG_E_NUTS_CLASSIC_HPP
 
 #include <stan/callbacks/writer.hpp>
 #include <stan/mcmc/stepsize_var_adapter.hpp>
@@ -41,7 +41,7 @@ namespace stan {
                                               this->z_.q);
 
           if (update) {
-            this->init_stepsize(info_writer);
+            this->init_stepsize(info_writer, error_writer);
 
             this->stepsize_adaptation_.set_mu(log(10 * this->nom_epsilon_));
             this->stepsize_adaptation_.restart();

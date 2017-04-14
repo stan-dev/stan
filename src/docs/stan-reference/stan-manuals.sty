@@ -75,7 +75,6 @@
 \newcommand{\FXC}[1][\value{FXNOTE}]{\ifnum#1=0\fxnote{Change to section \thesection}\stepcounter{FXNOTE}\fi}
 \renewcommand\englishlistfixmename{List of changes}
 
-\newcommand{\Stan}{Stan\xspace}
 \newcommand{\stanc}{{\ttfamily stanc}\xspace}
 \newcommand*{\Cpp}{C\raise.15ex\hbox{\footnotesize ++}\xspace} %\ensuremath{++}
 \newcommand{\clang}{{\ttfamily clang\raise.2ex\hbox{\footnotesize ++}}\xspace}
@@ -158,7 +157,13 @@
   \fitem{R}{#1}{T \farg{x}}{Returns the (elementwise) #2, #3
     for any argument type \code{T};  see
     \refsection{fun-vectorization} for details including return type
-    \code{R}.} 
+    \code{R}.}
+}
+\newcommand{\fitemUnaryVecSort}[4]{
+  \fitemindexsort{R}{#1}{T \farg{x}}{Returns the (elementwise) #2, #3
+    for any argument type \code{T};  see
+    \refsection{fun-vectorization} for details including return type
+    \code{R}.}{#1}{#4}
 }
 
 
@@ -174,7 +179,7 @@
 \begin{description}
 \item {\tt \farg{#1} \textasciitilde\ {\bfseries #2}(\farg{#3});}
   \\
-  Increment log probability with {\tt #2\_#4(\farg{#1}, \farg{#3})},
+  Increment log probability with {\tt #2\_#4(\farg{#1} \textbar\ \farg{#3})},
   dropping constant additive terms; \refsection{sampling-statements}
   explains sampling statements.%
 \index{{\tt\bfseries #2 }!sampling statement|hyperpage}

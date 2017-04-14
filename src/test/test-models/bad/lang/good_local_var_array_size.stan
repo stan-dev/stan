@@ -4,8 +4,8 @@ data {
 
 transformed data {
   int N[2];
-  N[1] <- 1;
-  N[2] <- 4;
+  N[1] = 1;
+  N[2] = 4;
 }
 parameters {
   real y;
@@ -16,7 +16,7 @@ model {
   for (i in 1:10) {
     real x[i];  // should allow i here.
     for (j in 1:i)
-      x[j] <- j * j;
+      x[j] = j * j;
   }
 
   for (i in 1:5) {

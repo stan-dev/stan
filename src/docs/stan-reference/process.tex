@@ -691,7 +691,7 @@ programming experience and have designed or contributed to other
 software systems that are still in production.
 
 Institutions at which the members of the Stan development team hold
-appointments as of Stan release 2.14.0 include Columbia University,
+appointments as of Stan release 2.15.0 include Columbia University,
 Adobe Creative Technologies Lab, University of Warwick, University of
 Toronto (Scarborough), Dartmouth Colloge, University of Washington,
 Lucidworks, CNRS (Paris), St. George's, University of London,
@@ -1102,24 +1102,6 @@ comparison or boolean operation, as follows.
 if (x != 0) ...
 \end{stancode}
 
-% \subsection{Functional \code{ifelse} versus Conditionals}
-% don't actually want this until we get proper short-circuiting conditionals!
-
-% If possible, the functional form \code{ifelse} is preferred to full
-% conditionals.  For example, the following block
-% %
-% \begin{stancode}
-% if (cond)
-%   x <- foo(y);
-% else 
-%   x <- bar(z);
-% \end{stancode}
-% %
-% should be recoded as follows.
-% %
-% \begin{stancode}
-% x <- ifelse(foo(y), bar(z));
-% \end{stancode}
 
 \section{Functions}
 
