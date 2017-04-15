@@ -6,7 +6,7 @@ data {
 }
 transformed data {
   int intercept;
-  intercept <- 5;  // failed in 1.0.2
+  intercept = 5;  // failed in 1.0.2
 }
 model {
 

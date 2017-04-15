@@ -1,5 +1,5 @@
-#ifndef STAN_MCMC_HMC_NUTS_BASE_NUTS_HPP
-#define STAN_MCMC_HMC_NUTS_BASE_NUTS_HPP
+#ifndef STAN_MCMC_HMC_NUTS_CLASSIC_BASE_NUTS_CLASSIC_HPP
+#define STAN_MCMC_HMC_NUTS_CLASSIC_BASE_NUTS_CLASSIC_HPP
 
 #include <stan/callbacks/writer.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>

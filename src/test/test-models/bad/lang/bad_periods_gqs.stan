@@ -6,5 +6,5 @@ model {
 }
 generated quantities {
   real x.y;
-  x.y <- z * 2;
+  x.y = z * 2;
 }
