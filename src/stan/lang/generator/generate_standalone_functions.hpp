@@ -25,16 +25,16 @@ namespace stan {
      * @param[in,out] o stream for generating
      */
     void generate_standalone_functions(
-           const program& prog, 
+           const program& prog,
            const std::vector<std::string>& namespaces,
            std::ostream& o) {
       generate_version_comment(o);
-      
-      //TODO(martincerny) try to reduce the includes that are necessary
+
+      // TODO(martincerny) try to reduce the includes that are necessary
       generate_includes(o);
 
-      //generate namespace starts
-      for(size_t namespace_i = 0; 
+      // generate namespace starts
+      for (size_t namespace_i = 0;
           namespace_i < namespaces.size(); ++namespace_i) {
         o << "namespace " << namespaces[namespace_i] << " { ";
       }
@@ -45,13 +45,12 @@ namespace stan {
       generate_globals(o);
       generate_functions(prog.function_decl_defs_, o);
 
-      //generate namespace ends
-      for(size_t namespace_i = 0; 
+      // generate namespace ends
+      for (size_t namespace_i = 0;
           namespace_i < namespaces.size(); ++namespace_i) {
         o << " } ";
       }
       o << std::endl;
-      
     }
 
   }

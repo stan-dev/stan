@@ -10,6 +10,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 /**
  * Print the version of stanc with major, minor and patch.
@@ -61,7 +62,7 @@ void print_stanc_help(std::ostream* out_stream) {
 
   print_help_option(out_stream, "allow_undefined", "",
                     "Do not fail if a function is declared but not defined");
-  //TODO(martincerny) help for standalone function compilation
+  // TODO(martincerny) help for standalone function compilation
 }
 
 /**
@@ -102,7 +103,7 @@ std::string identifier_from_file_name(const std::string& in_file_name) {
   } else {
     slashInd++;
   }
-  std::string result = 
+  std::string result =
     in_file_name.substr(slashInd, ptInd - slashInd);
   for (std::string::iterator strIt = result.begin();
       strIt != result.end(); strIt++) {
@@ -122,18 +123,17 @@ std::string identifier_from_file_name(const std::string& in_file_name) {
  * @param[in] extension The extension (WITHOUT dot)- e.g. "stan".
  * @return true if the file has the extension
  */
-bool has_extension(const std::string& file_name, const std::string& extension)
-{
-  if (file_name.length() >= extension.length() + 1) { //+1 for the dot
-    if (0 == file_name.compare (file_name.length() - extension.length(), 
+bool has_extension(const std::string& file_name, const std::string& extension) {
+  if (file_name.length() >= extension.length() + 1) {  // +1 for the dot
+    if (0 == file_name.compare (file_name.length() - extension.length(),
         extension.length(), extension)
-      && file_name[file_name.length() - extension.length() - 1] == '.') 
+      && file_name[file_name.length() - extension.length() - 1] == '.')
         return true;
     else
       return false;
   } else {
     return false;
-  }  
+  }
 }
 
 /**
@@ -143,7 +143,7 @@ bool has_extension(const std::string& file_name, const std::string& extension)
  * @param[in] identifier_type the type of the identifier to be reported 
  * in error messages
  */
-void check_identifier(const std::string& identifier, 
+void check_identifier(const std::string& identifier,
                       const std::string& identifier_type) {
   if (!isalpha(identifier[0]) && identifier[0] != '_') {
     std::string msg(identifier_type + " must not start with a "
@@ -153,7 +153,7 @@ void check_identifier(const std::string& identifier,
   for (std::string::const_iterator strIt = identifier.begin();
       strIt != identifier.end(); strIt++) {
     if (!isalnum(*strIt) && *strIt != '_') {
-      std::string msg(identifier_type 
+      std::string msg(identifier_type
         + " must contain only letters, numbers and _");
       throw std::invalid_argument(msg);
     }
@@ -230,7 +230,7 @@ int stanc_helper(int argc, const char* argv[],
           model_name = identifier_from_file_name(in_file_name) + "_model";
         }
 
-        //TODO(martincerny) Check that the -namespace flag is not set
+        // TODO(martincerny) Check that the -namespace flag is not set
 
         if (cmd.has_key("o")) {
           cmd.val("o", out_file_name);
@@ -240,7 +240,7 @@ int stanc_helper(int argc, const char* argv[],
           out_file_name += ".cpp";
         }
 
-        check_identifier(model_name,"model_name");
+        check_identifier(model_name, "model_name");
 
         std::fstream out(out_file_name.c_str(), std::fstream::out);
         if (out_stream) {
@@ -249,59 +249,59 @@ int stanc_helper(int argc, const char* argv[],
           *out_stream << "Output file=" << out_file_name << std::endl;
         }
 
-        valid_input = stan::lang::compile(err_stream, in, out, 
+        valid_input = stan::lang::compile(err_stream, in, out,
                         model_name, allow_undefined);
 
-        out.close();          
+        out.close();
         break;
       }
       case kStandaloneFunctions: {
-
         if (cmd.has_key("o")) {
           cmd.val("o", out_file_name);
         } else {
           out_file_name = identifier_from_file_name(in_file_name);
           out_file_name += ".hpp";
         }
-        
-        //TODO(martincerny) Allow multiple namespaces 
-        //(split namespace argument by "::")
+
+        // TODO(martincerny) Allow multiple namespaces
+        // (split namespace argument by "::")
         std::vector<std::string> namespaces;
         if (cmd.has_key("namespace")) {
           std::string ns;
-          cmd.val("namespace", ns);          
+          cmd.val("namespace", ns);
           namespaces.push_back(ns);
         } else {
-          namespaces.push_back(identifier_from_file_name(in_file_name) + "_functions");
+          namespaces.push_back(
+            identifier_from_file_name(in_file_name) + "_functions");
         }
 
-        //TODO(martincerny) Check that the -name flag is not set
+        // TODO(martincerny) Check that the -name flag is not set
 
-        for(size_t namespace_i = 0; 
+        for (size_t namespace_i = 0;
             namespace_i < namespaces.size(); ++namespace_i) {
-          check_identifier(namespaces[namespace_i],"namespace");
-        };
+          check_identifier(namespaces[namespace_i], "namespace");
+        }
 
         std::fstream out(out_file_name.c_str(), std::fstream::out);
         if (out_stream) {
           *out_stream << "Parsing a fuctions-only file" << std::endl;
 
-          *out_stream << "Target namespace= "; 
-          for(size_t namespace_i = 0; 
+          *out_stream << "Target namespace= ";
+          for (size_t namespace_i = 0;
               namespace_i < namespaces.size(); ++namespace_i) {
             *out_stream << "::" << namespaces[namespace_i];
-          }          
+          }
           *out_stream << std::endl;
 
           *out_stream << "Input file=" << in_file_name << std::endl;
           *out_stream << "Output file=" << out_file_name << std::endl;
         }
 
-        valid_input = stan::lang::compile_functions(err_stream, in, out, 
+        valid_input = stan::lang::compile_functions(err_stream, in, out,
                         namespaces, allow_undefined);
 
         out.close();
-        break;        
+        break;
       }
       default: {
         assert(false);
