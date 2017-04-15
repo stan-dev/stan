@@ -143,6 +143,14 @@ $(patsubst %.stan,%.hpp,$(TEST_MODELS)) : %.hpp : %.stan test/test-models/stanc$
 	$(WINE) test/test-models/stanc$(EXE) --o=$@ $<
 
 ##
+# Generate C++ from Stan standalone functions
+##
+TEST_FUNCTIONS := $(shell find src/test/test-models -type f -name '*.stanfuncs')
+$(patsubst %.stanfuncs,%.hpp,$(TEST_FUNCTIONS)) : %.hpp : %.stanfuncs test/test-models/stanc$(EXE)
+	$(WINE) test/test-models/stanc$(EXE) --o=$@ $<
+
+
+##
 # src/test/unit/lang/stanc_helper_test.cpp requires files to be read-only.
 ##
 .PHONY: change-file-permissions
@@ -165,6 +173,7 @@ src/test/performance/logistic_test.cpp: src/test/test-models/performance/logisti
 src/test/unit/lang/generator_test.cpp: src/test/test-models/good/lang/test_lp.hpp
 src/test/unit/lang/parser_generator_test.cpp: $(patsubst %.stan,%.hpp,$(shell find src/test/test-models/good/parser-generator -type f -name '*.stan'))
 src/test/unit/io/random_var_context_test.cpp: src/test/test-models/good/services/test_lp.hpp
+src/test/unit/lang/parser/functions_standalone_instantiate_test.cpp: src/test/test-models/good-standalone-functions/basic.hpp
 src/test/unit/lang/reject/reject_func_call_generated_quantities_test.cpp: src/test/test-models/good/lang/reject_func_call_generated_quantities.hpp
 src/test/unit/lang/reject/reject_func_call_model_test.cpp: src/test/test-models/good/lang/reject_func_call_model.hpp
 src/test/unit/lang/reject/reject_func_call_transformed_data_test.cpp: src/test/test-models/good/lang/reject_func_call_transformed_data.hpp
