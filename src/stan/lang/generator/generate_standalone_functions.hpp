@@ -3,10 +3,9 @@
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/generate_functions.hpp>
-#include <stan/lang/generator/generate_globals.hpp>
 #include <stan/lang/generator/generate_includes.hpp>
 #include <stan/lang/generator/generate_typedefs.hpp>
-#include <stan/lang/generator/generate_usings.hpp>
+#include <stan/lang/generator/generate_usings_standalone_functions.hpp>
 #include <stan/lang/generator/generate_version_comment.hpp>
 #include <ostream>
 #include <string>
@@ -31,18 +30,19 @@ namespace stan {
       generate_version_comment(o);
 
       // TODO(martincerny) try to reduce the includes that are necessary
-      generate_includes(o);
+      generate_include("stan/model/standalone_functions_header.hpp", o);
+      o << EOL;
 
       // generate namespace starts
       for (size_t namespace_i = 0;
           namespace_i < namespaces.size(); ++namespace_i) {
         o << "namespace " << namespaces[namespace_i] << " { ";
       }
-      o << std::endl;
+      o << EOL;
 
-      generate_usings(o);
+      generate_usings_standalone_functions(o);
+
       generate_typedefs(o);
-      generate_globals(o);
       generate_functions(prog.function_decl_defs_, o);
 
       // generate namespace ends
@@ -50,7 +50,7 @@ namespace stan {
           namespace_i < namespaces.size(); ++namespace_i) {
         o << " } ";
       }
-      o << std::endl;
+      o << EOL;
     }
 
   }
