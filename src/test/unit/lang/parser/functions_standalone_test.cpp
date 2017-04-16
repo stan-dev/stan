@@ -3,9 +3,12 @@
 
 TEST(lang_parser, functions_standalone_parsable) {
   test_parsable_standalone_functions("basic");
+  test_parsable_standalone_functions("special_functions");
 }
 
-// TODO(martincerny) check that the -namespace argument is used and enforced
-// correctly
+// TODO(martincerny) test forward function declarations
+
+// TODO(martincerny) check that the -namespace argument to stanc 
+// is used and enforced correctly
 
 

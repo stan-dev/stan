@@ -3,6 +3,7 @@
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/generate_functions.hpp>
+#include <stan/lang/generator/generate_function_instantiations.hpp>
 #include <stan/lang/generator/generate_includes.hpp>
 #include <stan/lang/generator/generate_typedefs.hpp>
 #include <stan/lang/generator/generate_usings_standalone_functions.hpp>
@@ -44,6 +45,7 @@ namespace stan {
 
       generate_typedefs(o);
       generate_functions(prog.function_decl_defs_, o);
+      generate_function_instantiations(prog.function_decl_defs_, o);
 
       // generate namespace ends
       for (size_t namespace_i = 0;
