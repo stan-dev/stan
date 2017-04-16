@@ -26,11 +26,10 @@ namespace stan {
      */
     void generate_function_instantiation(const function_decl_def& fun,
                            std::ostream& out) {
-
       // Do not generate anything for forward decalrations
       if (fun.body_.is_no_op_statement()) {
         return;
-      }                             
+      }
 
       bool is_rng = ends_with("_rng", fun.name_);
       bool is_lp = ends_with("_lp", fun.name_);

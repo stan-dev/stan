@@ -28,7 +28,7 @@ namespace stan {
      * @param[in] rng_type set a type of the rng argument in _rng functions
      */
     void generate_function_arguments(const function_decl_def& fun, bool is_rng,
-                                     bool is_lp, bool is_log, std::ostream& o, 
+                                     bool is_lp, bool is_log, std::ostream& o,
                                      bool double_only = false,
                                      std::string rng_type = "RNG") {
       o << "(";
@@ -48,9 +48,9 @@ namespace stan {
       }
       if ((is_rng || is_lp) && fun.arg_decls_.size() > 0)
         o << ", ";
-      if (is_rng)
+      if (is_rng) {
         o << rng_type << "& base_rng__";
-      else if (is_lp) {
+      } else if (is_lp) {
         if (double_only) {
           o << "double& lp__, stan::math::accumulator<double>& lp_accum__";
         } else {

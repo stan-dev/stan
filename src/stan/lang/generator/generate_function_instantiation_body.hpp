@@ -6,6 +6,7 @@
 #include <stan/lang/generator/generate_function_instantiation_template_parameters.hpp>
 #include <ostream>
 #include <vector>
+#include <string>
 
 namespace stan {
   namespace lang {
@@ -25,8 +26,8 @@ namespace stan {
      * @param[in] is_log true if function is log probability function
      * @param[in,out] o stream for generating
      */
-    void generate_function_instantiation_body(const function_decl_def& fun, 
-                                    bool is_rng, bool is_lp, bool is_log, 
+    void generate_function_instantiation_body(const function_decl_def& fun,
+                                    bool is_rng, bool is_lp, bool is_log,
                                     const std::string& rng_class,
                                     std::ostream& o) {
       o << "{" << EOL;
@@ -36,8 +37,8 @@ namespace stan {
       }
       generate_function_name(fun, o);
       generate_function_instantiation_template_parameters(
-        fun, is_rng, is_lp, is_log, rng_class, o); 
-        
+        fun, is_rng, is_lp, is_log, rng_class, o);
+
       o << "(";
       for (size_t arg_i = 0; arg_i < fun.arg_decls_.size(); ++arg_i) {
         o << fun.arg_decls_[arg_i].name_;
@@ -54,7 +55,7 @@ namespace stan {
       if (is_rng || is_lp || fun.arg_decls_.size() > 0)
         o << ", ";
       o << "pstream__";
-      
+
       o << ");" << EOL;
       o << "}" << EOL;
     }

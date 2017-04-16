@@ -1,9 +1,13 @@
-#ifndef STAN_LANG_GENERATOR_GENERATE_FUNCTION_INSTANTIATION_TEMPLATE_PARAMETERS_HPP
-#define STAN_LANG_GENERATOR_GENERATE_FUNCTION_INSTANTIATION_TEMPLATE_PARAMETERS_HPP
+#ifndef \
+STAN_LANG_GENERATOR_GENERATE_FUNCTION_INSTANTIATION_TEMPLATE_PARAMETERS_HPP
+#define \
+STAN_LANG_GENERATOR_GENERATE_FUNCTION_INSTANTIATION_TEMPLATE_PARAMETERS_HPP
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
 #include <ostream>
+#include <string>
+#include <vector>
 
 namespace stan {
   namespace lang {
@@ -21,14 +25,14 @@ namespace stan {
     void generate_function_instantiation_template_parameters(
                                               const function_decl_def& fun,
                                               bool is_rng, bool is_lp,
-                                              bool is_log, 
+                                              bool is_log,
                                               const std::string& rng_type,
                                               std::ostream& out) {
       std::vector<std::string> type_params;
       type_params.reserve(fun.arg_decls_.size());
 
       if (is_log) {
-        std::string propto_value = "false"; 
+        std::string propto_value = "false";
         type_params.push_back(propto_value);
       }
 
@@ -46,11 +50,10 @@ namespace stan {
         type_params.push_back("stan::math::accumulator<double> ");
       }
 
-
       if (!type_params.empty()) {
         out << "<";
         for (size_t param_i = 0; param_i < type_params.size(); ++param_i) {
-          if(param_i > 0) 
+          if (param_i > 0)
             out << ", ";
           out << type_params[param_i];
         }
