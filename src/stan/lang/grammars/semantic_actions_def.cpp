@@ -669,72 +669,74 @@ namespace stan {
     }
     boost::phoenix::function<remove_params_var> remove_params_var_f;
 
+    void dump_program_line(size_t idx_errline, int offset,
+                           const std::string& origin_file,
+                           size_t origin_line,
+                           const io::program_reader& reader,
+                           const std::vector<std::string>& program_lines,
+                           std::stringstream& error_msgs) {
+      boost::format fmt_lineno("%6d: ");
+      if (idx_errline + offset > 0
+          && idx_errline + offset < program_lines.size()) {
+        io::program_reader::trace_t trace = reader.trace(idx_errline + offset);
+        if (trace[trace.size() - 1].first == origin_file) {
+          std::string lineno = str(fmt_lineno % (origin_line + offset));
+          error_msgs << lineno << program_lines[idx_errline + offset - 1]
+                     << std::endl;
+        }
+      }
+    }
+
     void program_error::operator()(pos_iterator_t begin, pos_iterator_t end,
                                    pos_iterator_t where, variable_map& vm,
                                    std::stringstream& error_msgs,
                                    const io::program_reader& reader) const {
-      using boost::spirit::get_line;
-      using boost::format;
-      using std::setw;
-
-      size_t idx_errline = get_line(where);
-      if (idx_errline > 0) {
-        io::program_reader::trace_t trace = reader.trace(idx_errline);
-        std::string trace_str = io::program_reader::trace_to_string(trace);
-        error_msgs << "Error " << trace_str << std::endl;
-        error_msgs << "  Error context, with error position marked by ^"
-                   << std::endl
-                   << "  ----------------------------------------------"
-                   << std::endl;
-
-        std::basic_stringstream<char> sprogram;
-        sprogram << boost::make_iterator_range(begin, end);
-
-        // show error in context 2 lines before, 1 lines after
-        size_t idx_errcol = 0;
-        idx_errcol = get_column(begin, where) - 1;
-
-        std::string lineno = "";
-        // format fmt_lineno("% 5d:    ");
-
-        std::string line_2before = "";
-        std::string line_before = "";
-        std::string line_err = "";
-        std::string line_after = "";
-
-        size_t idx_line = 0;
-        size_t idx_before = idx_errline - 1;
-        if (idx_before > 0) {
-          // read lines up to error line, save 2 most recently read
-          while (idx_before > idx_line) {
-            line_2before = line_before;
-            std::getline(sprogram, line_before);
-            idx_line++;
-          }
-          if (line_2before.length() > 0) {
-            // lineno = str(fmt_lineno % (idx_before - 1) );
-            lineno = "  error -2: ";
-            error_msgs << lineno << line_2before << std::endl;
-          }
-          // lineno = str(fmt_lineno % idx_before);
-          lineno = "  error -1: ";
-          error_msgs << lineno << line_before << std::endl;
-        }
-
-        std::getline(sprogram, line_err);
-        // lineno = str(fmt_lineno % idx_errline);
-        lineno = "     error: ";
-        error_msgs << lineno << line_err << std::endl
-                   << setw(idx_errcol + lineno.length()) << "^" << std::endl;
-
-        if (!sprogram.eof()) {
-          std::getline(sprogram, line_after);
-          // lineno = str(fmt_lineno % (idx_errline+1));
-          lineno = "  error +1: ";
-          error_msgs << lineno << line_after << std::endl;
-        }
+      // extract line and column of error
+      size_t idx_errline = boost::spirit::get_line(where);
+      if (idx_errline == 0) {
+        error_msgs << "Error before start of program." << std::endl;
+        return;
       }
-      error_msgs << std::endl;
+      size_t idx_errcol = 0;
+      idx_errcol = get_column(begin, where) - 1;
+
+      // extract lines of included program
+      std::basic_stringstream<char> program_ss;
+      program_ss << boost::make_iterator_range(begin, end);
+      std::vector<std::string> program_lines;
+      while (!program_ss.eof()) {
+        std::string line;
+        std::getline(program_ss, line);
+        program_lines.push_back(line);
+      }
+
+      // dump include trace for error line
+      io::program_reader::trace_t trace = reader.trace(idx_errline);
+      std::string origin_file = trace[trace.size() - 1].first;
+      size_t origin_line = trace[trace.size() - 1].second;
+      error_msgs << "  error in '" << trace[trace.size() - 1].first
+                 << "' at line " << trace[trace.size() - 1].second
+                 << ", column " << idx_errcol << std::endl;
+      for (int i = trace.size() - 1; i-- > 0; )
+        error_msgs << "  included from '" << trace[i].first
+                   << "' at line " << trace[i].second << std::endl;
+
+      // dump context of error
+      error_msgs << "  -------------------------------------------------"
+                 << std::endl;
+
+      dump_program_line(idx_errline, -2, origin_file, origin_line,
+                        reader, program_lines, error_msgs);
+      dump_program_line(idx_errline, -1, origin_file, origin_line,
+                        reader, program_lines, error_msgs);
+      dump_program_line(idx_errline, 0, origin_file, origin_line,
+                        reader, program_lines, error_msgs);
+      error_msgs << std::setw(idx_errcol + 8) << "^" << std::endl;
+      dump_program_line(idx_errline, +1, origin_file, origin_line,
+                        reader, program_lines, error_msgs);
+
+      error_msgs << "  -------------------------------------------------"
+                 << std::endl << std::endl;
     }
     boost::phoenix::function<program_error> program_error_f;
 
