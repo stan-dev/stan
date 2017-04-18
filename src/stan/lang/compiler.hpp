@@ -43,7 +43,7 @@ namespace stan {
                                    allow_undefined);
       if (!parse_succeeded)
         return false;
-      generate_cpp(prog, name, out);
+      generate_cpp(prog, name, reader.history(), out);
       return true;
     }
 

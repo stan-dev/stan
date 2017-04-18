@@ -21,7 +21,9 @@ namespace stan {
       generate_indent(indent, o);
       o << "} catch (const std::exception& e) {" << EOL;
       generate_indent(indent + 1, o);
-      o << "stan::lang::rethrow_located(e,current_statement_begin__);" << EOL;
+      o << "stan::lang::rethrow_located(e, current_statement_begin__"
+        << ", prog_reader__);"
+        << EOL;
       generate_comment("Next line prevents compiler griping about no return",
                        indent + 1, o);
       generate_indent(indent + 1, o);

@@ -15,30 +15,28 @@
 namespace stan {
   namespace io {
 
-    namespace internal {
-      /**
-       * Structure to hold preprocessing events, which consist of (a)
-       * line number in concatenated program after includes, (b) line
-       * number in the stream from which the text is read, (c) a
-       * string-based action, and (d) a path to the current file.
-       */
-      struct preproc_event {
-        int concat_line_num_;
-        int line_num_;
-        std::string action_;
-        std::string path_;
+    /**
+     * Structure to hold preprocessing events, which consist of (a)
+     * line number in concatenated program after includes, (b) line
+     * number in the stream from which the text is read, (c) a
+     * string-based action, and (d) a path to the current file.
+     */
+    struct preproc_event {
+      int concat_line_num_;
+      int line_num_;
+      std::string action_;
+      std::string path_;
 
-        preproc_event(int concat_line_num, int line_num,
-                      const std::string& action, const std::string& path)
-          : concat_line_num_(concat_line_num), line_num_(line_num),
-            action_(action), path_(path) { }
+      preproc_event(int concat_line_num, int line_num,
+                    const std::string& action, const std::string& path)
+        : concat_line_num_(concat_line_num), line_num_(line_num),
+          action_(action), path_(path) { }
 
-        void print(std::ostream& out) {
-          out << "(" << concat_line_num_ << ", " << line_num_
-              << ", " << action_ << ", " << path_ << ")";
-        }
-      };
-    }
+      void print(std::ostream& out) {
+        out << "(" << concat_line_num_ << ", " << line_num_
+            << ", " << action_ << ", " << path_ << ")";
+      }
+    };
 
     /**
      * A <code>program_reader</code> reads a Stan program and unpacks
@@ -74,6 +72,12 @@ namespace stan {
         int concat_line_num = 0;
         read(in, name, search_path, concat_line_num);
       }
+
+      /**
+       * Construct a program reader with an empty program and
+       * history.
+       */
+      program_reader() : program_(""), history_() { }
 
       /**
        * Return a string representing the concatenated program.  This
@@ -156,9 +160,34 @@ namespace stan {
         return ss.str();
       }
 
+      /**
+       * Return the record of the files and includes used to build up
+       * this program.
+       *
+       * @return I/O history of the program
+       */
+      const std::vector<preproc_event>& history() const {
+        return history_;
+      }
+
+      /**
+       * Adds preprocessing event with specified components to the
+       * back of the history sequence.
+       *
+       * @param[in] concat_line_num position in concatenated program
+       * @parma[in] line_num position in current file
+       * @param[in] action purpose of preprocessing event
+       * @param[in] path location of current file
+       */
+      void add_event(int concat_line_num, int line_num,
+                     const std::string& action, const std::string& path) {
+        preproc_event e(concat_line_num, line_num, action, path);
+        history_.push_back(e);
+      }
+
     private:
       std::stringstream program_;
-      std::vector<internal::preproc_event> history_;
+      std::vector<preproc_event> history_;
 
       /**
        * Returns the characters following <code>#include</code> on
@@ -195,7 +224,6 @@ namespace stan {
       void read(std::istream& in, const std::string& path,
                 const std::vector<std::string>& search_path,
                 int& concat_line_num) {
-        using internal::preproc_event;
         history_.push_back(preproc_event(concat_line_num, 0, "start", path));
         for (int line_num = 1; ; ++line_num) {
           std::string line = read_line(in);

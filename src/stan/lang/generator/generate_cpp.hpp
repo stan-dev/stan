@@ -1,6 +1,7 @@
 #ifndef STAN_LANG_GENERATOR_GENERATE_CPP_HPP
 #define STAN_LANG_GENERATOR_GENERATE_CPP_HPP
 
+#include <stan/io/program_reader.hpp>
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/generate_class_decl.hpp>
 #include <stan/lang/generator/generate_class_decl_end.hpp>
@@ -43,6 +44,7 @@ namespace stan {
      * @param[in,out] o stream for generating
      */
     void generate_cpp(const program& prog, const std::string& model_name,
+                      const std::vector<io::preproc_event>& history,
                       std::ostream& o) {
       generate_version_comment(o);
       generate_includes(o);
@@ -55,7 +57,7 @@ namespace stan {
       generate_private_decl(o);
       generate_member_var_decls_all(prog, o);
       generate_public_decl(o);
-      generate_constructor(prog, model_name, o);
+      generate_constructor(prog, model_name, history, o);
       generate_destructor(model_name, o);
       // put back if ever need integer params
       // generate_set_param_ranges(prog.parameter_decl_, o);
