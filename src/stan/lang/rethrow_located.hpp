@@ -110,22 +110,18 @@ namespace stan {
 
       // create message with trace of includes and location of error
       std::stringstream o;
-      o << "Exception thrown at line " << line << ": "
-        << e.what();
-
-      // o << "Exception " << e.what();
-      // if (line < 1) {
-      //   o << "  Found before start of program.";
-      // } else {
-      //   io::program_reader::trace_t tr = reader.trace(line);
-      //   o << "  Found in '" << tr[tr.size() - 1].first
-      //     << "' at line " << tr[tr.size() - 1].second << std::endl;
-      //   for (int i = tr.size() - 1; --i >= 0; )
-      //     o << "; included from '" << tr[i].first
-      //       << "' at line " << tr[i].second << std::endl;
-      //   o << std::endl;
-      // }
-
+      o << "Exception: " << e.what();
+      if (line < 1) {
+        o << "  Found before start of program.";
+      } else {
+        io::program_reader::trace_t tr = reader.trace(line);
+        o << "  (in '" << tr[tr.size() - 1].first
+          << "' at line " << tr[tr.size() - 1].second;
+        for (int i = tr.size() - 1; --i >= 0; )
+          o << "; included from '" << tr[i].first
+            << "' at line " << tr[i].second;
+        o << ")" << std::endl;
+      }
       std::string s = o.str();
 
       if (is_type<bad_alloc>(e))

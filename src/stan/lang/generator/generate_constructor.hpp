@@ -13,6 +13,7 @@
 #include <stan/lang/generator/generate_void_statement.hpp>
 #include <ostream>
 #include <string>
+#include <vector>
 
 namespace stan {
   namespace lang {

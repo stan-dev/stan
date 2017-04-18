@@ -29,6 +29,7 @@
 #include <stan/lang/generator/generate_write_array_method.hpp>
 #include <ostream>
 #include <string>
+#include <vector>
 
 namespace stan {
   namespace lang {

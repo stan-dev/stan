@@ -106,14 +106,11 @@ namespace stan {
 
       void write_error_msg_(const std::exception& e,
                             callbacks::writer& writer) {
-        writer("Informational Message: The current Metropolis proposal "
-               "is about to be rejected because of the following issue:");
+        writer("Informational Message: Log density evaluation failed"
+               " and the parameter proposal was rejected because:");
         writer(e.what());
-        writer("If this warning occurs sporadically, such as for highly "
-               "constrained variable types like covariance matrices, then "
-               "the sampler is fine,");
-        writer("but if this warning occurs often then your model may be "
-               "either severely ill-conditioned or misspecified.");
+        writer("If this warning occurs more than a few times, your model"
+               " is either misspecified or numerically ill-conditioned.");
         writer();
       }
     };
