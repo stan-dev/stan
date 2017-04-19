@@ -87,25 +87,20 @@ namespace stan {
      */
     void rethrow_located(const std::exception& e, int line,
                          const io::program_reader& reader) {
-      std::cout << "WTF?" << std::endl;
-
       using std::bad_alloc;          // -> exception
       using std::bad_cast;           // -> exception
       using std::bad_exception;      // -> exception
       using std::bad_typeid;         // -> exception
       using std::ios_base;           // ::failure -> exception
-
       using std::domain_error;       // -> logic_error
       using std::invalid_argument;   // -> logic_error
       using std::length_error;       // -> logic_error
       using std::out_of_range;       // -> logic_error
       using std::logic_error;        // -> exception
-
       using std::overflow_error;     // -> runtime_error
       using std::range_error;        // -> runtime_error
       using std::underflow_error;    // -> runtime_error
       using std::runtime_error;      // -> exception
-
       using std::exception;
 
       // create message with trace of includes and location of error

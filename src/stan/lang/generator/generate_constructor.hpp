@@ -30,7 +30,6 @@ namespace stan {
      */
     void generate_constructor(const program& prog,
                               const std::string& model_name,
-                              const std::vector<io::preproc_event>& history,
                               std::ostream& o) {
       // constructor without RNG or template parameter
       o << INDENT << model_name << "(stan::io::var_context& context__," << EOL;
@@ -53,18 +52,6 @@ namespace stan {
       o << INDENT << "void ctor_body(stan::io::var_context& context__," << EOL;
       o << INDENT << "               RNG& base_rng__," << EOL;
       o << INDENT << "               std::ostream* pstream__) {" << EOL;
-
-      // generate preproc events before first statement
-      generate_comment("filling program I/O history for error reports", 2, o);
-
-      for (size_t i = 0; i < history.size(); ++i)
-        o << INDENT2 << "prog_reader__.add_event("
-          << history[i].concat_line_num_
-          << ", " << history[i]. line_num_
-          << ", \"" << history[i].action_ << "\""
-          << ", \"" << history[i].path_ << "\");" << std::endl;
-      o << std::endl;
-
       o << INDENT2 << "current_statement_begin__ = -1;" << EOL2;
       o << INDENT2 << "static const char* function__ = \""
         << model_name << "_namespace::" << model_name << "\";" << EOL;

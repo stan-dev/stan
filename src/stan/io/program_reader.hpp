@@ -74,6 +74,15 @@ namespace stan {
       }
 
       /**
+       * Construct a copy of the specified reader.  Both the
+       * underlying program string and history will be copied.
+       *
+       * @param r reader to copy
+       */
+      program_reader(const program_reader& r)
+      : program_(r.program_.str()), history_(r.history_) { }
+
+      /**
        * Construct a program reader with an empty program and
        * history.
        */

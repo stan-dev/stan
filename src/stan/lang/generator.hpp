@@ -94,6 +94,7 @@
 #include <stan/lang/generator/generate_param_names_method.hpp>
 #include <stan/lang/generator/generate_printable.hpp>
 #include <stan/lang/generator/generate_private_decl.hpp>
+#include <stan/lang/generator/generate_program_reader_fun.hpp>
 #include <stan/lang/generator/generate_propto_default_function.hpp>
 #include <stan/lang/generator/generate_propto_default_function_body.hpp>
 #include <stan/lang/generator/generate_public_decl.hpp>

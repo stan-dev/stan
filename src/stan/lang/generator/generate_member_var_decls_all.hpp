@@ -18,7 +18,6 @@ namespace stan {
      */
     void generate_member_var_decls_all(const program& prog,
                                        std::ostream& o) {
-      o << INDENT << "stan::io::program_reader prog_reader__;" << std::endl;
       generate_member_var_decls(prog.data_decl_, 1, o);
       generate_member_var_decls(prog.derived_data_decl_.first, 1, o);
     }

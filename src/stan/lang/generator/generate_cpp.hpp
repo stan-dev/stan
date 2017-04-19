@@ -21,6 +21,7 @@
 #include <stan/lang/generator/generate_namespace_start.hpp>
 #include <stan/lang/generator/generate_param_names_method.hpp>
 #include <stan/lang/generator/generate_private_decl.hpp>
+#include <stan/lang/generator/generate_program_reader_fun.hpp>
 #include <stan/lang/generator/generate_public_decl.hpp>
 #include <stan/lang/generator/generate_typedefs.hpp>
 #include <stan/lang/generator/generate_unconstrained_param_names_method.hpp>
@@ -53,12 +54,13 @@ namespace stan {
       generate_usings(o);
       generate_typedefs(o);
       generate_globals(o);
+      generate_program_reader_fun(history, o);
       generate_functions(prog.function_decl_defs_, o);
       generate_class_decl(model_name, o);
       generate_private_decl(o);
       generate_member_var_decls_all(prog, o);
       generate_public_decl(o);
-      generate_constructor(prog, model_name, history, o);
+      generate_constructor(prog, model_name, o);
       generate_destructor(model_name, o);
       // put back if ever need integer params
       // generate_set_param_ranges(prog.parameter_decl_, o);
