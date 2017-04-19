@@ -7298,43 +7298,43 @@ factor \code{L} is done in the transformed data block.
 
 \begin{stancode}
 functions {
-  vector gp_pred_rng(real[] x_pred,
-                     vector y_is,
-                     real[] x_is,
+  vector gp_pred_rng(real[] x2,
+                     vector y1,
+                     real[] x1,
                      real alpha,
                      real rho,
                      real sigma,
                      real delta) {
-    vector[size(x_pred)] f_pred;
-    int N_pred;
-    int N;
-    N_pred = size(x_pred);
-    N = rows(y_is);
+    vector[size(x2)] f2;
+    int N2;
+    int N1;
+    N2 = size(x2);
+    N1 = rows(y1);
 
     {
-      matrix[N, N] L_Sigma;
-      vector[N] K_div_y_is;
-      matrix[N, N_pred] k_x_is_x_pred;
-      matrix[N, N_pred] v_pred;
-      vector[N_pred] f_pred_mu;
-      matrix[N_pred, N_pred] cov_f_pred;
-      matrix[N_pred, N_pred] nug_pred;
-      matrix[N, N] Sigma;
-      Sigma = cov_exp_quad(x_is, alpha, rho);
-      for (n in 1:N)
+      matrix[N1, N1] L_Sigma;
+      vector[N1] K_div_y1;
+      matrix[N1, N2] k_x1_x2;
+      matrix[N1, N2] v_pred;
+      vector[N2] f2_mu;
+      matrix[N2, N2] cov_f2;
+      matrix[N2, N2] diag_delta;
+      matrix[N1, N1] Sigma;
+      Sigma = cov_exp_quad(x1, alpha, rho);
+      for (n in 1:N1)
         Sigma[n, n] = Sigma[n,n] + square(sigma);
       L_Sigma = cholesky_decompose(Sigma);
-      K_div_y_is = mdivide_left_tri_low(L_Sigma, y_is);
-      K_div_y_is = mdivide_right_tri_low(K_div_y_is',L_Sigma)';
-      k_x_is_x_pred = cov_exp_quad(x_is, x_pred, alpha, rho);
-      f_pred_mu = (k_x_is_x_pred' * K_div_y_is); 
-      v_pred = mdivide_left_tri_low(L_Sigma, k_x_is_x_pred);
-      cov_f_pred = cov_exp_quad(x_pred, alpha, rho) - v_pred' * v_pred;
-      diag_delta = diag_matrix(rep_vector(delta,N_pred));
+      K_div_y1 = mdivide_left_tri_low(L_Sigma, y1);
+      K_div_y1 = mdivide_right_tri_low(K_div_y1',L_Sigma)';
+      k_x1_x2 = cov_exp_quad(x1, x2, alpha, rho);
+      f2_mu = (k_x1_x2' * K_div_y1); 
+      v_pred = mdivide_left_tri_low(L_Sigma, k_x1_x2);
+      cov_f2 = cov_exp_quad(x2, alpha, rho) - v_pred' * v_pred;
+      diag_delta = diag_matrix(rep_vector(delta,N2));
 
-      f_pred = multi_normal_rng(f_pred_mu, cov_f_pred + diag_delta);
+      f2 = multi_normal_rng(f2_mu, cov_f2 + diag_delta);
     }
-    return f_pred;
+    return f2;
   }
 }
 data {
