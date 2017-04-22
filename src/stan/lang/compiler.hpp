@@ -27,6 +27,8 @@ namespace stan {
      * @param allow_undefined true if permits undefined functions
      * @param include_paths Ordered sequence of paths to search for
      *   include files
+     * @param filename name of file or other source from which input
+     *   stream was derived
      * @return <code>false</code> if code could not be generated due
      *   to syntax error in the Stan model; <code>true</code>
      *   otherwise.

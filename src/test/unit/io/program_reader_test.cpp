@@ -11,12 +11,6 @@ std::vector<std::string> create_search_path() {
   return search_path;
 }
 
-void expect_trace_string(const std::string& trace_string_expected,
-                         stan::io::program_reader& reader, int pos) {
-  EXPECT_EQ(trace_string_expected,
-            stan::io::program_reader::trace_to_string(reader.trace(pos)));
-}
-
 void expect_eq_traces(const std::vector<std::pair<std::string, int> >& e,
                          const std::vector<std::pair<std::string, int> >& f) {
   EXPECT_EQ(e.size(), f.size());
@@ -88,13 +82,6 @@ TEST(prog_reader, one) {
             "}\n",
             reader.program());
 
-  expect_trace_string("in file 'foo' at line 1\n", reader, 1);
-  expect_trace_string("in file 'foo' at line 2\n", reader, 2);
-  expect_trace_string("in file 'foo' at line 3\n", reader, 3);
-  expect_trace_string("in file 'foo' at line 4\n", reader, 4);
-  expect_trace_string("in file 'foo' at line 5\n", reader, 5);
-  expect_trace_string("in file 'foo' at line 6\n", reader, 6);
-
   for (int i = 1; i < 7; ++i)
     expect_trace(reader, i, "foo", i);
 
@@ -130,24 +117,6 @@ TEST(prog_reader, two) {
             "model {\n"
             "}\n",
             reader.program());
-
-  expect_trace_string("in file 'foo' at line 1\n", reader, 1);
-  expect_trace_string("in file 'incl_fun.stan' at line 1\n"
-                      "included from file 'foo' at line 2\n",
-                      reader, 2);
-  expect_trace_string("in file 'incl_fun.stan' at line 2\n"
-                      "included from file 'foo' at line 2\n", reader, 3);
-  expect_trace_string("in file 'incl_fun.stan' at line 3\n"
-                      "included from file 'foo' at line 2\n", reader, 4);
-  expect_trace_string("in file 'foo' at line 3\n", reader, 5);
-  expect_trace_string("in file 'incl_params.stan' at line 1\n"
-                      "included from file 'foo' at line 4\n", reader, 6);
-  expect_trace_string("in file 'incl_params.stan' at line 2\n"
-                      "included from file 'foo' at line 4\n", reader, 7);
-  expect_trace_string("in file 'incl_params.stan' at line 3\n"
-                      "included from file 'foo' at line 4\n", reader, 8);
-  expect_trace_string("in file 'foo' at line 5\n", reader, 9);
-  expect_trace_string("in file 'foo' at line 6\n", reader, 10);
 
   expect_trace(reader, 1, "foo", 1);
   expect_trace(reader, 2, "foo", 2, "incl_fun.stan", 1);
@@ -189,32 +158,6 @@ TEST(prog_reader, three) {
             "}\n"
             "model { }\n",
             reader.program());
-
-  expect_trace_string("in file 'foo' at line 1\n", reader, 1);
-  expect_trace_string("in file 'incl_rec.stan' at line 1\n"
-                      "included from file 'foo' at line 2\n", reader, 2);
-  expect_trace_string("in file 'incl_nested.stan' at line 1\n"
-                      "included from file 'incl_rec.stan' at line 2\n"
-                      "included from file 'foo' at line 2\n",
-                      reader, 3);
-  expect_trace_string("in file 'incl_nested.stan' at line 2\n"
-                      "included from file 'incl_rec.stan' at line 2\n"
-                      "included from file 'foo' at line 2\n",
-                      reader, 4);
-  expect_trace_string("in file 'incl_rec.stan' at line 3\n"
-                      "included from file 'foo' at line 2\n",
-                      reader, 5);
-  expect_trace_string("in file 'incl_rec.stan' at line 4\n"
-                      "included from file 'foo' at line 2\n",
-                      reader, 6);
-  expect_trace_string("in file 'incl_rec.stan' at line 5\n"
-                      "included from file 'foo' at line 2\n",
-                      reader, 7);
-  expect_trace_string("in file 'incl_rec.stan' at line 6\n"
-                      "included from file 'foo' at line 2\n",
-                      reader, 8);
-  expect_trace_string("in file 'foo' at line 3\n", reader, 9);
-  expect_trace_string("in file 'foo' at line 4\n", reader, 10);
 
   expect_trace(reader, 1, "foo", 1);
   expect_trace(reader, 2, "foo", 2, "incl_rec.stan", 1);

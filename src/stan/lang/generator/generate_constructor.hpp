@@ -24,8 +24,6 @@ namespace stan {
      *
      * @param[in] prog program from which to generate
      * @param[in] model_name name of model for class name
-     * @param[in] history list of file includes and positions used to
-     *   create text of program
      * @param[in,out] o stream for generating
      */
     void generate_constructor(const program& prog,

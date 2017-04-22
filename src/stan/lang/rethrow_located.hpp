@@ -81,9 +81,10 @@ namespace stan {
      * the specified exception, adding the specified line number to
      * the specified exception's message.
      *
-     * @param[in] e Original exception.
-     * @param[in] line Line number in Stan source program where
-     * exception originated.
+     * @param[in] e original exception
+     * @param[in] line line number in Stan source program where
+     *   exception originated
+     * @param[in] reader trace of how program was included from files
      */
     void rethrow_located(const std::exception& e, int line,
                          const io::program_reader& reader) {

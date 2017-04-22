@@ -136,40 +136,6 @@ namespace stan {
       }
 
       /**
-       * Return a string rendering of the specified include trace.
-       * The returned string will take the form:
-       *
-       * <pre>
-       * in file '<file>' at line <num>
-       * included from file '<file>' at line <num>
-       * ...
-       * included from file '<file> at line <num>
-       * </pre>
-       *
-       * @param target_line_num line number in concatenated program
-       * @return include trace for the line number
-       * @throw std::runtime_exception if the trace is empty
-       */
-      static std::string trace_to_string(const trace_t& x) {
-        if (x.size() < 1) {
-          std::stringstream ss;
-          ss << "Trace is empty" << std::endl;
-          std::string error_msg = ss.str();
-          throw std::runtime_error(error_msg);
-        }
-        std::stringstream ss;
-        ss << "in file '" << x[x.size() - 1].first
-           << "' at line " << x[x.size() - 1].second
-           << std::endl;
-        for (size_t i = x.size() - 1; i-- > 0; ) {
-          ss << "included from file '" << x[i].first
-             << "' at line " << x[i].second
-             << std::endl;
-        }
-        return ss.str();
-      }
-
-      /**
        * Return the record of the files and includes used to build up
        * this program.
        *
@@ -184,7 +150,7 @@ namespace stan {
        * back of the history sequence.
        *
        * @param[in] concat_line_num position in concatenated program
-       * @parma[in] line_num position in current file
+       * @param[in] line_num position in current file
        * @param[in] action purpose of preprocessing event
        * @param[in] path location of current file
        */

@@ -42,7 +42,9 @@ namespace stan {
      *
      * @param[in] prog program from which to generate
      * @param[in] model_name name of model for generating namespace
-     * and class name
+     *   and class name
+     * @param[in] history I/O include history for text underlying
+     *   program
      * @param[in,out] o stream for generating
      */
     void generate_cpp(const program& prog, const std::string& model_name,

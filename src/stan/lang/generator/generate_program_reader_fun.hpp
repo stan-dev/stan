@@ -17,9 +17,8 @@ namespace stan {
      * is an error to report, reconstructing on each call has
      * acceptable performance.
      *
-     * @param history record of I/O path for lines in compound program
-     * @return reader with hsitory matching that of specified history
-     * and an empty program string
+     * @param[in] history record of I/O path for lines in compound program
+     * @param[in, out] o stream to which generated code is written
      */
     void
     generate_program_reader_fun(const std::vector<io::preproc_event>& history,
