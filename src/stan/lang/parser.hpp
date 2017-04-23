@@ -53,7 +53,7 @@ namespace stan {
       lp_iterator fwd_end = lp_iterator(stan_string.end());
 
       program_grammar<lp_iterator> prog_grammar(name, reader, allow_undefined);
-      whitespace_grammar<lp_iterator> whitesp_grammar;
+      whitespace_grammar<lp_iterator> whitesp_grammar(prog_grammar.error_msgs_);
 
       bool parse_succeeded = false;
       try {

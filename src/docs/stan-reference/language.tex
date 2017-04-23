@@ -1,7 +1,7 @@
 \part{Stan Modeling Language}
 
 
-\chapter{Encodings, Includes, Comments, and Whitespace}
+\chapter{Encodings, Includes, and Comments}
 
 \noindent
 This quick chapter covers the character encoding, include mechanism,
@@ -114,6 +114,7 @@ data {
   int<lower=0> N;  // number of observations
   real y[N];  // observations
 }
+\end{stancode}
 
 \subsection{Bracketed Comments}
 
@@ -125,18 +126,18 @@ ignored.
 
 \section{Whitespace}
 
-\subsection{Whitespace characters}
+\subsection{Whitespace Characters}
 
 The whitespace characters (and their ASCII code points) are the space
 (0x20), tab (0x09), carriage return (0x0D), and line feed (0x0A).
 
-\subsection{Whitespace neutrality}
+\subsection{Whitespace Neutrality}
 
 Stan treats these whitespace characters identically.  Specifically,
 there is no significance to indentation, to tabs, to carriage returns
 or line feeds, or to any vertical alignment of text.
 
-\subsection{Whitespace location}
+\subsection{Whitespace Location}
 
 Zero or more whitespace characters may be placed between symbols in a
 Stan program.  For example, zero or more whitespace characters of any

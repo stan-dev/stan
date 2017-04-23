@@ -870,7 +870,12 @@ namespace stan {
     };
     extern boost::phoenix::function<trace> trace_f;
 
-
+    // called from: whitespace_grammar
+    struct deprecate_pound_comment : public phoenix_functor_unary {
+      void operator()(std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<deprecate_pound_comment>
+    deprecate_pound_comment_f;
 
   }
 }

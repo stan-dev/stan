@@ -2756,6 +2756,14 @@ namespace stan {
     }
     boost::phoenix::function<trace> trace_f;
 
+    void deprecate_pound_comment::operator()(std::ostream& error_msgs) const {
+      error_msgs << "Warning (non-fatal): Comments beginning with #"
+                 << " are deprecated.  Please use // in place of #"
+                 << " for line comments." << std::endl;
+    }
+    boost::phoenix::function<deprecate_pound_comment>
+    deprecate_pound_comment_f;
+
   }
 }
 
