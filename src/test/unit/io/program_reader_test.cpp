@@ -174,3 +174,42 @@ TEST(prog_reader, three) {
   EXPECT_THROW(reader.trace(11), std::runtime_error);
 }
 
+TEST(prog_reader, ignoreRecursive) {
+  using std::vector;
+  using std::string;
+  std::stringstream ss;
+  ss << "functions {\n"
+     << "#include badrecurse1.stan\n"
+     << "}\n"
+     << "model { }\n";
+  vector<string> search_path = create_search_path();
+  stan::io::program_reader reader(ss, "foo", search_path);
+  EXPECT_EQ("functions {\n}\nmodel { }\n", reader.program());
+}
+TEST(prog_reader, ignoreRecursive2) {
+  using std::vector;
+  using std::string;
+  std::stringstream ss;
+  ss << "functions {\n"
+     << "#include badrecurse2.stan\n"
+     << "}\n"
+     << "model { }\n";
+  vector<string> search_path = create_search_path();
+  stan::io::program_reader reader(ss, "foo", search_path);
+  EXPECT_EQ("functions {\n}\nmodel { }\n", reader.program());
+}
+TEST(prog_reader, allowSequential) {
+  using std::vector;
+  using std::string;
+  std::stringstream ss;
+  ss << "functions {\n"
+     << "#include simple1.stan\n"
+     << "#include simple1.stan\n"
+     << "}\n"
+     << "model { }\n";
+  vector<string> search_path = create_search_path();
+  stan::io::program_reader reader(ss, "foo", search_path);
+  EXPECT_EQ("functions {\n// foo\n// foo\n}\nmodel { }\n", reader.program());
+}
+
+

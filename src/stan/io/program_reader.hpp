@@ -6,6 +6,7 @@
 #include <cstdio>
 #include <istream>
 #include <fstream>
+#include <set>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -181,24 +182,13 @@ namespace stan {
         return line.substr(start, end - start);
       }
 
-      /**
-       * Read the rest of a program from the specified input stream in
-       * the specified path, with the specified search path for
-       * include files, and incrementing the specified concatenated
-       * line number.  This method is called recursively for included
-       * files.
-       *
-       * @param[in] in stream from which to read
-       * @param[in] path name of stream
-       * @param[in] search_path sequence of path names to search for
-       * include files
-       * @param[in,out] concat_line_num position in concatenated file
-       * to be updated
-       * @throw std::runtime_error if an included file cannot be found
-       */
       void read(std::istream& in, const std::string& path,
                 const std::vector<std::string>& search_path,
-                int& concat_line_num) {
+                int& concat_line_num,
+                std::set<std::string>& visited_paths) {
+        if (visited_paths.find(path) != visited_paths.end())
+          return;  // avoids recursive visitation
+        visited_paths.insert(path);
         history_.push_back(preproc_event(concat_line_num, 0, "start", path));
         for (int line_num = 1; ; ++line_num) {
           std::string line = read_line(in);
@@ -220,7 +210,8 @@ namespace stan {
                 continue;
               }
               try {
-                read(include_in, incl_path, search_path, concat_line_num);
+                read(include_in, incl_path, search_path, concat_line_num,
+                     visited_paths);
               } catch (...) {
                 include_in.close();
                 throw;
@@ -238,7 +229,33 @@ namespace stan {
             program_ << line;
           }
         }
+        visited_paths.erase(path);  // allow multiple, just not nested
       }
+
+
+      /**
+       * Read the rest of a program from the specified input stream in
+       * the specified path, with the specified search path for
+       * include files, and incrementing the specified concatenated
+       * line number.  This method is called recursively for included
+       * files.  If a file is included recursively, the second include
+       * is ignored.
+       *
+       * @param[in] in stream from which to read
+       * @param[in] path name of stream
+       * @param[in] search_path sequence of path names to search for
+       * include files
+       * @param[in,out] concat_line_num position in concatenated file
+       * to be updated
+       * @throw std::runtime_error if an included file cannot be found
+       */
+      void read(std::istream& in, const std::string& path,
+                const std::vector<std::string>& search_path,
+                int& concat_line_num) {
+        std::set<std::string> visited_paths;
+        read(in, path, search_path, concat_line_num, visited_paths);
+      }
+
     };
 
   }
