@@ -255,7 +255,6 @@ namespace stan {
         std::set<std::string> visited_paths;
         read(in, path, search_path, concat_line_num, visited_paths);
       }
-
     };
 
   }
