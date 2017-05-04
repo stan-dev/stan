@@ -30,6 +30,7 @@ def stopErr(msg, returncode):
 
 def isWin():
     if (platform.system().lower().startswith("windows")
+        or platform.system().lower().startswith("cygwin")
         or os.name.lower().startswith("windows")):
         return True
     return False
