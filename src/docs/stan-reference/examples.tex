@@ -6659,9 +6659,8 @@ a positive-definite matrix for any input $x$.%
   inference in the resulting models because the resulting distribution
   does not have unconstrained support.}
 
-A popular covariance function, which will be used in the
-implementations later in this chapter, is a generalized, 
-exponented quadratic function,
+A popular covariance function, which will be used in the implementations later
+in this chapter, is an exponented quadratic function,
 \[
 k(x)_{i, j}
 = \alpha^2 
@@ -6860,6 +6859,35 @@ encoding of the transform described above.
 
 \subsection{GP with a normal outcome}
 
+The full generative model for a GP with a normal outcome, 
+$y \in \R^N$, with inputs $x \in \R^N$, for a finite $N$:
+
+\begin{align*}
+  \rho & \sim \distro{Gamma}(4,4) \\
+  \alpha & \sim \distro{Normal}(0, 1) \\
+  \sigma & \sim \distro{Cauchy}(0, 1) \\
+  f & \sim \distro{MultiNormal}\left(0, K_{\rho,\alpha}(x)\right) \\
+  y_i & \sim \distro{Normal}(f_i, \sigma) \, \forall i \in \{1, \dots, N\}
+\end{align*}
+
+With a normal outcome, it is possible to integrate out the Gaussian
+process $f$, yielding the more parsimonious model:
+
+\begin{align*}
+  \rho & \sim \distro{Gamma}(4,4) \\
+  \alpha & \sim \distro{Normal}(0, 1) \\
+  \sigma & \sim \distro{Cauchy}(0, 1) \\
+  y & \sim \distro{MultiNormal}
+  \left(0, K_{\rho,\alpha}(x) + \mathbf{I}_N \sigma^2\right) \\
+\end{align*}
+
+It can be more computationally efficient when dealing with a normal 
+outcome to integrate out the Gaussian process, because this yields a
+lower-dimensional parameter space over which to do inference. We'll fit
+both models in Stan. The former model will be referred to as the latent
+variable GP, while the latter will be called the marginal likelihood
+GP.
+
 The hyperparameters controlling the covariance function of a Gaussian
 process can be fit by assigning them priors, then computing the
 posterior distribution of the hyperparameters given observed data.
@@ -6871,15 +6899,15 @@ defined based on prior knowledge of the scale of the output values
 ($\alpha$), the scale of the output noise ($\sigma$), and the scale at
 which distances are measured among inputs ($\rho$).
 
-The Stan code%
+The Stan program implementing the marginal likelihood GP is shown below. The
+program is similar to the Stan programs that implement the simulation GPs
+above, but because we are doing inference on the hyperparameters, we need to 
+calculate the covariance matrix \code{Sigma} in the model block, rather than
+the transformed data block. 
 %
 \footnote{The program code is available in the Stan example model repository;
 see \url{http://mc-stan.org/documentation}.}
-%
-is very similar to the simulation models in terms of the
-computations, but the blocks in which variables are declared and
-statements are executed has changed to accommodate the hyperparameter
-estimation problem.
+
 %
 \begin{stancode}
 data {
@@ -6907,8 +6935,8 @@ model {
 
   L_Sigma = cholesky_decompose(Sigma);
 
-  alpha ~ gamma(4, 4);
-  rho ~ gamma(5, 5);
+  alpha ~ normal(0, 1);
+  rho ~ gamma(4, 4);
   sigma ~ cauchy(0, 5);
 
   y ~ multi_normal_cholesky(mu, L_Sigma);
@@ -6925,7 +6953,14 @@ precomputed as transformed data.  The rest of the model consists of
 the priors for the hyperparameters and the multivariate
 Cholesky-parameterized normal likelihood, only now the value \code{y} is known and the
 covariance matrix \code{Sigma} is an unknown dependent on the
-hyperparameters. 
+hyperparameters, allowing us to learn the hyperparameters. 
+
+We have used the Cholesky parameterized \distro{MultiNormal} rather than the
+standard \distro{MultiNormal} because it allows us to the
+\code{cholesky\_decompose} function which has been optimized for both small and
+large matrices. When working with small matrices the differences in
+computational speed between the two approaches will not be noticeable, but for
+larger matrices ($N \gtrsim 100$) the Cholesky decomposition version will be faster.
 
 Hamiltonian Monte Carlo sampling is quite fast and effective for
 hyperparameter inference in this model \citep{Neal:1997}. If the posterior
@@ -6933,12 +6968,12 @@ is well-concentrated for the hyperparameters the Stan
 implementation will fit hyperparameters in models with a few hundred
 data points in seconds.
 
-\subsection{Latent variable GP}
+\subsubsection{Latent variable GP}
 
-We can explicitly code the latent variable formulation of a GP in Stan. This
-will be useful for when the outcome is not normal. We'll need to add a small
-positive term, $\delta$ to the diagonal of the covariance matrix in order to
-ensure that our covariance matrix remains positive definite.
+We can also explicitly code the latent variable formulation of a GP in Stan.
+This will be useful for when the outcome is not normal. We'll need to add a
+small positive term, $\delta$ to the diagonal of the covariance matrix in order
+to ensure that our covariance matrix remains positive definite.
 
 %
 \begin{stancode}
@@ -6980,10 +7015,28 @@ model {
 \end{stancode}
 %
 
+Two differences between the latent variable GP and the marginal likelihood GP
+are worth noting. The first is that we have augmented our parameter block with
+a new parameter vector of length $N$ called $\code{eta}$. This is used in the model
+block to generate a multivariate normal vector called $f$, corresponding to the
+latent GP. We put a $\distro{Normal}(0,1)$ prior on $\code{eta}$ like we did in the
+Cholesky-parameterized GP in the simulation section.  The second difference is
+that our likelihood is now univariate, though we could code $N$ likelihood
+terms as one $N$-dimensional multivariate normal with an identity covariance
+matrix multiplied by $\sigma^2$. However, it is more efficient to use the
+vectorized statement as shown above.
+
+\subsection{Discrete outcomes with Gaussian Processes}
+
+Gaussian processes can be generalized the same way as standard linear
+models by introducing a link function.  This allows them to be used as
+discrete data models.
+
 \subsubsection{Poisson GP}
 
-If we want to model count data, we can remove the $\sigma$ parameter,
-and switch our likelihood from \texttt{normal} to \texttt{poisson\_log}.
+If we want to model count data, we can remove the $\sigma$ parameter, and use
+\code{poisson\_log}, which implements a log link, for our likelihood rather
+than \code{normal}.
 
 %
 \begin{stancode}
@@ -7008,15 +7061,6 @@ model {
 }
 \end{stancode}
 %
-
-\subsection{Classification with Gaussian Processes}
-
-Gaussian processes can be generalized the same way as standard linear
-models by introducing a link function.  This allows them to be used as
-discrete data models, and in particular to perform classification
-using posterior predictive inference.  This section focuses on binary
-classification problems implemented with logistic Gaussian process
-regression.  
 
 \subsubsection{Logistic Gaussian Process Regression}
 
@@ -7050,16 +7094,6 @@ model {
 \end{stancode}
 %
 
-\subsection{Simulation}
-
-Simulation from a Gaussian process logistic regression is
-straightforward; just simulate from a Gaussian process and then
-simulate the $z_n$ from the $f_n$ using the sampling distribution
-above.  Simulation of the $z_n$ must be done in the generated
-quantities block, where it is possible to draw random variates from
-specified distributions.
-
-
 \subsection{Automatic Relevance Determination}
 
 If we have multivariate inputs $x \in \reals^D$, the squared exponential
@@ -7079,9 +7113,9 @@ along dimension $d$. Moreover, the scale of the parameters $\rho_d$ measures
 non-linearity along the $d$-th dimension, rather than ``relevance''.
 
 The implementation of automatic relevance determination in Stan is
-straightforward, though it currently requires the user to directly
-code the covariance matrix themselves. We'll write a function to generate the
-Cholesky of the covariance matrix called \texttt{L\_cov\_exp\_quad\_ARD}.
+straightforward, though it currently requires the user to directly code the
+covariance matrix. We'll write a function to generate the Cholesky of the
+covariance matrix called \code{L\_cov\_exp\_quad\_ARD}.
 
 %
 \begin{stancode}
@@ -7130,9 +7164,9 @@ model {
     f = L_sigma * eta;
   }
 
-  alpha ~ gamma(4, 4);
-  rho ~ gamma(5, 5);
-  sigma ~ cauchy(0, 5);
+  alpha ~ normal(0, 1);
+  rho ~ gamma(4, 4);
+  sigma ~ cauchy(0, 1);
   eta ~ normal(0, 1);
 
   y ~ normal(f, sigma);
@@ -7140,28 +7174,62 @@ model {
 \end{stancode}
 %
 
-
 \subsection{Priors for Gaussian Process Parameters}
 
-The parameters $\rho$ and $\alpha$ are weakly identified, and the ratio of the two 
-is better identified and affects the nonlinearity. However it is usual to use
-independent priors.  
+Formulating priors for GP hyperparameters requires the analyst to consider the
+inherent statistical properties of a GP, the GP's purprose in the model and the
+numerical issues that may arise in Stan when estimating a GP. 
 
-If the length scale is larger than the scale of the data the model is
+Perhaps most importantly, the parameters $\rho$ and $\alpha$ are weakly
+identified because of the equivalence of multivariate Gaussians with a
+covariance matrix parameterized by a Matern kernel. The ratio of the two
+parameters is well-identified, but in practice we put independent priors on the
+two hyperparameters because these two quantities are more interpretable than
+their ratio. 
+
+\subsubsection{Priors for length-scale}
+
+GPs are a flexible class of priors, and as such, can represent a wide spectrum
+of functions. Their flexibility can lead to numerical problems when estimating 
+a model in Stan using Euclidean Hamiltonian Monte Carlo. Length-scales that are
+smaller than the scale of the input data lead to a perfect fit with the
+observed data. This can require small step sizes when exploring this region
+of the parameter space. In order to limit the amount of posterior mass that
+resides in this region, the prior for length-scale should strongly regularize
+away from length-scales that are far smaller than the scale of the input.
+
+We may wish to put further soft constraints on the length-scale, but these are
+dependent on how the GP is used in our statistical model. If we are using the
+GP by itself, we likely don't need further constraints. We'd like to allow the
+GP prior to represent both high-frequency and low-frequency functions, so our
+prior should put non-neglible mass on both sets of functions. In this case, an
+inverse gamma will work well provided it has a left tail that puts neglible
+mass on length-scales that are small with respect to the input data.  
+
+If we're using the GP as a component in a larger model that includes an overall
+mean and fixed effects for the same variables we're using as the domain for the
+GP, we'll likely want to constrain large length-scales as well. A length scale
+that is larger than the scale of the data yields a GP posterior that is
 practically linear (with respect to the particular covariate) and increasing
-the length scale has little impact on the likelihood. Thus you should use a
-prior which quickly declines for the larger length scale values. If the length
-scale is so small that the correlation between data points is zero, then
-decreasing the length scale further does not change the model. There is
-typically no need to restrict the length scale from going to very small values,
-but sometimes it can be helpful.  One reasonable choice of priors is a gamma
-prior for the length scale, with the scale of the prior determined to be weakly
-informative (or more informative if information is available).
+the length scale has little impact on the likelihood. This will introduce
+nonidentiability in our model, as both the fixed effects and the GP will
+explain similar variation. In order to limit the amount of overlap between the
+GP and the linear regression, we should use a prior with a sharper right tail
+to limit the GP to higher-frequency functions. We can use an inverse Gaussian,
+which has an inverse gamma left tail and a Gaussian right tail.
 
-The parameter $\alpha$ corresponds to how much of the variation is
-explained by the regression function and has a similar role to the
-prior variance for linear model weights.  This means the prior can be
-the same as used in linear models, such as a half-t prior on $\alpha$.
+If we have high-frequency covariates in our fixed effects, we may wish to further
+regularize the GP away from high-frequency functions, which means we'll need to 
+penalize smaller length-scales. Luckily, we have a useful way of thinking about
+how length-scale affects the frequency of the functions supported the GP. If we
+were to repeatedly draw from a zero-mean GP with a length-scale of $\rho$ in a
+fixed-domain $[0,T]$, we would get a distribution for the number of times each draw
+of the GP crossed the zero axis. The expectation of this random variable, the number
+of zero crossings, is $\dfrac{T}{\pi \rho}$. You can see that as $\rho$ decreases,
+the expectation of the number of upcrossings increases as the GP is representing 
+higher-frequency functions. Thus, this is a good statistic to keep in mind when
+setting a lower-bound for our prior on length-scale in the presence of high-frequency
+covariates. 
 
 A priori, the closer $\rho_d$ is to zero, the more nonlinear the
 conditional mean in dimension $d$ is.  A posteriori, the actual dependencies
@@ -7173,6 +7241,16 @@ of x1 is higher \cite[page~80]{RasmussenWilliams:2006}.
 The collection of $\rho_d$ (or $1/\rho_d$) parameters can also be
 modeled hierarchically.
 
+\subsubsection{Priors for marginal standard deviation}
+
+The parameter $\alpha$ corresponds to how much of the variation is
+explained by the regression function and has a similar role to the
+prior variance for linear model weights.  This means the prior can be
+the same as used in linear models, such as a half-t prior on $\alpha$.
+
+If we want to allow for the possibility that the GP won't contribute to the
+conditional mean, we can encode this in the marginal standard-deviation by
+allowing the prior for $\alpha$ to put mass at zero.
 
 \subsection{Predictive Inference with a Gaussian Process}
 
@@ -7220,8 +7298,8 @@ model {
     f = L_sigma * eta;
   }
 
-  alpha ~ gamma(4, 4);
-  rho ~ gamma(5, 5);
+  alpha ~ normal(0, 1);
+  rho ~ gamma(4, 4);
   sigma ~ cauchy(0, 5);
   eta ~ normal(0, 1);
 
@@ -7235,7 +7313,6 @@ generated quantities {
 \end{stancode}
 %
 
-%
 The input vectors \code{x1} and \code{x2} are declared as data, as is the
 observed output vector \code{y1}.  The unknown output vector \code{y2}, which
 corresponds to input vector \code{x2}, is declared in the generated quantites
@@ -7252,18 +7329,75 @@ input vector \code{x}.  All that is left is to define the univariate
 normal sampling statement for \code{y}.
 
 The generated quantities block defines the quantity \code{y2}. We generate
-\code{y2} by sampling \code{N2} univariate normals with means from 
-the last \code{N2} elements of \code{f}.
+\code{y2} by sampling \code{N2} univariate normals with each mean corresponding
+to the appropriate element in \code{f}.
 
 \footnote{The program code is available in the Stan example model repository;
 see \url{http://mc-stan.org/documentation}.}
 %
-\subsection{Analytical Form of Joint Predictive Inference}
 
-Bayesian predictive inference for Gaussian processes can be sped up by
-deriving the posterior analytically, then directly sampling from it.
-This works for standard Gaussian processes, but not
-generalizations such as logistic Gaussian process regression.
+\subsubsection{Predictive Inference in non-Gaussian GPs}
+
+We can do predictive inference in non-Gaussian GPs in much the 
+same way as we do with Gaussian GPs.
+
+Consider the following full model for prediction using logistic Gaussian
+process regression.
+%
+\footnote{The model is available in the Stan example model repository;
+see \url{http://mc-stan.org/documentation}.}
+%
+%
+\begin{stancode}
+data {
+  int<lower=1> N1;     
+  real x1[N1]; 
+  vector[N1] z1;
+  int<lower=1> N2;
+  real x2[N2];
+}
+transformed data {
+  int<lower=1> N = N1 + N2;
+  real delta = 1e-9;
+  vector[N] x;
+  for (n in 1:N1) x[n] = x1[n];
+  for (n in 1:N2) x[N1 + n] = x2[n];
+}
+parameters {
+  real<lower=0> alpha;
+  real<lower=0> rho;
+  vector[N] eta;
+}
+model {
+  vector[N] f;
+  {
+    matrix[N, N] Sigma = cov_exp_quad(x, alpha, rho);
+    matrix[N, N] L_Sigma;
+    for (n in 1:N)
+      Sigma[n, n] = Sigma[n, n] + delta;
+    L_Sigma = cholesky_decompose(Sigma);
+    f = L_sigma * eta;
+  }
+
+  alpha ~ gamma(4, 4);
+  rho ~ gamma(5, 5);
+  eta ~ normal(0, 1);
+
+  y ~ bernoulli_logit(f[1:N1]);
+}
+generated quantities {
+  int z2[N2];
+  for (n in 1:N2)
+    z2[n] = bernoulli_logit_rng(f[N1 + n]);
+}
+\end{stancode}
+%
+
+\subsubsection{Analytical Form of Joint Predictive Inference}
+
+Bayesian predictive inference for Gaussian processes with Gaussian observations
+can be sped up by deriving the posterior analytically, then directly sampling
+from it.  
 
 Jumping straight to the result,
 \[
@@ -7290,11 +7424,12 @@ elements in $x$ and $\tilde{x}$ are never the same.
 \footnote{The program code is available in the Stan example model repository;
 see \url{http://mc-stan.org/documentation}.}
 %
-uses the analytic form of the posterior and provides sampling of the
-resulting multivariate normal through the Cholesky decomposition.
-The data declaration is the same as for the standard example.  The
-calculation of the predictive mean \code{mu} and covariance Cholesky
-factor \code{L} is done in the transformed data block.
+This Stan code below uses the analytic form of the posterior and provides
+sampling of the resulting multivariate normal through the Cholesky
+decomposition. The data declaration is the same as for the latent variable
+example, but we've defined a function called \code{gp\_pred\_rng} which
+will generate a draw from the posterior predictive mean conditioned on
+observed data \code{y1}.
 
 \begin{stancode}
 functions {
@@ -7305,11 +7440,9 @@ functions {
                      real rho,
                      real sigma,
                      real delta) {
-    vector[size(x2)] f2;
-    int N2;
-    int N1;
-    N2 = size(x2);
-    N1 = rows(y1);
+    int N1 = rows(y1);
+    int N2 = size(x2);
+    vector[N2] f2;
 
     {
       matrix[N1, N1] L_Sigma;
@@ -7373,125 +7506,6 @@ generated quantities {
     y2[n2] = normal_rng(f2[n2], sigma);
 }
 \end{stancode}
-
-This block implements the definitions of $\Sigma$, $\Omega$, and $K$
-directly.  The posterior mean vector $K^{\top}\Sigma^{-1}y$ is
-computed as \code{mu}.  The covariance has a Cholesky factor $L$ such
-that $LL^{\top} = \Omega - K^{\top}\Sigma^{-1}K$.  Given these two
-ingredients, sampling the predictive quantity $\tilde{y}$ is carried
-out by translating, scaling and rotating an isotropic normal sample 
-using the posterior mean and the Cholesky factorization of the
-posterior covariance.
-
-\subsection{Predictive Inference in non-Gaussian GPs}
-
-For hyperparameter estimation and predictive inference applications,
-the $f_n$ are typically latent parameters (i.e., not observed).
-Unfortunately, they cannot be easily marginalized out analytically,
-so they must be estimated from the data through the observed
-categorical outputs $z_n$.  Predictive inference will proceed not by
-sampling $z_n$ values, but directly through their probabilities, given
-by $\mbox{logit}^{-1}(y_n)$.
-
-\subsection{Stan Implementations}
-
-Joint hyperparameter estimation and predictive inference are easily
-accomplished in Stan by declaring the vector $y$ as a parameter,
-adding the sampling statements for observed $z$, and then proceeding 
-as for the previous regression models.  
-
-Consider the following full model for prediction using logistic Gaussian
-process regression.
-%
-\footnote{The model is available in the Stan example model repository;
-see \url{http://mc-stan.org/documentation}.}
-%
-%
-\begin{stancode}
-data {
-  int<lower=1> N1;     
-  real x1[N1]; 
-  vector[N1] z1;
-  int<lower=1> N2;
-  real x2[N2];
-}
-transformed data {
-  int<lower=1> N = N1 + N2;
-  vector[N] x;
-  for (n in 1:N1) x[n] = x1[n];
-  for (n in 1:N2) x[N1 + n] = x2[n];
-}
-parameters {
-  real<lower=0> alpha;
-  real<lower=0> rho;
-  vector[N] eta;
-}
-model {
-  vector[N] f;
-  {
-    matrix[N, N] Sigma = cov_exp_quad(x, alpha, rho);
-    matrix[N, N] L_Sigma = cholesky_decompose(Sigma);
-    f = L_sigma * eta;
-  }
-
-  alpha ~ gamma(4, 4);
-  rho ~ gamma(5, 5);
-  eta ~ normal(0, 1);
-
-  y ~ bernoulli_logit(f[1:N1]);
-}
-generated quantities {
-  int z2[N2];
-  for (n in 1:N2)
-    z2[n] = bernoulli_logit_rng(f[N1 + n]);
-}
-\end{stancode}
-%
-The transformed data block in which \code{mu} and \code{Sigma} are
-defined is not shown because it is identical to the model for
-prediction in the previous section.  Now the observed outcomes
-\code{z1}, declared as data, are binary.  The variable \code{y1} is
-still drawn from the Gaussian process with values \code{y1[n]} being
-the values of the function for input \code{x1[n]}, only now
-\code{y1[n]} is interpreted as the logit-scaled probability that
-\code{z1[n]} is 1.  The variable \code{y2} plays the same role for
-probabilistic predictions for inputs \code{x2} and is also declared as
-a parameter.
-
-In the model, the full vector \code{y} is defined as before by
-concatenating \code{y1} and \code{y2}, only this time both \code{y1}
-and \code{y2} are parameters.  The full vector \code{y} is defined as
-being multivariate normal as before.  Additionally, the \code{z1[n]}
-variables are given a Bernoulli distribution with logit-scaled
-parameters.  Only the \code{z1[n]} values are observed and hence only
-they are sampled.  There is no \code{z2[n]} vector because Stan does
-not support discrete sampling; instead, the predictions are in the
-form of the logit-scaled probabilities \code{y2}.
-
-Samples form this model do not mix as well as for the standard model.
-This is largely because the \code{z1} values are quantized forms of
-\code{y1}, and thus provide less precise data for estimation.  
-
-The model could be sped up by applying a Cholesky decomposition to the
-covariance matrix \code{Sigma} and then replacing the
-\code{multi\_normal} distribution with \code{multi\_normal\_cholesky}.
-
-A pure logistic Gaussian process regression would not include a noise
-term in the definition of the covariance matrix.  This can be
-implemented by simply removing the noise term(s) \code{sigma\_sq} from
-the definition of \code{Sigma}.  Probit regression can be coded by
-substituting the probit link for the logit.%
-%
-\footnote{Although it is possible to implement probit regression by
-  including the noise term \code{sigma\_sq} and then quantizing
-  \code{y1[n]} to produce \code{z1[n]}, this is not feasible in Stan
-  because it requires a complex constraint on \code{y} to be enforced
-  for multivariate normal distribution.}
-
-This simple prediction model could be extended in the same way as
-previous models by declaring the hyperparameters as parameters and
-defining the covariance matrix in the model block as a local variable.
-
 
 \chapter{Directions, Rotations, and Hyperspheres}
 
