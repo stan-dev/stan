@@ -8,22 +8,22 @@ transformed data {
   row_vector[5] c;
   row_vector[5] y;
 
-  C <- A / B;
-  C <- B \ A;
+  C = A / B;
+  C = B \ A;
 
-  x <- A \ b;
+  x = A \ b;
   
-  y <- c / A;
+  y = c / A;
 
-  A <- A ./ A;
+  A = A ./ A;
 
-  A <- A .* A;
+  A = A .* A;
 
-  x <- x ./ x;
-  x <- x .* x;
+  x = x ./ x;
+  x = x .* x;
 
-  y <- y ./ y;
-  y <- y .* y;
+  y = y ./ y;
+  y = y .* y;
 
 }
 model {

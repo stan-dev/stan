@@ -1,7 +1,6 @@
 \part{Stan Modeling Language}
 
 
-
 \chapter{Data Types and Variable Declarations}\label{data-types.chapter}
 
 \noindent
@@ -1012,7 +1011,29 @@ same restrictions as for vector and matrix sizes apply, namely that
 the size is declared with an integer-denoting expression that does not
 contain any parameters, transformed parameters, or generated quantities.
 
+\subsection{Size Zero Arrays}
 
+If any of an array's dimensions is size zero, the entire array will be
+of size zero.  That is, if we declare
+%
+\begin{stancode}
+real a[3, 0];
+\end{stancode}
+%
+then the resulting size of \code{a} is zero and querying any of its
+dimensions at run time will result in the value zero.  Declared as
+above, \code{a[1]} will be a size-zero one-dimensional array.  For
+comparison, declaring
+%
+\begin{stancode}
+real b[0, 3];
+\end{stancode}
+%
+also produces an array with an overall size of zero, but in this case,
+there is no way to index legally into \code{b}, because \code{b[0]} is
+undefined.  The array will behave at run time as if it's a $0 \times
+0$ array.  For example, the result of \code{to\_matrix(b)} will be a
+$0 \times 0$ matrix, not a $0 \times 3$ matrix.
 
 
 \section{Variable Types vs.\ Constraints and Sizes}
@@ -1973,12 +1994,9 @@ The key property of the conditional operator that makes it so useful
 in high-performance computing is that it only evaluates the returned
 subexpression, not the alternative expression.  In other words, it is
 not like a typical function that evaluates its argument expressions
-eagerly in order to pass their values to the function.  Specifically,
-the conditional operator provides a substantial speedup over the
-built-in \code{if\_else} function, which, like other functions, evaluates
-all three of its arguments when it is called.  As usual, the saving is
-mostly in the derivatives that do not get computed rather than the
-basic function evaluation itself.
+eagerly in order to pass their values to the function.  As usual, the
+saving is mostly in the derivatives that do not get computed rather
+than the unnecessary function evaluation itself.
 
 \subsubsection{Promotion to Parameter}
 
@@ -2570,7 +2588,7 @@ assignment statement evaluates the expression on the right-hand side
 and assigns it to the (indexed) variable on the left-hand side.  An
 example of a simple assignment is as follows.%
 %
-\footnote{In versions of Stan before 2.14.0, the operator \code{<-} was
+\footnote{In versions of Stan before 2.15.0, the operator \code{<-} was
   used for assignment rather than using the equal sign \code{=}.  The
   old operator \code{<-} is now deprecated and will print a warning.
   In the future, it will be removed.}
@@ -3148,7 +3166,7 @@ y ~ poisson(3.7);
 if (y < 2)
   target += negative_infinity();
 else
-  target += -log_sum_exp(poisson_lpdf(2 | 3.7),
+  target += -log_sum_exp(poisson_lpmf(2 | 3.7),
                          poisson_lccdf(2 | 3.7));
 \end{stancode}
 
@@ -3950,10 +3968,12 @@ generation.
 
 \subsection{Optionality and Ordering}
 
-All of the blocks other than the \code{model} block are optional.  The
-blocks that occur must occur in the order presented in the skeletal
-program above.  Within each block, both declarations and statements
-are optional, subject to the restriction that the declarations come
+All of the blocks are optional.  A consequence of this is that the
+empty string is a valid Stan program, although it will trigger a
+warning message from the Stan compiler.  The Stan program blocks
+that occur must occur in the order presented in the skeletal program
+above.  Within each block, both declarations and statements are
+optional, subject to the  restriction that the declarations come
 before the statements.
 
 \subsection{Variable Scope}

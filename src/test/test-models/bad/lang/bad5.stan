@@ -1,7 +1,7 @@
 transformed data {
   real y;
-  y <- lp__;
+  y = lp__;
 }
 model {
-    lp__ <- 2.0;
+    lp__ = 2.0;
 }

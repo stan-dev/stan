@@ -1,8 +1,7 @@
-#include <stan/math/rev/mat.hpp>
+#include <test/test-models/good/mcmc/hmc/common/gauss3D.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/mcmc/hmc/nuts/softabs_nuts.hpp>
 #include <boost/random/additive_combine.hpp>
-#include <test/test-models/good/mcmc/hmc/common/gauss3D.hpp>
 #include <stan/io/dump.hpp>
 #include <fstream>
 
