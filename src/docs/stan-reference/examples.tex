@@ -7663,7 +7663,10 @@ sampling of the resulting multivariate normal through the Cholesky
 decomposition. The data declaration is the same as for the latent variable
 example, but we've defined a function called \code{gp\_pred\_rng} which
 will generate a draw from the posterior predictive mean conditioned on
-observed data \code{y1}.
+observed data \code{y1}. The code efficiently caches the results of a Cholesky
+decomposition so it can be used in triangular solves to cut down on the
+the number of matrix-matrix multiplications required to compute the conditional
+mean and the conditional covariance of $p(\tilde{y})$.
 
 \begin{stancode}
 functions {
