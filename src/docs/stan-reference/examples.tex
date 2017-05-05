@@ -6910,7 +6910,17 @@ test is between the indexes $i$ and $j$, not between values $x_i$ and
 $x_j$. The addition of $\sigma^2$ on the diagonal is important
 to ensure the positive definiteness of the resulting matrix in the case of
 two identical inputs $x_i = x_j$.  In statistical terms, $\sigma$ is
-the scale of the noise term in the regression.
+the scale of the noise term in the regression. 
+
+The hyperparameter $\rho$ is the \emph{length-scale}, and corresponds to the
+frequency of the functions represented by the Gaussian process prior with
+respect to the domain. Values of $\rho$ closer to zero lead the GP to represent
+high-frequency functions, whereas larger values of $\rho$ lead to low-frequency
+functions. The hyperparameter $\alpha$ is the \emph{marginal standard
+deviation}. It controls the magnitude of the range of the function represented
+by the GP. If you were to take the standard deviation of many draws from the GP
+prior at a single input $x$ conditional on one value of $\alpha$ one would
+recover $\alph$.
 
 The only term in the squared exponential covariance function involving
 the inputs $x_i$ and $x_j$ is their vector difference, $x_i - x_j$.
@@ -7648,7 +7658,7 @@ is the matrix of covariances between inputs $x$ and $\tilde{x}$, which
 in the case of the generalized squared exponential covariance function
 would be
 \[
-K_{i, j} = \eta^2 \exp(-\rho^2 \sum_{d=1}^D (x_{i,d} -
+  K_{i, j} = \eta^2 \exp(-\dfrac{1}{2 \rho^2} \sum_{d=1}^D (x_{i,d} -
 \tilde{x}_{j,d})^2).
 \]
 There is no noise term including $\sigma^2$ because the indexes of
