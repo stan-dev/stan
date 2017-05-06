@@ -6856,7 +6856,7 @@ functions drawn from the process.
 Gaussian processes can be encoded in Stan by implementing their mean and
 covariance functions and plugging the result into the Gaussian form of their
 sampling distribution, or by using the specialized covariance functions
-outlined below.  This form of model is easy to understand and may be used for
+outlined below.  This form of model is straighforward and may be used for
 simulation, model fitting, or posterior predictive inference. A more efficient
 Stan implementation for the GP with a normally distributed outcome marginalizes
 over the latent Gaussian process, and applies a Cholesky-factor
@@ -6880,7 +6880,7 @@ $y_1,\ldots,y_N \in \reals$.  The defining feature of Gaussian
 processes is that the probability of a finite number of outputs $y$
 conditioned on their inputs $x$ is Gaussian,
 \[
-y \sim \distro{Normal}(m(x), k(x)),
+y \sim \distro{MultiNormal}(m(x), k(x)),
 \] 
 where $m(x)$ is an $N$-vector and $k(x)$ is an $N \times N$
 covariance matrix.  The mean function $m : \reals^{N \times D}
@@ -6920,7 +6920,7 @@ functions. The hyperparameter $\alpha$ is the \emph{marginal standard
 deviation}. It controls the magnitude of the range of the function represented
 by the GP. If you were to take the standard deviation of many draws from the GP
 prior at a single input $x$ conditional on one value of $\alpha$ one would
-recover $\alph$.
+recover $\alpha$.
 
 The only term in the squared exponential covariance function involving
 the inputs $x_i$ and $x_j$ is their vector difference, $x_i - x_j$.
@@ -7056,7 +7056,7 @@ $k(x)$, i.e., the lower-triangular matrix $L$ such that $LL^{\top} =
 k(x)$.  Then the transformed variable $\mu + Lz$ has the intended
 target distribution,
 \[
-\mu + Lz \sim \distro{Normal}(\mu, k(x)).
+  \mu + Lz \sim \distro{MultiNormal}(\mu(x), k(x)).
 \]
 
 This transform can be applied directly to Gaussian process
@@ -7109,7 +7109,7 @@ $y \in \R^N$, with inputs $x \in \R^N$, for a finite $N$:
 \begin{align*}
   \rho & \sim \distro{Gamma}(4,4) \\
   \alpha & \sim \distro{Normal}(0, 1) \\
-  \sigma & \sim \distro{Cauchy}(0, 1) \\
+  \sigma & \sim \distro{Normal}(0, 1) \\
   f & \sim \distro{MultiNormal}\left(0, K_{\rho,\alpha}(x)\right) \\
   y_i & \sim \distro{Normal}(f_i, \sigma) \, \forall i \in \{1, \dots, N\}
 \end{align*}
@@ -7120,7 +7120,7 @@ process $f$, yielding the more parsimonious model:
 \begin{align*}
   \rho & \sim \distro{Gamma}(4,4) \\
   \alpha & \sim \distro{Normal}(0, 1) \\
-  \sigma & \sim \distro{Cauchy}(0, 1) \\
+  \sigma & \sim \distro{Normal}(0, 1) \\
   y & \sim \distro{MultiNormal}
   \left(0, K_{\rho,\alpha}(x) + \mathbf{I}_N \sigma^2\right) \\
 \end{align*}
@@ -7132,16 +7132,14 @@ both models in Stan. The former model will be referred to as the latent
 variable GP, while the latter will be called the marginal likelihood
 GP.
 
-The hyperparameters controlling the covariance function of a Gaussian
-process can be fit by assigning them priors, then computing the
-posterior distribution of the hyperparameters given observed data.
-Because the hyperparameters are required to be positive and expected
-to have reasonably small values, broad half-Cauchy distributions act
-as quite vague priors which could just as well be uniform over a
-constrained range of values.  The priors on the parameters should be
-defined based on prior knowledge of the scale of the output values
-($\alpha$), the scale of the output noise ($\sigma$), and the scale at
-which distances are measured among inputs ($\rho$).
+The hyperparameters controlling the covariance function of a Gaussian process
+can be fit by assigning them priors, like we have in the generative models
+above, and then computing the posterior distribution of the hyperparameters
+given observed data. The priors on the parameters should be defined
+based on prior knowledge of the scale of the output values ($\alpha$), the
+scale of the output noise ($\sigma$), and the scale at which distances are
+measured among inputs ($\rho$). See \refsection{} for more information
+about how to specify appropriate priors for the hyperparameters.
 
 The Stan program implementing the marginal likelihood GP is shown below. The
 program is similar to the Stan programs that implement the simulation GPs
@@ -7443,16 +7441,33 @@ resides in this region, the prior for length-scale should strongly regularize
 away from length-scales that are far smaller than the scale of the input.
 
 We may wish to put further soft constraints on the length-scale, but these are
-dependent on how the GP is used in our statistical model. If we are using the
-GP by itself, we likely don't need further constraints. We'd like to allow the
-GP prior to represent both high-frequency and low-frequency functions, so our
-prior should put non-neglible mass on both sets of functions. In this case, an
-inverse gamma will work well provided it has a left tail that puts neglible
-mass on length-scales that are small with respect to the input data.  
+dependent on how the GP is used in our statistical model. 
+
+If our model consists of only the GP, i.e.:
+
+\begin{align}
+  f & \sim \distro{MultiNormal}\left(0, K_{\rho,\alpha}(x)\right) \\
+  y_i & \sim \distro{Normal}(f_i, \sigma) \, \forall i \in \{1, \dots, N\} \\
+  & x \in \reals^{N \times D}
+\end{align} 
+
+we likely don't need further constraints.  We'd like to allow the GP prior to
+represent both high-frequency and low-frequency functions, so our prior should
+put non-neglible mass on both sets of functions. In this case, an inverse gamma
+will work well provided it has a left tail that puts neglible mass on
+length-scales that are small with respect to the input data.  
 
 If we're using the GP as a component in a larger model that includes an overall
 mean and fixed effects for the same variables we're using as the domain for the
-GP, we'll likely want to constrain large length-scales as well. A length scale
+GP, i.e.:
+
+\begin{align}
+  f & \sim \distro{MultiNormal}\left(0, K_{\rho,\alpha}(x)\right) \\
+  y_i & \sim \distro{Normal}(\beta_0 + x_i \beta_{[1:D]} + f_i, \sigma) \, \forall i \in \{1, \dots, N\} \\
+  & x_i^T, \beta_{[1:D]} \in \reals{R}^D,\, x \in \reals^{N \times D}, f \in \
+\end{align} 
+
+we'll likely want to constrain large length-scales as well.  A length scale
 that is larger than the scale of the data yields a GP posterior that is
 practically linear (with respect to the particular covariate) and increasing
 the length scale has little impact on the likelihood. This will introduce
@@ -7752,6 +7767,17 @@ generated quantities {
     y2[n2] = normal_rng(f2[n2], sigma);
 }
 \end{stancode}
+
+\subsection{Multiple-output Gaussian processes}
+
+Suppose we have observations $y_{i,m} \in \reals$ each observed at $x_i \in
+\reals$. We could fit the following model to the data:
+
+\begin{align}
+  f & \sim \distro{MatrixNormal}(\mu(x), k(x), C) \\
+  y_{i, m} & \sim \distro{Normal}(f_{i,m}, \sigma) \\
+  f & \in \reals^{N \times M}
+\end{align}
 
 \chapter{Directions, Rotations, and Hyperspheres}
 
