@@ -212,14 +212,13 @@ TEST_F(ServicesSampleHmcNutsDiagE, output_regression_multiple_threads) {
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
+  // threads run in parallel
   std::thread t1(&stan::services::sample::hmc_nuts_diag_e<stan_model>,
       std::ref(model1), std::ref(context), random_seed, chain, init_radius,
       num_warmup, num_samples, num_thin, save_warmup, refresh,
       stepsize, stepsize_jitter, max_depth,
       std::ref(interrupt), std::ref(message), std::ref(error), std::ref(init),
       std::ref(parameter), std::ref(diagnostic));
-  t1.join();
-
 
   std::thread t2(&stan::services::sample::hmc_nuts_diag_e<stan_model>,
       std::ref(model2), std::ref(context), random_seed, chain, init_radius,
@@ -227,6 +226,8 @@ TEST_F(ServicesSampleHmcNutsDiagE, output_regression_multiple_threads) {
       stepsize, stepsize_jitter, max_depth,
       std::ref(interrupt), std::ref(message), std::ref(error), std::ref(init),
       std::ref(parameter), std::ref(diagnostic));
+
+  t1.join();
   t2.join();
 
   std::vector<std::string> message_values;
