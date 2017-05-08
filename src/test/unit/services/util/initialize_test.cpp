@@ -258,28 +258,26 @@ namespace test {
 }
 
 TEST_F(ServicesUtilInitialize, model_throws__radius_zero) {
-  std::vector<double> params;
   test::mock_throwing_model throwing_model;
 
   double init_radius = 0;
   bool print_timing = false;
-  EXPECT_THROW(params = stan::services::util::initialize(throwing_model, empty_context, rng,
-                                                         init_radius, print_timing,
-                                                         message, init),
+  EXPECT_THROW(stan::services::util::initialize(throwing_model, empty_context, rng,
+                                                init_radius, print_timing,
+                                                message, init),
                std::domain_error);
 
   EXPECT_EQ(1, count_matches("throwing within log_prob", message_ss.str()));
 }
 
 TEST_F(ServicesUtilInitialize, model_throws__radius_two) {
-  std::vector<double> params;
   test::mock_throwing_model throwing_model;
 
   double init_radius = 2;
   bool print_timing = false;
-  EXPECT_THROW(params = stan::services::util::initialize(throwing_model, empty_context, rng,
-                                                         init_radius, print_timing,
-                                                         message, init),
+  EXPECT_THROW(stan::services::util::initialize(throwing_model, empty_context, rng,
+                                                init_radius, print_timing,
+                                                message, init),
                std::domain_error);
   EXPECT_EQ(100, count_matches("throwing within log_prob", message_ss.str()));
 }
@@ -296,14 +294,13 @@ TEST_F(ServicesUtilInitialize, model_throws__full_init) {
   dim_r.push_back(d);
   stan::io::array_var_context init_context(names_r, values_r, dim_r);
 
-  std::vector<double> params;
   test::mock_throwing_model throwing_model;
 
   double init_radius = 2;
   bool print_timing = false;
-  EXPECT_THROW(params = stan::services::util::initialize(throwing_model, init_context, rng,
-                                                         init_radius, print_timing,
-                                                         message, init),
+  EXPECT_THROW(stan::services::util::initialize(throwing_model, init_context, rng,
+                                                init_radius, print_timing,
+                                                message, init),
                std::domain_error);
   EXPECT_EQ(100, count_matches("throwing within log_prob", message_ss.str()));
 }
