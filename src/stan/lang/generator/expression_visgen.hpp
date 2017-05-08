@@ -184,7 +184,7 @@ namespace stan {
       }
 
       void operator()(const algebra_solver& fx) const {
-        o_ << "algebra_solver"
+        o_ << fx.solver_name_
            << '('
            << fx.system_function_name_
            << "_functor__(), ";
@@ -199,7 +199,7 @@ namespace stan {
       }
 
       void operator()(const algebra_solver_control& fx) const {
-        o_ << "algebra_solver"
+        o_ << fx.solver_name_
            << '('
            << fx.system_function_name_
            << "_functor__(), ";

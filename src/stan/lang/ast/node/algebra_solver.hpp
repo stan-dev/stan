@@ -13,6 +13,11 @@ namespace stan {
      * Structure for algebraic solver statement.
      */
     struct algebra_solver {
+    
+      /**
+       * Name of solver.
+       */
+       std::string solver_name_;
 
       /**
        * Name of the algebra system.
@@ -53,7 +58,8 @@ namespace stan {
        * @param dat real-valued data
        * @param dat_int integer-valued data
        */
-      algebra_solver(const std::string& system_function_name,
+      algebra_solver(const std::string& solver_name,
+                     const std::string& system_function_name,
                      const expression& x,
                      const expression& y,
                      const expression& dat,

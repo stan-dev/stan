@@ -10,6 +10,7 @@ namespace stan {
     algebra_solver_control::algebra_solver_control() { }
 
     algebra_solver_control::algebra_solver_control(
+                            const std::string& solver_name,
                             const std::string& system_function_name,
                             const expression& x,
                             const expression& y,
@@ -18,7 +19,8 @@ namespace stan {
                             const expression& rel_tol,
                             const expression& fun_tol,
                             const expression& max_num_steps)
-      : system_function_name_(system_function_name),
+      : solver_name_(solver_name),
+        system_function_name_(system_function_name),
         x_(x), y_(y), dat_(dat), dat_int_(dat_int),
         rel_tol_(rel_tol), fun_tol_(fun_tol), max_num_steps_(max_num_steps) {
     }

@@ -16,6 +16,11 @@ namespace stan {
     struct algebra_solver_control {
 
       /**
+       * Name of the solver
+       */
+       std::string solver_name_;
+
+      /**
        * Name of the algebra system.
        */
       std::string system_function_name_;
@@ -73,7 +78,8 @@ namespace stan {
        * @param fun_tol function tolerance of integrator
        * @param max_steps max steps in integrator
        */
-       algebra_solver_control(const std::string& system_function_name,
+       algebra_solver_control(const std::string& solver_name,
+                              const std::string& system_function_name,
                               const expression& x,
                               const expression& y,
                               const expression& dat,
