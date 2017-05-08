@@ -642,8 +642,12 @@ of integers (type \code{int[]}).
   categorical variate with $N$-simplex distribution parameter
 \farg{theta}; may only be used in generated quantities block}
 \end{description}
-
-
+%
+\begin{description}
+\fitem{int}{categorical\_logit\_rng}{vector \farg{beta}}{Generate a
+  categorical variate with outcome in range $1:N$ from log-odds vector
+\farg{beta}; may only be used in generated quantities block}
+\end{description}
 
 \section{Ordered Logistic Distribution}
 
