@@ -4,17 +4,24 @@
 #include <test/test-models/good/optimization/rosenbrock.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <iostream>
+#include <thread>
 
 class ServicesSampleHmcNutsDiagE : public testing::Test {
 public:
   ServicesSampleHmcNutsDiagE()
-    : model(context, &model_log) {}
+    : model(context, &model_log),
+      model1(context, &model_log1),
+      model2(context, &model_log2) {}
 
   std::stringstream model_log;
+  std::stringstream model_log1;
+  std::stringstream model_log2;
   stan::test::unit::instrumented_writer message, init, error;
   stan::test::unit::instrumented_writer parameter, diagnostic;
   stan::io::empty_var_context context;
   stan_model model;
+  stan_model model1;
+  stan_model model2;
 };
 
 
@@ -186,5 +193,50 @@ TEST_F(ServicesSampleHmcNutsDiagE, output_regression) {
   EXPECT_EQ(0, init_values.size());
   EXPECT_EQ(0, error_values.size());
 
+
+}
+
+
+TEST_F(ServicesSampleHmcNutsDiagE, output_regression_multiple_threads) {
+  unsigned int random_seed = 0;
+  unsigned int chain = 1;
+  double init_radius = 0;
+  int num_warmup = 200;
+  int num_samples = 400;
+  int num_thin = 5;
+  bool save_warmup = true;
+  int refresh = 0;
+  double stepsize = 0.1;
+  double stepsize_jitter = 0;
+  int max_depth = 8;
+  stan::test::unit::instrumented_interrupt interrupt;
+  EXPECT_EQ(interrupt.call_count(), 0);
+
+  std::thread t1(&stan::services::sample::hmc_nuts_diag_e<stan_model>,
+      std::ref(model1), std::ref(context), random_seed, chain, init_radius,
+      num_warmup, num_samples, num_thin, save_warmup, refresh,
+      stepsize, stepsize_jitter, max_depth,
+      std::ref(interrupt), std::ref(message), std::ref(error), std::ref(init),
+      std::ref(parameter), std::ref(diagnostic));
+  t1.join();
+
+
+  std::thread t2(&stan::services::sample::hmc_nuts_diag_e<stan_model>,
+      std::ref(model2), std::ref(context), random_seed, chain, init_radius,
+      num_warmup, num_samples, num_thin, save_warmup, refresh,
+      stepsize, stepsize_jitter, max_depth,
+      std::ref(interrupt), std::ref(message), std::ref(error), std::ref(init),
+      std::ref(parameter), std::ref(diagnostic));
+  t2.join();
+
+  std::vector<std::string> message_values;
+  message_values = message.string_values();
+  std::vector<std::string> init_values;
+  init_values = init.string_values();
+  std::vector<std::string> error_values;
+  error_values = error.string_values();
+
+  EXPECT_EQ(0, init_values.size());
+  EXPECT_EQ(0, error_values.size());
 
 }

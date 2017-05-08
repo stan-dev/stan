@@ -20,7 +20,7 @@ CC = g++
 O = 3
 O_STANC = 0
 AR = ar
-C++11 = false
+C++11 = true
 
 ##
 # Set default compiler options.
