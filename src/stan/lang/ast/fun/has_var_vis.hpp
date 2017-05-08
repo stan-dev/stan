@@ -17,6 +17,8 @@ namespace stan {
     struct fun;
     struct integrate_ode;
     struct integrate_ode_control;
+    struct algebra_solver;
+    struct algebra_solver_control;
     struct index_op;
     struct index_op_sliced;
     struct conditional_op;
@@ -114,6 +116,24 @@ namespace stan {
        * @return true if expression contains a non-data variable
        */
       bool operator()(const integrate_ode_control& e) const;
+
+      /**
+       * Return true if the specified expression contains a non-data
+       * variable. 
+       *
+       * @param e expression
+       * @return true if expression contains a non-data variable
+       */
+      bool operator()(const algebra_solver& e) const;
+
+      /**
+       * Return true if the specified expression contains a non-data
+       * variable. 
+       *
+       * @param e expression
+       * @return true if expression contains a non-data variable
+       */
+      bool operator()(const algebra_solver_control& e) const;
 
       /**
        * Return true if the specified expression contains a non-data
