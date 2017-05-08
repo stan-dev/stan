@@ -109,6 +109,7 @@ namespace stan {
             message_writer("Rejecting initial value:");
             message_writer("  Error evaluating the log probability"
                    " at the initial value.");
+            message_writer(e.what());
             continue;
           }
           if (!boost::math::isfinite(log_prob)) {

@@ -1,5 +1,6 @@
 #include <stan/services/util/initialize.hpp>
 #include <gtest/gtest.h>
+#include <test/unit/util.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 #include <sstream>
 #include <test/test-models/good/services/test_lp.hpp>
@@ -25,7 +26,7 @@ public:
 
 TEST_F(ServicesUtilInitialize, radius_zero__print_false) {
   std::vector<double> params;
-    
+
   double init_radius = 0;
   bool print_timing = false;
   params = stan::services::util::initialize(model, empty_context, rng,
@@ -42,10 +43,10 @@ TEST_F(ServicesUtilInitialize, radius_zero__print_false) {
   EXPECT_EQ(params[0], init.vector_double_values()[0][0]);
   EXPECT_EQ(params[1], init.vector_double_values()[0][1]);
 }
-  
+
 TEST_F(ServicesUtilInitialize, radius_zero__print_true) {
   std::vector<double> params;
-    
+
   double init_radius = 0;
   bool print_timing = true;
   params = stan::services::util::initialize(model, empty_context, rng,
@@ -65,7 +66,7 @@ TEST_F(ServicesUtilInitialize, radius_zero__print_true) {
 
 TEST_F(ServicesUtilInitialize, radius_two__print_false) {
   std::vector<double> params;
-    
+
   double init_radius = 2;
   bool print_timing = false;
   params = stan::services::util::initialize(model, empty_context, rng,
@@ -87,7 +88,7 @@ TEST_F(ServicesUtilInitialize, radius_two__print_false) {
 
 TEST_F(ServicesUtilInitialize, radius_two__print_true) {
   std::vector<double> params;
-    
+
   double init_radius = 2;
   bool print_timing = true;
   params = stan::services::util::initialize(model, empty_context, rng,
@@ -113,7 +114,7 @@ TEST_F(ServicesUtilInitialize, full_init__print_false) {
   std::vector<std::vector<size_t> > dim_r;
   names_r.push_back("y");
   values_r.push_back(6.35149);   // 1.5 unconstrained: -10 + 20 * inv.logit(1.5)
-  values_r.push_back(-2.449187); // -0.5 unconstrained 
+  values_r.push_back(-2.449187); // -0.5 unconstrained
   std::vector<size_t> d;
   d.push_back(2);
   dim_r.push_back(d);
@@ -121,7 +122,7 @@ TEST_F(ServicesUtilInitialize, full_init__print_false) {
 
 
   std::vector<double> params;
-    
+
   double init_radius = 2;
   bool print_timing = false;
   params = stan::services::util::initialize(model, init_context, rng,
@@ -145,7 +146,7 @@ TEST_F(ServicesUtilInitialize, full_init__print_true) {
   std::vector<std::vector<size_t> > dim_r;
   names_r.push_back("y");
   values_r.push_back(6.35149);   // 1.5 unconstrained: -10 + 20 * inv.logit(1.5)
-  values_r.push_back(-2.449187); // -0.5 unconstrained 
+  values_r.push_back(-2.449187); // -0.5 unconstrained
   std::vector<size_t> d;
   d.push_back(2);
   dim_r.push_back(d);
@@ -153,7 +154,7 @@ TEST_F(ServicesUtilInitialize, full_init__print_true) {
 
 
   std::vector<double> params;
-    
+
   double init_radius = 2;
   bool print_timing = true;
   params = stan::services::util::initialize(model, init_context, rng,
@@ -256,15 +257,53 @@ namespace test {
   };
 }
 
-TEST_F(ServicesUtilInitialize, model_throws) {
+TEST_F(ServicesUtilInitialize, model_throws__radius_zero) {
   std::vector<double> params;
   test::mock_throwing_model throwing_model;
-    
+
+  double init_radius = 0;
+  bool print_timing = false;
+  EXPECT_THROW(params = stan::services::util::initialize(throwing_model, empty_context, rng,
+                                                         init_radius, print_timing,
+                                                         message, init),
+               std::domain_error);
+
+  EXPECT_EQ(1, count_matches("throwing within log_prob", message_ss.str()));
+}
+
+TEST_F(ServicesUtilInitialize, model_throws__radius_two) {
+  std::vector<double> params;
+  test::mock_throwing_model throwing_model;
+
   double init_radius = 2;
   bool print_timing = false;
-  EXPECT_THROW(params
-               = stan::services::util::initialize(throwing_model, empty_context, rng,
-                                                  init_radius, print_timing,
-                                                  message, init),
+  EXPECT_THROW(params = stan::services::util::initialize(throwing_model, empty_context, rng,
+                                                         init_radius, print_timing,
+                                                         message, init),
                std::domain_error);
+  EXPECT_EQ(100, count_matches("throwing within log_prob", message_ss.str()));
+}
+
+TEST_F(ServicesUtilInitialize, model_throws__full_init) {
+  std::vector<std::string> names_r;
+  std::vector<double> values_r;
+  std::vector<std::vector<size_t> > dim_r;
+  names_r.push_back("y");
+  values_r.push_back(6.35149);   // 1.5 unconstrained: -10 + 20 * inv.logit(1.5)
+  values_r.push_back(-2.449187); // -0.5 unconstrained
+  std::vector<size_t> d;
+  d.push_back(2);
+  dim_r.push_back(d);
+  stan::io::array_var_context init_context(names_r, values_r, dim_r);
+
+  std::vector<double> params;
+  test::mock_throwing_model throwing_model;
+
+  double init_radius = 2;
+  bool print_timing = false;
+  EXPECT_THROW(params = stan::services::util::initialize(throwing_model, init_context, rng,
+                                                         init_radius, print_timing,
+                                                         message, init),
+               std::domain_error);
+  EXPECT_EQ(100, count_matches("throwing within log_prob", message_ss.str()));
 }
