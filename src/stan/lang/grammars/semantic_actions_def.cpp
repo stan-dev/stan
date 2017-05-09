@@ -1545,14 +1545,7 @@ namespace stan {
     void validate_algebra_solver_non_control_args(const T& alg_fun,
                                                   const variable_map& var_map,
                                                   bool& pass,
-                                                  std::ostream& error_msgs) {      
-      error_msgs << "TEST" << std::endl
-                 << alg_fun.system_function_name_ << std::endl
-                 << alg_fun.x_.expression_type() << std::endl
-                 << alg_fun.y_.expression_type() << std::endl
-                 << alg_fun.dat_.expression_type() << std::endl
-                 << alg_fun.dat_int_.expression_type() << std::endl;
-      
+                                                  std::ostream& error_msgs) {
       pass = true;
       // test function argument type
       expr_type sys_result_type(VECTOR_T, 0);
