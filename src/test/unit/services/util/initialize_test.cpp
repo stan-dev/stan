@@ -304,3 +304,140 @@ TEST_F(ServicesUtilInitialize, model_throws__full_init) {
                std::domain_error);
   EXPECT_EQ(100, count_matches("throwing within log_prob", message_ss.str()));
 }
+
+
+namespace test {
+  // Mock Throwing Model throws exception
+  class mock_error_model: public stan::model::prob_grad {
+  public:
+
+    mock_error_model():
+      stan::model::prob_grad(1),
+      templated_log_prob_calls(0),
+      transform_inits_calls(0),
+      write_array_calls(0),
+      log_prob_return_value(0.0) { }
+
+    void reset() {
+      templated_log_prob_calls = 0;
+      transform_inits_calls = 0;
+      write_array_calls = 0;
+      log_prob_return_value = 0.0;
+    }
+
+    template <bool propto__, bool jacobian__, typename T__>
+    T__ log_prob(std::vector<T__>& params_r__,
+                 std::vector<int>& params_i__,
+                 std::ostream* pstream__ = 0) const {
+      ++templated_log_prob_calls;
+      throw std::out_of_range("out_of_range error in log_prob");
+      return log_prob_return_value;
+    }
+
+    void transform_inits(const stan::io::var_context& context__,
+                         std::vector<int>& params_i__,
+                         std::vector<double>& params_r__,
+                         std::ostream* pstream__) const {
+      ++transform_inits_calls;
+      for (size_t n = 0; n < params_r__.size(); ++n) {
+        params_r__[n] = n;
+      }
+    }
+
+    void get_dims(std::vector<std::vector<size_t> >& dimss__) const {
+      dimss__.resize(0);
+      std::vector<size_t> scalar_dim;
+      dimss__.push_back(scalar_dim);
+    }
+
+    void constrained_param_names(std::vector<std::string>& param_names__,
+                                 bool include_tparams__ = true,
+                                 bool include_gqs__ = true) const {
+      param_names__.push_back("theta");
+    }
+
+    void get_param_names(std::vector<std::string>& names) const {
+      constrained_param_names(names);
+    }
+
+    void unconstrained_param_names(std::vector<std::string>& param_names__,
+                                   bool include_tparams__ = true,
+                                   bool include_gqs__ = true) const {
+      param_names__.clear();
+      for (size_t n = 0; n < num_params_r__; ++n) {
+        std::stringstream param_name;
+        param_name << "param_" << n;
+        param_names__.push_back(param_name.str());
+      }
+    }
+    template <typename RNG>
+    void write_array(RNG& base_rng__,
+                     std::vector<double>& params_r__,
+                     std::vector<int>& params_i__,
+                     std::vector<double>& vars__,
+                     bool include_tparams__ = true,
+                     bool include_gqs__ = true,
+                     std::ostream* pstream__ = 0) const {
+      ++write_array_calls;
+      vars__.resize(0);
+      for (size_t i = 0; i < params_r__.size(); ++i)
+        vars__.push_back(params_r__[i]);
+    }
+
+    mutable int templated_log_prob_calls;
+    mutable int transform_inits_calls;
+    mutable int write_array_calls;
+    double log_prob_return_value;
+  };
+}
+
+
+TEST_F(ServicesUtilInitialize, model_errors__radius_zero) {
+  test::mock_error_model error_model;
+
+  double init_radius = 0;
+  bool print_timing = false;
+  EXPECT_THROW_MSG(stan::services::util::initialize(error_model, empty_context, rng,
+                                                    init_radius, print_timing,
+                                                    message, init),
+                   std::out_of_range,
+                   "out_of_range error in log_prob");
+  EXPECT_EQ(0, count_matches("out_of_range error in log_prob", message_ss.str()));
+}
+
+TEST_F(ServicesUtilInitialize, model_errors__radius_two) {
+  test::mock_error_model error_model;
+
+  double init_radius = 2;
+  bool print_timing = false;
+  EXPECT_THROW_MSG(stan::services::util::initialize(error_model, empty_context, rng,
+                                                    init_radius, print_timing,
+                                                    message, init),
+                   std::out_of_range,
+                   "out_of_range error in log_prob");
+  EXPECT_EQ(0, count_matches("out_of_range error in log_prob", message_ss.str()));
+}
+
+TEST_F(ServicesUtilInitialize, model_errors__full_init) {
+  std::vector<std::string> names_r;
+  std::vector<double> values_r;
+  std::vector<std::vector<size_t> > dim_r;
+  names_r.push_back("y");
+  values_r.push_back(6.35149);   // 1.5 unconstrained: -10 + 20 * inv.logit(1.5)
+  values_r.push_back(-2.449187); // -0.5 unconstrained
+  std::vector<size_t> d;
+  d.push_back(2);
+  dim_r.push_back(d);
+  stan::io::array_var_context init_context(names_r, values_r, dim_r);
+
+  test::mock_error_model error_model;
+
+  double init_radius = 2;
+  bool print_timing = false;
+  EXPECT_THROW_MSG(stan::services::util::initialize(error_model, init_context, rng,
+                                                    init_radius, print_timing,
+                                                    message, init),
+                   std::out_of_range,
+                   "out_of_range error in log_prob");
+  EXPECT_EQ(0, count_matches("out_of_range error in log_prob", message_ss.str()));
+}
