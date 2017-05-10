@@ -6856,7 +6856,7 @@ functions drawn from the process.
 Gaussian processes can be encoded in Stan by implementing their mean and
 covariance functions and plugging the result into the Gaussian form of their
 sampling distribution, or by using the specialized covariance functions
-outlined below.  This form of model is straighforward and may be used for
+outlined below.  This form of model is straightforward and may be used for
 simulation, model fitting, or posterior predictive inference. A more efficient
 Stan implementation for the GP with a normally distributed outcome marginalizes
 over the latent Gaussian process, and applies a Cholesky-factor
@@ -6894,7 +6894,7 @@ a positive-definite matrix for any input $x$.%
   does not have unconstrained support.}
 
 A popular covariance function, which will be used in the implementations later
-in this chapter, is an exponented quadratic function,
+in this chapter, is an exponentiated quadratic function,
 \[
 k(x)_{i, j}
 = \alpha^2 
@@ -7379,7 +7379,7 @@ functions {
         Sigma[j, i] = Sigma[i, j];
       }
     }
-    Sigma[N,N] = sq_alphha + delta;
+    Sigma[N,N] = sq_alpha + delta;
     return cholesky_decompose(Sigma);
   }
 }
@@ -7419,7 +7419,7 @@ model {
 \subsection{Priors for Gaussian Process Parameters}
 
 Formulating priors for GP hyperparameters requires the analyst to consider the
-inherent statistical properties of a GP, the GP's purprose in the model and the
+inherent statistical properties of a GP, the GP's purpose in the model and the
 numerical issues that may arise in Stan when estimating a GP. 
 
 Perhaps most importantly, the parameters $\rho$ and $\alpha$ are weakly
@@ -7453,8 +7453,8 @@ If our model consists of only the GP, i.e.:
 
 we likely don't need further constraints.  We'd like to allow the GP prior to
 represent both high-frequency and low-frequency functions, so our prior should
-put non-neglible mass on both sets of functions. In this case, an inverse gamma
-will work well provided it has a left tail that puts neglible mass on
+put non-negligible mass on both sets of functions. In this case, an inverse gamma
+will work well provided it has a left tail that puts negligible mass on
 length-scales that are small with respect to the input data.  
 
 If we're using the GP as a component in a larger model that includes an overall
@@ -7471,7 +7471,7 @@ we'll likely want to constrain large length-scales as well.  A length scale
 that is larger than the scale of the data yields a GP posterior that is
 practically linear (with respect to the particular covariate) and increasing
 the length scale has little impact on the likelihood. This will introduce
-nonidentiability in our model, as both the fixed effects and the GP will
+nonidentifiability in our model, as both the fixed effects and the GP will
 explain similar variation. In order to limit the amount of overlap between the
 GP and the linear regression, we should use a prior with a sharper right tail
 to limit the GP to higher-frequency functions. We can use an inverse Gaussian,
@@ -7495,7 +7495,7 @@ conditional mean in dimension $d$ is.  A posteriori, the actual dependencies
 between $x$ and $y$ play a role.  With one covariate $x_1$ having a
 linear effect and another covariate $x_2$ having a nonlinear effect,
 it is possible that $\rho_1 > \rho_2$ even if the predictive relevance
-of x1 is higher \cite[page~80]{RasmussenWilliams:2006}.
+of $x_1$ is higher \cite[page~80]{RasmussenWilliams:2006}.
 
 The collection of $\rho_d$ (or $1/\rho_d$) parameters can also be
 modeled hierarchically.
@@ -7574,7 +7574,7 @@ generated quantities {
 
 The input vectors \code{x1} and \code{x2} are declared as data, as is the
 observed output vector \code{y1}.  The unknown output vector \code{y2}, which
-corresponds to input vector \code{x2}, is declared in the generated quantites
+corresponds to input vector \code{x2}, is declared in the generated quantities
 block and will be sampled when the model is executed.  
 
 A transformed data block is used to combine the input vectors
@@ -7590,7 +7590,6 @@ normal sampling statement for \code{y}.
 The generated quantities block defines the quantity \code{y2}. We generate
 \code{y2} by sampling \code{N2} univariate normals with each mean corresponding
 to the appropriate element in \code{f}.
-
 \footnote{The program code is available in the Stan example model repository;
 see \url{http://mc-stan.org/documentation}.}
 %
