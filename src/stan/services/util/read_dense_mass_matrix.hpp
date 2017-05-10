@@ -36,7 +36,9 @@ namespace stan {
           inv_mass_matrix =
             stan::math::to_matrix(dense_vals, num_params, num_params);
         } catch (const std::exception& e) {
-          error_writer("Cannot get mass matrix from input file");
+          error_writer("Cannot get mass matrix from input file.");
+          error_writer("Caught exception: ");
+          error_writer(e.what());
           throw std::domain_error("Initialization failure");
         }
 

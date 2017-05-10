@@ -31,9 +31,9 @@ namespace stan {
        * specialized constructor for specified diag mass matrix
        */
       base_nuts(const Model& model, BaseRNG& rng,
-                Eigen::VectorXd& inv_mass_matrix)
+                Eigen::VectorXd& inv_metric)
         : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng,
-                                                            inv_mass_matrix),
+                                                            inv_metric),
           depth_(0), max_depth_(5), max_deltaH_(1000),
           n_leapfrog_(0), divergent_(0), energy_(0) {
       }
@@ -42,9 +42,9 @@ namespace stan {
        * specialized constructor for specified dense mass matrix
        */
       base_nuts(const Model& model, BaseRNG& rng,
-                Eigen::MatrixXd& inv_mass_matrix)
+                Eigen::MatrixXd& inv_metric)
         : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng,
-                                                            inv_mass_matrix),
+                                                            inv_metric),
         depth_(0), max_depth_(5), max_deltaH_(1000),
         n_leapfrog_(0), divergent_(0), energy_(0) {
       }

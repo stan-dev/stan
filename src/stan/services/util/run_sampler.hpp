@@ -63,7 +63,7 @@ namespace stan {
         double warm_delta_t = static_cast<double>(end - start) / CLOCKS_PER_SEC;
 
         writer.write_adapt_finish(sampler);
-
+        sampler.write_sampler_state(sample_writer);
 
         start = clock();
         util::generate_transitions(sampler, num_samples, num_warmup,

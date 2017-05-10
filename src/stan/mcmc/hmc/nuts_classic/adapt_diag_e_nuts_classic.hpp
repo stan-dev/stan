@@ -37,7 +37,7 @@ namespace stan {
                                                     s.accept_stat());
 
           bool update = this->var_adaptation_.learn_variance(
-                                              this->z_.inv_mass_matrix_,
+                                              this->z_.inv_e_metric_,
                                               this->z_.q);
 
           if (update) {

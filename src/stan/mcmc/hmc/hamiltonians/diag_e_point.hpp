@@ -15,7 +15,7 @@ namespace stan {
       /** 
        * Vector of diagonal elements of inverse mass matrix.
        */
-      Eigen::VectorXd inv_mass_matrix_;
+      Eigen::VectorXd inv_e_metric_;
 
       /**
        * Construct a diag point in n-dimensional phase space
@@ -24,8 +24,8 @@ namespace stan {
        * @param n number of dimensions
        */
       explicit diag_e_point(int n)
-        : ps_point(n), inv_mass_matrix_(n) {
-        inv_mass_matrix_.setOnes();
+        : ps_point(n), inv_e_metric_(n) {
+        inv_e_metric_.setOnes();
       }
 
       /**
@@ -33,11 +33,11 @@ namespace stan {
        * with specified vector of diagonal elements of inverse mass matrix.
        *
        * @param n number of dimensions
-       * @param inv_mass_matrix diagonal elements of initial mass matrix
+       * @param inv_e_metric diagonal elements of initial mass matrix
        */
-      diag_e_point(int n, Eigen::VectorXd& inv_mass_matrix)
-        : ps_point(n), inv_mass_matrix_(n) {
-        fast_vector_copy_<double>(inv_mass_matrix_, inv_mass_matrix);
+      diag_e_point(int n, Eigen::VectorXd& inv_e_metric)
+        : ps_point(n), inv_e_metric_(n) {
+        fast_vector_copy_<double>(inv_e_metric_, inv_e_metric);
       }
 
       /**
@@ -46,8 +46,8 @@ namespace stan {
        * @param z point to copy
        */
       diag_e_point(const diag_e_point& z): ps_point(z),
-                   inv_mass_matrix_(z.inv_mass_matrix_.size()) {
-        fast_vector_copy_<double>(inv_mass_matrix_, z.inv_mass_matrix_);
+                   inv_e_metric_(z.inv_e_metric_.size()) {
+        fast_vector_copy_<double>(inv_e_metric_, z.inv_e_metric_);
       }
 
       /**
@@ -58,11 +58,11 @@ namespace stan {
       void
       write_metric(stan::callbacks::writer& writer) {
         writer("Diagonal elements of inverse mass matrix:");
-        std::stringstream inv_mass_matrix_ss;
-        inv_mass_matrix_ss << inv_mass_matrix_(0);
-        for (int i = 1; i < inv_mass_matrix_.size(); ++i)
-          inv_mass_matrix_ss << ", " << inv_mass_matrix_(i);
-        writer(inv_mass_matrix_ss.str());
+        std::stringstream inv_e_metric_ss;
+        inv_e_metric_ss << inv_e_metric_(0);
+        for (int i = 1; i < inv_e_metric_.size(); ++i)
+          inv_e_metric_ss << ", " << inv_e_metric_(i);
+        writer(inv_e_metric_ss.str());
       }
     };
 

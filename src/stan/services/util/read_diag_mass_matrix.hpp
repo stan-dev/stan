@@ -37,7 +37,9 @@ namespace stan {
             inv_mass_matrix(i) = diag_vals[i];
           }
         } catch (const std::exception& e) {
-          error_writer("Cannot get mass matrix from input file");
+          error_writer("Cannot get mass matrix from input file.");
+          error_writer("Caught exception: ");
+          error_writer(e.what());
           throw std::domain_error("Initialization failure");
         }
         return inv_mass_matrix;

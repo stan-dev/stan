@@ -24,8 +24,8 @@ namespace stan {
        * specialized constructor for specified diag mass matrix
        */
       adapt_diag_e_nuts(const Model& model, BaseRNG& rng,
-                   Eigen::VectorXd& inv_mass_matrix)
-        : diag_e_nuts<Model, BaseRNG>(model, rng, inv_mass_matrix),
+                   Eigen::VectorXd& inv_e_metric)
+        : diag_e_nuts<Model, BaseRNG>(model, rng, inv_e_metric),
         stepsize_var_adapter(model.num_params_r()) {}
 
 
@@ -44,7 +44,7 @@ namespace stan {
                                                     s.accept_stat());
 
           bool update = this->var_adaptation_.learn_variance(
-                                              this->z_.inv_mass_matrix_,
+                                              this->z_.inv_e_metric_,
                                               this->z_.q);
 
           if (update) {

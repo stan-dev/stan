@@ -25,8 +25,8 @@ namespace stan {
        * specialized constructor for specified dense mass matrix
        */
       adapt_dense_e_static_hmc(const Model& model, BaseRNG& rng,
-                               Eigen::MatrixXd& inv_mass_matrix)
-        : dense_e_static_hmc<Model, BaseRNG>(model, rng, inv_mass_matrix),
+                               Eigen::MatrixXd& inv_e_metric)
+        : dense_e_static_hmc<Model, BaseRNG>(model, rng, inv_e_metric),
         stepsize_covar_adapter(model.num_params_r()) { }
 
 
@@ -47,7 +47,7 @@ namespace stan {
           this->update_L_();
 
           bool update = this->covar_adaptation_.learn_covariance
-            (this->z_.inv_mass_matrix_, this->z_.q);
+            (this->z_.inv_e_metric_, this->z_.q);
 
           if (update) {
             this->init_stepsize(info_writer, error_writer);

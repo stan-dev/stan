@@ -24,8 +24,8 @@ namespace stan {
        * specialized constructor for specified dense mass matrix
        */
       adapt_dense_e_nuts(const Model& model, BaseRNG& rng,
-                         Eigen::MatrixXd& inv_mass_matrix)
-        : dense_e_nuts<Model, BaseRNG>(model, rng, inv_mass_matrix),
+                         Eigen::MatrixXd& inv_e_metric)
+        : dense_e_nuts<Model, BaseRNG>(model, rng, inv_e_metric),
         stepsize_covar_adapter(model.num_params_r()) {}
 
       ~adapt_dense_e_nuts() {}
@@ -43,7 +43,7 @@ namespace stan {
                                                     s.accept_stat());
 
           bool update = this->covar_adaptation_.learn_covariance(
-                                                this->z_.inv_mass_matrix_,
+                                                this->z_.inv_e_metric_,
                                                 this->z_.q);
 
           if (update) {

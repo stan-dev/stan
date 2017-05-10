@@ -118,7 +118,6 @@ namespace stan {
          */
         void write_adapt_finish(stan::mcmc::base_mcmc& sampler) {
           sample_writer_("Adaptation terminated");
-          sampler.write_sampler_state(sample_writer_);
         }
 
         /**
