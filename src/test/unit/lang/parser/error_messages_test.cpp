@@ -9,7 +9,7 @@ TEST(LangGrammars,test1) {
   test_throws("err-transformed-params", 
               "PARSER EXPECTED: \"parameters");
   test_throws("err-expected-model", 
-              "PARSER EXPECTED: <model");
+              "PARSER EXPECTED: whitespace to end of file");
   test_throws("err-expected-generated", 
               "PARSER EXPECTED: \"quantities");
   test_throws("err-expected-bracket", 

@@ -242,23 +242,23 @@ TEST(lang_parser, infVariableName) {
   test_parsable("good_inf");
 }
 
-TEST(lang_parser, declarations_funciton_signatures) {
+TEST(lang_parser, declarations_function_signatures) {
   test_parsable("declarations");
 }
 
+// illegal, but will parse
 TEST(lang_parser, illegal_generated_quantities) {
-  EXPECT_THROW(is_parsable("illegal_generated_quantities"),
-               std::invalid_argument);
+  test_parsable("illegal_generated_quantities");
 }
 
+// illegal, but will parse
 TEST(lang_parser, illegal_transformed_data) {
-  EXPECT_THROW(is_parsable("illegal_transformed_data"),
-               std::invalid_argument);
+  test_parsable("illegal_transformed_data");
 }
 
+// illegal, but will parse
 TEST(lang_parser, illegal_transformed_parameters) {
-  EXPECT_THROW(is_parsable("illegal_transformed_parameters"),
-               std::invalid_argument);
+  test_parsable("illegal_transformed_parameters");
 }
 
 TEST(lang_parser, increment_log_prob) {

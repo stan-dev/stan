@@ -161,6 +161,7 @@ for (size_t i = 0; i < int_vector_types.size(); ++i) {
       VECTOR_T);
 }
 add("categorical_rng", INT_T, VECTOR_T);
+add("categorical_logit_rng", INT_T, VECTOR_T);
 for (size_t i = 0; i < vector_types.size(); ++i) {
   for (size_t j = 0; j < vector_types.size(); ++j) {
     for (size_t k = 0; k < vector_types.size(); ++k) {
@@ -1082,9 +1083,18 @@ for (size_t i=1; i < 10; i++) {
 }
 add("to_array_2d", expr_type(DOUBLE_T, 2), MATRIX_T);
 add("to_matrix", MATRIX_T, MATRIX_T);
+add("to_matrix", MATRIX_T, MATRIX_T, INT_T, INT_T);
+add("to_matrix", MATRIX_T, MATRIX_T, INT_T, INT_T, INT_T);
 add("to_matrix", MATRIX_T, VECTOR_T);
+add("to_matrix", MATRIX_T, VECTOR_T, INT_T, INT_T);
+add("to_matrix", MATRIX_T, VECTOR_T, INT_T, INT_T, INT_T);
 add("to_matrix", MATRIX_T, ROW_VECTOR_T);
+add("to_matrix", MATRIX_T, ROW_VECTOR_T, INT_T, INT_T);
+add("to_matrix", MATRIX_T, ROW_VECTOR_T, INT_T, INT_T, INT_T);
 add("to_matrix", MATRIX_T, expr_type(DOUBLE_T, 1), INT_T, INT_T);
+add("to_matrix", MATRIX_T, expr_type(DOUBLE_T, 1), INT_T, INT_T, INT_T);
+add("to_matrix", MATRIX_T, expr_type(INT_T, 1), INT_T, INT_T);
+add("to_matrix", MATRIX_T, expr_type(INT_T, 1), INT_T, INT_T, INT_T);
 add("to_matrix", MATRIX_T, expr_type(DOUBLE_T, 2));
 add("to_matrix", MATRIX_T, expr_type(INT_T, 2));
 add("to_row_vector", ROW_VECTOR_T, MATRIX_T);
