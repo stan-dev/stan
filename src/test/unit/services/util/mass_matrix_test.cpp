@@ -3,7 +3,7 @@
 
 TEST(mass_matrix, create_diag_sz1) {
   stan::io::dump dmp = 
-    stan::services::util::create_ident_diag_mass_matrix(1);
+    stan::services::util::create_unit_e_diag_mass_matrix(1);
   stan::io::var_context& inv_mass_matrix = dmp;
   std::vector<double> diag_vals
     = inv_mass_matrix.vals_r("mass_matrix");
@@ -13,7 +13,7 @@ TEST(mass_matrix, create_diag_sz1) {
 
 TEST(mass_matrix, create_diag_sz0) {
   stan::io::dump dmp = 
-    stan::services::util::create_ident_diag_mass_matrix(0);
+    stan::services::util::create_unit_e_diag_mass_matrix(0);
   stan::io::var_context& inv_mass_matrix = dmp;
   std::vector<double> diag_vals
     = inv_mass_matrix.vals_r("mass_matrix");
@@ -22,7 +22,7 @@ TEST(mass_matrix, create_diag_sz0) {
 
 TEST(mass_matrix, create_diag_sz100) {
   stan::io::dump dmp = 
-    stan::services::util::create_ident_diag_mass_matrix(100);
+    stan::services::util::create_unit_e_diag_mass_matrix(100);
   stan::io::var_context& inv_mass_matrix = dmp;
   std::vector<double> diag_vals
     = inv_mass_matrix.vals_r("mass_matrix");
@@ -33,7 +33,7 @@ TEST(mass_matrix, create_diag_sz100) {
 
 TEST(mass_matrix, create_dense_sz2) {
   stan::io::dump dmp = 
-    stan::services::util::create_ident_dense_mass_matrix(2);
+    stan::services::util::create_unit_e_dense_mass_matrix(2);
   stan::io::var_context& inv_mass_matrix = dmp;
   std::vector<double> dense_vals
     = inv_mass_matrix.vals_r("mass_matrix");
@@ -44,7 +44,7 @@ TEST(mass_matrix, create_dense_sz2) {
 
 TEST(mass_matrix, create_dense_sz3) {
   stan::io::dump dmp = 
-    stan::services::util::create_ident_dense_mass_matrix(3);
+    stan::services::util::create_unit_e_dense_mass_matrix(3);
   stan::io::var_context& inv_mass_matrix = dmp;
   std::vector<double> dense_vals
     = inv_mass_matrix.vals_r("mass_matrix");
@@ -62,7 +62,7 @@ TEST(mass_matrix, create_dense_sz3) {
 
 TEST(mass_matrix, create_dense_sz10) {
   stan::io::dump dmp = 
-    stan::services::util::create_ident_dense_mass_matrix(10);
+    stan::services::util::create_unit_e_dense_mass_matrix(10);
   stan::io::var_context& inv_mass_matrix = dmp;
   std::vector<double> dense_vals
     = inv_mass_matrix.vals_r("mass_matrix");

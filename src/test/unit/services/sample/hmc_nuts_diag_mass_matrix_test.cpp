@@ -26,7 +26,7 @@ public:
   stan_model model;
 };
 
-TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, ident_no_adapt) {
+TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, unit_e_no_adapt) {
   unsigned int random_seed = 12345;
   unsigned int chain = 1;
   double init_radius = 2;
@@ -64,14 +64,14 @@ TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, ident_no_adapt) {
   EXPECT_EQ(0, return_code);
 
   stan::io::dump dmp = 
-    stan::services::util::create_ident_diag_mass_matrix(3);
+    stan::services::util::create_unit_e_diag_mass_matrix(3);
   stan::io::var_context& inv_mass_matrix = dmp;
   std::vector<double> diag_vals
     = inv_mass_matrix.vals_r("mass_matrix");
   stan::test::unit::check_adaptation(3, diag_vals, parameter, 0.2);
 }
 
-TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, ident_adapt_250) {
+TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, unit_e_adapt_250) {
   unsigned int random_seed = 12345;
   unsigned int chain = 1;
   double init_radius = 2;
@@ -93,7 +93,7 @@ TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, ident_adapt_250) {
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
-  // run sampler with ident mass matrix, 250 warmups
+  // run sampler with unit_e mass matrix, 250 warmups
   int return_code =
     stan::services::sample::hmc_nuts_diag_e_adapt(model,
                                                   context,
@@ -124,7 +124,7 @@ TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, ident_adapt_250) {
   EXPECT_EQ(0, return_code);
 
   // check returned mass matrix
-  // captured result of running sampler w/ ident mass matrix, reported output:
+  // captured result of running sampler w/ unit_e mass matrix, reported output:
   // 0.929061, 0.823316, 0.643094
   std::vector<double> diag_vals;
   diag_vals.push_back(0.929061);

@@ -27,7 +27,7 @@ public:
   stan_model model;
 };
 
-TEST_F(ServicesSampleHmcStaticDenseEMassMatrix, ident_no_adapt) {
+TEST_F(ServicesSampleHmcStaticDenseEMassMatrix, unit_e_no_adapt) {
   unsigned int random_seed = 12345;
   unsigned int chain = 1;
   double init_radius = 2;
@@ -65,7 +65,7 @@ TEST_F(ServicesSampleHmcStaticDenseEMassMatrix, ident_no_adapt) {
   EXPECT_EQ(0, return_code);
 
   stan::io::dump dmp = 
-    stan::services::util::create_ident_dense_mass_matrix(3);
+    stan::services::util::create_unit_e_dense_mass_matrix(3);
   stan::io::var_context& inv_mass_matrix = dmp;
   std::vector<double> dense_vals
     = inv_mass_matrix.vals_r("mass_matrix");
@@ -73,7 +73,7 @@ TEST_F(ServicesSampleHmcStaticDenseEMassMatrix, ident_no_adapt) {
   stan::test::unit::check_adaptation(3, dense_vals, parameter, 0.2);
 }
 
-TEST_F(ServicesSampleHmcStaticDenseEMassMatrix, ident_adapt_250) {
+TEST_F(ServicesSampleHmcStaticDenseEMassMatrix, unit_e_adapt_250) {
   unsigned int random_seed = 12345;
   unsigned int chain = 1;
   double init_radius = 2;

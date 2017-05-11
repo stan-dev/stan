@@ -26,7 +26,7 @@ public:
   stan_model model;
 };
 
-TEST_F(ServicesSampleHmcStaticDiagEMassMatrix, ident_no_adapt) {
+TEST_F(ServicesSampleHmcStaticDiagEMassMatrix, unit_e_no_adapt) {
   unsigned int random_seed = 12345;
   unsigned int chain = 1;
   double init_radius = 2;
@@ -64,7 +64,7 @@ TEST_F(ServicesSampleHmcStaticDiagEMassMatrix, ident_no_adapt) {
   EXPECT_EQ(0, return_code);
 
   stan::io::dump dmp = 
-    stan::services::util::create_ident_diag_mass_matrix(3);
+    stan::services::util::create_unit_e_diag_mass_matrix(3);
   stan::io::var_context& inv_mass_matrix = dmp;
   std::vector<double> diag_vals
     = inv_mass_matrix.vals_r("mass_matrix");
@@ -72,7 +72,7 @@ TEST_F(ServicesSampleHmcStaticDiagEMassMatrix, ident_no_adapt) {
   stan::test::unit::check_adaptation(3, diag_vals, parameter, 0.2);
 }
 
-TEST_F(ServicesSampleHmcStaticDiagEMassMatrix, ident_adapt_250) {
+TEST_F(ServicesSampleHmcStaticDiagEMassMatrix, unit_e_adapt_250) {
   unsigned int random_seed = 12345;
   unsigned int chain = 1;
   double init_radius = 2;
@@ -124,7 +124,7 @@ TEST_F(ServicesSampleHmcStaticDiagEMassMatrix, ident_adapt_250) {
   EXPECT_EQ(0, return_code);
 
   // check returned mass matrix
-  // captured result of running sampler w/ ident mass matrix, reported output:
+  // captured result of running sampler w/ unit_e mass matrix, reported output:
   // 1.19161, 0.710345, 0.793847
   std::vector<double> diag_vals;
   diag_vals.push_back(1.19161);
