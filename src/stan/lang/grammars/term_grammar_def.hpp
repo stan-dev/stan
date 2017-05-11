@@ -46,7 +46,7 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::integrate_ode_control,
                           (stan::lang::expression, max_num_steps_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::algebra_solver,
-                           (std::string, solver_name_)
+                           // (std::string, solver_name_)
                            (std::string, system_function_name_)
                            (stan::lang::expression, x_)
                            (stan::lang::expression, y_)
@@ -248,7 +248,7 @@ namespace stan {
 
       algebra_solver_r.name("expression");
       algebra_solver_r
-        %= (string("algebra_solver") >> no_skip[!char_("a-zA-Z0-9_")])
+        %= string("algebra_solver") // >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('(')
         > identifier_r          // 1) system function name (function only)
         > lit(',')
