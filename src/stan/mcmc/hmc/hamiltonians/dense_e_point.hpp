@@ -47,7 +47,7 @@ namespace stan {
        */
       dense_e_point(const dense_e_point& z)
         : ps_point(z), inv_e_metric_(z.inv_e_metric_.rows(),
-                                            z.inv_e_metric_.cols()) {
+                                     z.inv_e_metric_.cols()) {
         fast_matrix_copy_<double>(inv_e_metric_, z.inv_e_metric_);
       }
 

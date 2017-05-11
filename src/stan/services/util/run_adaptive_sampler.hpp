@@ -77,6 +77,7 @@ namespace stan {
 
         sampler.disengage_adaptation();
         writer.write_adapt_finish(sampler);
+        sampler.write_sampler_state(sample_writer);
 
         start = clock();
         util::generate_transitions(sampler, num_samples, num_warmup,

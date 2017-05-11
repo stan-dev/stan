@@ -1,5 +1,5 @@
-#ifndef STAN_SERVICES_UTIL_CREATE_IDENT_DIAG_MASS_MATRIX_HPP
-#define STAN_SERVICES_UTIL_CREATE_IDENT_DIAG_MASS_MATRIX_HPP
+#ifndef STAN_SERVICES_UTIL_CREATE_UNIT_E_DIAG_MASS_MATRIX_HPP
+#define STAN_SERVICES_UTIL_CREATE_UNIT_E_DIAG_MASS_MATRIX_HPP
 
 #include <stan/io/dump.hpp>
 #include <sstream>
@@ -16,7 +16,7 @@ namespace stan {
        * @return var_context 
        */
       stan::io::dump
-      create_ident_diag_mass_matrix(size_t num_params) {
+      create_unit_e_diag_mass_matrix(size_t num_params) {
         std::stringstream txt;
         txt << "mass_matrix <- structure(c(";
         for (size_t i = 0; i < num_params; ++i) {

@@ -159,10 +159,10 @@ namespace stan {
                                  callbacks::writer& sample_writer,
                                  callbacks::writer& diagnostic_writer) {
         stan::io::dump dmp =
-          util::create_ident_dense_mass_matrix(model.num_params_r());
-        stan::io::var_context& ident_mass_matrix = dmp;
+          util::create_unit_e_dense_mass_matrix(model.num_params_r());
+        stan::io::var_context& unit_e_mass_matrix = dmp;
 
-        return hmc_nuts_dense_e_adapt(model, init, ident_mass_matrix,
+        return hmc_nuts_dense_e_adapt(model, init, unit_e_mass_matrix,
                                       random_seed, chain, init_radius,
                                       num_warmup, num_samples, num_thin,
                                       save_warmup, refresh,

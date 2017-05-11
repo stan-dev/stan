@@ -37,9 +37,9 @@ namespace stan {
        * specialized constructor for specified diag mass matrix
        */
       base_hmc(const Model &model, BaseRNG& rng,
-               Eigen::VectorXd& inv_metric)
+               Eigen::VectorXd& inv_e_metric)
         : base_mcmc(),
-          z_(model.num_params_r(), inv_metric),
+          z_(model.num_params_r(), inv_e_metric),
           integrator_(),
           hamiltonian_(model),
           rand_int_(rng),
@@ -52,9 +52,9 @@ namespace stan {
        * specialized constructor for specified dense mass matrix
        */
       base_hmc(const Model &model, BaseRNG& rng,
-               Eigen::MatrixXd& inv_metric)
+               Eigen::MatrixXd& inv_e_metric)
         : base_mcmc(),
-          z_(model.num_params_r(), inv_metric),
+          z_(model.num_params_r(), inv_e_metric),
           integrator_(),
           hamiltonian_(model),
           rand_int_(rng),
