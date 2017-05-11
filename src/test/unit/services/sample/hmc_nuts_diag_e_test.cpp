@@ -50,7 +50,8 @@ TEST_F(ServicesSampleHmcNutsDiagE, call_count) {
   EXPECT_EQ(num_output_lines, diagnostic.call_count("vector_double"));
 }
 
-TEST_F(ServicesSampleHmcNutsDiagE, output_sizes) {
+
+TEST_F(ServicesSampleHmcNutsDiagE, parameter_checks) {
   unsigned int random_seed = 0;
   unsigned int chain = 1;
   double init_radius = 0;
@@ -65,12 +66,14 @@ TEST_F(ServicesSampleHmcNutsDiagE, output_sizes) {
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
       
-  stan::services::sample::hmc_nuts_diag_e(
+  int return_code = stan::services::sample::hmc_nuts_diag_e(
       model, context, random_seed, chain, init_radius,
       num_warmup, num_samples, num_thin, save_warmup, refresh,
       stepsize, stepsize_jitter, max_depth,
       interrupt, message, error, init,
       parameter, diagnostic);
+
+  EXPECT_EQ(0, return_code);
 
   std::vector<std::vector<std::string> > parameter_names;
   parameter_names = parameter.vector_string_values();
@@ -80,15 +83,6 @@ TEST_F(ServicesSampleHmcNutsDiagE, output_sizes) {
   diagnostic_names = diagnostic.vector_string_values();
   std::vector<std::vector<double> > diagnostic_values;
   diagnostic_values = diagnostic.vector_double_values();
-  std::vector<std::string> message_values;
-  message_values = message.string_values();
-  std::vector<std::string> init_values;
-  init_values = init.string_values();
-  std::vector<std::string> error_values;
-  error_values = error.string_values();
-
-  EXPECT_EQ(0, init_values.size());
-  EXPECT_EQ(0, error_values.size());
 
   // Expectations of hmc nuts parameter names for rosenbrock model
   ASSERT_EQ(9, parameter_names[0].size());
@@ -113,6 +107,39 @@ TEST_F(ServicesSampleHmcNutsDiagE, output_sizes) {
   EXPECT_EQ("lp__", diagnostic_names[0][0]);
   EXPECT_EQ("accept_stat__", diagnostic_names[0][1]);
 
+}
+
+TEST_F(ServicesSampleHmcNutsDiagE, output_sizes) {
+  unsigned int random_seed = 0;
+  unsigned int chain = 1;
+  double init_radius = 0;
+  int num_warmup = 200;
+  int num_samples = 400;
+  int num_thin = 5;
+  bool save_warmup = true;
+  int refresh = 0;
+  double stepsize = 0.1;
+  double stepsize_jitter = 0;
+  int max_depth = 8;
+  stan::test::unit::instrumented_interrupt interrupt;
+  EXPECT_EQ(interrupt.call_count(), 0);
+      
+  int return_code = stan::services::sample::hmc_nuts_diag_e(
+      model, context, random_seed, chain, init_radius,
+      num_warmup, num_samples, num_thin, save_warmup, refresh,
+      stepsize, stepsize_jitter, max_depth,
+      interrupt, message, error, init,
+      parameter, diagnostic);
+
+  EXPECT_EQ(0, return_code);
+
+  std::vector<std::string> init_values;
+  init_values = init.string_values();
+  std::vector<std::string> error_values;
+  error_values = error.string_values();
+
+  EXPECT_EQ(0, init_values.size());
+  EXPECT_EQ(0, error_values.size());
 }
 
 
