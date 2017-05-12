@@ -90,38 +90,57 @@ TEST(commandStancHelper, failRC) {
   EXPECT_TRUE(rc != 0);
 }
 
-
 TEST(commandStancHelper, noSuchFile) {
+  std::stringstream out;
+  std::stringstream err;
+  int argc = 2;
+  std::vector<const char*> argv_vec;
+  argv_vec.push_back("main");
+  argv_vec.push_back("src/test/test-models/good/nosuchfile.stan");
+  const char** argv = &argv_vec[0];
+  int rc = stanc_helper(argc, argv, &out, &err);
+  EXPECT_GT(err.str().size(), 10)
+    << "error=" << err.str() << std::endl;
+  expect_find(err.str(), "Failed to open model file");
+  EXPECT_TRUE(rc != 0);
+}
+
+TEST(commandStancHelper, readOnlyDirReadFile) {
+  std::stringstream out;
+  std::stringstream err;
+  int argc = 3;
+  std::vector<const char*> argv_vec;
+  argv_vec.push_back("main");
+  argv_vec.push_back("--name=m1");
+  argv_vec.push_back("src/test/test-models/bad/read_only/m1.stan");
+  const char** argv = &argv_vec[0];
+  int rc = stanc_helper(argc, argv, &out, &err);
+  EXPECT_TRUE(rc == 0);
+}
+
+TEST(commandStancHelper, readOnlyDirWriteFile) {
   std::stringstream out;
   std::stringstream err;
   int argc = 4;
   std::vector<const char*> argv_vec;
   argv_vec.push_back("main");
   argv_vec.push_back("--name=m1");
-  argv_vec.push_back("--o=src/test/test-models/nosuchfile.hpp");
-  argv_vec.push_back("src/test/test-models/nosuchfile.stan");
+  argv_vec.push_back("--o=src/test/test-models/read_only/m1.cpp");
+  argv_vec.push_back("src/test/test-models/bad/read_only/m1.stan");
   const char** argv = &argv_vec[0];
   int rc = stanc_helper(argc, argv, &out, &err);
-  EXPECT_GT(err.str().size(), 25)
-    << "error=" << err.str() << std::endl;
-  expect_find(err.str(), "Failed to open output file");
   EXPECT_TRUE(rc != 0);
 }
 
-// TODO(morris):  write cross-platform test for read-only directory?
-// TEST(commandStancHelper, failWriteCpp) {
-//   std::stringstream out;
-//   std::stringstream err;
-//   int argc = 4;
-//   std::vector<const char*> argv_vec;
-//   argv_vec.push_back("main");
-//   argv_vec.push_back("--name=m1");
-//   argv_vec.push_back("--o=/tmp/read_only/m1.hpp");
-//   argv_vec.push_back("/tmp/read_only/m1.stan");
-//   const char** argv = &argv_vec[0];
-//   int rc = stanc_helper(argc, argv, &out, &err);
-//   EXPECT_GT(err.str().size(), 25)
-//     << "error=" << err.str() << std::endl;
-//   expect_find(err.str(), "Failed to open output file");
-//   EXPECT_TRUE(rc != 0);
-// }
+TEST(commandStancHelper, readOnlyDirBadFile) {
+  std::stringstream out;
+  std::stringstream err;
+  int argc = 2;
+  std::vector<const char*> argv_vec;
+  argv_vec.push_back("main");
+  argv_vec.push_back("src/test/test-models/bad/read_only/nosuchfile.stan");
+  const char** argv = &argv_vec[0];
+  int rc = stanc_helper(argc, argv, &out, &err);
+  EXPECT_TRUE(rc != 0);
+}
+
