@@ -89,4 +89,37 @@ TEST(commandStancHelper, failRC) {
   // I only tested that it's != 0 to contrast with earlier success
   EXPECT_TRUE(rc != 0);
 }
-    
+
+TEST(commandStancHelper, failWriteCpp) {
+  std::stringstream out;
+  std::stringstream err;
+  int argc = 4;
+  std::vector<const char*> argv_vec;
+  argv_vec.push_back("main");
+  argv_vec.push_back("--name=m1");
+  argv_vec.push_back("--o=src/test/test-models/bad/read_only/m1.hpp");
+  argv_vec.push_back("src/test/test-models/bad/read_only/m1.stan");
+  const char** argv = &argv_vec[0];
+  int rc = stanc_helper(argc, argv, &out, &err);
+  std::cout << out.str() << std::endl;
+  std::cout << err.str() << std::endl;
+  
+  EXPECT_TRUE(rc != 0);
+}
+
+TEST(commandStancHelper, noSuchFile) {
+  std::stringstream out;
+  std::stringstream err;
+  int argc = 4;
+  std::vector<const char*> argv_vec;
+  argv_vec.push_back("main");
+  argv_vec.push_back("--name=m1");
+  argv_vec.push_back("--o=src/test/test-models/bad/read_only/nosuchfile.hpp");
+  argv_vec.push_back("src/test/test-models/bad/read_only/m1.stan");
+  const char** argv = &argv_vec[0];
+  int rc = stanc_helper(argc, argv, &out, &err);
+  std::cout << out.str() << std::endl;
+  std::cout << err.str() << std::endl;
+  
+  EXPECT_TRUE(rc != 0);
+}
