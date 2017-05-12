@@ -101,9 +101,9 @@ TEST(commandStancHelper, failWriteCpp) {
   argv_vec.push_back("src/test/test-models/bad/read_only/m1.stan");
   const char** argv = &argv_vec[0];
   int rc = stanc_helper(argc, argv, &out, &err);
-  std::cout << out.str() << std::endl;
-  std::cout << err.str() << std::endl;
-  
+  EXPECT_GT(err.str().size(), 25)
+    << "error=" << err.str() << std::endl;
+  expect_find(err.str(), "Failed to open output file");
   EXPECT_TRUE(rc != 0);
 }
 
@@ -118,8 +118,8 @@ TEST(commandStancHelper, noSuchFile) {
   argv_vec.push_back("src/test/test-models/bad/read_only/m1.stan");
   const char** argv = &argv_vec[0];
   int rc = stanc_helper(argc, argv, &out, &err);
-  std::cout << out.str() << std::endl;
-  std::cout << err.str() << std::endl;
-  
+  EXPECT_GT(err.str().size(), 25)
+    << "error=" << err.str() << std::endl;
+  expect_find(err.str(), "Failed to open output file");
   EXPECT_TRUE(rc != 0);
 }
