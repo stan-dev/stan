@@ -10,6 +10,7 @@
 #include <stdexcept>
 #include <string>
 
+
 /**
  * Print the version of stanc with major, minor and patch.
  * 
@@ -125,7 +126,14 @@ int stanc_helper(int argc, const char* argv[],
     }
     std::string in_file_name;
     cmd.bare(0, in_file_name);
+
     std::ifstream in(in_file_name.c_str());
+    if (!in.is_open()) {
+      std::stringstream msg;
+      msg << "Failed to open model file "
+          <<  in_file_name.c_str();
+      throw std::invalid_argument(msg.str());
+    }
 
     std::string model_name;
     if (cmd.has_key("name")) {
@@ -181,11 +189,25 @@ int stanc_helper(int argc, const char* argv[],
       *out_stream << "Input file=" << in_file_name << std::endl;
       *out_stream << "Output file=" << out_file_name << std::endl;
     }
+    // check that we can write to out before invoking compiler
+    if (!out.is_open()) {
+      std::stringstream msg;
+      msg << "Failed to open output file "
+          <<  out_file_name.c_str();
+      throw std::invalid_argument(msg.str());
+    }
 
     bool valid_model
       = stan::lang::compile(err_stream, in, out, model_name, allow_undefined);
 
     out.close();
+    if (out.bad()) {
+      std::stringstream msg;
+      msg << "Error writing output file "
+          << out_file_name.c_str();
+      throw std::invalid_argument(msg.str());
+    }
+
     if (!valid_model) {
       if (err_stream)
         *err_stream << "PARSING FAILED." << std::endl;
