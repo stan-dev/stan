@@ -70,12 +70,12 @@ TEST(commandStancHelper, readOnlyOK) {
   std::stringstream out;
   std::stringstream err;
   int rc = run_helper("src/test/test-models/good/stanc_helper.stan", out, err);
-  
   EXPECT_EQ(0, rc)
     << "out=" << out.str() << std::endl << "err=" << err.str() << std::endl;
   expect_find(out.str(), "Model name=stanc_helper_model");
   expect_find(out.str(), "Input file=src/test/test-models/good/stanc_helper.stan");
   expect_find(out.str(), "Output file=stanc_helper_model.cpp");
+  delete_file(&err, "stanc_helper_model.cpp");
   EXPECT_EQ(0, err.str().size())
     << "error=" << err.str() << std::endl;
 }
@@ -108,14 +108,18 @@ TEST(commandStancHelper, noSuchFile) {
 TEST(commandStancHelper, readOnlyDirReadFile) {
   std::stringstream out;
   std::stringstream err;
-  int argc = 3;
+  int argc = 4;
   std::vector<const char*> argv_vec;
   argv_vec.push_back("main");
   argv_vec.push_back("--name=m1");
+  argv_vec.push_back("--o=src/test/test-models/m1.cpp");
   argv_vec.push_back("src/test/test-models/bad/read_only/m1.stan");
   const char** argv = &argv_vec[0];
   int rc = stanc_helper(argc, argv, &out, &err);
   EXPECT_TRUE(rc == 0);
+  delete_file(&err, "src/test/test-models/m1.cpp");
+  EXPECT_EQ(0, err.str().size())
+    << "error=" << err.str() << std::endl;
 }
 
 TEST(commandStancHelper, readOnlyDirWriteFile) {
