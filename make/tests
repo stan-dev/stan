@@ -150,8 +150,10 @@ change-file-permissions:
 ifeq ($(OS_TYPE),win)
 	attrib +r src\\test\\test-models\\good\\stanc_helper.stan
 	attrib +r src\\test\\test-models\\bad\\stanc_helper.stan
+	attrib +r src\\test\\test-models\\bad\\read_only
 else
 	chmod 444 src/test/test-models/*/stanc_helper.stan
+	chmod 555 src/test/test-models/bad/read_only
 endif
 
 src/test/unit/lang/stanc_helper_test.cpp: change-file-permissions
