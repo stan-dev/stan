@@ -260,7 +260,7 @@ int stanc_helper(int argc, const char* argv[],
           msg << "Failed to open output file "
               <<  out_file_name.c_str();
           throw std::invalid_argument(msg.str());
-        }        
+        }
 
         valid_input = stan::lang::compile(err_stream, in, out,
                         model_name, allow_undefined);

@@ -31,9 +31,9 @@ namespace stan {
         return;
       }
 
-      //Functions that have only int args were not templated in the first place
-      //=> they are already instantiated
-      if(has_only_int_args(fun)) {
+      // Functions that have only int args were not templated in the first place
+      // => they are already instantiated
+      if (has_only_int_args(fun)) {
         return;
       }
 
