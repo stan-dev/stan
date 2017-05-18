@@ -20,13 +20,15 @@ namespace stan {
      * @param[in] is_lp true if function accesses log density
      * accumulator
      * @param[in] is_log true if function is a probability function
+     * @param[in] rng_class class of the RNG being used (required by xxx_rng 
+     * functions)
      * @param[in] out stream for generating
      */
     void generate_function_instantiation_template_parameters(
                                               const function_decl_def& fun,
                                               bool is_rng, bool is_lp,
                                               bool is_log,
-                                              const std::string& rng_type,
+                                              const std::string& rng_class,
                                               std::ostream& out) {
       std::vector<std::string> type_params;
       type_params.reserve(fun.arg_decls_.size());
@@ -43,7 +45,7 @@ namespace stan {
         }
       }
       if (is_rng) {
-        type_params.push_back(rng_type);
+        type_params.push_back(rng_class);
       } else if (is_lp) {
         type_params.push_back("double");
         // the trailing space after '>' is necessary to compile

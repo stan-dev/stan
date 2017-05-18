@@ -24,6 +24,8 @@ namespace stan {
      * @param[in] is_lp true if function accesses log density
      * accumulator
      * @param[in] is_log true if function is log probability function
+     * @param[in] rng_class class of the RNG being used (required by xxx_rng 
+     * functions)
      * @param[in,out] o stream for generating
      */
     void generate_function_instantiation_body(const function_decl_def& fun,
