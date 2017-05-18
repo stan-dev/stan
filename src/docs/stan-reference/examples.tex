@@ -5145,7 +5145,7 @@ draws a random value for \code{s} at every iteration.
 \begin{stancode}
 generated quantities {
   int<lower=1,upper=T> s;
-  s = categorical_rng(softmax(lp));
+  s = categorical_logit_rng(lp);
 }
 \end{stancode}
 %

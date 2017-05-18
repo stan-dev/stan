@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 
+
 /**
  * Print the version of stanc with major, minor and patch.
  * 
@@ -216,6 +217,12 @@ int stanc_helper(int argc, const char* argv[],
     }
 
     std::ifstream in(in_file_name.c_str());
+    if (!in.is_open()) {
+      std::stringstream msg;
+      msg << "Failed to open model file "
+          <<  in_file_name.c_str();
+      throw std::invalid_argument(msg.str());
+    }
 
     bool allow_undefined = cmd.has_flag("allow_undefined");
 
@@ -248,6 +255,12 @@ int stanc_helper(int argc, const char* argv[],
           *out_stream << "Input file=" << in_file_name << std::endl;
           *out_stream << "Output file=" << out_file_name << std::endl;
         }
+        if (!out.is_open()) {
+          std::stringstream msg;
+          msg << "Failed to open output file "
+              <<  out_file_name.c_str();
+          throw std::invalid_argument(msg.str());
+        }        
 
         valid_input = stan::lang::compile(err_stream, in, out,
                         model_name, allow_undefined);

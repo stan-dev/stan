@@ -51,7 +51,11 @@ namespace stan {
        *   be printed to message_writer
        * @param[in,out] message_writer message writer
        * @param[in,out] init_writer init writer (on the unconstrained scale)
-       * @throws std::domain_error if the model could not be initialized
+       * @throws exception passed through from the model if the model has a
+       *   fatal error (not a std::domain_error)
+       * @throws std::domain_error if the model can not be initialized and
+       *   the model does not have a fatal error (only allows for
+       *   std::domain_error)
        * @return valid unconstrained parameters for the model
        */
       template <class Model, class RNG>
@@ -104,12 +108,18 @@ namespace stan {
               (unconstrained, disc_vector, &msg);
             if (msg.str().length() > 0)
               message_writer(msg.str());
-          } catch (std::exception& e) {
+          } catch (std::domain_error& e) {
             message_writer();
             message_writer("Rejecting initial value:");
             message_writer("  Error evaluating the log probability"
-                   " at the initial value.");
+                           " at the initial value.");
+            message_writer(e.what());
             continue;
+          } catch (std::exception& e) {
+            message_writer();
+            message_writer("Unrecoverable error evaluating the log probability"
+                           " at the initial value.");
+            throw;
           }
           if (!boost::math::isfinite(log_prob)) {
             message_writer("Rejecting initial value:");

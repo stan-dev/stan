@@ -54,8 +54,9 @@ bool is_parsable(const std::string& file_name,
                  bool allow_undefined = false) {
   stan::lang::program prog;
   std::ifstream fs(file_name.c_str());
-  if (!fs.good()) {
-    throw std::invalid_argument("Could not read model file: " + file_name);
+  if (fs.fail()) {
+    *msgs <<  "Cannot open model file " << file_name << std::endl; 
+    return false;
   }
   std::string model_name = file_name_to_model_name(file_name);
   bool parsable
