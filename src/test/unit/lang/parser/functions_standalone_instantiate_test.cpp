@@ -2,6 +2,7 @@
 #include <sstream>
 #include <test/test-models/good-standalone-functions/basic.hpp>
 #include <test/test-models/good-standalone-functions/special_functions.hpp>
+#include <test/test-models/good-standalone-functions/integrate.hpp>
 
 using namespace stan::math;
 
@@ -43,6 +44,14 @@ TEST(lang_parser, functions_standalone_instantiate_double_special) {
   expect_no_errors(error_stream);
 
   special_functions_functions::test_lpdf(1.5, 6, &error_stream);
+  expect_no_errors(error_stream);
+}
+
+TEST(lang_parser, functions_standalone_instantiate_numerical_integration) {
+  std::ostringstream error_stream;
+
+  //I am not interested in the results, just that the functions run
+  integrate_functions::ode_integrate(&error_stream);
   expect_no_errors(error_stream);
 }
 
