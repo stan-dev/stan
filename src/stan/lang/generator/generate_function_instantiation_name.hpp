@@ -19,7 +19,7 @@ namespace stan {
      */
     void generate_function_instantiation_name(const function_decl_def& fun,
                            std::ostream& out) {
-      out << fun.name_ << "__double_only";
+      out << fun.name_;
     }
 
   }
