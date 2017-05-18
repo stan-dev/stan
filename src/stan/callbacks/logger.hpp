@@ -68,28 +68,28 @@ namespace stan {
       virtual void warn(const std::stringstream& message) { }
 
       /**
-       * Logs a message with error log level.
+       * Logs an error with error log level.
        *
        * @param[in] message message
        */
       virtual void error(const std::string& message) { }
 
       /**
-       * Logs a message with error log level.
+       * Logs an error with error log level.
        *
        * @param[in] message message
        */
       virtual void error(const std::stringstream& message) { }
 
       /**
-       * Logs a message with fatal log level.
+       * Logs an error with fatal log level.
        *
        * @param[in] message message
        */
       virtual void fatal(const std::string& message) { }
 
       /**
-       * Logs a message with fatal log level.
+       * Logs an error with fatal log level.
        *
        * @param[in] message message
        */
