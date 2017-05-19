@@ -7051,7 +7051,7 @@ normal variate.  Suppose $z$ is an an isotropic unit normal variate
 z \sim \distro{Normal}({\bf 0}, {\bf 1}),
 \]
 where ${\bf 0}$ is an $N$-vector of 0 values and ${\bf 1}$ is the $N
-\times N$ unit matrix.  Let $L$ be the Cholesky decomposition of
+\times N$ identity matrix.  Let $L$ be the Cholesky decomposition of
 $k(x)$, i.e., the lower-triangular matrix $L$ such that $LL^{\top} =
 k(x)$.  Then the transformed variable $\mu + Lz$ has the intended
 target distribution,
@@ -7138,7 +7138,7 @@ above, and then computing the posterior distribution of the hyperparameters
 given observed data. The priors on the parameters should be defined
 based on prior knowledge of the scale of the output values ($\alpha$), the
 scale of the output noise ($\sigma$), and the scale at which distances are
-measured among inputs ($\rho$). See \refsection{} for more information
+measured among inputs ($\rho$). See \refsection{priors-gp} for more information
 about how to specify appropriate priors for the hyperparameters.
 
 The Stan program implementing the marginal likelihood GP is shown below. The
@@ -7162,8 +7162,8 @@ transformed data {
   mu = rep_vector(0, N);
 }
 parameters {
-  real<lower=0> alpha;
   real<lower=0> rho;
+  real<lower=0> alpha;
   real<lower=0> sigma;
 }
 model {
@@ -7177,9 +7177,9 @@ model {
 
   L_Sigma = cholesky_decompose(Sigma);
 
-  alpha ~ normal(0, 1);
   rho ~ gamma(4, 4);
-  sigma ~ cauchy(0, 5);
+  alpha ~ normal(0, 1);
+  sigma ~ normal(0, 1);
 
   y ~ multi_normal_cholesky(mu, L_Sigma);
 }
@@ -7228,8 +7228,8 @@ transformed data {
   real delta = 1e-9;
 }
 parameters {
-  real<lower=0> alpha;
   real<lower=0> rho;
+  real<lower=0> alpha;
   real<lower=0> sigma;
   vector[N] eta;
 }
@@ -7244,12 +7244,12 @@ model {
       Sigma[k, k] = Sigma[k, k] + delta; 
 
     L_Sigma = cholesky_decompose(Sigma);
-    f = L_sigma * eta;
+    f = L_Sigma * eta;
   }
 
-  alpha ~ gamma(4, 4);
   rho ~ gamma(5, 5);
-  sigma ~ cauchy(0, 5);
+  alpha ~ normal(0, 1);
+  sigma ~ normal(0, 1);
   eta ~ normal(0, 1);
 
   y ~ normal(f, sigma);
@@ -7278,7 +7278,9 @@ discrete data models.
 
 If we want to model count data, we can remove the $\sigma$ parameter, and use
 \code{poisson\_log}, which implements a log link, for our likelihood rather
-than \code{normal}.
+than \code{normal}. We can also add an overall mean parameter, $a$, which
+will account for the marginal expected value for $y$. We do this because we
+cannot center count data like we can for normally distributed data.
 
 %
 \begin{stancode}
@@ -7291,6 +7293,7 @@ data {
 parameters {
   real<lower=0> alpha;
   real<lower=0> rho;
+	real a;
   vector[N] eta;
 }
 model {
@@ -7298,8 +7301,9 @@ model {
   alpha ~ gamma(4, 4);
   rho ~ gamma(5, 5);
   eta ~ normal(0, 1);
+	a ~ normal(0, 1);
 
-  y ~ poisson_log(f);
+  y ~ poisson_log(a + f);
 }
 \end{stancode}
 %
@@ -7318,7 +7322,8 @@ or in other words,
 \]
 
 We can extend our latent variable GP Stan program to deal with classification
-problems:
+problems. Below, $a$ is the bias term, which can help account for imbalanced
+classes in the training data:
 
 %
 \begin{stancode}
@@ -7331,7 +7336,7 @@ data {
 model {
 ...
 
-  y ~ bernoulli_logit(f);
+  y ~ bernoulli_logit(a + f);
 }
 \end{stancode}
 %
@@ -7352,7 +7357,8 @@ The estimation of $\rho$ was termed ``automatic relevance determination'' in
 \citep{Neal:1996}, but this is misleading, because the magnitude the scale of
 the posterior for each $\rho_d$ is dependent on the scaling of the input data
 along dimension $d$. Moreover, the scale of the parameters $\rho_d$ measures
-non-linearity along the $d$-th dimension, rather than ``relevance'' \citep{PiironenVehtari:2016}.
+non-linearity along the $d$-th dimension, rather than ``relevance''
+\citep{PiironenVehtari:2016}.
 
 The implementation of automatic relevance determination in Stan is
 straightforward, though it currently requires the user to directly code the
@@ -7394,8 +7400,8 @@ transformed data {
   delta = 1e-9;
 }
 parameters {
-  real<lower=0> alpha;
   vector<lower=0>[D] rho;
+  real<lower=0> alpha;
   real<lower=0> sigma;
   vector[N] eta;
 }
@@ -7403,12 +7409,12 @@ model {
   vector[N] f;
   {
     matrix[N, N] L_Sigma = L_cov_exp_quad_ARD(x, alpha, rho, 1e-9);
-    f = L_sigma * eta;
+    f = L_Sigma * eta;
   }
 
-  alpha ~ normal(0, 1);
   rho ~ gamma(4, 4);
-  sigma ~ cauchy(0, 1);
+  alpha ~ normal(0, 1);
+  sigma ~ normal(0, 1);
   eta ~ normal(0, 1);
 
   y ~ normal(f, sigma);
@@ -7416,7 +7422,7 @@ model {
 \end{stancode}
 %
 
-\subsection{Priors for Gaussian Process Parameters}
+\subsection{Priors for Gaussian Process Parameters}\label{priors-gp.section}
 
 Formulating priors for GP hyperparameters requires the analyst to consider the
 inherent statistical properties of a GP, the GP's purpose in the model and the
@@ -7424,7 +7430,7 @@ numerical issues that may arise in Stan when estimating a GP.
 
 Perhaps most importantly, the parameters $\rho$ and $\alpha$ are weakly
 identified because of the equivalence of multivariate Gaussians with a
-covariance matrix parameterized by a Matern kernel. The ratio of the two
+covariance matrix parameterized by a Matern kernel \citep{zhang-gp:2004}. The ratio of the two
 parameters is well-identified, but in practice we put independent priors on the
 two hyperparameters because these two quantities are more interpretable than
 their ratio. 
@@ -7432,13 +7438,19 @@ their ratio.
 \subsubsection{Priors for length-scale}
 
 GPs are a flexible class of priors, and as such, can represent a wide spectrum
-of functions. Their flexibility can lead to numerical problems when estimating 
-a model in Stan using Euclidean Hamiltonian Monte Carlo. Length-scales that are
-smaller than the scale of the input data lead to a perfect fit with the
-observed data. This can require small step sizes when exploring this region
-of the parameter space. In order to limit the amount of posterior mass that
-resides in this region, the prior for length-scale should strongly regularize
-away from length-scales that are far smaller than the scale of the input.
+of functions. Their flexibility can lead to numerical problems when estimating
+a model in Stan using Euclidean Hamiltonian Monte Carlo. When the length-scale
+falls far below the minimum spacing of the input covariates the functions
+supported by the GP will interpolate almost exactly between the input data.
+These length-scales yield a likelihood that is nearly flat with respect to
+length-scale. If our prior does not sharply regularize small length-scales,
+there can be non-negligible mass in these regions of the posterior, which would
+require our sampler to decrease its step-size in order to explore these
+regions. For example, if our covariate $x$ were equally spaced one unit apart,
+a change from a length-scale of $0.1$ to $0.01$ would not yield a change in the
+likelihood.  Thus the prior must identify the model below these length-scales.
+In order to avoid these small length scales we need a prior that favors length
+scales more appropriate to the input data.
 
 We may wish to put further soft constraints on the length-scale, but these are
 dependent on how the GP is used in our statistical model. 
@@ -7453,9 +7465,9 @@ If our model consists of only the GP, i.e.:
 
 we likely don't need further constraints.  We'd like to allow the GP prior to
 represent both high-frequency and low-frequency functions, so our prior should
-put non-negligible mass on both sets of functions. In this case, an inverse gamma
-will work well provided it has a left tail that puts negligible mass on
-length-scales that are small with respect to the input data.  
+put non-negligible mass on both sets of functions. In this case, an inverse
+gamma will work well as it has a left tail that puts negligible mass on
+length-scales that are small with respect to the input data. 
 
 If we're using the GP as a component in a larger model that includes an overall
 mean and fixed effects for the same variables we're using as the domain for the
@@ -7464,7 +7476,7 @@ GP, i.e.:
 \begin{align}
   f & \sim \distro{MultiNormal}\left(0, K_{\rho,\alpha}(x)\right) \\
   y_i & \sim \distro{Normal}(\beta_0 + x_i \beta_{[1:D]} + f_i, \sigma) \, \forall i \in \{1, \dots, N\} \\
-  & x_i^T, \beta_{[1:D]} \in \reals{R}^D,\, x \in \reals^{N \times D}, f \in \
+  & x_i^T, \beta_{[1:D]} \in \reals^D,\, x \in \reals^{N \times D}, f \in \
 \end{align} 
 
 we'll likely want to constrain large length-scales as well.  A length scale
@@ -7474,8 +7486,14 @@ the length scale has little impact on the likelihood. This will introduce
 nonidentifiability in our model, as both the fixed effects and the GP will
 explain similar variation. In order to limit the amount of overlap between the
 GP and the linear regression, we should use a prior with a sharper right tail
-to limit the GP to higher-frequency functions. We can use an inverse Gaussian,
-which has an inverse gamma left tail and a Gaussian right tail.
+to limit the GP to higher-frequency functions. We can use a generalized inverse Gaussian 
+distribution:
+
+\begin{align}
+	f(x | a, b, p) = \dfrac{(a/b)^{p/2}}{2K_p(\sqrt{ab})} x^{p - 1}\exp(-(ax + b / x)/2)
+\end{align} 
+
+which has an inverse gamma left tail if $p \leq 0$ and a Gaussian right tail.
 
 If we have high-frequency covariates in our fixed effects, we may wish to further
 regularize the GP away from high-frequency functions, which means we'll need to 
@@ -7488,7 +7506,7 @@ of zero crossings, is $\dfrac{T}{\pi \rho}$. You can see that as $\rho$ decrease
 the expectation of the number of upcrossings increases as the GP is representing 
 higher-frequency functions. Thus, this is a good statistic to keep in mind when
 setting a lower-bound for our prior on length-scale in the presence of high-frequency
-covariates. 
+covariates. However, this statistic only valid for one-dimensional inputs.
 
 A priori, the closer $\rho_d$ is to zero, the more nonlinear the
 conditional mean in dimension $d$ is.  A posteriori, the actual dependencies
@@ -7554,7 +7572,7 @@ model {
   {
     matrix[N, N] Sigma = cov_exp_quad(x, alpha, rho);
     matrix[N, N] L_Sigma = cholesky_decompose(Sigma);
-    f = L_sigma * eta;
+    f = L_Sigma * eta;
   }
 
   alpha ~ normal(0, 1);
@@ -7634,7 +7652,7 @@ model {
     for (n in 1:N)
       Sigma[n, n] = Sigma[n, n] + delta;
     L_Sigma = cholesky_decompose(Sigma);
-    f = L_sigma * eta;
+    f = L_Sigma * eta;
   }
 
   alpha ~ gamma(4, 4);
