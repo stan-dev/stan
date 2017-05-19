@@ -6,6 +6,8 @@
 #include <stan/lang/generator/generate_function_inline_return_type.hpp>
 #include <stan/lang/generator/generate_function_instantiation_body.hpp>
 #include <stan/lang/generator/generate_function_instantiation_name.hpp>
+#include <stan/lang/generator/generate_function_arguments.hpp>
+#include <stan/lang/generator/has_only_int_args.hpp>
 #include <ostream>
 #include <string>
 
