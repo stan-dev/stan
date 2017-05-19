@@ -7280,7 +7280,7 @@ If we want to model count data, we can remove the $\sigma$ parameter, and use
 \code{poisson\_log}, which implements a log link, for our likelihood rather
 than \code{normal}. We can also add an overall mean parameter, $a$, which
 will account for the marginal expected value for $y$. We do this because we
-cannot center count data like we can for normally distributed data.
+cannot center count data like we would for normally distributed data.
 
 %
 \begin{stancode}
@@ -7322,7 +7322,7 @@ or in other words,
 \]
 
 We can extend our latent variable GP Stan program to deal with classification
-problems. Below, $a$ is the bias term, which can help account for imbalanced
+problems. Below $a$ is the bias term, which can help account for imbalanced
 classes in the training data:
 
 %
@@ -7787,7 +7787,7 @@ generated quantities {
 
 \subsection{Multiple-output Gaussian processes}
 
-Suppose we have observations $y_{i,m} \in \reals$ each observed at $x_i \in
+Suppose we have observations $y_{i} \in \reals^M$ each observed at $x_i \in
 \reals$. We could fit the following model to the data:
 
 \begin{align}
@@ -7795,6 +7795,52 @@ Suppose we have observations $y_{i,m} \in \reals$ each observed at $x_i \in
   y_{i, m} & \sim \distro{Normal}(f_{i,m}, \sigma) \\
   f & \in \reals^{N \times M}
 \end{align}
+
+The \distro{MatrixNormal} distribution has two covariance matrices: $k(x)$ to deal with
+among-row covariance, and $C$ to deal with among-column covariance.
+
+This can be implemented in Stan using a latent-variable GP formulation:
+
+\begin{stancode}
+data {
+  int<lower=1> N;
+	int<lower=1> M;
+  real x[N];
+  matrix[N, M] y;
+}
+transformed data {
+  real delta = 1e-9;
+}
+parameters {
+  real<lower=0> rho;
+	vector<lower=0>[M] alpha;
+  real<lower=0> sigma;
+  cholesky_factor_corr[M] L_Omega;
+  matrix[N, M] eta;
+}
+model {
+  matrix[N, M] f;
+  {
+    matrix[N, N] Sigma = cov_exp_quad(x, alpha, rho);
+    matrix[N, N] L_Sigma;
+
+    // diagonal elements
+    for (k in 1:N)
+      Sigma[k, k] = Sigma[k, k] + delta; 
+
+    L_Sigma = cholesky_decompose(Sigma);
+		f = L_Sigma * eta * diag_pre_multiply(alpha, L_Omega)';
+  }
+
+  rho ~ gamma(5, 5);
+  alpha ~ normal(0, 1);
+  sigma ~ normal(0, 1);
+  L_Omega ~ lkj_corr_cholesky(3);
+	to_vector(eta) ~ normal(0, 1);
+
+	to_vector(y) ~ normal(to_vector(f), sigma);
+}
+\end{stancode}
 
 \chapter{Directions, Rotations, and Hyperspheres}
 
