@@ -8,10 +8,11 @@
 class ServicesUtil : public ::testing::Test {
 public:
   ServicesUtil()
-    : mcmc_writer(sample_writer, diagnostic_writer, message_writer),
+    : mcmc_writer(sample_writer, diagnostic_writer, logger),
       model(context, &model_log) { }
 
-  stan::test::unit::instrumented_writer sample_writer, diagnostic_writer, message_writer;
+  stan::test::unit::instrumented_writer sample_writer, diagnostic_writer;
+  stan::test::unit::instrumented_logger logger;
   stan::services::util::mcmc_writer mcmc_writer;
   std::stringstream model_log;
   stan::io::empty_var_context context;
@@ -21,7 +22,7 @@ public:
 TEST_F(ServicesUtil, constructor) {
   EXPECT_EQ(0, sample_writer.call_count());
   EXPECT_EQ(0, diagnostic_writer.call_count());
-  EXPECT_EQ(0, message_writer.call_count());
+  EXPECT_EQ(0, logger.call_count());
 }
 
 class mock_sampler : public stan::mcmc::base_mcmc {
@@ -86,7 +87,7 @@ TEST_F(ServicesUtil, write_sample_names) {
   EXPECT_EQ(1, sample_writer.call_count());
   EXPECT_EQ(1, sample_writer.call_count("vector_string"));
   EXPECT_EQ(0, diagnostic_writer.call_count());
-  EXPECT_EQ(0, message_writer.call_count());
+  EXPECT_EQ(0, logger.call_count());
 }
 
 TEST_F(ServicesUtil, write_sample_params) {
@@ -99,7 +100,7 @@ TEST_F(ServicesUtil, write_sample_params) {
   EXPECT_EQ(1, sample_writer.call_count());
   EXPECT_EQ(1, sample_writer.call_count("vector_double"));
   EXPECT_EQ(0, diagnostic_writer.call_count());
-  EXPECT_EQ(0, message_writer.call_count());
+  EXPECT_EQ(0, logger.call_count());
 }
 
 TEST_F(ServicesUtil, write_adapt_finish) {
@@ -109,7 +110,7 @@ TEST_F(ServicesUtil, write_adapt_finish) {
   EXPECT_EQ(1, sample_writer.call_count());
   EXPECT_EQ(1, sample_writer.call_count("string"));
   EXPECT_EQ(0, diagnostic_writer.call_count());
-  EXPECT_EQ(0, message_writer.call_count());
+  EXPECT_EQ(0, logger.call_count());
 }
 
 TEST_F(ServicesUtil, write_diagnostic_names) {
@@ -121,7 +122,7 @@ TEST_F(ServicesUtil, write_diagnostic_names) {
   EXPECT_EQ(0, sample_writer.call_count());
   EXPECT_EQ(1, diagnostic_writer.call_count());
   EXPECT_EQ(1, diagnostic_writer.call_count("vector_string"));
-  EXPECT_EQ(0, message_writer.call_count());
+  EXPECT_EQ(0, logger.call_count());
 }
 
 TEST_F(ServicesUtil, write_diagnostic_params) {
@@ -133,7 +134,7 @@ TEST_F(ServicesUtil, write_diagnostic_params) {
   EXPECT_EQ(0, sample_writer.call_count());
   EXPECT_EQ(1, diagnostic_writer.call_count());
   EXPECT_EQ(1, diagnostic_writer.call_count("vector_double"));
-  EXPECT_EQ(0, message_writer.call_count());
+  EXPECT_EQ(0, logger.call_count());
 }
 
 TEST_F(ServicesUtil, internal_write_timing) {
@@ -152,7 +153,6 @@ TEST_F(ServicesUtil, write_timing) {
   EXPECT_EQ(5, diagnostic_writer.call_count());
   EXPECT_EQ(3, diagnostic_writer.call_count("string"));
   EXPECT_EQ(2, diagnostic_writer.call_count("empty"));
-  EXPECT_EQ(5, message_writer.call_count());
-  EXPECT_EQ(3, message_writer.call_count("string"));
-  EXPECT_EQ(2, message_writer.call_count("empty"));
+  EXPECT_EQ(5, logger.call_count());
+  EXPECT_EQ(5, logger.call_count_info());
 }

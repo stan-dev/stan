@@ -29,15 +29,11 @@ namespace stan {
         return this->V(z);
       }
 
-      double dG_dt(unit_e_point& z,
-                   callbacks::writer& info_writer,
-                   callbacks::writer& error_writer) {
+      double dG_dt(unit_e_point& z, callbacks::logger& logger) {
         return 2 * T(z) - z.q.dot(z.g);
       }
 
-      Eigen::VectorXd dtau_dq(unit_e_point& z,
-                              callbacks::writer& info_writer,
-                              callbacks::writer& error_writer) {
+      Eigen::VectorXd dtau_dq(unit_e_point& z, callbacks::logger& logger) {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 
@@ -45,9 +41,7 @@ namespace stan {
         return z.p;
       }
 
-      Eigen::VectorXd dphi_dq(unit_e_point& z,
-                              callbacks::writer& info_writer,
-                              callbacks::writer& error_writer) {
+      Eigen::VectorXd dphi_dq(unit_e_point& z, callbacks::logger& logger) {
         return z.g;
       }
 
