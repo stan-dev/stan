@@ -17,11 +17,11 @@ model {
   theta ~ beta(1,1);
   for (n in 1:N) 
     y[n] ~ bernoulli(theta);
+  print("quitting time");
+  reject("QUIT");
 }
 generated quantities {
   int z;
   print("In generated quantities");
   z = N;
-  print("quittint time");
-  reject("QUIT");
 }
