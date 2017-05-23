@@ -44,7 +44,9 @@ namespace stan {
       o << INDENT << "               unsigned int random_seed__," << EOL;
       o << INDENT << "               std::ostream* pstream__) {" << EOL;
       o << INDENT2 << "boost::ecuyer1988 base_rng__ =" << EOL;
-      o << INDENT2 << "  stan::services::util::create_rng(random_seed__, 0);" << EOL2;
+      o << INDENT2
+        << "  stan::services::util::create_rng(random_seed__, 0);"
+        << EOL2;
       o << INDENT2 << "current_statement_begin__ = -1;" << EOL2;
       o << INDENT2 << "static const char* function__ = \""
         << model_name << "_namespace::" << model_name << "\";" << EOL;
