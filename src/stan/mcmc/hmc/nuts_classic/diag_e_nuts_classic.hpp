@@ -1,5 +1,5 @@
-#ifndef STAN_MCMC_HMC_NUTS_DIAG_E_NUTS_CLASSIC_HPP
-#define STAN_MCMC_HMC_NUTS_DIAG_E_NUTS_CLASSIC_HPP
+#ifndef STAN_MCMC_HMC_NUTS_CLASSIC_DIAG_E_NUTS_CLASSIC_HPP
+#define STAN_MCMC_HMC_NUTS_CLASSIC_DIAG_E_NUTS_CLASSIC_HPP
 
 #include <stan/mcmc/hmc/nuts_classic/base_nuts_classic.hpp>
 #include <stan/mcmc/hmc/hamiltonians/diag_e_point.hpp>

@@ -68,7 +68,7 @@ namespace stan {
           > -param_var_decls_r
           > eps[add_params_var_f(boost::phoenix::ref(var_map_))]
           > -derived_var_decls_r
-          > model_r
+          > -model_r
           > eps[remove_params_var_f(boost::phoenix::ref(var_map_))]
           > -generated_var_decls_r;
 

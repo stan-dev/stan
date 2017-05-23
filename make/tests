@@ -150,8 +150,10 @@ change-file-permissions:
 ifeq ($(OS_TYPE),win)
 	attrib +r src\\test\\test-models\\good\\stanc_helper.stan
 	attrib +r src\\test\\test-models\\bad\\stanc_helper.stan
+	attrib +r src\\test\\test-models\\bad\\read_only
 else
 	chmod 444 src/test/test-models/*/stanc_helper.stan
+	chmod 555 src/test/test-models/bad/read_only
 endif
 
 src/test/unit/lang/stanc_helper_test.cpp: change-file-permissions
@@ -185,6 +187,8 @@ src/test/unit/mcmc/hmc/integrators/impl_leapfrog_test.cpp: src/test/test-models/
 src/test/unit/mcmc/hmc/integrators/impl_leapfrog2_test.cpp: src/test/test-models/good/mcmc/hmc/integrators/gauss.hpp
 src/test/unit/mcmc/hmc/nuts/unit_e_nuts_test.cpp: src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
 src/test/unit/mcmc/hmc/nuts/softabs_nuts_test.cpp: src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
+src/test/unit/mcmc/hmc/nuts/instantiation_test.cpp: src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
+src/test/unit/mcmc/hmc/nuts_classic/instantiation_test.cpp: src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
 src/test/unit/mcmc/hmc/xhmc/unit_e_xhmc_test.cpp: src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
 src/test/unit/mcmc/hmc/xhmc/softabs_xhmc_test.cpp: src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
 src/test/unit/mcmc/hmc/static_uniform/derived_static_uniform_test.cpp: src/test/test-models/good/mcmc/hmc/common/gauss.hpp

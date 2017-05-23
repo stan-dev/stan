@@ -3,7 +3,7 @@
 \chapter{Regression Models}
 
 \noindent
-\Stan supports regression models from simple linear regressions to
+Stan supports regression models from simple linear regressions to
 multilevel generalized linear models.  
 
 \section{Linear Regression}
@@ -28,7 +28,7 @@ and reducing still further, to
 y_n \sim \distro{Normal}(\alpha + \beta X_n, \, \sigma).
 \]
 %
-This latter form of the model is coded in \Stan as follows.
+This latter form of the model is coded in Stan as follows.
 %
 \begin{stancode}
 data {
@@ -158,6 +158,7 @@ make that much of a difference to speed, though, so the choice should
 be based on clarity.
 
 \section{The QR Reparameterization}\label{QR-reparameterization.section}
+
 In the previous example, the linear predictor can be written as
 $\eta = x \beta$, where $\eta$ is a $N$-vector of predictions, 
 $x$ is a $N \times K$ matrix, and $\beta$ is a $K$-vector of coefficients.
@@ -185,8 +186,8 @@ transformed data {
   matrix[K, K] R_ast;
   matrix[K, K] R_ast_inverse;
   // thin and scale the QR decomposition
-  Q_ast = qr_Q(x)[, 1:K] * sqrt(n - 1);
-  R_ast = qr_R(x)[1:K, ] / sqrt(n - 1);
+  Q_ast = qr_Q(x)[, 1:K] * sqrt(N - 1);
+  R_ast = qr_R(x)[1:K, ] / sqrt(N - 1);
   R_ast_inverse = inverse(R_ast);
 }
 parameters {
@@ -204,31 +205,34 @@ generated quantities {
 \end{stancode}
 %
 Since this Stan program generates equivalent predictions for $y$ and
-the same posterior distribution for $\alpha$, $\beta$, and $\sigma$
-as the previous Stan program, many wonder why the version with this
-QR reparameterization performs so much better in practice, often both in
-terms of wall time and in terms of effective sample size. The reasoning 
-is three-fold:
+the same posterior distribution for $\alpha$, $\beta$, and $\sigma$ as
+the previous Stan program, many wonder why the version with this QR
+reparameterization performs so much better in practice, often both in
+terms of wall time and in terms of effective sample size. The
+reasoning is threefold:
+%
 \begin{enumerate}
- \item The columns of $Q^\ast$ are orthogonal whereas the columns of 
-   $x$ generally are not. Thus, it is easier for a Markov Chain to move
-   around in $\theta$-space than in $\beta$-space.
- \item The columns of $Q^\ast$ have the same scale whereas the columns
-   of $x$ generally do not. Thus, a Hamiltonian Monte Carlo algorithm
-   can move around the parameter space with a smaller number of larger
-   steps
- \item Since the covariance matrix for the columns of $Q\ast$ is an
-   identity matrix, $\theta$ typically has a reasonable scale if the
-   units of $y$ are also reasonable. This also helps HMC move efficiently
-   without compromising numerical accuracy.
+\item The columns of $Q^\ast$ are orthogonal whereas the columns of
+  $x$ generally are not. Thus, it is easier for a Markov Chain to move
+  around in $\theta$-space than in $\beta$-space.
+\item The columns of $Q^\ast$ have the same scale whereas the columns
+  of $x$ generally do not. Thus, a Hamiltonian Monte Carlo algorithm
+  can move around the parameter space with a smaller number of larger
+  steps
+\item Since the covariance matrix for the columns of $Q\ast$ is an
+  identity matrix, $\theta$ typically has a reasonable scale if the
+  units of $y$ are also reasonable. This also helps HMC move
+  efficiently without compromising numerical accuracy.
 \end{enumerate}
+%
 Consequently, this QR reparameterization is recommended for linear and
-generalized linear models in Stan whenever $K > 1$ and you do not have an
-informative prior on the \emph{location} of $\beta$. It can also be
-worthwhile to subtract the mean from each column of $x$ before obtaining
-the QR decomposition, which does not affect the posterior distribution of
-$\theta$ or $\beta$ but does affect $\alpha$ and allows you to interpret
-$\alpha$ as the expectation of $y$ in a linear model.
+generalized linear models in Stan whenever $K > 1$ and you do not have
+an informative prior on the \emph{location} of $\beta$. It can also be
+worthwhile to subtract the mean from each column of $x$ before
+obtaining the QR decomposition, which does not affect the posterior
+distribution of $\theta$ or $\beta$ but does affect $\alpha$ and
+allows you to interpret $\alpha$ as the expectation of $y$ in a linear
+model.
 
 \section{Priors for Coefficients and Scales}\label{regression-priors.section}
 
@@ -496,10 +500,10 @@ use of conjugacy, working only on the log density and its derivatives.
 \section{Robust Noise Models}
 
 The standard approach to linear regression is to model the noise
-term $\epsilon$ as having a normal distribution.  From \Stan's
+term $\epsilon$ as having a normal distribution.  From Stan's
 perspective, there is nothing special about normally distributed
 noise.  For instance, robust regression can be accommodated by giving
-the noise term a Student-$t$ distribution.  To code this in \Stan, the
+the noise term a Student-$t$ distribution.  To code this in Stan, the
 sampling distribution is changed to the following.
 %
 
@@ -598,8 +602,8 @@ typically written as
 \]
 %
 The cumulative unit normal distribution function $\Phi$ is implemented
-in \Stan as the function \code{Phi}.  The probit regression model
-may be coded in \Stan by replacing the logistic model's sampling
+in Stan as the function \code{Phi}.  The probit regression model
+may be coded in Stan by replacing the logistic model's sampling
 statement with the following.
 %
 
@@ -608,7 +612,7 @@ statement with the following.
 \end{stancode}
 %
 A fast approximation to the cumulative unit normal distribution function 
-$\Phi$ is implemented in \Stan as the function \code{Phi\_approx}.  The 
+$\Phi$ is implemented in Stan as the function \code{Phi\_approx}.  The 
 approximate probit regression model may be coded with the following.
 %
 
@@ -619,7 +623,7 @@ approximate probit regression model may be coded with the following.
 \section{Multi-Logit Regression}\label{multi-logit.section}
 
 Multiple outcome forms of logistic regression can be coded directly in
-\Stan.  For instance, suppose there are $K$ possible outcomes for each
+Stan.  For instance, suppose there are $K$ possible outcomes for each
 output variable $y_n$.  Also suppose that there is a $D$-dimensional
 vector $x_n$ of predictors for $y_n$.  The multi-logit model with
 $\distro{Normal}(0,5)$ priors on the coefficients is coded as follows.
@@ -719,16 +723,16 @@ parameters {
 %
 and then these are transformed to parameters to use in the model.
 First, a transformed data block is added before the parameters block
-to define a column vector of zero values,
+to define a row vector of zero values,
 %
 \begin{stancode}
 transformed data {
-  vector[D] zeros;
-  zeros = rep_vector(0, D);
+  row_vector[D] zeros;
+  zeros = rep_row_vector(0, D);
 }
 \end{stancode}
 %
-and then these are appended to \code{beta\_row} to produce the
+which can then be appended to \code{beta\_row} to produce the
 coefficient matrix \code{beta},
 %
 \begin{stancode}
@@ -738,9 +742,9 @@ transformed parameters {
 }
 \end{stancode}
 %
-See \refsection{matrix-broadcast} for a definition of \code{rep\_vector} and
-\refsection{matrix-concatenation} for a definition of
-\code{append\_col}.
+See \refsection{matrix-broadcast} for a definition of
+\code{rep\_row\_vector} and \refsection{matrix-concatenation} for a
+definition of \code{append\_row}.
 
 This is not quite the same model as using $K$-vectors as parameters,
 because now the prior only applies to $(K-1)$-vectors.  In practice,
@@ -847,7 +851,7 @@ and ordered probit models.
 
 \subsection{Ordered Logistic Regression}
 
-The ordered logistic model can be coded in \Stan using the
+The ordered logistic model can be coded in Stan using the
 \code{ordered} data type for the cutpoints and the built-in
 \code{ordered\_logistic} distribution.
 %
@@ -875,7 +879,7 @@ which guarantees that \code{c[k]} is less than \code{c[k+1]}.
 
 If the cutpoints were assigned independent priors, the constraint
 effectively truncates the joint prior to support over points that
-satisfy the ordering constraint.  Luckily, \Stan does not need to
+satisfy the ordering constraint.  Luckily, Stan does not need to
 compute the effect of the constraint on the normalizing term because
 the probability is needed only up to a proportion.
 
@@ -1547,8 +1551,26 @@ The code in the Stan program above can be sped up dramatically by replacing:
     y[n] ~ normal(x[n] * beta[jj[n]], sigma);
 \end{stancode}
 %
-with a redeclaration of \code{beta} and a revised model block sampling
-statement. 
+with the vectorized form:
+%
+\begin{stancode}
+  {
+    vector[N] x_beta_jj;
+    for (n in 1:N)
+      x_beta_jj[n] = x[n] * beta[jj[n]]
+    y ~ normal(x_beta_jj, sigma);
+  }
+\end{stancode}
+%
+The outer brackets create a local scope in which to define the
+variable \code{x\_beta\_jj}, which is then filled in a loop and used
+to define a vectorized sampling statement.  The reason this is such a
+big win is that it allows us to take the log of sigma only once and it
+greatly reduces the size of the resulting expression graph by packing
+all of the work into a single density function.
+
+Although it is tempting to redeclare \code{beta} and include a revised
+model block sampling statement,
 %
 \begin{stancode}
 parameters {
@@ -1559,7 +1581,20 @@ model {
   ...
 \end{stancode}
 %
-which takes advantage of indexing introduced in Stan version 2.9 (see \refsection{language-multi-indexing}).
+thsi fails because it breaks the vectorization of sampling for
+\code{beta},%
+%
+\footnote{Thanks to Mike Lawrence for pointing this out in the GitHub
+  issue for the manual.}
+%
+\begin{stancode}
+  beta ~ multi_normal(...);
+\end{stancode}
+%
+which requires \code{beta} to be an array of vectors.  Both
+vectorizations are important, so the best solution is to just use the
+loop above, because \code{rows\_dot\_product} cannot do much
+optimization in and of itself because there are no shared computations.
 
 The code in the Stan program above also builds up an array of vectors
 for the outcomes and for the multivariate normal, which provides a
@@ -2171,7 +2206,7 @@ $\tilde{x}$ and $\tilde{N}$,
 generated quantities {
   vector[N] y_tilde;
   for (n in 1:N)
-    y_tilde = normal_rng(alpha + beta * x[n], sigma);
+    y_tilde[n] = normal_rng(alpha + beta * x[n], sigma);
 }
 \end{stancode}
 %
@@ -2183,7 +2218,7 @@ well, the simulated $\tilde{y}$ will look like the actual data $y$.
 
 
 
-\chapter{Time-Series Models}
+\chapter{Time-Series Models}\label{time-series.chapter}
 
 \noindent
 Times series data come arranged in temporal order.  This chapter
@@ -2194,7 +2229,7 @@ as autoregressive and moving average models, and hidden Markov models.
 also be used for time-series (and spatial) data.
 
 
-\section{Autoregressive Models}
+\section{Autoregressive Models}\label{autoregressive.section}
 
 A first-order autoregressive model (AR(1)) with normal noise takes
 each point $y_n$ in a sequence $y$ to be generated according to
@@ -2210,7 +2245,7 @@ noise scaled as $\sigma$.
 
 With improper flat priors on the regression coefficients for slope
 ($\beta$), intercept ($\alpha$), and noise scale ($\sigma$),
-the \Stan program for the AR(1) model is as follows.
+the Stan program for the AR(1) model is as follows.
 %
 \begin{stancode}
 data {
@@ -2244,14 +2279,12 @@ above being replaced with the one-liner
 %
 \begin{stancode}
 model {
-  tail(y, N - 1) ~ normal(alpha + beta * head(y, N - 1), sigma);
+  y[2:(N - 1)] ~ normal(alpha + beta * y[1:(N - 1)], sigma);
 }
 \end{stancode}
 %
-The tail operation pulls out the last \code{N\,-\,1} elements of
-\code{y} and the head operation pulls out the first \code{N\,-\,1};
-vector arithmetic is used to multiply the head elements by
-\code{beta}.  
+The left-hand side slicing operation pulls out the last $N-1$
+elements and the right-hand side version pulls out the first $N-1$.
 
 
 
@@ -3170,7 +3203,7 @@ provided later in the chapter.
 
 \section{Missing Data}
 
-\Stan treats variables declared in the \code{data} and
+Stan treats variables declared in the \code{data} and
 \code{transformed data} blocks as known and the variables in the
 \code{parameters} block as unknown.
 
@@ -3194,10 +3227,8 @@ parameters {
   real y_mis[N_mis];
 }
 model {
-  for (n in 1:N_obs)
-    y_obs[n] ~ normal(mu, sigma);
-  for (n in 1:N_mis)
-    y_mis[n] ~ normal(mu, sigma);
+  y_obs ~ normal(mu, sigma);
+  y_mis ~ normal(mu, sigma);
 }
 \end{stancode}
 %
@@ -3206,18 +3237,10 @@ non-negative integer variables \code{N\_obs} and \code{N\_mis}.  The
 observed data is provided as an array data variable \code{y\_obs}.
 The missing data is coded as an array parameter, \code{y\_mis}.  The
 ordinary parameters being estimated, the location \code{mu} and scale
-\code{sigma}, are also coded as parameters.  A better way to write the
-model would be to vectorize, so the body would be
-%
-\begin{stancode}
-   y_obs ~ normal(mu, sigma);
-   y_mis ~ normal(mu, sigma);
-\end{stancode}
-
-The model contains one loop over the observed data and one over the
-missing data.  This slight redundancy in specification leads to much
-more efficient sampling for missing data problems in \Stan than the
-more general technique described in the next section.
+\code{sigma}, are also coded as parameters.  The model is vectorized
+on the observed and missing data; combining them in this case would be
+less efficient because the data observations would be promoted and
+have needless derivatives calculated.
 
 
 \section{Partially Known Parameters}\label{partially-known-parameters.section}
@@ -3225,7 +3248,7 @@ more general technique described in the next section.
 In some situations, such as when a multivariate probability function
 has partially observed outcomes or parameters, it will be necessary to
 create a vector mixing known (data) and unknown (parameter) values.
-This can be done in \Stan by creating a vector or array in the
+This can be done in Stan by creating a vector or array in the
 \code{transformed parameters} block and assigning to it.
 
 The following example involves a bivariate covariance matrix in which the
@@ -3238,14 +3261,12 @@ data {
   real<lower=0> var1;     real<lower=0> var2;
 }
 transformed data {
-  real<upper=0> min_cov;   
-  real<lower=0> max_cov;  
-  max_cov = sqrt(var1 * var2);  
-  min_cov = -max_cov;
+  real<lower=0> max_cov = sqrt(var1 * var2);  
+  real<upper=0> min_cov = -max_cov;
 }
 parameters {
   vector[2] mu;
-  real<lower=min_cov,upper=max_cov> cov;
+  real<lower=min_cov, upper=max_cov> cov;
 }
 transformed parameters {
   matrix[2, 2] Sigma;
@@ -3253,34 +3274,86 @@ transformed parameters {
   Sigma[2, 1] = cov;      Sigma[2, 2] = var2;
 }  
 model {
- for (n in 1:N)
-   y[n] ~ multi_normal(mu, Sigma);
+  y ~ multi_normal(mu, Sigma);
 }
 \end{stancode}
 %
 The variances are defined as data in variables \code{var1} and
 \code{var2}, whereas the covariance is defined as a parameter in
-variable \code{cov}.  The $2 \times 2$ covariance matrix
-\code{Sigma} is defined as a transformed parameter, with the variances
-assigned to the two diagonal elements and the covariance to the two
-off-diagonal elements.
+variable \code{cov}.  The $2 \times 2$ covariance matrix \code{Sigma}
+is defined as a transformed parameter, with the variances assigned to
+the two diagonal elements and the covariance to the two off-diagonal
+elements.
 
 The constraint on the covariance declaration ensures that the
 resulting covariance matrix \code{sigma} is positive definite.  The
 bound, plus or minus the square root of the product of the variances,
 is defined as transformed data so that it is only calculated once.
 
-\section{Efficiency Note}
+The vectorization of the multivariate normal is critical for
+efficiency here.  The transformed parameter \code{Sigma} could be
+defined as a local variable within the model block if 
 
-The missing-data example in the first section could be programmed with
-a mixed data and parameter array following the approach of the
-partially known parameter example in the second section.  The behavior
-will be correct, but the computation is wasteful.  Each parameter, be
-it declared in the \code{parameters} or \code{transformed parameters}
-block, uses an algorithmic differentiation variable which is more
-expensive in terms of memory and gradient-calculation time than a
-simple data variable.  Furthermore, the copy takes up extra space and
-extra time.
+\section{Sliced Missing Data}
+
+If the missing data is part of some larger data structure, then it can
+often be effectively reassembled using index arrays and slicing.
+Here's an example for time-series data, where only some entries in the
+series are observed. 
+%
+\begin{stancode}
+data {
+  int<lower = 0> N_obs;
+  int<lower = 0> N_mis;
+  int<lower = 1, upper = N_obs + N_mis> ii_obs[N_obs];
+  int<lower = 1, upper = N_obs + N_mis> ii_mis[N_mis];
+  real y_obs[N_obs];
+}
+transformed data {
+  int<lower = 0> N = N_obs + N_mis;
+}
+parameters {
+  real y_mis[N_mis];
+  real<lower=0> sigma;
+}
+transformed parameters {
+  real y[N];
+  y[ii_obs] = y_obs;
+  y[ii_mis] = y_mis;
+}
+model {
+  sigma ~ gamma(1, 1);
+  y[1] ~ normal(0, 100);
+  y[2:N] ~ normal(y[1:(N - 1)], sigma);
+}
+\end{stancode}
+%
+The index arrays \code{ii\_obs} and \code{ii\_mis} contain the indexes
+into the final array \code{y} of the observed data (coded as a data
+vector \code{y\_obs}) and the missing data (coded as a parameter
+vector \code{y\_mis}).  See \refchapter{time-series} for further
+discussion of time-series model and specifically
+\refsection{autoregressive} for an explanation of the vectorization
+for \code{y} as well as an explanation of how to convert this example
+to a full AR(1) model.  To ensure \code{y[1]} has a proper posterior
+in case it is missing, we have given it an explicit, albeit broad,
+prior.
+
+Another potential application would be filling the
+columns of a data matrix of predictors for which some predictors are
+missing; matrix columns can be accessed as vectors and assigned the
+same way, as in
+%
+\begin{stancode}
+  x[N_obs_2, 2] = x_obs_2;
+  x[N_mis_2, 2] = x_mis_2;
+\end{stancode}
+%
+where the relevant variables are all hard coded with index \code{2}
+because Stan doesn't support ragged arrays.  These could all be packed
+into a single array with more fiddly indexing that slices out vectors
+from longer vectors (see \refsection{ragged-data-structs} for a
+general discussion of coding ragged data structures in Stan).
 
 \section{Loading matrix for factor analysis}
 
@@ -3329,6 +3402,102 @@ all convenient to place a prior on the full covariance matrix \code{L
 adjustment is provided in the subsection of
 \refsection{change-of-variables} devoted to covariance matrices.
 
+\section{Missing Multivariate Data}
+
+It's often the case that one or more components of a multivariate
+outcome are missing.%
+%
+\footnote{Note that this is not the same as missing components of a
+  multivariate predictor in a regression problem;  in that case, you
+  will need to represent the missing data as a parameter and impute
+  missing values in order to feed them into the regression.}
+%
+As an example, we'll consider the bivariate distribution, which is
+easily marginalized.  The coding here is brute force, representing
+both an array of vector observations \code{y} and a boolean array
+\code{y\_observed} to indicate which values were observed (others can
+have dummy values in the input).
+
+\begin{stancode}
+vector[2] y[N];
+int<lower=0, upper=1> y_observed[N, 2];
+\end{stancode}
+
+If both components are observed, we model them using the full
+multi-normal, otherwise we model the marginal distribution of the
+component that is observed.
+
+\begin{stancode}
+for (n in 1:N) {
+  if (y_observed[n, 1] && y_observed[n, 2])
+    y[n] ~ multi_normal(mu, Sigma);
+  else if (y_observed[n, 1])
+    y[n, 1] ~ normal(mu[1], sqrt(Sigma[1, 1]));
+  else if (y_observed[n, 2])
+    y[n, 2] ~ normal(mu[2], sqrt(Sigma[2, 2]));
+}
+\end{stancode}
+
+It's a bit more work, but much more efficient to vectorize these
+sampling statements.  In transformed data, build up three vectors of
+indices, for the three cases above:
+%
+\begin{stancode}
+transformed data {
+  int ns12[observed_12(y_observed)];
+  int ns1[observed_1(y_observed)];
+  int ns2[observed_2(y_observed)];
+}
+\end{stancode}
+%
+You will need to write functions that pull out the count of
+observations in each of the three sampling situations.  This must be
+done with functions because the result needs to go in top-level block
+variable size declaration.  Then the rest of transformed data just
+fills in the values using three counters.
+%
+\begin{stancode}
+int n12 = 1;
+int n1 = 1;
+int n2 = 1;
+for (n in 1:N) {
+  if (y_observed[n, 1] && y_observed[n, 2]) {
+    ns12[n12] = n;
+    n12 = n12 + 1;
+  } else if (y_observed[n, 1]) {
+    ns1[n1] = n;
+    n1 = n1 + 1;
+  } else if (y_observed[n, 2]) {
+    ns2[n2] = n;    
+    n2 = n2 + 1;
+  }
+}
+\end{stancode}
+%
+Then, in the model block, everything's nice and vectorizable
+using those indexes constructed once in transformed data:
+%
+\begin{stancode}
+y[ns12] ~ multi_normal(mu, Sigma);
+y[ns1] ~ normal(mu[1], sqrt(Sigma[1, 1]));
+y[ns2] ~ normal(mu[2], sqrt(Sigma[2, 2]));
+\end{stancode}
+%
+The result will be much more efficient than using latent variables for
+the missing data, but requires the multivariate distribution to be
+marginalized analytically.  It'd be more efficient still to precompute
+the three arrays in the transformed data block, though the efficiency
+improvement will be relatively minor compared to vectorizing the
+probability functions.
+
+This approach can easily be generalized with some index fiddling to
+the general multivariate case.  The trick is to pull out entries in
+the covariance matrix for the missing components.  It can also be used
+in situations such as multivariate differential equation solutions
+where only one component is observed, as in a phase-space experiment
+recording only time and position of a pendulum (and not recording
+momentum).
+
 
 \chapter{Truncated or Censored Data}
 
@@ -3351,9 +3520,9 @@ Truncated data is data for which measurements are only reported if
 they fall above a lower bound, below an upper bound, or between a
 lower and upper bound.  
 
-Truncated data may be modeled in \Stan using truncated distributions.
+Truncated data may be modeled in Stan using truncated distributions.
 For example, suppose the truncated data is $y_n$ with an upper
-truncation point of $U = 300$ so that $y_n < 300$.  In \Stan, this
+truncation point of $U = 300$ so that $y_n < 300$.  In Stan, this
 data can be modeled as following a truncated normal distribution for
 the observations as follows. 
 %
@@ -3484,7 +3653,7 @@ does not report values above 300 pounds.
 
 One way to model censored data is to treat the censored data as
 missing data that is constrained to fall in the censored range of
-values.  Since \Stan does not allow unknown values in its arrays or
+values.  Since Stan does not allow unknown values in its arrays or
 matrices, the censored values must be represented explicitly, as in the
 following right-censored case.
 %
@@ -3537,8 +3706,8 @@ is
 \]
 %
 where \code{normal\_lccdf} is the log of complementary CDF
-(\Stan provides \code{<distr>\_lccdf} for each distribution
-implemented in \Stan).
+(Stan provides \code{<distr>\_lccdf} for each distribution
+implemented in Stan).
 
 The following right-censored model assumes
 that the censoring point is known, so it is declared as data.
@@ -3595,10 +3764,12 @@ model {
 \noindent
 Finite mixture models of an outcome assume that the outcome is drawn
 from one of several distributions, the identity of which is controlled
-by a categorical mixing distribution. Mixture models typically have
+by a categorical mixing distribution.  Mixture models typically have
 multimodal densities with modes near the modes of the mixture
 components.  Mixture models may be parameterized in several ways, as
-described in the following sections.
+described in the following sections.  Mixture models may be used
+directly for modeling data with multimodal distributions, or they may
+be used as priors for other parameters.
 
 \section{Relation to Clustering}\label{clustering-mixture.section}
 
@@ -3634,15 +3805,15 @@ of the mixture component $z_n$,
 y_n \sim \distro{Normal}(\mu_{z[n]},\sigma_{z[n]}).
 \]
 %
-This model is not directly supported by \Stan because it involves
-discrete parameters $z_n$, but \Stan can sample $\mu$ and $\sigma$ 
+This model is not directly supported by Stan because it involves
+discrete parameters $z_n$, but Stan can sample $\mu$ and $\sigma$ 
 by summing out the $z$ parameter as described in the next section.
 
 
 \section{Summing out the Responsibility Parameter}
 
 To implement the normal mixture model outlined in the previous
-section in \Stan, the discrete parameters can be summed out of the
+section in Stan, the discrete parameters can be summed out of the
 model. If $Y$ is a mixture of $K$ normal distributions with 
 locations $\mu_k$ and scales $\sigma_k$ with mixing proportions
 $\lambda$ in the unit $K$-simplex, then 
@@ -3682,7 +3853,7 @@ most arithmetic precision possible out of the operation.
 
 For example, the mixture of $\code{Normal}(-1,2)$ and
 $\code{Normal}(3,1)$ with mixing proportion $\lambda =
-(0.3,0.7)^{\top}$ can be implemented in \Stan as follows.
+(0.3,0.7)^{\top}$ can be implemented in Stan as follows.
 %
 \begin{stancode}
 parameters {
@@ -3714,6 +3885,50 @@ The log probability term is derived by taking
 \end{eqnarray*}
 %
 
+\subsubsection{Dropping uniform mixture ratios}
+
+If a two-component mixture has a mixing ratio of 0.5, then the mixing
+ratios can be dropped, because
+%
+\begin{stancode}
+neg_log_half = -log(0.5);
+for (n in 1:N)
+  target
+    += log_sum_exp(neg_log_half + normal_lpdf(y[n] | mu[1], sigma[1]),
+                   neg_log_half + normal_lpdf(y[n] | mu[2], sigma[2]));
+\end{stancode}
+%
+then the $-\log 0.5$ term isn't contributing to the proportional
+density, and the above can be replaced with the more efficient version
+%
+\begin{stancode}
+for (n in 1:N)
+  target += log_sum_exp(normal_lpdf(y[n] | mu[1], sigma[1]),
+                        normal_lpdf(y[n] | mu[2], sigma[2]));
+\end{stancode}
+%
+The same result holds if there are $K$ components and the mixing
+simplex $\lambda$ is symmetric, i.e.,
+%
+\[
+\lambda = \left( \frac{1}{K},   \ldots, \frac{1}{K} \right).
+\]
+%
+The result follows from the identity
+%
+\[
+\mbox{log\_sum\_exp}(c + a, c + b)
+\ = \ 
+c + \mbox{log\_sum\_exp(a, b)}
+\]
+%
+and the fact that adding a constant $c$ to the log density accumulator
+has no effect because the log density is only specified up to an
+additive constant in the first place.  There is nothing specific to
+the normal distribution here; constants may always be dropped from the
+target.
+
+
 \subsection{Estimating Parameters of a Mixture}
 
 Given the scheme for representing mixtures, it may be moved to an
@@ -3728,20 +3943,20 @@ data {
   real y[N];               // observations
 }
 parameters {
-  simplex[K] theta;        // mixing proportions
-  real mu[K];              // locations of mixture components
-  real<lower=0> sigma[K];  // scales of mixture components
+  simplex[K] theta;          // mixing proportions
+  ordered mu[K];             // locations of mixture components
+  vector<lower=0>[K] sigma;  // scales of mixture components
 }
 model {
-  real ps[K];              // temp for log component densities
-  sigma ~ cauchy(0, 2.5);
+  real log_theta[K] = log(theta);  // cache log calculation
+
+  sigma ~ lognormal(0, 2);
   mu ~ normal(0, 10);
   for (n in 1:N) {
-    for (k in 1:K) {
-      ps[k] = log(theta[k]) 
-               + normal_lpdf(y[n] | mu[k], sigma[k]);
-    }
-    target += log_sum_exp(ps);
+    real lps[K] = log_theta;
+    for (k in 1:K)
+      lps[k] = lps[k] + normal_lpdf(y[n] | mu[k], sigma[k]);
+    target += log_sum_exp(lps);
   }
 }
 \end{stancode}
@@ -3749,21 +3964,26 @@ model {
 The model involves \code{K} mixture components and \code{N} data
 points. The mixing proportion parameter \code{theta} is declared to be
 a unit $K$-simplex, whereas the component location parameter \code{mu}
-and scale parameter \code{sigma} are both defined to be arrays of size
-\code{K}. The values in the scale array \code{sigma} are constrained
-to be non-negative, and have a weakly informative prior given in the
-model. The model declares a local array variable \code{ps} to be size
-\code{K} and uses it to accumulate the contributions from the mixture
-components.
+and scale parameter \code{sigma} are both defined to be
+\code{K}-vectors.  
 
-The locations and scales are drawn from simple priors for the sake of
-this example, but could be anything supported by \Stan.  The mixture
-components  could even be modeled hierarchically.
+The location parameter \code{mu} is declared to be an ordered vector
+in order to identify the model.  This will not affect inferences that
+do not depend on the ordering of the components as long as the prior
+for the components \code{mu[k]} is symmetric, as it is here (each
+component has an independent $\mathsf{Normal}(0, 10)$ prior).  It
+would even be possible to include a hierarchical prior for the components.
 
-The main action is in the loop over data points \code{n}.  For each
-such point, the log of $\lambda_k \times
-\distro{Normal}(y_n|\mu_k,\sigma_k)$ is calculated and added to the
-array \code{ps}.  Then the log probability is incremented with the log
+The values in the scale array \code{sigma} are constrained to be
+non-negative, and have a weakly informative prior given in the model
+chosen to avoid zero values and thus collapsing components.  
+
+The model declares a local array variable \code{lps} to be size
+\code{K} and uses it to accumulate the log contributions from the
+mixture components.  The main action is in the loop over data points
+\code{n}.  For each such point, the log of $\theta_k \times
+\distro{Normal}(y_n \, | \, \mu_k,\sigma_k)$ is calculated and added to the
+array \code{lpps}.  Then the log probability is incremented with the log
 sum of exponentials of those values.
 
 \section{Vectorizing Mixtures}
@@ -3771,7 +3991,10 @@ sum of exponentials of those values.
 There is (currently) no way to vectorize mixture models at the
 observation level in Stan.  This section is to warn users away from
 attempting to vectorize naively, as it results in a different model.
-A proper mixture at the observation level is defined as
+A proper mixture at the observation level is defined as follows, where
+we assume that \code{lambda}, \code{y[n]}, \code{mu[1], mu[2]}, and
+\code{sigma[1], sigma[2]} are all scalars and \code{lambda} is between
+0 and 1.
 %
 \begin{stancode}
 for (n in 1:N) {
@@ -3829,11 +4052,21 @@ p(y \, | \, \lambda, \mu, \sigma)
 \section{Inferences Supported by
   Mixtures}\label{mixture-inference.section}
 
-In many mixture models, the mixture components are exchangeable in the
-model and thus not identifiable.  This arises if the parameters of the
-mixture components have exchangeable priors and the mixture ratio gets
-a uniform prior so that the parameters of the mixture components are
-also exchangeable in the likelihood.
+In many mixture models, the mixture components are underlyingly
+exchangeable in the model and thus not identifiable.  This arises if
+the parameters of the mixture components have exchangeable priors and
+the mixture ratio gets a uniform prior so that the parameters of the
+mixture components are also exchangeable in the likelihood.  
+
+We have finessed this basic problem by ordering the parameters.  This
+will allow us in some cases to pick out mixture components either
+ahead of time or after fitting (e.g., male vs. female, or Democrat
+vs.\ Republican).  
+
+In other cases, we do not care about the actual identities of the
+mixture components and want to consider inferences that are
+independent of indexes.  For example, we might only be interested
+in posterior predictions for new observations.
 
 \subsection{Mixtures with Unidentifiable Components}
 
@@ -4750,7 +4983,7 @@ model calculations.
 
 The Stan program for the change point model is shown in
 \reffigure{change-point-model}.  The transformed parameter
-\code{lp[s]} stores the quantity $\log p(s,D|e,l)$.
+\code{lp[s]} stores the quantity $\log p(s, D \, | \, e, l)$.
 %
 \begin{figure}
 \begin{stancode}
@@ -4791,7 +5024,7 @@ model {
 \end{figure}
 
 Although the model in \reffigure{change-point-model} is easy to
-undertand, the doubly nested loop used for \code{s} and \code{t} is
+understand, the doubly nested loop used for \code{s} and \code{t} is
 quadratic in \code{T}.  Luke Wiklendt pointed out that a linear
 alternative can be achieved by the use of dynamic programming similar
 to the forward-backward algorithm for Hidden Markov models;  he
@@ -4802,15 +5035,16 @@ transformed parameters block of the above Stan program.
 transformed parameters {
     vector[T] lp;
     {
-      vector[T+1] lp_e;
-      vector[T+1] lp_l;
-      lp_e[1] <- 0;
-      lp_l[1] <- 0;
+      vector[T + 1] lp_e;
+      vector[T + 1] lp_l;
+      lp_e[1] = 0;
+      lp_l[1] = 0;
       for (t in 1:T) {
-        lp_e[t + 1] <- lp_e[t] + poisson_lpmf(D[t] | e);
-        lp_l[t + 1] <- lp_l[t] + poisson_lpmf(D[t] | l);
+        lp_e[t + 1] = lp_e[t] + poisson_lpmf(D[t] | e);
+        lp_l[t + 1] = lp_l[t] + poisson_lpmf(D[t] | l);
       }
-      lp <- rep_vector(log_unif + lp_l[T + 1], T) + head(lp_e, T) - head(lp_l, T);
+      lp = rep_vector(log_unif + lp_l[T + 1], T)
+           + head(lp_e, T) - head(lp_l, T);
     }
   }
 \end{stancode}
@@ -4911,7 +5145,7 @@ draws a random value for \code{s} at every iteration.
 \begin{stancode}
 generated quantities {
   int<lower=1,upper=T> s;
-  s = categorical_rng(softmax(lp));
+  s = categorical_logit_rng(lp);
 }
 \end{stancode}
 %
@@ -5837,7 +6071,7 @@ In the situation where there are no missing values, the two model
 formulations produce exactly the same log posterior density.
 
 
-\section{Ragged Data Structures}
+\section{Ragged Data Structures}\label{ragged-data-structs.section}
 
 Ragged arrays are arrays that are not rectangular, but have different
 sized entries.  This kind of structure crops up when there are

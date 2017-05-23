@@ -11,12 +11,6 @@ namespace stan {
     double_literal::double_literal(double val)
       : val_(val), type_(DOUBLE_T, 0U) {  }
 
-    double_literal& double_literal::operator=(const double_literal& dl) {
-      val_ = dl.val_;
-      type_ = dl.type_;
-      return *this;
-    }
-
   }
 }
 #endif

@@ -14,7 +14,7 @@ namespace stan {
      * user-facing/C++ format and parameter/data format controlled by
      * the flags.
      *
-     * @param[out] e expression to generate
+     * @param[in] e expression to generate
      * @param[in] user_facing true if generation is to read by user, false
      * for code generation in C++
      * @param[in] is_var_context true if generation in parameter var
@@ -33,7 +33,7 @@ namespace stan {
      * generation is done for a double context rather than a var
      * (parameter) context.
      *
-     * @param[out] e expression to generate
+     * @param[in] e expression to generate
      * @param[in] user_facing true if generation is to read by user, false
      * for code generation in C++
      * @param[in,out] o stream for generating
@@ -49,7 +49,7 @@ namespace stan {
      * Generate the specified expression to the specified stream, with
      * C++ syntax.
      *
-     * @param[out] e expression to generate
+     * @param[in] e expression to generate
      * @param[in,out] o stream for generating
      */
     void generate_expression(const expression& e, std::ostream& o) {

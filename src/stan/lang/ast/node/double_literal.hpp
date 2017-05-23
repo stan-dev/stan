@@ -30,17 +30,8 @@ namespace stan {
        *
        * @param val value of literal
        */
-      double_literal(double val);  // NOLINT(runtime/explicit)
-
-      /**
-       * Assign a double literal to this literal and return it.
-       *
-       * @param dl new value literal
-       * @return new value reference
-       */
-      double_literal& operator=(const double_literal& dl);
+      explicit double_literal(double val);
     };
-
 
   }
 }
