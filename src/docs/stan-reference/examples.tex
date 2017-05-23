@@ -7791,13 +7791,51 @@ Suppose we have observations $y_{i} \in \reals^M$ each observed at $x_i \in
 \reals$. We could fit the following model to the data:
 
 \begin{align}
-  f & \sim \distro{MatrixNormal}(\mu(x), k(x), C) \\
+  f & \sim \distro{MatrixNormal}(\mu(x), K_{\rho,\alpha}(x), C) \\
   y_{i, m} & \sim \distro{Normal}(f_{i,m}, \sigma) \\
   f & \in \reals^{N \times M}
 \end{align}
 
-The \distro{MatrixNormal} distribution has two covariance matrices: $k(x)$ to deal with
-among-row covariance, and $C$ to deal with among-column covariance.
+The \distro{MatrixNormal} distribution has two covariance matrices: $k(x)$ to encode 
+among-row covariance, and $C$ to define among-column covariance. This means that the 
+expected value of $f^T f$ is equal to $\text{trace}(K_{\rho,\alpha}(x))C$, whereas the expected value of $f f^T$ is 
+$\text{trace}(C) \times k(x)$. We can derive this using properties of expectation
+and the \distro{MatrixNormal} density:
+
+\begin{align}
+	\E[f f^T]_{i,j} & = \E\left[f_i f_j\right] \text{where} f_i, \, f_j \in \reals^M \\
+									& = \E\left[\sum_{m = 0}^M f_{i,m} f_{j,m}\right] \\
+									& = \sum_{m = 0}^M \E\left[f_{i,m} f_{j,m}\right] \\
+									& = \sum_{m = 0}^M \E\left[f_m(x_i) f_m(x_j)\right] \\
+									& = \sum_{m = 0}^M C_{m,m} \times k(x_i, x_j | \rho, \alpha) \\
+									& = \text{trace}(C) \times k(x_i, x_j)
+\end{align}
+
+\begin{align}
+	\E[f^T f]_{i,j} & = \E\left[f_i f_j\right] \text{where} f_i, \, f_j \in \reals^N \\
+									& = \E\left[\sum_{n = 0}^N f_{n,i} f_{n,j}\right] \\
+									& = \sum_{n = 0}^N \E\left[f_{n,i} f_{n,j}\right] \\
+									& = \sum_{n = 0}^N \E\left[f_i(x_n) f_j(x_n)\right] \\
+									& = \sum_{n = 0}^N C_{i,j} \times k(x_n, x_n | \rho, \alpha) \\
+									& = N \alpha^2 \times C_{i, j} \\
+									& = \text{trace}(K_{\rho, \alpha}) \times C_{i,j}
+\end{align}
+
+We can see that we should set $\alpha$ to $1.0$ because the parameter is not identified unless
+we constrain $\text{trace}(C) = 1$. Otherwise, we can multiply $\alpha$ by a scalar $d$ and 
+$C$ by $1/d$ and our likelihood will not change.
+
+We can generate a random variable $f$ from a \distro{MatrixNormal} density in
+$\reals^{N \times M}$ using the following algorithm:
+
+\begin{align}
+	\eta_{i,j} & \sim \distro{Normal}(0, 1) \forall i,j \\
+	f & = L_{K_{\rho, 1.0}} \, \eta \, L_C^T \\
+	f & \sim \distro{MatrixNormal}(0, K_{\rho, 1.0}, C) \\
+	\eta & \in \reals^{N \times M} \\
+	L_C & = \text{cholesky\_decompose}(C) \\
+	L_{K_{\rho, 1.0}} & = \text{cholesky\_decompose}(K_{\rho, 1.0})
+\end{align}
 
 This can be implemented in Stan using a latent-variable GP formulation:
 
@@ -7821,7 +7859,7 @@ parameters {
 model {
   matrix[N, M] f;
   {
-    matrix[N, N] Sigma = cov_exp_quad(x, alpha, rho);
+    matrix[N, N] Sigma = cov_exp_quad(x, 1.0, rho);
     matrix[N, N] L_Sigma;
 
     // diagonal elements
