@@ -22,7 +22,7 @@ namespace stan {
         // Advance generator to avoid process conflicts
         static boost::uintmax_t DISCARD_STRIDE
           = static_cast<boost::uintmax_t>(1) << 50;
-        rng.discard(DISCARD_STRIDE * (chain - 1));
+        rng.discard(DISCARD_STRIDE * (chain));
 
         return rng;
       }
