@@ -19,3 +19,13 @@ TEST(rng, initialize_with_id) {
     EXPECT_NE(rng1, rng2);
   }
 }
+
+TEST(rng, initialize_with_zero) {
+  boost::ecuyer1988 rng1 = stan::services::util::create_rng(0, 0);
+  boost::ecuyer1988 rng2 = stan::services::util::create_rng(0, 0);
+
+  EXPECT_EQ(rng1, rng2);
+
+  rng2();
+  EXPECT_NE(rng1, rng2);
+}
