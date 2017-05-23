@@ -2,6 +2,8 @@
 #include <gtest/gtest.h>
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <test/test-models/good/services/test_lp.hpp>
+#include <stan/callbacks/logger.hpp>
+#include <stan/callbacks/writer.hpp>
 #include <stan/io/empty_var_context.hpp>
 #include <stan/services/util/create_rng.hpp>
 
@@ -49,8 +51,7 @@ public:
 
   stan::mcmc::sample
   transition(stan::mcmc::sample& init_sample,
-             stan::callbacks::writer& info_writer,
-             stan::callbacks::writer& error_writer) {
+             stan::callbacks::logger& logger) {
     ++n_transition;
     stan::mcmc::sample result(init_sample);
     return result;

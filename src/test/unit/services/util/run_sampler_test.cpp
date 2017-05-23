@@ -4,6 +4,7 @@
 #include <stan/io/empty_var_context.hpp>
 #include <stan/services/util/create_rng.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
+#include <stan/callbacks/stream_logger.hpp>
 
 class mock_sampler : public stan::mcmc::base_mcmc {
 public:
@@ -26,11 +27,10 @@ public:
     n_get_sampler_diagnostic_names = 0;
     n_get_sampler_diagnostics = 0;
   }
-  
+
   stan::mcmc::sample
   transition(stan::mcmc::sample& init_sample,
-             stan::callbacks::writer& info_writer,
-             stan::callbacks::writer& error_writer) {
+             stan::callbacks::logger& logger) {
     ++n_transition;
     stan::mcmc::sample result(init_sample);
     return result;
@@ -78,8 +78,8 @@ public:
   std::vector<double> cont_vector;
   boost::ecuyer1988 rng;
   stan::test::unit::instrumented_interrupt interrupt;
-  stan::test::unit::instrumented_writer message_writer, error_writer,
-    sample_writer, diagnostic_writer;
+  stan::test::unit::instrumented_writer sample_writer, diagnostic_writer;
+  stan::test::unit::instrumented_logger logger;
   mock_sampler sampler;
   int num_warmup, num_samples, num_thin, refresh;
   bool save_warmup;
@@ -92,17 +92,13 @@ TEST_F(ServicesUtil, all_zero) {
                                     num_thin, refresh, save_warmup,
                                     rng,
                                     interrupt,
-                                    message_writer, error_writer,
+                                    logger,
                                     sample_writer, diagnostic_writer);
   EXPECT_EQ(0, interrupt.call_count());
 
-  EXPECT_EQ(3, message_writer.call_count("string"))
-    << "Writes the elapsed time";
-  EXPECT_EQ(message_writer.call_count("string") + message_writer.call_count("empty"),
-            message_writer.call_count())
-    << "No other calls to message_writer";
-  
-  EXPECT_EQ(0, error_writer.call_count());
+  EXPECT_EQ(3 + 2, logger.call_count()) << "Writes the elapsed time";
+  EXPECT_EQ(logger.call_count(), logger.call_count_info())
+    << "No other calls to logger";
 
   EXPECT_EQ(6, sample_writer.call_count());
   EXPECT_EQ(1, sample_writer.call_count("vector_string"))
@@ -111,7 +107,7 @@ TEST_F(ServicesUtil, all_zero) {
     << "elapsed time";
   EXPECT_EQ(2, sample_writer.call_count("empty"))
     << "blank lines";
-  
+
   EXPECT_EQ(6, diagnostic_writer.call_count());
   EXPECT_EQ(1, diagnostic_writer.call_count("vector_string"))
     << "header line";
@@ -129,17 +125,13 @@ TEST_F(ServicesUtil, num_warmup_no_save) {
                                     num_thin, refresh, save_warmup,
                                     rng,
                                     interrupt,
-                                    message_writer, error_writer,
+                                    logger,
                                     sample_writer, diagnostic_writer);
   EXPECT_EQ(num_warmup, interrupt.call_count());
 
-  EXPECT_EQ(3, message_writer.call_count("string"))
-    << "Writes the elapsed time";
-  EXPECT_EQ(message_writer.call_count("string") + message_writer.call_count("empty"),
-            message_writer.call_count())
-    << "No other calls to message_writer";
-  
-  EXPECT_EQ(0, error_writer.call_count());
+  EXPECT_EQ(3 + 2, logger.call_count()) << "Writes the elapsed time";
+  EXPECT_EQ(logger.call_count(), logger.call_count_info())
+    << "No other calls to logger";
 
   EXPECT_EQ(6, sample_writer.call_count());
   EXPECT_EQ(1, sample_writer.call_count("vector_string"))
@@ -148,7 +140,7 @@ TEST_F(ServicesUtil, num_warmup_no_save) {
     << "elapsed time";
   EXPECT_EQ(2, sample_writer.call_count("empty"))
     << "blank lines";
-  
+
   EXPECT_EQ(6, diagnostic_writer.call_count());
   EXPECT_EQ(1, diagnostic_writer.call_count("vector_string"))
     << "header line";
@@ -167,17 +159,13 @@ TEST_F(ServicesUtil, num_warmup_save) {
                                     num_thin, refresh, save_warmup,
                                     rng,
                                     interrupt,
-                                    message_writer, error_writer,
+                                    logger,
                                     sample_writer, diagnostic_writer);
   EXPECT_EQ(num_warmup, interrupt.call_count());
 
-  EXPECT_EQ(3, message_writer.call_count("string"))
-    << "Writes the elapsed time";
-  EXPECT_EQ(message_writer.call_count("string") + message_writer.call_count("empty"),
-            message_writer.call_count())
-    << "No other calls to message_writer";
-  
-  EXPECT_EQ(0, error_writer.call_count());
+  EXPECT_EQ(3 + 2, logger.call_count()) << "Writes the elapsed time";
+  EXPECT_EQ(logger.call_count(), logger.call_count_info())
+    << "No other calls to logger";
 
   EXPECT_EQ(num_warmup + 6, sample_writer.call_count());
   EXPECT_EQ(1, sample_writer.call_count("vector_string"))
@@ -188,7 +176,7 @@ TEST_F(ServicesUtil, num_warmup_save) {
     << "blank lines";
   EXPECT_EQ(num_warmup, sample_writer.call_count("vector_double"))
     << "warmup draws";
-  
+
   EXPECT_EQ(num_warmup + 6, diagnostic_writer.call_count());
   EXPECT_EQ(1, diagnostic_writer.call_count("vector_string"))
     << "header line";
@@ -209,17 +197,13 @@ TEST_F(ServicesUtil, num_samples) {
                                     num_thin, refresh, save_warmup,
                                     rng,
                                     interrupt,
-                                    message_writer, error_writer,
+                                    logger,
                                     sample_writer, diagnostic_writer);
   EXPECT_EQ(num_samples, interrupt.call_count());
 
-  EXPECT_EQ(3, message_writer.call_count("string"))
-    << "Writes the elapsed time";
-  EXPECT_EQ(message_writer.call_count("string") + message_writer.call_count("empty"),
-            message_writer.call_count())
-    << "No other calls to message_writer";
-  
-  EXPECT_EQ(0, error_writer.call_count());
+  EXPECT_EQ(3 + 2, logger.call_count()) << "Writes the elapsed time";
+  EXPECT_EQ(logger.call_count(), logger.call_count_info())
+    << "No other calls to logger";
 
   EXPECT_EQ(num_samples + 6, sample_writer.call_count());
   EXPECT_EQ(1, sample_writer.call_count("vector_string"))
@@ -230,7 +214,7 @@ TEST_F(ServicesUtil, num_samples) {
     << "blank lines";
   EXPECT_EQ(num_samples, sample_writer.call_count("vector_double"))
     << "num_samples draws";
-  
+
   EXPECT_EQ(num_samples + 6, diagnostic_writer.call_count());
   EXPECT_EQ(1, diagnostic_writer.call_count("vector_string"))
     << "header line";
@@ -253,17 +237,13 @@ TEST_F(ServicesUtil, num_warmup_save_num_samples_num_thin) {
                                     num_thin, refresh, save_warmup,
                                     rng,
                                     interrupt,
-                                    message_writer, error_writer,
+                                    logger,
                                     sample_writer, diagnostic_writer);
   EXPECT_EQ(num_warmup + num_samples, interrupt.call_count());
 
-  EXPECT_EQ(3, message_writer.call_count("string"))
-    << "Writes the elapsed time";
-  EXPECT_EQ(message_writer.call_count("string") + message_writer.call_count("empty"),
-            message_writer.call_count())
-    << "No other calls to message_writer";
-  
-  EXPECT_EQ(0, error_writer.call_count());
+  EXPECT_EQ(3 + 2, logger.call_count()) << "Writes the elapsed time";
+  EXPECT_EQ(logger.call_count(), logger.call_count_info())
+    << "No other calls to logger";
 
   EXPECT_EQ((num_warmup + num_samples) / num_thin + 6,
             sample_writer.call_count());
@@ -276,7 +256,7 @@ TEST_F(ServicesUtil, num_warmup_save_num_samples_num_thin) {
   EXPECT_EQ((num_warmup + num_samples) / num_thin,
             sample_writer.call_count("vector_double"))
     << "thinned warmup and draws";
-  
+
   EXPECT_EQ((num_warmup + num_samples) / num_thin + 6,
             diagnostic_writer.call_count());
   EXPECT_EQ(1, diagnostic_writer.call_count("vector_string"))
@@ -302,18 +282,15 @@ TEST_F(ServicesUtil, num_warmup_num_samples_refresh) {
                                     num_thin, refresh, save_warmup,
                                     rng,
                                     interrupt,
-                                    message_writer, error_writer,
+                                    logger,
                                     sample_writer, diagnostic_writer);
   EXPECT_EQ(num_warmup + num_samples, interrupt.call_count());
 
-  EXPECT_EQ((num_warmup + num_samples) / refresh + 2 + 3, message_writer.call_count("string"))
+  EXPECT_EQ((num_warmup + num_samples) / refresh + 2 + 3 + 2, logger.call_count())
     << "Writes 1 to start warmup, 1 to start post-warmup, and "
     << "(num_warmup + num_samples) / refresh, then the elapsed time";
-  EXPECT_EQ(message_writer.call_count("string") + message_writer.call_count("empty"),
-            message_writer.call_count())
-    << "No other calls to message_writer";
-  
-  EXPECT_EQ(0, error_writer.call_count());
+  EXPECT_EQ(logger.call_count(), logger.call_count_info())
+    << "No other calls to logger";
 
   EXPECT_EQ(num_samples + 6,
             sample_writer.call_count());
@@ -326,7 +303,7 @@ TEST_F(ServicesUtil, num_warmup_num_samples_refresh) {
   EXPECT_EQ(num_samples,
             sample_writer.call_count("vector_double"))
     << "draws";
-  
+
   EXPECT_EQ(num_samples + 6,
             diagnostic_writer.call_count());
   EXPECT_EQ(1, diagnostic_writer.call_count("vector_string"))

@@ -233,7 +233,46 @@ namespace stan {
           return fatal_.size();
         }
 
+        unsigned int find_debug(const std::string& msg) {
+          return find_(debug_, msg);
+        }
+
+        unsigned int find_info(const std::string& msg) {
+          return find_(info_, msg);
+        }
+
+        unsigned int find_warn(const std::string& msg) {
+          return find_(warn_, msg);
+        }
+
+        unsigned int find_error(const std::string& msg) {
+          return find_(error_, msg);
+        }
+
+        unsigned int find_fatal(const std::string& msg) {
+          return find_(fatal_, msg);
+        }
+
+        unsigned int find(const std::string& msg) {
+          return find_debug(msg) + find_info(msg) + find_warn(msg)
+            + find_error(msg) + find_fatal(msg);
+        }
+
+        void print_info(std::ostream& o) {
+          for (size_t n = 0; n < info_.size(); ++n)
+            o << info_[n] << std::endl;
+        }
+
       private:
+        unsigned int find_(const std::vector<std::string>& vec, const std::string& msg) {
+          unsigned int count = 0;
+          for (size_t n = 0; n < vec.size(); ++n)
+            if (vec[n].find(msg) != std::string::npos)
+              count++;
+          return count;
+        }
+
+
         std::vector<std::string> debug_;
         std::vector<std::string> info_;
         std::vector<std::string> warn_;
