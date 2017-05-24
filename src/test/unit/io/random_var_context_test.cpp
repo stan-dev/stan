@@ -9,10 +9,9 @@ class random_var_context : public testing::Test {
 public:
   random_var_context()
     : empty_context(),
-      model(empty_context, &model_ss),
+      model(empty_context, (std::stringstream*) 0),
       rng(0) { }
 
-  std::stringstream model_ss;
   stan::io::empty_var_context empty_context;
   stan_model model;
   boost::ecuyer1988 rng;
