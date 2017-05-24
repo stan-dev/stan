@@ -176,6 +176,14 @@ src/test/unit/lang/reject/reject_model_test.cpp: src/test/test-models/good/lang/
 src/test/unit/lang/reject/reject_mult_args_test.cpp: src/test/test-models/good/lang/reject_mult_args.hpp
 src/test/unit/lang/reject/reject_transformed_data_test.cpp: src/test/test-models/good/lang/reject_transformed_data.hpp
 src/test/unit/lang/reject/reject_transformed_parameters_test.cpp: src/test/test-models/good/lang/reject_transformed_parameters.hpp
+src/test/unit/lang/reject/print_reject_function_gq_test.cpp: src/test/test-models/good/lang/print_reject_function_gq.hpp
+src/test/unit/lang/reject/print_reject_function_model_test.cpp: src/test/test-models/good/lang/print_reject_function_model.hpp
+src/test/unit/lang/reject/print_reject_function_tparams_test.cpp: src/test/test-models/good/lang/print_reject_function_tparams.hpp
+src/test/unit/lang/reject/print_reject_function_tdata_test.cpp: src/test/test-models/good/lang/print_reject_function_tdata.hpp
+src/test/unit/lang/reject/print_reject_gq_test.cpp: src/test/test-models/good/lang/print_reject_gq_block.hpp
+src/test/unit/lang/reject/print_reject_model_test.cpp: src/test/test-models/good/lang/print_reject_model_block.hpp
+src/test/unit/lang/reject/print_reject_tparams_test.cpp: src/test/test-models/good/lang/print_reject_tparams_block.hpp
+src/test/unit/lang/reject/print_reject_tdata_test.cpp: src/test/test-models/good/lang/print_reject_tdata_block.hpp
 src/test/unit/mcmc/hmc/hamiltonians/base_hamiltonian_test.cpp: src/test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp
 src/test/unit/mcmc/hmc/hamiltonians/dense_e_metric_test.cpp: src/test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp
 src/test/unit/mcmc/hmc/hamiltonians/diag_e_metric_test.cpp: src/test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp
