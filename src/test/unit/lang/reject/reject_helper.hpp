@@ -54,4 +54,33 @@ void reject_test(const std::string& expected_msg1 = "",
   FAIL() << "model failed to reject" << std::endl;
 }
 
+template <class M, class E>
+void print_reject_test(const std::string& expected_msg1 = "") {
+
+  std::fstream empty_data_stream("");
+  stan::io::dump empty_data_context(empty_data_stream);
+  empty_data_stream.close();
+
+  std::stringstream model_output;
+
+  boost::ecuyer1988 base_rng;
+  base_rng.seed(123456);
+
+  std::stringstream ss;
+  try {
+    M model(empty_data_context, &ss);
+    std::vector<double> cont_vector(model.num_params_r(), 0.0);
+    std::vector<int> disc_vector;
+    double lp = model.template log_prob<false,false>(cont_vector, disc_vector, &ss);
+    (void) lp;
+    std::vector<double> params;
+    model.write_array(base_rng, cont_vector, disc_vector,
+                      params, true, true, &ss);
+  } catch (const E& e) {
+    expect_substring(ss.str(), expected_msg1);
+    return;
+  }
+  FAIL() << "model failed to reject" << std::endl;
+}
+
 #endif 
