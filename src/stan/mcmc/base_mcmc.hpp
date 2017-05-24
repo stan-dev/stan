@@ -2,6 +2,7 @@
 #define STAN_MCMC_BASE_MCMC_HPP
 
 #include <stan/callbacks/logger.hpp>
+#include <stan/callbacks/writer.hpp>
 #include <stan/mcmc/sample.hpp>
 #include <ostream>
 #include <string>
