@@ -97,10 +97,10 @@ namespace stan {
           std::stringstream ss;
           try {
             model.write_array(rng,
-                              const_cast<Eigen::VectorXd&>(sample.cont_params()),
-                              model_values,
-                              true, true,
-                              &ss);
+                        const_cast<Eigen::VectorXd&>(sample.cont_params()),
+                        model_values,
+                        true, true,
+                        &ss);
           } catch (const std::exception& e) {
             if (ss.str().length() > 0)
               message_writer_(ss.str());
