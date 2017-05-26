@@ -87,7 +87,9 @@ namespace stan {
         }
 
         stan::mcmc::adapt_diag_e_nuts<Model, boost::ecuyer1988>
-          sampler(model, rng, inv_mass_matrix);
+          sampler(model, rng);
+
+        sampler.set_metric(inv_mass_matrix);
         sampler.set_nominal_stepsize(stepsize);
         sampler.set_stepsize_jitter(stepsize_jitter);
         sampler.set_max_depth(max_depth);

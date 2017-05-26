@@ -51,6 +51,14 @@ namespace stan {
 
       ~base_nuts() {}
 
+      void set_metric(const Eigen::MatrixXd& inv_e_metric) {
+        this->z_.set_metric(inv_e_metric);
+      }
+
+      void set_metric(const Eigen::VectorXd& inv_e_metric) {
+        this->z_.set_metric(inv_e_metric);
+      }
+
       void set_max_depth(int d) {
         if (d > 0)
           max_depth_ = d;

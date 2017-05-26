@@ -29,18 +29,6 @@ namespace stan {
       }
 
       /**
-       * Construct a dense point in n-dimensional phase space
-       * with specified inverse mass matrix.
-       *
-       * @param n number of dimensions
-       * @param inv_e_metric initial mass matrix
-       */
-      dense_e_point(int n, Eigen::MatrixXd& inv_e_metric)
-        : ps_point(n), inv_e_metric_(n, n) {
-        fast_matrix_copy_<double>(inv_e_metric_, inv_e_metric);
-      }
-
-      /**
        * Copy constructor which does fast copy of inverse mass matrix.
        *
        * @param z point to copy
@@ -49,6 +37,16 @@ namespace stan {
         : ps_point(z), inv_e_metric_(z.inv_e_metric_.rows(),
                                      z.inv_e_metric_.cols()) {
         fast_matrix_copy_<double>(inv_e_metric_, z.inv_e_metric_);
+      }
+
+      /**
+       * Set elements of mass matrix
+       *
+       * @param inv_e_metric initial mass matrix
+       */
+      void
+      set_metric(const Eigen::MatrixXd& inv_e_metric) {
+        inv_e_metric_ = inv_e_metric;
       }
 
       /**

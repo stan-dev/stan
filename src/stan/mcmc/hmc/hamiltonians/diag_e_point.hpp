@@ -29,18 +29,6 @@ namespace stan {
       }
 
       /**
-       * Construct a diag point in n-dimensional phase space
-       * with specified vector of diagonal elements of inverse mass matrix.
-       *
-       * @param n number of dimensions
-       * @param inv_e_metric diagonal elements of initial mass matrix
-       */
-      diag_e_point(int n, Eigen::VectorXd& inv_e_metric)
-        : ps_point(n), inv_e_metric_(n) {
-        fast_vector_copy_<double>(inv_e_metric_, inv_e_metric);
-      }
-
-      /**
        * Copy constructor which does fast copy of inverse mass matrix.
        *
        * @param z point to copy
@@ -48,6 +36,16 @@ namespace stan {
       diag_e_point(const diag_e_point& z): ps_point(z),
                    inv_e_metric_(z.inv_e_metric_.size()) {
         fast_vector_copy_<double>(inv_e_metric_, z.inv_e_metric_);
+      }
+
+      /**
+       * Set elements of mass matrix
+       *
+       * @param inv_e_metric initial mass matrix
+       */
+      void
+      set_metric(const Eigen::VectorXd& inv_e_metric) {
+        inv_e_metric_ = inv_e_metric;
       }
 
       /**

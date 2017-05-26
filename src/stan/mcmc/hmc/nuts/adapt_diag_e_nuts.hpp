@@ -20,15 +20,6 @@ namespace stan {
         : diag_e_nuts<Model, BaseRNG>(model, rng),
         stepsize_var_adapter(model.num_params_r()) {}
 
-      /** 
-       * specialized constructor for specified diag mass matrix
-       */
-      adapt_diag_e_nuts(const Model& model, BaseRNG& rng,
-                   Eigen::VectorXd& inv_e_metric)
-        : diag_e_nuts<Model, BaseRNG>(model, rng, inv_e_metric),
-        stepsize_var_adapter(model.num_params_r()) {}
-
-
       ~adapt_diag_e_nuts() {}
 
       sample

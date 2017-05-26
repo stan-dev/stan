@@ -19,14 +19,6 @@ namespace stan {
       diag_e_nuts(const Model& model, BaseRNG& rng)
         : base_nuts<Model, diag_e_metric, expl_leapfrog,
                     BaseRNG>(model, rng) { }
-
-      /** 
-       * specialized constructor for specified diag mass matrix
-       */
-      diag_e_nuts(const Model& model, BaseRNG& rng,
-                   Eigen::VectorXd& inv_e_metric)
-        : base_nuts<Model, diag_e_metric, expl_leapfrog,
-                    BaseRNG>(model, rng, inv_e_metric) { }
     };
 
   }  // mcmc

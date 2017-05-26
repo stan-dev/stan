@@ -89,7 +89,9 @@ namespace stan {
         }
 
         stan::mcmc::adapt_dense_e_static_hmc<Model, boost::ecuyer1988>
-          sampler(model, rng, inv_mass_matrix);
+          sampler(model, rng);
+
+        sampler.set_metric(inv_mass_matrix);
         sampler.set_nominal_stepsize_and_T(stepsize, int_time);
         sampler.set_stepsize_jitter(stepsize_jitter);
 
