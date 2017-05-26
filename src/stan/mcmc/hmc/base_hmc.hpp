@@ -34,36 +34,6 @@ namespace stan {
           epsilon_jitter_(0.0) {}
 
       /** 
-       * specialized constructor for specified diag mass matrix
-       */
-      base_hmc(const Model &model, BaseRNG& rng,
-               Eigen::VectorXd& inv_e_metric)
-        : base_mcmc(),
-          z_(model.num_params_r(), inv_e_metric),
-          integrator_(),
-          hamiltonian_(model),
-          rand_int_(rng),
-          rand_uniform_(rand_int_),
-          nom_epsilon_(0.1),
-          epsilon_(nom_epsilon_),
-          epsilon_jitter_(0.0) {}
-
-      /** 
-       * specialized constructor for specified dense mass matrix
-       */
-      base_hmc(const Model &model, BaseRNG& rng,
-               Eigen::MatrixXd& inv_e_metric)
-        : base_mcmc(),
-          z_(model.num_params_r(), inv_e_metric),
-          integrator_(),
-          hamiltonian_(model),
-          rand_int_(rng),
-          rand_uniform_(rand_int_),
-          nom_epsilon_(0.1),
-          epsilon_(nom_epsilon_),
-          epsilon_jitter_(0.0) {}
-
-      /** 
        * format and write stepsize
        */
       void
