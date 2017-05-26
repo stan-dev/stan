@@ -25,7 +25,7 @@ namespace stan {
        * @tparam Model Model class
        * @param[in] model Input model to test (with data already instantiated)
        * @param[in] init var context for initialization
-       * @param[in] init_mass_matrix var context for mass matrix
+       * @param[in] init_metric diagonals of mass matrix
        * @param[in] random_seed random seed for the random number generator
        * @param[in] chain chain id to advance the pseudo random number generator
        * @param[in] init_radius radius to initialize
@@ -47,7 +47,7 @@ namespace stan {
        */
       template <class Model>
       int hmc_nuts_diag_e(Model& model, stan::io::var_context& init,
-                          stan::io::var_context& init_mass_matrix,
+                          stan::io::var_context& init_metric,
                           unsigned int random_seed, unsigned int chain,
                           double init_radius, int num_warmup,
                           int num_samples, int num_thin, bool save_warmup,
@@ -68,7 +68,7 @@ namespace stan {
         Eigen::VectorXd inv_mass_matrix;
         try {
           inv_mass_matrix =
-            util::read_diag_mass_matrix(init_mass_matrix, model.num_params_r(),
+            util::read_diag_mass_matrix(init_metric, model.num_params_r(),
                                          error_writer);
           util::validate_diag_mass_matrix(inv_mass_matrix, error_writer);
         } catch (const std::domain_error& e) {
