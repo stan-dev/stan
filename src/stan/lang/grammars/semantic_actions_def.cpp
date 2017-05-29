@@ -972,6 +972,19 @@ namespace stan {
     }
     boost::phoenix::function<validate_assignment> validate_assignment_f;
 
+    void validate_compound_assignment::operator()(compound_assignment& a,
+                                         const scope& var_scope,
+                                         const std::string& op,
+                                         const std::string& fun_name,
+                                         bool& pass, variable_map& vm,
+                                         std::ostream& error_msgs) const {
+      std::cout << "compound assignment, op: " << op << " fun_name: " << fun_name <<  std::endl;
+    }
+    boost::phoenix::function<validate_compound_assignment> validate_compound_assignment_f;
+
+
+
+
     bool is_defined(const std::string& function_name,
                     const std::vector<expr_type>& arg_types) {
       expr_type ret_type(DOUBLE_T, 0);

@@ -38,6 +38,11 @@ namespace stan {
       assignment_r;
 
       boost::spirit::qi::rule<Iterator,
+                              compound_assignment(scope),
+                              whitespace_grammar<Iterator> >
+      compound_assignment_r;
+
+      boost::spirit::qi::rule<Iterator,
                               assgn(scope),
                               whitespace_grammar<Iterator> >
       assgn_r;

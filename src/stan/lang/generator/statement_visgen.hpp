@@ -158,6 +158,10 @@ namespace stan {
 
       void operator()(const nil& /*x*/) const { }
 
+      void operator()(const compound_assignment& x) const {
+        o_ << "compound assignment" << EOL;
+      }
+
       void operator()(const assignment& x) const {
         generate_indent(indent_, o_);
         o_ << "stan::math::assign(";

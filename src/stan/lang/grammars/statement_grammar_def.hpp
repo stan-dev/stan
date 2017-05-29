@@ -24,6 +24,11 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::assignment,
                           (stan::lang::variable_dims, var_dims_)
                           (stan::lang::expression, expr_) )
 
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::compound_assignment,
+                          (stan::lang::variable_dims, var_dims_)
+                          (std::string, op_)
+                          (stan::lang::expression, expr_) )
+
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::variable_dims,
                           (std::string, name_)
                           (std::vector<stan::lang::expression>, dims_) )
@@ -116,7 +121,8 @@ namespace stan {
         | reject_statement_r(_r1)                   // key "reject"
         | return_statement_r(_r1)                   // key "return"
         | void_return_statement_r(_r1)              // key "return"
-        | assignment_r(_r1)                         // lvalue "<-"
+        | assignment_r(_r1)                         // lvalue "=" or "<-"
+        | compound_assignment_r(_r1)                // lvalue "+=" or "-="
         | assgn_r(_r1)                              // var[idxs] <- expr
         | sample_r(_r1)                             // expression "~"
         | expression_g(_r1)                         // expression
@@ -261,6 +267,19 @@ namespace stan {
         >> assignment_operator_r
         >> (eps > expression_rhs_r(_r1))
            [validate_assgn_f(_val, _pass, boost::phoenix::ref(error_msgs_))]
+        > lit(';');
+
+
+      // _r1 = var scope
+      // this one comes before compound_assgn_r to deal with simple assignment
+      compound_assignment_r.name("variable compound op-equals by expression");
+      compound_assignment_r
+        %= var_lhs_r(_r1)
+        >> string("+=")
+        >> expression_rhs_r(_r1)
+        [validate_compound_assignment_f(_val, _r1, "+", "plus_equals", _pass,
+                                        boost::phoenix::ref(var_map_),
+                                        boost::phoenix::ref(error_msgs_))]
         > lit(';');
 
       assignment_operator_r.name("assignment operator");

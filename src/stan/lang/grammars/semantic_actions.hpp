@@ -429,6 +429,17 @@ namespace stan {
     extern boost::phoenix::function<validate_assignment> validate_assignment_f;
 
     // called from: statement_grammar
+    struct validate_compound_assignment : public phoenix_functor_septenary {
+      void operator()(compound_assignment& a, const scope& var_scope,
+                      const std::string& op,
+                      const std::string& fun_name,
+                      bool& pass, variable_map& vm, std::ostream& error_msgs)
+        const;
+    };
+    extern boost::phoenix::function<validate_compound_assignment>
+    validate_compound_assignment_f;
+
+    // called from: statement_grammar
     struct validate_sample : public phoenix_functor_quaternary {
       void operator()(sample& s, const variable_map& var_map,
                       bool& pass, std::ostream& error_msgs) const;
