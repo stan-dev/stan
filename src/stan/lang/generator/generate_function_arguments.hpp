@@ -59,7 +59,13 @@ namespace stan {
       }
       if (is_rng || is_lp || fun.arg_decls_.size() > 0)
         o << ", ";
-      o << "std::ostream* pstream__ = 0";
+      o << "std::ostream* pstream__";
+
+      // Generate a default pstream value, but only if this is not a forward
+      // declaration
+      if (!fun.body_.is_no_op_statement()) {
+        o << " = 0";
+      }
       o << ")";
     }
 
