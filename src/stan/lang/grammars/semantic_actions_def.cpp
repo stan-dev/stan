@@ -4,6 +4,7 @@
 #include <stan/lang/ast.hpp>
 #include <stan/lang/grammars/iterator_typedefs.hpp>
 #include <stan/lang/grammars/semantic_actions.hpp>
+#include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/variant/apply_visitor.hpp>
@@ -1031,6 +1032,8 @@ namespace stan {
         pass = false;
         return;
       }
+      // remove "=" from op
+      ca.op_ = boost::algorithm::erase_last_copy(ca.op_,"=");
       pass = true;
     }
     boost::phoenix::function<validate_compound_assignment>

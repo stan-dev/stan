@@ -155,21 +155,27 @@ namespace stan {
         o_ << ");" << std::endl;
       }
 
-
       void operator()(const nil& /*x*/) const { }
 
       void operator()(const compound_assignment& x) const {
-        // if rhs is var, lhs must also be var
         generate_indent(indent_, o_);
+        o_ << "stan::math::assign(";
         generate_indexed_expr<true>(x.var_dims_.name_,
                                     x.var_dims_.dims_,
                                     x.var_type_.base_type_,
                                     x.var_type_.dims_.size(),
                                     false,
                                     o_);
-        o_ << " += " ;
+        o_ << ", (";
+        generate_indexed_expr<true>(x.var_dims_.name_,
+                                    x.var_dims_.dims_,
+                                    x.var_type_.base_type_,
+                                    x.var_type_.dims_.size(),
+                                    false,
+                                    o_);
+        o_ << " " << x.op_ << " ";
         generate_expression(x.expr_, false, is_var_context_, o_);
-        o_  << EOL;
+        o_ << "));" << EOL;
       }
 
       void operator()(const assignment& x) const {
