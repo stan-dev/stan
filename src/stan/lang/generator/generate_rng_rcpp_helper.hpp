@@ -1,8 +1,8 @@
 #ifndef STAN_LANG_GENERATOR_GENERATE_RNG_RCPP_HELPER_HPP
 #define STAN_LANG_GENERATOR_GENERATE_RNG_RCPP_HELPER_HPP
 
-#include <ostream>
 #include <stan/lang/generator/constants.hpp>
+#include <ostream>
 
 namespace stan {
   namespace lang {
@@ -16,7 +16,7 @@ namespace stan {
      */
     void generate_rng_rcpp_helper(std::ostream& o) {
       o << "// [[Rcpp::export]]" << EOL;
-      o << "boost::ecuyer1988 __create_rng(int seed) {" << EOL; 
+      o << "boost::ecuyer1988 __create_rng(int seed) {" << EOL;
       o << "\treturn(boost::ecuyer1988(seed));" << EOL;
       o << "}" << EOL << EOL;
     }

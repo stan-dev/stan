@@ -46,7 +46,7 @@ namespace stan {
 
       generate_usings_standalone_functions(o);
 
-      generate_rng_rcpp_helper(o);      
+      generate_rng_rcpp_helper(o);
 
       generate_typedefs(o);
       generate_functions(prog.function_decl_defs_, o, true /*rcpp_export*/);
