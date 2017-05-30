@@ -48,6 +48,8 @@ namespace stan {
       std::string scalar_t_name = "double";
       std::string rng_class = "boost::ecuyer1988";
 
+      out << "// [[Rcpp::export]]" << EOL;
+
       generate_function_inline_return_type(fun, scalar_t_name, 0, out);
       generate_function_instantiation_name(fun, out);
       generate_function_arguments(

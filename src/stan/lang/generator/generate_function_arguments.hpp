@@ -59,7 +59,7 @@ namespace stan {
       }
       if (is_rng || is_lp || fun.arg_decls_.size() > 0)
         o << ", ";
-      o << "std::ostream* pstream__";
+      o << "std::ostream* pstream__ = 0";
       o << ")";
     }
 
