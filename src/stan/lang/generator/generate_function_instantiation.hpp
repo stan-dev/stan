@@ -53,7 +53,8 @@ namespace stan {
       generate_function_inline_return_type(fun, scalar_t_name, 0, out);
       generate_function_instantiation_name(fun, out);
       generate_function_arguments(
-        fun, is_rng, is_lp, is_pf, out, true /*no templates*/, rng_class);
+        fun, is_rng, is_lp, is_pf, out, true /*no templates*/, rng_class,
+        true /*parameter_defaults*/);
 
       generate_function_instantiation_body(
         fun, is_rng, is_lp, is_pf, rng_class, out);

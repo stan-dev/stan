@@ -55,7 +55,7 @@ void test_pg_count(const std::string& program_name,
 
 TEST(unitLang, simpleTest) {
   test_pg("user-function-struct-const", 
-          "operator()(const T0__& x, std::ostream* pstream__ = 0) const {");
+          "operator()(const T0__& x, std::ostream* pstream__) const {");
 }     
              
 TEST(unitLang, odeTest) {

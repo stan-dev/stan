@@ -26,11 +26,14 @@ namespace stan {
      * @param[in] double_only do not do any templating and make all arguments
      * based on the standard double type
      * @param[in] rng_type set a type of the rng argument in _rng functions
+     * @param[in] parameter_defaults if true, default values for the standard
+     * parameters (now only pstream__) will be generated
      */
     void generate_function_arguments(const function_decl_def& fun, bool is_rng,
                                      bool is_lp, bool is_log, std::ostream& o,
                                      bool double_only = false,
-                                     std::string rng_type = "RNG") {
+                                     std::string rng_type = "RNG",
+                                     bool parameter_defaults = false) {
       o << "(";
       for (size_t i = 0; i < fun.arg_decls_.size(); ++i) {
         std::string template_type_i;
@@ -59,13 +62,12 @@ namespace stan {
       }
       if (is_rng || is_lp || fun.arg_decls_.size() > 0)
         o << ", ";
-      o << "std::ostream* pstream__";
 
-      // Generate a default pstream value, but only if this is not a forward
-      // declaration
-      if (!fun.body_.is_no_op_statement()) {
+      o << "std::ostream* pstream__";
+      if (parameter_defaults) {
         o << " = 0";
       }
+
       o << ")";
     }
 
