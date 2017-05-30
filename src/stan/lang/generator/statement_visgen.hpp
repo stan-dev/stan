@@ -159,7 +159,17 @@ namespace stan {
       void operator()(const nil& /*x*/) const { }
 
       void operator()(const compound_assignment& x) const {
-        o_ << "compound assignment" << EOL;
+        // if rhs is var, lhs must also be var
+        generate_indent(indent_, o_);
+        generate_indexed_expr<true>(x.var_dims_.name_,
+                                    x.var_dims_.dims_,
+                                    x.var_type_.base_type_,
+                                    x.var_type_.dims_.size(),
+                                    false,
+                                    o_);
+        o_ << " += " ;
+        generate_expression(x.expr_, false, is_var_context_, o_);
+        o_  << EOL;
       }
 
       void operator()(const assignment& x) const {

@@ -110,6 +110,125 @@ namespace stan {
       return true;
     }
 
+    void set_fun_type(fun& fun, std::ostream& error_msgs) {
+      std::vector<expr_type> arg_types;
+      for (size_t i = 0; i < fun.args_.size(); ++i)
+        arg_types.push_back(fun.args_[i].expression_type());
+      fun.type_ = function_signatures::instance()
+        .get_result_type(fun.name_, arg_types, error_msgs);
+    }
+
+    int num_dimss(std::vector<std::vector<stan::lang::expression> >& dimss) {
+      int sum = 0;
+      for (size_t i = 0; i < dimss.size(); ++i)
+        sum += dimss[i].size();
+      return sum;
+    }
+
+    bool is_defined(const std::string& function_name,
+                    const std::vector<expr_type>& arg_types) {
+      expr_type ret_type(DOUBLE_T, 0);
+      function_signature_t sig(ret_type, arg_types);
+      return function_signatures::instance().is_defined(function_name, sig);
+    }
+
+    bool is_double_return(const std::string& function_name,
+                          const std::vector<expr_type>& arg_types,
+                          std::ostream& error_msgs) {
+      return function_signatures::instance()
+        .get_result_type(function_name, arg_types, error_msgs, true)
+        .is_primitive_double();
+    }
+
+    bool is_univariate(const expr_type& et) {
+      return et.num_dims_ == 0
+        && (et.base_type_ == INT_T
+            || et.base_type_ == DOUBLE_T);
+    }
+
+    bool is_valid_assignment(const base_var_decl& lhs_var_type,
+                             const variable_dims& lhs_var_dims,
+                             const expression& rhs_expr,
+                             const std::string& name,
+                             const std::string& stmt_type,
+                             const scope& var_scope,
+                             variable_map& vm,
+                             std::ostream& error_msgs) {
+      // validate scope matches declaration scope
+      scope lhs_origin = vm.get_scope(name);
+      if (lhs_origin.program_block() != var_scope.program_block()) {
+        error_msgs << "Cannot assign to variable outside of block where declared"
+                   << "; left-hand-side variable origin=";
+        print_scope(error_msgs, lhs_origin);
+        error_msgs << std::endl;
+        return false;
+      }
+
+      // enforce constancy of function args
+      if (!lhs_origin.is_local() && lhs_origin.fun()) {
+        error_msgs << "Cannot assign to function argument variables."
+                   << std::endl
+                   << "Use local variables instead."
+                   << std::endl;
+        return false;
+      }
+
+      // validatate dimensions match
+      size_t var_num_dims = lhs_var_type.dims_.size();
+      size_t num_index_dims = lhs_var_dims.dims_.size();
+      expr_type inferred_lhs_type = infer_type_indexing(lhs_var_type.base_type_,
+                                                        var_num_dims,
+                                                        num_index_dims);
+      if (inferred_lhs_type.is_ill_formed()) {
+        error_msgs << "Too many indexes for variable"
+                   << "; variable name = " << name
+                   << "; num dimensions given = " << lhs_var_dims.dims_.size()
+                   << "; variable array dimensions = " << lhs_var_type.dims_.size()
+                   << std::endl;
+        return false;
+      }
+      if (inferred_lhs_type.num_dims_ != rhs_expr.expression_type().num_dims_) {
+        error_msgs << "Dimension mismatch in "
+                   << stmt_type
+                   << "; variable name = "
+                   << name
+                   << ", num dimensions given = "
+                   << inferred_lhs_type.num_dims_
+                   << "; right-hand side dimensions = "
+                   << rhs_expr.expression_type().num_dims_
+                   << std::endl;
+        return false;
+      }
+
+      // validate assignment type compatibility
+      // allow int -> double promotion
+      base_expr_type lhs_type = inferred_lhs_type.base_type_;
+      base_expr_type rhs_type = rhs_expr.expression_type().base_type_;
+      bool types_compatible =
+        (lhs_type == rhs_type
+         || (lhs_type == DOUBLE_T && rhs_type == INT_T));
+      if (!types_compatible) {
+        error_msgs << "Base type mismatch in "
+                   << stmt_type
+                   << "; variable name = "
+                   << name
+                   << ", type = ";
+        write_base_expr_type(error_msgs, lhs_type);
+        error_msgs << "; right-hand side type=";
+        write_base_expr_type(error_msgs, rhs_type);
+        error_msgs << std::endl;
+        return false;
+      }
+
+      return true;
+    }    
+      
+
+
+    // //////////////////////////////////
+    // *** functors for grammar rules ***
+    // //////////////////////////////////
+
     void validate_double_expr::operator()(const expression& expr,
                               bool& pass,
                               std::stringstream& error_msgs)
@@ -125,20 +244,6 @@ namespace stan {
     }
     boost::phoenix::function<validate_double_expr> validate_double_expr_f;
 
-    void set_fun_type(fun& fun, std::ostream& error_msgs) {
-      std::vector<expr_type> arg_types;
-      for (size_t i = 0; i < fun.args_.size(); ++i)
-        arg_types.push_back(fun.args_[i].expression_type());
-      fun.type_ = function_signatures::instance()
-        .get_result_type(fun.name_, arg_types, error_msgs);
-    }
-
-    int num_dimss(std::vector<std::vector<stan::lang::expression> >& dimss) {
-      int sum = 0;
-      for (size_t i = 0; i < dimss.size(); ++i)
-        sum += dimss[i].size();
-      return sum;
-    }
 
     template <typename L, typename R>
     void assign_lhs::operator()(L& lhs, const R& rhs) const {
@@ -887,125 +992,50 @@ namespace stan {
       // validate existence
       std::string name = a.var_dims_.name_;
       if (!vm.exists(name)) {
-        error_msgs << "unknown variable in assignment"
-                   << "; lhs variable=" << a.var_dims_.name_
-                   << std::endl;
-
-        pass = false;
-        return;
-      }
-
-      // validate scope matches declaration scope
-      scope lhs_origin = vm.get_scope(name);
-      if (lhs_origin.program_block() != var_scope.program_block()) {
-        error_msgs << "attempt to assign variable in wrong block."
-                   << " left-hand-side variable origin=";
-        print_scope(error_msgs, lhs_origin);
-        error_msgs << std::endl;
-        pass = false;
-        return;
-      }
-
-      // enforce constancy of function args
-      if (!lhs_origin.is_local()
-          && lhs_origin.fun()) {
-        error_msgs << "Illegal to assign to function argument variables."
-                   << std::endl
-                   << "Use local variables instead."
+        error_msgs << "Unknown variable in assignment"
+                   << "; lhs variable=" << name
                    << std::endl;
         pass = false;
         return;
       }
-
-      // validate types
+      // validate compatible dims, type
       a.var_type_ = vm.get(name);
-      size_t lhs_var_num_dims = a.var_type_.dims_.size();
-      size_t num_index_dims = a.var_dims_.dims_.size();
-
-      expr_type lhs_type = infer_type_indexing(a.var_type_.base_type_,
-                                               lhs_var_num_dims,
-                                               num_index_dims);
-
-      if (lhs_type.is_ill_formed()) {
-        error_msgs << "too many indexes for variable "
-                   << "; variable name = " << name
-                   << "; num dimensions given = " << num_index_dims
-                   << "; variable array dimensions = " << lhs_var_num_dims
-                   << std::endl;
+      if (!is_valid_assignment(a.var_type_, a.var_dims_, a.expr_, name,
+                               "assignment",
+                               var_scope, vm, error_msgs)) {
         pass = false;
         return;
       }
-
-      base_expr_type lhs_base_type = lhs_type.base_type_;
-      base_expr_type rhs_base_type = a.expr_.expression_type().base_type_;
-      // allow int -> double promotion
-      bool types_compatible
-        = lhs_base_type == rhs_base_type
-        || (lhs_base_type == DOUBLE_T && rhs_base_type == INT_T);
-      if (!types_compatible) {
-        error_msgs << "base type mismatch in assignment"
-                   << "; variable name = "
-                   << a.var_dims_.name_
-                   << ", type = ";
-        write_base_expr_type(error_msgs, lhs_base_type);
-        error_msgs << "; right-hand side type=";
-        write_base_expr_type(error_msgs, rhs_base_type);
-        error_msgs << std::endl;
-        pass = false;
-        return;
-      }
-
-      if (lhs_type.num_dims_ != a.expr_.expression_type().num_dims_) {
-        error_msgs << "dimension mismatch in assignment"
-                   << "; variable name = "
-                   << a.var_dims_.name_
-                   << ", num dimensions given = "
-                   << lhs_type.num_dims_
-                   << "; right-hand side dimensions = "
-                   << a.expr_.expression_type().num_dims_
-                   << std::endl;
-        pass = false;
-        return;
-      }
-
       pass = true;
     }
     boost::phoenix::function<validate_assignment> validate_assignment_f;
 
-    void validate_compound_assignment::operator()(compound_assignment& a,
+    void validate_compound_assignment::operator()(compound_assignment& ca,
                                          const scope& var_scope,
-                                         const std::string& op,
-                                         const std::string& fun_name,
                                          bool& pass, variable_map& vm,
                                          std::ostream& error_msgs) const {
-      std::cout << "compound assignment, op: " << op << " fun_name: " << fun_name <<  std::endl;
+      // validate existence
+      std::string name = ca.var_dims_.name_;
+      if (!vm.exists(name)) {
+        error_msgs << "Unknown variable in compound assignment"
+                   << "; lhs variable=" << name
+                   << std::endl;
+        pass = false;
+        return;
+      }
+      // validate compatible dims, type
+      ca.var_type_ = vm.get(name);
+      if (!is_valid_assignment(ca.var_type_, ca.var_dims_, ca.expr_, name,
+                               "compound assignment",
+                               var_scope, vm, error_msgs)) {
+        pass = false;
+        return;
+      }
+      pass = true;
     }
-    boost::phoenix::function<validate_compound_assignment> validate_compound_assignment_f;
-
-
-
-
-    bool is_defined(const std::string& function_name,
-                    const std::vector<expr_type>& arg_types) {
-      expr_type ret_type(DOUBLE_T, 0);
-      function_signature_t sig(ret_type, arg_types);
-      return function_signatures::instance().is_defined(function_name, sig);
-    }
-
-    bool is_double_return(const std::string& function_name,
-                          const std::vector<expr_type>& arg_types,
-                          std::ostream& error_msgs) {
-      return function_signatures::instance()
-        .get_result_type(function_name, arg_types, error_msgs, true)
-        .is_primitive_double();
-    }
-
-    bool is_univariate(const expr_type& et) {
-      return et.num_dims_ == 0
-        && (et.base_type_ == INT_T
-            || et.base_type_ == DOUBLE_T);
-    }
-
+    boost::phoenix::function<validate_compound_assignment>
+    validate_compound_assignment_f;
+    
     void validate_sample::operator()(sample& s,
                                      const variable_map& var_map, bool& pass,
                                      std::ostream& error_msgs) const {
