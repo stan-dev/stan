@@ -5,8 +5,8 @@
 #include <stan/io/chained_var_context.hpp>
 #include <stan/io/random_var_context.hpp>
 #include <stan/callbacks/interrupt.hpp>
+#include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
-#include <stan/callbacks/tee_writer.hpp>
 #include <stan/model/test_gradients.hpp>
 #include <stan/services/util/create_rng.hpp>
 #include <stan/services/util/initialize.hpp>
@@ -33,7 +33,7 @@ namespace stan {
        * @param[in] epsilon epsilon to use for finite differences
        * @param[in] error amount of absolute error to allow
        * @param[in,out] interrupt interrupt callback
-       * @param[in,out] message_writer Writer callback for display output
+       * @param[in,out] logger Logger for messages
        * @param[in,out] init_writer Writer callback for unconstrained inits
        * @param[in,out] parameter_writer Writer callback for file output
        * @return the number of parameters that are not within epsilon
@@ -44,7 +44,7 @@ namespace stan {
                    unsigned int random_seed, unsigned int chain,
                    double init_radius, double epsilon, double error,
                    callbacks::interrupt& interrupt,
-                   callbacks::writer& message_writer,
+                   callbacks::logger& logger,
                    callbacks::writer& init_writer,
                    callbacks::writer& parameter_writer) {
         boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
@@ -53,16 +53,14 @@ namespace stan {
         std::vector<double> cont_vector
           = util::initialize(model, init, rng, init_radius,
                              false,
-                             message_writer, init_writer);
+                             logger, init_writer);
 
-        message_writer("TEST GRADIENT MODE");
-
-        stan::callbacks::tee_writer writer(message_writer, parameter_writer);
+        logger.info("TEST GRADIENT MODE");
 
         int num_failed
           = stan::model::test_gradients<true, true>(model, cont_vector,
                                                     disc_vector, epsilon, error,
-                                                    interrupt, writer);
+                                                    interrupt, logger, parameter_writer);
 
         return num_failed;
       }
