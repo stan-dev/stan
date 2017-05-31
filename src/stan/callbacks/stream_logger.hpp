@@ -21,6 +21,7 @@ namespace stan {
       std::ostream& warn_;
       std::ostream& error_;
       std::ostream& fatal_;
+
     public:
       /**
        * Constructs a <code>stream_logger</code> with an output

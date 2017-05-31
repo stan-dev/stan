@@ -40,7 +40,8 @@ namespace stan {
         }
 
         if (init_buffer + base_window + term_buffer > num_warmup) {
-          logger.info("WARNING: There aren't enough warmup iterations to fit the");
+          logger.info("WARNING: There aren't enough warmup "
+                      "iterations to fit the");
           logger.info("         three stages of adaptation as currently"
                  + std::string(" configured."));
 
@@ -50,7 +51,8 @@ namespace stan {
           adapt_base_window_
             = num_warmup - (adapt_init_buffer_ + adapt_term_buffer_);
 
-          logger.info("         Reducing each adaptation stage to 15%/75%/10% of");
+          logger.info("         Reducing each adaptation stage to "
+                      "15%/75%/10% of");
           logger.info("         the given number of warmup iterations:");
 
           std::stringstream init_buffer_msg;

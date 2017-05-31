@@ -92,8 +92,8 @@ namespace stan {
                      "is about to be rejected because of the following issue:");
         logger.error(e.what());
         logger.error("If this warning occurs sporadically, such as for highly "
-                     "constrained variable types like covariance matrices, then "
-                     "the sampler is fine,");
+                     "constrained variable types like covariance matrices, "
+                     "then the sampler is fine,");
         logger.error("but if this warning occurs often then your model may be "
                      "either severely ill-conditioned or misspecified.");
         logger.error("");

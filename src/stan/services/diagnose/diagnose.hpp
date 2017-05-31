@@ -60,7 +60,8 @@ namespace stan {
         int num_failed
           = stan::model::test_gradients<true, true>(model, cont_vector,
                                                     disc_vector, epsilon, error,
-                                                    interrupt, logger, parameter_writer);
+                                                    interrupt, logger,
+                                                    parameter_writer);
 
         return num_failed;
       }
