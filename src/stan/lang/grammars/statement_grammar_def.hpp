@@ -266,7 +266,9 @@ namespace stan {
         >> (string("+=")
             | string("-=")
             | string("*=")
-            | string("/="))
+            | string("/=")
+            | string(".*=")
+            | string("./="))
         >> expression_rhs_r(_r1)
         [validate_compound_assignment_f(_val, _r1, _pass,
                                         boost::phoenix::ref(var_map_),

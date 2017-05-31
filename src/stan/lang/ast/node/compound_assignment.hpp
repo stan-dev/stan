@@ -41,6 +41,11 @@ namespace stan {
       expression expr_;
 
       /**
+       * Function signature of operation, is nil when lhs and rhs are scalars.
+       */
+      expression fun_sig_;
+
+      /**
        * Construct an empty compound assignment.
        */
       compound_assignment();
