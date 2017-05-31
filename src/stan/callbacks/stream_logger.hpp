@@ -27,7 +27,11 @@ namespace stan {
        * Constructs a <code>stream_logger</code> with an output
        * stream for each log level.
        *
-       * @param[in] debug stream to output debug messages
+       * @param[in,out] debug stream to output debug messages
+       * @param[in,out] info stream to output info messages
+       * @param[in,out] warn stream to output warn messages
+       * @param[in,out] error stream to output error messages
+       * @param[in,out] fatal stream to output fatal messages
        */
       stream_logger(std::ostream& debug,
                     std::ostream& info,
