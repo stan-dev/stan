@@ -273,8 +273,8 @@ TEST_F(ServicesUtilInitialize, model_throws__radius_zero) {
                                                 logger, init),
                std::domain_error);
 
-  EXPECT_EQ(4, logger.call_count());
-  EXPECT_EQ(4, logger.call_count_info());
+  EXPECT_EQ(3, logger.call_count());
+  EXPECT_EQ(3, logger.call_count_info());
   EXPECT_EQ(1, logger.find_info("throwing within log_prob"));
 }
 
@@ -287,8 +287,8 @@ TEST_F(ServicesUtilInitialize, model_throws__radius_two) {
                                                 init_radius, print_timing,
                                                 logger, init),
                std::domain_error);
-  EXPECT_EQ(403, logger.call_count());
-  EXPECT_EQ(403, logger.call_count_info());
+  EXPECT_EQ(303, logger.call_count());
+  EXPECT_EQ(303, logger.call_count_info());
   EXPECT_EQ(100, logger.find_info("throwing within log_prob"));
 }
 
@@ -312,8 +312,8 @@ TEST_F(ServicesUtilInitialize, model_throws__full_init) {
                                                 init_radius, print_timing,
                                                 logger, init),
                std::domain_error);
-  EXPECT_EQ(403, logger.call_count());
-  EXPECT_EQ(403, logger.call_count_info());
+  EXPECT_EQ(303, logger.call_count());
+  EXPECT_EQ(303, logger.call_count_info());
   EXPECT_EQ(100, logger.find_info("throwing within log_prob"));
 }
 
@@ -414,8 +414,8 @@ TEST_F(ServicesUtilInitialize, model_errors__radius_zero) {
                                                     logger, init),
                    std::out_of_range,
                    "out_of_range error in log_prob");
-  EXPECT_EQ(3, logger.call_count());
-  EXPECT_EQ(3, logger.call_count_info());
+  EXPECT_EQ(2, logger.call_count());
+  EXPECT_EQ(2, logger.call_count_info());
   EXPECT_EQ(1, logger.find_info("out_of_range error in log_prob"));
   EXPECT_EQ(1, logger.find_info("Unrecoverable error evaluating the log probability at the initial value."));
 }
@@ -430,8 +430,8 @@ TEST_F(ServicesUtilInitialize, model_errors__radius_two) {
                                                     logger, init),
                    std::out_of_range,
                    "out_of_range error in log_prob");
-  EXPECT_EQ(3, logger.call_count());
-  EXPECT_EQ(3, logger.call_count_info());
+  EXPECT_EQ(2, logger.call_count());
+  EXPECT_EQ(2, logger.call_count_info());
   EXPECT_EQ(1, logger.find_info("out_of_range error in log_prob"));
 }
 
@@ -456,7 +456,7 @@ TEST_F(ServicesUtilInitialize, model_errors__full_init) {
                                                     logger, init),
                    std::out_of_range,
                    "out_of_range error in log_prob");
-  EXPECT_EQ(3, logger.call_count());
-  EXPECT_EQ(3, logger.call_count_info());
+  EXPECT_EQ(2, logger.call_count());
+  EXPECT_EQ(2, logger.call_count_info());
   EXPECT_EQ(1, logger.find_info("out_of_range error in log_prob"));
 }
