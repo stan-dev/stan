@@ -29,8 +29,8 @@ TEST(langParserTermGrammar, array_expr) {
   test_parsable("array-expr/validate_array_expr_big");
   test_parsable("array-expr/validate_array_expr_primitives");
   test_parsable("array-expr/validate_array_expr_containers");
-  test_throws("validate_array_expr_bad1", "base type mismatch");
-  test_throws("validate_array_expr_bad2", "dimension mismatch");
+  test_throws("validate_array_expr_bad1", "Base type mismatch");
+  test_throws("validate_array_expr_bad2", "Dimension mismatch");
   test_throws("validate_array_expr_bad3", "ERROR");
   test_throws("validate_array_expr_bad3a", "ERROR");
 }
@@ -39,7 +39,7 @@ TEST(langParserTermGrammar, infixExponentiation) {
   test_parsable("validate_exponentiation_good");
   test_parsable("validate_exponentiation_precedence");
   test_throws("validate_exponentiation_bad", 
-              "base type mismatch in assignment; variable name = z");
+              "Base type mismatch in assignment; variable name = z");
 }
 
 TEST(langParserTermGrammar, modulusOp) {

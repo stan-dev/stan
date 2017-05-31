@@ -54,7 +54,7 @@ TEST(parserFunctions,funsBad4) {
 
 TEST(parserFunctions,funsBad5) {
   test_throws("functions-bad5",
-              "base type mismatch in assignment");
+              "Base type mismatch in assignment");
 }
 
 TEST(parserFunctions,funsBad6) {
@@ -81,7 +81,7 @@ TEST(parserFunctions,funsBad12) {
 
 TEST(parserFunctions,funsBad13) {
   test_throws("functions-bad13",
-              "Illegal to assign to function argument variables");
+              "Cannot assign to function argument variables.");
 }
 
 TEST(parserFunctions,funsBad14) {
