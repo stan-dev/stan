@@ -25,7 +25,7 @@ namespace stan {
        * @param[in] num_samples number of post warmup draws
        * @param[in] num_thin number to thin the draws. Must be greater than
        *   or equal to 1.
-       * @param[in] refresh controls output to the <code>message_writer</code>
+       * @param[in] refresh controls output to the <code>logger</code>
        * @param[in] save_warmup indicates whether the warmup draws should be
        *   sent to the sample writer
        * @param[in,out] rng random number generator

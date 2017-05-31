@@ -22,7 +22,7 @@ namespace stan {
        *
        * This will test the first order gradients using reverse mode
        * at the value specified in cont_params. This method only
-       * outputs to the message_writer.
+       * outputs to the logger.
        *
        * @tparam Model A model implementation
        * @param[in] model Input model to test (with data already instantiated)

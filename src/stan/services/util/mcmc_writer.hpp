@@ -105,8 +105,8 @@ namespace stan {
                         &ss);
           } catch (const std::exception& e) {
             if (ss.str().length() > 0)
-              message_writer_(ss.str());
-            message_writer_(e.what());
+              logger_(ss);
+            logger_(e.what());
             return;
           }
           if (ss.str().length() > 0)
