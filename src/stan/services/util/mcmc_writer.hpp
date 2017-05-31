@@ -97,11 +97,18 @@ namespace stan {
           Eigen::VectorXd model_values;
 
           std::stringstream ss;
-          model.write_array(rng,
-                            const_cast<Eigen::VectorXd&>(sample.cont_params()),
-                            model_values,
-                            true, true,
-                            &ss);
+          try {
+            model.write_array(rng,
+                        const_cast<Eigen::VectorXd&>(sample.cont_params()),
+                        model_values,
+                        true, true,
+                        &ss);
+          } catch (const std::exception& e) {
+            if (ss.str().length() > 0)
+              message_writer_(ss.str());
+            message_writer_(e.what());
+            return;
+          }
           if (ss.str().length() > 0)
             logger_.info(ss);
 

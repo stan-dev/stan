@@ -94,29 +94,38 @@ namespace stan {
             stan::io::chained_var_context context(init, random_context);
 
             std::stringstream msg;
-            model.transform_inits(context,
-                                  disc_vector,
-                                  unconstrained,
-                                  &msg);
+            try {
+              model.transform_inits(context,
+                                    disc_vector,
+                                    unconstrained,
+                                    &msg);
+            } catch (const std::exception& e) {
+              if (msg.str().length() > 0)
+                logger.info(msg);
+              logger.info(e.what());
+              throw;
+            }
             if (msg.str().length() > 0)
               logger.info(msg);
           }
           double log_prob(0);
+          std::stringstream msg;
           try {
-            std::stringstream msg;
             log_prob = model.template log_prob<false, true>
               (unconstrained, disc_vector, &msg);
             if (msg.str().length() > 0)
               logger.info(msg);
           } catch (std::domain_error& e) {
-            logger.info("");
+            if (msg.str().length() > 0)
+              logger.info(msg);
             logger.info("Rejecting initial value:");
             logger.info("  Error evaluating the log probability"
                         " at the initial value.");
             logger.info(e.what());
             continue;
           } catch (std::exception& e) {
-            logger.info("");
+            if (msg.str().length() > 0)
+              logger.info(msg);
             logger.info("Unrecoverable error evaluating the log probability"
                         " at the initial value.");
             logger.info(e.what());
@@ -134,9 +143,16 @@ namespace stan {
           std::vector<double> gradient;
           bool gradient_ok = true;
           clock_t start_check = clock();
-          log_prob = stan::model::log_prob_grad<true, true>
-            (model, unconstrained, disc_vector,
-             gradient, &log_prob_msg);
+          try {
+            log_prob = stan::model::log_prob_grad<true, true>
+              (model, unconstrained, disc_vector,
+               gradient, &log_prob_msg);
+          } catch (const std::exception& e) {
+            if (log_prob_msg.str().length() > 0)
+              logger.info(log_prob_msg);
+            logger.info(e.what());
+            throw;
+          }
           clock_t end_check = clock();
           double deltaT = static_cast<double>(end_check - start_check)
             / CLOCKS_PER_SEC;
