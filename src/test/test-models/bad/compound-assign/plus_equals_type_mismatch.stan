@@ -1,8 +1,5 @@
-functions {
-  real foo(real a1) {
-    real lf1 = a1;
-    int lf2;
-    lf2 += a1;
-    return lf1;
-  }
+generated quantities {
+  real x[3] = [1.2, 2.3, 3.3];
+  real y[3] = [0, -1, -3];
+  x += y;
 }

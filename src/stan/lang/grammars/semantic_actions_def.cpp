@@ -1032,14 +1032,14 @@ namespace stan {
         return;
       }
       ca.var_type_ = vm.get(name);
-      ca.op_ = boost::algorithm::erase_last_copy(ca.op_,"=");
-
       expr_type inferred_lhs_type = infer_var_dims_type(ca.var_type_, ca.var_dims_);
+      int lhs_num_dims = ca.var_type_.dims_.size();
+      int lhs_num_idxs = ca.var_dims_.dims_.size();
       if (inferred_lhs_type.is_ill_formed()) {
         error_msgs << "Too many indexes for variable"
                    << "; variable name = " << name
-                   << "; num dimensions given = " << ca.var_dims_.dims_.size()
-                   << "; variable array dimensions = " << ca.var_type_.dims_.size()
+                   << "; specified indexes = " << lhs_num_idxs
+                   << "; variable array dimensions = " << lhs_num_dims
                    << std::endl;
         pass = false;
         return;
@@ -1047,16 +1047,28 @@ namespace stan {
       if (inferred_lhs_type.is_primitive()
           && boost::algorithm::starts_with(ca.op_,"\\.")) {
         error_msgs << "Cannot apply element-wise operation to scalar"
-                   << "; variable name = "
-                   << name
-                   << ", type = ";
-        write_base_expr_type(error_msgs, inferred_lhs_type.base_type_);
-        error_msgs << "; compound operation is: " << ca.op_
+                   << "; compound operation is: " << ca.op_
                    << std::endl;
         pass = false;
         return;
       }
-      
+      std::cout << "name " << name
+                << "; var type " << inferred_lhs_type.type()
+                << "; num dims " << inferred_lhs_type.num_dims()
+                << std::endl;
+      // no compound assign for array types  (std::vector)
+      if (inferred_lhs_type.num_dims() > 0) {
+        error_msgs << "Cannot apply operator '" << ca.op_
+                   << "' to array variable; variable name = "
+                   << name
+                   << ".";
+        error_msgs << std::endl;
+        pass = false;
+        return;
+      }
+      // restrict to infix and element-wise operations
+      // when lhs and rhs are same shape, and broadcast operations
+      // when rhs is double and lhs is vector, row_vector, or matrix
       base_expr_type lhs_type = inferred_lhs_type.base_type_;
       base_expr_type rhs_type = ca.expr_.expression_type().base_type_;
       bool types_compatible =
@@ -1077,15 +1089,14 @@ namespace stan {
         pass = false;
         return;
       }
-
       // compound op-equal for scalars, don't need function call
       if (inferred_lhs_type.is_primitive()
           && (rhs_type == INT_T || rhs_type == DOUBLE_T)) {
         pass = true;
         return;
       }
-
       // set up function call info
+      ca.op_ = boost::algorithm::erase_last_copy(ca.op_,"=");
       std::string fun_name;
       if (ca.op_ == "+") {
         fun_name = "add";
