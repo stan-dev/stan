@@ -1,13 +1,13 @@
-#include <stan/services/sample/hmc_nuts_diag_e_adapt.hpp>
+#include <stan/services/sample/hmc_static_unit_e_adapt.hpp>
 #include <gtest/gtest.h>
 #include <stan/io/empty_var_context.hpp>
 #include <test/test-models/good/optimization/rosenbrock.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <iostream>
 
-class ServicesSampleHmcNutsDiagEAdapt : public testing::Test {
+class ServicesSampleHmcStaticUnitEAdapt : public testing::Test {
 public:
-  ServicesSampleHmcNutsDiagEAdapt()
+  ServicesSampleHmcStaticUnitEAdapt()
     : model(context, &model_log) {}
 
   std::stringstream model_log;
@@ -18,7 +18,7 @@ public:
 };
 
 
-TEST_F(ServicesSampleHmcNutsDiagEAdapt, call_count) {
+TEST_F(ServicesSampleHmcStaticUnitEAdapt, call_count) {
   unsigned int random_seed = 0;
   unsigned int chain = 1;
   double init_radius = 0;
@@ -29,22 +29,18 @@ TEST_F(ServicesSampleHmcNutsDiagEAdapt, call_count) {
   int refresh = 0;
   double stepsize = 0.1;
   double stepsize_jitter = 0;
-  int max_depth = 8;
+  double int_time = 8;
   double delta = .1;
   double gamma = .1;
   double kappa = .1;
   double t0 = .1;
-  unsigned int init_buffer = 50;
-  unsigned int term_buffer = 50;
-  unsigned int window = 100;
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
-  int return_code = stan::services::sample::hmc_nuts_diag_e_adapt(
+  int return_code = stan::services::sample::hmc_static_unit_e_adapt(
       model, context, random_seed, chain, init_radius,
       num_warmup, num_samples, num_thin, save_warmup, refresh,
-      stepsize, stepsize_jitter, max_depth, delta, gamma, kappa, t0,
-      init_buffer, term_buffer, window,
+      stepsize, stepsize_jitter, int_time, delta, gamma, kappa, t0,
       interrupt, logger, init,
       parameter, diagnostic);
 
@@ -69,7 +65,7 @@ TEST_F(ServicesSampleHmcNutsDiagEAdapt, call_count) {
 }
 
 
-TEST_F(ServicesSampleHmcNutsDiagEAdapt, output_sizes) {
+TEST_F(ServicesSampleHmcStaticUnitEAdapt, output_sizes) {
   unsigned int random_seed = 0;
   unsigned int chain = 1;
   double init_radius = 0;
@@ -80,22 +76,18 @@ TEST_F(ServicesSampleHmcNutsDiagEAdapt, output_sizes) {
   int refresh = 0;
   double stepsize = 0.1;
   double stepsize_jitter = 0;
-  int max_depth = 8;
+  double int_time = 8;
   double delta = .1;
   double gamma = .1;
   double kappa = .1;
   double t0 = .1;
-  unsigned int init_buffer = 50;
-  unsigned int term_buffer = 50;
-  unsigned int window = 100;
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
-  stan::services::sample::hmc_nuts_diag_e_adapt(
+  stan::services::sample::hmc_static_unit_e_adapt(
       model, context, random_seed, chain, init_radius,
       num_warmup, num_samples, num_thin, save_warmup, refresh,
-      stepsize, stepsize_jitter, max_depth, delta, gamma, kappa, t0,
-      init_buffer, term_buffer, window,
+      stepsize, stepsize_jitter, int_time, delta, gamma, kappa, t0,
       interrupt, logger, init,
       parameter, diagnostic);
 
@@ -109,11 +101,11 @@ TEST_F(ServicesSampleHmcNutsDiagEAdapt, output_sizes) {
   diagnostic_values = diagnostic.vector_double_values();
 
   // Expectations of parameter parameter names.
-  ASSERT_EQ(9, parameter_names[0].size());
+  ASSERT_EQ(7, parameter_names[0].size());
   EXPECT_EQ("lp__", parameter_names[0][0]);
   EXPECT_EQ("accept_stat__", parameter_names[0][1]);
   EXPECT_EQ("stepsize__", parameter_names[0][2]);
-  EXPECT_EQ("treedepth__", parameter_names[0][3]);
+  EXPECT_EQ("int_time__", parameter_names[0][3]);
 
   // Expect one name per parameter value.
   EXPECT_EQ(parameter_names[0].size(), parameter_values[0].size());
@@ -128,7 +120,7 @@ TEST_F(ServicesSampleHmcNutsDiagEAdapt, output_sizes) {
 }
 
 
-TEST_F(ServicesSampleHmcNutsDiagEAdapt, parameter_checks) {
+TEST_F(ServicesSampleHmcStaticUnitEAdapt, parameter_checks) {
   unsigned int random_seed = 0;
   unsigned int chain = 1;
   double init_radius = 0;
@@ -139,23 +131,19 @@ TEST_F(ServicesSampleHmcNutsDiagEAdapt, parameter_checks) {
   int refresh = 0;
   double stepsize = 0.1;
   double stepsize_jitter = 0;
-  int max_depth = 8;
+  double int_time = 8;
   double delta = .1;
   double gamma = .1;
   double kappa = .1;
   double t0 = .1;
-  unsigned int init_buffer = 50;
-  unsigned int term_buffer = 50;
-  unsigned int window = 100;
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
 
-  int return_code = stan::services::sample::hmc_nuts_diag_e_adapt(
+  int return_code = stan::services::sample::hmc_static_unit_e_adapt(
       model, context, random_seed, chain, init_radius,
       num_warmup, num_samples, num_thin, save_warmup, refresh,
-      stepsize, stepsize_jitter, max_depth, delta, gamma, kappa, t0,
-      init_buffer, term_buffer, window,
+      stepsize, stepsize_jitter, int_time, delta, gamma, kappa, t0,
       interrupt, logger, init,
       parameter, diagnostic);
 
@@ -172,7 +160,7 @@ TEST_F(ServicesSampleHmcNutsDiagEAdapt, parameter_checks) {
 
 }
 
-TEST_F(ServicesSampleHmcNutsDiagEAdapt, output_regression) {
+TEST_F(ServicesSampleHmcStaticUnitEAdapt, output_regression) {
   unsigned int random_seed = 0;
   unsigned int chain = 1;
   double init_radius = 0;
@@ -183,23 +171,19 @@ TEST_F(ServicesSampleHmcNutsDiagEAdapt, output_regression) {
   int refresh = 0;
   double stepsize = 0.1;
   double stepsize_jitter = 0;
-  int max_depth = 8;
+  double int_time = 8;
   double delta = .1;
   double gamma = .1;
   double kappa = .1;
   double t0 = .1;
-  unsigned int init_buffer = 50;
-  unsigned int term_buffer = 50;
-  unsigned int window = 100;
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
 
-  stan::services::sample::hmc_nuts_diag_e_adapt(
+  stan::services::sample::hmc_static_unit_e_adapt(
       model, context, random_seed, chain, init_radius,
       num_warmup, num_samples, num_thin, save_warmup, refresh,
-      stepsize, stepsize_jitter, max_depth, delta, gamma, kappa, t0,
-      init_buffer, term_buffer, window,
+      stepsize, stepsize_jitter, int_time, delta, gamma, kappa, t0,
       interrupt, logger, init,
       parameter, diagnostic);
 

@@ -12,8 +12,8 @@ public:
     : model(context, &model_log) {}
 
   std::stringstream model_log;
-  stan::test::unit::instrumented_writer message, init, error;
-  stan::test::unit::instrumented_writer parameter, diagnostic;
+  stan::test::unit::instrumented_logger logger;
+  stan::test::unit::instrumented_writer init, parameter, diagnostic;
   stan::io::empty_var_context context;
   stan_model model;
 };
@@ -28,15 +28,14 @@ TEST_F(ServicesSamplesFixedParam, call_count) {
   int refresh = 0;
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
-  
+
   int return_code = stan::services::sample::fixed_param(model, context,
                                                         seed, chain, init_radius,
                                                         num_iterations,
                                                         1,
                                                         refresh,
                                                         interrupt,
-                                                        message,
-                                                        error,
+                                                        logger,
                                                         init,
                                                         parameter,
                                                         diagnostic);
@@ -69,15 +68,14 @@ TEST_F(ServicesSamplesFixedParam, output_sizes) {
   int refresh = 0;
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
-  
+
   stan::services::sample::fixed_param(model, context,
                                       seed, chain, init_radius,
                                       num_iterations,
                                       1,
                                       refresh,
                                       interrupt,
-                                      message,
-                                      error,
+                                      logger,
                                       init,
                                       parameter,
                                       diagnostic);
@@ -91,7 +89,7 @@ TEST_F(ServicesSamplesFixedParam, output_sizes) {
   std::vector<std::vector<double> > diagnostic_values;
   diagnostic_values = diagnostic.vector_double_values();
 
-  // Expectations of parameter parameter names.  
+  // Expectations of parameter parameter names.
   ASSERT_EQ(4, parameter_names[0].size());
   EXPECT_EQ("lp__", parameter_names[0][0]);
   EXPECT_EQ("accept_stat__", parameter_names[0][1]);
@@ -104,7 +102,7 @@ TEST_F(ServicesSamplesFixedParam, output_sizes) {
 
   // Expect one vector of parameter values per iterations
   EXPECT_EQ(num_iterations, parameter_values.size());
- 
+
   // Expect one call to set parameter names, and one set of output per
   // iteration.
   EXPECT_EQ("lp__", diagnostic_names[0][0]);
@@ -121,15 +119,14 @@ TEST_F(ServicesSamplesFixedParam, parameter_checks) {
   int refresh = 0;
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
-  
+
   int return_code = stan::services::sample::fixed_param(model, context,
                                                         seed, chain, init_radius,
                                                         num_iterations,
                                                         1,
                                                         refresh,
                                                         interrupt,
-                                                        message,
-                                                        error,
+                                                        logger,
                                                         init,
                                                         parameter,
                                                         diagnostic);
@@ -165,15 +162,14 @@ TEST_F(ServicesSamplesFixedParam, output_regression) {
   int refresh = 0;
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
-  
+
   stan::services::sample::fixed_param(model, context,
                                       seed, chain, init_radius,
                                       num_iterations,
                                       1,
                                       refresh,
                                       interrupt,
-                                      message,
-                                      error,
+                                      logger,
                                       init,
                                       parameter,
                                       diagnostic);
@@ -186,18 +182,14 @@ TEST_F(ServicesSamplesFixedParam, output_regression) {
   diagnostic_names = diagnostic.vector_string_values();
   std::vector<std::vector<double> > diagnostic_values;
   diagnostic_values = diagnostic.vector_double_values();
-  std::vector<std::string> message_values;
-  message_values = message.string_values();
   std::vector<std::string> init_values;
   init_values = init.string_values();
-  std::vector<std::string> error_values;
-  error_values = error.string_values();
 
-  EXPECT_NE(std::string::npos, message_values[0].find("Elapsed Time:"));
-  EXPECT_NE(std::string::npos, message_values[0].find("seconds (Warm-up)"));
-  EXPECT_NE(std::string::npos, message_values[1].find("seconds (Sampling)"));
-  EXPECT_NE(std::string::npos, message_values[2].find("seconds (Total)"));
+  EXPECT_EQ(1, logger.find_info("Elapsed Time:"));
+  EXPECT_EQ(1, logger.find_info("seconds (Warm-up)"));
+  EXPECT_EQ(1, logger.find_info("seconds (Sampling)"));
+  EXPECT_EQ(1, logger.find_info("seconds (Total)"));
+  EXPECT_EQ(0, logger.call_count_error());
 
   EXPECT_EQ(0, init_values.size());
-  EXPECT_EQ(0, error_values.size());
 }

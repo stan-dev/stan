@@ -1,5 +1,5 @@
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
-#include <stan/callbacks/stream_writer.hpp>
+#include <stan/callbacks/stream_logger.hpp>
 #include <stan/mcmc/hmc/nuts_classic/base_nuts_classic.hpp>
 #include <stan/mcmc/hmc/integrators/expl_leapfrog.hpp>
 #include <boost/random/additive_combine.hpp>
@@ -38,17 +38,11 @@ namespace stan {
       double tau(ps_point& z) { return T(z); }
       double phi(ps_point& z) { return this->V(z); }
 
-      double dG_dt(
-        ps_point& z,
-        callbacks::writer& info_writer,
-        callbacks::writer& error_writer) {
+      double dG_dt(ps_point& z, callbacks::logger& logger) {
         return 2;
       }
 
-      Eigen::VectorXd dtau_dq(
-        ps_point& z,
-        callbacks::writer& info_writer,
-        callbacks::writer& error_writer) {
+      Eigen::VectorXd dtau_dq(ps_point& z, callbacks::logger& logger) {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 
@@ -56,25 +50,17 @@ namespace stan {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 
-      Eigen::VectorXd dphi_dq(
-        ps_point& z,
-        callbacks::writer& info_writer,
-        callbacks::writer& error_writer) {
+      Eigen::VectorXd dphi_dq(ps_point& z, callbacks::logger& logger) {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 
-      void init(ps_point& z,
-                callbacks::writer& info_writer,
-                callbacks::writer& error_writer) {
+      void init(ps_point& z, callbacks::logger& logger) {
         z.V = 0;
       }
 
       void sample_p(ps_point& z, BaseRNG& rng) {};
 
-      void update_potential_gradient(
-        ps_point& z,
-        callbacks::writer& info_writer,
-        callbacks::writer& error_writer) {
+      void update_potential_gradient(ps_point& z, callbacks::logger& logger) {
         z.V += 500;
       }
 
@@ -163,14 +149,11 @@ TEST(McmcNutsBaseNutsClassic, build_tree) {
   sampler.sample_stepsize();
   sampler.z() = z_init;
 
-  std::stringstream output;
-  stan::callbacks::stream_writer writer(output);
-  std::stringstream error_stream;
-  stan::callbacks::stream_writer error_writer(error_stream);
-
+  std::stringstream debug, info, warn, error, fatal;
+  stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
   int n_valid = sampler.build_tree(3, rho, &z_init, z_propose, util,
-                                   writer, error_writer);
+                                   logger);
 
   EXPECT_EQ(8, n_valid);
 
@@ -185,8 +168,11 @@ TEST(McmcNutsBaseNutsClassic, build_tree) {
   EXPECT_EQ(8 * init_momentum, sampler.z().q(0));
   EXPECT_EQ(init_momentum, sampler.z().p(0));
 
-  EXPECT_EQ("", output.str());
-  EXPECT_EQ("", error_stream.str());
+  EXPECT_EQ("", debug.str());
+  EXPECT_EQ("", info.str());
+  EXPECT_EQ("", warn.str());
+  EXPECT_EQ("", error.str());
+  EXPECT_EQ("", fatal.str());
 }
 
 TEST(McmcNutsBaseNutsClassic, slice_criterion) {
@@ -219,35 +205,35 @@ TEST(McmcNutsBaseNutsClassic, slice_criterion) {
   sampler.sample_stepsize();
   sampler.z() = z_init;
 
-  std::stringstream output;
-  stan::callbacks::stream_writer writer(output);
-  std::stringstream error_stream;
-  stan::callbacks::stream_writer error_writer(error_stream);
-
+  std::stringstream debug, info, warn, error, fatal;
+  stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
   int n_valid = 0;
 
   sampler.z().V = -750;
   n_valid = sampler.build_tree(0, rho, &z_init, z_propose, util,
-                               writer, error_writer);
+                               logger);
 
   EXPECT_EQ(1, n_valid);
   EXPECT_EQ(0, sampler.divergent_);
 
   sampler.z().V = -250;
   n_valid = sampler.build_tree(0, rho, &z_init, z_propose, util,
-                               writer, error_writer);
+                               logger);
 
   EXPECT_EQ(0, n_valid);
   EXPECT_EQ(0, sampler.divergent_);
 
   sampler.z().V = 750;
   n_valid = sampler.build_tree(0, rho, &z_init, z_propose, util,
-                               writer, error_writer);
+                               logger);
 
   EXPECT_EQ(0, n_valid);
   EXPECT_EQ(1, sampler.divergent_);
 
-  EXPECT_EQ("", output.str());
-  EXPECT_EQ("", error_stream.str());
+  EXPECT_EQ("", debug.str());
+  EXPECT_EQ("", info.str());
+  EXPECT_EQ("", warn.str());
+  EXPECT_EQ("", error.str());
+  EXPECT_EQ("", fatal.str());
 }

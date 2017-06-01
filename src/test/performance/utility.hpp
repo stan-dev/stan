@@ -8,13 +8,11 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/random/additive_combine.hpp>  // L'Ecuyer RNG
 #include <boost/random/uniform_real_distribution.hpp>
-
-
 #include <stan/model/gradient.hpp>
-
 #include <stan/services/sample/hmc_nuts_diag_e_adapt.hpp>
 #include <stan/io/empty_var_context.hpp>
 #include <stan/callbacks/interrupt.hpp>
+#include <stan/callbacks/stream_logger.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/callbacks/writer.hpp>
 
@@ -220,8 +218,7 @@ namespace stan {
 
         // Sample output
         callbacks::writer init_writer;
-        callbacks::stream_writer info(std::cout, "# ");
-        callbacks::stream_writer err(std::cerr);
+        callbacks::stream_logger logger(std::cout, std::cout, std::cout, std::cerr, std::cerr);
         std::fstream output_stream(output_file.c_str(), std::fstream::out);
         callbacks::stream_writer sample_writer(output_stream, "# ");
         callbacks::writer diagnostic_writer;
@@ -265,8 +262,7 @@ namespace stan {
                                                              term_buffer,
                                                              window,
                                                              interrupt,
-                                                             info,
-                                                             err,
+                                                             logger,
                                                              init_writer,
                                                              sample_writer,
                                                              diagnostic_writer);

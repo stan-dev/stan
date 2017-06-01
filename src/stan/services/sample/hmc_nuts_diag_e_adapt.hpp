@@ -42,8 +42,7 @@ namespace stan {
        * @param[in] term_buffer width of final fast adaptation interval
        * @param[in] window initial width of slow adaptation interval
        * @param[in,out] interrupt Callback for interrupts
-       * @param[in,out] message_writer Writer for messages
-       * @param[in,out] error_writer Writer for errors
+       * @param[in,out] logger Logger for messages
        * @param[in,out] init_writer Writer callback for unconstrained inits
        * @param[in,out] sample_writer Writer for draws
        * @param[in,out] diagnostic_writer Writer for diagnostic information
@@ -60,8 +59,7 @@ namespace stan {
                                 double t0, unsigned int init_buffer,
                                 unsigned int term_buffer, unsigned int window,
                                 callbacks::interrupt& interrupt,
-                                callbacks::writer& message_writer,
-                                callbacks::writer& error_writer,
+                                callbacks::logger& logger,
                                 callbacks::writer& init_writer,
                                 callbacks::writer& sample_writer,
                                 callbacks::writer& diagnostic_writer) {
@@ -70,7 +68,7 @@ namespace stan {
         std::vector<int> disc_vector;
         std::vector<double> cont_vector
           = util::initialize(model, init, rng, init_radius, true,
-                             message_writer, init_writer);
+                             logger, init_writer);
 
         stan::mcmc::adapt_diag_e_nuts<Model, boost::ecuyer1988>
           sampler(model, rng);
@@ -85,11 +83,11 @@ namespace stan {
         sampler.get_stepsize_adaptation().set_t0(t0);
 
         sampler.set_window_params(num_warmup, init_buffer, term_buffer,
-                                  window, message_writer);
+                                  window, logger);
 
         util::run_adaptive_sampler(sampler, model, cont_vector, num_warmup,
                                    num_samples, num_thin, refresh, save_warmup,
-                                   rng, interrupt, message_writer, error_writer,
+                                   rng, interrupt, logger,
                                    sample_writer, diagnostic_writer);
 
         return error_codes::OK;

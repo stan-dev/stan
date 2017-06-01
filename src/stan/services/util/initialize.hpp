@@ -1,6 +1,7 @@
 #ifndef STAN_SERVICES_UTIL_INITIALIZE_HPP
 #define STAN_SERVICES_UTIL_INITIALIZE_HPP
 
+#include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/var_context.hpp>
 #include <stan/io/random_var_context.hpp>
@@ -48,8 +49,8 @@ namespace stan {
        *   A value of 0 indicates that the unconstrained parameters (not
        *   provided by init) should be initialized with 0.
        * @param[in] print_timing indicates whether a timing message should
-       *   be printed to message_writer
-       * @param[in,out] message_writer message writer
+       *   be printed to the logger
+       * @param[in,out] logger logger for messages
        * @param[in,out] init_writer init writer (on the unconstrained scale)
        * @throws exception passed through from the model if the model has a
        *   fatal error (not a std::domain_error)
@@ -64,8 +65,7 @@ namespace stan {
                                      RNG& rng,
                                      double init_radius,
                                      bool print_timing,
-                                     stan::callbacks::writer&
-                                     message_writer,
+                                     stan::callbacks::logger& logger,
                                      stan::callbacks::writer&
                                      init_writer) {
         std::vector<double> unconstrained;
@@ -101,12 +101,12 @@ namespace stan {
                                     &msg);
             } catch (const std::exception& e) {
               if (msg.str().length() > 0)
-                message_writer(msg.str());
-              message_writer(e.what());
+                logger.info(msg);
+              logger.info(e.what());
               throw;
             }
             if (msg.str().length() > 0)
-              message_writer(msg.str());
+              logger.info(msg);
           }
           double log_prob(0);
           std::stringstream msg;
@@ -114,28 +114,29 @@ namespace stan {
             log_prob = model.template log_prob<false, true>
               (unconstrained, disc_vector, &msg);
             if (msg.str().length() > 0)
-              message_writer(msg.str());
+              logger.info(msg);
           } catch (std::domain_error& e) {
             if (msg.str().length() > 0)
-              message_writer(msg.str());
-            message_writer("Rejecting initial value:");
-            message_writer("  Error evaluating the log probability"
-                           " at the initial value.");
-            message_writer(e.what());
+              logger.info(msg);
+            logger.info("Rejecting initial value:");
+            logger.info("  Error evaluating the log probability"
+                        " at the initial value.");
+            logger.info(e.what());
             continue;
           } catch (std::exception& e) {
             if (msg.str().length() > 0)
-              message_writer(msg.str());
-            message_writer("Unrecoverable error evaluating the log probability"
-                           " at the initial value.");
+              logger.info(msg);
+            logger.info("Unrecoverable error evaluating the log probability"
+                        " at the initial value.");
+            logger.info(e.what());
             throw;
           }
           if (!boost::math::isfinite(log_prob)) {
-            message_writer("Rejecting initial value:");
-            message_writer("  Log probability evaluates to log(0),"
-                           " i.e. negative infinity.");
-            message_writer("  Stan can't start sampling from this"
-                           " initial value.");
+            logger.info("Rejecting initial value:");
+            logger.info("  Log probability evaluates to log(0),"
+                        " i.e. negative infinity.");
+            logger.info("  Stan can't start sampling from this"
+                        " initial value.");
             continue;
           }
           std::stringstream log_prob_msg;
@@ -148,41 +149,41 @@ namespace stan {
                gradient, &log_prob_msg);
           } catch (const std::exception& e) {
             if (log_prob_msg.str().length() > 0)
-              message_writer(log_prob_msg.str());
-            message_writer(e.what());
+              logger.info(log_prob_msg);
+            logger.info(e.what());
             throw;
           }
           clock_t end_check = clock();
           double deltaT = static_cast<double>(end_check - start_check)
             / CLOCKS_PER_SEC;
           if (log_prob_msg.str().length() > 0)
-            message_writer(log_prob_msg.str());
+            logger.info(log_prob_msg);
 
           for (size_t i = 0; i < gradient.size(); ++i) {
             if (gradient_ok && !boost::math::isfinite(gradient[i])) {
-              message_writer("Rejecting initial value:");
-              message_writer("  Gradient evaluated at the initial value"
-                             " is not finite.");
-              message_writer("  Stan can't start sampling from this"
-                             " initial value.");
+              logger.info("Rejecting initial value:");
+              logger.info("  Gradient evaluated at the initial value"
+                          " is not finite.");
+              logger.info("  Stan can't start sampling from this"
+                          " initial value.");
               gradient_ok = false;
             }
           }
           if (gradient_ok && print_timing) {
-            message_writer();
+            logger.info("");
             std::stringstream msg1;
             msg1 << "Gradient evaluation took " << deltaT << " seconds";
-            message_writer(msg1.str());
+            logger.info(msg1);
 
             std::stringstream msg2;
             msg2 << "1000 transitions using 10 leapfrog steps"
                  << " per transition would take"
                  << " " << 1e4 * deltaT << " seconds.";
-            message_writer(msg2.str());
+            logger.info(msg2);
 
-            message_writer("Adjust your expectations accordingly!");
-            message_writer();
-            message_writer();
+            logger.info("Adjust your expectations accordingly!");
+            logger.info("");
+            logger.info("");
           }
           if (gradient_ok)
             break;
@@ -190,15 +191,15 @@ namespace stan {
 
         if (num_init_tries == MAX_INIT_TRIES) {
           if (!is_fully_initialized && !init_zero) {
-            message_writer();
+            logger.info("");
             std::stringstream msg;
             msg << "Initialization between (-" << init_radius
                 << ", " << init_radius << ") failed after"
                 << " " << MAX_INIT_TRIES <<  " attempts. ";
-            message_writer(msg.str());
-            message_writer(" Try specifying initial values,"
-                           " reducing ranges of constrained values,"
-                           " or reparameterizing the model.");
+            logger.info(msg);
+            logger.info(" Try specifying initial values,"
+                        " reducing ranges of constrained values,"
+                        " or reparameterizing the model.");
           }
           throw std::domain_error("Initialization failed.");
         }
@@ -210,5 +211,4 @@ namespace stan {
     }
   }
 }
-
 #endif
