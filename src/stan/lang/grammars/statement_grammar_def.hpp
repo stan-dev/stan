@@ -270,9 +270,9 @@ namespace stan {
             | string(".*=")
             | string("./="))
         >> expression_rhs_r(_r1)
-        [validate_compound_assignment_f(_val, _r1, _pass,
-                                        boost::phoenix::ref(var_map_),
-                                        boost::phoenix::ref(error_msgs_))]
+           [validate_compound_assignment_f(_val, _r1, _pass,
+                                           boost::phoenix::ref(var_map_),
+                                           boost::phoenix::ref(error_msgs_))]
         > lit(';');
 
       // _r1 = var scope
@@ -285,7 +285,6 @@ namespace stan {
            [validate_assgn_f(_val, _pass, boost::phoenix::ref(error_msgs_))]
         > lit(';');
 
-
       assignment_operator_r.name("assignment operator");
       assignment_operator_r
         %= lit("<-")
@@ -297,8 +296,8 @@ namespace stan {
       var_r
         = identifier_r
           [validate_lhs_var_assgn_f(_1, _r1, _val,  _pass,
-                               boost::phoenix::ref(var_map_),
-                               boost::phoenix::ref(error_msgs_))];
+                                    boost::phoenix::ref(var_map_),
+                                    boost::phoenix::ref(error_msgs_))];
 
       // separate rule for name on expectation failure
       // _r1 = var scope
@@ -331,14 +330,14 @@ namespace stan {
         %= (expression_g(_r1)
             >> lit('~'))
         > eps
-          [validate_allow_sample_f(_r1, _pass,
-                                   boost::phoenix::ref(error_msgs_))]
+        [validate_allow_sample_f(_r1, _pass,
+                                 boost::phoenix::ref(error_msgs_))]
         > distribution_r(_r1)
         > -truncation_range_r(_r1)
         > lit(';')
         > eps
-          [validate_sample_f(_val, boost::phoenix::ref(var_map_),
-                             _pass, boost::phoenix::ref(error_msgs_))];
+        [validate_sample_f(_val, boost::phoenix::ref(var_map_),
+                           _pass, boost::phoenix::ref(error_msgs_))];
 
       // _r1 = var scope
       distribution_r.name("distribution and parameters");
@@ -364,18 +363,18 @@ namespace stan {
         %= (lit("return") >> no_skip[!char_("a-zA-Z0-9_")])
         >> expression_g(_r1)
         >> lit(';') [validate_return_allowed_f(_r1, _pass,
-                                       boost::phoenix::ref(error_msgs_))];
+                                               boost::phoenix::ref(error_msgs_))];
 
       // _r1 = var scope
       void_return_statement_r.name("void return statement");
       void_return_statement_r
-        = lit("return")[set_void_return_f(_val)]
-        >> lit(';')[validate_void_return_allowed_f(_r1, _pass,
-                                        boost::phoenix::ref(error_msgs_))];
+        = lit("return") [set_void_return_f(_val)]
+        >> lit(';') [validate_void_return_allowed_f(_r1, _pass,
+                                                   boost::phoenix::ref(error_msgs_))];
 
       no_op_statement_r.name("no op statement");
       no_op_statement_r
-        %= lit(';')[set_no_op_f(_val)];
+        %= lit(';') [set_no_op_f(_val)];
     }
 
   }

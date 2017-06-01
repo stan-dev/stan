@@ -94,7 +94,7 @@ TEST(langParserStatementGrammar, validateAssignmentTypes) {
 
 TEST(langParserStatementGrammar, assignRealToIntMessage) {
   test_throws("assign_real_to_int",
-              "PARSER EXPECTED: <expression assignable to left-hand side>");
+              "Base type mismatch in assignment");
 }
 
 TEST(langParserStatementGrammar, useCdfWithSamplingNotation) {

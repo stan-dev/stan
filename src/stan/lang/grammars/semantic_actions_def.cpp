@@ -149,7 +149,7 @@ namespace stan {
 
     bool can_assign_to_lhs_var(const std::string& lhs_var_name,
                                const scope& var_scope,
-                               variable_map& vm,
+                               const variable_map& vm,
                                std::ostream& error_msgs) {
       // validate scope matches declaration scope
       scope lhs_origin = vm.get_scope(lhs_var_name);
@@ -199,6 +199,7 @@ namespace stan {
       }
       base_expr_type lhs_base_type = lhs_type.base_type_;
       base_expr_type rhs_base_type = rhs_expr.expression_type().base_type_;
+      // allow int -> double promotion, even in arrays
       bool types_compatible =
         (lhs_base_type == rhs_base_type
          || (lhs_base_type == DOUBLE_T && rhs_base_type == INT_T));
@@ -899,17 +900,15 @@ namespace stan {
                                        std::ostream& error_msgs) const {
       // validate existence
       if (!vm.exists(name)) {
+        error_msgs << "Unknown variable in assignment"
+                   << "; lhs variable=" << name
+                   << std::endl;
         pass = false;
         return;
       }
       // validate scope matches declaration scope
       scope lhs_origin = vm.get_scope(name);
       if (lhs_origin.program_block() != var_scope.program_block()) {
-        pass = false;
-        return;
-      }
-      // variable is function arg, can't assign to
-      if (lhs_origin.fun() && !lhs_origin.is_local()) {
         pass = false;
         return;
       }
@@ -931,40 +930,10 @@ namespace stan {
         pass = false;
         return;
       }
-
-      expr_type rhs_type = a.rhs_.expression_type();
-      base_expr_type lhs_base_type = lhs_type.base_type_;
-      base_expr_type rhs_base_type = rhs_type.base_type_;
-      // allow int -> double promotion, even in arrays
-      bool types_compatible
-        = lhs_base_type == rhs_base_type
-        || (lhs_base_type == DOUBLE_T && rhs_base_type == INT_T);
-      if (!types_compatible) {
-        error_msgs << "base type mismatch in assignment"
-                   << "; variable name="
-                   << name
-                   << ", type=";
-        write_base_expr_type(error_msgs, lhs_base_type);
-        error_msgs << "; right-hand side type=";
-        write_base_expr_type(error_msgs, rhs_base_type);
-        error_msgs << std::endl;
+      if (!has_same_shape(lhs_type, a.rhs_, name, "assignment", error_msgs)) {
         pass = false;
         return;
       }
-
-      if (lhs_type.num_dims_ != rhs_type.num_dims_) {
-        error_msgs << "dimension mismatch in assignment"
-                   << "; variable name="
-                   << name
-                   << ", num dimensions given="
-                   << lhs_type.num_dims_
-                   << "; right-hand side dimensions="
-                   << rhs_type.num_dims_
-                   << std::endl;
-        pass = false;
-        return;
-      }
-
       if (a.lhs_var_occurs_on_rhs()) {
         // this only requires a warning --- a deep copy will be made
         error_msgs << "WARNING: left-hand side variable"
@@ -1005,9 +974,8 @@ namespace stan {
         pass = false;
         return;
       }
-      
       if (!has_same_shape(inferred_lhs_type, a.expr_, name,
-                         "assignment", error_msgs)) {
+                          "assignment", error_msgs)) {
         pass = false;
         return;
       }
@@ -1028,6 +996,9 @@ namespace stan {
         return;
       }
       if (!can_assign_to_lhs_var(name, var_scope, vm, error_msgs)) {
+        error_msgs << "Unknown variable in compound assignment"
+                   << "; lhs variable=" << name
+                   << std::endl;
         pass = false;
         return;
       }
@@ -1044,18 +1015,6 @@ namespace stan {
         pass = false;
         return;
       }
-      if (inferred_lhs_type.is_primitive()
-          && boost::algorithm::starts_with(ca.op_,"\\.")) {
-        error_msgs << "Cannot apply element-wise operation to scalar"
-                   << "; compound operation is: " << ca.op_
-                   << std::endl;
-        pass = false;
-        return;
-      }
-      std::cout << "name " << name
-                << "; var type " << inferred_lhs_type.type()
-                << "; num dims " << inferred_lhs_type.num_dims()
-                << std::endl;
       // no compound assign for array types  (std::vector)
       if (inferred_lhs_type.num_dims() > 0) {
         error_msgs << "Cannot apply operator '" << ca.op_
@@ -1066,11 +1025,19 @@ namespace stan {
         pass = false;
         return;
       }
+      if (inferred_lhs_type.is_primitive()
+          && boost::algorithm::starts_with(ca.op_,"\\.")) {
+        error_msgs << "Cannot apply element-wise operation to scalar"
+                   << "; compound operation is: " << ca.op_
+                   << std::endl;
+        pass = false;
+        return;
+      }
       // restrict to infix and element-wise operations
       // when lhs and rhs are same shape, and broadcast operations
       // when rhs is double and lhs is vector, row_vector, or matrix
-      base_expr_type lhs_type = inferred_lhs_type.base_type_;
-      base_expr_type rhs_type = ca.expr_.expression_type().base_type_;
+      expr_type lhs_type = inferred_lhs_type.type();
+      expr_type rhs_type = ca.expr_.expression_type();
       bool types_compatible =
         (lhs_type == rhs_type
          || (lhs_type == DOUBLE_T && rhs_type == INT_T)
@@ -1078,14 +1045,11 @@ namespace stan {
          || (lhs_type == ROW_VECTOR_T && rhs_type == DOUBLE_T)
          || (lhs_type == MATRIX_T && rhs_type == DOUBLE_T));
       if (!types_compatible) {
-        error_msgs << "Base type mismatch in compound assignment"
-                   << "; variable name = "
-                   << name
-                   << ", type = ";
-        write_base_expr_type(error_msgs, lhs_type);
-        error_msgs << "; right-hand side type=";
-        write_base_expr_type(error_msgs, rhs_type);
-        error_msgs << std::endl;
+        error_msgs << "Type mismatch in compound assignment"
+                   << "; variable name = " << name
+                   << ", left-hand side type = " << lhs_type
+                   << "; right-hand side type=" << rhs_type
+                   << std::endl;
         pass = false;
         return;
       }
@@ -1110,22 +1074,19 @@ namespace stan {
         fun_name = "elt_divide";
       } else if (ca.op_ == ".*") {
         if (!(lhs_type == rhs_type)) {
-          error_msgs << "Type mismatch for compound assignment,"
+          error_msgs << "Type mismatch in compound assignment,"
                      << " element-wise multiplication requires same shape"
-                   << "; variable name = "
-                   << name
-                   << ", type = ";
-          write_base_expr_type(error_msgs, lhs_type);
-          error_msgs << "; right-hand side type=";
-          write_base_expr_type(error_msgs, rhs_type);
-          error_msgs << std::endl;
+                   << "; variable name = " << name
+                   << ", left-hand side type = " << lhs_type
+                   << "; right-hand side type=" << rhs_type
+                     << std::endl;
           pass = false;
           return;
         }
         fun_name = "elt_multiply";
       }        
       variable lhs_expr(name);
-      lhs_expr.set_type(ca.var_type_.base_type_,ca.var_dims_.dims_.size());
+      lhs_expr.set_type(lhs_type.base_type_,lhs_type.num_dims_);
       std::vector<expression> args;
       args.push_back(lhs_expr);
       args.push_back(ca.expr_);
@@ -1339,7 +1300,6 @@ namespace stan {
           return;
         }
       }
-
       pass = true;
     }
     boost::phoenix::function<validate_sample> validate_sample_f;
