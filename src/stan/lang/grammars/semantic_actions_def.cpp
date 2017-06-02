@@ -1060,6 +1060,7 @@ namespace stan {
         (lhs_type == rhs_type
          || (lhs_type == VECTOR_T && rhs_type == DOUBLE_T)
          || (lhs_type == ROW_VECTOR_T && rhs_type == DOUBLE_T)
+         || (lhs_type == ROW_VECTOR_T && rhs_type == MATRIX_T)
          || (lhs_type == MATRIX_T && rhs_type == DOUBLE_T));
       if (!types_compatible) {
         error_msgs << "Cannot apply operator '" << ca.op_ << "='"
