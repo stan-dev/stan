@@ -158,20 +158,6 @@ namespace stan {
       void operator()(const nil& /*x*/) const { }
 
       void operator()(const compound_assignment& x) const {
-        // we know that dimensions are the same, we only need to check the sizes
-        if (!x.expr_.expression_type().is_primitive()) {
-          generate_indent(indent_, o_);
-          o_ << "stan::math::check_matching_dims(\"compound assign\", \"left-hand-side\", ";
-          generate_indexed_expr<true>(x.var_dims_.name_,
-                                      x.var_dims_.dims_,
-                                      x.var_type_.base_type_,
-                                      x.var_type_.dims_.size(),
-                                      false,
-                                      o_);
-          o_ << ", \"right-hand-side\", ";
-          generate_expression(x.expr_, false, is_var_context_, o_);
-          o_ << ");" << EOL;
-        }
         generate_indent(indent_, o_);
         o_ << "stan::math::assign(";
         generate_indexed_expr<true>(x.var_dims_.name_,
@@ -180,9 +166,10 @@ namespace stan {
                                     x.var_type_.dims_.size(),
                                     false,
                                     o_);
-        o_ << ", (";
-        if (is_nil(x.fun_sig_)) {
-          generate_indexed_expr<true>(x.var_dims_.name_,
+        o_ << ", ";
+        if (x.op_name_.size() == 0) {
+          o_ << "(";
+          generate_indexed_expr<false>(x.var_dims_.name_,
                                       x.var_dims_.dims_,
                                       x.var_type_.base_type_,
                                       x.var_type_.dims_.size(),
@@ -190,10 +177,20 @@ namespace stan {
                                       o_);
           o_ << " " << x.op_ << " ";
           generate_expression(x.expr_, false, is_var_context_, o_);
+          o_ << ")";
         } else {
-          generate_expression(x.fun_sig_, false, is_var_context_, o_);
+          o_ << x.op_name_ << "(";
+          generate_indexed_expr<false>(x.var_dims_.name_,
+                                      x.var_dims_.dims_,
+                                      x.var_type_.base_type_,
+                                      x.var_type_.dims_.size(),
+                                      false,
+                                      o_);
+          o_ << ", ";
+          generate_expression(x.expr_, false, is_var_context_, o_);
+          o_ << ")";
         }
-        o_ << "));" << EOL;
+        o_ << ");" << EOL;
       }
 
       void operator()(const assignment& x) const {

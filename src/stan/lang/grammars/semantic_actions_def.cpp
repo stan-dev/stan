@@ -1006,6 +1006,14 @@ namespace stan {
       expr_type inferred_lhs_type = infer_var_dims_type(ca.var_type_, ca.var_dims_);
       int lhs_num_dims = ca.var_type_.dims_.size();
       int lhs_num_idxs = ca.var_dims_.dims_.size();
+
+      // std::cout << "var name " << name << std::endl;
+      // std::cout << "var_type_ " << ca.var_type_.base_type_ << std::endl;
+      // std::cout << "inferred_lhs_type: " << inferred_lhs_type << std::endl;
+      // std::cout << "inferred_lhs_type.num_dims(): " << inferred_lhs_type.num_dims() << std::endl;
+      // std::cout << "lhs_num_dims: " << lhs_num_dims << std::endl;
+      // std::cout << "lhs_num_idxs: " << lhs_num_idxs << std::endl;
+
       if (inferred_lhs_type.is_ill_formed()) {
         error_msgs << "Too many indexes for variable"
                    << "; variable name = " << name
@@ -1025,74 +1033,71 @@ namespace stan {
         pass = false;
         return;
       }
-      if (inferred_lhs_type.is_primitive()
+      expr_type lhs_type = inferred_lhs_type.type();
+      // std::cout << "lhs_type: " << lhs_type.type() << std::endl;
+      // std::cout << "lhs_type.num_dims(): " << lhs_type.num_dims() << std::endl;
+      expr_type rhs_type = ca.expr_.expression_type();
+      if (lhs_type.is_primitive()
           && boost::algorithm::starts_with(ca.op_,"\\.")) {
         error_msgs << "Cannot apply element-wise operation to scalar"
-                   << "; compound operation is: " << ca.op_
+                   << "; compound operator is: " << ca.op_
                    << std::endl;
         pass = false;
         return;
       }
-      // restrict to infix and element-wise operations
+      ca.op_ = boost::algorithm::erase_last_copy(ca.op_,"=");
+      // compound op-equal for scalar types, generator doesn't use fun_sig_
+      if (lhs_type.is_primitive()
+          && rhs_type.is_primitive()
+          && (lhs_type == DOUBLE_T || lhs_type == rhs_type)) {
+        pass = true;
+        return;
+      }
+      // container types allow infix and element-wise operations
       // when lhs and rhs are same shape, and broadcast operations
       // when rhs is double and lhs is vector, row_vector, or matrix
-      expr_type lhs_type = inferred_lhs_type.type();
-      expr_type rhs_type = ca.expr_.expression_type();
       bool types_compatible =
         (lhs_type == rhs_type
-         || (lhs_type == DOUBLE_T && rhs_type == INT_T)
          || (lhs_type == VECTOR_T && rhs_type == DOUBLE_T)
          || (lhs_type == ROW_VECTOR_T && rhs_type == DOUBLE_T)
          || (lhs_type == MATRIX_T && rhs_type == DOUBLE_T));
       if (!types_compatible) {
-        error_msgs << "Type mismatch in compound assignment"
-                   << "; variable name = " << name
-                   << ", left-hand side type = " << lhs_type
+        error_msgs << "Cannot apply operator '" << ca.op_ << "='"
+                   << " to operands;"
+                   << " left-hand side type = " << lhs_type
                    << "; right-hand side type=" << rhs_type
                    << std::endl;
         pass = false;
         return;
       }
-      // compound op-equal for scalars, don't need function call
-      if (inferred_lhs_type.is_primitive()
-          && (rhs_type == INT_T || rhs_type == DOUBLE_T)) {
-        pass = true;
+      std::string op_name;
+      if (ca.op_ == "+") {
+        op_name = "add";
+      } else if (ca.op_ == "-") {
+        op_name = "subtract";
+      } else if (ca.op_ == "*") {
+        op_name = "multiply";
+      } else if (ca.op_ == "/") {
+        op_name = "divide";
+      } else if (ca.op_ == "./") {
+        op_name = "elt_divide";
+      } else if (ca.op_ == ".*") {
+        op_name = "elt_multiply";
+      }        
+      std::vector<expr_type> arg_types;
+      arg_types.push_back(lhs_type);
+      arg_types.push_back(rhs_type);
+      function_signature_t op_equals_sig(lhs_type, arg_types);
+      if (!function_signatures::instance().is_defined(op_name,op_equals_sig)) {
+        error_msgs << "Cannot apply operator '" << ca.op_ << "='"
+                   << " to operands;"
+                   << " left-hand side type = " << lhs_type
+                   << "; right-hand side type=" << rhs_type
+                   << std::endl;
+        pass = false;
         return;
       }
-      // set up function call info
-      ca.op_ = boost::algorithm::erase_last_copy(ca.op_,"=");
-      std::string fun_name;
-      if (ca.op_ == "+") {
-        fun_name = "add";
-      } else if (ca.op_ == "-") {
-        fun_name = "subtract";
-      } else if (ca.op_ == "*") {
-        fun_name = "multiply";
-      } else if (ca.op_ == "/") {
-        fun_name = "divide";
-      } else if (ca.op_ == "./") {
-        fun_name = "elt_divide";
-      } else if (ca.op_ == ".*") {
-        if (!(lhs_type == rhs_type)) {
-          error_msgs << "Type mismatch in compound assignment,"
-                     << " element-wise multiplication requires same shape"
-                   << "; variable name = " << name
-                   << ", left-hand side type = " << lhs_type
-                   << "; right-hand side type=" << rhs_type
-                     << std::endl;
-          pass = false;
-          return;
-        }
-        fun_name = "elt_multiply";
-      }        
-      variable lhs_expr(name);
-      lhs_expr.set_type(lhs_type.base_type_,lhs_type.num_dims_);
-      std::vector<expression> args;
-      args.push_back(lhs_expr);
-      args.push_back(ca.expr_);
-      fun f(fun_name,args);
-      set_fun_type(f, error_msgs);
-      ca.fun_sig_ = f;
+      ca.op_name_ = op_name;
       pass = true;
     }
     boost::phoenix::function<validate_compound_assignment>

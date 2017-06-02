@@ -88,10 +88,16 @@ bool is_parsable_folder(const std::string& model_name,
  * @param model_name Name of model to parse
  */
 void test_parsable(const std::string& model_name) {
-  {
-    SCOPED_TRACE("parsing: " + model_name);
-    EXPECT_TRUE(is_parsable_folder(model_name, "good"));
+  bool result;
+  std::stringstream msgs;
+  SCOPED_TRACE("parsing: " + model_name);
+  result = is_parsable_folder(model_name, "good", &msgs);
+  if (!result) {
+    FAIL() << std::endl << "*********************************" << std::endl
+           << "model name=" << model_name << std::endl
+           << msgs.str() << std::endl;
   }
+  SUCCEED();
 }
 
 /** test that model with specified name in folder "bad" throws
@@ -117,7 +123,6 @@ void test_throws(const std::string& model_name, const std::string& error_msg) {
     }
     return;
   }
-  
   FAIL() << "model name=" << model_name 
          << " is parsable and were expecting msg=" << error_msg
          << std::endl;

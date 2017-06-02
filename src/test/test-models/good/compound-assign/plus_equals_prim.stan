@@ -1,54 +1,63 @@
 functions {
   real foo(real a1) {
-    real b = a1;
-    print(" in function foo");
-    print("    b: ", b);
-    print("    a1: ", a1);
-    b += a1 / 2;
-    print("    b += a1: ", b);
+    real b;
+    int c;
+    b += a1;
+    c += c;
     return b;
   }
+}
+data {
+  int b;
+  int c;
 }
 transformed data {
   int x = 10;
   real y = 20;
-  print("in transformed data");
-  print("x: ", x)
-  x += 1;  // scalar int
-  print("x += 1: ", x)
-  print("y: ", y);
-  y += 1;  // scalar double
-  print("y += 1: ", y);
+  int ax[3] = { 1, 2, 3 };
+  real ay[3] = { 1.0, 2.0, 3.0 };
+  x += 1;
+  x += c;
+  x += ax[1];
+  y += 1;
+  y += 1.0;
+  y += b;
+  y += c;
+  y += ax[1];
+  y += ay[1];
+  y += foo(y);
 }
 transformed parameters {
   real w = 30;
-  print("in transformed parameters");
-  print("w: ", w);
+  w += b;
+  w += c;
+  w += x;
   w += y;
-  print("w += y: ", w);
+  w += ax[1];
+  w += ay[1];
   w += foo(w);
-  print("w += foo(w): ", w);
 }  
 model {
   real v = 7;
-  print("in model block");
+  v += b;
+  v += c;
+  v += ax[1];
+  v += ay[1];
   v += y;
-  print("v += y: ", v);
-  v += foo(w);
-  print("v += foo(w): ", v);
   v += foo(y);
-  print("v += foo(y): ", v);
+  v += w;
+  v += foo(w);
+  v += v;
+  v += foo(v);
 }
 generated quantities {
   real z = 40;
-  print("in generated quantities");
-  print("z: ", z);
-  print("y: ", y);
-  print("w: ", w);
+  z += b;
+  z += c;
+  z += ax[1];
+  z += ay[1];
   z += w;
-  print("z += w: ", z);
+  z += foo(w);
   z += y;
-  print("z += y: ", z);
   z += foo(y);
-  print("z += foo(y): ", z);
 }

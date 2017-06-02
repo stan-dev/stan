@@ -43,7 +43,7 @@ namespace stan {
       /**
        * Function signature of operation, is nil when lhs and rhs are scalars.
        */
-      expression fun_sig_;
+      std::string op_name_;
 
       /**
        * Construct an empty compound assignment.

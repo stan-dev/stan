@@ -133,3 +133,24 @@ TEST(langParserStatementGrammar, removeLpDoubleUnderscore) {
               "  Use target() function to get log density.");
 }
 
+TEST(langParserStatementGrammar, plusEqualsGood) {
+  test_parsable("compound-assign/plus_equals_prim");
+  test_parsable("compound-assign/plus_equals_container");
+}
+TEST(langParserStatementGrammar, plusEqualsBad) {
+  test_throws("compound-assign/plus_equals_bad_var_lhs","does not exist");
+  test_throws("compound-assign/plus_equals_bad_var_rhs","does not exist");
+  test_throws("compound-assign/plus_equals_type_mismatch","Cannot apply operator '+='");
+  test_throws("compound-assign/plus_equals_type_mismatch2","Cannot apply operator '+='");
+  test_throws("compound-assign/plus_equals_matrix_array","Cannot apply operator '+='");
+  test_throws("compound-assign/plus_equals_matrix_array2","Cannot apply operator '+='");
+  test_throws("compound-assign/plus_equals_row_vec_array","Cannot apply operator '+='");
+  test_throws("compound-assign/plus_equals_vector_array","Cannot apply operator '+='");
+
+}
+// TEST(langParserStatementGrammar, timesEqualsGood) {
+//   test_parsable("compound-assign/plus_equals_prim");
+// }
+TEST(langParserStatementGrammar, timesEqualsBad) {
+  test_throws("compound-assign/times_equals_matrix_array","Cannot apply operator '*='");
+}
