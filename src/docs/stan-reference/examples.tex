@@ -6943,7 +6943,7 @@ the inputs $x_i$ and $x_j$ is their vector difference, $x_i - x_j$.
 This produces a process with stationary covariance in the sense that
 if an input vector $x$ is translated by a vector $\epsilon$ to $x +
 \epsilon$, the covariance at any pair of outputs is unchanged, because
-$K(x | \theta) = K(x | \theta)$.
+$K(x | \theta) = K(x + \epsilon| \theta)$.
 
 The summation involved is just the squared Euclidean distance between
 $x_i$ and $x_j$ (i.e., the $L_2$ norm of their difference, $x_i -
@@ -7800,24 +7800,42 @@ generated quantities {
 
 \subsection{Multiple-output Gaussian processes}
 
-Suppose we have $N$ observations of $y_{[i,]} \in \reals^M$ each observed at
-$x_i \in \reals^K$. One can model each of the $M$ dimensions of $y$, $y_m$:
+Suppose we have observations $y_i \in \reals^M$ observed at
+$x_i \in \reals^K$. One can model the data like so:
 \begin{align*}
-  y_m \, |  \, x & \sim \distro{Normal}(f_m(x), \sigma) \\
-  f_m(x) & \sim \distro{GP}(m(x), K(x | \alpha_m, \rho))
+  y_i & \sim \distro{MultiNormal}(f(x_i), \mathbf{I}_M \sigma^2) \\
+  f(x) & \sim \distro{GP}(m(x), K(x | \theta, \phi)) \\
+  K(x & | \theta) \in \reals^{M \times M}, \, f(x), \, m(x) \in \reals^M
 \end{align*}
-We model each dimension of $y_i$ being generated from an $M$-dimensional vector 
-$f_i$ with a full-rank covariance matrix defining the covariance
-between dimensions of $f_i$ and $f_{i,j}$ .
-We could fit the following model to the data:
+where the $K(x, x^\prime | \theta, \phi)_{[m, m^\prime]}$ entry defines the 
+covariance between $f_m(x)$ and $f_{m^\prime}(x^\prime)(x)$. This construction
+of Gaussian processes allows us to learn the covariance between the output
+dimensions of $f(x)$. If we parameterize our kernel $K$:
 \begin{align*}
-  f & \sim \distro{MatrixNormal}(\mu(x), K(x | \alpha, \rho), C) \\
+  K(x, x^\prime | \theta, \phi)_{[m, m^\prime]} = k(x, x^\prime | \theta) k(m, m^\prime | \phi)
+\end{align*}
+then our finite dimensional generative model for the above is:
+\begin{align*}
+  f & \sim \distro{MatrixNormal}(m(x), K(x | \alpha, \rho), C(\phi)) \\
   y_{i, m} & \sim \distro{Normal}(f_{i,m}, \sigma) \\
   f & \in \reals^{N \times M}
 \end{align*}
+where $K(x | \alpha, \rho)$ is the exponentiated quadratic kernel we've used
+throughout this chapter, and $C(\phi)$ is a positive-definite matrix,
+parameterized by some vector $\phi$.
+
 The \distro{MatrixNormal} distribution has two covariance matrices: $K(x |
-\alpha, \rho)$ to encode among-row covariance, and $C$ to define among-column
-covariance. This means that $\E\left[f^T f\right]$ is equal to
+\alpha, \rho)$ to encode column covariance, and $C(\phi)$ to define row 
+covariance. The salient features of the \distro{MatrixNormal} are that the rows
+of the matrix $f$ are distributed:
+\begin{align*}
+  f_{[n,]} \sim \distro{MultiNormal}(m(x)_{[n,]}, K(x | \alpha, \rho)_{[n,n]} C(\phi))
+\end{align*}
+and that the columns of the matrix $f$ are distributed:
+\begin{align*}
+  f_{[,m]} \sim \distro{MultiNormal}(m(x)_{[,m]}, K(x | \alpha, \rho) C(\phi)_{[m,m]})
+\end{align*}
+This also means means that $\E\left[f^T f\right]$ is equal to
 $\text{trace}(K(x | \alpha, \rho)) \times C$, whereas $\E\left[ff^T\right]$ 
 is $\text{trace}(C) \times K(x | \alpha, \rho)$. We can derive this using
 properties of expectation and the \distro{MatrixNormal} density.
@@ -7831,14 +7849,16 @@ $\reals^{N \times M}$ using the following algorithm:
 %
 \begin{align*}
 	\eta_{i,j} & \sim \distro{Normal}(0, 1) \, \forall i,j \\
-	f & = L_{K(x | 1.0, \rho)} \, \eta \, L_C^T \\
-	f & \sim \distro{MatrixNormal}(0, K(x | 1.0, \rho), C) \\
+	f & = L_{K(x | 1.0, \rho)} \, \eta \, L_C(\phi)^T \\
+	f & \sim \distro{MatrixNormal}(0, K(x | 1.0, \rho), C(\phi)) \\
 	\eta & \in \reals^{N \times M} \\
-	L_C & = \text{cholesky\_decompose}(C) \\
+	L_C(\phi) & = \text{cholesky\_decompose}(C(\phi)) \\
   L_{K(x | 1.0, \rho)} & = \text{cholesky\_decompose}(K(x | 1.0, \rho))
 \end{align*}
 
-This can be implemented in Stan using a latent-variable GP formulation:
+This can be implemented in Stan using a latent-variable GP formulation. We've used
+\distro{LkjCorr} for $C(\phi)$, but any positive-definite matrix will do.
+
 
 \begin{stancode}
 data {
