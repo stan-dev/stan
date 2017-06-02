@@ -7509,13 +7509,30 @@ to limit the GP to higher-frequency functions. We can use a generalized inverse
 Gaussian distribution:
 %
 \begin{align*}
-	f(x | a, b, p) = \dfrac{(a/b)^{p/2}}{2K_p(\sqrt{ab})} x^{p - 1}\exp(-(ax + b
-	/ x)/2)
+	f(x | a, b, p) & = \dfrac{(a/b)^{p/2}}{2K_p(\sqrt{ab})} x^{p - 1}\exp(-(ax + b
+	/ x)/2) \\
+	& x, a, b \in \reals^{+}, \, p \in \mathbb{Z}
 \end{align*} 
 %
 which has an inverse gamma left tail if $p \leq 0$ and a Gaussian right tail.
 This has not yet been implemented in Stan's math library, but it is possible to
-implement as a user defined function.
+implement as a user defined function:
+\begin{stancode}
+functions {
+  real generalized_inverse_gaussian_lpdf(real x,
+                                         int p,
+                                         real a,
+                                         real b) {
+      real lp =
+      p * 0.5 * log(a / b)
+      - log(2 * modified_bessel_second_kind(p, sqrt(a * b)))
+      + (p - 1) * log(x) - (a * x + b / x) * 0.5;
+      return lp;
+  }
+}
+data {
+...
+\end{stancode}
 
 If we have high-frequency covariates in our fixed effects, we may wish to
 further regularize the GP away from high-frequency functions, which means we'll
@@ -7703,7 +7720,7 @@ inputs $\tilde{x}$ for which predictions are to be inferred, and $K$
 is the matrix of covariances between inputs $x$ and $\tilde{x}$, which
 in the case of the exponentiated quadratic covariance function
 would be
-\[ K(x | \alpha, \rho, \sigma)_{i, j} = \eta^2 \exp(-\dfrac{1}{2 \rho^2}
+\[ K(x | \alpha, \rho)_{i, j} = \eta^2 \exp(-\dfrac{1}{2 \rho^2}
 \sum_{d=1}^D (x_{i,d} - \tilde{x}_{j,d})^2).  \]
 There is no noise term including $\sigma^2$ because the indexes of
 elements in $x$ and $\tilde{x}$ are never the same.
