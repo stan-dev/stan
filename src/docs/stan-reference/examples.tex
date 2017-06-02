@@ -7201,16 +7201,15 @@ model {
 }
 \end{stancode}
 %
-The data block now declares a vector \code{y} of observed values
-\code{y[n]} for inputs \code{x[n]}.  The transformed data block now
-only defines the mean vector to be zero.  The three hyperparameters
-are defined as parameters constrained to be non-negative.  The
-computation of the covariance matrix \code{K} is now in the model
-block because it involves unknown parameters and thus can't simply be
-precomputed as transformed data.  The rest of the model consists of
-the priors for the hyperparameters and the multivariate
-Cholesky-parameterized normal likelihood, only now the value \code{y} is known and the
-covariance matrix \code{K} is an unknown dependent on the
+The data block now declares a vector \code{y} of observed values \code{y[n]}
+for inputs \code{x[n]}.  The transformed data block now only defines the mean
+vector to be zero.  The three hyperparameters are defined as parameters
+constrained to be non-negative.  The computation of the covariance matrix
+\code{K} is now in the model block because it involves unknown parameters and
+thus can't simply be precomputed as transformed data.  The rest of the model
+consists of the priors for the hyperparameters and the multivariate
+Cholesky-parameterized normal likelihood, only now the value \code{y} is known
+and the covariance matrix \code{K} is an unknown dependent on the
 hyperparameters, allowing us to learn the hyperparameters. 
 
 We have used the Cholesky parameterized \distro{MultiNormal} rather than the
@@ -7218,13 +7217,13 @@ standard \distro{MultiNormal} because it allows us to the
 \code{cholesky\_decompose} function which has been optimized for both small and
 large matrices. When working with small matrices the differences in
 computational speed between the two approaches will not be noticeable, but for
-larger matrices ($N \gtrsim 100$) the Cholesky decomposition version will be faster.
+larger matrices ($N \gtrsim 100$) the Cholesky decomposition version will be
+faster.
 
-Hamiltonian Monte Carlo sampling is quite fast and effective for
-hyperparameter inference in this model \citep{Neal:1997}. If the posterior
-is well-concentrated for the hyperparameters the Stan
-implementation will fit hyperparameters in models with a few hundred
-data points in seconds.
+Hamiltonian Monte Carlo sampling is quite fast and effective for hyperparameter
+inference in this model \citep{Neal:1997}. If the posterior is
+well-concentrated for the hyperparameters the Stan implementation will fit
+hyperparameters in models with a few hundred data points in seconds.
 
 \subsubsection{Latent variable GP}
 
@@ -7478,24 +7477,25 @@ If our model consists of only the GP, i.e.:
 \begin{align*}
   f & \sim \distro{MultiNormal}\left(0, K(x | \alpha, \rho)\right) \\
   y_i & \sim \distro{Normal}(f_i, \sigma) \, \forall i \in \{1, \dots, N\} \\
-  & x \in \reals^{N \times D}
+  & x \in \reals^{N \times D}, \, f \in \reals^N
 \end{align*} 
 %
 we likely don't need constraints beyond penalizing small length-scales.  We'd
 like to allow the GP prior to represent both high-frequency and low-frequency
 functions, so our prior should put non-negligible mass on both sets of
-functions. In this case, an inverse gamma will work well as it has a sharp left
-tail that puts negligible mass on length-scales, but a generous right tail, allowing
-for large length-scales. 
+functions. In this case, an inverse gamma, \code{inv\_gamma\_lpdf} in Stan's
+language, will work well as it has a sharp left tail that puts negligible mass
+on length-scales, but a generous right tail, allowing for large length-scales. 
 
 If we're using the GP as a component in a larger model that includes an overall
 mean and fixed effects for the same variables we're using as the domain for the
 GP, i.e.:
 %
 \begin{align*}
-  f & \sim \distro{MultiNormal}\left(0, K(x | \alpha, \rho)\right) \\
-  y_i & \sim \distro{Normal}(\beta_0 + x_i \beta_{[1:D]} + f_i, \sigma) \, \forall i \in \{1, \dots, N\} \\
-  & x_i^T, \beta_{[1:D]} \in \reals^D,\, x \in \reals^{N \times D}, f \in \
+	f & \sim \distro{MultiNormal}\left(0, K(x | \alpha, \rho)\right) \\ y_i &
+	\sim \distro{Normal}(\beta_0 + x_i \beta_{[1:D]} + f_i, \sigma) \, \forall i
+	\in \{1, \dots, N\} \\ & x_i^T, \beta_{[1:D]} \in \reals^D,\, x \in \reals^{N
+	\times D},\, f \in \reals^N
 \end{align*} 
 %
 we'll likely want to constrain large length-scales as well.  A length scale
@@ -7505,27 +7505,31 @@ the length scale has little impact on the likelihood. This will introduce
 nonidentifiability in our model, as both the fixed effects and the GP will
 explain similar variation. In order to limit the amount of overlap between the
 GP and the linear regression, we should use a prior with a sharper right tail
-to limit the GP to higher-frequency functions. We can use a generalized inverse Gaussian 
-distribution:
+to limit the GP to higher-frequency functions. We can use a generalized inverse
+Gaussian distribution:
 %
 \begin{align*}
-  f(x | a, b, p) = \dfrac{(a/b)^{p/2}}{2K_p(\sqrt{ab})} x^{p - 1}\exp(-(ax + b / x)/2)
+	f(x | a, b, p) = \dfrac{(a/b)^{p/2}}{2K_p(\sqrt{ab})} x^{p - 1}\exp(-(ax + b
+	/ x)/2)
 \end{align*} 
 %
 which has an inverse gamma left tail if $p \leq 0$ and a Gaussian right tail.
+This has not yet been implemented in Stan's math library, but it is possible to
+implement as a user defined function.
 
-If we have high-frequency covariates in our fixed effects, we may wish to further
-regularize the GP away from high-frequency functions, which means we'll need to 
-penalize smaller length-scales. Luckily, we have a useful way of thinking about
-how length-scale affects the frequency of the functions supported the GP. If we
-were to repeatedly draw from a zero-mean GP with a length-scale of $\rho$ in a
-fixed-domain $[0,T]$, we would get a distribution for the number of times each draw
-of the GP crossed the zero axis. The expectation of this random variable, the number
-of zero crossings, is $T / \pi \rho$. You can see that as $\rho$ decreases,
-the expectation of the number of upcrossings increases as the GP is representing 
-higher-frequency functions. Thus, this is a good statistic to keep in mind when
-setting a lower-bound for our prior on length-scale in the presence of high-frequency
-covariates. However, this statistic is only valid for one-dimensional inputs.
+If we have high-frequency covariates in our fixed effects, we may wish to
+further regularize the GP away from high-frequency functions, which means we'll
+need to penalize smaller length-scales. Luckily, we have a useful way of
+thinking about how length-scale affects the frequency of the functions
+supported the GP. If we were to repeatedly draw from a zero-mean GP with a
+length-scale of $\rho$ in a fixed-domain $[0,T]$, we would get a distribution
+for the number of times each draw of the GP crossed the zero axis. The
+expectation of this random variable, the number of zero crossings, is $T / \pi
+\rho$. You can see that as $\rho$ decreases, the expectation of the number of
+upcrossings increases as the GP is representing higher-frequency functions.
+Thus, this is a good statistic to keep in mind when setting a lower-bound for
+our prior on length-scale in the presence of high-frequency covariates.
+However, this statistic is only valid for one-dimensional inputs.
 
 \subsubsection{Priors for marginal standard deviation}
 
@@ -7702,10 +7706,8 @@ inputs $\tilde{x}$ for which predictions are to be inferred, and $K$
 is the matrix of covariances between inputs $x$ and $\tilde{x}$, which
 in the case of the exponentiated quadratic covariance function
 would be
-\[
-  K(x | \alpha, \rho, \sigma)_{i, j} = \eta^2 \exp(-\dfrac{1}{2 \rho^2} \sum_{d=1}^D (x_{i,d} -
-\tilde{x}_{j,d})^2).
-\]
+\[ K(x | \alpha, \rho, \sigma)_{i, j} = \eta^2 \exp(-\dfrac{1}{2 \rho^2}
+\sum_{d=1}^D (x_{i,d} - \tilde{x}_{j,d})^2).  \]
 There is no noise term including $\sigma^2$ because the indexes of
 elements in $x$ and $\tilde{x}$ are never the same.
 
@@ -7811,9 +7813,8 @@ where the $K(x, x^\prime | \theta, \phi)_{[m, m^\prime]}$ entry defines the
 covariance between $f_m(x)$ and $f_{m^\prime}(x^\prime)(x)$. This construction
 of Gaussian processes allows us to learn the covariance between the output
 dimensions of $f(x)$. If we parameterize our kernel $K$:
-\begin{align*}
-  K(x, x^\prime | \theta, \phi)_{[m, m^\prime]} = k(x, x^\prime | \theta) k(m, m^\prime | \phi)
-\end{align*}
+\begin{align*} K(x, x^\prime | \theta, \phi)_{[m, m^\prime]} = k(x, x^\prime |
+\theta) k(m, m^\prime | \phi) \end{align*}
 then our finite dimensional generative model for the above is:
 \begin{align*}
   f & \sim \distro{MatrixNormal}(m(x), K(x | \alpha, \rho), C(\phi)) \\
@@ -7828,13 +7829,10 @@ The \distro{MatrixNormal} distribution has two covariance matrices: $K(x |
 \alpha, \rho)$ to encode column covariance, and $C(\phi)$ to define row 
 covariance. The salient features of the \distro{MatrixNormal} are that the rows
 of the matrix $f$ are distributed:
-\begin{align*}
-  f_{[n,]} \sim \distro{MultiNormal}(m(x)_{[n,]}, K(x | \alpha, \rho)_{[n,n]} C(\phi))
-\end{align*}
-and that the columns of the matrix $f$ are distributed:
-\begin{align*}
-  f_{[,m]} \sim \distro{MultiNormal}(m(x)_{[,m]}, K(x | \alpha, \rho) C(\phi)_{[m,m]})
-\end{align*}
+\begin{align*} f_{[n,]} \sim \distro{MultiNormal}(m(x)_{[n,]}, K(x | \alpha,
+\rho)_{[n,n]} C(\phi)) \end{align*} and that the columns of the matrix $f$ are
+distributed: \begin{align*} f_{[,m]} \sim \distro{MultiNormal}(m(x)_{[,m]}, K(x
+	| \alpha, \rho) C(\phi)_{[m,m]}) \end{align*}
 This also means means that $\E\left[f^T f\right]$ is equal to
 $\text{trace}(K(x | \alpha, \rho)) \times C$, whereas $\E\left[ff^T\right]$ 
 is $\text{trace}(C) \times K(x | \alpha, \rho)$. We can derive this using
