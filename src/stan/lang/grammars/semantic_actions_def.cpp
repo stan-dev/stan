@@ -1028,6 +1028,7 @@ namespace stan {
         pass = false;
         return;
       }
+
       expr_type lhs_type = inferred_lhs_type.type();
       expr_type rhs_type = ca.expr_.expression_type();
       if (lhs_type.is_primitive()
@@ -1038,11 +1039,11 @@ namespace stan {
         pass = false;
         return;
       }
-      // 
       if (lhs_type.is_primitive()
           && rhs_type.is_primitive()
           && (lhs_type == DOUBLE_T || lhs_type == rhs_type)) {
-        pass = true; // done checking <prim> <op>= <prim>
+        // done checking <prim> <op>= <prim>
+        pass = true;
         return;
       }
 
