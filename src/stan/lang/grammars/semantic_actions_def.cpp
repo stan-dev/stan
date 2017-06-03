@@ -154,7 +154,7 @@ namespace stan {
       // validate scope matches declaration scope
       scope lhs_origin = vm.get_scope(lhs_var_name);
       if (lhs_origin.program_block() != var_scope.program_block()) {
-        error_msgs << "Cannot assign to variable outside of block where declared"
+        error_msgs << "Cannot assign to variable outside of declaration block"
                    << "; left-hand-side variable origin=";
         print_scope(error_msgs, lhs_origin);
         error_msgs << std::endl;
@@ -216,7 +216,7 @@ namespace stan {
         return false;
       }
       return true;
-    }    
+    }
 
 
     // //////////////////////////////////
@@ -964,12 +964,16 @@ namespace stan {
         return;
       }
       a.var_type_ = vm.get(name);
-      expr_type inferred_lhs_type = infer_var_dims_type(a.var_type_, a.var_dims_);
+      expr_type inferred_lhs_type
+        = infer_var_dims_type(a.var_type_, a.var_dims_);
       if (inferred_lhs_type.is_ill_formed()) {
         error_msgs << "Too many indexes for variable"
-                   << "; variable name = " << name
-                   << "; num dimensions given = " << a.var_dims_.dims_.size()
-                   << "; variable array dimensions = " << a.var_type_.dims_.size()
+                   << "; variable name = "
+                   << name
+                   << "; num dimensions given = "
+                   << a.var_dims_.dims_.size()
+                   << "; variable array dimensions = "
+                   << a.var_type_.dims_.size()
                    << std::endl;
         pass = false;
         return;
@@ -1003,14 +1007,16 @@ namespace stan {
         return;
       }
       ca.var_type_ = vm.get(name);
-      expr_type inferred_lhs_type = infer_var_dims_type(ca.var_type_, ca.var_dims_);
+      expr_type inferred_lhs_type
+        = infer_var_dims_type(ca.var_type_, ca.var_dims_);
       int lhs_num_dims = ca.var_type_.dims_.size();
       int lhs_num_idxs = ca.var_dims_.dims_.size();
 
       // std::cout << "var name " << name << std::endl;
       // std::cout << "var_type_ " << ca.var_type_.base_type_ << std::endl;
       // std::cout << "inferred_lhs_type: " << inferred_lhs_type << std::endl;
-      // std::cout << "inferred_lhs_type.num_dims(): " << inferred_lhs_type.num_dims() << std::endl;
+      // std::cout << "inferred_lhs_type.num_dims(): "
+      // << inferred_lhs_type.num_dims() << std::endl;
       // std::cout << "lhs_num_dims: " << lhs_num_dims << std::endl;
       // std::cout << "lhs_num_idxs: " << lhs_num_idxs << std::endl;
 
@@ -1035,18 +1041,19 @@ namespace stan {
       }
       expr_type lhs_type = inferred_lhs_type.type();
       // std::cout << "lhs_type: " << lhs_type.type() << std::endl;
-      // std::cout << "lhs_type.num_dims(): " << lhs_type.num_dims() << std::endl;
+      // std::cout << "lhs_type.num_dims(): "
+      // << lhs_type.num_dims() << std::endl;
       expr_type rhs_type = ca.expr_.expression_type();
       if (lhs_type.is_primitive()
-          && boost::algorithm::starts_with(ca.op_,"\\.")) {
+          && boost::algorithm::starts_with(ca.op_, "\\.")) {
         error_msgs << "Cannot apply element-wise operation to scalar"
                    << "; compound operator is: " << ca.op_
                    << std::endl;
         pass = false;
         return;
       }
-      ca.op_ = boost::algorithm::erase_last_copy(ca.op_,"=");
-      // compound op-equal for scalar types, generator doesn't use fun_sig_
+      ca.op_ = boost::algorithm::erase_last_copy(ca.op_, "=");
+      // compound op-equal for scalar types, done checking
       if (lhs_type.is_primitive()
           && rhs_type.is_primitive()
           && (lhs_type == DOUBLE_T || lhs_type == rhs_type)) {
@@ -1084,12 +1091,12 @@ namespace stan {
         op_name = "elt_divide";
       } else if (ca.op_ == ".*") {
         op_name = "elt_multiply";
-      }        
+      }
       std::vector<expr_type> arg_types;
       arg_types.push_back(lhs_type);
       arg_types.push_back(rhs_type);
       function_signature_t op_equals_sig(lhs_type, arg_types);
-      if (!function_signatures::instance().is_defined(op_name,op_equals_sig)) {
+      if (!function_signatures::instance().is_defined(op_name, op_equals_sig)) {
         error_msgs << "Cannot apply operator '" << ca.op_ << "='"
                    << " to operands;"
                    << " left-hand side type = " << lhs_type
@@ -1103,7 +1110,7 @@ namespace stan {
     }
     boost::phoenix::function<validate_compound_assignment>
     validate_compound_assignment_f;
-    
+
     void validate_sample::operator()(sample& s,
                                      const variable_map& var_map, bool& pass,
                                      std::ostream& error_msgs) const {

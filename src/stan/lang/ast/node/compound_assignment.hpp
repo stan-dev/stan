@@ -13,7 +13,6 @@ namespace stan {
      * AST node for compound assignment statements.
      */
     struct compound_assignment {
-
       /**
        * Type of the left hand side variable before indexing.
        */
@@ -27,7 +26,7 @@ namespace stan {
       variable_dims var_dims_;
 
       /**
-       * String representation of the arithmetic operation.
+       * String representation of the arithmetic operator symbol.
        * Doesn't include assignment operator <code>=<code>,
        * e.g. for compound addition-assignment <code>+=</code> stmt
        * <code>op</code> value is <code>+</code>.
@@ -41,7 +40,8 @@ namespace stan {
       expression expr_;
 
       /**
-       * Function signature of operation, is nil when lhs and rhs are scalars.
+       * Stan math function name, (see `src/stan/lang/function_signatures.h`).
+       * Left unset when both operands are primitive.
        */
       std::string op_name_;
 
@@ -55,10 +55,11 @@ namespace stan {
        * arithmetic operator, and value.
        *
        * @param var_dims variable and array/matrix indexes
-       * @param op arithmetic operator
+       * @param op compound operator symbol
        * @param expr right hand side, value being assigned to indexed variable
        */
-      compound_assignment(variable_dims& var_dims, std::string& op, expression& expr);
+      compound_assignment(variable_dims& var_dims, std::string& op,
+                          expression& expr);
     };
 
   }

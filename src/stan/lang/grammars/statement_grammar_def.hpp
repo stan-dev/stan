@@ -363,14 +363,14 @@ namespace stan {
         %= (lit("return") >> no_skip[!char_("a-zA-Z0-9_")])
         >> expression_g(_r1)
         >> lit(';') [validate_return_allowed_f(_r1, _pass,
-                                               boost::phoenix::ref(error_msgs_))];
+                                     boost::phoenix::ref(error_msgs_))];
 
       // _r1 = var scope
       void_return_statement_r.name("void return statement");
       void_return_statement_r
         = lit("return") [set_void_return_f(_val)]
         >> lit(';') [validate_void_return_allowed_f(_r1, _pass,
-                                                   boost::phoenix::ref(error_msgs_))];
+                                          boost::phoenix::ref(error_msgs_))];
 
       no_op_statement_r.name("no op statement");
       no_op_statement_r

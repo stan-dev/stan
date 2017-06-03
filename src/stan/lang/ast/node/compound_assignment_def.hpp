@@ -2,6 +2,7 @@
 #define STAN_LANG_AST_NODE_COMPOUND_ASSIGNMENT_DEF_HPP
 
 #include <stan/lang/ast.hpp>
+#include <string>
 
 namespace stan {
   namespace lang {
