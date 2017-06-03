@@ -26,10 +26,7 @@ namespace stan {
       variable_dims var_dims_;
 
       /**
-       * String representation of the arithmetic operator symbol.
-       * Doesn't include assignment operator <code>=<code>,
-       * e.g. for compound addition-assignment <code>+=</code> stmt
-       * <code>op</code> value is <code>+</code>.
+       * String representation of the compound operator.
        */
       std::string op_;
 
