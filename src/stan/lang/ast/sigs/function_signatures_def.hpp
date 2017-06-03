@@ -41,7 +41,7 @@ namespace stan {
         return false;
       const std::vector<function_signature_t> sigs = sigs_map_[name];
       for (size_t i = 0; i < sigs.size(); ++i)
-        if (sig.second  == sigs[i].second)
+        if (sig.second  == sigs[i].second) 
           return true;
       return false;
     }

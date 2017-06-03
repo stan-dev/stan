@@ -1000,9 +1000,6 @@ namespace stan {
         return;
       }
       if (!can_assign_to_lhs_var(name, var_scope, vm, error_msgs)) {
-        error_msgs << "Unknown variable in compound assignment"
-                   << "; lhs variable=" << name
-                   << std::endl;
         pass = false;
         return;
       }
@@ -1011,14 +1008,6 @@ namespace stan {
         = infer_var_dims_type(ca.var_type_, ca.var_dims_);
       int lhs_num_dims = ca.var_type_.dims_.size();
       int lhs_num_idxs = ca.var_dims_.dims_.size();
-
-      // std::cout << "var name " << name << std::endl;
-      // std::cout << "var_type_ " << ca.var_type_.base_type_ << std::endl;
-      // std::cout << "inferred_lhs_type: " << inferred_lhs_type << std::endl;
-      // std::cout << "inferred_lhs_type.num_dims(): "
-      // << inferred_lhs_type.num_dims() << std::endl;
-      // std::cout << "lhs_num_dims: " << lhs_num_dims << std::endl;
-      // std::cout << "lhs_num_idxs: " << lhs_num_idxs << std::endl;
 
       if (inferred_lhs_type.is_ill_formed()) {
         error_msgs << "Too many indexes for variable"
@@ -1040,38 +1029,35 @@ namespace stan {
         return;
       }
       expr_type lhs_type = inferred_lhs_type.type();
-      // std::cout << "lhs_type: " << lhs_type.type() << std::endl;
-      // std::cout << "lhs_type.num_dims(): "
-      // << lhs_type.num_dims() << std::endl;
       expr_type rhs_type = ca.expr_.expression_type();
       if (lhs_type.is_primitive()
-          && boost::algorithm::starts_with(ca.op_, "\\.")) {
+          && boost::algorithm::starts_with(ca.op_, ".")) {
         error_msgs << "Cannot apply element-wise operation to scalar"
                    << "; compound operator is: " << ca.op_
                    << std::endl;
         pass = false;
         return;
       }
-      ca.op_ = boost::algorithm::erase_last_copy(ca.op_, "=");
-      // compound op-equal for scalar types, done checking
+      // 
       if (lhs_type.is_primitive()
           && rhs_type.is_primitive()
           && (lhs_type == DOUBLE_T || lhs_type == rhs_type)) {
-        pass = true;
+        pass = true; // done checking <prim> <op>= <prim>
         return;
       }
-      // container types allow infix and element-wise operations
-      // when lhs and rhs are same shape, and broadcast operations
-      // when rhs is double and lhs is vector, row_vector, or matrix
+
       bool types_compatible =
+        // container types allow infix and element-wise operations
+        // when lhs and rhs are same shape, and broadcast operations
+        // when rhs is double and lhs is vector, row_vector, or matrix
         (lhs_type == rhs_type
          || (lhs_type == VECTOR_T && rhs_type == DOUBLE_T)
          || (lhs_type == ROW_VECTOR_T && rhs_type == DOUBLE_T)
          || (lhs_type == ROW_VECTOR_T && rhs_type == MATRIX_T)
          || (lhs_type == MATRIX_T && rhs_type == DOUBLE_T));
       if (!types_compatible) {
-        error_msgs << "Cannot apply operator '" << ca.op_ << "='"
-                   << " to operands;"
+        error_msgs << "Cannot apply operator '" << ca.op_
+                   << "' to operands;"
                    << " left-hand side type = " << lhs_type
                    << "; right-hand side type=" << rhs_type
                    << std::endl;
@@ -1079,26 +1065,27 @@ namespace stan {
         return;
       }
       std::string op_name;
-      if (ca.op_ == "+") {
+      if (ca.op_ == "+=") {
         op_name = "add";
-      } else if (ca.op_ == "-") {
+      } else if (ca.op_ == "-=") {
         op_name = "subtract";
-      } else if (ca.op_ == "*") {
+      } else if (ca.op_ == "*=") {
         op_name = "multiply";
-      } else if (ca.op_ == "/") {
+      } else if (ca.op_ == "/=") {
         op_name = "divide";
-      } else if (ca.op_ == "./") {
+      } else if (ca.op_ == "./=") {
         op_name = "elt_divide";
-      } else if (ca.op_ == ".*") {
+      } else if (ca.op_ == ".*=") {
         op_name = "elt_multiply";
       }
+      // check that "lhs <op> rhs" is valid stan::math function sig
       std::vector<expr_type> arg_types;
       arg_types.push_back(lhs_type);
       arg_types.push_back(rhs_type);
       function_signature_t op_equals_sig(lhs_type, arg_types);
       if (!function_signatures::instance().is_defined(op_name, op_equals_sig)) {
-        error_msgs << "Cannot apply operator '" << ca.op_ << "='"
-                   << " to operands;"
+        error_msgs << "Cannot apply operator '" << ca.op_
+                   << "' to operands;"
                    << " left-hand side type = " << lhs_type
                    << "; right-hand side type=" << rhs_type
                    << std::endl;

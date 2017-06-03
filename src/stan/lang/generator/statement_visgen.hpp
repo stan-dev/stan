@@ -8,6 +8,7 @@
 #include <stan/lang/generator/generate_local_var_decls.hpp>
 #include <stan/lang/generator/generate_printable.hpp>
 #include <stan/lang/generator/visgen.hpp>
+#include <boost/algorithm/string.hpp>
 #include <ostream>
 #include <sstream>
 #include <string>
@@ -158,6 +159,7 @@ namespace stan {
       void operator()(const nil& /*x*/) const { }
 
       void operator()(const compound_assignment& x) const {
+        std::string op = boost::algorithm::erase_last_copy(x.op_, "=");
         generate_indent(indent_, o_);
         o_ << "stan::math::assign(";
         generate_indexed_expr<true>(x.var_dims_.name_,
