@@ -7519,16 +7519,13 @@ This has not yet been implemented in Stan's math library, but it is possible to
 implement as a user defined function:
 \begin{stancode}
 functions {
-  real generalized_inverse_gaussian_lpdf(real x,
-                                         int p,
-                                         real a,
-                                         real b) {
-      real lp =
-      p * 0.5 * log(a / b)
+ real generalized_inverse_gaussian_lpdf(real x, int p, 
+                                        real a, real b) {
+   return p * 0.5 * log(a / b)
       - log(2 * modified_bessel_second_kind(p, sqrt(a * b)))
-      + (p - 1) * log(x) - (a * x + b / x) * 0.5;
-      return lp;
-  }
+      + (p - 1) * log(x)
+      - (a * x + b / x) * 0.5;
+ }
 }
 data {
 ...
