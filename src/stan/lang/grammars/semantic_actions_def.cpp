@@ -1234,7 +1234,7 @@ namespace stan {
                    << "  * Functions used as statements must be"
                    << " declared to have void returns"
                    << std::endl << std::endl;
-        pass = false;
+        pass = true;
         return;
       }
       pass = true;
@@ -1360,7 +1360,7 @@ namespace stan {
     boost::phoenix::function<set_no_op> set_no_op_f;
 
     void validate_integrate_1d::operator()(
-                      const integrate_1d& ode_fun,
+                      const integrate_1d& int_fun,
                       const variable_map& var_map, bool& pass,
                       std::ostream& error_msgs) const {
       pass = true;
@@ -1370,7 +1370,7 @@ namespace stan {
     validate_integrate_1d_f;
 
     void validate_integrate_1d_grad::operator()(
-                      const integrate_1d_grad& ode_fun,
+                      const integrate_1d_grad& int_fun,
                       const variable_map& var_map, bool& pass,
                       std::ostream& error_msgs) const {
       pass = true;

@@ -167,8 +167,7 @@ namespace stan {
 
       integrate_1d_r.name("expression");
       integrate_1d_r
-        %= ( (string("integrate_1d") >> no_skip[!char_("a-zA-Z0-9_")])
-             | (string("integrate_1d") >> no_skip[!char_("a-zA-Z0-9_")]) )
+        %= ( (string("integrate_1d") >> no_skip[!char_("a-zA-Z0-9_")]) )
         > lit('(')
         > identifier_r          // system function name (function only)
         > lit(',')
