@@ -9,9 +9,9 @@
 
 /**
  * Use 3-param model test-models/good/mcmc/hmc/common/gauss3D
- * fix seed 12345, test against specified inv mass matrix
+ * fix seed 12345, test against specified inv Euclidean metric
  * Tests crafted by running samplers with test config
- * to capture resulting inverse mass matrix values.
+ * to capture resulting inverse Euclidean metric values.
  */
 
 class ServicesSampleHmcNutsDiagEMassMatrix : public testing::Test {
@@ -63,10 +63,10 @@ TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, unit_e_no_adapt) {
   EXPECT_EQ(0, return_code);
 
   stan::io::dump dmp =
-    stan::services::util::create_unit_e_diag_mass_matrix(3);
-  stan::io::var_context& inv_mass_matrix = dmp;
+    stan::services::util::create_unit_e_diag_inv_metric(3);
+  stan::io::var_context& inv_metric = dmp;
   std::vector<double> diag_vals
-    = inv_mass_matrix.vals_r("mass_matrix");
+    = inv_metric.vals_r("inv_metric");
   stan::test::unit::check_adaptation(3, diag_vals, parameter, 0.2);
 }
 
@@ -92,7 +92,7 @@ TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, unit_e_adapt_250) {
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
-  // run sampler with unit_e mass matrix, 250 warmups
+  // run sampler with unit_e Euclidean metric, 250 warmups
   int return_code =
     stan::services::sample::hmc_nuts_diag_e_adapt(model,
                                                   context,
@@ -121,8 +121,8 @@ TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, unit_e_adapt_250) {
                                                   diagnostic);
   EXPECT_EQ(0, return_code);
 
-  // check returned mass matrix
-  // captured result of running sampler w/ unit_e mass matrix, reported output:
+  // check returned Euclidean metric
+  // captured result of running sampler w/ unit_e Euclidean metric, reported output:
   // 0.929061, 0.823316, 0.643094
   std::vector<double> diag_vals;
   diag_vals.push_back(0.929061);
@@ -131,7 +131,7 @@ TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, unit_e_adapt_250) {
   stan::test::unit::check_adaptation(3, diag_vals, parameter, 0.2);
 }
 
-TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, use_mass_matrix_no_adapt) {
+TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, use_metric_no_adapt) {
   unsigned int random_seed = 12345;
   unsigned int chain = 1;
   double init_radius = 2;
@@ -147,15 +147,15 @@ TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, use_mass_matrix_no_adapt) {
   EXPECT_EQ(interrupt.call_count(), 0);
 
   std::string txt =
-    "mass_matrix <- structure(c(0.787405, 0.884987, 1.19869),.Dim=c(3))";
+    "inv_metric <- structure(c(0.787405, 0.884987, 1.19869),.Dim=c(3))";
   std::stringstream in(txt);
   stan::io::dump dump(in);
-  stan::io::var_context& inv_mass_matrix = dump;
+  stan::io::var_context& inv_metric = dump;
 
   int return_code =
     stan::services::sample::hmc_nuts_diag_e(model,
                                             context,
-                                            inv_mass_matrix,
+                                            inv_metric,
                                             random_seed,
                                             chain,
                                             init_radius,
@@ -175,13 +175,13 @@ TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, use_mass_matrix_no_adapt) {
 
   EXPECT_EQ(0, return_code);
 
-  // check results against initial vals (stan::io::var_context inv_mass_matrix)
+  // check results against initial vals (stan::io::var_context inv_metric)
   std::vector<double> diag_vals(3);
-  diag_vals = inv_mass_matrix.vals_r("mass_matrix");
+  diag_vals = inv_metric.vals_r("inv_metric");
   stan::test::unit::check_adaptation(3, diag_vals, parameter, 0.2);
 }
 
-TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, use_mass_matrix_skip_adapt) {
+TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, use_metric_skip_adapt) {
   // run adaptive sampler with 0 warmups
   unsigned int random_seed = 12345;
   unsigned int chain = 1;
@@ -205,15 +205,15 @@ TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, use_mass_matrix_skip_adapt) {
   EXPECT_EQ(interrupt.call_count(), 0);
 
   std::string txt =
-    "mass_matrix <- structure(c(0.787405, 0.884987, 1.19869),.Dim=c(3))";
+    "inv_metric <- structure(c(0.787405, 0.884987, 1.19869),.Dim=c(3))";
   std::stringstream in(txt);
   stan::io::dump dump(in);
-  stan::io::var_context& inv_mass_matrix = dump;
+  stan::io::var_context& inv_metric = dump;
 
   int return_code =
     stan::services::sample::hmc_nuts_diag_e_adapt(model,
                                                   context,
-                                                  inv_mass_matrix,
+                                                  inv_metric,
                                                   random_seed,
                                                   chain,
                                                   init_radius,
@@ -240,8 +240,8 @@ TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, use_mass_matrix_skip_adapt) {
 
   EXPECT_EQ(0, return_code);
 
-  // check results against initial vals (stan::io::var_context inv_mass_matrix)
+  // check results against initial vals (stan::io::var_context inv_metric)
   std::vector<double> diag_vals(3);
-  diag_vals = inv_mass_matrix.vals_r("mass_matrix");
+  diag_vals = inv_metric.vals_r("inv_metric");
   stan::test::unit::check_adaptation(3, diag_vals, parameter, 0.2);
 }

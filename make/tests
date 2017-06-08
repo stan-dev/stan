@@ -228,10 +228,10 @@ src/test/unit/services/sample/hmc_static_dense_e_test.cpp : src/test/test-models
 src/test/unit/services/sample/hmc_static_diag_e_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/services/sample/hmc_static_diag_e_adapt_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/services/sample/hmc_static_unit_e_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
-src/test/unit/services/sample/hmc_nuts_dense_mass_matrix_test.cpp : src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
-src/test/unit/services/sample/hmc_nuts_diag_mass_matrix_test.cpp : src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
-src/test/unit/services/sample/hmc_static_dense_mass_matrix_test.cpp : src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
-src/test/unit/services/sample/hmc_static_diag_mass_matrix_test.cpp : src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
+src/test/unit/services/sample/hmc_nuts_dense_inv_metric_test.cpp : src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
+src/test/unit/services/sample/hmc_nuts_diag_inv_metric_test.cpp : src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
+src/test/unit/services/sample/hmc_static_dense_inv_metric_test.cpp : src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
+src/test/unit/services/sample/hmc_static_diag_inv_metric_test.cpp : src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
 src/test/unit/services/util/generate_transitions_test.cpp: src/test/test-models/good/services/test_lp.hpp
 src/test/unit/services/util/initialize_test.cpp: src/test/test-models/good/services/test_lp.hpp
 src/test/unit/services/util/run_adaptive_sampler_test.cpp src/test/unit/services/util/run_sampler_test.cpp: src/test/test-models/good/services/test_lp.hpp

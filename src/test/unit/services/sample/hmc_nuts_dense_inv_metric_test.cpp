@@ -9,9 +9,9 @@
 
 /**
  * Use 3-param model test-models/good/mcmc/hmc/common/gauss3D
- * fix seed 12345, test against specified inv mass matrix
+ * fix seed 12345, test against specified inv Euclidean metric
  * Tests crafted by running samplers with test config
- * to capture resulting inverse mass matrix values.
+ * to capture resulting inverse Euclidean metric values.
  */
 
 class ServicesSampleHmcNutsDenseEMassMatrix : public testing::Test {
@@ -63,11 +63,11 @@ TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, ident_no_adapt) {
   EXPECT_EQ(0, return_code);
 
   stan::io::dump dmp =
-    stan::services::util::create_unit_e_dense_mass_matrix(3);
-  stan::io::var_context& inv_mass_matrix = dmp;
+    stan::services::util::create_unit_e_dense_inv_metric(3);
+  stan::io::var_context& inv_metric = dmp;
   std::vector<double> dense_vals
-    = inv_mass_matrix.vals_r("mass_matrix");
-  // check returned mass matrix
+    = inv_metric.vals_r("inv_metric");
+  // check returned Euclidean metric
   stan::test::unit::check_adaptation(3, 3, dense_vals, parameter, 0.1);
 }
 
@@ -93,7 +93,7 @@ TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, ident_adapt_250) {
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
-  // run sampler with ident mass matrix, 250 warmups
+  // run sampler with ident Euclidean metric, 250 warmups
   int return_code =
     stan::services::sample::hmc_nuts_dense_e_adapt(model,
                                                    context,
@@ -122,7 +122,7 @@ TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, ident_adapt_250) {
                                                    diagnostic);
   EXPECT_EQ(0, return_code);
 
-  // result of running adaptive sampler w/ ident mass matrix:
+  // result of running adaptive sampler w/ ident Euclidean metric:
   // 1.21622, -0.0271004, 0.00515814
   // -0.0271004, 0.59758, -0.0153581
   // 0.00515814, -0.0153581, 0.863086
@@ -139,7 +139,7 @@ TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, ident_adapt_250) {
   stan::test::unit::check_adaptation(3, 3, dense_vals, parameter, 0.2);
 }
 
-TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, use_mass_matrix_no_adapt) {
+TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, use_metric_no_adapt) {
   unsigned int random_seed = 12345;
   unsigned int chain = 1;
   double init_radius = 2;
@@ -155,19 +155,19 @@ TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, use_mass_matrix_no_adapt) {
   EXPECT_EQ(interrupt.call_count(), 0);
 
   std::string txt =
-    "mass_matrix <- structure(c("
+    "inv_metric <- structure(c("
     "0.640211, 0.156096, -0.374048, "
     "0.156096, 1.41239, -0.0412753, "
     "-0.374048, -0.0412753, 1.29567 "
     "), .Dim  = c(3,3))";
   std::stringstream in(txt);
   stan::io::dump dump(in);
-  stan::io::var_context& inv_mass_matrix = dump;
+  stan::io::var_context& inv_metric = dump;
 
   int return_code =
     stan::services::sample::hmc_nuts_dense_e(model,
                                              context,
-                                             inv_mass_matrix,
+                                             inv_metric,
                                              random_seed,
                                              chain,
                                              init_radius,
@@ -187,11 +187,11 @@ TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, use_mass_matrix_no_adapt) {
   EXPECT_EQ(0, return_code);
 
   std::vector<double> dense_vals(9);
-  dense_vals = inv_mass_matrix.vals_r("mass_matrix");
+  dense_vals = inv_metric.vals_r("inv_metric");
   stan::test::unit::check_adaptation(3, 3, dense_vals, parameter, 0.2);
 }
 
-TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, use_mass_matrix_skip_adapt) {
+TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, use_metric_skip_adapt) {
   unsigned int random_seed = 12345;
   unsigned int chain = 1;
   double init_radius = 2;
@@ -214,19 +214,19 @@ TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, use_mass_matrix_skip_adapt) {
   EXPECT_EQ(interrupt.call_count(), 0);
 
   std::string txt =
-    "mass_matrix <- structure(c("
+    "inv_metric <- structure(c("
     "0.640211, 0.156096, -0.374048, "
     "0.156096, 1.41239, -0.0412753, "
     "-0.374048, -0.0412753, 1.29567 "
     "), .Dim  = c(3,3))";
   std::stringstream in(txt);
   stan::io::dump dump(in);
-  stan::io::var_context& inv_mass_matrix = dump;
+  stan::io::var_context& inv_metric = dump;
 
   int return_code =
     stan::services::sample::hmc_nuts_dense_e_adapt(model,
                                                    context,
-                                                   inv_mass_matrix,
+                                                   inv_metric,
                                                    random_seed,
                                                    chain,
                                                    init_radius,
@@ -254,6 +254,6 @@ TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, use_mass_matrix_skip_adapt) {
   EXPECT_EQ(0, return_code);
 
   std::vector<double> dense_vals(9);
-  dense_vals = inv_mass_matrix.vals_r("mass_matrix");
+  dense_vals = inv_metric.vals_r("inv_metric");
   stan::test::unit::check_adaptation(3, 3, dense_vals, parameter, 0.2);
 }

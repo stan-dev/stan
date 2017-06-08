@@ -12,7 +12,7 @@
 #include <stan/services/util/run_sampler.hpp>
 #include <stan/services/util/create_rng.hpp>
 #include <stan/services/util/initialize.hpp>
-#include <stan/services/util/mass_matrix.hpp>
+#include <stan/services/util/inv_metric.hpp>
 #include <vector>
 
 namespace stan {
@@ -21,12 +21,13 @@ namespace stan {
 
       /**
        * Runs HMC with NUTS without adaptation using diagonal Euclidean metric
-       * with a pre-specified mass matrix.
+       * with a pre-specified Euclidean metric.
        *
        * @tparam Model Model class
        * @param[in] model Input model to test (with data already instantiated)
        * @param[in] init var context for initialization
-       * @param[in] init_metric diagonals of mass matrix
+       * @param[in] init_inv_metric var context exposing an initial diagonal
+                    inverse Euclidean metric (must be positive definite)
        * @param[in] random_seed random seed for the random number generator
        * @param[in] chain chain id to advance the pseudo random number generator
        * @param[in] init_radius radius to initialize
@@ -47,7 +48,7 @@ namespace stan {
        */
       template <class Model>
       int hmc_nuts_diag_e(Model& model, stan::io::var_context& init,
-                          stan::io::var_context& init_metric,
+                          stan::io::var_context& init_inv_metric,
                           unsigned int random_seed, unsigned int chain,
                           double init_radius, int num_warmup,
                           int num_samples, int num_thin, bool save_warmup,
@@ -64,12 +65,12 @@ namespace stan {
           = util::initialize(model, init, rng, init_radius, true,
                              logger, init_writer);
 
-        Eigen::VectorXd inv_mass_matrix;
+        Eigen::VectorXd inv_metric;
         try {
-          inv_mass_matrix =
-            util::read_diag_mass_matrix(init_metric, model.num_params_r(),
+          inv_metric =
+            util::read_diag_inv_metric(init_inv_metric, model.num_params_r(),
                                         logger);
-          util::validate_diag_mass_matrix(inv_mass_matrix, logger);
+          util::validate_diag_inv_metric(inv_metric, logger);
         } catch (const std::domain_error& e) {
           return error_codes::CONFIG;
         }
@@ -77,7 +78,7 @@ namespace stan {
         stan::mcmc::diag_e_nuts<Model, boost::ecuyer1988>
           sampler(model, rng);
 
-        sampler.set_metric(inv_mass_matrix);
+        sampler.set_metric(inv_metric);
         sampler.set_nominal_stepsize(stepsize);
         sampler.set_stepsize_jitter(stepsize_jitter);
         sampler.set_max_depth(max_depth);
@@ -92,7 +93,7 @@ namespace stan {
 
       /**
        * Runs HMC with NUTS without adaptation using diagonal Euclidean metric,
-       * with identity matrix as initial inv_mass_matrix.
+       * with identity matrix as initial inv_metric.
        *
        * @tparam Model Model class
        * @param[in] model Input model to test (with data already instantiated)
@@ -128,10 +129,10 @@ namespace stan {
                           callbacks::writer& sample_writer,
                           callbacks::writer& diagnostic_writer) {
         stan::io::dump dmp =
-          util::create_unit_e_diag_mass_matrix(model.num_params_r());
-        stan::io::var_context& unit_e_mass_matrix = dmp;
+          util::create_unit_e_diag_inv_metric(model.num_params_r());
+        stan::io::var_context& unit_e_metric = dmp;
 
-        return hmc_nuts_diag_e(model, init, unit_e_mass_matrix,
+        return hmc_nuts_diag_e(model, init, unit_e_metric,
                                random_seed, chain, init_radius, num_warmup,
                                num_samples, num_thin, save_warmup, refresh,
                                stepsize, stepsize_jitter, max_depth,
