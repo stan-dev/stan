@@ -41,15 +41,6 @@ TEST_F(ServicesSamplesFixedParam, call_count) {
                                                         diagnostic);
   EXPECT_EQ(0, return_code);
 
-  std::vector<std::vector<std::string> > parameter_names;
-  parameter_names = parameter.vector_string_values();
-  std::vector<std::vector<double> > parameter_values;
-  parameter_values = parameter.vector_double_values();
-  std::vector<std::vector<std::string> > diagnostic_names;
-  diagnostic_names = diagnostic.vector_string_values();
-  std::vector<std::vector<double> > diagnostic_values;
-  diagnostic_values = diagnostic.vector_double_values();
-
   // Expecatations of message call counts
   EXPECT_EQ(num_iterations, interrupt.call_count());
   EXPECT_EQ(1, parameter.call_count("vector_string"));
@@ -150,7 +141,6 @@ TEST_F(ServicesSamplesFixedParam, parameter_checks) {
   EXPECT_DOUBLE_EQ(0.0, parameter_values.back()[2])
     << "final memory_writer should be (0, 0)";
   EXPECT_EQ(return_code, 0);
-
 }
 
 TEST_F(ServicesSamplesFixedParam, output_regression) {

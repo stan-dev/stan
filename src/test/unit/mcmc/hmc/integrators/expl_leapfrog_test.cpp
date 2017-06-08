@@ -419,7 +419,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_9) {
   z.q(0) =  1.27097196280777;
   z.p(0) = -0.159996782671291;
   z.g(0) =  1.27097196280777;
-  z.mInv(0) = 0.733184698671436;
+  z.inv_e_metric_(0) = 0.733184698671436;
   EXPECT_NEAR(z.V,     0.807684865121721, 1e-15);
   EXPECT_NEAR(z.q(0),  1.27097196280777, 1e-15);
   EXPECT_NEAR(z.p(0), -0.159996782671291, 1e-15);

@@ -34,12 +34,31 @@ namespace stan {
           epsilon_(nom_epsilon_),
           epsilon_jitter_(0.0) {}
 
+      /** 
+       * format and write stepsize
+       */
       void
-      write_sampler_state(callbacks::writer& writer) {
+      write_sampler_stepsize(callbacks::writer& writer) {
         std::stringstream nominal_stepsize;
         nominal_stepsize << "Step size = " << get_nominal_stepsize();
         writer(nominal_stepsize.str());
+      }
+
+      /** 
+       * write elements of mass matrix
+       */
+      void
+      write_sampler_metric(callbacks::writer& writer) {
         z_.write_metric(writer);
+      }
+
+      /** 
+       * write stepsize and elements of mass matrix
+       */
+      void
+      write_sampler_state(callbacks::writer& writer) {
+        write_sampler_stepsize(writer);
+        write_sampler_metric(writer);
       }
 
       void get_sampler_diagnostic_names(std::vector<std::string>& model_names,

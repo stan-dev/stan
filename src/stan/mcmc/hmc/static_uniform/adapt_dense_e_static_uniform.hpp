@@ -34,7 +34,7 @@ namespace stan {
                                                     s.accept_stat());
 
           bool update = this->covar_adaptation_.learn_covariance
-            (this->z_.mInv, this->z_.q);
+            (this->z_.inv_e_metric_, this->z_.q);
 
           if (update) {
             this->init_stepsize(logger);

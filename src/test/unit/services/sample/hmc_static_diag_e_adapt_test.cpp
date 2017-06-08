@@ -17,7 +17,6 @@ public:
   stan_model model;
 };
 
-
 TEST_F(ServicesSampleHmcStaticDiagEAdapt, call_count) {
   unsigned int random_seed = 0;
   unsigned int chain = 1;
@@ -50,16 +49,6 @@ TEST_F(ServicesSampleHmcStaticDiagEAdapt, call_count) {
 
   EXPECT_EQ(0, return_code);
 
-  std::vector<std::vector<std::string> > parameter_names;
-  parameter_names = parameter.vector_string_values();
-  std::vector<std::vector<double> > parameter_values;
-  parameter_values = parameter.vector_double_values();
-  std::vector<std::vector<std::string> > diagnostic_names;
-  diagnostic_names = diagnostic.vector_string_values();
-  std::vector<std::vector<double> > diagnostic_values;
-  diagnostic_values = diagnostic.vector_double_values();
-
-  // Expecatations of message call counts
   int num_output_lines = (num_warmup+num_samples)/num_thin;
   EXPECT_EQ(num_warmup+num_samples, interrupt.call_count());
   EXPECT_EQ(1, parameter.call_count("vector_string"));
@@ -68,8 +57,7 @@ TEST_F(ServicesSampleHmcStaticDiagEAdapt, call_count) {
   EXPECT_EQ(num_output_lines, diagnostic.call_count("vector_double"));
 }
 
-
-TEST_F(ServicesSampleHmcStaticDiagEAdapt, output_sizes) {
+TEST_F(ServicesSampleHmcStaticDiagEAdapt, parameter_checks) {
   unsigned int random_seed = 0;
   unsigned int chain = 1;
   double init_radius = 0;
@@ -114,6 +102,9 @@ TEST_F(ServicesSampleHmcStaticDiagEAdapt, output_sizes) {
   EXPECT_EQ("accept_stat__", parameter_names[0][1]);
   EXPECT_EQ("stepsize__", parameter_names[0][2]);
   EXPECT_EQ("int_time__", parameter_names[0][3]);
+  EXPECT_EQ("energy__", parameter_names[0][4]);
+  EXPECT_EQ("x", parameter_names[0][5]);
+  EXPECT_EQ("y", parameter_names[0][6]);
 
   // Expect one name per parameter value.
   EXPECT_EQ(parameter_names[0].size(), parameter_values[0].size());
@@ -127,8 +118,7 @@ TEST_F(ServicesSampleHmcStaticDiagEAdapt, output_sizes) {
   EXPECT_EQ("accept_stat__", diagnostic_names[0][1]);
 }
 
-
-TEST_F(ServicesSampleHmcStaticDiagEAdapt, parameter_checks) {
+TEST_F(ServicesSampleHmcStaticDiagEAdapt, output_sizes) {
   unsigned int random_seed = 0;
   unsigned int chain = 1;
   double init_radius = 0;
@@ -150,7 +140,6 @@ TEST_F(ServicesSampleHmcStaticDiagEAdapt, parameter_checks) {
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
-
   int return_code = stan::services::sample::hmc_static_diag_e_adapt(
       model, context, random_seed, chain, init_radius,
       num_warmup, num_samples, num_thin, save_warmup, refresh,
@@ -169,7 +158,6 @@ TEST_F(ServicesSampleHmcStaticDiagEAdapt, parameter_checks) {
   diagnostic_values = diagnostic.vector_double_values();
 
   EXPECT_EQ(return_code, 0);
-
 }
 
 TEST_F(ServicesSampleHmcStaticDiagEAdapt, output_regression) {

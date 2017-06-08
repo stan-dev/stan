@@ -100,10 +100,10 @@ TEST_F(ServicesUtil, all_zero) {
   EXPECT_EQ(logger.call_count(), logger.call_count_info())
     << "No other calls to logger";
 
-  EXPECT_EQ(6, sample_writer.call_count());
+  EXPECT_EQ(7, sample_writer.call_count());
   EXPECT_EQ(1, sample_writer.call_count("vector_string"))
     << "header line";
-  EXPECT_EQ(3, sample_writer.call_count("string"))
+  EXPECT_EQ(4, sample_writer.call_count("string"))
     << "elapsed time";
   EXPECT_EQ(2, sample_writer.call_count("empty"))
     << "blank lines";
@@ -133,10 +133,10 @@ TEST_F(ServicesUtil, num_warmup_no_save) {
   EXPECT_EQ(logger.call_count(), logger.call_count_info())
     << "No other calls to logger";
 
-  EXPECT_EQ(6, sample_writer.call_count());
+  EXPECT_EQ(7, sample_writer.call_count());
   EXPECT_EQ(1, sample_writer.call_count("vector_string"))
     << "header line";
-  EXPECT_EQ(3, sample_writer.call_count("string"))
+  EXPECT_EQ(4, sample_writer.call_count("string"))
     << "elapsed time";
   EXPECT_EQ(2, sample_writer.call_count("empty"))
     << "blank lines";
@@ -167,10 +167,10 @@ TEST_F(ServicesUtil, num_warmup_save) {
   EXPECT_EQ(logger.call_count(), logger.call_count_info())
     << "No other calls to logger";
 
-  EXPECT_EQ(num_warmup + 6, sample_writer.call_count());
+  EXPECT_EQ(num_warmup + 7, sample_writer.call_count());
   EXPECT_EQ(1, sample_writer.call_count("vector_string"))
     << "header line";
-  EXPECT_EQ(3, sample_writer.call_count("string"))
+  EXPECT_EQ(4, sample_writer.call_count("string"))
     << "elapsed time";
   EXPECT_EQ(2, sample_writer.call_count("empty"))
     << "blank lines";
@@ -205,10 +205,10 @@ TEST_F(ServicesUtil, num_samples) {
   EXPECT_EQ(logger.call_count(), logger.call_count_info())
     << "No other calls to logger";
 
-  EXPECT_EQ(num_samples + 6, sample_writer.call_count());
+  EXPECT_EQ(num_samples + 7, sample_writer.call_count());
   EXPECT_EQ(1, sample_writer.call_count("vector_string"))
     << "header line";
-  EXPECT_EQ(3, sample_writer.call_count("string"))
+  EXPECT_EQ(4, sample_writer.call_count("string"))
     << "elapsed time";
   EXPECT_EQ(2, sample_writer.call_count("empty"))
     << "blank lines";
@@ -245,11 +245,11 @@ TEST_F(ServicesUtil, num_warmup_save_num_samples_num_thin) {
   EXPECT_EQ(logger.call_count(), logger.call_count_info())
     << "No other calls to logger";
 
-  EXPECT_EQ((num_warmup + num_samples) / num_thin + 6,
+  EXPECT_EQ((num_warmup + num_samples) / num_thin + 7,
             sample_writer.call_count());
   EXPECT_EQ(1, sample_writer.call_count("vector_string"))
     << "header line";
-  EXPECT_EQ(3, sample_writer.call_count("string"))
+  EXPECT_EQ(4, sample_writer.call_count("string"))
     << "elapsed time";
   EXPECT_EQ(2, sample_writer.call_count("empty"))
     << "blank lines";
@@ -292,11 +292,11 @@ TEST_F(ServicesUtil, num_warmup_num_samples_refresh) {
   EXPECT_EQ(logger.call_count(), logger.call_count_info())
     << "No other calls to logger";
 
-  EXPECT_EQ(num_samples + 6,
+  EXPECT_EQ(num_samples + 7,
             sample_writer.call_count());
   EXPECT_EQ(1, sample_writer.call_count("vector_string"))
     << "header line";
-  EXPECT_EQ(3, sample_writer.call_count("string"))
+  EXPECT_EQ(4, sample_writer.call_count("string"))
     << "elapsed time";
   EXPECT_EQ(2, sample_writer.call_count("empty"))
     << "blank lines";

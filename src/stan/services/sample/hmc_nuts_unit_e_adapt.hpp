@@ -2,6 +2,7 @@
 #define STAN_SERVICES_SAMPLE_HMC_NUTS_UNIT_E_ADAPT_HPP
 
 #include <stan/callbacks/interrupt.hpp>
+#include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_unit_e_nuts.hpp>

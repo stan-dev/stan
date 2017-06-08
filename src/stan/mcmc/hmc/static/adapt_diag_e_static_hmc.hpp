@@ -34,8 +34,9 @@ namespace stan {
                                                     s.accept_stat());
           this->update_L_();
 
-          bool update = this->var_adaptation_.learn_variance(this->z_.mInv,
-                                                             this->z_.q);
+          bool update = this->var_adaptation_.learn_variance(
+                                              this->z_.inv_e_metric_,
+                                              this->z_.q);
 
           if (update) {
             this->init_stepsize(logger);

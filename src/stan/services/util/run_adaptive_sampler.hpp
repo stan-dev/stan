@@ -13,7 +13,7 @@ namespace stan {
     namespace util {
 
       /**
-       * Runs the sampler without adaptation.
+       * Runs the sampler with adaptation.
        *
        * @tparam Sampler Type of adaptive sampler.
        * @tparam Model Type of model
@@ -77,6 +77,7 @@ namespace stan {
 
         sampler.disengage_adaptation();
         writer.write_adapt_finish(sampler);
+        sampler.write_sampler_state(sample_writer);
 
         start = clock();
         util::generate_transitions(sampler, num_samples, num_warmup,

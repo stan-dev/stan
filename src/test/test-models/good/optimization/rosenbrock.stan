@@ -4,6 +4,6 @@ parameters {
 }
 
 model {
-  increment_log_prob( -(pow(1-x,2) + 100*pow(y - pow(x,2),2)) );
+  target += -(pow(1-x,2) + 100*pow(y - pow(x,2),2));
 }
 

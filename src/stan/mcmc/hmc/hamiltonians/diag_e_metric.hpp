@@ -18,7 +18,7 @@ namespace stan {
         : base_hamiltonian<Model, diag_e_point, BaseRNG>(model) {}
 
       double T(diag_e_point& z) {
-        return 0.5 * z.p.dot( z.mInv.cwiseProduct(z.p) );
+        return 0.5 * z.p.dot( z.inv_e_metric_.cwiseProduct(z.p) );
       }
 
       double tau(diag_e_point& z) {
@@ -38,7 +38,7 @@ namespace stan {
       }
 
       Eigen::VectorXd dtau_dp(diag_e_point& z) {
-        return z.mInv.cwiseProduct(z.p);
+        return z.inv_e_metric_.cwiseProduct(z.p);
       }
 
       Eigen::VectorXd dphi_dq(diag_e_point& z, callbacks::logger& logger) {
@@ -50,7 +50,7 @@ namespace stan {
           rand_diag_gaus(rng, boost::normal_distribution<>());
 
         for (int i = 0; i < z.p.size(); ++i)
-          z.p(i) = rand_diag_gaus() / sqrt(z.mInv(i));
+          z.p(i) = rand_diag_gaus() / sqrt(z.inv_e_metric_(i));
       }
     };
 
