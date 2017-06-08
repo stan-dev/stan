@@ -1,7 +1,7 @@
 #ifndef STAN_MCMC_HMC_STATIC_ADAPT_DIAG_E_STATIC_HMC_HPP
 #define STAN_MCMC_HMC_STATIC_ADAPT_DIAG_E_STATIC_HMC_HPP
 
-#include <stan/callbacks/writer.hpp>
+#include <stan/callbacks/logger.hpp>
 #include <stan/mcmc/hmc/static/diag_e_static_hmc.hpp>
 #include <stan/mcmc/stepsize_var_adapter.hpp>
 
@@ -24,13 +24,10 @@ namespace stan {
       ~adapt_diag_e_static_hmc() {}
 
       sample
-      transition(sample& init_sample,
-                 callbacks::writer& info_writer,
-                 callbacks::writer& error_writer) {
+      transition(sample& init_sample, callbacks::logger& logger) {
         sample s
           = diag_e_static_hmc<Model, BaseRNG>::transition(init_sample,
-                                                          info_writer,
-                                                          error_writer);
+                                                          logger);
 
         if (this->adapt_flag_) {
           this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,
@@ -42,7 +39,7 @@ namespace stan {
                                               this->z_.q);
 
           if (update) {
-            this->init_stepsize(info_writer, error_writer);
+            this->init_stepsize(logger);
             this->update_L_();
 
             this->stepsize_adaptation_.set_mu(log(10 * this->nom_epsilon_));

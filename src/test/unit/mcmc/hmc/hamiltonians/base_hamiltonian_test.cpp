@@ -1,5 +1,6 @@
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
 #include <test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp>
+#include <stan/callbacks/stream_logger.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 #include <boost/random/additive_combine.hpp>
 #include <test/unit/util.hpp>
@@ -20,13 +21,10 @@ TEST(BaseHamiltonian, update_potential_gradient) {
   stan::mcmc::ps_point z(11);
   z.q.setOnes();
 
-  std::stringstream metric_output;
-  stan::callbacks::stream_writer writer(metric_output);
+  std::stringstream debug, info, warn, error, fatal;
+  stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
-  std::stringstream error_stream;
-  stan::callbacks::stream_writer error_writer(error_stream);
-
-  metric.update_potential_gradient(z, writer, error_writer);
+  metric.update_potential_gradient(z, logger);
 
   EXPECT_FLOAT_EQ(10.73223197, z.V);
 
@@ -36,8 +34,11 @@ TEST(BaseHamiltonian, update_potential_gradient) {
 
 
   EXPECT_EQ("", model_output.str());
-  EXPECT_EQ("", metric_output.str());
-  EXPECT_EQ("", error_stream.str());
+  EXPECT_EQ("", debug.str());
+  EXPECT_EQ("", info.str());
+  EXPECT_EQ("", warn.str());
+  EXPECT_EQ("", error.str());
+  EXPECT_EQ("", fatal.str());
 }
 
 TEST(BaseHamiltonian, streams) {

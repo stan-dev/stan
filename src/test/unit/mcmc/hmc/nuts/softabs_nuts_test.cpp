@@ -1,5 +1,5 @@
 #include <test/test-models/good/mcmc/hmc/common/gauss3D.hpp>
-#include <stan/callbacks/stream_writer.hpp>
+#include <stan/callbacks/stream_logger.hpp>
 #include <stan/mcmc/hmc/nuts/softabs_nuts.hpp>
 #include <boost/random/additive_combine.hpp>
 #include <stan/io/dump.hpp>
@@ -20,10 +20,8 @@ TEST(McmcSoftAbsNuts, build_tree_test) {
   z_init.p(1) = 1;
   z_init.p(2) = -1;
 
-  std::stringstream output;
-  stan::callbacks::stream_writer writer(output);
-  std::stringstream error_stream;
-  stan::callbacks::stream_writer error_writer(error_stream);
+  std::stringstream debug, info, warn, error, fatal;
+  stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
   std::fstream empty_stream("", std::fstream::in);
   stan::io::dump data_var_context(empty_stream);
@@ -33,7 +31,7 @@ TEST(McmcSoftAbsNuts, build_tree_test) {
     sampler(model, base_rng);
 
   sampler.z() = z_init;
-  sampler.init_hamiltonian(writer, error_writer);
+  sampler.init_hamiltonian(logger);
   sampler.set_nominal_stepsize(0.1);
   sampler.set_stepsize_jitter(0);
   sampler.sample_stepsize();
@@ -52,7 +50,7 @@ TEST(McmcSoftAbsNuts, build_tree_test) {
   bool valid_subtree = sampler.build_tree(3, z_propose,
                                           p_sharp_left, p_sharp_right, rho,
                                           H0, 1, n_leapfrog, log_sum_weight,
-                                          sum_metro_prob, writer, error_writer);
+                                          sum_metro_prob, logger);
 
   EXPECT_EQ(0.1, sampler.get_nominal_stepsize());
 
@@ -74,8 +72,11 @@ TEST(McmcSoftAbsNuts, build_tree_test) {
   EXPECT_FLOAT_EQ(std::log(0.34310558), log_sum_weight);
   EXPECT_FLOAT_EQ(0.34310558, sum_metro_prob);
 
-  EXPECT_EQ("", output.str());
-  EXPECT_EQ("", error_stream.str());
+  EXPECT_EQ("", debug.str());
+  EXPECT_EQ("", info.str());
+  EXPECT_EQ("", warn.str());
+  EXPECT_EQ("", error.str());
+  EXPECT_EQ("", fatal.str());
 }
 
 TEST(McmcSoftAbsNuts, tree_boundary_test) {
@@ -89,10 +90,8 @@ TEST(McmcSoftAbsNuts, tree_boundary_test) {
   z_init.p(1) = 1;
   z_init.p(2) = -1;
 
-  std::stringstream output;
-  stan::callbacks::stream_writer writer(output);
-  std::stringstream error_stream;
-  stan::callbacks::stream_writer error_writer(error_stream);
+  std::stringstream debug, info, warn, error, fatal;
+  stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
   std::fstream empty_stream("", std::fstream::in);
   stan::io::dump data_var_context(empty_stream);
@@ -108,41 +107,41 @@ TEST(McmcSoftAbsNuts, tree_boundary_test) {
   double epsilon = 0.1;
 
   stan::mcmc::softabs_point z_test = z_init;
-  metric.init(z_test, writer, error_writer);
+  metric.init(z_test, logger);
 
-  softabs_integrator.evolve(z_test, metric, epsilon, writer, error_writer);
+  softabs_integrator.evolve(z_test, metric, epsilon, logger);
   Eigen::VectorXd p_sharp_forward_1 = metric.dtau_dp(z_test);
 
-  softabs_integrator.evolve(z_test, metric, epsilon, writer, error_writer);
+  softabs_integrator.evolve(z_test, metric, epsilon, logger);
   Eigen::VectorXd p_sharp_forward_2 = metric.dtau_dp(z_test);
 
-  softabs_integrator.evolve(z_test, metric, epsilon, writer, error_writer);
-  softabs_integrator.evolve(z_test, metric, epsilon, writer, error_writer);
+  softabs_integrator.evolve(z_test, metric, epsilon, logger);
+  softabs_integrator.evolve(z_test, metric, epsilon, logger);
   Eigen::VectorXd p_sharp_forward_3 = metric.dtau_dp(z_test);
 
-  softabs_integrator.evolve(z_test, metric, epsilon, writer, error_writer);
-  softabs_integrator.evolve(z_test, metric, epsilon, writer, error_writer);
-  softabs_integrator.evolve(z_test, metric, epsilon, writer, error_writer);
-  softabs_integrator.evolve(z_test, metric, epsilon, writer, error_writer);
+  softabs_integrator.evolve(z_test, metric, epsilon, logger);
+  softabs_integrator.evolve(z_test, metric, epsilon, logger);
+  softabs_integrator.evolve(z_test, metric, epsilon, logger);
+  softabs_integrator.evolve(z_test, metric, epsilon, logger);
   Eigen::VectorXd p_sharp_forward_4 = metric.dtau_dp(z_test);
 
   z_test = z_init;
-  metric.init(z_test, writer, error_writer);
+  metric.init(z_test, logger);
 
-  softabs_integrator.evolve(z_test, metric, -epsilon, writer, error_writer);
+  softabs_integrator.evolve(z_test, metric, -epsilon, logger);
   Eigen::VectorXd p_sharp_backward_1 = metric.dtau_dp(z_test);
 
-  softabs_integrator.evolve(z_test, metric, -epsilon, writer, error_writer);
+  softabs_integrator.evolve(z_test, metric, -epsilon, logger);
   Eigen::VectorXd p_sharp_backward_2 = metric.dtau_dp(z_test);
 
-  softabs_integrator.evolve(z_test, metric, -epsilon, writer, error_writer);
-  softabs_integrator.evolve(z_test, metric, -epsilon, writer, error_writer);
+  softabs_integrator.evolve(z_test, metric, -epsilon, logger);
+  softabs_integrator.evolve(z_test, metric, -epsilon, logger);
   Eigen::VectorXd p_sharp_backward_3 = metric.dtau_dp(z_test);
 
-  softabs_integrator.evolve(z_test, metric, -epsilon, writer, error_writer);
-  softabs_integrator.evolve(z_test, metric, -epsilon, writer, error_writer);
-  softabs_integrator.evolve(z_test, metric, -epsilon, writer, error_writer);
-  softabs_integrator.evolve(z_test, metric, -epsilon, writer, error_writer);
+  softabs_integrator.evolve(z_test, metric, -epsilon, logger);
+  softabs_integrator.evolve(z_test, metric, -epsilon, logger);
+  softabs_integrator.evolve(z_test, metric, -epsilon, logger);
+  softabs_integrator.evolve(z_test, metric, -epsilon, logger);
   Eigen::VectorXd p_sharp_backward_4 = metric.dtau_dp(z_test);
 
   // Check expected tree boundaries to those dynamically geneated by NUTS
@@ -165,12 +164,12 @@ TEST(McmcSoftAbsNuts, tree_boundary_test) {
 
   // Depth 0 forward
   sampler.z() = z_init;
-  sampler.init_hamiltonian(writer, error_writer);
+  sampler.init_hamiltonian(logger);
   sampler.build_tree(0, z_propose,
                      p_sharp_left, p_sharp_right, rho,
                      H0, 1, n_leapfrog, log_sum_weight,
                      sum_metro_prob,
-                     writer, error_writer);
+                     logger);
 
   for (int n = 0; n < rho.size(); ++n)
     EXPECT_FLOAT_EQ(p_sharp_forward_1(n), p_sharp_left(n));
@@ -180,12 +179,12 @@ TEST(McmcSoftAbsNuts, tree_boundary_test) {
 
   // Depth 1 forward
   sampler.z() = z_init;
-  sampler.init_hamiltonian(writer, error_writer);
+  sampler.init_hamiltonian(logger);
   sampler.build_tree(1, z_propose,
                      p_sharp_left, p_sharp_right, rho,
                      H0, 1, n_leapfrog, log_sum_weight,
                      sum_metro_prob,
-                     writer, error_writer);
+                     logger);
 
   for (int n = 0; n < rho.size(); ++n)
     EXPECT_FLOAT_EQ(p_sharp_forward_1(n), p_sharp_left(n));
@@ -195,12 +194,12 @@ TEST(McmcSoftAbsNuts, tree_boundary_test) {
 
   // Depth 2 forward
   sampler.z() = z_init;
-  sampler.init_hamiltonian(writer, error_writer);
+  sampler.init_hamiltonian(logger);
   sampler.build_tree(2, z_propose,
                      p_sharp_left, p_sharp_right, rho,
                      H0, 1, n_leapfrog, log_sum_weight,
                      sum_metro_prob,
-                     writer, error_writer);
+                     logger);
 
   for (int n = 0; n < rho.size(); ++n)
     EXPECT_FLOAT_EQ(p_sharp_forward_1(n), p_sharp_left(n));
@@ -210,12 +209,12 @@ TEST(McmcSoftAbsNuts, tree_boundary_test) {
 
   // Depth 3 forward
   sampler.z() = z_init;
-  sampler.init_hamiltonian(writer, error_writer);
+  sampler.init_hamiltonian(logger);
   sampler.build_tree(3, z_propose,
                      p_sharp_left, p_sharp_right, rho,
                      H0, 1, n_leapfrog, log_sum_weight,
                      sum_metro_prob,
-                     writer, error_writer);
+                     logger);
 
   for (int n = 0; n < rho.size(); ++n)
     EXPECT_FLOAT_EQ(p_sharp_forward_1(n), p_sharp_left(n));
@@ -225,12 +224,12 @@ TEST(McmcSoftAbsNuts, tree_boundary_test) {
 
   // Depth 0 backward
   sampler.z() = z_init;
-  sampler.init_hamiltonian(writer, error_writer);
+  sampler.init_hamiltonian(logger);
   sampler.build_tree(0, z_propose,
                      p_sharp_left, p_sharp_right, rho,
                      H0, -1, n_leapfrog, log_sum_weight,
                      sum_metro_prob,
-                     writer, error_writer);
+                     logger);
 
   for (int n = 0; n < rho.size(); ++n)
     EXPECT_FLOAT_EQ(p_sharp_backward_1(n), p_sharp_left(n));
@@ -240,12 +239,12 @@ TEST(McmcSoftAbsNuts, tree_boundary_test) {
 
   // Depth 1 backward
   sampler.z() = z_init;
-  sampler.init_hamiltonian(writer, error_writer);
+  sampler.init_hamiltonian(logger);
   sampler.build_tree(1, z_propose,
                      p_sharp_left, p_sharp_right, rho,
                      H0, -1, n_leapfrog, log_sum_weight,
                      sum_metro_prob,
-                     writer, error_writer);
+                     logger);
 
   for (int n = 0; n < rho.size(); ++n)
     EXPECT_FLOAT_EQ(p_sharp_backward_1(n), p_sharp_left(n));
@@ -255,12 +254,12 @@ TEST(McmcSoftAbsNuts, tree_boundary_test) {
 
   // Depth 2 backward
   sampler.z() = z_init;
-  sampler.init_hamiltonian(writer, error_writer);
+  sampler.init_hamiltonian(logger);
   sampler.build_tree(2, z_propose,
                      p_sharp_left, p_sharp_right, rho,
                      H0, -1, n_leapfrog, log_sum_weight,
                      sum_metro_prob,
-                     writer, error_writer);
+                     logger);
 
   for (int n = 0; n < rho.size(); ++n)
     EXPECT_FLOAT_EQ(p_sharp_backward_1(n), p_sharp_left(n));
@@ -270,12 +269,12 @@ TEST(McmcSoftAbsNuts, tree_boundary_test) {
 
   // Depth 3 backward
   sampler.z() = z_init;
-  sampler.init_hamiltonian(writer, error_writer);
+  sampler.init_hamiltonian(logger);
   sampler.build_tree(3, z_propose,
                      p_sharp_left, p_sharp_right, rho,
                      H0, -1, n_leapfrog, log_sum_weight,
                      sum_metro_prob,
-                     writer, error_writer);
+                     logger);
 
   for (int n = 0; n < rho.size(); ++n)
     EXPECT_FLOAT_EQ(p_sharp_backward_1(n), p_sharp_left(n));
@@ -295,10 +294,8 @@ TEST(McmcSoftAbsNuts, transition_test) {
   z_init.p(1) = 1;
   z_init.p(2) = -1;
 
-  std::stringstream output;
-  stan::callbacks::stream_writer writer(output);
-  std::stringstream error_stream;
-  stan::callbacks::stream_writer error_writer(error_stream);
+  std::stringstream debug, info, warn, error, fatal;
+  stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
   std::fstream empty_stream("", std::fstream::in);
   stan::io::dump data_var_context(empty_stream);
@@ -308,14 +305,14 @@ TEST(McmcSoftAbsNuts, transition_test) {
     sampler(model, base_rng);
 
   sampler.z() = z_init;
-  sampler.init_hamiltonian(writer, error_writer);
+  sampler.init_hamiltonian(logger);
   sampler.set_nominal_stepsize(0.1);
   sampler.set_stepsize_jitter(0);
   sampler.sample_stepsize();
 
   stan::mcmc::sample init_sample(z_init.q, 0, 0);
 
-  stan::mcmc::sample s = sampler.transition(init_sample, writer, error_writer);
+  stan::mcmc::sample s = sampler.transition(init_sample, logger);
 
   EXPECT_EQ(4, sampler.depth_);
   EXPECT_EQ((2 << 3) - 1, sampler.n_leapfrog_);
@@ -326,6 +323,9 @@ TEST(McmcSoftAbsNuts, transition_test) {
   EXPECT_FLOAT_EQ(1.6008, s.cont_params()(2));
   EXPECT_FLOAT_EQ(-3.5239484, s.log_prob());
   EXPECT_FLOAT_EQ(0.99690288, s.accept_stat());
-  EXPECT_EQ("", output.str());
-  EXPECT_EQ("", error_stream.str());
+  EXPECT_EQ("", debug.str());
+  EXPECT_EQ("", info.str());
+  EXPECT_EQ("", warn.str());
+  EXPECT_EQ("", error.str());
+  EXPECT_EQ("", fatal.str());
 }

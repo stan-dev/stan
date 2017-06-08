@@ -1,8 +1,10 @@
 #ifndef STAN_SERVICES_SAMPLE_FIXED_PARAM_HPP
 #define STAN_SERVICES_SAMPLE_FIXED_PARAM_HPP
 
-#include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/callbacks/interrupt.hpp>
+#include <stan/callbacks/logger.hpp>
+#include <stan/callbacks/writer.hpp>
+#include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/mcmc/fixed_param_sampler.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/services/util/mcmc_writer.hpp>
@@ -32,8 +34,7 @@ namespace stan {
        * @param[in] num_thin Number to thin the samples
        * @param[in] refresh Controls the output
        * @param[in,out] interrupt Callback for interrupts
-       * @param[in,out] message_writer Writer for messages
-       * @param[in,out] error_writer Writer for errors
+       * @param[in,out] logger Logger for messages
        * @param[in,out] init_writer Writer callback for unconstrained inits
        * @param[in,out] sample_writer Writer for draws
        * @param[in,out] diagnostic_writer Writer for diagnostic information
@@ -45,8 +46,7 @@ namespace stan {
                       double init_radius, int num_samples,
                       int num_thin, int refresh,
                       callbacks::interrupt& interrupt,
-                      callbacks::writer& message_writer,
-                      callbacks::writer& error_writer,
+                      callbacks::logger& logger,
                       callbacks::writer& init_writer,
                       callbacks::writer& sample_writer,
                       callbacks::writer& diagnostic_writer) {
@@ -55,11 +55,11 @@ namespace stan {
         std::vector<int> disc_vector;
         std::vector<double> cont_vector
           = util::initialize(model, init, rng, init_radius, false,
-                             message_writer, init_writer);
+                             logger, init_writer);
 
         stan::mcmc::fixed_param_sampler sampler;
         util::mcmc_writer
-          writer(sample_writer, diagnostic_writer, message_writer);
+          writer(sample_writer, diagnostic_writer, logger);
         Eigen::VectorXd cont_params(cont_vector.size());
         for (size_t i = 0; i < cont_vector.size(); i++)
           cont_params[i] = cont_vector[i];
@@ -73,8 +73,7 @@ namespace stan {
 
         util::generate_transitions(sampler, num_samples, 0, num_samples,
                                    num_thin, refresh, true, false, writer,
-                                   s, model, rng, interrupt, message_writer,
-                                   error_writer);
+                                   s, model, rng, interrupt, logger);
         clock_t end = clock();
 
         double sampleDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;

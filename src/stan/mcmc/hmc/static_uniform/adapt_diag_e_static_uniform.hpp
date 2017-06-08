@@ -24,13 +24,10 @@ namespace stan {
       ~adapt_diag_e_static_uniform() {}
 
       sample
-      transition(sample& init_sample,
-                 callbacks::writer& info_writer,
-                 callbacks::writer& error_writer) {
+      transition(sample& init_sample, callbacks::logger& logger) {
         sample s
           = diag_e_static_uniform<Model, BaseRNG>::transition(init_sample,
-                                                              info_writer,
-                                                              error_writer);
+                                                              logger);
 
         if (this->adapt_flag_) {
           this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,
@@ -40,7 +37,7 @@ namespace stan {
                                               this->z_.inv_e_metric_,
                                               this->z_.q);
           if (update) {
-            this->init_stepsize(info_writer, error_writer);
+            this->init_stepsize(logger);
             this->stepsize_adaptation_.set_mu(log(10 * this->nom_epsilon_));
             this->stepsize_adaptation_.restart();
           }

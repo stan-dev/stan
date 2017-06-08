@@ -1,17 +1,18 @@
 #ifndef STAN_SERVICES_SAMPLE_HMC_STATIC_DENSE_E_ADAPT_HPP
 #define STAN_SERVICES_SAMPLE_HMC_STATIC_DENSE_E_ADAPT_HPP
 
+#include <stan/callbacks/interrupt.hpp>
+#include <stan/callbacks/logger.hpp>
+#include <stan/callbacks/writer.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat.hpp>
-#include <stan/callbacks/interrupt.hpp>
-#include <stan/callbacks/writer.hpp>
 #include <stan/mcmc/fixed_param_sampler.hpp>
-#include <stan/services/error_codes.hpp>
 #include <stan/mcmc/hmc/static/adapt_dense_e_static_hmc.hpp>
-#include <stan/services/util/run_adaptive_sampler.hpp>
+#include <stan/services/error_codes.hpp>
 #include <stan/services/util/create_rng.hpp>
 #include <stan/services/util/initialize.hpp>
 #include <stan/services/util/mass_matrix.hpp>
+#include <stan/services/util/run_adaptive_sampler.hpp>
 #include <vector>
 
 namespace stan {
@@ -45,8 +46,7 @@ namespace stan {
        * @param[in] term_buffer width of final fast adaptation interval
        * @param[in] window initial width of slow adaptation interval
        * @param[in,out] interrupt Callback for interrupts
-       * @param[in,out] message_writer Writer for messages
-       * @param[in,out] error_writer Writer for errors
+       * @param[in,out] logger Logger for messages
        * @param[in,out] init_writer Writer callback for unconstrained inits
        * @param[in,out] sample_writer Writer for draws
        * @param[in,out] diagnostic_writer Writer for diagnostic information
@@ -66,8 +66,7 @@ namespace stan {
                                    unsigned int term_buffer,
                                    unsigned int window,
                                    callbacks::interrupt& interrupt,
-                                   callbacks::writer& message_writer,
-                                   callbacks::writer& error_writer,
+                                   callbacks::logger& logger,
                                    callbacks::writer& init_writer,
                                    callbacks::writer& sample_writer,
                                    callbacks::writer& diagnostic_writer) {
@@ -76,14 +75,14 @@ namespace stan {
         std::vector<int> disc_vector;
         std::vector<double> cont_vector
           = util::initialize(model, init, rng, init_radius, true,
-                             message_writer, init_writer);
+                             logger, init_writer);
 
         Eigen::MatrixXd inv_mass_matrix;
         try {
           inv_mass_matrix =
             util::read_dense_mass_matrix(init_metric, model.num_params_r(),
-                                         error_writer);
-          util::validate_dense_mass_matrix(inv_mass_matrix, error_writer);
+                                         logger);
+          util::validate_dense_mass_matrix(inv_mass_matrix, logger);
         } catch (const std::domain_error& e) {
           return error_codes::CONFIG;
         }
@@ -102,11 +101,11 @@ namespace stan {
         sampler.get_stepsize_adaptation().set_t0(t0);
 
         sampler.set_window_params(num_warmup, init_buffer, term_buffer,
-                                  window, message_writer);
+                                  window, logger);
 
         util::run_adaptive_sampler(sampler, model, cont_vector, num_warmup,
                                    num_samples, num_thin, refresh, save_warmup,
-                                   rng, interrupt, message_writer, error_writer,
+                                   rng, interrupt, logger,
                                    sample_writer, diagnostic_writer);
 
         return error_codes::OK;
@@ -138,8 +137,7 @@ namespace stan {
        * @param[in] term_buffer width of final fast adaptation interval
        * @param[in] window initial width of slow adaptation interval
        * @param[in,out] interrupt Callback for interrupts
-       * @param[in,out] message_writer Writer for messages
-       * @param[in,out] error_writer Writer for errors
+       * @param[in,out] logger Logger for messages
        * @param[in,out] init_writer Writer callback for unconstrained inits
        * @param[in,out] sample_writer Writer for draws
        * @param[in,out] diagnostic_writer Writer for diagnostic information
@@ -158,8 +156,7 @@ namespace stan {
                                    unsigned int term_buffer,
                                    unsigned int window,
                                    callbacks::interrupt& interrupt,
-                                   callbacks::writer& message_writer,
-                                   callbacks::writer& error_writer,
+                                   callbacks::logger& logger,
                                    callbacks::writer& init_writer,
                                    callbacks::writer& sample_writer,
                                    callbacks::writer& diagnostic_writer) {
@@ -173,7 +170,7 @@ namespace stan {
                                         stepsize, stepsize_jitter, int_time,
                                         delta, gamma, kappa, t0,
                                         init_buffer, term_buffer, window,
-                                        interrupt, message_writer, error_writer,
+                                        interrupt, logger,
                                         init_writer, sample_writer,
                                         diagnostic_writer);
       }

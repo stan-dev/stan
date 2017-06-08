@@ -8,7 +8,7 @@
 #include <vector>
 #include <gtest/gtest.h>
 
-/** 
+/**
  * Use 3-param model test-models/good/mcmc/hmc/common/gauss3D
  * fix seed 12345, test against specified inv mass matrix
  * Tests crafted by running samplers with test config
@@ -21,8 +21,8 @@ public:
     : model(context, &model_log) {}
 
   std::stringstream model_log;
-  stan::test::unit::instrumented_writer message, init, error;
-  stan::test::unit::instrumented_writer parameter, diagnostic;
+  stan::test::unit::instrumented_logger logger;
+  stan::test::unit::instrumented_writer init, parameter, diagnostic;
   stan::io::empty_var_context context;
   stan_model model;
 };
@@ -57,14 +57,13 @@ TEST_F(ServicesSampleHmcStaticDenseEMassMatrix, unit_e_no_adapt) {
                                               stepsize_jitter,
                                               int_time,
                                               interrupt,
-                                              message,
-                                              error,
+                                              logger,
                                               init,
                                               parameter,
                                               diagnostic);
   EXPECT_EQ(0, return_code);
 
-  stan::io::dump dmp = 
+  stan::io::dump dmp =
     stan::services::util::create_unit_e_dense_mass_matrix(3);
   stan::io::var_context& inv_mass_matrix = dmp;
   std::vector<double> dense_vals
@@ -117,8 +116,7 @@ TEST_F(ServicesSampleHmcStaticDenseEMassMatrix, unit_e_adapt_250) {
                                                     term_buffer,
                                                     window,
                                                     interrupt,
-                                                    message,
-                                                    error,
+                                                    logger,
                                                     init,
                                                     parameter,
                                                     diagnostic);
@@ -183,8 +181,7 @@ TEST_F(ServicesSampleHmcStaticDenseEMassMatrix, use_mass_matrix_no_adapt) {
                                               stepsize_jitter,
                                               int_time,
                                               interrupt,
-                                              message,
-                                              error,
+                                              logger,
                                               init,
                                               parameter,
                                               diagnostic);
@@ -251,8 +248,7 @@ TEST_F(ServicesSampleHmcStaticDenseEMassMatrix, use_mass_matrix_skip_adapt) {
                                                     term_buffer,
                                                     window,
                                                     interrupt,
-                                                    message,
-                                                    error,
+                                                    logger,
                                                     init,
                                                     parameter,
                                                     diagnostic);
@@ -263,4 +259,3 @@ TEST_F(ServicesSampleHmcStaticDenseEMassMatrix, use_mass_matrix_skip_adapt) {
   dense_vals = inv_mass_matrix.vals_r("mass_matrix");
   stan::test::unit::check_adaptation(3, 3, dense_vals, parameter, 0.2);
 }
-

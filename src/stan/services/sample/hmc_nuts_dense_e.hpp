@@ -1,13 +1,13 @@
 #ifndef STAN_SERVICES_SAMPLE_HMC_NUTS_DENSE_E_HPP
 #define STAN_SERVICES_SAMPLE_HMC_NUTS_DENSE_E_HPP
 
+#include <stan/callbacks/interrupt.hpp>
+#include <stan/callbacks/logger.hpp>
+#include <stan/callbacks/writer.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat.hpp>
-#include <stan/callbacks/interrupt.hpp>
-#include <stan/callbacks/writer.hpp>
-#include <stan/mcmc/fixed_param_sampler.hpp>
-#include <stan/services/error_codes.hpp>
 #include <stan/mcmc/hmc/nuts/dense_e_nuts.hpp>
+#include <stan/services/error_codes.hpp>
 #include <stan/services/util/run_sampler.hpp>
 #include <stan/services/util/create_rng.hpp>
 #include <stan/services/util/initialize.hpp>
@@ -38,8 +38,7 @@ namespace stan {
        * @param[in] stepsize_jitter uniform random jitter of stepsize
        * @param[in] max_depth Maximum tree depth
        * @param[in,out] interrupt Callback for interrupts
-       * @param[in,out] message_writer Writer for messages
-       * @param[in,out] error_writer Writer for messages
+       * @param[in,out] logger Logger for messages
        * @param[in,out] init_writer Writer callback for unconstrained inits
        * @param[in,out] sample_writer Writer for draws
        * @param[in,out] diagnostic_writer Writer for diagnostic information
@@ -54,8 +53,7 @@ namespace stan {
                            double stepsize, double stepsize_jitter,
                            int max_depth,
                            callbacks::interrupt& interrupt,
-                           callbacks::writer& message_writer,
-                           callbacks::writer& error_writer,
+                           callbacks::logger& logger,
                            callbacks::writer& init_writer,
                            callbacks::writer& sample_writer,
                            callbacks::writer& diagnostic_writer) {
@@ -64,14 +62,14 @@ namespace stan {
         std::vector<int> disc_vector;
         std::vector<double> cont_vector
           = util::initialize(model, init, rng, init_radius, true,
-                             message_writer, init_writer);
+                             logger, init_writer);
 
         Eigen::MatrixXd inv_mass_matrix;
         try {
           inv_mass_matrix =
             util::read_dense_mass_matrix(init_metric, model.num_params_r(),
-                                         error_writer);
-          util::validate_dense_mass_matrix(inv_mass_matrix, error_writer);
+                                         logger);
+          util::validate_dense_mass_matrix(inv_mass_matrix, logger);
         } catch (const std::domain_error& e) {
           return error_codes::CONFIG;
         }
@@ -87,7 +85,7 @@ namespace stan {
 
         util::run_sampler(sampler, model, cont_vector, num_warmup, num_samples,
                           num_thin, refresh, save_warmup, rng, interrupt,
-                          message_writer, error_writer,
+                          logger,
                           sample_writer, diagnostic_writer);
         return error_codes::OK;
       }
@@ -111,8 +109,7 @@ namespace stan {
        * @param[in] stepsize_jitter uniform random jitter of stepsize
        * @param[in] max_depth Maximum tree depth
        * @param[in,out] interrupt Callback for interrupts
-       * @param[in,out] message_writer Writer for messages
-       * @param[in,out] error_writer Writer for messages
+       * @param[in,out] logger Logger for messages
        * @param[in,out] init_writer Writer callback for unconstrained inits
        * @param[in,out] sample_writer Writer for draws
        * @param[in,out] diagnostic_writer Writer for diagnostic information
@@ -127,8 +124,7 @@ namespace stan {
                            double stepsize, double stepsize_jitter,
                            int max_depth,
                            callbacks::interrupt& interrupt,
-                           callbacks::writer& message_writer,
-                           callbacks::writer& error_writer,
+                           callbacks::logger& logger,
                            callbacks::writer& init_writer,
                            callbacks::writer& sample_writer,
                            callbacks::writer& diagnostic_writer) {
@@ -140,7 +136,7 @@ namespace stan {
                                 random_seed, chain, init_radius, num_warmup,
                                 num_samples, num_thin, save_warmup, refresh,
                                 stepsize, stepsize_jitter, max_depth,
-                                interrupt, message_writer, error_writer,
+                                interrupt, logger,
                                 init_writer, sample_writer, diagnostic_writer);
       }
 

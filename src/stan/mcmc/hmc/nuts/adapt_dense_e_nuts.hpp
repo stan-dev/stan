@@ -1,7 +1,7 @@
 #ifndef STAN_MCMC_HMC_NUTS_ADAPT_DENSE_E_NUTS_HPP
 #define STAN_MCMC_HMC_NUTS_ADAPT_DENSE_E_NUTS_HPP
 
-#include <stan/callbacks/writer.hpp>
+#include <stan/callbacks/logger.hpp>
 #include <stan/mcmc/stepsize_covar_adapter.hpp>
 #include <stan/mcmc/hmc/nuts/dense_e_nuts.hpp>
 
@@ -23,12 +23,9 @@ namespace stan {
       ~adapt_dense_e_nuts() {}
 
       sample
-      transition(sample& init_sample,
-                 callbacks::writer& info_writer,
-                 callbacks::writer& error_writer) {
+      transition(sample& init_sample, callbacks::logger& logger) {
         sample s = dense_e_nuts<Model, BaseRNG>::transition(init_sample,
-                                                            info_writer,
-                                                            error_writer);
+                                                            logger);
 
         if (this->adapt_flag_) {
           this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,
@@ -39,7 +36,7 @@ namespace stan {
                                                 this->z_.q);
 
           if (update) {
-            this->init_stepsize(info_writer, error_writer);
+            this->init_stepsize(logger);
 
             this->stepsize_adaptation_.set_mu(log(10 * this->nom_epsilon_));
             this->stepsize_adaptation_.restart();

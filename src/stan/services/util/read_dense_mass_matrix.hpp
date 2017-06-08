@@ -1,7 +1,7 @@
 #ifndef STAN_SERVICES_UTIL_READ_DENSE_MASS_MATRIX_HPP
 #define STAN_SERVICES_UTIL_READ_DENSE_MASS_MATRIX_HPP
 
-#include <stan/callbacks/writer.hpp>
+#include <stan/callbacks/logger.hpp>
 #include <stan/io/var_context.hpp>
 #include <stan/math/prim/mat.hpp>
 #include <limits>
@@ -18,14 +18,14 @@ namespace stan {
        *
        * @param[in] init_mass_matrix a var_context with array of initial values
        * @param[in] num_params expected number of row, column elements
-       * @param[in,out] error_writer message writer
+       * @param[in,out] logger Logger for messages
        * @throws std::domain_error if cannot read the mass matrix
        * @return mass_matrix
        */
       Eigen::MatrixXd
       read_dense_mass_matrix(stan::io::var_context& init_mass_matrix,
                                  size_t num_params,
-                                 stan::callbacks::writer& error_writer) {
+                                 callbacks::logger& logger) {
         Eigen::MatrixXd inv_mass_matrix;
         try {
           init_mass_matrix.validate_dims("read dense mass matrix",
@@ -36,9 +36,9 @@ namespace stan {
           inv_mass_matrix =
             stan::math::to_matrix(dense_vals, num_params, num_params);
         } catch (const std::exception& e) {
-          error_writer("Cannot get mass matrix from input file.");
-          error_writer("Caught exception: ");
-          error_writer(e.what());
+          logger.error("Cannot get mass matrix from input file.");
+          logger.error("Caught exception: ");
+          logger.error(e.what());
           throw std::domain_error("Initialization failure");
         }
 

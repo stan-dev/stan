@@ -1,7 +1,7 @@
 #ifndef STAN_SERVICES_UTIL_READ_DIAG_MASS_MATRIX_HPP
 #define STAN_SERVICES_UTIL_READ_DIAG_MASS_MATRIX_HPP
 
-#include <stan/callbacks/writer.hpp>
+#include <stan/callbacks/logger.hpp>
 #include <stan/io/var_context.hpp>
 #include <Eigen/Dense>
 #include <limits>
@@ -18,14 +18,14 @@ namespace stan {
        *
        * @param[in] init_mass_matrix a var_context with initial values
        * @param[in] num_params expected number of diagonal elements
-       * @param[in,out] error_writer message writer
+       * @param[in,out] logger Logger for messages
        * @throws std::domain_error if the mass matrix is invalid
        * @return mass_matrix vector of diagonal values
        */
       Eigen::VectorXd
       read_diag_mass_matrix(stan::io::var_context& init_mass_matrix,
                             size_t num_params,
-                            stan::callbacks::writer& error_writer) {
+                            callbacks::logger& logger) {
         Eigen::VectorXd inv_mass_matrix(num_params);
         try {
           init_mass_matrix.validate_dims("read diag mass matrix", "mass_matrix",
@@ -37,9 +37,9 @@ namespace stan {
             inv_mass_matrix(i) = diag_vals[i];
           }
         } catch (const std::exception& e) {
-          error_writer("Cannot get mass matrix from input file.");
-          error_writer("Caught exception: ");
-          error_writer(e.what());
+          logger.error("Cannot get mass matrix from input file.");
+          logger.error("Caught exception: ");
+          logger.error(e.what());
           throw std::domain_error("Initialization failure");
         }
         return inv_mass_matrix;
