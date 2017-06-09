@@ -1,6 +1,7 @@
 #include <test/test-models/good/variational/gradient_warn.hpp>
 #include <stan/variational/advi.hpp>
 #include <stan/callbacks/stream_writer.hpp>
+#include <stan/callbacks/stream_logger.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 #include <vector>
@@ -13,10 +14,10 @@ typedef boost::ecuyer1988 rng_t;
 class advi_test : public ::testing::Test {
 public:
   advi_test()
-    : message_writer(message_stream_),
+    : logger(message_stream_, message_stream_, message_stream_, message_stream_, message_stream_),
       parameter_writer(parameter_stream_),
       diagnostic_writer(diagnostic_stream_) { }
-  
+
   void SetUp() {
     std::fstream data_stream("src/test/test-models/good/variational/gradient_warn.data.R",
                              std::fstream::in);
@@ -54,7 +55,7 @@ public:
   std::stringstream parameter_stream_;
   std::stringstream diagnostic_stream_;
 
-  stan::callbacks::stream_writer message_writer;
+  stan::callbacks::stream_logger logger;
   stan::callbacks::stream_writer parameter_writer;
   stan::callbacks::stream_writer diagnostic_writer;
 
@@ -67,7 +68,7 @@ private:
 
 TEST_F(advi_test, gradient_warn_meanfield) {
   EXPECT_EQ(0, advi_meanfield_->run(0.1, false, 50, 0.01, 10000,
-                                    message_writer,
+                                    logger,
                                     parameter_writer,
                                     diagnostic_writer));
   SUCCEED() << "expecting it to compile and run without problems";
@@ -75,7 +76,7 @@ TEST_F(advi_test, gradient_warn_meanfield) {
 
 TEST_F(advi_test, gradient_warn_fullrank) {
   EXPECT_EQ(0, advi_fullrank_->run(0.1, false, 50, 0.01, 10000,
-                                   message_writer,
+                                   logger,
                                    parameter_writer,
                                    diagnostic_writer));
   SUCCEED() << "expecting it to compile and run without problems";

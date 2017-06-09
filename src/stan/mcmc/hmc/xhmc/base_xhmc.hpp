@@ -1,7 +1,7 @@
 #ifndef STAN_MCMC_HMC_NUTS_BASE_XHMC_HPP
 #define STAN_MCMC_HMC_NUTS_BASE_XHMC_HPP
 
-#include <stan/callbacks/writer.hpp>
+#include <stan/callbacks/logger.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/mcmc/hmc/base_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
@@ -84,16 +84,14 @@ namespace stan {
       double get_x_delta() { return this->x_delta_; }
 
       sample
-      transition(sample& init_sample,
-                 callbacks::writer& info_writer,
-                 callbacks::writer& error_writer) {
+      transition(sample& init_sample, callbacks::logger& logger) {
         // Initialize the algorithm
         this->sample_stepsize();
 
         this->seed(init_sample.cont_params());
 
         this->hamiltonian_.sample_p(this->z_, this->rand_int_);
-        this->hamiltonian_.init(this->z_, info_writer, error_writer);
+        this->hamiltonian_.init(this->z_, logger);
 
         ps_point z_plus(this->z_);
         ps_point z_minus(z_plus);
@@ -101,8 +99,7 @@ namespace stan {
         ps_point z_sample(z_plus);
         ps_point z_propose(z_plus);
 
-        double ave = this->hamiltonian_.dG_dt(this->z_,
-                                              info_writer, error_writer);
+        double ave = this->hamiltonian_.dG_dt(this->z_, logger);
         double log_sum_weight = 0;  // log(exp(H0 - H0))
 
         double H0 = this->hamiltonian_.H(this->z_);
@@ -126,7 +123,7 @@ namespace stan {
               = build_tree(this->depth_, z_propose,
                            ave_subtree, log_sum_weight_subtree,
                            H0, 1, n_leapfrog, sum_metro_prob,
-                           info_writer, error_writer);
+                           logger);
             z_plus.ps_point::operator=(this->z_);
           } else {
             this->z_.ps_point::operator=(z_minus);
@@ -134,7 +131,7 @@ namespace stan {
               = build_tree(this->depth_, z_propose,
                            ave_subtree, log_sum_weight_subtree,
                            H0, -1, n_leapfrog, sum_metro_prob,
-                           info_writer, error_writer);
+                           logger);
             z_minus.ps_point::operator=(this->z_);
           }
 
@@ -197,20 +194,18 @@ namespace stan {
        * @param sign Direction in time to built subtree
        * @param n_leapfrog Summed number of leapfrog evaluations
        * @param sum_metro_prob Summed Metropolis probabilities across trajectory
-       * @param info_writer Stream for information messages
-       * @param error_writer Stream for error messages
+       * @param logger Logger for messages
       */
       int build_tree(int depth, ps_point& z_propose,
                      double& ave, double& log_sum_weight,
                      double H0, double sign, int& n_leapfrog,
                      double& sum_metro_prob,
-                     callbacks::writer& info_writer,
-                     callbacks::writer& error_writer) {
+                     callbacks::logger& logger) {
         // Base case
         if (depth == 0) {
           this->integrator_.evolve(this->z_, this->hamiltonian_,
                                    sign * this->epsilon_,
-                                   info_writer, error_writer);
+                                   logger);
           ++n_leapfrog;
 
           double h = this->hamiltonian_.H(this->z_);
@@ -219,9 +214,7 @@ namespace stan {
 
           if ((h - H0) > this->max_deltaH_) this->divergent_ = true;
 
-          double dG_dt = this->hamiltonian_.dG_dt(this->z_,
-                                                  info_writer,
-                                                  error_writer);
+          double dG_dt = this->hamiltonian_.dG_dt(this->z_, logger);
 
           stable_sum(ave, log_sum_weight,
                      dG_dt, H0 - h,
@@ -246,7 +239,7 @@ namespace stan {
           = build_tree(depth - 1, z_propose,
                        ave_left, log_sum_weight_left,
                        H0, sign, n_leapfrog, sum_metro_prob,
-                       info_writer, error_writer);
+                       logger);
 
         if (!valid_left) return false;
         stable_sum(ave, log_sum_weight,
@@ -262,7 +255,7 @@ namespace stan {
           = build_tree(depth - 1, z_propose_right,
                        ave_right, log_sum_weight_right,
                        H0, sign, n_leapfrog, sum_metro_prob,
-                       info_writer, error_writer);
+                       logger);
 
         if (!valid_right) return false;
         stable_sum(ave, log_sum_weight,

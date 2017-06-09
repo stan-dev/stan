@@ -2,6 +2,7 @@
 #define STAN_SERVICES_EXPERIMENTAL_ADVI_MEANFIELD_HPP
 
 #include <stan/callbacks/interrupt.hpp>
+#include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/services/util/experimental_message.hpp>
 #include <stan/services/util/initialize.hpp>
@@ -40,7 +41,7 @@ namespace stan {
          * @param[in] output_samples number of posterior samples to draw and
          *   save
          * @param[in,out] interrupt callback to be called every iteration
-         * @param[in,out] message_writer output for messages
+         * @param[in,out] logger Logger for messages
          * @param[in,out] init_writer Writer callback for unconstrained inits
          * @param[in,out] parameter_writer output for parameter values
          * @param[in,out] diagnostic_writer output for diagnostic values
@@ -54,18 +55,18 @@ namespace stan {
                       bool adapt_engaged, int adapt_iterations, int eval_elbo,
                       int output_samples,
                       callbacks::interrupt& interrupt,
-                      callbacks::writer& message_writer,
+                      callbacks::logger& logger,
                       callbacks::writer& init_writer,
                       callbacks::writer& parameter_writer,
                       callbacks::writer& diagnostic_writer) {
-          util::experimental_message(message_writer);
+          util::experimental_message(logger);
 
           boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
 
           std::vector<int> disc_vector;
           std::vector<double> cont_vector
             = util::initialize(model, init, rng, init_radius, true,
-                               message_writer, init_writer);
+                               logger, init_writer);
 
           std::vector<std::string> names;
           names.push_back("lp__");
@@ -83,7 +84,7 @@ namespace stan {
                      elbo_samples, eval_elbo, output_samples);
           cmd_advi.run(eta, adapt_engaged, adapt_iterations,
                        tol_rel_obj, max_iterations,
-                       message_writer, parameter_writer, diagnostic_writer);
+                       logger, parameter_writer, diagnostic_writer);
 
           return 0;
         }

@@ -4,8 +4,7 @@
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/dense_e_metric.hpp>
 #include <test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp>
-#include <stan/callbacks/stream_writer.hpp>
-#include <stan/callbacks/writer.hpp>
+#include <stan/callbacks/stream_logger.hpp>
 #include <test/unit/util.hpp>
 #include <gtest/gtest.h>
 
@@ -59,10 +58,9 @@ TEST(McmcDenseEMetric, gradients) {
   data_stream.close();
 
 
-  std::stringstream model_output, metric_output;
-  stan::callbacks::stream_writer writer(metric_output);
-  std::stringstream error_stream;
-  stan::callbacks::stream_writer error_writer(error_stream);
+  std::stringstream model_output;
+  std::stringstream debug, info, warn, error, fatal;
+  stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
   funnel_model_namespace::funnel_model model(data_var_context, &model_output);
 
@@ -70,23 +68,23 @@ TEST(McmcDenseEMetric, gradients) {
 
   double epsilon = 1e-6;
 
-  metric.init(z, writer, error_writer);
-  Eigen::VectorXd g1 = metric.dtau_dq(z, writer, error_writer);
+  metric.init(z, logger);
+  Eigen::VectorXd g1 = metric.dtau_dq(z, logger);
 
   for (int i = 0; i < z.q.size(); ++i) {
 
     double delta = 0;
 
     z.q(i) += epsilon;
-    metric.update_potential(z, writer, error_writer);
+    metric.update_potential(z, logger);
     delta += metric.tau(z);
 
     z.q(i) -= 2 * epsilon;
-    metric.update_potential(z, writer, error_writer);
+    metric.update_potential(z, logger);
     delta -= metric.tau(z);
 
     z.q(i) += epsilon;
-    metric.update_potential(z, writer, error_writer);
+    metric.update_potential(z, logger);
 
     delta /= 2 * epsilon;
 
@@ -112,22 +110,22 @@ TEST(McmcDenseEMetric, gradients) {
     EXPECT_NEAR(delta, g2(i), epsilon);
   }
 
-  Eigen::VectorXd g3 = metric.dphi_dq(z, writer, error_writer);
+  Eigen::VectorXd g3 = metric.dphi_dq(z, logger);
 
   for (int i = 0; i < z.q.size(); ++i) {
 
     double delta = 0;
 
     z.q(i) += epsilon;
-    metric.update_potential(z, writer, error_writer);
+    metric.update_potential(z, logger);
     delta += metric.phi(z);
 
     z.q(i) -= 2 * epsilon;
-    metric.update_potential(z, writer, error_writer);
+    metric.update_potential(z, logger);
     delta -= metric.phi(z);
 
     z.q(i) += epsilon;
-    metric.update_potential(z, writer, error_writer);
+    metric.update_potential(z, logger);
 
     delta /= 2 * epsilon;
 
@@ -136,8 +134,11 @@ TEST(McmcDenseEMetric, gradients) {
   }
 
   EXPECT_EQ("", model_output.str());
-  EXPECT_EQ("", metric_output.str());
-  EXPECT_EQ("", error_stream.str());
+  EXPECT_EQ("", debug.str());
+  EXPECT_EQ("", info.str());
+  EXPECT_EQ("", warn.str());
+  EXPECT_EQ("", error.str());
+  EXPECT_EQ("", fatal.str());
 }
 
 TEST(McmcDenseEMetric, streams) {
@@ -151,7 +152,6 @@ TEST(McmcDenseEMetric, streams) {
 
 
   stan::mcmc::mock_model model(q.size());
-  stan::callbacks::writer writer;
 
   // typedef to use within Google Test macros
   typedef stan::mcmc::dense_e_metric<stan::mcmc::mock_model, rng_t> dense_e;

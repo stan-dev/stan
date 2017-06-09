@@ -19,13 +19,15 @@ namespace stan {
         base_nuts_classic<Model, diag_e_metric,
                           expl_leapfrog, BaseRNG>(model, rng) { }
 
-      // Note that the points don't need to be swapped
-      // here since start.mInv = finish.mInv
+      // Note that the points don't need to be swapped here
+      // since start.inv_e_metric_ = finish.inv_e_metric_
       bool compute_criterion(ps_point& start,
                              diag_e_point& finish,
                              Eigen::VectorXd& rho) {
-        return finish.mInv.cwiseProduct(finish.p).dot(rho - finish.p) > 0
-               && finish.mInv.cwiseProduct(start.p).dot(rho - start.p) > 0;
+        return
+          finish.inv_e_metric_.cwiseProduct(finish.p).dot(rho - finish.p) > 0
+          &&
+          finish.inv_e_metric_.cwiseProduct(start.p).dot(rho - start.p) > 0;
       }
     };
 
