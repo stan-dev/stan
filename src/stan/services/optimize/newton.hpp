@@ -5,6 +5,7 @@
 #include <stan/io/chained_var_context.hpp>
 #include <stan/io/random_var_context.hpp>
 #include <stan/callbacks/interrupt.hpp>
+#include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/optimization/newton.hpp>
 #include <stan/services/error_codes.hpp>
@@ -32,7 +33,7 @@ namespace stan {
        * @param[in] save_iterations indicates whether all the interations should
        *   be saved
        * @param[in,out] interrupt callback to be called every iteration
-       * @param[in,out] message_writer output for messages
+       * @param[in,out] logger Logger for messages
        * @param[in,out] init_writer Writer callback for unconstrained inits
        * @param[in,out] parameter_writer output for parameter values
        * @return error_codes::OK if successful
@@ -43,7 +44,7 @@ namespace stan {
                  double init_radius, int num_iterations,
                  bool save_iterations,
                  callbacks::interrupt& interrupt,
-                 callbacks::writer& message_writer,
+                 callbacks::logger& logger,
                  callbacks::writer& init_writer,
                  callbacks::writer& parameter_writer) {
         boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
@@ -51,7 +52,7 @@ namespace stan {
         std::vector<int> disc_vector;
         std::vector<double> cont_vector
           = util::initialize(model, init, rng, init_radius, false,
-                             message_writer, init_writer);
+                             logger, init_writer);
 
 
         double lp(0);
@@ -59,17 +60,17 @@ namespace stan {
           std::stringstream message;
           lp = model.template log_prob<false, false>(cont_vector, disc_vector,
                                                      &message);
-          message_writer(message.str());
+          logger.info(message);
         } catch (const std::exception& e) {
-          message_writer();
-          message_writer("Informational Message: The current Metropolis"
+          logger.info("");
+          logger.info("Informational Message: The current Metropolis"
                          " proposal is about to be rejected because of"
                          " the following issue:");
-          message_writer(e.what());
-          message_writer("If this warning occurs sporadically, such as"
+          logger.info(e.what());
+          logger.info("If this warning occurs sporadically, such as"
                          " for highly constrained variable types like"
                          " covariance matrices, then the sampler is fine,");
-          message_writer("but if this warning occurs often then your model"
+          logger.info("but if this warning occurs often then your model"
                          " may be either severely ill-conditioned or"
                          " misspecified.");
           lp = -std::numeric_limits<double>::infinity();
@@ -77,7 +78,7 @@ namespace stan {
 
         std::stringstream msg;
         msg << "Initial log joint probability = " << lp;
-        message_writer(msg.str());
+        logger.info(msg);
 
         std::vector<std::string> names;
         names.push_back("lp__");
@@ -92,7 +93,7 @@ namespace stan {
             model.write_array(rng, cont_vector, disc_vector, values,
                               true, true, &ss);
             if (ss.str().length() > 0)
-              message_writer(ss.str());
+              logger.info(ss);
             values.insert(values.begin(), lp);
             parameter_writer(values);
           }
@@ -105,7 +106,7 @@ namespace stan {
                << std::setw(2) << (m + 1) << "."
                << " Log joint probability = " << std::setw(10) << lp
                << ". Improved by " << (lp - lastlp) << ".";
-          message_writer(msg2.str());
+          logger.info(msg2);
 
           if (std::fabs(lp - lastlp) <= 1e-8)
             break;
@@ -117,7 +118,7 @@ namespace stan {
           model.write_array(rng, cont_vector, disc_vector, values,
                             true, true, &ss);
           if (ss.str().length() > 0)
-            message_writer(ss.str());
+            logger.info(ss);
           values.insert(values.begin(), lp);
           parameter_writer(values);
         }

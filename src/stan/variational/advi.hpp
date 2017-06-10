@@ -2,6 +2,7 @@
 #define STAN_VARIATIONAL_ADVI_HPP
 
 #include <stan/math.hpp>
+#include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/io/dump.hpp>
@@ -88,7 +89,7 @@ namespace stan {
        *
        * @param[in] variational variational approximation at which to evaluate
        * the ELBO.
-       * @param message_writer writer for messages
+       * @param logger logger for messages
        * @return the evidence lower bound.
        * @throw std::domain_error If, after n_monte_carlo_elbo_ number of draws
        * from the variational distribution all give non-finite log joint
@@ -96,7 +97,7 @@ namespace stan {
        * that the variational distribution has somehow collapsed.
        */
       double calc_ELBO(const Q& variational,
-                       callbacks::writer& message_writer)
+                       callbacks::logger& logger)
         const {
         static const char* function =
           "stan::variational::advi::calc_ELBO";
@@ -112,7 +113,7 @@ namespace stan {
             std::stringstream ss;
             double log_prob = model_.template log_prob<false, true>(zeta, &ss);
             if (ss.str().length() > 0)
-              message_writer(ss.str());
+              logger.info(ss);
             stan::math::check_finite(function, "log_prob", log_prob);
             elbo += log_prob;
             ++i;
@@ -140,12 +141,10 @@ namespace stan {
        * the ELBO.
        * @param[out] elbo_grad gradient of ELBO with respect to variational
        * approximation.
-       * @param message_writer writer for messages
+       * @param logger logger for messages
        */
       void calc_ELBO_grad(const Q& variational, Q& elbo_grad,
-                          callbacks::writer&
-                          message_writer)
-        const {
+                          callbacks::logger& logger) const {
         static const char* function =
           "stan::variational::advi::calc_ELBO_grad";
 
@@ -162,7 +161,7 @@ namespace stan {
 
         variational.calc_grad(elbo_grad,
                               model_, cont_params_, n_monte_carlo_grad_, rng_,
-                              message_writer);
+                              logger);
       }
 
       /**
@@ -171,7 +170,7 @@ namespace stan {
        * @param[in] variational initial variational distribution.
        * @param[in] adapt_iterations number of iterations to spend doing stochastic
        * gradient ascent at each proposed eta value.
-       * @param[in,out] message_writer writer for messages
+       * @param[in,out] logger logger for messages
        * @return adapted (tuned) value of eta via heuristic grid search
        * @throw std::domain_error If either (a) the initial ELBO cannot be
        * computed at the initial variational distribution, (b) all step-size
@@ -179,7 +178,7 @@ namespace stan {
        */
       double adapt_eta(Q& variational,
                        int adapt_iterations,
-                       callbacks::writer& message_writer)
+                       callbacks::logger& logger)
         const {
         static const char* function = "stan::variational::advi::adapt_eta";
 
@@ -187,7 +186,7 @@ namespace stan {
                                    "Number of adaptation iterations",
                                    adapt_iterations);
 
-        message_writer("Begin eta adaptation.");
+        logger.info("Begin eta adaptation.");
 
         // Sequence of eta values to try during adaptation
         const int eta_sequence_size = 5;
@@ -198,7 +197,7 @@ namespace stan {
         double elbo_best = -std::numeric_limits<double>::max();
         double elbo_init;
         try {
-          elbo_init = calc_ELBO(variational, message_writer);
+          elbo_init = calc_ELBO(variational, logger);
         } catch (const std::domain_error& e) {
           const char* name = "Cannot compute ELBO using the initial "
             "variational distribution.";
@@ -233,12 +232,12 @@ namespace stan {
             variational
               ::print_progress(print_progress_m, 0,
                                adapt_iterations * eta_sequence_size,
-                               adapt_iterations, true, "", "", message_writer);
+                               adapt_iterations, true, "", "", logger);
 
             // (ROBUST) Compute gradient of ELBO. It's OK if it diverges.
             // We'll try a smaller eta.
             try {
-              calc_ELBO_grad(variational, elbo_grad, message_writer);
+              calc_ELBO_grad(variational, elbo_grad, logger);
             } catch (const std::domain_error& e) {
               elbo_grad.set_to_zero();
             }
@@ -258,7 +257,7 @@ namespace stan {
 
           // (ROBUST) Compute ELBO. It's OK if it has diverged.
           try {
-            elbo = calc_ELBO(variational, message_writer);
+            elbo = calc_ELBO(variational, logger);
           } catch (const std::domain_error& e) {
             elbo = -std::numeric_limits<double>::max();
           }
@@ -275,8 +274,8 @@ namespace stan {
               ss << (" earlier than expected.");
             else
               ss << ".";
-            message_writer(ss.str());
-            message_writer();
+            logger.info(ss);
+            logger.info("");
             do_more_tuning = false;
           } else {
             if (eta_sequence_index < eta_sequence_size - 1) {
@@ -291,8 +290,8 @@ namespace stan {
                 ss << "Success!"
                    << " Found best value [eta = " << eta_best
                    << "].";
-                message_writer(ss.str());
-                message_writer();
+                logger.info(ss);
+                logger.info("");
                 eta_best = eta;
                 do_more_tuning = false;
               } else {
@@ -318,7 +317,7 @@ namespace stan {
        * @param[in] eta stepsize scaling parameter
        * @param[in] tol_rel_obj relative tolerance parameter for convergence
        * @param[in] max_iterations max number of iterations to run algorithm
-       * @param[in,out] message_writer writer for mesasges
+       * @param[in,out] logger logger for messages
        * @param[in,out] diagnostic_writer writer for diagnostic information
        * @throw std::domain_error If the ELBO or its gradient is ever
        * non-finite, at any iteration
@@ -327,7 +326,7 @@ namespace stan {
                                       double eta,
                                       double tol_rel_obj,
                                       int max_iterations,
-                                      callbacks::writer& message_writer,
+                                      callbacks::logger& logger,
                                       callbacks::writer& diagnostic_writer)
         const {
         static const char* function =
@@ -365,12 +364,12 @@ namespace stan {
                                       2.0));
         boost::circular_buffer<double> elbo_diff(cb_size);
 
-        message_writer("Begin stochastic gradient ascent.");
-        message_writer("  iter"
-                       "       ELBO"
-                       "   delta_ELBO_mean"
-                       "   delta_ELBO_med"
-                       "   notes ");
+        logger.info("Begin stochastic gradient ascent.");
+        logger.info("  iter"
+                    "       ELBO"
+                    "   delta_ELBO_mean"
+                    "   delta_ELBO_med"
+                    "   notes ");
 
         // Timing variables
         clock_t start = clock();
@@ -381,7 +380,7 @@ namespace stan {
         bool do_more_iterations = true;
         for (int iter_counter = 1; do_more_iterations; ++iter_counter) {
           // Compute gradient using Monte Carlo integration
-          calc_ELBO_grad(variational, elbo_grad, message_writer);
+          calc_ELBO_grad(variational, elbo_grad, logger);
 
           // Update step-size
           if (iter_counter == 1) {
@@ -399,7 +398,7 @@ namespace stan {
           // Check for convergence every "eval_elbo_"th iteration
           if (iter_counter % eval_elbo_ == 0) {
             elbo_prev = elbo;
-            elbo = calc_ELBO(variational, message_writer);
+            elbo = calc_ELBO(variational, logger);
             if (elbo > elbo_best)
               elbo_best = elbo;
             delta_elbo = rel_difference(elbo, elbo_prev);
@@ -447,24 +446,24 @@ namespace stan {
               }
             }
 
-            message_writer(ss.str());
+            logger.info(ss);
 
             if (do_more_iterations == false &&
                 rel_difference(elbo, elbo_best) > 0.05) {
-              message_writer("Informational Message: The ELBO at a previous "
-                             "iteration is larger than the ELBO upon "
-                             "convergence!");
-              message_writer("This variational approximation may not "
-                             "have converged to a good optimum.");
+              logger.info("Informational Message: The ELBO at a previous "
+                          "iteration is larger than the ELBO upon "
+                          "convergence!");
+              logger.info("This variational approximation may not "
+                          "have converged to a good optimum.");
             }
           }
 
           if (iter_counter == max_iterations) {
-            message_writer("Informational Message: The maximum number of "
-                           "iterations is reached! The algorithm may not have "
-                           "converged.");
-            message_writer("This variational approximation is not "
-                           "guaranteed to be meaningful.");
+            logger.info("Informational Message: The maximum number of "
+                        "iterations is reached! The algorithm may not have "
+                        "converged.");
+            logger.info("This variational approximation is not "
+                        "guaranteed to be meaningful.");
             do_more_iterations = false;
           }
         }
@@ -478,14 +477,14 @@ namespace stan {
        * @param[in] adapt_iterations number of iterations for eta adaptation
        * @param[in] tol_rel_obj relative tolerance parameter for convergence
        * @param[in] max_iterations max number of iterations to run algorithm
-       * @param[in,out] message_writer writer for messages
+       * @param[in,out] logger logger for messages
        * @param[in,out] parameter_writer writer for parameters
        *   (typically to file)
        * @param[in,out] diagnostic_writer writer for diagnostic information
-      */
+       */
       int run(double eta, bool adapt_engaged, int adapt_iterations,
               double tol_rel_obj, int max_iterations,
-              callbacks::writer& message_writer,
+              callbacks::logger& logger,
               callbacks::writer& parameter_writer,
               callbacks::writer& diagnostic_writer)
         const {
@@ -495,7 +494,7 @@ namespace stan {
         Q variational = Q(cont_params_);
 
         if (adapt_engaged) {
-          eta = adapt_eta(variational, adapt_iterations, message_writer);
+          eta = adapt_eta(variational, adapt_iterations, logger);
           parameter_writer("Stepsize adaptation complete.");
           std::stringstream ss;
           ss << "eta = " << eta;
@@ -504,7 +503,7 @@ namespace stan {
 
         stochastic_gradient_ascent(variational, eta,
                                    tol_rel_obj, max_iterations,
-                                   message_writer, diagnostic_writer);
+                                   logger, diagnostic_writer);
 
         // Write mean of posterior approximation on first output line
         cont_params_ = variational.mean();
@@ -518,17 +517,17 @@ namespace stan {
         model_.write_array(rng_, cont_vector, disc_vector, values,
                            true, true, &msg);
         if (msg.str().length() > 0)
-          message_writer(msg.str());
+          logger.info(msg);
         values.insert(values.begin(), 0);
         parameter_writer(values);
 
         // Draw more samples from posterior and write on subsequent lines
-        message_writer();
+        logger.info("");
         std::stringstream ss;
         ss << "Drawing a sample of size "
            << n_posterior_samples_
            << " from the approximate posterior... ";
-        message_writer(ss.str());
+        logger.info(ss);
 
         for (int n = 0; n < n_posterior_samples_; ++n) {
           variational.sample(rng_, cont_params_);
@@ -539,11 +538,11 @@ namespace stan {
           model_.write_array(rng_, cont_vector, disc_vector, values,
                              true, true, &msg2);
           if (msg2.str().length() > 0)
-            message_writer(msg2.str());
+            logger.info(msg2);
           values.insert(values.begin(), 0);
           parameter_writer(values);
         }
-        message_writer("COMPLETED.");
+        logger.info("COMPLETED.");
 
         return stan::services::error_codes::OK;
       }
