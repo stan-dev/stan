@@ -706,7 +706,7 @@ statement ::= atomic_statement | nested_statement
 
 atomic_statement ::= atomic_statement_body ';'
 atomic_statement_body
-::=  lhs ('=' | '<-') expression
+::=  lhs assignment_op expression
    | expression '~' identifier '(' expressions ')' ?truncation
    | function_literal '(' expressions ')'
    | 'increment_log_prob' '(' expression ')'
@@ -717,6 +717,8 @@ atomic_statement_body
    | 'reject' '(' (expression | string_literal)* ')'
    | 'return' expression
    | ''
+
+assignment_op ::= '<-' | '=' | '+=' | '-=' | '*=' | '/=' | '.*=' | '/*='
 
 string_literal ::= '"' char* '"'
 
