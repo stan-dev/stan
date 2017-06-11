@@ -1557,7 +1557,7 @@ with the vectorized form:
   {
     vector[N] x_beta_jj;
     for (n in 1:N)
-      x_beta_jj[n] = x[n] * beta[jj[n]]
+      x_beta_jj[n] = x[n] * beta[jj[n]];
     y ~ normal(x_beta_jj, sigma);
   }
 \end{stancode}
