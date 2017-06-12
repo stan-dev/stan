@@ -1,7 +1,7 @@
 #ifndef STAN_SERVICES_UTIL_EXPERIMENTAL_MESSAGE_HPP
 #define STAN_SERVICES_UTIL_EXPERIMENTAL_MESSAGE_HPP
 
-#include <stan/callbacks/writer.hpp>
+#include <stan/callbacks/logger.hpp>
 
 namespace stan {
   namespace services {
@@ -11,20 +11,19 @@ namespace stan {
        * Writes an experimental message to the writer.
        * All experimental algorithms should call this function.
        *
-       * @param[in,out] message_writer writer for experimental algorithm message
+       * @param[in,out] logger logger for experimental algorithm message
        */
-      void experimental_message(stan::callbacks::writer&
-                                message_writer) {
-        message_writer("------------------------------"
-                       "------------------------------");
-        message_writer("EXPERIMENTAL ALGORITHM:");
-        message_writer("  This procedure has not been thoroughly tested"
-                       " and may be unstable");
-        message_writer("  or buggy. The interface is subject to change.");
-        message_writer("------------------------------"
-                       "------------------------------");
-        message_writer();
-        message_writer();
+      void experimental_message(stan::callbacks::logger& logger) {
+        logger.info("------------------------------"
+                    "------------------------------");
+        logger.info("EXPERIMENTAL ALGORITHM:");
+        logger.info("  This procedure has not been thoroughly tested"
+                    " and may be unstable");
+        logger.info("  or buggy. The interface is subject to change.");
+        logger.info("------------------------------"
+                    "------------------------------");
+        logger.info("");
+        logger.info("");
       }
 
     }
