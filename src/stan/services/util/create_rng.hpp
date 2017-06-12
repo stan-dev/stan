@@ -10,7 +10,7 @@ namespace stan {
       /**
        * Creates a pseudo random number generator from a random seed
        * and a chain id by initializing the PRNG with the seed and
-       * then advancing past 2<sup>50<sup> times the chain ID draws to
+       * then advancing past pow(2, 50) times the chain ID draws to
        * ensure different chains sample from different segments of the
        * pseudo random number sequence.
        *
