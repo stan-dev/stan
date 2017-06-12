@@ -60,6 +60,10 @@ bool is_parsable(const std::string& file_name,
                  bool allow_undefined = false) {
   stan::lang::program prog;
   std::ifstream fs(file_name.c_str());
+  if (fs.fail()) {
+    *msgs <<  "Cannot open model file " << file_name << std::endl; 
+    return false;
+  }
   std::string model_name = file_name_to_model_name(file_name);
   stan::io::program_reader reader = create_stub_reader();
   bool parsable

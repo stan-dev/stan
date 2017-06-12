@@ -15,8 +15,9 @@ public:
     : model(context, &model_log) {}
 
   std::stringstream model_log;
-  stan::test::unit::instrumented_writer message, init, error;
+  stan::test::unit::instrumented_writer init;
   stan::test::unit::instrumented_writer parameter, diagnostic;
+  stan::test::unit::instrumented_logger logger;
   stan::io::empty_var_context context;
   stan_model model;
 };
@@ -37,11 +38,11 @@ TEST_F(ServicesSamplesGenerateTransitions, call_counting) {
   std::vector<double> cont_vector
     = stan::services::util::initialize(model, context, rng, init_radius,
                                        false,
-                                       message, diagnostic);
+                                       logger, diagnostic);
 
   stan::mcmc::fixed_param_sampler sampler;
   stan::services::util::mcmc_writer
-    writer(parameter, diagnostic, message);
+    writer(parameter, diagnostic, logger);
   Eigen::VectorXd cont_params(cont_vector.size());
   for (size_t i = 0; i < cont_vector.size(); i++)
     cont_params[i] = cont_vector[i];
@@ -52,7 +53,7 @@ TEST_F(ServicesSamplesGenerateTransitions, call_counting) {
 
   stan::services::util::generate_transitions(
     sampler, num_iterations, 0, 20, 1, refresh, true, false, writer,
-    s, model, rng, interrupt, message, error);
+    s, model, rng, interrupt, logger);
 
   std::vector<std::vector<std::string> > parameter_names;
   parameter_names = parameter.vector_string_values();
@@ -66,10 +67,9 @@ TEST_F(ServicesSamplesGenerateTransitions, call_counting) {
   // Expect interrupt to be called once per iteration.
   EXPECT_EQ(interrupt.call_count(), num_iterations);
 
-  // Expect no messages, no init messages, and no error messages.
-  EXPECT_EQ(message.call_count(), 0);
+  // Expect no messages and no init messages
+  EXPECT_EQ(logger.call_count(), 0);
   EXPECT_EQ(init.call_count(), 0);
-  EXPECT_EQ(error.call_count(), 0);
 
   // Expect on call to set parameter names, and one set of output per
   // iteration.
@@ -101,11 +101,11 @@ TEST_F(ServicesSamplesGenerateTransitions, output_sizes) {
   std::vector<double> cont_vector
     = stan::services::util::initialize(model, context, rng, init_radius,
                                        false,
-                                       message, diagnostic);
+                                       logger, diagnostic);
 
   stan::mcmc::fixed_param_sampler sampler;
   stan::services::util::mcmc_writer
-    writer(parameter, diagnostic, message);
+    writer(parameter, diagnostic, logger);
   Eigen::VectorXd cont_params(cont_vector.size());
   for (size_t i = 0; i < cont_vector.size(); i++)
     cont_params[i] = cont_vector[i];
@@ -116,7 +116,7 @@ TEST_F(ServicesSamplesGenerateTransitions, output_sizes) {
 
   stan::services::util::generate_transitions(
     sampler, num_iterations, 0, 20, 1, refresh, true, false, writer,
-    s, model, rng, interrupt, message, error);
+    s, model, rng, interrupt, logger);
 
   std::vector<std::vector<std::string> > parameter_names;
   parameter_names = parameter.vector_string_values();

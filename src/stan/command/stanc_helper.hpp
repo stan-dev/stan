@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 
+
 /**
  * Print the version of stanc with major, minor and patch.
  *
@@ -126,7 +127,14 @@ int stanc_helper(int argc, const char* argv[],
     }
     std::string in_file_name;
     cmd.bare(0, in_file_name);
+
     std::ifstream in(in_file_name.c_str());
+    if (!in.is_open()) {
+      std::stringstream msg;
+      msg << "Failed to open model file "
+          <<  in_file_name.c_str();
+      throw std::invalid_argument(msg.str());
+    }
 
     std::string model_name;
     if (cmd.has_key("name")) {
@@ -182,6 +190,13 @@ int stanc_helper(int argc, const char* argv[],
       *out_stream << "Input file=" << in_file_name << std::endl;
       *out_stream << "Output file=" << out_file_name << std::endl;
     }
+    // check that we can write to out before invoking compiler
+    if (!out.is_open()) {
+      std::stringstream msg;
+      msg << "Failed to open output file "
+          <<  out_file_name.c_str();
+      throw std::invalid_argument(msg.str());
+    }
 
     std::vector<std::string> include_paths;
     include_paths.push_back("");
@@ -190,6 +205,13 @@ int stanc_helper(int argc, const char* argv[],
                             allow_undefined, in_file_name, include_paths);
 
     out.close();
+    if (out.bad()) {
+      std::stringstream msg;
+      msg << "Error writing output file "
+          << out_file_name.c_str();
+      throw std::invalid_argument(msg.str());
+    }
+
     if (!valid_model) {
       if (err_stream)
         *err_stream << "PARSING FAILED." << std::endl;

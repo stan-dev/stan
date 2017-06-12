@@ -1,6 +1,6 @@
 #include <stan/io/dump.hpp>
 #include <stan/mcmc/hmc/hamiltonians/softabs_metric.hpp>
-#include <stan/callbacks/stream_writer.hpp>
+#include <stan/callbacks/stream_logger.hpp>
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
 #include <test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp>
 #include <test/unit/util.hpp>
@@ -28,13 +28,12 @@ TEST(McmcSoftAbs, sample_p) {
   double m = 0;
   double m2 = 0;
 
-  std::stringstream model_output, metric_output;
-  stan::callbacks::stream_writer writer(metric_output);
+  std::stringstream model_output;
+  std::stringstream debug, info, warn, error, fatal;
+  stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
-  std::stringstream error_stream;
-  stan::callbacks::stream_writer error_writer(error_stream);
 
-  metric.update_metric(z, writer, error_writer);
+  metric.update_metric(z, logger);
 
   for (int i = 0; i < n_samples; ++i) {
     metric.sample_p(z, base_rng);
@@ -53,7 +52,12 @@ TEST(McmcSoftAbs, sample_p) {
   // Variance within 10% of expected value (d / 2)
   EXPECT_TRUE(std::fabs(var - 0.5 * q.size()) < 0.1 * q.size());
 
-  EXPECT_EQ("", metric_output.str());
+  EXPECT_EQ("", model_output.str());
+  EXPECT_EQ("", debug.str());
+  EXPECT_EQ("", info.str());
+  EXPECT_EQ("", warn.str());
+  EXPECT_EQ("", error.str());
+  EXPECT_EQ("", fatal.str());
 }
 
 TEST(McmcSoftAbs, gradients) {
@@ -70,11 +74,9 @@ TEST(McmcSoftAbs, gradients) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
 
-  std::stringstream model_output, metric_output;
-  stan::callbacks::stream_writer writer(metric_output);
-
-  std::stringstream error_stream;
-  stan::callbacks::stream_writer error_writer(error_stream);
+  std::stringstream model_output;
+  std::stringstream debug, info, warn, error, fatal;
+  stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
   funnel_model_namespace::funnel_model model(data_var_context, &model_output);
 
@@ -82,19 +84,19 @@ TEST(McmcSoftAbs, gradients) {
 
   double epsilon = 1e-6;
 
-  metric.init(z, writer, error_writer);
-  Eigen::VectorXd g1 = metric.dtau_dq(z, writer, error_writer);
+  metric.init(z, logger);
+  Eigen::VectorXd g1 = metric.dtau_dq(z, logger);
 
   for (int i = 0; i < z.q.size(); ++i) {
 
     double delta = 0;
 
     z.q(i) += epsilon;
-    metric.init(z, writer, error_writer);
+    metric.init(z, logger);
     delta += metric.tau(z);
 
     z.q(i) -= 2 * epsilon;
-    metric.init(z, writer, error_writer);
+    metric.init(z, logger);
     delta -= metric.tau(z);
 
     z.q(i) += epsilon;
@@ -104,7 +106,7 @@ TEST(McmcSoftAbs, gradients) {
     EXPECT_NEAR(delta, g1(i), epsilon);
   }
 
-  metric.init(z, writer, error_writer);
+  metric.init(z, logger);
   Eigen::VectorXd g2 = metric.dtau_dp(z);
 
   for (int i = 0; i < z.q.size(); ++i) {
@@ -124,17 +126,17 @@ TEST(McmcSoftAbs, gradients) {
     EXPECT_NEAR(delta, g2(i), epsilon);
   }
 
-  Eigen::VectorXd g3 = metric.dphi_dq(z, writer, error_writer);
+  Eigen::VectorXd g3 = metric.dphi_dq(z, logger);
 
   for (int i = 0; i < z.q.size(); ++i) {
     double delta = 0;
 
     z.q(i) += epsilon;
-    metric.init(z, writer, error_writer);
+    metric.init(z, logger);
     delta += metric.phi(z);
 
     z.q(i) -= 2 * epsilon;
-    metric.init(z, writer, error_writer);
+    metric.init(z, logger);
     delta -= metric.phi(z);
 
     z.q(i) += epsilon;
@@ -145,8 +147,11 @@ TEST(McmcSoftAbs, gradients) {
   }
 
   EXPECT_EQ("", model_output.str());
-  EXPECT_EQ("", metric_output.str());
-  EXPECT_EQ("", error_stream.str());
+  EXPECT_EQ("", debug.str());
+  EXPECT_EQ("", info.str());
+  EXPECT_EQ("", warn.str());
+  EXPECT_EQ("", error.str());
+  EXPECT_EQ("", fatal.str());
 }
 
 TEST(McmcSoftAbs, streams) {

@@ -1,7 +1,7 @@
 #ifndef STAN_MCMC_HMC_NUTS_ADAPT_UNIT_E_NUTS_HPP
 #define STAN_MCMC_HMC_NUTS_ADAPT_UNIT_E_NUTS_HPP
 
-#include <stan/callbacks/writer.hpp>
+#include <stan/callbacks/logger.hpp>
 #include <stan/mcmc/hmc/nuts/unit_e_nuts.hpp>
 #include <stan/mcmc/stepsize_adapter.hpp>
 
@@ -22,12 +22,9 @@ namespace stan {
       ~adapt_unit_e_nuts() {}
 
       sample
-      transition(sample& init_sample,
-                 callbacks::writer& info_writer,
-                 callbacks::writer& error_writer) {
+      transition(sample& init_sample, callbacks::logger& logger) {
         sample s = unit_e_nuts<Model, BaseRNG>::transition(init_sample,
-                                                           info_writer,
-                                                           error_writer);
+                                                           logger);
 
         if (this->adapt_flag_)
           this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,

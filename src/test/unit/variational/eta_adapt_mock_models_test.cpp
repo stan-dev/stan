@@ -1,9 +1,8 @@
 #include <ostream>
 #include <stan/io/var_context.hpp>
 #include <stan/io/dump.hpp>
-#include <stan/callbacks/stream_writer.hpp>
+#include <stan/callbacks/stream_logger.hpp>
 #include <stan/model/prob_grad.hpp>
-#include <stan/callbacks/stream_writer.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
@@ -215,13 +214,13 @@ public:
   eta_adapt_test() :
     model(3),
     throwing_model(3),
-    writer(output) {}
+    logger(log_stream_, log_stream_, log_stream_, log_stream_, log_stream_) {}
 
   void SetUp() {
     cont_params = Eigen::VectorXd::Zero(3);
     model.reset();
     rng.reset();
-    output.clear();
+    log_stream_.clear();
   }
 
   std::string init;
@@ -229,8 +228,8 @@ public:
   mock_model model;
   mock_throwing_model throwing_model;
   mock_rng rng;
-  std::stringstream output;
-  stan::callbacks::stream_writer writer;
+  std::stringstream log_stream_;
+  stan::callbacks::stream_logger logger;
 };
 
 TEST_F(eta_adapt_test, initialize_state_zero_negative_infinity) {
@@ -270,9 +269,9 @@ TEST_F(eta_adapt_test, initialize_state_zero_negative_infinity) {
                       "Your model may be either "
                       "severely ill-conditioned or misspecified.";
 
-  EXPECT_THROW_MSG(advi_meanfield->adapt_eta(meanfield_init, 10, writer),
+  EXPECT_THROW_MSG(advi_meanfield->adapt_eta(meanfield_init, 10, logger),
                    std::domain_error, error);
-  EXPECT_THROW_MSG(advi_fullrank->adapt_eta(fullrank_init, 10, writer),
+  EXPECT_THROW_MSG(advi_fullrank->adapt_eta(fullrank_init, 10, logger),
                    std::domain_error, error);
 
   delete advi_meanfield;
@@ -316,9 +315,9 @@ TEST_F(eta_adapt_test, initialize_state_zero_grad_error) {
                       "Your model may be either "
                       "severely ill-conditioned or misspecified.";
 
-  EXPECT_THROW_MSG(advi_meanfield->adapt_eta(meanfield_init, 10, writer),
+  EXPECT_THROW_MSG(advi_meanfield->adapt_eta(meanfield_init, 10, logger),
                    std::domain_error, error);
-  EXPECT_THROW_MSG(advi_fullrank->adapt_eta(fullrank_init, 10, writer),
+  EXPECT_THROW_MSG(advi_fullrank->adapt_eta(fullrank_init, 10, logger),
                    std::domain_error, error);
 
   delete advi_meanfield;
