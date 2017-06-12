@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 #include <stan/callbacks/stream_writer.hpp>
+#include <stan/callbacks/stream_logger.hpp>
 #include <sstream>
 #include <test/test-models/good/services/test_lp.hpp>
 #include <stan/io/empty_var_context.hpp>
@@ -16,10 +17,12 @@ public:
       message(message_ss),
       rng(stan::services::util::create_rng(0, 1)) {}
 
-  stan::io::empty_var_context empty_context;
-  std::stringstream model_ss, message_ss;
   stan_model model;
+  stan::io::empty_var_context empty_context;
+  std::stringstream model_ss;
+  std::stringstream message_ss;
   stan::callbacks::stream_writer message;
+  stan::test::unit::instrumented_logger logger;
   stan::test::unit::instrumented_writer init;
   boost::ecuyer1988 rng;
 };
@@ -31,13 +34,13 @@ TEST_F(ServicesUtilInitialize, radius_zero__print_false) {
   bool print_timing = false;
   params = stan::services::util::initialize(model, empty_context, rng,
                                             init_radius, print_timing,
-                                            message, init);
+                                            logger, init);
   ASSERT_EQ(model.num_params_r(), params.size())
     << "2 parameters";
   EXPECT_FLOAT_EQ(0, params[0]);
   EXPECT_FLOAT_EQ(0, params[1]);
 
-  EXPECT_EQ("", message_ss.str());
+  EXPECT_EQ(0, logger.call_count());
   ASSERT_EQ(1, init.vector_double_values().size());
   ASSERT_EQ(2, init.vector_double_values()[0].size());
   EXPECT_EQ(params[0], init.vector_double_values()[0][0]);
@@ -51,13 +54,15 @@ TEST_F(ServicesUtilInitialize, radius_zero__print_true) {
   bool print_timing = true;
   params = stan::services::util::initialize(model, empty_context, rng,
                                             init_radius, print_timing,
-                                            message, init);
+                                            logger, init);
   ASSERT_EQ(model.num_params_r(), params.size())
     << "2 parameters";
   EXPECT_FLOAT_EQ(0, params[0]);
   EXPECT_FLOAT_EQ(0, params[1]);
 
-  EXPECT_TRUE(message_ss.str().find("Gradient evaluation") != std::string::npos);
+  EXPECT_EQ(6, logger.call_count());
+  EXPECT_EQ(6, logger.call_count_info());
+  EXPECT_EQ(1, logger.find_info("Gradient evaluation"));
   ASSERT_EQ(1, init.vector_double_values().size());
   ASSERT_EQ(2, init.vector_double_values()[0].size());
   EXPECT_EQ(params[0], init.vector_double_values()[0][0]);
@@ -71,7 +76,7 @@ TEST_F(ServicesUtilInitialize, radius_two__print_false) {
   bool print_timing = false;
   params = stan::services::util::initialize(model, empty_context, rng,
                                             init_radius, print_timing,
-                                            message, init);
+                                            logger, init);
   ASSERT_EQ(model.num_params_r(), params.size())
     << "2 parameters";
   EXPECT_GT(params[0], -init_radius);
@@ -79,7 +84,7 @@ TEST_F(ServicesUtilInitialize, radius_two__print_false) {
   EXPECT_GT(params[1], -init_radius);
   EXPECT_LT(params[1], init_radius);
 
-  EXPECT_EQ("", message_ss.str());
+  EXPECT_EQ(0, logger.call_count());
   ASSERT_EQ(1, init.vector_double_values().size());
   ASSERT_EQ(2, init.vector_double_values()[0].size());
   EXPECT_EQ(params[0], init.vector_double_values()[0][0]);
@@ -93,7 +98,7 @@ TEST_F(ServicesUtilInitialize, radius_two__print_true) {
   bool print_timing = true;
   params = stan::services::util::initialize(model, empty_context, rng,
                                             init_radius, print_timing,
-                                            message, init);
+                                            logger, init);
   ASSERT_EQ(model.num_params_r(), params.size())
     << "2 parameters";
   EXPECT_GT(params[0], -init_radius);
@@ -101,7 +106,9 @@ TEST_F(ServicesUtilInitialize, radius_two__print_true) {
   EXPECT_GT(params[1], -init_radius);
   EXPECT_LT(params[1], init_radius);
 
-  EXPECT_TRUE(message_ss.str().find("Gradient evaluation") != std::string::npos);
+  EXPECT_EQ(6, logger.call_count());
+  EXPECT_EQ(6, logger.call_count_info());
+  EXPECT_EQ(1, logger.find_info("Gradient evaluation"));
   ASSERT_EQ(1, init.vector_double_values().size());
   ASSERT_EQ(2, init.vector_double_values()[0].size());
   EXPECT_EQ(params[0], init.vector_double_values()[0][0]);
@@ -127,13 +134,13 @@ TEST_F(ServicesUtilInitialize, full_init__print_false) {
   bool print_timing = false;
   params = stan::services::util::initialize(model, init_context, rng,
                                             init_radius, print_timing,
-                                            message, init);
+                                            logger, init);
   ASSERT_EQ(model.num_params_r(), params.size())
     << "2 parameters";
   EXPECT_FLOAT_EQ(1.5, params[0]);
   EXPECT_FLOAT_EQ(-0.5, params[1]);
 
-  EXPECT_EQ("", message_ss.str());
+  EXPECT_EQ(0, logger.call_count());
   ASSERT_EQ(1, init.vector_double_values().size());
   ASSERT_EQ(2, init.vector_double_values()[0].size());
   EXPECT_EQ(params[0], init.vector_double_values()[0][0]);
@@ -159,13 +166,15 @@ TEST_F(ServicesUtilInitialize, full_init__print_true) {
   bool print_timing = true;
   params = stan::services::util::initialize(model, init_context, rng,
                                             init_radius, print_timing,
-                                            message, init);
+                                            logger, init);
   ASSERT_EQ(model.num_params_r(), params.size())
     << "2 parameters";
   EXPECT_FLOAT_EQ(1.5, params[0]);
   EXPECT_FLOAT_EQ(-0.5, params[1]);
 
-  EXPECT_TRUE(message_ss.str().find("Gradient evaluation") != std::string::npos);
+  EXPECT_EQ(6, logger.call_count());
+  EXPECT_EQ(6, logger.call_count_info());
+  EXPECT_EQ(1, logger.find_info("Gradient evaluation"));
   ASSERT_EQ(1, init.vector_double_values().size());
   ASSERT_EQ(2, init.vector_double_values()[0].size());
   EXPECT_EQ(params[0], init.vector_double_values()[0][0]);
@@ -264,10 +273,12 @@ TEST_F(ServicesUtilInitialize, model_throws__radius_zero) {
   bool print_timing = false;
   EXPECT_THROW(stan::services::util::initialize(throwing_model, empty_context, rng,
                                                 init_radius, print_timing,
-                                                message, init),
+                                                logger, init),
                std::domain_error);
 
-  EXPECT_EQ(1, count_matches("throwing within log_prob", message_ss.str()));
+  EXPECT_EQ(3, logger.call_count());
+  EXPECT_EQ(3, logger.call_count_info());
+  EXPECT_EQ(1, logger.find_info("throwing within log_prob"));
 }
 
 TEST_F(ServicesUtilInitialize, model_throws__radius_two) {
@@ -277,9 +288,11 @@ TEST_F(ServicesUtilInitialize, model_throws__radius_two) {
   bool print_timing = false;
   EXPECT_THROW(stan::services::util::initialize(throwing_model, empty_context, rng,
                                                 init_radius, print_timing,
-                                                message, init),
+                                                logger, init),
                std::domain_error);
-  EXPECT_EQ(100, count_matches("throwing within log_prob", message_ss.str()));
+  EXPECT_EQ(303, logger.call_count());
+  EXPECT_EQ(303, logger.call_count_info());
+  EXPECT_EQ(100, logger.find_info("throwing within log_prob"));
 }
 
 TEST_F(ServicesUtilInitialize, model_throws__full_init) {
@@ -300,9 +313,11 @@ TEST_F(ServicesUtilInitialize, model_throws__full_init) {
   bool print_timing = false;
   EXPECT_THROW(stan::services::util::initialize(throwing_model, init_context, rng,
                                                 init_radius, print_timing,
-                                                message, init),
+                                                logger, init),
                std::domain_error);
-  EXPECT_EQ(100, count_matches("throwing within log_prob", message_ss.str()));
+  EXPECT_EQ(303, logger.call_count());
+  EXPECT_EQ(303, logger.call_count_info());
+  EXPECT_EQ(100, logger.find_info("throwing within log_prob"));
 }
 
 
@@ -399,10 +414,13 @@ TEST_F(ServicesUtilInitialize, model_errors__radius_zero) {
   bool print_timing = false;
   EXPECT_THROW_MSG(stan::services::util::initialize(error_model, empty_context, rng,
                                                     init_radius, print_timing,
-                                                    message, init),
+                                                    logger, init),
                    std::out_of_range,
                    "out_of_range error in log_prob");
-  EXPECT_EQ(0, count_matches("out_of_range error in log_prob", message_ss.str()));
+  EXPECT_EQ(2, logger.call_count());
+  EXPECT_EQ(2, logger.call_count_info());
+  EXPECT_EQ(1, logger.find_info("out_of_range error in log_prob"));
+  EXPECT_EQ(1, logger.find_info("Unrecoverable error evaluating the log probability at the initial value."));
 }
 
 TEST_F(ServicesUtilInitialize, model_errors__radius_two) {
@@ -412,10 +430,12 @@ TEST_F(ServicesUtilInitialize, model_errors__radius_two) {
   bool print_timing = false;
   EXPECT_THROW_MSG(stan::services::util::initialize(error_model, empty_context, rng,
                                                     init_radius, print_timing,
-                                                    message, init),
+                                                    logger, init),
                    std::out_of_range,
                    "out_of_range error in log_prob");
-  EXPECT_EQ(0, count_matches("out_of_range error in log_prob", message_ss.str()));
+  EXPECT_EQ(2, logger.call_count());
+  EXPECT_EQ(2, logger.call_count_info());
+  EXPECT_EQ(1, logger.find_info("out_of_range error in log_prob"));
 }
 
 TEST_F(ServicesUtilInitialize, model_errors__full_init) {
@@ -436,8 +456,10 @@ TEST_F(ServicesUtilInitialize, model_errors__full_init) {
   bool print_timing = false;
   EXPECT_THROW_MSG(stan::services::util::initialize(error_model, init_context, rng,
                                                     init_radius, print_timing,
-                                                    message, init),
+                                                    logger, init),
                    std::out_of_range,
                    "out_of_range error in log_prob");
-  EXPECT_EQ(0, count_matches("out_of_range error in log_prob", message_ss.str()));
+  EXPECT_EQ(2, logger.call_count());
+  EXPECT_EQ(2, logger.call_count_info());
+  EXPECT_EQ(1, logger.find_info("out_of_range error in log_prob"));
 }

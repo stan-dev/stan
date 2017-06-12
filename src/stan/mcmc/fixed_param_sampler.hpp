@@ -1,7 +1,7 @@
 #ifndef STAN_MCMC_FIXED_PARAM_SAMPLER_HPP
 #define STAN_MCMC_FIXED_PARAM_SAMPLER_HPP
 
-#include <stan/callbacks/writer.hpp>
+#include <stan/callbacks/logger.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/mcmc/sample.hpp>
 
@@ -13,9 +13,7 @@ namespace stan {
       fixed_param_sampler() { }
 
       sample
-      transition(sample& init_sample,
-                 callbacks::writer& info_writer,
-                 callbacks::writer& error_writer) {
+      transition(sample& init_sample, callbacks::logger& logger) {
         return init_sample;
       }
     };

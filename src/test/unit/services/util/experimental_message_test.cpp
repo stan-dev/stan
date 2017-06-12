@@ -1,13 +1,12 @@
 #include <stan/services/util/experimental_message.hpp>
 #include <gtest/gtest.h>
-#include <stan/callbacks/stream_writer.hpp>
+#include <test/unit/services/instrumented_callbacks.hpp>
 #include <sstream>
 
 TEST(ServicesUtil, experimental_message) {
-  std::stringstream ss;
-  stan::callbacks::stream_writer writer(ss);
+  stan::test::unit::instrumented_logger logger;
 
-  stan::services::util::experimental_message(writer);
+  stan::services::util::experimental_message(logger);
 
-  EXPECT_TRUE(ss.str().find("EXPERIMENTAL ALGORITHM") != std::string::npos);
+  EXPECT_EQ(1, logger.find_info("EXPERIMENTAL ALGORITHM"));
 }

@@ -1,7 +1,7 @@
 #ifndef STAN_MCMC_HMC_STATIC_ADAPT_SOFTABS_STATIC_HMC_HPP
 #define STAN_MCMC_HMC_STATIC_ADAPT_SOFTABS_STATIC_HMC_HPP
 
-#include <stan/callbacks/writer.hpp>
+#include <stan/callbacks/logger.hpp>
 #include <stan/mcmc/hmc/static/softabs_static_hmc.hpp>
 #include <stan/mcmc/stepsize_adapter.hpp>
 
@@ -22,12 +22,9 @@ namespace stan {
 
       ~adapt_softabs_static_hmc() { }
 
-      sample transition(sample& init_sample,
-                        callbacks::writer& info_writer,
-                        callbacks::writer& error_writer) {
+      sample transition(sample& init_sample, callbacks::logger& logger) {
         sample s = softabs_static_hmc<Model, BaseRNG>::transition(init_sample,
-                                                                  info_writer,
-                                                                  error_writer);
+                                                                  logger);
 
         if (this->adapt_flag_) {
           this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,

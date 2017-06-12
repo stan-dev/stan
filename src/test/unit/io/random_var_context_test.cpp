@@ -9,7 +9,7 @@ class random_var_context : public testing::Test {
 public:
   random_var_context()
     : empty_context(),
-      model(empty_context, (std::stringstream*) 0),
+      model(empty_context, static_cast<std::stringstream*>(0)),
       rng(0) { }
 
   stan::io::empty_var_context empty_context;
@@ -34,7 +34,7 @@ TEST_F(random_var_context, vals_r) {
   EXPECT_GT(vals_r[0], -10);
   EXPECT_LT(vals_r[0], 10);
   EXPECT_GT(vals_r[1], -100);
-  EXPECT_LT(vals_r[1], 10);  
+  EXPECT_LT(vals_r[1], 10);
 }
 
 TEST_F(random_var_context, dims_r) {

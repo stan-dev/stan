@@ -1,6 +1,7 @@
 #ifndef STAN_MODEL_TEST_GRADIENTS_HPP
 #define STAN_MODEL_TEST_GRADIENTS_HPP
 
+#include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/model/finite_diff_grad.hpp>
 #include <stan/model/log_prob_grad.hpp>
@@ -31,7 +32,8 @@ namespace stan {
      * @param[in] error Real-valued scalar saying how much error to allow.
      *   Reasonable value is 1e-6.
      * @param[in,out] interrupt callback to be called at every iteration
-     * @param[in,out] writer Writer for messages
+     * @param[in,out] logger Logger for messages
+     * @param[in,out] parameter_writer Writer callback for file output
      * @return number of failed gradient comparisons versus allowed
      * error, so 0 if all gradients pass
      */
@@ -42,7 +44,8 @@ namespace stan {
                        double epsilon,
                        double error,
                        stan::callbacks::interrupt& interrupt,
-                       stan::callbacks::writer& writer) {
+                       stan::callbacks::logger& logger,
+                       stan::callbacks::writer& parameter_writer) {
       std::stringstream msg;
       std::vector<double> grad;
       double lp = log_prob_grad<propto, jacobian_adjust_transform>(model,
@@ -50,23 +53,31 @@ namespace stan {
                                                                    params_i,
                                                                    grad,
                                                                    &msg);
-      if (msg.str().length() > 0)
-        writer(msg.str());
+      if (msg.str().length() > 0) {
+        logger.info(msg);
+        parameter_writer(msg.str());
+      }
 
       std::vector<double> grad_fd;
       finite_diff_grad<false, true, Model>(model, interrupt, params_r, params_i,
                                            grad_fd, epsilon, &msg);
-      if (msg.str().length() > 0)
-        writer(msg.str());
+      if (msg.str().length() > 0) {
+        logger.info(msg);
+        parameter_writer(msg.str());
+      }
 
       int num_failed = 0;
 
       std::stringstream lp_msg;
       lp_msg << " Log probability=" << lp;
 
-      writer();
-      writer(lp_msg.str());
-      writer();
+      parameter_writer();
+      parameter_writer(lp_msg.str());
+      parameter_writer();
+
+      logger.info("");
+      logger.info(lp_msg);
+      logger.info("");
 
       std::stringstream header;
       header << std::setw(10) << "param idx"
@@ -75,7 +86,8 @@ namespace stan {
              << std::setw(16) << "finite diff"
              << std::setw(16) << "error";
 
-      writer(header.str());
+      parameter_writer(header.str());
+      logger.info(header);
 
       for (size_t k = 0; k < params_r.size(); k++) {
         std::stringstream line;
@@ -84,7 +96,8 @@ namespace stan {
              << std::setw(16) << grad[k]
              << std::setw(16) << grad_fd[k]
              << std::setw(16) << (grad[k] - grad_fd[k]);
-        writer(line.str());
+        parameter_writer(line.str());
+        logger.info(line);
         if (std::fabs(grad[k] - grad_fd[k]) > error)
           num_failed++;
       }

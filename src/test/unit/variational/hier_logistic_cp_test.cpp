@@ -1,6 +1,7 @@
 #include <test/test-models/good/variational/hier_logistic_cp.hpp>
 #include <stan/variational/advi.hpp>
 #include <stan/callbacks/writer.hpp>
+#include <stan/callbacks/stream_logger.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 #include <vector>
@@ -40,7 +41,8 @@ TEST(advi_test, hier_logistic_cp_constraint_meanfield) {
                                                      1);
 
   stan::callbacks::writer writer;
+  stan::callbacks::stream_logger logger(output, output, output, output, output);
 
   test_advi.run(0.01, false, 50, 1, 2e4,
-                writer, writer, writer);
+                logger, writer, writer);
 }
