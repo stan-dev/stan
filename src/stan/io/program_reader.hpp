@@ -1,5 +1,5 @@
-#ifndef STAN_IO_PROGRAM_READER_PROGRAM_READER_HPP
-#define STAN_IO_PROGRAM_READER_PROGRAM_READER_HPP
+#ifndef STAN_IO_PROGRAM_READER_HPP
+#define STAN_IO_PROGRAM_READER_HPP
 
 #include <stan/io/read_line.hpp>
 #include <stan/io/starts_with.hpp>
@@ -52,7 +52,7 @@ namespace stan {
       typedef std::pair<std::string, int> path_line_t;
 
       /**
-       * Orered sequence of path and line number pairs.
+       * Ordered sequence of path and line number pairs.
        */
       typedef std::vector<path_line_t> trace_t;
 
