@@ -121,18 +121,6 @@ TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, ident_adapt_250) {
                                                    parameter,
                                                    diagnostic);
   EXPECT_EQ(0, return_code);
-  std::vector<double> dense_vals;
-  // brute force output match with result:
-  dense_vals.push_back(0.764394);
-  dense_vals.push_back(-0.191946);
-  dense_vals.push_back(-0.00630207);
-  dense_vals.push_back(-0.191946);
-  dense_vals.push_back(1.15688);
-  dense_vals.push_back(-0.0937319);
-  dense_vals.push_back(-0.00630207);
-  dense_vals.push_back(-0.0937319);
-  dense_vals.push_back(0.812369);
-  stan::test::unit::check_adaptation(3, 3, dense_vals, parameter, 0.25);
 }
 
 TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, use_metric_no_adapt) {
