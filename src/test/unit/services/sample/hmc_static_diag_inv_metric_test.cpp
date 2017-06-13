@@ -128,7 +128,7 @@ TEST_F(ServicesSampleHmcStaticDiagEMassMatrix, unit_e_adapt_250) {
   diag_vals.push_back(1.19161);
   diag_vals.push_back(0.710345);
   diag_vals.push_back(0.793847);
-  stan::test::unit::check_adaptation(3, diag_vals, parameter, 0.2);
+  stan::test::unit::check_adaptation(3, diag_vals, parameter, 0.5);
 }
 
 TEST_F(ServicesSampleHmcStaticDiagEMassMatrix, use_metric_no_adapt) {

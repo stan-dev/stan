@@ -132,12 +132,12 @@ TEST_F(ServicesSampleHmcStaticDenseEMassMatrix, unit_e_adapt_250) {
   dense_vals.push_back(0.0734898);
   dense_vals.push_back(-0.12395);
   dense_vals.push_back(0.0734898);
-  dense_vals.push_back(0.876038);
+  dense_vals.push_back(0.976038);
   dense_vals.push_back(-0.051543);
   dense_vals.push_back(-0.12395);
   dense_vals.push_back(-0.051543);
-  dense_vals.push_back(0.8274);
-  stan::test::unit::check_adaptation(3, 3, dense_vals, parameter, 0.2);
+  dense_vals.push_back(0.999274);
+  stan::test::unit::check_adaptation(3, 3, dense_vals, parameter, 0.5);
 }
 
 TEST_F(ServicesSampleHmcStaticDenseEMassMatrix, use_metric_no_adapt) {
