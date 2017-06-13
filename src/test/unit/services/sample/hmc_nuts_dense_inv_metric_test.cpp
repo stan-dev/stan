@@ -93,7 +93,7 @@ TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, ident_adapt_250) {
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
-  // run sampler with ident Euclidean metric, 250 warmups
+  // run sampler with ident Euclidean metric
   int return_code =
     stan::services::sample::hmc_nuts_dense_e_adapt(model,
                                                    context,
@@ -121,23 +121,18 @@ TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, ident_adapt_250) {
                                                    parameter,
                                                    diagnostic);
   EXPECT_EQ(0, return_code);
-
-  // ran adaptive sampler w/ ident Euclidean metric
-  // 250 warmups, random seed 12345:
-  // 0.640211  0.156096 -0.374048
-  // 0.156096 1.41239  -0.0412753
-  // -0.374048 -0.0412753  1.29567
   std::vector<double> dense_vals;
-  dense_vals.push_back(0.640211);
-  dense_vals.push_back(0.156096);
-  dense_vals.push_back(-0.374048);
-  dense_vals.push_back(0.156096);
-  dense_vals.push_back(1.41239);
-  dense_vals.push_back(-0.0412753);
-  dense_vals.push_back(-0.374048);
-  dense_vals.push_back(-0.0412753);
-  dense_vals.push_back(1.29567);
-  stan::test::unit::check_adaptation(3, 3, dense_vals, parameter, 0.5);
+  // brute force output match with result:
+  dense_vals.push_back(0.764394);
+  dense_vals.push_back(-0.191946);
+  dense_vals.push_back(-0.00630207);
+  dense_vals.push_back(-0.191946);
+  dense_vals.push_back(1.15688);
+  dense_vals.push_back(-0.0937319);
+  dense_vals.push_back(-0.00630207);
+  dense_vals.push_back(-0.0937319);
+  dense_vals.push_back(0.812369);
+  stan::test::unit::check_adaptation(3, 3, dense_vals, parameter, 0.25);
 }
 
 TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, use_metric_no_adapt) {
