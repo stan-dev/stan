@@ -25,8 +25,6 @@ namespace stan {
      * @param out C++ code output stream
      * @param name Name of model class
      * @param allow_undefined true if permits undefined functions
-     * @param include_paths Ordered sequence of paths to search for
-     *   include files
      * @param filename name of file or other source from which input
      *   stream was derived
      * @return <code>false</code> if code could not be generated due
@@ -37,7 +35,7 @@ namespace stan {
                  const std::string& name, const bool allow_undefined = false,
                  const std::string& filename = "unkown file name",
                  const std::vector<std::string>& include_paths
-                   = std::vector<std::string>()) {
+                  = std::vector<std::string>()) {
       io::program_reader reader(in, filename, include_paths);
       std::string s = reader.program();
       std::stringstream ss(s);
