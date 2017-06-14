@@ -120,15 +120,6 @@ TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, unit_e_adapt_250) {
                                                   parameter,
                                                   diagnostic);
   EXPECT_EQ(0, return_code);
-
-  // check returned Euclidean metric
-  // captured result of running sampler w/ unit_e Euclidean metric, reported output:
-  // 0.929061, 0.823316, 0.643094
-  std::vector<double> diag_vals;
-  diag_vals.push_back(0.929061);
-  diag_vals.push_back(0.823316);
-  diag_vals.push_back(0.643094);
-  stan::test::unit::check_adaptation(3, diag_vals, parameter, 0.2);
 }
 
 TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, use_metric_no_adapt) {

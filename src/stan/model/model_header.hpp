@@ -12,6 +12,7 @@
 #include <stan/lang/rethrow_located.hpp>
 #include <stan/model/prob_grad.hpp>
 #include <stan/model/indexing.hpp>
+#include <stan/services/util/create_rng.hpp>
 
 #include <boost/exception/all.hpp>
 #include <boost/random/additive_combine.hpp>
