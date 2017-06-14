@@ -35,8 +35,7 @@ namespace stan {
        * @param[in] model model
        * @param[in,out] base_rng random number generator
        * @param[in,out] callback interrupt callback called once an iteration
-       * @param[in,out] info_writer writer for informational messages
-       * @param[in,out] error_writer writer for error messages
+       * @param[in,out] logger logger for messages
        */
       template <class Model, class RNG>
       void generate_transitions(stan::mcmc::base_mcmc& sampler,
@@ -47,8 +46,7 @@ namespace stan {
                                 stan::mcmc::sample& init_s,
                                 Model& model, RNG& base_rng,
                                 callbacks::interrupt& callback,
-                                callbacks::writer& info_writer,
-                                callbacks::writer& error_writer) {
+                                callbacks::logger& logger) {
         for (int m = 0; m < num_iterations; ++m) {
           callback();
 
@@ -67,10 +65,10 @@ namespace stan {
                     << "%] ";
             message << (warmup ? " (Warmup)" : " (Sampling)");
 
-            info_writer(message.str());
+            logger.info(message);
           }
 
-          init_s = sampler.transition(init_s, info_writer, error_writer);
+          init_s = sampler.transition(init_s, logger);
 
           if (save && ((m % num_thin) == 0)) {
             mcmc_writer.write_sample_params(base_rng, init_s, sampler, model);

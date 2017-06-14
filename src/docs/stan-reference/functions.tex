@@ -2741,7 +2741,7 @@ The cumulative sum of a sequence $x_1,\ldots,x_N$ is the
 sequence $y_1,\ldots,y_N$, where
 %
 \[
-y_n = \sum_{m = 1}^{n} x_n.
+y_n = \sum_{m = 1}^{n} x_m.
 \]
 
 \begin{description}
@@ -2767,13 +2767,13 @@ Euclidian distance between $x_i \in \reals^D$ and $x_j \in \reals^D$:
 
 \[
   \text{cov}(f(x_i), f(x_j)) = k(x_i, x_j)
-= \sigma^2
+= \alpha^2
 \exp \left(
-	- \dfrac{1}{2l^2} \sum_{d=1}^D (x_{i,d} - x_{j,d})^2
+	- \dfrac{1}{2\rho^2} \sum_{d=1}^D (x_{i,d} - x_{j,d})^2
 \right)
 \]
 
-\noindent with $\sigma$ and $l$ constrained to be positive.
+\noindent with $\alpha$ and $\rho$ constrained to be positive.
 
 There are two variants of the exponentiated quadratic covariance function in
 Stan. One builds a covariance matrix, $K \in \reals^{N \times N}$ for $x_1,
@@ -2786,28 +2786,28 @@ $K_{i,j} = k(x_i, x^\prime_j)$.
 
 \begin{description}
 %
-\fitem{matrix}{cov\_exp\_quad}{row\_vectors \farg{x}, real \farg{sigma}, real
-\farg{l}}{ The covariance matrix with an exponentiated quadratic kernel of
+\fitem{matrix}{cov\_exp\_quad}{row\_vectors \farg{x}, real \farg{alpha}, real
+\farg{rho}}{ The covariance matrix with an exponentiated quadratic kernel of
 \farg{x}.}
 
-\fitem{matrix}{cov\_exp\_quad}{vectors \farg{x}, real \farg{sigma}, real
-\farg{l}}{ The covariance matrix with an exponentiated quadratic kernel of
+\fitem{matrix}{cov\_exp\_quad}{vectors \farg{x}, real \farg{alpha}, real
+\farg{rho}}{ The covariance matrix with an exponentiated quadratic kernel of
 \farg{x}.}
 
-\fitem{matrix}{cov\_exp\_quad}{real[] \farg{x}, real \farg{sigma}, real
-\farg{l}}{ The covariance matrix with an exponentiated quadratic kernel of
+\fitem{matrix}{cov\_exp\_quad}{real[] \farg{x}, real \farg{alpha}, real
+\farg{rho}}{ The covariance matrix with an exponentiated quadratic kernel of
 \farg{x}.}
 
 \fitemtwolines{matrix}{cov\_exp\_quad}{row\_vectors \farg{x1}, row\_vectors
-\farg{x2}}{real \farg{sigma}, real \farg{l}}{ The covariance matrix with an
+\farg{x2}}{real \farg{alpha}, real \farg{rho}}{ The covariance matrix with an
 exponentiated quadratic kernel of \farg{x1} and \farg{x2}.}
 
 \fitemtwolines{matrix}{cov\_exp\_quad}{vectors \farg{x1}, vectors
-\farg{x2}}{real \farg{sigma}, real \farg{l}}{ The covariance matrix with an
+\farg{x2}}{real \farg{alpha}, real \farg{rho}}{ The covariance matrix with an
 exponentiated quadratic kernel of \farg{x1} and \farg{x2}.}
 
 \fitemtwolines{matrix}{cov\_exp\_quad}{real[] \farg{x1}, real[]
-\farg{x2}}{real \farg{sigma}, real \farg{l}}{ The covariance matrix with an
+\farg{x2}}{real \farg{alpha}, real \farg{rho}}{ The covariance matrix with an
 exponentiated quadratic kernel of \farg{x1} and \farg{x2}.}
 
 \end{description}
