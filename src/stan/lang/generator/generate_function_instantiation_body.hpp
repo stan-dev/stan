@@ -33,7 +33,7 @@ namespace stan {
                                     const std::string& rng_class,
                                     std::ostream& o) {
       o << "{" << EOL;
-      o << "\t";
+      o << "  ";
       if (!fun.return_type_.is_void()) {
         o << "return ";
       }

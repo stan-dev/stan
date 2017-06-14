@@ -17,7 +17,7 @@ namespace stan {
     void generate_rng_rcpp_helper(std::ostream& o) {
       o << "// [[Rcpp::export]]" << EOL;
       o << "boost::ecuyer1988 __create_rng(int seed) {" << EOL;
-      o << "\treturn(boost::ecuyer1988(seed));" << EOL;
+      o << "  return(boost::ecuyer1988(seed));" << EOL;
       o << "}" << EOL << EOL;
     }
 
