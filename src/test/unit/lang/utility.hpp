@@ -73,12 +73,13 @@ bool is_parsable(const std::string& file_name,
  */
 bool is_parsable_folder(const std::string& model_name,
                         const std::string folder = "good",
-                        std::ostream* msgs = 0) {
+                        std::ostream* msgs = 0,
+                        const std::string extension = ".stan") {
   std::string path("src/test/test-models/");
   path += folder;
   path += "/";
   path += model_name;
-  path += ".stan";
+  path += extension;
   return is_parsable(path, msgs, false);
 }
 
@@ -91,6 +92,19 @@ void test_parsable(const std::string& model_name) {
   {
     SCOPED_TRACE("parsing: " + model_name);
     EXPECT_TRUE(is_parsable_folder(model_name, "good"));
+  }
+}
+
+/** test that file with standalone functions with specified name in folder 
+ * "good-standalone-functions" parses without throwing an exception
+ *
+ * @param model_name Name of model to parse
+ */
+void test_parsable_standalone_functions(const std::string& model_name) {
+  {
+    SCOPED_TRACE("parsing standalone functions: " + model_name);
+    EXPECT_TRUE(is_parsable_folder(model_name, "good-standalone-functions", 
+                  0, ".stanfuncs"));
   }
 }
 

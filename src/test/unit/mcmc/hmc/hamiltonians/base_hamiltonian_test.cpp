@@ -48,8 +48,9 @@ TEST(BaseHamiltonian, streams) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
 
-  EXPECT_NO_THROW(funnel_model_namespace::funnel_model model(data_var_context, 0));
-
+  EXPECT_NO_THROW(funnel_model_namespace::funnel_model
+                  model(data_var_context, 0,
+                        static_cast<std::stringstream*>(0)));
   std::stringstream output;
   EXPECT_NO_THROW(funnel_model_namespace::funnel_model model(data_var_context, &output));
   EXPECT_EQ("", output.str());

@@ -93,7 +93,7 @@ TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, ident_adapt_250) {
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
-  // run sampler with ident Euclidean metric, 250 warmups
+  // run sampler with ident Euclidean metric
   int return_code =
     stan::services::sample::hmc_nuts_dense_e_adapt(model,
                                                    context,
@@ -121,22 +121,6 @@ TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, ident_adapt_250) {
                                                    parameter,
                                                    diagnostic);
   EXPECT_EQ(0, return_code);
-
-  // result of running adaptive sampler w/ ident Euclidean metric:
-  // 1.21622, -0.0271004, 0.00515814
-  // -0.0271004, 0.59758, -0.0153581
-  // 0.00515814, -0.0153581, 0.863086
-  std::vector<double> dense_vals;
-  dense_vals.push_back(1.21622);
-  dense_vals.push_back(-0.0271004);
-  dense_vals.push_back(0.00515814);
-  dense_vals.push_back(-0.0271004);
-  dense_vals.push_back(0.59758);
-  dense_vals.push_back(-0.0153581);
-  dense_vals.push_back(0.00515814);
-  dense_vals.push_back(-0.0153581);
-  dense_vals.push_back(0.863086);
-  stan::test::unit::check_adaptation(3, 3, dense_vals, parameter, 0.2);
 }
 
 TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, use_metric_no_adapt) {
@@ -188,7 +172,7 @@ TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, use_metric_no_adapt) {
 
   std::vector<double> dense_vals(9);
   dense_vals = inv_metric.vals_r("inv_metric");
-  stan::test::unit::check_adaptation(3, 3, dense_vals, parameter, 0.2);
+  stan::test::unit::check_adaptation(3, 3, dense_vals, parameter, 0.4);
 }
 
 TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, use_metric_skip_adapt) {
@@ -255,5 +239,5 @@ TEST_F(ServicesSampleHmcNutsDenseEMassMatrix, use_metric_skip_adapt) {
 
   std::vector<double> dense_vals(9);
   dense_vals = inv_metric.vals_r("inv_metric");
-  stan::test::unit::check_adaptation(3, 3, dense_vals, parameter, 0.2);
+  stan::test::unit::check_adaptation(3, 3, dense_vals, parameter, 0.4);
 }
