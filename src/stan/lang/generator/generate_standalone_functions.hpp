@@ -1,10 +1,12 @@
 #ifndef STAN_LANG_GENERATOR_GENERATE_STANDALONE_FUNCTIONS_HPP
 #define STAN_LANG_GENERATOR_GENERATE_STANDALONE_FUNCTIONS_HPP
 
+#include <stan/io/program_reader.hpp>
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/generate_functions.hpp>
 #include <stan/lang/generator/generate_function_instantiations.hpp>
 #include <stan/lang/generator/generate_includes.hpp>
+#include <stan/lang/generator/generate_program_reader_fun.hpp>
 #include <stan/lang/generator/generate_typedefs.hpp>
 #include <stan/lang/generator/generate_usings_standalone_functions.hpp>
 #include <stan/lang/generator/generate_version_comment.hpp>
