@@ -1,5 +1,18 @@
+#include <stan/io/program_reader.hpp>
 #include <stan/lang/rethrow_located.hpp>
 #include <gtest/gtest.h>
+
+
+stan::io::program_reader stub_reader() {
+  stan::io::program_reader r;
+  r.add_event(0, 0, "start", "/Users/carp/temp2/foo.stan");
+  r.add_event(5, 5, "include", "/Users/carp/temp2/bar.stan");
+  r.add_event(5, 0, "start", "/Users/carp/temp2/bar.stan");
+  r.add_event(8, 3, "end", "/Users/carp/temp2/bar.stan");
+  r.add_event(8, 6, "restart", "/Users/carp/temp2/foo.stan");
+  r.add_event(9, 7, "end", "/Users/carp/temp2/foo.stan");
+  return r;
+}
 
 template <typename E, typename E2>
 void test_rethrow_located_2() {
@@ -7,12 +20,13 @@ void test_rethrow_located_2() {
     try {
       throw E("foo");
     } catch (const std::exception& e) {
-      stan::lang::rethrow_located(e, 5);
+      stan::io::program_reader reader = stub_reader();
+      stan::lang::rethrow_located(e, 5, reader);
     }
   } catch (const E2& e) {
-    EXPECT_TRUE(std::string(e.what()).find_first_of("5") 
+    EXPECT_TRUE(std::string(e.what()).find_first_of("5")
                 != std::string::npos);
-    EXPECT_TRUE(std::string(e.what()).find_first_of("foo") 
+    EXPECT_TRUE(std::string(e.what()).find_first_of("foo")
                 != std::string::npos);
     return;
   } catch (...) {
@@ -32,12 +46,13 @@ void test_rethrow_located_nullary(const std::string& original_type) {
     try {
       throw E();
     } catch (const std::exception& e) {
-      stan::lang::rethrow_located(e, 5);
+      stan::io::program_reader reader = stub_reader();
+      stan::lang::rethrow_located(e, 5, reader);
     }
   } catch (const E& e) {
-    EXPECT_TRUE(std::string(e.what()).find_first_of("5") 
+    EXPECT_TRUE(std::string(e.what()).find_first_of("5")
                 != std::string::npos);
-    EXPECT_TRUE(std::string(e.what()).find_first_of(original_type) 
+    EXPECT_TRUE(std::string(e.what()).find_first_of(original_type)
                 != std::string::npos);
     return;
   } catch (...) {
@@ -80,14 +95,15 @@ TEST(langRethrowLocated, locatedException) {
     try {
       throw located_exception<located_exception<std::exception> >("foo","bar");
     } catch (const std::exception& e) {
-      stan::lang::rethrow_located(e, 5);
+      stan::io::program_reader reader = stub_reader();
+      stan::lang::rethrow_located(e, 5, reader);
     }
   } catch (const std::exception& e) {
-    EXPECT_TRUE(std::string(e.what()).find_first_of("foo") 
+    EXPECT_TRUE(std::string(e.what()).find_first_of("foo")
                 != std::string::npos);
-    EXPECT_TRUE(std::string(e.what()).find_first_of("bar") 
+    EXPECT_TRUE(std::string(e.what()).find_first_of("bar")
                 != std::string::npos);
-    EXPECT_TRUE(std::string(e.what()).find_first_of("5") 
+    EXPECT_TRUE(std::string(e.what()).find_first_of("5")
                 != std::string::npos);
     return;
   } catch (...) {

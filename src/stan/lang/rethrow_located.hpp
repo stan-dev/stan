@@ -1,6 +1,7 @@
 #ifndef STAN_LANG_RETHROW_LOCATED_HPP
 #define STAN_LANG_RETHROW_LOCATED_HPP
 
+#include <stan/io/program_reader.hpp>
 #include <exception>
 #include <ios>
 #include <new>
@@ -80,33 +81,43 @@ namespace stan {
      * the specified exception, adding the specified line number to
      * the specified exception's message.
      *
-     * @param[in] e Original exception.
-     * @param[in] line Line number in Stan source program where
-     * exception originated.
+     * @param[in] e original exception
+     * @param[in] line line number in Stan source program where
+     *   exception originated
+     * @param[in] reader trace of how program was included from files
      */
-    void rethrow_located(const std::exception& e, int line) {
+    void rethrow_located(const std::exception& e, int line,
+                         const io::program_reader& reader) {
       using std::bad_alloc;          // -> exception
       using std::bad_cast;           // -> exception
       using std::bad_exception;      // -> exception
       using std::bad_typeid;         // -> exception
       using std::ios_base;           // ::failure -> exception
-
       using std::domain_error;       // -> logic_error
       using std::invalid_argument;   // -> logic_error
       using std::length_error;       // -> logic_error
       using std::out_of_range;       // -> logic_error
       using std::logic_error;        // -> exception
-
       using std::overflow_error;     // -> runtime_error
       using std::range_error;        // -> runtime_error
       using std::underflow_error;    // -> runtime_error
       using std::runtime_error;      // -> exception
-
       using std::exception;
 
+      // create message with trace of includes and location of error
       std::stringstream o;
-      o << "Exception thrown at line " << line << ": "
-        << e.what();
+      o << "Exception: " << e.what();
+      if (line < 1) {
+        o << "  Found before start of program.";
+      } else {
+        io::program_reader::trace_t tr = reader.trace(line);
+        o << "  (in '" << tr[tr.size() - 1].first
+          << "' at line " << tr[tr.size() - 1].second;
+        for (int i = tr.size() - 1; --i >= 0; )
+          o << "; included from '" << tr[i].first
+            << "' at line " << tr[i].second;
+        o << ")" << std::endl;
+      }
       std::string s = o.str();
 
       if (is_type<bad_alloc>(e))

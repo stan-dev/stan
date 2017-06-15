@@ -4,6 +4,7 @@
 #include <stan/math.hpp>
 
 #include <boost/random/additive_combine.hpp>
+#include <stan/io/program_reader.hpp>
 #include <stan/lang/rethrow_located.hpp>
 
 #include <cmath>

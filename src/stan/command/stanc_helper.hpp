@@ -224,6 +224,9 @@ int stanc_helper(int argc, const char* argv[],
       throw std::invalid_argument(msg.str());
     }
 
+    std::vector<std::string> include_paths;
+    include_paths.push_back("");
+
     bool allow_undefined = cmd.has_flag("allow_undefined");
 
     bool valid_input = false;
@@ -262,9 +265,8 @@ int stanc_helper(int argc, const char* argv[],
           throw std::invalid_argument(msg.str());
         }
 
-        valid_input = stan::lang::compile(err_stream, in, out,
-                        model_name, allow_undefined);
-
+        valid_input = stan::lang::compile(err_stream, in, out, model_name,
+                                  allow_undefined, in_file_name, include_paths);
         out.close();
         break;
       }
