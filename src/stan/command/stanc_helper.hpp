@@ -124,7 +124,8 @@ inline std::string identifier_from_file_name(const std::string& in_file_name) {
  * @param[in] extension The extension (WITHOUT dot)- e.g. "stan".
  * @return true if the file has the extension
  */
-inline bool has_extension(const std::string& file_name, const std::string& extension) {
+inline bool has_extension(const std::string& file_name,
+                          const std::string& extension) {
   if (file_name.length() >= extension.length() + 1) {  // +1 for the dot
     if (0 == file_name.compare (file_name.length() - extension.length(),
                                 extension.length(), extension)
@@ -266,7 +267,8 @@ inline int stanc_helper(int argc, const char* argv[],
       }
 
       valid_input = stan::lang::compile(err_stream, in, out, model_name,
-                                        allow_undefined, in_file_name, include_paths);
+                                        allow_undefined, in_file_name,
+                                        include_paths);
       out.close();
       break;
     }
@@ -286,8 +288,8 @@ inline int stanc_helper(int argc, const char* argv[],
         cmd.val("namespace", ns);
         namespaces.push_back(ns);
       } else {
-        namespaces.push_back(
-                             identifier_from_file_name(in_file_name) + "_functions");
+        namespaces.push_back(identifier_from_file_name(in_file_name)
+                             + "_functions");
       }
 
       // TODO(martincerny) Check that the -name flag is not set
