@@ -1,6 +1,7 @@
 #ifndef STAN_VARIATIONAL_NORMAL_FULLRANK_HPP
 #define STAN_VARIATIONAL_NORMAL_FULLRANK_HPP
 
+#include <stan/callbacks/logger.hpp>
 #include <stan/math/prim/mat.hpp>
 #include <stan/model/gradient.hpp>
 #include <stan/variational/base_family.hpp>
@@ -18,7 +19,7 @@ namespace stan {
      */
     class normal_fullrank : public base_family {
     private:
-      /** 
+      /**
        * Mean vector.
        */
       Eigen::VectorXd mu_;
@@ -36,7 +37,7 @@ namespace stan {
 
       /**
        * Raise a domain exception if the specified vector contains
-       * not-a-number values. 
+       * not-a-number values.
        *
        * @param[in] mu Mean vector.
        * @throw std::domain_error If the mean vector contains NaN
@@ -156,8 +157,8 @@ namespace stan {
 
       /**
        * Set the Cholesky factor to the specified value.
-       * 
-       * @param L_chol Cholesky factor of covariance matrix.
+       *
+       * @param[in] L_chol Cholesky factor of covariance matrix.
        * @throw std::domain_error  If the specified matrix is not
        * square, is not lower triangular, if its size does not match
        * the dimensionality of this approximation, or if it contains
@@ -210,7 +211,7 @@ namespace stan {
        * specified approximation.
        *
        * @param[in] rhs Approximation from which to gather the mean and
-       * covariance. 
+       * covariance.
        * @return This approximation after assignment.
        * @throw std::domain_error If the dimensionality of the specified
        * approximation does not match this approximation's dimensionality.
@@ -231,9 +232,9 @@ namespace stan {
        * the specified approximation to this approximation.
        *
        * @param[in] rhs Approximation from which to gather the mean and
-       * covariance. 
+       * covariance.
        * @return This approximation after adding the specified
-       * approximation. 
+       * approximation.
        * @throw std::domain_error If the dimensionality of the specified
        * approximation does not match this approximation's dimensionality.
        */
@@ -309,10 +310,10 @@ namespace stan {
       }
 
       /**
-       * Returns the mean vector for this approximation.  
-       * 
+       * Returns the mean vector for this approximation.
+       *
        * See: <code>mu()</code>.
-       * 
+       *
        * @return Mean vector for this approximation.
        */
       const Eigen::VectorXd& mean() const {
@@ -390,7 +391,7 @@ namespace stan {
        * @param[in] cont_params Continuous parameters.
        * @param[in] n_monte_carlo_grad Sample size for gradient computation.
        * @param[in,out] rng Random number generator.
-       * @param[in,out] message_writer writer for messages
+       * @param[in,out] logger logger for messages
        * @throw std::domain_error If the number of divergent
        * iterations exceeds its specified bounds.
        */
@@ -400,7 +401,7 @@ namespace stan {
                      Eigen::VectorXd& cont_params,
                      int n_monte_carlo_grad,
                      BaseRNG& rng,
-                     interface_callbacks::writer::base_writer& message_writer)
+                     callbacks::logger& logger)
         const {
         static const char* function =
           "stan::variational::normal_fullrank::calc_grad";
@@ -430,7 +431,7 @@ namespace stan {
             std::stringstream ss;
             stan::model::gradient(m, zeta, tmp_lp, tmp_mu_grad, &ss);
             if (ss.str().length() > 0)
-              message_writer(ss.str());
+              logger.info(ss);
             stan::math::check_finite(function, "Gradient of mu", tmp_mu_grad);
 
             mu_grad += tmp_mu_grad;

@@ -1,10 +1,10 @@
 data {
    real y;
 }
-derived data {
+transformed data {
    real z;
    
-   y <- 10.0;
+   y = 10.0;
 }
 model {
 }

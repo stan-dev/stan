@@ -4,9 +4,9 @@ transformed data {
   real z;
   int n;
 
-  z <- if_else(n,x,y);
+  z = if_else(n,x,y);
 
-  z <- binomial_coefficient_log(x,y);
+  z = binomial_coefficient_log(x,y);
 }
 model {
 }

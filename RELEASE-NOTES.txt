@@ -5,6 +5,100 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v2.15.0 (14 April 2017)
+======================================================================
+
+New Team Members
+--------------------------------------------------
+* Sean Talts (Columbia University) -- Stan and Math libraries
+* Imad Ali (Columbia University) -- Bayesian Statistician
+
+Bug Fixes
+--------------------------------------------------
+* Added runtime checks for container variable dimensions (#1194)
+* Fixed compiler errors for certain variants of nuts_classic (#2268)
+* Fixed compound declaration definition in local blocks (#2145)
+
+New User-Facing Features
+--------------------------------------------------
+* Row-vector and matrix expressions (#1489)
+* Better warning message for windowed adaptation (#2064)
+* Stan language - model block is optional in a Stan program (#1427)
+
+New Internal Features
+--------------------------------------------------
+* Code cleanup for parser grammars (#2223)
+* Exposed new function signatures for to_matrix (#1452)
+* Remove initial state from the calculation of the average Metropolis acceptance probability (#2182)
+* Refactor stan/lang/generator.hpp (#2204)
+* Add informational message to `std::domain_error` exception (#2203)
+* Tweaked windowed adaptation warning to be more readable (#2064)
+
+Documentation
+--------------------------------------------------
+* User manual updates for this release (#2122)
+
+v2.14.0 (26 December 2016)
+======================================================================
+
+Bug Fixes
+--------------------------------------------------
+* NUTS sampler broken (#2179)
+* seralization issues with RStan v2.13.1 (#2179)
+* printing result of a void function parses, but doesnt' compile (#2168)
+* compound declare/define not working for all types (#2163)
+
+Other
+--------------------------------------------------
+* Update Stan Math Library to v2.14.0
+* make use of const references consistent (#2186)
+
+
+v2.13.1 (3 December 2016)
+======================================================================
+
+Bug Fixes
+--------------------------------------------------
+* fixed compound declare and define (#2156, #2153, #2146)
+
+
+v2.13.0 (25 November 2016)
+======================================================================
+
+New Team Members
+--------------------------------------------------
+* Thel Seraphim (Columbia University) -- Stan and Math libraries
+* Vincent Picaud (CEA, France) -- MathematicaStan
+
+Bug Fixes
+--------------------------------------------------
+* generated code for lower truncation fixed for discrete variables (#2054)
+* typo in error messages for RNGs only allowed in transformed data
+  block (#2124)
+* variables ending in _lpdf are now allowed (#2123)
+* cov_exp_quad() not compiling in C++ (#2113)
+* conditional operator in functions not compiling in C++ (#2101)
+* off-by-one error in error message for integrate_ode_bdf() fixed (#2073)
+
+New User-Facing Features
+--------------------------------------------------
+* vectorization of unary functions (#2119, #2037)
+* bernoulli_logit_rng() added to language (#2084)
+* Jacobian warning now suggests `target +=` (#2066)
+* matrix_exp() function now available (#2043)
+* compound declaration / definition statements (#1951)
+
+New Internal Features
+--------------------------------------------------
+* user-defined functions can be declared and not defined (#2068)
+
+Documentation
+--------------------------------------------------
+* manaul reorganization (#1599)
+* line too long (#2121)
+* added integer % operator documentation (#2065)
+* lots more (#2051)
+
 
 v2.12.0 (6 September 2016)
 ======================================================================
@@ -80,14 +174,14 @@ New User-Facing Features
 * introduction of = for assignment; deprecating <- (#1819)
 * _lpdf, _lpmf, _lcdf, _lccdf and vertical bar notation
   for probability mass, density, and cumulative distribution
-  functions; update user-defined function syntax; 
+  functions; update user-defined function syntax;
   deprecate older forms (#1811)
 * target += lp to replace increment_log_prob(lp); target() to rpelace
   log_prob() function;  remove lp__ variable access (#1800)
 * conditional (ternary) operator (#1125)
 * stiff diff eq solver CVODES from Sundials
 * add control parameters (tolerance, max iteraitons) to ODE solvers
-* rename ODE solvers based on algorithm, integrate_ode_rk45 
+* rename ODE solvers based on algorithm, integrate_ode_rk45
   for existing non-stiff Runge-Kutta solver and integrate_ode_bdf
   for the stiff backward differentiation form;  deprecate
   the unmarked integrate_ode function (#1886)
@@ -232,7 +326,7 @@ New Features
   Mac compilers (#1472)
 * Error messages now use operator notation (#1401)
 * More specific error messages for illegal assignments (#1100)
-* More specific error messages for illegal sampling statement 
+* More specific error messages for illegal sampling statement
   signatures (#1425)
 * Extended range on ibeta derivatives with wide impact on CDFs (#1426)
 * Display initialization error messages (#1403)
@@ -278,7 +372,7 @@ Code Reorganization and Back End Upgrades
 Manual and Dcoumentation
 --------------------------------------------------
 * New Logo in Manual; remove old logos (#1023)
-* Corrected all known bug reports and typos; details in 
+* Corrected all known bug reports and typos; details in
   issues #1420, #1508, #1496
 * Thanks to Sunil Nandihalli, Andy Choi, Sebastian Weber,
   Heraa Hu, @jonathan-g (GitHub handle), M. B. Joseph, Damjan
@@ -286,7 +380,7 @@ Manual and Dcoumentation
 * Fix some parsing issues for index (#1498)
 * Added chapter on variational inference
 * Added strangely unrelated regressions and multivariate probit
-  examples 
+  examples
 * Discussion from Ben Goodrich about reject() and sampling
 * Start to reorganize code with fast examples first, then
   explanations
@@ -379,7 +473,7 @@ Language Enhancements
 * initialize transformed data and generated quantities the
   same way as transformed parameters [#1099]
 * libstan.a removed and model compilation is 100% header-only [#1095]
-* check for infinite/nan inits from boundary initializations 
+* check for infinite/nan inits from boundary initializations
   with warning [#537]
 
 API/Build/Test Enhancements
@@ -397,7 +491,7 @@ API/Build/Test Enhancements
   end-to-end regression testing on speed [#708, #1245]
 * manual index parser for tool automation in interfaces (such as
   auto-complete suggestions) and emacs mode
-* refactor log determinant and fix return type cast in vector arena 
+* refactor log determinant and fix return type cast in vector arena
   alloc  [#1187]
 * update makefile dependencies for auto-generated cpp test files [#1108]
 * move test models into clearly labeled directories (good/bad) [#1016]
@@ -417,12 +511,12 @@ Bug Fixes
 * allow functions to be used in variable declaration constriants [#1151]
 * fix segfault resulting from multivariate normal in optimizer (root
   cause wasn't in optimizer, but in autodiff nesting cleanup) [#1200]
-* fixed return type in language and C++ for append_row of two 
+* fixed return type in language and C++ for append_row of two
   column vectors and append_col of two row vectors [#1241]
 * fixed derivative error for pareto_type_2_log() [#1223]
 * remove unused models from stan distribution (they're now in
   the stan-dev/example-models repo on GitHub) [#1249]
-* squash compiler warnings and fix windows tests (mostly 
+* squash compiler warnings and fix windows tests (mostly
   signed vs. unsigned, as usual) [#1257]
 * fix memory leak in ODE solver [#1160]
 * fix overflow in gamma_p function to throw instead [#674]
@@ -451,8 +545,8 @@ Documentation
   - remove bogus paths to models and replace with pointers to
     example-models repo
   - clarified Wishart/inverse Wishart parameterizations w.r.t. BDA3
-  - fixed exp_mod_normal definition 
-  - fix student-t reparameterization 
+  - fixed exp_mod_normal definition
+  - fix student-t reparameterization
   - fix hurdle distribution definition
 
 Thanks!
@@ -460,7 +554,7 @@ Thanks!
 Thanks to all the users who contributed code and doc corrections
 and comments: Alex Zvoleff, Juan Sebastián Casallas, Gökçen
 Eraslan, seldomworks [GitHub handle], Avraham Adler, Sebastian
-Weber, Amos Waterland, David Hallvig, Howard Zail, Andre Pfeuffer, 
+Weber, Amos Waterland, David Hallvig, Howard Zail, Andre Pfeuffer,
 Bobby Jacob, Cody Ross, Krzysztof Sakrejda, Andrew Ellis, John Sutton
 
 
@@ -481,17 +575,17 @@ New Features
 * added modulus function in a way tht is consistent with integer
   division across platforms (#577)
 * exposed pareto_type_2_rng (#580)
-* added Frechet distribution and multi_gp_cholesky distribution 
+* added Frechet distribution and multi_gp_cholesky distribution
   (thanks to Alexey Stukalov for both)
 
-Enhancements 
+Enhancements
 ----------------------------------------
 * removed Eigen code insertion for numeric traits and replaced
   with order-independent metaprogram (#1065)
 * cleaned up error messages to provide clearer error context
   and more informative messages (#640)
 * extensive tests for higher order autodiff in densities (#823)
-* added context factory 
+* added context factory
 * deprecated lkj_cov density (#865)
 * trying again with informational/rejection message (#223)
 * more code moved from interfaces into Stan common libraries,
@@ -502,7 +596,7 @@ Enhancements
 * worked around unused function warnings from gcc (#796)
 * fixed error messages in vector to array conversion (#579, thanks
   Kevin S. Van Horn)
-* fixed gp-fit.stan example to be as efficient as manual 
+* fixed gp-fit.stan example to be as efficient as manual
   version (#782)
 * update to Eigen version 3.2.2 (#1087)
 
@@ -511,7 +605,7 @@ Builds
 * pull out testing into Python script for developers to simplify
   makes
 * libstan dependencies handled properly and regenerate
-  dependencies, including working around bug in GNU 
+  dependencies, including working around bug in GNU
   make 3.8.1 (#1058, #1061, #1062)
 
 Bug Fixes
@@ -532,7 +626,7 @@ Bug Fixes
 * complete review of function library for NaN behavior and consistency
   of calls for double and autodiff values, with extensive
   documentation and extensive new unit tests for this and other,
-  ehances NaN testing in built-in test functions (several dozen issues 
+  ehances NaN testing in built-in test functions (several dozen issues
   in the #800 to #902 range)
 * fixing Eigen assert bugs with NO_DEBUG in tests (#904)
 * fix to makefile to allow builds in g++ 4.4 (thanks to Ewan Dunbar)
@@ -572,10 +666,10 @@ New Features
 * enhanced effective range of normal_cdf to prevent underflow/overflow
 * added von Mises RNG
 * added ability to use scalars in all element-wise operations
-* allow matrix division for mixing scalars and matrices 
+* allow matrix division for mixing scalars and matrices
 * vectorization of outcome variates in multivariate normal with efficiency boosts
 * generalization of multivariate normal to allow rwo vectors as means
-  and 
+  and
 
 Reorganization
 --------------
@@ -624,20 +718,20 @@ Testing
   more
 * enhanced cholesky factor tests for round trip transforms and
   derivatives
-* extensive unit testing added for optimization 
+* extensive unit testing added for optimization
 * remove use of std::cout in all tests
 
 Example Models
 --------------
 * lots of cleanup in links and models in ARM examples
-* added BUGS litter example with more stable priors than in the 
-  BUGS version (the original model doesn't fit well in BUGS as is, 
+* added BUGS litter example with more stable priors than in the
+  BUGS version (the original model doesn't fit well in BUGS as is,
   either)
 
 Documentation
 -------------
 * add infix operators to manual
-* categorical_logit sampling statement	
+* categorical_logit sampling statement
 * Cholesky factor with unit diagonal transform example
 * example of using linear regression for prediction/forecasting with
   notes
@@ -647,7 +741,7 @@ Documentation
 * fix typo in multiply_lower_self_transpose (thanks to Alexey Stukalov)
 * fix formatting of reserved names in manual
 * fixed typo and clarified effective sample size doc
- 
+
 
 v2.3.0 (18 June 2014)
 ======================================================================
@@ -659,11 +753,11 @@ New Features
 ------------
 * user-defined function definitions added to Stan language
 * a^b syntax for pow(a,b)  (thanks to Mitzi Morris)
-* reshaping functions: to_matrix(), to_vector(), to_row_vector(), 
+* reshaping functions: to_matrix(), to_vector(), to_row_vector(),
   to_array_1d(), to_array_2d()
 * matrix operations: quad_form_sym() (x' *Sigma * x), QR decompositions
   qr_Q(), qr_R()
-* densities: Gaussian processes multi_gp_log(), multi_gp(), 
+* densities: Gaussian processes multi_gp_log(), multi_gp(),
   and alternative negative binomial parameterization neg_binomial_2()
 * random number generator: multi_normal_cholesky_rng()
 * sorting: sort_indices_*() for returning indexes in sorted order by
@@ -695,7 +789,7 @@ Documentation
   clarified von Mises normalization, updated censoring doc (thanks
   to Alexey Stukalov), negative binomial doc enhanced, new references,
   new discussion of hierarchical models referencing Betancourt and
-  Girolami paper, 
+  Girolami paper,
 * Avraham Adler was particularly useful in pointing out and fixing
   documentation errors
 
@@ -711,7 +805,7 @@ Bug Fixes
   function, and softmax functions
 * removed many compiler warnings
 * numerous bug fixes to arithmetic test code conditions and messages,
-  including calls from 
+  including calls from
 * fixed model crashes when no parameter specified
 * fixed template name conflicts for some compiler bugs (thanks Kevin
   S. Van Horn)
@@ -814,7 +908,7 @@ exponent
 * fix Newton optimization backtrack to eventually terminate with
   failure rather than looping infinitely
 * fix CSV output from command for matrices (was transposed)
-* fixes to allow Stan to build under Cygwin 
+* fixes to allow Stan to build under Cygwin
 * fix double indexing on LHS of assignment
 * fix nested expression prints to allow indexed array sizes in
   declarations
@@ -823,7 +917,7 @@ exponent
 * added vector size test in assignment
 * fixed mixture examples
 * fixed rep_vector to work with integer value
-* fixed parser error message 
+* fixed parser error message
 * fixed use of Boost NaN tests
 * initialze local variables to NaN to prevent segfaults if used
   before defined
@@ -853,12 +947,12 @@ Modeling Language
 * added broadcast (repetition) functions for initializing
   matrices, vectors, and arrays
 * better error messages in parser
-* additional distributions: 
+* additional distributions:
     + exp_mod_normal
-    + gumbel 
+    + gumbel
     + skew_normal
-* additional functions: 
-    + mdivide_right_spd 
+* additional functions:
+    + mdivide_right_spd
     + mdivide_left_spd
     + owenst
     + columns_dot_product
@@ -867,7 +961,7 @@ Modeling Language
     + rep_arrray
     + rep_matrix
     + rep_row_vector
-    + rep_vector    
+    + rep_vector
 
 Command-Line
 * added option to display autocorrelations in the command-line program
@@ -890,9 +984,9 @@ C++/Internal
 
 Doc
 * additions to user's guide w. sample models
-    + stochastic volatility example with source, optimized source, 
+    + stochastic volatility example with source, optimized source,
       simulation
-    + time series, moving average, standardization for linear 
+    + time series, moving average, standardization for linear
       regression, hidden Markov models, with examples
 * manual's index is now hyperlinked
 * added additional acknowledgements to manual
@@ -913,11 +1007,11 @@ Bug Fixes
 * all probability distribution functions and cumulative distribution
   functions behave properly with 0 length vector arguments
 * fixed error in definition of hypergeometric pmf
-* fixed arguments to nesterov optimization ctor in command 
-* fixed issue with initialization matrices being read improperly 
-* Use fabs() instead of abs() in unit_vector_constrain. 
+* fixed arguments to nesterov optimization ctor in command
+* fixed issue with initialization matrices being read improperly
+* Use fabs() instead of abs() in unit_vector_constrain.
 * typos in the manual
-* rstan: 
+* rstan:
   + fixed crash in R when index is out of bounds using set_cppo("fast")
   + io_context fix skipping len=0
   + fix the typo in manual (dims -> dim)
@@ -951,12 +1045,12 @@ Bug Fixes
 * disabled Boost asserts in parser to quiet R's warnings
 * enabled prints in generated quantities block
 * various documentation patches
-* fixed memory leak in matrix operations leading to leaks in 
+* fixed memory leak in matrix operations leading to leaks in
   multivariate probability function use
 * wrapped call to gradient log prob to catch unexpected exceptions
 * fixed matrix resize issue on Windows that caused models to fail
   at optimization levels above 0
-* fixed bug in print preventing hyphens or grave accents from 
+* fixed bug in print preventing hyphens or grave accents from
   priting
 * fixed issue preventing matrix rows from being assigned on the
   left side of an assignment statement
@@ -975,15 +1069,15 @@ Bug Fixes
 * fixed off-by-one in NUTS treedepth bound so NUTS goes
   at most to specified tree depth rather than specified depth + 1
 * various compiler compatibility and minor consistency issues
-* fixed bug in metaprogram preventing lower/upper bound constraints 
+* fixed bug in metaprogram preventing lower/upper bound constraints
   on matrices
 * fixed print error for number of kept samples
 * fixed floating point literal precision issue in code generation
-* fixed bug in bernoulli_log for boundary chance of success 
+* fixed bug in bernoulli_log for boundary chance of success
   theta=0 or theta=1
 * many doc patches (mostly due to user comments -- thanks!)
 * replace boost sign() to avoid compiler conflicts
-* trapping mismatched dimension assignments in arrays, 
+* trapping mismatched dimension assignments in arrays,
   matrices, and vectors
 
 Enhancements
@@ -1014,12 +1108,12 @@ New Functions
 * probability functions
     + multivariate normal, precision parameterization
 * model timing and n_eff output in CSV for all test models
-* ongoing vectorizations and reparameterizations 
+* ongoing vectorizations and reparameterizations
   of probability functions
 * faster Phi_approx computing an approximate cumulative unit
   normal density
 * added dims() function to extract dimensions of arrays of scalars,
-  vectors, and matrices  
+  vectors, and matrices
 * added size()  function to extract the number of elements in an array
 
 
@@ -1027,7 +1121,7 @@ v1.1.0  (17 Dec 2012)
 ======================================================================
 -- Backward Compatibility Issue
    * Categorical distribution recoded to match documentation;  it
-     now has support {1,...,K} rather than {0,...,K-1}.  
+     now has support {1,...,K} rather than {0,...,K-1}.
    * (RStan) change default value of permuted flag from FALSE to TRUE for
      Stan fit S4 extract() method
 -- New Features
@@ -1038,7 +1132,7 @@ v1.1.0  (17 Dec 2012)
      matrices
    * special functions: log_inv_logit(), log1m_inv_logit()
    * matrix special functions: cumulative_sum()
-   * probability functions: poisson_log_log() for log-rate 
+   * probability functions: poisson_log_log() for log-rate
      parameterized Poisson
    * matrix functions: block(), diag_pre_multiply(), diag_post_multiply()
    * comparison operators (<, >, <=, >=, ==, !=)
@@ -1095,7 +1189,7 @@ Stan Bug Fixes:
 Stan New Features:
  -- mdivide_left_tri_low, mdivide_right_tri_low functions
  -- all univariate continuous densities vectorized
- -- better error checking for transforms 
+ -- better error checking for transforms
  -- new error return type in stanc for invalid arguments
  -- lower and upper bounds for vectors, row vectors, and matrices
  -- command parameter refresh <= 0 turns off iteration reporting
@@ -1111,19 +1205,19 @@ Stan Manual Additions:
  -- updated Eigen licensing information (now MPL, was LGPL)
  -- fixed alpha ordering issue in function index due to bolding
 RStan Bug Fixes:
- -- bug of setting parameter epsilon_pm wrongly for NUTS 
+ -- bug of setting parameter epsilon_pm wrongly for NUTS
  -- fixed seed reset so results match Stan
 RStan New Features:
  -- return empty stanfit object upon error such as incorrect data
     input, wrong argument specification, etc. Previously, it will
     stop. The empty stanfit includes the compiled model, so it can be
     reused.
- -- add function stan_demo() to run examples included in Stan. 
- -- add function sflist2stanfit() to merge a list of stanfit objects 
-    into one, to facilitate user-level parallelism. 
- -- add S3 method as.matrix, as.array, is.array, dim, 
-    dimnames for stanfit objects. 
- -- specify seed using string of digits in addition to numbers  
+ -- add function stan_demo() to run examples included in Stan.
+ -- add function sflist2stanfit() to merge a list of stanfit objects
+    into one, to facilitate user-level parallelism.
+ -- add S3 method as.matrix, as.array, is.array, dim,
+    dimnames for stanfit objects.
+ -- specify seed using string of digits in addition to numbers
  -- turn off refresh if value <= 0
 
 
@@ -1144,7 +1238,7 @@ New Features:
   -- multiply_lower_tri_self_transpose function
   -- vectorized several probability functions (see the manual)
 Manual Additions:
-  -- programming guide: IRT models 
+  -- programming guide: IRT models
   -- new appendix: style guide
   -- new appendix: migrating from Stan
   -- new index: function and distribution index
@@ -1188,20 +1282,20 @@ Cmd:    stan/mcmc/chains.hpp
 R:      rstan/rstan/src/chains.cpp
 
 var_context impl
-Cmd: 
-R: rstan/rstan/inst/include/rstan/io/rlist_ref_var_context.hpp 
+Cmd:
+R: rstan/rstan/inst/include/rstan/io/rlist_ref_var_context.hpp
 
 makefiles
 Cmd:    add .cpp files, makefile,  make/make*
 R:      rstan/rstan/src/Makefile{,.win}
 
 
-boost/eigen version 
+boost/eigen version
 Cmd:    lib/boost_x.xx.x/, lib/eigen_x.x.x, etc.
-R:      rstan/rstan/src/Makefile{,.win} 
+R:      rstan/rstan/src/Makefile{,.win}
         rstan/rstan/R/options.R
 
-author list 
+author list
 Cmd:   web/mc-stan.org/development-team.html
 R:     rstan/rstan/DESCRIPTION
        rstan/rstan/man/rstan.Rd

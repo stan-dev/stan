@@ -1,9 +1,8 @@
 #include <ostream>
 #include <stan/io/var_context.hpp>
 #include <stan/io/dump.hpp>
-#include <stan/interface_callbacks/var_context_factory/var_context_factory.hpp>
-#include <stan/interface_callbacks/writer/stream_writer.hpp>
-#include <stan/services/init/initialize_state.hpp>
+#include <stan/callbacks/stream_logger.hpp>
+#include <stan/callbacks/stream_writer.hpp>
 #include <stan/model/prob_grad.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>
@@ -211,44 +210,21 @@ public:
   int calls;
 };
 
-class mock_context_factory
-  : public stan::interface_callbacks::var_context_factory::var_context_factory<stan::io::dump> {
-public:
-  mock_context_factory()
-    : calls(0),
-      last_call("") { }
-
-  void reset() {
-    calls = 0;
-    last_call = "";
-  }
-
-  stan::io::dump operator()(const std::string source) {
-    calls++;
-    last_call = source;
-    std::string txt = "a <- 0\nb <- 1\nc <- 2";
-    std::stringstream in(txt);
-    return stan::io::dump(in);
-  }
-
-  int calls;
-  std::string last_call;
-};
-
 
 class stochastic_gradient_ascent_test : public testing::Test {
 public:
   stochastic_gradient_ascent_test() :
     model(3),
     throwing_model(3),
-    writer(output) {}
+    writer(writer_output),
+    logger(logger_output, logger_output, logger_output, logger_output, logger_output) {}
 
   void SetUp() {
     cont_params = Eigen::VectorXd::Zero(3);
     model.reset();
     rng.reset();
-    output.clear();
-    context_factory.reset();
+    writer_output.clear();
+    logger_output.clear();
   }
 
   std::string init;
@@ -256,9 +232,9 @@ public:
   mock_model model;
   mock_throwing_model throwing_model;
   mock_rng rng;
-  std::stringstream output;
-  mock_context_factory context_factory;
-  stan::interface_callbacks::writer::stream_writer writer;
+  std::stringstream writer_output, logger_output;
+  stan::callbacks::stream_writer writer;
+  stan::callbacks::stream_logger logger;
 };
 
 TEST_F(stochastic_gradient_ascent_test, initialize_state_zero_negative_infinity) {
@@ -302,14 +278,14 @@ TEST_F(stochastic_gradient_ascent_test, initialize_state_zero_negative_infinity)
                                                               1.0,
                                                               0.01,
                                                               1000,
-                                                              writer,
+                                                              logger,
                                                               writer),
                    std::domain_error, error);
   EXPECT_THROW_MSG(advi_fullrank->stochastic_gradient_ascent(fullrank_init,
                                                              1.0,
                                                              0.01,
                                                              1000,
-                                                             writer,
+                                                             logger,
                                                              writer),
                    std::domain_error, error);
 
@@ -358,7 +334,7 @@ TEST_F(stochastic_gradient_ascent_test, initialize_state_zero_grad_error) {
                                                               1.0,
                                                               0.01,
                                                               1000,
-                                                              writer,
+                                                              logger,
                                                               writer),
                    std::domain_error, error);
 
@@ -372,13 +348,10 @@ TEST_F(stochastic_gradient_ascent_test, initialize_state_zero_grad_error) {
                                                              1.0,
                                                              0.01,
                                                              1000,
-                                                             writer,
+                                                             logger,
                                                              writer),
                    std::domain_error, error);
 
   delete advi_meanfield;
   delete advi_fullrank;
 }
-
-
-

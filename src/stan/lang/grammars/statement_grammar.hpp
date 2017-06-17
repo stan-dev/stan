@@ -20,7 +20,7 @@ namespace stan {
     template <typename Iterator>
     struct statement_grammar
       : boost::spirit::qi::grammar<Iterator,
-                                   statement(bool, var_origin, bool, bool),
+                                   statement(scope, bool),
                                    whitespace_grammar<Iterator> > {
       statement_grammar(variable_map& var_map,
                         std::stringstream& error_msgs);
@@ -33,12 +33,12 @@ namespace stan {
       indexes_grammar<Iterator> indexes_g;
 
       boost::spirit::qi::rule<Iterator,
-                              assignment(var_origin),
+                              assignment(scope),
                               whitespace_grammar<Iterator> >
       assignment_r;
 
       boost::spirit::qi::rule<Iterator,
-                              assgn(var_origin),
+                              assgn(scope),
                               whitespace_grammar<Iterator> >
       assgn_r;
 
@@ -49,47 +49,47 @@ namespace stan {
 
 
       boost::spirit::qi::rule<Iterator,
-                              expression(var_origin),
+                              expression(scope),
                               whitespace_grammar<Iterator> >
       non_lvalue_assign_r;
 
 
       boost::spirit::qi::rule<Iterator,
-                              std::vector<expression>(var_origin),
+                              std::vector<expression>(scope),
                               whitespace_grammar<Iterator> >
       dims_r;
 
       boost::spirit::qi::rule<Iterator,
-                              variable(var_origin),
+                              variable(scope),
                               whitespace_grammar<Iterator> >
       var_r;
 
 
       boost::spirit::qi::rule<Iterator,
-                              distribution(var_origin),
+                              distribution(scope),
                               whitespace_grammar<Iterator> >
       distribution_r;
 
 
       boost::spirit::qi::rule<Iterator,
-                              increment_log_prob_statement(bool, var_origin),
+                              increment_log_prob_statement(scope),
                               whitespace_grammar<Iterator> >
       increment_log_prob_statement_r;
 
       boost::spirit::qi::rule<Iterator,
-                              increment_log_prob_statement(bool, var_origin),
+                              increment_log_prob_statement(scope),
                               whitespace_grammar<Iterator> >
       increment_target_statement_r;
 
       boost::spirit::qi::rule<Iterator,
                               boost::spirit::qi::locals<std::string>,
-                              for_statement(bool, var_origin, bool),
+                              for_statement(scope),
                               whitespace_grammar<Iterator> >
       for_statement_r;
 
 
       boost::spirit::qi::rule<Iterator,
-                              while_statement(bool, var_origin, bool),
+                              while_statement(scope),
                               whitespace_grammar<Iterator> >
       while_statement_r;
 
@@ -99,28 +99,28 @@ namespace stan {
       break_continue_statement_r;
 
       boost::spirit::qi::rule<Iterator,
-                              print_statement(var_origin),
+                              print_statement(scope),
                               whitespace_grammar<Iterator> >
       print_statement_r;
 
       boost::spirit::qi::rule<Iterator,
-                              reject_statement(var_origin),
+                              reject_statement(scope),
                               whitespace_grammar<Iterator> >
       reject_statement_r;
 
 
       boost::spirit::qi::rule<Iterator,
-                              return_statement(var_origin),
+                              return_statement(scope),
                               whitespace_grammar<Iterator> >
       return_statement_r;
 
       boost::spirit::qi::rule<Iterator,
-                              return_statement(var_origin),
+                              return_statement(scope),
                               whitespace_grammar<Iterator> >
       void_return_statement_r;
 
       boost::spirit::qi::rule<Iterator,
-                              printable(var_origin),
+                              printable(scope),
                               whitespace_grammar<Iterator> >
       printable_r;
 
@@ -136,7 +136,7 @@ namespace stan {
       identifier_r;
 
       boost::spirit::qi::rule<Iterator,
-                              std::vector<var_decl>(),
+                              std::vector<var_decl>(scope),
                               whitespace_grammar<Iterator> >
       local_var_decls_r;
 
@@ -146,48 +146,49 @@ namespace stan {
       no_op_statement_r;
 
       boost::spirit::qi::rule<Iterator,
-                              std::vector<expression>(var_origin),
+                              std::vector<expression>(scope),
                               whitespace_grammar<Iterator> >
       opt_dims_r;
 
       boost::spirit::qi::rule<Iterator,
-                              range(var_origin),
+                              range(scope),
                               whitespace_grammar<Iterator> >
       range_r;
 
       boost::spirit::qi::rule<Iterator,
-                              sample(bool, var_origin),
+                              sample(scope),
                               whitespace_grammar<Iterator> >
       sample_r;
 
       boost::spirit::qi::rule<Iterator,
-                              statement(bool, var_origin, bool, bool),
+                              statement(scope, bool),
                               whitespace_grammar<Iterator> >
       statement_r;
 
       boost::spirit::qi::rule<Iterator,
-                              statement(bool, var_origin, bool, bool),
+                              statement(scope, bool),
                               whitespace_grammar<Iterator> >
       statement_sub_r;
 
       boost::spirit::qi::rule<Iterator,
-                              boost::spirit::qi::locals<std::vector<var_decl> >,
-                              statements(bool, var_origin, bool, bool),
+                              boost::spirit::qi::locals<std::vector<var_decl>,
+                                                        scope>,
+                              statements(scope, bool),
                               whitespace_grammar<Iterator> >
       statement_seq_r;
 
       boost::spirit::qi::rule<Iterator,
-                              range(var_origin),
+                              range(scope),
                               whitespace_grammar<Iterator> >
       truncation_range_r;
 
       boost::spirit::qi::rule<Iterator,
-                              variable_dims(var_origin),
+                              variable_dims(scope),
                               whitespace_grammar<Iterator> >
       var_lhs_r;
 
       boost::spirit::qi::rule<Iterator,
-                              expression(var_origin),
+                              expression(scope),
                               whitespace_grammar<Iterator> >
       expression_rhs_r;
     };

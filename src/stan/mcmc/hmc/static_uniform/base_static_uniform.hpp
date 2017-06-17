@@ -1,7 +1,7 @@
 #ifndef STAN_MCMC_HMC_UNIFORM_BASE_STATIC_UNIFORM_HPP
 #define STAN_MCMC_HMC_UNIFORM_BASE_STATIC_UNIFORM_HPP
 
-#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/logger.hpp>
 #include <stan/mcmc/hmc/base_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
@@ -34,15 +34,13 @@ namespace stan {
       ~base_static_uniform() {}
 
       sample
-      transition(sample& init_sample,
-                 interface_callbacks::writer::base_writer& info_writer,
-                 interface_callbacks::writer::base_writer& error_writer) {
+      transition(sample& init_sample, callbacks::logger& logger) {
         this->sample_stepsize();
 
         this->seed(init_sample.cont_params());
 
         this->hamiltonian_.sample_p(this->z_, this->rand_int_);
-        this->hamiltonian_.init(this->z_, info_writer, error_writer);
+        this->hamiltonian_.init(this->z_, logger);
 
         ps_point z_init(this->z_);
         double H0 = this->hamiltonian_.H(this->z_);
@@ -57,7 +55,7 @@ namespace stan {
         for (int l = 0; l < Lp; ++l) {
           this->integrator_.evolve(this->z_, this->hamiltonian_,
                                    -this->epsilon_,
-                                   info_writer, error_writer);
+                                   logger);
 
           double h = this->hamiltonian_.H(this->z_);
           if (boost::math::isnan(h))
@@ -76,7 +74,7 @@ namespace stan {
         for (int l = 0; l < L_ - 1 - Lp; ++l) {
           this->integrator_.evolve(this->z_, this->hamiltonian_,
                                    this->epsilon_,
-                                   info_writer, error_writer);
+                                   logger);
 
           double h = this->hamiltonian_.H(this->z_);
           if (boost::math::isnan(h))

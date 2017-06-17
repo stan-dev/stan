@@ -41,7 +41,7 @@ namespace stan {
                        const char* name = "ANON",
                        int depth = 0) {
       x.resize(y.rows(), y.cols());
-      for (size_t i = 0; i < y.size(); ++i)
+      for (int i = 0; i < y.size(); ++i)
         assign(x(i), nil_index_list(), y(i), name, depth + 1);
     }
 
@@ -59,7 +59,7 @@ namespace stan {
     /**
      * Assign the specified Eigen vector at the specified single index
      * to the specified value.
-     * 
+     *
      * Types: vec[uni] <- scalar
      *
      * @tparam T Type of assigned vector scalar.
@@ -84,7 +84,7 @@ namespace stan {
     /**
      * Assign the specified Eigen vector at the specified single index
      * to the specified value.
-     * 
+     *
      * Types:  row_vec[uni] <- scalar
      *
      * @tparam T Type of assigned row vector scalar.
@@ -109,7 +109,7 @@ namespace stan {
     /**
      * Assign the specified Eigen vector at the specified multiple
      * index to the specified value.
-     * 
+     *
      * Types:  vec[multi] <- vec
      *
      * @tparam T Type of assigned vector scalar.
@@ -121,7 +121,7 @@ namespace stan {
      * @param[in] name Name of variable (default "ANON").
      * @param[in] depth Indexing depth (default 0).
      * @throw std::out_of_range If any of the indices are out of bounds.
-     * @throw std::domain_error If the value size isn't the same as
+     * @throw std::invalid_argument If the value size isn't the same as
      * the indexed size.
      */
     template <typename T, typename I, typename U>
@@ -130,8 +130,9 @@ namespace stan {
            const cons_index_list<I, nil_index_list>& idxs,
            const Eigen::Matrix<U, Eigen::Dynamic, 1>& y,
            const char* name = "ANON", int depth = 0) {
-      math::check_equal("vector[multi] assign sizes", name, y.size(),
-                        rvalue_index_size(idxs.head_, x.size()));
+      math::check_size_match("vector[multi] assign sizes",
+                             "lhs", rvalue_index_size(idxs.head_, x.size()),
+                             name, y.size());
       for (int n = 0; n < y.size(); ++n) {
         int i = rvalue_at(n, idxs.head_);
         math::check_range("vector[multi] assign range", name, x.size(), i);
@@ -142,7 +143,7 @@ namespace stan {
     /**
      * Assign the specified Eigen row vector at the specified multiple
      * index to the specified value.
-     * 
+     *
      * Types:   row_vec[multi] <- row_vec
      *
      * @tparam T Scalar type for assigned row vector.
@@ -155,7 +156,7 @@ namespace stan {
      * @param[in] name Name of variable (default "ANON").
      * @param[in] depth Indexing depth (default 0).
      * @throw std::out_of_range If any of the indices are out of bounds.
-     * @throw std::domain_error If the value size isn't the same as
+     * @throw std::invalid_argument If the value size isn't the same as
      * the indexed size.
      */
     template <typename T, typename I, typename U>
@@ -164,9 +165,9 @@ namespace stan {
            const cons_index_list<I, nil_index_list>& idxs,
            const Eigen::Matrix<U, 1, Eigen::Dynamic>& y,
            const char* name = "ANON", int depth = 0) {
-      using stan::math::check_equal;
-      check_equal("row_vector[multi] assign sizes",
-                  name, y.size(), rvalue_index_size(idxs.head_, x.size()));
+      math::check_size_match("row_vector[multi] assign sizes",
+                             "lhs", rvalue_index_size(idxs.head_, x.size()),
+                             name, y.size());
       for (int n = 0; n < y.size(); ++n) {
         int i = rvalue_at(n, idxs.head_);
         math::check_range("row_vector[multi] assign range", name, x.size(), i);
@@ -177,7 +178,7 @@ namespace stan {
     /**
      * Assign the specified Eigen matrix at the specified single index
      * to the specified row vector value.
-     * 
+     *
      * Types:  mat[uni] = rowvec
      *
      * @tparam T Assigned matrix scalar type.
@@ -189,7 +190,7 @@ namespace stan {
      * @param[in] name Name of variable (default "ANON").
      * @param[in] depth Indexing depth (default 0).
      * @throw std::out_of_range If any of the indices are out of bounds.
-     * @throw std::domain_error If the number of columns in the row
+     * @throw std::invalid_argument If the number of columns in the row
      * vector and matrix do not match.
      */
     template <typename T, typename U>
@@ -197,7 +198,9 @@ namespace stan {
                 const cons_index_list<index_uni, nil_index_list>& idxs,
                 const Eigen::Matrix<U, 1, Eigen::Dynamic>& y,
                 const char* name = "ANON", int depth = 0) {
-      math::check_equal("matrix[uni] assign sizes", name, y.cols(), x.cols());
+      math::check_size_match("matrix[uni] assign sizes",
+                             "lhs", x.cols(),
+                             name, y.cols());
       int i = idxs.head_.n_;
       math::check_range("matrix[uni] assign range", name, x.rows(), i);
       for (int j = 0; j < x.cols(); ++j)  // loop allows double to var assgn
@@ -207,7 +210,7 @@ namespace stan {
     /**
      * Assign the specified Eigen matrix at the specified multiple
      * index to the specified matrix value.
-     * 
+     *
      * Types:  mat[multi] = mat
      *
      * @tparam T Assigned matrix scalar type.
@@ -219,7 +222,7 @@ namespace stan {
      * @param[in] name Name of variable (default "ANON").
      * @param[in] depth Indexing depth (default 0).
      * @throw std::out_of_range If any of the indices are out of bounds.
-     * @throw std::domain_error If the dimensions of the indexed
+     * @throw std::invalid_argument If the dimensions of the indexed
      * matrix and right-hand side matrix do not match.
      */
     template <typename T, typename I, typename U>
@@ -229,10 +232,12 @@ namespace stan {
            const Eigen::Matrix<U, Eigen::Dynamic, Eigen::Dynamic>& y,
            const char* name = "ANON", int depth = 0) {
       int x_idx_rows = rvalue_index_size(idxs.head_, x.rows());
-      math::check_equal("matrix[multi] assign row sizes", name, y.rows(),
-                        x_idx_rows);
-      math::check_equal("matrix[multi] assign col sizes", name, y.cols(),
-                        x.cols());
+      math::check_size_match("matrix[multi] assign row sizes",
+                             "lhs", x_idx_rows,
+                             name, y.rows());
+      math::check_size_match("matrix[multi] assign col sizes",
+                             "lhs", x.cols(),
+                             name, y.cols());
       for (int i = 0; i < y.rows(); ++i) {
         int m = rvalue_at(i, idxs.head_);
         math::check_range("matrix[multi] assign range", name, x.rows(), m);
@@ -245,7 +250,7 @@ namespace stan {
     /**
      * Assign the specified Eigen matrix at the specified pair of
      * single indexes to the specified scalar value.
-     * 
+     *
      * Types:  mat[single, single] = scalar
      *
      * @tparam T Matrix scalar type.
@@ -274,20 +279,20 @@ namespace stan {
     /**
      * Assign the specified Eigen matrix at the specified single and
      * multiple index to the specified row vector.
-     * 
+     *
      * Types:  mat[uni, multi] = rowvec
      *
      * @tparam T Assigned matrix scalar type.
      * @tparam I Multi-index type.
      * @tparam U Value row vector scalar type (must be assignable to
-     * T). 
+     * T).
      * @param[in] x Matrix variable to be assigned.
      * @param[in] idxs Sequence of single and multiple index (from 1).
      * @param[in] y Value row vector.
      * @param[in] name Name of variable (default "ANON").
      * @param[in] depth Indexing depth (default 0).
      * @throw std::out_of_range If any of the indices are out of bounds.
-     * @throw std::domain_error If the dimensions of the indexed
+     * @throw std::invalid_argument If the dimensions of the indexed
      * matrix and right-hand side row vector do not match.
      */
     template <typename T, typename I, typename U>
@@ -298,8 +303,9 @@ namespace stan {
            const Eigen::Matrix<U, 1, Eigen::Dynamic>& y,
            const char* name = "ANON", int depth = 0) {
       int x_idxs_cols = rvalue_index_size(idxs.tail_.head_, x.cols());
-      math::check_equal("matrix[uni,multi] assign sizes", name, y.cols(),
-                        x_idxs_cols);
+      math::check_size_match("matrix[uni,multi] assign sizes",
+                             "lhs", x_idxs_cols,
+                             name, y.cols());
       int m = idxs.head_.n_;
       math::check_range("matrix[uni,multi] assign range", name, x.rows(), m);
       for (int i = 0; i < y.size(); ++i) {
@@ -312,7 +318,7 @@ namespace stan {
     /**
      * Assign the specified Eigen matrix at the specified multiple and
      * single index to the specified vector.
-     * 
+     *
      * Types:  mat[multi, uni] = vec
      *
      * @tparam T Assigned matrix scalar type.
@@ -324,7 +330,7 @@ namespace stan {
      * @param[in] name Name of variable (default "ANON").
      * @param[in] depth Indexing depth (default 0).
      * @throw std::out_of_range If any of the indices are out of bounds.
-     * @throw std::domain_error If the dimensions of the indexed
+     * @throw std::invalid_argument If the dimensions of the indexed
      * matrix and right-hand side vector do not match.
      */
     template <typename T, typename I, typename U>
@@ -336,8 +342,9 @@ namespace stan {
            const Eigen::Matrix<U, Eigen::Dynamic, 1>& y,
            const char* name = "ANON", int depth = 0) {
       int x_idxs_rows = rvalue_index_size(idxs.head_, x.rows());
-      math::check_equal("matrix[multi,uni] assign sizes", name, y.rows(),
-                        x_idxs_rows);
+      math::check_size_match("matrix[multi,uni] assign sizes",
+                             "lhs", x_idxs_rows,
+                             name, y.rows());
       int n = idxs.tail_.head_.n_;
       math::check_range("matrix[multi,uni] assign range", name, x.cols(), n);
       for (int i = 0; i < y.size(); ++i) {
@@ -350,7 +357,7 @@ namespace stan {
     /**
      * Assign the specified Eigen matrix at the specified pair of
      * multiple indexes to the specified matrix.
-     * 
+     *
      * Types:  mat[multi, multi] = mat
      *
      * @tparam T Assigned matrix scalar type.
@@ -363,7 +370,7 @@ namespace stan {
      * @param[in] name Name of variable (default "ANON").
      * @param[in] depth Indexing depth (default 0).
      * @throw std::out_of_range If any of the indices are out of bounds.
-     * @throw std::domain_error If the dimensions of the indexed
+     * @throw std::invalid_argument If the dimensions of the indexed
      * matrix and value matrix do not match.
      */
     template <typename T, typename I1, typename I2, typename U>
@@ -377,10 +384,12 @@ namespace stan {
            const char* name = "ANON", int depth = 0) {
       int x_idxs_rows = rvalue_index_size(idxs.head_, x.rows());
       int x_idxs_cols = rvalue_index_size(idxs.tail_.head_, x.cols());
-      math::check_equal("matrix[multi,multi] assign sizes", name, y.rows(),
-                        x_idxs_rows);
-      math::check_equal("matrix[multi,multi] assign sizes", name, y.cols(),
-                        x_idxs_cols);
+      math::check_size_match("matrix[multi,multi] assign sizes",
+                             "lhs", x_idxs_rows,
+                             name, y.rows());
+      math::check_size_match("matrix[multi,multi] assign sizes",
+                             "lhs", x_idxs_cols,
+                             name, y.cols());
       for (int j = 0; j < y.cols(); ++j) {
         int n = rvalue_at(j, idxs.tail_.head_);
         math::check_range("matrix[multi,multi] assign range", name,
@@ -399,22 +408,22 @@ namespace stan {
      * index list beginning with a single index to the specified value.
      *
      * This function operates recursively to carry out the tail
-     * indexing. 
-     * 
+     * indexing.
+     *
      * Types:  x[uni | L] = y
      *
      * @tparam T Assigned vector member type.
      * @tparam L Type of tail of index list.
      * @tparam U Value scalar type (must be assignable to indexed
-     * variable). 
+     * variable).
      * @param[in] x Array variable to be assigned.
      * @param[in] idxs List of indexes beginning with single index
-     * (from 1). 
+     * (from 1).
      * @param[in] y Value.
      * @param[in] name Name of variable (default "ANON").
      * @param[in] depth Indexing depth (default 0).
      * @throw std::out_of_range If any of the indices are out of bounds.
-     * @throw std::domain_error If the dimensions do not match in the
+     * @throw std::invalid_argument If the dimensions do not match in the
      * tail assignment.
      */
     template <typename T, typename L, typename U>
@@ -431,23 +440,23 @@ namespace stan {
      * index list beginning with a multiple index to the specified value.
      *
      * This function operates recursively to carry out the tail
-     * indexing. 
-     * 
+     * indexing.
+     *
      * Types:  x[multi | L] = y
      *
      * @tparam T Assigned vector member type.
      * @tparam I Type of multiple index heading index list.
      * @tparam L Type of tail of index list.
      * @tparam U Value scalar type (must be assignable to indexed
-     * variable). 
+     * variable).
      * @param[in] x Array variable to be assigned.
      * @param[in] idxs List of indexes beginning with multiple index
-     * (from 1). 
+     * (from 1).
      * @param[in] y Value.
      * @param[in] name Name of variable (default "ANON").
      * @param[in] depth Indexing depth (default 0).
      * @throw std::out_of_range If any of the indices are out of bounds.
-     * @throw std::domain_error If the size of the multiple indexing
+     * @throw std::invalid_argument If the size of the multiple indexing
      * and size of first dimension of value do not match, or any of
      * the recursive tail assignment dimensions do not match.
      */
@@ -457,8 +466,9 @@ namespace stan {
                   const std::vector<U>& y,
                   const char* name = "ANON", int depth = 0) {
       int x_idx_size = rvalue_index_size(idxs.head_, x.size());
-      math::check_equal("vector[multi,...] assign sizes", name, y.size(),
-                        x_idx_size);
+      math::check_size_match("vector[multi,...] assign sizes",
+                             "lhs", x_idx_size,
+                             name, y.size());
       for (size_t n = 0; n < y.size(); ++n) {
         int i = rvalue_at(n, idxs.head_);
         math::check_range("vector[multi,...] assign range", name, x.size(), i);

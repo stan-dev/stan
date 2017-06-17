@@ -1,7 +1,7 @@
 #ifndef STAN_MCMC_STEPSIZE_VAR_ADAPTER_HPP
 #define STAN_MCMC_STEPSIZE_VAR_ADAPTER_HPP
 
-#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/logger.hpp>
 #include <stan/mcmc/base_adapter.hpp>
 #include <stan/mcmc/stepsize_adaptation.hpp>
 #include <stan/mcmc/var_adaptation.hpp>
@@ -27,12 +27,12 @@ namespace stan {
                              unsigned int init_buffer,
                              unsigned int term_buffer,
                              unsigned int base_window,
-                             interface_callbacks::writer::base_writer& writer) {
+                             callbacks::logger& logger) {
         var_adaptation_.set_window_params(num_warmup,
                                           init_buffer,
                                           term_buffer,
                                           base_window,
-                                          writer);
+                                          logger);
       }
 
 

@@ -18,7 +18,7 @@ namespace stan {
     template <typename Iterator>
     struct expression_grammar
       : public boost::spirit::qi::grammar<Iterator,
-                                          expression(var_origin),
+                                          expression(scope),
                                           whitespace_grammar<Iterator> > {
       variable_map& var_map_;
       std::stringstream& error_msgs_;
@@ -28,27 +28,27 @@ namespace stan {
                          std::stringstream& error_msgs);
 
       boost::spirit::qi::rule<Iterator,
-                              expression(var_origin),
+                              expression(scope),
                               whitespace_grammar<Iterator> >
       expression_r;
 
       boost::spirit::qi::rule<Iterator,
-                              expression(var_origin),
+                              expression(scope),
                               whitespace_grammar<Iterator> >
       expression09_r;
 
       boost::spirit::qi::rule<Iterator,
-                              expression(var_origin),
+                              expression(scope),
                               whitespace_grammar<Iterator> >
       expression10_r;
 
       boost::spirit::qi::rule<Iterator,
-                              expression(var_origin),
+                              expression(scope),
                               whitespace_grammar<Iterator> >
       expression14_r;
 
       boost::spirit::qi::rule<Iterator,
-                              expression(var_origin),
+                              expression(scope),
                               whitespace_grammar<Iterator> >
       expression15_r;
 
@@ -56,7 +56,7 @@ namespace stan {
                               boost::spirit::qi::locals<stan::lang::expression,
                                                         stan::lang::expression,
                                                         stan::lang::expression>,
-                              conditional_op(var_origin),
+                              conditional_op(scope),
                               whitespace_grammar<Iterator> >
       conditional_op_r;
     };

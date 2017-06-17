@@ -1,7 +1,7 @@
 #ifndef STAN_MCMC_HMC_STATIC_ADAPT_UNIT_E_STATIC_HMC_HPP
 #define STAN_MCMC_HMC_STATIC_ADAPT_UNIT_E_STATIC_HMC_HPP
 
-#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/logger.hpp>
 #include <stan/mcmc/hmc/static_uniform/unit_e_static_uniform.hpp>
 #include <stan/mcmc/stepsize_adapter.hpp>
 
@@ -24,13 +24,10 @@ namespace stan {
       ~adapt_unit_e_static_uniform() { }
 
       sample
-      transition(sample& init_sample,
-                 interface_callbacks::writer::base_writer& info_writer,
-                 interface_callbacks::writer::base_writer& error_writer) {
+      transition(sample& init_sample, callbacks::logger& logger) {
         sample s
           = unit_e_static_uniform<Model, BaseRNG>::transition(init_sample,
-                                                              info_writer,
-                                                              error_writer);
+                                                              logger);
 
         if (this->adapt_flag_) {
           this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,

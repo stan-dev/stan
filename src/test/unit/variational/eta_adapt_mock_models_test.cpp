@@ -1,11 +1,8 @@
 #include <ostream>
 #include <stan/io/var_context.hpp>
 #include <stan/io/dump.hpp>
-#include <stan/interface_callbacks/var_context_factory/var_context_factory.hpp>
-#include <stan/interface_callbacks/writer/stream_writer.hpp>
-#include <stan/services/init/initialize_state.hpp>
+#include <stan/callbacks/stream_logger.hpp>
 #include <stan/model/prob_grad.hpp>
-#include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
@@ -212,44 +209,18 @@ public:
   int calls;
 };
 
-class mock_context_factory
-  : public stan::interface_callbacks::var_context_factory::var_context_factory<stan::io::dump> {
-public:
-  mock_context_factory()
-    : calls(0),
-      last_call("") { }
-
-  void reset() {
-    calls = 0;
-    last_call = "";
-  }
-
-  stan::io::dump operator()(const std::string source) {
-    calls++;
-    last_call = source;
-    std::string txt = "a <- 0\nb <- 1\nc <- 2";
-    std::stringstream in(txt);
-    return stan::io::dump(in);
-  }
-
-  int calls;
-  std::string last_call;
-};
-
-
 class eta_adapt_test : public testing::Test {
 public:
   eta_adapt_test() :
     model(3),
     throwing_model(3),
-    writer(output) {}
+    logger(log_stream_, log_stream_, log_stream_, log_stream_, log_stream_) {}
 
   void SetUp() {
     cont_params = Eigen::VectorXd::Zero(3);
     model.reset();
     rng.reset();
-    output.clear();
-    context_factory.reset();
+    log_stream_.clear();
   }
 
   std::string init;
@@ -257,9 +228,8 @@ public:
   mock_model model;
   mock_throwing_model throwing_model;
   mock_rng rng;
-  std::stringstream output;
-  mock_context_factory context_factory;
-  stan::interface_callbacks::writer::stream_writer writer;
+  std::stringstream log_stream_;
+  stan::callbacks::stream_logger logger;
 };
 
 TEST_F(eta_adapt_test, initialize_state_zero_negative_infinity) {
@@ -299,9 +269,9 @@ TEST_F(eta_adapt_test, initialize_state_zero_negative_infinity) {
                       "Your model may be either "
                       "severely ill-conditioned or misspecified.";
 
-  EXPECT_THROW_MSG(advi_meanfield->adapt_eta(meanfield_init, 10, writer),
+  EXPECT_THROW_MSG(advi_meanfield->adapt_eta(meanfield_init, 10, logger),
                    std::domain_error, error);
-  EXPECT_THROW_MSG(advi_fullrank->adapt_eta(fullrank_init, 10, writer),
+  EXPECT_THROW_MSG(advi_fullrank->adapt_eta(fullrank_init, 10, logger),
                    std::domain_error, error);
 
   delete advi_meanfield;
@@ -345,9 +315,9 @@ TEST_F(eta_adapt_test, initialize_state_zero_grad_error) {
                       "Your model may be either "
                       "severely ill-conditioned or misspecified.";
 
-  EXPECT_THROW_MSG(advi_meanfield->adapt_eta(meanfield_init, 10, writer),
+  EXPECT_THROW_MSG(advi_meanfield->adapt_eta(meanfield_init, 10, logger),
                    std::domain_error, error);
-  EXPECT_THROW_MSG(advi_fullrank->adapt_eta(fullrank_init, 10, writer),
+  EXPECT_THROW_MSG(advi_fullrank->adapt_eta(fullrank_init, 10, logger),
                    std::domain_error, error);
 
   delete advi_meanfield;

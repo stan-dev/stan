@@ -1,6 +1,7 @@
 #ifndef STAN_MCMC_HMC_HAMILTONIANS_DENSE_E_METRIC_HPP
 #define STAN_MCMC_HMC_HAMILTONIANS_DENSE_E_METRIC_HPP
 
+#include <stan/callbacks/logger.hpp>
 #include <stan/math/prim/mat.hpp>
 #include <stan/mcmc/hmc/hamiltonians/base_hamiltonian.hpp>
 #include <stan/mcmc/hmc/hamiltonians/dense_e_point.hpp>
@@ -20,7 +21,7 @@ namespace stan {
         : base_hamiltonian<Model, dense_e_point, BaseRNG>(model) {}
 
       double T(dense_e_point& z) {
-        return 0.5 * z.p.transpose() * z.mInv * z.p;
+        return 0.5 * z.p.transpose() * z.inv_e_metric_ * z.p;
       }
 
       double tau(dense_e_point& z) {
@@ -31,27 +32,19 @@ namespace stan {
         return this->V(z);
       }
 
-      double dG_dt(dense_e_point& z,
-                   interface_callbacks::writer::base_writer& info_writer,
-                   interface_callbacks::writer::base_writer& error_writer) {
+      double dG_dt(dense_e_point& z, callbacks::logger& logger) {
         return 2 * T(z) - z.q.dot(z.g);
       }
 
-      Eigen::VectorXd dtau_dq(
-        dense_e_point& z,
-        interface_callbacks::writer::base_writer& info_writer,
-        interface_callbacks::writer::base_writer& error_writer) {
+      Eigen::VectorXd dtau_dq(dense_e_point& z, callbacks::logger& logger) {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 
       Eigen::VectorXd dtau_dp(dense_e_point& z) {
-        return z.mInv * z.p;
+        return z.inv_e_metric_ * z.p;
       }
 
-      Eigen::VectorXd dphi_dq(
-        dense_e_point& z,
-        interface_callbacks::writer::base_writer& info_writer,
-        interface_callbacks::writer::base_writer& error_writer) {
+      Eigen::VectorXd dphi_dq(dense_e_point& z, callbacks::logger& logger) {
         return z.g;
       }
 
@@ -65,7 +58,7 @@ namespace stan {
         for (idx_t i = 0; i < u.size(); ++i)
           u(i) = rand_dense_gaus();
 
-        z.p = z.mInv.llt().matrixL().solve(u);
+        z.p = z.inv_e_metric_.llt().matrixL().solve(u);
       }
     };
 

@@ -5,7 +5,7 @@
 \chapter{Licensing}\label{licensing.appendix}
 
 \noindent
-\Stan and its two dependent libraries, Boost and Eigen, are
+Stan and its two dependent libraries, Boost and Eigen, are
 distributed under liberal freedom-respecting%
 %
 \footnote{The link
@@ -14,20 +14,20 @@ distributed under liberal freedom-respecting%
   source'' and ``freedom respecting.''}
 %
 licenses approved by the Open Source Initiative.%
-\footnote{See \url{http://opensource.org}.}  
+\footnote{See \url{http://opensource.org}.}
 
 In particular, the licenses for Stan and its dependent libraries have
-no ``copyleft'' provisions requiring applications of \Stan to be
+no ``copyleft'' provisions requiring applications of Stan to be
 open source if they are redistributed.
 
 This chapter describes the licenses for the tools that are distributed
-with \Stan.  The next chapter explains some of the build tools that
-are not distributed with \Stan, but are required to build and run
-\Stan models.
+with Stan.  The next chapter explains some of the build tools that
+are not distributed with Stan, but are required to build and run
+Stan models.
 
-\section{\Stan's License}
+\section{Stan's License}
 
-\Stan is distributed under the BSD 3-clause license (BSD New).
+Stan is distributed under the BSD 3-clause license (BSD New).
 %
 \begin{quote}
 \url{http://www.opensource.org/licenses/BSD-3-Clause}
@@ -55,7 +55,7 @@ The copyright for each Boost package is held by its developers or their
 assginees.
 
 
-\section{Eigen License} 
+\section{Eigen License}
 
 Stan uses the Eigen library for matrix arithmetic and linear algebra.
 Eigen is distributed under the Mozilla Public License, version 2.
@@ -65,7 +65,7 @@ Eigen is distributed under the Mozilla Public License, version 2.
 \end{quote}
 %
 The copyright of Eigen is owned jointly by its developers or their
-assignees. 
+assignees.
 
 \section{SUNDIALS License}
 
@@ -118,11 +118,11 @@ you can look for similar structures in these examples.
 \begin{itemize}
 \item \BUGS is interpreted; Stan is compiled in two steps, first a
   model is is translated to templated C++ and then to a
-  platform-specific executable.  \Stan, unlike \BUGS, allows the user
+  platform-specific executable.  Stan, unlike \BUGS, allows the user
   to directly program in C++, but we do not describe how to do this in
   this Stan manual (see the getting started with \Cpp section of
   \url{http://mc-stan.org} for more information on using Stan directly
-  from \Cpp). 
+  from \Cpp).
 \item \BUGS performs \MCMC updating one scalar parameter at a time
   (with some exceptions such as \JAGS's implementation of regression
   and generalized linear models and some conjugate multivariate
@@ -148,9 +148,9 @@ you can look for similar structures in these examples.
 \item In \BUGS, the order in which statements are written does not
   matter.  They are executed according to the directed graphical model
   so that variables are always defined when needed.  A side effect of
-  the direct execution of \Stan's modeling language is that statements
+  the direct execution of Stan's modeling language is that statements
   execute in the order in which they are written.  For instance, the
-  following \Stan program, which sets \code{mu} before using it to
+  following Stan program, which sets \code{mu} before using it to
   sample \code{y}.
 %
 \begin{stancode}
@@ -161,19 +161,19 @@ y ~ normal(mu,sigma);
 It translates to the following \Cpp code.
 %
 \begin{stancode}
-mu = a + b * x; 
+mu = a + b * x;
 lp += normal_log(mu,sigma);
 \end{stancode}
 %
-Contrast this with the \Stan program
+Contrast this with the Stan program
 %
 \begin{stancode}
 y ~ normal(mu,sigma)
 mu = a + b * x
 \end{stancode}
 %
-This program is well formed, but is almost certainly  
-a coding error, because it attempts to use \code{mu} before 
+This program is well formed, but is almost certainly
+a coding error, because it attempts to use \code{mu} before
 it is set. It translates to the following \Cpp code.
 %
 \begin{stancode}
@@ -207,7 +207,7 @@ sample out of hand as if it had zero probability.
   can take longer per iteration (as it typically takes many "leapfrog
   steps" within each iteration), but the iterations typically have lower
   autocorrelation.  So Stan might work fine with 1000 iterations in an
-  example where \BUGS would require 100,000 for good mixing.  We 
+  example where \BUGS would require 100,000 for good mixing.  We
   recommend monitoring potential scale reduction statistics ($\hat{R}$)
   and the effective sample size to judge when to stop (stopping when
   $\hat{R}$ values do not counter-indicate convergence and when enough
@@ -248,7 +248,7 @@ for (i in 1:n)
   y[i] ~ normal(mu, sigma);
 \end{stancode}
 %
-and also equivalently, 
+and also equivalently,
 %
 \begin{stancode}
 for (i in 1:n) {
@@ -271,11 +271,11 @@ brackets indicating the body of the for loop.
   deviation 2 is \code{normal(1,2)}, not \code{normal(1,4)} or
   \code{normal(1,0.25)}.
 %
-\item Similarly, the second argument to the "multivariate normal" 
+\item Similarly, the second argument to the "multivariate normal"
   function is the covariance matrix and not the inverse covariance matrix
   (i.e., the precision matrix) (as in \BUGS). The same is true for
   the "multivariate student" distribution.
-%  
+%
 \item
 The distributions have slightly different names:
 %
@@ -305,7 +305,7 @@ $\vdots$ & $\vdots$
 %
 In \BUGS, the above model would not be legal because the variable
 \code{total} is defined more than once.  But in Stan, the loop is
-executed in order, so \code{total} is overwritten in each step.  
+executed in order, so \code{total} is overwritten in each step.
 %
 \item Stan uses explicit declarations.  Variables are declared with
   base type integer or real, and vectors, matrices, and arrays have
@@ -313,7 +313,7 @@ executed in order, so \code{total} is overwritten in each step.
   information also.  For data and transformed parameters, the bounds
   are used for error checking.  For parameters, the constraints
   are critical to sampling as they determine the geometry over which
-  the Hamiltonian is simulated.  
+  the Hamiltonian is simulated.
   \\[6pt]
   Variables can be declared as data, transformed data, parameters, transformed
   parameters, or generated quantities.  They can also be declared as
@@ -331,11 +331,11 @@ truncated versions may not exist and may not be vectorized.}
 allowing
 %
 \begin{stancode}
-for (i in 1:n) 
+for (i in 1:n)
   y[i] ~ normal(mu[i], sigma[i]);
 \end{stancode}
 %
-to be expressed more compactly as 
+to be expressed more compactly as
 %
 \begin{stancode}
 y ~ normal(mu,sigma);
@@ -379,9 +379,9 @@ language section of this manual.
 \item Stan supports general conditional statements using a standard
   if-else syntax.  For example, a zero-inflated (or -deflated) Poisson
   mixture model is defined using the if-else syntax as described in
-  \refsection{zero-inflated}. 
+  \refsection{zero-inflated}.
 %
-\item Stan supports general while loops using a standard syntax.  
+\item Stan supports general while loops using a standard syntax.
 While loops give Stan full Turing equivalent computational power.
 They are useful for defining iterative functions with complex
 termination conditions.  As an illustration of their syntax,
@@ -431,7 +431,7 @@ model {
 \item In \BUGS you need to define all variables.  In Stan, if you
   declare but don't define a parameter it implicitly has a flat prior
   (on the scale in which the parameter is defined).  For example, if
-  you have a parameter \code{p} declared as 
+  you have a parameter \code{p} declared as
 \begin{stancode}
 real<lower=0,upper=1> p;
 \end{stancode}
@@ -446,9 +446,9 @@ real theta;
 \end{stancode}
 %
 and have no sampling statement for \code{theta} in the
-\code{model} block, 
+\code{model} block,
  then you are implicitly assigning an improper uniform prior
-on $(-\infty,\infty)$ to \code{theta}.  
+on $(-\infty,\infty)$ to \code{theta}.
 %
 % Then if
 % you define a transformed parameter \code{p} using
@@ -464,11 +464,11 @@ on $(-\infty,\infty)$ to \code{theta}.
 % model: p ~ beta (0, 0);
 \item \BUGS models are always proper (being constructed as a product
   of proper marginal and conditional densities).  Stan models can be
-  improper.  Here is the simplest improper Stan model: 
+  improper.  Here is the simplest improper Stan model:
 \begin{stancode}
 parameters {
   real theta;
-} 
+}
 model { }
 \end{stancode}
 % \item You can also define some improper models in \BUGS directly, for
@@ -494,7 +494,7 @@ rather, \emph{both} statements contribute to the density function that
 is evaluated.  The above two lines have the effect of including the
 product, $\distro{Norm}(y|0,1) \times \distro{Norm}(y|2,3)$, into the
 density function.
-\\[6pt] 
+\\[6pt]
 For a perhaps more confusing example, consider the following two lines in a Stan model:
 \begin{stancode}
 x ~ normal(0.8*y, sigma);
@@ -530,7 +530,7 @@ conditionals have regressions with slope 0.8.
   Stan and RStan.  Installing RStan will automatically set up Stan.
   When RStan moves to CRAN, it will get even easier.
 \item In practice we typically run the same Stan model repeatedly.  If
-  you pass RStan the result of a previously fitted model the model will 
+  you pass RStan the result of a previously fitted model the model will
   not need be recompiled. An example is given on the running
   Stan from R pages available from \code{http://mc-stan.org/}.
 \item When you run Stan, it saves various conditions including
@@ -548,7 +548,7 @@ conditionals have regressions with slope 0.8.
 \item As in R2WinBUGS and R2jags, after running the Stan model, you
   can quickly summarize using \code{plot()} and \code{print()}.  You
   can access the simulations themselves using various extractor
-  functions, as described in the RStan documentation.  
+  functions, as described in the RStan documentation.
 \item Various information about the sampler, such as number of
   leapfrog steps, log probability, and step size, is available through
   extractor functions.   These can be useful for understanding what is
@@ -564,440 +564,289 @@ conditionals have regressions with slope 0.8.
   subscribing and posting and to look at archives.
 \end{itemize}
 
-
-\chapter{Stan Program Style Guide}
+\chapter{Modeling Language Syntax}
 
 \noindent
-This appendix describes the preferred style for laying out Stan
-models. These are not rules of the language, but simply
-recommendations for laying out programs in a text editor.  Although
-these recommendations may seem arbitrary, they are similar to those of
-many teams for many programming languages.  Like rules for typesetting
-text, the goal is to achieve readability without wasting white space
-either vertically or horizontally.
+This chapter defines the basic syntax of the Stan modeling language
+using a Backus-Naur form (\BNF) grammar plus extra-grammatical
+constraints on function typing and operator precedence and
+associativity.
 
-\section{Choose a Consistent Style}
+\section{BNF Grammars}
 
-The most important point of style is consistency.  Consistent coding
-style makes it easier to read not only a single program, but multiple
-programs.  So when departing from this style guide, the number one
-recommendation is to do so consistently.
+\subsection{Syntactic Conventions}
 
-\section{Line Length}
+In the following \BNF grammars, literal strings are indicated in
+single quotes (\Verb|'|).  Grammar non-terminals are unquoted strings.
+A prefix question mark (\code{?A}) indicates optionality of \code{A}.
+A postfixed Kleene star (\code{A*}) indicates zero or more occurrences
+of \code{A}.  The notation \code{A \% B}, following the Boost Spirit
+parser library's notation, is shorthand for \code{?(A (B A)*)}, i.e.,
+any number of \code{A} (including zero), separated by \code{B}.  A
+postfixed, curly-braced number indicates a fixed number of repetions;
+e.g., \code{A\{6\}} is equivalent to a sequence of six copies of \code{A}.
 
-Line lengths should not exceed 80 characters.%
-%
-\footnote{Even 80 characters may be too many for rendering in print;
-  for instance, in this manual, the number of code characters that fit
-  on a line is about 65.}
-%
-This is a typical recommendation for many programming language style
-guides because it makes it easier to lay out text edit windows side by
-side and to view the code on the web without wrapping, easier to view
-diffs from version control, etc.  About the only thing that is
-sacrificed is laying out expressions on a single line.
+\subsection{Programs}
 
-\section{File Extensions}
+{\small
+\begin{Verbatim}
+program ::= ?functions ?data ?tdata ?params ?tparams model ?generated
 
-The recommended file extension for Stan model files is \code{.stan}.  
-For Stan data dump files, the recommended extension is \code{.R}, or
-more informatively, \code{.data.R}.
+functions ::= 'functions' function_decls
+data ::= 'data' var_decls
+tdata ::= 'transformed data' var_decls_statements
+params ::= 'parameters' var_decls
+tparams ::= 'transformed parameters' var_decls_statements
+model ::= 'model' statement
+generated ::= 'generated quantities' var_decls_statements
 
-\section{Variable Naming}
-
-The recommended variable naming is to follow C/\Cpp naming
-conventions, in which variables are lowercase, with the underscore
-character (\Verb|_|) used as a separator.  Thus it is preferred to use
-\Verb|sigma_y|, rather than the run together \Verb|sigmay|, camel-case
-\Verb|sigmaY|, or capitalized camel-case \Verb|SigmaY|.  Even matrix
-variables should be lowercased.
-
-The exception to the lowercasing recommendation, which also follows
-the C/\Cpp conventions, is for size constants, for which the
-recommended form is a single uppercase letter.  The reason for this is
-that it allows the loop variables to match.  So loops over the indices of
-an $M \times N$ matrix $a$ would look as follows.
-%
-\begin{stancode}
-for (m in 1:M)
-  for (n in 1:N)
-     a[m,n] = ...
-\end{stancode}
-
-
-\section{Local Variable Scope}
-
-Declaring local variables in the block in which they are used aids in
-understanding programs because it cuts down on the amount of text
-scanning or memory required to reunite the declaration and definition.
-
-The following Stan program corresponds to a direct translation of a
-BUGS model, which uses a different element of \code{mu} in each
-iteration.
-%
-\begin{stancode}
-model {
-  real mu[N];
-  for (n in 1:N) {
-    mu[n] = alpha * x[n] + beta;
-    y[n] ~ normal(mu[n],sigma);
-  }
+function_decls ::= '{' function_decl* '}'
+var_decls ::= '{' var_decl* '}'
+var_decls_statements ::= '{' var_decl* statement* '}'
+\end{Verbatim}
 }
-\end{stancode}
-%
-Because variables can be reused in Stan and because they should be
-declared locally for clarity, this model should be recoded as follows.
-%
-\begin{stancode}
-model {
-  for (n in 1:N) {
-    real mu;
-    mu = alpha * x[n] + beta;
-    y[n] ~ normal(mu,sigma);
-  }
-}
-\end{stancode}
-% 
-The local variable can be eliminated altogether, as follows.
-%
-\begin{stancode}
-model {
-  for (n in 1:N)
-    y[n] ~ normal(alpha * x[n] + beta, sigma);
-}
-\end{stancode}
-%
-There is unlikely to be any measurable efficiency difference
-between the last two implementations, but both should be a bit
-more efficient than the BUGS translation.
 
-\subsubsection{Scope of Compound Structures with Componentwise Assignment}
+\subsection{Function Declarations}
 
-In the case of local variables for compound structures, such as
-arrays, vectors, or matrices, if they are built up component by
-component rather than in large chunks, it can be more efficient to
-declare a local variable for the structure outside of the block
-in which it is used.  This allows it to be allocated once and then
-reused.
-%
-\begin{stancode}
-model {
-  vector[K] mu;
-  for (n in 1:N) {
-    for (k in 1:K) 
-      mu[k] = ...;
-    y[n] ~ multi_normal(mu,Sigma);
-}
-\end{stancode}
-%
-In this case, the vector \code{mu} will be allocated
-outside of both loops, and used a total of \code{N} times.
-
-\section{Parentheses and Brackets}
-
-\subsection{Optional Parentheses for Single-Statement Blocks}
-
-Single-statement blocks can be rendered in one of two ways.  The fully
-explicit bracketed way is as follows.
-%
-\begin{stancode}
-for (n in 1:N) {
-  y[n] ~ normal(mu,1);
-}
-\end{stancode}
-%
-The following statement without brackets has the same effect.
-%
-\begin{stancode}
-for (n in 1:N)
-  y[n] ~ normal(mu,1);
-\end{stancode}
-%  
-Single-statement blocks can also be written on a single line, as
-in the following example.
-%
-\begin{stancode}
-for (n in 1:N) y[n] ~ normal(mu,1);
-\end{stancode}
-%
-These can be much harder to read than the first example. Only use this
-style if the statement is very simple, as in this example.  Unless
-there are many similar cases, it's almost always clearer to put
-each sampling statement on its own line.
-
-Conditional and looping statements may also be written without brackets.
-
-The use of for loops without brackets can be dangerous.  For instance,
-consider this program.
-%
-\begin{stancode}
-for (n in 1:N)
-  z[n] ~ normal(nu,1);
-  y[n] ~ normal(mu,1);
-\end{stancode}
-%
-Because Stan ignores whitespace and the parser completes a statement
-as eagerly as possible (just as in C++), the previous program is
-equivalent to the following program.
-%
-\begin{stancode}
-for (n in 1:N) {
-  z[n] ~ normal(nu,1);
-}
-y[n] ~ normal(mu,1);
-\end{stancode}
-%
-
-
-\subsection{Parentheses in Nested Operator Expressions}
-
-The preferred style for operators minimizes parentheses.  This reduces
-clutter in code that can actually make it harder to read expressions.
-For example, the expression \code{a~+~b~*~c} is preferred to the
-equivalent \code{a~+~(b~*~c)} or \code{(a~+~(b~*~c))}.  The operator
-precedences and associativities are given in
-\reffigure{operator-precedence}.
-
-Similarly, comparison operators can usually be written with minimal
-bracketing, with the form \code{y[n] > 0 || x[n] != 0} preferred to
-the bracketed form \code{(y[n] > 0) || (x[n] != 0)}.  
-
-\subsection{No Open Brackets on Own Line}
-
-Vertical space is valuable as it controls how much of a program you
-can see.  The preferred Stan style is as shown in the previous
-section, not as follows.
-%
-\begin{stancode}
-for (n in 1:N) 
 {
-  y[n] ~ normal(mu,1);
+\small
+\begin{Verbatim}[fontsize=\small]
+function_decl ::= unsized_return_type identifier '(' unsized_types ')'
+                 statement
+
+unsized_return_type ::= 'void' | unsized_type
+unsized_type ::= (basic_type ?unsized_dims)
+unsized_types ::= unsized_type % ','
+basic_type ::= 'int' | 'real' | 'vector' | 'row_vector' | 'matrix'
+unsized_dims ::= '['  ','*  ']'
+\end{Verbatim}
 }
-\end{stancode}
-%
-This also goes for parameters blocks, transformed data blocks, 
-which should look as follows.
-%
-\begin{stancode}
-transformed parameters {
-  real sigma;
-  ...
+
+\subsection{Variable Declarations}
+
+{
+\small
+\begin{Verbatim}[fontsize=\small]
+var_decl ::= var_type variable ?dims ?('=' expression) ';'
+
+var_type ::= 'int' range_constraint
+           | 'real' range_constraint
+           | 'vector' range_constraint '[' expression ']'
+           | 'ordered' '[' expression ']'
+           | 'positive_ordered' '[' expression ']'
+           | 'simplex' '[' expression ']'
+           | 'unit_vector' '[' expression ']'
+           | 'row_vector' range_constraint '[' expression ']'
+           | 'matrix' range_constraint '[' expression ',' expression ']'
+           | 'cholesky_factor_corr' '[' expression ']'
+           | 'cholesky_factor_cov' '[' expression ?(',' expression) ']'
+           | 'corr_matrix' '[' expression ']'
+           | 'cov_matrix' '[' expression ']'
+
+range_constraint ::= ?('<' range '>')
+
+range ::= 'lower' '=' expression ',' 'upper' = expression
+        | 'lower' '=' expression
+        | 'upper' '=' expression
+
+dims ::= '['  expressions ']'
+
+variable ::= identifier
+
+identifier ::= [a-zA-Z] [a-zA-Z0-9_]*
+\end{Verbatim}
 }
-\end{stancode}
-%
 
+\subsection{Expressions}
 
-\section{Conditionals}
+{
+\small
+\begin{Verbatim}[fontsize=\small]
+expressions ::= expression % ','
+expression ::= numeric_literal
+             | variable
+             | '{' expressions '}'
+             | expression `?` expression `:` expression
+             | expression infixOp expression
+             | prefixOp expression
+             | expression postfixOp
+             | expression '[' indexes ']'
+             | function_literal '(' ?expressions ')'
+             | function_literal '(' expression ?('|' expression % ',') ')'
+             | integrate_ode '(' function_literal (',' expression){6} ')'
+             | integrate_ode_rk45
+               '(' function_literal (',' expression){6|9} ')'
+             | integrate_ode_bdf
+               '(' function_literal (',' expression){6|9} ')'
+             | '(' expression ')'
 
-Stan supports the full \Cpp-style conditional syntax,
-allowing real or integer values to act as conditions, as follows.
-%
-\begin{stancode}
-real x;
-...
-if (x) {
-   // executes if x not equal to 0
-   ...
+index ::= ?(expression | expression ':' | ':' expression
+            | expression ':' expression)
+
+indexes ::= index % ','
+
+numeric_literal ::= integer_literal | real_literal
+
+integer_literal ::= 0 | [1-9] [0-9]*
+
+real_literal ::= integer_literal ?('.' [0-9]*) ?exp_literal
+
+exp_literal ::= ('e' | 'E') integer_literal
+
+function_literal ::= identifier
+\end{Verbatim}
 }
-\end{stancode}
+
+\subsection{Statements}
+
+{
+\small
+\begin{Verbatim}[fontsize=\small]
+statement ::= atomic_statement | nested_statement
+
+atomic_statement ::= atomic_statement_body ';'
+atomic_statement_body
+::=  lhs ('=' | '<-') expression
+   | expression '~' identifier '(' expressions ')' ?truncation
+   | function_literal '(' expressions ')'
+   | 'increment_log_prob' '(' expression ')'
+   | 'target' '+=' expression
+   | 'break'
+   | 'continue'
+   | 'print' '(' (expression | string_literal)* ')'
+   | 'reject' '(' (expression | string_literal)* ')'
+   | 'return' expression
+   | ''
+
+string_literal ::= '"' char* '"'
+
+truncation ::= 'T' '[' ?expression ',' ?expression ']'
+
+lhs ::= identifier ?('[' indexes ']')
+
+nested_statement
+::=
+  | 'if' '(' expression ')' statement
+    ('else' 'if' '(' expression ')' statement)*
+    ?('else' statement)
+  | 'while' '(' expression ')' statement
+  | 'for' '(' identifier 'in' expression ':' expression ')' statement
+  | '{' var_decl* statement+ '}'
+\end{Verbatim}
 %
-
-\subsection{Explicit Comparisons of Non-Boolean Conditions}
-
-The preferred form is to write the condition out explicitly for
-integer or real values that are not produced as the result of a
-comparison or boolean operation, as follows.
-%
-\begin{stancode}
-if (x != 0) ...
-\end{stancode}
-
-% \subsection{Functional \code{ifelse} versus Conditionals}
-% don't actually want this until we get proper short-circuiting conditionals!
-
-% If possible, the functional form \code{ifelse} is preferred to full
-% conditionals.  For example, the following block
-% %
-% \begin{stancode}
-% if (cond)
-%   x <- foo(y);
-% else 
-%   x <- bar(z);
-% \end{stancode}
-% %
-% should be recoded as follows.
-% %
-% \begin{stancode}
-% x <- ifelse(foo(y), bar(z));
-% \end{stancode}
-
-\section{Functions}
-
-Functions are laid out the same way as in languages such as Java and
-\Cpp.  For example,
-%
-\begin{stancode}
-real foo(real x, real y) {
-  return sqrt(x * log(y));
 }
-\end{stancode}
+
+\section{Extra-Grammatical Constraints}
+
+\subsection{Type Constraints}
+
+A well-formed Stan program must satisfy the type constraints imposed
+by functions and distributions.  For example, the binomial
+distribution requires an integer total count parameter and integer
+variate and when truncated would require integer truncation points.
+If these constraints are violated, the program will be rejected during
+parsing with an error message indicating the location of the problem.
+For information on argument types, see \refpart{built-in-functions}.
+
+\subsection{Operator Precedence and Associativity}
+
+In the Stan grammar provided in this chapter, the expression \code{1
+  + 2 * 3} has two parses.  As described in
+\refsection{arithmetic-expressions}, Stan disambiguates between the
+meaning $1 + (2 \times 3)$ and the meaning $(1 + 2) \times 3$ based on
+operator precedences and associativities.
+
+\subsection{Typing of Compound Declaration and Definition}
+
+In a compound variable declaration and definition, the type of the
+right-hand side expression must be assignable to the variable being
+declared.  The assignability constraint restricts compound
+declarations and definitions to local variables and variables declared
+in the transformed data, transformed parameters, and generated
+quantities blocks.
+
+\subsection{Typing of Array Expressions}
+
+The types of expressions used for elements in array expressions
+(\Verb|'{' expressions '}'|) must all be of the same type or a mixture
+of \code{int} and \code{real} types (in which case the result is
+promoted to be of type \code{real}).
+
+\subsection{Forms of Numbers}
+
+Integer literals longer than one digit may not start with 0 and real
+literals cannot consist of only a period or only an exponent.
+
+\subsection{Conditional Arguments}
+
+Both the conditional if-then-else statement and while-loop statement
+require the expression denoting the condition to be a primitive type,
+integer or real.
+
+\subsection{Print Arguments}
+
+The arguments to a print statement cannot be void.
+
+\subsection{Only Break and Continue in Loops}
+
+The \code{break} and \code{continue} statements may only be used
+within the body of a for-loop or while-loop.
+
+\subsection{PRNG Function Locations}
+
+Functions ending in \code{\_rng} may only be called in the transformed
+data and generated quantities block, and within the bodies of
+user-defined functions with names ending in \code{\_rng}.
+
+\subsection{Probability Function Naming}
+
+A probability function literal must have one of the following
+suffixes: \code{\_lpdf}, \code{\_lpmf}, \code{\_lcdf}, or \code{\_lccdf}.
+
+\subsection{ODE Solver Argument Types and Origins}
+
+The \code{integrate\_ode}, \code{integrate\_ode\_rk45}, and
+\code{integrate\_ode\_bdf} functions may be used without control
+parameters;  in this case
 %
-The return type is flush left, the parentheses for the arguments are
-adjacent to the arguments and function name, and there is a space
-after the comma for arguments after the first.  The open curly brace
-for the body is on the same line as the function name, following the
-layout of loops and conditionals.  The body itself is indented; here
-we use two spaces.  The close curly brace appears on its own line.
+\begin{itemize}
+\item its first argument to refer to a function with signature
+\begin{quote}
+ \code{(real,~real[],~real[],~real[],~int[])~:~real[]},
+\end{quote}
+\item the remaining six arguments must assignable to types
+\begin{quote}
+  \code{real[]}, \code{real}, \code{real[]}, \code{real[]},
+\code{real[]}, and \code{int[]}
+\end{quote}
+ respectively, and
+\item the third, fourth, and sixth arguments must be expressions not
+  containing any variables not originating in the data or transformed
+  data blocks.
+\end{itemize}
 %
-If function names or argument lists are long, they can be
-written as
-%
-\begin{stancode}
-matrix
-function_to_do_some_hairy_algebra(matrix thingamabob,
-                                  vector doohickey2) {
-  ...body...
-}
-\end{stancode}
-%
-The function starts a new line, under the type.  The arguments are
-aligned under each other.
+The \code{integrate\_ode\_rk45} and \code{integrate\_ode\_bdf}
+functions may accept three additional arguments, which like the third,
+fourth, and sixth arguments, must be expressions free of parameter
+references.  The final three arguments must be assignable to types
+\begin{quote}
+\code{real}, \code{real}, \code{int}.
+\end{quote}
 
-Function documentation should follow the Javadoc and Doxygen styles.
-Here's an example repeated from \refsection{documenting-functions}.
-%
-\begin{stancode}
-/**
- * Return a data matrix of specified size with rows 
- * corresponding to items and the first column filled 
- * with the value 1 to represent the intercept and the 
- * remaining columns randomly filled with unit-normal draws.
- *
- * @param N Number of rows correspond to data items
- * @param K Number of predictors, counting the intercept, per
- *          item.
- * @return Simulated predictor matrix.
- */
-matrix predictors_rng(int N, int K) {  
-  ...
-\end{stancode}
-%
-The open comment is \code{/**}, asterisks are aligned below the first
-asterisk of the open comment, and the end comment \code{*/} is also
-aligned on the asterisk.  The tags \code{@param} and \code{@return}
-are used to label function arguments (i.e., parameters) and return
-values.  
+\subsection{Indexes}
 
-\section{White Space}
+Standalone expressions used as indexes must denote either an integer
+(\code{int}) or an integer array (\code{int[]}).  Expressions
+participating in range indexes (e.g., \code{a} and \code{b} in
+\code{a~:~b}) must denote integers (\code{int}).
 
-Stan allows spaces between elements of a program.  The white space
-characters allowed in Stan programs include the space (ASCII
-\code{0x20}), line feed (ASCII \code{0x0A}), carriage return
-(\code{0x0D}), and tab (\code{0x09}).  Stan treats all whitespace
-characters interchangeably, with any sequence of whitespace characters
-being syntactically equivalent to a single space character.
-Nevertheless, effective use of whitespace is the key to good program
-layout.
-
-
-\subsection{Line Breaks Between Statements and Declarations}
-
-It is dispreferred to have multiple statements or declarations on the
-same line, as in the following example.
-%
-\begin{stancode}
-transformed parameters {
-  real mu_centered;  real sigma;
-  mu = (mu_raw - mean_mu_raw);    sigma = pow(tau,-2);
-}
-\end{stancode}
-%
-These should be broken into four separate lines.
-
-\subsection{No Tabs}
-
-Stan programs should not contain tab characters.  They are legal and
-may be used anywhere other whitespace occurs.  Using tabs to layout a
-program is highly unportable because the number of spaces
-represented by a single tab character varies depending on which
-program is doing the rendering and how it is configured.  
-
-\subsection{Two-Character Indents}
-
-Stan has standardized on two space characters of indentation, which is
-the standard convention for C/C++ code.  Another sensible choice is
-four spaces, which is the convention for Java and Python.  Just be
-consistent.  
-
-\subsection{Space Between \code{if} and Condition}
-
-Use a space after \code{if}s.  For instance, use \code{if (x < y) ...}, not
-\code{if(x < y) ...}.
-
-\subsection{No Space For Function Calls}
-
-There is no space between a function name and the function it applies
-to.  For instance, use \code{normal(0,1)}, not \code{normal (0,1)}.
-
-\subsection{Spaces Around Operators}
-
-There should be spaces around binary operators.  For instance, use
-\code{y[1]~=~x}, not \code{y[1]=x}, use \code{(x~+~y)~*~z} not
-\code{(x+y)*z}.
-
-\subsection{Breaking Expressions across Lines}
-
-Sometimes expressions are too long to fit on a single line.  In that
-case, the recommended form is to break \emph{before} an operator,%
-%
-\footnote{This is the usual convention in both typesetting and other
-  programming languages. Neither R nor BUGS allows breaks before an
-  operator because they allow newlines to signal the end of an
-  expression or statement.}
-%
-aligning the operator to indicate scoping.  For example, use the
-following form (though not the content; inverting matrices is almost
-always a bad idea).
-%
-\begin{stancode}
-target += (y - mu)' * inv(Sigma) * (y - mu);
-\end{stancode}
-%
-Here, the multiplication operator (\code{*}) is aligned to clearly
-signal the multiplicands in the product.  
-
-For function arguments, break after a comma and line the next
-argument up underneath as follows.
-%
-\begin{stancode}
-y[n] ~ normal(alpha + beta * x + gamma * y,
-              pow(tau,-0.5));
-\end{stancode}
-%
-
-\subsection{Optional Spaces after Commas}
-
-Optionally use spaces after commas in function arguments for clarity.
-For example, \code{normal(alpha * x[n] + beta,sigma)} can also be
-written as \code{normal(alpha~*~x[n]~+~beta,~sigma)}.
-
-
-
-\subsection{Unix Newlines}
-
-Wherever possible, Stan programs should use a single line feed 
-character to separate lines.  All of the Stan developers (so far, at 
-least) work on Unix-like operating systems and using a standard 
-newline makes the programs easier for us to read and share.  
-
-\subsubsection{Platform Specificity of Newlines}
-
-Newlines are signaled in Unix-like operating systems such as Linux and
-Mac OS X with a single line-feed (LF) character (ASCII code point
-\code{0x0A}).  Newlines are signaled in Windows using two characters,
-a carriage return (CR) character (ASCII code point \code{0x0D})
-followed by a line-feed (LF) character.
-
+A second condition is that there not be more indexes provided than
+dimensions of the underlying expression (in general) or variable (on
+the left side of assignments) being indexed.  A vector or row vector
+adds 1 to the array dimension and a matrix adds 2.  That is, the type
+\code{matrix[\,,\,,\,]}, a three-dimensional array of matrices, has five
+index positions: three for the array, one for the row of the matrix
+and one for the column.
 
 \chapter{Warning and Error Messages}\label{error-messages.appendix}
 
@@ -1013,7 +862,7 @@ The messages returned by Stan come in two flavors, warnings and
 errors.  Error messages arise when a fatal problem occurs under the
 hood from which there is no way to recover.  Warning messages arise
 in circumstances from which the underlying program can continue to
-operaate.  
+operaate.
 
 An example warning message is an informational message about
 ill-formed input to an underlying function, which results in a
@@ -1084,7 +933,7 @@ how to upgrade it.
 
 \begin{description}
 \item[Deprecated] The deprecated syntax uses the operator \code{<-}
-  for assignment, e.g., 
+  for assignment, e.g.,
 \begin{stancode}
 a <- b;
 \end{stancode}
@@ -1152,7 +1001,7 @@ Use the no-argument function \code{target()} instead.
   sequence of zero or more parameters \code{...} to produce the
   expression \code{foo\_log(y, ...)}.
 \item[Replacement] If \code{y} can be a real value (including vectors
-or matrices), replace 
+or matrices), replace
 %
 \begin{stancode}
 foo_log(y, ...)
@@ -1179,13 +1028,13 @@ foo_lpmf(y | ...).
 \end{description}
 
 \section{\code{cdf\_log} and \code{ccdf\_log} Cumulative Distribution
-  Functions} 
+  Functions}
 
 \begin{description}
-\item[Deprecated] 
+\item[Deprecated]
 The log cumulative distribution and complementary cumulative
 distribution functions for a distribution \code{foo} are currently
-written as \code{foo\_cdf\_log} and \code{foo\_ccdf\_log}.  
+written as \code{foo\_cdf\_log} and \code{foo\_ccdf\_log}.
 \item[Replacement]
 Replace \code{foo\_cdf\_log(y, ...)} with \code{foo\_lcdf(y | ...)}.
 \\[4pt]
@@ -1198,7 +1047,7 @@ Replace \code{foo\_ccdf\_log(y, ...)} with \code{foo\_lccdf(y | ...)}.
 \item[Deprecated]  Currently two non-conforming functions ending in
   suffix \code{\_log}.
 \item[Replacement] Replace \code{multiply\_log(...)} with
-  \code{lmultiply(...)}.  
+  \code{lmultiply(...)}.
 \\[4pt]
 Replace \code{binomial\_coefficient\_log(...)} with \code{lchoose(...)}.
 \end{description}
@@ -1213,7 +1062,7 @@ Replace \code{binomial\_coefficient\_log(...)} with \code{lchoose(...)}.
 y ~ foo(...);
 \end{stancode}
 %
-having the same effect as 
+having the same effect as
 %
 \begin{stancode}
 target += foo_log(y, ...);
@@ -1257,9 +1106,11 @@ matrix types.
 \section{\code{if\_else} Function}
 
 \begin{description}
-\item[Deprecated]The function \code{if\_else} is deprecated.  This function takes three arguments
-\code{a}, \code{b}, and \code{c}, where \code{a} is an \code{int} value and \code{b} and \code{c}
-are scalars. It returns \code{b} if \code{a} is non-zero and \code{c} otherwise.
+\item[Deprecated]The function \code{if\_else} is deprecated.  This
+  function takes three arguments \code{a}, \code{b}, and \code{c},
+  where \code{a} is an \code{int} value and \code{b} and \code{c} are
+  scalars. It returns \code{b} if \code{a} is non-zero and \code{c}
+  otherwise.
 %
 \item[Replacement] Use the conditional operator which allows more
   flexiblity in the types of \code{b} and \code{c} and is much more
@@ -1274,6 +1125,18 @@ x = if_else(a,b,c);
 x = a ? b : c;
 \end{stancode}
 \end{description}
+
+\section{\code{\#} Commens}
+
+\begin{description}
+\item[Deprecated] The use of \code{\#} for line-based comments is
+  deprecated.  From the first occurrence of \code{\#} onward, the rest
+  of the line is ignored.  This happens after includes are resolved
+  starting with \code{\#include}.
+\item[Replacement] Use a pair of forward slashes, \code{//}, for line
+  comments.  See \refsection{comments}.
+\end{description}
+
 
 \chapter{Mathematical Functions}\label{math-functions.appendix}
 
@@ -1296,10 +1159,10 @@ constant for the beta distribution, and is defined for $a > 0$ and $b
 
 \section{Incomplete Beta}\label{inc-beta-appendix.section}
 
-The incomplete beta function, $\mathrm{B}(x; a, b)$, is defined for 
+The incomplete beta function, $\mathrm{B}(x; a, b)$, is defined for
 $x \in [0, 1]$ and $a, b \geq 0$ such that $a + b \neq 0$ by
 \[
-\mathrm{B}(x; \, a, b) 
+\mathrm{B}(x; \, a, b)
 \ = \
 \int_0^x u^{a -  1} \, (1 - u)^{b - 1} \, du,
 \]
@@ -1339,9 +1202,9 @@ The digamma function $\Psi$ is the derivative of the $\log \Gamma$
 function,
 %
 \[
-\Psi(u) 
+\Psi(u)
 \ = \
-\frac{d}{d u} \log \Gamma(u) 
+\frac{d}{d u} \log \Gamma(u)
 \ = \
 \frac{1}{\Gamma(u)} \ \frac{d}{d u} \Gamma(u).
 \]

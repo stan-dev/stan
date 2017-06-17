@@ -1,6 +1,6 @@
 #include <test/test-models/good/variational/multivariate_no_constraint.hpp>
 #include <stan/variational/advi.hpp>
-#include <stan/interface_callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/stream_logger.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 #include <vector>
@@ -25,8 +25,8 @@ TEST(advi_test, multivar_no_constraint_fullrank) {
   // Other params
   int n_monte_carlo_grad = 10;
   int n_grad_samples = 1e4;
-  std::stringstream output;
-  stan::interface_callbacks::writer::stream_writer message_writer(output);
+  std::stringstream log_stream;
+  stan::callbacks::stream_logger logger(log_stream, log_stream, log_stream, log_stream, log_stream);
 
   // Dummy input
   Eigen::VectorXd cont_params = Eigen::VectorXd::Zero(2);
@@ -52,7 +52,7 @@ TEST(advi_test, multivar_no_constraint_fullrank) {
     stan::variational::normal_fullrank(mu, L_chol);
 
   double elbo = 0.0;
-  elbo = test_advi.calc_ELBO(muL, message_writer);
+  elbo = test_advi.calc_ELBO(muL, logger);
 
   // Can calculate ELBO analytically
   double zeta = -0.5 * ( 3*2*log(2.0*stan::math::pi()) + 18.5 + 25 + 13 );
@@ -123,7 +123,7 @@ TEST(advi_test, multivar_no_constraint_fullrank) {
           "Dimension of variational q (2) must match in size";
   EXPECT_THROW_MSG(muL.calc_grad(elbo_grad,
                                  my_model, cont_params, n_monte_carlo_grad,
-                                 base_rng, message_writer),
+                                 base_rng, logger),
                    std::invalid_argument, error);
 }
 
@@ -141,8 +141,8 @@ TEST(advi_test, multivar_no_constraint_meanfield) {
 
   // Other params
   int n_monte_carlo_grad = 10;
-  std::stringstream output;
-  stan::interface_callbacks::writer::stream_writer message_writer(output);
+  std::stringstream log_stream;
+  stan::callbacks::stream_logger logger(log_stream, log_stream, log_stream, log_stream, log_stream);
 
   // Dummy input
   Eigen::VectorXd cont_params = Eigen::VectorXd::Zero(2);
@@ -170,7 +170,7 @@ TEST(advi_test, multivar_no_constraint_meanfield) {
     stan::variational::normal_meanfield(mu, sigma_tilde);
 
   double elbo = 0.0;
-  elbo = test_advi.calc_ELBO(musigmatilde, message_writer);
+  elbo = test_advi.calc_ELBO(musigmatilde, logger);
 
   // Can calculate ELBO analytically
   double zeta = -0.5 * ( 3*2*log(2.0*stan::math::pi()) + 18.5 + 25 + 13 );
@@ -231,6 +231,6 @@ TEST(advi_test, multivar_no_constraint_meanfield) {
           "Dimension of variational q (2) must match in size";
   EXPECT_THROW_MSG(musigmatilde.calc_grad(elbo_grad,
                                  my_model, cont_params, n_monte_carlo_grad,
-                                 base_rng, message_writer),
+                                 base_rng, logger),
                    std::invalid_argument, error);
 }

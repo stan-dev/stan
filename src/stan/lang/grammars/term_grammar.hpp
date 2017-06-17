@@ -24,7 +24,7 @@ namespace stan {
     template <typename Iterator>
     struct term_grammar
       : public boost::spirit::qi::grammar<Iterator,
-                                          expression(var_origin),
+                                          expression(scope),
                                           whitespace_grammar<Iterator> > {
       term_grammar(variable_map& var_map, std::stringstream& error_msgs,
                    expression_grammar<Iterator>& eg);
@@ -35,18 +35,27 @@ namespace stan {
       indexes_grammar<Iterator> indexes_g;
 
       boost::spirit::qi::rule<Iterator,
-                              std::vector<expression>(var_origin),
+                              std::vector<expression>(scope),
                               whitespace_grammar<Iterator> >
       args_r;
 
+      boost::spirit::qi::rule<Iterator,
+                              array_expr(scope),
+                              whitespace_grammar<Iterator> >
+      array_expr_r;
 
       boost::spirit::qi::rule<Iterator,
-                              expression(var_origin),
+                              row_vector_expr(scope),
+                              whitespace_grammar<Iterator> >
+      vec_expr_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              expression(scope),
                               whitespace_grammar<Iterator> >
       dim_r;
 
       boost::spirit::qi::rule<Iterator,
-                              std::vector<expression>(var_origin),
+                              std::vector<expression>(scope),
                               whitespace_grammar<Iterator> >
       dims_r;
 
@@ -57,30 +66,32 @@ namespace stan {
       double_literal_r;
 
       boost::spirit::qi::rule<Iterator,
-                              expression(var_origin),
+                              expression(scope),
                               whitespace_grammar<Iterator> >
       exponentiated_factor_r;
 
 
       boost::spirit::qi::rule<Iterator,
-                              boost::spirit::qi::locals<variable, fun>,
-                              expression(var_origin),
+                              boost::spirit::qi::locals<variable, fun,
+                                                        array_expr,
+                                                        row_vector_expr>,
+                              expression(scope),
                               whitespace_grammar<Iterator> >
       factor_r;
 
 
       boost::spirit::qi::rule<Iterator,
-                              fun(var_origin),
+                              fun(scope),
                               whitespace_grammar<Iterator> >
       fun_r;
 
       boost::spirit::qi::rule<Iterator,
-                              integrate_ode(var_origin),
+                              integrate_ode(scope),
                               whitespace_grammar<Iterator> >
       integrate_ode_r;
 
       boost::spirit::qi::rule<Iterator,
-                              integrate_ode_control(var_origin),
+                              integrate_ode_control(scope),
                               whitespace_grammar<Iterator> >
       integrate_ode_control_r;
 
@@ -91,7 +102,7 @@ namespace stan {
       identifier_r;
 
       boost::spirit::qi::rule<Iterator,
-          expression(var_origin),
+          expression(scope),
           boost::spirit::qi::locals<std::vector<std::vector<expression> >,
                                     std::vector<idx> >,
           whitespace_grammar<Iterator> >
@@ -104,19 +115,19 @@ namespace stan {
 
 
       boost::spirit::qi::rule<Iterator,
-                              expression(var_origin),
+                              expression(scope),
                               whitespace_grammar<Iterator> >
       negated_factor_r;
 
       boost::spirit::qi::rule<Iterator,
-                              std::vector<expression>(var_origin),
+                              std::vector<expression>(scope),
                               whitespace_grammar<Iterator> >
       prob_args_r;
 
 
 
       boost::spirit::qi::rule<Iterator,
-                              expression(var_origin),
+                              expression(scope),
                               whitespace_grammar<Iterator> >
       term_r;
 

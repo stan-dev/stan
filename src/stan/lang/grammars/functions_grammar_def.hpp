@@ -44,7 +44,6 @@ namespace stan {
       using boost::spirit::qi::_pass;
       using boost::spirit::qi::_val;
       using boost::spirit::qi::labels::_a;
-      using boost::spirit::qi::labels::_b;
 
       functions_r.name("function declarations and definitions");
       functions_r
@@ -57,13 +56,13 @@ namespace stan {
                                       boost::phoenix::ref(error_msgs_),
                                       allow_undefined)];
 
-      // locals: _a = allow sampling, _b = origin (function, rng/lp)
+      // locals: _a = origin (function, rng/lp)
       function_r.name("function declaration or definition");
       function_r
-        %= bare_type_g[set_void_function_f(_1, _b, _pass,
+        %= bare_type_g[set_void_function_f(_1, _a, _pass,
                                            boost::phoenix::ref(error_msgs_))]
         > identifier_r
-          [set_allows_sampling_origin_f(_1, _a, _b)]
+          [set_allows_sampling_origin_f(_1, _a)]
           [validate_prob_fun_f(_1, _pass, boost::phoenix::ref(error_msgs_))]
         > lit('(')
         > arg_decls_r
@@ -71,8 +70,8 @@ namespace stan {
         > eps
           [validate_pmf_pdf_variate_f(_val, _pass,
                                       boost::phoenix::ref(error_msgs_))]
-        > eps[scope_lp_f(boost::phoenix::ref(var_map_))]
-        > statement_g(_a, _b, true, false)
+        > eps[set_fun_params_scope_f(_a, boost::phoenix::ref(var_map_))]
+        > statement_g(_a, false)
         > eps[unscope_variables_f(_val, boost::phoenix::ref(var_map_))]
         > eps[validate_return_type_f(_val, _pass,
                                      boost::phoenix::ref(error_msgs_))]

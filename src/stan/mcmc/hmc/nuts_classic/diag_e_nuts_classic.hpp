@@ -1,5 +1,5 @@
-#ifndef STAN_MCMC_HMC_NUTS_DIAG_E_NUTS_CLASSIC_HPP
-#define STAN_MCMC_HMC_NUTS_DIAG_E_NUTS_CLASSIC_HPP
+#ifndef STAN_MCMC_HMC_NUTS_CLASSIC_DIAG_E_NUTS_CLASSIC_HPP
+#define STAN_MCMC_HMC_NUTS_CLASSIC_DIAG_E_NUTS_CLASSIC_HPP
 
 #include <stan/mcmc/hmc/nuts_classic/base_nuts_classic.hpp>
 #include <stan/mcmc/hmc/hamiltonians/diag_e_point.hpp>
@@ -19,13 +19,15 @@ namespace stan {
         base_nuts_classic<Model, diag_e_metric,
                           expl_leapfrog, BaseRNG>(model, rng) { }
 
-      // Note that the points don't need to be swapped
-      // here since start.mInv = finish.mInv
+      // Note that the points don't need to be swapped here
+      // since start.inv_e_metric_ = finish.inv_e_metric_
       bool compute_criterion(ps_point& start,
                              diag_e_point& finish,
                              Eigen::VectorXd& rho) {
-        return finish.mInv.cwiseProduct(finish.p).dot(rho - finish.p) > 0
-               && finish.mInv.cwiseProduct(start.p).dot(rho - start.p) > 0;
+        return
+          finish.inv_e_metric_.cwiseProduct(finish.p).dot(rho - finish.p) > 0
+          &&
+          finish.inv_e_metric_.cwiseProduct(start.p).dot(rho - start.p) > 0;
       }
     };
 

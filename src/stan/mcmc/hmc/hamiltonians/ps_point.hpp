@@ -1,7 +1,8 @@
 #ifndef STAN_MCMC_HMC_HAMILTONIANS_PS_POINT_HPP
 #define STAN_MCMC_HMC_HAMILTONIANS_PS_POINT_HPP
 
-#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer.hpp>
+#include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <boost/lexical_cast.hpp>
 #include <Eigen/Dense>
 #include <string>
@@ -73,7 +74,7 @@ namespace stan {
        * @param writer writer callback
        */
       virtual void
-      write_metric(stan::interface_callbacks::writer::base_writer& writer) {}
+      write_metric(stan::callbacks::writer& writer) {}
 
     protected:
       template <typename T>
