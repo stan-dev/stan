@@ -5,7 +5,7 @@
 #   - CFLAGS_GTEST
 #   - OPT
 #   - EXE
-# 
+#
 # Additionally, set the following variables to build
 # demo/lang using the Microsoft Visual Studio compiler.
 #   - CC_STANC
@@ -14,7 +14,7 @@
 ##
 
 EXE = .exe
-O_STANC ?= 3
+O_STANC = 3
 CFLAGS_GTEST += -DGTEST_HAS_PTHREAD=0
 PATH_SEPARATOR = '\'
 ## Detecting Process Bitness:
@@ -40,4 +40,3 @@ ifeq (mingw32-g++,$(CC_TYPE))
 endif
 ifeq (clang++,$(CC_TYPE))
 endif
-
