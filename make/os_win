@@ -5,7 +5,7 @@
 #   - CFLAGS_GTEST
 #   - OPT
 #   - EXE
-# 
+#
 # Additionally, set the following variables to build
 # demo/lang using the Microsoft Visual Studio compiler.
 #   - CC_STANC
@@ -20,9 +20,9 @@ PATH_SEPARATOR = '\'
 ## Detecting Process Bitness:
 ## http://blogs.msdn.com/b/david.wang/archive/2006/03/26/howto-detect-process-bitness.aspx
 ifeq ($(PROCESSOR_ARCHITECTURE)$(PROCESSOR_ARCHITEW6432),x86)
-  BIT=32
+  BIT?=32
 else
-  BIT=64
+  BIT?=64
 endif
 ifeq (g++,$(CC_TYPE))
   CFLAGS += -m$(BIT)
@@ -40,4 +40,3 @@ ifeq (mingw32-g++,$(CC_TYPE))
 endif
 ifeq (clang++,$(CC_TYPE))
 endif
-

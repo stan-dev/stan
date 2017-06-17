@@ -128,6 +128,23 @@ test/dummy.cpp:
 .PHONY: test-headers
 test-headers: $(HEADER_TESTS)
 
+##
+# Adding a test for multiple translation units. If this fails,
+# a new function is probably missing an inline
+##
+
+test/unit/multiple_translation_units%.o : src/test/unit/multiple_translation_units%.cpp
+	@mkdir -p $(dir $@)
+	$(COMPILE.c) -O$O $< $(OUTPUT_OPTION)
+
+test/unit/libmultiple.so : test/unit/multiple_translation_units1.o test/unit/multiple_translation_units2.o
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -shared $(OUTPUT_OPTION) $^
+
+src/test/unit/multiple_translation_units_test.cpp : test/unit/libmultiple.so
+
+
+
 ############################################################
 ##
 # Use the stanc compiler to generate C++ from Stan programs

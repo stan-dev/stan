@@ -22,8 +22,8 @@ namespace stan {
        * @param[in] chain the chain id
        * @return a boost::ecuyer1988 instance
        */
-      boost::ecuyer1988 create_rng(unsigned int seed,
-                                   unsigned int chain) {
+      inline boost::ecuyer1988 create_rng(unsigned int seed,
+                                          unsigned int chain) {
         using boost::uintmax_t;
         static uintmax_t DISCARD_STRIDE = static_cast<uintmax_t>(1) << 50;
         boost::ecuyer1988 rng(seed);
