@@ -247,65 +247,43 @@ vector<lower = -1, upper = 1>[3] rho;
 \end{stancode}
 
 There are also special data types for structured vectors and
-matrices.
-% There are four constrained vector data types, \code{simplex}
-% for unit simplexes, \code{unit\_vector} for unit-length vectors,
-% \code{ordered} for ordered vectors of scalars and
-% \code{positive\_ordered} for vectors of positive ordered
-% scalars. There are specialized matrix data types \code{corr\_matrix}
-% and \code{cov\_matrix} for correlation matrices (symmetric, positive
-% definite, unit diagonal) and covariance matrices (symmetric, positive
-% definite).  The type \code{cholesky\_factor\_cov} is for Cholesky
-% factors of covariance matrices (lower triangular, positive diagonal,
-% product with own transpose is a covariance matrix).  The type
-% \code{cholesky\_factor\_corr} is for Cholesky factors of correlation
-% matrices (lower triangular, positive diagonal, unit-length rows).
+matrices. There are four constrained vector data types, \code{simplex}
+for unit simplexes, \code{unit\_vector} for unit-length vectors,
+\code{ordered} for ordered vectors of scalars and
+\code{positive\_ordered} for vectors of positive ordered
+scalars. There are specialized matrix data types \code{corr\_matrix}
+and \code{cov\_matrix} for correlation matrices (symmetric, positive
+definite, unit diagonal) and covariance matrices (symmetric, positive
+definite).  The type \code{cholesky\_factor\_cov} is for Cholesky
+factors of covariance matrices (lower triangular, positive diagonal,
+product with own transpose is a covariance matrix).  The type
+\code{cholesky\_factor\_corr} is for Cholesky factors of correlation
+matrices (lower triangular, positive diagonal, unit-length rows).
 
-Constraints provide error checking for variables defined in the \code{data},
-\code{transformed data}, \code{transformed parameters}, and
-\code{generated quantities} blocks.
-%
-Constraints are critical for variables declared in the
-\code{parameters} block, where they determine the transformation from
-constrained variables (those satisfying the declared constraint) to
-unconstrained variables (those ranging over all of $\mathbb{R}^n$).
+Constraints provide error checking for variables defined in the
+\code{data}, \code{transformed data}, \code{transformed parameters},
+and \code{generated quantities} blocks.  Constraints are critical for
+variables declared in the \code{parameters} block, where they
+determine the transformation from constrained variables (those
+satisfying the declared constraint) to unconstrained variables (those
+ranging over all of $\mathbb{R}^n$).
 
 It is worth calling out the most important aspect of constrained data
 types:
 %
 \begin{quote}
-\it
-The model must have support (non-zero density) at every value of the
-parameters that meets their declared constraints.
+  \it The model must have support (non-zero density, equivalently
+  finite log density) at every value of the parameters that meets
+  their declared constraints.
 \end{quote}
 %
-If the declared parameter constraints are less strict than the
-support, the samplers and optimizers may have any of a number of
-pathologies including just getting stuck, failure to initialize,
-excessive Metropolis rejection, or biased samples due to inability to
-explore the tails of the distribution.
+If this condition is violated with parameter values that satisfy
+declared constraints but do not have finite log density, then the
+samplers and optimizers may have any of a number of pathologies
+including just getting stuck, failure to initialize, excessive
+Metropolis rejection, or biased samples due to inability to explore
+the tails of the distribution.
 
-% Integer or real types may be constrained with lower bounds, upper
-% bounds, or both.  There are four constrained vector data types,
-% \code{simplex} for unit simplexes, \code{unit\_vector} for unit-length
-% vectors, \code{ordered} for ordered vectors of scalars and
-% \code{positive\_ordered} for vectors of positive ordered scalars.
-% There are specialized matrix data types \code{corr\_matrix} and
-% \code{cov\_matrix} for correlation matrices (symmetric, positive
-% definite, unit diagonal) and covariance matrices (symmetric, positive
-% definite).  The type \code{cholesky\_factor\_cov} is for Cholesky
-% factors of covariance matrices (lower triangular, positive diagonal,
-% product with own transpose is a covariance matrix).  The type
-% \code{cholesky\_factor\_corr} is for Cholesky factors of correlation
-% matrices (lower triangular, positive diagonal, unit-length rows).
-
-% \subsection{Arrays}
-
-% Stan supports arrays of arbitrary order of any of the basic data
-% types or constrained basic data types.  This includes
-% three-dimensional arrays of integers, one-dimensional arrays of
-% positive reals, four-dimensional arrays of simplexes, one-dimensional
-% arrays of row vectors, and so on.
 
 \section{Primitive Numerical Data Types}\label{numerical-data-types.section}
 
@@ -615,6 +593,15 @@ variables, are validated to ensure they contain simplex values; for
 simplexes, this is only done up to a statically specified accuracy
 threshold $\epsilon$ to account for errors arising from floating-point
 imprecision.
+
+In high dimensional problems, simplexes may require smaller step sizes
+in the inference algorithms in order to remain stable; this can be
+achieved through higher target acceptance rates for samplers and
+longer warmup periods, tighter tolerances for optimization with more
+iterations, and in either case, with less dispersed parameter
+initialization or custom initialization if there are informative
+priors for some parameters.
+
 
 \subsection{Unit Vectors}
 
@@ -2954,28 +2941,8 @@ their sum will be added to the total log density.
 
 \subsection{Accessing the Log Density}
 
-To increment the log density returned by the model by some value
-\code{u}, use the following statement.%
-%
-\footnote{Originally, Stan provided direct access to the log density
-  through a variable \code{lp\_\_} and then later through the
-  \code{increment\_log\_prob()} statement, but the first has been
-  removed and the latter deprecated.}
-%
-\begin{stancode}
-target += u;
-\end{stancode}
-%
-In general, \code{u} can be any expression;  if it is a container, the
-log density will be incremented by the sum of the elements in the
-container.
-
 To access accumulated log density up to the current execution point,
-the function \code{get\_lp()} may be used.%
-%
-\footnote{The value of \code{lp\_\_} will only hold the Jacobian until
-  the end of the execution because it is not used in either
-  \code{increment\_log\_prob(u)} or \code{target += u}.}
+the function \code{target()()} may be used.
 
 
 \section{Sampling Statements}\label{sampling-statements.section}
@@ -3008,7 +2975,7 @@ In general, a sampling statement of the form
 y ~ dist(theta1, ..., thetaN);
 \end{stancode}
 %
-involving subexpressions \code{y1} and \code{theta1} through
+involving subexpressions \code{y} and \code{theta1} through
 \code{thetaN} (including the case where \code{N} is zero) will be well
 formed if and only if the corresponding assignment statement is
 well-formed.  For densities allowing real \code{y} values, the log
@@ -3062,20 +3029,25 @@ The left-hand side of a sampling statement may be a complex
 expression.  For instance, it is legal syntactically to write
 %
 \begin{stancode}
-data {
-  real<lower=0> y;
+parameters {
+  real<lower=0> beta;
 }
 // ...
 model {
-  log(y) ~ normal(mu, sigma);
+  log(beta) ~ normal(mu, sigma);
 }
 \end{stancode}
 %
-Unfortunately, this is not enough to properly model \code{y} as having
-a lognormal distribution.  The log Jacobian of the transform must be
-added to the log probability accumulator to account for the
-differential change in scale (see \refsection{change-of-variables} for
-full definitions).  For the case above, the following adjustment will
+Unfortunately, this is not enough to properly model \code{beta} as
+having a lognormal distribution.  Whenever a nonliner transform is
+applied to a parameter, such as the logarithm function being applied
+to \code{beta} here, and then used on the left-hand side of a sampling
+statement or on the left of a vertical bar in a log pdf function, an
+adjustment must be made to account for the differential change in
+scale and ensure \code{beta} gets the correct distribution.  The
+correction required is to add the log Jacobian of the transform to the
+target log density (see \refsection{change-of-variables} for full
+definitions).  For the case above, the following adjustment will
 account for the log transform.%
 %
 \footnote{Because $\log | \frac{d}{dy} \log y | = \log | 1/y | = - \log
