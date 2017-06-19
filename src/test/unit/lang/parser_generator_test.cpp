@@ -20,7 +20,7 @@ void test_pg(const std::string& program_name,
 
   std::string hpp_code;
   read_file(path, hpp_code);
-  
+
   EXPECT_TRUE(hpp_code.find(expected_substring) != std::string::npos)
     << "program_name: " << program_name << std::endl
     << "expected_substring: " << expected_substring;
@@ -54,10 +54,10 @@ void test_pg_count(const std::string& program_name,
 }
 
 TEST(unitLang, simpleTest) {
-  test_pg("user-function-struct-const", 
+  test_pg("user-function-struct-const",
           "operator()(const T0__& x, std::ostream* pstream__) const {");
-}     
-             
+}
+
 TEST(unitLang, odeTest) {
   std::string expected;
   expected = "stan::math::assign(y_hat, "
@@ -65,4 +65,8 @@ TEST(unitLang, odeTest) {
   test_pg("ode", expected);
   test_pg_count("ode", expected, 1);
 }
-             
+
+TEST(langGenerator, doubleSidedTruncation) {
+  test_pg("double-trunc",
+          "lp_accum__.add(-log(normal_cdf(1, 0, 1) - normal_cdf(-(1), 0, 1)));");
+}

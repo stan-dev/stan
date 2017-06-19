@@ -91,8 +91,27 @@ namespace stan {
         if (x.truncation_.has_low() && x.truncation_.has_high()) {
           // T[L,U]: -log_diff_exp(Dist_cdf_log(U|params),
           //                       Dist_cdf_log(L|Params))
-          sso_lp << "log_diff_exp(";
-          sso_lp << get_cdf(x.dist_.family_) << "(";
+          // sso_lp << "log_diff_exp(";
+          // sso_lp << get_cdf(x.dist_.family_) << "(";
+          // generate_expression(x.truncation_.high_.expr_, sso_lp);
+          // for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
+          //   sso_lp << ", ";
+          //   generate_expression(x.dist_.args_[i], sso_lp);
+          // }
+          // if (is_user_defined)
+          //   sso_lp << ", pstream__";
+          // sso_lp << "), " << get_cdf(x.dist_.family_) << "(";
+          // generate_expression(x.truncation_.low_.expr_, sso_lp);
+          // for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
+          //   sso_lp << ", ";
+          //   generate_expression(x.dist_.args_[i], sso_lp);
+          // }
+          // if (is_user_defined)
+          //   sso_lp << ", pstream__";
+          // sso_lp << "))";
+
+          sso_lp << "log(";
+          sso_lp << x.dist_.family_ << "_cdf(";
           generate_expression(x.truncation_.high_.expr_, sso_lp);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
             sso_lp << ", ";
@@ -100,7 +119,7 @@ namespace stan {
           }
           if (is_user_defined)
             sso_lp << ", pstream__";
-          sso_lp << "), " << get_cdf(x.dist_.family_) << "(";
+          sso_lp << ") - " << x.dist_.family_ << "_cdf(";
           generate_expression(x.truncation_.low_.expr_, sso_lp);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
             sso_lp << ", ";

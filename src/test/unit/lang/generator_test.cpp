@@ -555,3 +555,4 @@ TEST(genArrayBuilderAdds, addScalars) {
   stan::lang::generate_array_builder_adds(elts, true, false, o2);
   EXPECT_EQ(3, count_matches(".add(", o2.str()));
 }
+
