@@ -52,7 +52,7 @@ is distributed under the Boost Software License version 1.0.
 \end{quote}
 %
 The copyright for each Boost package is held by its developers or their
-assginees.
+assignees.
 
 
 \section{Eigen License}
@@ -70,7 +70,7 @@ assignees.
 \section{SUNDIALS License}
 
 Stan uses the SUNDIALS package for solving stiff differential
-equations.  SUNDIALS is distrubted under the new BSD (3-clause) license.
+equations.  SUNDIALS is distributed under the new BSD (3-clause) license.
 %
 \begin{quote}
 \url{https://opensource.org/licenses/BSD-3-Clause}
@@ -583,7 +583,7 @@ A postfixed Kleene star (\code{A*}) indicates zero or more occurrences
 of \code{A}.  The notation \code{A \% B}, following the Boost Spirit
 parser library's notation, is shorthand for \code{?(A (B A)*)}, i.e.,
 any number of \code{A} (including zero), separated by \code{B}.  A
-postfixed, curly-braced number indicates a fixed number of repetions;
+postfixed, curly-braced number indicates a fixed number of repetitions;
 e.g., \code{A\{6\}} is equivalent to a sequence of six copies of \code{A}.
 
 \subsection{Programs}
@@ -862,7 +862,7 @@ The messages returned by Stan come in two flavors, warnings and
 errors.  Error messages arise when a fatal problem occurs under the
 hood from which there is no way to recover.  Warning messages arise
 in circumstances from which the underlying program can continue to
-operaate.
+operate.
 
 An example warning message is an informational message about
 ill-formed input to an underlying function, which results in a
@@ -893,7 +893,7 @@ parser and \Cpp code generator.
 \section{Initialization}
 
 \begin{itemize}
-\item {\it vanishing density.} This message arrises when there is a
+\item {\it vanishing density.} This message arises when there is a
   problem with initialization not providing a finite log probability.
 %
 \end{itemize}
@@ -964,7 +964,7 @@ target += u;
 \section{\code{lp\_\_} Variable}
 
 \begin{description}
-\item[Depcreated]
+\item[Deprecated]
 The variable \code{lp\_\_} is available wherever log density increment
 statements are allowed (\code{target~+=} and \Verb|~| shorthand
 statements).
@@ -1113,7 +1113,7 @@ matrix types.
   otherwise.
 %
 \item[Replacement] Use the conditional operator which allows more
-  flexiblity in the types of \code{b} and \code{c} and is much more
+  flexibility in the types of \code{b} and \code{c} and is much more
   efficient in that it only evaluates whichever of \code{b} or
   \code{c} is returned.  See \refsection{conditional-operator} for
   full details of the conditional operator.  Replace
@@ -1126,7 +1126,7 @@ x = a ? b : c;
 \end{stancode}
 \end{description}
 
-\section{\code{\#} Commens}
+\section{\code{\#} Comments}
 
 \begin{description}
 \item[Deprecated] The use of \code{\#} for line-based comments is
