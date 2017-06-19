@@ -45,7 +45,7 @@ language like R or Python), try writing scripts to run the data
 through the models and produce whatever posterior analysis you need.
 Scripts can be written for the shell, R, or Python.  Whatever language
 a script is in, it should be self contained and not depend on global
-variables having been set, other data being read in, etc.  
+variables having been set, other data being read in, etc.
 
 See \refchapter{reproducibility} for complete information on
 reproducibility in Stan and its interfaces.
@@ -54,7 +54,7 @@ reproducibility in Stan and its interfaces.
 
 It may seem like overkill if running the project is only a single line
 of code, but the script provides not only a way to run the code, but
-also a form of concrete documentation for what is run. 
+also a form of concrete documentation for what is run.
 
 
 \subsection{Randomization and Saving Seeds}
@@ -87,7 +87,7 @@ used.  Not only might others want to read a program or model, the
 developer will want to read it later.  One of the motivations of
 Stan's design was to make models self-documenting in terms of variable
 usage (e.g., data versus parameter), types (e.g., covariance matrix
-vs. unconstrained matrix) and sizes.  
+vs. unconstrained matrix) and sizes.
 
 A large part of readability is consistency.  Particularly in naming
 and layout.  Not only of programs themselves, but the directories and
@@ -123,13 +123,13 @@ sense by scatterplotting $x$ vs. $y$.
 
 Software projects are almost always designed top-down from one or more
 intended use cases.  Good software coding, on the other hand, is
-typically done bottom-up.  
+typically done bottom-up.
 
 The motivation for top-down design is obvious.  The motivation for
 bottom-up development is that it is much easier to develop software
 using components that have been thoroughly tested.  Although Stan has
 no built-in support for either modularity or testing, many of the same
-principles apply.  
+principles apply.
 
 The way the developers of Stan themselves build models is to start as
 simply as possibly, then build up. This is true even if we have a
@@ -147,12 +147,12 @@ One of the best ways to make sure your model is doing the right thing
 computationally is to generate simulated (i.e., ``fake'') data with
 known parameter values, then see if the model can recover these
 parameters from the data.  If not, there is very little hope that it
-will do the right thing with data from the wild.  
+will do the right thing with data from the wild.
 
 There are fancier ways to do this, where you can do things like run
 $\chi^2$ tests on marginal statistics or follow the paradigm
 introduced in \citep{CookGelmanRubin:2006}, which involves interval
-tests.  
+tests.
 
 \section{Debug by Print}
 
@@ -162,7 +162,7 @@ debug-by-printf.%
 %
 \footnote{The ``f'' is not a typo --- it's a historical artifact of
   the name of the \code{printf} function used for formatted printing
-  in C.} 
+  in C.}
 
 Stan supports print statements with one or more string or expression
 arguments.  Because Stan is an imperative language, variables can have
@@ -206,7 +206,7 @@ more information on the syntax and evaluation of print statements.
 The machine does what the code says, not what the documentation says.
 Documentation, on the other hand, might not match the code.  Code
 documentation easily rots as the code evolves if the documentation is
-not well maintained.  
+not well maintained.
 
 Thus it is always preferable to write readable code as opposed to
 documenting unreadable code.  Every time you write a piece of
@@ -225,8 +225,8 @@ bracketed comments cannot be wrapped inside of bracketed comments.
 
 \subsection{What Not to Comment}
 
-When commenting code, it is usually safe to assume that you are 
-writing the comments for other programmers who understand the basics 
+When commenting code, it is usually safe to assume that you are
+writing the comments for other programmers who understand the basics
 of the programming language in use.  In other words, don't comment the
 obvious.  For instance, there is no need to have comments
 such as the following, which add nothing to the code.
@@ -392,19 +392,19 @@ repository produces a full backup of the system and all past versions.
 \includegraphics[height=4.5in]{img/git-process.png}
 \end{center}
 \caption{\small\it Git branching process for master
-  and development branches.  New features and ordinary (not hot) 
+  and development branches.  New features and ordinary (not hot)
   bugfixes are developed in branches from and merged back into the
   development  branch.  These are then
   collected into releases and merged with the master branch, which
   tracks the releases.  Hotfix branches are like feature or ordinary
-  bugfix branches, but branch from master and merge back into master. 
+  bugfix branches, but branch from master and merge back into master.
   Image courtesy of \citep{Driessen:2010}.}\label{git-process.figure} \end{figure}
 %
 The basic Git process for branching, releasing, hotfixing, and merging
 follows standard Git procedure \citep{Driessen:2010}. A diagram
 outlining the process is presented in \reffigure{git-process}. The key
 idea is that the master branch is always at the latest release, with
-older commits tagged for previous releases. 
+older commits tagged for previous releases.
 
 The development branch always represents the current state of
 development. Feature and bugfix branches branch from the development
@@ -459,7 +459,7 @@ the Python unit testing framework unittest%
   \url{http://cran.r-project.org/web/packages/RUnit/index.html}.}
 
 The point of unit testing is to test the program at the application
-programmer interface (API) level, not the end-to-end functional level.  
+programmer interface (API) level, not the end-to-end functional level.
 
 The tests are run automatically when pull requests are created through
 a continuous integration process. PyStan uses the Travis continuous
@@ -491,7 +491,7 @@ given release (or commit within a branch) may be downloaded as an
 archive (zip file) or may be cloned for development under Git.
 Cloning in Git provides a complete copy of all version history,
 including every commit to every branch since the beginning of the
-project.  
+project.
 
 User feedback is accommodated through three channels. First, and most
 formally, there is an issue tracker for each of Stan C++, CmdStan,
@@ -517,7 +517,7 @@ In addition to unit testing at the individual function level, Stan
 undergoes rigorous end-to-end testing of its model fitting
 functionality. Models with known answers are evaluated for both speed
 and accuracy. Models without analytic solutions are evaluated in terms
-of MCMC error.  
+of MCMC error.
 
 
 \section{Release Cycles}
@@ -538,7 +538,7 @@ tar-gzipped archive of the release.
 Stan is released exclusively as source code, so nothing needs to be
 done with respect to binary release management or compatibility.  The
 source is tested so that it can be used under Windows, Mac OS X, and
-Linux.  
+Linux.
 
 Instructions for installing Stan C++, CmdStan, RStan, and PyStan are
 managed separately and distributed with the associated product.
@@ -575,7 +575,7 @@ it breaks forward compatibility.  When a version introduces a new
 feature without breaking backward compatibility, its minor version
 number is incremented.  Whenever the minor version is incremented, the
 patch level reverts to 0.  Most Stan releases increment the minor
-version. 
+version.
 
 \subsection{Bug Fixes and Patch Releases}
 
@@ -616,12 +616,12 @@ complete record of the entire project's commits and branches. After
 first cloning a repository, it may be kept up to date using Git's pull
 command (available from the command-line or platform-specific
 graphical user interfaces).   An alternative delivery mechanism is as
-a zip archive of a snapshot of the system.  
+a zip archive of a snapshot of the system.
 
 \section{Maintenance, Support, and Retirement}
 
 Stan support extends only to the most current release. Specifically,
-patches are not backported to older versions.  
+patches are not backported to older versions.
 
 Early fixes of bugs are available to users in the form of updated
 development branches. Snapshots of the entire code base at every
@@ -675,7 +675,7 @@ accessed through version control.
 
 The members of the Stan development team are drawn from multiple
 computational, scientific, and statistical disciplines across
-academic, not-for-profit, and industrial laboratories. 
+academic, not-for-profit, and industrial laboratories.
 
 Most of Stan's developers have Ph.D. degrees, some have Master's
 degrees, and some are currently enrolled as undergraduate or graduate
@@ -693,7 +693,7 @@ software systems that are still in production.
 Institutions at which the members of the Stan development team hold
 appointments as of Stan release 2.16.0 include Columbia University,
 Adobe Creative Technologies Lab, University of Warwick, University of
-Toronto (Scarborough), Dartmouth Colloge, University of Washington,
+Toronto (Scarborough), Dartmouth College, University of Washington,
 Lucidworks, CNRS (Paris), St. George's, University of London,
 University of Massachussetts (Amherst), Aalto University, and Novartis
 Pharma.
@@ -734,7 +734,7 @@ compute clusters at Columbia or elsewhere.
 The entire history of the Stan C++, CmdStan, RStan, and PyStan
 repositories is maintained on the GitHub servers as well as on each
 developer's individual copy of the repository. Specifically, each
-repository can be reconstituted from any of the core 
+repository can be reconstituted from any of the core
 developers' machines.
 
 
@@ -788,7 +788,7 @@ The data needs to be the same down to the bit level. For example, if
 you are running in RStan, Rcpp handles the conversion between R's
 floating point numbers and C++ doubles. If Rcpp changes the conversion
 process or use different types, the results are not guaranteed to be
-the same down to the bit level.  
+the same down to the bit level.
 
 The compiler and compiler settings can also be an issue.  There is a
 nice discussion of the issues and how to control reproducibility in
@@ -799,7 +799,7 @@ Intel's proprietary compiler by \cite{CordenKreitzer:2014}.
 \chapter{Contributed Modules}
 
 \noindent
-Stan is an open-source project and welcomes user contributions.  
+Stan is an open-source project and welcomes user contributions.
 
 In order to reduce maintenance on the main trunk of Stan development
 and to allow developer-specified licenses, contributed Stan modules
@@ -812,10 +812,10 @@ Developers who have a Stan module to contribute should contact the
 Stan developers either through one of the following.
 %
 \begin{itemize}
-\item \code{stan-users} mailing list: 
+\item \code{stan-users} mailing list:
 \\
 \url{https://groups.google.com/forum/?fromgroups#!forum/stan-users}
-\item Stan e-mail: 
+\item Stan e-mail:
 \\
 \href{mailto:mc.stanislaw@gmail.com}{\tt mc.stanislaw@gmail.com}
 \end{itemize}
@@ -889,7 +889,7 @@ sacrificed is laying out expressions on a single line.
 
 \section{File Extensions}
 
-The recommended file extension for Stan model files is \code{.stan}.  
+The recommended file extension for Stan model files is \code{.stan}.
 For Stan data dump files, the recommended extension is \code{.R}, or
 more informatively, \code{.data.R}.
 
@@ -947,7 +947,7 @@ model {
   }
 }
 \end{stancode}
-% 
+%
 The local variable can be eliminated altogether, as follows.
 %
 \begin{stancode}
@@ -974,7 +974,7 @@ reused.
 model {
   vector[K] mu;
   for (n in 1:N) {
-    for (k in 1:K) 
+    for (k in 1:K)
       mu[k] = ...;
     y[n] ~ multi_normal(mu,Sigma);
 }
@@ -1002,7 +1002,7 @@ The following statement without brackets has the same effect.
 for (n in 1:N)
   y[n] ~ normal(mu,1);
 \end{stancode}
-%  
+%
 Single-statement blocks can also be written on a single line, as
 in the following example.
 %
@@ -1050,7 +1050,7 @@ precedences and associativities are given in
 
 Similarly, comparison operators can usually be written with minimal
 bracketing, with the form \code{y[n] > 0 || x[n] != 0} preferred to
-the bracketed form \code{(y[n] > 0) || (x[n] != 0)}.  
+the bracketed form \code{(y[n] > 0) || (x[n] != 0)}.
 
 \subsection{No Open Brackets on Own Line}
 
@@ -1059,13 +1059,13 @@ can see.  The preferred Stan style is as shown in the previous
 section, not as follows.
 %
 \begin{stancode}
-for (n in 1:N) 
+for (n in 1:N)
 {
   y[n] ~ normal(mu,1);
 }
 \end{stancode}
 %
-This also goes for parameters blocks, transformed data blocks, 
+This also goes for parameters blocks, transformed data blocks,
 which should look as follows.
 %
 \begin{stancode}
@@ -1140,9 +1140,9 @@ Here's an example repeated from \refsection{documenting-functions}.
 %
 \begin{stancode}
 /**
- * Return a data matrix of specified size with rows 
- * corresponding to items and the first column filled 
- * with the value 1 to represent the intercept and the 
+ * Return a data matrix of specified size with rows
+ * corresponding to items and the first column filled
+ * with the value 1 to represent the intercept and the
  * remaining columns randomly filled with unit-normal draws.
  *
  * @param N Number of rows correspond to data items
@@ -1150,7 +1150,7 @@ Here's an example repeated from \refsection{documenting-functions}.
  *          item.
  * @return Simulated predictor matrix.
  */
-matrix predictors_rng(int N, int K) {  
+matrix predictors_rng(int N, int K) {
   ...
 \end{stancode}
 %
@@ -1158,7 +1158,7 @@ The open comment is \code{/**}, asterisks are aligned below the first
 asterisk of the open comment, and the end comment \code{*/} is also
 aligned on the asterisk.  The tags \code{@param} and \code{@return}
 are used to label function arguments (i.e., parameters) and return
-values.  
+values.
 
 \section{White Space}
 
@@ -1192,14 +1192,14 @@ Stan programs should not contain tab characters.  They are legal and
 may be used anywhere other whitespace occurs.  Using tabs to layout a
 program is highly unportable because the number of spaces
 represented by a single tab character varies depending on which
-program is doing the rendering and how it is configured.  
+program is doing the rendering and how it is configured.
 
 \subsection{Two-Character Indents}
 
 Stan has standardized on two space characters of indentation, which is
 the standard convention for C/C++ code.  Another sensible choice is
 four spaces, which is the convention for Java and Python.  Just be
-consistent.  
+consistent.
 
 \subsection{Space Between \code{if} and Condition}
 
@@ -1236,7 +1236,7 @@ target += (y - mu)' * inv(Sigma) * (y - mu);
 \end{stancode}
 %
 Here, the multiplication operator (\code{*}) is aligned to clearly
-signal the multiplicands in the product.  
+signal the multiplicands in the product.
 
 For function arguments, break after a comma and line the next
 argument up underneath as follows.
@@ -1257,10 +1257,10 @@ written as \code{normal(alpha~*~x[n]~+~beta,~sigma)}.
 
 \subsection{Unix Newlines}
 
-Wherever possible, Stan programs should use a single line feed 
-character to separate lines.  All of the Stan developers (so far, at 
-least) work on Unix-like operating systems and using a standard 
-newline makes the programs easier for us to read and share.  
+Wherever possible, Stan programs should use a single line feed
+character to separate lines.  All of the Stan developers (so far, at
+least) work on Unix-like operating systems and using a standard
+newline makes the programs easier for us to read and share.
 
 \subsubsection{Platform Specificity of Newlines}
 
