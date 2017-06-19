@@ -536,12 +536,12 @@ transformed parameters {
 The Jacobian for adding a constant is one, so its log drops out of the
 log density.
 
-Even if the lower bound is a paramter rather than data, there is no
+Even if the lower bound is a parameter rather than data, there is no
 Jacobian required, because the transform from $(L, \alpha_{\mathrm
   raw})$ to $(L + \alpha_{\mathrm raw}, \alpha_{\mathrm raw}$ produces
 a Jacobian derivative matrix with a unit determinant.
 
-It's also possible implement the transform by directly trnasforming
+It's also possible implement the transform by directly transforming
 an unconstrained parameter and accounting for the Jacobian.
 %
 \begin{stancode}
@@ -573,7 +573,7 @@ taking into account the dependencies.
 
 \subsection{Varying Upper and Lower Bounds}
 
-Suppowe there are lower and upper bounds that vary by parameter.
+Suppose there are lower and upper bounds that vary by parameter.
 These can be applied to shift and rescale a parameter constrained to
 $(0, 1)$.
 %
@@ -4266,7 +4266,3 @@ the transformed model, to
 \begin{stancode}
     y_std ~ normal(alpha_std + beta_std * x_std, sigma_std);
 \end{stancode}
-
-
-
-

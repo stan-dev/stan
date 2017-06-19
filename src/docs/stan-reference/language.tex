@@ -753,7 +753,7 @@ A Cholesky factor for a correlation matrix $L$ is a $K \times K$
 lower-triangular matrix with positive diagonal entries and rows that
 are of length 1 (i.e., $\sum_{n=1}^K L_{m,n}^2 = 1$).  If $L$ is a
 Cholesky factor for a correlation matrix, then $L\,L^{\top}$ is a
-correlation matrix (i.e., symmetric postive definite with a unit
+correlation matrix (i.e., symmetric positive definite with a unit
 diagonal).
 
 A declaration such as
@@ -3039,7 +3039,7 @@ model {
 \end{stancode}
 %
 Unfortunately, this is not enough to properly model \code{beta} as
-having a lognormal distribution.  Whenever a nonliner transform is
+having a lognormal distribution.  Whenever a nonlinear transform is
 applied to a parameter, such as the logarithm function being applied
 to \code{beta} here, and then used on the left-hand side of a sampling
 statement or on the left of a vertical bar in a log pdf function, an
@@ -3155,7 +3155,7 @@ F^C_X(x)
 Unlike the cdf, the ccdf is exclusive of the bound, hence the event
 $X > x$ rather than the cdf's event $X \leq x$.
 
-For continous distributions, the ccdf works out to
+For continuous distributions, the ccdf works out to
 \[
 F^C_X(x)
 \ = \ 1 - \int_{-\infty}^x p_X(u) \, du

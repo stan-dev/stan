@@ -708,7 +708,7 @@ numbers (i.e., the non-negative integers).
 \section{Negative Binomial Distribution}
 
 For the negative binomial distribution Stan uses the parameterization
-described in \citet{GelmanEtAl:2013}.  For alternative parametrizations, see \refsection{nbalt}.
+described in \citet{GelmanEtAl:2013}.  For alternative parameterizations, see \refsection{nbalt}.
 
 \subsubsection{Probability Mass Function}
 
@@ -1480,7 +1480,7 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
   given location \farg{mu} and scale \farg{sigma}}
 %
 \fitem{real}{lognormal\_lcdf}{reals \farg{y} \textbar\ reals \farg{mu}, reals
-  \farg{sigma}}{The log of the lognormal cumulative distribution fucntion
+  \farg{sigma}}{The log of the lognormal cumulative distribution function
    of \farg{y} given location \farg{mu} and scale \farg{sigma}}
 %
 \fitem{real}{lognormal\_lccdf}{reals \farg{y} \textbar\ reals \farg{mu}, reals
@@ -1911,7 +1911,7 @@ non-negative real numbers.
 \subsubsection{Stan Functions}
 \begin{description}
 \fitem{real}{rayleigh\_lpdf}{reals \farg{y} \textbar\ reals \farg{sigma}}{The log of the Rayleigh
- ensity of \farg{y} given scale \farg{sigma}}
+ density of \farg{y} given scale \farg{sigma}}
 %
 \fitem{real}{rayleigh\_cdf}{real \farg{y}, real
 \farg{sigma}}{The Rayleigh cumulative distribution of \farg{y} given scale \farg{sigma}}
@@ -2490,7 +2490,7 @@ of positive inverse scales, then for $y \in \reals^{K \times N}$,
 where $y_i$ is the $i$th row of $y$.  This is used to efficiently handle
 Gaussian Processes with multi-variate outputs where only the output dimensions
 share a kernel function but vary based on their scale.  If the model allows
-parametrization in terms of Cholesky factor of the kernel matrix, this distribution
+parameterization in terms of Cholesky factor of the kernel matrix, this distribution
 is also more efficient than $\distro{MultiGP}()$. Note that this
 function does not take into account the mean prediction.
 
