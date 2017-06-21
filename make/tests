@@ -128,6 +128,23 @@ test/dummy.cpp:
 .PHONY: test-headers
 test-headers: $(HEADER_TESTS)
 
+##
+# Adding a test for multiple translation units. If this fails,
+# a new function is probably missing an inline
+##
+
+test/unit/multiple_translation_units%.o : src/test/unit/multiple_translation_units%.cpp
+	@mkdir -p $(dir $@)
+	$(COMPILE.c) -O$O $< $(OUTPUT_OPTION)
+
+test/unit/libmultiple.so : test/unit/multiple_translation_units1.o test/unit/multiple_translation_units2.o
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -shared $(OUTPUT_OPTION) $^
+
+src/test/unit/multiple_translation_units_test.cpp : test/unit/libmultiple.so
+
+
+
 ############################################################
 ##
 # Use the stanc compiler to generate C++ from Stan programs
@@ -141,6 +158,14 @@ test/test-models/stanc$(EXE) : src/test/test-models/stanc.cpp bin/libstanc.a
 TEST_MODELS := $(shell find src/test/test-models -type f -name '*.stan')
 $(patsubst %.stan,%.hpp,$(TEST_MODELS)) : %.hpp : %.stan test/test-models/stanc$(EXE)
 	$(WINE) test/test-models/stanc$(EXE) --o=$@ $<
+
+##
+# Generate C++ from Stan standalone functions
+##
+TEST_FUNCTIONS := $(shell find src/test/test-models -type f -name '*.stanfuncs')
+$(patsubst %.stanfuncs,%.hpp,$(TEST_FUNCTIONS)) : %.hpp : %.stanfuncs test/test-models/stanc$(EXE)
+	$(WINE) test/test-models/stanc$(EXE) --o=$@ $<
+
 
 ##
 # src/test/unit/lang/stanc_helper_test.cpp requires files to be read-only.
@@ -167,6 +192,7 @@ src/test/performance/logistic_test.cpp: src/test/test-models/performance/logisti
 src/test/unit/lang/generator_test.cpp: src/test/test-models/good/lang/test_lp.hpp
 src/test/unit/lang/parser_generator_test.cpp: $(patsubst %.stan,%.hpp,$(shell find src/test/test-models/good/parser-generator -type f -name '*.stan'))
 src/test/unit/io/random_var_context_test.cpp: src/test/test-models/good/services/test_lp.hpp
+src/test/unit/lang/parser/functions_standalone_instantiate_test.cpp: src/test/test-models/good-standalone-functions/basic.hpp src/test/test-models/good-standalone-functions/special_functions.hpp src/test/test-models/good-standalone-functions/integrate.hpp
 src/test/unit/lang/reject/reject_func_call_generated_quantities_test.cpp: src/test/test-models/good/lang/reject_func_call_generated_quantities.hpp
 src/test/unit/lang/reject/reject_func_call_model_test.cpp: src/test/test-models/good/lang/reject_func_call_model.hpp
 src/test/unit/lang/reject/reject_func_call_transformed_data_test.cpp: src/test/test-models/good/lang/reject_func_call_transformed_data.hpp
@@ -228,6 +254,7 @@ src/test/unit/services/sample/hmc_static_dense_e_test.cpp : src/test/test-models
 src/test/unit/services/sample/hmc_static_diag_e_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/services/sample/hmc_static_diag_e_adapt_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/services/sample/hmc_static_unit_e_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
+src/test/unit/services/sample/hmc_static_unit_e_adapt_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/services/sample/hmc_nuts_dense_inv_metric_test.cpp : src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
 src/test/unit/services/sample/hmc_nuts_diag_inv_metric_test.cpp : src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
 src/test/unit/services/sample/hmc_static_dense_inv_metric_test.cpp : src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp

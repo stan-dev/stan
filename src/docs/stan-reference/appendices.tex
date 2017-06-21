@@ -14,7 +14,7 @@ distributed under liberal freedom-respecting%
   source'' and ``freedom respecting.''}
 %
 licenses approved by the Open Source Initiative.%
-\footnote{See \url{http://opensource.org}.}  
+\footnote{See \url{http://opensource.org}.}
 
 In particular, the licenses for Stan and its dependent libraries have
 no ``copyleft'' provisions requiring applications of Stan to be
@@ -52,10 +52,10 @@ is distributed under the Boost Software License version 1.0.
 \end{quote}
 %
 The copyright for each Boost package is held by its developers or their
-assginees.
+assignees.
 
 
-\section{Eigen License} 
+\section{Eigen License}
 
 Stan uses the Eigen library for matrix arithmetic and linear algebra.
 Eigen is distributed under the Mozilla Public License, version 2.
@@ -65,12 +65,12 @@ Eigen is distributed under the Mozilla Public License, version 2.
 \end{quote}
 %
 The copyright of Eigen is owned jointly by its developers or their
-assignees. 
+assignees.
 
 \section{SUNDIALS License}
 
 Stan uses the SUNDIALS package for solving stiff differential
-equations.  SUNDIALS is distrubted under the new BSD (3-clause) license.
+equations.  SUNDIALS is distributed under the new BSD (3-clause) license.
 %
 \begin{quote}
 \url{https://opensource.org/licenses/BSD-3-Clause}
@@ -122,7 +122,7 @@ you can look for similar structures in these examples.
   to directly program in C++, but we do not describe how to do this in
   this Stan manual (see the getting started with \Cpp section of
   \url{http://mc-stan.org} for more information on using Stan directly
-  from \Cpp). 
+  from \Cpp).
 \item \BUGS performs \MCMC updating one scalar parameter at a time
   (with some exceptions such as \JAGS's implementation of regression
   and generalized linear models and some conjugate multivariate
@@ -161,7 +161,7 @@ y ~ normal(mu,sigma);
 It translates to the following \Cpp code.
 %
 \begin{stancode}
-mu = a + b * x; 
+mu = a + b * x;
 lp += normal_log(mu,sigma);
 \end{stancode}
 %
@@ -172,8 +172,8 @@ y ~ normal(mu,sigma)
 mu = a + b * x
 \end{stancode}
 %
-This program is well formed, but is almost certainly  
-a coding error, because it attempts to use \code{mu} before 
+This program is well formed, but is almost certainly
+a coding error, because it attempts to use \code{mu} before
 it is set. It translates to the following \Cpp code.
 %
 \begin{stancode}
@@ -207,7 +207,7 @@ sample out of hand as if it had zero probability.
   can take longer per iteration (as it typically takes many "leapfrog
   steps" within each iteration), but the iterations typically have lower
   autocorrelation.  So Stan might work fine with 1000 iterations in an
-  example where \BUGS would require 100,000 for good mixing.  We 
+  example where \BUGS would require 100,000 for good mixing.  We
   recommend monitoring potential scale reduction statistics ($\hat{R}$)
   and the effective sample size to judge when to stop (stopping when
   $\hat{R}$ values do not counter-indicate convergence and when enough
@@ -248,7 +248,7 @@ for (i in 1:n)
   y[i] ~ normal(mu, sigma);
 \end{stancode}
 %
-and also equivalently, 
+and also equivalently,
 %
 \begin{stancode}
 for (i in 1:n) {
@@ -271,11 +271,11 @@ brackets indicating the body of the for loop.
   deviation 2 is \code{normal(1,2)}, not \code{normal(1,4)} or
   \code{normal(1,0.25)}.
 %
-\item Similarly, the second argument to the "multivariate normal" 
+\item Similarly, the second argument to the "multivariate normal"
   function is the covariance matrix and not the inverse covariance matrix
   (i.e., the precision matrix) (as in \BUGS). The same is true for
   the "multivariate student" distribution.
-%  
+%
 \item
 The distributions have slightly different names:
 %
@@ -305,7 +305,7 @@ $\vdots$ & $\vdots$
 %
 In \BUGS, the above model would not be legal because the variable
 \code{total} is defined more than once.  But in Stan, the loop is
-executed in order, so \code{total} is overwritten in each step.  
+executed in order, so \code{total} is overwritten in each step.
 %
 \item Stan uses explicit declarations.  Variables are declared with
   base type integer or real, and vectors, matrices, and arrays have
@@ -313,7 +313,7 @@ executed in order, so \code{total} is overwritten in each step.
   information also.  For data and transformed parameters, the bounds
   are used for error checking.  For parameters, the constraints
   are critical to sampling as they determine the geometry over which
-  the Hamiltonian is simulated.  
+  the Hamiltonian is simulated.
   \\[6pt]
   Variables can be declared as data, transformed data, parameters, transformed
   parameters, or generated quantities.  They can also be declared as
@@ -331,11 +331,11 @@ truncated versions may not exist and may not be vectorized.}
 allowing
 %
 \begin{stancode}
-for (i in 1:n) 
+for (i in 1:n)
   y[i] ~ normal(mu[i], sigma[i]);
 \end{stancode}
 %
-to be expressed more compactly as 
+to be expressed more compactly as
 %
 \begin{stancode}
 y ~ normal(mu,sigma);
@@ -379,9 +379,9 @@ language section of this manual.
 \item Stan supports general conditional statements using a standard
   if-else syntax.  For example, a zero-inflated (or -deflated) Poisson
   mixture model is defined using the if-else syntax as described in
-  \refsection{zero-inflated}. 
+  \refsection{zero-inflated}.
 %
-\item Stan supports general while loops using a standard syntax.  
+\item Stan supports general while loops using a standard syntax.
 While loops give Stan full Turing equivalent computational power.
 They are useful for defining iterative functions with complex
 termination conditions.  As an illustration of their syntax,
@@ -431,7 +431,7 @@ model {
 \item In \BUGS you need to define all variables.  In Stan, if you
   declare but don't define a parameter it implicitly has a flat prior
   (on the scale in which the parameter is defined).  For example, if
-  you have a parameter \code{p} declared as 
+  you have a parameter \code{p} declared as
 \begin{stancode}
 real<lower=0,upper=1> p;
 \end{stancode}
@@ -446,9 +446,9 @@ real theta;
 \end{stancode}
 %
 and have no sampling statement for \code{theta} in the
-\code{model} block, 
+\code{model} block,
  then you are implicitly assigning an improper uniform prior
-on $(-\infty,\infty)$ to \code{theta}.  
+on $(-\infty,\infty)$ to \code{theta}.
 %
 % Then if
 % you define a transformed parameter \code{p} using
@@ -464,11 +464,11 @@ on $(-\infty,\infty)$ to \code{theta}.
 % model: p ~ beta (0, 0);
 \item \BUGS models are always proper (being constructed as a product
   of proper marginal and conditional densities).  Stan models can be
-  improper.  Here is the simplest improper Stan model: 
+  improper.  Here is the simplest improper Stan model:
 \begin{stancode}
 parameters {
   real theta;
-} 
+}
 model { }
 \end{stancode}
 % \item You can also define some improper models in \BUGS directly, for
@@ -494,7 +494,7 @@ rather, \emph{both} statements contribute to the density function that
 is evaluated.  The above two lines have the effect of including the
 product, $\distro{Norm}(y|0,1) \times \distro{Norm}(y|2,3)$, into the
 density function.
-\\[6pt] 
+\\[6pt]
 For a perhaps more confusing example, consider the following two lines in a Stan model:
 \begin{stancode}
 x ~ normal(0.8*y, sigma);
@@ -530,7 +530,7 @@ conditionals have regressions with slope 0.8.
   Stan and RStan.  Installing RStan will automatically set up Stan.
   When RStan moves to CRAN, it will get even easier.
 \item In practice we typically run the same Stan model repeatedly.  If
-  you pass RStan the result of a previously fitted model the model will 
+  you pass RStan the result of a previously fitted model the model will
   not need be recompiled. An example is given on the running
   Stan from R pages available from \code{http://mc-stan.org/}.
 \item When you run Stan, it saves various conditions including
@@ -548,7 +548,7 @@ conditionals have regressions with slope 0.8.
 \item As in R2WinBUGS and R2jags, after running the Stan model, you
   can quickly summarize using \code{plot()} and \code{print()}.  You
   can access the simulations themselves using various extractor
-  functions, as described in the RStan documentation.  
+  functions, as described in the RStan documentation.
 \item Various information about the sampler, such as number of
   leapfrog steps, log probability, and step size, is available through
   extractor functions.   These can be useful for understanding what is
@@ -583,7 +583,7 @@ A postfixed Kleene star (\code{A*}) indicates zero or more occurrences
 of \code{A}.  The notation \code{A \% B}, following the Boost Spirit
 parser library's notation, is shorthand for \code{?(A (B A)*)}, i.e.,
 any number of \code{A} (including zero), separated by \code{B}.  A
-postfixed, curly-braced number indicates a fixed number of repetions;
+postfixed, curly-braced number indicates a fixed number of repetitions;
 e.g., \code{A\{6\}} is equivalent to a sequence of six copies of \code{A}.
 
 \subsection{Programs}
@@ -864,7 +864,7 @@ The messages returned by Stan come in two flavors, warnings and
 errors.  Error messages arise when a fatal problem occurs under the
 hood from which there is no way to recover.  Warning messages arise
 in circumstances from which the underlying program can continue to
-operaate.  
+operate.
 
 An example warning message is an informational message about
 ill-formed input to an underlying function, which results in a
@@ -895,7 +895,7 @@ parser and \Cpp code generator.
 \section{Initialization}
 
 \begin{itemize}
-\item {\it vanishing density.} This message arrises when there is a
+\item {\it vanishing density.} This message arises when there is a
   problem with initialization not providing a finite log probability.
 %
 \end{itemize}
@@ -935,7 +935,7 @@ how to upgrade it.
 
 \begin{description}
 \item[Deprecated] The deprecated syntax uses the operator \code{<-}
-  for assignment, e.g., 
+  for assignment, e.g.,
 \begin{stancode}
 a <- b;
 \end{stancode}
@@ -966,7 +966,7 @@ target += u;
 \section{\code{lp\_\_} Variable}
 
 \begin{description}
-\item[Depcreated]
+\item[Deprecated]
 The variable \code{lp\_\_} is available wherever log density increment
 statements are allowed (\code{target~+=} and \Verb|~| shorthand
 statements).
@@ -1003,7 +1003,7 @@ Use the no-argument function \code{target()} instead.
   sequence of zero or more parameters \code{...} to produce the
   expression \code{foo\_log(y, ...)}.
 \item[Replacement] If \code{y} can be a real value (including vectors
-or matrices), replace 
+or matrices), replace
 %
 \begin{stancode}
 foo_log(y, ...)
@@ -1030,13 +1030,13 @@ foo_lpmf(y | ...).
 \end{description}
 
 \section{\code{cdf\_log} and \code{ccdf\_log} Cumulative Distribution
-  Functions} 
+  Functions}
 
 \begin{description}
-\item[Deprecated] 
+\item[Deprecated]
 The log cumulative distribution and complementary cumulative
 distribution functions for a distribution \code{foo} are currently
-written as \code{foo\_cdf\_log} and \code{foo\_ccdf\_log}.  
+written as \code{foo\_cdf\_log} and \code{foo\_ccdf\_log}.
 \item[Replacement]
 Replace \code{foo\_cdf\_log(y, ...)} with \code{foo\_lcdf(y | ...)}.
 \\[4pt]
@@ -1049,7 +1049,7 @@ Replace \code{foo\_ccdf\_log(y, ...)} with \code{foo\_lccdf(y | ...)}.
 \item[Deprecated]  Currently two non-conforming functions ending in
   suffix \code{\_log}.
 \item[Replacement] Replace \code{multiply\_log(...)} with
-  \code{lmultiply(...)}.  
+  \code{lmultiply(...)}.
 \\[4pt]
 Replace \code{binomial\_coefficient\_log(...)} with \code{lchoose(...)}.
 \end{description}
@@ -1064,7 +1064,7 @@ Replace \code{binomial\_coefficient\_log(...)} with \code{lchoose(...)}.
 y ~ foo(...);
 \end{stancode}
 %
-having the same effect as 
+having the same effect as
 %
 \begin{stancode}
 target += foo_log(y, ...);
@@ -1108,12 +1108,14 @@ matrix types.
 \section{\code{if\_else} Function}
 
 \begin{description}
-\item[Deprecated]The function \code{if\_else} is deprecated.  This function takes three arguments
-\code{a}, \code{b}, and \code{c}, where \code{a} is an \code{int} value and \code{b} and \code{c}
-are scalars. It returns \code{b} if \code{a} is non-zero and \code{c} otherwise.
+\item[Deprecated]The function \code{if\_else} is deprecated.  This
+  function takes three arguments \code{a}, \code{b}, and \code{c},
+  where \code{a} is an \code{int} value and \code{b} and \code{c} are
+  scalars. It returns \code{b} if \code{a} is non-zero and \code{c}
+  otherwise.
 %
 \item[Replacement] Use the conditional operator which allows more
-  flexiblity in the types of \code{b} and \code{c} and is much more
+  flexibility in the types of \code{b} and \code{c} and is much more
   efficient in that it only evaluates whichever of \code{b} or
   \code{c} is returned.  See \refsection{conditional-operator} for
   full details of the conditional operator.  Replace
@@ -1125,6 +1127,18 @@ x = if_else(a,b,c);
 x = a ? b : c;
 \end{stancode}
 \end{description}
+
+\section{\code{\#} Comments}
+
+\begin{description}
+\item[Deprecated] The use of \code{\#} for line-based comments is
+  deprecated.  From the first occurrence of \code{\#} onward, the rest
+  of the line is ignored.  This happens after includes are resolved
+  starting with \code{\#include}.
+\item[Replacement] Use a pair of forward slashes, \code{//}, for line
+  comments.  See \refsection{comments}.
+\end{description}
+
 
 \chapter{Mathematical Functions}\label{math-functions.appendix}
 
@@ -1147,10 +1161,10 @@ constant for the beta distribution, and is defined for $a > 0$ and $b
 
 \section{Incomplete Beta}\label{inc-beta-appendix.section}
 
-The incomplete beta function, $\mathrm{B}(x; a, b)$, is defined for 
+The incomplete beta function, $\mathrm{B}(x; a, b)$, is defined for
 $x \in [0, 1]$ and $a, b \geq 0$ such that $a + b \neq 0$ by
 \[
-\mathrm{B}(x; \, a, b) 
+\mathrm{B}(x; \, a, b)
 \ = \
 \int_0^x u^{a -  1} \, (1 - u)^{b - 1} \, du,
 \]
@@ -1190,9 +1204,9 @@ The digamma function $\Psi$ is the derivative of the $\log \Gamma$
 function,
 %
 \[
-\Psi(u) 
+\Psi(u)
 \ = \
-\frac{d}{d u} \log \Gamma(u) 
+\frac{d}{d u} \log \Gamma(u)
 \ = \
 \frac{1}{\Gamma(u)} \ \frac{d}{d u} \Gamma(u).
 \]

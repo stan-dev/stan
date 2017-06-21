@@ -1,6 +1,8 @@
 #ifndef STAN_LANG_GRAMMARS_SEMANTIC_ACTIONS_HPP
 #define STAN_LANG_GRAMMARS_SEMANTIC_ACTIONS_HPP
 
+
+#include <stan/io/program_reader.hpp>
 #include <stan/lang/ast.hpp>
 #include <stan/lang/grammars/iterator_typedefs.hpp>
 #include <boost/variant/recursive_variant.hpp>
@@ -359,10 +361,11 @@ namespace stan {
     extern boost::phoenix::function<remove_params_var> remove_params_var_f;
 
     // called from: program_grammar
-    struct program_error : public phoenix_functor_quinary {
+    struct program_error : public phoenix_functor_senary {
       void operator()(pos_iterator_t _begin, pos_iterator_t _end,
                       pos_iterator_t _where, variable_map& vm,
-                      std::stringstream& error_msgs) const;
+                      std::stringstream& error_msgs,
+                      const io::program_reader& reader) const;
     };
     extern boost::phoenix::function<program_error> program_error_f;
 
@@ -877,7 +880,12 @@ namespace stan {
     };
     extern boost::phoenix::function<trace> trace_f;
 
-
+    // called from: whitespace_grammar
+    struct deprecate_pound_comment : public phoenix_functor_unary {
+      void operator()(std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<deprecate_pound_comment>
+    deprecate_pound_comment_f;
 
   }
 }

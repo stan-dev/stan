@@ -18,8 +18,10 @@ namespace stan {
       softabs_fun(const Model& m, std::ostream* out): model_(m), o_(out) {}
 
       template <typename T>
-      T operator()(Eigen::Matrix<T, Eigen::Dynamic, 1>& x) const {
-        return model_.template log_prob<true, true, T>(x, o_);
+      T operator()(const Eigen::Matrix<T, Eigen::Dynamic, 1>& x) const {
+        // log_prob() requires non-const but doesn't modify its argument
+        return model_.template
+          log_prob<true, true, T>(const_cast<Eigen::Matrix<T, -1, 1>& >(x), o_);
       }
     };
 
@@ -103,14 +105,11 @@ namespace stan {
       }
 
       void update_metric(softabs_point& z, callbacks::logger& logger) {
-        // Compute the Hessian
-        stan::math::hessian<double>(softabs_fun<Model>(this->model_, 0),
-                                    z.q, z.V, z.g, z.hessian);
-
+        math::hessian<softabs_fun<Model> >(softabs_fun<Model>(this->model_, 0),
+                                           z.q, z.V, z.g, z.hessian);
         z.V = -z.V;
         z.g = -z.g;
         z.hessian = -z.hessian;
-
         // Compute the eigen decomposition of the Hessian,
         // then perform the SoftAbs transformation
         z.eigen_deco.compute(z.hessian);
