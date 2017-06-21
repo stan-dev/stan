@@ -5,6 +5,7 @@
 
 #include <stan/io/cmd_line.hpp>
 #include <stan/io/dump.hpp>
+#include <stan/io/program_reader.hpp>
 #include <stan/io/reader.hpp>
 #include <stan/io/writer.hpp>
 

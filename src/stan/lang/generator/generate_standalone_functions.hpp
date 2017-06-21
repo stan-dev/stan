@@ -1,10 +1,12 @@
 #ifndef STAN_LANG_GENERATOR_GENERATE_STANDALONE_FUNCTIONS_HPP
 #define STAN_LANG_GENERATOR_GENERATE_STANDALONE_FUNCTIONS_HPP
 
+#include <stan/io/program_reader.hpp>
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/generate_functions.hpp>
 #include <stan/lang/generator/generate_function_instantiations.hpp>
 #include <stan/lang/generator/generate_includes.hpp>
+#include <stan/lang/generator/generate_program_reader_fun.hpp>
 #include <stan/lang/generator/generate_typedefs.hpp>
 #include <stan/lang/generator/generate_usings_standalone_functions.hpp>
 #include <stan/lang/generator/generate_version_comment.hpp>
@@ -23,11 +25,14 @@ namespace stan {
      *
      * @param[in] prog program from which to generate
      * @param[in] namespaces namespace to generate the functions in
+     * @param[in] history I/O include history for text underlying
+     *   program
      * @param[in,out] o stream for generating
      */
     void generate_standalone_functions(
            const program& prog,
            const std::vector<std::string>& namespaces,
+           const std::vector<io::preproc_event>& history,
            std::ostream& o) {
       generate_version_comment(o);
 
@@ -49,6 +54,7 @@ namespace stan {
       generate_rng_rcpp_helper(o);
 
       generate_typedefs(o);
+      generate_program_reader_fun(history, o);
       generate_functions(prog.function_decl_defs_, o, true /*rcpp_export*/);
       generate_function_instantiations(prog.function_decl_defs_, o);
 

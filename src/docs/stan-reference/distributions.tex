@@ -4,7 +4,7 @@
 
 Functions associated with distributions are set up to follow the same
 naming conventions for both built-in distributions and for user-defined
-distributions. 
+distributions.
 
 \section{Suffix Marks Type of Function}
 
@@ -18,7 +18,7 @@ log probability mass function  & discrete & \code{\_lpmf} \\
 log probability density function  & continuous & \code{\_lpdf} \\
 \hline
 log cumulative distribution function & any & \code{\_lcdf} \\
-log complementary cumulative distribution function & any & \code{\_lccdf} \\ 
+log complementary cumulative distribution function & any & \code{\_lccdf} \\
 \hline
 random number generator & any & \code{\_rng}
 \end{tabular}
@@ -114,14 +114,14 @@ For a univariate random variable $Y$ with probability function $p_Y(y \,
 | \, \theta)$, the cumulative distribution function (CDF) $F_Y$ is
 defined by
 \[
-F_Y(y) 
+F_Y(y)
 \ = \
-\mbox{Pr}[Y < y] 
+\mbox{Pr}[Y < y]
 \ = \
 \int_{-\infty}^y p(y \, | \, \theta) \ \mathrm{d}\theta.
 \]
 The complementary cumulative distribution function (CCDF) is defined
-as 
+as
 \[
 \mbox{Pr}[Y \geq y]
 \ = \
@@ -134,7 +134,7 @@ to 1 (the closest you can get is roughly $1 - 10^{-15}$).
 
 In Stan, there is a cumulative distribution function for each
 probability function.  For instance, \code{normal\_cdf(y,~mu,~sigma)}
-is defined by 
+is defined by
 %
 \[
 \int_0^y \distro{Normal}(y \, | \, \mu, \sigma) \ \mathrm{d}y.
@@ -182,7 +182,7 @@ speed because the work required to solve the linear system for the
 covariance matrix is only done once.
 
 Stan also overloads some scalar functions, such as \code{log} and
-\code{exp}, to apply to vectors (arrays) and return vectors (arrays).  
+\code{exp}, to apply to vectors (arrays) and return vectors (arrays).
 These vectorizations are defined elementwise and unlike the
 probability functions, provide only minimal efficiency speedups over
 repeated application and assignment in a loop.
@@ -205,7 +205,7 @@ vector, or a row-vector.  If there is more than one array or vector
 argument, their types can be anything but their size must match.  For
 instance, it is legal to use
 \code{normal\_lpdf(row\_vector~|~vector,~real)} as long as the vector and
-row vector have the same size.  
+row vector have the same size.
 
 \subsubsection{Vectorized Vector and Row Vector Arguments}
 
@@ -447,7 +447,7 @@ Suppose $N \in \nats$, $\alpha \in \reals$, and $n \in
 
 \begin{eqnarray*}
 \distro{BinomialLogit}(n|N,\alpha)
-& = & \distro{BinomialLogit}(n|N,\mbox{logit}^{-1}(\alpha))
+& = & \distro{Binomial}(n|N,\mbox{logit}^{-1}(\alpha))
 \\[6pt]
 & = & \binom{N}{n} \left( \mbox{logit}^{-1}(\alpha) \right)^{n}
                     \left( 1 - \mbox{logit}^{-1}(\alpha) \right)^{N - n}.
@@ -708,7 +708,7 @@ numbers (i.e., the non-negative integers).
 \section{Negative Binomial Distribution}
 
 For the negative binomial distribution Stan uses the parameterization
-described in \citet{GelmanEtAl:2013}.  For alternative parametrizations, see \refsection{nbalt}.
+described in \citet{GelmanEtAl:2013}.  For alternative parameterizations, see \refsection{nbalt}.
 
 \subsubsection{Probability Mass Function}
 
@@ -1005,7 +1005,7 @@ where the multinomial coefficient is defined by
     \code{N = sum(\farg{y})}}
 %
 \fitem{int[]}{multinomial\_rng}{vector \farg{theta}, int \farg{N}}{Generate a
-  multinomial variate with simplex distribution parameter \farg{theta} and 
+  multinomial variate with simplex distribution parameter \farg{theta} and
   total count \farg{N}; may only be used in generated quantities block}
 \end{description}
 
@@ -1072,7 +1072,7 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
 \end{description}
 %
 \begin{description}
-\fitem{real}{normal\_rng}{real \farg{mu} \textbar\ real \farg{sigma}}{Generate a normal
+\fitem{real}{normal\_rng}{real \farg{mu},  real \farg{sigma}}{Generate a normal
   variate with location \farg{mu} and scale \farg{sigma}; may only be used in
   generated quantities block}
 \end{description}
@@ -1130,51 +1130,51 @@ may only be used in generated quantities block}
 
 \subsubsection{Probability Density Function}
 
-If $\mu \in \reals$, $\sigma \in \posreals$, and $\alpha \in \reals$,
+If $\xi \in \reals$, $\omega \in \posreals$, and $\alpha \in \reals$,
 then for $y \in \reals$,
 \[
-\distro{SkewNormal}(y|\mu,\sigma,\alpha)
+\distro{SkewNormal}(y \mid \xi, \omega, \alpha)
 =
-\frac{1}{\sigma\sqrt{2\pi}}
+\frac{1}{\omega\sqrt{2\pi}}
 \
 \exp\left( - \, \frac{1}{2}
-           \left(  \frac{y - \mu}{\sigma} \right)^2
+           \left(  \frac{y - \xi}{\omega} \right)^2
     \right)
 \
-\left(1 + \erf\left( \alpha\left(\frac{y - \mu}{\sigma\sqrt{2}}\right)\right)\right)
+\left(1 + \erf\left( \alpha\left(\frac{y - \xi}{\omega\sqrt{2}}\right)\right)\right)
 .
 \]
 
-\pitem{y}{skew\_normal}{mu, sigma, alpha}
+\pitem{y}{skew\_normal}{xi, omega, alpha}
 
 \subsubsection{Stan Functions}
 
 \begin{description}
-  \fitem{real}{skew\_normal\_lpdf}{reals \farg{y} \textbar\ reals \farg{mu}, reals
-    \farg{sigma}, reals \farg{alpha}}{The log of the skew normal density
-	of \farg{y} given location \farg{mu}, scale \farg{sigma}, and
+  \fitem{real}{skew\_normal\_lpdf}{reals \farg{y} \textbar\ reals \farg{xi}, reals
+    \farg{omega}, reals \farg{alpha}}{The log of the skew normal density
+	of \farg{y} given location \farg{xi}, scale \farg{omega}, and
 	shape \farg{alpha}}
 %
-\fitem{real}{skew\_normal\_cdf}{reals \farg{y}, reals \farg{mu}, reals
-  \farg{sigma}, reals \farg{alpha}}{The skew normal
-  distribution function of \farg{y} given location \farg{mu}, scale
-  \farg{sigma}, and shape \farg{alpha}}
+\fitem{real}{skew\_normal\_cdf}{reals \farg{y}, reals \farg{xi}, reals
+  \farg{omega}, reals \farg{alpha}}{The skew normal
+  distribution function of \farg{y} given location \farg{xi}, scale
+  \farg{omega}, and shape \farg{alpha}}
 %
-\fitemtwolines{real}{skew\_normal\_lcdf}{reals \farg{y} \textbar\ reals \farg{mu}, reals
-  \farg{sigma}}{reals \farg{alpha}}{The log of the skew normal cumulative
-  distribution function of \farg{y} given location \farg{mu}, scale
-  \farg{sigma}, and shape \farg{alpha}}
+\fitemtwolines{real}{skew\_normal\_lcdf}{reals \farg{y} \textbar\ reals \farg{xi}, reals
+  \farg{omega}}{reals \farg{alpha}}{The log of the skew normal cumulative
+  distribution function of \farg{y} given location \farg{xi}, scale
+  \farg{omega}, and shape \farg{alpha}}
 %
-\fitemtwolines{real}{skew\_normal\_lccdf}{reals \farg{y} \textbar\ reals \farg{mu}, reals
-  \farg{sigma}}{reals \farg{alpha}}{The log of the skew normal complementary
-   cumulative distribution function of \farg{y} given location \farg{mu}, scale
-  \farg{sigma}, and shape \farg{alpha}}
+\fitemtwolines{real}{skew\_normal\_lccdf}{reals \farg{y} \textbar\ reals \farg{xi}, reals
+  \farg{omega}}{reals \farg{alpha}}{The log of the skew normal complementary
+   cumulative distribution function of \farg{y} given location \farg{xi}, scale
+  \farg{omega}, and shape \farg{alpha}}
 \end{description}
 %
 \begin{description}
-\fitem{real}{skew\_normal\_rng}{real \farg{mu}, real \farg{sigma},
+\fitem{real}{skew\_normal\_rng}{real \farg{xi}, real \farg{omega},
   real \farg{alpha}}{Generate a skew normal variate with location
-  \farg{mu}, scale \farg{sigma}, and shape \farg{alpha}; may only be used in
+  \farg{xi}, scale \farg{omega}, and shape \farg{alpha}; may only be used in
   generated quantities block}
 \end{description}
 
@@ -1297,7 +1297,7 @@ terms of the scale, in contrast to the exponential distribution (see
 terms of inverse scale.
 
 The double-exponential distribution can be defined as a compound
-exponential-normal distribution.  Specifically, if 
+exponential-normal distribution.  Specifically, if
 \[
 \alpha \sim \mathsf{Exponential}\left( \frac{1}{\lambda} \right)
 \]
@@ -1480,7 +1480,7 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
   given location \farg{mu} and scale \farg{sigma}}
 %
 \fitem{real}{lognormal\_lcdf}{reals \farg{y} \textbar\ reals \farg{mu}, reals
-  \farg{sigma}}{The log of the lognormal cumulative distribution fucntion
+  \farg{sigma}}{The log of the lognormal cumulative distribution function
    of \farg{y} given location \farg{mu} and scale \farg{sigma}}
 %
 \fitem{real}{lognormal\_lccdf}{reals \farg{y} \textbar\ reals \farg{mu}, reals
@@ -1911,7 +1911,7 @@ non-negative real numbers.
 \subsubsection{Stan Functions}
 \begin{description}
 \fitem{real}{rayleigh\_lpdf}{reals \farg{y} \textbar\ reals \farg{sigma}}{The log of the Rayleigh
- ensity of \farg{y} given scale \farg{sigma}}
+ density of \farg{y} given scale \farg{sigma}}
 %
 \fitem{real}{rayleigh\_cdf}{real \farg{y}, real
 \farg{sigma}}{The Rayleigh cumulative distribution of \farg{y} given scale \farg{sigma}}
@@ -2490,7 +2490,7 @@ of positive inverse scales, then for $y \in \reals^{K \times N}$,
 where $y_i$ is the $i$th row of $y$.  This is used to efficiently handle
 Gaussian Processes with multi-variate outputs where only the output dimensions
 share a kernel function but vary based on their scale.  If the model allows
-parametrization in terms of Cholesky factor of the kernel matrix, this distribution
+parameterization in terms of Cholesky factor of the kernel matrix, this distribution
 is also more efficient than $\distro{MultiGP}()$. Note that this
 function does not take into account the mean prediction.
 

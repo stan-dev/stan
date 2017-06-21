@@ -1,6 +1,7 @@
 #ifndef STAN_LANG_GENERATOR_GENERATE_CONSTRUCTOR_HPP
 #define STAN_LANG_GENERATOR_GENERATE_CONSTRUCTOR_HPP
 
+#include <stan/io/program_reader.hpp>
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_comment.hpp>
@@ -12,6 +13,7 @@
 #include <stan/lang/generator/generate_void_statement.hpp>
 #include <ostream>
 #include <string>
+#include <vector>
 
 namespace stan {
   namespace lang {

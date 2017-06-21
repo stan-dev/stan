@@ -32,6 +32,8 @@
 #include <stan/lang/ast/fun/is_nil_def.hpp>
 #include <stan/lang/ast/fun/is_nil_vis_def.hpp>
 #include <stan/lang/ast/fun/is_no_op_statement_vis_def.hpp>
+#include <stan/lang/ast/fun/is_nonempty_def.hpp>
+#include <stan/lang/ast/fun/is_space_def.hpp>
 #include <stan/lang/ast/fun/is_user_defined_def.hpp>
 #include <stan/lang/ast/fun/is_user_defined_prob_function_def.hpp>
 #include <stan/lang/ast/fun/name_vis_def.hpp>
