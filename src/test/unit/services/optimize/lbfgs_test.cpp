@@ -2,12 +2,13 @@
 #include <gtest/gtest.h>
 #include <stan/io/empty_var_context.hpp>
 #include <test/test-models/good/optimization/rosenbrock.hpp>
+#include <test/unit/services/instrumented_callbacks.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 
 struct mock_callback : public stan::callbacks::interrupt {
   int n;
   mock_callback() : n(0) { }
-  
+
   void operator()() {
     n++;
   }
@@ -23,7 +24,7 @@ public:
   values(std::ostream& stream)
     : stan::callbacks::stream_writer(stream) {
   }
-  
+
   /**
    * Writes a set of names.
    *
@@ -48,13 +49,13 @@ public:
 class ServicesOptimizeLbfgs : public testing::Test {
 public:
   ServicesOptimizeLbfgs()
-    : message(message_ss),
-      init(init_ss),
+    : init(init_ss),
       parameter(parameter_ss),
       model(context, &model_ss) {}
 
-  std::stringstream message_ss, init_ss, parameter_ss, model_ss;
-  stan::callbacks::stream_writer message, init;
+  std::stringstream init_ss, parameter_ss, model_ss;
+  stan::callbacks::stream_writer init;
+  stan::test::unit::instrumented_logger logger;
   values parameter;
   stan::io::empty_var_context context;
   stan_model model;
@@ -69,7 +70,7 @@ TEST_F(ServicesOptimizeLbfgs, rosenbrock) {
   bool save_iterations = true;
   int refresh = 0;
   mock_callback callback;
-  
+
   int return_code = stan::services::optimize::lbfgs(model, context,
                                                     seed, chain, init_radius,
                                                     5,
@@ -82,14 +83,17 @@ TEST_F(ServicesOptimizeLbfgs, rosenbrock) {
                                                     2000,
                                                     save_iterations, refresh,
                                                     callback,
-                                                    message,
+                                                    logger,
                                                     init,
                                                     parameter);
 
-  EXPECT_EQ("Initial log joint probability = -1\nOptimization terminated normally: \n  Convergence detected: relative gradient magnitude is below tolerance\n", message_ss.str());
+  EXPECT_EQ(logger.call_count(), logger.call_count_info()) << "all output to info";
+  EXPECT_EQ(1, logger.find("Initial log joint probability = -1"));
+  EXPECT_EQ(1, logger.find("Optimization terminated normally: "));
+  EXPECT_EQ(1, logger.find("  Convergence detected: relative gradient magnitude is below tolerance"));
 
   EXPECT_EQ("0,0\n", init_ss.str());
-  
+
   ASSERT_EQ(3, parameter.names_.size());
   EXPECT_EQ("lp__", parameter.names_[0]);
   EXPECT_EQ("x", parameter.names_[1]);

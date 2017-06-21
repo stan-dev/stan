@@ -6,16 +6,17 @@
 #include <string>
 #include <iostream>
 #include <boost/random/additive_combine.hpp> // L'Ecuyer RNG
+#include <stan/callbacks/stream_logger.hpp>
 
 typedef boost::ecuyer1988 rng_t;
 
 class advi_test : public ::testing::Test {
 public:
   advi_test()
-    : message_writer(message_stream_),
+    : logger(message_stream_, message_stream_, message_stream_, message_stream_, message_stream_),
       parameter_writer(parameter_stream_),
       diagnostic_writer(diagnostic_stream_) { }
-  
+
   void SetUp() {
     // Create mock data_var_context
     std::fstream data_stream("src/test/test-models/good/variational/hier_logistic.data.R",
@@ -57,10 +58,10 @@ public:
   std::stringstream message_stream_;
   std::stringstream parameter_stream_;
   std::stringstream diagnostic_stream_;
-  stan::callbacks::stream_writer message_writer;
+  stan::callbacks::stream_logger logger;
   stan::callbacks::stream_writer parameter_writer;
   stan::callbacks::stream_writer diagnostic_writer;
-  
+
 private:
   stan_model *model_;
   stan_model *model_null_stream_;
@@ -70,7 +71,7 @@ private:
 
 TEST_F(advi_test, hier_logistic_constraint_meanfield) {
   EXPECT_EQ(0, advi_->run(0.1, false, 50, 1, 2e4,
-                          message_writer, parameter_writer, diagnostic_writer));
+                          logger, parameter_writer, diagnostic_writer));
   SUCCEED() << "expecting it to compile and run without problems";
   EXPECT_NE("", parameter_stream_.str());
   SUCCEED() << "expecting it to output values";

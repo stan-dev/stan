@@ -10,7 +10,8 @@ public:
     : model(context, &model_log) {}
 
   std::stringstream model_log;
-  stan::test::unit::instrumented_writer message, init, parameter, diagnostic;
+  stan::test::unit::instrumented_writer init, parameter, diagnostic;
+  stan::test::unit::instrumented_logger logger;
   stan::io::empty_var_context context;
   stan::test::unit::instrumented_interrupt interrupt;
   stan_model model;
@@ -29,7 +30,7 @@ TEST_F(ServicesExperimentalAdvi, experimental_message) {
   int adapt_iterations = 50;
   int eval_elbo = 100;
   int output_samples = 1000;
-  
+
   stan::services::experimental::advi
     ::fullrank(model, context,
                seed, chain, init_radius,
@@ -39,15 +40,14 @@ TEST_F(ServicesExperimentalAdvi, experimental_message) {
                adapt_iterations,
                eval_elbo, output_samples,
                interrupt,
-               message, init, parameter, diagnostic);
+               logger, init, parameter, diagnostic);
 
-  bool found_experimental_message = false;
-  for (size_t n = 0; n < message.string_values().size(); ++n) {
-    if (!found_experimental_message
-        && message.string_values().at(n).find("EXPERIMENTAL ALGORITHM") != std::string::npos)
-      found_experimental_message = true;
-  }
-  EXPECT_TRUE(found_experimental_message) << "Missing experimental algorithm message";
+  EXPECT_GT(logger.call_count(), 0);
+  EXPECT_EQ(logger.call_count(), logger.call_count_info())
+    << "all messages go to info";
+
+  EXPECT_EQ(1, logger.find_info("EXPERIMENTAL ALGORITHM"))
+    << "Missing experimental algorithm message";
 }
 
 TEST_F(ServicesExperimentalAdvi, fullrank) {
@@ -63,7 +63,7 @@ TEST_F(ServicesExperimentalAdvi, fullrank) {
   int adapt_iterations = 50;
   int eval_elbo = 100;
   int output_samples = 1000;
-  
+
   int return_code = stan::services::experimental::advi
     ::fullrank(model, context,
                seed, chain, init_radius,
@@ -73,7 +73,7 @@ TEST_F(ServicesExperimentalAdvi, fullrank) {
                adapt_iterations,
                eval_elbo, output_samples,
                interrupt,
-               message, init, parameter, diagnostic);
+               logger, init, parameter, diagnostic);
   EXPECT_EQ(0, return_code);
 
   ASSERT_EQ(1, init.vector_double_values().size());

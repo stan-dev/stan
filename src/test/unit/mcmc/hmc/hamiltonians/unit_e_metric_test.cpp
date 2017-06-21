@@ -3,7 +3,7 @@
 #include <stan/io/dump.hpp>
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/unit_e_metric.hpp>
-#include <stan/callbacks/stream_writer.hpp>
+#include <stan/callbacks/stream_logger.hpp>
 #include <test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp>
 #include <test/unit/util.hpp>
 #include <gtest/gtest.h>
@@ -57,11 +57,9 @@ TEST(McmcUnitEMetric, gradients) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
 
-  std::stringstream model_output, metric_output;
-  stan::callbacks::stream_writer writer(metric_output);
-
-  std::stringstream error_stream;
-  stan::callbacks::stream_writer error_writer(error_stream);
+  std::stringstream model_output;
+  std::stringstream debug, info, warn, error, fatal;
+  stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
   funnel_model_namespace::funnel_model model(data_var_context, &model_output);
 
@@ -69,18 +67,18 @@ TEST(McmcUnitEMetric, gradients) {
 
   double epsilon = 1e-6;
 
-  metric.update_potential_gradient(z, writer, error_writer);
-  Eigen::VectorXd g1 = metric.dtau_dq(z, writer, error_writer);
+  metric.update_potential_gradient(z, logger);
+  Eigen::VectorXd g1 = metric.dtau_dq(z, logger);
 
   for (int i = 0; i < z.q.size(); ++i) {
     double delta = 0;
 
     z.q(i) += epsilon;
-    metric.update_potential(z, writer, error_writer);
+    metric.update_potential(z, logger);
     delta += metric.tau(z);
 
     z.q(i) -= 2 * epsilon;
-    metric.update_potential(z, writer, error_writer);
+    metric.update_potential(z, logger);
     delta -= metric.tau(z);
 
     z.q(i) += epsilon;
@@ -90,7 +88,7 @@ TEST(McmcUnitEMetric, gradients) {
     EXPECT_NEAR(delta, g1(i), epsilon);
   }
 
-  metric.update_potential_gradient(z, writer, error_writer);
+  metric.update_potential_gradient(z, logger);
   Eigen::VectorXd g2 = metric.dtau_dp(z);
 
   for (int i = 0; i < z.q.size(); ++i) {
@@ -109,17 +107,17 @@ TEST(McmcUnitEMetric, gradients) {
     EXPECT_NEAR(delta, g2(i), epsilon);
   }
 
-  Eigen::VectorXd g3 = metric.dphi_dq(z, writer, error_writer);
+  Eigen::VectorXd g3 = metric.dphi_dq(z, logger);
 
   for (int i = 0; i < z.q.size(); ++i) {
     double delta = 0;
 
     z.q(i) += epsilon;
-    metric.update_potential(z, writer, error_writer);
+    metric.update_potential(z, logger);
     delta += metric.phi(z);
 
     z.q(i) -= 2 * epsilon;
-    metric.update_potential(z, writer, error_writer);
+    metric.update_potential(z, logger);
     delta -= metric.phi(z);
 
     z.q(i) += epsilon;
@@ -130,8 +128,11 @@ TEST(McmcUnitEMetric, gradients) {
   }
 
   EXPECT_EQ("", model_output.str());
-  EXPECT_EQ("", metric_output.str());
-  EXPECT_EQ("", error_stream.str());
+  EXPECT_EQ("", debug.str());
+  EXPECT_EQ("", info.str());
+  EXPECT_EQ("", warn.str());
+  EXPECT_EQ("", error.str());
+  EXPECT_EQ("", fatal.str());
 }
 
 TEST(McmcUnitEMetric, streams) {

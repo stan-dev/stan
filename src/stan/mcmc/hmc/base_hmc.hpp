@@ -1,6 +1,7 @@
 #ifndef STAN_MCMC_HMC_BASE_HMC_HPP
 #define STAN_MCMC_HMC_BASE_HMC_HPP
 
+#include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
@@ -33,12 +34,31 @@ namespace stan {
           epsilon_(nom_epsilon_),
           epsilon_jitter_(0.0) {}
 
+      /** 
+       * format and write stepsize
+       */
       void
-      write_sampler_state(callbacks::writer& writer) {
+      write_sampler_stepsize(callbacks::writer& writer) {
         std::stringstream nominal_stepsize;
         nominal_stepsize << "Step size = " << get_nominal_stepsize();
         writer(nominal_stepsize.str());
+      }
+
+      /** 
+       * write elements of mass matrix
+       */
+      void
+      write_sampler_metric(callbacks::writer& writer) {
         z_.write_metric(writer);
+      }
+
+      /** 
+       * write stepsize and elements of mass matrix
+       */
+      void
+      write_sampler_state(callbacks::writer& writer) {
+        write_sampler_stepsize(writer);
+        write_sampler_metric(writer);
       }
 
       void get_sampler_diagnostic_names(std::vector<std::string>& model_names,
@@ -55,14 +75,12 @@ namespace stan {
       }
 
       void
-      init_hamiltonian(callbacks::writer& info_writer,
-                       callbacks::writer& error_writer) {
-        this->hamiltonian_.init(this->z_, info_writer, error_writer);
+      init_hamiltonian(callbacks::logger& logger) {
+        this->hamiltonian_.init(this->z_, logger);
       }
 
       void
-      init_stepsize(callbacks::writer& info_writer,
-                    callbacks::writer& error_writer) {
+      init_stepsize(callbacks::logger& logger) {
         ps_point z_init(this->z_);
 
         // Skip initialization for extreme step sizes
@@ -70,14 +88,14 @@ namespace stan {
           return;
 
         this->hamiltonian_.sample_p(this->z_, this->rand_int_);
-        this->hamiltonian_.init(this->z_, info_writer, error_writer);
+        this->hamiltonian_.init(this->z_, logger);
 
         // Guaranteed to be finite if randomly initialized
         double H0 = this->hamiltonian_.H(this->z_);
 
         this->integrator_.evolve(this->z_, this->hamiltonian_,
                                  this->nom_epsilon_,
-                                 info_writer, error_writer);
+                                 logger);
 
         double h = this->hamiltonian_.H(this->z_);
         if (boost::math::isnan(h))
@@ -91,13 +109,13 @@ namespace stan {
           this->z_.ps_point::operator=(z_init);
 
           this->hamiltonian_.sample_p(this->z_, this->rand_int_);
-          this->hamiltonian_.init(this->z_, info_writer, error_writer);
+          this->hamiltonian_.init(this->z_, logger);
 
           double H0 = this->hamiltonian_.H(this->z_);
 
           this->integrator_.evolve(this->z_, this->hamiltonian_,
                                    this->nom_epsilon_,
-                                   info_writer, error_writer);
+                                   logger);
 
           double h = this->hamiltonian_.H(this->z_);
           if (boost::math::isnan(h))
