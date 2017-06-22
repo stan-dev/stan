@@ -136,21 +136,25 @@ TEST(langParserStatementGrammar, removeLpDoubleUnderscore) {
 TEST(langParserStatementGrammar, plusEqualsGood) {
   test_parsable("compound-assign/plus_equals_prim");
   test_parsable("compound-assign/plus_equals_container");
+  test_parsable("compound-assign/plus_equals_manual");
 }
 
 TEST(langParserStatementGrammar, minusEqualsGood) {
   test_parsable("compound-assign/minus_equals_prim");
   test_parsable("compound-assign/minus_equals_container");
+  test_parsable("compound-assign/minus_equals_manual");
 }
 
 TEST(langParserStatementGrammar, multiplyEqualsGood) {
   test_parsable("compound-assign/multiply_equals_prim");
   test_parsable("compound-assign/multiply_equals_container");
+  test_parsable("compound-assign/multiply_equals_manual");
 }
 
 TEST(langParserStatementGrammar, divideEqualsGood) {
   test_parsable("compound-assign/divide_equals_prim");
   test_parsable("compound-assign/divide_equals_container");
+  test_parsable("compound-assign/divide_equals_manual");
 }
 
 TEST(langParserStatementGrammar, eltOpEqualsGood) {
@@ -180,6 +184,8 @@ TEST(langParserStatementGrammar, plusEqualsBad) {
               "Cannot apply operator '+='");
   test_throws("compound-assign/plus_equals_row_vec_array",
               "Cannot apply operator '+='");
+  test_throws("compound-assign/plus_equals_bad_init",
+              "PARSER EXPECTED: \";\"");
 }
 
 TEST(langParserStatementGrammar, timesEqualsBad) {
