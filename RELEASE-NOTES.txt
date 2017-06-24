@@ -5,6 +5,39 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v2.16.0 (15 June 2017)
+======================================================================
+
+New Team Members
+--------------------------------------------------
+* Breck Baldwin (Columbia University) -- Project Coordinator
+
+Bug Fixes
+--------------------------------------------------
+* Fix typo in cumulative_sum definition (#2288)
+* Check input/output streams and give better errors when files are not found (#2227)
+* Flush print outputs even in the face of a reject (#2311)
+
+
+New User-Facing Features
+--------------------------------------------------
+* New categorical_logit_rng function (#517)
+* New include mechanism for including stan code from other files (#2224)
+* New mechanism for compiling standalone Stan functions (#2267)
+
+
+New Internal Features
+--------------------------------------------------
+* New logging framework (#512)
+* Resolve hessian() to call O(N) reverse-mode version (#2321)
+* Change model to take in int seed for RNG instead of full RNG object (#2241)
+
+Documentation
+--------------------------------------------------
+* Updates to the Gaussian Processes chapter in the manual (#2240)
+* User manual updates for this release (#2265)
+
+
 v2.15.0 (14 April 2017)
 ======================================================================
 

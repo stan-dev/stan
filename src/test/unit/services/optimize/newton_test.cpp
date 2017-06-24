@@ -2,7 +2,9 @@
 #include <gtest/gtest.h>
 #include <stan/io/empty_var_context.hpp>
 #include <test/test-models/good/optimization/rosenbrock.hpp>
+#include <test/unit/services/instrumented_callbacks.hpp>
 #include <stan/callbacks/stream_writer.hpp>
+
 
 struct mock_callback : public stan::callbacks::interrupt {
   int n;
@@ -48,13 +50,13 @@ public:
 class ServicesOptimizeNewton : public testing::Test {
 public:
   ServicesOptimizeNewton()
-    : message(message_ss),
-      init(init_ss),
+    : init(init_ss),
       parameter(parameter_ss),
       model(context, &model_ss) {}
 
-  std::stringstream message_ss, init_ss, parameter_ss, model_ss;
-  stan::callbacks::stream_writer message, init;
+  std::stringstream init_ss, parameter_ss, model_ss;
+  stan::test::unit::instrumented_logger logger;
+  stan::callbacks::stream_writer init;
   values parameter;
   stan::io::empty_var_context context;
   stan_model model;
@@ -74,13 +76,14 @@ TEST_F(ServicesOptimizeNewton, rosenbrock) {
                                                      seed, chain, init_radius,
                                                      num_interations, save_iterations,
                                                      callback,
-                                                     message,
+                                                     logger,
                                                      init,
                                                      parameter);
 
   EXPECT_EQ(0, return_code);
-  EXPECT_TRUE(message_ss.str().find("Initial log joint probability = -1") != std::string::npos);
-  EXPECT_TRUE(message_ss.str().find("Iteration  1. Log joint probability =") != std::string::npos);
+  EXPECT_EQ(logger.call_count(), logger.call_count_info()) << "all output to info";
+  EXPECT_EQ(1, logger.find("Initial log joint probability = -1"));
+  EXPECT_EQ(1, logger.find("Iteration  1. Log joint probability ="));
 
   ASSERT_EQ(3, parameter.names_.size());
   EXPECT_EQ("lp__", parameter.names_[0]);
@@ -113,13 +116,14 @@ TEST_F(ServicesOptimizeNewton, rosenbrock_no_save_iterations) {
                                                      seed, chain, init_radius,
                                                      num_interations, save_iterations,
                                                      callback,
-                                                     message,
+                                                     logger,
                                                      init,
                                                      parameter);
 
   EXPECT_EQ(0, return_code);
-  EXPECT_TRUE(message_ss.str().find("Initial log joint probability = -1") != std::string::npos);
-  EXPECT_TRUE(message_ss.str().find("Iteration  1. Log joint probability =") != std::string::npos);
+  EXPECT_EQ(logger.call_count(), logger.call_count_info()) << "all output to info";
+  EXPECT_EQ(1, logger.find("Initial log joint probability = -1"));
+  EXPECT_EQ(1, logger.find("Iteration  1. Log joint probability ="));
 
   EXPECT_EQ("0,0\n", init_ss.str());
 

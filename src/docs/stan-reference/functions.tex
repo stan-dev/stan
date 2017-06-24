@@ -376,7 +376,7 @@ probability accumulator starts at zero and is then incremented in
 various ways by a Stan program.  The variables are first transformed
 from unconstrained to constrained, and the log Jacobian determinant
 added to the log probability accumulator.  Then the model block is
-executed on the constrained parmeters, with each sampling statement
+executed on the constrained parameters, with each sampling statement
 (\Verb|~|) and log probability increment statement
 (\code{increment\_log\_prob}) adding to the accumulator.  At the end
 of the model block execution, the value of the log probability
@@ -2474,7 +2474,7 @@ matrix with diagonal \farg{x}}
 \end{description}
 
 Although the \code{diag\_matrix} function is available, it is unlikely
-to ever show up in an efficient Stan program.  For exmaple, rather
+to ever show up in an efficient Stan program.  For example, rather
 than converting a diagonal to a full matrix for use as a covariance
 matrix,
 %
@@ -2493,7 +2493,7 @@ y ~ normal(mu, sigma);
 Rather than writing \code{m~*~diag\_matrix(v)} where \code{m} is a
 matrix and \code{v} is a vector, it is much more efficient to write
 \code{diag\_post\_multiply(m,~v)} (and similarly for pre-multiplication).
-By the same topken, it is better to use \code{quad\_form\_diag(m,~v)}
+By the same token, it is better to use \code{quad\_form\_diag(m,~v)}
 rather than \code{quad\_form(m,~diag\_matrix(v))}.
 
 
@@ -2741,7 +2741,7 @@ The cumulative sum of a sequence $x_1,\ldots,x_N$ is the
 sequence $y_1,\ldots,y_N$, where
 %
 \[
-y_n = \sum_{m = 1}^{n} x_n.
+y_n = \sum_{m = 1}^{n} x_m.
 \]
 
 \begin{description}
@@ -2767,13 +2767,13 @@ Euclidian distance between $x_i \in \reals^D$ and $x_j \in \reals^D$:
 
 \[
   \text{cov}(f(x_i), f(x_j)) = k(x_i, x_j)
-= \sigma^2
+= \alpha^2
 \exp \left(
-	- \dfrac{1}{2l^2} \sum_{d=1}^D (x_{i,d} - x_{j,d})^2
+	- \dfrac{1}{2\rho^2} \sum_{d=1}^D (x_{i,d} - x_{j,d})^2
 \right)
 \]
 
-\noindent with $\sigma$ and $l$ constrained to be positive.
+\noindent with $\alpha$ and $\rho$ constrained to be positive.
 
 There are two variants of the exponentiated quadratic covariance function in
 Stan. One builds a covariance matrix, $K \in \reals^{N \times N}$ for $x_1,
@@ -2786,28 +2786,28 @@ $K_{i,j} = k(x_i, x^\prime_j)$.
 
 \begin{description}
 %
-\fitem{matrix}{cov\_exp\_quad}{row\_vectors \farg{x}, real \farg{sigma}, real
-\farg{l}}{ The covariance matrix with an exponentiated quadratic kernel of
+\fitem{matrix}{cov\_exp\_quad}{row\_vectors \farg{x}, real \farg{alpha}, real
+\farg{rho}}{ The covariance matrix with an exponentiated quadratic kernel of
 \farg{x}.}
 
-\fitem{matrix}{cov\_exp\_quad}{vectors \farg{x}, real \farg{sigma}, real
-\farg{l}}{ The covariance matrix with an exponentiated quadratic kernel of
+\fitem{matrix}{cov\_exp\_quad}{vectors \farg{x}, real \farg{alpha}, real
+\farg{rho}}{ The covariance matrix with an exponentiated quadratic kernel of
 \farg{x}.}
 
-\fitem{matrix}{cov\_exp\_quad}{real[] \farg{x}, real \farg{sigma}, real
-\farg{l}}{ The covariance matrix with an exponentiated quadratic kernel of
+\fitem{matrix}{cov\_exp\_quad}{real[] \farg{x}, real \farg{alpha}, real
+\farg{rho}}{ The covariance matrix with an exponentiated quadratic kernel of
 \farg{x}.}
 
 \fitemtwolines{matrix}{cov\_exp\_quad}{row\_vectors \farg{x1}, row\_vectors
-\farg{x2}}{real \farg{sigma}, real \farg{l}}{ The covariance matrix with an
+\farg{x2}}{real \farg{alpha}, real \farg{rho}}{ The covariance matrix with an
 exponentiated quadratic kernel of \farg{x1} and \farg{x2}.}
 
 \fitemtwolines{matrix}{cov\_exp\_quad}{vectors \farg{x1}, vectors
-\farg{x2}}{real \farg{sigma}, real \farg{l}}{ The covariance matrix with an
+\farg{x2}}{real \farg{alpha}, real \farg{rho}}{ The covariance matrix with an
 exponentiated quadratic kernel of \farg{x1} and \farg{x2}.}
 
 \fitemtwolines{matrix}{cov\_exp\_quad}{real[] \farg{x1}, real[]
-\farg{x2}}{real \farg{sigma}, real \farg{l}}{ The covariance matrix with an
+\farg{x2}}{real \farg{alpha}, real \farg{rho}}{ The covariance matrix with an
 exponentiated quadratic kernel of \farg{x1} and \farg{x2}.}
 
 \end{description}

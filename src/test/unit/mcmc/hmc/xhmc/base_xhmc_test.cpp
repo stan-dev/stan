@@ -1,5 +1,5 @@
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
-#include <stan/callbacks/stream_writer.hpp>
+#include <stan/callbacks/stream_logger.hpp>
 #include <stan/mcmc/hmc/xhmc/base_xhmc.hpp>
 #include <stan/mcmc/hmc/integrators/expl_leapfrog.hpp>
 #include <boost/random/additive_combine.hpp>
@@ -34,17 +34,11 @@ namespace stan {
       double tau(ps_point& z) { return T(z); }
       double phi(ps_point& z) { return this->V(z); }
 
-      double dG_dt(
-        ps_point& z,
-        callbacks::writer& info_writer,
-        callbacks::writer& error_writer) {
+      double dG_dt(ps_point& z,callbacks::logger& logger) {
         return 2;
       }
 
-      Eigen::VectorXd dtau_dq(
-        ps_point& z,
-        callbacks::writer& info_writer,
-        callbacks::writer& error_writer) {
+      Eigen::VectorXd dtau_dq(ps_point& z, callbacks::logger& logger) {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 
@@ -52,25 +46,17 @@ namespace stan {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 
-      Eigen::VectorXd dphi_dq(
-        ps_point& z,
-        callbacks::writer& info_writer,
-        callbacks::writer& error_writer) {
+      Eigen::VectorXd dphi_dq(ps_point& z, callbacks::logger& logger) {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 
-      void init(ps_point& z,
-                callbacks::writer& info_writer,
-                callbacks::writer& error_writer) {
+      void init(ps_point& z, callbacks::logger& logger) {
         z.V = 0;
       }
 
       void sample_p(ps_point& z, BaseRNG& rng) {};
 
-      void update_potential_gradient(
-        ps_point& z,
-        callbacks::writer& info_writer,
-        callbacks::writer& error_writer) {
+      void update_potential_gradient(ps_point& z, callbacks::logger& logger) {
         z.V += 500;
       }
 
@@ -168,17 +154,14 @@ TEST(McmcXHMCBaseXHMC, build_tree) {
   sampler.sample_stepsize();
   sampler.z() = z_init;
 
-  std::stringstream output;
-  stan::callbacks::stream_writer writer(output);
-  std::stringstream error_stream;
-  stan::callbacks::stream_writer error_writer(error_stream);
-
+  std::stringstream debug, info, warn, error, fatal;
+  stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
   bool valid_subtree = sampler.build_tree(3, z_propose,
                                           ave, log_sum_weight,
                                           H0, 1, n_leapfrog,
                                           sum_metro_prob,
-                                          writer, error_writer);
+                                          logger);
 
   EXPECT_TRUE(valid_subtree);
 
@@ -190,8 +173,11 @@ TEST(McmcXHMCBaseXHMC, build_tree) {
   EXPECT_FLOAT_EQ(H0  + std::log(n_leapfrog), log_sum_weight);
   EXPECT_FLOAT_EQ(std::exp(H0) * n_leapfrog, sum_metro_prob);
 
-  EXPECT_EQ("", output.str());
-  EXPECT_EQ("", error_stream.str());
+  EXPECT_EQ("", debug.str());
+  EXPECT_EQ("", info.str());
+  EXPECT_EQ("", warn.str());
+  EXPECT_EQ("", error.str());
+  EXPECT_EQ("", fatal.str());
 }
 
 TEST(McmcXHMCBaseXHMC, divergence_test) {
@@ -222,11 +208,8 @@ TEST(McmcXHMCBaseXHMC, divergence_test) {
   sampler.sample_stepsize();
   sampler.z() = z_init;
 
-  std::stringstream output;
-  stan::callbacks::stream_writer writer(output);
-  std::stringstream error_stream;
-  stan::callbacks::stream_writer error_writer(error_stream);
-
+  std::stringstream debug, info, warn, error, fatal;
+  stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
   bool valid_subtree = 0;
 
@@ -235,7 +218,7 @@ TEST(McmcXHMCBaseXHMC, divergence_test) {
                                      ave, log_sum_weight,
                                      H0, 1, n_leapfrog,
                                      sum_metro_prob,
-                                     writer, error_writer);
+                                     logger);
   EXPECT_TRUE(valid_subtree);
   EXPECT_EQ(0, sampler.divergent_);
 
@@ -244,7 +227,7 @@ TEST(McmcXHMCBaseXHMC, divergence_test) {
                                      ave, log_sum_weight,
                                      H0, 1, n_leapfrog,
                                      sum_metro_prob,
-                                     writer, error_writer);
+                                     logger);
 
   EXPECT_TRUE(valid_subtree);
   EXPECT_EQ(0, sampler.divergent_);
@@ -254,13 +237,16 @@ TEST(McmcXHMCBaseXHMC, divergence_test) {
                                      ave, log_sum_weight,
                                      H0, 1, n_leapfrog,
                                      sum_metro_prob,
-                                     writer, error_writer);
+                                     logger);
 
   EXPECT_FALSE(valid_subtree);
   EXPECT_EQ(1, sampler.divergent_);
 
-  EXPECT_EQ("", output.str());
-  EXPECT_EQ("", error_stream.str());
+  EXPECT_EQ("", debug.str());
+  EXPECT_EQ("", info.str());
+  EXPECT_EQ("", warn.str());
+  EXPECT_EQ("", error.str());
+  EXPECT_EQ("", fatal.str());
 }
 
 TEST(McmcXHMCBaseXHMC, transition) {
@@ -282,18 +268,19 @@ TEST(McmcXHMCBaseXHMC, transition) {
   sampler.sample_stepsize();
   sampler.z() = z_init;
 
-  std::stringstream output_stream;
-  stan::callbacks::stream_writer writer(output_stream);
-  std::stringstream error_stream;
-  stan::callbacks::stream_writer error_writer(error_stream);
+  std::stringstream debug, info, warn, error, fatal;
+  stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
   stan::mcmc::sample init_sample(z_init.q, 0, 0);
 
-  stan::mcmc::sample s = sampler.transition(init_sample, writer, error_writer);
+  stan::mcmc::sample s = sampler.transition(init_sample, logger);
 
   EXPECT_EQ(31.5, s.cont_params()(0));
   EXPECT_EQ(0, s.log_prob());
   EXPECT_EQ(1, s.accept_stat());
-  EXPECT_EQ("", output_stream.str());
-  EXPECT_EQ("", error_stream.str());
+  EXPECT_EQ("", debug.str());
+  EXPECT_EQ("", info.str());
+  EXPECT_EQ("", warn.str());
+  EXPECT_EQ("", error.str());
+  EXPECT_EQ("", fatal.str());
 }

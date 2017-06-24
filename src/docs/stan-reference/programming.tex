@@ -76,7 +76,7 @@ model {
 
 It is often more natural to specify hyperpriors in terms of
 transformed parameters.  In the case of the Beta, the obvious choice
-for reparameterization is in terms of a mean parameter 
+for reparameterization is in terms of a mean parameter
 \[
 \phi = \alpha / (\alpha + \beta)
 \]
@@ -109,7 +109,7 @@ model {
 \end{stancode}
 %
 The new parameters, \code{phi} and \code{lambda}, are declared in the
-parameters block and the parameters for the Beta distribution, 
+parameters block and the parameters for the Beta distribution,
 \code{alpha} and \code{beta}, are declared and defined in the
 transformed parameters block.  And If their values are not of interest,
 they could instead be defined as local variables in the model as
@@ -139,7 +139,7 @@ model {
 %
 If the variables \code{alpha} and \code{beta} are of interest, they
 can be defined in the transformed parameter block and then used in the
-model.  
+model.
 
 
 \subsubsection{Jacobians not Necessary}
@@ -147,7 +147,7 @@ model.
 Because the transformed parameters are being used, rather than given a
 distribution, there is no need to apply a Jacobian adjustment for the
 transform.  For example, in the beta distribution example,
-\code{alpha} and \code{beta} have the correct posterior distribution.  
+\code{alpha} and \code{beta} have the correct posterior distribution.
 
 \subsubsection{Dirichlet Priors}
 
@@ -170,7 +170,7 @@ model {
 %
 This provides essentially $K$ degrees of freedom, one for each
 dimension of \code{alpha}, and it is not obvious how to specify a
-reasonable prior for \code{alpha}.  
+reasonable prior for \code{alpha}.
 
 An alternative coding is to use the mean, which is a simplex, and a
 total count.
@@ -203,7 +203,7 @@ $\mbox{logit}(u)$ is distributed as $\distro{Logistic}(0, 1)$.  This
 is because inverse logit is the cumulative distribution function (cdf)
 for the logistic distribution, so that the logit function itself is
 the inverse cdf and thus maps a uniform draw in $(0, 1)$ to a
-logistically-distributed quantity.  
+logistically-distributed quantity.
 
 Things work the same way for the probit case: if $u$ has a
 $\distro{Uniform}(0, 1)$ distribution, then $\Phi^{-1}(u)$ has a
@@ -305,7 +305,7 @@ vectorized normal distribution as follows.
   theta_raw ~ normal(mu, sigma);
 \end{stancode}
 %
-where either or both of \code{mu} and \code{sigma} can be vectors.  
+where either or both of \code{mu} and \code{sigma} can be vectors.
 
 \section{Changes of Variables}
 
@@ -313,7 +313,7 @@ Changes of variables are applied when the transformation of a
 parameter is characterized by a distribution.  The standard textbook
 example is the lognormal distribution, which is the distribution of a
 variable $y > 0$ whose logarithm $\log y$ has a normal distribution.
-Note that the distribution is being assigned to $\log y$. 
+Note that the distribution is being assigned to $\log y$.
 
 The change of variables requires an adjustment to the probability to
 account for the distortion caused by the transform.  For this to work,
@@ -328,7 +328,7 @@ univariate changes of variables).
 In the case of log normals, if $y$'s logarithm is normal with mean
 $\mu$ and deviation $\sigma$, then the distribution of $y$ is given by
 \[
-p(y) 
+p(y)
 \ = \
 \distro{Normal}(\log y| \mu, \sigma) \  \left| \frac{d}{dy} \log y \right|
 \ = \
@@ -336,7 +336,7 @@ p(y)
 \]
 Stan works on the log scale to prevent underflow, where
 \[
-\log p(y) 
+\log p(y)
 =
 \log \distro{Normal}(\log y| \mu, \sigma)
 - \log y.
@@ -363,7 +363,7 @@ model {
 \end{stancode}
 %
 It is important, as always, to declare appropriate constraints on
-parameters;  here \code{y} is constrained to be positive. 
+parameters;  here \code{y} is constrained to be positive.
 
 It would be slightly more efficient to define a local variable for the
 logarithm, as follows.
@@ -388,7 +388,7 @@ This section illustrates the difference between a change of variables
 and a simple variable transformation.  A transformation samples a
 parameter, then transforms it, whereas a change of variables
 transforms a parameter, then samples it.  Only the latter requires a
-Jacobian adjustment.  
+Jacobian adjustment.
 
 Note that it does not matter whether the probability function is
 expressed using a sampling statement, such as
@@ -408,7 +408,7 @@ target += normal_lpmf(log(y) | mu, sigma);
 Like the log normal, the inverse gamma distribution is a distribution
 of variables whose inverse has a gamma distribution.  This section
 contrasts two approaches, first with a transform, then with a change
-of variables. 
+of variables.
 
 The transform based approach to sampling \code{y\_inv} with an inverse
 gamma distribution can be coded as follows.
@@ -418,7 +418,7 @@ parameters {
   real<lower=0> y;
 }
 transformed parameters {
-  real<lower=0> y_inv;   
+  real<lower=0> y_inv;
   y_inv = 1 / y;
 }
 model {
@@ -435,11 +435,11 @@ parameters {
 }
 transformed parameters {
   real<lower=0> y;
-  y = 1 / y_inv;                         // change
-  target +=  -2 * log(y_inv) );  // adjustme;
+  y = 1 / y_inv;  // change variables
 }
 model {
   y ~ gamma(2,4);
+  target +=  -2 * log(y_inv);  //  Jacobian adjustment;
 }
 \end{stancode}
 %
@@ -499,7 +499,7 @@ be simplified and made more efficient by recoding as follows.
 transformed parameters {
   ...
   vector[K] J_diag;  // diagonals of Jacobian matrix
-  ... 
+  ...
   ... compute J[k, k] = d.v[k] / d.u[k] ...
   target += sum(log(J_diag));
   ...
@@ -514,10 +514,35 @@ of parameters and a vector of lower bounds?  Then the transforms and
 Jacobians (all of which are described in
 \refchapter{variable-transforms}) have to be calculated in Stan.
 
+\subsection{Varying Lower Bounds}
+
 For example, suppose there is a vector parameter $\alpha$ with a
-vector $L$ of lower bounds.  The following program declares raw
-unconstrained parameters, then explicitly transforms the raw
-parameters to $\alpha$, accounting for the Jacobian along the way.
+vector $L$ of lower bounds.  The simplest way to deal with this if $L$
+is a constant is to shift a lower-bounded parameter.
+%
+\begin{stancode}
+data {
+  int N;
+  vector[N] L;  // lower bounds
+  ...
+parameters {
+  vector<lower=0>[N] alpha_raw;
+  ...
+transformed parameters {
+  vector[N] alpha = L + alpha_raw;
+  ...
+\end{stancode}
+%
+The Jacobian for adding a constant is one, so its log drops out of the
+log density.
+
+Even if the lower bound is a parameter rather than data, there is no
+Jacobian required, because the transform from $(L, \alpha_{\mathrm
+  raw})$ to $(L + \alpha_{\mathrm raw}, \alpha_{\mathrm raw}$ produces
+a Jacobian derivative matrix with a unit determinant.
+
+It's also possible implement the transform by directly transforming
+an unconstrained parameter and accounting for the Jacobian.
 %
 \begin{stancode}
 data {
@@ -546,6 +571,33 @@ $\alpha_{\mathrm{raw}}$; if the bounds do depend on
 $\alpha_{\mathrm{raw}}$ then a revised Jacobian needs to be calculated
 taking into account the dependencies.
 
+\subsection{Varying Upper and Lower Bounds}
+
+Suppose there are lower and upper bounds that vary by parameter.
+These can be applied to shift and rescale a parameter constrained to
+$(0, 1)$.
+%
+\begin{stancode}
+data {
+  int N;
+  vector[N] L;  // lower bounds
+  vector[N] U;  // upper bounds
+  ...
+parameters {
+  vector<lower=0, upper=1>[N] alpha_raw;
+  ...
+transformed parameters {
+  vector[N] alpha = L + (U - L) .* alpha_raw;
+\end{stancode}
+%
+The expression \code{U - L} is multiplied by \code{alpha\_raw}
+elementwise to produce a vector of variables in $(0, U-L)$, then
+adding $L$ results in a variable ranging between $(L, U)$.
+
+In this case, it is important that $L$ and $U$ are constants,
+otherwise a Jacobian would be required when multiplying by $U - L$.
+
+
 
 \chapter{Custom Probability Functions}%
 \label{custom-probability-functions.chapter}
@@ -568,11 +620,11 @@ are the bounds, with $\alpha < \beta$, then $y \in (\alpha,\beta)$ has
 a density defined as follows.
 \[
 \distro{Triangle}(y | \alpha,\beta)
-= 
+=
 \frac{2}{\beta - \alpha}
 \
 \left(
-1 - 
+1 -
 \left|
 y - \frac{\alpha + \beta}{\beta - \alpha}
 \right|
@@ -623,7 +675,7 @@ target += log(fmax(0.0,1 - fabs(y)));
 %
 With the constraint on \code{y} in place, this is just a less
 efficient, slower, and less arithmetically stable version of the
-original program.  But if the constraint on \code{y} is removed, 
+original program.  But if the constraint on \code{y} is removed,
 the model will compile and run without arithmetic errors, but will not
 sample properly.%
 %
@@ -651,7 +703,7 @@ target += log(lambda) - y * lambda;
 This encoding will work for any \code{lambda} and \code{y}; they can
 be parameters, data, or one of each, or even local variables.
 
-The assignment statement in the previous paragraph generates 
+The assignment statement in the previous paragraph generates
 \Cpp code that is very similar to that generated by the following
 sampling statement.
 %
@@ -755,7 +807,7 @@ order to detect bad or illegal outcomes of some processing step.
 Rejection is used to flag errors that arise in inputs or in program
 state.  It is far better to fail early with a localized informative
 error message than to run into problems much further downstream (as in
-rejecting a state or failing to compute a derivative).  
+rejecting a state or failing to compute a derivative).
 
 The most common errors that are coded is to test that all of the
 arguments to a function are legal.  The following function takes a
@@ -811,8 +863,8 @@ details about the reject statement.
 {\it Functions:} & {\it Locals Variables:} & {\it Nonlocal Variables:} \\
 {\it Undimensioned} & {\it Unconstrained} & {\it Constrained} \\
 \hline \hline
-\code{int} 
-& \code{int} 
+\code{int}
+& \code{int}
 & \code{int<lower=L>}
 \\
 & &  \code{int<upper=U>}
@@ -821,8 +873,8 @@ details about the reject statement.
 %
 \\ \hline
 %
-\code{real} 
-& \code{real} 
+\code{real}
+& \code{real}
 & \code{real<lower=L>}
 \\
 & &  \code{real<upper=U>}
@@ -832,7 +884,7 @@ details about the reject statement.
 \\ \hline
 %
 \code{vector}
-& 
+&
 \code{vector[N]}
 & \code{vector<lower=L>[N]}
 \\
@@ -860,8 +912,8 @@ details about the reject statement.
 %
 \\ \hline
 %
-\code{matrix} 
-& \code{matrix[M,~N]} 
+\code{matrix}
+& \code{matrix[M,~N]}
 & \code{matrix<lower=L>[M,~N]}
 \\
 & &  \code{matrix<upper=U>[M,~N]}
@@ -870,7 +922,7 @@ details about the reject statement.
 \\[4pt]
 & & \code{cov\_matrix[K]}
 \\
-& & \code{corr\_matrix[K]} 
+& & \code{corr\_matrix[K]}
 \\
 & & \code{cholesky\_factor\_cov[K]}
 \\
@@ -919,10 +971,10 @@ is used.%
 %
 \footnote{A range of built-in validation routines is coming to Stan soon!
 Alternatively, the \code{reject} statement can be used to check
-constraints on the simplex.} 
+constraints on the simplex.}
 %
 Upper or lower bounds on values or constrained types are not allowed
-as return types or argument types in function declarations.  
+as return types or argument types in function declarations.
 
 \subsection{Array Types for Function Declarations}
 
@@ -937,7 +989,7 @@ real[] baz(real[,] x);
 %
 The notation \code{[\,]} is used for one-dimensional arrays (as in the
 return above), \code{[\,,\,]} for two-dimensional arrays,
-\code{[\,,\,,\,]} for three-dimensional arrays, and so on.  
+\code{[\,,\,,\,]} for three-dimensional arrays, and so on.
 
 Functions support arrays of any type, including matrix and vector
 types.  As with other types, no constraints are allowed.
@@ -973,7 +1025,7 @@ statement in the body of the previous example.
 Void functions applied to appropriately typed arguments may be used on
 their own as statements.  For example, the pretty-print function
 defined above may be applied to a covariance matrix being defined in
-the transformed parameters block. 
+the transformed parameters block.
 %
 \begin{stancode}
 transformed parameters {
@@ -1097,8 +1149,8 @@ them, a new density function may be defined and reused.
 %
 \begin{stancode}
 functions {
-  real unit_normal_lpdf(real y) { 
-    return normal_lpdf(y | 0, 1); 
+  real unit_normal_lpdf(real y) {
+    return normal_lpdf(y | 0, 1);
   }
 }
 ...
@@ -1111,7 +1163,7 @@ model {
 %
 The ability to use the \code{unit\_normal} function as a density is
 keyed off its name ending in \code{\_lpdf} (names ending in
-\code{\_lpmf} for probability mass functions work the same way).  
+\code{\_lpmf} for probability mass functions work the same way).
 
 In general, if \code{foo\_lpdf} is defined to consume $N + 1$
 arguments, then
@@ -1120,7 +1172,7 @@ arguments, then
 y ~ foo(theta1, ..., thetaN);
 \end{stancode}
 %
-can be used as shorthand for 
+can be used as shorthand for
 %
 \begin{stancode}
 target += foo_lpdf(y | theta1, ..., thetaN);
@@ -1128,7 +1180,7 @@ target += foo_lpdf(y | theta1, ..., thetaN);
 %
 As with the built-in functions, the suffix \code{\_lpdf} is dropped and
 the first argument moves to the left of the sampling symbol (\Verb|~|)
-in the sampling statement.  
+in the sampling statement.
 
 Functions ending in \code{\_lpmf} (for probability mass functions),
 behave exactly the same way.  The difference is that the first
@@ -1157,9 +1209,9 @@ generator.
 %
 \begin{stancode}
 /**
- * Return a data matrix of specified size with rows 
- * corresponding to items and the first column filled 
- * with the value 1 to represent the intercept and the 
+ * Return a data matrix of specified size with rows
+ * corresponding to items and the first column filled
+ * with the value 1 to represent the intercept and the
  * remaining columns randomly filled with unit-normal draws.
  *
  * @param N Number of rows corresponding to data items
@@ -1167,7 +1219,7 @@ generator.
  *          item.
  * @return Simulated predictor matrix.
  */
-matrix predictors_rng(int N, int K) { 
+matrix predictors_rng(int N, int K) {
   ...
 \end{stancode}
 %
@@ -1190,7 +1242,7 @@ For example,
 %
 \begin{stancode}
  ...
- * @param theta 
+ * @param theta
  * @throws If any of the entries of theta is negative.
  */
 real entropy(vector theta) {
@@ -1241,7 +1293,7 @@ some applications.  For instance, consider the matrix power operation,
 $A^n$, which is defined for a square matrix $A$ and positive integer
 $n$ by
 \[
-A^n 
+A^n
 =
 \begin{cases}
 \ \mbox{I} & \mbox{if } n = 0, \mbox{ and}
@@ -1259,7 +1311,7 @@ directly translated to a recursive function definition.
   matrix matrix_pow(matrix a, int n) {
     if (n == 0)
       return diag_matrix(rep_vector(1, rows(a)));
-    else 
+    else
       return a *  matrix_pow(a, n - 1);
   }
 \end{stancode}
@@ -1308,7 +1360,7 @@ redundant intercept parameters.%
   Gibbs sampling as used in BUGS and JAGS and the Hamiltonian Monte
   Carlo (HMC) and no-U-turn samplers (NUTS) used by Stan.}
 %
-Suppose there are observations $y_n$ for $n \in 1{:}N$, 
+Suppose there are observations $y_n$ for $n \in 1{:}N$,
 two intercept parameters $\lambda_1$ and
 $\lambda_2$, a scale parameter $\sigma > 0$, and the sampling distribution
 %
@@ -1344,7 +1396,7 @@ The impropriety shows up visually as a ridge in the posterior density,
 as illustrated in the left-hand figure of
 \reffigure{non-identifiable-density}.  The ridge for this model is
 along the line where $\lambda_2 = \lambda_1 + c$ for some constant
-$c$.  
+$c$.
 
 Contrast this model with a simple regression with a single intercept
 parameter $\mu$ and sampling distribution
@@ -1374,7 +1426,7 @@ difficulties, i.e.,
 %
 \[
 p(y | \alpha, \beta)
-= 
+=
 p(y | \alpha + c, \beta - c).
 \]
 %
@@ -1449,7 +1501,7 @@ $\alpha$ of linear predictors to a $K$-simplex $\theta =
 The softmax function is many-to-one, which leads to a lack of
 identifiability of the unconstrained parameters $\alpha$.  In
 particular, adding or subtracting a constant from each $\alpha_k$
-produces the same simplex $\theta$. 
+produces the same simplex $\theta$.
 
 
 
@@ -1500,8 +1552,8 @@ vector softmax_id(vector alpha) {
   vector[num_elements(alpha) + 1] alphac1;
   for (k in 1:num_elements(alpha))
     alphac1[k] = alpha[k];
-  alpha[num_elements(alphac)] = 0;
-  return softmax(alphac);
+  alphac1[num_elements(alphac1)] = 0;
+  return softmax(alphac1);
 }
 \end{stancode}
 
@@ -1511,7 +1563,7 @@ vector softmax_id(vector alpha) {
 \subsubsection{Adding Priors}
 
 So far, the models have been discussed as if the priors on the
-parameters were improper uniform priors.  
+parameters were improper uniform priors.
 
 A more general Bayesian solution to these invariance problems is to
 impose proper priors on the parameters.  This approach can be used to
@@ -1572,7 +1624,7 @@ constrained) wiggle room.
 
 Care must be used when adding a prior to resolve invariances.  If the
 prior is taken to be too broad (i.e., too vague), the resolution is in
-theory only, and samplers will still struggle.  
+theory only, and samplers will still struggle.
 
 Ideally, a realistic prior will be formulated based on substantive
 knowledge of the problem being modeled.  Such a prior can be chosen to
@@ -1610,7 +1662,7 @@ Consider a normal mixture model with two location parameters $\mu_1$
 and $\mu_2$, a shared scale $\sigma > 0$, a mixture ratio $\theta \in
 [0,1]$, and likelihood
 \[
-p(y|\theta,\mu_1,\mu_2,\sigma) 
+p(y|\theta,\mu_1,\mu_2,\sigma)
 = \prod_{n=1}^N \big( \theta \, \distro{Normal}(y_n|\mu_1,\sigma)
                        + (1 - \theta) \, \distro{Normal}(y_n|\mu_2,\sigma) \big).
 \]
@@ -1631,7 +1683,7 @@ effective sample size are both compromised by label switching.  The
 problem is that the posterior mean, a key ingredient in these
 computations, is affected by label switching, resulting in a posterior
 mean for $\mu_1$ that is equal to that of $\mu_2$, and a posterior
-mean for $\theta$ that is always 1/2, no matter what the data is. 
+mean for $\theta$ that is always 1/2, no matter what the data is.
 
 \subsection{Some Inferences are Invariant}
 
@@ -1649,7 +1701,7 @@ $\theta$ in the two component mixture model will always be 1/2.
 
 Theoretically, this should not present a problem for inference because
 all of the integrals involved in posterior predictive inference will
-be well behaved. The problem in practice is computation. 
+be well behaved. The problem in practice is computation.
 
 Being able to carry out such invariant inferences in practice is an
 altogether different matter.  It is almost always intractable to find
@@ -1686,12 +1738,12 @@ standard approaches to posterior inference for event probabilities is
 compromised.  For instance, attempting to use $M$ posterior samples to
 estimate $\mbox{Pr}[\mu_1 > \mu_2]$, will fail, because the estimator
 \[
-\mbox{Pr}[\mu_1 > \mu_2] 
-\approx 
+\mbox{Pr}[\mu_1 > \mu_2]
+\approx
 \sum_{m=1}^M \mbox{I}(\mu_1^{(m)} > \mu_2^{(m)})
 \]
 will result in an estimate of 0 because the posterior respects the
-constraint in the model.  
+constraint in the model.
 
 \subsubsection{Initialization around a Single Mode}
 
@@ -1713,13 +1765,13 @@ neighborhood of a particular mode in the posterior.
 It is possible for two mixture components in a mixture model to
 collapse to the same values during sampling or optimization.  For
 example, a mixture of $K$ normals might devolve to have $\mu_i =
-\mu_j$ and $\sigma_i = \sigma_j$ for $i \neq j$.  
+\mu_j$ and $\sigma_i = \sigma_j$ for $i \neq j$.
 
 This will typically happen early in sampling due to initialization in
 MCMC or optimization or arise from random movement during MCMC.  Once
 the parameters match for a given draw $(m)$, it can become hard to
 escape because there can be a trough of low-density mass between the
-current parameter values and the ones without collapsed components.  
+current parameter values and the ones without collapsed components.
 
 It may help to use a smaller step size during warmup, a stronger prior
 on each mixture component's membership responsibility.  A more extreme
@@ -1757,7 +1809,7 @@ a Bernoulli likelihood model coupled with a ``weak'' beta prior, leads
 to a posterior
 %
 \begin{eqnarray*}
-p(\phi|y) 
+p(\phi|y)
 & \propto & \textstyle
 \distro{Beta}(\phi|0.5,0.5) \times \prod_{n=1}^N \distro{Bernoulli}(y_n|\phi)
 \\[4pt]
@@ -1818,7 +1870,7 @@ $x_{n,k} > 0$ if and only if $y_n = 1$, a condition known as
 ``separability.''  In this case, predictive accuracy on the observed data
 continue to improve as $\beta_k \rightarrow \infty$, because for cases
 with $y_n = 1$, $x_n \beta \rightarrow \infty$ and hence
-$\mbox{logit}^{-1}(x_n \beta) \rightarrow 1$.  
+$\mbox{logit}^{-1}(x_n \beta) \rightarrow 1$.
 
 With separability, there is no maximum to the likelihood and hence no
 maximum likelihood estimate.  From the Bayesian perspective, the
@@ -1866,13 +1918,13 @@ Consider what happens with initial values $\lambda_1^{(0)}, \lambda_2^{(0)}$.
 Gibbs sampling proceeds in iteration $m$ by drawing
 %
 \begin{eqnarray*}
-\lambda_1^{(m)} 
+\lambda_1^{(m)}
 & \sim & p(\lambda_1 \, | \, \lambda_2^{(m-1)}, \, \sigma^{(m-1)}, \, y)
 \\[6pt]
 \lambda_2^{(m)}
 & \sim & p(\lambda_2 \, | \, \lambda_1^{(m)}, \, \sigma^{(m-1)}, \, y)
 \\[6pt]
-\sigma^{(m)} 
+\sigma^{(m)}
 & \sim & p(\sigma \, | \, \lambda_1^{(m)}, \, \lambda_2^{(m)}, \, y).
 \end{eqnarray*}
 %
@@ -1902,7 +1954,7 @@ $\lambda_2$, the gradient of the log posterior is going to adjust for
 the correlation and the simulation will run $\lambda_1$ and
 $\lambda_2$ in opposite directions along the valley corresponding to
 the ridge in the posterior log density (see
-\reffigure{non-identifiable-density}.  
+\reffigure{non-identifiable-density}.
 
 \subsection{No-U-Turn Sampling}
 
@@ -1922,7 +1974,7 @@ or its implementation.  It is simply not possible to sample from an
 improper posterior!  Thus the behavior of HMC in general and NUTS
 in particular should be reassuring in that it will clearly fail in
 cases of improper posteriors, resulting in a clean diagnostic of
-sweeping out very large paths in the posterior.  
+sweeping out very large paths in the posterior.
 
 \begin{figure}
 %
@@ -1983,10 +2035,10 @@ sigma            1.0  1.6e-03   0.071   9.3e-01   1.0   1.2   2094    27321    1
   %
   On the top is the non-identified model with improper uniform priors
   and likelihood $y_n \sim \distro{Normal}(\lambda_1 + \lambda_2,
-  \sigma)$. 
+  \sigma)$.
   %
   In the middle is the same likelihood as the middle plus priors
-  $\lambda_k \sim \distro{Normal}(0,10)$. 
+  $\lambda_k \sim \distro{Normal}(0,10)$.
   %
   On the bottom is an identified model with an improper prior, with
   likelihood  $y_n \sim \distro{Normal}(\mu,\sigma)$.  All models
@@ -2065,12 +2117,12 @@ outputs are the following.
   The average number of leapfrog steps is roughly 3 in
   the identified model, 150 in the model identified by a weak prior, and
   1400 in the non-identified model.
-\item 
+\item
   The number of effective samples per
   second for $\mu$ is roughly 31,000 in the identified model, 1900 in the model
   identified with weakly informative priors, and 200 in the
-  non-identified model; the results are similar for $\sigma$.  
-\item 
+  non-identified model; the results are similar for $\sigma$.
+\item
   In the non-identified model, the 95\% interval for $\lambda_1$ is
   (-2300,6000), whereas it is only (-12,12) in the model identified with
   weakly informative priors.
@@ -2117,7 +2169,7 @@ promotion of arrays to vectors because the target, row vector or
 column vector, is ambiguous.  Similarly, row vectors are separated
 from column vectors because multiplying a row vector by a column
 vector produces a scalar, whereas multiplying in the opposite order
-produces a matrix.  
+produces a matrix.
 
 The following code fragment shows all four ways to declare a
 two-dimensional container of size $M \times N$.
@@ -2134,7 +2186,7 @@ various purposes and the type of \code{b[m]}, which is shown in
 comments to the right of the declarations.  Thus the only way to
 efficiently iterate over row vectors is to use the third declaration,
 but if you need linear algebra on matrices, but the only way to use
-matrix operations is to use the fourth declaration. 
+matrix operations is to use the fourth declaration.
 
 The inefficiencies due to any manual reshaping of containers is
 usually slight compared to what else is going on in a Stan program
@@ -2162,9 +2214,9 @@ the error.  All of Stan's containers check the sizes of all indexes.
 The underlying matrix and linear algebra operations are implemented in
 terms of data types from the Eigen \Cpp library.  By having vectors
 and matrices as basic types, no conversion is necessary when invoking
-matrix operations or calling linear algebra functions.  
+matrix operations or calling linear algebra functions.
 
-Arrays, on the other hand, are implemented as instances of the \Cpp \ 
+Arrays, on the other hand, are implemented as instances of the \Cpp \
 \code{std::vector} class (not to be confused with Eigen's
 \code{Eigen::Vector} class or Stan vectors).  By implementing arrays
 this way, indexing is very efficient because values can be returned by
@@ -2174,11 +2226,11 @@ reference rather than copied by value.
 
 In Stan models, there are a few minor efficiency considerations in
 deciding between a two-dimensional array and a matrix, which may seem
-interchangeable at first glance.  
+interchangeable at first glance.
 
 First, matrices use a bit less memory than two-dimensional arrays.
 This is because they don't store a sequence of arrays, but just the
-data and the two dimensions.  
+data and the two dimensions.
 
 Second, matrices store their data in column-major order.  Furthermore,
 all of the data in a matrix is guaranteed to be contiguous in memory.
@@ -2395,7 +2447,7 @@ This latter version is equivalent in speed to the clunky assignment to
 a local variable.
 %
 \begin{stancode}
-{ 
+{
   vector[N] mu;
   for (n in 1:N)
     mu[n] = alpha[ii[n]] + beta[ii[n]] * x[n];
@@ -2410,9 +2462,9 @@ with an array of integers;  the ellipses stand for code defining the
 variables as indicated in the comments.
 %
 \begin{stancode}
-int c[3];     
+int c[3];
 ...             // define: c == (5, 9, 7)
-int idxs[4];   
+int idxs[4];
 ...             // define: idxs == (3, 3, 1, 2)
 int d[4];
 d = c[idxs];   // result: d == (7, 7, 5, 9)
@@ -2433,7 +2485,7 @@ Multiple indexing can also be used with multi-dimensional arrays.  For
 example, consider the following.
 %
 \begin{stancode}
-int c[2, 3];   
+int c[2, 3];
 ...            // define: c = ((1, 3, 5), ((7, 11, 13))
 int idxs[4];
 ...            // define: idxs = (2, 2, 1, 2)
@@ -2459,17 +2511,17 @@ e = c[2, idxs];  // result:  c[2] = (7, 11, 13)
 %
 The single index is applied, the one-dimensional result is determined,
 then the multiple index is applied to the result.  That is,
-\code{c[2,idxs]} evaluates to the same value as \code{c[2][idxs]}. 
+\code{c[2,idxs]} evaluates to the same value as \code{c[2][idxs]}.
 
 Multiple indexing can apply to more than one position of a
 multi-dimensional array.  For instance, consider the following
 %
 \begin{stancode}
-int c[2, 3];   
+int c[2, 3];
 ...                    // define: c = ((1, 3, 5), (7, 11, 13))
 int idxs1[3];
 ...                    // define: idxs1 = (2, 2, 1)
-int idxs2[2]; 
+int idxs2[2];
 ...                    // define: idxs2 = (1, 3)
 int d[3, 2];
 d = c[idxs1, idxs2];  // result: d = ((7, 13), (7, 13), (1, 5))
@@ -2510,7 +2562,7 @@ d = c[3:6];  // result: d == (c[3], c[4], c[5], c[6])
 %
 The range index \code{3:6} behaves semantically just like the multiple
 index \code{(3, 4, 5, 6)}.  In terms of implementation, the sliced
-upper and/or lower bounded indices are faster and use less memory 
+upper and/or lower bounded indices are faster and use less memory
 because they do not explicitly create a multiple index, but rather use
 a direct loop.  They are also easier to read, so should be preferred
 over multiple indexes where applicable.
@@ -2519,8 +2571,8 @@ over multiple indexes where applicable.
 
 It is also possible to supply just a lower bound, or just an upper
 bound.  Writing \code{c[3:]} is just shorthand for
-\code{c[3:size(c)]}.  Writing \code{c[:5]} is just shorthand for 
-\code{c[1:5]}.  
+\code{c[3:size(c)]}.  Writing \code{c[:5]} is just shorthand for
+\code{c[1:5]}.
 
 \subsection{Full Range Indexes}
 
@@ -2534,7 +2586,7 @@ which in turn is just equal to \code{c}.
 
 Multiple expressions may be used on the left-hand side of an
 assignment statement, where they work exactly the same way as on the
-right-hand side in terms of picking out entries of a container.  
+right-hand side in terms of picking out entries of a container.
 For example, consider the following.
 %
 \begin{stancode}
@@ -2548,7 +2600,7 @@ a[idxs] = c;   // result: a == (1, 9, 5)
 %
 The result above can be worked out by noting that the assignment sets
 \code{a[idxs[1]]} (\code{a[3]}) to \code{c[1]} (\code{5}) and
-\code{a[idxs[2]]} (\code{a[2]}) to \code{c[2]} (\code{9}). 
+\code{a[idxs[2]]} (\code{a[2]}) to \code{c[2]} (\code{9}).
 
 The same principle applies when there are many multiple indexes, as
 in the following example.
@@ -2587,7 +2639,7 @@ example, consider the array \code{a} in the following code fragment.
 int a[3];
 ...                // define: a == (5, 6, 7)
 a[2:3] = a[1:2];
-...                // result: a == (5, 5, 6) 
+...                // result: a == (5, 5, 6)
 \end{stancode}
 %
 The reason the value of \code{a} after the assignment is $(5,5,6)$
@@ -2687,8 +2739,8 @@ dimensionality as indicated in the comments above.
 If matrices receive a single multiple index, the result is a matrix.
 So if \code{m} is a matrix, so is \code{m[2:4]}.  In contrast,
 supplying a single index, \code{m[3]}, produces a row vector result.
-That is, \code{m[3]} produces the same result as \code{m[3,~]} 
-or \code{m[3,~1:cols(m)]}. 
+That is, \code{m[3]} produces the same result as \code{m[3,~]}
+or \code{m[3,~1:cols(m)]}.
 
 \subsection{Arrays of Vectors or Matrices}
 
@@ -2753,16 +2805,11 @@ data-frame or database format.
 
 \begin{stancode}
 transformed data {
-  int<lower=1, upper=3> ii[7];
-  int<lower=1, upper=3> jj[7];
-  ii[1] = 1;  jj[1] = 1;
-  ii[2] = 2;  jj[2] = 1;   // skip [1, 2] and [1, 3]
-  ii[3] = 3;  jj[3] = 1;
-  ii[4] = 2;  jj[4] = 2;
-  ii[5] = 3;  jj[5] = 2;
-  ii[6] = 2;  jj[6] = 3;
-  ii[7] = 3;  jj[7] = 3;
-}
+  int<lower=1, upper=3> idxs[7,
+    = { {1, 1},
+        {2, 1}, {2, 2}, {2, 3},
+        {3, 1}, {3, 2}, {3, 3} };
+  ...
 \end{stancode}
 %
 The seven remaining parameters are declared as a vector.
@@ -2770,7 +2817,7 @@ The seven remaining parameters are declared as a vector.
 \begin{stancode}
 parameters {
   vector[7] A_raw;
-}
+  ...
 \end{stancode}
 %
 Then the full matrix \code{A} is constructed in the model block as a
@@ -2779,17 +2826,17 @@ local variable.
 \begin{stancode}
 model {
   matrix[3, 3] A;
-  A[ii, jj] = A_raw;
+  for (i in 1:7)
+    A[idxs[i, 1], idxs[i, 2]] = A_raw[i];
   A[1, 2] = 0;
   A[1, 3] = 0;
-}
+  ...
 \end{stancode}
-
+%
 This may seem like overkill in this setting, but in more general
-settings, the matrix size, vector size, and the \code{ii} and
-\code{jj} array and size can be coded up as data along with the values
-to fill in for the constant entries.  Similar techniques can be used
-to build up matrices with ad-hoc constraints, such as a handful of
+settings, the matrix size, vector size, and the \code{idxs} array will
+be too large to code directly.  Similar techniques can be used to
+build up matrices with ad-hoc constraints, such as a handful of
 entries known to be positive.
 
 
@@ -2860,7 +2907,7 @@ There is a difference between pure computational efficiency and
 statistical efficiency for Stan programs fit with sampling-based
 algorithms.  Computational efficiency measures the amount of time or
 memory required for a given step in a calculation, such as an
-evaluation of a log posterior or penalized likelihood.  
+evaluation of a log posterior or penalized likelihood.
 
 Statistical efficiency typically involves requiring fewer steps in
 algorithms by making the statistical formulation of a model better
@@ -2975,7 +3022,7 @@ robustly and efficiently, whereas the real data for which it was
 intended runs slowly or may even have convergence and mixing issues.
 While some of the techniques recommended in the remaining sections of
 this chapter may mitigate the problem somewhat, the best remedy is a
-better model specification.  
+better model specification.
 
 Somewhat counterintuitively, more complicated models often run faster
 than simpler models.  One common pattern is with a group of parameters
@@ -2995,7 +3042,7 @@ difficult posterior geometries.  One way to speed up such models is
 through reparameterization.  In some cases, reparameterization can
 dramatically increase effective sample size for the same number of
 iterations or even make programs that would not converge well
-behaved. 
+behaved.
 
 \subsection{Example: Neal's Funnel}
 
@@ -3021,7 +3068,7 @@ parameters in the prior.
   Neal's funnel for the upper-level variable $y$ and one lower-level
   variable $x_1$ (see the text for the formula).  The blue region has
   log density greater than -8, the yellow region density greater than
-  -16, and the gray background a density less than -16.  
+  -16, and the gray background a density less than -16.
   (Right) 4000 draws from a run of Stan's
   sampler with default settings.  Both plots are restricted to the
   shown window of $x_1$ and $y$ values; some draws fell outside of
@@ -3052,7 +3099,7 @@ and the first dimension $x_1$ is shown in \reffigure{funnel}.
 The funnel can be implemented directly in Stan as follows.
 %
 \begin{stancode}
-parameters {  
+parameters {
   real y;
   vector[9] x;
 }
@@ -3074,7 +3121,7 @@ from which samples are drawn is known, the model can be converted to
 the following more efficient form.
 %
 \begin{stancode}
-parameters {  
+parameters {
   real y_raw;
   vector[9] x_raw;
 }
@@ -3082,12 +3129,12 @@ transformed parameters {
   real y;
   vector[9] x;
 
-  y = 3.0 * y_raw;  
+  y = 3.0 * y_raw;
   x = exp(y/2) * x_raw;
 }
 model {
-  y_raw ~ normal(0, 1); // implies y ~ normal(0, 3) 
-  x_raw ~ normal(0, 1); // implies x ~ normal(0, exp(y/2))  
+  y_raw ~ normal(0, 1); // implies y ~ normal(0, 3)
+  x_raw ~ normal(0, 1); // implies x ~ normal(0, exp(y/2))
 }
 \end{stancode}
 %
@@ -3139,7 +3186,7 @@ F^{-1}_X(y) = \mu + \tau \tan \left( \pi \left( y - \frac{1}{2} \right) \right).
 Thus if the random variable $Y$ has a unit uniform distribution, $Y
 \sim \distro{Uniform}(0,1)$, then $F^{-1}_X(Y)$ has a Cauchy
 distribution with location $\mu$ and scale $\tau$, i.e., $F^{-1}_X(Y) \sim
-\distro{Cauchy}(\mu,\tau)$. 
+\distro{Cauchy}(\mu,\tau)$.
 
 Consider a Stan program involving a Cauchy-distributed parameter
 \code{beta}.
@@ -3167,7 +3214,7 @@ parameters {
 transformed parameters {
   real beta;
   beta = mu + tau * tan(beta_unif);  // beta ~ cauchy(mu, tau)
-}    
+}
 model {
   beta_unif ~ uniform(-pi()/2, pi()/2);  // not necessary
   ...
@@ -3189,7 +3236,7 @@ without changing sampling behavior.  This is because $\log
 needs the total log probability up to an additive constant.  Stan will spend
 some time checking that that \code{beta\_unif} is between
 \code{-pi()/2} and \code{pi()/2}, but this condition is guaranteed by
-the constraints in the declaration of \code{beta\_unif}.  
+the constraints in the declaration of \code{beta\_unif}.
 
 \subsection{Reparameterizing a Student-t Distribution}
 
@@ -3217,8 +3264,8 @@ The marginal distribution of $\beta$ when you integrate out $\tau$ is
 $\mbox{\sf Student-t}(\nu, 0, 1)$, i.e.,
 \[
 \mbox{\sf Student-t}(\beta | \nu,0,1).
-= 
-\int_0^{\infty} 
+=
+\int_0^{\infty}
 \,
 \mbox{\sf Normal}(\beta | 0, 1 / \tau^{-\frac{1}{2}})
 \times
@@ -3267,7 +3314,7 @@ with
 parameters {
   real<lower=0> nu;
   real<lower=0> tau;
-  real alpha;  
+  real alpha;
   ...
 transformed parameters {
   real beta;
@@ -3279,7 +3326,7 @@ model {
   tau ~ gamma(half_nu, half_nu);
   alpha ~ normal(0, 1);
   ...
-\end{stancode}  
+\end{stancode}
 %
 Although set to \code{0} here, in most cases, the lower bound for the
 degrees of freedom parameter \code{nu} can be set to \code{1} or
@@ -3293,7 +3340,7 @@ distribution approaches a normal distribution.  Thus the parameter
 Unfortunately, the usual situation in applied Bayesian modeling
 involves complex geometries and interactions that are not known
 analytically.  Nevertheless, reparameterization can still be very
-effective for separating parameters.  
+effective for separating parameters.
 
 \subsubsection{Centered parameterization}
 
@@ -3303,7 +3350,7 @@ centered parameterization is as follows.
 %
 \begin{stancode}
 parameters {
-  real mu_beta;   
+  real mu_beta;
   real<lower=0> sigma_beta;
   vector[K] beta;
   ...
@@ -3353,7 +3400,7 @@ transformed parameters {
   // implies: beta ~ normal(mu_beta, sigma_beta)
   beta = mu_beta + sigma_beta * beta_raw;
 model {
-  beta_raw ~ normal(0, 1);  
+  beta_raw ~ normal(0, 1);
   ...
 \end{stancode}
 %
@@ -3362,19 +3409,19 @@ defined in the original model.
 
 Reparameterization of hierarchical models is not limited to the normal
 distribution, although the normal distribution is the best candidate
-for doing so. In general, any distribution of parameters in the 
+for doing so. In general, any distribution of parameters in the
 location-scale family is a good candidate for reparameterization. Let
 $\beta = l + s\alpha$ where $l$ is a location parameter and $s$ is a
 scale parameter. Note that $l$ need not be the mean, $s$ need not
 be the standard deviation, and neither the mean nor the standard
 deviation need to exist. If $\alpha$ and $\beta$ are from the same
-distributional family but $\alpha$ has location zero and unit scale, 
+distributional family but $\alpha$ has location zero and unit scale,
 while $\beta$ has location $l$ and scale $s$, then that distribution
 is a location-scale distribution. Thus, if $\alpha$ were a parameter
 and $\beta$ were a transformed parameter, then a prior distribution
-from the location-scale family on $\alpha$ with location zero and unit 
+from the location-scale family on $\alpha$ with location zero and unit
 scale implies a prior distribution on $\beta$ with location $l$ and
-scale $s$. Doing so would reduce the dependence between $\alpha$, 
+scale $s$. Doing so would reduce the dependence between $\alpha$,
 $l$, and $s$.
 
 There are several univariate distributions in the location-scale
@@ -3382,9 +3429,9 @@ family, such as the Student t distribution, including its special
 cases of the Cauchy distribution (with one degree of freedom) and the
 normal distribution (with infinite degrees of freedom). As shown above,
 if $\alpha$ is distributed standard normal, then $\beta$ is distributed
-normal with mean $\mu = l$ and standard deviation $\sigma = s$. The 
-logistic, the double exponential, the generalized extreme value 
-distributions, and the stable distribution are also in the 
+normal with mean $\mu = l$ and standard deviation $\sigma = s$. The
+logistic, the double exponential, the generalized extreme value
+distributions, and the stable distribution are also in the
 location-scale family.
 
 Also, if $z$ is distributed standard normal, then $z^2$ is distributed
@@ -3399,7 +3446,7 @@ parameters just to obtain one transformed parameter to use in a model.
 
 \subsection{Multivariate Reparameterizations}
 
-The benefits of reparameterization are not limited to univariate 
+The benefits of reparameterization are not limited to univariate
 distributions. A parameter with a multivariate normal prior distribution
 is also an excellent candidate for reparameterization. Suppose you intend
 the prior for $\beta$ to be multivariate normal with mean vector $\mu$
@@ -3424,10 +3471,10 @@ In this case \Verb|mu| and \Verb|Sigma| are fixed data, but they could
 be unknown parameters, in which case their priors would be unaffected
 by a reparameterization of \Verb|beta|.
 
-If $\alpha$ has the same dimensions as $\beta$ but the elements of 
-$\alpha$ are independently and identically distributed standard normal 
-such that $\beta = \mu + L\alpha$, where $LL^\top = \Sigma$, then 
-$\beta$ is distributed multivariate normal with mean vector $\mu$ and 
+If $\alpha$ has the same dimensions as $\beta$ but the elements of
+$\alpha$ are independently and identically distributed standard normal
+such that $\beta = \mu + L\alpha$, where $LL^\top = \Sigma$, then
+$\beta$ is distributed multivariate normal with mean vector $\mu$ and
 covariance matrix $\Sigma$. One choice for $L$ is the Cholesky factor
 of $\Sigma$. Thus, the model above could be reparameterized as follows.
 %
@@ -3446,10 +3493,10 @@ parameters {
   ...
 transformed parameters {
   vector[K] beta;
-  beta = mu + L * alpha; 
+  beta = mu + L * alpha;
 }
 model {
-  alpha ~ normal(0, 1); 
+  alpha ~ normal(0, 1);
   // implies: beta ~ multi_normal(mu, Sigma)
   ...
 \end{stancode}
@@ -3459,7 +3506,7 @@ reduces dependence among the elements of \Verb|alpha| and second, it
 avoids the need to invert \Verb|Sigma| every time \Verb|multi_normal|
 is evaluated.
 
-The Cholesky factor is also useful when a covariance matrix is 
+The Cholesky factor is also useful when a covariance matrix is
 decomposed into a correlation matrix that is multiplied from both
 sides by a diagonal matrix of standard deviations, where either the
 standard deviations or the correlations are unknown parameters. The
@@ -3502,7 +3549,7 @@ model {
 %
 This reparameterization of a multivariate normal distribution in
 terms of standard normal variates can be extended to other multivariate
-distributions that can be conceptualized as contaminations of the 
+distributions that can be conceptualized as contaminations of the
 multivariate normal, such as the multivariate Student t and the skew
 multivariate normal distribution.
 
@@ -3556,7 +3603,7 @@ model {
   for (i in 1:(K-1))
     A[i, K] = 0;
   A[K, K] = sqrt(c[K]);
-  
+
   for (i in 1:K)
     c[i] ~ chi_square(nu - i + 1);
 
@@ -3568,7 +3615,7 @@ model {
 %
 This reparameterization is more efficient for three reasons. First, it
 reduces dependence among the elements of \Verb|z| and second, it
-avoids the need to invert the covariance matrix, $W$ every time 
+avoids the need to invert the covariance matrix, $W$ every time
 \Verb|wishart| is evaluated. Third, if $W$ is to be used with a
 multivariate normal distribution, you can pass $L A$ to the more
 efficient \Verb|multi_normal_cholesky| function, rather than passing
@@ -3578,9 +3625,9 @@ If $W$ is distributed Wishart with scale matrix $S$ and degrees of
 freedom $\nu$, then $W^{-1}$ is distributed inverse Wishart with inverse
 scale matrix $S^{-1}$ and degrees of freedom $\nu$. Thus, the previous
 result can be used to reparameterize the inverse Wishart distribution.
-Since $W = L * A * A^{\top} * L^{\top}$, 
+Since $W = L * A * A^{\top} * L^{\top}$,
 $W^{-1} = L^{{\top}^{-1}} A^{{\top}^{-1}} A^{-1} L^{-1}$, where all four
-inverses exist, but 
+inverses exist, but
 $L^{{-1}^{\top}} = L^{{\top}^{-1}}$ and $A^{{-1}^{\top}} = A^{{\top}^{-1}}$.
 We can slightly modify the above Stan code for this case:
 %
@@ -3607,7 +3654,7 @@ parameters {
   ...
 model {
   matrix[K, K] A;
-  matrix[K, K] A_inv_L_inv;  
+  matrix[K, K] A_inv_L_inv;
   int count;
   count = 1;
   for (j in 1:(K-1)) {
@@ -3628,18 +3675,18 @@ model {
   for (i in 1:K)
     c[i] ~ chi_square(nu - i + 1);
 
-  z ~ normal(0, 1); // implies: crossprod(A_inv_L_inv) ~ 
+  z ~ normal(0, 1); // implies: crossprod(A_inv_L_inv) ~
   // inv_wishart(nu, L_inv' * L_inv)
   ...
 \end{stancode}
 %
 Another candidate for reparameterization is the Dirichlet distribution
-with all $K$ shape parameters equal. \cite{ZyczkowskiSommers:2001} shows 
-that if $\theta_i$ is equal to the sum of $\beta$ independent squared 
-standard normal variates and $\rho_i = \frac{\theta_i}{\sum \theta_i}$, 
-then the $K$-vector $\rho$ is distributed Dirichlet with all shape 
-parameters equal to $\frac{\beta}{2}$. In particular, if $\beta = 2$, 
-then $\rho$ is uniformly distributed on the unit simplex. Thus, we can 
+with all $K$ shape parameters equal. \cite{ZyczkowskiSommers:2001} shows
+that if $\theta_i$ is equal to the sum of $\beta$ independent squared
+standard normal variates and $\rho_i = \frac{\theta_i}{\sum \theta_i}$,
+then the $K$-vector $\rho$ is distributed Dirichlet with all shape
+parameters equal to $\frac{\beta}{2}$. In particular, if $\beta = 2$,
+then $\rho$ is uniformly distributed on the unit simplex. Thus, we can
 make $\rho$ be a transformed parameter to reduce dependence, as in:
 %
 \begin{stancode}
@@ -3657,7 +3704,7 @@ transformed parameters {
 }
 model {
   for (k in 1:K)
-    z[k] ~ normal(0, 1); 
+    z[k] ~ normal(0, 1);
   // implies: rho ~ dirichlet(0.5 * beta * ones)
   ...
 \end{stancode}
@@ -3690,20 +3737,20 @@ example, consider the following code snippet, where \code{foo()} is
 some operation that depends on \code{n}.
 %
 \begin{stancode}
-for (n in 1:N) 
+for (n in 1:N)
   total = total + foo(n,...);
 \end{stancode}
 %
 This code has to create intermediate representations for each
-of the \code{N} summands.  
+of the \code{N} summands.
 
 A faster alternative is to copy the values into a vector, then
 apply the \code{sum()} operator, as in the following refactoring.
 %
 \begin{stancode}
-{  
+{
   vector[N] summands;
-  for (n in 1:N) 
+  for (n in 1:N)
     summands[n] = foo(n,...);
   total = sum(summands);
 }
@@ -3739,7 +3786,7 @@ parameters {
 }
 model {
   for (n in 1:N) {
-    real gamma;  
+    real gamma;
     gamma = 0;
     for (k in 1:K)
       gamma = gamma + x[n, k] * beta[k];
@@ -3783,7 +3830,7 @@ by more fully exploiting expression templates inside the Eigen
 \Cpp matrix library.  This will require enhancing Eigen to deal
 with mixed-type arguments, such as the type \code{double} used
 for constants and the algorithmic differentiation type
-\code{stan::math::var} 
+\code{stan::math::var}
 used for variables.}.
 %
 The inefficiency of transposition could itself be mitigated somewhat by
@@ -3840,7 +3887,7 @@ data {
 }
 parameters {
   vector[K] beta;
-} 
+}
 model {
   y ~ normal(x * beta, 1);
 }
@@ -3848,7 +3895,7 @@ model {
 %
 The variables are all declared as either matrix or vector types.
 The result of the matrix-vector multiplication \code{x * beta} in the
-model block is a vector of the same length as \code{y}.  
+model block is a vector of the same length as \code{y}.
 
 The probability function documentation in \refpart{built-in-functions}
 indicates which of Stan's probability functions support
@@ -3886,7 +3933,7 @@ vectorize all at once.
 \end{stancode}
 %
 If there aren't many levels (values \code{ii[n]} can take), then it
-behooves us to reorganize the data by group in a case like this.  
+behooves us to reorganize the data by group in a case like this.
 Rather than having a single observation vector \code{y}, there are K of them.
 And because Stan doesn't support ragged arrays, it means K
 declarations.  For instance, with 5 levels, we have
@@ -3922,7 +3969,7 @@ parameters {
 }
 model {
   theta ~ beta(alpha, beta);
-  for (n in 1:N) 
+  for (n in 1:N)
     y[n] ~ bernoulli(theta);
 }
 \end{stancode}
@@ -3938,7 +3985,7 @@ model may be recoded using the binomial distribution as follows.
 %
 Because truth is represented as one and falsehood as zero, the sum
 \code{sum(y)} of a binary vector \code{y} is equal to the number of
-positive outcomes out of a total of \code{N} trials.  
+positive outcomes out of a total of \code{N} trials.
 
 This can be generalized to other discrete cases (one wouldn't expect
 continuous observations to be duplicated if they are random).  Suppose
@@ -3969,7 +4016,7 @@ should be counted once in the transformed data block and stored.
 If an expression is calculated once, the value should be saved and
 reused wherever possible.  That is, rather than using
 \code{exp(theta)} in multiple places, declare a local variable to
-store its value and reuse the local variable.  
+store its value and reuse the local variable.
 
 Another case that may not be so obvious is with two multilevel
 parameters, say \code{a[ii[n]] + b[jj[n]]}.  If \code{a} and \code{b}
@@ -4035,8 +4082,8 @@ where the sample mean of $y$ is
 \]
 and the sample standard deviation of $y$ is
 \[
-\mbox{sd}(y) 
-= \left( 
+\mbox{sd}(y)
+= \left(
 \frac{1}{N} \sum_{n=1}^N (y_n - \bar{y})^2
 \right)^{1/2}.
 \]
@@ -4065,7 +4112,7 @@ parameters {
 }
 model {
   // priors
-  alpha ~ normal(0, 10);    
+  alpha ~ normal(0, 10);
   beta ~ normal(0, 10);
   sigma ~ cauchy(0, 5);
   // likelihood
@@ -4077,7 +4124,7 @@ model {
 
 The data block for the standardized model is identical.  The
 standardized predictors and outputs are defined in the transformed
-data block.  
+data block.
 %
 \begin{stancode}
 data {
@@ -4097,11 +4144,11 @@ parameters {
   real<lower=0> sigma_std;
 }
 model {
-  alpha_std ~ normal(0, 10);    
+  alpha_std ~ normal(0, 10);
   beta_std ~ normal(0, 10);
   sigma_std ~ cauchy(0, 5);
   for (n in 1:N)
-    y_std[n] ~ normal(alpha_std + beta_std * x_std[n], 
+    y_std[n] ~ normal(alpha_std + beta_std * x_std[n],
                       sigma_std);
 }
 \end{stancode}
@@ -4118,7 +4165,7 @@ that's the scale of the noise for predictors $\alpha = \beta = 0$.
 
 The original regression
 \[
-y_n 
+y_n
 = \alpha + \beta x_n + \epsilon_n
 \]
 has been transformed to a regression on the standardized variables,
@@ -4131,66 +4178,66 @@ has been transformed to a regression on the standardized variables,
 The original parameters can be recovered with a little algebra,
 %
 \begin{eqnarray*}
-y_n 
+y_n
 & = & \mbox{z}_y^{-1}(\mbox{z}_y(y_n))
 \\[4pt]
-& = & 
-\mbox{z}_y^{-1} 
-\left( 
-\alpha' 
+& = &
+\mbox{z}_y^{-1}
+\left(
+\alpha'
 + \beta' \mbox{z}_x(x_n)
 + \epsilon_n'
 \right)
 \\[4pt]
-& = & 
-\mbox{z}_y^{-1} 
-\left( 
-\alpha' 
-+ \beta' 
-    \left(  
+& = &
+\mbox{z}_y^{-1}
+\left(
+\alpha'
++ \beta'
+    \left(
       \frac{x_n - \bar{x}}{\mbox{\small sd}(x)}
     \right)
 + \epsilon_n'
 \right)
 \\[4pt]
-& = & 
+& = &
 \mbox{sd}(y)
-\left( 
-\alpha' 
-+ \beta' 
-    \left(  
+\left(
+\alpha'
++ \beta'
+    \left(
       \frac{x_n - \bar{x}}{\mbox{\small sd}(x)}
     \right)
 + \epsilon_n'
 \right)
 + \bar{y}
 \\[4pt]
-& = & 
-\left( 
-  \mbox{sd}(y) 
-      \left( 
-          \alpha' 
+& = &
+\left(
+  \mbox{sd}(y)
+      \left(
+          \alpha'
           - \beta' \frac{\bar{x}}{\mbox{\small sd}(x)}
-      \right) 
-  + \bar{y}  
+      \right)
+  + \bar{y}
 \right)
 + \left(
-      \beta' \frac{\mbox{\small sd}(y)}{\mbox{\small sd}(x)} 
+      \beta' \frac{\mbox{\small sd}(y)}{\mbox{\small sd}(x)}
   \right) x_n
 + \mbox{sd}(y) \epsilon'_n,
 \end{eqnarray*}
 %
 from which the original scale parameter values can be read off,
 \[
-\alpha 
+\alpha
 =
-\mbox{sd}(y) 
-      \left( 
-          \alpha' 
+\mbox{sd}(y)
+      \left(
+          \alpha'
           - \beta' \frac{\bar{x}}{\mbox{\small sd}(x)}
-      \right) 
+      \right)
   + \bar{y};
-\ \ \ \ \ 
+\ \ \ \ \
 \beta = \beta' \frac{\mbox{\small sd}(y)}{\mbox{\small sd}(x)};
 \ \ \ \ \
 \sigma = \mbox{sd}(y) \sigma'.
@@ -4204,7 +4251,7 @@ generated quantities {
   real alpha;
   real beta;
   real<lower=0> sigma;
-  alpha = sd(y) * (alpha_std - beta_std * mean(x) / sd(x)) 
+  alpha = sd(y) * (alpha_std - beta_std * mean(x) / sd(x))
            + mean(y);
   beta = beta_std * sd(y) / sd(x);
   sigma = sd(y) * sigma_std;
@@ -4219,7 +4266,3 @@ the transformed model, to
 \begin{stancode}
     y_std ~ normal(alpha_std + beta_std * x_std, sigma_std);
 \end{stancode}
-
-
-
-

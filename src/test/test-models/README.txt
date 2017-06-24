@@ -7,3 +7,5 @@ good: parsed and code generated without a main, *included* (not
 
 bad: not parsed; put ill-formed models here to test error messages.
 
+good-standalone-functions: same as good, but only for files to be 
+      compiled as standalone functions.

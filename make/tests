@@ -128,6 +128,23 @@ test/dummy.cpp:
 .PHONY: test-headers
 test-headers: $(HEADER_TESTS)
 
+##
+# Adding a test for multiple translation units. If this fails,
+# a new function is probably missing an inline
+##
+
+test/unit/multiple_translation_units%.o : src/test/unit/multiple_translation_units%.cpp
+	@mkdir -p $(dir $@)
+	$(COMPILE.c) -O$O $< $(OUTPUT_OPTION)
+
+test/unit/libmultiple.so : test/unit/multiple_translation_units1.o test/unit/multiple_translation_units2.o
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -shared $(OUTPUT_OPTION) $^
+
+src/test/unit/multiple_translation_units_test.cpp : test/unit/libmultiple.so
+
+
+
 ############################################################
 ##
 # Use the stanc compiler to generate C++ from Stan programs
@@ -143,15 +160,25 @@ $(patsubst %.stan,%.hpp,$(TEST_MODELS)) : %.hpp : %.stan test/test-models/stanc$
 	$(WINE) test/test-models/stanc$(EXE) --o=$@ $<
 
 ##
+# Generate C++ from Stan standalone functions
+##
+TEST_FUNCTIONS := $(shell find src/test/test-models -type f -name '*.stanfuncs')
+$(patsubst %.stanfuncs,%.hpp,$(TEST_FUNCTIONS)) : %.hpp : %.stanfuncs test/test-models/stanc$(EXE)
+	$(WINE) test/test-models/stanc$(EXE) --o=$@ $<
+
+
+##
 # src/test/unit/lang/stanc_helper_test.cpp requires files to be read-only.
 ##
 .PHONY: change-file-permissions
-change-file-permissions: 
+change-file-permissions:
 ifeq ($(OS_TYPE),win)
 	attrib +r src\\test\\test-models\\good\\stanc_helper.stan
 	attrib +r src\\test\\test-models\\bad\\stanc_helper.stan
+	attrib +r src\\test\\test-models\\bad\\read_only
 else
 	chmod 444 src/test/test-models/*/stanc_helper.stan
+	chmod 555 src/test/test-models/bad/read_only
 endif
 
 src/test/unit/lang/stanc_helper_test.cpp: change-file-permissions
@@ -165,6 +192,7 @@ src/test/performance/logistic_test.cpp: src/test/test-models/performance/logisti
 src/test/unit/lang/generator_test.cpp: src/test/test-models/good/lang/test_lp.hpp
 src/test/unit/lang/parser_generator_test.cpp: $(patsubst %.stan,%.hpp,$(shell find src/test/test-models/good/parser-generator -type f -name '*.stan'))
 src/test/unit/io/random_var_context_test.cpp: src/test/test-models/good/services/test_lp.hpp
+src/test/unit/lang/parser/functions_standalone_instantiate_test.cpp: src/test/test-models/good-standalone-functions/basic.hpp src/test/test-models/good-standalone-functions/special_functions.hpp src/test/test-models/good-standalone-functions/integrate.hpp
 src/test/unit/lang/reject/reject_func_call_generated_quantities_test.cpp: src/test/test-models/good/lang/reject_func_call_generated_quantities.hpp
 src/test/unit/lang/reject/reject_func_call_model_test.cpp: src/test/test-models/good/lang/reject_func_call_model.hpp
 src/test/unit/lang/reject/reject_func_call_transformed_data_test.cpp: src/test/test-models/good/lang/reject_func_call_transformed_data.hpp
@@ -174,6 +202,14 @@ src/test/unit/lang/reject/reject_model_test.cpp: src/test/test-models/good/lang/
 src/test/unit/lang/reject/reject_mult_args_test.cpp: src/test/test-models/good/lang/reject_mult_args.hpp
 src/test/unit/lang/reject/reject_transformed_data_test.cpp: src/test/test-models/good/lang/reject_transformed_data.hpp
 src/test/unit/lang/reject/reject_transformed_parameters_test.cpp: src/test/test-models/good/lang/reject_transformed_parameters.hpp
+src/test/unit/lang/reject/print_reject_function_gq_test.cpp: src/test/test-models/good/lang/print_reject_function_gq.hpp
+src/test/unit/lang/reject/print_reject_function_model_test.cpp: src/test/test-models/good/lang/print_reject_function_model.hpp
+src/test/unit/lang/reject/print_reject_function_tparams_test.cpp: src/test/test-models/good/lang/print_reject_function_tparams.hpp
+src/test/unit/lang/reject/print_reject_function_tdata_test.cpp: src/test/test-models/good/lang/print_reject_function_tdata.hpp
+src/test/unit/lang/reject/print_reject_gq_test.cpp: src/test/test-models/good/lang/print_reject_gq_block.hpp
+src/test/unit/lang/reject/print_reject_model_test.cpp: src/test/test-models/good/lang/print_reject_model_block.hpp
+src/test/unit/lang/reject/print_reject_tparams_test.cpp: src/test/test-models/good/lang/print_reject_tparams_block.hpp
+src/test/unit/lang/reject/print_reject_tdata_test.cpp: src/test/test-models/good/lang/print_reject_tdata_block.hpp
 src/test/unit/mcmc/hmc/hamiltonians/base_hamiltonian_test.cpp: src/test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp
 src/test/unit/mcmc/hmc/hamiltonians/dense_e_metric_test.cpp: src/test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp
 src/test/unit/mcmc/hmc/hamiltonians/diag_e_metric_test.cpp: src/test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp
@@ -202,26 +238,31 @@ src/test/unit/old_services/mcmc/sample_test.cpp: src/test/test-models/good/servi
 src/test/unit/old_services/mcmc/warmup_test.cpp: src/test/test-models/good/services/test_lp.hpp
 src/test/unit/old_services/optimize/do_bfgs_optimize_test.cpp: src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/services/diagnose/diagnose_test.cpp : src/test/test-models/good/services/test_lp.hpp
-src/test/unit/services/optimize/bfgs_test.cpp \
-src/test/unit/services/optimize/lbfgs_test.cpp \
+src/test/unit/services/optimize/bfgs_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
+src/test/unit/services/optimize/lbfgs_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/services/optimize/newton_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/services/experimental/advi/fullrank_test.cpp src/test/unit/services/experimental/advi/meanfield_test.cpp : src/test/test-models/good/services/test_lp.hpp
+src/test/unit/services/sample/fixed_param_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/services/sample/hmc_nuts_dense_e_adapt_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/services/sample/hmc_nuts_dense_e_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/services/sample/hmc_nuts_diag_e_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
-src/test/unit/services/sample/hmc_nuts_diag_e_adapt_e_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
+src/test/unit/services/sample/hmc_nuts_diag_e_adapt_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/services/sample/hmc_nuts_unit_e_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
-src/test/unit/services/sample/hmc_nuts_unit_e_adapt_e_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
+src/test/unit/services/sample/hmc_nuts_unit_e_adapt_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/services/sample/hmc_static_dense_e_adapt_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/services/sample/hmc_static_dense_e_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/services/sample/hmc_static_diag_e_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
-src/test/unit/services/sample/hmc_static_diag_e_adapt_e_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
+src/test/unit/services/sample/hmc_static_diag_e_adapt_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
 src/test/unit/services/sample/hmc_static_unit_e_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
-src/test/unit/services/sample/hmc_static_unit_e_adapt_e_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
+src/test/unit/services/sample/hmc_static_unit_e_adapt_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
+src/test/unit/services/sample/hmc_nuts_dense_inv_metric_test.cpp : src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
+src/test/unit/services/sample/hmc_nuts_diag_inv_metric_test.cpp : src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
+src/test/unit/services/sample/hmc_static_dense_inv_metric_test.cpp : src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
+src/test/unit/services/sample/hmc_static_diag_inv_metric_test.cpp : src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
 src/test/unit/services/util/generate_transitions_test.cpp: src/test/test-models/good/services/test_lp.hpp
 src/test/unit/services/util/initialize_test.cpp: src/test/test-models/good/services/test_lp.hpp
 src/test/unit/services/util/run_adaptive_sampler_test.cpp src/test/unit/services/util/run_sampler_test.cpp: src/test/test-models/good/services/test_lp.hpp
-src/test/unit/services/util/mcmc_writer.hpp : src/test/test-models/good/services/test_lp.hpp
+src/test/unit/services/util/mcmc_writer_test.cpp : src/test/test-models/good/services/test_lp.hpp
 src/test/unit/old_services/sample/mcmc_writer_test.cpp: src/test/test-models/good/io_example.hpp
 src/test/unit/variational/advi_univar_no_constraint_test.cpp: src/test/test-models/good/variational/univariate_no_constraint.hpp
 src/test/unit/variational/advi_univar_with_constraint_test.cpp: src/test/test-models/good/variational/univariate_with_constraint.hpp
@@ -253,4 +294,3 @@ endif
 ifneq (,$(filter $(STANC_TESTS),$(MAKECMDGOALS)))
   -include $(patsubst src/%.cpp,bin/%.d,$(TEMPLATE_INSTANTIATION_CPP))
 endif
-

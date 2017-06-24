@@ -18,11 +18,13 @@ namespace stan {
      * @param[in] funs sequence of function declarations and
      * definitions
      * @param[in,out] o stream for generating
+     * @param[in] rcpp_export if true, comments to enable export for RCpp
+     * are generated
      */
     void generate_functions(const std::vector<function_decl_def>& funs,
-                            std::ostream& o) {
+                            std::ostream& o, bool rcpp_export = false) {
       for (size_t i = 0; i < funs.size(); ++i) {
-        generate_function(funs[i], o);
+        generate_function(funs[i], o, rcpp_export);
         generate_function_functor(funs[i], o);
       }
     }
