@@ -1030,7 +1030,7 @@ namespace stan {
       }
       // no compound assign for array types  (std::vector)
       std::string op_equals = ca.op_;
-      ca.op_ = op_equals.substr(0,op_equals.size()-1);
+      ca.op_ = op_equals.substr(0, op_equals.size()-1);
       if (inferred_lhs_type.num_dims() > 0) {
         error_msgs << "Cannot apply operator '" << op_equals
                    << "' to array variable; variable name = "
