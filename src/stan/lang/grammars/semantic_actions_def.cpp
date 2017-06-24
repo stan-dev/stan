@@ -1029,8 +1029,10 @@ namespace stan {
         return;
       }
       // no compound assign for array types  (std::vector)
+      std::string op_equals = ca.op_;
+      ca.op_ = op_equals.substr(0,op_equals.size()-1);
       if (inferred_lhs_type.num_dims() > 0) {
-        error_msgs << "Cannot apply operator '" << ca.op_
+        error_msgs << "Cannot apply operator '" << op_equals
                    << "' to array variable; variable name = "
                    << name
                    << ".";
@@ -1044,7 +1046,7 @@ namespace stan {
       if (lhs_type.is_primitive()
           && boost::algorithm::starts_with(ca.op_, ".")) {
         error_msgs << "Cannot apply element-wise operation to scalar"
-                   << "; compound operator is: " << ca.op_
+                   << "; compound operator is: " << op_equals
                    << std::endl;
         pass = false;
         return;
@@ -1067,7 +1069,7 @@ namespace stan {
          || (lhs_type == ROW_VECTOR_T && rhs_type == MATRIX_T)
          || (lhs_type == MATRIX_T && rhs_type == DOUBLE_T));
       if (!types_compatible) {
-        error_msgs << "Cannot apply operator '" << ca.op_
+        error_msgs << "Cannot apply operator '" << op_equals
                    << "' to operands;"
                    << " left-hand side type = " << lhs_type
                    << "; right-hand side type=" << rhs_type
@@ -1076,17 +1078,17 @@ namespace stan {
         return;
       }
       std::string op_name;
-      if (ca.op_ == "+=") {
+      if (ca.op_ == "+") {
         op_name = "add";
-      } else if (ca.op_ == "-=") {
+      } else if (ca.op_ == "-") {
         op_name = "subtract";
-      } else if (ca.op_ == "*=") {
+      } else if (ca.op_ == "*") {
         op_name = "multiply";
-      } else if (ca.op_ == "/=") {
+      } else if (ca.op_ == "/") {
         op_name = "divide";
-      } else if (ca.op_ == "./=") {
+      } else if (ca.op_ == "./") {
         op_name = "elt_divide";
-      } else if (ca.op_ == ".*=") {
+      } else if (ca.op_ == ".*") {
         op_name = "elt_multiply";
       }
       // check that "lhs <op> rhs" is valid stan::math function sig
@@ -1095,7 +1097,7 @@ namespace stan {
       arg_types.push_back(rhs_type);
       function_signature_t op_equals_sig(lhs_type, arg_types);
       if (!function_signatures::instance().is_defined(op_name, op_equals_sig)) {
-        error_msgs << "Cannot apply operator '" << ca.op_
+        error_msgs << "Cannot apply operator '" << op_equals
                    << "' to operands;"
                    << " left-hand side type = " << lhs_type
                    << "; right-hand side type=" << rhs_type
