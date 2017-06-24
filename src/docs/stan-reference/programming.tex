@@ -1552,8 +1552,8 @@ vector softmax_id(vector alpha) {
   vector[num_elements(alpha) + 1] alphac1;
   for (k in 1:num_elements(alpha))
     alphac1[k] = alpha[k];
-  alpha[num_elements(alphac)] = 0;
-  return softmax(alphac);
+  alphac1[num_elements(alphac1)] = 0;
+  return softmax(alphac1);
 }
 \end{stancode}
 
