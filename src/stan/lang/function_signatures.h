@@ -161,6 +161,7 @@ for (size_t i = 0; i < int_vector_types.size(); ++i) {
       VECTOR_T);
 }
 add("categorical_rng", INT_T, VECTOR_T);
+add("categorical_logit_rng", INT_T, VECTOR_T);
 for (size_t i = 0; i < vector_types.size(); ++i) {
   for (size_t j = 0; j < vector_types.size(); ++j) {
     for (size_t k = 0; k < vector_types.size(); ++k) {

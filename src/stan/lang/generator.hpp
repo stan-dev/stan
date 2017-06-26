@@ -43,7 +43,7 @@
 #include <stan/lang/generator/write_dims_visgen.hpp>
 #include <stan/lang/generator/write_param_names_visgen.hpp>
 
-// generation functions, starts from geneate_cpp
+// generation functions, starts from generate_cpp
 #include <stan/lang/generator/generate_arg_decl.hpp>
 #include <stan/lang/generator/generate_array_var_type.hpp>
 #include <stan/lang/generator/generate_array_builder_adds.hpp>
@@ -94,6 +94,7 @@
 #include <stan/lang/generator/generate_param_names_method.hpp>
 #include <stan/lang/generator/generate_printable.hpp>
 #include <stan/lang/generator/generate_private_decl.hpp>
+#include <stan/lang/generator/generate_program_reader_fun.hpp>
 #include <stan/lang/generator/generate_propto_default_function.hpp>
 #include <stan/lang/generator/generate_propto_default_function_body.hpp>
 #include <stan/lang/generator/generate_public_decl.hpp>

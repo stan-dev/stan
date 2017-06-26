@@ -42,6 +42,8 @@
 #include <stan/lang/ast/fun/is_assignable.hpp>
 #include <stan/lang/ast/fun/is_multi_index.hpp>
 #include <stan/lang/ast/fun/is_nil.hpp>
+#include <stan/lang/ast/fun/is_nonempty.hpp>
+#include <stan/lang/ast/fun/is_space.hpp>
 #include <stan/lang/ast/fun/is_user_defined.hpp>
 #include <stan/lang/ast/fun/is_user_defined_prob_function.hpp>
 #include <stan/lang/ast/fun/operator_stream_expr_type.hpp>

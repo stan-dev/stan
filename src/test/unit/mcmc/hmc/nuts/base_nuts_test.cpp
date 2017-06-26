@@ -1,5 +1,5 @@
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
-#include <stan/callbacks/stream_writer.hpp>
+#include <stan/callbacks/stream_logger.hpp>
 #include <stan/mcmc/hmc/nuts/base_nuts.hpp>
 #include <stan/mcmc/hmc/integrators/expl_leapfrog.hpp>
 #include <vector>
@@ -55,15 +55,12 @@ namespace stan {
       double phi(ps_point& z) { return this->V(z); }
 
       double dG_dt(ps_point& z,
-                   callbacks::writer& info_writer,
-                   callbacks::writer& error_writer) {
+                   callbacks::logger& logger) {
         return 2;
       }
 
-      Eigen::VectorXd dtau_dq(
-        ps_point& z,
-        callbacks::writer& info_writer,
-        callbacks::writer& error_writer) {
+      Eigen::VectorXd dtau_dq(ps_point& z,
+                              callbacks::logger& logger) {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 
@@ -71,25 +68,18 @@ namespace stan {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 
-      Eigen::VectorXd dphi_dq(
-        ps_point& z,
-        callbacks::writer& info_writer,
-        callbacks::writer& error_writer) {
+      Eigen::VectorXd dphi_dq(ps_point& z, callbacks::logger& logger) {
         return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 
-      void init(ps_point& z,
-                callbacks::writer& info_writer,
-                callbacks::writer& error_writer) {
+      void init(ps_point& z, callbacks::logger& logger) {
         z.V = 0;
       }
 
       void sample_p(ps_point& z, BaseRNG& rng) {};
 
-      void update_potential_gradient(
-        ps_point& z,
-        callbacks::writer& info_writer,
-        callbacks::writer& error_writer) {
+      void update_potential_gradient(ps_point& z,
+                                     callbacks::logger& logger) {
         z.V += 500;
       }
 
@@ -111,7 +101,6 @@ namespace stan {
 }
 
 TEST(McmcNutsBaseNuts, set_max_depth_test) {
-
   rng_t base_rng(0);
 
   Eigen::VectorXd q(2);
@@ -175,16 +164,13 @@ TEST(McmcNutsBaseNuts, build_tree_test) {
   sampler.sample_stepsize();
   sampler.z() = z_init;
 
-  std::stringstream output;
-  stan::callbacks::stream_writer writer(output);
-  std::stringstream error_stream;
-  stan::callbacks::stream_writer error_writer(error_stream);
-
+  std::stringstream debug, info, warn, error, fatal;
+  stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
   bool valid_subtree = sampler.build_tree(3, z_propose,
                                           p_sharp_left, p_sharp_right, rho,
                                           H0, 1, n_leapfrog, log_sum_weight,
-                                          sum_metro_prob, writer, error_writer);
+                                          sum_metro_prob, logger);
 
   EXPECT_TRUE(valid_subtree);
 
@@ -199,8 +185,11 @@ TEST(McmcNutsBaseNuts, build_tree_test) {
   EXPECT_FLOAT_EQ(H0 + std::log(n_leapfrog), log_sum_weight);
   EXPECT_FLOAT_EQ(std::exp(H0) * n_leapfrog, sum_metro_prob);
 
-  EXPECT_EQ("", output.str());
-  EXPECT_EQ("", error_stream.str());
+  EXPECT_EQ("", debug.str());
+  EXPECT_EQ("", info.str());
+  EXPECT_EQ("", warn.str());
+  EXPECT_EQ("", error.str());
+  EXPECT_EQ("", fatal.str());
 }
 
 TEST(McmcNutsBaseNuts, rho_aggregation_test) {
@@ -233,16 +222,13 @@ TEST(McmcNutsBaseNuts, rho_aggregation_test) {
   sampler.sample_stepsize();
   sampler.z() = z_init;
 
-  std::stringstream output;
-  stan::callbacks::stream_writer writer(output);
-  std::stringstream error_stream;
-  stan::callbacks::stream_writer error_writer(error_stream);
-
+  std::stringstream debug, info, warn, error, fatal;
+  stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
   sampler.build_tree(3, z_propose,
                      p_sharp_left, p_sharp_right, rho,
                      H0, 1, n_leapfrog, log_sum_weight,
-                     sum_metro_prob, writer, error_writer);
+                     sum_metro_prob, logger);
 
   EXPECT_EQ(7, sampler.rho_values.size());
   EXPECT_EQ(2 * init_momentum, sampler.rho_values.at(0));
@@ -284,11 +270,8 @@ TEST(McmcNutsBaseNuts, divergence_test) {
   sampler.sample_stepsize();
   sampler.z() = z_init;
 
-  std::stringstream output;
-  stan::callbacks::stream_writer writer(output);
-  std::stringstream error_stream;
-  stan::callbacks::stream_writer error_writer(error_stream);
-
+  std::stringstream debug, info, warn, error, fatal;
+  stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
   bool valid_subtree = 0;
 
@@ -297,7 +280,7 @@ TEST(McmcNutsBaseNuts, divergence_test) {
                                      p_sharp_left, p_sharp_right, rho,
                                      H0, 1, n_leapfrog, log_sum_weight,
                                      sum_metro_prob,
-                                     writer, error_writer);
+                                     logger);
   EXPECT_TRUE(valid_subtree);
   EXPECT_FALSE(sampler.divergent_);
 
@@ -306,7 +289,7 @@ TEST(McmcNutsBaseNuts, divergence_test) {
                                      p_sharp_left, p_sharp_right, rho,
                                      H0, 1, n_leapfrog, log_sum_weight,
                                      sum_metro_prob,
-                                     writer, error_writer);
+                                     logger);
 
   EXPECT_TRUE(valid_subtree);
   EXPECT_FALSE(sampler.divergent_);
@@ -316,13 +299,16 @@ TEST(McmcNutsBaseNuts, divergence_test) {
                                      p_sharp_left, p_sharp_right, rho,
                                      H0, 1, n_leapfrog, log_sum_weight,
                                      sum_metro_prob,
-                                     writer, error_writer);
+                                     logger);
 
   EXPECT_FALSE(valid_subtree);
   EXPECT_TRUE(sampler.divergent_);
 
-  EXPECT_EQ("", output.str());
-  EXPECT_EQ("", error_stream.str());
+  EXPECT_EQ("", debug.str());
+  EXPECT_EQ("", info.str());
+  EXPECT_EQ("", warn.str());
+  EXPECT_EQ("", error.str());
+  EXPECT_EQ("", fatal.str());
 }
 
 TEST(McmcNutsBaseNuts, transition) {
@@ -344,15 +330,13 @@ TEST(McmcNutsBaseNuts, transition) {
   sampler.sample_stepsize();
   sampler.z() = z_init;
 
-  std::stringstream output_stream;
-  stan::callbacks::stream_writer writer(output_stream);
-  std::stringstream error_stream;
-  stan::callbacks::stream_writer error_writer(error_stream);
+  std::stringstream debug, info, warn, error, fatal;
+  stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
   stan::mcmc::sample init_sample(z_init.q, 0, 0);
 
   // Transition will expand trajectory until max_depth is hit
-  stan::mcmc::sample s = sampler.transition(init_sample, writer, error_writer);
+  stan::mcmc::sample s = sampler.transition(init_sample, logger);
 
   EXPECT_EQ(sampler.get_max_depth(), sampler.depth_);
   EXPECT_EQ((2 << (sampler.get_max_depth() - 1)) - 1, sampler.n_leapfrog_);
@@ -361,6 +345,9 @@ TEST(McmcNutsBaseNuts, transition) {
   EXPECT_EQ(21 * init_momentum, s.cont_params()(0));
   EXPECT_EQ(0, s.log_prob());
   EXPECT_EQ(1, s.accept_stat());
-  EXPECT_EQ("", output_stream.str());
-  EXPECT_EQ("", error_stream.str());
+  EXPECT_EQ("", debug.str());
+  EXPECT_EQ("", info.str());
+  EXPECT_EQ("", warn.str());
+  EXPECT_EQ("", error.str());
+  EXPECT_EQ("", fatal.str());
 }

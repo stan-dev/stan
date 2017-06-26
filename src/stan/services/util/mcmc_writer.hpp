@@ -1,6 +1,8 @@
 #ifndef STAN_SERVICES_UTIL_MCMC_WRITER_HPP
 #define STAN_SERVICES_UTIL_MCMC_WRITER_HPP
 
+#include <stan/callbacks/logger.hpp>
+#include <stan/callbacks/writer.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/mcmc/sample.hpp>
 #include <stan/model/prob_grad.hpp>
@@ -22,7 +24,7 @@ namespace stan {
       private:
         callbacks::writer& sample_writer_;
         callbacks::writer& diagnostic_writer_;
-        callbacks::writer& message_writer_;
+        callbacks::logger& logger_;
 
       public:
         /**
@@ -31,14 +33,14 @@ namespace stan {
          * @param[in,out] sample_writer samples are "written" to this stream
          * @param[in,out] diagnostic_writer diagnostic info is "written" to this
          *   stream
-         * @param[in,out] message_writer messages are written to this stream
+         * @param[in,out] logger messages are written through the logger
          */
         mcmc_writer(callbacks::writer& sample_writer,
                     callbacks::writer& diagnostic_writer,
-                    callbacks::writer& message_writer)
+                    callbacks::logger& logger)
           : sample_writer_(sample_writer),
             diagnostic_writer_(diagnostic_writer),
-            message_writer_(message_writer) {
+            logger_(logger) {
         }
 
         /**
@@ -95,13 +97,20 @@ namespace stan {
           Eigen::VectorXd model_values;
 
           std::stringstream ss;
-          model.write_array(rng,
-                            const_cast<Eigen::VectorXd&>(sample.cont_params()),
-                            model_values,
-                            true, true,
-                            &ss);
+          try {
+            model.write_array(rng,
+                        const_cast<Eigen::VectorXd&>(sample.cont_params()),
+                        model_values,
+                        true, true,
+                        &ss);
+          } catch (const std::exception& e) {
+            if (ss.str().length() > 0)
+              logger_.info(ss);
+            logger_.info(e.what());
+            return;
+          }
           if (ss.str().length() > 0)
-            message_writer_(ss.str());
+            logger_.info(ss);
 
           for (int i = 0; i < model_values.size(); ++i)
             values.push_back(model_values(i));
@@ -118,7 +127,6 @@ namespace stan {
          */
         void write_adapt_finish(stan::mcmc::base_mcmc& sampler) {
           sample_writer_("Adaptation terminated");
-          sampler.write_sampler_state(sample_writer_);
         }
 
         /**
@@ -195,6 +203,36 @@ namespace stan {
         }
 
         /**
+         * Internal method
+         *
+         * Logs timing information
+         *
+         * @param[in] warmDeltaT warmup time in seconds
+         * @param[in] sampleDeltaT sample time in seconds
+         */
+        void log_timing(double warmDeltaT, double sampleDeltaT) {
+          std::string title(" Elapsed Time: ");
+          logger_.info("");
+
+          std::stringstream ss1;
+          ss1 << title << warmDeltaT << " seconds (Warm-up)";
+          logger_.info(ss1);
+
+          std::stringstream ss2;
+          ss2 << std::string(title.size(), ' ') << sampleDeltaT
+              << " seconds (Sampling)";
+          logger_.info(ss2);
+
+          std::stringstream ss3;
+          ss3 << std::string(title.size(), ' ')
+              << warmDeltaT + sampleDeltaT
+              << " seconds (Total)";
+          logger_.info(ss3);
+
+          logger_.info("");
+        }
+
+        /**
          * Print timing information to all streams
          *
          * @param[in] warmDeltaT warmup time (sec)
@@ -203,7 +241,7 @@ namespace stan {
         void write_timing(double warmDeltaT, double sampleDeltaT) {
           write_timing(warmDeltaT, sampleDeltaT, sample_writer_);
           write_timing(warmDeltaT, sampleDeltaT, diagnostic_writer_);
-          write_timing(warmDeltaT, sampleDeltaT, message_writer_);
+          log_timing(warmDeltaT, sampleDeltaT);
         }
       };
 

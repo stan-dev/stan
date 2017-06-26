@@ -1,6 +1,7 @@
 #include <ostream>
 #include <stan/io/var_context.hpp>
 #include <stan/io/dump.hpp>
+#include <stan/callbacks/stream_logger.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/model/prob_grad.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
@@ -215,13 +216,15 @@ public:
   stochastic_gradient_ascent_test() :
     model(3),
     throwing_model(3),
-    writer(output) {}
+    writer(writer_output),
+    logger(logger_output, logger_output, logger_output, logger_output, logger_output) {}
 
   void SetUp() {
     cont_params = Eigen::VectorXd::Zero(3);
     model.reset();
     rng.reset();
-    output.clear();
+    writer_output.clear();
+    logger_output.clear();
   }
 
   std::string init;
@@ -229,8 +232,9 @@ public:
   mock_model model;
   mock_throwing_model throwing_model;
   mock_rng rng;
-  std::stringstream output;
+  std::stringstream writer_output, logger_output;
   stan::callbacks::stream_writer writer;
+  stan::callbacks::stream_logger logger;
 };
 
 TEST_F(stochastic_gradient_ascent_test, initialize_state_zero_negative_infinity) {
@@ -274,14 +278,14 @@ TEST_F(stochastic_gradient_ascent_test, initialize_state_zero_negative_infinity)
                                                               1.0,
                                                               0.01,
                                                               1000,
-                                                              writer,
+                                                              logger,
                                                               writer),
                    std::domain_error, error);
   EXPECT_THROW_MSG(advi_fullrank->stochastic_gradient_ascent(fullrank_init,
                                                              1.0,
                                                              0.01,
                                                              1000,
-                                                             writer,
+                                                             logger,
                                                              writer),
                    std::domain_error, error);
 
@@ -330,7 +334,7 @@ TEST_F(stochastic_gradient_ascent_test, initialize_state_zero_grad_error) {
                                                               1.0,
                                                               0.01,
                                                               1000,
-                                                              writer,
+                                                              logger,
                                                               writer),
                    std::domain_error, error);
 
@@ -344,13 +348,10 @@ TEST_F(stochastic_gradient_ascent_test, initialize_state_zero_grad_error) {
                                                              1.0,
                                                              0.01,
                                                              1000,
-                                                             writer,
+                                                             logger,
                                                              writer),
                    std::domain_error, error);
 
   delete advi_meanfield;
   delete advi_fullrank;
 }
-
-
-

@@ -4,7 +4,7 @@
 
 \noindent
 Stan supports regression models from simple linear regressions to
-multilevel generalized linear models.  
+multilevel generalized linear models.
 
 \section{Linear Regression}
 
@@ -15,7 +15,7 @@ regression notation as
 %
 \[
 y_n = \alpha + \beta x_n + \epsilon_n
-\ \ \ \mbox{where} \ \ \ 
+\ \ \ \mbox{where} \ \ \
 \epsilon_n \sim \distro{Normal}(0,\sigma).
 \]
 This is equivalent to the following sampling involving the
@@ -122,7 +122,7 @@ $N$-vector of predictions, one for each of the $N$ data items.  These
 predictions line up with the outcomes in the $N$-vector \code{y}, so
 the entire model may be written using matrix arithmetic as shown.  It
 would be possible to include a column of 1 values in \code{x} and
-remove the \code{alpha} parameter.  
+remove the \code{alpha} parameter.
 
 The sampling statement in the model above is just a more efficient,
 vector-based approach to coding the model with a loop, as in the
@@ -136,7 +136,7 @@ model {
 \end{stancode}
 %
 With Stan's matrix indexing scheme, \code{x[n]} picks out row \code{n}
-of the matrix \code{x};  because \code{beta} is a column vector, 
+of the matrix \code{x};  because \code{beta} is a column vector,
 the product \code{x[n] * beta} is a scalar of type \code{real}.
 
 \subsubsection{Intercepts as Inputs}
@@ -160,18 +160,18 @@ be based on clarity.
 \section{The QR Reparameterization}\label{QR-reparameterization.section}
 
 In the previous example, the linear predictor can be written as
-$\eta = x \beta$, where $\eta$ is a $N$-vector of predictions, 
+$\eta = x \beta$, where $\eta$ is a $N$-vector of predictions,
 $x$ is a $N \times K$ matrix, and $\beta$ is a $K$-vector of coefficients.
 Presuming $N \geq K$, we can exploit the fact that any design matrix, $x$
 can be decomposed using the thin QR decomposition into an orthogonal matrix
 $Q$ and an upper-triangular matrix $R$, i.e. $x = Q R$. See \ref{QR-decomposition}
-for more information on the QR decomposition but note that \code{qr\_Q} and 
+for more information on the QR decomposition but note that \code{qr\_Q} and
 \code{qr\_R} implement the fat QR decomposition so here we thin it by including
 only $K$ columns in $Q$ and $K$ rows in $R$. Also, in practice, it is best to
-write $x = Q^\ast R^\ast$ where $Q^\ast = Q \times \sqrt{n - 1}$ and 
-$R^\ast = \frac{1}{\sqrt{n - 1}} R$. Thus, we can equivalently write 
-$\eta = x \beta = Q R \beta = Q^\ast R^\ast \beta$. If we let 
-$\theta = R^\ast \beta$, then we have $\eta = Q^\ast \theta$ and 
+write $x = Q^\ast R^\ast$ where $Q^\ast = Q \times \sqrt{n - 1}$ and
+$R^\ast = \frac{1}{\sqrt{n - 1}} R$. Thus, we can equivalently write
+$\eta = x \beta = Q R \beta = Q^\ast R^\ast \beta$. If we let
+$\theta = R^\ast \beta$, then we have $\eta = Q^\ast \theta$ and
 $\beta = R^{\ast^{-1}} \theta$. In that case, the previous Stan program becomes
 %
 \begin{stancode}
@@ -242,11 +242,11 @@ in hierarchical models are discussed in
 \refsection{hierarchical-priors} and multivariate parameters in
 \refsection{multivariate-hierarchical-priors}. There is also a
 discussion of priors used to identify models in
-\refsection{priors-for-identification}. 
+\refsection{priors-for-identification}.
 
-However, as described in \refsection{QR-reparameterization}, if you do 
-not have an informative prior on the \emph{location} of the regression 
-coefficients, then you are better off reparameterizing your model so 
+However, as described in \refsection{QR-reparameterization}, if you do
+not have an informative prior on the \emph{location} of the regression
+coefficients, then you are better off reparameterizing your model so
 that the regression coefficients are a generated quantity. In that case,
 it usually does not matter very much what prior is used on on the
 reparameterized regression coefficients and almost any weakly informative
@@ -305,7 +305,7 @@ real<lower=0.1, upper=2.7> sigma;
 \end{stancode}
 %
 This will implicitly give \code{sigma} a $\distro{Uniform}(0.1, 2.7)$
-prior.  
+prior.
 
 \subsubsection{Matching Support to Constraints}
 
@@ -320,7 +320,7 @@ parameters {
   ...
 model {
   // *** bad *** : support narrower than constraint
-  sigma ~ uniform(0.1, 2.7);  
+  sigma ~ uniform(0.1, 2.7);
 \end{stancode}
 %
 The sampling statement imposes a limited support for \code{sigma} in
@@ -346,7 +346,7 @@ coefficients such as $\distro{Normal}(0,1000)$.%
 %
 If the prior scale, such as 1000, is several orders of magnitude
 larger than the estimated coefficients, then such a prior is
-effectively providing no effect whatsoever.  
+effectively providing no effect whatsoever.
 
 We actively discourage users from using the default scale priors
 suggested through the BUGS examples \citep{LunnEtAl:2012}, such as
@@ -379,7 +379,7 @@ sigma ~ normal(0, 1000);
 gives \code{sigma} a half-normal prior, technically
 %
 \[
-p(\sigma) 
+p(\sigma)
 \ = \
 \frac{\distro{Normal}(\sigma | 0, 1000)}
      {1 - \distro{NormalCDF}(0 | 0, 1000)}
@@ -427,7 +427,7 @@ Consider the women's height example again.  One way to formulate a
 proper prior is to impose a uniform prior on a bounded scale.  For
 example, we could declare the parameter for mean women's height to
 have a lower bound of one meter and an upper bound of three meters.
-Surely the answer has to lie in that range.  
+Surely the answer has to lie in that range.
 
 Similarly, it is not uncommon to see priors for scale parameters that
 impose lower bounds of zero and upper bounds of very large numbers,
@@ -461,7 +461,7 @@ prior that concentrates most of mass around the area where values are
 expected to be, but still leaves a lot of mass in its tails.  The
 usual choice in such a situation is to use a Cauchy distribution for a
 prior, which can concentrate its mass around its median, but has tails
-that are so fat that the variance is infinite.  
+that are so fat that the variance is infinite.
 
 Without specific information, the Cauchy prior is a very good default
 parameter choice for regression coefficients
@@ -545,11 +545,11 @@ parameters {
 }
 model {
   y ~ bernoulli_logit(alpha + beta * x);
-} 
+}
 \end{stancode}
 %
 The noise parameter is built into the Bernoulli formulation here
-rather than specified directly.  
+rather than specified directly.
 
 Logistic regression is a kind of generalized linear model with binary
 outcomes and the log odds (logit) link function, defined by
@@ -558,7 +558,7 @@ outcomes and the log odds (logit) link function, defined by
 \mbox{logit}(v) = \log \left( \frac{v}{1-v} \right).
 \]
 %
-The inverse of the link function appears in the model.  
+The inverse of the link function appears in the model.
 %
 \[
 \mbox{logit}^{-1}(u) = \frac{1}{1 + \exp(-u)}.
@@ -566,10 +566,10 @@ The inverse of the link function appears in the model.
 %
 
 The model formulation above uses the logit-parameterized version of
-the Bernoulli distribution, which is defined by 
+the Bernoulli distribution, which is defined by
 %
 \[
-\distro{BernoulliLogit}(y|\alpha) 
+\distro{BernoulliLogit}(y|\alpha)
 =
 \distro{Bernoulli}(y | \mbox{logit}^{-1}(\alpha)).
 \]
@@ -596,7 +596,7 @@ for (n in 1:N)
 
 Other link functions may be used in the same way.  For example, probit
 regression uses the cumulative normal distribution function, which is
-typically written as 
+typically written as
 \[
 \Phi(x) = \int_{-\infty}^x \distro{Normal}(y|0,1) \, dy.
 \]
@@ -611,8 +611,8 @@ statement with the following.
         y[n] ~ bernoulli(Phi(alpha + beta * x[n]));
 \end{stancode}
 %
-A fast approximation to the cumulative unit normal distribution function 
-$\Phi$ is implemented in Stan as the function \code{Phi\_approx}.  The 
+A fast approximation to the cumulative unit normal distribution function
+$\Phi$ is implemented in Stan as the function \code{Phi\_approx}.  The
 approximate probit regression model may be coded with the following.
 %
 
@@ -661,7 +661,7 @@ distribution, with the parameters on the logit scale (see
 \code{categorical\_logit}).
 
 The first loop may be made more efficient by vectorizing the first
-loop by converting the matrix \code{beta} to a vector, 
+loop by converting the matrix \code{beta} to a vector,
 %
 \begin{stancode}
 to_vector(beta) ~ normal(0, 5);
@@ -711,7 +711,7 @@ of its input, the model is typically only identified if there is a
 suitable prior on the coefficients.
 
 An alternative is to use $(K-1)$-vectors by fixing one of them to be
-zero. \refsection{partially-known-parameters} discusses how to mix 
+zero. \refsection{partially-known-parameters} discusses how to mix
 constants and parameters in a vector.  In the multi-logit case, the
 parameter block would be redefined to use $(K-1)$-vectors
 %
@@ -824,7 +824,7 @@ necessary to take on every possible value that sums to zero.
 
 With this parameterization, a Dirichlet prior can be placed on
 \code{beta\_raw}, perhaps uniform, and another prior put on
-\code{beta\_scale}, typically for ``shrinkage.''  
+\code{beta\_scale}, typically for ``shrinkage.''
 
 
 \subsection{Soft Centering}
@@ -847,7 +847,7 @@ vector $\beta \in \reals^D$ along with a sequence of cutpoints $c \in
 $k$ if the linear predictor $x_n \beta$ falls between $c_{k-1}$ and
 $c_k$, assuming $c_0 = -\infty$ and $c_K = \infty$.  The noise term is
 fixed by the form of regression, with examples for ordered logistic
-and ordered probit models.  
+and ordered probit models.
 
 \subsection{Ordered Logistic Regression}
 
@@ -863,19 +863,19 @@ data {
   int<lower=1> D;
   int<lower=1,upper=K> y[N];
   row_vector[D] x[N];
-} 
+}
 parameters {
   vector[D] beta;
   ordered[K-1] c;
-} 
+}
 model {
   for (n in 1:N)
     y[n] ~ ordered_logistic(x[n] * beta, c);
 }
 \end{stancode}
-% 
+%
 The vector of cutpoints \code{c} is declared as \code{ordered[K-1]},
-which guarantees that \code{c[k]} is less than \code{c[k+1]}. 
+which guarantees that \code{c[k]} is less than \code{c[k+1]}.
 
 If the cutpoints were assigned independent priors, the constraint
 effectively truncates the joint prior to support over points that
@@ -974,7 +974,7 @@ model {
   for (n in 1:N)
     y[n] ~ bernoulli(inv_logit(x[n] * beta[ll[n]]));
 }
-\end{stancode}  
+\end{stancode}
 %
 The standard deviation parameter \code{sigma} gets an implicit uniform
 prior on $(0,\infty)$ because of its declaration with a lower-bound
@@ -1017,7 +1017,7 @@ Bernoulli,
 
 \begin{stancode}
   for (n in 1:N)
-    y[n] ~ bernoulli_logit(x[n] * beta[ll[n]]);    
+    y[n] ~ bernoulli_logit(x[n] * beta[ll[n]]);
 \end{stancode}
 %
 See \refsection{bernoulli-logit-distribution} for a definition of
@@ -1042,7 +1042,7 @@ the original formulation as a loop over a sampling statement.
 %
 The brackets introduce a new scope for the local variable
 \code{x\_beta\_ll}; alternatively, the variable may be declared at the
-top of the model block.  
+top of the model block.
 
 In some cases, such as the above, the local variable assignment leads
 to models that are less readable.  The recommended practice in such
@@ -1149,7 +1149,7 @@ The model parameters are declared as follows.
 %
 
 \begin{stancode}
-parameters {    
+parameters {
   real delta;         // mean student ability
   real alpha[J];      // ability of student j - mean ability
   real beta[K];       // difficulty of question k
@@ -1196,7 +1196,7 @@ priors.  For example, adding a term $\xi$ to each $\alpha_j$ and
 $\beta_k$ results in the same predictions.  The use of priors for
 $\alpha$ and $\beta$ located at 0 identifies the parameters; see
 \citep{GelmanHill:2007} for a discussion of identifiability issues and
-alternative approaches to identification.  
+alternative approaches to identification.
 
 For testing purposes, the IRT 1PL model distributed with Stan uses
 informative priors that match the actual data generation process used
@@ -1220,12 +1220,12 @@ parameters are declared as follows.
 %
 
 \begin{stancode}
-parameters {    
+parameters {
   real mu_beta;                  // mean student ability
   real alpha[J];               // ability for j - mean
   real beta[K];                // difficulty for k
   real<lower=0> gamma[K];      // discrimination of k
-  real<lower=0> sigma_beta;    // scale of difficulties 
+  real<lower=0> sigma_beta;    // scale of difficulties
   real<lower=0> sigma_gamma;   // scale of log discrimination
 }
 \end{stancode}
@@ -1235,14 +1235,14 @@ The parameters should be clearer after the model definition.
 \begin{stancode}
 model {
   alpha ~ normal(0, 1);
-  beta ~ normal(0, sigma_beta);   
+  beta ~ normal(0, sigma_beta);
   gamma ~ lognormal(0, sigma_gamma);
   mu_beta ~ cauchy(0, 5);
   sigma_alpha ~ cauchy(0, 5);
   sigma_beta ~ cauchy(0, 5);
   sigma_gamma ~ cauchy(0, 5);
   for (n in 1:N)
-    y[n] ~ bernoulli_logit(gamma[kk[n]] 
+    y[n] ~ bernoulli_logit(gamma[kk[n]]
                            * (alpha[jj[n]] - (beta[kk[n]] + mu_beta)));
 }
 \end{stancode}
@@ -1271,7 +1271,7 @@ given weakly informative non-hierarchical priors, such as
 \end{stancode}
 %
 The point is that the \code{alpha} determines the scale and location
-and \code{beta} and \code{gamma} are allowed to float.  
+and \code{beta} and \code{gamma} are allowed to float.
 
 The \code{beta} parameter is here given a non-centered
 parameterization, with parameter \code{mu\_beta} serving as the mean
@@ -1289,7 +1289,7 @@ and
 %
 Non-centered parameterizations tend to be more efficient in
 hierarchical models; see \refsection{reparameterization} for more
-information on non-centered reparameterizations.  
+information on non-centered reparameterizations.
 
 The intercept term \code{mu\_beta} can't itself be modeled
 hierarchically, so it is given a weakly informative
@@ -1344,7 +1344,7 @@ outcomes and negative in cases of 0 outcomes, then the maximum
 likelihood estimate for the coefficient for that predictor diverges to
 infinity.  This divergence can be controlled by providing a prior for
 the coefficient, which will ``shrink'' the estimate back toward zero
-and thus identify the model in the posterior.  
+and thus identify the model in the posterior.
 
 Similar problems arise for sampling with improper flat priors.  The
 sampler will try to draw very large values.  By providing a prior,
@@ -1358,7 +1358,7 @@ well-behaved sampling.
 In hierarchical regression models (and other situations), several
 individual-level variables may be assigned hierarchical priors.  For
 example, a model with multiple varying intercepts and slopes within
-might assign them a multivariate prior. 
+might assign them a multivariate prior.
 
 As an example, the individuals might be people and the outcome income,
 with predictors such as education level and age, and the groups might be states
@@ -1375,7 +1375,7 @@ has a predictor row vector $x_n$ of size $K$; to unify the notation, they
 assume that $x_{n,1} = 1$ is a fixed ``intercept'' predictor.  To
 encode group membership, they assume individual $n$ belongs to group
 $jj[n] \in 1{:}J$.  Each individual $n$ also has an observed outcome
-$y_n$ taking on real values. 
+$y_n$ taking on real values.
 
 \subsubsection{Likelihood}
 
@@ -1384,7 +1384,7 @@ varying by group, so that $\beta_j$ is the coefficient $K$-vector for
 group $j$.  The likelihood function for individual $n$ is then just
 %
 \[
-y_n \sim \distro{Normal}(x_n \, \beta_{jj[n]}, \, \sigma) 
+y_n \sim \distro{Normal}(x_n \, \beta_{jj[n]}, \, \sigma)
 \mbox{ for } n \in 1{:}N.
 \]
 %
@@ -1416,18 +1416,18 @@ prior for independent coefficients, such as
 \]
 Of course, if more is known about the expected coefficient values
 $\beta_{j, k}$, this information can be incorporated into the prior for
-$\mu_k$.  
+$\mu_k$.
 
 For the prior on the covariance matrix, Gelman and Hill suggest using
 a scaled inverse Wishart.  That choice was motivated primarily by
 convenience as it is conjugate to the multivariate likelihood function
-and thus simplifies Gibbs sampling.  
+and thus simplifies Gibbs sampling.
 
 In Stan, there is no restriction to conjugacy for multivariate priors,
 and we in fact recommend a slightly different approach.  Like Gelman
 and Hill, we decompose our prior into a scale and a matrix, but are
 able to do so in a more natural way based on the actual variable
-scales and a correlation matrix.  Specifically, we define 
+scales and a correlation matrix.  Specifically, we define
 \[
 \Sigma = \mbox{diag\_matrix}(\tau) \ \Omega \ \mbox{diag\_matrix}(\tau),
 \]
@@ -1446,7 +1446,7 @@ The components of the scale vector $\tau$ can be given any reasonable
 prior for scales, but we recommend something weakly informative like a
 half-Cauchy distribution with a small scale, such as
 \[
-\tau_k \sim \distro{Cauchy}(0, 2.5) 
+\tau_k \sim \distro{Cauchy}(0, 2.5)
 \mbox{ for } k \in 1{:}K \mbox{ constrained by } \tau_k > 0.
 \]
 As for the prior means, if there is information about the scale of
@@ -1484,7 +1484,7 @@ The group-level coefficients $\gamma$ may themselves be given
 independent weakly informative priors, such as
 \[
 \gamma_l \sim \distro{Normal}(0,5).
-\] 
+\]
 As usual, information about the group-level means should be
 incorporated into this prior.
 
@@ -1529,7 +1529,7 @@ model {
 \end{stancode}
 %
 The hyperprior covariance matrix is defined implicitly through the
-a quadratic form in the code 
+a quadratic form in the code
 because the correlation matrix \code{Omega} and scale vector
 \code{tau} are more natural to inspect in the output; to output
 \code{Sigma}, define it as a transformed parameter.  The function
@@ -1557,7 +1557,7 @@ with the vectorized form:
   {
     vector[N] x_beta_jj;
     for (n in 1:N)
-      x_beta_jj[n] = x[n] * beta[jj[n]]
+      x_beta_jj[n] = x[n] * beta[jj[n]];
     y ~ normal(x_beta_jj, sigma);
   }
 \end{stancode}
@@ -1581,7 +1581,7 @@ model {
   ...
 \end{stancode}
 %
-thsi fails because it breaks the vectorization of sampling for
+this fails because it breaks the vectorization of sampling for
 \code{beta},%
 %
 \footnote{Thanks to Mike Lawrence for pointing this out in the GitHub
@@ -1599,7 +1599,7 @@ optimization in and of itself because there are no shared computations.
 The code in the Stan program above also builds up an array of vectors
 for the outcomes and for the multivariate normal, which provides a
 very significant speedup by reducing the number of linear systems that
-need to be solved and differentiated.  
+need to be solved and differentiated.
 %
 \begin{stancode}
   {
@@ -1629,7 +1629,7 @@ prior with an equivalent Cholesky factorized prior is as follows.
 %
 \begin{stancode}
 data {
-  matrix[J, L] u;  
+  matrix[J, L] u;
   ...
 parameters {
   matrix[K, J] z;
@@ -1640,10 +1640,10 @@ transformed parameters {
   beta = u * gamma + (diag_pre_multiply(tau,L_Omega) * z)';
 }
 model {
-  to_vector(z) ~ normal(0, 1); 
+  to_vector(z) ~ normal(0, 1);
   L_Omega ~ lkj_corr_cholesky(2);
   ...
-\end{stancode}  
+\end{stancode}
 %
 The data variable \code{u} was originally an array of vectors, which
 is efficient for access; here it is redeclared as a matrix in order to
@@ -1660,12 +1660,12 @@ Pre-multiplying the Cholesky factor by the scale produces the Cholesky
 factor of the final covariance matrix,
 %
 \begin{stancode}
-  Sigma_beta 
+  Sigma_beta
   = quad_form_diag(Omega, tau)
   = diag_pre_multiply(tau, L_Omega) * diag_pre_multiply(tau, L_Omega)'
 \end{stancode}
 %
-where the diagonal pre-multiply compound operation is defined by 
+where the diagonal pre-multiply compound operation is defined by
 %
 \begin{stancode}
 diag_pre_multiply(a, b) = diag_matrix(a) * b
@@ -1685,8 +1685,8 @@ optimized model is as follows.
 \begin{stancode}
 parameters {
   matrix[K, J] z;
-  cholesky_factor_corr[K] L_Omega;  
-  vector<lower=0,upper=pi()/2>[K] tau_unif;  
+  cholesky_factor_corr[K] L_Omega;
+  vector<lower=0,upper=pi()/2>[K] tau_unif;
   matrix[L, K] gamma;                         // group coeffs
   real<lower=0> sigma;                       // prediction error scale
 }
@@ -1697,7 +1697,7 @@ transformed parameters {
   beta = u * gamma + (diag_pre_multiply(tau,L_Omega) * z)';
 }
 model {
-  to_vector(z) ~ normal(0, 1); 
+  to_vector(z) ~ normal(0, 1);
   L_Omega ~ lkj_corr_cholesky(2);
   to_vector(gamma) ~ normal(0, 5);
   y ~ normal(rows_dot_product(beta[jj] , x), sigma);
@@ -1716,12 +1716,12 @@ This model also reparameterizes the prior scale \code{tau} to avoid potential pr
 %   ...
 % transformed parameters {
 %   matrix[M,3] alpha;
-%   alpha 
+%   alpha
 %     = transpose(rep_matrix(mu, M)
 %                  + diag_pre_multiply(sigma_Sigma,L_Sigma) * z);
 %   ...
 % model {
-%   to_vector(z) ~ normal(0, 1); 
+%   to_vector(z) ~ normal(0, 1);
 %   gamma ~ normal(0, 5);
 %   sigma_Sigma ~ cauchy(0, 2.5);
 %   L_Sigma ~ lkj_corr_cholesky(3);
@@ -1729,7 +1729,7 @@ This model also reparameterizes the prior scale \code{tau} to avoid potential pr
 % \end{stancode}
 % \end{quote}
 % %
-% Taken together, this Stan program amounts to 
+% Taken together, this Stan program amounts to
 % %
 % \begin{eqnarray*}
 % \sigma & \sim & \mbox{Cauchy}(0, 2.5)
@@ -1771,11 +1771,11 @@ matrix \code{x\_new}.
 data {
   int<lower=1> K;
   int<lower=0> N;
-  matrix[N, K] x;       
-  vector[N] y;     
+  matrix[N, K] x;
+  vector[N] y;
 
   int<lower=0> N_new;
-  matrix[N_new, K] x_new; 
+  matrix[N_new, K] x_new;
 }
 parameters {
   vector[K] beta;
@@ -1806,10 +1806,10 @@ parameters {
   real<lower=0> sigma;
 }
 model {
-  y ~ normal(x * beta, sigma);         
+  y ~ normal(x * beta, sigma);
 }
 generated quantities {
-  vector[N_new] y_new;  
+  vector[N_new] y_new;
   for (n in 1:N_new)
     y_new[n] = normal_rng(x_new[n] * beta, sigma);
 }
@@ -1832,7 +1832,7 @@ negative binomial random variate with a mean of $2^{31}$.  These must
 be intercepted and dealt with, typically be reparameterizing or
 reimplementing the random number generator using real values rather
 than integers, which are upper-bounded by $2^{31} - 1$ in Stan.
-  
+
 
 \section{Multivariate Outcomes}
 
@@ -1841,13 +1841,13 @@ scalar, boolean, categorical, ordinal, or count).  Even multinomial
 regressions are just repeated categorical regressions.  In contrast,
 this section discusses regression when each observed value is
 multivariate.  To relate multiple outcomes in a regression setting,
-their error terms are provided with covariance structure.  
+their error terms are provided with covariance structure.
 
 This section considers two cases, seemingly unrelated regressions for
 continuous multivariate quantities and multivariate probit regression
 for boolean multivariate quantities.
 
-\subsection{Seemingly Unrelated Regressions} 
+\subsection{Seemingly Unrelated Regressions}
 
 The first model considered is the ``seemingly unrelated'' regressions
 (SUR) of econometrics where several linear regressions share
@@ -1932,7 +1932,7 @@ all at once by converting the matrix \code{beta} to a vector.
 
 If required, the full correlation or covariance matrices may be
 reconstructed from their Cholesky factors in the generated quantities
-block.  
+block.
 
 
 \subsection{Multivariate Probit Regression}
@@ -1944,7 +1944,7 @@ regression.
 The observations $y_n$ are $D$-vectors of boolean values (coded 0 for
 false, 1 for true).  The values for the observations $y_n$ are based
 on latent values $z_n$ drawn from a seemingly unrelated regression
-model (see the previous section), 
+model (see the previous section),
 %
 \begin{eqnarray*}
  z_n & = & x_n \, \beta + \epsilon_n
@@ -2067,7 +2067,7 @@ parameters {
 These include the regression coefficients \code{beta} and the Cholesky
 factor of the correlation matrix, \code{L\_Omega}.  This time there is
 no scaling because the covariance matrix has unit scale (i.e., it is a
-correlation matrix;  see above). 
+correlation matrix;  see above).
 
 The critical part of the parameter declaration is that the latent real
 value $z$ is broken into positive-constrained and negative-constrained
@@ -2092,9 +2092,9 @@ seemingly unrelated regression.
 model {
   L_Omega ~ lkj_corr_cholesky(4);
   to_vector(beta) ~ normal(0, 5);
-  { 
+  {
     vector[D] beta_x[N];
-    for (n in 1:N) 
+    for (n in 1:N)
       beta_x[n] = beta * x[n];
     z ~ multi_normal_cholesky(beta_x, L_Omega);
   }
@@ -2105,12 +2105,12 @@ This simple form of model is made possible by the Albert and
 Chib-style constraints on \code{z}.
 
 Finally, the correlation matrix itself can be put back together in the
-generated quantities block if desired. 
+generated quantities block if desired.
 %
 \begin{stancode}
 generated quantities {
   corr_matrix[D] Omega;
-  Omega = multiply_lower_tri_self_transpose(L_Omega);  
+  Omega = multiply_lower_tri_self_transpose(L_Omega);
 }
 \end{stancode}
 %
@@ -2136,9 +2136,9 @@ improper uniform priors, the posterior over the parameters given $x$
 and $y$ is
 %
 \[
-p(\alpha, \beta, \sigma \, | \, x, y) 
-\propto 
-\prod_{n=1}^N 
+p(\alpha, \beta, \sigma \, | \, x, y)
+\propto
+\prod_{n=1}^N
   \distro{Normal}(y_n \, | \, \alpha + \beta x_n, \sigma).
 \]
 %
@@ -2150,7 +2150,7 @@ p(\tilde{y}_n \, | \, \tilde{x}_n, x, y)
 = \int_{(\alpha,\beta,\sigma)}
   \distro{Normal}(\tilde{y}_n \, | \, \alpha + \beta \tilde{x}_n, \sigma)
   \times
-  p(\alpha, \beta, \sigma \, | \, x, y) 
+  p(\alpha, \beta, \sigma \, | \, x, y)
   \
   \mathrm{d}(\alpha,\beta,\sigma).
 \]
@@ -2223,7 +2223,7 @@ well, the simulated $\tilde{y}$ will look like the actual data $y$.
 \noindent
 Times series data come arranged in temporal order.  This chapter
 presents two kinds of time series models, regression-like models such
-as autoregressive and moving average models, and hidden Markov models. 
+as autoregressive and moving average models, and hidden Markov models.
 
 \refchapter{gaussian-processes} presents Gaussian processes, which may
 also be used for time-series (and spatial) data.
@@ -2279,7 +2279,7 @@ above being replaced with the one-liner
 %
 \begin{stancode}
 model {
-  y[2:(N - 1)] ~ normal(alpha + beta * y[1:(N - 1)], sigma);
+  y[2:N] ~ normal(alpha + beta * y[1:(N - 1)], sigma);
 }
 \end{stancode}
 %
@@ -2288,13 +2288,13 @@ elements and the right-hand side version pulls out the first $N-1$.
 
 
 
-\subsection{Extensions to the AR(1) Model} 
+\subsection{Extensions to the AR(1) Model}
 
 Proper priors of a range of different families may be added for the
 regression coefficients and noise scale.  The normal noise model can
 be changed to a Student-$t$ distribution or any other distribution
 with unbounded support.  The model could also be made hierarchical if
-multiple series of observations are available.  
+multiple series of observations are available.
 
 To enforce the estimation of a stationary AR(1) process, the slope
 coefficient \code{beta} may be constrained with bounds as follows.
@@ -2368,7 +2368,7 @@ equations, where $r_t$ is the observed return at time point $t$
 and $\mu$, $\alpha_0$, and $\alpha_1$ are unknown regression coefficient parameters.
 %
 \begin{eqnarray*}
-r_t & = & \mu + a_t 
+r_t & = & \mu + a_t
 \\[2pt]
 a_t & = & \sigma_t \epsilon_t
 \\[2pt]
@@ -2379,7 +2379,7 @@ a_t & = & \sigma_t \epsilon_t
 %
 In order to ensure the noise terms $\sigma^2_t$ are positive, the
 scale coefficients are constrained to be positive, $\alpha_0, \alpha_1
-> 0$.  To ensure stationarity of the time series, the slope is 
+> 0$.  To ensure stationarity of the time series, the slope is
 constrained to to be less than one, $\alpha_1 < 1$.%
 %
 \footnote{In practice, it can be useful to remove the constraint to
@@ -2434,21 +2434,21 @@ stationary, the coefficients must all satisfy $\alpha_0, \alpha_1,
 %
 \begin{stancode}
 data {
-  int<lower=0> T; 
+  int<lower=0> T;
   real r[T];
-  real<lower=0> sigma1; 
+  real<lower=0> sigma1;
 }
 parameters {
-  real mu; 
-  real<lower=0> alpha0;          
-  real<lower=0,upper=1> alpha1;  
-  real<lower=0,upper=(1-alpha1)> beta1; 
+  real mu;
+  real<lower=0> alpha0;
+  real<lower=0,upper=1> alpha1;
+  real<lower=0,upper=(1-alpha1)> beta1;
 }
 transformed parameters {
   real<lower=0> sigma[T];
   sigma[1] = sigma1;
   for (t in 2:T)
-    sigma[t] = sqrt(alpha0 
+    sigma[t] = sqrt(alpha0
                      + alpha1 * pow(r[t-1] - mu, 2)
                      + beta1 * pow(sigma[t-1], 2));
 }
@@ -2458,12 +2458,12 @@ model {
 \end{stancode}
 %
 To get the recursive definition of the volatility regression off the
-ground, the data declaration includes a non-negative value 
-\code{sigma1} for the scale of the noise at $t = 1$. 
+ground, the data declaration includes a non-negative value
+\code{sigma1} for the scale of the noise at $t = 1$.
 
 The constraints are coded directly on the parameter declarations.
 This declaration is order-specific in that the constraint on \code{beta1}
-depends on the value of \code{alpha1}. 
+depends on the value of \code{alpha1}.
 
 A transformed parameter array of non-negative values \code{sigma} is
 used to store the scale values at each time point.  The definition of
@@ -2528,7 +2528,7 @@ model {
   theta ~ cauchy(0, 2.5);
   sigma ~ cauchy(0, 2.5);
   for (t in 3:T)
-    y[t] ~ normal(mu 
+    y[t] ~ normal(mu
                   + theta[1] * epsilon[t - 1]
                   + theta[2] * epsilon[t - 2],
                   sigma);
@@ -2545,7 +2545,7 @@ although other priors can be used just as easily.
 This model could be improved in terms of speed by vectorizing the
 sampling statement in the model block.  Vectorizing the calculation of
 the $\epsilon_t$ could also be sped up by using a dot product instead
-of a loop.  
+of a loop.
 
 
 \subsection{Vectorized $\mbox{MA}(Q)$ Model}
@@ -2629,11 +2629,11 @@ model {
 \end{stancode}
 %
 The data is declared in the same way as the other time-series
-regressions and the parameters are documented in the code. 
+regressions and the parameters are documented in the code.
 
 In the model block, the local vector \code{nu} stores the predictions
 and \code{err} the errors.  These are computed similarly to the
-errors in the moving average models described in the previous section.  
+errors in the moving average models described in the previous section.
 
 The priors are weakly informative for stationary processes.  The
 likelihood only involves the error term, which is efficiently
@@ -2658,7 +2658,7 @@ model {
   err = y[1] - mu + phi * mu;
   err ~ normal(0, sigma);
   for (t in 2:T) {
-    err = y[t] - (mu + phi * y[t-1] + theta * err); 
+    err = y[t] - (mu + phi * y[t-1] + theta * err);
     err ~ normal(0, sigma);
   }
 }
@@ -2668,7 +2668,7 @@ This approach to ARMA models provides a nice example of how local
 variables, such as \code{err} in this case, can be reused in Stan.
 Folta's approach could be extended to higher order moving-average
 models by storing more than one error term as a local variable and
-reassigning them in the loop.  
+reassigning them in the loop.
 
 Both encodings are very fast.  The original encoding has the advantage
 of vectorizing the normal distribution, but it uses a bit more memory.
@@ -2702,7 +2702,7 @@ it's worth adding the following constraint to ensure stationarity.
 %
 \begin{stancode}
 read<lower = -1, upper = 1> phi;
-\end{stancode} 
+\end{stancode}
 
 
 
@@ -2736,7 +2736,7 @@ h_1 \sim \distro{Normal}\left( \mu, \frac{\sigma}{\sqrt{1 - \phi^2}} \right)
 %
 Rearranging the first line, $\epsilon_t = y_t \exp(-h_t / 2)$,
 allowing the sampling distribution for $y_t$ to be written as
-\[ 
+\[
 y_t \sim \distro{Normal}(0,\exp(h_t/2)).
 \]
 The recurrence equation for $h_{t+1}$ may be combined with the
@@ -2761,7 +2761,7 @@ parameters {
 model {
   phi ~ uniform(-1, 1);
   sigma ~ cauchy(0, 5);
-  mu ~ cauchy(0, 10);  
+  mu ~ cauchy(0, 10);
   h[1] ~ normal(mu, sigma / sqrt(1 - phi * phi));
   for (t in 2:T)
     h[t] ~ normal(mu + phi * (h[t - 1] -  mu), sigma);
@@ -2781,11 +2781,11 @@ typically has high posterior variance.  For example, simulating 500
 data points from the above model with $\mu = -1.02$, $\phi = 0.95$,
 and $\sigma = 0.25$ leads to 95\% posterior intervals for $\mu$ of
 $(-1.23, -0.54)$, for $\phi$ of $(0.82,0.98 )$ and for $\sigma$ of
-$(0.16,0.38)$. 
+$(0.16,0.38)$.
 
 The samples using NUTS show a high degree of autocorrelation among the
 samples, both for this model and the stochastic volatility model
-evaluated in \citep{Hoffman-Gelman:2011, Hoffman-Gelman:2014}.  
+evaluated in \citep{Hoffman-Gelman:2011, Hoffman-Gelman:2014}.
 Using a non-diagonal mass
 matrix provides faster convergence and more effective samples than a
 diagonal mass matrix, but will not scale to large values of $T$.
@@ -2866,7 +2866,7 @@ probability of transitioning to state $z_t$ from state $z_{t-1}$ is
 z_t \sim \distro{Categorical}(\theta_{z[t-1]}).
 \]
 The output $y_t$ at time $t$ is generated conditionally independently
-based on the latent state $z_t$.  
+based on the latent state $z_t$.
 
 This section describes HMMs with a simple categorical model for
 outputs $y_t \in \{1,\ldots,V\}$.  The categorical distribution for
@@ -2901,7 +2901,7 @@ parameters {
   simplex[V] phi[K];    // emit probs
 }
 model {
-  for (k in 1:K) 
+  for (k in 1:K)
     theta[k] ~ dirichlet(alpha);
   for (k in 1:K)
     phi[k] ~ dirichlet(beta);
@@ -2924,7 +2924,7 @@ If the data are conceived as a subsequence of a long-running process,
 the probability of $z_1$ should be set to the stationary state
 probabilities in the Markov chain.  In this case, there is no distinct
 end to the data, so there is no need to model the probability that the
-sequence ends at $z_T$.  
+sequence ends at $z_T$.
 
 An alternative conception of HMMs is as models of finite-length
 sequences.  For example, human language sentences have distinct
@@ -2953,7 +2953,7 @@ emission matrices.
 transformed data {
   int<lower=0> trans[K, K];
   int<lower=0> emit[K, V];
-  for (k1 in 1:K) 
+  for (k1 in 1:K)
     for (k2 in 1:K)
       trans[k1, k2] = 0;
   for (t in 2:T)
@@ -3006,7 +3006,7 @@ data block.
 transformed data {
   vector<lower=0>[K] alpha_post[K];
   vector<lower=0>[V] beta_post[K];
-  for (k in 1:K) 
+  for (k in 1:K)
     alpha_post[k] = alpha;
   for (t in 2:T)
     alpha_post[z[t-1], z[t]] = alpha_post[z[t-1], z[t]] + 1;
@@ -3021,7 +3021,7 @@ The posterior can now be written analytically as follows.
 %
 \begin{stancode}
 model {
-  for (k in 1:K) 
+  for (k in 1:K)
     theta[k] ~ dirichlet(alpha_post[k]);
   for (k in 1:K)
     phi[k] ~ dirichlet(beta_post[k]);
@@ -3039,7 +3039,7 @@ supervised and unsupervised data.  Implementing this estimation
 strategy in Stan requires calculating the probability of an output
 sequence with an unknown state sequence.  This is a marginalization
 problem, and for HMMs, it is computed with the so-called forward
-algorithm.  
+algorithm.
 
 In Stan, the forward algorithm is coded as follows.%
 %
@@ -3059,12 +3059,12 @@ data {
 %
 The model for the supervised data does not change; the unsupervised
 data is handled with the following Stan implementation of the forward
-algorithm.  
+algorithm.
 %
 \begin{stancode}
 model {
  ...
-  { 
+  {
     real acc[K];
     real gamma[T_unsup, K];
     for (k in 1:K)
@@ -3099,7 +3099,7 @@ way.
 
 The brackets provide the scope for the local variables \code{acc} and
 \code{gamma}; these could have been declared earlier, but it is
-clearer to keep their declaration near their use. 
+clearer to keep their declaration near their use.
 
 
 \subsection{Predictive Inference}
@@ -3108,7 +3108,7 @@ Given the transition and emission parameters, $\theta_{k, k'}$ and
 $\phi_{k,v}$ and an observation sequence $u_1,\ldots,u_T \in \{
 1,\ldots,V \}$, the Viterbi (dynamic programming) algorithm
 computes the state sequence which is most likely to have generated the
-observed output $u$.  
+observed output $u$.
 
 The Viterbi algorithm can be coded in Stan in the generated quantities
 block as follows.  The predictions here is the most likely state
@@ -3122,7 +3122,7 @@ different from sample to sample in the posterior.
 generated quantities {
   int<lower=1,upper=K> y_star[T_unsup];
   real log_p_y_star;
-  { 
+  {
     int back_ptr[T_unsup, K];
     real best_logp[T_unsup, K];
     real best_total_logp;
@@ -3133,7 +3133,7 @@ generated quantities {
         best_logp[t, k] = negative_infinity();
         for (j in 1:K) {
           real logp;
-          logp = best_logp[t-1, j] 
+          logp = best_logp[t-1, j]
                   + log(theta[j, k]) + log(phi[k, u[t]]);
           if (logp > best_logp[t, k]) {
             back_ptr[t, k] = j;
@@ -3147,7 +3147,7 @@ generated quantities {
       if (best_logp[T_unsup, k] == log_p_y_star)
         y_star[T_unsup] = k;
     for (t in 1:(T_unsup - 1))
-      y_star[T_unsup - t] = back_ptr[T_unsup - t + 1, 
+      y_star[T_unsup - t] = back_ptr[T_unsup - t + 1,
                                       y_star[T_unsup - t + 1]];
   }
 }
@@ -3261,7 +3261,7 @@ data {
   real<lower=0> var1;     real<lower=0> var2;
 }
 transformed data {
-  real<lower=0> max_cov = sqrt(var1 * var2);  
+  real<lower=0> max_cov = sqrt(var1 * var2);
   real<upper=0> min_cov = -max_cov;
 }
 parameters {
@@ -3272,7 +3272,7 @@ transformed parameters {
   matrix[2, 2] Sigma;
   Sigma[1, 1] = var1;     Sigma[1, 2] = cov;
   Sigma[2, 1] = cov;      Sigma[2, 2] = var2;
-}  
+}
 model {
   y ~ multi_normal(mu, Sigma);
 }
@@ -3292,14 +3292,14 @@ is defined as transformed data so that it is only calculated once.
 
 The vectorization of the multivariate normal is critical for
 efficiency here.  The transformed parameter \code{Sigma} could be
-defined as a local variable within the model block if 
+defined as a local variable within the model block if
 
 \section{Sliced Missing Data}
 
 If the missing data is part of some larger data structure, then it can
 often be effectively reassembled using index arrays and slicing.
 Here's an example for time-series data, where only some entries in the
-series are observed. 
+series are observed.
 %
 \begin{stancode}
 data {
@@ -3372,13 +3372,13 @@ transformed data {
   K_choose_2 = (K * (K - 1)) / 2;
 }
 parameters {
-  vector[K_choose_2] L_lower;  
+  vector[K_choose_2] L_lower;
 }
 transformed parameters {
   cholesky_factor_cov[K] L;
   for (k in 1:K)
     L[k, k] = 1;
-  { 
+  {
     int i;
     for (m in 2:K) {
       for (n in 1:(m - 1)) {
@@ -3468,7 +3468,7 @@ for (n in 1:N) {
     ns1[n1] = n;
     n1 = n1 + 1;
   } else if (y_observed[n, 2]) {
-    ns2[n2] = n;    
+    ns2[n2] = n;
     n2 = n2 + 1;
   }
 }
@@ -3518,30 +3518,30 @@ distributions, cdfs, and ccdfs.
 
 Truncated data is data for which measurements are only reported if
 they fall above a lower bound, below an upper bound, or between a
-lower and upper bound.  
+lower and upper bound.
 
 Truncated data may be modeled in Stan using truncated distributions.
 For example, suppose the truncated data is $y_n$ with an upper
 truncation point of $U = 300$ so that $y_n < 300$.  In Stan, this
 data can be modeled as following a truncated normal distribution for
-the observations as follows. 
+the observations as follows.
 %
 \begin{stancode}
 data {
   int<lower=0> N;
   real U;
   real<upper=U> y[N];
-} 
+}
 parameters {
   real mu;
   real<lower=0> sigma;
-} 
+}
 model {
   for (n in 1:N)
     y[n] ~ normal(mu, sigma) T[,U];
 }
 \end{stancode}
-% 
+%
 The model declares an upper bound \code{U} as data and constrains
 the data for \code{y} to respect the constraint;  this will be checked
 when the data is loaded into the model before sampling begins.
@@ -3558,7 +3558,7 @@ will evaluate to $-\infty$.  For instance, if variate \code{y} is
 sampled with the statement.
 %
 \begin{stancode}
-for (n in 1:N) 
+for (n in 1:N)
   y[n] ~ normal(mu, sigma) T[L,U];
 \end{stancode}
 %
@@ -3582,7 +3582,7 @@ If in the above model, \code{L} or \code{U} is a parameter and
 \code{y} is data, then \code{L} and \code{U} must be appropriately
 constrained so that all data is in range and the value of \code{L} is
 less than that of \code{U} (if they are equal, the parameter range
-collapses to a single point and the Hamiltonian dynamics used by 
+collapses to a single point and the Hamiltonian dynamics used by
 the sampler break down).  The following declarations ensure the bounds
 are well behaved.
 %
@@ -3614,13 +3614,13 @@ data {
   real y[N];
 }
 parameters {
-  real<upper = min(y)> L; 
+  real<upper = min(y)> L;
   real<lower = max(y)> U;
   real mu;
   real<lower=0> sigma;
 }
 model {
-  L ~ ...;  
+  L ~ ...;
   U ~ ...;
   for (n in 1:N)
     y[n] ~ normal(mu, sigma) T[L,U];
@@ -3638,7 +3638,7 @@ at least one data point.  The constraint that \code{L} is less than
 
 The ellipses where the priors for the bounds \code{L} and \code{U}
 should go should be filled in with a an informative prior in
-order for this model to not concentrate \code{L} strongly around 
+order for this model to not concentrate \code{L} strongly around
 \code{min(y)} and \code{U} strongly around \code{max(y)}.
 
 
@@ -3647,7 +3647,7 @@ order for this model to not concentrate \code{L} strongly around
 Censoring hides values from points that are too large, too small, or
 both.  Unlike with truncated data, the number of data points that were
 censored is known.  The textbook example is the household scale which
-does not report values above 300 pounds.  
+does not report values above 300 pounds.
 
 \subsection{Estimating Censored Values}
 
@@ -3681,7 +3681,7 @@ and \code{sigma}.  Because the censored data array \code{y\_cens} is
 declared to have values of type \code{real<lower=U>}, all imputed values
 for censored data will be greater than \code{U}.  The imputed censored
 data affects the location and scale parameters through the last
-sampling statement in the model.  
+sampling statement in the model.
 
 \subsection{Integrating out Censored Values}
 
@@ -3691,7 +3691,7 @@ the values can be integrated out.  Each censored data point has a
 probability of
 %
 \[
-\mbox{Pr}[y > U] 
+\mbox{Pr}[y > U]
 = \int_U^{\infty} \distro{Normal}(y|\mu,\sigma) \, dy
 = 1 - \Phi\left(\frac{y - \mu}{\sigma}\right),
 \]
@@ -3724,7 +3724,7 @@ parameters {
   real<lower=0> sigma;
 }
 model {
-  y_obs ~ normal(mu, sigma); 
+  y_obs ~ normal(mu, sigma);
   target += N_cens * normal_lccdf(U | mu, sigma);
 }
 \end{stancode}
@@ -3780,7 +3780,7 @@ normal mixture model discussed in this chapter reappears in
 multivariate form as the statistical basis for the $K$-means
 algorithm;  the latent Dirichlet allocation model, usually applied to
 clustering problems, can be viewed as a mixed-membership multinomial
-mixture model. 
+mixture model.
 
 
 \section{Latent Discrete Parameterization}
@@ -3800,13 +3800,13 @@ z_n \sim \distro{Categorical}(\lambda).
 \]
 %
 The variable $y_n$ is distributed according to the parameters
-of the mixture component $z_n$, 
+of the mixture component $z_n$,
 \[
 y_n \sim \distro{Normal}(\mu_{z[n]},\sigma_{z[n]}).
 \]
 %
 This model is not directly supported by Stan because it involves
-discrete parameters $z_n$, but Stan can sample $\mu$ and $\sigma$ 
+discrete parameters $z_n$, but Stan can sample $\mu$ and $\sigma$
 by summing out the $z$ parameter as described in the next section.
 
 
@@ -3814,12 +3814,12 @@ by summing out the $z$ parameter as described in the next section.
 
 To implement the normal mixture model outlined in the previous
 section in Stan, the discrete parameters can be summed out of the
-model. If $Y$ is a mixture of $K$ normal distributions with 
+model. If $Y$ is a mixture of $K$ normal distributions with
 locations $\mu_k$ and scales $\sigma_k$ with mixing proportions
-$\lambda$ in the unit $K$-simplex, then 
+$\lambda$ in the unit $K$-simplex, then
 \[
 p_Y(y | \lambda, \mu, \sigma)
-\ = \ 
+\ = \
 \sum_{k=1}^K \lambda_k \, \distro{Normal}(y \, | \, \mu_k, \sigma_k).
 \]
 
@@ -3879,7 +3879,7 @@ The log probability term is derived by taking
 \\[2pt]
 & = & \mbox{log\_sum\_exp}(\hspace*{-5pt}\begin{array}[t]{l}
                          \log(0.3) + \log \distro{Normal}(y|-1,2),
-                         \\                  
+                         \\
                          \log(0.7) + \log \distro{Normal}(y|3,1) \ ).
                        \end{array}
 \end{eqnarray*}
@@ -3918,7 +3918,7 @@ The result follows from the identity
 %
 \[
 \mbox{log\_sum\_exp}(c + a, c + b)
-\ = \ 
+\ = \
 c + \mbox{log\_sum\_exp(a, b)}
 \]
 %
@@ -3965,7 +3965,7 @@ The model involves \code{K} mixture components and \code{N} data
 points. The mixing proportion parameter \code{theta} is declared to be
 a unit $K$-simplex, whereas the component location parameter \code{mu}
 and scale parameter \code{sigma} are both defined to be
-\code{K}-vectors.  
+\code{K}-vectors.
 
 The location parameter \code{mu} is declared to be an ordered vector
 in order to identify the model.  This will not affect inferences that
@@ -3976,7 +3976,7 @@ would even be possible to include a hierarchical prior for the components.
 
 The values in the scale array \code{sigma} are constrained to be
 non-negative, and have a weakly informative prior given in the model
-chosen to avoid zero values and thus collapsing components.  
+chosen to avoid zero values and thus collapsing components.
 
 The model declares a local array variable \code{lps} to be size
 \code{K} and uses it to accumulate the log contributions from the
@@ -3998,7 +3998,7 @@ we assume that \code{lambda}, \code{y[n]}, \code{mu[1], mu[2]}, and
 %
 \begin{stancode}
 for (n in 1:N) {
-  target += log_sum_exp(log(lambda) 
+  target += log_sum_exp(log(lambda)
                           + normal_lpdf(y[n] | mu[1], sigma[1]),
                         log1m(lambda)
                           + normal_lpdf(y[n] | mu[2], sigma[2]));
@@ -4008,7 +4008,7 @@ or equivalently
 %
 \begin{stancode}
 for (n in 1:N)
-  target += log_mix(lambda, 
+  target += log_mix(lambda,
                     normal_lpdf(y[n] | mu[1], sigma[1]),
                     normal_lpdf(y[n] | mu[2], sigma[2])));
 \end{stancode}
@@ -4016,16 +4016,16 @@ for (n in 1:N)
 This definition assumes that each observation $y_n$ may have arisen
 from either of the mixture components. The density is
 \[
-p(y \, | \, \lambda, \mu, \sigma) 
+p(y \, | \, \lambda, \mu, \sigma)
 = \prod_{n=1}^N (\lambda \times \distro{Normal}(y_n \, | \, \mu_1, \sigma_1)
                  + (1 - \lambda) \times \distro{Normal}(y_n \, | \, \mu_2, \sigma_2).
 \]
-%                       
+%
 Contrast the previous model with the following (erroneous) attempt to
 vectorize the model.
 %
 \begin{stancode}
-target += log_sum_exp(log(lambda) 
+target += log_sum_exp(log(lambda)
                         + normal_lpdf(y | mu[1], sigma[1]),
                       log1m(lambda)
                         + normal_lpdf(y | mu[2], sigma[2]));
@@ -4056,12 +4056,12 @@ In many mixture models, the mixture components are underlyingly
 exchangeable in the model and thus not identifiable.  This arises if
 the parameters of the mixture components have exchangeable priors and
 the mixture ratio gets a uniform prior so that the parameters of the
-mixture components are also exchangeable in the likelihood.  
+mixture components are also exchangeable in the likelihood.
 
 We have finessed this basic problem by ordering the parameters.  This
 will allow us in some cases to pick out mixture components either
 ahead of time or after fitting (e.g., male vs. female, or Democrat
-vs.\ Republican).  
+vs.\ Republican).
 
 In other cases, we do not care about the actual identities of the
 mixture components and want to consider inferences that are
@@ -4089,8 +4089,8 @@ The prior on the mixture ratio is uniform,
 so that with the likelihood
 %
 \[
-p(y_n \, | \, \mu, \sigma) 
-= \lambda \, \distro{Normal}(y_n \, | \, \mu_1, \sigma_1) 
+p(y_n \, | \, \mu, \sigma)
+= \lambda \, \distro{Normal}(y_n \, | \, \mu_1, \sigma_1)
 + (1 - \lambda) \, \distro{Normal}(y_n \, | \, \mu_2, \sigma_2),
 \]
 %
@@ -4100,7 +4100,7 @@ $\lambda$ flipping to $1 - \lambda$.%
 %
 \footnote{Imposing a constraint such as $\theta < 0.5$ will resolve
   the symmetry, but fundamentally changes the model and its posterior
-  inferences.} 
+  inferences.}
 
 \subsection{Inference under Label Switching}
 
@@ -4119,7 +4119,7 @@ complete parameter vector $\theta$ will be
 %
 \[
 p(\tilde{y} \, | \, y)
-= 
+=
 \int_{\theta}
 p(\tilde{y} \, | \, \theta)
 \, p(\theta | y)
@@ -4195,7 +4195,7 @@ Bernoulli probability mass function to allow more flexibility in
 modeling the probability of a zero outcome.  Zero-inflated models, as
 defined by \citet{Lambert:1992}, add additional probability mass to
 the outcome of zero.  Hurdle models, on the other hand, are formulated
-as pure mixtures of zero and non-zero outcomes.  
+as pure mixtures of zero and non-zero outcomes.
 
 Zero inflation and hurdle models can be formulated for discrete
 distributions other than the Poisson.  Zero inflation does not work
@@ -4215,8 +4215,8 @@ used for mixing proportions because $\lambda$ is the traditional
 notation for a Poisson mean parameter).  The probability function is
 thus
 \[
-p(y_n|\theta,\lambda) 
-= 
+p(y_n|\theta,\lambda)
+=
 \left\{
 \begin{array}{ll}
 \theta + (1 - \theta) \times \distro{Poisson}(0|\lambda) & \mbox{ if } y_n = 0, \mbox{ and}
@@ -4224,7 +4224,7 @@ p(y_n|\theta,\lambda)
 (1-\theta) \times \distro{Poisson}(y_n|\lambda) & \mbox{ if } y_n > 0.
 \end{array}
 \right.
-\] 
+\]
 %
 The log probability function can be implemented directly in Stan as follows.
 %
@@ -4241,7 +4241,7 @@ model {
   for (n in 1:N) {
     if (y[n] == 0)
       target += log_sum_exp(bernoulli_lpmf(1 | theta),
-                            bernoulli_lpmf(0 | theta) 
+                            bernoulli_lpmf(0 | theta)
                               + poisson_lpmf(y[n] | lambda));
     else
       target += bernoulli_lpmf(0 | theta)
@@ -4265,7 +4265,7 @@ defined by
 %
 \[
 p(y|\theta,\lambda)
-= 
+=
 \begin{cases}
 \ \theta & \mbox{if } y = 0, \mbox{ and}
 \\
@@ -4279,7 +4279,7 @@ p(y|\theta,\lambda)
 %
 where \distro{PoissonCDF} is the cumulative distribution function for
 the Poisson distribution.  The hurdle model is even more straightforward to
-program in Stan, as it does not require an explicit mixture.  
+program in Stan, as it does not require an explicit mixture.
 %
 \begin{stancode}
    if (y[n] == 0)
@@ -4308,7 +4308,7 @@ effect is equivalent to the direct definition of the log likelihood.
 Julian King pointed out that because
 \[
 \log \left( 1 - \distro{PoissonCDF}(0 | \lambda) \right)
-\ = \ \log \left( 1 - \distro{Poisson}(0 | \lambda) \right) 
+\ = \ \log \left( 1 - \distro{Poisson}(0 | \lambda) \right)
 \ = \ \log(1 - \exp(-\lambda))
 \]
 the CCDF in the else clause can be replaced with a simpler expression.
@@ -4353,7 +4353,7 @@ transformed data {
 
   N0 = num_zero(y);
   Ngt0 = N - N0;
-  { 
+  {
     int pos;
     pos = 1;
     for (n in 1:N) {
@@ -4434,7 +4434,7 @@ its effect on a model is usually small.  When measurement error is
 large relative to the quantity being measured, or when very precise
 relations can be estimated being measured quantities, it is useful to
 introduce an explicit model of measurement error.  One kind of
-measurement error is rounding. 
+measurement error is rounding.
 
 Meta-analysis plays out statistically very much like measurement error
 models, where the inferences drawn from multiple data sets are
@@ -4465,12 +4465,12 @@ data {
 }
 parameters {
   real alpha;           // intercept
-  real beta;            // slope 
+  real beta;            // slope
   real<lower=0> sigma;  // outcome noise
 }
 model {
   y ~ normal(alpha + beta * x, sigma);
-  alpha ~ normal(0, 10);  
+  alpha ~ normal(0, 10);
   beta ~ normal(0, 10);
   sigma ~ cauchy(0, 5);
 }
@@ -4494,7 +4494,7 @@ data {
   real<lower=0> tau;  // measurement noise
 }
 parameters {
-  real x[N];          // unknown true value   
+  real x[N];          // unknown true value
   real mu_x;          // prior location
   real sigma_x;       // prior scale
   ...
@@ -4503,7 +4503,7 @@ model {
   x ~ normal(mu_x, sigma_x);  // prior
   x_meas ~ normal(x, tau);    // measurement model
   y ~ normal(alpha + beta * x, sigma);
-  ... 
+  ...
 }
 \end{stancode}
 %
@@ -4535,7 +4535,7 @@ course, other exposure models can be provided.
 A common form of measurement error arises from rounding measurements.
 Rounding may be done in many ways, such as rounding weights to the
 nearest milligram, or to the nearest pound; rounding may even be done
-by rounding down to the nearest integer.  
+by rounding down to the nearest integer.
 
 Exercise 3.5(b) from \citep{GelmanEtAl:2013} provides an example.
 %
@@ -4543,7 +4543,7 @@ Exercise 3.5(b) from \citep{GelmanEtAl:2013} provides an example.
   3.5. \ Suppose we weigh an object five times and measure
   weights, rounded to the nearest pound, of 10, 10, 12, 11, 9.  Assume
   the unrounded measurements are normally distributed with a
-  noninformative prior distribution on $\mu$ and $\sigma^2$. 
+  noninformative prior distribution on $\mu$ and $\sigma^2$.
   \\[4pt]
   (b) \ Give the correct posterior distribution for $(\mu, \sigma^2)$,
   treating the measurements as rounded.
@@ -4561,15 +4561,15 @@ The probability mass function for the discrete observation $y$ is then given
 by marginalizing out the unrounded measurement, producing the likelihood
 \[
 p(y_n \, | \, \mu, \sigma)
-= 
+=
 \int_{y_n - 0.5}^{y_n + 0.5}
 \
 \distro{Normal}(z_n \, | \, \mu, \sigma)
 \
 \mathrm{d}z_n
-= 
+=
 \Phi\!\left(\frac{y_n + 0.5 - \mu}{\sigma}\right)
-- 
+-
 \Phi\!\left(\frac{y_n - 0.5 - \mu}{\sigma}\right).
 \]
 Gelman's answer for this problem took the noninformative prior to be
@@ -4589,10 +4589,10 @@ p(\mu, \sigma^2) \ p(y \, | \, \mu, \sigma^2)
 &  \propto &
 \frac{1}{\sigma^2}
 \
-\mathlarger{\mathlarger{\prod}}_{n=1}^5 
+\mathlarger{\mathlarger{\prod}}_{n=1}^5
 \left(
 \Phi\!\left(\frac{y_n + 0.5 - \mu}{\sigma}\right)
-- 
+-
 \Phi\!\left(\frac{y_n - 0.5 - \mu}{\sigma}\right)
 \right).
 \end{eqnarray*}
@@ -4665,7 +4665,7 @@ unrounded parameters.
 
 Meta-analysis aims to pool the data from several studies, such as the
 application of a tutoring program in several schools or treatment
-using a drug in several clinical trials.  
+using a drug in several clinical trials.
 
 The Bayesian framework is particularly convenient for meta-analysis,
 because each previous study can be treated as providing a noisy
@@ -4712,17 +4712,17 @@ be transformed to an unbounded scale by considering the log odds ratio
 \[
 y_j = \log \left( \frac{r^t_j / (n^t_j - r^t_j)}
                        {r^c_j / (n^c_j - r^c_j)} \right)
-\ \ = \ \ 
+\ \ = \ \
 \log \left( \frac{r^t_j}{n^t_j - r^t_j} \right)
-- 
+-
 \log \left( \frac{r^c_j}{n^c_j - r^c_j} \right)
 \]
 and corresponding standard errors
 \[
 \sigma_j = \sqrt{
-\frac{1}{r^T_i} 
+\frac{1}{r^T_i}
 + \frac{1}{n^T_i - r^T_i}
-+ \frac{1}{r^C_i} 
++ \frac{1}{r^C_i}
 + \frac{1}{n^C_i - r^C_i}
 }.
 \]
@@ -4735,7 +4735,7 @@ integer division (see \refsection{int-arithmetic}).
 transformed data {
   real y[J];
   real<lower=0> sigma[J];
-  for (j in 1:J) 
+  for (j in 1:J)
     y[j] = log(r_t[j]) - log(n_t[j] - r_t[j])
             - (log(r_c[j]) - log(n_c[j] - r_c[j]);
   for (j in 1:J)
@@ -4744,7 +4744,7 @@ transformed data {
 }
 \end{stancode}
 %
-This definition will be problematic if any of the success counts is 
+This definition will be problematic if any of the success counts is
 zero or equal to the number of trials.
 If that arises, a direct binomial model will be required or other
 transforms must be used than the unregularized sample log odds.
@@ -4783,7 +4783,7 @@ To model so-called ``random effects,'' where the treatment effect may
 vary by clinical trial, a hierarchical model can be used.  The
 parameters include per-trial treatment effects and the hierarchical
 prior parameters, which will be estimated along with other unknown
-quantities.  
+quantities.
 %
 \begin{stancode}
 parameters {
@@ -4812,7 +4812,7 @@ in each school.%
 %
 \footnote{The model provided for this data in
 \citep[Section~5.5]{GelmanEtAl:2013} is included with the
-data in the Stan example model repository, 
+data in the Stan example model repository,
 \url{http://mc-stan.org/documentation}.}
 
 \subsubsection{Extensions and Alternatives}
@@ -4862,7 +4862,7 @@ Standard optimization algorithms, including expectation maximization
 (EM), are often provided in applied statistics papers to describe
 maximum likelihood estimation algorithms.  Such derivations provide
 exactly the marginalization needed for coding the model in Stan.
- 
+
 \section{Change Point Models}
 
 The first example is a model of coal mining disasters in the U.K.\
@@ -4913,13 +4913,13 @@ As of version 2.10, Stan supports the conditional operator.
 To code this model in Stan, the discrete parameter $s$ must be
 marginalized out to produce a model defining the log of the
 probability function $p(e,l,D_t)$.  The full joint probability factors
-as 
+as
 %
 \begin{eqnarray*}
 p(e,l,s,D)
 & = & p(e) \, p(l) \, p(s) \, p(D | s, e, l)
 \\[3pt]
-& = & 
+& = &
 \begin{array}[t]{l}
 \distro{Exponential}(e|r_e) \ \distro{Exponential}(l|r_l) \
 \distro{Uniform}(s|1, T)
@@ -4938,7 +4938,7 @@ p(e,l,D) & = & p(e,l) \, p(D|e,l),
 where the likelihood is defined by marginalizing $s$ as
 %
 \begin{eqnarray*}
-p(D | e,l) 
+p(D | e,l)
 & = &
 \sum_{s=1}^T p(s, D | e,l)
 \\[3pt]
@@ -4946,7 +4946,7 @@ p(D | e,l)
 \sum_{s=1}^T p(s) p(D | s,e,l)
 \\[3pt]
 & = &
-\sum_{s=1}^T \distro{Uniform}(s | 1,T) 
+\sum_{s=1}^T \distro{Uniform}(s | 1,T)
 \, \prod_{t=1}^T \distro{Poisson}(D_t | t < s \ ? \ e \ : \ l)
 \end{eqnarray*}
 %
@@ -4956,7 +4956,7 @@ Stan operates on the log scale and thus requires the log likelihood,
 \log p(D | e,l)
 \\[3pt]
 \mbox{ } \ \ = \
-\mbox{log\_sum\_exp}_{s=1}^T 
+\mbox{log\_sum\_exp}_{s=1}^T
 \begin{array}[t]{l}
 \big(
  \log \distro{Uniform}(s \, | \, 1, T)
@@ -5013,7 +5013,7 @@ model {
   e ~ exponential(r_e);
   l ~ exponential(r_l);
   target += log_sum_exp(lp);
-}    
+}
 \end{stancode}
 \vspace*{-6pt}
 \caption{\small\it A change point model in which disaster rates
@@ -5093,7 +5093,7 @@ p(s | D)
 & \propto &
 q(s | D)
 \\[3pt]
-& = & 
+& = &
 \frac{1}{M} \sum_{m=1}^{M} \exp(\code{lp}[m,s]).
 \end{eqnarray*}
 %
@@ -5145,7 +5145,7 @@ draws a random value for \code{s} at every iteration.
 \begin{stancode}
 generated quantities {
   int<lower=1,upper=T> s;
-  s = categorical_rng(softmax(lp));
+  s = categorical_logit_rng(lp);
 }
 \end{stancode}
 %
@@ -5184,7 +5184,7 @@ lp = rep_matrix(log_unif, T);
 for (s1 in 1:T)
   for (s2 in 1:T)
     for (t in 1:T)
-      lp[s1,s2] = lp[s1,s2] 
+      lp[s1,s2] = lp[s1,s2]
         + poisson_lpmf(D[t] | t < s1 ? e : (t < s2 ? m : l));
 \end{stancode}
 %
@@ -5292,12 +5292,12 @@ transform used for variables declared with a lower bound.
 The Cormack-Jolly-Seber (CJS) model
 \citep{Cormack:1964,Jolly:1965,Seber:1965} is an open-population model
 in which the population may change over time due to death; the
-presentation here draws heavily on \citep{Schofield:2007}.  
+presentation here draws heavily on \citep{Schofield:2007}.
 
 The basic data is
 %
 \begin{itemize}
-\item $I$ : number of individuals, 
+\item $I$ : number of individuals,
 \item $T$ : number of capture periods, and
 \item $y_{i,t}$ : boolean indicating if individual $i$ was captured at
   time $t$.
@@ -5351,10 +5351,10 @@ the probability that an individual is never captured again if it is
 alive at time $t$ (if it is dead, the recapture probability is zero).
 this quantity is defined recursively by
 \[
-\chi_t 
-= 
+\chi_t
+=
 \begin{cases}
-1 
+1
 & \mbox{if } t = T
 \\[3pt]
 (1 - \phi_t) + \phi_t (1 - p_{t+1}) \chi_{t+1}
@@ -5370,7 +5370,7 @@ not surviving to the next time period, with probability $(1 -
 \phi_t)$, or (2) surviving to the next time period with probability
 $\phi_t$, not being captured in the next time period with probability
 $(1 - p_{t+1})$, and not being captured again after being alive in
-period $t+1$ with probability $\chi_{t+1}$. 
+period $t+1$ with probability $\chi_{t+1}$.
 
 With three capture times, there are three captured/not-captured
 profiles an individual may have.  These may be naturally coded as
@@ -5395,7 +5395,7 @@ binary numbers as follows.
 {5} & + & - & + & $\phi_1 \, (1 - p_2) \, \phi_2 \, p_3$
 \\ \hline
 {6} & + & + & - & $ \phi_1 \, p_2 \, \chi_2$
-\\ 
+\\
 {7} & + & + & + & $\phi_1 \, p_2 \, \phi_2 \, p_3$
 \end{tabular}
 \end{center}
@@ -5432,7 +5432,7 @@ parameters {
   real<lower=0,upper=1> p[3];
 }
 transformed parameters {
-  real<lower=0,upper=1> chi[2];  
+  real<lower=0,upper=1> chi[2];
   chi[2] = (1 - phi[2]) + phi[2] * (1 - p[3]);
   chi[1] = (1 - phi[1]) + phi[1] * (1 - p[2]) * chi[2];
 }
@@ -5442,9 +5442,9 @@ model {
   target += history[4] * (log(chi[1]));
   target += history[5] * (log(phi[1]) + log1m(p[2])
                             + log(phi[2]) + log(p[3]));
-  target += history[6] * (log(phi[1]) + log(p[2]) 
+  target += history[6] * (log(phi[1]) + log(p[2])
                             + log(chi[2]));
-  target += history[7] * (log(phi[1]) + log(p[2]) 
+  target += history[7] * (log(phi[1]) + log(p[2])
                             + log(phi[2]) + log(p[3]));
 }
 generated quantities {
@@ -5507,7 +5507,7 @@ captured.%
 feed it into the Stan model as preprocessed data.  Yet another
 alternative encoding would be a sparse one recording only the
 capture events along with their time and identifying the individual
-captured.} 
+captured.}
 %
 \begin{stancode}
 functions {
@@ -5517,11 +5517,11 @@ functions {
         return k;
     return 0;
   }
-  int last_capture(int[] y_i) { 
+  int last_capture(int[] y_i) {
     for (k_rev in 0:(size(y_i) - 1)) {
       int k;
       k = size(y_i) - k_rev;
-      if (y_i[k]) 
+      if (y_i[k])
         return k;
     }
     return 0;
@@ -5553,7 +5553,7 @@ transformed data {
   n_captured = rep_vector(0, T);
   for (t in 1:T)
     for (i in 1:I)
-      if (y[i, t]) 
+      if (y[i, t])
         n_captured[t] = n_captured[t] + 1;
 }
 \end{stancode}
@@ -5588,16 +5588,16 @@ functions {
   ...
   vector prob_uncaptured(int T, vector p, vector phi) {
     vector[T] chi;
-    chi[T] = 1.0;              
+    chi[T] = 1.0;
     for (t in 1:(T - 1)) {
       int t_curr;
       int t_next;
       t_curr = T - t;
       t_next = t_curr + 1;
-      chi[t_curr] = (1 - phi[t_curr]) 
-                     + phi[t_curr] 
-                       * (1 - p[t_next]) 
-                       * chi[t_next]; 
+      chi[t_curr] = (1 - phi[t_curr])
+                     + phi[t_curr]
+                       * (1 - p[t_next])
+                       * chi[t_next];
     }
     return chi;
   }
@@ -5748,7 +5748,7 @@ categories of items in the data.
 
 In this section, only categorical ratings are considered, and the
 challenge in the modeling for Stan is to marginalize out the discrete
-parameters.  
+parameters.
 
 \cite{DawidSkene:1979} introduce a noisy-measurement model for
 data coding and apply in the epidemiological setting of coding what
@@ -5854,12 +5854,12 @@ This can be done item by item, with
 \[
 p(y | \theta, \pi)
 \ = \
-\prod_{i=1}^I \sum_{k=1}^K  
+\prod_{i=1}^I \sum_{k=1}^K
   \left( \distro{Categorical}(z_i | \pi)
          \prod_{j=1}^J
          \distro{Categorical}(y_{i, j}|\theta_{j, z[i]})
   \right).
-\]            
+\]
 %
 In the missing data model, only the observed labels would be used in
 the inner product.
@@ -5879,7 +5879,7 @@ probability function on the log scale,
          \log \distro{Categorical}(y_{i, j}|\theta_{j, z[i]})
   \right) \right),
 \end{array}
-\]                            
+\]
 which can be directly coded using Stan's built-in \code{log\_sum\_exp}
 function.
 
@@ -5911,7 +5911,7 @@ transformed parameters {
     log_q_z[i] = log(pi);
     for (j in 1:J)
       for (k in 1:K)
-        log_q_z[i, k] = log_q_z[i, k] 
+        log_q_z[i, k] = log_q_z[i, k]
                          + log(theta[j, k, y[i, j]]);
   }
 }
@@ -5940,7 +5940,7 @@ informative priors are $\alpha_k = 3$ and $\beta_{k,k} = 2.5 K$ and
 $\beta_{k,k'} = 1$ if $k \neq k'$.  Taking $\alpha$ and $\beta_k$ to
 be unit vectors and applying optimization will produce the same answer
 as the expectation maximization (EM) algorithm of
-\cite{DawidSkene:1979}.  
+\cite{DawidSkene:1979}.
 
 \subsubsection{Inference for the True Category}
 
@@ -5992,7 +5992,7 @@ model {
 \begin{center}
 \begin{minipage}[c]{0.45\textwidth}
 \[
-y 
+y
 =
 \left[
 \begin{array}{cccc}
@@ -6008,7 +6008,7 @@ y
 \ \ \
 \begin{minipage}[c]{0.45\textwidth}
 \begin{tabular}{ll|l}
-$jj$ & $kk$ & $y$ 
+$jj$ & $kk$ & $y$
 \\ \hline
 1 & 1 & 0
 \\
@@ -6075,7 +6075,7 @@ formulations produce exactly the same log posterior density.
 
 Ragged arrays are arrays that are not rectangular, but have different
 sized entries.  This kind of structure crops up when there are
-different numbers of observations per entry.  
+different numbers of observations per entry.
 
 A general approach to dealing with ragged structure is to move to a
 full database-like data structure as discussed in the previous
@@ -6107,7 +6107,7 @@ $s  =  \{ 3 \ \ 2 \ \ 4 \}$
   rows of different sizes ($y_1$ is size 3, $y_2$ size 2, and $y_3$
   size 4).  On the right is an example of how to code the data in Stan,
   using a single vector $y$ to hold all the values and a separate
-  array of integers $s$ to hold the group row sizes.  In this 
+  array of integers $s$ to hold the group row sizes.  In this
   example, $y_1 = z_{1:3}$, $y_2 =
   z_{4:5}$, and $y_3 = z_{6:9}$.}\label{ragged-data.figure}
 \end{figure}
@@ -6118,7 +6118,7 @@ using vectorized notation, would yield a likelihood
 \[
 \prod_{n=1}^3 \log \distro{Normal}(y_n | \mu_n, \sigma).
 \]
-There's no direct way to encode this in Stan.  
+There's no direct way to encode this in Stan.
 
 A full database type structure could be used, as in the sparse
 example, but this is inefficient, wasting space for unnecessary
@@ -6127,7 +6127,7 @@ way to code this data is as a single list of values, with a separate
 data structure indicating the sizes of each subarray.  This is
 indicated on the right of \reffigure{ragged-data}.  This coding uses a
 single array for the values and a separate array for the sizes of each
-row.  
+row.
 
 The model can then be coded up using slicing operations as follows.
 \begin{quote}
@@ -6181,7 +6181,7 @@ $K$-means clustering is a method of clustering data represented as
 $D$-dimensional vectors.  Specifically, there will be $N$ items to be
 clustered, each represented as a vector $y_n \in \reals^D$.  In the
 ``soft'' version of $K$-means, the assignments to clusters will be
-probabilistic.  
+probabilistic.
 
 \subsection{Geometric Hard  $K$-Means Clustering}
 
@@ -6192,7 +6192,7 @@ data vectors $y$ as input.
 \begin{enumerate}
 \item For each $n$ in $1:N$, randomly assign vector $y_n$ to a cluster in $1{:}K$;
 \item Repeat
-\begin{enumerate} 
+\begin{enumerate}
 \item For each cluster $k$ in $1{:}K$, compute the cluster centroid $\mu_k$  by averaging the
   vectors assigned to that cluster;
 \item For each $n$ in $1:N$, reassign $y_n$ to the cluster $k$
@@ -6272,7 +6272,7 @@ transformed parameters {
   real<upper=0> soft_z[N, K]; // log unnormalized clusters
   for (n in 1:N)
     for (k in 1:K)
-      soft_z[n, k] = neg_log_K 
+      soft_z[n, k] = neg_log_K
                      - 0.5 * dot_self(mu[k] - y[n]);
 }
 model {
@@ -6305,7 +6305,7 @@ produces a log probability density proportional to Euclidean distance
 geometries.  For instance, replacing the normal distribution with the
 double exponential (Laplace) distribution produces a clustering model
 based on $L_1$ distance (i.e., Manhattan or taxicab
-distance). 
+distance).
 
 Within the multivariate normal version of $K$-means, replacing the
 unit covariance matrix with a shared covariance matrix amounts to
@@ -6339,7 +6339,7 @@ cannot be compared across multiple Markov chains.  In fact, the only
 parameter in soft $K$-means is not identified, leading to problems in
 monitoring convergence.  Clusters can even fail to be identified
 within a single chain, with indices swapping if the chain is long
-enough or the data is not cleanly separated. 
+enough or the data is not cleanly separated.
 
 \subsection{Multimodality}
 
@@ -6376,12 +6376,12 @@ which labels for items are observed.%
 
 Multinomial mixture models are referred to as ``naive Bayes'' because
 they are often applied to classification problems where the
-multinomial independence assumptions are clearly false. 
+multinomial independence assumptions are clearly false.
 
 Naive Bayes classification and clustering can be applied to any data
 with multinomial structure.  A typical example of this is natural
 language text classification and clustering, which is used an example
-in what follows. 
+in what follows.
 
 The observed data consists of a sequence of $M$ documents made up of
 bags of words drawn from a vocabulary of $V$ distinct words.  A
@@ -6398,7 +6398,7 @@ distribution,
 z_m \sim \distro{Categorical}(\theta).
 \]
 The $K$-simplex parameter $\theta$ represents the prevalence of each
-category in the data.  
+category in the data.
 
 Next, the words in each document are generated conditionally
 independently of each other and the words in other documents based on
@@ -6443,7 +6443,7 @@ $\code{N} = \sum_{m=1}^M N_m$ & $w_{M,N[M]}$ & $M$ \\
 %
 The relevant variables for the program are \code{N}, the total number
 of words in all the documents, the word array \code{w}, and the
-document identity array \code{doc}.  
+document identity array \code{doc}.
 
 \subsection{Estimation with Category-Labeled Training Data}
 
@@ -6475,7 +6475,7 @@ parameters {
 }
 model {
   theta ~ dirichlet(alpha);
-  for (k in 1:K)  
+  for (k in 1:K)
     phi[k] ~ dirichlet(beta);
   for (m in 1:M)
     z[m] ~ categorical(theta);
@@ -6486,12 +6486,12 @@ model {
 %
 Note that the topic identifiers $z_m$ are declared as data and the
 latent category assignments are included as part of the likelihood
-function.  
+function.
 
 \subsection{Estimation without Category-Labeled Training Data}
 
 Naive Bayes models can be used in an unsupervised fashion to cluster
-multinomial-structured data into a fixed number $K$ of categories.  
+multinomial-structured data into a fixed number $K$ of categories.
 The data declaration includes the same variables as the model in the
 previous section excluding the topic labels \code{z}.   Because
 \code{z} is discrete, it needs to be summed out of the model
@@ -6502,13 +6502,13 @@ likelihood is now computed as the marginal document probability
 \begin{array}{l}
 \log p(w_{m,1},\ldots,w_{m,N_m}|\theta,\phi)
 \\[2pt]
-\ \ \ = \ 
-\log \sum_{k=1}^K 
+\ \ \ = \
+\log \sum_{k=1}^K
 \left( \distro{Categorical}(k|\theta)
         \times \prod_{n=1}^{N_m} \distro{Categorical}(w_{m,n}|\phi_k)
 \right)
 \\[6pt]
-\ \ \ = \ 
+\ \ \ = \
 \log \sum_{k=1}^K \exp \left(
 \log \distro{Categorical}(k|\theta)
 + \sum_{n=1}^{N_m} \log \distro{Categorical}(w_{m,n}|\phi_k)
@@ -6526,12 +6526,12 @@ model {
   theta ~ dirichlet(alpha);
   for (k in 1:K)
     phi[k] ~ dirichlet(beta);
-  for (m in 1:M) 
-    for (k in 1:K) 
+  for (m in 1:M)
+    for (k in 1:K)
       gamma[m, k] = categorical_lpmf(k | theta);
   for (n in 1:N)
     for (k in 1:K)
-      gamma[doc[n], k] = gamma[doc[n], k] 
+      gamma[doc[n], k] = gamma[doc[n], k]
                          + categorical_lpmf(w[n] | phi[k]);
   for (m in 1:M)
     target += log_sum_exp(gamma[m]);
@@ -6549,7 +6549,7 @@ $m$ is assigned category $k$ is
 \[
 \mbox{Pr}[z_m = k|w,\alpha,\beta]
 =
-\exp \left( 
+\exp \left(
 \gamma_{m,k}
 - \log \sum_{k=1}^K \exp \left( \gamma_{m,k} \right)
 \right).
@@ -6644,10 +6644,10 @@ The marginal posterior of the topic and word variables is
 %
 \begin{eqnarray*}
 p(\theta,\phi|w,\alpha,\beta)
-& \propto & 
+& \propto &
 p(\theta|\alpha) \times p(\phi|\beta) \times p(w|\theta,\phi)
 \\[4pt]
-& = & 
+& = &
 \prod_{m=1}^M p(\theta_m|\alpha)
 \times
 \prod_{k=1}^K p(\phi_k|\beta)
@@ -6672,16 +6672,16 @@ formula that can be implemented directly in Stan,
 \begin{array}{l}
 \log p(\theta,\phi|w,\alpha,\beta)
 \\[6pt]
-{ } \ \ 
+{ } \ \
 \begin{array}{l}
 { } = \sum_{m=1}^M \log \distro{Dirichlet}(\theta_m|\alpha)
 \ + \
 \sum_{k=1}^K \log \distro{Dirichlet}(\phi_k|\beta)
 \\[6pt]
 { } \ \ \ \ \
-+ \sum_{m=1}^M \sum_{n=1}^{N[m]} \log \left( 
++ \sum_{m=1}^M \sum_{n=1}^{N[m]} \log \left(
 \sum_{z=1}^K
-  \distro{Categorical}(z|\theta_m) 
+  \distro{Categorical}(z|\theta_m)
    \times \distro{Categorical}(w_{m,n}|\phi_z)
  \right)
 \end{array}
@@ -6711,28 +6711,28 @@ parameters {
   simplex[V] phi[K];     // word dist for topic k
 }
 model {
-  for (m in 1:M)  
+  for (m in 1:M)
     theta[m] ~ dirichlet(alpha);  // prior
-  for (k in 1:K)  
+  for (k in 1:K)
     phi[k] ~ dirichlet(beta);     // prior
   for (n in 1:N) {
     real gamma[K];
-    for (k in 1:K) 
+    for (k in 1:K)
       gamma[k] = log(theta[doc[n], k]) + log(phi[k, w[n]]);
-    target += log_sum_exp(gamma));  // likelihood;
+    target += log_sum_exp(gamma);  // likelihood;
   }
 }
 \end{stancode}
 %
 As in the other mixture models, the log-sum-of-exponents function is
-used to stabilize the numerical arithmetic. 
+used to stabilize the numerical arithmetic.
 
 \subsection{Correlated Topic Model}
 
 To account for correlations in the distribution of topics for
 documents, \citep{BleiLafferty:2007} introduced a variant of LDA in
 which the Dirichlet prior on the per-document topic distribution is
-replaced with a multivariate logistic normal distribution.  
+replaced with a multivariate logistic normal distribution.
 
 The authors treat the prior as a fixed hyperparameter.  They use an
 $L_1$-regularized estimate of covariance, which is equivalent to the
@@ -6752,7 +6752,7 @@ the multivariate logistic normal prior.
 data {
   ... data as before without alpha ...
   vector[K] mu;          // topic mean
-  cov_matrix[K] Sigma;   // topic covariance 
+  cov_matrix[K] Sigma;   // topic covariance
 }
 \end{stancode}
 %
@@ -6781,7 +6781,7 @@ model {
 
 By adding a prior for the mean and covariance, Stan supports full
 Bayesian inference for the correlated topic model.  This requires
-moving the declarations of topic mean \code{mu} and covariance \code{Sigma} 
+moving the declarations of topic mean \code{mu} and covariance \code{Sigma}
 from the data block to the parameters block and providing them with
 priors in the model.  A relatively efficient and interpretable prior
 for the covariance matrix \code{Sigma} may be encoded as follows.
@@ -6831,7 +6831,7 @@ determined by the prior on \code{sigma}.
 \chapter{Gaussian Processes}\label{gaussian-processes.chapter}
 
 \noindent
-Gaussian process are continuous stochastic processes and thus may be
+Gaussian processes are continuous stochastic processes and thus may be
 interpreted as providing a probability distribution over functions.  A
 probability distribution over continuous functions may be viewed,
 roughly, as an uncountably infinite collection of random variables,
@@ -6839,11 +6839,11 @@ one for each valid input.  The generality of the supported functions
 makes Gaussian priors popular choices for priors in general
 multivariate (non-linear) regression problems.
 
-The defining feature of a Gaussian process is that the distribution of
-the function's value at a finite number of input points is a
-multivariate normal distribution.  This makes it tractable to both fit
-models from finite amounts of observed data and make predictions for
-finitely many new data points. 
+The defining feature of a Gaussian process is that the joint distribution of
+the function's value at a finite number of input points is a multivariate
+normal distribution.  This makes it tractable to both fit models from finite
+amounts of observed data and make predictions for finitely many new data
+points.
 
 Unlike a simple multivariate normal distribution, which is
 parameterized by a mean vector and covariance matrix, a Gaussian
@@ -6853,13 +6853,14 @@ return a mean vector and covariance matrix which provide the mean and
 covariance of the outputs corresponding to those input points in the
 functions drawn from the process.
 
-Gaussian processes can be encoded in Stan by implementing their mean
-and covariance functions and plugging the result into the Gaussian
-form of their sampling distribution.  This form of model is easy to
-understand and may be used for simulation, model fitting, or posterior
-predictive inference.  More efficient Stan implementation for the
-basic (non-logistic) regression applies a Cholesky-factor
-reparameterization of the Gaussian and computes the posterior
+Gaussian processes can be encoded in Stan by implementing their mean and
+covariance functions and plugging the result into the Gaussian form of their
+sampling distribution, or by using the specialized covariance functions
+outlined below.  This form of model is straightforward and may be used for
+simulation, model fitting, or posterior predictive inference. A more efficient
+Stan implementation for the GP with a normally distributed outcome marginalizes
+over the latent Gaussian process, and applies a Cholesky-factor
+reparameterization of the Gaussian to compute the likelihood and the posterior
 predictive distribution analytically.
 
 After defining Gaussian processes, this chapter covers the basic
@@ -6877,14 +6878,14 @@ The data for a multivariate Gaussian process regression consists of a
 series of $N$ inputs $x_1,\ldots,x_N \in \reals^D$ paired with outputs
 $y_1,\ldots,y_N \in \reals$.  The defining feature of Gaussian
 processes is that the probability of a finite number of outputs $y$
-conditioned on their inputs $x$ is Gaussian,
+conditioned on their inputs $x$ is Gaussian:
 \[
-y \sim \distro{Normal}(m(x), k(x)),
-\] 
-where $m(x)$ is an $N$-vector and $k(x)$ is an $N \times N$
+y \sim \distro{MultiNormal}(m(x), K(x | \theta)),
+\]
+where $m(x)$ is an $N$-vector and $K(x | \theta)$ is an $N \times N$
 covariance matrix.  The mean function $m : \reals^{N \times D}
 \rightarrow \reals^{N}$ can be anything, but the covariance function
-$k : \reals^{N \times D} \rightarrow \reals^{N \times N}$ must produce
+$K : \reals^{N \times D} \rightarrow \reals^{N \times N}$ must produce
 a positive-definite matrix for any input $x$.%
 %
 \footnote{Gaussian processes can be extended to covariance functions
@@ -6892,44 +6893,67 @@ a positive-definite matrix for any input $x$.%
   inference in the resulting models because the resulting distribution
   does not have unconstrained support.}
 
-A popular covariance function, which will be used in the
-implementations later in this chapter, is a generalized, squared
-exponential function,
+A popular covariance function, which will be used in the implementations later
+in this chapter, is an exponentiated quadratic function,
 \[
-k(x)_{i, j}
-= \eta^2 
+  K(x | \alpha, \rho, \sigma)_{i, j}
+= \alpha^2
 \exp \left(
-- \rho^2 \sum_{d=1}^D (x_{i,d} - x_{j,d})^2
+- \dfrac{1}{2 \rho^2} \sum_{d=1}^D (x_{i,d} - x_{j,d})^2
 \right)
 + \delta_{i, j} \sigma^2,
 \]
-where $\eta$, $\rho$, and $\sigma$ are hyperparameters defining the
+where $\alpha$, $\rho$, and $\sigma$ are hyperparameters defining the
 covariance function and where $\delta_{i, j}$ is the Kronecker delta
 function with value 1 if $i = j$ and value 0 otherwise; note that this
 test is between the indexes $i$ and $j$, not between values $x_i$ and
-$x_j$. The addition of $\sigma^2$ on the diagonal is important
+$x_j$. Note that this kernel is obtained through a convolution of two
+independent Gaussian processes, $f_1$ and $f_2$, with kernels
+\[
+  K_1(x | \alpha, \rho)_{i, j}
+= \alpha^2
+\exp \left(
+- \dfrac{1}{2 \rho^2} \sum_{d=1}^D (x_{i,d} - x_{j,d})^2
+\right)
+\]
+and
+\[
+  K_2(x | \sigma)_{i, j}
+=
+ \delta_{i, j} \sigma^2,
+\]
+
+The addition of $\sigma^2$ on the diagonal is important
 to ensure the positive definiteness of the resulting matrix in the case of
 two identical inputs $x_i = x_j$.  In statistical terms, $\sigma$ is
 the scale of the noise term in the regression.
+
+The hyperparameter $\rho$ is the \emph{length-scale}, and corresponds to the
+frequency of the functions represented by the Gaussian process prior with
+respect to the domain. Values of $\rho$ closer to zero lead the GP to represent
+high-frequency functions, whereas larger values of $\rho$ lead to low-frequency
+functions. The hyperparameter $\alpha$ is the \emph{marginal standard
+deviation}. It controls the magnitude of the range of the function represented
+by the GP. If you were to take the standard deviation of many draws from the GP
+$f_1$ prior at a single input $x$ conditional on one value of $\alpha$ one
+would recover $\alpha$.
 
 The only term in the squared exponential covariance function involving
 the inputs $x_i$ and $x_j$ is their vector difference, $x_i - x_j$.
 This produces a process with stationary covariance in the sense that
 if an input vector $x$ is translated by a vector $\epsilon$ to $x +
 \epsilon$, the covariance at any pair of outputs is unchanged, because
-$k(x) = k(x+\epsilon)$.
+$K(x | \theta) = K(x + \epsilon| \theta)$.
 
 The summation involved is just the squared Euclidean distance between
 $x_i$ and $x_j$ (i.e., the $L_2$ norm of their difference, $x_i -
 x_j$). This results in support for smooth functions in the process.
 The amount of variation in the function is controlled by the free
-hyperparameters $\eta$, $\rho$, and $\sigma$.  
+hyperparameters $\alpha$, $\rho$, and $\sigma$.
 
 Changing the notion of distance from Euclidean to taxicab distance
 (i.e., an $L_1$ norm) changes the support to functions which are
 continuous but not smooth.
-
-
 
 \section{Simulating from a Gaussian Process}
 
@@ -6942,7 +6966,7 @@ The Stan model defines the mean and covariance functions in a
 transformed data block and then samples outputs $y$ in the model using
 a multivariate normal distribution.  To make the model concrete, the
 squared exponential covariance function described in the previous section
-will be used with hyperparameters set to $\eta^2 = 1$, $\rho^2 = 1$,
+will be used with hyperparameters set to $\alpha^2 = 1$, $\rho^2 = 1$,
 and $\sigma^2 = 0.1$, and the mean function $m$ is defined to always
 return the zero vector, $m(x) = {\bf 0}$.  Consider the following
 implementation of a Gaussian process simulator.%
@@ -6957,33 +6981,58 @@ data {
 }
 transformed data {
   vector[N] mu;
-  cov_matrix[N] Sigma;
-  for (i in 1:N) 
-    mu[i] = 0;
-  for (i in 1:N) 
-    for (j in 1:N)
-      Sigma[i, j] = exp(-pow(x[i] - x[j], 2)) 
-                    + i == j ? 0.1 : 0.0;
+  matrix[N, N] K;
+  mu = rep_vector(0, N);
+  for (i in 1:(N - 1)) {
+    K[i,i] = 1 + 0.1;
+    for (j in (i + 1):N) {
+      K[i, j] = exp(-1/2 * pow(x[i] - x[j], 2));
+      K[j, i] = K[i, j];
+    }
+  }
+  K[N,N] = 1 + 0.1;
 }
 parameters {
   vector[N] y;
 }
 model {
-  y ~ multi_normal(mu, Sigma);
+  y ~ multi_normal(mu, K);
+}
+\end{stancode}
+%
+The above model can also be written more compactly using the specialized
+covariance function that implements the exponentiated quadratic kernel.
+%
+\begin{stancode}
+data {
+  int<lower=1> N;
+  real x[N];
+}
+transformed data {
+  vector[N] mu;
+  cov_matrix[N] K;
+  mu = rep_vector(0, N);
+  K = cov_exp_quad(x, 1, 1);
+  for (i in 1:N)
+    K[i, i] = K[i, i] + 0.1;
+}
+parameters {
+  vector[N] y;
+}
+model {
+  y ~ multi_normal(mu, K);
 }
 \end{stancode}
 %
 The input data is just the vector of inputs \code{x} and its size
 \code{N}.  Such a model can be used with values of \code{x} evenly
 spaced over some interval in order to plot sample draws of functions
-from a Gaussian process.  The covariance matrix \code{Sigma} is not
-being computed efficiently here; see
-Section~\refsection{fit-gp} for a better approach.
+from a Gaussian process.
 
 \subsection{Multivariate Inputs}
 
-Only the covariance function's distance computation needs to change in
-moving from a univariate model to a multivariate model.%
+Only the input data needs to change in moving from a univariate model to a
+multivariate model.%
 %
 \footnote{The model is available in the Stan example model repository;
 see \url{http://mc-stan.org/documentation}.}
@@ -6998,39 +7047,32 @@ data {
 }
 transformed data {
 ...
-      Sigma[i, j] = exp(-dot_self(x[i] - x[j]))
-                    + i == j ? 0.1 : 0.0;
 ...
 \end{stancode}
 %
 The data is now declared as an array of vectors instead of an array of
-scalars; the dimensionality \code{D} is also declared.  The squared
-Euclidean distance calculation is done using the \code{dot\_self}
-function, which returns the dot product of its argument with itself, here
-\code{x[i]~-~x[j]}.
+scalars; the dimensionality \code{D} is also declared.
 
-In the remainder of the chapter, univariate models will be used for
-simplicity, but any of them could be changed to multivariate in the
-same way as the simple sampling model.  The only extra computational
-overhead from a multivariate model is in the distance calculation,
-which is only done once when the transformed data block is run after
-the data is read.
+In the remainder of the chapter, univariate models will be used for simplicity,
+but any of the models could be changed to multivariate in the same way as the
+simple sampling model. The only extra computational overhead from a
+multivariate model is in the distance calculation.
 
 \subsection{Cholesky Factored and Transformed Implementation}
 
-A much more efficient implementation of the simulation model can be
+A more efficient implementation of the simulation model can be
 coded in Stan by relocating, rescaling and rotating an isotropic unit
 normal variate.  Suppose $z$ is an an isotropic unit normal variate
 \[
 z \sim \distro{Normal}({\bf 0}, {\bf 1}),
 \]
 where ${\bf 0}$ is an $N$-vector of 0 values and ${\bf 1}$ is the $N
-\times N$ unit matrix.  Let $L$ be the Cholesky decomposition of
-$k(x)$, i.e., the lower-triangular matrix $L$ such that $LL^{\top} =
-k(x)$.  Then the transformed variable $\mu + Lz$ has the intended
+\times N$ identity matrix.  Let $L$ be the Cholesky decomposition of
+$K(x | \theta)$, i.e., the lower-triangular matrix $L$ such that $LL^{\top} =
+K(x | \theta)$.  Then the transformed variable $\mu + Lz$ has the intended
 target distribution,
 \[
-\mu + Lz \sim \distro{Normal}(\mu, k(x)).
+  \mu + Lz \sim \distro{MultiNormal}(\mu(x), K(x | \theta)).
 \]
 
 This transform can be applied directly to Gaussian process
@@ -7041,7 +7083,7 @@ see \url{http://mc-stan.org/documentation}.}
 %
 This model has the same data declarations for \code{N} and \code{x},
 and the same transformed data definitions of \code{mu} and
-\code{Sigma} as the previous model, with the addition of a transformed
+\code{K} as the previous model, with the addition of a transformed
 data variable for the Cholesky decomposition.  The parameters change
 to the raw parameters sampled from an isotropic unit normal, and the
 actual samples are defined as generated quantities.
@@ -7051,7 +7093,7 @@ actual samples are defined as generated quantities.
 transformed data {
   matrix[N, N] L;
 ...
-  L = cholesky_decompose(Sigma);
+  L = cholesky_decompose(K);
 }
 parameters {
   vector[N] z;
@@ -7066,166 +7108,456 @@ generated quantities {
 \end{stancode}
 %
 The Cholesky decomposition is only computed once, after the data is
-loaded and the covariance matrix \code{Sigma} computed.  The isotropic
+loaded and the covariance matrix \code{K} computed.  The isotropic
 normal distribution for \code{z} is specified as a vectorized
 univariate distribution for efficiency; this specifies that each
 \code{z[n]} has an independent unit normal distribution.  The sampled
 vector \code{y} is then defined as a generated quantity using a direct
 encoding of the transform described above.
 
-
 \section{Fitting a Gaussian Process}\label{fit-gp.section}
 
-The hyperparameters controlling the covariance function of a Gaussian
-process can be fit by assigning them priors, then computing the
-posterior distribution of the hyperparameters given observed data.
-Because the hyperparameters are required to be positive and expected
-to have reasonably small values, broad half-Cauchy distributions act
-as quite vague priors which could just as well be uniform over a
-constrained range of values.  The priors on the parameters should be
-defined based on prior knowledge of the scale of the output values
-($\eta$), the scale of the output noise ($\sigma$), and the scale at
-which distances are measured among inputs ($1/\rho$).
+\subsection{GP with a normal outcome}
 
-The Stan code%
+The full generative model for a GP with a normal outcome,
+$y \in \R^N$, with inputs $x \in \R^N$, for a finite $N$:
+
+\begin{align*}
+  \rho & \sim \distro{Gamma}(4,4) \\
+  \alpha & \sim \distro{Normal}(0, 1) \\
+  \sigma & \sim \distro{Normal}(0, 1) \\
+  f & \sim \distro{MultiNormal}\left(0, K(x | \alpha, \rho)\right) \\
+  y_i & \sim \distro{Normal}(f_i, \sigma) \, \forall i \in \{1, \dots, N\}
+\end{align*}
+
+With a normal outcome, it is possible to integrate out the Gaussian
+process $f$, yielding the more parsimonious model:
+
+\begin{align*}
+  \rho & \sim \distro{Gamma}(4,4) \\
+  \alpha & \sim \distro{Normal}(0, 1) \\
+  \sigma & \sim \distro{Normal}(0, 1) \\
+  y & \sim \distro{MultiNormal}
+  \left(0, K(x | \alpha, \rho) + \mathbf{I}_N \sigma^2\right) \\
+\end{align*}
+
+It can be more computationally efficient when dealing with a normal
+outcome to integrate out the Gaussian process, because this yields a
+lower-dimensional parameter space over which to do inference. We'll fit
+both models in Stan. The former model will be referred to as the latent
+variable GP, while the latter will be called the marginal likelihood
+GP.
+
+The hyperparameters controlling the covariance function of a Gaussian process
+can be fit by assigning them priors, like we have in the generative models
+above, and then computing the posterior distribution of the hyperparameters
+given observed data. The priors on the parameters should be defined
+based on prior knowledge of the scale of the output values ($\alpha$), the
+scale of the output noise ($\sigma$), and the scale at which distances are
+measured among inputs ($\rho$). See \refsection{priors-gp} for more information
+about how to specify appropriate priors for the hyperparameters.
+
+The Stan program implementing the marginal likelihood GP is shown below. The
+program is similar to the Stan programs that implement the simulation GPs
+above, but because we are doing inference on the hyperparameters, we need to
+calculate the covariance matrix \code{K} in the model block, rather than
+the transformed data block.
 %
 \footnote{The program code is available in the Stan example model repository;
 see \url{http://mc-stan.org/documentation}.}
-%
-is very similar to the simulation models in terms of the
-computations, but the blocks in which variables are declared and
-statements are executed has changed to accommodate the hyperparameter
-estimation problem.
+
 %
 \begin{stancode}
 data {
   int<lower=1> N;
-  vector[N] x;
+  real x[N];
   vector[N] y;
 }
 transformed data {
   vector[N] mu;
-  for (i in 1:N) mu[i] = 0;
+  mu = rep_vector(0, N);
 }
 parameters {
-  real<lower=0> eta_sq;
-  real<lower=0> inv_rho_sq;
-  real<lower=0> sigma_sq;
-}
-transformed parameters {
-  real<lower=0> rho_sq;
-  rho_sq = inv(inv_rho_sq);
+  real<lower=0> rho;
+  real<lower=0> alpha;
+  real<lower=0> sigma;
 }
 model {
-  matrix[N, N] Sigma;
-  // off-diagonal elements
-  for (i in 1:(N-1)) {
-    for (j in (i+1):N) {
-      Sigma[i, j] = eta_sq * exp(-rho_sq * pow(x[i] - x[j],2));
-      Sigma[j, i] = Sigma[i, j];
-    }
-  }
+  matrix[N, N] K = cov_exp_quad(x, alpha, rho);
+  matrix[N, N] L_K;
+  real sq_sigma = square(sigma);
+
   // diagonal elements
-  for (k in 1:N)
-    Sigma[k, k] = eta_sq + sigma_sq;  // + jitter
+  for (n in 1:N)
+    K[n, n] = K[n, n] + sq_sigma;
 
-  eta_sq ~ cauchy(0, 5);
-  inv_rho_sq ~ cauchy(0, 5);
-  sigma_sq ~ cauchy(0, 5);
+  L_K = cholesky_decompose(K);
 
-  y ~ multi_normal(mu, Sigma);
+  rho ~ gamma(4, 4);
+  alpha ~ normal(0, 1);
+  sigma ~ normal(0, 1);
+
+  y ~ multi_normal_cholesky(mu, L_K);
 }
 \end{stancode}
 %
-The data block now declares a vector \code{y} of observed values
-\code{y[n]} for inputs \code{x[n]}.  The transformed data block now
-only defines the mean vector to be zero.  The three hyperparameters
-are defined as parameters constrained to be non-negative.  The
-computation of the covariance matrix \code{Sigma} is now in the model
-block because it involves unknown parameters and thus can't simply be
-precomputed as transformed data.  The rest of the model consists of
-the priors for the hyperparameters and the multivariate
-normal likelihood, only now the value \code{y} is known and the
-covariance matrix \code{Sigma} is an unknown dependent on the
-hyperparameters.  Note that a prior is put on the scale term
-\code{inv\_rho\_sq}, then \code{rho\_sq} is defined as
-\code{inv(inv\_rho\_sq)}, which is just a more efficient way of
-expressing \code{1~/~rho\_sq}.  An alternative would be to just divide
-by \code{inv\_rho\_sq}.
+The data block now declares a vector \code{y} of observed values \code{y[n]}
+for inputs \code{x[n]}.  The transformed data block now only defines the mean
+vector to be zero.  The three hyperparameters are defined as parameters
+constrained to be non-negative.  The computation of the covariance matrix
+\code{K} is now in the model block because it involves unknown parameters and
+thus can't simply be precomputed as transformed data.  The rest of the model
+consists of the priors for the hyperparameters and the multivariate
+Cholesky-parameterized normal likelihood, only now the value \code{y} is known
+and the covariance matrix \code{K} is an unknown dependent on the
+hyperparameters, allowing us to learn the hyperparameters.
 
-Hamiltonian Monte Carlo sampling is quite fast and effective for
-hyperparameter inference in this model \citep{Neal:1997}, and the Stan
-implementation will fit hyperparameters in models with hundreds of
-data points in seconds.
+We have used the Cholesky parameterized \distro{MultiNormal} rather than the
+standard \distro{MultiNormal} because it allows us to the
+\code{cholesky\_decompose} function which has been optimized for both small and
+large matrices. When working with small matrices the differences in
+computational speed between the two approaches will not be noticeable, but for
+larger matrices ($N \gtrsim 100$) the Cholesky decomposition version will be
+faster.
+
+Hamiltonian Monte Carlo sampling is quite fast and effective for hyperparameter
+inference in this model \citep{Neal:1997}. If the posterior is
+well-concentrated for the hyperparameters the Stan implementation will fit
+hyperparameters in models with a few hundred data points in seconds.
+
+\subsubsection{Latent variable GP}
+
+We can also explicitly code the latent variable formulation of a GP in Stan.
+This will be useful for when the outcome is not normal. We'll need to add a
+small positive term, $\delta$ to the diagonal of the covariance matrix in order
+to ensure that our covariance matrix remains positive definite.
+
+%
+\begin{stancode}
+data {
+  int<lower=1> N;
+  real x[N];
+  vector[N] y;
+}
+transformed data {
+  real delta = 1e-9;
+}
+parameters {
+  real<lower=0> rho;
+  real<lower=0> alpha;
+  real<lower=0> sigma;
+  vector[N] eta;
+}
+model {
+  vector[N] f;
+  {
+    matrix[N, N] K = cov_exp_quad(x, alpha, rho);
+    matrix[N, N] L_K;
+
+    // diagonal elements
+    for (k in 1:N)
+      K[k, k] = K[k, k] + delta;
+
+    L_K = cholesky_decompose(K);
+    f = L_K * eta;
+  }
+
+  rho ~ gamma(4, 4);
+  alpha ~ normal(0, 1);
+  sigma ~ normal(0, 1);
+  eta ~ normal(0, 1);
+
+  y ~ normal(f, sigma);
+}
+\end{stancode}
+%
+
+Two differences between the latent variable GP and the marginal likelihood GP
+are worth noting. The first is that we have augmented our parameter block with
+a new parameter vector of length $N$ called $\code{eta}$. This is used in the model
+block to generate a multivariate normal vector called $f$, corresponding to the
+latent GP. We put a $\distro{Normal}(0,1)$ prior on $\code{eta}$ like we did in the
+Cholesky-parameterized GP in the simulation section.  The second difference is
+that our likelihood is now univariate, though we could code $N$ likelihood
+terms as one $N$-dimensional multivariate normal with an identity covariance
+matrix multiplied by $\sigma^2$. However, it is more efficient to use the
+vectorized statement as shown above.
+
+\subsection{Discrete outcomes with Gaussian Processes}
+
+Gaussian processes can be generalized the same way as standard linear
+models by introducing a link function.  This allows them to be used as
+discrete data models.
+
+\subsubsection{Poisson GP}
+
+If we want to model count data, we can remove the $\sigma$ parameter, and use
+\code{poisson\_log}, which implements a log link, for our likelihood rather
+than \code{normal}. We can also add an overall mean parameter, $a$, which
+will account for the marginal expected value for $y$. We do this because we
+cannot center count data like we would for normally distributed data.
+
+%
+\begin{stancode}
+data {
+...
+  int<lower=0> y[N];
+...
+}
+...
+parameters {
+  real<lower=0> alpha;
+  real<lower=0> rho;
+  real a;
+  vector[N] eta;
+}
+model {
+...
+  alpha ~ normal(0, 1);
+  rho ~ gamma(4, 4);
+  eta ~ normal(0, 1);
+  a ~ normal(0, 1);
+
+  y ~ poisson_log(a + f);
+}
+\end{stancode}
+%
+
+\subsubsection{Logistic Gaussian Process Regression}
+
+For binary classification problems, the observed outputs $z_n \in
+\setlist{0,1}$ are binary.  These outputs are modeled using a Gaussian
+process with (unobserved) outputs $y_n$ through the logistic link,
+\[
+z_n \sim \distro{Bernoulli}(\mbox{logit}^{-1}(y_n)),
+\]
+or in other words,
+\[
+\mbox{Pr}[z_n = 1] = \mbox{logit}^{-1}(y_n).
+\]
+
+We can extend our latent variable GP Stan program to deal with classification
+problems. Below $a$ is the bias term, which can help account for imbalanced
+classes in the training data:
+
+%
+\begin{stancode}
+data {
+...
+  int<lower=0, upper=1> z[N];
+...
+}
+...
+model {
+...
+
+  y ~ bernoulli_logit(a + f);
+}
+\end{stancode}
+%
 
 \subsection{Automatic Relevance Determination}
 
-``Automatic relevance determination'' is the term used in machine
-learning corresponding to the term ``hierarchical modeling'' in
-statistics.  In either case, the idea is that hyperparameters are
-estimated from data (in Bayesian inference, via the joint posterior
-distribution) rather than being preset.
-
-For multivariate inputs $x \in \reals^D$, the squared exponential
-covariance function can be further generalized by fitting a precision
-parameter $\rho_d^2$ for each dimension $d$,
+If we have multivariate inputs $x \in \reals^D$, the squared exponential
+covariance function can be further generalized by fitting a scale
+parameter $\rho_d$ for each dimension $d$,
 \[
-k(x)_{i, j} = \eta^2 \exp 
-\left(
-- \sum_{d=1}^D \rho_d^2 (x_{i,d} - x_{j,d})^2
+  k(x | \alpha, \vec{\rho}, \sigma)_{i, j} = \alpha^2 \exp
+\left(-\dfrac{1}{2}
+\sum_{d=1}^D \dfrac{1}{\rho_d^2} (x_{i,d} - x_{j,d})^2
 \right)
 + \delta_{i, j}\sigma^2.
 \]
-The estimation of $\rho$ was termed ``automatic relevance
-determination'' in \citep{Neal:1996}, because the larger $\rho_d$ is,
-the more dimension $d$ is weighted in the distance calculation.
+The estimation of $\rho$ was termed ``automatic relevance determination'' in
+\citep{Neal:1996}, but this is misleading, because the magnitude the scale of
+the posterior for each $\rho_d$ is dependent on the scaling of the input data
+along dimension $d$. Moreover, the scale of the parameters $\rho_d$ measures
+non-linearity along the $d$-th dimension, rather than ``relevance''
+\citep{PiironenVehtari:2016}.
 
-The implementation of automatic relevance determination in Stan is
-straightforward.  A model like the one to fit the basic
-hyperparameters can be generalized by declaring \code{rho} to be a
-vector of size \code{D} and defining the covariance function as in
-this subsection.
-
-
-\subsubsection{Priors for Gaussian Process Parameters}
-
-The parameters $\rho$ and $\eta$ are only weakly identifiable, and the
-ratio of them is better identified and affects the
-nonlinearity. However it is usual to use independent priors.  It may
-be easier to formulate a prior for $1/\rho$, which is the length
-scale or $1/\rho^2$ as in the earlier example.  
-
-If the length scale is larger than the scale of the data the model is
-practically linear (with respect to the particular covariate) and
-increasing the length scale does not change the model. Thus you should
-use a prior which goes down for the larger length scale values. If the
-length scale is so small that the correlation between data points is
-zero, then decreasing the length scale further does not change the
-model. There is typically no need to restrict the length scale from
-going to very small values, but sometimes it can be helpful.  One
-reasonable choice of priors is a half-t prior for the length scale,
-with the scale of the prior determined to be weakly informative (or
-more informative if information is available).
-
-The parameter $\eta$ corresponds to how much of the variation is
-explained by the regression function and has a similar role to the
-prior variance for linear model weights.  This means the prior can be
-the same as used in linear models, such as a half-t prior on $\eta$.
-
-A priori, the closer $\rho_d$ is to zero, the less effect the
-predictor dimension $d$ has.  A posterior, the actual dependencies
+A priori, the closer $\rho_d$ is to zero, the more nonlinear the
+conditional mean in dimension $d$ is.  A posteriori, the actual dependencies
 between $x$ and $y$ play a role.  With one covariate $x_1$ having a
 linear effect and another covariate $x_2$ having a nonlinear effect,
-it is possible that $\rho_1 < \rho_2$ even if the predictive relevance
-of x1 is higher. That is, $\rho$ is related to the relevance, but it
-is more accurate to say that it measures the nonlinearity or the
-expected number of upcrossings \cite[page~80]{RasmussenWilliams:2006}.
-
+it is possible that $\rho_1 > \rho_2$ even if the predictive relevance
+of $x_1$ is higher \cite[page~80]{RasmussenWilliams:2006}.
 The collection of $\rho_d$ (or $1/\rho_d$) parameters can also be
 modeled hierarchically.
 
+The implementation of automatic relevance determination in Stan is
+straightforward, though it currently requires the user to directly code the
+covariance matrix. We'll write a function to generate the Cholesky of the
+covariance matrix called \code{L\_cov\_exp\_quad\_ARD}.
 
-\section{Predictive Inference with a Gaussian Process}
+%
+\begin{stancode}
+functions {
+  matrix L_cov_exp_quad_ARD(real[] x,
+                            real alpha,
+                            vector[] rho,
+                            real delta) {
+    int N = size(x);
+    matrix[N, N] K;
+    real inv_half = -1/2;
+    real sq_alpha = square(alpha);
+    for (i in 1:(N - 1)) {
+      K[i,i] = sq_alpha + delta;
+      for (j in (i + 1):N) {
+        K[i, j] = sq_alpha
+                      * exp(inv_half
+                            * dot_self((x[i] - x[j]) ./ rho));
+        K[j, i] = K[i, j];
+      }
+    }
+    K[N,N] = sq_alpha + delta;
+    return cholesky_decompose(K);
+  }
+}
+data {
+  int<lower=1> N;
+  int<lower=1> D;
+  vector[D] x[N];
+  vector[N] y;
+}
+transformed data {
+  real delta;
+  delta = 1e-9;
+}
+parameters {
+  vector<lower=0>[D] rho;
+  real<lower=0> alpha;
+  real<lower=0> sigma;
+  vector[N] eta;
+}
+model {
+  vector[N] f;
+  {
+    matrix[N, N] L_K = L_cov_exp_quad_ARD(x, alpha, rho, 1e-9);
+    f = L_K * eta;
+  }
+
+  rho ~ gamma(4, 4);
+  alpha ~ normal(0, 1);
+  sigma ~ normal(0, 1);
+  eta ~ normal(0, 1);
+
+  y ~ normal(f, sigma);
+}
+\end{stancode}
+%
+
+\subsection{Priors for Gaussian Process Parameters}\label{priors-gp.section}
+
+Formulating priors for GP hyperparameters requires the analyst to consider the
+inherent statistical properties of a GP, the GP's purpose in the model, and the
+numerical issues that may arise in Stan when estimating a GP.
+
+Perhaps most importantly, the parameters $\rho$ and $\alpha$ are weakly
+identified \citep{zhang-gp:2004}. The ratio of the two
+parameters is well-identified, but in practice we put independent priors on the
+two hyperparameters because these two quantities are more interpretable than
+their ratio.
+
+\subsubsection{Priors for length-scale}
+
+GPs are a flexible class of priors, and as such, can represent a wide spectrum
+of functions.  For length scales below the minimum spacing of the covariates
+the GP likelihood plateaus.  Unless regularized by a prior, this flat
+likelihood induces considerable posterior mass at small length scales where the
+observation variance drops to zero and the functions supported by the GP being
+to exactly interpolate between the input data.  The resulting posterior not
+only significantly overfits to the input data, it also becomes hard to
+accurately sample using Euclidean HMC.
+
+We may wish to put further soft constraints on the length-scale, but these are
+dependent on how the GP is used in our statistical model.
+
+If our model consists of only the GP, i.e.:
+%
+\begin{align*}
+  f & \sim \distro{MultiNormal}\left(0, K(x | \alpha, \rho)\right) \\
+  y_i & \sim \distro{Normal}(f_i, \sigma) \, \forall i \in \{1, \dots, N\} \\
+  & x \in \reals^{N \times D}, \, f \in \reals^N
+\end{align*}
+%
+we likely don't need constraints beyond penalizing small length-scales.  We'd
+like to allow the GP prior to represent both high-frequency and low-frequency
+functions, so our prior should put non-negligible mass on both sets of
+functions. In this case, an inverse gamma, \code{inv\_gamma\_lpdf} in Stan's
+language, will work well as it has a sharp left tail that puts negligible mass
+on length-scales, but a generous right tail, allowing for large length-scales.
+
+If we're using the GP as a component in a larger model that includes an overall
+mean and fixed effects for the same variables we're using as the domain for the
+GP, i.e.:
+%
+\begin{align*}
+	f & \sim \distro{MultiNormal}\left(0, K(x | \alpha, \rho)\right) \\ y_i &
+	\sim \distro{Normal}(\beta_0 + x_i \beta_{[1:D]} + f_i, \sigma) \, \forall i
+	\in \{1, \dots, N\} \\ & x_i^T, \beta_{[1:D]} \in \reals^D,\, x \in \reals^{N
+	\times D},\, f \in \reals^N
+\end{align*}
+%
+we'll likely want to constrain large length-scales as well.  A length scale
+that is larger than the scale of the data yields a GP posterior that is
+practically linear (with respect to the particular covariate) and increasing
+the length scale has little impact on the likelihood. This will introduce
+nonidentifiability in our model, as both the fixed effects and the GP will
+explain similar variation. In order to limit the amount of overlap between the
+GP and the linear regression, we should use a prior with a sharper right tail
+to limit the GP to higher-frequency functions. We can use a generalized inverse
+Gaussian distribution:
+%
+\begin{align*}
+	f(x | a, b, p) & = \dfrac{(a/b)^{p/2}}{2K_p(\sqrt{ab})} x^{p - 1}\exp(-(ax + b
+	/ x)/2) \\
+	& x, a, b \in \reals^{+}, \, p \in \mathbb{Z}
+\end{align*}
+%
+which has an inverse gamma left tail if $p \leq 0$ and a Gaussian right tail.
+This has not yet been implemented in Stan's math library, but it is possible to
+implement as a user defined function:
+\begin{stancode}
+functions {
+  real generalized_inverse_gaussian_lpdf(real x, int p,
+                                        real a, real b) {
+    return p * 0.5 * log(a / b)
+      - log(2 * modified_bessel_second_kind(p, sqrt(a * b)))
+      + (p - 1) * log(x)
+      - (a * x + b / x) * 0.5;
+ }
+}
+data {
+...
+\end{stancode}
+
+If we have high-frequency covariates in our fixed effects, we may wish to
+further regularize the GP away from high-frequency functions, which means we'll
+need to penalize smaller length-scales. Luckily, we have a useful way of
+thinking about how length-scale affects the frequency of the functions
+supported the GP. If we were to repeatedly draw from a zero-mean GP with a
+length-scale of $\rho$ in a fixed-domain $[0,T]$, we would get a distribution
+for the number of times each draw of the GP crossed the zero axis. The
+expectation of this random variable, the number of zero crossings, is $T / \pi
+\rho$. You can see that as $\rho$ decreases, the expectation of the number of
+upcrossings increases as the GP is representing higher-frequency functions.
+Thus, this is a good statistic to keep in mind when setting a lower-bound for
+our prior on length-scale in the presence of high-frequency covariates.
+However, this statistic is only valid for one-dimensional inputs.
+
+\subsubsection{Priors for marginal standard deviation}
+
+The parameter $\alpha$ corresponds to how much of the variation is
+explained by the regression function and has a similar role to the
+prior variance for linear model weights.  This means the prior can be
+the same as used in linear models, such as a half-$t$ prior on $\alpha$.
+
+A half-$t$ or half-Gaussian prior on alpha also has the benefit of putting
+nontrivial prior mass around zero. This allows the GP support the zero
+functions and allows the possibility that the GP won't contribute to the
+conditional mean of the total output.
+
+\subsection{Predictive Inference with a Gaussian Process}
 
 Suppose for a given sequence of inputs $x$ that the corresponding
 outputs $y$ are observed.  Given a new sequence of inputs $\tilde{x}$,
@@ -7242,242 +7574,76 @@ p(\tilde{y}, y|\tilde{x},x).
 
 A direct implementation in Stan defines a model in terms of the
 joint distribution of the observed $y$ and unobserved $\tilde{y}$.
-Although Stan does not support mixed vectors of parameters and data
-directly, such a vector may be synthesized as a local variable in the
-model block.  The following model takes this approach.%
-%
-\footnote{The program code is available in the Stan example model repository;
-see \url{http://mc-stan.org/documentation}.}
 %
 \begin{stancode}
 data {
-  int<lower=1> N1;     
-  vector[N1] x1; 
+  int<lower=1> N1;
+  real x1[N1];
   vector[N1] y1;
   int<lower=1> N2;
-  vector[N2] x2;
+  real x2[N2];
 }
 transformed data {
-  int<lower=1> N;
-  vector[N1+N2] x;
-  vector[N1+N2] mu;
-  cov_matrix[N1+N2] Sigma;
-  N = N1 + N2;
+  int<lower=1> N = N1 + N2;
+  vector[N] x;
   for (n in 1:N1) x[n] = x1[n];
   for (n in 1:N2) x[N1 + n] = x2[n];
-  for (i in 1:N) mu[i] = 0;
-  for (i in 1:N) 
-    for (j in 1:N)
-      Sigma[i, j] = exp(-pow(x[i] - x[j],2)) 
-                    + i == j ? 0.1 : 0.0;
 }
 parameters {
-  vector[N2] y2;
+  real<lower=0> alpha;
+  real<lower=0> rho;
+  real<lower=0> sigma;
+  vector[N] eta;
 }
 model {
-  vector[N] y;
-  for (n in 1:N1) y[n] = y1[n];
-  for (n in 1:N2) y[N1 + n] = y2[n];
+  vector[N] f;
+  {
+    matrix[N, N] K = cov_exp_quad(x, alpha, rho);
+    matrix[N, N] L_K = cholesky_decompose(K);
+    f = L_K * eta;
+  }
 
-  y ~ multi_normal(mu, Sigma);
+  alpha ~ normal(0, 1);
+  rho ~ gamma(4, 4);
+  sigma ~ normal(0, 1);
+  eta ~ normal(0, 1);
+
+  y ~ normal(f[1:N1], sigma);
+}
+generated quantities {
+  vector[N2] y2;
+  for (n in 1:N2)
+    y2[n] = normal_rng(f[N1 + n], sigma);
 }
 \end{stancode}
 %
-The input vectors \code{x1} and \code{x2} are declared as data, as is
-the observed output vector \code{y1}.  The unknown output vector
-\code{y2}, which corresponds to input vector \code{x2}, is declared as
-a parameter and will be sampled when the model is executed.  
+
+The input vectors \code{x1} and \code{x2} are declared as data, as is the
+observed output vector \code{y1}.  The unknown output vector \code{y2}, which
+corresponds to input vector \code{x2}, is declared in the generated quantities
+block and will be sampled when the model is executed.
 
 A transformed data block is used to combine the input vectors
-\code{x1} and \code{x2} into a single vector \code{x}.  The covariance
-function is then applied to this combined input vector to produce the
-covariance matrix \code{Sigma}.  The mean vector \code{mu} is also
-declared and set to zero.
+\code{x1} and \code{x2} into a single vector \code{x}.
 
-The model block declares and defines a local variable for the combined
-output vector \code{y}, which consists of the concatenation of the
-known outputs \code{y1} and unknown outputs \code{y2}.  Thus the
-combined output vector \code{y} is aligned with the combined
-input vector \code{x}.  All that is left is to define the multivariate
+The model block declares and defines a local variable for the combined output
+vector \code{f}, which consists of the concatenation of the conditional mean
+for known outputs \code{y1} and unknown outputs \code{y2}.  Thus the
+combined output vector \code{f} is aligned with the combined
+input vector \code{x}.  All that is left is to define the univariate
 normal sampling statement for \code{y}.
 
-\subsection{Cholesky Factorization Speedup}
-
-This model could be sped up fairly substantially by computing the
-Cholesky factor of \code{Sigma} in the transformed data block
-\begin{stancode}
-transformed data {
-  matrix[N1+N2, N1+N2] L;
-...
-  L = cholesky_decompose(Sigma);
-...
-\end{stancode}
-%
-and then replacing \code{multi\_normal} with the more efficient
-\code{multi\_normal\_cholesky} in the model block.  
-%
-\begin{stancode}
-...
-model {
-...
-  y ~ multi_normal_cholesky(mu,L);
-}
-\end{stancode}
-%  
-At this point, \code{Sigma} could be declared as a local
-variable in the data block so that its memory may be recovered after
-the data is loaded.
-
-\subsection{Analytical Form of Joint Predictive Inference}
-
-Bayesian predictive inference for Gaussian processes can be sped up by
-deriving the posterior analytically, then directly sampling from it.
-This works for standard Gaussian processes, but not
-generalizations such as logistic Gaussian process regression.
-
-Jumping straight to the result,
-\[
-p(\tilde{y}|\tilde{x},y,x)
-= 
-\distro{Normal}(K^{\top}\Sigma^{-1}y,\
-                \Omega - K^{\top}\Sigma^{-1}K),
-\]
-where $\Sigma = k(x)$ is the result of applying the covariance
-function to the inputs $x$ with observed outputs $y$, $\Omega =
-k(\tilde{x})$ is the result of applying the covariance function to the
-inputs $\tilde{x}$ for which predictions are to be inferred, and $K$
-is the matrix of covariances between inputs $x$ and $\tilde{x}$, which
-in the case of the generalized squared exponential covariance function
-would be
-\[
-K_{i, j} = \eta^2 \exp(-\rho^2 \sum_{d=1}^D (x_{i,d} -
-\tilde{x}_{j,d})^2).
-\]
-There is no noise term including $\sigma^2$ because the indexes of
-elements in $x$ and $\tilde{x}$ are never the same.
-
-Because a Stan model is only required to be proportional to the
-posterior, the posterior may be coded directly.  The following
-example%
-%
+The generated quantities block defines the quantity \code{y2}. We generate
+\code{y2} by sampling \code{N2} univariate normals with each mean corresponding
+to the appropriate element in \code{f}.
 \footnote{The program code is available in the Stan example model repository;
 see \url{http://mc-stan.org/documentation}.}
 %
-uses the analytic form of the posterior and provides sampling of the
-resulting multivariate normal through the Cholesky decomposition.
-The data declaration is the same as for the standard example.  The
-calculation of the predictive mean \code{mu} and covariance Cholesky
-factor \code{L} is done in the transformed data block.
-%
-\begin{stancode}
-transformed data {
-  vector[N2] mu;
-  matrix[N2, N2] L;
-  { 
-    matrix[N1, N1] Sigma;
-    matrix[N2, N2] Omega;
-    matrix[N1, N2] K;
-    
-    matrix[N2, N1] K_transpose_div_Sigma;
-    matrix[N2, N2] Tau;
 
-    for (i in 1:N1) 
-      for (j in 1:N1)
-        Sigma[i, j] = exp(-pow(x1[i] - x1[j], 2)) 
-          + i == j ? 0.1 : 0.0;
-    for (i in 1:N2) 
-      for (j in 1:N2)
-        Omega[i, j] = exp(-pow(x2[i] - x2[j], 2)) 
-          + (i == j ? 0.1 : 0.0);
-    for (i in 1:N1)
-      for (j in 1:N2)
-        K[i, j] = exp(-pow(x1[i] - x2[j], 2));
-    
-    K_transpose_div_Sigma = K' / Sigma;
-    mu = K_transpose_div_Sigma * y1; 
-    Tau = Omega - K_transpose_div_Sigma * K;
-    for (i in 1:(N2-1))
-      for (j in (i+1):N2)
-        Tau[i, j] = Tau[j, i];
+\subsubsection{Predictive Inference in non-Gaussian GPs}
 
-    L = cholesky_decompose(Tau);
-  }
-}
-\end{stancode}
-%
-This block implements the definitions of $\Sigma$, $\Omega$, and $K$
-directly.  The posterior mean vector $K^{\top}\Sigma^{-1}y$ is
-computed as \code{mu}.  The covariance has a Cholesky factor $L$ such
-that $LL^{\top} = \Omega - K^{\top}\Sigma^{-1}K$.  Given these two
-ingredients, sampling the predictive quantity $\tilde{y}$ is carried
-out by translating, scaling and rotating an isotropic normal sample 
-using the posterior mean and the Cholesky factorization of the
-posterior covariance.
-
-
-\subsection{Joint Hyperparameter Fitting and Predictive Inference}
-
-Hyperparameter fitting may be carried out jointly with predictive
-inference in a single model.  This allows full Bayesian inference to
-account for the affect of the uncertainty in the hyperparameter
-estimates on the predictive inferences.  
-
-To encode a joint hyperparameter fit and predictive inference model in
-Stan, declare the hyperparameters as additional parameters,
-give them a prior in the model, move the definition of \code{Sigma} to
-a local variable in the model defined using the hyperparameters.
-% Because of the marginalization properties of Gaussian processes, the
-% predictive inference does not affect hyperparameter estimation (in
-% theory; in practice it can add noise).
-
-\section{Classification with Gaussian Processes}
-
-Gaussian processes can be generalized the same way as standard linear
-models by introducing a link function.  This allows them to be used as
-discrete data models, and in particular to perform classification
-using posterior predictive inference.  This section focuses on binary
-classification problems implemented with logistic Gaussian process
-regression.  
-
-\subsection{Logistic Gaussian Process Regression}
-
-For binary classification problems, the observed outputs $z_n \in
-\setlist{0,1}$ are binary.  These outputs are modeled using a Gaussian
-process with (unobserved) outputs $y_n$ through the logistic link,
-\[
-z_n \sim \distro{Bernoulli}(\mbox{logit}^{-1}(y_n)),
-\]
-or in other words,
-\[
-\mbox{Pr}[z_n = 1] = \mbox{logit}^{-1}(y_n).
-\]
-
-\subsection{Simulation}
-
-Simulation from a Gaussian process logistic regression is
-straightforward; just simulate from a Gaussian process and then
-simulate the $z_n$ from the $y_n$ using the sampling distribution
-above.  Simulation of the $z_n$ must be done in the generated
-quantities block, where it is possible to draw random variates from
-specified distributions.
-
-
-\subsection{Hyperparameter Estimation and Predictive Inference}
-
-For hyperparameter estimation and predictive inference applications,
-the $y_n$ are typically latent parameters (i.e., not observed).
-Unfortunately, they cannot be easily marginalized out analytically,
-so they must be estimated from the data through the observed
-categorical outputs $z_n$.  Predictive inference will proceed not by
-sampling $z_n$ values, but directly through their probabilities, given
-by $\mbox{logit}^{-1}(y_n)$.
-
-\subsection{Stan Implementations}
-
-Hyperparameter estimation and predictive inference are easily
-accomplished in Stan by declaring the vector $y$ as a parameter,
-adding the sampling statements for observed $z$, and then proceeding 
-as for the previous regression models.  
+We can do predictive inference in non-Gaussian GPs in much the
+same way as we do with Gaussian GPs.
 
 Consider the following full model for prediction using logistic Gaussian
 process regression.
@@ -7485,77 +7651,265 @@ process regression.
 \footnote{The model is available in the Stan example model repository;
 see \url{http://mc-stan.org/documentation}.}
 %
+%
 \begin{stancode}
 data {
-  int<lower=1> N1;     
-  vector[N1] x1; 
-  int<lower=0,upper=1> z1[N1];
+  int<lower=1> N1;
+  real x1[N1];
+  vector[N1] z1;
   int<lower=1> N2;
-  vector[N2] x2;
+  real x2[N2];
 }
 transformed data {
- ... define mu as zero, compute Sigma from x1, x2 ...
+  int<lower=1> N = N1 + N2;
+  real delta = 1e-9;
+  vector[N] x;
+  for (n in 1:N1) x[n] = x1[n];
+  for (n in 1:N2) x[N1 + n] = x2[n];
 }
 parameters {
-  vector[N1] y1;
-  vector[N2] y2;
+  real<lower=0> alpha;
+  real<lower=0> rho;
+  vector[N] eta;
 }
 model {
-  vector[N] y;
-  for (n in 1:N1) y[n] = y1[n];
-  for (n in 1:N2) y[N1 + n] = y2[n];
+  vector[N] f;
+  {
+    matrix[N, N] K = cov_exp_quad(x, alpha, rho);
+    matrix[N, N] L_K;
+    for (n in 1:N)
+      K[n, n] = K[n, n] + delta;
+    L_K = cholesky_decompose(K);
+    f = L_K * eta;
+  }
 
-  y ~ multi_normal(mu, Sigma);
-  for (n in 1:N1)
-    z1[n] ~ bernoulli_logit(y1[n]);
+  alpha ~ normal(0, 1);
+  rho ~ gamma(4, 4);
+  eta ~ normal(0, 1);
+
+  y ~ bernoulli_logit(f[1:N1]);
+}
+generated quantities {
+  int z2[N2];
+  for (n in 1:N2)
+    z2[n] = bernoulli_logit_rng(f[N1 + n]);
 }
 \end{stancode}
 %
-The transformed data block in which \code{mu} and \code{Sigma} are
-defined is not shown because it is identical to the model for
-prediction in the previous section.  Now the observed outcomes
-\code{z1}, declared as data, are binary.  The variable \code{y1} is
-still drawn from the Gaussian process with values \code{y1[n]} being
-the values of the function for input \code{x1[n]}, only now
-\code{y1[n]} is interpreted as the logit-scaled probability that
-\code{z1[n]} is 1.  The variable \code{y2} plays the same role for
-probabilistic predictions for inputs \code{x2} and is also declared as
-a parameter.
 
-In the model, the full vector \code{y} is defined as before by
-concatenating \code{y1} and \code{y2}, only this time both \code{y1}
-and \code{y2} are parameters.  The full vector \code{y} is defined as
-being multivariate normal as before.  Additionally, the \code{z1[n]}
-variables are given a Bernoulli distribution with logit-scaled
-parameters.  Only the \code{z1[n]} values are observed and hence only
-they are sampled.  There is no \code{z2[n]} vector because Stan does
-not support discrete sampling; instead, the predictions are in the
-form of the logit-scaled probabilities \code{y2}.
+\subsubsection{Analytical Form of Joint Predictive Inference}
 
-Samples form this model do not mix as well as for the standard model.
-This is largely because the \code{z1} values are quantized forms of
-\code{y1}, and thus provide less precise data for estimation.  
+Bayesian predictive inference for Gaussian processes with Gaussian observations
+can be sped up by deriving the posterior analytically, then directly sampling
+from it.
 
-The model could be sped up by applying a Cholesky decomposition to the
-covariance matrix \code{Sigma} and then replacing the
-\code{multi\_normal} distribution with \code{multi\_normal\_cholesky}.
+Jumping straight to the result,
+\[
+p(\tilde{y}|\tilde{x},y,x)
+=
+\distro{Normal}(K^{\top}\Sigma^{-1}y,\
+                \Omega - K^{\top}\Sigma^{-1}K),
+\]
+where $\Sigma = K(x | \alpha, \rho, \sigma)$ is the result of applying the covariance
+function to the inputs $x$ with observed outputs $y$, $\Omega =
+K(\tilde{x} | \alpha, \rho)$ is the result of applying the covariance function to the
+inputs $\tilde{x}$ for which predictions are to be inferred, and $K$
+is the matrix of covariances between inputs $x$ and $\tilde{x}$, which
+in the case of the exponentiated quadratic covariance function
+would be
+\[ K(x | \alpha, \rho)_{i, j} = \eta^2 \exp(-\dfrac{1}{2 \rho^2}
+\sum_{d=1}^D (x_{i,d} - \tilde{x}_{j,d})^2).  \]
+There is no noise term including $\sigma^2$ because the indexes of
+elements in $x$ and $\tilde{x}$ are never the same.
 
-A pure logistic Gaussian process regression would not include a noise
-term in the definition of the covariance matrix.  This can be
-implemented by simply removing the noise term(s) \code{sigma\_sq} from
-the definition of \code{Sigma}.  Probit regression can be coded by
-substituting the probit link for the logit.%
 %
-\footnote{Although it is possible to implement probit regression by
-  including the noise term \code{sigma\_sq} and then quantizing
-  \code{y1[n]} to produce \code{z1[n]}, this is not feasible in Stan
-  because it requires a complex constraint on \code{y} to be enforced
-  for multivariate normal distribution.}
+\footnote{The program code is available in the Stan example model repository;
+see \url{http://mc-stan.org/documentation}.}
+%
+This Stan code below uses the analytic form of the posterior and provides
+sampling of the resulting multivariate normal through the Cholesky
+decomposition. The data declaration is the same as for the latent variable
+example, but we've defined a function called \code{gp\_pred\_rng} which will
+generate a draw from the posterior predictive mean conditioned on observed data
+\code{y1}. The code uses a Cholesky decomposition in triangular solves in order
+to cut down on the the number of matrix-matrix multiplications when computing
+the conditional mean and the conditional covariance of $p(\tilde{y})$.
 
-This simple prediction model could be extended in the same way as
-previous models by declaring the hyperparameters as parameters and
-defining the covariance matrix in the model block as a local variable.
+\begin{stancode}
+functions {
+  vector gp_pred_rng(real[] x2,
+                     vector y1,
+                     real[] x1,
+                     real alpha,
+                     real rho,
+                     real sigma,
+                     real delta) {
+    int N1 = rows(y1);
+    int N2 = size(x2);
+    vector[N2] f2;
 
+    {
+      matrix[N1, N1] L_K;
+      vector[N1] K_div_y1;
+      matrix[N1, N2] k_x1_x2;
+      matrix[N1, N2] v_pred;
+      vector[N2] f2_mu;
+      matrix[N2, N2] cov_f2;
+      matrix[N2, N2] diag_delta;
+      matrix[N1, N1] K;
+      K = cov_exp_quad(x1, alpha, rho);
+      for (n in 1:N1)
+        K[n, n] = K[n,n] + square(sigma);
+      L_K = cholesky_decompose(K);
+      K_div_y1 = mdivide_left_tri_low(L_K, y1);
+      K_div_y1 = mdivide_right_tri_low(K_div_y1',L_K)';
+      k_x1_x2 = cov_exp_quad(x1, x2, alpha, rho);
+      f2_mu = (k_x1_x2' * K_div_y1);
+      v_pred = mdivide_left_tri_low(L_K, k_x1_x2);
+      cov_f2 = cov_exp_quad(x2, alpha, rho) - v_pred' * v_pred;
+      diag_delta = diag_matrix(rep_vector(delta,N2));
+
+      f2 = multi_normal_rng(f2_mu, cov_f2 + diag_delta);
+    }
+    return f2;
+  }
+}
+data {
+  int<lower=1> N1;
+  real x1[N1];
+  vector[N1] y1;
+  int<lower=1> N2;
+  real x2[N2];
+}
+transformed data {
+  vector[N1] mu = rep_vector(0, N1);
+}
+parameters {
+  real<lower=0> alpha;
+  real<lower=0> rho;
+  real<lower=0> sigma;
+}
+model {
+  matrix[N1, N1] L_K;
+  {
+    matrix[N1, N1] K = cov_exp_quad(x, alpha, rho);
+    real sq_sigma = square(sigma);
+    for (n1 in 1:N1)
+      K[n1, n1] = K[n1, n1] + sq_sigma;
+    L_K = cholesky_decompose(K);
+  }
+
+  y ~ multi_normal_cholesky(mu, L_K);
+}
+generated quantities {
+  vector[N2] f2;
+  vector[N2] y2;
+
+  f2 = gp_pred_rng(x2, y1, x1, alpha, rho, sigma);
+  for (n2 in 1:N2)
+    y2[n2] = normal_rng(f2[n2], sigma);
+}
+\end{stancode}
+
+\subsection{Multiple-output Gaussian processes}
+
+Suppose we have observations $y_i \in \reals^M$ observed at
+$x_i \in \reals^K$. One can model the data like so:
+\begin{align*}
+  y_i & \sim \distro{MultiNormal}(f(x_i), \mathbf{I}_M \sigma^2) \\
+  f(x) & \sim \distro{GP}(m(x), K(x | \theta, \phi)) \\
+  K(x & | \theta) \in \reals^{M \times M}, \, f(x), \, m(x) \in \reals^M
+\end{align*}
+where the $K(x, x^\prime | \theta, \phi)_{[m, m^\prime]}$ entry defines the
+covariance between $f_m(x)$ and $f_{m^\prime}(x^\prime)(x)$. This construction
+of Gaussian processes allows us to learn the covariance between the output
+dimensions of $f(x)$. If we parameterize our kernel $K$:
+\begin{align*} K(x, x^\prime | \theta, \phi)_{[m, m^\prime]} = k(x, x^\prime |
+\theta) k(m, m^\prime | \phi) \end{align*}
+then our finite dimensional generative model for the above is:
+\begin{align*}
+  f & \sim \distro{MatrixNormal}(m(x), K(x | \alpha, \rho), C(\phi)) \\
+  y_{i, m} & \sim \distro{Normal}(f_{i,m}, \sigma) \\
+  f & \in \reals^{N \times M}
+\end{align*}
+where $K(x | \alpha, \rho)$ is the exponentiated quadratic kernel we've used
+throughout this chapter, and $C(\phi)$ is a positive-definite matrix,
+parameterized by some vector $\phi$.
+
+The \distro{MatrixNormal} distribution has two covariance matrices: $K(x |
+\alpha, \rho)$ to encode column covariance, and $C(\phi)$ to define row
+covariance. The salient features of the \distro{MatrixNormal} are that the rows
+of the matrix $f$ are distributed:
+\begin{align*} f_{[n,]} \sim \distro{MultiNormal}(m(x)_{[n,]}, K(x | \alpha,
+\rho)_{[n,n]} C(\phi)) \end{align*} and that the columns of the matrix $f$ are
+distributed: \begin{align*} f_{[,m]} \sim \distro{MultiNormal}(m(x)_{[,m]}, K(x
+	| \alpha, \rho) C(\phi)_{[m,m]}) \end{align*}
+This also means means that $\E\left[f^T f\right]$ is equal to
+$\text{trace}(K(x | \alpha, \rho)) \times C$, whereas $\E\left[ff^T\right]$
+is $\text{trace}(C) \times K(x | \alpha, \rho)$. We can derive this using
+properties of expectation and the \distro{MatrixNormal} density.
+
+We should set $\alpha$ to $1.0$ because the parameter is not identified unless
+we constrain $\text{trace}(C) = 1$. Otherwise, we can multiply $\alpha$ by a scalar $d$ and
+$C$ by $1/d$ and our likelihood will not change.
+%
+We can generate a random variable $f$ from a \distro{MatrixNormal} density in
+$\reals^{N \times M}$ using the following algorithm:
+%
+\begin{align*}
+	\eta_{i,j} & \sim \distro{Normal}(0, 1) \, \forall i,j \\
+	f & = L_{K(x | 1.0, \rho)} \, \eta \, L_C(\phi)^T \\
+	f & \sim \distro{MatrixNormal}(0, K(x | 1.0, \rho), C(\phi)) \\
+	\eta & \in \reals^{N \times M} \\
+	L_C(\phi) & = \text{cholesky\_decompose}(C(\phi)) \\
+  L_{K(x | 1.0, \rho)} & = \text{cholesky\_decompose}(K(x | 1.0, \rho))
+\end{align*}
+
+This can be implemented in Stan using a latent-variable GP formulation. We've used
+\distro{LkjCorr} for $C(\phi)$, but any positive-definite matrix will do.
+
+
+\begin{stancode}
+data {
+  int<lower=1> N;
+  int<lower=1> M;
+  real x[N];
+  matrix[N, M] y;
+}
+transformed data {
+  real delta = 1e-9;
+}
+parameters {
+  real<lower=0> rho;
+  vector<lower=0>[M] alpha;
+  real<lower=0> sigma;
+  cholesky_factor_corr[M] L_Omega;
+  matrix[N, M] eta;
+}
+model {
+  matrix[N, M] f;
+  {
+    matrix[N, N] K = cov_exp_quad(x, 1.0, rho);
+    matrix[N, N] L_K;
+
+    // diagonal elements
+    for (k in 1:N)
+      K[k, k] = K[k, k] + delta;
+
+    L_K = cholesky_decompose(K);
+    f = L_K * eta
+        * diag_pre_multiply(alpha, L_Omega)';
+  }
+
+  rho ~ gamma(4, 4);
+  alpha ~ normal(0, 1);
+  sigma ~ normal(0, 1);
+  L_Omega ~ lkj_corr_cholesky(3);
+  to_vector(eta) ~ normal(0, 1);
+
+  to_vector(y) ~ normal(to_vector(f), sigma);
+}
+\end{stancode}
 
 \chapter{Directions, Rotations, and Hyperspheres}
 
@@ -7576,7 +7930,7 @@ Stan supports directional statistics by providing a unit-vector data
 type, the values of which determine points on a hypersphere (circle in
 two dimensions, sphere in three dimensions).
 
-\section{Unit Vectors}  
+\section{Unit Vectors}
 
 The length of a vector $x \in \reals^K$ is given by
 \[
@@ -7622,7 +7976,7 @@ spherical statistics.
 Even though $S^{n-1}$ behaves locally like $\reals^{n-1}$, there is no
 way to smoothly map between them. For example, because
 latitude and longitude work on a modular basis (wrapping at $2\pi$
-radians in natural units), they do not produce a smooth map. 
+radians in natural units), they do not produce a smooth map.
 
 Like a bounded interval $(a, b)$, in geometric terms, a sphere is
 compact in that the distance between any two points is bounded.
@@ -7644,7 +7998,7 @@ lying on a vector out of the origin is projected to the same point on
 the surface of the sphere.  \cite{Marsaglia:1972} introduced an
 auxiliary variable interpretation of this mapping that provides the
 desired properties of uniformity; see \refsection{unit-vector} for
-details. 
+details.
 
 
 \subsubsection{Warning: undefined at zero!}
@@ -7671,7 +8025,7 @@ matrix is defined by
 R_{\theta}
 =
 \begin{bmatrix}
-\cos \theta & - \sin \theta 
+\cos \theta & - \sin \theta
 \\
 \sin \theta & \cos \theta
 \end{bmatrix}.
@@ -7721,7 +8075,7 @@ The function signatures for Stan's ODE solvers can be found in
 
 As a concrete example of a system of ODEs, consider a harmonic
 oscillator, which is characterized by an equilibrium position and a
-restoring force proportional to the displacement with friction.  
+restoring force proportional to the displacement with friction.
 The system state will be a pair $y = (y_1, y_2)$ representing position
 and momentum (i.e., a point in phase space).  The change in the system
 with respect to time is given by the following differential equations.%
@@ -7731,7 +8085,7 @@ with respect to time is given by the following differential equations.%
   to implement the \code{rk45} solver.}
 %
 \begin{equation}\label{ode-sho.equation}
-\frac{d}{dt} y_1 = y_2 
+\frac{d}{dt} y_1 = y_2
 \hspace*{0.5in}
 \frac{d}{dt} y_2 = -y_1 - \theta y_2
 \end{equation}
@@ -7846,7 +8200,7 @@ setting
   y = \left[\begin{array}{c}
         y_1 \\
         y_2 \\
-        \end{array}\right] \ \ \ \ \ 
+        \end{array}\right] \ \ \ \ \
    A = \left[\begin{array}{cc}
 	0 & 1 \\
 	-1 & -\theta \\
@@ -7874,15 +8228,15 @@ model {
 generated quantities {
   vector[2] y_hat[T];
   matrix[2, 2] A;
-  
+
   A[1, 1] = 0;
   A[1, 2] = 1;
   A[2, 1] = -1;
   A[2, 2] = -theta[1];
-  
+
   for (t in 1:T)
     y_hat[t] = matrix_exp((t - 1) * A) * y0;
-  
+
   // add measurement error
   for (t in 1:T) {
     y_hat[t, 1] = y_hat[t, 1] + normal_rng(0, 0.1);
@@ -7894,13 +8248,13 @@ generated quantities {
 \caption{\small\it Stan program to simulate noisy measurements from a
   simple harmonic oscillator.  The system of linear differential equations is
   coded as a matrix. The system parameters \code{theta} and initial
-  state \code{y0} are read in as data along  observation times \code{ts}. 
+  state \code{y0} are read in as data along  observation times \code{ts}.
   The generated quantities block is used to solve the ODE for the specified
-  times and then add random measurement error, producing observations 
+  times and then add random measurement error, producing observations
   \code{y\_hat}. Because the ODEs are linear, we can use the \code{matrix\_exp}
   function to solve the system. }\label{sho-sim-me.figure}
 \end{figure}
-  
+
 
 \section{Measurement Error Models}
 
@@ -7939,7 +8293,7 @@ simulate noisy observations given in \reffigure{sho-sim}.
 \begin{stancode}
 functions {
   real[] sho(real t,
-             real[] y, 
+             real[] y,
              real[] theta,
              real[] x_r,
              int[] x_i) {
@@ -8026,7 +8380,7 @@ linear model.  These states will then be observed with measurement error.
 \begin{stancode}
 functions {
   real[] sho(real t,
-             real[] y, 
+             real[] y,
              real[] theta,
              real[] x_r,
              int[] x_i) {
@@ -8152,10 +8506,10 @@ the default maximum number of steps is \code{1e6} ($10^6$).
 The relative and absolute tolerance control the accuracy of the
 solutions generated by the integrator.  Relative tolerances are
 relative to the solution value, whereas absolute tolerances is the
-maximum absolute error allowed in a solution.  
+maximum absolute error allowed in a solution.
 
 Smaller tolerances produce more accurate solutions.  Smaller
-tolerances also require more computation time.  
+tolerances also require more computation time.
 
 \subsubsection{Sensitivity Analysis}
 
@@ -8169,4 +8523,4 @@ The maximum number of steps can be used to stop a runaway simulation.
 This can arise in MCMC when a bad jump is taken, particularly during
 warmup.  With the non-stiff solver, this may result in jumping into a
 stiff region of the parameter space, which would require a very small
-step size and very many steps to satisfy even modest tolerances.  
+step size and very many steps to satisfy even modest tolerances.
