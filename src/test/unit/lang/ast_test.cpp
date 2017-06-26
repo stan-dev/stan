@@ -391,41 +391,40 @@ TEST(langAst, solveOde) {
 }
 
 TEST(langAst, solveAlgebra) {
-  using stan::lang::algebra_solver;
-  using stan::lang::variable;
-  using stan::lang::expr_type;
-  using stan::lang::expression;
-
-  algebra_solver so;  // null ctor should work and not raise error
-
-  std::string system_function_name = "bronzino";
-
-  variable x("x_var_name");
-  x.set_type(VECTOR_T, 0);  // vector from Eigen
-
-  variable y("y_var_name");
-  y.set_type(VECTOR_T, 0);
-
-  variable dat("dat_r_var_name");
-  dat.set_type(DOUBLE_T, 1);  // plain old vector
-
-  variable dat_int("dat_int_var_name");
-  dat_int.set_type(INT_T, 1);
-
-  // example of instantiation
-  algebra_solver so2(system_function_name, x, y, dat, dat_int);
-
-  // dumb test to make sure we at least get the right types back
-  EXPECT_EQ(system_function_name, so2.system_function_name_);
-  EXPECT_EQ(x.type_, so2.x_.expression_type());
-  EXPECT_EQ(y.type_, so2.y_.expression_type());
-  EXPECT_EQ(dat.type_, so2.dat_.expression_type());
-  EXPECT_EQ(dat_int.type_, so2.dat_int_.expression_type());
-
-  expression e2(so2);
-  EXPECT_EQ(expr_type(VECTOR_T, 0), e2.expression_type());
+    using stan::lang::algebra_solver;
+    using stan::lang::variable;
+    using stan::lang::expr_type;
+    using stan::lang::expression;
+    
+    algebra_solver so;  // null ctor should work and not raise error
+    
+    std::string system_function_name = "bronzino";
+    
+    variable x("x_var_name");
+    x.set_type(VECTOR_T, 0);  // vector from Eigen
+    
+    variable y("y_var_name");
+    y.set_type(VECTOR_T, 0);
+    
+    variable dat("dat_r_var_name");
+    dat.set_type(DOUBLE_T, 1);  // plain old vector
+    
+    variable dat_int("dat_int_var_name");
+    dat_int.set_type(INT_T, 1);
+    
+    // example of instantiation
+    algebra_solver so2(system_function_name, x, y, dat, dat_int);
+    
+    // dumb test to make sure we at least get the right types back
+    EXPECT_EQ(system_function_name, so2.system_function_name_);
+    EXPECT_EQ(x.type_, so2.x_.expression_type());
+    EXPECT_EQ(y.type_, so2.y_.expression_type());
+    EXPECT_EQ(dat.type_, so2.dat_.expression_type());
+    EXPECT_EQ(dat_int.type_, so2.dat_int_.expression_type());
+    
+    expression e2(so2);
+    EXPECT_EQ(expr_type(VECTOR_T, 0), e2.expression_type());
 }
-
 
 void testTotalDims(int expected_total_dims,
                    const stan::lang::base_expr_type& base_type,
