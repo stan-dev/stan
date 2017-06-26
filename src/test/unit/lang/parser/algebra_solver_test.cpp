@@ -23,7 +23,6 @@ TEST(lang_parser, algebra_solver_bad) {
               "fourth argument to algebra_solver (real data) must be data only");
 }
 
-
 TEST(lang_parser, algebra_solver_control_bad) {
   test_throws("algebra_solver/bad_fun_type_control",
               "first argument to algebra_solver must be the name of a function with signature");
