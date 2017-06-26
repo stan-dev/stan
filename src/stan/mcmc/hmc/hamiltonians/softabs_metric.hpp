@@ -18,8 +18,10 @@ namespace stan {
       softabs_fun(const Model& m, std::ostream* out): model_(m), o_(out) {}
 
       template <typename T>
-      T operator()(Eigen::Matrix<T, Eigen::Dynamic, 1>& x) const {
-        return model_.template log_prob<true, true, T>(x, o_);
+      T operator()(const Eigen::Matrix<T, Eigen::Dynamic, 1>& x) const {
+        // log_prob() requires non-const but doesn't modify its argument
+        return model_.template
+          log_prob<true, true, T>(const_cast<Eigen::Matrix<T, -1, 1>& >(x), o_);
       }
     };
 
@@ -46,17 +48,12 @@ namespace stan {
         return this->V(z) + 0.5 * z.log_det_metric;
       }
 
-      double dG_dt(softabs_point& z,
-                   callbacks::writer& info_writer,
-                   callbacks::writer& error_writer) {
+      double dG_dt(softabs_point& z, callbacks::logger& logger) {
         return 2 * T(z)
-               - z.q.dot(dtau_dq(z, info_writer, error_writer)
-               + dphi_dq(z, info_writer, error_writer));
+          - z.q.dot(dtau_dq(z, logger) + dphi_dq(z, logger));
       }
 
-      Eigen::VectorXd dtau_dq(softabs_point& z,
-                              callbacks::writer& info_writer,
-                              callbacks::writer& error_writer) {
+      Eigen::VectorXd dtau_dq(softabs_point& z, callbacks::logger& logger) {
         Eigen::VectorXd a = z.softabs_lambda_inv
           .cwiseProduct(z.eigen_deco.eigenvectors().transpose() * z.p);
         Eigen::MatrixXd A = a.asDiagonal()
@@ -77,9 +74,7 @@ namespace stan {
           .cwiseProduct(z.eigen_deco.eigenvectors().transpose() * z.p);
       }
 
-      Eigen::VectorXd dphi_dq(softabs_point& z,
-                              callbacks::writer& info_writer,
-                              callbacks::writer& error_writer) {
+      Eigen::VectorXd dphi_dq(softabs_point& z, callbacks::logger& logger) {
         Eigen::VectorXd a
           = z.softabs_lambda_inv.cwiseProduct(z.pseudo_j.diagonal());
         Eigen::MatrixXd A = a.asDiagonal()
@@ -104,24 +99,17 @@ namespace stan {
         z.p = z.eigen_deco.eigenvectors() * a;
       }
 
-      void init(softabs_point& z,
-                callbacks::writer& info_writer,
-                callbacks::writer& error_writer) {
-        update_metric(z, info_writer, error_writer);
-        update_metric_gradient(z, info_writer, error_writer);
+      void init(softabs_point& z, callbacks::logger& logger) {
+        update_metric(z, logger);
+        update_metric_gradient(z, logger);
       }
 
-      void update_metric(softabs_point& z,
-                         callbacks::writer& info_writer,
-                         callbacks::writer& error_writer) {
-        // Compute the Hessian
-        stan::math::hessian<double>(softabs_fun<Model>(this->model_, 0),
-                                    z.q, z.V, z.g, z.hessian);
-
+      void update_metric(softabs_point& z, callbacks::logger& logger) {
+        math::hessian<softabs_fun<Model> >(softabs_fun<Model>(this->model_, 0),
+                                           z.q, z.V, z.g, z.hessian);
         z.V = -z.V;
         z.g = -z.g;
         z.hessian = -z.hessian;
-
         // Compute the eigen decomposition of the Hessian,
         // then perform the SoftAbs transformation
         z.eigen_deco.compute(z.hessian);
@@ -154,9 +142,7 @@ namespace stan {
          z.log_det_metric += std::log(z.softabs_lambda(i));
       }
 
-      void update_metric_gradient(softabs_point& z,
-                                  callbacks::writer& info_writer,
-                                  callbacks::writer& error_writer) {
+      void update_metric_gradient(softabs_point& z, callbacks::logger& logger) {
         // Compute the pseudo-Jacobian of the SoftAbs transform
         for (idx_t i = 0; i < z.q.size(); ++i) {
           for (idx_t j = 0; j <= i; ++j) {
@@ -188,10 +174,8 @@ namespace stan {
         }
       }
 
-      void update_gradients(softabs_point& z,
-                            callbacks::writer& info_writer,
-                            callbacks::writer& error_writer) {
-        update_metric_gradient(z, info_writer, error_writer);
+      void update_gradients(softabs_point& z, callbacks::logger& logger) {
+        update_metric_gradient(z, logger);
       }
 
       // Threshold below which a power series

@@ -10,7 +10,8 @@ TEST(ModelUtil, streams) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
 
-  stan_model model(data_var_context, 0);
+
+  stan_model model(data_var_context, static_cast<std::stringstream*>(0));
   std::vector<double> params_r(1);
   std::vector<int> params_i(0);
   std::vector<double> gradient;

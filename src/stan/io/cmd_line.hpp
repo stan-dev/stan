@@ -24,9 +24,9 @@ namespace stan {
      * @param width Width of option (defaults to 20).
      * @param o Output stream ptr, default to null
      */
-    void pad_help_option(std::ostream* o,
-                         const std::string& option = "",
-                         unsigned int width = 20) {
+    inline void pad_help_option(std::ostream* o,
+                                const std::string& option = "",
+                                unsigned int width = 20) {
       if (!o) return;
       *o << "  " << option;
       int padding = width - option.size();
@@ -46,10 +46,10 @@ namespace stan {
      * @param msg
      * @param note
      */
-    void print_help_helper(std::ostream* o,
-                           const std::string& key_val,
-                           const std::string& msg,
-                           const std::string& note = "") {
+    inline void print_help_helper(std::ostream* o,
+                                  const std::string& key_val,
+                                  const std::string& msg,
+                                  const std::string& note = "") {
       if (!o) return;
       pad_help_option(o, key_val);
       *o << msg
@@ -71,11 +71,11 @@ namespace stan {
      * @param msg
      * @param note
      */
-    void print_help_option(std::ostream* o,
-                           const std::string& key,
-                           const std::string& value_type,
-                           const std::string& msg,
-                           const std::string& note = "") {
+    inline void print_help_option(std::ostream* o,
+                                  const std::string& key,
+                                  const std::string& value_type,
+                                  const std::string& msg,
+                                  const std::string& note = "") {
       std::stringstream ss;
       ss << "--" << key;
       if (value_type.size() > 0)
@@ -187,7 +187,7 @@ namespace stan {
        * @tparam Type of value.
        */
       template <typename T>
-      bool val(const std::string& key, T& x) const {
+      inline bool val(const std::string& key, T& x) const {
         if (!has_key(key))
           return false;
         std::stringstream s(key_val_.find(key)->second);
@@ -210,7 +210,7 @@ namespace stan {
        *
        * @return Number of bare arguments.
        */
-      size_t bare_size() const {
+      inline size_t bare_size() const {
         return bare_.size();
       }
 
@@ -228,7 +228,7 @@ namespace stan {
        * @tparam T Type of value returned.
        */
       template <typename T>
-      bool bare(size_t n, T& x) const {
+      inline bool bare(size_t n, T& x) const {
         if (n >= bare_.size())
           return false;
         std::stringstream s(bare_[n]);
@@ -272,7 +272,7 @@ namespace stan {
     // explicit instantation for std::string to allow for spaces
     // in bare_[n]
     template <>
-    bool cmd_line::bare<std::string>(size_t n, std::string& x) const {
+    inline bool cmd_line::bare<std::string>(size_t n, std::string& x) const {
       if (n >= bare_.size())
         return false;
       x = bare_[n];
@@ -282,8 +282,8 @@ namespace stan {
     // explicit instantation for std::string to allow for spaces
     // in key_val_
     template <>
-    bool cmd_line::val<std::string>(const std::string& key,
-                                    std::string& x) const {
+    inline bool cmd_line::val<std::string>(const std::string& key,
+                                           std::string& x) const {
       if (!has_key(key))
         return false;
       x = key_val_.find(key)->second;

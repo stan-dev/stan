@@ -23,8 +23,7 @@ namespace stan {
       { }
 
       sample transition(sample& init_sample,
-                        callbacks::writer& info_writer,
-                        callbacks::writer& error_writer) {
+                        callbacks::logger& logger) {
         this->seed(init_sample.cont_params());
         return sample(this->z_.q, - this->hamiltonian_.V(this->z_), 0);
       }

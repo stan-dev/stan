@@ -1,6 +1,6 @@
 #include <stan/io/dump.hpp>
 #include <stan/mcmc/hmc/hamiltonians/softabs_metric.hpp>
-#include <stan/callbacks/stream_writer.hpp>
+#include <stan/callbacks/stream_logger.hpp>
 #include <stan/mcmc/hmc/hamiltonians/unit_e_metric.hpp>
 #include <stan/mcmc/hmc/integrators/impl_leapfrog.hpp>
 
@@ -22,10 +22,8 @@ TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_energy_conservation) {
   data_stream.close();
 
   std::stringstream model_output;
-  std::stringstream metric_output;
-  stan::callbacks::stream_writer writer(metric_output);
-  std::stringstream error_stream;
-  stan::callbacks::stream_writer error_writer(error_stream);
+  std::stringstream debug, info, warn, error, fatal;
+  stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
   gauss_model_namespace::gauss_model model(data_var_context, &model_output);
 
@@ -39,7 +37,7 @@ TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_energy_conservation) {
   z.q(0) = 1;
   z.p(0) = 1;
 
-  metric.init(z, writer, error_writer);
+  metric.init(z, logger);
   double H0 = metric.H(z);
   double aveDeltaH = 0;
 
@@ -48,7 +46,7 @@ TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_energy_conservation) {
   size_t L = tau / epsilon;
 
   for (size_t n = 0; n < L; ++n) {
-    integrator.evolve(z, metric, epsilon, writer, error_writer);
+    integrator.evolve(z, metric, epsilon, logger);
 
     double deltaH = metric.H(z) - H0;
     aveDeltaH += (deltaH - aveDeltaH) / double(n + 1);
@@ -59,7 +57,11 @@ TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_energy_conservation) {
   EXPECT_NEAR(aveDeltaH, 0, epsilon * epsilon);
 
   EXPECT_EQ("", model_output.str());
-  EXPECT_EQ("", metric_output.str());
+  EXPECT_EQ("", debug.str());
+  EXPECT_EQ("", info.str());
+  EXPECT_EQ("", warn.str());
+  EXPECT_EQ("", error.str());
+  EXPECT_EQ("", fatal.str());
 }
 
 TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_symplecticness) {
@@ -70,10 +72,8 @@ TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_symplecticness) {
   data_stream.close();
 
   std::stringstream model_output;
-  std::stringstream metric_output;
-  stan::callbacks::stream_writer writer(metric_output);
-  std::stringstream error_stream;
-  stan::callbacks::stream_writer error_writer(error_stream);
+  std::stringstream debug, info, warn, error, fatal;
+  stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
   gauss_model_namespace::gauss_model model(data_var_context, &model_output);
 
@@ -106,11 +106,11 @@ TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_symplecticness) {
   size_t L = pi / epsilon;
 
   for (int i = 0; i < n_points; ++i)
-    metric.init(z.at(i), writer, error_writer);
+    metric.init(z.at(i), logger);
 
   for (size_t n = 0; n < L; ++n)
     for (int i = 0; i < n_points; ++i)
-      integrator.evolve(z.at(i), metric, epsilon, writer, error_writer);
+      integrator.evolve(z.at(i), metric, epsilon, logger);
 
   // Compute area of evolved shape using divergence theorem in 2D
   double area = 0;
@@ -148,7 +148,11 @@ TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_symplecticness) {
 
 
   EXPECT_EQ("", model_output.str());
-  EXPECT_EQ("", metric_output.str());
+  EXPECT_EQ("", debug.str());
+  EXPECT_EQ("", info.str());
+  EXPECT_EQ("", warn.str());
+  EXPECT_EQ("", error.str());
+  EXPECT_EQ("", fatal.str());
 }
 
 TEST(McmcHmcIntegratorsImplLeapfrog, softabs_energy_conservation) {
@@ -159,10 +163,8 @@ TEST(McmcHmcIntegratorsImplLeapfrog, softabs_energy_conservation) {
   data_stream.close();
 
   std::stringstream model_output;
-  std::stringstream metric_output;
-  stan::callbacks::stream_writer writer(metric_output);
-  std::stringstream error_stream;
-  stan::callbacks::stream_writer error_writer(error_stream);
+  std::stringstream debug, info, warn, error, fatal;
+  stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
   gauss_model_namespace::gauss_model model(data_var_context, &model_output);
 
@@ -176,7 +178,7 @@ TEST(McmcHmcIntegratorsImplLeapfrog, softabs_energy_conservation) {
   z.q(0) = 1;
   z.p(0) = 1;
 
-  metric.init(z, writer, error_writer);
+  metric.init(z, logger);
   double H0 = metric.H(z);
   double aveDeltaH = 0;
 
@@ -185,7 +187,7 @@ TEST(McmcHmcIntegratorsImplLeapfrog, softabs_energy_conservation) {
   size_t L = tau / epsilon;
 
   for (size_t n = 0; n < L; ++n) {
-    integrator.evolve(z, metric, epsilon, writer, error_writer);
+    integrator.evolve(z, metric, epsilon, logger);
 
     double deltaH = metric.H(z) - H0;
     aveDeltaH += (deltaH - aveDeltaH) / double(n + 1);
@@ -196,7 +198,11 @@ TEST(McmcHmcIntegratorsImplLeapfrog, softabs_energy_conservation) {
   EXPECT_NEAR(aveDeltaH, 0, epsilon * epsilon);
 
   EXPECT_EQ("", model_output.str());
-  EXPECT_EQ("", metric_output.str());
+  EXPECT_EQ("", debug.str());
+  EXPECT_EQ("", info.str());
+  EXPECT_EQ("", warn.str());
+  EXPECT_EQ("", error.str());
+  EXPECT_EQ("", fatal.str());
 }
 
 TEST(McmcHmcIntegratorsImplLeapfrog, softabs_symplecticness) {
@@ -207,10 +213,8 @@ TEST(McmcHmcIntegratorsImplLeapfrog, softabs_symplecticness) {
   data_stream.close();
 
   std::stringstream model_output;
-  std::stringstream metric_output;
-  stan::callbacks::stream_writer writer(metric_output);
-  std::stringstream error_stream;
-  stan::callbacks::stream_writer error_writer(error_stream);
+  std::stringstream debug, info, warn, error, fatal;
+  stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
   gauss_model_namespace::gauss_model model(data_var_context, &model_output);
 
@@ -243,11 +247,11 @@ TEST(McmcHmcIntegratorsImplLeapfrog, softabs_symplecticness) {
   size_t L = pi / epsilon;
 
   for (int i = 0; i < n_points; ++i)
-    metric.init(z.at(i), writer, error_writer);
+    metric.init(z.at(i), logger);
 
   for (size_t n = 0; n < L; ++n)
     for (int i = 0; i < n_points; ++i)
-      integrator.evolve(z.at(i), metric, epsilon, writer, error_writer);
+      integrator.evolve(z.at(i), metric, epsilon, logger);
 
   // Compute area of evolved shape using divergence theorem in 2D
   double area = 0;
@@ -285,5 +289,9 @@ TEST(McmcHmcIntegratorsImplLeapfrog, softabs_symplecticness) {
 
 
   EXPECT_EQ("", model_output.str());
-  EXPECT_EQ("", metric_output.str());
+  EXPECT_EQ("", debug.str());
+  EXPECT_EQ("", info.str());
+  EXPECT_EQ("", warn.str());
+  EXPECT_EQ("", error.str());
+  EXPECT_EQ("", fatal.str());
 }

@@ -29,6 +29,7 @@ generated quantities {
   n <- poisson_log_rng(2.7);
 
   n <- categorical_rng(theta);
+  n <- categorical_logit_rng(theta);
   ns <- multinomial_rng(theta,20);
 
   z <- normal_rng(0,1);

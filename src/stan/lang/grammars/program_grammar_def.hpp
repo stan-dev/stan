@@ -1,10 +1,10 @@
 #ifndef STAN_LANG_GRAMMARS_PROGRAM_GRAMMAR_DEF_HPP
 #define STAN_LANG_GRAMMARS_PROGRAM_GRAMMAR_DEF_HPP
 
+#include <stan/io/program_reader.hpp>
 #include <stan/lang/ast.hpp>
 #include <stan/lang/grammars/program_grammar.hpp>
 #include <stan/lang/grammars/semantic_actions.hpp>
-#include <boost/format.hpp>
 #include <boost/fusion/include/std_pair.hpp>
 #include <boost/spirit/home/support/iterators/line_pos_iterator.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
@@ -38,9 +38,11 @@ namespace stan {
 
     template <typename Iterator>
     program_grammar<Iterator>::program_grammar(const std::string& model_name,
+                                               const io::program_reader& reader,
                                                bool allow_undefined)
         : program_grammar::base_type(program_r),
           model_name_(model_name),
+          reader_(reader),
           var_map_(),
           error_msgs_(),
           expression_g(var_map_, error_msgs_),
@@ -155,7 +157,8 @@ namespace stan {
         on_error<rethrow>(program_r,
                           program_error_f(_1, _2, _3,
                                           boost::phoenix::ref(var_map_),
-                                          boost::phoenix::ref(error_msgs_)));
+                                          boost::phoenix::ref(error_msgs_),
+                                          boost::phoenix::ref(reader_)));
     }
 
   }
