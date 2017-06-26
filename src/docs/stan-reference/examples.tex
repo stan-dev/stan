@@ -6986,7 +6986,7 @@ transformed data {
   for (i in 1:(N - 1)) {
     K[i,i] = 1 + 0.1;
     for (j in (i + 1):N) {
-      K[i, j] = exp(-1/2 * pow(x[i] - x[j], 2));
+      K[i, j] = exp(-0.5 * square(x[i] - x[j]));
       K[j, i] = K[i, j];
     }
   }
@@ -7398,14 +7398,12 @@ functions {
                             real delta) {
     int N = size(x);
     matrix[N, N] K;
-    real inv_half = -1/2;
     real sq_alpha = square(alpha);
     for (i in 1:(N - 1)) {
       K[i,i] = sq_alpha + delta;
       for (j in (i + 1):N) {
         K[i, j] = sq_alpha
-                      * exp(inv_half
-                            * dot_self((x[i] - x[j]) ./ rho));
+                      * exp(-0.5 * dot_self((x[i] - x[j]) ./ rho));
         K[j, i] = K[i, j];
       }
     }
