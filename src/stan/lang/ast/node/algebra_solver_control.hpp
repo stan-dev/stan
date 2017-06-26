@@ -60,7 +60,7 @@ namespace stan {
       algebra_solver_control();
 
       /**
-       * Construt an algebraic solver with control parameters with 
+       * Construt an algebraic solver with control parameters with
        * the specified values.
        *
        * @param system_function_name name of algebraic solver
@@ -70,7 +70,7 @@ namespace stan {
        * @param dat_int integer-valued data
        * @param rel_tol relative tolerance of integrator
        * @param fun_tol function tolerance of integrator
-       * @param max_steps max steps in integrator
+       * @param max_num_steps max steps in integrator
        */
        algebra_solver_control(const std::string& system_function_name,
                               const expression& x,
