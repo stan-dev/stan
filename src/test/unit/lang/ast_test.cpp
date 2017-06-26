@@ -871,3 +871,13 @@ TEST(StanLangAstFun, is_nonempty) {
   EXPECT_TRUE(is_nonempty("1"));
   EXPECT_TRUE(is_nonempty("  \r\n \n 1  \n"));
 }
+
+
+
+
+
+
+
+
+
+
