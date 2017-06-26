@@ -216,7 +216,7 @@ namespace stan {
         generate_expression(fx.fun_tol_, o_);
         o_ << ", ";
         generate_expression(fx.max_num_steps_, o_);
-        o_ << ")";        
+        o_ << ")";
       }
 
       void operator()(const fun& fx) const {

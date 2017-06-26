@@ -13,7 +13,6 @@ namespace stan {
      * Structure for algebraic solver statement.
      */
     struct algebra_solver {
-
       /**
        * Name of the algebra system.
        */

@@ -240,7 +240,8 @@ namespace stan {
         >> lit(',')
         >> expression_g(_r1)     // 8) maximum number of steps (data only)
         > lit(')')
-          [validate_algebra_solver_control_f(_val, boost::phoenix::ref(var_map_),
+          [validate_algebra_solver_control_f(_val,
+                                             boost::phoenix::ref(var_map_),
                                              _pass,
                                              boost::phoenix::ref(error_msgs_))];
 

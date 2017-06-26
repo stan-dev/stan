@@ -97,7 +97,7 @@ namespace stan {
       // if any vars, return true  -- CHECK: nonlinearity?
       return boost::apply_visitor(*this, e.y_.expr_);
     }
-    
+
     bool has_non_param_var_vis::operator()(const algebra_solver_control& e)
       const {
       // if any vars, return true

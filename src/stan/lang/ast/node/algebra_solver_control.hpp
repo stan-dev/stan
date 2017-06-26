@@ -14,7 +14,6 @@ namespace stan {
      * parameters for the solver.
      */
     struct algebra_solver_control {
-
       /**
        * Name of the algebra system.
        */
