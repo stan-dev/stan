@@ -396,7 +396,7 @@ TEST(langAst, solveAlgebra) {
   using stan::lang::expr_type;
   using stan::lang::expression;
 
-  algebra_solver so;  // null ctor should work and not raise error - WUT?
+  algebra_solver so;  // null ctor should work and not raise error
 
   std::string system_function_name = "bronzino";
 

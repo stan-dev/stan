@@ -12,21 +12,13 @@ functions {
 
 
 data {
-  // vector[2] x;
-  // vector[2] y;
-  // real dat[0];
-  // int dat_int[0];
-  // vector[2] theta;
+
 }
 
 transformed data {
   vector[2] x;
-  vector[2] y;
   real dat[0];
-  int dat_int[0];
-  vector[2] theta;
-
-  theta = algebra_solver(algebra_system, x, y, dat, dat_int);
+  real dat_int[0];
 }
 
 parameters {
@@ -36,11 +28,9 @@ parameters {
 
 transformed parameters {
   vector[2] theta_p;
-  theta_p = algebra_solver(algebra_system, x, y, dat, dat_int);
-  theta_p = algebra_solver(algebra_system, x, y_p, dat, dat_int);
+  theta_p = algebra_solver(algebra_system, x, y_p, dat, dat_int, 0.01, 0.01, 10);
 }
 
 model {
   dummy_parameter ~ normal(0, 1);
 }
-
