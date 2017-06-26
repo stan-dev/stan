@@ -9,14 +9,12 @@ namespace stan {
 
     algebra_solver::algebra_solver() { }
 
-    algebra_solver::algebra_solver(// const std::string& solver_name,
-                                   const std::string& system_function_name,
+    algebra_solver::algebra_solver(const std::string& system_function_name,
                                    const expression& x,
                                    const expression& y,
                                    const expression& dat,
                                    const expression& dat_int)
-      : // solver_name_(solver_name),
-        system_function_name_(system_function_name),
+      : system_function_name_(system_function_name),
         x_(x), y_(y), dat_(dat), dat_int_(dat_int) { }
 
     }
