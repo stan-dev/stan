@@ -1744,6 +1744,37 @@ used to extract the dimensions of vectors and matrices.
   type \code{real[4,3]} then \code{size(x)} is 4.}
 \end{description}
 
+%
+\section{Array Concatenation}\label{array-concatenation.section}
+
+Arrays of integers, reals, vectors, row\_vectors, and matrices can
+be concatenated together using the following operations.
+
+\begin{description}
+\fitem{int[]}{append\_array}{int[] \farg{x}, int[] \farg{y}}{
+  Return the concatenation of two arrays of integers in the order
+  of the arguments. }
+%
+\fitem{real[]}{append\_array}{real[] \farg{x}, real[] \farg{y}}{
+  Return the concatenation of two arrays of reals in the order
+  of the arguments. }
+%
+\fitem{vector[]}{append\_array}{vector[] \farg{x}, vector[]
+  \farg{y}}{ Return the concatenation of two arrays of vectors
+  in the order of the arguments. The vectors must all have the same
+  number of rows.}
+%
+\fitem{row\_vector[]}{append\_array}{row\_vector[] \farg{x}, row\_vector[]
+  \farg{y}}{ Return the concatenation of two arrays of row\_vectors
+  in the order of the arguments. The row\_vectors must all have the same
+  number of columns.}
+%
+\fitem{matrix[]}{append\_array}{matrix[] \farg{x}, matrix[]
+  \farg{y}}{ Return the concatenation of two arrays of matrices
+  in the order of the arguments. The matrices must all have the same
+  dimensions.}
+\end{description}
+%
 
 \section{Array Broadcasting}\label{array-broadcasting.section}
 
