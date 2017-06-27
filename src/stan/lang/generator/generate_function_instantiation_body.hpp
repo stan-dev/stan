@@ -3,7 +3,7 @@
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/generate_function_name.hpp>
-#include <stan/lang/generator/generate_function_instantiation_template_parameters.hpp>
+#include <stan/lang/generator/generate_fun_inst_templ_params.hpp>
 #include <ostream>
 #include <vector>
 #include <string>
@@ -12,8 +12,8 @@ namespace stan {
   namespace lang {
 
     /**
-     * Generate the body for a function instantiation (e.g., the 
-     * call to the templated function with all templated arguments based on 
+     * Generate the body for a function instantiation (e.g., the
+     * call to the templated function with all templated arguments based on
      * double).
      * Requires precalculated flags for whether it is an RNG, uses the log
      * density accumulator or is a probability function, to the
@@ -24,7 +24,7 @@ namespace stan {
      * @param[in] is_lp true if function accesses log density
      * accumulator
      * @param[in] is_log true if function is log probability function
-     * @param[in] rng_class class of the RNG being used (required by xxx_rng 
+     * @param[in] rng_class class of the RNG being used (required by xxx_rng
      * functions)
      * @param[in,out] o stream for generating
      */
