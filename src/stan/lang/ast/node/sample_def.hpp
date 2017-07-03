@@ -7,10 +7,10 @@ namespace stan {
   namespace lang {
 
 
-    sample::sample() { }
+    sample::sample() : is_discrete_(false) { }
 
     sample::sample(expression& e, distribution& dist)
-        : expr_(e), dist_(dist) { }
+      : expr_(e), dist_(dist), is_discrete_(false) { }
 
     bool sample::is_ill_formed() const {
         return expr_.expression_type().is_ill_formed()

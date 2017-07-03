@@ -24,6 +24,9 @@ namespace stan {
       int n_tree;
       double sum_prob;
       bool criterion;
+
+      // just to guarantee bool initializes to valid value
+      nuts_util() : criterion(false) { }
     };
 
     // The No-U-Turn Sampler (NUTS) with the

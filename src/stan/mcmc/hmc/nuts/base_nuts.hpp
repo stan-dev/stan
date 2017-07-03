@@ -24,10 +24,10 @@ namespace stan {
       base_nuts(const Model& model, BaseRNG& rng)
         : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
           depth_(0), max_depth_(5), max_deltaH_(1000),
-          n_leapfrog_(0), divergent_(0), energy_(0) {
+          n_leapfrog_(0), divergent_(false), energy_(0) {
       }
 
-      /** 
+      /**
        * specialized constructor for specified diag mass matrix
        */
       base_nuts(const Model& model, BaseRNG& rng,
@@ -35,10 +35,10 @@ namespace stan {
         : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng,
                                                             inv_e_metric),
           depth_(0), max_depth_(5), max_deltaH_(1000),
-          n_leapfrog_(0), divergent_(0), energy_(0) {
+          n_leapfrog_(0), divergent_(false), energy_(0) {
       }
 
-      /** 
+      /**
        * specialized constructor for specified dense mass matrix
        */
       base_nuts(const Model& model, BaseRNG& rng,
@@ -46,7 +46,7 @@ namespace stan {
         : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng,
                                                             inv_e_metric),
         depth_(0), max_depth_(5), max_deltaH_(1000),
-        n_leapfrog_(0), divergent_(0), energy_(0) {
+        n_leapfrog_(0), divergent_(false), energy_(0) {
       }
 
       ~base_nuts() {}
