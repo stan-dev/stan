@@ -12,7 +12,7 @@ void test_rtl_2_ltr(size_t idx_rtl,
   stan::json::vars_map_r vars_r;
   stan::json::vars_map_i vars_i;
   stan::json::json_data_handler handler(vars_r, vars_i);
-  EXPECT_TRUE(handler.is_int_ == 0 || handler.is_int_ == 1);
+
   size_t idx = handler.convert_offset_rtl_2_ltr(idx_rtl,dims);
   EXPECT_EQ(idx, idx_ltr);
 }
