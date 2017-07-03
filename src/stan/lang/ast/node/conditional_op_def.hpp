@@ -6,7 +6,8 @@
 namespace stan {
   namespace lang {
 
-    conditional_op::conditional_op() { }
+    conditional_op::conditional_op()
+      : has_var_(false) { }
 
     conditional_op::conditional_op(const expression& cond,
                                    const expression& true_val,
