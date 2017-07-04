@@ -27,7 +27,7 @@ namespace stan {
      * @param[in, out] out output stream to which function definition
      * is written
      * @param[in] rcpp_export if true, comments to enable export for RCpp
-     * are generated
+     * are generated (for non-templated functions only)
      */
     void generate_function(const function_decl_def& fun,
                            std::ostream& out, bool rcpp_export = false) {
@@ -37,8 +37,9 @@ namespace stan {
         || ends_with("_lpdf", fun.name_) || ends_with("_lpmf", fun.name_);
       std::string scalar_t_name = fun_scalar_type(fun, is_lp);
 
-      if (rcpp_export)
-        out << "// [[Rcpp::export]]" << EOL;
+      if (rcpp_export && has_only_int_args(fun) 
+        && !fun.body_.is_no_op_statement())
+          out << "// [[Rcpp::export]]" << EOL;
 
       generate_function_template_parameters(fun, is_rng, is_lp, is_pf, out);
       generate_function_inline_return_type(fun, scalar_t_name, 0, out);

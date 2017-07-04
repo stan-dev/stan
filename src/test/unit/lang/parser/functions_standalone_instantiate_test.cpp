@@ -29,6 +29,11 @@ TEST(lang_parser, functions_standalone_instantiate_double_basic) {
     multiply(my_vec,5.0))  
       << "Problem instantiating a vector -> vector function from standalone compilation.";
   expect_no_errors(error_stream);
+
+  EXPECT_EQ(basic_functions::int_only_multiplication(3, 8, &error_stream), 
+    3 * 8)  
+      << "Problem instantiating an int-only function from standalone compilation.";
+  expect_no_errors(error_stream);
 }
 
 TEST(lang_parser, functions_standalone_instantiate_double_special) {
