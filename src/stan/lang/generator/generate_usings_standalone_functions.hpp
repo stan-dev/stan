@@ -20,7 +20,6 @@ namespace stan {
       generate_using("std::string", o);
       generate_using("std::stringstream", o);
       generate_using("std::vector", o);
-      generate_using("stan::math::lgamma", o);
       generate_using_namespace("stan::math", o);
       o << EOL;
     }
