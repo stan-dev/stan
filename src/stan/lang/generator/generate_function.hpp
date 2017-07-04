@@ -37,7 +37,7 @@ namespace stan {
         || ends_with("_lpdf", fun.name_) || ends_with("_lpmf", fun.name_);
       std::string scalar_t_name = fun_scalar_type(fun, is_lp);
 
-      if (rcpp_export && has_only_int_args(fun) 
+      if (rcpp_export && has_only_int_args(fun)
         && !fun.body_.is_no_op_statement())
           out << "// [[Rcpp::export]]" << EOL;
 
