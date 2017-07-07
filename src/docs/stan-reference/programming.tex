@@ -1552,8 +1552,8 @@ vector softmax_id(vector alpha) {
   vector[num_elements(alpha) + 1] alphac1;
   for (k in 1:num_elements(alpha))
     alphac1[k] = alpha[k];
-  alpha[num_elements(alphac)] = 0;
-  return softmax(alphac);
+  alphac1[num_elements(alphac1)] = 0;
+  return softmax(alphac1);
 }
 \end{stancode}
 
@@ -3588,12 +3588,11 @@ parameters {
   ...
 model {
   matrix[K, K] A;
-  int count;
-  count = 1;
+  int count = 1;
   for (j in 1:(K-1)) {
     for (i in (j+1):K) {
       A[i, j] = z[count];
-      count = count + 1;
+      count += 1;
     }
     for (i in 1:(j - 1)) {
       A[i, j] = 0.0;
@@ -3660,7 +3659,7 @@ model {
   for (j in 1:(K-1)) {
     for (i in (j+1):K) {
       A[i, j] = z[count];
-      count = count + 1;
+      count += 1;
     }
     for (i in 1:(j - 1)) {
       A[i, j] = 0.0;
@@ -3738,7 +3737,7 @@ some operation that depends on \code{n}.
 %
 \begin{stancode}
 for (n in 1:N)
-  total = total + foo(n,...);
+  total += foo(n,...);
 \end{stancode}
 %
 This code has to create intermediate representations for each
@@ -3786,10 +3785,9 @@ parameters {
 }
 model {
   for (n in 1:N) {
-    real gamma;
-    gamma = 0;
+    real gamma = 0;
     for (k in 1:K)
-      gamma = gamma + x[n, k] * beta[k];
+      gamma += x[n, k] * beta[k];
     y[n] ~ normal(gamma, 1);
   }
 }
@@ -3825,13 +3823,14 @@ replaced with a transpose and multiply, as in
 The relative inefficiency of the transpose and multiply approach is
 that the transposition operator allocates a new vector into which the
 result of the transposition is copied.  This consumes both time
-and memory\footnote{Future versions of Stan may remove this inefficiency
-by more fully exploiting expression templates inside the Eigen
-\Cpp matrix library.  This will require enhancing Eigen to deal
-with mixed-type arguments, such as the type \code{double} used
-for constants and the algorithmic differentiation type
-\code{stan::math::var}
-used for variables.}.
+and memory%
+%
+\footnote{Future versions of Stan may remove this inefficiency by more
+  fully exploiting expression templates inside the Eigen \Cpp matrix
+  library.  This will require enhancing Eigen to deal with mixed-type
+  arguments, such as the type \code{double} used for constants and the
+  algorithmic differentiation type \code{stan::math::var} used for
+  variables.}.
 %
 The inefficiency of transposition could itself be mitigated somewhat by
 reordering the product and pulling the transposition out of the loop,
@@ -3871,6 +3870,26 @@ model {
 Declaring the data as a matrix and then computing all the predictors
 at once using matrix multiplication is more efficient still, as in the
 example discussed in the next section.
+
+Having said all this, the most efficient way to code this model is
+with direct matrix multiplication, as in
+%
+\begin{stancode}
+data {
+  matrix[N, K] x;
+  vector[N] y;
+}
+parameters {
+  vector[K] beta;
+}
+model {
+  y ~ normal(x * beta, 1);
+\end{stancode}
+%
+In general, encapsulated single operations that do the work of loops
+will be more efficient in their encapsulated forms.  Rather than
+performing a sequence of row-vector/vector multipliations, it is
+better to encapsulate it as a single matrix/vector multiplication.
 
 \subsection{Vectorized Probability Functions}
 

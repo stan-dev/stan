@@ -19,7 +19,7 @@ namespace stan {
      * definitions
      * @param[in,out] o stream for generating
      * @param[in] rcpp_export if true, comments to enable export for RCpp
-     * are generated
+     * are generated (for non-templated functions only)
      */
     void generate_functions(const std::vector<function_decl_def>& funs,
                             std::ostream& o, bool rcpp_export = false) {

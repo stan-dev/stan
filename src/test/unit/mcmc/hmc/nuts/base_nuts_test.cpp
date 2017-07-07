@@ -110,6 +110,8 @@ TEST(McmcNutsBaseNuts, set_max_depth_test) {
   stan::mcmc::mock_model model(q.size());
   stan::mcmc::mock_nuts sampler(model, base_rng);
 
+  EXPECT_TRUE(sampler.divergent_ == true || sampler.divergent_ == false);
+
   int old_max_depth = 1;
   sampler.set_max_depth(old_max_depth);
   EXPECT_EQ(old_max_depth, sampler.get_max_depth());

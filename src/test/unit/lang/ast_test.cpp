@@ -835,7 +835,44 @@ TEST(StanLangAstFun, is_nonempty) {
   EXPECT_TRUE(is_nonempty("  \r\n \n 1  \n"));
 }
 
+template <typename T>
+void expect_has_var_bool(const T& x) {
+  EXPECT_TRUE(x.has_var_ == 0 || x.has_var_ == 1);
+}
 
+
+TEST(StanLangAst, ConditionalOp) {
+  expect_has_var_bool(stan::lang::conditional_op());
+
+  stan::lang::expression e = int_literal(3);
+  expect_has_var_bool(stan::lang::conditional_op(e, e, e));
+}
+
+TEST(StanLangAst, RowVectorExpr) {
+  expect_has_var_bool(stan::lang::row_vector_expr());
+}
+
+TEST(StanLangAst, MatrixExpr) {
+  expect_has_var_bool(stan::lang::matrix_expr());
+}
+
+TEST(StanLangAst, Sample) {
+  stan::lang::sample s;
+  EXPECT_TRUE(s.is_discrete_ == true || s.is_discrete_ == false);
+
+  stan::lang::expression e = int_literal(3);
+  stan::lang::distribution d;
+  stan::lang::sample s2(e, d);
+  EXPECT_TRUE(s2.is_discrete_ == true || s2.is_discrete_ == false);
+}
+
+TEST(StanLangAst, Scope) {
+  stan::lang::scope s;
+  EXPECT_TRUE(s.is_local() == true || s.is_local() == false);
+
+  stan::lang::scope s2(stan::lang::data_origin);
+  EXPECT_TRUE(s2.is_local() == true || s2.is_local() == false);
+}
 
 
 

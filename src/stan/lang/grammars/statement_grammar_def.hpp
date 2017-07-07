@@ -24,6 +24,11 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::assignment,
                           (stan::lang::variable_dims, var_dims_)
                           (stan::lang::expression, expr_) )
 
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::compound_assignment,
+                          (stan::lang::variable_dims, var_dims_)
+                          (std::string, op_)
+                          (stan::lang::expression, expr_) )
+
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::variable_dims,
                           (std::string, name_)
                           (std::vector<stan::lang::expression>, dims_) )
@@ -116,7 +121,8 @@ namespace stan {
         | reject_statement_r(_r1)                   // key "reject"
         | return_statement_r(_r1)                   // key "return"
         | void_return_statement_r(_r1)              // key "return"
-        | assignment_r(_r1)                         // lvalue "<-"
+        | assignment_r(_r1)                         // lvalue "=" or "<-"
+        | compound_assignment_r(_r1)                // lvalue "+=" or "-="
         | assgn_r(_r1)                              // var[idxs] <- expr
         | sample_r(_r1)                             // expression "~"
         | expression_g(_r1)                         // expression
@@ -254,6 +260,22 @@ namespace stan {
         > lit(';');
 
       // _r1 = var scope
+      compound_assignment_r.name("variable compound op-equals by expression");
+      compound_assignment_r
+        %= var_lhs_r(_r1)
+        >> (string("+=")
+            | string("-=")
+            | string("*=")
+            | string("/=")
+            | string(".*=")
+            | string("./="))
+        >> expression_rhs_r(_r1)
+           [validate_compound_assignment_f(_val, _r1, _pass,
+                                           boost::phoenix::ref(var_map_),
+                                           boost::phoenix::ref(error_msgs_))]
+        > lit(';');
+
+      // _r1 = var scope
       assgn_r.name("indexed variable assginment statement");
       assgn_r
         %= var_r(_r1)
@@ -274,8 +296,8 @@ namespace stan {
       var_r
         = identifier_r
           [validate_lhs_var_assgn_f(_1, _r1, _val,  _pass,
-                               boost::phoenix::ref(var_map_),
-                               boost::phoenix::ref(error_msgs_))];
+                                    boost::phoenix::ref(var_map_),
+                                    boost::phoenix::ref(error_msgs_))];
 
       // separate rule for name on expectation failure
       // _r1 = var scope
@@ -308,14 +330,14 @@ namespace stan {
         %= (expression_g(_r1)
             >> lit('~'))
         > eps
-          [validate_allow_sample_f(_r1, _pass,
-                                   boost::phoenix::ref(error_msgs_))]
+        [validate_allow_sample_f(_r1, _pass,
+                                 boost::phoenix::ref(error_msgs_))]
         > distribution_r(_r1)
         > -truncation_range_r(_r1)
         > lit(';')
         > eps
-          [validate_sample_f(_val, boost::phoenix::ref(var_map_),
-                             _pass, boost::phoenix::ref(error_msgs_))];
+        [validate_sample_f(_val, boost::phoenix::ref(var_map_),
+                           _pass, boost::phoenix::ref(error_msgs_))];
 
       // _r1 = var scope
       distribution_r.name("distribution and parameters");
@@ -341,18 +363,18 @@ namespace stan {
         %= (lit("return") >> no_skip[!char_("a-zA-Z0-9_")])
         >> expression_g(_r1)
         >> lit(';') [validate_return_allowed_f(_r1, _pass,
-                                       boost::phoenix::ref(error_msgs_))];
+                                     boost::phoenix::ref(error_msgs_))];
 
       // _r1 = var scope
       void_return_statement_r.name("void return statement");
       void_return_statement_r
-        = lit("return")[set_void_return_f(_val)]
-        >> lit(';')[validate_void_return_allowed_f(_r1, _pass,
-                                        boost::phoenix::ref(error_msgs_))];
+        = lit("return") [set_void_return_f(_val)]
+        >> lit(';') [validate_void_return_allowed_f(_r1, _pass,
+                                          boost::phoenix::ref(error_msgs_))];
 
       no_op_statement_r.name("no op statement");
       no_op_statement_r
-        %= lit(';')[set_no_op_f(_val)];
+        %= lit(';') [set_no_op_f(_val)];
     }
 
   }

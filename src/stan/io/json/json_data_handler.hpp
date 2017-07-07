@@ -93,14 +93,14 @@ namespace stan {
        *
        * <b>Warning:</b> This method does not close the input stream.
        *
-       * @param vars_r - name-value map for real-valued variables
-       * @param vars_i - name-value map for int-valued variables
+       * @param vars_r name-value map for real-valued variables
+       * @param vars_i name-value map for int-valued variables
        */
-      json_data_handler(vars_map_r& vars_r, vars_map_i& vars_i) :
-        json_handler(), vars_r_(vars_r), vars_i_(vars_i),
-        key_(), values_r_(), values_i_(),
-        dims_(), dims_verify_(), dims_unknown_(),
-        dim_idx_(), dim_last_(), is_int_() {
+      json_data_handler(vars_map_r& vars_r, vars_map_i& vars_i)
+        : json_handler(), vars_r_(vars_r), vars_i_(vars_i),
+          key_(), values_r_(), values_i_(),
+          dims_(), dims_verify_(), dims_unknown_(),
+          dim_idx_(0), dim_last_(0), is_int_(true) {
       }
 
       void start_text() {
