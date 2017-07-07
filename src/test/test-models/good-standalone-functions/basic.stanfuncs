@@ -10,5 +10,9 @@ functions {
 		vector[num_elements(x)] result = x * 5.0;
 		return result;
 	}
+
+	int int_only_multiplication(int a, int b) {
+		return a*b;
+	}
 }
 
