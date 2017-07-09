@@ -8,10 +8,6 @@ pystan, cmdstan}) and math library level (stan-dev/math).
 v2.16.0 (15 June 2017)
 ======================================================================
 
-New Team Members
---------------------------------------------------
-* Breck Baldwin (Columbia University) -- Project Coordinator
-
 Bug Fixes
 --------------------------------------------------
 * Fix typo in cumulative_sum definition (#2288)

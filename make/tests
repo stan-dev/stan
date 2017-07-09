@@ -284,6 +284,12 @@ src/test/unit/variational/eta_adapt_small_test.cpp:src/test/test-models/good/var
 ##
 test/integration/compile_models$(EXE) : $(patsubst %.stan,%.hpp-test,$(shell find src/test/test-models/good -type f -name '*.stan'))
 
+## 
+# Same trick as above for models, but for standalone functions, using 
+# "src/test/test-models/good-standalone-functions/*.stanfuncs"
+##
+test/integration/compile_standalone_functions$(EXE) : $(patsubst %.stanfuncs,%.hpp-test,$(shell find src/test/test-models/good-standalone-functions -type f -name '*.stanfuncs'))
+
 
 test_name = $(shell echo $(1) | sed 's,_[0-9]\{5\},_test.hpp,g')
 

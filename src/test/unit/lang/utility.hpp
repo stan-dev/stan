@@ -61,7 +61,7 @@ bool is_parsable(const std::string& file_name,
   stan::lang::program prog;
   std::ifstream fs(file_name.c_str());
   if (fs.fail()) {
-    *msgs <<  "Cannot open model file " << file_name << std::endl; 
+    *msgs <<  "Cannot open model file " << file_name << std::endl;
     return false;
   }
   std::string model_name = file_name_to_model_name(file_name);
@@ -96,13 +96,19 @@ bool is_parsable_folder(const std::string& model_name,
  * @param model_name Name of model to parse
  */
 void test_parsable(const std::string& model_name) {
-  {
-    SCOPED_TRACE("parsing: " + model_name);
-    EXPECT_TRUE(is_parsable_folder(model_name, "good"));
+  bool result;
+  std::stringstream msgs;
+  SCOPED_TRACE("parsing: " + model_name);
+  result = is_parsable_folder(model_name, "good", &msgs);
+  if (!result) {
+    FAIL() << std::endl << "*********************************" << std::endl
+           << "model name=" << model_name << std::endl
+           << msgs.str() << std::endl;
   }
+  SUCCEED();
 }
 
-/** test that file with standalone functions with specified name in folder 
+/** test that file with standalone functions with specified name in folder
  * "good-standalone-functions" parses without throwing an exception
  *
  * @param model_name Name of model to parse
@@ -110,7 +116,7 @@ void test_parsable(const std::string& model_name) {
 void test_parsable_standalone_functions(const std::string& model_name) {
   {
     SCOPED_TRACE("parsing standalone functions: " + model_name);
-    EXPECT_TRUE(is_parsable_folder(model_name, "good-standalone-functions", 
+    EXPECT_TRUE(is_parsable_folder(model_name, "good-standalone-functions",
                   0, ".stanfuncs"));
   }
 }
@@ -138,7 +144,6 @@ void test_throws(const std::string& model_name, const std::string& error_msg) {
     }
     return;
   }
-
   FAIL() << "model name=" << model_name
          << " is parsable and were expecting msg=" << error_msg
          << std::endl;

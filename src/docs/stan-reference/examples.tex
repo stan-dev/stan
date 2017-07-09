@@ -1982,10 +1982,9 @@ there are in $y$.
 \begin{stancode}
 functions {
   int sum(int[,] a) {
-    int s;
-    s = 0;
+    int s = 0;
     for (i in 1:size(a))
-      s = s + sum(a[i]);
+      s += sum(a[i]);
     return s;
   }
 }
@@ -2036,11 +2035,11 @@ transformed data {
         if (y[n,d] == 1) {
           n_pos[i] = n;
           d_pos[i] = d;
-          i = i + 1;
+          i += 1;
         } else {
           n_neg[j] = n;
           d_neg[j] = d;
-          j = j + 1;
+          j += 1;
         }
       }
     }
@@ -2340,10 +2339,9 @@ parameters {
 }
 model {
   for (n in (K+1):N) {
-    real mu;
-    mu = alpha;
+    real mu = alpha;
     for (k in 1:K)
-      mu = mu + beta[k] * y[n-k];
+      mu += beta[k] * y[n-k];
     y[n] ~ normal(mu, sigma);
   }
 }
@@ -2815,12 +2813,11 @@ parameter block.
 %
 \begin{stancode}
 transformed parameters {
-  vector[T] h;            // log volatility at time t
-  h = h_std * sigma;     // now h ~ normal(0, sigma)
-  h[1] = h[1] / sqrt(1 - phi * phi);  // rescale h[1]
-  h = h + mu;
+  vector[T] h = h_std * sigma;  // now h ~ normal(0, sigma)
+  h[1] /= sqrt(1 - phi * phi);  // rescale h[1]
+  h += mu;
   for (t in 2:T)
-    h[t] = h[t] + phi * (h[t-1] - mu);
+    h[t] += phi * (h[t-1] - mu);
 }
 \end{stancode}
 %
@@ -2957,12 +2954,12 @@ transformed data {
     for (k2 in 1:K)
       trans[k1, k2] = 0;
   for (t in 2:T)
-    trans[z[t - 1], z[t]] = 1 + trans[z[t - 1], z[t]];
+    trans[z[t - 1], z[t]] += 1;
   for (k in 1:K)
     for (v in 1:V)
       emit[k,v] = 0;
   for (t in 1:T)
-    emit[z[t], w[t]] = 1 + emit[z[t], w[t]];
+    emit[z[t], w[t]] += 1;
 }
 \end{stancode}
 %
@@ -3009,11 +3006,11 @@ transformed data {
   for (k in 1:K)
     alpha_post[k] = alpha;
   for (t in 2:T)
-    alpha_post[z[t-1], z[t]] = alpha_post[z[t-1], z[t]] + 1;
+    alpha_post[z[t-1], z[t]] += 1;
   for (k in 1:K)
     beta_post[k] = beta;
   for (t in 1:T)
-    beta_post[z[t],w[t]] = beta_post[z[t],w[t]] + 1;
+    beta_post[z[t], w[t]] += 1;
 }
 \end{stancode}
 %
@@ -3384,7 +3381,7 @@ transformed parameters {
       for (n in 1:(m - 1)) {
         L[m, n] = L_lower[i];
         L[n, m] = 0;
-        i = i + 1;
+        i += 1;
       }
     }
   }
@@ -3463,13 +3460,13 @@ int n2 = 1;
 for (n in 1:N) {
   if (y_observed[n, 1] && y_observed[n, 2]) {
     ns12[n12] = n;
-    n12 = n12 + 1;
+    n12 += 1;
   } else if (y_observed[n, 1]) {
     ns1[n1] = n;
-    n1 = n1 + 1;
+    n1 += 1;
   } else if (y_observed[n, 2]) {
     ns2[n2] = n;
-    n2 = n2 + 1;
+    n2 += 1;
   }
 }
 \end{stancode}
@@ -3949,13 +3946,12 @@ parameters {
 }
 model {
   real log_theta[K] = log(theta);  // cache log calculation
-
   sigma ~ lognormal(0, 2);
   mu ~ normal(0, 10);
   for (n in 1:N) {
     real lps[K] = log_theta;
     for (k in 1:K)
-      lps[k] = lps[k] + normal_lpdf(y[n] | mu[k], sigma[k]);
+      lps[k] += normal_lpdf(y[n] | mu[k], sigma[k]);
     target += log_sum_exp(lps);
   }
 }
@@ -4332,11 +4328,10 @@ number of non-zero entries in an array of integers,
 \begin{stancode}
 functions {
   int num_zero(int[] y) {
-    int nz;
-    nz = 0;
+    int nz = 0;
     for (n in 1:size(y))
       if (y[n] == 0)
-        nz = nz + 1;
+        nz += 1;
     return nz;
   }
 }
@@ -4347,19 +4342,15 @@ statistics,
 %
 \begin{stancode}
 transformed data {
-  int<lower=0, upper=N> N0;
-  int<lower=0, upper=N> Ngt0;
+  int<lower=0, upper=N> N0 = num_zero(y);
+  int<lower=0, upper=N> Ngt0 = N - N0;
   int<lower=1> y_nz[N - num_zero(y)];
-
-  N0 = num_zero(y);
-  Ngt0 = N - N0;
   {
-    int pos;
-    pos = 1;
+    int pos = 1;
     for (n in 1:N) {
       if (y[n] != 0) {
         y_nz[pos] = y[n];
-        pos = pos + 1;
+        pos += 1;
       }
     }
   }
@@ -6986,7 +6977,7 @@ transformed data {
   for (i in 1:(N - 1)) {
     K[i,i] = 1 + 0.1;
     for (j in (i + 1):N) {
-      K[i, j] = exp(-1/2 * pow(x[i] - x[j], 2));
+      K[i, j] = exp(-0.5 * square(x[i] - x[j]));
       K[j, i] = K[i, j];
     }
   }
@@ -7398,14 +7389,12 @@ functions {
                             real delta) {
     int N = size(x);
     matrix[N, N] K;
-    real inv_half = -1/2;
     real sq_alpha = square(alpha);
     for (i in 1:(N - 1)) {
       K[i,i] = sq_alpha + delta;
       for (j in (i + 1):N) {
         K[i, j] = sq_alpha
-                      * exp(inv_half
-                            * dot_self((x[i] - x[j]) ./ rho));
+                      * exp(-0.5 * dot_self((x[i] - x[j]) ./ rho));
         K[j, i] = K[i, j];
       }
     }
@@ -8227,20 +8216,14 @@ model {
 }
 generated quantities {
   vector[2] y_hat[T];
-  matrix[2, 2] A;
-
-  A[1, 1] = 0;
-  A[1, 2] = 1;
-  A[2, 1] = -1;
-  A[2, 2] = -theta[1];
-
+  matrix[2, 2] A = [[ 0,  1],
+                    [-1, -theta[1]]]
   for (t in 1:T)
     y_hat[t] = matrix_exp((t - 1) * A) * y0;
-
   // add measurement error
   for (t in 1:T) {
-    y_hat[t, 1] = y_hat[t, 1] + normal_rng(0, 0.1);
-    y_hat[t, 2] = y_hat[t, 2] + normal_rng(0, 0.1);
+    y_hat[t, 1] += normal_rng(0, 0.1);
+    y_hat[t, 2] += normal_rng(0, 0.1);
   }
 }
 \end{stancode}
@@ -8317,13 +8300,11 @@ transformed data {
 model {
 }
 generated quantities {
-  real y_hat[T,2];
-  y_hat = integrate_ode_rk45(sho, y0, t0, ts, theta, x_r, x_i);
-
+  real y_hat[T,2] = integrate_ode_rk45(sho, y0, t0, ts, theta, x_r, x_i);
   // add measurement error
   for (t in 1:T) {
-    y_hat[t, 1] = y_hat[t, 1] + normal_rng(0, 0.1);
-    y_hat[t, 2] = y_hat[t, 2] + normal_rng(0, 0.1);
+    y_hat[t, 1] += normal_rng(0, 0.1);
+    y_hat[t, 2] += normal_rng(0, 0.1);
   }
 }
 \end{stancode}

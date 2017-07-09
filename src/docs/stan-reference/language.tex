@@ -2853,6 +2853,85 @@ arising from he right-hand side changing in the middle of an
 assignment statement's execution.
 
 
+\subsection{Compound Arithmetic and Assignment Statement}\label{compound-arithmetic-assignment.section}
+
+Stan's arithmetic operators may be used in compound arithmetic
+and assignment operations.  For example, consider the following
+example of compound addition and assignment.
+%
+\begin{stancode}
+real x = 5;
+x += 7;  // value of x is now 12
+\end{stancode}
+%
+The compound arithmetic and assignment statement above is equivalent
+to the following long form.
+%
+\begin{stancode}
+x = x + 7;
+\end{stancode}
+%
+In general, the compound form
+%
+\begin{stancode}
+x op= y
+\end{stancode}
+%
+will be equivalent to
+%
+\begin{stancode}
+x = x op y;
+\end{stancode}
+%
+The compound statement will be legal whenever the long form is legal.
+This requires that the operation \code{x op y} must itself be well
+formed and that the result of the operation be assignable to \code{x}.
+For the expression \code{x} to be assignable, it must be an indexed
+variable where the variable is defined in the current block.  For
+example, the following compound addition and assignment statement will
+increment a single element of a vector by two.
+%
+\begin{stancode}
+vector[N] x;
+x[3] += 2;
+\end{stancode}
+%
+As a further example, consider
+%
+\begin{stancode}
+matirx[M, M] x;
+vector[M] y;
+real z;
+x *= x;  // OK, (x * x) is a matrix
+x *= z;  // OK, (x * z) is a matrix
+x *= y;  // BAD, (x * y) is a vector
+\end{stancode}
+
+The supported compound arithmetic and assignment
+operations are listed in \reffigure{compound-arithmetic-assign}; they
+are also listed in the index prefaced by \code{operator}, e.g.,
+\code{operator+=}.
+%
+\begin{figure}
+\begin{center}
+\begin{tabular}{r|l|l}
+{\it Operation} & {\it Compound} & {\it Long} \\ \hline \hline
+addition & \code{x += y} & \code{x = x + y} \\
+subtraction & \code{x -= y} & \code{x = x - y} \\ \hline
+multiplication & \code{x *= y} & \code{x = x * y} \\
+division & \code{x /= y} & \code{x = x / y} \\ \hline
+elementwise multiplication & \code{x .*= y} & \code{x = x .* y} \\
+elementwise division & \code{x ./= y} & \code{x = x ./ y} \\ \hline
+\end{tabular}
+\end{center}
+\caption{\small\it Stan allows compound arithmetic and assignment
+  statements of the forms listed in the table above.  The compound
+  form is legal whenever the corresponding long form would be legal
+  and it has the same effect.}\label{compound-arithmetic-assign.figure}
+\end{figure}
+%
+
+
 
 \section{Increment Log Density}\label{increment-log-prob.section}
 
@@ -2930,6 +3009,25 @@ Stan only requires models to be defined up to a constant that does not
 depend on the parameters.  This is convenient because often the
 normalizing constant $Z$ is either time-consuming to compute or
 intractable to evaluate.
+
+\subsubsection{Relation to compound addition and assignment}
+
+The increment log density statement looks syntactically like compound
+addition and assignment (see
+\refsection{compound-arithmetic-assignment}, it is treated as a
+primitive statement because \code{target} is not itself a variable.
+So, even though
+%
+\begin{stancode}
+target += lp;
+\end{stancode}
+%
+is a legal statement, the corresponding long form is not legal.
+%
+\begin{stancode}
+target = target + lp;  // BAD, target is not a variable
+\end{stancode}
+
 
 \subsubsection{Vectorization}
 
@@ -3459,9 +3557,9 @@ times, as in the following legal code.
 %
 \begin{stancode}
 for (n in 1:100) {
-  y = y + y * epsilon;
-  epsilon = epsilon / 2.0;
-  y = y + y * epsilon;
+  y += y * epsilon;
+  epsilon = 0.5 * epsilon;
+  y += y * epsilon;
 }
 \end{stancode}
 
@@ -3633,12 +3731,11 @@ in a for loop, it is legal to have the following
 \begin{stancode}
 for (m in 1:M) {
   {
-     int n;
-     n = 2 * m;
-     sum = sum + n
+     int n = 2 * m;
+     sum += n;
   }
   for (n in 1:N)
-    sum = sum + x[m, n];
+    sum += x[m, n];
 }
 \end{stancode}
 %
@@ -3707,7 +3804,7 @@ real sum;
 sum = 0;
 for (n in 1:size(x)) {
   if (x[n] <= 0) continue;
-  sum = sum + x[n];
+  sum += x[n];
 }
 \end{stancode}
 %
@@ -3724,7 +3821,7 @@ real sum;
 sum = 0;
 for (n in 1:size(x)) {
   if (x[n] > 0)
-    sum = sum + x[n];
+    sum += x[n];
 }
 \end{stancode}
 %

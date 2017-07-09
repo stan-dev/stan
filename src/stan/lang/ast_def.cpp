@@ -61,6 +61,7 @@
 #include <stan/lang/ast/node/break_continue_statement_def.hpp>
 #include <stan/lang/ast/node/cholesky_factor_var_decl_def.hpp>
 #include <stan/lang/ast/node/cholesky_corr_var_decl_def.hpp>
+#include <stan/lang/ast/node/compound_assignment_def.hpp>
 #include <stan/lang/ast/node/conditional_op_def.hpp>
 #include <stan/lang/ast/node/conditional_statement_def.hpp>
 #include <stan/lang/ast/node/corr_matrix_var_decl_def.hpp>

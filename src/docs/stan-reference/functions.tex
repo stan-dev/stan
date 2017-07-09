@@ -3425,6 +3425,141 @@ one-dimensional array in row-major order.}
 \end{description}
 
 
+\chapter{Compound Arithmetic and Assignment}
+
+The compound arithmetic and assignment operations are coded directly
+as statements, as described in
+\refsection{compound-arithmetic-assignment}.  They allow statements of
+the form 
+%
+\begin{stancode}
+x = x op y;
+\end{stancode}
+%
+with the compound form
+%
+\begin{stancode}
+x op= y;
+\end{stancode}
+%
+The signatures of the supported compound arithmetic and assignment
+operations are as follows.
+
+\section{Compound Addition and Assignment}
+
+\begin{description}
+\fitem{void}{operator+=}{int \farg{x}, int \farg{y}}{\code{\farg{x} +=
+    y} is equivalent to \code{\farg{x} = \farg{x} + \farg{y}}.}
+\fitem{void}{operator+=}{real \farg{x}, real \farg{y}}{\code{\farg{x} +=
+    y} is equivalent to \code{\farg{x} = \farg{x} + \farg{y}}.}
+%
+\fitem{void}{operator+=}{vector \farg{x}, real \farg{y}}{\code{\farg{x} +=
+    y} is equivalent to \code{\farg{x} = \farg{x} + \farg{y}}.}
+\fitem{void}{operator+=}{row\_vector \farg{x}, real \farg{y}}{\code{\farg{x} +=
+    y} is equivalent to \code{\farg{x} = \farg{x} + \farg{y}}.}
+\fitem{void}{operator+=}{matrix \farg{x}, real \farg{y}}{\code{\farg{x} +=
+    y} is equivalent to \code{\farg{x} = \farg{x} + \farg{y}}.}
+%
+\fitem{void}{operator+=}{vector \farg{x}, vector \farg{y}}{\code{\farg{x} +=
+    y} is equivalent to \code{\farg{x} = \farg{x} + \farg{y}}.}
+\fitem{void}{operator+=}{row\_vector \farg{x}, row\_vector \farg{y}}{\code{\farg{x} +=
+    y} is equivalent to \code{\farg{x} = \farg{x} + \farg{y}}.}
+\fitem{void}{operator+=}{matrix \farg{x}, matrix \farg{y}}{\code{\farg{x} +=
+    y} is equivalent to \code{\farg{x} = \farg{x} + \farg{y}}.}
+\end{description}
+
+\section{Compound Subtraction and Assignment}
+
+\begin{description}
+\fitem{void}{operator-=}{int \farg{x}, int \farg{y}}{\code{\farg{x} -=
+    y} is equivalent to \code{\farg{x} = \farg{x} - \farg{y}}.}
+\fitem{void}{operator-=}{real \farg{x}, real \farg{y}}{\code{\farg{x} -=
+    y} is equivalent to \code{\farg{x} = \farg{x} - \farg{y}}.}
+%
+\fitem{void}{operator-=}{vector \farg{x}, real \farg{y}}{\code{\farg{x} -=
+    y} is equivalent to \code{\farg{x} = \farg{x} - \farg{y}}.}
+\fitem{void}{operator-=}{row\_vector \farg{x}, real \farg{y}}{\code{\farg{x} -=
+    y} is equivalent to \code{\farg{x} = \farg{x} - \farg{y}}.}
+\fitem{void}{operator-=}{matrix \farg{x}, real \farg{y}}{\code{\farg{x} -=
+    y} is equivalent to \code{\farg{x} = \farg{x} - \farg{y}}.}
+%
+\fitem{void}{operator-=}{vector \farg{x}, vector \farg{y}}{\code{\farg{x} -=
+    y} is equivalent to \code{\farg{x} = \farg{x} - \farg{y}}.}
+\fitem{void}{operator-=}{row\_vector \farg{x}, row\_vector \farg{y}}{\code{\farg{x} -=
+    y} is equivalent to \code{\farg{x} = \farg{x} - \farg{y}}.}
+\fitem{void}{operator-=}{matrix \farg{x}, matrix \farg{y}}{\code{\farg{x} -=
+    y} is equivalent to \code{\farg{x} = \farg{x} - \farg{y}}.}
+\end{description}
+
+\section{Compound Multiplication and Assignment}
+
+\begin{description}
+\fitem{void}{operator*=}{int \farg{x}, int \farg{y}}{\code{\farg{x} *=
+    y} is equivalent to \code{\farg{x} = \farg{x} * \farg{y}}.}
+\fitem{void}{operator*=}{real \farg{x}, real \farg{y}}{\code{\farg{x} *=
+    y} is equivalent to \code{\farg{x} = \farg{x} * \farg{y}}.}
+%
+\fitem{void}{operator*=}{vector \farg{x}, real \farg{y}}{\code{\farg{x} *=
+    y} is equivalent to \code{\farg{x} = \farg{x} * \farg{y}}.}
+\fitem{void}{operator*=}{row\_vector \farg{x}, real \farg{y}}{\code{\farg{x} *=
+    y} is equivalent to \code{\farg{x} = \farg{x} * \farg{y}}.}
+\fitem{void}{operator*=}{matrix \farg{x}, real \farg{y}}{\code{\farg{x} *=
+    y} is equivalent to \code{\farg{x} = \farg{x} * \farg{y}}.}
+%
+\fitem{void}{operator*=}{row\_vector \farg{x}, matrix \farg{y}}{\code{\farg{x} *=
+    y} is equivalent to \code{\farg{x} = \farg{x} * \farg{y}}.}
+%
+\fitem{void}{operator*=}{matrix \farg{x}, matrix \farg{y}}{\code{\farg{x} *=
+    y} is equivalent to \code{\farg{x} = \farg{x} * \farg{y}}.}
+\end{description}
+
+\section{Compound Division and Assignment}
+
+\begin{description}
+\fitem{void}{operator/=}{int \farg{x}, int \farg{y}}{\code{\farg{x} /=
+    y} is equivalent to \code{\farg{x} = \farg{x} / \farg{y}}.}
+\fitem{void}{operator/=}{real \farg{x}, real \farg{y}}{\code{\farg{x} /=
+    y} is equivalent to \code{\farg{x} = \farg{x} / \farg{y}}.}
+%
+\fitem{void}{operator/=}{vector \farg{x}, real \farg{y}}{\code{\farg{x} /=
+    y} is equivalent to \code{\farg{x} = \farg{x} / \farg{y}}.}
+\fitem{void}{operator/=}{row\_vector \farg{x}, real \farg{y}}{\code{\farg{x} /=
+    y} is equivalent to \code{\farg{x} = \farg{x} / \farg{y}}.}
+\fitem{void}{operator/=}{matrix \farg{x}, real \farg{y}}{\code{\farg{x} /=
+    y} is equivalent to \code{\farg{x} = \farg{x} / \farg{y}}.}
+\end{description}
+
+\section{Compound Elementwise Multiplication and Assignment}
+
+\begin{description}
+\fitem{void}{operator.*=}{vector \farg{x}, vector \farg{y}}{\code{\farg{x} .*=
+    y} is equivalent to \code{\farg{x} = \farg{x} .* \farg{y}}.}
+\fitem{void}{operator.*=}{row\_vector \farg{x}, row\_vector \farg{y}}{\code{\farg{x} .*=
+    y} is equivalent to \code{\farg{x} = \farg{x} .* \farg{y}}.}
+\fitem{void}{operator.*=}{matrix \farg{x}, matrix \farg{y}}{\code{\farg{x} .*=
+    y} is equivalent to \code{\farg{x} = \farg{x} .* \farg{y}}.}
+\end{description}
+
+\section{Compound Elementwise Division and Assignment}
+
+\begin{description}
+\fitem{void}{operator./=}{vector \farg{x}, vector \farg{y}}{\code{\farg{x} ./=
+    y} is equivalent to \code{\farg{x} = \farg{x} ./ \farg{y}}.}
+\fitem{void}{operator./=}{row\_vector \farg{x}, row\_vector \farg{y}}{\code{\farg{x} ./=
+    y} is equivalent to \code{\farg{x} = \farg{x} ./ \farg{y}}.}
+\fitem{void}{operator./=}{matrix \farg{x}, matrix \farg{y}}{\code{\farg{x} ./=
+    y} is equivalent to \code{\farg{x} = \farg{x} ./ \farg{y}}.}
+%
+\fitem{void}{operator./=}{vector \farg{x}, real \farg{y}}{\code{\farg{x} ./=
+    y} is equivalent to \code{\farg{x} = \farg{x} ./ \farg{y}}.}
+\fitem{void}{operator./=}{row\_vector \farg{x}, real \farg{y}}{\code{\farg{x} ./=
+    y} is equivalent to \code{\farg{x} = \farg{x} ./ \farg{y}}.}
+\fitem{void}{operator./=}{matrix \farg{x}, real \farg{y}}{\code{\farg{x} ./=
+    y} is equivalent to \code{\farg{x} = \farg{x} ./ \farg{y}}.}
+\end{description}
+
+
+
 \chapter{Ordinary Differential Equation Solvers}
 \label{functions-ode-solver.chapter}
 
@@ -3588,7 +3723,6 @@ the same size:
 An example of a complete Stan program with a system definition and
 solver call is shown for data simulation in \reffigure{sho-sim} and
 estimation in \reffigure{sho-both}.
-
 
 
 
