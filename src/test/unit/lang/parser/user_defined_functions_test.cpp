@@ -105,3 +105,7 @@ TEST(parserFunctions,funsBad17) {
               " ending in _log, _lpdf, _lpmf, _lcdf, or _lccdf.");
 }
 
+TEST(parserFunctions, badProbFunSuffix) {
+  test_throws("bad_prob_fun_Suffix",
+              "Probability function must end in _lpdf or _lpmf");
+}

@@ -1131,6 +1131,19 @@ namespace stan {
         return;
       }
 
+      if (!(ends_with("_lpdf", internal_function_name)
+            || ends_with("_lpmf", internal_function_name)
+            || ends_with("_log", internal_function_name))) {
+        pass = false;
+        error_msgs << "Probability function must end in _lpdf or _lpmf."
+                   << " Found distribution family = " << function_name
+                   << " with no corresponding probability function"
+                   << " " << function_name << "_lpdf"
+                   << ", " << function_name << "_lpmf"
+                   << ", or " << function_name << "_log" << std::endl;
+        return;
+      }
+
       if ((internal_function_name.find("multiply_log") != std::string::npos)
           || (internal_function_name.find("binomial_coefficient_log")
               != std::string::npos)) {
