@@ -15,6 +15,9 @@ namespace stan {
      * Generate code to to the specified stream to resize the
      * variables in the specified declarations and fill them with
      * dummy values.
+     * Generated code is preceeded by stmt updating global variable
+     * `current_statement_begin__` to src file line number where
+     * variable is declared.
      *
      * @param[in] vs variable declarations
      * @param[in,out] o stream for generating
@@ -24,6 +27,9 @@ namespace stan {
       var_resizing_visgen vis_resizer(o);
       init_vars_visgen vis_filler(2, o);
       for (size_t i = 0; i < vs.size(); ++i) {
+        generate_indent(2, o);
+        o << "current_statement_begin__ = " <<  vs[i].begin_line_ << ";"
+          << EOL;
         boost::apply_visitor(vis_resizer, vs[i].decl_);
         boost::apply_visitor(vis_filler, vs[i].decl_);
         if (vs[i].has_def()) {

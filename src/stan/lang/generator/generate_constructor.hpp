@@ -76,7 +76,6 @@ namespace stan {
       bool is_var_context = false;
       bool is_fun_return = false;
 
-      // need to fix generate_located_statements
       generate_located_statements(prog.derived_data_decl_.second,
                                   2, o, include_sampling, is_var_context,
                                   is_fun_return);

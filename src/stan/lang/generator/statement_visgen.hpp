@@ -13,6 +13,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <typeinfo>
 
 namespace stan {
   namespace lang {
@@ -307,9 +308,10 @@ namespace stan {
                                    is_var_context_, is_fun_return_);
         }
         o_ << EOL;
-        for (size_t i = 0; i < x.statements_.size(); ++i)
+        for (size_t i = 0; i < x.statements_.size(); ++i) {
           generate_statement(x.statements_[i], indent, o_, include_sampling_,
                              is_var_context_, is_fun_return_);
+        }
         if (has_local_vars) {
           generate_indent(indent_, o_);
           o_ << "}" << EOL;
