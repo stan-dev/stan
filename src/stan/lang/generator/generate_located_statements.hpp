@@ -30,11 +30,12 @@ namespace stan {
                                      int indent, std::ostream& o,
                                      bool include_sampling, bool is_var_context,
                                      bool is_fun_return) {
-      generate_try(indent, o);
+      //      generate_try(indent, o);
       for (size_t i = 0; i < ss.size(); ++i)
-        generate_statement(ss[i], indent + 1, o, include_sampling,
+        //        generate_statement(ss[i], indent + 1, o, include_sampling,
+        generate_statement(ss[i], indent, o, include_sampling,
                            is_var_context, is_fun_return);
-      generate_catch_throw_located(indent, o);
+      //      generate_catch_throw_located(indent, o);
     }
 
   }

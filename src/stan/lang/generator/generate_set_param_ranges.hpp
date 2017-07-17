@@ -22,15 +22,18 @@ namespace stan {
      * parameter variable is declared.
      *
      * @param[in] var_decls sequence of variable declarations
+     * @param[in] indent indentation level
      * @param[in,out] o stream for generating
      */
     void generate_set_param_ranges(const std::vector<var_decl>& var_decls,
-                                   std::ostream& o) {
-      o << INDENT2 << "num_params_r__ = 0U;" << EOL;
-      o << INDENT2 << "param_ranges_i__.clear();" << EOL;
+                                   int indent, std::ostream& o) {
+      generate_indent(indent, o);
+      o << "num_params_r__ = 0U;" << EOL;
+      generate_indent(indent, o);
+      o << "param_ranges_i__.clear();" << EOL;
       set_param_ranges_visgen vis(o);
       for (size_t i = 0; i < var_decls.size(); ++i) {
-        generate_indent(2, o);
+        generate_indent(indent, o);
         o << "current_statement_begin__ = " <<  var_decls[i].begin_line_ << ";"
           << EOL;
         boost::apply_visitor(vis, var_decls[i].decl_);

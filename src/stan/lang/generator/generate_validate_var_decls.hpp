@@ -24,15 +24,13 @@ namespace stan {
     void generate_validate_var_decls(const std::vector<var_decl> decls,
                                      int indent, std::ostream& o) {
       for (size_t i = 0; i < decls.size(); ++i) {
-        generate_indent(2, o);
+        generate_indent(indent, o);
         o << "current_statement_begin__ = " <<  decls[i].begin_line_ << ";"
           << EOL;
 
         generate_validate_var_decl(decls[i], indent, o);
       }
     }
-
-
   }
 }
 #endif
