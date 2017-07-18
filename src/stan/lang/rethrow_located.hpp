@@ -108,7 +108,7 @@ namespace stan {
       std::stringstream o;
       o << "Exception: " << e.what();
       if (line < 1) {
-        o << "  Found before start of program.";
+        o << "  in program.";
       } else {
         io::program_reader::trace_t tr = reader.trace(line);
         o << "  (in '" << tr[tr.size() - 1].first

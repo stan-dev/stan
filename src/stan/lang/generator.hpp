@@ -81,8 +81,8 @@
 #include <stan/lang/generator/generate_initialization.hpp>
 #include <stan/lang/generator/generate_local_var_decls.hpp>
 #include <stan/lang/generator/generate_local_var_inits.hpp>
-#include <stan/lang/generator/generate_located_statement.hpp>
-#include <stan/lang/generator/generate_located_statements.hpp>
+//#include <stan/lang/generator/generate_located_statement.hpp>
+//#include <stan/lang/generator/generate_located_statements.hpp>
 #include <stan/lang/generator/generate_log_prob.hpp>
 #include <stan/lang/generator/generate_member_var_decls.hpp>
 #include <stan/lang/generator/generate_member_var_decls_all.hpp>

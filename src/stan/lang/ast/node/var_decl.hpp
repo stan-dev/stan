@@ -222,8 +222,6 @@ namespace stan {
        * The line in the source code where the declaration ends.
        */
       std::size_t end_line_;
-
-
     };
 
   }

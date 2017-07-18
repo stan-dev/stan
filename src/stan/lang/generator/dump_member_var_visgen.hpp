@@ -47,7 +47,7 @@ namespace stan {
       explicit dump_member_var_visgen(size_t indent, std::ostream& o)
         : visgen(o), indent_(indent),
           var_resizer_(var_resizing_visgen(indent, o)),
-          var_size_validator_(var_size_validating_visgen(o,
+          var_size_validator_(var_size_validating_visgen(indent, o,
                                                     "data initialization")) {
       }
 
@@ -64,7 +64,6 @@ namespace stan {
         size_t indentation = indent_;
         for (size_t dim_up = 0U; dim_up < dims.size(); ++dim_up) {
           size_t dim = dims.size() - dim_up - 1U;
-          ++indentation;
           generate_indent(indentation, o_);
           o_ << "size_t " << x.name_ << "_limit_" << dim << "__ = ";
           generate_expression(dims[dim], o_);
@@ -73,14 +72,15 @@ namespace stan {
           o_ << "for (size_t i_" << dim << "__ = 0; i_"
              << dim << "__ < " << x.name_ << "_limit_" << dim
              << "__; ++i_" << dim << "__) {" << EOL;
+          ++indentation;
         }
-        generate_indent(indentation+1, o_);
+        generate_indent(indentation, o_);
         o_ << x.name_;
         for (size_t dim = 0; dim < dims.size(); ++dim)
           o_ << "[i_" << dim << "__]";
         o_ << " = vals_i__[pos__++];" << EOL;
         for (size_t dim = 0; dim < dims.size(); ++dim) {
-          generate_indent(dims.size() + 1 - dim, o_);
+          generate_indent(--indentation, o_);
           o_ << "}" << EOL;
         }
       }
@@ -96,7 +96,6 @@ namespace stan {
         size_t indentation = indent_;
         for (size_t dim_up = 0U; dim_up < dims.size(); ++dim_up) {
           size_t dim = dims.size() - dim_up - 1U;
-          ++indentation;
           generate_indent(indentation, o_);
           o_ << "size_t " << x.name_ << "_limit_" << dim << "__ = ";
           generate_expression(dims[dim], o_);
@@ -105,14 +104,15 @@ namespace stan {
           o_ << "for (size_t i_" << dim << "__ = 0; i_" << dim << "__ < "
              << x.name_ << "_limit_" << dim << "__; ++i_" << dim << "__) {"
              << EOL;
+          ++indentation;
         }
-        generate_indent(indentation+1, o_);
+        generate_indent(indentation, o_);
         o_ << x.name_;
         for (size_t dim = 0; dim < dims.size(); ++dim)
           o_ << "[i_" << dim << "__]";
         o_ << " = vals_r__[pos__++];" << EOL;
         for (size_t dim = 0; dim < dims.size(); ++dim) {
-          generate_indent(dims.size() + 1 - dim, o_);
+          generate_indent(--indentation, o_);
           o_ << "}" << EOL;
         }
       }

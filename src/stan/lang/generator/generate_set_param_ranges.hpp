@@ -31,7 +31,7 @@ namespace stan {
       o << "num_params_r__ = 0U;" << EOL;
       generate_indent(indent, o);
       o << "param_ranges_i__.clear();" << EOL;
-      set_param_ranges_visgen vis(o);
+      set_param_ranges_visgen vis(indent, o);
       for (size_t i = 0; i < var_decls.size(); ++i) {
         generate_indent(indent, o);
         o << "current_statement_begin__ = " <<  var_decls[i].begin_line_ << ";"

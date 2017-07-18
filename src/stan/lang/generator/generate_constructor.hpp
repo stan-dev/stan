@@ -6,9 +6,9 @@
 #include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_catch_throw_located.hpp>
 #include <stan/lang/generator/generate_comment.hpp>
-#include <stan/lang/generator/generate_located_statements.hpp>
 #include <stan/lang/generator/generate_member_var_inits.hpp>
 #include <stan/lang/generator/generate_set_param_ranges.hpp>
+#include <stan/lang/generator/generate_statement.hpp>
 #include <stan/lang/generator/generate_try.hpp>
 #include <stan/lang/generator/generate_validate_var_decls.hpp>
 #include <stan/lang/generator/generate_var_resizing.hpp>
@@ -79,9 +79,10 @@ namespace stan {
       bool is_var_context = false;
       bool is_fun_return = false;
 
-      generate_located_statements(prog.derived_data_decl_.second,
-                                  3, o, include_sampling, is_var_context,
-                                  is_fun_return);
+      for (size_t i = 0; i < prog.derived_data_decl_.second.size(); ++i)
+        generate_statement(prog.derived_data_decl_.second[i],
+                           3, o, include_sampling, is_var_context,
+                           is_fun_return);
       o << EOL;
       generate_comment("validate transformed data", 3, o);
       generate_validate_var_decls(prog.derived_data_decl_.first, 3, o);

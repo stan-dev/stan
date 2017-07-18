@@ -3,6 +3,7 @@
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
+#include <stan/lang/generator/generate_indent.hpp>
 #include <stan/lang/generator/generate_validate_positive.hpp>
 #include <ostream>
 #include <string>
@@ -18,6 +19,7 @@ namespace stan {
      * only use positive dimension sizes and that the var_context
      * out of which they are read have matching dimension sizes.
      *
+     * @param[in] indent indentation level
      * @param[in,out] o stream for generating
      * @param[in] stage step of processing
      * @param[in] var_name name of variable being validated
@@ -27,7 +29,8 @@ namespace stan {
      * matrix rows
      * @param[in] type_arg2 optional size of matrix columns
      */
-    void generate_validate_context_size(std::ostream& o,
+    void generate_validate_context_size(size_t indent,
+                                        std::ostream& o,
                                         const std::string& stage,
                                         const std::string& var_name,
                                         const std::string& base_type,
@@ -38,16 +41,17 @@ namespace stan {
                                           = expression()) {
       // check array dimensions
       for (size_t i = 0; i < dims.size(); ++i)
-        generate_validate_positive(var_name, dims[i], 2, o);
+        generate_validate_positive(var_name, dims[i], indent, o);
       // check vector, row_vector, and matrix rows
       if (!is_nil(type_arg1))
-        generate_validate_positive(var_name, type_arg1, 2, o);
+        generate_validate_positive(var_name, type_arg1, indent, o);
       // check matrix cols
       if (!is_nil(type_arg2))
-        generate_validate_positive(var_name, type_arg2, 2, o);
+        generate_validate_positive(var_name, type_arg2, indent, o);
 
       // calls var_context to make sure dimensions match
-      o << INDENT2 << "context__.validate_dims("
+      generate_indent(indent, o);
+      o << "context__.validate_dims("
         << '"' << stage << '"' << ", "
         << '"' << var_name << '"' << ", "
         << '"' << base_type << '"' << ", "
@@ -66,7 +70,6 @@ namespace stan {
       }
       o << "));" << EOL;
     }
-
   }
 }
 #endif
