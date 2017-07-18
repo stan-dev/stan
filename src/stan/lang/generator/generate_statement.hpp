@@ -4,6 +4,7 @@
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/is_numbered_statement_vis.hpp>
+#include <stan/lang/generator/generate_indent.hpp>
 #include <stan/lang/generator/statement_visgen.hpp>
 #include <boost/variant/apply_visitor.hpp>
 #include <ostream>

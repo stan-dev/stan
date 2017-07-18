@@ -3,6 +3,7 @@
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/generate_eigen_index_expression.hpp>
+#include <stan/lang/generator/generate_indent.hpp>
 #include <stan/lang/generator/generate_validate_positive.hpp>
 #include <stan/lang/generator/generate_void_statement.hpp>
 #include <stan/lang/generator/visgen.hpp>
