@@ -133,60 +133,58 @@ namespace stan {
       // _r2 var scope
       var_decl_r.name("variable declaration");
       var_decl_r
-        = (
-           raw[int_decl_r(_r2)
-               [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
-                          boost::phoenix::ref(error_msgs))]]
-           [add_var_decl_line_number_f(_val, begin(_1), end(_1))]
+        = (raw[int_decl_r(_r2)
+              [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
+                         boost::phoenix::ref(error_msgs))]]
+              [add_var_decl_line_number_f(_val, begin(_1), end(_1))]
            | raw[double_decl_r(_r2)
-                 [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
-                            boost::phoenix::ref(error_msgs_))]]
-           [add_var_decl_line_number_f(_val, begin(_1), end(_1))]
+                [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
+                           boost::phoenix::ref(error_msgs_))]]
+                [add_var_decl_line_number_f(_val, begin(_1), end(_1))]
            | raw[vector_decl_r(_r2)
-                 [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
-                            boost::phoenix::ref(error_msgs_))]]
-           [add_var_decl_line_number_f(_val, begin(_1), end(_1))]
+                [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
+                           boost::phoenix::ref(error_msgs_))]]
+                [add_var_decl_line_number_f(_val, begin(_1), end(_1))]
            | raw[row_vector_decl_r(_r2)
-                 [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
-                            boost::phoenix::ref(error_msgs_))]]
-           [add_var_decl_line_number_f(_val, begin(_1), end(_1))]
+                [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
+                           boost::phoenix::ref(error_msgs_))]]
+                [add_var_decl_line_number_f(_val, begin(_1), end(_1))]
            | raw[matrix_decl_r(_r2)
-                 [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
-                            boost::phoenix::ref(error_msgs_))]]
-           [add_var_decl_line_number_f(_val, begin(_1), end(_1))]
+                [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
+                           boost::phoenix::ref(error_msgs_))]]
+                [add_var_decl_line_number_f(_val, begin(_1), end(_1))]
            | raw[unit_vector_decl_r(_r2)
-                 [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
-                            boost::phoenix::ref(error_msgs_))]]
-           [add_var_decl_line_number_f(_val, begin(_1), end(_1))]
+                [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
+                           boost::phoenix::ref(error_msgs_))]]
+                [add_var_decl_line_number_f(_val, begin(_1), end(_1))]
            | raw[simplex_decl_r(_r2)
-                 [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
-                            boost::phoenix::ref(error_msgs_))]]
-           [add_var_decl_line_number_f(_val, begin(_1), end(_1))]
+                [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
+                           boost::phoenix::ref(error_msgs_))]]
+                [add_var_decl_line_number_f(_val, begin(_1), end(_1))]
            | raw[ordered_decl_r(_r2)
-                 [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
-                            boost::phoenix::ref(error_msgs_))]]
-           [add_var_decl_line_number_f(_val, begin(_1), end(_1))]
+                [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
+                           boost::phoenix::ref(error_msgs_))]]
+                [add_var_decl_line_number_f(_val, begin(_1), end(_1))]
            | raw[positive_ordered_decl_r(_r2)
-                 [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
-                            boost::phoenix::ref(error_msgs_))]]
-           [add_var_decl_line_number_f(_val, begin(_1), end(_1))]
+                [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
+                           boost::phoenix::ref(error_msgs_))]]
+                [add_var_decl_line_number_f(_val, begin(_1), end(_1))]
            | raw[cholesky_factor_decl_r(_r2)
-                 [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
-                            boost::phoenix::ref(error_msgs_))]]
-           [add_var_decl_line_number_f(_val, begin(_1), end(_1))]
+                [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
+                           boost::phoenix::ref(error_msgs_))]]
+                [add_var_decl_line_number_f(_val, begin(_1), end(_1))]
            | raw[cholesky_corr_decl_r(_r2)
-                 [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
-                            boost::phoenix::ref(error_msgs_))]]
-           [add_var_decl_line_number_f(_val, begin(_1), end(_1))]
+                [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
+                           boost::phoenix::ref(error_msgs_))]]
+                [add_var_decl_line_number_f(_val, begin(_1), end(_1))]
            | raw[cov_matrix_decl_r(_r2)
-                 [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
-                            boost::phoenix::ref(error_msgs_))]]
-           [add_var_decl_line_number_f(_val, begin(_1), end(_1))]
+                [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
+                           boost::phoenix::ref(error_msgs_))]]
+                [add_var_decl_line_number_f(_val, begin(_1), end(_1))]
            | raw[corr_matrix_decl_r(_r2)
-                 [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
-                            boost::phoenix::ref(error_msgs_))]]
-           [add_var_decl_line_number_f(_val, begin(_1), end(_1))]
-          )
+                [add_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r2,
+                           boost::phoenix::ref(error_msgs_))]]
+                [add_var_decl_line_number_f(_val, begin(_1), end(_1))])
         > eps
           [validate_decl_constraints_f(_r1, _a, _val, _pass,
                                        boost::phoenix::ref(error_msgs_)),
@@ -431,4 +429,3 @@ namespace stan {
 
 }
 #endif
-
