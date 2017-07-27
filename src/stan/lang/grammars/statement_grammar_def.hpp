@@ -105,7 +105,7 @@ namespace stan {
       statement_r.name("statement");
       statement_r
         = raw[statement_sub_r(_r1, _r2)[assign_lhs_f(_val, _1)]]
-        [add_stmt_line_number_f(_val, begin(_1), end(_1))];
+        [add_line_number_f(_val, begin(_1), end(_1))];
 
       statement_sub_r.name("statement");
       statement_sub_r

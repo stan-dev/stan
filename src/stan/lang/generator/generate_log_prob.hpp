@@ -8,6 +8,7 @@
 #include <stan/lang/generator/generate_local_var_decls.hpp>
 #include <stan/lang/generator/generate_local_var_inits.hpp>
 #include <stan/lang/generator/generate_statement.hpp>
+#include <stan/lang/generator/generate_statements.hpp>
 #include <stan/lang/generator/generate_try.hpp>
 #include <stan/lang/generator/generate_validate_transformed_params.hpp>
 #include <stan/lang/generator/generate_validate_var_decls.hpp>
@@ -48,6 +49,8 @@ namespace stan {
 
       bool is_var_context = true;
       bool is_fun_return = false;
+      bool include_sampling = true;
+
       generate_try(2, o);
 
       generate_comment("model parameters", 3, o);
@@ -59,10 +62,8 @@ namespace stan {
                                is_fun_return);
       o << EOL;
 
-      bool include_sampling = true;
-      for (size_t i = 0; i < p.derived_decl_.second.size(); ++i)
-        generate_statement(p.derived_decl_.second[i], 3, o,
-                           include_sampling, is_var_context,
+      generate_statements(p.derived_decl_.second,
+                           3, o, include_sampling, is_var_context,
                            is_fun_return);
       o << EOL;
 

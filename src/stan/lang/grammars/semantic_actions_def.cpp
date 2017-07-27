@@ -1453,24 +1453,24 @@ namespace stan {
     boost::phoenix::function<validate_non_void_expression>
     validate_non_void_expression_f;
 
-
-    void add_stmt_line_number::operator()(statement& stmt,
-                                     const pos_iterator_t& begin,
-                                     const pos_iterator_t& end) const {
-      stmt.begin_line_ = get_line(begin);
-      stmt.end_line_ = get_line(end);
+    template <typename T, typename I>
+    void add_line_number::operator()(T& line,
+                                     const I& begin,
+                                     const I& end) const {
+      line.begin_line_ = get_line(begin);
+      line.end_line_ = get_line(end);
     }
-    boost::phoenix::function<add_stmt_line_number>
-    add_stmt_line_number_f;
+    boost::phoenix::function<add_line_number>
+    add_line_number_f;
 
-    void add_var_decl_line_number::operator()(var_decl& var_decl,
-                                     const pos_iterator_t& begin,
-                                     const pos_iterator_t& end) const {
-      var_decl.begin_line_ = get_line(begin);
-      var_decl.end_line_ = get_line(end);
-    }
-    boost::phoenix::function<add_var_decl_line_number>
-    add_var_decl_line_number_f;
+    template void add_line_number::operator()(var_decl&,
+                                              const pos_iterator_t& begin,
+                                              const pos_iterator_t& end) const;
+
+
+    template void add_line_number::operator()(statement&,
+                                              const pos_iterator_t& begin,
+                                              const pos_iterator_t& end) const;
 
 
     void set_void_return::operator()(return_statement& s) const {

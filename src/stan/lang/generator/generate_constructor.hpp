@@ -8,7 +8,7 @@
 #include <stan/lang/generator/generate_comment.hpp>
 #include <stan/lang/generator/generate_member_var_inits.hpp>
 #include <stan/lang/generator/generate_set_param_ranges.hpp>
-#include <stan/lang/generator/generate_statement.hpp>
+#include <stan/lang/generator/generate_statements.hpp>
 #include <stan/lang/generator/generate_try.hpp>
 #include <stan/lang/generator/generate_validate_var_decls.hpp>
 #include <stan/lang/generator/generate_var_resizing.hpp>
@@ -79,8 +79,7 @@ namespace stan {
       bool is_var_context = false;
       bool is_fun_return = false;
 
-      for (size_t i = 0; i < prog.derived_data_decl_.second.size(); ++i)
-        generate_statement(prog.derived_data_decl_.second[i],
+      generate_statements(prog.derived_data_decl_.second,
                            3, o, include_sampling, is_var_context,
                            is_fun_return);
       o << EOL;

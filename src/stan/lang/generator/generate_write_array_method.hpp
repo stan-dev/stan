@@ -6,7 +6,7 @@
 #include <stan/lang/generator/generate_catch_throw_located.hpp>
 #include <stan/lang/generator/generate_comment.hpp>
 #include <stan/lang/generator/generate_local_var_decls.hpp>
-#include <stan/lang/generator/generate_statement.hpp>
+#include <stan/lang/generator/generate_statements.hpp>
 #include <stan/lang/generator/generate_try.hpp>
 #include <stan/lang/generator/generate_validate_var_decls.hpp>
 #include <stan/lang/generator/generate_void_statement.hpp>
@@ -79,10 +79,9 @@ namespace stan {
                                is_fun_return);
       o << EOL;
       bool include_sampling = false;
-      for (size_t i = 0; i < prog.derived_decl_.second.size(); ++i)
-        generate_statement(prog.derived_decl_.second[i], 3, o,
-                                  include_sampling, is_var_context,
-                                  is_fun_return);
+      generate_statements(prog.derived_decl_.second, 3, o,
+                         include_sampling, is_var_context,
+                         is_fun_return);
       o << EOL;
 
       generate_comment("validate transformed parameters", 3, o);
@@ -101,9 +100,8 @@ namespace stan {
                                is_var_context, is_fun_return);
 
       o << EOL;
-      for (size_t i = 0; i < prog.generated_decl_.second.size(); ++i)
-        generate_statement(prog.generated_decl_.second[i], 3, o,
-                           include_sampling, is_var_context,
+      generate_statements(prog.generated_decl_.second,
+                           3, o, include_sampling, is_var_context,
                            is_fun_return);
       o << EOL;
 
