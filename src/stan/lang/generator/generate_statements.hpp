@@ -15,9 +15,8 @@ namespace stan {
      * with flags indicating whether sampling statements are allowed
      * and whether generation is in a variable context or
      * a function return context.
-
      *
-     * @param[in] decls variable declarations
+     * @param[in] statements vector of statements
      * @param[in] indent indentation level
      * @param[in,out] o stream for generating
      * @param[in] include_sampling true if sampling statements are
