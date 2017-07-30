@@ -28,3 +28,5 @@ env:
   -  TESTFOLDER=src/test/unit/version_test.cpp
 
 script: ./runTests.py -j2 $TESTFOLDER
+
+dist: precise
