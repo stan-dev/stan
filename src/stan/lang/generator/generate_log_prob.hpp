@@ -3,11 +3,13 @@
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
+#include <stan/lang/generator/generate_catch_throw_located.hpp>
 #include <stan/lang/generator/generate_comment.hpp>
 #include <stan/lang/generator/generate_local_var_decls.hpp>
 #include <stan/lang/generator/generate_local_var_inits.hpp>
-#include <stan/lang/generator/generate_located_statement.hpp>
-#include <stan/lang/generator/generate_located_statements.hpp>
+#include <stan/lang/generator/generate_statement.hpp>
+#include <stan/lang/generator/generate_statements.hpp>
+#include <stan/lang/generator/generate_try.hpp>
 #include <stan/lang/generator/generate_validate_transformed_params.hpp>
 #include <stan/lang/generator/generate_validate_var_decls.hpp>
 #include <ostream>
@@ -47,39 +49,41 @@ namespace stan {
 
       bool is_var_context = true;
       bool is_fun_return = false;
+      bool include_sampling = true;
 
-      generate_comment("model parameters", 2, o);
-      generate_local_var_inits(p.parameter_decl_, is_var_context, true, o);
+      generate_try(2, o);
+
+      generate_comment("model parameters", 3, o);
+      generate_local_var_inits(p.parameter_decl_, is_var_context, true, 3, o);
       o << EOL;
 
-      generate_comment("transformed parameters", 2, o);
-      generate_local_var_decls(p.derived_decl_.first, 2, o, is_var_context,
+      generate_comment("transformed parameters", 3, o);
+      generate_local_var_decls(p.derived_decl_.first, 3, o, is_var_context,
                                is_fun_return);
       o << EOL;
 
-      bool include_sampling = true;
-      generate_located_statements(p.derived_decl_.second, 2, o,
-                                  include_sampling, is_var_context,
-                                  is_fun_return);
+      generate_statements(p.derived_decl_.second,
+                           3, o, include_sampling, is_var_context,
+                           is_fun_return);
       o << EOL;
 
-      generate_validate_transformed_params(p.derived_decl_.first, 2, o);
-      o << INDENT2
+      generate_validate_transformed_params(p.derived_decl_.first, 3, o);
+      o << INDENT3
         << "const char* function__ = \"validate transformed params\";"
         << EOL;
-      o << INDENT2
+      o << INDENT3
         << "(void) function__;  // dummy to suppress unused var warning"
         << EOL;
 
-      generate_validate_var_decls(p.derived_decl_.first, 2, o);
+      generate_validate_var_decls(p.derived_decl_.first, 3, o);
 
       o << EOL;
-      generate_comment("model body", 2, o);
+      generate_comment("model body", 3, o);
 
-
-      generate_located_statement(p.statement_, 2, o, include_sampling,
-                                 is_var_context, is_fun_return);
-
+      generate_statement(p.statement_, 3, o, include_sampling,
+                         is_var_context, is_fun_return);
+      o << EOL;
+      generate_catch_throw_located(2, o);
 
       o << EOL;
       o << INDENT2 << "lp_accum__.add(lp__);" << EOL;

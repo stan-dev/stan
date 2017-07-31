@@ -79,10 +79,9 @@
 #include <stan/lang/generator/generate_init_method.hpp>
 #include <stan/lang/generator/generate_initializer.hpp>
 #include <stan/lang/generator/generate_initialization.hpp>
+#include <stan/lang/generator/generate_line_number.hpp>
 #include <stan/lang/generator/generate_local_var_decls.hpp>
 #include <stan/lang/generator/generate_local_var_inits.hpp>
-#include <stan/lang/generator/generate_located_statement.hpp>
-#include <stan/lang/generator/generate_located_statements.hpp>
 #include <stan/lang/generator/generate_log_prob.hpp>
 #include <stan/lang/generator/generate_member_var_decls.hpp>
 #include <stan/lang/generator/generate_member_var_decls_all.hpp>
@@ -103,6 +102,7 @@
 #include <stan/lang/generator/generate_real_var_type.hpp>
 #include <stan/lang/generator/generate_set_param_ranges.hpp>
 #include <stan/lang/generator/generate_statement.hpp>
+#include <stan/lang/generator/generate_statements.hpp>
 #include <stan/lang/generator/generate_type.hpp>
 #include <stan/lang/generator/generate_typedef.hpp>
 #include <stan/lang/generator/generate_typedefs.hpp>

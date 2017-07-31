@@ -42,7 +42,7 @@ namespace stan {
 
       std::ostringstream buf;
       buf << in.rdbuf();
-      std::string stan_string = buf.str();
+      std::string stan_string = buf.str() + "\n";
       if (!is_nonempty(stan_string))
         *out << std::endl << "WARNING: empty program" << std::endl;
 

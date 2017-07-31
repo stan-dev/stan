@@ -22,6 +22,9 @@ namespace stan {
      * initializations, for the specified declarations, indentation
      * level, writing to the specified stream, with flags indicating
      * if its in a variable context or function return environment.
+     * Generated code is preceeded by stmt updating global variable
+     * `current_statement_begin__` to src file line number where
+     * variable is declared.
      *
      * @param[in] vs variable declarations
      * @param[in] indent indentation level
@@ -36,6 +39,9 @@ namespace stan {
       local_var_init_nan_visgen vis_init(is_var_context, indent, o);
       init_vars_visgen vis_filler(indent, o);
       for (size_t i = 0; i < vs.size(); ++i) {
+        generate_indent(indent, o);
+        o << "current_statement_begin__ = " <<  vs[i].begin_line_ << ";"
+          << EOL;
         boost::apply_visitor(vis_decl, vs[i].decl_);
         boost::apply_visitor(vis_init, vs[i].decl_);
         boost::apply_visitor(vis_filler, vs[i].decl_);
