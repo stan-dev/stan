@@ -22,13 +22,19 @@ namespace stan {
      */
     struct set_param_ranges_visgen : public visgen {
       /**
+       * Indentation level.
+       */
+      size_t indent_;
+
+      /**
        * Construct a visitor for generating ranges that writes to the
        * specified stream.
        *
+       * @param[in] indent indentation level
        * @param[in,out] o stream for generating
        */
-      explicit set_param_ranges_visgen(std::ostream& o)
-        : visgen(o) {
+      explicit set_param_ranges_visgen(size_t indent, std::ostream& o)
+        : visgen(o), indent_(indent) {
       }
 
       /**
@@ -40,10 +46,12 @@ namespace stan {
        */
       void generate_increment_i(const std::vector<expression>& dims) const {
         if (dims.size() == 0) {
-          o_ << INDENT2 << "++num_params_i__;" << EOL;
+          generate_indent(indent_, o_);
+          o_ << "++num_params_i__;" << EOL;
           return;
         }
-        o_ << INDENT2 << "num_params_r__ += ";
+        generate_indent(indent_, o_);
+        o_ << "num_params_r__ += ";
         for (size_t i = 0; i < dims.size(); ++i) {
           if (i > 0) o_ << " * ";
           generate_expression(dims[i], o_);
@@ -59,10 +67,12 @@ namespace stan {
        */
       void generate_increment(std::vector<expression> dims) const {
         if (dims.size() == 0) {
-          o_ << INDENT2 << "++num_params_r__;" << EOL;
+          generate_indent(indent_, o_);
+          o_ << "++num_params_r__;" << EOL;
           return;
         }
-        o_ << INDENT2 << "num_params_r__ += ";
+        generate_indent(indent_, o_);
+        o_ << "num_params_r__ += ";
         for (size_t i = 0; i < dims.size(); ++i) {
           if (i > 0) o_ << " * ";
           generate_expression(dims[i], o_);
@@ -80,7 +90,8 @@ namespace stan {
        */
       void generate_increment(const expression& K,
                               const std::vector<expression>& dims) const {
-        o_ << INDENT2 << "num_params_r__ += ";
+        generate_indent(indent_, o_);
+        o_ << "num_params_r__ += ";
         generate_expression(K, o_);
         for (size_t i = 0; i < dims.size(); ++i) {
           o_ << " * ";
@@ -99,7 +110,8 @@ namespace stan {
        */
       void generate_increment(const expression& M, const expression& N,
                               const std::vector<expression>& dims) const {
-        o_ << INDENT2 << "num_params_r__ += ";
+        generate_indent(indent_, o_);
+        o_ << "num_params_r__ += ";
         generate_expression(M, o_);
         o_ << " * ";
         generate_expression(N, o_);
@@ -114,7 +126,7 @@ namespace stan {
 
       void operator()(const int_var_decl& x) const {
         for (size_t i = 0; i < x.dims_.size(); ++i) {
-          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+          generate_validate_positive(x.name_, x.dims_[i], indent_, o_);
         }
         generate_increment_i(x.dims_);
         // for loop for ranges
@@ -141,15 +153,15 @@ namespace stan {
 
       void operator()(const double_var_decl& x) const {
         for (size_t i = 0; i < x.dims_.size(); ++i) {
-          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+          generate_validate_positive(x.name_, x.dims_[i], indent_, o_);
         }
         generate_increment(x.dims_);
       }
 
       void operator()(const vector_var_decl& x) const {
-        generate_validate_positive(x.name_, x.M_, 2, o_);
+        generate_validate_positive(x.name_, x.M_, indent_, o_);
         for (size_t i = 0; i < x.dims_.size(); ++i) {
-          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+          generate_validate_positive(x.name_, x.dims_[i], indent_, o_);
         }
         generate_increment(x.M_, x.dims_);
       }
@@ -157,14 +169,14 @@ namespace stan {
       void operator()(const row_vector_var_decl& x) const {
         generate_validate_positive(x.name_, x.N_, 2, o_);
         for (size_t i = 0; i < x.dims_.size(); ++i) {
-          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+          generate_validate_positive(x.name_, x.dims_[i], indent_, o_);
         }
         generate_increment(x.N_, x.dims_);
       }
 
       void operator()(const matrix_var_decl& x) const {
         generate_validate_positive(x.name_, x.M_, 2, o_);
-        generate_validate_positive(x.name_, x.N_, 2, o_);
+        generate_validate_positive(x.name_, x.N_, indent_, o_);
         for (size_t i = 0; i < x.dims_.size(); ++i) {
           generate_validate_positive(x.name_, x.dims_[i], 2, o_);
         }
@@ -172,11 +184,12 @@ namespace stan {
       }
 
       void operator()(const unit_vector_var_decl& x) const {
-        generate_validate_positive(x.name_, x.K_, 2, o_);
+        generate_validate_positive(x.name_, x.K_, indent_, o_);
         for (size_t i = 0; i < x.dims_.size(); ++i) {
-          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+          generate_validate_positive(x.name_, x.dims_[i], indent_, o_);
         }
-        o_ << INDENT2 << "num_params_r__ += (";
+        generate_indent(indent_, o_);
+        o_ << "num_params_r__ += (";
         generate_expression(x.K_, o_);
         o_ << ")";
         for (size_t i = 0; i < x.dims_.size(); ++i) {
@@ -188,11 +201,12 @@ namespace stan {
 
       void operator()(const simplex_var_decl& x) const {
         // only K-1 vals
-        generate_validate_positive(x.name_, x.K_, 2, o_);
+        generate_validate_positive(x.name_, x.K_, indent_, o_);
         for (size_t i = 0; i < x.dims_.size(); ++i) {
-          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+          generate_validate_positive(x.name_, x.dims_[i], indent_, o_);
         }
-        o_ << INDENT2 << "num_params_r__ += (";
+        generate_indent(indent_, o_);
+        o_ << "num_params_r__ += (";
         generate_expression(x.K_, o_);
         o_ << " - 1)";
         for (size_t i = 0; i < x.dims_.size(); ++i) {
@@ -203,28 +217,29 @@ namespace stan {
       }
 
       void operator()(const ordered_var_decl& x) const {
-        generate_validate_positive(x.name_, x.K_, 2, o_);
+        generate_validate_positive(x.name_, x.K_, indent_, o_);
         for (size_t i = 0; i < x.dims_.size(); ++i) {
-          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+          generate_validate_positive(x.name_, x.dims_[i], indent_, o_);
         }
         generate_increment(x.K_, x.dims_);
       }
 
       void operator()(const positive_ordered_var_decl& x) const {
-        generate_validate_positive(x.name_, x.K_, 2, o_);
+        generate_validate_positive(x.name_, x.K_, indent_, o_);
         for (size_t i = 0; i < x.dims_.size(); ++i) {
-          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+          generate_validate_positive(x.name_, x.dims_[i], indent_, o_);
         }
         generate_increment(x.K_, x.dims_);
       }
 
       void operator()(const cholesky_factor_var_decl& x) const {
-        generate_validate_positive(x.name_, x.M_, 2, o_);
-        generate_validate_positive(x.name_, x.N_, 2, o_);
+        generate_validate_positive(x.name_, x.M_, indent_, o_);
+        generate_validate_positive(x.name_, x.N_, indent_, o_);
         for (size_t i = 0; i < x.dims_.size(); ++i) {
-          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+          generate_validate_positive(x.name_, x.dims_[i], indent_, o_);
         }
-        o_ << INDENT2 << "num_params_r__ += ((";
+        generate_indent(indent_, o_);
+        o_ << "num_params_r__ += ((";
         // N * (N + 1) / 2  +  (M - N) * M
         generate_expression(x.N_, o_);
         o_ << " * (";
@@ -244,11 +259,12 @@ namespace stan {
       }
 
       void operator()(const cholesky_corr_var_decl& x) const {
-        generate_validate_positive(x.name_, x.K_, 2, o_);
+        generate_validate_positive(x.name_, x.K_, indent_, o_);
         for (size_t i = 0; i < x.dims_.size(); ++i) {
-          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+          generate_validate_positive(x.name_, x.dims_[i], indent_, o_);
         }
-        o_ << INDENT2 << "num_params_r__ += ((";
+        generate_indent(indent_, o_);
+        o_ << "num_params_r__ += ((";
         generate_expression(x.K_, o_);
         o_ << " * (";
         generate_expression(x.K_, o_);
@@ -261,12 +277,13 @@ namespace stan {
       }
 
       void operator()(const cov_matrix_var_decl& x) const {
-        generate_validate_positive(x.name_, x.K_, 2, o_);
+        generate_validate_positive(x.name_, x.K_, indent_, o_);
         for (size_t i = 0; i < x.dims_.size(); ++i) {
-          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+          generate_validate_positive(x.name_, x.dims_[i], indent_, o_);
         }
         // (K * (K - 1))/2 + K  ?? define fun(K) = ??
-        o_ << INDENT2 << "num_params_r__ += ((";
+        generate_indent(indent_, o_);
+        o_ << "num_params_r__ += ((";
         generate_expression(x.K_, o_);
         o_ << " * (";
         generate_expression(x.K_, o_);
@@ -281,11 +298,12 @@ namespace stan {
       }
 
       void operator()(const corr_matrix_var_decl& x) const {
-        generate_validate_positive(x.name_, x.K_, 2, o_);
+        generate_validate_positive(x.name_, x.K_, indent_, o_);
         for (size_t i = 0; i < x.dims_.size(); ++i) {
-          generate_validate_positive(x.name_, x.dims_[i], 2, o_);
+          generate_validate_positive(x.name_, x.dims_[i], indent_, o_);
         }
-        o_ << INDENT2 << "num_params_r__ += ((";
+        generate_indent(indent_, o_);
+        o_ << "num_params_r__ += ((";
         generate_expression(x.K_, o_);
         o_ << " * (";
         generate_expression(x.K_, o_);

@@ -3,9 +3,11 @@
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
+#include <stan/lang/generator/generate_catch_throw_located.hpp>
 #include <stan/lang/generator/generate_comment.hpp>
 #include <stan/lang/generator/generate_local_var_decls.hpp>
-#include <stan/lang/generator/generate_located_statements.hpp>
+#include <stan/lang/generator/generate_statements.hpp>
+#include <stan/lang/generator/generate_try.hpp>
 #include <stan/lang/generator/generate_validate_var_decls.hpp>
 #include <stan/lang/generator/generate_void_statement.hpp>
 #include <stan/lang/generator/write_array_visgen.hpp>
@@ -50,10 +52,9 @@ namespace stan {
       for (size_t i = 0; i < prog.parameter_decl_.size(); ++i)
         boost::apply_visitor(vis, prog.parameter_decl_[i].decl_);
 
-      // this is for all other values
-      write_array_vars_visgen vis_writer(o);
 
       // writes parameters
+      write_array_vars_visgen vis_writer(2, o);
       for (size_t i = 0; i < prog.parameter_decl_.size(); ++i)
         boost::apply_visitor(vis_writer, prog.parameter_decl_[i].decl_);
       o << EOL;
@@ -71,47 +72,49 @@ namespace stan {
       o << INDENT2 << "(void) DUMMY_VAR__;  // suppress unused var warning"
         << EOL2;
 
+      generate_try(2, o);
       bool is_var_context = false;
       bool is_fun_return = false;
-      generate_local_var_decls(prog.derived_decl_.first, 2, o, is_var_context,
+      generate_local_var_decls(prog.derived_decl_.first, 3, o, is_var_context,
                                is_fun_return);
       o << EOL;
       bool include_sampling = false;
-      generate_located_statements(prog.derived_decl_.second, 2, o,
-                                  include_sampling, is_var_context,
-                                  is_fun_return);
+      generate_statements(prog.derived_decl_.second, 3, o,
+                         include_sampling, is_var_context,
+                         is_fun_return);
       o << EOL;
 
-      generate_comment("validate transformed parameters", 2, o);
-      generate_validate_var_decls(prog.derived_decl_.first, 2, o);
+      generate_comment("validate transformed parameters", 3, o);
+      generate_validate_var_decls(prog.derived_decl_.first, 3, o);
       o << EOL;
 
-      generate_comment("write transformed parameters", 2, o);
+      generate_comment("write transformed parameters", 3, o);
       for (size_t i = 0; i < prog.derived_decl_.first.size(); ++i)
         boost::apply_visitor(vis_writer, prog.derived_decl_.first[i].decl_);
       o << EOL;
 
-      o << INDENT2 << "if (!include_gqs__) return;"
+      o << INDENT3 << "if (!include_gqs__) return;"
         << EOL;
-      generate_comment("declare and define generated quantities", 2, o);
-      generate_local_var_decls(prog.generated_decl_.first, 2, o,
+      generate_comment("declare and define generated quantities", 3, o);
+      generate_local_var_decls(prog.generated_decl_.first, 3, o,
                                is_var_context, is_fun_return);
 
       o << EOL;
-      generate_located_statements(prog.generated_decl_.second, 2, o,
-                                  include_sampling, is_var_context,
-                                  is_fun_return);
+      generate_statements(prog.generated_decl_.second,
+                           3, o, include_sampling, is_var_context,
+                           is_fun_return);
       o << EOL;
 
-      generate_comment("validate generated quantities", 2, o);
-      generate_validate_var_decls(prog.generated_decl_.first, 2, o);
+      generate_comment("validate generated quantities", 3, o);
+      generate_validate_var_decls(prog.generated_decl_.first, 3, o);
       o << EOL;
 
-      generate_comment("write generated quantities", 2, o);
+      generate_comment("write generated quantities", 3, o);
       for (size_t i = 0; i < prog.generated_decl_.first.size(); ++i)
         boost::apply_visitor(vis_writer, prog.generated_decl_.first[i].decl_);
       if (prog.generated_decl_.first.size() > 0)
         o << EOL;
+      generate_catch_throw_located(2, o);
 
       o << INDENT << "}" << EOL2;
 

@@ -517,14 +517,6 @@ namespace stan {
     validate_non_void_expression_f;
 
     // called from: statement_grammar
-    struct add_line_number : public phoenix_functor_ternary {
-      void operator()(statement& stmt,
-                      const pos_iterator_t& begin,
-                      const pos_iterator_t& end) const;
-    };
-    extern boost::phoenix::function<add_line_number> add_line_number_f;
-
-    // called from: statement_grammar
     struct set_void_return : public phoenix_functor_unary {
       void operator()(return_statement& s) const;
     };
@@ -536,9 +528,8 @@ namespace stan {
     };
     extern boost::phoenix::function<set_no_op> set_no_op_f;
 
+
     // called from: term_grammar
-
-
     struct deprecated_integrate_ode : phoenix_functor_unary {
       void operator()(std::ostream& error_msgs) const;
     };
@@ -744,6 +735,16 @@ namespace stan {
       bool operator()(const binary_op& x) const;
       bool operator()(const unary_op& x) const;
     };
+
+    // called from: var_decls_grammar
+    struct add_line_number : public phoenix_functor_ternary {
+      template <typename T, typename I>
+      void operator()(T& line,
+                      const I& begin,
+                      const I& end) const;
+    };
+    extern boost::phoenix::function<add_line_number>
+    add_line_number_f;
 
     // called from: var_decls_grammar
     struct validate_decl_constraints : public phoenix_functor_quinary {
