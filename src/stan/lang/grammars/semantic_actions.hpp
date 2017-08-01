@@ -313,8 +313,9 @@ namespace stan {
     extern boost::phoenix::function<unscope_variables> unscope_variables_f;
 
     // called from: functions_grammar
-    struct add_fun_var : public phoenix_functor_quaternary {
-      void operator()(arg_decl& decl, bool& pass, variable_map& vm,
+    struct add_fun_var : public phoenix_functor_quinary {
+      void operator()(arg_decl& decl, scope& scope, bool& pass,
+                      variable_map& vm,
                       std::ostream& error_msgs) const;
     };
     extern boost::phoenix::function<add_fun_var> add_fun_var_f;

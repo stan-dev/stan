@@ -679,7 +679,8 @@ namespace stan {
     }
     boost::phoenix::function<unscope_variables> unscope_variables_f;
 
-    void add_fun_var::operator()(arg_decl& decl, bool& pass, variable_map& vm,
+    void add_fun_var::operator()(arg_decl& decl, scope& scope, bool& pass,
+                                 variable_map& vm, 
                                  std::ostream& error_msgs) const {
       if (vm.exists(decl.name_)) {
         pass = false;
@@ -692,8 +693,11 @@ namespace stan {
         return;
       }
       pass = true;
+      origin_block var_origin = scope.program_block();
+      if (var_origin != data_origin) var_origin = function_argument_origin;
+      //      std::cout << decl.name_ << " origin " << var_origin << std::endl;
       vm.add(decl.name_, decl.base_variable_declaration(),
-             function_argument_origin);
+             var_origin);
     }
     boost::phoenix::function<add_fun_var> add_fun_var_f;
 
