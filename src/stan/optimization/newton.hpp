@@ -17,7 +17,7 @@ namespace stan {
     // Negates any positive eigenvalues in H so that H is negative
     // definite, and then solves Hu = g and stores the result into
     // g. Avoids problems due to non-log-concave distributions.
-    void make_negative_definite_and_solve(matrix_d& H, vector_d& g) {
+    inline void make_negative_definite_and_solve(matrix_d& H, vector_d& g) {
       Eigen::SelfAdjointEigenSolver<matrix_d> solver(H);
       matrix_d eigenvectors = solver.eigenvectors();
       vector_d eigenvalues = solver.eigenvalues();
