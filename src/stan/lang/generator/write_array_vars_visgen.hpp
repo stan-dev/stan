@@ -20,12 +20,19 @@ namespace stan {
      */
     struct write_array_vars_visgen : public visgen {
       /**
+       * Indentation level.
+       */
+      size_t indent_;
+
+      /**
        * Construct a variable array writer visitor for the specified
        * stream.
        *
+       * @param[in] indent indentation level
        * @param[in,out] o stream for generating
        */
-      explicit write_array_vars_visgen(std::ostream& o) : visgen(o) { }
+      explicit write_array_vars_visgen(size_t indent, std::ostream& o)
+        : visgen(o), indent_(indent) { }
 
       /**
        * Write a variable with the specified name, array dimension
@@ -42,20 +49,21 @@ namespace stan {
         for (size_t i = 0; i < matdims.size(); ++i)
           dims.push_back(matdims[i]);
         if (dims.size() == 0) {
-          o_ << INDENT2 << "vars__.push_back(" << name << ");" << EOL;
+          generate_indent(indent_, o_);
+          o_ << "vars__.push_back(" << name << ");" << EOL;
           return;
         }
         // for (size_t i = 0; i < dims.size(); ++i) {
         for (size_t i = dims.size(); i > 0; ) {
           --i;
-          generate_indent((dims.size() - i) + 1, o_);
+          generate_indent((dims.size() - i) + indent_, o_);
           o_ << "for (int k_" << i << "__ = 0;"
              << " k_" << i << "__ < ";
           generate_expression(dims[i], o_);
           o_ << "; ++k_" << i << "__) {" << EOL;
         }
 
-        generate_indent(dims.size() + 2, o_);
+        generate_indent(dims.size() + indent_, o_);
         o_ << "vars__.push_back(" << name;
         if (arraydims.size() > 0) {
           o_ << '[';
@@ -74,7 +82,7 @@ namespace stan {
         o_ << ");" << EOL;
 
         for (size_t i = dims.size(); i > 0; --i) {
-          generate_indent(i + 1, o_);
+          generate_indent(i + indent_, o_);
           o_ << "}" << EOL;
         }
       }

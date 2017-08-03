@@ -28,6 +28,11 @@ namespace stan {
      */
     struct init_visgen : public visgen {
       /**
+       * Indentation level.
+       */
+      size_t indent_;
+
+      /**
        * Visitor for validating variable sizes
        */
       var_size_validating_visgen var_size_validator_;
@@ -36,10 +41,12 @@ namespace stan {
        * Construct a visitor to generate initializations to the
        * specialized stream.
        *
+       * @param[in] indent indentation level
        * @param[in,out] o stream for generating
        */
-      explicit init_visgen(std::ostream& o)
-        : visgen(o), var_size_validator_(o, "initialization") {  }
+      explicit init_visgen(size_t indent, std::ostream& o)
+        : visgen(o), indent_(indent),
+          var_size_validator_(indent, o, "initialization") {  }
 
       /**
        * Generate the suffix for the appropriate unconstraining
@@ -76,22 +83,19 @@ namespace stan {
       }
 
       /**
-       * Generate the loop over the specified dimension sizes at the
-       * specified indent level.
+       * Generate the loop over the specified dimension sizes.
        *
        * @param[in] dims dimension sizes
-       * @param[in] indent indentation level
        */
-      void generate_dims_loop_fwd(const std::vector<expression>& dims,
-                                  int indent = 2U) const {
+      void generate_dims_loop_fwd(const std::vector<expression>& dims) const {
         size_t size = dims.size();
         for (size_t i = 0; i < size; ++i) {
-          generate_indent(i + indent, o_);
+          generate_indent(i + indent_, o_);
           o_ << "for (int i" << i << "__ = 0U; i" << i << "__ < ";
           generate_expression(dims[i].expr_, o_);
           o_ << "; ++i" << i << "__)" << EOL;
         }
-        generate_indent(2U + dims.size(), o_);
+        generate_indent(indent_ + dims.size(), o_);
       }
 
       /**
@@ -121,24 +125,20 @@ namespace stan {
                                const std::string& var_name,
                                const std::vector<expression>& dims) const {
         generate_dims_loop_fwd(dims);
-        o_ << "try {"
-           << EOL
-           << INDENT3
-           << "writer__." << write_method_name;
+        o_ << "try {" << EOL;
+        generate_indent(indent_ + 1, o_);
+        o_ << "writer__." << write_method_name;
         generate_name_dims(var_name, dims.size());
-        o_ << ");"
-           << EOL
-           << INDENT2
-           << "} catch (const std::exception& e) { "
-           << EOL
-           << INDENT3
-           << "throw std::runtime_error("
+        o_ << ");" << EOL;
+        generate_indent(indent_, o_);
+        o_ << "} catch (const std::exception& e) { " << EOL;
+        generate_indent(indent_ + 1, o_);
+        o_ << "throw std::runtime_error("
            << "std::string(\"Error transforming variable "
            << var_name << ": \") + e.what());"
-           << EOL
-           << INDENT2
-           << "}"
            << EOL;
+        generate_indent(indent_, o_);
+        o_ << "}" << EOL;
       }
 
       /**
@@ -162,8 +162,7 @@ namespace stan {
                                 const expression& type_arg2 = expression(),
                                 const expression& definition = expression())
       const {
-        o_ << INDENT2 << "// generate_declaration " << name << std::endl;
-        o_ << INDENT2;
+        generate_indent(indent_, o_);
         generate_type(base_type, dims, dims.size(), o_);
         o_ << ' ' << name;
         generate_initializer(o_, base_type, dims, type_arg1, type_arg2);
@@ -193,6 +192,7 @@ namespace stan {
        * the specified name, base type, dimension sizes, vector/matrix
        * dimension sizes, and indentation level.
        *
+       * @param[in] indent indentation level
        * @param[in] base_type base type of variable as string
        * @param[in] name variable name
        * @param[in] dims dimension sizes
@@ -201,12 +201,12 @@ namespace stan {
        * @param[in] dim2 optional matrix number of columns
        * @param[in] indent optional indentation level
        */
-      void generate_buffer_loop(const std::string& base_type,
+      void generate_buffer_loop(size_t indent,
+                                const std::string& base_type,
                                 const std::string& name,
                                 const std::vector<expression>& dims,
                                 const expression& dim1 = expression(),
-                                const expression& dim2 = expression(),
-                                int indent = 2U) const {
+                                const expression& dim2 = expression()) const {
         size_t size = dims.size();
         bool is_matrix = !is_nil(dim1) && !is_nil(dim2);
         bool is_vector = !is_nil(dim1) && is_nil(dim2);
@@ -253,14 +253,16 @@ namespace stan {
        * @param[in] name name of integer variable
        */
       void generate_check_int(const std::string& name) const {
-        o_ << EOL << INDENT2
-           << "if (!(context__.contains_i(\"" << name << "\")))"
-           << EOL << INDENT3
-           << "throw std::runtime_error(\"variable " << name << " missing\");"
+        o_ << EOL;
+        generate_indent(indent_, o_);
+        o_ << "if (!(context__.contains_i(\"" << name << "\")))" << EOL;
+        generate_indent(indent_ + 1, o_);
+        o_ << "throw std::runtime_error(\"variable " << name << " missing\");"
            << EOL;
-        o_ << INDENT2 << "vals_i__ = context__.vals_i(\"" << name << "\");"
-           << EOL;
-        o_ << INDENT2 << "pos__ = 0U;" << EOL;
+        generate_indent(indent_, o_);
+        o_ << "vals_i__ = context__.vals_i(\"" << name << "\");" << EOL;
+        generate_indent(indent_, o_);
+        o_ << "pos__ = 0U;" << EOL;
       }
 
       /**
@@ -270,14 +272,16 @@ namespace stan {
        * @param[in] name variable name
        */
       void generate_check_double(const std::string& name) const {
-        o_ << EOL << INDENT2
-           << "if (!(context__.contains_r(\"" << name << "\")))"
-           << EOL << INDENT3
-           << "throw std::runtime_error(\"variable " << name << " missing\");"
+        o_ << EOL;
+        generate_indent(indent_, o_);
+        o_ << "if (!(context__.contains_r(\"" << name << "\")))" << EOL;
+        generate_indent(indent_ + 1, o_);
+        o_ << "throw std::runtime_error(\"variable " << name << " missing\");"
            << EOL;
-        o_ << INDENT2
-           << "vals_r__ = context__.vals_r(\"" << name << "\");" << EOL;
-        o_ << INDENT2 << "pos__ = 0U;" << EOL;
+        generate_indent(indent_, o_);
+        o_ << "vals_r__ = context__.vals_r(\"" << name << "\");" << EOL;
+        generate_indent(indent_, o_);
+        o_ << "pos__ = 0U;" << EOL;
       }
 
       void operator()(const double_var_decl& x) const {
@@ -285,7 +289,7 @@ namespace stan {
         var_size_validator_(x);
         generate_declaration(x.name_, "double", x.dims_, nil(), nil(), x.def_);
         if (is_nil(x.def_)) {
-          generate_buffer_loop("r", x.name_, x.dims_);
+          generate_buffer_loop(indent_, "r", x.name_, x.dims_);
         }
         generate_write_loop(function_args("scalar", x),
                             x.name_, x.dims_);
@@ -296,7 +300,7 @@ namespace stan {
         generate_check_int(x.name_);
         var_size_validator_(x);
         generate_declaration(x.name_, "int", x.dims_, nil(), nil(), x.def_);
-        generate_buffer_loop("i", x.name_, x.dims_);
+        generate_buffer_loop(indent_, "i", x.name_, x.dims_);
         generate_write_loop("integer(", x.name_, x.dims_);
       }
 
@@ -304,7 +308,7 @@ namespace stan {
         generate_check_double(x.name_);
         var_size_validator_(x);
         generate_declaration(x.name_, "vector_d", x.dims_, x.M_, nil(), x.def_);
-        generate_buffer_loop("r", x.name_, x.dims_, x.M_);
+        generate_buffer_loop(indent_, "r", x.name_, x.dims_, x.M_);
         generate_write_loop(function_args("vector", x),
                             x.name_, x.dims_);
       }
@@ -314,7 +318,7 @@ namespace stan {
         var_size_validator_(x);
         generate_declaration(x.name_, "row_vector_d", x.dims_, x.N_, nil(),
                              x.def_);
-        generate_buffer_loop("r", x.name_, x.dims_, x.N_);
+        generate_buffer_loop(indent_, "r", x.name_, x.dims_, x.N_);
         generate_write_loop(function_args("row_vector", x),
                             x.name_, x.dims_);
       }
@@ -323,7 +327,7 @@ namespace stan {
         generate_check_double(x.name_);
         var_size_validator_(x);
         generate_declaration(x.name_, "matrix_d", x.dims_, x.M_, x.N_, x.def_);
-        generate_buffer_loop("r", x.name_, x.dims_, x.M_, x.N_);
+        generate_buffer_loop(indent_, "r", x.name_, x.dims_, x.M_, x.N_);
         generate_write_loop(function_args("matrix", x),
                             x.name_, x.dims_);
       }
@@ -332,7 +336,7 @@ namespace stan {
         generate_check_double(x.name_);
         var_size_validator_(x);
         generate_declaration(x.name_, "vector_d", x.dims_, x.K_, nil(), x.def_);
-        generate_buffer_loop("r", x.name_, x.dims_, x.K_);
+        generate_buffer_loop(indent_, "r", x.name_, x.dims_, x.K_);
         generate_write_loop("unit_vector_unconstrain(", x.name_, x.dims_);
       }
 
@@ -340,7 +344,7 @@ namespace stan {
         generate_check_double(x.name_);
         var_size_validator_(x);
         generate_declaration(x.name_, "vector_d", x.dims_, x.K_, nil(), x.def_);
-        generate_buffer_loop("r", x.name_, x.dims_, x.K_);
+        generate_buffer_loop(indent_, "r", x.name_, x.dims_, x.K_);
         generate_write_loop("simplex_unconstrain(", x.name_, x.dims_);
       }
 
@@ -348,7 +352,7 @@ namespace stan {
         generate_check_double(x.name_);
         var_size_validator_(x);
         generate_declaration(x.name_, "vector_d", x.dims_, x.K_, nil(), x.def_);
-        generate_buffer_loop("r", x.name_, x.dims_, x.K_);
+        generate_buffer_loop(indent_, "r", x.name_, x.dims_, x.K_);
         generate_write_loop("ordered_unconstrain(", x.name_, x.dims_);
       }
 
@@ -356,7 +360,7 @@ namespace stan {
         generate_check_double(x.name_);
         var_size_validator_(x);
         generate_declaration(x.name_, "vector_d", x.dims_, x.K_, nil(), x.def_);
-        generate_buffer_loop("r", x.name_, x.dims_, x.K_);
+        generate_buffer_loop(indent_, "r", x.name_, x.dims_, x.K_);
         generate_write_loop("positive_ordered_unconstrain(", x.name_, x.dims_);
       }
 
@@ -364,7 +368,7 @@ namespace stan {
         generate_check_double(x.name_);
         var_size_validator_(x);
         generate_declaration(x.name_, "matrix_d", x.dims_, x.M_, x.N_, x.def_);
-        generate_buffer_loop("r", x.name_, x.dims_, x.M_, x.N_);
+        generate_buffer_loop(indent_, "r", x.name_, x.dims_, x.M_, x.N_);
         generate_write_loop("cholesky_factor_unconstrain(", x.name_, x.dims_);
       }
 
@@ -372,7 +376,7 @@ namespace stan {
         generate_check_double(x.name_);
         var_size_validator_(x);
         generate_declaration(x.name_, "matrix_d", x.dims_, x.K_, x.K_, x.def_);
-        generate_buffer_loop("r", x.name_, x.dims_, x.K_, x.K_);
+        generate_buffer_loop(indent_, "r", x.name_, x.dims_, x.K_, x.K_);
         generate_write_loop("cholesky_corr_unconstrain(", x.name_, x.dims_);
       }
 
@@ -380,7 +384,7 @@ namespace stan {
         generate_check_double(x.name_);
         var_size_validator_(x);
         generate_declaration(x.name_, "matrix_d", x.dims_, x.K_, x.K_, x.def_);
-        generate_buffer_loop("r", x.name_, x.dims_, x.K_, x.K_);
+        generate_buffer_loop(indent_, "r", x.name_, x.dims_, x.K_, x.K_);
         generate_write_loop("cov_matrix_unconstrain(", x.name_, x.dims_);
       }
 
@@ -388,7 +392,7 @@ namespace stan {
         generate_check_double(x.name_);
         var_size_validator_(x);
         generate_declaration(x.name_, "matrix_d", x.dims_, x.K_, x.K_, x.def_);
-        generate_buffer_loop("r", x.name_, x.dims_, x.K_, x.K_);
+        generate_buffer_loop(indent_, "r", x.name_, x.dims_, x.K_, x.K_);
         generate_write_loop("corr_matrix_unconstrain(", x.name_, x.dims_);
       }
     };

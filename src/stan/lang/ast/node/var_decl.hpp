@@ -212,6 +212,16 @@ namespace stan {
        * The variable declaration variant type.
        */
       var_decl_t decl_;
+
+      /**
+       * The line in the source code where the declaration begins.
+       */
+      std::size_t begin_line_;
+
+      /**
+       * The line in the source code where the declaration ends.
+       */
+      std::size_t end_line_;
     };
 
   }

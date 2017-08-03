@@ -24,6 +24,11 @@ namespace stan {
      */
     struct init_local_var_visgen : public visgen {
       /**
+       * Indentation level.
+       */
+      size_t indent_;
+
+      /**
        * Flag indicating if variables need to be declared.
        */
       const bool declare_vars_;
@@ -42,11 +47,12 @@ namespace stan {
        * @param[in] declare_vars true if variables need to be declared
        * @param[in] is_var_context true if generation is in a
        * variable context
+       * @param[in] indent indentation level
        * @param[in,out] o stream for generating
        */
       explicit init_local_var_visgen(bool declare_vars, bool is_var_context,
-                                     std::ostream& o)
-        : visgen(o), declare_vars_(declare_vars),
+                                     size_t indent, std::ostream& o)
+        : visgen(o), indent_(indent), declare_vars_(declare_vars),
           is_var_context_(is_var_context) {  }
 
       void generate_initialize_array(const std::string& var_type,
@@ -55,7 +61,7 @@ namespace stan {
                                  const std::string& name,
                                  const std::vector<expression>& dims) const {
         if (declare_vars_) {
-          o_ << INDENT2;
+          generate_indent(indent_, o_);
           for (size_t i = 0; i < dims.size(); ++i) o_ << "vector<";
           o_ << var_type;
           for (size_t i = 0; i < dims.size(); ++i) o_ << "> ";
@@ -64,11 +70,12 @@ namespace stan {
         }
 
         if (dims.size() == 0) {
-          generate_void_statement(name, 2, o_);
-          o_ << INDENT2 << "if (jacobian__)" << EOL;
+          generate_void_statement(name, indent_, o_);
+          generate_indent(indent_, o_);
+          o_ << "if (jacobian__)" << EOL;
 
           // w Jacobian
-          generate_indent(3, o_);
+          generate_indent(indent_ + 1, o_);
           o_ << name << " = in__." << read_type  << "_constrain(";
           for (size_t j = 0; j < read_args.size(); ++j) {
             if (j > 0) o_ << ",";
@@ -79,10 +86,11 @@ namespace stan {
           o_ << "lp__";
           o_ << ");" << EOL;
 
-          o_ << INDENT2 << "else" << EOL;
+          generate_indent(indent_, o_);
+          o_ << "else" << EOL;
 
           // w/o Jacobian
-          generate_indent(3, o_);
+          generate_indent(indent_ + 1, o_);
           o_ << name << " = in__." << read_type  << "_constrain(";
           for (size_t j = 0; j < read_args.size(); ++j) {
             if (j > 0) o_ << ",";
@@ -94,24 +102,24 @@ namespace stan {
           // dims > 0
           std::string name_dims(name);
           for (size_t i = 0; i < dims.size(); ++i) {
-            generate_indent(i + 2, o_);
+            generate_indent(indent_ + i, o_);
             o_ << "size_t dim_"  << name << "_" << i << "__ = ";
             generate_expression(dims[i], o_);
             o_ << ";" << EOL;
 
             if (i < dims.size() - 1) {
-              generate_indent(i + 2, o_);
+              generate_indent(indent_ + i, o_);
               o_ << name_dims << ".resize(dim" << "_"
                  << name << "_" << i << "__);"
                  << EOL;
               name_dims.append("[k_").append(to_string(i)).append("__]");
             }
 
-            generate_indent(i + 2, o_);
+            generate_indent(indent_ + i, o_);
             if (i == dims.size() - 1) {
               o_ << name_dims << ".reserve(dim_" << name
                  << "_" << i << "__);" << EOL;
-              generate_indent(i + 2, o_);
+              generate_indent(indent_ + i, o_);
             }
 
             o_ << "for (size_t k_" << i << "__ = 0;"
@@ -120,11 +128,11 @@ namespace stan {
 
             // if on the last loop, push read element into array
             if (i == dims.size() - 1) {
-              generate_indent(i + 3, o_);
+              generate_indent(indent_ + i + 1, o_);
               o_ << "if (jacobian__)" << EOL;
 
               // w Jacobian
-              generate_indent(i + 4, o_);
+              generate_indent(indent_ + i + 2, o_);
               o_ << name_dims << ".push_back(in__."
                  << read_type << "_constrain(";
               for (size_t j = 0; j < read_args.size(); ++j) {
@@ -136,11 +144,11 @@ namespace stan {
               o_ << "lp__";
               o_ << "));" << EOL;
 
-              generate_indent(i + 3, o_);
+              generate_indent(indent_ + i + 1, o_);
               o_ << "else" << EOL;
 
               // w/o Jacobian
-              generate_indent(i + 4, o_);
+              generate_indent(indent_ + i + 2, o_);
               o_ << name_dims << ".push_back(in__."
                  << read_type << "_constrain(";
               for (size_t j = 0; j < read_args.size(); ++j) {
@@ -152,7 +160,7 @@ namespace stan {
           }
 
           for (size_t i = dims.size(); i > 0; --i) {
-            generate_indent(i + 1, o_);
+            generate_indent(indent_ + i - 1, o_);
             o_ << "}" << EOL;
           }
         }

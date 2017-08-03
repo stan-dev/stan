@@ -39,7 +39,7 @@ namespace stan {
       o << INDENT2 << "std::vector<double> vals_r__;" << EOL;
       o << INDENT2 << "std::vector<int> vals_i__;"
         << EOL;
-      init_visgen vis(o);
+      init_visgen vis(2, o);
       for (size_t i = 0; i < vs.size(); ++i)
         boost::apply_visitor(vis, vs[i].decl_);
 

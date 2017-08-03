@@ -2,8 +2,10 @@
 #define STAN_LANG_GENERATOR_GENERATE_FUNCTION_BODY_HPP
 
 #include <stan/lang/ast.hpp>
+#include <stan/lang/generator/generate_catch_throw_located.hpp>
 #include <stan/lang/generator/constants.hpp>
-#include <stan/lang/generator/generate_located_statement.hpp>
+#include <stan/lang/generator/generate_statement.hpp>
+#include <stan/lang/generator/generate_try.hpp>
 #include <ostream>
 #include <string>
 
@@ -43,8 +45,10 @@ namespace stan {
       bool is_fun_return = true;
       bool include_sampling = true;
       o << INDENT << "int current_statement_begin__ = -1;" << EOL;
-      generate_located_statement(fun.body_, 1, o, include_sampling,
-                                 is_var_context, is_fun_return);
+      generate_try(1, o);
+      generate_statement(fun.body_, 2, o, include_sampling,
+                         is_var_context, is_fun_return);
+      generate_catch_throw_located(1, o);
       o << "}" << EOL;
     }
 
