@@ -1061,7 +1061,8 @@ care must be taken to ensure the posterior is both proper and not
 overly sensitive either statistically or computationally to wide tails
 in the priors.
 
-\subsection{Boundary-Avoiding Priors for MLE in Hierarchical Models}
+\subsection{Boundary-Avoiding Priors for MLE in Hierarchical
+Models}\label{bound-avoid-priors.subsection}
 
 The fundamental problem with maximum likelihood estimation (MLE) in
 the hierarchical model setting is that as the hierarchical variance
@@ -7480,10 +7481,11 @@ functions, so our prior should put non-negligible mass on both sets of
 functions. In this case, an inverse gamma, \code{inv\_gamma\_lpdf} in Stan's
 language, will work well as it has a sharp left tail that puts negligible mass
 on infinitesimal length-scales, but a generous right tail, allowing for large
-length-scales. Inverse gamma priors are zero-avoiding because the density is
-zero at zero, so the posterior for length-scale will be pushed away from zero,
-leading to very little posterior mass on functions that perfectly interpolate
-the observed data.
+length-scales. Inverse gamma priors will avoid infinitesimal length-scales
+because the density is zero at zero, so the posterior for length-scale will be
+pushed away from zero. An inverse gamma distribution is one of many
+zero-avoiding or boundary-avoiding distributions. See
+\ref{bound-avoid-priors.subsection} for more on boundary-avoiding priors.
 
 If we're using the GP as a component in a larger model that includes an overall
 mean and fixed effects for the same variables we're using as the domain for the
