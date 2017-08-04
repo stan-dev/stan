@@ -12,21 +12,21 @@ $(LIBGTEST): $(LIBGTEST)(test/gtest.o)
 
 test/gtest.o: $(GTEST)/src/gtest-all.cc
 	@mkdir -p test
-	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
+	$(COMPILE.cc) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
 
 ##
 # Rule for building a test
 ##
 test/%.o : src/test/%_test.cpp
 	@mkdir -p $(dir $@)
-	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
+	$(COMPILE.cc) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
 
 ##
 # Rule for building a test executable
 ##
 test/%$(EXE) : test/%.o $(LIBGTEST) $(LIBCVODES)
 	@mkdir -p $(dir $@)
-	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LIBCVODES)
+	$(LINK.cc) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LIBCVODES)
 
 
 ##
@@ -51,7 +51,7 @@ test/%.d : src/test/%_test.cpp
 	@mkdir -p $(dir $@)
 	@set -e; \
 	rm -f $@; \
-	$(CC) $(CFLAGS) -O$O $(CFLAGS_GTEST) $(TARGET_ARCH) -MM $< > $@.$$$$; \
+	$(COMPILE.cc) -O$O $(CFLAGS_GTEST) $(TARGET_ARCH) -MM $< > $@.$$$$; \
 	sed -e 's,\($(notdir $*)\)\(_test\)\.o[ :]*,$(dir $@)\1\$(EXE) $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
 
@@ -60,7 +60,7 @@ test/test-models/stanc.d : src/test/test-models/stanc.cpp
 	@mkdir -p $(dir $@)
 	@set -e; \
 	rm -f $@; \
-	$(CC) $(CFLAGS) -O$O $(CFLAGS_GTEST) $(TARGET_ARCH) -MM $< > $@.$$$$; \
+	$(COMPILE.cc) -O$O $(CFLAGS_GTEST) $(TARGET_ARCH) -MM $< > $@.$$$$; \
 	sed -e 's,\($(basename $(@F))\)\.o[ :]*,$(dir $@)\1\$(EXE) $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
 
@@ -89,7 +89,7 @@ endif
 ##
 .PHONY: %.hpp-test
 src/test/test-models/good/%.hpp-test : src/test/test-models/good/%.hpp test/test-model-main.cpp
-	$(COMPILE.c) -O0 -include $< -o $(DEV_NULL) test/test-model-main.cpp
+	$(COMPILE.cc) -O0 -include $< -o $(DEV_NULL) test/test-model-main.cpp
 
 test/test-model-main.cpp:
 	@mkdir -p test
@@ -118,7 +118,7 @@ test/test-model-main.cpp:
 
 .PHONY: HEADER_TESTS
 %.hpp-test : %.hpp test/dummy.cpp
-	$(COMPILE.c) -O0 -include $< -o $(DEV_NULL) test/dummy.cpp
+	$(COMPILE.cc) -O0 -include $< -o $(DEV_NULL) test/dummy.cpp
 
 test/dummy.cpp:
 	@mkdir -p test
@@ -135,11 +135,11 @@ test-headers: $(HEADER_TESTS)
 
 test/unit/multiple_translation_units%.o : src/test/unit/multiple_translation_units%.cpp
 	@mkdir -p $(dir $@)
-	$(COMPILE.c) -O$O $< $(OUTPUT_OPTION)
+	$(COMPILE.cc) -O$O $< $(OUTPUT_OPTION)
 
 test/unit/libmultiple.so : test/unit/multiple_translation_units1.o test/unit/multiple_translation_units2.o
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -shared $(OUTPUT_OPTION) $^
+	$(COMPILE.cc) -shared $(OUTPUT_OPTION) $^
 
 src/test/unit/multiple_translation_units_test.cpp : test/unit/libmultiple.so
 
@@ -153,7 +153,7 @@ src/test/unit/multiple_translation_units_test.cpp : test/unit/libmultiple.so
 .PRECIOUS: test/test-models/stanc$(EXE)
 test/test-models/stanc$(EXE) : src/test/test-models/stanc.cpp bin/libstanc.a
 	@mkdir -p $(dir $@)
-	$(LINK.c) -O$(O_STANC) $(OUTPUT_OPTION) $< $(LDLIBS_STANC)
+	$(LINK.cc) -O$(O_STANC) $(OUTPUT_OPTION) $< $(LDLIBS_STANC)
 
 TEST_MODELS := $(shell find src/test/test-models -type f -name '*.stan')
 $(patsubst %.stan,%.hpp,$(TEST_MODELS)) : %.hpp : %.stan test/test-models/stanc$(EXE)
