@@ -8046,6 +8046,154 @@ can be modeled directly with ad-hoc predictors for holidays and
 weekends, or with data normalization back to natural scales for
 daylight savings time.
 
+\chapter{Solving Algebraic Equations}\label{algebra-solver.chapter}
+
+\noindent
+Stan provides a built-in mechanism for specifying and solving systems
+of algebraic equations. The function signatures for Stan's algebraic solver
+can be found in \refchapter{functions-algebraic-solver}.
+%
+Solving any system of algebraic equations can be translated into a root-finding
+problem, that is, given a function $f(x)$, we wish to find $x$ such that
+$f(x) = 0$.
+
+\section{Example: System of Nonlinear Algebraic Equations}
+
+For systems of linear algebraic equations, we recommend solving the system
+using an inverse matrix. The algebraic solver becomes handy when we want
+to solve nonlinear equations.
+%
+As an illustrative example, we consider a nonlinear system of two equations
+with two unknowns. Our goal is to simultaneously solve all equations for
+$x_1$ and $x_2$, such that the vector function $z$ goes to 0. 
+%
+\begin{eqnarray}\label{algebra.equation}
+  \begin{aligned}
+  z_1 &= x_1 - \theta_1 \\
+  z_2 &= x_1 x_2 + \theta_2 \\
+  \end{aligned}
+\end{eqnarray}
+%
+
+\section{Coding an Algebraic System}
+
+A system of algebraic equations is coded directly in Stan as a function with a
+strictly specified signature. For example, the nonlinear system given by
+\refequation{algebra.equation} can be coded using the following function
+in Stan (see \refchapter{functions-programming} for
+more information on coding user-defined functions).
+%
+\begin{stancode}
+real[] system(real[] x,       // unknowns
+               real[] theta,  // parameters
+               real[] dat_r,    // data (real)
+               real[] dat_i) {  // data (integer)
+  real z[2];
+  z[1] = x[1] - theta[1];
+  z[2] = x[1] * x[2] - theta[2];
+  return z;
+}
+\end{stancode}
+%
+The function takes the unknowns we wish to solve for in \code{x} (a real array),
+the system parameters in \code{theta} (a real array), the real data in
+\code{dat\_r} (a real array) and the integer data in \code{dat\_i} (an integer array). The
+system function returns the value of the function, for which we want to compute the roots. 
+Our example does not use real or integer data. Nevertheless, these
+unused arguments must be included in the system function with exactly the
+signature above.
+
+\subsubsection{Strict Signature}  
+%
+The function defining the system must have exactly these argument types and
+return type. This may require passing in zero-length arrays for data or parameter
+if the system does not involve data or parameters.
+
+\section{Calling the Algebraic Solver}
+%
+Let's suppose $\theta = \{3, 6\}$. To call the algebraic solver, we need to
+provide an initial guess. A good guess can significantly speed up the solver and
+even determine whether the solver converges or not.
+%
+The following code returns the solution to our nonlinear algebraic system:
+%
+\begin{stancode}
+transformed data {
+  real guess[2] = {1, 1};
+  real dat_r[0];
+  int dar_i[0];
+}
+
+transformed parameters {
+  real theta[2] = {3, 6};
+  real x[2];
+
+  x = algebra_solver(guess, theta, dat_r, dat_i);
+}
+\end{stancode}
+
+which returns $x = \{3, -2\}$.
+
+\subsection{Data versus Parameters}
+The arguments for the initial guess \code{guess}, the real data \code{dat\_r}, and
+the integer data \code{dat\_i} must be expressions that only involve data or
+transformed data variables. The parameters \code{theta} is the only argument
+which may involve parameters.
+
+\subsection{Length of the Algebraic Function and of the Vector of Unknowns}
+The Jacobian of the solution with respect to the parameters is computed
+using the implicit function theorem, which places certain restrictions. In particular,
+the Jacobian of the algebraic function $f$ with respect to the unknowns $x$ must
+be invertible. This requires the Jacobian to be square, meaning \textit{$f(x)$ and
+$x$ have the same length} or, in other words \textit{the number of equations in
+the system is the same as the number of unknowns.}
+
+\subsection{Pathological Solutions}
+Certain systems may be degenerate, meaning they have multiple solutions. The 
+algebraic solver will not report these cases, as the algorithm stops once it has found
+an acceptable solution. The initial guess will often determine which solution gets found
+first. The degeneracy may be broken by putting additional constraints on the solution.
+For instance, it might make physical sense for a solution to be positive or negative.
+
+On the other hand, a system may not have a solution (for a given point in the parameter
+space). In that case, the solver will not converge to a solution. When the solver fails to
+do so, the current metropolis proposal gets rejected.
+
+\section{Control Parameters for the Algebraic Solver}
+%
+The call to the algebraic solver shown above uses the default control settings. The solver
+allows three additional parameters, all of which must be supplied if any of them is
+required.
+%
+\begin{stancode}
+  x = algebra_solver(guess, theta, dat_r, dat_i, 
+                     rel_tol, f_tol, max_steps);
+\end{stancode}
+
+The three control arguments are relative tolerance, function tolerance, and maximum
+number of steps. Their default values are respectively \code{1e-10} ($10^{-10}$), \code{1e-6}
+($10^{-6}$), and \code{1e3} ($10^3$).
+
+\subsection{Tolerance}
+%
+The relative and function tolerances control the accuracy of the solution generated by
+the solver. Relative tolerances are relative to the solution value. The function tolerance
+is the norm of the algebraic function, once we plug in the proposed solution. This norm
+should go to 0 (equivalently, all elements of the vector function are 0). It helps to think about this
+geometrically. Ideally the output of the algebraic function is at the origin; the norm measures
+deviations from this ideal. Users should remember the norm scales with the square root of
+$f$'s length.
+
+Smaller relative tolerances produce more accurate solutions but require more computational time.
+
+\subsubsection{Sensitivity Analysis} \ \\
+The tolerances should be set low enough that setting them lower does not change the
+statistical properties of posterior samples generated by the Stan program.
+
+\subsection{Maximum Number of Steps}
+%
+The maximum number of steps can be used to stop a runaway simulation. This can arise in
+MCMC when a bad jump is taken, particularly during warmup.
 
 
 \chapter{Solving Differential Equations}\label{ode-solver.chapter}
