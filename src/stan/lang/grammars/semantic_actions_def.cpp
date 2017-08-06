@@ -127,12 +127,12 @@ namespace stan {
       return sum;
     }
 
-    bool is_defined(const std::string& function_name,
-                    const std::vector<expr_type>& arg_types) {
-      expr_type ret_type(DOUBLE_T, 0);
-      function_signature_t sig(ret_type, arg_types);
-      return function_signatures::instance().is_defined(function_name, sig);
-    }
+    // bool is_defined(const std::string& function_name,
+    //                 const std::vector<expr_type>& arg_types) {
+    //   expr_type ret_type(DOUBLE_T, 0);
+    //   function_signature_t sig(ret_type, arg_types);
+    //   return function_signatures::instance().is_defined(function_name, sig);
+    // }
 
     bool is_double_return(const std::string& function_name,
                           const std::vector<expr_type>& arg_types,
@@ -487,11 +487,12 @@ namespace stan {
              function_signature_t> >::const_iterator it
              = existing.begin();
            it != existing.end();
-           ++it)
+           ++it) {
         if (name_sig.first == (*it).first
             && (name_only
                 || name_sig.second.second == (*it).second.second))
           return true;  // name and arg sequences match
+      }
       return false;
     }
 
@@ -539,16 +540,20 @@ namespace stan {
         std::set<std::pair<std::string, function_signature_t> >&
                                             functions_defined,
         std::ostream& error_msgs) const {
+
       // build up representations
       expr_type result_type(decl.return_type_.base_type_,
                             decl.return_type_.num_dims_);
-      std::vector<expr_type> arg_types;
+      std::vector<function_arg_type> arg_types;
       for (size_t i = 0; i < decl.arg_decls_.size(); ++i)
-        arg_types.push_back(expr_type(decl.arg_decls_[i].arg_type_.base_type_,
-                                      decl.arg_decls_[i].arg_type_.num_dims_));
+        arg_types.push_back(
+                  function_arg_type(expr_type(decl.arg_decls_[i].arg_type_.base_type_,
+                                              decl.arg_decls_[i].arg_type_.num_dims_),
+                                    decl.arg_decls_[i].is_data_));
 
       function_signature_t sig(result_type, arg_types);
       std::pair<std::string, function_signature_t> name_sig(decl.name_, sig);
+
       // check that not already declared if just declaration
       if (decl.body_.is_no_op_statement()
           && fun_exists(functions_declared, name_sig)) {
@@ -575,22 +580,56 @@ namespace stan {
         return;
       }
 
-
-      if (ends_with("_lpdf", decl.name_) && arg_types[0].base_type_ == INT_T) {
+       // check argument qualifiers
+      if (!decl.body_.is_no_op_statement()) {
+        function_signature_t decl_sig =
+          function_signatures::instance().user_definition(name_sig);
+        if (!decl_sig.first.is_ill_formed()) {
+          std::cout << "check declaration" << std::endl;
+          if (decl_sig.second.size() != arg_types.size()) {
+            error_msgs << "Declaration, definition mismatch for function "
+                       << decl.name_
+                       << ": declaration has " << arg_types.size()
+                       << " arguments, definition has " << arg_types.size()
+                       << "arguments." << std::endl;
+            pass = false;
+            return;
+          }
+          for (size_t i = 0; i < arg_types.size(); ++i) {
+            if (decl_sig.second[i].expr_type_ != arg_types[i].expr_type_
+                || decl_sig.second[i].data_only_ != arg_types[i].data_only_) {
+              error_msgs << "Declaration, definition mismatch for function "
+                         << decl.name_ << " argument " << i + 1
+                         << ": argument declared as \""
+                         << (decl_sig.second[i].data_only_ ? "" : "data ")
+                         << decl_sig.second[i].expr_type_
+                         << "\", defined as \""
+                         << (arg_types[i].data_only_ ? "" : "data ")
+                         << arg_types[i].expr_type_ << "\"." <<  std::endl;
+              pass = false;
+              return;
+            }
+          }
+        }
+      }
+       
+      if (ends_with("_lpdf", decl.name_) && arg_types[0].expr_type_.base_type_ == INT_T) {
         error_msgs << "Parse Error.  Probability density functions require"
                    << " real variates (first argument)."
-                   << " Found type = " << arg_types[0] << std::endl;
+                   << " Found type = " << arg_types[0].expr_type_ << std::endl;
         pass = false;
         return;
       }
-      if (ends_with("_lpmf", decl.name_) && arg_types[0].base_type_ != INT_T) {
+      if (ends_with("_lpmf", decl.name_) && arg_types[0].expr_type_.base_type_ != INT_T) {
         error_msgs << "Parse Error.  Probability mass functions require"
                    << " integer variates (first argument)."
-                   << " Found type = " << arg_types[0] << std::endl;
+                   << " Found type = " << arg_types[0].expr_type_ << std::endl;
         pass = false;
         return;
       }
 
+      // check definition arguments against declaration arguments
+      
       // add declaration in local sets and in parser function sigs
       if (functions_declared.find(name_sig) == functions_declared.end()) {
         functions_declared.insert(name_sig);
@@ -694,8 +733,19 @@ namespace stan {
       }
       pass = true;
       origin_block var_origin = scope.program_block();
-      if (var_origin != data_origin) var_origin = function_argument_origin;
       //      std::cout << decl.name_ << " origin " << var_origin << std::endl;
+      if (var_origin == data_origin) {
+        if (decl.base_variable_declaration().base_type_ == INT_T) {
+          pass = false;
+          error_msgs << "data qualifier cannot be applied to int variable, name="
+                     << decl.name_;
+          error_msgs << std::endl;
+          return;
+        }
+        decl.is_data_ = true;
+      } else {
+        var_origin = function_argument_origin;
+      }
       vm.add(decl.name_, decl.base_variable_declaration(),
              var_origin);
     }
@@ -1096,9 +1146,9 @@ namespace stan {
         op_name = "elt_multiply";
       }
       // check that "lhs <op> rhs" is valid stan::math function sig
-      std::vector<expr_type> arg_types;
-      arg_types.push_back(lhs_type);
-      arg_types.push_back(rhs_type);
+      std::vector<function_arg_type> arg_types;
+      arg_types.push_back(function_arg_type(lhs_type));
+      arg_types.push_back(function_arg_type(rhs_type));
       function_signature_t op_equals_sig(lhs_type, arg_types);
       if (!function_signatures::instance().is_defined(op_name, op_equals_sig)) {
         error_msgs << "Cannot apply operator '" << op_equals
@@ -1506,12 +1556,12 @@ namespace stan {
       pass = true;
       // test function argument type
       expr_type sys_result_type(DOUBLE_T, 1);
-      std::vector<expr_type> sys_arg_types;
-      sys_arg_types.push_back(expr_type(DOUBLE_T, 0));
-      sys_arg_types.push_back(expr_type(DOUBLE_T, 1));
-      sys_arg_types.push_back(expr_type(DOUBLE_T, 1));
-      sys_arg_types.push_back(expr_type(DOUBLE_T, 1));
-      sys_arg_types.push_back(expr_type(INT_T, 1));
+      std::vector<function_arg_type> sys_arg_types;
+      sys_arg_types.push_back(function_arg_type(expr_type(DOUBLE_T, 0)));
+      sys_arg_types.push_back(function_arg_type(expr_type(DOUBLE_T, 1)));
+      sys_arg_types.push_back(function_arg_type(expr_type(DOUBLE_T, 1)));
+      sys_arg_types.push_back(function_arg_type(expr_type(DOUBLE_T, 1)));
+      sys_arg_types.push_back(function_arg_type(expr_type(INT_T, 1)));
       function_signature_t system_signature(sys_result_type, sys_arg_types);
       if (!function_signatures::instance()
           .is_defined(ode_fun.system_function_name_, system_signature)) {

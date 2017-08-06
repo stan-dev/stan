@@ -55,6 +55,7 @@
 
 #include <stan/lang/ast/sigs/function_signature_t.hpp>
 #include <stan/lang/ast/sigs/function_signatures.hpp>
+#include <stan/lang/ast/sigs/function_arg_type.hpp>
 
 #include <stan/lang/ast/node/arg_decl.hpp>
 #include <stan/lang/ast/node/array_expr.hpp>

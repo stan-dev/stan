@@ -51,6 +51,10 @@ namespace stan {
       bool is_user_defined(const std::pair<std::string, function_signature_t>&
                            name_sig);
 
+      // todo: doc
+      function_signature_t user_definition(const std::pair<std::string,
+                                           function_signature_t>& name_sig) const;
+
       /**
        * Add a built-in function with the specified name, result, type
        * and arguments.
@@ -61,7 +65,7 @@ namespace stan {
        */
       void add(const std::string& name,
                const expr_type& result_type,
-               const std::vector<expr_type>& arg_types);
+               const std::vector<function_arg_type>& arg_types);
 
       /**
        * Add a built-in function with the specifed name and result
@@ -257,7 +261,7 @@ namespace stan {
        * to the signature arguments
        */
       int num_promotions(const std::vector<expr_type>& call_args,
-                         const std::vector<expr_type>& sig_args);
+                         const std::vector<function_arg_type>& sig_args);
 
       /**
        * Return the result expression type resulting from applying a

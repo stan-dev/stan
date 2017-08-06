@@ -43,6 +43,12 @@ namespace stan {
        * Name of the argument variable.
        */
       std::string name_;
+
+      /**
+       * True if argument has "data" qualifier.
+       */
+      bool is_data_;
+
     };
 
   }

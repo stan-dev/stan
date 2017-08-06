@@ -18,8 +18,8 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::function_decl_def,
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::arg_decl,
                           (stan::lang::expr_type, arg_type_)
-                          (std::string, name_)
-                          (stan::lang::statement, body_) )
+                          (std::string, name_) )
+//                          (stan::lang::statement, body_) )
 
 namespace stan {
 

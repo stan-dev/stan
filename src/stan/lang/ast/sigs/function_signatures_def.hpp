@@ -35,16 +35,34 @@ namespace stan {
       return user_defined_set_.find(name_sig) != user_defined_set_.end();
     }
 
+    function_signature_t function_signatures::user_definition(
+                const std::pair<std::string, function_signature_t>& name_sig) const {
+      using std::pair;
+      using std::set;
+      using std::string;
+      for (set<pair<string, function_signature_t> >::const_iterator
+             it = user_defined_set_.begin();
+           it != user_defined_set_.end();
+           ++it) {
+        if (it->first == name_sig.first)
+          return it->second;
+      }
+      expr_type ill_formed = expr_type();
+      std::vector<function_arg_type> arg_types;
+      return function_signature_t(ill_formed, arg_types);
+    }
+
     bool function_signatures::is_defined(const std::string& name,
                                          const function_signature_t& sig) {
       if (sigs_map_.find(name) == sigs_map_.end())
         return false;
       const std::vector<function_signature_t> sigs = sigs_map_[name];
       for (size_t i = 0; i < sigs.size(); ++i)
-        if (sig.second  == sigs[i].second)
+        if (sig.second == sigs[i].second)
           return true;
       return false;
     }
+
 
     bool function_signatures::discrete_first_arg(const std::string& fun)
       const {
@@ -58,7 +76,7 @@ namespace stan {
       const vector<function_signature_t> sigs = it->second;
       for (size_t i = 0; i < sigs.size(); ++i) {
         if (sigs[i].second.size() == 0
-            || sigs[i].second[0].base_type_ != INT_T)
+            || sigs[i].second[0].expr_type_.base_type_ != INT_T)
           return false;
       }
       return true;
@@ -66,21 +84,21 @@ namespace stan {
 
     void function_signatures::add(const std::string& name,
                                   const expr_type& result_type,
-                                  const std::vector<expr_type>& arg_types) {
+                                  const std::vector<function_arg_type>& arg_types) {
       sigs_map_[name].push_back(function_signature_t(result_type, arg_types));
     }
 
     void function_signatures::add(const std::string& name,
                                   const expr_type& result_type) {
-      std::vector<expr_type> arg_types;
+      std::vector<function_arg_type> arg_types;
       add(name, result_type, arg_types);
     }
 
     void function_signatures::add(const std::string& name,
                                   const expr_type& result_type,
                                   const expr_type& arg_type) {
-      std::vector<expr_type> arg_types;
-      arg_types.push_back(arg_type);
+      std::vector<function_arg_type> arg_types;
+      arg_types.push_back(function_arg_type(arg_type));
       add(name, result_type, arg_types);
     }
 
@@ -88,9 +106,9 @@ namespace stan {
                                   const expr_type& result_type,
                                   const expr_type& arg_type1,
                                   const expr_type& arg_type2) {
-      std::vector<expr_type> arg_types;
-      arg_types.push_back(arg_type1);
-      arg_types.push_back(arg_type2);
+      std::vector<function_arg_type> arg_types;
+      arg_types.push_back(function_arg_type(arg_type1));
+      arg_types.push_back(function_arg_type(arg_type2));
       add(name, result_type, arg_types);
     }
 
@@ -99,10 +117,10 @@ namespace stan {
                                   const expr_type& arg_type1,
                                   const expr_type& arg_type2,
                                   const expr_type& arg_type3) {
-      std::vector<expr_type> arg_types;
-      arg_types.push_back(arg_type1);
-      arg_types.push_back(arg_type2);
-      arg_types.push_back(arg_type3);
+      std::vector<function_arg_type> arg_types;
+      arg_types.push_back(function_arg_type(arg_type1));
+      arg_types.push_back(function_arg_type(arg_type2));
+      arg_types.push_back(function_arg_type(arg_type3));
       add(name, result_type, arg_types);
     }
 
@@ -112,11 +130,11 @@ namespace stan {
                                   const expr_type& arg_type2,
                                   const expr_type& arg_type3,
                                   const expr_type& arg_type4) {
-      std::vector<expr_type> arg_types;
-      arg_types.push_back(arg_type1);
-      arg_types.push_back(arg_type2);
-      arg_types.push_back(arg_type3);
-      arg_types.push_back(arg_type4);
+      std::vector<function_arg_type> arg_types;
+      arg_types.push_back(function_arg_type(arg_type1));
+      arg_types.push_back(function_arg_type(arg_type2));
+      arg_types.push_back(function_arg_type(arg_type3));
+      arg_types.push_back(function_arg_type(arg_type4));
       add(name, result_type, arg_types);
     }
 
@@ -127,12 +145,12 @@ namespace stan {
                                   const expr_type& arg_type3,
                                   const expr_type& arg_type4,
                                   const expr_type& arg_type5) {
-      std::vector<expr_type> arg_types;
-      arg_types.push_back(arg_type1);
-      arg_types.push_back(arg_type2);
-      arg_types.push_back(arg_type3);
-      arg_types.push_back(arg_type4);
-      arg_types.push_back(arg_type5);
+      std::vector<function_arg_type> arg_types;
+      arg_types.push_back(function_arg_type(arg_type1));
+      arg_types.push_back(function_arg_type(arg_type2));
+      arg_types.push_back(function_arg_type(arg_type3));
+      arg_types.push_back(function_arg_type(arg_type4));
+      arg_types.push_back(function_arg_type(arg_type5));
       add(name, result_type, arg_types);
     }
 
@@ -144,13 +162,13 @@ namespace stan {
                                   const expr_type& arg_type4,
                                   const expr_type& arg_type5,
                                   const expr_type& arg_type6) {
-      std::vector<expr_type> arg_types;
-      arg_types.push_back(arg_type1);
-      arg_types.push_back(arg_type2);
-      arg_types.push_back(arg_type3);
-      arg_types.push_back(arg_type4);
-      arg_types.push_back(arg_type5);
-      arg_types.push_back(arg_type6);
+      std::vector<function_arg_type> arg_types;
+      arg_types.push_back(function_arg_type(arg_type1));
+      arg_types.push_back(function_arg_type(arg_type2));
+      arg_types.push_back(function_arg_type(arg_type3));
+      arg_types.push_back(function_arg_type(arg_type4));
+      arg_types.push_back(function_arg_type(arg_type5));
+      arg_types.push_back(function_arg_type(arg_type6));
       add(name, result_type, arg_types);
     }
 
@@ -163,14 +181,14 @@ namespace stan {
                                   const expr_type& arg_type5,
                                   const expr_type& arg_type6,
                                   const expr_type& arg_type7) {
-      std::vector<expr_type> arg_types;
-      arg_types.push_back(arg_type1);
-      arg_types.push_back(arg_type2);
-      arg_types.push_back(arg_type3);
-      arg_types.push_back(arg_type4);
-      arg_types.push_back(arg_type5);
-      arg_types.push_back(arg_type6);
-      arg_types.push_back(arg_type7);
+      std::vector<function_arg_type> arg_types;
+      arg_types.push_back(function_arg_type(arg_type1));
+      arg_types.push_back(function_arg_type(arg_type2));
+      arg_types.push_back(function_arg_type(arg_type3));
+      arg_types.push_back(function_arg_type(arg_type4));
+      arg_types.push_back(function_arg_type(arg_type5));
+      arg_types.push_back(function_arg_type(arg_type6));
+      arg_types.push_back(function_arg_type(arg_type7));
       add(name, result_type, arg_types);
     }
 
@@ -207,19 +225,19 @@ namespace stan {
 
     int function_signatures::num_promotions(
                             const std::vector<expr_type>& call_args,
-                            const std::vector<expr_type>& sig_args) {
+                            const std::vector<function_arg_type>& sig_args) {
       if (call_args.size() != sig_args.size()) {
         return -1;  // failure
       }
       int num_promotions = 0;
       for (size_t i = 0; i < call_args.size(); ++i) {
-        if (call_args[i] == sig_args[i]) {
+        if (call_args[i] == sig_args[i].expr_type_) {
           continue;
         } else if (call_args[i].is_primitive_int()
-                   && sig_args[i].is_primitive_double()) {
+                   && sig_args[i].expr_type_.is_primitive_double()) {
           ++num_promotions;
         } else {
-          return -1;  // failed match
+          return -1; // failed match
         }
       }
       return num_promotions;
@@ -248,7 +266,6 @@ namespace stan {
     }
 
 
-
     bool is_binary_operator(const std::string& name) {
       return name == "add"
         || name == "subtract"
@@ -275,8 +292,6 @@ namespace stan {
         || is_unary_operator(name)
         || is_unary_postfix_operator(name);
     }
-
-
 
 
     std::string fun_name_to_operator(const std::string& name) {
@@ -311,8 +326,8 @@ namespace stan {
       if (name.size() > OP_SIZE && name.substr(0, OP_SIZE) == "operator") {
         std::string operator_name = name.substr(OP_SIZE);
         if (arg_types.size() == 2) {
-          msgs << arg_types[0] << " " << operator_name << " " << arg_types[1]
-               << std::endl;
+          msgs << arg_types[0] << " " << operator_name << " "
+               << arg_types[1] << std::endl;
           return;
         } else if (arg_types.size() == 1) {
           if (operator_name == "'")  // exception for postfix
@@ -336,6 +351,42 @@ namespace stan {
       }
       msgs << ")" << std::endl;
     }
+
+    void print_signature(const std::string& name,
+                         const std::vector<function_arg_type>& arg_types,
+                         bool sampling_error_style,
+                         std::ostream& msgs) {
+      static size_t OP_SIZE = std::string("operator").size();
+      msgs << "  ";
+      if (name.size() > OP_SIZE && name.substr(0, OP_SIZE) == "operator") {
+        std::string operator_name = name.substr(OP_SIZE);
+        if (arg_types.size() == 2) {
+          msgs << arg_types[0].expr_type_ << " " << operator_name << " "
+               << arg_types[1].expr_type_ << std::endl;
+          return;
+        } else if (arg_types.size() == 1) {
+          if (operator_name == "'")  // exception for postfix
+            msgs << arg_types[0].expr_type_ << operator_name << std::endl;
+          else
+            msgs << operator_name << arg_types[0].expr_type_ << std::endl;
+          return;
+        } else {
+          // should not be reachable due to operator grammar
+          // continue on purpose to get more info to user if this happens
+          msgs << "Operators must have 1 or 2 arguments." << std::endl;
+        }
+      }
+      if (sampling_error_style && arg_types.size() > 0)
+        msgs << arg_types[0].expr_type_ << " ~ ";
+      msgs << name << "(";
+      size_t start = sampling_error_style ? 1 : 0;
+      for (size_t j = start; j < arg_types.size(); ++j) {
+        if (j > start) msgs << ", ";
+        msgs << arg_types[j].expr_type_;
+      }
+      msgs << ")" << std::endl;
+    }
+    
 
     expr_type function_signatures::get_result_type(const std::string& name,
                                            const std::vector<expr_type>& args,
