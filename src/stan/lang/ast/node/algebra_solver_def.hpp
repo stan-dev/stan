@@ -10,12 +10,12 @@ namespace stan {
     algebra_solver::algebra_solver() { }
 
     algebra_solver::algebra_solver(const std::string& system_function_name,
-                                   const expression& x,
                                    const expression& y,
-                                   const expression& dat,
-                                   const expression& dat_int)
+                                   const expression& theta,
+                                   const expression& x_r,
+                                   const expression& x_i)
       : system_function_name_(system_function_name),
-        x_(x), y_(y), dat_(dat), dat_int_(dat_int) { }
+        y_(y), theta_(theta), x_r_(x_r), x_i_(x_i) { }
 
     }
 }

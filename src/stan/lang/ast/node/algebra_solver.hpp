@@ -21,22 +21,22 @@ namespace stan {
       /**
        * Initial guess for solution.
        */
-      expression x_;
+      expression y_;
 
       /**
        * Parameters.
        */
-      expression y_;
+      expression theta_;
 
       /**
        * Real-valued data.
        */
-      expression dat_;
+      expression x_r_;
 
       /**
        * Integer-valued data.
        */
-      expression dat_int_;
+      expression x_i_;
 
       /**
        * Construct a default algebra solver node.
@@ -53,10 +53,10 @@ namespace stan {
        * @param dat_int integer-valued data
        */
       algebra_solver(const std::string& system_function_name,
-                     const expression& x,
                      const expression& y,
-                     const expression& dat,
-                     const expression& dat_int);
+                     const expression& theta,
+                     const expression& x_r,
+                     const expression& x_i);
     };
 
   }

@@ -1560,10 +1560,10 @@ namespace stan {
       // test function argument type
       expr_type sys_result_type(VECTOR_T, 0);
       std::vector<expr_type> sys_arg_types;
-      sys_arg_types.push_back(expr_type(VECTOR_T, 0));  // x
       sys_arg_types.push_back(expr_type(VECTOR_T, 0));  // y
-      sys_arg_types.push_back(expr_type(DOUBLE_T, 1));  // dat
-      sys_arg_types.push_back(expr_type(INT_T, 1));  // dat_int
+      sys_arg_types.push_back(expr_type(VECTOR_T, 0));  // theta
+      sys_arg_types.push_back(expr_type(DOUBLE_T, 1));  // x_r
+      sys_arg_types.push_back(expr_type(INT_T, 1));  // x_i
       function_signature_t system_signature(sys_result_type, sys_arg_types);
       if (!function_signatures::instance()
           .is_defined(alg_fun.system_function_name_, system_signature)) {
@@ -1575,47 +1575,47 @@ namespace stan {
       }
 
       // test regular argument types
-      if (alg_fun.x_.expression_type() != expr_type(VECTOR_T, 0)) {
+      if (alg_fun.y_.expression_type() != expr_type(VECTOR_T, 0)) {
         error_msgs << "second argument to algebra_solver"
                    << " must have type vector for initial guess;"
-                   << " found type = "
-                   << alg_fun.x_.expression_type()
-                   << ". ";
-        pass = false;
-      }
-      if (alg_fun.y_.expression_type() != expr_type(VECTOR_T, 0)) {
-        error_msgs << "third argument to algebra_solver"
-                   << " must have type vector for parameters;"
                    << " found type = "
                    << alg_fun.y_.expression_type()
                    << ". ";
         pass = false;
       }
-      if (alg_fun.dat_.expression_type() != expr_type(DOUBLE_T, 1)) {
-        error_msgs << "fourth argument to algebra_solver"
-                   << " must have type real[] for real data;"
+      if (alg_fun.theta_.expression_type() != expr_type(VECTOR_T, 0)) {
+        error_msgs << "third argument to algebra_solver"
+                   << " must have type vector for parameters;"
                    << " found type = "
-                   << alg_fun.dat_.expression_type()
+                   << alg_fun.theta_.expression_type()
                    << ". ";
         pass = false;
       }
-      if (alg_fun.dat_int_.expression_type() != expr_type(INT_T, 1)) {
+      if (alg_fun.x_r_.expression_type() != expr_type(DOUBLE_T, 1)) {
+        error_msgs << "fourth argument to algebra_solver"
+                   << " must have type real[] for real data;"
+                   << " found type = "
+                   << alg_fun.x_r_.expression_type()
+                   << ". ";
+        pass = false;
+      }
+      if (alg_fun.x_i_.expression_type() != expr_type(INT_T, 1)) {
         error_msgs << "fifth argument to algebra_solver"
                    << " must have type int[] for integer data;"
                    << " found type = "
-                   << alg_fun.dat_int_.expression_type()
+                   << alg_fun.x_i_.expression_type()
                    << ". ";
         pass = false;
       }
 
       // test data-only variables do not have parameters (int locals OK)
-      if (has_var(alg_fun.x_, var_map)) {
+      if (has_var(alg_fun.y_, var_map)) {
         error_msgs << "second argument to algebra_solver"
                    << " (initial guess)"
                    << " must be data only and not reference parameters";
         pass = false;
       }
-      if (has_var(alg_fun.dat_, var_map)) {
+      if (has_var(alg_fun.x_r_, var_map)) {
         error_msgs << "fourth argument to algebra_solver"
                    << " (real data)"
                    << " must be data only and not reference parameters";
@@ -2378,11 +2378,11 @@ namespace stan {
         && boost::apply_visitor(*this, x.theta_.expr_);
     }
     bool data_only_expression::operator()(const algebra_solver& x) const {
-      return boost::apply_visitor(*this, x.y_.expr_);
+      return boost::apply_visitor(*this, x.theta_.expr_);
     }
     bool data_only_expression::operator()(const algebra_solver_control& x)
       const {
-      return boost::apply_visitor(*this, x.y_.expr_);
+      return boost::apply_visitor(*this, x.theta_.expr_);
     }
     bool data_only_expression::operator()(const fun& x) const {
       for (size_t i = 0; i < x.args_.size(); ++i)

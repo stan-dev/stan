@@ -22,22 +22,22 @@ namespace stan {
       /**
        * Initial guess (vector of real).
        */
-      expression x_;
+      expression y_;
 
       /**
        * Parameters (vector of real).
        */
-      expression y_;
+      expression theta_;
 
       /**
        * Real-valued data (array of real).
        */
-      expression dat_;
+      expression x_r_;
 
       /**
        * Integer-valued data (array of int).
        */
-      expression dat_int_;
+      expression x_i_;
 
       /**
        * Relative tolerance (real).
@@ -64,19 +64,19 @@ namespace stan {
        * the specified values.
        *
        * @param system_function_name name of algebraic solver
-       * @param x initial guess for solution
-       * @param y parameters
-       * @param dat real-valued data
-       * @param dat_int integer-valued data
+       * @param y initial guess for solution
+       * @param theta parameters
+       * @param x_r real-valued data
+       * @param x_i integer-valued data
        * @param rel_tol relative tolerance of integrator
        * @param fun_tol function tolerance of integrator
        * @param max_num_steps max steps in integrator
        */
        algebra_solver_control(const std::string& system_function_name,
-                              const expression& x,
                               const expression& y,
-                              const expression& dat,
-                              const expression& dat_int,
+                              const expression& theta,
+                              const expression& x_r,
+                              const expression& x_i,
                               const expression& rel_tol,
                               const expression& fun_tol,
                               const expression& max_num_steps);

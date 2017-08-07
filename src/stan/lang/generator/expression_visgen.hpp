@@ -188,13 +188,13 @@ namespace stan {
            << '('
            << fx.system_function_name_
            << "_functor__(), ";
-        generate_expression(fx.x_, o_);
-        o_ << ", ";
         generate_expression(fx.y_, o_);
         o_ << ", ";
-        generate_expression(fx.dat_, o_);
+        generate_expression(fx.theta_, o_);
         o_ << ", ";
-        generate_expression(fx.dat_int_, o_);
+        generate_expression(fx.x_r_, o_);
+        o_ << ", ";
+        generate_expression(fx.x_i_, o_);
         o_ << ", pstream__)";
       }
 
@@ -203,13 +203,13 @@ namespace stan {
            << '('
            << fx.system_function_name_
            << "_functor__(), ";
-        generate_expression(fx.x_, o_);
-        o_ << ", ";
         generate_expression(fx.y_, o_);
         o_ << ", ";
-        generate_expression(fx.dat_, o_);
+        generate_expression(fx.theta_, o_);
         o_ << ", ";
-        generate_expression(fx.dat_int_, o_);
+        generate_expression(fx.x_r_, o_);
+        o_ << ", ";
+        generate_expression(fx.x_i_, o_);
         o_ << ", pstream__, ";
         generate_expression(fx.rel_tol_, o_);
         o_ << ", ";
