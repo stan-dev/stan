@@ -3450,7 +3450,7 @@ An algebraic system is specified as an ordinary function in Stan within the
 function block. The algebraic system function must have this signature:
 %
 \begin{stancode}
-real[] algebra_system(real[] unknown, real[] theta,
+real[] algebra_system(real[] y, real[] theta,
                       real[] x_r, int[] x_i)
 \end{stancode}
 %
@@ -3476,7 +3476,7 @@ of the algebraic system.
 %
    \fitemthreelines{real[~]}{algebra\_solver}%
                   {function \farg{algebra\_system}}%
-                  {real[] \farg{initial\_guess}}%
+                  {real[] \farg{y\_guess}}%
                   {real \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
                   {Solves the algebraic system, given an initial guess,
                     using the Powell Hybrid algorithm with the unsupported
@@ -3484,7 +3484,7 @@ of the algebraic system.
                    
 \fitemfourlines{real[~]}{algebra\_solver}%
                   {function \farg{algebra\_system}}%
-                  {real[] \farg{initial\_guess}}%
+                  {real[] \farg{y\_guess}}%
                   {real \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
                   {real \farg{rel\_tol}, real \farg{f\_tol}, int \farg{max\_steps}}%
                   {Solves the algebraic system, given an initial guess,
@@ -3500,7 +3500,7 @@ of the algebraic system.
 The arguments to the algebraic solver are as follows:
 %
 \begin{enumerate}
-\item \farg{algebra\_system}: function literal refering to a function
+\item \farg{algebra\_system}: function literal referring to a function
   specifying the system of algebraic equations with signature described
   in \refsection{functions-algebra-function}:
   \begin{quote}
@@ -3509,7 +3509,7 @@ The arguments to the algebraic solver are as follows:
   The arguments represent (1) unknown, (2) parameters, (3) real data, and
   (4) integer data, and the return value contains the value of the algebraic
   function, which goes to 0 when we plug in the solution to the algebraic system,
-\item \farg{initial\_guess}: initia guess for the solution, type \code{real[]},
+\item \farg{y\_guess}: initia guess for the solution, type \code{real[]},
 \item \farg{theta}: parameters, type \code{real[]},
 \item \farg{x\_r}: real data, type \code{real[]}, data only, and
 \item \farg{x\_i}: parameters, type \code{int[]}, data only.
@@ -3530,14 +3530,11 @@ The return value for the algebraic solver is an array of type \code{real[]}, wit
 which, when plugged in as the \code{unknowns} make the algebraic function go to 0.
 
 \subsection{Sizes and Parallel Arrays}
-Certain sizes must match. In particular, the following groups are of the same size:
-%
-\begin{enumerate}
-  \item unknowns passed into the system function, algebraic function returned by the system
-  function, initial guess passed into the solver, and return value of the solver,
-  \item parameters, real data, and integer data passed to the solver will be passed to the system
-  function.
-\end{enumerate}
+Certain sizes have to be consistent. The initial guess, return value of the solver, and
+return value of the algebraic function must all be the same size. 
+
+The parameters, real data, and integer data will be passed from the solver directly to the
+system function. 
 
 \subsection{Example}
 

@@ -63,11 +63,11 @@ namespace stan {
     }
 
     bool var_occurs_vis::operator()(const algebra_solver& e) const {
-      return false;
+      return false;  // no refs persist out of algebra_solver() call
     }
 
     bool var_occurs_vis::operator()(const algebra_solver_control& e) const {
-      return false;
+      return false;  // no refs persist out of algebra_solver_control() call
     }
 
     bool var_occurs_vis::operator()(const index_op& e) const {
