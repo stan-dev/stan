@@ -127,13 +127,6 @@ namespace stan {
       return sum;
     }
 
-    // bool is_defined(const std::string& function_name,
-    //                 const std::vector<expr_type>& arg_types) {
-    //   expr_type ret_type(DOUBLE_T, 0);
-    //   function_signature_t sig(ret_type, arg_types);
-    //   return function_signatures::instance().is_defined(function_name, sig);
-    // }
-
     bool is_double_return(const std::string& function_name,
                           const std::vector<expr_type>& arg_types,
                           std::ostream& error_msgs) {
@@ -281,6 +274,7 @@ namespace stan {
         error_msgs << "expression is ill formed" << std::endl;
     }
     boost::phoenix::function<validate_expr_type3> validate_expr_type3_f;
+
 
     void is_prob_fun::operator()(const std::string& s,
                                  bool& pass) const {
@@ -540,7 +534,6 @@ namespace stan {
         std::set<std::pair<std::string, function_signature_t> >&
                                             functions_defined,
         std::ostream& error_msgs) const {
-
       // build up representations
       expr_type result_type(decl.return_type_.base_type_,
                             decl.return_type_.num_dims_);
@@ -583,9 +576,8 @@ namespace stan {
        // check argument qualifiers
       if (!decl.body_.is_no_op_statement()) {
         function_signature_t decl_sig =
-          function_signatures::instance().user_definition(name_sig);
+          function_signatures::instance().get_user_definition(name_sig);
         if (!decl_sig.first.is_ill_formed()) {
-          std::cout << "check declaration" << std::endl;
           if (decl_sig.second.size() != arg_types.size()) {
             error_msgs << "Declaration, definition mismatch for function "
                        << decl.name_
@@ -733,7 +725,6 @@ namespace stan {
       }
       pass = true;
       origin_block var_origin = scope.program_block();
-      //      std::cout << decl.name_ << " origin " << var_origin << std::endl;
       if (var_origin == data_origin) {
         if (decl.base_variable_declaration().base_type_ == INT_T) {
           pass = false;
@@ -1721,6 +1712,7 @@ namespace stan {
     void set_fun_type_named::operator()(expression& fun_result, fun& fun,
                                         const scope& var_scope,
                                         bool& pass,
+                                        const variable_map& var_map,
                                         std::ostream& error_msgs) const {
       if (fun.name_ == "get_lp")
         error_msgs << "Warning (non-fatal): get_lp() function deprecated."
@@ -1738,10 +1730,35 @@ namespace stan {
 
       fun.type_ = function_signatures::instance()
         .get_result_type(fun.name_, arg_types, error_msgs);
+
       if (fun.type_ == ILL_FORMED_T) {
         pass = false;
         return;
       }
+
+      // get function definition for this functiion
+      std::vector<function_arg_type> fun_arg_types;
+      for (size_t i = 0; i < fun.args_.size(); ++i)
+        fun_arg_types.push_back(function_arg_type(arg_types[i]));
+      function_signature_t sig(fun.type_, fun_arg_types);
+      std::pair<std::string, function_signature_t> name_sig(fun.name_, sig);
+      function_signature_t decl_sig =
+        function_signatures::instance().get_user_definition(name_sig);
+      if (!decl_sig.first.is_ill_formed()) {
+        for (size_t i = 0; i < fun_arg_types.size(); ++i) {
+          if (decl_sig.second[i].data_only_) {
+            if (has_var(fun.args_[i], var_map)) {
+              error_msgs << "Function argument error, function: "
+                         << fun.name_ << ", argument: " << i + 1
+                         << " must be data only, "
+                         << "found expression containing a parameter varaible."
+                         << std::endl;
+              pass = false;
+              return;
+            }
+          }
+        }
+      }      
 
       // disjunction so only first match triggered
       deprecate_fun("binomial_coefficient_log", "lchoose", fun, error_msgs)

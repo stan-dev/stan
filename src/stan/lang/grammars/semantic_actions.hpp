@@ -169,7 +169,6 @@ namespace stan {
     };
     extern boost::phoenix::function<assign_lhs> assign_lhs_f;
 
-
     // called from: expression07_grammar
     struct validate_expr_type3 : public phoenix_functor_ternary {
       void operator()(const expression& expr, bool& pass,
@@ -565,9 +564,10 @@ namespace stan {
     validate_integrate_ode_control_f;
 
     // called from: term_grammar
-    struct set_fun_type_named : public phoenix_functor_quinary {
+    struct set_fun_type_named : public phoenix_functor_senary {
       void operator()(expression& fun_result, fun& fun,
                       const scope& var_scope, bool& pass,
+                      const variable_map& var_map,
                       std::ostream& error_msgs) const;
     };
     extern boost::phoenix::function<set_fun_type_named> set_fun_type_named_f;

@@ -35,17 +35,19 @@ namespace stan {
       return user_defined_set_.find(name_sig) != user_defined_set_.end();
     }
 
-    function_signature_t function_signatures::user_definition(
+    function_signature_t function_signatures::get_user_definition(
                 const std::pair<std::string, function_signature_t>& name_sig) const {
       using std::pair;
       using std::set;
       using std::string;
-      for (set<pair<string, function_signature_t> >::const_iterator
-             it = user_defined_set_.begin();
-           it != user_defined_set_.end();
-           ++it) {
-        if (it->first == name_sig.first)
-          return it->second;
+      if (user_defined_set_.find(name_sig) != user_defined_set_.end()) {
+        for (set<pair<string, function_signature_t> >::const_iterator
+               it = user_defined_set_.begin();
+             it != user_defined_set_.end();
+             ++it) {
+          if (it->first == name_sig.first)
+            return it->second;
+        }
       }
       expr_type ill_formed = expr_type();
       std::vector<function_arg_type> arg_types;

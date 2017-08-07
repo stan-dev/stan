@@ -209,6 +209,7 @@ namespace stan {
         | integrate_ode_r(_r1)[assign_lhs_f(_val, _1)]
         | (fun_r(_r1)[assign_lhs_f(_b, _1)]
            > eps[set_fun_type_named_f(_val, _b, _r1, _pass,
+                                      boost::phoenix::ref(var_map_),
                                       boost::phoenix::ref(error_msgs_))])
         | (variable_r[assign_lhs_f(_a, _1)]
            > eps[set_var_type_f(_a, _val, boost::phoenix::ref(var_map_),
