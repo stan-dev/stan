@@ -12,7 +12,7 @@ namespace stan {
      * Runtime variable declaration information including the name of
      * the variable, the name of its type, number of array dimensions,
      * and the sizes of all of the dimensions (including vector and
-     * matrix dimensions).
+     * matrix dimensions, with array dimensions first).
      */
     class sized_var_decl : public var_decl {
     private:
