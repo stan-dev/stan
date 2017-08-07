@@ -1,7 +1,7 @@
 #include <stan/model/log_prob_propto.hpp>
 #include <test/test-models/good/model/valid.hpp>
-#include <test/unit/util.hpp>
 #include <gtest/gtest.h>
+#include <test/unit/util.hpp>
 
 TEST(ModelUtil, streams) {
   stan::test::capture_std_streams();
@@ -51,4 +51,3 @@ TEST(ModelUtil, streams) {
   EXPECT_EQ("", stan::test::cout_ss.str());
   EXPECT_EQ("", stan::test::cerr_ss.str());
 }
-

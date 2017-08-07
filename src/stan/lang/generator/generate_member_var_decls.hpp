@@ -26,8 +26,6 @@ namespace stan {
         boost::apply_visitor(vis, vs[i].decl_);
     }
 
-
-
   }
 }
 #endif

@@ -1,6 +1,9 @@
-#ifndef TEST__UNIT__UTIL_HPP
-#define TEST__UNIT__UTIL_HPP
+#ifndef TEST_UNIT_UTIL_HPP
+#define TEST_UNIT_UTIL_HPP
 
+#include <gtest/gtest.h>
+#include <iostream>
+#include <sstream>
 #include <string>
 
 #define EXPECT_THROW_MSG(expr, T_e, msg)                \
@@ -27,6 +30,7 @@ int count_matches(const std::string& target,
 
 namespace stan {
   namespace test {
+
     std::streambuf *cout_buf = 0;
     std::streambuf *cerr_buf = 0;
 
@@ -50,7 +54,26 @@ namespace stan {
       cout_buf = 0;
       cerr_buf = 0;
     }
+
+    /**
+     * Compare the two arguments using EXPECT_EQ.
+     */
+    template <typename T1, typename T2>
+    void expect_eq(const T1& x1, const T2& x2) {
+      EXPECT_EQ(x1, x2);
+    }
+
+    /**
+     * Compare the two containers for size using EXPECT_EQ and then
+     * recursively compare the elements using expect_eq.
+     */
+    template <typename T>
+    void expect_eq(const std::vector<T>& x, const std::vector<T>& y) {
+      EXPECT_EQ(x.size(), y.size());
+      for (size_t i = 0; i < x.size(); ++i)
+        expect_eq(x[i], y[i]);
+    }
+
   }
 }
-
 #endif

@@ -21,7 +21,7 @@
 #include <stan/lang/generator/constrained_param_names_visgen.hpp>
 #include <stan/lang/generator/dump_member_var_visgen.hpp>
 #include <stan/lang/generator/expression_visgen.hpp>
-#include <stan/lang/generator/printable_visgen.hpp>
+#include <stan/lang/generator/get_var_decls_visgen.hpp>
 #include <stan/lang/generator/idx_visgen.hpp>
 #include <stan/lang/generator/idx_user_visgen.hpp>
 #include <stan/lang/generator/init_local_var_visgen.hpp>
@@ -30,6 +30,7 @@
 #include <stan/lang/generator/local_var_decl_visgen.hpp>
 #include <stan/lang/generator/local_var_init_nan_visgen.hpp>
 #include <stan/lang/generator/member_var_decl_visgen.hpp>
+#include <stan/lang/generator/printable_visgen.hpp>
 #include <stan/lang/generator/set_param_ranges_visgen.hpp>
 #include <stan/lang/generator/statement_visgen.hpp>
 #include <stan/lang/generator/unconstrained_param_names_visgen.hpp>
@@ -67,6 +68,7 @@
 #include <stan/lang/generator/generate_function_inline_return_type.hpp>
 #include <stan/lang/generator/generate_function_template_parameters.hpp>
 #include <stan/lang/generator/generate_functor_arguments.hpp>
+#include <stan/lang/generator/generate_get_var_decls.hpp>
 #include <stan/lang/generator/generate_globals.hpp>
 #include <stan/lang/generator/generate_idx.hpp>
 #include <stan/lang/generator/generate_idxs.hpp>
