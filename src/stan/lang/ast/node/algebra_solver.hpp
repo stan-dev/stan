@@ -47,10 +47,10 @@ namespace stan {
        * Construct an algebraic solver.
        *
        * @param system_function_name name of ODE system
-       * @param x initial guess for solution
-       * @param y parameters
-       * @param dat real-valued data
-       * @param dat_int integer-valued data
+       * @param y initial guess for solution
+       * @param theta parameters
+       * @param x_r real-valued data
+       * @param x_i integer-valued data
        */
       algebra_solver(const std::string& system_function_name,
                      const expression& y,
