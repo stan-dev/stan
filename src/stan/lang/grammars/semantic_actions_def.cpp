@@ -1570,7 +1570,8 @@ namespace stan {
         error_msgs << "first argument to "
                    << "algebra_solver"
                    << " must be the name of a function with signature"
-                   << " (vector, vector, real[], int[]) : vector ";
+                   << " (vector, vector, real[], int[]) : vector "
+                   << std::endl;
         pass = false;
       }
 
@@ -1580,7 +1581,7 @@ namespace stan {
                    << " must have type vector for initial guess;"
                    << " found type = "
                    << alg_fun.y_.expression_type()
-                   << ". ";
+                   << ". " << std::endl;
         pass = false;
       }
       if (alg_fun.theta_.expression_type() != expr_type(VECTOR_T, 0)) {
@@ -1588,7 +1589,7 @@ namespace stan {
                    << " must have type vector for parameters;"
                    << " found type = "
                    << alg_fun.theta_.expression_type()
-                   << ". ";
+                   << ". " << std::endl;
         pass = false;
       }
       if (alg_fun.x_r_.expression_type() != expr_type(DOUBLE_T, 1)) {
@@ -1596,7 +1597,7 @@ namespace stan {
                    << " must have type real[] for real data;"
                    << " found type = "
                    << alg_fun.x_r_.expression_type()
-                   << ". ";
+                   << ". " << std::endl;
         pass = false;
       }
       if (alg_fun.x_i_.expression_type() != expr_type(INT_T, 1)) {
@@ -1604,7 +1605,7 @@ namespace stan {
                    << " must have type int[] for integer data;"
                    << " found type = "
                    << alg_fun.x_i_.expression_type()
-                   << ". ";
+                   << ". " << std::endl;
         pass = false;
       }
 
@@ -1612,13 +1613,15 @@ namespace stan {
       if (has_var(alg_fun.y_, var_map)) {
         error_msgs << "second argument to algebra_solver"
                    << " (initial guess)"
-                   << " must be data only and not reference parameters";
+                   << " must be data only and not reference parameters"
+                   << std::endl;
         pass = false;
       }
       if (has_var(alg_fun.x_r_, var_map)) {
         error_msgs << "fourth argument to algebra_solver"
                    << " (real data)"
-                   << " must be data only and not reference parameters";
+                   << " must be data only and not reference parameters"
+                   << std::endl;
         pass = false;
       }
     }
@@ -1644,7 +1647,7 @@ namespace stan {
                    << " (relative tolerance) must have type real or int;"
                    << " found type="
                    << alg_fun.rel_tol_.expression_type()
-                   << ". ";
+                   << ". " << std::endl;
         pass = false;
       }
       if (!alg_fun.fun_tol_.expression_type().is_primitive()) {
@@ -1652,7 +1655,7 @@ namespace stan {
                    << " (function tolerance) must have type real or int;"
                    << " found type="
                    << alg_fun.fun_tol_.expression_type()
-                   << ". ";
+                   << ". " << std::endl;
         pass = false;
       }
       if (!alg_fun.max_num_steps_.expression_type().is_primitive()) {
@@ -1660,7 +1663,7 @@ namespace stan {
                    << " (max number of steps) must have type real or int;"
                    << " found type="
                    << alg_fun.max_num_steps_.expression_type()
-                   << ". ";
+                   << ". " << std::endl;
         pass = false;
       }
 
@@ -1668,19 +1671,21 @@ namespace stan {
       if (has_var(alg_fun.rel_tol_, var_map)) {
         error_msgs << "sixth argument to algebra_solver"
                    << " (relative tolerance) must be data only"
-                   << " and not depend on parameters";
+                   << " and not depend on parameters"
+                   << std::endl;
         pass = false;
       }
       if (has_var(alg_fun.fun_tol_, var_map)) {
         error_msgs << "seventh argument to algebra_solver"
                    << " (function tolerance ) must be data only"
-                   << " and not depend parameters";
+                   << " and not depend parameters"
+                   << std::endl;
         pass = false;
       }
       if (has_var(alg_fun.max_num_steps_, var_map)) {
         error_msgs << "eighth argument to algebra_solver"
                    << " (max number of steps) must be data only"
-                   << " and not depend on parameters";
+                   << " and not depend on parameters" << std::endl;
         pass = false;
       }
     }
