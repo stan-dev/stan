@@ -8112,8 +8112,11 @@ vector for parameter if the system does not involve data or parameters.
 \section{Calling the Algebraic Solver}
 %
 Let's suppose $\theta = \{3, 6\}$. To call the algebraic solver, we need to
-provide an initial guess. A good guess can significantly speed up the solver and,
-in pathological cases, even determine whether the solver converges or not.
+provide an initial guess. This varies on a case-by-case basis, but in general
+a good guess will speed up the solver and, in pathological cases, even determine
+whether the solver converges or not. If the solver does not converge, the metropolis
+proposal gets rejected and a warning message, stating no acceptable solution has
+been found, is issued.
 
 The solver has three tuning parameters to determine convergence: the relative tolerance, 
 the function tolerance, and the maximum number of steps. Their default values are respectively
