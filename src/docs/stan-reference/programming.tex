@@ -947,15 +947,13 @@ details about the reject statement.
 }\label{constrained-types.figure}
 \end{figure}
 
-Function argument and return types are not declared with their sizes.
-They also may not contain any constraints;  see
+Function argument and return types for vector and matrix types
+are not declared with their sizes, unlike type declarations for variables.
+Function argument type declarations may not be
+declared with constraints, either lower or upper bounds or structured
+constraints like forming a simplex or correlation matrix, (as is also
+the case for local varaibles);  see
 \reffigure{constrained-types} for a list.
-
-Unlike type declarations for variables, function type declarations for
-matrix and vector types are not declared with their sizes.  Like local
-variable declarations, function argument type declarations may not be
-declared with constraints (either lower or upper bounds or structured
-constraints like forming a simplex or correlation matrix).
 
 For example, here's a function to compute the entropy of a categorical
 distribution with simplex parameter \code{theta}.
@@ -993,6 +991,43 @@ return above), \code{[\,,\,]} for two-dimensional arrays,
 
 Functions support arrays of any type, including matrix and vector
 types.  As with other types, no constraints are allowed.
+
+\subsection{Data-only Function Arguments}
+
+A function argument which is a real-valued or container of real values
+can be qualified using the prefix qualifier \code{data}.
+The following is an example of a data-only function argument.
+%
+\begin{stancode}
+real foo(real y, data real mu) {
+  return -0.5 * (y - mu)^2;
+}
+\end{stancode}
+%
+
+This qualifier restricts this argument to being invoked
+with expressions which consist only of data variables,
+transformed data variables, literals, and function calls.
+A data-only function argument cannot involve real variables declared
+in the parameters, transformed parameters, or model block.
+Attempts to invoke a function using an expression which contains
+parameter, transformed parameters, or model block variables
+as a data-only argument will result in an error message from the
+parser.
+
+Use of the \code{data} qualifier must be consistent between the
+forward declaration and the definition of a functions.
+
+This qualifier should be used when writing functions that call Stan's
+built-in ordinary differential equation (ODE) solvers which have
+strictly specified signatures where some arguments of are data only
+expressions. (See \refchapter{ode-solver} and
+\refchapter{functions-ode-solver} for details.)
+Arguments to the embedding function which will be used as a
+data-only argument to an ODE solver function, either directly
+or indirectly, should have the \code{data} prefix qualifier.
+This allows for compile-time type checking and increases
+overall program understandability.
 
 
 \section{Functions as Statements}
