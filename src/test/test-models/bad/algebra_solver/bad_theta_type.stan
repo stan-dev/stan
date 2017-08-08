@@ -22,7 +22,7 @@ transformed data {
 }
 
 parameters {
-  vector[2] theta_p;
+  real theta_p;
   real dummy_parameter;
 }
 

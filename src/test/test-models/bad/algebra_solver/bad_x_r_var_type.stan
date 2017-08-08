@@ -1,5 +1,5 @@
 functions {
-  vector algebra_system (real[] y,
+  vector algebra_system (vector y,
                          vector theta,
                          real[] x_r,
                          int[] x_i) {
@@ -10,25 +10,25 @@ functions {
   }
 }
 
-
 data {
 
 }
 
 transformed data {
   vector[2] y;
-  real x_r[0];
+  // real x_r[0];
   int x_i[0];
 }
 
 parameters {
+  real x_r_p[0];
   vector[2] theta_p;
   real dummy_parameter;
 }
 
 transformed parameters {
   vector[2] y_s_p;
-  y_s_p = algebra_solver(algebra_system, y, theta_p, x_r, x_i);
+  y_s_p = algebra_solver(algebra_system, y, theta_p, x_r_p, x_i);
 }
 
 model {

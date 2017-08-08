@@ -10,25 +10,24 @@ functions {
   }
 }
 
-
 data {
 
 }
 
 transformed data {
-  vector[2] y;
   real x_r[0];
   int x_i[0];
 }
 
 parameters {
+  vector[2] y_p;
   vector[2] theta_p;
   real dummy_parameter;
 }
 
 transformed parameters {
   vector[2] y_s_p;
-  y_s_p = algebra_solver(algebra_system, y, theta_p, x_r, x_i);
+  y_s_p = algebra_solver(algebra_system, y_p, theta_p, x_r, x_i, 0.01, 0.01, 10);
 }
 
 model {

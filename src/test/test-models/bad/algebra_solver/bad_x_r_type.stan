@@ -1,5 +1,5 @@
 functions {
-  vector algebra_system (real[] y,
+  vector algebra_system (vector y,
                          vector theta,
                          real[] x_r,
                          int[] x_i) {
@@ -17,7 +17,7 @@ data {
 
 transformed data {
   vector[2] y;
-  real x_r[0];
+  int x_r[0];
   int x_i[0];
 }
 
