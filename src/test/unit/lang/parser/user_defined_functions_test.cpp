@@ -5,9 +5,9 @@ TEST(parserFunctions, funsGood0) {
   test_parsable("validate_functions"); // tests proper definitions and use
 }
 
-// TEST(parserFunctions, funsGood1) {
-//   test_parsable("functions-good1");
-// }
+TEST(parserFunctions, funsGood1) {
+ test_parsable("functions-good1");
+}
 
 TEST(parserFunctions, funsGood2) {
   test_parsable("functions-good2");
@@ -23,20 +23,16 @@ TEST(parserFunctions, funsGood4) {
                                         // symbols are not saved
 }
 
-TEST(parserFunctions, funsBad18) {
-  test_throws("functions-bad18","variable identifier (name) may not be reserved word");
-}
-
 TEST(parserFunctions, funsBad0) {
-  test_throws("functions-bad0","Functions cannot contain void argument types");
+  test_throws("functions-bad0", "Functions cannot contain void argument types");
 }
 
 TEST(parserFunctions, funsBad1) {
-  test_throws("functions-bad1","Function already declared");
+  test_throws("functions-bad1", "Function already declared");
 }
 
 TEST(parserFunctions, funsBad2) {
-  test_throws("functions-bad2","Function declared, but not defined");
+  test_throws("functions-bad2", "Function declared, but not defined");
 }
 
 TEST(parserFunctions, funsBad2_good) {
@@ -44,7 +40,7 @@ TEST(parserFunctions, funsBad2_good) {
 }
 
 TEST(parserFunctions, funsBad3) {
-  test_throws("functions-bad3","SYNTAX ERROR, MESSAGE(S) FROM PARSER:");
+  test_throws("functions-bad3", "SYNTAX ERROR, MESSAGE(S) FROM PARSER:");
 }
 
 TEST(parserFunctions,funsBad4) {
@@ -105,3 +101,26 @@ TEST(parserFunctions,funsBad17) {
               " ending in _log, _lpdf, _lpmf, _lcdf, or _lccdf.");
 }
 
+TEST(parserFunctions, funsBad18) {
+  test_throws("functions-bad18",
+              "variable identifier (name) may not be reserved word");
+}
+
+TEST(parserFunctions, funsBad19) {
+  test_throws("functions-bad19",
+              "argument declared as real, defined as data real");
+}
+
+TEST(parserFunctions, funsBad20) {
+  test_throws("functions-bad20",
+              "argument declared as data real, defined as real");
+}
+
+TEST(parserFunctions, funsBad21) {
+  test_throws("functions-bad21",
+              "must be data only, found expression containing a parameter varaible");
+}
+TEST(parserFunctions, funsBadODE) {
+  test_throws("functions-bad22-ode",
+              "must be data only, found expression containing a parameter varaible");
+}

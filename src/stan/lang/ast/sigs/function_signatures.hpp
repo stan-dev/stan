@@ -52,16 +52,14 @@ namespace stan {
                            name_sig);
 
       /**
-       * Return the function definition for user defined functions
-       * given the function name and argument expression types.
-       * Used to check argument qualifiers, which are only available
-       * from function definition, not invocation.
+       * Return the function definition given the function name and argument
+       * expression types. Used to check argument qualifiers, which are
+       * only available from function definition.
        *
        * @param name_sig name and signature of function
        */
-      function_signature_t get_user_definition(const std::pair<std::string,
-                                               function_signature_t>& name_sig)
-        const;
+      function_signature_t get_definition(const std::string& name,
+                                          const function_signature_t& sig);
 
       /**
        * Add a built-in function with the specified name, result, type

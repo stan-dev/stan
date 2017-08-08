@@ -565,7 +565,7 @@ namespace stan {
       }
 
       // check not already system defined
-      if (!fun_exists(functions_declared, name_sig)
+      if (!fun_exists(functions_declared, name_sig) 
           && function_signatures::instance().is_defined(decl.name_, sig)) {
         error_msgs << "Parse Error.  Function system defined, name="
                    << decl.name_;
@@ -576,7 +576,7 @@ namespace stan {
        // check argument qualifiers
       if (!decl.body_.is_no_op_statement()) {
         function_signature_t decl_sig =
-          function_signatures::instance().get_user_definition(name_sig);
+          function_signatures::instance().get_definition(decl.name_, sig);
         if (!decl_sig.first.is_ill_formed()) {
           if (decl_sig.second.size() != arg_types.size()) {
             error_msgs << "Declaration, definition mismatch for function "
@@ -591,13 +591,13 @@ namespace stan {
             if (decl_sig.second[i].expr_type_ != arg_types[i].expr_type_
                 || decl_sig.second[i].data_only_ != arg_types[i].data_only_) {
               error_msgs << "Declaration, definition mismatch for function "
-                         << decl.name_ << " argument " << i + 1
-                         << ": argument declared as \""
+                         << decl.name_ << " argument " << (i + 1)
+                         << ": argument declared as "
                          << (decl_sig.second[i].data_only_ ? "" : "data ")
                          << decl_sig.second[i].expr_type_
-                         << "\", defined as \""
+                         << ", defined as "
                          << (arg_types[i].data_only_ ? "" : "data ")
-                         << arg_types[i].expr_type_ << "\"." <<  std::endl;
+                         << arg_types[i].expr_type_ << "." <<  std::endl;
               pass = false;
               return;
             }
@@ -1741,15 +1741,14 @@ namespace stan {
       for (size_t i = 0; i < fun.args_.size(); ++i)
         fun_arg_types.push_back(function_arg_type(arg_types[i]));
       function_signature_t sig(fun.type_, fun_arg_types);
-      std::pair<std::string, function_signature_t> name_sig(fun.name_, sig);
       function_signature_t decl_sig =
-        function_signatures::instance().get_user_definition(name_sig);
+        function_signatures::instance().get_definition(fun.name_, sig);
       if (!decl_sig.first.is_ill_formed()) {
         for (size_t i = 0; i < fun_arg_types.size(); ++i) {
           if (decl_sig.second[i].data_only_) {
             if (has_var(fun.args_[i], var_map)) {
               error_msgs << "Function argument error, function: "
-                         << fun.name_ << ", argument: " << i + 1
+                         << fun.name_ << ", argument: " << (i + 1)
                          << " must be data only, "
                          << "found expression containing a parameter varaible."
                          << std::endl;

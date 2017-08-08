@@ -13,6 +13,7 @@ using stan::lang::omni_idx;
 using stan::lang::expression;
 using stan::lang::int_literal;
 using stan::lang::function_signatures;
+using stan::lang::function_arg_type;
 using stan::lang::expr_type;
 using stan::lang::DOUBLE_T;
 using stan::lang::INT_T;
@@ -20,6 +21,61 @@ using stan::lang::VECTOR_T;
 using stan::lang::ROW_VECTOR_T;
 using stan::lang::MATRIX_T;
 using std::vector;
+
+
+TEST(langAst, getDefinition) {
+  // tests for Stan lang function definitions with fun argument qualifier "data"
+  stan::lang::function_signatures& fs
+    = stan::lang::function_signatures::instance();
+  std::string name = "f3args";
+  expr_type return_type = expr_type(DOUBLE_T);
+  std::vector<function_arg_type> arg_types;
+  arg_types.push_back(function_arg_type(expr_type(DOUBLE_T, 2U), true));
+  arg_types.push_back(function_arg_type(expr_type(INT_T, 1U)));
+  arg_types.push_back(function_arg_type(expr_type(VECTOR_T, 0U)));
+
+  // check is defined
+  fs.add(name, return_type, arg_types);
+  stan::lang::function_signature_t sig(return_type, arg_types);
+  EXPECT_TRUE(fs.is_defined(name, sig));
+}
+
+TEST(langAst, missingDefinition) {
+  stan::lang::function_signatures& fs
+    = stan::lang::function_signatures::instance();
+
+  std::string name = "fmissing";
+  expr_type return_type = expr_type(DOUBLE_T);
+  std::vector<function_arg_type> arg_types;
+  arg_types.push_back(function_arg_type(expr_type(DOUBLE_T, 2U), true));
+
+  // check not defined
+  stan::lang::function_signature_t sig(return_type, arg_types);
+  EXPECT_FALSE(fs.is_defined(name, sig));
+}
+
+TEST(langAst, checkDefinition) {
+  // tests for Stan lang function definitions with fun argument qualifier "data"
+  stan::lang::function_signatures& fs
+    = stan::lang::function_signatures::instance();
+  std::string name = "f3args";
+  expr_type return_type = expr_type(DOUBLE_T);
+  std::vector<function_arg_type> arg_types;
+  arg_types.push_back(function_arg_type(expr_type(DOUBLE_T, 2U), true));
+  arg_types.push_back(function_arg_type(expr_type(INT_T, 1U)));
+  arg_types.push_back(function_arg_type(expr_type(VECTOR_T, 0U)));
+  fs.add(name, return_type, arg_types);
+
+  // check definition
+  stan::lang::function_signature_t sig(return_type, arg_types);
+  stan::lang::function_signature_t sig2 = fs.get_definition(name, sig);
+  EXPECT_EQ(sig, fs.get_definition(name, sig));
+
+  // check function arguments
+  EXPECT_TRUE(sig2.second[0].data_only_);
+  EXPECT_FALSE(sig2.second[1].data_only_);
+  EXPECT_FALSE(sig2.second[2].data_only_);
+}
 
 TEST(langAst, discreteFirstArg) {
   // true if first argument to function is always discrete
@@ -30,10 +86,10 @@ TEST(langAst, discreteFirstArg) {
 }
 
 TEST(langAst, printSignature) {
-  std::vector<expr_type> arg_types;
-  arg_types.push_back(expr_type(DOUBLE_T, 2U));
-  arg_types.push_back(expr_type(INT_T, 1U));
-  arg_types.push_back(expr_type(VECTOR_T, 0U));
+  std::vector<function_arg_type> arg_types;
+  arg_types.push_back(function_arg_type(expr_type(DOUBLE_T, 2U)));
+  arg_types.push_back(function_arg_type(expr_type(INT_T, 1U)));
+  arg_types.push_back(function_arg_type(expr_type(VECTOR_T, 0U)));
   std::string name = "foo";
 
   std::stringstream platform_eol_ss;
@@ -290,8 +346,8 @@ TEST(langAst, isUserDefined) {
   args.push_back(expression(int_literal(0)));
   EXPECT_FALSE(is_user_defined(name,args));
 
-  vector<expr_type> arg_types;
-  arg_types.push_back(expr_type(INT_T,0));
+  vector<function_arg_type> arg_types;
+  arg_types.push_back(function_arg_type(expr_type(INT_T,0)));
   expr_type result_type(DOUBLE_T,0);
   // must add first, before making user defined
   function_signatures::instance().add(name, result_type, arg_types);
@@ -873,6 +929,8 @@ TEST(StanLangAst, Scope) {
   stan::lang::scope s2(stan::lang::data_origin);
   EXPECT_TRUE(s2.is_local() == true || s2.is_local() == false);
 }
+
+
 
 
 
