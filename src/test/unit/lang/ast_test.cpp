@@ -400,27 +400,27 @@ TEST(langAst, solveAlgebra) {
     
     std::string system_function_name = "bronzino";
     
-    variable x("x_var_name");
-    x.set_type(VECTOR_T, 0);  // vector from Eigen
-    
     variable y("y_var_name");
-    y.set_type(VECTOR_T, 0);
+    y.set_type(VECTOR_T, 0);  // vector from Eigen
     
-    variable dat("dat_r_var_name");
-    dat.set_type(DOUBLE_T, 1);  // plain old vector
+    variable theta("theta_var_name");
+    theta.set_type(VECTOR_T, 0);
     
-    variable dat_int("dat_int_var_name");
-    dat_int.set_type(INT_T, 1);
+    variable x_r("x_r_r_var_name");
+    x_r.set_type(DOUBLE_T, 1);  // plain old vector
+    
+    variable x_i("x_i_var_name");
+    x_i.set_type(INT_T, 1);
     
     // example of instantiation
-    algebra_solver so2(system_function_name, x, y, dat, dat_int);
+    algebra_solver so2(system_function_name, y, theta, x_r, x_i);
     
     // dumb test to make sure we at least get the right types back
     EXPECT_EQ(system_function_name, so2.system_function_name_);
-    EXPECT_EQ(x.type_, so2.x_.expression_type());
     EXPECT_EQ(y.type_, so2.y_.expression_type());
-    EXPECT_EQ(dat.type_, so2.dat_.expression_type());
-    EXPECT_EQ(dat_int.type_, so2.dat_int_.expression_type());
+    EXPECT_EQ(theta.type_, so2.theta_.expression_type());
+    EXPECT_EQ(x_r.type_, so2.x_r_.expression_type());
+    EXPECT_EQ(x_i.type_, so2.x_i_.expression_type());
     
     expression e2(so2);
     EXPECT_EQ(expr_type(VECTOR_T, 0), e2.expression_type());
