@@ -39,7 +39,7 @@ namespace stan {
        * which is a data-only expression.
        *
        * @param expr_type function argument expression type
-       * @param num_dims number of dimensions
+       * @param data_only true if argument has prefix qualifier `data`
        */
       function_arg_type(const expr_type expr_type, bool data_only);
 

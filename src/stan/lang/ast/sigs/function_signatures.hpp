@@ -56,7 +56,8 @@ namespace stan {
        * expression types. Used to check argument qualifiers, which are
        * only available from function definition.
        *
-       * @param name_sig name and signature of function
+       * @param name function name
+       * @param sig functionand sig
        */
       function_signature_t get_definition(const std::string& name,
                                           const function_signature_t& sig);
