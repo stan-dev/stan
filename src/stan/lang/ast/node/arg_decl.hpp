@@ -48,7 +48,6 @@ namespace stan {
        * True if argument has "data" qualifier.
        */
       bool is_data_;
-
     };
 
   }

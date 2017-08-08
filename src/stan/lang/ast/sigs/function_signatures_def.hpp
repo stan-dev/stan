@@ -76,7 +76,8 @@ namespace stan {
 
     void function_signatures::add(const std::string& name,
                                   const expr_type& result_type,
-                                  const std::vector<function_arg_type>& arg_types) {
+                                  const std::vector<function_arg_type>&
+                                  arg_types) {
       sigs_map_[name].push_back(function_signature_t(result_type, arg_types));
     }
 
@@ -229,7 +230,7 @@ namespace stan {
                    && sig_args[i].expr_type_.is_primitive_double()) {
           ++num_promotions;
         } else {
-          return -1; // failed match
+          return -1;    // failed match
         }
       }
       return num_promotions;
@@ -378,7 +379,6 @@ namespace stan {
       }
       msgs << ")" << std::endl;
     }
-    
 
     expr_type function_signatures::get_result_type(const std::string& name,
                                            const std::vector<expr_type>& args,

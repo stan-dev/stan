@@ -540,9 +540,9 @@ namespace stan {
       std::vector<function_arg_type> arg_types;
       for (size_t i = 0; i < decl.arg_decls_.size(); ++i)
         arg_types.push_back(
-                  function_arg_type(expr_type(decl.arg_decls_[i].arg_type_.base_type_,
-                                              decl.arg_decls_[i].arg_type_.num_dims_),
-                                    decl.arg_decls_[i].is_data_));
+            function_arg_type(expr_type(decl.arg_decls_[i].arg_type_.base_type_,
+                                        decl.arg_decls_[i].arg_type_.num_dims_),
+                              decl.arg_decls_[i].is_data_));
 
       function_signature_t sig(result_type, arg_types);
       std::pair<std::string, function_signature_t> name_sig(decl.name_, sig);
@@ -565,7 +565,7 @@ namespace stan {
       }
 
       // check not already system defined
-      if (!fun_exists(functions_declared, name_sig) 
+      if (!fun_exists(functions_declared, name_sig)
           && function_signatures::instance().is_defined(decl.name_, sig)) {
         error_msgs << "Parse Error.  Function system defined, name="
                    << decl.name_;
@@ -604,15 +604,17 @@ namespace stan {
           }
         }
       }
-       
-      if (ends_with("_lpdf", decl.name_) && arg_types[0].expr_type_.base_type_ == INT_T) {
+
+      if (ends_with("_lpdf", decl.name_)
+          && arg_types[0].expr_type_.base_type_ == INT_T) {
         error_msgs << "Parse Error.  Probability density functions require"
                    << " real variates (first argument)."
                    << " Found type = " << arg_types[0].expr_type_ << std::endl;
         pass = false;
         return;
       }
-      if (ends_with("_lpmf", decl.name_) && arg_types[0].expr_type_.base_type_ != INT_T) {
+      if (ends_with("_lpmf", decl.name_)
+          && arg_types[0].expr_type_.base_type_ != INT_T) {
         error_msgs << "Parse Error.  Probability mass functions require"
                    << " integer variates (first argument)."
                    << " Found type = " << arg_types[0].expr_type_ << std::endl;
@@ -620,8 +622,6 @@ namespace stan {
         return;
       }
 
-      // check definition arguments against declaration arguments
-      
       // add declaration in local sets and in parser function sigs
       if (functions_declared.find(name_sig) == functions_declared.end()) {
         functions_declared.insert(name_sig);
@@ -636,7 +636,6 @@ namespace stan {
       pass = true;
     }
     boost::phoenix::function<add_function_signature> add_function_signature_f;
-
 
     void validate_pmf_pdf_variate::operator()(function_decl_def& decl,
                                               bool& pass,
@@ -711,7 +710,7 @@ namespace stan {
     boost::phoenix::function<unscope_variables> unscope_variables_f;
 
     void add_fun_var::operator()(arg_decl& decl, scope& scope, bool& pass,
-                                 variable_map& vm, 
+                                 variable_map& vm,
                                  std::ostream& error_msgs) const {
       if (vm.exists(decl.name_)) {
         pass = false;
@@ -728,8 +727,8 @@ namespace stan {
       if (var_origin == data_origin) {
         if (decl.base_variable_declaration().base_type_ == INT_T) {
           pass = false;
-          error_msgs << "data qualifier cannot be applied to int variable, name="
-                     << decl.name_;
+          error_msgs << "data qualifier cannot be applied to int variable, "
+                     << "name " << decl.name_;
           error_msgs << std::endl;
           return;
         }
@@ -1757,7 +1756,7 @@ namespace stan {
             }
           }
         }
-      }      
+      }
 
       // disjunction so only first match triggered
       deprecate_fun("binomial_coefficient_log", "lchoose", fun, error_msgs)

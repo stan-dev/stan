@@ -12,7 +12,8 @@ namespace stan {
      * The type of a function signature, mapping a vector of
      * argument expression types to a result expression type.
      */
-    typedef std::pair<expr_type, std::vector<function_arg_type> > function_signature_t;
+    typedef std::pair<expr_type, std::vector<function_arg_type> >
+    function_signature_t;
 
   }
 }

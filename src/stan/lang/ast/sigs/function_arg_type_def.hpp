@@ -11,7 +11,7 @@ namespace stan {
 
     function_arg_type::function_arg_type(const expr_type expr_type)
       : expr_type_(expr_type), data_only_(false) { }
-    
+
     function_arg_type::function_arg_type(const expr_type expr_type,
                                          bool data_only)
       : expr_type_(expr_type), data_only_(data_only) { }
