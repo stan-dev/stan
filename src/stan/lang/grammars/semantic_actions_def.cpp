@@ -255,6 +255,11 @@ namespace stan {
     template void assign_lhs::operator()(expression&,
                                          const integrate_ode_control&)
       const;
+    template void assign_lhs::operator()(expression&, const algebra_solver&)
+      const;
+    template void assign_lhs::operator()(expression&,
+                                         const algebra_solver_control&)
+      const;
     template void assign_lhs::operator()(array_expr&,
                                          const array_expr&) const;
     template void assign_lhs::operator()(matrix_expr&,
@@ -1664,6 +1669,148 @@ namespace stan {
     boost::phoenix::function<validate_integrate_ode_control>
     validate_integrate_ode_control_f;
 
+    template <class T>
+    void validate_algebra_solver_non_control_args(const T& alg_fun,
+                                                  const variable_map& var_map,
+                                                  bool& pass,
+                                                  std::ostream& error_msgs) {
+      pass = true;
+      // test function argument type
+      expr_type sys_result_type(VECTOR_T, 0);
+      std::vector<expr_type> sys_arg_types;
+      sys_arg_types.push_back(expr_type(VECTOR_T, 0));  // y
+      sys_arg_types.push_back(expr_type(VECTOR_T, 0));  // theta
+      sys_arg_types.push_back(expr_type(DOUBLE_T, 1));  // x_r
+      sys_arg_types.push_back(expr_type(INT_T, 1));  // x_i
+      function_signature_t system_signature(sys_result_type, sys_arg_types);
+      if (!function_signatures::instance()
+          .is_defined(alg_fun.system_function_name_, system_signature)) {
+        error_msgs << "first argument to "
+                   << "algebra_solver"
+                   << " must be the name of a function with signature"
+                   << " (vector, vector, real[], int[]) : vector "
+                   << std::endl;
+        pass = false;
+      }
+
+      // test regular argument types
+      if (alg_fun.y_.expression_type() != expr_type(VECTOR_T, 0)) {
+        error_msgs << "second argument to algebra_solver"
+                   << " must have type vector for initial guess;"
+                   << " found type = "
+                   << alg_fun.y_.expression_type()
+                   << ". " << std::endl;
+        pass = false;
+      }
+      if (alg_fun.theta_.expression_type() != expr_type(VECTOR_T, 0)) {
+        error_msgs << "third argument to algebra_solver"
+                   << " must have type vector for parameters;"
+                   << " found type = "
+                   << alg_fun.theta_.expression_type()
+                   << ". " << std::endl;
+        pass = false;
+      }
+      if (alg_fun.x_r_.expression_type() != expr_type(DOUBLE_T, 1)) {
+        error_msgs << "fourth argument to algebra_solver"
+                   << " must have type real[] for real data;"
+                   << " found type = "
+                   << alg_fun.x_r_.expression_type()
+                   << ". " << std::endl;
+        pass = false;
+      }
+      if (alg_fun.x_i_.expression_type() != expr_type(INT_T, 1)) {
+        error_msgs << "fifth argument to algebra_solver"
+                   << " must have type int[] for integer data;"
+                   << " found type = "
+                   << alg_fun.x_i_.expression_type()
+                   << ". " << std::endl;
+        pass = false;
+      }
+
+      // test data-only variables do not have parameters (int locals OK)
+      if (has_var(alg_fun.y_, var_map)) {
+        error_msgs << "second argument to algebra_solver"
+                   << " (initial guess)"
+                   << " must be data only and not reference parameters"
+                   << std::endl;
+        pass = false;
+      }
+      if (has_var(alg_fun.x_r_, var_map)) {
+        error_msgs << "fourth argument to algebra_solver"
+                   << " (real data)"
+                   << " must be data only and not reference parameters"
+                   << std::endl;
+        pass = false;
+      }
+    }
+
+    void validate_algebra_solver::operator()(const algebra_solver& alg_fun,
+                                             const variable_map& var_map,
+                                             bool& pass,
+                                             std::ostream& error_msgs) const {
+      validate_algebra_solver_non_control_args(alg_fun, var_map, pass,
+                                               error_msgs);
+    }
+    boost::phoenix::function<validate_algebra_solver>
+      validate_algebra_solver_f;
+
+    void validate_algebra_solver_control::operator()(
+                      const algebra_solver_control& alg_fun,
+                      const variable_map& var_map, bool& pass,
+                      std::ostream& error_msgs) const {
+      validate_algebra_solver_non_control_args(alg_fun, var_map, pass,
+                                              error_msgs);
+      if (!alg_fun.rel_tol_.expression_type().is_primitive()) {
+        error_msgs << "sixth argument to algebra_solver "
+                   << " (relative tolerance) must have type real or int;"
+                   << " found type="
+                   << alg_fun.rel_tol_.expression_type()
+                   << ". " << std::endl;
+        pass = false;
+      }
+      if (!alg_fun.fun_tol_.expression_type().is_primitive()) {
+        error_msgs << "seventh argument to algebra_solver "
+                   << " (function tolerance) must have type real or int;"
+                   << " found type="
+                   << alg_fun.fun_tol_.expression_type()
+                   << ". " << std::endl;
+        pass = false;
+      }
+      if (!alg_fun.max_num_steps_.expression_type().is_primitive()) {
+        error_msgs << "eighth argument to algebra_solver"
+                   << " (max number of steps) must have type real or int;"
+                   << " found type="
+                   << alg_fun.max_num_steps_.expression_type()
+                   << ". " << std::endl;
+        pass = false;
+      }
+
+      // test data-only variables do not have parameters (int locals OK)
+      if (has_var(alg_fun.rel_tol_, var_map)) {
+        error_msgs << "sixth argument to algebra_solver"
+                   << " (relative tolerance) must be data only"
+                   << " and not depend on parameters"
+                   << std::endl;
+        pass = false;
+      }
+      if (has_var(alg_fun.fun_tol_, var_map)) {
+        error_msgs << "seventh argument to algebra_solver"
+                   << " (function tolerance ) must be data only"
+                   << " and not depend parameters"
+                   << std::endl;
+        pass = false;
+      }
+      if (has_var(alg_fun.max_num_steps_, var_map)) {
+        error_msgs << "eighth argument to algebra_solver"
+                   << " (max number of steps) must be data only"
+                   << " and not depend on parameters" << std::endl;
+        pass = false;
+      }
+    }
+    boost::phoenix::function<validate_algebra_solver_control>
+    validate_algebra_solver_control_f;
+
+
     void set_fun_type_named::operator()(expression& fun_result, fun& fun,
                                         const scope& var_scope,
                                         bool& pass,
@@ -2352,6 +2499,13 @@ namespace stan {
       const {
       return boost::apply_visitor(*this, x.y0_.expr_)
         && boost::apply_visitor(*this, x.theta_.expr_);
+    }
+    bool data_only_expression::operator()(const algebra_solver& x) const {
+      return boost::apply_visitor(*this, x.theta_.expr_);
+    }
+    bool data_only_expression::operator()(const algebra_solver_control& x)
+      const {
+      return boost::apply_visitor(*this, x.theta_.expr_);
     }
     bool data_only_expression::operator()(const fun& x) const {
       for (size_t i = 0; i < x.args_.size(); ++i)
