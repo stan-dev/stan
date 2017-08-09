@@ -37,6 +37,8 @@ namespace stan {
 
     bool function_signatures::is_defined(const std::string& name,
                                          const function_signature_t& sig) {
+      if (sigs_map_.find(name) == sigs_map_.end())
+        return false;
       const std::vector<function_signature_t> sigs = sigs_map_[name];
       for (size_t i = 0; i < sigs.size(); ++i)
         if (sig.second == sigs[i].second)
