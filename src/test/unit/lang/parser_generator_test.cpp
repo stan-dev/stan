@@ -68,8 +68,8 @@ TEST(unitLang, odeTest) {
 
 TEST(unitLang, algebra_solverTest) {
   std::string expected;
-  expected = "stan::math::assign(theta, "
-    "algebra_solver(algebra_system_functor__(), x, y, dat, dat_int, pstream__));";
+  expected = "stan::math::assign(y_s, "
+    "algebra_solver(algebra_system_functor__(), y, theta, x_r, x_i, pstream__));";
   test_pg("algebra_solver", expected);
   test_pg_count("algebra_solver", expected, 1);
 }
