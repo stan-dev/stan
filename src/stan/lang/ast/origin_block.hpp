@@ -76,13 +76,6 @@ namespace stan {
      */
     const int void_function_argument_origin_rng = 11;
 
-    /**
-     * The variable arose as an argument to a function and has qualifier
-     * \c data.
-     */
-    //    const int void_function_argument_origin_data = 12;
-
-
   }
 }
 #endif
