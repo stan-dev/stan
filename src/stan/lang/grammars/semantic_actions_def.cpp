@@ -1721,11 +1721,11 @@ namespace stan {
       pass = true;
       // test function argument type
       expr_type sys_result_type(VECTOR_T, 0);
-      std::vector<expr_type> sys_arg_types;
-      sys_arg_types.push_back(expr_type(VECTOR_T, 0));  // y
-      sys_arg_types.push_back(expr_type(VECTOR_T, 0));  // theta
-      sys_arg_types.push_back(expr_type(DOUBLE_T, 1));  // x_r
-      sys_arg_types.push_back(expr_type(INT_T, 1));  // x_i
+      std::vector<function_arg_type> sys_arg_types;
+      sys_arg_types.push_back(function_arg_type(expr_type(VECTOR_T, 0), true));  // y
+      sys_arg_types.push_back(function_arg_type(expr_type(VECTOR_T, 0)));  // theta
+      sys_arg_types.push_back(function_arg_type(expr_type(DOUBLE_T, 1), true));  // x_r
+      sys_arg_types.push_back(function_arg_type(expr_type(INT_T, 1)));  // x_i
       function_signature_t system_signature(sys_result_type, sys_arg_types);
       if (!function_signatures::instance()
           .is_defined(alg_fun.system_function_name_, system_signature)) {
