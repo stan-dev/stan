@@ -23,6 +23,38 @@ TEST(parserFunctions, funsGood4) {
                                         // symbols are not saved
 }
 
+TEST(parserFunctions, rejectfuns1) {
+  test_parsable("lang/print_reject_function_gq");
+}
+
+TEST(parserFunctions, rejectfuns2) {
+  test_parsable("lang/print_reject_function_model");
+}
+
+TEST(parserFunctions, rejectfuns3) {
+  test_parsable("lang/print_reject_function_tdata");
+}
+
+TEST(parserFunctions, rejectfuns4) {
+  test_parsable("lang/print_reject_function_tparams");
+}
+
+TEST(parserFunctions, rejectfuns5) {
+  test_parsable("lang/reject_func_call_generated_quantities");
+}
+
+TEST(parserFunctions, rejectfuns6) {
+  test_parsable("lang/reject_func_call_model");
+}
+
+TEST(parserFunctions, rejectfuns7) {
+  test_parsable("lang/reject_func_call_transformed_data");
+}
+
+TEST(parserFunctions, rejectfuns8) {
+  test_parsable("lang/reject_func_call_transformed_parameters");
+}
+
 TEST(parserFunctions, funsBad0) {
   test_throws("functions-bad0", "Functions cannot contain void argument types");
 }
