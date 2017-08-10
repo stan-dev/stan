@@ -232,7 +232,6 @@ namespace stan {
     }
     boost::phoenix::function<validate_double_expr> validate_double_expr_f;
 
-
     template <typename L, typename R>
     void assign_lhs::operator()(L& lhs, const R& rhs) const {
       lhs = rhs;
@@ -959,9 +958,7 @@ namespace stan {
                                        std::ostream& error_msgs) const {
       // validate existence
       if (!vm.exists(name)) {
-        error_msgs << "Unknown variable in assignment"
-                   << "; lhs variable=" << name
-                   << std::endl;
+        // fail silently, allow backtracking
         pass = false;
         return;
       }
@@ -983,7 +980,9 @@ namespace stan {
       // validate var exists
       std::string name = a.lhs_var_.name_;
       if (!vm.exists(name)) {
-        // fail silently to allow backtracking without spurious error messages
+        error_msgs << "Unknown variable in assignment"
+                   << "; lhs variable=" << name
+                   << std::endl;
         pass = false;
         return;
       }
@@ -1729,10 +1728,14 @@ namespace stan {
       // test function argument type
       expr_type sys_result_type(VECTOR_T, 0);
       std::vector<function_arg_type> sys_arg_types;
-      sys_arg_types.push_back(function_arg_type(expr_type(VECTOR_T, 0), true));  // y
-      sys_arg_types.push_back(function_arg_type(expr_type(VECTOR_T, 0)));  // theta
-      sys_arg_types.push_back(function_arg_type(expr_type(DOUBLE_T, 1), true));  // x_r
-      sys_arg_types.push_back(function_arg_type(expr_type(INT_T, 1)));  // x_i
+      sys_arg_types.push_back(function_arg_type(expr_type(VECTOR_T,
+                                                          0), true));  // y
+      sys_arg_types.push_back(function_arg_type(expr_type(VECTOR_T,
+                                                          0)));  // theta
+      sys_arg_types.push_back(function_arg_type(expr_type(DOUBLE_T,
+                                                          1), true));  // x_r
+      sys_arg_types.push_back(function_arg_type(expr_type(INT_T,
+                                                          1)));  // x_i
       function_signature_t system_signature(sys_result_type, sys_arg_types);
       if (!function_signatures::instance()
           .is_defined(alg_fun.system_function_name_, system_signature)) {
