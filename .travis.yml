@@ -2,31 +2,67 @@ language: cpp
 
 sudo: false
 
-os:
-  - linux
-  
-compiler:
-  - clang
-  - gcc
+before_script:
+  - eval "${MATRIX_EVAL}"
+  - echo ${CXX}
+  - ${CXX} --version
+  - echo "CC=$CXX" > make/local
+
+linux_clang: &linux_clang
+  os: linux
+  compiler: "clang-3.8"
+  addons:
+    apt:
+      sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.8' ]
+      packages: [ 'clang-3.8', 'libc++-dev' ]
+
+linux_gcc: &linux_gcc
+  os: linux
+  compiler: "gcc-4.9"
+  addons:
+    apt:
+      sources: [ 'ubuntu-toolchain-r-test' ]
+      packages: [ 'g++-4.9' ]
 
 before_install: make math-revert
 
-before_script: echo "CC=$CXX" > make/local
-
 matrix:
   fast_finish: true
-
-env:
-  -  TESTFOLDER=src/test/unit/callbacks
-  -  TESTFOLDER=src/test/unit/io
-  -  TESTFOLDER=src/test/unit/lang
-  -  TESTFOLDER=src/test/unit/mcmc
-  -  TESTFOLDER=src/test/unit/model
-  -  TESTFOLDER=src/test/unit/optimization
-  -  TESTFOLDER=src/test/unit/services
-  -  TESTFOLDER=src/test/unit/variational
-  -  TESTFOLDER=src/test/unit/version_test.cpp
+  include:
+    - <<: *linux_clang
+      env:
+        - MATRIX_EVAL="CXX=clang++-3.8"
+          TESTFOLDER="src/test/unit/callbacks src/test/unit/io"
+    - <<: *linux_clang
+      env:
+        - MATRIX_EVAL="CXX=clang++-3.8"
+          TESTFOLDER=src/test/unit/lang
+    - <<: *linux_clang
+      env:
+        - MATRIX_EVAL="CXX=clang++-3.8"
+          TESTFOLDER="src/test/unit/mcmc src/test/unit/model src/test/unit/optimization"
+    - <<: *linux_clang
+      env:
+        - MATRIX_EVAL="CXX=clang++-3.8"
+          TESTFOLDER="src/test/unit/services src/test/unit/variational src/test/unit/version_test.cpp"
+    - <<: *linux_gcc
+      env:
+        - MATRIX_EVAL="CXX=g++-4.9"
+          TESTFOLDER="src/test/unit/callbacks src/test/unit/io"
+    - <<: *linux_gcc
+      env:
+        - MATRIX_EVAL="CXX=g++-4.9"
+          TESTFOLDER=src/test/unit/lang
+    - <<: *linux_gcc
+      env:
+        - MATRIX_EVAL="CXX=g++-4.9"
+          TESTFOLDER="src/test/unit/mcmc src/test/unit/model src/test/unit/optimization"
+    - <<: *linux_gcc
+      env:
+        - MATRIX_EVAL="CXX=g++-4.9"
+          TESTFOLDER="src/test/unit/services src/test/unit/variational src/test/unit/version_test.cpp"
 
 script: ./runTests.py -j2 $TESTFOLDER
 
-dist: precise
+sudo: false
+dist: trusty
