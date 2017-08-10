@@ -978,9 +978,16 @@ namespace stan {
     boost::phoenix::function<validate_lhs_var_assgn> validate_lhs_var_assgn_f;
 
     void validate_assgn::operator()(const assgn& a, bool& pass,
+                                    const variable_map& vm,
                                     std::ostream& error_msgs) const {
-      // resolve type of lhs[idxs] and make sure it matches rhs
+      // validate var exists
       std::string name = a.lhs_var_.name_;
+      if (!vm.exists(name)) {
+        // fail silently to allow backtracking without spurious error messages
+        pass = false;
+        return;
+      }
+
       expression lhs_expr = expression(a.lhs_var_);
       expr_type lhs_type = indexed_type(lhs_expr, a.idxs_);
       if (lhs_type.is_ill_formed()) {
@@ -1008,7 +1015,7 @@ namespace stan {
 
     void validate_assignment::operator()(assignment& a,
                                          const scope& var_scope,
-                                         bool& pass, variable_map& vm,
+                                         bool& pass, const variable_map& vm,
                                          std::ostream& error_msgs) const {
       std::string name = a.var_dims_.name_;
       if (!vm.exists(name)) {
