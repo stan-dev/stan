@@ -106,6 +106,6 @@ TEST(parserFunctions,funsBad17) {
 }
 
 TEST(parserFunctions, badProbFunSuffix) {
-  test_throws("bad_prob_fun_Suffix",
+  test_throws("bad_prob_fun_suffix",
               "Probability function must end in _lpdf or _lpmf");
 }
