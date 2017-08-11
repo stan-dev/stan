@@ -183,6 +183,42 @@ namespace stan {
         o_ << ")";
       }
 
+      void operator()(const algebra_solver& fx) const {
+        o_ << "algebra_solver"
+           << '('
+           << fx.system_function_name_
+           << "_functor__(), ";
+        generate_expression(fx.y_, o_);
+        o_ << ", ";
+        generate_expression(fx.theta_, o_);
+        o_ << ", ";
+        generate_expression(fx.x_r_, o_);
+        o_ << ", ";
+        generate_expression(fx.x_i_, o_);
+        o_ << ", pstream__)";
+      }
+
+      void operator()(const algebra_solver_control& fx) const {
+        o_ << "algebra_solver"
+           << '('
+           << fx.system_function_name_
+           << "_functor__(), ";
+        generate_expression(fx.y_, o_);
+        o_ << ", ";
+        generate_expression(fx.theta_, o_);
+        o_ << ", ";
+        generate_expression(fx.x_r_, o_);
+        o_ << ", ";
+        generate_expression(fx.x_i_, o_);
+        o_ << ", pstream__, ";
+        generate_expression(fx.rel_tol_, o_);
+        o_ << ", ";
+        generate_expression(fx.fun_tol_, o_);
+        o_ << ", ";
+        generate_expression(fx.max_num_steps_, o_);
+        o_ << ")";
+      }
+
       void operator()(const fun& fx) const {
         // first test if short-circuit op (binary && and || applied to
         // primitives; overloads are eager, not short-circuiting)

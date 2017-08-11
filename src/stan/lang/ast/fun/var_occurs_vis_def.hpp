@@ -62,6 +62,14 @@ namespace stan {
       return false;  // no refs persist out of integrate_ode_control() call
     }
 
+    bool var_occurs_vis::operator()(const algebra_solver& e) const {
+      return false;  // no refs persist out of algebra_solver() call
+    }
+
+    bool var_occurs_vis::operator()(const algebra_solver_control& e) const {
+      return false;  // no refs persist out of algebra_solver_control() call
+    }
+
     bool var_occurs_vis::operator()(const index_op& e) const {
       // refs only persist out of expression, not indexes
       return boost::apply_visitor(*this, e.expr_.expr_);

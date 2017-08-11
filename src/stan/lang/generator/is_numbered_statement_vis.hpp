@@ -10,10 +10,10 @@ namespace stan {
 
     /**
      * Visitor to return true if the statement is numbered for error
-     * reporting.  All statements are numbered other than the nil
-     * statement and sequences of statements, the former because there
-     * is nothing to number and the latter because each statement
-     * within the sequence is numbered.
+     * reporting.  All statements are numbered except for:
+     * the nil and no-op statements because there is nothing to number;
+     * sequences of statements because each statement within the sequence
+     * is numbered.
      */
     struct is_numbered_statement_vis : public boost::static_visitor<bool> {
       /**
@@ -53,7 +53,7 @@ namespace stan {
 
       bool operator()(const reject_statement& st) const { return true; }
 
-      bool operator()(const no_op_statement& st) const { return true; }
+      bool operator()(const no_op_statement& st) const { return false; }
 
       bool operator()(const return_statement& st) const { return true; }
     };
