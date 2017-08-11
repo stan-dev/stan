@@ -35,6 +35,10 @@ namespace stan {
 
     expression::expression(const integrate_ode_control& expr) : expr_(expr) { }
 
+    expression::expression(const algebra_solver& expr) : expr_(expr) { }
+
+    expression::expression(const algebra_solver_control& expr) : expr_(expr) { }
+
     expression::expression(const fun& expr) : expr_(expr) { }
 
     expression::expression(const index_op& expr) : expr_(expr) { }
