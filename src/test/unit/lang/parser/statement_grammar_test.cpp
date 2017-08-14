@@ -94,7 +94,7 @@ TEST(langParserStatementGrammar, validateAssignmentTypes) {
 
 TEST(langParserStatementGrammar, assignRealToIntMessage) {
   test_throws("assign_real_to_int",
-              "PARSER EXPECTED: <expression assignable to left-hand side>");
+              "Base type mismatch in assignment");
 }
 
 TEST(langParserStatementGrammar, useCdfWithSamplingNotation) {
@@ -112,7 +112,7 @@ TEST(langParserStatementGrammar, targetFunGetLpDeprecated) {
   test_warning("get-lp-deprecate", 
                "Warning (non-fatal): get_lp() function deprecated.");
   test_warning("get-lp-deprecate", 
-  "  It will be removed in a future release.");
+               "  It will be removed in a future release.");
   test_warning("get-lp-deprecate", 
                "  Use target() instead.");
   test_throws("get-lp-target-data",
@@ -133,3 +133,70 @@ TEST(langParserStatementGrammar, removeLpDoubleUnderscore) {
               "  Use target() function to get log density.");
 }
 
+TEST(langParserStatementGrammar, plusEqualsGood) {
+  test_parsable("compound-assign/plus_equals_prim");
+  test_parsable("compound-assign/plus_equals_container");
+  test_parsable("compound-assign/plus_equals_manual");
+}
+
+TEST(langParserStatementGrammar, minusEqualsGood) {
+  test_parsable("compound-assign/minus_equals_prim");
+  test_parsable("compound-assign/minus_equals_container");
+  test_parsable("compound-assign/minus_equals_manual");
+}
+
+TEST(langParserStatementGrammar, multiplyEqualsGood) {
+  test_parsable("compound-assign/multiply_equals_prim");
+  test_parsable("compound-assign/multiply_equals_container");
+  test_parsable("compound-assign/multiply_equals_manual");
+}
+
+TEST(langParserStatementGrammar, divideEqualsGood) {
+  test_parsable("compound-assign/divide_equals_prim");
+  test_parsable("compound-assign/divide_equals_container");
+  test_parsable("compound-assign/divide_equals_manual");
+}
+
+TEST(langParserStatementGrammar, eltOpEqualsGood) {
+  test_parsable("compound-assign/elt_multiply_equals");
+  test_parsable("compound-assign/elt_divide_equals");
+}
+
+TEST(langParserStatementGrammar, plusEqualsBad) {
+  test_throws("compound-assign/plus_equals_bad_var_lhs","does not exist");
+  test_throws("compound-assign/plus_equals_bad_var_lhs2",
+              "Cannot assign to variable outside of declaration block");
+  test_throws("compound-assign/plus_equals_bad_lhs_idxs",
+              "Too many indexes for variable");
+  test_throws("compound-assign/plus_equals_bad_var_rhs",
+              "does not exist");
+  test_throws("compound-assign/plus_equals_type_mismatch",
+              "Cannot apply operator '+='");
+  test_throws("compound-assign/plus_equals_type_mismatch2",
+              "Cannot apply operator '+='");
+  test_throws("compound-assign/plus_equals_matrix_array",
+              "Cannot apply operator '+='");
+  test_throws("compound-assign/plus_equals_matrix_array2",
+              "Cannot apply operator '+='");
+  test_throws("compound-assign/plus_equals_prim_array",
+              "Cannot apply operator '+='");
+  test_throws("compound-assign/plus_equals_row_vec_array",
+              "Cannot apply operator '+='");
+  test_throws("compound-assign/plus_equals_row_vec_array",
+              "Cannot apply operator '+='");
+  test_throws("compound-assign/plus_equals_bad_init",
+              "PARSER EXPECTED: \";\"");
+}
+
+TEST(langParserStatementGrammar, timesEqualsBad) {
+  test_throws("compound-assign/times_equals_matrix_array",
+              "Cannot apply operator '*='");
+}
+
+
+TEST(langParserStatementGrammar, eltOpEqualsBad) {
+  test_throws("compound-assign/elt_times_equals_prim",
+              "Cannot apply element-wise operation to scalar");
+  test_throws("compound-assign/elt_divide_equals_prim",
+              "Cannot apply element-wise operation to scalar");
+}

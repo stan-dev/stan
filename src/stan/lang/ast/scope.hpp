@@ -38,8 +38,7 @@ namespace stan {
        *
        * @param program_block enclosing program block
        */
-      scope(const
-                 origin_block& program_block);   // NOLINT(runtime/explicit)
+      scope(const origin_block& program_block);   // NOLINT(runtime/explicit)
 
       /**
        * Construct scope for a variable in specified outer program block,

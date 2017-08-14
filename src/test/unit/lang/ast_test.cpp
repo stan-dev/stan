@@ -390,6 +390,42 @@ TEST(langAst, solveOde) {
   EXPECT_EQ(expr_type(DOUBLE_T,2), e2.expression_type());
 }
 
+TEST(langAst, solveAlgebra) {
+    using stan::lang::algebra_solver;
+    using stan::lang::variable;
+    using stan::lang::expr_type;
+    using stan::lang::expression;
+    
+    algebra_solver so;  // null ctor should work and not raise error
+    
+    std::string system_function_name = "bronzino";
+    
+    variable y("y_var_name");
+    y.set_type(VECTOR_T, 0);  // vector from Eigen
+    
+    variable theta("theta_var_name");
+    theta.set_type(VECTOR_T, 0);
+    
+    variable x_r("x_r_r_var_name");
+    x_r.set_type(DOUBLE_T, 1);  // plain old vector
+    
+    variable x_i("x_i_var_name");
+    x_i.set_type(INT_T, 1);
+    
+    // example of instantiation
+    algebra_solver so2(system_function_name, y, theta, x_r, x_i);
+    
+    // dumb test to make sure we at least get the right types back
+    EXPECT_EQ(system_function_name, so2.system_function_name_);
+    EXPECT_EQ(y.type_, so2.y_.expression_type());
+    EXPECT_EQ(theta.type_, so2.theta_.expression_type());
+    EXPECT_EQ(x_r.type_, so2.x_r_.expression_type());
+    EXPECT_EQ(x_i.type_, so2.x_i_.expression_type());
+    
+    expression e2(so2);
+    EXPECT_EQ(expr_type(VECTOR_T, 0), e2.expression_type());
+}
+
 void testTotalDims(int expected_total_dims,
                    const stan::lang::base_expr_type& base_type,
                    size_t num_dims) {
@@ -835,7 +871,44 @@ TEST(StanLangAstFun, is_nonempty) {
   EXPECT_TRUE(is_nonempty("  \r\n \n 1  \n"));
 }
 
+template <typename T>
+void expect_has_var_bool(const T& x) {
+  EXPECT_TRUE(x.has_var_ == 0 || x.has_var_ == 1);
+}
 
+
+TEST(StanLangAst, ConditionalOp) {
+  expect_has_var_bool(stan::lang::conditional_op());
+
+  stan::lang::expression e = int_literal(3);
+  expect_has_var_bool(stan::lang::conditional_op(e, e, e));
+}
+
+TEST(StanLangAst, RowVectorExpr) {
+  expect_has_var_bool(stan::lang::row_vector_expr());
+}
+
+TEST(StanLangAst, MatrixExpr) {
+  expect_has_var_bool(stan::lang::matrix_expr());
+}
+
+TEST(StanLangAst, Sample) {
+  stan::lang::sample s;
+  EXPECT_TRUE(s.is_discrete_ == true || s.is_discrete_ == false);
+
+  stan::lang::expression e = int_literal(3);
+  stan::lang::distribution d;
+  stan::lang::sample s2(e, d);
+  EXPECT_TRUE(s2.is_discrete_ == true || s2.is_discrete_ == false);
+}
+
+TEST(StanLangAst, Scope) {
+  stan::lang::scope s;
+  EXPECT_TRUE(s.is_local() == true || s.is_local() == false);
+
+  stan::lang::scope s2(stan::lang::data_origin);
+  EXPECT_TRUE(s2.is_local() == true || s2.is_local() == false);
+}
 
 
 

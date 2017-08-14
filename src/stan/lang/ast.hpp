@@ -56,6 +56,8 @@
 #include <stan/lang/ast/sigs/function_signature_t.hpp>
 #include <stan/lang/ast/sigs/function_signatures.hpp>
 
+#include <stan/lang/ast/node/algebra_solver.hpp>
+#include <stan/lang/ast/node/algebra_solver_control.hpp>
 #include <stan/lang/ast/node/arg_decl.hpp>
 #include <stan/lang/ast/node/array_expr.hpp>
 #include <stan/lang/ast/node/assgn.hpp>
@@ -65,6 +67,7 @@
 #include <stan/lang/ast/node/break_continue_statement.hpp>
 #include <stan/lang/ast/node/cholesky_corr_var_decl.hpp>
 #include <stan/lang/ast/node/cholesky_factor_var_decl.hpp>
+#include <stan/lang/ast/node/compound_assignment.hpp>
 #include <stan/lang/ast/node/conditional_op.hpp>
 #include <stan/lang/ast/node/conditional_statement.hpp>
 #include <stan/lang/ast/node/corr_matrix_var_decl.hpp>

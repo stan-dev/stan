@@ -8,10 +8,12 @@
 #include <stan/lang/generator/generate_local_var_decls.hpp>
 #include <stan/lang/generator/generate_printable.hpp>
 #include <stan/lang/generator/visgen.hpp>
+#include <boost/algorithm/string.hpp>
 #include <ostream>
 #include <sstream>
 #include <string>
 #include <vector>
+#include <typeinfo>
 
 namespace stan {
   namespace lang {
@@ -155,8 +157,44 @@ namespace stan {
         o_ << ");" << std::endl;
       }
 
-
       void operator()(const nil& /*x*/) const { }
+
+      void operator()(const compound_assignment& x) const {
+        std::string op = boost::algorithm::erase_last_copy(x.op_, "=");
+        generate_indent(indent_, o_);
+        o_ << "stan::math::assign(";
+        generate_indexed_expr<true>(x.var_dims_.name_,
+                                    x.var_dims_.dims_,
+                                    x.var_type_.base_type_,
+                                    x.var_type_.dims_.size(),
+                                    false,
+                                    o_);
+        o_ << ", ";
+        if (x.op_name_.size() == 0) {
+          o_ << "(";
+          generate_indexed_expr<false>(x.var_dims_.name_,
+                                      x.var_dims_.dims_,
+                                      x.var_type_.base_type_,
+                                      x.var_type_.dims_.size(),
+                                      false,
+                                      o_);
+          o_ << " " << x.op_ << " ";
+          generate_expression(x.expr_, false, is_var_context_, o_);
+          o_ << ")";
+        } else {
+          o_ << x.op_name_ << "(";
+          generate_indexed_expr<false>(x.var_dims_.name_,
+                                      x.var_dims_.dims_,
+                                      x.var_type_.base_type_,
+                                      x.var_type_.dims_.size(),
+                                      false,
+                                      o_);
+          o_ << ", ";
+          generate_expression(x.expr_, false, is_var_context_, o_);
+          o_ << ")";
+        }
+        o_ << ");" << EOL;
+      }
 
       void operator()(const assignment& x) const {
         generate_indent(indent_, o_);
@@ -262,17 +300,17 @@ namespace stan {
 
       void operator()(const statements& x) const {
         bool has_local_vars = x.local_decl_.size() > 0;
-        size_t indent = has_local_vars ? (indent_ + 1) : indent_;
         if (has_local_vars) {
           generate_indent(indent_, o_);
           o_ << "{" << EOL;
-          generate_local_var_decls(x.local_decl_, indent, o_,
+          generate_local_var_decls(x.local_decl_, indent_, o_,
                                    is_var_context_, is_fun_return_);
         }
         o_ << EOL;
-        for (size_t i = 0; i < x.statements_.size(); ++i)
-          generate_statement(x.statements_[i], indent, o_, include_sampling_,
+        for (size_t i = 0; i < x.statements_.size(); ++i) {
+          generate_statement(x.statements_[i], indent_, o_, include_sampling_,
                              is_var_context_, is_fun_return_);
+        }
         if (has_local_vars) {
           generate_indent(indent_, o_);
           o_ << "}" << EOL;

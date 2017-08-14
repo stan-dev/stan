@@ -1983,10 +1983,9 @@ there are in $y$.
 \begin{stancode}
 functions {
   int sum(int[,] a) {
-    int s;
-    s = 0;
+    int s = 0;
     for (i in 1:size(a))
-      s = s + sum(a[i]);
+      s += sum(a[i]);
     return s;
   }
 }
@@ -2037,11 +2036,11 @@ transformed data {
         if (y[n,d] == 1) {
           n_pos[i] = n;
           d_pos[i] = d;
-          i = i + 1;
+          i += 1;
         } else {
           n_neg[j] = n;
           d_neg[j] = d;
-          j = j + 1;
+          j += 1;
         }
       }
     }
@@ -2341,10 +2340,9 @@ parameters {
 }
 model {
   for (n in (K+1):N) {
-    real mu;
-    mu = alpha;
+    real mu = alpha;
     for (k in 1:K)
-      mu = mu + beta[k] * y[n-k];
+      mu += beta[k] * y[n-k];
     y[n] ~ normal(mu, sigma);
   }
 }
@@ -2816,12 +2814,11 @@ parameter block.
 %
 \begin{stancode}
 transformed parameters {
-  vector[T] h;            // log volatility at time t
-  h = h_std * sigma;     // now h ~ normal(0, sigma)
-  h[1] = h[1] / sqrt(1 - phi * phi);  // rescale h[1]
-  h = h + mu;
+  vector[T] h = h_std * sigma;  // now h ~ normal(0, sigma)
+  h[1] /= sqrt(1 - phi * phi);  // rescale h[1]
+  h += mu;
   for (t in 2:T)
-    h[t] = h[t] + phi * (h[t-1] - mu);
+    h[t] += phi * (h[t-1] - mu);
 }
 \end{stancode}
 %
@@ -2958,12 +2955,12 @@ transformed data {
     for (k2 in 1:K)
       trans[k1, k2] = 0;
   for (t in 2:T)
-    trans[z[t - 1], z[t]] = 1 + trans[z[t - 1], z[t]];
+    trans[z[t - 1], z[t]] += 1;
   for (k in 1:K)
     for (v in 1:V)
       emit[k,v] = 0;
   for (t in 1:T)
-    emit[z[t], w[t]] = 1 + emit[z[t], w[t]];
+    emit[z[t], w[t]] += 1;
 }
 \end{stancode}
 %
@@ -3010,11 +3007,11 @@ transformed data {
   for (k in 1:K)
     alpha_post[k] = alpha;
   for (t in 2:T)
-    alpha_post[z[t-1], z[t]] = alpha_post[z[t-1], z[t]] + 1;
+    alpha_post[z[t-1], z[t]] += 1;
   for (k in 1:K)
     beta_post[k] = beta;
   for (t in 1:T)
-    beta_post[z[t],w[t]] = beta_post[z[t],w[t]] + 1;
+    beta_post[z[t], w[t]] += 1;
 }
 \end{stancode}
 %
@@ -3385,7 +3382,7 @@ transformed parameters {
       for (n in 1:(m - 1)) {
         L[m, n] = L_lower[i];
         L[n, m] = 0;
-        i = i + 1;
+        i += 1;
       }
     }
   }
@@ -3464,13 +3461,13 @@ int n2 = 1;
 for (n in 1:N) {
   if (y_observed[n, 1] && y_observed[n, 2]) {
     ns12[n12] = n;
-    n12 = n12 + 1;
+    n12 += 1;
   } else if (y_observed[n, 1]) {
     ns1[n1] = n;
-    n1 = n1 + 1;
+    n1 += 1;
   } else if (y_observed[n, 2]) {
     ns2[n2] = n;
-    n2 = n2 + 1;
+    n2 += 1;
   }
 }
 \end{stancode}
@@ -3950,13 +3947,12 @@ parameters {
 }
 model {
   real log_theta[K] = log(theta);  // cache log calculation
-
   sigma ~ lognormal(0, 2);
   mu ~ normal(0, 10);
   for (n in 1:N) {
     real lps[K] = log_theta;
     for (k in 1:K)
-      lps[k] = lps[k] + normal_lpdf(y[n] | mu[k], sigma[k]);
+      lps[k] += normal_lpdf(y[n] | mu[k], sigma[k]);
     target += log_sum_exp(lps);
   }
 }
@@ -4333,11 +4329,10 @@ number of non-zero entries in an array of integers,
 \begin{stancode}
 functions {
   int num_zero(int[] y) {
-    int nz;
-    nz = 0;
+    int nz = 0;
     for (n in 1:size(y))
       if (y[n] == 0)
-        nz = nz + 1;
+        nz += 1;
     return nz;
   }
 }
@@ -4348,19 +4343,15 @@ statistics,
 %
 \begin{stancode}
 transformed data {
-  int<lower=0, upper=N> N0;
-  int<lower=0, upper=N> Ngt0;
+  int<lower=0, upper=N> N0 = num_zero(y);
+  int<lower=0, upper=N> Ngt0 = N - N0;
   int<lower=1> y_nz[N - num_zero(y)];
-
-  N0 = num_zero(y);
-  Ngt0 = N - N0;
   {
-    int pos;
-    pos = 1;
+    int pos = 1;
     for (n in 1:N) {
       if (y[n] != 0) {
         y_nz[pos] = y[n];
-        pos = pos + 1;
+        pos += 1;
       }
     }
   }
@@ -6986,7 +6977,7 @@ transformed data {
   for (i in 1:(N - 1)) {
     K[i, i] = 1 + 0.1;
     for (j in (i + 1):N) {
-      K[i, j] = exp(-0.5 * pow(x[i] - x[j],2));
+      K[i, j] = exp(-0.5 * square(x[i] - x[j]));
       K[j, i] = K[i, j];
     }
   }
@@ -7395,14 +7386,13 @@ functions {
                             real delta) {
     int N = size(x);
     matrix[N, N] K;
-    real neg_half = -0.5;
     real sq_alpha = square(alpha);
     for (i in 1:(N-1)) {
       K[i, i] = sq_alpha + delta;
       for (j in (i + 1):N) {
-        K[i, j] = sq_alpha * exp(neg_half * 
-                                 dot_self((x[i] - x[j]) ./ rho));
-        K[j, i] = K[i, j]; 
+        K[i, j] = sq_alpha
+                      * exp(-0.5 * dot_self((x[i] - x[j]) ./ rho));
+        K[j, i] = K[i, j];
       }
     }
     K[N, N] = sq_alpha + delta;
@@ -8072,6 +8062,167 @@ can be modeled directly with ad-hoc predictors for holidays and
 weekends, or with data normalization back to natural scales for
 daylight savings time.
 
+\chapter{Solving Algebraic Equations}\label{algebra-solver.chapter}
+
+\noindent
+Stan provides a built-in mechanism for specifying and solving systems
+of algebraic equations. The function signatures for Stan's algebraic solver
+can be found in \refchapter{functions-algebraic-solver}.
+%
+Solving any system of algebraic equations can be translated into a root-finding
+problem, that is, given a function $f$, we wish to find $y$ such that
+$f(y) = 0$.
+
+\section{Example: System of Nonlinear Algebraic Equations}
+
+For systems of linear algebraic equations, we recommend solving the system
+using matrix division. The algebraic solver becomes handy when we want
+to solve nonlinear equations.
+%
+As an illustrative example, we consider a nonlinear system of two equations
+with two unknowns. Our goal is to simultaneously solve all equations for
+$y_1$ and $y_2$, such that the vector $z$ goes to 0. 
+%
+\begin{eqnarray}\label{algebra.equation}
+  \begin{aligned}
+  z_1 &= y_1 - \theta_1 \\
+  z_2 &= y_1 y_2 + \theta_2 \\
+  \end{aligned}
+\end{eqnarray}
+%
+
+\section{Coding an Algebraic System}
+
+A system of algebraic equations is coded directly in Stan as a function with a
+strictly specified signature. For example, the nonlinear system given by
+\refequation{algebra} can be coded using the following function
+in Stan (see \refchapter{functions-programming} for
+more information on coding user-defined functions).
+%
+\begin{stancode}
+vector system(vector y,        // unknowns
+              vector theta,    // parameters
+              real[] x_r,      // data (real)
+              real[] x_i) {    // data (integer)
+  vector[2] z;
+  z[1] = y[1] - theta[1];
+  z[2] = y[1] * y[2] - theta[2];
+  return z;
+}
+\end{stancode}
+%
+The function takes the unknowns we wish to solve for in \code{y} (a vector),
+the system parameters in \code{theta} (a vector), the real data in
+\code{x\_r} (a real array) and the integer data in \code{x\_i} (an integer array). The
+system function returns the value of the function, for which we want to compute the roots. 
+Our example does not use real or integer data. Nevertheless, these
+unused arguments must be included in the system function with exactly the
+signature above.
+
+\subsubsection{Strict Signature}  
+%
+The function defining the system must have exactly these argument types and
+return type. This may require passing in zero-length arrays for data or a zero-length
+vector for parameter if the system does not involve data or parameters.
+
+\section{Calling the Algebraic Solver}
+%
+Let's suppose $\theta = \{3, 6\}$. To call the algebraic solver, we need to
+provide an initial guess. This varies on a case-by-case basis, but in general
+a good guess will speed up the solver and, in pathological cases, even determine
+whether the solver converges or not. If the solver does not converge, the metropolis
+proposal gets rejected and a warning message, stating no acceptable solution has
+been found, is issued.
+
+The solver has three tuning parameters to determine convergence: the relative tolerance, 
+the function tolerance, and the maximum number of steps. Their default values are respectively
+\code{1e-10} ($10^{-10}$), \code{1e-6} ($10^{-6}$), and \code{1e3} ($10^3$). Their
+behavior is explained in \refsection{algebra-control}.
+%
+The following code returns the solution to our nonlinear algebraic system:
+%
+\begin{stancode}
+transformed data {
+  vector[2] y_guess = {1, 1};
+  real x_r[0];
+  int x_i[0];
+}
+
+transformed parameters {
+  vector[2] theta = {3, 6};
+  vector[2] y;
+
+  y = algebra_solver(y_guess, theta, x_r, x_i);
+}
+\end{stancode}
+
+which returns $y = \{3, -2\}$.
+
+\subsection{Data versus Parameters}
+The arguments for the initial guess \code{y\_guess}, the real data \code{x\_r}, and
+the integer data \code{x\_i} must be expressions that only involve data or
+transformed data variables. The parameters \code{theta} is the only argument
+which may involve parameters.
+
+\subsection{Length of the Algebraic Function and of the Vector of Unknowns}
+The Jacobian of the solution with respect to the parameters is computed
+using the implicit function theorem, which imposes certain restrictions. In particular,
+the Jacobian of the algebraic function $f$ with respect to the unknowns $x$ must
+be invertible. This requires the Jacobian to be square, meaning \textit{$f(y)$ and
+$y$ have the same length} or, in other words \textit{the number of equations in
+the system is the same as the number of unknowns.}
+
+\subsection{Pathological Solutions}
+Certain systems may be degenerate, meaning they have multiple solutions. The 
+algebraic solver will not report these cases, as the algorithm stops once it has found
+an acceptable solution. The initial guess will often determine which solution gets found
+first. The degeneracy may be broken by putting additional constraints on the solution.
+For instance, it might make physical sense for a solution to be positive or negative.
+
+On the other hand, a system may not have a solution (for a given point in the parameter
+space). In that case, the solver will not converge to a solution. When the solver fails to
+do so, the current metropolis proposal gets rejected.
+
+\section{Control Parameters for the Algebraic Solver}\label{algebra-control.section}
+%
+The call to the algebraic solver shown above uses the default control settings. The solver
+allows three additional parameters, all of which must be supplied if any of them is
+supplied.
+%
+\begin{stancode}
+  y = algebra_solver(y_guess, theta, x_r, x_i, 
+                     rel_tol, f_tol, max_steps);
+\end{stancode}
+
+The three control arguments are relative tolerance, function tolerance, and maximum
+number of steps. Both tolerances need to be satisfied. If one of them is not met, the
+metropolis proposal gets rejected with a warning message explaining which criterion
+was not satisfied. The default values for the control arguments are respectively
+\code{1e-10} ($10^{-10}$), \code{1e-6} ($10^{-6}$), and \code{1e3} ($10^3$).
+
+\subsection{Tolerance}
+%
+The relative and function tolerances control the accuracy of the solution generated by
+the solver. Relative tolerances are relative to the solution value. The function tolerance
+is the norm of the algebraic function, once we plug in the proposed solution. This norm
+should go to 0 (equivalently, all elements of the vector function are 0). It helps to think about this
+geometrically. Ideally the output of the algebraic function is at the origin; the norm measures
+deviations from this ideal. As the length of the return vector increases, a certain
+function tolerance becomes an increasingly difficult criterion to meet, given each
+individual element of the vector contribute to the norm. 
+
+Smaller relative tolerances produce more accurate solutions but require more computational time.
+
+\subsubsection{Sensitivity Analysis} \ \\
+The tolerances should be set low enough that setting them lower does not change the
+statistical properties of posterior samples generated by the Stan program.
+
+\subsection{Maximum Number of Steps}
+%
+The maximum number of steps can be used to stop a runaway simulation. This can arise in
+MCMC when a bad jump is taken, particularly during warmup. If the limit is hit, the
+current metropolis proposal gets rejected. Users will see a  warning message stating the 
+maximum number of steps has been exceeded.
 
 
 \chapter{Solving Differential Equations}\label{ode-solver.chapter}
@@ -8253,20 +8404,14 @@ model {
 }
 generated quantities {
   vector[2] y_hat[T];
-  matrix[2, 2] A;
-
-  A[1, 1] = 0;
-  A[1, 2] = 1;
-  A[2, 1] = -1;
-  A[2, 2] = -theta[1];
-
+  matrix[2, 2] A = [[ 0,  1],
+                    [-1, -theta[1]]]
   for (t in 1:T)
     y_hat[t] = matrix_exp((t - 1) * A) * y0;
-
   // add measurement error
   for (t in 1:T) {
-    y_hat[t, 1] = y_hat[t, 1] + normal_rng(0, 0.1);
-    y_hat[t, 2] = y_hat[t, 2] + normal_rng(0, 0.1);
+    y_hat[t, 1] += normal_rng(0, 0.1);
+    y_hat[t, 2] += normal_rng(0, 0.1);
   }
 }
 \end{stancode}
@@ -8343,13 +8488,11 @@ transformed data {
 model {
 }
 generated quantities {
-  real y_hat[T,2];
-  y_hat = integrate_ode_rk45(sho, y0, t0, ts, theta, x_r, x_i);
-
+  real y_hat[T,2] = integrate_ode_rk45(sho, y0, t0, ts, theta, x_r, x_i);
   // add measurement error
   for (t in 1:T) {
-    y_hat[t, 1] = y_hat[t, 1] + normal_rng(0, 0.1);
-    y_hat[t, 2] = y_hat[t, 2] + normal_rng(0, 0.1);
+    y_hat[t, 1] += normal_rng(0, 0.1);
+    y_hat[t, 2] += normal_rng(0, 0.1);
   }
 }
 \end{stancode}

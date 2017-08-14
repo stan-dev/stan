@@ -7,14 +7,13 @@
 namespace stan {
   namespace lang {
 
-    scope::scope()
-      : program_block_(model_name_origin), is_local_(false) { }
+    scope::scope() : program_block_(model_name_origin), is_local_(false) { }
 
     scope::scope(const origin_block& program_block)
       : program_block_(program_block), is_local_(false) { }
 
     scope::scope(const origin_block& program_block,
-                           const bool& is_local)
+                 const bool& is_local)
       : program_block_(program_block), is_local_(is_local) { }
 
 

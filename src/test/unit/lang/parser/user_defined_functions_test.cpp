@@ -54,7 +54,7 @@ TEST(parserFunctions,funsBad4) {
 
 TEST(parserFunctions,funsBad5) {
   test_throws("functions-bad5",
-              "base type mismatch in assignment");
+              "Base type mismatch in assignment");
 }
 
 TEST(parserFunctions,funsBad6) {
@@ -81,7 +81,7 @@ TEST(parserFunctions,funsBad12) {
 
 TEST(parserFunctions,funsBad13) {
   test_throws("functions-bad13",
-              "Illegal to assign to function argument variables");
+              "Cannot assign to function argument variables.");
 }
 
 TEST(parserFunctions,funsBad14) {
@@ -105,3 +105,7 @@ TEST(parserFunctions,funsBad17) {
               " ending in _log, _lpdf, _lpmf, _lcdf, or _lccdf.");
 }
 
+TEST(parserFunctions, badProbFunSuffix) {
+  test_throws("bad_prob_fun_suffix",
+              "Probability function must end in _lpdf or _lpmf");
+}

@@ -16,6 +16,8 @@ namespace stan {
 
     statement::statement(const assgn& st) : statement_(st) { }
 
+    statement::statement(const compound_assignment& st) : statement_(st) { }
+
     statement::statement(const sample& st) : statement_(st) { }
 
     statement::statement(const increment_log_prob_statement& st)

@@ -678,6 +678,8 @@ expression ::= numeric_literal
                '(' function_literal (',' expression){6|9} ')'
              | integrate_ode_bdf
                '(' function_literal (',' expression){6|9} ')'
+             | algebra_solver
+             '('function_literal (',' expression){4|7} ')'
              | '(' expression ')'
 
 index ::= ?(expression | expression ':' | ':' expression
@@ -706,7 +708,7 @@ statement ::= atomic_statement | nested_statement
 
 atomic_statement ::= atomic_statement_body ';'
 atomic_statement_body
-::=  lhs ('=' | '<-') expression
+::=  lhs assignment_op expression
    | expression '~' identifier '(' expressions ')' ?truncation
    | function_literal '(' expressions ')'
    | 'increment_log_prob' '(' expression ')'
@@ -717,6 +719,8 @@ atomic_statement_body
    | 'reject' '(' (expression | string_literal)* ')'
    | 'return' expression
    | ''
+
+assignment_op ::= '<-' | '=' | '+=' | '-=' | '*=' | '/=' | '.*=' | '/*='
 
 string_literal ::= '"' char* '"'
 
@@ -802,6 +806,34 @@ user-defined functions with names ending in \code{\_rng}.
 
 A probability function literal must have one of the following
 suffixes: \code{\_lpdf}, \code{\_lpmf}, \code{\_lcdf}, or \code{\_lccdf}.
+
+\subsection{Algebraic Solver Argument Types and Origins}
+
+The \code{algebra\_solver} function may be used without control
+parameters; in this case
+%
+\begin{itemize}
+\item its first argument refers to a function with signature
+\begin{quote}
+  \code{(~real[], ~real[],~real[],~int[])~:~real[]},
+\end{quote}
+\item the remaining four arguments must be assignable to types
+\begin{quote}
+  \code{real[]}, \code{real[]}, \code{real[]}, \code{int[]}
+\end{quote}
+  respectively and
+  \item the second, fourth, and fifth arguments must be expressions
+  containing only variables originating from the data or transformed
+  data blocks.
+\end{itemize}
+%
+The \code{algebra\_solver} function may accept three additional arguments,
+which like the second, fourth, and fifth arguments, must be expressions free
+of parameter references. The final free arguments must be assignable to types
+\begin{quote}
+\code{real}, \code{real}, \code{int}
+\end{quote}
+
 
 \subsection{ODE Solver Argument Types and Origins}
 

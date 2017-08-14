@@ -2,25 +2,25 @@
 #include <test/unit/lang/utility.hpp>
 
 TEST(LangGrammars,test1) {
-  test_throws("err-open-block", 
+  test_throws("err-open-block",
               "PARSER EXPECTED: \"{");
-  test_throws("err-close-block", 
+  test_throws("err-close-block",
               "PARSER EXPECTED: \"}");
-  test_throws("err-transformed-params", 
+  test_throws("err-transformed-params",
               "PARSER EXPECTED: \"parameters");
-  test_throws("err-expected-model", 
+  test_throws("err-expected-model",
               "PARSER EXPECTED: whitespace to end of file");
-  test_throws("err-expected-generated", 
+  test_throws("err-expected-generated",
               "PARSER EXPECTED: \"quantities");
-  test_throws("err-expected-bracket", 
+  test_throws("err-expected-bracket",
               "PARSER EXPECTED: \"{");
-  test_throws("err-expected-end-of-model", 
+  test_throws("err-expected-end-of-model",
               "PARSER EXPECTED: whitespace to end of file");
-  test_throws("err-second-operand-plus", 
+  test_throws("err-second-operand-plus",
               "PARSER EXPECTED: <expression>");
-  test_throws("err-nested-parens", 
+  test_throws("err-nested-parens",
               "PARSER EXPECTED: <expression>");
-  test_throws("err-nested-parens-close", 
+  test_throws("err-nested-parens-close",
               "PARSER EXPECTED: \")");
   test_throws("err-integrate-ode-comma",
               "PARSER EXPECTED: \",");
@@ -51,7 +51,7 @@ TEST(LangGrammars,test1) {
               "variable \"lijaflj\" does not exist");
   test_throws("err-fun-bare-types-int",
               "comma to indicate more dimensions or ]");
-  test_throws("err-bare-type-close-square", 
+  test_throws("err-bare-type-close-square",
               "comma to indicate more dimensions or ] to end type declaration");
   test_throws("err-close-function-args",
               "PARSER EXPECTED: <argument declaration or close paren");
@@ -65,5 +65,7 @@ TEST(LangGrammars,test1) {
               "variable \"real\" does not exist");
   test_throws("err-double-dims",
               "dimension declaration requires expression denoting integer; found type=real");
+  test_throws("oneline-error",
+              "1: parameters { vector y[10]; } model { }");
 }
- 
+
