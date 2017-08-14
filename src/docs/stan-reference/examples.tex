@@ -8087,8 +8087,8 @@ vector system(vector y,        // unknowns
 The function takes the unknowns we wish to solve for in \code{y} (a vector),
 the system parameters in \code{theta} (a vector), the real data in
 \code{x\_r} (a real array) and the integer data in \code{x\_i} (an integer array). The
-system function returns the value of the function, for which we want to compute the roots. 
-Our example does not use real or integer data. Nevertheless, these
+system function returns the value of the function (a vector), for which we want to compute
+the roots. Our example does not use real or integer data. Nevertheless, these
 unused arguments must be included in the system function with exactly the
 signature above.
 
@@ -8096,7 +8096,7 @@ signature above.
 %
 The function defining the system must have exactly these argument types and
 return type. This may require passing in zero-length arrays for data or a zero-length
-vector for parameter if the system does not involve data or parameters.
+vector for parameters if the system does not involve data or parameters.
 
 \section{Calling the Algebraic Solver}
 %
@@ -8125,7 +8125,7 @@ transformed parameters {
   vector[2] theta = {3, 6};
   vector[2] y;
 
-  y = algebra_solver(y_guess, theta, x_r, x_i);
+  y = algebra_solver(system, y_guess, theta, x_r, x_i);
 }
 \end{stancode}
 
@@ -8163,7 +8163,7 @@ allows three additional parameters, all of which must be supplied if any of them
 supplied.
 %
 \begin{stancode}
-  y = algebra_solver(y_guess, theta, x_r, x_i, 
+  y = algebra_solver(system, y_guess, theta, x_r, x_i, 
                      rel_tol, f_tol, max_steps);
 \end{stancode}
 
