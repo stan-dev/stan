@@ -3613,7 +3613,7 @@ of the algebraic system.
                   {vector \farg{y\_guess}}%
                   {vector \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
                   {Solves the algebraic system, given an initial guess,
-                    using the Powell Hybrid algorithm.}
+                    using the Powell hybrid algorithm.}
                    
 \fitemfourlines{vector}{algebra\_solver}%
                   {function \farg{algebra\_system}}%
@@ -3621,7 +3621,7 @@ of the algebraic system.
                   {vector \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
                   {real \farg{rel\_tol}, real \farg{f\_tol}, int \farg{max\_steps}}%
                   {Solves the algebraic system, given an initial guess,
-                    using the Powell Hybrid algorithm with additional control
+                    using the Powell hybrid algorithm with additional control
                     parameters for the solver.}
 %
 \end{description}
@@ -3638,7 +3638,7 @@ The arguments to the algebraic solver are as follows:
   \begin{quote}
     (vector, vector, real[], int[]):vector
   \end{quote}
-  The arguments represent (1) unknown, (2) parameters, (3) real data, and
+  The arguments represent (1) unknowns, (2) parameters, (3) real data, and
   (4) integer data, and the return value contains the value of the algebraic
   function, which goes to 0 when we plug in the solution to the algebraic system,
 \item \farg{y\_guess}: initia guess for the solution, type \code{vector},
