@@ -8039,8 +8039,9 @@ daylight savings time.
 
 \noindent
 Stan provides a built-in mechanism for specifying and solving systems
-of algebraic equations. The function signatures for Stan's algebraic solver
-can be found in \refchapter{functions-algebraic-solver}.
+of algebraic equations, using the Powell hybrid method \citep{Powell:1970}.
+The function signatures for Stan's algebraic solver can be found in
+\refchapter{functions-algebraic-solver}.
 %
 Solving any system of algebraic equations can be translated into a root-finding
 problem, that is, given a function $f$, we wish to find $y$ such that
@@ -8104,8 +8105,8 @@ Let's suppose $\theta = \{3, 6\}$. To call the algebraic solver, we need to
 provide an initial guess. This varies on a case-by-case basis, but in general
 a good guess will speed up the solver and, in pathological cases, even determine
 whether the solver converges or not. If the solver does not converge, the metropolis
-proposal gets rejected and a warning message, stating no acceptable solution has
-been found, is issued.
+proposal gets rejected and a warning message, stating no acceptable solution was
+found, is issued.
 
 The solver has three tuning parameters to determine convergence: the relative tolerance, 
 the function tolerance, and the maximum number of steps. Their default values are respectively

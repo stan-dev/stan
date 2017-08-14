@@ -3670,10 +3670,11 @@ system function.
 
 \subsection{Algorithmic Details}
 
-The algebraic solver is built on the Powell hybrid solver, implemented in the
-unsupported module for nonlinear optimization problems of the Eigen library.
-This solver is in turn based on the algorithm developed for the package
-MINPACK-1.
+The algebraic solver uses the Powell hybrid method \citep{Powell:1970}. The
+Stan code builds on the implementation of the hybrid solver in the
+unsupported module for nonlinear optimization problems of the Eigen library
+\citep{Eigen:2013}. This solver is in turn based on the algorithm developed
+for the package MINPACK-1 \citep{minpack:1980}.
 
 The Jacobian of the solution with respect to auxiliary parameters is computed
 using the implicit function theorem. Intermediate Jacobians (of the the algebraic
