@@ -7482,10 +7482,10 @@ mean and fixed effects for the same variables we're using as the domain for the
 GP, i.e.:
 %
 \begin{align*}
-	f & \sim \distro{MultiNormal}\left(0, K(x | \alpha, \rho)\right) \\ y_i &
-	\sim \distro{Normal}(\beta_0 + x_i \beta_{[1:D]} + f_i, \sigma) \, \forall i
-	\in \{1, \dots, N\} \\ & x_i^T, \beta_{[1:D]} \in \reals^D,\, x \in \reals^{N
-	\times D},\, f \in \reals^N
+  f & \sim \distro{MultiNormal}\left(0, K(x | \alpha, \rho)\right) \\ y_i &
+  \sim \distro{Normal}(\beta_0 + x_i \beta_{[1:D]} + f_i, \sigma) \, \forall i
+  \in \{1, \dots, N\} \\ & x_i^T, \beta_{[1:D]} \in \reals^D,\, x \in \reals^{N
+  \times D},\, f \in \reals^N
 \end{align*}
 %
 we'll likely want to constrain large length-scales as well.  A length scale
@@ -7499,9 +7499,9 @@ to limit the GP to higher-frequency functions. We can use a generalized inverse
 Gaussian distribution:
 %
 \begin{align*}
-	f(x | a, b, p) & = \dfrac{(a/b)^{p/2}}{2K_p(\sqrt{ab})} x^{p - 1}\exp(-(ax + b
-	/ x)/2) \\
-	& x, a, b \in \reals^{+}, \, p \in \mathbb{Z}
+  f(x | a, b, p) & = \dfrac{(a/b)^{p/2}}{2K_p(\sqrt{ab})} x^{p - 1}\exp(-(ax + b
+  / x)/2) \\
+  & x, a, b \in \reals^{+}, \, p \in \mathbb{Z}
 \end{align*}
 %
 which has an inverse gamma left tail if $p \leq 0$ and an inverse Gaussian
@@ -7740,41 +7740,40 @@ to cut down on the the number of matrix-matrix multiplications when computing
 the conditional mean and the conditional covariance of $p(\tilde{y})$.
 
 \begin{stancode}
-functions{
-    vector gp_pred_rng(real[] x2,
-                       vector y1,
-                       real[] x1,
-                       real alpha,
-                       real rho,
-                       real sigma,
-                       real delta) {
-      int N1 = rows(y1);
-      int N2 = size(x2);
-      vector[N2] f2;
-  
-      {
-        matrix[N1, N1] L_K;
-        vector[N1] K_div_y1;
-        matrix[N1, N2] k_x1_x2;
-        matrix[N1, N2] v_pred;
-        vector[N2] f2_mu;
-        matrix[N2, N2] cov_f2;
-        matrix[N2, N2] diag_delta;
-        matrix[N1, N1] K;
-        K = cov_exp_quad(x1, alpha, rho);
-        for (n in 1:N1)
-          K[n, n] = K[n,n] + square(sigma);
-        L_K = cholesky_decompose(K);
-        K_div_y1 = mdivide_left_tri_low(L_K, y1);
-        K_div_y1 = mdivide_right_tri_low(K_div_y1',L_K)';
-        k_x1_x2 = cov_exp_quad(x1, x2, alpha, rho);
-        f2_mu = (k_x1_x2' * K_div_y1); 
-        v_pred = mdivide_left_tri_low(L_K, k_x1_x2);
-        cov_f2 = cov_exp_quad(x2, alpha, rho) - v_pred' * v_pred;
-        diag_delta = diag_matrix(rep_vector(delta,N2));
-  
-        f2 = multi_normal_rng(f2_mu, cov_f2 + diag_delta);
-      }
+functions {
+  vector gp_pred_rng(real[] x2,
+                     vector y1,
+                     real[] x1,
+                     real alpha,
+                     real rho,
+                     real sigma,
+                     real delta) {
+    int N1 = rows(y1);
+    int N2 = size(x2);
+    vector[N2] f2;
+    {
+      matrix[N1, N1] L_K;
+      vector[N1] K_div_y1;
+      matrix[N1, N2] k_x1_x2;
+      matrix[N1, N2] v_pred;
+      vector[N2] f2_mu;
+      matrix[N2, N2] cov_f2;
+      matrix[N2, N2] diag_delta;
+      matrix[N1, N1] K;
+      K = cov_exp_quad(x1, alpha, rho);
+      for (n in 1:N1)
+        K[n, n] = K[n,n] + square(sigma);
+      L_K = cholesky_decompose(K);
+      K_div_y1 = mdivide_left_tri_low(L_K, y1);
+      K_div_y1 = mdivide_right_tri_low(K_div_y1',L_K)';
+      k_x1_x2 = cov_exp_quad(x1, x2, alpha, rho);
+      f2_mu = (k_x1_x2' * K_div_y1); 
+      v_pred = mdivide_left_tri_low(L_K, k_x1_x2);
+      cov_f2 = cov_exp_quad(x2, alpha, rho) - v_pred' * v_pred;
+      diag_delta = diag_matrix(rep_vector(delta,N2));
+
+      f2 = multi_normal_rng(f2_mu, cov_f2 + diag_delta);
+    }
     return f2;
   }
 }
@@ -7855,7 +7854,7 @@ of the matrix $f$ are distributed:
 \begin{align*} f_{[n,]} \sim \distro{MultiNormal}(m(x)_{[n,]}, K(x | \alpha,
 \rho)_{[n,n]} C(\phi)) \end{align*} and that the columns of the matrix $f$ are
 distributed: \begin{align*} f_{[,m]} \sim \distro{MultiNormal}(m(x)_{[,m]}, K(x
-	| \alpha, \rho) C(\phi)_{[m,m]}) \end{align*}
+  | \alpha, \rho) C(\phi)_{[m,m]}) \end{align*}
 This also means means that $\E\left[f^T f\right]$ is equal to
 $\text{trace}(K(x | \alpha, \rho)) \times C$, whereas $\E\left[ff^T\right]$
 is $\text{trace}(C) \times K(x | \alpha, \rho)$. We can derive this using
@@ -7869,11 +7868,11 @@ We can generate a random variable $f$ from a \distro{MatrixNormal} density in
 $\reals^{N \times M}$ using the following algorithm:
 %
 \begin{align*}
-	\eta_{i,j} & \sim \distro{Normal}(0, 1) \, \forall i,j \\
-	f & = L_{K(x | 1.0, \rho)} \, \eta \, L_C(\phi)^T \\
-	f & \sim \distro{MatrixNormal}(0, K(x | 1.0, \rho), C(\phi)) \\
-	\eta & \in \reals^{N \times M} \\
-	L_C(\phi) & = \text{cholesky\_decompose}(C(\phi)) \\
+  \eta_{i,j} & \sim \distro{Normal}(0, 1) \, \forall i,j \\
+  f & = L_{K(x | 1.0, \rho)} \, \eta \, L_C(\phi)^T \\
+  f & \sim \distro{MatrixNormal}(0, K(x | 1.0, \rho), C(\phi)) \\
+  \eta & \in \reals^{N \times M} \\
+  L_C(\phi) & = \text{cholesky\_decompose}(C(\phi)) \\
   L_{K(x | 1.0, \rho)} & = \text{cholesky\_decompose}(K(x | 1.0, \rho))
 \end{align*}
 
