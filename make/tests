@@ -4,7 +4,7 @@
 ##
 LIBGTEST = test/libgtest.a
 GTEST_MAIN = $(GTEST)/src/gtest_main.cc
-CFLAGS_GTEST += -isystem $(GTEST)/include -isystem $(GTEST)
+GTEST_CXXFLAGS += -isystem $(GTEST)/include -isystem $(GTEST)
 
 ##
 # Build the google test library.
@@ -12,21 +12,21 @@ $(LIBGTEST): $(LIBGTEST)(test/gtest.o)
 
 test/gtest.o: $(GTEST)/src/gtest-all.cc
 	@mkdir -p test
-	$(COMPILE.cc) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
+	$(COMPILE.cc) -O$O $(GTEST_CXXFLAGS) $< $(OUTPUT_OPTION)
 
 ##
 # Rule for building a test
 ##
 test/%.o : src/test/%_test.cpp
 	@mkdir -p $(dir $@)
-	$(COMPILE.cc) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
+	$(COMPILE.cc) -O$O $(GTEST_CXXFLAGS) $< $(OUTPUT_OPTION)
 
 ##
 # Rule for building a test executable
 ##
 test/%$(EXE) : test/%.o $(LIBGTEST) $(LIBCVODES)
 	@mkdir -p $(dir $@)
-	$(LINK.cc) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LIBCVODES)
+	$(LINK.cc) -O$O $(GTEST_MAIN) $< $(GTEST_CXXFLAGS) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LIBCVODES)
 
 
 ##
@@ -51,7 +51,7 @@ test/%.d : src/test/%_test.cpp
 	@mkdir -p $(dir $@)
 	@set -e; \
 	rm -f $@; \
-	$(COMPILE.cc) -O$O $(CFLAGS_GTEST) $(TARGET_ARCH) -MM $< > $@.$$$$; \
+	$(COMPILE.cc) -O$O $(GTEST_CXXFLAGS) $(TARGET_ARCH) -MM $< > $@.$$$$; \
 	sed -e 's,\($(notdir $*)\)\(_test\)\.o[ :]*,$(dir $@)\1\$(EXE) $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
 
@@ -60,7 +60,7 @@ test/test-models/stanc.d : src/test/test-models/stanc.cpp
 	@mkdir -p $(dir $@)
 	@set -e; \
 	rm -f $@; \
-	$(COMPILE.cc) -O$O $(CFLAGS_GTEST) $(TARGET_ARCH) -MM $< > $@.$$$$; \
+	$(COMPILE.cc) -O$O $(GTEST_CXXFLAGS) $(TARGET_ARCH) -MM $< > $@.$$$$; \
 	sed -e 's,\($(basename $(@F))\)\.o[ :]*,$(dir $@)\1\$(EXE) $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
 

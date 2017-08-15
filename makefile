@@ -23,7 +23,9 @@ STAN ?=
 MATH ?= lib/stan_math/
 
 -include $(MATH)make/default_compiler_options
-CXXFLAGS += -I src -isystem $(MATH) -DFUSION_MAX_VECTOR_SIZE=12 -Wno-unused-local-typedefs
+# We need to turn off warnings after -Wall, which is in CPPFLAGS
+CPPFLAGS += -Wno-unused-local-typedef
+CXXFLAGS += -I src -isystem $(MATH) -DFUSION_MAX_VECTOR_SIZE=12
 LDLIBS_STANC = -Lbin -lstanc
 
 -include $(HOME)/.config/stan/make.local  # define local variables
@@ -46,7 +48,7 @@ CXX = $(CC)
 # These includes should update the following variables
 # based on the OS:
 #   - CFLAGS
-#   - CFLAGS_GTEST
+#   - GTEST_CXXFLAGS
 #   - EXE
 ##
 -include $(MATH)make/detect_os
