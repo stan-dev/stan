@@ -11,6 +11,9 @@
 #include <stan/lang/grammars/whitespace_grammar.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/phoenix/phoenix.hpp>
+#include <boost/phoenix/core/detail/expression.hpp>
+#include <boost/phoenix/core/detail/cpp03/expression.hpp>
+
 #include <sstream>
 #include <string>
 #include <vector>
