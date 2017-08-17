@@ -3,6 +3,10 @@
 
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
+#include <boost/version.hpp>
+#if BOOST_VERSION == 106400
+#  include <boost/phoenix/core/limits.hpp>
+#endif
 #include <stan/lang/ast.hpp>
 #include <stan/lang/grammars/bare_type_grammar.hpp>
 #include <stan/lang/grammars/semantic_actions.hpp>
