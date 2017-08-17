@@ -40,7 +40,7 @@ namespace stan {
       // Psuedo-Jacobian of the eigenvalues
       Eigen::MatrixXd pseudo_j;
 
-      virtual void
+      virtual inline void
       write_metric(stan::callbacks::writer& writer) {
         writer("No free parameters for SoftAbs metric");
       }

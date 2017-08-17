@@ -261,6 +261,7 @@ namespace stan {
        * @throw std::domain_error If the dimensionality of the specified
        * approximation does not match this approximation's dimensionality.
        */
+      inline
       normal_fullrank& operator/=(const normal_fullrank& rhs) {
         static const char* function =
           "stan::variational::normal_fullrank::operator/=";
@@ -474,6 +475,7 @@ namespace stan {
      * @return Sum of the specified approximations.
      * @throw std::domain_error If the dimensionalities do not match.
      */
+    inline
     normal_fullrank operator+(normal_fullrank lhs, const normal_fullrank& rhs) {
       return lhs += rhs;
     }
@@ -487,6 +489,7 @@ namespace stan {
      * @return Elementwise division of the specified approximations.
      * @throw std::domain_error If the dimensionalities do not match.
      */
+    inline
     normal_fullrank operator/(normal_fullrank lhs, const normal_fullrank& rhs) {
       return lhs /= rhs;
     }
@@ -500,6 +503,7 @@ namespace stan {
      * @param[in] rhs Approximation.
      * @return Addition of scalar to specified approximation.
      */
+    inline
     normal_fullrank operator+(double scalar, normal_fullrank rhs) {
       return rhs += scalar;
     }
@@ -513,6 +517,7 @@ namespace stan {
      * @param[in] rhs Approximation.
      * @return Multiplication of scalar by the specified approximation.
      */
+    inline
     normal_fullrank operator*(double scalar, normal_fullrank rhs) {
       return rhs *= scalar;
     }
