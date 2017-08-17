@@ -56,6 +56,8 @@
 #include <stan/lang/ast/sigs/function_signature_t.hpp>
 #include <stan/lang/ast/sigs/function_signatures.hpp>
 
+#include <stan/lang/ast/node/algebra_solver.hpp>
+#include <stan/lang/ast/node/algebra_solver_control.hpp>
 #include <stan/lang/ast/node/arg_decl.hpp>
 #include <stan/lang/ast/node/array_expr.hpp>
 #include <stan/lang/ast/node/assgn.hpp>

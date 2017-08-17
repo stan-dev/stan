@@ -45,6 +45,23 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::integrate_ode_control,
                           (stan::lang::expression, abs_tol_)
                           (stan::lang::expression, max_num_steps_) )
 
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::algebra_solver,
+                           (std::string, system_function_name_)
+                           (stan::lang::expression, y_)
+                           (stan::lang::expression, theta_)
+                           (stan::lang::expression, x_r_)
+                           (stan::lang::expression, x_i_) )
+
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::algebra_solver_control,
+                           (std::string, system_function_name_)
+                           (stan::lang::expression, y_)
+                           (stan::lang::expression, theta_)
+                           (stan::lang::expression, x_r_)
+                           (stan::lang::expression, x_i_)
+                           (stan::lang::expression, rel_tol_)
+                           (stan::lang::expression, fun_tol_)
+                           (stan::lang::expression, max_num_steps_) )
+
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::fun,
                           (std::string, name_)
                           (std::vector<stan::lang::expression>, args_) )
@@ -203,10 +220,54 @@ namespace stan {
           [validate_integrate_ode_f(_val, boost::phoenix::ref(var_map_),
                                     _pass, boost::phoenix::ref(error_msgs_))];
 
+      algebra_solver_control_r.name("expression");
+      algebra_solver_control_r
+        %= lit("algebra_solver")
+        >> lit('(')
+        >> identifier_r          // 1) system function name (function only)
+        >> lit(',')
+        >> expression_g(_r1)     // 2) y (data only)
+        >> lit(',')
+        >> expression_g(_r1)     // 3) theta
+        >> lit(',')
+        >> expression_g(_r1)     // 4) x_r (data only)
+        >> lit(',')
+        >> expression_g(_r1)     // 5) x_i (data only)
+        >> lit(',')
+        >> expression_g(_r1)     // 6) relative tolerance (data only)
+        >> lit(',')
+        >> expression_g(_r1)     // 7) function tolerance (data only)
+        >> lit(',')
+        >> expression_g(_r1)     // 8) maximum number of steps (data only)
+        > lit(')')
+          [validate_algebra_solver_control_f(_val,
+                                             boost::phoenix::ref(var_map_),
+                                             _pass,
+                                             boost::phoenix::ref(error_msgs_))];
+
+      algebra_solver_r.name("expression");
+      algebra_solver_r
+        %= lit("algebra_solver")
+        > lit('(')
+        > identifier_r          // 1) system function name (function only)
+        > lit(',')
+        > expression_g(_r1)     // 2) y (data only)
+        > lit(',')
+        > expression_g(_r1)     // 3) theta
+        > lit(',')
+        > expression_g(_r1)     // 4) x_r (data only)
+        > lit(',')
+        > expression_g(_r1)     // 5) x_i (data only)
+        > lit(')')
+          [validate_algebra_solver_f(_val, boost::phoenix::ref(var_map_),
+                                     _pass, boost::phoenix::ref(error_msgs_))];
+
       factor_r.name("expression");
       factor_r =
         integrate_ode_control_r(_r1)[assign_lhs_f(_val, _1)]
         | integrate_ode_r(_r1)[assign_lhs_f(_val, _1)]
+        | algebra_solver_control_r(_r1)[assign_lhs_f(_val, _1)]
+        | algebra_solver_r(_r1)[assign_lhs_f(_val, _1)]
         | (fun_r(_r1)[assign_lhs_f(_b, _1)]
            > eps[set_fun_type_named_f(_val, _b, _r1, _pass,
                                       boost::phoenix::ref(error_msgs_))])
