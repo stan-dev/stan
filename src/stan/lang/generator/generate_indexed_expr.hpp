@@ -46,7 +46,7 @@ namespace stan {
         o << expr;
         return;
       }
-      if (ai_size <= (e_num_dims + 1) || base_type != MATRIX_T) {
+      if (ai_size <= (e_num_dims + 1) || !base_type.is_matrix_type()) {
         for (size_t n = 0; n < ai_size; ++n)
           o << (isLHS ? "get_base1_lhs(" : "get_base1(");
         o << expr;

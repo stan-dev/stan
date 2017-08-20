@@ -2,18 +2,32 @@
 #define STAN_LANG_AST_HPP
 
 #include <stan/lang/ast/base_expr_type.hpp>
+#include <stan/lang/ast/double_type.hpp>
 #include <stan/lang/ast/expr_type.hpp>
+#include <stan/lang/ast/ill_formed_type.hpp>
+#include <stan/lang/ast/int_type.hpp>
+#include <stan/lang/ast/matrix_type.hpp>
 #include <stan/lang/ast/nil.hpp>
 #include <stan/lang/ast/origin_block.hpp>
+#include <stan/lang/ast/row_vector_type.hpp>
 #include <stan/lang/ast/scope.hpp>
 #include <stan/lang/ast/variable_map.hpp>
+#include <stan/lang/ast/vector_type.hpp>
+#include <stan/lang/ast/void_type.hpp>
 
 #include <stan/lang/ast/fun/has_non_param_var_vis.hpp>
 #include <stan/lang/ast/fun/has_prob_fun_suffix.hpp>
 #include <stan/lang/ast/fun/has_var_vis.hpp>
+#include <stan/lang/ast/fun/is_double_type_vis.hpp>
+#include <stan/lang/ast/fun/is_ill_formed_type_vis.hpp>
+#include <stan/lang/ast/fun/is_int_type_vis.hpp>
+#include <stan/lang/ast/fun/is_matrix_type_vis.hpp>
 #include <stan/lang/ast/fun/is_multi_index_vis.hpp>
 #include <stan/lang/ast/fun/is_no_op_statement_vis.hpp>
 #include <stan/lang/ast/fun/is_nil_vis.hpp>
+#include <stan/lang/ast/fun/is_row_vector_type_vis.hpp>
+#include <stan/lang/ast/fun/is_vector_type_vis.hpp>
+#include <stan/lang/ast/fun/is_void_type_vis.hpp>
 #include <stan/lang/ast/fun/name_vis.hpp>
 #include <stan/lang/ast/fun/returns_type_vis.hpp>
 #include <stan/lang/ast/fun/strip_ccdf_suffix.hpp>

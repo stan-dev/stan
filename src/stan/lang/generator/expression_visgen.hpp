@@ -255,7 +255,7 @@ namespace stan {
 
       void operator()(const conditional_op& expr) const {
         bool types_prim_match
-          = (expr.type_.is_primitive() && expr.type_.base_type_ == INT_T)
+          = (expr.type_.is_primitive() && expr.type_.base_type_.is_int_type())
           || (!expr.has_var_ && expr.type_.is_primitive()
               && (expr.true_val_.expression_type()
                   == expr.false_val_.expression_type()));

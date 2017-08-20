@@ -1,0 +1,15 @@
+#ifndef STAN_LANG_AST_MATRIX_TYPE_HPP
+#define STAN_LANG_AST_MATRIX_TYPE_HPP
+
+namespace stan {
+  namespace lang {
+
+    /**
+     * Matrix base expression type.
+     */
+    struct matrix_type {
+    };
+
+  }
+}
+#endif

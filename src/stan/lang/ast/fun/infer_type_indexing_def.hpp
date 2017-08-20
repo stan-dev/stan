@@ -13,14 +13,14 @@ namespace stan {
       if (num_index_dims <= num_expr_dims)
         return expr_type(expr_base_type, num_expr_dims - num_index_dims);
       if (num_index_dims == (num_expr_dims + 1)) {
-        if (expr_base_type == VECTOR_T || expr_base_type == ROW_VECTOR_T)
-          return expr_type(DOUBLE_T, 0U);
-        if (expr_base_type == MATRIX_T)
-          return expr_type(ROW_VECTOR_T, 0U);
+        if (expr_base_type.is_vector_type() || expr_base_type.is_row_vector_type())
+          return expr_type(double_type(), 0U);
+        if (expr_base_type.is_matrix_type())
+          return expr_type(row_vector_type(), 0U);
       }
       if (num_index_dims == (num_expr_dims + 2))
-        if (expr_base_type == MATRIX_T)
-          return expr_type(DOUBLE_T, 0U);
+        if (expr_base_type.is_matrix_type())
+          return expr_type(double_type(), 0U);
 
       // error condition, result expr_type has is_ill_formed() = true
       return expr_type();

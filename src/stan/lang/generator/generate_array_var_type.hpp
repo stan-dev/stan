@@ -21,32 +21,23 @@ namespace stan {
                                  const std::string& real_var_type,
                                  bool is_var_context,
                                  std::ostream& o) {
-      switch (base_type) {
-      case INT_T :
+      if (base_type.is_int_type()) 
         o << "int";
-        break;
-      case DOUBLE_T :
+      else if (base_type.is_double_type())
         o << real_var_type;
-        break;
-      case VECTOR_T :
+      else if (base_type.is_vector_type())
         o << (is_var_context
               ? "Eigen::Matrix<T__,Eigen::Dynamic,1> "
               : "vector_d");
-        break;
-      case ROW_VECTOR_T :
+      else if (base_type.is_row_vector_type())
         o << (is_var_context
               ? "Eigen::Matrix<T__,1,Eigen::Dynamic> "
               : "row_vector_d");
-        break;
-      case MATRIX_T :
+      else if (base_type.is_matrix_type())
         o << (is_var_context
               ? "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> "
               : "matrix_d");
-        break;
-      }
     }
-
-
 
   }
 }

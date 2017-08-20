@@ -8,13 +8,13 @@
 namespace stan {
   namespace lang {
 
-    vector_var_decl::vector_var_decl() : base_var_decl(VECTOR_T) { }
+    vector_var_decl::vector_var_decl() : base_var_decl(vector_type()) { }
 
     vector_var_decl::vector_var_decl(const range& range, const expression& M,
                                      const std::string& name,
                                      const std::vector<expression>& dims,
                                      const expression& def)
-      : base_var_decl(name, dims, VECTOR_T, def), range_(range), M_(M) {  }
+      : base_var_decl(name, dims, vector_type(), def), range_(range), M_(M) {  }
 
   }
 }

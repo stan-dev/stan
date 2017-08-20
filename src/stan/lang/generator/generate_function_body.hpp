@@ -31,7 +31,7 @@ namespace stan {
       o << " {" << EOL;
       o << INDENT << "typedef " << scalar_t_name << " fun_scalar_t__;" << EOL;
       o << INDENT << "typedef "
-        << ((fun.return_type_.base_type_ == INT_T) ? "int" : "fun_scalar_t__")
+        << (fun.return_type_.base_type_.is_int_type() ? "int" : "fun_scalar_t__")
         << " fun_return_scalar_t__;" << EOL;
       o << INDENT
         << "const static bool propto__ = true;" << EOL

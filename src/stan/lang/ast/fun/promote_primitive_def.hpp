@@ -17,7 +17,7 @@ namespace stan {
                                 const expr_type& et2) {
       if (!et1.is_primitive() || !et2.is_primitive())
         return expr_type();
-      return et1.type() == DOUBLE_T ? et1 : et2;
+      return et1.type().is_double_type() ? et1 : et2;
     }
 
   }

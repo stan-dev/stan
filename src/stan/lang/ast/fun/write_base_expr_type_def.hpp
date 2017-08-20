@@ -7,31 +7,23 @@ namespace stan {
   namespace lang {
 
     std::ostream& write_base_expr_type(std::ostream& o, base_expr_type type) {
-      switch (type) {
-      case INT_T :
+      if (type.is_int_type())
         o << "int";
-        break;
-      case DOUBLE_T :
+      else if (type.is_double_type())
         o << "real";
-        break;
-      case VECTOR_T :
+      else if (type.is_vector_type()) 
         o << "vector";
-        break;
-      case ROW_VECTOR_T :
+      else if (type.is_row_vector_type()) 
         o << "row vector";
-        break;
-      case MATRIX_T :
+      else if (type.is_matrix_type())
         o << "matrix";
-        break;
-      case ILL_FORMED_T :
+      else if (type.is_ill_formed_type()) 
         o << "ill formed";
-        break;
-      case VOID_T :
+      else if (type.is_void_type()) 
         o << "void";
-        break;
-      default:
+      else 
         o << "UNKNOWN";
-      }
+
       return o;
     }
   }

@@ -6,9 +6,9 @@
 namespace stan {
   namespace lang {
 
-    int_literal::int_literal() : type_(INT_T) { }
+    int_literal::int_literal() : type_(int_type()) { }
 
-    int_literal::int_literal(int val) : val_(val), type_(INT_T) { }
+    int_literal::int_literal(int val) : val_(val), type_(int_type()) { }
 
   }
 }

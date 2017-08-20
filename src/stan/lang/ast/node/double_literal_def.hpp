@@ -6,10 +6,10 @@
 namespace stan {
   namespace lang {
 
-    double_literal::double_literal() : type_(DOUBLE_T, 0U) { }
+    double_literal::double_literal() : type_(double_type(), 0U) { }
 
     double_literal::double_literal(double val)
-      : val_(val), type_(DOUBLE_T, 0U) {  }
+      : val_(val), type_(double_type(), 0U) {  }
 
   }
 }
