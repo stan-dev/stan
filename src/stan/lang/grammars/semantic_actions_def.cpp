@@ -278,6 +278,7 @@ namespace stan {
                          const std::vector<std::vector<expression> >&) const;
     template void assign_lhs::operator()(fun&, const fun&) const;
     template void assign_lhs::operator()(variable&, const variable&) const;
+    template void assign_lhs::operator()(base_expr_type&, const base_expr_type&) const;
 
     void validate_expr_type3::operator()(const expression& expr, bool& pass,
                                          std::ostream& error_msgs) const {
@@ -351,6 +352,7 @@ namespace stan {
       base_expr_type true_val_base_type = true_val_type.base_type_;
       expr_type false_val_type = conditional_op.false_val_.expression_type();
       base_expr_type false_val_base_type = false_val_type.base_type_;
+
       bool types_compatible
         = (true_val_type == false_val_type)
         || (true_val_type.is_primitive() && false_val_type.is_primitive()
@@ -358,7 +360,7 @@ namespace stan {
                || (true_val_base_type.is_double_type()
                    && false_val_base_type.is_int_type())
                || (true_val_base_type.is_int_type()
-                   && false_val_base_type.is_int_type())));
+                   && false_val_base_type.is_double_type())));
 
       if (!types_compatible) {
         error_msgs << "base type mismatch in ternary expression,"
@@ -1976,7 +1978,7 @@ namespace stan {
         if ((et.base_type_.is_int_type() && et_next.base_type_.is_double_type())
             || (et.base_type_.is_double_type() && et_next.base_type_.is_int_type())) {
           et.base_type_ = double_type();
-        } else if (!(et.base_type_ == et_next.base_type_)) {
+        } else if (et.base_type_ != et_next.base_type_) {
           error_msgs << "Expressions for elements of array must have"
                      << " the same or promotable types; found"
                      << " previous type=" << et

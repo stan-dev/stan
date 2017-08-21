@@ -34,12 +34,12 @@ namespace stan {
       type_identifier_r.name("bare type identifier\n"
                 "  legal values: void, int, real, vector, row_vector, matrix");
       type_identifier_r
-        %= lit("void")[assign_lhs_f(_val, void_type())]
-        | lit("int")[assign_lhs_f(_val, int_type())]
-        | lit("real")[assign_lhs_f(_val, double_type())]
-        | lit("vector")[assign_lhs_f(_val, vector_type())]
-        | lit("row_vector")[assign_lhs_f(_val, row_vector_type())]
-        | lit("matrix")[assign_lhs_f(_val, matrix_type())];
+        %= lit("void")[assign_lhs_f(_val, base_expr_type(void_type()))]
+        | lit("int")[assign_lhs_f(_val, base_expr_type(int_type()))]
+        | lit("real")[assign_lhs_f(_val, base_expr_type(double_type()))]
+        | lit("vector")[assign_lhs_f(_val, base_expr_type(vector_type()))]
+        | lit("row_vector")[assign_lhs_f(_val, base_expr_type(row_vector_type()))]
+        | lit("matrix")[assign_lhs_f(_val, base_expr_type(matrix_type()))];
 
       array_dims_r.name("array dimensions,\n"
              "    e.g., empty (not an array) [] (1D array) or [,] (2D array)");

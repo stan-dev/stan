@@ -104,6 +104,25 @@ namespace stan {
       return false;
     }
 
+    bool base_expr_type::operator!=(const base_expr_type& base_type) const {
+      if ((is_ill_formed_type() &&
+           base_type.is_ill_formed_type())
+          || (is_void_type() &&
+              base_type.is_void_type())
+          || (is_int_type() &&
+              base_type.is_int_type())
+          || (is_double_type() &&
+              base_type.is_double_type())
+          || (is_vector_type() &&
+              base_type.is_vector_type())
+          || (is_row_vector_type() &&
+              base_type.is_row_vector_type())
+          || (is_matrix_type() &&
+              base_type.is_matrix_type()))
+        return false;
+      return true;
+    }
+
   }
 }
 #endif

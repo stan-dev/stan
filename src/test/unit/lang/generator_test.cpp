@@ -364,10 +364,11 @@ TEST(langGenerator, sliceIndexes) {
 }
 
 TEST(langGenerator, slicedAssigns) {
-  using stan::lang::DOUBLE_T;
+  using stan::lang::base_expr_type;
+  using stan::lang::double_type;
 
   stan::lang::variable v("foo");
-  v.set_type(DOUBLE_T, 0);
+  v.set_type(base_expr_type(double_type()), 0);
 
   stan::lang::expression e_int3(stan::lang::int_literal(3));
   stan::lang::uni_idx ui3(e_int3);
@@ -443,11 +444,11 @@ TEST(langGenerator, genRealVars) {
 
 TEST(langGenerator, genArrayVars) {
   using stan::lang::base_expr_type;
-  using stan::lang::INT_T;
-  using stan::lang::DOUBLE_T;
-  using stan::lang::VECTOR_T;
-  using stan::lang::ROW_VECTOR_T;
-  using stan::lang::MATRIX_T;
+  using stan::lang::int_type;
+  using stan::lang::double_type;
+  using stan::lang::vector_type;
+  using stan::lang::row_vector_type;
+  using stan::lang::matrix_type;
   using stan::lang::scope;
   using stan::lang::transformed_data_origin;
   using stan::lang::function_argument_origin;
@@ -459,89 +460,89 @@ TEST(langGenerator, genArrayVars) {
   ssReal.str(std::string());
   o.str(std::string());
   stan::lang::generate_real_var_type(td_origin, true, true, ssReal);
-  stan::lang::generate_array_var_type(DOUBLE_T,ssReal.str(),true,o);
+  stan::lang::generate_array_var_type(base_expr_type(double_type()),ssReal.str(),true,o);
   EXPECT_EQ(1, count_matches("T__", o.str()));
 
   ssReal.str(std::string());
   o.str(std::string());
   stan::lang::generate_real_var_type(td_origin, false, true, ssReal);
-  stan::lang::generate_array_var_type(DOUBLE_T,ssReal.str(),true,o);
+  stan::lang::generate_array_var_type(base_expr_type(double_type()),ssReal.str(),true,o);
   EXPECT_EQ(1, count_matches("double", o.str()));
 
   ssReal.str(std::string());
   o.str(std::string());
   stan::lang::generate_real_var_type(td_origin, true, false, ssReal);
-  stan::lang::generate_array_var_type(DOUBLE_T,ssReal.str(),true,o);
+  stan::lang::generate_array_var_type(base_expr_type(double_type()),ssReal.str(),true,o);
   EXPECT_EQ(1, count_matches("double", o.str()));
 
   ssReal.str(std::string());
   o.str(std::string());
   stan::lang::generate_real_var_type(td_origin, false, false, ssReal);
-  stan::lang::generate_array_var_type(DOUBLE_T,ssReal.str(),true,o);
+  stan::lang::generate_array_var_type(base_expr_type(double_type()),ssReal.str(),true,o);
   EXPECT_EQ(1, count_matches("double", o.str()));
 
   ssReal.str(std::string());
   o.str(std::string());
   stan::lang::generate_real_var_type(fun_origin, true, true, ssReal);
-  stan::lang::generate_array_var_type(DOUBLE_T,ssReal.str(),true,o);
+  stan::lang::generate_array_var_type(base_expr_type(double_type()),ssReal.str(),true,o);
   EXPECT_EQ(1, count_matches("fun_scalar_t__", o.str()));
 
   ssReal.str(std::string());
   o.str(std::string());
   stan::lang::generate_real_var_type(fun_origin, false, true, ssReal);
-  stan::lang::generate_array_var_type(DOUBLE_T,ssReal.str(),true,o);
+  stan::lang::generate_array_var_type(base_expr_type(double_type()),ssReal.str(),true,o);
   EXPECT_EQ(1, count_matches("fun_scalar_t__", o.str()));
 
   ssReal.str(std::string());
   o.str(std::string());
   stan::lang::generate_real_var_type(fun_origin, true, false, ssReal);
-  stan::lang::generate_array_var_type(DOUBLE_T,ssReal.str(),true,o);
+  stan::lang::generate_array_var_type(base_expr_type(double_type()),ssReal.str(),true,o);
   EXPECT_EQ(1, count_matches("fun_scalar_t__", o.str()));
 
   ssReal.str(std::string());
   o.str(std::string());
   stan::lang::generate_real_var_type(fun_origin, false, false, ssReal);
-  stan::lang::generate_array_var_type(DOUBLE_T,ssReal.str(),true,o);
+  stan::lang::generate_array_var_type(base_expr_type(double_type()),ssReal.str(),true,o);
   EXPECT_EQ(1, count_matches("fun_scalar_t__", o.str()));
 
   ssReal.str(std::string());
   o.str(std::string());
-  stan::lang::generate_array_var_type(INT_T,ssReal.str(),true,o);
+  stan::lang::generate_array_var_type(base_expr_type(int_type()),ssReal.str(),true,o);
   EXPECT_EQ(1, count_matches("int", o.str()));
 
   ssReal.str(std::string());
   o.str(std::string());
-  stan::lang::generate_array_var_type(INT_T,ssReal.str(),false,o);
+  stan::lang::generate_array_var_type(base_expr_type(int_type()),ssReal.str(),false,o);
   EXPECT_EQ(1, count_matches("int", o.str()));
 
   ssReal.str(std::string());
   o.str(std::string());
-  stan::lang::generate_array_var_type(VECTOR_T,ssReal.str(),true,o);
+  stan::lang::generate_array_var_type(base_expr_type(vector_type()),ssReal.str(),true,o);
   EXPECT_EQ(1, count_matches("Eigen::Matrix<T__,Eigen::Dynamic,1> ", o.str()));
 
   ssReal.str(std::string());
   o.str(std::string());
-  stan::lang::generate_array_var_type(VECTOR_T,ssReal.str(),false,o);
+  stan::lang::generate_array_var_type(base_expr_type(vector_type()),ssReal.str(),false,o);
   EXPECT_EQ(1, count_matches("vector_d", o.str()));
 
   ssReal.str(std::string());
   o.str(std::string());
-  stan::lang::generate_array_var_type(ROW_VECTOR_T,ssReal.str(),true,o);
+  stan::lang::generate_array_var_type(base_expr_type(row_vector_type()),ssReal.str(),true,o);
   EXPECT_EQ(1, count_matches("Eigen::Matrix<T__,1,Eigen::Dynamic> ", o.str()));
 
   ssReal.str(std::string());
   o.str(std::string());
-  stan::lang::generate_array_var_type(ROW_VECTOR_T,ssReal.str(),false,o);
+  stan::lang::generate_array_var_type(base_expr_type(row_vector_type()),ssReal.str(),false,o);
   EXPECT_EQ(1, count_matches("row_vector_d", o.str()));
 
   ssReal.str(std::string());
   o.str(std::string());
-  stan::lang::generate_array_var_type(MATRIX_T,ssReal.str(),true,o);
+  stan::lang::generate_array_var_type(base_expr_type(matrix_type()),ssReal.str(),true,o);
   EXPECT_EQ(1, count_matches("Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> ", o.str()));
 
   ssReal.str(std::string());
   o.str(std::string());
-  stan::lang::generate_array_var_type(MATRIX_T,ssReal.str(),false,o);
+  stan::lang::generate_array_var_type(base_expr_type(matrix_type()),ssReal.str(),false,o);
   EXPECT_EQ(1, count_matches("matrix_d", o.str()));
 }
 
