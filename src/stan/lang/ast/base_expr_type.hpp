@@ -55,6 +55,10 @@ namespace stan {
       bool operator==(const base_expr_type& base_type) const;
 
       bool operator!=(const base_expr_type& base_type) const;
+      bool operator<(const base_expr_type& base_type) const;
+      bool operator<=(const base_expr_type& base_type) const;
+      bool operator>(const base_expr_type& base_type) const;
+      bool operator>=(const base_expr_type& base_type) const;
 
       bool is_ill_formed_type() const;
       bool is_void_type() const;

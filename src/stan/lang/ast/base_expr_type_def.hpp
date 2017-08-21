@@ -123,6 +123,58 @@ namespace stan {
       return true;
     }
 
+    bool base_expr_type::operator<(const base_expr_type& base_type) const {
+      if (is_ill_formed_type()) {
+        if (base_type.is_ill_formed_type()) return false;
+        return true;
+      } else if (is_void_type()) {
+        if (base_type.is_ill_formed_type()
+            || base_type.is_void_type()) return false;
+        return true;
+      } else if (is_int_type()) {
+        if (base_type.is_ill_formed_type()
+            || base_type.is_void_type()
+            || base_type.is_int_type()) return false;
+        return true;
+      } else if (is_double_type()) {
+        if (base_type.is_ill_formed_type()
+            || base_type.is_void_type()
+            || base_type.is_int_type()
+            || base_type.is_double_type()) return false;
+        return true;
+      } else if (is_vector_type()) {
+        if (base_type.is_ill_formed_type()
+            || base_type.is_void_type()
+            || base_type.is_int_type()
+            || base_type.is_double_type()
+            || base_type.is_vector_type()) return false;
+        return true;
+      } else if (is_row_vector_type()) {
+        if (base_type.is_ill_formed_type()
+            || base_type.is_void_type()
+            || base_type.is_int_type()
+            || base_type.is_double_type()
+            || base_type.is_vector_type()
+            || base_type.is_row_vector_type()) return false;
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    bool base_expr_type::operator>(const base_expr_type& base_type) const {
+      return !(base_expr_type(base_type_) == base_type
+               || base_expr_type(base_type_) < base_type);
+    }
+    bool base_expr_type::operator<=(const base_expr_type& base_type) const {
+      return (base_expr_type(base_type_) == base_type
+              || base_expr_type(base_type_) < base_type);
+    }
+
+    bool base_expr_type::operator>=(const base_expr_type& base_type) const {
+      return !(base_expr_type(base_type_) < base_type);
+    }
+
   }
 }
 #endif

@@ -98,6 +98,7 @@ TEST(lang_ast,expr_type_num_dims) {
   EXPECT_EQ(2U,expr_type(int_type(),2U).num_dims());
   EXPECT_EQ(2U,expr_type(vector_type(),2U).num_dims());
 }
+
 TEST(lang_ast,expr_type_is_primitive) {
   EXPECT_TRUE(expr_type(double_type()).is_primitive());
   EXPECT_TRUE(expr_type(int_type()).is_primitive());
@@ -106,6 +107,7 @@ TEST(lang_ast,expr_type_is_primitive) {
   EXPECT_FALSE(expr_type(matrix_type()).is_primitive());
   EXPECT_FALSE(expr_type(int_type(),2U).is_primitive());
 }
+
 TEST(lang_ast,expr_type_is_primitive_int) {
   EXPECT_FALSE(expr_type(double_type()).is_primitive_int());
   EXPECT_TRUE(expr_type(int_type()).is_primitive_int());
@@ -114,6 +116,7 @@ TEST(lang_ast,expr_type_is_primitive_int) {
   EXPECT_FALSE(expr_type(matrix_type()).is_primitive_int());
   EXPECT_FALSE(expr_type(int_type(),2U).is_primitive_int());
 }
+
 TEST(lang_ast,expr_type_is_primitive_double) {
   EXPECT_TRUE(expr_type(double_type()).is_primitive_double());
   EXPECT_FALSE(expr_type(int_type()).is_primitive_double());
@@ -122,11 +125,107 @@ TEST(lang_ast,expr_type_is_primitive_double) {
   EXPECT_FALSE(expr_type(matrix_type()).is_primitive_double());
   EXPECT_FALSE(expr_type(int_type(),2U).is_primitive_double());
 }
+
 TEST(lang_ast,expr_type_eq) {
   EXPECT_EQ(expr_type(double_type()),expr_type(double_type()));
   EXPECT_EQ(expr_type(double_type(),1U),expr_type(double_type(),1U));
   EXPECT_NE(expr_type(int_type()), expr_type(double_type()));
   EXPECT_NE(expr_type(int_type(),1), expr_type(int_type(),2));
+  EXPECT_TRUE(expr_type(int_type(),1) != expr_type(int_type(),2));
+  EXPECT_FALSE(expr_type(int_type(),1) == expr_type(int_type(),2));
+}
+
+TEST(lang_ast,base_expr_type_vis) {
+  EXPECT_TRUE(base_expr_type(ill_formed_type()).is_ill_formed_type());
+  EXPECT_TRUE(base_expr_type(void_type()).is_void_type());
+  EXPECT_TRUE(base_expr_type(int_type()).is_int_type());
+  EXPECT_TRUE(base_expr_type(double_type()).is_double_type());
+  EXPECT_TRUE(base_expr_type(vector_type()).is_vector_type());
+  EXPECT_TRUE(base_expr_type(row_vector_type()).is_row_vector_type());
+  EXPECT_TRUE(base_expr_type(matrix_type()).is_matrix_type());
+
+  EXPECT_FALSE(base_expr_type(void_type()).is_ill_formed_type());
+  EXPECT_FALSE(base_expr_type(int_type()).is_void_type());
+  EXPECT_FALSE(base_expr_type(double_type()).is_int_type());
+  EXPECT_FALSE(base_expr_type(int_type()).is_double_type());
+  EXPECT_FALSE(base_expr_type(int_type()).is_vector_type());
+  EXPECT_FALSE(base_expr_type(vector_type()).is_row_vector_type());
+  EXPECT_FALSE(base_expr_type(vector_type()).is_matrix_type());
+}
+
+
+TEST(lang_ast,base_expr_type_compare_ops) {
+  EXPECT_TRUE(base_expr_type(int_type())
+              == base_expr_type(int_type()));
+  EXPECT_TRUE(base_expr_type(int_type())
+              != base_expr_type(double_type()));
+  EXPECT_FALSE(base_expr_type(int_type())
+              != base_expr_type(int_type()));
+  EXPECT_TRUE(base_expr_type(int_type())
+              >= base_expr_type(int_type()));
+  EXPECT_TRUE(base_expr_type(int_type())
+              <= base_expr_type(int_type()));
+  EXPECT_FALSE(base_expr_type(int_type())
+               > base_expr_type(int_type()));
+  EXPECT_FALSE(base_expr_type(int_type())
+               < base_expr_type(int_type()));
+  EXPECT_TRUE(base_expr_type(ill_formed_type())
+              < base_expr_type(int_type()));
+  EXPECT_TRUE(base_expr_type(void_type())
+              < base_expr_type(double_type()));
+  EXPECT_TRUE(base_expr_type(ill_formed_type())
+              < base_expr_type(double_type()));
+  EXPECT_TRUE(base_expr_type(void_type())
+              < base_expr_type(vector_type()));
+  EXPECT_TRUE(base_expr_type(ill_formed_type())
+              < base_expr_type(row_vector_type()));
+  EXPECT_TRUE(base_expr_type(void_type())
+              < base_expr_type(matrix_type()));
+
+  EXPECT_FALSE(base_expr_type(ill_formed_type())
+              < base_expr_type(ill_formed_type()));
+  EXPECT_FALSE(base_expr_type(void_type())
+              < base_expr_type(void_type()));
+  EXPECT_FALSE(base_expr_type(int_type())
+               < base_expr_type(int_type()));
+  EXPECT_FALSE(base_expr_type(double_type())
+               < base_expr_type(double_type()));
+  EXPECT_FALSE(base_expr_type(vector_type())
+              < base_expr_type(vector_type()));
+  EXPECT_FALSE(base_expr_type(row_vector_type())
+              < base_expr_type(row_vector_type()));
+  EXPECT_FALSE(base_expr_type(matrix_type())
+              < base_expr_type(matrix_type()));
+
+  EXPECT_FALSE(base_expr_type(ill_formed_type())
+              > base_expr_type(ill_formed_type()));
+  EXPECT_FALSE(base_expr_type(void_type())
+              > base_expr_type(void_type()));
+  EXPECT_FALSE(base_expr_type(int_type())
+               > base_expr_type(int_type()));
+  EXPECT_FALSE(base_expr_type(double_type())
+               > base_expr_type(double_type()));
+  EXPECT_FALSE(base_expr_type(vector_type())
+              > base_expr_type(vector_type()));
+  EXPECT_FALSE(base_expr_type(row_vector_type())
+              > base_expr_type(row_vector_type()));
+  EXPECT_FALSE(base_expr_type(matrix_type())
+              > base_expr_type(matrix_type()));
+
+  EXPECT_FALSE(base_expr_type(ill_formed_type())
+              != base_expr_type(ill_formed_type()));
+  EXPECT_FALSE(base_expr_type(void_type())
+              != base_expr_type(void_type()));
+  EXPECT_FALSE(base_expr_type(int_type())
+               != base_expr_type(int_type()));
+  EXPECT_FALSE(base_expr_type(double_type())
+               != base_expr_type(double_type()));
+  EXPECT_FALSE(base_expr_type(vector_type())
+              != base_expr_type(vector_type()));
+  EXPECT_FALSE(base_expr_type(row_vector_type())
+              != base_expr_type(row_vector_type()));
+  EXPECT_FALSE(base_expr_type(matrix_type())
+              != base_expr_type(matrix_type()));
 }
 
 TEST(lang_ast,expr_type_type) {
@@ -184,7 +283,7 @@ TEST(lang_ast,function_signatures_log_sum_exp_2) {
                                              expr_type(double_type())),
                                error_msgs));
 }
-
+ 
 TEST(lang_ast, function_signatures_add) {
   stan::lang::function_signatures& fs = stan::lang::function_signatures::instance();
   std::stringstream error_msgs;
@@ -308,6 +407,7 @@ TEST(langAst, isUserDefined) {
   pair<string, function_signature_t> name_sig(name, sig);
 
   function_signatures::instance().set_user_defined(name_sig);
+  
   EXPECT_TRUE(is_user_defined(name, args));
   EXPECT_TRUE(function_signatures::instance().is_user_defined(name_sig));
   EXPECT_FALSE(is_user_defined_prob_function("foo",

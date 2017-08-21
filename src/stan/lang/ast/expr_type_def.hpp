@@ -23,27 +23,27 @@ namespace stan {
     }
 
     bool expr_type::operator!=(const expr_type& et) const {
-        return !(*this == et);
+      return !(*this == et);
     }
 
     bool expr_type::operator<(const expr_type& et) const {
-      return !(base_type_ == et.base_type_)
-        || num_dims_ < et.num_dims_;
+      return base_type_ < et.base_type_
+             || (base_type_ == et.base_type_ && num_dims_ < et.num_dims_);
     }
 
     bool expr_type::operator<=(const expr_type& et) const {
-      return !(base_type_ == et.base_type_)
-        || num_dims_ <= et.num_dims_;
+      return base_type_ < et.base_type_
+             || (base_type_ == et.base_type_ && num_dims_ <= et.num_dims_);
     }
 
     bool expr_type::operator>(const expr_type& et) const {
-      return !(base_type_ == et.base_type_)
-        || num_dims_ > et.num_dims_;
+      return base_type_ > et.base_type_
+             || (base_type_ == et.base_type_ && num_dims_ > et.num_dims_);
     }
 
     bool expr_type::operator>=(const expr_type& et) const {
-      return !(base_type_ == et.base_type_)
-        || num_dims_ >= et.num_dims_;
+      return base_type_ > et.base_type_
+             || (base_type_ == et.base_type_ && num_dims_ >= et.num_dims_);
     }
 
     bool expr_type::is_primitive() const {
