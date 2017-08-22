@@ -5,10 +5,6 @@
 // #include <boost/config/warning_disable.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
-#include <boost/version.hpp>
-#if BOOST_VERSION == 106400
-#  include <boost/phoenix/core/limits.hpp>
-#endif
 #include <stan/lang/ast.hpp>
 #include <stan/lang/grammars/term_grammar.hpp>
 #include <stan/lang/grammars/expression_grammar.hpp>

@@ -8,10 +8,6 @@
 #include <boost/fusion/include/std_pair.hpp>
 #include <boost/spirit/home/support/iterators/line_pos_iterator.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
-#include <boost/version.hpp>
-#if BOOST_VERSION == 106400
-#  include <boost/phoenix/core/limits.hpp>
-#endif
 #include <boost/spirit/include/qi.hpp>
 #include <iomanip>
 #include <sstream>

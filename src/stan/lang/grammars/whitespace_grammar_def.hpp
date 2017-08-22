@@ -6,9 +6,6 @@
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/version.hpp>
-#if BOOST_VERSION == 106400
-#  include <boost/phoenix/core/limits.hpp>
-#endif
 #include <sstream>
 
 namespace stan {
