@@ -188,21 +188,26 @@ namespace stan {
         add(name, expr_type(double_type(), i), expr_type(int_type(), i));
         add(name, expr_type(double_type(), i), expr_type(double_type(), i));
         add(name, expr_type(vector_type(), i), expr_type(vector_type(), i));
-        add(name, expr_type(row_vector_type(), i), expr_type(row_vector_type(), i));
+        add(name, expr_type(row_vector_type(), i),
+            expr_type(row_vector_type(), i));
         add(name, expr_type(matrix_type(), i), expr_type(matrix_type(), i));
       }
     }
 
     void function_signatures::add_binary(const::std::string& name) {
-      add(name, expr_type(double_type()), expr_type(double_type()), expr_type(double_type()));
+      add(name, expr_type(double_type()), expr_type(double_type()),
+          expr_type(double_type()));
     }
 
     void function_signatures::add_ternary(const::std::string& name) {
-      add(name, expr_type(double_type()), expr_type(double_type()), expr_type(double_type()), expr_type(double_type()));
+      add(name, expr_type(double_type()), expr_type(double_type()),
+          expr_type(double_type()), expr_type(double_type()));
     }
 
     void function_signatures::add_quaternary(const::std::string& name) {
-      add(name, expr_type(double_type()), expr_type(double_type()), expr_type(double_type()), expr_type(double_type()), expr_type(double_type()));
+      add(name, expr_type(double_type()), expr_type(double_type()),
+          expr_type(double_type()), expr_type(double_type()),
+          expr_type(double_type()));
     }
 
     int function_signatures::num_promotions(

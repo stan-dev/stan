@@ -13,7 +13,8 @@ namespace stan {
       if (num_index_dims <= num_expr_dims)
         return expr_type(expr_base_type, num_expr_dims - num_index_dims);
       if (num_index_dims == (num_expr_dims + 1)) {
-        if (expr_base_type.is_vector_type() || expr_base_type.is_row_vector_type())
+        if (expr_base_type.is_vector_type()
+            || expr_base_type.is_row_vector_type())
           return expr_type(double_type(), 0U);
         if (expr_base_type.is_matrix_type())
           return expr_type(row_vector_type(), 0U);

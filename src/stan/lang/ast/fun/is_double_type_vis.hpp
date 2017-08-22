@@ -18,7 +18,6 @@ namespace stan {
      * Visitor to determine if a base_expr_type is double type.
      */
     struct is_double_type_vis : public boost::static_visitor<bool> {
-    
       /**
        * Return true if the specified base expression type is double type.
        *
@@ -26,7 +25,7 @@ namespace stan {
        * @return false
        */
       bool operator()(const ill_formed_type& base_type) const;
-    
+
       /**
        * Return true if the specified base expression type is double type.
        *

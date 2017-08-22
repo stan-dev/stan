@@ -8,7 +8,8 @@
 namespace stan {
   namespace lang {
 
-    unit_vector_var_decl::unit_vector_var_decl() : base_var_decl(vector_type()) { }
+    unit_vector_var_decl::unit_vector_var_decl()
+      : base_var_decl(vector_type()) { }
 
     unit_vector_var_decl::unit_vector_var_decl(const expression& K,
                                           const std::string& name,

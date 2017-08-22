@@ -11,17 +11,17 @@ namespace stan {
         o << "int";
       else if (type.is_double_type())
         o << "real";
-      else if (type.is_vector_type()) 
+      else if (type.is_vector_type())
         o << "vector";
-      else if (type.is_row_vector_type()) 
+      else if (type.is_row_vector_type())
         o << "row vector";
       else if (type.is_matrix_type())
         o << "matrix";
-      else if (type.is_ill_formed_type()) 
+      else if (type.is_ill_formed_type())
         o << "ill formed";
-      else if (type.is_void_type()) 
+      else if (type.is_void_type())
         o << "void";
-      else 
+      else
         o << "UNKNOWN";
 
       return o;

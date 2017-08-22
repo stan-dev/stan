@@ -18,7 +18,6 @@ namespace stan {
      * Struct to wrap the variant base type of expressions.
      */
     struct base_expr_type {
-
       /**
        * The variant base type of expressions.
        */

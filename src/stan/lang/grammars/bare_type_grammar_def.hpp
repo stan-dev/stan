@@ -38,7 +38,8 @@ namespace stan {
         | lit("int")[assign_lhs_f(_val, base_expr_type(int_type()))]
         | lit("real")[assign_lhs_f(_val, base_expr_type(double_type()))]
         | lit("vector")[assign_lhs_f(_val, base_expr_type(vector_type()))]
-        | lit("row_vector")[assign_lhs_f(_val, base_expr_type(row_vector_type()))]
+        | lit("row_vector")[assign_lhs_f(_val,
+                                         base_expr_type(row_vector_type()))]
         | lit("matrix")[assign_lhs_f(_val, base_expr_type(matrix_type()))];
 
       array_dims_r.name("array dimensions,\n"

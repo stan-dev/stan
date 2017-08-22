@@ -17,7 +17,6 @@ namespace stan {
      * Visitor to determine if a base_expr_type is ill_formed type.
      */
     struct is_ill_formed_type_vis : public boost::static_visitor<bool> {
-    
       /**
        * Return true if the specified base expression type is ill_formed type.
        *

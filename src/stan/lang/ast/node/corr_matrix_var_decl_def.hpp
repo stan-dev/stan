@@ -8,7 +8,8 @@
 namespace stan {
   namespace lang {
 
-    corr_matrix_var_decl::corr_matrix_var_decl() : base_var_decl(matrix_type()) { }
+    corr_matrix_var_decl::corr_matrix_var_decl()
+      : base_var_decl(matrix_type()) { }
 
     corr_matrix_var_decl::corr_matrix_var_decl(const expression& K,
                                    const std::string& name,

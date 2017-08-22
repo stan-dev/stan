@@ -278,7 +278,8 @@ namespace stan {
                          const std::vector<std::vector<expression> >&) const;
     template void assign_lhs::operator()(fun&, const fun&) const;
     template void assign_lhs::operator()(variable&, const variable&) const;
-    template void assign_lhs::operator()(base_expr_type&, const base_expr_type&) const;
+    template void assign_lhs::operator()(base_expr_type&,
+                                         const base_expr_type&) const;
 
     void validate_expr_type3::operator()(const expression& expr, bool& pass,
                                          std::ostream& error_msgs) const {
@@ -582,15 +583,16 @@ namespace stan {
         return;
       }
 
-
-      if (ends_with("_lpdf", decl.name_) && arg_types[0].base_type_.is_int_type()) {
+      if (ends_with("_lpdf", decl.name_)
+          && arg_types[0].base_type_.is_int_type()) {
         error_msgs << "Parse Error.  Probability density functions require"
                    << " real variates (first argument)."
                    << " Found type = " << arg_types[0] << std::endl;
         pass = false;
         return;
       }
-      if (ends_with("_lpmf", decl.name_) && !arg_types[0].base_type_.is_int_type()) {
+      if (ends_with("_lpmf", decl.name_)
+          && !arg_types[0].base_type_.is_int_type()) {
         error_msgs << "Parse Error.  Probability mass functions require"
                    << " integer variates (first argument)."
                    << " Found type = " << arg_types[0] << std::endl;
@@ -627,14 +629,16 @@ namespace stan {
         return;
       }
       expr_type variate_type = decl.arg_decls_[0].arg_type_;
-      if (ends_with("_lpdf", decl.name_) && variate_type.base_type_.is_int_type()) {
+      if (ends_with("_lpdf", decl.name_)
+          && variate_type.base_type_.is_int_type()) {
         error_msgs << "Parse Error.  Probability density functions require"
                    << " real variates (first argument)."
                    << " Found type = " << variate_type << std::endl;
         pass = false;
         return;
       }
-      if (ends_with("_lpmf", decl.name_) && !variate_type.base_type_.is_int_type()) {
+      if (ends_with("_lpmf", decl.name_)
+          && !variate_type.base_type_.is_int_type()) {
         error_msgs << "Parse Error.  Probability mass functions require"
                    << " integer variates (first argument)."
                    << " Found type = " << variate_type << std::endl;
@@ -765,7 +769,8 @@ namespace stan {
 
     void add_params_var::operator()(variable_map& vm) const {
       vm.add("params_r__",
-             base_var_decl("params_r__", std::vector<expression>(), vector_type()),
+             base_var_decl("params_r__", std::vector<expression>(),
+                           vector_type()),
              parameter_origin);  // acts like a parameter
     }
     boost::phoenix::function<add_params_var> add_params_var_f;
@@ -1071,10 +1076,14 @@ namespace stan {
         // when lhs and rhs are same shape, and broadcast operations
         // when rhs is double and lhs is vector, row_vector, or matrix
         (lhs_type == rhs_type
-         || (lhs_type.type().is_vector_type() && rhs_type.type().is_double_type())
-         || (lhs_type.type().is_row_vector_type() && rhs_type.type().is_double_type())
-         || (lhs_type.type().is_row_vector_type() && rhs_type.type().is_matrix_type())
-         || (lhs_type.type().is_matrix_type() && rhs_type.type().is_double_type()));
+         || (lhs_type.type().is_vector_type()
+             && rhs_type.type().is_double_type())
+         || (lhs_type.type().is_row_vector_type()
+             && rhs_type.type().is_double_type())
+         || (lhs_type.type().is_row_vector_type()
+             && rhs_type.type().is_matrix_type())
+         || (lhs_type.type().is_matrix_type()
+             && rhs_type.type().is_double_type()));
       if (!types_compatible) {
         error_msgs << "Cannot apply operator '" << op_equals
                    << "' to operands;"
@@ -1976,7 +1985,8 @@ namespace stan {
           return;
         }
         if ((et.base_type_.is_int_type() && et_next.base_type_.is_double_type())
-            || (et.base_type_.is_double_type() && et_next.base_type_.is_int_type())) {
+            || (et.base_type_.is_double_type()
+                && et_next.base_type_.is_int_type())) {
           et.base_type_ = double_type();
         } else if (et.base_type_ != et_next.base_type_) {
           error_msgs << "Expressions for elements of array must have"

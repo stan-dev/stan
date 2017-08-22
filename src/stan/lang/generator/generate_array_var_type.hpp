@@ -21,7 +21,7 @@ namespace stan {
                                  const std::string& real_var_type,
                                  bool is_var_context,
                                  std::ostream& o) {
-      if (base_type.is_int_type()) 
+      if (base_type.is_int_type())
         o << "int";
       else if (base_type.is_double_type())
         o << real_var_type;

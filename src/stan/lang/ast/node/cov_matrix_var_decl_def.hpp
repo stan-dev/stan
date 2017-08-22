@@ -8,7 +8,8 @@
 namespace stan {
   namespace lang {
 
-    cov_matrix_var_decl::cov_matrix_var_decl() : base_var_decl(matrix_type()) {  }
+    cov_matrix_var_decl::cov_matrix_var_decl()
+      : base_var_decl(matrix_type()) {  }
 
     cov_matrix_var_decl::cov_matrix_var_decl(const expression& K,
                                          const std::string& name,

@@ -15,7 +15,8 @@ namespace stan {
                                      const std::string& name,
                                      const std::vector<expression>& dims,
                                      const expression& def)
-      : base_var_decl(name, dims, matrix_type(), def), range_(range), M_(M), N_(N) {
+      : base_var_decl(name, dims, matrix_type(), def), range_(range), M_(M),
+        N_(N) {
     }
 
   }
