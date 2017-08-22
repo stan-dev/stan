@@ -24,6 +24,7 @@ namespace stan {
      * @param[in] suffix  suffix string
      * @param[in,out] logger  logger
      */
+    inline
     void print_progress(int m,
                         int start,
                         int finish,

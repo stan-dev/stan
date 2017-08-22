@@ -16,6 +16,7 @@ namespace stan {
        * @param[in] num_params expected number of denseonal elements
        * @return var_context 
        */
+      inline
       stan::io::dump
       create_unit_e_dense_inv_metric(size_t num_params) {
         Eigen::MatrixXd inv_metric(num_params, num_params);
