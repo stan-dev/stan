@@ -426,11 +426,17 @@ TEST(io_writer, cov_matrix_unconstrain_exception) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   
   y.resize(2,2);
-  y << 1.0, 0.0, 0.0, 1.0;
+  y << 1.0, 0.7, 0.7, 1.0;
   EXPECT_NO_THROW(writer.cov_matrix_unconstrain(y));
+  std::vector<double> z = writer.data_r();
+  Eigen::VectorXd w(3);
+  for (int i = 0; i < 3; i++) w.coeffRef(i) = z[i];
+  Eigen::MatrixXd y_ = stan::math::cov_matrix_constrain(w, 2);
+  for (int i = 0; i < 2; i ++) for (int j = 0; j < 2; j++)
+    EXPECT_FLOAT_EQ(y(i,j), y_(i,j));
   
   y << 0.0, 1.0, 0.0, 0.0;
-  EXPECT_THROW(writer.cov_matrix_unconstrain(y), std::runtime_error);
+  EXPECT_THROW(writer.cov_matrix_unconstrain(y), std::domain_error);
 
   y.resize(0,0);
   EXPECT_THROW(writer.cov_matrix_unconstrain(y), std::runtime_error);
