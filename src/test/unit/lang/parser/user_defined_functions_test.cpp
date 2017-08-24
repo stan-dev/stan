@@ -156,3 +156,7 @@ TEST(parserFunctions, funsBadODE) {
   test_throws("functions-bad22-ode",
               "must be data only, found expression containing a parameter varaible");
 }
+TEST(parserFunctions, badProbFunSuffix) {
+  test_throws("bad_prob_fun_suffix",
+              "Probability function must end in _lpdf or _lpmf");
+}

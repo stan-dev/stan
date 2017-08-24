@@ -22,6 +22,7 @@ namespace stan {
        * @throws std::domain_error if cannot read the Euclidean metric
        * @return inv_metric
        */
+      inline
       Eigen::MatrixXd
       read_dense_inv_metric(stan::io::var_context& init_context,
                             size_t num_params,
