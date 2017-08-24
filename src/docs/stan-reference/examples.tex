@@ -1061,7 +1061,8 @@ care must be taken to ensure the posterior is both proper and not
 overly sensitive either statistically or computationally to wide tails
 in the priors.
 
-\subsection{Boundary-Avoiding Priors for MLE in Hierarchical Models}
+\subsection{Boundary-Avoiding Priors for MLE in Hierarchical
+Models}\label{bound-avoid-priors.subsection}
 
 The fundamental problem with maximum likelihood estimation (MLE) in
 the hierarchical model setting is that as the hierarchical variance
@@ -6971,17 +6972,16 @@ data {
   real x[N];
 }
 transformed data {
-  vector[N] mu;
   matrix[N, N] K;
-  mu = rep_vector(0, N);
+  vector[N] mu = rep_vector(0, N);
   for (i in 1:(N - 1)) {
-    K[i,i] = 1 + 0.1;
+    K[i, i] = 1 + 0.1;
     for (j in (i + 1):N) {
       K[i, j] = exp(-0.5 * square(x[i] - x[j]));
       K[j, i] = K[i, j];
     }
   }
-  K[N,N] = 1 + 0.1;
+  K[N, N] = 1 + 0.1;
 }
 parameters {
   vector[N] y;
@@ -7000,12 +7000,10 @@ data {
   real x[N];
 }
 transformed data {
-  vector[N] mu;
-  cov_matrix[N] K;
-  mu = rep_vector(0, N);
-  K = cov_exp_quad(x, 1, 1);
-  for (i in 1:N)
-    K[i, i] = K[i, i] + 0.1;
+  matrix[N, N] K = cov_exp_quad(x, 1.0, 1.0);
+  vector[N] mu = rep_vector(0, N);
+  for (n in 1:N) 
+    K[n, n] = K[n, n] + 0.1;
 }
 parameters {
   vector[N] y;
@@ -7032,8 +7030,8 @@ The only lines that change from the univariate model above are as follows.
 %
 \begin{stancode}
 data {
-  int<lower=1> D;
   int<lower=1> N;
+  int<lower=1> D;
   vector[D] x[N];
 }
 transformed data {
@@ -7053,17 +7051,17 @@ multivariate model is in the distance calculation.
 
 A more efficient implementation of the simulation model can be
 coded in Stan by relocating, rescaling and rotating an isotropic unit
-normal variate.  Suppose $z$ is an an isotropic unit normal variate
+normal variate.  Suppose $\eta$ is an an isotropic unit normal variate
 \[
-z \sim \distro{Normal}({\bf 0}, {\bf 1}),
+\eta \sim \distro{Normal}({\bf 0}, {\bf 1}),
 \]
 where ${\bf 0}$ is an $N$-vector of 0 values and ${\bf 1}$ is the $N
 \times N$ identity matrix.  Let $L$ be the Cholesky decomposition of
 $K(x | \theta)$, i.e., the lower-triangular matrix $L$ such that $LL^{\top} =
-K(x | \theta)$.  Then the transformed variable $\mu + Lz$ has the intended
+K(x | \theta)$.  Then the transformed variable $\mu + L\eta$ has the intended
 target distribution,
 \[
-  \mu + Lz \sim \distro{MultiNormal}(\mu(x), K(x | \theta)).
+  \mu + L\eta \sim \distro{MultiNormal}(\mu(x), K(x | \theta)).
 \]
 
 This transform can be applied directly to Gaussian process
@@ -7087,22 +7085,22 @@ transformed data {
   L = cholesky_decompose(K);
 }
 parameters {
-  vector[N] z;
+  vector[N] eta;
 }
 model {
-  z ~ normal(0, 1);
+  eta ~ normal(0, 1);
 }
 generated quantities {
   vector[N] y;
-  y = mu + L * z;
+  y = mu + L * eta;
 }
 \end{stancode}
 %
 The Cholesky decomposition is only computed once, after the data is
 loaded and the covariance matrix \code{K} computed.  The isotropic
-normal distribution for \code{z} is specified as a vectorized
+normal distribution for \code{eta} is specified as a vectorized
 univariate distribution for efficiency; this specifies that each
-\code{z[n]} has an independent unit normal distribution.  The sampled
+\code{eta[n]} has an independent unit normal distribution.  The sampled
 vector \code{y} is then defined as a generated quantity using a direct
 encoding of the transform described above.
 
@@ -7114,7 +7112,7 @@ The full generative model for a GP with a normal outcome,
 $y \in \R^N$, with inputs $x \in \R^N$, for a finite $N$:
 
 \begin{align*}
-  \rho & \sim \distro{Gamma}(4,4) \\
+  \rho & \sim \distro{InvGamma}(5, 5) \\
   \alpha & \sim \distro{Normal}(0, 1) \\
   \sigma & \sim \distro{Normal}(0, 1) \\
   f & \sim \distro{MultiNormal}\left(0, K(x | \alpha, \rho)\right) \\
@@ -7125,7 +7123,7 @@ With a normal outcome, it is possible to integrate out the Gaussian
 process $f$, yielding the more parsimonious model:
 
 \begin{align*}
-  \rho & \sim \distro{Gamma}(4,4) \\
+  \rho & \sim \distro{InvGamma}(5, 5) \\
   \alpha & \sim \distro{Normal}(0, 1) \\
   \sigma & \sim \distro{Normal}(0, 1) \\
   y & \sim \distro{MultiNormal}
@@ -7165,8 +7163,7 @@ data {
   vector[N] y;
 }
 transformed data {
-  vector[N] mu;
-  mu = rep_vector(0, N);
+  vector[N] mu = rep_vector(0, N);
 }
 parameters {
   real<lower=0> rho;
@@ -7174,17 +7171,17 @@ parameters {
   real<lower=0> sigma;
 }
 model {
-  matrix[N, N] K = cov_exp_quad(x, alpha, rho);
   matrix[N, N] L_K;
+  matrix[N, N] K = cov_exp_quad(x, alpha, rho);
   real sq_sigma = square(sigma);
 
   // diagonal elements
   for (n in 1:N)
     K[n, n] = K[n, n] + sq_sigma;
-
+  
   L_K = cholesky_decompose(K);
-
-  rho ~ gamma(4, 4);
+  
+  rho ~ inv_gamma(5, 5);
   alpha ~ normal(0, 1);
   sigma ~ normal(0, 1);
 
@@ -7242,18 +7239,18 @@ parameters {
 model {
   vector[N] f;
   {
-    matrix[N, N] K = cov_exp_quad(x, alpha, rho);
     matrix[N, N] L_K;
-
+    matrix[N, N] K = cov_exp_quad(x, alpha, rho);
+  
     // diagonal elements
-    for (k in 1:N)
-      K[k, k] = K[k, k] + delta;
-
+    for (n in 1:N)
+      K[n, n] = K[n, n] + delta;
+    
     L_K = cholesky_decompose(K);
     f = L_K * eta;
   }
-
-  rho ~ gamma(4, 4);
+  
+  rho ~ inv_gamma(5, 5);
   alpha ~ normal(0, 1);
   sigma ~ normal(0, 1);
   eta ~ normal(0, 1);
@@ -7297,17 +7294,17 @@ data {
 }
 ...
 parameters {
-  real<lower=0> alpha;
   real<lower=0> rho;
+  real<lower=0> alpha;
   real a;
   vector[N] eta;
 }
 model {
 ...
+  rho ~ inv_gamma(5, 5);
   alpha ~ normal(0, 1);
-  rho ~ gamma(4, 4);
-  eta ~ normal(0, 1);
   a ~ normal(0, 1);
+  eta ~ normal(0, 1);
 
   y ~ poisson_log(a + f);
 }
@@ -7383,22 +7380,22 @@ covariance matrix called \code{L\_cov\_exp\_quad\_ARD}.
 %
 \begin{stancode}
 functions {
-  matrix L_cov_exp_quad_ARD(real[] x,
+  matrix L_cov_exp_quad_ARD(vector[] x,
                             real alpha,
-                            vector[] rho,
+                            vector rho,
                             real delta) {
     int N = size(x);
     matrix[N, N] K;
     real sq_alpha = square(alpha);
-    for (i in 1:(N - 1)) {
-      K[i,i] = sq_alpha + delta;
+    for (i in 1:(N-1)) {
+      K[i, i] = sq_alpha + delta;
       for (j in (i + 1):N) {
         K[i, j] = sq_alpha
                       * exp(-0.5 * dot_self((x[i] - x[j]) ./ rho));
         K[j, i] = K[i, j];
       }
     }
-    K[N,N] = sq_alpha + delta;
+    K[N, N] = sq_alpha + delta;
     return cholesky_decompose(K);
   }
 }
@@ -7409,8 +7406,7 @@ data {
   vector[N] y;
 }
 transformed data {
-  real delta;
-  delta = 1e-9;
+  real delta = 1e-9;
 }
 parameters {
   vector<lower=0>[D] rho;
@@ -7421,11 +7417,11 @@ parameters {
 model {
   vector[N] f;
   {
-    matrix[N, N] L_K = L_cov_exp_quad_ARD(x, alpha, rho, 1e-9);
+    matrix[N, N] L_K = L_cov_exp_quad_ARD(x, alpha, rho, delta);
     f = L_K * eta;
   }
-
-  rho ~ gamma(4, 4);
+  
+  rho ~ inv_gamma(5, 5);
   alpha ~ normal(0, 1);
   sigma ~ normal(0, 1);
   eta ~ normal(0, 1);
@@ -7474,17 +7470,22 @@ like to allow the GP prior to represent both high-frequency and low-frequency
 functions, so our prior should put non-negligible mass on both sets of
 functions. In this case, an inverse gamma, \code{inv\_gamma\_lpdf} in Stan's
 language, will work well as it has a sharp left tail that puts negligible mass
-on length-scales, but a generous right tail, allowing for large length-scales.
+on infinitesimal length-scales, but a generous right tail, allowing for large
+length-scales. Inverse gamma priors will avoid infinitesimal length-scales
+because the density is zero at zero, so the posterior for length-scale will be
+pushed away from zero. An inverse gamma distribution is one of many
+zero-avoiding or boundary-avoiding distributions. See
+\ref{bound-avoid-priors.subsection} for more on boundary-avoiding priors.
 
 If we're using the GP as a component in a larger model that includes an overall
 mean and fixed effects for the same variables we're using as the domain for the
 GP, i.e.:
 %
 \begin{align*}
-	f & \sim \distro{MultiNormal}\left(0, K(x | \alpha, \rho)\right) \\ y_i &
-	\sim \distro{Normal}(\beta_0 + x_i \beta_{[1:D]} + f_i, \sigma) \, \forall i
-	\in \{1, \dots, N\} \\ & x_i^T, \beta_{[1:D]} \in \reals^D,\, x \in \reals^{N
-	\times D},\, f \in \reals^N
+  f & \sim \distro{MultiNormal}\left(0, K(x | \alpha, \rho)\right) \\ y_i &
+  \sim \distro{Normal}(\beta_0 + x_i \beta_{[1:D]} + f_i, \sigma) \, \forall i
+  \in \{1, \dots, N\} \\ & x_i^T, \beta_{[1:D]} \in \reals^D,\, x \in \reals^{N
+  \times D},\, f \in \reals^N
 \end{align*}
 %
 we'll likely want to constrain large length-scales as well.  A length scale
@@ -7498,14 +7499,14 @@ to limit the GP to higher-frequency functions. We can use a generalized inverse
 Gaussian distribution:
 %
 \begin{align*}
-	f(x | a, b, p) & = \dfrac{(a/b)^{p/2}}{2K_p(\sqrt{ab})} x^{p - 1}\exp(-(ax + b
-	/ x)/2) \\
-	& x, a, b \in \reals^{+}, \, p \in \mathbb{Z}
+  f(x | a, b, p) & = \dfrac{(a/b)^{p/2}}{2K_p(\sqrt{ab})} x^{p - 1}\exp(-(ax + b
+  / x)/2) \\
+  & x, a, b \in \reals^{+}, \, p \in \mathbb{Z}
 \end{align*}
 %
-which has an inverse gamma left tail if $p \leq 0$ and a Gaussian right tail.
-This has not yet been implemented in Stan's math library, but it is possible to
-implement as a user defined function:
+which has an inverse gamma left tail if $p \leq 0$ and an inverse Gaussian
+right tail.  This has not yet been implemented in Stan's math library, but it
+is possible to implement as a user defined function:
 \begin{stancode}
 functions {
   real generalized_inverse_gaussian_lpdf(real x, int p,
@@ -7573,36 +7574,44 @@ data {
   real x2[N2];
 }
 transformed data {
+  real delta = 1e-9;
   int<lower=1> N = N1 + N2;
-  vector[N] x;
-  for (n in 1:N1) x[n] = x1[n];
-  for (n in 1:N2) x[N1 + n] = x2[n];
+  real x[N];
+  for (n1 in 1:N1) x[n1] = x1[n1];
+  for (n2 in 1:N2) x[N1 + n2] = x2[n2];
 }
 parameters {
-  real<lower=0> alpha;
   real<lower=0> rho;
+  real<lower=0> alpha;
   real<lower=0> sigma;
   vector[N] eta;
 }
-model {
+transformed parameters {
   vector[N] f;
   {
+    matrix[N, N] L_K;
     matrix[N, N] K = cov_exp_quad(x, alpha, rho);
-    matrix[N, N] L_K = cholesky_decompose(K);
+  
+    // diagonal elements
+    for (n in 1:N)
+      K[n, n] = K[n, n] + delta;
+    
+    L_K = cholesky_decompose(K);
     f = L_K * eta;
   }
-
+}
+model {
+  rho ~ inv_gamma(5, 5);
   alpha ~ normal(0, 1);
-  rho ~ gamma(4, 4);
   sigma ~ normal(0, 1);
   eta ~ normal(0, 1);
 
-  y ~ normal(f[1:N1], sigma);
+  y1 ~ normal(f[1:N1], sigma);
 }
 generated quantities {
   vector[N2] y2;
-  for (n in 1:N2)
-    y2[n] = normal_rng(f[N1 + n], sigma);
+  for (n2 in 1:N2)
+    y2[n2] = normal_rng(f[N1 + n2], sigma);
 }
 \end{stancode}
 %
@@ -7645,43 +7654,49 @@ see \url{http://mc-stan.org/documentation}.}
 data {
   int<lower=1> N1;
   real x1[N1];
-  vector[N1] z1;
+  int<lower=0, upper=1> z1[N1];
   int<lower=1> N2;
   real x2[N2];
 }
 transformed data {
-  int<lower=1> N = N1 + N2;
   real delta = 1e-9;
-  vector[N] x;
-  for (n in 1:N1) x[n] = x1[n];
-  for (n in 1:N2) x[N1 + n] = x2[n];
+  int<lower=1> N = N1 + N2;
+  real x[N];
+  for (n1 in 1:N1) x[n1] = x1[n1];
+  for (n2 in 1:N2) x[N1 + n2] = x2[n2];
 }
 parameters {
-  real<lower=0> alpha;
   real<lower=0> rho;
+  real<lower=0> alpha;
+  real a;
   vector[N] eta;
 }
-model {
+transformed parameters {
   vector[N] f;
   {
-    matrix[N, N] K = cov_exp_quad(x, alpha, rho);
     matrix[N, N] L_K;
+    matrix[N, N] K = cov_exp_quad(x, alpha, rho);
+  
+    // diagonal elements
     for (n in 1:N)
       K[n, n] = K[n, n] + delta;
+    
     L_K = cholesky_decompose(K);
     f = L_K * eta;
   }
-
+}
+model {
+  rho ~ inv_gamma(5, 5);
   alpha ~ normal(0, 1);
-  rho ~ gamma(4, 4);
+  a ~ normal(0, 1);
   eta ~ normal(0, 1);
 
-  y ~ bernoulli_logit(f[1:N1]);
+  z1 ~ bernoulli_logit(a + f[1:N1]);
 }
 generated quantities {
   int z2[N2];
-  for (n in 1:N2)
-    z2[n] = bernoulli_logit_rng(f[N1 + n]);
+  for (n2 in 1:N2)
+    z2[n2] = bernoulli_logit_rng(a + f[N1 + n2]);
 }
 \end{stancode}
 %
@@ -7736,7 +7751,6 @@ functions {
     int N1 = rows(y1);
     int N2 = size(x2);
     vector[N2] f2;
-
     {
       matrix[N1, N1] L_K;
       vector[N1] K_div_y1;
@@ -7753,7 +7767,7 @@ functions {
       K_div_y1 = mdivide_left_tri_low(L_K, y1);
       K_div_y1 = mdivide_right_tri_low(K_div_y1',L_K)';
       k_x1_x2 = cov_exp_quad(x1, x2, alpha, rho);
-      f2_mu = (k_x1_x2' * K_div_y1);
+      f2_mu = (k_x1_x2' * K_div_y1); 
       v_pred = mdivide_left_tri_low(L_K, k_x1_x2);
       cov_f2 = cov_exp_quad(x2, alpha, rho) - v_pred' * v_pred;
       diag_delta = diag_matrix(rep_vector(delta,N2));
@@ -7772,29 +7786,37 @@ data {
 }
 transformed data {
   vector[N1] mu = rep_vector(0, N1);
+  real delta = 1e-9;
 }
 parameters {
-  real<lower=0> alpha;
   real<lower=0> rho;
+  real<lower=0> alpha;
   real<lower=0> sigma;
 }
 model {
   matrix[N1, N1] L_K;
   {
-    matrix[N1, N1] K = cov_exp_quad(x, alpha, rho);
+    matrix[N1, N1] K = cov_exp_quad(x1, alpha, rho);
     real sq_sigma = square(sigma);
+  
+    // diagonal elements
     for (n1 in 1:N1)
       K[n1, n1] = K[n1, n1] + sq_sigma;
+    
     L_K = cholesky_decompose(K);
   }
+  
+  rho ~ inv_gamma(5, 5);
+  alpha ~ normal(0, 1);
+  sigma ~ normal(0, 1);
 
-  y ~ multi_normal_cholesky(mu, L_K);
+  y1 ~ multi_normal_cholesky(mu, L_K);
 }
 generated quantities {
   vector[N2] f2;
   vector[N2] y2;
 
-  f2 = gp_pred_rng(x2, y1, x1, alpha, rho, sigma);
+  f2 = gp_pred_rng(x2, y1, x1, alpha, rho, sigma, delta);
   for (n2 in 1:N2)
     y2[n2] = normal_rng(f2[n2], sigma);
 }
@@ -7832,7 +7854,7 @@ of the matrix $f$ are distributed:
 \begin{align*} f_{[n,]} \sim \distro{MultiNormal}(m(x)_{[n,]}, K(x | \alpha,
 \rho)_{[n,n]} C(\phi)) \end{align*} and that the columns of the matrix $f$ are
 distributed: \begin{align*} f_{[,m]} \sim \distro{MultiNormal}(m(x)_{[,m]}, K(x
-	| \alpha, \rho) C(\phi)_{[m,m]}) \end{align*}
+  | \alpha, \rho) C(\phi)_{[m,m]}) \end{align*}
 This also means means that $\E\left[f^T f\right]$ is equal to
 $\text{trace}(K(x | \alpha, \rho)) \times C$, whereas $\E\left[ff^T\right]$
 is $\text{trace}(C) \times K(x | \alpha, \rho)$. We can derive this using
@@ -7846,11 +7868,11 @@ We can generate a random variable $f$ from a \distro{MatrixNormal} density in
 $\reals^{N \times M}$ using the following algorithm:
 %
 \begin{align*}
-	\eta_{i,j} & \sim \distro{Normal}(0, 1) \, \forall i,j \\
-	f & = L_{K(x | 1.0, \rho)} \, \eta \, L_C(\phi)^T \\
-	f & \sim \distro{MatrixNormal}(0, K(x | 1.0, \rho), C(\phi)) \\
-	\eta & \in \reals^{N \times M} \\
-	L_C(\phi) & = \text{cholesky\_decompose}(C(\phi)) \\
+  \eta_{i,j} & \sim \distro{Normal}(0, 1) \, \forall i,j \\
+  f & = L_{K(x | 1.0, \rho)} \, \eta \, L_C(\phi)^T \\
+  f & \sim \distro{MatrixNormal}(0, K(x | 1.0, \rho), C(\phi)) \\
+  \eta & \in \reals^{N \times M} \\
+  L_C(\phi) & = \text{cholesky\_decompose}(C(\phi)) \\
   L_{K(x | 1.0, \rho)} & = \text{cholesky\_decompose}(K(x | 1.0, \rho))
 \end{align*}
 
@@ -7861,42 +7883,46 @@ This can be implemented in Stan using a latent-variable GP formulation. We've us
 \begin{stancode}
 data {
   int<lower=1> N;
-  int<lower=1> M;
+  int<lower=1> D;
   real x[N];
-  matrix[N, M] y;
+  matrix[N, D] y;
 }
 transformed data {
   real delta = 1e-9;
 }
 parameters {
   real<lower=0> rho;
-  vector<lower=0>[M] alpha;
+  vector<lower=0>[D] alpha;
   real<lower=0> sigma;
-  cholesky_factor_corr[M] L_Omega;
-  matrix[N, M] eta;
+  cholesky_factor_corr[D] L_Omega;
+  matrix[N, D] eta;
 }
 model {
-  matrix[N, M] f;
+  matrix[N, D] f;
   {
     matrix[N, N] K = cov_exp_quad(x, 1.0, rho);
     matrix[N, N] L_K;
 
     // diagonal elements
-    for (k in 1:N)
-      K[k, k] = K[k, k] + delta;
+    for (n in 1:N)
+      K[n, n] = K[n, n] + delta; 
 
     L_K = cholesky_decompose(K);
     f = L_K * eta
         * diag_pre_multiply(alpha, L_Omega)';
   }
 
-  rho ~ gamma(4, 4);
+  rho ~ inv_gamma(5, 5);
   alpha ~ normal(0, 1);
   sigma ~ normal(0, 1);
   L_Omega ~ lkj_corr_cholesky(3);
   to_vector(eta) ~ normal(0, 1);
 
   to_vector(y) ~ normal(to_vector(f), sigma);
+}
+generated quantities {
+  matrix[D, D] Omega;
+  Omega = L_Omega * L_Omega';
 }
 \end{stancode}
 
