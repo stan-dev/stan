@@ -15,6 +15,7 @@ namespace stan {
        * @param[in] num_params expected number of diagonal elements
        * @return var_context 
        */
+      inline
       stan::io::dump
       create_unit_e_diag_inv_metric(size_t num_params) {
         std::stringstream txt;

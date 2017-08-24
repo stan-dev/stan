@@ -15,6 +15,7 @@ namespace stan {
        * @param[in,out] logger Logger for messages
        * @throws std::domain_error if matrix is not positive definite
        */
+      inline
       void
       validate_dense_inv_metric(const Eigen::MatrixXd& inv_metric,
                                 callbacks::logger& logger) {

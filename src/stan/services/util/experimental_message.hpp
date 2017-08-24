@@ -13,7 +13,7 @@ namespace stan {
        *
        * @param[in,out] logger logger for experimental algorithm message
        */
-      void experimental_message(stan::callbacks::logger& logger) {
+      inline void experimental_message(stan::callbacks::logger& logger) {
         logger.info("------------------------------"
                     "------------------------------");
         logger.info("EXPERIMENTAL ALGORITHM:");

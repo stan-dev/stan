@@ -23,6 +23,7 @@ namespace stan {
        * @throws std::domain_error if the Euclidean metric is invalid
        * @return inv_metric vector of diagonal values
        */
+      inline
       Eigen::VectorXd
       read_diag_inv_metric(stan::io::var_context& init_context,
                            size_t num_params,
