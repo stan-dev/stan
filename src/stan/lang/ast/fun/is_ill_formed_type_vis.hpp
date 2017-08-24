@@ -6,6 +6,7 @@
 namespace stan {
   namespace lang {
 
+    struct ill_formed_type;
     struct void_type;
     struct int_type;
     struct double_type;

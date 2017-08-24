@@ -1,8 +1,16 @@
 #ifndef STAN_LANG_AST_EXPR_TYPE_DEF_HPP
 #define STAN_LANG_AST_EXPR_TYPE_DEF_HPP
 
-#include <stan/lang/ast/expr_type.hpp>
+#include <stan/lang/ast/ill_formed_type.hpp>
+#include <stan/lang/ast/void_type.hpp>
+#include <stan/lang/ast/int_type.hpp>
+#include <stan/lang/ast/double_type.hpp>
+#include <stan/lang/ast/vector_type.hpp>
+#include <stan/lang/ast/row_vector_type.hpp>
+#include <stan/lang/ast/matrix_type.hpp>
 #include <stan/lang/ast/base_expr_type.hpp>
+
+#include <stan/lang/ast/expr_type.hpp>
 #include <stan/lang/ast/fun/write_base_expr_type.hpp>
 #include <ostream>
 

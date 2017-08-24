@@ -2,6 +2,7 @@
 #define STAN_LANG_AST_BASE_EXPR_TYPE_HPP
 
 #include <boost/variant/recursive_variant.hpp>
+#include <cstddef>
 
 namespace stan {
   namespace lang {
