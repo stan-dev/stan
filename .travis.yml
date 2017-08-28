@@ -33,36 +33,44 @@ matrix:
       env:
         - MATRIX_EVAL="CXX=clang++-3.8"
           TESTFOLDER="src/test/unit/callbacks src/test/unit/io"
+          PARALLEL=2
     - <<: *linux_clang
       env:
         - MATRIX_EVAL="CXX=clang++-3.8"
           TESTFOLDER=src/test/unit/lang
+          PARALLEL=2
     - <<: *linux_clang
       env:
         - MATRIX_EVAL="CXX=clang++-3.8"
           TESTFOLDER="src/test/unit/mcmc src/test/unit/model src/test/unit/optimization"
+          PARALLEL=2
     - <<: *linux_clang
       env:
         - MATRIX_EVAL="CXX=clang++-3.8"
           TESTFOLDER="src/test/unit/services src/test/unit/variational src/test/unit/version_test.cpp"
+          PARALLEL=2
     - <<: *linux_gcc
       env:
         - MATRIX_EVAL="CXX=g++-4.9"
           TESTFOLDER="src/test/unit/callbacks src/test/unit/io"
+          PARALLEL=2
     - <<: *linux_gcc
       env:
         - MATRIX_EVAL="CXX=g++-4.9"
           TESTFOLDER=src/test/unit/lang
+          PARALLEL=1
     - <<: *linux_gcc
       env:
         - MATRIX_EVAL="CXX=g++-4.9"
           TESTFOLDER="src/test/unit/mcmc src/test/unit/model src/test/unit/optimization"
+          PARALLEL=1
     - <<: *linux_gcc
       env:
         - MATRIX_EVAL="CXX=g++-4.9"
           TESTFOLDER="src/test/unit/services src/test/unit/variational src/test/unit/version_test.cpp"
+          PARALLEL=2
 
-script: ./runTests.py -j2 $TESTFOLDER
+script: ./runTests.py -j$PARALLEL $TESTFOLDER
 
 sudo: false
 dist: trusty
