@@ -446,17 +446,12 @@ namespace stan {
           BOOST_THROW_EXCEPTION(
               std::runtime_error("y must have elements and"
                                  " y must be a square matrix"));
-        idx_t k_choose_2 = (k * (k-1)) / 2;
-        array_vec_t cpcs(k_choose_2);
-        array_vec_t sds(k);
-        bool successful = stan::math::factor_cov_matrix(y, cpcs, sds);
-        if (!successful)
-          BOOST_THROW_EXCEPTION
-            (std::runtime_error("factor_cov_matrix failed"));
-        for (idx_t i = 0; i < k_choose_2; ++i)
-          data_r_.push_back(cpcs[i]);
-        for (idx_t i = 0; i < k; ++i)
-          data_r_.push_back(sds[i]);
+        vector_t L_vec = stan::math::cov_matrix_free(y);
+        int i = 0;
+        for (idx_t m = 0; m < k; ++m) {
+          for (idx_t n = 0; n <= m; ++n)
+            data_r_.push_back(L_vec.coeff(i++));
+        }
       }
 
       /**
@@ -481,18 +476,7 @@ namespace stan {
                                       "Matrix", y);
         idx_t k = y.rows();
         idx_t k_choose_2 = (k * (k-1)) / 2;
-        array_vec_t cpcs(k_choose_2);
-        array_vec_t sds(k);
-        bool successful = stan::math::factor_cov_matrix(y, cpcs, sds);
-        if (!successful)
-          BOOST_THROW_EXCEPTION
-            (std::runtime_error("y cannot be factorized by factor_cov_matrix"));
-        for (idx_t i = 0; i < k; ++i) {
-          // sds on log scale unconstrained
-          if (fabs(sds[i] - 0.0) >= CONSTRAINT_TOLERANCE)
-            BOOST_THROW_EXCEPTION
-              (std::runtime_error("sds on log scale are unconstrained"));
-        }
+        vector_t cpcs = stan::math::corr_matrix_free(y);
         for (idx_t i = 0; i < k_choose_2; ++i)
           data_r_.push_back(cpcs[i]);
       }

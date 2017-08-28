@@ -54,6 +54,7 @@ namespace stan {
        *
        * @param writer Stan writer callback
        */
+      inline
       void
       write_metric(stan::callbacks::writer& writer) {
         writer("Elements of inverse mass matrix:");

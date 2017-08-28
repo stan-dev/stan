@@ -228,6 +228,7 @@ namespace stan {
        * @throw std::domain_error If the dimensionality of the specified
        * approximation does not match this approximation's dimensionality.
        */
+      inline
       normal_meanfield& operator/=(const normal_meanfield& rhs) {
         static const char* function =
           "stan::variational::normal_meanfield::operator/=";
@@ -434,6 +435,7 @@ namespace stan {
      * @return Sum of the specified approximations.
      * @throw std::domain_error If the dimensionalities do not match.
      */
+    inline
     normal_meanfield operator+(normal_meanfield lhs,
                                const normal_meanfield& rhs) {
       return lhs += rhs;
@@ -448,6 +450,7 @@ namespace stan {
      * @return Elementwise division of the specified approximations.
      * @throw std::domain_error If the dimensionalities do not match.
      */
+    inline
     normal_meanfield operator/(normal_meanfield lhs,
                                const normal_meanfield& rhs) {
       return lhs /= rhs;
@@ -462,6 +465,7 @@ namespace stan {
      * @param[in] rhs Approximation.
      * @return Addition of scalar to specified approximation.
      */
+    inline
     normal_meanfield operator+(double scalar, normal_meanfield rhs) {
       return rhs += scalar;
     }
@@ -475,6 +479,7 @@ namespace stan {
      * @param[in] rhs Approximation.
      * @return Multiplication of scalar by the specified approximation.
      */
+    inline
     normal_meanfield operator*(double scalar, normal_meanfield rhs) {
       return rhs *= scalar;
     }
