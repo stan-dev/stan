@@ -57,7 +57,17 @@ matrix:
     - <<: *linux_gcc
       env:
         - MATRIX_EVAL="CXX=g++-4.9"
-          TESTFOLDER=src/test/unit/lang
+          TESTFOLDER=src/test/unit/lang/*.cpp
+          PARALLEL=1
+    - <<: *linux_gcc
+      env:
+        - MATRIX_EVAL="CXX=g++-4.9"
+          TESTFOLDER=src/test/unit/lang/parser
+          PARALLEL=1
+    - <<: *linux_gcc
+      env:
+        - MATRIX_EVAL="CXX=g++-4.9"
+          TESTFOLDER=src/test/unit/lang/reject
           PARALLEL=1
     - <<: *linux_gcc
       env:
@@ -68,7 +78,7 @@ matrix:
       env:
         - MATRIX_EVAL="CXX=g++-4.9"
           TESTFOLDER="src/test/unit/services src/test/unit/variational src/test/unit/version_test.cpp"
-          PARALLEL=2
+          PARALLEL=1
 
 script: ./runTests.py -j$PARALLEL $TESTFOLDER
 
