@@ -19,6 +19,10 @@ TEST(lang_parser, csr_to_dense_matrix_function_signatures) {
 }
 
 
+TEST(lang_parser, append_array_matrix_function_signatures) {
+  test_parsable("function-signatures/math/matrix/append_array");
+}
+
 TEST(lang_parser, append_col_matrix_function_signatures) {
   test_parsable("function-signatures/math/matrix/append_col");
 }
