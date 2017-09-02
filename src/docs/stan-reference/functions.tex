@@ -3424,121 +3424,6 @@ one-dimensional array in row-major order.}
 %
 \end{description}
 
-\chapter{Algebraic Equation Solver}
-\label{functions-algebraic-solver.chapter}
-
-Stan provides a built-in algebraic equation solver. Although it 
-looks like other function applications, the algebraic solver is
-special in two ways.
-
-First, the algebraic solver is a higher-order function, i.e. it takes
-another function as one of its arguments. The only other functions
-in Stan which share this feature are the ordinary differential equation
-solvers (see section~\ref{functions-ode-solver.chapter}). Ordinary Stan
-functions do not allow functions as arguments.
-
-Second, some of the arguments of the algebraic solvers are restricted
-to data only expressions. These expressions must not contain variables
-other than those declared in the data or transformed data blocks. Ordinary
-Stan functions place no restriction on the origin of variables in their argument
-expressions.
-
-\section{Specifying an Algebraic Equation as a Function}
-\label{functions-algebra-function.section}
-
-An algebraic system is specified as an ordinary function in Stan within the
-function block. The algebraic system function must have this signature:
-%
-\begin{stancode}
-real[] algebra_system(real[] y, real[] theta,
-                      real[] x_r, int[] x_i)
-\end{stancode}
-%
-The algebraic system function should return the value of the algebraic
-function which goes to 0, when we plug in the solution to the algebraic
-system.
-
-The argument of this function are:
-\begin{itemize}
-\item \farg{unknown}, the unknowns we wish to solve for
-\item \farg{theta}, parameter values used to evaluate the algebraic system
-\item \farg{x\_r}, data values used to evaluate the algebraic system
-\item \farg{x\_i}, integer data used to evaluate the algebraic system
-\end{itemize}
-
-The algebraic system function separates parameter values, \farg{theta},
-from data values, \farg{x\_r}, for efficiency in computing the gradients
-of the algebraic system.
-
-\section{Call to the Algebraic Solver}
-
-\begin{description}
-%
-   \fitemthreelines{real[~]}{algebra\_solver}%
-                  {function \farg{algebra\_system}}%
-                  {real[] \farg{y\_guess}}%
-                  {real \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
-                  {Solves the algebraic system, given an initial guess,
-                    using the Powell Hybrid algorithm.}
-                   
-\fitemfourlines{real[~]}{algebra\_solver}%
-                  {function \farg{algebra\_system}}%
-                  {real[] \farg{y\_guess}}%
-                  {real \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
-                  {real \farg{rel\_tol}, real \farg{f\_tol}, int \farg{max\_steps}}%
-                  {Solves the algebraic system, given an initial guess,
-                    using the Powell Hybrid algorithm.}
-%
-\end{description}
-
-
-\subsection{Arguments to the Algebraic Solver}
-
-The arguments to the algebraic solver are as follows:
-%
-\begin{enumerate}
-\item \farg{algebra\_system}: function literal referring to a function
-  specifying the system of algebraic equations with signature described
-  in \refsection{functions-algebra-function}:
-  \begin{quote}
-    (real[], real[], real[], int[]):real[]
-  \end{quote}
-  The arguments represent (1) unknown, (2) parameters, (3) real data, and
-  (4) integer data, and the return value contains the value of the algebraic
-  function, which goes to 0 when we plug in the solution to the algebraic system,
-\item \farg{y\_guess}: initia guess for the solution, type \code{real[]},
-\item \farg{theta}: parameters, type \code{real[]},
-\item \farg{x\_r}: real data, type \code{real[]}, data only, and
-\item \farg{x\_i}: parameters, type \code{int[]}, data only.
-\end{enumerate}
-
-For more fine-grained control of the algebraic solver, these parameters can also
-be provided:
-%
-\begin{enumerate}
-  \addtocounter{enumi}{5}
-  \item \farg{rel\_tol}: relative tolerance for the algebraic solver, type \code{real}, data only,
-  \item \farg{function\_tol}: function tolerance for the algebraic solver, type \code{real}, data only,
-  \item \farg{max\_num\_steps}: maximum number of steps to take in the algebraic solver, type \code{int}, data only.
-\end{enumerate}
-
-\subsection{Return Value}
-The return value for the algebraic solver is an array of type \code{real[]}, with values
-which, when plugged in as the \code{unknowns} make the algebraic function go to 0.
-
-\subsection{Sizes and Parallel Arrays}
-Certain sizes have to be consistent. The initial guess, return value of the solver, and
-return value of the algebraic function must all be the same size. 
-
-The parameters, real data, and integer data will be passed from the solver directly to the
-system function. 
-
-\subsection{Example}
-
-An example of Stan code with a system definition and solver call is shown
-in \refchapter{algebra-solver.chapter}.
-
-
 
 \chapter{Compound Arithmetic and Assignment}
 
@@ -3673,7 +3558,134 @@ operations are as follows.
     y} is equivalent to \code{\farg{x} = \farg{x} ./ \farg{y}}.}
 \end{description}
 
+\chapter{Algebraic Equation Solver}
+\label{functions-algebraic-solver.chapter}
 
+Stan provides a built-in algebraic equation solver. Although it 
+looks like other function applications, the algebraic solver is
+special in two ways.
+
+First, the algebraic solver is a higher-order function, i.e. it takes
+another function as one of its arguments. The only other functions
+in Stan which share this feature are the ordinary differential equation
+solvers (see section~\ref{functions-ode-solver.chapter}). Ordinary Stan
+functions do not allow functions as arguments.
+
+Second, some of the arguments of the algebraic solvers are restricted
+to data only expressions. These expressions must not contain variables
+other than those declared in the data or transformed data blocks. Ordinary
+Stan functions place no restriction on the origin of variables in their argument
+expressions.
+
+\section{Specifying an Algebraic Equation as a Function}
+\label{functions-algebra-function.section}
+
+An algebraic system is specified as an ordinary function in Stan within the
+function block. The algebraic system function must have this signature:
+%
+\begin{stancode}
+vector algebra_system(vector y, vector theta,
+                      real[] x_r, int[] x_i)
+\end{stancode}
+%
+The algebraic system function should return the value of the algebraic
+function which goes to 0, when we plug in the solution to the algebraic
+system.
+
+The argument of this function are:
+\begin{itemize}
+\item \farg{y}, the unknowns we wish to solve for
+\item \farg{theta}, parameter values used to evaluate the algebraic system
+\item \farg{x\_r}, data values used to evaluate the algebraic system
+\item \farg{x\_i}, integer data used to evaluate the algebraic system
+\end{itemize}
+
+The algebraic system function separates parameter values, \farg{theta},
+from data values, \farg{x\_r}, for efficiency in computing the gradients
+of the algebraic system.
+
+\section{Call to the Algebraic Solver}
+
+\begin{description}
+%
+   \fitemthreelines{vector}{algebra\_solver}%
+                  {function \farg{algebra\_system}}%
+                  {vector \farg{y\_guess}}%
+                  {vector \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
+                  {Solves the algebraic system, given an initial guess,
+                    using the Powell hybrid algorithm.}
+                   
+\fitemfourlines{vector}{algebra\_solver}%
+                  {function \farg{algebra\_system}}%
+                  {vector \farg{y\_guess}}%
+                  {vector \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
+                  {real \farg{rel\_tol}, real \farg{f\_tol}, int \farg{max\_steps}}%
+                  {Solves the algebraic system, given an initial guess,
+                    using the Powell hybrid algorithm with additional control
+                    parameters for the solver.}
+%
+\end{description}
+
+
+\subsection{Arguments to the Algebraic Solver}
+
+The arguments to the algebraic solver are as follows:
+%
+\begin{enumerate}
+\item \farg{algebra\_system}: function literal referring to a function
+  specifying the system of algebraic equations with signature described
+  in \refsection{functions-algebra-function}:
+  \begin{quote}
+    (vector, vector, real[], int[]):vector
+  \end{quote}
+  The arguments represent (1) unknowns, (2) parameters, (3) real data, and
+  (4) integer data, and the return value contains the value of the algebraic
+  function, which goes to 0 when we plug in the solution to the algebraic system,
+\item \farg{y\_guess}: initia guess for the solution, type \code{vector},
+\item \farg{theta}: parameters, type \code{vector},
+\item \farg{x\_r}: real data, type \code{real[]}, data only, and
+\item \farg{x\_i}: parameters, type \code{int[]}, data only.
+\end{enumerate}
+
+For more fine-grained control of the algebraic solver, these parameters can also
+be provided:
+%
+\begin{enumerate}
+  \addtocounter{enumi}{5}
+  \item \farg{rel\_tol}: relative tolerance for the algebraic solver, type \code{real}, data only,
+  \item \farg{function\_tol}: function tolerance for the algebraic solver, type \code{real}, data only,
+  \item \farg{max\_num\_steps}: maximum number of steps to take in the algebraic solver, type \code{int}, data only.
+\end{enumerate}
+
+\subsection{Return Value}
+The return value for the algebraic solver is an object of type \code{vector}, with values
+which, when plugged in as \code{y} make the algebraic function go to 0.
+
+\subsection{Sizes and Parallel Arrays}
+Certain sizes have to be consistent. The initial guess, return value of the solver, and
+return value of the algebraic function must all be the same size. 
+
+The parameters, real data, and integer data will be passed from the solver directly to the
+system function. 
+
+\subsection{Algorithmic Details}
+
+The algebraic solver uses the Powell hybrid method \citep{Powell:1970}. The
+Stan code builds on the implementation of the hybrid solver in the
+unsupported module for nonlinear optimization problems of the Eigen library
+\citep{Eigen:2013}. This solver is in turn based on the algorithm developed
+for the package MINPACK-1 \citep{minpack:1980}.
+
+The Jacobian of the solution with respect to auxiliary parameters is computed
+using the implicit function theorem. Intermediate Jacobians (of the the algebraic
+function's output with respect to the unknowns \farg{y} and with respect to the
+auxiliary parameters \farg{theta}) are computed using Stan's automatic
+differentiation.
+
+\subsection{Example}
+
+An example of Stan code with a system definition and solver call is shown
+in \refchapter{algebra-solver}.
 
 \chapter{Ordinary Differential Equation Solvers}
 \label{functions-ode-solver.chapter}
