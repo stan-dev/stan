@@ -582,26 +582,16 @@ namespace stan {
         function_signature_t decl_sig =
           function_signatures::instance().get_definition(decl.name_, sig);
         if (!decl_sig.first.is_ill_formed()) {
-          if (decl_sig.second.size() != arg_types.size()) {
-            error_msgs << "Declaration, definition mismatch for function "
-                       << decl.name_
-                       << ": declaration has " << arg_types.size()
-                       << " arguments, definition has " << arg_types.size()
-                       << "arguments." << std::endl;
-            pass = false;
-            return;
-          }
           for (size_t i = 0; i < arg_types.size(); ++i) {
             if (decl_sig.second[i].expr_type_ != arg_types[i].expr_type_
                 || decl_sig.second[i].data_only_ != arg_types[i].data_only_) {
-              error_msgs << "Declaration, definition mismatch for function "
+              error_msgs << "Declaration doesn't match definition "
+                         << "for function: "
                          << decl.name_ << " argument " << (i + 1)
                          << ": argument declared as "
-                         << (decl_sig.second[i].data_only_ ? "" : "data ")
-                         << decl_sig.second[i].expr_type_
+                         << arg_types[i]
                          << ", defined as "
-                         << (arg_types[i].data_only_ ? "" : "data ")
-                         << arg_types[i].expr_type_ << "." <<  std::endl;
+                         << decl_sig.second[i] << "." <<  std::endl;
               pass = false;
               return;
             }
@@ -613,7 +603,7 @@ namespace stan {
           && arg_types[0].expr_type_.base_type_ == INT_T) {
         error_msgs << "Parse Error.  Probability density functions require"
                    << " real variates (first argument)."
-                   << " Found type = " << arg_types[0].expr_type_ << std::endl;
+                   << " Found type = " << arg_types[0] << std::endl;
         pass = false;
         return;
       }
@@ -621,7 +611,7 @@ namespace stan {
           && arg_types[0].expr_type_.base_type_ != INT_T) {
         error_msgs << "Parse Error.  Probability mass functions require"
                    << " integer variates (first argument)."
-                   << " Found type = " << arg_types[0].expr_type_ << std::endl;
+                   << " Found type = " << arg_types[0] << std::endl;
         pass = false;
         return;
       }
@@ -731,8 +721,8 @@ namespace stan {
       if (var_origin == data_origin) {
         if (decl.base_variable_declaration().base_type_ == INT_T) {
           pass = false;
-          error_msgs << "data qualifier cannot be applied to int variable, "
-                     << "name " << decl.name_;
+          error_msgs << "Data qualifier cannot be applied to int variable, "
+                     << "name " << decl.name_ << ".";
           error_msgs << std::endl;
           return;
         }
@@ -1914,28 +1904,27 @@ namespace stan {
         function_signatures::instance().get_definition(fun.name_, sig);
       if (!decl_sig.first.is_ill_formed()) {
         for (size_t i = 0; i < fun_arg_types.size(); ++i) {
-          if (decl_sig.second[i].data_only_) {
-            if (has_var(fun.args_[i], var_map)) {
-              error_msgs << "Function argument error, function: "
-                         << fun.name_ << ", argument: " << (i + 1)
-                         << " must be data only, "
-                         << "found expression containing a parameter varaible."
-                         << std::endl;
-              pass = false;
-              return;
-            }
+          if (decl_sig.second[i].data_only_
+              && has_var(fun.args_[i], var_map)) {
+            error_msgs << "Function argument error, function: "
+                       << fun.name_ << ", argument: " << (i + 1)
+                       << " must be data only, "
+                       << "found expression containing a parameter varaible."
+                       << std::endl;
+            pass = false;
+            return;
           }
         }
       }
 
       // disjunction so only first match triggered
       deprecate_fun("binomial_coefficient_log", "lchoose", fun, error_msgs)
-      || deprecate_fun("multiply_log", "lmultiply", fun, error_msgs)
-      || deprecate_suffix("_cdf_log", "'_lcdf'", fun, error_msgs)
-      || deprecate_suffix("_ccdf_log", "'_lccdf'", fun, error_msgs)
-      || deprecate_suffix("_log",
-              "'_lpdf' for density functions or '_lpmf' for mass functions",
-              fun, error_msgs);
+        || deprecate_fun("multiply_log", "lmultiply", fun, error_msgs)
+        || deprecate_suffix("_cdf_log", "'_lcdf'", fun, error_msgs)
+        || deprecate_suffix("_ccdf_log", "'_lccdf'", fun, error_msgs)
+        || deprecate_suffix("_log",
+             "'_lpdf' for density functions or '_lpmf' for mass functions",
+             fun, error_msgs);
 
       // add stan::math:: qualifier for built-in nullary and math.h
       qualify_builtins(fun);
@@ -3100,6 +3089,11 @@ namespace stan {
       var_scope = scope(program_block);
     }
     boost::phoenix::function<set_var_scope> set_var_scope_f;
+
+    void set_data_origin::operator()(scope& var_scope) const {
+      var_scope = scope(data_origin);
+    }
+    boost::phoenix::function<set_data_origin> set_data_origin_f;
 
     void set_var_scope_local::operator()(scope& var_scope,
                                          const origin_block& program_block)

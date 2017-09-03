@@ -994,7 +994,9 @@ types.  As with other types, no constraints are allowed.
 
 \subsection{Data-only Function Arguments}
 
-A function argument which is a real-valued or container of real values
+A function argument which is a real-valued type or
+a container of a real-valued type,
+i.e., not an integer type or integer array type,
 can be qualified using the prefix qualifier \code{data}.
 The following is an example of a data-only function argument.
 %
@@ -1019,13 +1021,17 @@ Use of the \code{data} qualifier must be consistent between the
 forward declaration and the definition of a functions.
 
 This qualifier should be used when writing functions that call Stan's
-built-in ordinary differential equation (ODE) solvers which have
+built-in ordinary differential equation (ODE) solvers or using Stan's
+algebraic solver. 
+These solvers have
 strictly specified signatures where some arguments of are data only
-expressions. (See \refchapter{ode-solver} and
-\refchapter{functions-ode-solver} for details.)
-Arguments to the embedding function which will be used as a
-data-only argument to an ODE solver function, either directly
-or indirectly, should have the \code{data} prefix qualifier.
+expressions. (See \refchapter{ode-solver},
+\refchapter{functions-ode-solver}, and
+\refchapter{functions-algebraic-solver},for details.)
+When writing a function which calls the ODE or algebraic solver,
+arguments to that function which are passed into the call
+to the solver, either directly or indirectly, should have the
+\code{data} prefix qualifier.
 This allows for compile-time type checking and increases
 overall program understandability.
 

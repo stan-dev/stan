@@ -19,10 +19,8 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::function_decl_def,
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::arg_decl,
                           (stan::lang::expr_type, arg_type_)
                           (std::string, name_) )
-//                          (stan::lang::statement, body_) )
 
 namespace stan {
-
   namespace lang {
 
   template <typename Iterator>
@@ -93,7 +91,7 @@ namespace stan {
       // locals: _a = scope (origin) argument data or var
       arg_decl_r.name("function argument declaration");
       arg_decl_r
-        %= -(lit("data")[set_var_scope_f(_a, data_origin)])
+        %= -(lit("data")[set_data_origin_f(_a)])
         >> bare_type_g[validate_non_void_arg_f(_1, _pass,
                        boost::phoenix::ref(error_msgs_))]
         > identifier_r

@@ -356,14 +356,14 @@ namespace stan {
       if (name.size() > OP_SIZE && name.substr(0, OP_SIZE) == "operator") {
         std::string operator_name = name.substr(OP_SIZE);
         if (arg_types.size() == 2) {
-          msgs << arg_types[0].expr_type_ << " " << operator_name << " "
-               << arg_types[1].expr_type_ << std::endl;
+          msgs << arg_types[0] << " " << operator_name << " "
+               << arg_types[1] << std::endl;
           return;
         } else if (arg_types.size() == 1) {
           if (operator_name == "'")  // exception for postfix
-            msgs << arg_types[0].expr_type_ << operator_name << std::endl;
+            msgs << arg_types[0] << operator_name << std::endl;
           else
-            msgs << operator_name << arg_types[0].expr_type_ << std::endl;
+            msgs << operator_name << arg_types[0] << std::endl;
           return;
         } else {
           // should not be reachable due to operator grammar
@@ -372,12 +372,12 @@ namespace stan {
         }
       }
       if (sampling_error_style && arg_types.size() > 0)
-        msgs << arg_types[0].expr_type_ << " ~ ";
+        msgs << arg_types[0] << " ~ ";
       msgs << name << "(";
       size_t start = sampling_error_style ? 1 : 0;
       for (size_t j = start; j < arg_types.size(); ++j) {
         if (j > start) msgs << ", ";
-        msgs << arg_types[j].expr_type_;
+        msgs << arg_types[j];
       }
       msgs << ")" << std::endl;
     }

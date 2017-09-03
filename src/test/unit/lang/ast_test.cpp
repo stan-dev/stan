@@ -107,6 +107,16 @@ TEST(langAst, printSignature) {
   stan::lang::print_signature(name, arg_types, sampling_error_style2, msgs2);
   EXPECT_EQ("  foo(real[,], int[], vector)" + platform_eol,
             msgs2.str());
+
+  arg_types.push_back(function_arg_type(expr_type(MATRIX_T, 0U), true));
+  arg_types.push_back(function_arg_type(expr_type(MATRIX_T, 0U), false));
+
+  std::stringstream msgs3;
+  stan::lang::print_signature(name, arg_types, sampling_error_style2, msgs3);
+  EXPECT_EQ("  foo(real[,], int[], vector, data matrix, matrix)" + platform_eol,
+            msgs3.str());
+
+  
 }
 
 TEST(langAst, hasVar) {

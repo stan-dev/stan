@@ -894,6 +894,11 @@ namespace stan {
     };
     extern boost::phoenix::function<set_var_scope> set_var_scope_f;
 
+    struct set_data_origin : public phoenix_functor_unary {
+      void operator()(scope& var_scope) const;
+    };
+    extern boost::phoenix::function<set_data_origin> set_data_origin_f;
+
     struct set_var_scope_local : public phoenix_functor_binary {
       void operator()(scope& var_scope, const origin_block& program_block)
         const;

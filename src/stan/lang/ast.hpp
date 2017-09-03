@@ -47,6 +47,7 @@
 #include <stan/lang/ast/fun/is_user_defined.hpp>
 #include <stan/lang/ast/fun/is_user_defined_prob_function.hpp>
 #include <stan/lang/ast/fun/operator_stream_expr_type.hpp>
+#include <stan/lang/ast/fun/operator_stream_function_arg_type.hpp>
 #include <stan/lang/ast/fun/print_scope.hpp>
 #include <stan/lang/ast/fun/promote_primitive.hpp>
 #include <stan/lang/ast/fun/returns_type.hpp>
