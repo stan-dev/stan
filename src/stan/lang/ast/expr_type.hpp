@@ -162,11 +162,13 @@ namespace stan {
     };
 
     /**
-     * Print `expr_type` to output stream.
+     * Stream a user-readable version of the expression type to the
+     * specified output stream, returning the speicifed argument
+     * output stream to allow chaining.
      *
-     * @param ostream output stream.
-     * @param expr_type expression type.
-     * @return output stream.
+     * @param o output stream
+     * @param et expression type
+     * @return argument output stream
      */
     std::ostream& operator<<(std::ostream& o, const expr_type& et);
 

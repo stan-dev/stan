@@ -117,11 +117,13 @@ namespace stan {
     };
 
     /**
-     * Print `fa_type` to output stream.
+     * Stream a user-readable version of the function argument type to the
+     * specified output stream, returning the speicifed argument
+     * output stream to allow chaining.
      *
-     * @param ostream output stream.
-     * @param fa_type function argument type.
-     * @return output stream.
+     * @param o output stream
+     * @param fa_type function argument type
+     * @return argument output stream
      */
     std::ostream& operator<<(std::ostream& o,
                              const function_arg_type& fa_type);
