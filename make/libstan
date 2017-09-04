@@ -7,5 +7,5 @@ bin/libstanc.a : $(TEMPLATE_INSTANTIATION)
 
 $(TEMPLATE_INSTANTIATION) : bin/%.o : src/%.cpp
 	@mkdir -p $(dir $@)
-	$(COMPILE.c) -O$(O_STANC) $(OUTPUT_OPTION) $<
+	$(COMPILE.cc) -O$(O_STANC) $(OUTPUT_OPTION) $<
 
