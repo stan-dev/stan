@@ -115,5 +115,6 @@
 #include <stan/lang/ast/node/while_statement_def.hpp>
 
 #include <stan/lang/ast/sigs/function_signatures_def.hpp>
+#include <stan/lang/ast/sigs/function_arg_type_def.hpp>
 
 #endif
