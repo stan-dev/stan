@@ -14,33 +14,23 @@ SUFIXES:
 # - O: Optimization level. Valid values are {0, 1, 2, 3}.
 # - AR: archiver (must specify for cross-compiling)
 # - OS_TYPE: {mac, win, linux}
-# - C++11: Compile with C++11 extensions, Valid values: {true, false}. 
 ##
-CC = g++
-O = 3
-O_STANC = 0
-AR = ar
-C++11 = false
-
-##
-# Set default compiler options.
-## 
-CFLAGS = -I src -isystem $(EIGEN) -isystem $(BOOST) -isystem $(CVODES)/include -isystem $(MATH) -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -DFUSION_MAX_VECTOR_SIZE=12 -DNO_FPRINTF_OUTPUT -pipe -Wno-unused-local-typedefs
-CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
-LDLIBS = 
-LDLIBS_STANC = -Lbin -lstanc
-EXE = 
-WINE =
-
--include $(HOME)/.config/stan/make.local  # define local variables
--include make/local                       # overwrite local variables
-
 
 ##
 # Library locations
 ##
 STAN ?= 
 MATH ?= lib/stan_math/
+
+-include $(MATH)make/default_compiler_options
+CXXFLAGS += -I src -isystem $(MATH) -DFUSION_MAX_VECTOR_SIZE=12 -Wno-unused-local-typedefs
+LDLIBS_STANC = -Lbin -lstanc
+
+-include $(HOME)/.config/stan/make.local  # define local variables
+-include make/local                       # overwrite local variables
+
+CXX = $(CC)
+
 -include $(MATH)make/libraries
 
 ##
@@ -49,17 +39,17 @@ MATH ?= lib/stan_math/
 # - CC_MAJOR: major version of CC
 # - CC_MINOR: minor version of CC
 ##
--include make/detect_cc
+-include $(MATH)make/detect_cc
 
 # OS_TYPE is set automatically by this script
 ##
 # These includes should update the following variables
 # based on the OS:
 #   - CFLAGS
-#   - CFLAGS_GTEST
+#   - GTEST_CXXFLAGS
 #   - EXE
 ##
--include make/detect_os
+-include $(MATH)make/detect_os
 
 include make/libstan  # bin/libstan.a bin/libstanc.a
 include make/tests    # tests
@@ -77,7 +67,7 @@ endif
 
 bin/%.o : src/%.cpp
 	@mkdir -p $(dir $@)
-	$(COMPILE.c) -O$O $(OUTPUT_OPTION) $<
+	$(COMPILE.cc) -O$O $(OUTPUT_OPTION) $<
 
 ##
 # Rule for generating dependencies.
@@ -86,7 +76,7 @@ bin/%.d : src/%.cpp
 	@mkdir -p $(dir $@)
 	@set -e; \
 	rm -f $@; \
-	$(CC) $(CFLAGS) -O$O $(TARGET_ARCH) -MM $< > $@.$$$$; \
+	$(COMPILE.cc) -O$O $(TARGET_ARCH) -MM $< > $@.$$$$; \
 	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1\.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
 
