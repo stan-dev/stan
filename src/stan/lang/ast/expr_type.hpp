@@ -3,6 +3,7 @@
 
 #include <stan/lang/ast/base_expr_type.hpp>
 #include <cstddef>
+#include <ostream>
 
 namespace stan {
   namespace lang {
@@ -159,6 +160,15 @@ namespace stan {
        */
       std::size_t num_dims() const;
     };
+
+    /**
+     * Print `expr_type` to output stream.
+     *
+     * @param ostream output stream.
+     * @param expr_type expression type.
+     * @return output stream.
+     */
+    std::ostream& operator<<(std::ostream& o, const expr_type& et);
 
   }
 }

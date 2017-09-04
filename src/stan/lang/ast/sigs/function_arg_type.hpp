@@ -3,6 +3,7 @@
 
 #include <stan/lang/ast/expr_type.hpp>
 #include <cstddef>
+#include <ostream>
 
 namespace stan {
   namespace lang {
@@ -115,6 +116,16 @@ namespace stan {
       bool operator>=(const function_arg_type& fa_type) const;
     };
 
+    /**
+     * Print `fa_type` to output stream.
+     *
+     * @param ostream output stream.
+     * @param fa_type function argument type.
+     * @return output stream.
+     */
+    std::ostream& operator<<(std::ostream& o,
+                             const function_arg_type& fa_type);
+    
   }
 }
 #endif
