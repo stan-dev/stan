@@ -7,6 +7,7 @@
 #include <stan/lang/grammars/semantic_actions.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/phoenix/phoenix.hpp>
+#include <boost/version.hpp>
 #include <set>
 #include <string>
 #include <vector>
