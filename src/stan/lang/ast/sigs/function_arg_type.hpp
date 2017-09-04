@@ -125,7 +125,7 @@ namespace stan {
      */
     std::ostream& operator<<(std::ostream& o,
                              const function_arg_type& fa_type);
-    
+
   }
 }
 #endif
