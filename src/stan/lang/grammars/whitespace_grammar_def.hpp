@@ -5,6 +5,7 @@
 #include <stan/lang/grammars/semantic_actions.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
+#include <boost/version.hpp>
 #include <sstream>
 
 namespace stan {
