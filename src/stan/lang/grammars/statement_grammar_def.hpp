@@ -282,7 +282,9 @@ namespace stan {
         >> indexes_g(_r1)
         >> assignment_operator_r
         >> (eps > expression_rhs_r(_r1))
-           [validate_assgn_f(_val, _pass, boost::phoenix::ref(error_msgs_))]
+           [validate_assgn_f(_val, _pass,
+                             boost::phoenix::ref(var_map_),
+                             boost::phoenix::ref(error_msgs_))]
         > lit(';');
 
       assignment_operator_r.name("assignment operator");
