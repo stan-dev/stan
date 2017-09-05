@@ -10,6 +10,7 @@
 #include <stan/lang/ast/row_vector_type.hpp>
 #include <stan/lang/ast/matrix_type.hpp>
 #include <cstddef>
+#include <ostream>
 
 namespace stan {
   namespace lang {
@@ -166,6 +167,17 @@ namespace stan {
        */
       std::size_t num_dims() const;
     };
+
+    /**
+     * Stream a user-readable version of the expression type to the
+     * specified output stream, returning the speicifed argument
+     * output stream to allow chaining.
+     *
+     * @param o output stream
+     * @param et expression type
+     * @return argument output stream
+     */
+    std::ostream& operator<<(std::ostream& o, const expr_type& et);
 
   }
 }

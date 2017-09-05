@@ -18,11 +18,9 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::function_decl_def,
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::arg_decl,
                           (stan::lang::expr_type, arg_type_)
-                          (std::string, name_)
-                          (stan::lang::statement, body_) )
+                          (std::string, name_) )
 
 namespace stan {
-
   namespace lang {
 
   template <typename Iterator>
@@ -43,6 +41,7 @@ namespace stan {
       using boost::spirit::qi::lit;
       using boost::spirit::qi::_pass;
       using boost::spirit::qi::_val;
+
       using boost::spirit::qi::labels::_a;
 
       functions_r.name("function declarations and definitions");
@@ -56,7 +55,7 @@ namespace stan {
                                       boost::phoenix::ref(error_msgs_),
                                       allow_undefined)];
 
-      // locals: _a = origin (function, rng/lp)
+      // locals: _a = scope (origin) function subtype void,rng,lp)
       function_r.name("function declaration or definition");
       function_r
         %= bare_type_g[set_void_function_f(_1, _a, _pass,
@@ -89,12 +88,14 @@ namespace stan {
         %= arg_decl_r % ','
         | eps;
 
+      // locals: _a = scope (origin) argument data or var
       arg_decl_r.name("function argument declaration");
       arg_decl_r
-        %= bare_type_g[validate_non_void_arg_f(_1, _pass,
-                                       boost::phoenix::ref(error_msgs_))]
+        %= -(lit("data")[set_data_origin_f(_a)])
+        >> bare_type_g[validate_non_void_arg_f(_1, _pass,
+                       boost::phoenix::ref(error_msgs_))]
         > identifier_r
-        > eps[add_fun_var_f(_val, _pass,
+        > eps[add_fun_var_f(_val, _a, _pass,
                             boost::phoenix::ref(var_map_),
                             boost::phoenix::ref(error_msgs_))];
 
