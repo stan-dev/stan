@@ -7,6 +7,7 @@
 #include <string>
 #include <iostream>
 #include <boost/random/additive_combine.hpp> // L'Ecuyer RNG
+#include <boost/version.hpp>
 
 typedef boost::ecuyer1988 rng_t;
 
@@ -61,6 +62,11 @@ TEST_F(eta_adapt_small_test, eta_should_be_small) {
   stan::variational::normal_fullrank fullrank_init =
     stan::variational::normal_fullrank(cont_params_);
 
+#if BOOST_VERSION == 106400
+  EXPECT_EQ(0.1, advi_meanfield_->adapt_eta(meanfield_init, 1000, logger));
+  EXPECT_EQ(0.1, advi_fullrank_->adapt_eta(fullrank_init, 1000, logger));
+#else
   EXPECT_EQ(0.1, advi_meanfield_->adapt_eta(meanfield_init, 50, logger));
   EXPECT_EQ(0.1, advi_fullrank_->adapt_eta(fullrank_init, 50, logger));
+#endif
 }

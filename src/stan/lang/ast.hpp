@@ -47,6 +47,7 @@
 #include <stan/lang/ast/fun/is_user_defined.hpp>
 #include <stan/lang/ast/fun/is_user_defined_prob_function.hpp>
 #include <stan/lang/ast/fun/operator_stream_expr_type.hpp>
+#include <stan/lang/ast/fun/operator_stream_function_arg_type.hpp>
 #include <stan/lang/ast/fun/print_scope.hpp>
 #include <stan/lang/ast/fun/promote_primitive.hpp>
 #include <stan/lang/ast/fun/returns_type.hpp>
@@ -55,6 +56,7 @@
 
 #include <stan/lang/ast/sigs/function_signature_t.hpp>
 #include <stan/lang/ast/sigs/function_signatures.hpp>
+#include <stan/lang/ast/sigs/function_arg_type.hpp>
 
 #include <stan/lang/ast/node/algebra_solver.hpp>
 #include <stan/lang/ast/node/algebra_solver_control.hpp>
