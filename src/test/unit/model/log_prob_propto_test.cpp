@@ -10,7 +10,8 @@ TEST(ModelUtil, streams) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
 
-  stan_model model(data_var_context, 0);
+
+  stan_model model(data_var_context, static_cast<std::stringstream*>(0));
   std::vector<double> params_r(1);
   std::vector<int> params_i(0);
   std::vector<double> gradient;
@@ -18,11 +19,15 @@ TEST(ModelUtil, streams) {
   std::stringstream out;
 
   try {
-    stan::model::log_prob_propto<true, stan_model>(model, params_r, params_i, 0);
-    stan::model::log_prob_propto<false, stan_model>(model, params_r, params_i, 0);
+    stan::model::log_prob_propto<true, stan_model>(model,
+                                                   params_r, params_i, 0);
+    stan::model::log_prob_propto<false, stan_model>(model,
+                                                    params_r, params_i, 0);
     out.str("");
-    stan::model::log_prob_propto<true, stan_model>(model, params_r, params_i, &out);
-    stan::model::log_prob_propto<false, stan_model>(model, params_r, params_i, &out);
+    stan::model::log_prob_propto<true, stan_model>(model,
+                                                   params_r, params_i, &out);
+    stan::model::log_prob_propto<false, stan_model>(model,
+                                                    params_r, params_i, &out);
     EXPECT_EQ("", out.str());
   } catch (...) {
     FAIL() << "log_prob_propto";
@@ -41,7 +46,7 @@ TEST(ModelUtil, streams) {
     FAIL() << "log_prob_propto";
   }
 
-  
+
   stan::test::reset_std_streams();
   EXPECT_EQ("", stan::test::cout_ss.str());
   EXPECT_EQ("", stan::test::cerr_ss.str());

@@ -1,6 +1,7 @@
 #ifndef STAN_LANG_GENERATOR_GENERATE_CPP_HPP
 #define STAN_LANG_GENERATOR_GENERATE_CPP_HPP
 
+#include <stan/io/program_reader.hpp>
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/generate_class_decl.hpp>
 #include <stan/lang/generator/generate_class_decl_end.hpp>
@@ -20,6 +21,7 @@
 #include <stan/lang/generator/generate_namespace_start.hpp>
 #include <stan/lang/generator/generate_param_names_method.hpp>
 #include <stan/lang/generator/generate_private_decl.hpp>
+#include <stan/lang/generator/generate_program_reader_fun.hpp>
 #include <stan/lang/generator/generate_public_decl.hpp>
 #include <stan/lang/generator/generate_typedefs.hpp>
 #include <stan/lang/generator/generate_unconstrained_param_names_method.hpp>
@@ -28,6 +30,7 @@
 #include <stan/lang/generator/generate_write_array_method.hpp>
 #include <ostream>
 #include <string>
+#include <vector>
 
 namespace stan {
   namespace lang {
@@ -39,10 +42,13 @@ namespace stan {
      *
      * @param[in] prog program from which to generate
      * @param[in] model_name name of model for generating namespace
-     * and class name
+     *   and class name
+     * @param[in] history I/O include history for text underlying
+     *   program
      * @param[in,out] o stream for generating
      */
     void generate_cpp(const program& prog, const std::string& model_name,
+                      const std::vector<io::preproc_event>& history,
                       std::ostream& o) {
       generate_version_comment(o);
       generate_includes(o);
@@ -50,6 +56,7 @@ namespace stan {
       generate_usings(o);
       generate_typedefs(o);
       generate_globals(o);
+      generate_program_reader_fun(history, o);
       generate_functions(prog.function_decl_defs_, o);
       generate_class_decl(model_name, o);
       generate_private_decl(o);

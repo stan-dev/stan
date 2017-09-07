@@ -5,6 +5,7 @@
 #include <stan/io/chained_var_context.hpp>
 #include <stan/io/random_var_context.hpp>
 #include <stan/callbacks/interrupt.hpp>
+#include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/optimization/bfgs.hpp>
 #include <stan/services/error_codes.hpp>
@@ -43,9 +44,9 @@ namespace stan {
        * @param[in] num_iterations maximum number of iterations
        * @param[in] save_iterations indicates whether all the interations should
        *   be saved to the parameter_writer
-       * @param[in] refresh how often to write output to message_writer
+       * @param[in] refresh how often to write output to logger
        * @param[in,out] interrupt callback to be called every iteration
-       * @param[in,out] message_writer output for messages
+       * @param[in,out] logger Logger for messages
        * @param[in,out] init_writer Writer callback for unconstrained inits
        * @param[in,out] parameter_writer output for parameter values
        * @return error_codes::OK if successful
@@ -58,7 +59,7 @@ namespace stan {
                 double tol_rel_grad, double tol_param, int num_iterations,
                 bool save_iterations, int refresh,
                 callbacks::interrupt& interrupt,
-                callbacks::writer& message_writer,
+                callbacks::logger& logger,
                 callbacks::writer& init_writer,
                 callbacks::writer& parameter_writer) {
         boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
@@ -66,7 +67,7 @@ namespace stan {
         std::vector<int> disc_vector;
         std::vector<double> cont_vector
           = util::initialize(model, init, rng, init_radius, false,
-                             message_writer, init_writer);
+                             logger, init_writer);
 
         std::stringstream lbfgs_ss;
         typedef stan::optimization::BFGSLineSearch
@@ -85,7 +86,7 @@ namespace stan {
 
         std::stringstream initial_msg;
         initial_msg << "Initial log joint probability = " << lp;
-        message_writer(initial_msg.str());
+        logger.info(initial_msg);
 
         std::vector<std::string> names;
         names.push_back("lp__");
@@ -98,7 +99,7 @@ namespace stan {
           model.write_array(rng, cont_vector, disc_vector, values,
                             true, true, &msg);
           if (msg.str().length() > 0)
-            message_writer(msg.str());
+            logger.info(msg);
 
           values.insert(values.begin(), lp);
           parameter_writer(values);
@@ -110,7 +111,7 @@ namespace stan {
           if (refresh > 0
               && (lbfgs.iter_num() == 0
                   || ((lbfgs.iter_num() + 1) % refresh == 0)))
-            message_writer("    Iter"
+            logger.info("    Iter"
                            "      log prob"
                            "        ||dx||"
                            "      ||grad||"
@@ -143,11 +144,11 @@ namespace stan {
             msg << " " << std::setw(7)
                 << lbfgs.grad_evals() << " ";
             msg << " " << lbfgs.note() << " ";
-            message_writer(msg.str());
+            logger.info(msg);
           }
 
           if (lbfgs_ss.str().length() > 0) {
-            message_writer(lbfgs_ss.str());
+            logger.info(lbfgs_ss);
             lbfgs_ss.str("");
           }
 
@@ -157,7 +158,7 @@ namespace stan {
             model.write_array(rng, cont_vector, disc_vector, values,
                               true, true, &msg);
             if (msg.str().length() > 0)
-              message_writer(msg.str());
+              logger.info(msg);
 
             values.insert(values.begin(), lp);
             parameter_writer(values);
@@ -170,7 +171,7 @@ namespace stan {
           model.write_array(rng, cont_vector, disc_vector, values,
                             true, true, &msg);
           if (msg.str().length() > 0)
-            message_writer(msg.str());
+            logger.info(msg);
 
           values.insert(values.begin(), lp);
           parameter_writer(values);
@@ -178,13 +179,13 @@ namespace stan {
 
         int return_code;
         if (ret >= 0) {
-          message_writer("Optimization terminated normally: ");
+          logger.info("Optimization terminated normally: ");
           return_code = error_codes::OK;
         } else {
-          message_writer("Optimization terminated with error: ");
+          logger.info("Optimization terminated with error: ");
           return_code = error_codes::SOFTWARE;
         }
-        message_writer("  " + lbfgs.get_code_string(ret));
+        logger.info("  " + lbfgs.get_code_string(ret));
 
         return return_code;
       }

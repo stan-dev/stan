@@ -17,8 +17,10 @@ namespace stan {
         : model(m), o(out) {}
 
       template <typename T>
-      T operator()(Eigen::Matrix<T, Eigen::Dynamic, 1>& x) const {
-        return model.template log_prob<true, true, T>(x, o);
+      T operator()(const Eigen::Matrix<T, Eigen::Dynamic, 1>& x) const {
+        // log_prob() requires non-const but doesn't modify its argument
+        return model.template
+          log_prob<true, true, T>(const_cast<Eigen::Matrix<T, -1, 1>& >(x), o);
       }
     };
 

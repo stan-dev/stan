@@ -95,6 +95,15 @@ namespace stan {
                               whitespace_grammar<Iterator> >
       integrate_ode_control_r;
 
+      boost::spirit::qi::rule<Iterator,
+                              algebra_solver(scope),
+                              whitespace_grammar<Iterator> >
+      algebra_solver_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              algebra_solver_control(scope),
+                              whitespace_grammar<Iterator> >
+      algebra_solver_control_r;
 
       boost::spirit::qi::rule<Iterator,
                               std::string(),

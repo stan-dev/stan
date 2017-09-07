@@ -13,6 +13,7 @@ using stan::lang::omni_idx;
 using stan::lang::expression;
 using stan::lang::int_literal;
 using stan::lang::function_signatures;
+using stan::lang::function_arg_type;
 using stan::lang::expr_type;
 using stan::lang::DOUBLE_T;
 using stan::lang::INT_T;
@@ -20,6 +21,61 @@ using stan::lang::VECTOR_T;
 using stan::lang::ROW_VECTOR_T;
 using stan::lang::MATRIX_T;
 using std::vector;
+
+
+TEST(langAst, getDefinition) {
+  // tests for Stan lang function definitions with fun argument qualifier "data"
+  stan::lang::function_signatures& fs
+    = stan::lang::function_signatures::instance();
+  std::string name = "f3args";
+  expr_type return_type = expr_type(DOUBLE_T);
+  std::vector<function_arg_type> arg_types;
+  arg_types.push_back(function_arg_type(expr_type(DOUBLE_T, 2U), true));
+  arg_types.push_back(function_arg_type(expr_type(INT_T, 1U)));
+  arg_types.push_back(function_arg_type(expr_type(VECTOR_T, 0U)));
+
+  // check is defined
+  fs.add(name, return_type, arg_types);
+  stan::lang::function_signature_t sig(return_type, arg_types);
+  EXPECT_TRUE(fs.is_defined(name, sig));
+}
+
+TEST(langAst, missingDefinition) {
+  stan::lang::function_signatures& fs
+    = stan::lang::function_signatures::instance();
+
+  std::string name = "fmissing";
+  expr_type return_type = expr_type(DOUBLE_T);
+  std::vector<function_arg_type> arg_types;
+  arg_types.push_back(function_arg_type(expr_type(DOUBLE_T, 2U), true));
+
+  // check not defined
+  stan::lang::function_signature_t sig(return_type, arg_types);
+  EXPECT_FALSE(fs.is_defined(name, sig));
+}
+
+TEST(langAst, checkDefinition) {
+  // tests for Stan lang function definitions with fun argument qualifier "data"
+  stan::lang::function_signatures& fs
+    = stan::lang::function_signatures::instance();
+  std::string name = "f3args";
+  expr_type return_type = expr_type(DOUBLE_T);
+  std::vector<function_arg_type> arg_types;
+  arg_types.push_back(function_arg_type(expr_type(DOUBLE_T, 2U), true));
+  arg_types.push_back(function_arg_type(expr_type(INT_T, 1U)));
+  arg_types.push_back(function_arg_type(expr_type(VECTOR_T, 0U)));
+  fs.add(name, return_type, arg_types);
+
+  // check definition
+  stan::lang::function_signature_t sig(return_type, arg_types);
+  stan::lang::function_signature_t sig2 = fs.get_definition(name, sig);
+  EXPECT_EQ(sig, fs.get_definition(name, sig));
+
+  // check function arguments
+  EXPECT_TRUE(sig2.second[0].data_only_);
+  EXPECT_FALSE(sig2.second[1].data_only_);
+  EXPECT_FALSE(sig2.second[2].data_only_);
+}
 
 TEST(langAst, discreteFirstArg) {
   // true if first argument to function is always discrete
@@ -30,10 +86,10 @@ TEST(langAst, discreteFirstArg) {
 }
 
 TEST(langAst, printSignature) {
-  std::vector<expr_type> arg_types;
-  arg_types.push_back(expr_type(DOUBLE_T, 2U));
-  arg_types.push_back(expr_type(INT_T, 1U));
-  arg_types.push_back(expr_type(VECTOR_T, 0U));
+  std::vector<function_arg_type> arg_types;
+  arg_types.push_back(function_arg_type(expr_type(DOUBLE_T, 2U)));
+  arg_types.push_back(function_arg_type(expr_type(INT_T, 1U)));
+  arg_types.push_back(function_arg_type(expr_type(VECTOR_T, 0U)));
   std::string name = "foo";
 
   std::stringstream platform_eol_ss;
@@ -43,7 +99,7 @@ TEST(langAst, printSignature) {
   std::stringstream msgs1;
   bool sampling_error_style1 = true;
   stan::lang::print_signature(name, arg_types, sampling_error_style1, msgs1);
-  EXPECT_EQ("  real[,] ~ foo(int[], vector)" + platform_eol,  
+  EXPECT_EQ("  real[,] ~ foo(int[], vector)" + platform_eol,
             msgs1.str());
 
   std::stringstream msgs2;
@@ -51,6 +107,16 @@ TEST(langAst, printSignature) {
   stan::lang::print_signature(name, arg_types, sampling_error_style2, msgs2);
   EXPECT_EQ("  foo(real[,], int[], vector)" + platform_eol,
             msgs2.str());
+
+  arg_types.push_back(function_arg_type(expr_type(MATRIX_T, 0U), true));
+  arg_types.push_back(function_arg_type(expr_type(MATRIX_T, 0U), false));
+
+  std::stringstream msgs3;
+  stan::lang::print_signature(name, arg_types, sampling_error_style2, msgs3);
+  EXPECT_EQ("  foo(real[,], int[], vector, data matrix, matrix)" + platform_eol,
+            msgs3.str());
+
+  
 }
 
 TEST(langAst, hasVar) {
@@ -69,13 +135,13 @@ TEST(langAst, hasVar) {
   base_var_decl alpha_decl = base_var_decl("alpha",dims,DOUBLE_T);
   scope alpha_origin = parameter_origin;
   vm.add("alpha", alpha_decl, alpha_origin);
-  
+
   variable v("alpha");
   v.set_type(DOUBLE_T, 2U);
   expression e(v);
   EXPECT_TRUE(has_var(e, vm));
 
-  vm.add("beta", 
+  vm.add("beta",
          base_var_decl("beta", vector<expression>(), INT_T),
          model_name_origin);
   variable v_beta("beta");
@@ -180,7 +246,7 @@ TEST(lang_ast,function_signatures_add) {
   stan::lang::function_signatures& fs = stan::lang::function_signatures::instance();
   std::stringstream error_msgs;
 
-  EXPECT_EQ(expr_type(DOUBLE_T), 
+  EXPECT_EQ(expr_type(DOUBLE_T),
             fs.get_result_type("sqrt",expr_type_vec(expr_type(DOUBLE_T)),
                                error_msgs));
   EXPECT_EQ(expr_type(), fs.get_result_type("foo__",expr_type_vec(),error_msgs));
@@ -189,16 +255,16 @@ TEST(lang_ast,function_signatures_add) {
   // these next two conflict
   fs.add("bar__",expr_type(DOUBLE_T),expr_type(INT_T),expr_type(DOUBLE_T));
   fs.add("bar__",expr_type(DOUBLE_T),expr_type(DOUBLE_T),expr_type(INT_T));
-  EXPECT_EQ(expr_type(), 
+  EXPECT_EQ(expr_type(),
             fs.get_result_type("bar__",expr_type_vec(expr_type(INT_T),expr_type(INT_T)),
                                error_msgs));
 
   // after this, should be resolvable
   fs.add("bar__",expr_type(INT_T), expr_type(INT_T), expr_type(INT_T));
-  EXPECT_EQ(expr_type(INT_T), 
+  EXPECT_EQ(expr_type(INT_T),
             fs.get_result_type("bar__",expr_type_vec(INT_T,INT_T),
                                error_msgs)); // expr_type(INT_T),expr_type(INT_T))));
-  
+
 }
 
 TEST(langAst,voidType) {
@@ -290,8 +356,8 @@ TEST(langAst, isUserDefined) {
   args.push_back(expression(int_literal(0)));
   EXPECT_FALSE(is_user_defined(name,args));
 
-  vector<expr_type> arg_types;
-  arg_types.push_back(expr_type(INT_T,0));
+  vector<function_arg_type> arg_types;
+  arg_types.push_back(function_arg_type(expr_type(INT_T,0)));
   expr_type result_type(DOUBLE_T,0);
   // must add first, before making user defined
   function_signatures::instance().add(name, result_type, arg_types);
@@ -299,12 +365,12 @@ TEST(langAst, isUserDefined) {
   pair<string,function_signature_t> name_sig(name,sig);
 
   function_signatures::instance().set_user_defined(name_sig);
-  
+
   EXPECT_TRUE(is_user_defined(name,args));
 
-  
+
   EXPECT_TRUE(function_signatures::instance().is_user_defined(name_sig));
-                           
+
   EXPECT_FALSE(is_user_defined_prob_function("foo",
                                              expression(double_literal(1.3)),
                                              args));
@@ -332,7 +398,7 @@ TEST(langAst, resetSigs) {
   set<string> ks1 = fs1.key_set();
   size_t keyset_size = ks1.size();
   EXPECT_TRUE(keyset_size > 0);
-  
+
   stan::lang::function_signatures::reset_sigs();
 
   stan::lang::function_signatures& fs2
@@ -360,11 +426,11 @@ TEST(langAst, solveOde) {
   t0.set_type(DOUBLE_T, 0);  // double
 
   variable ts("ts_var_name");
-  ts.set_type(DOUBLE_T, 1); 
+  ts.set_type(DOUBLE_T, 1);
 
   variable theta("theta_var_name");
   theta.set_type(DOUBLE_T, 1);
-  
+
   variable x("x_var_name");
   x.set_type(DOUBLE_T, 1);
 
@@ -390,6 +456,42 @@ TEST(langAst, solveOde) {
   EXPECT_EQ(expr_type(DOUBLE_T,2), e2.expression_type());
 }
 
+TEST(langAst, solveAlgebra) {
+    using stan::lang::algebra_solver;
+    using stan::lang::variable;
+    using stan::lang::expr_type;
+    using stan::lang::expression;
+    
+    algebra_solver so;  // null ctor should work and not raise error
+    
+    std::string system_function_name = "bronzino";
+    
+    variable y("y_var_name");
+    y.set_type(VECTOR_T, 0);  // vector from Eigen
+    
+    variable theta("theta_var_name");
+    theta.set_type(VECTOR_T, 0);
+    
+    variable x_r("x_r_r_var_name");
+    x_r.set_type(DOUBLE_T, 1);  // plain old vector
+    
+    variable x_i("x_i_var_name");
+    x_i.set_type(INT_T, 1);
+    
+    // example of instantiation
+    algebra_solver so2(system_function_name, y, theta, x_r, x_i);
+    
+    // dumb test to make sure we at least get the right types back
+    EXPECT_EQ(system_function_name, so2.system_function_name_);
+    EXPECT_EQ(y.type_, so2.y_.expression_type());
+    EXPECT_EQ(theta.type_, so2.theta_.expression_type());
+    EXPECT_EQ(x_r.type_, so2.x_r_.expression_type());
+    EXPECT_EQ(x_i.type_, so2.x_i_.expression_type());
+    
+    expression e2(so2);
+    EXPECT_EQ(expr_type(VECTOR_T, 0), e2.expression_type());
+}
+
 void testTotalDims(int expected_total_dims,
                    const stan::lang::base_expr_type& base_type,
                    size_t num_dims) {
@@ -398,7 +500,7 @@ void testTotalDims(int expected_total_dims,
 
   variable v("foo");
   v.set_type(base_type, num_dims);
-  
+
   expression e(v);
   EXPECT_EQ(expected_total_dims,e.total_dims());
 }
@@ -521,7 +623,7 @@ TEST(langAst, assgn) {
 
 // tests recovery of base expression type and number of dims
 // given expression and indexing
-void test_recover(stan::lang::base_expr_type base_et_expected, 
+void test_recover(stan::lang::base_expr_type base_et_expected,
                   size_t num_dims_expected,
                   stan::lang::base_expr_type base_et, size_t num_dims,
                   const std::vector<stan::lang::idx>& idxs) {
@@ -542,7 +644,7 @@ void test_err(stan::lang::base_expr_type base_et, size_t num_dims,
 }
 
 TEST(langAst, idxs) {
-  const stan::lang::base_expr_type bet[] 
+  const stan::lang::base_expr_type bet[]
     = { INT_T, DOUBLE_T, VECTOR_T, ROW_VECTOR_T, MATRIX_T };
   vector<idx> idxs;
   for (size_t n = 0; n < 4; ++n)
@@ -551,7 +653,7 @@ TEST(langAst, idxs) {
 }
 
 void one_index_recover(const std::vector<stan::lang::idx>& idxs, size_t redux) {
-  const stan::lang::base_expr_type bet[] 
+  const stan::lang::base_expr_type bet[]
     = { INT_T, DOUBLE_T, VECTOR_T, ROW_VECTOR_T, MATRIX_T };
   for (size_t n = 1; n < 4; ++n)
     for (int i = 0; i < 5; ++i)
@@ -574,7 +676,7 @@ TEST(langAst, idxs0) {
 TEST(langAst, idxs1) {
   vector<idx> idxs;
   idxs.push_back(omni_idx());
-  
+
   one_index_errs(idxs);
   one_index_recover(idxs, 0U);
   test_recover(VECTOR_T, 0U, VECTOR_T, 0U, idxs);
@@ -583,7 +685,7 @@ TEST(langAst, idxs1) {
 }
 
 void two_index_recover(const std::vector<stan::lang::idx>& idxs, size_t redux) {
-  const stan::lang::base_expr_type bet[] 
+  const stan::lang::base_expr_type bet[]
     = { INT_T, DOUBLE_T, VECTOR_T, ROW_VECTOR_T, MATRIX_T };
   for (size_t n = 2; n < 4; ++n)
     for (int i = 0; i < 5; ++i)
@@ -647,7 +749,7 @@ TEST(langAst, idxs11) {
 }
 
 void three_index_recover(const std::vector<stan::lang::idx>& idxs, size_t redux) {
-  const stan::lang::base_expr_type bet[] 
+  const stan::lang::base_expr_type bet[]
     = { INT_T, DOUBLE_T, VECTOR_T, ROW_VECTOR_T, MATRIX_T };
   for (int i = 0; i < 5; ++i)
     for (size_t n = 3; n < 5; ++n)
@@ -760,7 +862,7 @@ TEST(langAst, idxs111) {
 
 TEST(langAst, indexOpSliced) {
   using stan::lang::index_op_sliced;
-  
+
   vector<idx> idxs;
   idxs.push_back(omni_idx());
   idxs.push_back(uni_idx(expression(int_literal(3))));
@@ -813,7 +915,66 @@ TEST(langAst, lhsVarOccursOnRhs) {
   EXPECT_TRUE(a7.lhs_var_occurs_on_rhs());
 }
 
+TEST(StanLangAstFun, is_space) {
+  using stan::lang::is_space;
+  EXPECT_TRUE(is_space(' '));
+  EXPECT_TRUE(is_space('\n'));
+  EXPECT_TRUE(is_space('\t'));
+  EXPECT_TRUE(is_space('\r'));
 
+  EXPECT_FALSE(is_space('a'));
+  EXPECT_FALSE(is_space('2'));
+}
+TEST(StanLangAstFun, is_nonempty) {
+  using stan::lang::is_nonempty;
+  EXPECT_FALSE(is_nonempty(" "));
+  EXPECT_FALSE(is_nonempty("\n"));
+  EXPECT_FALSE(is_nonempty("\t"));
+  EXPECT_FALSE(is_nonempty("\r"));
+  EXPECT_FALSE(is_nonempty("   \r  \t  "));
+
+  EXPECT_TRUE(is_nonempty("1"));
+  EXPECT_TRUE(is_nonempty("  \r\n \n 1  \n"));
+}
+
+template <typename T>
+void expect_has_var_bool(const T& x) {
+  EXPECT_TRUE(x.has_var_ == 0 || x.has_var_ == 1);
+}
+
+
+TEST(StanLangAst, ConditionalOp) {
+  expect_has_var_bool(stan::lang::conditional_op());
+
+  stan::lang::expression e = int_literal(3);
+  expect_has_var_bool(stan::lang::conditional_op(e, e, e));
+}
+
+TEST(StanLangAst, RowVectorExpr) {
+  expect_has_var_bool(stan::lang::row_vector_expr());
+}
+
+TEST(StanLangAst, MatrixExpr) {
+  expect_has_var_bool(stan::lang::matrix_expr());
+}
+
+TEST(StanLangAst, Sample) {
+  stan::lang::sample s;
+  EXPECT_TRUE(s.is_discrete_ == true || s.is_discrete_ == false);
+
+  stan::lang::expression e = int_literal(3);
+  stan::lang::distribution d;
+  stan::lang::sample s2(e, d);
+  EXPECT_TRUE(s2.is_discrete_ == true || s2.is_discrete_ == false);
+}
+
+TEST(StanLangAst, Scope) {
+  stan::lang::scope s;
+  EXPECT_TRUE(s.is_local() == true || s.is_local() == false);
+
+  stan::lang::scope s2(stan::lang::data_origin);
+  EXPECT_TRUE(s2.is_local() == true || s2.is_local() == false);
+}
 
 
 

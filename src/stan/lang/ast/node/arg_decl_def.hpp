@@ -8,10 +8,10 @@
 namespace stan {
   namespace lang {
 
-    arg_decl::arg_decl() { }
+    arg_decl::arg_decl() : is_data_(false) { }
 
     arg_decl::arg_decl(const expr_type& arg_type, const std::string& name)
-      : arg_type_(arg_type), name_(name) { }
+      : arg_type_(arg_type), name_(name), is_data_(false) { }
 
     base_var_decl arg_decl::base_variable_declaration() const {
       std::vector<expression> dims;

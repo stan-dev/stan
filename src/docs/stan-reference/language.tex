@@ -1,8 +1,158 @@
 \part{Stan Modeling Language}
 
 
+\chapter{Encodings, Includes, and Comments}
 
-\chapter{Data Types and Variable Declarations}\label{data-types.chapter}
+\noindent
+This quick chapter covers the character encoding, include mechanism,
+and comment syntax for the Stan language.
+
+\section{Character Encoding}
+
+\subsection{Stan Program}
+
+The content of a Stan program must be coded in ASCII.  Extended
+character sets such as UTF-8 encoded Unicode may not be used for
+identifiers or other text in a program.
+
+\subsection{Comments}
+
+The content of comments is ignored by the language compiler and may be
+written using any character encoding (e.g., ASCII, UTF-8, Latin1,
+Big5).  The comment delimiters themselves must be coded in ASCII.
+
+
+\section{Includes}\label{includes.section}
+
+Stan allows one file to be included within another file with the
+following syntax.  For example, suppose the file
+\code{std-normal.stan} defines the standard normal log probability
+density function (up to an additive constant).
+%
+\begin{stancode}
+functions {
+  real std_normal_lpdf(vector y) {
+    return -0.5 * y' * y;
+  }
+}
+\end{stancode}
+%
+Suppose we also have a file containing a Stan program with an include
+statement.
+%
+\begin{stancode}
+#include std-normal.stan
+parameters {
+  real y;
+}
+model {
+  y ~ std_normal();
+}
+\end{stancode}
+%
+This Stan program behaves as if the contents of the file
+\code{std-normal.stan} replace the line with the \code{\#include}
+statement, behaving as if a single Stan program were provided.
+%
+\begin{stancode}
+functions {
+  real std_normal_lpdf(vector y) {
+    return -0.5 * y' * y;
+  }
+}
+parameters {
+  real y;
+}
+model {
+  y ~ std_normal();
+}
+\end{stancode}
+%
+
+There are no restrictions on where include statements may be placed
+within a file or what the contents are of the replaced file.  No
+additional whitespace is included beyond what is in the included file.
+
+\subsection{Recursive Includes}
+
+Recursive includes will be ignored.  For example, suppose
+\code{a.stan} contains
+%
+\begin{stancode}
+#include b.stan
+\end{stancode}
+%
+and \code{b.stan} contains
+%
+\begin{stancode}
+#include a.stan
+\end{stancode}
+%
+The result of processing this file will be empty, because
+\code{a.stan} will include \code{b.stan}, from which the include of
+\code{a.stan} is ignored and a warning printed.
+
+\subsection{Include Paths}
+
+The Stan interfaces provide a mechanism for specifying a sequence of
+system paths in which to search for include files.  The file included
+is the first one that is found in the sequence.
+
+\section{Comments}\label{comments.section}
+
+Stan supports \Cpp-style line-based and bracketed comments.  Comments
+may be used anywhere whitespace is allowed in a Stan program.
+
+\subsection{Line-Based Comments}
+
+Any characters on a line following two forward slashes (\Verb|//|) is
+ignored along with the slashes.  These may be used, for example, to
+document variables,
+%
+\begin{stancode}
+data {
+  int<lower=0> N;  // number of observations
+  real y[N];  // observations
+}
+\end{stancode}
+
+\subsection{Bracketed Comments}
+
+For bracketed comments, any text between a forward-slash and asterisk
+pair (\Verb|/*|) and an asterisk and forward-slash pair (\Verb|*/|) is
+ignored.
+
+
+
+\section{Whitespace}
+
+\subsection{Whitespace Characters}
+
+The whitespace characters (and their ASCII code points) are the space
+(0x20), tab (0x09), carriage return (0x0D), and line feed (0x0A).
+
+\subsection{Whitespace Neutrality}
+
+Stan treats these whitespace characters identically.  Specifically,
+there is no significance to indentation, to tabs, to carriage returns
+or line feeds, or to any vertical alignment of text.
+
+\subsection{Whitespace Location}
+
+Zero or more whitespace characters may be placed between symbols in a
+Stan program.  For example, zero or more whitespace characters of any
+variety may be included before and after a binary operation such as
+\code{a~*~b}, before a statement-ending semicolon, around parentheses
+or brackets, before or after commas separating function arguments,
+etc.
+
+Identifiers and literals may not be separated by whitespace.  Thus it
+is not legal to write the number \code{10000} as \code{10~000} or to
+write the identifier \code{normal\_lpdf} as \code{normal~\_~lpdf}.
+
+
+\chapter{Data Types and Variable
+  Declarations}\label{data-types.chapter}
 
 \noindent
 This chapter covers the data types for expressions in Stan.  Every
@@ -44,7 +194,7 @@ Passing arguments to functions in Stan works just like assignment to
 basic types.  Stan functions are only specified for the basic data
 types of their arguments, including array dimensionality, but not for
 sizes or constraints.  Of course, functions often check constraints as
-part of their behavior.  
+part of their behavior.
 
 \subsection{Primitive Types}
 
@@ -97,65 +247,43 @@ vector<lower = -1, upper = 1>[3] rho;
 \end{stancode}
 
 There are also special data types for structured vectors and
-matrices.
-% There are four constrained vector data types, \code{simplex}
-% for unit simplexes, \code{unit\_vector} for unit-length vectors,
-% \code{ordered} for ordered vectors of scalars and
-% \code{positive\_ordered} for vectors of positive ordered
-% scalars. There are specialized matrix data types \code{corr\_matrix}
-% and \code{cov\_matrix} for correlation matrices (symmetric, positive
-% definite, unit diagonal) and covariance matrices (symmetric, positive
-% definite).  The type \code{cholesky\_factor\_cov} is for Cholesky
-% factors of covariance matrices (lower triangular, positive diagonal,
-% product with own transpose is a covariance matrix).  The type
-% \code{cholesky\_factor\_corr} is for Cholesky factors of correlation
-% matrices (lower triangular, positive diagonal, unit-length rows).
+matrices. There are four constrained vector data types, \code{simplex}
+for unit simplexes, \code{unit\_vector} for unit-length vectors,
+\code{ordered} for ordered vectors of scalars and
+\code{positive\_ordered} for vectors of positive ordered
+scalars. There are specialized matrix data types \code{corr\_matrix}
+and \code{cov\_matrix} for correlation matrices (symmetric, positive
+definite, unit diagonal) and covariance matrices (symmetric, positive
+definite).  The type \code{cholesky\_factor\_cov} is for Cholesky
+factors of covariance matrices (lower triangular, positive diagonal,
+product with own transpose is a covariance matrix).  The type
+\code{cholesky\_factor\_corr} is for Cholesky factors of correlation
+matrices (lower triangular, positive diagonal, unit-length rows).
 
-Constraints provide error checking for variables defined in the \code{data},
-\code{transformed data}, \code{transformed parameters}, and 
-\code{generated quantities} blocks.
-%
-Constraints are critical for variables declared in the
-\code{parameters} block, where they determine the transformation from
-constrained variables (those satisfying the declared constraint) to
-unconstrained variables (those ranging over all of $\mathbb{R}^n$).
+Constraints provide error checking for variables defined in the
+\code{data}, \code{transformed data}, \code{transformed parameters},
+and \code{generated quantities} blocks.  Constraints are critical for
+variables declared in the \code{parameters} block, where they
+determine the transformation from constrained variables (those
+satisfying the declared constraint) to unconstrained variables (those
+ranging over all of $\mathbb{R}^n$).
 
 It is worth calling out the most important aspect of constrained data
-types: 
+types:
 %
 \begin{quote}
-\it
-The model must have support (non-zero density) at every value of the
-parameters that meets their declared constraints.
+  \it The model must have support (non-zero density, equivalently
+  finite log density) at every value of the parameters that meets
+  their declared constraints.
 \end{quote}
 %
-If the declared parameter constraints are less strict than the
-support, the samplers and optimizers may have any of a number of
-pathologies including just getting stuck, failure to initialize,
-excessive Metropolis rejection, or biased samples due to inability to
-explore the tails of the distribution.
+If this condition is violated with parameter values that satisfy
+declared constraints but do not have finite log density, then the
+samplers and optimizers may have any of a number of pathologies
+including just getting stuck, failure to initialize, excessive
+Metropolis rejection, or biased samples due to inability to explore
+the tails of the distribution.
 
-% Integer or real types may be constrained with lower bounds, upper
-% bounds, or both.  There are four constrained vector data types,
-% \code{simplex} for unit simplexes, \code{unit\_vector} for unit-length
-% vectors, \code{ordered} for ordered vectors of scalars and
-% \code{positive\_ordered} for vectors of positive ordered scalars.
-% There are specialized matrix data types \code{corr\_matrix} and
-% \code{cov\_matrix} for correlation matrices (symmetric, positive
-% definite, unit diagonal) and covariance matrices (symmetric, positive
-% definite).  The type \code{cholesky\_factor\_cov} is for Cholesky
-% factors of covariance matrices (lower triangular, positive diagonal,
-% product with own transpose is a covariance matrix).  The type
-% \code{cholesky\_factor\_corr} is for Cholesky factors of correlation
-% matrices (lower triangular, positive diagonal, unit-length rows).
-
-% \subsection{Arrays}
-
-% Stan supports arrays of arbitrary order of any of the basic data
-% types or constrained basic data types.  This includes
-% three-dimensional arrays of integers, one-dimensional arrays of
-% positive reals, four-dimensional arrays of simplexes, one-dimensional
-% arrays of row vectors, and so on.
 
 \section{Primitive Numerical Data Types}\label{numerical-data-types.section}
 
@@ -201,7 +329,7 @@ operands and their result is large.
 There are three special real values used to represent (1) not-a-number
 value for error conditions, (2) positive infinity for overflow, and
 (3) negative infinity for overflow.  The behavior of these special
-numbers follows standard IEEE 754 behavior.  
+numbers follows standard IEEE 754 behavior.
 
 \subsubsection{Not-a-number}
 
@@ -466,6 +594,15 @@ simplexes, this is only done up to a statically specified accuracy
 threshold $\epsilon$ to account for errors arising from floating-point
 imprecision.
 
+In high dimensional problems, simplexes may require smaller step sizes
+in the inference algorithms in order to remain stable; this can be
+achieved through higher target acceptance rates for samplers and
+longer warmup periods, tighter tolerances for optimization with more
+iterations, and in either case, with less dispersed parameter
+initialization or custom initialization if there are informative
+priors for some parameters.
+
+
 \subsection{Unit Vectors}
 
 A unit vector is a vector with a norm of one.  For instance,
@@ -616,7 +753,7 @@ A Cholesky factor for a correlation matrix $L$ is a $K \times K$
 lower-triangular matrix with positive diagonal entries and rows that
 are of length 1 (i.e., $\sum_{n=1}^K L_{m,n}^2 = 1$).  If $L$ is a
 Cholesky factor for a correlation matrix, then $L\,L^{\top}$ is a
-correlation matrix (i.e., symmetric postive definite with a unit
+correlation matrix (i.e., symmetric positive definite with a unit
 diagonal).
 
 A declaration such as
@@ -1012,7 +1149,29 @@ same restrictions as for vector and matrix sizes apply, namely that
 the size is declared with an integer-denoting expression that does not
 contain any parameters, transformed parameters, or generated quantities.
 
+\subsection{Size Zero Arrays}
 
+If any of an array's dimensions is size zero, the entire array will be
+of size zero.  That is, if we declare
+%
+\begin{stancode}
+real a[3, 0];
+\end{stancode}
+%
+then the resulting size of \code{a} is zero and querying any of its
+dimensions at run time will result in the value zero.  Declared as
+above, \code{a[1]} will be a size-zero one-dimensional array.  For
+comparison, declaring
+%
+\begin{stancode}
+real b[0, 3];
+\end{stancode}
+%
+also produces an array with an overall size of zero, but in this case,
+there is no way to index legally into \code{b}, because \code{b[0]} is
+undefined.  The array will behave at run time as if it's a $0 \times
+0$ array.  For example, the result of \code{to\_matrix(b)} will be a
+$0 \times 0$ matrix, not a $0 \times 3$ matrix.
 
 
 \section{Variable Types vs.\ Constraints and Sizes}
@@ -1103,7 +1262,7 @@ two-dimensional array of vectors.
 \section{Compound Variable Declaration and Definition}
 
 Stan allows assignable variables to be declared and defined in a
-single statement.  Assignable variables are 
+single statement.  Assignable variables are
 %
 \begin{itemize}
 \item local variables, and
@@ -1118,7 +1277,7 @@ int N = 5;
 \end{stancode}
 %
 declares the variable \code{N} to be an integer scalar type and at the
-same time defines it to be the value of the expression \code{5}.  
+same time defines it to be the value of the expression \code{5}.
 
 \subsection{Assignment Typing}
 
@@ -1175,7 +1334,7 @@ recursive algorithms).
 Any variable that is in scope and any function that is available in
 the block in which the compound declaration and definition appears may
 be used in the expression on the right-hand side of the compound
-declaration and definition statement. 
+declaration and definition statement.
 
 \chapter{Expressions}
 
@@ -1500,7 +1659,7 @@ Square brackets may be wrapped around a sequence of comma separated
 primitive expressions to produce a row vector expression.   For
 example, the expression \Verb|[ 1, 10, 100 ]| denotes a row vector of
 three elements with real values 1.0, 10.0, and 100.0.
-Applying the transpose operator to a row vector expression produces 
+Applying the transpose operator to a row vector expression produces
 a vector expression.
 This syntax provides a way declare and define small vectors a single line, as follows.
 
@@ -1512,7 +1671,7 @@ vector[3] v3 = [ 3, 4, 5 ]';
 %
 
 The vector expression values may be compound expressions
-or variable names,  so it is legal to write 
+or variable names,  so it is legal to write
 \Verb|[ 2 * 3, 1 + 4]|  or \Verb|[ x, y ]|, providing that \Verb|x|
 and \Verb|y| are primitive variables.
 
@@ -1567,7 +1726,7 @@ arrays directly, as in the following example.
 int b[2, 3] = { { 1, 2, 3 }, { 4, 5, 6 } };
 \end{stancode}
 %
-This way, \code{b[1]} is \Verb|{ 1, 2, 3 }| and \code{b[2]} is 
+This way, \code{b[1]} is \Verb|{ 1, 2, 3 }| and \code{b[2]} is
 \Verb|{ 4, 5, 6 }|.
 
 Whitespace is always interchangeable in Stan, so the above can be laid
@@ -1627,7 +1786,7 @@ integer arrays (\code{int[~]}).  But it is not allowed because the two
 one-dimensional arrays are not the same size.  If the elements are
 array expressions, this can be diagnosed at compile time.  If one or
 both expressions is a variable, then that won't be caught until
-runtime.  
+runtime.
 %
 \begin{stancode}
 { { 1, 2, 3 }, m }  // runtime error if m not size 3
@@ -1648,17 +1807,17 @@ int a[0];   // a is fully defined as zero element array
 
 \subsubsection{Integer only array expressions}
 
-If an array expression contains only integer elements, such as 
+If an array expression contains only integer elements, such as
 \Verb|{ 1, 2, 3 }|, then the result type will be an integer array,
 \code{int[]}.  This means that the following will \emph{not}\ be
-legal. 
+legal.
 %
 \begin{stancode}
 real a[2] = { -3, 12 };  // error: int[] can't be assigned to real[]
 \end{stancode}
 %
 Integer arrays may not be assigned to real values.  However, this
-problem is easily sidestepped by using real literal expressions.  
+problem is easily sidestepped by using real literal expressions.
 %
 \begin{stancode}
 real a[2] = { -3.0, 12.0 };
@@ -1906,7 +2065,7 @@ is interpreted as \mbox{\code{-(n \textasciicircum\ 3)}}.
 The ternary conditional operator is unique in that it takes three
 arguments and uses a mixed syntax.  If \code{a} is an expression of
 type \code{int} and \code{b} and \code{c} are expressions that can be
-converted to one another (e.g., compared with \code{==}), then 
+converted to one another (e.g., compared with \code{==}), then
 %
 \begin{stancode}
 a ? b : c
@@ -1973,12 +2132,9 @@ The key property of the conditional operator that makes it so useful
 in high-performance computing is that it only evaluates the returned
 subexpression, not the alternative expression.  In other words, it is
 not like a typical function that evaluates its argument expressions
-eagerly in order to pass their values to the function.  Specifically,
-the conditional operator provides a substantial speedup over the
-built-in \code{if\_else} function, which, like other functions, evaluates
-all three of its arguments when it is called.  As usual, the saving is
-mostly in the derivatives that do not get computed rather than the
-basic function evaluation itself.
+eagerly in order to pass their values to the function.  As usual, the
+saving is mostly in the derivatives that do not get computed rather
+than the unnecessary function evaluation itself.
 
 \subsubsection{Promotion to Parameter}
 
@@ -2075,13 +2231,13 @@ all of the indexes.  A complete table of index types is given in
 \begin{center}
 \begin{tabular}{c|c|c}
 {\it index type} & {\it example}  & {\it value} \\ \hline \hline
-integer & \code{a[11]} 
+integer & \code{a[11]}
 & value of \code{a} at index 11
 \\ \hline
 integer array & \code{a[ii]}
 & \code{a[ii[1]]}, \ \ldots, \ \code{a[ii[K]]}
 \\[4pt]
-lower bound & \code{a[3:]} 
+lower bound & \code{a[3:]}
 & \code{a[3]}, \ \ldots, \ \code{a[N]}
 \\
 upper bound & \code{a[:5]}
@@ -2099,7 +2255,7 @@ all & \code{a[]}
 \end{center}
 \vspace*{-8pt}
 \caption{\small\it Types of indexes and examples with one-dimensional
-  containers of size \code{N} and an integer array \code{ii} of type 
+  containers of size \code{N} and an integer array \code{ii} of type
 \code{int[]} size \code{K}.}\label{index-types.figure}
 \end{figure}
 
@@ -2154,7 +2310,7 @@ multiple & n/a & matrix
 a matrix \code{a}, with integer single indexes \code{i} and \code{j}
 and integer array multiple indexes \code{is} and \code{js}.  The same
 typing rules apply for all multiple indexes.}%
-\label{matrix-indexing.figure} 
+\label{matrix-indexing.figure}
 \end{figure}
 
 Evaluation of matrices with multiple indexes is defined to respect the
@@ -2570,7 +2726,7 @@ assignment statement evaluates the expression on the right-hand side
 and assigns it to the (indexed) variable on the left-hand side.  An
 example of a simple assignment is as follows.%
 %
-\footnote{In versions of Stan before 2.14.0, the operator \code{<-} was
+\footnote{In versions of Stan before 2.17.0, the operator \code{<-} was
   used for assignment rather than using the equal sign \code{=}.  The
   old operator \code{<-} is now deprecated and will print a warning.
   In the future, it will be removed.}
@@ -2697,6 +2853,85 @@ arising from he right-hand side changing in the middle of an
 assignment statement's execution.
 
 
+\subsection{Compound Arithmetic and Assignment Statement}\label{compound-arithmetic-assignment.section}
+
+Stan's arithmetic operators may be used in compound arithmetic
+and assignment operations.  For example, consider the following
+example of compound addition and assignment.
+%
+\begin{stancode}
+real x = 5;
+x += 7;  // value of x is now 12
+\end{stancode}
+%
+The compound arithmetic and assignment statement above is equivalent
+to the following long form.
+%
+\begin{stancode}
+x = x + 7;
+\end{stancode}
+%
+In general, the compound form
+%
+\begin{stancode}
+x op= y
+\end{stancode}
+%
+will be equivalent to
+%
+\begin{stancode}
+x = x op y;
+\end{stancode}
+%
+The compound statement will be legal whenever the long form is legal.
+This requires that the operation \code{x op y} must itself be well
+formed and that the result of the operation be assignable to \code{x}.
+For the expression \code{x} to be assignable, it must be an indexed
+variable where the variable is defined in the current block.  For
+example, the following compound addition and assignment statement will
+increment a single element of a vector by two.
+%
+\begin{stancode}
+vector[N] x;
+x[3] += 2;
+\end{stancode}
+%
+As a further example, consider
+%
+\begin{stancode}
+matirx[M, M] x;
+vector[M] y;
+real z;
+x *= x;  // OK, (x * x) is a matrix
+x *= z;  // OK, (x * z) is a matrix
+x *= y;  // BAD, (x * y) is a vector
+\end{stancode}
+
+The supported compound arithmetic and assignment
+operations are listed in \reffigure{compound-arithmetic-assign}; they
+are also listed in the index prefaced by \code{operator}, e.g.,
+\code{operator+=}.
+%
+\begin{figure}
+\begin{center}
+\begin{tabular}{r|l|l}
+{\it Operation} & {\it Compound} & {\it Long} \\ \hline \hline
+addition & \code{x += y} & \code{x = x + y} \\
+subtraction & \code{x -= y} & \code{x = x - y} \\ \hline
+multiplication & \code{x *= y} & \code{x = x * y} \\
+division & \code{x /= y} & \code{x = x / y} \\ \hline
+elementwise multiplication & \code{x .*= y} & \code{x = x .* y} \\
+elementwise division & \code{x ./= y} & \code{x = x ./ y} \\ \hline
+\end{tabular}
+\end{center}
+\caption{\small\it Stan allows compound arithmetic and assignment
+  statements of the forms listed in the table above.  The compound
+  form is legal whenever the corresponding long form would be legal
+  and it has the same effect.}\label{compound-arithmetic-assign.figure}
+\end{figure}
+%
+
+
 
 \section{Increment Log Density}\label{increment-log-prob.section}
 
@@ -2775,6 +3010,25 @@ depend on the parameters.  This is convenient because often the
 normalizing constant $Z$ is either time-consuming to compute or
 intractable to evaluate.
 
+\subsubsection{Relation to compound addition and assignment}
+
+The increment log density statement looks syntactically like compound
+addition and assignment (see
+\refsection{compound-arithmetic-assignment}, it is treated as a
+primitive statement because \code{target} is not itself a variable.
+So, even though
+%
+\begin{stancode}
+target += lp;
+\end{stancode}
+%
+is a legal statement, the corresponding long form is not legal.
+%
+\begin{stancode}
+target = target + lp;  // BAD, target is not a variable
+\end{stancode}
+
+
 \subsubsection{Vectorization}
 
 The \code{target += ...} statement accepts an argument in place of
@@ -2785,28 +3039,8 @@ their sum will be added to the total log density.
 
 \subsection{Accessing the Log Density}
 
-To increment the log density returned by the model by some value
-\code{u}, use the following statement.%
-%
-\footnote{Originally, Stan provided direct access to the log density
-  through a variable \code{lp\_\_} and then later through the
-  \code{increment\_log\_prob()} statement, but the first has been
-  removed and the latter deprecated.}
-%
-\begin{stancode}
-target += u;
-\end{stancode}
-%
-In general, \code{u} can be any expression;  if it is a container, the
-log density will be incremented by the sum of the elements in the
-container.
-
 To access accumulated log density up to the current execution point,
-the function \code{get\_lp()} may be used.%
-%
-\footnote{The value of \code{lp\_\_} will only hold the Jacobian until
-  the end of the execution because it is not used in either
-  \code{increment\_log\_prob(u)} or \code{target += u}.}
+the function \code{target()()} may be used.
 
 
 \section{Sampling Statements}\label{sampling-statements.section}
@@ -2839,7 +3073,7 @@ In general, a sampling statement of the form
 y ~ dist(theta1, ..., thetaN);
 \end{stancode}
 %
-involving subexpressions \code{y1} and \code{theta1} through
+involving subexpressions \code{y} and \code{theta1} through
 \code{thetaN} (including the case where \code{N} is zero) will be well
 formed if and only if the corresponding assignment statement is
 well-formed.  For densities allowing real \code{y} values, the log
@@ -2893,20 +3127,25 @@ The left-hand side of a sampling statement may be a complex
 expression.  For instance, it is legal syntactically to write
 %
 \begin{stancode}
-data {
-  real<lower=0> y;
+parameters {
+  real<lower=0> beta;
 }
 // ...
 model {
-  log(y) ~ normal(mu, sigma);
+  log(beta) ~ normal(mu, sigma);
 }
 \end{stancode}
 %
-Unfortunately, this is not enough to properly model \code{y} as having
-a lognormal distribution.  The log Jacobian of the transform must be
-added to the log probability accumulator to account for the
-differential change in scale (see \refsection{change-of-variables} for
-full definitions).  For the case above, the following adjustment will
+Unfortunately, this is not enough to properly model \code{beta} as
+having a lognormal distribution.  Whenever a nonlinear transform is
+applied to a parameter, such as the logarithm function being applied
+to \code{beta} here, and then used on the left-hand side of a sampling
+statement or on the left of a vertical bar in a log pdf function, an
+adjustment must be made to account for the differential change in
+scale and ensure \code{beta} gets the correct distribution.  The
+correction required is to add the log Jacobian of the transform to the
+target log density (see \refsection{change-of-variables} for full
+definitions).  For the case above, the following adjustment will
 account for the log transform.%
 %
 \footnote{Because $\log | \frac{d}{dy} \log y | = \log | 1/y | = - \log
@@ -2953,7 +3192,7 @@ p_{[a, \infty]}(x)
 \]
 %
 A probability mass function $p(x)$ is truncated to $[a, \infty]$ by
-defining 
+defining
 %
 \[
 p_{[a, \infty]}(x) = \frac{p(x)}
@@ -2972,7 +3211,7 @@ p_{[-\infty, b]}(x)
 \]
 %
 A probability mass function $p(x)$ is truncated to $[-\infty, b]$ by
-defining 
+defining
 %
 \[
 p_{[-\infty,b]}(x) = \frac{p(x)}
@@ -3014,7 +3253,7 @@ F^C_X(x)
 Unlike the cdf, the ccdf is exclusive of the bound, hence the event
 $X > x$ rather than the cdf's event $X \leq x$.
 
-For continous distributions, the ccdf works out to 
+For continuous distributions, the ccdf works out to
 \[
 F^C_X(x)
 \ = \ 1 - \int_{-\infty}^x p_X(u) \, du
@@ -3099,7 +3338,7 @@ behaves in the same way as the following code.
 %
 \begin{stancode}
 y ~ poisson(3.7);
-if (y < 2 || y > 10) 
+if (y < 2 || y > 10)
   target += negative_infinity();
 else
   target += -log_sum_exp(poisson_lpmf(2 | 3.7),
@@ -3148,14 +3387,14 @@ y ~ poisson(3.7);
 if (y < 2)
   target += negative_infinity();
 else
-  target += -log_sum_exp(poisson_lpdf(2 | 3.7),
+  target += -log_sum_exp(poisson_lpmf(2 | 3.7),
                          poisson_lccdf(2 | 3.7));
 \end{stancode}
 
 
 \subsubsection{Truncation with upper bounds in Stan}
 
-To truncate with only an upper bound, the lower bound is left blank.  
+To truncate with only an upper bound, the lower bound is left blank.
 The upper truncated sampling statement
 %
 \begin{stancode}
@@ -3168,7 +3407,7 @@ produces the same result as the following code.
 target += normal_lpdf(y | 0, 1);
 if (y > 2.1)
   target += negative_infinity();
-else 
+else
   target += -normal_lcdf(2.1 | 0, 1);
 \end{stancode}
 
@@ -3185,7 +3424,7 @@ behaves the same way as the following code.
 y ~ poisson(3.7);
 if (y > 10)
   target += negative_infinity();
-else 
+else
   target += -poisson_lcdf(10 | 3.7);
 \end{stancode}
 
@@ -3318,9 +3557,9 @@ times, as in the following legal code.
 %
 \begin{stancode}
 for (n in 1:100) {
-  y = y + y * epsilon;
-  epsilon = epsilon / 2.0;
-  y = y + y * epsilon;
+  y += y * epsilon;
+  epsilon = 0.5 * epsilon;
+  y += y * epsilon;
 }
 \end{stancode}
 
@@ -3492,12 +3731,11 @@ in a for loop, it is legal to have the following
 \begin{stancode}
 for (m in 1:M) {
   {
-     int n;
-     n = 2 * m;
-     sum = sum + n
+     int n = 2 * m;
+     sum += n;
   }
   for (n in 1:N)
-    sum = sum + x[m, n];
+    sum += x[m, n];
 }
 \end{stancode}
 %
@@ -3566,7 +3804,7 @@ real sum;
 sum = 0;
 for (n in 1:size(x)) {
   if (x[n] <= 0) continue;
-  sum = sum + x[n];
+  sum += x[n];
 }
 \end{stancode}
 %
@@ -3583,7 +3821,7 @@ real sum;
 sum = 0;
 for (n in 1:size(x)) {
   if (x[n] > 0)
-    sum = sum + x[n];
+    sum += x[n];
 }
 \end{stancode}
 %
@@ -3616,7 +3854,7 @@ If the break is triggered by \code{cond3} being true, execution will
 continue after the nested loop.
 
 As with break statements, continue statements go back to the top of
-the most deeply nested loop in which the \code{continue} appears.  
+the most deeply nested loop in which the \code{continue} appears.
 
 Although break and continue must appear within loops, they may appear
 in nested statements within loops, such as within the conditionals
@@ -3826,14 +4064,14 @@ parameters {
   ...
 model {
   // **wrong** needs explicit truncation
-  theta ~ normal(0, 1); 
+  theta ~ normal(0, 1);
   ...
 \end{stancode}
 %
 This program is wrong because its truncation bounds on \code{theta}
 depend on parameters, and thus need to be accounted for using an
 explicit truncation on the distribution.  This is the right way to do
-it.  
+it.
 %
 \begin{stancode}
   theta ~ normal(0, 1) T[a, b];
@@ -3856,7 +4094,7 @@ through constraints.
     reject("theta not in (a, b)");
   // still **wrong**, needs T[a,b]
   theta ~ normal(0, 1);
-\end{stancode} 
+\end{stancode}
 %
 In this case, the prior integrates to something less than one over the
 region of the parameter space where the complicated inequalities are
@@ -3878,33 +4116,6 @@ reject statements to raise errors or help with debugging.
 A Stan program is organized into a sequence of named blocks, the
 bodies of which consist of variable declarations, followed in the case
 of some blocks with statements.
-
-\section{Comments}\label{comments.section}
-
-Stan supports \Cpp-style line-based and bracketed comments.  Comments
-may be used anywhere whitespace is allowed in a Stan program.
-
-\subsection{Line-Based Comments}
-
-In line-based comments, any text on a line following
-two forward slashes (\Verb|//|) or the pound sign (\Verb|#|)
-is ignored (along with the slashes or pound sign).
-
-\subsection{Bracketed Comments}
-
-For bracketed comments, any text between a forward-slash and asterisk
-pair (\Verb|/*|) and an asterisk and forward-slash pair (\Verb|*/|) is
-ignored.
-
-\subsection{Character Encoding}
-
-Comments may be in ASCII, UTF-8, Latin1, or any other character
-encoding that is byte-wise compatible with ASCII.  This excludes
-encodings like UTF-16, Big5, etc.%
-%
-\footnote{The issue is that they will separate the characters in
-  \code{*/} and \code{*/}.}
-
 
 \section{Overview of Stan's Program Blocks}
 
@@ -3950,10 +4161,12 @@ generation.
 
 \subsection{Optionality and Ordering}
 
-All of the blocks other than the \code{model} block are optional.  The
-blocks that occur must occur in the order presented in the skeletal
-program above.  Within each block, both declarations and statements
-are optional, subject to the restriction that the declarations come
+All of the blocks are optional.  A consequence of this is that the
+empty string is a valid Stan program, although it will trigger a
+warning message from the Stan compiler.  The Stan program blocks
+that occur must occur in the order presented in the skeletal program
+above.  Within each block, both declarations and statements are
+optional, subject to the  restriction that the declarations come
 before the statements.
 
 \subsection{Variable Scope}

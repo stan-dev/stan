@@ -5,10 +5,10 @@
 
 \noindent
 This document is both a user's guide and a reference manual for
-\Stan's probabilistic modeling language.  This introductory chapter
-provides a high-level overview of \Stan. The remaining
+Stan's probabilistic modeling language.  This introductory chapter
+provides a high-level overview of Stan. The remaining
 parts of this document include a practically-oriented user's guide for
-programming models and a detailed reference manual for \Stan's
+programming models and a detailed reference manual for Stan's
 modeling language and associated programs and data formats.
 
 \section{Stan Home Page}
@@ -109,14 +109,14 @@ MathematicaStan home page is
 
 \section{Stan Programs}
 
-A \Stan program defines a statistical model through a conditional
+A Stan program defines a statistical model through a conditional
 probability function $p(\theta|y,x)$, where $\theta$ is a sequence of
 modeled unknown values (e.g., model parameters, latent variables, missing
 data, future predictions), $y$ is a sequence of modeled known
 values, and $x$ is a sequence of unmodeled predictors and constants
 (e.g., sizes, hyperparameters).
 
-\Stan programs consist of variable type declarations and statements.
+Stan programs consist of variable type declarations and statements.
 Variable types include constrained and unconstrained integer, scalar,
 vector, and matrix types, as well as (multidimensional) arrays of
 other types.  Variables are declared in blocks corresponding to the
@@ -152,10 +152,10 @@ a draw at the point the generated quantities block is evaluated.
 
 \subsection{Execution Order}
 
-Statements in \Stan are interpreted imperatively, so their order
+Statements in Stan are interpreted imperatively, so their order
 matters.  Atomic statements involve the assignment of a value to a
 variable.  Sequences of statements (and optionally local variable
-declarations) may be organized into a block.  \Stan also provides bounded
+declarations) may be organized into a block.  Stan also provides bounded
 for-each loops of the sort used in \R and \BUGS.
 
 
@@ -195,18 +195,18 @@ machine (or in C) can be implemented in Stan (not necessarily easily,
 of course).  All that is required for Turing completeness is loops,
 conditionals, and arrays that can be dynamically (re)sized in a loop.
 
-\section{Compiling and Running \Stan Programs}
+\section{Compiling and Running Stan Programs}
 
-A \Stan program is first translated to a \Cpp program by the \Stan
+A Stan program is first translated to a \Cpp program by the Stan
 compiler \stanc, then the \Cpp program compiled to a self-contained
-platform-specific executable.  \Stan can generate executables for
+platform-specific executable.  Stan can generate executables for
 various flavors of Windows, Mac OS X, and Linux.%
 %
-\footnote{A \Stan program may also be compiled to a dynamically
+\footnote{A Stan program may also be compiled to a dynamically
   linkable object file for use in a higher-level scripting language
   such as \R or Python.}
 %
-Running the \Stan executable for a model first reads in and validates
+Running the Stan executable for a model first reads in and validates
 the known values $y$ and $x$, then generates a sequence of
 (non-independent) identically distributed samples $\theta^{(1)},
 \theta^{(2)}, \ldots$, each of which has the marginal distribution
@@ -215,7 +215,7 @@ $p(\theta|y,x)$.
 
 \section{Sampling}
 
-For continuous parameters, \Stan uses Hamiltonian Monte Carlo (\HMC)
+For continuous parameters, Stan uses Hamiltonian Monte Carlo (\HMC)
 sampling \citep{Duane:1987, Neal:1994, Neal:2011}, a form of Markov
 chain Monte Carlo (\MCMC) sampling \citep{Metropolis:1953}.  Stan does
 not provide discrete sampling for parameters. Discrete observations
@@ -241,7 +241,7 @@ detailed balance of the resulting Markov chain transitions
 \citep{Metropolis:1953, Hastings:1970}.
 
 Basic Euclidean Hamiltonian Monte Carlo involves three ``tuning''
-parameters to which its behavior is quite sensitive.  \Stan's samplers
+parameters to which its behavior is quite sensitive.  Stan's samplers
 allow these parameters to be set by hand or set automatically without
 user intervention.
 
@@ -255,13 +255,13 @@ size from an interval of possible step sizes \citep{Neal:2011}.
 
 The second tuning parameter is the number of steps taken per
 iteration, the product of which with the temporal step size determines
-the total Hamiltonian simulation time.  \Stan can be set to use a
+the total Hamiltonian simulation time.  Stan can be set to use a
 specified number of steps, or it can automatically adapt the number of
 steps during sampling using the No-U-Turn (\NUTS) sampler
 \citep{Hoffman-Gelman:2011, Hoffman-Gelman:2014}.
 
 The third tuning parameter is a mass matrix for the fictional
-particle.  \Stan can be configured to estimate a diagonal mass matrix
+particle.  Stan can be configured to estimate a diagonal mass matrix
 or a full mass matrix during warmup; Stan will support user-specified
 mass matrices in the future.  Estimating a diagonal mass matrix
 normalizes the scale of each element $\theta_k$ of the unknown
@@ -283,7 +283,7 @@ distribution $p(\theta|y,x)$ after the chain has converged to its
 equilibrium distribution.  There are several methods to test whether
 an \MCMC method has failed to converge; unfortunately, passing the
 tests does not guarantee convergence.  The recommended method for
-\Stan is to run multiple Markov chains, initialized randomly with a
+Stan is to run multiple Markov chains, initialized randomly with a
 diffuse set of initial parameter values, discard the warmup/adaptation
 samples, then split the remainder of each chain in half and compute
 the potential scale reduction statistic, $\hat{R}$
@@ -307,7 +307,7 @@ hand.
 
 \subsection{Bayesian Inference and Monte Carlo Methods}
 
-\Stan was developed to support full Bayesian inference.  Bayesian
+Stan was developed to support full Bayesian inference.  Bayesian
 inference is based in part on Bayes's rule,
 \[
 p(\theta|y,x) \propto p(y|\theta,x) \, p(\theta,x),
@@ -318,7 +318,7 @@ constants $x$) is proportional (for fixed $y$ and $x$) to the
 product of the likelihood function $p(y|\theta,x)$ and prior
 $p(\theta,x)$.
 
-For \Stan, Bayesian modeling involves coding the posterior probability
+For Stan, Bayesian modeling involves coding the posterior probability
 function up to a proportion, which Bayes's rule shows is equivalent to
 modeling the product of the likelihood function and prior up to a
 proportion.
@@ -335,7 +335,7 @@ data.
 
 \section{Optimization}
 
-\Stan also supports optimization-based inference for models.  Given a
+Stan also supports optimization-based inference for models.  Given a
 posterior $p(\theta|y)$, Stan can find the posterior mode $\theta^*$,
 which is defined by
 %

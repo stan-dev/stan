@@ -1,6 +1,7 @@
 #ifndef STAN_VARIATIONAL_NORMAL_FULLRANK_HPP
 #define STAN_VARIATIONAL_NORMAL_FULLRANK_HPP
 
+#include <stan/callbacks/logger.hpp>
 #include <stan/math/prim/mat.hpp>
 #include <stan/model/gradient.hpp>
 #include <stan/variational/base_family.hpp>
@@ -260,6 +261,7 @@ namespace stan {
        * @throw std::domain_error If the dimensionality of the specified
        * approximation does not match this approximation's dimensionality.
        */
+      inline
       normal_fullrank& operator/=(const normal_fullrank& rhs) {
         static const char* function =
           "stan::variational::normal_fullrank::operator/=";
@@ -390,7 +392,7 @@ namespace stan {
        * @param[in] cont_params Continuous parameters.
        * @param[in] n_monte_carlo_grad Sample size for gradient computation.
        * @param[in,out] rng Random number generator.
-       * @param[in,out] message_writer writer for messages
+       * @param[in,out] logger logger for messages
        * @throw std::domain_error If the number of divergent
        * iterations exceeds its specified bounds.
        */
@@ -400,7 +402,7 @@ namespace stan {
                      Eigen::VectorXd& cont_params,
                      int n_monte_carlo_grad,
                      BaseRNG& rng,
-                     callbacks::writer& message_writer)
+                     callbacks::logger& logger)
         const {
         static const char* function =
           "stan::variational::normal_fullrank::calc_grad";
@@ -430,7 +432,7 @@ namespace stan {
             std::stringstream ss;
             stan::model::gradient(m, zeta, tmp_lp, tmp_mu_grad, &ss);
             if (ss.str().length() > 0)
-              message_writer(ss.str());
+              logger.info(ss);
             stan::math::check_finite(function, "Gradient of mu", tmp_mu_grad);
 
             mu_grad += tmp_mu_grad;
@@ -473,6 +475,7 @@ namespace stan {
      * @return Sum of the specified approximations.
      * @throw std::domain_error If the dimensionalities do not match.
      */
+    inline
     normal_fullrank operator+(normal_fullrank lhs, const normal_fullrank& rhs) {
       return lhs += rhs;
     }
@@ -486,6 +489,7 @@ namespace stan {
      * @return Elementwise division of the specified approximations.
      * @throw std::domain_error If the dimensionalities do not match.
      */
+    inline
     normal_fullrank operator/(normal_fullrank lhs, const normal_fullrank& rhs) {
       return lhs /= rhs;
     }
@@ -499,6 +503,7 @@ namespace stan {
      * @param[in] rhs Approximation.
      * @return Addition of scalar to specified approximation.
      */
+    inline
     normal_fullrank operator+(double scalar, normal_fullrank rhs) {
       return rhs += scalar;
     }
@@ -512,6 +517,7 @@ namespace stan {
      * @param[in] rhs Approximation.
      * @return Multiplication of scalar by the specified approximation.
      */
+    inline
     normal_fullrank operator*(double scalar, normal_fullrank rhs) {
       return rhs *= scalar;
     }

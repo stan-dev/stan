@@ -1,7 +1,7 @@
 #ifndef STAN_VARIATIONAL_NORMAL_MEANFIELD_HPP
 #define STAN_VARIATIONAL_NORMAL_MEANFIELD_HPP
 
-#include <stan/callbacks/writer.hpp>
+#include <stan/callbacks/logger.hpp>
 #include <stan/math/prim/mat.hpp>
 #include <stan/model/gradient.hpp>
 #include <stan/variational/base_family.hpp>
@@ -19,7 +19,7 @@ namespace stan {
      */
     class normal_meanfield : public base_family {
     private:
-      /** 
+      /**
        * Mean vector.
        */
       Eigen::VectorXd mu_;
@@ -119,7 +119,7 @@ namespace stan {
 
       /**
        * Set the log standard deviation vector to the specified
-       * value. 
+       * value.
        *
        * @param[in] omega Log standard deviation vector.
        * @throw std::domain_error If the log standard deviation
@@ -201,7 +201,7 @@ namespace stan {
        * @param[in] rhs Approximation from which to gather the mean
        * and log standard deviation vectors.
        * @return This approximation after adding the specified
-       * approximation. 
+       * approximation.
        * @throw std::domain_error If the size of the specified
        * approximation does not match the size of this approximation.
        */
@@ -219,7 +219,7 @@ namespace stan {
       /**
        * Return this approximation after elementwise division by the
        * specified approximation's mean and log standard deviation
-       * vectors. 
+       * vectors.
        *
        * @param[in] rhs Approximation from which to gather the mean
        * and log standard deviation vectors.
@@ -228,6 +228,7 @@ namespace stan {
        * @throw std::domain_error If the dimensionality of the specified
        * approximation does not match this approximation's dimensionality.
        */
+      inline
       normal_meanfield& operator/=(const normal_meanfield& rhs) {
         static const char* function =
           "stan::variational::normal_meanfield::operator/=";
@@ -259,7 +260,7 @@ namespace stan {
       /**
        * Return this approximation after multiplying by the specified
        * scalar to each entry in the mean and log standard deviation
-       * vectors. 
+       * vectors.
        *
        * <b>Warning:</b> No finiteness check is made on the scalar, so
        * it may introduce NaNs.
@@ -275,10 +276,10 @@ namespace stan {
       }
 
       /**
-       * Returns the mean vector for this approximation.  
-       * 
+       * Returns the mean vector for this approximation.
+       *
        * See: <code>mu()</code>.
-       * 
+       *
        * @return Mean vector for this approximation.
        */
       const Eigen::VectorXd& mean() const {
@@ -355,7 +356,7 @@ namespace stan {
        * @param[in] n_monte_carlo_grad Number of samples for gradient
        * computation.
        * @param[in,out] rng Random number generator.
-       * @param[in,out] message_writer writer for messages
+       * @param[in,out] logger logger for messages
        * @throw std::domain_error If the number of divergent
        * iterations exceeds its specified bounds.
        */
@@ -365,7 +366,7 @@ namespace stan {
                      Eigen::VectorXd& cont_params,
                      int n_monte_carlo_grad,
                      BaseRNG& rng,
-                     callbacks::writer& message_writer)
+                     callbacks::logger& logger)
         const {
         static const char* function =
           "stan::variational::normal_meanfield::calc_grad";
@@ -395,7 +396,7 @@ namespace stan {
             std::stringstream ss;
             stan::model::gradient(m, zeta, tmp_lp, tmp_mu_grad, &ss);
             if (ss.str().length() > 0)
-              message_writer(ss.str());
+              logger.info(ss);
             stan::math::check_finite(function, "Gradient of mu", tmp_mu_grad);
             mu_grad += tmp_mu_grad;
             omega_grad.array() += tmp_mu_grad.array().cwiseProduct(eta.array());
@@ -434,6 +435,7 @@ namespace stan {
      * @return Sum of the specified approximations.
      * @throw std::domain_error If the dimensionalities do not match.
      */
+    inline
     normal_meanfield operator+(normal_meanfield lhs,
                                const normal_meanfield& rhs) {
       return lhs += rhs;
@@ -448,6 +450,7 @@ namespace stan {
      * @return Elementwise division of the specified approximations.
      * @throw std::domain_error If the dimensionalities do not match.
      */
+    inline
     normal_meanfield operator/(normal_meanfield lhs,
                                const normal_meanfield& rhs) {
       return lhs /= rhs;
@@ -462,6 +465,7 @@ namespace stan {
      * @param[in] rhs Approximation.
      * @return Addition of scalar to specified approximation.
      */
+    inline
     normal_meanfield operator+(double scalar, normal_meanfield rhs) {
       return rhs += scalar;
     }
@@ -475,6 +479,7 @@ namespace stan {
      * @param[in] rhs Approximation.
      * @return Multiplication of scalar by the specified approximation.
      */
+    inline
     normal_meanfield operator*(double scalar, normal_meanfield rhs) {
       return rhs *= scalar;
     }

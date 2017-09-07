@@ -1,7 +1,7 @@
 #ifndef STAN_VARIATIONAL_PRINT_PROGRESS_HPP
 #define STAN_VARIATIONAL_PRINT_PROGRESS_HPP
 
-#include <stan/callbacks/writer.hpp>
+#include <stan/callbacks/logger.hpp>
 #include <stan/math/prim/scal/err/check_positive.hpp>
 #include <stan/math/prim/scal/err/check_nonnegative.hpp>
 #include <cmath>
@@ -22,8 +22,9 @@ namespace stan {
      * @param[in] tune    boolean indicates tuning vs. variational inference
      * @param[in] prefix  prefix string
      * @param[in] suffix  suffix string
-     * @param[in,out] writer  writer
+     * @param[in,out] logger  logger
      */
+    inline
     void print_progress(int m,
                         int start,
                         int finish,
@@ -31,7 +32,7 @@ namespace stan {
                         bool tune,
                         const std::string& prefix,
                         const std::string& suffix,
-                        callbacks::writer& writer) {
+                        callbacks::logger& logger) {
       static const char* function =
         "stan::variational::print_progress";
 
@@ -61,7 +62,7 @@ namespace stan {
            << "%] ";
         ss << (tune ? " (Adaptation)" : " (Variational Inference)");
         ss << suffix;
-        writer(ss.str());
+        logger.info(ss);
       }
     }
 

@@ -1,9 +1,11 @@
 #ifndef STAN_LANG_GRAMMARS_SEMANTIC_ACTIONS_DEF_CPP
 #define STAN_LANG_GRAMMARS_SEMANTIC_ACTIONS_DEF_CPP
 
+#include <stan/io/program_reader.hpp>
 #include <stan/lang/ast.hpp>
 #include <stan/lang/grammars/iterator_typedefs.hpp>
 #include <stan/lang/grammars/semantic_actions.hpp>
+#include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/variant/apply_visitor.hpp>
@@ -25,7 +27,7 @@ namespace stan {
   namespace lang {
 
     /**
-     * Set original name of specified function to name and add 
+     * Set original name of specified function to name and add
      * "stan::math::" namespace qualifier to name.
      *
      * @param[in, out] f Function to qualify.
@@ -110,21 +112,6 @@ namespace stan {
       return true;
     }
 
-    void validate_double_expr::operator()(const expression& expr,
-                              bool& pass,
-                              std::stringstream& error_msgs)
-      const {
-      if (!expr.expression_type().is_primitive_double()
-          && !expr.expression_type().is_primitive_int()) {
-        error_msgs << "expression denoting real required; found type="
-                   << expr.expression_type() << std::endl;
-        pass = false;
-        return;
-      }
-      pass = true;
-    }
-    boost::phoenix::function<validate_double_expr> validate_double_expr_f;
-
     void set_fun_type(fun& fun, std::ostream& error_msgs) {
       std::vector<expr_type> arg_types;
       for (size_t i = 0; i < fun.args_.size(); ++i)
@@ -140,6 +127,111 @@ namespace stan {
       return sum;
     }
 
+    bool is_double_return(const std::string& function_name,
+                          const std::vector<expr_type>& arg_types,
+                          std::ostream& error_msgs) {
+      return function_signatures::instance()
+        .get_result_type(function_name, arg_types, error_msgs, true)
+        .is_primitive_double();
+    }
+
+    bool is_univariate(const expr_type& et) {
+      return et.num_dims_ == 0
+        && (et.base_type_ == INT_T
+            || et.base_type_ == DOUBLE_T);
+    }
+
+    bool can_assign_to_lhs_var(const std::string& lhs_var_name,
+                               const scope& var_scope,
+                               const variable_map& vm,
+                               std::ostream& error_msgs) {
+      // validate scope matches declaration scope
+      scope lhs_origin = vm.get_scope(lhs_var_name);
+      if (lhs_origin.program_block() != var_scope.program_block()) {
+        error_msgs << "Cannot assign to variable outside of declaration block"
+                   << "; left-hand-side variable origin=";
+        print_scope(error_msgs, lhs_origin);
+        error_msgs << std::endl;
+        return false;
+      }
+      // enforce constancy of function args
+      if (!lhs_origin.is_local() && lhs_origin.fun()) {
+        error_msgs << "Cannot assign to function argument variables."
+                   << std::endl
+                   << "Use local variables instead."
+                   << std::endl;
+        return false;
+      }
+      return true;
+    }
+
+    expr_type infer_var_dims_type(const base_var_decl& var_type,
+                                  const variable_dims& var_dims) {
+      size_t var_num_dims = var_type.dims_.size();
+      size_t num_index_dims = var_dims.dims_.size();
+      return infer_type_indexing(var_type.base_type_,
+                                 var_num_dims,
+                                 num_index_dims);
+    }
+
+    bool has_same_shape(const expr_type& lhs_type,
+                        const expression& rhs_expr,
+                        const std::string& name,
+                        const std::string& stmt_type,
+                        std::ostream& error_msgs) {
+      if (lhs_type.num_dims_ != rhs_expr.expression_type().num_dims_) {
+        error_msgs << "Dimension mismatch in "
+                   << stmt_type
+                   << "; variable name = "
+                   << name
+                   << ", num dimensions given = "
+                   << lhs_type.num_dims_
+                   << "; right-hand side dimensions = "
+                   << rhs_expr.expression_type().num_dims_
+                   << std::endl;
+        return false;
+      }
+      base_expr_type lhs_base_type = lhs_type.base_type_;
+      base_expr_type rhs_base_type = rhs_expr.expression_type().base_type_;
+      // allow int -> double promotion, even in arrays
+      bool types_compatible =
+        (lhs_base_type == rhs_base_type
+         || (lhs_base_type == DOUBLE_T && rhs_base_type == INT_T));
+      if (!types_compatible) {
+        error_msgs << "Base type mismatch in "
+                   << stmt_type
+                   << "; variable name = "
+                   << name
+                   << ", type = ";
+        write_base_expr_type(error_msgs, lhs_base_type);
+        error_msgs << "; right-hand side type=";
+        write_base_expr_type(error_msgs, rhs_base_type);
+        error_msgs << std::endl;
+        return false;
+      }
+      return true;
+    }
+
+
+    // //////////////////////////////////
+    // *** functors for grammar rules ***
+    // //////////////////////////////////
+
+    void validate_double_expr::operator()(const expression& expr,
+                              bool& pass,
+                              std::stringstream& error_msgs)
+      const {
+      if (!expr.expression_type().is_primitive_double()
+          && !expr.expression_type().is_primitive_int()) {
+        error_msgs << "expression denoting real required; found type="
+                   << expr.expression_type() << std::endl;
+        pass = false;
+        return;
+      }
+      pass = true;
+    }
+    boost::phoenix::function<validate_double_expr> validate_double_expr_f;
+
     template <typename L, typename R>
     void assign_lhs::operator()(L& lhs, const R& rhs) const {
       lhs = rhs;
@@ -154,6 +246,11 @@ namespace stan {
       const;
     template void assign_lhs::operator()(expression&,
                                          const integrate_ode_control&)
+      const;
+    template void assign_lhs::operator()(expression&, const algebra_solver&)
+      const;
+    template void assign_lhs::operator()(expression&,
+                                         const algebra_solver_control&)
       const;
     template void assign_lhs::operator()(array_expr&,
                                          const array_expr&) const;
@@ -181,6 +278,7 @@ namespace stan {
         error_msgs << "expression is ill formed" << std::endl;
     }
     boost::phoenix::function<validate_expr_type3> validate_expr_type3_f;
+
 
     void is_prob_fun::operator()(const std::string& s,
                                  bool& pass) const {
@@ -387,11 +485,12 @@ namespace stan {
              function_signature_t> >::const_iterator it
              = existing.begin();
            it != existing.end();
-           ++it)
+           ++it) {
         if (name_sig.first == (*it).first
             && (name_only
                 || name_sig.second.second == (*it).second.second))
           return true;  // name and arg sequences match
+      }
       return false;
     }
 
@@ -442,13 +541,16 @@ namespace stan {
       // build up representations
       expr_type result_type(decl.return_type_.base_type_,
                             decl.return_type_.num_dims_);
-      std::vector<expr_type> arg_types;
+      std::vector<function_arg_type> arg_types;
       for (size_t i = 0; i < decl.arg_decls_.size(); ++i)
-        arg_types.push_back(expr_type(decl.arg_decls_[i].arg_type_.base_type_,
-                                      decl.arg_decls_[i].arg_type_.num_dims_));
+        arg_types.push_back(
+            function_arg_type(expr_type(decl.arg_decls_[i].arg_type_.base_type_,
+                                        decl.arg_decls_[i].arg_type_.num_dims_),
+                              decl.arg_decls_[i].is_data_));
 
       function_signature_t sig(result_type, arg_types);
       std::pair<std::string, function_signature_t> name_sig(decl.name_, sig);
+
       // check that not already declared if just declaration
       if (decl.body_.is_no_op_statement()
           && fun_exists(functions_declared, name_sig)) {
@@ -475,15 +577,38 @@ namespace stan {
         return;
       }
 
+       // check argument qualifiers
+      if (!decl.body_.is_no_op_statement()) {
+        function_signature_t decl_sig =
+          function_signatures::instance().get_definition(decl.name_, sig);
+        if (!decl_sig.first.is_ill_formed()) {
+          for (size_t i = 0; i < arg_types.size(); ++i) {
+            if (decl_sig.second[i].expr_type_ != arg_types[i].expr_type_
+                || decl_sig.second[i].data_only_ != arg_types[i].data_only_) {
+              error_msgs << "Declaration doesn't match definition "
+                         << "for function: "
+                         << decl.name_ << " argument " << (i + 1)
+                         << ": argument declared as "
+                         << arg_types[i]
+                         << ", defined as "
+                         << decl_sig.second[i] << "." <<  std::endl;
+              pass = false;
+              return;
+            }
+          }
+        }
+      }
 
-      if (ends_with("_lpdf", decl.name_) && arg_types[0].base_type_ == INT_T) {
+      if (ends_with("_lpdf", decl.name_)
+          && arg_types[0].expr_type_.base_type_ == INT_T) {
         error_msgs << "Parse Error.  Probability density functions require"
                    << " real variates (first argument)."
                    << " Found type = " << arg_types[0] << std::endl;
         pass = false;
         return;
       }
-      if (ends_with("_lpmf", decl.name_) && arg_types[0].base_type_ != INT_T) {
+      if (ends_with("_lpmf", decl.name_)
+          && arg_types[0].expr_type_.base_type_ != INT_T) {
         error_msgs << "Parse Error.  Probability mass functions require"
                    << " integer variates (first argument)."
                    << " Found type = " << arg_types[0] << std::endl;
@@ -505,7 +630,6 @@ namespace stan {
       pass = true;
     }
     boost::phoenix::function<add_function_signature> add_function_signature_f;
-
 
     void validate_pmf_pdf_variate::operator()(function_decl_def& decl,
                                               bool& pass,
@@ -563,11 +687,13 @@ namespace stan {
     }
     boost::phoenix::function<validate_return_type> validate_return_type_f;
 
-    // TODO(morris): remove if params_r__ no longer used
-    void scope_params::operator()(variable_map& vm) const {
+    void set_fun_params_scope::operator()(scope& var_scope, variable_map& vm)
+      const {
+      var_scope = scope(var_scope.program_block(), true);
+      // TODO(morris): remove if params_r__ no longer used
       vm.add("params_r__", VECTOR_T, parameter_origin);
     }
-    boost::phoenix::function<scope_params> scope_params_f;
+    boost::phoenix::function<set_fun_params_scope> set_fun_params_scope_f;
 
     void unscope_variables::operator()(function_decl_def& decl,
                                        variable_map& vm) const {
@@ -577,7 +703,8 @@ namespace stan {
     }
     boost::phoenix::function<unscope_variables> unscope_variables_f;
 
-    void add_fun_var::operator()(arg_decl& decl, bool& pass, variable_map& vm,
+    void add_fun_var::operator()(arg_decl& decl, scope& scope, bool& pass,
+                                 variable_map& vm,
                                  std::ostream& error_msgs) const {
       if (vm.exists(decl.name_)) {
         pass = false;
@@ -590,8 +717,21 @@ namespace stan {
         return;
       }
       pass = true;
+      origin_block var_origin = scope.program_block();
+      if (var_origin == data_origin) {
+        if (decl.base_variable_declaration().base_type_ == INT_T) {
+          pass = false;
+          error_msgs << "Data qualifier cannot be applied to int variable, "
+                     << "name " << decl.name_ << ".";
+          error_msgs << std::endl;
+          return;
+        }
+        decl.is_data_ = true;
+      } else {
+        var_origin = function_argument_origin;
+      }
       vm.add(decl.name_, decl.base_variable_declaration(),
-             function_argument_origin);
+             var_origin);
     }
     boost::phoenix::function<add_fun_var> add_fun_var_f;
 
@@ -666,65 +806,74 @@ namespace stan {
     }
     boost::phoenix::function<remove_params_var> remove_params_var_f;
 
-    void program_error::operator()(pos_iterator_t _begin, pos_iterator_t _end,
-                                   pos_iterator_t _where, variable_map& vm,
-                                   std::stringstream& error_msgs) const {
-      using boost::spirit::get_line;
-      using boost::format;
-      using std::setw;
-
-      size_t idx_errline = get_line(_where);
-
-      error_msgs << std::endl;
-
-      if (idx_errline > 0) {
-        error_msgs << "ERROR at line " << idx_errline
-                   << std::endl << std::endl;
-
-        std::basic_stringstream<char> sprogram;
-        sprogram << boost::make_iterator_range(_begin, _end);
-
-        // show error in context 2 lines before, 1 lines after
-        size_t idx_errcol = 0;
-        idx_errcol = get_column(_begin, _where) - 1;
-
-        std::string lineno = "";
-        format fmt_lineno("% 3d:    ");
-
-        std::string line_2before = "";
-        std::string line_before = "";
-        std::string line_err = "";
-        std::string line_after = "";
-
-        size_t idx_line = 0;
-        size_t idx_before = idx_errline - 1;
-        if (idx_before > 0) {
-          // read lines up to error line, save 2 most recently read
-          while (idx_before > idx_line) {
-            line_2before = line_before;
-            std::getline(sprogram, line_before);
-            idx_line++;
-          }
-          if (line_2before.length() > 0) {
-            lineno = str(fmt_lineno % (idx_before - 1) );
-            error_msgs << lineno << line_2before << std::endl;
-          }
-          lineno = str(fmt_lineno % idx_before);
-          error_msgs << lineno << line_before << std::endl;
-        }
-
-        std::getline(sprogram, line_err);
-        lineno = str(fmt_lineno % idx_errline);
-        error_msgs << lineno << line_err << std::endl
-                   << setw(idx_errcol + lineno.length()) << "^" << std::endl;
-
-        if (!sprogram.eof()) {
-          std::getline(sprogram, line_after);
-          lineno = str(fmt_lineno % (idx_errline+1));
-          error_msgs << lineno << line_after << std::endl;
+    void dump_program_line(size_t idx_errline, int offset,
+                           const std::string& origin_file,
+                           size_t origin_line,
+                           const io::program_reader& reader,
+                           const std::vector<std::string>& program_lines,
+                           std::stringstream& error_msgs) {
+      boost::format fmt_lineno("%6d: ");
+      if (idx_errline + offset > 0
+          && idx_errline + offset < program_lines.size()) {
+        io::program_reader::trace_t trace = reader.trace(idx_errline + offset);
+        if (trace[trace.size() - 1].first == origin_file) {
+          std::string lineno = str(fmt_lineno % (origin_line + offset));
+          error_msgs << lineno << program_lines[idx_errline + offset - 1]
+                     << std::endl;
         }
       }
-      error_msgs << std::endl;
+    }
+
+    void program_error::operator()(pos_iterator_t begin, pos_iterator_t end,
+                                   pos_iterator_t where, variable_map& vm,
+                                   std::stringstream& error_msgs,
+                                   const io::program_reader& reader) const {
+      // extract line and column of error
+      size_t idx_errline = boost::spirit::get_line(where);
+      if (idx_errline == 0) {
+        error_msgs << "Error before start of program." << std::endl;
+        return;
+      }
+      size_t idx_errcol = 0;
+      idx_errcol = get_column(begin, where) - 1;
+
+      // extract lines of included program
+      std::basic_stringstream<char> program_ss;
+      program_ss << boost::make_iterator_range(begin, end);
+      std::vector<std::string> program_lines;
+      while (!program_ss.eof()) {
+        std::string line;
+        std::getline(program_ss, line);
+        program_lines.push_back(line);
+      }
+
+      // dump include trace for error line
+      io::program_reader::trace_t trace = reader.trace(idx_errline);
+      std::string origin_file = trace[trace.size() - 1].first;
+      size_t origin_line = trace[trace.size() - 1].second;
+      error_msgs << "  error in '" << trace[trace.size() - 1].first
+                 << "' at line " << trace[trace.size() - 1].second
+                 << ", column " << idx_errcol << std::endl;
+      for (int i = trace.size() - 1; i-- > 0; )
+        error_msgs << "  included from '" << trace[i].first
+                   << "' at line " << trace[i].second << std::endl;
+
+      // dump context of error
+      error_msgs << "  -------------------------------------------------"
+                 << std::endl;
+
+      dump_program_line(idx_errline, -2, origin_file, origin_line,
+                        reader, program_lines, error_msgs);
+      dump_program_line(idx_errline, -1, origin_file, origin_line,
+                        reader, program_lines, error_msgs);
+      dump_program_line(idx_errline, 0, origin_file, origin_line,
+                        reader, program_lines, error_msgs);
+      error_msgs << std::setw(idx_errcol + 8) << "^" << std::endl;
+      dump_program_line(idx_errline, +1, origin_file, origin_line,
+                        reader, program_lines, error_msgs);
+
+      error_msgs << "  -------------------------------------------------"
+                 << std::endl << std::endl;
     }
     boost::phoenix::function<program_error> program_error_f;
 
@@ -792,25 +941,20 @@ namespace stan {
     boost::phoenix::function<validate_void_return_allowed>
     validate_void_return_allowed_f;
 
-    void identifier_to_var::operator()(const std::string& name,
+    void validate_lhs_var_assgn::operator()(const std::string& name,
                                        const scope& var_scope,
                                        variable& v,  bool& pass,
                                        const variable_map& vm,
                                        std::ostream& error_msgs) const {
       // validate existence
       if (!vm.exists(name)) {
+        // fail silently, allow backtracking
         pass = false;
         return;
       }
-
       // validate scope matches declaration scope
       scope lhs_origin = vm.get_scope(name);
       if (lhs_origin.program_block() != var_scope.program_block()) {
-        pass = false;
-        return;
-      }
-      // enforce constancy of function args
-      if (lhs_origin.fun()) {
         pass = false;
         return;
       }
@@ -818,12 +962,21 @@ namespace stan {
       v.set_type(vm.get_base_type(name), vm.get_num_dims(name));
       pass = true;
     }
-    boost::phoenix::function<identifier_to_var> identifier_to_var_f;
+    boost::phoenix::function<validate_lhs_var_assgn> validate_lhs_var_assgn_f;
 
     void validate_assgn::operator()(const assgn& a, bool& pass,
+                                    const variable_map& vm,
                                     std::ostream& error_msgs) const {
-      // resolve type of lhs[idxs] and make sure it matches rhs
+      // validate var exists
       std::string name = a.lhs_var_.name_;
+      if (!vm.exists(name)) {
+        error_msgs << "Unknown variable in assignment"
+                   << "; lhs variable=" << name
+                   << std::endl;
+        pass = false;
+        return;
+      }
+
       expression lhs_expr = expression(a.lhs_var_);
       expr_type lhs_type = indexed_type(lhs_expr, a.idxs_);
       if (lhs_type.is_ill_formed()) {
@@ -832,40 +985,10 @@ namespace stan {
         pass = false;
         return;
       }
-
-      expr_type rhs_type = a.rhs_.expression_type();
-      base_expr_type lhs_base_type = lhs_type.base_type_;
-      base_expr_type rhs_base_type = rhs_type.base_type_;
-      // allow int -> double promotion, even in arrays
-      bool types_compatible
-        = lhs_base_type == rhs_base_type
-        || (lhs_base_type == DOUBLE_T && rhs_base_type == INT_T);
-      if (!types_compatible) {
-        error_msgs << "base type mismatch in assignment"
-                   << "; variable name="
-                   << name
-                   << ", type=";
-        write_base_expr_type(error_msgs, lhs_base_type);
-        error_msgs << "; right-hand side type=";
-        write_base_expr_type(error_msgs, rhs_base_type);
-        error_msgs << std::endl;
+      if (!has_same_shape(lhs_type, a.rhs_, name, "assignment", error_msgs)) {
         pass = false;
         return;
       }
-
-      if (lhs_type.num_dims_ != rhs_type.num_dims_) {
-        error_msgs << "dimension mismatch in assignment"
-                   << "; variable name="
-                   << name
-                   << ", num dimensions given="
-                   << lhs_type.num_dims_
-                   << "; right-hand side dimensions="
-                   << rhs_type.num_dims_
-                   << std::endl;
-        pass = false;
-        return;
-      }
-
       if (a.lhs_var_occurs_on_rhs()) {
         // this only requires a warning --- a deep copy will be made
         error_msgs << "WARNING: left-hand side variable"
@@ -881,116 +1004,157 @@ namespace stan {
 
     void validate_assignment::operator()(assignment& a,
                                          const scope& var_scope,
-                                         bool& pass, variable_map& vm,
+                                         bool& pass, const variable_map& vm,
                                          std::ostream& error_msgs) const {
-      // validate existence
       std::string name = a.var_dims_.name_;
       if (!vm.exists(name)) {
-        error_msgs << "unknown variable in assignment"
-                   << "; lhs variable=" << a.var_dims_.name_
-                   << std::endl;
-
-        pass = false;
-        return;
-      }
-
-      // validate scope matches declaration scope
-      scope lhs_origin = vm.get_scope(name);
-      if (lhs_origin.program_block() != var_scope.program_block()) {
-        error_msgs << "attempt to assign variable in wrong block."
-                   << " left-hand-side variable origin=";
-        print_scope(error_msgs, lhs_origin);
-        error_msgs << std::endl;
-        pass = false;
-        return;
-      }
-
-      // enforce constancy of function args
-      if (!lhs_origin.is_local()
-          && lhs_origin.fun()) {
-        error_msgs << "Illegal to assign to function argument variables."
-                   << std::endl
-                   << "Use local variables instead."
+        error_msgs << "Unknown variable in assignment"
+                   << "; lhs variable=" << name
                    << std::endl;
         pass = false;
         return;
       }
-
-      // validate types
+      if (!can_assign_to_lhs_var(name, var_scope, vm, error_msgs)) {
+        pass = false;
+        return;
+      }
       a.var_type_ = vm.get(name);
-      size_t lhs_var_num_dims = a.var_type_.dims_.size();
-      size_t num_index_dims = a.var_dims_.dims_.size();
-
-      expr_type lhs_type = infer_type_indexing(a.var_type_.base_type_,
-                                               lhs_var_num_dims,
-                                               num_index_dims);
-
-      if (lhs_type.is_ill_formed()) {
-        error_msgs << "too many indexes for variable "
-                   << "; variable name = " << name
-                   << "; num dimensions given = " << num_index_dims
-                   << "; variable array dimensions = " << lhs_var_num_dims
+      expr_type inferred_lhs_type
+        = infer_var_dims_type(a.var_type_, a.var_dims_);
+      if (inferred_lhs_type.is_ill_formed()) {
+        error_msgs << "Too many indexes for variable"
+                   << "; variable name = "
+                   << name
+                   << "; num dimensions given = "
+                   << a.var_dims_.dims_.size()
+                   << "; variable array dimensions = "
+                   << a.var_type_.dims_.size()
                    << std::endl;
         pass = false;
         return;
       }
-
-      base_expr_type lhs_base_type = lhs_type.base_type_;
-      base_expr_type rhs_base_type = a.expr_.expression_type().base_type_;
-      // allow int -> double promotion
-      bool types_compatible
-        = lhs_base_type == rhs_base_type
-        || (lhs_base_type == DOUBLE_T && rhs_base_type == INT_T);
-      if (!types_compatible) {
-        error_msgs << "base type mismatch in assignment"
-                   << "; variable name = "
-                   << a.var_dims_.name_
-                   << ", type = ";
-        write_base_expr_type(error_msgs, lhs_base_type);
-        error_msgs << "; right-hand side type=";
-        write_base_expr_type(error_msgs, rhs_base_type);
-        error_msgs << std::endl;
+      if (!has_same_shape(inferred_lhs_type, a.expr_, name,
+                          "assignment", error_msgs)) {
         pass = false;
         return;
       }
-
-      if (lhs_type.num_dims_ != a.expr_.expression_type().num_dims_) {
-        error_msgs << "dimension mismatch in assignment"
-                   << "; variable name = "
-                   << a.var_dims_.name_
-                   << ", num dimensions given = "
-                   << lhs_type.num_dims_
-                   << "; right-hand side dimensions = "
-                   << a.expr_.expression_type().num_dims_
-                   << std::endl;
-        pass = false;
-        return;
-      }
-
       pass = true;
     }
     boost::phoenix::function<validate_assignment> validate_assignment_f;
 
-    bool is_defined(const std::string& function_name,
-                    const std::vector<expr_type>& arg_types) {
-      expr_type ret_type(DOUBLE_T, 0);
-      function_signature_t sig(ret_type, arg_types);
-      return function_signatures::instance().is_defined(function_name, sig);
-    }
+    void validate_compound_assignment::operator()(compound_assignment& ca,
+                                         const scope& var_scope,
+                                         bool& pass, variable_map& vm,
+                                         std::ostream& error_msgs) const {
+      std::string name = ca.var_dims_.name_;
+      if (!vm.exists(name)) {
+        error_msgs << "Unknown variable in compound assignment"
+                   << "; lhs variable=" << name
+                   << std::endl;
+        pass = false;
+        return;
+      }
+      if (!can_assign_to_lhs_var(name, var_scope, vm, error_msgs)) {
+        pass = false;
+        return;
+      }
+      ca.var_type_ = vm.get(name);
+      expr_type inferred_lhs_type
+        = infer_var_dims_type(ca.var_type_, ca.var_dims_);
+      int lhs_num_dims = ca.var_type_.dims_.size();
+      int lhs_num_idxs = ca.var_dims_.dims_.size();
 
-    bool is_double_return(const std::string& function_name,
-                          const std::vector<expr_type>& arg_types,
-                          std::ostream& error_msgs) {
-      return function_signatures::instance()
-        .get_result_type(function_name, arg_types, error_msgs, true)
-        .is_primitive_double();
-    }
+      if (inferred_lhs_type.is_ill_formed()) {
+        error_msgs << "Too many indexes for variable"
+                   << "; variable name = " << name
+                   << "; specified indexes = " << lhs_num_idxs
+                   << "; variable array dimensions = " << lhs_num_dims
+                   << std::endl;
+        pass = false;
+        return;
+      }
+      // no compound assign for array types  (std::vector)
+      std::string op_equals = ca.op_;
+      ca.op_ = op_equals.substr(0, op_equals.size()-1);
+      if (inferred_lhs_type.num_dims() > 0) {
+        error_msgs << "Cannot apply operator '" << op_equals
+                   << "' to array variable; variable name = "
+                   << name
+                   << ".";
+        error_msgs << std::endl;
+        pass = false;
+        return;
+      }
 
-    bool is_univariate(const expr_type& et) {
-      return et.num_dims_ == 0
-        && (et.base_type_ == INT_T
-            || et.base_type_ == DOUBLE_T);
+      expr_type lhs_type = inferred_lhs_type.type();
+      expr_type rhs_type = ca.expr_.expression_type();
+      if (lhs_type.is_primitive()
+          && boost::algorithm::starts_with(ca.op_, ".")) {
+        error_msgs << "Cannot apply element-wise operation to scalar"
+                   << "; compound operator is: " << op_equals
+                   << std::endl;
+        pass = false;
+        return;
+      }
+      if (lhs_type.is_primitive()
+          && rhs_type.is_primitive()
+          && (lhs_type == DOUBLE_T || lhs_type == rhs_type)) {
+        // done checking <prim> <op>= <prim>
+        pass = true;
+        return;
+      }
+
+      bool types_compatible =
+        // container types allow infix and element-wise operations
+        // when lhs and rhs are same shape, and broadcast operations
+        // when rhs is double and lhs is vector, row_vector, or matrix
+        (lhs_type == rhs_type
+         || (lhs_type == VECTOR_T && rhs_type == DOUBLE_T)
+         || (lhs_type == ROW_VECTOR_T && rhs_type == DOUBLE_T)
+         || (lhs_type == ROW_VECTOR_T && rhs_type == MATRIX_T)
+         || (lhs_type == MATRIX_T && rhs_type == DOUBLE_T));
+      if (!types_compatible) {
+        error_msgs << "Cannot apply operator '" << op_equals
+                   << "' to operands;"
+                   << " left-hand side type = " << lhs_type
+                   << "; right-hand side type=" << rhs_type
+                   << std::endl;
+        pass = false;
+        return;
+      }
+      std::string op_name;
+      if (ca.op_ == "+") {
+        op_name = "add";
+      } else if (ca.op_ == "-") {
+        op_name = "subtract";
+      } else if (ca.op_ == "*") {
+        op_name = "multiply";
+      } else if (ca.op_ == "/") {
+        op_name = "divide";
+      } else if (ca.op_ == "./") {
+        op_name = "elt_divide";
+      } else if (ca.op_ == ".*") {
+        op_name = "elt_multiply";
+      }
+      // check that "lhs <op> rhs" is valid stan::math function sig
+      std::vector<function_arg_type> arg_types;
+      arg_types.push_back(function_arg_type(lhs_type));
+      arg_types.push_back(function_arg_type(rhs_type));
+      function_signature_t op_equals_sig(lhs_type, arg_types);
+      if (!function_signatures::instance().is_defined(op_name, op_equals_sig)) {
+        error_msgs << "Cannot apply operator '" << op_equals
+                   << "' to operands;"
+                   << " left-hand side type = " << lhs_type
+                   << "; right-hand side type=" << rhs_type
+                   << std::endl;
+        pass = false;
+        return;
+      }
+      ca.op_name_ = op_name;
+      pass = true;
     }
+    boost::phoenix::function<validate_compound_assignment>
+    validate_compound_assignment_f;
 
     void validate_sample::operator()(sample& s,
                                      const variable_map& var_map, bool& pass,
@@ -1009,6 +1173,19 @@ namespace stan {
         pass = false;
         error_msgs << "Error: couldn't find distribution named "
                    << function_name << std::endl;
+        return;
+      }
+
+      if (!(ends_with("_lpdf", internal_function_name)
+            || ends_with("_lpmf", internal_function_name)
+            || ends_with("_log", internal_function_name))) {
+        pass = false;
+        error_msgs << "Probability function must end in _lpdf or _lpmf."
+                   << " Found distribution family = " << function_name
+                   << " with no corresponding probability function"
+                   << " " << function_name << "_lpdf"
+                   << ", " << function_name << "_lpmf"
+                   << ", or " << function_name << "_log" << std::endl;
         return;
       }
 
@@ -1194,7 +1371,6 @@ namespace stan {
           return;
         }
       }
-
       pass = true;
     }
     boost::phoenix::function<validate_sample> validate_sample_f;
@@ -1335,14 +1511,25 @@ namespace stan {
     boost::phoenix::function<validate_non_void_expression>
     validate_non_void_expression_f;
 
-
-    void add_line_number::operator()(statement& stmt,
-                                     const pos_iterator_t& begin,
-                                     const pos_iterator_t& end) const {
-      stmt.begin_line_ = get_line(begin);
-      stmt.end_line_ = get_line(end);
+    template <typename T, typename I>
+    void add_line_number::operator()(T& line,
+                                     const I& begin,
+                                     const I& end) const {
+      line.begin_line_ = get_line(begin);
+      line.end_line_ = get_line(end);
     }
-    boost::phoenix::function<add_line_number> add_line_number_f;
+    boost::phoenix::function<add_line_number>
+    add_line_number_f;
+
+    template void add_line_number::operator()(var_decl&,
+                                              const pos_iterator_t& begin,
+                                              const pos_iterator_t& end) const;
+
+
+    template void add_line_number::operator()(statement&,
+                                              const pos_iterator_t& begin,
+                                              const pos_iterator_t& end) const;
+
 
     void set_void_return::operator()(return_statement& s) const {
       s = return_statement();
@@ -1373,12 +1560,12 @@ namespace stan {
       pass = true;
       // test function argument type
       expr_type sys_result_type(DOUBLE_T, 1);
-      std::vector<expr_type> sys_arg_types;
-      sys_arg_types.push_back(expr_type(DOUBLE_T, 0));
-      sys_arg_types.push_back(expr_type(DOUBLE_T, 1));
-      sys_arg_types.push_back(expr_type(DOUBLE_T, 1));
-      sys_arg_types.push_back(expr_type(DOUBLE_T, 1));
-      sys_arg_types.push_back(expr_type(INT_T, 1));
+      std::vector<function_arg_type> sys_arg_types;
+      sys_arg_types.push_back(function_arg_type(expr_type(DOUBLE_T, 0)));
+      sys_arg_types.push_back(function_arg_type(expr_type(DOUBLE_T, 1)));
+      sys_arg_types.push_back(function_arg_type(expr_type(DOUBLE_T, 1)));
+      sys_arg_types.push_back(function_arg_type(expr_type(DOUBLE_T, 1)));
+      sys_arg_types.push_back(function_arg_type(expr_type(INT_T, 1)));
       function_signature_t system_signature(sys_result_type, sys_arg_types);
       if (!function_signatures::instance()
           .is_defined(ode_fun.system_function_name_, system_signature)) {
@@ -1535,9 +1722,156 @@ namespace stan {
     boost::phoenix::function<validate_integrate_ode_control>
     validate_integrate_ode_control_f;
 
+    template <class T>
+    void validate_algebra_solver_non_control_args(const T& alg_fun,
+                                                  const variable_map& var_map,
+                                                  bool& pass,
+                                                  std::ostream& error_msgs) {
+      pass = true;
+      // test function argument type
+      expr_type sys_result_type(VECTOR_T, 0);
+      std::vector<function_arg_type> sys_arg_types;
+      sys_arg_types.push_back(function_arg_type(expr_type(VECTOR_T,
+                                                          0), true));  // y
+      sys_arg_types.push_back(function_arg_type(expr_type(VECTOR_T,
+                                                          0)));  // theta
+      sys_arg_types.push_back(function_arg_type(expr_type(DOUBLE_T,
+                                                          1), true));  // x_r
+      sys_arg_types.push_back(function_arg_type(expr_type(INT_T,
+                                                          1)));  // x_i
+      function_signature_t system_signature(sys_result_type, sys_arg_types);
+      if (!function_signatures::instance()
+          .is_defined(alg_fun.system_function_name_, system_signature)) {
+        error_msgs << "first argument to "
+                   << "algebra_solver"
+                   << " must be the name of a function with signature"
+                   << " (vector, vector, real[], int[]) : vector "
+                   << std::endl;
+        pass = false;
+      }
+
+      // test regular argument types
+      if (alg_fun.y_.expression_type() != expr_type(VECTOR_T, 0)) {
+        error_msgs << "second argument to algebra_solver"
+                   << " must have type vector for initial guess;"
+                   << " found type = "
+                   << alg_fun.y_.expression_type()
+                   << ". " << std::endl;
+        pass = false;
+      }
+      if (alg_fun.theta_.expression_type() != expr_type(VECTOR_T, 0)) {
+        error_msgs << "third argument to algebra_solver"
+                   << " must have type vector for parameters;"
+                   << " found type = "
+                   << alg_fun.theta_.expression_type()
+                   << ". " << std::endl;
+        pass = false;
+      }
+      if (alg_fun.x_r_.expression_type() != expr_type(DOUBLE_T, 1)) {
+        error_msgs << "fourth argument to algebra_solver"
+                   << " must have type real[] for real data;"
+                   << " found type = "
+                   << alg_fun.x_r_.expression_type()
+                   << ". " << std::endl;
+        pass = false;
+      }
+      if (alg_fun.x_i_.expression_type() != expr_type(INT_T, 1)) {
+        error_msgs << "fifth argument to algebra_solver"
+                   << " must have type int[] for integer data;"
+                   << " found type = "
+                   << alg_fun.x_i_.expression_type()
+                   << ". " << std::endl;
+        pass = false;
+      }
+
+      // test data-only variables do not have parameters (int locals OK)
+      if (has_var(alg_fun.y_, var_map)) {
+        error_msgs << "second argument to algebra_solver"
+                   << " (initial guess)"
+                   << " must be data only and not reference parameters"
+                   << std::endl;
+        pass = false;
+      }
+      if (has_var(alg_fun.x_r_, var_map)) {
+        error_msgs << "fourth argument to algebra_solver"
+                   << " (real data)"
+                   << " must be data only and not reference parameters"
+                   << std::endl;
+        pass = false;
+      }
+    }
+
+    void validate_algebra_solver::operator()(const algebra_solver& alg_fun,
+                                             const variable_map& var_map,
+                                             bool& pass,
+                                             std::ostream& error_msgs) const {
+      validate_algebra_solver_non_control_args(alg_fun, var_map, pass,
+                                               error_msgs);
+    }
+    boost::phoenix::function<validate_algebra_solver>
+      validate_algebra_solver_f;
+
+    void validate_algebra_solver_control::operator()(
+                      const algebra_solver_control& alg_fun,
+                      const variable_map& var_map, bool& pass,
+                      std::ostream& error_msgs) const {
+      validate_algebra_solver_non_control_args(alg_fun, var_map, pass,
+                                              error_msgs);
+      if (!alg_fun.rel_tol_.expression_type().is_primitive()) {
+        error_msgs << "sixth argument to algebra_solver "
+                   << " (relative tolerance) must have type real or int;"
+                   << " found type="
+                   << alg_fun.rel_tol_.expression_type()
+                   << ". " << std::endl;
+        pass = false;
+      }
+      if (!alg_fun.fun_tol_.expression_type().is_primitive()) {
+        error_msgs << "seventh argument to algebra_solver "
+                   << " (function tolerance) must have type real or int;"
+                   << " found type="
+                   << alg_fun.fun_tol_.expression_type()
+                   << ". " << std::endl;
+        pass = false;
+      }
+      if (!alg_fun.max_num_steps_.expression_type().is_primitive()) {
+        error_msgs << "eighth argument to algebra_solver"
+                   << " (max number of steps) must have type real or int;"
+                   << " found type="
+                   << alg_fun.max_num_steps_.expression_type()
+                   << ". " << std::endl;
+        pass = false;
+      }
+
+      // test data-only variables do not have parameters (int locals OK)
+      if (has_var(alg_fun.rel_tol_, var_map)) {
+        error_msgs << "sixth argument to algebra_solver"
+                   << " (relative tolerance) must be data only"
+                   << " and not depend on parameters"
+                   << std::endl;
+        pass = false;
+      }
+      if (has_var(alg_fun.fun_tol_, var_map)) {
+        error_msgs << "seventh argument to algebra_solver"
+                   << " (function tolerance ) must be data only"
+                   << " and not depend parameters"
+                   << std::endl;
+        pass = false;
+      }
+      if (has_var(alg_fun.max_num_steps_, var_map)) {
+        error_msgs << "eighth argument to algebra_solver"
+                   << " (max number of steps) must be data only"
+                   << " and not depend on parameters" << std::endl;
+        pass = false;
+      }
+    }
+    boost::phoenix::function<validate_algebra_solver_control>
+    validate_algebra_solver_control_f;
+
+
     void set_fun_type_named::operator()(expression& fun_result, fun& fun,
                                         const scope& var_scope,
                                         bool& pass,
+                                        const variable_map& var_map,
                                         std::ostream& error_msgs) const {
       if (fun.name_ == "get_lp")
         error_msgs << "Warning (non-fatal): get_lp() function deprecated."
@@ -1555,19 +1889,42 @@ namespace stan {
 
       fun.type_ = function_signatures::instance()
         .get_result_type(fun.name_, arg_types, error_msgs);
+
       if (fun.type_ == ILL_FORMED_T) {
         pass = false;
         return;
       }
 
+      // get function definition for this functiion
+      std::vector<function_arg_type> fun_arg_types;
+      for (size_t i = 0; i < fun.args_.size(); ++i)
+        fun_arg_types.push_back(function_arg_type(arg_types[i]));
+      function_signature_t sig(fun.type_, fun_arg_types);
+      function_signature_t decl_sig =
+        function_signatures::instance().get_definition(fun.name_, sig);
+      if (!decl_sig.first.is_ill_formed()) {
+        for (size_t i = 0; i < fun_arg_types.size(); ++i) {
+          if (decl_sig.second[i].data_only_
+              && has_var(fun.args_[i], var_map)) {
+            error_msgs << "Function argument error, function: "
+                       << fun.name_ << ", argument: " << (i + 1)
+                       << " must be data only, "
+                       << "found expression containing a parameter varaible."
+                       << std::endl;
+            pass = false;
+            return;
+          }
+        }
+      }
+
       // disjunction so only first match triggered
       deprecate_fun("binomial_coefficient_log", "lchoose", fun, error_msgs)
-      || deprecate_fun("multiply_log", "lmultiply", fun, error_msgs)
-      || deprecate_suffix("_cdf_log", "'_lcdf'", fun, error_msgs)
-      || deprecate_suffix("_ccdf_log", "'_lccdf'", fun, error_msgs)
-      || deprecate_suffix("_log",
-              "'_lpdf' for density functions or '_lpmf' for mass functions",
-              fun, error_msgs);
+        || deprecate_fun("multiply_log", "lmultiply", fun, error_msgs)
+        || deprecate_suffix("_cdf_log", "'_lcdf'", fun, error_msgs)
+        || deprecate_suffix("_ccdf_log", "'_lccdf'", fun, error_msgs)
+        || deprecate_suffix("_log",
+             "'_lpdf' for density functions or '_lpmf' for mass functions",
+             fun, error_msgs);
 
       // add stan::math:: qualifier for built-in nullary and math.h
       qualify_builtins(fun);
@@ -2224,6 +2581,13 @@ namespace stan {
       return boost::apply_visitor(*this, x.y0_.expr_)
         && boost::apply_visitor(*this, x.theta_.expr_);
     }
+    bool data_only_expression::operator()(const algebra_solver& x) const {
+      return boost::apply_visitor(*this, x.theta_.expr_);
+    }
+    bool data_only_expression::operator()(const algebra_solver_control& x)
+      const {
+      return boost::apply_visitor(*this, x.theta_.expr_);
+    }
     bool data_only_expression::operator()(const fun& x) const {
       for (size_t i = 0; i < x.args_.size(); ++i)
         if (!boost::apply_visitor(*this, x.args_[i].expr_))
@@ -2726,6 +3090,11 @@ namespace stan {
     }
     boost::phoenix::function<set_var_scope> set_var_scope_f;
 
+    void set_data_origin::operator()(scope& var_scope) const {
+      var_scope = scope(data_origin);
+    }
+    boost::phoenix::function<set_data_origin> set_data_origin_f;
+
     void set_var_scope_local::operator()(scope& var_scope,
                                          const origin_block& program_block)
       const {
@@ -2740,6 +3109,18 @@ namespace stan {
       var_scope = scope(enclosing_block, true);
     }
     boost::phoenix::function<reset_var_scope> reset_var_scope_f;
+
+    void trace::operator()(const std::string& msg) const {
+    }
+    boost::phoenix::function<trace> trace_f;
+
+    void deprecate_pound_comment::operator()(std::ostream& error_msgs) const {
+      error_msgs << "Warning (non-fatal): Comments beginning with #"
+                 << " are deprecated.  Please use // in place of #"
+                 << " for line comments." << std::endl;
+    }
+    boost::phoenix::function<deprecate_pound_comment>
+    deprecate_pound_comment_f;
 
   }
 }
