@@ -18,10 +18,20 @@ namespace stan {
       : base_type_(base_type), order_id_(T::ORDER_ID) {
     }
 
-    // only void_type requires explicit instantiation of templated constructor
+    // explicit instantiation of templated constructors
+    //! \relates stan::lang::base_expr_type
+    template stan::lang::base_expr_type::base_expr_type(const ill_formed_type&);
     //! \relates stan::lang::base_expr_type
     template stan::lang::base_expr_type::base_expr_type(const void_type&);
-
+    //! \relates stan::lang::base_expr_type
+    template stan::lang::base_expr_type::base_expr_type(const int_type&);
+    //! \relates stan::lang::base_expr_type
+    template stan::lang::base_expr_type::base_expr_type(const double_type&);
+    //! \relates stan::lang::base_expr_type
+    template stan::lang::base_expr_type::base_expr_type(const vector_type&);
+    //! \relates stan::lang::base_expr_type
+    template stan::lang::base_expr_type::base_expr_type(const row_vector_type&);
+    
     bool base_expr_type::is_ill_formed_type() const {
       return order_id_ == ill_formed_type::ORDER_ID;
     }
