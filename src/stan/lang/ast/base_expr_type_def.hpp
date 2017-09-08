@@ -18,6 +18,8 @@ namespace stan {
       : base_type_(base_type), order_id_(T::ORDER_ID) {
     }
 
+    // only void_type requires explicit instantiation of templated constructor
+    //! \relates stan::lang::base_expr_type
     template stan::lang::base_expr_type::base_expr_type(const void_type&);
 
     bool base_expr_type::is_ill_formed_type() const {

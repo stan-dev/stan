@@ -52,7 +52,7 @@ namespace stan {
       /**
        * Construct a base expression type with the specified base type.
        *
-       * @param base_type base type
+       * @param x base type
        */
       base_expr_type(const base_expr_type& x);  // NOLINT(runtime/explicit)
 
