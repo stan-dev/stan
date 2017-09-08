@@ -23,7 +23,7 @@ STAN ?=
 MATH ?= lib/stan_math/
 
 -include $(MATH)make/default_compiler_options
-CXXFLAGS += -I src -isystem $(MATH) -DFUSION_MAX_VECTOR_SIZE=12 -Wno-unused-local-typedefs
+CXXFLAGS += -I src -isystem $(MATH) -DFUSION_MAX_VECTOR_SIZE=12 -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION -Wno-unused-local-typedefs
 LDLIBS_STANC = -Lbin -lstanc
 
 -include $(HOME)/.config/stan/make.local  # define local variables
