@@ -31,7 +31,7 @@ namespace stan {
     template stan::lang::base_expr_type::base_expr_type(const vector_type&);
     //! \relates stan::lang::base_expr_type
     template stan::lang::base_expr_type::base_expr_type(const row_vector_type&);
-    
+
     bool base_expr_type::is_ill_formed_type() const {
       return order_id_ == ill_formed_type::ORDER_ID;
     }
