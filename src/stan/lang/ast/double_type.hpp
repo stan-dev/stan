@@ -8,6 +8,12 @@ namespace stan {
      * Double base expression type.
      */
     struct double_type {
+      static const int ORDER_ID = 3;
+
+      /**
+       * Fixed numerical ID used for sorting.
+       */
+      int order_id_;
     };
 
   }

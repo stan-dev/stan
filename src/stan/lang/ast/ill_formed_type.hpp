@@ -8,8 +8,15 @@ namespace stan {
      * Ill_Formed base expression type.
      */
     struct ill_formed_type {
+      static const int ORDER_ID = 0;
+
+      /**
+       * Fixed numerical ID used for sorting.
+       */
+      int order_id_;
     };
 
   }
 }
 #endif
+

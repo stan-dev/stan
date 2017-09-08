@@ -8,6 +8,12 @@ namespace stan {
      * Vector base expression type.
      */
     struct vector_type {
+      static const int ORDER_ID = 4;
+
+      /**
+       * Fixed numerical ID used for sorting.
+       */
+      int order_id_;
     };
 
   }

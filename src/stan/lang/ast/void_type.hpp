@@ -8,6 +8,12 @@ namespace stan {
      * Void base expression type.
      */
     struct void_type {
+      static const int ORDER_ID = 1;
+
+      /**
+       * Fixed numerical ID used for sorting.
+       */
+      int order_id_;
     };
 
   }

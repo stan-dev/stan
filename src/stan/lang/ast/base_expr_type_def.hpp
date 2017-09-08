@@ -6,48 +6,16 @@
 namespace stan {
   namespace lang {
 
-    base_expr_type::base_expr_type()
-      : base_type_(ill_formed_type())  {
+    base_expr_type::base_expr_type() : base_type_(ill_formed_type()) {
     }
 
-    base_expr_type::base_expr_type(const base_expr_type_t&
-                                   base_type)
-      : base_type_(base_type) {
+    base_expr_type::base_expr_type(const base_expr_type& x)
+      : base_type_(x.base_type_), order_id_(x.order_id_) {
     }
 
-    base_expr_type::base_expr_type(const ill_formed_type&
-                                   base_type)
-      : base_type_(base_type) {
-    }
-
-    base_expr_type::base_expr_type(const void_type&
-                                   base_type)
-      : base_type_(base_type) {
-    }
-
-    base_expr_type::base_expr_type(const int_type&
-                                   base_type)
-      : base_type_(base_type) {
-    }
-
-    base_expr_type::base_expr_type(const double_type&
-                                   base_type)
-      : base_type_(base_type) {
-    }
-
-    base_expr_type::base_expr_type(const vector_type&
-                                   base_type)
-      : base_type_(base_type) {
-    }
-
-    base_expr_type::base_expr_type(const row_vector_type&
-                                   base_type)
-      : base_type_(base_type) {
-    }
-
-    base_expr_type::base_expr_type(const matrix_type&
-                                   base_type)
-      : base_type_(base_type) {
+    template <typename T>
+    base_expr_type::base_expr_type(const T& base_type)
+      : base_type_(base_type), order_id_(T::ORDER_ID) {
     }
 
     bool base_expr_type::is_ill_formed_type() const {
@@ -86,7 +54,7 @@ namespace stan {
     }
 
     bool base_expr_type::operator==(const base_expr_type& base_type) const {
-      if ((is_ill_formed_type() &&
+      return ((is_ill_formed_type() &&
            base_type.is_ill_formed_type())
           || (is_void_type() &&
               base_type.is_void_type())
@@ -99,80 +67,27 @@ namespace stan {
           || (is_row_vector_type() &&
               base_type.is_row_vector_type())
           || (is_matrix_type() &&
-              base_type.is_matrix_type()))
-        return true;
-      return false;
+              base_type.is_matrix_type()));
     }
 
     bool base_expr_type::operator!=(const base_expr_type& base_type) const {
-      if ((is_ill_formed_type() &&
-           base_type.is_ill_formed_type())
-          || (is_void_type() &&
-              base_type.is_void_type())
-          || (is_int_type() &&
-              base_type.is_int_type())
-          || (is_double_type() &&
-              base_type.is_double_type())
-          || (is_vector_type() &&
-              base_type.is_vector_type())
-          || (is_row_vector_type() &&
-              base_type.is_row_vector_type())
-          || (is_matrix_type() &&
-              base_type.is_matrix_type()))
-        return false;
-      return true;
+      return !(*this == base_type);
     }
 
     bool base_expr_type::operator<(const base_expr_type& base_type) const {
-      if (is_ill_formed_type()) {
-        if (base_type.is_ill_formed_type()) return false;
-        return true;
-      } else if (is_void_type()) {
-        if (base_type.is_ill_formed_type()
-            || base_type.is_void_type()) return false;
-        return true;
-      } else if (is_int_type()) {
-        if (base_type.is_ill_formed_type()
-            || base_type.is_void_type()
-            || base_type.is_int_type()) return false;
-        return true;
-      } else if (is_double_type()) {
-        if (base_type.is_ill_formed_type()
-            || base_type.is_void_type()
-            || base_type.is_int_type()
-            || base_type.is_double_type()) return false;
-        return true;
-      } else if (is_vector_type()) {
-        if (base_type.is_ill_formed_type()
-            || base_type.is_void_type()
-            || base_type.is_int_type()
-            || base_type.is_double_type()
-            || base_type.is_vector_type()) return false;
-        return true;
-      } else if (is_row_vector_type()) {
-        if (base_type.is_ill_formed_type()
-            || base_type.is_void_type()
-            || base_type.is_int_type()
-            || base_type.is_double_type()
-            || base_type.is_vector_type()
-            || base_type.is_row_vector_type()) return false;
-        return true;
-      } else {
-        return false;
-      }
+      return order_id_ < base_type.order_id_;
     }
 
     bool base_expr_type::operator>(const base_expr_type& base_type) const {
-      return !(base_expr_type(base_type_) == base_type
-               || base_expr_type(base_type_) < base_type);
+      return order_id_ > base_type.order_id_;
     }
+
     bool base_expr_type::operator<=(const base_expr_type& base_type) const {
-      return (base_expr_type(base_type_) == base_type
-              || base_expr_type(base_type_) < base_type);
+      return !(order_id_ > base_type.order_id_);
     }
 
     bool base_expr_type::operator>=(const base_expr_type& base_type) const {
-      return !(base_expr_type(base_type_) < base_type);
+      return !(order_id_ < base_type.order_id_);
     }
 
   }
