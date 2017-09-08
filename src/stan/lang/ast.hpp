@@ -18,16 +18,9 @@
 #include <stan/lang/ast/fun/has_non_param_var_vis.hpp>
 #include <stan/lang/ast/fun/has_prob_fun_suffix.hpp>
 #include <stan/lang/ast/fun/has_var_vis.hpp>
-#include <stan/lang/ast/fun/is_double_type_vis.hpp>
-#include <stan/lang/ast/fun/is_ill_formed_type_vis.hpp>
-#include <stan/lang/ast/fun/is_int_type_vis.hpp>
-#include <stan/lang/ast/fun/is_matrix_type_vis.hpp>
 #include <stan/lang/ast/fun/is_multi_index_vis.hpp>
 #include <stan/lang/ast/fun/is_no_op_statement_vis.hpp>
 #include <stan/lang/ast/fun/is_nil_vis.hpp>
-#include <stan/lang/ast/fun/is_row_vector_type_vis.hpp>
-#include <stan/lang/ast/fun/is_vector_type_vis.hpp>
-#include <stan/lang/ast/fun/is_void_type_vis.hpp>
 #include <stan/lang/ast/fun/name_vis.hpp>
 #include <stan/lang/ast/fun/returns_type_vis.hpp>
 #include <stan/lang/ast/fun/strip_ccdf_suffix.hpp>

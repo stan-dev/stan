@@ -18,60 +18,42 @@ namespace stan {
       : base_type_(base_type), order_id_(T::ORDER_ID) {
     }
 
+    template stan::lang::base_expr_type::base_expr_type(const void_type&);
+
     bool base_expr_type::is_ill_formed_type() const {
-      is_ill_formed_type_vis v;
-      return boost::apply_visitor(v, base_type_);
+      return order_id_ == ill_formed_type::ORDER_ID;
     }
 
     bool base_expr_type::is_void_type() const {
-      is_void_type_vis v;
-      return boost::apply_visitor(v, base_type_);
+      return order_id_ == void_type::ORDER_ID;
     }
 
     bool base_expr_type::is_int_type() const {
-      is_int_type_vis v;
-      return boost::apply_visitor(v, base_type_);
+      return order_id_ == int_type::ORDER_ID;
     }
 
     bool base_expr_type::is_double_type() const {
-      is_double_type_vis v;
-      return boost::apply_visitor(v, base_type_);
+      return order_id_ == double_type::ORDER_ID;
     }
 
     bool base_expr_type::is_vector_type() const {
-      is_vector_type_vis v;
-      return boost::apply_visitor(v, base_type_);
+      return order_id_ == vector_type::ORDER_ID;
     }
 
     bool base_expr_type::is_row_vector_type() const {
-      is_row_vector_type_vis v;
-      return boost::apply_visitor(v, base_type_);
+      return order_id_ == row_vector_type::ORDER_ID;
     }
 
     bool base_expr_type::is_matrix_type() const {
-      is_matrix_type_vis v;
-      return boost::apply_visitor(v, base_type_);
+      return order_id_ == matrix_type::ORDER_ID;
     }
 
     bool base_expr_type::operator==(const base_expr_type& base_type) const {
-      return ((is_ill_formed_type() &&
-           base_type.is_ill_formed_type())
-          || (is_void_type() &&
-              base_type.is_void_type())
-          || (is_int_type() &&
-              base_type.is_int_type())
-          || (is_double_type() &&
-              base_type.is_double_type())
-          || (is_vector_type() &&
-              base_type.is_vector_type())
-          || (is_row_vector_type() &&
-              base_type.is_row_vector_type())
-          || (is_matrix_type() &&
-              base_type.is_matrix_type()));
+      return order_id_ == base_type.order_id_;
     }
 
     bool base_expr_type::operator!=(const base_expr_type& base_type) const {
-      return !(*this == base_type);
+      return order_id_ != base_type.order_id_;
     }
 
     bool base_expr_type::operator<(const base_expr_type& base_type) const {

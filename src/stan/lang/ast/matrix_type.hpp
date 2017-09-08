@@ -9,11 +9,6 @@ namespace stan {
      */
     struct matrix_type {
       static const int ORDER_ID = 6;
-
-      /**
-       * Fixed numerical ID used for sorting.
-       */
-      int order_id_;
     };
 
   }

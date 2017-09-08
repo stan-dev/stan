@@ -9,11 +9,6 @@ namespace stan {
      */
     struct row_vector_type {
       static const int ORDER_ID = 5;
-
-      /**
-       * Fixed numerical ID used for sorting.
-       */
-      int order_id_;
     };
 
   }
