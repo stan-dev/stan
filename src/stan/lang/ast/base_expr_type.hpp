@@ -57,12 +57,53 @@ namespace stan {
       base_expr_type(const base_expr_type& x);  // NOLINT(runtime/explicit)
 
       /**
-       * Construct a base expression type from from a variant base type.
+       * Construct a base expression type from an ill formed base type.
        *
-       * @param base_type base type
+       * @param x base type
        */
-      template <typename T>
-      base_expr_type(const T& base_type);  // NOLINT(runtime/explicit)
+      base_expr_type(const ill_formed_type& x);  // NOLINT(runtime/explicit)
+
+      /**
+       * Construct a base expression type from a void base type.
+       *
+       * @param x base type
+       */
+      base_expr_type(const void_type& x);  // NOLINT(runtime/explicit)
+
+      /**
+       * Construct a base expression type from an int base type.
+       *
+       * @param x base type
+       */
+      base_expr_type(const int_type& x);  // NOLINT(runtime/explicit)
+
+      /**
+       * Construct a base expression type from a double base type.
+       *
+       * @param x base type
+       */
+      base_expr_type(const double_type& x);  // NOLINT(runtime/explicit)
+
+      /**
+       * Construct a base expression type from a vector base type.
+       *
+       * @param x base type
+       */
+      base_expr_type(const vector_type& x);  // NOLINT(runtime/explicit)
+
+      /**
+       * Construct a base expression type from a row vector base type.
+       *
+       * @param x base type
+       */
+      base_expr_type(const row_vector_type& x);  // NOLINT(runtime/explicit)
+
+      /**
+       * Construct a base expression type from a matrix base type.
+       *
+       * @param x base type
+       */
+      base_expr_type(const matrix_type& x);  // NOLINT(runtime/explicit)
 
       /**
        * Return true if the specified base expression type is the same as
