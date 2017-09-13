@@ -34,7 +34,7 @@ namespace stan {
      */
     bool compile(std::ostream* msgs, std::istream& in, std::ostream& out,
                  const std::string& name, const bool allow_undefined = false,
-                 const std::string& filename = "unkown file name",
+                 const std::string& filename = "unknown file name",
                  const std::vector<std::string>& include_paths
                   = std::vector<std::string>()) {
       io::program_reader reader(in, filename, include_paths);
