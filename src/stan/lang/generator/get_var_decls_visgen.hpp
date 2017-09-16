@@ -36,11 +36,13 @@ namespace stan {
       void operator()(const nil& /*x*/) const { }
 
       void operator()(const int_var_decl& x) const {
-        push_back_var_decl("int", x.name_, x.dims_.size());
+        push_back_var_decl("int", x.name_, x.dims_.size(),
+                           x.range_.has_low(), x.range.has_high());
       }
 
       void operator()(const double_var_decl& x) const {
-        push_back_var_decl("real", x.name_, x.dims_.size());
+        push_back_var_decl("real", x.name_, x.dims_.size(),
+                           x.range_.has_low(), x.range.has_high());
       }
 
       void operator()(const unit_vector_var_decl& x) const {
@@ -60,15 +62,19 @@ namespace stan {
       }
 
       void operator()(const vector_var_decl& x) const {
-        push_back_var_decl("vector", x.name_, x.dims_.size());
+        push_back_var_decl("vector", x.name_, x.dims_.size(),
+                           x.range_.has_low(), x.range.has_high());
+
       }
 
       void operator()(const row_vector_var_decl& x) const {
-        push_back_var_decl("row_vector", x.name_, x.dims_.size());
+        push_back_var_decl("row_vector", x.name_, x.dims_.size(),
+                           x.range_.has_low(), x.range.has_high());
       }
 
       void operator()(const matrix_var_decl& x) const {
-        push_back_var_decl("matrix", x.name_, x.dims_.size());
+        push_back_var_decl("matrix", x.name_, x.dims_.size(),
+                           x.range_.has_low(), x.range.has_high());
       }
 
       void operator()(const cholesky_factor_var_decl& x) const {
