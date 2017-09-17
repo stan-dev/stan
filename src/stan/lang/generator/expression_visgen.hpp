@@ -8,6 +8,7 @@
 #include <stan/lang/generator/generate_type.hpp>
 #include <stan/lang/generator/visgen.hpp>
 #include <boost/lexical_cast.hpp>
+#include <iostream>
 #include <ostream>
 #include <string>
 #include <vector>
@@ -104,7 +105,7 @@ namespace stan {
       void operator()(const std::string& x) const { o_ << x; }  // identifiers
       void operator()(const index_op& x) const {
         std::stringstream expr_o;
-        generate_expression(x.expr_, expr_o);
+        generate_expression(x.expr_, user_facing_, is_var_context_, expr_o);
         std::string expr_string = expr_o.str();
         std::vector<expression> indexes;
         size_t e_num_dims = x.expr_.expression_type().num_dims_;
@@ -117,22 +118,22 @@ namespace stan {
       }
       void operator()(const index_op_sliced& x) const {
         if (x.idxs_.size() == 0) {
-          generate_expression(x.expr_, user_facing_, o_);
+          generate_expression(x.expr_, user_facing_, is_var_context_, o_);
           return;
         }
         if (user_facing_) {
-          generate_expression(x.expr_, user_facing_, o_);
+          generate_expression(x.expr_, user_facing_, is_var_context_, o_);
           generate_idxs_user(x.idxs_, o_);
           return;
         }
         o_ << "stan::model::rvalue(";
-        generate_expression(x.expr_, o_);
+        generate_expression(x.expr_, user_facing_, is_var_context_, o_);
         o_ << ", ";
         generate_idxs(x.idxs_, o_);
         o_ << ", ";
         o_ << '"';
         bool user_facing = true;
-        generate_expression(x.expr_, user_facing, o_);
+        generate_expression(x.expr_, user_facing, is_var_context_, o_);
         o_ << '"';
         o_ << ")";
       }
@@ -150,7 +151,7 @@ namespace stan {
         o_ << ", ";
         generate_expression(fx.ts_, o_);
         o_ << ", ";
-        generate_expression(fx.theta_, o_);
+        generate_expression(fx.theta_, user_facing_, is_var_context_, o_);
         o_ << ", ";
         generate_expression(fx.x_, o_);
         o_ << ", ";
@@ -169,7 +170,7 @@ namespace stan {
         o_ << ", ";
         generate_expression(fx.ts_, o_);
         o_ << ", ";
-        generate_expression(fx.theta_, o_);
+        generate_expression(fx.theta_, user_facing_, is_var_context_, o_);
         o_ << ", ";
         generate_expression(fx.x_, o_);
         o_ << ", ";
@@ -190,7 +191,7 @@ namespace stan {
            << "_functor__(), ";
         generate_expression(fx.y_, o_);
         o_ << ", ";
-        generate_expression(fx.theta_, o_);
+        generate_expression(fx.theta_, user_facing_, is_var_context_, o_);
         o_ << ", ";
         generate_expression(fx.x_r_, o_);
         o_ << ", ";
@@ -205,7 +206,7 @@ namespace stan {
            << "_functor__(), ";
         generate_expression(fx.y_, o_);
         o_ << ", ";
-        generate_expression(fx.theta_, o_);
+        generate_expression(fx.theta_, user_facing_, is_var_context_, o_);
         o_ << ", ";
         generate_expression(fx.x_r_, o_);
         o_ << ", ";
@@ -259,7 +260,6 @@ namespace stan {
           || (!expr.has_var_ && expr.type_.is_primitive()
               && (expr.true_val_.expression_type()
                   == expr.false_val_.expression_type()));
-
         std::stringstream ss;
         generate_real_var_type(expr.scope_, expr.has_var_,
                                is_var_context_, ss);

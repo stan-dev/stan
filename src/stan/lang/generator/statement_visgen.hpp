@@ -95,18 +95,18 @@ namespace stan {
           //                       Dist_cdf_log(L|Params))
           sso_lp << "log_diff_exp(";
           sso_lp << get_cdf(x.dist_.family_) << "(";
-          generate_expression(x.truncation_.high_.expr_, sso_lp);
+          generate_expression(x.truncation_.high_.expr_, false, is_var_context_, sso_lp);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
             sso_lp << ", ";
-            generate_expression(x.dist_.args_[i], sso_lp);
+            generate_expression(x.dist_.args_[i], false, is_var_context_, sso_lp);
           }
           if (is_user_defined)
             sso_lp << ", pstream__";
           sso_lp << "), " << get_cdf(x.dist_.family_) << "(";
-          generate_expression(x.truncation_.low_.expr_, sso_lp);
+          generate_expression(x.truncation_.low_.expr_, false, is_var_context_, sso_lp);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
             sso_lp << ", ";
-            generate_expression(x.dist_.args_[i], sso_lp);
+            generate_expression(x.dist_.args_[i], false, is_var_context_, sso_lp);
           }
           if (is_user_defined)
             sso_lp << ", pstream__";
@@ -115,10 +115,10 @@ namespace stan {
         } else if (!x.truncation_.has_low() && x.truncation_.has_high()) {
           // T[,U];  -Dist_cdf_log(U)
           sso_lp << get_cdf(x.dist_.family_) << "(";
-          generate_expression(x.truncation_.high_.expr_, sso_lp);
+          generate_expression(x.truncation_.high_.expr_, false, is_var_context_, sso_lp);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
             sso_lp << ", ";
-            generate_expression(x.dist_.args_[i], sso_lp);
+            generate_expression(x.dist_.args_[i], false, is_var_context_, sso_lp);
           }
           if (is_user_defined)
             sso_lp << ", pstream__";
@@ -127,10 +127,10 @@ namespace stan {
         } else if (x.truncation_.has_low() && !x.truncation_.has_high()) {
           // T[L,]: -Dist_ccdf_log(L)
           sso_lp << get_ccdf(x.dist_.family_) << "(";
-          generate_expression(x.truncation_.low_.expr_, sso_lp);
+          generate_expression(x.truncation_.low_.expr_, false, is_var_context_, sso_lp);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
             sso_lp << ", ";
-            generate_expression(x.dist_.args_[i], sso_lp);
+            generate_expression(x.dist_.args_[i], false, is_var_context_, sso_lp);
           }
           if (is_user_defined)
             sso_lp << ", pstream__";
@@ -143,10 +143,10 @@ namespace stan {
           o_ << "log_sum_exp(" << sso_lp.str() << ", ";
           // generate adjustment for lower-bound off by 1 due to log CCDF
           o_ << prob_fun << "(";
-          generate_expression(x.truncation_.low_.expr_, o_);
+          generate_expression(x.truncation_.low_.expr_, false, is_var_context_, o_);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
             o_ << ", ";
-            generate_expression(x.dist_.args_[i], o_);
+            generate_expression(x.dist_.args_[i], false, is_var_context_, o_);
           }
           if (is_user_defined) o_ << ", pstream__";
           o_ << "))";
@@ -255,10 +255,10 @@ namespace stan {
         std::string prob_fun = get_prob_fun(x.dist_.family_);
         generate_indent(indent_, o_);
         o_ << "lp_accum__.add(" << prob_fun << "<propto__>(";
-        generate_expression(x.expr_, o_);
+        generate_expression(x.expr_, false, is_var_context_, o_);
         for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
           o_ << ", ";
-          generate_expression(x.dist_.args_[i], o_);
+          generate_expression(x.dist_.args_[i], false, is_var_context_, o_);
         }
         bool is_user_defined
           = is_user_defined_prob_function(prob_fun, x.expr_, x.dist_.args_);
@@ -270,9 +270,9 @@ namespace stan {
         if (x.truncation_.has_low()) {
           generate_indent(indent_, o_);
           o_ << "if (";
-          generate_expression(x.expr_,  o_);
+          generate_expression(x.expr_, false, is_var_context_, o_);
           o_ << " < ";
-          generate_expression(x.truncation_.low_.expr_, o_);
+          generate_expression(x.truncation_.low_.expr_, false, is_var_context_, o_);
           o_ << ") lp_accum__.add(-std::numeric_limits<double>::infinity());"
              << EOL;
         }
@@ -280,9 +280,9 @@ namespace stan {
           generate_indent(indent_, o_);
           if (x.truncation_.has_low()) o_ << "else ";
           o_ << "if (";
-          generate_expression(x.expr_, o_);
+          generate_expression(x.expr_, false, is_var_context_, o_);
           o_ << " > ";
-          generate_expression(x.truncation_.high_.expr_, o_);
+          generate_expression(x.truncation_.high_.expr_, false, is_var_context_, o_);
           o_ << ") lp_accum__.add(-std::numeric_limits<double>::infinity());"
              << EOL;
         }
@@ -294,7 +294,7 @@ namespace stan {
       void operator()(const increment_log_prob_statement& x) const {
         generate_indent(indent_, o_);
         o_ << "lp_accum__.add(";
-        generate_expression(x.log_prob_, o_);
+        generate_expression(x.log_prob_, false, is_var_context_, o_);
         o_ << ");" << EOL;
       }
 
@@ -351,7 +351,7 @@ namespace stan {
         if (!rs.return_value_.expression_type().is_ill_formed()
             && !rs.return_value_.expression_type().is_void()) {
           o_ << "stan::math::promote_scalar<fun_return_scalar_t__>(";
-          generate_expression(rs.return_value_, o_);
+          generate_expression(rs.return_value_, false, is_var_context_, o_);
           o_ << ")";
         }
         o_ << ";" << EOL;
@@ -360,9 +360,9 @@ namespace stan {
       void operator()(const for_statement& x) const {
         generate_indent(indent_, o_);
         o_ << "for (int " << x.variable_ << " = ";
-        generate_expression(x.range_.low_, o_);
+        generate_expression(x.range_.low_, false, is_var_context_, o_);
         o_ << "; " << x.variable_ << " <= ";
-        generate_expression(x.range_.high_, o_);
+        generate_expression(x.range_.high_, false, is_var_context_, o_);
         o_ << "; ++" << x.variable_ << ") {" << EOL;
         generate_statement(x.statement_, indent_ + 1, o_, include_sampling_,
                            is_var_context_, is_fun_return_);
@@ -373,7 +373,7 @@ namespace stan {
       void operator()(const while_statement& x) const {
         generate_indent(indent_, o_);
         o_ << "while (as_bool(";
-        generate_expression(x.condition_, o_);
+        generate_expression(x.condition_, false, is_var_context_, o_);
         o_ << ")) {" << EOL;
         generate_statement(x.body_, indent_+1, o_, include_sampling_,
                            is_var_context_, is_fun_return_);
@@ -393,7 +393,7 @@ namespace stan {
           else
             o_ << " else ";
           o_ << "if (as_bool(";
-          generate_expression(x.conditions_[i], o_);
+          generate_expression(x.conditions_[i], false, is_var_context_, o_);
           o_ << ")) {" << EOL;
           generate_statement(x.bodies_[i], indent_ + 1, o_, include_sampling_,
                              is_var_context_, is_fun_return_);
