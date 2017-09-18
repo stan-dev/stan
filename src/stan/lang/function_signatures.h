@@ -38,6 +38,13 @@ add("add", MATRIX_T, DOUBLE_T, MATRIX_T);
 for (size_t i = 0; i < base_types.size(); ++i) {
   add("add", base_types[i], base_types[i]);
 }
+for (size_t i = 1; i < 8; ++i) {
+  add("append_array", expr_type(INT_T, i), expr_type(INT_T, i), expr_type(INT_T, i));
+  add("append_array", expr_type(DOUBLE_T, i), expr_type(DOUBLE_T, i), expr_type(DOUBLE_T, i));
+  add("append_array", expr_type(VECTOR_T, i), expr_type(VECTOR_T, i), expr_type(VECTOR_T, i));
+  add("append_array", expr_type(ROW_VECTOR_T, i), expr_type(ROW_VECTOR_T, i), expr_type(ROW_VECTOR_T, i));
+  add("append_array", expr_type(MATRIX_T, i), expr_type(MATRIX_T, i), expr_type(MATRIX_T, i));
+}
 add_unary_vectorized("asin");
 add_unary_vectorized("asinh");
 add_unary_vectorized("atan");
