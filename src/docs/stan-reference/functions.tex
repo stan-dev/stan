@@ -1744,7 +1744,6 @@ used to extract the dimensions of vectors and matrices.
   type \code{real[4,3]} then \code{size(x)} is 4.}
 \end{description}
 
-
 \section{Array Broadcasting}\label{array-broadcasting.section}
 
 The following operations create arrays by repeating elements to fill
@@ -1817,6 +1816,29 @@ After the assignment to \code{b}, the value for \code{b[j,k,m,n]} is
 equal to \code{a[m,n]} where it is defined, for \code{j} in \code{1:3},
 \code{k} in \code{1:4}, \code{m} in \code{1:5}, and \code{n} in
 \code{1:6}.
+
+%
+\section{Array Concatenation}\label{array-concatenation.section}
+
+\begin{description}
+\fitem{T}{append\_array}{T \farg{x}, T \farg{y}}{
+  Return the concatenation of two arrays in the order of the arguments.
+  T must be an N-dimensional array of any Stan type (with a maximum N of 8). All
+  dimensions but the first must match. }
+\end{description}
+%
+For example, the following code appends two three dimensional arrays of matrices
+together. Note that all dimensions except the first match. Any mismatches will
+cause an error to be thrown.
+%
+\begin{stancode}
+matrix[4, 6] x1[2, 1, 7];
+matrix[4, 6] x2[3, 1, 7];
+matrix[4, 6] x3[5, 1, 7];
+// ...
+x3 = append_array(x1, x2);
+\end{stancode}
+%
 
 \section{Sorting functions}\label{sorting-functions.section}
 
