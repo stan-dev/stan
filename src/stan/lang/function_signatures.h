@@ -1,5 +1,4 @@
-// included from constructor for function_signatures() in
-// src/stan/lang/ast.hpp
+// included from constructor for function_signatures() in src/stan/lang/ast.hpp
 
 std::vector<base_expr_type> base_types;
 base_types.push_back(int_type());
