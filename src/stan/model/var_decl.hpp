@@ -21,20 +21,19 @@ namespace stan {
 
     public:
       /**
-       * Construct a variable declaration with the specified name and
-       * type name.
+       * Construct a variable declaration with the specified name,
+       * type name, dimensions, and bounds.
        *
        * @param[in] name name of variable
        * @param[in] type_name name of the variable's type
        * @param[in] array_dims number of array dimensions
        * @param[in] has_lower_bound true if declaration has lower
-       * bound (default value false)
+       * bound
        * @param[in] has_upper_bound true if declaration has upper
-       * bound (default value false)
+       * bound
        */
       var_decl(const std::string& name, const std::string& type_name,
-               int array_dims, bool has_lower_bound = false,
-               bool has_upper_bound = false)
+               int array_dims, bool has_lower_bound, bool has_upper_bound)
         : name_(name), type_name_(type_name), array_dims_(array_dims),
           has_lower_bound_(has_lower_bound), has_upper_bound_(has_upper_bound)
       { }
