@@ -86,11 +86,11 @@ namespace stan {
     }
 
     bool base_expr_type::operator<=(const base_expr_type& base_type) const {
-      return !(order_id_ > base_type.order_id_);
+      return order_id_ <= base_type.order_id_;
     }
 
     bool base_expr_type::operator>=(const base_expr_type& base_type) const {
-      return !(order_id_ < base_type.order_id_);
+      return order_id_ >= base_type.order_id_;
     }
 
   }

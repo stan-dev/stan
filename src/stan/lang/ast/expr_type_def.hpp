@@ -19,10 +19,10 @@ namespace stan {
 
     expr_type::expr_type() : base_type_(ill_formed_type()), num_dims_(0) { }
 
-    expr_type::expr_type(const base_expr_type base_type)
+    expr_type::expr_type(const base_expr_type& base_type)
       : base_type_(base_type), num_dims_(0) { }
 
-    expr_type::expr_type(const base_expr_type base_type,
+    expr_type::expr_type(const base_expr_type& base_type,
                          std::size_t num_dims)
       : base_type_(base_type), num_dims_(num_dims) {  }
 
