@@ -34,7 +34,7 @@ namespace stan {
                            std::ostream& cpp_out,
                            const std::vector<std::string>& namespaces,
                            const bool allow_undefined = false,
-                           const std::string& filename = "unkown file name",
+                           const std::string& filename = "unknown file name",
                            const std::vector<std::string>& include_paths
                            = std::vector<std::string>()) {
       io::program_reader reader(stan_funcs_in, filename, include_paths);
