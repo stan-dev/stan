@@ -22,11 +22,9 @@ namespace stan {
                                 const std::vector<stan::lang::var_decl>& vs,
                                 std::ostream& o) {
       o << EOL << INDENT2 << "if (" << flag << ") {" << EOL;
-
       get_var_decls_visgen vis(o);
       for (size_t i = 0; i < vs.size(); ++i)
         boost::apply_visitor(vis, vs[i].decl_);
-
       o << INDENT2 << "}" << EOL;
     }
 
@@ -38,9 +36,8 @@ namespace stan {
      */
     void generate_get_var_decls(const stan::lang::program& prog,
                                 std::ostream& o) {
-      o << EOL
-        << EOL << INDENT << "static std::vector<stan::model::var_decl>"
-        << EOL << INDENT << "get_var_decls(bool data__,"
+      o << EOL2 << INDENT << "static std::vector<stan::model::var_decl>"
+        << EOL << INDENT << "var_decls(bool data__,"
         << EOL << INDENT3 << "bool transformed_data__,"
         << EOL << INDENT3 << "bool parameters__,"
         << EOL << INDENT3 << "bool transformed_parameters__,"
@@ -60,7 +57,7 @@ namespace stan {
 
       o << EOL << INDENT2 << "return decls__;"
         << EOL << INDENT << "}"
-        << EOL << EOL;
+        << EOL2;
     }
 
   }
