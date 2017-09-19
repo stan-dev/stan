@@ -5,6 +5,35 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v2.17.0 (05 September 2017)
+======================================================================
+
+Bug Fixes
+--------------------------------------------------
+* Call the correct unconstrain function for covariance matrices from writer
+  method (#2386)
+* Better error messages (#2280, #2359)
+* Deal better with 0-length simplexes (#2365)
+* undefined behavior with uninitialized bool (#2344)
+
+New User-Facing Features
+--------------------------------------------------
+* append_array function (#481)
+* "data" type prefix qualifier for function arguments (#2369, #2376)
+* new algebraic solver (#2380, #2300, #2339)
+* standalone functions (#2310)
+
+New Internal Features
+--------------------------------------------------
+* C++11 support (#2364)
+* Boost 1.64.0
+* Inline many functions to allow use in multiple translation units (#2082)
+
+Documentation
+--------------------------------------------------
+* Updates to the Gaussian Processes chapter in the manual (#2372)
+
+
 v2.16.0 (15 June 2017)
 ======================================================================
 
@@ -14,13 +43,11 @@ Bug Fixes
 * Check input/output streams and give better errors when files are not found (#2227)
 * Flush print outputs even in the face of a reject (#2311)
 
-
 New User-Facing Features
 --------------------------------------------------
 * New categorical_logit_rng function (#517)
 * New include mechanism for including stan code from other files (#2224)
 * New mechanism for compiling standalone Stan functions (#2267)
-
 
 New Internal Features
 --------------------------------------------------
