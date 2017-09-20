@@ -9,34 +9,25 @@
 namespace stan {
   namespace lang {
 
-
     /**
      * Visitor to generate local variable initializations.
      */
     struct local_var_init_nan_visgen : public visgen {
       /**
-       * true if the generation takes place in a variable context.
-       */
-      const bool is_var_context_;
-
-      /**
        * Construct a local variable initializer in the specified
-       * context at the specified indentation level and writing to the
+       * scope at the specified indentation level and writing to the
        * specified stream.
        *
-       * @param[in] is_var_context true if generation is in variable
-       * context
        * @param[in] indent indentation level
        * @param[in,out] o stream for generating
        */
-      local_var_init_nan_visgen(bool is_var_context, int indent,
-                                std::ostream& o)
-        : visgen(indent, o), is_var_context_(is_var_context) { }
+      local_var_init_nan_visgen(int indent, std::ostream& o)
+        : visgen(indent, o) { }
 
       /**
        * Initialize the variable or its contained elements to
        * not-a-number or the dummy variable if it's in a variable
-       * context.
+       * scope.
        *
        * @tparam T type of variable declaration
        * @param x variable declaration
@@ -45,10 +36,7 @@ namespace stan {
       void generate_init(const T& x) const {
         generate_indent(indent_, o_);
         o_ << "stan::math::initialize(" << x.name_ << ", "
-           << (is_var_context_
-               ? "DUMMY_VAR__"
-               : "std::numeric_limits<double>::quiet_NaN()")
-           << ");" << EOL;
+           << "DUMMY_VAR__" << ");" << EOL;
       }
 
       void operator()(const nil& /*x*/) const { }

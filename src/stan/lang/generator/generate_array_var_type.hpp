@@ -14,12 +14,10 @@ namespace stan {
      *
      * @param[in] base_type expression base type
      * @param[in] real_var_type context-dependent <code>real</code> type
-     * @param[in] is_var_context true when in auto-diff context
      * @param[in,out] o generated typename
      */
     void generate_array_var_type(const base_expr_type& base_type,
                                  const std::string& real_var_type,
-                                 bool is_var_context,
                                  std::ostream& o) {
       switch (base_type) {
       case INT_T :
@@ -29,19 +27,14 @@ namespace stan {
         o << real_var_type;
         break;
       case VECTOR_T :
-        o << (is_var_context
-              ? "Eigen::Matrix<T__,Eigen::Dynamic,1> "
-              : "vector_d");
+        o << "Eigen::Matrix<" << real_var_type << ",Eigen::Dynamic,1> ";
         break;
       case ROW_VECTOR_T :
-        o << (is_var_context
-              ? "Eigen::Matrix<T__,1,Eigen::Dynamic> "
-              : "row_vector_d");
+        o << "Eigen::Matrix<" << real_var_type << ",1,Eigen::Dynamic> ";
         break;
       case MATRIX_T :
-        o << (is_var_context
-              ? "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> "
-              : "matrix_d");
+        o << "Eigen::Matrix<" << real_var_type
+          << ",Eigen::Dynamic,Eigen::Dynamic> ";
         break;
       }
     }

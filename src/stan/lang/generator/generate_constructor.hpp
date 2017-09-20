@@ -47,12 +47,15 @@ namespace stan {
       o << INDENT << "void ctor_body(stan::io::var_context& context__," << EOL;
       o << INDENT << "               unsigned int random_seed__," << EOL;
       o << INDENT << "               std::ostream* pstream__) {" << EOL;
+      o << INDENT2 << "typedef double local_scalar_t__;" << EOL2;
+
       o << INDENT2 << "boost::ecuyer1988 base_rng__ =" << EOL;
       o << INDENT2 << "  stan::services::util::create_rng(random_seed__, 0);"
         << EOL;
       o << INDENT2 << "(void) base_rng__;  // suppress unused var warning"
         << EOL2;
       o << INDENT2 << "current_statement_begin__ = -1;" << EOL2;
+
       o << INDENT2 << "static const char* function__ = \""
         << model_name << "_namespace::" << model_name << "\";" << EOL;
       generate_void_statement("function__", 2, o);
@@ -61,7 +64,8 @@ namespace stan {
       o << INDENT2 << "std::vector<int> vals_i__;" << EOL;
       o << INDENT2 << "std::vector<double> vals_r__;" << EOL;
       o << INDENT2
-        << "double DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());"
+        << "local_scalar_t__ DUMMY_VAR__"
+        << "(std::numeric_limits<double>::quiet_NaN());"
         << EOL;
       o << INDENT2 << "(void) DUMMY_VAR__;  // suppress unused var warning"
         << EOL2;
@@ -76,12 +80,10 @@ namespace stan {
       o << EOL;
 
       bool include_sampling = false;
-      bool is_var_context = false;
       bool is_fun_return = false;
 
       generate_statements(prog.derived_data_decl_.second,
-                           3, o, include_sampling, is_var_context,
-                           is_fun_return);
+                           3, o, include_sampling, is_fun_return);
       o << EOL;
       generate_comment("validate transformed data", 3, o);
       generate_validate_var_decls(prog.derived_data_decl_.first, 3, o);

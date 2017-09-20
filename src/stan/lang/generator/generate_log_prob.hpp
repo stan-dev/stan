@@ -34,10 +34,12 @@ namespace stan {
         << EOL;
       o << INDENT << "             std::ostream* pstream__ = 0) const {"
         << EOL2;
+      o << INDENT2 << "typedef T__ local_scalar_t__;" << EOL2;
 
       // use this dummy for inits
       o << INDENT2
-        << "T__ DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());"
+        << "local_scalar_t__ DUMMY_VAR__"
+        << "(std::numeric_limits<double>::quiet_NaN());"
         << EOL;
       o << INDENT2 << "(void) DUMMY_VAR__;  // suppress unused var warning"
         << EOL2;
@@ -47,24 +49,22 @@ namespace stan {
       o << INDENT2 << "stan::math::accumulator<T__> lp_accum__;"
         << EOL2;
 
-      bool is_var_context = true;
       bool is_fun_return = false;
+      bool gen_local_vars = true;
       bool include_sampling = true;
 
       generate_try(2, o);
 
       generate_comment("model parameters", 3, o);
-      generate_local_var_inits(p.parameter_decl_, is_var_context, true, 3, o);
+      generate_local_var_inits(p.parameter_decl_, gen_local_vars, 3, o);
       o << EOL;
 
       generate_comment("transformed parameters", 3, o);
-      generate_local_var_decls(p.derived_decl_.first, 3, o, is_var_context,
-                               is_fun_return);
+      generate_local_var_decls(p.derived_decl_.first, 3, o, is_fun_return);
       o << EOL;
 
       generate_statements(p.derived_decl_.second,
-                           3, o, include_sampling, is_var_context,
-                           is_fun_return);
+                           3, o, include_sampling, is_fun_return);
       o << EOL;
 
       generate_validate_transformed_params(p.derived_decl_.first, 3, o);
@@ -80,8 +80,7 @@ namespace stan {
       o << EOL;
       generate_comment("model body", 3, o);
 
-      generate_statement(p.statement_, 3, o, include_sampling,
-                         is_var_context, is_fun_return);
+      generate_statement(p.statement_, 3, o, include_sampling, is_fun_return);
       o << EOL;
       generate_catch_throw_located(2, o);
 

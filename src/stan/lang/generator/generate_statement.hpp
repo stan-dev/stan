@@ -25,20 +25,16 @@ namespace stan {
      * @param[in,out] o stream for generating
      * @param[in] include_sampling true if sampling statements are
      * included
-     * @param[in] is_var_context true if in context to generate
-     * variables
      * @param[in] is_fun_return true if in context of function return
      */
     void generate_statement(const statement& s, int indent, std::ostream& o,
-                            bool include_sampling, bool is_var_context,
-                            bool is_fun_return) {
+                            bool include_sampling, bool is_fun_return) {
       is_numbered_statement_vis vis_is_numbered;
       if (boost::apply_visitor(vis_is_numbered, s.statement_)) {
         generate_indent(indent, o);
         o << "current_statement_begin__ = " << s.begin_line_ << ";" << EOL;
       }
-      statement_visgen vis(indent, include_sampling, is_var_context,
-                           is_fun_return, o);
+      statement_visgen vis(indent, include_sampling, is_fun_return, o);
       boost::apply_visitor(vis, s.statement_);
     }
 
