@@ -9,7 +9,6 @@
 #include <stan/lang/generator/generate_type.hpp>
 #include <stan/lang/generator/visgen.hpp>
 #include <boost/lexical_cast.hpp>
-#include <iostream>
 #include <ostream>
 #include <string>
 #include <vector>
