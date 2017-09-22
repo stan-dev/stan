@@ -39,8 +39,9 @@ namespace stan {
 
     /**
      * Add qualifier "stan::math::" to nullary functions defined in
-     * the Stan language.  Sets original name of specified function to
-     * name and add "stan::math::" namespace qualifier to name.
+     * the Stan language and to unary <code>abs<code>.  Sets original
+     * name of specified function to name and add "stan::math::"
+     * namespace qualifier to name.
      *
      * @param[in, out] f Function to qualify.
      */
@@ -49,7 +50,8 @@ namespace stan {
       if (f.name_ == "e" || f.name_ == "pi" || f.name_ == "log2"
           || f.name_ == "log10" || f.name_ == "sqrt2"
           || f.name_ == "not_a_number" || f.name_ == "positive_infinity"
-          || f.name_ == "negative_infinity" || f.name_ == "machine_precision")
+          || f.name_ == "negative_infinity" || f.name_ == "machine_precision"
+          || f.name_ == "abs")
         qualify(f);
     }
 
