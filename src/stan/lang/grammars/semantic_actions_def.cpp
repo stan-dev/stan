@@ -78,7 +78,7 @@ namespace stan {
           qualify(f);
       else if (f.args_.size() == 2
                && (f.name_ == "fdim" || f.name_ == "fmax" || f.name_ == "fmin"
-                   || f.name_ == "hypot" ))
+                   || f.name_ == "hypot"))
         qualify(f);
       else if (f.args_.size() == 3 && f.name_ == "fma")
         qualify(f);
