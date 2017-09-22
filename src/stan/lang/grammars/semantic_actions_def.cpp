@@ -27,8 +27,8 @@ namespace stan {
   namespace lang {
 
     /**
-     * Set original name of specified function to name and add
-     * "stan::math::" namespace qualifier to name.
+     * Set `original_name_` of specified function to `name_` then
+     * adds `stan::math::` namespace qualifier to `name_`.
      *
      * @param[in, out] f Function to qualify.
      */
@@ -38,45 +38,48 @@ namespace stan {
     }
 
     /**
-     * Add qualifier "stan::math::" to nullary functions defined in
-     * the Stan language and to unary `abs`.  Sets original
-     * name of specified function to name and add "stan::math::"
-     * namespace qualifier to name.
+     * Add namespace qualifier `stan::math::` to function names in order to
+     * avoid ambiguities for nullary functions in the Stan language which
+     * are also defined in `cmath.h` via call to function `qualify`.
      *
      * @param[in, out] f Function to qualify.
      */
     void qualify_builtins(fun& f) {
-      if ((f.args_.size() == 1 && f.name_ == "abs")
-          || (f.args_.size() > 0
-              && (f.name_ == "e" || f.name_ == "pi"
-                  || f.name_ == "log2" || f.name_ == "log10"
-                  || f.name_ == "sqrt2" || f.name_ == "not_a_number"
-                  || f.name_ == "positive_infinity"
-                  || f.name_ == "negative_infinity"
-                  || f.name_ == "machine_precision")))
+      if (f.args_.size() == 0
+          && (f.name_ == "e" || f.name_ == "pi"
+              || f.name_ == "log2" || f.name_ == "log10"
+              || f.name_ == "sqrt2" || f.name_ == "not_a_number"
+              || f.name_ == "positive_infinity"
+              || f.name_ == "negative_infinity"
+              || f.name_ == "machine_precision"))
           qualify(f);
     }
 
     /**
-     * Add namespace qualifier stan::math:: to specify Stan versions
-     * of functions to avoid ambiguities with versions defined in
-     * math.h in the top-level namespace.  Sets original name of
-     * specified function to name and add <code>stan::math::</code>
-     * namespace qualifier to name.
+     * Add namespace qualifier `stan::math::` to function names in order to
+     * avoid ambiguities for unary functions which are also defined in `cmath.h`
+     * via call to function `qualify`.
      *
      * @param[in, out] f Function to qualify.
      */
     void qualify_cpp11_builtins(fun& f) {
       if (f.args_.size() == 1
-          && (f.name_ == "acosh"|| f.name_ == "asinh" || f.name_ == "atanh"
-              || f.name_ == "exp2" || f.name_ == "expm1" || f.name_ == "log1p"
-              || f.name_ == "log2" || f.name_ == "cbrt" || f.name_ == "erf"
-              || f.name_ == "erfc" || f.name_ == "tgamma" || f.name_ == "lgamma"
-              || f.name_ == "round" || f.name_ == "trunc"))
+          && (f.name_ == "abs" || f.name_ == "acos"|| f.name_ == "acosh"
+              || f.name_ == "asin"|| f.name_ == "asinh" || f.name_ == "atan"
+              || f.name_ == "atan2" || f.name_ == "atanh" || f.name_ == "cbrt"
+              || f.name_ == "ciel" || f.name_ == "cos"|| f.name_ == "cosh"
+              || f.name_ == "erf" || f.name_ == "erfc" || f.name_ == "exp"
+              || f.name_ == "exp2" || f.name_ == "expm1" || f.name_ == "fabs"
+              || f.name_ == "floor" || f.name_ == "lgamma" || f.name_ == "log"
+              || f.name_ == "log1p" || f.name_ == "log2" || f.name_ == "log10"
+              || f.name_ == "round" || f.name_ == "sin" || f.name_ == "sinh"
+              || f.name_ == "sqrt" || f.name_ == "tan" || f.name_ == "tanh"
+              || f.name_ == "tgamma" || f.name_ == "trunc"))
           qualify(f);
       else if (f.args_.size() == 2
                && (f.name_ == "fdim" || f.name_ == "fmax" || f.name_ == "fmin"
-                   || f.name_ == "hypot"))
+                   || f.name_ == "fmod" || f.name_ == "hypot" ||
+                   f.name_ == "pow"))
         qualify(f);
       else if (f.args_.size() == 3 && f.name_ == "fma")
         qualify(f);
@@ -1929,6 +1932,7 @@ namespace stan {
         || deprecate_suffix("_log",
              "'_lpdf' for density functions or '_lpmf' for mass functions",
              fun, error_msgs);
+
 
       // add stan::math:: qualifier for built-in nullary and math.h
       qualify_builtins(fun);
