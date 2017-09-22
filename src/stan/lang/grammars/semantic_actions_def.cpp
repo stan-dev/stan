@@ -39,7 +39,7 @@ namespace stan {
 
     /**
      * Add qualifier "stan::math::" to nullary functions defined in
-     * the Stan language and to unary <code>abs<code>.  Sets original
+     * the Stan language and to unary `abs`.  Sets original
      * name of specified function to name and add "stan::math::"
      * namespace qualifier to name.
      *
