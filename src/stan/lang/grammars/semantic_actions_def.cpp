@@ -46,13 +46,15 @@ namespace stan {
      * @param[in, out] f Function to qualify.
      */
     void qualify_builtins(fun& f) {
-      if (f.args_.size() > 0) return;
-      if (f.name_ == "e" || f.name_ == "pi" || f.name_ == "log2"
-          || f.name_ == "log10" || f.name_ == "sqrt2"
-          || f.name_ == "not_a_number" || f.name_ == "positive_infinity"
-          || f.name_ == "negative_infinity" || f.name_ == "machine_precision"
-          || f.name_ == "abs")
-        qualify(f);
+      if ((f.args_.size() == 1 && f.name_ == "abs")
+          || (f.args_.size() > 0
+              && (f.name_ == "e" || f.name_ == "pi"
+                  || f.name_ == "log2" || f.name_ == "log10"
+                  || f.name_ == "sqrt2" || f.name_ == "not_a_number"
+                  || f.name_ == "positive_infinity"
+                  || f.name_ == "negative_infinity"
+                  || f.name_ == "machine_precision")))
+          qualify(f);
     }
 
     /**
