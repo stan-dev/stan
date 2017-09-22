@@ -67,7 +67,7 @@ namespace stan {
           && (f.name_ == "abs" || f.name_ == "acos"|| f.name_ == "acosh"
               || f.name_ == "asin"|| f.name_ == "asinh" || f.name_ == "atan"
               || f.name_ == "atan2" || f.name_ == "atanh" || f.name_ == "cbrt"
-              || f.name_ == "ciel" || f.name_ == "cos"|| f.name_ == "cosh"
+              || f.name_ == "cos"|| f.name_ == "cosh"
               || f.name_ == "erf" || f.name_ == "erfc" || f.name_ == "exp"
               || f.name_ == "exp2" || f.name_ == "expm1" || f.name_ == "fabs"
               || f.name_ == "floor" || f.name_ == "lgamma" || f.name_ == "log"
@@ -78,8 +78,7 @@ namespace stan {
           qualify(f);
       else if (f.args_.size() == 2
                && (f.name_ == "fdim" || f.name_ == "fmax" || f.name_ == "fmin"
-                   || f.name_ == "fmod" || f.name_ == "hypot" ||
-                   f.name_ == "pow"))
+                   || f.name_ == "hypot" ))
         qualify(f);
       else if (f.args_.size() == 3 && f.name_ == "fma")
         qualify(f);
