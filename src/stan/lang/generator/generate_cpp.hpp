@@ -12,6 +12,7 @@
 #include <stan/lang/generator/generate_functions.hpp>
 #include <stan/lang/generator/generate_get_var_decls.hpp>
 #include <stan/lang/generator/generate_get_sized_var_decls.hpp>
+#include <stan/lang/generator/generate_get_shaped_var_decls.hpp>
 #include <stan/lang/generator/generate_globals.hpp>
 #include <stan/lang/generator/generate_includes.hpp>
 #include <stan/lang/generator/generate_init_method.hpp>
@@ -77,6 +78,7 @@ namespace stan {
       generate_constrained_param_names_method(prog, o);
       generate_unconstrained_param_names_method(prog, o);
       generate_get_sized_var_decls(prog, o);
+      generate_get_shaped_var_decls(prog, o);
       generate_get_var_decls(prog, o);
       generate_class_decl_end(o);
       generate_namespace_end(o);

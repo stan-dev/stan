@@ -14,6 +14,7 @@
 #include <stan/model/indexing.hpp>
 #include <stan/model/var_decl.hpp>
 #include <stan/model/sized_var_decl.hpp>
+#include <stan/model/shaped_var_decl.hpp>
 #include <stan/services/util/create_rng.hpp>
 
 #include <boost/exception/all.hpp>

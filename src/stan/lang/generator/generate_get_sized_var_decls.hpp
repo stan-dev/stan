@@ -48,7 +48,8 @@ namespace stan {
         << EOL << INDENT2 << "vector<stan::model::sized_var_decl> decls__;";
 
       generate_get_sized_var_decls("data__", prog.data_decl_, o);
-      generate_get_sized_var_decls("transformed_data__", prog.data_decl_, o);
+      generate_get_sized_var_decls("transformed_data__",
+                                   prog.derived_data_decl_.first, o);
       generate_get_sized_var_decls("parameters__", prog.parameter_decl_, o);
       generate_get_sized_var_decls("transformed_parameters__",
                                    prog.derived_decl_.first, o);
