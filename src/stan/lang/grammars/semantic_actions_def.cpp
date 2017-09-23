@@ -43,14 +43,17 @@ namespace stan {
                || f.name_ == "machine_precision"))
           ||  (f.args_.size() == 1
                && (f.name_ == "abs" || f.name_ == "acos"|| f.name_ == "acosh"
-                   || f.name_ == "asin"|| f.name_ == "asinh" || f.name_ == "atan"
-                   || f.name_ == "atan2" || f.name_ == "atanh" || f.name_ == "cbrt"
+                   || f.name_ == "asin"|| f.name_ == "asinh"
+                   || f.name_ == "atan" || f.name_ == "atan2"
+                   || f.name_ == "atanh" || f.name_ == "cbrt"
                    || f.name_ == "ceil" || f.name_ == "cos"|| f.name_ == "cosh"
                    || f.name_ == "erf" || f.name_ == "erfc" || f.name_ == "exp"
-                   || f.name_ == "exp2" || f.name_ == "expm1" || f.name_ == "fabs"
-                   || f.name_ == "floor" || f.name_ == "lgamma" || f.name_ == "log"
-                   || f.name_ == "log1p" || f.name_ == "log2" || f.name_ == "log10"
-                   || f.name_ == "round" || f.name_ == "sin" || f.name_ == "sinh"
+                   || f.name_ == "exp2" || f.name_ == "expm1"
+                   || f.name_ == "fabs" || f.name_ == "floor"
+                   || f.name_ == "lgamma" || f.name_ == "log"
+                   || f.name_ == "log1p" || f.name_ == "log2"
+                   || f.name_ == "log10" || f.name_ == "round"
+                   || f.name_ == "sin" || f.name_ == "sinh"
                    || f.name_ == "sqrt" || f.name_ == "tan" || f.name_ == "tanh"
                    || f.name_ == "tgamma" || f.name_ == "trunc"))
           || (f.args_.size() == 2
