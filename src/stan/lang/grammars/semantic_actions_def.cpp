@@ -27,13 +27,31 @@ namespace stan {
   namespace lang {
 
     /**
-     * Add namespace qualifier `stan::math::` to function names in order to
-     * avoid ambiguities for nullary functions in the Stan language which
-     * are also defined in `cmath.h`.
+     * Add namespace qualifier `stan::math::` or `std::` to function names
+     * in order to avoid ambiguities for functions in the Stan language which
+     * are also defined in c and/or other libraries that some compilers (gcc)
+     * bring into the top-level namespace.
      *
      * @param[in, out] f Function to qualify.
      */
     void qualify_builtins(fun& f) {
+      if (fun.name_ == "max" || fun.name_ == "min") {
+        if (fun.args_.size() == 2) {
+          if (fun.args_[0].expression_type().is_primitive_int()
+              && fun.args_[1].expression_type().is_primitive_int()) {
+            fun.name_ = "std::" + fun.name_;
+            return;
+          }
+        }
+      }
+
+      if (fun.name_ == "ceil") {
+        if (fun.args_[0].expression_type().is_primitive_int()) {
+          fun.name_ = "std::" + fun.name_;
+          return;
+        }
+      }
+
       if ((f.args_.size() == 0
            && (f.name_ == "e" || f.name_ == "pi"
                || f.name_ == "log2" || f.name_ == "log10"
@@ -1952,21 +1970,6 @@ namespace stan {
         }
       }
 
-      if (fun.name_ == "max" || fun.name_ == "min") {
-        if (fun.args_.size() == 2) {
-          if (fun.args_[0].expression_type().is_primitive_int()
-              && fun.args_[1].expression_type().is_primitive_int()) {
-            fun.name_ = "std::" + fun.name_;
-          }
-        }
-      }
-
-      if (fun.name_ == "ceil") {
-        if (fun.args_[0].expression_type().is_primitive_int()) {
-          fun.name_ = "std::" + fun.name_;
-        }
-      }
-
       if (fun.name_ == "abs"
           && fun.args_.size() > 0
           && fun.args_[0].expression_type().is_primitive_double()) {
@@ -1996,7 +1999,7 @@ namespace stan {
                    << std::endl;
       }
 
-      // add stan::math:: qualifier to avoid ambiguities w/ c math fns
+      // add namespace qualifier to avoid ambiguities w/ c math fns
       qualify_builtins(fun);
 
       fun_result = fun;
