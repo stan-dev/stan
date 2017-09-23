@@ -27,61 +27,37 @@ namespace stan {
   namespace lang {
 
     /**
-     * Set `original_name_` of specified function to `name_` then
-     * adds `stan::math::` namespace qualifier to `name_`.
-     *
-     * @param[in, out] f Function to qualify.
-     */
-    void qualify(fun& f) {
-      f.original_name_ = f.name_;
-      f.name_ = "stan::math::" + f.name_;
-    }
-
-    /**
      * Add namespace qualifier `stan::math::` to function names in order to
      * avoid ambiguities for nullary functions in the Stan language which
-     * are also defined in `cmath.h` via call to function `qualify`.
+     * are also defined in `cmath.h`.
      *
      * @param[in, out] f Function to qualify.
      */
     void qualify_builtins(fun& f) {
-      if (f.args_.size() == 0
-          && (f.name_ == "e" || f.name_ == "pi"
-              || f.name_ == "log2" || f.name_ == "log10"
-              || f.name_ == "sqrt2" || f.name_ == "not_a_number"
-              || f.name_ == "positive_infinity"
-              || f.name_ == "negative_infinity"
-              || f.name_ == "machine_precision"))
-          qualify(f);
-    }
-
-    /**
-     * Add namespace qualifier `stan::math::` to function names in order to
-     * avoid ambiguities for unary functions which are also defined in `cmath.h`
-     * via call to function `qualify`.
-     *
-     * @param[in, out] f Function to qualify.
-     */
-    void qualify_cpp11_builtins(fun& f) {
-      if (f.args_.size() == 1
-          && (f.name_ == "abs" || f.name_ == "acos"|| f.name_ == "acosh"
-              || f.name_ == "asin"|| f.name_ == "asinh" || f.name_ == "atan"
-              || f.name_ == "atan2" || f.name_ == "atanh" || f.name_ == "cbrt"
-              || f.name_ == "cos"|| f.name_ == "cosh"
-              || f.name_ == "erf" || f.name_ == "erfc" || f.name_ == "exp"
-              || f.name_ == "exp2" || f.name_ == "expm1" || f.name_ == "fabs"
-              || f.name_ == "floor" || f.name_ == "lgamma" || f.name_ == "log"
-              || f.name_ == "log1p" || f.name_ == "log2" || f.name_ == "log10"
-              || f.name_ == "round" || f.name_ == "sin" || f.name_ == "sinh"
-              || f.name_ == "sqrt" || f.name_ == "tan" || f.name_ == "tanh"
-              || f.name_ == "tgamma" || f.name_ == "trunc"))
-          qualify(f);
-      else if (f.args_.size() == 2
-               && (f.name_ == "fdim" || f.name_ == "fmax" || f.name_ == "fmin"
-                   || f.name_ == "hypot"))
-        qualify(f);
-      else if (f.args_.size() == 3 && f.name_ == "fma")
-        qualify(f);
+      if ((f.args_.size() == 0
+           && (f.name_ == "e" || f.name_ == "pi"
+               || f.name_ == "log2" || f.name_ == "log10"
+               || f.name_ == "sqrt2" || f.name_ == "not_a_number"
+               || f.name_ == "positive_infinity"
+               || f.name_ == "negative_infinity"
+               || f.name_ == "machine_precision"))
+          ||  (f.args_.size() == 1
+               && (f.name_ == "abs" || f.name_ == "acos"|| f.name_ == "acosh"
+                   || f.name_ == "asin"|| f.name_ == "asinh" || f.name_ == "atan"
+                   || f.name_ == "atan2" || f.name_ == "atanh" || f.name_ == "cbrt"
+                   || f.name_ == "ceil" || f.name_ == "cos"|| f.name_ == "cosh"
+                   || f.name_ == "erf" || f.name_ == "erfc" || f.name_ == "exp"
+                   || f.name_ == "exp2" || f.name_ == "expm1" || f.name_ == "fabs"
+                   || f.name_ == "floor" || f.name_ == "lgamma" || f.name_ == "log"
+                   || f.name_ == "log1p" || f.name_ == "log2" || f.name_ == "log10"
+                   || f.name_ == "round" || f.name_ == "sin" || f.name_ == "sinh"
+                   || f.name_ == "sqrt" || f.name_ == "tan" || f.name_ == "tanh"
+                   || f.name_ == "tgamma" || f.name_ == "trunc"))
+          || (f.args_.size() == 2
+              && (f.name_ == "fdim" || f.name_ == "fmax" || f.name_ == "fmin"
+                  || f.name_ == "hypot"))
+          || (f.args_.size() == 3 && f.name_ == "fma"))
+        f.name_ = "stan::math::" + f.name_;
     }
 
     bool has_prob_suffix(const std::string& s) {
@@ -92,7 +68,6 @@ namespace stan {
     void replace_suffix(const std::string& old_suffix,
                         const std::string& new_suffix, fun& f) {
       if (!ends_with(old_suffix, f.name_)) return;
-      f.original_name_ = f.name_;
       f.name_ = f.name_.substr(0, f.name_.size() - old_suffix.size())
         + new_suffix;
     }
@@ -1933,10 +1908,6 @@ namespace stan {
              fun, error_msgs);
 
 
-      // add stan::math:: qualifier for built-in nullary and math.h
-      qualify_builtins(fun);
-      qualify_cpp11_builtins(fun);
-
       // use old function names for built-in prob funs
       if (!function_signatures::instance().has_user_defined_key(fun.name_)) {
         replace_suffix("_lpdf", "_log", fun);
@@ -1987,7 +1958,13 @@ namespace stan {
         }
       }
 
-      if (fun.name_ == "stan::math::abs"
+      if (fun.name_ == "ceil") {
+        if (fun.args_[0].expression_type().is_primitive_int()) {
+          fun.name_ = "std::" + fun.name_;
+        }
+      }
+
+      if (fun.name_ == "abs"
           && fun.args_.size() > 0
           && fun.args_[0].expression_type().is_primitive_double()) {
         error_msgs << "Warning: Function abs(real) is deprecated"
@@ -2015,6 +1992,9 @@ namespace stan {
                    << "Use the conditional operator '?:' instead."
                    << std::endl;
       }
+
+      // add stan::math:: qualifier to avoid ambiguities w/ c math fns
+      qualify_builtins(fun);
 
       fun_result = fun;
       pass = true;
