@@ -1987,7 +1987,7 @@ namespace stan {
         }
       }
 
-      if (fun.name_ == "abs"
+      if (fun.name_ == "stan::math::abs"
           && fun.args_.size() > 0
           && fun.args_[0].expression_type().is_primitive_double()) {
         error_msgs << "Warning: Function abs(real) is deprecated"
