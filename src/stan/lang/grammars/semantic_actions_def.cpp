@@ -35,21 +35,18 @@ namespace stan {
      * @param[in, out] f Function to qualify.
      */
     void qualify_builtins(fun& f) {
-      if (f.name_ == "max" || f.name_ == "min") {
-        if (f.args_.size() == 2) {
-          if (f.args_[0].expression_type().is_primitive_int()
-              && f.args_[1].expression_type().is_primitive_int()) {
-            f.name_ = "std::" + f.name_;
-            return;
-          }
-        }
+      if ((f.name_ == "max" || f.name_ == "min")
+          && f.args_.size() == 2
+          && f.args_[0].expression_type().is_primitive_int()
+          && f.args_[1].expression_type().is_primitive_int()) {
+        f.name_ = "std::" + f.name_;
+        return;
       }
-
-      if (f.name_ == "ceil") {
-        if (f.args_[0].expression_type().is_primitive_int()) {
-          f.name_ = "std::" + f.name_;
-          return;
-        }
+      
+      if (f.name_ == "ceil" 
+          && f.args_[0].expression_type().is_primitive_int()) {
+        f.name_ = "std::" + f.name_;
+        return;
       }
 
       if ((f.args_.size() == 0
