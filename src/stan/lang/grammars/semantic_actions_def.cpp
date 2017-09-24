@@ -42,8 +42,8 @@ namespace stan {
         f.name_ = "std::" + f.name_;
         return;
       }
-      
-      if (f.name_ == "ceil" 
+
+      if (f.name_ == "ceil"
           && f.args_[0].expression_type().is_primitive_int()) {
         f.name_ = "std::" + f.name_;
         return;
