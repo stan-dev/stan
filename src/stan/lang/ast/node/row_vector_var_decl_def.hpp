@@ -8,14 +8,16 @@
 namespace stan {
   namespace lang {
 
-    row_vector_var_decl::row_vector_var_decl() : base_var_decl(ROW_VECTOR_T) { }
+    row_vector_var_decl::row_vector_var_decl()
+      : base_var_decl(row_vector_type()) { }
 
     row_vector_var_decl::row_vector_var_decl(const range& range,
                                          const expression& N,
                                          const std::string& name,
                                          const std::vector<expression>& dims,
                                          const expression& def)
-      : base_var_decl(name, dims, ROW_VECTOR_T, def), range_(range), N_(N) { }
+      : base_var_decl(name, dims, row_vector_type(), def), range_(range),
+        N_(N) { }
 
   }
 }

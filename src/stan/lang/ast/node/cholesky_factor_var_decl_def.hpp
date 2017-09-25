@@ -9,7 +9,7 @@ namespace stan {
   namespace lang {
 
     cholesky_factor_var_decl::cholesky_factor_var_decl()
-      : base_var_decl(MATRIX_T) { }
+      : base_var_decl(matrix_type()) { }
 
     cholesky_factor_var_decl::cholesky_factor_var_decl(const expression& M,
                                        const expression& N,
@@ -17,7 +17,7 @@ namespace stan {
                                        const std::vector<expression>& dims,
                                        const expression& def)
 
-      : base_var_decl(name, dims, MATRIX_T, def), M_(M), N_(N) { }
+      : base_var_decl(name, dims, matrix_type(), def), M_(M), N_(N) { }
 
   }
 }
