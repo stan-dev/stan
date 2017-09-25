@@ -6,6 +6,7 @@
 
 #include <stan/lang/ast.hpp>
 
+#include <stan/lang/ast/base_expr_type_def.hpp>
 #include <stan/lang/ast/expr_type_def.hpp>
 #include <stan/lang/ast/scope_def.hpp>
 #include <stan/lang/ast/variable_map_def.hpp>

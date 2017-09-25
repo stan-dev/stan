@@ -70,7 +70,7 @@ namespace stan {
       const vector<function_signature_t> sigs = it->second;
       for (size_t i = 0; i < sigs.size(); ++i) {
         if (sigs[i].second.size() == 0
-            || sigs[i].second[0].expr_type_.base_type_ != INT_T)
+            || !sigs[i].second[0].expr_type_.base_type_.is_int_type())
           return false;
       }
       return true;
@@ -188,34 +188,39 @@ namespace stan {
     }
 
     void function_signatures::add_nullary(const::std::string& name) {
-      add(name, DOUBLE_T);
+      add(name, expr_type(double_type()));
     }
 
     void function_signatures::add_unary(const::std::string& name) {
-      add(name, DOUBLE_T, DOUBLE_T);
+      add(name, expr_type(double_type()), expr_type(double_type()));
     }
 
     void function_signatures::add_unary_vectorized(const::std::string&
     name) {
       for (size_t i = 0; i < 8; ++i) {
-        add(name, expr_type(DOUBLE_T, i), expr_type(INT_T, i));
-        add(name, expr_type(DOUBLE_T, i), expr_type(DOUBLE_T, i));
-        add(name, expr_type(VECTOR_T, i), expr_type(VECTOR_T, i));
-        add(name, expr_type(ROW_VECTOR_T, i), expr_type(ROW_VECTOR_T, i));
-        add(name, expr_type(MATRIX_T, i), expr_type(MATRIX_T, i));
+        add(name, expr_type(double_type(), i), expr_type(int_type(), i));
+        add(name, expr_type(double_type(), i), expr_type(double_type(), i));
+        add(name, expr_type(vector_type(), i), expr_type(vector_type(), i));
+        add(name, expr_type(row_vector_type(), i),
+            expr_type(row_vector_type(), i));
+        add(name, expr_type(matrix_type(), i), expr_type(matrix_type(), i));
       }
     }
 
     void function_signatures::add_binary(const::std::string& name) {
-      add(name, DOUBLE_T, DOUBLE_T, DOUBLE_T);
+      add(name, expr_type(double_type()), expr_type(double_type()),
+          expr_type(double_type()));
     }
 
     void function_signatures::add_ternary(const::std::string& name) {
-      add(name, DOUBLE_T, DOUBLE_T, DOUBLE_T, DOUBLE_T);
+      add(name, expr_type(double_type()), expr_type(double_type()),
+          expr_type(double_type()), expr_type(double_type()));
     }
 
     void function_signatures::add_quaternary(const::std::string& name) {
-      add(name, DOUBLE_T, DOUBLE_T, DOUBLE_T, DOUBLE_T, DOUBLE_T);
+      add(name, expr_type(double_type()), expr_type(double_type()),
+          expr_type(double_type()), expr_type(double_type()),
+          expr_type(double_type()));
     }
 
     int function_signatures::num_promotions(

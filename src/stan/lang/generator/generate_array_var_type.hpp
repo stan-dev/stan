@@ -19,27 +19,18 @@ namespace stan {
     void generate_array_var_type(const base_expr_type& base_type,
                                  const std::string& real_var_type,
                                  std::ostream& o) {
-      switch (base_type) {
-      case INT_T :
+      if (base_type.is_int_type())
         o << "int";
-        break;
-      case DOUBLE_T :
+      else if (base_type.is_double_type())
         o << real_var_type;
-        break;
-      case VECTOR_T :
+      else if (base_type.is_vector_type())
         o << "Eigen::Matrix<" << real_var_type << ",Eigen::Dynamic,1> ";
-        break;
-      case ROW_VECTOR_T :
+      else if (base_type.is_row_vector_type())
         o << "Eigen::Matrix<" << real_var_type << ",1,Eigen::Dynamic> ";
-        break;
-      case MATRIX_T :
+      else if (base_type.is_matrix_type())
         o << "Eigen::Matrix<" << real_var_type
           << ",Eigen::Dynamic,Eigen::Dynamic> ";
-        break;
-      }
     }
-
-
 
   }
 }
