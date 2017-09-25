@@ -148,9 +148,9 @@ namespace stan {
           if (this->rand_uniform_() < accept_prob)
             z_sample = z_propose;
 
-            // Break if exhaustion criterion is satisfied
-            if (std::fabs(ave) < x_delta_)
-              break;
+          // Break if exhaustion criterion is satisfied
+          if (std::fabs(ave) < x_delta_)
+            break;
         }
 
         this->n_leapfrog_ = n_leapfrog;
