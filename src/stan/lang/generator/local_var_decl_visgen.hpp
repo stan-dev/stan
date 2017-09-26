@@ -20,23 +20,15 @@ namespace stan {
      */
     struct local_var_decl_visgen : public visgen {
       /**
-       * true if generating a variable with the type of a function return.
-       */
-      bool is_fun_return_;
-
-      /**
        * Construct a visitor to generate local variable declarations
-       * with the specified indentation level and flags indicating if
-       * the local variable is declared within a function with return type,
-       * and writing to the specified stream.
+       * with the specified indentation level and writing to
+       * the specified stream.
        *
        * @param[in] indent indentation level
-       * @param[in] is_fun_return true if type should be function
-       * return type
        * @param[in,out] o stream for generating
        */
-      local_var_decl_visgen(int indent, bool is_fun_return, std::ostream& o)
-        : visgen(indent, o), is_fun_return_(is_fun_return) {  }
+      local_var_decl_visgen(int indent, std::ostream& o)
+        : visgen(indent, o) { }
 
       /**
        * Generate the type for the specified basic type and number of
@@ -158,7 +150,7 @@ namespace stan {
 
       void operator()(const double_var_decl& x) const {
         std::vector<expression> ctor_args;
-        declare_array(is_fun_return_ ? "fun_scalar_t__" : "local_scalar_t__",
+        declare_array("local_scalar_t__",
                       ctor_args, x.name_, x.dims_);
       }
 
@@ -166,9 +158,7 @@ namespace stan {
         std::vector<expression> ctor_args;
         generate_validate_positive(x.name_, x.M_, indent_, o_);
         ctor_args.push_back(x.M_);
-        declare_array(is_fun_return_
-                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
-                      : "Eigen::Matrix<local_scalar_t__,Eigen::Dynamic,1> ",
+        declare_array("Eigen::Matrix<local_scalar_t__,Eigen::Dynamic,1> ",
                       ctor_args, x.name_, x.dims_);
       }
 
@@ -176,9 +166,7 @@ namespace stan {
         std::vector<expression> ctor_args;
         generate_validate_positive(x.name_, x.N_, indent_, o_);
         ctor_args.push_back(x.N_);
-        declare_array(is_fun_return_
-                      ? "Eigen::Matrix<fun_scalar_t__,1,Eigen::Dynamic> "
-                      : "Eigen::Matrix<local_scalar_t__,1,Eigen::Dynamic> ",
+        declare_array("Eigen::Matrix<local_scalar_t__,1,Eigen::Dynamic> ",
                       ctor_args, x.name_, x.dims_);
       }
 
@@ -188,10 +176,7 @@ namespace stan {
         generate_validate_positive(x.name_, x.N_, indent_, o_);
         ctor_args.push_back(x.M_);
         ctor_args.push_back(x.N_);
-        declare_array(is_fun_return_
-                      ? "Eigen::Matrix<fun_scalar_t__,"
-                      "Eigen::Dynamic,Eigen::Dynamic> "
-                      : "Eigen::Matrix<local_scalar_t__,"
+        declare_array("Eigen::Matrix<local_scalar_t__,"
                       "Eigen::Dynamic,Eigen::Dynamic> ",
                       ctor_args, x.name_, x.dims_);
       }
@@ -200,9 +185,7 @@ namespace stan {
         std::vector<expression> ctor_args;
         generate_validate_positive(x.name_, x.K_, indent_, o_);
         ctor_args.push_back(x.K_);
-        declare_array(is_fun_return_
-                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
-                      : "Eigen::Matrix<local_scalar_t__,Eigen::Dynamic,1> ",
+        declare_array("Eigen::Matrix<local_scalar_t__,Eigen::Dynamic,1> ",
                       ctor_args, x.name_, x.dims_);
       }
 
@@ -210,9 +193,7 @@ namespace stan {
         std::vector<expression> ctor_args;
         generate_validate_positive(x.name_, x.K_, indent_, o_);
         ctor_args.push_back(x.K_);
-        declare_array(is_fun_return_
-                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
-                      : "Eigen::Matrix<local_scalar_t__,Eigen::Dynamic,1> ",
+        declare_array("Eigen::Matrix<local_scalar_t__,Eigen::Dynamic,1> ",
                       ctor_args, x.name_, x.dims_);
       }
 
@@ -220,9 +201,7 @@ namespace stan {
         std::vector<expression> ctor_args;
         generate_validate_positive(x.name_, x.K_, indent_, o_);
         ctor_args.push_back(x.K_);
-        declare_array(is_fun_return_
-                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
-                      : "Eigen::Matrix<local_scalar_t__,Eigen::Dynamic,1> ",
+        declare_array("Eigen::Matrix<local_scalar_t__,Eigen::Dynamic,1> ",
                       ctor_args, x.name_, x.dims_);
       }
 
@@ -230,9 +209,7 @@ namespace stan {
         std::vector<expression> ctor_args;
         generate_validate_positive(x.name_, x.K_, indent_, o_);
         ctor_args.push_back(x.K_);
-        declare_array(is_fun_return_
-                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
-                      : "Eigen::Matrix<local_scalar_t__,Eigen::Dynamic,1> ",
+        declare_array("Eigen::Matrix<local_scalar_t__,Eigen::Dynamic,1> ",
                       ctor_args, x.name_, x.dims_);
       }
 
@@ -242,10 +219,7 @@ namespace stan {
         generate_validate_positive(x.name_, x.N_, indent_, o_);
         ctor_args.push_back(x.M_);
         ctor_args.push_back(x.N_);
-        declare_array(is_fun_return_
-                      ? "Eigen::Matrix<fun_scalar_t__,"
-                      "Eigen::Dynamic,Eigen::Dynamic> "
-                      : "Eigen::Matrix<local_scalar_t__,"
+        declare_array("Eigen::Matrix<local_scalar_t__,"
                       "Eigen::Dynamic,Eigen::Dynamic> ",
                       ctor_args, x.name_, x.dims_);
       }
@@ -265,10 +239,7 @@ namespace stan {
         generate_validate_positive(x.name_, x.K_, indent_, o_);
         ctor_args.push_back(x.K_);
         ctor_args.push_back(x.K_);
-        declare_array(is_fun_return_
-                      ? "Eigen::Matrix<fun_scalar_t__,"
-                      "Eigen::Dynamic,Eigen::Dynamic> "
-                      : "Eigen::Matrix<local_scalar_t__,"
+        declare_array("Eigen::Matrix<local_scalar_t__,"
                       "Eigen::Dynamic,Eigen::Dynamic> ",
                       ctor_args, x.name_, x.dims_);
       }
@@ -278,10 +249,7 @@ namespace stan {
         generate_validate_positive(x.name_, x.K_, indent_, o_);
         ctor_args.push_back(x.K_);
         ctor_args.push_back(x.K_);
-        declare_array(is_fun_return_
-                      ? "Eigen::Matrix<fun_scalar_t__,"
-                      "Eigen::Dynamic,Eigen::Dynamic> "
-                      : "Eigen::Matrix<local_scalar_t__,"
+        declare_array("Eigen::Matrix<local_scalar_t__,"
                       "Eigen::Dynamic,Eigen::Dynamic> ",
                       ctor_args, x.name_, x.dims_);
       }

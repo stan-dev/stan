@@ -15,8 +15,7 @@ namespace stan {
     /**
      * Generate the specified statement with the specified indentation
      * level on the specified output stream with flags indicating
-     * whether sampling statements are allowed and whether the
-     * generation is in a variable context or function return context.
+     * whether sampling statements are allowed.
      * Generated statement is preceeded by stmt updating global variable
      * `current_statement_begin__` to src file line number where stmt begins.
      *
@@ -25,16 +24,15 @@ namespace stan {
      * @param[in,out] o stream for generating
      * @param[in] include_sampling true if sampling statements are
      * included
-     * @param[in] is_fun_return true if in context of function return
      */
     void generate_statement(const statement& s, int indent, std::ostream& o,
-                            bool include_sampling, bool is_fun_return) {
+                            bool include_sampling) {
       is_numbered_statement_vis vis_is_numbered;
       if (boost::apply_visitor(vis_is_numbered, s.statement_)) {
         generate_indent(indent, o);
         o << "current_statement_begin__ = " << s.begin_line_ << ";" << EOL;
       }
-      statement_visgen vis(indent, include_sampling, is_fun_return, o);
+      statement_visgen vis(indent, include_sampling, o);
       boost::apply_visitor(vis, s.statement_);
     }
 

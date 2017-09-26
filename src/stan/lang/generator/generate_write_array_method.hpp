@@ -77,12 +77,11 @@ namespace stan {
         << EOL2;
 
       generate_try(2, o);
-      bool is_fun_return = false;
-      generate_local_var_decls(prog.derived_decl_.first, 3, o, is_fun_return);
+      generate_local_var_decls(prog.derived_decl_.first, 3, o);
       o << EOL;
       bool include_sampling = false;
       generate_statements(prog.derived_decl_.second, 3, o,
-                         include_sampling, is_fun_return);
+                          include_sampling);
       o << EOL;
 
       generate_comment("validate transformed parameters", 3, o);
@@ -97,11 +96,11 @@ namespace stan {
       o << INDENT3 << "if (!include_gqs__) return;"
         << EOL;
       generate_comment("declare and define generated quantities", 3, o);
-      generate_local_var_decls(prog.generated_decl_.first, 3, o, is_fun_return);
+      generate_local_var_decls(prog.generated_decl_.first, 3, o);
 
       o << EOL;
       generate_statements(prog.generated_decl_.second,
-                           3, o, include_sampling, is_fun_return);
+                          3, o, include_sampling);
       o << EOL;
 
       generate_comment("validate generated quantities", 3, o);

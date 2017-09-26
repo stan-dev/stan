@@ -2,7 +2,6 @@
 #define STAN_LANG_GENERATOR_GENERATE_ARRAY_BUILDER_ADDS_HPP
 
 #include <stan/lang/ast.hpp>
-#include <stan/lang/generator/generate_expression.hpp>
 #include <ostream>
 #include <vector>
 

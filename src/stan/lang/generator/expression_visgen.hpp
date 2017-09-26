@@ -16,9 +16,7 @@
 namespace stan {
   namespace lang {
 
-    void generate_expression(const expression& e, bool user_facing,
-                             std::ostream& o);
-
+    // forward declare recursive helper functions
     void generate_array_builder_adds(const std::vector<expression>& elements,
                                      bool user_facing, std::ostream& o);
 

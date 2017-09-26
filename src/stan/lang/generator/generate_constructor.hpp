@@ -80,10 +80,9 @@ namespace stan {
       o << EOL;
 
       bool include_sampling = false;
-      bool is_fun_return = false;
 
-      generate_statements(prog.derived_data_decl_.second,
-                           3, o, include_sampling, is_fun_return);
+      generate_statements(prog.derived_data_decl_.second, 3, o,
+                          include_sampling);
       o << EOL;
       generate_comment("validate transformed data", 3, o);
       generate_validate_var_decls(prog.derived_data_decl_.first, 3, o);

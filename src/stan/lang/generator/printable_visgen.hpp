@@ -3,8 +3,8 @@
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
-#include <stan/lang/generator/generate_quoted_string.hpp>
 #include <stan/lang/generator/generate_expression.hpp>
+#include <stan/lang/generator/generate_quoted_string.hpp>
 #include <ostream>
 #include <string>
 

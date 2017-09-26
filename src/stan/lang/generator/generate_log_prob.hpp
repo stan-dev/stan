@@ -49,7 +49,6 @@ namespace stan {
       o << INDENT2 << "stan::math::accumulator<T__> lp_accum__;"
         << EOL2;
 
-      bool is_fun_return = false;
       bool gen_local_vars = true;
       bool include_sampling = true;
 
@@ -60,11 +59,11 @@ namespace stan {
       o << EOL;
 
       generate_comment("transformed parameters", 3, o);
-      generate_local_var_decls(p.derived_decl_.first, 3, o, is_fun_return);
+      generate_local_var_decls(p.derived_decl_.first, 3, o);
       o << EOL;
 
       generate_statements(p.derived_decl_.second,
-                           3, o, include_sampling, is_fun_return);
+                          3, o, include_sampling);
       o << EOL;
 
       generate_validate_transformed_params(p.derived_decl_.first, 3, o);
@@ -80,7 +79,7 @@ namespace stan {
       o << EOL;
       generate_comment("model body", 3, o);
 
-      generate_statement(p.statement_, 3, o, include_sampling, is_fun_return);
+      generate_statement(p.statement_, 3, o, include_sampling);
       o << EOL;
       generate_catch_throw_located(2, o);
 

@@ -3,7 +3,6 @@
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
-#include <stan/lang/generator/generate_expression.hpp>
 #include <stan/lang/generator/generate_indent.hpp>
 #include <stan/lang/generator/visgen.hpp>
 #include <ostream>

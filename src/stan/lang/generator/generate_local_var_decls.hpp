@@ -17,8 +17,7 @@ namespace stan {
     /**
      * Generate local variable declarations, including
      * initializations, for the specified declarations, indentation
-     * level, writing to the specified stream, with flags indicating
-     * if it is in a function return scope.
+     * level, writing to the specified stream.
      * Generated code is preceeded by stmt updating global variable
      * `current_statement_begin__` to src file line number where
      * variable is declared.
@@ -26,11 +25,10 @@ namespace stan {
      * @param[in] vs variable declarations
      * @param[in] indent indentation level
      * @param[in,out] o stream for generating
-     * @param[in] is_fun_return true if in function return context
      */
     void generate_local_var_decls(const std::vector<var_decl>& vs, int indent,
-                                  std::ostream& o, bool is_fun_return) {
-      local_var_decl_visgen vis_decl(indent, is_fun_return, o);
+                                  std::ostream& o) {
+      local_var_decl_visgen vis_decl(indent, o);
       local_var_init_nan_visgen vis_init(indent, o);
       init_vars_visgen vis_filler(indent, o);
       for (size_t i = 0; i < vs.size(); ++i) {

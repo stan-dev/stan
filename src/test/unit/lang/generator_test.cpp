@@ -383,7 +383,7 @@ TEST(langGenerator, slicedAssigns) {
   s.end_line_ = 14U;
 
   std::stringstream o;
-  generate_statement(s, 2, o, true, false);
+  generate_statement(s, 2, o, true);
   EXPECT_TRUE(0U < o.str().find(
       "stan::model::cons_list(stan::model::index_uni(3), stan::model::cons_list(stan::model::index_max(5), stan::model::nil_index_list()))"));
 }
