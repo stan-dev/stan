@@ -413,11 +413,11 @@ TEST(langGenerator, genRealVars) {
 
   o.str(std::string());
   stan::lang::generate_real_var_type(fun_origin, true, o);
-  EXPECT_EQ(1, count_matches("fun_scalar_t__", o.str()));
+  EXPECT_EQ(1, count_matches("local_scalar_t__", o.str()));
 
   o.str(std::string());
   stan::lang::generate_real_var_type(fun_origin, false, o);
-  EXPECT_EQ(1, count_matches("fun_scalar_t__", o.str()));
+  EXPECT_EQ(1, count_matches("local_scalar_t__", o.str()));
 }
 
 TEST(langGenerator, genArrayVars) {
@@ -451,13 +451,13 @@ TEST(langGenerator, genArrayVars) {
   stan::lang::generate_real_var_type(fun_origin, true, ssReal);
   o.str(std::string());
   stan::lang::generate_array_var_type(base_expr_type(double_type()),ssReal.str(),o);
-  EXPECT_EQ(1, count_matches("fun_scalar_t__", o.str()));
+  EXPECT_EQ(1, count_matches("local_scalar_t__", o.str()));
 
   ssReal.str(std::string());
   o.str(std::string());
   stan::lang::generate_real_var_type(fun_origin, false, ssReal);
   stan::lang::generate_array_var_type(base_expr_type(double_type()),ssReal.str(),o);
-  EXPECT_EQ(1, count_matches("fun_scalar_t__", o.str()));
+  EXPECT_EQ(1, count_matches("local_scalar_t__", o.str()));
 
   ssReal.str(std::string());
   o.str(std::string());

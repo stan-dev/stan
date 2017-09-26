@@ -19,7 +19,7 @@ namespace stan {
     void generate_real_var_type(const scope& var_scope,
                                 bool has_var,
                                 std::ostream& o) {
-      if (has_var)
+      if (var_scope.fun() || has_var)
         o << "local_scalar_t__";
       else
         o << "double";
