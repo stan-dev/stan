@@ -29,26 +29,24 @@ namespace stan {
         return;
       }
       o << " {" << EOL;
-      o << INDENT << "typedef " << scalar_t_name << " fun_scalar_t__;" << EOL;
+      o << INDENT << "typedef " << scalar_t_name << " local_scalar_t__;" << EOL;
       o << INDENT << "typedef "
         << (fun.return_type_.base_type_.is_int_type()
-            ? "int" : "fun_scalar_t__")
+            ? "int" : "local_scalar_t__")
         << " fun_return_scalar_t__;" << EOL;
       o << INDENT
         << "const static bool propto__ = true;" << EOL
         << INDENT << "(void) propto__;" << EOL;
       // use this dummy for inits
-      o << INDENT2 << "fun_scalar_t__ "
+      o << INDENT2 << "local_scalar_t__ "
         << "DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());" << EOL;
       o << INDENT2 << "(void) DUMMY_VAR__;  // suppress unused var warning"
         << EOL2;
-      bool is_var_context = false;
-      bool is_fun_return = true;
+
       bool include_sampling = true;
       o << INDENT << "int current_statement_begin__ = -1;" << EOL;
       generate_try(1, o);
-      generate_statement(fun.body_, 2, o, include_sampling,
-                         is_var_context, is_fun_return);
+      generate_statement(fun.body_, 2, o, include_sampling);
       generate_catch_throw_located(1, o);
       o << "}" << EOL;
     }

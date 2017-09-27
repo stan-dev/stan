@@ -2,13 +2,12 @@
 #define STAN_LANG_GENERATOR_IDX_VISGEN_HPP
 
 #include <stan/lang/ast.hpp>
+#include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/visgen.hpp>
 #include <ostream>
 
 namespace stan {
   namespace lang {
-
-    void generate_expression(const expression& e, std::ostream& o);
 
     struct idx_visgen : public visgen {
       /**
@@ -20,13 +19,13 @@ namespace stan {
 
       void operator()(const uni_idx& i) const {
         o_ << "stan::model::index_uni(";
-        generate_expression(i.idx_, o_);
+        generate_expression(i.idx_, NOT_USER_FACING, o_);
         o_ << ")";
       }
 
       void operator()(const multi_idx& i) const {
         o_ << "stan::model::index_multi(";
-        generate_expression(i.idxs_, o_);
+        generate_expression(i.idxs_, NOT_USER_FACING, o_);
         o_ << ")";
       }
 
@@ -36,21 +35,21 @@ namespace stan {
 
       void operator()(const lb_idx& i) const {
         o_ << "stan::model::index_min(";
-        generate_expression(i.lb_, o_);
+        generate_expression(i.lb_, NOT_USER_FACING, o_);
         o_ << ")";
       }
 
       void operator()(const ub_idx& i) const {
         o_ << "stan::model::index_max(";
-        generate_expression(i.ub_, o_);
+        generate_expression(i.ub_, NOT_USER_FACING, o_);
         o_ << ")";
       }
 
       void operator()(const lub_idx& i) const {
         o_ << "stan::model::index_min_max(";
-        generate_expression(i.lb_, o_);
+        generate_expression(i.lb_, NOT_USER_FACING, o_);
         o_ << ", ";
-        generate_expression(i.ub_, o_);
+        generate_expression(i.ub_, NOT_USER_FACING, o_);
         o_ << ")";
       }
     };

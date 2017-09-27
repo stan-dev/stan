@@ -39,9 +39,12 @@ namespace stan {
       o << INDENT << "                 bool include_gqs__ = true," << EOL;
       o << INDENT
         << "                 std::ostream* pstream__ = 0) const {" << EOL;
+      o << INDENT2 << "typedef double local_scalar_t__;" << EOL2;
+
       o << INDENT2 << "vars__.resize(0);" << EOL;
       o << INDENT2
-        << "stan::io::reader<double> in__(params_r__,params_i__);"<< EOL;
+        << "stan::io::reader<local_scalar_t__> in__(params_r__,params_i__);"
+        << EOL;
       o << INDENT2 << "static const char* function__ = \""
         << model_name << "_namespace::write_array\";" << EOL;
       generate_void_statement("function__", 2, o);
@@ -67,21 +70,18 @@ namespace stan {
       o << INDENT2 << "stan::math::accumulator<double> lp_accum__;" << EOL2;
 
       o << INDENT2
-        << "double DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());"
+        << "local_scalar_t__ DUMMY_VAR__"
+        << "(std::numeric_limits<double>::quiet_NaN());"
         << EOL;
       o << INDENT2 << "(void) DUMMY_VAR__;  // suppress unused var warning"
         << EOL2;
 
       generate_try(2, o);
-      bool is_var_context = false;
-      bool is_fun_return = false;
-      generate_local_var_decls(prog.derived_decl_.first, 3, o, is_var_context,
-                               is_fun_return);
+      generate_local_var_decls(prog.derived_decl_.first, 3, o);
       o << EOL;
       bool include_sampling = false;
       generate_statements(prog.derived_decl_.second, 3, o,
-                         include_sampling, is_var_context,
-                         is_fun_return);
+                          include_sampling);
       o << EOL;
 
       generate_comment("validate transformed parameters", 3, o);
@@ -96,13 +96,11 @@ namespace stan {
       o << INDENT3 << "if (!include_gqs__) return;"
         << EOL;
       generate_comment("declare and define generated quantities", 3, o);
-      generate_local_var_decls(prog.generated_decl_.first, 3, o,
-                               is_var_context, is_fun_return);
+      generate_local_var_decls(prog.generated_decl_.first, 3, o);
 
       o << EOL;
       generate_statements(prog.generated_decl_.second,
-                           3, o, include_sampling, is_var_context,
-                           is_fun_return);
+                          3, o, include_sampling);
       o << EOL;
 
       generate_comment("validate generated quantities", 3, o);

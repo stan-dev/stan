@@ -12,8 +12,6 @@
 namespace stan {
   namespace lang {
 
-    void generate_expression(const expression& e, std::ostream& o);
-
     struct validate_var_decl_visgen : public visgen {
       /**
        * Construct a variable declaration validating visitor with the
@@ -35,7 +33,7 @@ namespace stan {
         for (size_t i = 0; i < dims.size(); ++i) {
           generate_indent(indent_+i, o_);
           o_ << "for (int k" << i << "__ = 0;" << " k" << i << "__ < ";
-          generate_expression(dims[i].expr_, o_);
+          generate_expression(dims[i].expr_, NOT_USER_FACING, o_);
           o_ << ";" << " ++k" << i << "__) {" << EOL;
         }
       }
@@ -86,7 +84,7 @@ namespace stan {
           o_ << "\",";
           generate_loop_var(x.name_, x.dims_.size());
           o_ << ",";
-          generate_expression(x.range_.low_.expr_, o_);
+          generate_expression(x.range_.low_.expr_, NOT_USER_FACING, o_);
           o_ << ");" << EOL;
         }
         if (x.range_.has_high()) {
@@ -97,7 +95,7 @@ namespace stan {
           o_ << "\",";
           generate_loop_var(x.name_, x.dims_.size());
           o_ << ",";
-          generate_expression(x.range_.high_.expr_, o_);
+          generate_expression(x.range_.high_.expr_, NOT_USER_FACING, o_);
           o_ << ");" << EOL;
         }
         generate_end_for_dims(x.dims_.size());

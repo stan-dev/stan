@@ -12,8 +12,6 @@
 namespace stan {
   namespace lang {
 
-    void generate_expression(const expression& e, std::ostream& o);
-
     /**
      * Visitor for generating code to fill the <code>vars__</code>
      * accumulator with variable names.
@@ -59,7 +57,7 @@ namespace stan {
           generate_indent((dims.size() - i) + indent_, o_);
           o_ << "for (int k_" << i << "__ = 0;"
              << " k_" << i << "__ < ";
-          generate_expression(dims[i], o_);
+          generate_expression(dims[i], NOT_USER_FACING, o_);
           o_ << "; ++k_" << i << "__) {" << EOL;
         }
 

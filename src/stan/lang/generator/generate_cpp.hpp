@@ -54,7 +54,7 @@ namespace stan {
       generate_includes(o);
       generate_namespace_start(model_name, o);
       generate_usings(o);
-      generate_typedefs(o);
+      //      generate_typedefs(o);
       generate_globals(o);
       generate_program_reader_fun(history, o);
       generate_functions(prog.function_decl_defs_, o);

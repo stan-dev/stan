@@ -11,9 +11,6 @@
 namespace stan {
   namespace lang {
 
-    void generate_expression(const expression& e, bool user_facing,
-                             std::ostream& o);
-
     /**
      * Generate the specified expression indexed with the specified
      * indices with the specified base type of expression being
@@ -28,8 +25,7 @@ namespace stan {
      * @param[in] indexes indexes for expression
      * @param[in] base_type base type of expression
      * @param[in] e_num_dims number of array dimensions in expression
-     * @param[in] user_facing true if expression generated for user
-     * output
+     * @param[in] user_facing true if expression might be reported to user
      * @param[in,out] o stream for generating
      */
     template <bool isLHS>

@@ -10,9 +10,6 @@
 namespace stan {
   namespace lang {
 
-
-    void generate_expression(const expression& e, std::ostream& o);
-
     /**
      * Visitor for writing the dimensions of variables.
      */
@@ -38,12 +35,12 @@ namespace stan {
         o_ << INDENT2 << "dims__.resize(0);" << EOL;
         for (size_t i = 0; i < array_dims.size(); ++i) {
           o_ << INDENT2 << "dims__.push_back(";
-          generate_expression(array_dims[i].expr_, o_);
+          generate_expression(array_dims[i].expr_, NOT_USER_FACING, o_);
           o_ << ");" << EOL;
         }
         for (size_t i = 0; i < matrix_dims.size(); ++i) {
           o_ << INDENT2 << "dims__.push_back(";
-          generate_expression(matrix_dims[i].expr_, o_);
+          generate_expression(matrix_dims[i].expr_, NOT_USER_FACING, o_);
           o_ << ");" << EOL;
         }
         o_ << INDENT2 << "dimss__.push_back(dims__);" << EOL;

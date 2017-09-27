@@ -19,8 +19,6 @@
 namespace stan {
   namespace lang {
 
-    void generate_expression(const expression& e, std::ostream& o);
-
     /**
      * Visitor for generating code to initialize data variables from
      * an underying <code>var_context</code> in variable
@@ -64,17 +62,17 @@ namespace stan {
         ss << fun_prefix;
         if (has_lub(x)) {
           ss << "_lub_unconstrain(";
-          generate_expression(x.range_.low_.expr_, ss);
+          generate_expression(x.range_.low_.expr_, NOT_USER_FACING, ss);
           ss << ',';
-          generate_expression(x.range_.high_.expr_, ss);
+          generate_expression(x.range_.high_.expr_, NOT_USER_FACING, ss);
           ss << ',';
         } else if (has_lb(x)) {
           ss << "_lb_unconstrain(";
-          generate_expression(x.range_.low_.expr_, ss);
+          generate_expression(x.range_.low_.expr_, NOT_USER_FACING, ss);
           ss << ',';
         } else if (has_ub(x)) {
           ss << "_ub_unconstrain(";
-          generate_expression(x.range_.high_.expr_, ss);
+          generate_expression(x.range_.high_.expr_, NOT_USER_FACING, ss);
           ss << ',';
         } else {
           ss << "_unconstrain(";
@@ -92,7 +90,7 @@ namespace stan {
         for (size_t i = 0; i < size; ++i) {
           generate_indent(i + indent_, o_);
           o_ << "for (int i" << i << "__ = 0U; i" << i << "__ < ";
-          generate_expression(dims[i].expr_, o_);
+          generate_expression(dims[i].expr_, NOT_USER_FACING, o_);
           o_ << "; ++i" << i << "__)" << EOL;
         }
         generate_indent(indent_ + dims.size(), o_);
@@ -214,24 +212,24 @@ namespace stan {
         if (is_matrix) {
           generate_indent(indent, o_);
           o_ << "for (int j2__ = 0U; j2__ < ";
-          generate_expression(dim2.expr_, o_);
+          generate_expression(dim2.expr_, NOT_USER_FACING, o_);
           o_ << "; ++j2__)" << EOL;
 
           generate_indent(indent+1, o_);
           o_ << "for (int j1__ = 0U; j1__ < ";
-          generate_expression(dim1.expr_, o_);
+          generate_expression(dim1.expr_, NOT_USER_FACING, o_);
           o_ << "; ++j1__)" << EOL;
         } else if (is_vector) {
           generate_indent(indent, o_);
           o_ << "for (int j1__ = 0U; j1__ < ";
-          generate_expression(dim1.expr_, o_);
+          generate_expression(dim1.expr_, NOT_USER_FACING, o_);
           o_ << "; ++j1__)" << EOL;
         }
         for (size_t i = 0; i < size; ++i) {
           size_t idx = size - i - 1;
           generate_indent(i + indent + extra_indent, o_);
           o_ << "for (int i" << idx << "__ = 0U; i" << idx << "__ < ";
-          generate_expression(dims[idx].expr_, o_);
+          generate_expression(dims[idx].expr_, NOT_USER_FACING, o_);
           o_ << "; ++i" << idx << "__)" << EOL;
         }
         generate_indent_num_dims(2U, dims, dim1, dim2);
