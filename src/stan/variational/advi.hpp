@@ -366,7 +366,7 @@ namespace stan {
 
         logger.info("Begin stochastic gradient ascent.");
         logger.info("  iter"
-                    "       ELBO"
+                    "             ELBO"
                     "   delta_ELBO_mean"
                     "   delta_ELBO_med"
                     "   notes ");
@@ -411,7 +411,7 @@ namespace stan {
             ss << "  "
                << std::setw(4) << iter_counter
                << "  "
-               << std::right << std::setw(9) << std::setprecision(1)
+               << std::setw(15) << std::fixed << std::setprecision(3)
                << elbo
                << "  "
                << std::setw(16) << std::fixed << std::setprecision(3)
