@@ -16,8 +16,6 @@
 namespace stan {
   namespace lang {
 
-    void generate_expression(const expression& e, std::ostream& o);
-
     /**
      * Visitor for wirting an array initialization.
      */
@@ -52,7 +50,7 @@ namespace stan {
           o_ << name << " = in__." << read_type  << "_constrain(";
           for (size_t j = 0; j < read_args.size(); ++j) {
             if (j > 0) o_ << ",";
-            generate_expression(read_args[j], o_);
+            generate_expression(read_args[j], NOT_USER_FACING, o_);
           }
           o_ << ");" << EOL;
           return;
@@ -66,7 +64,7 @@ namespace stan {
         for (size_t i = 0; i < dims.size(); ++i) {
           generate_indent(i + 2, o_);
           o_ << "size_t dim_"  << name << "_" << i << "__ = ";
-          generate_expression(dims[i], o_);
+          generate_expression(dims[i], NOT_USER_FACING, o_);
           o_ << ";" << EOL;
           if (i < dims.size() - 1) {
             generate_indent(i + 2, o_);
@@ -83,7 +81,7 @@ namespace stan {
             o_ << name_dims << ".push_back(in__." << read_type << "_constrain(";
             for (size_t j = 0; j < read_args.size(); ++j) {
               if (j > 0) o_ << ",";
-              generate_expression(read_args[j], o_);
+              generate_expression(read_args[j], NOT_USER_FACING, o_);
             }
             o_ << "));" << EOL;
           }

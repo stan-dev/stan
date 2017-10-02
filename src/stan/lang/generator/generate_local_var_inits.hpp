@@ -19,20 +19,16 @@ namespace stan {
      * the specified stream.
      *
      * @param[in] vs variable declarations
-     * @param[in] is_var_context true if generating in variable
-     * context
      * @param[in] declare_vars true if variables should be declared
      * @param[in] indent indentation level
      * @param[in,out] o stream for generating
      */
-    void generate_local_var_inits(std::vector<var_decl> vs, bool is_var_context,
-                                  bool declare_vars, int indent,
-                                  std::ostream& o) {
+    void generate_local_var_inits(std::vector<var_decl> vs, bool declare_vars,
+                                  int indent, std::ostream& o) {
       generate_indent(indent, o);
-      o << "stan::io::reader<"
-        << (is_var_context ? "T__" : "double")
-        << "> in__(params_r__,params_i__);" << EOL2;
-      init_local_var_visgen vis_init(declare_vars, is_var_context, indent, o);
+      o << "stan::io::reader<local_scalar_t__> in__(params_r__,params_i__);"
+        << EOL2;
+      init_local_var_visgen vis_init(declare_vars, indent, o);
       for (size_t i = 0; i < vs.size(); ++i)
         boost::apply_visitor(vis_init, vs[i].decl_);
     }

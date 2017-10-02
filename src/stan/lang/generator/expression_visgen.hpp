@@ -2,6 +2,7 @@
 #define STAN_LANG_GENERATOR_EXPRESSION_VISGEN_HPP
 
 #include <stan/lang/ast.hpp>
+#include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_array_var_type.hpp>
 #include <stan/lang/generator/generate_indexed_expr.hpp>
 #include <stan/lang/generator/generate_real_var_type.hpp>
@@ -15,23 +16,23 @@
 namespace stan {
   namespace lang {
 
-    void generate_expression(const expression& e, bool user_facing,
-                             bool is_var_context, std::ostream& o);
-
+    // forward declare recursive helper functions
     void generate_array_builder_adds(const std::vector<expression>& elements,
-                                     bool user_facing, bool is_var_context,
-                                     std::ostream& o);
+                                     bool user_facing, std::ostream& o);
 
     void generate_idxs(const std::vector<idx>& idxs, std::ostream& o);
 
     void generate_idxs_user(const std::vector<idx>& idxs, std::ostream& o);
 
     struct expression_visgen : public visgen {
-      explicit expression_visgen(std::ostream& o, bool user_facing,
-                                 bool is_var_context)
+      /**
+         true when generated expression might be reported to user
+      */
+      const bool user_facing_;
+
+      explicit expression_visgen(std::ostream& o, bool user_facing)
         : visgen(o),
-          user_facing_(user_facing),
-          is_var_context_(is_var_context) {
+          user_facing_(user_facing) {
       }
 
       void operator()(const nil& /*x*/) const {
@@ -49,11 +50,10 @@ namespace stan {
 
       void operator()(const array_expr& x) const {
         std::stringstream ssRealType;
-        generate_real_var_type(x.array_expr_scope_, x.has_var_,
-                               is_var_context_, ssRealType);
+        generate_real_var_type(x.array_expr_scope_, x.has_var_, ssRealType);
         std::stringstream ssArrayType;
         generate_array_var_type(x.type_.base_type_, ssRealType.str(),
-                                is_var_context_, ssArrayType);
+                                ssArrayType);
         o_ << "static_cast<";
         generate_type(ssArrayType.str(), x.args_, x.type_.num_dims_, o_);
         o_ << " >(";
@@ -63,34 +63,32 @@ namespace stan {
                       x.type_.num_dims_ - 1,
                       o_);
         o_ << " >()";
-        generate_array_builder_adds(x.args_, user_facing_, is_var_context_, o_);
+        generate_array_builder_adds(x.args_, user_facing_, o_);
         o_ << ".array()";
         o_ << ")";
       }
 
       void operator()(const matrix_expr& x) const {
         std::stringstream ssRealType;
-        generate_real_var_type(x.matrix_expr_scope_, x.has_var_,
-                               is_var_context_, ssRealType);
+        generate_real_var_type(x.matrix_expr_scope_, x.has_var_, ssRealType);
         // to_matrix arg is std::vector of row vectors (Eigen::Matrix<T, 1, C>)
         o_ << "stan::math::to_matrix(stan::math::array_builder<Eigen::Matrix<";
         generate_type(ssRealType.str(), x.args_, 0, o_);
         o_ << ", 1, Eigen::Dynamic> >()";
-        generate_array_builder_adds(x.args_, user_facing_, is_var_context_, o_);
+        generate_array_builder_adds(x.args_, user_facing_, o_);
         o_ << ".array()";
         o_ << ")";
       }
 
-
       void operator()(const row_vector_expr& x) const {
         std::stringstream ssRealType;
         generate_real_var_type(x.row_vector_expr_scope_, x.has_var_,
-                               is_var_context_, ssRealType);
+                               ssRealType);
         // to_row_vector arg is std::vector of type T
         o_ << "stan::math::to_row_vector(stan::math::array_builder<";
         generate_type(ssRealType.str(), x.args_, 0, o_);
         o_ << " >()";
-        generate_array_builder_adds(x.args_, user_facing_, is_var_context_, o_);
+        generate_array_builder_adds(x.args_, user_facing_, o_);
         o_ << ".array()";
         o_ << ")";
       }
@@ -100,11 +98,14 @@ namespace stan {
       void operator()(int n) const {   // NOLINT
         o_ << static_cast<long>(n);    // NOLINT
       }
+
       void operator()(double x) const { o_ << x; }
+
       void operator()(const std::string& x) const { o_ << x; }  // identifiers
+
       void operator()(const index_op& x) const {
         std::stringstream expr_o;
-        generate_expression(x.expr_, expr_o);
+        generate_expression(x.expr_, user_facing_, expr_o);
         std::string expr_string = expr_o.str();
         std::vector<expression> indexes;
         size_t e_num_dims = x.expr_.expression_type().num_dims_;
@@ -115,6 +116,7 @@ namespace stan {
         generate_indexed_expr<false>(expr_string, indexes, base_type,
                                      e_num_dims, user_facing_, o_);
       }
+
       void operator()(const index_op_sliced& x) const {
         if (x.idxs_.size() == 0) {
           generate_expression(x.expr_, user_facing_, o_);
@@ -126,13 +128,12 @@ namespace stan {
           return;
         }
         o_ << "stan::model::rvalue(";
-        generate_expression(x.expr_, o_);
+        generate_expression(x.expr_, user_facing_, o_);
         o_ << ", ";
         generate_idxs(x.idxs_, o_);
         o_ << ", ";
         o_ << '"';
-        bool user_facing = true;
-        generate_expression(x.expr_, user_facing, o_);
+        generate_expression(x.expr_, USER_FACING, o_);
         o_ << '"';
         o_ << ")";
       }
@@ -144,17 +145,17 @@ namespace stan {
            << '('
            << fx.system_function_name_
            << "_functor__(), ";
-        generate_expression(fx.y0_, o_);
+        generate_expression(fx.y0_, NOT_USER_FACING, o_);
         o_ << ", ";
-        generate_expression(fx.t0_, o_);
+        generate_expression(fx.t0_, NOT_USER_FACING, o_);
         o_ << ", ";
-        generate_expression(fx.ts_, o_);
+        generate_expression(fx.ts_, NOT_USER_FACING, o_);
         o_ << ", ";
-        generate_expression(fx.theta_, o_);
+        generate_expression(fx.theta_, user_facing_, o_);
         o_ << ", ";
-        generate_expression(fx.x_, o_);
+        generate_expression(fx.x_, NOT_USER_FACING, o_);
         o_ << ", ";
-        generate_expression(fx.x_int_, o_);
+        generate_expression(fx.x_int_, NOT_USER_FACING, o_);
         o_ << ", pstream__)";
       }
 
@@ -163,23 +164,23 @@ namespace stan {
            << '('
            << fx.system_function_name_
            << "_functor__(), ";
-        generate_expression(fx.y0_, o_);
+        generate_expression(fx.y0_, NOT_USER_FACING, o_);
         o_ << ", ";
-        generate_expression(fx.t0_, o_);
+        generate_expression(fx.t0_, NOT_USER_FACING, o_);
         o_ << ", ";
-        generate_expression(fx.ts_, o_);
+        generate_expression(fx.ts_, NOT_USER_FACING, o_);
         o_ << ", ";
-        generate_expression(fx.theta_, o_);
+        generate_expression(fx.theta_, user_facing_, o_);
         o_ << ", ";
-        generate_expression(fx.x_, o_);
+        generate_expression(fx.x_, NOT_USER_FACING, o_);
         o_ << ", ";
-        generate_expression(fx.x_int_, o_);
+        generate_expression(fx.x_int_, NOT_USER_FACING, o_);
         o_ << ", pstream__, ";
-        generate_expression(fx.rel_tol_, o_);
+        generate_expression(fx.rel_tol_, NOT_USER_FACING, o_);
         o_ << ", ";
-        generate_expression(fx.abs_tol_, o_);
+        generate_expression(fx.abs_tol_, NOT_USER_FACING, o_);
         o_ << ", ";
-        generate_expression(fx.max_num_steps_, o_);
+        generate_expression(fx.max_num_steps_, NOT_USER_FACING, o_);
         o_ << ")";
       }
 
@@ -188,13 +189,13 @@ namespace stan {
            << '('
            << fx.system_function_name_
            << "_functor__(), ";
-        generate_expression(fx.y_, o_);
+        generate_expression(fx.y_, NOT_USER_FACING, o_);
         o_ << ", ";
-        generate_expression(fx.theta_, o_);
+        generate_expression(fx.theta_, user_facing_, o_);
         o_ << ", ";
-        generate_expression(fx.x_r_, o_);
+        generate_expression(fx.x_r_, NOT_USER_FACING, o_);
         o_ << ", ";
-        generate_expression(fx.x_i_, o_);
+        generate_expression(fx.x_i_, NOT_USER_FACING, o_);
         o_ << ", pstream__)";
       }
 
@@ -203,19 +204,19 @@ namespace stan {
            << '('
            << fx.system_function_name_
            << "_functor__(), ";
-        generate_expression(fx.y_, o_);
+        generate_expression(fx.y_, NOT_USER_FACING, o_);
         o_ << ", ";
-        generate_expression(fx.theta_, o_);
+        generate_expression(fx.theta_, user_facing_, o_);
         o_ << ", ";
-        generate_expression(fx.x_r_, o_);
+        generate_expression(fx.x_r_, NOT_USER_FACING, o_);
         o_ << ", ";
-        generate_expression(fx.x_i_, o_);
+        generate_expression(fx.x_i_, NOT_USER_FACING, o_);
         o_ << ", pstream__, ";
-        generate_expression(fx.rel_tol_, o_);
+        generate_expression(fx.rel_tol_, NOT_USER_FACING, o_);
         o_ << ", ";
-        generate_expression(fx.fun_tol_, o_);
+        generate_expression(fx.fun_tol_, NOT_USER_FACING, o_);
         o_ << ", ";
-        generate_expression(fx.max_num_steps_, o_);
+        generate_expression(fx.max_num_steps_, NOT_USER_FACING, o_);
         o_ << ")";
       }
 
@@ -259,10 +260,8 @@ namespace stan {
           || (!expr.has_var_ && expr.type_.is_primitive()
               && (expr.true_val_.expression_type()
                   == expr.false_val_.expression_type()));
-
         std::stringstream ss;
-        generate_real_var_type(expr.scope_, expr.has_var_,
-                               is_var_context_, ss);
+        generate_real_var_type(expr.scope_, expr.has_var_, ss);
 
         o_ << "(";
         boost::apply_visitor(*this, expr.cond_.expr_);
@@ -302,9 +301,6 @@ namespace stan {
         boost::apply_visitor(*this, expr.subject.expr_);
         o_ << ')';
       }
-
-      const bool user_facing_;
-      const bool is_var_context_;
     };
 
   }

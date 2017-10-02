@@ -12,8 +12,6 @@
 namespace stan {
   namespace lang {
 
-    void generate_expression(const expression& e, std::ostream& o);
-
     /**
      * Generate an initializer for a variable of the specified base
      * type with the specified dimension sizes with an additional size
@@ -34,7 +32,7 @@ namespace stan {
                               const expression& type_arg2 = expression()) {
       for (size_t i = 0; i < dims.size(); ++i) {
         o << '(';
-        generate_expression(dims[i].expr_, o);
+        generate_expression(dims[i].expr_, NOT_USER_FACING, o);
         o << ',';
         generate_type(base_type, dims, dims.size() - i - 1, o);
       }

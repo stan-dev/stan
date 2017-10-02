@@ -2,6 +2,7 @@
 #define STAN_LANG_GENERATOR_GENERATE_VAR_RESIZING_HPP
 
 #include <stan/lang/ast.hpp>
+#include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/init_vars_visgen.hpp>
 #include <stan/lang/generator/generate_indent.hpp>
 #include <stan/lang/generator/var_resizing_visgen.hpp>
@@ -37,7 +38,7 @@ namespace stan {
         if (vs[i].has_def()) {
           generate_indent(indent, o);
           o << "stan::math::assign(" << vs[i].name() << ",";
-          generate_expression(vs[i].def(), o);
+          generate_expression(vs[i].def(), NOT_USER_FACING, o);
           o << ");" << EOL;
         }
       }

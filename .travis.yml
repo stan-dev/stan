@@ -53,7 +53,7 @@ matrix:
       env:
         - MATRIX_EVAL="CXX=g++-4.9"
           TESTFOLDER="src/test/unit/callbacks src/test/unit/io"
-          PARALLEL=2
+          PARALLEL=1
     - <<: *linux_gcc
       env:
         - MATRIX_EVAL="CXX=g++-4.9"

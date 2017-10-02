@@ -2,6 +2,7 @@
 #define STAN_LANG_GENERATOR_GENERATE_VALIDATE_POSITIVE_HPP
 
 #include <stan/lang/ast.hpp>
+#include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_indent.hpp>
 #include <stan/lang/generator/generate_quoted_expression.hpp>
 #include <ostream>
@@ -9,8 +10,6 @@
 
 namespace stan {
   namespace lang {
-
-    void generate_expression(const expression& e, std::ostream& o);
 
     /**
      * Generate call to stan_math lib function validate_non_negative_index
@@ -38,7 +37,7 @@ namespace stan {
       o << "validate_non_negative_index(\"" << var_name << "\", ";
       generate_quoted_expression(expr, o);
       o << ", ";
-      generate_expression(expr, o);
+      generate_expression(expr, NOT_USER_FACING, o);
       o << ");" << EOL;
     }
 

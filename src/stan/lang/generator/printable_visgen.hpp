@@ -2,8 +2,9 @@
 #define STAN_LANG_GENERATOR_PRINTABLE_VISGEN_HPP
 
 #include <stan/lang/ast.hpp>
-#include <stan/lang/generator/generate_quoted_string.hpp>
+#include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_expression.hpp>
+#include <stan/lang/generator/generate_quoted_string.hpp>
 #include <ostream>
 #include <string>
 
@@ -39,7 +40,7 @@ namespace stan {
        * @param e expression to generate
        */
       void operator()(const expression& e) const {
-        generate_expression(e, o_);
+        generate_expression(e, NOT_USER_FACING, o_);
       }
     };
 

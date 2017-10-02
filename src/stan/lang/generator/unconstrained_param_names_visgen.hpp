@@ -12,8 +12,6 @@
 namespace stan {
   namespace lang {
 
-    void generate_expression(const expression& e, std::ostream& o);
-
     /**
      * Visitor for adding unconstrained parameter names to the name
      * accumulator <code>param_names__</code>.
@@ -47,7 +45,7 @@ namespace stan {
         for (size_t i = combo_dims.size(); i-- > 0; ) {
           generate_indent(1 + combo_dims.size() - i, o_);
           o_ << "for (int k_" << i << "__ = 1;" << " k_" << i << "__ <= ";
-          generate_expression(combo_dims[i].expr_, o_);
+          generate_expression(combo_dims[i].expr_, NOT_USER_FACING, o_);
           o_ << "; ++k_" << i << "__) {" << EOL;  // begin (1)
         }
         // add to accumulator

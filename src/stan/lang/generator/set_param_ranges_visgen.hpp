@@ -12,8 +12,6 @@
 namespace stan {
   namespace lang {
 
-    void generate_expression(const expression& e, std::ostream& o);
-
     /**
      * Visitor for generating ranges output for parameters used to set
      * local variables <code>param_ranges_i__</code> and
@@ -54,7 +52,7 @@ namespace stan {
         o_ << "num_params_r__ += ";
         for (size_t i = 0; i < dims.size(); ++i) {
           if (i > 0) o_ << " * ";
-          generate_expression(dims[i], o_);
+          generate_expression(dims[i], NOT_USER_FACING, o_);
         }
         o_ << ";" << EOL;
       }
@@ -75,7 +73,7 @@ namespace stan {
         o_ << "num_params_r__ += ";
         for (size_t i = 0; i < dims.size(); ++i) {
           if (i > 0) o_ << " * ";
-          generate_expression(dims[i], o_);
+          generate_expression(dims[i], NOT_USER_FACING, o_);
         }
         o_ << ";" << EOL;
       }
@@ -92,10 +90,10 @@ namespace stan {
                               const std::vector<expression>& dims) const {
         generate_indent(indent_, o_);
         o_ << "num_params_r__ += ";
-        generate_expression(K, o_);
+        generate_expression(K, NOT_USER_FACING, o_);
         for (size_t i = 0; i < dims.size(); ++i) {
           o_ << " * ";
-          generate_expression(dims[i], o_);
+          generate_expression(dims[i], NOT_USER_FACING, o_);
         }
         o_ << ";" << EOL;
       }
@@ -112,12 +110,12 @@ namespace stan {
                               const std::vector<expression>& dims) const {
         generate_indent(indent_, o_);
         o_ << "num_params_r__ += ";
-        generate_expression(M, o_);
+        generate_expression(M, NOT_USER_FACING, o_);
         o_ << " * ";
-        generate_expression(N, o_);
+        generate_expression(N, NOT_USER_FACING, o_);
         for (size_t i = 0; i < dims.size(); ++i) {
           o_ << " * ";
-          generate_expression(dims[i], o_);
+          generate_expression(dims[i], NOT_USER_FACING, o_);
         }
         o_ << ";" << EOL;
       }
@@ -134,15 +132,15 @@ namespace stan {
           generate_indent(i + 2, o_);
           o_ << "for (size_t i_" << i << "__ = 0; ";
           o_ << "i_" << i << "__ < ";
-          generate_expression(x.dims_[i], o_);
+          generate_expression(x.dims_[i], NOT_USER_FACING, o_);
           o_ << "; ++i_" << i << "__) {" << EOL;
         }
         // add range
         generate_indent(x.dims_.size() + 2, o_);
         o_ << "param_ranges_i__.push_back(std::pair<int, int>(";
-        generate_expression(x.range_.low_, o_);
+        generate_expression(x.range_.low_, NOT_USER_FACING, o_);
         o_ << ", ";
-        generate_expression(x.range_.high_, o_);
+        generate_expression(x.range_.high_, NOT_USER_FACING, o_);
         o_ << "));" << EOL;
         // close for loop
         for (size_t i = 0; i < x.dims_.size(); ++i) {
@@ -190,11 +188,11 @@ namespace stan {
         }
         generate_indent(indent_, o_);
         o_ << "num_params_r__ += (";
-        generate_expression(x.K_, o_);
+        generate_expression(x.K_, NOT_USER_FACING, o_);
         o_ << ")";
         for (size_t i = 0; i < x.dims_.size(); ++i) {
           o_ << " * ";
-          generate_expression(x.dims_[i], o_);
+          generate_expression(x.dims_[i], NOT_USER_FACING, o_);
         }
         o_ << ";" << EOL;
       }
@@ -207,11 +205,11 @@ namespace stan {
         }
         generate_indent(indent_, o_);
         o_ << "num_params_r__ += (";
-        generate_expression(x.K_, o_);
+        generate_expression(x.K_, NOT_USER_FACING, o_);
         o_ << " - 1)";
         for (size_t i = 0; i < x.dims_.size(); ++i) {
           o_ << " * ";
-          generate_expression(x.dims_[i], o_);
+          generate_expression(x.dims_[i], NOT_USER_FACING, o_);
         }
         o_ << ";" << EOL;
       }
@@ -241,19 +239,19 @@ namespace stan {
         generate_indent(indent_, o_);
         o_ << "num_params_r__ += ((";
         // N * (N + 1) / 2  +  (M - N) * M
-        generate_expression(x.N_, o_);
+        generate_expression(x.N_, NOT_USER_FACING, o_);
         o_ << " * (";
-        generate_expression(x.N_, o_);
+        generate_expression(x.N_, NOT_USER_FACING, o_);
         o_ << " + 1)) / 2 + (";
-        generate_expression(x.M_, o_);
+        generate_expression(x.M_, NOT_USER_FACING, o_);
         o_ << " - ";
-        generate_expression(x.N_, o_);
+        generate_expression(x.N_, NOT_USER_FACING, o_);
         o_ << ") * ";
-        generate_expression(x.N_, o_);
+        generate_expression(x.N_, NOT_USER_FACING, o_);
         o_ << ")";
         for (size_t i = 0; i < x.dims_.size(); ++i) {
           o_ << " * ";
-          generate_expression(x.dims_[i], o_);
+          generate_expression(x.dims_[i], NOT_USER_FACING, o_);
         }
         o_ << ";" << EOL;
       }
@@ -265,13 +263,13 @@ namespace stan {
         }
         generate_indent(indent_, o_);
         o_ << "num_params_r__ += ((";
-        generate_expression(x.K_, o_);
+        generate_expression(x.K_, NOT_USER_FACING, o_);
         o_ << " * (";
-        generate_expression(x.K_, o_);
+        generate_expression(x.K_, NOT_USER_FACING, o_);
         o_ << " - 1)) / 2)";
         for (size_t i = 0; i < x.dims_.size(); ++i) {
           o_ << " * ";
-          generate_expression(x.dims_[i], o_);
+          generate_expression(x.dims_[i], NOT_USER_FACING, o_);
         }
         o_ << ";" << EOL;
       }
@@ -284,15 +282,15 @@ namespace stan {
         // (K * (K - 1))/2 + K  ?? define fun(K) = ??
         generate_indent(indent_, o_);
         o_ << "num_params_r__ += ((";
-        generate_expression(x.K_, o_);
+        generate_expression(x.K_, NOT_USER_FACING, o_);
         o_ << " * (";
-        generate_expression(x.K_, o_);
+        generate_expression(x.K_, NOT_USER_FACING, o_);
         o_ << " - 1)) / 2 + ";
-        generate_expression(x.K_, o_);
+        generate_expression(x.K_, NOT_USER_FACING, o_);
         o_ << ")";
         for (size_t i = 0; i < x.dims_.size(); ++i) {
           o_ << " * ";
-          generate_expression(x.dims_[i], o_);
+          generate_expression(x.dims_[i], NOT_USER_FACING, o_);
         }
         o_ << ";" << EOL;
       }
@@ -304,13 +302,13 @@ namespace stan {
         }
         generate_indent(indent_, o_);
         o_ << "num_params_r__ += ((";
-        generate_expression(x.K_, o_);
+        generate_expression(x.K_, NOT_USER_FACING, o_);
         o_ << " * (";
-        generate_expression(x.K_, o_);
+        generate_expression(x.K_, NOT_USER_FACING, o_);
         o_ << " - 1)) / 2)";
         for (size_t i = 0; i < x.dims_.size(); ++i) {
           o_ << " * ";
-          generate_expression(x.dims_[i], o_);
+          generate_expression(x.dims_[i], NOT_USER_FACING, o_);
         }
         o_ << ";" << EOL;
       }
