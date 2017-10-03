@@ -1584,7 +1584,6 @@ namespace stan {
                    << " (real, real[], real[], real[], int[]) : real[] ";
         pass = false;
       }
-      // check signature  of system_function_name_
       
       // test regular argument types
       if (ode_fun.y0_.expression_type() != expr_type(double_type(), 1)) {
