@@ -50,7 +50,7 @@ TEST(lang_parser, integrate_ode_rk45_bad) {
 }
 TEST(lang_parser, integrate_ode_bdf_bad) {
   test_throws("ode/bad_bdf_control_function_return",
-              "first argument to integrate_ode_bdf must be the name of a function with signature");
+      "first argument to integrate_ode_bdf must be the name of a function with signature");
   test_throws("ode/bad_fun_type_bdf",
       "first argument to integrate_ode_bdf must be the name of a function with signature");
   test_throws("ode/bad_y_type_bdf",
