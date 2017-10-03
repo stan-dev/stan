@@ -4,6 +4,7 @@ def clean() {
         make clean-all
         git clean -xffd
         echo 'CC=${env.CXX}' > make/local
+        echo 'CXXFLAGS += -Werror' >> make/local
     """
 }
 
@@ -33,31 +34,35 @@ pipeline {
                 sh "echo 'CXXFLAGS += -Werror' >> make/local"
             }
         }
-        //stage('Linting & Doc checks') {
-        //    steps {
-        //        parallel(
-        //            CppLint: { sh "make cpplint" },
-        //            documentation: { sh 'make doxygen' },
-        //            manual: { sh 'make manual' },
-        //            headers: { sh "make -j${env.PARALLEL} test-headers" },
-        //            failFast: true
-        //        )
-        //    }
-        //}
+        stage('Linting & Doc checks') {
+            steps {
+                parallel(
+                    CppLint: { sh "make cpplint" },
+                    documentation: { sh 'make doxygen' },
+                    manual: { sh 'make manual' },
+                    headers: { sh "make -j${env.PARALLEL} test-headers" },
+                    failFast: true
+                )
+            }
+        }
         stage('Tests') {
             failFast true
             parallel {
                 stage('Windows Unit') {
                     agent { label 'windows' }
-                    clean()
-                    checkout_pr(params.math_pr)
-                    sh "./runTests.py -j${env.PARALLEL} src/test/unit"
+                    steps {
+                        clean()
+                        checkout_pr(params.math_pr)
+                        sh "./runTests.py -j${env.PARALLEL} src/test/unit"
+                    }
                 }
                 stage('Windows Headers') { 
-                    node { label 'windows' }
-                    clean()
-                    checkout_pr(params.math_pr)
-                    sh "make -j${env.PARALLEL} test-headers"
+                    agent { label 'windows' }
+                    steps {
+                        clean()
+                        checkout_pr(params.math_pr)
+                        sh "make -j${env.PARALLEL} test-headers"
+                    }
                 }
                 //These aren't turned on in the old config - broken
                 //windowsIntegration: {
@@ -67,36 +72,37 @@ pipeline {
                 //},
                 stage('Unit') { 
                     agent any
-                    clean()
-                    checkout_pr(params.math_pr)
-                    sh "./runTests.py -j${env.PARALLEL} src/test/unit"
+                    steps {
+                        clean()
+                        checkout_pr(params.math_pr)
+                        sh "./runTests.py -j${env.PARALLEL} src/test/unit"
+                    }
                 }
                 stage('Integration') {
                     agent any
-                    clean()
-                    checkout_pr(params.math_pr)
-                    sh "./runTests.py -j${env.PARALLEL} src/test/integration"
+                    steps {
+                        clean()
+                        checkout_pr(params.math_pr)
+                        sh "./runTests.py -j${env.PARALLEL} src/test/integration"
+                    }
+                }
+                stage('Upstream CmdStan tests') {
+                    when {
+                        allOf {
+                            not { branch 'master' }
+                            not { branch 'develop' }
+                        }
+                    }
+                    steps {
+                        build(job: 'CmdStan/develop',
+                                parameters: [string(name: 'stan_pr', value: env.BRANCH_NAME),
+                                                string(name: 'math_pr', value: params.math_pr)])
+                    }
                 }
             }
         }
-        stage('Upstream CmdStan tests') {
-            when {
-                allOf {
-                    not { branch 'master' }
-                    not { branch 'develop' }
-                }
-            }
-            steps {
-                build(job: 'CmdStan Pipeline/develop',
-                        parameters: [string(name: 'stan_pr', value: env.BRANCH_NAME),
-                                        string(name: 'math_pr', value: params.math_pr)])
-            }
-        }
-            
         stage('Performance') {
             agent { label 'gelman-group-mac' }
-            //XXX Eventually make this block from running with other jobs
-            //buildBlocker blockingJobs: '.*', blockLevel: 'NODE'
             steps {
                 clean()
                 checkout_pr(params.math_pr)
