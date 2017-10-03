@@ -40,8 +40,9 @@ namespace stan {
       if (sigs_map_.find(name) == sigs_map_.end())
         return false;
       const std::vector<function_signature_t> sigs = sigs_map_[name];
+      // check return type
       for (size_t i = 0; i < sigs.size(); ++i)
-        if (sig.second == sigs[i].second)
+        if (sig.first == sigs[i].first && sig.second == sigs[i].second)
           return true;
       return false;
     }
@@ -51,7 +52,7 @@ namespace stan {
                                         const function_signature_t& sig) {
       const std::vector<function_signature_t> sigs = sigs_map_[name];
       for (size_t i = 0; i < sigs.size(); ++i)
-        if (sig.second == sigs[i].second)
+        if (sig.first == sigs[i].first && sig.second == sigs[i].second)
           return sigs[i];
       expr_type ill_formed = expr_type();
       std::vector<function_arg_type> arg_types;

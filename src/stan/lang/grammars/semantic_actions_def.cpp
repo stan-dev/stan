@@ -1584,7 +1584,8 @@ namespace stan {
                    << " (real, real[], real[], real[], int[]) : real[] ";
         pass = false;
       }
-
+      // check signature  of system_function_name_
+      
       // test regular argument types
       if (ode_fun.y0_.expression_type() != expr_type(double_type(), 1)) {
         error_msgs << "second argument to "
@@ -1707,7 +1708,7 @@ namespace stan {
 
       // test data-only variables do not have parameters (int locals OK)
       if (has_var(ode_fun.rel_tol_, var_map)) {
-        error_msgs << "eight argument to "
+        error_msgs << "eighth argument to "
                    << ode_fun.integration_function_name_
                    << " (relative tolerance) must be data only"
                    << " and not depend on parameters";
