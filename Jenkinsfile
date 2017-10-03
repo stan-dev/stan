@@ -17,6 +17,25 @@ def checkout_pr(String pr) {
         """
     }
 }
+def clean_bat() {
+    bat """
+        make math-revert
+        make clean-all
+        git clean -xffd
+        echo CC=${env.CXX} -Werror > make/local
+    """
+}
+
+def checkout_pr_bat(String pr) {
+    if (pr != '')  {
+        prNumber = pr.tokenize('-').last()
+        bat """
+            cd stan/lib/stan_math
+            git fetch https://github.com/stan-dev/math +refs/pull/${prNumber}/merge:refs/remotes/origin/pr/${prNumber}/merge
+            git checkout refs/remotes/origin/pr/${prNumber}/merge
+        """
+    }
+}
 
 pipeline {
     agent any
@@ -51,18 +70,20 @@ pipeline {
                 stage('Windows Unit') {
                     agent { label 'windows' }
                     steps {
-                        clean()
-                        checkout_pr(params.math_pr)
-                        sh "./runTests.py -j${env.PARALLEL} src/test/unit"
+                        clean_bat()
+                        checkout_pr_bat(params.math_pr)
+                        bat "runTests.py -j${env.PARALLEL} src/test/unit"
                     }
+                    post { always { cleanWs() } }
                 }
                 stage('Windows Headers') { 
                     agent { label 'windows' }
                     steps {
-                        clean()
-                        checkout_pr(params.math_pr)
-                        sh "make -j${env.PARALLEL} test-headers"
+                        clean_bat()
+                        checkout_pr_bat(params.math_pr)
+                        bat "make -j${env.PARALLEL} test-headers"
                     }
+                    post { always { cleanWs() } }
                 }
                 //These aren't turned on in the old config - broken
                 //windowsIntegration: {
@@ -77,6 +98,7 @@ pipeline {
                         checkout_pr(params.math_pr)
                         sh "./runTests.py -j${env.PARALLEL} src/test/unit"
                     }
+                    post { always { cleanWs() } }
                 }
                 stage('Integration') {
                     agent any
@@ -85,6 +107,7 @@ pipeline {
                         checkout_pr(params.math_pr)
                         sh "./runTests.py -j${env.PARALLEL} src/test/integration"
                     }
+                    post { always { cleanWs() } }
                 }
                 stage('Upstream CmdStan tests') {
                     when {
@@ -94,7 +117,7 @@ pipeline {
                         }
                     }
                     steps {
-                        build(job: 'CmdStan/develop',
+                        build(job: 'CmdStan/downstream tests',
                                 parameters: [string(name: 'stan_pr', value: env.BRANCH_NAME),
                                                 string(name: 'math_pr', value: params.math_pr)])
                     }
@@ -124,6 +147,7 @@ pipeline {
     }
     post {
         always {
+            cleanWs()
             warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
             warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
             warnings consoleParsers: [[parserName: 'CppLint']], canRunOnFailed: true
