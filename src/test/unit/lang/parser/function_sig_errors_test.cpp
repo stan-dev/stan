@@ -1,4 +1,6 @@
 #include <gtest/gtest.h>
+#include <exception>
+#include <stdexcept>
 #include <test/unit/lang/utility.hpp>
 
 TEST(langParser, functionSigErrorsFunUnknown) {
@@ -27,3 +29,9 @@ TEST(langParser, functionSigErrorsMultiDef) {
   test_throws("multi_fun",
               "Function already defined, name=foo");
 }
+TEST(langParser, functionSigErrorsFactorial) {
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/function-signatures/math/functions/falling_factorial.stan"),
+                           std::invalid_argument);
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/function-signatures/math/functions/rising_factorial.stan"),
+                           std::invalid_argument);
+}  
