@@ -113,12 +113,9 @@ pipeline {
                     }
                 }
                 stage('Upstream CmdStan tests') {
-                    when {
-                        allOf {
-                            not { branch 'master' }
-                            not { branch 'develop' }
-                        }
-                    }
+                    // These will only execute when we're running against the
+                    // live PR build, not on other branches
+                    when { expression { env.BRANCH_NAME ==~ /PR-\d+/ } }
                     steps {
                         build(job: 'CmdStan/downstream tests',
                                 parameters: [string(name: 'stan_pr', value: env.BRANCH_NAME),
