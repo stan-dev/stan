@@ -1,44 +1,23 @@
-def clean() {
-    sh """
-        make math-revert
-        make clean-all
-        git clean -xffd
-        echo 'CC=${env.CXX}' > make/local
-        echo 'CXXFLAGS += -Werror' >> make/local
-    """
-}
-
-def checkout_pr(String pr) {
-    if (pr != '')  {
-        prNumber = pr.tokenize('-').last()
-        sh """ cd stan/lib/stan_math
-            git fetch https://github.com/stan-dev/math +refs/pull/${prNumber}/merge:refs/remotes/origin/pr/${prNumber}/merge
-            git checkout refs/remotes/origin/pr/${prNumber}/merge
-        """
-    }
-}
-def clean_bat() {
-    bat """
+def setup(String pr) {
+    script = """
         make math-revert
         make clean-all
         git clean -xffd
         echo CC=${env.CXX} -Werror > make/local
     """
-}
-
-def checkout_pr_bat(String pr) {
     if (pr != '')  {
         prNumber = pr.tokenize('-').last()
-        bat """
+        script += """ 
             cd stan/lib/stan_math
             git fetch https://github.com/stan-dev/math +refs/pull/${prNumber}/merge:refs/remotes/origin/pr/${prNumber}/merge
             git checkout refs/remotes/origin/pr/${prNumber}/merge
         """
     }
+    return script
 }
 
 pipeline {
-    agent any
+    agent none
     options {
         disableConcurrentBuilds()
     }
@@ -46,22 +25,35 @@ pipeline {
         string(defaultValue: '', name: 'math_pr')
     }
     stages {
-        stage('Clean & Setup') {
-            steps {
-                clean()
-                checkout_pr(params.math_pr)
-                sh "echo 'CXXFLAGS += -Werror' >> make/local"
-            }
-        }
         stage('Linting & Doc checks') {
+            agent any
             steps {
-                parallel(
-                    CppLint: { sh "make cpplint" },
-                    documentation: { sh 'make doxygen' },
-                    manual: { sh 'make manual' },
-                    headers: { sh "make -j${env.PARALLEL} test-headers" },
-                    failFast: true
-                )
+                script {
+                    sh setup(params.math_pr)
+                    parallel(
+                        CppLint: {
+                            sh "make cpplint"
+                        },
+                        documentation: {
+                            sh 'make doxygen' 
+                        },
+                        manual: {
+                            sh 'make manual' 
+                        },
+                        headers: {
+                            sh "make -j${env.PARALLEL} test-headers" 
+                        },
+                        failFast: true
+                    )
+                }
+            }
+            post { 
+                always {
+                    cleanWs()
+                    warnings consoleParsers: [[parserName: 'CppLint']], canRunOnFailed: true
+                    warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
+                    warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
+                }
             }
         }
         stage('Tests') {
@@ -70,44 +62,61 @@ pipeline {
                 stage('Windows Unit') {
                     agent { label 'windows' }
                     steps {
-                        clean_bat()
-                        checkout_pr_bat(params.math_pr)
+                        bat setup(params.math_pr)
                         bat "runTests.py -j${env.PARALLEL} src/test/unit"
+                        junit 'test/**/*.xml'
                     }
-                    post { always { cleanWs() } }
+                    post {
+                        always { 
+                            cleanWs() 
+                            warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
+                            warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
+                        }
+                    }
                 }
                 stage('Windows Headers') { 
                     agent { label 'windows' }
                     steps {
-                        clean_bat()
-                        checkout_pr_bat(params.math_pr)
+                        bat setup(params.math_pr)
                         bat "make -j${env.PARALLEL} test-headers"
                     }
-                    post { always { cleanWs() } }
+                    post {
+                        always {
+                            cleanWs() 
+                            warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
+                            warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
+                        }
+                    }
                 }
-                //These aren't turned on in the old config - broken
-                //windowsIntegration: {
-                //    agent { label 'windows' }
-                //    clean()
-                //    sh "./runTests.py -j${env.PARALLEL} src/test/integration"
-                //},
                 stage('Unit') { 
                     agent any
                     steps {
-                        clean()
-                        checkout_pr(params.math_pr)
+                        sh setup(params.math_pr)
                         sh "./runTests.py -j${env.PARALLEL} src/test/unit"
+                        junit 'test/**/*.xml'
                     }
-                    post { always { cleanWs() } }
+                    post {
+                        always {
+                            cleanWs() 
+                            warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
+                            warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
+                        }
+                    }
                 }
                 stage('Integration') {
                     agent any
-                    steps {
-                        clean()
-                        checkout_pr(params.math_pr)
+                    steps { 
+                        sh setup(params.math_pr)
                         sh "./runTests.py -j${env.PARALLEL} src/test/integration"
+                        junit 'test/**/*.xml'
+                      }
+                    post {
+                        always {
+                            cleanWs() 
+                            warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
+                            warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
+                        }
                     }
-                    post { always { cleanWs() } }
                 }
                 stage('Upstream CmdStan tests') {
                     when {
@@ -127,13 +136,17 @@ pipeline {
         stage('Performance') {
             agent { label 'gelman-group-mac' }
             steps {
-                clean()
-                checkout_pr(params.math_pr)
+                sh setup(params.math_pr)
                 sh """
-                    ./runTests.py src/test/performance
+                    ./runTests.py -j${env.PARALLEL} src/test/performance
                     cd test/performance
                     RScript ../../src/test/performance/plot_performance.R 
                 """
+                junit 'test/**/*.xml'
+                archiveArtifacts 'test/performance/performance.csv,test/performance/performance.png'
+                perfReport compareBuildPrevious: true, errorFailedThreshold: 0, errorUnstableThreshold: 0, failBuildIfNoResultFile: false, modePerformancePerTestCase: true, sourceDataFiles: 'test/performance/**.xml'
+                warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
+                warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
             }
         }
         stage('Update CmdStan Upstream') {
@@ -143,17 +156,6 @@ pipeline {
                 sh "curl -O https://raw.githubusercontent.com/stan-dev/ci-scripts/master/jenkins/create-cmdstan-pull-request.sh"
                 sh "sh create-cmdstan-pull-request.sh"
             }
-        }
-    }
-    post {
-        always {
-            cleanWs()
-            warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
-            warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
-            warnings consoleParsers: [[parserName: 'CppLint']], canRunOnFailed: true
-            archiveArtifacts 'test/performance/performance.csv,test/performance/performance.png'
-            junit 'test/**/*.xml'
-            perfReport compareBuildPrevious: true, errorFailedThreshold: 0, errorUnstableThreshold: 0, failBuildIfNoResultFile: false, modePerformancePerTestCase: true, sourceDataFiles: 'test/performance/**.xml'
         }
     }
 }
