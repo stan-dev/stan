@@ -26,104 +26,104 @@ pipeline {
         string(defaultValue: '', name: 'math_pr')
     }
     stages {
-        stage('Linting & Doc checks') {
-            agent any
-            steps {
-                script {
-                    sh 'printenv'
-                    sh setup(params.math_pr)
-                    parallel(
-                        CppLint: { sh "make cpplint" },
-                        documentation: { sh 'make doxygen' },
-                        manual: { sh 'make manual' },
-                        headers: { sh "make -j${env.PARALLEL} test-headers" },
-                        failFast: true
-                    )
-                }
-            }
-            post { 
-                always {
-                    cleanWs()
-                    warnings consoleParsers: [[parserName: 'CppLint']], canRunOnFailed: true
-                    warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
-                    warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
-                }
-            }
-        }
-        stage('Tests') {
-            failFast true
-            parallel {
-                stage('Windows Unit') {
-                    agent { label 'windows' }
-                    steps {
-                        bat setup(params.math_pr)
-                        bat "runTests.py -j${env.PARALLEL} src/test/unit"
-                        junit 'test/**/*.xml'
-                    }
-                    post {
-                        always { 
-                            cleanWs() 
-                            warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
-                            warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
-                        }
-                    }
-                }
-                stage('Windows Headers') { 
-                    agent { label 'windows' }
-                    steps {
-                        bat setup(params.math_pr)
-                        bat "make -j${env.PARALLEL} test-headers"
-                    }
-                    post {
-                        always {
-                            cleanWs() 
-                            warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
-                            warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
-                        }
-                    }
-                }
-                stage('Unit') { 
-                    agent any
-                    steps {
-                        sh setup(params.math_pr, false)
-                        sh "./runTests.py -j${env.PARALLEL} src/test/unit"
-                        junit 'test/**/*.xml'
-                    }
-                    post {
-                        always {
-                            cleanWs() 
-                            warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
-                            warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
-                        }
-                    }
-                }
-                stage('Integration') {
-                    agent any
-                    steps { 
-                        sh setup(params.math_pr)
-                        sh "./runTests.py -j${env.PARALLEL} src/test/integration"
-                        junit 'test/**/*.xml'
-                      }
-                    post {
-                        always {
-                            cleanWs() 
-                            warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
-                            warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
-                        }
-                    }
-                }
-                stage('Upstream CmdStan tests') {
-                    // These will only execute when we're running against the
-                    // live PR build, not on other branches
-                    when { expression { env.BRANCH_NAME ==~ /PR-\d+/ } }
-                    steps {
-                        build(job: 'CmdStan/downstream tests',
-                                parameters: [string(name: 'stan_pr', value: env.BRANCH_NAME),
-                                                string(name: 'math_pr', value: params.math_pr)])
-                    }
-                }
-            }
-        }
+        //stage('Linting & Doc checks') {
+        //    agent any
+        //    steps {
+        //        script {
+        //            sh 'printenv'
+        //            sh setup(params.math_pr)
+        //            parallel(
+        //                CppLint: { sh "make cpplint" },
+        //                documentation: { sh 'make doxygen' },
+        //                manual: { sh 'make manual' },
+        //                headers: { sh "make -j${env.PARALLEL} test-headers" },
+        //                failFast: true
+        //            )
+        //        }
+        //    }
+        //    post { 
+        //        always {
+        //            cleanWs()
+        //            warnings consoleParsers: [[parserName: 'CppLint']], canRunOnFailed: true
+        //            warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
+        //            warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
+        //        }
+        //    }
+        //}
+        //stage('Tests') {
+        //    failFast true
+        //    parallel {
+        //        stage('Windows Unit') {
+        //            agent { label 'windows' }
+        //            steps {
+        //                bat setup(params.math_pr)
+        //                bat "runTests.py -j${env.PARALLEL} src/test/unit"
+        //                junit 'test/**/*.xml'
+        //            }
+        //            post {
+        //                always { 
+        //                    cleanWs() 
+        //                    warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
+        //                    warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
+        //                }
+        //            }
+        //        }
+        //        stage('Windows Headers') { 
+        //            agent { label 'windows' }
+        //            steps {
+        //                bat setup(params.math_pr)
+        //                bat "make -j${env.PARALLEL} test-headers"
+        //            }
+        //            post {
+        //                always {
+        //                    cleanWs() 
+        //                    warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
+        //                    warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
+        //                }
+        //            }
+        //        }
+        //        stage('Unit') { 
+        //            agent any
+        //            steps {
+        //                sh setup(params.math_pr, false)
+        //                sh "./runTests.py -j${env.PARALLEL} src/test/unit"
+        //                junit 'test/**/*.xml'
+        //            }
+        //            post {
+        //                always {
+        //                    cleanWs() 
+        //                    warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
+        //                    warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
+        //                }
+        //            }
+        //        }
+        //        stage('Integration') {
+        //            agent any
+        //            steps { 
+        //                sh setup(params.math_pr)
+        //                sh "./runTests.py -j${env.PARALLEL} src/test/integration"
+        //                junit 'test/**/*.xml'
+        //              }
+        //            post {
+        //                always {
+        //                    cleanWs() 
+        //                    warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
+        //                    warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
+        //                }
+        //            }
+        //        }
+        //        stage('Upstream CmdStan tests') {
+        //            // These will only execute when we're running against the
+        //            // live PR build, not on other branches
+        //            when { expression { env.BRANCH_NAME ==~ /PR-\d+/ } }
+        //            steps {
+        //                build(job: 'CmdStan/downstream tests',
+        //                        parameters: [string(name: 'stan_pr', value: env.BRANCH_NAME),
+        //                                        string(name: 'math_pr', value: params.math_pr)])
+        //            }
+        //        }
+        //    }
+        //}
         stage('Performance') {
             agent { label 'gelman-group-mac' }
             steps {
