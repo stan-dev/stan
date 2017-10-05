@@ -24,7 +24,7 @@ namespace stan {
      * @param[in] allow_undefined Permit undefined functions?
      * @param filename name of file or other source from which input
      *   stream was derived
-     * @param include_paths array of names of included files
+     * @param include_paths array of paths to search for included files
      * @return <code>false</code> if code could not be generated
      *    due to syntax error in the functions file;
      *    <code>true</code> otherwise.
