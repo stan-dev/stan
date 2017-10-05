@@ -51,6 +51,9 @@ pipeline {
             post { 
                 always {
                     cleanWs()
+                    warnings consoleParsers: [[parserName: 'CppLint']], canRunOnFailed: true
+                    warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
+                    warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
                 }
             }
         }
@@ -67,6 +70,8 @@ pipeline {
                     post {
                         always { 
                             cleanWs() 
+                            warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
+                            warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
                         }
                     }
                 }
@@ -79,6 +84,8 @@ pipeline {
                     post {
                         always {
                             cleanWs() 
+                            warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
+                            warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
                         }
                     }
                 }
@@ -92,6 +99,8 @@ pipeline {
                     post {
                         always {
                             cleanWs() 
+                            warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
+                            warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
                         }
                     }
                 }
@@ -105,6 +114,8 @@ pipeline {
                     post {
                         always {
                             cleanWs() 
+                            warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
+                            warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
                         }
                     }
                 }
@@ -135,6 +146,8 @@ pipeline {
                 junit 'test/**/*.xml'
                 archiveArtifacts 'test/performance/performance.csv,test/performance/performance.png'
                 perfReport compareBuildPrevious: true, errorFailedThreshold: 0, errorUnstableThreshold: 0, failBuildIfNoResultFile: false, modePerformancePerTestCase: true, sourceDataFiles: 'test/performance/**.xml'
+                warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
+                warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
             }
         }
         stage('Update CmdStan Upstream') {
@@ -144,13 +157,6 @@ pipeline {
                 sh "curl -O https://raw.githubusercontent.com/stan-dev/ci-scripts/master/jenkins/create-cmdstan-pull-request.sh"
                 sh "sh create-cmdstan-pull-request.sh"
             }
-        }
-    }
-    post {
-        always {
-            warnings consoleParsers: [[parserName: 'CppLint']], canRunOnFailed: true
-            warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
-            warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
         }
     }
 }
