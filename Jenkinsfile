@@ -30,20 +30,13 @@ pipeline {
             agent any
             steps {
                 script {
+                    sh 'printenv'
                     sh setup(params.math_pr)
                     parallel(
-                        CppLint: {
-                            sh "make cpplint"
-                        },
-                        documentation: {
-                            sh 'make doxygen' 
-                        },
-                        manual: {
-                            sh 'make manual' 
-                        },
-                        headers: {
-                            sh "make -j${env.PARALLEL} test-headers" 
-                        },
+                        CppLint: { sh "make cpplint" },
+                        documentation: { sh 'make doxygen' },
+                        manual: { sh 'make manual' },
+                        headers: { sh "make -j${env.PARALLEL} test-headers" },
                         failFast: true
                     )
                 }
