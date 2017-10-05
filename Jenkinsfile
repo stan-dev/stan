@@ -1,9 +1,10 @@
-def setup(String pr) {
+def setup(String pr, Boolean failOnError = true) {
+    errorStr = failOnError ? "-Werror " : ""
     script = """
         make math-revert
         make clean-all
         git clean -xffd
-        echo CC=${env.CXX} -Werror > make/local
+        echo CC=${env.CXX} ${errorStr}> make/local
     """
     if (pr != '')  {
         prNumber = pr.tokenize('-').last()
@@ -91,7 +92,7 @@ pipeline {
                 stage('Unit') { 
                     agent any
                     steps {
-                        sh setup(params.math_pr)
+                        sh setup(params.math_pr, false)
                         sh "./runTests.py -j${env.PARALLEL} src/test/unit"
                         junit 'test/**/*.xml'
                     }
