@@ -363,7 +363,8 @@ for (size_t i = 0; i < vector_types.size(); ++i) {
 }
 add_unary("exponential_rng");
 add_unary_vectorized("fabs");
-add_binary("falling_factorial");
+add("falling_factorial", expr_type(double_type()), expr_type(double_type()), expr_type(int_type()));
+add("falling_factorial", expr_type(int_type()), expr_type(int_type()), expr_type(int_type()));
 add_binary("fdim");
 add_unary_vectorized("floor");
 add_ternary("fma");
@@ -917,7 +918,8 @@ add("rep_matrix", expr_type(matrix_type()), expr_type(vector_type()), expr_type(
 add("rep_matrix", expr_type(matrix_type()), expr_type(row_vector_type()), expr_type(int_type()));
 add("rep_row_vector", expr_type(row_vector_type()), expr_type(double_type()), expr_type(int_type()));
 add("rep_vector", expr_type(vector_type()), expr_type(double_type()), expr_type(int_type()));
-add_binary("rising_factorial");
+add("rising_factorial", expr_type(double_type()), expr_type(double_type()), expr_type(int_type()));
+add("rising_factorial", expr_type(int_type()), expr_type(int_type()), expr_type(int_type()));
 add_unary_vectorized("round");
 add("row", expr_type(row_vector_type()), expr_type(matrix_type()), expr_type(int_type()));
 add("rows", expr_type(int_type()), expr_type(vector_type()));
