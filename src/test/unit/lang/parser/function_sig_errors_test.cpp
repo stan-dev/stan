@@ -30,8 +30,8 @@ TEST(langParser, functionSigErrorsMultiDef) {
               "Function already defined, name=foo");
 }
 TEST(langParser, functionSigErrorsFactorial) {
-  EXPECT_THROW(is_parsable("src/test/test-models/bad/function-signatures/math/functions/falling_factorial.stan"),
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/function-signatures/falling_factorial.stan"),
                            std::invalid_argument);
-  EXPECT_THROW(is_parsable("src/test/test-models/bad/function-signatures/math/functions/rising_factorial.stan"),
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/function-signatures/rising_factorial.stan"),
                            std::invalid_argument);
 }  
