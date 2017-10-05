@@ -23,7 +23,8 @@ pipeline {
         disableConcurrentBuilds()
     }
     parameters {
-        string(defaultValue: '', name: 'math_pr')
+        string(defaultValue: '', name: 'math_pr', description: "Leave blank "
+                + "unless testing against a specific math repo pull request.")
     }
     stages {
         stage('Linting & Doc checks') {
