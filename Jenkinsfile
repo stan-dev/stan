@@ -142,7 +142,6 @@ pipeline {
     }
     post {
         always {
-            agent any
             warnings consoleParsers: [[parserName: 'CppLint']], canRunOnFailed: true
             warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
             warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
