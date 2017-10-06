@@ -51,7 +51,7 @@ pipeline {
                     steps {
                         bat setup(params.math_pr)
                         bat "runTests.py -j${env.PARALLEL} src/test/unit"
-                        junit 'test/**/*.xml'
+                        retry(2) { junit 'test/unit/**/*.xml' }
                     }
                     post { always { cleanWs() } }
                 }
@@ -68,7 +68,7 @@ pipeline {
                     steps {
                         sh setup(params.math_pr, false)
                         sh "./runTests.py -j${env.PARALLEL} src/test/unit"
-                        junit 'test/**/*.xml'
+                        retry(2) { junit 'test/unit/**/*.xml' }
                     }
                     post { always { cleanWs() } }
                 }
@@ -77,7 +77,7 @@ pipeline {
                     steps { 
                         sh setup(params.math_pr)
                         sh "./runTests.py -j${env.PARALLEL} src/test/integration"
-                        junit 'test/**/*.xml'
+                        retry(2) { junit 'test/integration/*.xml' }
                     }
                     post { always { cleanWs() } }
                 }
@@ -102,9 +102,11 @@ pipeline {
                     cd test/performance
                     RScript ../../src/test/performance/plot_performance.R 
                 """
-                junit 'test/**/*.xml'
-                archiveArtifacts 'test/performance/performance.csv,test/performance/performance.png'
-                perfReport compareBuildPrevious: true, errorFailedThreshold: 0, errorUnstableThreshold: 0, failBuildIfNoResultFile: false, modePerformancePerTestCase: true, sourceDataFiles: 'test/performance/**.xml'
+                retry(2) {
+                    junit 'test/**/*.xml'
+                    archiveArtifacts 'test/performance/performance.csv,test/performance/performance.png'
+                    perfReport compareBuildPrevious: true, errorFailedThreshold: 0, errorUnstableThreshold: 0, failBuildIfNoResultFile: false, modePerformancePerTestCase: true, sourceDataFiles: 'test/performance/**.xml'
+                }
             }
         }
         stage('Update CmdStan Upstream') {
