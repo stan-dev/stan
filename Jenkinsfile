@@ -41,14 +41,7 @@ pipeline {
                     )
                 }
             }
-            post { 
-                always {
-                    cleanWs()
-                    warnings consoleParsers: [[parserName: 'CppLint']], canRunOnFailed: true
-                    warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
-                    warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
-                }
-            }
+            post { always { cleanWs() } }
         }
         stage('Tests') {
             failFast true
@@ -60,13 +53,7 @@ pipeline {
                         bat "runTests.py -j${env.PARALLEL} src/test/unit"
                         junit 'test/**/*.xml'
                     }
-                    post {
-                        always { 
-                            cleanWs() 
-                            warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
-                            warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
-                        }
-                    }
+                    post { always { cleanWs() } }
                 }
                 stage('Windows Headers') { 
                     agent { label 'windows' }
@@ -74,13 +61,7 @@ pipeline {
                         bat setup(params.math_pr)
                         bat "make -j${env.PARALLEL} test-headers"
                     }
-                    post {
-                        always {
-                            cleanWs() 
-                            warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
-                            warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
-                        }
-                    }
+                    post { always { cleanWs() } }
                 }
                 stage('Unit') { 
                     agent any
@@ -89,13 +70,7 @@ pipeline {
                         sh "./runTests.py -j${env.PARALLEL} src/test/unit"
                         junit 'test/**/*.xml'
                     }
-                    post {
-                        always {
-                            cleanWs() 
-                            warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
-                            warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
-                        }
-                    }
+                    post { always { cleanWs() } }
                 }
                 stage('Integration') {
                     agent any
@@ -103,14 +78,8 @@ pipeline {
                         sh setup(params.math_pr)
                         sh "./runTests.py -j${env.PARALLEL} src/test/integration"
                         junit 'test/**/*.xml'
-                      }
-                    post {
-                        always {
-                            cleanWs() 
-                            warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
-                            warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
-                        }
                     }
+                    post { always { cleanWs() } }
                 }
                 stage('Upstream CmdStan tests') {
                     // These will only execute when we're running against the
@@ -144,6 +113,15 @@ pipeline {
             steps {
                 sh "curl -O https://raw.githubusercontent.com/stan-dev/ci-scripts/master/jenkins/create-cmdstan-pull-request.sh"
                 sh "sh create-cmdstan-pull-request.sh"
+            }
+        }
+    }
+    post {
+        always {
+            node('master') {
+                warnings consoleParsers: [[parserName: 'CppLint']], canRunOnFailed: true
+                warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
+                warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
             }
         }
     }
