@@ -139,13 +139,13 @@ pipeline {
         //        sh "sh create-cmdstan-pull-request.sh"
         //    }
         //}
-        stage('Parse error messages') {
+    }
+    post {
+        always {
             agent any
-            steps {
-                warnings consoleParsers: [[parserName: 'CppLint']], canRunOnFailed: true
-                warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
-                warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
-            }
+            warnings consoleParsers: [[parserName: 'CppLint']], canRunOnFailed: true
+            warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
+            warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
         }
     }
 }
