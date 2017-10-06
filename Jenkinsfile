@@ -92,7 +92,6 @@ pipeline {
                     post {
                         always {
                             cleanWs() 
-                            junit 'test/**/*.xml'
                             warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
                             warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
                         }
