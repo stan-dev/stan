@@ -50,7 +50,6 @@ namespace stan {
         << EOL2;
 
       bool gen_local_vars = true;
-      bool include_sampling = true;
 
       generate_try(2, o);
 
@@ -62,8 +61,7 @@ namespace stan {
       generate_local_var_decls(p.derived_decl_.first, 3, o);
       o << EOL;
 
-      generate_statements(p.derived_decl_.second,
-                          3, o, include_sampling);
+      generate_statements(p.derived_decl_.second, 3, o);
       o << EOL;
 
       generate_validate_transformed_params(p.derived_decl_.first, 3, o);
@@ -79,7 +77,7 @@ namespace stan {
       o << EOL;
       generate_comment("model body", 3, o);
 
-      generate_statement(p.statement_, 3, o, include_sampling);
+      generate_statement(p.statement_, 3, o);
       o << EOL;
       generate_catch_throw_located(2, o);
 

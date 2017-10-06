@@ -14,25 +14,21 @@ namespace stan {
 
     /**
      * Generate the specified statement with the specified indentation
-     * level on the specified output stream with flags indicating
-     * whether sampling statements are allowed.
+     * level on the specified output stream.
      * Generated statement is preceeded by stmt updating global variable
      * `current_statement_begin__` to src file line number where stmt begins.
      *
      * @param[in] s statement to generate
      * @param[in] indent indentation level
      * @param[in,out] o stream for generating
-     * @param[in] include_sampling true if sampling statements are
-     * included
      */
-    void generate_statement(const statement& s, int indent, std::ostream& o,
-                            bool include_sampling) {
+    void generate_statement(const statement& s, int indent, std::ostream& o) {
       is_numbered_statement_vis vis_is_numbered;
       if (boost::apply_visitor(vis_is_numbered, s.statement_)) {
         generate_indent(indent, o);
         o << "current_statement_begin__ = " << s.begin_line_ << ";" << EOL;
       }
-      statement_visgen vis(indent, include_sampling, o);
+      statement_visgen vis(indent, o);
       boost::apply_visitor(vis, s.statement_);
     }
 
