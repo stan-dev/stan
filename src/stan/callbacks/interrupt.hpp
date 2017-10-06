@@ -25,7 +25,7 @@ namespace stan {
       /**
        * Virtual destructor.
        */
-      virtual ~interrupt() {}
+      virtual ~interrupt( ){}
     };
 
   }
