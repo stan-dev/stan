@@ -63,8 +63,8 @@ pipeline {
                     }
                     post {
                         always {
-                            cleanWs()
                             retry(2) { junit 'test/unit/**/*.xml' }
+                            cleanWs()
                         }
                     }
                 }
@@ -84,8 +84,8 @@ pipeline {
                     }
                     post {
                         always {
-                            cleanWs()
                             retry(2) { junit 'test/unit/**/*.xml' }
+                            cleanWs()
                         }
                     }
                 }
@@ -97,8 +97,8 @@ pipeline {
                     }
                     post {
                         always {
-                            cleanWs()
                             retry(2) { junit 'test/integration/*.xml' }
+                            cleanWs()
                         }
                     }
                 }
