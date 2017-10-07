@@ -17,6 +17,15 @@ def setup(String pr, Boolean failOnError = true) {
     return script
 }
 
+def mailDevs(String label) {
+    emailext (
+        subject: "[StanJenkins] ${label}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
+        body: """<p>${label}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
+            <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>&QUOT;</p>""",
+        recipientProviders: [[$class: 'DevelopersRecipientProvider']]
+    )
+}
+
 pipeline {
     agent none
     options {
@@ -51,9 +60,13 @@ pipeline {
                     steps {
                         bat setup(params.math_pr)
                         bat "runTests.py -j${env.PARALLEL} src/test/unit"
-                        retry(2) { junit 'test/unit/**/*.xml' }
                     }
-                    post { always { cleanWs() } }
+                    post {
+                        always {
+                            cleanWs()
+                            retry(2) { junit 'test/unit/**/*.xml' }
+                        }
+                    }
                 }
                 stage('Windows Headers') { 
                     agent { label 'windows' }
@@ -68,18 +81,26 @@ pipeline {
                     steps {
                         sh setup(params.math_pr, false)
                         sh "./runTests.py -j${env.PARALLEL} src/test/unit"
-                        retry(2) { junit 'test/unit/**/*.xml' }
                     }
-                    post { always { cleanWs() } }
+                    post {
+                        always {
+                            cleanWs()
+                            retry(2) { junit 'test/unit/**/*.xml' }
+                        }
+                    }
                 }
                 stage('Integration') {
                     agent any
                     steps { 
                         sh setup(params.math_pr)
                         sh "./runTests.py -j${env.PARALLEL} src/test/integration"
-                        retry(2) { junit 'test/integration/*.xml' }
                     }
-                    post { always { cleanWs() } }
+                    post {
+                        always {
+                            cleanWs()
+                            retry(2) { junit 'test/integration/*.xml' }
+                        }
+                    }
                 }
                 stage('Upstream CmdStan tests') {
                     // These will only execute when we're running against the
@@ -102,10 +123,14 @@ pipeline {
                     cd test/performance
                     RScript ../../src/test/performance/plot_performance.R 
                 """
-                retry(2) {
-                    junit 'test/**/*.xml'
-                    archiveArtifacts 'test/performance/performance.csv,test/performance/performance.png'
-                    perfReport compareBuildPrevious: true, errorFailedThreshold: 0, errorUnstableThreshold: 0, failBuildIfNoResultFile: false, modePerformancePerTestCase: true, sourceDataFiles: 'test/performance/**.xml'
+            }
+            post {
+                always {
+                    retry(2) {
+                        junit 'test/**/*.xml'
+                        archiveArtifacts 'test/performance/performance.csv,test/performance/performance.png'
+                        perfReport compareBuildPrevious: true, errorFailedThreshold: 0, errorUnstableThreshold: 0, failBuildIfNoResultFile: false, modePerformancePerTestCase: true, sourceDataFiles: 'test/performance/**.xml'
+                    }
                 }
             }
         }
@@ -126,22 +151,7 @@ pipeline {
                 warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
             }
         }
-        success {
-            emailext (
-                subject: "[StanJenkins] SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
-                body: """<p>SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
-                    <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>&QUOT;</p>""",
-                recipientProviders: [[$class: 'DevelopersRecipientProvider']]
-            )
-        }
-
-        failure {
-            emailext (
-                subject: "[StanJenkins] FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
-                body: """<p>FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
-                    <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>&QUOT;</p>""",
-                recipientProviders: [[$class: 'DevelopersRecipientProvider']]
-            )
-        }
+        success { mailDevs("SUCCESSFUL") }
+        failure { mailDevs("FAILURE") }
     }
 }
