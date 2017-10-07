@@ -79,9 +79,7 @@ namespace stan {
       generate_try(2, o);
       generate_local_var_decls(prog.derived_decl_.first, 3, o);
       o << EOL;
-      bool include_sampling = false;
-      generate_statements(prog.derived_decl_.second, 3, o,
-                          include_sampling);
+      generate_statements(prog.derived_decl_.second, 3, o);
       o << EOL;
 
       generate_comment("validate transformed parameters", 3, o);
@@ -99,8 +97,7 @@ namespace stan {
       generate_local_var_decls(prog.generated_decl_.first, 3, o);
 
       o << EOL;
-      generate_statements(prog.generated_decl_.second,
-                          3, o, include_sampling);
+      generate_statements(prog.generated_decl_.second, 3, o);
       o << EOL;
 
       generate_comment("validate generated quantities", 3, o);

@@ -78,11 +78,7 @@ namespace stan {
       generate_comment("initialize data variables", 3, o);
       generate_var_resizing(prog.derived_data_decl_.first, 3, o);
       o << EOL;
-
-      bool include_sampling = false;
-
-      generate_statements(prog.derived_data_decl_.second, 3, o,
-                          include_sampling);
+      generate_statements(prog.derived_data_decl_.second, 3, o);
       o << EOL;
       generate_comment("validate transformed data", 3, o);
       generate_validate_var_decls(prog.derived_data_decl_.first, 3, o);

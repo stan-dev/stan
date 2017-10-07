@@ -20,11 +20,10 @@ namespace stan {
 
     void generate_idxs(const std::vector<idx>& idxs, std::ostream& o);
 
-    void generate_statement(const statement& s, int indent, std::ostream& o,
-                            bool include_sampling);
+    void generate_statement(const statement& s, int indent, std::ostream& o);
 
     void generate_statement(const std::vector<statement>& ss, int indent,
-                            std::ostream& o, bool include_sampling);
+                            std::ostream& o);
 
     /**
      * Visitor for generating statements.
@@ -36,23 +35,14 @@ namespace stan {
       size_t indent_;
 
       /**
-       * true if sampling statements ae allowed.
-       */
-      bool include_sampling_;
-
-      /**
        * Construct a visitor for generating statements at the
-       * specified indent level to the specified stream, with flags
-       * indicating whether sampling statements are allowed and
-       * whether the generation is a function return scope.
+       * specified indent level to the specified stream.
        *
        * @param[in] indent indentation level
-       * @param[in] include_sampling true if sampling statements are
-       * allowed
        * @param[in,out] o stream for generating
        */
-      statement_visgen(size_t indent,  bool include_sampling, std::ostream& o)
-        : visgen(o), indent_(indent), include_sampling_(include_sampling) { }
+      statement_visgen(size_t indent, std::ostream& o)
+        : visgen(o), indent_(indent) { }
 
       /**
        * Generate the target log density increments for truncating a
@@ -232,7 +222,6 @@ namespace stan {
       }
 
       void operator()(const sample& x) const {
-        if (!include_sampling_) return;
         std::string prob_fun = get_prob_fun(x.dist_.family_);
         generate_indent(indent_, o_);
         o_ << "lp_accum__.add(" << prob_fun << "<propto__>(";
@@ -288,7 +277,7 @@ namespace stan {
         }
         o_ << EOL;
         for (size_t i = 0; i < x.statements_.size(); ++i) {
-          generate_statement(x.statements_[i], indent_, o_, include_sampling_);
+          generate_statement(x.statements_[i], indent_, o_);
         }
         if (has_local_vars) {
           generate_indent(indent_, o_);
@@ -343,7 +332,7 @@ namespace stan {
         o_ << "; " << x.variable_ << " <= ";
         generate_expression(x.range_.high_, NOT_USER_FACING, o_);
         o_ << "; ++" << x.variable_ << ") {" << EOL;
-        generate_statement(x.statement_, indent_ + 1, o_, include_sampling_);
+        generate_statement(x.statement_, indent_ + 1, o_);
         generate_indent(indent_, o_);
         o_ << "}" << EOL;
       }
@@ -353,7 +342,7 @@ namespace stan {
         o_ << "while (as_bool(";
         generate_expression(x.condition_, NOT_USER_FACING, o_);
         o_ << ")) {" << EOL;
-        generate_statement(x.body_, indent_+1, o_, include_sampling_);
+        generate_statement(x.body_, indent_+1, o_);
         generate_indent(indent_, o_);
         o_ << "}" << EOL;
       }
@@ -372,14 +361,13 @@ namespace stan {
           o_ << "if (as_bool(";
           generate_expression(x.conditions_[i], NOT_USER_FACING, o_);
           o_ << ")) {" << EOL;
-          generate_statement(x.bodies_[i], indent_ + 1, o_, include_sampling_);
+          generate_statement(x.bodies_[i], indent_ + 1, o_);
           generate_indent(indent_, o_);
           o_ << '}';
         }
         if (x.bodies_.size() > x.conditions_.size()) {
           o_ << " else {" << EOL;
-          generate_statement(x.bodies_[x.bodies_.size()-1], indent_ + 1,
-                             o_, include_sampling_);
+          generate_statement(x.bodies_[x.bodies_.size()-1], indent_ + 1, o_);
           generate_indent(indent_, o_);
           o_ << '}';
         }

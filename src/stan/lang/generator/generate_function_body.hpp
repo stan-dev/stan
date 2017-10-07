@@ -43,10 +43,9 @@ namespace stan {
       o << INDENT2 << "(void) DUMMY_VAR__;  // suppress unused var warning"
         << EOL2;
 
-      bool include_sampling = true;
       o << INDENT << "int current_statement_begin__ = -1;" << EOL;
       generate_try(1, o);
-      generate_statement(fun.body_, 2, o, include_sampling);
+      generate_statement(fun.body_, 2, o);
       generate_catch_throw_located(1, o);
       o << "}" << EOL;
     }
