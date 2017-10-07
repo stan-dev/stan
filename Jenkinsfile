@@ -26,6 +26,10 @@ def mailDevs(String label) {
     )
 }
 
+def runTests(String testPath) {
+    "runTests.py -j${env.PARALLEL} ${testPath} || echo ${testPath} failed"
+}
+
 pipeline {
     agent none
     options {
@@ -59,14 +63,10 @@ pipeline {
                     agent { label 'windows' }
                     steps {
                         bat setup(params.math_pr)
-                        bat "runTests.py -j${env.PARALLEL} src/test/unit"
+                        bat runTests("src/test/unit")
+                        retry(2) { junit 'test/unit/**/*.xml' }
                     }
-                    post {
-                        always {
-                            retry(2) { junit 'test/unit/**/*.xml' }
-                            cleanWs()
-                        }
-                    }
+                    post { always { cleanWs() } }
                 }
                 stage('Windows Headers') { 
                     agent { label 'windows' }
@@ -80,27 +80,19 @@ pipeline {
                     agent any
                     steps {
                         sh setup(params.math_pr, false)
-                        sh "./runTests.py -j${env.PARALLEL} src/test/unit"
+                        sh "./" + runTests("src/test/unit")
+                        retry(2) { junit 'test/unit/**/*.xml' }
                     }
-                    post {
-                        always {
-                            retry(2) { junit 'test/unit/**/*.xml' }
-                            cleanWs()
-                        }
-                    }
+                    post { always { cleanWs() } }
                 }
                 stage('Integration') {
                     agent any
                     steps { 
                         sh setup(params.math_pr)
-                        sh "./runTests.py -j${env.PARALLEL} src/test/integration"
+                        sh "./" + runTests("src/test/integration")
+                        retry(2) { junit 'test/integration/*.xml' }
                     }
-                    post {
-                        always {
-                            retry(2) { junit 'test/integration/*.xml' }
-                            cleanWs()
-                        }
-                    }
+                    post { always { cleanWs() } }
                 }
                 stage('Upstream CmdStan tests') {
                     // These will only execute when we're running against the
