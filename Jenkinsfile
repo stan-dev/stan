@@ -9,7 +9,7 @@ def setup(String pr, Boolean failOnError = true) {
     if (pr != '')  {
         prNumber = pr.tokenize('-').last()
         script += """ 
-            cd stan/lib/stan_math
+            cd lib/stan_math
             git fetch https://github.com/stan-dev/math +refs/pull/${prNumber}/merge:refs/remotes/origin/pr/${prNumber}/merge
             git checkout refs/remotes/origin/pr/${prNumber}/merge
         """
@@ -32,9 +32,6 @@ def runTests(String testPath) {
 
 pipeline {
     agent none
-    options {
-        disableConcurrentBuilds()
-    }
     parameters {
         string(defaultValue: '', name: 'math_pr', description: "Leave blank "
                 + "unless testing against a specific math repo pull request.")
