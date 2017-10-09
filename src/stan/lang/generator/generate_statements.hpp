@@ -11,20 +11,16 @@ namespace stan {
 
     /**
      * Generate the set of statements in a program block with
-     * the specified indentation level on the specified stream
-     * with flags indicating whether sampling statements are allowed.
+     * the specified indentation level on the specified stream.
      *
      * @param[in] statements vector of statements
      * @param[in] indent indentation level
      * @param[in,out] o stream for generating
-     * @param[in] include_sampling true if sampling statements are
-     * included
      */
     void generate_statements(const std::vector<statement> statements,
-                             int indent, std::ostream& o,
-                             bool include_sampling) {
+                             int indent, std::ostream& o) {
       for (size_t i = 0; i < statements.size(); ++i)
-        generate_statement(statements[i], indent, o, include_sampling);
+        generate_statement(statements[i], indent, o);
     }
 
   }
