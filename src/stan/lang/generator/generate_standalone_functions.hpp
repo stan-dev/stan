@@ -10,7 +10,6 @@
 #include <stan/lang/generator/generate_typedefs.hpp>
 #include <stan/lang/generator/generate_usings_standalone_functions.hpp>
 #include <stan/lang/generator/generate_version_comment.hpp>
-#include <stan/lang/generator/generate_rng_rcpp_helper.hpp>
 #include <ostream>
 #include <string>
 #include <vector>
@@ -36,8 +35,6 @@ namespace stan {
            std::ostream& o) {
       generate_version_comment(o);
 
-      o << "// [[Rcpp::depends(rstan)]]" << EOL;
-
       // TODO(martincerny) try to reduce the includes that are necessary
       generate_include("stan/model/standalone_functions_header.hpp", o);
       o << EOL;
@@ -50,9 +47,6 @@ namespace stan {
       o << EOL;
 
       generate_usings_standalone_functions(o);
-
-      generate_rng_rcpp_helper(o);
-
       generate_typedefs(o);
       generate_program_reader_fun(history, o);
       generate_functions(prog.function_decl_defs_, o, true /*rcpp_export*/);
