@@ -27,7 +27,7 @@ def mailBuildResults(String label) {
         subject: "[StanJenkins] ${label}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
         body: """${label}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]': Check console output at ${env.BUILD_URL}""",
         recipientProviders: [[$class: 'RequesterRecipientProvider']],
-        to: "${env.CHANGE_AUTHOR_EMAIL}, stan-buildbot@googlegroups.com"
+        to: "${env.CHANGE_AUTHOR_EMAIL}" //, stan-buildbot@googlegroups.com"
     )
 }
 
@@ -59,6 +59,9 @@ pipeline {
                     retry(3) { checkout scm }
                     sh 'printenv'
                     sh setup(params.math_pr)
+                    println "hello, changeset time"
+                    println currentBuild
+                    println currentBuild.changeSets
                     for (cs in currentBuild.changeSets) {
                         println cs
                         for (commit in cs) {
