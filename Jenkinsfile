@@ -36,7 +36,8 @@ def runTests(String testPath) {
 }
 
 def updateUpstream(String upstreamRepo) {
-    if (env.BRANCH_NAME == 'develop') {
+    println("hello", branch('develop'))
+    if (branch('develop')) {
         sh "curl -O https://raw.githubusercontent.com/stan-dev/ci-scripts/master/jenkins/create-${upstreamRepo}-pull-request.sh"
         sh "sh create-${upstreamRepo}-pull-request.sh"
     }
@@ -57,21 +58,7 @@ pipeline {
             steps {
                 script {
                     retry(3) { checkout scm }
-                    sh 'printenv'
                     sh setup(params.math_pr)
-                    println "hello, changeset time"
-                    println currentBuild
-                    println currentBuild.changeSets
-                    for (cs in currentBuild.changeSets) {
-                        println cs
-                        for (commit in cs) {
-                            println commit
-                            println commit.authorEmail
-                            for (af in commit.affectedFiles) {
-                                println af.path
-                            }
-                        }
-                    }
                     stash 'StanSetup'
                     parallel(
                         CppLint: { sh "make cpplint" },
