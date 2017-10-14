@@ -36,14 +36,15 @@ def runTests(String testPath) {
 }
 
 def updateUpstream(String upstreamRepo) {
-    when { branch 'develop' }
-    echo "hello"
-    if (env.BRANCH_NAME == "origin/develop") {
-        sh "curl -O https://raw.githubusercontent.com/stan-dev/ci-scripts/master/jenkins/create-${upstreamRepo}-pull-request.sh"
-        sh "sh create-${upstreamRepo}-pull-request.sh"
+    stage('Update ${upstreamRepo} upstream') {
+        when { branch 'develop' }
+        steps {
+            echo "hello"
+            sh "curl -O https://raw.githubusercontent.com/stan-dev/ci-scripts/master/jenkins/create-${upstreamRepo}-pull-request.sh"
+            sh "sh create-${upstreamRepo}-pull-request.sh"
+        }
     }
 }
-
 
 pipeline {
     agent none
@@ -59,10 +60,11 @@ pipeline {
             steps {
                 script {
                     retry(3) { checkout scm }
-                    sh setup(params.math_pr)
+                    //sh setup(params.math_pr)
                     stash 'StanSetup'
                     parallel(
-                        CppLint: { sh "make cpplint" },
+                        //CppLint: { sh "make cpplint" },
+                        CppLint: { echo 'lhello'},
                         //documentation: { sh 'make doxygen' },
                         //manual: { sh 'make manual' },
                         //headers: { sh "make -j${env.PARALLEL} test-headers" },
