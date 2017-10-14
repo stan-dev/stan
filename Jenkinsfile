@@ -22,12 +22,12 @@ def setup(String pr, Boolean failOnError = true) {
     return script
 }
 
-def mailBuildResults(String label) {
+def mailBuildResults(String label, additionalEmails='') {
     emailext (
         subject: "[StanJenkins] ${label}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
         body: """${label}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]': Check console output at ${env.BUILD_URL}""",
         recipientProviders: [[$class: 'RequesterRecipientProvider']],
-        to: "${env.CHANGE_AUTHOR_EMAIL}" //, stan-buildbot@googlegroups.com"
+        to: "${env.CHANGE_AUTHOR_EMAIL}, ${additionalEmails}"
     )
 }
 
@@ -36,7 +36,8 @@ def runTests(String testPath) {
 }
 
 def updateUpstream(String upstreamRepo) {
-    println("hello", branch('develop'))
+    echo "hello"
+    echo branch('develop')
     if (branch('develop')) {
         sh "curl -O https://raw.githubusercontent.com/stan-dev/ci-scripts/master/jenkins/create-${upstreamRepo}-pull-request.sh"
         sh "sh create-${upstreamRepo}-pull-request.sh"
@@ -160,6 +161,7 @@ pipeline {
             updateUpstream('cmdstan')
             mailBuildResults("SUCCESSFUL")
         }
-        failure { mailBuildResults("FAILURE") }
+        unstable { mailBuildResults("UNSTABLE", "stan-buildbot@googlegroups.com") }
+        failure { mailBuildResults("FAILURE", "stan-buildbot@googlegroups.com") }
     }
 }
