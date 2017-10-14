@@ -66,9 +66,9 @@ pipeline {
                         println cs
                         for (commit in cs) {
                             println commit
-                            println commit.author
+                            println commit.authorEmail
                             for (af in commit.affectedFiles) {
-                                println af
+                                println af.path
                             }
                         }
                     }
