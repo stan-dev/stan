@@ -59,6 +59,16 @@ pipeline {
                     retry(3) { checkout scm }
                     sh 'printenv'
                     sh setup(params.math_pr)
+                    for (cs in currentBuild.changeSets) {
+                        println cs
+                        for (commit in cs) {
+                            println commit
+                            println commit.author
+                            for (af in commit.affectedFiles) {
+                                println af
+                            }
+                        }
+                    }
                     stash 'StanSetup'
                     parallel(
                         CppLint: { sh "make cpplint" },
