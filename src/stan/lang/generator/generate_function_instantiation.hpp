@@ -8,6 +8,7 @@
 #include <stan/lang/generator/generate_function_arguments.hpp>
 #include <stan/lang/generator/has_only_int_args.hpp>
 #include <ostream>
+#include <vector>
 #include <string>
 
 namespace stan {

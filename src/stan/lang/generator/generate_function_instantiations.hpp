@@ -4,6 +4,7 @@
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/generate_function_instantiation.hpp>
 #include <ostream>
+#include <string>
 #include <vector>
 
 namespace stan {
@@ -18,7 +19,7 @@ namespace stan {
      * @param[in,out] o stream for generating
      */
     void generate_function_instantiations(
-           const std::vector<function_decl_def>& funs, 
+           const std::vector<function_decl_def>& funs,
            const std::vector<std::string>& namespaces,
            std::ostream& o) {
       for (size_t i = 0; i < funs.size(); ++i) {
