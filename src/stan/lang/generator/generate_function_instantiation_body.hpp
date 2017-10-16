@@ -29,6 +29,7 @@ namespace stan {
      * @param[in,out] o stream for generating
      */
     void generate_function_instantiation_body(const function_decl_def& fun,
+                                    const std::vector<std::string>& namespaces,
                                     bool is_rng, bool is_lp, bool is_log,
                                     const std::string& rng_class,
                                     std::ostream& o) {
@@ -36,6 +37,10 @@ namespace stan {
       o << "  ";
       if (!fun.return_type_.is_void()) {
         o << "return ";
+      }
+      o << EOL;
+      for (const std::string& namespace_i : namespaces) {
+        o << namespace_i << "::";
       }
       generate_function_name(fun, o);
       generate_function_instantiation_template_parameters(
@@ -57,7 +62,6 @@ namespace stan {
       if (is_rng || is_lp || fun.arg_decls_.size() > 0)
         o << ", ";
       o << "pstream__";
-
       o << ");" << EOL;
       o << "}" << EOL;
     }

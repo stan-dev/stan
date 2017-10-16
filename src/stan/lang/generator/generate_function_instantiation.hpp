@@ -2,7 +2,6 @@
 #define STAN_LANG_GENERATOR_GENERATE_FUNCTION_INSTANTIATION_HPP
 
 #include <stan/lang/ast.hpp>
-#include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_function_inline_return_type.hpp>
 #include <stan/lang/generator/generate_function_instantiation_body.hpp>
 #include <stan/lang/generator/generate_function_instantiation_name.hpp>
@@ -27,6 +26,7 @@ namespace stan {
      * is written
      */
     void generate_function_instantiation(const function_decl_def& fun,
+                           const std::vector<std::string>& namespaces,
                            std::ostream& out) {
       // Do not generate anything for forward decalrations
       if (fun.body_.is_no_op_statement()) {
@@ -48,8 +48,7 @@ namespace stan {
       std::string scalar_t_name = "double";
       std::string rng_class = "boost::ecuyer1988";
 
-      out << "// [[Rcpp::export]]" << EOL;
-
+      out << "// [[stan::function]]" << EOL;
       generate_function_inline_return_type(fun, scalar_t_name, 0, out);
       generate_function_instantiation_name(fun, out);
       generate_function_arguments(
@@ -57,7 +56,7 @@ namespace stan {
         true /*parameter_defaults*/);
 
       generate_function_instantiation_body(
-        fun, is_rng, is_lp, is_pf, rng_class, out);
+        fun, namespaces, is_rng, is_lp, is_pf, rng_class, out);
 
       out << EOL;
     }
