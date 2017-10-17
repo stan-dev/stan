@@ -35,11 +35,28 @@ def runTests(String testPath) {
 }
 
 def updateUpstream(String upstreamRepo) {
-    if (env.BRANCH_NAME == 'develop') {
+    if (env.BRANCH_NAME == 'build/upstream') {
         node('master') {
-            retry(3) { checkout scm }
-            sh "curl -O https://raw.githubusercontent.com/stan-dev/ci-scripts/master/jenkins/create-${upstreamRepo}-pull-request.sh"
-            sh "sh create-${upstreamRepo}-pull-request.sh"
+            retry(3) {
+                checkout([$class: 'GitSCM',
+                        branches: [[name: '*/develop']],
+                        doGenerateSubmoduleConfigurations: false,
+                        extensions: [[$class: 'SubmoduleOption',
+                                    disableSubmodules: false,
+                                    parentCredentials: false,
+                                    recursiveSubmodules: true,
+                                    reference: '',
+                                    trackingSubmodules: false]],
+                        submoduleCfg: [],
+                        userRemoteConfigs: [[url: 'git@github.com:stan-dev/cmdstan.git',
+                                           credentialsId: 'a630aebc-6861-4e69-b497-fd7f496ec46b'
+                ]]])
+            }
+            sh """
+                curl -O https://raw.githubusercontent.com/stan-dev/ci-scripts/master/jenkins/create-${upstreamRepo}-pull-request.sh
+                sh create-${upstreamRepo}-pull-request.sh
+            """
+            deleteDir()
         }
     }
 }
