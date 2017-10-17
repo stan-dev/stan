@@ -48,6 +48,8 @@ pipeline {
         string(defaultValue: '', name: 'math_pr', description: "Leave blank "
                 + "unless testing against a specific math repo pull request, "
                 + "e.g. PR-640.")
+        string(defaultValue: 'downstream tests', name: 'cmdstan_pr',
+          description: 'PR to test CmdStan upstream against e.g. PR-630')
     }
     options { skipDefaultCheckout() }
     stages {
@@ -116,7 +118,7 @@ pipeline {
                     // live PR build, not on other branches
                     when { expression { env.BRANCH_NAME ==~ /PR-\d+/ } }
                     steps {
-                        build(job: 'CmdStan/downstream tests',
+                        build(job: 'CmdStan/${cmdstan_pr}',
                               parameters: [string(name: 'stan_pr', value: env.BRANCH_NAME),
                                            string(name: 'math_pr', value: params.math_pr)])
                     }
