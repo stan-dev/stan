@@ -117,7 +117,7 @@ pipeline {
                     // live PR build, not on other branches
                     when { expression { env.BRANCH_NAME ==~ /PR-\d+/ } }
                     steps {
-                        build(job: "CmdStan/${cmdstan_pr}",
+                        build(job: "CmdStan/${params.cmdstan_pr}",
                               parameters: [string(name: 'stan_pr', value: env.BRANCH_NAME),
                                            string(name: 'math_pr', value: params.math_pr)])
                     }
