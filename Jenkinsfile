@@ -4,7 +4,6 @@ def setupCC(failOnError = true) {
 }
 
 def setup(String pr, Boolean failOnError = true) {
-    errorStr = failOnError ? "-Werror " : ""
     script = """
         make math-revert
         make clean-all
