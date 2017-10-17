@@ -20,6 +20,8 @@ namespace stan {
      * specified stream.
      *
      * @param[in] fun function declaration
+     * @param[in] namespaces vector of strings used to generate the 
+     *   namespaces generated code is nested in.
      * @param[in] is_rng true if function is an RNG
      * @param[in] is_lp true if function accesses log density
      * accumulator
