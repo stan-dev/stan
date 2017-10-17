@@ -155,7 +155,7 @@ pipeline {
                 warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
             }
         }
-    k   success {
+        success {
             updateUpstream('cmdstan')
             mailBuildResults("SUCCESSFUL")
         }
