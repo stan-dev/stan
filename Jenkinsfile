@@ -35,9 +35,11 @@ def runTests(String testPath) {
 }
 
 def updateUpstream(String upstreamRepo) {
-    if (env.BRANCH_NAME == 'develop') {
-        sh "curl -O https://raw.githubusercontent.com/stan-dev/ci-scripts/master/jenkins/create-${upstreamRepo}-pull-request.sh"
-        sh "sh create-${upstreamRepo}-pull-request.sh"
+    node('master') {
+        if (env.BRANCH_NAME == 'develop') {
+            sh "curl -O https://raw.githubusercontent.com/stan-dev/ci-scripts/master/jenkins/create-${upstreamRepo}-pull-request.sh"
+            sh "sh create-${upstreamRepo}-pull-request.sh"
+        }
     }
 }
 
