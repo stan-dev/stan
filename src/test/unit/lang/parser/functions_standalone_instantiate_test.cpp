@@ -39,7 +39,7 @@ TEST(lang_parser, functions_standalone_instantiate_double_basic) {
 TEST(lang_parser, functions_standalone_instantiate_double_special) {
   double lp = 0.1;
   stan::math::accumulator<double> lp_accum;
-  boost::ecuyer1988 rng = special_functions_functions::__create_rng(123456);
+  boost::ecuyer1988 rng(123456);
   std::ostringstream error_stream;
 
   special_functions_functions::test_lp(1.0, lp, lp_accum, &error_stream);

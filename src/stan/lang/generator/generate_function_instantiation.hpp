@@ -34,12 +34,6 @@ namespace stan {
         return;
       }
 
-      // Functions that have only int args were not templated in the first place
-      // => they are already instantiated
-      if (has_only_int_args(fun)) {
-        return;
-      }
-
       bool is_rng = ends_with("_rng", fun.name_);
       bool is_lp = ends_with("_lp", fun.name_);
       bool is_pf = ends_with("_log", fun.name_)
