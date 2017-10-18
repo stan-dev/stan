@@ -35,7 +35,7 @@ def runTests(String testPath) {
 }
 
 def updateUpstream(String upstreamRepo) {
-    if (env.BRANCH_NAME == 'build/upstream') {
+    if (env.BRANCH_NAME == 'develop') {
         node('master') {
             retry(3) {
                 checkout([$class: 'GitSCM',
