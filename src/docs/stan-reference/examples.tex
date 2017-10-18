@@ -8103,7 +8103,7 @@ more information on coding user-defined functions).
 vector system(vector y,        // unknowns
               vector theta,    // parameters
               real[] x_r,      // data (real)
-              real[] x_i) {    // data (integer)
+              int[] x_i) {     // data (integer)
   vector[2] z;
   z[1] = y[1] - theta[1];
   z[2] = y[1] * y[2] - theta[2];
