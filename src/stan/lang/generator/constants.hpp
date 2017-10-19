@@ -1,12 +1,14 @@
 #ifndef STAN_LANG_GENERATOR_CONSTANTS_HPP
 #define STAN_LANG_GENERATOR_CONSTANTS_HPP
 
-#include <stan/lang/ast/node/expression.hpp>
+#include <stan/lang/ast/node/fun.hpp>
 #include <string>
 #include <vector>
 
 namespace stan {
   namespace lang {
+
+    struct expression;
 
     /**
      * End-of-line marker.
