@@ -15,9 +15,7 @@ namespace stan {
      * parametersfor standalone generation of functions.
      *
      * @param[in] funs sequence of function declarations and
-     *   definitions
-     * @param[in] namespaces vector of strings used to generate the 
-     *   namespaces generated code is nested in.
+     * definitions
      * @param[in,out] o stream for generating
      */
     void generate_function_instantiations(

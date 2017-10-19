@@ -23,8 +23,6 @@ namespace stan {
      * ending in one of "_rng", "_lp", or "_log".
      *
      * @param[in] fun function AST object
-     * @param[in] namespaces vector of strings used to generate the 
-     *   namespaces generated code is nested in.
      * @param[in, out] out output stream to which function definition
      * is written
      */
