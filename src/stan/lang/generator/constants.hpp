@@ -38,6 +38,15 @@ namespace stan {
      */
     const std::vector<expression> EMPTY_EXP_VECTOR(0);
 
+    /**
+     * Flag for generating expressions when code is user facing.
+     */ 
+    const bool USER_FACING(true);
+
+    /**
+     * Flag for generating expressions when code is not user facing.
+     */ 
+    const bool NOT_USER_FACING(false);
   }
 }
 #endif

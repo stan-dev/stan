@@ -6,7 +6,7 @@
 help:
 
 ## Disable implicit rules.
-SUFIXES:
+.SUFFIXES:
 
 ##
 # Users should only need to set these three variables for use.

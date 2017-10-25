@@ -8,13 +8,14 @@
 namespace stan {
   namespace lang {
 
-    cov_matrix_var_decl::cov_matrix_var_decl() : base_var_decl(MATRIX_T) {  }
+    cov_matrix_var_decl::cov_matrix_var_decl()
+      : base_var_decl(matrix_type()) {  }
 
     cov_matrix_var_decl::cov_matrix_var_decl(const expression& K,
                                          const std::string& name,
                                          const std::vector<expression>& dims,
                                          const expression& def)
-      : base_var_decl(name, dims, MATRIX_T, def), K_(K) { }
+      : base_var_decl(name, dims, matrix_type(), def), K_(K) { }
 
   }
 }

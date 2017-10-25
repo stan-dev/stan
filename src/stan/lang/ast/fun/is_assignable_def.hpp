@@ -17,9 +17,9 @@ namespace stan {
         assignable = false;
         error_msgs << "Mismatched array dimensions.";
       }
-      if (l_type.base_type_ != r_type.base_type_
-          && (!(l_type.base_type_ == DOUBLE_T
-                && r_type.base_type_ == INT_T))) {
+      if (!(l_type.base_type_ == r_type.base_type_
+            || (l_type.base_type_.is_double_type()
+                && r_type.base_type_.is_int_type()))) {
         assignable = false;
         error_msgs << "Base type mismatch. ";
       }

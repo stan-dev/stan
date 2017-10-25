@@ -15,11 +15,14 @@ using stan::lang::int_literal;
 using stan::lang::function_signatures;
 using stan::lang::function_arg_type;
 using stan::lang::expr_type;
-using stan::lang::DOUBLE_T;
-using stan::lang::INT_T;
-using stan::lang::VECTOR_T;
-using stan::lang::ROW_VECTOR_T;
-using stan::lang::MATRIX_T;
+using stan::lang::base_expr_type;
+using stan::lang::ill_formed_type;
+using stan::lang::void_type;
+using stan::lang::double_type;
+using stan::lang::int_type;
+using stan::lang::vector_type;
+using stan::lang::row_vector_type;
+using stan::lang::matrix_type;
 using std::vector;
 
 
@@ -28,11 +31,11 @@ TEST(langAst, getDefinition) {
   stan::lang::function_signatures& fs
     = stan::lang::function_signatures::instance();
   std::string name = "f3args";
-  expr_type return_type = expr_type(DOUBLE_T);
+  expr_type return_type = expr_type(double_type());
   std::vector<function_arg_type> arg_types;
-  arg_types.push_back(function_arg_type(expr_type(DOUBLE_T, 2U), true));
-  arg_types.push_back(function_arg_type(expr_type(INT_T, 1U)));
-  arg_types.push_back(function_arg_type(expr_type(VECTOR_T, 0U)));
+  arg_types.push_back(function_arg_type(expr_type(double_type(), 2U), true));
+  arg_types.push_back(function_arg_type(expr_type(int_type(), 1U)));
+  arg_types.push_back(function_arg_type(expr_type(vector_type(), 0U)));
 
   // check is defined
   fs.add(name, return_type, arg_types);
@@ -45,9 +48,9 @@ TEST(langAst, missingDefinition) {
     = stan::lang::function_signatures::instance();
 
   std::string name = "fmissing";
-  expr_type return_type = expr_type(DOUBLE_T);
+  expr_type return_type = expr_type(double_type());
   std::vector<function_arg_type> arg_types;
-  arg_types.push_back(function_arg_type(expr_type(DOUBLE_T, 2U), true));
+  arg_types.push_back(function_arg_type(expr_type(double_type(), 2U), true));
 
   // check not defined
   stan::lang::function_signature_t sig(return_type, arg_types);
@@ -59,11 +62,11 @@ TEST(langAst, checkDefinition) {
   stan::lang::function_signatures& fs
     = stan::lang::function_signatures::instance();
   std::string name = "f3args";
-  expr_type return_type = expr_type(DOUBLE_T);
+  expr_type return_type = expr_type(double_type());
   std::vector<function_arg_type> arg_types;
-  arg_types.push_back(function_arg_type(expr_type(DOUBLE_T, 2U), true));
-  arg_types.push_back(function_arg_type(expr_type(INT_T, 1U)));
-  arg_types.push_back(function_arg_type(expr_type(VECTOR_T, 0U)));
+  arg_types.push_back(function_arg_type(expr_type(double_type(), 2U), true));
+  arg_types.push_back(function_arg_type(expr_type(int_type(), 1U)));
+  arg_types.push_back(function_arg_type(expr_type(vector_type(), 0U)));
   fs.add(name, return_type, arg_types);
 
   // check definition
@@ -87,9 +90,9 @@ TEST(langAst, discreteFirstArg) {
 
 TEST(langAst, printSignature) {
   std::vector<function_arg_type> arg_types;
-  arg_types.push_back(function_arg_type(expr_type(DOUBLE_T, 2U)));
-  arg_types.push_back(function_arg_type(expr_type(INT_T, 1U)));
-  arg_types.push_back(function_arg_type(expr_type(VECTOR_T, 0U)));
+  arg_types.push_back(function_arg_type(expr_type(double_type(), 2U)));
+  arg_types.push_back(function_arg_type(expr_type(int_type(), 1U)));
+  arg_types.push_back(function_arg_type(expr_type(vector_type(), 0U)));
   std::string name = "foo";
 
   std::stringstream platform_eol_ss;
@@ -108,8 +111,8 @@ TEST(langAst, printSignature) {
   EXPECT_EQ("  foo(real[,], int[], vector)" + platform_eol,
             msgs2.str());
 
-  arg_types.push_back(function_arg_type(expr_type(MATRIX_T, 0U), true));
-  arg_types.push_back(function_arg_type(expr_type(MATRIX_T, 0U), false));
+  arg_types.push_back(function_arg_type(expr_type(matrix_type(), 0U), true));
+  arg_types.push_back(function_arg_type(expr_type(matrix_type(), 0U), false));
 
   std::stringstream msgs3;
   stan::lang::print_signature(name, arg_types, sampling_error_style2, msgs3);
@@ -132,20 +135,20 @@ TEST(langAst, hasVar) {
 
   variable_map vm;
   vector<expression> dims;
-  base_var_decl alpha_decl = base_var_decl("alpha",dims,DOUBLE_T);
+  base_var_decl alpha_decl = base_var_decl("alpha",dims,double_type());
   scope alpha_origin = parameter_origin;
   vm.add("alpha", alpha_decl, alpha_origin);
 
   variable v("alpha");
-  v.set_type(DOUBLE_T, 2U);
+  v.set_type(double_type(), 2U);
   expression e(v);
   EXPECT_TRUE(has_var(e, vm));
 
   vm.add("beta",
-         base_var_decl("beta", vector<expression>(), INT_T),
+         base_var_decl("beta", vector<expression>(), int_type()),
          model_name_origin);
   variable v_beta("beta");
-  v_beta.set_type(INT_T, 0U);
+  v_beta.set_type(int_type(), 0U);
   expression e_beta(v_beta);
   EXPECT_FALSE(has_var(e_beta, vm));
 
@@ -158,49 +161,154 @@ TEST(langAst, hasVar) {
 
 TEST(lang_ast,expr_type_num_dims) {
   EXPECT_EQ(0U,expr_type().num_dims());
-  EXPECT_EQ(2U,expr_type(INT_T,2U).num_dims());
-  EXPECT_EQ(2U,expr_type(VECTOR_T,2U).num_dims());
+  EXPECT_EQ(2U,expr_type(int_type(),2U).num_dims());
+  EXPECT_EQ(2U,expr_type(vector_type(),2U).num_dims());
 }
+
 TEST(lang_ast,expr_type_is_primitive) {
-  EXPECT_TRUE(expr_type(DOUBLE_T).is_primitive());
-  EXPECT_TRUE(expr_type(INT_T).is_primitive());
-  EXPECT_FALSE(expr_type(VECTOR_T).is_primitive());
-  EXPECT_FALSE(expr_type(ROW_VECTOR_T).is_primitive());
-  EXPECT_FALSE(expr_type(MATRIX_T).is_primitive());
-  EXPECT_FALSE(expr_type(INT_T,2U).is_primitive());
+  EXPECT_TRUE(expr_type(double_type()).is_primitive());
+  EXPECT_TRUE(expr_type(int_type()).is_primitive());
+  EXPECT_FALSE(expr_type(vector_type()).is_primitive());
+  EXPECT_FALSE(expr_type(row_vector_type()).is_primitive());
+  EXPECT_FALSE(expr_type(matrix_type()).is_primitive());
+  EXPECT_FALSE(expr_type(int_type(),2U).is_primitive());
 }
+
 TEST(lang_ast,expr_type_is_primitive_int) {
-  EXPECT_FALSE(expr_type(DOUBLE_T).is_primitive_int());
-  EXPECT_TRUE(expr_type(INT_T).is_primitive_int());
-  EXPECT_FALSE(expr_type(VECTOR_T).is_primitive_int());
-  EXPECT_FALSE(expr_type(ROW_VECTOR_T).is_primitive_int());
-  EXPECT_FALSE(expr_type(MATRIX_T).is_primitive_int());
-  EXPECT_FALSE(expr_type(INT_T,2U).is_primitive_int());
+  EXPECT_FALSE(expr_type(double_type()).is_primitive_int());
+  EXPECT_TRUE(expr_type(int_type()).is_primitive_int());
+  EXPECT_FALSE(expr_type(vector_type()).is_primitive_int());
+  EXPECT_FALSE(expr_type(row_vector_type()).is_primitive_int());
+  EXPECT_FALSE(expr_type(matrix_type()).is_primitive_int());
+  EXPECT_FALSE(expr_type(int_type(),2U).is_primitive_int());
 }
+
 TEST(lang_ast,expr_type_is_primitive_double) {
-  EXPECT_TRUE(expr_type(DOUBLE_T).is_primitive_double());
-  EXPECT_FALSE(expr_type(INT_T).is_primitive_double());
-  EXPECT_FALSE(expr_type(VECTOR_T).is_primitive_double());
-  EXPECT_FALSE(expr_type(ROW_VECTOR_T).is_primitive_double());
-  EXPECT_FALSE(expr_type(MATRIX_T).is_primitive_double());
-  EXPECT_FALSE(expr_type(INT_T,2U).is_primitive_double());
+  EXPECT_TRUE(expr_type(double_type()).is_primitive_double());
+  EXPECT_FALSE(expr_type(int_type()).is_primitive_double());
+  EXPECT_FALSE(expr_type(vector_type()).is_primitive_double());
+  EXPECT_FALSE(expr_type(row_vector_type()).is_primitive_double());
+  EXPECT_FALSE(expr_type(matrix_type()).is_primitive_double());
+  EXPECT_FALSE(expr_type(int_type(),2U).is_primitive_double());
 }
+
 TEST(lang_ast,expr_type_eq) {
-  EXPECT_EQ(expr_type(DOUBLE_T),expr_type(DOUBLE_T));
-  EXPECT_EQ(expr_type(DOUBLE_T,1U),expr_type(DOUBLE_T,1U));
-  EXPECT_NE(expr_type(INT_T), expr_type(DOUBLE_T));
-  EXPECT_NE(expr_type(INT_T,1), expr_type(INT_T,2));
+  EXPECT_EQ(expr_type(double_type()),expr_type(double_type()));
+  EXPECT_EQ(expr_type(double_type(),1U),expr_type(double_type(),1U));
+  EXPECT_NE(expr_type(int_type()), expr_type(double_type()));
+  EXPECT_NE(expr_type(int_type(),1), expr_type(int_type(),2));
+  EXPECT_TRUE(expr_type(int_type(),1) != expr_type(int_type(),2));
+  EXPECT_FALSE(expr_type(int_type(),1) == expr_type(int_type(),2));
 }
+
+TEST(lang_ast,base_expr_type_vis) {
+  EXPECT_TRUE(base_expr_type(ill_formed_type()).is_ill_formed_type());
+  EXPECT_TRUE(base_expr_type(void_type()).is_void_type());
+  EXPECT_TRUE(base_expr_type(int_type()).is_int_type());
+  EXPECT_TRUE(base_expr_type(double_type()).is_double_type());
+  EXPECT_TRUE(base_expr_type(vector_type()).is_vector_type());
+  EXPECT_TRUE(base_expr_type(row_vector_type()).is_row_vector_type());
+  EXPECT_TRUE(base_expr_type(matrix_type()).is_matrix_type());
+
+  EXPECT_FALSE(base_expr_type(void_type()).is_ill_formed_type());
+  EXPECT_FALSE(base_expr_type(int_type()).is_void_type());
+  EXPECT_FALSE(base_expr_type(double_type()).is_int_type());
+  EXPECT_FALSE(base_expr_type(int_type()).is_double_type());
+  EXPECT_FALSE(base_expr_type(int_type()).is_vector_type());
+  EXPECT_FALSE(base_expr_type(vector_type()).is_row_vector_type());
+  EXPECT_FALSE(base_expr_type(vector_type()).is_matrix_type());
+}
+
+
+TEST(lang_ast,base_expr_type_compare_ops) {
+  EXPECT_TRUE(base_expr_type(int_type())
+              == base_expr_type(int_type()));
+  EXPECT_TRUE(base_expr_type(int_type())
+              != base_expr_type(double_type()));
+  EXPECT_FALSE(base_expr_type(int_type())
+              != base_expr_type(int_type()));
+  EXPECT_TRUE(base_expr_type(int_type())
+              >= base_expr_type(int_type()));
+  EXPECT_TRUE(base_expr_type(int_type())
+              <= base_expr_type(int_type()));
+  EXPECT_FALSE(base_expr_type(int_type())
+               > base_expr_type(int_type()));
+  EXPECT_FALSE(base_expr_type(int_type())
+               < base_expr_type(int_type()));
+  EXPECT_TRUE(base_expr_type(ill_formed_type())
+              < base_expr_type(int_type()));
+  EXPECT_TRUE(base_expr_type(void_type())
+              < base_expr_type(double_type()));
+  EXPECT_TRUE(base_expr_type(ill_formed_type())
+              < base_expr_type(double_type()));
+  EXPECT_TRUE(base_expr_type(void_type())
+              < base_expr_type(vector_type()));
+  EXPECT_TRUE(base_expr_type(ill_formed_type())
+              < base_expr_type(row_vector_type()));
+  EXPECT_TRUE(base_expr_type(void_type())
+              < base_expr_type(matrix_type()));
+
+  EXPECT_FALSE(base_expr_type(ill_formed_type())
+              < base_expr_type(ill_formed_type()));
+  EXPECT_FALSE(base_expr_type(void_type())
+              < base_expr_type(void_type()));
+  EXPECT_FALSE(base_expr_type(int_type())
+               < base_expr_type(int_type()));
+  EXPECT_FALSE(base_expr_type(double_type())
+               < base_expr_type(double_type()));
+  EXPECT_FALSE(base_expr_type(vector_type())
+              < base_expr_type(vector_type()));
+  EXPECT_FALSE(base_expr_type(row_vector_type())
+              < base_expr_type(row_vector_type()));
+  EXPECT_FALSE(base_expr_type(matrix_type())
+              < base_expr_type(matrix_type()));
+
+  EXPECT_FALSE(base_expr_type(ill_formed_type())
+              > base_expr_type(ill_formed_type()));
+  EXPECT_FALSE(base_expr_type(void_type())
+              > base_expr_type(void_type()));
+  EXPECT_FALSE(base_expr_type(int_type())
+               > base_expr_type(int_type()));
+  EXPECT_FALSE(base_expr_type(double_type())
+               > base_expr_type(double_type()));
+  EXPECT_FALSE(base_expr_type(vector_type())
+              > base_expr_type(vector_type()));
+  EXPECT_FALSE(base_expr_type(row_vector_type())
+              > base_expr_type(row_vector_type()));
+  EXPECT_FALSE(base_expr_type(matrix_type())
+              > base_expr_type(matrix_type()));
+
+  EXPECT_FALSE(base_expr_type(ill_formed_type())
+              != base_expr_type(ill_formed_type()));
+  EXPECT_FALSE(base_expr_type(void_type())
+              != base_expr_type(void_type()));
+  EXPECT_FALSE(base_expr_type(int_type())
+               != base_expr_type(int_type()));
+  EXPECT_FALSE(base_expr_type(double_type())
+               != base_expr_type(double_type()));
+  EXPECT_FALSE(base_expr_type(vector_type())
+              != base_expr_type(vector_type()));
+  EXPECT_FALSE(base_expr_type(row_vector_type())
+              != base_expr_type(row_vector_type()));
+  EXPECT_FALSE(base_expr_type(matrix_type())
+              != base_expr_type(matrix_type()));
+}
+
 TEST(lang_ast,expr_type_type) {
-  EXPECT_EQ(DOUBLE_T,expr_type(DOUBLE_T).type());
-  EXPECT_EQ(DOUBLE_T,expr_type(DOUBLE_T,3U).type());
-  EXPECT_NE(DOUBLE_T,expr_type(INT_T).type());
-  EXPECT_NE(DOUBLE_T,expr_type(VECTOR_T,2U).type());
+  EXPECT_EQ(base_expr_type(double_type()),
+              expr_type(double_type()).type());
+  EXPECT_EQ(base_expr_type(double_type()),
+            expr_type(double_type(),3U).type());
+  EXPECT_NE(base_expr_type(double_type()),
+            expr_type(int_type()).type());
+  EXPECT_NE(base_expr_type(double_type()),
+            expr_type(vector_type(),2U).type());
 }
 
 std::vector<expr_type> expr_type_vec() {
   return std::vector<expr_type>();
 }
+
 std::vector<expr_type> expr_type_vec(const expr_type& t1) {
   std::vector<expr_type> etv;
   etv.push_back(t1);
@@ -226,107 +334,106 @@ std::vector<expr_type> expr_type_vec(const expr_type& t1,
 TEST(lang_ast,function_signatures_log_sum_exp_1) {
   stan::lang::function_signatures& fs = stan::lang::function_signatures::instance();
   std::stringstream error_msgs;
-  EXPECT_EQ(expr_type(DOUBLE_T),
+  EXPECT_EQ(expr_type(double_type()),
             fs.get_result_type("log_sum_exp",
-                               expr_type_vec(expr_type(DOUBLE_T,1U)),
+                               expr_type_vec(expr_type(double_type(),1U)),
                                error_msgs));
 }
 
 TEST(lang_ast,function_signatures_log_sum_exp_2) {
   stan::lang::function_signatures& fs = stan::lang::function_signatures::instance();
   std::stringstream error_msgs;
-  EXPECT_EQ(expr_type(DOUBLE_T),
+  EXPECT_EQ(expr_type(double_type()),
             fs.get_result_type("log_sum_exp",
-                               expr_type_vec(expr_type(DOUBLE_T),
-                                             expr_type(DOUBLE_T)),
+                               expr_type_vec(expr_type(double_type()),
+                                             expr_type(double_type())),
                                error_msgs));
 }
-
-TEST(lang_ast,function_signatures_add) {
+ 
+TEST(lang_ast, function_signatures_add) {
   stan::lang::function_signatures& fs = stan::lang::function_signatures::instance();
   std::stringstream error_msgs;
 
-  EXPECT_EQ(expr_type(DOUBLE_T),
-            fs.get_result_type("sqrt",expr_type_vec(expr_type(DOUBLE_T)),
+  EXPECT_EQ(expr_type(double_type()),
+            fs.get_result_type("sqrt", expr_type_vec(expr_type(double_type())),
                                error_msgs));
-  EXPECT_EQ(expr_type(), fs.get_result_type("foo__",expr_type_vec(),error_msgs));
-  EXPECT_EQ(expr_type(), fs.get_result_type("foo__",expr_type_vec(expr_type(DOUBLE_T)),error_msgs));
+  EXPECT_EQ(expr_type(), fs.get_result_type("foo__", expr_type_vec(), error_msgs));
+  EXPECT_EQ(expr_type(), fs.get_result_type("foo__", expr_type_vec(expr_type(double_type())), error_msgs));
 
   // these next two conflict
-  fs.add("bar__",expr_type(DOUBLE_T),expr_type(INT_T),expr_type(DOUBLE_T));
-  fs.add("bar__",expr_type(DOUBLE_T),expr_type(DOUBLE_T),expr_type(INT_T));
+  fs.add("bar__", expr_type(double_type()), expr_type(int_type()), expr_type(double_type()));
+  fs.add("bar__", expr_type(double_type()), expr_type(double_type()), expr_type(int_type()));
   EXPECT_EQ(expr_type(),
-            fs.get_result_type("bar__",expr_type_vec(expr_type(INT_T),expr_type(INT_T)),
+            fs.get_result_type("bar__", expr_type_vec(expr_type(int_type()), expr_type(int_type())),
                                error_msgs));
 
   // after this, should be resolvable
-  fs.add("bar__",expr_type(INT_T), expr_type(INT_T), expr_type(INT_T));
-  EXPECT_EQ(expr_type(INT_T),
-            fs.get_result_type("bar__",expr_type_vec(INT_T,INT_T),
-                               error_msgs)); // expr_type(INT_T),expr_type(INT_T))));
+  fs.add("bar__", expr_type(int_type()), expr_type(int_type()), expr_type(int_type()));
+  EXPECT_EQ(expr_type(int_type()),
+            fs.get_result_type("bar__", expr_type_vec(expr_type(int_type()), expr_type(int_type())),
+                               error_msgs));
 
 }
 
-TEST(langAst,voidType) {
-  EXPECT_EQ(stan::lang::VOID_T, 0);
+TEST(langAst, voidType) {
   std::stringstream ss;
-  stan::lang::write_base_expr_type(ss, stan::lang::VOID_T);
-  EXPECT_EQ("void",ss.str());
-
-  expr_type et(stan::lang::VOID_T,0);
-  EXPECT_TRUE(et.is_void());
+  stan::lang::write_base_expr_type(ss, void_type());
+  EXPECT_EQ("void", ss.str());
+  expr_type et(void_type(), 0);
+  EXPECT_TRUE(et.type().is_void_type());
 }
 
-TEST(langAst,baseVarDecl) {
+TEST(langAst, baseVarDecl) {
   std::vector<stan::lang::expression> dims;
   dims.push_back(stan::lang::expression(stan::lang::int_literal(0)));
-  stan::lang::base_var_decl bvd("foo", dims, INT_T);
-  EXPECT_EQ("foo",bvd.name_);
+  stan::lang::base_var_decl bvd("foo", dims, int_type());
+  EXPECT_EQ("foo", bvd.name_);
   EXPECT_EQ(1U, bvd.dims_.size());
   EXPECT_EQ(stan::lang::expression(stan::lang::int_literal(0)).expression_type(),
             bvd.dims_[0].expression_type());
-  EXPECT_EQ(INT_T, bvd.base_type_);
+  EXPECT_EQ(base_expr_type(int_type()), bvd.base_type_);
 }
 
-TEST(langAst,argDecl) {
+TEST(langAst, argDecl) {
   stan::lang::arg_decl ad;
-  ad.arg_type_ = expr_type(INT_T,0);
+  ad.arg_type_ = expr_type(int_type(), 0);
   ad.name_ = "foo";
   stan::lang::base_var_decl bvd = ad.base_variable_declaration();
   EXPECT_EQ("foo", bvd.name_);
   EXPECT_EQ(0U, bvd.dims_.size());
-  EXPECT_EQ(INT_T, bvd.base_type_);
+  EXPECT_EQ(base_expr_type(int_type()), bvd.base_type_);
 }
 
 TEST(langAst,functionDeclDef) {
-  stan::lang::function_decl_def fdd(expr_type(stan::lang::INT_T,0),
+  stan::lang::function_decl_def fdd(expr_type(stan::lang::int_type(), 0),
                                   "foo",
                                   std::vector<stan::lang::arg_decl>(),
                                   stan::lang::statement(stan::lang::no_op_statement()));
-  EXPECT_EQ("foo",fdd.name_);
+  EXPECT_EQ("foo", fdd.name_);
   EXPECT_TRUE(fdd.body_.is_no_op_statement());
-  EXPECT_EQ(0U,fdd.arg_decls_.size());
+  EXPECT_EQ(0U, fdd.arg_decls_.size());
   EXPECT_TRUE(fdd.return_type_.is_primitive_int());
 }
-TEST(langAst,functionDeclDefs) {
-  stan::lang::function_decl_def fdd1(expr_type(stan::lang::INT_T,0),
-                                  "foo",
-                                  std::vector<stan::lang::arg_decl>(),
-                                  stan::lang::statement(stan::lang::no_op_statement()));
+
+TEST(langAst, functionDeclDefs) {
+  stan::lang::function_decl_def fdd1(expr_type(stan::lang::int_type(), 0),
+                                     "foo",
+                                     std::vector<stan::lang::arg_decl>(),
+                                     stan::lang::statement(stan::lang::no_op_statement()));
   stan::lang::arg_decl ad;
-  ad.arg_type_ = expr_type(INT_T,0);
+  ad.arg_type_ = expr_type(int_type(), 0);
   ad.name_ = "foo";
   std::vector<stan::lang::arg_decl> arg_decls;
   arg_decls.push_back(ad);
-  stan::lang::function_decl_def fdd2(expr_type(stan::lang::DOUBLE_T,3),
-                                  "bar",
-                                   arg_decls,
-                                   stan::lang::statement(stan::lang::no_op_statement()));
+  stan::lang::function_decl_def fdd2(expr_type(stan::lang::double_type(), 3),
+                                     "bar",
+                                     arg_decls,
+                                     stan::lang::statement(stan::lang::no_op_statement()));
   std::vector<stan::lang::function_decl_def> vec_fdds;
   vec_fdds.push_back(fdd1);
   vec_fdds.push_back(fdd2);
   stan::lang::function_decl_defs fdds(vec_fdds);
-  EXPECT_EQ(2U,fdds.decl_defs_.size());
+  EXPECT_EQ(2U, fdds.decl_defs_.size());
 }
 
 TEST(langAst, hasRngSuffix) {
@@ -334,6 +441,7 @@ TEST(langAst, hasRngSuffix) {
   EXPECT_FALSE(stan::lang::has_rng_suffix("foo.rng"));
   EXPECT_FALSE(stan::lang::has_rng_suffix("foo.bar"));
 }
+
 TEST(langAst, hasLpSuffix) {
   EXPECT_TRUE(stan::lang::has_lp_suffix("foo_lp"));
   EXPECT_FALSE(stan::lang::has_lp_suffix("foo.lp"));
@@ -352,31 +460,28 @@ TEST(langAst, isUserDefined) {
   using std::pair;
   vector<expression> args;
   string name = "foo";
-  EXPECT_FALSE(is_user_defined(name,args));
+  EXPECT_FALSE(is_user_defined(name, args));
   args.push_back(expression(int_literal(0)));
-  EXPECT_FALSE(is_user_defined(name,args));
+  EXPECT_FALSE(is_user_defined(name, args));
 
   vector<function_arg_type> arg_types;
-  arg_types.push_back(function_arg_type(expr_type(INT_T,0)));
-  expr_type result_type(DOUBLE_T,0);
+  arg_types.push_back(function_arg_type(expr_type(int_type(),0)));
+  expr_type result_type(double_type(),0);
   // must add first, before making user defined
   function_signatures::instance().add(name, result_type, arg_types);
   function_signature_t sig(result_type, arg_types);
-  pair<string,function_signature_t> name_sig(name,sig);
+  pair<string, function_signature_t> name_sig(name, sig);
 
   function_signatures::instance().set_user_defined(name_sig);
-
-  EXPECT_TRUE(is_user_defined(name,args));
-
-
+  
+  EXPECT_TRUE(is_user_defined(name, args));
   EXPECT_TRUE(function_signatures::instance().is_user_defined(name_sig));
-
   EXPECT_FALSE(is_user_defined_prob_function("foo",
                                              expression(double_literal(1.3)),
                                              args));
 
   string name_pf = "bar_log";
-  pair<string,function_signature_t> name_sig_pf(name_pf,sig);
+  pair<string, function_signature_t> name_sig_pf(name_pf, sig);
   function_signatures::instance().add(name_pf, result_type, arg_types);
   function_signatures::instance().set_user_defined(name_sig_pf);
 
@@ -420,23 +525,22 @@ TEST(langAst, solveOde) {
   std::string system_function_name = "foo";
 
   variable y0("y0_var_name");
-  y0.set_type(DOUBLE_T, 1);  // plain old vector
+  y0.set_type(double_type(), 1);  // plain old vector
 
   variable t0("t0_var_name");
-  t0.set_type(DOUBLE_T, 0);  // double
+  t0.set_type(double_type(), 0);  // double
 
   variable ts("ts_var_name");
-  ts.set_type(DOUBLE_T, 1);
+  ts.set_type(double_type(), 1);
 
   variable theta("theta_var_name");
-  theta.set_type(DOUBLE_T, 1);
+  theta.set_type(double_type(), 1);
 
   variable x("x_var_name");
-  x.set_type(DOUBLE_T, 1);
+  x.set_type(double_type(), 1);
 
   variable x_int("x_int_var_name");
-  x.set_type(INT_T, 1);
-
+  x.set_type(int_type(), 1);
 
   // example of instantiation
   integrate_ode so2(integration_function_name, system_function_name,
@@ -453,7 +557,7 @@ TEST(langAst, solveOde) {
   EXPECT_EQ(x_int.type_, so2.x_int_.expression_type());
 
   expression e2(so2);
-  EXPECT_EQ(expr_type(DOUBLE_T,2), e2.expression_type());
+  EXPECT_EQ(expr_type(double_type(),2), e2.expression_type());
 }
 
 TEST(langAst, solveAlgebra) {
@@ -463,20 +567,19 @@ TEST(langAst, solveAlgebra) {
     using stan::lang::expression;
     
     algebra_solver so;  // null ctor should work and not raise error
-    
     std::string system_function_name = "bronzino";
     
     variable y("y_var_name");
-    y.set_type(VECTOR_T, 0);  // vector from Eigen
+    y.set_type(vector_type(), 0);  // vector from Eigen
     
     variable theta("theta_var_name");
-    theta.set_type(VECTOR_T, 0);
+    theta.set_type(vector_type(), 0);
     
     variable x_r("x_r_r_var_name");
-    x_r.set_type(DOUBLE_T, 1);  // plain old vector
+    x_r.set_type(double_type(), 1);  // plain old vector
     
     variable x_i("x_i_var_name");
-    x_i.set_type(INT_T, 1);
+    x_i.set_type(int_type(), 1);
     
     // example of instantiation
     algebra_solver so2(system_function_name, y, theta, x_r, x_i);
@@ -489,7 +592,7 @@ TEST(langAst, solveAlgebra) {
     EXPECT_EQ(x_i.type_, so2.x_i_.expression_type());
     
     expression e2(so2);
-    EXPECT_EQ(expr_type(VECTOR_T, 0), e2.expression_type());
+    EXPECT_EQ(expr_type(vector_type(), 0), e2.expression_type());
 }
 
 void testTotalDims(int expected_total_dims,
@@ -502,20 +605,20 @@ void testTotalDims(int expected_total_dims,
   v.set_type(base_type, num_dims);
 
   expression e(v);
-  EXPECT_EQ(expected_total_dims,e.total_dims());
+  EXPECT_EQ(expected_total_dims, e.total_dims());
 }
 
 TEST(gmAst,expressionTotalDims) {
-  testTotalDims(0, DOUBLE_T, 0);
-  testTotalDims(2, DOUBLE_T, 2);
-  testTotalDims(0, INT_T, 0);
-  testTotalDims(2, INT_T, 2);
-  testTotalDims(2, MATRIX_T, 0);
-  testTotalDims(5, MATRIX_T, 3);
-  testTotalDims(1, VECTOR_T, 0);
-  testTotalDims(4, VECTOR_T, 3);
-  testTotalDims(1, ROW_VECTOR_T, 0);
-  testTotalDims(4, ROW_VECTOR_T, 3);
+  testTotalDims(0, double_type(), 0);
+  testTotalDims(2, double_type(), 2);
+  testTotalDims(0, int_type(), 0);
+  testTotalDims(2, int_type(), 2);
+  testTotalDims(2, matrix_type(), 0);
+  testTotalDims(5, matrix_type(), 3);
+  testTotalDims(1, vector_type(), 0);
+  testTotalDims(4, vector_type(), 3);
+  testTotalDims(1, row_vector_type(), 0);
+  testTotalDims(4, row_vector_type(), 3);
 }
 
 TEST(gmAst, isBinaryOperator) {
@@ -524,16 +627,19 @@ TEST(gmAst, isBinaryOperator) {
   EXPECT_TRUE(is_binary_operator("elt_divide"));
   EXPECT_FALSE(is_binary_operator("foo"));
 }
+
 TEST(gmAst, isUnaryOperator) {
   using stan::lang::is_unary_operator;
   EXPECT_TRUE(is_unary_operator("minus"));
   EXPECT_FALSE(is_unary_operator("foo"));
 }
+
 TEST(gmAst, isUnaryPostfix) {
   using stan::lang::is_unary_postfix_operator;
   EXPECT_TRUE(is_unary_postfix_operator("transpose"));
   EXPECT_FALSE(is_unary_postfix_operator("bar"));
 }
+
 TEST(gmAst, funNameToOperator) {
   using stan::lang::fun_name_to_operator;
   EXPECT_EQ("+", fun_name_to_operator("add"));
@@ -545,63 +651,69 @@ TEST(langAst, uniIdx) {
   stan::lang::expression e(stan::lang::int_literal(3));
   stan::lang::uni_idx i(e);
   // test proper type storage and retrieval
-  EXPECT_EQ(INT_T, i.idx_.expression_type().type());
+  EXPECT_EQ(base_expr_type(int_type()), i.idx_.expression_type().type());
   EXPECT_EQ(0, i.idx_.expression_type().num_dims());
   // test allow construction
   EXPECT_NO_THROW(stan::lang::idx(i));
 }
+
 TEST(langAst, multiIdx) {
   stan::lang::variable v("foo");
-  v.set_type(INT_T, 1);
+  v.set_type(int_type(), 1);
   stan::lang::expression e(v);
   stan::lang::multi_idx i(e);
   // test proper type storage and retrieval
-  EXPECT_EQ(INT_T, i.idxs_.expression_type().type());
+  EXPECT_EQ(base_expr_type(int_type()), i.idxs_.expression_type().type());
   EXPECT_EQ(1, i.idxs_.expression_type().num_dims());
   // test allow construction
   EXPECT_NO_THROW(stan::lang::idx(i));
 }
+
 TEST(langAst, omniIdx) {
   // nothing to store or retrieve for omni
   EXPECT_NO_THROW(stan::lang::omni_idx());
   // test allow construction
   EXPECT_NO_THROW(stan::lang::idx(i));
 }
+
 TEST(langAst, lbIdx) {
   stan::lang::expression e(stan::lang::int_literal(3));
   stan::lang::lb_idx i(e);
   // test proper type storage and retrieval
-  EXPECT_EQ(INT_T, i.lb_.expression_type().type());
+  EXPECT_EQ(base_expr_type(int_type()), i.lb_.expression_type().type());
   EXPECT_EQ(0, i.lb_.expression_type().num_dims());
   // test allow construction
   EXPECT_NO_THROW(stan::lang::idx(i));
 }
+
 TEST(langAst, ubIdx) {
   stan::lang::expression e(stan::lang::int_literal(3));
   stan::lang::ub_idx i(e);
   // test proper type storage and retrieval
-  EXPECT_EQ(INT_T, i.ub_.expression_type().type());
+  EXPECT_EQ(base_expr_type(int_type()), i.ub_.expression_type().type());
   EXPECT_EQ(0, i.ub_.expression_type().num_dims());
   // test allow construction
   EXPECT_NO_THROW(stan::lang::idx(i));
 }
+
 TEST(langAst, lubIdx) {
   stan::lang::expression e1(stan::lang::int_literal(3));
   stan::lang::variable v("foo");
-  v.set_type(INT_T, 0);
+  v.set_type(int_type(), 0);
   stan::lang::expression e2(v);
   stan::lang::lub_idx i(e1,e2);
   // test proper type storage and retrieval
-  EXPECT_EQ(INT_T, i.lb_.expression_type().type());
+  EXPECT_EQ(base_expr_type(int_type()), i.lb_.expression_type().type());
   EXPECT_EQ(0, i.lb_.expression_type().num_dims());
-  EXPECT_EQ(INT_T, i.ub_.expression_type().type());
+  EXPECT_EQ(base_expr_type(int_type()), i.ub_.expression_type().type());
   EXPECT_EQ(0, i.ub_.expression_type().num_dims());
   // test allow construction
   EXPECT_NO_THROW(stan::lang::idx(i));
 }
+
 TEST(langAst, assgn) {
   stan::lang::variable v("foo");
-  v.set_type(DOUBLE_T, 0);
+  v.set_type(double_type(), 0);
   std::vector<stan::lang::idx> is;
   stan::lang::expression e_int3(stan::lang::int_literal(3));
   stan::lang::uni_idx ui(e_int3);
@@ -613,39 +725,42 @@ TEST(langAst, assgn) {
   EXPECT_EQ(1, a.idxs_.size());
   // retrieve LHS variable
   EXPECT_EQ(0, a.lhs_var_.type_.num_dims());
-  EXPECT_EQ(DOUBLE_T, a.lhs_var_.type_.type());
+  EXPECT_EQ(base_expr_type(double_type()), a.lhs_var_.type_.type());
   // retrieve RHS expression
   EXPECT_EQ(0, a.rhs_.expression_type().num_dims());
-  EXPECT_EQ(INT_T, a.rhs_.expression_type().type());
+  EXPECT_EQ(base_expr_type(int_type()), a.rhs_.expression_type().type());
 }
 
 // Type Inference Tests for Generalized Indexing
 
 // tests recovery of base expression type and number of dims
 // given expression and indexing
-void test_recover(stan::lang::base_expr_type base_et_expected,
+void test_recover(base_expr_type base_et_expected,
                   size_t num_dims_expected,
-                  stan::lang::base_expr_type base_et, size_t num_dims,
+                  base_expr_type base_et, size_t num_dims,
                   const std::vector<stan::lang::idx>& idxs) {
   stan::lang::variable v("foo");
   v.set_type(base_et, num_dims);
   stan::lang::expression e(v);
-  stan::lang::expr_type et = indexed_type(e, idxs);
+  expr_type et = indexed_type(e, idxs);
   EXPECT_EQ(base_et_expected, et.base_type_);
   EXPECT_EQ(num_dims_expected, et.num_dims_);
 }
-void test_err(stan::lang::base_expr_type base_et, size_t num_dims,
+
+void test_err(base_expr_type base_et, size_t num_dims,
               const std::vector<stan::lang::idx>& idxs) {
   stan::lang::variable v("foo");
   v.set_type(base_et, num_dims);
   stan::lang::expression e(v);
-  stan::lang::expr_type et = indexed_type(e, idxs);
-  EXPECT_EQ(stan::lang::ILL_FORMED_T, et.base_type_);
+  expr_type et = indexed_type(e, idxs);
+  EXPECT_EQ(base_expr_type(ill_formed_type()), et.base_type_);
 }
 
 TEST(langAst, idxs) {
   const stan::lang::base_expr_type bet[]
-    = { INT_T, DOUBLE_T, VECTOR_T, ROW_VECTOR_T, MATRIX_T };
+    = { base_expr_type(int_type()), base_expr_type(double_type()),
+        base_expr_type(vector_type()), base_expr_type(row_vector_type()),
+        base_expr_type(matrix_type()) };
   vector<idx> idxs;
   for (size_t n = 0; n < 4; ++n)
     for (int i = 0; i < 5; ++i)
@@ -654,51 +769,63 @@ TEST(langAst, idxs) {
 
 void one_index_recover(const std::vector<stan::lang::idx>& idxs, size_t redux) {
   const stan::lang::base_expr_type bet[]
-    = { INT_T, DOUBLE_T, VECTOR_T, ROW_VECTOR_T, MATRIX_T };
+    = { base_expr_type(int_type()), base_expr_type(double_type()),
+        base_expr_type(vector_type()), base_expr_type(row_vector_type()),
+        base_expr_type(matrix_type()) };
   for (size_t n = 1; n < 4; ++n)
     for (int i = 0; i < 5; ++i)
       test_recover(bet[i], n - redux, bet[i], n, idxs);
 }
+
 void one_index_errs(const std::vector<stan::lang::idx>& idxs) {
-  test_err(DOUBLE_T, 0U, idxs);
-  test_err(INT_T, 0U, idxs);
+  test_err(base_expr_type(double_type()), 0U, idxs);
+  test_err(base_expr_type(int_type()), 0U, idxs);
 }
+
 TEST(langAst, idxs0) {
   vector<idx> idxs;
   idxs.push_back(uni_idx(expression(int_literal(3))));
 
   one_index_errs(idxs);
   one_index_recover(idxs, 1U);
-  test_recover(DOUBLE_T, 0U, VECTOR_T, 0U, idxs);
-  test_recover(DOUBLE_T, 0U, ROW_VECTOR_T, 0U, idxs);
-  test_recover(ROW_VECTOR_T, 0U, MATRIX_T, 0U, idxs);
+  test_recover(base_expr_type(double_type()), 0U,
+               base_expr_type(vector_type()), 0U, idxs);
+  test_recover(base_expr_type(double_type()), 0U,
+               base_expr_type(row_vector_type()), 0U, idxs);
+  test_recover(base_expr_type(row_vector_type()), 0U,
+               base_expr_type(matrix_type()), 0U, idxs);
 }
+
 TEST(langAst, idxs1) {
   vector<idx> idxs;
   idxs.push_back(omni_idx());
 
   one_index_errs(idxs);
   one_index_recover(idxs, 0U);
-  test_recover(VECTOR_T, 0U, VECTOR_T, 0U, idxs);
-  test_recover(ROW_VECTOR_T, 0U, ROW_VECTOR_T, 0U, idxs);
-  test_recover(MATRIX_T, 0U, MATRIX_T, 0U, idxs);
+  test_recover(base_expr_type(vector_type()), 0U, base_expr_type(vector_type()), 0U, idxs);
+  test_recover(base_expr_type(row_vector_type()), 0U, base_expr_type(row_vector_type()), 0U, idxs);
+  test_recover(base_expr_type(matrix_type()), 0U, base_expr_type(matrix_type()), 0U, idxs);
 }
 
 void two_index_recover(const std::vector<stan::lang::idx>& idxs, size_t redux) {
   const stan::lang::base_expr_type bet[]
-    = { INT_T, DOUBLE_T, VECTOR_T, ROW_VECTOR_T, MATRIX_T };
+    = { base_expr_type(int_type()), base_expr_type(double_type()),
+        base_expr_type(vector_type()), base_expr_type(row_vector_type()),
+        base_expr_type(base_expr_type(matrix_type())) };
   for (size_t n = 2; n < 4; ++n)
     for (int i = 0; i < 5; ++i)
       test_recover(bet[i], n - redux, bet[i], n, idxs);
 }
+
 void two_index_errs(const std::vector<stan::lang::idx>& idxs) {
-  test_err(DOUBLE_T, 0U, idxs);
-  test_err(DOUBLE_T, 1U, idxs);
-  test_err(INT_T, 0U, idxs);
-  test_err(INT_T, 1U, idxs);
-  test_err(VECTOR_T, 0U, idxs);
-  test_err(ROW_VECTOR_T, 0U, idxs);
+  test_err(base_expr_type(double_type()), 0U, idxs);
+  test_err(base_expr_type(double_type()), 1U, idxs);
+  test_err(base_expr_type(int_type()), 0U, idxs);
+  test_err(base_expr_type(int_type()), 1U, idxs);
+  test_err(base_expr_type(vector_type()), 0U, idxs);
+  test_err(base_expr_type(row_vector_type()), 0U, idxs);
 }
+
 TEST(langAst, idxs00) {
   vector<idx> idxs;
   idxs.push_back(uni_idx(expression(int_literal(3))));
@@ -706,11 +833,12 @@ TEST(langAst, idxs00) {
 
   two_index_errs(idxs);
   two_index_recover(idxs, 2U);
-  test_recover(DOUBLE_T, 0U, VECTOR_T, 1U, idxs);
-  test_recover(DOUBLE_T, 0U, ROW_VECTOR_T, 1U, idxs);
-  test_recover(DOUBLE_T, 0U, MATRIX_T, 0U, idxs);
-  test_recover(ROW_VECTOR_T, 0U, MATRIX_T, 1U, idxs);
+  test_recover(base_expr_type(double_type()), 0U, base_expr_type(vector_type()), 1U, idxs);
+  test_recover(base_expr_type(double_type()), 0U, base_expr_type(row_vector_type()), 1U, idxs);
+  test_recover(base_expr_type(double_type()), 0U, base_expr_type(matrix_type()), 0U, idxs);
+  test_recover(base_expr_type(row_vector_type()), 0U, base_expr_type(matrix_type()), 1U, idxs);
 }
+
 TEST(langAst, idxs01) {
   vector<idx> idxs;
   idxs.push_back(uni_idx(expression(int_literal(5))));
@@ -718,11 +846,12 @@ TEST(langAst, idxs01) {
 
   two_index_errs(idxs);
   two_index_recover(idxs, 1U);
-  test_recover(VECTOR_T, 0U, VECTOR_T, 1U, idxs);
-  test_recover(ROW_VECTOR_T, 0U, ROW_VECTOR_T, 1U, idxs);
-  test_recover(ROW_VECTOR_T, 0U, MATRIX_T, 0U, idxs);
-  test_recover(MATRIX_T, 0U, MATRIX_T, 1U, idxs);
+  test_recover(base_expr_type(vector_type()), 0U, base_expr_type(vector_type()), 1U, idxs);
+  test_recover(base_expr_type(row_vector_type()), 0U, base_expr_type(row_vector_type()), 1U, idxs);
+  test_recover(base_expr_type(row_vector_type()), 0U, base_expr_type(matrix_type()), 0U, idxs);
+  test_recover(base_expr_type(matrix_type()), 0U, base_expr_type(matrix_type()), 1U, idxs);
 }
+
 TEST(langAst, idxs10) {
   vector<idx> idxs;
   idxs.push_back(omni_idx());
@@ -730,11 +859,12 @@ TEST(langAst, idxs10) {
 
   two_index_errs(idxs);
   two_index_recover(idxs, 1U);
-  test_recover(DOUBLE_T, 1U, VECTOR_T, 1U, idxs);
-  test_recover(DOUBLE_T, 1U, ROW_VECTOR_T, 1U, idxs);
-  test_recover(VECTOR_T, 0U, MATRIX_T, 0U, idxs);
-  test_recover(ROW_VECTOR_T, 1U, MATRIX_T, 1U, idxs);
+  test_recover(base_expr_type(double_type()), 1U, base_expr_type(vector_type()), 1U, idxs);
+  test_recover(base_expr_type(double_type()), 1U, base_expr_type(row_vector_type()), 1U, idxs);
+  test_recover(base_expr_type(vector_type()), 0U, base_expr_type(matrix_type()), 0U, idxs);
+  test_recover(base_expr_type(row_vector_type()), 1U, base_expr_type(matrix_type()), 1U, idxs);
 }
+
 TEST(langAst, idxs11) {
   vector<idx> idxs;
   idxs.push_back(omni_idx());
@@ -742,32 +872,36 @@ TEST(langAst, idxs11) {
 
   two_index_errs(idxs);
   two_index_recover(idxs, 0U);
-  test_recover(VECTOR_T, 1U, VECTOR_T, 1U, idxs);
-  test_recover(ROW_VECTOR_T, 1U, ROW_VECTOR_T, 1U, idxs);
-  test_recover(MATRIX_T, 0U, MATRIX_T, 0U, idxs);
-  test_recover(MATRIX_T, 1U, MATRIX_T, 1U, idxs);
+  test_recover(base_expr_type(vector_type()), 1U, base_expr_type(vector_type()), 1U, idxs);
+  test_recover(base_expr_type(row_vector_type()), 1U, base_expr_type(row_vector_type()), 1U, idxs);
+  test_recover(base_expr_type(matrix_type()), 0U, base_expr_type(matrix_type()), 0U, idxs);
+  test_recover(base_expr_type(matrix_type()), 1U, base_expr_type(matrix_type()), 1U, idxs);
 }
 
 void three_index_recover(const std::vector<stan::lang::idx>& idxs, size_t redux) {
   const stan::lang::base_expr_type bet[]
-    = { INT_T, DOUBLE_T, VECTOR_T, ROW_VECTOR_T, MATRIX_T };
+    = { base_expr_type(int_type()), base_expr_type(double_type()),
+        base_expr_type(vector_type()), base_expr_type(row_vector_type()),
+        base_expr_type(matrix_type()) };
   for (int i = 0; i < 5; ++i)
     for (size_t n = 3; n < 5; ++n)
       test_recover(bet[i], n - redux, bet[i], n, idxs);
 }
+
 void three_index_errs(const std::vector<stan::lang::idx>& idxs) {
-  test_err(DOUBLE_T, 0U, idxs);
-  test_err(DOUBLE_T, 1U, idxs);
-  test_err(DOUBLE_T, 2U, idxs);
-  test_err(INT_T, 0U, idxs);
-  test_err(INT_T, 1U, idxs);
-  test_err(INT_T, 2U, idxs);
-  test_err(VECTOR_T, 0U, idxs);
-  test_err(VECTOR_T, 1U, idxs);
-  test_err(ROW_VECTOR_T, 0U, idxs);
-  test_err(ROW_VECTOR_T, 1U, idxs);
-  test_err(MATRIX_T, 0U, idxs);
+  test_err(base_expr_type(double_type()), 0U, idxs);
+  test_err(base_expr_type(double_type()), 1U, idxs);
+  test_err(base_expr_type(double_type()), 2U, idxs);
+  test_err(base_expr_type(int_type()), 0U, idxs);
+  test_err(base_expr_type(int_type()), 1U, idxs);
+  test_err(base_expr_type(int_type()), 2U, idxs);
+  test_err(base_expr_type(vector_type()), 0U, idxs);
+  test_err(base_expr_type(vector_type()), 1U, idxs);
+  test_err(base_expr_type(row_vector_type()), 0U, idxs);
+  test_err(base_expr_type(row_vector_type()), 1U, idxs);
+  test_err(base_expr_type(matrix_type()), 0U, idxs);
 }
+
 TEST(langAst, idxs000) {
   vector<idx> idxs;
   idxs.push_back(uni_idx(expression(int_literal(3))));
@@ -776,11 +910,12 @@ TEST(langAst, idxs000) {
 
   three_index_errs(idxs);
   three_index_recover(idxs, 3U);
-  test_recover(DOUBLE_T, 0U, VECTOR_T, 2U, idxs);
-  test_recover(DOUBLE_T, 0U, ROW_VECTOR_T, 2U, idxs);
-  test_recover(DOUBLE_T, 0U, MATRIX_T, 1U, idxs);
-  test_recover(ROW_VECTOR_T, 0U, MATRIX_T, 2U, idxs);
+  test_recover(base_expr_type(double_type()), 0U, base_expr_type(vector_type()), 2U, idxs);
+  test_recover(base_expr_type(double_type()), 0U, base_expr_type(row_vector_type()), 2U, idxs);
+  test_recover(base_expr_type(double_type()), 0U, base_expr_type(matrix_type()), 1U, idxs);
+  test_recover(base_expr_type(row_vector_type()), 0U, base_expr_type(matrix_type()), 2U, idxs);
 }
+
 TEST(langAst, idxs001) {
   vector<idx> idxs;
   idxs.push_back(uni_idx(expression(int_literal(3))));
@@ -789,11 +924,12 @@ TEST(langAst, idxs001) {
 
   three_index_errs(idxs);
   three_index_recover(idxs, 2U);
-  test_recover(VECTOR_T, 0U, VECTOR_T, 2U, idxs);
-  test_recover(ROW_VECTOR_T, 0U, ROW_VECTOR_T, 2U, idxs);
-  test_recover(ROW_VECTOR_T, 0U, MATRIX_T, 1U, idxs);
-  test_recover(MATRIX_T, 0U, MATRIX_T, 2U, idxs);
+  test_recover(base_expr_type(vector_type()), 0U, base_expr_type(vector_type()), 2U, idxs);
+  test_recover(base_expr_type(row_vector_type()), 0U, base_expr_type(row_vector_type()), 2U, idxs);
+  test_recover(base_expr_type(row_vector_type()), 0U, base_expr_type(matrix_type()), 1U, idxs);
+  test_recover(base_expr_type(matrix_type()), 0U, base_expr_type(matrix_type()), 2U, idxs);
 }
+
 TEST(langAst, idxs011) {
   vector<idx> idxs;
   idxs.push_back(uni_idx(expression(int_literal(3))));
@@ -802,11 +938,12 @@ TEST(langAst, idxs011) {
 
   three_index_errs(idxs);
   three_index_recover(idxs, 1U);
-  test_recover(VECTOR_T, 1U, VECTOR_T, 2U, idxs);
-  test_recover(ROW_VECTOR_T, 1U, ROW_VECTOR_T, 2U, idxs);
-  test_recover(MATRIX_T, 0U, MATRIX_T, 1U, idxs);
-  test_recover(MATRIX_T, 1U, MATRIX_T, 2U, idxs);
+  test_recover(base_expr_type(vector_type()), 1U, base_expr_type(vector_type()), 2U, idxs);
+  test_recover(base_expr_type(row_vector_type()), 1U, base_expr_type(row_vector_type()), 2U, idxs);
+  test_recover(base_expr_type(matrix_type()), 0U, base_expr_type(matrix_type()), 1U, idxs);
+  test_recover(base_expr_type(matrix_type()), 1U, base_expr_type(matrix_type()), 2U, idxs);
 }
+
 TEST(langAst, idxs100) {
   vector<idx> idxs;
   idxs.push_back(omni_idx());
@@ -815,11 +952,12 @@ TEST(langAst, idxs100) {
 
   three_index_errs(idxs);
   three_index_recover(idxs, 2U);
-  test_recover(DOUBLE_T, 1U, VECTOR_T, 2U, idxs);
-  test_recover(DOUBLE_T, 1U, ROW_VECTOR_T, 2U, idxs);
-  test_recover(DOUBLE_T, 1U, MATRIX_T, 1U, idxs);
-  test_recover(ROW_VECTOR_T, 1U, MATRIX_T, 2U, idxs);
+  test_recover(base_expr_type(double_type()), 1U, base_expr_type(vector_type()), 2U, idxs);
+  test_recover(base_expr_type(double_type()), 1U, base_expr_type(row_vector_type()), 2U, idxs);
+  test_recover(base_expr_type(double_type()), 1U, base_expr_type(matrix_type()), 1U, idxs);
+  test_recover(base_expr_type(row_vector_type()), 1U, base_expr_type(matrix_type()), 2U, idxs);
 }
+
 TEST(langAst, idxs101) {
   vector<idx> idxs;
   idxs.push_back(omni_idx());
@@ -828,11 +966,12 @@ TEST(langAst, idxs101) {
 
   three_index_errs(idxs);
   three_index_recover(idxs, 1U);
-  test_recover(VECTOR_T, 1U, VECTOR_T, 2U, idxs);
-  test_recover(ROW_VECTOR_T, 1U, ROW_VECTOR_T, 2U, idxs);
-  test_recover(ROW_VECTOR_T, 1U, MATRIX_T, 1U, idxs);
-  test_recover(MATRIX_T, 1U, MATRIX_T, 2U, idxs);
+  test_recover(base_expr_type(vector_type()), 1U, base_expr_type(vector_type()), 2U, idxs);
+  test_recover(base_expr_type(row_vector_type()), 1U, base_expr_type(row_vector_type()), 2U, idxs);
+  test_recover(base_expr_type(row_vector_type()), 1U, base_expr_type(matrix_type()), 1U, idxs);
+  test_recover(base_expr_type(matrix_type()), 1U, base_expr_type(matrix_type()), 2U, idxs);
 }
+
 TEST(langAst, idxs110) {
   vector<idx> idxs;
   idxs.push_back(omni_idx());
@@ -841,11 +980,12 @@ TEST(langAst, idxs110) {
 
   three_index_errs(idxs);
   three_index_recover(idxs, 1U);
-  test_recover(DOUBLE_T, 2U, VECTOR_T, 2U, idxs);
-  test_recover(DOUBLE_T, 2U, ROW_VECTOR_T, 2U, idxs);
-  test_recover(VECTOR_T, 1U, MATRIX_T, 1U, idxs);
-  test_recover(ROW_VECTOR_T, 2U, MATRIX_T, 2U, idxs);
+  test_recover(base_expr_type(double_type()), 2U, base_expr_type(vector_type()), 2U, idxs);
+  test_recover(base_expr_type(double_type()), 2U, base_expr_type(row_vector_type()), 2U, idxs);
+  test_recover(base_expr_type(vector_type()), 1U, base_expr_type(matrix_type()), 1U, idxs);
+  test_recover(base_expr_type(row_vector_type()), 2U, base_expr_type(matrix_type()), 2U, idxs);
 }
+
 TEST(langAst, idxs111) {
   vector<idx> idxs;
   idxs.push_back(omni_idx());
@@ -854,10 +994,10 @@ TEST(langAst, idxs111) {
 
   three_index_errs(idxs);
   three_index_recover(idxs, 0U);
-  test_recover(VECTOR_T, 2U, VECTOR_T, 2U, idxs);
-  test_recover(ROW_VECTOR_T, 2U, ROW_VECTOR_T, 2U, idxs);
-  test_recover(MATRIX_T, 1U, MATRIX_T, 1U, idxs);
-  test_recover(MATRIX_T, 2U, MATRIX_T, 2U, idxs);
+  test_recover(base_expr_type(vector_type()), 2U, base_expr_type(vector_type()), 2U, idxs);
+  test_recover(base_expr_type(row_vector_type()), 2U, base_expr_type(row_vector_type()), 2U, idxs);
+  test_recover(base_expr_type(matrix_type()), 1U, base_expr_type(matrix_type()), 1U, idxs);
+  test_recover(base_expr_type(matrix_type()), 2U, base_expr_type(matrix_type()), 2U, idxs);
 }
 
 TEST(langAst, indexOpSliced) {
@@ -870,17 +1010,17 @@ TEST(langAst, indexOpSliced) {
   // no need to retest all of type inference here --- just that it's plumbed
   index_op_sliced ios;
   stan::lang::variable v("foo");
-  v.set_type(VECTOR_T, 1U);
+  v.set_type(vector_type(), 1U);
   ios.expr_ = v;
   ios.idxs_ = idxs;
   ios.infer_type();
-  EXPECT_EQ(DOUBLE_T, ios.type_.base_type_);
+  EXPECT_EQ(base_expr_type(double_type()), ios.type_.base_type_);
   EXPECT_EQ(1U, ios.type_.num_dims_);
 }
 
 TEST(langAst, lhsVarOccursOnRhs) {
   stan::lang::variable v("foo");
-  v.set_type(DOUBLE_T, 0);
+  v.set_type(double_type(), 0);
   std::vector<stan::lang::idx> is;
   stan::lang::expression e_int3(stan::lang::int_literal(3));
   stan::lang::uni_idx ui(e_int3);
@@ -925,6 +1065,7 @@ TEST(StanLangAstFun, is_space) {
   EXPECT_FALSE(is_space('a'));
   EXPECT_FALSE(is_space('2'));
 }
+
 TEST(StanLangAstFun, is_nonempty) {
   using stan::lang::is_nonempty;
   EXPECT_FALSE(is_nonempty(" "));
@@ -975,13 +1116,3 @@ TEST(StanLangAst, Scope) {
   stan::lang::scope s2(stan::lang::data_origin);
   EXPECT_TRUE(s2.is_local() == true || s2.is_local() == false);
 }
-
-
-
-
-
-
-
-
-
-

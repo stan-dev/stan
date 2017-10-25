@@ -12,8 +12,6 @@
 namespace stan {
   namespace lang {
 
-    void generate_expression(const expression& e, std::ostream& o);
-
     /*
      * Generates code to validate data variables to make sure they
      * only use positive dimension sizes and that the var_context
@@ -58,14 +56,14 @@ namespace stan {
         << "context__.to_vec(";
       for (size_t i = 0; i < dims.size(); ++i) {
         if (i > 0) o << ",";
-        generate_expression(dims[i].expr_, o);
+        generate_expression(dims[i].expr_, NOT_USER_FACING, o);
       }
       if (!is_nil(type_arg1)) {
         if (dims.size() > 0) o << ",";
-        generate_expression(type_arg1.expr_, o);
+        generate_expression(type_arg1.expr_, NOT_USER_FACING, o);
         if (!is_nil(type_arg2)) {
           o << ",";
-          generate_expression(type_arg2.expr_, o);
+          generate_expression(type_arg2.expr_, NOT_USER_FACING, o);
         }
       }
       o << "));" << EOL;

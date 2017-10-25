@@ -25,37 +25,30 @@ namespace stan {
       for (size_t d = 0; d < t.num_dims_; ++d)
         o << "std::vector<";
       bool is_template_type = false;
-      switch (t.base_type_) {
-      case INT_T :
+      if (t.base_type_.is_int_type()) {
         o << "int";
         is_template_type = false;
-        break;
-      case DOUBLE_T:
+      } else if (t.base_type_.is_double_type()) {
         o << scalar_t_name;
         is_template_type = false;
-        break;
-      case VECTOR_T:
+      } else if (t.base_type_.is_vector_type()) {
         o << "Eigen::Matrix<"
           << scalar_t_name
           << ", Eigen::Dynamic,1>";
         is_template_type = true;
-        break;
-      case ROW_VECTOR_T:
+      } else if (t.base_type_.is_row_vector_type()) {
         o << "Eigen::Matrix<"
           << scalar_t_name
           << ", 1,Eigen::Dynamic>";
         is_template_type = true;
-        break;
-      case MATRIX_T:
+      } else if (t.base_type_.is_matrix_type()) {
         o << "Eigen::Matrix<"
           << scalar_t_name
           << ", Eigen::Dynamic,Eigen::Dynamic>";
         is_template_type = true;
-        break;
-      case VOID_T:
+      } else if (t.base_type_.is_void_type()) {
         o << "void";
-        break;
-      default:
+      } else {
         o << "UNKNOWN TYPE";
       }
       for (size_t d = 0; d < t.num_dims_; ++d) {
