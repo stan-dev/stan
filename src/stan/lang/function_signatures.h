@@ -785,8 +785,19 @@ for (size_t i=1; i < 10; i++) {
   add("num_elements", expr_type(int_type()), expr_type(vector_type(), i));
 }
 add("ordered_logistic_log", expr_type(double_type()), expr_type(int_type()), expr_type(double_type()), expr_type(vector_type()));
+add("ordered_logistic_log", expr_type(double_type()), expr_type(int_type(), 1), expr_type(vector_type()), expr_type(vector_type()));
+add("ordered_logistic_log", expr_type(double_type()), expr_type(int_type(), 1), expr_type(vector_type()), expr_type(vector_type(), 1));
 add("ordered_logistic_lpmf", expr_type(double_type()), expr_type(int_type()), expr_type(double_type()), expr_type(vector_type()));
+add("ordered_logistic_lpmf", expr_type(double_type()), expr_type(int_type(), 1), expr_type(vector_type()), expr_type(vector_type()));
+add("ordered_logistic_lpmf", expr_type(double_type()), expr_type(int_type(), 1), expr_type(vector_type()), expr_type(vector_type(), 1));
 add("ordered_logistic_rng", expr_type(int_type()), expr_type(double_type()), expr_type(vector_type()));
+add("ordered_probit_log", expr_type(double_type()), expr_type(int_type()), expr_type(double_type()), expr_type(vector_type()));
+add("ordered_probit_log", expr_type(double_type()), expr_type(int_type(), 1), expr_type(vector_type()), expr_type(vector_type()));
+add("ordered_probit_log", expr_type(double_type()), expr_type(int_type(), 1), expr_type(vector_type()), expr_type(vector_type(), 1));
+add("ordered_probit_lpmf", expr_type(double_type()), expr_type(int_type()), expr_type(double_type()), expr_type(vector_type()));
+add("ordered_probit_lpmf", expr_type(double_type()), expr_type(int_type(), 1), expr_type(vector_type()), expr_type(vector_type()));
+add("ordered_probit_lpmf", expr_type(double_type()), expr_type(int_type(), 1), expr_type(vector_type()), expr_type(vector_type(), 1));
+add("ordered_probit_rng", expr_type(int_type()), expr_type(double_type()), expr_type(vector_type()));
 add_binary("owens_t");
 for (size_t i = 0; i < vector_types.size(); ++i) {
   for (size_t j = 0; j < vector_types.size(); ++j) {
