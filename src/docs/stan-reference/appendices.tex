@@ -715,8 +715,8 @@ atomic_statement_body
    | 'target' '+=' expression
    | 'break'
    | 'continue'
-   | 'print' '(' (expression | string_literal)* ')'
-   | 'reject' '(' (expression | string_literal)* ')'
+   | 'print' '(' (expression | string_literal)% ',' ')'
+   | 'reject' '(' (expression | string_literal)% ',' ')'
    | 'return' expression
    | ''
 
