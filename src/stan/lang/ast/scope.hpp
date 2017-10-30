@@ -66,6 +66,15 @@ namespace stan {
       bool is_local() const;
 
       /**
+       * Flags local scopes which permit parameter variables,
+       * i.e., program block can't be transformed data or
+       * generated quantities program blocks.
+       *
+       * @return true for local parameter origin block types
+       */
+      bool local_allows_var() const;
+
+      /**
        * Flags scopes where parameter variables are declared,
        * i.e., top-level of parameter or transformed parameter block.
        *
