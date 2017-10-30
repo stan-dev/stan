@@ -14,6 +14,6 @@ transformed data {
     real x_r[0] = {1.0};
     int x_i[0];
 
-    y = algebra_solver(tail_delta, y_guess, theta, x_r, x_i);
+    y = algebra_solver(target, y_guess, theta, x_r, x_i);
   }
 }
