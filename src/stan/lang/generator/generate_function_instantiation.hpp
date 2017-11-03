@@ -2,13 +2,13 @@
 #define STAN_LANG_GENERATOR_GENERATE_FUNCTION_INSTANTIATION_HPP
 
 #include <stan/lang/ast.hpp>
-#include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_function_inline_return_type.hpp>
 #include <stan/lang/generator/generate_function_instantiation_body.hpp>
 #include <stan/lang/generator/generate_function_instantiation_name.hpp>
 #include <stan/lang/generator/generate_function_arguments.hpp>
 #include <stan/lang/generator/has_only_int_args.hpp>
 #include <ostream>
+#include <vector>
 #include <string>
 
 namespace stan {
@@ -23,19 +23,16 @@ namespace stan {
      * ending in one of "_rng", "_lp", or "_log".
      *
      * @param[in] fun function AST object
+     * @param[in] namespaces vector of strings used to generate the 
+     *   namespaces generated code is nested in.
      * @param[in, out] out output stream to which function definition
      * is written
      */
     void generate_function_instantiation(const function_decl_def& fun,
+                           const std::vector<std::string>& namespaces,
                            std::ostream& out) {
       // Do not generate anything for forward decalrations
       if (fun.body_.is_no_op_statement()) {
-        return;
-      }
-
-      // Functions that have only int args were not templated in the first place
-      // => they are already instantiated
-      if (has_only_int_args(fun)) {
         return;
       }
 
@@ -48,8 +45,7 @@ namespace stan {
       std::string scalar_t_name = "double";
       std::string rng_class = "boost::ecuyer1988";
 
-      out << "// [[Rcpp::export]]" << EOL;
-
+      out << "// [[stan::function]]" << EOL;
       generate_function_inline_return_type(fun, scalar_t_name, 0, out);
       generate_function_instantiation_name(fun, out);
       generate_function_arguments(
@@ -57,7 +53,7 @@ namespace stan {
         true /*parameter_defaults*/);
 
       generate_function_instantiation_body(
-        fun, is_rng, is_lp, is_pf, rng_class, out);
+        fun, namespaces, is_rng, is_lp, is_pf, rng_class, out);
 
       out << EOL;
     }

@@ -2,7 +2,6 @@
 #define STAN_LANG_GENERATOR_GENERATE_FUNCTION_INSTANTIATION_NAME_HPP
 
 #include <stan/lang/ast.hpp>
-#include <stan/lang/generator/constants.hpp>
 #include <ostream>
 #include <string>
 
