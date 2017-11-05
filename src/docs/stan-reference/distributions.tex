@@ -686,20 +686,10 @@ $\mbox{logit}^{-1}(\infty) = 1$.
 \subsubsection{Stan Functions}
 
 \begin{description}
-  \fitem{real}{ordered\_logistic\_lpmf}{int \farg{k} \textbar\ real \farg{eta},
-    vector \farg{c}}{The log ordered logistic probability mass of
-    \farg{k} given linear predictor \farg{eta} and cutpoints
-    \farg{c}.}
-%
-  \fitem{real}{ordered\_logistic\_lpmf}{ints \farg{k} \textbar\ vector \farg{eta},
-    vector \farg{c}}{The log ordered logistic probability mass of
-    \farg{k} given linear predictors \farg{eta}, all sharing the same cutpoints
-    \farg{c}.}
-%
   \fitem{real}{ordered\_logistic\_lpmf}{ints \farg{k} \textbar\ vector \farg{eta},
     vectors \farg{c}}{The log ordered logistic probability mass of
-    \farg{k} given linear predictors \farg{eta}, each with different cutpoints
-    \farg{c}.}
+    \farg{k} given linear predictors \farg{eta}, and cutpoints \farg{c}.}
+
 \fitem{int}{ordered\_logistic\_rng}{real \farg{eta}, vector \farg{c}}{Generate
   an ordered logistic variate with linear predictor \farg{eta} and cutpoints
     \farg{c}; may only be used in generated quantities block}
@@ -742,20 +732,9 @@ $\Phi(\infty) = 1$.
 \subsubsection{Stan Functions}
 
 \begin{description}
-  \fitem{real}{ordered\_probit\_lpmf}{int \farg{k} \textbar\ real \farg{eta},
-    vector \farg{c}}{The log ordered probit probability mass of
-    \farg{k} given linear predictor \farg{eta} and cutpoints
-    \farg{c}.}
-%
-  \fitem{real}{ordered\_probit\_lpmf}{ints \farg{k} \textbar\ vector \farg{eta},
-    vector \farg{c}}{The log ordered probit probability mass of
-    \farg{k} given linear predictors \farg{eta}, all sharing the same cutpoints
-    \farg{c}.}
-%
   \fitem{real}{ordered\_probit\_lpmf}{ints \farg{k} \textbar\ vector \farg{eta},
     vectors \farg{c}}{The log ordered probit probability mass of
-    \farg{k} given linear predictors \farg{eta}, each with different cutpoints
-    \farg{c}.}
+    \farg{k} given linear predictors \farg{eta}, and cutpoints \farg{c}.}
 %
 \fitem{int}{ordered\_probit\_rng}{real \farg{eta}, vector \farg{c}}{Generate
   an ordered probit variate with linear predictor \farg{eta} and cutpoints
