@@ -16,7 +16,7 @@ namespace stan {
     namespace util {
 
       /**
-       * gq_writer writes out 
+       * gq_writer writes out
        *
        * @tparam Model Model class
        */
@@ -25,7 +25,7 @@ namespace stan {
         callbacks::writer& sample_writer_;
         callbacks::logger& logger_;
         int num_constrained_params_;
-        
+
       public:
         /**
          * Constructor.
@@ -34,33 +34,35 @@ namespace stan {
          * @param[in,out] logger messages are written through the logger
          * @param[in] offset into vector past all constrained parameter names;
          */
-        gq_writer(callbacks::writer& sample_writer,
-                    callbacks::logger& logger,
-                    int num_constrained_params):
-          sample_writer_(sample_writer), logger_(logger),
-          num_constrained_params_(num_constrained_params) { }
-
+        gq_writer(callbacks::writer& sample_writer, callbacks::logger& logger,
+                  int num_constrained_params): sample_writer_(sample_writer),
+                  logger_(logger),
+                  num_constrained_params_(num_constrained_params) { }
 
         template <class Model>
         void write_gq_names(const Model& model) {
           std::vector<std::string> names;
           model.constrained_param_names(names, false, true);
-          std::vector<std::string> gq_names(names.begin() + num_constrained_params_,
+          std::vector<std::string> gq_names(names.begin()
+                                            + num_constrained_params_,
                                             names.end());
           sample_writer_(gq_names);
         }
 
-        template <class Model>
+        template <class Model, class RNG>
         void write_gq_values(const Model& model,
+                             RNG& rng,
                              const std::vector<double>& draw) {
           std::vector<double> values;
-
+          std::vector<int> params_i;  // unused - no discrete params
           std::stringstream ss;
           try {
             model.write_array(rng,
-                              const_cast<std::vector&>(draw)
+                              const_cast<std::vector<double>&>(draw),
+                              params_i,
                               values,
-                              false, true,
+                              false,
+                              true,
                               &ss);
           } catch (const std::exception& e) {
             if (ss.str().length() > 0)
@@ -71,11 +73,14 @@ namespace stan {
           if (ss.str().length() > 0)
             logger_.info(ss);
 
-          std::vector<double> gq_values(values.begin() + num_constrained_params_,
+          std::vector<double> gq_values(values.begin()
+                                        + num_constrained_params_,
                                         values.end());
           sample_writer_(gq_values);
         }
+      };
 
+    }
   }
 }
 #endif

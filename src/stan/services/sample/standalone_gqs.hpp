@@ -7,6 +7,7 @@
 #include <stan/services/error_codes.hpp>
 #include <stan/services/util/create_rng.hpp>
 #include <stan/services/util/gq_writer.hpp>
+#include <string>
 #include <vector>
 
 namespace stan {
@@ -23,15 +24,16 @@ namespace stan {
      * model.
      *
      * @tparam M type of model
-     * @param[in] m model to query
+     * @param[in] model model to query
      * @return number of constrained parameters for the model
      */
-    template <class M>
-    int num_constrained_params(const M& m) {
+    template <class Model>
+    int num_constrained_params(const Model& model) {
         std::vector<std::string> param_names;
-        const static bool include_tparams = false;
-        const static bool include_gqs = false;
-        model.constrained_param_names(param_names, include_tparams, include_gqs);
+        static const bool include_tparams = false;
+        static const bool include_gqs = false;
+        model.constrained_param_names(param_names, include_tparams,
+                                      include_gqs);
         return param_names.size();
     }
 
@@ -46,25 +48,23 @@ namespace stan {
      * @param[in, out] sample_writer writer to which draws are written
      * @return OK error code (always)
      */
-    template <class M>
-    int standalone_generate(const M& model,
-                            const std::vector<std::vector<double> >& draws,  // pre-parameters
+    template <class Model>
+    int standalone_generate(const Model& model,
+                            const std::vector<std::vector<double> >& draws,
                             unsigned int seed,
                             callbacks::interrupt& interrupt,
                             callbacks::logger& logger,
                             callbacks::writer& sample_writer) {
-      static const bool include_tparams = false;
-      static const bool include_gqs = true;
       const std::vector<int> params_i;
       boost::ecuyer1988 rng = util::create_rng(seed, 1);
-      int num_constrained_params = num_constrained_params(model);
-      qq_writer writer(sample_writer, logger, num_constrained_params);
+      int num_params = num_constrained_params(model);
+      util::gq_writer writer(sample_writer, logger, num_params);
       writer.write_gq_names(model);
       for (const std::vector<double>& draw : draws) {
         interrupt();  // call out to interrupt and fail
-        writer.write_gq_values(model, draw);
+        writer.write_gq_values(model, rng, draw);
       }
-      return return error_codes::OK;
+      return error_codes::OK;
     }
 
 
