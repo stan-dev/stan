@@ -4,7 +4,7 @@
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/callbacks/stream_logger.hpp>
 #include <sstream>
-#include <test/test-models/good/services/test_lp.hpp>
+#include <test/test-models/good/services/test_gq.hpp>
 #include <stan/io/empty_var_context.hpp>
 #include <stan/services/util/create_rng.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
@@ -29,7 +29,7 @@ TEST_F(ServicesUtilGQWriter, t1) {
                                         logger_ss);
   stan::services::util::gq_writer writer(sample_writer,logger,2);
   writer.write_gq_names(model);
-  // model test_lp.stan gen quantities block has 3 params:  xqg, y_rep.1, y_rep.2
+  // model test_gq.stan gen quantities block has 3 params:  xqg, y_rep.1, y_rep.2
   EXPECT_EQ(count_matches("xgq",sample_ss.str()),1);
   EXPECT_EQ(count_matches("y_rep",sample_ss.str()),2);
 }
@@ -47,6 +47,6 @@ TEST_F(ServicesUtilGQWriter, t2) {
   draw.push_back(-6.789);
   stan::services::util::gq_writer writer(sample_writer,logger,2);
   writer.write_gq_values(model, rng1, draw);
-  // model test_lp.stan generates 3 values, 2 commas
+  // model test_gq.stan generates 3 values, 2 commas
   EXPECT_EQ(count_matches(",",sample_ss.str()), 2);
 }

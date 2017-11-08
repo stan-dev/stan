@@ -2,7 +2,7 @@
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/callbacks/stream_logger.hpp>
 #include <stan/io/empty_var_context.hpp>
-#include <test/test-models/good/services/test_lp.hpp>
+#include <test/test-models/good/services/test_gq.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <test/unit/util.hpp>
 #include <gtest/gtest.h>
@@ -20,13 +20,13 @@ public:
   stan::test::unit::instrumented_interrupt interrupt;
 };
 
-TEST_F(ServicesStandaloneGQ, t1) {
-  // model test_lp.stan has 2 params
+TEST_F(ServicesStandaloneGQ, numParams) {
+  // model test_gq.stan has 2 params
   int num_params = stan::services::num_constrained_params(model);
   EXPECT_EQ(num_params, 2);
 }
 
-TEST_F(ServicesStandaloneGQ, t2) {
+TEST_F(ServicesStandaloneGQ, genDraws_tiny) {
   std::vector<double> draw1;
   draw1.push_back(-2.345);
   draw1.push_back(-6.789);
@@ -49,9 +49,10 @@ TEST_F(ServicesStandaloneGQ, t2) {
                                       interrupt,
                                       logger,
                                       sample_writer);
-  // model test_lp.stan gen quantities block has 3 params:  xqg, y_rep.1, y_rep.2
+  // model test_gq.stan gen quantities block has 3 params:  xqg, y_rep.1, y_rep.2
   EXPECT_EQ(count_matches("xgq",sample_ss.str()),1);
   EXPECT_EQ(count_matches("y_rep",sample_ss.str()),2);
+  // 2 draws + 1 header = 3 lines output
   EXPECT_EQ(count_matches("\n",sample_ss.str()),3);
 }
 
