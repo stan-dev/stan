@@ -13,12 +13,6 @@
 namespace stan {
   namespace services {
 
-    // TODO(carpenter): see if params_i can be static
-    // w.r.t. Google style:
-    // https://google.github.io/styleguide/cppguide.html#Static_and_Global_Variables
-
-    // TODO(carpenter): add refresh
-
     /**
      * Return the number of constrained parameters for the specified
      * model.
@@ -55,18 +49,39 @@ namespace stan {
                             callbacks::interrupt& interrupt,
                             callbacks::logger& logger,
                             callbacks::writer& sample_writer) {
-      const std::vector<int> params_i;
-      boost::ecuyer1988 rng = util::create_rng(seed, 1);
+      std::stringstream msg;
+      if (draws.empty()) {
+        logger.error("Empty set of draws from fitted model.");
+        return error_codes::DATAERR;
+      }
+
       int num_params = num_constrained_params(model);
+      std::vector<std::string> gq_names;
+      static const bool include_tparams = false;
+      static const bool include_gqs = true;
+      model.constrained_param_names(gq_names, include_tparams, include_gqs);
+      if (!((size_t)num_params < gq_names.size())) {
+        logger.error("Model doesn't generate any quantities of interest.");
+        return error_codes::CONFIG;
+      }
+      
       util::gq_writer writer(sample_writer, logger, num_params);
+      boost::ecuyer1988 rng = util::create_rng(seed, 1);
       writer.write_gq_names(model);
+
       for (const std::vector<double>& draw : draws) {
+        if ((size_t)num_params != draw.size()) {
+          msg << "Wrong number of params in draws from fitted model.  ";
+          msg << "Expecting " << num_params << " columns, ";
+          msg << "found " << draws[0].size() << " columns.";
+          logger.error(msg.str());
+          return error_codes::DATAERR;
+        }
         interrupt();  // call out to interrupt and fail
         writer.write_gq_values(model, rng, draw);
       }
       return error_codes::OK;
     }
-
 
   }
 }

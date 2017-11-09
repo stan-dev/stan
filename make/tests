@@ -260,6 +260,7 @@ src/test/unit/services/sample/hmc_nuts_diag_inv_metric_test.cpp : src/test/test-
 src/test/unit/services/sample/hmc_static_dense_inv_metric_test.cpp : src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
 src/test/unit/services/sample/hmc_static_diag_inv_metric_test.cpp : src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
 src/test/unit/services/sample/standalone_gqs_test.cpp : src/test/test-models/good/services/test_gq.hpp
+src/test/unit/services/sample/standalone_gqs_bad_test.cpp : src/test/test-models/good/services/test_gq2.hpp
 src/test/unit/services/sample/standalone_gqs_big_test.cpp : src/test/test-models/good/services/bym2_offset_only.hpp
 src/test/unit/services/util/generate_transitions_test.cpp: src/test/test-models/good/services/test_lp.hpp
 src/test/unit/services/util/gq_writer_test.cpp : src/test/test-models/good/services/test_gq.hpp

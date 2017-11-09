@@ -41,8 +41,10 @@ namespace stan {
 
         template <class Model>
         void write_gq_names(const Model& model) {
+          static const bool include_tparams = false;
+          static const bool include_gqs = true;
           std::vector<std::string> names;
-          model.constrained_param_names(names, false, true);
+          model.constrained_param_names(names, include_tparams, include_gqs);
           std::vector<std::string> gq_names(names.begin()
                                             + num_constrained_params_,
                                             names.end());
