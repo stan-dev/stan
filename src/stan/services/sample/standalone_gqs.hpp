@@ -32,6 +32,9 @@ namespace stan {
     }
 
     /**
+     * Given a set of draws from a fitted model, generate corresponding
+     * quantities of interest.  Data written to callback writer.
+     * Return code indicates success or type of error.
      *
      * @tparam M model class
      * @param[in] model instantiated model
@@ -40,7 +43,7 @@ namespace stan {
      * @param[in, out] interrupt called every iteration
      * @param[in, out] logger logger to which to write warning and error messages
      * @param[in, out] sample_writer writer to which draws are written
-     * @return OK error code (always)
+     * @return error code
      */
     template <class Model>
     int standalone_generate(const Model& model,
@@ -64,7 +67,7 @@ namespace stan {
         logger.error("Model doesn't generate any quantities of interest.");
         return error_codes::CONFIG;
       }
-      
+
       util::gq_writer writer(sample_writer, logger, num_params);
       boost::ecuyer1988 rng = util::create_rng(seed, 1);
       writer.write_gq_names(model);

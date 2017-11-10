@@ -32,13 +32,19 @@ namespace stan {
          *
          * @param[in,out] sample_writer samples are "written" to this stream
          * @param[in,out] logger messages are written through the logger
-         * @param[in] offset into vector past all constrained parameter names;
+         * @param[in] num_constrained_params offset into write_array gqs
          */
         gq_writer(callbacks::writer& sample_writer, callbacks::logger& logger,
                   int num_constrained_params): sample_writer_(sample_writer),
                   logger_(logger),
                   num_constrained_params_(num_constrained_params) { }
 
+        /**
+         * Write names of variables declared in the generated quantities block
+         * to stream `sample_writer_`.
+         *
+         * @tparam M model class
+         */
         template <class Model>
         void write_gq_names(const Model& model) {
           static const bool include_tparams = false;
@@ -51,6 +57,17 @@ namespace stan {
           sample_writer_(gq_names);
         }
 
+        /**
+         * Calls model's `write_array` method and writes values of
+         * variables defined in the generated quantities block
+         * to stream `sample_writer_`.
+         *
+         * @tparam M model class
+         * @tparam RNG pseudo random number generator class
+         * @param[in] model instantiated model
+         * @param[in] rng instantiated RNG
+         * @param[in] draw sequence unconstrained parameters values.
+         */
         template <class Model, class RNG>
         void write_gq_values(const Model& model,
                              RNG& rng,
