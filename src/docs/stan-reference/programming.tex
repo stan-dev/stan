@@ -94,11 +94,8 @@ parameters {
   real<lower=0.1> lambda;
   ...
 transformed parameters {
-  real<lower=0> alpha;
-  real<lower=0> beta;
-  ...
-  alpha = lambda * phi;
-  beta = lambda * (1 - phi);
+  real<lower=0> alpha = lambda * phi;
+  real<lower=0> beta = lambda * (1 - phi);
   ...
 model {
   phi ~ beta(1, 1); // uniform on phi, could drop
@@ -117,10 +114,8 @@ follows.
 %
 \begin{stancode}
 model {
-  real alpha;
-  real beta;
-  alpha = lambda * phi;
-  beta = lambda * (1 - phi);
+  real alpha = lambda * phi
+  real beta = lambda * (1 - phi);
 ...
   for (n in 1:N)
     theta[n] ~ beta(alpha, beta);
@@ -182,7 +177,7 @@ parameters {
   simplex[K] theta[N];
   ...
 transformed parameters {
-  vector[K] alpha = kappa * theta;
+  vector[K] alpha = kappa * phi;
   ...
 }
 model {
@@ -246,7 +241,7 @@ transformed parameters {
   real<lower = 0, upper = 1> theta = inv_logit(theta_raw);
 ...
 model {
-  theta_unc ~ logistic(mu, sigma);
+  theta_raw ~ logistic(mu, sigma);
   ...
   y ~ foo(theta);
 ...
@@ -306,6 +301,48 @@ vectorized normal distribution as follows.
 \end{stancode}
 %
 where either or both of \code{mu} and \code{sigma} can be vectors.
+
+
+% \subsection{Transforming multinomial to Poisson}
+
+% Lancaster \cite{lancaster:2000} provides an efficient
+% reparameterization of the multinomial distribution in terms of the
+% Poisson distribution.  Suppose we have a multinomial such as the
+% following:
+
+% \begin{stancode}
+% data {
+%   int<lower = 0> K;        // number of categories
+%   int<lower = 0> x[N, K];  // outcomes
+% \end{stancode}
+
+
+% This reparameterization is critical for
+% applying multinomials efficiently in Stan.
+
+% \begin{stancode}
+% data {
+%   int<lower = 0> K;  // number of categories
+%   ...
+% }
+% parameters {
+%   vector[K] log_alpha_star;
+%   ...
+% }
+% transformed parameters {
+%   vecotr[K] log_alpha;
+%   for (g in 1:groups)
+%     log_alpha[g] = log_alphastar[g] - log_sum_exp(x[g] * beta);
+% }
+% model {
+%   log_alpha_star ~ ...;  // some prior
+%   x ~ poisson_log(log_alpha);
+% }
+% \end{stancode}
+
+
+
+
 
 \section{Changes of Variables}
 
@@ -610,7 +647,7 @@ examples.
 
 \section{Examples}
 
-\subsection{Triangle Distribution}
+\subsection{Triangle distribution}
 
 A simple example is the triangle distribution,
 whose density is shaped like an isosceles triangle with corners at
@@ -639,7 +676,7 @@ Consider the following Stan implementation of
 $\distro{Triangle}(-1,1)$ for sampling.%
 %
 \footnote{The program is available in the Stan example model repository;
-see \url{http://mc-stan.org/documentation}.}
+see \url{http://mc-stan.org/users/documentation}.}
 %
 \begin{stancode}
 parameters {
@@ -689,7 +726,7 @@ sample properly.%
   \refchapter{variable-transforms} for more information on the
   transforms used by Stan.}
 
-\subsection{Exponential Distribution}
+\subsection{Exponential distribution}
 
 If Stan didn't happen to include the exponential distribution, it
 could be coded directly using the following assignment statement,
@@ -723,6 +760,46 @@ the same posterior because Stan only needs the log probability up to
 an additive constant.  If \code{lambda} and \code{y} are both
 constants, the sampling statement will drop both terms (but still
 check for out-of-domain errors on the inputs).
+
+\subsection{Bivariate normal cumulative distribution function}
+
+For another example of user-defined functions, consider the following
+definition of the bivariate normal cumulative distribution function
+(CDF) with location zero, unit variance, and correlation \code{rho}.
+That is, it computes
+\[
+\mbox{binormal\_cdf}(z_1, z_2, \rho) = \mbox{Pr}[Z_1 > z_1 \mbox{ and } Z_2 > z_2]
+\]
+where the random 2-vector $Z$ has the distribution
+\[
+Z \sim \distro{MultiNormal}\left(
+\begin{bmatrix}
+0 \\
+0
+\end{bmatrix}, \
+\begin{bmatrix}
+1 & \rho
+\\
+\rho & 1
+\end{bmatrix}
+]\right).
+\]
+%
+The following Stan program implements this function,
+%
+\begin{stancode}
+real binormal_cdf(real z1, real z2, real rho) {
+  if (z1 != 0 || z2 != 0) {
+    real denom = fabs(rho) < 1.0 ? sqrt((1 + rho) * (1 - rho)) : not_a_number();
+    real a1 = (z2 / z1 - rho) / denom;
+    real a2 = (z1 / z2 - rho) / denom;
+    real product = z1 * z2;
+    real delta = product < 0 || (product == 0 && (z1 + z2) < 0);
+    return 0.5 * (Phi(z1) + Phi(z2) - delta) - owens_t(z1, a1) - owens_t(z2, a2);
+  }
+  return 0.25 + asin(rho) / (2 * pi());
+}
+\end{stancode}
 
 
 \chapter{User-Defined Functions}\label{functions-programming.chapter}
@@ -852,7 +929,7 @@ Metropolis sense.%
 In generated quantities, rejections cause execution to halt because
 there is no way to recover and generate the remaining parameters, so
 extra care should be taken in calling functions in the generated
-quantities block.  See Section~\refsection{reject-statements} for full
+quantities block.  See \refsection{reject-statements} for full
 details about the reject statement.
 
 \subsection{Type Declarations for Functions}
@@ -1022,7 +1099,7 @@ forward declaration and the definition of a functions.
 
 This qualifier should be used when writing functions that call Stan's
 built-in ordinary differential equation (ODE) solvers or using Stan's
-algebraic solver. 
+algebraic solver.
 These solvers have
 strictly specified signatures where some arguments of are data only
 expressions. (See \refchapter{ode-solver},
@@ -1420,7 +1497,7 @@ p(y | \lambda_1 + q, \lambda_2 - q, \sigma).
 %
 The consequence is that an improper uniform prior $p(\mu,\sigma)
 \propto 1$ leads to an improper posterior.  This impropriety arises
-because the neighborhoods around $\lambda_1 + q, \lambda_1 - q$ have
+because the neighborhoods around $\lambda_1 + q, \lambda_2 - q$ have
 the same mass no matter what $q$ is.  Therefore, a sampler would need
 to spend as much time in the neighborhood of $\lambda_1=1000000000$
 and $\lambda_2=-1000000000$ as it does in the neighborhood of
@@ -2462,6 +2539,43 @@ operators as well as \refchapter{multi-indexing} for some
 reshaping operations involving multiple indexing and range indexing.
 
 
+\section{Aliasing in Stan Containers}
+
+Stan expressions are all evaluated before assignment happens, so there
+is no danger of so-called aliasing in array, vector, or matrix
+operations.  Contrast the behavior of the assignments to \code{u} and
+\code{x}, which start with the same values.
+
+The loop assigning to \code{u} and the compound slicing assigning to \code{x}.
+
+ the following trivial Stan program.
+
+\begin{stancode}
+transformed data {
+  vector[4] x = [ 1, 2, 3, 4 ]';
+  vector[4] u = [ 1, 2, 3, 4 ]';
+
+  for (t in 2:4)
+    u[t] = u[t - 1] * 3;
+
+  x[2:4] = x[1:3] * 3;
+
+  print("u = ", u);
+  print("x = ", x);
+}
+\end{stancode}
+%
+The output it produces is as follows
+%
+\begin{stancode}
+u = [1,3,9,27]
+x = [1,3,6,9]
+\end{stancode}
+%
+In the loop version assiging to \code{u}, the values are updated before being used to
+define subseqeunt values;  in the sliced expression assigning to
+\code{x}, the entire right-hand side is evaluated before assigning to
+the left-hand side.
 
 \chapter{Multiple Indexing and Range Indexing}\label{multi-indexing.chapter}
 
@@ -2846,7 +2960,7 @@ data-frame or database format.
 
 \begin{stancode}
 transformed data {
-  int<lower=1, upper=3> idxs[7,
+  int<lower=1, upper=3> idxs[7, 2]
     = { {1, 1},
         {2, 1}, {2, 2}, {2, 3},
         {3, 1}, {3, 2}, {3, 3} };
@@ -3074,6 +3188,42 @@ posterior may be concentrated near zero).  In such cases, replacing
 the fixed prior with a hierarchical prior such as \code{normal(mu,
   sigma)}, where \code{mu} and \code{sigma} are new parameters, with
 their own hyperpriors.
+
+\section{Avoiding Validation}
+
+Stan validates all of its data structure constraints.  For example,
+consider a transformed parameter defined to be a covariance matrix and
+then used as a covariance parameter in the model block.
+%
+\begin{stancode}
+transformed parameters {
+  cov_matrix[K] Sigma;
+  ...
+}                               // first validation
+model {
+  y ~ multi_normal(mu, Sigma);  // second validation
+  ...
+\end{stancode}
+%
+Becuase \code{Sigma} is declared to be a covariance matrix, it will be
+factored at the end of the transformed parameter block to ensure that
+it is positive definite.  The multivariate normal log density function
+also validates that \code{Sigma} is positive definite.  This test is
+expensive, having cubic run time (i.e., $\mathcal{O}(N^3)$ for
+$N \times N$ matrices), so it should not be done twice.%
+
+The test may be avoided by simply declaring \code{Sigma} to be a simple
+unconstrained matrix.
+%
+\begin{stancode}
+transformed parameters {
+  matrix[K, K] Sigma;
+  ...
+model {
+  y ~ multi_normal(mu, Sigma);  // only validation
+\end{stancode}
+%
+Now the only validation is carried out by the multivariate normal.
 
 
 \section{Reparameterization}\label{reparameterization.section}

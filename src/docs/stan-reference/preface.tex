@@ -28,8 +28,8 @@ needed a better sampler, not a more efficient implementation.
 We briefly considered trying to tune proposals for a random-walk
 Metropolis-Hastings sampler, but that seemed too problem specific and
 not even necessarily possible without some kind of adaptation rather
-than tuning of the proposals. 
- 
+than tuning of the proposals.
+
 
 \section*{The Path to Stan}
 
@@ -53,7 +53,7 @@ Sacado module of the Trilinos toolkit and the {\small CppAD} package in the
 {\sc coin-or} toolkit.  But neither package supported very many
 special functions (e.g., probability functions, log gamma, inverse logit) or
 linear algebra operations (e.g., Cholesky decomposition) and were not
-easily and modularly extensible.  
+easily and modularly extensible.
 
 So we built our own reverse-mode algorithmic differentiation package.
 But once we'd built our own reverse-mode algorithmic differentiation
@@ -62,7 +62,7 @@ probability functions from a package like Boost because they weren't
 templated on all the arguments.  We only needed algorithmic
 differentiation variables for parameters, not data or transformed
 data, and promotion is very inefficient in both time and memory.  So
-we wrote our own fully templated probability functions.  
+we wrote our own fully templated probability functions.
 
 Next, we integrated the Eigen \Cpp package for matrix operations and
 linear algebra functions.  Eigen makes extensive use of expression
@@ -72,12 +72,12 @@ ran into the same problem with Eigen as with the existing probability
 libraries --- it doesn't support mixed operations of algorithmic
 differentiation variables and primitives like \code{double}.
 
-At this point (Spring 2011), we were happily fitting models coded 
-directly in \Cpp on top of the pre-release versions of the Stan API. 
-Seeing how well this all worked, we set our sights on the generality 
-and ease of use of \BUGS.  So we designed a modeling language in which 
-statisticians could write their models in familiar notation that could 
-be transformed to efficient \Cpp code and then compiled into an 
+At this point (Spring 2011), we were happily fitting models coded
+directly in \Cpp on top of the pre-release versions of the Stan API.
+Seeing how well this all worked, we set our sights on the generality
+and ease of use of \BUGS.  So we designed a modeling language in which
+statisticians could write their models in familiar notation that could
+be transformed to efficient \Cpp code and then compiled into an
 efficient executable program.  It turned out that our modeling
 language was a bit more general than we'd anticipated, and we had an
 imperative probabilistic programming language on our hands.%
@@ -86,7 +86,7 @@ imperative probabilistic programming language on our hands.%
   probabilistic programming languages for specifying a directed
   graphical model.  In these languages, stochastic and deterministic
   (poor choice of name) nodes may represent random quantities.}
- 
+
 The next problem we ran into as we started implementing richer models
 is variables with constrained support (e.g., simplexes and covariance
 matrices).  Although it is possible to implement \HMC with bouncing
@@ -124,7 +124,7 @@ magnitude faster in \JAGS than in Stan.  Rats is a tough test case
 because the conjugate priors and lack of posterior correlations make
 it an ideal candidate for efficient Gibbs sampling.  But we thought
 the efficiency of compilation might compensate for the lack of ideal
-fit to the problem.  
+fit to the problem.
 
 We realized we were doing redundant calculations, so we wrote a
 vectorized form of the normal distribution for multiple variates with
@@ -176,7 +176,7 @@ to realize that it required a major refactoring (see, for example,
 while the outside hasn't changed dramatically in Stan 2, the inside is
 almost totally different in terms of how the HMC samplers are
 organized, how the output is analyzed, how the mathematics library is
-organized, etc.  
+organized, etc.
 
 We've also improved our original simple optimization algorithms and
 now use L-BFGS (a limited memory quasi-Newton method that uses
@@ -218,40 +218,18 @@ the true posterior and which forms of models can be fit efficiently,
 scalably, and reliably.
 
 
-\section*{Stan's Future}
+\section*{Stan's Roadmap}
 
-We're not done. There's still an enormous amount of work to do to
-improve Stan.  Some older, higher-level goals are in a standalone
-to-do list:
+There's still an enormous amount of work to do to improve Stan.
+Rather than a step-by-step roadmap, we have collected a list of
+high-level development goals on a wiki page:
 %
 \begin{quote}
 \url{https://github.com/stan-dev/stan/wiki/Longer-Term-To-Do-List}
 \end{quote}
-
 %
-We are gradually weaning ourselves off of the to-do list in favor of
-the GitHub issue tracker (see the next section for a link).
-
-Some major features are on our short-term horizon: Riemannian manifold
-Hamiltonian Monte Carlo (RHMC), transformed Laplace approximations
-with uncertainty quantification for maximum likelihood estimation,
-marginal maximum likelihood estimation, data-parallel expectation
-propagation, and streaming (stochastic) variational inference.  The
-latter has been prototyped and described in papers. 
-
-We will also continue to work on improving numerical stability and
-efficiency throughout.  In addition, we plan to revise the interfaces
-to make them easier to understand and more flexible to use (a
-difficult pair of goals to balance).
-
-Later in the Stan 2 release cycle (Stan 2.7), we added variational
-inference to Stan's sampling and optimization routines, with the
-promise of approximate Bayesian inference at much larger scales than
-is possible with Monte Carlo methods.  The future plans involve
-extending to a stochastic data-streaming implementation for very
-large-scale data problems.
-
-
+Issues start here before they have complete functional specifications
+and move to the GitHub issue tracker.
 
 \section*{You Can Help}
 
@@ -259,10 +237,10 @@ Please let us know if you have comments about this manual or
 suggestions for Stan.  We're especially interested in hearing about
 models you've fit or had problems fitting with Stan.  The best way to
 communicate with the Stan team about user issues is through the
-following user's group.
+Stan forums:
 %
 \begin{quote}
-\url{http://groups.google.com/group/stan-users}
+\url{http://discourse.mc-stan.org}
 \end{quote}
 %
 For reporting bugs or requesting features, Stan's issue tracker is at
@@ -278,15 +256,10 @@ software%
 \footnote{See \refappendix{licensing} for more information on Stan's
   licenses and the licenses of the software on which it depends.}
 %
-is that we love to collaborate.  We're interested in hearing
-from you if you'd like to volunteer to get involved on the development
-side.  We have all kinds of projects big and small that we haven't had
-time to code ourselves.  For developer's issues, we have a separate
-group.
-%
-\begin{quote}
-\url{http://groups.google.com/group/stan-dev}
-\end{quote}
+is that the Stan developers like to collaborate.  We're interested in
+hearing from you if you'd like to volunteer to get involved on the
+development side.  We have all kinds of projects big and small that we
+haven't had time to code ourselves.
 
 To contact the project developers off the mailing lists, send email to
 \begin{quote}
