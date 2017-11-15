@@ -337,6 +337,18 @@ namespace stan {
         o_ << "}" << EOL;
       }
 
+      void operator()(const foreach_statement& x) const {
+        generate_indent(indent_, o_);
+        o_ << "for (int " << x.variable_ << " = "; //FOREACH**: here, we need to change the generated C++
+        generate_expression(x.range_.low_, NOT_USER_FACING, o_);
+        o_ << "; " << x.variable_ << " <= ";
+        generate_expression(x.range_.high_, NOT_USER_FACING, o_);
+        o_ << "; ++" << x.variable_ << ") {" << EOL;
+        generate_statement(x.statement_, indent_ + 1, o_);
+        generate_indent(indent_, o_);
+        o_ << "}" << EOL;
+      }
+
       void operator()(const while_statement& x) const {
         generate_indent(indent_, o_);
         o_ << "while (as_bool(";

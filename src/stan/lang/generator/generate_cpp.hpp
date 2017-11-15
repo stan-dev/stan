@@ -36,7 +36,7 @@ namespace stan {
   namespace lang {
 
     /**
-     * Generae the C++ code for the specified program, generating it
+     * Generate the C++ code for the specified program, generating it
      * in a class and namespace derived from the specified model name,
      * writing to the specified stream.
      *
