@@ -10,8 +10,8 @@ functions {
     for (i in 1:10) continue;
 
     // direct foreach
-    foreach (i in 1:10) break;
-    foreach (i in 1:10) continue;
+    foreach (i in 1:10) break; //FOREACH**: this needs to be changed (range)
+    foreach (i in 1:10) continue; //FOREACH**: this needs to be changed (range)
 
     // in statement seq
     while (1) {
