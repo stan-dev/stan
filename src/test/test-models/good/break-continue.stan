@@ -1,4 +1,4 @@
-// test right value passed through for, while and embedded
+// test right value passed through for, foreach, while and embedded
 functions {
   int foo(int a) {
     // direct while
@@ -8,6 +8,10 @@ functions {
     // direct for
     for (i in 1:10) break;
     for (i in 1:10) continue;
+
+    // direct foreach
+    foreach (i in 1:10) break;
+    foreach (i in 1:10) continue;
 
     // in statement seq
     while (1) {
@@ -28,6 +32,9 @@ functions {
 
     // nested for
     while (1) for (i in 1:10) break;
+
+    // nested foreach
+    while (1) foreach (i in 1:10) break;
 
     // nested block
     while (1) {
