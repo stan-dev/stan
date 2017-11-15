@@ -347,7 +347,7 @@ namespace stan {
         o_ << "}" << EOL;
       }
 
-/*
+      /*
       void operator()(const foreach_matrix_statement& x) const {
         generate_indent(indent_, o_);
         o_ << "for (int " << x.freshvariable1_ << " =  0";
@@ -371,7 +371,7 @@ namespace stan {
         generate_indent(indent_, o_);
         o_ << "}" << EOL;
       }
-*/
+      */
 
       void operator()(const while_statement& x) const {
         generate_indent(indent_, o_);

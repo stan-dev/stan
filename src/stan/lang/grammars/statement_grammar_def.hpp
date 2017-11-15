@@ -217,7 +217,7 @@ namespace stan {
                                          boost::phoenix::ref(var_map_),
                                          boost::phoenix::ref(error_msgs_))]
         > lit("in")
-        > expression_rhs_r(_r1) //FOREACHCHANGE:
+        > expression_rhs_r(_r1) //FOREACHCHANGE: for looping over matrices, we should come up with a way of generating two fresh identifiers and binding them to two fields in the foreach_matrix_statement struct.
         > lit(')')
         > statement_r(_r1, true)
         > eps
