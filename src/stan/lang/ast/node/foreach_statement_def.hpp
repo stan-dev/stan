@@ -10,9 +10,9 @@ namespace stan {
     foreach_statement::foreach_statement() { }
 
     foreach_statement::foreach_statement(const std::string& variable,
-                                         const range& range,
+                                         const expression& expression, //FOREACHCHANGE:  really, this should be an array_expr. where do we do the type checking?
                                          const statement& stmt)
-      : variable_(variable), range_(range), statement_(stmt) { }
+      : variable_(variable), expression_(expression), statement_(stmt) { } //FOREACHCHANGE:  really, this should be an array_expr. where do we do the type checking?
 
   }
 }

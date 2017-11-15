@@ -10,8 +10,9 @@ functions {
     for (i in 1:10) continue;
 
     // direct foreach
-    foreach (i in 1:10) break; //FOREACHCHANGE: this needs to be changed (range)
-    foreach (i in 1:10) continue; //FOREACHCHANGE: this needs to be changed (range)
+    int xs[2];
+    foreach (x in xs) break; //FOREACHCHANGE: this needs to be changed (range)
+    foreach (x in xs) continue; //FOREACHCHANGE: this needs to be changed (range)
 
     // in statement seq
     while (1) {

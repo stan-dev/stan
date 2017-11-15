@@ -2,7 +2,7 @@
 #define STAN_LANG_AST_NODE_FOREACH_STATEMENT_HPP
 
 #include <stan/lang/ast/node/expression.hpp>
-#include <stan/lang/ast/node/range.hpp>
+//#include <stan/lang/ast/node/array_expr.hpp>
 #include <stan/lang/ast/node/statement.hpp>
 #include <string>
 
@@ -20,13 +20,14 @@ namespace stan {
 
       /**
        * Construct a foreach statement that loops the specified variable
-       * over the specified range to execute the specified statement.
+       * over the specified expression to execute the specified statement.
        *
        * @param[in] variable loop variable
-       * @param[in] range value range foreach loop variable
+       * @param[in] expression value expression foreach loop variable
        * @param[in] stmt body of the foreach loop
        */
-      foreach_statement(const std::string& variable, const range& range, //FOREACHCHANGE: this needs to be changed (range)
+      foreach_statement(const std::string& variable,
+                        const expression& expression, //FOREACHCHANGE: really, this should be an array_expr. where do we do the type checking?
                         const statement& stmt);
 
       /**
@@ -35,9 +36,9 @@ namespace stan {
       std::string variable_;
 
       /**
-       * The range of values for the loop variable.
+       * The expression of values for the loop variable.
        */
-      range range_; //FOREACHCHANGE: this needs to be changed (range)
+      expression expression_; //FOREACHCHANGE:  really, this should be an array_expr. where do we do the type checking?
 
       /**
        * The body of the foreach loop.
