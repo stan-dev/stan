@@ -26,7 +26,7 @@ namespace stan {
        * @param[in] range value range foreach loop variable
        * @param[in] stmt body of the foreach loop
        */
-      foreach_statement(const std::string& variable, const range& range, //FOREACH**: this needs to be changed (range)
+      foreach_statement(const std::string& variable, const range& range, //FOREACHCHANGE: this needs to be changed (range)
                         const statement& stmt);
 
       /**
@@ -37,7 +37,7 @@ namespace stan {
       /**
        * The range of values for the loop variable.
        */
-      range range_; //FOREACH**: this needs to be changed (range)
+      range range_; //FOREACHCHANGE: this needs to be changed (range)
 
       /**
        * The body of the foreach loop.

@@ -44,7 +44,7 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::for_statement,
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::foreach_statement,
                           (std::string, variable_)
-                          (stan::lang::range, range_) //FOREACH**: range type needs to be changed
+                          (stan::lang::range, range_) //FOREACHCHANGE: range type needs to be changed
                           (stan::lang::statement, statement_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::return_statement,
@@ -217,7 +217,7 @@ namespace stan {
                                          boost::phoenix::ref(var_map_),
                                          boost::phoenix::ref(error_msgs_))]
         > lit("in")
-        > range_r(_r1) //FOREACH**: range needs to be changed
+        > range_r(_r1) //FOREACHCHANGE: range needs to be changed
         > lit(')')
         > statement_r(_r1, true)
         > eps
