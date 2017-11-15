@@ -4,6 +4,7 @@
 /test
 /*.dSYM
 /bin
+/lib
 
 # other binary
 *.o
