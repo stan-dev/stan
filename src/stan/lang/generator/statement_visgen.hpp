@@ -347,23 +347,23 @@ namespace stan {
         o_ << "}" << EOL;
       }
 
-      /*
+      
       void operator()(const foreach_matrix_statement& x) const {
         generate_indent(indent_, o_);
-        o_ << "for (int " << x.freshvariable1_ << " =  0";
-        o_ << "; " << x.freshvariable1_ << " < ";
+        o_ << "for (int " << x.variable_ << "__loopid1 =  0";
+        o_ << "; " << x.variable_ << "__loopid1 < ";
         generate_expression(x.expression_.cols(), NOT_USER_FACING, o_);
-        o_ << "; ++" << x.freshvariable1_ << ") {" << EOL;
+        o_ << "; ++" << x.variable_ << "__loopid1) {" << EOL;
         generate_indent(indent_, o_);
-        o_ << "for (int " << x.freshvariable2_ << " =  0";
-        o_ << "; " << x.freshvariable2_ << " < ";
+        o_ << "for (int " << x.variable_ << "__loopid2 =  0";
+        o_ << "; " << x.variable_ << "__loopid2 < ";
         generate_expression(x.expression_.rows(), NOT_USER_FACING, o_);
-        o_ << "; ++" << x.freshvariable2_ << ") {" << EOL;
+        o_ << "; ++" << x.variable_ << "__loopid2) {" << EOL;
         generate_indent(indent_, o_);
         generate_indent(indent_, o_);
         o_ << "&auto " << x.variable_ << " = ";
         generate_expression(x.expression_, NOT_USER_FACING, o_);
-        o_ << "(" << x.freshvariable2_ << ", " << x.freshvariable1_ << ");"  << EOL;
+        o_ << "(" << x.variable_ << "__loopid2, " << x.variable_ << "__loopid1);"  << EOL;
         generate_statement(x.statement_, indent_ + 1, o_);
         generate_indent(indent_, o_);
         generate_indent(indent_, o_);
@@ -371,7 +371,7 @@ namespace stan {
         generate_indent(indent_, o_);
         o_ << "}" << EOL;
       }
-      */
+      
 
       void operator()(const while_statement& x) const {
         generate_indent(indent_, o_);
