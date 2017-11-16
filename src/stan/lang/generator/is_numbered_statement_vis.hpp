@@ -41,7 +41,9 @@ namespace stan {
 
       bool operator()(const for_statement& st) const  { return true; }
 
-      bool operator()(const foreach_statement& st) const  { return true; }
+      bool operator()(const foreach_a_statement& st) const  { return true; }
+
+      bool operator()(const foreach_m_statement& st) const  { return true; }
 
       bool operator()(const conditional_statement& st) const { return true; }
 

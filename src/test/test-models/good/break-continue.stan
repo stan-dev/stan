@@ -29,15 +29,43 @@ functions {
     // nested for
     while (1) for (i in 1:10) break;
 
-    // nested foreach
+    // nested foreach (array)
     while (1) {
       int vs[2];
-      vs[1] = 0;
-      vs[2] = 1;
-      foreach (v in vs) break; 
+      fora (v in vs) break; 
       //FOREACHCHANGE: this needs to be changed (range)
-      foreach (v in vs) continue;
+      fora (v in vs) continue;
       //FOREACHCHANGE: this needs to be changed (range)
+    }
+
+    // nested foreach (matrix)
+    while (1) {
+      matrix[2,3] vs;
+      form (v in vs) break; 
+      //FOREACHCHANGE: this needs to be changed (range)
+      form (v in vs) continue;
+      //FOREACHCHANGE: this needs to be changed (range)
+      form (v in vs) v = 3;
+    }
+
+    // nested foreach (vector)
+    while (1) {
+      vector[2] vs;
+      form (v in vs) break; 
+      //FOREACHCHANGE: this needs to be changed (range)
+      form (v in vs) continue;
+      //FOREACHCHANGE: this needs to be changed (range)
+      form (v in vs) v = 3;
+    }
+
+    // nested foreach (rowvector)
+    while (1) {
+      row_vector[2] vs;
+      form (v in vs) break; 
+      //FOREACHCHANGE: this needs to be changed (range)
+      form (v in vs) continue;
+      //FOREACHCHANGE: this needs to be changed (range)
+      form (v in vs) v = 3;
     }
 
     // nested block

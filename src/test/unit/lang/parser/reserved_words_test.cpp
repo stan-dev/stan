@@ -5,8 +5,12 @@ TEST(parserReservedWords, for) {
   test_throws("reserved/for", "variable identifier (name) may not be reserved word");
 }
 
-TEST(parserReservedWords, foreach) {
-  test_throws("reserved/foreach", "variable identifier (name) may not be reserved word");
+TEST(parserReservedWords, fora) {
+  test_throws("reserved/fora", "variable identifier (name) may not be reserved word");
+}
+
+TEST(parserReservedWords, form) {
+  test_throws("reserved/form", "variable identifier (name) may not be reserved word");
 }
 
 TEST(parserReservedWords, in) {

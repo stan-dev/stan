@@ -8,7 +8,8 @@
 #include <stan/lang/ast/node/break_continue_statement.hpp>
 #include <stan/lang/ast/node/conditional_statement.hpp>
 #include <stan/lang/ast/node/for_statement.hpp>
-#include <stan/lang/ast/node/foreach_statement.hpp>
+#include <stan/lang/ast/node/foreach_a_statement.hpp>
+#include <stan/lang/ast/node/foreach_m_statement.hpp>
 #include <stan/lang/ast/node/statement.hpp>
 #include <stan/lang/ast/node/statements.hpp>
 #include <stan/lang/ast/node/return_statement.hpp>
@@ -100,7 +101,12 @@ namespace stan {
       return returns_type(return_type_, st.statement_, error_msgs_);
     }
 
-    bool returns_type_vis::operator()(const foreach_statement& st) const  {
+    bool returns_type_vis::operator()(const foreach_a_statement& st) const  {
+      // body must end in appropriate return
+      return returns_type(return_type_, st.statement_, error_msgs_);
+    }
+
+    bool returns_type_vis::operator()(const foreach_m_statement& st) const  {
       // body must end in appropriate return
       return returns_type(return_type_, st.statement_, error_msgs_);
     }

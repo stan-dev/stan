@@ -94,9 +94,15 @@ namespace stan {
 
       boost::spirit::qi::rule<Iterator,
                               boost::spirit::qi::locals<std::string>,
-                              foreach_statement(scope),
+                              foreach_a_statement(scope),
                               whitespace_grammar<Iterator> >
-      foreach_statement_r;
+      foreach_a_statement_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::locals<std::string>,
+                              foreach_m_statement(scope),
+                              whitespace_grammar<Iterator> >
+      foreach_m_statement_r;
 
       boost::spirit::qi::rule<Iterator,
                               while_statement(scope),

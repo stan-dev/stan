@@ -30,7 +30,9 @@ namespace stan {
 
     statement::statement(const for_statement& st) : statement_(st) { }
 
-    statement::statement(const foreach_statement& st) : statement_(st) { }
+    statement::statement(const foreach_a_statement& st) : statement_(st) { }
+
+    statement::statement(const foreach_m_statement& st) : statement_(st) { }
 
     statement::statement(const while_statement& st) : statement_(st) { }
 
