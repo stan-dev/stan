@@ -9,11 +9,6 @@ functions {
     for (i in 1:10) break;
     for (i in 1:10) continue;
 
-    // direct foreach
-    int xs[2];
-    foreach (x in xs) break; //FOREACHCHANGE: this needs to be changed (range)
-    foreach (x in xs) continue; //FOREACHCHANGE: this needs to be changed (range)
-
     // in statement seq
     while (1) {
       int b;
@@ -35,7 +30,15 @@ functions {
     while (1) for (i in 1:10) break;
 
     // nested foreach
-     while (1) foreach (i in 1:10) break;
+    while (1) {
+      int vs[2];
+      vs[1] = 0;
+      vs[2] = 1;
+      foreach (v in vs) break; 
+      //FOREACHCHANGE: this needs to be changed (range)
+      foreach (v in vs) continue;
+      //FOREACHCHANGE: this needs to be changed (range)
+    }
 
     // nested block
     while (1) {
