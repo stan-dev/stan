@@ -17,6 +17,7 @@ namespace stan {
     struct expression;
     struct statements;
     struct for_statement;
+    struct foreach_statement;
     struct conditional_statement;
     struct while_statement;
     struct break_continue_statement;
@@ -130,6 +131,16 @@ namespace stan {
        * @return false
        */
       bool operator()(const for_statement& st) const;
+
+      /**
+       * Return true if the specified statement is a return statement
+       * with an expression of the type specified at construction
+       * time.
+       *
+       * @param[in] st statement
+       * @return false
+       */
+      bool operator()(const foreach_statement& st) const;
 
       /**
        * Return true if the specified statement is a return statement

@@ -16,6 +16,7 @@ namespace stan {
     struct expression;
     struct statements;
     struct for_statement;
+    struct foreach_statement;
     struct conditional_statement;
     struct while_statement;
     struct break_continue_statement;
@@ -40,6 +41,7 @@ namespace stan {
                      boost::recursive_wrapper<expression>,
                      boost::recursive_wrapper<statements>,
                      boost::recursive_wrapper<for_statement>,
+                     boost::recursive_wrapper<foreach_statement>,
                      boost::recursive_wrapper<conditional_statement>,
                      boost::recursive_wrapper<while_statement>,
                      boost::recursive_wrapper<break_continue_statement>,
@@ -133,6 +135,14 @@ namespace stan {
        * @param st basic statement
        */
       statement(const for_statement& st);  // NOLINT(runtime/explicit)
+
+      /**
+       * Construct a statement variant type wrapper from the specified
+       * basic statement.
+       *
+       * @param st basic statement
+       */
+      statement(const foreach_statement& st);  // NOLINT(runtime/explicit)
 
       /**
        * Construct a statement variant type wrapper from the specified

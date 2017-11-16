@@ -337,6 +337,42 @@ namespace stan {
         o_ << "}" << EOL;
       }
 
+      void operator()(const foreach_statement& x) const {
+        generate_indent(indent_, o_);
+        o_ << "for (auto " << x.variable_ << " : "; //FOREACHCHANGE: This is the code generation for a foreach loop over an array. For vectors and matrices, we should do something more clever. Presumably, we should do a (or two) ordinary loops over (a) fresh index variable(s) and define x.variable as a local variable by accessing the matrix/vector through its indices. We include example code below. Presumably, we want to add different statements for all types for which we want different code generation. Hopefully, we can get away with using the same parsing rule.
+        generate_expression(x.expression_, NOT_USER_FACING, o_);
+        o_ << ") {" << EOL;
+        generate_statement(x.statement_, indent_ + 1, o_);
+        generate_indent(indent_, o_);
+        o_ << "}" << EOL;
+      }
+
+ /*     
+      void operator()(const foreach_matrix_statement& x) const {
+        generate_indent(indent_, o_);
+        o_ << "for (int " << x.variable_ << "__loopid1 =  0";
+        o_ << "; " << x.variable_ << "__loopid1 < ";
+        generate_expression(x.expression_.cols(), NOT_USER_FACING, o_);
+        o_ << "; ++" << x.variable_ << "__loopid1) {" << EOL;
+        generate_indent(indent_, o_);
+        o_ << "for (int " << x.variable_ << "__loopid2 =  0";
+        o_ << "; " << x.variable_ << "__loopid2 < ";
+        generate_expression(x.expression_.rows(), NOT_USER_FACING, o_);
+        o_ << "; ++" << x.variable_ << "__loopid2) {" << EOL;
+        generate_indent(indent_, o_);
+        generate_indent(indent_, o_);
+        o_ << "&auto " << x.variable_ << " = ";
+        generate_expression(x.expression_, NOT_USER_FACING, o_);
+        o_ << "(" << x.variable_ << "__loopid2, " << x.variable_ << "__loopid1);"  << EOL;
+        generate_statement(x.statement_, indent_ + 1, o_);
+        generate_indent(indent_, o_);
+        generate_indent(indent_, o_);
+        o_ << "}" << EOL;
+        generate_indent(indent_, o_);
+        o_ << "}" << EOL;
+      }
+*/      
+
       void operator()(const while_statement& x) const {
         generate_indent(indent_, o_);
         o_ << "while (as_bool(";

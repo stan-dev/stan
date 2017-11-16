@@ -44,6 +44,10 @@ namespace stan {
       return false;
     }
 
+    bool is_no_op_statement_vis::operator()(const foreach_statement& st) const {
+      return false;
+    }
+
     bool is_no_op_statement_vis::operator()(
                                     const conditional_statement& st) const {
       return false;
