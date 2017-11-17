@@ -1,4 +1,4 @@
-// test right value passed through for, foreach, while and embedded
+// test right value passed through for, while and embedded
 functions {
   int foo(int a) {
     // direct while

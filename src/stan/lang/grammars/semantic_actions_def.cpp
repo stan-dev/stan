@@ -1464,6 +1464,12 @@ namespace stan {
     }
     boost::phoenix::function<add_loop_identifier> add_loop_identifier_f;
 
+    void store_loop_identifier::operator()(const std::string& name,
+                                           std::string& name_local) const {
+      name_local = name;
+    }
+    boost::phoenix::function<store_loop_identifier> store_loop_identifier_f;
+
     void remove_loop_identifier::operator()(const std::string& name,
                                             variable_map& vm) const {
       vm.remove(name);
@@ -2717,7 +2723,6 @@ namespace stan {
 
       // illegal identifiers
       reserve("for");
-      reserve("fora");
       reserve("form");
       reserve("in");
       reserve("while");
@@ -2796,7 +2801,6 @@ namespace stan {
       reserve("false");
       reserve("float");
       reserve("for");
-      reserve("fora");
       reserve("form");
       reserve("friend");
       reserve("goto");

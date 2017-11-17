@@ -204,12 +204,12 @@ namespace stan {
       for_statement_r
         %= (lit("for") >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('(')
-        > identifier_r[add_loop_identifier_f(_1, _a, _r1, _pass,
-                                         boost::phoenix::ref(var_map_),
-                                         boost::phoenix::ref(error_msgs_))]
+        > identifier_r[store_loop_identifier_f(_1, _a)]
         > lit("in")
         > range_r(_r1)
-        > lit(')')
+        > lit(')')[add_loop_identifier_f(_a, _a, _r1, _pass,
+                                         boost::phoenix::ref(var_map_),
+                                         boost::phoenix::ref(error_msgs_))]
         > statement_r(_r1, true)
         > eps
         [remove_loop_identifier_f(_a, boost::phoenix::ref(var_map_))];
@@ -219,12 +219,14 @@ namespace stan {
       foreach_a_statement_r
         %= (lit("fora") >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('(')
-        > identifier_r[add_loop_identifier_f(_1, _a, _r1, _pass,
+        > identifier_r[store_loop_identifier_f(_1, _a)]
+        > lit("in")
+        > expression_rhs_r(_r1)//[infer_array_expr_type_f(_b, _1, _r1, _pass,
+                                       //boost::phoenix::ref(var_map_),
+                                       //boost::phoenix::ref(error_msgs_))]//FOREACHCHANGE:
+        > lit(')')[add_loop_identifier_f(_a, _a, _r1, _pass,
                                          boost::phoenix::ref(var_map_),
                                          boost::phoenix::ref(error_msgs_))]
-        > lit("in")
-        > expression_rhs_r(_r1) //FOREACHCHANGE:
-        > lit(')')
         > statement_r(_r1, true)
         > eps
         [remove_loop_identifier_f(_a, boost::phoenix::ref(var_map_))];
@@ -234,12 +236,12 @@ namespace stan {
       foreach_m_statement_r
         %= (lit("form") >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('(')
-        > identifier_r[add_loop_identifier_f(_1, _a, _r1, _pass,
-                                         boost::phoenix::ref(var_map_),
-                                         boost::phoenix::ref(error_msgs_))]
+        > identifier_r[store_loop_identifier_f(_1, _a)]
         > lit("in")
-        > expression_rhs_r(_r1) //FOREACHCHANGE:
-        > lit(')')
+        > expression_rhs_r(_r1)//FOREACHCHANGE:
+        > lit(')')[add_loop_identifier_f(_a, _a, _r1, _pass,
+                                         boost::phoenix::ref(var_map_),
+                                         boost::phoenix::ref(error_msgs_))] 
         > statement_r(_r1, true)
         > eps
         [remove_loop_identifier_f(_a, boost::phoenix::ref(var_map_))];

@@ -488,6 +488,13 @@ namespace stan {
     extern boost::phoenix::function<add_loop_identifier> add_loop_identifier_f;
 
     // called from: statement_grammar
+    struct store_loop_identifier : public phoenix_functor_binary {
+      void operator()(const std::string& name,
+                      std::string& name_local) const;
+    };
+    extern boost::phoenix::function<store_loop_identifier> store_loop_identifier_f;
+
+    // called from: statement_grammar
     struct remove_loop_identifier : public phoenix_functor_binary {
       void operator()(const std::string& name, variable_map& vm) const;
     };
