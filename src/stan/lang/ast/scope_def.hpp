@@ -26,9 +26,9 @@ namespace stan {
     }
 
     bool scope::local_allows_var() const {
-      return is_local_ &&
-        !(program_block_ == transformed_data_origin
-          || program_block_ == derived_origin);
+      return is_local_
+        && program_block_ != transformed_data_origin
+        && program_block_ != derived_origin;
     }
 
     bool scope::par_or_tpar() const {

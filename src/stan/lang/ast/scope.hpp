@@ -66,9 +66,10 @@ namespace stan {
       bool is_local() const;
 
       /**
-       * Flags local scopes which permit parameter variables,
-       * i.e., program block can't be transformed data or
-       * generated quantities program blocks.
+       * Flags local scopes which permit parameter variables.
+       * Allows local blocks in functions, transfromed parameter,
+       * and model blocks; disallows local blocks in transformed data
+       * and generated quantities program blocks.
        *
        * @return true for local parameter origin block types
        */
