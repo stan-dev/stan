@@ -635,37 +635,36 @@ data {
   int N;
   int D;
   int y[N];
-  vector[D] x[N];
+  matrix[N, D] x;
 }
 parameters {
-  matrix[K,D] beta;
+  matrix[D, K] beta;
 }
 model {
-  for (k in 1:K)
-    beta[k] ~ normal(0, 5);
+  matrix[N, K] x_beta = x * beta;
+
+  to_vector(beta) ~ normal(0, 2);
+
   for (n in 1:N)
-    y[n] ~ categorical(softmax(beta * x[n]));
+    y[n] ~ categorical_logit(x_beta[n]);
 }
 \end{stancode}
 %
-See \refsection{softmax} for a definition of the softmax
-function.   A more efficient way to write the final line is
-%
-\begin{stancode}
-    y[n] ~ categorical_logit(beta * x[n]);
-\end{stancode}
-%
-The \code{categorical\_logit} distribution is like the categorical
-distribution, with the parameters on the logit scale (see
-\refsection{categorical-distribution} for a full definition of
-\code{categorical\_logit}).
+The matrix multiplication is pulled out to define a local variable for
+all of the predictors.   Then the prior on \code{beta} is coded in
+vectorized form.    Then, the categorical is expressed on the log-odds
+(logit) scale; an equivalent form without the matrix multiplication
 
-The first loop may be made more efficient by vectorizing the first
-loop by converting the matrix \code{beta} to a vector,
+The categorical distribution with log-odds (logit) scaled parameters
+used above is equivalent to writing
 %
 \begin{stancode}
-to_vector(beta) ~ normal(0, 5);
+    y[n] ~ categorical(softmax(x[n] * beta));
 \end{stancode}
+%
+See \refsection{softmax} for a definition of the softmax function and
+\refsection{categorical-distribution} for a full definition of
+\code{categorical\_logit}.
 
 
 \subsubsection{Constraints on Data Declarations}
@@ -680,10 +679,10 @@ readability.  The above model's declarations could be tightened to
 %
 
 \begin{stancode}
-  int<lower=2> K;
-  int<lower=0> N;
-  int<lower=1> D;
-  int<lower=1,upper=K> y[N];
+  int<lower = 2> K;
+  int<lower = 0> N;
+  int<lower = 1> D;
+  int<lower = 1, upper = K> y[N];
 \end{stancode}
 %
 These constraints arise because the number of categories, \code{K},
@@ -727,8 +726,7 @@ to define a row vector of zero values,
 %
 \begin{stancode}
 transformed data {
-  row_vector[D] zeros;
-  zeros = rep_row_vector(0, D);
+  row_vector[D] zeros = rep_row_vector(0, D);
 }
 \end{stancode}
 %
@@ -780,9 +778,7 @@ parameters {
 transformed parameters {
   vector[K] beta;  // centered
 
-  for (k in 1:(K-1)) {
-    beta[k] = beta_raw[k];
-  }
+  beta[1 : K - 1] = beta_raw;
   beta[K] = -sum(beta_raw);
   ...
 \end{stancode}
@@ -810,17 +806,16 @@ parameters {
   ...
 transformed parameters {
   vector[K] beta;
-  beta = beta_scale * (beta_raw - 1.0 / K);
+  beta = beta_scale * (beta_raw - inv(K));
   ...
 \end{stancode}
 %
-Given that \code{beta\_raw} sums to 1 because it is a simplex, the
-elementwise subtraction of $1 / K$ is guaranteed to sum to zero (note
-that the expression \code{1.0 / K} is used rather than \code{1 / K} to
-prevent integer arithmetic rounding down to zero).  Because the
-magnitude of the elements of the simplex is bounded, a scaling factor
-is required to provide \code{beta} with $K$ degrees of freedom
-necessary to take on every possible value that sums to zero.
+Here \code{inv(K)} is just a short way to write \code{1.0~/~K}.  Given
+that \code{beta\_raw} sums to 1 because it is a simplex, the
+elementwise subtraction of \code{inv(K)} is guaranteed to sum to zero.
+Because the magnitude of the elements of the simplex is bounded, a
+scaling factor is required to provide \code{beta} with $K$ degrees of
+freedom necessary to take on every possible value that sums to zero.
 
 With this parameterization, a Dirichlet prior can be placed on
 \code{beta\_raw}, perhaps uniform, and another prior put on
@@ -1222,7 +1217,7 @@ parameters are declared as follows.
 
 \begin{stancode}
 parameters {
-  real mu_beta;                  // mean student ability
+  real mu_beta;                // mean question difficulty
   real alpha[J];               // ability for j - mean
   real beta[K];                // difficulty for k
   real<lower=0> gamma[K];      // discrimination of k
@@ -1239,7 +1234,6 @@ model {
   beta ~ normal(0, sigma_beta);
   gamma ~ lognormal(0, sigma_gamma);
   mu_beta ~ cauchy(0, 5);
-  sigma_alpha ~ cauchy(0, 5);
   sigma_beta ~ cauchy(0, 5);
   sigma_gamma ~ cauchy(0, 5);
   for (n in 1:N)
@@ -1295,11 +1289,13 @@ information on non-centered reparameterizations.
 The intercept term \code{mu\_beta} can't itself be modeled
 hierarchically, so it is given a weakly informative
 $\distro{Cauchy}(0,5)$ prior.  Similarly, the scale terms,
-\code{sigma\_alpha}, \code{sigma\_beta}, and \code{sigma\_gamma}, are
-given half-Cauchy priors.  The truncation in the half-Cauchy prior is
-implicit; explicit truncation is not necessary because the log
-probability need only be calculated up to a proportion and the scale
-variables are constrained to $(0,\infty)$ by their declarations.
+\code{sigma\_beta}, and \code{sigma\_gamma}, are given half-Cauchy
+priors.  As mentioned earlier, the scale and location for \code{alpha}
+are fixed to ensure identifiability.  The truncation in the
+half-Cauchy prior is implicit; explicit truncation is not necessary
+because the log probability need only be calculated up to a proportion
+and the scale variables are constrained to $(0,\infty)$ by their
+declarations.
 
 
 
@@ -2700,7 +2696,7 @@ Further, unless one thinks that the process is really non-stationary,
 it's worth adding the following constraint to ensure stationarity.
 %
 \begin{stancode}
-read<lower = -1, upper = 1> phi;
+real<lower = -1, upper = 1> phi;
 \end{stancode}
 
 
@@ -2941,7 +2937,7 @@ dramatically by replacing the loops over categorical distributions
 with a single multinomial distribution.%
 %
 \footnote{The program is available in the Stan example model repository;
-see \url{http://mc-stan.org/documentation}.}
+see \url{http://mc-stan.org/users/documentation}.}
 %
 The data is declared as before, but now a transformed data blocks
 computes the sufficient statistics for estimating the transition and
@@ -2987,7 +2983,7 @@ analytically because the Dirichlet is the conjugate prior to the
 multinomial.  The following example%
 %
 \footnote{The program is available in the Stan example model repository;
-see \url{http://mc-stan.org/documentation}.}
+see \url{http://mc-stan.org/users/documentation}.}
 %
 illustrates how a Stan model can define the posterior analytically.
 This is possible in the Stan language because the model only needs to
@@ -3042,7 +3038,7 @@ algorithm.
 In Stan, the forward algorithm is coded as follows.%
 %
 \footnote{The program is available in the Stan example model repository;
-see \url{http://mc-stan.org/documentation}.}
+see \url{http://mc-stan.org/users/documentation}.}
 %
 First, two additional data variable are declared for the unsupervised
 data.
@@ -3125,7 +3121,7 @@ generated quantities {
     real best_logp[T_unsup, K];
     real best_total_logp;
     for (k in 1:K)
-      best_logp[1, K] = log(phi[k, u[1]]);
+      best_logp[1, k] = log(phi[k, u[1]]);
     for (t in 2:T_unsup) {
       for (k in 1:K) {
         best_logp[t, k] = negative_infinity();
@@ -3942,15 +3938,15 @@ data {
 }
 parameters {
   simplex[K] theta;          // mixing proportions
-  ordered mu[K];             // locations of mixture components
+  ordered[K] mu;             // locations of mixture components
   vector<lower=0>[K] sigma;  // scales of mixture components
 }
 model {
-  real log_theta[K] = log(theta);  // cache log calculation
+  vector[K] log_theta = log(theta);  // cache log calculation
   sigma ~ lognormal(0, 2);
   mu ~ normal(0, 10);
   for (n in 1:N) {
-    real lps[K] = log_theta;
+    vector[K] lps = log_theta;
     for (k in 1:K)
       lps[k] += normal_lpdf(y[n] | mu[k], sigma[k]);
     target += log_sum_exp(lps);
@@ -4007,7 +4003,7 @@ or equivalently
 for (n in 1:N)
   target += log_mix(lambda,
                     normal_lpdf(y[n] | mu[1], sigma[1]),
-                    normal_lpdf(y[n] | mu[2], sigma[2])));
+                    normal_lpdf(y[n] | mu[2], sigma[2]));
 \end{stancode}
 %
 This definition assumes that each observation $y_n$ may have arisen
@@ -4451,9 +4447,9 @@ $y$ based on $x$ with a slope and intercept is modeled as follows.
 %
 \begin{stancode}
 data {
-  int<lower=0> N;        // number of cases
-  real x[N];             // predictor (covariate)
-  real y[N];             // outcome (variate)
+  int<lower=0> N;       // number of cases
+  vector[N] x;          // predictor (covariate)
+  vector[N] y;          // outcome (variate)
 }
 parameters {
   real alpha;           // intercept
@@ -4805,7 +4801,7 @@ in each school.%
 \footnote{The model provided for this data in
 \citep[Section~5.5]{GelmanEtAl:2013} is included with the
 data in the Stan example model repository,
-\url{http://mc-stan.org/documentation}.}
+\url{http://mc-stan.org/users/documentation}.}
 
 \subsubsection{Extensions and Alternatives}
 
@@ -5380,7 +5376,7 @@ binary numbers as follows.
 \\ \hline
 {2} & - & + & - & $\chi_2$
 \\
-{3} & - & + & + & $\phi_2 \, \phi_3$
+{3} & - & + & + & $\phi_2 \, p_3$
 \\ \hline
 {4} & + & - & - & $\chi_1$
 \\
@@ -6244,7 +6240,7 @@ Consider the following Stan program for implementing $K$-means
 clustering.%
 %
 \footnote{The model is available in the Stan example model repository;
-see \url{http://mc-stan.org/documentation}.}
+see \url{http://mc-stan.org/users/documentation}.}
 %
 \begin{stancode}
 data {
@@ -6445,7 +6441,7 @@ training data with documents of known categories can be coded in Stan
 as follows%
 %
 \footnote{This model is available in the example model repository;
-  see \url{http://mc-stan.org/documentation}.}
+  see \url{http://mc-stan.org/users/documentation}.}
 %
 \begin{stancode}
 data {
@@ -6964,7 +6960,7 @@ return the zero vector, $m(x) = {\bf 0}$.  Consider the following
 implementation of a Gaussian process simulator.%
 %
 \footnote{This model is available in the example model repository;
-  see \url{http://mc-stan.org/documentation}.}
+  see \url{http://mc-stan.org/users/documentation}.}
 %
 \begin{stancode}
 data {
@@ -7002,7 +6998,7 @@ data {
 transformed data {
   matrix[N, N] K = cov_exp_quad(x, 1.0, 1.0);
   vector[N] mu = rep_vector(0, N);
-  for (n in 1:N) 
+  for (n in 1:N)
     K[n, n] = K[n, n] + 0.1;
 }
 parameters {
@@ -7024,7 +7020,7 @@ Only the input data needs to change in moving from a univariate model to a
 multivariate model.%
 %
 \footnote{The model is available in the Stan example model repository;
-see \url{http://mc-stan.org/documentation}.}
+see \url{http://mc-stan.org/users/documentation}.}
 %
 The only lines that change from the univariate model above are as follows.
 %
@@ -7068,7 +7064,7 @@ This transform can be applied directly to Gaussian process
 simulation.%
 %
 \footnote{The code is available in the Stan example model repository;
-see \url{http://mc-stan.org/documentation}.}
+see \url{http://mc-stan.org/users/documentation}.}
 %
 This model has the same data declarations for \code{N} and \code{x},
 and the same transformed data definitions of \code{mu} and
@@ -7153,7 +7149,7 @@ calculate the covariance matrix \code{K} in the model block, rather than
 the transformed data block.
 %
 \footnote{The program code is available in the Stan example model repository;
-see \url{http://mc-stan.org/documentation}.}
+see \url{http://mc-stan.org/users/documentation}.}
 
 %
 \begin{stancode}
@@ -7178,9 +7174,9 @@ model {
   // diagonal elements
   for (n in 1:N)
     K[n, n] = K[n, n] + sq_sigma;
-  
+
   L_K = cholesky_decompose(K);
-  
+
   rho ~ inv_gamma(5, 5);
   alpha ~ normal(0, 1);
   sigma ~ normal(0, 1);
@@ -7241,15 +7237,15 @@ model {
   {
     matrix[N, N] L_K;
     matrix[N, N] K = cov_exp_quad(x, alpha, rho);
-  
+
     // diagonal elements
     for (n in 1:N)
       K[n, n] = K[n, n] + delta;
-    
+
     L_K = cholesky_decompose(K);
     f = L_K * eta;
   }
-  
+
   rho ~ inv_gamma(5, 5);
   alpha ~ normal(0, 1);
   sigma ~ normal(0, 1);
@@ -7420,7 +7416,7 @@ model {
     matrix[N, N] L_K = L_cov_exp_quad_ARD(x, alpha, rho, delta);
     f = L_K * eta;
   }
-  
+
   rho ~ inv_gamma(5, 5);
   alpha ~ normal(0, 1);
   sigma ~ normal(0, 1);
@@ -7465,13 +7461,14 @@ If our model consists of only the GP, i.e.:
   & x \in \reals^{N \times D}, \, f \in \reals^N
 \end{align*}
 %
-we likely don't need constraints beyond penalizing small length-scales.  We'd
-like to allow the GP prior to represent both high-frequency and low-frequency
-functions, so our prior should put non-negligible mass on both sets of
-functions. In this case, an inverse gamma, \code{inv\_gamma\_lpdf} in Stan's
-language, will work well as it has a sharp left tail that puts negligible mass
-on infinitesimal length-scales, but a generous right tail, allowing for large
-length-scales. Inverse gamma priors will avoid infinitesimal length-scales
+we likely don't need constraints beyond penalizing small
+length-scales.  We'd like to allow the GP prior to represent both
+high-frequency and low-frequency functions, so our prior should put
+non-negligible mass on both sets of functions.  In this case, an
+inverse gamma, \code{inv\_gamma\_lpdf} in Stan’s language, will work
+well as it has a sharp left tail that puts negligible mass on
+infinitesimal length-scales, but a generous right tail, allowing for
+large length-scales. Inverse gamma priors will avoid infinitesimal length-scales
 because the density is zero at zero, so the posterior for length-scale will be
 pushed away from zero. An inverse gamma distribution is one of many
 zero-avoiding or boundary-avoiding distributions. See
@@ -7591,11 +7588,11 @@ transformed parameters {
   {
     matrix[N, N] L_K;
     matrix[N, N] K = cov_exp_quad(x, alpha, rho);
-  
+
     // diagonal elements
     for (n in 1:N)
       K[n, n] = K[n, n] + delta;
-    
+
     L_K = cholesky_decompose(K);
     f = L_K * eta;
   }
@@ -7635,7 +7632,7 @@ The generated quantities block defines the quantity \code{y2}. We generate
 \code{y2} by sampling \code{N2} univariate normals with each mean corresponding
 to the appropriate element in \code{f}.
 \footnote{The program code is available in the Stan example model repository;
-see \url{http://mc-stan.org/documentation}.}
+see \url{http://mc-stan.org/users/documentation}.}
 %
 
 \subsubsection{Predictive Inference in non-Gaussian GPs}
@@ -7647,7 +7644,7 @@ Consider the following full model for prediction using logistic Gaussian
 process regression.
 %
 \footnote{The model is available in the Stan example model repository;
-see \url{http://mc-stan.org/documentation}.}
+see \url{http://mc-stan.org/users/documentation}.}
 %
 %
 \begin{stancode}
@@ -7676,11 +7673,11 @@ transformed parameters {
   {
     matrix[N, N] L_K;
     matrix[N, N] K = cov_exp_quad(x, alpha, rho);
-  
+
     // diagonal elements
     for (n in 1:N)
       K[n, n] = K[n, n] + delta;
-    
+
     L_K = cholesky_decompose(K);
     f = L_K * eta;
   }
@@ -7728,7 +7725,7 @@ elements in $x$ and $\tilde{x}$ are never the same.
 
 %
 \footnote{The program code is available in the Stan example model repository;
-see \url{http://mc-stan.org/documentation}.}
+see \url{http://mc-stan.org/users/documentation}.}
 %
 This Stan code below uses the analytic form of the posterior and provides
 sampling of the resulting multivariate normal through the Cholesky
@@ -7767,7 +7764,7 @@ functions {
       K_div_y1 = mdivide_left_tri_low(L_K, y1);
       K_div_y1 = mdivide_right_tri_low(K_div_y1',L_K)';
       k_x1_x2 = cov_exp_quad(x1, x2, alpha, rho);
-      f2_mu = (k_x1_x2' * K_div_y1); 
+      f2_mu = (k_x1_x2' * K_div_y1);
       v_pred = mdivide_left_tri_low(L_K, k_x1_x2);
       cov_f2 = cov_exp_quad(x2, alpha, rho) - v_pred' * v_pred;
       diag_delta = diag_matrix(rep_vector(delta,N2));
@@ -7798,14 +7795,14 @@ model {
   {
     matrix[N1, N1] K = cov_exp_quad(x1, alpha, rho);
     real sq_sigma = square(sigma);
-  
+
     // diagonal elements
     for (n1 in 1:N1)
       K[n1, n1] = K[n1, n1] + sq_sigma;
-    
+
     L_K = cholesky_decompose(K);
   }
-  
+
   rho ~ inv_gamma(5, 5);
   alpha ~ normal(0, 1);
   sigma ~ normal(0, 1);
@@ -7905,7 +7902,7 @@ model {
 
     // diagonal elements
     for (n in 1:N)
-      K[n, n] = K[n, n] + delta; 
+      K[n, n] = K[n, n] + delta;
 
     L_K = cholesky_decompose(K);
     f = L_K * eta
@@ -8081,7 +8078,7 @@ to solve nonlinear equations.
 %
 As an illustrative example, we consider a nonlinear system of two equations
 with two unknowns. Our goal is to simultaneously solve all equations for
-$y_1$ and $y_2$, such that the vector $z$ goes to 0. 
+$y_1$ and $y_2$, such that the vector $z$ goes to 0.
 %
 \begin{eqnarray}\label{algebra.equation}
   \begin{aligned}
@@ -8119,7 +8116,7 @@ the roots. Our example does not use real or integer data. Nevertheless, these
 unused arguments must be included in the system function with exactly the
 signature above.
 
-\subsubsection{Strict Signature}  
+\subsubsection{Strict Signature}
 %
 The function defining the system must have exactly these argument types and
 return type. This may require passing in zero-length arrays for data or a zero-length
@@ -8134,7 +8131,7 @@ whether the solver converges or not. If the solver does not converge, the metrop
 proposal gets rejected and a warning message, stating no acceptable solution was
 found, is issued.
 
-The solver has three tuning parameters to determine convergence: the relative tolerance, 
+The solver has three tuning parameters to determine convergence: the relative tolerance,
 the function tolerance, and the maximum number of steps. Their default values are respectively
 \code{1e-10} ($10^{-10}$), \code{1e-6} ($10^{-6}$), and \code{1e3} ($10^3$). Their
 behavior is explained in \refsection{algebra-control}.
@@ -8173,7 +8170,7 @@ $y$ have the same length} or, in other words \textit{the number of equations in
 the system is the same as the number of unknowns.}
 
 \subsection{Pathological Solutions}
-Certain systems may be degenerate, meaning they have multiple solutions. The 
+Certain systems may be degenerate, meaning they have multiple solutions. The
 algebraic solver will not report these cases, as the algorithm stops once it has found
 an acceptable solution. The initial guess will often determine which solution gets found
 first. The degeneracy may be broken by putting additional constraints on the solution.
@@ -8190,7 +8187,7 @@ allows three additional parameters, all of which must be supplied if any of them
 supplied.
 %
 \begin{stancode}
-  y = algebra_solver(system, y_guess, theta, x_r, x_i, 
+  y = algebra_solver(system, y_guess, theta, x_r, x_i,
                      rel_tol, f_tol, max_steps);
 \end{stancode}
 
@@ -8209,7 +8206,7 @@ should go to 0 (equivalently, all elements of the vector function are 0). It hel
 geometrically. Ideally the output of the algebraic function is at the origin; the norm measures
 deviations from this ideal. As the length of the return vector increases, a certain
 function tolerance becomes an increasingly difficult criterion to meet, given each
-individual element of the vector contribute to the norm. 
+individual element of the vector contribute to the norm.
 
 Smaller relative tolerances produce more accurate solutions but require more computational time.
 
@@ -8221,7 +8218,7 @@ statistical properties of posterior samples generated by the Stan program.
 %
 The maximum number of steps can be used to stop a runaway simulation. This can arise in
 MCMC when a bad jump is taken, particularly during warmup. If the limit is hit, the
-current metropolis proposal gets rejected. Users will see a  warning message stating the 
+current metropolis proposal gets rejected. Users will see a  warning message stating the
 maximum number of steps has been exceeded.
 
 

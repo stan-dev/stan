@@ -18,7 +18,7 @@ feature requests, and everything else Stan related, see
 the Stan home page:
 %
 \begin{quote}
-\url{http://mc-stan.org/}
+\url{http://mc-stan.org}
 \end{quote}
 
 
@@ -42,7 +42,7 @@ documentation used to be part of this document, but is now its own
 standalone document.  The CmdStan home page is
 %
 \begin{quote}
-\url{http://mc-stan.org/cmdstan.html}
+\url{http://mc-stan.org/users/interfaces/cmdstan.html}
 \end{quote}
 
 \subsection{RStan}
@@ -53,7 +53,7 @@ R2WinBUGS and R2jags interfaces on which it was modeled.  The RStan
 home page is
 %
 \begin{quote}
-\url{http://mc-stan.org/rstan.html}
+\url{http://mc-stan.org/users/interfaces/rstan.html}
 \end{quote}
 
 \subsection{PyStan}
@@ -63,7 +63,7 @@ the Python memory level rather than calling Stan from the outside.
 The PyStan home page is
 %
 \begin{quote}
-\url{http://mc-stan.org/pystan.html}
+\url{http://mc-stan.org/users/interfaces/pystan.html}
 \end{quote}
 
 \subsubsection{MatlabStan}
@@ -73,7 +73,7 @@ MatlabStan currently wraps a CmdStan process.  The
 MatlabStan home page is
 %
 \begin{quote}
-\url{http://mc-stan.org/matlab-stan.html}
+\url{http://mc-stan.org/users/interfaces/matlab-stan.html}
 \end{quote}
 %
 
@@ -83,7 +83,7 @@ Stan.jl is the Julia interface to Stan.  Like MatlabStan, Stan.jl
 wraps a CmdStan process.  The Stan.jl home page is
 %
 \begin{quote}
-\url{http://mc-stan.org/julia-stan.html}
+\url{http://mc-stan.org/users/interfaces/julia-stan.html}
 \end{quote}
 %
 
@@ -93,7 +93,7 @@ StataStan is the Stata interface to Stan.  Like MatlabStan, Stan.jl
 wraps a CmdStan process.  The StataStan home page is
 %
 \begin{quote}
-\url{http://mc-stan.org/stata-stan.html}
+\url{http://mc-stan.org/users/interfaces/stata-stan.html}
 \end{quote}
 
 \subsubsection{MathematicaStan}
@@ -103,7 +103,7 @@ MatlabStan, MathematicaStan wraps a CmdStan process.  The
 MathematicaStan home page is
 %
 \begin{quote}
-\url{http://mc-stan.org/mathematica-stan.html}
+\url{http://mc-stan.org/users/interfaces/mathematica-stan.html}
 \end{quote}
 
 
@@ -122,7 +122,7 @@ vector, and matrix types, as well as (multidimensional) arrays of
 other types.  Variables are declared in blocks corresponding to the
 variable's use: data, transformed data, parameter, transformed
 parameter, or generated quantity.  Unconstrained local variables may
-be declared within statement blocks.  
+be declared within statement blocks.
 
 The transformed data, transformed parameter, and generated quantities
 blocks contain statements defining the variables declared in their
@@ -295,7 +295,7 @@ rerunning warmup and everything.%
   warmup iterations.  At most this rerunning strategy will consume
   about 50\% more cycles than guessing the correct number of
   iterations at the outset.}
-  
+
 When estimating a mean based on a sample of $M$ independent draws, the
 estimation error is proportional to $1/\sqrt{M}$.  If the draws are
 positively correlated, as they typically are when drawn using \MCMC
@@ -303,7 +303,7 @@ methods, the error is proportional to $1/\sqrt{\mbox{\sc n\_eff}}$,
 where {\sc n\_eff} is the effective sample size.  Thus it is standard
 practice to also monitor (an estimate of) the effective sample size
 until it is large enough for the estimation or inference task at
-hand.  
+hand.
 
 \subsection{Bayesian Inference and Monte Carlo Methods}
 
@@ -349,7 +349,7 @@ of $v$ at which $f(v)$ is maximized.
 If the prior is uniform, the posterior mode corresponds to the maximum
 likelihood estimate (MLE) of the parameters.  If the prior is not
 uniform, the posterior mode is sometimes called the maximum a
-posteriori (MAP) estimate. 
+posteriori (MAP) estimate.
 
 For optimization, the Jacobian of any transforms induced by
 constraints on variables are ignored.  It is more efficient in many
@@ -407,6 +407,3 @@ algorithm designed to leverage Stan's library of transformations and automatic
 differentiation toolbox \citep{Kucukelbir:2015}. ADVI circumvents all of the
 mathematics typically required to derive variational inference algorithms; it
 works with any Stan model.
-
-
-

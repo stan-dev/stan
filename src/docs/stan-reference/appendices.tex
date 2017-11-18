@@ -108,7 +108,7 @@ in designing Stan, we wanted to keep many of the useful features of
 Bugs.
 
 To start, take a look at the files of translated \BUGS models at
-\url{http://mc-stan.org/}.  These are 40 or so models from the \BUGS
+\url{http://mc-stan.org}.  These are 40 or so models from the \BUGS
 example volumes, all translated and tested (to provide the same
 answers as \BUGS) in Stan.  For any particular model you want to fit,
 you can look for similar structures in these examples.
@@ -526,13 +526,13 @@ conditionals have regressions with slope 0.8.
 
 \item Stan can be set up from within R using two lines of code.
   Follow the instructions for running Stan from R on
-  \url{http://mc-stan.org/}.  You don't need to separately download
+  \url{http://mc-stan.org}.  You don't need to separately download
   Stan and RStan.  Installing RStan will automatically set up Stan.
   When RStan moves to CRAN, it will get even easier.
 \item In practice we typically run the same Stan model repeatedly.  If
   you pass RStan the result of a previously fitted model the model will
   not need be recompiled. An example is given on the running
-  Stan from R pages available from \code{http://mc-stan.org/}.
+  Stan from R pages available from \code{http://mc-stan.org}.
 \item When you run Stan, it saves various conditions including
   starting values, some control variables for the tuning and running
   of the no-U-turn sampler, and the initial random seed. You can
@@ -560,7 +560,7 @@ conditionals have regressions with slope 0.8.
 \begin{itemize}
 \item Stan, like WinBUGS, OpenBUGS, and JAGS, has an active community,
   which you can access via the user's mailing list and the developer's
-  mailing list; see \code{http://mc-stan.org/} for information on
+  mailing list; see \code{http://mc-stan.org} for information on
   subscribing and posting and to look at archives.
 \end{itemize}
 
@@ -663,7 +663,7 @@ identifier ::= [a-zA-Z] [a-zA-Z0-9_]*
 \small
 \begin{Verbatim}[fontsize=\small]
 expressions ::= expression % ','
-expression ::= numeric_literal
+expression ::= real_literal
              | variable
              | '{' expressions '}'
              | expression `?` expression `:` expression
@@ -686,8 +686,6 @@ index ::= ?(expression | expression ':' | ':' expression
             | expression ':' expression)
 
 indexes ::= index % ','
-
-numeric_literal ::= integer_literal | real_literal
 
 integer_literal ::= 0 | [1-9] [0-9]*
 
@@ -715,8 +713,8 @@ atomic_statement_body
    | 'target' '+=' expression
    | 'break'
    | 'continue'
-   | 'print' '(' (expression | string_literal)% ',' ')'
-   | 'reject' '(' (expression | string_literal)% ',' ')'
+   | 'print' '(' (expression | string_literal) % ',' ')'
+   | 'reject' '(' (expression | string_literal) % ',' ')'
    | 'return' expression
    | ''
 

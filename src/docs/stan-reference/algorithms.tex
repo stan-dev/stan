@@ -53,7 +53,7 @@ and scale the target distribution; see \citep{Betancourt-Stein:2011}
 for details of the geometry.
 
 In Stan, this matrix may be set to the identity matrix (i.e., unit
-diagonal) or estimated from warmup samples and optionally restricted
+diagonal) or estimated from warmup draws and optionally restricted
 to a diagonal matrix. The inverse $\Sigma^{-1}$ is known as the mass
 matrix, and will be a unit, diagonal, or dense if $\Sigma$ is.
 
@@ -384,7 +384,7 @@ $t_0$    & adaptation iteration offset
 By setting the target acceptance parameter $\delta$ to a value closer
 to 1 (its value must be strictly less than 1 and its default value is
 0.8), adaptation will be forced to use smaller step sizes. This can
-improve sampling efficiency (effective samples per iteration) at the
+improve sampling efficiency (effective sample size per iteration) at the
 cost of increased iteration times. Raising the value of $\delta$ will
 also allow some models that would otherwise get stuck to overcome
 their blockages.
@@ -729,7 +729,7 @@ algorithm, potentially reducing Hamiltonian Monte Carlo to a simple
 random walk and biasing estimates by not being able to thoroughly
 explore the posterior distribution.  \cite{Betancourt:2016b} provides
 details of the theory, computation, and practical implications of
-divergent transitions in Hamiltonian Monte Carlo.  
+divergent transitions in Hamiltonian Monte Carlo.
 
 The Stan interfaces report divergences as warnings and provide ways to
 access which iterations encountered divergences.  ShinyStan provides
@@ -737,7 +737,7 @@ visualizations that highlight the starting point of divergent
 transitions to diagnose where the divergences arise in parameter
 space.  A common location is in the neck of the funnel in a centered
 parameterization (as in the funnel example discussed in
-\refsection{reparameterization}). 
+\refsection{reparameterization}).
 
 If the posterior is highly curved, very small step sizes are required
 for this gradient-based simulation of the Hamiltonian to be accurate.
@@ -1341,7 +1341,7 @@ An $n$-dimensional vector $x \in \reals^n$ is said to be a unit vector
 if it has unit Euclidean length, so that
 %
 \[
-\Vert x \Vert 
+\Vert x \Vert
 \ = \ \sqrt{x^{\top}\,x}
 \ = \ \sqrt{x_1^2 + x_2^2 + \cdots + x_n^2}
 \ = \ 1\ .
@@ -2155,7 +2155,7 @@ scheme in Stan's optimization feature.
 \subsection{Monte Carlo Approximation of the ELBO}
 
 ADVI uses Monte Carlo integration to approximate the variational
-objective function, the ELBO. The number of samples used to
+objective function, the ELBO. The number of draws used to
 approximate the ELBO is denoted by \texttt{elbo\_samples}. We
 recommend a default value of $100$, as we only evaluate the ELBO every
 \texttt{eval\_elbo} iterations, which also defaults to $100$.
@@ -2163,7 +2163,7 @@ recommend a default value of $100$, as we only evaluate the ELBO every
 \subsection{Monte Carlo Approximation of the Gradients}
 
 ADVI uses Monte Carlo integration to approximate the gradients of the
-ELBO. The number of samples used to approximate the gradients is
+ELBO. The number of draws used to approximate the gradients is
 denoted by \texttt{grad\_samples}. We recommend a default value of
 $1$, as this is the most efficient. It also a very noisy estimate of
 the gradient, but stochastic gradient ascent is capable of following
@@ -2256,5 +2256,3 @@ grows linearly with the number of parameters. This can be require a
 very long time, especially in models with latent parameters that grow
 with the data size. It can be helpful to diagnose a model with smaller
 data sizes in such cases.
-
-
