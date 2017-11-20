@@ -203,34 +203,32 @@ namespace stan {
       for_statement_r.name("for statement");
       for_statement_r
         %= (lit("for") >> no_skip[!char_("a-zA-Z0-9_")])
-        > lit('(')
-        > identifier_r[store_loop_identifier_f(_1, _a)]
-        > lit("in")
-        > range_r(_r1)
-        > lit(')')
-        > eps[add_loop_identifier_f(_a, _a, _r1, _pass,
+        >> lit('(')
+        >> identifier_r[store_loop_identifier_f(_1, _a)] // can we use assign_lhs_f?
+        >> lit("in")
+        >> (range_r(_r1) // FOREACHCHANGE: add type checking here to make sure that what we have is one of three OK cases. If not, then throw error. Further check for one specific type type (here range) (as written now). If not, then don't match. So should add an  > eps[type check for one of three types] after this.
+            > lit(')'))
+        >> (eps[add_loop_identifier_f(_a, _a, _r1, _pass,
                                          boost::phoenix::ref(var_map_),
                                          boost::phoenix::ref(error_msgs_))]
-        > statement_r(_r1, true)
-        > eps
+            > statement_r(_r1, true))
+        >> eps
         [remove_loop_identifier_f(_a, boost::phoenix::ref(var_map_))];
 
       // _r1 = var scope
       foreach_a_statement_r.name("foreach (array) statement");
       foreach_a_statement_r
         %= (lit("fora") >> no_skip[!char_("a-zA-Z0-9_")])
-        > lit('(')
-        > identifier_r[store_loop_identifier_f(_1, _a)]
-        > lit("in")
-        > expression_rhs_r(_r1)//[infer_array_expr_type_f(_b, _1, _r1, _pass,
-                                       //boost::phoenix::ref(var_map_),
-                                       //boost::phoenix::ref(error_msgs_))]//FOREACHCHANGE:
-        > lit(')')
-        > eps[add_loop_identifier_f(_a, _a, _r1, _pass,
+        >> lit('(')
+        >> identifier_r[store_loop_identifier_f(_1, _a)]
+        >> lit("in")
+        >> expression_rhs_r(_r1)//[_1.expression_type().num_dims > 0] //FOREACHCHANGE:
+        >> lit(')')
+        >> eps[add_loop_identifier_f(_a, _a, _r1, _pass,
                                          boost::phoenix::ref(var_map_),
-                                         boost::phoenix::ref(error_msgs_))]
-        > statement_r(_r1, true)
-        > eps
+                                         boost::phoenix::ref(error_msgs_))] //FOREACHCHANGE: pass type of identifier as argument to add_loop_identifier_f and make different for three loops.
+        >> statement_r(_r1, true)
+        >> eps
         [remove_loop_identifier_f(_a, boost::phoenix::ref(var_map_))];
 
       // _r1 = var scope
@@ -244,7 +242,7 @@ namespace stan {
         > lit(')')
         > eps[add_loop_identifier_f(_a, _a, _r1, _pass,
                                          boost::phoenix::ref(var_map_),
-                                         boost::phoenix::ref(error_msgs_))] 
+                                         boost::phoenix::ref(error_msgs_))]  //FOREACHCHANGE: pass type of identifier as argument to add_loop_identifier_f and make different for three loops.
         > statement_r(_r1, true)
         > eps
         [remove_loop_identifier_f(_a, boost::phoenix::ref(var_map_))];
