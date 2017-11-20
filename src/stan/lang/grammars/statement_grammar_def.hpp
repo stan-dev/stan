@@ -42,12 +42,12 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::for_statement,
                           (stan::lang::range, range_)
                           (stan::lang::statement, statement_) )
 
-BOOST_FUSION_ADAPT_STRUCT(stan::lang::foreach_a_statement,
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::for_array_statement,
                           (std::string, variable_)
                           (stan::lang::expression, expression_) //FOREACHCHANGE: range type needs to be changed
                           (stan::lang::statement, statement_) )
 
-BOOST_FUSION_ADAPT_STRUCT(stan::lang::foreach_m_statement,
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::for_matrix_statement,
                           (std::string, variable_)
                           (stan::lang::expression, expression_) //FOREACHCHANGE: range type needs to be changed
                           (stan::lang::statement, statement_) )
@@ -124,8 +124,8 @@ namespace stan {
         | increment_log_prob_statement_r(_r1)       // key "increment_log_prob"
         | increment_target_statement_r(_r1)         // key "target"
         | for_statement_r(_r1)                      // key "for"
-        | foreach_a_statement_r(_r1)                // key "fora"
-        | foreach_m_statement_r(_r1)                // key "form"
+        | for_array_statement_r(_r1)                // key "for"
+        | for_matrix_statement_r(_r1)                // key "for"
         | while_statement_r(_r1)                    // key "while"
         | break_continue_statement_r(_r2)           // key "break", "continue"
         | statement_2_g(_r1, _r2)                   // key "if"
@@ -216,9 +216,9 @@ namespace stan {
         [remove_loop_identifier_f(_a, boost::phoenix::ref(var_map_))];
 
       // _r1 = var scope
-      foreach_a_statement_r.name("foreach (array) statement");
-      foreach_a_statement_r
-        %= (lit("fora") >> no_skip[!char_("a-zA-Z0-9_")])
+      for_array_statement_r.name("foreach (array) statement");
+      for_array_statement_r
+        %= (lit("for") >> no_skip[!char_("a-zA-Z0-9_")])
         >> lit('(')
         >> identifier_r[store_loop_identifier_f(_1, _a)]
         >> lit("in")
@@ -231,9 +231,9 @@ namespace stan {
         [remove_loop_identifier_f(_a, boost::phoenix::ref(var_map_))];
 
       // _r1 = var scope
-      foreach_m_statement_r.name("foreach (matrix/vector) statement");
-      foreach_m_statement_r
-        %= (lit("form") >> no_skip[!char_("a-zA-Z0-9_")])
+      for_matrix_statement_r.name("foreach (matrix/vector) statement");
+      for_matrix_statement_r
+        %= (lit("for") >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('(')
         > identifier_r[store_loop_identifier_f(_1, _a)]
         > lit("in")

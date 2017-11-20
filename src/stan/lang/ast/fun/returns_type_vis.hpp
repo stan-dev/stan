@@ -17,8 +17,8 @@ namespace stan {
     struct expression;
     struct statements;
     struct for_statement;
-    struct foreach_a_statement;
-    struct foreach_m_statement;
+    struct for_array_statement;
+    struct for_matrix_statement;
     struct conditional_statement;
     struct while_statement;
     struct break_continue_statement;
@@ -141,7 +141,7 @@ namespace stan {
        * @param[in] st statement
        * @return false
        */
-      bool operator()(const foreach_a_statement& st) const;
+      bool operator()(const for_array_statement& st) const;
 
       /**
        * Return true if the specified statement is a return statement
@@ -151,7 +151,7 @@ namespace stan {
        * @param[in] st statement
        * @return false
        */
-      bool operator()(const foreach_m_statement& st) const;
+      bool operator()(const for_matrix_statement& st) const;
 
       /**
        * Return true if the specified statement is a return statement

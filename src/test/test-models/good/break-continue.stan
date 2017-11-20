@@ -32,40 +32,33 @@ functions {
     // nested foreach (array)
     while (1) {
       int vs[2];
-      fora (v in vs) break; 
-      //FOREACHCHANGE: this needs to be changed (range)
-      fora (v in vs) continue;
-      //FOREACHCHANGE: this needs to be changed (range)
+      for (v in vs) break; 
+      for (v in vs) continue;
+      for (v in vs) v = 3;
     }
 
     // nested foreach (matrix)
     while (1) {
       matrix[2,3] vs;
-      form (v in vs) break; 
-      //FOREACHCHANGE: this needs to be changed (range)
-      form (v in vs) continue;
-      //FOREACHCHANGE: this needs to be changed (range)
-      form (v in vs) v = 3;
+      for (v in vs) break; 
+      for (v in vs) continue;
+      for (v in vs) v = 3.2;
     }
 
     // nested foreach (vector)
     while (1) {
       vector[2] vs;
-      form (v in vs) break; 
-      //FOREACHCHANGE: this needs to be changed (range)
-      form (v in vs) continue;
-      //FOREACHCHANGE: this needs to be changed (range)
-      form (v in vs) v = 3;
+      for (v in vs) break; 
+      for (v in vs) continue;
+      for (v in vs) v = 3.2;
     }
 
     // nested foreach (rowvector)
     while (1) {
       row_vector[2] vs;
-      form (v in vs) break; 
-      //FOREACHCHANGE: this needs to be changed (range)
-      form (v in vs) continue;
-      //FOREACHCHANGE: this needs to be changed (range)
-      form (v in vs) v = 3;
+      for (v in vs) break; 
+      for (v in vs) continue;
+      for (v in vs) v = 3.2;
     }
 
     // nested block

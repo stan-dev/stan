@@ -337,7 +337,7 @@ namespace stan {
         o_ << "}" << EOL;
       }
 
-      void operator()(const foreach_a_statement& x) const {
+      void operator()(const for_array_statement& x) const {
         generate_indent(indent_, o_);
         //FOREACHCHANGE: Here, we need to decide whether we'd like an auto or auto&.
         o_ << "for (auto& " << x.variable_ << " : ";
@@ -348,7 +348,7 @@ namespace stan {
         o_ << "}" << EOL;
       }
 
-      void operator()(const foreach_m_statement& x) const {
+      void operator()(const for_matrix_statement& x) const {
         generate_indent(indent_, o_);
         o_ << "for (int " << x.variable_ << "__loopid1 = 0";
         o_ << "; " << x.variable_ << "__loopid1 < ";

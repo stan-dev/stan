@@ -2759,7 +2759,6 @@ namespace stan {
 
       // illegal identifiers
       reserve("for");
-      reserve("form");
       reserve("in");
       reserve("while");
       reserve("repeat");
@@ -2837,7 +2836,6 @@ namespace stan {
       reserve("false");
       reserve("float");
       reserve("for");
-      reserve("form");
       reserve("friend");
       reserve("goto");
       reserve("if");
