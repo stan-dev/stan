@@ -206,7 +206,7 @@ namespace stan {
         >> lit('(')
         >> identifier_r[store_loop_identifier_f(_1, _a)] // can we use assign_lhs_f?
         >> lit("in")
-        >> (range_r(_r1) // FOREACHCHANGE: add type checking here to make sure that what we have is one of three OK cases. If not, then throw error. Further check for one specific type type (here range) (as written now). If not, then don't match. So should add an  > eps[type check for one of three types] after this.
+        >> (range_r(_r1)
             > lit(')'))
         >> (eps[add_loop_identifier_f(_a, _a, _r1, _pass,
                                          boost::phoenix::ref(var_map_),
@@ -225,7 +225,7 @@ namespace stan {
         >> (expression_rhs_r(_r1)[add_array_loop_identifier_f(_1, _a, _r1, _pass,
                                          boost::phoenix::ref(var_map_),
                                          boost::phoenix::ref(error_msgs_))] //FOREACHCHANGE:
-            > lit(')')//FOREACHCHANGE: pass type of identifier as argument to add_loop_identifier_f and make different for three loops.
+            > lit(')')
             > statement_r(_r1, true))
         >> eps
         [remove_loop_identifier_f(_a, boost::phoenix::ref(var_map_))];
@@ -241,7 +241,6 @@ namespace stan {
                                          boost::phoenix::ref(var_map_),
                                          boost::phoenix::ref(error_msgs_))] //FOREACHCHANGE:
         > lit(')')
-        //FOREACHCHANGE: pass type of identifier as argument to add_loop_identifier_f and make different for three loops.
         > statement_r(_r1, true)
         > eps
         [remove_loop_identifier_f(_a, boost::phoenix::ref(var_map_))];

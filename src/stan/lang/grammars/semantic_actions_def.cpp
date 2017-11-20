@@ -1475,9 +1475,7 @@ namespace stan {
         error_msgs << "ERROR: loop variable already declared."
                    << " variable name=\"" << name << "\"" << std::endl;
       else
-        vm.add(name, base_var_decl(name, std::vector<expression>(),
-                                   //expr_type(expr.expression_type().type(), numdims - 1)),
-                                   int_type()),
+        vm.add(name, base_var_decl(name, std::vector<expression>(), expr.expression_type().type()),
                scope(var_scope.program_block(), true));
     }
     boost::phoenix::function<add_array_loop_identifier> add_array_loop_identifier_f;
