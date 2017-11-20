@@ -237,11 +237,11 @@ namespace stan {
         > lit('(')
         > identifier_r[store_loop_identifier_f(_1, _a)]
         > lit("in")
-        > expression_rhs_r(_r1)//FOREACHCHANGE:
-        > lit(')')
-        > eps[add_loop_identifier_f(_a, _a, _r1, _pass,
+        > expression_rhs_r(_r1)[add_matrix_loop_identifier_f(_1, _a, _r1, _pass,
                                          boost::phoenix::ref(var_map_),
-                                         boost::phoenix::ref(error_msgs_))]  //FOREACHCHANGE: pass type of identifier as argument to add_loop_identifier_f and make different for three loops.
+                                         boost::phoenix::ref(error_msgs_))] //FOREACHCHANGE:
+        > lit(')')
+        //FOREACHCHANGE: pass type of identifier as argument to add_loop_identifier_f and make different for three loops.
         > statement_r(_r1, true)
         > eps
         [remove_loop_identifier_f(_a, boost::phoenix::ref(var_map_))];

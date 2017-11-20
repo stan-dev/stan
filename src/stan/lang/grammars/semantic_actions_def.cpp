@@ -1482,6 +1482,26 @@ namespace stan {
     }
     boost::phoenix::function<add_array_loop_identifier> add_array_loop_identifier_f;
 
+    void add_matrix_loop_identifier::operator()(const stan::lang::expression& expr,
+                                         std::string& name,
+                                         const scope& var_scope,
+                                         bool& pass, variable_map& vm,
+                                         std::stringstream& error_msgs) const {
+      pass = !(vm.exists(name))
+             && (expr.expression_type().num_dims() == 0)
+             && (expr.expression_type().type().is_matrix_type() ||
+                 expr.expression_type().type().is_vector_type() ||
+                 expr.expression_type().type().is_row_vector_type());
+      if (!pass)
+        error_msgs << "ERROR: loop variable already declared."
+                   << " variable name=\"" << name << "\"" << std::endl;
+      else
+        vm.add(name, base_var_decl(name, std::vector<expression>(),
+                                   double_type()),
+               scope(var_scope.program_block(), true));
+    }
+    boost::phoenix::function<add_matrix_loop_identifier> add_matrix_loop_identifier_f;
+
     void store_loop_identifier::operator()(const std::string& name,
                                            std::string& name_local) const {
       name_local = name;
