@@ -202,7 +202,8 @@ namespace stan {
       // _r1 = var scope
       for_statement_r.name("for statement");
       for_statement_r
-        %= (lit("for") >> no_skip[!char_("a-zA-Z0-9_")])
+        %= lit("for")
+        >> no_skip[!char_("a-zA-Z0-9_")]
         >> lit('(')
         >> identifier_r[store_loop_identifier_f(_1, _a)] // can we use assign_lhs_f?
         >> lit("in")
@@ -212,26 +213,28 @@ namespace stan {
                                          boost::phoenix::ref(var_map_),
                                          boost::phoenix::ref(error_msgs_))]
             > statement_r(_r1, true))
-        >> eps
+        > eps
         [remove_loop_identifier_f(_a, boost::phoenix::ref(var_map_))];
 
       // _r1 = var scope
       for_array_statement_r.name("foreach (array) statement");
       for_array_statement_r
-        %= (lit("for") >> no_skip[!char_("a-zA-Z0-9_")])
+        %= lit("for")
+        >> no_skip[!char_("a-zA-Z0-9_")]
         >> lit('(')
         >> identifier_r[store_loop_identifier_f(_1, _a)]
         >> lit("in")
         >> (expression_rhs_r(_r1)[add_array_loop_identifier_f(_1, _a, _r1, _pass,
                                          boost::phoenix::ref(var_map_),
                                          boost::phoenix::ref(error_msgs_))] //FOREACHCHANGE:
-            > lit(')')
-            > statement_r(_r1, true))
-        >> eps
-        [remove_loop_identifier_f(_a, boost::phoenix::ref(var_map_))];
+            > lit(')'))
+        >> (eps  
+            > statement_r(_r1, true)) // We probably want to make the error checking here a bit more stringent. Also, clearly the add_array_loop_identifier_f needs to get its dimensions fixed.
+        > eps
+           [remove_loop_identifier_f(_a, boost::phoenix::ref(var_map_))];
 
       // _r1 = var scope
-      for_matrix_statement_r.name("foreach (matrix/vector) statement");
+      for_matrix_statement_r.name("foreach (matrix/vector/rowvector) statement");
       for_matrix_statement_r
         %= (lit("for") >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('(')

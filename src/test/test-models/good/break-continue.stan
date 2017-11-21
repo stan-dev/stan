@@ -35,6 +35,8 @@ functions {
       for (v in vs) break; 
       for (v in vs) continue;
       for (v in vs) v = 3;
+//      int ws[2, 3];
+//      for (w in ws) w = {4, 1};
     }
 
     // nested foreach (matrix)
