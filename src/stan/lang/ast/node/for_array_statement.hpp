@@ -26,7 +26,7 @@ namespace stan {
        * @param[in] stmt body of the foreach loop
        */
       for_array_statement(const std::string& variable,
-                          const expression& expression, //FOREACHCHANGE: really, this should be an array_expr. where do we do the type checking?
+                          const expression& expression,
                           const statement& stmt);
 
       /**
@@ -37,7 +37,7 @@ namespace stan {
       /**
        * The expression of values for the loop variable.
        */
-      expression expression_; //FOREACHCHANGE:  really, this should be an array_expr. where do we do the type checking?
+      expression expression_;
 
       /**
        * The body of the foreach loop.

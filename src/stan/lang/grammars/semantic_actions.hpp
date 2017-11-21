@@ -495,7 +495,8 @@ namespace stan {
                       bool& pass, variable_map& vm,
                       std::stringstream& error_msgs) const;
     };
-    extern boost::phoenix::function<add_array_loop_identifier> add_array_loop_identifier_f;
+    extern boost::phoenix::function<add_array_loop_identifier>
+      add_array_loop_identifier_f;
 
     // called from: statement_grammar
     struct add_matrix_loop_identifier : public phoenix_functor_senary {
@@ -505,14 +506,16 @@ namespace stan {
                       bool& pass, variable_map& vm,
                       std::stringstream& error_msgs) const;
     };
-    extern boost::phoenix::function<add_matrix_loop_identifier> add_matrix_loop_identifier_f;
+    extern boost::phoenix::function<add_matrix_loop_identifier>
+      add_matrix_loop_identifier_f;
 
     // called from: statement_grammar
     struct store_loop_identifier : public phoenix_functor_binary {
       void operator()(const std::string& name,
                       std::string& name_local) const;
     };
-    extern boost::phoenix::function<store_loop_identifier> store_loop_identifier_f;
+    extern boost::phoenix::function<store_loop_identifier>
+      store_loop_identifier_f;
 
     // called from: statement_grammar
     struct remove_loop_identifier : public phoenix_functor_binary {

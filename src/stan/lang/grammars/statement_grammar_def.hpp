@@ -44,12 +44,12 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::for_statement,
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::for_array_statement,
                           (std::string, variable_)
-                          (stan::lang::expression, expression_) //FOREACHCHANGE: range type needs to be changed
+                          (stan::lang::expression, expression_)
                           (stan::lang::statement, statement_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::for_matrix_statement,
                           (std::string, variable_)
-                          (stan::lang::expression, expression_) //FOREACHCHANGE: range type needs to be changed
+                          (stan::lang::expression, expression_)
                           (stan::lang::statement, statement_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::return_statement,
@@ -125,7 +125,7 @@ namespace stan {
         | increment_target_statement_r(_r1)         // key "target"
         | for_statement_r(_r1)                      // key "for"
         | for_array_statement_r(_r1)                // key "for"
-        | for_matrix_statement_r(_r1)                // key "for"
+        | for_matrix_statement_r(_r1)               // key "for"
         | while_statement_r(_r1)                    // key "while"
         | break_continue_statement_r(_r2)           // key "break", "continue"
         | statement_2_g(_r1, _r2)                   // key "if"
@@ -205,7 +205,7 @@ namespace stan {
         %= lit("for")
         >> no_skip[!char_("a-zA-Z0-9_")]
         >> lit('(')
-        >> identifier_r[store_loop_identifier_f(_1, _a)] // can we use assign_lhs_f?
+        >> identifier_r[store_loop_identifier_f(_1, _a)]
         >> lit("in")
         >> (range_r(_r1)
             > lit(')'))
@@ -217,24 +217,25 @@ namespace stan {
         [remove_loop_identifier_f(_a, boost::phoenix::ref(var_map_))];
 
       // _r1 = var scope
-      for_array_statement_r.name("foreach (array) statement");
+      for_array_statement_r.name("for (array) statement");
       for_array_statement_r
         %= lit("for")
         >> no_skip[!char_("a-zA-Z0-9_")]
         >> lit('(')
         >> identifier_r[store_loop_identifier_f(_1, _a)]
         >> lit("in")
-        >> (expression_rhs_r(_r1)[add_array_loop_identifier_f(_1, _a, _r1, _pass,
+        >> (expression_rhs_r(_r1)[add_array_loop_identifier_f(_1, _a, _r1,
+                                         _pass,
                                          boost::phoenix::ref(var_map_),
-                                         boost::phoenix::ref(error_msgs_))] //FOREACHCHANGE:
+                                         boost::phoenix::ref(error_msgs_))]
             > lit(')'))
-        >> (eps  
-            > statement_r(_r1, true)) // We probably want to make the error checking here a bit more stringent. Also, clearly the add_array_loop_identifier_f needs to get its dimensions fixed.
+        >> (eps
+            > statement_r(_r1, true))
         > eps
            [remove_loop_identifier_f(_a, boost::phoenix::ref(var_map_))];
 
       // _r1 = var scope
-      for_matrix_statement_r.name("foreach (matrix/vector/rowvector) statement");
+      for_matrix_statement_r.name("for (matrix/vector/rowvector) statement");
       for_matrix_statement_r
         %= (lit("for") >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('(')
@@ -242,7 +243,7 @@ namespace stan {
         > lit("in")
         > expression_rhs_r(_r1)[add_matrix_loop_identifier_f(_1, _a, _r1, _pass,
                                          boost::phoenix::ref(var_map_),
-                                         boost::phoenix::ref(error_msgs_))] //FOREACHCHANGE:
+                                         boost::phoenix::ref(error_msgs_))]
         > lit(')')
         > statement_r(_r1, true)
         > eps

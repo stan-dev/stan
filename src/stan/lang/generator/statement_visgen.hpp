@@ -339,7 +339,6 @@ namespace stan {
 
       void operator()(const for_array_statement& x) const {
         generate_indent(indent_, o_);
-        //FOREACHCHANGE: Here, we need to decide whether we'd like an auto or auto&.
         o_ << "for (auto& " << x.variable_ << " : ";
         generate_expression(x.expression_, NOT_USER_FACING, o_);
         o_ << ") {" << EOL;
@@ -362,7 +361,8 @@ namespace stan {
         generate_indent(indent_ + 2, o_);
         o_ << "auto& " << x.variable_ << " = ";
         generate_expression(x.expression_, NOT_USER_FACING, o_);
-        o_ << "(" << x.variable_ << "__loopid2, " << x.variable_ << "__loopid1);"  << EOL;
+        o_ << "(" << x.variable_ << "__loopid2, " << x.variable_
+           << "__loopid1);"  << EOL;
         generate_statement(x.statement_, indent_ + 2, o_);
         generate_indent(indent_ + 1, o_);
         o_ << "}" << EOL;

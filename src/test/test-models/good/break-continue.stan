@@ -15,7 +15,7 @@ functions {
       b = 5;
       break;
     }
-    
+
     // if, else if, else body
     while (1) {
       if (0) break;

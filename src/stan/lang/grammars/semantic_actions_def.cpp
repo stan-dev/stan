@@ -1464,11 +1464,12 @@ namespace stan {
     }
     boost::phoenix::function<add_loop_identifier> add_loop_identifier_f;
 
-    void add_array_loop_identifier::operator()(const stan::lang::expression& expr,
-                                         std::string& name,
-                                         const scope& var_scope,
-                                         bool& pass, variable_map& vm,
-                                         std::stringstream& error_msgs) const {
+    void add_array_loop_identifier
+      ::operator()(const stan::lang::expression& expr,
+                   std::string& name,
+                   const scope& var_scope,
+                   bool& pass, variable_map& vm,
+                   std::stringstream& error_msgs) const {
       int numdims = expr.expression_type().num_dims();
       pass = !(vm.exists(name)) && (numdims > 0);
       if (!pass)
@@ -1477,17 +1478,20 @@ namespace stan {
       else {
         std::cout << numdims << " ";
         std::vector<expression> dimvector(numdims - 1);
-        vm.add(name, base_var_decl(name, dimvector, expr.expression_type().type()),
+        vm.add(name, base_var_decl(name, dimvector,
+                                   expr.expression_type().type()),
                scope(var_scope.program_block(), true));
       }
     }
-    boost::phoenix::function<add_array_loop_identifier> add_array_loop_identifier_f;
+    boost::phoenix::function<add_array_loop_identifier>
+      add_array_loop_identifier_f;
 
-    void add_matrix_loop_identifier::operator()(const stan::lang::expression& expr,
-                                         std::string& name,
-                                         const scope& var_scope,
-                                         bool& pass, variable_map& vm,
-                                         std::stringstream& error_msgs) const {
+    void add_matrix_loop_identifier
+      ::operator()(const stan::lang::expression& expr,
+                   std::string& name,
+                   const scope& var_scope,
+                   bool& pass, variable_map& vm,
+                   std::stringstream& error_msgs) const {
       pass = !(vm.exists(name))
              && (expr.expression_type().num_dims() == 0)
              && (expr.expression_type().type().is_matrix_type() ||
@@ -1501,7 +1505,8 @@ namespace stan {
                                    double_type()),
                scope(var_scope.program_block(), true));
     }
-    boost::phoenix::function<add_matrix_loop_identifier> add_matrix_loop_identifier_f;
+    boost::phoenix::function<add_matrix_loop_identifier>
+      add_matrix_loop_identifier_f;
 
     void store_loop_identifier::operator()(const std::string& name,
                                            std::string& name_local) const {
