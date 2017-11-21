@@ -27,16 +27,20 @@ functions {
     while (1) while (0) break;
 
     // nested for
-    while (1) for (i in 1:10) break;
+    while (1) {
+      for (i in 1:10) break;
+    }
 
     // nested foreach (array)
     while (1) {
-      int vs[2];
+      int vs[2, 3];
       for (v in vs) break; 
       for (v in vs) continue;
-      for (v in vs) v = 3;
-//      int ws[2, 3];
-//      for (w in ws) w = {4, 1};
+      for (v in vs) v[1] = 3;
+      for (v in vs) {
+        for (vv in v) break;
+        v[1] = 1;
+      }
     }
 
     // nested foreach (matrix)

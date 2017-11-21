@@ -1469,14 +1469,17 @@ namespace stan {
                                          const scope& var_scope,
                                          bool& pass, variable_map& vm,
                                          std::stringstream& error_msgs) const {
-      std::size_t numdims = expr.expression_type().num_dims();
+      int numdims = expr.expression_type().num_dims();
       pass = !(vm.exists(name)) && (numdims > 0);
       if (!pass)
         error_msgs << "ERROR: loop variable already declared."
                    << " variable name=\"" << name << "\"" << std::endl;
-      else
-        vm.add(name, base_var_decl(name, std::vector<expression>(), expr.expression_type().type()),
+      else {
+        std::cout << numdims << " ";
+        std::vector<expression> dimvector(numdims - 1);
+        vm.add(name, base_var_decl(name, dimvector, expr.expression_type().type()),
                scope(var_scope.program_block(), true));
+      }
     }
     boost::phoenix::function<add_array_loop_identifier> add_array_loop_identifier_f;
 
