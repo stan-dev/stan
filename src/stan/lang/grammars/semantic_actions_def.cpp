@@ -1479,8 +1479,7 @@ namespace stan {
         pass = false;
         error_msgs << "ERROR: can only loop over container or range."
                    << std::endl;
-      }
-      else {
+      } else {
         std::vector<expression> dimvector(numdims - 1);
         vm.add(name, base_var_decl(name, dimvector,
                                    expr.expression_type().type()),
@@ -1507,11 +1506,11 @@ namespace stan {
         pass = false;
         error_msgs << "ERROR: can only loop over container or range."
                    << std::endl;
-      }
-      else
+      } else {
         vm.add(name, base_var_decl(name, std::vector<expression>(),
                                    double_type()),
                scope(var_scope.program_block(), true));
+      }
     }
     boost::phoenix::function<add_matrix_loop_identifier>
       add_matrix_loop_identifier_f;

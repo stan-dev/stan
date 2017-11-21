@@ -44,11 +44,13 @@ namespace stan {
       return false;
     }
 
-    bool is_no_op_statement_vis::operator()(const for_array_statement& st) const {
+    bool is_no_op_statement_vis
+      ::operator()(const for_array_statement& st) const {
       return false;
     }
 
-    bool is_no_op_statement_vis::operator()(const for_matrix_statement& st) const {
+    bool is_no_op_statement_vis
+      ::operator()(const for_matrix_statement& st) const {
       return false;
     }
 
