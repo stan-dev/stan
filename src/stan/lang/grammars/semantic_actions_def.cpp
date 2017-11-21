@@ -1471,12 +1471,16 @@ namespace stan {
                    bool& pass, variable_map& vm,
                    std::stringstream& error_msgs) const {
       int numdims = expr.expression_type().num_dims();
-      pass = !(vm.exists(name)) && (numdims > 0);
+      pass = !(vm.exists(name));
       if (!pass)
         error_msgs << "ERROR: loop variable already declared."
                    << " variable name=\"" << name << "\"" << std::endl;
+      if (!(numdims > 0)) {
+        pass = false;
+        error_msgs << "ERROR: can only loop over container or range."
+                   << std::endl;
+      }
       else {
-        std::cout << numdims << " ";
         std::vector<expression> dimvector(numdims - 1);
         vm.add(name, base_var_decl(name, dimvector,
                                    expr.expression_type().type()),
@@ -1492,14 +1496,18 @@ namespace stan {
                    const scope& var_scope,
                    bool& pass, variable_map& vm,
                    std::stringstream& error_msgs) const {
-      pass = !(vm.exists(name))
-             && (expr.expression_type().num_dims() == 0)
-             && (expr.expression_type().type().is_matrix_type() ||
-                 expr.expression_type().type().is_vector_type() ||
-                 expr.expression_type().type().is_row_vector_type());
+      pass = !(vm.exists(name));
       if (!pass)
         error_msgs << "ERROR: loop variable already declared."
                    << " variable name=\"" << name << "\"" << std::endl;
+      if (!(expr.expression_type().num_dims() == 0)
+            || !(expr.expression_type().type().is_matrix_type()
+                 || expr.expression_type().type().is_vector_type()
+                 || expr.expression_type().type().is_row_vector_type())) {
+        pass = false;
+        error_msgs << "ERROR: can only loop over container or range."
+                   << std::endl;
+      }
       else
         vm.add(name, base_var_decl(name, std::vector<expression>(),
                                    double_type()),
