@@ -287,11 +287,11 @@ namespace stan {
       range_r.name("range expression pair, colon");
       range_r
         %= expression_g(_r1)
-           [validate_int_expr_f(_1, _pass,
+           [validate_int_expr_no_error_msgs_f(_1, _pass,
                                      boost::phoenix::ref(error_msgs_))]
         >> lit(':')
         >> expression_g(_r1)
-           [validate_int_expr_f(_1, _pass,
+           [validate_int_expr_no_error_msgs_f(_1, _pass,
                                      boost::phoenix::ref(error_msgs_))];
 
       // _r1 = var scope

@@ -1477,8 +1477,6 @@ namespace stan {
                    << " variable name=\"" << name << "\"" << std::endl;
       if (!(numdims > 0)) {
         pass = false;
-        error_msgs << "ERROR: can only loop over container or range."
-                   << std::endl;
       } else {
         std::vector<expression> dimvector(numdims - 1);
         vm.add(name, base_var_decl(name, dimvector,
@@ -1504,7 +1502,7 @@ namespace stan {
                  || expr.expression_type().type().is_vector_type()
                  || expr.expression_type().type().is_row_vector_type())) {
         pass = false;
-        error_msgs << "ERROR: can only loop over container or range."
+        error_msgs << "ERROR: loop must be over container or range."
                    << std::endl;
       } else {
         vm.add(name, base_var_decl(name, std::vector<expression>(),
@@ -1540,6 +1538,19 @@ namespace stan {
       pass = true;
     }
     boost::phoenix::function<validate_int_expr> validate_int_expr_f;
+
+    void validate_int_expr_no_error_msgs::operator()(const expression& expr,
+                                            bool& pass,
+                                            std::stringstream& error_msgs)
+      const {
+      if (!expr.expression_type().is_primitive_int()) {
+        pass = false;
+        return;
+      }
+      pass = true;
+    }
+    boost::phoenix::function<validate_int_expr_no_error_msgs>
+      validate_int_expr_no_error_msgs_f;
 
     void deprecate_increment_log_prob::operator()(
                                        std::stringstream& error_msgs) const {

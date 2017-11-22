@@ -856,6 +856,13 @@ namespace stan {
     };
     extern boost::phoenix::function<validate_int_expr> validate_int_expr_f;
 
+    struct validate_int_expr_no_error_msgs : public phoenix_functor_ternary {
+      void operator()(const expression& expr, bool& pass,
+                      std::stringstream& error_msgs) const;
+    };
+    extern boost::phoenix::function<validate_int_expr_no_error_msgs>
+      validate_int_expr_no_error_msgs_f;
+
     struct set_int_range_lower : public phoenix_functor_quaternary {
       void operator()(range& range, const expression& expr, bool& pass,
                       std::stringstream& error_msgs) const;
