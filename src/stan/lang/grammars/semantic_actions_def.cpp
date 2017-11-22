@@ -1494,10 +1494,10 @@ namespace stan {
                    bool& pass, variable_map& vm,
                    std::stringstream& error_msgs) const {
       pass = !(vm.exists(name));
-      if (!pass)
+      if (!pass) {
         error_msgs << "ERROR: loop variable already declared."
                    << " variable name=\"" << name << "\"" << std::endl;
-      else if (!(expr.expression_type().num_dims() == 0)
+      } else if (!(expr.expression_type().num_dims() == 0)
             || !(expr.expression_type().type().is_matrix_type()
                  || expr.expression_type().type().is_vector_type()
                  || expr.expression_type().type().is_row_vector_type())) {
