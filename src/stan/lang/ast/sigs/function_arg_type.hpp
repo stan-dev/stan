@@ -60,7 +60,7 @@ namespace stan {
       /**
        * Return true if the `expr_type` of the specified
        * `function_arg_type` is not equal to the
-       * `expr_type` of this `function_arg_type</
+       * `expr_type` of this `function_arg_type`.
        * Ignore status of bool `data_only_`.
        *
        * @param fa_type other function argument type.
