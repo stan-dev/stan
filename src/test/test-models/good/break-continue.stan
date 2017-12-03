@@ -34,11 +34,19 @@ functions {
     // nested foreach (array)
     while (1) {
       int vs[2, 3];
-      for (v in vs) break; 
-      for (v in vs) continue;
-      for (v in vs) v[1] = 3;
       for (v in vs) {
-        for (vv in v) break;
+        v[1] = 0;
+        break;
+      }        
+      for (v in vs) {
+        v[1] = 0;
+        continue;
+      }
+      for (v in vs) {
+        for (vv in v) {
+          vv = 0;
+          break;
+        }
         v[1] = 1;
       }
     }
@@ -46,25 +54,40 @@ functions {
     // nested foreach (matrix)
     while (1) {
       matrix[2,3] vs;
-      for (v in vs) break; 
-      for (v in vs) continue;
-      for (v in vs) v = 3.2;
+      for (v in vs) {
+        v = 0;
+        break;
+      }
+      for (v in vs) {
+        v = 3.2;
+        continue;
+      }
     }
 
     // nested foreach (vector)
     while (1) {
       vector[2] vs;
-      for (v in vs) break; 
-      for (v in vs) continue;
-      for (v in vs) v = 3.2;
+      for (v in vs) {
+        v = 0;
+        break;
+      }
+      for (v in vs) {
+        v = 3.2;
+        continue;
+      }
     }
 
     // nested foreach (rowvector)
     while (1) {
       row_vector[2] vs;
-      for (v in vs) break; 
-      for (v in vs) continue;
-      for (v in vs) v = 3.2;
+      for (v in vs) {
+        v = 0;
+        break;
+      }
+      for (v in vs) {
+        v = 3.2;
+        continue;
+      }
     }
 
     // nested block
