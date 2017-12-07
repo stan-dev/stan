@@ -342,6 +342,7 @@ namespace stan {
         o_ << "for (auto& " << x.variable_ << " : ";
         generate_expression(x.expression_, NOT_USER_FACING, o_);
         o_ << ") {" << EOL;
+        generate_void_statement(x.variable_, indent_, o_);
         generate_statement(x.statement_, indent_ + 1, o_);
         generate_indent(indent_, o_);
         o_ << "}" << EOL;
@@ -359,6 +360,7 @@ namespace stan {
         generate_indent(indent_ + 1, o_);
         o_ << "auto& " << x.variable_ << " = *(";
         o_ << x.variable_ << "__loopid);"  << EOL;
+        generate_void_statement(x.variable_, indent_, o_);
         generate_statement(x.statement_, indent_ + 1, o_);
         generate_indent(indent_, o_);
         o_ << "}" << EOL;
