@@ -9,18 +9,31 @@ and comment syntax for the Stan language.
 
 \section{Character Encoding}
 
-\subsection{Stan Program}
+\subsection{Content}
 
-The content of a Stan program must be coded in ASCII.  Extended
-character sets such as UTF-8 encoded Unicode may not be used for
-identifiers or other text in a program.
+The content of a Stan program must be coded in ASCII.  All identifiers
+must consist of only ASCII alpha-numeric characters and the underscore
+character.  All arithmetic operators and punctuation must be coded in
+ASCII.
+
+\subsubsection{Compatibility with Latin-1 and UTF-8}
+
+The UTF-8 encoding of Unicode and the Latin-1 (ISO-8859-1) encoding
+share the first 128 code points with ASCII and thus cannot be
+distinguished from ASCII.  That means you can set editors, etc., to
+use UTF-8 or Latin-1 (or the other Latin-n variants) without worrying
+that the content of a Stan program will be destroyed.
 
 \subsection{Comments}
 
-The content of comments is ignored by the language compiler and may be
-written using any character encoding (e.g., ASCII, UTF-8, Latin1,
-Big5).  The comment delimiters themselves must be coded in ASCII.
+Any bytes on a line after a line-comment sequence (\code{//} or
+\Verb|#|) are ignored up until the ASCII newline character
+(\Verb|\n|).  They may thus be written in any character encoding which
+is convenient.
 
+Any content after a block comment open sequence in ASCII (\code{/*})
+up to the closing block comment (\code{*/}) is ignored, and thus may
+also be written in whatever character set is convenient.
 
 \section{Includes}\label{includes.section}
 
@@ -281,7 +294,7 @@ If this condition is violated with parameter values that satisfy
 declared constraints but do not have finite log density, then the
 samplers and optimizers may have any of a number of pathologies
 including just getting stuck, failure to initialize, excessive
-Metropolis rejection, or biased samples due to inability to explore
+Metropolis rejection, or biased draws due to inability to explore
 the tails of the distribution.
 
 
@@ -503,6 +516,36 @@ ranging between the minimum and maximum value of \code{y}.  As shown
 in the example code, the functions \code{min()} and \code{max()} may
 be applied to containers such as arrays.
 
+\subsection{Declaring Optional Variables}
+
+A variable may be declared with a size that depends on a boolean
+constant.  For example, consider the definition of \code{alpha} in the
+following program fragment.
+%
+\begin{stancode}
+data {
+  int<lower = 0, upper = 1> include_alpha;
+  ...
+parameters {
+  vector[include_alpha ? N : 0] alpha;
+\end{stancode}
+%
+If \code{include\_alpha} is true, the model will include the vector
+\code{alpha};  if the flag is false, the model will not include
+\code{alpha} (technically, it will include \code{alpha} of size 0,
+which means it won't contain any values and won't be included in any
+output).
+
+This technique is not just useful for containers.  If the value of
+\code{N} is set to 1, then the vector \code{alpha} will contain a
+single element and thus \code{alpha[1]} behaves like an optional
+scalar, the existence of which is controlled by \code{include\_alpha}.
+
+This coding pattern allows a single Stan program to define different
+models based on the data provided as input.  This strategy is used
+extensively in the implementation of the RStanArm package (see
+\url{http://mc-stan.org/users/interfaces/rstanarm}).
+
 \section{Vector and Matrix Data Types}
 
 Stan provides three types of container objects: arrays, vectors, and
@@ -655,8 +698,8 @@ The variable \code{d} is declared as a positive, ordered 5-vector by
 positive_ordered[5] d;
 \end{stancode}
 %
-Like ordered vectors, after their declaration positive ordered vectors
-assigned to other vectors and other vectors may be assigned to them.
+Like ordered vectors, after their declaration, positive ordered vectors
+may be assigned to other vectors and other vectors may be assigned to them.
 Constraints will be checked after executing the block in which the
 variables were declared.
 
@@ -1378,17 +1421,18 @@ not be used where a value of type \code{int} is required.
 
 A number written with a period or with scientific notation is assigned
 to a the continuous numeric type \code{real}.  Real literals are
-written in base 10 with a period (\code{.}) as a separator.  Examples
+written in base 10 with a period (\code{.}) as a separator and
+optionally an exponent with optional sign.  Examples
 of well-formed real literals include the following.
 %
 \begin{quote}
 \code{0.0}, \ \code{1.0}, \ \code{3.14}, \ \code{-217.9387}, \
-\code{2.7e3}, \ \code{-2E-5}
+\code{2.7e3}, \ \code{-2E-5}, \ \code{1.23e+3}.
 \end{quote}
 %
 The notation \code{e} or \code{E} followed by a positive or negative
 integer denotes a power of 10 to multiply.  For instance, \code{2.7e3}
-denotes $2.7 \times 10^3$ and \code{-2E-5} denotes $-2 \times
+and \code{2.7e+3} denote $2.7 \times 10^3$, whereas \code{-2E-5} denotes $-2 \times
 10^{-5}$.
 
 
@@ -2642,7 +2686,7 @@ Algebraically, the sampling statement in the model could be reduced to
   x ~ normal(0, 1);
 \end{stancode}
 %
-and it would seem the model should produce unit normal samples for
+and it would seem the model should produce unit normal draws for
 \code{x}.  But rather than canceling, the expression \code{sqrt(x -
   x)} causes a problem for derivatives.  The cause is the mechanistic
 evaluation of the chain rule,
@@ -2716,6 +2760,17 @@ constructed by using assignment statements.  Statements may be grouped
 into sequences and into for-each loops.  In addition, Stan allows
 local variables to be declared in blocks and also allows an empty
 statement consisting only of a semicolon.
+
+\section{Statement Block Contexts}
+
+The data and parameters blocks do not allow statments of any kind
+because these blocks are solely used to declare the data variables for
+input and the parameter variables for sampling.  All other blocks
+allow statements.  In these blocks, both variable declarations and
+statements are allowed.  The first statement that is not a variable
+declaration ends the list of block variable declarations.  See
+\refchapter{blocks} for more information about the block structure of
+Stan programs.
 
 
 \section{Assignment Statement}\label{assignment-statement.section}
@@ -3989,8 +4044,7 @@ becomes ill-defined (i.e., becomes not-a-number).
 
 The Stan \code{reject} statement provides a mechanism to
 report errors or problematic values encountered during program
-execution and either halt processing or reject samples or optimization
-iterations.
+execution and either halt processing or reject iterations.
 
 Like the \code{print} statement, the reject statement accepts
 any number of quoted string literals or Stan expressions as arguments.
@@ -4225,7 +4279,7 @@ declared and then defined through a sequence of statements.  Because
 variables scope over every statement that follows them, transformed
 data variables may be defined in terms of the data variables.
 
-Before generating any samples, data variables are read in, then the
+Before generating any draws, data variables are read in, then the
 transformed data variables are declared and the associated statements
 executed to define them.  This means the statements in the transformed
 data block are only ever evaluated once.%
@@ -4481,7 +4535,7 @@ order, starting with the \code{data} block in this section.
 
 The \code{data} block is for the declaration of variables that are
 read in as data.  With the current model executable, each Markov chain
-of samples will be executed in a different process, and each such
+of draws will be executed in a different process, and each such
 process will read the data exactly once.%
 %
 \footnote{With multiple threads, or even running chains sequentially
@@ -4622,14 +4676,14 @@ The amount of work done by the sampler does depend on the number of
 unconstrained parameters, but this is usually dwarfed by the gradient
 calculations.
 
-\subsection{Writing Samples}
+\subsection{Writing Draws}
 
-In the basic Stan compiled program, the values of variables are
-written to a file for each sample.  The constrained versions of the
-variables are written, again in the order they are defined in the
-\code{parameters} block.  In order to do this, the transformed
-parameter, model, and generated quantities statements must be
-executed.
+In the basic Stan compiled program, there is a file to which the
+values of variables are written for each draw.  The constrained
+versions of the variables are written in the order they are
+defined in the \code{parameters} block.  In order to do this, the
+transformed parameter, model, and generated quantities statements must
+also be executed.
 
 
 \section{Program Block: \code{transformed parameters}}
@@ -4638,7 +4692,7 @@ The \code{transformed parameters} program block consists of optional
 variable declarations followed by statements.  After the statements
 are executed, the constraints on the transformed parameters are
 validated.  Any variable declared as a transformed parameter is part
-of the output produced for samples.
+of the output produced for draws.
 
 Any variable that is defined wholly in terms of data or transformed
 data should be declared and defined in the transformed data block.
@@ -4696,9 +4750,9 @@ generated quantities block are
 \item calculating log likelihoods, deviances, etc.\ for model comparison.
 \end{itemize}
 %
-Forward samples, event probabilities and statistics may all be
+Parameter estimates, predictions, statistics, and event probabilities
 calculated directly using plug-in estimates.  Stan automatically
-provides full Bayesian inference by producing samples from the
+provides full Bayesian inference by producing draws from the
 posterior distribution of any calculated event probabilities,
 predictions, or statistics.  See \refchapter{bayesian} for more
 information on Bayesian inference.
@@ -5312,7 +5366,7 @@ account for the majority of the cycles consumed by a Stan program.
 \subsection{Metropolis Accept/Reject}
 
 A standard Metropolis accept/reject step is required to retain detailed
-balance and ensure samples are marginally distributed according to the
+balance and ensure draws are marginally distributed according to the
 probability function defined by the model.  This Metropolis adjustment
 is based on comparing log probabilities, here defined by the
 Hamiltonian, which is the sum of the potential (negative log
@@ -5350,7 +5404,7 @@ for sampling.
 Variational inference also runs similar to sampling. It begins by reading the
 data and initializing the algorithm. The initial variational approximation is a
 random draw from the standard normal distribution in the unconstrained
-(real-coordinate) space. Again, similar to sampling, it outputs samples from the
+(real-coordinate) space. Again, similar to sampling, it outputs draws from the
 approximate posterior once the algorithm has decided that it has converged.
 Thus, the tools we use for analyzing the result of Stan's sampling routines can
 also be used for variational inference.
@@ -5368,8 +5422,8 @@ probabilities.
 
 \section{Output}
 
-For each final sample (not counting samples during warmup or samples
-that are thinned), there is an output stage of writing the samples.
+For each final draw (not counting draws during warmup or draws
+that are thinned), there is an output stage of writing the draw.
 
 \subsection{Generated Quantities}
 
