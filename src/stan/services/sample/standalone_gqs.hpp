@@ -17,7 +17,7 @@ namespace stan {
      * Return the number of constrained parameters for the specified
      * model.
      *
-     * @tparam M type of model
+     * @tparam Model type of model
      * @param[in] model model to query
      * @return number of constrained parameters for the model
      */
@@ -36,7 +36,7 @@ namespace stan {
      * quantities of interest.  Data written to callback writer.
      * Return code indicates success or type of error.
      *
-     * @tparam M model class
+     * @tparam Model model class
      * @param[in] model instantiated model
      * @param[in] draws sequence of draws of unconstrained parameters
      * @param[in] seed seed to use for randomization
@@ -52,7 +52,6 @@ namespace stan {
                             callbacks::interrupt& interrupt,
                             callbacks::logger& logger,
                             callbacks::writer& sample_writer) {
-      std::stringstream msg;
       if (draws.empty()) {
         logger.error("Empty set of draws from fitted model.");
         return error_codes::DATAERR;
@@ -63,7 +62,7 @@ namespace stan {
       static const bool include_tparams = false;
       static const bool include_gqs = true;
       model.constrained_param_names(gq_names, include_tparams, include_gqs);
-      if (!((size_t)num_params < gq_names.size())) {
+      if (!(static_cast<size_t>(num_params) < gq_names.size())) {
         logger.error("Model doesn't generate any quantities of interest.");
         return error_codes::CONFIG;
       }
@@ -72,12 +71,14 @@ namespace stan {
       boost::ecuyer1988 rng = util::create_rng(seed, 1);
       writer.write_gq_names(model);
 
+      std::stringstream msg;
       for (const std::vector<double>& draw : draws) {
-        if ((size_t)num_params != draw.size()) {
+        if (static_cast<size_t>(num_params) != draw.size()) {
           msg << "Wrong number of params in draws from fitted model.  ";
           msg << "Expecting " << num_params << " columns, ";
           msg << "found " << draws[0].size() << " columns.";
-          logger.error(msg.str());
+          std::string msgstr = msg.str();
+          logger.error(msgstr);
           return error_codes::DATAERR;
         }
         interrupt();  // call out to interrupt and fail
