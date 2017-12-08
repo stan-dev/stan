@@ -3636,8 +3636,8 @@ for (y in ys) {
 Note, in particular, that we can assign to the loop variable \code{y}.
 For arrays, vectors and row-vectors \code{ys}, the loop variable \code{y}
 traverses the elements of \code{ys} in order and for matrices \code{ys}
-it traverses the elements of \code{ys} in row-major order
-(left-to-right, top-to-bottom). In partcular, note the difference between
+it traverses the elements of \code{ys} in column-major order
+(top-to-bottom, left-to-right). In partcular, note the difference between
 looping over a matrix and a nested array of type \code{real[][]}. In the
 latter case, the loop variable \code{y} denotes an array of type \code{real[]}
 rather than a single value of type \code{real} which would be its denotation
