@@ -87,6 +87,8 @@
 #include <stan/lang/ast/node/expression.hpp>
 #include <stan/lang/ast/node/expression_type_vis.hpp>
 #include <stan/lang/ast/node/for_statement.hpp>
+#include <stan/lang/ast/node/for_array_statement.hpp>
+#include <stan/lang/ast/node/for_matrix_statement.hpp>
 #include <stan/lang/ast/node/fun.hpp>
 #include <stan/lang/ast/node/function_decl_def.hpp>
 #include <stan/lang/ast/node/function_decl_defs.hpp>

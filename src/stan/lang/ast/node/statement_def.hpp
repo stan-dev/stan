@@ -30,6 +30,10 @@ namespace stan {
 
     statement::statement(const for_statement& st) : statement_(st) { }
 
+    statement::statement(const for_array_statement& st) : statement_(st) { }
+
+    statement::statement(const for_matrix_statement& st) : statement_(st) { }
+
     statement::statement(const while_statement& st) : statement_(st) { }
 
     statement::statement(const break_continue_statement& st)

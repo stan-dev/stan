@@ -488,6 +488,36 @@ namespace stan {
     extern boost::phoenix::function<add_loop_identifier> add_loop_identifier_f;
 
     // called from: statement_grammar
+    struct add_array_loop_identifier : public phoenix_functor_senary {
+      void operator()(const stan::lang::expression& expr,
+                      std::string& name,
+                      const scope& var_scope,
+                      bool& pass, variable_map& vm,
+                      std::stringstream& error_msgs) const;
+    };
+    extern boost::phoenix::function<add_array_loop_identifier>
+      add_array_loop_identifier_f;
+
+    // called from: statement_grammar
+    struct add_matrix_loop_identifier : public phoenix_functor_senary {
+      void operator()(const stan::lang::expression& expr,
+                      std::string& name,
+                      const scope& var_scope,
+                      bool& pass, variable_map& vm,
+                      std::stringstream& error_msgs) const;
+    };
+    extern boost::phoenix::function<add_matrix_loop_identifier>
+      add_matrix_loop_identifier_f;
+
+    // called from: statement_grammar
+    struct store_loop_identifier : public phoenix_functor_binary {
+      void operator()(const std::string& name,
+                      std::string& name_local) const;
+    };
+    extern boost::phoenix::function<store_loop_identifier>
+      store_loop_identifier_f;
+
+    // called from: statement_grammar
     struct remove_loop_identifier : public phoenix_functor_binary {
       void operator()(const std::string& name, variable_map& vm) const;
     };
@@ -825,6 +855,13 @@ namespace stan {
                       std::stringstream& error_msgs) const;
     };
     extern boost::phoenix::function<validate_int_expr> validate_int_expr_f;
+
+    struct validate_int_expr_no_error_msgs : public phoenix_functor_ternary {
+      void operator()(const expression& expr, bool& pass,
+                      std::stringstream& error_msgs) const;
+    };
+    extern boost::phoenix::function<validate_int_expr_no_error_msgs>
+      validate_int_expr_no_error_msgs_f;
 
     struct set_int_range_lower : public phoenix_functor_quaternary {
       void operator()(range& range, const expression& expr, bool& pass,

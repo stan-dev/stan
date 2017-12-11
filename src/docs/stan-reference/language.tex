@@ -2954,7 +2954,7 @@ x[3] += 2;
 As a further example, consider
 %
 \begin{stancode}
-matirx[M, M] x;
+matrix[M, M] x;
 vector[M] y;
 real z;
 x *= x;  // OK, (x * x) is a matrix
@@ -3617,6 +3617,31 @@ for (n in 1:100) {
   y += y * epsilon;
 }
 \end{stancode}
+
+\section{Foreach Loops}
+
+Similarly, the \code{for} keyword can be used to iterate over containers
+(arrays, vectors, row-vectors or matrices). For instance, suppose
+\code{ys} is a container with elements of type \code{T} and that
+\code{z} is a variable of type \code{T}. Then the following is a
+well-formed for-loop statement, which sets all elements of \code{ys}
+equal to \code{z}.
+%
+\begin{stancode}
+for (y in ys) {
+  y = z;
+}
+\end{stancode}
+%
+Note, in particular, that we can assign to the loop variable \code{y}.
+For arrays, vectors and row-vectors \code{ys}, the loop variable \code{y}
+traverses the elements of \code{ys} in order and for matrices \code{ys}
+it traverses the elements of \code{ys} in column-major order
+(top-to-bottom, left-to-right).
+In partcular, note the difference between looping over a matrix of type \code{matrix[N, M]} and a nested array of type \code{real[N, M]}.
+In the latter case, the loop variable \code{y} denotes an array of type \code{real[M]}
+rather than a single value of type \code{real} which would be its denotation
+in the former case.
 
 \section{Conditional Statements}
 

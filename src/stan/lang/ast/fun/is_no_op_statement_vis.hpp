@@ -15,6 +15,8 @@ namespace stan {
     struct expression;
     struct statements;
     struct for_statement;
+    struct for_array_statement;
+    struct for_matrix_statement;
     struct conditional_statement;
     struct while_statement;
     struct break_continue_statement;
@@ -98,6 +100,22 @@ namespace stan {
        * @return false
        */
       bool operator()(const for_statement& st) const;
+
+      /**
+       * Return true if the specified statement is a no-op statement.
+       *
+       * @param st statement
+       * @return false
+       */
+      bool operator()(const for_array_statement& st) const;
+
+      /**
+       * Return true if the specified statement is a no-op statement.
+       *
+       * @param st statement
+       * @return false
+       */
+      bool operator()(const for_matrix_statement& st) const;
 
       /**
        * Return true if the specified statement is a no-op statement.
