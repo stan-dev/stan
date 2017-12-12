@@ -5,6 +5,11 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v2.17.1 (11 December 2017)
+======================================================================
+This is a bugfix release fixing a performance regression in the math repo. See 
+https://github.com/stan-dev/math/issues/667 for more details.
+
 v2.17.0 (05 September 2017)
 ======================================================================
 

@@ -7,6 +7,7 @@
 #include <stan/lang/generator/generate_indexed_expr.hpp>
 #include <stan/lang/generator/generate_local_var_decls.hpp>
 #include <stan/lang/generator/generate_printable.hpp>
+#include <stan/lang/generator/generate_void_statement.hpp>
 #include <stan/lang/generator/visgen.hpp>
 #include <boost/algorithm/string.hpp>
 #include <ostream>
@@ -332,6 +333,35 @@ namespace stan {
         o_ << "; " << x.variable_ << " <= ";
         generate_expression(x.range_.high_, NOT_USER_FACING, o_);
         o_ << "; ++" << x.variable_ << ") {" << EOL;
+        generate_statement(x.statement_, indent_ + 1, o_);
+        generate_indent(indent_, o_);
+        o_ << "}" << EOL;
+      }
+
+      void operator()(const for_array_statement& x) const {
+        generate_indent(indent_, o_);
+        o_ << "for (auto& " << x.variable_ << " : ";
+        generate_expression(x.expression_, NOT_USER_FACING, o_);
+        o_ << ") {" << EOL;
+        generate_void_statement(x.variable_, indent_ + 1, o_);
+        generate_statement(x.statement_, indent_ + 1, o_);
+        generate_indent(indent_, o_);
+        o_ << "}" << EOL;
+      }
+
+      void operator()(const for_matrix_statement& x) const {
+        generate_indent(indent_, o_);
+        o_ << "for (auto " << x.variable_ << "__loopid = ";
+        generate_expression(x.expression_, NOT_USER_FACING, o_);
+        o_ << ".data(); " << x.variable_ << "__loopid < ";
+        generate_expression(x.expression_, NOT_USER_FACING, o_);
+        o_ << ".data() + ";
+        generate_expression(x.expression_, NOT_USER_FACING, o_);
+        o_ << ".size(); ++" << x.variable_ << "__loopid) {" << EOL;
+        generate_indent(indent_ + 1, o_);
+        o_ << "auto& " << x.variable_ << " = *(";
+        o_ << x.variable_ << "__loopid);"  << EOL;
+        generate_void_statement(x.variable_, indent_ + 1, o_);
         generate_statement(x.statement_, indent_ + 1, o_);
         generate_indent(indent_, o_);
         o_ << "}" << EOL;

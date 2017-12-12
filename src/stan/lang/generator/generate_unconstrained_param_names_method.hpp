@@ -28,16 +28,20 @@ namespace stan {
         << "                               bool include_gqs__ = true) const {"
         << EOL << INDENT2
         << "std::stringstream param_name_stream__;" << EOL;
-      unconstrained_param_names_visgen vis(o);
+      unconstrained_param_names_visgen vis1(1, o);
+      unconstrained_param_names_visgen vis2(2, o);
       for (size_t i = 0; i < prog.parameter_decl_.size(); ++i)
-        boost::apply_visitor(vis, prog.parameter_decl_[i].decl_);
+        boost::apply_visitor(vis1, prog.parameter_decl_[i].decl_);
       o << EOL << INDENT2
         << "if (!include_gqs__ && !include_tparams__) return;"  << EOL;
+      o << EOL << INDENT2 << "if (include_tparams__) {"  << EOL;
       for (size_t i = 0; i < prog.derived_decl_.first.size(); ++i)
-        boost::apply_visitor(vis, prog.derived_decl_.first[i].decl_);
+        boost::apply_visitor(vis2, prog.derived_decl_.first[i].decl_);
+      o << INDENT2 << "}" << EOL2;
+
       o << EOL << INDENT2 << "if (!include_gqs__) return;" << EOL;
       for (size_t i = 0; i < prog.generated_decl_.first.size(); ++i)
-        boost::apply_visitor(vis, prog.generated_decl_.first[i].decl_);
+        boost::apply_visitor(vis1, prog.generated_decl_.first[i].decl_);
       o << INDENT << "}" << EOL2;
     }
 
