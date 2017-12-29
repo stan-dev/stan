@@ -1,7 +1,7 @@
 #ifndef STAN_LANG_AST_FUN_RETURNS_TYPE_VIS_DEF_HPP
 #define STAN_LANG_AST_FUN_RETURNS_TYPE_VIS_DEF_HPP
 
-#include <stan/lang/ast/expr_type.hpp>
+#include <stan/lang/ast/type/bare_expr_type.hpp>
 #include <stan/lang/ast/fun/is_assignable.hpp>
 #include <stan/lang/ast/fun/returns_type.hpp>
 #include <stan/lang/ast/fun/returns_type_vis.hpp>
@@ -20,7 +20,7 @@ namespace stan {
   namespace lang {
 
 
-    returns_type_vis::returns_type_vis(const expr_type& return_type,
+    returns_type_vis::returns_type_vis(const bare_expr_type& return_type,
                                        std::ostream& error_msgs)
       : return_type_(return_type), error_msgs_(error_msgs) { }
 

@@ -1,7 +1,7 @@
 #ifndef STAN_LANG_AST_NODE_DOUBLE_LITERAL_HPP
 #define STAN_LANG_AST_NODE_DOUBLE_LITERAL_HPP
 
-#include <stan/lang/ast/expr_type.hpp>
+#include <stan/lang/ast/type/bare_expr_type.hpp>
 
 namespace stan {
   namespace lang {
@@ -18,7 +18,7 @@ namespace stan {
       /**
        * Expression type.
        */
-      expr_type type_;
+      bare_expr_type type_;
 
       /**
        * Default constructor for double literal.

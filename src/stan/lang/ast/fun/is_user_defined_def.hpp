@@ -15,15 +15,16 @@ namespace stan {
 
     bool is_user_defined(const std::string& name,
                          const std::vector<expression>& args) {
-      std::vector<expr_type> arg_types;
+      std::vector<bare_expr_type> arg_types;
       for (size_t i = 0; i <  args.size(); ++i)
         arg_types.push_back(args[i].expression_type());
       function_signature_t sig;
       int matches
         = function_signatures::instance()
         .get_signature_matches(name, arg_types, sig);
+      //TODO:mitzi trace matches != 1
       if (matches != 1)
-        return false;  // reall shouldn't come up;  throw instead?
+        return false;  //TODO:mitzi throw exception?
       std::pair<std::string, function_signature_t>
         name_sig(name, sig);
       return function_signatures::instance().is_user_defined(name_sig);

@@ -1,7 +1,7 @@
 #ifndef STAN_LANG_AST_NODE_ASSIGNMENT_HPP
 #define STAN_LANG_AST_NODE_ASSIGNMENT_HPP
 
-#include <stan/lang/ast/node/base_var_decl.hpp>
+#include <stan/lang/ast/type/bare_expr_type.hpp>
 #include <stan/lang/ast/node/expression.hpp>
 #include <stan/lang/ast/node/variable_dims.hpp>
 
@@ -41,7 +41,7 @@ namespace stan {
       /**
        * Type of the left hand side variable before indexing.
        */
-      base_var_decl var_type_;
+      bare_expr_type var_type_;
     };
 
   }

@@ -1,7 +1,7 @@
 #ifndef STAN_LANG_AST_FUN_RETURNS_TYPE_DEF_HPP
 #define STAN_LANG_AST_FUN_RETURNS_TYPE_DEF_HPP
 
-#include <stan/lang/ast/expr_type.hpp>
+#include <stan/lang/ast/type/bare_expr_type.hpp>
 #include <stan/lang/ast/fun/returns_type.hpp>
 #include <stan/lang/ast/fun/returns_type_vis.hpp>
 #include <stan/lang/ast/node/statement.hpp>
@@ -11,7 +11,7 @@
 namespace stan {
   namespace lang {
 
-    bool returns_type(const expr_type& return_type, const statement& statement,
+    bool returns_type(const bare_expr_type& return_type, const statement& statement,
                       std::ostream& error_msgs) {
       if (return_type.is_void())
         return true;

@@ -1,7 +1,7 @@
 #ifndef STAN_LANG_AST_SIGS_FUNCTION_SIGNATURES_HPP
 #define STAN_LANG_AST_SIGS_FUNCTION_SIGNATURES_HPP
 
-#include <stan/lang/ast/expr_type.hpp>
+#include <stan/lang/ast/type/bare_expr_type.hpp>
 #include <stan/lang/ast/sigs/function_signature_t.hpp>
 #include <map>
 #include <ostream>
@@ -71,7 +71,7 @@ namespace stan {
        * @param arg_types sequence of argument types
        */
       void add(const std::string& name,
-               const expr_type& result_type,
+               const bare_expr_type& result_type,
                const std::vector<function_arg_type>& arg_types);
 
       /**
@@ -82,7 +82,7 @@ namespace stan {
        * @param result_type function return type
        */
       void add(const std::string& name,
-               const expr_type& result_type);
+               const bare_expr_type& result_type);
 
       /**
        * Add a built-in function with the specifed name, result type,
@@ -93,8 +93,8 @@ namespace stan {
        * @param arg_type1 type of first argument
        */
       void add(const std::string& name,
-               const expr_type& result_type,
-               const expr_type& arg_type1);
+               const bare_expr_type& result_type,
+               const bare_expr_type& arg_type1);
       /**
        * Add a built-in function with the specifed name, result type,
        * and argument types.
@@ -105,9 +105,9 @@ namespace stan {
        * @param arg_type2 type of second argument
        */
       void add(const std::string& name,
-               const expr_type& result_type,
-               const expr_type& arg_type1,
-               const expr_type& arg_type2);
+               const bare_expr_type& result_type,
+               const bare_expr_type& arg_type1,
+               const bare_expr_type& arg_type2);
 
       /**
        * Add a built-in function with the specifed name, result type,
@@ -120,10 +120,10 @@ namespace stan {
        * @param arg_type3 type of third argument
        */
       void add(const std::string& name,
-               const expr_type& result_type,
-               const expr_type& arg_type1,
-               const expr_type& arg_type2,
-               const expr_type& arg_type3);
+               const bare_expr_type& result_type,
+               const bare_expr_type& arg_type1,
+               const bare_expr_type& arg_type2,
+               const bare_expr_type& arg_type3);
 
       /**
        * Add a built-in function with the specifed name, result type,
@@ -137,11 +137,11 @@ namespace stan {
        * @param arg_type4 type of fourth argument
        */
       void add(const std::string& name,
-               const expr_type& result_type,
-               const expr_type& arg_type1,
-               const expr_type& arg_type2,
-               const expr_type& arg_type3,
-               const expr_type& arg_type4);
+               const bare_expr_type& result_type,
+               const bare_expr_type& arg_type1,
+               const bare_expr_type& arg_type2,
+               const bare_expr_type& arg_type3,
+               const bare_expr_type& arg_type4);
 
       /**
        * Add a built-in function with the specifed name, result type,
@@ -156,12 +156,12 @@ namespace stan {
        * @param arg_type5 type of fifth argument
        */
       void add(const std::string& name,
-               const expr_type& result_type,
-               const expr_type& arg_type1,
-               const expr_type& arg_type2,
-               const expr_type& arg_type3,
-               const expr_type& arg_type4,
-               const expr_type& arg_type5);
+               const bare_expr_type& result_type,
+               const bare_expr_type& arg_type1,
+               const bare_expr_type& arg_type2,
+               const bare_expr_type& arg_type3,
+               const bare_expr_type& arg_type4,
+               const bare_expr_type& arg_type5);
 
       /**
        * Add a built-in function with the specifed name, result type,
@@ -177,13 +177,13 @@ namespace stan {
        * @param arg_type6 type of sixth argument
        */
       void add(const std::string& name,
-               const expr_type& result_type,
-               const expr_type& arg_type1,
-               const expr_type& arg_type2,
-               const expr_type& arg_type3,
-               const expr_type& arg_type4,
-               const expr_type& arg_type5,
-               const expr_type& arg_type6);
+               const bare_expr_type& result_type,
+               const bare_expr_type& arg_type1,
+               const bare_expr_type& arg_type2,
+               const bare_expr_type& arg_type3,
+               const bare_expr_type& arg_type4,
+               const bare_expr_type& arg_type5,
+               const bare_expr_type& arg_type6);
 
       /**
        * Add a built-in function with the specifed name, result type,
@@ -200,14 +200,14 @@ namespace stan {
        * @param arg_type7 type of seventh argument
        */
       void add(const std::string& name,
-               const expr_type& result_type,
-               const expr_type& arg_type1,
-               const expr_type& arg_type2,
-               const expr_type& arg_type3,
-               const expr_type& arg_type4,
-               const expr_type& arg_type5,
-               const expr_type& arg_type6,
-               const expr_type& arg_type7);
+               const bare_expr_type& result_type,
+               const bare_expr_type& arg_type1,
+               const bare_expr_type& arg_type2,
+               const bare_expr_type& arg_type3,
+               const bare_expr_type& arg_type4,
+               const bare_expr_type& arg_type5,
+               const bare_expr_type& arg_type6,
+               const bare_expr_type& arg_type7);
 
       /**
        * Add a built-in function with the specified name, a real
@@ -267,7 +267,7 @@ namespace stan {
        * @return number of promotions required to cast call arguments
        * to the signature arguments
        */
-      int num_promotions(const std::vector<expr_type>& call_args,
+      int num_promotions(const std::vector<bare_expr_type>& call_args,
                          const std::vector<function_arg_type>& sig_args);
 
       /**
@@ -284,8 +284,8 @@ namespace stan {
        * @return expression type resulting from applying function with
        * specified names to arguments of specified type
        */
-      expr_type get_result_type(const std::string& name,
-                                const std::vector<expr_type>& args,
+      bare_expr_type get_result_type(const std::string& name,
+                                const std::vector<bare_expr_type>& args,
                                 std::ostream& error_msgs,
                                 bool sampling_error_style = false);
 
@@ -299,7 +299,7 @@ namespace stan {
        * @return number of matches
        */
       int get_signature_matches(const std::string& name,
-                                const std::vector<expr_type>& args,
+                                const std::vector<bare_expr_type>& args,
                                 function_signature_t& signature);
 
       /**

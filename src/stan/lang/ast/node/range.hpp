@@ -6,8 +6,6 @@
 namespace stan {
   namespace lang {
 
-    struct expression;
-
     /**
      * AST structure for a range object with a low and high value.
      */

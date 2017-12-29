@@ -1,7 +1,7 @@
 #ifndef STAN_LANG_AST_NODE_VARIABLE_HPP
 #define STAN_LANG_AST_NODE_VARIABLE_HPP
 
-#include <stan/lang/ast/expr_type.hpp>
+#include <stan/lang/ast/type/bare_expr_type.hpp>
 #include <cstddef>
 #include <string>
 
@@ -20,7 +20,7 @@ namespace stan {
       /**
        * Type of variable.
        */
-      expr_type type_;
+      bare_expr_type type_;
 
       /**
        * Construct a default variable.
@@ -41,7 +41,7 @@ namespace stan {
        * @param base_type base type for variable
        * @param num_dims number of array dims for variable
        */
-      void set_type(const base_expr_type& base_type, std::size_t num_dims);
+      void set_type(const bare_expr_type& bare_type, std::size_t num_dims);
     };
 
   }

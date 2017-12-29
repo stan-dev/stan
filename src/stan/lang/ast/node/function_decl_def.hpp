@@ -1,8 +1,8 @@
 #ifndef STAN_LANG_AST_NODE_FUNCTION_DECL_DEF_HPP
 #define STAN_LANG_AST_NODE_FUNCTION_DECL_DEF_HPP
 
-#include <stan/lang/ast/expr_type.hpp>
-#include <stan/lang/ast/node/arg_decl.hpp>
+#include <stan/lang/ast/type/bare_expr_type.hpp>
+#include <stan/lang/ast/node/fun_var_decl.hpp>
 #include <stan/lang/ast/node/statement.hpp>
 #include <string>
 #include <vector>
@@ -32,14 +32,14 @@ namespace stan {
        * @param[in] body function body
        * 
        */
-      function_decl_def(const expr_type& return_type, const std::string& name,
-                        const std::vector<arg_decl>& arg_decls,
+      function_decl_def(const bare_expr_type& return_type, const std::string& name,
+                        const std::vector<fun_var_decl>& arg_decls,
                         const statement& body);
 
       /**
        * Tyep of value returned by function.
        */
-      expr_type return_type_;
+      bare_expr_type return_type_;
 
       /**
        * Name of the function.
@@ -49,7 +49,7 @@ namespace stan {
       /**
        * Sequence of argument declarations.
        */
-      std::vector<arg_decl> arg_decls_;
+      std::vector<fun_var_decl> arg_decls_;
 
       /**
        * Body of the function.

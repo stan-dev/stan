@@ -3,8 +3,7 @@
 
 
 
-#include <stan/lang/ast/base_expr_type.hpp>
-#include <stan/lang/ast/expr_type.hpp>
+#include <stan/lang/ast/type/bare_expr_type.hpp>
 #include <cstddef>
 
 namespace stan {
@@ -23,8 +22,8 @@ namespace stan {
      * @param num_indexes number of indexes provided
      * @return expression type of indexed expression
      */
-    expr_type infer_type_indexing(const base_expr_type& base_type,
-                                  std::size_t dims, std::size_t num_indexes);
+    bare_expr_type infer_type_indexing(const bare_expr_type& base_type,
+                                       std::size_t dims, std::size_t num_indexes);
 
 
 
@@ -37,8 +36,8 @@ namespace stan {
      * @param num_indexes number of indexes provided
      * @return expression type of indexed expression
      */
-    expr_type infer_type_indexing(const expression& expr,
-                                  std::size_t num_indexes);
+    bare_expr_type infer_type_indexing(const expression& expr,
+                                       std::size_t num_indexes);
   }
 }
 #endif

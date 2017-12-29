@@ -6,7 +6,7 @@
 namespace stan {
   namespace lang {
 
-    std::ostream& write_base_expr_type(std::ostream& o, base_expr_type type) {
+    std::ostream& write_base_expr_type(std::ostream& o, bare_expr_type type) {
       if (type.is_int_type())
         o << "int";
       else if (type.is_double_type())

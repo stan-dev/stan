@@ -11,8 +11,9 @@ namespace stan {
 
     variable::variable(const std::string& name) : name_(name) { }
 
-    void variable::set_type(const base_expr_type& base_type, size_t num_dims) {
-      type_ = expr_type(base_type, num_dims);
+    // TODO:mitzi - if num_dims > 1 need to create (nested) array_bare_type.
+    void variable::set_type(const bare_expr_type& bare_type, size_t num_dims) {
+      type_ = bare_type;
     }
 
   }

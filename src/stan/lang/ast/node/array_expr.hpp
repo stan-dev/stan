@@ -1,7 +1,7 @@
 #ifndef STAN_LANG_AST_NODE_ARRAY_EXPR_HPP
 #define STAN_LANG_AST_NODE_ARRAY_EXPR_HPP
 
-#include <stan/lang/ast/expr_type.hpp>
+#include <stan/lang/ast/type/bare_expr_type.hpp>
 #include <stan/lang/ast/scope.hpp>
 #include <stan/lang/ast/node/expression.hpp>
 #include <vector>
@@ -23,8 +23,8 @@ namespace stan {
       /**
        * Type of array.
        */
-      expr_type type_;
-
+      bare_expr_type type_;
+      
       /**
        * True if there is a variable within any of the expressions
        * that is a parameter, transformed parameter, or non-integer

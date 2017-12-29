@@ -1,7 +1,7 @@
 #ifndef STAN_LANG_AST_NODE_INDEX_OP_HPP
 #define STAN_LANG_AST_NODE_INDEX_OP_HPP
 
-#include <stan/lang/ast/expr_type.hpp>
+#include <stan/lang/ast/type/bare_expr_type.hpp>
 #include <stan/lang/ast/node/expression.hpp>
 #include <vector>
 
@@ -25,7 +25,7 @@ namespace stan {
       /**
        * Type of indexed expression.
        */
-      expr_type type_;
+      bare_expr_type type_;
 
       /**
        * Construct a default indexed expression.

@@ -1,163 +1,109 @@
 #ifndef STAN_LANG_AST_FUN_VAR_DECL_HAS_DEF_VIS_HPP
 #define STAN_LANG_AST_FUN_VAR_DECL_HAS_DEF_VIS_HPP
 
-#include <stan/lang/ast/node/cholesky_corr_var_decl.hpp>
-#include <stan/lang/ast/node/cholesky_factor_var_decl.hpp>
-#include <stan/lang/ast/node/corr_matrix_var_decl.hpp>
-#include <stan/lang/ast/node/cov_matrix_var_decl.hpp>
-#include <stan/lang/ast/node/double_var_decl.hpp>
-#include <stan/lang/ast/node/int_var_decl.hpp>
-#include <stan/lang/ast/node/matrix_var_decl.hpp>
-#include <stan/lang/ast/node/nil.hpp>
-#include <stan/lang/ast/node/ordered_var_decl.hpp>
-#include <stan/lang/ast/node/positive_ordered_var_decl.hpp>
-#include <stan/lang/ast/node/row_vector_var_decl.hpp>
-#include <stan/lang/ast/node/simplex_var_decl.hpp>
-#include <stan/lang/ast/node/unit_vector_var_decl.hpp>
-#include <stan/lang/ast/node/vector_var_decl.hpp>
+
+#include <stan/lang/ast/nil.hpp>
+#include <stan/lang/ast/node/array_block_var_decl.hpp>
+#include <stan/lang/ast/node/array_fun_var_decl.hpp>
+#include <stan/lang/ast/node/array_local_var_decl.hpp>
+#include <stan/lang/ast/node/cholesky_corr_block_var_decl.hpp>
+#include <stan/lang/ast/node/cholesky_factor_block_var_decl.hpp>
+#include <stan/lang/ast/node/corr_matrix_block_var_decl.hpp>
+#include <stan/lang/ast/node/cov_matrix_block_var_decl.hpp>
+#include <stan/lang/ast/node/double_block_var_decl.hpp>
+#include <stan/lang/ast/node/double_local_var_decl.hpp>
+#include <stan/lang/ast/node/int_block_var_decl.hpp>
+#include <stan/lang/ast/node/int_local_var_decl.hpp>
+#include <stan/lang/ast/node/matrix_block_var_decl.hpp>
+#include <stan/lang/ast/node/matrix_local_var_decl.hpp>
+#include <stan/lang/ast/node/ordered_block_var_decl.hpp>
+#include <stan/lang/ast/node/positive_ordered_block_var_decl.hpp>
+#include <stan/lang/ast/node/row_vector_block_var_decl.hpp>
+#include <stan/lang/ast/node/row_vector_local_var_decl.hpp>
+#include <stan/lang/ast/node/simplex_block_var_decl.hpp>
+#include <stan/lang/ast/node/unit_vector_block_var_decl.hpp>
+#include <stan/lang/ast/node/vector_block_var_decl.hpp>
+#include <stan/lang/ast/node/vector_local_var_decl.hpp>
 #include <boost/variant/static_visitor.hpp>
-#include <string>
 
 namespace stan {
   namespace lang {
-
+    
     /**
-     * Variable declaration visitor functor for determining if a
-     * variable declaration includes a definition.
+     * Visitor to check whether are variable declaration contains a definition.
      */
     struct var_decl_has_def_vis : public boost::static_visitor<bool> {
       /**
-       * Construct the visitor.
+       * Construct a var_decl_has_def visitor.
        */
       var_decl_has_def_vis();
 
       /**
-       * Return true if the specified variable declaration includes a
-       * variable definition (always false for the nil declaration). 
+       * Returns true if variable declaration has a definition.
        *
        * @param x variable declaration
-       * @return false
        */
       bool operator()(const nil& x) const;
 
       /**
-       * Return true if the specified variable declaration includes a
-       * variable definition. 
+       * Returns true if variable declaration has a definition.
        *
        * @param x variable declaration
-       * @return false
        */
-      bool operator()(const int_var_decl& x) const;
+      bool operator()(const array_block_var_decl& x) const;
+      bool operator()(const array_local_var_decl& x) const;
+
+      bool operator()(const cholesky_factor_block_var_decl& x) const;
+      bool operator()(const cholesky_corr_block_var_decl& x) const;
+      bool operator()(const cov_matrix_block_var_decl& x) const;
+      bool operator()(const corr_matrix_block_var_decl& x) const;
 
       /**
-       * Return true if the specified variable declaration includes a
-       * variable definition. 
+       * Returns true if variable declaration has a definition.
        *
        * @param x variable declaration
-       * @return false
        */
-      bool operator()(const double_var_decl& x) const;
+      bool operator()(const double_block_var_decl& x) const;
+      bool operator()(const double_local_var_decl& x) const;
 
       /**
-       * Return true if the specified variable declaration includes a
-       * variable definition. 
+       * Return the definition for a variable declaration.
        *
        * @param x variable declaration
-       * @return false
        */
-      bool operator()(const vector_var_decl& x) const;
+      bool operator()(const int_block_var_decl& x) const;
+      bool operator()(const int_local_var_decl& x) const;
 
       /**
-       * Return true if the specified variable declaration includes a
-       * variable definition. 
+       * Returns true if variable declaration has a definition.
        *
        * @param x variable declaration
-       * @return false
        */
-      bool operator()(const row_vector_var_decl& x) const;
+      bool operator()(const matrix_block_var_decl& x) const;
+      bool operator()(const matrix_local_var_decl& x) const;
+
+      bool operator()(const ordered_block_var_decl& x) const;
+      bool operator()(const positive_ordered_block_var_decl& x) const;
 
       /**
-       * Return true if the specified variable declaration includes a
-       * variable definition. 
+       * Returns true if variable declaration has a definition.
        *
        * @param x variable declaration
-       * @return false
        */
-      bool operator()(const matrix_var_decl& x) const;
+      bool operator()(const row_vector_block_var_decl& x) const;
+      bool operator()(const row_vector_local_var_decl& x) const;
+
+      bool operator()(const simplex_block_var_decl& x) const;
+      bool operator()(const unit_vector_block_var_decl& x) const;
 
       /**
-       * Return true if the specified variable declaration includes a
-       * variable definition. 
+       * Returns true if variable declaration has a definition.
        *
        * @param x variable declaration
-       * @return false
        */
-      bool operator()(const simplex_var_decl& x) const;
-
-      /**
-       * Return true if the specified variable declaration includes a
-       * variable definition. 
-       *
-       * @param x variable declaration
-       * @return false
-       */
-      bool operator()(const unit_vector_var_decl& x) const;
-
-      /**
-       * Return true if the specified variable declaration includes a
-       * variable definition. 
-       *
-       * @param x variable declaration
-       * @return false
-       */
-      bool operator()(const ordered_var_decl& x) const;
-
-      /**
-       * Return true if the specified variable declaration includes a
-       * variable definition. 
-       *
-       * @param x variable declaration
-       * @return false
-       */
-      bool operator()(const positive_ordered_var_decl& x) const;
-
-      /**
-       * Return true if the specified variable declaration includes a
-       * variable definition. 
-       *
-       * @param x variable declaration
-       * @return false
-       */
-      bool operator()(const cholesky_factor_var_decl& x) const;
-
-      /**
-       * Return true if the specified variable declaration includes a
-       * variable definition. 
-       *
-       * @param x variable declaration
-       * @return false
-       */
-      bool operator()(const cholesky_corr_var_decl& x) const;
-
-      /**
-       * Return true if the specified variable declaration includes a
-       * variable definition. 
-       *
-       * @param x variable declaration
-       * @return false
-       */
-      bool operator()(const cov_matrix_var_decl& x) const;
-
-      /**
-       * Return true if the specified variable declaration includes a
-       * variable definition. 
-       *
-       * @param x variable declaration
-       * @return false
-       */
-      bool operator()(const corr_matrix_var_decl& x) const;
+      bool operator()(const vector_block_var_decl& x) const;
+      bool operator()(const vector_local_var_decl& x) const;
     };
-
   }
 }
 #endif

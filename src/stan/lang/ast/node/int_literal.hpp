@@ -1,7 +1,7 @@
 #ifndef STAN_LANG_AST_NODE_INT_LITERAL_HPP
 #define STAN_LANG_AST_NODE_INT_LITERAL_HPP
 
-#include <stan/lang/ast/expr_type.hpp>
+#include <stan/lang/ast/type/bare_expr_type.hpp>
 
 namespace stan {
   namespace lang {
@@ -15,7 +15,7 @@ namespace stan {
       /**
        * Expression type of literal.
        */
-      expr_type type_;
+      bare_expr_type type_;
 
       /**
        * Construct a default int literal.

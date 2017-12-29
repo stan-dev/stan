@@ -6,7 +6,7 @@
 namespace stan {
   namespace lang {
 
-    struct expr_type;
+    struct bare_expr_type;
     struct expression;
     struct idx;
 
@@ -19,7 +19,7 @@ namespace stan {
      * @param[in] idxs Index sequence.
      * @return Type of expression applied to indexes.
      */
-    expr_type indexed_type(const expression& e, const std::vector<idx>& idxs);
+    bare_expr_type indexed_type(const expression& e, const std::vector<idx>& idxs);
 
   }
 }

@@ -2,82 +2,116 @@
 #define STAN_LANG_AST_FUN_VAR_DECL_HAS_DEF_VIS_DEF_HPP
 
 #include <stan/lang/ast.hpp>
+#include <boost/variant/apply_visitor.hpp>
 
 namespace stan {
   namespace lang {
-
     var_decl_has_def_vis::var_decl_has_def_vis() { }
 
-    bool var_decl_has_def_vis::operator()(const nil& /* x */)
-      const {
-      return false;  // should not be called
+    bool
+    var_decl_has_def_vis::operator()(const nil& x) const {
+      return false;
     }
 
-    bool var_decl_has_def_vis::operator()(const int_var_decl& x)
-      const {
+    bool
+    var_decl_has_def_vis::operator()(const array_block_var_decl& x) const {
       return !is_nil(x.def_);
     }
 
-    bool var_decl_has_def_vis::operator()(const double_var_decl& x)
-      const {
+    bool
+    var_decl_has_def_vis::operator()(const array_local_var_decl& x) const {
       return !is_nil(x.def_);
     }
 
-    bool var_decl_has_def_vis::operator()(const vector_var_decl& x)
-      const {
+    bool
+    var_decl_has_def_vis::operator()(const cholesky_factor_block_var_decl& x) const {
       return !is_nil(x.def_);
     }
 
-    bool var_decl_has_def_vis::operator()(
-                                    const row_vector_var_decl& x) const {
+    bool
+    var_decl_has_def_vis::operator()(const cholesky_corr_block_var_decl& x) const {
       return !is_nil(x.def_);
     }
 
-    bool var_decl_has_def_vis::operator()(const matrix_var_decl& x)
-      const {
+    bool
+    var_decl_has_def_vis::operator()(const cov_matrix_block_var_decl& x) const {
       return !is_nil(x.def_);
     }
 
-    bool var_decl_has_def_vis::operator()(
-                                    const unit_vector_var_decl& x) const {
+    bool
+    var_decl_has_def_vis::operator()(const corr_matrix_block_var_decl& x) const {
       return !is_nil(x.def_);
     }
 
-    bool var_decl_has_def_vis::operator()(
-                                     const simplex_var_decl& x) const {
+    bool
+    var_decl_has_def_vis::operator()(const double_block_var_decl& x) const {
       return !is_nil(x.def_);
     }
 
-    bool var_decl_has_def_vis::operator()(
-                                     const ordered_var_decl& x) const {
+    bool
+    var_decl_has_def_vis::operator()(const double_local_var_decl& x) const {
       return !is_nil(x.def_);
     }
 
-    bool var_decl_has_def_vis::operator()(
-                             const positive_ordered_var_decl& x) const {
+    bool
+    var_decl_has_def_vis::operator()(const int_block_var_decl& x) const {
       return !is_nil(x.def_);
     }
 
-    bool var_decl_has_def_vis::operator()(
-                                     const cholesky_factor_var_decl& x) const {
+    bool
+    var_decl_has_def_vis::operator()(const int_local_var_decl& x) const {
       return !is_nil(x.def_);
     }
 
-    bool var_decl_has_def_vis::operator()(
-                                     const cholesky_corr_var_decl& x) const {
+    bool
+    var_decl_has_def_vis::operator()(const matrix_block_var_decl& x) const {
       return !is_nil(x.def_);
     }
 
-    bool var_decl_has_def_vis::operator()(
-                                     const cov_matrix_var_decl& x) const {
+    bool
+    var_decl_has_def_vis::operator()(const matrix_local_var_decl& x) const {
       return !is_nil(x.def_);
     }
 
-    bool var_decl_has_def_vis::operator()(
-                                     const corr_matrix_var_decl& x) const {
+    bool
+    var_decl_has_def_vis::operator()(const ordered_block_var_decl& x) const {
       return !is_nil(x.def_);
     }
 
+    bool
+    var_decl_has_def_vis::operator()(const positive_ordered_block_var_decl& x) const {
+      return !is_nil(x.def_);
+    }
+
+    bool
+    var_decl_has_def_vis::operator()(const row_vector_block_var_decl& x) const {
+      return !is_nil(x.def_);
+    }
+
+    bool
+    var_decl_has_def_vis::operator()(const row_vector_local_var_decl& x) const {
+      return !is_nil(x.def_);
+    }
+
+    bool
+    var_decl_has_def_vis::operator()(const simplex_block_var_decl& x) const {
+      return !is_nil(x.def_);
+    }
+
+    bool
+    var_decl_has_def_vis::operator()(const unit_vector_block_var_decl& x) const {
+      return !is_nil(x.def_);
+    }
+
+    bool
+    var_decl_has_def_vis::operator()(const vector_block_var_decl& x) const {
+      return !is_nil(x.def_);
+    }
+
+    bool
+    var_decl_has_def_vis::operator()(const vector_local_var_decl& x) const {
+      return !is_nil(x.def_);
+    }
   }
 }
 #endif

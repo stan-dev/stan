@@ -6,14 +6,14 @@
 namespace stan {
   namespace lang {
 
-    struct expr_type;
+    struct bare_expr_type;
 
     /**
      *
      * @param et expression type
      * @return promoted expression type
      */
-    expr_type promote_primitive(const expr_type& et);
+    bare_expr_type promote_primitive(const bare_expr_type& et);
 
     /**
      *
@@ -21,8 +21,8 @@ namespace stan {
      * @param et2 second expression type
      * @return promoted expression type
      */
-    expr_type promote_primitive(const expr_type& et1, const expr_type& et2);
-
+    bare_expr_type promote_primitive(const bare_expr_type& et1,
+                                     const bare_expr_type& et2);
   }
 }
 #endif
