@@ -258,28 +258,28 @@ namespace stan {
         rho_hat_t.setZero();
         double rho_hat_even = 1;
         double rho_hat_odd = 0;
-	Eigen::VectorXd acov_t(chains);
-	for (int chain = 0; chain < chains; chain++)
-	  acov_t(chain) = acov(chain)(1);
-	rho_hat_odd = 1 - (mean_var - mean(acov_t)) / var_plus;
-	rho_hat_t(1) = rho_hat_odd;
-	// Geyer's initial positive sequence
+        Eigen::VectorXd acov_t(chains);
+        for (int chain = 0; chain < chains; chain++)
+          acov_t(chain) = acov(chain)(1);
+        rho_hat_odd = 1 - (mean_var - mean(acov_t)) / var_plus;
+        rho_hat_t(1) = rho_hat_odd;
+        // Geyer's initial positive sequence
         for (int t = 1;
-	     (t < (n_samples - 2) && (rho_hat_even + rho_hat_odd) >= 0);
-	     t += 2) {
-	  for (int chain = 0; chain < chains; chain++)
-	    acov_t(chain) = acov(chain)(t+1);
-	  rho_hat_even = 1 - (mean_var - mean(acov_t)) / var_plus;
+             (t < (n_samples - 2) && (rho_hat_even + rho_hat_odd) >= 0);
+             t += 2) {
+          for (int chain = 0; chain < chains; chain++)
+            acov_t(chain) = acov(chain)(t+1);
+          rho_hat_even = 1 - (mean_var - mean(acov_t)) / var_plus;
           for (int chain = 0; chain < chains; chain++)
             acov_t(chain) = acov(chain)(t+2);
           rho_hat_odd = 1 - (mean_var - mean(acov_t)) / var_plus;
           if ((rho_hat_even + rho_hat_odd) >= 0) {
             rho_hat_t(t+1) = rho_hat_even;
             rho_hat_t(t+2) = rho_hat_odd;
-	  }
+          }
         }
-	double ess = chains * n_samples;
-	ess /= (1 + 2 * rho_hat_t.sum());
+        double ess = chains * n_samples;
+        ess /= (1 + 2 * rho_hat_t.sum());
         return ess;
       }
 
