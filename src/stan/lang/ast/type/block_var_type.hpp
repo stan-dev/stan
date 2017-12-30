@@ -212,6 +212,12 @@ namespace stan {
       //  * Returns vector of sizes for each dimension, nil if unsized.
       //  */
       // std::vector<expression> size() const;
+
+      /**
+       * Returns equivalent bare_expr_type (unsized) for this block type.
+       */
+      bare_expr_type bare_type() const;
+
     };
   }
 }

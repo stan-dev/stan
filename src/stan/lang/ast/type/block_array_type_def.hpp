@@ -12,7 +12,7 @@ namespace stan {
                                        const expression& len)
       : element_type_(el_type), array_len_(len) { }
     
-    size_t block_array_type::dims() const {
+    int block_array_type::dims() const {
       size_t total = 1;
       block_var_type cur_type(element_type_);
       while (cur_type.is_array_type()) {

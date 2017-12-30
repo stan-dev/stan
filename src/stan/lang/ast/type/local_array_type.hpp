@@ -45,7 +45,7 @@ namespace stan {
       /**
        * Returns number of array dimensions.
        */
-      size_t dims() const;
+      int dims() const;
 
       /**
        * Returns the length of this array.

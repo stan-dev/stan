@@ -8,10 +8,13 @@
 namespace stan {
   namespace lang {
 
+    //TODO:mitzi - need visitor to get size of local var container types
+    //             need visitor to get corresponding bare type
+    //             these types are held by local_var_decl 
+
     /** 
      * Local variable types have sized container types.
      */
-    
     struct local_array_type;
     struct double_type;
     struct ill_formed_type;
@@ -142,6 +145,11 @@ namespace stan {
        * Returns vector of sizes for each dimension, nil if unsized.
        */
       std::vector<expression> size() const;
+
+      /**
+       * Returns equivalent bare_expr_type (unsized) for this local type.
+       */
+      bare_expr_type bare_type() const;
     };
     
   }

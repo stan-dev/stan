@@ -58,6 +58,11 @@ namespace stan {
       get_total_dims_vis vis;
       return boost::apply_visitor(vis, var_type_);
     }
+
+    bare_expr_type local_var_type::bare_type() const {
+      get_bare_type_vis vis;
+      return boost::apply_visitor(vis, var_type_);
+    }
   }
 }
 #endif
