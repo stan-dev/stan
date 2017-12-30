@@ -1,5 +1,5 @@
-#ifndef STAN_LANG_AST_ARRAY_BARE_TYPE_HPP
-#define STAN_LANG_AST_ARRAY_BARE_TYPE_HPP
+#ifndef STAN_LANG_AST_BARE_ARRAY_TYPE_HPP
+#define STAN_LANG_AST_BARE_ARRAY_TYPE_HPP
 
 #include <stan/lang/ast/node/expression.hpp>
 #include <string>
@@ -10,7 +10,7 @@ namespace stan {
     /** 
      * Bare array type for Stan variables and expressions (recursive).
      */
-    struct array_bare_type {
+    struct bare_array_type {
       /**
        * The array element type.
        */
@@ -18,14 +18,14 @@ namespace stan {
       /**
        * Construct an array local var type with default values.
        */
-      array_bare_type();
+      bare_array_type();
 
       /**
        * Construct a bare array type with the specified element type.
        *
        * @param el_type element type 
        */
-      array_bare_type(const bare_expr_type& el_type);  // NOLINT(runtime/explicit)
+      bare_array_type(const bare_expr_type& el_type);  // NOLINT(runtime/explicit)
 
       /**
        * Returns type of elements stored in innermost array.
@@ -35,7 +35,7 @@ namespace stan {
       /**
        * Returns number of array dimensions.
        */
-      int array_dims() const;
+      int dims() const;
     };
   }
 }

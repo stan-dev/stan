@@ -1,7 +1,7 @@
-#ifndef STAN_LANG_AST_FUN_GET_ARRAY_BLOCK_EL_TYPE_VIS_HPP
-#define STAN_LANG_AST_FUN_GET_ARRAY_BLOCK_EL_TYPE_VIS_HPP
+#ifndef STAN_LANG_AST_FUN_GET_BLOCK_ARRAY_BASE_TYPE_VIS_HPP
+#define STAN_LANG_AST_FUN_GET_BLOCK_ARRAY_BASE_TYPE_VIS_HPP
 
-#include <stan/lang/ast/type/array_block_type.hpp>
+#include <stan/lang/ast/type/block_array_type.hpp>
 #include <stan/lang/ast/type/cholesky_corr_block_type.hpp>
 #include <stan/lang/ast/type/cholesky_factor_block_type.hpp>
 #include <stan/lang/ast/type/corr_matrix_block_type.hpp>
@@ -22,24 +22,24 @@ namespace stan {
   namespace lang {
 
     /**
-     * Visitor to get array element type.
+     * Visitor to get base type from array type.
      */
-    struct get_array_block_el_type_vis : public boost::static_visitor<block_var_type> {
+    struct get_block_array_base_type_vis : public boost::static_visitor<block_var_type> {
       /**
        * Construct a visitor.
        */
-      get_array_block_el_type_vis();
+      get_block_array_base_type_vis();
 
       /**
-       * Return element type held by array type.
+       * Return base type held by array type.
        *
        * @param x type
-       * @return element type
+       * @return base type
        */
-      block_var_type operator()(const array_block_type& x) const;
+      block_var_type operator()(const block_array_type& x) const;
 
       /**
-       * Return element type held by array type.
+       * Return base type held by array type.
        *
        * @param x type
        * @return ill_formed_type
@@ -47,7 +47,7 @@ namespace stan {
       block_var_type operator()(const cholesky_corr_block_type& x) const;
 
       /**
-       * Return element type held by array type.
+       * Return base type held by array type.
        *
        * @param x type
        * @return ill_formed_type
@@ -55,7 +55,7 @@ namespace stan {
       block_var_type operator()(const cholesky_factor_block_type& x) const;
 
       /**
-       * Return element type held by array type.
+       * Return base type held by array type.
        *
        * @param x type
        * @return ill_formed_type
@@ -63,7 +63,7 @@ namespace stan {
       block_var_type operator()(const corr_matrix_block_type& x) const;
 
       /**
-       * Return element type held by array type.
+       * Return base type held by array type.
        *
        * @param x type
        * @return ill_formed_type
@@ -71,7 +71,7 @@ namespace stan {
       block_var_type operator()(const cov_matrix_block_type& x) const;
 
       /**
-       * Return element type held by array type.
+       * Return base type held by array type.
        *
        * @param x type
        * @return ill_formed_type
@@ -79,7 +79,7 @@ namespace stan {
       block_var_type operator()(const double_block_type& x) const;
 
       /**
-       * Return element type held by array type.
+       * Return base type held by array type.
        *
        * @param x type
        * @return ill_formed_type
@@ -87,7 +87,7 @@ namespace stan {
       block_var_type operator()(const ill_formed_type& x) const;
 
       /**
-       * Return element type held by array type.
+       * Return base type held by array type.
        *
        * @param x type
        * @return ill_formed_type
@@ -95,7 +95,7 @@ namespace stan {
       block_var_type operator()(const int_block_type& x) const;
 
       /**
-       * Return element type held by array type.
+       * Return base type held by array type.
        *
        * @param x type
        * @return ill_formed_type
@@ -103,7 +103,7 @@ namespace stan {
       block_var_type operator()(const matrix_block_type& x) const;
 
       /**
-       * Return element type held by array type.
+       * Return base type held by array type.
        *
        * @param x type
        * @return ill_formed_type
@@ -111,7 +111,7 @@ namespace stan {
       block_var_type operator()(const ordered_block_type& x) const;
 
       /**
-       * Return element type held by array type.
+       * Return base type held by array type.
        *
        * @param x type
        * @return ill_formed_type
@@ -119,7 +119,7 @@ namespace stan {
       block_var_type operator()(const positive_ordered_block_type& x) const;
 
       /**
-       * Return element type held by array type.
+       * Return base type held by array type.
        *
        * @param x type
        * @return ill_formed_type
@@ -127,7 +127,7 @@ namespace stan {
       block_var_type operator()(const row_vector_block_type& x) const;
 
       /**
-       * Return element type held by array type.
+       * Return base type held by array type.
        *
        * @param x type
        * @return ill_formed_type
@@ -135,7 +135,7 @@ namespace stan {
       block_var_type operator()(const simplex_block_type& x) const;
 
       /**
-       * Return element type held by array type.
+       * Return base type held by array type.
        *
        * @param x type
        * @return ill_formed_type
@@ -143,7 +143,7 @@ namespace stan {
       block_var_type operator()(const unit_vector_block_type& x) const;
 
       /**
-       * Return element type held by array type.
+       * Return base type held by array type.
        *
        * @param x type
        * @return ill_formed_type

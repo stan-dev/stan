@@ -5,6 +5,8 @@
 
 namespace stan {
   namespace lang {
+    get_expression_bare_type_vis::get_expression_bare_type_vis() { }
+
     bare_expr_type
     get_expression_bare_type_vis::operator()(const nil& st) const {
       return ill_formed_type();
@@ -46,11 +48,11 @@ namespace stan {
     // }
 
     // bare_expr_type get_expression_bare_type_vis::operator()(const integrate_ode& e) const {
-    //   return array_bare_type(double_type());
+    //   return bare_array_type(double_type());
     // }
 
     // bare_expr_type get_expression_bare_type_vis::operator()(const integrate_ode_control& e) const {
-    //   return array_bare_type(double_type());
+    //   return bare_array_type(double_type());
     // }
 
     // bare_expr_type get_expression_bare_type_vis::operator()(const algebra_solver& e) const {

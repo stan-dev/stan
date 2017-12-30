@@ -4,6 +4,7 @@
 #include <stan/lang/ast/node/expression.hpp>
 #include <boost/variant/recursive_variant.hpp>
 #include <string>
+#include <ostream>
 
 namespace stan {
   namespace lang {
@@ -11,7 +12,7 @@ namespace stan {
     /** 
      * Bare type for Stan variables and expressions.
      */
-    struct array_bare_type;
+    struct bare_array_type;
     struct double_type;
     struct ill_formed_type;
     struct int_type;
@@ -34,7 +35,7 @@ namespace stan {
         boost::recursive_wrapper<row_vector_type>,
         boost::recursive_wrapper<vector_type>,
         boost::recursive_wrapper<void_type>,
-        boost::recursive_wrapper<array_bare_type> >
+        boost::recursive_wrapper<bare_array_type> >
       bare_t;
 
       /**
@@ -113,7 +114,7 @@ namespace stan {
        *
        * @param type bare type
        */      
-      bare_expr_type(const array_bare_type& type); // NOLINT(runtime/explicit)
+      bare_expr_type(const bare_array_type& type); // NOLINT(runtime/explicit)
 
       /**
        * Return true if the specified bare type is the same as
@@ -205,15 +206,27 @@ namespace stan {
       bool is_matrix_type() const;
 
       /**
-       * Returns true if `bare_type_` is `array_bare_type`, false otherwise.
+       * Returns true if `bare_type_` is `bare_array_type`, false otherwise.
        */
-      bool is_array_var_type() const;
+      bool is_array_type() const;
 
       /**
-       * Returns array element type if `var_type_` is `array_bare_type`,
-       * ill_formed_type otherwise.  (Call `is_array_var_type()` first.)
+       * Returns the element type for `bare_array_type`, otherwise
+       * will return `ill_formed_type`.
        */
-      bare_expr_type get_array_el_type() const;
+      bare_expr_type array_element_type() const;
+
+      /**
+       * If `bare_type` is `bare_array_type`, returns the innermost type
+       * contained in the array, otherwise will return `ill_formed_type`.
+       */
+      bare_expr_type array_contains() const;
+
+      /**
+       * Returns number of array dimensions for this type.
+       * Returns 0 for non-array types.
+       */
+      int array_dims() const;
 
       /**
        * Returns total number of dimensions for container type.
@@ -221,6 +234,17 @@ namespace stan {
        */
       int num_dims() const;
     };
+
+    /**
+     * Stream a user-readable version of the bare_expr_type to the
+     * specified output stream, returning the specified argument
+     * output stream to allow chaining.
+     *
+     * @param o output stream
+     * @param x expression type
+     * @return argument output stream
+     */
+    std::ostream& operator<<(std::ostream& o, const bare_expr_type& x);
   }
 }
 #endif

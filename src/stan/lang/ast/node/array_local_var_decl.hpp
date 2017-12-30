@@ -1,5 +1,5 @@
-#ifndef STAN_LANG_AST_NODE_ARRAY_LOCAL_VAR_DECL_HPP
-#define STAN_LANG_AST_NODE_ARRAY_LOCAL_VAR_DECL_HPP
+#ifndef STAN_LANG_AST_NODE_LOCAL_ARRAY_VAR_DECL_HPP
+#define STAN_LANG_AST_NODE_LOCAL_ARRAY_VAR_DECL_HPP
 
 #include <stan/lang/ast/type/local_var_type.hpp>
 #include <stan/lang/ast/node/expression.hpp>
@@ -15,7 +15,7 @@ namespace stan {
       /**
        * Array type defines element type, array size.
        */
-      array_local_type type_;
+      local_array_type type_;
 
       /**
        * Construct an array local variable declaration with default

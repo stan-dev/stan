@@ -1,9 +1,9 @@
 #ifndef STAN_LANG_AST_FUN_GET_TOTAL_DIMS_VIS_HPP
 #define STAN_LANG_AST_FUN_GET_TOTAL_DIMS_VIS_HPP
 
-#include <stan/lang/ast/type/array_bare_type.hpp>
-#include <stan/lang/ast/type/array_block_type.hpp>
-#include <stan/lang/ast/type/array_local_type.hpp>
+#include <stan/lang/ast/type/bare_array_type.hpp>
+#include <stan/lang/ast/type/block_array_type.hpp>
+#include <stan/lang/ast/type/local_array_type.hpp>
 #include <stan/lang/ast/type/cholesky_corr_block_type.hpp>
 #include <stan/lang/ast/type/cholesky_factor_block_type.hpp>
 #include <stan/lang/ast/type/corr_matrix_block_type.hpp>
@@ -46,21 +46,21 @@ namespace stan {
        *
        * @param x type
        */
-      int operator()(const array_block_type& x) const;
+      int operator()(const block_array_type& x) const;
 
       /**
        * Return true if the specified type is an array type.
        *
        * @param x type
        */
-      int operator()(const array_local_type& x) const;
+      int operator()(const local_array_type& x) const;
 
       /**
        * Return true if the specified type is an array type.
        *
        * @param x type
        */
-      int operator()(const array_bare_type& x) const;
+      int operator()(const bare_array_type& x) const;
 
       /**
        * Return true if the specified type is an array type.

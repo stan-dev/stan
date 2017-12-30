@@ -21,19 +21,19 @@ namespace stan {
 
     std::vector<expression>
     var_decl_size_vis::operator()(const array_local_var_decl& x) const {
-      // recuse down through array_block_type.element_type_
+      // recuse down through block_array_type.element_type_
       return std::vector<expression>();
     }
 
     std::vector<expression>
     var_decl_size_vis::operator()(const int_block_var_decl& x) const {
-      // recuse down through array_block_type.element_type_
+      // recuse down through block_array_type.element_type_
       return std::vector<expression>();
     }
 
     std::vector<expression>
     var_decl_size_vis::operator()(const int_local_var_decl& x) const {
-      // recuse down through array_block_type.element_type_
+      // recuse down through block_array_type.element_type_
       return std::vector<expression>();
     }
 

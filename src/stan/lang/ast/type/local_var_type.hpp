@@ -12,7 +12,7 @@ namespace stan {
      * Local variable types have sized container types.
      */
     
-    struct array_local_type;
+    struct local_array_type;
     struct double_type;
     struct ill_formed_type;
     struct int_type;
@@ -31,7 +31,7 @@ namespace stan {
         boost::recursive_wrapper<matrix_local_type>,
         boost::recursive_wrapper<row_vector_local_type>,
         boost::recursive_wrapper<vector_local_type>,
-        boost::recursive_wrapper<array_local_type> >
+        boost::recursive_wrapper<local_array_type> >
       local_t;
 
       /**
@@ -99,7 +99,7 @@ namespace stan {
        *
        * @param type local variable type
        */      
-      local_var_type(const array_local_type& type); // NOLINT(runtime/explicit)
+      local_var_type(const local_array_type& type); // NOLINT(runtime/explicit)
 
       /**
        * Construct a local var type with the specified type.
@@ -110,15 +110,27 @@ namespace stan {
 
       
       /**
-       * Returns true if `var_type_` is `array_local_type`, false otherwise.
+       * Returns true if `var_type_` is `local_array_type`, false otherwise.
        */
-      bool is_array_var_type() const;
+      bool is_array_type() const;
 
       /**
-       * Returns array element type if `var_type_` is `array_local_type`,
-       * ill_formed_type otherwise.  (Call `is_array_var_type()` first.)
+       * Returns array element type if `var_type_` is `local_array_type`,
+       * ill_formed_type otherwise.  (Call `is_array_type()` first.)
        */
-      local_var_type get_array_el_type() const;
+      local_var_type array_element_type() const;
+
+      /**
+       * If `var_type` is `local_array_type`, returns the innermost type
+       * contained in the array, otherwise will return `ill_formed_type`.
+       */
+      local_var_type array_contains() const;
+
+      /**
+       * Returns number of array dimensions for this type.
+       * Returns 0 for non-array types.
+       */
+      int array_dims() const;
 
       /**
        * Returns total number of dimensions for container type.

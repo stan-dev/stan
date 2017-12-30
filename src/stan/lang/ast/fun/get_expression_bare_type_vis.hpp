@@ -26,6 +26,11 @@ namespace stan {
     
     struct get_expression_bare_type_vis : public boost::static_visitor<bare_expr_type> {
       /**
+       * Construct a visitor.
+       */
+      get_expression_bare_type_vis();
+
+      /**
        * Return the bare_expr_type corresponding to this expression
        *
        * @return bare expression type

@@ -10,7 +10,7 @@ namespace stan {
     var_decl::var_decl() { }
 
     var_decl::var_decl(const std::string& name)
-      : name_(name) {  }
+      : name_(name), bare_type_(ill_formed_type()) {  }
 
     var_decl::var_decl(const std::string& name,
                        const bare_expr_type& type)

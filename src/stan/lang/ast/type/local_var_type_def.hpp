@@ -32,15 +32,25 @@ namespace stan {
     local_var_type::local_var_type(const matrix_local_type& x)
       : var_type_(x) { }
 
-    local_var_type::local_var_type(const array_local_type& x)
+    local_var_type::local_var_type(const local_array_type& x)
       : var_type_(x) { }
 
-    bool local_var_type::is_array_var_type() const {
-      return boost::apply_visitor(is_array_var_type_vis(), var_type_);
+    bool local_var_type::is_array_type() const {
+      return boost::apply_visitor(is_array_type_vis(), var_type_);
     }
 
-    local_var_type local_var_type::get_array_el_type() const {
-      get_array_local_el_type_vis vis;
+    local_var_type local_var_type::array_element_type() const {
+      get_local_array_element_type_vis vis;
+      return boost::apply_visitor(vis, var_type_);
+    }
+
+    local_var_type local_var_type::array_contains() const {
+      get_local_array_base_type_vis vis;
+      return boost::apply_visitor(vis, var_type_);
+    }
+
+    int local_var_type::array_dims() const {
+      get_local_array_dims_vis vis;
       return boost::apply_visitor(vis, var_type_);
     }
 

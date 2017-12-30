@@ -1,13 +1,25 @@
 #ifndef STAN_LANG_AST_BARE_EXPR_TYPE_DEF_HPP
 #define STAN_LANG_AST_BARE_EXPR_TYPE_DEF_HPP
 
-#include <stan/lang/ast.hpp>
+#include <stan/lang/ast/type/bare_array_type.hpp>
+#include <stan/lang/ast/type/bare_expr_type.hpp>
+#include <stan/lang/ast/type/double_type.hpp>
+#include <stan/lang/ast/type/ill_formed_type.hpp>
+#include <stan/lang/ast/type/int_type.hpp>
+#include <stan/lang/ast/type/matrix_type.hpp>
+#include <stan/lang/ast/type/row_vector_type.hpp>
+#include <stan/lang/ast/type/vector_type.hpp>
+#include <stan/lang/ast/type/void_type.hpp>
+
+#include <stan/lang/ast/fun/write_bare_expr_type.hpp>
+#include <ostream>
 
 namespace stan {
   namespace lang {
 
     bare_expr_type::bare_expr_type()
-      : bare_type_(ill_formed_type()) { }
+      : bare_type_(ill_formed_type()),
+        order_id_(ill_formed_type::ORDER_ID) { }
 
     bare_expr_type::bare_expr_type(const bare_expr_type& x)
       : bare_type_(x.bare_type_), order_id_(x.order_id_) { }
@@ -40,9 +52,9 @@ namespace stan {
       : bare_type_(matrix_type()),
         order_id_(matrix_type::ORDER_ID) { }
 
-    bare_expr_type::bare_expr_type(const array_bare_type& x)
-      : bare_type_(array_bare_type(x.element_type_)),
-        order_id_(10 * x.array_dims() + x.contains().order_id_) { }
+    bare_expr_type::bare_expr_type(const bare_array_type& x)
+      : bare_type_(bare_array_type(x.element_type_)),
+        order_id_(10 * x.dims() + x.contains().order_id_) { }
 
     bool bare_expr_type::is_ill_formed_type() const {
       return order_id_ == ill_formed_type::ORDER_ID;
@@ -72,13 +84,23 @@ namespace stan {
       return order_id_ == matrix_type::ORDER_ID;
     }
 
-    bool bare_expr_type::is_array_var_type() const {
-      is_array_var_type_vis vis;
+    bool bare_expr_type::is_array_type() const {
+      is_array_type_vis vis;
       return boost::apply_visitor(vis, bare_type_);
     }
 
-    bare_expr_type bare_expr_type::get_array_el_type() const {
-      get_array_bare_el_type_vis vis;
+    bare_expr_type bare_expr_type::array_element_type() const {
+      get_bare_array_element_type_vis vis;
+      return boost::apply_visitor(vis, bare_type_);
+    }
+
+    bare_expr_type bare_expr_type::array_contains() const {
+      get_bare_array_base_type_vis vis;
+      return boost::apply_visitor(vis, bare_type_);
+    }
+
+    int bare_expr_type::array_dims() const {
+      get_bare_array_dims_vis vis;
       return boost::apply_visitor(vis, bare_type_);
     }
 
@@ -109,6 +131,11 @@ namespace stan {
 
     bool bare_expr_type::operator>=(const bare_expr_type& bare_type) const {
       return order_id_ >= bare_type.order_id_;
+    }
+
+    std::ostream& operator<<(std::ostream& o, const bare_expr_type& bare_type) {
+      write_bare_expr_type(o, bare_type);
+      return o;
     }
   }
 }

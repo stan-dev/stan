@@ -9,19 +9,16 @@ namespace stan {
     get_total_dims_vis::get_total_dims_vis() { }
 
 
-    int get_total_dims_vis::operator()(const array_block_type& x) const {
-      return array_block_type(x).array_dims() +
-             array_block_type(x).contains().num_dims();
+    int get_total_dims_vis::operator()(const block_array_type& x) const {
+      return x.dims() + x.contains().num_dims();
     }
 
-    int get_total_dims_vis::operator()(const array_local_type& x) const {
-      return array_local_type(x).array_dims() +
-             array_local_type(x).contains().num_dims();
+    int get_total_dims_vis::operator()(const local_array_type& x) const {
+      return x.dims() + x.contains().num_dims();
     }
 
-    int get_total_dims_vis::operator()(const array_bare_type& x) const {
-      return array_bare_type(x).array_dims() +
-             array_bare_type(x).contains().num_dims();
+    int get_total_dims_vis::operator()(const bare_array_type& x) const {
+      return x.dims() + x.contains().num_dims();
     }
 
     int get_total_dims_vis::operator()(const cholesky_corr_block_type& x) const {

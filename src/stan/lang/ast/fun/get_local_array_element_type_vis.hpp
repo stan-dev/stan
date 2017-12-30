@@ -1,7 +1,7 @@
-#ifndef STAN_LANG_AST_FUN_GET_ARRAY_LOCAL_EL_TYPE_VIS_HPP
-#define STAN_LANG_AST_FUN_GET_ARRAY_LOCAL_EL_TYPE_VIS_HPP
+#ifndef STAN_LANG_AST_FUN_GET_LOCAL_ARRAY_ELEMENT_TYPE_VIS_HPP
+#define STAN_LANG_AST_FUN_GET_LOCAL_ARRAY_ELEMENT_TYPE_VIS_HPP
 
-#include <stan/lang/ast/type/array_local_type.hpp>
+#include <stan/lang/ast/type/local_array_type.hpp>
 #include <stan/lang/ast/type/double_type.hpp>
 #include <stan/lang/ast/type/ill_formed_type.hpp>
 #include <stan/lang/ast/type/int_type.hpp>
@@ -16,14 +16,19 @@ namespace stan {
     /**
      * Visitor to get array element type.
      */
-    struct get_array_local_el_type_vis : public boost::static_visitor<local_var_type> {
+    struct get_local_array_element_type_vis : public boost::static_visitor<local_var_type> {
+      /**
+       * Construct a visitor.
+       */
+      get_local_array_element_type_vis();
+
       /**
        * Return element type held by array type.
        *
        * @param x type
        * @return element type
        */
-      local_var_type operator()(const array_local_type& x) const;
+      local_var_type operator()(const local_array_type& x) const;
 
       /**
        * Return element type held by array type.

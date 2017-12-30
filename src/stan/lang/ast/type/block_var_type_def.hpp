@@ -56,16 +56,26 @@ namespace stan {
     block_var_type::block_var_type(const vector_block_type& x)
       : var_type_(x) { }
 
-    block_var_type::block_var_type(const array_block_type& x)
+    block_var_type::block_var_type(const block_array_type& x)
       : var_type_(x) { }
 
-    bool block_var_type::is_array_var_type() const {
-      is_array_var_type_vis vis;
+    bool block_var_type::is_array_type() const {
+      is_array_type_vis vis;
       return boost::apply_visitor(vis, var_type_);
     }
 
-    block_var_type block_var_type::get_array_el_type() const {
-      get_array_block_el_type_vis vis;
+    block_var_type block_var_type::array_element_type() const {
+      get_block_array_element_type_vis vis;
+      return boost::apply_visitor(vis, var_type_);
+    }
+
+    block_var_type block_var_type::array_contains() const {
+      get_block_array_base_type_vis vis;
+      return boost::apply_visitor(vis, var_type_);
+    }
+
+    int block_var_type::array_dims() const {
+      get_block_array_dims_vis vis;
       return boost::apply_visitor(vis, var_type_);
     }
 

@@ -12,7 +12,7 @@ namespace stan {
      * Block variable types
      */
 
-    struct array_block_type;
+    struct block_array_type;
     struct cholesky_corr_block_type;
     struct cholesky_factor_block_type;
     struct corr_matrix_block_type;
@@ -47,7 +47,7 @@ namespace stan {
         boost::recursive_wrapper<simplex_block_type>,
         boost::recursive_wrapper<unit_vector_block_type>,
         boost::recursive_wrapper<vector_block_type>,
-        boost::recursive_wrapper<array_block_type> >
+        boost::recursive_wrapper<block_array_type> >
       block_t;
 
       /**
@@ -170,7 +170,7 @@ namespace stan {
        *
        * @param type block variable type
        */      
-      block_var_type(const array_block_type& x); // NOLINT(runtime/explicit)
+      block_var_type(const block_array_type& x); // NOLINT(runtime/explicit)
 
       /**
        * Construct a block var type with the specified type.
@@ -180,15 +180,27 @@ namespace stan {
       block_var_type(const block_t& var_type_);  // NOLINT(runtime/explicit)
 
       /**
-       * Returns true if `var_type_` is `array_block_type`, false otherwise.
+       * Returns true if `var_type_` is `block_array_type`, false otherwise.
        */
-      bool is_array_var_type() const;
+      bool is_array_type() const;
 
       /**
-       * Returns array element type if `var_type_` is `array_block_type`,
-       * ill_formed_type otherwise.  (Call `is_array_var_type()` first.)
+       * Returns array element type if `var_type_` is `block_array_type`,
+       * ill_formed_type otherwise.  (Call `is_array_type()` first.)
        */
-      block_var_type get_array_el_type() const;
+      block_var_type array_element_type() const;
+
+      /**
+       * If `var_type` is `block_array_type`, returns the innermost type
+       * contained in the array, otherwise will return `ill_formed_type`.
+       */
+      block_var_type array_contains() const;
+
+      /**
+       * Returns number of array dimensions for this type.
+       * Returns 0 for non-array types.
+       */
+      int array_dims() const;
 
       /**
        * Returns total number of dimensions for container type.

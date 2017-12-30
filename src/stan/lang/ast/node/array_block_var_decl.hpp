@@ -1,7 +1,7 @@
-#ifndef STAN_LANG_AST_NODE_ARRAY_BLOCK_VAR_DECL_HPP
-#define STAN_LANG_AST_NODE_ARRAY_BLOCK_VAR_DECL_HPP
+#ifndef STAN_LANG_AST_NODE_BLOCK_ARRAY_VAR_DECL_HPP
+#define STAN_LANG_AST_NODE_BLOCK_ARRAY_VAR_DECL_HPP
 
-#include <stan/lang/ast/type/array_block_type.hpp>
+#include <stan/lang/ast/type/block_array_type.hpp>
 #include <stan/lang/ast/type/block_var_type.hpp>
 #include <stan/lang/ast/node/expression.hpp>
 #include <string>
@@ -16,7 +16,7 @@ namespace stan {
       /**
        * Array type defines element type, array size.
        */
-      array_block_type type_;
+      block_array_type type_;
 
       /**
        * Construct an array block variable declaration with default

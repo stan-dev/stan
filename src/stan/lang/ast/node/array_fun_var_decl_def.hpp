@@ -12,7 +12,7 @@ namespace stan {
     array_fun_var_decl::array_fun_var_decl(
                           const std::string& name,
                           const bare_expr_type& el_type)
-      : var_decl(name), type_(array_bare_type(el_type)) { }
+      : var_decl(name), type_(bare_array_type(el_type)) { }
   }
 }
 #endif

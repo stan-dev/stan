@@ -15,7 +15,7 @@ namespace stan {
       /**
        * Array type defines element type, array size.
        */
-      array_bare_type type_;
+      bare_array_type type_;
 
       /**
        * Construct an array fun variable declaration with default

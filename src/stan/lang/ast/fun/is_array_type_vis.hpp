@@ -1,9 +1,9 @@
-#ifndef STAN_LANG_AST_FUN_IS_ARRAY_VAR_TYPE_VIS_HPP
-#define STAN_LANG_AST_FUN_IS_ARRAY_VAR_TYPE_VIS_HPP
+#ifndef STAN_LANG_AST_FUN_IS_ARRAY_TYPE_VIS_HPP
+#define STAN_LANG_AST_FUN_IS_ARRAY_TYPE_VIS_HPP
 
-#include <stan/lang/ast/type/array_bare_type.hpp>
-#include <stan/lang/ast/type/array_block_type.hpp>
-#include <stan/lang/ast/type/array_local_type.hpp>
+#include <stan/lang/ast/type/bare_array_type.hpp>
+#include <stan/lang/ast/type/block_array_type.hpp>
+#include <stan/lang/ast/type/local_array_type.hpp>
 #include <stan/lang/ast/type/cholesky_corr_block_type.hpp>
 #include <stan/lang/ast/type/cholesky_factor_block_type.hpp>
 #include <stan/lang/ast/type/corr_matrix_block_type.hpp>
@@ -35,11 +35,11 @@ namespace stan {
     /**
      * Visitor to check if type is an array type
      */
-    struct is_array_var_type_vis : public boost::static_visitor<bool> {
+    struct is_array_type_vis : public boost::static_visitor<bool> {
       /**
        * Construct the array type check visitor.
        */
-      is_array_var_type_vis();
+      is_array_type_vis();
 
       /**
        * Return true if the specified type is an array type.
@@ -47,7 +47,7 @@ namespace stan {
        * @param x type
        * @return true
        */
-      bool operator()(const array_block_type& x) const;
+      bool operator()(const block_array_type& x) const;
 
       /**
        * Return true if the specified type is an array type.
@@ -55,7 +55,7 @@ namespace stan {
        * @param x type
        * @return true
        */
-      bool operator()(const array_local_type& x) const;
+      bool operator()(const local_array_type& x) const;
 
       /**
        * Return true if the specified type is an array type.
@@ -63,7 +63,7 @@ namespace stan {
        * @param x type
        * @return true
        */
-      bool operator()(const array_bare_type& x) const;
+      bool operator()(const bare_array_type& x) const;
 
       /**
        * Return true if the specified type is an array type.

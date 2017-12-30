@@ -1,5 +1,5 @@
-#ifndef STAN_LANG_AST_ARRAY_LOCAL_TYPE_HPP
-#define STAN_LANG_AST_ARRAY_LOCAL_TYPE_HPP
+#ifndef STAN_LANG_AST_LOCAL_ARRAY_TYPE_HPP
+#define STAN_LANG_AST_LOCAL_ARRAY_TYPE_HPP
 
 #include <stan/lang/ast/node/expression.hpp>
 
@@ -11,7 +11,7 @@ namespace stan {
     /** 
      * Local array type for Stan variables and expressions (recursive).
      */
-    struct array_local_type {
+    struct local_array_type {
       /**
        * The array element type.
        */
@@ -25,7 +25,7 @@ namespace stan {
       /**
        * Construct an array local var type with default values.
        */
-      array_local_type();
+      local_array_type();
 
       /**
        * Construct a local array type with the specified element type
@@ -34,7 +34,7 @@ namespace stan {
        * @param el_type element type 
        * @param len array length
        */
-      array_local_type(const local_var_type& el_type,
+      local_array_type(const local_var_type& el_type,
                        const expression& len);
       
       /**
@@ -45,7 +45,7 @@ namespace stan {
       /**
        * Returns number of array dimensions.
        */
-      size_t array_dims() const;
+      size_t dims() const;
 
       /**
        * Returns the length of this array.
