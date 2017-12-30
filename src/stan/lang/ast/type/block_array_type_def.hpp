@@ -13,7 +13,7 @@ namespace stan {
       : element_type_(el_type), array_len_(len) { }
     
     int block_array_type::dims() const {
-      size_t total = 1;
+      int total = 1;
       block_var_type cur_type(element_type_);
       while (cur_type.is_array_type()) {
         total += 1;

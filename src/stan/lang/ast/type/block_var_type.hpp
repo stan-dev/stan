@@ -2,6 +2,7 @@
 #define STAN_LANG_AST_BLOCK_VAR_TYPE_HPP
 
 #include <stan/lang/ast/node/expression.hpp>
+#include <stan/lang/ast/node/range.hpp>
 #include <boost/variant/recursive_variant.hpp>
 #include <string>
 
@@ -180,17 +181,6 @@ namespace stan {
       block_var_type(const block_t& var_type_);  // NOLINT(runtime/explicit)
 
       /**
-       * Returns true if `var_type_` is `block_array_type`, false otherwise.
-       */
-      bool is_array_type() const;
-
-      /**
-       * Returns array element type if `var_type_` is `block_array_type`,
-       * ill_formed_type otherwise.  (Call `is_array_type()` first.)
-       */
-      block_var_type array_element_type() const;
-
-      /**
        * If `var_type` is `block_array_type`, returns the innermost type
        * contained in the array, otherwise will return `ill_formed_type`.
        */
@@ -203,21 +193,41 @@ namespace stan {
       int array_dims() const;
 
       /**
-       * Returns total number of dimensions for container type.
-       * Returns 0 for scalar types.
+       * Returns array element type if `var_type_` is `block_array_type`,
+       * ill_formed_type otherwise.  (Call `is_array_type()` first.)
        */
-      int num_dims() const;
+      block_var_type array_element_type() const;
 
-      // /**
-      //  * Returns vector of sizes for each dimension, nil if unsized.
-      //  */
-      // std::vector<expression> size() const;
+      /**
+       * Returns array length for block_array_type, nil otherwise.
+       */
+      expression array_len() const;
 
       /**
        * Returns equivalent bare_expr_type (unsized) for this block type.
        */
       bare_expr_type bare_type() const;
 
+      /**
+       * Returns bounds for this type.
+       */
+      range bounds() const;
+
+      /**
+       * Returns true if `var_type_` is `block_array_type`, false otherwise.
+       */
+      bool is_array_type() const;
+
+      /**
+       * Returns total number of dimensions for container type.
+       * Returns 0 for scalar types.
+       */
+      int num_dims() const;
+
+      /**
+       * Returns vector of sizes for each dimension, empty vector if unsized.
+       */
+      std::vector<expression> size() const;
     };
   }
 }

@@ -1,5 +1,5 @@
-#ifndef STAN_LANG_AST_FUN_GET_BLOCK_ARRAY_BASE_TYPE_VIS_HPP
-#define STAN_LANG_AST_FUN_GET_BLOCK_ARRAY_BASE_TYPE_VIS_HPP
+#ifndef STAN_LANG_AST_FUN_BLOCK_ARRAY_BASE_TYPE_VIS_HPP
+#define STAN_LANG_AST_FUN_BLOCK_ARRAY_BASE_TYPE_VIS_HPP
 
 #include <stan/lang/ast/type/block_array_type.hpp>
 #include <stan/lang/ast/type/cholesky_corr_block_type.hpp>
@@ -24,11 +24,11 @@ namespace stan {
     /**
      * Visitor to get base type from array type.
      */
-    struct get_block_array_base_type_vis : public boost::static_visitor<block_var_type> {
+    struct block_array_base_type_vis : public boost::static_visitor<block_var_type> {
       /**
        * Construct a visitor.
        */
-      get_block_array_base_type_vis();
+      block_array_base_type_vis();
 
       /**
        * Return base type held by array type.

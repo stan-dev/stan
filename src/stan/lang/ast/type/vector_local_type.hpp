@@ -22,6 +22,7 @@ namespace stan {
 
       /**
        * Construct a local var type with specified values.
+       * Length should be int expression - constructor doesn't check.
        *
        * @param N vector length
        */

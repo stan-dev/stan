@@ -35,18 +35,21 @@
 #include <stan/lang/ast/type/vector_local_type_def.hpp>
 
 #include <stan/lang/ast/fun/is_array_type_vis_def.hpp>
-#include <stan/lang/ast/fun/get_total_dims_vis_def.hpp>
-#include <stan/lang/ast/fun/get_expression_bare_type_vis_def.hpp>
-#include <stan/lang/ast/fun/get_bare_array_base_type_vis_def.hpp>
-#include <stan/lang/ast/fun/get_bare_array_dims_vis_def.hpp>
-#include <stan/lang/ast/fun/get_bare_array_element_type_vis_def.hpp>
-#include <stan/lang/ast/fun/get_bare_type_vis_def.hpp>
-#include <stan/lang/ast/fun/get_block_array_base_type_vis_def.hpp>
-#include <stan/lang/ast/fun/get_block_array_dims_vis_def.hpp>
-#include <stan/lang/ast/fun/get_block_array_element_type_vis_def.hpp>
-#include <stan/lang/ast/fun/get_local_array_base_type_vis_def.hpp>
-#include <stan/lang/ast/fun/get_local_array_dims_vis_def.hpp>
-#include <stan/lang/ast/fun/get_local_array_element_type_vis_def.hpp>
+#include <stan/lang/ast/fun/total_dims_vis_def.hpp>
+#include <stan/lang/ast/fun/expression_bare_type_vis_def.hpp>
+#include <stan/lang/ast/fun/bare_array_base_type_vis_def.hpp>
+#include <stan/lang/ast/fun/bare_array_dims_vis_def.hpp>
+#include <stan/lang/ast/fun/bare_array_element_type_vis_def.hpp>
+#include <stan/lang/ast/fun/bare_type_vis_def.hpp>
+#include <stan/lang/ast/fun/block_array_base_type_vis_def.hpp>
+#include <stan/lang/ast/fun/block_array_dims_vis_def.hpp>
+#include <stan/lang/ast/fun/block_array_element_type_vis_def.hpp>
+#include <stan/lang/ast/fun/block_type_bounds_vis_def.hpp>
+#include <stan/lang/ast/fun/local_array_base_type_vis_def.hpp>
+#include <stan/lang/ast/fun/local_array_dims_vis_def.hpp>
+#include <stan/lang/ast/fun/local_array_element_type_vis_def.hpp>
+#include <stan/lang/ast/fun/var_type_array_len_vis_def.hpp>
+#include <stan/lang/ast/fun/var_type_size_vis_def.hpp>
 
 #include <stan/lang/ast/fun/var_decl_def_vis_def.hpp>
 #include <stan/lang/ast/fun/var_decl_has_def_vis_def.hpp>

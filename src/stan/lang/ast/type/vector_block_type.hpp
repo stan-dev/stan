@@ -28,6 +28,7 @@ namespace stan {
 
       /**
        * Construct a block var type with specified values.
+       * Length should be int expression - constructor doesn't check.
        *
        * @param bounds variable upper and/or lower bounds
        * @param N vector length

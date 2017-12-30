@@ -1,5 +1,5 @@
-#ifndef STAN_LANG_AST_FUN_GET_BARE_TYPE_VIS_HPP
-#define STAN_LANG_AST_FUN_GET_BARE_TYPE_VIS_HPP
+#ifndef STAN_LANG_AST_FUN_BARE_TYPE_VIS_HPP
+#define STAN_LANG_AST_FUN_BARE_TYPE_VIS_HPP
 
 #include <stan/lang/ast/type/block_array_type.hpp>
 #include <stan/lang/ast/type/local_array_type.hpp>
@@ -30,11 +30,11 @@ namespace stan {
     /**
      * Visitor to get bare type for local and block var types.
      */
-    struct get_bare_type_vis : public boost::static_visitor<bare_expr_type> {
+    struct bare_type_vis : public boost::static_visitor<bare_expr_type> {
       /**
        * Construct a visitor.
        */
-      get_bare_type_vis();
+      bare_type_vis();
 
       /**
        * Return equivalent bare type.

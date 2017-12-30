@@ -1,5 +1,5 @@
-#ifndef STAN_LANG_AST_FUN_GET_BLOCK_ARRAY_DIMS_VIS_HPP
-#define STAN_LANG_AST_FUN_GET_BLOCK_ARRAY_DIMS_VIS_HPP
+#ifndef STAN_LANG_AST_FUN_BLOCK_ARRAY_DIMS_VIS_HPP
+#define STAN_LANG_AST_FUN_BLOCK_ARRAY_DIMS_VIS_HPP
 
 #include <stan/lang/ast/type/block_array_type.hpp>
 #include <stan/lang/ast/type/cholesky_corr_block_type.hpp>
@@ -24,11 +24,11 @@ namespace stan {
     /**
      * Visitor to get array dimensions from array type.
      */
-    struct get_block_array_dims_vis : public boost::static_visitor<int> {
+    struct block_array_dims_vis : public boost::static_visitor<int> {
       /**
        * Construct a visitor.
        */
-      get_block_array_dims_vis();
+      block_array_dims_vis();
 
       /**
        * Return number of array dimensions for this type.
@@ -39,7 +39,7 @@ namespace stan {
       int operator()(const block_array_type& x) const;
 
       /**
-       * Return number of array dimentions for this type.
+       * Return number of array dimensions for this type.
        *
        * @param x type
        * @return 0
@@ -47,7 +47,7 @@ namespace stan {
       int operator()(const cholesky_corr_block_type& x) const;
 
       /**
-       * Return number of array dimentions for this type.
+       * Return number of array dimensions for this type.
        *
        * @param x type
        * @return 0
@@ -55,7 +55,7 @@ namespace stan {
       int operator()(const cholesky_factor_block_type& x) const;
 
       /**
-       * Return number of array dimentions for this type.
+       * Return number of array dimensions for this type.
        *
        * @param x type
        * @return 0
@@ -63,7 +63,7 @@ namespace stan {
       int operator()(const corr_matrix_block_type& x) const;
 
       /**
-       * Return number of array dimentions for this type.
+       * Return number of array dimensions for this type.
        *
        * @param x type
        * @return 0
@@ -71,7 +71,7 @@ namespace stan {
       int operator()(const cov_matrix_block_type& x) const;
 
       /**
-       * Return number of array dimentions for this type.
+       * Return number of array dimensions for this type.
        *
        * @param x type
        * @return 0
@@ -79,7 +79,7 @@ namespace stan {
       int operator()(const double_block_type& x) const;
 
       /**
-       * Return number of array dimentions for this type.
+       * Return number of array dimensions for this type.
        *
        * @param x type
        * @return 0
@@ -87,7 +87,7 @@ namespace stan {
       int operator()(const ill_formed_type& x) const;
 
       /**
-       * Return number of array dimentions for this type.
+       * Return number of array dimensions for this type.
        *
        * @param x type
        * @return 0
@@ -95,7 +95,7 @@ namespace stan {
       int operator()(const int_block_type& x) const;
 
       /**
-       * Return number of array dimentions for this type.
+       * Return number of array dimensions for this type.
        *
        * @param x type
        * @return 0
@@ -103,7 +103,7 @@ namespace stan {
       int operator()(const matrix_block_type& x) const;
 
       /**
-       * Return number of array dimentions for this type.
+       * Return number of array dimensions for this type.
        *
        * @param x type
        * @return 0
@@ -111,7 +111,7 @@ namespace stan {
       int operator()(const ordered_block_type& x) const;
 
       /**
-       * Return number of array dimentions for this type.
+       * Return number of array dimensions for this type.
        *
        * @param x type
        * @return 0
@@ -119,7 +119,7 @@ namespace stan {
       int operator()(const positive_ordered_block_type& x) const;
 
       /**
-       * Return number of array dimentions for this type.
+       * Return number of array dimensions for this type.
        *
        * @param x type
        * @return 0
@@ -127,7 +127,7 @@ namespace stan {
       int operator()(const row_vector_block_type& x) const;
 
       /**
-       * Return number of array dimentions for this type.
+       * Return number of array dimensions for this type.
        *
        * @param x type
        * @return 0
@@ -135,7 +135,7 @@ namespace stan {
       int operator()(const simplex_block_type& x) const;
 
       /**
-       * Return number of array dimentions for this type.
+       * Return number of array dimensions for this type.
        *
        * @param x type
        * @return 0
@@ -143,7 +143,7 @@ namespace stan {
       int operator()(const unit_vector_block_type& x) const;
 
       /**
-       * Return number of array dimentions for this type.
+       * Return number of array dimensions for this type.
        *
        * @param x type
        * @return 0

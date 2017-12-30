@@ -1,5 +1,5 @@
-#ifndef STAN_LANG_AST_FUN_GET_EXPRESSION_BARE_TYPE_VIS_HPP
-#define STAN_LANG_AST_FUN_GET_EXPRESSION_BARE_TYPE_VIS_HPP
+#ifndef STAN_LANG_AST_FUN_EXPRESSION_BARE_TYPE_VIS_HPP
+#define STAN_LANG_AST_FUN_EXPRESSION_BARE_TYPE_VIS_HPP
 
 #include <stan/lang/ast/nil.hpp>
 #include <stan/lang/ast/node/int_literal.hpp>
@@ -24,11 +24,11 @@
 namespace stan {
   namespace lang {
     
-    struct get_expression_bare_type_vis : public boost::static_visitor<bare_expr_type> {
+    struct expression_bare_type_vis : public boost::static_visitor<bare_expr_type> {
       /**
        * Construct a visitor.
        */
-      get_expression_bare_type_vis();
+      expression_bare_type_vis();
 
       /**
        * Return the bare_expr_type corresponding to this expression

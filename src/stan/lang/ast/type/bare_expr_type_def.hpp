@@ -90,22 +90,22 @@ namespace stan {
     }
 
     bare_expr_type bare_expr_type::array_element_type() const {
-      get_bare_array_element_type_vis vis;
+      bare_array_element_type_vis vis;
       return boost::apply_visitor(vis, bare_type_);
     }
 
     bare_expr_type bare_expr_type::array_contains() const {
-      get_bare_array_base_type_vis vis;
+      bare_array_base_type_vis vis;
       return boost::apply_visitor(vis, bare_type_);
     }
 
     int bare_expr_type::array_dims() const {
-      get_bare_array_dims_vis vis;
+      bare_array_dims_vis vis;
       return boost::apply_visitor(vis, bare_type_);
     }
 
     int bare_expr_type::num_dims() const {
-      get_total_dims_vis vis;
+      total_dims_vis vis;
       return boost::apply_visitor(vis, bare_type_);
     }
 

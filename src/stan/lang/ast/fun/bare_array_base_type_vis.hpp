@@ -1,5 +1,5 @@
-#ifndef STAN_LANG_AST_FUN_GET_BARE_ARRAY_BASE_TYPE_VIS_HPP
-#define STAN_LANG_AST_FUN_GET_BARE_ARRAY_BASE_TYPE_VIS_HPP
+#ifndef STAN_LANG_AST_FUN_BARE_ARRAY_BASE_TYPE_VIS_HPP
+#define STAN_LANG_AST_FUN_BARE_ARRAY_BASE_TYPE_VIS_HPP
 
 #include <stan/lang/ast/type/bare_array_type.hpp>
 #include <stan/lang/ast/type/double_type.hpp>
@@ -16,11 +16,11 @@ namespace stan {
     /**
      * Visitor to get base type from array type.
      */
-    struct get_bare_array_base_type_vis : public boost::static_visitor<bare_expr_type> {
+    struct bare_array_base_type_vis : public boost::static_visitor<bare_expr_type> {
       /**
        * Construct a visitor.
        */
-      get_bare_array_base_type_vis();
+      bare_array_base_type_vis();
 
       /**
        * Return base type held by array type.

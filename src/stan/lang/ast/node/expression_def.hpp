@@ -71,7 +71,7 @@ namespace stan {
     // }
 
     bare_expr_type expression::expression_type() const {
-      get_expression_bare_type_vis vis;
+      expression_bare_type_vis vis;
       return boost::apply_visitor(vis, expr_);
     }
 

@@ -1,5 +1,5 @@
-#ifndef STAN_LANG_AST_FUN_GET_TOTAL_DIMS_VIS_HPP
-#define STAN_LANG_AST_FUN_GET_TOTAL_DIMS_VIS_HPP
+#ifndef STAN_LANG_AST_FUN_TOTAL_DIMS_VIS_HPP
+#define STAN_LANG_AST_FUN_TOTAL_DIMS_VIS_HPP
 
 #include <stan/lang/ast/type/bare_array_type.hpp>
 #include <stan/lang/ast/type/block_array_type.hpp>
@@ -35,11 +35,11 @@ namespace stan {
      * Visitor to count total number of dimensions for a var type.
      * Total is array dimensions and +1 for vectors or +2 for matrices.
      */
-    struct get_total_dims_vis : public boost::static_visitor<int> {
+    struct total_dims_vis : public boost::static_visitor<int> {
       /**
-       * Construct a get_total_dims visitor.
+       * Construct a total_dims visitor.
        */
-      get_total_dims_vis();
+      total_dims_vis();
 
       /**
        * Return the number of dimensions for this type.

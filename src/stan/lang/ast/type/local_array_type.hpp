@@ -30,6 +30,7 @@ namespace stan {
       /**
        * Construct a local array type with the specified element type
        * and array length.
+       * Length should be int expression - constructor doesn't check.
        *
        * @param el_type element type 
        * @param len array length

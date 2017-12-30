@@ -23,6 +23,7 @@ namespace stan {
 
       /**
        * Construct a block var type with specified values.
+       * Size should be int expression - constructor doesn't check.
        *
        * @param K size
        */

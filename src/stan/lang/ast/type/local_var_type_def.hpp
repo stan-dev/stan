@@ -35,32 +35,42 @@ namespace stan {
     local_var_type::local_var_type(const local_array_type& x)
       : var_type_(x) { }
 
-    bool local_var_type::is_array_type() const {
-      return boost::apply_visitor(is_array_type_vis(), var_type_);
-    }
-
-    local_var_type local_var_type::array_element_type() const {
-      get_local_array_element_type_vis vis;
-      return boost::apply_visitor(vis, var_type_);
-    }
-
     local_var_type local_var_type::array_contains() const {
-      get_local_array_base_type_vis vis;
+      local_array_base_type_vis vis;
       return boost::apply_visitor(vis, var_type_);
     }
 
     int local_var_type::array_dims() const {
-      get_local_array_dims_vis vis;
+      local_array_dims_vis vis;
       return boost::apply_visitor(vis, var_type_);
     }
 
-    int local_var_type::num_dims() const {
-      get_total_dims_vis vis;
+    local_var_type local_var_type::array_element_type() const {
+      local_array_element_type_vis vis;
+      return boost::apply_visitor(vis, var_type_);
+    }
+
+    expression local_var_type::array_len() const {
+      var_type_array_len_vis vis;
       return boost::apply_visitor(vis, var_type_);
     }
 
     bare_expr_type local_var_type::bare_type() const {
-      get_bare_type_vis vis;
+      bare_type_vis vis;
+      return boost::apply_visitor(vis, var_type_);
+    }
+
+    bool local_var_type::is_array_type() const {
+      return boost::apply_visitor(is_array_type_vis(), var_type_);
+    }
+
+    int local_var_type::num_dims() const {
+      total_dims_vis vis;
+      return boost::apply_visitor(vis, var_type_);
+    }
+
+    std::vector<expression> local_var_type::size() const {
+      var_type_size_vis vis;
       return boost::apply_visitor(vis, var_type_);
     }
   }

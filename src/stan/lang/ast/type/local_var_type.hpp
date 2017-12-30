@@ -9,8 +9,6 @@ namespace stan {
   namespace lang {
 
     //TODO:mitzi - need visitor to get size of local var container types
-    //             need visitor to get corresponding bare type
-    //             these types are held by local_var_decl 
 
     /** 
      * Local variable types have sized container types.
@@ -111,18 +109,6 @@ namespace stan {
        */
       local_var_type(const local_t& var_type_);  // NOLINT(runtime/explicit)
 
-      
-      /**
-       * Returns true if `var_type_` is `local_array_type`, false otherwise.
-       */
-      bool is_array_type() const;
-
-      /**
-       * Returns array element type if `var_type_` is `local_array_type`,
-       * ill_formed_type otherwise.  (Call `is_array_type()` first.)
-       */
-      local_var_type array_element_type() const;
-
       /**
        * If `var_type` is `local_array_type`, returns the innermost type
        * contained in the array, otherwise will return `ill_formed_type`.
@@ -136,20 +122,36 @@ namespace stan {
       int array_dims() const;
 
       /**
+       * Returns array element type if `var_type_` is `local_array_type`,
+       * ill_formed_type otherwise.  (Call `is_array_type()` first.)
+       */
+      local_var_type array_element_type() const;
+
+      /**
+       * Returns array length for local_array_type, nil otherwise.
+       */
+      expression array_len() const;
+
+      /**
+       * Returns equivalent bare_expr_type (unsized) for this local type.
+       */
+      bare_expr_type bare_type() const;
+      
+      /**
+       * Returns true if `var_type_` is `local_array_type`, false otherwise.
+       */
+      bool is_array_type() const;
+
+      /**
        * Returns total number of dimensions for container type.
        * Returns 0 for scalar types.
        */
       int num_dims() const;
 
       /**
-       * Returns vector of sizes for each dimension, nil if unsized.
+       * Returns vector of sizes for each dimension, empty vector if unsized.
        */
       std::vector<expression> size() const;
-
-      /**
-       * Returns equivalent bare_expr_type (unsized) for this local type.
-       */
-      bare_expr_type bare_type() const;
     };
     
   }

@@ -27,6 +27,7 @@ namespace stan {
 
       /**
        * Construct a block var type with specified values.
+       * Sizes should be int expressions - constructor doesn't check.
        *
        * @param M num rows
        * @param N num columns

@@ -33,6 +33,7 @@ namespace stan {
 
       /**
        * Construct a block var type with specified values.
+       * Sizes should be int expressions - constructor doesn't check.
        *
        * @param bounds variable upper and/or lower bounds
        * @param M num rows

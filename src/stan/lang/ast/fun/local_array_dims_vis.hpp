@@ -1,5 +1,5 @@
-#ifndef STAN_LANG_AST_FUN_GET_LOCAL_ARRAY_DIMS_VIS_HPP
-#define STAN_LANG_AST_FUN_GET_LOCAL_ARRAY_DIMS_VIS_HPP
+#ifndef STAN_LANG_AST_FUN_LOCAL_ARRAY_DIMS_VIS_HPP
+#define STAN_LANG_AST_FUN_LOCAL_ARRAY_DIMS_VIS_HPP
 
 #include <stan/lang/ast/type/local_array_type.hpp>
 #include <stan/lang/ast/type/double_type.hpp>
@@ -16,11 +16,11 @@ namespace stan {
     /**
      * Visitor to get array dimensions from array type.
      */
-    struct get_local_array_dims_vis : public boost::static_visitor<int> {
+    struct local_array_dims_vis : public boost::static_visitor<int> {
       /**
        * Construct a visitor.
        */
-      get_local_array_dims_vis();
+      local_array_dims_vis();
 
       /**
        * Return number of array dimensions for this type.
