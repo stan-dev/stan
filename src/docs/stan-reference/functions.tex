@@ -3693,7 +3693,7 @@ The arguments to the algebraic solver are as follows:
   (4) integer data, and the return value contains the value of the algebraic
   function, which goes to 0 when we plug in the solution to the algebraic system,
 \item \farg{y\_guess}: initia guess for the solution, type \code{vector},
-\item \farg{theta}: parameters, type \code{vector},
+\item \farg{theta}: parameters, type \code{vector}, parameters only,
 \item \farg{x\_r}: real data, type \code{real[]}, data only, and
 \item \farg{x\_i}: parameters, type \code{int[]}, data only.
 \end{enumerate}
@@ -3717,7 +3717,7 @@ Certain sizes have to be consistent. The initial guess, return value of the solv
 return value of the algebraic function must all be the same size.
 
 The parameters, real data, and integer data will be passed from the solver directly to the
-system function.
+system function. 
 
 \subsection{Algorithmic Details}
 
