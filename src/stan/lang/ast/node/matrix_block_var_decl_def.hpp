@@ -12,6 +12,13 @@ namespace stan {
     matrix_block_var_decl::matrix_block_var_decl(const std::string& name,
                                                  const range& bounds,
                                                  const expression& M,
+                                                 const expression& N)
+      : var_decl(name, bare_expr_type(matrix_type())),
+        type_(matrix_block_type(bounds, M, N)) { }
+
+    matrix_block_var_decl::matrix_block_var_decl(const std::string& name,
+                                                 const range& bounds,
+                                                 const expression& M,
                                                  const expression& N,
                                                  const expression& def)
       : var_decl(name, bare_expr_type(matrix_type()), def),

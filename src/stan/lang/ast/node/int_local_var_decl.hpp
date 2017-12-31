@@ -18,6 +18,13 @@ namespace stan {
       int_local_var_decl();
 
       /**
+       * Construct an integer local variable declaration with the specified name.
+       *
+       * @param name variable name
+       */
+      int_local_var_decl(const std::string& name);
+
+      /**
        * Construct an integer local variable declaration with the specified
        * name and definition.
        *

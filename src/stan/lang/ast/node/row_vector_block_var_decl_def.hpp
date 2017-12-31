@@ -12,6 +12,13 @@ namespace stan {
     row_vector_block_var_decl::row_vector_block_var_decl(
                                const std::string& name,
                                const range& bounds,
+                               const expression& N)
+      : var_decl(name, bare_expr_type(row_vector_type())),
+        type_(row_vector_block_type(bounds, N)) { }
+
+    row_vector_block_var_decl::row_vector_block_var_decl(
+                               const std::string& name,
+                               const range& bounds,
                                const expression& N,
                                const expression& def)
       : var_decl(name, bare_expr_type(row_vector_type()), def),

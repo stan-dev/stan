@@ -9,6 +9,9 @@ namespace stan {
 
     int_local_var_decl::int_local_var_decl() { }
 
+    int_local_var_decl::int_local_var_decl(const std::string& name)
+      : var_decl(name, bare_expr_type(int_type())) { }
+
     int_local_var_decl::int_local_var_decl(const std::string& name,
                                            const expression& def)
       : var_decl(name, bare_expr_type(int_type()), def) { }

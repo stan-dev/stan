@@ -26,6 +26,16 @@ namespace stan {
 
       /**
        * Construct a double block variable declaration with the specified
+       * name and bounds.
+       *
+       * @param name variable name
+       * @param bounds variable upper and/or lower bounds
+       */
+      double_block_var_decl(const std::string& name,
+                            const range& bounds);
+
+      /**
+       * Construct a double block variable declaration with the specified
        * name, bounds, and definition.
        *
        * @param name variable name
@@ -35,6 +45,7 @@ namespace stan {
       double_block_var_decl(const std::string& name,
                             const range& bounds,
                             const expression& def);
+
     };
   }
 }

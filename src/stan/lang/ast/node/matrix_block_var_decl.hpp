@@ -25,6 +25,20 @@ namespace stan {
 
       /**
        * Construct a matrix block variable declaration with the specified
+       * name, bounds, number of rows, number of columns.
+       *
+       * @param name variable name
+       * @param bounds variable upper and/or lower bounds
+       * @param M number of rows
+       * @param N number of columns
+       */
+      matrix_block_var_decl(const std::string& name,
+                            const range& bounds,
+                            const expression& M,
+                            const expression& N);
+
+      /**
+       * Construct a matrix block variable declaration with the specified
        * name, bounds, number of rows, number of columns, and definition.
        *
        * @param name variable name

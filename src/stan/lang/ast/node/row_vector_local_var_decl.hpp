@@ -24,6 +24,15 @@ namespace stan {
       row_vector_local_var_decl();
 
       /**
+       * Construct a row vector with the specified name and size.
+       *
+       * @param name variable name
+       * @param N row vector length
+       */
+      row_vector_local_var_decl(const std::string& name,
+                                const expression& N);
+
+      /**
        * Construct a row vector with the specified name, size, and definition.
        * Definition is nil if var isn't initialized via declaration.
        *

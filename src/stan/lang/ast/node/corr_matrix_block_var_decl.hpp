@@ -25,6 +25,16 @@ namespace stan {
       /**
        * Construct a variable declaration for a correlation matrix
        * with the specified name, size, and definition.
+       *
+       * @param name variable name
+       * @param K corr matrix size
+       */
+      corr_matrix_block_var_decl(const std::string& name,
+                                 const expression& K);
+
+      /**
+       * Construct a variable declaration for a correlation matrix
+       * with the specified name, size, and definition.
        * Definition is nil if var isn't initialized via declaration.
        *
        * @param name variable name

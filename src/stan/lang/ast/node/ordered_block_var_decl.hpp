@@ -24,6 +24,16 @@ namespace stan {
 
       /**
        * Construct an ordered vector declaration with
+       * the specified name and size.
+       *
+       * @param name variable name
+       * @param K vector size
+       */
+      ordered_block_var_decl(const std::string& name,
+                             const expression& K);
+
+      /**
+       * Construct an ordered vector declaration with
        * the specified name, size, and definition.
        * Definition is nil if var isn't initialized via declaration.
        *

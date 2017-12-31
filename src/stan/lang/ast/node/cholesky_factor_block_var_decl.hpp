@@ -25,6 +25,18 @@ namespace stan {
 
       /**
        * Construct a Cholesky factor variable declaration with the
+       * specified name, number of rows, and number of columns.
+       *
+       * @param name variable name
+       * @param M number of rows
+       * @param N number of columns
+       */
+      cholesky_factor_block_var_decl(const std::string& name,
+                                     const expression& M,
+                                     const expression& N);
+
+      /**
+       * Construct a Cholesky factor variable declaration with the
        * specified name, number of rows, number of columns, and definition.
        * Definition is nil if var isn't initialized via declaration.
        *

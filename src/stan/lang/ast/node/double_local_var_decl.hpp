@@ -18,6 +18,13 @@ namespace stan {
       double_local_var_decl();
 
       /**
+       * Construct a double local variable declaration with the specified name.n
+       *
+       * @param name variable name
+       */
+      double_local_var_decl(const std::string& name);
+
+      /**
        * Construct a double local variable declaration with the specified
        * name and definition.
        *

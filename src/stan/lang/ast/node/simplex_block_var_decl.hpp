@@ -24,6 +24,16 @@ namespace stan {
 
       /**
        * Construct a simplex declaration with
+       * the specified name and size.
+       *
+       * @param name variable name
+       * @param K simplex size
+       */
+      simplex_block_var_decl(const std::string& name,
+                             const expression& K);
+
+      /**
+       * Construct a simplex declaration with
        * the specified name, size, and definition.
        * Definition is nil if var isn't initialized via declaration.
        *
