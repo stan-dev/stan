@@ -201,6 +201,27 @@ namespace stan {
       block_var_decl(const array_block_var_decl& x);  // NOLINT(runtime/explicit)
 
       /**
+       * Return the variable declaration's bare expr type.
+       *
+       * @return the bare expr type
+       */
+      bare_expr_type bare_type() const;
+
+      /**
+       * Return the variable declaration's definition.
+       *
+       * @return expression definition for this variable
+       */
+      expression def() const;
+
+      /**
+       * Return true if variable declaration contains a definition.
+       *
+       * @return bool indicating has or doesn't have definition
+       */
+      bool has_def() const;
+
+      /**
        * Return the variable declaration's name.
        *
        * @return name of variable
@@ -208,64 +229,11 @@ namespace stan {
       std::string name() const;
 
       /**
-       * Return the variable declaration's bare expr type.
+       * Return the variable declaration's block_var_type
        *
-       * @return the bare expr type
+       * @return the variable expression's block_var_type
        */
-      bare_expr_type type() const;
-
-      /**
-       * Return true if this declaration also contains a definition. 
-       *
-       * @return true if there is a definition
-       */
-      bool has_def() const;
-
-      /**
-       * Return the definition included in this declaration.
-       *
-       * @return the variable definition
-       */
-      expression def() const;
-
-      /**
-       * Return the sizes of vectors and matrices.
-       *
-       * @return the sizes of vectors and matrices.
-       */
-      std::vector<expression> size() const;
-
-      // /**
-      //  * Return true if variable has lower bounds constraint.
-      //  *
-      //  * @return true if variable has lower bounds constraint.
-      //  */
-      // bool has_lower() const;
-
-      // /**
-      //  * Return true if variable has upper bounds constraint.
-      //  *
-      //  * @return true if variable has upper bounds constraint.
-      //  */
-      // bool has_upper() const;
-
-      // /**
-      //  * Return this variable's lower bounds constraint.
-      //  *
-      //  * @return this variable's lower bounds constraint.
-      //  */
-      // expression lower() const;
-
-      // /**
-      //  * Return this variable's upper bounds constraint.
-      //  *
-      //  * @return this variable's upper bounds constraint.
-      //  */
-      // expression upper() const;
-
-      // //      bool is_array() const;
-      // //      std::vector<expression> array_dims() const;
-
+      block_var_type type() const;
     };
   }
 }

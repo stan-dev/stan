@@ -11,6 +11,12 @@ namespace stan {
 
     vector_block_var_decl::vector_block_var_decl(const std::string& name,
                                                  const range& bounds,
+                                                 const expression& N)
+      : var_decl(name, bare_expr_type(vector_type())),
+        type_(vector_block_type(bounds, N)) { }
+
+    vector_block_var_decl::vector_block_var_decl(const std::string& name,
+                                                 const range& bounds,
                                                  const expression& N,
                                                  const expression& def)
       : var_decl(name, bare_expr_type(vector_type()), def),

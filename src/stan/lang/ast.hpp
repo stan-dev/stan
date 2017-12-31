@@ -54,11 +54,12 @@
 #include <stan/lang/ast/fun/var_type_array_len_vis.hpp>
 #include <stan/lang/ast/fun/var_type_size_vis.hpp>
 
+#include <stan/lang/ast/fun/var_decl_bare_type_vis.hpp>
+#include <stan/lang/ast/fun/var_decl_block_type_vis.hpp>
 #include <stan/lang/ast/fun/var_decl_def_vis.hpp>
 #include <stan/lang/ast/fun/var_decl_has_def_vis.hpp>
+#include <stan/lang/ast/fun/var_decl_local_type_vis.hpp>
 #include <stan/lang/ast/fun/var_decl_name_vis.hpp>
-// #include <stan/lang/ast/fun/var_decl_size_vis.hpp>
-#include <stan/lang/ast/fun/var_decl_type_vis.hpp>
 
 // #include <stan/lang/ast/fun/has_non_param_var_vis.hpp>
 // #include <stan/lang/ast/fun/has_prob_fun_suffix.hpp>

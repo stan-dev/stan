@@ -36,6 +36,20 @@ namespace stan {
        */
       vector_block_var_decl(const std::string& name,
                             const range& bounds,
+                            const expression& N);
+
+      /**
+       * Construct a column vector declaration with the specified
+       * name, bounds, number of rows, and definition.
+       * Definition is nil if var isn't initialized via declaration.
+       *
+       * @param name variable name
+       * @param bounds variable upper and/or lower bounds
+       * @param N number of rows
+       * @param def defition of variable
+       */
+      vector_block_var_decl(const std::string& name,
+                            const range& bounds,
                             const expression& N,
                             const expression& def);
     };

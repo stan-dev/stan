@@ -208,6 +208,8 @@ namespace stan {
        */
       bare_expr_type bare_type() const;
 
+      // TODO:mitzi - visitor: has_defined_bounds
+      
       /**
        * Returns bounds for this type.
        */

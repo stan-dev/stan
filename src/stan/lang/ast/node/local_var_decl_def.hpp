@@ -3,7 +3,6 @@
 
 #include <stan/lang/ast.hpp>
 #include <string>
-#include <vector>
 
 namespace stan {
   namespace lang {
@@ -24,18 +23,8 @@ namespace stan {
 
     local_var_decl::local_var_decl(const matrix_local_var_decl& x) : var_decl_(x) { }
 
-    std::string local_var_decl::name() const {
-      var_decl_name_vis vis;
-      return boost::apply_visitor(vis, var_decl_);
-    }
-
-    bare_expr_type local_var_decl::type() const {
-      var_decl_type_vis vis;
-      return boost::apply_visitor(vis, var_decl_);
-    }
-
-    bool local_var_decl::has_def() const {
-      var_decl_has_def_vis vis;
+    bare_expr_type local_var_decl::bare_type() const {
+      var_decl_bare_type_vis vis;
       return boost::apply_visitor(vis, var_decl_);
     }
 
@@ -44,9 +33,20 @@ namespace stan {
       return boost::apply_visitor(vis, var_decl_);
     }
 
-    // std::vector<expression> local_var_decl::size() const {
-    //   return boost::apply_visitor(var_decl_size_vis(), decl_);
-    // }
+    bool local_var_decl::has_def() const {
+      var_decl_has_def_vis vis;
+      return boost::apply_visitor(vis, var_decl_);
+    }
+
+    std::string local_var_decl::name() const {
+      var_decl_name_vis vis;
+      return boost::apply_visitor(vis, var_decl_);
+    }
+
+    local_var_type local_var_decl::type() const {
+      var_decl_local_type_vis vis;
+      return boost::apply_visitor(vis, var_decl_);
+    }
   }
 }
 #endif

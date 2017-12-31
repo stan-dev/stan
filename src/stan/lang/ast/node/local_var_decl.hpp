@@ -118,6 +118,28 @@ namespace stan {
        */
       local_var_decl(const matrix_local_var_decl& decl);  // NOLINT(runtime/explicit)
 
+
+      /**
+       * Return the variable declaration's bare expr type.
+       *
+       * @return the bare expr type
+       */
+      bare_expr_type bare_type() const;
+
+      /**
+       * Return the variable declaration's definition.
+       *
+       * @return expression definition for this variable
+       */
+      expression def() const;
+
+      /**
+       * Return true if variable declaration contains a definition.
+       *
+       * @return bool indicating has or doesn't have definition
+       */
+      bool has_def() const;
+
       /**
        * Return the variable declaration's name.
        *
@@ -126,39 +148,11 @@ namespace stan {
       std::string name() const;
 
       /**
-       * Return the variable declaration's bare expr type.
+       * Return the variable declaration's local_var_type
        *
-       * @return the bare expr type
+       * @return the variable expression's local_var_type
        */
-      bare_expr_type type() const;
-
-      /**
-       * Return true if this declaration also contains a definition. 
-       *
-       * @return true if there is a definition
-       */
-      bool has_def() const;
-
-      /**
-       * Return the definition included in this declaration.
-       *
-       * @return the variable definition
-       */
-      expression def() const;
-
-      // /**
-      //  * Return the sequence of array dimension sizes. 
-      //  *
-      //  * @return sequence of dimension sizes
-      //  */
-      // std::vector<expression> array_dims() const;
-
-      // /**
-      //  * Return the sizes of vectors and matrices.
-      //  *
-      //  * @return the sizes of vectors and matrices.
-      //  */
-      // std::vector<expression> size() const;
+      local_var_type type() const;
     };
 
   }

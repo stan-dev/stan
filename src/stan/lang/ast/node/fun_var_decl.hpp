@@ -124,18 +124,18 @@ namespace stan {
       fun_var_decl(const array_fun_var_decl& decl);  // NOLINT(runtime/explicit)
 
       /**
+       * Return the variable declaration's bare expr type.
+       *
+       * @return the bare expr type
+       */
+      bare_expr_type bare_type() const;
+
+      /**
        * Return the declaration's variable name.
        *
        * @return name of variable
        */
       std::string name() const;
-
-      /**
-       * Return the variable declaration's bare expr type.
-       *
-       * @return the bare expr type
-       */
-      bare_expr_type type() const;
     };
 
   }

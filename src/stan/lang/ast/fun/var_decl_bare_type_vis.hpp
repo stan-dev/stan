@@ -1,5 +1,5 @@
-#ifndef STAN_LANG_AST_FUN_VAR_DECL_TYPE_VIS_HPP
-#define STAN_LANG_AST_FUN_VAR_DECL_TYPE_VIS_HPP
+#ifndef STAN_LANG_AST_FUN_VAR_DECL_BARE_TYPE_VIS_HPP
+#define STAN_LANG_AST_FUN_VAR_DECL_BARE_TYPE_VIS_HPP
 
 #include <stan/lang/ast/nil.hpp>
 #include <stan/lang/ast/type/bare_expr_type.hpp>
@@ -39,11 +39,11 @@ namespace stan {
      * A visitor for the variant type of variable declarations that
      * returns the type of the variable.
      */
-    struct var_decl_type_vis : public boost::static_visitor<bare_expr_type> {
+    struct var_decl_bare_type_vis : public boost::static_visitor<bare_expr_type> {
       /**
        * Construct a var_decl_type visitor.
        */
-      var_decl_type_vis();
+      var_decl_bare_type_vis();
 
       /**
        * Return the ill-formed type

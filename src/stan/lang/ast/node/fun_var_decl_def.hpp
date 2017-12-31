@@ -3,7 +3,6 @@
 
 #include <stan/lang/ast.hpp>
 #include <string>
-#include <vector>
 
 namespace stan {
   namespace lang {
@@ -27,14 +26,14 @@ namespace stan {
     fun_var_decl::fun_var_decl(const array_fun_var_decl& x) : var_decl_(x) { }
 
     std::string fun_var_decl::name() const {
-      return boost::apply_visitor(var_decl_name_vis(), var_decl_);
+      var_decl_name_vis vis;
+      return boost::apply_visitor(vis, var_decl_);
     }
 
-    bare_expr_type fun_var_decl::type() const {
-      return boost::apply_visitor(var_decl_type_vis(), var_decl_);
+    bare_expr_type fun_var_decl::bare_type() const {
+      var_decl_bare_type_vis vis;
+      return boost::apply_visitor(vis, var_decl_);
     }
-
-
   }
 }
 #endif

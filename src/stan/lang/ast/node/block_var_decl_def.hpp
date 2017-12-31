@@ -3,7 +3,6 @@
 
 #include <stan/lang/ast.hpp>
 #include <string>
-#include <vector>
 
 namespace stan {
   namespace lang {
@@ -42,18 +41,8 @@ namespace stan {
 
     block_var_decl::block_var_decl(const array_block_var_decl& x) : var_decl_(x) { }
 
-    std::string block_var_decl::name() const {
-      var_decl_name_vis vis;
-      return boost::apply_visitor(vis, var_decl_);
-    }
-
-    bare_expr_type block_var_decl::type() const {
-      var_decl_type_vis vis;
-      return boost::apply_visitor(vis, var_decl_);
-    }
-
-    bool block_var_decl::has_def() const {
-      var_decl_has_def_vis vis;
+    bare_expr_type block_var_decl::bare_type() const {
+      var_decl_bare_type_vis vis;
       return boost::apply_visitor(vis, var_decl_);
     }
 
@@ -62,30 +51,20 @@ namespace stan {
       return boost::apply_visitor(vis, var_decl_);
     }
 
-    // std::vector<expression> block_var_decl::size() const {
-    //   return boost::apply_visitor(var_decl_size_vis(), var_decl_);
-    // }
-    
-    // bool block_var_decl::has_lower() const {
-    //   var_decl_has_lower_vis vis;
-    //   return boost::apply_visitor(vis, var_decl_);
-    // }
+    bool block_var_decl::has_def() const {
+      var_decl_has_def_vis vis;
+      return boost::apply_visitor(vis, var_decl_);
+    }
 
-    // expression block_var_decl::lower() const {
-    //   var_decl_lower_vis vis;
-    //   return boost::apply_visitor(vis, var_decl_);
-    // }
+    std::string block_var_decl::name() const {
+      var_decl_name_vis vis;
+      return boost::apply_visitor(vis, var_decl_);
+    }
 
-    // bool block_var_decl::has_upper() const {
-    //   var_decl_has_upper_vis vis;
-    //   return boost::apply_visitor(vis, var_decl_);
-    // }
-
-    // expression block_var_decl::upper() const {
-    //   var_decl_upper_vis vis;
-    //   return boost::apply_visitor(vis, var_decl_);
-    // }
-
+    block_var_type block_var_decl::type() const {
+      var_decl_block_type_vis vis;
+      return boost::apply_visitor(vis, var_decl_);
+    }
   }
 }
 #endif
