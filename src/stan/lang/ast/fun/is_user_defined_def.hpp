@@ -17,7 +17,7 @@ namespace stan {
                          const std::vector<expression>& args) {
       std::vector<bare_expr_type> arg_types;
       for (size_t i = 0; i <  args.size(); ++i)
-        arg_types.push_back(args[i].expression_type());
+        arg_types.push_back(args[i].bare_type());
       function_signature_t sig;
       int matches
         = function_signatures::instance()

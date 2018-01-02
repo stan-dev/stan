@@ -72,10 +72,18 @@ namespace stan {
       block_var_decl();
 
       /**
+       * Construct a variable declaration.
+       *
+       * @param x variable declaration
+       * basic declaration
+       */
+      block_var_decl(const block_var_decl& x);  // NOLINT(runtime/explicit)
+
+      /**
        * Construct a variable declaration with the specified variant
        * type holding a declaration.
        *
-       * @param decl variable declaration raw variant type holding a
+       * @param x variable declaration raw variant type holding a
        * basic declaration
        */
       block_var_decl(const block_var_decl_t& x);  // NOLINT(runtime/explicit)
@@ -84,7 +92,7 @@ namespace stan {
        * Construct a variable declaration with the specified
        * basic declaration.
        *
-       * @param decl variable declaration
+       * @param x variable declaration
        */
       block_var_decl(const nil& x);  // NOLINT(runtime/explicit)
 
@@ -92,7 +100,7 @@ namespace stan {
        * Construct a variable declaration with the specified
        * basic declaration.  
        *
-       * @param decl variable declaration
+       * @param x variable declaration
        */
       block_var_decl(const int_block_var_decl& x);  // NOLINT(runtime/explicit)
 
@@ -100,7 +108,7 @@ namespace stan {
        * Construct a variable declaration with the specified
        * basic declaration.  
        *
-       * @param decl variable declaration
+       * @param x variable declaration
        */
       block_var_decl(const double_block_var_decl& x);  // NOLINT(runtime/explicit)
 
@@ -108,7 +116,7 @@ namespace stan {
        * Construct a variable declaration with the specified
        * basic declaration.  
        *
-       * @param decl variable declaration
+       * @param x variable declaration
        */
       block_var_decl(const vector_block_var_decl& x);  // NOLINT(runtime/explicit)
 
@@ -116,7 +124,7 @@ namespace stan {
        * Construct a variable declaration with the specified
        * basic declaration.  
        *
-       * @param decl variable declaration
+       * @param x variable declaration
        */
       block_var_decl(const row_vector_block_var_decl& x);  // NOLINT(runtime/explicit)
 
@@ -124,7 +132,7 @@ namespace stan {
        * Construct a variable declaration with the specified
        * basic declaration.  
        *
-       * @param decl variable declaration
+       * @param x variable declaration
        */
       block_var_decl(const matrix_block_var_decl& x);  // NOLINT(runtime/explicit)
 
@@ -132,7 +140,7 @@ namespace stan {
        * Construct a variable declaration with the specified
        * basic declaration.  
        *
-       * @param decl variable declaration
+       * @param x variable declaration
        */
       block_var_decl(const simplex_block_var_decl& x);  // NOLINT(runtime/explicit)
 
@@ -140,7 +148,7 @@ namespace stan {
        * Construct a variable declaration with the specified
        * basic declaration.  
        *
-       * @param decl variable declaration
+       * @param x variable declaration
        */
       block_var_decl(const unit_vector_block_var_decl& x);  // NOLINT(runtime/explicit)
 
@@ -148,7 +156,7 @@ namespace stan {
        * Construct a variable declaration with the specified
        * basic declaration.  
        *
-       * @param decl variable declaration
+       * @param x variable declaration
        */
       block_var_decl(const ordered_block_var_decl& x);  // NOLINT(runtime/explicit)
 
@@ -156,7 +164,7 @@ namespace stan {
        * Construct a variable declaration with the specified
        * basic declaration.  
        *
-       * @param decl variable declaration
+       * @param x variable declaration
        */
       block_var_decl(const positive_ordered_block_var_decl& x);  // NOLINT
 
@@ -164,7 +172,7 @@ namespace stan {
        * Construct a variable declaration with the specified
        * basic declaration.  
        *
-       * @param decl variable declaration
+       * @param x variable declaration
        */
       block_var_decl(const cholesky_factor_block_var_decl& x);  // NOLINT
 
@@ -172,7 +180,7 @@ namespace stan {
        * Construct a variable declaration with the specified
        * basic declaration.  
        *
-       * @param decl variable declaration
+       * @param x variable declaration
        */
       block_var_decl(const cholesky_corr_block_var_decl& x);  // NOLINT(runtime/explicit)
 
@@ -180,7 +188,7 @@ namespace stan {
        * Construct a variable declaration with the specified
        * basic declaration.  
        *
-       * @param decl variable declaration
+       * @param x variable declaration
        */
       block_var_decl(const cov_matrix_block_var_decl& x);  // NOLINT(runtime/explicit)
 
@@ -188,7 +196,7 @@ namespace stan {
        * Construct a variable declaration with the specified
        * basic declaration.  
        *
-       * @param decl variable declaration
+       * @param x variable declaration
        */
       block_var_decl(const corr_matrix_block_var_decl& x);  // NOLINT(runtime/explicit)
 
@@ -196,7 +204,7 @@ namespace stan {
        * Construct a variable declaration with the specified
        * basic declaration.  
        *
-       * @param decl variable declaration
+       * @param x variable declaration
        */
       block_var_decl(const array_block_var_decl& x);  // NOLINT(runtime/explicit)
 

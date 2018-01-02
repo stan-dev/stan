@@ -143,7 +143,7 @@ namespace stan {
     bool returns_type_vis::operator()(const return_statement& st) const  {
       // return checked for type
       return return_type_.is_void()
-        || is_assignable(return_type_, st.return_value_.expression_type(),
+        || is_assignable(return_type_, st.return_value_.bare_type(),
                          "Returned expression does not match return type",
                          error_msgs_);
     }

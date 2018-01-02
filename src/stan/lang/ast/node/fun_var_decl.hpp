@@ -59,69 +59,75 @@ namespace stan {
       fun_var_decl();
 
       /**
+       * Construct a variable declaration.
+       *
+       * @param x variable declaration
+       */
+      fun_var_decl(const fun_var_decl& x);  // NOLINT(runtime/explicit)
+
+      /**
        * Construct a variable declaration with the specified variant
        * type holding a declaration.
        *
-       * @param decl variable declaration raw variant type holding a
-       * basic declaration
+       * @param x variable declaration raw variant type
        */
-      fun_var_decl(const fun_var_decl_t& decl);  // NOLINT(runtime/explicit)
+      fun_var_decl(const fun_var_decl_t& x);  // NOLINT(runtime/explicit)
 
       /**
        * Construct a variable declaration with the specified
        * basic declaration.
        *
-       * @param decl variable declaration
+       * @param x variable declaration
        */
-      fun_var_decl(const nil& decl);  // NOLINT(runtime/explicit)
+      fun_var_decl(const nil& x);  // NOLINT(runtime/explicit)
 
       /**
        * Construct a variable declaration with the specified
        * basic declaration.  
        *
-       * @param decl variable declaration
+       * @param x variable declaration
        */
-      fun_var_decl(const int_fun_var_decl& decl);  // NOLINT(runtime/explicit)
+      fun_var_decl(const int_fun_var_decl& x);  // NOLINT(runtime/explicit)
 
       /**
        * Construct a variable declaration with the specified
        * basic declaration.  
        *
-       * @param decl variable declaration
+       * @param x variable declaration
        */
-      fun_var_decl(const double_fun_var_decl& decl);  // NOLINT(runtime/explicit)
+      fun_var_decl(const double_fun_var_decl& x);  // NOLINT(runtime/explicit)
 
       /**
        * Construct a variable declaration with the specified
        * basic declaration.  
        *
-       * @param decl variable declaration
+       * @param x variable declaration
        */
-      fun_var_decl(const vector_fun_var_decl& decl);  // NOLINT(runtime/explicit)
+      fun_var_decl(const vector_fun_var_decl& x);  // NOLINT(runtime/explicit)
 
       /**
        * Construct a variable declaration with the specified
        * basic declaration.  
        *
-       * @param decl variable declaration
+       * @param x variable declaration
        */
-      fun_var_decl(const row_vector_fun_var_decl& decl);  // NOLINT(runtime/explicit)
+      fun_var_decl(const row_vector_fun_var_decl& x);  // NOLINT(runtime/explicit)
 
       /**
        * Construct a variable declaration with the specified
        * basic declaration.  
        *
-       * @param decl variable declaration
+       * @param x variable declaration
        */
-      fun_var_decl(const matrix_fun_var_decl& decl);  // NOLINT(runtime/explicit)
+      fun_var_decl(const matrix_fun_var_decl& x);  // NOLINT(runtime/explicit)
 
       /**
        * Construct a variable declaration with the specified
        * basic declaration.  
        *
-       * @param decl variable declaration
+       * @param x variable declaration
        */
-      fun_var_decl(const array_fun_var_decl& decl);  // NOLINT(runtime/explicit)
+      fun_var_decl(const array_fun_var_decl& x);  // NOLINT(runtime/explicit)
 
       /**
        * Return the variable declaration's bare expr type.

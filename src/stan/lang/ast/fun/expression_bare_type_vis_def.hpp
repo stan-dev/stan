@@ -72,7 +72,7 @@ namespace stan {
     // }
 
     // bare_expr_type expression_bare_type_vis::operator()(const conditional_op& e) const {
-    //   return e.cond_.expression_type();
+    //   return e.cond_.bare_type();
     // }
 
     // bare_expr_type expression_bare_type_vis::operator()(const binary_op& e) const {

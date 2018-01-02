@@ -70,7 +70,7 @@ namespace stan {
       // expression(const unary_op& expr);  // NOLINT(runtime/explicit)
       expression(const expression_t& expr_);  // NOLINT(runtime/explicit)
 
-      bare_expr_type expression_type() const;
+      bare_expr_type bare_type() const;
       int total_dims() const;
 
       // expression& operator+=(const expression& rhs);

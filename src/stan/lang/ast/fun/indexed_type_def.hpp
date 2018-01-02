@@ -8,7 +8,7 @@ namespace stan {
   namespace lang {
 
     bare_expr_type indexed_type(const expression& e, const std::vector<idx>& idxs) {
-      bare_expr_type e_type = e.expression_type();
+      bare_expr_type e_type = e.bare_type();
 
       size_t base_dims = e_type.num_dims();
       size_t unindexed_dims = base_dims;

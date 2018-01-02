@@ -7,9 +7,11 @@
 namespace stan {
   namespace lang {
 
-    local_var_decl::local_var_decl(const local_var_decl_t& x) : var_decl_(x) { }
-
     local_var_decl::local_var_decl() : var_decl_(nil()) { }
+
+    local_var_decl::local_var_decl(const local_var_decl& x) : var_decl_(x.var_decl_) { }
+
+    local_var_decl::local_var_decl(const local_var_decl_t& x) : var_decl_(x) { }
 
     local_var_decl::local_var_decl(const nil& x) : var_decl_(x) { }
 

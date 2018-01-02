@@ -32,8 +32,8 @@ namespace stan {
 
     bare_expr_type infer_type_indexing(const expression& expr,
                                        size_t num_index_dims) {
-      return infer_type_indexing(expr.expression_type(),
-                                 expr.expression_type().num_dims(),
+      return infer_type_indexing(expr.bare_type(),
+                                 expr.bare_type().num_dims(),
                                  num_index_dims);
     }
 

@@ -6,24 +6,34 @@
 
 namespace stan {
   namespace lang {
-
-    fun_var_decl::fun_var_decl(const fun_var_decl_t& x) : var_decl_(x) { }
-
     fun_var_decl::fun_var_decl() : var_decl_(nil()) { }
 
-    fun_var_decl::fun_var_decl(const nil& x) : var_decl_(x) { }
+    fun_var_decl::fun_var_decl(const fun_var_decl& x)
+      : var_decl_(x.var_decl_) { }
 
-    fun_var_decl::fun_var_decl(const int_fun_var_decl& x) : var_decl_(x) { }
+    fun_var_decl::fun_var_decl(const fun_var_decl_t& x)
+      : var_decl_(x) { }
 
-    fun_var_decl::fun_var_decl(const double_fun_var_decl& x) : var_decl_(x) { }
+    fun_var_decl::fun_var_decl(const nil& x)
+      : var_decl_(x) { }
 
-    fun_var_decl::fun_var_decl(const vector_fun_var_decl& x) : var_decl_(x) { }
+    fun_var_decl::fun_var_decl(const int_fun_var_decl& x)
+      : var_decl_(x) { }
 
-    fun_var_decl::fun_var_decl(const row_vector_fun_var_decl& x) : var_decl_(x) { }
+    fun_var_decl::fun_var_decl(const double_fun_var_decl& x)
+      : var_decl_(x) { }
 
-    fun_var_decl::fun_var_decl(const matrix_fun_var_decl& x) : var_decl_(x) { }
+    fun_var_decl::fun_var_decl(const vector_fun_var_decl& x)
+      : var_decl_(x) { }
 
-    fun_var_decl::fun_var_decl(const array_fun_var_decl& x) : var_decl_(x) { }
+    fun_var_decl::fun_var_decl(const row_vector_fun_var_decl& x)
+      : var_decl_(x) { }
+
+    fun_var_decl::fun_var_decl(const matrix_fun_var_decl& x)
+      : var_decl_(x) { }
+
+    fun_var_decl::fun_var_decl(const array_fun_var_decl& x)
+      : var_decl_(x) { }
 
     std::string fun_var_decl::name() const {
       var_decl_name_vis vis;

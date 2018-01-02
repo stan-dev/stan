@@ -70,13 +70,13 @@ namespace stan {
     //   return *this;
     // }
 
-    bare_expr_type expression::expression_type() const {
+    bare_expr_type expression::bare_type() const {
       expression_bare_type_vis vis;
       return boost::apply_visitor(vis, expr_);
     }
 
     int expression::total_dims() const {
-      return expression_type().num_dims();
+      return bare_type().num_dims();
     }
 
   }
