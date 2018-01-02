@@ -10,11 +10,10 @@
 #include <stan/lang/ast/variable_map_def.hpp>
 
 #include <stan/lang/ast/type/bare_array_type_def.hpp>
-#include <stan/lang/ast/type/block_array_type_def.hpp>
-#include <stan/lang/ast/type/local_array_type_def.hpp>
-
 #include <stan/lang/ast/type/bare_expr_type_def.hpp>
+#include <stan/lang/ast/type/block_array_type_def.hpp>
 #include <stan/lang/ast/type/block_var_type_def.hpp>
+#include <stan/lang/ast/type/local_array_type_def.hpp>
 #include <stan/lang/ast/type/local_var_type_def.hpp>
 
 #include <stan/lang/ast/type/cholesky_corr_block_type_def.hpp>
@@ -22,17 +21,24 @@
 #include <stan/lang/ast/type/corr_matrix_block_type_def.hpp>
 #include <stan/lang/ast/type/cov_matrix_block_type_def.hpp>
 #include <stan/lang/ast/type/double_block_type_def.hpp>
+#include <stan/lang/ast/type/double_type_def.hpp>
+#include <stan/lang/ast/type/ill_formed_type_def.hpp>
 #include <stan/lang/ast/type/int_block_type_def.hpp>
+#include <stan/lang/ast/type/int_type_def.hpp>
 #include <stan/lang/ast/type/matrix_block_type_def.hpp>
 #include <stan/lang/ast/type/matrix_local_type_def.hpp>
+#include <stan/lang/ast/type/matrix_type_def.hpp>
 #include <stan/lang/ast/type/ordered_block_type_def.hpp>
 #include <stan/lang/ast/type/positive_ordered_block_type_def.hpp>
 #include <stan/lang/ast/type/row_vector_block_type_def.hpp>
 #include <stan/lang/ast/type/row_vector_local_type_def.hpp>
+#include <stan/lang/ast/type/row_vector_type_def.hpp>
 #include <stan/lang/ast/type/simplex_block_type_def.hpp>
 #include <stan/lang/ast/type/unit_vector_block_type_def.hpp>
 #include <stan/lang/ast/type/vector_block_type_def.hpp>
 #include <stan/lang/ast/type/vector_local_type_def.hpp>
+#include <stan/lang/ast/type/vector_type_def.hpp>
+#include <stan/lang/ast/type/void_type_def.hpp>
 
 #include <stan/lang/ast/fun/is_array_type_vis_def.hpp>
 #include <stan/lang/ast/fun/total_dims_vis_def.hpp>
@@ -40,11 +46,13 @@
 #include <stan/lang/ast/fun/bare_array_base_type_vis_def.hpp>
 #include <stan/lang/ast/fun/bare_array_dims_vis_def.hpp>
 #include <stan/lang/ast/fun/bare_array_element_type_vis_def.hpp>
+#include <stan/lang/ast/fun/bare_type_order_id_vis_def.hpp>
 #include <stan/lang/ast/fun/bare_type_vis_def.hpp>
 #include <stan/lang/ast/fun/block_array_base_type_vis_def.hpp>
 #include <stan/lang/ast/fun/block_array_dims_vis_def.hpp>
 #include <stan/lang/ast/fun/block_array_element_type_vis_def.hpp>
 #include <stan/lang/ast/fun/block_type_bounds_vis_def.hpp>
+#include <stan/lang/ast/fun/block_type_has_def_bounds_vis_def.hpp>
 #include <stan/lang/ast/fun/local_array_base_type_vis_def.hpp>
 #include <stan/lang/ast/fun/local_array_dims_vis_def.hpp>
 #include <stan/lang/ast/fun/local_array_element_type_vis_def.hpp>

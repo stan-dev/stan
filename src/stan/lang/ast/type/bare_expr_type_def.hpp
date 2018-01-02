@@ -18,70 +18,65 @@ namespace stan {
   namespace lang {
 
     bare_expr_type::bare_expr_type()
-      : bare_type_(ill_formed_type()),
-        order_id_(ill_formed_type::ORDER_ID) { }
+      : bare_type_(ill_formed_type()) { }
 
     bare_expr_type::bare_expr_type(const bare_expr_type& x)
-      : bare_type_(x.bare_type_), order_id_(x.order_id_) { }
+      : bare_type_(x.bare_type_) { }
+
+    bare_expr_type::bare_expr_type(const bare_t& x)
+      : bare_type_(x) { }
 
     bare_expr_type::bare_expr_type(const ill_formed_type& x)
-      : bare_type_(ill_formed_type()),
-        order_id_(ill_formed_type::ORDER_ID) { }
+      : bare_type_(ill_formed_type()) { }
 
     bare_expr_type::bare_expr_type(const void_type& x)
-      : bare_type_(void_type()),
-        order_id_(void_type::ORDER_ID) { }
+      : bare_type_(void_type()) { }
 
     bare_expr_type::bare_expr_type(const int_type& x)
-      : bare_type_(int_type()),
-        order_id_(int_type::ORDER_ID) { }
+      : bare_type_(int_type()) { }
 
     bare_expr_type::bare_expr_type(const double_type& x)
-      : bare_type_(double_type()),
-        order_id_(double_type::ORDER_ID) { }
+      : bare_type_(double_type()) { }
 
     bare_expr_type::bare_expr_type(const vector_type& x)
-      : bare_type_(vector_type()),
-        order_id_(vector_type::ORDER_ID) { }
+      : bare_type_(vector_type()) { }
 
     bare_expr_type::bare_expr_type(const row_vector_type& x)
-      : bare_type_(row_vector_type()),
-        order_id_(row_vector_type::ORDER_ID) { }
+      : bare_type_(row_vector_type()) { }
 
     bare_expr_type::bare_expr_type(const matrix_type& x)
-      : bare_type_(matrix_type()),
-        order_id_(matrix_type::ORDER_ID) { }
+      : bare_type_(matrix_type()) { }
 
     bare_expr_type::bare_expr_type(const bare_array_type& x)
-      : bare_type_(bare_array_type(x.element_type_)),
-        order_id_(10 * x.dims() + x.contains().order_id_) { }
+      : bare_type_(bare_array_type(x.element_type_)) { }
+
 
     bool bare_expr_type::is_ill_formed_type() const {
-      return order_id_ == ill_formed_type::ORDER_ID;
+      return order_id() == ill_formed_type().oid();
     }
 
     bool bare_expr_type::is_void_type() const {
-      return order_id_ == void_type::ORDER_ID;
+      return order_id() == void_type().oid();
     }
 
     bool bare_expr_type::is_int_type() const {
-      return order_id_ == int_type::ORDER_ID;
+      return order_id() == int_type().oid();
     }
 
     bool bare_expr_type::is_double_type() const {
-      return order_id_ == double_type::ORDER_ID;
+      return order_id() == double_type().oid();
     }
 
     bool bare_expr_type::is_vector_type() const {
-      return order_id_ == vector_type::ORDER_ID;
+      return order_id() == vector_type().oid();
     }
 
     bool bare_expr_type::is_row_vector_type() const {
-      return order_id_ == row_vector_type::ORDER_ID;
+      return order_id() == row_vector_type().oid();
     }
 
     bool bare_expr_type::is_matrix_type() const {
-      return order_id_ == matrix_type::ORDER_ID;
+      return order_id() == matrix_type().oid();
     }
 
     bool bare_expr_type::is_array_type() const {
@@ -109,28 +104,33 @@ namespace stan {
       return boost::apply_visitor(vis, bare_type_);
     }
 
+    std::string bare_expr_type::order_id() const {
+      bare_type_order_id_vis vis;
+      return boost::apply_visitor(vis, bare_type_);
+    }
+
     bool bare_expr_type::operator==(const bare_expr_type& bare_type) const {
-      return order_id_ == bare_type.order_id_;
+      return order_id() == bare_type.order_id();
     }
 
     bool bare_expr_type::operator!=(const bare_expr_type& bare_type) const {
-      return order_id_ != bare_type.order_id_;
+      return order_id() != bare_type.order_id();
     }
 
     bool bare_expr_type::operator<(const bare_expr_type& bare_type) const {
-      return order_id_ < bare_type.order_id_;
+      return order_id() < bare_type.order_id();
     }
 
     bool bare_expr_type::operator>(const bare_expr_type& bare_type) const {
-      return order_id_ > bare_type.order_id_;
+      return order_id() > bare_type.order_id();
     }
 
     bool bare_expr_type::operator<=(const bare_expr_type& bare_type) const {
-      return order_id_ <= bare_type.order_id_;
+      return order_id() <= bare_type.order_id();
     }
 
     bool bare_expr_type::operator>=(const bare_expr_type& bare_type) const {
-      return order_id_ >= bare_type.order_id_;
+      return order_id() >= bare_type.order_id();
     }
 
     std::ostream& operator<<(std::ostream& o, const bare_expr_type& bare_type) {

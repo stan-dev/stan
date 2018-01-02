@@ -13,11 +13,6 @@ namespace stan {
      */
     struct array_fun_var_decl : public var_decl {
       /**
-       * Array type defines element type, array size.
-       */
-      bare_array_type type_;
-
-      /**
        * Construct an array fun variable declaration with default
        * values. 
        */

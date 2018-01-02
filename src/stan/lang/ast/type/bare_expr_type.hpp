@@ -22,7 +22,6 @@ namespace stan {
     struct void_type;
 
     struct bare_expr_type {
-      static const int ORDER_ID = 0;
 
       /**
        * Recursive wrapper for bare types.
@@ -42,11 +41,6 @@ namespace stan {
        * The bare type held by this wrapper.
        */
       bare_t bare_type_;
-
-      /**
-       * Fixed numerical ID used for sorting.
-       */
-      int order_id_;
 
       /**
        * Construct a bare var type with default values.
@@ -115,6 +109,13 @@ namespace stan {
        * @param type bare type
        */      
       bare_expr_type(const bare_array_type& type); // NOLINT(runtime/explicit)
+
+      /**
+       * Construct a local var type with the specified type.
+       *
+       * @param type local variable type
+       */
+      bare_expr_type(const bare_t& var_type_);  // NOLINT(runtime/explicit)
 
       /**
        * Return true if the specified bare type is the same as
@@ -233,6 +234,11 @@ namespace stan {
        * Returns 0 for scalar types.
        */
       int num_dims() const;
+
+      /**
+       * Returns order id for this bare type.
+       */
+      std::string order_id() const;
     };
 
     /**

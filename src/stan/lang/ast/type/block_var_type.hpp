@@ -208,8 +208,6 @@ namespace stan {
        */
       bare_expr_type bare_type() const;
 
-      // TODO:mitzi - visitor: has_defined_bounds
-      
       /**
        * Returns bounds for this type.
        */
@@ -219,6 +217,12 @@ namespace stan {
        * Returns true if `var_type_` is `block_array_type`, false otherwise.
        */
       bool is_array_type() const;
+
+      /**
+       * Returns true if there are specified upper and/or lower bounds
+       * for this type (contained type for arrays), false otherwise.
+       */
+      bool has_def_bounds() const;
 
       /**
        * Returns total number of dimensions for container type.

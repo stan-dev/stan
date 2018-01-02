@@ -23,6 +23,8 @@ namespace stan {
 
     local_var_decl::local_var_decl(const matrix_local_var_decl& x) : var_decl_(x) { }
 
+    local_var_decl::local_var_decl(const array_local_var_decl& x) : var_decl_(x) { }
+
     bare_expr_type local_var_decl::bare_type() const {
       var_decl_bare_type_vis vis;
       return boost::apply_visitor(vis, var_decl_);

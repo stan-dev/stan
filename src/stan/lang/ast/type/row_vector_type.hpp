@@ -1,6 +1,8 @@
 #ifndef STAN_LANG_AST_ROW_VECTOR_TYPE_HPP
 #define STAN_LANG_AST_ROW_VECTOR_TYPE_HPP
 
+#include <string>
+
 namespace stan {
   namespace lang {
 
@@ -8,7 +10,10 @@ namespace stan {
      * Row vector type.
      */
     struct row_vector_type {
-      static const int ORDER_ID = 5;
+      /**
+       * Returns identity string for this type.
+       */
+      std::string oid() const;
     };
 
   }

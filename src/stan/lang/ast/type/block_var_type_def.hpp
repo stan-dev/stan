@@ -94,6 +94,11 @@ namespace stan {
       return boost::apply_visitor(vis, var_type_);
     }
 
+    bool block_var_type::has_def_bounds() const {
+      block_type_has_def_bounds_vis vis;
+      return boost::apply_visitor(vis, var_type_);
+    }
+
     int block_var_type::num_dims() const {
       total_dims_vis vis;
       return boost::apply_visitor(vis, var_type_);

@@ -1,6 +1,8 @@
 #ifndef STAN_LANG_AST_ILL_FORMED_TYPE_HPP
 #define STAN_LANG_AST_ILL_FORMED_TYPE_HPP
 
+#include <string>
+
 namespace stan {
   namespace lang {
 
@@ -8,7 +10,10 @@ namespace stan {
      * Ill_Formed type.
      */
     struct ill_formed_type {
-      static const int ORDER_ID = 0;
+      /**
+       * Returns identity string for this type.
+       */
+      std::string oid() const;
     };
 
   }

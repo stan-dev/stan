@@ -1,12 +1,18 @@
 #ifndef STAN_LANG_AST_BARE_ARRAY_TYPE_HPP
 #define STAN_LANG_AST_BARE_ARRAY_TYPE_HPP
 
-#include <stan/lang/ast/node/expression.hpp>
 #include <string>
 
 namespace stan {
   namespace lang {
 
+    struct bare_expr_type;
+    struct double_type;
+    struct int_type;
+    struct matrix_type;
+    struct row_vector_type;
+    struct vector_type;
+    
     /** 
      * Bare array type for Stan variables and expressions (recursive).
      */
@@ -36,6 +42,12 @@ namespace stan {
        * Returns number of array dimensions.
        */
       int dims() const;
+
+      /**
+       * Returns identity string for this type.
+       */
+      std::string oid() const;
+
     };
   }
 }

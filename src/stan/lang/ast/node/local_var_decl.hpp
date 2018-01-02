@@ -118,6 +118,13 @@ namespace stan {
        */
       local_var_decl(const matrix_local_var_decl& decl);  // NOLINT(runtime/explicit)
 
+      /**
+       * Construct a variable declaration with the specified
+       * basic declaration.  
+       *
+       * @param decl variable declaration
+       */
+      local_var_decl(const array_local_var_decl& x);  // NOLINT(runtime/explicit)
 
       /**
        * Return the variable declaration's bare expr type.

@@ -25,6 +25,18 @@ namespace stan {
 
       /**
        * Construct an array variable declaration with the specified
+       * name, element type, and length.
+       *
+       * @param name variable name
+       * @param el_type element type
+       * @param len array length
+       */
+      array_local_var_decl(const std::string& name,
+                           const local_var_type& el_type,
+                           const expression& len);
+
+      /**
+       * Construct an array variable declaration with the specified
        * name, element type, length, and definition.
        *
        * @param name variable name
