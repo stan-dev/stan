@@ -40,6 +40,7 @@ namespace stan {
        */
       var_decl get(const std::string& name) const;
 
+      //TODO:mitzi - redundant - equivalent to get(name).bare_type_
       /**
        * Return the type declared for the variable with the specified
        * name. 

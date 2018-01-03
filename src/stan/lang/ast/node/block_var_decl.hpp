@@ -242,6 +242,13 @@ namespace stan {
        * @return the variable expression's block_var_type
        */
       block_var_type type() const;
+
+      /**
+       * Return the var_decl for this variable declaration
+       *
+       * @return var_decl
+      */
+      var_decl var_decl() const;
     };
   }
 }

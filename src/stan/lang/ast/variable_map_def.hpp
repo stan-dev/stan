@@ -17,7 +17,6 @@ namespace stan {
       return map_.find(name)->second.first;
     }
 
-    // get the var_decl for this name, return field  type
     bare_expr_type variable_map::get_bare_type(const std::string& name) const {
       return get(name).bare_type_;
     }

@@ -964,7 +964,7 @@ namespace stan {
         return;
       }
       v = variable(name);
-      v.set_type(vm.get_base_type(name), vm.get_num_dims(name));
+      v.set_type(vm.get_base_type(name));
       pass = true;
     }
     boost::phoenix::function<validate_lhs_var_assgn> validate_lhs_var_assgn_f;

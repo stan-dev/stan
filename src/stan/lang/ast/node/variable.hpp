@@ -35,13 +35,11 @@ namespace stan {
       variable(const std::string& name);  // NOLINT(runtime/explicit)
 
       /**
-       * Set the type of the variable to the expression type
-       * with the specified base type and number of dimensions.
+       * Set the variable type.
        *
-       * @param base_type base type for variable
-       * @param num_dims number of array dims for variable
+       * @param bare_type bare expression type
        */
-      void set_type(const bare_expr_type& bare_type, std::size_t num_dims);
+      void set_type(const bare_expr_type& bare_type);
     };
 
   }

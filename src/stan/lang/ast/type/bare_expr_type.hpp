@@ -212,6 +212,11 @@ namespace stan {
       bool is_array_type() const;
 
       /**
+       * Returns true if `bare_type_` is `int_type` or `double_type`, false otherwise.
+       */
+      bool is_primitive() const;
+
+      /**
        * Returns the element type for `bare_array_type`, otherwise
        * will return `ill_formed_type`.
        */

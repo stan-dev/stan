@@ -11,7 +11,8 @@ namespace stan {
                                array_expr_scope_() { }
 
     array_expr::array_expr(const std::vector<expression>& args)
-      : args_(args), type_(), has_var_(false), array_expr_scope_() { }
+      : args_(args), type_(bare_array_type(args.at(0).bare_type())),
+        has_var_(false), array_expr_scope_() { }
 
   }
 }

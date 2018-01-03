@@ -79,6 +79,11 @@ namespace stan {
       return order_id() == matrix_type().oid();
     }
 
+    bool bare_expr_type::is_primitive() const {
+      return order_id() == int_type().oid()
+        || order_id() == double_type().oid();
+    }
+
     bool bare_expr_type::is_array_type() const {
       is_array_type_vis vis;
       return boost::apply_visitor(vis, bare_type_);
