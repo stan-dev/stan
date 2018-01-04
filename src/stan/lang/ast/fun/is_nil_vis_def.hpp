@@ -54,25 +54,25 @@ namespace stan {
       return false;
     }
 
-    // bool is_nil_vis::operator()(const index_op& /* x */) const {
-    //   return false;
-    // }
+    bool is_nil_vis::operator()(const index_op& /* x */) const {
+      return false;
+    }
 
-    // bool is_nil_vis::operator()(const index_op_sliced& /* x */) const {
-    //   return false;
-    // }
+    bool is_nil_vis::operator()(const index_op_sliced& /* x */) const {
+      return false;
+    }
 
     bool is_nil_vis::operator()(const conditional_op& /* x */) const {
       return false;
     }
 
-    // bool is_nil_vis::operator()(const binary_op& /* x */) const {
-    //   return false;
-    // }
+    bool is_nil_vis::operator()(const binary_op& /* x */) const {
+      return false;
+    }
 
-    // bool is_nil_vis::operator()(const unary_op& /* x */) const {
-    //   return false;
-    // }
+    bool is_nil_vis::operator()(const unary_op& /* x */) const {
+      return false;
+    }
 
   }
 }

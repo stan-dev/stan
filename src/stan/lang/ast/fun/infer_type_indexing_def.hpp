@@ -1,45 +1,50 @@
 #ifndef STAN_LANG_AST_FUN_INFER_TYPE_INDEXING_DEF_HPP
 #define STAN_LANG_AST_FUN_INFER_TYPE_INDEXING_DEF_HPP
 
-#include <stan/lang/ast.hpp>
-#include <vector>
+#include <stan/lang/ast/node/expression.hpp>
+#include <stan/lang/ast/type/bare_expr_type.hpp>
+#include <stan/lang/ast/type/double_type.hpp>
+#include <stan/lang/ast/type/ill_formed_type.hpp>
+#include <stan/lang/ast/type/matrix_type.hpp>
+#include <stan/lang/ast/type/row_vector_type.hpp>
+#include <stan/lang/ast/type/vector_type.hpp>
 
 namespace stan {
   namespace lang {
 
-    bare_expr_type infer_type_indexing(const bare_expr_type& expr_base_type,
-                                       size_t num_expr_dims,
+    bare_expr_type infer_type_indexing(const expression& e,
                                        size_t num_index_dims) {
-      // TODO:mitzi  - this logic sucks -
-      // need to index into array and container types
-      // if (num_index_dims <= num_expr_dims)
-      //   return expr_type(expr_base_type, num_expr_dims - num_index_dims);
+      bare_expr_type bare_type = e.bare_type();
+      size_t num_expr_dims = bare_type.num_dims();
 
-      if (num_index_dims == (num_expr_dims + 1)) {
-        if (expr_base_type.is_vector_type()
-            || expr_base_type.is_row_vector_type())
-          return double_type();
-        if (expr_base_type.is_matrix_type())
-          return row_vector_type();
+      while (bare_type.is_array_type()
+             && num_index_dims > 1) {
+        bare_type = bare_type.array_element_type();
+        num_expr_dims--;
+        num_index_dims--;
       }
-      if (num_index_dims == (num_expr_dims + 2))
-        if (expr_base_type.is_matrix_type())
-          return double_type();
 
-      // error condition, result expr_type has is_ill_formed() = true
+      if (num_expr_dims < num_index_dims) 
+        return bare_expr_type(ill_formed_type());
+
+      if (bare_type.is_array_type())
+        return bare_type.array_element_type();
+      
+      if ((bare_type.is_row_vector_type()
+          || bare_type.is_vector_type())
+          && num_index_dims == 1)
+        return bare_expr_type(double_type());
+
+      if (bare_type.is_matrix_type()
+          &&  num_index_dims == 1)
+        return bare_expr_type(row_vector_type());
+
+      if (bare_type.is_matrix_type()
+          &&  num_index_dims == 1)
+        return bare_expr_type(double_type());
+      
       return bare_expr_type(ill_formed_type());
     }
-
-    bare_expr_type infer_type_indexing(const expression& expr,
-                                       size_t num_index_dims) {
-      return infer_type_indexing(expr.bare_type(),
-                                 expr.bare_type().num_dims(),
-                                 num_index_dims);
-    }
-
-
-
-
   }
 }
 #endif

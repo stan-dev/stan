@@ -41,7 +41,6 @@ namespace stan {
        */
       index_op(const expression& expr,
                const std::vector<std::vector<expression> >& dimss);
-      void infer_type();
     };
 
   }

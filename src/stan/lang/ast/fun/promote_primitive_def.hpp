@@ -1,8 +1,9 @@
 #ifndef STAN_LANG_AST_FUN_PROMOTE_PRIMITIVE_DEF_HPP
 #define STAN_LANG_AST_FUN_PROMOTE_PRIMITIVE_DEF_HPP
 
-#include <stan/lang/ast/type/bare_expr_type.hpp>
 #include <stan/lang/ast/fun/promote_primitive.hpp>
+#include <stan/lang/ast/type/bare_expr_type.hpp>
+#include <stan/lang/ast/type/ill_formed_type.hpp>
 
 namespace stan {
   namespace lang {

@@ -12,11 +12,7 @@ namespace stan {
     index_op::index_op(const expression& expr,
                        const std::vector<std::vector<expression> >& dimss)
       : expr_(expr), dimss_(dimss) {
-      infer_type();
-    }
-
-    void index_op::infer_type() {
-      type_ = infer_type_indexing(expr_, total_dims(dimss_));
+      type_ = infer_type_indexing(expr_, num_index_op_dims(dimss_));
     }
 
   }

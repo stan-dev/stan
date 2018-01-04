@@ -21,31 +21,31 @@ namespace stan {
     struct integrate_ode_control;
     struct algebra_solver;
     struct algebra_solver_control;
-    // struct index_op;
-    // struct index_op_sliced;
+    struct index_op;
+    struct index_op_sliced;
     struct conditional_op;
-    // struct binary_op;
-    // struct unary_op;
+    struct binary_op;
+    struct unary_op;
 
     struct expression {
-       typedef boost::variant<boost::recursive_wrapper<nil>,
-                              boost::recursive_wrapper<int_literal>,
-                              boost::recursive_wrapper<double_literal>,
-                              boost::recursive_wrapper<array_expr>,
-                              boost::recursive_wrapper<matrix_expr>,
-                              boost::recursive_wrapper<row_vector_expr>,
-                              boost::recursive_wrapper<variable>,
-                              boost::recursive_wrapper<fun>,
-                              boost::recursive_wrapper<integrate_ode>,
-                              boost::recursive_wrapper<integrate_ode_control>,
-                              boost::recursive_wrapper<algebra_solver>,
-                              boost::recursive_wrapper<algebra_solver_control>,
-                              boost::recursive_wrapper<conditional_op> >
-       expression_t;
-      //                        boost::recursive_wrapper<index_op>,
-      //                        boost::recursive_wrapper<index_op_sliced>,
-      //                        boost::recursive_wrapper<binary_op>,
-      //                        boost::recursive_wrapper<unary_op> >
+      typedef boost::variant<boost::recursive_wrapper<nil>,
+                             boost::recursive_wrapper<int_literal>,
+                             boost::recursive_wrapper<double_literal>,
+                             boost::recursive_wrapper<array_expr>,
+                             boost::recursive_wrapper<matrix_expr>,
+                             boost::recursive_wrapper<row_vector_expr>,
+                             boost::recursive_wrapper<variable>,
+                             boost::recursive_wrapper<fun>,
+                             boost::recursive_wrapper<integrate_ode>,
+                             boost::recursive_wrapper<integrate_ode_control>,
+                             boost::recursive_wrapper<algebra_solver>,
+                             boost::recursive_wrapper<algebra_solver_control>,
+                             boost::recursive_wrapper<index_op>,
+                             boost::recursive_wrapper<index_op_sliced>,
+                             boost::recursive_wrapper<conditional_op>,
+                             boost::recursive_wrapper<binary_op>,
+                             boost::recursive_wrapper<unary_op> >
+      expression_t;
 
       expression();
       expression(const expression& e);
@@ -63,20 +63,20 @@ namespace stan {
       expression(const integrate_ode_control& expr);  // NOLINT
       expression(const algebra_solver& expr);  // NOLINT(runtime/explicit)
       expression(const algebra_solver_control& expr);  // NOLINT
-      // expression(const index_op& expr);  // NOLINT(runtime/explicit)
-      // expression(const index_op_sliced& expr);  // NOLINT(runtime/explicit)
+      expression(const index_op& expr);  // NOLINT(runtime/explicit)
+      expression(const index_op_sliced& expr);  // NOLINT(runtime/explicit)
       expression(const conditional_op& expr);  // NOLINT(runtime/explicit)
-      // expression(const binary_op& expr);  // NOLINT(runtime/explicit)
-      // expression(const unary_op& expr);  // NOLINT(runtime/explicit)
+      expression(const binary_op& expr);  // NOLINT(runtime/explicit)
+      expression(const unary_op& expr);  // NOLINT(runtime/explicit)
       expression(const expression_t& expr_);  // NOLINT(runtime/explicit)
 
       bare_expr_type bare_type() const;
       int total_dims() const;
 
-      // expression& operator+=(const expression& rhs);
-      // expression& operator-=(const expression& rhs);
-      // expression& operator*=(const expression& rhs);
-      // expression& operator/=(const expression& rhs);
+      expression& operator+=(const expression& rhs);
+      expression& operator-=(const expression& rhs);
+      expression& operator*=(const expression& rhs);
+      expression& operator/=(const expression& rhs);
 
       expression_t expr_;
     };

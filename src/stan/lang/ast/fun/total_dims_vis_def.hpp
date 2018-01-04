@@ -8,7 +8,6 @@ namespace stan {
   namespace lang {
     total_dims_vis::total_dims_vis() { }
 
-
     int total_dims_vis::operator()(const block_array_type& x) const {
       return x.dims() + x.contains().num_dims();
     }

@@ -69,7 +69,7 @@
 // #include <stan/lang/ast/fun/has_non_param_var_vis.hpp>
 // #include <stan/lang/ast/fun/has_prob_fun_suffix.hpp>
 // #include <stan/lang/ast/fun/has_var_vis.hpp>
-// #include <stan/lang/ast/fun/is_multi_index_vis.hpp>
+#include <stan/lang/ast/fun/is_multi_index_vis.hpp>
 // #include <stan/lang/ast/fun/is_no_op_statement_vis.hpp>
 // #include <stan/lang/ast/fun/returns_type_vis.hpp>
 // #include <stan/lang/ast/fun/strip_ccdf_suffix.hpp>
@@ -87,20 +87,21 @@
 // #include <stan/lang/ast/fun/has_non_param_var.hpp>
 // #include <stan/lang/ast/fun/has_rng_suffix.hpp>
 // #include <stan/lang/ast/fun/has_var.hpp>
-// #include <stan/lang/ast/fun/indexed_type.hpp>
-// #include <stan/lang/ast/fun/infer_type_indexing.hpp>
+#include <stan/lang/ast/fun/indexed_type.hpp>
+#include <stan/lang/ast/fun/infer_type_indexing.hpp>
 // #include <stan/lang/ast/fun/is_assignable.hpp>
-// #include <stan/lang/ast/fun/is_multi_index.hpp>
+#include <stan/lang/ast/fun/is_multi_index.hpp>
 // #include <stan/lang/ast/fun/is_nonempty.hpp>
 // #include <stan/lang/ast/fun/is_space.hpp>
 // #include <stan/lang/ast/fun/is_user_defined.hpp>
 // #include <stan/lang/ast/fun/is_user_defined_prob_function.hpp>
+#include <stan/lang/ast/fun/num_index_op_dims.hpp>
 // #include <stan/lang/ast/fun/operator_stream_expr_type.hpp>
 // #include <stan/lang/ast/fun/operator_stream_function_arg_type.hpp>
 // #include <stan/lang/ast/fun/print_scope.hpp>
 #include <stan/lang/ast/fun/promote_primitive.hpp>
 // #include <stan/lang/ast/fun/returns_type.hpp>
-// #include <stan/lang/ast/fun/total_dims.hpp>
+
 // #include <stan/lang/ast/sigs/function_signature_t.hpp>
 // #include <stan/lang/ast/sigs/function_signatures.hpp>
 // #include <stan/lang/ast/sigs/function_arg_type.hpp>
@@ -144,7 +145,7 @@
 #include <stan/lang/ast/node/array_expr.hpp>
 // #include <stan/lang/ast/node/assgn.hpp>
 // #include <stan/lang/ast/node/assignment.hpp>
-// #include <stan/lang/ast/node/binary_op.hpp>
+#include <stan/lang/ast/node/binary_op.hpp>
 // #include <stan/lang/ast/node/break_continue_statement.hpp>
 // #include <stan/lang/ast/node/compound_assignment.hpp>
 #include <stan/lang/ast/node/conditional_op.hpp>
@@ -161,20 +162,20 @@
 #include <stan/lang/ast/node/fun.hpp>
 // #include <stan/lang/ast/node/function_decl_def.hpp>
 // #include <stan/lang/ast/node/function_decl_defs.hpp>
-// #include <stan/lang/ast/node/idx.hpp>
+#include <stan/lang/ast/node/idx.hpp>
 // #include <stan/lang/ast/node/increment_log_prob_statement.hpp>
-// #include <stan/lang/ast/node/index_op.hpp>
-// #include <stan/lang/ast/node/index_op_sliced.hpp>
+#include <stan/lang/ast/node/index_op.hpp>
+#include <stan/lang/ast/node/index_op_sliced.hpp>
 #include <stan/lang/ast/node/integrate_ode.hpp>
 #include <stan/lang/ast/node/integrate_ode_control.hpp>
 
 #include <stan/lang/ast/node/int_literal.hpp>
 
-// #include <stan/lang/ast/node/lb_idx.hpp>
-// #include <stan/lang/ast/node/lub_idx.hpp>
-// #include <stan/lang/ast/node/multi_idx.hpp>
+#include <stan/lang/ast/node/lb_idx.hpp>
+#include <stan/lang/ast/node/lub_idx.hpp>
+#include <stan/lang/ast/node/multi_idx.hpp>
 // #include <stan/lang/ast/node/no_op_statement.hpp>
-// #include <stan/lang/ast/node/omni_idx.hpp>
+#include <stan/lang/ast/node/omni_idx.hpp>
 // #include <stan/lang/ast/node/print_statement.hpp>
 // #include <stan/lang/ast/node/printable.hpp>
 // #include <stan/lang/ast/node/program.hpp>
@@ -187,8 +188,8 @@
 // #include <stan/lang/ast/node/statement.hpp>
 // #include <stan/lang/ast/node/statements.hpp>
 // #include <stan/lang/ast/node/ub_idx.hpp>
-// #include <stan/lang/ast/node/unary_op.hpp>
-// #include <stan/lang/ast/node/uni_idx.hpp>
+#include <stan/lang/ast/node/unary_op.hpp>
+#include <stan/lang/ast/node/uni_idx.hpp>
 #include <stan/lang/ast/node/variable.hpp>
 // #include <stan/lang/ast/node/variable_dims.hpp>
 // #include <stan/lang/ast/node/while_statement.hpp>

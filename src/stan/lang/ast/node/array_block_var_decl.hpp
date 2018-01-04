@@ -1,5 +1,5 @@
-#ifndef STAN_LANG_AST_NODE_BLOCK_ARRAY_VAR_DECL_HPP
-#define STAN_LANG_AST_NODE_BLOCK_ARRAY_VAR_DECL_HPP
+#ifndef STAN_LANG_AST_NODE_ARRAY_BLOCK_VAR_DECL_HPP
+#define STAN_LANG_AST_NODE_ARRAY_BLOCK_VAR_DECL_HPP
 
 #include <stan/lang/ast/type/block_array_type.hpp>
 #include <stan/lang/ast/type/block_var_type.hpp>

@@ -18,11 +18,11 @@ namespace stan {
     struct integrate_ode_control;
     struct algebra_solver;
     struct algebra_solver_control;
-    // struct index_op;
-    // struct index_op_sliced;
+    struct index_op;
+    struct index_op_sliced;
     struct conditional_op;
-    // struct binary_op;
-    // struct unary_op;
+    struct binary_op;
+    struct unary_op;
 
     /**
      * Callback functor for determining if one of the variant types
@@ -41,11 +41,11 @@ namespace stan {
       bool operator()(const integrate_ode_control& x) const;  // NOLINT
       bool operator()(const algebra_solver& x) const;  // NOLINT
       bool operator()(const algebra_solver_control& x) const;  // NOLINT
-      // bool operator()(const index_op& x) const;  // NOLINT(runtime/explicit)
-      // bool operator()(const index_op_sliced& x) const;  // NOLINT
+      bool operator()(const index_op& x) const;  // NOLINT(runtime/explicit)
+      bool operator()(const index_op_sliced& x) const;  // NOLINT
       bool operator()(const conditional_op& x) const;  // NOLINT
-      // bool operator()(const binary_op& x) const;  // NOLINT(runtime/explicit)
-      // bool operator()(const unary_op& x) const;  // NOLINT(runtime/explicit)
+      bool operator()(const binary_op& x) const;  // NOLINT(runtime/explicit)
+      bool operator()(const unary_op& x) const;  // NOLINT(runtime/explicit)
     };
 
   }

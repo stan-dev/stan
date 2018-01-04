@@ -48,11 +48,11 @@ namespace stan {
     }
 
     bare_expr_type expression_bare_type_vis::operator()(const integrate_ode& e) const {
-      return bare_array_type(bare_expr_type(bare_array_type(double_type())));
+      return bare_array_type(bare_expr_type(bare_array_type(bare_expr_type(double_type()))));
     }
 
     bare_expr_type expression_bare_type_vis::operator()(const integrate_ode_control& e) const {
-      return bare_array_type(bare_expr_type(bare_array_type(double_type())));
+      return bare_array_type(bare_expr_type(bare_array_type(bare_expr_type(double_type()))));
     }
 
     bare_expr_type expression_bare_type_vis::operator()(const algebra_solver& e) const {
@@ -63,25 +63,25 @@ namespace stan {
       return vector_type();
     }
 
-    // bare_expr_type expression_bare_type_vis::operator()(const index_op& e) const {
-    //   return e.type_;
-    // }
+    bare_expr_type expression_bare_type_vis::operator()(const index_op& e) const {
+      return e.type_;
+    }
 
-    // bare_expr_type expression_bare_type_vis::operator()(const index_op_sliced& e) const {
-    //   return e.type_;
-    // }
+    bare_expr_type expression_bare_type_vis::operator()(const index_op_sliced& e) const {
+      return e.type_;
+    }
 
     bare_expr_type expression_bare_type_vis::operator()(const conditional_op& e) const {
       return e.cond_.bare_type();
     }
 
-    // bare_expr_type expression_bare_type_vis::operator()(const binary_op& e) const {
-    //   return e.type_;
-    // }
+    bare_expr_type expression_bare_type_vis::operator()(const binary_op& e) const {
+      return e.type_;
+    }
 
-    // bare_expr_type expression_bare_type_vis::operator()(const unary_op& e) const {
-    //   return e.type_;
-    // }
+    bare_expr_type expression_bare_type_vis::operator()(const unary_op& e) const {
+      return e.type_;
+    }
 
   }
 }
