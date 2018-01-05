@@ -12,7 +12,7 @@
 namespace stan {
   namespace lang {
 
-   void function_signatures::reset_sigs() {
+    void function_signatures::reset_sigs() {
       if (sigs_ == 0) return;
       delete sigs_;
       sigs_ = 0;
@@ -26,12 +26,12 @@ namespace stan {
     }
 
     void function_signatures::set_user_defined(
-                const std::pair<std::string, function_signature_t>& name_sig) {
+      const std::pair<std::string, function_signature_t>& name_sig) {
       user_defined_set_.insert(name_sig);
     }
 
     bool function_signatures::is_user_defined(
-                const std::pair<std::string, function_signature_t>& name_sig) {
+      const std::pair<std::string, function_signature_t>& name_sig) {
       return user_defined_set_.find(name_sig) != user_defined_set_.end();
     }
 
@@ -54,8 +54,8 @@ namespace stan {
       for (size_t i = 0; i < sigs.size(); ++i)
         if (sig.first == sigs[i].first && sig.second == sigs[i].second)
           return sigs[i];
-      expr_type ill_formed = expr_type();
-      std::vector<function_arg_type> arg_types;
+      bare_expr_type ill_formed;
+      std::vector<fun_var_type> arg_types;
       return function_signature_t(ill_formed, arg_types);
     }
 
@@ -71,171 +71,192 @@ namespace stan {
       const vector<function_signature_t> sigs = it->second;
       for (size_t i = 0; i < sigs.size(); ++i) {
         if (sigs[i].second.size() == 0
-            || !sigs[i].second[0].expr_type_.base_type_.is_int_type())
+            || !sigs[i].second[0].bare_type_.is_int_type())
           return false;
       }
       return true;
     }
 
     void function_signatures::add(const std::string& name,
-                                  const expr_type& result_type,
-                                  const std::vector<function_arg_type>&
+                                  const bare_expr_type& result_type,
+                                  const std::vector<fun_var_type>&
                                   arg_types) {
       sigs_map_[name].push_back(function_signature_t(result_type, arg_types));
     }
 
     void function_signatures::add(const std::string& name,
-                                  const expr_type& result_type) {
-      std::vector<function_arg_type> arg_types;
+                                  const bare_expr_type& result_type) {
+      std::vector<fun_var_type> arg_types;
       add(name, result_type, arg_types);
     }
 
     void function_signatures::add(const std::string& name,
-                                  const expr_type& result_type,
-                                  const expr_type& arg_type) {
-      std::vector<function_arg_type> arg_types;
-      arg_types.push_back(function_arg_type(arg_type));
+                                  const bare_expr_type& result_type,
+                                  const bare_expr_type& arg_type) {
+      std::vector<fun_var_type> arg_types;
+      arg_types.push_back(fun_var_type(arg_type));
       add(name, result_type, arg_types);
     }
 
     void function_signatures::add(const std::string& name,
-                                  const expr_type& result_type,
-                                  const expr_type& arg_type1,
-                                  const expr_type& arg_type2) {
-      std::vector<function_arg_type> arg_types;
-      arg_types.push_back(function_arg_type(arg_type1));
-      arg_types.push_back(function_arg_type(arg_type2));
+                                  const bare_expr_type& result_type,
+                                  const bare_expr_type& arg_type1,
+                                  const bare_expr_type& arg_type2) {
+      std::vector<fun_var_type> arg_types;
+      arg_types.push_back(fun_var_type(arg_type1));
+      arg_types.push_back(fun_var_type(arg_type2));
       add(name, result_type, arg_types);
     }
 
     void function_signatures::add(const std::string& name,
-                                  const expr_type& result_type,
-                                  const expr_type& arg_type1,
-                                  const expr_type& arg_type2,
-                                  const expr_type& arg_type3) {
-      std::vector<function_arg_type> arg_types;
-      arg_types.push_back(function_arg_type(arg_type1));
-      arg_types.push_back(function_arg_type(arg_type2));
-      arg_types.push_back(function_arg_type(arg_type3));
+                                  const bare_expr_type& result_type,
+                                  const bare_expr_type& arg_type1,
+                                  const bare_expr_type& arg_type2,
+                                  const bare_expr_type& arg_type3) {
+      std::vector<fun_var_type> arg_types;
+      arg_types.push_back(fun_var_type(arg_type1));
+      arg_types.push_back(fun_var_type(arg_type2));
+      arg_types.push_back(fun_var_type(arg_type3));
       add(name, result_type, arg_types);
     }
 
     void function_signatures::add(const std::string& name,
-                                  const expr_type& result_type,
-                                  const expr_type& arg_type1,
-                                  const expr_type& arg_type2,
-                                  const expr_type& arg_type3,
-                                  const expr_type& arg_type4) {
-      std::vector<function_arg_type> arg_types;
-      arg_types.push_back(function_arg_type(arg_type1));
-      arg_types.push_back(function_arg_type(arg_type2));
-      arg_types.push_back(function_arg_type(arg_type3));
-      arg_types.push_back(function_arg_type(arg_type4));
+                                  const bare_expr_type& result_type,
+                                  const bare_expr_type& arg_type1,
+                                  const bare_expr_type& arg_type2,
+                                  const bare_expr_type& arg_type3,
+                                  const bare_expr_type& arg_type4) {
+      std::vector<fun_var_type> arg_types;
+      arg_types.push_back(fun_var_type(arg_type1));
+      arg_types.push_back(fun_var_type(arg_type2));
+      arg_types.push_back(fun_var_type(arg_type3));
+      arg_types.push_back(fun_var_type(arg_type4));
       add(name, result_type, arg_types);
     }
 
     void function_signatures::add(const std::string& name,
-                                  const expr_type& result_type,
-                                  const expr_type& arg_type1,
-                                  const expr_type& arg_type2,
-                                  const expr_type& arg_type3,
-                                  const expr_type& arg_type4,
-                                  const expr_type& arg_type5) {
-      std::vector<function_arg_type> arg_types;
-      arg_types.push_back(function_arg_type(arg_type1));
-      arg_types.push_back(function_arg_type(arg_type2));
-      arg_types.push_back(function_arg_type(arg_type3));
-      arg_types.push_back(function_arg_type(arg_type4));
-      arg_types.push_back(function_arg_type(arg_type5));
+                                  const bare_expr_type& result_type,
+                                  const bare_expr_type& arg_type1,
+                                  const bare_expr_type& arg_type2,
+                                  const bare_expr_type& arg_type3,
+                                  const bare_expr_type& arg_type4,
+                                  const bare_expr_type& arg_type5) {
+      std::vector<fun_var_type> arg_types;
+      arg_types.push_back(fun_var_type(arg_type1));
+      arg_types.push_back(fun_var_type(arg_type2));
+      arg_types.push_back(fun_var_type(arg_type3));
+      arg_types.push_back(fun_var_type(arg_type4));
+      arg_types.push_back(fun_var_type(arg_type5));
       add(name, result_type, arg_types);
     }
 
     void function_signatures::add(const std::string& name,
-                                  const expr_type& result_type,
-                                  const expr_type& arg_type1,
-                                  const expr_type& arg_type2,
-                                  const expr_type& arg_type3,
-                                  const expr_type& arg_type4,
-                                  const expr_type& arg_type5,
-                                  const expr_type& arg_type6) {
-      std::vector<function_arg_type> arg_types;
-      arg_types.push_back(function_arg_type(arg_type1));
-      arg_types.push_back(function_arg_type(arg_type2));
-      arg_types.push_back(function_arg_type(arg_type3));
-      arg_types.push_back(function_arg_type(arg_type4));
-      arg_types.push_back(function_arg_type(arg_type5));
-      arg_types.push_back(function_arg_type(arg_type6));
+                                  const bare_expr_type& result_type,
+                                  const bare_expr_type& arg_type1,
+                                  const bare_expr_type& arg_type2,
+                                  const bare_expr_type& arg_type3,
+                                  const bare_expr_type& arg_type4,
+                                  const bare_expr_type& arg_type5,
+                                  const bare_expr_type& arg_type6) {
+      std::vector<fun_var_type> arg_types;
+      arg_types.push_back(fun_var_type(arg_type1));
+      arg_types.push_back(fun_var_type(arg_type2));
+      arg_types.push_back(fun_var_type(arg_type3));
+      arg_types.push_back(fun_var_type(arg_type4));
+      arg_types.push_back(fun_var_type(arg_type5));
+      arg_types.push_back(fun_var_type(arg_type6));
       add(name, result_type, arg_types);
     }
 
     void function_signatures::add(const std::string& name,
-                                  const expr_type& result_type,
-                                  const expr_type& arg_type1,
-                                  const expr_type& arg_type2,
-                                  const expr_type& arg_type3,
-                                  const expr_type& arg_type4,
-                                  const expr_type& arg_type5,
-                                  const expr_type& arg_type6,
-                                  const expr_type& arg_type7) {
-      std::vector<function_arg_type> arg_types;
-      arg_types.push_back(function_arg_type(arg_type1));
-      arg_types.push_back(function_arg_type(arg_type2));
-      arg_types.push_back(function_arg_type(arg_type3));
-      arg_types.push_back(function_arg_type(arg_type4));
-      arg_types.push_back(function_arg_type(arg_type5));
-      arg_types.push_back(function_arg_type(arg_type6));
-      arg_types.push_back(function_arg_type(arg_type7));
+                                  const bare_expr_type& result_type,
+                                  const bare_expr_type& arg_type1,
+                                  const bare_expr_type& arg_type2,
+                                  const bare_expr_type& arg_type3,
+                                  const bare_expr_type& arg_type4,
+                                  const bare_expr_type& arg_type5,
+                                  const bare_expr_type& arg_type6,
+                                  const bare_expr_type& arg_type7) {
+      std::vector<fun_var_type> arg_types;
+      arg_types.push_back(fun_var_type(arg_type1));
+      arg_types.push_back(fun_var_type(arg_type2));
+      arg_types.push_back(fun_var_type(arg_type3));
+      arg_types.push_back(fun_var_type(arg_type4));
+      arg_types.push_back(fun_var_type(arg_type5));
+      arg_types.push_back(fun_var_type(arg_type6));
+      arg_types.push_back(fun_var_type(arg_type7));
       add(name, result_type, arg_types);
     }
 
     void function_signatures::add_nullary(const::std::string& name) {
-      add(name, expr_type(double_type()));
+      add(name, bare_expr_type(double_type()));
     }
 
     void function_signatures::add_unary(const::std::string& name) {
-      add(name, expr_type(double_type()), expr_type(double_type()));
+      double_type tDouble;
+      bare_expr_type a1(tDouble);
+      add(name, a1, a1);
     }
 
     void function_signatures::add_unary_vectorized(const::std::string&
-    name) {
+                                                   name) {
+      int_type tInt;
+      bare_array_type arInt(tInt);
+      bare_expr_type arIntType(arInt);
+      double_type tDouble;
+      bare_array_type arDouble(tDouble);
+      bare_expr_type arDoubleType(arDouble);
+      matrix_type tMatrix;
+      bare_array_type arMatrix(tMatrix);
+      bare_expr_type arMatrixType(arMatrix);
+      row_vector_type tRowVector;
+      bare_array_type arRowVector(tRowVector);
+      bare_expr_type arRowVectorType(arRowVector);
+      row_vector_type tVector;
+      bare_array_type arVector(tVector);
+      bare_expr_type arVectorType(arVector);
       for (size_t i = 0; i < 8; ++i) {
-        add(name, expr_type(double_type(), i), expr_type(int_type(), i));
-        add(name, expr_type(double_type(), i), expr_type(double_type(), i));
-        add(name, expr_type(vector_type(), i), expr_type(vector_type(), i));
-        add(name, expr_type(row_vector_type(), i),
-            expr_type(row_vector_type(), i));
-        add(name, expr_type(matrix_type(), i), expr_type(matrix_type(), i));
+        add(name, arIntType, arIntType);
+        add(name, arDoubleType, arDoubleType);
+        add(name, arMatrixType, arMatrixType);
+        add(name, arRowVectorType, arRowVectorType);
+        add(name, arVectorType, arVectorType);
+        arIntType = bare_array_type(arIntType);
+        arDoubleType = bare_array_type(arDoubleType);
+        arMatrixType = bare_array_type(arMatrixType);
+        arRowVectorType = bare_array_type(arRowVectorType);
+        arVectorType = bare_array_type(arVectorType);
       }
     }
 
     void function_signatures::add_binary(const::std::string& name) {
-      add(name, expr_type(double_type()), expr_type(double_type()),
-          expr_type(double_type()));
+      add(name, bare_expr_type(double_type()), bare_expr_type(double_type()),
+          bare_expr_type(double_type()));
     }
 
     void function_signatures::add_ternary(const::std::string& name) {
-      add(name, expr_type(double_type()), expr_type(double_type()),
-          expr_type(double_type()), expr_type(double_type()));
+      add(name, bare_expr_type(double_type()), bare_expr_type(double_type()),
+          bare_expr_type(double_type()), bare_expr_type(double_type()));
     }
 
     void function_signatures::add_quaternary(const::std::string& name) {
-      add(name, expr_type(double_type()), expr_type(double_type()),
-          expr_type(double_type()), expr_type(double_type()),
-          expr_type(double_type()));
+      add(name, bare_expr_type(double_type()), bare_expr_type(double_type()),
+          bare_expr_type(double_type()), bare_expr_type(double_type()),
+          bare_expr_type(double_type()));
     }
 
     int function_signatures::num_promotions(
-                            const std::vector<expr_type>& call_args,
-                            const std::vector<function_arg_type>& sig_args) {
+                             const std::vector<bare_expr_type>& call_args,
+                             const std::vector<fun_var_type>& sig_args) {
       if (call_args.size() != sig_args.size()) {
         return -1;  // failure
       }
       int num_promotions = 0;
       for (size_t i = 0; i < call_args.size(); ++i) {
-        if (call_args[i] == sig_args[i].expr_type_) {
+        if (call_args[i] == sig_args[i].bare_type_) {
           continue;
-        } else if (call_args[i].is_primitive_int()
-                   && sig_args[i].expr_type_.is_primitive_double()) {
+        } else if (call_args[i].is_primitive()
+                   && sig_args[i].bare_type_.is_double_type()) {
           ++num_promotions;
         } else {
           return -1;    // failed match
@@ -245,8 +266,8 @@ namespace stan {
     }
 
     int function_signatures::get_signature_matches(const std::string& name,
-                              const std::vector<expr_type>& args,
-                              function_signature_t& signature) {
+                                                   const std::vector<bare_expr_type>& args,
+                                                   function_signature_t& signature) {
       if (!has_key(name)) return 0;
       std::vector<function_signature_t> signatures = sigs_map_[name];
       size_t min_promotions = std::numeric_limits<size_t>::max();
@@ -265,7 +286,6 @@ namespace stan {
       }
       return num_matches;
     }
-
 
     bool is_binary_operator(const std::string& name) {
       return name == "add"
@@ -319,7 +339,7 @@ namespace stan {
     }
 
     void print_signature(const std::string& name,
-                         const std::vector<expr_type>& arg_types,
+                         const std::vector<bare_expr_type>& arg_types,
                          bool sampling_error_style,
                          std::ostream& msgs) {
       static size_t OP_SIZE = std::string("operator").size();
@@ -354,7 +374,7 @@ namespace stan {
     }
 
     void print_signature(const std::string& name,
-                         const std::vector<function_arg_type>& arg_types,
+                         const std::vector<fun_var_type>& arg_types,
                          bool sampling_error_style,
                          std::ostream& msgs) {
       static size_t OP_SIZE = std::string("operator").size();
@@ -388,10 +408,10 @@ namespace stan {
       msgs << ")" << std::endl;
     }
 
-    expr_type function_signatures::get_result_type(const std::string& name,
-                                           const std::vector<expr_type>& args,
-                                           std::ostream& error_msgs,
-                                           bool sampling_error_style) {
+    bare_expr_type function_signatures::get_result_type(const std::string& name,
+                                                   const std::vector<bare_expr_type>& args,
+                                                   std::ostream& error_msgs,
+                                                   bool sampling_error_style) {
       std::vector<function_signature_t> signatures = sigs_map_[name];
       size_t match_index = 0;
       size_t min_promotions = std::numeric_limits<size_t>::max();
@@ -456,7 +476,7 @@ namespace stan {
         }
         error_msgs << std::endl;
       }
-      return expr_type();  // ill-formed dummy
+      return bare_expr_type();  // ill-formed dummy
     }
 
     function_signatures::function_signatures() {

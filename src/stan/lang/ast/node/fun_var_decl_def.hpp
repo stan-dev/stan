@@ -34,16 +34,36 @@ namespace stan {
 
     fun_var_decl::fun_var_decl(const array_fun_var_decl& x)
       : var_decl_(x) { }
+    
+    bare_expr_type fun_var_decl::bare_type() const {
+      var_decl_bare_type_vis vis;
+      return boost::apply_visitor(vis, var_decl_);
+    }
+
+    fun_var_type fun_var_decl::fun_var_type() const {
+      fun_var_type_vis vis;
+      return boost::apply_visitor(vis, var_decl_);
+    }
+
+    bool fun_var_decl::is_data() const {
+      var_decl_is_data_vis vis;
+      return boost::apply_visitor(vis, var_decl_);
+    }
 
     std::string fun_var_decl::name() const {
       var_decl_name_vis vis;
       return boost::apply_visitor(vis, var_decl_);
     }
 
-    bare_expr_type fun_var_decl::bare_type() const {
-      var_decl_bare_type_vis vis;
-      return boost::apply_visitor(vis, var_decl_);
+    std::ostream& operator<<(std::ostream& o,
+                             const fun_var_decl& fv_decl) {
+      if (fv_decl.is_data()) o << "data ";
+      o << fv_decl.bare_type();
+      o << " ";
+      o << fv_decl.name();
+      return o;
     }
+
   }
 }
 #endif

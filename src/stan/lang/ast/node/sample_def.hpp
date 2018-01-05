@@ -13,7 +13,7 @@ namespace stan {
       : expr_(e), dist_(dist), is_discrete_(false) { }
 
     bool sample::is_ill_formed() const {
-        return expr_.bare_type().is_ill_formed()
+        return expr_.bare_type().is_ill_formed_type()
           || (truncation_.has_low()
               && expr_.bare_type() != truncation_.low_.bare_type())
           || (truncation_.has_high()

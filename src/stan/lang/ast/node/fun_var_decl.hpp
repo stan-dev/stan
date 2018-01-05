@@ -7,7 +7,6 @@
 namespace stan {
   namespace lang {
 
-
     struct nil;
     struct array_fun_var_decl;
     struct double_fun_var_decl;
@@ -20,7 +19,6 @@ namespace stan {
      * The variant structure to hold a variable declaration.
      */
     struct fun_var_decl {
-
       /**
        * The variant type for a variable declaration.
        */
@@ -37,11 +35,6 @@ namespace stan {
        * The fun variable decl type held by this wrapper.
        */
       fun_var_decl_t var_decl_;
-
-      /**
-       * True if argument has "data" qualifier.
-       */
-      bool is_data_;
 
       /**
        * The line in the source code where the declaration begins.
@@ -137,6 +130,20 @@ namespace stan {
       bare_expr_type bare_type() const;
 
       /**
+       * Return the variable declaration's fun_var_type.
+       *
+       * @return the fun_var_type
+       */
+      fun_var_type fun_var_type() const;
+
+      /**
+       * Return true if fun_var_decl has `data` qualifier
+       *
+       * @return bool
+       */
+      bool is_data() const;
+
+      /**
        * Return the declaration's variable name.
        *
        * @return name of variable
@@ -144,6 +151,17 @@ namespace stan {
       std::string name() const;
     };
 
+    /**
+     * Stream a user-readable version of the fun_var_decl to the
+     * specified output stream, returning the speicifed argument
+     * output stream to allow chaining.
+     *
+     * @param o output stream
+     * @param fvar fun_var_decl
+     * @return argument output stream
+     */
+    std::ostream& operator<<(std::ostream& o,
+                             const fun_var_decl& fv_decl);
   }
 }
 #endif

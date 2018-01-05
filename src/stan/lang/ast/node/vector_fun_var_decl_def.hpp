@@ -10,7 +10,11 @@ namespace stan {
     vector_fun_var_decl::vector_fun_var_decl() { }
 
     vector_fun_var_decl::vector_fun_var_decl(const std::string& name)
-      : var_decl(name, bare_expr_type(vector_type())) { }
+      : var_decl(name, bare_expr_type(vector_type())), is_data_(false) { }
+
+    vector_fun_var_decl::vector_fun_var_decl(const std::string& name,
+                                             bool is_data)
+      : var_decl(name, bare_expr_type(vector_type())), is_data_(is_data) { }
   }
 }
 #endif

@@ -13,7 +13,7 @@ namespace stan {
 
     bool returns_type(const bare_expr_type& return_type, const statement& statement,
                       std::ostream& error_msgs) {
-      if (return_type.is_void())
+      if (return_type.is_void_type())
         return true;
       returns_type_vis vis(return_type, error_msgs);
       return boost::apply_visitor(vis, statement.statement_);

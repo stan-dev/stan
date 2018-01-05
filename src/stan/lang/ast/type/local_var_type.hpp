@@ -8,8 +8,6 @@
 namespace stan {
   namespace lang {
 
-    //TODO:mitzi - need visitor to get size of local var container types
-
     /** 
      * Local variable types have sized container types.
      */

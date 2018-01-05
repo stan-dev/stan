@@ -12,7 +12,13 @@ namespace stan {
     array_fun_var_decl::array_fun_var_decl(
                           const std::string& name,
                           const bare_expr_type& el_type)
-      : var_decl(name, bare_array_type(el_type)) { };
+      : var_decl(name, bare_array_type(el_type)), is_data_(false) { };
+
+    array_fun_var_decl::array_fun_var_decl(
+                          const std::string& name,
+                          const bare_expr_type& el_type,
+                          bool is_data)
+      : var_decl(name, bare_array_type(el_type)), is_data_(is_data) { };
   }
 }
 #endif
