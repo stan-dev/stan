@@ -1084,119 +1084,119 @@ primitive_types.push_back(double_type());
 /* add("to_array_1d", expr_type(double_type(), 1), expr_type(matrix_type())); */
 /* add("to_array_1d", expr_type(double_type(), 1), expr_type(vector_type())); */
 /* add("to_array_1d", expr_type(double_type(), 1), expr_type(row_vector_type())); */
-                           /* for (size_t i=1; i < 10; i++) { */
-                           /*   add("to_array_1d", expr_type(double_type(), 1), */
-                           /*       expr_type(double_type(), i)); */
-                           /*   add("to_array_1d", expr_type(int_type(), 1), expr_type(int_type(), i)); */
-                           /* } */
-                           /* add("to_array_2d", expr_type(double_type(), 2), expr_type(matrix_type())); */
-                           /* add("to_matrix", expr_type(matrix_type()), expr_type(matrix_type())); */
-                           /* add("to_matrix", expr_type(matrix_type()), expr_type(matrix_type()), expr_type(int_type()), expr_type(int_type())); */
-                           /* add("to_matrix", expr_type(matrix_type()), expr_type(matrix_type()), expr_type(int_type()), expr_type(int_type()), expr_type(int_type())); */
-                           /* add("to_matrix", expr_type(matrix_type()), expr_type(vector_type())); */
-                           /* add("to_matrix", expr_type(matrix_type()), expr_type(vector_type()), expr_type(int_type()), expr_type(int_type())); */
-                           /* add("to_matrix", expr_type(matrix_type()), expr_type(vector_type()), expr_type(int_type()), expr_type(int_type()), expr_type(int_type())); */
-                           /* add("to_matrix", expr_type(matrix_type()), expr_type(row_vector_type())); */
-                           /* add("to_matrix", expr_type(matrix_type()), expr_type(row_vector_type()), expr_type(int_type()), expr_type(int_type())); */
-                           /* add("to_matrix", expr_type(matrix_type()), expr_type(row_vector_type()), expr_type(int_type()), expr_type(int_type()), expr_type(int_type())); */
-                           /* add("to_matrix", expr_type(matrix_type()), expr_type(double_type(), 1), expr_type(int_type()), expr_type(int_type())); */
-                           /* add("to_matrix", expr_type(matrix_type()), expr_type(double_type(), 1), expr_type(int_type()), expr_type(int_type()), expr_type(int_type())); */
-                           /* add("to_matrix", expr_type(matrix_type()), expr_type(int_type(), 1), expr_type(int_type()), expr_type(int_type())); */
-                           /* add("to_matrix", expr_type(matrix_type()), expr_type(int_type(), 1), expr_type(int_type()), expr_type(int_type()), expr_type(int_type())); */
-                           /* add("to_matrix", expr_type(matrix_type()), expr_type(double_type(), 2)); */
-                           /* add("to_matrix", expr_type(matrix_type()), expr_type(int_type(), 2)); */
-                           /* add("to_row_vector", expr_type(row_vector_type()), expr_type(matrix_type())); */
-                           /* add("to_row_vector", expr_type(row_vector_type()), expr_type(vector_type())); */
-                           /* add("to_row_vector", expr_type(row_vector_type()), expr_type(row_vector_type())); */
-                           /* add("to_row_vector", expr_type(row_vector_type()), expr_type(double_type(), 1)); */
-                           /* add("to_row_vector", expr_type(row_vector_type()), expr_type(int_type(), 1)); */
-                           /* add("to_vector", expr_type(vector_type()), expr_type(matrix_type())); */
-                           /* add("to_vector", expr_type(vector_type()), expr_type(vector_type())); */
-                           /* add("to_vector", expr_type(vector_type()), expr_type(row_vector_type())); */
-                           /* add("to_vector", expr_type(vector_type()), expr_type(double_type(), 1)); */
-                           /* add("to_vector", expr_type(vector_type()), expr_type(int_type(), 1)); */
-                           /* add("trace", expr_type(double_type()), expr_type(matrix_type())); */
-                           /* add("trace_gen_quad_form", expr_type(double_type()), expr_type(matrix_type()), expr_type(matrix_type()), expr_type(matrix_type())); */
-                           /* add("trace_quad_form", expr_type(double_type()), expr_type(matrix_type()), expr_type(vector_type())); */
-                           /* add("trace_quad_form", expr_type(double_type()), expr_type(matrix_type()), expr_type(matrix_type())); */
-                           /* add("transpose", expr_type(row_vector_type()), expr_type(vector_type())); */
-                           /* add("transpose", expr_type(vector_type()), expr_type(row_vector_type())); */
-                           /* add("transpose", expr_type(matrix_type()), expr_type(matrix_type())); */
-                           /* add_unary_vectorized("trunc"); */
-                           /* add_unary_vectorized("trigamma"); */
-                           /* for (size_t i = 0; i < vector_types.size(); ++i) { */
-                           /*   for (size_t j = 0; j < vector_types.size(); ++j) { */
-                           /*     for (size_t k = 0; k < vector_types.size(); ++k) { */
-                           /*         add("uniform_ccdf_log", expr_type(double_type()), */
-                           /*             vector_types[i], vector_types[j], vector_types[k]); */
-                           /*         add("uniform_cdf", expr_type(double_type()), */
-                           /*             vector_types[i], vector_types[j], vector_types[k]); */
-                           /*         add("uniform_cdf_log", expr_type(double_type()), */
-                           /*             vector_types[i], vector_types[j], vector_types[k]); */
-                           /*         add("uniform_log", expr_type(double_type()), */
-                           /*             vector_types[i], vector_types[j], vector_types[k]); */
-                           /*         add("uniform_lccdf", expr_type(double_type()), */
-                           /*             vector_types[i], vector_types[j], vector_types[k]); */
-                           /*         add("uniform_lcdf", expr_type(double_type()), */
-                           /*             vector_types[i], vector_types[j], vector_types[k]); */
-                           /*         add("uniform_lpdf", expr_type(double_type()), */
-                           /*             vector_types[i], vector_types[j], vector_types[k]); */
-                           /*     } */
-                           /*   } */
-                           /* } */
-                           /* add_binary("uniform_rng"); */
-                           /* add("variance", expr_type(double_type()), expr_type(double_type(), 1)); */
-                           /* add("variance", expr_type(double_type()), expr_type(vector_type())); */
-                           /* add("variance", expr_type(double_type()), expr_type(row_vector_type())); */
-                           /* add("variance", expr_type(double_type()), expr_type(matrix_type())); */
-                           /* for (size_t i = 0; i < vector_types.size(); ++i) { */
-                           /*   for (size_t j = 0; j < vector_types.size(); ++j) { */
-                           /*     for (size_t k = 0; k < vector_types.size(); ++k) { */
-                           /*       add("von_mises_log", expr_type(double_type()), */
-                           /*           vector_types[i], vector_types[j], vector_types[k]); */
-                           /*       add("von_mises_lpdf", expr_type(double_type()), */
-                           /*           vector_types[i], vector_types[j], vector_types[k]); */
-                           /*     } */
-                           /*   } */
-                           /* } */
-                           /* add_binary("von_mises_rng"); */
-                           /* for (size_t i = 0; i < vector_types.size(); ++i) { */
-                           /*   for (size_t j = 0; j < vector_types.size(); ++j) { */
-                           /*     for (size_t k = 0; k < vector_types.size(); ++k) { */
-                           /*         add("weibull_ccdf_log", expr_type(double_type()), */
-                           /*             vector_types[i], vector_types[j], vector_types[k]); */
-                           /*         add("weibull_cdf", expr_type(double_type()), */
-                           /*             vector_types[i], vector_types[j], vector_types[k]); */
-                           /*         add("weibull_cdf_log", expr_type(double_type()), */
-                           /*             vector_types[i], vector_types[j], vector_types[k]); */
-                           /*         add("weibull_log", expr_type(double_type()), */
-                           /*             vector_types[i], vector_types[j], vector_types[k]); */
-                           /*         add("weibull_lccdf", expr_type(double_type()), */
-                           /*             vector_types[i], vector_types[j], vector_types[k]); */
-                           /*         add("weibull_lcdf", expr_type(double_type()), */
-                           /*             vector_types[i], vector_types[j], vector_types[k]); */
-                           /*         add("weibull_lpdf", expr_type(double_type()), */
-                           /*             vector_types[i], vector_types[j], vector_types[k]); */
-                           /*     } */
-                           /*   } */
-                           /* } */
-                           /* add_binary("weibull_rng"); */
-                           /* for (size_t i = 0; i < vector_types.size(); ++i) { */
-                           /*   for (size_t j = 0; j < vector_types.size(); ++j) { */
-                           /*     for (size_t k = 0; k < vector_types.size(); ++k) { */
-                           /*       for (size_t l = 0; l < vector_types.size(); ++l) { */
-                           /* 	for (size_t m = 0; m < vector_types.size(); ++m) { */
-                           /*           add("wiener_log", expr_type(double_type()), vector_types[i], */
-                           /* 	      vector_types[j],vector_types[k], vector_types[l], */
-                           /* 	      vector_types[m]); */
-                           /* 	  add("wiener_lpdf", expr_type(double_type()), vector_types[i], */
-                           /* 	      vector_types[j],vector_types[k], vector_types[l], */
-                           /* 	      vector_types[m]); */
-                           /* 	} */
-                           /*       } */
-                           /*     } */
-                           /*   } */
-                           /* } */
-                           /* add("wishart_log", expr_type(double_type()), expr_type(matrix_type()), expr_type(double_type()), expr_type(matrix_type())); */
-                           /* add("wishart_lpdf", expr_type(double_type()), expr_type(matrix_type()), expr_type(double_type()), expr_type(matrix_type())); */
-                           /* add("wishart_rng", expr_type(matrix_type()), expr_type(double_type()), expr_type(matrix_type())); */
+/* for (size_t i=1; i < 10; i++) { */
+/*   add("to_array_1d", expr_type(double_type(), 1), */
+/*       expr_type(double_type(), i)); */
+/*   add("to_array_1d", expr_type(int_type(), 1), expr_type(int_type(), i)); */
+/* } */
+/* add("to_array_2d", expr_type(double_type(), 2), expr_type(matrix_type())); */
+/* add("to_matrix", expr_type(matrix_type()), expr_type(matrix_type())); */
+/* add("to_matrix", expr_type(matrix_type()), expr_type(matrix_type()), expr_type(int_type()), expr_type(int_type())); */
+/* add("to_matrix", expr_type(matrix_type()), expr_type(matrix_type()), expr_type(int_type()), expr_type(int_type()), expr_type(int_type())); */
+/* add("to_matrix", expr_type(matrix_type()), expr_type(vector_type())); */
+/* add("to_matrix", expr_type(matrix_type()), expr_type(vector_type()), expr_type(int_type()), expr_type(int_type())); */
+/* add("to_matrix", expr_type(matrix_type()), expr_type(vector_type()), expr_type(int_type()), expr_type(int_type()), expr_type(int_type())); */
+/* add("to_matrix", expr_type(matrix_type()), expr_type(row_vector_type())); */
+/* add("to_matrix", expr_type(matrix_type()), expr_type(row_vector_type()), expr_type(int_type()), expr_type(int_type())); */
+/* add("to_matrix", expr_type(matrix_type()), expr_type(row_vector_type()), expr_type(int_type()), expr_type(int_type()), expr_type(int_type())); */
+/* add("to_matrix", expr_type(matrix_type()), expr_type(double_type(), 1), expr_type(int_type()), expr_type(int_type())); */
+/* add("to_matrix", expr_type(matrix_type()), expr_type(double_type(), 1), expr_type(int_type()), expr_type(int_type()), expr_type(int_type())); */
+/* add("to_matrix", expr_type(matrix_type()), expr_type(int_type(), 1), expr_type(int_type()), expr_type(int_type())); */
+/* add("to_matrix", expr_type(matrix_type()), expr_type(int_type(), 1), expr_type(int_type()), expr_type(int_type()), expr_type(int_type())); */
+/* add("to_matrix", expr_type(matrix_type()), expr_type(double_type(), 2)); */
+/* add("to_matrix", expr_type(matrix_type()), expr_type(int_type(), 2)); */
+/* add("to_row_vector", expr_type(row_vector_type()), expr_type(matrix_type())); */
+/* add("to_row_vector", expr_type(row_vector_type()), expr_type(vector_type())); */
+/* add("to_row_vector", expr_type(row_vector_type()), expr_type(row_vector_type())); */
+/* add("to_row_vector", expr_type(row_vector_type()), expr_type(double_type(), 1)); */
+/* add("to_row_vector", expr_type(row_vector_type()), expr_type(int_type(), 1)); */
+/* add("to_vector", expr_type(vector_type()), expr_type(matrix_type())); */
+/* add("to_vector", expr_type(vector_type()), expr_type(vector_type())); */
+/* add("to_vector", expr_type(vector_type()), expr_type(row_vector_type())); */
+/* add("to_vector", expr_type(vector_type()), expr_type(double_type(), 1)); */
+/* add("to_vector", expr_type(vector_type()), expr_type(int_type(), 1)); */
+/* add("trace", expr_type(double_type()), expr_type(matrix_type())); */
+/* add("trace_gen_quad_form", expr_type(double_type()), expr_type(matrix_type()), expr_type(matrix_type()), expr_type(matrix_type())); */
+/* add("trace_quad_form", expr_type(double_type()), expr_type(matrix_type()), expr_type(vector_type())); */
+/* add("trace_quad_form", expr_type(double_type()), expr_type(matrix_type()), expr_type(matrix_type())); */
+/* add("transpose", expr_type(row_vector_type()), expr_type(vector_type())); */
+/* add("transpose", expr_type(vector_type()), expr_type(row_vector_type())); */
+/* add("transpose", expr_type(matrix_type()), expr_type(matrix_type())); */
+/* add_unary_vectorized("trunc"); */
+/* add_unary_vectorized("trigamma"); */
+/* for (size_t i = 0; i < vector_types.size(); ++i) { */
+/*   for (size_t j = 0; j < vector_types.size(); ++j) { */
+/*     for (size_t k = 0; k < vector_types.size(); ++k) { */
+/*         add("uniform_ccdf_log", expr_type(double_type()), */
+/*             vector_types[i], vector_types[j], vector_types[k]); */
+/*         add("uniform_cdf", expr_type(double_type()), */
+/*             vector_types[i], vector_types[j], vector_types[k]); */
+/*         add("uniform_cdf_log", expr_type(double_type()), */
+/*             vector_types[i], vector_types[j], vector_types[k]); */
+/*         add("uniform_log", expr_type(double_type()), */
+/*             vector_types[i], vector_types[j], vector_types[k]); */
+/*         add("uniform_lccdf", expr_type(double_type()), */
+/*             vector_types[i], vector_types[j], vector_types[k]); */
+/*         add("uniform_lcdf", expr_type(double_type()), */
+/*             vector_types[i], vector_types[j], vector_types[k]); */
+/*         add("uniform_lpdf", expr_type(double_type()), */
+/*             vector_types[i], vector_types[j], vector_types[k]); */
+/*     } */
+/*   } */
+/* } */
+/* add_binary("uniform_rng"); */
+/* add("variance", expr_type(double_type()), expr_type(double_type(), 1)); */
+/* add("variance", expr_type(double_type()), expr_type(vector_type())); */
+/* add("variance", expr_type(double_type()), expr_type(row_vector_type())); */
+/* add("variance", expr_type(double_type()), expr_type(matrix_type())); */
+/* for (size_t i = 0; i < vector_types.size(); ++i) { */
+/*   for (size_t j = 0; j < vector_types.size(); ++j) { */
+/*     for (size_t k = 0; k < vector_types.size(); ++k) { */
+/*       add("von_mises_log", expr_type(double_type()), */
+/*           vector_types[i], vector_types[j], vector_types[k]); */
+/*       add("von_mises_lpdf", expr_type(double_type()), */
+/*           vector_types[i], vector_types[j], vector_types[k]); */
+/*     } */
+/*   } */
+/* } */
+/* add_binary("von_mises_rng"); */
+/* for (size_t i = 0; i < vector_types.size(); ++i) { */
+/*   for (size_t j = 0; j < vector_types.size(); ++j) { */
+/*     for (size_t k = 0; k < vector_types.size(); ++k) { */
+/*         add("weibull_ccdf_log", expr_type(double_type()), */
+/*             vector_types[i], vector_types[j], vector_types[k]); */
+/*         add("weibull_cdf", expr_type(double_type()), */
+/*             vector_types[i], vector_types[j], vector_types[k]); */
+/*         add("weibull_cdf_log", expr_type(double_type()), */
+/*             vector_types[i], vector_types[j], vector_types[k]); */
+/*         add("weibull_log", expr_type(double_type()), */
+/*             vector_types[i], vector_types[j], vector_types[k]); */
+/*         add("weibull_lccdf", expr_type(double_type()), */
+/*             vector_types[i], vector_types[j], vector_types[k]); */
+/*         add("weibull_lcdf", expr_type(double_type()), */
+/*             vector_types[i], vector_types[j], vector_types[k]); */
+/*         add("weibull_lpdf", expr_type(double_type()), */
+/*             vector_types[i], vector_types[j], vector_types[k]); */
+/*     } */
+/*   } */
+/* } */
+/* add_binary("weibull_rng"); */
+/* for (size_t i = 0; i < vector_types.size(); ++i) { */
+/*   for (size_t j = 0; j < vector_types.size(); ++j) { */
+/*     for (size_t k = 0; k < vector_types.size(); ++k) { */
+/*       for (size_t l = 0; l < vector_types.size(); ++l) { */
+/* 	for (size_t m = 0; m < vector_types.size(); ++m) { */
+/*           add("wiener_log", expr_type(double_type()), vector_types[i], */
+/* 	      vector_types[j],vector_types[k], vector_types[l], */
+/* 	      vector_types[m]); */
+/* 	  add("wiener_lpdf", expr_type(double_type()), vector_types[i], */
+/* 	      vector_types[j],vector_types[k], vector_types[l], */
+/* 	      vector_types[m]); */
+/* 	} */
+/*       } */
+/*     } */
+/*   } */
+/* } */
+add("wishart_log", bare_expr_type(double_type()), bare_expr_type(matrix_type()), bare_expr_type(double_type()), bare_expr_type(matrix_type()));
+add("wishart_lpdf", bare_expr_type(double_type()), bare_expr_type(matrix_type()), bare_expr_type(double_type()), bare_expr_type(matrix_type()));
+add("wishart_rng", bare_expr_type(matrix_type()), bare_expr_type(double_type()), bare_expr_type(matrix_type()));
