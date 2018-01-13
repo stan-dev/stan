@@ -175,7 +175,7 @@
 #include <stan/lang/ast/node/omni_idx.hpp>
 #include <stan/lang/ast/node/print_statement.hpp>
 #include <stan/lang/ast/node/printable.hpp>
-//#include <stan/lang/ast/node/program.hpp>
+#include <stan/lang/ast/node/program.hpp>
 #include <stan/lang/ast/node/range.hpp>
 #include <stan/lang/ast/node/reject_statement.hpp>
 #include <stan/lang/ast/node/return_statement.hpp>
