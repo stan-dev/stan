@@ -264,6 +264,7 @@ namespace stan {
         rho_hat_odd = 1 - (mean_var - mean(acov_t)) / var_plus;
         rho_hat_t(1) = rho_hat_odd;
         // Geyer's initial positive sequence
+        int max_t = 1;
         for (int t = 1;
              (t < (n_samples - 2) && (rho_hat_even + rho_hat_odd) >= 0);
              t += 2) {
@@ -276,6 +277,14 @@ namespace stan {
           if ((rho_hat_even + rho_hat_odd) >= 0) {
             rho_hat_t(t+1) = rho_hat_even;
             rho_hat_t(t+2) = rho_hat_odd;
+          }
+          max_t = t+2;
+        }
+        // Geyer's initial monotone sequence
+        for (int t = 3; t <= (max_t - 2); t += 2) {
+          if ((rho_hat_t(t+1) + rho_hat_t(t+2)) > (rho_hat_t(t-1) + rho_hat_t(t))) {
+            rho_hat_t(t+1) = (rho_hat_t(t-1) + rho_hat_t(t)) / 2;
+            rho_hat_t(t+2) = rho_hat_t(t+1);
           }
         }
         double ess = chains * n_samples;
