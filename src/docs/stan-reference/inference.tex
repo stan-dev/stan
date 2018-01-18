@@ -614,21 +614,28 @@ overestimate of autocorrelation and an underestimate effective sample
 size.
 
 Because of the noise in the correlation estimates $\hat{\rho}_t$ as
-$t$ increases, only the initial estimates of $\hat{\rho}_t$ until lag
-$T$ are typically used. Negative autocorrelations can happen only on
-odd lags and by summing over pairs starting from lag 0, the paired
-autocorrelation is guaranteed to be positive modulo estimator noise
-\citep{Geyer:2011}.  Stan uses Geyer's initial positive sequence
-criterion and the effective sample size estimator is defined as
+$t$ increases, typical truncated sum of $\hat{\rho}_t$ is used.
+Negative autocorrelations can happen only on odd lags and by summing
+over pairs starting from lag 0, the paired autocorrelation is
+guaranteed to be positive, monotone and convex modulo estimator noise
+\citep{Geyer:1992, Geyer:2011}.  Stan uses Geyer's initial monotone
+sequence criterion. The effective sample size estimator is defined as
 \[
 \hat{N}_{\mbox{\scriptsize eff}}
 =
 \frac{MN}
-     {1 + 2 \sum_{t=1}^{T} \hat{\rho}_t}.
+     {\hat{\tau}},
 \]
 %
-where $T$ is the first odd positive integer for which
-$\hat{\rho}_{T+1}+\hat{\rho}_{T+2}$ is negative.
+where
+\[
+\hat{\tau} = 1 + 2 \sum_{t=1}^{2m+1} \hat{\rho}_t = -1 + 2 \sum_{t'=0}^{m} \hat{P}_{t'},
+\]
+where $\hat{P}_{t'}=\hat{\rho}_{2t'}+\hat{\rho}_{2t'+1}$. Initial
+positive sequence estimators is obtained by choosing the largest $m$
+such that $\hat{P}_{t'}>0, \quad t' = 1,\ldots,m$. The initial monotone
+sequence is obtained by further reducing $\hat{P}_{t'}$ to the minimum
+of the preceding ones so that the estimated sequence is monotone.
 
 
 \subsection{Thinning Samples}
