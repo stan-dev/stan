@@ -281,7 +281,8 @@ namespace stan {
         }
         // Geyer's initial monotone sequence
         for (int t = 3; t <= max_t - 2; t += 2) {
-          if (rho_hat_t(t + 1) + rho_hat_t(t + 2) > rho_hat_t(t - 1) + rho_hat_t(t)) {
+          if (rho_hat_t(t + 1) + rho_hat_t(t + 2) >
+              rho_hat_t(t - 1) + rho_hat_t(t)) {
             rho_hat_t(t + 1) = (rho_hat_t(t - 1) + rho_hat_t(t)) / 2;
             rho_hat_t(t + 2) = rho_hat_t(t + 1);
           }
