@@ -3721,7 +3721,8 @@ system function.
 
 \subsection{Algorithmic Details}
 
-The algebraic solver uses the Powell hybrid method \citep{Powell:1970}. The
+The algebraic solver uses the Powell hybrid method \citep{Powell:1970}, which
+in turn uses first-order derivatives. The
 Stan code builds on the implementation of the hybrid solver in the
 unsupported module for nonlinear optimization problems of the Eigen library
 \citep{Eigen:2013}. This solver is in turn based on the algorithm developed
