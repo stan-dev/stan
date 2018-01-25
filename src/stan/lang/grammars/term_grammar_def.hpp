@@ -226,7 +226,7 @@ namespace stan {
         >> lit('(')
         >> identifier_r          // 1) system function name (function only)
         >> lit(',')
-        >> expression_g(_r1)     // 2) y (data only)
+        >> expression_g(_r1)     // 2) y
         >> lit(',')
         >> expression_g(_r1)     // 3) theta
         >> lit(',')
@@ -251,7 +251,7 @@ namespace stan {
         > lit('(')
         > identifier_r          // 1) system function name (function only)
         > lit(',')
-        > expression_g(_r1)     // 2) y (data only)
+        > expression_g(_r1)     // 2) y
         > lit(',')
         > expression_g(_r1)     // 3) theta
         > lit(',')
