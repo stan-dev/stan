@@ -1,3 +1,8 @@
+@Library('StanUtils')
+import org.stan.Utils
+
+def utils = new org.stan.Utils()
+
 def setupCC(failOnError = true) {
     errorStr = failOnError ? "-Werror " : ""
     "echo CC=${env.CXX} ${errorStr}> make/local"
@@ -48,7 +53,7 @@ def updateUpstream(String upstreamRepo) {
                                     reference: '',
                                     trackingSubmodules: false]],
                         submoduleCfg: [],
-                        userRemoteConfigs: [[url: 'git@github.com:stan-dev/cmdstan.git',
+                        userRemoteConfigs: [[url: "git@github.com:stan-dev/${upstreamRepo}.git",
                                            credentialsId: 'a630aebc-6861-4e69-b497-fd7f496ec46b'
                 ]]])
             }
@@ -72,6 +77,17 @@ pipeline {
     }
     options { skipDefaultCheckout() }
     stages {
+        stage('Kill previous builds') {
+            when {
+                not { branch 'develop' }
+                not { branch 'master' }
+            }
+            steps {
+                script {
+                    utils.killOldBuilds()
+                }
+            }
+        }
         stage('Linting & Doc checks') {
             agent any
             steps {
