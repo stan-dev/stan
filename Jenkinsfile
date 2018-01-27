@@ -62,6 +62,7 @@ pipeline {
             when {
                 not { branch 'develop' }
                 not { branch 'master' }
+                not { branch 'downstream tests' }
             }
             steps {
                 script {
