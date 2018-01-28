@@ -3693,9 +3693,9 @@ The arguments to the algebraic solver are as follows:
   (4) integer data, and the return value contains the value of the algebraic
   function, which goes to 0 when we plug in the solution to the algebraic system,
 \item \farg{y\_guess}: initia guess for the solution, type \code{vector},
-\item \farg{theta}: parameters, type \code{vector},
-\item \farg{x\_r}: real data, type \code{real[]}, data only, and
-\item \farg{x\_i}: parameters, type \code{int[]}, data only.
+\item \farg{theta}: parameters only, type \code{vector},
+\item \farg{x\_r}: real data only, type \code{real[]}, and
+\item \farg{x\_i}: integer data only, type \code{int[]}.
 \end{enumerate}
 
 For more fine-grained control of the algebraic solver, these parameters can also
@@ -3717,11 +3717,12 @@ Certain sizes have to be consistent. The initial guess, return value of the solv
 return value of the algebraic function must all be the same size.
 
 The parameters, real data, and integer data will be passed from the solver directly to the
-system function.
+system function. 
 
 \subsection{Algorithmic Details}
 
-The algebraic solver uses the Powell hybrid method \citep{Powell:1970}. The
+The algebraic solver uses the Powell hybrid method \citep{Powell:1970}, which
+in turn uses first-order derivatives. The
 Stan code builds on the implementation of the hybrid solver in the
 unsupported module for nonlinear optimization problems of the Eigen library
 \citep{Eigen:2013}. This solver is in turn based on the algorithm developed

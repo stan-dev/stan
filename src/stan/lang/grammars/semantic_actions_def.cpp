@@ -1861,13 +1861,6 @@ namespace stan {
       }
 
       // test data-only variables do not have parameters (int locals OK)
-      if (has_var(alg_fun.y_, var_map)) {
-        error_msgs << "second argument to algebra_solver"
-                   << " (initial guess)"
-                   << " must be data only and not reference parameters"
-                   << std::endl;
-        pass = false;
-      }
       if (has_var(alg_fun.x_r_, var_map)) {
         error_msgs << "fourth argument to algebra_solver"
                    << " (real data)"
