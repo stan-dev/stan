@@ -237,18 +237,26 @@ namespace stan {
       std::string name() const;
 
       /**
+       * Set is_data_ flag on var_decl to true.
+       */
+      bool set_is_data();
+
+      /**
        * Return the variable declaration's block_var_type
        *
        * @return the variable expression's block_var_type
        */
       block_var_type type() const;
 
+      // TODO:mitzi - already have getters for var_decl - change to vis for var_decl.is_data_ member var only
+      // dito local_var_decl and fun_var_decl.
       /**
        * Return the var_decl for this variable declaration
        *
        * @return var_decl
       */
       var_decl var_decl() const;
+
     };
   }
 }

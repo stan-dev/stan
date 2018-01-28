@@ -12,11 +12,6 @@ namespace stan {
      */
     struct vector_fun_var_decl : public var_decl {
       /**
-       * True if argument has "data" qualifier.
-       */
-      bool is_data_;
-
-      /**
        * Construct a column vector variable declaration with default
        * values.
        */
@@ -28,14 +23,6 @@ namespace stan {
        * @param name variable name
        */
       vector_fun_var_decl(const std::string& name);
-
-      /**
-       * Construct a column vector with the specified name and is_data flag.
-       *
-       * @param name variable name
-       * @param is_data true if declared data_only
-       */
-      vector_fun_var_decl(const std::string& name, bool is_data);
     };
   }
 }

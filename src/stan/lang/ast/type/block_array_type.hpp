@@ -2,6 +2,7 @@
 #define STAN_LANG_AST_BLOCK_ARRAY_TYPE_HPP
 
 #include <stan/lang/ast/node/expression.hpp>
+#include <vector>
 
 namespace stan {
   namespace lang {
@@ -37,6 +38,17 @@ namespace stan {
        */
       block_array_type(const block_var_type& el_type,
                        const expression& len);
+
+      /**
+       * Construct a multi-dimensional block array type with the 
+       * specified element sized dimensions.
+       * Lengths should be int expression - constructor doesn't check.
+       *
+       * @param el_type element type 
+       * @param lens  vector of array lengths
+       */
+      block_array_type(const block_var_type& el_type,
+                       const std::vector<expression>& lens);
 
       /**
        * Returns type of elements stored in innermost array.

@@ -23,6 +23,11 @@ namespace stan {
       bare_expr_type bare_type_;
 
       /**
+       * True if variable declaration has "data" qualifier.
+       */
+      bool is_data_;
+
+      /**
        * Definition for variable (nil if undefined).
        */
       expression def_;
@@ -60,6 +65,42 @@ namespace stan {
       var_decl(const std::string& name,
                const bare_expr_type& type,
                const expression& def);
+
+      /**
+       * Return var_decl type.
+       *
+       * @return var_type_
+       */
+      bare_expr_type bare_type() const;
+
+      /**
+       * Return var_decl definition.
+       *
+       * @return def_
+       */
+      expression def() const;
+
+      /**
+       * Return var_decl is_data_ flag.
+       *
+       * @return is_data_
+       */
+      bool is_data() const;
+
+      /**
+       * Return var_decl name.
+       *
+       * @return name_
+       */
+      std::string name() const;
+
+      /**
+       * Set is_data_ flag
+       *
+       * @param bool true when var must be data_only
+       */
+      void set_is_data(bool flag);
+
     };
   }
 }

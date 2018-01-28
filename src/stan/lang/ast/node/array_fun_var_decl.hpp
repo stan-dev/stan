@@ -13,11 +13,6 @@ namespace stan {
      */
     struct array_fun_var_decl : public var_decl {
       /**
-       * True if argument has "data" qualifier.
-       */
-      bool is_data_;
-
-      /**
        * Construct an array fun variable declaration with default values. 
        */
       array_fun_var_decl();
@@ -31,18 +26,6 @@ namespace stan {
        */
       array_fun_var_decl(const std::string& name,
                          const bare_expr_type& el_type);
-
-      /**
-       * Construct an array variable declaration with the specified name,
-       * type, and is_data flag.
-       *
-       * @param name variable name
-       * @param el_type array element type
-       * @param is_data true if declared data_only
-       */
-      array_fun_var_decl(const std::string& name,
-                         const bare_expr_type& el_type,
-                         bool is_data);
 
     };
   }

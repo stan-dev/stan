@@ -12,11 +12,6 @@ namespace stan {
      */
     struct matrix_fun_var_decl : public var_decl {
       /**
-       * True if argument has "data" qualifier.
-       */
-      bool is_data_;
-
-      /**
        * Construct a matrix fun variable declaration with default values.
        */
       matrix_fun_var_decl();

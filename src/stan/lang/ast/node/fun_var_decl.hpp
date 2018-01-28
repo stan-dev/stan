@@ -137,18 +137,23 @@ namespace stan {
       fun_var_type fun_var_type() const;
 
       /**
-       * Return true if fun_var_decl has `data` qualifier
-       *
-       * @return bool
-       */
-      bool is_data() const;
-
-      /**
        * Return the declaration's variable name.
        *
        * @return name of variable
        */
       std::string name() const;
+
+      /**
+       * Set is_data_ flag on var_decl to true.
+       */
+      bool set_is_data();
+
+      /**
+       * Return the var_decl for this variable declaration
+       *
+       * @return var_decl
+      */
+      var_decl var_decl() const;
     };
 
     /**

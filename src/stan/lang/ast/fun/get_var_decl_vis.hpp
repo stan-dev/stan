@@ -29,7 +29,6 @@
 #include <stan/lang/ast/node/vector_local_var_decl.hpp>
 #include <stan/lang/ast/node/vector_fun_var_decl.hpp>
 #include <boost/variant/static_visitor.hpp>
-#include <string>
 
 namespace stan {
   namespace lang {
@@ -47,7 +46,6 @@ namespace stan {
       /**
        *
        * @param x variable declaration
-       * @return the empty string
        */
       var_decl operator()(const nil& x) const;
 
@@ -55,7 +53,7 @@ namespace stan {
        * Return the var_decl for this variable.
        *
        * @param x variable declaration
-       * @returnvar_decl
+       * @return var_decl
        */
       var_decl operator()(const array_block_var_decl& x) const;
       var_decl operator()(const array_local_var_decl& x) const;

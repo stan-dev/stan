@@ -161,11 +161,23 @@ namespace stan {
       std::string name() const;
 
       /**
+       * Set is_data_ flag on var_decl to true.
+       */
+      bool set_is_data();
+
+      /**
        * Return the variable declaration's local_var_type
        *
        * @return the variable expression's local_var_type
        */
       local_var_type type() const;
+
+      /**
+       * Return the var_decl for this variable declaration
+       *
+       * @return var_decl
+      */
+      var_decl var_decl() const;
     };
 
   }

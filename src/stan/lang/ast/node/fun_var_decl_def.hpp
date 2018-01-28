@@ -45,19 +45,24 @@ namespace stan {
       return boost::apply_visitor(vis, var_decl_);
     }
 
-    bool fun_var_decl::is_data() const {
-      var_decl_is_data_vis vis;
-      return boost::apply_visitor(vis, var_decl_);
-    }
-
     std::string fun_var_decl::name() const {
       var_decl_name_vis vis;
       return boost::apply_visitor(vis, var_decl_);
     }
 
+    bool fun_var_decl::set_is_data() {
+      set_var_decl_is_data_vis vis;
+      return boost::apply_visitor(vis, var_decl_);
+    }
+
+    var_decl fun_var_decl::var_decl() const {
+      get_var_decl_vis vis;
+      return boost::apply_visitor(vis, var_decl_);
+    }
+
     std::ostream& operator<<(std::ostream& o,
                              const fun_var_decl& fv_decl) {
-      if (fv_decl.is_data()) o << "data ";
+      if (fv_decl.var_decl().is_data()) o << "data ";
       o << fv_decl.bare_type();
       o << " ";
       o << fv_decl.name();

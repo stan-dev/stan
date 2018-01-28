@@ -37,7 +37,7 @@ namespace stan {
                         const statement& body);
 
       /**
-       * Tyep of value returned by function.
+       * Type of value returned by function.
        */
       bare_expr_type return_type_;
 

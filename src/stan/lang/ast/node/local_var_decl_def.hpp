@@ -47,8 +47,18 @@ namespace stan {
       return boost::apply_visitor(vis, var_decl_);
     }
 
+    bool local_var_decl::set_is_data() {
+      set_var_decl_is_data_vis vis;
+      return boost::apply_visitor(vis, var_decl_);
+    }
+
     local_var_type local_var_decl::type() const {
       var_decl_local_type_vis vis;
+      return boost::apply_visitor(vis, var_decl_);
+    }
+
+    var_decl local_var_decl::var_decl() const {
+      get_var_decl_vis vis;
       return boost::apply_visitor(vis, var_decl_);
     }
   }

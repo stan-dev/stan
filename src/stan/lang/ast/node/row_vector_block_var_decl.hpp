@@ -37,7 +37,6 @@ namespace stan {
                                 const range& bounds,
                                 const expression& N);
 
-
       /**
        * Construct a row vector declaration with the specified
        * name, bounds, length, and definition.

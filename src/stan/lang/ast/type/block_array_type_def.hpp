@@ -11,6 +11,22 @@ namespace stan {
     block_array_type::block_array_type(const block_var_type& el_type,
                                        const expression& len)
       : element_type_(el_type), array_len_(len) { }
+
+    block_array_type::block_array_type(const block_var_type& el_type,
+                                       const std::vector<expression>& lens) {
+      if (lens.size() == 1) {
+        element_type_ = el_type;
+        array_len_ = lens[0];
+      }
+      else {
+        block_array_type tmp(el_type, lens[lens.size()]);
+        for (size_t i = lens.size() - 1; i > 0; --i) {
+          tmp = block_array_type(tmp, lens[i]);
+        }
+        element_type_ = tmp;
+        array_len_ = lens[0];
+      }
+    }
     
     int block_array_type::dims() const {
       int total = 1;
