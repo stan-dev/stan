@@ -67,8 +67,9 @@ namespace stan {
       : block_var_decls_grammar::base_type(block_var_decls_r),
         var_map_(var_map),
         error_msgs_(error_msgs),
-        expression_g(var_map, error_msgs),
-        expression07_g(var_map, error_msgs, expression_g) {
+        expression_g(var_map_, error_msgs_),
+        expression07_g(var_map_, error_msgs_, expression_g) {
+
       using boost::spirit::qi::_1;
       using boost::spirit::qi::char_;
       using boost::spirit::qi::eps;
@@ -89,8 +90,8 @@ namespace stan {
       // _r1 var scope
       block_var_decls_r.name("block variable declarations");
       block_var_decls_r
-        %= eps[set_var_scope_local_f(_b, model_name_origin)]
-        > *(block_var_decl_r(_b));
+        %= eps[set_var_scope_f(_a, model_name_origin)]
+        > *(block_var_decl_r(_a));
 
       // for now - get this working then plug in array syntax
       // _r1 var scope
@@ -141,7 +142,7 @@ namespace stan {
 
       // TODO:mitzi - figure out line numbers for var_decls and statements
       block_el_var_decl_r.name("block non-array variable declaration");
-      block_el_var_decl_r
+      block_el_var_decl_r(_r1)
         = block_el_var_decl_sub_r(_r1)
           [add_block_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r1,
                            boost::phoenix::ref(error_msgs))];
@@ -156,7 +157,7 @@ namespace stan {
       // _a = error state local,
       // _r1 var scope
       block_el_type_r.name("block non-array variable type");
-      block_el_type_r
+      block_el_type_r(_r1)
         = int_type_r(_r1)
           | double_type_r(_r1)
           | vector_type_r(_r1)
@@ -173,33 +174,33 @@ namespace stan {
 
       // _r1 var scope
       int_type_r.name("integer declaration");
-      int_type_r
+      int_type_r(_r1)
         %= (lit("int")
             >> no_skip[!char_("a-zA-Z0-9_")])
         > -range_brackets_int_r(_r1);
 
       double_type_r.name("real declaration");
-      double_type_r
+      double_type_r(_r1)
         %= (lit("real")
             >> no_skip[!char_("a-zA-Z0-9_")])
         > -range_brackets_double_r(_r1);
 
       vector_type_r.name("vector declaration");
-      vector_type_r
+      vector_type_r(_r1)
         %= (lit("vector")
             >> no_skip[!char_("a-zA-Z0-9_")])
         > -range_brackets_double_r(_r1)
         > lit('[') > int_data_expr_r(_r1) > lit(']');
 
       row_vector_type_r.name("row vector declaration");
-      row_vector_type_r
+      row_vector_type_r(_r1)
         %= (lit("row_vector")
             >> no_skip[!char_("a-zA-Z0-9_")])
         > -range_brackets_double_r(_r1)
         > lit('[') > int_data_expr_r(_r1) > lit(']');
 
       matrix_type_r.name("matrix declaration");
-      matrix_type_r
+      matrix_type_r(_r1)
         %= (lit("matrix")
             >> no_skip[!char_("a-zA-Z0-9_")])
         > -range_brackets_double_r(_r1)
@@ -208,32 +209,32 @@ namespace stan {
         > lit(']');
 
       unit_vector_type_r.name("unit_vector declaration");
-      unit_vector_type_r
+      unit_vector_type_r(_r1)
         %= (lit("unit_vector")
             >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('[') > int_data_expr_r(_r1) > lit(']');
 
       simplex_type_r.name("simplex declaration");
-      simplex_type_r
+      simplex_type_r(_r1)
         %= (lit("simplex")
             >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('[') > int_data_expr_r(_r1) > lit(']');
 
       ordered_type_r.name("ordered declaration");
-      ordered_type_r
+      ordered_type_r(_r1)
         %= (lit("ordered")
             >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('[') > int_data_expr_r(_r1) > lit(']');
 
       positive_ordered_type_r.name("positive_ordered declaration");
-      positive_ordered_type_r
+      positive_ordered_type_r(_r1)
         %= (lit("positive_ordered")
             >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('[') > int_data_expr_r(_r1) > lit(']');
 
       cholesky_factor_type_r.name("cholesky factor for symmetric,"
                                   " positive-def declaration");
-      cholesky_factor_type_r
+      cholesky_factor_type_r(_r1)
         %= (lit("cholesky_factor_cov")
             >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('[')
@@ -244,26 +245,26 @@ namespace stan {
 
       cholesky_corr_type_r.name("cholesky factor for"
                                 " correlation matrix declaration");
-      cholesky_corr_type_r
+      cholesky_corr_type_r(_r1)
         %= (lit("cholesky_factor_corr")
             >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('[') > int_data_expr_r(_r1) > lit(']');
 
       cov_matrix_type_r.name("covariance matrix declaration");
-      cov_matrix_type_r
+      cov_matrix_type_r(_r1)
         %= (lit("cov_matrix")
             >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('[') > int_data_expr_r(_r1) > lit(']');
 
       corr_matrix_type_r.name("correlation matrix declaration");
-      corr_matrix_type_r
+      corr_matrix_type_r(_r1)
         %= (lit("corr_matrix")
             >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('[') > int_data_expr_r(_r1) > lit(']');
 
       // _r1 var scope
       int_data_expr_r.name("integer data expression");
-      int_data_expr_r
+      int_data_expr_r(_r1)
         %= expression_g(_r1)
            [validate_int_data_only_expr_f(_1, _pass,
                                           boost::phoenix::ref(var_map_),
@@ -271,15 +272,17 @@ namespace stan {
 
       // _r1 var scope
       array_dims_r.name("array dimensions");
-      array_dims_r %= lit('[') > (int_data_expr_r(_r1) % ',') > lit(']');
+      array_dims_r(_r1)
+        %= lit('[') > (int_data_expr_r(_r1) % ',') > lit(']');
 
       // _r1 var scope
       opt_def_r.name("variable definition (optional)");
-      opt_def_r %= -(lit('=') > expression_g(_r1));
+      opt_def_r(_r1)
+        %= -(lit('=') > expression_g(_r1));
 
       // _r1 var scope
       range_brackets_int_r.name("integer range expression pair, brackets");
-      range_brackets_int_r
+      range_brackets_int_r(_r1)
         = lit('<') [empty_range_f(_val, boost::phoenix::ref(error_msgs_))]
         >> (
             ((lit("lower")
@@ -304,7 +307,7 @@ namespace stan {
 
       // _r1 var scope
       range_brackets_double_r.name("real range expression pair, brackets");
-      range_brackets_double_r
+      range_brackets_double_r(_r1)
         = lit('<')[empty_range_f(_val, boost::phoenix::ref(error_msgs_))]
         > (
            ((lit("lower")

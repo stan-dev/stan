@@ -17,6 +17,7 @@ namespace stan {
     template <typename Iterator>
     struct block_var_decls_grammar
       : boost::spirit::qi::grammar<Iterator,
+                                   boost::spirit::qi::locals<scope>,
                                    std::vector<block_var_decl>,
                                    whitespace_grammar<Iterator> > {
       block_var_decls_grammar(variable_map& var_map,
@@ -28,15 +29,21 @@ namespace stan {
       expression07_grammar<Iterator> expression07_g;  // disallows comparisons
 
       boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::locals<scope>,
+                              std::vector<block_var_decl>,
+                              whitespace_grammar<Iterator> >
+      block_var_decls_r;
+
+      boost::spirit::qi::rule<Iterator,
                                std::vector<expression>(scope),
                                whitespace_grammar<Iterator> >
       array_dims_r;
 
-      boost::spirit::qi::rule<Iterator,
-                              boost::spirit::qi::locals<bool>,
-                              block_var_decl(scope),
-                              whitespace_grammar<Iterator> >
-      block_array_var_decl_r;
+      // boost::spirit::qi::rule<Iterator,
+      //                         boost::spirit::qi::locals<bool>,
+      //                         block_array_var_decl(scope),
+      //                         whitespace_grammar<Iterator> >
+      // block_array_var_decl_r;
 
       boost::spirit::qi::rule<Iterator,
                               boost::spirit::qi::locals<bool>,
@@ -61,12 +68,6 @@ namespace stan {
                               block_var_decl(scope),
                               whitespace_grammar<Iterator> >
       block_var_decl_r;
-
-      boost::spirit::qi::rule<Iterator,
-                              boost::spirit::qi::locals<bool, scope>,
-                              std::vector<block_var_decl>,
-                              whitespace_grammar<Iterator> >
-      block_var_decls_r;
 
       boost::spirit::qi::rule<Iterator,
                               cholesky_factor_block_type(scope),

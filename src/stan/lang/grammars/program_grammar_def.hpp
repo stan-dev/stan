@@ -59,7 +59,7 @@ namespace stan {
         using boost::spirit::qi::labels::_a;
 
         // add model_name to var_map with special origin
-        var_map_.add(model_name, base_var_decl(),
+        var_map_.add(model_name, var_decl(),
                      scope(model_name_origin, true));
 
         program_r.name("program");
