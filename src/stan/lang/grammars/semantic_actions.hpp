@@ -226,7 +226,7 @@ namespace stan {
 
     // called from: functions_grammar
     struct validate_non_void_arg_function : public phoenix_functor_ternary {
-      void operator()(const expr_type& arg_type,
+      void operator()(const bare_expr_type& arg_type,
                       bool& pass,
                       std::ostream& error_msgs) const;
     };
@@ -235,7 +235,7 @@ namespace stan {
 
     // called from: functions_grammar
     struct set_void_function : public phoenix_functor_quaternary {
-      void operator()(const expr_type& return_type, scope& var_scope,
+      void operator()(const bare_expr_type& return_type, scope& var_scope,
                       bool& pass, std::ostream& error_msgs) const;
     };
     extern boost::phoenix::function<set_void_function> set_void_function_f;
@@ -313,7 +313,7 @@ namespace stan {
 
     // called from: functions_grammar
     struct add_fun_var : public phoenix_functor_quinary {
-      void operator()(arg_decl& decl, scope& scope, bool& pass,
+      void operator()(fun_var_decl& decl, scope& scope, bool& pass,
                       variable_map& vm,
                       std::ostream& error_msgs) const;
     };
@@ -754,25 +754,6 @@ namespace stan {
     };
     extern boost::phoenix::function<require_vbar> require_vbar_f;
 
-    struct validate_no_constraints_vis : public boost::static_visitor<bool> {
-      std::stringstream& error_msgs_;
-      explicit validate_no_constraints_vis(std::stringstream& error_msgs);
-      bool operator()(const nil& /*x*/) const;
-      bool operator()(const int_var_decl& x) const;
-      bool operator()(const double_var_decl& x) const;
-      bool operator()(const vector_var_decl& x) const;
-      bool operator()(const row_vector_var_decl& x) const;
-      bool operator()(const matrix_var_decl& x) const;
-      bool operator()(const unit_vector_var_decl& /*x*/) const;
-      bool operator()(const simplex_var_decl& /*x*/) const;
-      bool operator()(const ordered_var_decl& /*x*/) const;
-      bool operator()(const positive_ordered_var_decl& /*x*/) const;
-      bool operator()(const cholesky_factor_var_decl& /*x*/) const;
-      bool operator()(const cholesky_corr_var_decl& /*x*/) const;
-      bool operator()(const cov_matrix_var_decl& /*x*/) const;
-      bool operator()(const corr_matrix_var_decl& /*x*/) const;
-    };
-
     struct data_only_expression : public boost::static_visitor<bool> {
       std::stringstream& error_msgs_;
       variable_map& var_map_;
@@ -807,14 +788,14 @@ namespace stan {
     extern boost::phoenix::function<add_line_number>
     add_line_number_f;
 
-    // called from: var_decls_grammar
-    struct validate_decl_constraints : public phoenix_functor_quinary {
-      void operator()(const bool& allow_constraints,
-                      const bool& declaration_ok, const var_decl& var_decl,
+    // TODO:mitzi - review fn, comments
+    //  called from: block_var_decls_grammar, 
+    struct validate_decl : public phoenix_functor_quaternary {
+      void operator()(const bool& declaration_ok, const var_decl& var_decl,
                       bool& pass, std::stringstream& error_msgs) const;
     };
-    extern boost::phoenix::function<validate_decl_constraints>
-    validate_decl_constraints_f;
+    extern boost::phoenix::function<validate_decl>
+    validate_decl_f;
 
     // called from: var_decls_grammar
     struct validate_definition : public phoenix_functor_quaternary {
@@ -840,7 +821,7 @@ namespace stan {
     // copies single dimension from M to N if only M declared
     struct copy_square_cholesky_dimension_if_necessary
       : public phoenix_functor_unary {
-      void operator()(cholesky_factor_var_decl& var_decl) const;
+      void operator()(cholesky_factor_block_type& block_type) const;
     };
     extern boost::phoenix::function<copy_square_cholesky_dimension_if_necessary>
     copy_square_cholesky_dimension_if_necessary_f;
@@ -875,14 +856,14 @@ namespace stan {
     };
     extern boost::phoenix::function<set_int_range_upper> set_int_range_upper_f;
 
-    struct validate_int_data_expr : public phoenix_functor_quinary {
-      void operator()(const expression& expr, const scope& var_scope,
-                      bool& pass, variable_map& var_map,
+    // TODO:mitzi - need validate int rule elsewhere?
+    struct validate_int_data_only_expr : public phoenix_functor_quaternary {
+      void operator()(const expression& expr, bool& pass, variable_map& var_map,
                       std::stringstream& error_msgs)
         const;
     };
-    extern boost::phoenix::function<validate_int_data_expr>
-    validate_int_data_expr_f;
+    extern boost::phoenix::function<validate_int_data_only_expr>
+    validate_int_data_only_expr_f;
 
     struct validate_double_expr : public phoenix_functor_ternary {
       void operator()(const expression& expr, bool& pass,
@@ -913,6 +894,14 @@ namespace stan {
         const;
     };
     extern boost::phoenix::function<add_var> add_var_f;
+
+    struct add_block_var : public phoenix_functor_senary {
+      void operator()(block_var_decl& var_decl_result, const block_var_decl& var_decl,
+                      variable_map& vm, bool& pass, const scope& var_scope,
+                      std::ostream& error_msgs)
+        const;
+    };
+    extern boost::phoenix::function<add_block_var> add_block_var_f;
 
     struct validate_in_loop : public phoenix_functor_ternary {
       void operator()(bool in_loop, bool& pass, std::ostream& error_msgs) const;

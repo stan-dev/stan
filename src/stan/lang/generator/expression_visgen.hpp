@@ -52,15 +52,15 @@ namespace stan {
         std::stringstream ssRealType;
         generate_real_var_type(x.array_expr_scope_, x.has_var_, ssRealType);
         std::stringstream ssArrayType;
-        generate_array_var_type(x.type_.base_type_, ssRealType.str(),
+        generate_array_var_type(x.type_, ssRealType.str(),
                                 ssArrayType);
         o_ << "static_cast<";
-        generate_type(ssArrayType.str(), x.args_, x.type_.num_dims_, o_);
+        generate_type(ssArrayType.str(), x.args_, x.type_.num_dims(), o_);
         o_ << " >(";
         o_ << "stan::math::array_builder<";
         generate_type(ssArrayType.str(),
                       x.args_,
-                      x.type_.num_dims_ - 1,
+                      x.type_.num_dims() - 1,
                       o_);
         o_ << " >()";
         generate_array_builder_adds(x.args_, user_facing_, o_);
@@ -108,12 +108,11 @@ namespace stan {
         generate_expression(x.expr_, user_facing_, expr_o);
         std::string expr_string = expr_o.str();
         std::vector<expression> indexes;
-        size_t e_num_dims = x.expr_.expression_type().num_dims_;
-        base_expr_type base_type = x.expr_.expression_type().base_type_;
+        size_t e_num_dims = x.type_.num_dims();
         for (size_t i = 0; i < x.dimss_.size(); ++i)
           for (size_t j = 0; j < x.dimss_[i].size(); ++j)
             indexes.push_back(x.dimss_[i][j]);  // wasteful copy, could use refs
-        generate_indexed_expr<false>(expr_string, indexes, base_type,
+        generate_indexed_expr<false>(expr_string, indexes, x.type_,
                                      e_num_dims, user_facing_, o_);
       }
 
@@ -256,10 +255,10 @@ namespace stan {
 
       void operator()(const conditional_op& expr) const {
         bool types_prim_match
-          = (expr.type_.is_primitive() && expr.type_.base_type_.is_int_type())
+          = (expr.type_.is_primitive() && expr.type_.is_int_type())
           || (!expr.has_var_ && expr.type_.is_primitive()
-              && (expr.true_val_.expression_type()
-                  == expr.false_val_.expression_type()));
+              && (expr.true_val_.bare_type()
+                  == expr.false_val_.bare_type()));
         std::stringstream ss;
         generate_real_var_type(expr.scope_, expr.has_var_, ss);
 

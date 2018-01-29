@@ -13,17 +13,17 @@ namespace stan {
 
     /**
      * Generate the specified expression indexed with the specified
-     * indices with the specified base type of expression being
+     * indices with the specified bare type of expression being
      * indexed, number of dimensions, and a flag indicating whether
      * the generation is for user output or C++ compilation.
-     * Depending on the base type, two layers of parens may be written
+     * Depending on the bare type, two layers of parens may be written
      * in the underlying code.
      *
      * @tparam isLHS true if indexed expression appears on left-hand
      * side of an assignment
      * @param[in] expr string for expression
      * @param[in] indexes indexes for expression
-     * @param[in] base_type base type of expression
+     * @param[in] bare_type bare type of expression
      * @param[in] e_num_dims number of array dimensions in expression
      * @param[in] user_facing true if expression might be reported to user
      * @param[in,out] o stream for generating
@@ -31,7 +31,7 @@ namespace stan {
     template <bool isLHS>
     void generate_indexed_expr(const std::string& expr,
                                const std::vector<expression>& indexes,
-                               base_expr_type base_type, size_t e_num_dims,
+                               bare_expr_type bare_type, size_t e_num_dims,
                                bool user_facing, std::ostream& o) {
       if (user_facing) {
         generate_indexed_expr_user(expr, indexes, o);
@@ -42,7 +42,7 @@ namespace stan {
         o << expr;
         return;
       }
-      if (ai_size <= (e_num_dims + 1) || !base_type.is_matrix_type()) {
+      if (ai_size <= (e_num_dims + 1) || !bare_type.is_matrix_type()) {
         for (size_t n = 0; n < ai_size; ++n)
           o << (isLHS ? "get_base1_lhs(" : "get_base1(");
         o << expr;
