@@ -686,13 +686,58 @@ $\mbox{logit}^{-1}(\infty) = 1$.
 \subsubsection{Stan Functions}
 
 \begin{description}
-  \fitem{real}{ordered\_logistic\_lpmf}{int \farg{k} \textbar\ real \farg{eta},
-    vector \farg{c}}{The log ordered logistic probability mass of
-    \farg{k} given linear predictor \farg{eta} and cutpoints
-    \farg{c}.}
-%
+  \fitem{real}{ordered\_logistic\_lpmf}{ints \farg{k} \textbar\ vector \farg{eta},
+    vectors \farg{c}}{The log ordered logistic probability mass of
+    \farg{k} given linear predictors \farg{eta}, and cutpoints \farg{c}.}
+
 \fitem{int}{ordered\_logistic\_rng}{real \farg{eta}, vector \farg{c}}{Generate
   an ordered logistic variate with linear predictor \farg{eta} and cutpoints
+    \farg{c}; may only be used in generated quantities block}
+\end{description}
+
+\section{Ordered Probit Distribution}
+
+\subsubsection{Probability Mass Function}
+
+If $K \in \nats$ with $K > 2$, $c \in \reals^{K-1}$ such that $c_k <
+c_{k+1}$ for $k \in \setlist{1,\ldots,K-2}$, and $\eta \in \reals$, then for $k \in
+\setlist{1,\ldots,K}$,
+\[
+\distro{OrderedProbit}(k|\eta,c)
+=
+\left\{
+\begin{array}{ll}
+1 - \Phi(\eta - c_1) & \mbox{if } k = 1,
+\\[4pt]
+\Phi(\eta - c_{k-1}) - \Phi(\eta -
+c_{k})
+
+& \mbox{if } 1 < k < K, \mbox{and}
+\\[4pt]
+\Phi(\eta - c_{K-1}) - 0
+& \mbox{if } k = K.
+\end{array}
+\right.
+\]
+%
+The $k=K$ case is written with the redundant subtraction of zero to
+illustrate the parallelism of the cases; the $k=1$ and $k=K$ edge
+cases can be subsumed into the general definition by setting $c_0 =
+-\infty$ and $c_K = +\infty$ with $\Phi(-\infty) = 0$ and
+$\Phi(\infty) = 1$.
+
+\pitemdisc{k}{ordered\_probit}{eta, c}
+
+
+\subsubsection{Stan Functions}
+
+\begin{description}
+  \fitem{real}{ordered\_probit\_lpmf}{ints \farg{k} \textbar\ vector \farg{eta},
+    vectors \farg{c}}{The log ordered probit probability mass of
+    \farg{k} given linear predictors \farg{eta}, and cutpoints \farg{c}.}
+%
+\fitem{int}{ordered\_probit\_rng}{real \farg{eta}, vector \farg{c}}{Generate
+  an ordered probit variate with linear predictor \farg{eta} and cutpoints
     \farg{c}; may only be used in generated quantities block}
 \end{description}
 

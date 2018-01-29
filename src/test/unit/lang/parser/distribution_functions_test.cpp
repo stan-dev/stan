@@ -227,6 +227,10 @@ TEST(lang_parser, ordered_logistic_distribution_function_signatures) {
   test_parsable("function-signatures/distributions/multivariate/discrete/ordered_logistic/ordered_logistic_log");
 }
 
+TEST(lang_parser, ordered_probit_distribution_function_signatures) {
+  test_parsable("function-signatures/distributions/multivariate/discrete/ordered_probit/ordered_probit_log");
+}
+
 TEST(lang_parser, dirichlet_distribution_function_signatures) {
   test_parsable("function-signatures/distributions/multivariate/continuous/dirichlet_log");
 }
