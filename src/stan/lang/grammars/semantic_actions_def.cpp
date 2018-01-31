@@ -1577,19 +1577,19 @@ namespace stan {
     validate_non_void_expression_f;
 
     //TODO:mitzi what happened to function "get_line"?
-    // template <typename T, typename I>
-    // void add_line_number::operator()(T& line,
-    //                                  const I& begin,
-    //                                  const I& end) const {
-    //   line.begin_line_ = get_line(begin);
-    //   line.end_line_ = get_line(end);
-    // }
-    // boost::phoenix::function<add_line_number>
-    // add_line_number_f;
+    template <typename T, typename I>
+    void add_line_number::operator()(T& line,
+                                     const I& begin,
+                                     const I& end) const {
+      line.begin_line_ = get_line(begin);
+      line.end_line_ = get_line(end);
+    }
+    boost::phoenix::function<add_line_number>
+    add_line_number_f;
 
-    // template void add_line_number::operator()(var_decl&,
-    //                                           const pos_iterator_t& begin,
-    //                                           const pos_iterator_t& end) const;
+    template void add_line_number::operator()(block_var_decl&,
+                                              const pos_iterator_t& begin,
+                                              const pos_iterator_t& end) const;
 
 
     // template void add_line_number::operator()(statement&,
@@ -2598,11 +2598,11 @@ namespace stan {
     validate_decl_f;
 
     void validate_definition::operator()(const scope& var_scope,
-                                         const var_decl& var_decl,
+                                         const block_var_decl& var_decl,
                                          bool& pass,
                                          std::stringstream& error_msgs)
       const {
-      if (is_nil(var_decl.def_)) return;
+      if (!var_decl.has_def()) return;
 
       // validate that assigment is allowed in this block
       if (!var_scope.allows_assignment()) {
@@ -2612,8 +2612,8 @@ namespace stan {
       }
 
       // validate type
-      bare_expr_type decl_type(var_decl.bare_type_);
-      bare_expr_type def_type = var_decl.def_.bare_type();
+      bare_expr_type decl_type(var_decl.bare_type());
+      bare_expr_type def_type = var_decl.def().bare_type();
 
       bool types_compatible
         = (decl_type.is_primitive()
@@ -2930,155 +2930,133 @@ namespace stan {
     }
     boost::phoenix::function<set_double_range_upper> set_double_range_upper_f;
 
-    template <typename T>
-    void add_var::operator()(var_decl& var_decl_result, const T& var_decl,
-                             variable_map& vm, bool& pass,
-                             const scope& var_scope,
-                             std::ostream& error_msgs) const {
-      if (vm.exists(var_decl.name_)) {
-        pass = false;
-        error_msgs << "duplicate declaration of variable, name="
-                   << var_decl.name_;
-
-        error_msgs << "; attempt to redeclare as ";
-        print_scope(error_msgs, var_scope);
-
-        error_msgs << "; original declaration as ";
-        print_scope(error_msgs, vm.get_scope(var_decl.name_));
-
-        error_msgs << std::endl;
-        var_decl_result = var_decl;
-        return;
-      }
-      if (var_scope.par_or_tpar()
-          && var_decl.bare_type().is_int_type()) {
-        pass = false;
-        error_msgs << "parameters or transformed parameters"
-                   << " cannot be integer or integer array; "
-                   << " found declared type int, parameter name="
-                   << var_decl.name_
-                   << std::endl;
-        var_decl_result = var_decl;
-        return;
-      }
-      pass = true;
-      vm.add(var_decl.name_, var_decl, var_scope);
-      var_decl_result = var_decl;
-    }
-    boost::phoenix::function<add_var> add_var_f;
-
-    template void add_var::operator()(var_decl&, const int_block_var_decl&,
-                                      variable_map&, bool&, const scope&,
-                                      std::ostream&) const;
-    template void add_var::operator()(var_decl&, const int_fun_var_decl&,
-                                      variable_map&, bool&, const scope&,
-                                      std::ostream&) const;
-    template void add_var::operator()(var_decl&, const int_local_var_decl&,
-                                      variable_map&, bool&, const scope&,
-                                      std::ostream&) const;
-    template void add_var::operator()(var_decl&, const double_block_var_decl&,
-                                      variable_map&, bool&, const scope&,
-                                      std::ostream&) const;
-    template void add_var::operator()(var_decl&, const double_fun_var_decl&,
-                                      variable_map&, bool&, const scope&,
-                                      std::ostream&) const;
-    template void add_var::operator()(var_decl&, const double_local_var_decl&,
-                                      variable_map&, bool&, const scope&,
-                                      std::ostream&) const;
-    template void add_var::operator()(var_decl&, const vector_block_var_decl&,
-                                      variable_map&, bool&, const scope&,
-                                      std::ostream&) const;
-    template void add_var::operator()(var_decl&, const vector_fun_var_decl&,
-                                      variable_map&, bool&, const scope&,
-                                      std::ostream&) const;
-    template void add_var::operator()(var_decl&, const vector_local_var_decl&,
-                                      variable_map&, bool&, const scope&,
-                                      std::ostream&) const;
-    template void add_var::operator()(var_decl&, const row_vector_block_var_decl&,
-                                      variable_map&, bool&, const scope&,
-                                      std::ostream&) const;
-    template void add_var::operator()(var_decl&, const row_vector_fun_var_decl&,
-                                      variable_map&, bool&, const scope&,
-                                      std::ostream&) const;
-    template void add_var::operator()(var_decl&, const row_vector_local_var_decl&,
-                                      variable_map&, bool&, const scope&,
-                                      std::ostream&) const;
-    template void add_var::operator()(var_decl&, const matrix_block_var_decl&,
-                                      variable_map&, bool&, const scope&,
-                                      std::ostream&) const;
-    template void add_var::operator()(var_decl&, const matrix_fun_var_decl&,
-                                      variable_map&, bool&, const scope&,
-                                      std::ostream&) const;
-    template void add_var::operator()(var_decl&, const matrix_local_var_decl&,
-                                      variable_map&, bool&, const scope&,
-                                      std::ostream&) const;
-    template void add_var::operator()(var_decl&, const simplex_block_var_decl&,
-                                      variable_map&, bool&, const scope&,
-                                      std::ostream&) const;
-    template void add_var::operator()(var_decl&, const unit_vector_block_var_decl&,
-                                      variable_map&, bool&, const scope&,
-                                      std::ostream&) const;
-    template void add_var::operator()(var_decl&, const ordered_block_var_decl&,
-                                      variable_map&, bool&, const scope&,
-                                      std::ostream&) const;
-    template void add_var::operator()(var_decl&,
-                                      const positive_ordered_block_var_decl&,
-                                      variable_map&, bool&, const scope&,
-                                      std::ostream&) const;
-    template void add_var::operator()(var_decl&,
-                                      const cholesky_factor_block_var_decl&,
-                                      variable_map&, bool&, const scope&,
-                                      std::ostream&) const;
-    template void add_var::operator()(var_decl&, const cholesky_corr_block_var_decl&,
-                                      variable_map&, bool&, const scope&,
-                                      std::ostream&) const;
-    template void add_var::operator()(var_decl&, const cov_matrix_block_var_decl&,
-                                      variable_map&, bool&, const scope&,
-                                      std::ostream&) const;
-    template void add_var::operator()(var_decl&, const corr_matrix_block_var_decl&,
-                                      variable_map&, bool&, const scope&,
-                                      std::ostream&) const;
-    template void add_var::operator()(var_decl&, const var_decl&,
-                                      variable_map&, bool&, const scope&,
-                                      std::ostream&) const;
-
     // parser calls this to register var in vm; sets result (_val) to value computed by subrule (_1)
-    void add_block_var::operator()(block_var_decl& block_var_decl_result, const block_var_decl& block_var_decl,
+    template <typename T>
+    void add_block_var::operator()(block_var_decl& block_var_decl_result,
+                                   const T& block_var_decl,
                                    variable_map& vm, bool& pass,
                                    const scope& var_scope,
                                    std::ostream& error_msgs) const {
-      if (vm.exists(block_var_decl.var_decl().name())) {
+      if (vm.exists(block_var_decl.name())) {
         pass = false;
         error_msgs << "duplicate declaration of variable, name="
-                   << block_var_decl.var_decl().name();
+                   << block_var_decl.name();
 
         error_msgs << "; attempt to redeclare as ";
         print_scope(error_msgs, var_scope);
 
         error_msgs << "; original declaration as ";
-        print_scope(error_msgs, vm.get_scope(block_var_decl.var_decl().name()));
+        print_scope(error_msgs, vm.get_scope(block_var_decl.name()));
 
         error_msgs << std::endl;
         block_var_decl_result = block_var_decl;
         return;
       }
       if (var_scope.par_or_tpar()
-          && block_var_decl.var_decl().bare_type().is_int_type()) {
+          && block_var_decl.bare_type().is_int_type()) {
         pass = false;
         error_msgs << "parameters or transformed parameters"
                    << " cannot be integer or integer array; "
                    << " found declared type int, parameter name="
-                   << block_var_decl.var_decl().name()
+                   << block_var_decl.name()
                    << std::endl;
         block_var_decl_result = block_var_decl;
         return;
       }
       pass = true;
-      vm.add(block_var_decl.var_decl().name(), block_var_decl.var_decl(), var_scope);
+      vm.add(block_var_decl.name(),
+             var_decl(block_var_decl.name(), block_var_decl.bare_type()),
+             var_scope);
       block_var_decl_result = block_var_decl;
     }
     boost::phoenix::function<add_block_var> add_block_var_f;
     
+    template void add_block_var::operator()(block_var_decl&,
+                                            const int_block_var_decl&,
+                                            variable_map&, bool&, const scope&,
+                                            std::ostream&) const;
+    template void add_block_var::operator()(block_var_decl&,
+                                            const double_block_var_decl&,
+                                            variable_map&, bool&, const scope&,
+                                            std::ostream&) const;
+    template void add_block_var::operator()(block_var_decl&,
+                                            const vector_block_var_decl&,
+                                            variable_map&, bool&, const scope&,
+                                            std::ostream&) const;
+    template void add_block_var::operator()(block_var_decl&,
+                                            const row_vector_block_var_decl&,
+                                            variable_map&, bool&, const scope&,
+                                            std::ostream&) const;
+    template void add_block_var::operator()(block_var_decl&,
+                                            const matrix_block_var_decl&,
+                                            variable_map&, bool&, const scope&,
+                                            std::ostream&) const;
+    template void add_block_var::operator()(block_var_decl&,
+                                            const simplex_block_var_decl&,
+                                            variable_map&, bool&, const scope&,
+                                            std::ostream&) const;
+    template void add_block_var::operator()(block_var_decl&,
+                                            const unit_vector_block_var_decl&,
+                                            variable_map&, bool&, const scope&,
+                                            std::ostream&) const;
+    template void add_block_var::operator()(block_var_decl&,
+                                            const ordered_block_var_decl&,
+                                            variable_map&, bool&, const scope&,
+                                            std::ostream&) const;
+    template void add_block_var::operator()(block_var_decl&,
+                                            const positive_ordered_block_var_decl&,
+                                            variable_map&, bool&, const scope&,
+                                            std::ostream&) const;
+    template void add_block_var::operator()(block_var_decl&,
+                                            const cholesky_factor_block_var_decl&,
+                                            variable_map&, bool&, const scope&,
+                                            std::ostream&) const;
+    template void add_block_var::operator()(block_var_decl&,
+                                            const cholesky_corr_block_var_decl&,
+                                            variable_map&, bool&, const scope&,
+                                            std::ostream&) const;
+    template void add_block_var::operator()(block_var_decl&,
+                                            const cov_matrix_block_var_decl&,
+                                            variable_map&, bool&, const scope&,
+                                            std::ostream&) const;
+    template void add_block_var::operator()(block_var_decl&,
+                                            const corr_matrix_block_var_decl&,
+                                            variable_map&, bool&, const scope&,
+                                            std::ostream&) const;
+
+
+    // template void add_block_var::operator()(const int_fun_var_decl&,
+    //                                   variable_map&, bool&, const scope&,
+    //                                   std::ostream&) const;
+    // template void add_var::operator()(const int_local_var_decl&,
+    //                                   variable_map&, bool&, const scope&,
+    //                                   std::ostream&) const;
+    // template void add_var::operator()(const double_fun_var_decl&,
+    //                                   variable_map&, bool&, const scope&,
+    //                                   std::ostream&) const;
+    // template void add_var::operator()(const double_local_var_decl&,
+    //                                   variable_map&, bool&, const scope&,
+    //                                   std::ostream&) const;
+    // template void add_var::operator()(const vector_fun_var_decl&,
+    //                                   variable_map&, bool&, const scope&,
+    //                                   std::ostream&) const;
+    // template void add_var::operator()(const vector_local_var_decl&,
+    //                                   variable_map&, bool&, const scope&,
+    //                                   std::ostream&) const;
+    // template void add_var::operator()(const row_vector_fun_var_decl&,
+    //                                   variable_map&, bool&, const scope&,
+    //                                   std::ostream&) const;
+    // template void add_var::operator()(const row_vector_local_var_decl&,
+    //                                   variable_map&, bool&, const scope&,
+    //                                   std::ostream&) const;
+    // template void add_var::operator()(const matrix_fun_var_decl&,
+    //                                   variable_map&, bool&, const scope&,
+    //                                   std::ostream&) const;
+    // template void add_var::operator()(const matrix_local_var_decl&,
+    //                                   variable_map&, bool&, const scope&,
+    //                                   std::ostream&) const;
+
+
     void validate_in_loop::operator()(bool in_loop, bool& pass,
                                       std::ostream& error_msgs) const {
       pass = in_loop;

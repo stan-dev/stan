@@ -799,7 +799,7 @@ namespace stan {
 
     // called from: var_decls_grammar
     struct validate_definition : public phoenix_functor_quaternary {
-      void operator()(const scope& var_scope, const var_decl& var_decl,
+      void operator()(const scope& var_scope, const block_var_decl& var_decl,
                       bool& pass, std::stringstream& error_msgs) const;
     };
     extern boost::phoenix::function<validate_definition>
@@ -886,17 +886,9 @@ namespace stan {
     extern boost::phoenix::function<set_double_range_upper>
     set_double_range_upper_f;
 
-    struct add_var : public phoenix_functor_senary {
-      template <typename T>
-      void operator()(var_decl& var_decl_result, const T& var_decl,
-                      variable_map& vm, bool& pass, const scope& var_scope,
-                      std::ostream& error_msgs)
-        const;
-    };
-    extern boost::phoenix::function<add_var> add_var_f;
-
     struct add_block_var : public phoenix_functor_senary {
-      void operator()(block_var_decl& var_decl_result, const block_var_decl& var_decl,
+      template <typename T>
+      void operator()(block_var_decl& var_decl_result, const T& var_decl,
                       variable_map& vm, bool& pass, const scope& var_scope,
                       std::ostream& error_msgs)
         const;
