@@ -24,25 +24,24 @@ namespace stan {
 
       /**
        * Construct an ordered vector declaration with
-       * the specified name and size.
+       * the specified name and type.
        *
        * @param name variable name
-       * @param K vector size
+       * @param type variable type
        */
       ordered_block_var_decl(const std::string& name,
-                             const expression& K);
+                             const ordered_block_type& type);
 
       /**
        * Construct an ordered vector declaration with
-       * the specified name, size, and definition.
-       * Definition is nil if var isn't initialized via declaration.
+       * the specified name, type, and definition.
        *
        * @param name variable name
-       * @param K vector size
+       * @param type variable type
        * @param def defition of variable
        */
       ordered_block_var_decl(const std::string& name,
-                             const expression& K,
+                             const ordered_block_type& type,
                              const expression& def);
     };
   }

@@ -7,7 +7,8 @@
 TEST(choleskyFactorBlockVarDecl, createVar1) {
   stan::lang::expression M(stan::lang::int_literal(3));
   stan::lang::expression N(stan::lang::int_literal(4));
-  stan::lang::cholesky_factor_block_var_decl x("x", M, N);
+  stan::lang::cholesky_factor_block_type cfbt(M, N);
+  stan::lang::cholesky_factor_block_var_decl x("x", cfbt);
 
   // check cholesky_factor_bloc_var_decl
   EXPECT_EQ(x.name_, "x");
@@ -15,9 +16,9 @@ TEST(choleskyFactorBlockVarDecl, createVar1) {
   EXPECT_TRUE(is_nil(x.def_));
 
   // check cholesky_factor_block_var_type
-  stan::lang::expression m_size = x.type_.M_;
+  stan::lang::expression m_size = x.type_.M();
   EXPECT_TRUE(m_size.bare_type().is_int_type());
-  stan::lang::expression n_size = x.type_.N_;
+  stan::lang::expression n_size = x.type_.N();
   EXPECT_TRUE(m_size.bare_type().is_int_type());
 
   // check block_var_decl wrapper

@@ -10,19 +10,15 @@ namespace stan {
     matrix_block_var_decl::matrix_block_var_decl() { }
 
     matrix_block_var_decl::matrix_block_var_decl(const std::string& name,
-                                                 const range& bounds,
-                                                 const expression& M,
-                                                 const expression& N)
-      : var_decl(name, bare_expr_type(matrix_type())),
-        type_(matrix_block_type(bounds, M, N)) { }
+                                                 const matrix_block_type& type)
+      : var_decl(name, matrix_type()),
+        type_(type.bounds(), type.M(), type.N()) { }
 
     matrix_block_var_decl::matrix_block_var_decl(const std::string& name,
-                                                 const range& bounds,
-                                                 const expression& M,
-                                                 const expression& N,
+                                                 const matrix_block_type& type,
                                                  const expression& def)
-      : var_decl(name, bare_expr_type(matrix_type()), def),
-        type_(matrix_block_type(bounds, M, N)) { }
+      : var_decl(name, matrix_type(), def),
+        type_(type.bounds(), type.M(), type.N()) { }
   }
 }
 #endif

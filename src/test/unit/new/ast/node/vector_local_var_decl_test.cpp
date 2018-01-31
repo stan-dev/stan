@@ -6,14 +6,15 @@
 
 TEST(vectorLocalVarDecl, createVar1) {
   stan::lang::expression N(stan::lang::int_literal(1));
-  stan::lang::vector_local_var_decl x("x", N);
+  stan::lang::vector_local_type vlt(N);
+  stan::lang::vector_local_var_decl x("x", vlt);
 
   // check vector_local_var_decl
   EXPECT_EQ(x.name_, "x");
   EXPECT_TRUE(x.bare_type_.is_vector_type());
   EXPECT_TRUE(is_nil(x.def_));
 
-  // check vector_local_var_type
+  // check vector_local_type
   stan::lang::expression x_size = x.type_.N_;
   EXPECT_TRUE(x_size.bare_type().is_int_type());
 

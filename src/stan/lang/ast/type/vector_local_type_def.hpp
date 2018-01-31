@@ -9,6 +9,8 @@ namespace stan {
 
     vector_local_type::vector_local_type(const expression& N)
       : N_(N) { }
+
+    expression vector_local_type::N() const { return N_; }
   }
 }
 #endif

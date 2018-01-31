@@ -9,6 +9,8 @@ namespace stan {
 
     unit_vector_block_type::unit_vector_block_type(const expression& K)
       : K_(K) { }
+
+    expression unit_vector_block_type::K() const { return K_; }
   }
 }
 #endif

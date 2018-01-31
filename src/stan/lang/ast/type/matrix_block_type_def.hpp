@@ -11,6 +11,12 @@ namespace stan {
                                          const expression& M,
                                          const expression& N)
       : bounds_(bounds), M_(M), N_(N) { }
+
+    range matrix_block_type::bounds() const { return bounds_; }
+
+    expression matrix_block_type::M() const { return M_; }
+
+    expression matrix_block_type::N() const { return N_; }
   }
 }
 #endif

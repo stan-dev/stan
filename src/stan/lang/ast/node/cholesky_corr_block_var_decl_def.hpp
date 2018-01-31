@@ -11,16 +11,14 @@ namespace stan {
 
     cholesky_corr_block_var_decl::cholesky_corr_block_var_decl(
                                   const std::string& name,
-                                  const expression& K)
-      : var_decl(name, bare_expr_type(matrix_type())),
-        type_(cholesky_corr_block_type(K)) { }
+                                  const cholesky_corr_block_type& type)
+      : var_decl(name, matrix_type()), type_(type.K()) { }
 
     cholesky_corr_block_var_decl::cholesky_corr_block_var_decl(
                                   const std::string& name,
-                                  const expression& K,
+                                  const cholesky_corr_block_type& type,
                                   const expression& def)
-      : var_decl(name, bare_expr_type(matrix_type()), def),
-        type_(cholesky_corr_block_type(K)) { }
+      : var_decl(name, matrix_type(), def), type_(type.K()) { }
   }
 }
 #endif

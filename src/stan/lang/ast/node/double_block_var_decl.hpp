@@ -32,7 +32,7 @@ namespace stan {
        * @param bounds variable upper and/or lower bounds
        */
       double_block_var_decl(const std::string& name,
-                            const range& bounds);
+                            const double_block_type& type);
 
       /**
        * Construct a double block variable declaration with the specified
@@ -43,7 +43,7 @@ namespace stan {
        * @param def definition
        */
       double_block_var_decl(const std::string& name,
-                            const range& bounds,
+                            const double_block_type& type,
                             const expression& def);
 
     };

@@ -46,6 +46,10 @@ namespace stan {
       return cur_type;
     }
 
+    block_var_type block_array_type::element_type() const {
+      return element_type_;
+    }
+
     expression block_array_type::array_len() const {
       return array_len_;
     }

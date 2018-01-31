@@ -24,9 +24,14 @@ namespace stan {
        * Construct a block var type with specified values.
        * Size should be int expression - constructor doesn't check.
        *
-       * @param K cov matrix size
+       * @param K corr matrix num rows, columns
        */
       cholesky_corr_block_type(const expression& K);
+
+      /**
+       * Get K (corr matrix num rows, columns)
+       */
+      expression K() const;
     };
 
   }

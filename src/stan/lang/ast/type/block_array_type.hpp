@@ -62,6 +62,11 @@ namespace stan {
       int dims() const;
 
       /**
+       * Returns top-level array element type.
+       */
+      block_var_type element_type() const;
+
+      /**
        * Returns the length of this array.
        */
       expression array_len() const;

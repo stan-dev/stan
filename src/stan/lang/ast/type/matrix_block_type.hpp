@@ -42,8 +42,22 @@ namespace stan {
       matrix_block_type(const range& bounds,
                         const expression& M,
                         const expression& N);
-    };
 
+      /**
+       * Get bounds.
+       */
+      range bounds() const;
+
+      /**
+       * Get M (num rows).
+       */
+      expression M() const;
+
+      /**
+       * Get N (num cols).
+       */
+      expression N() const;
+    };
   }
 }
 #endif

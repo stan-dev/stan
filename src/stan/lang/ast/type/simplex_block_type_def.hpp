@@ -9,6 +9,8 @@ namespace stan {
 
     simplex_block_type::simplex_block_type(const expression& K)
       : K_(K) { }
+
+    expression simplex_block_type::K() const { return K_; }
   }
 }
 #endif

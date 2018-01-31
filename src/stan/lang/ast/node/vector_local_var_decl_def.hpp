@@ -10,15 +10,13 @@ namespace stan {
     vector_local_var_decl::vector_local_var_decl() { }
 
     vector_local_var_decl::vector_local_var_decl(const std::string& name,
-                                                 const expression& N)
-      : var_decl(name, vector_type()),
-        type_(vector_local_type(N)) { }
+                                                 const vector_local_type& type)
+      : var_decl(name, vector_type()), type_(type.N()) { }
 
     vector_local_var_decl::vector_local_var_decl(const std::string& name,
-                                                 const expression& N,
+                                                 const vector_local_type& type,
                                                  const expression& def)
-      : var_decl(name, vector_type(), def),
-        type_(vector_local_type(N)) { }
+      : var_decl(name, vector_type(), def), type_(type.N()) { }
   }
 }
 #endif

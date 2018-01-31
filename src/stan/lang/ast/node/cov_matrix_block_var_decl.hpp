@@ -24,25 +24,24 @@ namespace stan {
 
       /**
        * Construct a variable declaration for a covariance matrix
-       * with the specified name and size.
+       * with the specified name and type.
        *
        * @param name variable name
-       * @param K cov matrix size
+       * @param type variable type
        */
       cov_matrix_block_var_decl(const std::string& name,
-                                const expression& K);
+                                const cov_matrix_block_type& type);
 
       /**
        * Construct a variable declaration for a covariance matrix
-       * with the specified name, size, and definition.
-       * Definition is nil if var isn't initialized via declaration.
+       * with the specified name, type, and definition.
        *
        * @param name variable name
-       * @param K cov matrix size
+       * @param type variable type
        * @param def defition of variable
        */
       cov_matrix_block_var_decl(const std::string& name,
-                                const expression& K,
+                                const cov_matrix_block_type& type,
                                 const expression& def);
     };
   }

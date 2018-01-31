@@ -10,6 +10,8 @@ namespace stan {
 
     int_block_type::int_block_type(const range& bounds)
       : bounds_(bounds) { }
+
+    range int_block_type::bounds() const { return bounds_; }
   }
 }
 #endif

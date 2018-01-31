@@ -10,6 +10,8 @@ namespace stan {
 
     corr_matrix_block_type::corr_matrix_block_type(const expression& K)
       : K_(K) { }
+
+    expression corr_matrix_block_type::K() const { return K_; }
   }
 }
 #endif

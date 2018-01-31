@@ -25,24 +25,24 @@ namespace stan {
 
       /**
        * Construct an integer block variable declaration with the specified
-       * name and bounds.
+       * name and type.
        *
        * @param name variable name
-       * @param bounds variable upper and/or lower bounds
+       * @param type variable type
        */
       int_block_var_decl(const std::string& name,
-                         const range& bounds);
+                         const int_block_type& type);
 
       /**
        * Construct an integer block variable declaration with the specified
        * name, bounds, and definition.
        *
        * @param name variable name
-       * @param bounds variable upper and/or lower bounds
+       * @param type variable type
        * @param def definition
        */
       int_block_var_decl(const std::string& name,
-                         const range& bounds,
+                         const int_block_type& type,
                          const expression& def);
     };
   }

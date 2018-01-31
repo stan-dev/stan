@@ -32,8 +32,7 @@ TEST(varDecl, create3Arg) {
 TEST(varDecl, createArray) {
   stan::lang::matrix_type tMat;
   stan::lang::bare_array_type d1(tMat);
-  stan::lang::bare_expr_type at(d1);
-  stan::lang::var_decl x("x", at);
+  stan::lang::var_decl x("x", d1);
   EXPECT_EQ(x.name_, "x");
   EXPECT_TRUE(x.bare_type_.is_array_type());
   EXPECT_FALSE(x.is_data());

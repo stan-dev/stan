@@ -7,7 +7,8 @@
 TEST(covMatrixBlockVarDecl, createVar1) {
   stan::lang::int_literal int_len(5);
   stan::lang::expression K(int_len);
-  stan::lang::cov_matrix_block_var_decl x("x", K);
+  stan::lang::cov_matrix_block_type cmbt(K);
+  stan::lang::cov_matrix_block_var_decl x("x", cmbt);
 
   // check cov_matrix_bloc_var_decl
   EXPECT_EQ(x.name_, "x");

@@ -3,7 +3,6 @@
 
 #include <stan/lang/ast/type/matrix_block_type.hpp>
 #include <stan/lang/ast/node/expression.hpp>
-#include <stan/lang/ast/node/range.hpp>
 #include <string>
 
 namespace stan {
@@ -25,32 +24,24 @@ namespace stan {
 
       /**
        * Construct a matrix block variable declaration with the specified
-       * name, bounds, number of rows, number of columns.
+       * name and type.
        *
        * @param name variable name
-       * @param bounds variable upper and/or lower bounds
-       * @param M number of rows
-       * @param N number of columns
+       * @param type variable type
        */
       matrix_block_var_decl(const std::string& name,
-                            const range& bounds,
-                            const expression& M,
-                            const expression& N);
+                            const matrix_block_type& type);
 
       /**
        * Construct a matrix block variable declaration with the specified
-       * name, bounds, number of rows, number of columns, and definition.
+       * name, type, and definition.
        *
        * @param name variable name
-       * @param bounds variable upper and/or lower bounds
-       * @param M number of rows
-       * @param N number of columns
+       * @param type variable type
        * @param def definition
        */
       matrix_block_var_decl(const std::string& name,
-                            const range& bounds,
-                            const expression& M,
-                            const expression& N,
+                            const matrix_block_type& type,
                             const expression& def);
     };
   }

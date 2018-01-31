@@ -26,28 +26,24 @@ namespace stan {
 
       /**
        * Construct an array variable declaration with the specified
-       * name, element type, and length.
+       * name and type.
        *
        * @param name variable name
-       * @param el_type element type
-       * @param len array length
+       * @param type variable type
        */
       array_block_var_decl(const std::string& name,
-                           const block_var_type& el_type,
-                           const expression& len);
+                           const block_array_type& type);
 
       /**
        * Construct an array variable declaration with the specified
        * name, element type, length, and definition.
        *
        * @param name variable name
-       * @param el_type element type
-       * @param len array length
+       * @param type variable type
        * @param def definition
        */
       array_block_var_decl(const std::string& name,
-                           const block_var_type& el_type,
-                           const expression& len,
+                           const block_array_type& type,
                            const expression& def);
     };
   }

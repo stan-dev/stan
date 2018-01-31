@@ -7,7 +7,8 @@
 TEST(intBlockVarDecl, createVar1) {
   stan::lang::range v_bounds(stan::lang::int_literal(-1),
                              stan::lang::int_literal(1));
-  stan::lang::int_block_var_decl x("x", v_bounds);
+  stan::lang::int_block_type ibt(v_bounds);
+  stan::lang::int_block_var_decl x("x", ibt);
 
   // check int_bloc_var_decl
   EXPECT_EQ(x.name_, "x");

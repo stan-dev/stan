@@ -11,16 +11,14 @@ namespace stan {
 
     row_vector_local_var_decl::row_vector_local_var_decl(
                                const std::string& name,
-                               const expression& N)
-      : var_decl(name, bare_expr_type(row_vector_type())),
-        type_(row_vector_local_type(N)) { }
+                               const row_vector_local_type& type)
+      : var_decl(name, row_vector_type()), type_(type.N()) { }
 
     row_vector_local_var_decl::row_vector_local_var_decl(
                                const std::string& name,
-                               const expression& N,
+                               const row_vector_local_type& type,
                                const expression& def)
-      : var_decl(name, bare_expr_type(row_vector_type()), def),
-        type_(row_vector_local_type(N)) { }
+      : var_decl(name, row_vector_type(), def), type_(type.N()) { }
   }
 }
 #endif

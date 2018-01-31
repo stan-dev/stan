@@ -27,8 +27,12 @@ namespace stan {
        * @param N vector length
        */
       row_vector_local_type(const expression& N);
+    
+      /**
+       * Get N (vector length).
+       */
+      expression N() const;
     };
-
   }
 }
 #endif

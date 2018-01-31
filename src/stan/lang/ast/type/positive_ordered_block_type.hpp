@@ -27,6 +27,11 @@ namespace stan {
        * @param K size
        */
       positive_ordered_block_type(const expression& K);
+
+      /**
+       * Get K (num rows, cols).
+       */
+      expression K() const;
     };
 
   }

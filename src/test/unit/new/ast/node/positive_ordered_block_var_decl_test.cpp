@@ -7,7 +7,8 @@
 TEST(positiveOrderedBlockVarDecl, createVar1) {
   stan::lang::int_literal int_len(5);
   stan::lang::expression K(int_len);
-  stan::lang::positive_ordered_block_var_decl x("x", K);
+  stan::lang::positive_ordered_block_type tPosOrd(K);
+  stan::lang::positive_ordered_block_var_decl x("x", tPosOrd);
 
   // check positive_ordered_bloc_var_decl
   EXPECT_EQ(x.name_, "x");

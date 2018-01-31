@@ -12,7 +12,8 @@ TEST(rowVectorBlockVarDecl, createVar1) {
   stan::lang::range vec_bounds(lb, ub);
   stan::lang::int_literal int_len(5);
   stan::lang::expression vec_len(int_len);
-  stan::lang::row_vector_block_var_decl x("x", vec_bounds, vec_len);
+  stan::lang::row_vector_block_type tRowVec(vec_bounds, vec_len);
+  stan::lang::row_vector_block_var_decl x("x", tRowVec);
 
   // check row_vector_bloc_var_decl
   EXPECT_EQ(x.name_, "x");

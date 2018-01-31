@@ -10,11 +10,11 @@ namespace stan {
     double_local_var_decl::double_local_var_decl() { }
 
     double_local_var_decl::double_local_var_decl(const std::string& name)
-      : var_decl(name, bare_expr_type(double_type())) { }
+      : var_decl(name, double_type()) { }
 
     double_local_var_decl::double_local_var_decl(const std::string& name,
                                                  const expression& def)
-      : var_decl(name, bare_expr_type(double_type()), def) { }
+      : var_decl(name, double_type(), def) { }
   }
 }
 #endif

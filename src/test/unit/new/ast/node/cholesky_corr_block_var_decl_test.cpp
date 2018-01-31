@@ -7,7 +7,8 @@
 TEST(choleskyCorrBlockVarDecl, createVar1) {
   stan::lang::int_literal int_len(5);
   stan::lang::expression K(int_len);
-  stan::lang::cholesky_corr_block_var_decl x("x", K);
+  stan::lang::cholesky_corr_block_type ccbt(K);
+  stan::lang::cholesky_corr_block_var_decl x("x", ccbt);
 
   // check cholesky_corr_bloc_var_decl
   EXPECT_EQ(x.name_, "x");

@@ -8,7 +8,8 @@ TEST(arrayLocalVarDecl, createVar1) {
   stan::lang::double_type dbt;
   stan::lang::local_var_type lvtDouble(dbt);
   stan::lang::expression array_len(stan::lang::int_literal(7));
-  stan::lang::array_local_var_decl x("x", lvtDouble, array_len);
+  stan::lang::local_array_type lat(lvtDouble, array_len);
+  stan::lang::array_local_var_decl x("x", lat);
 
   // check local_array_type
   EXPECT_EQ(x.type_.dims(), 1);
@@ -40,7 +41,8 @@ TEST(arrayLocalVarDecl, createVar2) {
 
   stan::lang::matrix_local_type lvtMatrix(M, N);
   stan::lang::expression array_len(stan::lang::int_literal(7));
-  stan::lang::array_local_var_decl x("x", lvtMatrix, array_len);
+  stan::lang::local_array_type lat(lvtMatrix, array_len);
+  stan::lang::array_local_var_decl x("x", lat);
 
   // check local_array_type
   EXPECT_TRUE(x.type_.element_type_.bare_type().is_matrix_type());

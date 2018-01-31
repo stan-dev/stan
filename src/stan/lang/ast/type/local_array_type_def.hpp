@@ -31,6 +31,10 @@ namespace stan {
       return cur_type;
     }
 
+    local_var_type local_array_type::element_type() const {
+      return element_type_;
+    }
+
     expression local_array_type::array_len() const {
       return array_len_;
     }

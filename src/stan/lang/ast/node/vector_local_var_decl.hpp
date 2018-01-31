@@ -25,25 +25,24 @@ namespace stan {
 
       /**
        * Construct a column vector declaration with
-       * the specified name and number of rows.
+       * the specified name and type.
        *
        * @param name variable name
-       * @param N number of rows
+       * @param type variable type
        */
       vector_local_var_decl(const std::string& name,
-                            const expression& N);
+                            const vector_local_type& type);
 
       /**
        * Construct a column vector declaration with
-       * the specified name, number of rows, and definition.
-       * Definition is nil if var isn't initialized via declaration.
+       * the specified name, type and definition.
        *
        * @param name variable name
-       * @param N number of rows
+       * @param type variable type
        * @param def defition of variable
        */
       vector_local_var_decl(const std::string& name,
-                            const expression& N,
+                            const vector_local_type& type,
                             const expression& def);
     };
   }

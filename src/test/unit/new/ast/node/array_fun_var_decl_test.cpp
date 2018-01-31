@@ -7,8 +7,8 @@
 TEST(arrayFunVarDecl, createVar1) {
   // 1-d array of real
   stan::lang::double_type dbl;
-  stan::lang::bare_expr_type betDbl(dbl);
-  stan::lang::array_fun_var_decl x("x", betDbl);
+  stan::lang::bare_array_type batDbl(dbl);
+  stan::lang::array_fun_var_decl x("x", batDbl);
 
   // check array_fun_var_decl
   EXPECT_TRUE(x.bare_type_.is_array_type());
@@ -32,8 +32,8 @@ TEST(arrayFunVarDecl, createVar1) {
 
 TEST(arrayFunVarDecl, createVar2) {
   stan::lang::matrix_type tMat;
-  stan::lang::bare_expr_type betMat(tMat);
-  stan::lang::array_fun_var_decl x("x", betMat);
+  stan::lang::bare_array_type batMat(tMat);
+  stan::lang::array_fun_var_decl x("x", batMat);
 
   //  check fun_array_type
   EXPECT_TRUE(x.bare_type_.is_array_type());

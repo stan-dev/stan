@@ -11,18 +11,16 @@ namespace stan {
 
     array_local_var_decl::array_local_var_decl(
                           const std::string& name,
-                          const local_var_type& el_type,
-                          const expression& len)
-      : var_decl(name, bare_array_type(el_type.bare_type())),
-        type_(local_array_type(el_type, len)) { }
+                          const local_array_type& type)
+      : var_decl(name, bare_array_type(type.element_type().bare_type())),
+        type_(type.element_type(), type.array_len()) { }
 
     array_local_var_decl::array_local_var_decl(
                           const std::string& name,
-                          const local_var_type& el_type,
-                          const expression& len,
+                          const local_array_type& type,
                           const expression& def)
-      : var_decl(name, bare_array_type(el_type.bare_type()), def),
-        type_(local_array_type(el_type, len)) { }
+      : var_decl(name, bare_array_type(type.element_type().bare_type()), def),
+        type_(type.element_type(), type.array_len()) { }
   }
 }
 #endif

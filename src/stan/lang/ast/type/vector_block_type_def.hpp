@@ -10,6 +10,10 @@ namespace stan {
     vector_block_type::vector_block_type(const range& bounds,
                                          const expression& N)
       : bounds_(bounds), N_(N) { }
+
+    range vector_block_type::bounds() const { return bounds_; }
+
+    expression vector_block_type::N() const { return N_; }
   }
 }
 #endif

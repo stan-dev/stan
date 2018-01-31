@@ -27,6 +27,11 @@ namespace stan {
        * @param K cov matrix size
        */
       cov_matrix_block_type(const expression& K);
+
+      /**
+       * Get K (cov matrix num rows, columns)
+       */
+      expression K() const;
     };
 
   }

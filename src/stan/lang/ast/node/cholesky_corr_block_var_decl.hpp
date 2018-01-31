@@ -26,28 +26,25 @@ namespace stan {
 
       /**
        * Construct a Cholesky factor variable declaration for a
-       * correlation matrix with the specified name and size.
-       * The type specifies the size (number of rows and columns).
+       * correlation matrix with the specified name and type.
        *
        * @param name variable name
-       * @param K corr matrix size
+       * @param type variable type
        */
       cholesky_corr_block_var_decl(const std::string& name,
-                                   const expression& K);
+                                   const cholesky_corr_block_type& type);
 
 
       /**
        * Construct a Cholesky factor variable declaration for a
-       * correlation matrix with the specified name, size, and definition.
-       * The type specifies the size (number of rows and columns).
-       * Definition is nil if var isn't initialized via declaration.
+       * correlation matrix with the specified name, type, and definition.
        *
        * @param name variable name
-       * @param K corr matrix size
+       * @param type variable type
        * @param def defition of variable
        */
       cholesky_corr_block_var_decl(const std::string& name,
-                                   const expression& K,
+                                   const cholesky_corr_block_type& type,
                                    const expression& def);
     };
   }

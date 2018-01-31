@@ -10,6 +10,8 @@ namespace stan {
     positive_ordered_block_type::positive_ordered_block_type(
                                  const expression& K)
       : K_(K) { }
+
+    expression positive_ordered_block_type::K() const { return K_; }
   }
 }
 #endif

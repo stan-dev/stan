@@ -34,6 +34,16 @@ namespace stan {
        */
       cholesky_factor_block_type(const expression& M,
                                  const expression& N);
+
+      /**
+       * Get M (num rows).
+       */
+      expression M() const;
+
+      /**
+       * Get N (num cols).
+       */
+      expression N() const;
     };
 
   }

@@ -7,14 +7,15 @@
 TEST(unitVectorBlockVarDecl, createVar1) {
   stan::lang::int_literal int_len(5);
   stan::lang::expression K(int_len);
-  stan::lang::unit_vector_block_var_decl x("x", K);
+  stan::lang::simplex_block_type sbt(K);
+  stan::lang::simplex_block_var_decl x("x", sbt);
 
-  // check unit_vector_bloc_var_decl
+  // check simplex_bloc_var_decl
   EXPECT_EQ(x.name_, "x");
   EXPECT_TRUE(x.bare_type_.is_vector_type());
   EXPECT_TRUE(is_nil(x.def_));
 
-  // check unit_vector_block_var_type
+  // check simplex_block_var_type
   stan::lang::expression x_size = x.type_.K_;
   EXPECT_TRUE(x_size.bare_type().is_int_type());
 

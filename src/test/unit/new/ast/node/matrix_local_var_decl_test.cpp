@@ -7,7 +7,8 @@
 TEST(matrixLocalVarDecl, createVar1) {
   stan::lang::expression M(stan::lang::int_literal(3));
   stan::lang::expression N(stan::lang::int_literal(4));
-  stan::lang::matrix_local_var_decl x("x", M, N);
+  stan::lang::matrix_local_type tMatrix(M, N);
+  stan::lang::matrix_local_var_decl x("x", tMatrix);
 
   // check matrix_local_var_decl
   EXPECT_EQ(x.name_, "x");

@@ -24,25 +24,24 @@ namespace stan {
 
       /**
        * Construct a unit vector declaration with
-       * the specified name and size.
+       * the specified name and type.
        *
        * @param name variable name
-       * @param K vector size
+       * @param type variable type
        */
       unit_vector_block_var_decl(const std::string& name,
-                                 const expression& K);
+                                 const unit_vector_block_type& type);
 
       /**
        * Construct a unit vector declaration with
-       * the specified name, size, and definition.
-       * Definition is nil if var isn't initialized via declaration.
+       * the specified name, type, and definition.
        *
        * @param name variable name
-       * @param K vector size
+       * @param type variable type
        * @param def defition of variable
        */
       unit_vector_block_var_decl(const std::string& name,
-                                 const expression& K,
+                                 const unit_vector_block_type& type,
                                  const expression& def);
     };
   }

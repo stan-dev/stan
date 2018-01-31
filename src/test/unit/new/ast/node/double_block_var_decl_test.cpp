@@ -10,7 +10,8 @@ TEST(doubleBlockVarDecl, createVar1) {
   stan::lang::expression lb(real_lb);
   stan::lang::expression ub(real_ub);
   stan::lang::range v_bounds(lb, ub);
-  stan::lang::double_block_var_decl x("x", v_bounds);
+  stan::lang::double_block_type dbt(v_bounds);
+  stan::lang::double_block_var_decl x("x", dbt);
 
   // check double_bloc_var_decl
   EXPECT_EQ(x.name_, "x");

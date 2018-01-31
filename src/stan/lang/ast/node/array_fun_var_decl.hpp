@@ -22,10 +22,10 @@ namespace stan {
        * and type.
        *
        * @param name variable name
-       * @param el_type array element type
+       * @param array_type array element type
        */
       array_fun_var_decl(const std::string& name,
-                         const bare_expr_type& el_type);
+                         const bare_array_type& array_type);
 
     };
   }

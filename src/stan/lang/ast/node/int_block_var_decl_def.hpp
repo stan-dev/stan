@@ -10,15 +10,13 @@ namespace stan {
     int_block_var_decl::int_block_var_decl() { }
 
     int_block_var_decl::int_block_var_decl(const std::string& name,
-                                           const range& bounds)
-      : var_decl(name, bare_expr_type(int_type())),
-        type_(int_block_type(bounds)) { }
+                                           const int_block_type& type)
+      : var_decl(name, int_type()), type_(type.bounds()) { }
 
     int_block_var_decl::int_block_var_decl(const std::string& name,
-                                           const range& bounds,
+                                           const int_block_type& type,
                                            const expression& def)
-      : var_decl(name, bare_expr_type(int_type()), def),
-        type_(int_block_type(bounds)) { }
+      : var_decl(name, int_type(), def), type_(type.bounds()) { }
   }
 }
 #endif

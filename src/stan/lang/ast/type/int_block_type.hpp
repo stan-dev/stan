@@ -26,6 +26,12 @@ namespace stan {
        * @param bounds variable upper and/or lower bounds
        */
       int_block_type(const range& bounds);
+
+      /**
+       * Get bounds constraints.
+       */
+      range bounds() const;
+
     };
 
   }

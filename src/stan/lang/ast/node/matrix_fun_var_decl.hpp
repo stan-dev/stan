@@ -22,15 +22,6 @@ namespace stan {
        * @param name variable name
        */
       matrix_fun_var_decl(const std::string& name);
-
-      /**
-       * Construct a matrix variable declaration with the specified name
-       * and is_data flag.
-       *
-       * @param name variable name
-       * @param is_data true if declared data_only
-       */
-      matrix_fun_var_decl(const std::string& name, bool is_data);
     };
   }
 }

@@ -24,28 +24,24 @@ namespace stan {
 
       /**
        * Construct a matrix local variable declaration with the specified
-       * name, number of rows, number of columns.
+       * name and type.
        *
        * @param name variable name
-       * @param M number of rows
-       * @param N number of columns
+       * @param type variable type
        */
       matrix_local_var_decl(const std::string& name,
-                            const expression& M,
-                            const expression& N);
+                            const matrix_local_type& type);
 
       /**
        * Construct a matrix local variable declaration with the specified
-       * name, number of rows, number of columns, and definition.
+       * name, type, and definition.
        *
        * @param name variable name
-       * @param M number of rows
-       * @param N number of columns
+       * @param type variable type
        * @param def definition
        */
       matrix_local_var_decl(const std::string& name,
-                            const expression& M,
-                            const expression& N,
+                            const matrix_local_type& type,
                             const expression& def);
     };
   }

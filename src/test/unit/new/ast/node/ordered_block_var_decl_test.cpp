@@ -7,7 +7,8 @@
 TEST(orderedBlockVarDecl, createVar1) {
   stan::lang::int_literal int_len(5);
   stan::lang::expression K(int_len);
-  stan::lang::ordered_block_var_decl x("x", K);
+  stan::lang::ordered_block_type tOrd(K);
+  stan::lang::ordered_block_var_decl x("x", tOrd);
 
   // check ordered_bloc_var_decl
   EXPECT_EQ(x.name_, "x");

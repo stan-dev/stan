@@ -27,29 +27,24 @@ namespace stan {
 
       /**
        * Construct a row vector declaration with the specified
-       * name, bounds, and length.
+       * name and type.
        *
        * @param name variable name
-       * @param bounds variable upper and/or lower bounds
-       * @param N row vector length
+       * @param type variable type
        */
       row_vector_block_var_decl(const std::string& name,
-                                const range& bounds,
-                                const expression& N);
+                                const row_vector_block_type& type);
 
       /**
        * Construct a row vector declaration with the specified
-       * name, bounds, length, and definition.
-       * Definition is nil if var isn't initialized via declaration.
+       * name, type, and definition.
        *
        * @param name variable name
-       * @param bounds variable upper and/or lower bounds
-       * @param N row vector length
+       * @param type variable type
        * @param def defition of variable
        */
       row_vector_block_var_decl(const std::string& name,
-                                const range& bounds,
-                                const expression& N,
+                                const row_vector_block_type& type,
                                 const expression& def);
     };
   }

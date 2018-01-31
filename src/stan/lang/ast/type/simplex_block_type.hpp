@@ -24,9 +24,14 @@ namespace stan {
        * Construct a block var type with specified values.
        * Size should be int expression - constructor doesn't check.
        *
-       * @param K size
+       * @param K simplex length
        */
       simplex_block_type(const expression& K);
+
+      /**
+       * Get K (simplex length).
+       */
+      expression K() const;
     };
 
   }

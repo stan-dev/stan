@@ -24,26 +24,24 @@ namespace stan {
 
       /**
        * Construct a positive ordered vector declaration with the specified
-       * name and size.
-       * Definition is nil if var isn't initialized via declaration.
+       * name and type.
        *
        * @param name variable name
-       * @param K vector size
+       * @param type variable type
        */
       positive_ordered_block_var_decl(const std::string& name,
-                                      const expression& K);
+                                      const positive_ordered_block_type& type);
 
       /**
        * Construct a positive ordered vector declaration with the specified
-       * name, size, and definition.
-       * Definition is nil if var isn't initialized via declaration.
+       * name, type, and definition.
        *
        * @param name variable name
-       * @param K vector size
+       * @param type variable type
        * @param def defition of variable
        */
       positive_ordered_block_var_decl(const std::string& name,
-                                      const expression& K,
+                                      const positive_ordered_block_type& type,
                                       const expression& def);
     };
   }

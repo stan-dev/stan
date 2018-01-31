@@ -10,17 +10,14 @@ namespace stan {
     vector_block_var_decl::vector_block_var_decl() { }
 
     vector_block_var_decl::vector_block_var_decl(const std::string& name,
-                                                 const range& bounds,
-                                                 const expression& N)
-      : var_decl(name, bare_expr_type(vector_type())),
-        type_(vector_block_type(bounds, N)) { }
+                                                 const vector_block_type& type)
+      : var_decl(name, vector_type()), type_(type.bounds(), type.N()) { }
 
     vector_block_var_decl::vector_block_var_decl(const std::string& name,
-                                                 const range& bounds,
-                                                 const expression& N,
+                                                 const vector_block_type& type,
                                                  const expression& def)
-      : var_decl(name, bare_expr_type(vector_type()), def),
-        type_(vector_block_type(bounds, N)) { }
+      : var_decl(name, vector_type(), def),
+        type_(type.bounds(), type.N()) { }
   }
 }
 #endif

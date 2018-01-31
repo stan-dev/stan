@@ -27,6 +27,11 @@ namespace stan {
        * @param K size
        */
       unit_vector_block_type(const expression& K);
+
+      /**
+       * Get K (vector length).
+       */
+      expression K() const;
     };
 
   }

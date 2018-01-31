@@ -10,7 +10,7 @@ namespace stan {
     int_fun_var_decl::int_fun_var_decl() { }
 
     int_fun_var_decl::int_fun_var_decl(const std::string& name)
-      : var_decl(name, bare_expr_type(int_type())) { }
+      : var_decl(name, int_type()) { }
   }
 }
 #endif

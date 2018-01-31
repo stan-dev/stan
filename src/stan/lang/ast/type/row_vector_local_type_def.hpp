@@ -9,6 +9,8 @@ namespace stan {
 
     row_vector_local_type::row_vector_local_type(const expression& N)
       : N_(N) { }
+
+    expression row_vector_local_type::N() const { return N_; }
   }
 }
 #endif

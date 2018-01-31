@@ -24,25 +24,25 @@ namespace stan {
 
       /**
        * Construct a variable declaration for a correlation matrix
-       * with the specified name, size, and definition.
+       * with the specified name and type.
        *
        * @param name variable name
-       * @param K corr matrix size
+       * @param type variable type
        */
       corr_matrix_block_var_decl(const std::string& name,
-                                 const expression& K);
+                                 const corr_matrix_block_type& type);
 
       /**
        * Construct a variable declaration for a correlation matrix
-       * with the specified name, size, and definition.
+       * with the specified name, type, and definition.
        * Definition is nil if var isn't initialized via declaration.
        *
        * @param name variable name
-       * @param K corr matrix size
+       * @param type variable type
        * @param def defition of variable
        */
       corr_matrix_block_var_decl(const std::string& name,
-                                 const expression& K,
+                                 const corr_matrix_block_type& type,
                                  const expression& def);
     };
   }

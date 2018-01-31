@@ -35,6 +35,16 @@ namespace stan {
        */
       vector_block_type(const range& bounds,
                         const expression& N);
+
+      /**
+       * Get bounds.
+       */
+      range bounds() const;
+
+      /**
+       * Get N (num cols).
+       */
+      expression N() const;
     };
   }
 }

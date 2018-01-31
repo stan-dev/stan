@@ -27,6 +27,11 @@ namespace stan {
        * @param K corr matrix size
        */
       corr_matrix_block_type(const expression& K);
+
+      /**
+       * Get K (corr matrix num rows, columns)
+       */
+      expression K() const;
     };
 
   }

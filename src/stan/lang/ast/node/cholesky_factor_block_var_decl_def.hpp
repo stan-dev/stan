@@ -12,18 +12,16 @@ namespace stan {
 
     cholesky_factor_block_var_decl::cholesky_factor_block_var_decl(
                                     const std::string& name,
-                                    const expression& M,
-                                    const expression& N)
-      : var_decl(name, bare_expr_type(matrix_type())),
-        type_(cholesky_factor_block_type(M, N)) { }
+                                    const cholesky_factor_block_type& type)
+      : var_decl(name, matrix_type()),
+        type_(type.M(), type.N()) { }
 
     cholesky_factor_block_var_decl::cholesky_factor_block_var_decl(
                                     const std::string& name,
-                                    const expression& M,
-                                    const expression& N,
+                                    const cholesky_factor_block_type& type,
                                     const expression& def)
-      : var_decl(name, bare_expr_type(matrix_type()), def),
-        type_(cholesky_factor_block_type(M, N)) { }
+      : var_decl(name, matrix_type(), def),
+        type_(type.M(), type.N()) { }
   }
 }
 #endif

@@ -9,6 +9,8 @@ namespace stan {
 
     double_block_type::double_block_type(const range& bounds)
       : bounds_(bounds) { }
+
+    range double_block_type::bounds() const { return bounds_; }
   }
 }
 #endif
