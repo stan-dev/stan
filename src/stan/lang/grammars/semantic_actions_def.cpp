@@ -1514,8 +1514,8 @@ namespace stan {
     boost::phoenix::function<remove_loop_identifier> remove_loop_identifier_f;
 
     void validate_int_expr::operator()(const expression& expr,
-                                            bool& pass,
-                                            std::stringstream& error_msgs)
+                                       bool& pass,
+                                       std::stringstream& error_msgs)
       const {
       if (!expr.bare_type().is_int_type()) {
         error_msgs << "expression denoting integer required; found type="

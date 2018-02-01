@@ -29,9 +29,16 @@ namespace stan {
       expression07_grammar<Iterator> expression07_g;  // disallows comparisons
 
       boost::spirit::qi::rule<Iterator,
-                              expression(scope),
+                              boost::spirit::qi::locals<scope>,
+                              std::vector<block_var_decl>,
                               whitespace_grammar<Iterator> >
-      def_r;
+      var_decls_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::locals<bool>,
+                              block_var_decl(scope),
+                              whitespace_grammar<Iterator> >
+      var_decl_r;
 
       boost::spirit::qi::rule<Iterator,
                               double_block_var_decl(scope),
@@ -44,16 +51,6 @@ namespace stan {
       double_type_r;
 
       boost::spirit::qi::rule<Iterator,
-                              std::string(),
-                              whitespace_grammar<Iterator> >
-      identifier_r;
-
-      boost::spirit::qi::rule<Iterator,
-                              std::string(),
-                              whitespace_grammar<Iterator> >
-      identifier_name_r;
-
-      boost::spirit::qi::rule<Iterator,
                               int_block_var_decl(scope),
                               whitespace_grammar<Iterator> >
       int_decl_r;
@@ -64,9 +61,134 @@ namespace stan {
       int_type_r;
 
       boost::spirit::qi::rule<Iterator,
+                              matrix_block_var_decl(scope),
+                              whitespace_grammar<Iterator> >
+      matrix_decl_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              matrix_block_type(scope),
+                              whitespace_grammar<Iterator> >
+      matrix_type_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              row_vector_block_var_decl(scope),
+                              whitespace_grammar<Iterator> >
+      row_vector_decl_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              row_vector_block_type(scope),
+                              whitespace_grammar<Iterator> >
+      row_vector_type_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              vector_block_var_decl(scope),
+                              whitespace_grammar<Iterator> >
+      vector_decl_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              vector_block_type(scope),
+                              whitespace_grammar<Iterator> >
+      vector_type_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              cholesky_corr_block_var_decl(scope),
+                              whitespace_grammar<Iterator> >
+      cholesky_corr_decl_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              cholesky_corr_block_type(scope),
+                              whitespace_grammar<Iterator> >
+      cholesky_corr_type_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              cholesky_factor_block_var_decl(scope),
+                              whitespace_grammar<Iterator> >
+      cholesky_factor_decl_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              cholesky_factor_block_type(scope),
+                              whitespace_grammar<Iterator> >
+      cholesky_factor_type_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              corr_matrix_block_var_decl(scope),
+                              whitespace_grammar<Iterator> >
+      corr_matrix_decl_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              corr_matrix_block_type(scope),
+                              whitespace_grammar<Iterator> >
+      corr_matrix_type_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              cov_matrix_block_var_decl(scope),
+                              whitespace_grammar<Iterator> >
+      cov_matrix_decl_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              cov_matrix_block_type(scope),
+                              whitespace_grammar<Iterator> >
+      cov_matrix_type_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              ordered_block_var_decl(scope),
+                              whitespace_grammar<Iterator> >
+      ordered_decl_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              ordered_block_type(scope),
+                              whitespace_grammar<Iterator> >
+      ordered_type_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              positive_ordered_block_type(scope),
+                              whitespace_grammar<Iterator> >
+      positive_ordered_type_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              positive_ordered_block_var_decl(scope),
+                              whitespace_grammar<Iterator> >
+      positive_ordered_decl_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              simplex_block_var_decl(scope),
+                              whitespace_grammar<Iterator> >
+      simplex_decl_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              simplex_block_type(scope),
+                              whitespace_grammar<Iterator> >
+      simplex_type_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              unit_vector_block_var_decl(scope),
+                              whitespace_grammar<Iterator> >
+      unit_vector_decl_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              unit_vector_block_type(scope),
+                              whitespace_grammar<Iterator> >
+      unit_vector_type_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              std::string(),
+                              whitespace_grammar<Iterator> >
+      identifier_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              std::string(),
+                              whitespace_grammar<Iterator> >
+      identifier_name_r;
+
+      boost::spirit::qi::rule<Iterator,
                               expression(scope),
                               whitespace_grammar<Iterator> >
       opt_def_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              expression(scope),
+                              whitespace_grammar<Iterator> >
+      def_r;
 
       boost::spirit::qi::rule<Iterator,
                               range(scope),
@@ -79,16 +201,14 @@ namespace stan {
       range_brackets_int_r;
 
       boost::spirit::qi::rule<Iterator,
-                              boost::spirit::qi::locals<bool>,
-                              block_var_decl(scope),
+                              expression(scope),
                               whitespace_grammar<Iterator> >
-      var_decl_r;
+      dim1_r;
 
       boost::spirit::qi::rule<Iterator,
-                              boost::spirit::qi::locals<scope>,
-                              std::vector<block_var_decl>,
+                              expression(scope),
                               whitespace_grammar<Iterator> >
-      var_decls_r;
+      int_data_expr_r;
     };
 
   }

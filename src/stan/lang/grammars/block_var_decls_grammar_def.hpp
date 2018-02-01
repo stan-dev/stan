@@ -12,21 +12,114 @@
 #include <string>
 #include <vector>
 
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::cholesky_corr_block_var_decl,
+                          (stan::lang::cholesky_corr_block_type, type_)
+                          (std::string, name_)
+                          (stan::lang::expression, def_))
+
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::cholesky_factor_block_var_decl,
+                          (stan::lang::cholesky_factor_block_type, type_)
+                          (std::string, name_)
+                          (stan::lang::expression, def_))
+
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::corr_matrix_block_var_decl,
+                          (stan::lang::corr_matrix_block_type, type_)
+                          (std::string, name_)
+                          (stan::lang::expression, def_))
+
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::cov_matrix_block_var_decl,
+                          (stan::lang::cov_matrix_block_type, type_)
+                          (std::string, name_)
+                          (stan::lang::expression, def_))
+
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::double_block_var_decl,
                           (stan::lang::double_block_type, type_)
                           (std::string, name_)
                           (stan::lang::expression, def_))
-
-BOOST_FUSION_ADAPT_STRUCT(stan::lang::double_block_type,
-                          (stan::lang::range, bounds_))
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::int_block_var_decl,
                           (stan::lang::int_block_type, type_)
                           (std::string, name_)
                           (stan::lang::expression, def_))
 
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::matrix_block_var_decl,
+                          (stan::lang::matrix_block_type, type_)
+                          (std::string, name_)
+                          (stan::lang::expression, def_))
+
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::ordered_block_var_decl,
+                          (stan::lang::ordered_block_type, type_)
+                          (std::string, name_)
+                          (stan::lang::expression, def_))
+
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::positive_ordered_block_var_decl,
+                          (stan::lang::positive_ordered_block_type, type_)
+                          (std::string, name_)
+                          (stan::lang::expression, def_))
+
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::row_vector_block_var_decl,
+                          (stan::lang::row_vector_block_type, type_)
+                          (std::string, name_)
+                          (stan::lang::expression, def_))
+
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::simplex_block_var_decl,
+                          (stan::lang::simplex_block_type, type_)
+                          (std::string, name_)
+                          (stan::lang::expression, def_))
+
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::unit_vector_block_var_decl,
+                          (stan::lang::unit_vector_block_type, type_)
+                          (std::string, name_)
+                          (stan::lang::expression, def_))
+
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::vector_block_var_decl,
+                          (stan::lang::vector_block_type, type_)
+                          (std::string, name_)
+                          (stan::lang::expression, def_))
+
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::double_block_type,
+                          (stan::lang::range, bounds_))
+
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::int_block_type,
                           (stan::lang::range, bounds_))
+
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::matrix_block_type,
+                          (stan::lang::range, bounds_)
+                          (stan::lang::expression, M_)
+                          (stan::lang::expression, N_))
+
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::row_vector_block_type,
+                          (stan::lang::range, bounds_)
+                          (stan::lang::expression, N_))
+
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::vector_block_type,
+                          (stan::lang::range, bounds_)
+                          (stan::lang::expression, N_))
+
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::cholesky_corr_block_type,
+                          (stan::lang::expression, K_))
+
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::cholesky_factor_block_type,
+                          (stan::lang::expression, M_)
+                          (stan::lang::expression, N_))
+
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::corr_matrix_block_type,
+                          (stan::lang::expression, K_))
+
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::cov_matrix_block_type,
+                          (stan::lang::expression, K_))
+
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::ordered_block_type,
+                          (stan::lang::expression, K_))
+
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::positive_ordered_block_type,
+                          (stan::lang::expression, K_))
+
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::simplex_block_type,
+                          (stan::lang::expression, K_))
+
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::unit_vector_block_type,
+                          (stan::lang::expression, K_))
 
 namespace stan {
 
@@ -72,11 +165,60 @@ namespace stan {
            | raw[double_decl_r(_r1)
                 [add_block_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r1,
                            boost::phoenix::ref(error_msgs_))]]
-              [add_line_number_f(_val, begin(_1), end(_1))])
+              [add_line_number_f(_val, begin(_1), end(_1))]
+           | raw[vector_decl_r(_r1)
+                [add_block_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r1,
+                           boost::phoenix::ref(error_msgs_))]]
+                [add_line_number_f(_val, begin(_1), end(_1))]
+           | raw[row_vector_decl_r(_r1)
+                [add_block_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r1,
+                           boost::phoenix::ref(error_msgs_))]]
+                [add_line_number_f(_val, begin(_1), end(_1))]
+           | raw[matrix_decl_r(_r1)
+                [add_block_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r1,
+                           boost::phoenix::ref(error_msgs_))]]
+                [add_line_number_f(_val, begin(_1), end(_1))]
+           | raw[unit_vector_decl_r(_r1)
+                [add_block_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r1,
+                           boost::phoenix::ref(error_msgs_))]]
+                [add_line_number_f(_val, begin(_1), end(_1))]
+           | raw[simplex_decl_r(_r1)
+                [add_block_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r1,
+                           boost::phoenix::ref(error_msgs_))]]
+                [add_line_number_f(_val, begin(_1), end(_1))]
+           | raw[ordered_decl_r(_r1)
+                [add_block_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r1,
+                           boost::phoenix::ref(error_msgs_))]]
+                [add_line_number_f(_val, begin(_1), end(_1))]
+           | raw[positive_ordered_decl_r(_r1)
+                [add_block_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r1,
+                           boost::phoenix::ref(error_msgs_))]]
+                [add_line_number_f(_val, begin(_1), end(_1))]
+           | raw[cholesky_factor_decl_r(_r1)
+                [add_block_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r1,
+                           boost::phoenix::ref(error_msgs_))]]
+                [add_line_number_f(_val, begin(_1), end(_1))]
+           | raw[cholesky_corr_decl_r(_r1)
+                [add_block_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r1,
+                           boost::phoenix::ref(error_msgs_))]]
+                [add_line_number_f(_val, begin(_1), end(_1))]
+           | raw[cov_matrix_decl_r(_r1)
+                [add_block_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r1,
+                           boost::phoenix::ref(error_msgs_))]]
+                [add_line_number_f(_val, begin(_1), end(_1))]
+           | raw[corr_matrix_decl_r(_r1)
+                [add_block_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r1,
+                           boost::phoenix::ref(error_msgs_))]]
+                [add_line_number_f(_val, begin(_1), end(_1))])
         > eps
           [validate_definition_f(_r1, _val, _pass,
                                  boost::phoenix::ref(error_msgs_))]
         > lit(';');
+
+   //************************* block var decls **************************************
+
+      // var_decl rules more complicated - first check for array dimensions
+      // local var _b tracts block_var_type???      
 
       // _r1 var scope
       int_decl_r.name("integer declaration");
@@ -85,12 +227,6 @@ namespace stan {
         > identifier_r
         > opt_def_r(_r1);
 
-      int_type_r.name("integer type");
-      int_type_r
-        %= (lit("int")
-            >> no_skip[!char_("a-zA-Z0-9_")])
-        > -range_brackets_int_r(_r1);
-
       // _r1 var scope
       double_decl_r.name("real declaration");
       double_decl_r
@@ -98,12 +234,182 @@ namespace stan {
         > identifier_r
         > opt_def_r(_r1);
 
+      // _r1 var scope
+      matrix_decl_r.name("matrix declaration");
+      matrix_decl_r
+        %= matrix_type_r(_r1)
+        > identifier_r
+        > opt_def_r(_r1);
+
+      // _r1 var scope
+      row_vector_decl_r.name("row vector declaration");
+      row_vector_decl_r
+        %= row_vector_type_r(_r1)
+        > identifier_r
+        > opt_def_r(_r1);
+
+      // _r1 var scope
+      vector_decl_r.name("vector declaration");
+      vector_decl_r
+        %= vector_type_r(_r1)
+        > identifier_r
+        > opt_def_r(_r1);
+
+
+      // _r1 var scope
+      cholesky_corr_decl_r.name("cholesky factor for"
+                                " correlation matrix declaration");
+      cholesky_corr_decl_r
+        %= cholesky_corr_type_r(_r1)
+        > identifier_r
+        > opt_def_r(_r1);
+
+      // _r1 var scope
+      cholesky_factor_decl_r.name("cholesky factor for"
+                                  " poisitive-def matrix declaration");
+      cholesky_factor_decl_r
+        %= cholesky_factor_type_r(_r1)
+        > identifier_r
+        > opt_def_r(_r1);
+
+      // _r1 var scope
+      corr_matrix_decl_r.name("correlation matrix declaration");
+      corr_matrix_decl_r
+        %= corr_matrix_type_r(_r1)
+        > identifier_r
+        > opt_def_r(_r1);
+
+      // _r1 var scope
+      cov_matrix_decl_r.name("covariance matrix declaration");
+      cov_matrix_decl_r
+        %= cov_matrix_type_r(_r1)
+        > identifier_r
+        > opt_def_r(_r1);
+
+      // _r1 var scope
+      ordered_decl_r.name("ordered declaration");
+      ordered_decl_r
+        %= ordered_type_r(_r1)
+        > identifier_r
+        > opt_def_r(_r1);
+
+      // _r1 var scope
+      positive_ordered_decl_r.name("positive ordered declaration");
+      positive_ordered_decl_r
+        %= positive_ordered_type_r(_r1)
+        > identifier_r
+        > opt_def_r(_r1);
+
+      // _r1 var scope
+      simplex_decl_r.name("simplex declaration");
+      simplex_decl_r
+        %= simplex_type_r(_r1)
+        > identifier_r
+        > opt_def_r(_r1);
+
+      // _r1 var scope
+      unit_vector_decl_r.name("unit vector declaration");
+      unit_vector_decl_r
+        %= unit_vector_type_r(_r1)
+        > identifier_r
+        > opt_def_r(_r1);
+      
+   //************************* types **************************************
+      
+      int_type_r.name("integer type");
+      int_type_r
+        %= (lit("int")
+            >> no_skip[!char_("a-zA-Z0-9_")])
+        > -range_brackets_int_r(_r1);
+
       double_type_r.name("real type");
       double_type_r
         %= (lit("real")
             >> no_skip[!char_("a-zA-Z0-9_")])
         > -range_brackets_double_r(_r1);
 
+      vector_type_r.name("vector type");
+      vector_type_r
+        %= (lit("vector")
+            >> no_skip[!char_("a-zA-Z0-9_")])
+        > -range_brackets_double_r(_r1)
+        > dim1_r(_r1);
+
+      row_vector_type_r.name("row vector type");
+      row_vector_type_r
+        %= (lit("row_vector")
+            >> no_skip[!char_("a-zA-Z0-9_")])
+        > -range_brackets_double_r(_r1)
+        > dim1_r(_r1);
+
+      matrix_type_r.name("matrix type");
+      matrix_type_r
+        %= (lit("matrix")
+            >> no_skip[!char_("a-zA-Z0-9_")])
+        > -range_brackets_double_r(_r1)
+        > lit('[')
+        > int_data_expr_r(_r1)
+        > lit(',')
+        > int_data_expr_r(_r1)
+        > lit(']');
+
+      ordered_type_r.name("ordered type");
+      ordered_type_r
+        %= (lit("ordered")
+            >> no_skip[!char_("a-zA-Z0-9_")])
+        > dim1_r(_r1);
+
+      positive_ordered_type_r.name("positive ordered type");
+      positive_ordered_type_r
+        %= (lit("positive_ordered")
+            >> no_skip[!char_("a-zA-Z0-9_")])
+        > dim1_r(_r1);
+
+      simplex_type_r.name("simplex type");
+      simplex_type_r
+        %= (lit("simplex")
+            >> no_skip[!char_("a-zA-Z0-9_")])
+        > dim1_r(_r1);
+
+      unit_vector_type_r.name("unit_vector type");
+      unit_vector_type_r
+        %= (lit("unit_vector")
+            >> no_skip[!char_("a-zA-Z0-9_")])
+        > dim1_r(_r1);
+
+      corr_matrix_type_r.name("correllation matrix type");
+      corr_matrix_type_r
+        %= (lit("corr_matrix")
+            >> no_skip[!char_("a-zA-Z0-9_")])
+        > dim1_r(_r1);
+
+      cov_matrix_type_r.name("covarience matrix type");
+      cov_matrix_type_r
+        %= (lit("cov_matrix")
+            >> no_skip[!char_("a-zA-Z0-9_")])
+        > dim1_r(_r1);
+
+      cholesky_corr_type_r.name("cholesky factor for"
+                                " correlation matrix declaration");
+      cholesky_corr_type_r
+        %= (lit("cholesky_factor_corr")
+            >> no_skip[!char_("a-zA-Z0-9_")])
+        > dim1_r(_r1);
+
+      cholesky_factor_type_r.name("cholesky factor for symmetric,"
+                                  " positive-def matrix declaration");
+      cholesky_factor_type_r
+        %= (lit("cholesky_factor_corr")
+            >> no_skip[!char_("a-zA-Z0-9_")])
+        > lit('[')
+        > int_data_expr_r(_r1)
+        > -(lit(',') > int_data_expr_r(_r1))
+        > lit(']')
+        > eps
+        [copy_square_cholesky_dimension_if_necessary_f(_val)];
+
+   //************************* helpers **************************************
+      
       // _r1 var scope
       opt_def_r.name("variable definition (optional)");
       opt_def_r %= -def_r(_r1);
@@ -161,6 +467,17 @@ namespace stan {
                                         boost::phoenix::ref(error_msgs_))])
             )
         > lit('>');
+
+      // _r1 var scope
+      dim1_r.name("vector length declaration: integer (data-only) in square brackets");
+      dim1_r %= lit('[') > int_data_expr_r(_r1) > lit(']');
+
+      // _r1 var scope
+      int_data_expr_r.name("integer data expression");
+      int_data_expr_r
+        %= expression_g(_r1)
+           [validate_int_expr_f(_1, _pass,
+                                boost::phoenix::ref(error_msgs_))];
 
       identifier_r.name("identifier");
       identifier_r

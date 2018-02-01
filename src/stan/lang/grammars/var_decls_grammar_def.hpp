@@ -340,9 +340,9 @@ namespace stan {
       int_data_expr_r.name("integer data expression");
       int_data_expr_r
         %= expression_g(_r1)
-           [validate_int_data_expr_f(_1, _r1, _pass,
-                                     boost::phoenix::ref(var_map_),
-                                     boost::phoenix::ref(error_msgs_))];
+           [validate_int_expr_f(_1, _r1, _pass,
+                                boost::phoenix::ref(var_map_),
+                                boost::phoenix::ref(error_msgs_))];
 
       // _r1 var scope
       dim1_r.name("size declaration: integer (data-only) in square brackets");
