@@ -733,6 +733,7 @@ nested_statement
     ?('else' statement)
   | 'while' '(' expression ')' statement
   | 'for' '(' identifier 'in' expression ':' expression ')' statement
+  | 'for' '(' identifier 'in' expression ')' statement
   | '{' var_decl* statement+ '}'
 \end{Verbatim}
 %
@@ -785,6 +786,13 @@ Both the conditional if-then-else statement and while-loop statement
 require the expression denoting the condition to be a primitive type,
 integer or real.
 
+\subsection{For Loop Containers}
+
+The for loop statement requires that we specify in addition to the
+loop identifier, either a range consisting of two expressions
+denoting an integer, separated by ':', or a single expression denoting
+a container.
+
 \subsection{Print Arguments}
 
 The arguments to a print statement cannot be void.
@@ -820,7 +828,7 @@ parameters; in this case
   \code{vector}, \code{vector}, \code{real[]}, \code{int[]}
 \end{quote}
   respectively and
-  \item the second, fourth, and fifth arguments must be expressions
+  \item the fourth and fifth arguments must be expressions
   containing only variables originating from the data or transformed
   data blocks.
 \end{itemize}

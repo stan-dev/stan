@@ -1464,6 +1464,61 @@ namespace stan {
     }
     boost::phoenix::function<add_loop_identifier> add_loop_identifier_f;
 
+    void add_array_loop_identifier
+      ::operator()(const stan::lang::expression& expr,
+                   std::string& name,
+                   const scope& var_scope,
+                   bool& pass, variable_map& vm,
+                   std::stringstream& error_msgs) const {
+      int numdims = expr.expression_type().num_dims();
+      pass = !(vm.exists(name));
+      if (!pass)
+        error_msgs << "ERROR: loop variable already declared."
+                   << " variable name=\"" << name << "\"" << std::endl;
+      if (!(numdims > 0)) {
+        pass = false;
+      } else {
+        std::vector<expression> dimvector(numdims - 1);
+        vm.add(name, base_var_decl(name, dimvector,
+                                   expr.expression_type().type()),
+               scope(var_scope.program_block(), true));
+      }
+    }
+    boost::phoenix::function<add_array_loop_identifier>
+      add_array_loop_identifier_f;
+
+    void add_matrix_loop_identifier
+      ::operator()(const stan::lang::expression& expr,
+                   std::string& name,
+                   const scope& var_scope,
+                   bool& pass, variable_map& vm,
+                   std::stringstream& error_msgs) const {
+      pass = !(vm.exists(name));
+      if (!pass) {
+        error_msgs << "ERROR: loop variable already declared."
+                   << " variable name=\"" << name << "\"" << std::endl;
+      } else if (!(expr.expression_type().num_dims() == 0)
+            || !(expr.expression_type().type().is_matrix_type()
+                 || expr.expression_type().type().is_vector_type()
+                 || expr.expression_type().type().is_row_vector_type())) {
+        pass = false;
+        error_msgs << "ERROR: loop must be over container or range."
+                   << std::endl;
+      } else {
+        vm.add(name, base_var_decl(name, std::vector<expression>(),
+                                   double_type()),
+               scope(var_scope.program_block(), true));
+      }
+    }
+    boost::phoenix::function<add_matrix_loop_identifier>
+      add_matrix_loop_identifier_f;
+
+    void store_loop_identifier::operator()(const std::string& name,
+                                           std::string& name_local) const {
+      name_local = name;
+    }
+    boost::phoenix::function<store_loop_identifier> store_loop_identifier_f;
+
     void remove_loop_identifier::operator()(const std::string& name,
                                             variable_map& vm) const {
       vm.remove(name);
@@ -1483,6 +1538,19 @@ namespace stan {
       pass = true;
     }
     boost::phoenix::function<validate_int_expr> validate_int_expr_f;
+
+    void validate_int_expr_no_error_msgs::operator()(const expression& expr,
+                                            bool& pass,
+                                            std::stringstream& error_msgs)
+      const {
+      if (!expr.expression_type().is_primitive_int()) {
+        pass = false;
+        return;
+      }
+      pass = true;
+    }
+    boost::phoenix::function<validate_int_expr_no_error_msgs>
+      validate_int_expr_no_error_msgs_f;
 
     void deprecate_increment_log_prob::operator()(
                                        std::stringstream& error_msgs) const {
@@ -1793,13 +1861,6 @@ namespace stan {
       }
 
       // test data-only variables do not have parameters (int locals OK)
-      if (has_var(alg_fun.y_, var_map)) {
-        error_msgs << "second argument to algebra_solver"
-                   << " (initial guess)"
-                   << " must be data only and not reference parameters"
-                   << std::endl;
-        pass = false;
-      }
       if (has_var(alg_fun.x_r_, var_map)) {
         error_msgs << "fourth argument to algebra_solver"
                    << " (real data)"

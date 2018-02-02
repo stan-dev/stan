@@ -13,13 +13,13 @@ TEST(langParserStatement2Grammar, addConditionalCondition) {
 TEST(langParserStatementGrammar, validateIntExpr2) {
   test_parsable("validate_int_expr2_good");
   test_throws("validate_int_expr2_bad1",
-              "expression denoting integer required");
+              "loop must be over container or range");
   test_throws("validate_int_expr2_bad2",
-              "expression denoting integer required");
+              "loop must be over container or range");
   test_throws("validate_int_expr2_bad3",
               "dimension declaration requires expression denoting integer");
   test_throws("validate_int_expr2_bad4",
-              "expression denoting integer required");
+              "loop must be over container or range");
 }
 
 TEST(langParserStatementGrammar, validateAllowSample) {

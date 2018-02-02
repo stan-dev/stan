@@ -1,4 +1,12 @@
 PYTHON2 ?= python
+# Check version because new distros have python to default to Python3
+PYTHON_VERSION := $(shell $(PYTHON2) -c "print(__import__('sys').version.split(' ' )[0].split('.')[0])")
+ifeq ($(PYTHON_VERSION),)
+  $(warning Python2 required by cpplint, but PYTHON2=$(PYTHON2) not found. See 'make help')
+endif
+ifeq ($(PYTHON_VERSION),3)
+  $(warning Python2 required by cpplint, but PYTHON2=$(PYTHON2) is Python3. See 'make help')
+endif
 
 .PHONY: cpplint
 cpplint:

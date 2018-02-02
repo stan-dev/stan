@@ -8,6 +8,8 @@
 #include <stan/lang/ast/node/break_continue_statement.hpp>
 #include <stan/lang/ast/node/conditional_statement.hpp>
 #include <stan/lang/ast/node/for_statement.hpp>
+#include <stan/lang/ast/node/for_array_statement.hpp>
+#include <stan/lang/ast/node/for_matrix_statement.hpp>
 #include <stan/lang/ast/node/statement.hpp>
 #include <stan/lang/ast/node/statements.hpp>
 #include <stan/lang/ast/node/return_statement.hpp>
@@ -99,7 +101,17 @@ namespace stan {
       return returns_type(return_type_, st.statement_, error_msgs_);
     }
 
-    bool returns_type_vis::operator()(const while_statement& st) const  {
+    bool returns_type_vis::operator()(const for_array_statement& st) const  {
+      // body must end in appropriate return
+      return returns_type(return_type_, st.statement_, error_msgs_);
+    }
+
+    bool returns_type_vis::operator()(const for_matrix_statement& st) const  {
+      // body must end in appropriate return
+      return returns_type(return_type_, st.statement_, error_msgs_);
+    }
+
+     bool returns_type_vis::operator()(const while_statement& st) const  {
       // body must end in appropriate return
       return returns_type(return_type_, st.body_, error_msgs_);
     }

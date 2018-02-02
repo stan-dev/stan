@@ -18,10 +18,19 @@ namespace stan {
      */
     struct constrained_param_names_visgen : public visgen {
       /**
+       * Indentation level.
+       */
+      size_t indent_;
+
+      /**
        * Construct a constrained parameter names generator for the
        * specified stream.
+       *
+       * @param[in] indent level of indentation
+       * @param[in,out] o stream for generating
        */
-      explicit constrained_param_names_visgen(std::ostream& o) : visgen(o) { }
+      explicit constrained_param_names_visgen(size_t indent, std::ostream& o)
+        : visgen(o), indent_(indent) { }
 
       /**
        * Generate the parameter names for the specified parameter
@@ -41,29 +50,29 @@ namespace stan {
           combo_dims.push_back(matrix_dims[i]);
 
         for (size_t i = combo_dims.size(); i-- > 0; ) {
-          generate_indent(1 + combo_dims.size() - i, o_);
+          generate_indent(indent_ + combo_dims.size() - i, o_);
           o_ << "for (int k_" << i << "__ = 1;"
              << " k_" << i << "__ <= ";
           generate_expression(combo_dims[i].expr_, NOT_USER_FACING, o_);
           o_ << "; ++k_" << i << "__) {" << EOL;  // begin (1)
         }
 
-        generate_indent(2 + combo_dims.size(), o_);
+        generate_indent(indent_ + 1 + combo_dims.size(), o_);
         o_ << "param_name_stream__.str(std::string());" << EOL;
 
-        generate_indent(2 + combo_dims.size(), o_);
+        generate_indent(indent_ + 1 + combo_dims.size(), o_);
         o_ << "param_name_stream__ << \"" << name << '"';
 
         for (size_t i = 0; i < combo_dims.size(); ++i)
           o_ << " << '.' << k_" << i << "__";
         o_ << ';' << EOL;
 
-        generate_indent(2 + combo_dims.size(), o_);
+        generate_indent(indent_ + 1 + combo_dims.size(), o_);
         o_ << "param_names__.push_back(param_name_stream__.str());" << EOL;
 
         // end for loop dims
         for (size_t i = 0; i < combo_dims.size(); ++i) {
-          generate_indent(1 + combo_dims.size() - i, o_);
+          generate_indent(indent_ + combo_dims.size() - i, o_);
           o_ << "}" << EOL;  // end (1)
         }
       }
