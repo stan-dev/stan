@@ -1054,6 +1054,11 @@ add("squared_distance", expr_type(double_type()), expr_type(row_vector_type()), 
 add_unary_vectorized("sqrt");
 add_nullary("sqrt2");
 add_unary_vectorized("square");
+for (size_t i = 0; i < vector_types.size(); ++i) 
+{
+  add("std_normal_log", expr_type(double_type()), vector_types[i]);
+  add("std_normal_lpdf", expr_type(double_type()), vector_types[i]);
+}
 add_unary("step");
 for (size_t i = 0; i < vector_types.size(); ++i) {
   for (size_t j = 0; j < vector_types.size(); ++j) {
