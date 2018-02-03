@@ -886,10 +886,32 @@ namespace stan {
     extern boost::phoenix::function<set_double_range_upper>
     set_double_range_upper_f;
 
-    struct add_block_var : public phoenix_functor_senary {
-      template <typename T>
-      void operator()(block_var_decl& var_decl_result, const T& var_decl,
-                      variable_map& vm, bool& pass, const scope& var_scope,
+    struct validate_array_block_var_decl : public phoenix_functor_septenary {
+      void operator()(block_var_decl& var_decl_result,
+                      const block_var_type& el_type,
+                      const std::string& name,
+                      const std::vector<expression>& dims,
+                      const expression& def,
+                      bool& pass,
+                      std::ostream& error_msgs)
+        const;
+    };
+    extern boost::phoenix::function<validate_array_block_var_decl>
+    validate_array_block_var_decl_f;
+
+    struct validate_single_block_var_decl : public phoenix_functor_ternary {
+      void operator()(block_var_decl& var_decl_result,
+                      bool& pass,
+                      std::ostream& error_msgs)
+        const;
+    };
+    extern boost::phoenix::function<validate_single_block_var_decl>
+    validate_single_block_var_decl_f;
+
+    struct add_block_var : public phoenix_functor_quinary {
+      void operator()(const block_var_decl& block_var_decl,
+                      variable_map& vm, bool& pass,
+                      const scope& var_scope,
                       std::ostream& error_msgs)
         const;
     };

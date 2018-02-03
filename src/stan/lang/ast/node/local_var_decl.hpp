@@ -1,50 +1,19 @@
 #ifndef STAN_LANG_AST_NODE_LOCAL_VAR_DECL_HPP
 #define STAN_LANG_AST_NODE_LOCAL_VAR_DECL_HPP
 
+#include <stan/lang/ast/type/local_var_type.hpp>
 #include <stan/lang/ast/node/expression.hpp>
-#include <boost/variant/recursive_variant.hpp>
+#include <stan/lang/ast/node/var_decl.hpp>
 #include <string>
-#include <vector>
 
 namespace stan {
   namespace lang {
 
-    struct nil;
-    struct array_local_var_decl;
-    struct double_local_var_decl;
-    struct int_local_var_decl;
-    struct matrix_local_var_decl;
-    struct row_vector_local_var_decl;
-    struct vector_local_var_decl;
-    
     /**
-     * The variant structure to hold a variable declaration.
+     * Structure to hold a local variable declaration.
+     * Local variables have specified sizes.
      */
-    struct local_var_decl {
-
-      /**
-       * The variant type for a variable declaration.
-       */
-      typedef boost::variant<
-        boost::recursive_wrapper<nil>,
-        boost::recursive_wrapper<array_local_var_decl>,
-        boost::recursive_wrapper<int_local_var_decl>,
-        boost::recursive_wrapper<double_local_var_decl>,
-        boost::recursive_wrapper<vector_local_var_decl>,
-        boost::recursive_wrapper<row_vector_local_var_decl>,
-        boost::recursive_wrapper<matrix_local_var_decl> >
-      local_var_decl_t;
-
-      /**
-       * The local variable decl type held by this wrapper.
-       */
-      local_var_decl_t var_decl_;
-
-      // do we need data qualifier for local vars?
-      // /**
-      //  * True if variable has "data" qualifier.
-      //  */
-      // bool is_data_;
+    struct local_var_decl : public var_decl {
 
       /**
        * The line in the source code where the declaration begins.
@@ -57,80 +26,37 @@ namespace stan {
       std::size_t end_line_;
 
       /**
+       * Type-specific sizes.
+       */
+      local_var_type type_;
+
+      /**
        * Construct a default variable declaration.
        */
       local_var_decl();
 
       /**
-       * Construct a variable declaration.
+       * Construct a local variable declaration with the specified
+       * name and type.
        *
-       * @param x variable declaration
+       * @param name variable name
+       * @param type variable type
        */
-      local_var_decl(const local_var_decl& x);  // NOLINT(runtime/explicit)
+      local_var_decl(const std::string& name,
+                     const local_var_type& type);
 
       /**
-       * Construct a variable declaration with the specified variant
-       * type holding a declaration.
+       * Construct a local variable declaration with the specified
+       * name, type, and definition.
        *
-       * @param x variable declaration raw variant type
+       * @param name variable name
+       * @param tyep variable type
+       * @param def definition
        */
-      local_var_decl(const local_var_decl_t& x);  // NOLINT(runtime/explicit)
+      local_var_decl(const std::string& name,
+                     const local_var_type& type,
+                     const expression& def);
 
-      /**
-       * Construct a variable declaration with the specified
-       * basic declaration.
-       *
-       * @param x variable declaration
-       */
-      local_var_decl(const nil& x);  // NOLINT(runtime/explicit)
-
-      /**
-       * Construct a variable declaration with the specified
-       * basic declaration.  
-       *
-       * @param x variable declaration
-       */
-      local_var_decl(const int_local_var_decl& x);  // NOLINT(runtime/explicit)
-
-      /**
-       * Construct a variable declaration with the specified
-       * basic declaration.  
-       *
-       * @param x variable declaration
-       */
-      local_var_decl(const double_local_var_decl& x);  // NOLINT(runtime/explicit)
-
-      /**
-       * Construct a variable declaration with the specified
-       * basic declaration.  
-       *
-       * @param x variable declaration
-       */
-      local_var_decl(const vector_local_var_decl& x);  // NOLINT(runtime/explicit)
-
-      /**
-       * Construct a variable declaration with the specified
-       * basic declaration.  
-       *
-       * @param x variable declaration
-       */
-      local_var_decl(const row_vector_local_var_decl& x);  // NOLINT(runtime/explicit)
-
-      /**
-       * Construct a variable declaration with the specified
-       * basic declaration.  
-       *
-       * @param x variable declaration
-       */
-      local_var_decl(const matrix_local_var_decl& x);  // NOLINT(runtime/explicit)
-
-      /**
-       * Construct a variable declaration with the specified
-       * basic declaration.  
-       *
-       * @param x variable declaration
-       */
-      local_var_decl(const array_local_var_decl& x);  // NOLINT(runtime/explicit)
 
       /**
        * Return the variable declaration's bare expr type.
@@ -161,23 +87,12 @@ namespace stan {
       std::string name() const;
 
       /**
-       * Set is_data_ flag on var_decl to true.
-       */
-      bool set_is_data();
-
-      /**
        * Return the variable declaration's local_var_type
+       * which contains size specifications.
        *
-       * @return the variable expression's local_var_type
+       * @return local_var_type
        */
       local_var_type type() const;
-
-      /**
-       * Return the var_decl for this variable declaration
-       *
-       * @return var_decl
-      */
-      var_decl var_decl() const;
     };
 
   }

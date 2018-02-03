@@ -141,6 +141,11 @@ namespace stan {
       bool is_array_type() const;
 
       /**
+       * Returns Stan language type name.
+       */
+      std::string name() const;
+
+      /**
        * Returns total number of dimensions for container type.
        * Returns 0 for scalar types.
        */
@@ -151,6 +156,17 @@ namespace stan {
        */
       std::vector<expression> size() const;
     };
+
+    /**
+     * Stream a user-readable version of the local_var_type to the
+     * specified output stream, returning the specified argument
+     * output stream to allow chaining.
+     *
+     * @param o output stream
+     * @param x expression type
+     * @return argument output stream
+     */
+    std::ostream& operator<<(std::ostream& o, const local_var_type& x);
     
   }
 }

@@ -2,7 +2,6 @@
 #define STAN_LANG_AST_SIGS_FUNCTION_SIGNATURES_HPP
 
 #include <stan/lang/ast/type/bare_expr_type.hpp>
-#include <stan/lang/ast/type/fun_var_type.hpp>
 #include <stan/lang/ast/sigs/function_signature_t.hpp>
 #include <map>
 #include <ostream>
@@ -73,7 +72,7 @@ namespace stan {
        */
       void add(const std::string& name,
                const bare_expr_type& result_type,
-               const std::vector<fun_var_type>& arg_types);
+               const std::vector<bare_expr_type>& arg_types);
 
       /**
        * Add a built-in function with the specifed name and result
@@ -269,7 +268,7 @@ namespace stan {
        * to the signature arguments
        */
       int num_promotions(const std::vector<bare_expr_type>& call_args,
-                         const std::vector<fun_var_type>& sig_args);
+                         const std::vector<bare_expr_type>& sig_args);
 
       /**
        * Return the result expression type resulting from applying a

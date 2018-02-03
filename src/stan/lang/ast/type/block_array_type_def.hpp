@@ -20,7 +20,7 @@ namespace stan {
       }
       else {
         block_array_type tmp(el_type, lens[lens.size()]);
-        for (size_t i = lens.size() - 1; i > 0; --i) {
+        for (size_t i = lens.size() - 2; i > 0; --i) {
           tmp = block_array_type(tmp, lens[i]);
         }
         element_type_ = tmp;

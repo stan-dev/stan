@@ -49,25 +49,19 @@
 #include <stan/lang/ast/fun/block_type_bounds_vis.hpp>
 #include <stan/lang/ast/fun/block_type_has_def_bounds_vis.hpp>
 #include <stan/lang/ast/fun/expression_bare_type_vis.hpp>
-#include <stan/lang/ast/fun/fun_var_type_vis.hpp>
-#include <stan/lang/ast/fun/get_var_decl_vis.hpp>
 #include <stan/lang/ast/fun/is_array_type_vis.hpp>
 #include <stan/lang/ast/fun/is_nil.hpp>
 #include <stan/lang/ast/fun/is_nil_vis.hpp>
 #include <stan/lang/ast/fun/local_array_base_type_vis.hpp>
 #include <stan/lang/ast/fun/local_array_dims_vis.hpp>
 #include <stan/lang/ast/fun/local_array_element_type_vis.hpp>
-#include <stan/lang/ast/fun/set_var_decl_is_data_vis.hpp>
 #include <stan/lang/ast/fun/total_dims_vis.hpp>
-#include <stan/lang/ast/fun/var_decl_bare_type_vis.hpp>
-#include <stan/lang/ast/fun/var_decl_block_type_vis.hpp>
-#include <stan/lang/ast/fun/var_decl_def_vis.hpp>
-#include <stan/lang/ast/fun/var_decl_has_def_vis.hpp>
-#include <stan/lang/ast/fun/var_decl_local_type_vis.hpp>
-#include <stan/lang/ast/fun/var_decl_name_vis.hpp>
+
 #include <stan/lang/ast/fun/var_type_array_len_vis.hpp>
+#include <stan/lang/ast/fun/var_type_name_vis.hpp>
 #include <stan/lang/ast/fun/var_type_size_vis.hpp>
 #include <stan/lang/ast/fun/write_bare_expr_type.hpp>
+#include <stan/lang/ast/fun/write_block_var_type.hpp>
 
 #include <stan/lang/ast/fun/has_non_param_var_vis.hpp>
 #include <stan/lang/ast/fun/has_prob_fun_suffix.hpp>
@@ -108,37 +102,9 @@
 #include <stan/lang/ast/sigs/function_signature_t.hpp>
 #include <stan/lang/ast/sigs/function_signatures.hpp>
 
-#include <stan/lang/ast/node/array_block_var_decl.hpp>
-#include <stan/lang/ast/node/array_fun_var_decl.hpp>
-#include <stan/lang/ast/node/array_local_var_decl.hpp>
-
 #include <stan/lang/ast/node/block_var_decl.hpp>
 #include <stan/lang/ast/node/local_var_decl.hpp>
 #include <stan/lang/ast/node/fun_var_decl.hpp>
-
-#include <stan/lang/ast/node/cholesky_corr_block_var_decl.hpp>
-#include <stan/lang/ast/node/cholesky_factor_block_var_decl.hpp>
-#include <stan/lang/ast/node/corr_matrix_block_var_decl.hpp>
-#include <stan/lang/ast/node/cov_matrix_block_var_decl.hpp>
-#include <stan/lang/ast/node/double_block_var_decl.hpp>
-#include <stan/lang/ast/node/double_fun_var_decl.hpp>
-#include <stan/lang/ast/node/double_local_var_decl.hpp>
-#include <stan/lang/ast/node/int_block_var_decl.hpp>
-#include <stan/lang/ast/node/int_fun_var_decl.hpp>
-#include <stan/lang/ast/node/int_local_var_decl.hpp>
-#include <stan/lang/ast/node/matrix_block_var_decl.hpp>
-#include <stan/lang/ast/node/matrix_fun_var_decl.hpp>
-#include <stan/lang/ast/node/matrix_local_var_decl.hpp>
-#include <stan/lang/ast/node/ordered_block_var_decl.hpp>
-#include <stan/lang/ast/node/positive_ordered_block_var_decl.hpp>
-#include <stan/lang/ast/node/row_vector_block_var_decl.hpp>
-#include <stan/lang/ast/node/row_vector_fun_var_decl.hpp>
-#include <stan/lang/ast/node/row_vector_local_var_decl.hpp>
-#include <stan/lang/ast/node/simplex_block_var_decl.hpp>
-#include <stan/lang/ast/node/unit_vector_block_var_decl.hpp>
-#include <stan/lang/ast/node/vector_block_var_decl.hpp>
-#include <stan/lang/ast/node/vector_fun_var_decl.hpp>
-#include <stan/lang/ast/node/vector_local_var_decl.hpp>
 
 #include <stan/lang/ast/node/var_decl.hpp>
 

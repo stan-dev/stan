@@ -31,6 +31,10 @@ TEST(bareExprType, createIllFormed) {
   EXPECT_FALSE(x.is_array_type());
   EXPECT_EQ(x.num_dims(), 0);
 
+  EXPECT_FALSE(x.is_data_);
+  x.set_is_data(true);
+  EXPECT_TRUE(x.is_data_);
+  
   bare_expr_type y;
   EXPECT_TRUE(x == y);
 
@@ -78,6 +82,10 @@ TEST(bareExprType, createInt) {
   std::stringstream ss;
   stan::lang::write_bare_expr_type(ss, x);
   EXPECT_EQ("int", ss.str());
+
+  EXPECT_FALSE(x.is_data_);
+  x.set_is_data(true);
+  EXPECT_TRUE(x.is_data_);
 
   int_type tInt2;
   bare_expr_type y(tInt2);

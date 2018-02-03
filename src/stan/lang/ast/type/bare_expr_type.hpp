@@ -43,6 +43,11 @@ namespace stan {
       bare_t bare_type_;
 
       /**
+       * True if type has "data" qualifier.
+       */
+      bool is_data_;
+
+      /**
        * Construct a bare var type with default values.
        */
       bare_expr_type();
@@ -210,6 +215,18 @@ namespace stan {
        * Returns true if `bare_type_` is `bare_array_type`, false otherwise.
        */
       bool is_array_type() const;
+
+      /**
+       * Returns `is_data_`
+       */
+      bool is_data() const;
+
+      /**
+       * Setter for `is_data_`
+       * 
+       * @param bool
+       */
+      void set_is_data(bool f);
 
       /**
        * Returns true if `bare_type_` is `int_type` or `double_type`, false otherwise.

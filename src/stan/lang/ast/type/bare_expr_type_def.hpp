@@ -18,38 +18,37 @@ namespace stan {
   namespace lang {
 
     bare_expr_type::bare_expr_type()
-      : bare_type_(ill_formed_type()) { }
+      : bare_type_(ill_formed_type()), is_data_(false) { }
 
     bare_expr_type::bare_expr_type(const bare_expr_type& x)
-      : bare_type_(x.bare_type_) { }
+      : bare_type_(x.bare_type_), is_data_(false) { }
 
     bare_expr_type::bare_expr_type(const bare_t& x)
-      : bare_type_(x) { }
+      : bare_type_(x), is_data_(false) { }
 
     bare_expr_type::bare_expr_type(const ill_formed_type& x)
-      : bare_type_(ill_formed_type()) { }
+      : bare_type_(ill_formed_type()), is_data_(false) { }
 
     bare_expr_type::bare_expr_type(const void_type& x)
-      : bare_type_(void_type()) { }
+      : bare_type_(void_type()), is_data_(false) { }
 
     bare_expr_type::bare_expr_type(const int_type& x)
-      : bare_type_(int_type()) { }
+      : bare_type_(int_type()), is_data_(false) { }
 
     bare_expr_type::bare_expr_type(const double_type& x)
-      : bare_type_(double_type()) { }
+      : bare_type_(double_type()), is_data_(false) { }
 
     bare_expr_type::bare_expr_type(const vector_type& x)
-      : bare_type_(vector_type()) { }
+      : bare_type_(vector_type()), is_data_(false) { }
 
     bare_expr_type::bare_expr_type(const row_vector_type& x)
-      : bare_type_(row_vector_type()) { }
+      : bare_type_(row_vector_type()), is_data_(false) { }
 
     bare_expr_type::bare_expr_type(const matrix_type& x)
-      : bare_type_(matrix_type()) { }
+      : bare_type_(matrix_type()), is_data_(false) { }
 
     bare_expr_type::bare_expr_type(const bare_array_type& x)
-      : bare_type_(bare_array_type(x.element_type_)) { }
-
+      : bare_type_(bare_array_type(x.element_type_)), is_data_(false) { }
 
     bool bare_expr_type::is_ill_formed_type() const {
       return order_id() == ill_formed_type().oid();
@@ -89,6 +88,10 @@ namespace stan {
       return boost::apply_visitor(vis, bare_type_);
     }
 
+    bool bare_expr_type::is_data() const {
+      return is_data_;
+    }
+
     bare_expr_type bare_expr_type::array_element_type() const {
       bare_array_element_type_vis vis;
       return boost::apply_visitor(vis, bare_type_);
@@ -112,6 +115,10 @@ namespace stan {
     std::string bare_expr_type::order_id() const {
       bare_type_order_id_vis vis;
       return boost::apply_visitor(vis, bare_type_);
+    }
+
+    void bare_expr_type::set_is_data(bool f) {
+      is_data_ = f;
     }
 
     bool bare_expr_type::operator==(const bare_expr_type& bare_type) const {

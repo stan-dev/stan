@@ -533,9 +533,9 @@ namespace stan {
         std::set<std::pair<std::string, function_signature_t> >&
                                             functions_defined,
         std::ostream& error_msgs) const {
-      std::vector<fun_var_type> arg_types;
+      std::vector<bare_expr_type> arg_types;
       for (size_t i = 0; i < decl.arg_decls_.size(); ++i) {
-        arg_types.push_back(decl.arg_decls_[i].fun_var_type());
+        arg_types.push_back(decl.arg_decls_[i].bare_type());
       }
       function_signature_t sig(decl.return_type_, arg_types);
       std::pair<std::string, function_signature_t> name_sig(decl.name_, sig);
@@ -566,13 +566,13 @@ namespace stan {
         return;
       }
 
-       // check argument qualifiers
+       // check argument type and qualifiers
       if (!decl.body_.is_no_op_statement()) {
         function_signature_t decl_sig =
           function_signatures::instance().get_definition(decl.name_, sig);
         if (!decl_sig.first.is_ill_formed_type()) {
           for (size_t i = 0; i < decl.arg_decls_.size(); ++i) {
-            if (decl_sig.second[i].bare_type_ != arg_types[i].bare_type_
+            if (decl_sig.second[i] != arg_types[i]
                 || decl_sig.second[i].is_data_ != arg_types[i].is_data_) {
               error_msgs << "Declaration doesn't match definition "
                          << "for function: "
@@ -1131,9 +1131,9 @@ namespace stan {
         op_name = "elt_multiply";
       }
       // check that "lhs <op> rhs" is valid stan::math function sig
-      std::vector<fun_var_type> arg_types;
-      arg_types.push_back(fun_var_type(inferred_lhs_type));
-      arg_types.push_back(fun_var_type(rhs_type));
+      std::vector<bare_expr_type> arg_types;
+      arg_types.push_back(inferred_lhs_type);
+      arg_types.push_back(rhs_type);
       function_signature_t op_equals_sig(inferred_lhs_type, arg_types);
       if (!function_signatures::instance().is_defined(op_name, op_equals_sig)) {
         error_msgs << "Cannot apply operator '" << op_equals
@@ -1629,19 +1629,23 @@ namespace stan {
       bare_expr_type bet_int(t_int);
       bare_array_type ar_int(bet_int);
       bare_expr_type bet_ar_int(ar_int);
+      bare_expr_type bet_ar_int_data(ar_int);
+      bet_ar_int_data.set_data_only(true);
 
       double_type t_double;
       bare_expr_type bet_double(t_double);
       bare_array_type ar_double(bet_double);
       bare_expr_type bet_ar_double(ar_double);
+      bare_expr_type bet_ar_double_data(ar_double_data);
+      bet_ar_double_data.set_data_only(true);
 
       bare_expr_type sys_result_type(bet_ar_double);
-      std::vector<fun_var_type> sys_arg_types;
-      sys_arg_types.push_back(fun_var_type(bet_double));
-      sys_arg_types.push_back(fun_var_type(bet_ar_double));
-      sys_arg_types.push_back(fun_var_type(bet_ar_double));
-      sys_arg_types.push_back(fun_var_type(bet_ar_double, true));
-      sys_arg_types.push_back(fun_var_type(bet_ar_int, true));
+      std::vector<bare_expr_type> sys_arg_types;
+      sys_arg_types.push_back(bet_double);
+      sys_arg_types.push_back(bet_ar_double);
+      sys_arg_types.push_back(bet_ar_double);
+      sys_arg_types.push_back(bet_ar_double_data);
+      sys_arg_types.push_back(bet_ar_int_data);
       function_signature_t system_signature(sys_result_type, sys_arg_types);
       if (!function_signatures::instance()
           .is_defined(ode_fun.system_function_name_, system_signature)) {
@@ -1812,16 +1816,20 @@ namespace stan {
       bare_expr_type bet_double(t_double);
       bare_array_type ar_double(bet_double);
       bare_expr_type bet_ar_double(ar_double);
+      bare_expr_type bet_ar_double_data(ar_double_data);
+      bet_ar_double_data.set_data_only(true);
 
       vector_type t_vector;
       bare_expr_type bet_vector(t_vector);
+      bare_expr_type bet_vector_data(t_vector);
+      bet_vector_data.set_data_only(true);
 
       bare_expr_type sys_result_type(t_vector);
-      std::vector<fun_var_type> sys_arg_types;
-      sys_arg_types.push_back(fun_var_type(bet_vector, true));  // y
-      sys_arg_types.push_back(fun_var_type(bet_vector, true));  // theta
-      sys_arg_types.push_back(fun_var_type(bet_ar_double, true));  // x_r
-      sys_arg_types.push_back(fun_var_type(bet_ar_int));  // x_i
+      std::vector<bare_expr_type> sys_arg_types;
+      sys_arg_types.push_back(bet_vector_data);  // y
+      sys_arg_types.push_back(bet_vector_data);  // theta
+      sys_arg_types.push_back(bet_ar_double_data);  // x_r
+      sys_arg_types.push_back(bet_ar_int);  // x_i
       function_signature_t system_signature(sys_result_type, sys_arg_types);
       if (!function_signatures::instance()
           .is_defined(alg_fun.system_function_name_, system_signature)) {
@@ -1978,9 +1986,9 @@ namespace stan {
       }
 
       // get function definition for this functiion
-      std::vector<fun_var_type> fun_arg_types;
+      std::vector<bare_expr_type> fun_arg_types;
       for (size_t i = 0; i < fun.args_.size(); ++i)
-        fun_arg_types.push_back(fun_var_type(arg_types[i]));
+        fun_arg_types.push_back(arg_types[i]);
       function_signature_t sig(fun.type_, fun_arg_types);
       function_signature_t decl_sig =
         function_signatures::instance().get_definition(fun.name_, sig);
@@ -2930,10 +2938,39 @@ namespace stan {
     }
     boost::phoenix::function<set_double_range_upper> set_double_range_upper_f;
 
-    // parser calls this to register var in vm; sets result (_val) to value computed by subrule (_1)
-    template <typename T>
-    void add_block_var::operator()(block_var_decl& block_var_decl_result,
-                                   const T& block_var_decl,
+    void validate_array_block_var_decl::operator()(
+                                        block_var_decl& var_decl_result,
+                                        const block_var_type& el_type,
+                                        const std::string& name,
+                                        const std::vector<expression>& dims,
+                                        const expression& def,
+                                        bool& pass,
+                                        std::ostream& error_msgs) const {
+      stan::lang::block_array_type bat(el_type, dims);
+      var_decl_result = block_var_decl(name, bat, def);
+    }
+    boost::phoenix::function<validate_array_block_var_decl>
+    validate_array_block_var_decl_f;
+
+    void validate_single_block_var_decl::operator()(
+                                        block_var_decl& var_decl_result,
+                                        bool& pass,
+                                        std::ostream& error_msgs) const {
+      // TODO:mitzi figure out what error flags are being passed around and use them.
+      block_var_decl result = block_var_decl(var_decl_result.name(),
+                                             var_decl_result.type(),
+                                             var_decl_result.def());
+      var_decl_result = result;
+      std::cout << "block var decl, bare type: "
+                 << var_decl_result.bare_type()
+                 << " type: "
+                 << var_decl_result.type()
+                 << std::endl;
+    }
+    boost::phoenix::function<validate_single_block_var_decl>
+    validate_single_block_var_decl_f;
+
+    void add_block_var::operator()(const block_var_decl& block_var_decl,
                                    variable_map& vm, bool& pass,
                                    const scope& var_scope,
                                    std::ostream& error_msgs) const {
@@ -2949,7 +2986,6 @@ namespace stan {
         print_scope(error_msgs, vm.get_scope(block_var_decl.name()));
 
         error_msgs << std::endl;
-        block_var_decl_result = block_var_decl;
         return;
       }
       if (var_scope.par_or_tpar()
@@ -2960,101 +2996,14 @@ namespace stan {
                    << " found declared type int, parameter name="
                    << block_var_decl.name()
                    << std::endl;
-        block_var_decl_result = block_var_decl;
         return;
       }
-      pass = true;
       vm.add(block_var_decl.name(),
              var_decl(block_var_decl.name(), block_var_decl.bare_type()),
              var_scope);
-      block_var_decl_result = block_var_decl;
+      pass = true;
     }
     boost::phoenix::function<add_block_var> add_block_var_f;
-    
-    template void add_block_var::operator()(block_var_decl&,
-                                            const int_block_var_decl&,
-                                            variable_map&, bool&, const scope&,
-                                            std::ostream&) const;
-    template void add_block_var::operator()(block_var_decl&,
-                                            const double_block_var_decl&,
-                                            variable_map&, bool&, const scope&,
-                                            std::ostream&) const;
-    template void add_block_var::operator()(block_var_decl&,
-                                            const vector_block_var_decl&,
-                                            variable_map&, bool&, const scope&,
-                                            std::ostream&) const;
-    template void add_block_var::operator()(block_var_decl&,
-                                            const row_vector_block_var_decl&,
-                                            variable_map&, bool&, const scope&,
-                                            std::ostream&) const;
-    template void add_block_var::operator()(block_var_decl&,
-                                            const matrix_block_var_decl&,
-                                            variable_map&, bool&, const scope&,
-                                            std::ostream&) const;
-    template void add_block_var::operator()(block_var_decl&,
-                                            const simplex_block_var_decl&,
-                                            variable_map&, bool&, const scope&,
-                                            std::ostream&) const;
-    template void add_block_var::operator()(block_var_decl&,
-                                            const unit_vector_block_var_decl&,
-                                            variable_map&, bool&, const scope&,
-                                            std::ostream&) const;
-    template void add_block_var::operator()(block_var_decl&,
-                                            const ordered_block_var_decl&,
-                                            variable_map&, bool&, const scope&,
-                                            std::ostream&) const;
-    template void add_block_var::operator()(block_var_decl&,
-                                            const positive_ordered_block_var_decl&,
-                                            variable_map&, bool&, const scope&,
-                                            std::ostream&) const;
-    template void add_block_var::operator()(block_var_decl&,
-                                            const cholesky_factor_block_var_decl&,
-                                            variable_map&, bool&, const scope&,
-                                            std::ostream&) const;
-    template void add_block_var::operator()(block_var_decl&,
-                                            const cholesky_corr_block_var_decl&,
-                                            variable_map&, bool&, const scope&,
-                                            std::ostream&) const;
-    template void add_block_var::operator()(block_var_decl&,
-                                            const cov_matrix_block_var_decl&,
-                                            variable_map&, bool&, const scope&,
-                                            std::ostream&) const;
-    template void add_block_var::operator()(block_var_decl&,
-                                            const corr_matrix_block_var_decl&,
-                                            variable_map&, bool&, const scope&,
-                                            std::ostream&) const;
-
-
-    // template void add_block_var::operator()(const int_fun_var_decl&,
-    //                                   variable_map&, bool&, const scope&,
-    //                                   std::ostream&) const;
-    // template void add_var::operator()(const int_local_var_decl&,
-    //                                   variable_map&, bool&, const scope&,
-    //                                   std::ostream&) const;
-    // template void add_var::operator()(const double_fun_var_decl&,
-    //                                   variable_map&, bool&, const scope&,
-    //                                   std::ostream&) const;
-    // template void add_var::operator()(const double_local_var_decl&,
-    //                                   variable_map&, bool&, const scope&,
-    //                                   std::ostream&) const;
-    // template void add_var::operator()(const vector_fun_var_decl&,
-    //                                   variable_map&, bool&, const scope&,
-    //                                   std::ostream&) const;
-    // template void add_var::operator()(const vector_local_var_decl&,
-    //                                   variable_map&, bool&, const scope&,
-    //                                   std::ostream&) const;
-    // template void add_var::operator()(const row_vector_fun_var_decl&,
-    //                                   variable_map&, bool&, const scope&,
-    //                                   std::ostream&) const;
-    // template void add_var::operator()(const row_vector_local_var_decl&,
-    //                                   variable_map&, bool&, const scope&,
-    //                                   std::ostream&) const;
-    // template void add_var::operator()(const matrix_fun_var_decl&,
-    //                                   variable_map&, bool&, const scope&,
-    //                                   std::ostream&) const;
-    // template void add_var::operator()(const matrix_local_var_decl&,
-    //                                   variable_map&, bool&, const scope&,
-    //                                   std::ostream&) const;
 
 
     void validate_in_loop::operator()(bool in_loop, bool& pass,

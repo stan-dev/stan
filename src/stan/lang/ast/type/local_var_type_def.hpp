@@ -64,6 +64,11 @@ namespace stan {
       return boost::apply_visitor(is_array_type_vis(), var_type_);
     }
 
+    std::string local_var_type::name() const {
+      var_type_name_vis vis;
+      return boost::apply_visitor(vis, var_type_);
+    }
+
     int local_var_type::num_dims() const {
       total_dims_vis vis;
       return boost::apply_visitor(vis, var_type_);
@@ -72,6 +77,11 @@ namespace stan {
     std::vector<expression> local_var_type::size() const {
       var_type_size_vis vis;
       return boost::apply_visitor(vis, var_type_);
+    }
+
+    std::ostream& operator<<(std::ostream& o, const local_var_type& var_type) {
+      write_bare_expr_type(o, var_type.bare_type());
+      return o;
     }
   }
 }

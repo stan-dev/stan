@@ -1,40 +1,17 @@
 #ifndef STAN_LANG_AST_NODE_FUN_VAR_DECL_HPP
 #define STAN_LANG_AST_NODE_FUN_VAR_DECL_HPP
 
-#include <boost/variant/recursive_variant.hpp>
+#include <stan/lang/ast/node/var_decl.hpp>
+#include <stan/lang/ast/type/bare_expr_type.hpp>
 #include <string>
 
 namespace stan {
   namespace lang {
 
-    struct nil;
-    struct array_fun_var_decl;
-    struct double_fun_var_decl;
-    struct int_fun_var_decl;
-    struct matrix_fun_var_decl;
-    struct row_vector_fun_var_decl;
-    struct vector_fun_var_decl;
-
     /**
-     * The variant structure to hold a variable declaration.
+     * Structure to hold a function argument declaration.
      */
-    struct fun_var_decl {
-      /**
-       * The variant type for a variable declaration.
-       */
-      typedef boost::variant<boost::recursive_wrapper<nil>,
-                             boost::recursive_wrapper<array_fun_var_decl>,
-                             boost::recursive_wrapper<int_fun_var_decl>,
-                             boost::recursive_wrapper<double_fun_var_decl>,
-                             boost::recursive_wrapper<vector_fun_var_decl>,
-                             boost::recursive_wrapper<row_vector_fun_var_decl>,
-                             boost::recursive_wrapper<matrix_fun_var_decl> >
-      fun_var_decl_t;
-
-      /**
-       * The fun variable decl type held by this wrapper.
-       */
-      fun_var_decl_t var_decl_;
+    struct fun_var_decl : public var_decl {
 
       /**
        * The line in the source code where the declaration begins.
@@ -45,82 +22,39 @@ namespace stan {
        * The line in the source code where the declaration ends.
        */
       std::size_t end_line_;
-      
+
+      /**
+       * Specific type of this variable.
+       */
+      bare_expr_type type_;
+
       /**
        * Construct a default variable declaration.
        */
       fun_var_decl();
 
       /**
-       * Construct a variable declaration.
+       * Construct a fun variable declaration with the specified
+       * name and type.
        *
-       * @param x variable declaration
+       * @param name variable name
+       * @param type variable type
        */
-      fun_var_decl(const fun_var_decl& x);  // NOLINT(runtime/explicit)
+      fun_var_decl(const std::string& name,
+                     const bare_expr_type& type);
 
       /**
-       * Construct a variable declaration with the specified variant
-       * type holding a declaration.
+       * Construct a fun variable declaration with the specified
+       * name, type, and definition.
        *
-       * @param x variable declaration raw variant type
+       * @param name variable name
+       * @param tyep variable type
+       * @param def definition
        */
-      fun_var_decl(const fun_var_decl_t& x);  // NOLINT(runtime/explicit)
+      fun_var_decl(const std::string& name,
+                     const bare_expr_type& type,
+                     const expression& def);
 
-      /**
-       * Construct a variable declaration with the specified
-       * basic declaration.
-       *
-       * @param x variable declaration
-       */
-      fun_var_decl(const nil& x);  // NOLINT(runtime/explicit)
-
-      /**
-       * Construct a variable declaration with the specified
-       * basic declaration.  
-       *
-       * @param x variable declaration
-       */
-      fun_var_decl(const int_fun_var_decl& x);  // NOLINT(runtime/explicit)
-
-      /**
-       * Construct a variable declaration with the specified
-       * basic declaration.  
-       *
-       * @param x variable declaration
-       */
-      fun_var_decl(const double_fun_var_decl& x);  // NOLINT(runtime/explicit)
-
-      /**
-       * Construct a variable declaration with the specified
-       * basic declaration.  
-       *
-       * @param x variable declaration
-       */
-      fun_var_decl(const vector_fun_var_decl& x);  // NOLINT(runtime/explicit)
-
-      /**
-       * Construct a variable declaration with the specified
-       * basic declaration.  
-       *
-       * @param x variable declaration
-       */
-      fun_var_decl(const row_vector_fun_var_decl& x);  // NOLINT(runtime/explicit)
-
-      /**
-       * Construct a variable declaration with the specified
-       * basic declaration.  
-       *
-       * @param x variable declaration
-       */
-      fun_var_decl(const matrix_fun_var_decl& x);  // NOLINT(runtime/explicit)
-
-      /**
-       * Construct a variable declaration with the specified
-       * basic declaration.  
-       *
-       * @param x variable declaration
-       */
-      fun_var_decl(const array_fun_var_decl& x);  // NOLINT(runtime/explicit)
 
       /**
        * Return the variable declaration's bare expr type.
@@ -130,43 +64,35 @@ namespace stan {
       bare_expr_type bare_type() const;
 
       /**
-       * Return the variable declaration's fun_var_type.
+       * Return the variable declaration's definition.
        *
-       * @return the fun_var_type
+       * @return expression definition for this variable
        */
-      fun_var_type fun_var_type() const;
+      expression def() const;
 
       /**
-       * Return the declaration's variable name.
+       * Return true if variable declaration contains a definition.
+       *
+       * @return bool indicating has or doesn't have definition
+       */
+      bool has_def() const;
+
+      /**
+       * Return the variable declaration's name.
        *
        * @return name of variable
        */
       std::string name() const;
 
       /**
-       * Set is_data_ flag on var_decl to true.
-       */
-      bool set_is_data();
-
-      /**
-       * Return the var_decl for this variable declaration
+       * Return the variable declaration's bare_expr_type
+       * which contains size specifications.
        *
-       * @return var_decl
-      */
-      var_decl var_decl() const;
+       * @return bare_expr_type
+       */
+      bare_expr_type type() const;
     };
 
-    /**
-     * Stream a user-readable version of the fun_var_decl to the
-     * specified output stream, returning the speicifed argument
-     * output stream to allow chaining.
-     *
-     * @param o output stream
-     * @param fvar fun_var_decl
-     * @return argument output stream
-     */
-    std::ostream& operator<<(std::ostream& o,
-                             const fun_var_decl& fv_decl);
   }
 }
 #endif

@@ -6,7 +6,8 @@
 namespace stan {
   namespace lang {
 
-    fun_var_type::fun_var_type() { }
+    fun_var_type::fun_var_type()
+      : bare_type_(ill_formed_type()), is_data_(false) { }
 
     fun_var_type::fun_var_type(const bare_expr_type& bare_type)
       : bare_type_(bare_type), is_data_(false) { }

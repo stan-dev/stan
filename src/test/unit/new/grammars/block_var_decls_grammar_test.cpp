@@ -40,7 +40,7 @@ std::vector<stan::lang::block_var_decl>
 parse_var_decls(std::string& input,
                 std::ostream& err_msgs) {
   using boost::spirit::qi::phrase_parse;
-  //  std::cout << "parsing: " << input << std::endl;
+  std::cout << "parsing: " << input << std::endl;
   
   typedef std::string::const_iterator input_iterator;
   typedef boost::spirit::line_pos_iterator<input_iterator> lp_iterator;
@@ -64,7 +64,7 @@ parse_var_decls(std::string& input,
   } catch (const boost::spirit::qi::expectation_failure<lp_iterator>& e) {
     std::cout << e.what_ << std::endl;
   }
-  //  std::cout << (parse_succeeded ? "OK" : "FAIL") << std::endl;
+  std::cout << (parse_succeeded ? "OK" : "FAIL") << std::endl;
   err_msgs << block_var_decls_grammar.error_msgs_.str();
 
   if (fwd_begin != fwd_end) {
@@ -100,6 +100,10 @@ TEST(Parser, parse_1) {
   bvds = parse_var_decls(input, msgs);
   EXPECT_EQ(msgs.str(), std::string());
   EXPECT_TRUE(1 == bvds.size());
+
+  std::stringstream ss;
+  stan::lang::write_block_var_type(ss, bvds[0].type());
+  EXPECT_EQ("int< lower>", ss.str());
 }
 
 TEST(Parser, parse_2) {
@@ -109,6 +113,12 @@ TEST(Parser, parse_2) {
   bvds = parse_var_decls(input, msgs);
   EXPECT_EQ(msgs.str(), std::string());
   EXPECT_TRUE(2 == bvds.size());
+
+  std::stringstream ss;
+  stan::lang::write_block_var_type(ss, bvds[0].type());
+  ss << std::endl;
+  stan::lang::write_block_var_type(ss, bvds[1].type());
+  EXPECT_EQ("real< lower>\nreal< lower, upper>", ss.str());
 }
 
 TEST(Parser, parse_3) {
@@ -118,4 +128,135 @@ TEST(Parser, parse_3) {
   bvds = parse_var_decls(input, msgs);
   EXPECT_EQ(msgs.str(), std::string());
   EXPECT_TRUE(3 == bvds.size());
+
+  std::cout << bvds[0].name()
+            << " "
+            << bvds[0].type()
+            << std::endl
+            << bvds[0].bare_type()
+            << std::endl;
+  std::cout << bvds[1].name()
+            << " "
+            << bvds[1].type()
+            << std::endl
+            << bvds[1].bare_type()
+            << std::endl;
+  std::cout << bvds[2].name()
+            << " "
+            << bvds[2].type()
+            << std::endl
+            << bvds[2].bare_type()
+            << std::endl;
+}
+
+TEST(Parser, parse_matrix) {
+  std::string input("matrix<lower=0>[1,2] my_matrix;");
+  std::stringstream msgs;
+  std::vector<stan::lang::block_var_decl> bvds;
+  bvds = parse_var_decls(input, msgs);
+  EXPECT_EQ(msgs.str(), std::string());
+  EXPECT_TRUE(1 == bvds.size());
+}
+
+TEST(Parser, parse_matrix2) {
+  std::string input("matrix<lower=0.0, upper=1.0>[1,2] x;");
+  std::stringstream msgs;
+  std::vector<stan::lang::block_var_decl> bvds;
+  bvds = parse_var_decls(input, msgs);
+  EXPECT_EQ(msgs.str(), std::string());
+  EXPECT_TRUE(1 == bvds.size());
+}
+
+// TEST(Parser, parse_vector) {
+//   std::string input("vector[5] a;");
+//   std::stringstream msgs;
+//   std::vector<stan::lang::block_var_decl> bvds;
+//   bvds = parse_var_decls(input, msgs);
+//   EXPECT_EQ(msgs.str(), std::string());
+//   EXPECT_TRUE(1 == bvds.size());
+// }
+
+// TEST(Parser, parse_row_vector) {
+//   std::string input("row_vector[5] a;");
+//   std::stringstream msgs;
+//   std::vector<stan::lang::block_var_decl> bvds;
+//   bvds = parse_var_decls(input, msgs);
+//   EXPECT_EQ(msgs.str(), std::string());
+//   EXPECT_TRUE(1 == bvds.size());
+// }
+
+// TEST(Parser, parse_simplex) {
+//   std::string input("simplex[5] a;");
+//   std::stringstream msgs;
+//   std::vector<stan::lang::block_var_decl> bvds;
+//   bvds = parse_var_decls(input, msgs);
+//   EXPECT_EQ(msgs.str(), std::string());
+//   EXPECT_TRUE(1 == bvds.size());
+// }
+
+// TEST(Parser, parse_array_1) {
+//   std::string input("int N[5];");
+//   std::stringstream msgs;
+//   std::vector<stan::lang::block_var_decl> bvds;
+//   bvds = parse_var_decls(input, msgs);
+//   EXPECT_EQ(msgs.str(), std::string());
+//   EXPECT_TRUE(1 == bvds.size());
+//   std::stringstream ss;
+//   stan::lang::write_block_var_type(ss, bvds[0].type());
+//   std::cout << ss.str() << std::endl;
+// }
+
+TEST(Parser, parse_array_2) {
+  std::string input("int N[5,5];");
+  std::stringstream msgs;
+  std::vector<stan::lang::block_var_decl> bvds;
+  bvds = parse_var_decls(input, msgs);
+  EXPECT_EQ(msgs.str(), std::string());
+  EXPECT_TRUE(1 == bvds.size());
+
+  std::cout << bvds[0].name()
+            << " "
+            << bvds[0].type()
+            << std::endl
+            << bvds[0].bare_type()
+            << std::endl;
+}
+
+TEST(Parser, parse_1d_array_matrix) {
+  std::string input("int x;\nmatrix[2,2] array_of_mat[100];\n");
+  std::stringstream msgs;
+  std::vector<stan::lang::block_var_decl> bvds;
+  bvds = parse_var_decls(input, msgs);
+  EXPECT_EQ(msgs.str(), std::string());
+  EXPECT_TRUE(2 == bvds.size());
+
+  std::cout << bvds[1].name()
+            << " "
+            << bvds[1].type()
+            << std::endl
+            << bvds[1].bare_type()
+            << std::endl;
+}
+
+TEST(Parser, parse_2d_array_matrix) {
+  std::string input("matrix[2,2] d1_array_of_mat[100];\n matrix[2,2] d2_array_of_mat[100,100];\n");
+  std::stringstream msgs;
+  std::vector<stan::lang::block_var_decl> bvds;
+  bvds = parse_var_decls(input, msgs);
+  EXPECT_EQ(msgs.str(), std::string());
+  EXPECT_TRUE(2 == bvds.size());
+
+  std::cout << bvds[0].name()
+            << " "
+            << bvds[0].type()
+            << std::endl
+            << bvds[0].bare_type()
+            << std::endl;
+
+  std::cout << bvds[1].name()
+            << " "
+            << bvds[1].type()
+            << std::endl
+            << bvds[1].bare_type()
+            << std::endl;
 }

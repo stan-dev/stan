@@ -8,17 +8,15 @@ TEST(varDecl, create1Arg) {
   EXPECT_EQ(x.name_, "x");
   EXPECT_TRUE(x.bare_type_.is_ill_formed_type());
   EXPECT_TRUE(is_nil(x.def_));
-  EXPECT_FALSE(x.is_data());
+  EXPECT_FALSE(x.bare_type_.is_data());
 }
 
 TEST(varDecl, create2Arg) {
   stan::lang::var_decl x("x", stan::lang::int_type());
   EXPECT_EQ(x.name_, "x");
   EXPECT_TRUE(x.bare_type_.is_int_type());
+  EXPECT_FALSE(x.bare_type_.is_data());
   EXPECT_TRUE(is_nil(x.def_));
-  EXPECT_FALSE(x.is_data());
-  x.set_is_data(true);
-  EXPECT_TRUE(x.is_data());
 }
 
 TEST(varDecl, create3Arg) {
@@ -26,6 +24,7 @@ TEST(varDecl, create3Arg) {
   stan::lang::var_decl x("x", stan::lang::int_type(), e);
   EXPECT_EQ(x.name_, "x");
   EXPECT_TRUE(x.bare_type_.is_int_type());
+  EXPECT_FALSE(x.bare_type_.is_data());
   EXPECT_EQ(x.def_.bare_type(), x.bare_type_);
 }
 
@@ -35,7 +34,13 @@ TEST(varDecl, createArray) {
   stan::lang::var_decl x("x", d1);
   EXPECT_EQ(x.name_, "x");
   EXPECT_TRUE(x.bare_type_.is_array_type());
-  EXPECT_FALSE(x.is_data());
-  x.set_is_data(true);
-  EXPECT_TRUE(x.is_data());
+  EXPECT_FALSE(x.bare_type_.is_data());
+}
+
+TEST(varDecl, createEmpty) {
+  stan::lang::var_decl x;
+  EXPECT_EQ(x.name_, "");
+  EXPECT_TRUE(x.bare_type_.is_ill_formed_type());
+  EXPECT_TRUE(is_nil(x.def_));
+  EXPECT_FALSE(x.bare_type_.is_data());
 }

@@ -99,6 +99,11 @@ namespace stan {
       return boost::apply_visitor(vis, var_type_);
     }
 
+    std::string block_var_type::name() const {
+      var_type_name_vis vis;
+      return boost::apply_visitor(vis, var_type_);
+    }
+
     int block_var_type::num_dims() const {
       total_dims_vis vis;
       return boost::apply_visitor(vis, var_type_);
@@ -108,6 +113,14 @@ namespace stan {
       var_type_size_vis vis;
       return boost::apply_visitor(vis, var_type_);
     }
+
+    std::ostream& operator<<(std::ostream& o, const block_var_type& var_type) {
+      write_block_var_type(o, var_type);
+      return o;
+    }
+
+
+
   }
 }
 #endif

@@ -99,12 +99,12 @@ namespace stan {
     };
 
     /**
-     * Stream a user-readable version of the fun_var_decl to the
+     * Stream a user-readable version of the fun_var_type to the
      * specified output stream, returning the speicifed argument
      * output stream to allow chaining.
      *
      * @param o output stream
-     * @param fvar fun_var_decl
+     * @param fvar fun_var_type
      * @return argument output stream
      */
     std::ostream& operator<<(std::ostream& o,
