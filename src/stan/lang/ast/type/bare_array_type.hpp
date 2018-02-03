@@ -7,11 +7,6 @@ namespace stan {
   namespace lang {
 
     struct bare_expr_type;
-    struct double_type;
-    struct int_type;
-    struct matrix_type;
-    struct row_vector_type;
-    struct vector_type;
     
     /** 
      * Bare array type for Stan variables and expressions (recursive).

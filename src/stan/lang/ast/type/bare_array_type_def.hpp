@@ -3,8 +3,6 @@
 
 #include <stan/lang/ast.hpp>
 
-#include <iostream>
-
 namespace stan {
   namespace lang {
 
@@ -36,7 +34,6 @@ namespace stan {
       std::string oid = std::string("array_") + element_type_.order_id();
       return oid;
     }
-
 
   }
 }
