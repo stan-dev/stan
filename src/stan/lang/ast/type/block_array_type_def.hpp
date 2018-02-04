@@ -19,7 +19,7 @@ namespace stan {
         array_len_ = lens[0];
       }
       else {
-        block_array_type tmp(el_type, lens[lens.size()]);
+        block_array_type tmp(el_type, lens[lens.size()-1]);
         for (size_t i = lens.size() - 2; i > 0; --i) {
           tmp = block_array_type(tmp, lens[i]);
         }
@@ -52,6 +52,17 @@ namespace stan {
 
     expression block_array_type::array_len() const {
       return array_len_;
+    }
+
+    std::vector<expression> block_array_type::array_lens() const {
+      std::vector<expression> result;
+      result.push_back(array_len_);
+      block_var_type cur_type(element_type_);
+      while (cur_type.is_array_type()) {
+        result.push_back(cur_type.array_len());
+        cur_type = cur_type.array_element_type();
+      }
+      return result;
     }
   }
 }

@@ -11,14 +11,8 @@ namespace stan {
     std::vector<expression>
     var_type_size_vis::operator()(const block_array_type& x)
       const {
-      std::vector<expression> sizes;
-      sizes.push_back(x.array_len_);
-      block_var_type cur_type(x.element_type_);
-      while (cur_type.is_array_type()) {
-        sizes.push_back(cur_type.array_len());
-        cur_type = cur_type.array_element_type();
-      }
-      std::vector<expression> base_sizes = cur_type.size();
+      std::vector<expression> sizes(x.array_lens());
+      std::vector<expression> base_sizes = x.contains().size();
       for (size_t i=0; i < base_sizes.size(); ++i) {
         sizes.push_back(base_sizes[i]);
       }

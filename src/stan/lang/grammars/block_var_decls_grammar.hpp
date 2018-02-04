@@ -1,6 +1,7 @@
 #ifndef STAN_LANG_GRAMMARS_BLOCK_VAR_DECLS_GRAMMAR_HPP
 #define STAN_LANG_GRAMMARS_BLOCK_VAR_DECLS_GRAMMAR_HPP
 
+#include <stan/io/program_reader.hpp>
 #include <stan/lang/ast.hpp>
 #include <stan/lang/grammars/whitespace_grammar.hpp>
 #include <stan/lang/grammars/expression_grammar.hpp>
@@ -10,6 +11,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <utility>
 
 namespace stan {
   namespace lang {
@@ -21,8 +23,10 @@ namespace stan {
                                    std::vector<block_var_decl>,
                                    whitespace_grammar<Iterator> > {
       block_var_decls_grammar(variable_map& var_map,
-                        std::stringstream& error_msgs);
+                              std::stringstream& error_msgs,
+                              const io::program_reader& reader);
 
+      const io::program_reader& reader_;
       variable_map& var_map_;
       std::stringstream& error_msgs_;
       expression_grammar<Iterator> expression_g;

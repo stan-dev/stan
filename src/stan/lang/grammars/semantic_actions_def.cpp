@@ -268,6 +268,8 @@ namespace stan {
     template void assign_lhs::operator()(variable&, const variable&) const;
     template void assign_lhs::operator()(bare_expr_type&,
                                          const bare_expr_type&) const;
+    template void assign_lhs::operator()(block_var_decl&,
+                                         const block_var_decl&) const;
 
     void validate_expr_type3::operator()(const expression& expr, bool& pass,
                                          std::ostream& error_msgs) const {
@@ -589,7 +591,7 @@ namespace stan {
       }
 
       if (ends_with("_lpdf", decl.name_)
-          && arg_types[0].bare_type_.is_int_type()) {
+          && arg_types[0].is_int_type()) {
         error_msgs << "Parse Error.  Probability density functions require"
                    << " real variates (first argument)."
                    << " Found type = " << arg_types[0] << std::endl;
@@ -597,7 +599,7 @@ namespace stan {
         return;
       }
       if (ends_with("_lpmf", decl.name_)
-          && !arg_types[0].bare_type_.is_int_type()) {
+          && !arg_types[0].is_int_type()) {
         error_msgs << "Parse Error.  Probability mass functions require"
                    << " integer variates (first argument)."
                    << " Found type = " << arg_types[0] << std::endl;
@@ -718,7 +720,7 @@ namespace stan {
           error_msgs << std::endl;
           return;
         }
-        decl.set_is_data();
+        decl.bare_type().set_is_data(true);
       } else {
         var_origin = function_argument_origin;
       }
@@ -1576,7 +1578,6 @@ namespace stan {
     boost::phoenix::function<validate_non_void_expression>
     validate_non_void_expression_f;
 
-    //TODO:mitzi what happened to function "get_line"?
     template <typename T, typename I>
     void add_line_number::operator()(T& line,
                                      const I& begin,
@@ -1592,9 +1593,9 @@ namespace stan {
                                               const pos_iterator_t& end) const;
 
 
-    // template void add_line_number::operator()(statement&,
-    //                                           const pos_iterator_t& begin,
-    //                                           const pos_iterator_t& end) const;
+    template void add_line_number::operator()(statement&,
+                                              const pos_iterator_t& begin,
+                                              const pos_iterator_t& end) const;
 
 
     void set_void_return::operator()(return_statement& s) const {
@@ -1630,14 +1631,14 @@ namespace stan {
       bare_array_type ar_int(bet_int);
       bare_expr_type bet_ar_int(ar_int);
       bare_expr_type bet_ar_int_data(ar_int);
-      bet_ar_int_data.set_data_only(true);
+      bet_ar_int_data.set_is_data(true);
 
       double_type t_double;
       bare_expr_type bet_double(t_double);
       bare_array_type ar_double(bet_double);
       bare_expr_type bet_ar_double(ar_double);
-      bare_expr_type bet_ar_double_data(ar_double_data);
-      bet_ar_double_data.set_data_only(true);
+      bare_expr_type bet_ar_double_data(ar_double);
+      bet_ar_double_data.set_is_data(true);
 
       bare_expr_type sys_result_type(bet_ar_double);
       std::vector<bare_expr_type> sys_arg_types;
@@ -1816,13 +1817,15 @@ namespace stan {
       bare_expr_type bet_double(t_double);
       bare_array_type ar_double(bet_double);
       bare_expr_type bet_ar_double(ar_double);
-      bare_expr_type bet_ar_double_data(ar_double_data);
-      bet_ar_double_data.set_data_only(true);
+
+      bare_expr_type bet_ar_double_data(ar_double);
+      bet_ar_double_data.set_is_data(true);
 
       vector_type t_vector;
       bare_expr_type bet_vector(t_vector);
+
       bare_expr_type bet_vector_data(t_vector);
-      bet_vector_data.set_data_only(true);
+      bet_vector_data.set_is_data(true);
 
       bare_expr_type sys_result_type(t_vector);
       std::vector<bare_expr_type> sys_arg_types;
@@ -2883,6 +2886,7 @@ namespace stan {
       range.low_ = expr;
       validate_int_expr validator;
       validator(expr, pass, error_msgs);
+      //      std::cout << "set_int_range_lower, pass: " << pass << std::endl;
     }
     boost::phoenix::function<set_int_range_lower> set_int_range_lower_f;
 
@@ -2893,6 +2897,7 @@ namespace stan {
       range.high_ = expr;
       validate_int_expr validator;
       validator(expr, pass, error_msgs);
+      //      std::cout << "set_int_range_upper, pass: " << pass << std::endl;
     }
     boost::phoenix::function<set_int_range_upper> set_int_range_upper_f;
 
@@ -2946,8 +2951,19 @@ namespace stan {
                                         const expression& def,
                                         bool& pass,
                                         std::ostream& error_msgs) const {
+      //      std::cout << "validate_array_block_var_decl" << std::endl;
+      //      std::cout << " name: " << name << " el_type " << el_type.bare_type() << std::endl;
+      //      std::cout << " size dims: " << dims.size() << std::endl;
       stan::lang::block_array_type bat(el_type, dims);
-      var_decl_result = block_var_decl(name, bat, def);
+
+      //      std::cout << " block_array_type, num dims? " << bat.dims() << std::endl;
+      //      std::cout << " block_array_type, dim 1 element? " << bat.element_type().bare_type() << std::endl;
+      block_var_decl result(name, bat, def);
+      var_decl_result = result;
+      // std::cout << "made it!" << std::endl;
+      // std::cout << "block var decl name: " << var_decl_result.name()
+      //           << " bare type: " << var_decl_result.bare_type()
+      //           << std::endl;
     }
     boost::phoenix::function<validate_array_block_var_decl>
     validate_array_block_var_decl_f;
@@ -2960,20 +2976,121 @@ namespace stan {
       block_var_decl result = block_var_decl(var_decl_result.name(),
                                              var_decl_result.type(),
                                              var_decl_result.def());
+      // std::cout << "validate_single_block_var_decl"
+      //           << " type: " << var_decl_result.type().name()
+      //           << " is bounded? " << var_decl_result.type().has_def_bounds()
+      //           << std::endl;
       var_decl_result = result;
-      std::cout << "block var decl, bare type: "
-                 << var_decl_result.bare_type()
-                 << " type: "
-                 << var_decl_result.type()
-                 << std::endl;
+      // std::cout << "block var decl name: " << var_decl_result.name()
+      //           << " bare type: " << var_decl_result.bare_type()
+      //           << " type: " << var_decl_result.type()
+      //           << std::endl;
     }
     boost::phoenix::function<validate_single_block_var_decl>
     validate_single_block_var_decl_f;
 
+    template <typename T>
+    void validate_block_var_type::operator()(
+                                             block_var_type& var_type_result,
+                                             const T& var_type,
+                                             bool& pass,
+                                             std::ostream& error_msgs) const {
+      block_var_type result(var_type);
+      var_type_result = result;
+      // std::cout << "validate_block_var_type, _val is: "
+      //           << " type: " << var_type_result.name()
+      //           << " is bounded? " << var_type_result.has_def_bounds()
+      //           << std::endl;
+    }
+    boost::phoenix::function<validate_block_var_type>
+    validate_block_var_type_f;
+
+    template void
+    validate_block_var_type::operator()(block_var_type& var_type_result,
+                             const block_array_type& var_type,
+                             bool& pass,
+                             std::ostream& error_msgs) const;
+    template void
+    validate_block_var_type::operator()(block_var_type& var_type_result,
+                             const cholesky_corr_block_type& var_type,
+                             bool& pass,
+                             std::ostream& error_msgs) const;
+    template void
+    validate_block_var_type::operator()(block_var_type& var_type_result,
+                             const cholesky_factor_block_type& var_type,
+                             bool& pass,
+                             std::ostream& error_msgs) const;
+    template void
+    validate_block_var_type::operator()(block_var_type& var_type_result,
+                             const corr_matrix_block_type& var_type,
+                             bool& pass,
+                             std::ostream& error_msgs) const;
+    template void
+    validate_block_var_type::operator()(block_var_type& var_type_result,
+                             const cov_matrix_block_type& var_type,
+                             bool& pass,
+                             std::ostream& error_msgs) const;
+    template void
+    validate_block_var_type::operator()(block_var_type& var_type_result,
+                             const double_block_type& var_type,
+                             bool& pass,
+                             std::ostream& error_msgs) const;
+    template void
+    validate_block_var_type::operator()(block_var_type& var_type_result,
+                             const ill_formed_type& var_type,
+                             bool& pass,
+                             std::ostream& error_msgs) const;
+    template void
+    validate_block_var_type::operator()(block_var_type& var_type_result,
+                             const int_block_type& var_type,
+                             bool& pass,
+                             std::ostream& error_msgs) const;
+    template void
+    validate_block_var_type::operator()(block_var_type& var_type_result,
+                             const matrix_block_type& var_type,
+                             bool& pass,
+                             std::ostream& error_msgs) const;
+    template void
+    validate_block_var_type::operator()(block_var_type& var_type_result,
+                             const ordered_block_type& var_type,
+                             bool& pass,
+                             std::ostream& error_msgs) const;
+    template void
+    validate_block_var_type::operator()(block_var_type& var_type_result,
+                             const positive_ordered_block_type& var_type,
+                             bool& pass,
+                             std::ostream& error_msgs) const;
+    template void
+    validate_block_var_type::operator()(block_var_type& var_type_result,
+                             const row_vector_block_type& var_type,
+                             bool& pass,
+                             std::ostream& error_msgs) const;
+    template void
+    validate_block_var_type::operator()(block_var_type& var_type_result,
+                             const simplex_block_type& var_type,
+                             bool& pass,
+                             std::ostream& error_msgs) const;
+    template void
+    validate_block_var_type::operator()(block_var_type& var_type_result,
+                             const unit_vector_block_type& var_type,
+                             bool& pass,
+                             std::ostream& error_msgs) const;
+    template void
+    validate_block_var_type::operator()(block_var_type& var_type_result,
+                             const vector_block_type& var_type,
+                             bool& pass,
+                             std::ostream& error_msgs) const;
+                                                      
     void add_block_var::operator()(const block_var_decl& block_var_decl,
                                    variable_map& vm, bool& pass,
                                    const scope& var_scope,
                                    std::ostream& error_msgs) const {
+
+      std::cout << "add_block_var_f, "
+                << "block var decl name: " << block_var_decl.name()
+                << " type: " << block_var_decl.type()
+                << std::endl;
+
       if (vm.exists(block_var_decl.name())) {
         pass = false;
         error_msgs << "duplicate declaration of variable, name="
@@ -3055,6 +3172,7 @@ namespace stan {
     boost::phoenix::function<reset_var_scope> reset_var_scope_f;
 
     void trace::operator()(const std::string& msg) const {
+      //      std::cout << msg << std::endl;
     }
     boost::phoenix::function<trace> trace_f;
 

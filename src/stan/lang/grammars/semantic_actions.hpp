@@ -908,6 +908,18 @@ namespace stan {
     extern boost::phoenix::function<validate_single_block_var_decl>
     validate_single_block_var_decl_f;
 
+    struct validate_block_var_type : public phoenix_functor_quaternary {
+      template <typename T>
+      void operator()(
+                      block_var_type& var_type_result,
+                      const T& var_type,
+                      bool& pass,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<validate_block_var_type>
+    validate_block_var_type_f;
+
+
     struct add_block_var : public phoenix_functor_quinary {
       void operator()(const block_var_decl& block_var_decl,
                       variable_map& vm, bool& pass,

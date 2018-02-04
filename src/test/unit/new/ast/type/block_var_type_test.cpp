@@ -207,6 +207,18 @@ TEST(blockVarType, createArray) {
   EXPECT_EQ("int[ ]", ss.str());
 }
 
+TEST(blockVarType, get1dArrayLens) {
+  int_block_type tInt;
+  expression e1;
+  block_array_type d1(tInt,e1);
+  block_var_type x(d1);
+
+  std::vector<expression> lens = d1.array_lens();
+  EXPECT_EQ(lens.size(), 1);
+  std::vector<expression> sizes = x.size();
+  EXPECT_EQ(sizes.size(), 1);
+}
+
 TEST(blockVarType, getArrayElType) {
   int_block_type tInt;
   expression e1;
@@ -220,7 +232,6 @@ TEST(blockVarType, getArrayElType) {
   std::stringstream ss;
   stan::lang::write_bare_expr_type(ss, z.bare_type());
   EXPECT_EQ("int", ss.str());
-
 }
 
 TEST(blockVarType, create2DArray) {
@@ -253,6 +264,27 @@ TEST(blockVarType, create2DArray) {
   EXPECT_EQ(z.num_dims(), 1);
 }
 
+TEST(blockVarType, create3DArray) {
+  int_block_type tInt;
+  expression e1;
+  std::vector<expression> dims;
+  dims.push_back(e1);
+  dims.push_back(e1);
+  dims.push_back(e1);
+  
+  block_array_type d3(tInt,dims);
+  block_var_type x(d3);
+  EXPECT_TRUE(x.is_array_type());
+  EXPECT_EQ(x.num_dims(), 3);
+  EXPECT_EQ(x.num_dims(), 3);
+  EXPECT_EQ(x.array_dims(), 3);
+  EXPECT_EQ(d3.dims(), 3);
+
+  std::stringstream ss;
+  stan::lang::write_bare_expr_type(ss, x.bare_type());
+  EXPECT_EQ("int[ , , ]", ss.str());
+}
+
 TEST(blockVarType, create2DArrayOfMatrices) {
   range r1;
   expression e1;
@@ -280,8 +312,36 @@ TEST(blockVarType, create2DArrayOfMatrices) {
   std::stringstream ss;
   stan::lang::write_bare_expr_type(ss, y.bare_type());
   EXPECT_EQ("matrix[ , ]", ss.str());
-
 }
+
+TEST(blockVarType, get2dArrayLens) {
+  range r1;
+  expression e1;
+  expression e2;
+  expression e3;
+  expression e4;
+
+  matrix_block_type tMat(r1, e1, e2);
+  block_array_type d1(tMat,e3);
+  block_var_type x(d1);
+  EXPECT_TRUE(x.is_array_type());
+  EXPECT_EQ(x.num_dims(), 3);
+  EXPECT_EQ(x.array_dims(), 1);
+  EXPECT_EQ(d1.dims(), 1);
+
+  block_array_type d2(x,e4);
+  EXPECT_EQ(d2.dims(), 2);
+
+  block_var_type y(d2);
+  EXPECT_EQ(y.num_dims(), 4);
+  EXPECT_EQ(y.array_dims(), 2);
+
+  std::vector<expression> lens = d2.array_lens();
+  EXPECT_EQ(lens.size(), 2);
+  std::vector<expression> sizes = y.size();
+  EXPECT_EQ(sizes.size(), 4);
+}
+
 
 TEST(blockVarType, createArrayInt) {
   range r1;

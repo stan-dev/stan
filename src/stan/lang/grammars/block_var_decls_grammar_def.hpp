@@ -67,8 +67,10 @@ namespace stan {
 
     template <typename Iterator>
     block_var_decls_grammar<Iterator>::block_var_decls_grammar(variable_map& var_map,
-                                               std::stringstream& error_msgs)
+                                                               std::stringstream& error_msgs,
+                                                               const io::program_reader& reader)
       : block_var_decls_grammar::base_type(var_decls_r),
+        reader_(reader),
         var_map_(var_map),
         error_msgs_(error_msgs),
         expression_g(var_map, error_msgs),
@@ -101,58 +103,43 @@ namespace stan {
       // _r1 var scope
       var_decl_r.name("variable declaration");
       var_decl_r
-        %= (array_var_decl_r(_r1)
-            | single_var_decl_r(_r1))
-           [add_block_var_f(_val, boost::phoenix::ref(var_map_), _a, _r1,
-                            boost::phoenix::ref(error_msgs_)),
-            validate_definition_f(_r1, _val, _pass,
-                                  boost::phoenix::ref(error_msgs_))]
+        = ( raw[array_var_decl_r(_r1)
+                [trace_f("array_var_decl_r"),
+                 add_block_var_f(_1, boost::phoenix::ref(var_map_), _a, _r1,
+                                 boost::phoenix::ref(error_msgs_)),
+                 validate_definition_f(_r1, _1, _pass,
+                                       boost::phoenix::ref(error_msgs_)),
+                 assign_lhs_f(_val, _1)]
+                ]
+            [add_line_number_f(_val, begin(_1), end(_1))] 
+            | raw[single_var_decl_r(_r1)
+                  [add_block_var_f(_1, boost::phoenix::ref(var_map_), _a, _r1,
+                                   boost::phoenix::ref(error_msgs_)),
+                   validate_definition_f(_r1, _1, _pass,
+                                         boost::phoenix::ref(error_msgs_)),
+                   assign_lhs_f(_val, _1)]
+                  ]
+            [add_line_number_f(_val, begin(_1), end(_1))] )
         > lit(';');
-
-        // = (array_var_decl_r(_r1)
-        //     [add_block_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r1,
-        //                      boost::phoenix::ref(error_msgs))]
-        //     | single_var_decl_r(_r1)
-        //     [add_block_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r1,
-        //                      boost::phoenix::ref(error_msgs_))])
-        // > eps
-        //  [validate_definition_f(_r1, _val, _pass,
-        //                         boost::phoenix::ref(error_msgs_))]
-        // > lit(';');
-
-
-      // 
-      //   = (raw[array_var_decl_r(_r1)
-      //          [add_block_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r1,
-      //                           boost::phoenix::ref(error_msgs))]]
-      //      [add_line_number_f(_val, begin(_1), end(_1))]
-      //      | raw[single_var_decl_r(_r1)
-      //            [add_block_var_f(_val, _1, boost::phoenix::ref(var_map_), _a, _r1,
-      //                             boost::phoenix::ref(error_msgs_))]]
-      //      [add_line_number_f(_val, begin(_1), end(_1))])
-      //   > eps
-      //   [validate_definition_f(_r1, _val, _pass,
-      //                          boost::phoenix::ref(error_msgs_))]
-      //   > lit(';');
-
 
       array_var_decl_r.name("array block var declaration");
       array_var_decl_r
         = (element_type_r(_r1)[trace_f("element_type_r")]
-           >> identifier_r[trace_f("identifier_r")]
-           >> dims_r(_r1)[trace_f("dims_r")]
-           >> opt_def_r(_r1)[trace_f("opt_def_r")])
+            >> identifier_r[trace_f("identifier_r")]
+            >> dims_r(_r1)[trace_f("dims_r")]
+            >> opt_def_r(_r1)[trace_f("opt_def_r")])
         [validate_array_block_var_decl_f(_val, _1, _2, _3, _4, _a,
                                          boost::phoenix::ref(error_msgs_))];
+
 
       single_var_decl_r.name("single-element block var declaration");
       single_var_decl_r
         %= element_type_r(_r1)
-        > identifier_r
-        > opt_def_r(_r1)
-        > eps
-          [validate_single_block_var_decl_f(_val, _pass,
-                                           boost::phoenix::ref(error_msgs_))];
+           > identifier_r
+           > opt_def_r(_r1)
+           > eps
+           [validate_single_block_var_decl_f(_val, _pass,
+                                             boost::phoenix::ref(error_msgs_))];
       
       element_type_r.name("block var element type declaration");
       element_type_r
@@ -168,12 +155,9 @@ namespace stan {
             | corr_matrix_type_r(_r1)
             | cov_matrix_type_r(_r1)
             | cholesky_corr_type_r(_r1)
-            | cholesky_factor_type_r(_r1));
-      // TODO:mitzi - validate type properly
-
-      // _r1 var scope
-      dims_r.name("array dimensions");
-      dims_r %= lit('[') > (int_data_expr_r(_r1) % ',') > lit(']');
+            | cholesky_factor_type_r(_r1))
+        [validate_block_var_type_f(_val, _1, _pass,
+                                   boost::phoenix::ref(error_msgs_))];
       
       int_type_r.name("integer type");
       int_type_r
@@ -268,6 +252,10 @@ namespace stan {
         [copy_square_cholesky_dimension_if_necessary_f(_val)];
 
       // _r1 var scope
+      dims_r.name("array dimensions");
+      dims_r %= lit('[') > (int_data_expr_r(_r1) % ',') > lit(']');
+
+      // _r1 var scope
       opt_def_r.name("variable definition (optional)");
       opt_def_r %= -def_r(_r1);
 
@@ -279,26 +267,26 @@ namespace stan {
       range_brackets_int_r.name("integer range expression pair, brackets");
       range_brackets_int_r
         = lit('<') [empty_range_f(_val, boost::phoenix::ref(error_msgs_))]
-        >> (
+        > (
             ((lit("lower")
-              >> lit('=')
-              >> expression07_g(_r1)
+              > lit('=')
+              > expression07_g(_r1)
                  [set_int_range_lower_f(_val, _1, _pass,
                                         boost::phoenix::ref(error_msgs_))])
-             >> -(lit(',')
-                  >> lit("upper")
-                  >> lit('=')
-                  >> expression07_g(_r1)
+             > -(lit(',')
+                  > lit("upper")
+                  > lit('=')
+                  > expression07_g(_r1)
                      [set_int_range_upper_f(_val, _1, _pass,
                                             boost::phoenix::ref(error_msgs_))]))
            |
            (lit("upper")
-            >> lit('=')
-            >> expression07_g(_r1)
+            > lit('=')
+            > expression07_g(_r1)
                [set_int_range_upper_f(_val, _1, _pass,
                                       boost::phoenix::ref(error_msgs_))])
             )
-        >> lit('>');
+        > lit('>');
 
       // _r1 var scope
       range_brackets_double_r.name("real range expression pair, brackets");
