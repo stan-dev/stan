@@ -5,7 +5,7 @@
 
 namespace stan {
   namespace lang {
-    vector_local_type::vector_local_type() { }
+    vector_local_type::vector_local_type() : N_(nil()) { }
 
     vector_local_type::vector_local_type(const expression& N)
       : N_(N) { }

@@ -6,7 +6,8 @@
 namespace stan {
   namespace lang {
 
-    int_block_type::int_block_type() { }
+    int_block_type::int_block_type()
+      : bounds_(nil(), nil()) { }
 
     int_block_type::int_block_type(const range& bounds)
       : bounds_(bounds) { }

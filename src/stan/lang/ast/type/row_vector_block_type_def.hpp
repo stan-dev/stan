@@ -5,7 +5,8 @@
 
 namespace stan {
   namespace lang {
-    row_vector_block_type::row_vector_block_type() { }
+    row_vector_block_type::row_vector_block_type()
+          : bounds_(nil(), nil()), N_(nil()) { }
 
     row_vector_block_type::row_vector_block_type(const range& bounds,
                                                  const expression& N)

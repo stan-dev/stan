@@ -6,7 +6,7 @@
 namespace stan {
   namespace lang {
 
-    cov_matrix_block_type::cov_matrix_block_type() { }
+    cov_matrix_block_type::cov_matrix_block_type() : K_(nil()) { }
 
     cov_matrix_block_type::cov_matrix_block_type(const expression& K)
       : K_(K) { }

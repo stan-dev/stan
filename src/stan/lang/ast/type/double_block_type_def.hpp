@@ -5,7 +5,8 @@
 
 namespace stan {
   namespace lang {
-    double_block_type::double_block_type() { }
+    double_block_type::double_block_type()
+      : bounds_(nil(), nil()) { }
 
     double_block_type::double_block_type(const range& bounds)
       : bounds_(bounds) { }

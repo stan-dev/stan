@@ -5,7 +5,8 @@
 
 namespace stan {
   namespace lang {
-    positive_ordered_block_type::positive_ordered_block_type() { }
+    positive_ordered_block_type::positive_ordered_block_type()
+      : K_(nil()) { }
 
     positive_ordered_block_type::positive_ordered_block_type(
                                  const expression& K)

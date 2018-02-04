@@ -5,7 +5,8 @@
 
 namespace stan {
   namespace lang {
-    vector_block_type::vector_block_type() { }
+    vector_block_type::vector_block_type()
+      : bounds_(nil(), nil()), N_(nil()) { }
 
     vector_block_type::vector_block_type(const range& bounds,
                                          const expression& N)

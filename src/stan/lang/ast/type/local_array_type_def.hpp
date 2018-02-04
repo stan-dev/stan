@@ -7,7 +7,7 @@ namespace stan {
   namespace lang {
 
     local_array_type::local_array_type()
-      : element_type_(ill_formed_type()) { }
+      : element_type_(ill_formed_type()), array_len_(nil()) { }
 
     local_array_type::local_array_type(const local_var_type& el_type,
                                        const expression& len)

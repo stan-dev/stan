@@ -6,7 +6,8 @@
 namespace stan {
   namespace lang {
 
-    block_array_type::block_array_type() { }
+    block_array_type::block_array_type()
+          : element_type_(ill_formed_type()), array_len_(nil()) { }
 
     block_array_type::block_array_type(const block_var_type& el_type,
                                        const expression& len)

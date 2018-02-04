@@ -5,7 +5,7 @@
 
 namespace stan {
   namespace lang {
-    unit_vector_block_type::unit_vector_block_type() { }
+    unit_vector_block_type::unit_vector_block_type() : K_(nil()) { }
 
     unit_vector_block_type::unit_vector_block_type(const expression& K)
       : K_(K) { }

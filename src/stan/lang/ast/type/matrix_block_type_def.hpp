@@ -5,7 +5,7 @@
 
 namespace stan {
   namespace lang {
-    matrix_block_type::matrix_block_type() { }
+    matrix_block_type::matrix_block_type() : M_(nil()), N_(nil()) { }
 
     matrix_block_type::matrix_block_type(const range& bounds,
                                          const expression& M,

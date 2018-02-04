@@ -6,7 +6,7 @@
 namespace stan {
   namespace lang {
 
-    cholesky_corr_block_type::cholesky_corr_block_type() { }
+    cholesky_corr_block_type::cholesky_corr_block_type() : K_(nil()) { }
 
     cholesky_corr_block_type::cholesky_corr_block_type(const expression& K)
       : K_(K) { }

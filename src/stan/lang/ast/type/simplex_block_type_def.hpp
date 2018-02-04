@@ -5,7 +5,7 @@
 
 namespace stan {
   namespace lang {
-    simplex_block_type::simplex_block_type() { }
+    simplex_block_type::simplex_block_type() : K_(nil()) { }
 
     simplex_block_type::simplex_block_type(const expression& K)
       : K_(K) { }

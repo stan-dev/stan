@@ -5,7 +5,8 @@
 
 namespace stan {
   namespace lang {
-    matrix_local_type::matrix_local_type() { }
+    matrix_local_type::matrix_local_type()
+      : M_(nil()), N_(nil()) { }
 
     matrix_local_type::matrix_local_type(const expression& M,
                                          const expression& N)
