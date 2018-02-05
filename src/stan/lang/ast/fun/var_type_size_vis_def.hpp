@@ -37,15 +37,16 @@ namespace stan {
     }
 
     std::vector<expression>
-    var_type_size_vis::operator()(const cholesky_corr_block_type& x)
+    var_type_size_vis::operator()(const cholesky_factor_corr_block_type& x)
       const {
       std::vector<expression> sizes;
+      sizes.push_back(x.K_);
       sizes.push_back(x.K_);
       return sizes;
     }
 
     std::vector<expression>
-    var_type_size_vis::operator()(const cholesky_factor_block_type& x)
+    var_type_size_vis::operator()(const cholesky_factor_cov_block_type& x)
       const {
       std::vector<expression> sizes;
       sizes.push_back(x.M_);
@@ -58,6 +59,7 @@ namespace stan {
       const {
       std::vector<expression> sizes;
       sizes.push_back(x.K_);
+      sizes.push_back(x.K_);
       return sizes;
     }
 
@@ -65,6 +67,7 @@ namespace stan {
     var_type_size_vis::operator()(const cov_matrix_block_type& x)
       const {
       std::vector<expression> sizes;
+      sizes.push_back(x.K_);
       sizes.push_back(x.K_);
       return sizes;
     }

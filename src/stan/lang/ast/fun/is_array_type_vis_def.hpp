@@ -20,11 +20,11 @@ namespace stan {
       return true;
     }
 
-    bool is_array_type_vis::operator()(const cholesky_corr_block_type& x) const {
+    bool is_array_type_vis::operator()(const cholesky_factor_corr_block_type& x) const {
       return false;
     }
 
-    bool is_array_type_vis::operator()(const cholesky_factor_block_type& x) const {
+    bool is_array_type_vis::operator()(const cholesky_factor_cov_block_type& x) const {
       return false;
     }
 

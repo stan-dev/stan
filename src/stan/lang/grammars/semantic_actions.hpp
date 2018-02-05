@@ -821,7 +821,7 @@ namespace stan {
     // copies single dimension from M to N if only M declared
     struct copy_square_cholesky_dimension_if_necessary
       : public phoenix_functor_unary {
-      void operator()(cholesky_factor_block_type& block_type) const;
+      void operator()(cholesky_factor_cov_block_type& block_type) const;
     };
     extern boost::phoenix::function<copy_square_cholesky_dimension_if_necessary>
     copy_square_cholesky_dimension_if_necessary_f;

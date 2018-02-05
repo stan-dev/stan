@@ -13,11 +13,11 @@ namespace stan {
        return bounds.has_low() || bounds.has_high();
     }
 
-    bool block_type_has_def_bounds_vis::operator()(const cholesky_corr_block_type& x) const {
+    bool block_type_has_def_bounds_vis::operator()(const cholesky_factor_corr_block_type& x) const {
       return false;
     }
 
-    bool block_type_has_def_bounds_vis::operator()(const cholesky_factor_block_type& x) const {
+    bool block_type_has_def_bounds_vis::operator()(const cholesky_factor_cov_block_type& x) const {
       return false;
     }
 

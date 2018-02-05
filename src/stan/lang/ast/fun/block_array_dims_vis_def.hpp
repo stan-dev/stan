@@ -12,11 +12,11 @@ namespace stan {
       return x.dims();
     }
 
-    int block_array_dims_vis::operator()(const cholesky_corr_block_type& x) const {
+    int block_array_dims_vis::operator()(const cholesky_factor_corr_block_type& x) const {
       return 0;
     }
 
-    int block_array_dims_vis::operator()(const cholesky_factor_block_type& x) const {
+    int block_array_dims_vis::operator()(const cholesky_factor_cov_block_type& x) const {
       return 0;
     }
 

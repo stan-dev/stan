@@ -17,10 +17,10 @@ namespace stan {
     block_var_type::block_var_type(const ill_formed_type& x)
       : var_type_(x) { }
 
-    block_var_type::block_var_type(const cholesky_corr_block_type& x)
+    block_var_type::block_var_type(const cholesky_factor_corr_block_type& x)
       : var_type_(x) { }
 
-    block_var_type::block_var_type(const cholesky_factor_block_type& x)
+    block_var_type::block_var_type(const cholesky_factor_cov_block_type& x)
       : var_type_(x) { }
 
     block_var_type::block_var_type(const corr_matrix_block_type& x)

@@ -12,11 +12,11 @@ namespace stan {
       return x.element_type_;
     }
 
-    block_var_type block_array_element_type_vis::operator()(const cholesky_corr_block_type& x) const {
+    block_var_type block_array_element_type_vis::operator()(const cholesky_factor_corr_block_type& x) const {
       return ill_formed_type();
     }
 
-    block_var_type block_array_element_type_vis::operator()(const cholesky_factor_block_type& x) const {
+    block_var_type block_array_element_type_vis::operator()(const cholesky_factor_cov_block_type& x) const {
       return ill_formed_type();
     }
 

@@ -14,8 +14,8 @@
 #include <stan/lang/ast/type/local_var_type.hpp>
 #include <stan/lang/ast/type/local_array_type.hpp>
 
-#include <stan/lang/ast/type/cholesky_corr_block_type.hpp>
-#include <stan/lang/ast/type/cholesky_factor_block_type.hpp>
+#include <stan/lang/ast/type/cholesky_factor_corr_block_type.hpp>
+#include <stan/lang/ast/type/cholesky_factor_cov_block_type.hpp>
 #include <stan/lang/ast/type/corr_matrix_block_type.hpp>
 #include <stan/lang/ast/type/cov_matrix_block_type.hpp>
 #include <stan/lang/ast/type/double_block_type.hpp>

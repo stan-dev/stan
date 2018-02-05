@@ -6,8 +6,8 @@
 
 using stan::lang::block_var_type;
 using stan::lang::block_array_type;
-using stan::lang::cholesky_corr_block_type;
-using stan::lang::cholesky_factor_block_type;
+using stan::lang::cholesky_factor_corr_block_type;
+using stan::lang::cholesky_factor_cov_block_type;
 using stan::lang::corr_matrix_block_type;
 using stan::lang::cov_matrix_block_type;
 using stan::lang::double_block_type;
@@ -129,7 +129,7 @@ TEST(blockVarType, createMatrix) {
   EXPECT_EQ("matrix", ss.str());
 }
 
-TEST(blockVarType, createMatrixSized) {
+TEST(blockVarType, createMatrixBounded) {
   range r1;
   expression e1;
   matrix_block_type tMatrix(r1, e1, e1);
@@ -145,7 +145,7 @@ TEST(blockVarType, createMatrixSized) {
   EXPECT_EQ("matrix", ss.str());
 }
 
-TEST(blockVarType, createVectorSized) {
+TEST(blockVarType, createVectorBounded) {
   range r1;
   expression e1;
   vector_block_type tVector(r1, e1);
@@ -161,7 +161,7 @@ TEST(blockVarType, createVectorSized) {
   EXPECT_EQ("vector", ss.str());
 }
 
-TEST(blockVarType, createRowVectorSized) {
+TEST(blockVarType, createRowVectorBounded) {
   range r1;
   expression e1;
   row_vector_block_type tRowVector(r1, e1);

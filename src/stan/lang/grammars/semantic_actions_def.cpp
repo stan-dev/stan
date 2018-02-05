@@ -2866,7 +2866,7 @@ namespace stan {
 
     // copies single dimension from M to N if only M declared
     void copy_square_cholesky_dimension_if_necessary::operator()(
-                           cholesky_factor_block_type& block_type) const {
+                           cholesky_factor_cov_block_type& block_type) const {
         if (is_nil(block_type.N_))
           block_type.N_ = block_type.M_;
     }
@@ -3012,12 +3012,12 @@ namespace stan {
                              std::ostream& error_msgs) const;
     template void
     validate_block_var_type::operator()(block_var_type& var_type_result,
-                             const cholesky_corr_block_type& var_type,
+                             const cholesky_factor_corr_block_type& var_type,
                              bool& pass,
                              std::ostream& error_msgs) const;
     template void
     validate_block_var_type::operator()(block_var_type& var_type_result,
-                             const cholesky_factor_block_type& var_type,
+                             const cholesky_factor_cov_block_type& var_type,
                              bool& pass,
                              std::ostream& error_msgs) const;
     template void
@@ -3086,10 +3086,10 @@ namespace stan {
                                    const scope& var_scope,
                                    std::ostream& error_msgs) const {
 
-      std::cout << "add_block_var_f, "
-                << "block var decl name: " << block_var_decl.name()
-                << " type: " << block_var_decl.type()
-                << std::endl;
+      // std::cout << "add_block_var_f, "
+      //           << "block var decl name: " << block_var_decl.name()
+      //           << " type: " << block_var_decl.type()
+      //           << std::endl;
 
       if (vm.exists(block_var_decl.name())) {
         pass = false;

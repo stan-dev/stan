@@ -14,8 +14,8 @@ namespace stan {
      */
 
     struct block_array_type;
-    struct cholesky_corr_block_type;
-    struct cholesky_factor_block_type;
+    struct cholesky_factor_corr_block_type;
+    struct cholesky_factor_cov_block_type;
     struct corr_matrix_block_type;
     struct cov_matrix_block_type;
     struct double_block_type;
@@ -35,8 +35,8 @@ namespace stan {
        */
       typedef boost::variant<
         boost::recursive_wrapper<ill_formed_type>,
-        boost::recursive_wrapper<cholesky_corr_block_type>,
-        boost::recursive_wrapper<cholesky_factor_block_type>,
+        boost::recursive_wrapper<cholesky_factor_corr_block_type>,
+        boost::recursive_wrapper<cholesky_factor_cov_block_type>,
         boost::recursive_wrapper<corr_matrix_block_type>,
         boost::recursive_wrapper<cov_matrix_block_type>,
         boost::recursive_wrapper<double_block_type>,
@@ -80,14 +80,14 @@ namespace stan {
        *
        * @param type block variable type
        */      
-      block_var_type(const cholesky_corr_block_type& x); // NOLINT(runtime/explicit)
+      block_var_type(const cholesky_factor_corr_block_type& x); // NOLINT(runtime/explicit)
 
       /**
        * Construct a block var type with the specified type.
        *
        * @param type block variable type
        */      
-      block_var_type(const cholesky_factor_block_type& x); // NOLINT(runtime/explicit)
+      block_var_type(const cholesky_factor_cov_block_type& x); // NOLINT(runtime/explicit)
 
       /**
        * Construct a block var type with the specified type.

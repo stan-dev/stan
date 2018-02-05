@@ -21,13 +21,13 @@ namespace stan {
     }
 
     expression
-    var_type_array_len_vis::operator()(const cholesky_corr_block_type& x)
+    var_type_array_len_vis::operator()(const cholesky_factor_corr_block_type& x)
       const {
       return expression(nil());
     }
 
     expression
-    var_type_array_len_vis::operator()(const cholesky_factor_block_type& x)
+    var_type_array_len_vis::operator()(const cholesky_factor_cov_block_type& x)
       const {
       return expression(nil());
     }

@@ -4,8 +4,8 @@
 #include <stan/lang/ast/node/expression.hpp>
 #include <stan/lang/ast/type/block_array_type.hpp>
 #include <stan/lang/ast/type/local_array_type.hpp>
-#include <stan/lang/ast/type/cholesky_corr_block_type.hpp>
-#include <stan/lang/ast/type/cholesky_factor_block_type.hpp>
+#include <stan/lang/ast/type/cholesky_factor_corr_block_type.hpp>
+#include <stan/lang/ast/type/cholesky_factor_cov_block_type.hpp>
 #include <stan/lang/ast/type/corr_matrix_block_type.hpp>
 #include <stan/lang/ast/type/cov_matrix_block_type.hpp>
 #include <stan/lang/ast/type/double_block_type.hpp>
@@ -60,7 +60,7 @@ namespace stan {
        * @param x type
        * @return name
        */
-      std::string operator()(const cholesky_corr_block_type& x) const;
+      std::string operator()(const cholesky_factor_corr_block_type& x) const;
 
       /**
        * Return name for this type.
@@ -68,7 +68,7 @@ namespace stan {
        * @param x type
        * @return name
        */
-      std::string operator()(const cholesky_factor_block_type& x) const;
+      std::string operator()(const cholesky_factor_cov_block_type& x) const;
 
       /**
        * Return name for this type.

@@ -3,8 +3,8 @@
 
 #include <stan/lang/ast/node/range.hpp>
 #include <stan/lang/ast/type/block_array_type.hpp>
-#include <stan/lang/ast/type/cholesky_corr_block_type.hpp>
-#include <stan/lang/ast/type/cholesky_factor_block_type.hpp>
+#include <stan/lang/ast/type/cholesky_factor_corr_block_type.hpp>
+#include <stan/lang/ast/type/cholesky_factor_cov_block_type.hpp>
 #include <stan/lang/ast/type/corr_matrix_block_type.hpp>
 #include <stan/lang/ast/type/cov_matrix_block_type.hpp>
 #include <stan/lang/ast/type/double_block_type.hpp>
@@ -45,7 +45,7 @@ namespace stan {
        * @param x type
        * @return bounds
        */
-      range operator()(const cholesky_corr_block_type& x) const;
+      range operator()(const cholesky_factor_corr_block_type& x) const;
 
       /**
        * Return bounds for this type.
@@ -53,7 +53,7 @@ namespace stan {
        * @param x type
        * @return bounds
        */
-      range operator()(const cholesky_factor_block_type& x) const;
+      range operator()(const cholesky_factor_cov_block_type& x) const;
 
       /**
        * Return bounds for this type.

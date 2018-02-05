@@ -31,11 +31,11 @@ namespace stan {
       return bare_array;
     }
 
-    bare_expr_type bare_type_vis::operator()(const cholesky_corr_block_type& x) const {
+    bare_expr_type bare_type_vis::operator()(const cholesky_factor_corr_block_type& x) const {
       return matrix_type();
     }
 
-    bare_expr_type bare_type_vis::operator()(const cholesky_factor_block_type& x) const {
+    bare_expr_type bare_type_vis::operator()(const cholesky_factor_cov_block_type& x) const {
       return matrix_type();
     }
 

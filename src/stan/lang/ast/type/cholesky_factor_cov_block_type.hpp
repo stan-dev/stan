@@ -1,5 +1,5 @@
-#ifndef STAN_LANG_AST_CHOLESKY_FACTOR_BLOCK_TYPE_HPP
-#define STAN_LANG_AST_CHOLESKY_FACTOR_BLOCK_TYPE_HPP
+#ifndef STAN_LANG_AST_CHOLESKY_FACTOR_COV_BLOCK_TYPE_HPP
+#define STAN_LANG_AST_CHOLESKY_FACTOR_COV_BLOCK_TYPE_HPP
 
 #include <stan/lang/ast/node/expression.hpp>
 
@@ -7,9 +7,12 @@ namespace stan {
   namespace lang {
 
     /**
-     * Cholesky factor matrix block var type.
+     * Cholesky factor for covariance matrix block var type.
+     *
+     * Note:  no 1-arg constructor for square matrix;
+     * both row and column dimensions always required.
      */
-    struct cholesky_factor_block_type {
+    struct cholesky_factor_cov_block_type {
       /**
        * Number of rows.
        */
@@ -23,17 +26,16 @@ namespace stan {
       /**
        * Construct a block var type with default values.
        */
-      cholesky_factor_block_type();
+      cholesky_factor_cov_block_type();
 
       /**
        * Construct a block var type with specified values.
-       * Sizes should be int expressions - constructor doesn't check.
        *
        * @param M num rows
        * @param N num columns
        */
-      cholesky_factor_block_type(const expression& M,
-                                 const expression& N);
+      cholesky_factor_cov_block_type(const expression& M,
+                                     const expression& N);
 
       /**
        * Get M (num rows).

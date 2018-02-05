@@ -36,10 +36,10 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::vector_block_type,
                           (stan::lang::range, bounds_)
                           (stan::lang::expression, N_))
 
-BOOST_FUSION_ADAPT_STRUCT(stan::lang::cholesky_corr_block_type,
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::cholesky_factor_corr_block_type,
                           (stan::lang::expression, K_))
 
-BOOST_FUSION_ADAPT_STRUCT(stan::lang::cholesky_factor_block_type,
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::cholesky_factor_cov_block_type,
                           (stan::lang::expression, M_)
                           (stan::lang::expression, N_))
 
@@ -154,8 +154,8 @@ namespace stan {
             | unit_vector_type_r(_r1)
             | corr_matrix_type_r(_r1)
             | cov_matrix_type_r(_r1)
-            | cholesky_corr_type_r(_r1)
-            | cholesky_factor_type_r(_r1))
+            | cholesky_factor_corr_type_r(_r1)
+            | cholesky_factor_cov_type_r(_r1))
         [validate_block_var_type_f(_val, _1, _pass,
                                    boost::phoenix::ref(error_msgs_))];
       
@@ -232,16 +232,16 @@ namespace stan {
             >> no_skip[!char_("a-zA-Z0-9_")])
         > dim1_r(_r1);
 
-      cholesky_corr_type_r.name("cholesky factor of"
+      cholesky_factor_corr_type_r.name("cholesky factor of"
                                 " a correlation matrix type");
-      cholesky_corr_type_r
+      cholesky_factor_corr_type_r
         %= (lit("cholesky_factor_corr")
             >> no_skip[!char_("a-zA-Z0-9_")])
         > dim1_r(_r1);
 
-      cholesky_factor_type_r.name("cholesky factor of"
+      cholesky_factor_cov_type_r.name("cholesky factor of"
                                   " a covariance matrix type");
-      cholesky_factor_type_r
+      cholesky_factor_cov_type_r
         %= (lit("cholesky_factor_cov")
             >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('[')

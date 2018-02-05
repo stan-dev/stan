@@ -20,11 +20,11 @@ namespace stan {
       return x.dims() + x.contains().num_dims();
     }
 
-    int total_dims_vis::operator()(const cholesky_corr_block_type& x) const {
+    int total_dims_vis::operator()(const cholesky_factor_corr_block_type& x) const {
       return 2;
     }
 
-    int total_dims_vis::operator()(const cholesky_factor_block_type& x) const {
+    int total_dims_vis::operator()(const cholesky_factor_cov_block_type& x) const {
       return 2;
     }
 

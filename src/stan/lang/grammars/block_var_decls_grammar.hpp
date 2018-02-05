@@ -87,14 +87,14 @@ namespace stan {
       vector_type_r;
 
       boost::spirit::qi::rule<Iterator,
-                              cholesky_corr_block_type(scope),
+                              cholesky_factor_corr_block_type(scope),
                               whitespace_grammar<Iterator> >
-      cholesky_corr_type_r;
+      cholesky_factor_corr_type_r;
 
       boost::spirit::qi::rule<Iterator,
-                              cholesky_factor_block_type(scope),
+                              cholesky_factor_cov_block_type(scope),
                               whitespace_grammar<Iterator> >
-      cholesky_factor_type_r;
+      cholesky_factor_cov_type_r;
 
       boost::spirit::qi::rule<Iterator,
                               corr_matrix_block_type(scope),
