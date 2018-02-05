@@ -136,8 +136,8 @@ TEST(Parser, parse_array_of_cholesky_factor_corr_block_type) {
   EXPECT_EQ("2-dim array of cholesky_factor_corr", ss.str());
 }
 
-TEST(Parser, parse_cholesky_factor_cov_block_type) {
-  std::string input("  int K;\n  cholesky_factor_cov[M, N] x;");
+TEST(Parser, parse_cholesky_factor_cov_block_type_square) {
+  std::string input("  int K;\n  cholesky_factor_cov[K] x;");
   bool pass = false;
   std::stringstream msgs;
   std::vector<stan::lang::block_var_decl> bvds;
@@ -156,22 +156,28 @@ TEST(Parser, parse_cholesky_factor_cov_block_type) {
   EXPECT_EQ("cholesky_factor_cov", ss.str());
 }
 
-TEST(Parser, parse_cholesky_factor_cov_block_type_square) {
-  std::string input("  int K;\n  cholesky_factor_cov[K] x;");
+TEST(Parser, parse_cholesky_factor_cov_block_type_rect) {
+  std::string input("  int M;\n int N;\n  cholesky_factor_cov[M, N] x;");
   bool pass = false;
   std::stringstream msgs;
   std::vector<stan::lang::block_var_decl> bvds;
   bvds = parse_var_decls(input, pass, msgs);
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(2 == bvds.size());
+  EXPECT_TRUE(3 == bvds.size());
 
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvds[0].type());
   EXPECT_EQ("int", ss.str());
 
+
   ss.str(std::string());
   ss.clear();
   stan::lang::write_block_var_type(ss, bvds[1].type());
+  EXPECT_EQ("int", ss.str());
+
+  ss.str(std::string());
+  ss.clear();
+  stan::lang::write_block_var_type(ss, bvds[2].type());
   EXPECT_EQ("cholesky_factor_cov", ss.str());
 }
