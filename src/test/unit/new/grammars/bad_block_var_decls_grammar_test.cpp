@@ -19,7 +19,7 @@ TEST(Parser, parse_unknown) {
   EXPECT_NE(msgs.str().find("PARSER FAILED TO PARSE INPUT"), std::string::npos);
 }
 
-TEST(Parser, parse_unfinished) {
+TEST(Parser, parse_unfinished_1) {
   std::string input("int;");
   bool pass = false;
   std::stringstream msgs;
@@ -30,7 +30,19 @@ TEST(Parser, parse_unfinished) {
   EXPECT_NE(msgs.str().find("PARSER EXPECTED: <identifier>"), std::string::npos);
 }
 
-TEST(Parser, parse_unfinished_l3) {
+TEST(Parser, parse_unfinished_2) {
+  std::string input("int x");
+  bool pass = false;
+  std::stringstream msgs;
+  std::vector<stan::lang::block_var_decl> bvds;
+  bvds = parse_var_decls(input, pass, msgs);
+  
+  EXPECT_FALSE(pass);
+  EXPECT_NE(msgs.str().find("PARSER EXPECTED"), std::string::npos);
+  EXPECT_NE(msgs.str().find("\";\""), std::string::npos);
+}
+
+TEST(Parser, parse_unfinished_3) {
   std::string input("real y;\n"
                     "real z;\n"
                     "int;");
@@ -43,6 +55,19 @@ TEST(Parser, parse_unfinished_l3) {
   EXPECT_NE(msgs.str().find("PARSER EXPECTED: <identifier>"), std::string::npos);
 }
 
+TEST(Parser, parse_unfinished_4) {
+  std::string input("real y\n"
+                    "real z\n");
+  bool pass = false;
+  std::stringstream msgs;
+  std::vector<stan::lang::block_var_decl> bvds;
+  bvds = parse_var_decls(input, pass, msgs);
+
+  EXPECT_FALSE(pass);
+  EXPECT_NE(msgs.str().find("PARSER EXPECTED"), std::string::npos);
+  EXPECT_NE(msgs.str().find("\";\""), std::string::npos);
+}
+
 TEST(Parser, parse_unfinished_matrix) {
   std::string input("matrix;");
   bool pass = false;
@@ -52,6 +77,17 @@ TEST(Parser, parse_unfinished_matrix) {
 
   EXPECT_FALSE(pass);
   EXPECT_NE(msgs.str().find("PARSER EXPECTED: \"[\""), std::string::npos);
+}
+
+TEST(Parser, parse_matrix_missing_commas) {
+  std::string input("matrix[2 3] x;");
+  bool pass = false;
+  std::stringstream msgs;
+  std::vector<stan::lang::block_var_decl> bvds;
+  bvds = parse_var_decls(input, pass, msgs);
+
+  EXPECT_FALSE(pass);
+  EXPECT_NE(msgs.str().find("PARSER EXPECTED: \",\""), std::string::npos);
 }
 
 TEST(Parser, parse_bounded_simplex) {
@@ -76,6 +112,29 @@ TEST(Parser, parse_unclosed_dim) {
 
   EXPECT_FALSE(pass);
   EXPECT_NE(msgs.str().find("PARSER EXPECTED: \"]\""), std::string::npos);
+}
+
+TEST(Parser, parse_non_int_dim_1) {
+  std::string input("real K;\n"
+                    "simplex[K] foo;");
+  bool pass = false;
+  std::stringstream msgs;
+  std::vector<stan::lang::block_var_decl> bvds;
+  bvds = parse_var_decls(input, pass, msgs);
+
+  EXPECT_FALSE(pass);
+  EXPECT_NE(msgs.str().find("expression denoting integer required; found type=real"), std::string::npos);
+}
+
+TEST(Parser, parse_non_int_dim_2) {
+  std::string input("simplex[1.1] foo;");
+  bool pass = false;
+  std::stringstream msgs;
+  std::vector<stan::lang::block_var_decl> bvds;
+  bvds = parse_var_decls(input, pass, msgs);
+
+  EXPECT_FALSE(pass);
+  EXPECT_NE(msgs.str().find("expression denoting integer required; found type=real"), std::string::npos);
 }
 
 TEST(Parser, parse_too_many_dims) {
@@ -154,6 +213,66 @@ TEST(Parser, bounds_test_1) {
 
   EXPECT_FALSE(pass);
   EXPECT_NE(msgs.str().find("expression denoting integer required"), std::string::npos);
+}
+
+TEST(Parser, bounds_test_2) {
+  std::string input("int<lower=1, upper=2.0> J;\n");
+  bool pass = false;
+  std::stringstream msgs;
+  std::vector<stan::lang::block_var_decl> bvds;
+  bvds = parse_var_decls(input, pass, msgs);
+
+  EXPECT_FALSE(pass);
+  EXPECT_NE(msgs.str().find("expression denoting integer required"), std::string::npos);
+}
+
+TEST(Parser, bounds_test_3) {
+  std::string input("int<middle=1, upper=2.0> J;\n");
+  bool pass = false;
+  std::stringstream msgs;
+  std::vector<stan::lang::block_var_decl> bvds;
+  bvds = parse_var_decls(input, pass, msgs);
+
+  EXPECT_FALSE(pass);
+  EXPECT_NE(msgs.str().find("PARSER EXPECTED"), std::string::npos);
+  EXPECT_NE(msgs.str().find("\"lower\""), std::string::npos);
+  EXPECT_NE(msgs.str().find("\"upper\""), std::string::npos);
+}
+
+TEST(Parser, bounds_test_4) {
+  std::string input("int<lower 1, upper=2.0> J;\n");
+  bool pass = false;
+  std::stringstream msgs;
+  std::vector<stan::lang::block_var_decl> bvds;
+  bvds = parse_var_decls(input, pass, msgs);
+
+  EXPECT_FALSE(pass);
+  EXPECT_NE(msgs.str().find("PARSER EXPECTED"), std::string::npos);
+  EXPECT_NE(msgs.str().find("\"=\""), std::string::npos);
+}
+
+TEST(Parser, bounds_test_5) {
+  std::string input("int<upper=2,lower=1> J;\n");
+  bool pass = false;
+  std::stringstream msgs;
+  std::vector<stan::lang::block_var_decl> bvds;
+  bvds = parse_var_decls(input, pass, msgs);
+
+  EXPECT_FALSE(pass);
+  EXPECT_NE(msgs.str().find("PARSER EXPECTED"), std::string::npos);
+  EXPECT_NE(msgs.str().find("\">\""), std::string::npos);
+}
+
+TEST(Parser, bounds_test_6) {
+  std::string input("int<lower=1,upper=2,upper=3> J;\n");
+  bool pass = false;
+  std::stringstream msgs;
+  std::vector<stan::lang::block_var_decl> bvds;
+  bvds = parse_var_decls(input, pass, msgs);
+
+  EXPECT_FALSE(pass);
+  EXPECT_NE(msgs.str().find("PARSER EXPECTED"), std::string::npos);
+  EXPECT_NE(msgs.str().find("\">\""), std::string::npos);
 }
 
 

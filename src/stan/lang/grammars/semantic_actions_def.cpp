@@ -1452,7 +1452,6 @@ namespace stan {
     }
     boost::phoenix::function<add_loop_identifier> add_loop_identifier_f;
 
-    // TODO:mitzi review unit tests for all loop identifiers
     void add_array_loop_identifier
       ::operator()(const stan::lang::expression& expr,
                    std::string& name,
@@ -2887,7 +2886,6 @@ namespace stan {
       range.low_ = expr;
       validate_int_expr validator;
       validator(expr, pass, error_msgs);
-      //      std::cout << "set_int_range_lower, pass: " << pass << std::endl;
     }
     boost::phoenix::function<set_int_range_lower> set_int_range_lower_f;
 
@@ -2898,7 +2896,6 @@ namespace stan {
       range.high_ = expr;
       validate_int_expr validator;
       validator(expr, pass, error_msgs);
-      //      std::cout << "set_int_range_upper, pass: " << pass << std::endl;
     }
     boost::phoenix::function<set_int_range_upper> set_int_range_upper_f;
 
@@ -2952,19 +2949,24 @@ namespace stan {
                                         const expression& def,
                                         bool& pass,
                                         std::ostream& error_msgs) const {
-      //      std::cout << "validate_array_block_var_decl" << std::endl;
-      //      std::cout << " name: " << name << " el_type " << el_type.bare_type() << std::endl;
-      //      std::cout << " size dims: " << dims.size() << std::endl;
-      stan::lang::block_array_type bat(el_type, dims);
 
-      //      std::cout << " block_array_type, num dims? " << bat.dims() << std::endl;
-      //      std::cout << " block_array_type, dim 1 element? " << bat.element_type().bare_type() << std::endl;
+      pass = !el_type.bare_type().is_ill_formed_type();
+      if (!pass) {
+        error_msgs << "array variable declaration is ill formed,"
+                   << " variable name="
+                   << name
+                   << std::endl;
+        return;
+      }
+      if (dims.size() < 1) {
+        error_msgs << "array type requires at least 1 dimension,"
+                   << " none specified" << std::endl;
+        pass = false;
+        return;
+      }
+      stan::lang::block_array_type bat(el_type, dims);
       block_var_decl result(name, bat, def);
       var_decl_result = result;
-      // std::cout << "made it!" << std::endl;
-      // std::cout << "block var decl name: " << var_decl_result.name()
-      //           << " bare type: " << var_decl_result.bare_type()
-      //           << std::endl;
     }
     boost::phoenix::function<validate_array_block_var_decl>
     validate_array_block_var_decl_f;
@@ -2973,19 +2975,18 @@ namespace stan {
                                         block_var_decl& var_decl_result,
                                         bool& pass,
                                         std::ostream& error_msgs) const {
-      // TODO:mitzi figure out what error flags are being passed around and use them.
+      pass = !var_decl_result.bare_type().is_ill_formed_type();
+      if (!pass) {
+        error_msgs << "variable declaration is ill formed,"
+                   << " variable name="
+                   << name
+                   << std::endl;
+        return;
+      }
       block_var_decl result = block_var_decl(var_decl_result.name(),
                                              var_decl_result.type(),
                                              var_decl_result.def());
-      // std::cout << "validate_single_block_var_decl"
-      //           << " type: " << var_decl_result.type().name()
-      //           << " is bounded? " << var_decl_result.type().has_def_bounds()
-      //           << std::endl;
       var_decl_result = result;
-      // std::cout << "block var decl name: " << var_decl_result.name()
-      //           << " bare type: " << var_decl_result.bare_type()
-      //           << " type: " << var_decl_result.type()
-      //           << std::endl;
     }
     boost::phoenix::function<validate_single_block_var_decl>
     validate_single_block_var_decl_f;
@@ -2996,12 +2997,14 @@ namespace stan {
                                              const T& var_type,
                                              bool& pass,
                                              std::ostream& error_msgs) const {
+      pass = !var_type_result.bare_type().is_ill_formed_type();
+      if (!pass) {
+        error_msgs << "variable type is ill formed"
+                   << std::endl;
+        return;
+      }
       block_var_type result(var_type);
       var_type_result = result;
-      // std::cout << "validate_block_var_type, _val is: "
-      //           << " type: " << var_type_result.name()
-      //           << " is bounded? " << var_type_result.has_def_bounds()
-      //           << std::endl;
     }
     boost::phoenix::function<validate_block_var_type>
     validate_block_var_type_f;
@@ -3087,7 +3090,6 @@ namespace stan {
                                    const scope& var_scope,
                                    std::ostream& error_msgs) const {
       pass = false;
-
       // std::cout << "add_block_var_f, "
       //           << "block var decl name: " << block_var_decl.name()
       //           << " type: " << block_var_decl.type()
@@ -3115,7 +3117,6 @@ namespace stan {
       }
       if (var_scope.par_or_tpar()
           && block_var_decl.bare_type().is_int_type()) {
-        pass = false;
         error_msgs << "parameters or transformed parameter variables"
                    << " cannot be integer or integer array; "
                    << " found int variable declaration, name="
@@ -3123,13 +3124,8 @@ namespace stan {
                    << std::endl;
         return;
       }
-
       var_decl new_decl(block_var_decl.name(), block_var_decl.bare_type(), block_var_decl.def());
       vm.add(block_var_decl.name(), new_decl, var_scope);
-
-      // sanity = vm.exists(block_var_decl.name());
-      // std::cout << "added to vm, checking: " << sanity << std::endl;
-
       pass = true;
     }
     boost::phoenix::function<add_block_var> add_block_var_f;
