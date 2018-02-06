@@ -118,9 +118,6 @@ namespace stan {
       write_block_var_type(o, var_type);
       return o;
     }
-
-
-
   }
 }
 #endif

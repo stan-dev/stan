@@ -103,23 +103,18 @@ namespace stan {
       // _r1 var scope
       var_decl_r.name("variable declaration");
       var_decl_r
-        = ( raw[array_var_decl_r(_r1)
-                [trace_f("array_var_decl_r"),
-                 add_block_var_f(_1, boost::phoenix::ref(var_map_), _a, _r1,
-                                 boost::phoenix::ref(error_msgs_)),
-                 validate_definition_f(_r1, _1, _pass,
-                                       boost::phoenix::ref(error_msgs_)),
-                 assign_lhs_f(_val, _1)]
-                ]
-            [add_line_number_f(_val, begin(_1), end(_1))] 
-            | raw[single_var_decl_r(_r1)
-                  [add_block_var_f(_1, boost::phoenix::ref(var_map_), _a, _r1,
-                                   boost::phoenix::ref(error_msgs_)),
-                   validate_definition_f(_r1, _1, _pass,
-                                         boost::phoenix::ref(error_msgs_)),
-                   assign_lhs_f(_val, _1)]
-                  ]
-            [add_line_number_f(_val, begin(_1), end(_1))] )
+        = ( raw[array_var_decl_r(_r1)[trace_f("array_var_decl_r"),
+                                      assign_lhs_f(_val, _1)]]
+            [add_line_number_f(_val, begin(_1), end(_1))]
+          | raw[single_var_decl_r(_r1)[trace_f("single_el_var_decl_r"),
+                                       assign_lhs_f(_val, _1)]]
+            [add_line_number_f(_val, begin(_1), end(_1))]
+            )
+        > eps  
+        [add_block_var_f(_val, boost::phoenix::ref(var_map_), _pass, _r1,
+                         boost::phoenix::ref(error_msgs_)),
+         validate_definition_f(_r1, _val, _pass,
+                               boost::phoenix::ref(error_msgs_))]
         > lit(';');
 
       array_var_decl_r.name("array block var declaration");
@@ -128,7 +123,7 @@ namespace stan {
             >> identifier_r[trace_f("identifier_r")]
             >> dims_r(_r1)[trace_f("dims_r")]
             >> opt_def_r(_r1)[trace_f("opt_def_r")])
-        [validate_array_block_var_decl_f(_val, _1, _2, _3, _4, _a,
+        [validate_array_block_var_decl_f(_val, _1, _2, _3, _4, _pass,
                                          boost::phoenix::ref(error_msgs_))];
 
 
@@ -314,11 +309,12 @@ namespace stan {
         > lit('>');
 
       // _r1 var scope
-      dim1_r.name("vector length declaration: integer (data-only) in square brackets");
+      dim1_r.name("vector length declaration:"
+                  " data-only integer expression in square brackets");
       dim1_r %= lit('[') > int_data_expr_r(_r1) > lit(']');
 
       // _r1 var scope
-      int_data_expr_r.name("integer data expression");
+      int_data_expr_r.name("data-only integer expression");
       int_data_expr_r
         %= expression_g(_r1)
            [validate_int_expr_f(_1, _pass,

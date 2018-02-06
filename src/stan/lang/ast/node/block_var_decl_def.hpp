@@ -52,6 +52,7 @@ namespace stan {
     block_var_type block_var_decl::type() const {
       return type_;
     }
+
   }
 }
 #endif

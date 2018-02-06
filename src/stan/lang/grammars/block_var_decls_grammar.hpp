@@ -45,13 +45,11 @@ namespace stan {
       var_decl_r;
 
       boost::spirit::qi::rule<Iterator,
-                              boost::spirit::qi::locals<bool>,
                               block_var_decl(scope),
                               whitespace_grammar<Iterator> >
       array_var_decl_r;
 
       boost::spirit::qi::rule<Iterator,
-                              boost::spirit::qi::locals<bool>,
                               block_var_decl(scope),
                               whitespace_grammar<Iterator> >
       single_var_decl_r;

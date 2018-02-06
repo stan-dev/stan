@@ -2826,6 +2826,7 @@ namespace stan {
           reserve(*it);
     }
 
+    // validates identifier shape
     void validate_identifier::operator()(const std::string& identifier,
                                          bool& pass,
                                          std::stringstream& error_msgs) const {
@@ -3085,21 +3086,28 @@ namespace stan {
                                    variable_map& vm, bool& pass,
                                    const scope& var_scope,
                                    std::ostream& error_msgs) const {
+      pass = false;
 
       // std::cout << "add_block_var_f, "
       //           << "block var decl name: " << block_var_decl.name()
       //           << " type: " << block_var_decl.type()
+      //           << " begin_line_: " << block_var_decl.begin_line_
+      //           << " end_line_: " << block_var_decl.end_line_
       //           << std::endl;
 
       if (vm.exists(block_var_decl.name())) {
-        pass = false;
+        var_decl prev_decl = vm.get(block_var_decl.name());
         error_msgs << "duplicate declaration of variable, name="
                    << block_var_decl.name();
 
-        error_msgs << "; attempt to redeclare as ";
+        error_msgs << "; attempt to redeclare as "
+                   << block_var_decl.bare_type()
+                   << " in "; 
         print_scope(error_msgs, var_scope);
 
-        error_msgs << "; original declaration as ";
+        error_msgs << "; previously declared as "
+                   << prev_decl.bare_type()
+                   << " in "; 
         print_scope(error_msgs, vm.get_scope(block_var_decl.name()));
 
         error_msgs << std::endl;
@@ -3108,16 +3116,20 @@ namespace stan {
       if (var_scope.par_or_tpar()
           && block_var_decl.bare_type().is_int_type()) {
         pass = false;
-        error_msgs << "parameters or transformed parameters"
+        error_msgs << "parameters or transformed parameter variables"
                    << " cannot be integer or integer array; "
-                   << " found declared type int, parameter name="
+                   << " found int variable declaration, name="
                    << block_var_decl.name()
                    << std::endl;
         return;
       }
-      vm.add(block_var_decl.name(),
-             var_decl(block_var_decl.name(), block_var_decl.bare_type()),
-             var_scope);
+
+      var_decl new_decl(block_var_decl.name(), block_var_decl.bare_type(), block_var_decl.def());
+      vm.add(block_var_decl.name(), new_decl, var_scope);
+
+      // sanity = vm.exists(block_var_decl.name());
+      // std::cout << "added to vm, checking: " << sanity << std::endl;
+
       pass = true;
     }
     boost::phoenix::function<add_block_var> add_block_var_f;

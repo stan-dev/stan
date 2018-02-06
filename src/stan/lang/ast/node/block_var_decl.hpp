@@ -94,6 +94,7 @@ namespace stan {
        */
       block_var_type type() const;
     };
+
   }
 }
 #endif
