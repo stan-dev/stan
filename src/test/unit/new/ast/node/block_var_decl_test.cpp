@@ -110,7 +110,7 @@ TEST(arrayBlockVarDecl, createVar2) {
 TEST(choleskyCorrBlockVarDecl, createVar1) {
   stan::lang::int_literal int_len(5);
   stan::lang::expression K(int_len);
-  stan::lang::cholesky_factor_corr_block_type ccbt(K);
+  stan::lang::cholesky_corr_block_type ccbt(K);
 
   stan::lang::block_var_decl bvar("x", ccbt);
 
@@ -135,7 +135,7 @@ TEST(choleskyCorrBlockVarDecl, createVar1) {
 TEST(choleskyFactorBlockVarDecl, createVar1) {
   stan::lang::expression M(stan::lang::int_literal(3));
   stan::lang::expression N(stan::lang::int_literal(4));
-  stan::lang::cholesky_factor_cov_block_type cfbt(M, N);
+  stan::lang::cholesky_factor_block_type cfbt(M, N);
 
   stan::lang::block_var_decl bvar("x", cfbt);
 
@@ -149,8 +149,8 @@ TEST(choleskyFactorBlockVarDecl, createVar1) {
   EXPECT_EQ(bvar_sizes.size(), 2);
   EXPECT_TRUE(bvar_sizes.at(0).bare_type().is_int_type());
 
-  stan::lang::cholesky_factor_cov_block_type cfbt2
-    = boost::get<stan::lang::cholesky_factor_cov_block_type>(bvar.type().var_type_);
+  stan::lang::cholesky_factor_block_type cfbt2
+    = boost::get<stan::lang::cholesky_factor_block_type>(bvar.type().var_type_);
   stan::lang::expression m_size = cfbt2.M();
   EXPECT_TRUE(m_size.bare_type().is_int_type());
   stan::lang::expression n_size = cfbt2.N();
