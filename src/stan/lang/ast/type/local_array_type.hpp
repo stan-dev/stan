@@ -37,7 +37,18 @@ namespace stan {
        */
       local_array_type(const local_var_type& el_type,
                        const expression& len);
-      
+
+      /**
+       * Construct a multi-dimensional local array type with the 
+       * specified element sized dimensions.
+       * Lengths should be int expression - constructor doesn't check.
+       *
+       * @param el_type element type 
+       * @param lens  vector of array lengths
+       */
+      local_array_type(const local_var_type& el_type,
+                       const std::vector<expression>& lens);
+
       /**
        * Returns type of elements stored in innermost array.
        */

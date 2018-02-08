@@ -23,6 +23,22 @@ namespace stan {
       return total;
     }
 
+    local_array_type::local_array_type(const local_var_type& el_type,
+                                       const std::vector<expression>& lens) {
+      if (lens.size() == 1) {
+        element_type_ = el_type;
+        array_len_ = lens[0];
+      }
+      else {
+        local_array_type tmp(el_type, lens[lens.size()-1]);
+        for (size_t i = lens.size() - 2; i > 0; --i) {
+          tmp = local_array_type(tmp, lens[i]);
+        }
+        element_type_ = tmp;
+        array_len_ = lens[0];
+      }
+    }
+
     local_var_type local_array_type::contains() const {
       local_var_type cur_type(element_type_);
       while (cur_type.is_array_type()) {

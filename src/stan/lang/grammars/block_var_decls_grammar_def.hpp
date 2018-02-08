@@ -104,7 +104,7 @@ namespace stan {
                [add_line_number_f(_val, begin(_1), end(_1))]
             )
         > eps  
-        [add_block_var_f(_val, boost::phoenix::ref(var_map_), _pass, _r1,
+        [add_to_var_map_f(_val, boost::phoenix::ref(var_map_), _pass, _r1,
                          boost::phoenix::ref(error_msgs_)),
          validate_definition_f(_r1, _val, _pass,
                                boost::phoenix::ref(error_msgs_))]
@@ -126,8 +126,8 @@ namespace stan {
            > identifier_r
            > opt_def_r(_r1)
            > eps
-           [validate_single_block_var_decl_f(_val, _pass,
-                                             boost::phoenix::ref(error_msgs_))];
+           [validate_single_var_decl_f(_val, _pass,
+                                       boost::phoenix::ref(error_msgs_))];
       
       element_type_r.name("block var element type declaration");
       element_type_r

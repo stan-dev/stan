@@ -252,3 +252,28 @@ TEST(localVarType, create2DArrayOfMatrices) {
   EXPECT_EQ("matrix[ , ]", ss.str());
 
 }
+
+TEST(localVarType, create4DArrayInt) {
+  expression e1;
+  expression e2;
+  expression e3;
+  expression e4;
+
+  int_type tInt;
+
+  std::vector<expression> dims;
+  dims.push_back(e1);
+  dims.push_back(e2);
+  dims.push_back(e3);
+  dims.push_back(e4);
+
+  local_array_type d4(tInt,dims);
+  local_var_type y(d4);
+  EXPECT_TRUE(y.is_array_type());
+  EXPECT_TRUE(y.array_contains().bare_type().is_int_type());
+  EXPECT_EQ(y.array_dims(), 4);
+
+  std::stringstream ss;
+  stan::lang::write_bare_expr_type(ss, y.bare_type());
+  EXPECT_EQ("int[ , , , ]", ss.str());
+}

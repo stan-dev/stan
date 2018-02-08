@@ -799,7 +799,8 @@ namespace stan {
 
     // called from: var_decls_grammar
     struct validate_definition : public phoenix_functor_quaternary {
-      void operator()(const scope& var_scope, const block_var_decl& var_decl,
+      template <typename T>
+      void operator()(const scope& var_scope, const T& var_decl,
                       bool& pass, std::stringstream& error_msgs) const;
     };
     extern boost::phoenix::function<validate_definition>
@@ -899,14 +900,28 @@ namespace stan {
     extern boost::phoenix::function<validate_array_block_var_decl>
     validate_array_block_var_decl_f;
 
-    struct validate_single_block_var_decl : public phoenix_functor_ternary {
-      void operator()(const block_var_decl& var_decl_result,
+    struct validate_array_local_var_decl : public phoenix_functor_septenary {
+      void operator()(local_var_decl& var_decl_result,
+                      const local_var_type& el_type,
+                      const std::string& name,
+                      const std::vector<expression>& dims,
+                      const expression& def,
                       bool& pass,
                       std::ostream& error_msgs)
         const;
     };
-    extern boost::phoenix::function<validate_single_block_var_decl>
-    validate_single_block_var_decl_f;
+    extern boost::phoenix::function<validate_array_local_var_decl>
+    validate_array_local_var_decl_f;
+
+    struct validate_single_var_decl : public phoenix_functor_ternary {
+      template <typename T>
+      void operator()(const T& var_decl_result,
+                      bool& pass,
+                      std::ostream& error_msgs)
+        const;
+    };
+    extern boost::phoenix::function<validate_single_var_decl>
+    validate_single_var_decl_f;
 
     struct validate_block_var_type : public phoenix_functor_quaternary {
       template <typename T>
@@ -919,15 +934,27 @@ namespace stan {
     extern boost::phoenix::function<validate_block_var_type>
     validate_block_var_type_f;
 
+    struct validate_local_var_type : public phoenix_functor_quaternary {
+      template <typename T>
+      void operator()(
+                      local_var_type& var_type_result,
+                      const T& var_type,
+                      bool& pass,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<validate_local_var_type>
+    validate_local_var_type_f;
 
-    struct add_block_var : public phoenix_functor_quinary {
-      void operator()(const block_var_decl& block_var_decl,
+
+    struct add_to_var_map : public phoenix_functor_quinary {
+      template <typename T>
+      void operator()(const T& decl,
                       variable_map& vm, bool& pass,
                       const scope& var_scope,
                       std::ostream& error_msgs)
         const;
     };
-    extern boost::phoenix::function<add_block_var> add_block_var_f;
+    extern boost::phoenix::function<add_to_var_map> add_to_var_map_f;
 
     struct validate_in_loop : public phoenix_functor_ternary {
       void operator()(bool in_loop, bool& pass, std::ostream& error_msgs) const;
