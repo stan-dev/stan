@@ -900,7 +900,7 @@ namespace stan {
     validate_array_block_var_decl_f;
 
     struct validate_single_block_var_decl : public phoenix_functor_ternary {
-      void operator()(block_var_decl& var_decl_result,
+      void operator()(const block_var_decl& var_decl_result,
                       bool& pass,
                       std::ostream& error_msgs)
         const;
@@ -968,6 +968,13 @@ namespace stan {
       void operator()(const std::string& msg) const;
     };
     extern boost::phoenix::function<trace> trace_f;
+
+    // handle trace messages as needed for debugging
+    struct trace_pass : public phoenix_functor_binary {
+      void operator()(const std::string& msg,
+                      const bool& pass) const;
+    };
+    extern boost::phoenix::function<trace_pass> trace_pass_f;
 
     // called from: whitespace_grammar
     struct deprecate_pound_comment : public phoenix_functor_unary {

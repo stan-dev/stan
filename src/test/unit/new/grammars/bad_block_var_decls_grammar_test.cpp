@@ -274,6 +274,3 @@ TEST(Parser, bounds_test_6) {
   EXPECT_NE(msgs.str().find("PARSER EXPECTED"), std::string::npos);
   EXPECT_NE(msgs.str().find("\">\""), std::string::npos);
 }
-
-
-//  std::cout << msgs.str() << std::endl;

@@ -3,6 +3,7 @@
 
 #include <stan/lang/ast.hpp>
 #include <string>
+#include <iostream>
 
 namespace stan {
   namespace lang {
@@ -37,6 +38,9 @@ namespace stan {
       map_.erase(name);
     }
 
+    size_t variable_map::size() const {
+      return map_.size();
+    }
   }
 }
 #endif

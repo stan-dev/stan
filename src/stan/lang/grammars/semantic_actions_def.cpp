@@ -2612,6 +2612,10 @@ namespace stan {
                                          bool& pass,
                                          std::stringstream& error_msgs)
       const {
+      // std::cout << "validate_definition: " << var_decl.name()
+      //           << " type: " << var_decl.type() << std::endl;
+      // std::cout << "pass: " << pass << std::endl;
+      
       if (!var_decl.has_def()) return;
 
       // validate that assigment is allowed in this block
@@ -2829,6 +2833,7 @@ namespace stan {
     void validate_identifier::operator()(const std::string& identifier,
                                          bool& pass,
                                          std::stringstream& error_msgs) const {
+      //      std::cout << "validate_identifier, name: " << identifier << std::endl;
       int len = identifier.size();
       if (len >= 2
           && identifier[len-1] == '_'
@@ -2904,6 +2909,7 @@ namespace stan {
                                                  variable_map& var_map,
                                                  std::stringstream& error_msgs)
       const {
+      //      std::cout << "validate_int_data_only_expr " << pass << std::endl;
       if (!expr.bare_type().is_int_type()) {
         error_msgs << "dimension declaration requires expression"
                    << " denoting integer; found type="
@@ -2915,6 +2921,7 @@ namespace stan {
       data_only_expression vis(error_msgs, var_map);
       bool only_data_dimensions = boost::apply_visitor(vis, expr.expr_);
       pass = only_data_dimensions;
+      //      std::cout << "only_data_dimensions? " << pass << std::endl;
       return;
     }
     boost::phoenix::function<validate_int_data_only_expr> validate_int_data_only_expr_f;
@@ -2950,43 +2957,43 @@ namespace stan {
                                         bool& pass,
                                         std::ostream& error_msgs) const {
 
-      pass = !el_type.bare_type().is_ill_formed_type();
-      if (!pass) {
-        error_msgs << "array variable declaration is ill formed,"
-                   << " variable name="
-                   << name
-                   << std::endl;
-        return;
-      }
-      if (dims.size() < 1) {
-        error_msgs << "array type requires at least 1 dimension,"
-                   << " none specified" << std::endl;
-        pass = false;
-        return;
-      }
+      // pass = !el_type.bare_type().is_ill_formed_type();
+      // if (!pass) {
+      //   error_msgs << "array variable declaration is ill formed,"
+      //              << " variable name="
+      //              << name
+      //              << std::endl;
+      //   return;
+      // }
+      // if (dims.size() < 1) {
+      //   error_msgs << "array type requires at least 1 dimension,"
+      //              << " none specified" << std::endl;
+      //   pass = false;
+      //   return;
+      // }
       stan::lang::block_array_type bat(el_type, dims);
       block_var_decl result(name, bat, def);
       var_decl_result = result;
+      // std::cout << "validate_array_block_var_decl, " << var_decl_result.name()
+      //           << " type: " << var_decl_result.type() << std::endl;
     }
     boost::phoenix::function<validate_array_block_var_decl>
     validate_array_block_var_decl_f;
 
     void validate_single_block_var_decl::operator()(
-                                        block_var_decl& var_decl_result,
+                                        const block_var_decl& var_decl_result,
                                         bool& pass,
                                         std::ostream& error_msgs) const {
-      pass = !var_decl_result.bare_type().is_ill_formed_type();
-      if (!pass) {
+      // std::cout << "validate_single_block_var_decl, " << var_decl_result.name()
+      //           << " type: " << var_decl_result.type() << std::endl;
+      if (var_decl_result.bare_type().is_ill_formed_type()) {
         error_msgs << "variable declaration is ill formed,"
                    << " variable name="
-                   << name
+                   << var_decl_result.name()
                    << std::endl;
+        pass = false;
         return;
       }
-      block_var_decl result = block_var_decl(var_decl_result.name(),
-                                             var_decl_result.type(),
-                                             var_decl_result.def());
-      var_decl_result = result;
     }
     boost::phoenix::function<validate_single_block_var_decl>
     validate_single_block_var_decl_f;
@@ -2997,13 +3004,13 @@ namespace stan {
                                              const T& var_type,
                                              bool& pass,
                                              std::ostream& error_msgs) const {
-      pass = !var_type_result.bare_type().is_ill_formed_type();
-      if (!pass) {
+      block_var_type result(var_type);
+      if (result.bare_type().is_ill_formed_type()) {
         error_msgs << "variable type is ill formed"
                    << std::endl;
+        pass = false;
         return;
-      }
-      block_var_type result(var_type);
+      }        
       var_type_result = result;
     }
     boost::phoenix::function<validate_block_var_type>
@@ -3093,6 +3100,8 @@ namespace stan {
       // std::cout << "add_block_var_f, "
       //           << "block var decl name: " << block_var_decl.name()
       //           << " type: " << block_var_decl.type()
+      //           << " bare_type: " << block_var_decl.bare_type()
+      //           << " type.bare_type: " << block_var_decl.type().bare_type()
       //           << " begin_line_: " << block_var_decl.begin_line_
       //           << " end_line_: " << block_var_decl.end_line_
       //           << std::endl;
@@ -3113,6 +3122,7 @@ namespace stan {
         print_scope(error_msgs, vm.get_scope(block_var_decl.name()));
 
         error_msgs << std::endl;
+        pass = false;
         return;
       }
       if (var_scope.par_or_tpar()
@@ -3122,10 +3132,14 @@ namespace stan {
                    << " found int variable declaration, name="
                    << block_var_decl.name()
                    << std::endl;
+        pass = false;
         return;
       }
-      var_decl new_decl(block_var_decl.name(), block_var_decl.bare_type(), block_var_decl.def());
-      vm.add(block_var_decl.name(), new_decl, var_scope);
+      var_decl bare_decl(block_var_decl.name(),
+                         block_var_decl.type().bare_type(),
+                         block_var_decl.def());
+      
+      vm.add(block_var_decl.name(), bare_decl, var_scope);
       pass = true;
     }
     boost::phoenix::function<add_block_var> add_block_var_f;
@@ -3183,6 +3197,12 @@ namespace stan {
       //      std::cout << msg << std::endl;
     }
     boost::phoenix::function<trace> trace_f;
+
+    void trace_pass::operator()(const std::string& msg,
+                                 const bool& pass) const {
+      //      std::cout << msg << " pass? " << pass << std::endl;
+    }
+    boost::phoenix::function<trace_pass> trace_pass_f;
 
     void deprecate_pound_comment::operator()(std::ostream& error_msgs) const {
       error_msgs << "Warning (non-fatal): Comments beginning with #"

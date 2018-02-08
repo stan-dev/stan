@@ -34,7 +34,7 @@ namespace stan {
     
 
     bare_expr_type block_var_decl::bare_type() const {
-      return this->bare_type_;
+      return type_.bare_type();
     }
 
     expression block_var_decl::def() const {

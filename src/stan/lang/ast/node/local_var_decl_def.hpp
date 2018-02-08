@@ -33,7 +33,7 @@ namespace stan {
     }
 
     bare_expr_type local_var_decl::bare_type() const {
-      return this->bare_type_;
+      return this->type_.bare_type();
     }
 
     expression local_var_decl::def() const {

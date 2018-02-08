@@ -90,8 +90,9 @@ namespace stan {
        * origins.
        */
       std::map<std::string, range_t> map_;
-    };
 
+      size_t size() const;
+    };
   }
 }
 #endif

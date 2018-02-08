@@ -60,71 +60,85 @@ namespace stan {
       element_type_r;
 
       boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::locals<bool>,
                               double_block_type(scope),
                               whitespace_grammar<Iterator> >
       double_type_r;
 
       boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::locals<bool>,
                               int_block_type(scope),
                               whitespace_grammar<Iterator> >
       int_type_r;
 
       boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::locals<bool>,
                               matrix_block_type(scope),
                               whitespace_grammar<Iterator> >
       matrix_type_r;
 
       boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::locals<bool>,
                               row_vector_block_type(scope),
                               whitespace_grammar<Iterator> >
       row_vector_type_r;
 
       boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::locals<bool>,
                               vector_block_type(scope),
                               whitespace_grammar<Iterator> >
       vector_type_r;
 
       boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::locals<bool>,
                               cholesky_factor_corr_block_type(scope),
                               whitespace_grammar<Iterator> >
       cholesky_factor_corr_type_r;
 
       boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::locals<bool>,
                               cholesky_factor_cov_block_type(scope),
                               whitespace_grammar<Iterator> >
       cholesky_factor_cov_type_r;
 
       boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::locals<bool>,
                               corr_matrix_block_type(scope),
                               whitespace_grammar<Iterator> >
       corr_matrix_type_r;
 
       boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::locals<bool>,
                               cov_matrix_block_type(scope),
                               whitespace_grammar<Iterator> >
       cov_matrix_type_r;
 
       boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::locals<bool>,
                               ordered_block_type(scope),
                               whitespace_grammar<Iterator> >
       ordered_type_r;
 
       boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::locals<bool>,
                               positive_ordered_block_type(scope),
                               whitespace_grammar<Iterator> >
       positive_ordered_type_r;
 
       boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::locals<bool>,
                               simplex_block_type(scope),
                               whitespace_grammar<Iterator> >
       simplex_type_r;
 
       boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::locals<bool>,
                               unit_vector_block_type(scope),
                               whitespace_grammar<Iterator> >
       unit_vector_type_r;
 
       boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::locals<bool>,
                               std::string(),
                               whitespace_grammar<Iterator> >
       identifier_r;
@@ -135,11 +149,13 @@ namespace stan {
       identifier_name_r;
 
       boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::locals<bool>,
                               expression(scope),
                               whitespace_grammar<Iterator> >
       opt_def_r;
 
       boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::locals<bool>,
                               expression(scope),
                               whitespace_grammar<Iterator> >
       def_r;

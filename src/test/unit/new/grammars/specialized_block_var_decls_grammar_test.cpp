@@ -47,14 +47,9 @@ TEST(Parser, parse_array_of_cholesky_factor_corr_block_type) {
   EXPECT_EQ("2-dim array of cholesky_factor_corr", ss.str());
 }
 
-<<<<<<< HEAD
 TEST(Parser, parse_cholesky_factor_cov_block_type_square) {
   std::string input("int K;\n"
                     "cholesky_factor_cov[K] x;");
-=======
-TEST(Parser, parse_cholesky_factor_cov_block_type) {
-  std::string input("  int K;\n  cholesky_factor_cov[M, N] x;");
->>>>>>> parent of 251fbc5e2... regularized names for cholesky factor types; more unit tests
   bool pass = false;
   std::stringstream msgs;
   std::vector<stan::lang::block_var_decl> bvds;
@@ -72,15 +67,10 @@ TEST(Parser, parse_cholesky_factor_cov_block_type) {
   EXPECT_EQ("cholesky_factor_cov", ss.str());
 }
 
-<<<<<<< HEAD
 TEST(Parser, parse_cholesky_factor_cov_block_type_rect) {
   std::string input("int M;\n"
                     "int N;\n"
                     "cholesky_factor_cov[M, N] x;");
-=======
-TEST(Parser, parse_cholesky_factor_cov_block_type_square) {
-  std::string input("  int K;\n  cholesky_factor_cov[K] x;");
->>>>>>> parent of 251fbc5e2... regularized names for cholesky factor types; more unit tests
   bool pass = false;
   std::stringstream msgs;
   std::vector<stan::lang::block_var_decl> bvds;
@@ -88,7 +78,6 @@ TEST(Parser, parse_cholesky_factor_cov_block_type_square) {
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-<<<<<<< HEAD
   EXPECT_TRUE(3 == bvds.size());
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvds[0].type());
@@ -150,9 +139,6 @@ TEST(Parser, parse_array_of_corr_matrix_block_type) {
   std::stringstream msgs;
   std::vector<stan::lang::block_var_decl> bvds;
   bvds = parse_var_decls(input, pass, msgs);
-=======
-  EXPECT_TRUE(2 == bvds.size());
->>>>>>> parent of 251fbc5e2... regularized names for cholesky factor types; more unit tests
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
@@ -166,7 +152,6 @@ TEST(Parser, parse_array_of_corr_matrix_block_type) {
   EXPECT_EQ("2-dim array of corr_matrix", ss.str());
 }
 
-<<<<<<< HEAD
 TEST(Parser, parse_cov_matrix_block_type) {
   std::string input("int K;\n"
                     "cov_matrix[K] x;");
@@ -387,10 +372,14 @@ TEST(Parser, parse_many_types) {
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvds[0].type());
   EXPECT_EQ("int", ss.str());
-=======
+
   ss.str(std::string());
   ss.clear();
   stan::lang::write_block_var_type(ss, bvds[1].type());
-  EXPECT_EQ("cholesky_factor_cov", ss.str());
->>>>>>> parent of 251fbc5e2... regularized names for cholesky factor types; more unit tests
+  EXPECT_EQ("corr_matrix", ss.str());
+
+  ss.str(std::string());
+  ss.clear();
+  stan::lang::write_block_var_type(ss, bvds[6].type());
+  EXPECT_EQ("2-dim array of unit_vector", ss.str());
 }

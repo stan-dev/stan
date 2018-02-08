@@ -103,12 +103,10 @@ namespace stan {
       // _r1 var scope
       var_decl_r.name("variable declaration");
       var_decl_r
-        = ( raw[array_var_decl_r(_r1)[trace_f("array_var_decl_r"),
-                                      assign_lhs_f(_val, _1)]]
-            [add_line_number_f(_val, begin(_1), end(_1))]
-          | raw[single_var_decl_r(_r1)[trace_f("single_el_var_decl_r"),
-                                       assign_lhs_f(_val, _1)]]
-            [add_line_number_f(_val, begin(_1), end(_1))]
+        = ( raw[array_var_decl_r(_r1)[assign_lhs_f(_val, _1)]]
+               [add_line_number_f(_val, begin(_1), end(_1))]
+          | raw[single_var_decl_r(_r1)[assign_lhs_f(_val, _1)]]
+               [add_line_number_f(_val, begin(_1), end(_1))]
             )
         > eps  
         [add_block_var_f(_val, boost::phoenix::ref(var_map_), _pass, _r1,
@@ -119,10 +117,10 @@ namespace stan {
 
       array_var_decl_r.name("array block var declaration");
       array_var_decl_r
-        = (element_type_r(_r1)[trace_f("element_type_r")]
-            >> identifier_r[trace_f("identifier_r")]
-            >> dims_r(_r1)[trace_f("dims_r")]
-            >> opt_def_r(_r1)[trace_f("opt_def_r")])
+        = (element_type_r(_r1)
+           >> identifier_r
+           >> dims_r(_r1)
+           >> opt_def_r(_r1))
         [validate_array_block_var_decl_f(_val, _1, _2, _3, _4, _pass,
                                          boost::phoenix::ref(error_msgs_))];
 

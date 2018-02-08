@@ -19,18 +19,23 @@ TEST(Parser, parse_empty) {
 }
 
 TEST(Parser, parse_1) {
-  std::string input("int<lower=0> x;");
+  std::string input("int N;\n"
+                    "int M;\n"
+                    "real x;\n"
+                    "real y;\n"
+                    "real z;\n"
+                    "\n");
   bool pass = false;
   std::stringstream msgs;
   std::vector<stan::lang::block_var_decl> bvds;
   bvds = parse_var_decls(input, pass, msgs);
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(1 == bvds.size());
+  EXPECT_TRUE(5 == bvds.size());
 
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvds[0].type());
-  EXPECT_EQ("int< lower>", ss.str());
+  EXPECT_EQ("int", ss.str());
 }
 
 TEST(Parser, parse_2) {
@@ -53,7 +58,7 @@ TEST(Parser, parse_2) {
 }
 
 TEST(Parser, parse_3) {
-  std::string input("int x;\n"
+  std::string input("int N;\n"
                     "real y;\n"
                     "real<lower=2.1, upper=2.9> z;\n");
   bool pass = false;
@@ -131,6 +136,18 @@ TEST(Parser, parse_row_vector) {
   EXPECT_TRUE(1 == bvds.size());
 }
 
+TEST(Parser, parse_row_vector2) {
+  std::string input("int N;\n"
+                    "row_vector[N] a;\n");
+  bool pass = false;
+  std::stringstream msgs;
+  std::vector<stan::lang::block_var_decl> bvds;
+  bvds = parse_var_decls(input, pass, msgs);
+  EXPECT_TRUE(pass);
+  EXPECT_EQ(msgs.str(), std::string());
+  EXPECT_TRUE(2 == bvds.size());
+}
+
 TEST(Parser, parse_simplex) {
   std::string input("simplex[5] a;");
   bool pass = false;
@@ -185,4 +202,20 @@ TEST(Parser, parse_2d_array_matrix) {
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
   EXPECT_TRUE(2 == bvds.size());
+}
+
+TEST(Parser, parse_2d_array_matrix_2) {
+  std::string input("int N;\n"
+                    "int M;\n"
+                    "int I;\n"
+                    "int J;\n"
+                    "matrix[M,N] d1_array_of_mat[I];\n"
+                    "matrix[M,N] d2_array_of_mat[I, J];\n");
+  bool pass = false;
+  std::stringstream msgs;
+  std::vector<stan::lang::block_var_decl> bvds;
+  bvds = parse_var_decls(input, pass, msgs);
+  EXPECT_TRUE(pass);
+  EXPECT_EQ(msgs.str(), std::string());
+  EXPECT_TRUE(6 == bvds.size());
 }
