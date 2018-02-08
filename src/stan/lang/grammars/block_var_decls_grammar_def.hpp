@@ -67,10 +67,8 @@ namespace stan {
 
     template <typename Iterator>
     block_var_decls_grammar<Iterator>::block_var_decls_grammar(variable_map& var_map,
-                                                               std::stringstream& error_msgs,
-                                                               const io::program_reader& reader)
+                                                               std::stringstream& error_msgs)
       : block_var_decls_grammar::base_type(var_decls_r),
-        reader_(reader),
         var_map_(var_map),
         error_msgs_(error_msgs),
         expression_g(var_map, error_msgs),
@@ -88,7 +86,6 @@ namespace stan {
       using boost::spirit::qi::_val;
       using boost::spirit::qi::raw;
 
-      using boost::spirit::qi::labels::_a;
       using boost::spirit::qi::labels::_r1;
 
       using boost::phoenix::begin;
@@ -96,10 +93,8 @@ namespace stan {
 
       var_decls_r.name("variable declarations");
       var_decls_r
-        %= eps[set_var_scope_f(_a, derived_origin)]
-           > *(var_decl_r(_a));
+        %=  *(var_decl_r(_r1));
 
-      // _a = error state local,
       // _r1 var scope
       var_decl_r.name("variable declaration");
       var_decl_r

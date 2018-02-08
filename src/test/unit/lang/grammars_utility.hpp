@@ -1,6 +1,7 @@
 #ifndef TEST_UNIT_LANG_GRAMMARS_UTILITY_HPP
 #define TEST_UNIT_LANG_GRAMMARS_UTILITY_HPP
 
+#include <test/unit/new/grammars/test_block_var_decls_grammar_inst.cpp>
 #include <stan/io/program_reader.hpp>
 
 #include <stan/lang/ast_def.cpp>
@@ -58,17 +59,17 @@ parse_var_decls(std::string& input,
   lp_iterator fwd_begin = lp_iterator(input.begin());
   lp_iterator fwd_end = lp_iterator(input.end());
 
-  // block_var_decls_grammar args:  vm, msgs
+  // test_block_var_decls_grammar args:  reader, vm, msgs
   stan::lang::variable_map vm;
   std::stringstream msgs;
 
   // block_var_decls_grammar synthesis:  block_var_type
   std::vector<stan::lang::block_var_decl> parse_result;
 
-  stan::lang::block_var_decls_grammar<lp_iterator> block_var_decls_grammar(vm, msgs, reader);
-  stan::lang::whitespace_grammar<lp_iterator> whitesp_grammar(block_var_decls_grammar.error_msgs_);
+  stan::lang::test_block_var_decls_grammar<lp_iterator> test_block_var_decls_grammar(reader, vm, msgs);
+  stan::lang::whitespace_grammar<lp_iterator> whitesp_grammar(test_block_var_decls_grammar.error_msgs_);
   try {
-    pass = phrase_parse(fwd_begin, fwd_end, block_var_decls_grammar,
+    pass = phrase_parse(fwd_begin, fwd_end, test_block_var_decls_grammar,
                         whitesp_grammar, parse_result);
   } catch (const boost::spirit::qi::expectation_failure<lp_iterator>& e) {
     std::stringstream ss;
@@ -82,11 +83,11 @@ parse_var_decls(std::string& input,
     }
     err_msgs << "SYNTAX ERROR, MESSAGE(S) FROM PARSER:"
       << std::endl
-      << block_var_decls_grammar.error_msgs_.str();
+      << test_block_var_decls_grammar.error_msgs_.str();
   } catch (const std::exception& e) {
       err_msgs << "PROGRAM ERROR, MESSAGE(S) FROM PARSER:"
                << std::endl
-               << block_var_decls_grammar.error_msgs_.str()
+               << test_block_var_decls_grammar.error_msgs_.str()
                << std::endl;
   }
   if (fwd_begin != fwd_end) {
@@ -99,7 +100,7 @@ parse_var_decls(std::string& input,
              << std::endl;
     err_msgs << "MESSAGE(S) FROM PARSER:"
              << std::endl
-             << block_var_decls_grammar.error_msgs_.str()
+             << test_block_var_decls_grammar.error_msgs_.str()
              << std::endl;
   }
   return parse_result;
