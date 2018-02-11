@@ -11,6 +11,10 @@
 #include <string>
 #include <vector>
 
+// TODO:mitzi  need to pass in scope as _r1
+// scope registered in var map same as enclosing scope
+// needed to maintain distinction between reals (data) and params.
+
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::local_var_decl,
                            (stan::lang::local_var_type, type_)
                            (std::string, name_)
@@ -51,56 +55,54 @@ namespace stan {
       using boost::spirit::qi::_val;
       using boost::spirit::qi::raw;
 
+      using boost::spirit::qi::labels::_r1;
+
       using boost::phoenix::begin;
       using boost::phoenix::end;
-
-      scope ls = scope(model_name_origin, true);
-      scope& local_scope_ = ls;
       
       local_var_decls_r.name("variable declarations");
       local_var_decls_r
-        %=  *(local_var_decl_r);
+        %=  *(local_var_decl_r(_r1));
 
       local_var_decl_r.name("variable declaration");
       local_var_decl_r
-        = ( raw[array_local_var_decl_r[assign_lhs_f(_val, _1)]]
+        = ( raw[array_local_var_decl_r(_r1)[assign_lhs_f(_val, _1)]]
                [add_line_number_f(_val, begin(_1), end(_1))]
-          | raw[single_local_var_decl_r[assign_lhs_f(_val, _1)]]
+            | raw[single_local_var_decl_r(_r1)[assign_lhs_f(_val, _1)]]
                [add_line_number_f(_val, begin(_1), end(_1))]
             )
         > eps  
-        [add_to_var_map_f(_val, boost::phoenix::ref(var_map_), _pass,
-                          boost::phoenix::ref(local_scope_),
+        [add_to_var_map_f(_val, boost::phoenix::ref(var_map_), _pass, _r1,
                           boost::phoenix::ref(error_msgs_)),
-         validate_definition_f(boost::phoenix::ref(local_scope_), _val, _pass,
+         validate_definition_f(_r1, _val, _pass,
                                boost::phoenix::ref(error_msgs_))]
         > lit(';');
 
       array_local_var_decl_r.name("array local var declaration");
       array_local_var_decl_r
-        = (local_element_type_r
+        = (local_element_type_r(_r1)
            >> local_identifier_r
-           >> local_dims_r
-           >> local_opt_def_r)
+           >> local_dims_r(_r1)
+           >> local_opt_def_r(_r1))
         [validate_array_local_var_decl_f(_val, _1, _2, _3, _4, _pass,
                                          boost::phoenix::ref(error_msgs_))];
 
       single_local_var_decl_r.name("single-element local var declaration");
       single_local_var_decl_r
-        %= local_element_type_r
+        %= local_element_type_r(_r1)
            > local_identifier_r
-           > local_opt_def_r
+           > local_opt_def_r(_r1)
            > eps
            [validate_single_var_decl_f(_val, _pass,
                                              boost::phoenix::ref(error_msgs_))];
       
       local_element_type_r.name("local var element type declaration");
       local_element_type_r
-        %= (local_int_type_r
-            | local_double_type_r
-            | local_vector_type_r
-            | local_row_vector_type_r
-            | local_matrix_type_r)
+        %= (local_int_type_r(_r1)
+            | local_double_type_r(_r1)
+            | local_vector_type_r(_r1)
+            | local_row_vector_type_r(_r1)
+            | local_matrix_type_r(_r1))
         [validate_local_var_type_f(_val, _1, _pass,
                                    boost::phoenix::ref(error_msgs_))];
       
@@ -118,40 +120,40 @@ namespace stan {
       local_vector_type_r
         %= (lit("vector")
             >> no_skip[!char_("a-zA-Z0-9_")])
-        > local_dim1_r;
+        > local_dim1_r(_r1);
 
       local_row_vector_type_r.name("row vector type");
       local_row_vector_type_r
         %= (lit("row_vector")
             >> no_skip[!char_("a-zA-Z0-9_")])
-        > local_dim1_r;
+        > local_dim1_r(_r1);
 
       local_matrix_type_r.name("matrix type");
       local_matrix_type_r
         %= (lit("matrix")
             >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('[')
-        > local_int_data_expr_r
+        > local_int_data_expr_r(_r1)
         > lit(',')
-        > local_int_data_expr_r
+        > local_int_data_expr_r(_r1)
         > lit(']');
 
       local_dims_r.name("array dimensions");
-      local_dims_r %= lit('[') > (local_int_data_expr_r % ',') > lit(']');
+      local_dims_r %= lit('[') > (local_int_data_expr_r(_r1) % ',') > lit(']');
 
       local_opt_def_r.name("variable definition (optional)");
-      local_opt_def_r %= -local_def_r;
+      local_opt_def_r %= -local_def_r(_r1);
 
       local_def_r.name("variable definition");
-      local_def_r %= lit('=') > expression_g(boost::phoenix::ref(local_scope_));
+      local_def_r %= lit('=') > expression_g(_r1);
 
       local_dim1_r.name("vector length declaration:"
                   " data-only integer expression in square brackets");
-      local_dim1_r %= lit('[') > local_int_data_expr_r > lit(']');
+      local_dim1_r %= lit('[') > local_int_data_expr_r(_r1) > lit(']');
 
       local_int_data_expr_r.name("data-only integer expression");
       local_int_data_expr_r
-        %= expression_g(boost::phoenix::ref(local_scope_))
+        %= expression_g(_r1)
            [validate_int_expr_f(_1, _pass,
                                 boost::phoenix::ref(error_msgs_))];
 

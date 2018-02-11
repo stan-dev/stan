@@ -19,7 +19,7 @@ namespace stan {
     template <typename Iterator>
     struct local_var_decls_grammar
       : boost::spirit::qi::grammar<Iterator,
-                                   std::vector<local_var_decl>,
+                                   std::vector<local_var_decl>(scope),
                                    whitespace_grammar<Iterator> > {
       local_var_decls_grammar(variable_map& var_map,
                               std::stringstream& error_msgs);
@@ -29,52 +29,52 @@ namespace stan {
       expression07_grammar<Iterator> expression07_g;  // disallows comparisons
 
       boost::spirit::qi::rule<Iterator,
-                              std::vector<local_var_decl>,
+                              std::vector<local_var_decl>(scope),
                               whitespace_grammar<Iterator> >
       local_var_decls_r;
 
       boost::spirit::qi::rule<Iterator,
-                              local_var_decl,
+                              local_var_decl(scope),
                               whitespace_grammar<Iterator> >
       local_var_decl_r;
 
       boost::spirit::qi::rule<Iterator,
-                              local_var_decl,
+                              local_var_decl(scope),
                               whitespace_grammar<Iterator> >
       array_local_var_decl_r;
 
       boost::spirit::qi::rule<Iterator,
-                              local_var_decl,
+                              local_var_decl(scope),
                               whitespace_grammar<Iterator> >
       single_local_var_decl_r;
 
       boost::spirit::qi::rule<Iterator,
-                              local_var_type,
+                              local_var_type(scope),
                               whitespace_grammar<Iterator> >
       local_element_type_r;
 
       boost::spirit::qi::rule<Iterator,
-                              double_type,
+                              double_type(scope),
                               whitespace_grammar<Iterator> >
       local_double_type_r;
 
       boost::spirit::qi::rule<Iterator,
-                              int_type,
+                              int_type(scope),
                               whitespace_grammar<Iterator> >
       local_int_type_r;
 
       boost::spirit::qi::rule<Iterator,
-                              matrix_local_type,
+                              matrix_local_type(scope),
                               whitespace_grammar<Iterator> >
       local_matrix_type_r;
 
       boost::spirit::qi::rule<Iterator,
-                              row_vector_local_type,
+                              row_vector_local_type(scope),
                               whitespace_grammar<Iterator> >
       local_row_vector_type_r;
 
       boost::spirit::qi::rule<Iterator,
-                              vector_local_type,
+                              vector_local_type(scope),
                               whitespace_grammar<Iterator> >
       local_vector_type_r;
 
@@ -89,26 +89,26 @@ namespace stan {
       local_identifier_name_r;
 
       boost::spirit::qi::rule<Iterator,
-                              expression,
+                              expression(scope),
                               whitespace_grammar<Iterator> >
       local_opt_def_r;
 
       boost::spirit::qi::rule<Iterator,
-                              expression,
+                              expression(scope),
                               whitespace_grammar<Iterator> >
       local_def_r;
       boost::spirit::qi::rule<Iterator,
-                              expression,
+                              expression(scope),
                               whitespace_grammar<Iterator> >
       local_dim1_r;
 
       boost::spirit::qi::rule<Iterator,
-                              expression,
+                              expression(scope),
                               whitespace_grammar<Iterator> >
       local_int_data_expr_r;
 
       boost::spirit::qi::rule<Iterator,
-                              std::vector<expression>,
+                              std::vector<expression>(scope),
                               whitespace_grammar<Iterator> >
       local_dims_r;
     };
