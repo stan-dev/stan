@@ -5,7 +5,6 @@
 
 #include <stan/io/program_reader.hpp>
 #include <stan/lang/ast.hpp>
-#include <stan/lang/grammars/semantic_actions.hpp>
 #include <boost/spirit/home/support/iterators/line_pos_iterator.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/qi.hpp>
@@ -13,7 +12,6 @@
 #include <sstream>
 #include <string>
 #include <utility>
-#include <vector>
 
 namespace stan {
 
@@ -27,7 +25,6 @@ namespace stan {
         reader_(reader),
         error_msgs_(error_msgs),
         bare_type_g(error_msgs_) {
-      using boost::spirit::qi::eps;
 
       test_bare_type_r.name("test bare_type");
       test_bare_type_r

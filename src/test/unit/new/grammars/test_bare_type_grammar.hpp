@@ -5,7 +5,6 @@
 #include <stan/lang/ast.hpp>
 #include <stan/lang/grammars/whitespace_grammar.hpp>
 #include <stan/lang/grammars/bare_type_grammar.hpp>
-#include <stan/lang/grammars/semantic_actions.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <string>
 #include <sstream>

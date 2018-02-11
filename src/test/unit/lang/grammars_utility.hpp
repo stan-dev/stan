@@ -85,9 +85,11 @@ parse_var_decls(std::string& input,
                << e.what_
                << std::endl;
     }
-    err_msgs << "SYNTAX ERROR, MESSAGE(S) FROM PARSER:"
-      << std::endl
-      << test_block_var_decls_grammar.error_msgs_.str();
+    if (test_block_var_decls_grammar.error_msgs_.str().length() != 0) {
+      err_msgs << "SYNTAX ERROR, MESSAGE(S) FROM PARSER:"
+               << std::endl
+               << test_block_var_decls_grammar.error_msgs_.str();
+    }
   } catch (const std::exception& e) {
       err_msgs << "PROGRAM ERROR, MESSAGE(S) FROM PARSER:"
                << std::endl
@@ -99,12 +101,8 @@ parse_var_decls(std::string& input,
     std::basic_stringstream<char> unparsed_non_ws;
     unparsed_non_ws << boost::make_iterator_range(fwd_begin, fwd_end);
     err_msgs << "PARSER FAILED TO PARSE INPUT"
-              << std::endl
-              << unparsed_non_ws.str()
-             << std::endl;
-    err_msgs << "MESSAGE(S) FROM PARSER:"
              << std::endl
-             << test_block_var_decls_grammar.error_msgs_.str()
+             << unparsed_non_ws.str()
              << std::endl;
   }
   return parse_result;
@@ -155,9 +153,11 @@ parse_local_var_decls(std::string& input,
                << e.what_
                << std::endl;
     }
-    err_msgs << "SYNTAX ERROR, MESSAGE(S) FROM PARSER:"
-      << std::endl
-      << test_local_var_decls_grammar.error_msgs_.str();
+    if (test_local_var_decls_grammar.error_msgs_.str().length() != 0) {
+      err_msgs << "SYNTAX ERROR, MESSAGE(S) FROM PARSER:"
+               << std::endl
+               << test_local_var_decls_grammar.error_msgs_.str();
+    }
   } catch (const std::exception& e) {
       err_msgs << "PROGRAM ERROR, MESSAGE(S) FROM PARSER:"
                << std::endl
@@ -169,12 +169,8 @@ parse_local_var_decls(std::string& input,
     std::basic_stringstream<char> unparsed_non_ws;
     unparsed_non_ws << boost::make_iterator_range(fwd_begin, fwd_end);
     err_msgs << "PARSER FAILED TO PARSE INPUT"
-              << std::endl
-              << unparsed_non_ws.str()
-             << std::endl;
-    err_msgs << "MESSAGE(S) FROM PARSER:"
              << std::endl
-             << test_local_var_decls_grammar.error_msgs_.str()
+             << unparsed_non_ws.str()
              << std::endl;
   }
   return parse_result;
@@ -222,9 +218,11 @@ parse_bare_type(std::string& input,
                << e.what_
                << std::endl;
     }
-    err_msgs << "SYNTAX ERROR, MESSAGE(S) FROM PARSER:"
-      << std::endl
-      << test_bare_type_grammar.error_msgs_.str();
+    if (test_bare_type_grammar.error_msgs_.str().length() != 0) {
+      err_msgs << "SYNTAX ERROR, MESSAGE(S) FROM PARSER:"
+               << std::endl
+               << test_bare_type_grammar.error_msgs_.str();
+    }
   } catch (const std::exception& e) {
       err_msgs << "PROGRAM ERROR, MESSAGE(S) FROM PARSER:"
                << std::endl
@@ -236,12 +234,8 @@ parse_bare_type(std::string& input,
     std::basic_stringstream<char> unparsed_non_ws;
     unparsed_non_ws << boost::make_iterator_range(fwd_begin, fwd_end);
     err_msgs << "PARSER FAILED TO PARSE INPUT"
-              << std::endl
-              << unparsed_non_ws.str()
-             << std::endl;
-    err_msgs << "MESSAGE(S) FROM PARSER:"
              << std::endl
-             << test_bare_type_grammar.error_msgs_.str()
+             << unparsed_non_ws.str()
              << std::endl;
   }
   return parse_result;
