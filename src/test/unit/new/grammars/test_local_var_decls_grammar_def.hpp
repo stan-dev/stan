@@ -29,8 +29,6 @@ namespace stan {
         var_map_(var_map),
         error_msgs_(error_msgs),
         local_var_decls_g(var_map_, error_msgs_) {
-      using boost::spirit::qi::eps;
-      using boost::spirit::qi::labels::_a;
 
       test_local_var_decls_r.name("test local_var_decls");
       test_local_var_decls_r

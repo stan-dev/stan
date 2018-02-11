@@ -3209,6 +3209,36 @@ namespace stan {
     }
     boost::phoenix::function<validate_array_local_var_decl>
     validate_array_local_var_decl_f;
+                                                      
+    void validate_array_bare_type::operator()(
+                                        bare_expr_type& bare_type_result,
+                                        const bare_expr_type& el_type,
+                                        const size_t& num_dims,
+                                        bool& pass,
+                                        std::ostream& error_msgs) const {
+      //      std::cout << "validate_array_bare_type" << std::endl;
+      if (num_dims == 0) {
+        error_msgs << "array type requires at least 1 dimension,"
+                   << " none found" << std::endl;
+        pass = false;
+        return;
+      }
+      if (el_type.is_ill_formed_type()) {
+        error_msgs << "ill-formed array element type" << std::endl;
+        pass = false;
+        return;
+      }
+      stan::lang::bare_array_type bat(el_type);
+      for (size_t i=0; i < num_dims-1; ++i) {
+        stan::lang::bare_expr_type cur_type(bat);
+        bat = bare_array_type(cur_type);
+      }
+      bare_type_result = bat;
+      // std::cout << "validate_array_bare_type"
+      //           << " type: " << bare_type_result << std::endl;
+    }
+    boost::phoenix::function<validate_array_bare_type>
+    validate_array_bare_type_f;
 
     template <typename T>
     void add_to_var_map::operator()(const T& decl,
