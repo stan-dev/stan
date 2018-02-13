@@ -106,6 +106,66 @@ TEST(arrayBlockVarDecl, createVar2) {
   stan::lang::write_block_var_type(ss, bvar.type());
   EXPECT_EQ("1-dim array of matrix< lower, upper>", ss.str());
 }
+TEST(arrayBlockVarDecl, createVar3) {
+  // 3-d array of matrix
+  stan::lang::double_literal real_lb(-2.0);
+  stan::lang::double_literal real_ub(2.0);
+  stan::lang::expression lb(real_lb);
+  stan::lang::expression ub(real_ub);
+  stan::lang::range m_bounds(lb, ub);
+  stan::lang::expression M(stan::lang::int_literal(3));
+  stan::lang::expression N(stan::lang::int_literal(4));
+  stan::lang::matrix_block_type bvtMatrix(m_bounds, M, N);
+  stan::lang::expression d1_array_len(stan::lang::int_literal(7));
+  stan::lang::block_array_type d1(bvtMatrix, d1_array_len);
+  stan::lang::expression d2_array_len(stan::lang::int_literal(8));
+  stan::lang::block_array_type d2(d1, d2_array_len);
+  stan::lang::expression d3_array_len(stan::lang::int_literal(9));
+  stan::lang::block_array_type d3(d2, d3_array_len);
+  stan::lang::block_var_decl bvar("x", d3);
+  
+  EXPECT_EQ(bvar.name(), "x");
+
+  EXPECT_TRUE(bvar.type().is_array_type());
+  EXPECT_TRUE(bvar.type().array_contains().bare_type().is_matrix_type());
+  EXPECT_EQ(bvar.type().array_dims(), 3);
+  EXPECT_EQ(bvar.type().num_dims(), 5);
+
+  // get var_decl component
+  stan::lang::var_decl vdecl = static_cast<stan::lang::var_decl>(bvar);
+  EXPECT_EQ(vdecl.name_, "x");
+  EXPECT_TRUE(vdecl.bare_type_.is_array_type());
+  EXPECT_TRUE(is_nil(vdecl.def_));
+
+  EXPECT_TRUE(bvar.type().array_contains().has_def_bounds());
+  EXPECT_TRUE(bvar.type().array_contains().bounds().has_low());
+  EXPECT_TRUE(bvar.type().array_contains().bounds().has_high());
+
+  std::vector<stan::lang::expression> bvar_sizes = bvar.type().size();
+  EXPECT_EQ(bvar_sizes.size(), 5);
+  EXPECT_TRUE(bvar_sizes.at(0).bare_type().is_int_type());
+
+  stan::lang::int_literal
+    tmp = boost::get<stan::lang::int_literal>(bvar_sizes.at(0).expr_);
+  EXPECT_EQ(tmp, 4);
+  tmp = boost::get<stan::lang::int_literal>(bvar_sizes.at(1).expr_);
+  EXPECT_EQ(tmp, 3);
+  tmp = boost::get<stan::lang::int_literal>(bvar_sizes.at(2).expr_);
+  EXPECT_EQ(tmp, 9);
+  tmp = boost::get<stan::lang::int_literal>(bvar_sizes.at(3).expr_);
+  EXPECT_EQ(tmp, 8);
+  tmp = boost::get<stan::lang::int_literal>(bvar_sizes.at(4).expr_);
+  EXPECT_EQ(tmp, 7);
+
+  std::stringstream ss;
+  stan::lang::write_bare_expr_type(ss, bvar.bare_type());
+  EXPECT_EQ("matrix[ , , ]", ss.str());
+
+  ss.str(std::string());
+  ss.clear();
+  stan::lang::write_block_var_type(ss, bvar.type());
+  EXPECT_EQ("3-dim array of matrix< lower, upper>", ss.str());
+}
 
 TEST(choleskyCorrBlockVarDecl, createVar1) {
   stan::lang::int_literal int_len(5);

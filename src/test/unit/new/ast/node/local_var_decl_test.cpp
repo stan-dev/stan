@@ -56,6 +56,53 @@ TEST(arrayLocalVarDecl, createVar2) {
   EXPECT_EQ("matrix[ ]", ss.str());
 }
 
+TEST(arrayLocalVarDecl, createVar3) {
+  // 3-d array of matrix
+  stan::lang::expression M(stan::lang::int_literal(3));
+  stan::lang::expression N(stan::lang::int_literal(4));
+  stan::lang::matrix_local_type lvtMatrix(M, N);
+  stan::lang::expression d1_array_len(stan::lang::int_literal(7));
+  stan::lang::local_array_type d1(lvtMatrix, d1_array_len);
+  stan::lang::expression d2_array_len(stan::lang::int_literal(8));
+  stan::lang::local_array_type d2(d1, d2_array_len);
+  stan::lang::expression d3_array_len(stan::lang::int_literal(9));
+  stan::lang::local_array_type d3(d2, d3_array_len);
+  stan::lang::local_var_decl lvar("x", d3);
+  
+  EXPECT_EQ(lvar.name(), "x");
+
+  EXPECT_TRUE(lvar.type().is_array_type());
+  EXPECT_TRUE(lvar.type().array_contains().bare_type().is_matrix_type());
+  EXPECT_EQ(lvar.type().array_dims(), 3);
+  EXPECT_EQ(lvar.type().num_dims(), 5);
+
+  // get var_decl component
+  stan::lang::var_decl vdecl = static_cast<stan::lang::var_decl>(lvar);
+  EXPECT_EQ(vdecl.name_, "x");
+  EXPECT_TRUE(vdecl.bare_type_.is_array_type());
+  EXPECT_TRUE(is_nil(vdecl.def_));
+
+  std::vector<stan::lang::expression> lvar_sizes = lvar.type().size();
+  EXPECT_EQ(lvar_sizes.size(), 5);
+  EXPECT_TRUE(lvar_sizes.at(0).bare_type().is_int_type());
+
+  stan::lang::int_literal
+    tmp = boost::get<stan::lang::int_literal>(lvar_sizes.at(0).expr_);
+  EXPECT_EQ(tmp.val_, 4);
+  tmp = boost::get<stan::lang::int_literal>(lvar_sizes.at(1).expr_);
+  EXPECT_EQ(tmp.val_, 3);
+  tmp = boost::get<stan::lang::int_literal>(lvar_sizes.at(2).expr_);
+  EXPECT_EQ(tmp.val_, 9);
+  tmp = boost::get<stan::lang::int_literal>(lvar_sizes.at(3).expr_);
+  EXPECT_EQ(tmp.val_, 8);
+  tmp = boost::get<stan::lang::int_literal>(lvar_sizes.at(4).expr_);
+  EXPECT_EQ(tmp.val_, 7);
+
+  std::stringstream ss;
+  stan::lang::write_bare_expr_type(ss, lvar.bare_type());
+  EXPECT_EQ("matrix[ , , ]", ss.str());
+}
+
 TEST(doubleLocalVarDecl, createVar1) {
   stan::lang::double_type dbt;
   stan::lang::local_var_type lvtDouble(dbt);

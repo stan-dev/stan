@@ -11,10 +11,17 @@ namespace stan {
     std::vector<expression>
     var_type_size_vis::operator()(const block_array_type& x)
       const {
-      std::vector<expression> sizes(x.array_lens());
+      std::vector<expression> sizes;
       std::vector<expression> base_sizes = x.contains().size();
-      for (size_t i=0; i < base_sizes.size(); ++i) {
-        sizes.push_back(base_sizes[i]);
+      if (base_sizes.size() == 2) {
+        sizes.push_back(base_sizes[1]);
+        sizes.push_back(base_sizes[0]);
+      } else if (base_sizes.size() == 1) {
+        sizes.push_back(base_sizes[0]);
+      }
+      std::vector<expression> array_sizes(x.array_lens());
+      for (size_t i=0; i < array_sizes.size(); ++i) {
+        sizes.push_back(array_sizes[i]);
       }
       return sizes;
     }
@@ -23,15 +30,16 @@ namespace stan {
     var_type_size_vis::operator()(const local_array_type& x)
       const {
       std::vector<expression> sizes;
-      sizes.push_back(x.array_len_);
-      local_var_type cur_type(x.element_type_);
-      while (cur_type.is_array_type()) {
-        sizes.push_back(cur_type.array_len());
-        cur_type = cur_type.array_element_type();
+      std::vector<expression> base_sizes = x.contains().size();
+      if (base_sizes.size() == 2) {
+        sizes.push_back(base_sizes[1]);
+        sizes.push_back(base_sizes[0]);
+      } else if (base_sizes.size() == 1) {
+        sizes.push_back(base_sizes[0]);
       }
-      std::vector<expression> base_sizes = cur_type.size();
-      for (size_t i=0; i < base_sizes.size(); ++i) {
-        sizes.push_back(base_sizes[i]);
+      std::vector<expression> array_sizes(x.array_lens());
+      for (size_t i=0; i < array_sizes.size(); ++i) {
+        sizes.push_back(array_sizes[i]);
       }
       return sizes;
     }

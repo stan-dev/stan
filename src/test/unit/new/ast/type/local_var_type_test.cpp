@@ -273,6 +273,9 @@ TEST(localVarType, create4DArrayInt) {
   EXPECT_TRUE(y.array_contains().bare_type().is_int_type());
   EXPECT_EQ(y.array_dims(), 4);
 
+  std::vector<expression> lens = d4.array_lens();
+  EXPECT_EQ(lens.size(), 4);
+  
   std::stringstream ss;
   stan::lang::write_bare_expr_type(ss, y.bare_type());
   EXPECT_EQ("int[ , , , ]", ss.str());

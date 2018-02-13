@@ -68,6 +68,11 @@ namespace stan {
        * Returns the length of this array.
        */
       expression array_len() const;
+
+      /**
+       * Returns a vector of lengths of all array dimensions.
+       */
+      std::vector<expression> array_lens() const;
     };
   }
 }

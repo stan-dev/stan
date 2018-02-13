@@ -54,6 +54,17 @@ namespace stan {
     expression local_array_type::array_len() const {
       return array_len_;
     }
+
+    std::vector<expression> local_array_type::array_lens() const {
+      std::vector<expression> result;
+      result.push_back(array_len_);
+      local_var_type cur_type(element_type_);
+      while (cur_type.is_array_type()) {
+        result.push_back(cur_type.array_len());
+        cur_type = cur_type.array_element_type();
+      }
+      return result;
+    }
   }
 }
 #endif
