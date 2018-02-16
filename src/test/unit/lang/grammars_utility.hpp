@@ -1,6 +1,7 @@
 #ifndef TEST_UNIT_LANG_GRAMMARS_UTILITY_HPP
 #define TEST_UNIT_LANG_GRAMMARS_UTILITY_HPP
 
+#include <test/unit/new/grammars/test_statement_grammar_inst.cpp>
 #include <test/unit/new/grammars/test_block_var_decls_grammar_inst.cpp>
 #include <test/unit/new/grammars/test_local_var_decls_grammar_inst.cpp>
 #include <test/unit/new/grammars/test_bare_type_grammar_inst.cpp>
@@ -8,16 +9,19 @@
 
 #include <stan/lang/ast_def.cpp>
 
-#include <stan/lang/generator/expression_visgen.hpp>
-#include <stan/lang/generator/generate_array_builder_adds.hpp>
-#include <stan/lang/generator/generate_expression.hpp>
-#include <stan/lang/generator/generate_idxs.hpp>
-#include <stan/lang/generator/generate_idxs_user.hpp>
-#include <stan/lang/generator/generate_idx.hpp>
-#include <stan/lang/generator/generate_idx_user.hpp>
-#include <stan/lang/generator/idx_visgen.hpp>
-#include <stan/lang/generator/idx_user_visgen.hpp>
+// all of this needed for good error messages from parser
+// #include <stan/lang/generator/expression_visgen.hpp>
+// #include <stan/lang/generator/generate_array_builder_adds.hpp>
+// #include <stan/lang/generator/generate_expression.hpp>
+// #include <stan/lang/generator/generate_idxs.hpp>
+// #include <stan/lang/generator/generate_idxs_user.hpp>
+// #include <stan/lang/generator/generate_idx.hpp>
+// #include <stan/lang/generator/generate_idx_user.hpp>
+// #include <stan/lang/generator/idx_visgen.hpp>
+// #include <stan/lang/generator/idx_user_visgen.hpp>
 
+#include <stan/lang/grammars/statement_grammar_inst.cpp>
+#include <stan/lang/grammars/statement_2_grammar_inst.cpp>
 #include <stan/lang/grammars/block_var_decls_grammar_inst.cpp>
 #include <stan/lang/grammars/local_var_decls_grammar_inst.cpp>
 #include <stan/lang/grammars/bare_type_grammar_inst.cpp>
@@ -41,6 +45,72 @@
 #include <string>
 #include <stdexcept>
 #include <iostream>
+
+stan::lang::statement
+parse_statement(std::string& input,
+                bool& pass,
+                std::ostream& err_msgs) {
+  using boost::spirit::qi::expectation_failure;
+  using boost::spirit::qi::phrase_parse;
+
+  pass = false;
+
+  //  std::cout << "parsing: " << std::endl << input << std::endl;
+  std::vector<std::string> search_path;
+  search_path.push_back("foo");  
+  std::stringstream ss(input);
+  stan::io::program_reader reader(ss, "foo", search_path);
+
+  typedef std::string::const_iterator input_iterator;
+  typedef boost::spirit::line_pos_iterator<input_iterator> lp_iterator;
+
+  lp_iterator fwd_begin = lp_iterator(input.begin());
+  lp_iterator fwd_end = lp_iterator(input.end());
+
+  // test_statement_grammar args:  reader, vm, msgs
+  stan::lang::variable_map vm;
+  std::stringstream msgs;
+
+  // statement_grammar synthesis:  statement
+  stan::lang::statement parse_result;
+
+  stan::lang::test_statement_grammar<lp_iterator> test_statement_grammar(reader, vm, msgs);
+  stan::lang::whitespace_grammar<lp_iterator> whitesp_grammar(test_statement_grammar.error_msgs_);
+  try {
+    pass = phrase_parse(fwd_begin, fwd_end, test_statement_grammar,
+                        whitesp_grammar, parse_result);
+  } catch (const boost::spirit::qi::expectation_failure<lp_iterator>& e) {
+    std::stringstream ss;
+    ss << e.what_;
+    std::string e_what = ss.str();
+    std::string angle_eps("<eps>");
+    if (e_what != angle_eps) {
+      err_msgs << "PARSER EXPECTED: "
+               << e.what_
+               << std::endl;
+    }
+    if (test_statement_grammar.error_msgs_.str().length() != 0) {
+      err_msgs << "SYNTAX ERROR, MESSAGE(S) FROM PARSER:"
+               << std::endl
+               << test_statement_grammar.error_msgs_.str();
+    }
+  } catch (const std::exception& e) {
+      err_msgs << "PROGRAM ERROR, MESSAGE(S) FROM PARSER:"
+               << std::endl
+               << test_statement_grammar.error_msgs_.str()
+               << std::endl;
+  }
+  if (fwd_begin != fwd_end) {
+    pass = false;
+    std::basic_stringstream<char> unparsed_non_ws;
+    unparsed_non_ws << boost::make_iterator_range(fwd_begin, fwd_end);
+    err_msgs << "PARSER FAILED TO PARSE INPUT"
+             << std::endl
+             << unparsed_non_ws.str()
+             << std::endl;
+  }
+  return parse_result;
+}
 
 std::vector<stan::lang::block_var_decl>
 parse_var_decls(std::string& input,
