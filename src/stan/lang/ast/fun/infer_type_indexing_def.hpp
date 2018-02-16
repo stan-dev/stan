@@ -13,6 +13,8 @@ namespace stan {
 
     bare_expr_type infer_type_indexing(const bare_expr_type& bare_type,
                                        size_t num_index_dims) {
+      if (num_index_dims == 0) return bare_type;
+
       size_t num_expr_dims = bare_type.num_dims();
       bare_expr_type tmp = bare_type;
       while (tmp.is_array_type()

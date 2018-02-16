@@ -266,14 +266,20 @@ namespace stan {
                          const std::vector<std::vector<expression> >&) const;
     template void assign_lhs::operator()(fun&, const fun&) const;
     template void assign_lhs::operator()(variable&, const variable&) const;
+    template void assign_lhs::operator()(std::vector<block_var_decl>&,
+                                         const std::vector<block_var_decl>&)
+      const;
+    template void assign_lhs::operator()(std::vector<local_var_decl>&,
+                                         const std::vector<local_var_decl>&)
+      const;
     template void assign_lhs::operator()(bare_expr_type&,
                                          const bare_expr_type&) const;
     template void assign_lhs::operator()(block_var_decl&,
                                          const block_var_decl&) const;
     template void assign_lhs::operator()(local_var_decl&,
                                          const local_var_decl&) const;
-    template void assign_lhs::operator()(fun_var_decl&,
-                                         const fun_var_decl&) const;
+    template void assign_lhs::operator()(var_decl&,
+                                         const var_decl&) const;
 
     void validate_expr_type3::operator()(const expression& expr, bool& pass,
                                          std::ostream& error_msgs) const {
@@ -403,7 +409,7 @@ namespace stan {
     }
     boost::phoenix::function<binary_op_expr> binary_op_f;
 
-    void validate_non_void_arg_function::operator()(const bare_expr_type& arg_type,
+    void validate_non_void_arg_function::operator()(bare_expr_type& arg_type,
                                             bool& pass,
                                             std::ostream& error_msgs) const {
       pass = !arg_type.is_void_type();
@@ -700,9 +706,11 @@ namespace stan {
     }
     boost::phoenix::function<unscope_variables> unscope_variables_f;
 
-    void add_fun_var::operator()(fun_var_decl& decl, scope& scope, bool& pass,
-                                 variable_map& vm,
-                                 std::ostream& error_msgs) const {
+    void add_fun_arg_var::operator()(const var_decl& decl,
+                                     const scope& scope,
+                                     bool& pass,
+                                     variable_map& vm,
+                                     std::ostream& error_msgs) const {
       if (vm.exists(decl.name())) {
         pass = false;
         error_msgs << "duplicate declaration of variable, name="
@@ -714,23 +722,11 @@ namespace stan {
         return;
       }
       pass = true;
-      origin_block var_origin = scope.program_block();
-      if (var_origin == data_origin) {
-        // parser sets scope to "var_origin" when qualifier "data" encountered
-        if (decl.bare_type().is_int_type()) {
-          pass = false;
-          error_msgs << "Data qualifier cannot be applied to int variable, "
-                     << "name " << decl.name() << ".";
-          error_msgs << std::endl;
-          return;
-        }
-        decl.bare_type().set_is_data(true);
-      } else {
-        var_origin = function_argument_origin;
-      }
-      vm.add(decl.name(), var_decl(decl.name(), decl.bare_type()), var_origin);
+      stan::lang::scope arg_scope(scope.program_block() == data_origin ?
+                       data_origin : function_argument_origin);
+      vm.add(decl.name(), decl, arg_scope);
     }
-    boost::phoenix::function<add_fun_var> add_fun_var_f;
+    boost::phoenix::function<add_fun_arg_var> add_fun_arg_var_f;
 
     // TODO(carpenter): seems redundant; see if it can be removed
     void set_omni_idx::operator()(omni_idx& val) const {
@@ -1018,6 +1014,11 @@ namespace stan {
       a.var_type_ = vm.get_bare_type(name);
       bare_expr_type inferred_lhs_type
         = infer_var_dims_type(a.var_type_, a.var_dims_);
+
+      // std::cout << "validate_assignment, " << name << " type " << a.var_type_
+      //           << " inferred type (indexes) " << inferred_lhs_type
+      //           << std::endl;
+
       if (inferred_lhs_type.is_ill_formed_type()) {
         error_msgs << "Too many indexes for variable"
                    << "; variable name = "
@@ -1159,7 +1160,6 @@ namespace stan {
     void validate_sample::operator()(sample& s,
                                      const variable_map& var_map, bool& pass,
                                      std::ostream& error_msgs) const {
-      static const bool user_facing = true;
       std::vector<bare_expr_type> arg_types;
       arg_types.push_back(s.expr_.bare_type());
       for (size_t i = 0; i < s.dist_.args_.size(); ++i)
@@ -1227,6 +1227,7 @@ namespace stan {
         return;
       }
       // test for LHS not being purely a variable
+      //      static const bool user_facing = true;
       if (has_non_param_var(s.expr_, var_map)) {
         error_msgs << "Warning (non-fatal):"
                    << std::endl
@@ -1240,7 +1241,8 @@ namespace stan {
                    << "Left-hand-side of sampling statement:"
                    << std::endl
                    << "    ";
-        generate_expression(s.expr_, user_facing, error_msgs);
+        // TODO:mitzi - ignore generate_expression for now
+        //        generate_expression(s.expr_, user_facing, error_msgs);
         error_msgs << " ~ " << function_name << "(...)"
                    << std::endl;
       }
@@ -1251,7 +1253,8 @@ namespace stan {
                      << " must be univariate."
                      << std::endl
                      << "  Found outcome expression: ";
-          generate_expression(s.expr_, user_facing, error_msgs);
+        // TODO:mitzi - ignore generate_expression for now
+          //          generate_expression(s.expr_, user_facing, error_msgs);
           error_msgs << std::endl
                      << "  with non-univariate type: "
                      << s.expr_.bare_type()
@@ -1265,7 +1268,8 @@ namespace stan {
                        << " must be univariate."
                        << std::endl
                        << "  Found parameter expression: ";
-            generate_expression(s.dist_.args_[i], user_facing, error_msgs);
+        // TODO:mitzi - ignore generate_expression for now
+            //            generate_expression(s.dist_.args_[i], user_facing, error_msgs);
             error_msgs << std::endl
                        << "  with non-univariate type: "
                        << s.dist_.args_[i].bare_type()
@@ -1280,7 +1284,8 @@ namespace stan {
                    << " must be univariate."
                    << std::endl
                    << "  Found lower bound expression: ";
-        generate_expression(s.truncation_.low_, user_facing, error_msgs);
+        // TODO:mitzi - ignore generate_expression for now
+        //        generate_expression(s.truncation_.low_, user_facing, error_msgs);
         error_msgs << std::endl
                    << "  with non-univariate type: "
                    << s.truncation_.low_.bare_type()
@@ -1294,7 +1299,8 @@ namespace stan {
                    << " must be univariate."
                    << std::endl
                    << "  Found upper bound expression: ";
-        generate_expression(s.truncation_.high_, user_facing, error_msgs);
+        // TODO:mitzi - ignore generate_expression for now
+        //        generate_expression(s.truncation_.high_, user_facing, error_msgs);
         error_msgs << std::endl
                    << "  with non-univariate type: "
                    << s.truncation_.high_.bare_type()
@@ -1378,12 +1384,13 @@ namespace stan {
     void expression_as_statement::operator()(bool& pass,
                                      const stan::lang::expression& expr,
                                      std::stringstream& error_msgs) const {
-      static const bool user_facing = true;
+      //      static const bool user_facing = true;
       if (!(expr.bare_type().is_void_type())) {
         error_msgs << "Illegal statement beginning with non-void"
                    << " expression parsed as"
                    << std::endl << "  ";
-        generate_expression(expr.expr_, user_facing, error_msgs);
+        // TODO:mitzi - ignore generate_expression for now
+        //        generate_expression(expr.expr_, user_facing, error_msgs);
         error_msgs << std::endl
                    << "Not a legal assignment, sampling, or function"
                    << " statement.  Note that"
@@ -1412,10 +1419,10 @@ namespace stan {
     }
     boost::phoenix::function<expression_as_statement> expression_as_statement_f;
 
-    void unscope_locals::operator()(const std::vector<var_decl>& var_decls,
+    void unscope_locals::operator()(const std::vector<local_var_decl>& var_decls,
                                     variable_map& vm) const {
       for (size_t i = 0; i < var_decls.size(); ++i)
-        vm.remove(var_decls[i].name_);
+        vm.remove(var_decls[i].name());
     }
     boost::phoenix::function<unscope_locals> unscope_locals_f;
 
@@ -2248,7 +2255,6 @@ namespace stan {
     void division_expr::operator()(expression& expr1,
                                    const expression& expr2,
                                    std::ostream& error_msgs) const {
-      static const bool user_facing = true;
       if (expr1.bare_type().is_primitive()
           && expr2.bare_type().is_primitive()
           && (expr1.bare_type().is_double_type()
@@ -2256,6 +2262,7 @@ namespace stan {
         expr1 /= expr2;
         return;
       }
+      //      static const bool user_facing = true;
       std::vector<expression> args;
       args.push_back(expr1);
       args.push_back(expr2);
@@ -2265,9 +2272,11 @@ namespace stan {
         error_msgs << "Warning: integer division"
                    << " implicitly rounds to integer."
                    << " Found int division: ";
-        generate_expression(expr1.expr_, user_facing, error_msgs);
+        // TODO:mitzi ignore generate_expression for now
+        //        generate_expression(expr1.expr_, user_facing, error_msgs);
         error_msgs << " / ";
-        generate_expression(expr2.expr_, user_facing, error_msgs);
+        // TODO:mitzi ignore generate_expression for now
+        //        generate_expression(expr2.expr_, user_facing, error_msgs);
         error_msgs << std::endl
                    << " Positive values rounded down,"
                    << " negative values rounded up or down"
@@ -3209,6 +3218,44 @@ namespace stan {
     }
     boost::phoenix::function<validate_array_local_var_decl>
     validate_array_local_var_decl_f;
+                                                      
+    void validate_fun_arg_var::operator()(var_decl& var_decl_result,
+                                      const bare_expr_type& bare_type,
+                                      const std::string& name,
+                                      bool& pass,
+                                      std::ostream& error_msgs) const {
+      //      std::cout << "validate_fun_arg_var" << std::endl;
+      if (bare_type.is_ill_formed_type()) {
+        error_msgs << "function argument is ill formed,"
+                   << " name="
+                   << name
+                   << std::endl;
+        pass = false;
+        return;
+      }
+      stan::lang::var_decl vd(name, bare_type);
+      var_decl_result = vd;
+      // std::cout << "validate_fun_arg_var, " << var_decl_result.name()
+      //           << " type: " << var_decl_result.type() << std::endl;
+    }
+    boost::phoenix::function<validate_fun_arg_var>
+    validate_fun_arg_var_f;
+                                                      
+    void validate_bare_type_is_data::operator()(
+                                       bare_expr_type& bare_type,
+                                       scope& scope,
+                                       bool& pass,
+                                       std::ostream& error_msgs) const {
+      if (bare_type.is_int_type()) {
+          pass = false;
+          error_msgs << "data qualifier cannot be applied to variable of type int"
+                     << std::endl;      
+          return;
+      }
+      bare_type.set_is_data(scope.program_block() == data_origin);
+    }
+    boost::phoenix::function<validate_bare_type_is_data>
+    validate_bare_type_is_data_f;
                                                       
     void validate_array_bare_type::operator()(
                                         bare_expr_type& bare_type_result,

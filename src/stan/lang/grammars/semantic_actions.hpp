@@ -226,7 +226,7 @@ namespace stan {
 
     // called from: functions_grammar
     struct validate_non_void_arg_function : public phoenix_functor_ternary {
-      void operator()(const bare_expr_type& arg_type,
+      void operator()(bare_expr_type& arg_type,
                       bool& pass,
                       std::ostream& error_msgs) const;
     };
@@ -312,12 +312,22 @@ namespace stan {
     extern boost::phoenix::function<unscope_variables> unscope_variables_f;
 
     // called from: functions_grammar
-    struct add_fun_var : public phoenix_functor_quinary {
-      void operator()(fun_var_decl& decl, scope& scope, bool& pass,
+    struct add_fun_arg_var : public phoenix_functor_quinary {
+      void operator()(const var_decl& decl, const scope& scope,
+                      bool& pass,
                       variable_map& vm,
                       std::ostream& error_msgs) const;
     };
-    extern boost::phoenix::function<add_fun_var> add_fun_var_f;
+    extern boost::phoenix::function<add_fun_arg_var> add_fun_arg_var_f;
+
+    struct validate_fun_arg_var : public phoenix_functor_quinary {
+      void operator()(var_decl& var_decl_result,
+                      const bare_expr_type& bare_type,
+                      const std::string& name,
+                      bool& pass,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<validate_fun_arg_var> validate_fun_arg_var_f;
 
     // called from: indexes_grammar
     struct set_omni_idx : public phoenix_functor_unary {
@@ -459,7 +469,7 @@ namespace stan {
 
     // called from: statement_grammar
     struct unscope_locals : public phoenix_functor_binary {
-      void operator()(const std::vector<var_decl>& var_decls, variable_map& vm)
+      void operator()(const std::vector<local_var_decl>& var_decls, variable_map& vm)
         const;
     };
     extern boost::phoenix::function<unscope_locals> unscope_locals_f;
@@ -897,6 +907,16 @@ namespace stan {
     };
     extern boost::phoenix::function<validate_array_bare_type>
     validate_array_bare_type_f;
+
+    struct validate_bare_type_is_data : public phoenix_functor_quaternary {
+      void operator()(bare_expr_type& fun_arg_type,
+                      scope& scope,
+                      bool& pass,
+                      std::ostream& error_msgs)
+        const;
+    };
+    extern boost::phoenix::function<validate_bare_type_is_data>
+    validate_bare_type_is_data_f;
 
     struct validate_array_block_var_decl : public phoenix_functor_septenary {
       void operator()(block_var_decl& var_decl_result,

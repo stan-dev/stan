@@ -7,7 +7,7 @@
 #include <stan/lang/grammars/indexes_grammar.hpp>
 #include <stan/lang/grammars/semantic_actions.hpp>
 #include <stan/lang/grammars/statement_grammar.hpp>
-#include <stan/lang/grammars/var_decls_grammar.hpp>
+#include <stan/lang/grammars/local_var_decls_grammar.hpp>
 #include <stan/lang/grammars/whitespace_grammar.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/phoenix/phoenix.hpp>
@@ -73,7 +73,7 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::sample,
                           (stan::lang::range, truncation_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::statements,
-                          (std::vector<stan::lang::var_decl>, local_decl_)
+                          (std::vector<stan::lang::local_var_decl>, local_decl_)
                           (std::vector<stan::lang::statement>, statements_) )
 
 namespace stan {
@@ -87,7 +87,7 @@ namespace stan {
         var_map_(var_map),
         error_msgs_(error_msgs),
         expression_g(var_map, error_msgs),
-        var_decls_g(var_map, error_msgs),
+        local_var_decls_g(var_map, error_msgs),
         statement_2_g(var_map, error_msgs, *this),
         indexes_g(var_map, error_msgs, expression_g) {
       using boost::spirit::qi::_1;
@@ -152,7 +152,7 @@ namespace stan {
         > eps[unscope_locals_f(_a, boost::phoenix::ref(var_map_))];
 
       local_var_decls_r
-        %= var_decls_g(false, _r1);  // - constants
+        %= local_var_decls_g(_r1);
 
       // _r1 = var scope
       increment_log_prob_statement_r.name("increment log prob statement");
