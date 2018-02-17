@@ -10,7 +10,6 @@
 #include <stan/lang/ast/type/bare_array_type.hpp>
 #include <stan/lang/ast/type/block_var_type.hpp>
 #include <stan/lang/ast/type/block_array_type.hpp>
-#include <stan/lang/ast/type/fun_var_type.hpp>
 #include <stan/lang/ast/type/local_var_type.hpp>
 #include <stan/lang/ast/type/local_array_type.hpp>
 
@@ -104,7 +103,6 @@
 
 #include <stan/lang/ast/node/block_var_decl.hpp>
 #include <stan/lang/ast/node/local_var_decl.hpp>
-#include <stan/lang/ast/node/fun_var_decl.hpp>
 
 #include <stan/lang/ast/node/var_decl.hpp>
 

@@ -147,15 +147,15 @@ TEST(arrayBlockVarDecl, createVar3) {
 
   stan::lang::int_literal
     tmp = boost::get<stan::lang::int_literal>(bvar_sizes.at(0).expr_);
-  EXPECT_EQ(tmp, 4);
+  EXPECT_EQ(tmp.val_, 4);
   tmp = boost::get<stan::lang::int_literal>(bvar_sizes.at(1).expr_);
-  EXPECT_EQ(tmp, 3);
+  EXPECT_EQ(tmp.val_, 3);
   tmp = boost::get<stan::lang::int_literal>(bvar_sizes.at(2).expr_);
-  EXPECT_EQ(tmp, 9);
+  EXPECT_EQ(tmp.val_, 9);
   tmp = boost::get<stan::lang::int_literal>(bvar_sizes.at(3).expr_);
-  EXPECT_EQ(tmp, 8);
+  EXPECT_EQ(tmp.val_, 8);
   tmp = boost::get<stan::lang::int_literal>(bvar_sizes.at(4).expr_);
-  EXPECT_EQ(tmp, 7);
+  EXPECT_EQ(tmp.val_, 7);
 
   std::stringstream ss;
   stan::lang::write_bare_expr_type(ss, bvar.bare_type());

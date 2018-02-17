@@ -17,12 +17,12 @@ namespace stan {
       range bounds_;
 
       /**
-       * Number of rows
+       * Number of rows (arg_1)
        */
       expression M_;
 
       /**
-       * Number of columns
+       * Number of columns (arg_2)
        */
       expression N_;
 
