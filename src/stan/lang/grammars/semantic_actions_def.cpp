@@ -410,8 +410,10 @@ namespace stan {
     boost::phoenix::function<binary_op_expr> binary_op_f;
 
     void validate_non_void_arg_function::operator()(bare_expr_type& arg_type,
-                                            bool& pass,
-                                            std::ostream& error_msgs) const {
+                                                    const scope& var_scope,
+                                                    bool& pass,
+                                                    std::ostream& error_msgs) const {
+      arg_type.set_is_data(var_scope.program_block() == data_origin);
       pass = !arg_type.is_void_type();
       if (!pass)
         error_msgs << "Functions cannot contain void argument types; "
@@ -545,6 +547,7 @@ namespace stan {
         std::set<std::pair<std::string, function_signature_t> >&
                                             functions_defined,
         std::ostream& error_msgs) const {
+      //      std::cout << "add_function_signature" << std::endl;
       std::vector<bare_expr_type> arg_types;
       for (size_t i = 0; i < decl.arg_decls_.size(); ++i) {
         arg_types.push_back(decl.arg_decls_[i].bare_type());
@@ -552,6 +555,7 @@ namespace stan {
       function_signature_t sig(decl.return_type_, arg_types);
       std::pair<std::string, function_signature_t> name_sig(decl.name_, sig);
 
+      //      std::cout << "check that not already declared if just declaration" << std::endl;
       // check that not already declared if just declaration
       if (decl.body_.is_no_op_statement()
           && fun_exists(functions_declared, name_sig)) {
@@ -561,6 +565,7 @@ namespace stan {
         return;
       }
 
+      //      std::cout << "check not already user defined" << std::endl;
       // check not already user defined
       if (fun_exists(functions_defined, name_sig)) {
         error_msgs << "Parse Error.  Function already defined, name="
@@ -569,6 +574,7 @@ namespace stan {
         return;
       }
 
+      //      std::cout << "check not already system defined" << std::endl;
       // check not already system defined
       if (!fun_exists(functions_declared, name_sig)
           && function_signatures::instance().is_defined(decl.name_, sig)) {
@@ -578,6 +584,7 @@ namespace stan {
         return;
       }
 
+      //      std::cout << "check argument type and qualifiers" << std::endl;
        // check argument type and qualifiers
       if (!decl.body_.is_no_op_statement()) {
         function_signature_t decl_sig =
@@ -629,6 +636,9 @@ namespace stan {
       if (!decl.body_.is_no_op_statement())
         functions_defined.insert(name_sig);
       pass = true;
+
+      //      std::cout << "added function sig" << std::endl;
+
     }
     boost::phoenix::function<add_function_signature> add_function_signature_f;
 
@@ -2626,11 +2636,10 @@ namespace stan {
                                          bool& pass,
                                          std::stringstream& error_msgs)
       const {
-      // std::cout << "validate_definition: " << var_decl.name()
-      //           << " type: " << var_decl.type() << std::endl;
-      // std::cout << "pass: " << pass << std::endl;
+      std::cout << "validate_definition: " << var_decl.name()
+                << "pass: " << pass << std::endl;
       
-      if (!var_decl.has_def()) return;
+      if (is_nil(var_decl.def())) return;
 
       // validate that assigment is allowed in this block
       if (!var_scope.allows_assignment()) {
@@ -2679,6 +2688,11 @@ namespace stan {
 
     template void validate_definition::operator()(const scope& var_scope,
                                        const local_var_decl& var_decl,
+                                       bool& pass,
+                                       std::stringstream& error_msgs) const;
+
+    template void validate_definition::operator()(const scope& var_scope,
+                                       const var_decl& var_decl,
                                        bool& pass,
                                        std::stringstream& error_msgs) const;
 
@@ -3293,14 +3307,14 @@ namespace stan {
                                    const scope& var_scope,
                                    std::ostream& error_msgs) const {
       pass = false;
-      // std::cout << "add_to_var_map_f,"
-      //           << " var decl name: " << decl.name()
-      //           << " type: " << decl.type()
-      //           << " bare_type: " << decl.bare_type()
-      //           << " type.bare_type: " << decl.type().bare_type()
-      //           << " begin_line_: " << decl.begin_line_
-      //           << " end_line_: " << decl.end_line_
-      //           << std::endl;
+      std::cout << "add_to_var_map_f,"
+                << " var decl name: " << decl.name()
+                << " type: " << decl.type()
+                << " bare_type: " << decl.bare_type()
+                << " type.bare_type: " << decl.type().bare_type()
+                << " begin_line_: " << decl.begin_line_
+                << " end_line_: " << decl.end_line_
+                << std::endl;
 
       if (vm.exists(decl.name())) {
         var_decl prev_decl = vm.get(decl.name());

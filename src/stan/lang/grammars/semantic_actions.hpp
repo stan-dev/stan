@@ -225,8 +225,9 @@ namespace stan {
     extern boost::phoenix::function<binary_op_expr> binary_op_f;
 
     // called from: functions_grammar
-    struct validate_non_void_arg_function : public phoenix_functor_ternary {
+    struct validate_non_void_arg_function : public phoenix_functor_quaternary {
       void operator()(bare_expr_type& arg_type,
+                      const scope& var_scope,
                       bool& pass,
                       std::ostream& error_msgs) const;
     };

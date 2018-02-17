@@ -11,7 +11,7 @@
 #include <stan/lang/grammars/whitespace_grammar.hpp>
 #include <stan/lang/grammars/expression_grammar.hpp>
 #include <stan/lang/grammars/statement_grammar.hpp>
-#include <stan/lang/grammars/var_decls_grammar.hpp>
+#include <stan/lang/grammars/block_decls_grammar.hpp>
 #include <test/unit/util.hpp>
 #include <boost/lexical_cast.hpp>
 #include <iostream>
