@@ -9,6 +9,8 @@
 #include <utility>
 #include <vector>
 
+#include <iostream>
+
 namespace stan {
   namespace lang {
 
@@ -200,6 +202,13 @@ namespace stan {
 
     void function_signatures::add_unary_vectorized(const::std::string&
                                                    name) {
+
+      add(name, bare_expr_type(int_type()), bare_expr_type(int_type()));
+      add(name, bare_expr_type(double_type()), bare_expr_type(double_type()));
+      add(name, bare_expr_type(vector_type()), bare_expr_type(vector_type()));
+      add(name, bare_expr_type(row_vector_type()), bare_expr_type(row_vector_type()));
+      add(name, bare_expr_type(matrix_type()), bare_expr_type(matrix_type()));
+
       int_type tInt;
       bare_array_type arInt(tInt);
       bare_expr_type arIntType(arInt);
@@ -221,11 +230,11 @@ namespace stan {
         add(name, arMatrixType, arMatrixType);
         add(name, arRowVectorType, arRowVectorType);
         add(name, arVectorType, arVectorType);
-        arIntType = bare_array_type(arIntType);
-        arDoubleType = bare_array_type(arDoubleType);
-        arMatrixType = bare_array_type(arMatrixType);
-        arRowVectorType = bare_array_type(arRowVectorType);
-        arVectorType = bare_array_type(arVectorType);
+        arIntType = bare_expr_type(bare_array_type(arIntType));
+        arDoubleType = bare_expr_type(bare_array_type(arDoubleType));
+        arMatrixType = bare_expr_type(bare_array_type(arMatrixType));
+        arRowVectorType = bare_expr_type(bare_array_type(arRowVectorType));
+        arVectorType = bare_expr_type(bare_array_type(arVectorType));
       }
     }
 

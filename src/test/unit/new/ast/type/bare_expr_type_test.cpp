@@ -242,3 +242,42 @@ TEST(bareExprType, create2DArrayOfMatrices) {
   stan::lang::write_bare_expr_type(ss, y);
   EXPECT_EQ("matrix[ , ]", ss.str());
 }
+
+TEST(bareExprType, create3DArrayOfMatrices) {
+  matrix_type tMat;
+  bare_array_type d1(tMat, 3);
+  EXPECT_EQ(d1.oid(),"array_array_array_06_matrix_type");
+  bare_expr_type x(d1);
+  EXPECT_TRUE(x.is_array_type());
+  EXPECT_EQ(x.num_dims(), 5);
+  EXPECT_EQ(x.array_dims(), 3);
+}
+
+TEST(bareExprType, create1DArrayOfVector) {
+  vector_type tVec;
+  bare_array_type d1(tVec, 1);
+  EXPECT_EQ(d1.oid(),"array_04_vector_type");
+  bare_expr_type x(d1);
+  EXPECT_TRUE(x.is_array_type());
+  EXPECT_EQ(x.num_dims(), 2);
+  EXPECT_EQ(x.array_dims(), 1);
+}
+
+TEST(bareExprType, create0DArrayOfVector) {
+  vector_type tVec;
+  bare_array_type d1(tVec, 0);
+  EXPECT_EQ(d1.oid(),"array_00_ill_formed_type");
+  bare_expr_type x(d1);
+  EXPECT_TRUE(x.is_array_type());
+  EXPECT_EQ(x.num_dims(), 0);
+  EXPECT_EQ(x.array_dims(), 0);
+}
+
+TEST(bareExprType, create10DArrayOfVector) {
+  vector_type tVec;
+  bare_array_type d1(tVec, 10);
+  bare_expr_type x(d1);
+  EXPECT_TRUE(x.is_array_type());
+  EXPECT_EQ(x.num_dims(), 11);
+  EXPECT_EQ(x.array_dims(), 10);
+}
