@@ -12,7 +12,7 @@ namespace stan {
 
     function_decl_def::function_decl_def(const bare_expr_type& return_type,
                                          const std::string& name,
-                                         const std::vector<fun_var_decl>& arg_decls,
+                                         const std::vector<var_decl>& arg_decls,
                                          const statement& body)
       : return_type_(return_type), name_(name), arg_decls_(arg_decls),
         body_(body) {
