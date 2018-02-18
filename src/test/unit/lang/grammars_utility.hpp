@@ -21,6 +21,9 @@
 // #include <stan/lang/generator/idx_visgen.hpp>
 // #include <stan/lang/generator/idx_user_visgen.hpp>
 
+#include <stan/lang/parser.hpp>
+
+#include <stan/lang/grammars/program_grammar_inst.cpp>
 #include <stan/lang/grammars/functions_grammar_inst.cpp>
 #include <stan/lang/grammars/statement_grammar_inst.cpp>
 #include <stan/lang/grammars/statement_2_grammar_inst.cpp>
@@ -47,6 +50,23 @@
 #include <string>
 #include <stdexcept>
 #include <iostream>
+
+stan::lang::program
+parse_program(std::string& input,
+              bool& pass,
+              std::ostream& err_msgs) {
+  pass = false;
+
+  std::cout << "parsing: " << std::endl << input << std::endl;
+  std::istringstream istr(input);
+  std::vector<std::string> search_path;
+  search_path.push_back("foo");  
+  std::stringstream ss(input);
+  stan::io::program_reader reader(ss, "foo", search_path);
+  stan::lang::program parse_result;
+  pass = stan::lang::parse(&err_msgs, istr, "foo", reader, parse_result, false);
+  return parse_result;
+}
 
 std::vector<stan::lang::function_decl_def>
 parse_functions(std::string& input,

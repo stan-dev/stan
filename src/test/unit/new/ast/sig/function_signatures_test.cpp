@@ -59,11 +59,66 @@ TEST(lang_ast,function_signatures_log_sum_exp_2) {
   std::stringstream error_msgs;
   EXPECT_EQ(bare_expr_type(double_type()),
             fs.get_result_type("log_sum_exp",
+                               bare_expr_type_vec(bare_expr_type(vector_type())),
+                               error_msgs));
+}
+
+TEST(lang_ast,function_signatures_log_sum_exp_3) {
+  stan::lang::function_signatures& fs = stan::lang::function_signatures::instance();
+  std::stringstream error_msgs;
+  EXPECT_EQ(bare_expr_type(double_type()),
+            fs.get_result_type("log_sum_exp",
+                               bare_expr_type_vec(bare_expr_type(row_vector_type())),
+                               error_msgs));
+}
+
+TEST(lang_ast,function_signatures_log_sum_exp_4) {
+  stan::lang::function_signatures& fs = stan::lang::function_signatures::instance();
+  std::stringstream error_msgs;
+  EXPECT_EQ(bare_expr_type(double_type()),
+            fs.get_result_type("log_sum_exp",
+                               bare_expr_type_vec(bare_expr_type(matrix_type())),
+                               error_msgs));
+}
+
+TEST(lang_ast,function_signatures_log_sum_exp_binary) {
+  stan::lang::function_signatures& fs = stan::lang::function_signatures::instance();
+  std::stringstream error_msgs;
+  EXPECT_EQ(bare_expr_type(double_type()),
+            fs.get_result_type("log_sum_exp",
                                bare_expr_type_vec(bare_expr_type(double_type()),
                                                   bare_expr_type(double_type())),
                                error_msgs));
 }
- 
+
+TEST(lang_ast,function_signatures_unary_vectorized_trunc_0) {
+  stan::lang::function_signatures& fs = stan::lang::function_signatures::instance();
+  std::stringstream error_msgs;
+  EXPECT_EQ(bare_expr_type(double_type()),
+            fs.get_result_type("trunc",
+                               bare_expr_type_vec(double_type()),
+                               error_msgs));
+}
+
+TEST(lang_ast,function_signatures_unary_vectorized_trunc_1) {
+  stan::lang::function_signatures& fs = stan::lang::function_signatures::instance();
+  std::stringstream error_msgs;
+  EXPECT_EQ(bare_expr_type(bare_array_type(double_type())),
+            fs.get_result_type("trunc",
+                               bare_expr_type_vec(bare_array_type(double_type())),
+                               error_msgs));
+}
+
+TEST(lang_ast,function_signatures_unary_vectorized_trunc_8) {
+  stan::lang::function_signatures& fs = stan::lang::function_signatures::instance();
+  std::stringstream error_msgs;
+  EXPECT_EQ(bare_expr_type(bare_array_type(double_type(),8)),
+            fs.get_result_type("trunc",
+                               bare_expr_type_vec(bare_array_type(double_type(),8)),
+                               error_msgs));
+}
+
+
 TEST(lang_ast, function_signatures_add) {
   stan::lang::function_signatures& fs = stan::lang::function_signatures::instance();
   std::stringstream error_msgs;
