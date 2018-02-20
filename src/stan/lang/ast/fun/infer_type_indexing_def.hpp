@@ -13,35 +13,28 @@ namespace stan {
 
     bare_expr_type infer_type_indexing(const bare_expr_type& bare_type,
                                        size_t num_index_dims) {
+      
       if (num_index_dims == 0) return bare_type;
+      if (num_index_dims > static_cast<size_t>(bare_type.num_dims()))
+        return ill_formed_type();
 
-      size_t num_expr_dims = bare_type.num_dims();
       bare_expr_type tmp = bare_type;
-      while (tmp.is_array_type()
-             && num_index_dims > 1) {
+      while (tmp.is_array_type() && num_index_dims > 0) {
         tmp = tmp.array_element_type();
-        num_expr_dims--;
-        num_index_dims--;
+        --num_index_dims;
       }
 
-      if (num_expr_dims < num_index_dims) 
-        return bare_expr_type(ill_formed_type());
+      if (num_index_dims == 0) return tmp;
 
-      if (bare_type.is_array_type())
-        return bare_type.array_element_type();
-      
-      if ((bare_type.is_row_vector_type()
-          || bare_type.is_vector_type())
+      if ((tmp.is_vector_type() || tmp.is_row_vector_type())
           && num_index_dims == 1)
-        return bare_expr_type(double_type());
+        return double_type();
+      
+      if (tmp.is_matrix_type() && num_index_dims == 2)
+        return double_type();
 
-      if (bare_type.is_matrix_type()
-          &&  num_index_dims == 1)
-        return bare_expr_type(row_vector_type());
-
-      if (bare_type.is_matrix_type()
-          &&  num_index_dims == 1)
-        return bare_expr_type(double_type());
+      if (tmp.is_matrix_type() && num_index_dims == 1)
+        return row_vector_type();
       
       return bare_expr_type(ill_formed_type());
     }

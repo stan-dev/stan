@@ -112,6 +112,7 @@ namespace stan {
     }
 
     void set_fun_type(fun& fun, std::ostream& error_msgs) {
+      //      std::cout << "set_fun_type?? " << std::endl;
       std::vector<bare_expr_type> arg_types;
       for (size_t i = 0; i < fun.args_.size(); ++i)
         arg_types.push_back(fun.args_[i].bare_type());
@@ -176,6 +177,7 @@ namespace stan {
                         const std::string& name,
                         const std::string& stmt_type,
                         std::ostream& error_msgs) {
+
       if (lhs_type.num_dims() != rhs_expr.bare_type().num_dims()) {
         error_msgs << "Dimension mismatch in "
                    << stmt_type
@@ -188,21 +190,17 @@ namespace stan {
                    << std::endl;
         return false;
       }
-      bare_expr_type rhs_bare_type = rhs_expr.bare_type();
+      
       // allow int -> double promotion, even in arrays
       bool types_compatible =
-        (lhs_type == rhs_bare_type
-         || (lhs_type.is_double_type() && rhs_bare_type.is_int_type()));
+        (lhs_type == rhs_expr.bare_type()
+         || (lhs_type.is_double_type() && rhs_expr.bare_type().is_int_type()));
       if (!types_compatible) {
-        error_msgs << "Base type mismatch in "
-                   << stmt_type
-                   << "; variable name = "
-                   << name
-                   << ", type = ";
-        write_bare_expr_type(error_msgs, lhs_type);
-        error_msgs << "; right-hand side type=";
-        write_bare_expr_type(error_msgs, rhs_bare_type);
-        error_msgs << std::endl;
+        error_msgs << "Base type mismatch in " << stmt_type
+                   << "; variable name = " << name
+                   << ", type = " << lhs_type
+                   << "; right-hand side type = " << rhs_expr.bare_type()
+                   << std::endl;
         return false;
       }
       return true;
@@ -970,6 +968,13 @@ namespace stan {
     void validate_assgn::operator()(const assgn& a, bool& pass,
                                     const variable_map& vm,
                                     std::ostream& error_msgs) const {
+      // std::cout << "validate_assgn"
+      //           << " var: " << a.lhs_var_.name_
+      //           << " type: " << a.lhs_var_.type_
+      //           << " idxs: " << a.idxs_.size()
+      //           << " rhs type: " << a.rhs_.bare_type()
+      //           << std::endl;
+
       // validate var exists
       std::string name = a.lhs_var_.name_;
       if (!vm.exists(name)) {
@@ -982,6 +987,8 @@ namespace stan {
 
       expression lhs_expr = expression(a.lhs_var_);
       bare_expr_type lhs_type = indexed_type(lhs_expr, a.idxs_);
+      //      std::cout << "lhs indexed_type " << lhs_type << std::endl;
+
       if (lhs_type.is_ill_formed_type()) {
         error_msgs << "Left-hand side indexing incompatible with variable."
                    << std::endl;
@@ -1170,10 +1177,15 @@ namespace stan {
     void validate_sample::operator()(sample& s,
                                      const variable_map& var_map, bool& pass,
                                      std::ostream& error_msgs) const {
+      //      std::cout << "validate sample" << std::endl;
+      //      std::cout << " s.expr_.bare_type(): " << s.expr_.bare_type() << std::endl;
       std::vector<bare_expr_type> arg_types;
       arg_types.push_back(s.expr_.bare_type());
-      for (size_t i = 0; i < s.dist_.args_.size(); ++i)
+      for (size_t i = 0; i < s.dist_.args_.size(); ++i) {
         arg_types.push_back(s.dist_.args_[i].bare_type());
+        //        std::cout << "arg " << i << " type: " << s.dist_.args_[i].bare_type() << std::endl;
+      }
+
       std::string function_name(s.dist_.family_);
       std::string internal_function_name = get_prob_fun(function_name);
       s.is_discrete_ = function_signatures::instance()
@@ -1987,6 +1999,7 @@ namespace stan {
                                         bool& pass,
                                         const variable_map& var_map,
                                         std::ostream& error_msgs) const {
+      //      std::cout << "set_fun_type_named?? " << std::endl;
       if (fun.name_ == "get_lp")
         error_msgs << "Warning (non-fatal): get_lp() function deprecated."
                    << std::endl
@@ -2455,7 +2468,11 @@ namespace stan {
                  bool& pass, std::ostream& error_msgs) const {
       index_op iop(expression, dimss);
       int expr_dims = expression.total_dims();
+      //      std::cout << " expr_dims " << expr_dims << std::endl;
+
       int index_dims = num_dimss(dimss);
+      //      std::cout << " index_dims " << index_dims << std::endl;
+
       if (expr_dims < index_dims) {
         error_msgs << "Indexed expression must have at least as many"
                    << " dimensions as number of indexes supplied: "
@@ -2636,8 +2653,8 @@ namespace stan {
                                          bool& pass,
                                          std::stringstream& error_msgs)
       const {
-      std::cout << "validate_definition: " << var_decl.name()
-                << "pass: " << pass << std::endl;
+      //      std::cout << "validate_definition: " << var_decl.name()
+      //                << "pass: " << pass << std::endl;
       
       if (is_nil(var_decl.def())) return;
 
@@ -3307,14 +3324,14 @@ namespace stan {
                                    const scope& var_scope,
                                    std::ostream& error_msgs) const {
       pass = false;
-      std::cout << "add_to_var_map_f,"
-                << " var decl name: " << decl.name()
-                << " type: " << decl.type()
-                << " bare_type: " << decl.bare_type()
-                << " type.bare_type: " << decl.type().bare_type()
-                << " begin_line_: " << decl.begin_line_
-                << " end_line_: " << decl.end_line_
-                << std::endl;
+      //      std::cout << "add_to_var_map_f,"
+      //           << " var decl name: " << decl.name()
+      //           << " type: " << decl.type()
+      //           << " bare_type: " << decl.bare_type()
+      //           << " type.bare_type: " << decl.type().bare_type()
+      //           << " begin_line_: " << decl.begin_line_
+      //           << " end_line_: " << decl.end_line_
+      //           << std::endl;
 
       if (vm.exists(decl.name())) {
         var_decl prev_decl = vm.get(decl.name());

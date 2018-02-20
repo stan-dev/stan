@@ -420,7 +420,6 @@ namespace stan {
         return signatures[match_index].first;
 
       // all returns after here are for ill-typed input
-
       if (num_matches == 0) {
         error_msgs << "No matches for: "
                    << std::endl << std::endl;
