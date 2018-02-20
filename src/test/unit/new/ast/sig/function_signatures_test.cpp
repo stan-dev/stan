@@ -119,6 +119,35 @@ TEST(lang_ast,function_signatures_unary_vectorized_trunc_8) {
 }
 
 
+TEST(lang_ast,function_signatures_multi_normal_0) {
+  stan::lang::function_signatures& fs = stan::lang::function_signatures::instance();
+  std::stringstream error_msgs;
+  EXPECT_EQ(bare_expr_type(double_type()),
+            fs.get_result_type("multi_normal_log",
+                               bare_expr_type_vec(bare_array_type(vector_type()), bare_array_type(vector_type()), matrix_type()),
+                               error_msgs));
+}
+
+TEST(lang_ast,function_signatures_multi_normal_cholesky_0) {
+  stan::lang::function_signatures& fs = stan::lang::function_signatures::instance();
+  std::stringstream error_msgs;
+  EXPECT_EQ(bare_expr_type(double_type()),
+            fs.get_result_type("multi_normal_cholesky_log",
+                               bare_expr_type_vec(bare_array_type(vector_type()), bare_array_type(vector_type()), matrix_type()),
+                               error_msgs));
+}
+
+
+TEST(lang_ast,function_signatures_multi_normal_cholesky_1) {
+  stan::lang::function_signatures& fs = stan::lang::function_signatures::instance();
+  std::stringstream error_msgs;
+  EXPECT_EQ(bare_expr_type(double_type()),
+            fs.get_result_type("multi_normal_cholesky_log",
+                               bare_expr_type_vec(bare_array_type(vector_type()), vector_type(), matrix_type()),
+                               error_msgs));
+}
+
+
 TEST(lang_ast, function_signatures_add) {
   stan::lang::function_signatures& fs = stan::lang::function_signatures::instance();
   std::stringstream error_msgs;
