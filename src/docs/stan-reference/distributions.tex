@@ -1117,7 +1117,7 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
 \end{description}
 %
 \begin{description}
-\fitem{real}{normal\_rng}{real \farg{mu},  real \farg{sigma}}{Generate a normal
+\fitem{real}{normal\_rng}{reals \farg{mu},  reals \farg{sigma}}{Generate a normal
   variate with location \farg{mu} and scale \farg{sigma}; may only be used in
   generated quantities block}
 \end{description}
@@ -1165,8 +1165,8 @@ If $\mu \in \reals$, $\sigma \in \posreals$, and $\lambda \in
 \end{description}
 %
 \begin{description}
-\fitem{real}{exp\_mod\_normal\_rng}{real \farg{mu}, real \farg{sigma},
-real \farg{lambda}}{Generate a exponentially modified normal variate
+\fitem{real}{exp\_mod\_normal\_rng}{reals \farg{mu}, reals \farg{sigma},
+reals \farg{lambda}}{Generate a exponentially modified normal variate
 with location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda};
 may only be used in generated quantities block}
 \end{description}
@@ -1217,7 +1217,7 @@ then for $y \in \reals$,
 \end{description}
 %
 \begin{description}
-\fitem{real}{skew\_normal\_rng}{real \farg{xi}, real \farg{omega},
+\fitem{real}{skew\_normal\_rng}{reals \farg{xi}, reals \farg{omega},
   real \farg{alpha}}{Generate a skew normal variate with location
   \farg{xi}, scale \farg{omega}, and shape \farg{alpha}; may only be used in
   generated quantities block}
@@ -1273,7 +1273,7 @@ then for $y \in \reals$,
 \end{description}
 %
 \begin{description}
-\fitem{real}{student\_t\_rng}{real \farg{nu}, real \farg{mu}, real
+\fitem{real}{student\_t\_rng}{reals \farg{nu}, reals \farg{mu}, reals
   \farg{sigma}}{Generate a Student-$t$ variate with degrees of freedom
 \farg{nu}, location \farg{mu}, and scale \farg{sigma}; may only be used in
   generated quantities block}
@@ -1319,7 +1319,7 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in \reals$,
 \end{description}
 %
 \begin{description}
-\fitem{real}{cauchy\_rng}{real \farg{mu}, real \farg{sigma}}{Generate a Cauchy
+\fitem{real}{cauchy\_rng}{reals \farg{mu}, reals \farg{sigma}}{Generate a Cauchy
   variate with location \farg{mu} and scale \farg{sigma}; may only be used in
   generated quantities block}
 \end{description}
@@ -1386,7 +1386,7 @@ function of \farg{y} given location \farg{mu} and scale \farg{sigma}}
 \end{description}
 %
 \begin{description}
-\fitem{real}{double\_exponential\_rng}{real \farg{mu}, real
+\fitem{real}{double\_exponential\_rng}{reals \farg{mu}, reals
   \farg{sigma}}{Generate a double exponential variate with location
   \farg{mu} and scale \farg{sigma}; may only be used in generated
   quantities block}
@@ -1434,7 +1434,7 @@ location \farg{mu} and scale \farg{sigma}}
 \end{description}
 %
 \begin{description}
-\fitem{real}{logistic\_rng}{real \farg{mu}, real
+\fitem{real}{logistic\_rng}{reals \farg{mu}, reals
   \farg{sigma}}{Generate a logistic variate with location \farg{mu}
   and scale \farg{sigma}; may only be used in generated quantities block}
 \end{description}
@@ -1477,7 +1477,7 @@ If $\mu \in \reals$ and $\beta \in \posreals$, then for $y \in \reals$,
 \end{description}
 %
 \begin{description}
-\fitem{real}{gumbel\_rng}{real \farg{mu}, real
+\fitem{real}{gumbel\_rng}{reals \farg{mu}, reals
   \farg{beta}}{Generate a gumbel variate with location \farg{mu}
   and scale \farg{beta}; may only be used in generated quantities block}
 \end{description}
@@ -1534,7 +1534,7 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
 \end{description}
 %
 \begin{description}
-\fitem{real}{lognormal\_rng}{real \farg{mu}, real
+\fitem{real}{lognormal\_rng}{reals \farg{mu}, reals
   \farg{beta}}{Generate a lognormal variate with location \farg{mu}
   and scale \farg{sigma}; may only be used in generated quantities block}
 \end{description}
@@ -1580,7 +1580,7 @@ y^{\nu/2 - 1}
 \end{description}
 %
 \begin{description}
-\fitem{real}{chi\_square\_rng}{real \farg{nu}}{Generate a Chi-square
+\fitem{real}{chi\_square\_rng}{reals \farg{nu}}{Generate a Chi-square
   variate with degrees of freedom \farg{nu}; may only be used in
   generated quantities block}
 \end{description}
@@ -1628,7 +1628,7 @@ y^{-\nu/2 - 1}
 \end{description}
 %
 \begin{description}
-\fitem{real}{inv\_chi\_square\_rng}{real \farg{nu}}{Generate an
+\fitem{real}{inv\_chi\_square\_rng}{reals \farg{nu}}{Generate an
   inverse Chi-squared variate with degrees of freedom \farg{nu};
 may only be used in generated quantities block}
 \end{description}
@@ -1689,7 +1689,7 @@ y^{-(\nu/2 + 1)}
 \end{description}
 %
 \begin{description}
-\fitem{real}{scaled\_inv\_chi\_square\_rng}{real \farg{nu}, real
+\fitem{real}{scaled\_inv\_chi\_square\_rng}{reals \farg{nu}, reals
   \farg{sigma}}{Generate a scaled inverse Chi-squared variate with degrees
 of freedom \farg{nu} and scale \farg{sigma}; may only be used in generated
 quantities block}
@@ -1731,7 +1731,7 @@ If $\beta \in \posreals$, then for $y \in \posreals$,
 \end{description}
 %
 \begin{description}
-\fitem{real}{exponential\_rng}{real \farg{beta}}{Generate an
+\fitem{real}{exponential\_rng}{reals \farg{beta}}{Generate an
   exponential variate with inverse scale \farg{beta}; may only be used in
   generated quantities block}
 \end{description}
@@ -1778,7 +1778,7 @@ y^{\alpha - 1}
 \end{description}
 %
 \begin{description}
-\fitem{real}{gamma\_rng}{real \farg{alpha}, real
+\fitem{real}{gamma\_rng}{reals \farg{alpha}, reals
   \farg{beta}}{Generate a gamma variate with shape
   \farg{alpha} and inverse scale \farg{beta}; may only be used in generated
 quantities block}
@@ -1827,7 +1827,7 @@ y^{-(\alpha + 1)}
 \end{description}
 %
 \begin{description}
-\fitem{real}{inv\_gamma\_rng}{real \farg{alpha}, real
+\fitem{real}{inv\_gamma\_rng}{reals \farg{alpha}, reals
   \farg{beta}}{Generate an inverse gamma variate with shape
   \farg{alpha} and scale \farg{beta}; may only be used in generated
 quantities block}
@@ -1878,7 +1878,7 @@ then $Y^{-1} \propto \distro{Frechet}(\alpha,\sigma^{-1})$.
 \end{description}
 %
 \begin{description}
-\fitem{real}{weibull\_rng}{real \farg{alpha}, real
+\fitem{real}{weibull\_rng}{reals \farg{alpha}, reals
   \farg{sigma}}{Generate a weibull variate with shape
   \farg{alpha} and scale \farg{sigma}; may only be used in generated
 quantities block}
@@ -1928,7 +1928,7 @@ then $Y^{-1} \propto \distro{Weibull}(\alpha,\sigma^{-1})$.
 \end{description}
 %
 \begin{description}
-\fitem{real}{frechet\_rng}{real \farg{alpha}, real
+\fitem{real}{frechet\_rng}{reals \farg{alpha}, reals
   \farg{sigma}}{Generate an Fr\'{e}chet variate with shape
   \farg{alpha} and scale \farg{sigma}; may only be used in generated
 quantities block}
@@ -1970,7 +1970,7 @@ non-negative real numbers.
 \end{description}
 %
 \begin{description}
-\fitem{real}{rayleigh\_rng}{real
+\fitem{real}{rayleigh\_rng}{reals
   \farg{sigma}}{Generate a Rayleigh variate with scale
   \farg{sigma}; may only be used in generated
 quantities block}
@@ -2065,7 +2065,7 @@ $y \in \posreals$ with $y \geq y_{\mbox{\footnotesize\rm min}}$,
 \end{description}
 %
 \begin{description}
-\fitem{real}{pareto\_rng}{real \farg{y\_min}, real
+\fitem{real}{pareto\_rng}{reals \farg{y\_min}, reals
   \farg{alpha}}{Generate a Pareto variate with positive minimum value
   \farg{y\_min} and shape \farg{alpha}; may only be used in generated
   quantities block}
@@ -2110,7 +2110,7 @@ Note that the Lomax distribution is a Pareto Type 2 distribution with $\mu=0$.
 \end{description}
 %
 \begin{description}
-\fitem{real}{pareto\_type\_2\_rng}{real \farg{mu}, real \farg{lambda}, real
+\fitem{real}{pareto\_type\_2\_rng}{reals \farg{mu}, reals \farg{lambda}, reals
   \farg{alpha}}{Generate a Pareto Type 2 variate with location
   \farg{mu}, scale \farg{lambda}, and shape \farg{alpha}; may only be used in generated
   quantities block}
