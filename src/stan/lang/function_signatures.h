@@ -123,8 +123,22 @@ for (size_t i = 0; i < vector_types.size(); ++i) {
     }
   }
 }
-add("beta_rng", expr_type(double_type()), expr_type(double_type()), expr_type(double_type()));
+for (size_t i = 0; i < primitive_types.size(); ++i) {
+  for (size_t j = 0; j < primitive_types.size(); ++j) {
+    add("beta_rng", expr_type(double_type()), primitive_types[i], primitive_types[j]);
+  }
+ }
+for (size_t i = 0; i < primitive_types.size(); i++) {
+  add("beta_rng", expr_type(vector_type()), primitive_types[i], expr_type(int_type(), 1U));
+  add("beta_rng", expr_type(vector_type()), expr_type(int_type(), 1U), primitive_types[i]);
+ }
 for (size_t i = 1; i < vector_types.size(); ++i) {
+  for (size_t j = 0; j < primitive_types.size(); ++j) {
+    add("beta_rng", expr_type(vector_type()), primitive_types[j], vector_types[i]);
+    add("beta_rng", expr_type(vector_type()), vector_types[i], primitive_types[j]);
+  }
+  add("beta_rng", expr_type(vector_type()), vector_types[i], expr_type(int_type(), 1U));
+  add("beta_rng", expr_type(vector_type()), expr_type(int_type(), 1U), vector_types[i]);
   for (size_t j = 1; j < vector_types.size(); ++j) {
     add("beta_rng", expr_type(vector_type()), vector_types[i], vector_types[j]);
   }

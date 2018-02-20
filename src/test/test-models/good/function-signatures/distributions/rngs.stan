@@ -56,6 +56,24 @@ generated quantities {
   z = von_mises_rng(1.0,2.0);
   z = uniform_rng(-1.0, 1.0);
 
+  v = normal_rng(mu, 2.0);
+  v = exp_mod_normal_rng(mu, 1.5, alpha);
+  v = skew_normal_rng(mu, 1.0, theta);
+  v = student_t_rng(theta, 3.0, alpha);
+  v = cauchy_rng(theta, 0.76);
+  v = double_exponential_rng(mu, 0.2);
+  v = logistic_rng(mu, 0.5);
+  v = gumbel_rng(mu, 1);
+  v = lognormal_rng(mu, 3.7);
+  v = scaled_inv_chi_square_rng(mu, 3.0);
+  v = gamma_rng(2.4, theta);
+  v = inv_gamma_rng(alpha, 3.4);
+  v = weibull_rng(alpha, 5.3);
+  v = frechet_rng(mu, 8.2);
+  v = pareto_rng(alpha, 3.9);
+  v = pareto_type_2_rng(mu, alpha, 8.1);
+  v = beta_rng(theta, 0.4);
+
   v = normal_rng(mu, theta);
   v = exp_mod_normal_rng(mu, theta, alpha);
   v = skew_normal_rng(mu, alpha, theta);
