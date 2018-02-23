@@ -69,12 +69,10 @@ TEST(astExpression, array_expr) {
 
 TEST(astExpression, variable_expr) {
   stan::lang::matrix_type tMat;
-  stan::lang::bare_array_type d1(tMat);
-  stan::lang::bare_expr_type x(d1);
-  stan::lang::bare_array_type d2(x);
-  stan::lang::bare_expr_type y(d2);
+  stan::lang::bare_array_type d2_ar(tMat,2);
+  stan::lang::bare_expr_type bet(d2_ar);
   stan::lang::variable v("foo");
-  v.set_type(y);
+  v.set_type(bet);
   stan::lang::expression e1 = v;
   EXPECT_TRUE(e1.bare_type().is_array_type());
   EXPECT_EQ(e1.bare_type().order_id(), "array_array_06_matrix_type");
@@ -162,6 +160,15 @@ TEST(astExpression, integrate_ode) {
   stan::lang::expression e1(so2);
   // check expression
   EXPECT_EQ(e1.bare_type().order_id(), "array_array_03_double_type");
+}
+
+TEST(astExpression, conditional_op) {
+  stan::lang::expression e1 = stan::lang::int_literal(5);
+  stan::lang::expression e2 = stan::lang::double_literal(2.0);
+  stan::lang::expression e3 = stan::lang::double_literal(-2.0);
+
+  stan::lang::expression e4(stan::lang::conditional_op(e1,e2,e3));
+  EXPECT_TRUE(e4.bare_type().is_double_type());
 }
 
 TEST(astExpression, binary_op) {

@@ -35,8 +35,8 @@ TEST(blockVarType, createIllFormed) {
   EXPECT_FALSE(x.is_array_type());
   EXPECT_EQ(x.num_dims(), 0);
 
-  std::vector<expression> sizes = x.size();
-  EXPECT_EQ(sizes.size(), 0);
+  std::vector<expression> array_lens = x.array_lens();
+  EXPECT_EQ(array_lens.size(), 0);
 
   std::stringstream ss;
   stan::lang::write_bare_expr_type(ss, x.bare_type());
@@ -50,8 +50,8 @@ TEST(blockVarType, createInt) {
   EXPECT_FALSE(x.is_array_type());
   EXPECT_EQ(x.num_dims(), 0);
 
-  std::vector<expression> sizes = x.size();
-  EXPECT_EQ(sizes.size(), 0);
+  std::vector<expression> array_lens = x.array_lens();
+  EXPECT_EQ(array_lens.size(), 0);
 
   std::stringstream ss;
   stan::lang::write_bare_expr_type(ss, x.bare_type());
@@ -64,8 +64,8 @@ TEST(blockVarType, createDouble) {
   EXPECT_FALSE(x.is_array_type());
   EXPECT_EQ(x.num_dims(), 0);
 
-  std::vector<expression> sizes = x.size();
-  EXPECT_EQ(sizes.size(), 0);
+  std::vector<expression> array_lens = x.array_lens();
+  EXPECT_EQ(array_lens.size(), 0);
 
   std::stringstream ss;
   stan::lang::write_bare_expr_type(ss, x.bare_type());
@@ -79,8 +79,8 @@ TEST(blockVarType, createDoubleBounded) {
   EXPECT_FALSE(x.is_array_type());
   EXPECT_EQ(x.num_dims(), 0);
 
-  std::vector<expression> sizes = x.size();
-  EXPECT_EQ(sizes.size(), 0);
+  std::vector<expression> array_lens = x.array_lens();
+  EXPECT_EQ(array_lens.size(), 0);
 
   std::stringstream ss;
   stan::lang::write_bare_expr_type(ss, x.bare_type());
@@ -93,8 +93,8 @@ TEST(blockVarType, createVector) {
   EXPECT_FALSE(x.is_array_type());
   EXPECT_EQ(x.num_dims(), 1);
 
-  std::vector<expression> sizes = x.size();
-  EXPECT_EQ(sizes.size(), 1);
+  std::vector<expression> array_lens = x.array_lens();
+  EXPECT_EQ(array_lens.size(), 0);
 
   std::stringstream ss;
   stan::lang::write_bare_expr_type(ss, x.bare_type());
@@ -107,8 +107,8 @@ TEST(blockVarType, createRowVector) {
   EXPECT_FALSE(x.is_array_type());
   EXPECT_EQ(x.num_dims(), 1);
 
-  std::vector<expression> sizes = x.size();
-  EXPECT_EQ(sizes.size(), 1);
+  std::vector<expression> array_lens = x.array_lens();
+  EXPECT_EQ(array_lens.size(), 0);
 
   std::stringstream ss;
   stan::lang::write_bare_expr_type(ss, x.bare_type());
@@ -121,8 +121,8 @@ TEST(blockVarType, createMatrix) {
   EXPECT_FALSE(x.is_array_type());
   EXPECT_EQ(x.num_dims(), 2);
 
-  std::vector<expression> sizes = x.size();
-  EXPECT_EQ(sizes.size(), 2);
+  std::vector<expression> array_lens = x.array_lens();
+  EXPECT_EQ(array_lens.size(), 0);
 
   std::stringstream ss;
   stan::lang::write_bare_expr_type(ss, x.bare_type());
@@ -137,8 +137,8 @@ TEST(blockVarType, createMatrixBounded) {
   EXPECT_FALSE(x.is_array_type());
   EXPECT_EQ(x.num_dims(), 2);
 
-  std::vector<expression> sizes = x.size();
-  EXPECT_EQ(sizes.size(), 2);
+  std::vector<expression> array_lens = x.array_lens();
+  EXPECT_EQ(array_lens.size(), 0);
 
   std::stringstream ss;
   stan::lang::write_bare_expr_type(ss, x.bare_type());
@@ -153,8 +153,8 @@ TEST(blockVarType, createVectorBounded) {
   EXPECT_FALSE(x.is_array_type());
   EXPECT_EQ(x.num_dims(), 1);
 
-  std::vector<expression> sizes = x.size();
-  EXPECT_EQ(sizes.size(), 1);
+  std::vector<expression> array_lens = x.array_lens();
+  EXPECT_EQ(array_lens.size(), 0);
 
   std::stringstream ss;
   stan::lang::write_bare_expr_type(ss, x.bare_type());
@@ -169,8 +169,8 @@ TEST(blockVarType, createRowVectorBounded) {
   EXPECT_FALSE(x.is_array_type());
   EXPECT_EQ(x.num_dims(), 1);
 
-  std::vector<expression> sizes = x.size();
-  EXPECT_EQ(sizes.size(), 1);
+  std::vector<expression> array_lens = x.array_lens();
+  EXPECT_EQ(array_lens.size(), 0);
 
   std::stringstream ss;
   stan::lang::write_bare_expr_type(ss, x.bare_type());
@@ -199,8 +199,8 @@ TEST(blockVarType, createArray) {
   EXPECT_EQ(x.num_dims(), 1);
   expression array_len = x.array_len();
 
-  std::vector<expression> sizes = x.size();
-  EXPECT_EQ(sizes.size(), 1);
+  std::vector<expression> array_lens = x.array_lens();
+  EXPECT_EQ(array_lens.size(), 1);
 
   std::stringstream ss;
   stan::lang::write_bare_expr_type(ss, x.bare_type());
@@ -215,8 +215,8 @@ TEST(blockVarType, get1dArrayLens) {
 
   std::vector<expression> lens = d1.array_lens();
   EXPECT_EQ(lens.size(), 1);
-  std::vector<expression> sizes = x.size();
-  EXPECT_EQ(sizes.size(), 1);
+  std::vector<expression> array_lens = x.array_lens();
+  EXPECT_EQ(array_lens.size(), 1);
 }
 
 TEST(blockVarType, getArrayElType) {
@@ -251,8 +251,8 @@ TEST(blockVarType, create2DArray) {
   EXPECT_EQ(y.array_dims(), 2);
   EXPECT_EQ(y.num_dims(), 2);
 
-  std::vector<expression> sizes = y.size();
-  EXPECT_EQ(sizes.size(), 2);
+  std::vector<expression> array_lens = y.array_lens();
+  EXPECT_EQ(array_lens.size(), y.array_dims());
 
   std::stringstream ss;
   stan::lang::write_bare_expr_type(ss, y.bare_type());
@@ -306,8 +306,8 @@ TEST(blockVarType, create2DArrayOfMatrices) {
   EXPECT_EQ(y.num_dims(), 4);
   EXPECT_EQ(y.array_dims(), 2);
 
-  std::vector<expression> sizes = y.size();
-  EXPECT_EQ(sizes.size(), 4);
+  std::vector<expression> array_lens = y.array_lens();
+  EXPECT_EQ(array_lens.size(), y.array_dims());
 
   std::stringstream ss;
   stan::lang::write_bare_expr_type(ss, y.bare_type());
@@ -338,8 +338,8 @@ TEST(blockVarType, get2dArrayLens) {
 
   std::vector<expression> lens = d2.array_lens();
   EXPECT_EQ(lens.size(), 2);
-  std::vector<expression> sizes = y.size();
-  EXPECT_EQ(sizes.size(), 4);
+  std::vector<expression> array_lens = y.array_lens();
+  EXPECT_EQ(array_lens.size(), y.array_dims());
 }
 
 

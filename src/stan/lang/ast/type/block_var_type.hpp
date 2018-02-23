@@ -181,6 +181,18 @@ namespace stan {
       block_var_type(const block_t& var_type_);  // NOLINT(runtime/explicit)
 
       /**
+       * Returns expression for length of vector types or
+       * number of rows for matrix type, nil otherwise.
+       */
+      expression arg1() const;
+
+      /**
+       * Returns expression for number of columns for matrix types,
+       * nil otherwise.
+       */
+      expression arg2() const;
+
+      /**
        * If `var_type` is `block_array_type`, returns the innermost type
        * contained in the array, otherwise will return `ill_formed_type`.
        */
@@ -202,6 +214,12 @@ namespace stan {
        * Returns array length for block_array_type, nil otherwise.
        */
       expression array_len() const;
+
+      /**
+       * Returns vector of array lengths for block_array_type,
+       * empty vector otherwise.
+       */
+      std::vector<expression> array_lens() const;
 
       /**
        * Returns equivalent bare_expr_type (unsized) for this block type.
@@ -235,10 +253,10 @@ namespace stan {
        */
       int num_dims() const;
 
-      /**
-       * Returns vector of sizes for each dimension, empty vector if unsized.
-       */
-      std::vector<expression> size() const;
+      // /**
+      //  * Returns vector of sizes for each dimension, empty vector if unsized.
+      //  */
+      // std::vector<expression> size() const;
     };
 
     /**

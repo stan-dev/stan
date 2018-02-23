@@ -59,6 +59,16 @@ namespace stan {
     block_var_type::block_var_type(const block_array_type& x)
       : var_type_(x) { }
 
+    expression block_var_type::arg1() const {
+      var_type_arg1_vis vis;
+      return boost::apply_visitor(vis, var_type_);
+    }
+
+    expression block_var_type::arg2() const {
+      var_type_arg2_vis vis;
+      return boost::apply_visitor(vis, var_type_);
+    }
+
     block_var_type block_var_type::array_contains() const {
       block_array_base_type_vis vis;
       return boost::apply_visitor(vis, var_type_);
@@ -76,6 +86,11 @@ namespace stan {
 
     expression block_var_type::array_len() const {
       var_type_array_len_vis vis;
+      return boost::apply_visitor(vis, var_type_);
+    }
+
+    std::vector<expression> block_var_type::array_lens() const {
+      var_type_array_lens_vis vis;
       return boost::apply_visitor(vis, var_type_);
     }
 
@@ -109,10 +124,10 @@ namespace stan {
       return boost::apply_visitor(vis, var_type_);
     }
 
-    std::vector<expression> block_var_type::size() const {
-      var_type_size_vis vis;
-      return boost::apply_visitor(vis, var_type_);
-    }
+    // std::vector<expression> block_var_type::size() const {
+    //   var_type_size_vis vis;
+    //   return boost::apply_visitor(vis, var_type_);
+    // }
 
     std::ostream& operator<<(std::ostream& o, const block_var_type& var_type) {
       write_block_var_type(o, var_type);
