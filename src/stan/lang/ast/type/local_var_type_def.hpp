@@ -89,11 +89,6 @@ namespace stan {
       return boost::apply_visitor(vis, var_type_);
     }
 
-    // std::vector<expression> local_var_type::size() const {
-    //   var_type_size_vis vis;
-    //   return boost::apply_visitor(vis, var_type_);
-    // }
-
     std::ostream& operator<<(std::ostream& o, const local_var_type& var_type) {
       write_bare_expr_type(o, var_type.bare_type());
       return o;

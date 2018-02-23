@@ -25,7 +25,7 @@ TEST(arrayBlockVarDecl, createVar1) {
   // get var_decl component
   stan::lang::var_decl vdecl = static_cast<stan::lang::var_decl>(bvar);
   EXPECT_EQ(vdecl.name_, "x");
-  EXPECT_TRUE(vdecl.bare_type_.is_array_type());
+  EXPECT_TRUE(vdecl.bare_type().is_array_type());
   EXPECT_TRUE(is_nil(vdecl.def_));
 
   EXPECT_FALSE(bvar.has_def());
@@ -34,9 +34,9 @@ TEST(arrayBlockVarDecl, createVar1) {
   EXPECT_FALSE(bvar.type().bounds().has_low());
   EXPECT_FALSE(bvar.type().bounds().has_high());
 
-  std::vector<stan::lang::expression> bvar_sizes = bvar.type().size();
-  EXPECT_EQ(bvar_sizes.size(), 1);
-  EXPECT_TRUE(bvar_sizes.at(0).bare_type().is_int_type());
+  std::vector<stan::lang::expression> bvar_array_lens = bvar.type().array_lens();
+  EXPECT_EQ(bvar_array_lens.size(), bvar.type().array_dims());
+  EXPECT_TRUE(bvar_array_lens.at(0).bare_type().is_int_type());
 
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvar.type());
@@ -86,16 +86,16 @@ TEST(arrayBlockVarDecl, createVar2) {
   // get var_decl component
   stan::lang::var_decl vdecl = static_cast<stan::lang::var_decl>(bvar);
   EXPECT_EQ(vdecl.name_, "x");
-  EXPECT_TRUE(vdecl.bare_type_.is_array_type());
+  EXPECT_TRUE(vdecl.bare_type().is_array_type());
   EXPECT_TRUE(is_nil(vdecl.def_));
 
   EXPECT_TRUE(bvar.type().array_contains().has_def_bounds());
   EXPECT_TRUE(bvar.type().array_contains().bounds().has_low());
   EXPECT_TRUE(bvar.type().array_contains().bounds().has_high());
 
-  std::vector<stan::lang::expression> bvar_sizes = bvar.type().size();
-  EXPECT_EQ(bvar_sizes.size(), 3);
-  EXPECT_TRUE(bvar_sizes.at(0).bare_type().is_int_type());
+  std::vector<stan::lang::expression> bvar_array_lens = bvar.type().array_lens();
+  EXPECT_EQ(bvar_array_lens.size(), bvar.type().array_dims());
+  EXPECT_TRUE(bvar_array_lens.at(0).bare_type().is_int_type());
 
   std::stringstream ss;
   stan::lang::write_bare_expr_type(ss, bvar.bare_type());
@@ -134,29 +134,32 @@ TEST(arrayBlockVarDecl, createVar3) {
   // get var_decl component
   stan::lang::var_decl vdecl = static_cast<stan::lang::var_decl>(bvar);
   EXPECT_EQ(vdecl.name_, "x");
-  EXPECT_TRUE(vdecl.bare_type_.is_array_type());
+  EXPECT_TRUE(vdecl.bare_type().is_array_type());
   EXPECT_TRUE(is_nil(vdecl.def_));
 
   EXPECT_TRUE(bvar.type().array_contains().has_def_bounds());
   EXPECT_TRUE(bvar.type().array_contains().bounds().has_low());
   EXPECT_TRUE(bvar.type().array_contains().bounds().has_high());
 
-  std::vector<stan::lang::expression> bvar_sizes = bvar.type().size();
-  EXPECT_EQ(bvar_sizes.size(), 5);
-  EXPECT_TRUE(bvar_sizes.at(0).bare_type().is_int_type());
+  std::vector<stan::lang::expression> bvar_array_lens = bvar.type().array_lens();
+  EXPECT_EQ(bvar_array_lens.size(), bvar.type().array_dims());
+  EXPECT_TRUE(bvar_array_lens.at(0).bare_type().is_int_type());
 
   stan::lang::int_literal
-    tmp = boost::get<stan::lang::int_literal>(bvar_sizes.at(0).expr_);
-  EXPECT_EQ(tmp.val_, 4);
-  tmp = boost::get<stan::lang::int_literal>(bvar_sizes.at(1).expr_);
-  EXPECT_EQ(tmp.val_, 3);
-  tmp = boost::get<stan::lang::int_literal>(bvar_sizes.at(2).expr_);
+    tmp = boost::get<stan::lang::int_literal>(bvar_array_lens.at(0).expr_);
   EXPECT_EQ(tmp.val_, 9);
-  tmp = boost::get<stan::lang::int_literal>(bvar_sizes.at(3).expr_);
+  tmp = boost::get<stan::lang::int_literal>(bvar_array_lens.at(1).expr_);
   EXPECT_EQ(tmp.val_, 8);
-  tmp = boost::get<stan::lang::int_literal>(bvar_sizes.at(4).expr_);
+  tmp = boost::get<stan::lang::int_literal>(bvar_array_lens.at(2).expr_);
   EXPECT_EQ(tmp.val_, 7);
 
+  EXPECT_TRUE(bvar.type().array_contains().arg1().bare_type().is_int_type());
+  tmp = boost::get<stan::lang::int_literal>(bvar.type().array_contains().arg1().expr_);
+  EXPECT_EQ(tmp.val_, 3);
+
+  EXPECT_TRUE(bvar.type().array_contains().arg2().bare_type().is_int_type());
+  tmp = boost::get<stan::lang::int_literal>(bvar.type().array_contains().arg2().expr_);
+  EXPECT_EQ(tmp.val_, 4);
   std::stringstream ss;
   stan::lang::write_bare_expr_type(ss, bvar.bare_type());
   EXPECT_EQ("matrix[ , , ]", ss.str());
@@ -183,9 +186,10 @@ TEST(choleskyCorrBlockVarDecl, createVar1) {
   EXPECT_FALSE(bvar.type().bounds().has_low());
   EXPECT_FALSE(bvar.type().bounds().has_high());
 
-  std::vector<stan::lang::expression> bvar_sizes = bvar.type_.size();
-  EXPECT_EQ(bvar_sizes.size(), 2);
-  EXPECT_TRUE(bvar_sizes.at(0).bare_type().is_int_type());
+  std::vector<stan::lang::expression> bvar_array_lens = bvar.type().array_lens();
+  EXPECT_EQ(bvar_array_lens.size(), bvar.type().array_dims());
+  EXPECT_TRUE(bvar.type().arg1().bare_type().is_int_type());
+  EXPECT_TRUE(bvar.type().arg2().bare_type().is_int_type());
 
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvar.type());
@@ -205,9 +209,10 @@ TEST(choleskyFactorBlockVarDecl, createVar1) {
   EXPECT_FALSE(bvar.has_def());
   EXPECT_FALSE(bvar.type().has_def_bounds());
 
-  std::vector<stan::lang::expression> bvar_sizes = bvar.type().size();
-  EXPECT_EQ(bvar_sizes.size(), 2);
-  EXPECT_TRUE(bvar_sizes.at(0).bare_type().is_int_type());
+  std::vector<stan::lang::expression> bvar_array_lens = bvar.type().array_lens();
+  EXPECT_EQ(bvar_array_lens.size(), bvar.type().array_dims());
+  EXPECT_TRUE(bvar.type().arg1().bare_type().is_int_type());
+  EXPECT_TRUE(bvar.type().arg2().bare_type().is_int_type());
 
   stan::lang::cholesky_factor_cov_block_type cfbt2
     = boost::get<stan::lang::cholesky_factor_cov_block_type>(bvar.type().var_type_);
@@ -236,9 +241,9 @@ TEST(corrMatrixBlockVarDecl, createVar1) {
   EXPECT_TRUE(is_nil(bvar.def()));
   EXPECT_FALSE(bvar.has_def());
   
-  std::vector<stan::lang::expression> bvar_sizes = bvar.type().size();
-  EXPECT_EQ(bvar_sizes.size(), 2);
-  EXPECT_TRUE(bvar_sizes.at(0).bare_type().is_int_type());
+  std::vector<stan::lang::expression> bvar_array_lens = bvar.type().array_lens();
+  EXPECT_EQ(bvar_array_lens.size(), bvar.type().array_dims());
+  EXPECT_TRUE(bvar.type().arg1().bare_type().is_int_type());
 
   // check corr_matrix_block_var_type
   stan::lang::corr_matrix_block_type cmbt2
@@ -266,9 +271,9 @@ TEST(covMatrixBlockVarDecl, createVar1) {
   EXPECT_TRUE(is_nil(bvar.def()));
   EXPECT_FALSE(bvar.has_def());
   
-  std::vector<stan::lang::expression> bvar_sizes = bvar.type().size();
-  EXPECT_EQ(bvar_sizes.size(), 2);
-  EXPECT_TRUE(bvar_sizes.at(0).bare_type().is_int_type());
+  std::vector<stan::lang::expression> bvar_array_lens = bvar.type().array_lens();
+  EXPECT_EQ(bvar_array_lens.size(), bvar.type().array_dims());
+  EXPECT_TRUE(bvar.type().arg1().bare_type().is_int_type());
 
   // check cov_matrix_block_var_type
   stan::lang::cov_matrix_block_type cmbt2
@@ -298,8 +303,8 @@ TEST(doubleBlockVarDecl, createVar1) {
   EXPECT_TRUE(bvar.type().bounds().has_low());
   EXPECT_TRUE(bvar.type().bounds().has_high());
 
-  std::vector<stan::lang::expression> bvar_sizes = bvar.type().size();
-  EXPECT_EQ(bvar_sizes.size(), 0);
+  std::vector<stan::lang::expression> bvar_array_lens = bvar.type().array_lens();
+  EXPECT_EQ(bvar_array_lens.size(), bvar.type().array_dims());
 
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvar.type());
@@ -319,8 +324,8 @@ TEST(intBlockVarDecl, createVar1) {
   EXPECT_TRUE(bvar.type().bounds().has_low());
   EXPECT_TRUE(bvar.type().bounds().has_high());
 
-  std::vector<stan::lang::expression> bvar_sizes = bvar.type().size();
-  EXPECT_EQ(bvar_sizes.size(), 0);
+  std::vector<stan::lang::expression> bvar_array_lens = bvar.type().array_lens();
+  EXPECT_EQ(bvar_array_lens.size(), bvar.type().array_dims());
 
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvar.type());
@@ -346,10 +351,10 @@ TEST(matrixBlockVarDecl, createVar1) {
   EXPECT_TRUE(bvar.type().bounds().has_low());
   EXPECT_TRUE(bvar.type().bounds().has_high());
 
-  std::vector<stan::lang::expression> bvar_sizes = bvar.type().size();
-  EXPECT_EQ(bvar_sizes.size(), 2);
-  EXPECT_TRUE(bvar_sizes.at(0).bare_type().is_int_type());
-  EXPECT_TRUE(bvar_sizes.at(1).bare_type().is_int_type());
+  std::vector<stan::lang::expression> bvar_array_lens = bvar.type().array_lens();
+  EXPECT_EQ(bvar_array_lens.size(), bvar.type().array_dims());
+  EXPECT_TRUE(bvar.type().arg1().bare_type().is_int_type());
+  EXPECT_TRUE(bvar.type().arg2().bare_type().is_int_type());
 
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvar.type());
@@ -370,10 +375,10 @@ TEST(matrixBlockVarDecl, unbounded) {
   EXPECT_FALSE(bvar.type().bounds().has_low());
   EXPECT_FALSE(bvar.type().bounds().has_high());
 
-  std::vector<stan::lang::expression> bvar_sizes = bvar.type().size();
-  EXPECT_EQ(bvar_sizes.size(), 2);
-  EXPECT_TRUE(bvar_sizes.at(0).bare_type().is_int_type());
-  EXPECT_TRUE(bvar_sizes.at(1).bare_type().is_int_type());
+  std::vector<stan::lang::expression> bvar_array_lens = bvar.type().array_lens();
+  EXPECT_EQ(bvar_array_lens.size(), bvar.type().array_dims());
+  EXPECT_TRUE(bvar.type().arg1().bare_type().is_int_type());
+  EXPECT_TRUE(bvar.type().arg2().bare_type().is_int_type());
 
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvar.type());
@@ -394,9 +399,9 @@ TEST(orderedBlockVarDecl, createVar1) {
   EXPECT_FALSE(bvar.type().bounds().has_high());
   EXPECT_FALSE(bvar.type().has_def_bounds());
 
-  std::vector<stan::lang::expression> bvar_sizes = bvar.type().size();
-  EXPECT_EQ(bvar_sizes.size(), 1);
-  EXPECT_TRUE(bvar_sizes.at(0).bare_type().is_int_type());
+  std::vector<stan::lang::expression> bvar_array_lens = bvar.type().array_lens();
+  EXPECT_EQ(bvar_array_lens.size(), bvar.type().array_dims());
+  EXPECT_TRUE(bvar.type().arg1().bare_type().is_int_type());
 
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvar.type());
@@ -417,9 +422,9 @@ TEST(positiveOrderedBlockVarDecl, createVar1) {
   EXPECT_FALSE(bvar.type().bounds().has_high());
   EXPECT_FALSE(bvar.type().has_def_bounds());
 
-  std::vector<stan::lang::expression> bvar_sizes = bvar.type().size();
-  EXPECT_EQ(bvar_sizes.size(), 1);
-  EXPECT_TRUE(bvar_sizes.at(0).bare_type().is_int_type());
+  std::vector<stan::lang::expression> bvar_array_lens = bvar.type().array_lens();
+  EXPECT_EQ(bvar_array_lens.size(), bvar.type().array_dims());
+  EXPECT_TRUE(bvar.type().arg1().bare_type().is_int_type());
 
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvar.type());
@@ -445,9 +450,9 @@ TEST(rowVectorBlockVarDecl, createVar1) {
   EXPECT_TRUE(bvar.type().bounds().has_high());
   EXPECT_TRUE(bvar.type().has_def_bounds());
 
-  std::vector<stan::lang::expression> bvar_sizes = bvar.type().size();
-  EXPECT_EQ(bvar_sizes.size(), 1);
-  EXPECT_TRUE(bvar_sizes.at(0).bare_type().is_int_type());
+  std::vector<stan::lang::expression> bvar_array_lens = bvar.type().array_lens();
+  EXPECT_EQ(bvar_array_lens.size(), bvar.type().array_dims());
+  EXPECT_TRUE(bvar.type().arg1().bare_type().is_int_type());
 
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvar.type());
@@ -468,9 +473,9 @@ TEST(simplexBlockVarDecl, createVar1) {
   EXPECT_FALSE(bvar.type().bounds().has_high());
   EXPECT_FALSE(bvar.type().has_def_bounds());
 
-  std::vector<stan::lang::expression> bvar_sizes = bvar.type().size();
-  EXPECT_EQ(bvar_sizes.size(), 1);
-  EXPECT_TRUE(bvar_sizes.at(0).bare_type().is_int_type());
+  std::vector<stan::lang::expression> bvar_array_lens = bvar.type().array_lens();
+  EXPECT_EQ(bvar_array_lens.size(), bvar.type().array_dims());
+  EXPECT_TRUE(bvar.type().arg1().bare_type().is_int_type());
 
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvar.type());
@@ -491,9 +496,9 @@ TEST(unitVectorBlockVarDecl, createVar1) {
   EXPECT_FALSE(bvar.type().bounds().has_high());
   EXPECT_FALSE(bvar.type().has_def_bounds());
 
-  std::vector<stan::lang::expression> bvar_sizes = bvar.type().size();
-  EXPECT_EQ(bvar_sizes.size(), 1);
-  EXPECT_TRUE(bvar_sizes.at(0).bare_type().is_int_type());
+  std::vector<stan::lang::expression> bvar_array_lens = bvar.type().array_lens();
+  EXPECT_EQ(bvar_array_lens.size(), bvar.type().array_dims());
+  EXPECT_TRUE(bvar.type().arg1().bare_type().is_int_type());
 
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvar.type());
@@ -519,9 +524,9 @@ TEST(vectorBlockVarDecl, createVar1) {
   EXPECT_TRUE(bvar.type().bounds().has_high());
   EXPECT_TRUE(bvar.type().has_def_bounds());
 
-  std::vector<stan::lang::expression> bvar_sizes = bvar.type().size();
-  EXPECT_EQ(bvar_sizes.size(), 1);
-  EXPECT_TRUE(bvar_sizes.at(0).bare_type().is_int_type());
+  std::vector<stan::lang::expression> bvar_array_lens = bvar.type().array_lens();
+  EXPECT_EQ(bvar_array_lens.size(), bvar.type().array_dims());
+  EXPECT_TRUE(bvar.type().arg1().bare_type().is_int_type());
 
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvar.type());
@@ -529,10 +534,16 @@ TEST(vectorBlockVarDecl, createVar1) {
 }
 
 TEST(illFormedBlockVarDecl, createVar1) {
-  stan::lang::block_var_decl lvar;
+  stan::lang::block_var_decl bvar;
 
-  EXPECT_EQ(lvar.name(), "");
-  EXPECT_TRUE(lvar.type().bare_type().is_ill_formed_type());
-  EXPECT_EQ(lvar.bare_type(), stan::lang::ill_formed_type());
-  EXPECT_FALSE(lvar.has_def());
+  EXPECT_EQ(bvar.name(), "");
+  EXPECT_TRUE(bvar.type().bare_type().is_ill_formed_type());
+  EXPECT_EQ(bvar.bare_type(), stan::lang::ill_formed_type());
+  EXPECT_FALSE(bvar.has_def());
+  EXPECT_TRUE(bvar.type().arg1().bare_type().is_ill_formed_type());
+  EXPECT_TRUE(bvar.type().arg2().bare_type().is_ill_formed_type());
+  std::vector<stan::lang::expression> bvar_array_lens = bvar.type().array_lens();
+  EXPECT_EQ(bvar_array_lens.size(), 0);
+  EXPECT_EQ(bvar.type().num_dims(), 0);
+  EXPECT_EQ(bvar.type().array_dims(), 0);
 }

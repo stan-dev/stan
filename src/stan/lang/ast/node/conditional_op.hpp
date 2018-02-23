@@ -52,6 +52,7 @@ namespace stan {
       /**
        * Construct a conditional operator expression from the
        * specified condition and values.
+       * No type checking on expressions.
        *
        * @param cond condition expression
        * @param true_val value to return if true

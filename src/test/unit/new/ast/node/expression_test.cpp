@@ -166,9 +166,36 @@ TEST(astExpression, conditional_op) {
   stan::lang::expression e1 = stan::lang::int_literal(5);
   stan::lang::expression e2 = stan::lang::double_literal(2.0);
   stan::lang::expression e3 = stan::lang::double_literal(-2.0);
-
-  stan::lang::expression e4(stan::lang::conditional_op(e1,e2,e3));
+  stan::lang::conditional_op co(e1,e2,e3);
+  stan::lang::expression e4(co);
   EXPECT_TRUE(e4.bare_type().is_double_type());
+}
+
+TEST(astExpression, conditional_op_mixed) {
+  stan::lang::expression e1 = stan::lang::int_literal(5);
+  stan::lang::expression e2 = stan::lang::int_literal(2);
+  stan::lang::expression e3 = stan::lang::double_literal(-2.0);
+  stan::lang::conditional_op co(e1,e2,e3);
+  stan::lang::expression e4(co);
+  EXPECT_TRUE(e4.bare_type().is_double_type());
+}
+
+TEST(astExpression, conditional_op_int) {
+  stan::lang::expression e1 = stan::lang::int_literal(5);
+  stan::lang::expression e2 = stan::lang::int_literal(2);
+  stan::lang::expression e3 = stan::lang::int_literal(3);
+  stan::lang::conditional_op co(e1,e2,e3);
+  stan::lang::expression e4(co);
+  EXPECT_TRUE(e4.bare_type().is_int_type());
+}
+
+TEST(astExpression, conditional_op_bad) {
+  stan::lang::expression e1 = stan::lang::double_literal(1.0);
+  stan::lang::expression e2 = stan::lang::int_literal(2);
+  stan::lang::expression e3 = stan::lang::array_expr();
+  stan::lang::conditional_op co(e1,e2,e3);
+  stan::lang::expression e4(co);
+  EXPECT_TRUE(e4.bare_type().is_ill_formed_type());
 }
 
 TEST(astExpression, binary_op) {

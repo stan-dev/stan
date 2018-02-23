@@ -61,7 +61,6 @@
 #include <stan/lang/ast/fun/var_type_array_len_vis.hpp>
 #include <stan/lang/ast/fun/var_type_array_lens_vis.hpp>
 #include <stan/lang/ast/fun/var_type_name_vis.hpp>
-//#include <stan/lang/ast/fun/var_type_size_vis.hpp>
 #include <stan/lang/ast/fun/write_bare_expr_type.hpp>
 #include <stan/lang/ast/fun/write_block_var_type.hpp>
 

@@ -14,6 +14,10 @@ using stan::lang::row_vector_local_type;
 using stan::lang::vector_local_type;
 using stan::lang::expression;
 
+using stan::lang::int_literal;
+using stan::lang::double_literal;
+using stan::lang::write_bare_expr_type;
+
 TEST(localVarType, createDefault) {
   local_var_type x;
   EXPECT_EQ(x.num_dims(), 0);
@@ -29,7 +33,7 @@ TEST(localVarType, createIllFormed) {
   EXPECT_EQ(array_lens.size(), 0);
 
   std::stringstream ss;
-  stan::lang::write_bare_expr_type(ss, x.bare_type());
+  write_bare_expr_type(ss, x.bare_type());
   EXPECT_EQ("ill formed", ss.str());
 }
 
@@ -41,9 +45,13 @@ TEST(localVarType, createInt) {
 
   std::vector<expression> array_lens = x.array_lens();
   EXPECT_EQ(array_lens.size(), 0);
+  expression len = x.array_len();
+  EXPECT_TRUE(len.bare_type().is_ill_formed_type());
+  EXPECT_TRUE(x.arg1().bare_type().is_ill_formed_type());
+  EXPECT_TRUE(x.arg2().bare_type().is_ill_formed_type());
 
   std::stringstream ss;
-  stan::lang::write_bare_expr_type(ss, x.bare_type());
+  write_bare_expr_type(ss, x.bare_type());
   EXPECT_EQ("int", ss.str());
 }
 
@@ -57,7 +65,7 @@ TEST(localVarType, createDouble) {
   EXPECT_EQ(array_lens.size(), 0);
 
   std::stringstream ss;
-  stan::lang::write_bare_expr_type(ss, x.bare_type());
+  write_bare_expr_type(ss, x.bare_type());
   EXPECT_EQ("real", ss.str());
 }
 
@@ -71,7 +79,7 @@ TEST(localVarType, createVector) {
   EXPECT_EQ(array_lens.size(), 0);
 
   std::stringstream ss;
-  stan::lang::write_bare_expr_type(ss, x.bare_type());
+  write_bare_expr_type(ss, x.bare_type());
   EXPECT_EQ("vector", ss.str());
 }
 
@@ -85,7 +93,7 @@ TEST(localVarType, createRowVector) {
   EXPECT_EQ(array_lens.size(), 0);
 
   std::stringstream ss;
-  stan::lang::write_bare_expr_type(ss, x.bare_type());
+  write_bare_expr_type(ss, x.bare_type());
   EXPECT_EQ("row vector", ss.str());
 }
 
@@ -99,14 +107,17 @@ TEST(localVarType, createMatrix) {
   EXPECT_EQ(array_lens.size(), 0);
 
   std::stringstream ss;
-  stan::lang::write_bare_expr_type(ss, x.bare_type());
+  write_bare_expr_type(ss, x.bare_type());
   EXPECT_EQ("matrix", ss.str());
 }
 
 TEST(localVarType, createMatrixSized) {
-  expression e;
-  matrix_local_type tMatrix(e, e);
+  expression M(int_literal(3));
+  expression N(int_literal(4));
+  matrix_local_type tMatrix(M, N);
   local_var_type x(tMatrix);
+  EXPECT_TRUE(x.arg1().bare_type().is_int_type());
+  EXPECT_TRUE(x.arg2().bare_type().is_int_type());
   EXPECT_FALSE(x.is_array_type());
   EXPECT_EQ(x.num_dims(), 2);
 
@@ -114,37 +125,41 @@ TEST(localVarType, createMatrixSized) {
   EXPECT_EQ(array_lens.size(), 0);
 
   std::stringstream ss;
-  stan::lang::write_bare_expr_type(ss, x.bare_type());
+  write_bare_expr_type(ss, x.bare_type());
   EXPECT_EQ("matrix", ss.str());
 }
 
 TEST(localVarType, createVectorSized) {
-  expression e;
-  vector_local_type tVector(e);
+  expression N(int_literal(4));
+  vector_local_type tVector(N);
   local_var_type x(tVector);
   EXPECT_FALSE(x.is_array_type());
   EXPECT_EQ(x.num_dims(), 1);
+  EXPECT_TRUE(x.arg1().bare_type().is_int_type());
+  EXPECT_TRUE(x.arg2().bare_type().is_ill_formed_type());
 
   std::vector<expression> array_lens = x.array_lens();
   EXPECT_EQ(array_lens.size(), 0);
 
   std::stringstream ss;
-  stan::lang::write_bare_expr_type(ss, x.bare_type());
+  write_bare_expr_type(ss, x.bare_type());
   EXPECT_EQ("vector", ss.str());
 }
 
 TEST(localVarType, createRowVectorSized) {
-  expression e;
-  row_vector_local_type tRowVector(e);
+  expression N(int_literal(4));
+  row_vector_local_type tRowVector(N);
   local_var_type x(tRowVector);
   EXPECT_FALSE(x.is_array_type());
   EXPECT_EQ(x.num_dims(), 1);
+  EXPECT_TRUE(x.arg1().bare_type().is_int_type());
+  EXPECT_TRUE(x.arg2().bare_type().is_ill_formed_type());
 
   std::vector<expression> array_lens = x.array_lens();
   EXPECT_EQ(array_lens.size(), 0);
 
   std::stringstream ss;
-  stan::lang::write_bare_expr_type(ss, x.bare_type());
+  write_bare_expr_type(ss, x.bare_type());
   EXPECT_EQ("row vector", ss.str());
 }
 
@@ -157,7 +172,7 @@ TEST(localVarType, createCopy) {
   EXPECT_FALSE(y.is_array_type());
 
   std::stringstream ss;
-  stan::lang::write_bare_expr_type(ss, y.bare_type());
+  write_bare_expr_type(ss, y.bare_type());
   EXPECT_EQ("int", ss.str());
 }
 
@@ -174,7 +189,7 @@ TEST(localVarType, createArray) {
   EXPECT_EQ(array_lens.size(), x.array_dims());
 
   std::stringstream ss;
-  stan::lang::write_bare_expr_type(ss, x.bare_type());
+  write_bare_expr_type(ss, x.bare_type());
   EXPECT_EQ("int[ ]", ss.str());
 }
 
@@ -189,7 +204,7 @@ TEST(localVarType, getArrayElType) {
   local_var_type z = x.array_element_type();
   EXPECT_FALSE(z.is_array_type());
   std::stringstream ss;
-  stan::lang::write_bare_expr_type(ss, z.bare_type());
+  write_bare_expr_type(ss, z.bare_type());
   EXPECT_EQ("int", ss.str());
 
 }
@@ -215,7 +230,7 @@ TEST(localVarType, create2DArray) {
   EXPECT_EQ(array_lens.size(), y.array_dims());
 
   std::stringstream ss;
-  stan::lang::write_bare_expr_type(ss, y.bare_type());
+  write_bare_expr_type(ss, y.bare_type());
   EXPECT_EQ("int[ , ]", ss.str());
 
   local_var_type z = y.array_element_type();
@@ -248,7 +263,7 @@ TEST(localVarType, create2DArrayOfMatrices) {
   EXPECT_EQ(array_lens.size(), y.array_dims());
 
   std::stringstream ss;
-  stan::lang::write_bare_expr_type(ss, y.bare_type());
+  write_bare_expr_type(ss, y.bare_type());
   EXPECT_EQ("matrix[ , ]", ss.str());
 
 }
@@ -277,6 +292,6 @@ TEST(localVarType, create4DArrayInt) {
   EXPECT_EQ(lens.size(), y.array_dims());
   
   std::stringstream ss;
-  stan::lang::write_bare_expr_type(ss, y.bare_type());
+  write_bare_expr_type(ss, y.bare_type());
   EXPECT_EQ("int[ , , , ]", ss.str());
 }

@@ -124,11 +124,6 @@ namespace stan {
       return boost::apply_visitor(vis, var_type_);
     }
 
-    // std::vector<expression> block_var_type::size() const {
-    //   var_type_size_vis vis;
-    //   return boost::apply_visitor(vis, var_type_);
-    // }
-
     std::ostream& operator<<(std::ostream& o, const block_var_type& var_type) {
       write_block_var_type(o, var_type);
       return o;
