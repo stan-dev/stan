@@ -99,7 +99,7 @@ generated quantities block.
 
 \subsection{Not Vectorized}
 
-Unlike the probability functions, the PRNG functions are not
+Unlike the probability functions, only some of the PRNG functions are
 vectorized.
 
 
@@ -161,9 +161,11 @@ and \code{normal\_lccdf(y | mu,~sigma)} is defined by
 
 \noindent
 Stan's univariate log probability functions, including the log density
-functions, log mass functions, log CDFs, and log CCDFs, all support vectorized
-function application, with results defined to be the sum of the
-elementwise application of the function.
+functions, log mass functions, log CDFs, and log CCDFs, all support
+vectorized function application, with results defined to be the sum of
+the elementwise application of the function.  Some of the PRNG
+functions support vectorization, see
+\ref{vectorization-prng.subsection} for more details.
 
 In all cases, matrix operations are at least as fast and usually
 faster than loops and vectorized log probability functions are faster
@@ -225,7 +227,7 @@ The pseudo-type \code{ints} is used for vectorized integer arguments.
 Where it appears either an integer or array of integers may be used.
 
 
-\subsection{Evaluating Vectorized Functions}
+\subsection{Evaluating Vectorized Log Probability Functions}
 
 The result of a vectorized log probability function is equivalent to
 the sum of the evaluations on each element.  Any non-vector argument,
@@ -258,7 +260,31 @@ for (n in 1:N)
   y[n] ~ normal(mu[n], sigma);
 \end{stancode}
 
+\subsection{Evaluating Vectorized PRNG Functions}\label{vectorization-prng.subsection}
 
+Some PRNG functions accept vector arguments.  Such functions are
+indicated by the plural pseudo-types \code{reals} or \code{ints}.  As
+in the vectorized arguments subsections of
+Section~\ref{prob-vectorization.section}, the pseudo type \code{reals}
+may be filled with a real, an int, a one-dimensional array of real or
+int, a vector, or a row-vector.  Similarly, \code{ints} may be filled
+with an int or a one-dimensional array.  Note that \code{reals} is a
+superset of \code{ints}, here.  Hence, all combinations of
+\code{reals} and \code{ints} are allowed in the case that a function
+has two or more arguments.  For instance, the following is allowed in a
+generated quantities block.
+
+\begin{stancode}
+    real x[3];
+    vector[3] mu;
+    x = normal_rng(mu, 3);
+\end{stancode}
+
+The result of a vectorized PRNG function depends on the dimensions of
+the arguments.  If there are any non-scalar arguments, the return type
+is an array matching the dimension of any of the non-scalar arguments,
+as all non-scalar arguments must have matching dimension.  If all
+arguments are scalars, then the return type is a scalar.
 
 \chapter{Binary Distributions}
 
