@@ -59,9 +59,12 @@
 #include <stan/lang/ast/fun/local_array_element_type_vis_def.hpp>
 #include <stan/lang/ast/fun/total_dims_vis_def.hpp>
 
+#include <stan/lang/ast/fun/var_type_arg1_vis_def.hpp>
+#include <stan/lang/ast/fun/var_type_arg2_vis_def.hpp>
 #include <stan/lang/ast/fun/var_type_array_len_vis_def.hpp>
+#include <stan/lang/ast/fun/var_type_array_lens_vis_def.hpp>
 #include <stan/lang/ast/fun/var_type_name_vis_def.hpp>
-#include <stan/lang/ast/fun/var_type_size_vis_def.hpp>
+//#include <stan/lang/ast/fun/var_type_size_vis_def.hpp>
 #include <stan/lang/ast/fun/write_bare_expr_type_def.hpp>
 #include <stan/lang/ast/fun/write_block_var_type_def.hpp>
 
