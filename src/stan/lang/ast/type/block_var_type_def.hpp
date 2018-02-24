@@ -104,6 +104,11 @@ namespace stan {
       return boost::apply_visitor(vis, var_type_);
     }
 
+    std::string block_var_type::cpp_typename() const {
+      cpp_typename_vis vis;
+      return boost::apply_visitor(vis, var_type_);
+    }
+
     bool block_var_type::is_array_type() const {
       is_array_type_vis vis;
       return boost::apply_visitor(vis, var_type_);

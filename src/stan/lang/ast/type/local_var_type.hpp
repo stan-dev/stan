@@ -152,6 +152,11 @@ namespace stan {
        * Returns equivalent bare_expr_type (unsized) for this local type.
        */
       bare_expr_type bare_type() const;
+
+      /**
+       * Returns cpp type or typedef used by generator for this local type.
+       */
+      std::string cpp_typename() const;
       
       /**
        * Returns true if `var_type_` is `local_array_type`, false otherwise.
