@@ -227,8 +227,7 @@ namespace stan {
     template<typename T>
     expr_type function_signatures::rng_return_type(const expr_type& t) {
       T return_type;
-      return t.is_primitive() ?
-        expr_type(return_type) : expr_type(return_type, 1U);
+      return expr_type(return_type, !t.is_primitive());
     }
 
     template<typename T>
@@ -245,9 +244,7 @@ namespace stan {
                             const expr_type& t,
                             const expr_type& u,
                             const expr_type& v) {
-      T return_type;
-      return t.is_primitive() && (u.is_primitive() && v.is_primitive())
-        ? expr_type(return_type) : expr_type(return_type, 1U);
+      return rng_return_type<T>(rng_return_type<T>(t, u), v);
     }
 
     int function_signatures::num_promotions(

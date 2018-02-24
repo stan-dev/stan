@@ -259,33 +259,48 @@ namespace stan {
 
       /**
        * Determine the return type of distributions' RNG function
-       * based on the primitive-ness of the arguments; if argument
-       * has dimension greater than 1 should return a vector_type.
+       * based on the primitiveness of the arguments. If both
+       * arguments are scalar, the return type is int or real
+       * depending on the distribtuion. Otherwise, the return type is
+       * int[] for discrete distributions and real[] for continuous
+       * ones.
        *
        * @param t type of first argument
+       * @return expression type resulting from primitiveness of
+       * arguments and distribution's support
        */
       template<typename T>
       expr_type rng_return_type(const expr_type& t);
 
       /**
-       * Determine the return type of distribution's RNG function
-       * based on the primitive-ness of the arguments; any argument
-       * with dimension greater than 1 should return a vector_type.
+       * Determine the return type of distributions' RNG function
+       * based on the primitiveness of the arguments. If both
+       * arguments are scalar, the return type is int or real
+       * depending on the distribtuion. Otherwise, the return type is
+       * int[] for discrete distributions and real[] for continuous
+       * ones.
        *
        * @param t type of first argument
        * @param u type of second argument
+       * @return expression type resulting from primitiveness of
+       * arguments and distribution's support
        */
       template<typename T>
       expr_type rng_return_type(const expr_type& t, const expr_type& u);
 
       /**
-       * Determine the return type of distribution's RNG function
-       * based on the primitive-ness of the arguments; any argument
-       * with dimension greater than 1 should return a vector_type.
+       * Determine the return type of distributions' RNG function
+       * based on the primitiveness of the arguments. If both
+       * arguments are scalar, the return type is int or real
+       * depending on the distribtuion. Otherwise, the return type is
+       * int[] for discrete distributions and real[] for continuous
+       * ones.
        *
        * @param t type of first argument
        * @param u type of second argument
        * @param v type of third argument
+       * @return expression type resulting from primitiveness of
+       * arguments and distribution's support
        */
       template<typename T>
       expr_type rng_return_type(const expr_type& t,
