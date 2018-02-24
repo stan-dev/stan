@@ -182,7 +182,8 @@ TEST(Parser, parse_array_2) {
 }
 
 TEST(Parser, parse_1d_array_matrix) {
-  std::string input("int x;\nmatrix[2,2] array_of_mat[100];\n");
+  std::string input("int x;\n"
+                    "matrix[2,2] array_of_mat[100];\n");
   bool pass = false;
   std::stringstream msgs;
   std::vector<stan::lang::block_var_decl> bvds;
