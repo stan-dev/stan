@@ -147,7 +147,7 @@ namespace stan {
         %= lit('{')
         > eps[reset_var_scope_f(_b, _r1)]
         > local_var_decls_r(_b)[assign_lhs_f(_a, _1)]
-        > *statement_r(_b, _r2)
+        > *statement_r(_b, _r2)[trace_f("statement_seq_r, statement_r")]
         > lit('}')
         > eps[unscope_locals_f(_a, boost::phoenix::ref(var_map_))];
 
@@ -410,7 +410,7 @@ namespace stan {
       return_statement_r.name("return statement");
       return_statement_r
         %= (lit("return") >> no_skip[!char_("a-zA-Z0-9_")])
-        >> expression_g(_r1)
+        >> expression_g(_r1)[trace_f("return statement, expression")]
         >> lit(';') [validate_return_allowed_f(_r1, _pass,
                                      boost::phoenix::ref(error_msgs_))];
 

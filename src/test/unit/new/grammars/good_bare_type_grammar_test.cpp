@@ -13,6 +13,7 @@ TEST(Parser, parse_void) {
   std::stringstream msgs;
   stan::lang::bare_expr_type bet;
   bet = parse_bare_type(input, pass, msgs);
+  std::cout << msgs.str() << std::endl;
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
@@ -29,6 +30,7 @@ TEST(Parser, parse_int) {
   std::stringstream msgs;
   stan::lang::bare_expr_type bet;
   bet = parse_bare_type(input, pass, msgs);
+  std::cout << msgs.str() << std::endl;
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
@@ -45,6 +47,7 @@ TEST(Parser, parse_double) {
   std::stringstream msgs;
   stan::lang::bare_expr_type bet;
   bet = parse_bare_type(input, pass, msgs);
+  std::cout << msgs.str() << std::endl;
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
@@ -61,6 +64,7 @@ TEST(Parser, parse_vector) {
   std::stringstream msgs;
   stan::lang::bare_expr_type bet;
   bet = parse_bare_type(input, pass, msgs);
+  std::cout << msgs.str() << std::endl;
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
@@ -77,6 +81,7 @@ TEST(Parser, parse_row_vector) {
   std::stringstream msgs;
   stan::lang::bare_expr_type bet;
   bet = parse_bare_type(input, pass, msgs);
+  std::cout << msgs.str() << std::endl;
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
@@ -93,6 +98,7 @@ TEST(Parser, parse_matrix) {
   std::stringstream msgs;
   stan::lang::bare_expr_type bet;
   bet = parse_bare_type(input, pass, msgs);
+  std::cout << msgs.str() << std::endl;
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
@@ -109,6 +115,7 @@ TEST(Parser, parse_matrix_1d_array) {
   std::stringstream msgs;
   stan::lang::bare_expr_type bet;
   bet = parse_bare_type(input, pass, msgs);
+  std::cout << msgs.str() << std::endl;
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
@@ -128,6 +135,7 @@ TEST(Parser, parse_matrix_2d_array) {
   std::stringstream msgs;
   stan::lang::bare_expr_type bet;
   bet = parse_bare_type(input, pass, msgs);
+  std::cout << msgs.str() << std::endl;
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());

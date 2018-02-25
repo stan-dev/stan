@@ -898,7 +898,7 @@ namespace stan {
     extern boost::phoenix::function<set_double_range_upper>
     set_double_range_upper_f;
 
-    struct validate_array_bare_type : public phoenix_functor_quinary {
+    struct validate_bare_type : public phoenix_functor_quinary {
       void operator()(bare_expr_type& bare_type_result,
                       const bare_expr_type& el_type,
                       const size_t& num_dims,
@@ -906,8 +906,8 @@ namespace stan {
                       std::ostream& error_msgs)
         const;
     };
-    extern boost::phoenix::function<validate_array_bare_type>
-    validate_array_bare_type_f;
+    extern boost::phoenix::function<validate_bare_type>
+    validate_bare_type_f;
 
     struct validate_bare_type_is_data : public phoenix_functor_quaternary {
       void operator()(bare_expr_type& fun_arg_type,

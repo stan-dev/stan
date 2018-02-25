@@ -91,15 +91,13 @@ namespace stan {
       // locals: _a = scope (origin) argument data or var
       arg_decl_r.name("function argument declaration");
       arg_decl_r
-        %= -(lit("data")[set_data_origin_f(_a),
-                         trace_f("found data qualifier")])
+        %= -(lit("data")[set_data_origin_f(_a)])
         >> bare_type_g[validate_non_void_arg_f(_1, _a, _pass,
                        boost::phoenix::ref(error_msgs_))]
         > identifier_r
-        > eps[trace_pass_f("arg_decl_r, eps", _pass),
-              add_fun_arg_var_f(_val, _a, _pass,
-                            boost::phoenix::ref(var_map_),
-                            boost::phoenix::ref(error_msgs_))];
+        > eps[add_fun_arg_var_f(_val, _a, _pass,
+                                boost::phoenix::ref(var_map_),
+                                boost::phoenix::ref(error_msgs_))];
 
       identifier_r.name("identifier");
       identifier_r

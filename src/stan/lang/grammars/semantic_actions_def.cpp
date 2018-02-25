@@ -5,6 +5,18 @@
 #include <stan/lang/ast.hpp>
 #include <stan/lang/grammars/iterator_typedefs.hpp>
 #include <stan/lang/grammars/semantic_actions.hpp>
+
+// all of this needed for good error messages from parser
+#include <stan/lang/generator/expression_visgen.hpp>
+#include <stan/lang/generator/generate_array_builder_adds.hpp>
+#include <stan/lang/generator/generate_expression.hpp>
+#include <stan/lang/generator/generate_idxs.hpp>
+#include <stan/lang/generator/generate_idxs_user.hpp>
+#include <stan/lang/generator/generate_idx.hpp>
+#include <stan/lang/generator/generate_idx_user.hpp>
+#include <stan/lang/generator/idx_visgen.hpp>
+#include <stan/lang/generator/idx_user_visgen.hpp>
+
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 #include <boost/spirit/include/qi.hpp>
@@ -1249,7 +1261,7 @@ namespace stan {
         return;
       }
       // test for LHS not being purely a variable
-      //      static const bool user_facing = true;
+      static const bool user_facing = true;
       if (has_non_param_var(s.expr_, var_map)) {
         error_msgs << "Warning (non-fatal):"
                    << std::endl
@@ -1263,8 +1275,7 @@ namespace stan {
                    << "Left-hand-side of sampling statement:"
                    << std::endl
                    << "    ";
-        // TODO:mitzi - ignore generate_expression for now
-        //        generate_expression(s.expr_, user_facing, error_msgs);
+        generate_expression(s.expr_, user_facing, error_msgs);
         error_msgs << " ~ " << function_name << "(...)"
                    << std::endl;
       }
@@ -1275,8 +1286,7 @@ namespace stan {
                      << " must be univariate."
                      << std::endl
                      << "  Found outcome expression: ";
-        // TODO:mitzi - ignore generate_expression for now
-          //          generate_expression(s.expr_, user_facing, error_msgs);
+          generate_expression(s.expr_, user_facing, error_msgs);
           error_msgs << std::endl
                      << "  with non-univariate type: "
                      << s.expr_.bare_type()
@@ -1290,8 +1300,7 @@ namespace stan {
                        << " must be univariate."
                        << std::endl
                        << "  Found parameter expression: ";
-        // TODO:mitzi - ignore generate_expression for now
-            //            generate_expression(s.dist_.args_[i], user_facing, error_msgs);
+            generate_expression(s.dist_.args_[i], user_facing, error_msgs);
             error_msgs << std::endl
                        << "  with non-univariate type: "
                        << s.dist_.args_[i].bare_type()
@@ -1306,8 +1315,7 @@ namespace stan {
                    << " must be univariate."
                    << std::endl
                    << "  Found lower bound expression: ";
-        // TODO:mitzi - ignore generate_expression for now
-        //        generate_expression(s.truncation_.low_, user_facing, error_msgs);
+        generate_expression(s.truncation_.low_, user_facing, error_msgs);
         error_msgs << std::endl
                    << "  with non-univariate type: "
                    << s.truncation_.low_.bare_type()
@@ -1321,8 +1329,7 @@ namespace stan {
                    << " must be univariate."
                    << std::endl
                    << "  Found upper bound expression: ";
-        // TODO:mitzi - ignore generate_expression for now
-        //        generate_expression(s.truncation_.high_, user_facing, error_msgs);
+        generate_expression(s.truncation_.high_, user_facing, error_msgs);
         error_msgs << std::endl
                    << "  with non-univariate type: "
                    << s.truncation_.high_.bare_type()
@@ -1406,13 +1413,12 @@ namespace stan {
     void expression_as_statement::operator()(bool& pass,
                                      const stan::lang::expression& expr,
                                      std::stringstream& error_msgs) const {
-      //      static const bool user_facing = true;
+      static const bool user_facing = true;
       if (!(expr.bare_type().is_void_type())) {
         error_msgs << "Illegal statement beginning with non-void"
                    << " expression parsed as"
                    << std::endl << "  ";
-        // TODO:mitzi - ignore generate_expression for now
-        //        generate_expression(expr.expr_, user_facing, error_msgs);
+        generate_expression(expr.expr_, user_facing, error_msgs);
         error_msgs << std::endl
                    << "Not a legal assignment, sampling, or function"
                    << " statement.  Note that"
@@ -2285,7 +2291,7 @@ namespace stan {
         expr1 /= expr2;
         return;
       }
-      //      static const bool user_facing = true;
+      static const bool user_facing = true;
       std::vector<expression> args;
       args.push_back(expr1);
       args.push_back(expr2);
@@ -2295,11 +2301,9 @@ namespace stan {
         error_msgs << "Warning: integer division"
                    << " implicitly rounds to integer."
                    << " Found int division: ";
-        // TODO:mitzi ignore generate_expression for now
-        //        generate_expression(expr1.expr_, user_facing, error_msgs);
+        generate_expression(expr1.expr_, user_facing, error_msgs);
         error_msgs << " / ";
-        // TODO:mitzi ignore generate_expression for now
-        //        generate_expression(expr2.expr_, user_facing, error_msgs);
+        generate_expression(expr2.expr_, user_facing, error_msgs);
         error_msgs << std::endl
                    << " Positive values rounded down,"
                    << " negative values rounded up or down"
@@ -3011,6 +3015,7 @@ namespace stan {
                                         const expression& def,
                                         bool& pass,
                                         std::ostream& error_msgs) const {
+      //      std::cout << "validate_array_block_var_decl" << std::endl;
       if (dims.size() == 0) {
         error_msgs << "array type requires at least 1 dimension,"
                    << " none found" << std::endl;
@@ -3039,8 +3044,8 @@ namespace stan {
                                         const T& var_decl_result,
                                         bool& pass,
                                         std::ostream& error_msgs) const {
-      // std::cout << "validate_single_block_var_decl, " << var_decl_result.name()
-      //           << " type: " << var_decl_result.type() << std::endl;
+      //      std::cout << "validate_single_var_decl, " << var_decl_result.name()
+      //                << " type: " << var_decl_result.type() << std::endl;
       if (var_decl_result.bare_type().is_ill_formed_type()) {
         error_msgs << "variable declaration is ill formed,"
                    << " variable name="
@@ -3226,7 +3231,7 @@ namespace stan {
                                         const expression& def,
                                         bool& pass,
                                         std::ostream& error_msgs) const {
-      //      std::cout << "validate_array_local_var" << std::endl;
+      //      std::cout << "validate_array_local_var, name: " << name << std::endl;
       if (dims.size() == 0) {
         error_msgs << "array type requires at least 1 dimension,"
                    << " none found" << std::endl;
@@ -3288,22 +3293,23 @@ namespace stan {
     boost::phoenix::function<validate_bare_type_is_data>
     validate_bare_type_is_data_f;
                                                       
-    void validate_array_bare_type::operator()(
+    void validate_bare_type::operator()(
                                         bare_expr_type& bare_type_result,
                                         const bare_expr_type& el_type,
                                         const size_t& num_dims,
                                         bool& pass,
                                         std::ostream& error_msgs) const {
-      //      std::cout << "validate_array_bare_type" << std::endl;
-      if (num_dims == 0) {
-        error_msgs << "array type requires at least 1 dimension,"
-                   << " none found" << std::endl;
+      //      std::cout << "validate_bare_type" << std::endl;
+      if (el_type.is_ill_formed_type()) {
+        error_msgs << "ill-formed bare type" << std::endl;
         pass = false;
         return;
       }
-      if (el_type.is_ill_formed_type()) {
-        error_msgs << "ill-formed array element type" << std::endl;
-        pass = false;
+      pass = true;
+      if (num_dims == 0) {
+        bare_type_result = el_type;
+        // std::cout << "validate_bare_type"
+        //           << " type: " << bare_type_result << std::endl;
         return;
       }
       stan::lang::bare_array_type bat(el_type);
@@ -3312,11 +3318,11 @@ namespace stan {
         bat = bare_array_type(cur_type);
       }
       bare_type_result = bat;
-      // std::cout << "validate_array_bare_type"
+      // std::cout << "validate_bare_type"
       //           << " type: " << bare_type_result << std::endl;
     }
-    boost::phoenix::function<validate_array_bare_type>
-    validate_array_bare_type_f;
+    boost::phoenix::function<validate_bare_type>
+    validate_bare_type_f;
 
     template <typename T>
     void add_to_var_map::operator()(const T& decl,
@@ -3433,13 +3439,13 @@ namespace stan {
     boost::phoenix::function<reset_var_scope> reset_var_scope_f;
 
     void trace::operator()(const std::string& msg) const {
-      //      std::cout << msg << std::endl;
+      //            std::cout << msg << std::endl;
     }
     boost::phoenix::function<trace> trace_f;
 
     void trace_pass::operator()(const std::string& msg,
                                  const bool& pass) const {
-      //      std::cout << msg << " pass? " << pass << std::endl;
+      //            std::cout << msg << " pass? " << pass << std::endl;
     }
     boost::phoenix::function<trace_pass> trace_pass_f;
 

@@ -27,11 +27,10 @@ namespace stan {
                "   (no dimensions or constraints, just commas,\n"
                "   e.g. real[,] for a 2D array or int for a single integer,\n"
                "   and constrained types such as cov_matrix not allowed)");
-      bare_type_r = ((type_identifier_r
-                      >> bare_dims_r)
-                      [validate_array_bare_type_f(_val, _1, _2, _pass,
-                                                  boost::phoenix::ref(error_msgs_))]
-                    | type_identifier_r[assign_lhs_f(_val, _1)]);
+      bare_type_r = (type_identifier_r
+                     >> bare_dims_r)
+                    [validate_bare_type_f(_val, _1, _2, _pass,
+                                                boost::phoenix::ref(error_msgs_))];
 
       type_identifier_r.name("bare type identifier\n"
                 "  legal values: void, int, real, vector, row_vector, matrix");

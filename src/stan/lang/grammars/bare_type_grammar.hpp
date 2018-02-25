@@ -31,6 +31,16 @@ namespace stan {
       boost::spirit::qi::rule<Iterator,
                               bare_expr_type(),
                               whitespace_grammar<Iterator> >
+      array_bare_type_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              bare_expr_type(),
+                              whitespace_grammar<Iterator> >
+      single_bare_type_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              bare_expr_type(),
+                              whitespace_grammar<Iterator> >
       type_identifier_r;
 
       boost::spirit::qi::rule<Iterator,

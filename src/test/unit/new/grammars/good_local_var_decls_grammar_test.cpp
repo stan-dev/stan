@@ -89,6 +89,19 @@ TEST(Parser, parse_row_vector2) {
   EXPECT_TRUE(2 == lvds.size());
 }
 
+TEST(Parser, parse_row_vectorarray) {
+  std::string input("int N;\n"
+                    "row_vector[N] a[N,2];\n");
+  bool pass = false;
+  std::stringstream msgs;
+  std::vector<stan::lang::local_var_decl> lvds;
+  lvds = parse_local_var_decls(input, pass, msgs);
+
+  EXPECT_TRUE(pass);
+  EXPECT_EQ(msgs.str(), std::string());
+  EXPECT_TRUE(2 == lvds.size());
+}
+
 TEST(Parser, parse_array_1) {
   std::string input("int N[5];");
   bool pass = false;
