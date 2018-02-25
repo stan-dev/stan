@@ -154,11 +154,6 @@ namespace stan {
       bare_expr_type bare_type() const;
 
       /**
-       * Returns cpp type or typedef used by generator for this local type.
-       */
-      std::string cpp_typename() const;
-      
-      /**
        * Returns true if `var_type_` is `local_array_type`, false otherwise.
        */
       bool is_array_type() const;
@@ -173,11 +168,6 @@ namespace stan {
        * Returns 0 for scalar types.
        */
       int num_dims() const;
-
-      // /**
-      //  * Returns vector of sizes for each dimension, empty vector if unsized.
-      //  */
-      // std::vector<expression> size() const;
     };
 
     /**
