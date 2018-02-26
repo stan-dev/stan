@@ -55,6 +55,11 @@ namespace stan {
        * Body of the function.
        */
       statement body_;
+
+      /**
+       * Return true if this function has only integer arguments.
+       */
+      bool has_only_int_args() const;
     };
 
   }

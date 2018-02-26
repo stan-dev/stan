@@ -36,6 +36,7 @@ TEST(blockVarType, createIllFormed) {
   ill_formed_type tIll;
   block_var_type x(tIll);
   EXPECT_FALSE(x.is_array_type());
+  EXPECT_FALSE(x.is_specialized());
   EXPECT_EQ(x.num_dims(), 0);
 
   std::vector<expression> array_lens = x.array_lens();
@@ -51,6 +52,7 @@ TEST(blockVarType, createInt) {
   block_var_type x(tInt);
 
   EXPECT_FALSE(x.is_array_type());
+  EXPECT_FALSE(x.is_specialized());
   EXPECT_EQ(x.num_dims(), 0);
   EXPECT_FALSE(x.has_def_bounds());
   std::vector<expression> array_lens = x.array_lens();
@@ -71,6 +73,7 @@ TEST(blockVarType, createIntBounded) {
   block_var_type x(tInt);
   EXPECT_TRUE(x.has_def_bounds());
   EXPECT_FALSE(x.is_array_type());
+  EXPECT_FALSE(x.is_specialized());
   EXPECT_EQ(x.num_dims(), 0);
 
   std::vector<expression> array_lens = x.array_lens();
@@ -85,6 +88,7 @@ TEST(blockVarType, createDouble) {
   double_block_type tDouble;
   block_var_type x(tDouble);
   EXPECT_FALSE(x.is_array_type());
+  EXPECT_FALSE(x.is_specialized());
   EXPECT_EQ(x.num_dims(), 0);
 
   std::vector<expression> array_lens = x.array_lens();
@@ -101,6 +105,7 @@ TEST(blockVarType, createDoubleBounded) {
   block_var_type x(tDouble);
   EXPECT_TRUE(x.has_def_bounds());
   EXPECT_FALSE(x.is_array_type());
+  EXPECT_FALSE(x.is_specialized());
   EXPECT_EQ(x.num_dims(), 0);
 
   std::vector<expression> array_lens = x.array_lens();
@@ -131,6 +136,7 @@ TEST(blockVarType, createVector) {
   vector_block_type tVector;
   block_var_type x(tVector);
   EXPECT_FALSE(x.is_array_type());
+  EXPECT_FALSE(x.is_specialized());
   EXPECT_EQ(x.num_dims(), 1);
 
   std::vector<expression> array_lens = x.array_lens();
@@ -149,6 +155,7 @@ TEST(blockVarType, createVectorBoundedSized) {
   EXPECT_TRUE(x.has_def_bounds());
   EXPECT_TRUE(x.arg1().bare_type().is_int_type());
   EXPECT_FALSE(x.is_array_type());
+  EXPECT_FALSE(x.is_specialized());
   EXPECT_EQ(x.num_dims(), 1);
 
   std::vector<expression> array_lens = x.array_lens();
@@ -163,6 +170,7 @@ TEST(blockVarType, createRowVector) {
   row_vector_block_type tRowVector;
   block_var_type x(tRowVector);
   EXPECT_FALSE(x.is_array_type());
+  EXPECT_FALSE(x.is_specialized());
   EXPECT_EQ(x.num_dims(), 1);
 
   std::vector<expression> array_lens = x.array_lens();
@@ -198,6 +206,7 @@ TEST(blockVarType, createMatrixDefault) {
   EXPECT_TRUE(x.arg2().bare_type().is_ill_formed_type());
   EXPECT_FALSE(x.has_def_bounds());
   EXPECT_FALSE(x.is_array_type());
+  EXPECT_FALSE(x.is_specialized());
   EXPECT_EQ(x.num_dims(), 2);
 
   std::vector<expression> array_lens = x.array_lens();
@@ -235,6 +244,7 @@ TEST(blockVarType, createCopy) {
   //  EXPECT_TRUE(x == y);
   EXPECT_EQ(y.num_dims(), 0);
   EXPECT_FALSE(y.is_array_type());
+  EXPECT_FALSE(x.is_specialized());
 
   std::stringstream ss;
   write_bare_expr_type(ss, y.bare_type());
@@ -247,6 +257,7 @@ TEST(blockVarType, createArray) {
   block_array_type d1(tInt,e1);
   block_var_type x(d1);
   EXPECT_TRUE(x.is_array_type());
+  EXPECT_FALSE(x.is_specialized());
   EXPECT_EQ(x.num_dims(), 1);
   expression array_len = x.array_len();
 

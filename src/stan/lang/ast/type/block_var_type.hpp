@@ -237,6 +237,12 @@ namespace stan {
       bool is_array_type() const;
 
       /**
+       * Returns true if `var_type_` is a specialized vector or matrix type.
+       * If `var_type_` is array type, evaluates contained type.
+       */
+      bool is_specialized() const;
+
+      /**
        * Returns true if there are specified upper and/or lower bounds
        * for this type (contained type for arrays), false otherwise.
        */
