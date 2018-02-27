@@ -46,7 +46,9 @@
 #include <stan/lang/ast/fun/block_array_dims_vis.hpp>
 #include <stan/lang/ast/fun/block_array_element_type_vis.hpp>
 #include <stan/lang/ast/fun/block_type_bounds_vis.hpp>
+#include <stan/lang/ast/fun/block_type_is_specialized_vis.hpp>
 #include <stan/lang/ast/fun/block_type_has_def_bounds_vis.hpp>
+#include <stan/lang/ast/fun/block_type_params_total_vis.hpp>
 #include <stan/lang/ast/fun/expression_bare_type_vis.hpp>
 #include <stan/lang/ast/fun/is_array_type_vis.hpp>
 #include <stan/lang/ast/fun/is_nil.hpp>
