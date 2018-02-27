@@ -124,3 +124,18 @@ TEST(Parser, parse_local_var_def) {
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string(""));
 }
+
+TEST(Parser, parse_indexing) {
+  std::string input("{\n"
+                    "  real y;\n"
+                    "  int N;\n"
+                    "  int node1[N];\n"
+                    "  vector[N] phi;\n"
+                    "  y = -0.5 * dot_self(phi[node1] - phi[node1]);\n"
+                    "}\n");
+  bool pass = false;
+  std::stringstream msgs;
+  stan::lang::statement stmt;
+  stmt = parse_statement(input, pass, msgs);
+  std::cout << msgs.str() << std::endl;
+}

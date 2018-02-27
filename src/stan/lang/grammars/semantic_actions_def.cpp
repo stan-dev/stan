@@ -779,9 +779,12 @@ namespace stan {
 
     void validate_ints_expression::operator()(const expression& e, bool& pass,
                                               std::ostream& error_msgs) const {
-      if (!e.bare_type().is_int_type()) {
+      bare_expr_type bare_type = e.bare_type();
+      if (bare_type.is_array_type())
+        bare_type = bare_type.array_contains();
+      if (!bare_type.is_int_type()) {
         error_msgs << "ERROR:  Container index must be integer; found type=";
-        write_bare_expr_type(error_msgs, e.bare_type());
+        write_bare_expr_type(error_msgs, bare_type);
         error_msgs << std::endl;
         pass = false;
         return;
