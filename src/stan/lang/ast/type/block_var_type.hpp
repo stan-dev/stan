@@ -258,6 +258,12 @@ namespace stan {
        * Returns 0 for scalar types.
        */
       int num_dims() const;
+
+      /**
+       * Returns an expression for the number of parameters
+       * a parameter variable of this type contributes to a model.
+       */
+      expression params_total() const;
     };
 
     /**
