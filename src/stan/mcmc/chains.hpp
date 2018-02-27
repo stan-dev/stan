@@ -62,7 +62,6 @@ namespace stan {
         return std::sqrt(variance(x));
       }
 
-
       static double covariance(const Eigen::VectorXd& x,
                                const Eigen::VectorXd& y,
                                std::ostream* err = 0) {
@@ -289,6 +288,88 @@ namespace stan {
         }
         double ess = chains * n_samples;
         ess /= (1 + 2 * rho_hat_t.sum());
+        return ess;
+      }
+
+      /**
+       * Returns the effective sample size for the specified parameter
+       * across all kept samples.
+       *
+       * The implementation is close to the effective sample size
+       * description in BDA3 (p. 286-287).  See more details in Stan
+       * reference manual section "Effective Sample Size".
+       *
+       * Current implementation takes the minimum number of samples
+       * across chains as the number of samples per chain.
+       *
+       * @param std::vector<std::vector<double> > samples
+       * @return
+       */
+      double
+      effective_sample_size(const std::vector<std::vector<double> >& samples)
+        const {
+        int chains = samples.size();
+
+        // need to generalize to each jagged samples per chain
+        int n_samples = samples[0].size();
+        for (int chain = 1; chain < chains; chain++) {
+          n_samples = std::min(n_samples,
+                               static_cast<int>(samples[chain].size()));
+        }
+
+        std::vector<std::vector<double> > acov(chains);
+        for (int chain = 0; chain < chains; chain++) {
+          stan::math::autocovariance(samples[chain], acov[chain]);
+        }
+
+        std::vector<double> chain_mean(chains);
+        std::vector<double> chain_var(chains);
+        for (int chain = 0; chain < chains; chain++) {
+          double n_kept_samples = num_kept_samples(chain);
+          chain_mean[chain] = stan::math::mean(samples[chain]);
+          chain_var[chain] = acov[chain][0]*n_kept_samples/(n_kept_samples-1);
+        }
+
+        double mean_var = stan::math::mean(chain_var);
+        double var_plus = mean_var*(n_samples-1)/n_samples;
+        if (chains > 1)
+          var_plus += stan::math::variance(chain_mean);
+        std::vector<double> rho_hat_t(n_samples);
+        std::fill(rho_hat_t.begin(), rho_hat_t.end(), 0);
+        std::vector<double> acov_t(chains);
+        for (int chain = 0; chain < chains; chain++)
+          acov_t[chain] = acov[chain][1];
+        double rho_hat_even = 1;
+        double rho_hat_odd = 1 - (mean_var - stan::math::mean(acov_t)) / var_plus;
+        rho_hat_t[1] = rho_hat_odd;
+        // Geyer's initial positive sequence
+        int max_t = 1;
+        for (int t = 1;
+             (t < (n_samples - 2) && (rho_hat_even + rho_hat_odd) >= 0);
+             t += 2) {
+          for (int chain = 0; chain < chains; chain++)
+            acov_t[chain] = acov[chain][t+1];
+          rho_hat_even = 1 - (mean_var - stan::math::mean(acov_t)) / var_plus;
+          for (int chain = 0; chain < chains; chain++)
+            acov_t[chain] = acov[chain][t+2];
+          rho_hat_odd = 1 - (mean_var - stan::math::mean(acov_t)) / var_plus;
+          if ((rho_hat_even + rho_hat_odd) >= 0) {
+            rho_hat_t[t + 1] = rho_hat_even;
+            rho_hat_t[t + 2] = rho_hat_odd;
+          }
+          max_t = t + 2;
+        }
+        // Geyer's initial monotone sequence
+        for (int t = 3; t <= max_t - 2; t += 2) {
+          if (rho_hat_t[t + 1] + rho_hat_t[t + 2] >
+              rho_hat_t[t - 1] + rho_hat_t[t]) {
+            rho_hat_t[t + 1] = (rho_hat_t[t - 1] + rho_hat_t[t]) / 2;
+            rho_hat_t[t + 2] = rho_hat_t[t + 1];
+          }
+        }
+        double sum_rho_hat_t = std::accumulate(rho_hat_t.begin(), rho_hat_t.end(), 0.);
+        double ess = chains * n_samples;
+        ess /= (1 + 2 * sum_rho_hat_t);
         return ess;
       }
 
@@ -699,6 +780,18 @@ namespace stan {
 
       double effective_sample_size(const std::string& name) const {
         return effective_sample_size(index(name));
+      }
+
+      double effective_sample_size_pod(const int index) const {
+        std::vector<std::vector<double> > samples(num_chains());
+        for (int chain = 0; chain < num_chains(); chain++) {
+          Eigen::VectorXd Esample = this->samples(chain, index);
+          samples[chain].resize(Esample.size());
+          for (int n = 0; n < Esample.size(); n++) {
+            samples[chain][n] = Esample[n];
+          }
+        }
+        return effective_sample_size(samples);
       }
 
       double split_potential_scale_reduction(const int index) const {
