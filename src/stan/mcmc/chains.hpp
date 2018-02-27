@@ -340,7 +340,8 @@ namespace stan {
         for (int chain = 0; chain < chains; chain++)
           acov_t[chain] = acov[chain][1];
         double rho_hat_even = 1;
-        double rho_hat_odd = 1 - (mean_var - stan::math::mean(acov_t)) / var_plus;
+        double
+          rho_hat_odd = 1 - (mean_var - stan::math::mean(acov_t)) / var_plus;
         rho_hat_t[1] = rho_hat_odd;
         // Geyer's initial positive sequence
         int max_t = 1;
@@ -367,7 +368,9 @@ namespace stan {
             rho_hat_t[t + 2] = rho_hat_t[t + 1];
           }
         }
-        double sum_rho_hat_t = std::accumulate(rho_hat_t.begin(), rho_hat_t.end(), 0.);
+        double sum_rho_hat_t = std::accumulate(rho_hat_t.begin(),
+                                               rho_hat_t.end(),
+                                               0.);
         double ess = chains * n_samples;
         ess /= (1 + 2 * sum_rho_hat_t);
         return ess;
