@@ -6,6 +6,7 @@
 #include <stan/lang/generator/generate_initializer.hpp>
 #include <stan/lang/generator/generate_type.hpp>
 #include <stan/lang/generator/generate_validate_positive.hpp>
+#include <stan/lang/generator/get_typedef_var_type.hpp>
 #include <ostream>
 #include <string>
 #include <vector>
@@ -22,33 +23,34 @@ namespace stan {
      * @param[in,out] o stream for generating
      * @param[in] indent indentation level
      * @param[in] var_name name of variable being initialized
-     * @param[in] base_type base type of variable
-     * @param[in] dims dimension sizes
-     * @param[in] type_arg1 optional vector/row-vector size or matrix
-     * rows
-     * @param[in] type_arg2 optional size of matrix columns
+     * @param[in] bare type of variable (after array unfolding)
+     * @param[in] arg1 expr for vector/matrix num rows
+     * @param[in] arg2 expr for matrix num cols
+     * @param[in] dims array dimension sizes
      */
     void generate_initialization(std::ostream& o, size_t indent,
                                  const std::string& var_name,
-                                 const std::string& base_type,
-                                 const std::vector<expression>& dims,
-                                 const expression& type_arg1 = expression(),
-                                 const expression& type_arg2 = expression()) {
-      // check array dimensions
-      for (size_t i = 0; i < dims.size(); ++i)
-        generate_validate_positive(var_name, dims[i], indent, o);
-      // check vector, row_vector, and matrix rows
-      if (!is_nil(type_arg1))
-        generate_validate_positive(var_name, type_arg1, indent, o);
-      // check matrix cols
-      if (!is_nil(type_arg2))
-        generate_validate_positive(var_name, type_arg2, indent, o);
+                                 const bare_expr_type& bare_type,
+                                 const expression& arg1,
+                                 const expression& arg2,
+                                 const std::vector<expression>& dims) {
 
-      // initialize variable
+      if (!is_nil(arg1))
+        generate_validate_positive(var_name, arg1, indent, o);
+      if (!is_nil(arg2))
+        generate_validate_positive(var_name, arg2, indent, o);
+      for (size_t i = 0; i < dims.size(); ++i) 
+        generate_validate_positive(var_name, dims[i], indent, o);
+      
       generate_indent(indent, o);
       o << var_name << " = ";
-      generate_type(base_type, dims, dims.size(), o);
-      generate_initializer(o, base_type, dims, type_arg1, type_arg2);
+      if (bare_type.is_double_type() && dims.size() == 0)
+        o << "DUMMY_VAR__;" << EOL;
+      else {
+        std::string cpptype = get_typedef_var_type(bare_type);
+        generate_type(cpptype, dims, dims.size(), o);
+        generate_initializer(o, cpptype, dims, arg1, arg2);
+      }
     }
 
   }

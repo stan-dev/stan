@@ -50,7 +50,7 @@ namespace stan {
 
       o << "(";
       for (size_t arg_i = 0; arg_i < fun.arg_decls_.size(); ++arg_i) {
-        o << fun.arg_decls_[arg_i].name_;
+        o << fun.arg_decls_[arg_i].name();
         if (arg_i + 1 < fun.arg_decls_.size()) {
           o << ", ";
         }

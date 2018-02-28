@@ -19,41 +19,41 @@ namespace stan {
      * matrices.
      *
      * @param o stream for generating
-     * @param base_type base type of variable
+     * @param cpptype c++ variable type
      * @param dims sizes of dimensions for variable
      * @param type_arg1 size of vector or row vector or size of rows
      * for matrix, not used otherwise
      * @param type_arg2 size of columns for matrix, not used otherwise
      */
     void generate_initializer(std::ostream& o,
-                              const std::string& base_type,
+                              const std::string& cpptype,
                               const std::vector<expression>& dims,
                               const expression& type_arg1 = expression(),
                               const expression& type_arg2 = expression()) {
       for (size_t i = 0; i < dims.size(); ++i) {
-        o << '(';
+        o << "(";
         generate_expression(dims[i].expr_, NOT_USER_FACING, o);
-        o << ',';
-        generate_type(base_type, dims, dims.size() - i - 1, o);
+        o << ", ";
+        generate_type(cpptype, dims, dims.size() - i - 1, o);
       }
 
-      o << '(';
+      o << "(";
       if (!is_nil(type_arg1)) {
         generate_eigen_index_expression(type_arg1, o);
         if (!is_nil(type_arg2)) {
-          o << ',';
+          o << ", ";
           generate_eigen_index_expression(type_arg2, o);
         }
       } else if (!is_nil(type_arg2.expr_)) {
         generate_eigen_index_expression(type_arg2, o);
       } else {
-        o << '0';
+        o << "0";
       }
-      o << ')';
+      o << ")";
 
       for (size_t i = 0; i < dims.size(); ++i)
-        o << ')';
-      o << ';' << EOL;
+        o << ")";
+      o << ";" << EOL;
     }
 
   }

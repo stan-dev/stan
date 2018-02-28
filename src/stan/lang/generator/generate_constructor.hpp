@@ -4,14 +4,14 @@
 #include <stan/io/program_reader.hpp>
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
+#include <stan/lang/generator/generate_block_var_inits.hpp>
 #include <stan/lang/generator/generate_catch_throw_located.hpp>
 #include <stan/lang/generator/generate_comment.hpp>
-#include <stan/lang/generator/generate_member_var_inits.hpp>
+#include <stan/lang/generator/generate_data_block_var_inits.hpp>
 #include <stan/lang/generator/generate_set_param_ranges.hpp>
 #include <stan/lang/generator/generate_statements.hpp>
 #include <stan/lang/generator/generate_try.hpp>
 #include <stan/lang/generator/generate_validate_var_decls.hpp>
-#include <stan/lang/generator/generate_var_resizing.hpp>
 #include <stan/lang/generator/generate_void_statement.hpp>
 #include <ostream>
 #include <string>
@@ -71,12 +71,12 @@ namespace stan {
         << EOL2;
       o << INDENT2 << "// initialize member variables" << EOL;
       generate_try(2, o);
-      generate_member_var_inits(prog.data_decl_, 3, o);
+      generate_data_block_var_inits(prog.data_decl_, 3, o);
       o << EOL;
       generate_comment("validate, data variables", 3, o);
       generate_validate_var_decls(prog.data_decl_, 3, o);
       generate_comment("initialize data variables", 3, o);
-      generate_var_resizing(prog.derived_data_decl_.first, 3, o);
+      generate_block_var_inits(prog.derived_data_decl_.first, 3, o);
       o << EOL;
       generate_statements(prog.derived_data_decl_.second, 3, o);
       o << EOL;

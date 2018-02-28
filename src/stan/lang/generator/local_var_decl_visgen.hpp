@@ -69,12 +69,12 @@ namespace stan {
             generate_type(type, dims.size() - dim - 1);
             generate_init_args(type, ctor_args, dims, dim + 1);
             o_ << ')';  // close(2)
-          } else if (type == "var") {
-            o_ << ", DUMMY_VAR__";
+          // } else if (type == "var") {
+          //   o_ << ", DUMMY_VAR__";
           } else if (type == "int") {
             o_ << ", 0";
-          } else if (type == "double") {
-            o_ << ", 0.0";
+          // } else if (type == "double") {
+          //   o_ << ", 0.0";
           } else {
             // shouldn't hit this
           }
@@ -83,10 +83,10 @@ namespace stan {
           if (ctor_args.size() == 0) {  // scalar int or real
             if (type == "int") {
               o_ << "(0)";
-            } else if (type == "double") {
-              o_ << "(0.0)";
-            } else if (type == "var") {
-              o_ << "(DUMMY_VAR__)";
+            // } else if (type == "double") {
+            //   o_ << "(0.0)";
+            // } else if (type == "var") {
+            //   o_ << "(DUMMY_VAR__)";
             } else {
               // shouldn't hit this, either
             }

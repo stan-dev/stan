@@ -5,8 +5,8 @@
 #include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_catch_throw_located.hpp>
 #include <stan/lang/generator/generate_comment.hpp>
-#include <stan/lang/generator/generate_local_var_decls.hpp>
-#include <stan/lang/generator/generate_local_var_inits.hpp>
+#include <stan/lang/generator/generate_log_prob_var_decls.hpp>
+#include <stan/lang/generator/generate_log_prob_var_inits.hpp>
 #include <stan/lang/generator/generate_statement.hpp>
 #include <stan/lang/generator/generate_statements.hpp>
 #include <stan/lang/generator/generate_try.hpp>
@@ -54,11 +54,12 @@ namespace stan {
       generate_try(2, o);
 
       generate_comment("model parameters", 3, o);
-      generate_local_var_inits(p.parameter_decl_, gen_local_vars, 3, o);
+      generate_log_prob_var_inits(p.parameter_decl_, gen_local_vars, 3, o);
       o << EOL;
 
       generate_comment("transformed parameters", 3, o);
-      generate_local_var_decls(p.derived_decl_.first, 3, o);
+      //      generate_log_prob_var_decls(p.derived_decl_.first, 3, o);
+      generate_local_var_decl_inits(p.derived_decl_.first, 3, o);
       o << EOL;
 
       generate_statements(p.derived_decl_.second, 3, o);

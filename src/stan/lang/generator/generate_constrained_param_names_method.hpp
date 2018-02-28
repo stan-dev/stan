@@ -3,13 +3,15 @@
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
-#include <stan/lang/generator/constrained_param_names_visgen.hpp>
-#include <boost/variant/apply_visitor.hpp>
+#include <stan/lang/generator/get_block_var_dims.hpp>
 #include <ostream>
+#include <vector>
 
 namespace stan {
   namespace lang {
-
+    void
+    generate_param_names_array(size_t indent, std::ostream& o,
+                               const block_var_decl var_decl);
     /**
      * Generate the <code>constrained_param_names</code> method for
      * the specified program on the specified stream.
@@ -28,22 +30,57 @@ namespace stan {
         << "                             bool include_gqs__ = true) const {"
         << EOL << INDENT2
         << "std::stringstream param_name_stream__;" << EOL;
-      constrained_param_names_visgen vis1(1, o);
-      constrained_param_names_visgen vis2(2, o);
       for (size_t i = 0; i < prog.parameter_decl_.size(); ++i)
-        boost::apply_visitor(vis1, prog.parameter_decl_[i].decl_);
+        generate_param_names_array(1, o, prog.parameter_decl_[i]);
       o << EOL << INDENT2
         << "if (!include_gqs__ && !include_tparams__) return;" << EOL;
       o << EOL << INDENT2 << "if (include_tparams__) {"  << EOL;
       for (size_t i = 0; i < prog.derived_decl_.first.size(); ++i)
-        boost::apply_visitor(vis2, prog.derived_decl_.first[i].decl_);
+        generate_param_names_array(2, o, prog.derived_decl_.first[i]);
       o << INDENT2 << "}" << EOL2;
       o << EOL << INDENT2 << "if (!include_gqs__) return;" << EOL;
       for (size_t i = 0; i < prog.generated_decl_.first.size(); ++i)
-        boost::apply_visitor(vis1, prog.generated_decl_.first[i].decl_);
+        generate_param_names_array(1, o, prog.generated_decl_.first[i]);
       o << INDENT << "}" << EOL2;
     }
 
+    /**
+     * Generate the parameter names for the specified parameter variable.
+     *
+     * @param[in] indent level of indentation
+     * @param[in,out] o stream for generating
+     * @param[in] var_decl block_var_decl
+     */
+    void
+    generate_param_names_array(size_t indent, std::ostream& o,
+                               const block_var_decl var_decl) {
+      std::vector<expression> dims = get_block_var_dims(var_decl);
+      for (size_t i = dims.size(); i-- > 0; ) {
+        generate_indent(indent + dims.size() - i, o);
+        o << "for (int k_" << i << "__ = 1;"
+           << " k_" << i << "__ <= ";
+        generate_expression(dims[i].expr_, NOT_USER_FACING, o);
+        o << "; ++k_" << i << "__) {" << EOL;  // begin (1)
+      }
+      generate_indent(indent + 1 + dims.size(), o);
+      o << "param_name_stream__.str(std::string());" << EOL;
+
+      generate_indent(indent + 1 + dims.size(), o);
+      o << "param_name_stream__ << \"" << var_decl.name() << '"';
+
+      for (size_t i = 0; i < dims.size(); ++i)
+        o << " << '.' << k_" << i << "__";
+      o << ';' << EOL;
+
+      generate_indent(indent + 1 + dims.size(), o);
+      o << "param_names__.push_back(param_name_stream__.str());" << EOL;
+
+      // end for loop dims
+      for (size_t i = 0; i < dims.size(); ++i) {
+        generate_indent(indent + dims.size() - i, o);
+        o << "}" << EOL;  // end (1)
+      }
+    }
   }
 }
 #endif

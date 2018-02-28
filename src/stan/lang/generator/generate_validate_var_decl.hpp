@@ -19,8 +19,7 @@ namespace stan {
      */
     void generate_validate_var_decl(const var_decl& decl, int indent,
                                     std::ostream& o) {
-      validate_var_decl_visgen vis(indent, o);
-      boost::apply_visitor(vis, decl.decl_);
+
     }
 
   }

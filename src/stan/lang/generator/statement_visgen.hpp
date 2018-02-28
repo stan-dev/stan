@@ -5,7 +5,7 @@
 #include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_indent.hpp>
 #include <stan/lang/generator/generate_indexed_expr.hpp>
-#include <stan/lang/generator/generate_local_var_decls.hpp>
+#include <stan/lang/generator/generate_local_var_decl_inits.hpp>
 #include <stan/lang/generator/generate_printable.hpp>
 #include <stan/lang/generator/generate_void_statement.hpp>
 #include <stan/lang/generator/visgen.hpp>
@@ -137,30 +137,30 @@ namespace stan {
         o_ << "stan::math::assign(";
         generate_indexed_expr<true>(x.var_dims_.name_,
                                     x.var_dims_.dims_,
-                                    x.var_type_.base_type_,
-                                    x.var_type_.dims_.size(),
+                                    x.var_type_,
+                                    x.var_type_.array_dims(),
                                     false,
                                     o_);
         o_ << ", ";
         if (x.op_name_.size() == 0) {
           o_ << "(";
           generate_indexed_expr<false>(x.var_dims_.name_,
-                                      x.var_dims_.dims_,
-                                      x.var_type_.base_type_,
-                                      x.var_type_.dims_.size(),
-                                      false,
-                                      o_);
+                                       x.var_dims_.dims_,
+                                       x.var_type_,
+                                       x.var_type_.array_dims(),
+                                       false,
+                                       o_);
           o_ << " " << x.op_ << " ";
           generate_expression(x.expr_, NOT_USER_FACING, o_);
           o_ << ")";
         } else {
           o_ << x.op_name_ << "(";
           generate_indexed_expr<false>(x.var_dims_.name_,
-                                      x.var_dims_.dims_,
-                                      x.var_type_.base_type_,
-                                      x.var_type_.dims_.size(),
-                                      false,
-                                      o_);
+                                       x.var_dims_.dims_,
+                                       x.var_type_,
+                                       x.var_type_.array_dims(),
+                                       false,
+                                       o_);
           o_ << ", ";
           generate_expression(x.expr_, NOT_USER_FACING, o_);
           o_ << ")";
@@ -173,8 +173,8 @@ namespace stan {
         o_ << "stan::math::assign(";
         generate_indexed_expr<true>(x.var_dims_.name_,
                                     x.var_dims_.dims_,
-                                    x.var_type_.base_type_,
-                                    x.var_type_.dims_.size(),
+                                    x.var_type_,
+                                    x.var_type_.array_dims(),
                                     false,
                                     o_);
         o_ << ", ";
@@ -274,7 +274,7 @@ namespace stan {
         if (has_local_vars) {
           generate_indent(indent_, o_);
           o_ << "{" << EOL;
-          generate_local_var_decls(x.local_decl_, indent_, o_);
+          generate_local_var_decl_inits(x.local_decl_, indent_, o_);
         }
         o_ << EOL;
         for (size_t i = 0; i < x.statements_.size(); ++i) {
@@ -317,8 +317,8 @@ namespace stan {
       void operator()(const return_statement& rs) const {
         generate_indent(indent_, o_);
         o_ << "return ";
-        if (!rs.return_value_.expression_type().is_ill_formed()
-            && !rs.return_value_.expression_type().is_void()) {
+        if (!rs.return_value_.bare_type().is_ill_formed_type()
+            && !rs.return_value_.bare_type().is_void_type()) {
           o_ << "stan::math::promote_scalar<fun_return_scalar_t__>(";
           generate_expression(rs.return_value_, NOT_USER_FACING, o_);
           o_ << ")";

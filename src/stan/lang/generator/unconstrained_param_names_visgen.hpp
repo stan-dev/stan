@@ -9,6 +9,8 @@
 #include <string>
 #include <vector>
 
+// TODO:mitzi - this shoudl work on block_var_type, not var decl?
+
 namespace stan {
   namespace lang {
 

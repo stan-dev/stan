@@ -1,5 +1,5 @@
-#ifndef STAN_LANG_GENERATOR_GENERATE_LOCAL_VAR_DECLS_HPP
-#define STAN_LANG_GENERATOR_GENERATE_LOCAL_VAR_DECLS_HPP
+#ifndef STAN_LANG_GENERATOR_GENERATE_LOCAL_VAR_DECL_INITS_HPP
+#define STAN_LANG_GENERATOR_GENERATE_LOCAL_VAR_DECL_INITS_HPP
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
@@ -26,7 +26,7 @@ namespace stan {
      * @param[in] indent indentation level
      * @param[in,out] o stream for generating
      */
-    void generate_local_var_decls(const std::vector<var_decl>& vs, int indent,
+    void generate_local_var_decl_inits(const std::vector<var_decl>& vs, int indent,
                                   std::ostream& o) {
       local_var_decl_visgen vis_decl(indent, o);
       local_var_init_nan_visgen vis_init(indent, o);

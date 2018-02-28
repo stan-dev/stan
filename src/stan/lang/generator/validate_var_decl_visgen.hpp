@@ -24,47 +24,6 @@ namespace stan {
         : visgen(indent, o) {  }
 
       /**
-       * Generate the openings of a sequence of zero or more for loops
-       * corresponding to the specified dimension sizes.
-       *
-       * @param[in] dims dimension sizes
-       */
-      void generate_begin_for_dims(const std::vector<expression>& dims) const {
-        for (size_t i = 0; i < dims.size(); ++i) {
-          generate_indent(indent_+i, o_);
-          o_ << "for (int k" << i << "__ = 0;" << " k" << i << "__ < ";
-          generate_expression(dims[i].expr_, NOT_USER_FACING, o_);
-          o_ << ";" << " ++k" << i << "__) {" << EOL;
-        }
-      }
-
-      /**
-       * Generate matching closing braces for loops corresponding to
-       * the sepcifeid number of dimensions.
-       *
-       * @param[in] dims_size number of dimensions
-       */
-      void generate_end_for_dims(size_t dims_size) const {
-        for (size_t i = 0; i < dims_size; ++i) {
-          generate_indent(indent_ + dims_size - i - 1, o_);
-          o_ << "}" << EOL;
-        }
-      }
-
-      /**
-       * Generate the loop variable and indexes for the specified
-       * variable name and number of dimensions.
-       *
-       * @param[in] name name of variable
-       * @param[in] dims_size number of dimensions of variable
-       */
-      void generate_loop_var(const std::string& name, size_t dims_size) const {
-        o_ << name;
-        for (size_t i = 0; i < dims_size; ++i)
-          o_ << "[k" << i << "__]";
-      }
-
-      /**
        * Validate the specified basic type declaration.
        *
        * @tparam T declaration type

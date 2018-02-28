@@ -16,10 +16,11 @@ namespace stan {
      * @param[in,out] o stream for generating
      */
     // use to disambiguate VectorXd(0) ctor from Scalar* alternative
+    // is this necessary?  omit cast and see....
     void generate_eigen_index_expression(const expression& e, std::ostream& o) {
-      o << "static_cast<Eigen::VectorXd::Index>(";
+      //      o << "static_cast<Eigen::VectorXd::Index>(";
       generate_expression(e.expr_, NOT_USER_FACING, o);
-      o << ")";
+      //      o << ")";
     }
 
 

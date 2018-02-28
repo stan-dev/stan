@@ -4,7 +4,7 @@
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_indent.hpp>
-#include <stan/lang/generator/get_block_var_dims.hpp>
+#include <stan/lang/generator/generate_initialization.hpp>
 #include <ostream>
 #include <vector>
 
@@ -31,16 +31,15 @@ namespace stan {
         o << "current_statement_begin__ = " <<  vs[i].begin_line_ << ";"
           << EOL;
 
-        // unfold recursive array type to get array element info
+        // unfold array type to get array element info
         std::string var_name(vs[i].name());
         block_var_type btype = (vs[i].type());
         if (btype.is_array_type())
           btype = btype.array_contains();
-        std::string cpp_typename(btype.cpp_typename());
         expression el_arg1 = btype.arg1();
         expression el_arg2 = btype.arg2();
 
-        generate_initialization(o, indent, var_name, cpp_typename,
+        generate_initialization(o, indent, var_name, btype.bare_type(),
                                 el_arg1, el_arg2, vs[i].type().array_lens());
 
         generate_indent(indent, o);

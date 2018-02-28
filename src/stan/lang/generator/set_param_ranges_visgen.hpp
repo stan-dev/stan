@@ -9,6 +9,11 @@
 #include <ostream>
 #include <vector>
 
+
+// TODO:mitzi - need this visitor, make it work for block_var_types
+// handle array dimensions separately from type size
+// type size:  bounds/ specialized types
+
 namespace stan {
   namespace lang {
 

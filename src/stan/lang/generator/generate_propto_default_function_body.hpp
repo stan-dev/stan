@@ -24,7 +24,7 @@ namespace stan {
       for (size_t i = 0; i < fun.arg_decls_.size(); ++i) {
         if (i > 0)
           o << ",";
-        o << fun.arg_decls_[i].name_;
+        o << fun.arg_decls_[i].name();
       }
       if (fun.arg_decls_.size() > 0)
         o << ", ";

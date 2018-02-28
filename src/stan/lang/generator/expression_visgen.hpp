@@ -54,6 +54,7 @@ namespace stan {
         std::stringstream ssArrayType;
         generate_array_var_type(x.type_, ssRealType.str(),
                                 ssArrayType);
+        // TODO:mizi do we need static cast? L58-60, L68
         o_ << "static_cast<";
         generate_type(ssArrayType.str(), x.args_, x.type_.num_dims(), o_);
         o_ << " >(";
@@ -141,7 +142,7 @@ namespace stan {
         o_ << (fx.integration_function_name_ == "integrate_ode"
                ? "integrate_ode_rk45"
                : fx.integration_function_name_)
-           << '('
+           << "("
            << fx.system_function_name_
            << "_functor__(), ";
         generate_expression(fx.y0_, NOT_USER_FACING, o_);
@@ -160,7 +161,7 @@ namespace stan {
 
       void operator()(const integrate_ode_control& fx) const {
         o_ << fx.integration_function_name_
-           << '('
+           << "("
            << fx.system_function_name_
            << "_functor__(), ";
         generate_expression(fx.y0_, NOT_USER_FACING, o_);
@@ -185,7 +186,7 @@ namespace stan {
 
       void operator()(const algebra_solver& fx) const {
         o_ << "algebra_solver"
-           << '('
+           << "("
            << fx.system_function_name_
            << "_functor__(), ";
         generate_expression(fx.y_, NOT_USER_FACING, o_);
@@ -200,7 +201,7 @@ namespace stan {
 
       void operator()(const algebra_solver_control& fx) const {
         o_ << "algebra_solver"
-           << '('
+           << "("
            << fx.system_function_name_
            << "_functor__(), ";
         generate_expression(fx.y_, NOT_USER_FACING, o_);
@@ -231,9 +232,9 @@ namespace stan {
           o_ << "))";
           return;
         }
-        o_ << fx.name_ << '(';
+        o_ << fx.name_ << "(";
         for (size_t i = 0; i < fx.args_.size(); ++i) {
-          if (i > 0) o_ << ',';
+          if (i > 0) o_ << ", ";
           boost::apply_visitor(*this, fx.args_[i].expr_);
         }
         if (fx.args_.size() > 0
@@ -250,7 +251,7 @@ namespace stan {
             o_ << ", ";
           o_ << "pstream__";
         }
-        o_ << ')';
+        o_ << ")";
       }
 
       void operator()(const conditional_op& expr) const {
@@ -288,17 +289,17 @@ namespace stan {
       }
 
       void operator()(const binary_op& expr) const {
-        o_ << '(';
+        o_ << "(";
         boost::apply_visitor(*this, expr.left.expr_);
-        o_ << ' ' << expr.op << ' ';
+        o_ << " " << expr.op << " ";
         boost::apply_visitor(*this, expr.right.expr_);
-        o_ << ')';
+        o_ << ")";
       }
 
       void operator()(const unary_op& expr) const {
-        o_ << expr.op << '(';
+        o_ << expr.op << "(";
         boost::apply_visitor(*this, expr.subject.expr_);
-        o_ << ')';
+        o_ << ")";
       }
     };
 

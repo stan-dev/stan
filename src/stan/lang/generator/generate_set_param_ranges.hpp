@@ -4,8 +4,6 @@
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_indent.hpp>
-#include <stan/lang/generator/set_param_ranges_visgen.hpp>
-#include <boost/variant/apply_visitor.hpp>
 #include <ostream>
 #include <vector>
 
@@ -25,18 +23,27 @@ namespace stan {
      * @param[in] indent indentation level
      * @param[in,out] o stream for generating
      */
-    void generate_set_param_ranges(const std::vector<var_decl>& var_decls,
+    void generate_set_param_ranges(const std::vector<block_var_decl>& var_decls,
                                    int indent, std::ostream& o) {
       generate_indent(indent, o);
       o << "num_params_r__ = 0U;" << EOL;
       generate_indent(indent, o);
       o << "param_ranges_i__.clear();" << EOL;
-      set_param_ranges_visgen vis(indent, o);
+
       for (size_t i = 0; i < var_decls.size(); ++i) {
         generate_indent(indent, o);
         o << "current_statement_begin__ = " <<  var_decls[i].begin_line_ << ";"
           << EOL;
-        boost::apply_visitor(vis, var_decls[i].decl_);
+
+        std::string var_name(var_decls[i].name());
+        std::vector<expression> ar_lens(var_decls[i].type().array_lens());
+        for (size_t i = 0; i < ar_lens.size(); ++i)
+          generate_validate_positive(var_name, ar_lens[i], indent, o);
+
+        generate_indent(indent, o);
+        o << "num_params_r__ += ";
+        generate_expression(var_decls[i].type().params_total(), NOT_USER_FACING, o);
+        o << ";" << EOL;
       }
     }
 
@@ -45,3 +52,4 @@ namespace stan {
   }
 }
 #endif
+

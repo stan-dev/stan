@@ -5,7 +5,7 @@
 #include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_catch_throw_located.hpp>
 #include <stan/lang/generator/generate_comment.hpp>
-#include <stan/lang/generator/generate_local_var_decls.hpp>
+#include <stan/lang/generator/generate_local_var_decl_inits.hpp>
 #include <stan/lang/generator/generate_statements.hpp>
 #include <stan/lang/generator/generate_try.hpp>
 #include <stan/lang/generator/generate_validate_var_decls.hpp>
@@ -75,7 +75,7 @@ namespace stan {
         << EOL2;
 
       generate_try(2, o);
-      generate_local_var_decls(prog.derived_decl_.first, 3, o);
+      generate_local_var_decl_inits(prog.derived_decl_.first, 3, o);
       o << EOL;
       generate_statements(prog.derived_decl_.second, 3, o);
       o << EOL;
@@ -93,7 +93,7 @@ namespace stan {
       o << INDENT3 << "if (!include_gqs__) return;"
         << EOL;
       generate_comment("declare and define generated quantities", 3, o);
-      generate_local_var_decls(prog.generated_decl_.first, 3, o);
+      generate_local_var_decl_inits(prog.generated_decl_.first, 3, o);
 
       o << EOL;
       generate_statements(prog.generated_decl_.second, 3, o);
