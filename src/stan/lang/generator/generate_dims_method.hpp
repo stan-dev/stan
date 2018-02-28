@@ -33,27 +33,27 @@ namespace stan {
     }
 
     void generate_var_dims(const block_var_decl& decl, std::ostream& o) {
-      o_ << INDENT2 << "dims__.resize(0);" << EOL;
+      o << INDENT2 << "dims__.resize(0);" << EOL;
       if (decl.type().bare_type().is_vector_type()
           || decl.type().bare_type().is_row_type() ) {
-        o_ << INDENT2 << "dims__.push_back(";
-        generate_expression(decl.type().arg1(), NOT_USER_FACING, o_);
-        o_ << ");" << EOL;
+        o << INDENT2 << "dims__.push_back(";
+        generate_expression(decl.type().arg1(), NOT_USER_FACING, o);
+        o << ");" << EOL;
       } else if (decl.type().bare_type().is_matrix_type()) {
-        o_ << INDENT2 << "dims__.push_back(";
-        generate_expression(decl.type().arg1(), NOT_USER_FACING, o_);
-        o_ << ");" << EOL;
-        o_ << INDENT2 << "dims__.push_back(";
-        generate_expression(decl.type().arg2(), NOT_USER_FACING, o_);
-        o_ << ");" << EOL;
+        o << INDENT2 << "dims__.push_back(";
+        generate_expression(decl.type().arg1(), NOT_USER_FACING, o);
+        o << ");" << EOL;
+        o << INDENT2 << "dims__.push_back(";
+        generate_expression(decl.type().arg2(), NOT_USER_FACING, o);
+        o << ");" << EOL;
       }
       std::vector<expression> ar_lens = decl.array_lens();
       for (size_t i = 0; i < ar_lens.size(); ++i) {
-        o_ << INDENT2 << "dims__.push_back(";
-        generate_expression(ar_lens[i], NOT_USER_FACING, o_);
-        o_ << ");" << EOL;
+        o << INDENT2 << "dims__.push_back(";
+        generate_expression(ar_lens[i], NOT_USER_FACING, o);
+        o << ");" << EOL;
       }
-      o_ << INDENT2 << "dimss__.push_back(dims__);" << EOL;
+      o << INDENT2 << "dimss__.push_back(dims__);" << EOL;
     }
   }
 }

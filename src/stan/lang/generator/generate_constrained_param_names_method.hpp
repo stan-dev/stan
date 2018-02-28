@@ -7,6 +7,8 @@
 #include <ostream>
 #include <vector>
 
+// TODO:mitzi check indexing of array dims  vs. vector/matrix dims
+
 namespace stan {
   namespace lang {
     void

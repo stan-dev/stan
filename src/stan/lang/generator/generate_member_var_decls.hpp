@@ -29,14 +29,14 @@ namespace stan {
         block_var_type btype = (vs[i].type());
         if (btype.is_array_type())
           btype = btype.array_contains();
-        std::string typename = get_typedef_var_type(btype.bare_type());
+        std::string typedef_var_type = get_typedef_var_type(btype.bare_type());
         int ar_dims = vs[i].type().array_dims();
 
         for (int i = 0; i < indent; ++i)
           o << INDENT;
         for (int i = 0; i < ar_dims; ++i)
           o << "vector<";
-        o << typename;
+        o << typedef_var_type;
         if (ar_dims > 0)
           o << ">";
         for (int i = 1; i < ar_dims; ++i)
