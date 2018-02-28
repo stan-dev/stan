@@ -23,7 +23,7 @@ bool run_test(std::string& stan_code,
   std::cout << "\ntest.stan:" << std::endl;
   std::cout << stan_code << std::endl;
 
-  stan::lang::generate_block_var_inits(bvds, 1, cpp_code);
+  stan::lang::generate_member_var_decls(bvds, 1, cpp_code);
 
   std::cout << "test.hpp:" << std::endl;
   std::cout << cpp_code.str() << std::endl;
