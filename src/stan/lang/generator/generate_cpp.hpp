@@ -12,7 +12,7 @@
 #include <stan/lang/generator/generate_functions.hpp>
 #include <stan/lang/generator/generate_globals.hpp>
 #include <stan/lang/generator/generate_includes.hpp>
-#include <stan/lang/generator/generate_init_method.hpp>
+#include <stan/lang/generator/generate_transform_inits_method.hpp>
 #include <stan/lang/generator/generate_log_prob.hpp>
 #include <stan/lang/generator/generate_member_var_decls_all.hpp>
 #include <stan/lang/generator/generate_model_name_method.hpp>
@@ -66,7 +66,7 @@ namespace stan {
       generate_destructor(model_name, o);
       // put back if ever need integer params
       // generate_set_param_ranges(prog.parameter_decl_, o);
-      generate_init_method(prog.parameter_decl_, o);
+      generate_transform_inits_method(prog.parameter_decl_, o);
       generate_log_prob(prog, o);
       generate_param_names_method(prog, o);
       generate_dims_method(prog, o);

@@ -1,5 +1,5 @@
-#ifndef STAN_LANG_GENERATOR_GENERATE_INIT_METHOD_HPP
-#define STAN_LANG_GENERATOR_GENERATE_INIT_METHOD_HPP
+#ifndef STAN_LANG_GENERATOR_GENERATE_TRANSFORM_INITS_METHOD_HPP
+#define STAN_LANG_GENERATOR_GENERATE_TRANSFORM_INITS_METHOD_HPP
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
@@ -111,7 +111,7 @@ namespace stan {
      * @param[in] vs variable declarations
      * @param[in,out] o stream for generating
      */
-    void generate_init_method(const std::vector<block_var_decl>& vs,
+    void generate_transform_inits_method(const std::vector<block_var_decl>& vs,
                               std::ostream& o) {
       int indent = 2;
 
