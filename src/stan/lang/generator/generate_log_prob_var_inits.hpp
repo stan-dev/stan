@@ -4,9 +4,11 @@
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_indent.hpp>
-#include <boost/variant/apply_visitor.hpp>
+#include <stan/lang/generator/get_verbose_var_type.hpp>
+#include <stan/lang/generator/write_var_decl_type.hpp>
 #include <ostream>
 #include <vector>
+#include <string>
 
 namespace stan {
   namespace lang {
@@ -19,32 +21,42 @@ namespace stan {
      *
      * @param[in,out] o stream for generating
      */
-    std::string read_fn(const block_var_type& btype) {
-        std::stringstream ss;
-        if (btype.bare_type().is_double_type())
-          ss << "scalar";
-        else
-          ss << btype.name();
-        if (btype.has_def_bounds()) {
-          if (btype.bounds().has_low() && btype.bounds().has_high()) {
-            ss << "_lub_constrain(";
-            generate_expression(btype.bounds().low_.expr_, NOT_USER_FACING, ss);
+    std::string constrain_fn(const block_var_type& btype) {
+      std::stringstream ss;
+      if (btype.bare_type().is_double_type())
+        ss << "scalar";
+      else
+        ss << btype.name();
+      if (btype.has_def_bounds()) {
+        if (btype.bounds().has_low() && btype.bounds().has_high()) {
+          ss << "_lub_constrain(";
+          generate_expression(btype.bounds().low_.expr_, NOT_USER_FACING, ss);
+          ss << ", ";
+          generate_expression(btype.bounds().high_.expr_, NOT_USER_FACING, ss);
+          if (!is_nil(btype.arg1()))
             ss << ", ";
-            generate_expression(btype.bounds().high_.expr_, NOT_USER_FACING, ss);
+        } else if (btype.bounds().has_low()) {
+          ss << "_lb_constrain(";
+          generate_expression(btype.bounds().low_.expr_, NOT_USER_FACING, ss);
+          if (!is_nil(btype.arg1()))
             ss << ", ";
-          } else if (btype.bounds().has_low()) {
-            ss << "_lb_constrain(";
-            generate_expression(btype.bounds().low_.expr_, NOT_USER_FACING, ss);
-            ss << ", ";
-          } else {
-            ss << "_ub_constrain(";
-            generate_expression(btype.bounds().high_.expr_, NOT_USER_FACING, ss);
-            ss << ", ";
-          }
         } else {
-          ss << "_constrain(";
+          ss << "_ub_constrain(";
+          generate_expression(btype.bounds().high_.expr_, NOT_USER_FACING, ss);
+          if (!is_nil(btype.arg1()))
+            ss << ", ";
         }
-        return ss.str();
+      } else {
+        ss << "_constrain(";
+      }
+      if (!is_nil(btype.arg1())) {
+        generate_expression(btype.arg1(), NOT_USER_FACING, ss);
+      }
+      if (!is_nil(btype.arg2())) {
+        ss << ", ";
+        generate_expression(btype.arg2(), NOT_USER_FACING, ss);
+      }
+      return ss.str();
     }
 
     /**
@@ -66,7 +78,7 @@ namespace stan {
         << EOL2;
 
       // per-var init
-      for (size_t i = 0; i < vs.size(); ++i)
+      for (size_t i = 0; i < vs.size(); ++i) {
         // TODO:mitzi : generate runtime error?
         // parser should prevent this from happening
         // avoid generating code that won't compile - flag/ignore int params
@@ -78,69 +90,87 @@ namespace stan {
           continue;
         }
 
-        // setup - name, type, and var shape
+        // setup - name, type, and var shape, loop var names
         std::string var_name(vs[i].name());
         // unfold array type to get array element info
         block_var_type btype = (vs[i].type());
         if (btype.is_array_type())
           btype = btype.array_contains();
+
+        std::string cpp_type_str = get_verbose_var_type(btype.bare_type());
+        std::string constrain_str = constrain_fn(btype);
         // dimension sizes and type - array or matrix/vec rows, columns
         std::vector<expression> ar_lens(vs[i].type().array_lens());
-        expression arg1 = btype.arg1();
-        expression arg2 = btype.arg2();
-        // use parallel arrays of index names and limits for fill vals_r__ loop
+        // use parallel arrays of index names and limits for constraint loop
+        std::vector<std::string> dim_size_var_names;
         std::vector<std::string> idx_names;
-        std::vector<expression> limits;
-        int start_ar_idx = (!is_nil(arg2)) ? 2 : ((!is_nil(arg1)) ? 1 : 0);
-        if (start_ar_idx == 2) {
-          idx_names.push_back("j2__");
-          limits.push_back(arg2);
+        for (size_t k = 0; k < ar_lens.size(); ++k) {
+          std::stringstream ss;
+          ss << "dim" << var_name << "_" << k << "__";
+          dim_size_var_names.push_back(ss.str());
+          ss.str(std::string());
+          ss.clear();
+          ss << "k_" << k << "__";
+          idx_names.push_back(ss.str());
         }
-        if (start_ar_idx > 0) {
-          idx_names.push_back("j1__");
-          limits.push_back(arg1);
-        }
-        for (size_t i = ar_lens.size(); i > 0; --i) {
-          std::stringstream ss_name;
-          ss_name << "i" << i - 1 << "__";
-          idx_names.push_back(ss_name.str());
-          limits.push_back(ar_lens[i-1]);
-        }
+
         // generate declaration
         if (declare_vars) {
-          generate_indent(indent, o);
-          write_var_decl_type(btype.bare_type(), ar_lens.size(), indent, o);
+          write_var_decl_type(btype.bare_type(), cpp_type_str,
+                              ar_lens.size(), indent, o);
           o << " " << var_name << ";" << EOL;
         }
 
-        if (btype.bare_type.is_double_type())
-          // scalar param
+        if (!btype.bare_type().is_array_type())
           generate_void_statement(var_name, indent, o);
         else {
-          // for each dimension - 
-          // decl size_t
-          // reserve
-          // index
+          // dynamic initialization for array types
+           for (size_t k = 0; k < ar_lens.size(); ++k) {
+            // declare dim_size_var
+            generate_indent(indent + k, o);
+            o << "size_t " << dim_size_var_names[i] << " = ";
+            generate_expression(ar_lens[k], NOT_USER_FACING, o);
+            o << EOL;
+            // resize
+            generate_indent(indent + k, o);
+            o << var_name;
+            if (k > 0)
+              o << "[" << idx_names[k-1] << "]";
+            o << ".resize(" << dim_size_var_names[k] << ");" << EOL;
+            // open for loop
+            generate_indent(indent + k, o);
+            o << "for(size_t " << idx_names[k] << "; "
+              << idx_names[k] << " < " << dim_size_var_names[k]
+              << "; ++" << idx_names[k] << ") {" << EOL;
+          }
         }
-        // innermost dimension
-        generate_indent(indent, o);
+
+        // innermost dimension - apply constraint
+        generate_indent(indent + ar_lens.size(), o);
         o << "if (jacobian__)" << EOL;
-        // w Jacobian
-        generate_indent(indent + 1, o);
-        // generate var name
-        // generate index
-        // o << ".push_back(in__." << read_fn << ",lp__); << EOL
-        generate_indent(indent, o);
+        generate_indent(indent + ar_lens.size() + 1, o);
+        o << var_name;
+        for (size_t k = 1; k < ar_lens.size(); ++k)
+          o << "[" << idx_names[k-1] << "]";
+        o << ".push_back(in__." << constrain_str << ", lp__));" << EOL;
+        generate_indent(indent + ar_lens.size(), o);
         o << "else" << EOL;
         // w/o Jacobian
-        generate_indent(indent + 1, o);
-        // generate var name
-        // generate index
-        // o << ".push_back(in__." << read_fn << "); << EOL
+        generate_indent(indent + ar_lens.size() + 1, o);
+        o << var_name;
+        for (size_t k = 1; k < ar_lens.size(); ++k)
+          o << "[" << idx_names[k-1] << "]";
+        o << ".push_back(in__." << constrain_str << "));" << EOL;
 
+        // close brackets
+        for (size_t k = ar_lens.size(); k > 0; --k) {
+          generate_indent(indent + k - 1, o);
+          o << "}" << EOL << EOL;
+        }
+        o << EOL; 
       }
     }
-
+    
   }
 }
 #endif

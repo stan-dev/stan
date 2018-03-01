@@ -31,7 +31,7 @@ bool run_test(std::string& stan_code,
   return pass;
 }
 
-TEST(generateSetParamRanges, t1) {
+TEST(generateTransformInitsMethod, t1) {
   std::string input("real y;\n"
                     "real<lower=2.1, upper=2.9> z;\n");
   std::stringstream cpp_code;
@@ -39,7 +39,7 @@ TEST(generateSetParamRanges, t1) {
   EXPECT_TRUE(pass);
 }
 
-TEST(generateSetParamRanges, t2) {
+TEST(generateTransformInitsMethod, t2) {
   std::string input("matrix<lower=-7,upper=6>[3, 6] my_mat_mn;\n"
                     "matrix<upper=0>[2,4] d2_array_of_mat[8, 9];\n");
 
@@ -49,7 +49,7 @@ TEST(generateSetParamRanges, t2) {
   // TESTS?
 }
 
-TEST(generateSetParamRanges, t5) {
+TEST(generateTransformInitsMethod, t5) {
   std::string input("simplex[5] s5;\n"
                     "corr_matrix[5] cm5;\n");
 

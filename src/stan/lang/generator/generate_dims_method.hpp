@@ -34,15 +34,12 @@ namespace stan {
 
     void generate_var_dims(const block_var_decl& decl, std::ostream& o) {
       o << INDENT2 << "dims__.resize(0);" << EOL;
-      if (decl.type().bare_type().is_vector_type()
-          || decl.type().bare_type().is_row_type() ) {
+      if (!is_nil(decl.type().arg1())) {
         o << INDENT2 << "dims__.push_back(";
         generate_expression(decl.type().arg1(), NOT_USER_FACING, o);
         o << ");" << EOL;
-      } else if (decl.type().bare_type().is_matrix_type()) {
-        o << INDENT2 << "dims__.push_back(";
-        generate_expression(decl.type().arg1(), NOT_USER_FACING, o);
-        o << ");" << EOL;
+      }
+      if (!is_nil(decl.type().arg2())) {
         o << INDENT2 << "dims__.push_back(";
         generate_expression(decl.type().arg2(), NOT_USER_FACING, o);
         o << ");" << EOL;

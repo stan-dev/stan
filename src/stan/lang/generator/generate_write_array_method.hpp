@@ -10,9 +10,11 @@
 #include <stan/lang/generator/generate_try.hpp>
 #include <stan/lang/generator/generate_validate_var_decls.hpp>
 #include <stan/lang/generator/generate_void_statement.hpp>
+
 #include <stan/lang/generator/write_array_visgen.hpp>
 #include <stan/lang/generator/write_array_vars_visgen.hpp>
 #include <boost/variant/apply_visitor.hpp>
+
 #include <ostream>
 #include <string>
 

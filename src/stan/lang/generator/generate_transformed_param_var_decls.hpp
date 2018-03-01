@@ -1,5 +1,5 @@
-#ifndef STAN_LANG_GENERATOR_GENERATE_LOCAL_VAR_DECL_INITS_HPP
-#define STAN_LANG_GENERATOR_GENERATE_LOCAL_VAR_DECL_INITS_HPP
+#ifndef STAN_LANG_GENERATOR_GENERATE_TRANSFORMED_PARAM_VAR_DECLS_HPP
+#define STAN_LANG_GENERATOR_GENERATE_TRANSFORMED_PARAM_VAR_DECLS_HPP
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
@@ -14,7 +14,7 @@ namespace stan {
   namespace lang {
 
     /**
-     * Generate local variable declarations, including
+     * Generate transformed_param variable declarations, including
      * initializations, for the specified declarations, indentation
      * level, writing to the specified stream.
      * Generated code is preceeded by stmt updating global variable
@@ -25,7 +25,7 @@ namespace stan {
      * @param[in] indent indentation level
      * @param[in,out] o stream for generating
      */
-    void generate_local_var_decl_inits(const std::vector<local_var_decl>& vs, int indent,
+    void generate_transformed_param_var_decls(const std::vector<block_var_decl>& vs, int indent,
                                   std::ostream& o) {
       for (size_t i = 0; i < vs.size(); ++i) {
         generate_indent(indent, o);
@@ -36,20 +36,20 @@ namespace stan {
         std::vector<expression> ar_lens(vs[i].type().array_lens());
         std::string var_name(vs[i].name());
         // unfold array type to get array element info
-        local_var_type ltype = (vs[i].type());
+        block_var_type ltype = (vs[i].type());
         if (ltype.is_array_type())
           ltype = ltype.array_contains();
-        std::string cpp_type_str = get_verbose_var_type(ltype.bare_type());
 
         // validate dimensions before declaration
         for (int i = 1; i < ar_dims; ++i)
           generate_validate_positive(var_name, ar_lens[i], indent, o);
 
         // declare 
-        write_var_decl_type(ltype.bare_type(), cpp_type_str,
+        write_var_decl_type(ltype.bare_type(), 
+                            get_verbose_var_type(btype.bare_type()),
                             ar_dims, indent, o);
         o << " " << var_name;
-        write_var_decl_arg(ltype.bare_type(), cpp_type_str,
+        write_var_decl_arg(ltype.bare_type(),
                            ar_lens, ltype.arg1(), ltype.arg2(), o);
         o << ";" << EOL;
 
@@ -72,6 +72,14 @@ namespace stan {
           generate_expression(vs[i].def(), NOT_USER_FACING, o);
           o << ");" << EOL;
         }
+
+        // validate
+        // TODO:mitzi
+        // check initialized
+        // apply constraints
+        
+
+
       }
       o << EOL;
     }

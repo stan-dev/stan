@@ -7,14 +7,12 @@
 namespace stan {
   namespace lang {
     /**
-     * Return cpp type used for variable declarations.
+     * Return type string for variable type.
      *
      * @param[in] bare_expr_type bare_type
      */
     std::string
     get_verbose_var_type(const bare_expr_type bare_type) {
-
-      //TODO:mitzi  why not use cpp_typename instead?
 
       bare_expr_type bt(bare_type);
       if (bt.is_array_type())

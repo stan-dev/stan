@@ -30,8 +30,6 @@ namespace stan {
         << EOL;
       o << INDENT << "T__ log_prob(vector<T__>& params_r__,"
         << EOL;
-      o << INDENT << "             vector<int>& params_i__,"
-        << EOL;
       o << INDENT << "             std::ostream* pstream__ = 0) const {"
         << EOL2;
       o << INDENT2 << "typedef T__ local_scalar_t__;" << EOL2;
@@ -58,13 +56,13 @@ namespace stan {
       o << EOL;
 
       generate_comment("transformed parameters", 3, o);
-      //      generate_log_prob_var_decls(p.derived_decl_.first, 3, o);
-      generate_local_var_decl_inits(p.derived_decl_.first, 3, o);
+      generate_log_prob_var_decls(p.derived_decl_.first, 3, o);
       o << EOL;
 
       generate_statements(p.derived_decl_.second, 3, o);
       o << EOL;
 
+      generate_comment("validate transformed parameters", 3, o);
       generate_validate_transformed_params(p.derived_decl_.first, 3, o);
       o << INDENT3
         << "const char* function__ = \"validate transformed params\";"
@@ -96,10 +94,8 @@ namespace stan {
       o << INDENT << "  vec_params_r.reserve(params_r.size());" << EOL;
       o << INDENT << "  for (int i = 0; i < params_r.size(); ++i)" << EOL;
       o << INDENT << "    vec_params_r.push_back(params_r(i));" << EOL;
-      o << INDENT << "  std::vector<int> vec_params_i;" << EOL;
       o << INDENT
-        << "  return log_prob<propto,jacobian,T_>(vec_params_r, "
-        << "vec_params_i, pstream);" << EOL;
+        << "  return log_prob<propto,jacobian,T_>(vec_params_r, pstream);" << EOL;
       o << INDENT << "}" << EOL2;
     }
 

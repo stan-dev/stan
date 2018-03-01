@@ -31,7 +31,7 @@ bool run_test(std::string& stan_code,
   return pass;
 }
 
-TEST(generateBlockVarInits, t1) {
+TEST(generateValidateVarDecls, t1) {
   std::string input("int N;\n"
                     "real y;\n"
                     "real<lower=2.1, upper=2.9> z;\n");
@@ -41,7 +41,7 @@ TEST(generateBlockVarInits, t1) {
   // TESTS:  1 bounded decl
 }
 
-TEST(generateBlockVarInits, t2) {
+TEST(generateValidateVarDecls, t2) {
   std::string input("int<lower=0> N;\n"
                     "int<lower=0> M;\n"
                     "int<lower=0> I;\n"
@@ -56,7 +56,7 @@ TEST(generateBlockVarInits, t2) {
   // TESTS?
 }
 
-TEST(generateBlockVarInits, t3) {
+TEST(generateValidateVarDecls, t3) {
   std::string input("vector<upper=0.001>[5] c[10,20,30];");
 
   std::stringstream cpp_code;
@@ -65,7 +65,7 @@ TEST(generateBlockVarInits, t3) {
   // TESTS?
 }
 
-TEST(generateBlockVarInits, t4) {
+TEST(generateValidateVarDecls, t4) {
   std::string input("matrix<lower=0.0, upper=1.0>[1,2] x;\n"
                     "matrix<lower=0.0, upper=1.0>[1,2] y[5,6];\n");
 
@@ -75,7 +75,7 @@ TEST(generateBlockVarInits, t4) {
   // TESTS?
 }
 
-TEST(generateBlockVarInits, t5) {
+TEST(generateValidateVarDecls, t5) {
   std::string input("simplex[5] s5;\n"
                     "corr_matrix[5] cm5;\n");
 

@@ -31,7 +31,7 @@ bool run_test(std::string& stan_code,
   return pass;
 }
 
-TEST(generateLocalVarInits, t1) {
+TEST(generateLocalVarDecls, t1) {
   std::string input("int N;\n"
                     "real y;\n");
   std::stringstream cpp_code;
@@ -40,7 +40,7 @@ TEST(generateLocalVarInits, t1) {
 
 }
 
-TEST(generateLocalVarInits, t2) {
+TEST(generateLocalVarDecls, t2) {
   std::string input("int N;\n"
                     "int x[N];\n"
                     "real y[N];\n");
@@ -50,7 +50,7 @@ TEST(generateLocalVarInits, t2) {
 
 }
 
-TEST(generateLocalVarInits, t3) {
+TEST(generateLocalVarDecls, t3) {
   std::string input("int N;\n"
                     "int M;\n"
                     "int I;\n"
@@ -65,7 +65,7 @@ TEST(generateLocalVarInits, t3) {
   // TESTS?
 }
 
-TEST(generateLocalVarInits, t4) {
+TEST(generateLocalVarDecls, t4) {
   std::string input("vector[5] a;\n"
                     "vector[5] b[2];\n"
                     "vector[5] c[10,20,30];\n");
@@ -75,7 +75,7 @@ TEST(generateLocalVarInits, t4) {
   // TESTS?
 }
 
-TEST(generateLocalVarInits, t5) {
+TEST(generateLocalVarDecls, t5) {
   std::string input("row_vector[5] a;\n"
                     "row_vector[5] b[2];\n"
                     "row_vector[5] c[10,20,30];\n");

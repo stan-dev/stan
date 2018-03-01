@@ -7,8 +7,9 @@
 #include <stan/lang/generator/generate_indent.hpp>
 #include <stan/lang/generator/generate_validate_context_size.hpp>
 #include <stan/lang/generator/get_typedef_var_type.hpp>
-#include <stan/lang/generator/write_param_decl_arg.hpp>
-#include <stan/lang/generator/write_param_decl_type.hpp>
+#include <stan/lang/generator/get_verbose_var_type.hpp>
+#include <stan/lang/generator/write_var_decl_type.hpp>
+#include <stan/lang/generator/write_var_decl_arg.hpp>
 #include <iostream>
 #include <ostream>
 #include <vector>
@@ -136,6 +137,7 @@ namespace stan {
         block_var_type btype = (vs[i].type());
         if (btype.is_array_type())
           btype = btype.array_contains();
+        std::string cpp_type_str = get_typedef_var_type(btype.bare_type());
         // dimension sizes and type - array or matrix/vec rows, columns
         std::vector<expression> ar_lens(vs[i].type().array_lens());
         expression arg1 = btype.arg1();
@@ -163,13 +165,18 @@ namespace stan {
         o << "current_statement_begin__ = " <<  vs[i].begin_line_ << ";"
           << EOL;
 
+
         // check context
         generate_indent(indent, o);
         o << "if (!(context__.contains_r(\""
           << var_name << "\")))" << EOL;
         generate_indent(indent + 1, o);
-        o << "throw std::runtime_error(\"variable "
-          << var_name << " missing\");" << EOL;
+        o << "stan::lang::rethrow_located("
+          << "std::runtime_error(std::string(\"Variable "
+          << var_name
+          << "missing\")), current_statement_begin__, prog_reader__());"
+          << EOL;
+        // init context position
         generate_indent(indent, o);
         o << "vals_r__ = context__.vals_r(\""
           << var_name << "\");" << EOL;
@@ -181,10 +188,11 @@ namespace stan {
                                        var_name, get_typedef_var_type(btype.bare_type()),
                                        ar_lens, btype.arg1(), btype.arg2());
         // declaration
-        write_param_decl_type(btype.bare_type(), ar_lens.size(), indent, o);
+        write_var_decl_type(btype.bare_type(), cpp_type_str,
+                            ar_lens.size(), indent, o);
         o << " " << var_name;
-        write_param_decl_arg(btype.bare_type(), ar_lens,
-                                btype.arg1(), btype.arg2(), o);
+        write_var_decl_arg(btype.bare_type(), cpp_type_str,
+                             ar_lens, btype.arg1(), btype.arg2(), o);
         o << ";" << EOL;
 
         // fill vals_r__ buffer loop

@@ -1,7 +1,7 @@
-#ifndef STAN_LANG_GENERATOR_WRITE_PARAM_DECL_ARG_HPP
-#define STAN_LANG_GENERATOR_WRITE_PARAM_DECL_ARG_HPP
+#ifndef STAN_LANG_GENERATOR_WRITE_VAR_DECL_ARG_HPP
+#define STAN_LANG_GENERATOR_WRITE_VAR_DECL_ARG_HPP
 
-#include <stan/lang/generator/get_typedef_var_type.hpp>
+#include <stan/lang/generator/get_verbose_var_type.hpp>
 #include <string>
 #include <ostream>
 
@@ -18,39 +18,44 @@ namespace stan {
      * so bare_type shouldn't be bare_array_type (or ill_formed_type).
      *
      * @param[in] bare_type
+     * @param[in] cpp_type_str generated cpp type
      * @param[in] ar_lens vector of sizes for each array dimension
      * @param[in] arg1 expression for size of first dim of vec/matrix (or nil)
      * @param[in] arg1 expression for size of second dim of matrix (or nil)
      * @param[in,out] o stream for generating
      */
     void
-    write_param_decl_arg(const bare_expr_type& bare_type,
-                    const std::vector<expression>& ar_lens,
-                    const expression& arg1,
-                    const expression& arg2,
-                    std::ostream& o){
+    write_var_decl_arg(const bare_expr_type& bare_type,
+                       const std::string& cpp_type_str,
+                       const std::vector<expression>& ar_lens,
+                       const expression& arg1,
+                       const expression& arg2,
+                       std::ostream& o){
+
+      bool ends_with_angle = 
+        cpp_type_str.at(cpp_type_str.length()-1) == '>';
 
       // innermost element initialization
-      std::string cpp_typename = get_typedef_var_type(bare_type);
       std::stringstream base_init;
-      if (bare_type.is_double_type()) {
-        base_init << "double(0)";
+      if (bare_type.is_int_type()) {
+        base_init << "(0)";
+      } else if (bare_type.is_double_type()) {
+        base_init << "(DUMMY_VAR__)";
       } else if (bare_type.is_vector_type()
                  || bare_type.is_row_vector_type()) {
-        base_init << cpp_typename << "(";
+        base_init << "(";
         generate_expression(arg1, NOT_USER_FACING, base_init);
         base_init << ")";
       } else if (bare_type.is_matrix_type()) {
-        base_init << cpp_typename << "(";
+        base_init << "(";
         generate_expression(arg1, NOT_USER_FACING, base_init);
         base_init << ", ";
         generate_expression(arg2, NOT_USER_FACING, base_init);
         base_init << ")";
       } else {
         // shouldn't get here
-        base_init << "0";
+        base_init << "()";
       }
-      
 
       // for array dimensions, init for each dimension is:
       // <size dim-n>, (n-1) nested vectors of cpp_decl_type
@@ -61,9 +66,9 @@ namespace stan {
         o << ", "; 
         for (int j = 0; j < ct; ++j)
           o << "vector<" ;
-        o << cpp_typename;
+        o << cpp_type_str;
         for (int j = 0; j < ct; ++j) {
-          if (j > 0)
+          if (j > 0 || ends_with_angle)
             o << " "; // maybe not needed for c++11
           o << ">" ;
         }
