@@ -4,6 +4,7 @@
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_indent.hpp>
+#include <stan/lang/generator/get_constrain_fn_prefix.hpp>
 #include <stan/lang/generator/get_verbose_var_type.hpp>
 #include <stan/lang/generator/write_var_decl_type.hpp>
 #include <ostream>
@@ -12,52 +13,6 @@
 
 namespace stan {
   namespace lang {
-
-    /**
-     * Generate the name of the read function together
-     * with expressions for the bounds parameters, if any
-     *
-     * NOTE: expecting that parser disallows integer params.
-     *
-     * @param[in,out] o stream for generating
-     */
-    std::string constrain_fn(const block_var_type& btype) {
-      std::stringstream ss;
-      if (btype.bare_type().is_double_type())
-        ss << "scalar";
-      else
-        ss << btype.name();
-      if (btype.has_def_bounds()) {
-        if (btype.bounds().has_low() && btype.bounds().has_high()) {
-          ss << "_lub_constrain(";
-          generate_expression(btype.bounds().low_.expr_, NOT_USER_FACING, ss);
-          ss << ", ";
-          generate_expression(btype.bounds().high_.expr_, NOT_USER_FACING, ss);
-          if (!is_nil(btype.arg1()))
-            ss << ", ";
-        } else if (btype.bounds().has_low()) {
-          ss << "_lb_constrain(";
-          generate_expression(btype.bounds().low_.expr_, NOT_USER_FACING, ss);
-          if (!is_nil(btype.arg1()))
-            ss << ", ";
-        } else {
-          ss << "_ub_constrain(";
-          generate_expression(btype.bounds().high_.expr_, NOT_USER_FACING, ss);
-          if (!is_nil(btype.arg1()))
-            ss << ", ";
-        }
-      } else {
-        ss << "_constrain(";
-      }
-      if (!is_nil(btype.arg1())) {
-        generate_expression(btype.arg1(), NOT_USER_FACING, ss);
-      }
-      if (!is_nil(btype.arg2())) {
-        ss << ", ";
-        generate_expression(btype.arg2(), NOT_USER_FACING, ss);
-      }
-      return ss.str();
-    }
 
     /**
      * Generate initializations for the specified log_prob variables,
@@ -98,7 +53,7 @@ namespace stan {
           btype = btype.array_contains();
 
         std::string cpp_type_str = get_verbose_var_type(btype.bare_type());
-        std::string constrain_str = constrain_fn(btype);
+        std::string constrain_str = get_constrain_fn_prefix(btype);
         // dimension sizes and type - array or matrix/vec rows, columns
         std::vector<expression> ar_lens(vs[i].type().array_lens());
         // use parallel arrays of index names and limits for constraint loop
@@ -116,19 +71,20 @@ namespace stan {
 
         // generate declaration
         if (declare_vars) {
-          write_var_decl_type(btype.bare_type(), cpp_type_str,
-                              ar_lens.size(), indent, o);
+          generate_indent(indent, o);
+          generate_bare_type(btype.bare_type(), cpp_type_str, o);
           o << " " << var_name << ";" << EOL;
         }
 
-        if (!btype.bare_type().is_array_type())
+        // void stmt or for loop for array types
+        if (ar_lens.size() == 0)
           generate_void_statement(var_name, indent, o);
         else {
           // dynamic initialization for array types
            for (size_t k = 0; k < ar_lens.size(); ++k) {
             // declare dim_size_var
             generate_indent(indent + k, o);
-            o << "size_t " << dim_size_var_names[i] << " = ";
+            o << "size_t " << dim_size_var_names[k] << " = ";
             generate_expression(ar_lens[k], NOT_USER_FACING, o);
             o << EOL;
             // resize
@@ -139,36 +95,39 @@ namespace stan {
             o << ".resize(" << dim_size_var_names[k] << ");" << EOL;
             // open for loop
             generate_indent(indent + k, o);
-            o << "for(size_t " << idx_names[k] << "; "
+            o << "for (size_t " << idx_names[k] << "; "
               << idx_names[k] << " < " << dim_size_var_names[k]
               << "; ++" << idx_names[k] << ") {" << EOL;
           }
         }
 
-        // innermost dimension - apply constraint
+        // constrain element
         generate_indent(indent + ar_lens.size(), o);
         o << "if (jacobian__)" << EOL;
+
         generate_indent(indent + ar_lens.size() + 1, o);
         o << var_name;
         for (size_t k = 1; k < ar_lens.size(); ++k)
           o << "[" << idx_names[k-1] << "]";
         o << ".push_back(in__." << constrain_str << ", lp__));" << EOL;
+
         generate_indent(indent + ar_lens.size(), o);
         o << "else" << EOL;
-        // w/o Jacobian
+
         generate_indent(indent + ar_lens.size() + 1, o);
         o << var_name;
         for (size_t k = 1; k < ar_lens.size(); ++k)
           o << "[" << idx_names[k-1] << "]";
         o << ".push_back(in__." << constrain_str << "));" << EOL;
 
-        // close brackets
+        // close for loop for array types
         for (size_t k = ar_lens.size(); k > 0; --k) {
           generate_indent(indent + k - 1, o);
-          o << "}" << EOL << EOL;
+          o << "}" << EOL;
         }
-        o << EOL; 
+        o << EOL;
       }
+      o << EOL;
     }
     
   }

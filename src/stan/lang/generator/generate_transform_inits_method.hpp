@@ -184,9 +184,9 @@ namespace stan {
         o << "pos__ = 0U;" << EOL;
         
         // validate dimensions before they get used in declaration
-        generate_validate_context_size(indent, o, "initialization",
-                                       var_name, get_typedef_var_type(btype.bare_type()),
-                                       ar_lens, btype.arg1(), btype.arg2());
+        generate_validate_context_size(vs[i], "parameter initialization",
+                                       indent, o);
+
         // declaration
         write_var_decl_type(btype.bare_type(), cpp_type_str,
                             ar_lens.size(), indent, o);

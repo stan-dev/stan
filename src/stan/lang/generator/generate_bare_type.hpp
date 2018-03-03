@@ -11,12 +11,14 @@ namespace stan {
 
     /**
      * Generate the basic type for the specified expression type
-     * without dimensions, using the specified scalar type string,
-     * writing to the specified stream.
+     * using the specified scalar type string and writing to
+     * the specified stream.
+     *
+     * Scalar type string is `local_scalar_t__` in log_prob method,
+     * `double` elsewhere.
      *
      * @param[in] t expression type
      * @param[in] scalar_t_name name of scalar type for double values
-     * and containers
      * @param[in] o stream for generating
      */
     void generate_bare_type(const bare_expr_type& t,
@@ -45,12 +47,12 @@ namespace stan {
       } else if (bt.is_row_vector_type()) {
         o << "Eigen::Matrix<"
           << scalar_t_name
-          << ", 1,Eigen::Dynamic>";
+          << ", 1, Eigen::Dynamic>";
         is_template_type = true;
       } else if (bt.is_matrix_type()) {
         o << "Eigen::Matrix<"
           << scalar_t_name
-          << ", Eigen::Dynamic,Eigen::Dynamic>";
+          << ", Eigen::Dynamic, Eigen::Dynamic>";
         is_template_type = true;
       } else if (bt.is_void_type()) {
         o << "void";

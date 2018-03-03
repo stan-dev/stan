@@ -5,13 +5,13 @@
 #include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_catch_throw_located.hpp>
 #include <stan/lang/generator/generate_comment.hpp>
-#include <stan/lang/generator/generate_log_prob_var_decls.hpp>
+#include <stan/lang/generator/generate_block_var_decls.hpp>
 #include <stan/lang/generator/generate_log_prob_var_inits.hpp>
 #include <stan/lang/generator/generate_statement.hpp>
 #include <stan/lang/generator/generate_statements.hpp>
 #include <stan/lang/generator/generate_try.hpp>
 #include <stan/lang/generator/generate_validate_transformed_params.hpp>
-#include <stan/lang/generator/generate_validate_var_decls.hpp>
+//#include <stan/lang/generator/generate_validate_var_decl.hpp>
 #include <ostream>
 
 namespace stan {
@@ -56,7 +56,7 @@ namespace stan {
       o << EOL;
 
       generate_comment("transformed parameters", 3, o);
-      generate_log_prob_var_decls(p.derived_decl_.first, 3, o);
+      generate_block_var_decls(p.derived_decl_.first, 3, o);
       o << EOL;
 
       generate_statements(p.derived_decl_.second, 3, o);
@@ -71,7 +71,7 @@ namespace stan {
         << "(void) function__;  // dummy to suppress unused var warning"
         << EOL;
 
-      generate_validate_var_decls(p.derived_decl_.first, 3, o);
+      //      generate_validate_var_decls(p.derived_decl_.first, 3, o);
 
       o << EOL;
       generate_comment("model body", 3, o);

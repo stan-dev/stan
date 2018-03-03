@@ -36,7 +36,7 @@ namespace stan {
       for (int i = 0; i < indent; ++i)
         o << INDENT;
       for (int i = 0; i < ar_dims; ++i)
-        o << "vector<";
+        o << "std::vector<";
       o << cpp_type_str;
       for (int i = 0; i < ar_dims; ++i) {
         if (ar_dims > 0 || ends_with_angle)

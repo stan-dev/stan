@@ -23,7 +23,7 @@ bool run_test(std::string& stan_code,
   std::cout << "\ntest.stan:" << std::endl;
   std::cout << stan_code << std::endl;
 
-  stan::lang::generate_block_var_inits(bvds, 1, cpp_code);
+  stan::lang::generate_data_var_inits(bvds, 1, cpp_code);
 
   std::cout << "test.hpp:" << std::endl;
   std::cout << cpp_code.str() << std::endl;
@@ -46,6 +46,8 @@ TEST(generateBlockVarInits, t2) {
                     "int M;\n"
                     "int I;\n"
                     "int J;\n"
+                    "real x;\n"
+                    "real y;\n"
                     "matrix[M, N] my_mat_mn;\n"
                     "matrix[M,N] d1_array_of_mat[I];\n"
                     "matrix[M,N] d2_array_of_mat[I, J];\n");

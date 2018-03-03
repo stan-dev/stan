@@ -4,14 +4,17 @@
 #include <stan/io/program_reader.hpp>
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
-#include <stan/lang/generator/generate_block_var_inits.hpp>
+#include <stan/lang/generator/generate_data_var_ctor.hpp>
+#include <stan/lang/generator/generate_data_var_init.hpp>
 #include <stan/lang/generator/generate_catch_throw_located.hpp>
 #include <stan/lang/generator/generate_comment.hpp>
-#include <stan/lang/generator/generate_data_block_var_inits.hpp>
 #include <stan/lang/generator/generate_set_param_ranges.hpp>
 #include <stan/lang/generator/generate_statements.hpp>
 #include <stan/lang/generator/generate_try.hpp>
-#include <stan/lang/generator/generate_validate_var_decls.hpp>
+#include <stan/lang/generator/generate_validate_context_size.hpp>
+#include <stan/lang/generator/generate_validate_var_decl.hpp>
+#include <stan/lang/generator/generate_validate_var_dims.hpp>
+#include <stan/lang/generator/generate_var_fill_define.hpp>
 #include <stan/lang/generator/generate_void_statement.hpp>
 #include <ostream>
 #include <string>
@@ -69,20 +72,53 @@ namespace stan {
         << EOL;
       o << INDENT2 << "(void) DUMMY_VAR__;  // suppress unused var warning"
         << EOL2;
-      o << INDENT2 << "// initialize member variables" << EOL;
+
       generate_try(2, o);
-      generate_data_block_var_inits(prog.data_decl_, 3, o);
-      o << EOL;
-      generate_comment("validate, data variables", 3, o);
-      generate_validate_var_decls(prog.data_decl_, 3, o);
-      generate_comment("initialize data variables", 3, o);
-      generate_block_var_inits(prog.derived_data_decl_.first, 3, o);
-      o << EOL;
+      generate_comment("initialize data block variables from context__", 3, o);
+      // todo:  bundle into single function
+      for (size_t i = 0; i < prog.data_decl_.size(); ++i) {
+        generate_indent(3, o);
+        o << "current_statement_begin__ = " <<  prog.data_decl_[i].begin_line_ << ";"
+          << EOL;
+        generate_validate_var_dims(prog.data_decl_[i], 3, o);
+        generate_validate_context_size(prog.data_decl_[i],
+                                       "data initialization", 3, o);
+        generate_data_var_ctor(prog.data_decl_[i], 3, o);
+        generate_data_var_init(prog.data_decl_[i], 3, o);
+        generate_validate_var_decl(prog.data_decl_[i], 3, o);
+        o << EOL;
+      }
+
+      generate_comment("initialize transformed data variables", 3, o);
+      // todo:  bundle into single function
+      for (size_t i = 0; i < prog.derived_data_decl_.first.size(); ++i) {
+        generate_indent(3, o);
+        o << "current_statement_begin__ = "
+          <<  prog.derived_data_decl_.first[i].begin_line_ << ";" << EOL;
+        generate_validate_var_dims(prog.derived_data_decl_.first[i], 3, o);
+        generate_data_var_ctor(prog.derived_data_decl_.first[i], 3, o);
+        generate_var_fill_define(prog.derived_data_decl_.first[i], 3, o);
+        o << EOL;
+      }
+
+      generate_comment("execute transformed data statements", 3, o);
       generate_statements(prog.derived_data_decl_.second, 3, o);
       o << EOL;
+
       generate_comment("validate transformed data", 3, o);
-      generate_validate_var_decls(prog.derived_data_decl_.first, 3, o);
+      // todo:  bundle into single function
+      for (size_t i = 0; i < prog.derived_data_decl_.first.size(); ++i) {
+        if (prog.derived_data_decl_.first[i].type().has_def_bounds()
+            || prog.derived_data_decl_.first[i].type().is_specialized()) {
+          generate_indent(3, o);
+          o << "current_statement_begin__ = "
+            <<  prog.derived_data_decl_.first[i].begin_line_ << ";" << EOL;
+          generate_validate_var_decl(prog.derived_data_decl_.first[i], 3, o);
+          o << EOL;
+        }
+      }
       o << EOL;
+
       generate_comment("validate, set parameter ranges", 3, o);
       generate_set_param_ranges(prog.parameter_decl_, 3, o);
       generate_catch_throw_located(2, o);

@@ -22,7 +22,10 @@ namespace stan {
       o << "current_statement_begin__ = " <<  line.begin_line_ << ";" << EOL;
     }
 
-    template void generate_line_number(const var_decl&,
+    template void generate_line_number(const block_var_decl&,
+                                       int indent, std::ostream& o);
+
+    template void generate_line_number(const local_var_decl&,
                                        int indent, std::ostream& o);
 
     template void generate_line_number(const statement&,

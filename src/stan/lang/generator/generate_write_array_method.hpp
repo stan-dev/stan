@@ -6,14 +6,12 @@
 #include <stan/lang/generator/generate_catch_throw_located.hpp>
 #include <stan/lang/generator/generate_comment.hpp>
 #include <stan/lang/generator/generate_local_var_decl_inits.hpp>
+#include <stan/lang/generator/generate_read_transform_params.hpp>
 #include <stan/lang/generator/generate_statements.hpp>
 #include <stan/lang/generator/generate_try.hpp>
-#include <stan/lang/generator/generate_validate_var_decls.hpp>
+//#include <stan/lang/generator/generate_validate_var_decl.hpp>
 #include <stan/lang/generator/generate_void_statement.hpp>
-
-#include <stan/lang/generator/write_array_visgen.hpp>
-#include <stan/lang/generator/write_array_vars_visgen.hpp>
-#include <boost/variant/apply_visitor.hpp>
+#include <stan/lang/generator/generate_write_array_vars.hpp>
 
 #include <ostream>
 #include <string>
@@ -50,64 +48,54 @@ namespace stan {
       o << INDENT2 << "static const char* function__ = \""
         << model_name << "_namespace::write_array\";" << EOL;
       generate_void_statement("function__", 2, o);
-
-      // declares, reads, and sets parameters
-      generate_comment("read-transform, write parameters", 2, o);
-      write_array_visgen vis(o);
-      for (size_t i = 0; i < prog.parameter_decl_.size(); ++i)
-        boost::apply_visitor(vis, prog.parameter_decl_[i].decl_);
-
-
-      // writes parameters
-      write_array_vars_visgen vis_writer(2, o);
-      for (size_t i = 0; i < prog.parameter_decl_.size(); ++i)
-        boost::apply_visitor(vis_writer, prog.parameter_decl_[i].decl_);
       o << EOL;
+      
+      generate_comment("read-transform, write parameters", 2, o);
+      generate_read_transform_params(prog.parameter_decl_, 2, o);
+      generate_write_array_vars(prog.parameter_decl_, 2, o);
 
       generate_comment("declare and define transformed parameters", 2, o);
       o << INDENT2 <<  "double lp__ = 0.0;" << EOL;
       generate_void_statement("lp__", 2, o);
       o << INDENT2 << "stan::math::accumulator<double> lp_accum__;" << EOL2;
-
       o << INDENT2
         << "local_scalar_t__ DUMMY_VAR__"
         << "(std::numeric_limits<double>::quiet_NaN());"
         << EOL;
       o << INDENT2 << "(void) DUMMY_VAR__;  // suppress unused var warning"
         << EOL2;
-
       generate_try(2, o);
-      generate_local_var_decl_inits(prog.derived_decl_.first, 3, o);
+      generate_block_var_decls(prog.derived_decl_.first, 3, o);
       o << EOL;
       generate_statements(prog.derived_decl_.second, 3, o);
       o << EOL;
 
       generate_comment("validate transformed parameters", 3, o);
-      generate_validate_var_decls(prog.derived_decl_.first, 3, o);
+      //      generate_validate_var_decls(prog.derived_decl_.first, 3, o);
       o << EOL;
 
       generate_comment("write transformed parameters", 3, o);
       o << INDENT3 << "if (include_tparams__) {" << EOL;
-      for (size_t i = 0; i < prog.derived_decl_.first.size(); ++i)
-        boost::apply_visitor(vis_writer, prog.derived_decl_.first[i].decl_);
+      generate_write_array_vars(prog.derived_decl_.first, 4, o);
       o << INDENT3 << "}" << EOL;
 
       o << INDENT3 << "if (!include_gqs__) return;"
         << EOL;
       generate_comment("declare and define generated quantities", 3, o);
-      generate_local_var_decl_inits(prog.generated_decl_.first, 3, o);
+      generate_member_var_decls(prog.generated_decl_.first, 3, o);
+      generate_block_var_decls(prog.generated_decl_.first, 3, o);
 
+      generate_comment("generated quantities statements", 2, o);
       o << EOL;
       generate_statements(prog.generated_decl_.second, 3, o);
       o << EOL;
 
       generate_comment("validate generated quantities", 3, o);
-      generate_validate_var_decls(prog.generated_decl_.first, 3, o);
+      //      generate_validate_var_decls(prog.generated_decl_.first, 3, o);
       o << EOL;
 
       generate_comment("write generated quantities", 3, o);
-      for (size_t i = 0; i < prog.generated_decl_.first.size(); ++i)
-        boost::apply_visitor(vis_writer, prog.generated_decl_.first[i].decl_);
+      generate_write_array_vars(prog.generated_decl_.first, 3, o);
       if (prog.generated_decl_.first.size() > 0)
         o << EOL;
       generate_catch_throw_located(2, o);

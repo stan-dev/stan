@@ -23,7 +23,7 @@ bool run_test(std::string& stan_code,
   std::cout << "\ntest.stan:" << std::endl;
   std::cout << stan_code << std::endl;
 
-  stan::lang::generate_log_prob_var_decls(bvds, 2, cpp_code);
+  stan::lang::generate_read_transform_params(bvds, 1, cpp_code);
 
   std::cout << "test.hpp:" << std::endl;
   std::cout << cpp_code.str() << std::endl;
@@ -31,7 +31,7 @@ bool run_test(std::string& stan_code,
   return pass;
 }
 
-TEST(generateLogProbVarDecls, t1) {
+TEST(generateTransformInitsMethod, t1) {
   std::string input("real y;\n"
                     "real<lower=2.1, upper=2.9> z;\n");
   std::stringstream cpp_code;
@@ -39,10 +39,9 @@ TEST(generateLogProbVarDecls, t1) {
   EXPECT_TRUE(pass);
 }
 
-TEST(generateLogProbVarDecls, t2) {
+TEST(generateTransformInitsMethod, t2) {
   std::string input("matrix<lower=-7,upper=6>[3, 6] my_mat_mn;\n"
-                    "matrix<upper=0>[2,4] d2_array_of_mat[8, 9];\n"
-                    "matrix<upper=0>[2,4] d3_array_of_mat[7, 8, 9];\n");
+                    "matrix<upper=0>[2,4] d2_array_of_mat[8, 9];\n");
 
   std::stringstream cpp_code;
   bool pass = run_test(input, cpp_code);
@@ -50,7 +49,7 @@ TEST(generateLogProbVarDecls, t2) {
   // TESTS?
 }
 
-TEST(generateLogProbVarDecls, t5) {
+TEST(generateTransformInitsMethod, t5) {
   std::string input("simplex[5] s5;\n"
                     "corr_matrix[5] cm5;\n");
 

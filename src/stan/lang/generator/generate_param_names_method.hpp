@@ -22,14 +22,14 @@ namespace stan {
         << EOL;
       o << INDENT2 << "names__.resize(0);" << EOL;
       for (size_t i = 0; i < prog.parameter_decl_.size(); ++i)
-        o_ << INDENT2 << "names__.push_back(\""
+        o << INDENT2 << "names__.push_back(\""
            << prog.parameter_decl_[i].name() << "\");" << EOL;
       for (size_t i = 0; i < prog.derived_decl_.first.size(); ++i)
-        o_ << INDENT2 << "names__.push_back(\""
+        o << INDENT2 << "names__.push_back(\""
            << prog.derived_decl_.first[i].name() << "\");" << EOL;
       for (size_t i = 0; i < prog.generated_decl_.first.size(); ++i)
-        o_ << INDENT2 << "names__.push_back(\""
-           << prog.generated_decl_.first[i].name() << "\");" << EOL;
+        o << INDENT2 << "names__.push_back(\""
+          << prog.generated_decl_.first[i].name() << "\");" << EOL;
       o << INDENT << "}" << EOL2;
     }
 
