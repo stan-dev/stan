@@ -57,7 +57,6 @@ parse_program(std::string& input,
               std::ostream& err_msgs) {
   pass = false;
 
-  std::cout << "parsing: " << std::endl << input << std::endl;
   std::istringstream istr(input);
   std::vector<std::string> search_path;
   search_path.push_back("foo");  

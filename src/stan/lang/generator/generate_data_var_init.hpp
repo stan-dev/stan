@@ -5,6 +5,9 @@
 #include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_expression.hpp>
 #include <stan/lang/generator/generate_indent.hpp>
+#include <stan/lang/generator/write_nested_for_loop_end.hpp>
+#include <stan/lang/generator/write_nested_read_loop_begin.hpp>
+#include <stan/lang/generator/write_nested_read_loop_var.hpp>
 #include <iostream>
 #include <ostream>
 #include <vector>
@@ -31,32 +34,23 @@ namespace stan {
 
       // setup - name, type, and var shape
       std::string var_name(var_decl.name());
-      // unfold array type to get array element info
       block_var_type btype = (var_decl.type());
       if (btype.is_array_type())
         btype = btype.array_contains();
-      // dimension sizes and type - array or matrix/vec rows, columns
       std::vector<expression> ar_lens(var_decl.type().array_lens());
       expression arg1 = btype.arg1();
       expression arg2 = btype.arg2();
-      // use parallel arrays of index names and limits for read loop
-      std::vector<std::string> idx_names;
-      std::vector<expression> limits;
-      size_t start_ar_idx = (!is_nil(arg2)) ? 2 : ((!is_nil(arg1)) ? 1 : 0);
-      if (start_ar_idx == 2) {
-        idx_names.push_back("j_2__");
-        limits.push_back(arg2);
-      }
-      if (start_ar_idx > 0) {
-        idx_names.push_back("j_1__");
-        limits.push_back(arg1);
-      }
-      for (size_t i = ar_lens.size(); i > 0; --i) {
-        std::stringstream ss_name;
-        ss_name << "k_" << i - 1 << "__";
-        idx_names.push_back(ss_name.str());
-        limits.push_back(ar_lens[i - 1]);
-      }
+
+      // combine all dimension sizes in column major order
+      std::vector<expression> dims;
+      size_t num_args = (!is_nil(arg2)) ? 2 : ((!is_nil(arg1)) ? 1 : 0);
+      if (num_args == 2) 
+        dims.push_back(arg2);
+      if (num_args > 0)
+        dims.push_back(arg1);
+      for (size_t i = ar_lens.size(); i > 0; --i)
+        dims.push_back(ar_lens[i - 1]);
+
       std::string vals("vals_r");
       if (btype.bare_type().is_int_type())
         vals = "vals_i";
@@ -65,37 +59,16 @@ namespace stan {
       o << vals << "__ = context__." << vals << "(\"" << var_name << "\");" << EOL;
       generate_indent(indent, o);
       o << "pos__ = 0;" << EOL;
+      
+      write_nested_read_loop_begin(dims, num_args, indent, o);
 
-      // nested for stmts open
-      int indentation = indent;
-      for (size_t i = 0; i < limits.size(); ++i) {
-        generate_indent(indentation, o);
-        o << "for (size_t " << idx_names[i] << " = 0; "
-          << idx_names[i] << " < ";
-        generate_expression(limits[i], NOT_USER_FACING, o);
-        o << "; ++" << idx_names[i] << ") {" << EOL;
-        indentation++;                                    
-      }               
-      // innermost assign - update pos__
-      generate_indent(indentation, o);
-      o << var_name;
-      // array idxs
-      for (size_t i = limits.size(); i > start_ar_idx; --i)
-        o << "[" << idx_names[i-1] << "]";
-      if (start_ar_idx == 2) {
-        o << "(" << idx_names[1] << ", " << idx_names[0] << ")";
-      } else if (start_ar_idx == 1) {
-        o << "(" << idx_names[0] << ")";
-      }
+      // innermost loop stmt: update pos__
+      write_nested_read_loop_var(var_name, ar_lens.size(),
+                                 num_args, indent, o);
       o << " = " << vals << "__[pos__++]; " << EOL;
 
-      // nested close
-      for (size_t i = 0; i < limits.size(); ++i) {
-        indentation--;                                    
-        generate_indent(indentation, o);
-        o << "}" << EOL;
-      }        
-    }
+      write_nested_for_loop_end(dims.size(), indent, o);
+    }        
 
   }
 }

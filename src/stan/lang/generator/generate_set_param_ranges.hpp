@@ -27,8 +27,6 @@ namespace stan {
                                    int indent, std::ostream& o) {
       generate_indent(indent, o);
       o << "num_params_r__ = 0U;" << EOL;
-      generate_indent(indent, o);
-      o << "param_ranges_i__.clear();" << EOL;
 
       for (size_t i = 0; i < var_decls.size(); ++i) {
         generate_indent(indent, o);

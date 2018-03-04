@@ -23,6 +23,12 @@
 #include <stan/lang/generator/get_constrain_fn_prefix.hpp>
 #include <stan/lang/generator/get_block_var_dims.hpp>
 
+#include <stan/lang/generator/write_nested_for_loop_begin.hpp>
+#include <stan/lang/generator/write_nested_for_loop_end.hpp>
+#include <stan/lang/generator/write_nested_for_loop_var.hpp>
+#include <stan/lang/generator/write_nested_read_loop_begin.hpp>
+#include <stan/lang/generator/write_nested_read_loop_var.hpp>
+
 #include <stan/lang/generator/write_var_decl_arg.hpp>
 #include <stan/lang/generator/write_var_decl_type.hpp>
 
