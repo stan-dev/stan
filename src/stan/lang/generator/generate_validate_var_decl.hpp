@@ -35,7 +35,7 @@ namespace stan {
         btype = btype.array_contains();
 
       if (btype.has_def_bounds()) {
-        write_nested_for_loop_begin(ar_lens, indent, o);
+        write_nested_for_loop_begin(var_name, ar_lens, indent, o);
         range bounds = btype.bounds();
         if (bounds.has_low()) {
           generate_indent(indent + ar_lens.size(), o);
@@ -61,7 +61,7 @@ namespace stan {
         }
         write_nested_for_loop_end(ar_lens.size(), indent, o);
       } else if (btype.is_specialized()) {
-        write_nested_for_loop_begin(ar_lens, indent, o);
+        write_nested_for_loop_begin(var_name, ar_lens, indent, o);
         generate_indent(indent + ar_lens.size(), o);
         o << "stan::math::check_" << btype.name() << "(function__, ";
         o << "\"";

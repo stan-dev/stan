@@ -30,20 +30,19 @@ namespace stan {
           generate_expression(btype.bounds().low_.expr_, NOT_USER_FACING, ss);
           ss << ", ";
           generate_expression(btype.bounds().high_.expr_, NOT_USER_FACING, ss);
-          ss << ", ";
         } else if (btype.bounds().has_low()) {
           ss << "_lb_constrain(";
           generate_expression(btype.bounds().low_.expr_, NOT_USER_FACING, ss);
-          ss << ", ";
         } else {
           ss << "_ub_constrain(";
           generate_expression(btype.bounds().high_.expr_, NOT_USER_FACING, ss);
-          ss << ", ";
         }
       } else {
         ss << "_constrain(";
       }
       if (!is_nil(btype.arg1())) {
+        if (btype.has_def_bounds())
+          ss << ", ";
         generate_expression(btype.arg1(), NOT_USER_FACING, ss);
       }
       if (btype.name() == "matrix" || btype.name() == "cholesky_factor_cov") {

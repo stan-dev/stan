@@ -28,9 +28,6 @@ namespace stan {
     void generate_log_prob_var_inits(std::vector<block_var_decl> vs,
                                      bool declare_vars,
                                      int indent, std::ostream& o) {
-      generate_indent(indent, o);
-      o << "stan::io::reader<local_scalar_t__> in__(params_r__);"
-        << EOL2;
 
       // per-var init
       for (size_t i = 0; i < vs.size(); ++i) {

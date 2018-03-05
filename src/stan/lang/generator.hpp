@@ -8,7 +8,6 @@
 #include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/fun_scalar_type.hpp>
 
-#include <stan/lang/generator/generate_data_var_ctor.hpp>
 #include <stan/lang/generator/generate_data_var_init.hpp>
 #include <stan/lang/generator/generate_param_names_array.hpp>
 #include <stan/lang/generator/generate_var_constructor.hpp>
@@ -28,6 +27,7 @@
 #include <stan/lang/generator/write_nested_for_loop_var.hpp>
 #include <stan/lang/generator/write_nested_read_loop_begin.hpp>
 #include <stan/lang/generator/write_nested_read_loop_var.hpp>
+#include <stan/lang/generator/write_nested_resize_loop_begin.hpp>
 
 #include <stan/lang/generator/write_var_decl_arg.hpp>
 #include <stan/lang/generator/write_var_decl_type.hpp>

@@ -3,10 +3,11 @@
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
+#include <stan/lang/generator/generate_bare_type.hpp>
 #include <stan/lang/generator/generate_catch_throw_located.hpp>
 #include <stan/lang/generator/generate_comment.hpp>
 #include <stan/lang/generator/generate_block_var_decls.hpp>
-#include <stan/lang/generator/generate_log_prob_var_inits.hpp>
+#include <stan/lang/generator/generate_param_var_init.hpp>
 #include <stan/lang/generator/generate_statement.hpp>
 #include <stan/lang/generator/generate_statements.hpp>
 #include <stan/lang/generator/generate_try.hpp>
@@ -24,7 +25,7 @@ namespace stan {
      * @param p program
      * @param o stream for generating
      */
-    void generate_log_prob(const program& p, std::ostream& o) {
+    void generate_log_prob(const program& prog, std::ostream& o) {
       o << EOL;
       o << INDENT << "template <bool propto__, bool jacobian__, typename T__>"
         << EOL;
@@ -51,33 +52,43 @@ namespace stan {
 
       generate_try(2, o);
 
+      generate_indent(2, o);
+      o << "stan::io::reader<local_scalar_t__> in__(params_r__);" << EOL;
+      o << EOL;
+
       generate_comment("model parameters", 3, o);
-      generate_log_prob_var_inits(p.parameter_decl_, gen_local_vars, 3, o);
-      o << EOL;
+      //      generate_log_prob_var_inits(prog.parameter_decl_, gen_local_vars, 3, o);
+      for (size_t i = 0; i < prog.parameter_decl_.size(); ++i) {
+        generate_indent(3, o);
+        o << "current_statement_begin__ = " <<  prog.parameter_decl_[i].begin_line_ << ";"
+          << EOL;
+        generate_param_var_init(prog.parameter_decl_[i], gen_local_vars, 3, o);
+        o << EOL;
+      }
 
-      generate_comment("transformed parameters", 3, o);
-      generate_block_var_decls(p.derived_decl_.first, 3, o);
-      o << EOL;
+      // generate_comment("transformed parameters", 3, o);
+      // generate_block_var_decls(prog.derived_decl_.first, 3, o);
+      // o << EOL;
 
-      generate_statements(p.derived_decl_.second, 3, o);
-      o << EOL;
+      // generate_statements(prog.derived_decl_.second, 3, o);
+      // o << EOL;
 
-      generate_comment("validate transformed parameters", 3, o);
-      generate_validate_transformed_params(p.derived_decl_.first, 3, o);
-      o << INDENT3
-        << "const char* function__ = \"validate transformed params\";"
-        << EOL;
-      o << INDENT3
-        << "(void) function__;  // dummy to suppress unused var warning"
-        << EOL;
+      // generate_comment("validate transformed parameters", 3, o);
+      // generate_validate_transformed_params(prog.derived_decl_.first, 3, o);
+      // o << INDENT3
+      //   << "const char* function__ = \"validate transformed params\";"
+      //   << EOL;
+      // o << INDENT3
+      //   << "(void) function__;  // dummy to suppress unused var warning"
+      //   << EOL;
 
-      //      generate_validate_var_decls(p.derived_decl_.first, 3, o);
+      //      generate_validate_var_decls(prog.derived_decl_.first, 3, o);
 
-      o << EOL;
-      generate_comment("model body", 3, o);
+      // o << EOL;
+      // generate_comment("model body", 3, o);
 
-      generate_statement(p.statement_, 3, o);
-      o << EOL;
+      // generate_statement(prog.statement_, 3, o);
+      // o << EOL;
       generate_catch_throw_located(2, o);
 
       o << EOL;

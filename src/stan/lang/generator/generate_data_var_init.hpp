@@ -60,7 +60,7 @@ namespace stan {
       generate_indent(indent, o);
       o << "pos__ = 0;" << EOL;
       
-      write_nested_read_loop_begin(dims, num_args, indent, o);
+      write_nested_read_loop_begin(var_name, dims, num_args, indent, o);
 
       // innermost loop stmt: update pos__
       write_nested_read_loop_var(var_name, ar_lens.size(),
