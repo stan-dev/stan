@@ -1,5 +1,5 @@
-#ifndef STAN_LANG_GENERATOR_WRITE_NESTED_READ_LOOP_BEGIN_HPP
-#define STAN_LANG_GENERATOR_WRITE_NESTED_READ_LOOP_BEGIN_HPP
+#ifndef STAN_LANG_GENERATOR_WRITE_BEGIN_ALL_DIMS_COL_MAJ_LOOP_HPP
+#define STAN_LANG_GENERATOR_WRITE_BEGIN_ALL_DIMS_COL_MAJ_LOOP_HPP
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
@@ -26,9 +26,10 @@ namespace stan {
      * @param[in] indent indentation level
      * @param[in,out] o stream for generating
      */
-    void write_nested_read_loop_begin(const std::string& name,
-                                      const std::vector<expression>& dims,
-                                      size_t num_args, int indent, std::ostream& o)
+    void write_begin_all_dims_col_maj_loop(const std::string& name,
+                                           const std::vector<expression>& dims,
+                                           size_t num_args,
+                                           int indent, std::ostream& o)
     {
       // declare row, col dimension indexes size_t var j_<n>_max__
       for (size_t i = 0; i < num_args; ++i) {

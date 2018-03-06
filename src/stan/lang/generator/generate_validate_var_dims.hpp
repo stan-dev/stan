@@ -25,6 +25,10 @@ namespace stan {
       std::string name(var_decl.name());
       expression arg1(var_decl.type().arg1());
       expression arg2(var_decl.type().arg2());
+      if (var_decl.type().is_array_type()) {
+        arg1 = var_decl.type().array_contains().arg1();
+        arg2 = var_decl.type().array_contains().arg2();
+      }
       std::vector<expression> ar_var_dims = var_decl.type().array_lens();
 
       if (!is_nil(arg1))

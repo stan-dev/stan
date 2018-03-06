@@ -24,12 +24,12 @@ namespace stan {
       else if (bare_type.is_double_type())
         o << real_var_type;
       else if (bare_type.is_vector_type())
-        o << "Eigen::Matrix<" << real_var_type << ",Eigen::Dynamic,1> ";
+        o << "Eigen::Matrix<" << real_var_type << ", Eigen::Dynamic, 1> ";
       else if (bare_type.is_row_vector_type())
-        o << "Eigen::Matrix<" << real_var_type << ",1,Eigen::Dynamic> ";
+        o << "Eigen::Matrix<" << real_var_type << ", 1, Eigen::Dynamic> ";
       else if (bare_type.is_matrix_type())
         o << "Eigen::Matrix<" << real_var_type
-          << ",Eigen::Dynamic,Eigen::Dynamic> ";
+          << ", Eigen::Dynamic, Eigen::Dynamic> ";
     }
 
   }

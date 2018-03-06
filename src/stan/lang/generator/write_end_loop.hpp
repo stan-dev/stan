@@ -1,12 +1,10 @@
-#ifndef STAN_LANG_GENERATOR_WRITE_NESTED_FOR_LOOP_END_ARG_HPP
-#define STAN_LANG_GENERATOR_WRITE_NESTED_FOR_LOOP_END_ARG_HPP
+#ifndef STAN_LANG_GENERATOR_WRITE_END_LOOP_HPP
+#define STAN_LANG_GENERATOR_WRITE_END_LOOP_HPP
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
-#include <stan/lang/generator/generate_expression.hpp>
 #include <stan/lang/generator/generate_indent.hpp>
 #include <ostream>
-#include <vector>
 
 namespace stan {
   namespace lang {
@@ -19,8 +17,8 @@ namespace stan {
      * @param[in] indent indentation level
      * @param[in,out] o stream for generating
      */
-    void write_nested_for_loop_end(size_t dims_size,
-                                    int indent, std::ostream& o) {
+    void write_end_loop(size_t dims_size,
+                                   int indent, std::ostream& o) {
       for (size_t i = dims_size; i > 0; --i) {
         generate_indent(indent + i - 1, o);
         o << "}" << EOL;

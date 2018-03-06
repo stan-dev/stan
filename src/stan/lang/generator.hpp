@@ -13,6 +13,7 @@
 #include <stan/lang/generator/generate_var_constructor.hpp>
 #include <stan/lang/generator/generate_var_decl.hpp>
 #include <stan/lang/generator/generate_var_fill_define.hpp>
+#include <stan/lang/generator/generate_validate_tparam_inits.hpp>
 #include <stan/lang/generator/generate_validate_var_decl.hpp>
 #include <stan/lang/generator/generate_validate_var_dims.hpp>
 #include <stan/lang/generator/generate_param_names_array.hpp>
@@ -22,12 +23,15 @@
 #include <stan/lang/generator/get_constrain_fn_prefix.hpp>
 #include <stan/lang/generator/get_block_var_dims.hpp>
 
-#include <stan/lang/generator/write_nested_for_loop_begin.hpp>
-#include <stan/lang/generator/write_nested_for_loop_end.hpp>
-#include <stan/lang/generator/write_nested_for_loop_var.hpp>
+#include <stan/lang/generator/write_begin_all_dims_col_maj_loop.hpp>
+#include <stan/lang/generator/write_begin_all_dims_row_maj_loop.hpp>
+#include <stan/lang/generator/write_begin_array_dims_loop.hpp>
+#include <stan/lang/generator/write_end_loop.hpp>
 #include <stan/lang/generator/write_nested_read_loop_begin.hpp>
-#include <stan/lang/generator/write_nested_read_loop_var.hpp>
 #include <stan/lang/generator/write_nested_resize_loop_begin.hpp>
+#include <stan/lang/generator/write_var_idx_all_dims.hpp>
+#include <stan/lang/generator/write_var_idx_all_dims_msg.hpp>
+#include <stan/lang/generator/write_var_idx_array_dims.hpp>
 
 #include <stan/lang/generator/write_var_decl_arg.hpp>
 #include <stan/lang/generator/write_var_decl_type.hpp>
@@ -93,7 +97,7 @@
 #include <stan/lang/generator/generate_initializer.hpp>
 #include <stan/lang/generator/generate_line_number.hpp>
 #include <stan/lang/generator/generate_local_var_decl_inits.hpp>
-#include <stan/lang/generator/generate_log_prob_var_inits.hpp>
+//#include <stan/lang/generator/generate_log_prob_var_inits.hpp>
 #include <stan/lang/generator/generate_log_prob.hpp>
 #include <stan/lang/generator/generate_member_var_decls.hpp>
 #include <stan/lang/generator/generate_member_var_decls_all.hpp>

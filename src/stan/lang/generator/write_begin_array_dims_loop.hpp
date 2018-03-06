@@ -1,5 +1,5 @@
-#ifndef STAN_LANG_GENERATOR_WRITE_NESTED_FOR_LOOP_BEGIN_ARG_HPP
-#define STAN_LANG_GENERATOR_WRITE_NESTED_FOR_LOOP_BEGIN_ARG_HPP
+#ifndef STAN_LANG_GENERATOR_WRITE_BEGIN_ARRAY_DIMS_LOOP_HPP
+#define STAN_LANG_GENERATOR_WRITE_BEGIN_ARRAY_DIMS_LOOP_HPP
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
@@ -23,7 +23,7 @@ namespace stan {
      * @param[in] indent indentation level
      * @param[in,out] o stream for generating
      */
-    void write_nested_for_loop_begin(const std::string& name,
+    void write_begin_array_dims_loop(const std::string& name,
                                      const std::vector<expression>& dims,
                                      int indent, std::ostream& o) {
       // declare size_t var k_<n>_max__

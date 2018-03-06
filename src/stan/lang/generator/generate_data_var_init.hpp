@@ -5,9 +5,9 @@
 #include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_expression.hpp>
 #include <stan/lang/generator/generate_indent.hpp>
-#include <stan/lang/generator/write_nested_for_loop_end.hpp>
+#include <stan/lang/generator/write_end_loop.hpp>
 #include <stan/lang/generator/write_nested_read_loop_begin.hpp>
-#include <stan/lang/generator/write_nested_read_loop_var.hpp>
+#include <stan/lang/generator/write_var_idx_all_dims.hpp>
 #include <iostream>
 #include <ostream>
 #include <vector>
@@ -63,11 +63,12 @@ namespace stan {
       write_nested_read_loop_begin(var_name, dims, num_args, indent, o);
 
       // innermost loop stmt: update pos__
-      write_nested_read_loop_var(var_name, ar_lens.size(),
-                                 num_args, indent, o);
+      generate_indent(indent + dims.size(), o);
+      o << var_name;
+      write_var_idx_all_dims(ar_lens.size(), num_args, o);
       o << " = " << vals << "__[pos__++]; " << EOL;
 
-      write_nested_for_loop_end(dims.size(), indent, o);
+      write_end_loop(dims.size(), indent, o);
     }        
 
   }

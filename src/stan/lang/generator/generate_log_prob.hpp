@@ -7,9 +7,10 @@
 #include <stan/lang/generator/generate_catch_throw_located.hpp>
 #include <stan/lang/generator/generate_comment.hpp>
 #include <stan/lang/generator/generate_block_var_decls.hpp>
-#include <stan/lang/generator/generate_param_var_init.hpp>
+#include <stan/lang/generator/generate_param_var.hpp>
 #include <stan/lang/generator/generate_statement.hpp>
 #include <stan/lang/generator/generate_statements.hpp>
+#include <stan/lang/generator/generate_tparam_var.hpp>
 #include <stan/lang/generator/generate_try.hpp>
 #include <stan/lang/generator/generate_validate_transformed_params.hpp>
 //#include <stan/lang/generator/generate_validate_var_decl.hpp>
@@ -57,38 +58,59 @@ namespace stan {
       o << EOL;
 
       generate_comment("model parameters", 3, o);
-      //      generate_log_prob_var_inits(prog.parameter_decl_, gen_local_vars, 3, o);
       for (size_t i = 0; i < prog.parameter_decl_.size(); ++i) {
         generate_indent(3, o);
         o << "current_statement_begin__ = " <<  prog.parameter_decl_[i].begin_line_ << ";"
           << EOL;
-        generate_param_var_init(prog.parameter_decl_[i], gen_local_vars, 3, o);
+        generate_param_var(prog.parameter_decl_[i], gen_local_vars, 3, o);
         o << EOL;
       }
 
-      // generate_comment("transformed parameters", 3, o);
-      // generate_block_var_decls(prog.derived_decl_.first, 3, o);
-      // o << EOL;
+      if (prog.derived_decl_.first.size() > 0) {
+        generate_comment("transformed parameters", 3, o);
+        for (size_t i = 0; i < prog.derived_decl_.first.size(); ++i) {
+          generate_indent(3, o);
+          o << "current_statement_begin__ = " <<  prog.derived_decl_.first[i].begin_line_ << ";"
+            << EOL;
+          generate_tparam_var(prog.derived_decl_.first[i], 3, o);
+          o << EOL;
+        }
+      }
+      
+      if (prog.derived_decl_.second.size() > 0) {
+        generate_comment("transformed parameters block statements", 3, o);
+        generate_statements(prog.derived_decl_.second, 3, o);
+        o << EOL;
+      }
+      
+      if (prog.derived_decl_.first.size() > 0) {
+        generate_comment("validate transformed parameters", 3, o);
+        o << INDENT3
+          << "const char* function__ = \"validate transformed params\";"
+          << EOL;
+        o << INDENT3
+          << "(void) function__;  // dummy to suppress unused var warning"
+          << EOL;
+        o << EOL;
 
-      // generate_statements(prog.derived_decl_.second, 3, o);
-      // o << EOL;
+        for (size_t i = 0; i < prog.derived_decl_.first.size(); ++i) {
+          if (prog.derived_decl_.first[i].type().has_def_bounds()
+              || prog.derived_decl_.first[i].type().is_specialized()) {
+            generate_indent(3, o);
+            o << "current_statement_begin__ = "
+              <<  prog.derived_decl_.first[i].begin_line_ << ";" << EOL;
+            generate_validate_tparam_inits(prog.derived_decl_.first[i], 3, o);
+            generate_validate_var_decl(prog.derived_decl_.first[i], 3, o);
+            o << EOL;
+          }
+        }
+        o << EOL;
+      }      
 
-      // generate_comment("validate transformed parameters", 3, o);
-      // generate_validate_transformed_params(prog.derived_decl_.first, 3, o);
-      // o << INDENT3
-      //   << "const char* function__ = \"validate transformed params\";"
-      //   << EOL;
-      // o << INDENT3
-      //   << "(void) function__;  // dummy to suppress unused var warning"
-      //   << EOL;
+      generate_comment("model body", 3, o);
+      generate_statement(prog.statement_, 3, o);
+      o << EOL;
 
-      //      generate_validate_var_decls(prog.derived_decl_.first, 3, o);
-
-      // o << EOL;
-      // generate_comment("model body", 3, o);
-
-      // generate_statement(prog.statement_, 3, o);
-      // o << EOL;
       generate_catch_throw_located(2, o);
 
       o << EOL;

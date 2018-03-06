@@ -42,7 +42,7 @@ namespace stan {
       } else if (bt.is_vector_type()) {
         o << "Eigen::Matrix<"
           << scalar_t_name
-          << ", Eigen::Dynamic,1>";
+          << ", Eigen::Dynamic, 1>";
         is_template_type = true;
       } else if (bt.is_row_vector_type()) {
         o << "Eigen::Matrix<"

@@ -1,13 +1,15 @@
-#ifndef STAN_LANG_GENERATOR_GENERATE_PARAM_VAR_INIT_HPP
-#define STAN_LANG_GENERATOR_GENERATE_PARAM_VAR_INIT_HPP
+#ifndef STAN_LANG_GENERATOR_GENERATE_PARAM_VAR_HPP
+#define STAN_LANG_GENERATOR_GENERATE_PARAM_VAR_HPP
 
 #include <stan/lang/ast.hpp>
+#include <stan/lang/generator/generate_bare_type.hpp>
 #include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_expression.hpp>
 #include <stan/lang/generator/generate_indent.hpp>
-#include <stan/lang/generator/write_nested_for_loop_end.hpp>
-#include <stan/lang/generator/write_nested_for_loop_var.hpp>
+#include <stan/lang/generator/get_constrain_fn_prefix.hpp>
+#include <stan/lang/generator/write_end_loop.hpp>
 #include <stan/lang/generator/write_nested_resize_loop_begin.hpp>
+#include <stan/lang/generator/write_var_idx_array_dims.hpp>
 #include <iostream>
 #include <ostream>
 #include <vector>
@@ -25,9 +27,9 @@ namespace stan {
      * @param[in] indent indentation level
      * @param[in,out] o stream for generating
      */
-    void generate_param_var_init(const block_var_decl& var_decl,
-                                 bool gen_decl_stmt,
-                                 int indent, std::ostream& o) {
+    void generate_param_var(const block_var_decl& var_decl,
+                            bool gen_decl_stmt,
+                            int indent, std::ostream& o) {
 
       // setup - name, type, and var shape
       std::string var_name(var_decl.name());
@@ -58,7 +60,8 @@ namespace stan {
 
       generate_indent(indent + dims.size() + 1, o);
       if (dims.size() > 0) {
-        write_nested_for_loop_var(var_name, dims.size() - 1, indent, o);
+        o << var_name;
+        write_var_idx_array_dims(dims.size() - 1, o);
         o << ".push_back(in__." << constrain_str << lp_arg << ");" << EOL;
       }
       else {
@@ -70,14 +73,15 @@ namespace stan {
 
       generate_indent(indent + dims.size() + 1, o);
       if (dims.size() > 0) {
-        write_nested_for_loop_var(var_name, dims.size() - 1, indent, o);
+        o << var_name;
+        write_var_idx_array_dims(dims.size() - 1, o);
         o << ".push_back(in__." << constrain_str << "));" << EOL;
       }
       else {
         o << var_name << " = in__." << constrain_str << ");" << EOL;
       }
       
-      write_nested_for_loop_end(dims.size(), indent, o);
+      write_end_loop(dims.size(), indent, o);
     }        
 
   }

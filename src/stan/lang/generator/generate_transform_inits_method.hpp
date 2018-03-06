@@ -92,7 +92,7 @@ namespace stan {
         << "void transform_inits(const stan::io::var_context& context," << EOL;
       o << INDENT
         << "                     "
-        << "Eigen::Matrix<double,Eigen::Dynamic,1>& params_r," << EOL;
+        << "Eigen::Matrix<double, Eigen::Dynamic, 1>& params_r," << EOL;
       o << INDENT
         << "                     std::ostream* pstream__) const {" << EOL;
       o << INDENT << "  std::vector<double> params_r_vec;" << EOL;

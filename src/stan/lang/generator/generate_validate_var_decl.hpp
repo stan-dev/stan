@@ -5,9 +5,9 @@
 #include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_expression.hpp>
 #include <stan/lang/generator/generate_indent.hpp>
-#include <stan/lang/generator/write_nested_for_loop_begin.hpp>
-#include <stan/lang/generator/write_nested_for_loop_end.hpp>
-#include <stan/lang/generator/write_nested_for_loop_var.hpp>
+#include <stan/lang/generator/write_begin_array_dims_loop.hpp>
+#include <stan/lang/generator/write_end_loop.hpp>
+#include <stan/lang/generator/write_var_idx_array_dims.hpp>
 #include <ostream>
 #include <vector>
 
@@ -35,15 +35,15 @@ namespace stan {
         btype = btype.array_contains();
 
       if (btype.has_def_bounds()) {
-        write_nested_for_loop_begin(var_name, ar_lens, indent, o);
         range bounds = btype.bounds();
+        write_begin_array_dims_loop(var_name, ar_lens, indent, o);
         if (bounds.has_low()) {
           generate_indent(indent + ar_lens.size(), o);
           o << "check_greater_or_equal(function__, ";
-          o << "\"";
-          write_nested_for_loop_var(var_name, ar_lens.size(), indent, o);
-          o << "\", ";
-          write_nested_for_loop_var(var_name, ar_lens.size(), indent, o);
+          o << "\"" << var_name;
+          write_var_idx_array_dims(ar_lens.size(), o);
+          o << "\", " << var_name;
+          write_var_idx_array_dims(ar_lens.size(), o);
           o << ", ";
           generate_expression(bounds.low_.expr_, NOT_USER_FACING, o);
           o << ");" << EOL;
@@ -51,25 +51,25 @@ namespace stan {
         if (bounds.has_high()) {
           generate_indent(indent + ar_lens.size(), o);
           o << "check_less_or_equal(function__, ";
-          o << "\"";
-          write_nested_for_loop_var(var_name, ar_lens.size(), indent, o);
-          o << "\", ";
-          write_nested_for_loop_var(var_name, ar_lens.size(), indent, o);
+          o << "\"" << var_name;
+          write_var_idx_array_dims(ar_lens.size(), o);
+          o << "\", " << var_name;
+          write_var_idx_array_dims(ar_lens.size(), o);
           o << ", ";
           generate_expression(bounds.high_.expr_, NOT_USER_FACING, o);
           o << ");" << EOL;
         }
-        write_nested_for_loop_end(ar_lens.size(), indent, o);
+        write_end_loop(ar_lens.size(), indent, o);
       } else if (btype.is_specialized()) {
-        write_nested_for_loop_begin(var_name, ar_lens, indent, o);
+        write_begin_array_dims_loop(var_name, ar_lens, indent, o);
         generate_indent(indent + ar_lens.size(), o);
         o << "stan::math::check_" << btype.name() << "(function__, ";
-        o << "\"";
-        write_nested_for_loop_var(var_name, ar_lens.size(), indent, o);
-        o << "\", ";
-        write_nested_for_loop_var(var_name, ar_lens.size(), indent, o);
+        o << "\"" << var_name;
+        write_var_idx_array_dims(ar_lens.size(), o);
+        o << "\", " << var_name;
+        write_var_idx_array_dims(ar_lens.size(), o);
         o << ");" << EOL;
-        write_nested_for_loop_end(ar_lens.size(), indent, o);
+        write_end_loop(ar_lens.size(), indent, o);
       }
     }
   }
