@@ -1,5 +1,5 @@
-#ifndef STAN_LANG_GENERATOR_GET_CONSTRAIN_FN_PREFIX_HPP
-#define STAN_LANG_GENERATOR_GET_CONSTRAIN_FN_PREFIX_HPP
+#ifndef STAN_LANG_GENERATOR_WRITE_CONSTRAINTS_FN_HPP
+#define STAN_LANG_GENERATOR_WRITE_CONSTRAINTS_FN_HPP
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
@@ -12,13 +12,17 @@ namespace stan {
     /**
      * Generate the name of the constrain function together
      * with expressions for the bounds parameters, if any.
+     * Constrain and unconstrain functions both take bounds
+     * constrain function also needs row, column size args.
      *
      * NOTE: expecting that parser disallows integer params.
      *
      * @param[in] btype block var type
+     * @param[in] fn_name either "constrain" or "unconstrain"
      */
-    std::string
-    get_constrain_fn_prefix(const block_var_type& btype) {
+    std::string write_constraints_fn(const block_var_type& btype,
+                                   std::string fn_name) {
+      bool constrain = fn_name.compare("constrain") == 0;
       std::stringstream ss;
       if (btype.bare_type().is_double_type())
         ss << "scalar";
@@ -26,20 +30,22 @@ namespace stan {
         ss << btype.name();
       if (btype.has_def_bounds()) {
         if (btype.bounds().has_low() && btype.bounds().has_high()) {
-          ss << "_lub_constrain(";
+          ss << "_lub_" << fn_name << "(";
           generate_expression(btype.bounds().low_.expr_, NOT_USER_FACING, ss);
           ss << ", ";
           generate_expression(btype.bounds().high_.expr_, NOT_USER_FACING, ss);
         } else if (btype.bounds().has_low()) {
-          ss << "_lb_constrain(";
+          ss << "_lb_" << fn_name << "(";
           generate_expression(btype.bounds().low_.expr_, NOT_USER_FACING, ss);
         } else {
-          ss << "_ub_constrain(";
+          ss << "_ub_" << fn_name << "(";
           generate_expression(btype.bounds().high_.expr_, NOT_USER_FACING, ss);
         }
       } else {
-        ss << "_constrain(";
+        ss << "_" << fn_name << "(";
       }
+      if (!constrain) return ss.str();
+
       if (!is_nil(btype.arg1())) {
         if (btype.has_def_bounds())
           ss << ", ";

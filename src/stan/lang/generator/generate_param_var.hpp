@@ -6,7 +6,7 @@
 #include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_expression.hpp>
 #include <stan/lang/generator/generate_indent.hpp>
-#include <stan/lang/generator/get_constrain_fn_prefix.hpp>
+#include <stan/lang/generator/write_constraints_fn.hpp>
 #include <stan/lang/generator/write_end_loop.hpp>
 #include <stan/lang/generator/write_nested_resize_loop_begin.hpp>
 #include <stan/lang/generator/write_var_idx_array_dims.hpp>
@@ -33,13 +33,13 @@ namespace stan {
 
       // setup - name, type, and var shape
       std::string var_name(var_decl.name());
+      std::vector<expression> dims(var_decl.type().array_lens());
+
       block_var_type btype = (var_decl.type());
       if (btype.is_array_type())
         btype = btype.array_contains();
 
-      std::string constrain_str = get_constrain_fn_prefix(btype);
-      std::vector<expression> dims(var_decl.type().array_lens());
-      // add comma before lp__ arg to constrain function?
+      std::string constrain_str = write_constraints_fn(btype, "constrain");
       std::string lp_arg("lp__)");
       if (btype.has_def_bounds() || !btype.bare_type().is_double_type())
         lp_arg= ", lp__)";

@@ -8,6 +8,7 @@
 #include <stan/lang/generator/generate_validate_context_size.hpp>
 #include <stan/lang/generator/get_typedef_var_type.hpp>
 #include <stan/lang/generator/get_verbose_var_type.hpp>
+#include <stan/lang/generator/write_constraints_fn.hpp>
 #include <stan/lang/generator/write_var_decl_type.hpp>
 #include <stan/lang/generator/write_var_decl_arg.hpp>
 #include <iostream>
@@ -17,42 +18,6 @@
 
 namespace stan {
   namespace lang {
-
-    /**
-     * Generate the name of the unconstrain function together
-     * with expressions for the bounds parameters, if any
-     *
-     * NOTE: expecting that parser disallows integer params.
-     *
-     * @param[in,out] o stream for generating
-     */
-    std::string unconstrain_fn(const block_var_type& btype) {
-        std::stringstream ss;
-        if (btype.bare_type().is_double_type())
-          ss << "scalar";
-        else
-          ss << btype.name();
-        if (btype.has_def_bounds()) {
-          if (btype.bounds().has_low() && btype.bounds().has_high()) {
-            ss << "_lub_unconstrain(";
-            generate_expression(btype.bounds().low_.expr_, NOT_USER_FACING, ss);
-            ss << ", ";
-            generate_expression(btype.bounds().high_.expr_, NOT_USER_FACING, ss);
-            ss << ", ";
-          } else if (btype.bounds().has_low()) {
-            ss << "_lb_unconstrain(";
-            generate_expression(btype.bounds().low_.expr_, NOT_USER_FACING, ss);
-            ss << ", ";
-          } else {
-            ss << "_ub_unconstrain(";
-            generate_expression(btype.bounds().high_.expr_, NOT_USER_FACING, ss);
-            ss << ", ";
-          }
-        } else {
-          ss << "_unconstrain(";
-        }
-        return ss.str();
-    }
 
     /**
      * Generate the <code>transform_inits</code> method declaration
@@ -137,34 +102,23 @@ namespace stan {
         block_var_type btype = (vs[i].type());
         if (btype.is_array_type())
           btype = btype.array_contains();
-        std::string cpp_type_str = get_typedef_var_type(btype.bare_type());
-        // dimension sizes and type - array or matrix/vec rows, columns
+
         std::vector<expression> ar_lens(vs[i].type().array_lens());
         expression arg1 = btype.arg1();
         expression arg2 = btype.arg2();
-        // use parallel arrays of index names and limits for fill vals_r__ loop
-        std::vector<std::string> idx_names;
-        std::vector<expression> limits;
-        int start_ar_idx = (!is_nil(arg2)) ? 2 : ((!is_nil(arg1)) ? 1 : 0);
-        if (start_ar_idx == 2) {
-          idx_names.push_back("j2__");
-          limits.push_back(arg2);
-        }
-        if (start_ar_idx > 0) {
-          idx_names.push_back("j1__");
-          limits.push_back(arg1);
-        }
-        for (size_t i = ar_lens.size(); i > 0; --i) {
-          std::stringstream ss_name;
-          ss_name << "i" << i - 1 << "__";
-          idx_names.push_back(ss_name.str());
-          limits.push_back(ar_lens[i-1]);
-        }
 
+        // combine all dimension sizes in column major order
+        std::vector<expression> dims;
+        size_t num_args = (!is_nil(arg2)) ? 2 : ((!is_nil(arg1)) ? 1 : 0);
+        if (num_args == 2) 
+          dims.push_back(arg2);
+        if (num_args > 0)
+          dims.push_back(arg1);
+        for (size_t i = ar_lens.size(); i > 0; --i)
+          dims.push_back(ar_lens[i - 1]);
         generate_indent(indent, o);
         o << "current_statement_begin__ = " <<  vs[i].begin_line_ << ";"
           << EOL;
-
 
         // check context
         generate_indent(indent, o);
@@ -188,47 +142,34 @@ namespace stan {
                                        indent, o);
 
         // declaration
-        write_var_decl_type(btype.bare_type(), cpp_type_str,
-                            ar_lens.size(), indent, o);
+        generate_indent(indent, o);
+        generate_bare_type(vs[i].type().bare_type(), "local_scalar_t__", o);
         o << " " << var_name;
-        write_var_decl_arg(btype.bare_type(), cpp_type_str,
-                             ar_lens, btype.arg1(), btype.arg2(), o);
-        o << ";" << EOL;
+        if (vs[i].type().num_dims() == 0) {
+          o << ";" << EOL;
+        } else {
+          o << "(";
+          generate_initializer(vs[i].type(), "local_scalar_t__", o);
+          o << ");" << EOL;
+        }        
 
-        // fill vals_r__ buffer loop
-        // indexes innermost scalar element of (array of) matrix/vec types
-        for (size_t i = 0; i < idx_names.size(); ++i) {
-          generate_indent(indent + i, o);
-          o << "for (int " << idx_names[i] << " = 0U; "
-            << idx_names[i] << " < ";
-          generate_expression(limits[i], NOT_USER_FACING, o);
-          o << "; ++" << idx_names[i] << ")" << EOL;
-        }
-        // fill vals_r__ stmt
-        generate_indent(indent + idx_names.size(), o);
+        // fill vals_r__ loop
+        write_begin_all_dims_col_maj_loop(var_name, dims, num_args,
+                                          indent, o);
+        generate_indent(indent + dims.size(), o);
         o << var_name;
-        for (size_t i = start_ar_idx; i < idx_names.size(); ++i)
-          o << "[" << idx_names[i] << "]";
-        if (start_ar_idx == 2)
-          o << "(j1__,j2__)";
-        else if (start_ar_idx == 1)
-          o << "(j1__)";
+        write_var_idx_all_dims(ar_lens.size(), num_args, o);
         o << " = vals_r__[pos__++];" << EOL;
-          
-        // write loop for each array element (if array var)
-        for (size_t i = 0; i < ar_lens.size(); ++i) {
-          generate_indent(indent + i, o);
-          o << "for (int i" << i << "__ = 0U; i" << i << "__ < ";
-          generate_expression(ar_lens[i], NOT_USER_FACING, o);
-          o << "; __" << i << "__)" << EOL;
-        }
-        // generate call to unconstrain fn in try/catch block
+        write_end_loop(dims.size(), indent, o);
+
+        // unconstrain var contents
+        write_begin_array_dims_loop(var_name, ar_lens, indent, o);
         generate_indent(indent, o);
         o << "try {" << EOL;
         generate_indent(indent + 1, o);
-        o << "writer__." << unconstrain_fn(btype) << var_name;
-        for (size_t i = 0; i < ar_lens.size(); ++i) 
-          o << "[i" << i << "__]";
+        o << "writer__." << write_constraints_fn(btype, "unconstrain")
+          << var_name;
+        write_var_idx_array_dims(ar_lens.size(), o);
         o << ");" << EOL;
         generate_indent(indent, o);
         o << "} catch (const std::exception& e) {" << EOL;
@@ -245,9 +186,10 @@ namespace stan {
           << "(\"*** IF YOU SEE THIS, PLEASE REPORT A BUG ***\");"
           << EOL;
         generate_indent(indent, o);
-        o << "}" << EOL << EOL;
+        o << "}" << EOL;
+        write_end_loop(ar_lens.size(), indent, o);
+        o << EOL;
       }
-
       generate_method_end(o);
     }
 

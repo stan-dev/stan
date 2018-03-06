@@ -3,7 +3,7 @@
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
-#include <stan/lang/generator/get_constrain_fn_prefix.hpp>
+#include <stan/lang/generator/write_constraints_fn.hpp>
 #include <ostream>
 #include <string>
 
@@ -52,7 +52,7 @@ namespace stan {
                             ar_lens.size(), indent, o);
         o << " " << var_name;
         if (ar_lens.size() == 0) {
-          o << " = " << get_constrain_fn_prefix(btype) << ");" << EOL;
+          o << " = " << write_constraints_fn(btype, "constrain") << ");" << EOL;
         } else {
           o << ";" << EOL;
           // open for loop: declare dim var, (resize)
@@ -83,7 +83,7 @@ namespace stan {
           for (size_t k = 1; k < ar_lens.size(); ++k)
             o << "[" << idx_names[k-1] << "]";
           o << ".push_back(in__." 
-            << get_constrain_fn_prefix(btype)
+            << write_constraints_fn(btype, "constrain")
             << "));" << EOL;
 
           // close for loop

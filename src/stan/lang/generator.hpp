@@ -20,12 +20,12 @@
 
 #include <stan/lang/generator/get_typedef_var_type.hpp>
 #include <stan/lang/generator/get_verbose_var_type.hpp>
-#include <stan/lang/generator/get_constrain_fn_prefix.hpp>
 #include <stan/lang/generator/get_block_var_dims.hpp>
 
 #include <stan/lang/generator/write_begin_all_dims_col_maj_loop.hpp>
 #include <stan/lang/generator/write_begin_all_dims_row_maj_loop.hpp>
 #include <stan/lang/generator/write_begin_array_dims_loop.hpp>
+#include <stan/lang/generator/write_constraints_fn.hpp>
 #include <stan/lang/generator/write_end_loop.hpp>
 #include <stan/lang/generator/write_nested_read_loop_begin.hpp>
 #include <stan/lang/generator/write_nested_resize_loop_begin.hpp>
