@@ -62,6 +62,7 @@ namespace stan {
         return std::sqrt(variance(x));
       }
 
+
       static double covariance(const Eigen::VectorXd& x,
                                const Eigen::VectorXd& y,
                                std::ostream* err = 0) {
@@ -76,7 +77,7 @@ namespace stan {
         accumulator_set<double, stats<covariance<double, covariate1> > > acc;
 
         int M = std::min(x.size(), y.size());
-        for (int i = 0; i < M; ++i)
+        for (int i = 0; i < M; i++)
           acc(x(i), boost::accumulators::covariate1 = y(i));
 
         return boost::accumulators::covariance(acc) * M / (M-1);
@@ -98,7 +99,7 @@ namespace stan {
         accumulator_set<double, stats<variance> > acc_y;
 
         int M = std::min(x.size(), y.size());
-        for (int i = 0; i < M; ++i) {
+        for (int i = 0; i < M; i++) {
           acc_xy(x(i), boost::accumulators::covariate1 = y(i));
           acc_y(y(i));
         }
@@ -126,13 +127,13 @@ namespace stan {
         if (prob < 0.5) {
           accumulator_set<double, stats<tail_quantile<left> > >
             acc(tail<left>::cache_size = cache_size);
-          for (int i = 0; i < M; ++i)
+          for (int i = 0; i < M; i++)
             acc(x(i));
           return quantile(acc, quantile_probability = prob);
         }
         accumulator_set<double, stats<tail_quantile<right> > >
           acc(tail<right>::cache_size = cache_size);
-        for (int i = 0; i < M; ++i)
+        for (int i = 0; i < M; i++)
           acc(x(i));
         return quantile(acc, quantile_probability = prob);
       }
@@ -157,13 +158,13 @@ namespace stan {
         accumulator_set<double, stats<tail_quantile<right> > >
           acc_right(tail<right>::cache_size = cache_size);
 
-        for (int i = 0; i < M; ++i) {
+        for (int i = 0; i < M; i++) {
           acc_left(x(i));
           acc_right(x(i));
         }
 
         Eigen::VectorXd q(probs.size());
-        for (int i = 0; i < probs.size(); ++i) {
+        for (int i = 0; i < probs.size(); i++) {
           if (probs(i) < 0.5)
             q(i) = quantile(acc_left,
                             quantile_probability = probs(i));
@@ -181,12 +182,12 @@ namespace stan {
 
         std::vector<double> ac;
         std::vector<double> sample(x.size());
-        for (int i = 0; i < x.size(); ++i)
+        for (int i = 0; i < x.size(); i++)
           sample[i] = x(i);
         math::autocorrelation(sample, ac);
 
         Eigen::VectorXd ac2(ac.size());
-        for (idx_t i = 0; i < ac.size(); ++i)
+        for (idx_t i = 0; i < ac.size(); i++)
           ac2(i) = ac[i];
         return ac2;
       }
@@ -198,12 +199,12 @@ namespace stan {
 
         std::vector<double> ac;
         std::vector<double> sample(x.size());
-        for (int i = 0; i < x.size(); ++i)
+        for (int i = 0; i < x.size(); i++)
           sample[i] = x(i);
         math::autocovariance(sample, ac);
 
         Eigen::VectorXd ac2(ac.size());
-        for (idx_t i = 0; i < ac.size(); ++i)
+        for (idx_t i = 0; i < ac.size(); i++)
           ac2(i) = ac[i];
         return ac2;
       }
@@ -213,11 +214,13 @@ namespace stan {
        * across all kept samples.
        *
        * See more details in Stan reference manual section "Effective
-       * Sample Size".
-       * http://mc-stan.org/users/documentation
+       * Sample Size". http://mc-stan.org/users/documentation
        *
-       * @param 2 dimensional Eigen matrix, number chains by number samples
-       * @return Effective sample size for the specified parameter
+       * Current implementation takes the minimum number of samples
+       * across chains as the number of samples per chain.
+       *
+       * @param 2 dimensional matrix of samples num draws by num chains
+       * @return effective sample size for the specified parameter
        */
       double effective_sample_size(const Eigen::Matrix<Eigen::VectorXd,
                                    Dynamic, 1> &samples) const {
@@ -225,19 +228,19 @@ namespace stan {
 
         // need to generalize to each jagged samples per chain
         int n_samples = samples(0).size();
-        for (int chain = 1; chain < chains; ++chain) {
+        for (int chain = 1; chain < chains; chain++) {
           n_samples = std::min(n_samples,
                                static_cast<int>(samples(chain).size()));
         }
 
         Eigen::Matrix<Eigen::VectorXd, Dynamic, 1> acov(chains);
-        for (int chain = 0; chain < chains; ++chain) {
-          acov(chain) = autocovariance(samples(chain));
+        for (int chain = 0; chain < chains; chain++) {
+          math::autocovariance<double>(samples(chain), acov(chain));
         }
 
         Eigen::VectorXd chain_mean(chains);
         Eigen::VectorXd chain_var(chains);
-        for (int chain = 0; chain < chains; ++chain) {
+        for (int chain = 0; chain < chains; chain++) {
           double n_kept_samples = num_kept_samples(chain);
           chain_mean(chain) = mean(samples(chain));
           chain_var(chain) = acov(chain)(0)*n_kept_samples/(n_kept_samples-1);
@@ -247,40 +250,42 @@ namespace stan {
         double var_plus = mean_var*(n_samples-1)/n_samples;
         if (chains > 1)
           var_plus += variance(chain_mean);
-        Eigen::VectorXd rho_hat(n_samples);
-        rho_hat.setZero();
+        Eigen::VectorXd rho_hat_t(n_samples);
+        rho_hat_t.setZero();
         Eigen::VectorXd acov_t(chains);
-        for (int chain = 0; chain < chains; ++chain)
+        for (int chain = 0; chain < chains; chain++)
           acov_t(chain) = acov(chain)(1);
         double rho_hat_even = 1;
         double rho_hat_odd = 1 - (mean_var - mean(acov_t)) / var_plus;
-        rho_hat(1) = rho_hat_odd;
+        rho_hat_t(1) = rho_hat_odd;
         // Geyer's initial positive sequence
         int max_t = 1;
         for (int t = 1;
              (t < (n_samples - 2) && (rho_hat_even + rho_hat_odd) >= 0);
              t += 2) {
-          for (int chain = 0; chain < chains; ++chain)
+          for (int chain = 0; chain < chains; chain++)
             acov_t(chain) = acov(chain)(t + 1);
           rho_hat_even = 1 - (mean_var - mean(acov_t)) / var_plus;
-          for (int chain = 0; chain < chains; ++chain)
+          for (int chain = 0; chain < chains; chain++)
             acov_t(chain) = acov(chain)(t + 2);
           rho_hat_odd = 1 - (mean_var - mean(acov_t)) / var_plus;
           if ((rho_hat_even + rho_hat_odd) >= 0) {
-            rho_hat(t + 1) = rho_hat_even;
-            rho_hat(t + 2) = rho_hat_odd;
+            rho_hat_t(t + 1) = rho_hat_even;
+            rho_hat_t(t + 2) = rho_hat_odd;
           }
           max_t = t + 2;
         }
         // Geyer's initial monotone sequence
         for (int t = 3; t <= max_t - 2; t += 2) {
-          if (rho_hat(t + 1) + rho_hat(t + 2) >
-              rho_hat(t - 1) + rho_hat(t)) {
-            rho_hat(t + 1) = (rho_hat(t - 1) + rho_hat(t)) / 2;
-            rho_hat(t + 2) = rho_hat(t + 1);
+          if (rho_hat_t(t + 1) + rho_hat_t(t + 2) >
+              rho_hat_t(t - 1) + rho_hat_t(t)) {
+            rho_hat_t(t + 1) = (rho_hat_t(t - 1) + rho_hat_t(t)) / 2;
+            rho_hat_t(t + 2) = rho_hat_t(t + 1);
           }
         }
-        return chains * n_samples / (1 + 2 * rho_hat.sum());
+        double ess = chains * n_samples;
+        ess /= (1 + 2 * rho_hat_t.sum());
+        return ess;
       }
 
       /**
@@ -288,78 +293,73 @@ namespace stan {
        * across all kept samples.
        *
        * See more details in Stan reference manual section "Effective
-       * Sample Size".
-       * http://mc-stan.org/users/documentation
+       * Sample Size". http://mc-stan.org/users/documentation
        *
-       * @param number chains by number samples
-       * @return Effective sample size for the specified parameter
+       * Current implementation assumes chains are all of equal size.
+       *
+       * @param std::vector stores pointers to arrays of chains
+       * @return effective sample size for the specified parameter
        */
-      double
-      effective_sample_size(const std::vector<std::vector<double>* >& chains)
-        const {
-        int n_chains = chains.size();
+      double effective_sample_size(const std::vector<const double*>& chains,
+                                   int num_draws) const {
+        int num_chains = chains.size();
 
-        // need to generalize to each jagged samples per chain
-        int n_samples = chains[0]->size();
-        for (int chain = 1; chain < n_chains; ++chain) {
-          n_samples = std::min(n_samples,
-                               static_cast<int>(chains[chain]->size()));
+        Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, 1> autocov(num_chains);
+        Eigen::VectorXd chain_mean(num_chains);
+        Eigen::VectorXd chain_var(num_chains);
+        for (int chain = 0; chain < num_chains; ++chain) {
+          math::autocovariance<double>(Eigen::Map<const Eigen::VectorXd>
+                                       (&chains[chain][0], num_draws),
+                                       autocov(chain));
         }
 
-        std::vector<std::vector<double> > autocov(n_chains);
-        for (int chain = 0; chain < n_chains; ++chain) {
-          math::autocovariance(*chains[chain], autocov[chain]);
-        }
-
-        std::vector<double> chain_mean(n_chains);
-        std::vector<double> chain_var(n_chains);
-        for (int chain = 0; chain < n_chains; ++chain) {
+        for (int chain = 0; chain < num_chains; ++chain) {
           double n_kept_samples = num_kept_samples(chain);
-          chain_mean[chain] = math::mean(*chains[chain]);
-          chain_var[chain] = autocov[chain][0] * n_kept_samples
-            / (n_kept_samples-1);
+          chain_mean(chain) =
+            (Eigen::Map<const Eigen::VectorXd>(&chains[chain][0],
+                                               num_draws)).mean();
+          chain_var(chain) = autocov(chain)(0) * n_kept_samples
+            / (n_kept_samples - 1);
         }
 
-        double mean_var = math::mean(chain_var);
-        double var_plus = mean_var*(n_samples-1)/n_samples;
-        if (n_chains > 1)
-          var_plus += math::variance(chain_mean);
-        std::vector<double> rho_hat(n_samples, 0.0);
-        std::vector<double> acov(n_chains);
-        for (int chain = 0; chain < n_chains; ++chain)
-          acov[chain] = autocov[chain][1];
+        double mean_var = chain_var.mean();
+        double var_plus = mean_var * (num_draws - 1) / num_draws;
+        if (num_chains > 1)
+          var_plus += variance(chain_mean);
+        Eigen::VectorXd rho_hat(num_draws);
+        rho_hat.setZero();
+        Eigen::VectorXd acov(num_chains);
+        for (int chain = 0; chain < num_chains; ++chain) \
+          acov(chain) = autocov(chain)(1);
         double rho_hat_even = 1;
-        double
-          rho_hat_odd = 1 - (mean_var - math::mean(acov)) / var_plus;
-        rho_hat[1] = rho_hat_odd;
+        double rho_hat_odd = 1 - (mean_var - acov.mean()) / var_plus;
+        rho_hat(1) = rho_hat_odd;
         // Geyer's initial positive sequence
-        int max_t = 1;
+        int max_time = 1;
         for (int t = 1;
-             (t < (n_samples - 2) && (rho_hat_even + rho_hat_odd) >= 0);
+             (t < (num_draws - 2) && (rho_hat_even + rho_hat_odd) >= 0);
              t += 2) {
-          for (int chain = 0; chain < n_chains; ++chain)
-            acov[chain] = autocov[chain][t+1];
-          rho_hat_even = 1 - (mean_var - math::mean(acov)) / var_plus;
-          for (int chain = 0; chain < n_chains; ++chain)
-            acov[chain] = autocov[chain][t+2];
-          rho_hat_odd = 1 - (mean_var - math::mean(acov)) / var_plus;
+          for (int chain = 0; chain < num_chains; ++chain)
+            acov(chain) = autocov(chain)(t + 1);
+          rho_hat_even = 1 - (mean_var - acov.mean()) / var_plus;
+          for (int chain = 0; chain < num_chains; ++chain)
+            acov(chain) = autocov(chain)(t + 2);
+          rho_hat_odd = 1 - (mean_var - acov.mean()) / var_plus;
           if ((rho_hat_even + rho_hat_odd) >= 0) {
-            rho_hat[t + 1] = rho_hat_even;
-            rho_hat[t + 2] = rho_hat_odd;
+            rho_hat(t + 1) = rho_hat_even;
+            rho_hat(t + 2) = rho_hat_odd;
           }
-          max_t = t + 2;
+          max_time = t + 2;
         }
         // Geyer's initial monotone sequence
-        for (int t = 3; t <= max_t - 2; t += 2) {
-          if (rho_hat[t + 1] + rho_hat[t + 2] >
-              rho_hat[t - 1] + rho_hat[t]) {
-            rho_hat[t + 1] = (rho_hat[t - 1] + rho_hat[t]) / 2;
-            rho_hat[t + 2] = rho_hat[t + 1];
+        for (int t = 3; t <= max_time - 2; t += 2) {
+          if (rho_hat(t + 1) + rho_hat(t + 2) >
+              rho_hat(t - 1) + rho_hat(t)) {
+            rho_hat(t + 1) = (rho_hat(t - 1) + rho_hat(t)) / 2;
+            rho_hat(t + 2) = rho_hat(t + 1);
           }
         }
-        double sum_rho_hat = std::accumulate(rho_hat.begin(),
-                                             rho_hat.end(), 0.0);
-        return n_chains * n_samples / (1 + 2 * sum_rho_hat);
+        return num_chains * num_draws / (1 + 2 * rho_hat.sum());
       }
 
       /**
@@ -381,7 +381,7 @@ namespace stan {
                                       Dynamic, 1> &samples) const {
         int chains = samples.size();
         int n_samples = samples(0).size();
-        for (int chain = 1; chain < chains; ++chain) {
+        for (int chain = 1; chain < chains; chain++) {
           n_samples = std::min(n_samples,
                                static_cast<int>(samples(chain).size()));
         }
@@ -392,7 +392,7 @@ namespace stan {
         Eigen::VectorXd split_chain_mean(2*chains);
         Eigen::VectorXd split_chain_var(2*chains);
 
-        for (int chain = 0; chain < chains; ++chain) {
+        for (int chain = 0; chain < chains; chain++) {
           split_chain_mean(2*chain) = mean(samples(chain).topRows(n));
           split_chain_mean(2*chain+1) = mean(samples(chain).bottomRows(n));
 
@@ -413,7 +413,7 @@ namespace stan {
 
       explicit chains(const std::vector<std::string>& param_names)
         : param_names_(param_names.size()) {
-        for (size_t i = 0; i < param_names.size(); ++i)
+        for (size_t i = 0; i < param_names.size(); i++)
           param_names_(i) = param_names[i];
       }
 
@@ -469,7 +469,7 @@ namespace stan {
 
       int num_samples() const {
         int n = 0;
-        for (int chain = 0; chain < num_chains(); ++chain)
+        for (int chain = 0; chain < num_chains(); chain++)
           n += num_samples(chain);
         return n;
       }
@@ -480,7 +480,7 @@ namespace stan {
 
       int num_kept_samples() const {
         int n = 0;
-        for (int chain = 0; chain < num_chains(); ++chain)
+        for (int chain = 0; chain < num_chains(); chain++)
           n += num_kept_samples(chain);
         return n;
       }
@@ -498,18 +498,18 @@ namespace stan {
           Eigen::Matrix<Eigen::MatrixXd, Dynamic, 1>
             samples_copy(num_chains());
           Eigen::VectorXi warmup_copy(num_chains());
-          for (int i = 0; i < n; ++i) {
+          for (int i = 0; i < n; i++) {
             samples_copy(i) = samples_(i);
             warmup_copy(i) = warmup_(i);
           }
 
           samples_.resize(chain+1);
           warmup_.resize(chain+1);
-          for (int i = 0; i < n; ++i) {
+          for (int i = 0; i < n; i++) {
             samples_(i) = samples_copy(i);
             warmup_(i) = warmup_copy(i);
           }
-          for (int i = n; i < chain+1; ++i) {
+          for (int i = n; i < chain+1; i++) {
             samples_(i) = Eigen::MatrixXd(0, num_params());
             warmup_(i) = 0;
           }
@@ -542,7 +542,7 @@ namespace stan {
           return;
         int n_col = sample[0].size();
         Eigen::MatrixXd sample_copy(n_row, n_col);
-        for (int i = 0; i < n_row; ++i) {
+        for (int i = 0; i < n_row; i++) {
           sample_copy.row(i)
             = Eigen::VectorXd::Map(&sample[i][0], sample[0].size());
         }
@@ -569,7 +569,7 @@ namespace stan {
       Eigen::VectorXd samples(const int index) const {
         Eigen::VectorXd s(num_kept_samples());
         int start = 0;
-        for (int chain = 0; chain < num_chains(); ++chain) {
+        for (int chain = 0; chain < num_chains(); chain++) {
           int n = num_kept_samples(chain);
           s.middleRows(start, n) = samples_(chain).col(index).bottomRows(n);
           start += n;
@@ -761,7 +761,7 @@ namespace stan {
       double effective_sample_size(const int index) const {
         Eigen::Matrix<Eigen::VectorXd, Dynamic, 1>
           samples(num_chains());
-        for (int chain = 0; chain < num_chains(); ++chain) {
+        for (int chain = 0; chain < num_chains(); chain++) {
           samples(chain) = this->samples(chain, index);
         }
         return effective_sample_size(samples);
@@ -771,24 +771,21 @@ namespace stan {
         return effective_sample_size(index(name));
       }
 
-      double effective_sample_size_std_vector(const int index) const {
-        std::vector<std::vector<double>* > chains(num_chains());
+      double effective_sample_size_new(const int index) const {
+        Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, 1>
+          samples(num_chains());
+        std::vector<const double*> chains;
         for (int chain = 0; chain < num_chains(); ++chain) {
-          Eigen::VectorXd eigen_draws = this->samples(chain, index);
-          std::vector<double>* std_vector_draws = new std::vector<double>;
-          std_vector_draws->resize(eigen_draws.size());
-          std::copy(&eigen_draws[0],
-                    &eigen_draws[0] + eigen_draws.size(),
-                    std_vector_draws->begin());
-          chains[chain] = std_vector_draws;
+          samples(chain) = this->samples(chain, index);
+          chains.push_back(&samples(chain)(0));
         }
-        return effective_sample_size(chains);
+        return effective_sample_size(chains, samples(0).size());
       }
 
       double split_potential_scale_reduction(const int index) const {
         Eigen::Matrix<Eigen::VectorXd, Dynamic, 1>
           samples(num_chains());
-        for (int chain = 0; chain < num_chains(); ++chain) {
+        for (int chain = 0; chain < num_chains(); chain++) {
           samples(chain) = this->samples(chain, index);
         }
         return split_potential_scale_reduction(samples);

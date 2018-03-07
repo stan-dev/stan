@@ -847,8 +847,8 @@ TEST_F(McmcChains,blocker_effective_sample_size) {
   }
 
   for (int index = 4; index < chains.num_params(); index++) {
-    ASSERT_NEAR(n_eff(index - 4), chains.effective_sample_size_std_vector(index), 1.0)
-      << "n_effective_std_vector for index: " << index << ", parameter: "
+    ASSERT_NEAR(n_eff(index - 4), chains.effective_sample_size_new(index), 1.0)
+      << "n_effective_new for index: " << index << ", parameter: "
       << chains.param_name(index);
   }
 }
