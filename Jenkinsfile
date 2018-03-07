@@ -34,8 +34,10 @@ def mailBuildResults(String label, additionalEmails='') {
     )
 }
 
-def runTests(String testPath) {
-    sh "./runTests.py -j${env.PARALLEL} ${testPath} --make-only"
+def runTests(String testPath, Boolean separateMakeStep=true) {
+    if (separateMakeStep) {
+        sh "./runTests.py -j${env.PARALLEL} ${testPath} --make-only"
+    }
     try { sh "./runTests.py -j${env.PARALLEL} ${testPath}" }
     finally { junit 'test/**/*.xml' }
 }
@@ -45,7 +47,6 @@ def runTestsWin(String testPath) {
     try { bat "runTests.py -j${env.PARALLEL} ${testPath}" }
     finally { junit 'test/**/*.xml' }
 }
-
 
 pipeline {
     agent none
@@ -128,7 +129,7 @@ pipeline {
                     steps { 
                         unstash 'StanSetup'
                         setupCC()
-                        runTests("src/test/integration")
+                        runTests("src/test/integration", separateMakeStep=false)
                     }
                     post { always { deleteDir() } }
                 }
