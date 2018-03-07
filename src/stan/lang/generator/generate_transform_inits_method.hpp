@@ -6,6 +6,7 @@
 #include <stan/lang/generator/generate_comment.hpp>
 #include <stan/lang/generator/generate_indent.hpp>
 #include <stan/lang/generator/generate_validate_context_size.hpp>
+#include <stan/lang/generator/generate_validate_var_dims.hpp>
 #include <stan/lang/generator/get_typedef_var_type.hpp>
 #include <stan/lang/generator/get_verbose_var_type.hpp>
 #include <stan/lang/generator/write_constraints_fn.hpp>
@@ -78,44 +79,30 @@ namespace stan {
      * @param[in,out] o stream for generating
      */
     void generate_transform_inits_method(const std::vector<block_var_decl>& vs,
-                              std::ostream& o) {
+                                         std::ostream& o) {
       int indent = 2;
 
       generate_method_begin(o);
       o << EOL;
       
       for (size_t i = 0; i < vs.size(); ++i) {
+        std::string var_name(vs[i].name());
+        block_var_type vtype = vs[i].type();
+        block_var_type el_type = vs[i].type();
+        if (el_type.is_array_type())
+          el_type = el_type.array_contains();
+
         // TODO:mitzi : generate runtime error?
         // parser should prevent this from happening
         // avoid generating code that won't compile - flag/ignore int params
         if (vs[i].bare_type().is_int_type()) {
           std::stringstream ss;
-          ss << "Found int-valued param: " << vs[i].name()
+          ss << "Found int-valued param: " << var_name
              << "; illegal - params must be real-valued" << EOL;
           generate_comment(ss.str(), indent, o);
           continue;
         }
 
-        // setup - name, type, and var shape
-        std::string var_name(vs[i].name());
-        // unfold array type to get array element info
-        block_var_type btype = (vs[i].type());
-        if (btype.is_array_type())
-          btype = btype.array_contains();
-
-        std::vector<expression> ar_lens(vs[i].type().array_lens());
-        expression arg1 = btype.arg1();
-        expression arg2 = btype.arg2();
-
-        // combine all dimension sizes in column major order
-        std::vector<expression> dims;
-        size_t num_args = (!is_nil(arg2)) ? 2 : ((!is_nil(arg1)) ? 1 : 0);
-        if (num_args == 2) 
-          dims.push_back(arg2);
-        if (num_args > 0)
-          dims.push_back(arg1);
-        for (size_t i = ar_lens.size(); i > 0; --i)
-          dims.push_back(ar_lens[i - 1]);
         generate_indent(indent, o);
         o << "current_statement_begin__ = " <<  vs[i].begin_line_ << ";"
           << EOL;
@@ -137,57 +124,55 @@ namespace stan {
         generate_indent(indent, o);
         o << "pos__ = 0U;" << EOL;
         
-        // validate dimensions before they get used in declaration
+        // validate dims, match against input sizes
+        generate_validate_var_dims(vs[i], indent, o);
         generate_validate_context_size(vs[i], "parameter initialization",
                                        indent, o);
 
-        // declaration
+        // instantiate
         generate_indent(indent, o);
-        generate_bare_type(vs[i].type().bare_type(), "local_scalar_t__", o);
+        generate_bare_type(vtype.bare_type(), "double", o);
         o << " " << var_name;
-        if (vs[i].type().num_dims() == 0) {
-          o << ";" << EOL;
+        if (vtype.num_dims() == 0) {
+          o << "(0);" << EOL;
         } else {
           o << "(";
-          generate_initializer(vs[i].type(), "local_scalar_t__", o);
+          generate_initializer(vs[i].type(), "double", o);
           o << ");" << EOL;
         }        
 
         // fill vals_r__ loop
-        write_begin_all_dims_col_maj_loop(var_name, dims, num_args,
-                                          indent, o);
-        generate_indent(indent + dims.size(), o);
+        write_begin_all_dims_col_maj_loop(vs[i], true, indent, o);
+        generate_indent(indent + vtype.num_dims(), o);
         o << var_name;
-        write_var_idx_all_dims(ar_lens.size(), num_args, o);
+        write_var_idx_all_dims(vtype.array_dims(),
+                               vtype.num_dims() - vtype.array_dims(),
+                               o);
         o << " = vals_r__[pos__++];" << EOL;
-        write_end_loop(dims.size(), indent, o);
+        write_end_loop(vtype.num_dims(), indent, o);
 
         // unconstrain var contents
-        write_begin_array_dims_loop(var_name, ar_lens, indent, o);
-        generate_indent(indent, o);
+        write_begin_array_dims_loop(vs[i], false, indent, o);
+        generate_indent(indent + vtype.array_dims(), o);
         o << "try {" << EOL;
-        generate_indent(indent + 1, o);
-        o << "writer__." << write_constraints_fn(btype, "unconstrain")
+        generate_indent(indent + vtype.array_dims() + 1, o);
+        o << "writer__." << write_constraints_fn(el_type, "unconstrain")
           << var_name;
-        write_var_idx_array_dims(ar_lens.size(), o);
+        write_var_idx_array_dims(vtype.array_dims(), o);
         o << ");" << EOL;
-        generate_indent(indent, o);
+        generate_indent(indent + vtype.array_dims(), o);
         o << "} catch (const std::exception& e) {" << EOL;
-        generate_indent(indent + 1, o);
+        generate_indent(indent + vtype.array_dims() + 1, o);
         o << "stan::lang::rethrow_located("
           << "std::runtime_error(std::string(\"Error transforming variable "
           << var_name
           << ": \") + e.what()), current_statement_begin__, prog_reader__());"
           << EOL;
-        generate_indent(indent + 1, o);
-        o << "// Next line prevents compiler griping about no return" << EOL;
-        generate_indent(indent + 1, o);
-        o << "throw std::runtime_error"
-          << "(\"*** IF YOU SEE THIS, PLEASE REPORT A BUG ***\");"
-          << EOL;
-        generate_indent(indent, o);
+        generate_indent(indent + vtype.array_dims(), o);
         o << "}" << EOL;
-        write_end_loop(ar_lens.size(), indent, o);
+        write_end_loop(vtype.array_dims(), indent, o);
+
+        // all done, add blank line for readibility
         o << EOL;
       }
       generate_method_end(o);

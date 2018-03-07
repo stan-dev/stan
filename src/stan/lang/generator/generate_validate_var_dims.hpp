@@ -18,13 +18,11 @@ namespace stan {
      * @param[in] indent indentation level
      * @param[in,out] o stream for generating
      */
-
-    template <typename T>
-    void generate_validate_var_dims(const T& var_decl,
+    void generate_validate_var_dims(const block_var_decl& var_decl,
                                     int indent, std::ostream& o) {
       std::string name(var_decl.name());
-      expression arg1(var_decl.type().arg1());
-      expression arg2(var_decl.type().arg2());
+      expression arg1 = var_decl.type().arg1();
+      expression arg2 = var_decl.type().arg2();
       if (var_decl.type().is_array_type()) {
         arg1 = var_decl.type().array_contains().arg1();
         arg2 = var_decl.type().array_contains().arg2();
@@ -40,13 +38,6 @@ namespace stan {
       for (size_t i = 0; i < ar_var_dims.size(); ++i)
         generate_validate_positive(name, ar_var_dims[i], indent, o);
     }
-
-    template void generate_validate_var_dims(const block_var_decl&,
-                                             int indent, std::ostream& o);
-
-    template void generate_validate_var_dims(const local_var_decl&,
-                                             int indent, std::ostream& o);
-                                              
 
   }
 }

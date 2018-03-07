@@ -36,7 +36,7 @@ namespace stan {
 
       if (btype.has_def_bounds()) {
         range bounds = btype.bounds();
-        write_begin_array_dims_loop(var_name, ar_lens, indent, o);
+        write_begin_array_dims_loop(decl, true, indent, o);
         if (bounds.has_low()) {
           generate_indent(indent + ar_lens.size(), o);
           o << "check_greater_or_equal(function__, ";
@@ -61,7 +61,7 @@ namespace stan {
         }
         write_end_loop(ar_lens.size(), indent, o);
       } else if (btype.is_specialized()) {
-        write_begin_array_dims_loop(var_name, ar_lens, indent, o);
+        write_begin_array_dims_loop(decl, true, indent, o);
         generate_indent(indent + ar_lens.size(), o);
         o << "stan::math::check_" << btype.name() << "(function__, ";
         o << "\"" << var_name;

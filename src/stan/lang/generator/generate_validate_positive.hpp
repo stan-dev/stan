@@ -25,22 +25,23 @@ namespace stan {
      *                              write array, generated quantities
      * <br/> generate_set_param_ranges - parameter variables
      *
-     * @param[in] var_name variable name
-     * @param[in] expr declared dim size expression
+
+     * @param[in] name construct name
+     * @param[in] expression dimension size
      * @param[in] indents indentation level
      * @param[in,out] o output stream for generated code
      */
-    void generate_validate_positive(const std::string& var_name,
-                                    const expression& expr, int indents,
-                                    std::ostream& o) {
-      generate_indent(indents, o);
-      o << "validate_non_negative_index(\"" << var_name << "\", ";
+    void generate_validate_positive(const std::string& name,
+                                    const expression& expr,
+                                    int indent, std::ostream& o) {
+
+      generate_indent(indent, o);
+      o << "validate_non_negative_index(\"" << name << "\", ";
       generate_quoted_expression(expr, o);
       o << ", ";
       generate_expression(expr, NOT_USER_FACING, o);
       o << ");" << EOL;
     }
-
   }
 }
 #endif

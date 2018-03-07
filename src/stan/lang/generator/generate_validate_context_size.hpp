@@ -6,6 +6,7 @@
 #include <stan/lang/generator/generate_expression.hpp>
 #include <stan/lang/generator/generate_indent.hpp>
 #include <stan/lang/generator/generate_validate_positive.hpp>
+#include <stan/lang/generator/get_typedef_var_type.hpp>
 #include <ostream>
 #include <string>
 #include <vector>
@@ -42,7 +43,7 @@ namespace stan {
       o << "context__.validate_dims("
         << '"' << stage << '"' << ", "
         << '"' << var_name << '"' << ", "
-        << '"' << btype.bare_type() << '"' << ", "
+        << '"' << get_typedef_var_type(btype.bare_type()) << '"' << ", "
         << "context__.to_vec(";
       for (size_t i = 0; i < array_dim_sizes.size(); ++i) {
         if (i > 0) o << ",";

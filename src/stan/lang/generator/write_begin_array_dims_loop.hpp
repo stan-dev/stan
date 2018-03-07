@@ -12,33 +12,36 @@ namespace stan {
   namespace lang {
 
     /**
-     * Generate the openings of a sequence of zero or more nested for loops
-     * corresponding to the specified dimension sizes with the
+     * Generate the openings of a sequence of zero or more for loops
+     * corresponding to array dimensions of a variable, with the
      * specified indentation level writing to the specified stream.
-     * Declare named size_t variable for each dimension size in order to avoid
-     * re-evaluation of dimension size expression on each iteration.
+     * If specified, declare named size_t variable for each dimension
+     * which avoids re-evaluation of size expression on each iteration.
      *
-     * @param[in] name variable name
-     * @param[in] dims dimension sizes
+     * @param[in] var_decl variable declaration
+     * @param[in] declare_size_vars if true, generate size_t var decls
      * @param[in] indent indentation level
      * @param[in,out] o stream for generating
      */
-    void write_begin_array_dims_loop(const std::string& name,
-                                     const std::vector<expression>& dims,
+    void write_begin_array_dims_loop(const block_var_decl& var_decl,
+                                     bool declare_size_vars,
                                      int indent, std::ostream& o) {
-      // declare size_t var k_<n>_max__
-      for (size_t i = 0; i < dims.size(); ++i) {
-        generate_indent(indent, o);
-        o << "size_t " << name << "_k_" << i << "_max__ = ";
-        generate_expression(dims[i], NOT_USER_FACING, o);
-        o << ";" << EOL;
+      std::string name(var_decl.name());
+      std::vector<expression> ar_var_dims = var_decl.type().array_lens();
+
+      if (declare_size_vars) {
+        for (size_t i = 0; i < ar_var_dims.size(); ++i) {
+          generate_indent(indent, o);
+          o << "size_t " << name << "_k_" << i << "_max__ = ";
+          generate_expression(ar_var_dims[i], NOT_USER_FACING, o);
+          o << ";" << EOL;
+        }
       }
-      // nested for stmts open
-      for (size_t i = 0; i < dims.size(); ++i) {
+      for (size_t i = 0; i < ar_var_dims.size(); ++i) {
         generate_indent(indent + i, o);
-        o << "for (int k"  << i << "__ = 0;"
-          << " k" << i << "__ < " << name << "_k_" << i << "_max__;"
-          << " ++k" << i << "__) {" << EOL;
+        o << "for (int k_"  << i << "__ = 0;"
+          << " k_" << i << "__ < " << name << "_k_" << i << "_max__;"
+          << " ++k_" << i << "__) {" << EOL;
       }
     }
 

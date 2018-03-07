@@ -58,3 +58,17 @@ TEST(generateTransformInitsMethod, t5) {
   EXPECT_TRUE(pass);
   // TESTS?
 }
+
+TEST(generateTransformInitsMethod, t6) {
+  std::string input("  real p_y;\n"
+                    "  real p_d4_y[2,3,4,5];\n"
+                    "  matrix[2,3] p_d2_mat[4,5];\n"
+                    "  corr_matrix[2] p_d2_corr_mat[4,5];\n"
+                    "  vector[3] beta;\n"
+                    "  real<lower=0> sigma;\n");
+
+  std::stringstream cpp_code;
+  bool pass = run_test(input, cpp_code);
+  EXPECT_TRUE(pass);
+  // TESTS?
+}

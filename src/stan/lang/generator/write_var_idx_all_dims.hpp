@@ -23,7 +23,7 @@ namespace stan {
                                 std::ostream& o) {
 
       for (size_t i = 0; i < num_ar_dims; ++i)
-        o << "[k" << i << "__]";
+        o << "[k_" << i << "__]";
 
       if (num_args == 1)
         o << "(j_1__)";
