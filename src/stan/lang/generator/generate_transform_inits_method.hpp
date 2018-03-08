@@ -34,17 +34,20 @@ namespace stan {
       o << INDENT
         << "void transform_inits(const stan::io::var_context& context__,"
         << EOL;
+      o << INDENT << "                     std::vector<int>& params_i__,"
+        << EOL;
       o << INDENT << "                     std::vector<double>& params_r__,"
         << EOL;
       o << INDENT << "                     std::ostream* pstream__) const {"
         << EOL;
       o << INDENT2 << "stan::io::writer<double> "
-        << "writer__(params_r__);"        
+        << "writer__(params_r__, params_i__);"        
         << EOL;
 
       o << INDENT2 << "size_t pos__;" << EOL;
       o << INDENT2 << "(void) pos__; // dummy call to supress warning" << EOL;
       o << INDENT2 << "std::vector<double> vals_r__;" << EOL;
+      o << INDENT2 << "std::vector<int> vals_i__;" << EOL;
     }
 
     /**
@@ -65,8 +68,9 @@ namespace stan {
       o << INDENT
         << "                     std::ostream* pstream__) const {" << EOL;
       o << INDENT << "  std::vector<double> params_r_vec;" << EOL;
+      o << INDENT << "  std::vector<int> params_i_vec;" << EOL;
       o << INDENT
-        << "  transform_inits(context, params_r_vec, pstream__);"
+        << "  transform_inits(context, params_i_vec, params_r_vec, pstream__);"
         << EOL;
       o << INDENT << "  params_r.resize(params_r_vec.size());" << EOL;
       o << INDENT << "  for (int i = 0; i < params_r.size(); ++i)" << EOL;
@@ -159,8 +163,10 @@ namespace stan {
         generate_indent(indent + vtype.array_dims(), o);
         o << "try {" << EOL;
         generate_indent(indent + vtype.array_dims() + 1, o);
-        o << "writer__." << write_constraints_fn(el_type, "unconstrain")
-          << var_name;
+        o << "writer__." << write_constraints_fn(el_type, "unconstrain");
+        if (el_type.has_def_bounds() || el_type.is_specialized())
+          o << ", ";
+        o << var_name;
         write_var_idx_array_dims(vtype.array_dims(), o);
         o << ");" << EOL;
         generate_indent(indent + vtype.array_dims(), o);

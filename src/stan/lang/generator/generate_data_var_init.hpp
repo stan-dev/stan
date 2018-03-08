@@ -5,8 +5,8 @@
 #include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_expression.hpp>
 #include <stan/lang/generator/generate_indent.hpp>
+#include <stan/lang/generator/write_begin_all_dims_row_maj_loop.hpp>
 #include <stan/lang/generator/write_end_loop.hpp>
-#include <stan/lang/generator/write_nested_read_loop_begin.hpp>
 #include <stan/lang/generator/write_var_idx_all_dims.hpp>
 #include <iostream>
 #include <ostream>
@@ -34,25 +34,13 @@ namespace stan {
 
       // setup - name, type, and var shape
       std::string var_name(var_decl.name());
-      block_var_type btype = (var_decl.type());
-      if (btype.is_array_type())
-        btype = btype.array_contains();
-      std::vector<expression> ar_lens(var_decl.type().array_lens());
-      expression arg1 = btype.arg1();
-      expression arg2 = btype.arg2();
-
-      // combine all dimension sizes in column major order
-      std::vector<expression> dims;
-      size_t num_args = (!is_nil(arg2)) ? 2 : ((!is_nil(arg1)) ? 1 : 0);
-      if (num_args == 2) 
-        dims.push_back(arg2);
-      if (num_args > 0)
-        dims.push_back(arg1);
-      for (size_t i = ar_lens.size(); i > 0; --i)
-        dims.push_back(ar_lens[i - 1]);
+      block_var_type vtype = (var_decl.type());
+      block_var_type el_type = (var_decl.type());
+      if (el_type.is_array_type())
+        el_type = el_type.array_contains();
 
       std::string vals("vals_r");
-      if (btype.bare_type().is_int_type())
+      if (vtype.bare_type().is_int_type())
         vals = "vals_i";
 
       generate_indent(indent, o);
@@ -60,15 +48,16 @@ namespace stan {
       generate_indent(indent, o);
       o << "pos__ = 0;" << EOL;
       
-      write_nested_read_loop_begin(var_name, dims, num_args, indent, o);
+      write_begin_all_dims_col_maj_loop(var_decl, true, indent, o);
 
       // innermost loop stmt: update pos__
-      generate_indent(indent + dims.size(), o);
+      generate_indent(indent + vtype.num_dims(), o);
       o << var_name;
-      write_var_idx_all_dims(ar_lens.size(), num_args, o);
+      write_var_idx_all_dims(vtype.array_dims(),
+                             vtype.num_dims() - vtype.array_dims(), o);
       o << " = " << vals << "__[pos__++]; " << EOL;
 
-      write_end_loop(dims.size(), indent, o);
+      write_end_loop(vtype.num_dims(), indent, o);
     }        
 
   }

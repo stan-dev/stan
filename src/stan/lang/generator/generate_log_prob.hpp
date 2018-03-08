@@ -30,6 +30,8 @@ namespace stan {
         << EOL;
       o << INDENT << "T__ log_prob(vector<T__>& params_r__,"
         << EOL;
+      o << INDENT << "             vector<int>& params_i__,"
+        << EOL;
       o << INDENT << "             std::ostream* pstream__ = 0) const {"
         << EOL2;
       o << INDENT2 << "typedef T__ local_scalar_t__;" << EOL2;
@@ -52,7 +54,7 @@ namespace stan {
       generate_try(2, o);
 
       generate_indent(2, o);
-      o << "stan::io::reader<local_scalar_t__> in__(params_r__);" << EOL;
+      o << "stan::io::reader<local_scalar_t__> in__(params_r__, params_i__);" << EOL;
       o << EOL;
 
       generate_comment("model parameters", 3, o);
@@ -125,8 +127,9 @@ namespace stan {
       o << INDENT << "  vec_params_r.reserve(params_r.size());" << EOL;
       o << INDENT << "  for (int i = 0; i < params_r.size(); ++i)" << EOL;
       o << INDENT << "    vec_params_r.push_back(params_r(i));" << EOL;
+      o << INDENT << "  std::vector<int> vec_params_i;" << EOL;
       o << INDENT
-        << "  return log_prob<propto,jacobian,T_>(vec_params_r, pstream);" << EOL;
+        << "  return log_prob<propto,jacobian,T_>(vec_params_r, vec_params_i, pstream);" << EOL;
       o << INDENT << "}" << EOL2;
     }
 

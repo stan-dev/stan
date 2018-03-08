@@ -62,14 +62,14 @@ namespace stan {
       // nested for stmts open, row, col indexes
       if (!is_nil(arg2)) {
         generate_indent(indent++, o);
-        o << "for (int " << name << "_j_2__ = 0; "
-          << name << "_j_2__ < " << name << "_j_2_max__;"
+        o << "for (size_t j_2__ = 0; "
+          << "j_2__ < " << name << "_j_2_max__;"
           << " ++j_2__) {" << EOL;
       }
       if (!is_nil(arg1)) {
         generate_indent(indent++, o);
-        o << "for (int " << name << "_j_1__ = 0; "
-          << name << "_j_1__ < " << name << "_j_1_max__;"
+        o << "for (size_t j_1__ = 0; "
+          << "j_1__ < " << name << "_j_1_max__;"
           << " ++j_1__) {" << EOL;
       }
       for (size_t i = ar_var_dims.size(); i > 0; --i) {

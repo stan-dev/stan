@@ -14,7 +14,6 @@
 #include <stan/lang/generator/generate_data_var_init.hpp>
 #include <stan/lang/generator/generate_param_names_array.hpp>
 #include <stan/lang/generator/generate_var_constructor.hpp>
-#include <stan/lang/generator/generate_var_decl.hpp>
 #include <stan/lang/generator/generate_var_fill_define.hpp>
 #include <stan/lang/generator/generate_validate_tparam_inits.hpp>
 #include <stan/lang/generator/generate_validate_var_decl.hpp>
@@ -31,7 +30,6 @@
 #include <stan/lang/generator/write_begin_array_dims_loop.hpp>
 #include <stan/lang/generator/write_constraints_fn.hpp>
 #include <stan/lang/generator/write_end_loop.hpp>
-#include <stan/lang/generator/write_nested_read_loop_begin.hpp>
 #include <stan/lang/generator/write_nested_resize_loop_begin.hpp>
 #include <stan/lang/generator/write_resize_var_idx.hpp>
 #include <stan/lang/generator/write_var_idx_all_dims.hpp>
@@ -50,10 +48,6 @@
 #include <stan/lang/generator/printable_visgen.hpp>
 #include <stan/lang/generator/idx_visgen.hpp>
 #include <stan/lang/generator/idx_user_visgen.hpp>
-#include <stan/lang/generator/local_var_decl_visgen.hpp>
-
-// TODO:mitzi - init_nan??????
-#include <stan/lang/generator/local_var_init_nan_visgen.hpp>
 
 #include <stan/lang/generator/statement_visgen.hpp>
 #include <stan/lang/generator/visgen.hpp>
