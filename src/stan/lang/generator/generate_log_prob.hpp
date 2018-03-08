@@ -11,6 +11,7 @@
 #include <stan/lang/generator/generate_statement.hpp>
 #include <stan/lang/generator/generate_statements.hpp>
 #include <stan/lang/generator/generate_try.hpp>
+#include <stan/lang/generator/generate_validate_tparam_inits.hpp>
 #include <stan/lang/generator/generate_validate_var_decl.hpp>
 #include <ostream>
 

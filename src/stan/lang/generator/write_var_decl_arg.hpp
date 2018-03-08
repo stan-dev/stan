@@ -1,6 +1,9 @@
 #ifndef STAN_LANG_GENERATOR_WRITE_VAR_DECL_ARG_HPP
 #define STAN_LANG_GENERATOR_WRITE_VAR_DECL_ARG_HPP
 
+#include <stan/lang/ast.hpp>
+#include <stan/lang/generator/constants.hpp>
+#include <stan/lang/generator/generate_expression.hpp>
 #include <stan/lang/generator/get_verbose_var_type.hpp>
 #include <string>
 #include <ostream>

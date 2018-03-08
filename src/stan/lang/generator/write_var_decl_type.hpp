@@ -1,6 +1,8 @@
 #ifndef STAN_LANG_GENERATOR_WRITE_VAR_DECL_TYPE_HPP
 #define STAN_LANG_GENERATOR_WRITE_VAR_DECL_TYPE_HPP
 
+#include <stan/lang/ast.hpp>
+#include <stan/lang/generator/constants.hpp>
 #include <string>
 #include <ostream>
 

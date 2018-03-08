@@ -3,7 +3,9 @@
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
+#include <stan/lang/generator/generate_bare_type.hpp>
 #include <stan/lang/generator/generate_comment.hpp>
+#include <stan/lang/generator/generate_initializer.hpp>
 #include <stan/lang/generator/generate_indent.hpp>
 #include <stan/lang/generator/generate_validate_context_size.hpp>
 #include <stan/lang/generator/generate_validate_var_dims.hpp>

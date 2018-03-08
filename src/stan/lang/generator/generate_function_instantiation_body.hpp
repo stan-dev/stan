@@ -37,7 +37,7 @@ namespace stan {
                                     std::ostream& o) {
       o << "{" << EOL;
       o << "  ";
-      if (!fun.return_type_.is_void()) {
+      if (!fun.return_type_.is_void_type()) {
         o << "return ";
       }
       o << EOL;

@@ -2,9 +2,12 @@
 #define STAN_LANG_GENERATOR_GENERATE_MEMBER_VAR_DECLS_HPP
 
 #include <stan/lang/ast.hpp>
+#include <stan/lang/generator/constants.hpp>
+#include <stan/lang/generator/generate_indent.hpp>
 #include <stan/lang/generator/get_typedef_var_type.hpp>
 #include <ostream>
 #include <vector>
+#include <string>
 
 namespace stan {
   namespace lang {
