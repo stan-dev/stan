@@ -8,6 +8,9 @@
 #include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/fun_scalar_type.hpp>
 
+#include <stan/lang/generator/generate_block_var.hpp>
+#include <stan/lang/generator/generate_validate_block_var.hpp>
+#include <stan/lang/generator/generate_write_block_var.hpp>
 #include <stan/lang/generator/generate_data_var_init.hpp>
 #include <stan/lang/generator/generate_param_names_array.hpp>
 #include <stan/lang/generator/generate_var_constructor.hpp>
@@ -17,6 +20,7 @@
 #include <stan/lang/generator/generate_validate_var_decl.hpp>
 #include <stan/lang/generator/generate_validate_var_dims.hpp>
 #include <stan/lang/generator/generate_param_names_array.hpp>
+
 
 #include <stan/lang/generator/get_typedef_var_type.hpp>
 #include <stan/lang/generator/get_verbose_var_type.hpp>
@@ -29,6 +33,7 @@
 #include <stan/lang/generator/write_end_loop.hpp>
 #include <stan/lang/generator/write_nested_read_loop_begin.hpp>
 #include <stan/lang/generator/write_nested_resize_loop_begin.hpp>
+#include <stan/lang/generator/write_resize_var_idx.hpp>
 #include <stan/lang/generator/write_var_idx_all_dims.hpp>
 #include <stan/lang/generator/write_var_idx_all_dims_msg.hpp>
 #include <stan/lang/generator/write_var_idx_array_dims.hpp>
@@ -40,32 +45,24 @@
 #include <stan/lang/generator/is_numbered_statement_vis.hpp>
 
 // visitor classes for generation
-//#include <stan/lang/generator/constrained_param_names_visgen.hpp>
-//#include <stan/lang/generator/dump_member_var_visgen.hpp>
+
 #include <stan/lang/generator/expression_visgen.hpp>
 #include <stan/lang/generator/printable_visgen.hpp>
 #include <stan/lang/generator/idx_visgen.hpp>
 #include <stan/lang/generator/idx_user_visgen.hpp>
-//#include <stan/lang/generator/local_var_decl_visgen.hpp>
+#include <stan/lang/generator/local_var_decl_visgen.hpp>
+
 // TODO:mitzi - init_nan??????
-//#include <stan/lang/generator/local_var_init_nan_visgen.hpp>
-//#include <stan/lang/generator/set_param_ranges_visgen.hpp>
+#include <stan/lang/generator/local_var_init_nan_visgen.hpp>
+
 #include <stan/lang/generator/statement_visgen.hpp>
-//#include <stan/lang/generator/unconstrained_param_names_visgen.hpp>
-//#include <stan/lang/generator/validate_var_decl_visgen.hpp>
-//#include <stan/lang/generator/validate_transformed_params_visgen.hpp>
 #include <stan/lang/generator/visgen.hpp>
-//#include <stan/lang/generator/write_array_visgen.hpp>
-//#include <stan/lang/generator/write_array_vars_visgen.hpp>
-//#include <stan/lang/generator/write_dims_visgen.hpp>
-//#include <stan/lang/generator/write_param_names_visgen.hpp>
 
 // generation functions, starts from generate_cpp
-//#include <stan/lang/generator/generate_arg_decl.hpp>
-//#include <stan/lang/generator/generate_array_var_type.hpp>
+#include <stan/lang/generator/generate_arg_decl.hpp>
+#include <stan/lang/generator/generate_array_var_type.hpp>
 #include <stan/lang/generator/generate_array_builder_adds.hpp>
 #include <stan/lang/generator/generate_bare_type.hpp>
-//#include <stan/lang/generator/generate_block_var_decls.hpp>
 #include <stan/lang/generator/generate_catch_throw_located.hpp>
 #include <stan/lang/generator/generate_class_decl.hpp>
 #include <stan/lang/generator/generate_class_decl_end.hpp>
@@ -97,7 +94,6 @@
 #include <stan/lang/generator/generate_initializer.hpp>
 #include <stan/lang/generator/generate_line_number.hpp>
 #include <stan/lang/generator/generate_local_var_decl_inits.hpp>
-//#include <stan/lang/generator/generate_log_prob_var_inits.hpp>
 #include <stan/lang/generator/generate_log_prob.hpp>
 #include <stan/lang/generator/generate_member_var_decls.hpp>
 #include <stan/lang/generator/generate_member_var_decls_all.hpp>
@@ -114,7 +110,7 @@
 #include <stan/lang/generator/generate_public_decl.hpp>
 #include <stan/lang/generator/generate_quoted_expression.hpp>
 #include <stan/lang/generator/generate_quoted_string.hpp>
-//#include <stan/lang/generator/generate_real_var_type.hpp>
+#include <stan/lang/generator/generate_real_var_type.hpp>
 #include <stan/lang/generator/generate_read_transform_params.hpp>
 #include <stan/lang/generator/generate_set_param_ranges.hpp>
 #include <stan/lang/generator/generate_statement.hpp>
@@ -130,10 +126,8 @@
 #include <stan/lang/generator/generate_usings.hpp>
 #include <stan/lang/generator/generate_validate_context_size.hpp>
 #include <stan/lang/generator/generate_validate_positive.hpp>
-#include <stan/lang/generator/generate_validate_transformed_params.hpp>
 #include <stan/lang/generator/generate_version_comment.hpp>
 #include <stan/lang/generator/generate_void_statement.hpp>
 #include <stan/lang/generator/generate_write_array_method.hpp>
-#include <stan/lang/generator/generate_write_array_vars.hpp>
 
 #endif

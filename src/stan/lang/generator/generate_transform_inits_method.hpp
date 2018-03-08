@@ -7,11 +7,14 @@
 #include <stan/lang/generator/generate_indent.hpp>
 #include <stan/lang/generator/generate_validate_context_size.hpp>
 #include <stan/lang/generator/generate_validate_var_dims.hpp>
-#include <stan/lang/generator/get_typedef_var_type.hpp>
-#include <stan/lang/generator/get_verbose_var_type.hpp>
 #include <stan/lang/generator/write_constraints_fn.hpp>
-#include <stan/lang/generator/write_var_decl_type.hpp>
-#include <stan/lang/generator/write_var_decl_arg.hpp>
+#include <stan/lang/generator/write_begin_all_dims_col_maj_loop.hpp>
+#include <stan/lang/generator/write_begin_array_dims_loop.hpp>
+#include <stan/lang/generator/write_constraints_fn.hpp>
+#include <stan/lang/generator/write_end_loop.hpp>
+#include <stan/lang/generator/write_var_idx_all_dims.hpp>
+#include <stan/lang/generator/write_var_idx_array_dims.hpp>
+
 #include <iostream>
 #include <ostream>
 #include <vector>

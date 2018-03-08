@@ -40,8 +40,8 @@ TEST(generateTransformInitsMethod, t1) {
 }
 
 TEST(generateTransformInitsMethod, t2) {
-  std::string input("matrix<lower=-7,upper=6>[3, 6] my_mat_mn;\n"
-                    "matrix<upper=0>[2,4] d2_array_of_mat[8, 9];\n");
+  std::string input("simplex[5] s5;\n"
+                    "corr_matrix[5] cm5;\n");
 
   std::stringstream cpp_code;
   bool pass = run_test(input, cpp_code);
@@ -49,9 +49,12 @@ TEST(generateTransformInitsMethod, t2) {
   // TESTS?
 }
 
-TEST(generateTransformInitsMethod, t5) {
-  std::string input("simplex[5] s5;\n"
-                    "corr_matrix[5] cm5;\n");
+TEST(generateTransformInitsMethod, t3) {
+  std::string input("real p_y;\n"
+                    "real p_d4_y[2,3,4,5];\n"
+                    "matrix[2,3] p_d2_mat[4,5];\n"
+                    "corr_matrix[2] p_d2_corr_mat[4,5];\n"
+                    "real<lower=0> sigma;\n");
 
   std::stringstream cpp_code;
   bool pass = run_test(input, cpp_code);

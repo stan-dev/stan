@@ -3,7 +3,6 @@
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
-#include <stan/lang/generator/generate_expression.hpp>
 #include <stan/lang/generator/generate_indent.hpp>
 #include <stan/lang/generator/write_begin_all_dims_row_maj_loop.hpp>
 #include <stan/lang/generator/write_end_loop.hpp>

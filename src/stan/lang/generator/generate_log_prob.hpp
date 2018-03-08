@@ -4,16 +4,14 @@
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_bare_type.hpp>
+#include <stan/lang/generator/generate_block_var.hpp>
 #include <stan/lang/generator/generate_catch_throw_located.hpp>
 #include <stan/lang/generator/generate_comment.hpp>
-#include <stan/lang/generator/generate_block_var_decls.hpp>
 #include <stan/lang/generator/generate_param_var.hpp>
 #include <stan/lang/generator/generate_statement.hpp>
 #include <stan/lang/generator/generate_statements.hpp>
-#include <stan/lang/generator/generate_tparam_var.hpp>
 #include <stan/lang/generator/generate_try.hpp>
-#include <stan/lang/generator/generate_validate_transformed_params.hpp>
-//#include <stan/lang/generator/generate_validate_var_decl.hpp>
+#include <stan/lang/generator/generate_validate_var_decl.hpp>
 #include <ostream>
 
 namespace stan {
@@ -72,7 +70,7 @@ namespace stan {
           generate_indent(3, o);
           o << "current_statement_begin__ = " <<  prog.derived_decl_.first[i].begin_line_ << ";"
             << EOL;
-          generate_tparam_var(prog.derived_decl_.first[i], 3, o);
+          generate_block_var(prog.derived_decl_.first[i], "local_scalar_t__", 3, o);
           o << EOL;
         }
       }

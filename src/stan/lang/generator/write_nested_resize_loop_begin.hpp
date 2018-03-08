@@ -20,7 +20,6 @@ namespace stan {
      * re-evaluation of dimension size expression on each iteration.
      *
      * Dynamic initialization of parameter variables.
-     * Loops over containers require call to `resize` before open for loop.
      *
      * @param[in] name var name
      * @param[in] dims dimension sizes
@@ -35,34 +34,36 @@ namespace stan {
         return;
       }
 
-      // declare size_t var k_<n>_max__
+      // declare size_t var i_<n>_max__
       for (size_t i = 0; i < dims.size(); ++i) {
         generate_indent(indent, o);
-        o << "size_t " << name << "_k_" << i << "_max__ = ";
+        o << "size_t " << name << "_i_" << i << "_max__ = ";
         generate_expression(dims[i], NOT_USER_FACING, o);
         o << ";" << EOL;
       }
-      // nested for stmts open
+
       for (size_t i = 0; i < dims.size(); ++i) {
-        // dynamic allocation stmt
         if (i < dims.size() - 1) {
+          // dynamic allocation stmt
           generate_indent(indent + i, o);
           o << name;
           for (size_t j = 0; j < i; ++j)
-            o << "[k_" << j << "__]";
-          o << ".resize(" << name << "_k_" << i << "_max__);" << EOL;
+            o << "[i_" << j << "__]";
+          o << ".resize(" << name << "_i_" << i << "_max__);" << EOL;
         } else {
+          // innermost dimension, reserve
           generate_indent(indent + i, o);
           o << name;
           for (size_t j = 0; j < i; ++j)
-            o << "[k_" << j << "__]";
-          o << ".reserve(" << name << "_k_" <<  i << "_max__);" << EOL;
+            o << "[i_" << j << "__]";
+          o << ".reserve(" << name << "_i_" <<  i << "_max__);" << EOL;
         }
+
         // open for loop
         generate_indent(indent + i, o);
-        o << "for (int k"  << i << "__ = 0;"
-          << " k" << i << "__ < " << name << "_k_" << i << "_max__;"
-          << " ++k" << i << "__) {" << EOL;
+        o << "for (int i_"  << i << "__ = 0;"
+          << " i_" << i << "__ < " << name << "_i_" << i << "_max__;"
+          << " ++i_" << i << "__) {" << EOL;
       }
     }
 
