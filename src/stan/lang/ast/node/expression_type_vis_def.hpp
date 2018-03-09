@@ -53,6 +53,11 @@ namespace stan {
       return expr_type(vector_type(), 0);
     }
 
+    expr_type
+    expression_type_vis::operator()(const map_rect& e) const {
+      return expr_type(vector_type(), 0);
+    }
+
     expr_type expression_type_vis::operator()(const fun& e) const {
       return e.type_;
     }

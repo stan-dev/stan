@@ -114,6 +114,7 @@
 #include <stan/lang/ast/node/range.hpp>
 #include <stan/lang/ast/node/reject_statement.hpp>
 #include <stan/lang/ast/node/return_statement.hpp>
+#include <stan/lang/ast/node/map_rect.hpp>
 #include <stan/lang/ast/node/matrix_expr.hpp>
 #include <stan/lang/ast/node/row_vector_expr.hpp>
 #include <stan/lang/ast/node/row_vector_var_decl.hpp>

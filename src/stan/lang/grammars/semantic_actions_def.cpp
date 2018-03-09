@@ -251,6 +251,9 @@ namespace stan {
     template void assign_lhs::operator()(expression&,
                                          const algebra_solver_control&)
       const;
+    template void assign_lhs::operator()(expression&,
+                                         const map_rect&)
+      const;
     template void assign_lhs::operator()(array_expr&,
                                          const array_expr&) const;
     template void assign_lhs::operator()(matrix_expr&,
@@ -1936,6 +1939,65 @@ namespace stan {
     boost::phoenix::function<validate_algebra_solver_control>
     validate_algebra_solver_control_f;
 
+    void validate_map_rect::operator()(
+            const map_rect& mr, const variable_map& var_map,
+            bool& pass, std::ostream& error_msgs) const {
+      pass = true;
+
+      // mapped function signature
+      // vector f(vector param_shared, vector param_local,
+      //          real[] data_r, int[] data_i)
+      expr_type shared_params_type(vector_type(), 0);
+      expr_type job_params_type(vector_type(), 0);
+      expr_type job_data_r_type(double_type(), 0);
+      expr_type job_data_i_type(int_type(), 0);
+      expr_type result_type(vector_type(), 0);
+      std::vector<function_arg_type> arg_types
+          = { function_arg_type(shared_params_type),
+              function_arg_type(job_params_type),
+              function_arg_type(job_data_r_type),
+              function_arg_type(job_data_i_type) };
+      function_signature_t mapped_fun_signature(result_type, arg_types);
+
+      // validate mapped function signature
+      if (!function_signatures::instance()
+          .is_defined(mr.fun_name_, mapped_fun_signature)) {
+        error_msgs << "first argument to function map_rect()"
+                   << " must be the name of a function with signature"
+                   << " (vector, vector, real[], int[]) : vector";
+        pass = false;
+      }
+
+      // validate parameter and data argument shapes
+      if (mr.shared_params_.expression_type() != shared_params_type) {
+        error_msgs << "second argument to map_rect() must be vector";
+        pass = false;
+      }
+      if (mr.job_params_.expression_type() != job_params_type) {
+        error_msgs << "third argument to map_rect() must be vector";
+        pass = false;
+      }
+      if (mr.job_data_r_.expression_type() != job_data_r_type) {
+        error_msgs << "fourth argument to map_rect() must be real array";
+        pass = false;
+      }
+      if (mr.job_data_i_.expression_type() != job_data_i_type) {
+        error_msgs << "fifth argument to map-rect() must be int array";
+        pass = false;
+      }
+
+      // test data is data only
+      if (has_var(mr.job_data_r_, var_map)) {
+        error_msgs << "fourth argment to map_rect() must be data only";
+        pass = false;
+      }
+      if (has_var(mr.job_data_i_, var_map)) {
+        error_msgs << "fifth argument to map_rect() must be data only";
+        pass = false;
+      }
+    }
+    boost::phoenix::function<validate_map_rect> validate_map_rect_f;
+
 
     void set_fun_type_named::operator()(expression& fun_result, fun& fun,
                                         const scope& var_scope,
@@ -2647,6 +2709,11 @@ namespace stan {
     bool data_only_expression::operator()(const algebra_solver_control& x)
       const {
       return boost::apply_visitor(*this, x.theta_.expr_);
+    }
+    bool data_only_expression::operator()(const map_rect& x)
+      const {
+      return boost::apply_visitor(*this, x.shared_params_.expr_)
+          && boost::apply_visitor(*this, x.job_params_.expr_);
     }
     bool data_only_expression::operator()(const fun& x) const {
       for (size_t i = 0; i < x.args_.size(); ++i)
