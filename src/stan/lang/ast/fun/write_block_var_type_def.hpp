@@ -1,8 +1,7 @@
 #ifndef STAN_LANG_AST_FUN_WRITE_BLOCK_VAR_TYPE_DEF_HPP
 #define STAN_LANG_AST_FUN_WRITE_BLOCK_VAR_TYPE_DEF_HPP
 
-#include <stan/lang/ast/fun/write_block_var_type.hpp>
-#include <boost/variant.hpp>
+#include <stan/lang/ast.hpp>
 
 namespace stan {
   namespace lang {

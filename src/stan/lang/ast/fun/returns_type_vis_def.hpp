@@ -1,24 +1,11 @@
 #ifndef STAN_LANG_AST_FUN_RETURNS_TYPE_VIS_DEF_HPP
 #define STAN_LANG_AST_FUN_RETURNS_TYPE_VIS_DEF_HPP
 
-#include <stan/lang/ast/type/bare_expr_type.hpp>
-#include <stan/lang/ast/fun/is_assignable.hpp>
-#include <stan/lang/ast/fun/returns_type.hpp>
-#include <stan/lang/ast/fun/returns_type_vis.hpp>
-#include <stan/lang/ast/node/break_continue_statement.hpp>
-#include <stan/lang/ast/node/conditional_statement.hpp>
-#include <stan/lang/ast/node/for_statement.hpp>
-#include <stan/lang/ast/node/for_array_statement.hpp>
-#include <stan/lang/ast/node/for_matrix_statement.hpp>
-#include <stan/lang/ast/node/statement.hpp>
-#include <stan/lang/ast/node/statements.hpp>
-#include <stan/lang/ast/node/return_statement.hpp>
-#include <stan/lang/ast/node/while_statement.hpp>
+#include <stan/lang/ast.hpp>
 #include <ostream>
 
 namespace stan {
   namespace lang {
-
 
     returns_type_vis::returns_type_vis(const bare_expr_type& return_type,
                                        std::ostream& error_msgs)

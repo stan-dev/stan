@@ -2,7 +2,6 @@
 #define STAN_LANG_AST_FUN_STRIP_PROB_FUN_SUFFIX_DEF_HPP
 
 #include <stan/lang/ast.hpp>
-#include <string>
 
 namespace stan {
   namespace lang {

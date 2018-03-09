@@ -2,7 +2,6 @@
 #define STAN_LANG_AST_FUN_VAR_TYPE_ARRAY_LENS_VIS_DEF_HPP
 
 #include <stan/lang/ast.hpp>
-#include <boost/variant/apply_visitor.hpp>
 
 namespace stan {
   namespace lang {

@@ -1,10 +1,7 @@
 #ifndef STAN_LANG_AST_FUN_RETURNS_TYPE_DEF_HPP
 #define STAN_LANG_AST_FUN_RETURNS_TYPE_DEF_HPP
 
-#include <stan/lang/ast/type/bare_expr_type.hpp>
-#include <stan/lang/ast/fun/returns_type.hpp>
-#include <stan/lang/ast/fun/returns_type_vis.hpp>
-#include <stan/lang/ast/node/statement.hpp>
+#include <stan/lang/ast.hpp>
 #include <boost/variant/apply_visitor.hpp>
 #include <ostream>
 
