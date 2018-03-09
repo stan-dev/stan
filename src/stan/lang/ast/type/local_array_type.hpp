@@ -2,11 +2,10 @@
 #define STAN_LANG_AST_LOCAL_ARRAY_TYPE_HPP
 
 #include <stan/lang/ast/node/expression.hpp>
+#include <stan/lang/ast/type/local_var_type.hpp>
 
 namespace stan {
   namespace lang {
-
-    struct local_var_type;
 
     /** 
      * Local array type for Stan variables and expressions (recursive).

@@ -1,6 +1,7 @@
 #ifndef STAN_LANG_AST_INT_TYPE_DEF_HPP
 #define STAN_LANG_AST_INT_TYPE_DEF_HPP
 
+#include <stan/lang/ast/type/int_type.hpp>
 #include <string>
 
 namespace stan {

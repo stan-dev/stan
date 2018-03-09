@@ -7,7 +7,7 @@ namespace stan {
   namespace lang {
 
     struct order_id {
-      static const string ORDER_ID;
+      static const std::string ORDER_ID;
     };
 
   }

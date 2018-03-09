@@ -11,6 +11,13 @@
 #include <stan/lang/ast/type/vector_type.hpp>
 #include <stan/lang/ast/type/void_type.hpp>
 
+#include <stan/lang/ast/fun/bare_array_base_type_vis.hpp>
+#include <stan/lang/ast/fun/bare_array_dims_vis.hpp>
+#include <stan/lang/ast/fun/bare_array_element_type_vis.hpp>
+#include <stan/lang/ast/fun/bare_type_order_id_vis.hpp>
+#include <stan/lang/ast/fun/bare_type_vis.hpp>
+#include <stan/lang/ast/fun/is_array_type_vis.hpp>
+#include <stan/lang/ast/fun/total_dims_vis.hpp>
 #include <stan/lang/ast/fun/write_bare_expr_type.hpp>
 #include <ostream>
 

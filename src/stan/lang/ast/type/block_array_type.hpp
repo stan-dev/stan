@@ -2,12 +2,11 @@
 #define STAN_LANG_AST_BLOCK_ARRAY_TYPE_HPP
 
 #include <stan/lang/ast/node/expression.hpp>
+#include <stan/lang/ast/type/block_var_type.hpp>
 #include <vector>
 
 namespace stan {
   namespace lang {
-
-    struct block_var_type;
     
     /** 
      * Block array type for Stan variables and expressions (recursive).
