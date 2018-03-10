@@ -114,6 +114,14 @@ namespace stan {
       return boost::apply_visitor(vis, bare_type_);
     }
 
+    bare_expr_type bare_expr_type::base() const {
+      is_array_type_vis is_array_vis;
+      bare_array_base_type_vis get_base_vis;
+      if  (boost::apply_visitor(is_array_vis, bare_type_))
+        return boost::apply_visitor(get_base_vis, bare_type_);
+      return bare_type_;
+    }
+
     int bare_expr_type::num_dims() const {
       total_dims_vis vis;
       return boost::apply_visitor(vis, bare_type_);

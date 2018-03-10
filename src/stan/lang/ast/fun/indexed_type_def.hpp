@@ -23,77 +23,73 @@ namespace stan {
     */
     bare_expr_type indexed_type(const expression& e,
                                 const std::vector<idx>& idxs) {
-      bare_expr_type e_bare_type = e.bare_type();
-
       // check idxs size, although parser should disallow this
-      if (idxs.size() == 0) return e_bare_type;  
+      if (idxs.size() == 0) return e.bare_type();
 
-      size_t tot_dims = e_bare_type.num_dims();
       // cannot index primitive type
-      if (tot_dims == 0) return ill_formed_type();
-      // too many indexes for expression type
-      if (tot_dims < idxs.size()) return ill_formed_type();
+      if (e.bare_type().num_dims() == 0) return ill_formed_type();
 
-      int base_dims = e_bare_type.num_dims() - e_bare_type.array_dims();
-      // pad front of idxs so that we can reason about matrices later
-      std::vector<idx> idxs_padded;
-      multi_idx padding;
-      int pad_ct = tot_dims - idxs.size();
-      for (int i = 0; i < pad_ct; ++i)
-        idxs_padded.push_back(padding);
-      for (size_t i = 0; i < idxs.size(); ++i)
-        idxs_padded.push_back(idxs[i]);
-      
-      // int var pos tracks position in vector idxs
-      int pos = idxs_padded.size() - 1;
-      // check indexes on array dimensions only
-      for ( ; pos >= base_dims && e_bare_type.is_array_type(); --pos) {
-        if (!is_multi_index(idxs_padded[pos]))
-          e_bare_type = e_bare_type.array_element_type();
+      int e_dims = e.bare_type().num_dims();
+      int uni_cts = 0;
+      for (size_t i = 0; i < idxs.size(); ++i) {
+        if (!is_multi_index(idxs[i])) {
+          uni_cts++;
+        }
       }
-
-      // for primitive types, at end of loop, pos == 0
-      if (pos < 0) return e_bare_type;
-
-      // vector and matrix types, evaluate indexing on positions 0,1
-      // if indexes on array dims are multi-dim, indexed type is an array type
-      int ar_dims = e_bare_type.array_dims();
-
-      // compute indexed type for innermost array_element
-      if (ar_dims > 0) e_bare_type = e_bare_type.array_contains();
-
-      if (e_bare_type.is_vector_type()
-                 || e_bare_type.is_row_vector_type()) {
-        if (pos > 0) return ill_formed_type();  // sanity check
-        // reduce vector types according to remaining idx
-        if (!is_multi_index(idxs_padded[0])) {
-          if (ar_dims > 0) return bare_array_type(double_type(), ar_dims);
-          else return double_type();
+      if (uni_cts > e_dims)
+        return ill_formed_type();
+      
+      std::vector<int> slots(e_dims, 0);
+      for (size_t i = 0; i < idxs.size(); ++i) {
+        if (!is_multi_index(idxs[i])) {
+          slots[i] = 1;
+        }
+      }
+      int dims = e_dims - uni_cts;
+      if (e.bare_type().base().is_primitive()) {
+        if (dims == 0)
+          return e.bare_type().base();
+        else
+          return bare_array_type(e.bare_type().base(), dims);
+      }
+      if (e.bare_type().base().num_dims() == 1) {  // vector/row_vector
+        if (slots[e_dims - 1] == 1) {
+          if (dims == 0)
+            return double_type();
+          else
+            return bare_array_type(double_type(), dims);
+        } else {  
+          --dims;  // vector/row_vector contributes 1 dim to total
+          if (dims == 0)
+            return e.bare_type().base();
+          else
+            return bare_array_type(e.bare_type().base(), dims);
+        }
+      } else {  // matrix type, see table in reference manual for indexing logic
+        if (slots[e_dims - 2] == 1 && slots[e_dims - 1] == 1) {
+          if (dims == 0)
+            return double_type();
+          else
+            return bare_expr_type(bare_array_type(double_type(), dims));
+        } else if (slots[e_dims - 2] == 1) {
+          --dims;
+          if (dims == 0)
+            return row_vector_type();
+          else
+            return bare_expr_type(bare_array_type(row_vector_type(), dims));
+        } else if (slots[e_dims - 1] == 1) {
+          --dims;
+          if (dims == 0)
+            return vector_type();
+          else
+            return bare_expr_type(bare_array_type(vector_type(), dims));
         } else {
-          if (ar_dims > 0) return bare_array_type(e_bare_type, ar_dims);
-          else return e_bare_type;
-        }
-      } else if (e_bare_type.is_matrix_type()) {
-        if (pos > 1) return ill_formed_type();  // sanity check
-        // reduce matrix types according to remaining idx(s)
-        if (is_multi_index(idxs_padded[0]) && is_multi_index(idxs_padded[1])) {
-          // both row and col idexes unspecified or multi-idx
-          if (ar_dims > 0) return bare_array_type(matrix_type(), ar_dims);
-          else return matrix_type();
-        }
-        else if (is_multi_index(idxs_padded[1]) || pad_ct == 1) {
-          // no index specified for row, multi-idx on col
-          if (ar_dims > 0) return bare_array_type(row_vector_type(), ar_dims);
-          else return row_vector_type();
-        }
-        else if (is_multi_index(idxs_padded[0])  && pad_ct == 0) {
-          // specified uni-index on row, multi-idx on col
-          if (ar_dims > 0) return bare_array_type(vector_type(), ar_dims);
-          else return vector_type();
-        }
-        else {
-          if (ar_dims > 0) return bare_array_type(double_type(), ar_dims);
-          else return double_type();
+          --dims;
+          --dims; // matrix contributes 2 dims to total
+          if (dims == 0)
+            return matrix_type();
+          else
+            return bare_expr_type(bare_array_type(matrix_type(), dims));
         }
       }
       return ill_formed_type();

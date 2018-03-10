@@ -7,12 +7,14 @@ namespace stan {
   namespace lang {
 
     bare_expr_type infer_type_indexing(const bare_expr_type& bare_type,
-                                       int num_index_dims) {
+                                       size_t num_index_dims) {
       
       if (num_index_dims == 0) return bare_type;
-      if (num_index_dims > bare_type.num_dims())
-        return ill_formed_type();
-
+      if (bare_type.num_dims() >= 0) {
+        if (num_index_dims > (size_t)bare_type.num_dims())
+          return ill_formed_type();
+      }
+      
       bare_expr_type tmp = bare_type;
       while (tmp.is_array_type() && num_index_dims > 0) {
         tmp = tmp.array_element_type();

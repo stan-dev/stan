@@ -203,7 +203,9 @@ namespace stan {
     void function_signatures::add_unary_vectorized(const::std::string&
                                                    name) {
 
-      add(name, bare_expr_type(int_type()), bare_expr_type(int_type()));
+      // note:  vectorized functions always return elements of type real;
+      //        integer elements are promoted to real elements
+      add(name, bare_expr_type(double_type()), bare_expr_type(int_type()));
       add(name, bare_expr_type(double_type()), bare_expr_type(double_type()));
       add(name, bare_expr_type(vector_type()), bare_expr_type(vector_type()));
       add(name, bare_expr_type(row_vector_type()), bare_expr_type(row_vector_type()));
@@ -221,11 +223,11 @@ namespace stan {
       row_vector_type tRowVector;
       bare_array_type arRowVector(tRowVector);
       bare_expr_type arRowVectorType(arRowVector);
-      row_vector_type tVector;
+      vector_type tVector;
       bare_array_type arVector(tVector);
       bare_expr_type arVectorType(arVector);
       for (size_t i = 0; i < 8; ++i) {
-        add(name, arIntType, arIntType);
+        add(name, arDoubleType, arIntType);
         add(name, arDoubleType, arDoubleType);
         add(name, arMatrixType, arMatrixType);
         add(name, arRowVectorType, arRowVectorType);

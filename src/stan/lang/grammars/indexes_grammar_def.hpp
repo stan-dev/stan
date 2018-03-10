@@ -57,12 +57,12 @@ namespace stan {
       index_r.name("index expression, one of: "
                    "(int, int[], int:, :int, int:int, :)");
       index_r
-        %= lub_index_r(_r1)
-        | lb_index_r(_r1)
-        | uni_index_r(_r1)
-        | multi_index_r(_r1)
-        | ub_index_r(_r1)
-        | omni_index_r(_r1);
+        %= lub_index_r(_r1)[trace_f("lub_index_r")]
+        | lb_index_r(_r1)[trace_f("lb_index_r")]
+        | uni_index_r(_r1)[trace_f("uni_index_r")]
+        | multi_index_r(_r1)[trace_f("multi_index_r")]
+        | ub_index_r(_r1)[trace_f("ub_index_r")]
+        | omni_index_r(_r1)[trace_f("omni_index_r")];
 
       //   _r1 var scope
       lub_index_r.name("index expression int:int");
@@ -70,14 +70,14 @@ namespace stan {
         %= int_expression_r(_r1)
         >> lit(":")
         >> int_expression_r(_r1)
-        > eps;
+        > eps[trace_f("lub_index_r")];
 
       //   _r1 var scope
       lb_index_r.name("index expression int:");
       lb_index_r
         %= int_expression_r(_r1)
         >> lit(":")
-        > eps;
+        > eps[trace_f("lb_index_r")];;
 
       //   _r1 var scope
       uni_index_r.name("index expression int");

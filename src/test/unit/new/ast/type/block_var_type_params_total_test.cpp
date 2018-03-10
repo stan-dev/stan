@@ -99,7 +99,6 @@ TEST(blockVarType, createCholeskyFactor) {
 
   std::stringstream msgs;
   generate_expression(x.params_total(), false, msgs);
-  std::cout << msgs.str() << std::endl;
 }
 
 
@@ -110,7 +109,6 @@ TEST(blockVarType, createCholeskyFactorCorr) {
 
   std::stringstream msgs;
   generate_expression(x.params_total(), false, msgs);
-  std::cout << msgs.str() << std::endl;
 }
 
 TEST(blockVarType, createArrayCFCorr) {
@@ -126,7 +124,6 @@ TEST(blockVarType, createArrayCFCorr) {
 
   std::stringstream msgs;
   generate_expression(x.params_total(), false, msgs);
-  std::cout << msgs.str() << std::endl;
 }
 
 TEST(blockVarType, createCorrMatrix) {
@@ -136,7 +133,6 @@ TEST(blockVarType, createCorrMatrix) {
 
   std::stringstream msgs;
   generate_expression(x.params_total(), false, msgs);
-  std::cout << msgs.str() << std::endl;
 }
 
 TEST(blockVarType, createCovMatrix) {
@@ -146,7 +142,6 @@ TEST(blockVarType, createCovMatrix) {
 
   std::stringstream msgs;
   generate_expression(x.params_total(), false, msgs);
-  std::cout << msgs.str() << std::endl;
 }
 
 TEST(blockVarType, createOrdered) {
@@ -156,7 +151,6 @@ TEST(blockVarType, createOrdered) {
 
   std::stringstream msgs;
   generate_expression(x.params_total(), false, msgs);
-  std::cout << msgs.str() << std::endl;
 }
 
 TEST(blockVarType, createArrayOrd) {
@@ -168,7 +162,6 @@ TEST(blockVarType, createArrayOrd) {
 
   std::stringstream msgs;
   generate_expression(x.params_total(), false, msgs);
-  std::cout << msgs.str() << std::endl;
 }
 
 TEST(blockVarType, createPosOrdered) {
@@ -178,7 +171,6 @@ TEST(blockVarType, createPosOrdered) {
 
   std::stringstream msgs;
   generate_expression(x.params_total(), false, msgs);
-  std::cout << msgs.str() << std::endl;
 }
 
 TEST(blockVarType, createSimplex) {
@@ -188,7 +180,6 @@ TEST(blockVarType, createSimplex) {
 
   std::stringstream msgs;
   generate_expression(x.params_total(), false, msgs);
-  std::cout << msgs.str() << std::endl;
 }
 
 TEST(blockVarType, createArraySimplex) {
@@ -200,7 +191,6 @@ TEST(blockVarType, createArraySimplex) {
 
   std::stringstream msgs;
   generate_expression(x.params_total(), false, msgs);
-  std::cout << msgs.str() << std::endl;
 }
 
 TEST(blockVarType, createUnitVec) {
@@ -210,5 +200,4 @@ TEST(blockVarType, createUnitVec) {
 
   std::stringstream msgs;
   generate_expression(x.params_total(), false, msgs);
-  std::cout << msgs.str() << std::endl;
 }

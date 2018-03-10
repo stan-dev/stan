@@ -6,16 +6,17 @@
 #include <stan/lang/grammars/iterator_typedefs.hpp>
 #include <stan/lang/grammars/semantic_actions.hpp>
 
-// all of this needed for good error messages from parser
-#include <stan/lang/generator/expression_visgen.hpp>
-#include <stan/lang/generator/generate_array_builder_adds.hpp>
-#include <stan/lang/generator/generate_expression.hpp>
-#include <stan/lang/generator/generate_idxs.hpp>
-#include <stan/lang/generator/generate_idxs_user.hpp>
-#include <stan/lang/generator/generate_idx.hpp>
-#include <stan/lang/generator/generate_idx_user.hpp>
-#include <stan/lang/generator/idx_visgen.hpp>
-#include <stan/lang/generator/idx_user_visgen.hpp>
+// // all of this needed for good error messages from parser
+// // running in standalone testing mode, but not from stanc_helper
+// #include <stan/lang/generator/expression_visgen.hpp>
+// #include <stan/lang/generator/generate_array_builder_adds.hpp>
+// #include <stan/lang/generator/generate_expression.hpp>
+// #include <stan/lang/generator/generate_idxs.hpp>
+// #include <stan/lang/generator/generate_idxs_user.hpp>
+// #include <stan/lang/generator/generate_idx.hpp>
+// #include <stan/lang/generator/generate_idx_user.hpp>
+// #include <stan/lang/generator/idx_visgen.hpp>
+// #include <stan/lang/generator/idx_user_visgen.hpp>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
@@ -124,7 +125,6 @@ namespace stan {
     }
 
     void set_fun_type(fun& fun, std::ostream& error_msgs) {
-      //      std::cout << "set_fun_type?? " << std::endl;
       std::vector<bare_expr_type> arg_types;
       for (size_t i = 0; i < fun.args_.size(); ++i)
         arg_types.push_back(fun.args_[i].bare_type());
@@ -190,28 +190,31 @@ namespace stan {
                         const std::string& stmt_type,
                         std::ostream& error_msgs) {
 
-      if (lhs_type.num_dims() != rhs_expr.bare_type().num_dims()) {
+      if (lhs_type.num_dims() != rhs_expr.bare_type().num_dims()
+          || lhs_type.array_dims() != rhs_expr.bare_type().array_dims()
+          ) {
         error_msgs << "Dimension mismatch in "
                    << stmt_type
                    << "; variable name = "
                    << name
-                   << ", num dimensions given = "
-                   << lhs_type.num_dims()
-                   << "; right-hand side dimensions = "
-                   << rhs_expr.bare_type().num_dims()
+                   << ", type = " << lhs_type
+                   << "; right-hand side type = "
+                   << rhs_expr.bare_type()
                    << std::endl;
         return false;
       }
       
       // allow int -> double promotion, even in arrays
       bool types_compatible =
-        (lhs_type == rhs_expr.bare_type()
-         || (lhs_type.is_double_type() && rhs_expr.bare_type().is_int_type()));
+        (lhs_type.base() == rhs_expr.bare_type().base()
+         || (lhs_type.base().is_double_type()
+             && rhs_expr.bare_type().base().is_int_type()));
       if (!types_compatible) {
         error_msgs << "Base type mismatch in " << stmt_type
                    << "; variable name = " << name
-                   << ", type = " << lhs_type
-                   << "; right-hand side type = " << rhs_expr.bare_type()
+                   << ", base type = " << lhs_type.base()
+                   << "; right-hand side base type = "
+                   << rhs_expr.bare_type().base()
                    << std::endl;
         return false;
       }
@@ -557,7 +560,6 @@ namespace stan {
         std::set<std::pair<std::string, function_signature_t> >&
                                             functions_defined,
         std::ostream& error_msgs) const {
-      //      std::cout << "add_function_signature" << std::endl;
       std::vector<bare_expr_type> arg_types;
       for (size_t i = 0; i < decl.arg_decls_.size(); ++i) {
         arg_types.push_back(decl.arg_decls_[i].bare_type());
@@ -779,13 +781,9 @@ namespace stan {
 
     void validate_ints_expression::operator()(const expression& e, bool& pass,
                                               std::ostream& error_msgs) const {
-      bare_expr_type bare_type = e.bare_type();
-      if (bare_type.is_array_type())
-        bare_type = bare_type.array_contains();
-      if (!bare_type.is_int_type()) {
-        error_msgs << "ERROR:  Container index must be integer; found type=";
-        write_bare_expr_type(error_msgs, bare_type);
-        error_msgs << std::endl;
+      if (!e.bare_type().base().is_int_type()) {
+        error_msgs << "ERROR:  Container index must be integer; found type="
+                   << e.bare_type() << std::endl;
         pass = false;
         return;
       }
@@ -1002,6 +1000,7 @@ namespace stan {
 
       expression lhs_expr = expression(a.lhs_var_);
       bare_expr_type lhs_type = indexed_type(lhs_expr, a.idxs_);
+
       //      std::cout << "lhs indexed_type " << lhs_type << std::endl;
 
       if (lhs_type.is_ill_formed_type()) {
@@ -1010,6 +1009,7 @@ namespace stan {
         pass = false;
         return;
       }
+      // call to has_same_shape is not correct.... not taking into account idxs
       if (!has_same_shape(lhs_type, a.rhs_, name, "assignment", error_msgs)) {
         pass = false;
         return;
@@ -1044,12 +1044,9 @@ namespace stan {
         return;
       }
       a.var_type_ = vm.get_bare_type(name);
+        
       bare_expr_type inferred_lhs_type
         = infer_var_dims_type(a.var_type_, a.var_dims_);
-
-      // std::cout << "validate_assignment, " << name << " type " << a.var_type_
-      //           << " inferred type (indexes) " << inferred_lhs_type
-      //           << std::endl;
 
       if (inferred_lhs_type.is_ill_formed_type()) {
         error_msgs << "Too many indexes for variable"
@@ -1488,7 +1485,7 @@ namespace stan {
         error_msgs << "ERROR: loop variable already declared."
                    << " variable name=\"" << name << "\"" << std::endl;
       else
-
+        // loop over range, loop var type is int
         vm.add(name, var_decl(name, int_type()),
                scope(var_scope.program_block(), true));
     }
@@ -1500,14 +1497,13 @@ namespace stan {
                    const scope& var_scope,
                    bool& pass, variable_map& vm,
                    std::stringstream& error_msgs) const {
-
       pass = !(vm.exists(name));
       if (!pass) {
         error_msgs << "ERROR: loop variable already declared."
                    << " variable name=\"" << name << "\"" << std::endl;
         return;
       }
-      pass = !(expr.bare_type().is_array_type());
+      pass = expr.bare_type().is_array_type();
       if (!pass) {
         error_msgs << "ERROR: loop variable must be array type."
                    << " variable type=\"" << expr.bare_type() << "\"" << std::endl;
@@ -1532,12 +1528,14 @@ namespace stan {
                    << " variable name=\"" << name << "\"" << std::endl;
         return;
       }
-      pass = !(expr.bare_type().num_dims() > 0);
+      pass = expr.bare_type().num_dims() > 0
+             && !(expr.bare_type().is_array_type());
       if (!pass) {
         error_msgs << "ERROR: loop must be over container or range."
                    << std::endl;
         return;
       }
+      // loop over elements of vec/rowvec/matrix, loop var type is double
       vm.add(name, var_decl(name, double_type()),
              scope(var_scope.program_block(), true));
     }
@@ -1630,6 +1628,10 @@ namespace stan {
     add_line_number_f;
 
     template void add_line_number::operator()(block_var_decl&,
+                                              const pos_iterator_t& begin,
+                                              const pos_iterator_t& end) const;
+
+    template void add_line_number::operator()(local_var_decl&,
                                               const pos_iterator_t& begin,
                                               const pos_iterator_t& end) const;
 
@@ -2156,25 +2158,18 @@ namespace stan {
       bare_expr_type e_first(array_expr.args_[0].bare_type());
       for (size_t i = 1; i < array_expr.args_.size(); ++i) {
         bare_expr_type e_next(array_expr.args_[i].bare_type());
-        if (e_first.num_dims() != e_next.num_dims()) {
-          error_msgs << "Expressions for elements of array must have"
-                     << " same array sizes; found"
-                     << " first element type=" << e_first
-                     << "; type at position " << i << "=" << e_next;
-          array_expr.type_ = ill_formed_type();
-          pass = false;
-          return;
-        }
-        if (e_first.is_int_type() && e_next.is_double_type()) {
-          e_first = double_type();
-        } else if (e_first != e_next) {
-          error_msgs << "Expressions for elements of array must have"
-                     << " the same or promotable types; found"
-                     << " first element type=" << e_first
-                     << "; type at position " << i << "=" << e_next;
-          array_expr.type_ = ill_formed_type();
-          pass = false;
-          return;
+        if (e_first != e_next) {
+          if (e_first.is_primitive() && e_next.is_primitive())
+            e_first = double_type();
+          else {
+            error_msgs << "Expressions for elements of array must have"
+                       << " the same or promotable types; found"
+                       << " first element type=" << e_first
+                       << "; type at position " << i + 1 << "=" << e_next;
+            array_expr.type_ = ill_formed_type();
+            pass = false;
+            return;
+          }
         }
       }
       array_expr.type_ = bare_array_type(e_first);
@@ -3042,189 +3037,37 @@ namespace stan {
     boost::phoenix::function<validate_array_block_var_decl>
     validate_array_block_var_decl_f;
 
-    template <typename T>
-    void validate_single_var_decl::operator()(
-                                        const T& var_decl_result,
-                                        bool& pass,
-                                        std::ostream& error_msgs) const {
-      //      std::cout << "validate_single_var_decl, " << var_decl_result.name()
-      //                << " type: " << var_decl_result.type() << std::endl;
-      if (var_decl_result.bare_type().is_ill_formed_type()) {
+    void validate_single_block_var_decl::operator()(
+                                         const block_var_decl& var_decl,
+                                         bool& pass,
+                                         std::ostream& error_msgs) const {
+      if (var_decl.bare_type().is_ill_formed_type()) {
         error_msgs << "variable declaration is ill formed,"
                    << " variable name="
-                   << var_decl_result.name()
+                   << var_decl.name()
                    << std::endl;
         pass = false;
         return;
       }
     }
-    boost::phoenix::function<validate_single_var_decl>
-    validate_single_var_decl_f;
+    boost::phoenix::function<validate_single_block_var_decl>
+    validate_single_block_var_decl_f;
 
-    template void
-    validate_single_var_decl::operator()(
-                              const block_var_type& var_decl_result,
-                              bool& pass,
-                              std::ostream& error_msgs) const;
-
-    template void
-    validate_single_var_decl::operator()(
-                              const local_var_type& var_decl_result,
-                              bool& pass,
-                              std::ostream& error_msgs) const;
-
-
-    template <typename T>
-    void validate_block_var_type::operator()(
-                                             block_var_type& var_type_result,
-                                             const T& var_type,
-                                             bool& pass,
-                                             std::ostream& error_msgs) const {
-      block_var_type result(var_type);
-      if (result.bare_type().is_ill_formed_type()) {
-        error_msgs << "variable type is ill formed"
+    void validate_single_local_var_decl::operator()(
+                                         const local_var_decl& var_decl,
+                                         bool& pass,
+                                         std::ostream& error_msgs) const {
+      if (var_decl.bare_type().is_ill_formed_type()) {
+        error_msgs << "variable declaration is ill formed,"
+                   << " variable name="
+                   << var_decl.name()
                    << std::endl;
         pass = false;
         return;
-      }        
-      var_type_result = result;
+      }
     }
-    boost::phoenix::function<validate_block_var_type>
-    validate_block_var_type_f;
-
-    template void
-    validate_block_var_type::operator()(block_var_type& var_type_result,
-                             const block_array_type& var_type,
-                             bool& pass,
-                             std::ostream& error_msgs) const;
-    template void
-    validate_block_var_type::operator()(block_var_type& var_type_result,
-                             const cholesky_factor_corr_block_type& var_type,
-                             bool& pass,
-                             std::ostream& error_msgs) const;
-    template void
-    validate_block_var_type::operator()(block_var_type& var_type_result,
-                             const cholesky_factor_cov_block_type& var_type,
-                             bool& pass,
-                             std::ostream& error_msgs) const;
-    template void
-    validate_block_var_type::operator()(block_var_type& var_type_result,
-                             const corr_matrix_block_type& var_type,
-                             bool& pass,
-                             std::ostream& error_msgs) const;
-    template void
-    validate_block_var_type::operator()(block_var_type& var_type_result,
-                             const cov_matrix_block_type& var_type,
-                             bool& pass,
-                             std::ostream& error_msgs) const;
-    template void
-    validate_block_var_type::operator()(block_var_type& var_type_result,
-                             const double_block_type& var_type,
-                             bool& pass,
-                             std::ostream& error_msgs) const;
-    template void
-    validate_block_var_type::operator()(block_var_type& var_type_result,
-                             const ill_formed_type& var_type,
-                             bool& pass,
-                             std::ostream& error_msgs) const;
-    template void
-    validate_block_var_type::operator()(block_var_type& var_type_result,
-                             const int_block_type& var_type,
-                             bool& pass,
-                             std::ostream& error_msgs) const;
-    template void
-    validate_block_var_type::operator()(block_var_type& var_type_result,
-                             const matrix_block_type& var_type,
-                             bool& pass,
-                             std::ostream& error_msgs) const;
-    template void
-    validate_block_var_type::operator()(block_var_type& var_type_result,
-                             const ordered_block_type& var_type,
-                             bool& pass,
-                             std::ostream& error_msgs) const;
-    template void
-    validate_block_var_type::operator()(block_var_type& var_type_result,
-                             const positive_ordered_block_type& var_type,
-                             bool& pass,
-                             std::ostream& error_msgs) const;
-    template void
-    validate_block_var_type::operator()(block_var_type& var_type_result,
-                             const row_vector_block_type& var_type,
-                             bool& pass,
-                             std::ostream& error_msgs) const;
-    template void
-    validate_block_var_type::operator()(block_var_type& var_type_result,
-                             const simplex_block_type& var_type,
-                             bool& pass,
-                             std::ostream& error_msgs) const;
-    template void
-    validate_block_var_type::operator()(block_var_type& var_type_result,
-                             const unit_vector_block_type& var_type,
-                             bool& pass,
-                             std::ostream& error_msgs) const;
-    template void
-    validate_block_var_type::operator()(block_var_type& var_type_result,
-                             const vector_block_type& var_type,
-                             bool& pass,
-                             std::ostream& error_msgs) const;
-
-
-    template <typename T>
-    void validate_local_var_type::operator()(
-                                             local_var_type& var_type_result,
-                                             const T& var_type,
-                                             bool& pass,
-                                             std::ostream& error_msgs) const {
-      local_var_type result(var_type);
-      //      std::cout << "validate local var_type, parsed bare_type: " << result << std::endl;
-
-      if (result.bare_type().is_ill_formed_type()) {
-        error_msgs << "variable type is ill formed"
-                   << std::endl;
-        pass = false;
-        return;
-      }        
-      var_type_result = result;
-    }
-    boost::phoenix::function<validate_local_var_type>
-    validate_local_var_type_f;
-
-
-    template void
-    validate_local_var_type::operator()(local_var_type& var_type_result,
-                             const local_array_type& var_type,
-                             bool& pass,
-                             std::ostream& error_msgs) const;
-    template void
-    validate_local_var_type::operator()(local_var_type& var_type_result,
-                             const double_type& var_type,
-                             bool& pass,
-                             std::ostream& error_msgs) const;
-    template void
-    validate_local_var_type::operator()(local_var_type& var_type_result,
-                             const ill_formed_type& var_type,
-                             bool& pass,
-                             std::ostream& error_msgs) const;
-    template void
-    validate_local_var_type::operator()(local_var_type& var_type_result,
-                             const int_type& var_type,
-                             bool& pass,
-                             std::ostream& error_msgs) const;
-    template void
-    validate_local_var_type::operator()(local_var_type& var_type_result,
-                             const matrix_local_type& var_type,
-                             bool& pass,
-                             std::ostream& error_msgs) const;
-    template void
-    validate_local_var_type::operator()(local_var_type& var_type_result,
-                             const row_vector_local_type& var_type,
-                             bool& pass,
-                             std::ostream& error_msgs) const;
-    template void
-    validate_local_var_type::operator()(local_var_type& var_type_result,
-                             const vector_local_type& var_type,
-                             bool& pass,
-                             std::ostream& error_msgs) const;
+    boost::phoenix::function<validate_single_local_var_decl>
+    validate_single_local_var_decl_f;
                                                       
     void validate_array_local_var_decl::operator()(
                                         local_var_decl& var_decl_result,
@@ -3442,13 +3285,13 @@ namespace stan {
     boost::phoenix::function<reset_var_scope> reset_var_scope_f;
 
     void trace::operator()(const std::string& msg) const {
-      //            std::cout << msg << std::endl;
+      //      std::cout << msg << std::endl;
     }
     boost::phoenix::function<trace> trace_f;
 
     void trace_pass::operator()(const std::string& msg,
                                  const bool& pass) const {
-      //            std::cout << msg << " pass? " << pass << std::endl;
+      //      std::cout << msg << " pass? " << pass << std::endl;
     }
     boost::phoenix::function<trace_pass> trace_pass_f;
 

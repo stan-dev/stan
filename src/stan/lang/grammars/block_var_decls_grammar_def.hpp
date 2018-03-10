@@ -126,8 +126,8 @@ namespace stan {
            > identifier_r
            > opt_def_r(_r1)
            > eps
-           [validate_single_var_decl_f(_val, _pass,
-                                       boost::phoenix::ref(error_msgs_))];
+           [validate_single_block_var_decl_f(_val, _pass,
+                                             boost::phoenix::ref(error_msgs_))];
       
       element_type_r.name("block var element type declaration");
       element_type_r
@@ -143,9 +143,7 @@ namespace stan {
             | corr_matrix_type_r(_r1)
             | cov_matrix_type_r(_r1)
             | cholesky_factor_corr_type_r(_r1)
-            | cholesky_factor_cov_type_r(_r1))
-        [validate_block_var_type_f(_val, _1, _pass,
-                                   boost::phoenix::ref(error_msgs_))];
+            | cholesky_factor_cov_type_r(_r1));
       
       int_type_r.name("integer type");
       int_type_r

@@ -258,13 +258,21 @@ add("diag_pre_multiply", bare_expr_type(matrix_type()), bare_expr_type(vector_ty
 add("diag_pre_multiply", bare_expr_type(matrix_type()), bare_expr_type(row_vector_type()), bare_expr_type(matrix_type()));
 add("diagonal", bare_expr_type(vector_type()), bare_expr_type(matrix_type()));
 add_unary_vectorized("digamma");
+
+add("dims", bare_expr_type(bare_array_type(int_type(), 1)), bare_expr_type(int_type()));
+add("dims", bare_expr_type(bare_array_type(int_type(), 1)), bare_expr_type(double_type()));
+add("dims", bare_expr_type(bare_array_type(int_type(), 1)), bare_expr_type(vector_type()));
+add("dims", bare_expr_type(bare_array_type(int_type(), 1)), bare_expr_type(row_vector_type()));
+add("dims", bare_expr_type(bare_array_type(int_type(), 1)), bare_expr_type(matrix_type()));
+
 for (size_t i = 0; i < 8; ++i) {
-  add("dims", bare_expr_type(bare_array_type(int_type(), 1)), bare_expr_type(bare_array_type(bare_array_type(int_type(), i))));
-  add("dims", bare_expr_type(bare_array_type(int_type(), 1)), bare_expr_type(bare_array_type(bare_array_type(double_type(), i))));
-  add("dims", bare_expr_type(bare_array_type(int_type(), 1)), bare_expr_type(bare_array_type(bare_array_type(vector_type(), i))));
-  add("dims", bare_expr_type(bare_array_type(int_type(), 1)), bare_expr_type(bare_array_type(bare_array_type(row_vector_type(), i))));
-  add("dims", bare_expr_type(bare_array_type(int_type(), 1)), bare_expr_type(bare_array_type(bare_array_type(matrix_type(), i))));
- }
+  add("dims", bare_expr_type(bare_array_type(int_type(), 1)), bare_expr_type(bare_array_type(int_type(), i + 1)));
+  add("dims", bare_expr_type(bare_array_type(int_type(), 1)), bare_expr_type(bare_array_type(double_type(), i + 1)));
+  add("dims", bare_expr_type(bare_array_type(int_type(), 1)), bare_expr_type(bare_array_type(vector_type(), i + 1)));
+  add("dims", bare_expr_type(bare_array_type(int_type(), 1)), bare_expr_type(bare_array_type(row_vector_type(), i + 1)));
+  add("dims", bare_expr_type(bare_array_type(int_type(), 1)), bare_expr_type(bare_array_type(matrix_type(), i + 1)));
+}
+
 add("dirichlet_log", bare_expr_type(double_type()), bare_expr_type(vector_type()), bare_expr_type(vector_type()));
 add("dirichlet_lpdf", bare_expr_type(double_type()), bare_expr_type(vector_type()), bare_expr_type(vector_type()));
 add("dirichlet_rng", bare_expr_type(vector_type()), bare_expr_type(vector_type()));

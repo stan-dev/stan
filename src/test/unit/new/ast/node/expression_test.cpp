@@ -239,7 +239,7 @@ TEST(astExpression, index_op) {
   EXPECT_TRUE(e3.bare_type().is_double_type());
 }
 
-TEST(astExpression, index_op_sliced) {
+TEST(astExpression, idx_sliced_all_multi) {
   stan::lang::variable v1("foo");
   // multi-idx index expression
   v1.set_type(stan::lang::bare_array_type(stan::lang::int_type()));
@@ -249,13 +249,168 @@ TEST(astExpression, index_op_sliced) {
   EXPECT_TRUE(stan::lang::is_multi_index(i1));
   std::vector<stan::lang::idx> idxs;
   idxs.push_back(idx);
+  idxs.push_back(idx);
+  idxs.push_back(idx);
 
-  stan::lang::bare_expr_type d1 = stan::lang::bare_array_type(stan::lang::int_type());
-  stan::lang::bare_expr_type d2 = stan::lang::bare_array_type(d1);
+  stan::lang::bare_expr_type d3_ar_mat =
+    stan::lang::bare_array_type(stan::lang::matrix_type(), 3);
   stan::lang::variable v2("bar");
-  v2.set_type(d2);
+  v2.set_type(d3_ar_mat);
   stan::lang::expression e2(v2);
   stan::lang::index_op_sliced i_op_slice(e2, idxs);
+
   stan::lang::expression e3 = i_op_slice;
-  EXPECT_EQ(e3.bare_type(), d2);
+  EXPECT_TRUE(e3.bare_type().num_dims() == 5);
+  EXPECT_TRUE(e3.bare_type().array_dims() == 3);
+  EXPECT_TRUE(e3.bare_type().base().is_matrix_type());
+}
+
+TEST(astExpression, index_sliced_2) {
+  stan::lang::variable v1("multi_idx");
+  v1.set_type(stan::lang::bare_array_type(stan::lang::int_type()));
+  stan::lang::expression e1(v1);
+  stan::lang::multi_idx i1(e1);
+  stan::lang::idx m_idx(i1);
+  EXPECT_TRUE(stan::lang::is_multi_index(m_idx));
+
+  stan::lang::expression e2 = stan::lang::int_literal(5);
+  stan::lang::uni_idx i2(e2);
+  stan::lang::idx u_idx(i2);
+  EXPECT_FALSE(stan::lang::is_multi_index(u_idx));
+
+  std::vector<stan::lang::idx> idxs;
+  idxs.push_back(m_idx);
+  idxs.push_back(m_idx);
+  idxs.push_back(u_idx);
+
+  stan::lang::bare_expr_type d3 = stan::lang::bare_array_type(stan::lang::int_type(), 3);
+  stan::lang::variable v2("bar");
+  v2.set_type(d3);
+  stan::lang::expression e3(v2);
+  stan::lang::index_op_sliced i_op_slice(e3, idxs);
+
+  stan::lang::expression e4 = i_op_slice;
+  EXPECT_TRUE(e4.bare_type().num_dims() == 2);
+  EXPECT_TRUE(e4.bare_type().array_dims() == 2);
+  EXPECT_TRUE(e4.bare_type().base().is_int_type());
+}
+
+TEST(astExpression, index_sliced_3) {
+  stan::lang::variable v1("multi_idx");
+  v1.set_type(stan::lang::bare_array_type(stan::lang::int_type()));
+  stan::lang::expression e1(v1);
+  stan::lang::multi_idx i1(e1);
+  stan::lang::idx m_idx(i1);
+  EXPECT_TRUE(stan::lang::is_multi_index(m_idx));
+
+  stan::lang::expression e2 = stan::lang::int_literal(5);
+  stan::lang::uni_idx i2(e2);
+  stan::lang::idx u_idx(i2);
+  EXPECT_FALSE(stan::lang::is_multi_index(u_idx));
+
+  std::vector<stan::lang::idx> idxs;
+  idxs.push_back(m_idx);
+  idxs.push_back(m_idx);
+  idxs.push_back(u_idx);
+
+  stan::lang::bare_expr_type d3 = stan::lang::bare_array_type(stan::lang::vector_type(), 2);
+  stan::lang::variable v2("bar");
+  v2.set_type(d3);
+  stan::lang::expression e3(v2);
+  stan::lang::index_op_sliced i_op_slice(e3, idxs);
+
+  stan::lang::expression e4 = i_op_slice;
+  EXPECT_TRUE(e4.bare_type().num_dims() == 2);
+  EXPECT_TRUE(e4.bare_type().array_dims() == 1);
+  EXPECT_TRUE(e4.bare_type().base().is_vector_type());
+}
+
+TEST(astExpression, index_sliced_4) {
+  stan::lang::variable v1("multi_idx");
+  v1.set_type(stan::lang::bare_array_type(stan::lang::int_type()));
+  stan::lang::expression e1(v1);
+  stan::lang::multi_idx i1(e1);
+  stan::lang::idx m_idx(i1);
+  EXPECT_TRUE(stan::lang::is_multi_index(m_idx));
+
+  stan::lang::expression e2 = stan::lang::int_literal(5);
+  stan::lang::uni_idx i2(e2);
+  stan::lang::idx u_idx(i2);
+  EXPECT_FALSE(stan::lang::is_multi_index(u_idx));
+
+  std::vector<stan::lang::idx> idxs;
+  idxs.push_back(u_idx);
+  idxs.push_back(m_idx);
+  idxs.push_back(m_idx);
+
+  stan::lang::bare_expr_type d3 = stan::lang::bare_array_type(stan::lang::vector_type(), 2);
+  stan::lang::variable v2("bar");
+  v2.set_type(d3);
+  stan::lang::expression e3(v2);
+  stan::lang::index_op_sliced i_op_slice(e3, idxs);
+
+  stan::lang::expression e4 = i_op_slice;
+  EXPECT_TRUE(e4.bare_type().num_dims() == 2);
+  EXPECT_TRUE(e4.bare_type().array_dims() == 2);
+  EXPECT_TRUE(e4.bare_type().base().is_double_type());
+}
+
+TEST(astExpression, index_sliced_5) {
+  stan::lang::variable v1("multi_idx");
+  v1.set_type(stan::lang::bare_array_type(stan::lang::int_type()));
+  stan::lang::expression e1(v1);
+  stan::lang::multi_idx i1(e1);
+  stan::lang::idx m_idx(i1);
+  EXPECT_TRUE(stan::lang::is_multi_index(m_idx));
+
+  stan::lang::expression e2 = stan::lang::int_literal(5);
+  stan::lang::uni_idx i2(e2);
+  stan::lang::idx u_idx(i2);
+  EXPECT_FALSE(stan::lang::is_multi_index(u_idx));
+
+  std::vector<stan::lang::idx> idxs;
+  idxs.push_back(u_idx);
+  idxs.push_back(m_idx);
+  idxs.push_back(m_idx);
+
+  stan::lang::bare_expr_type d3 = stan::lang::bare_array_type(stan::lang::matrix_type(), 1);
+  stan::lang::variable v2("bar");
+  v2.set_type(d3);
+  stan::lang::expression e3(v2);
+  stan::lang::index_op_sliced i_op_slice(e3, idxs);
+
+  stan::lang::expression e4 = i_op_slice;
+  EXPECT_TRUE(e4.bare_type().num_dims() == 2);
+  EXPECT_TRUE(e4.bare_type().array_dims() == 1);
+  EXPECT_TRUE(e4.bare_type().base().is_row_vector_type());
+}
+
+TEST(astExpression, index_sliced_6) {
+  stan::lang::variable v1("multi_idx");
+  v1.set_type(stan::lang::bare_array_type(stan::lang::int_type()));
+  stan::lang::expression e1(v1);
+  stan::lang::multi_idx i1(e1);
+  stan::lang::idx m_idx(i1);
+  EXPECT_TRUE(stan::lang::is_multi_index(m_idx));
+
+  stan::lang::expression e2 = stan::lang::int_literal(5);
+  stan::lang::uni_idx i2(e2);
+  stan::lang::idx u_idx(i2);
+  EXPECT_FALSE(stan::lang::is_multi_index(u_idx));
+
+  std::vector<stan::lang::idx> idxs;
+  idxs.push_back(m_idx);
+  idxs.push_back(u_idx);
+  idxs.push_back(m_idx);
+
+  stan::lang::bare_expr_type d3 = stan::lang::bare_array_type(stan::lang::matrix_type(), 1);
+  stan::lang::variable v2("bar");
+  v2.set_type(d3);
+  stan::lang::expression e3(v2);
+  stan::lang::index_op_sliced i_op_slice(e3, idxs);
+
+  stan::lang::expression e4 = i_op_slice;
+  EXPECT_TRUE(e4.bare_type().num_dims() == 2);
+  EXPECT_TRUE(e4.bare_type().array_dims() == 1);
+  EXPECT_TRUE(e4.bare_type().base().is_vector_type());
 }

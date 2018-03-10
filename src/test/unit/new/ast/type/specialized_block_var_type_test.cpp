@@ -1,4 +1,16 @@
 #include <stan/lang/ast_def.cpp>
+
+// using these to check row/col args for specialized types
+#include <stan/lang/generator/expression_visgen.hpp>
+#include <stan/lang/generator/generate_array_builder_adds.hpp>
+#include <stan/lang/generator/generate_expression.hpp>
+#include <stan/lang/generator/generate_idxs.hpp>
+#include <stan/lang/generator/generate_idxs_user.hpp>
+#include <stan/lang/generator/generate_idx.hpp>
+#include <stan/lang/generator/generate_idx_user.hpp>
+#include <stan/lang/generator/idx_visgen.hpp>
+#include <stan/lang/generator/idx_user_visgen.hpp>
+
 #include <gtest/gtest.h>
 #include <sstream>
 #include <string>
@@ -58,16 +70,26 @@ TEST(blockVarType, createCholeskyFactorCovSquare) {
   EXPECT_EQ(x.num_dims(), 2);
   EXPECT_TRUE(x.arg1().bare_type().is_int_type());
   EXPECT_TRUE(x.arg2().bare_type().is_int_type());
-  int_literal e1 = boost::get<stan::lang::int_literal>(x.arg1().expr_);
-  int_literal e2 = boost::get<stan::lang::int_literal>(x.arg2().expr_);
-  EXPECT_EQ(e1.val_, e2.val_);
-  
   std::vector<expression> array_lens = x.array_lens();
   EXPECT_EQ(array_lens.size(), x.array_dims());
 
   std::stringstream ss;
+
+  generate_expression(x.arg1(), false, ss);
+  EXPECT_EQ("4", ss.str());
+  ss.str(std::string());
+
+  ss.clear();
+  generate_expression(x.arg2(), false, ss);
+  EXPECT_EQ("4", ss.str());
+  ss.str(std::string());
+  ss.clear();
+
+  ss.str(std::string());
+  ss.clear();
   write_block_var_type(ss, x);
   EXPECT_EQ("cholesky_factor_cov", ss.str());
+
   ss.str(std::string());
   ss.clear();
   write_bare_expr_type(ss, x.bare_type());
@@ -84,14 +106,21 @@ TEST(blockVarType, createCholeskyFactorCovRect) {
   EXPECT_EQ(x.num_dims(), 2);
   EXPECT_TRUE(x.arg1().bare_type().is_int_type());
   EXPECT_TRUE(x.arg2().bare_type().is_int_type());
-  int_literal e1 = boost::get<stan::lang::int_literal>(x.arg1().expr_);
-  int_literal e2 = boost::get<stan::lang::int_literal>(x.arg2().expr_);
-  EXPECT_NE(e1.val_, e2.val_);
 
   std::vector<expression> array_lens = x.array_lens();
   EXPECT_EQ(array_lens.size(), x.array_dims());
-
   std::stringstream ss;
+
+  generate_expression(x.arg1(), false, ss);
+  EXPECT_EQ("3", ss.str());
+  ss.str(std::string());
+
+  ss.clear();
+  generate_expression(x.arg2(), false, ss);
+  EXPECT_EQ("4", ss.str());
+  ss.str(std::string());
+  ss.clear();
+
   write_block_var_type(ss, x);
   EXPECT_EQ("cholesky_factor_cov", ss.str());
   ss.str(std::string());
@@ -109,14 +138,22 @@ TEST(blockVarType, createCholeskyFactorCorr) {
   EXPECT_EQ(x.num_dims(), 2);
   EXPECT_TRUE(x.arg1().bare_type().is_int_type());
   EXPECT_TRUE(x.arg2().bare_type().is_int_type());
-  int_literal e1 = boost::get<stan::lang::int_literal>(x.arg1().expr_);
-  int_literal e2 = boost::get<stan::lang::int_literal>(x.arg2().expr_);
-  EXPECT_EQ(e1.val_, e2.val_);
 
   std::vector<expression> array_lens = x.array_lens();
   EXPECT_EQ(array_lens.size(), x.array_dims());
 
   std::stringstream ss;
+
+  generate_expression(x.arg1(), false, ss);
+  EXPECT_EQ("3", ss.str());
+  ss.str(std::string());
+
+  ss.clear();
+  generate_expression(x.arg2(), false, ss);
+  EXPECT_EQ("3", ss.str());
+
+  ss.str(std::string());
+  ss.clear();
   write_block_var_type(ss, x);
   EXPECT_EQ("cholesky_factor_corr", ss.str());
   ss.str(std::string());
@@ -143,11 +180,19 @@ TEST(blockVarType, createArrayCFCorr) {
   block_var_type y = x.array_contains();
   EXPECT_TRUE(y.arg1().bare_type().is_int_type());
   EXPECT_TRUE(y.arg2().bare_type().is_int_type());
-  int_literal e1 = boost::get<stan::lang::int_literal>(y.arg1().expr_);
-  int_literal e2 = boost::get<stan::lang::int_literal>(y.arg2().expr_);
-  EXPECT_EQ(e1.val_, e2.val_);
 
   std::stringstream ss;
+
+  generate_expression(y.arg1(), false, ss);
+  EXPECT_EQ("3", ss.str());
+  ss.str(std::string());
+
+  ss.clear();
+  generate_expression(y.arg2(), false, ss);
+  EXPECT_EQ("3", ss.str());
+
+  ss.str(std::string());
+  ss.clear();
   write_block_var_type(ss, x);
   EXPECT_EQ("1-dim array of cholesky_factor_corr", ss.str());
   ss.str(std::string());
@@ -169,13 +214,22 @@ TEST(blockVarType, createCorrMatrix) {
 
   EXPECT_TRUE(x.arg1().bare_type().is_int_type());
   EXPECT_TRUE(x.arg2().bare_type().is_int_type());
-  int_literal e1 = boost::get<stan::lang::int_literal>(x.arg1().expr_);
-  int_literal e2 = boost::get<stan::lang::int_literal>(x.arg2().expr_);
-  EXPECT_EQ(e1.val_, e2.val_);
 
   std::stringstream ss;
+
+  generate_expression(x.arg1(), false, ss);
+  EXPECT_EQ("3", ss.str());
+  ss.str(std::string());
+
+  ss.clear();
+  generate_expression(x.arg2(), false, ss);
+  EXPECT_EQ("3", ss.str());
+
+  ss.str(std::string());
+  ss.clear();
   write_block_var_type(ss, x);
   EXPECT_EQ("corr_matrix", ss.str());
+
   ss.str(std::string());
   ss.clear();
   write_bare_expr_type(ss, x.bare_type());
@@ -195,6 +249,17 @@ TEST(blockVarType, createArrayCorrMat) {
   EXPECT_EQ(array_lens.size(), x.array_dims());
 
   std::stringstream ss;
+
+  generate_expression(x.array_contains().arg1(), false, ss);
+  EXPECT_EQ("3", ss.str());
+  ss.str(std::string());
+
+  ss.clear();
+  generate_expression(x.array_contains().arg2(), false, ss);
+  EXPECT_EQ("3", ss.str());
+
+  ss.str(std::string());
+  ss.clear();
   write_block_var_type(ss, x);
   EXPECT_EQ("1-dim array of corr_matrix", ss.str());
   ss.str(std::string());
@@ -213,14 +278,22 @@ TEST(blockVarType, createCovMatrix) {
 
   EXPECT_TRUE(x.arg1().bare_type().is_int_type());
   EXPECT_TRUE(x.arg2().bare_type().is_int_type());
-  int_literal e1 = boost::get<stan::lang::int_literal>(x.arg1().expr_);
-  int_literal e2 = boost::get<stan::lang::int_literal>(x.arg2().expr_);
-  EXPECT_EQ(e1.val_, e2.val_);
 
   std::vector<expression> array_lens = x.array_lens();
   EXPECT_EQ(array_lens.size(), x.array_dims());
 
   std::stringstream ss;
+
+  generate_expression(x.arg1(), false, ss);
+  EXPECT_EQ("3", ss.str());
+  ss.str(std::string());
+
+  ss.clear();
+  generate_expression(x.arg2(), false, ss);
+  EXPECT_EQ("3", ss.str());
+
+  ss.str(std::string());
+  ss.clear();
   write_block_var_type(ss, x);
   EXPECT_EQ("cov_matrix", ss.str());
   ss.str(std::string());
@@ -247,13 +320,22 @@ TEST(blockVarType, createArrayCovMat) {
   block_var_type y = x.array_contains();
   EXPECT_TRUE(y.arg1().bare_type().is_int_type());
   EXPECT_TRUE(y.arg2().bare_type().is_int_type());
-  int_literal e1 = boost::get<stan::lang::int_literal>(y.arg1().expr_);
-  int_literal e2 = boost::get<stan::lang::int_literal>(y.arg2().expr_);
-  EXPECT_EQ(e1.val_, e2.val_);
 
   std::stringstream ss;
+
+  generate_expression(y.arg1(), false, ss);
+  EXPECT_EQ("3", ss.str());
+  ss.str(std::string());
+
+  ss.clear();
+  generate_expression(y.arg2(), false, ss);
+  EXPECT_EQ("3", ss.str());
+
+  ss.str(std::string());
+  ss.clear();
   write_block_var_type(ss, x);
   EXPECT_EQ("1-dim array of cov_matrix", ss.str());
+
   ss.str(std::string());
   ss.clear();
   write_bare_expr_type(ss, x.bare_type());
@@ -273,12 +355,22 @@ TEST(blockVarType, createOrdered) {
 
   EXPECT_TRUE(x.arg1().bare_type().is_int_type());
   EXPECT_TRUE(x.arg2().bare_type().is_ill_formed_type());
-  int_literal e1 = boost::get<stan::lang::int_literal>(x.arg1().expr_);
-  EXPECT_EQ(e1.val_, 3);
 
   std::stringstream ss;
+
+  generate_expression(x.arg1(), false, ss);
+  EXPECT_EQ("3", ss.str());
+
+  ss.str(std::string());
+  ss.clear();
+  generate_expression(x.arg2(), false, ss);
+  EXPECT_EQ("nil", ss.str());
+
+  ss.str(std::string());
+  ss.clear();
   write_block_var_type(ss, x);
   EXPECT_EQ("ordered", ss.str());
+
   ss.str(std::string());
   ss.clear();
   write_bare_expr_type(ss, x.bare_type());
@@ -319,10 +411,13 @@ TEST(blockVarType, createPosOrdered) {
 
   EXPECT_TRUE(x.arg1().bare_type().is_int_type());
   EXPECT_TRUE(x.arg2().bare_type().is_ill_formed_type());
-  int_literal e1 = boost::get<stan::lang::int_literal>(x.arg1().expr_);
-  EXPECT_EQ(e1.val_, 3);
 
   std::stringstream ss;
+  generate_expression(x.arg1(), false, ss);
+  EXPECT_EQ("3", ss.str());
+
+  ss.str(std::string());
+  ss.clear();
   write_block_var_type(ss, x);
   EXPECT_EQ("positive_ordered", ss.str());
   ss.str(std::string());
@@ -365,10 +460,13 @@ TEST(blockVarType, createSimplex) {
 
   EXPECT_TRUE(x.arg1().bare_type().is_int_type());
   EXPECT_TRUE(x.arg2().bare_type().is_ill_formed_type());
-  int_literal e1 = boost::get<stan::lang::int_literal>(x.arg1().expr_);
-  EXPECT_EQ(e1.val_, 3);
 
   std::stringstream ss;
+  generate_expression(x.arg1(), false, ss);
+  EXPECT_EQ("3", ss.str());
+
+  ss.str(std::string());
+  ss.clear();
   write_block_var_type(ss, x);
   EXPECT_EQ("simplex", ss.str());
   ss.str(std::string());
@@ -412,10 +510,13 @@ TEST(blockVarType, createUnitVec) {
 
   EXPECT_TRUE(x.arg1().bare_type().is_int_type());
   EXPECT_TRUE(x.arg2().bare_type().is_ill_formed_type());
-  int_literal e1 = boost::get<stan::lang::int_literal>(x.arg1().expr_);
-  EXPECT_EQ(e1.val_, 3);
 
   std::stringstream ss;
+  generate_expression(x.arg1(), false, ss);
+  EXPECT_EQ("3", ss.str());
+
+  ss.str(std::string());
+  ss.clear();
   write_block_var_type(ss, x);
   EXPECT_EQ("unit_vector", ss.str());
   ss.str(std::string());

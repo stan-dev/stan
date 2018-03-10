@@ -2,7 +2,6 @@
 #define STAN_LANG_AST_FUN_INFER_TYPE_INDEXING_HPP
 
 #include <stan/lang/ast/type/bare_expr_type.hpp>
-#include <cstddef>
 
 namespace stan {
   namespace lang {
@@ -16,7 +15,7 @@ namespace stan {
      * @return expression type of indexed expression
      */
     bare_expr_type infer_type_indexing(const bare_expr_type& e,
-                                       std::size_t num_indexes);
+                                       size_t num_indexes);
   }
 }
 #endif

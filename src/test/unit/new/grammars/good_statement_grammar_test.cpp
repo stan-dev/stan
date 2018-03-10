@@ -70,6 +70,22 @@ TEST(Parser, parse_local_var_assign_4) {
   EXPECT_EQ(msgs.str(), std::string(""));
 }
 
+TEST(Parser, parse_local_var_assign_for_loop) {
+  std::string input("{\n"
+                    "  row_vector[2] vs;\n"
+                    "  for (v in vs) {\n"
+                    "    v = 0;\n"
+                    "  }\n"
+                    "}\n");
+
+  bool pass = false;
+  std::stringstream msgs;
+  stan::lang::statement stmt;
+  stmt = parse_statement(input, pass, msgs);
+  EXPECT_TRUE(pass);
+  EXPECT_EQ(msgs.str(), std::string(""));
+}
+
 TEST(Parser, parse_infer_type_1) {
   std::string input("{\n"
                     "  int N;\n"
@@ -89,7 +105,6 @@ TEST(Parser, parse_infer_type_1) {
   stmt = parse_statement(input, pass, msgs);
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string(""));
-  std::cout << msgs.str() << std::endl;
 }
 
 
@@ -107,7 +122,6 @@ TEST(Parser, parse_infer_type_0) {
   stmt = parse_statement(input, pass, msgs);
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string(""));
-  std::cout << msgs.str() << std::endl;
 }
 
 TEST(Parser, parse_local_var_def) {
@@ -137,5 +151,34 @@ TEST(Parser, parse_indexing) {
   std::stringstream msgs;
   stan::lang::statement stmt;
   stmt = parse_statement(input, pass, msgs);
-  std::cout << msgs.str() << std::endl;
+  EXPECT_TRUE(pass);
+  EXPECT_EQ(msgs.str(), std::string(""));
+}
+
+TEST(Parser, keyword_for) {
+  std::string input("{\n"
+                    "  real force;\n"
+                    "  force = force * force;\n"
+                    "}\n");
+  bool pass = false;
+  std::stringstream msgs;
+  stan::lang::statement stmt;
+  stmt = parse_statement(input, pass, msgs);
+  EXPECT_TRUE(pass);
+  EXPECT_EQ(msgs.str(), std::string(""));
+}
+
+TEST(Parser, assign_array_expr) {
+  std::string input("{\n"
+                    "  real d_r1;\n"
+                    "  real td_arr_real_d1_2[3] = {d_r1, 2, 3};\n"
+                    "}\n");
+
+
+  bool pass = false;
+  std::stringstream msgs;
+  stan::lang::statement stmt;
+  stmt = parse_statement(input, pass, msgs);
+  EXPECT_TRUE(pass);
+  EXPECT_EQ(msgs.str(), std::string(""));
 }

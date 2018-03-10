@@ -252,6 +252,12 @@ namespace stan {
       int array_dims() const;
 
       /**
+       * If array type, returns bare_expr_type of innermost type,
+       * otherwise returns this type.
+       */
+      bare_expr_type base() const;
+
+      /**
        * Returns total number of dimensions for container type.
        * Returns 0 for scalar types.
        */

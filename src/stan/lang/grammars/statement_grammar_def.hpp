@@ -124,8 +124,8 @@ namespace stan {
         | increment_log_prob_statement_r(_r1)       // key "increment_log_prob"
         | increment_target_statement_r(_r1)         // key "target"
         | for_statement_r(_r1)                      // key "for"
-        | for_array_statement_r(_r1)                // key "for"
         | for_matrix_statement_r(_r1)               // key "for"
+        | for_array_statement_r(_r1)                // key "for"
         | while_statement_r(_r1)                    // key "while"
         | break_continue_statement_r(_r2)           // key "break", "continue"
         | statement_2_g(_r1, _r2)                   // key "if"
@@ -217,37 +217,38 @@ namespace stan {
         [remove_loop_identifier_f(_a, boost::phoenix::ref(var_map_))];
 
       // _r1 = var scope
-      for_array_statement_r.name("for (array) statement");
-      for_array_statement_r
+      for_matrix_statement_r.name("for (matrix/vector/rowvector) statement");
+      for_matrix_statement_r
         %= lit("for")
         >> no_skip[!char_("a-zA-Z0-9_")]
         >> lit('(')
         >> identifier_r[store_loop_identifier_f(_1, _a)]
         >> lit("in")
-        >> (expression_rhs_r(_r1)[add_array_loop_identifier_f(_1, _a, _r1,
-                                         _pass,
-                                         boost::phoenix::ref(var_map_),
-                                         boost::phoenix::ref(error_msgs_))]
+        >> (expression_rhs_r(_r1)[add_matrix_loop_identifier_f(_1, _a, _r1,
+                                            _pass,
+                                            boost::phoenix::ref(var_map_),
+                                            boost::phoenix::ref(error_msgs_))]
             > lit(')'))
         >> (eps
             > statement_r(_r1, true))
         > eps
-           [remove_loop_identifier_f(_a, boost::phoenix::ref(var_map_))];
+        [remove_loop_identifier_f(_a, boost::phoenix::ref(var_map_))];
 
       // _r1 = var scope
-      for_matrix_statement_r.name("for (matrix/vector/rowvector) statement");
-      for_matrix_statement_r
+      for_array_statement_r.name("for (array) statement");
+      for_array_statement_r
         %= (lit("for") >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('(')
         > identifier_r[store_loop_identifier_f(_1, _a)]
         > lit("in")
-        > expression_rhs_r(_r1)[add_matrix_loop_identifier_f(_1, _a, _r1, _pass,
+        > expression_rhs_r(_r1)[add_array_loop_identifier_f(_1, _a, _r1,
+                                         _pass,
                                          boost::phoenix::ref(var_map_),
                                          boost::phoenix::ref(error_msgs_))]
         > lit(')')
         > statement_r(_r1, true)
         > eps
-        [remove_loop_identifier_f(_a, boost::phoenix::ref(var_map_))];
+           [remove_loop_identifier_f(_a, boost::phoenix::ref(var_map_))];
 
       // _r1 = var scope
       print_statement_r.name("print statement");
@@ -326,7 +327,7 @@ namespace stan {
       assgn_r.name("indexed variable assginment statement");
       assgn_r
         %= var_r(_r1)
-        >> indexes_g(_r1)
+        >> indexes_g(_r1)[trace_f("indexed var")]
         >> assignment_operator_r
         >> (eps > expression_rhs_r(_r1))
            [validate_assgn_f(_val, _pass,

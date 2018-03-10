@@ -1,7 +1,6 @@
 #ifndef STAN_LANG_GRAMMARS_SEMANTIC_ACTIONS_HPP
 #define STAN_LANG_GRAMMARS_SEMANTIC_ACTIONS_HPP
 
-
 #include <stan/io/program_reader.hpp>
 #include <stan/lang/ast.hpp>
 #include <stan/lang/grammars/iterator_typedefs.hpp>
@@ -945,38 +944,23 @@ namespace stan {
     extern boost::phoenix::function<validate_array_local_var_decl>
     validate_array_local_var_decl_f;
 
-    struct validate_single_var_decl : public phoenix_functor_ternary {
-      template <typename T>
-      void operator()(const T& var_decl_result,
+    struct validate_single_block_var_decl : public phoenix_functor_ternary {
+      void operator()(const block_var_decl& var_decl_result,
                       bool& pass,
                       std::ostream& error_msgs)
         const;
     };
-    extern boost::phoenix::function<validate_single_var_decl>
-    validate_single_var_decl_f;
+    extern boost::phoenix::function<validate_single_block_var_decl>
+    validate_single_block_var_decl_f;
 
-    struct validate_block_var_type : public phoenix_functor_quaternary {
-      template <typename T>
-      void operator()(
-                      block_var_type& var_type_result,
-                      const T& var_type,
+    struct validate_single_local_var_decl : public phoenix_functor_ternary {
+      void operator()(const local_var_decl& var_decl_result,
                       bool& pass,
-                      std::ostream& error_msgs) const;
+                      std::ostream& error_msgs)
+        const;
     };
-    extern boost::phoenix::function<validate_block_var_type>
-    validate_block_var_type_f;
-
-    struct validate_local_var_type : public phoenix_functor_quaternary {
-      template <typename T>
-      void operator()(
-                      local_var_type& var_type_result,
-                      const T& var_type,
-                      bool& pass,
-                      std::ostream& error_msgs) const;
-    };
-    extern boost::phoenix::function<validate_local_var_type>
-    validate_local_var_type_f;
-
+    extern boost::phoenix::function<validate_single_local_var_decl>
+    validate_single_local_var_decl_f;
 
     struct add_to_var_map : public phoenix_functor_quinary {
       template <typename T>

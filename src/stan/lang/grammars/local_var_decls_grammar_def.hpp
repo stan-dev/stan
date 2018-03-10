@@ -93,7 +93,7 @@ namespace stan {
            > local_identifier_r
            > local_opt_def_r(_r1)
            > eps
-           [validate_single_var_decl_f(_val, _pass,
+           [validate_single_local_var_decl_f(_val, _pass,
                                              boost::phoenix::ref(error_msgs_))];
       
       local_element_type_r.name("local var element type declaration");
@@ -102,9 +102,7 @@ namespace stan {
             | local_double_type_r(_r1)
             | local_vector_type_r(_r1)
             | local_row_vector_type_r(_r1)
-            | local_matrix_type_r(_r1))
-        [validate_local_var_type_f(_val, _1, _pass,
-                                   boost::phoenix::ref(error_msgs_))];
+            | local_matrix_type_r(_r1));
       
       local_int_type_r.name("integer type");
       local_int_type_r
