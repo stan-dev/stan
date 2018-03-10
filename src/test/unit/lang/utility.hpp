@@ -130,9 +130,7 @@ void test_parsable_standalone_functions(const std::string& model_name) {
 void test_throws(const std::string& model_name, const std::string& error_msg) {
   std::stringstream msgs;
   try {
-    bool is_parsable = is_parsable_folder(model_name, "bad", &msgs);
-    // EXPECT_FALSE(is_parsable) << "model parsable in test_throws";
-    // return;
+    is_parsable_folder(model_name, "bad", &msgs);
   } catch (const std::invalid_argument& e) {
     if (std::string(e.what()).find(error_msg) == std::string::npos
         && msgs.str().find(error_msg) == std::string::npos) {

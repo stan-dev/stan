@@ -54,6 +54,24 @@ struct map_rect {
   map_rect();
 
   /**
+   * Copy constructor using the member variables of the specified
+   * object to construct a copy.
+   *
+   * @param mr rectangular map to copy
+   */
+  map_rect(const map_rect& mr);
+
+  /**
+   * Assign the member variables of the specified rectangular map
+   * object to this object's member variables.  This operator and the
+   * copy constructor are defined to avoid incrementing the call
+   * identifier accidentally.
+   *
+   * @param mr rectangular map to assign
+   */
+  map_rect& operator=(const map_rect& mr);
+
+  /**
    * Construct an instance with the specified function name, shared
    * parameters, job-specific parameters, and job-specific data, with
    * an automatically generated call ID.  The call IDs are assigned

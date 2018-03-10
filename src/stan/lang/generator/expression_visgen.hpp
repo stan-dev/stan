@@ -222,7 +222,7 @@ namespace stan {
 
       void operator()(const map_rect& fx) const {
         o_ << "map_rect";
-        o_ << "<" << fx.call_id_ << ", " << fx.fun_name_ << ">";
+        o_ << "<" << fx.call_id_ << ", " << fx.fun_name_ << "_functor__>";
         o_ << "(";
         generate_expression(fx.shared_params_, user_facing_, o_);
         o_ << ", ";
