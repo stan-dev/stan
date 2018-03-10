@@ -622,12 +622,30 @@ namespace stan {
     validate_algebra_solver_control_f;
 
     // called from: term_grammar
-    struct validate_map_rect
-      : public phoenix_functor_quaternary {
+    /**
+     * Functor for validating the arguments to map_rect.
+     */
+    struct validate_map_rect : public phoenix_functor_quaternary {
+      /**
+       * Validate that the specified rectangular map object has
+       * appropriately typed argumnets, setting the pass flag to false
+       * and writing an error message to the output stream if they
+       * don't.  Sizes cannot be tested until runtime.
+       *
+       * @param mr structure to validate
+       * @param var_map mapping for variables
+       * @param pass reference to set to false upon failure
+       * @param error_msgs reference to error message stream
+       * @throws std::illegal_argument_exception if the arguments are
+       * not of the appropriate shapes.
+       */
       void operator()(const map_rect& mr,
                       const variable_map& var_map, bool& pass,
                       std::ostream& error_msgs) const;
     };
+    /**
+     * Phoenix wrapper for the rectangular map structure validator.
+     */
     extern boost::phoenix::function<validate_map_rect> validate_map_rect_f;
 
     // called from: term_grammar

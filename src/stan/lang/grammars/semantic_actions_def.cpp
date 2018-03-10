@@ -1949,8 +1949,8 @@ namespace stan {
       //          real[] data_r, int[] data_i)
       expr_type shared_params_type(vector_type(), 0);
       expr_type job_params_type(vector_type(), 0);
-      expr_type job_data_r_type(double_type(), 0);
-      expr_type job_data_i_type(int_type(), 0);
+      expr_type job_data_r_type(double_type(), 1);
+      expr_type job_data_i_type(int_type(), 1);
       expr_type result_type(vector_type(), 0);
       std::vector<function_arg_type> arg_types
           = { function_arg_type(shared_params_type),
@@ -1973,16 +1973,22 @@ namespace stan {
         error_msgs << "second argument to map_rect() must be vector";
         pass = false;
       }
-      if (mr.job_params_.expression_type() != job_params_type) {
+      // one more array dim for args other than shared params
+      expr_type job_paramss_type(vector_type(), 1);
+      if (mr.job_params_.expression_type() != job_paramss_type) {
         error_msgs << "third argument to map_rect() must be vector";
         pass = false;
       }
-      if (mr.job_data_r_.expression_type() != job_data_r_type) {
-        error_msgs << "fourth argument to map_rect() must be real array";
+      expr_type job_data_rs_type(double_type(), 2);
+      if (mr.job_data_r_.expression_type() != job_data_rs_type) {
+        error_msgs << "fourth argument to map_rect() must be two"
+                   << " dimensional real array";
         pass = false;
       }
-      if (mr.job_data_i_.expression_type() != job_data_i_type) {
-        error_msgs << "fifth argument to map-rect() must be int array";
+      expr_type job_data_is_type(int_type(), 2);
+      if (mr.job_data_i_.expression_type() != job_data_is_type) {
+        error_msgs << "fifth argument to map_rect() must be two"
+                   << " dimensional int array";
         pass = false;
       }
 
