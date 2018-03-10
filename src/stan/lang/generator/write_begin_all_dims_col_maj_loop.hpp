@@ -75,7 +75,7 @@ namespace stan {
       for (size_t i = ar_var_dims.size(); i > 0; --i) {
         int idx = i - 1;   // size == N, indexes run from 0 .. N - 1
         generate_indent(indent++, o);
-        o << "for (int k_"  << idx << "__ = 0;"
+        o << "for (size_t k_"  << idx << "__ = 0;"
           << " k_" << idx << "__ < "
           << name << "_k_" << idx  << "_max__;"
           << " ++k_" << idx << "__) {" << EOL;

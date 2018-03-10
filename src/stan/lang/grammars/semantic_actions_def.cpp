@@ -6,8 +6,8 @@
 #include <stan/lang/grammars/iterator_typedefs.hpp>
 #include <stan/lang/grammars/semantic_actions.hpp>
 
-// // all of this needed for good error messages from parser
-// // running in standalone testing mode, but not from stanc_helper
+// all of this needed for good error messages from parser
+// running in standalone testing mode, but not from stanc_helper
 // #include <stan/lang/generator/expression_visgen.hpp>
 // #include <stan/lang/generator/generate_array_builder_adds.hpp>
 // #include <stan/lang/generator/generate_expression.hpp>
@@ -1039,6 +1039,14 @@ namespace stan {
         pass = false;
         return;
       }
+
+      //      std::cout << "validate_assignment"
+                << " assigning to var: " << a.var_dims_.name_
+                << " with num dims: " << a.var_dims_.dims_.size()
+                << " expr: " << a.expr_.bare_type()
+                << std::endl;
+
+
       if (!can_assign_to_lhs_var(name, var_scope, vm, error_msgs)) {
         pass = false;
         return;
@@ -1047,6 +1055,8 @@ namespace stan {
         
       bare_expr_type inferred_lhs_type
         = infer_var_dims_type(a.var_type_, a.var_dims_);
+
+      //      std::cout << " inferred_lhs_type " << inferred_lhs_type << std::endl;
 
       if (inferred_lhs_type.is_ill_formed_type()) {
         error_msgs << "Too many indexes for variable"

@@ -61,7 +61,7 @@ namespace stan {
 
         // open for loop
         generate_indent(indent + i, o);
-        o << "for (int i_"  << i << "__ = 0;"
+        o << "for (size_t i_"  << i << "__ = 0;"
           << " i_" << i << "__ < " << name << "_i_" << i << "_max__;"
           << " ++i_" << i << "__) {" << EOL;
       }

@@ -39,7 +39,7 @@ namespace stan {
       }
       for (size_t i = 0; i < ar_var_dims.size(); ++i) {
         generate_indent(indent + i, o);
-        o << "for (int k_"  << i << "__ = 0;"
+        o << "for (size_t k_"  << i << "__ = 0;"
           << " k_" << i << "__ < " << name << "_k_" << i << "_max__;"
           << " ++k_" << i << "__) {" << EOL;
       }
