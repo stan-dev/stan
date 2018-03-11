@@ -137,7 +137,7 @@ namespace stan {
         o_ << "stan::math::assign(";
         generate_indexed_expr<true>(x.var_dims_.name_,
                                     x.var_dims_.dims_,
-                                    x.var_type_,
+                                    x.var_type_.base(),
                                     x.var_type_.array_dims(),
                                     false,
                                     o_);
@@ -146,7 +146,7 @@ namespace stan {
           o_ << "(";
           generate_indexed_expr<false>(x.var_dims_.name_,
                                        x.var_dims_.dims_,
-                                       x.var_type_,
+                                       x.var_type_.base(),
                                        x.var_type_.array_dims(),
                                        false,
                                        o_);
@@ -157,7 +157,7 @@ namespace stan {
           o_ << x.op_name_ << "(";
           generate_indexed_expr<false>(x.var_dims_.name_,
                                        x.var_dims_.dims_,
-                                       x.var_type_,
+                                       x.var_type_.base(),
                                        x.var_type_.array_dims(),
                                        false,
                                        o_);
@@ -173,7 +173,7 @@ namespace stan {
         o_ << "stan::math::assign(";
         generate_indexed_expr<true>(x.var_dims_.name_,
                                     x.var_dims_.dims_,
-                                    x.var_type_,
+                                    x.var_type_.base(),
                                     x.var_type_.array_dims(),
                                     false,
                                     o_);

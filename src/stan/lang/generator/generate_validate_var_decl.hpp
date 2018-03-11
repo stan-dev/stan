@@ -21,10 +21,12 @@ namespace stan {
      * NOTE:  bounded / specialized types are mutually exclusive
      *
      * @param[in] decl variable declaration
+     * @param[in] declare_size_vars if true, loops declare size_t vars
      * @param[in] indent indentation level
      * @param[in,out] o stream for generating
      */
     void generate_validate_var_decl(const block_var_decl decl,
+                                    bool declare_size_vars,
                                     int indent, std::ostream& o) {
 
       std::string var_name(decl.name());
@@ -36,7 +38,7 @@ namespace stan {
 
       if (btype.has_def_bounds()) {
         range bounds = btype.bounds();
-        write_begin_array_dims_loop(decl, true, indent, o);
+        write_begin_array_dims_loop(decl, declare_size_vars, indent, o);
         if (bounds.has_low()) {
           generate_indent(indent + ar_lens.size(), o);
           o << "check_greater_or_equal(function__, ";
@@ -61,7 +63,7 @@ namespace stan {
         }
         write_end_loop(ar_lens.size(), indent, o);
       } else if (btype.is_specialized()) {
-        write_begin_array_dims_loop(decl, true, indent, o);
+        write_begin_array_dims_loop(decl, declare_size_vars, indent, o);
         generate_indent(indent + ar_lens.size(), o);
         o << "stan::math::check_" << btype.name() << "(function__, ";
         o << "\"" << var_name;

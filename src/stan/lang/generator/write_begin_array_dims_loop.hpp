@@ -29,13 +29,13 @@ namespace stan {
       std::string name(var_decl.name());
       std::vector<expression> ar_var_dims = var_decl.type().array_lens();
 
-      if (declare_size_vars) {
-        for (size_t i = 0; i < ar_var_dims.size(); ++i) {
-          generate_indent(indent, o);
-          o << "size_t " << name << "_k_" << i << "_max__ = ";
-          generate_expression(ar_var_dims[i], NOT_USER_FACING, o);
-          o << ";" << EOL;
-        }
+      for (size_t i = 0; i < ar_var_dims.size(); ++i) {
+        generate_indent(indent, o);
+        if (declare_size_vars)
+          o << "size_t ";
+        o << name << "_k_" << i << "_max__ = ";
+        generate_expression(ar_var_dims[i], NOT_USER_FACING, o);
+        o << ";" << EOL;
       }
       for (size_t i = 0; i < ar_var_dims.size(); ++i) {
         generate_indent(indent + i, o);

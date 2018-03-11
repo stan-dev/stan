@@ -113,7 +113,7 @@ namespace stan {
         for (size_t i = 0; i < x.dimss_.size(); ++i)
           for (size_t j = 0; j < x.dimss_[i].size(); ++j)
             indexes.push_back(x.dimss_[i][j]);  // wasteful copy, could use refs
-        generate_indexed_expr<false>(expr_string, indexes, x.type_,
+        generate_indexed_expr<false>(expr_string, indexes, x.type_.base(),
                                      e_num_dims, user_facing_, o_);
       }
 

@@ -38,25 +38,29 @@ namespace stan {
       }
       std::vector<expression> ar_var_dims = var_decl.type().array_lens();
 
-      if (declare_size_vars) {
-        if (!is_nil(arg2)) {
-          generate_indent(indent, o);
-          o << "size_t " << name << "_j_2_max__ = ";
-          generate_expression(arg2, NOT_USER_FACING, o);
-          o << ";" << EOL;
-        }
-        if (!is_nil(arg1)) {
-          generate_indent(indent, o);
-          o << "size_t " << name << "_j_1_max__ = ";
-          generate_expression(arg1, NOT_USER_FACING, o);
-          o << ";" << EOL;
-        }
-        for (size_t i = 0; i < ar_var_dims.size(); ++i) {
-          generate_indent(indent, o);
-          o << "size_t " << name << "_k_" << i << "_max__ = ";
-          generate_expression(ar_var_dims[i], NOT_USER_FACING, o);
-          o << ";" << EOL;
-        }
+      if (!is_nil(arg2)) {
+        generate_indent(indent, o);
+        if (declare_size_vars)
+          o << "size_t ";
+        o << name << "_j_2_max__ = ";
+        generate_expression(arg2, NOT_USER_FACING, o);
+        o << ";" << EOL;
+      }
+      if (!is_nil(arg1)) {
+        generate_indent(indent, o);
+        if (declare_size_vars)
+          o << "size_t ";
+        o << name << "_j_1_max__ = ";
+        generate_expression(arg1, NOT_USER_FACING, o);
+        o << ";" << EOL;
+      }
+      for (size_t i = 0; i < ar_var_dims.size(); ++i) {
+        generate_indent(indent, o);
+        if (declare_size_vars)
+          o << "size_t ";
+        o << name << "_k_" << i << "_max__ = ";
+        generate_expression(ar_var_dims[i], NOT_USER_FACING, o);
+        o << ";" << EOL;
       }
 
       // nested for stmts open, row, col indexes

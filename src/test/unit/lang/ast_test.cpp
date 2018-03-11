@@ -13,9 +13,8 @@ using stan::lang::omni_idx;
 using stan::lang::expression;
 using stan::lang::int_literal;
 using stan::lang::function_signatures;
-using stan::lang::function_arg_type;
-using stan::lang::expr_type;
-using stan::lang::base_expr_type;
+using stan::lang::bare_array_type;
+using stan::lang::bare_expr_type;
 using stan::lang::ill_formed_type;
 using stan::lang::void_type;
 using stan::lang::double_type;
@@ -25,102 +24,6 @@ using stan::lang::row_vector_type;
 using stan::lang::matrix_type;
 using std::vector;
 
-
-TEST(langAst, getDefinition) {
-  // tests for Stan lang function definitions with fun argument qualifier "data"
-  stan::lang::function_signatures& fs
-    = stan::lang::function_signatures::instance();
-  std::string name = "f3args";
-  expr_type return_type = expr_type(double_type());
-  std::vector<function_arg_type> arg_types;
-  arg_types.push_back(function_arg_type(expr_type(double_type(), 2U), true));
-  arg_types.push_back(function_arg_type(expr_type(int_type(), 1U)));
-  arg_types.push_back(function_arg_type(expr_type(vector_type(), 0U)));
-
-  // check is defined
-  fs.add(name, return_type, arg_types);
-  stan::lang::function_signature_t sig(return_type, arg_types);
-  EXPECT_TRUE(fs.is_defined(name, sig));
-}
-
-TEST(langAst, missingDefinition) {
-  stan::lang::function_signatures& fs
-    = stan::lang::function_signatures::instance();
-
-  std::string name = "fmissing";
-  expr_type return_type = expr_type(double_type());
-  std::vector<function_arg_type> arg_types;
-  arg_types.push_back(function_arg_type(expr_type(double_type(), 2U), true));
-
-  // check not defined
-  stan::lang::function_signature_t sig(return_type, arg_types);
-  EXPECT_FALSE(fs.is_defined(name, sig));
-}
-
-TEST(langAst, checkDefinition) {
-  // tests for Stan lang function definitions with fun argument qualifier "data"
-  stan::lang::function_signatures& fs
-    = stan::lang::function_signatures::instance();
-  std::string name = "f3args";
-  expr_type return_type = expr_type(double_type());
-  std::vector<function_arg_type> arg_types;
-  arg_types.push_back(function_arg_type(expr_type(double_type(), 2U), true));
-  arg_types.push_back(function_arg_type(expr_type(int_type(), 1U)));
-  arg_types.push_back(function_arg_type(expr_type(vector_type(), 0U)));
-  fs.add(name, return_type, arg_types);
-
-  // check definition
-  stan::lang::function_signature_t sig(return_type, arg_types);
-  stan::lang::function_signature_t sig2 = fs.get_definition(name, sig);
-  EXPECT_EQ(sig, fs.get_definition(name, sig));
-
-  // check function arguments
-  EXPECT_TRUE(sig2.second[0].data_only_);
-  EXPECT_FALSE(sig2.second[1].data_only_);
-  EXPECT_FALSE(sig2.second[2].data_only_);
-}
-
-TEST(langAst, discreteFirstArg) {
-  // true if first argument to function is always discrete
-  EXPECT_TRUE(function_signatures::instance()
-              .discrete_first_arg("poisson_log"));
-  EXPECT_FALSE(function_signatures::instance()
-              .discrete_first_arg("normal_log"));
-}
-
-TEST(langAst, printSignature) {
-  std::vector<function_arg_type> arg_types;
-  arg_types.push_back(function_arg_type(expr_type(double_type(), 2U)));
-  arg_types.push_back(function_arg_type(expr_type(int_type(), 1U)));
-  arg_types.push_back(function_arg_type(expr_type(vector_type(), 0U)));
-  std::string name = "foo";
-
-  std::stringstream platform_eol_ss;
-  platform_eol_ss << std::endl;
-  std::string platform_eol = platform_eol_ss.str();
-
-  std::stringstream msgs1;
-  bool sampling_error_style1 = true;
-  stan::lang::print_signature(name, arg_types, sampling_error_style1, msgs1);
-  EXPECT_EQ("  real[,] ~ foo(int[], vector)" + platform_eol,
-            msgs1.str());
-
-  std::stringstream msgs2;
-  bool sampling_error_style2 = false;
-  stan::lang::print_signature(name, arg_types, sampling_error_style2, msgs2);
-  EXPECT_EQ("  foo(real[,], int[], vector)" + platform_eol,
-            msgs2.str());
-
-  arg_types.push_back(function_arg_type(expr_type(matrix_type(), 0U), true));
-  arg_types.push_back(function_arg_type(expr_type(matrix_type(), 0U), false));
-
-  std::stringstream msgs3;
-  stan::lang::print_signature(name, arg_types, sampling_error_style2, msgs3);
-  EXPECT_EQ("  foo(real[,], int[], vector, data matrix, matrix)" + platform_eol,
-            msgs3.str());
-
-  
-}
 
 TEST(langAst, hasVar) {
   using stan::lang::base_var_decl;
@@ -134,21 +37,20 @@ TEST(langAst, hasVar) {
   using stan::lang::variable_map;
 
   variable_map vm;
-  vector<expression> dims;
-  base_var_decl alpha_decl = base_var_decl("alpha",dims,double_type());
+  var_decl alpha_decl = var_decl("alpha", double_type());
   scope alpha_origin = parameter_origin;
   vm.add("alpha", alpha_decl, alpha_origin);
 
   variable v("alpha");
-  v.set_type(double_type(), 2U);
+  v.set_type(double_type());
   expression e(v);
   EXPECT_TRUE(has_var(e, vm));
 
-  vm.add("beta",
-         base_var_decl("beta", vector<expression>(), int_type()),
-         model_name_origin);
+  var_decl beta_decl = var_decl("beta", int_type());
+  vm.add("beta", beta_decl, model_name_origin));
+
   variable v_beta("beta");
-  v_beta.set_type(int_type(), 0U);
+  v_beta.set_type(int_type());
   expression e_beta(v_beta);
   EXPECT_FALSE(has_var(e_beta, vm));
 
@@ -160,45 +62,45 @@ TEST(langAst, hasVar) {
 }
 
 TEST(lang_ast,expr_type_num_dims) {
-  EXPECT_EQ(0U,expr_type().num_dims());
-  EXPECT_EQ(2U,expr_type(int_type(),2U).num_dims());
-  EXPECT_EQ(2U,expr_type(vector_type(),2U).num_dims());
+  EXPECT_EQ(0U,bare_expr_type().num_dims());
+  EXPECT_EQ(2U,bare_expr_type(bare_array_type(int_type(),2U)).num_dims());
+  EXPECT_EQ(2U,bare_expr_type(bare_array_type(vector_type(),2U)).num_dims());
 }
 
 TEST(lang_ast,expr_type_is_primitive) {
-  EXPECT_TRUE(expr_type(double_type()).is_primitive());
-  EXPECT_TRUE(expr_type(int_type()).is_primitive());
-  EXPECT_FALSE(expr_type(vector_type()).is_primitive());
-  EXPECT_FALSE(expr_type(row_vector_type()).is_primitive());
-  EXPECT_FALSE(expr_type(matrix_type()).is_primitive());
-  EXPECT_FALSE(expr_type(int_type(),2U).is_primitive());
+  EXPECT_TRUE(bare_expr_type(double_type()).is_primitive());
+  EXPECT_TRUE(bare_expr_type(int_type()).is_primitive());
+  EXPECT_FALSE(bare_expr_type(vector_type()).is_primitive());
+  EXPECT_FALSE(bare_expr_type(row_vector_type()).is_primitive());
+  EXPECT_FALSE(bare_expr_type(matrix_type()).is_primitive());
+  EXPECT_FALSE(bare_expr_type(int_type(),2U).is_primitive());
 }
 
 TEST(lang_ast,expr_type_is_primitive_int) {
-  EXPECT_FALSE(expr_type(double_type()).is_primitive_int());
-  EXPECT_TRUE(expr_type(int_type()).is_primitive_int());
-  EXPECT_FALSE(expr_type(vector_type()).is_primitive_int());
-  EXPECT_FALSE(expr_type(row_vector_type()).is_primitive_int());
-  EXPECT_FALSE(expr_type(matrix_type()).is_primitive_int());
-  EXPECT_FALSE(expr_type(int_type(),2U).is_primitive_int());
+  EXPECT_FALSE(bare_expr_type(double_type()).is_primitive_int());
+  EXPECT_TRUE(bare_expr_type(int_type()).is_primitive_int());
+  EXPECT_FALSE(bare_expr_type(vector_type()).is_primitive_int());
+  EXPECT_FALSE(bare_expr_type(row_vector_type()).is_primitive_int());
+  EXPECT_FALSE(bare_expr_type(matrix_type()).is_primitive_int());
+  EXPECT_FALSE(bare_expr_type(int_type(),2U).is_primitive_int());
 }
 
 TEST(lang_ast,expr_type_is_primitive_double) {
-  EXPECT_TRUE(expr_type(double_type()).is_primitive_double());
-  EXPECT_FALSE(expr_type(int_type()).is_primitive_double());
-  EXPECT_FALSE(expr_type(vector_type()).is_primitive_double());
-  EXPECT_FALSE(expr_type(row_vector_type()).is_primitive_double());
-  EXPECT_FALSE(expr_type(matrix_type()).is_primitive_double());
-  EXPECT_FALSE(expr_type(int_type(),2U).is_primitive_double());
+  EXPECT_TRUE(bare_expr_type(double_type()).is_primitive_double());
+  EXPECT_FALSE(bare_expr_type(int_type()).is_primitive_double());
+  EXPECT_FALSE(bare_expr_type(vector_type()).is_primitive_double());
+  EXPECT_FALSE(bare_expr_type(row_vector_type()).is_primitive_double());
+  EXPECT_FALSE(bare_expr_type(matrix_type()).is_primitive_double());
+  EXPECT_FALSE(bare_expr_type(int_type(),2U).is_primitive_double());
 }
 
 TEST(lang_ast,expr_type_eq) {
-  EXPECT_EQ(expr_type(double_type()),expr_type(double_type()));
-  EXPECT_EQ(expr_type(double_type(),1U),expr_type(double_type(),1U));
-  EXPECT_NE(expr_type(int_type()), expr_type(double_type()));
-  EXPECT_NE(expr_type(int_type(),1), expr_type(int_type(),2));
-  EXPECT_TRUE(expr_type(int_type(),1) != expr_type(int_type(),2));
-  EXPECT_FALSE(expr_type(int_type(),1) == expr_type(int_type(),2));
+  EXPECT_EQ(bare_expr_type(double_type()),expr_type(double_type()));
+  EXPECT_EQ(bare_expr_type(double_type(),1U),expr_type(double_type(),1U));
+  EXPECT_NE(bare_expr_type(int_type()), expr_type(double_type()));
+  EXPECT_NE(bare_expr_type(int_type(),1), expr_type(int_type(),2));
+  EXPECT_TRUE(bare_expr_type(int_type(),1) != expr_type(int_type(),2));
+  EXPECT_FALSE(bare_expr_type(int_type(),1) == expr_type(int_type(),2));
 }
 
 TEST(lang_ast,base_expr_type_vis) {

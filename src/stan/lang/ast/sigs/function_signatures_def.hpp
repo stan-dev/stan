@@ -73,7 +73,7 @@ namespace stan {
       const vector<function_signature_t> sigs = it->second;
       for (size_t i = 0; i < sigs.size(); ++i) {
         if (sigs[i].second.size() == 0
-            || !sigs[i].second[0].is_int_type())
+            || !sigs[i].second[0].base().is_int_type())
           return false;
       }
       return true;

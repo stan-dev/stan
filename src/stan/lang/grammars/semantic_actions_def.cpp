@@ -1040,11 +1040,11 @@ namespace stan {
         return;
       }
 
-      //      std::cout << "validate_assignment"
-                << " assigning to var: " << a.var_dims_.name_
-                << " with num dims: " << a.var_dims_.dims_.size()
-                << " expr: " << a.expr_.bare_type()
-                << std::endl;
+      //       std::cout << "validate_assignment"
+      //           << " assigning to var: " << a.var_dims_.name_
+      //           << " with num dims: " << a.var_dims_.dims_.size()
+      //           << " expr: " << a.expr_.bare_type()
+      //           << std::endl;
 
 
       if (!can_assign_to_lhs_var(name, var_scope, vm, error_msgs)) {

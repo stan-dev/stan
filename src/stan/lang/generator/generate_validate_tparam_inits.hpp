@@ -53,7 +53,7 @@ namespace stan {
       o << "stan::lang::rethrow_located("
         << "std::runtime_error(std::string(\"Error initializing variable "
         << decl.name()
-        << ": \") + e.what()), current_statement_begin__, prog_reader__());"
+        << ": \") + msg__.str()), current_statement_begin__, prog_reader__());"
         << EOL;
 
       generate_indent(indent + decl.type().num_dims(), o);

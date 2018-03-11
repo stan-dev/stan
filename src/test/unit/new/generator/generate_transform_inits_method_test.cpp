@@ -72,3 +72,13 @@ TEST(generateTransformInitsMethod, t6) {
   EXPECT_TRUE(pass);
   // TESTS?
 }
+
+TEST(generateTransformInitsMethod, t7) {
+  std::string input("  real<lower=-10, upper=10> y[2];\n");
+  // looking for:  std::vector<double> y(2,double(0));
+
+  std::stringstream cpp_code;
+  bool pass = run_test(input, cpp_code);
+  EXPECT_TRUE(pass);
+  // TESTS?
+}

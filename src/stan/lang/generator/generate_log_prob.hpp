@@ -31,8 +31,6 @@ namespace stan {
         << EOL;
       o << INDENT << "T__ log_prob(vector<T__>& params_r__,"
         << EOL;
-      o << INDENT << "             vector<int>& params_i__,"
-        << EOL;
       o << INDENT << "             std::ostream* pstream__ = 0) const {"
         << EOL2;
       o << INDENT2 << "typedef T__ local_scalar_t__;" << EOL2;
@@ -48,13 +46,14 @@ namespace stan {
       o << INDENT2 << "T__ lp__(0.0);"
         << EOL;
       o << INDENT2 << "stan::math::accumulator<T__> lp_accum__;"
+        << EOL;
+      o << INDENT2 << "std::vector<int> params_i__; // not used"
         << EOL2;
 
       bool gen_local_vars = true;
 
       generate_try(2, o);
-
-      generate_indent(2, o);
+      generate_indent(3, o);
       o << "stan::io::reader<local_scalar_t__> in__(params_r__, params_i__);" << EOL;
       o << EOL;
 
@@ -101,7 +100,7 @@ namespace stan {
             o << "current_statement_begin__ = "
               <<  prog.derived_decl_.first[i].begin_line_ << ";" << EOL;
             generate_validate_tparam_inits(prog.derived_decl_.first[i], 3, o);
-            generate_validate_var_decl(prog.derived_decl_.first[i], 3, o);
+            generate_validate_var_decl(prog.derived_decl_.first[i], false, 3, o);
             o << EOL;
           }
         }
@@ -128,9 +127,8 @@ namespace stan {
       o << INDENT << "  vec_params_r.reserve(params_r.size());" << EOL;
       o << INDENT << "  for (int i = 0; i < params_r.size(); ++i)" << EOL;
       o << INDENT << "    vec_params_r.push_back(params_r(i));" << EOL;
-      o << INDENT << "  std::vector<int> vec_params_i;" << EOL;
       o << INDENT
-        << "  return log_prob<propto,jacobian,T_>(vec_params_r, vec_params_i, pstream);" << EOL;
+        << "  return log_prob<propto,jacobian,T_>(vec_params_r, pstream);" << EOL;
       o << INDENT << "}" << EOL2;
     }
 

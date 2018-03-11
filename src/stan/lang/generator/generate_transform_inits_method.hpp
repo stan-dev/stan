@@ -60,6 +60,7 @@ namespace stan {
      */
     void generate_method_end(std::ostream& o) {
       o << INDENT2 << "params_r__ = writer__.data_r();" << EOL;
+      o << INDENT2 << "params_i__ = writer__.data_i();" << EOL;
       o << INDENT << "}" << EOL2;
 
       o << INDENT
@@ -145,9 +146,8 @@ namespace stan {
         if (vtype.num_dims() == 0) {
           o << "(0);" << EOL;
         } else {
-          o << "(";
           generate_initializer(vs[i].type(), "double", o);
-          o << ");" << EOL;
+          o << ";" << EOL;
         }        
 
         // fill vals_r__ loop

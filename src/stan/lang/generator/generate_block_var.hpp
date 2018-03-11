@@ -40,9 +40,8 @@ namespace stan {
         o << ";" << EOL;
         generate_void_statement(var_name, indent, o);
       } else {
-        o << "(";
         generate_initializer(var_decl.type(), type_str, o);
-        o << ");" << EOL;
+        o << ";" << EOL;
       }        
 
       generate_indent(indent, o);

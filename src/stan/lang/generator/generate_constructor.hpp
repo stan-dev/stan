@@ -85,7 +85,7 @@ namespace stan {
                                        "data initialization", 3, o);
         generate_data_var_ctor(prog.data_decl_[i], 3, o);
         generate_data_var_init(prog.data_decl_[i], 3, o);
-        generate_validate_var_decl(prog.data_decl_[i], 3, o);
+        generate_validate_var_decl(prog.data_decl_[i], false, 3, o);
         o << EOL;
       }
 
@@ -113,7 +113,7 @@ namespace stan {
           generate_indent(3, o);
           o << "current_statement_begin__ = "
             <<  prog.derived_data_decl_.first[i].begin_line_ << ";" << EOL;
-          generate_validate_var_decl(prog.derived_data_decl_.first[i], 3, o);
+          generate_validate_var_decl(prog.derived_data_decl_.first[i], true, 3, o);
           o << EOL;
         }
       }
