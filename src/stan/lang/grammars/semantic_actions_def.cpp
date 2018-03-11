@@ -1962,7 +1962,7 @@ namespace stan {
       // validate mapped function signature
       if (!function_signatures::instance()
           .is_defined(mr.fun_name_, mapped_fun_signature)) {
-        error_msgs << "first argument to function map_rect()"
+        error_msgs << "first argument to map_rect"
                    << " must be the name of a function with signature"
                    << " (vector, vector, real[], int[]) : vector";
         pass = false;
@@ -1970,35 +1970,42 @@ namespace stan {
 
       // validate parameter and data argument shapes
       if (mr.shared_params_.expression_type() != shared_params_type) {
-        error_msgs << "second argument to map_rect() must be vector";
+        if (!pass) error_msgs << ";  ";
+        error_msgs << "second argument to map_rect must be of type vector";
         pass = false;
       }
       // one more array dim for args other than shared params
       expr_type job_paramss_type(vector_type(), 1);
       if (mr.job_params_.expression_type() != job_paramss_type) {
-        error_msgs << "third argument to map_rect() must be vector";
+        if (!pass) error_msgs << ";  ";
+        error_msgs << "third argument to map_rect must be of type vector[]"
+                   << " (array of vectors)";
         pass = false;
       }
       expr_type job_data_rs_type(double_type(), 2);
       if (mr.job_data_r_.expression_type() != job_data_rs_type) {
-        error_msgs << "fourth argument to map_rect() must be two"
-                   << " dimensional real array";
+        if (!pass) error_msgs << ";  ";
+        error_msgs << "fourth argument to map_rect must be of type real[ , ]"
+                   << " (two dimensional array of reals)";
         pass = false;
       }
       expr_type job_data_is_type(int_type(), 2);
       if (mr.job_data_i_.expression_type() != job_data_is_type) {
-        error_msgs << "fifth argument to map_rect() must be two"
-                   << " dimensional int array";
+        if (!pass) error_msgs << ";  ";
+        error_msgs << "fifth argument to map_rect must be of type int[ , ]"
+                   << " (two dimensional array of integers)";
         pass = false;
       }
 
       // test data is data only
       if (has_var(mr.job_data_r_, var_map)) {
-        error_msgs << "fourth argment to map_rect() must be data only";
+        if (!pass) error_msgs << ";  ";
+        error_msgs << "fourth argment to map_rect must be data only";
         pass = false;
       }
       if (has_var(mr.job_data_i_, var_map)) {
-        error_msgs << "fifth argument to map_rect() must be data only";
+        if (!pass) error_msgs << ";  ";
+        error_msgs << "fifth argument to map_rect must be data only";
         pass = false;
       }
     }
