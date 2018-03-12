@@ -224,6 +224,29 @@ namespace stan {
           expr_type(double_type()));
     }
 
+    template<typename T>
+    expr_type function_signatures::rng_return_type(const expr_type& t) {
+      T return_type;
+      return expr_type(return_type, !t.is_primitive());
+    }
+
+    template<typename T>
+    expr_type function_signatures::rng_return_type(
+                            const expr_type& t,
+                            const expr_type& u) {
+      T return_type;
+      return t.is_primitive() && u.is_primitive()
+        ? expr_type(return_type) : expr_type(return_type, 1U);
+    }
+
+    template<typename T>
+    expr_type function_signatures::rng_return_type(
+                            const expr_type& t,
+                            const expr_type& u,
+                            const expr_type& v) {
+      return rng_return_type<T>(rng_return_type<T>(t, u), v);
+    }
+
     int function_signatures::num_promotions(
                             const std::vector<expr_type>& call_args,
                             const std::vector<function_arg_type>& sig_args) {
