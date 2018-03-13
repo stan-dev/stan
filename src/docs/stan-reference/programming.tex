@@ -1,7 +1,8 @@
 \part{Programming Techniques}\label{programming-techniques.part}
 
 
-\chapter{Reparameterization \& Change of Variables}\label{change-of-variables.chapter}
+\chapter{Reparameterization \& Change of Variables}%
+\label{change-of-variables.chapter}
 
 \noindent
 As with BUGS, Stan supports a direct encoding of reparameterizations.
@@ -1097,20 +1098,19 @@ parser.
 Use of the \code{data} qualifier must be consistent between the
 forward declaration and the definition of a functions.
 
-This qualifier should be used when writing functions that call Stan's
-built-in ordinary differential equation (ODE) solvers or using Stan's
-algebraic solver.
-These solvers have
-strictly specified signatures where some arguments of are data only
+This qualifier should be used when writing functions that call the
+built-in ordinary differential equation (ODE) solvers, algebraic
+solvers, or map functions.  These higher-order functions have strictly
+specified signatures where some arguments of are data only
 expressions. (See \refchapter{ode-solver},
-\refchapter{functions-ode-solver}, and
-\refchapter{functions-algebraic-solver},for details.)
-When writing a function which calls the ODE or algebraic solver,
-arguments to that function which are passed into the call
-to the solver, either directly or indirectly, should have the
-\code{data} prefix qualifier.
-This allows for compile-time type checking and increases
-overall program understandability.
+\refsection{functions-ode-solver}, and
+\refsection{functions-algebraic-solver},for details.)  When writing a
+function which calls the ODE or algebraic solver, arguments to that
+function which are passed into the call to the solver, either directly
+or indirectly, should have the \code{data} prefix qualifier.  This
+allows for compile-time type checking and increases overall program
+understandability.
+
 
 
 \section{Functions as Statements}
@@ -1448,6 +1448,7 @@ following conditional clause.
 
 
 \chapter{Problematic Posteriors}\label{problematic-posteriors.chapter}%
+
 \noindent
 Mathematically speaking, with a proper posterior, one can do Bayesian
 inference and that's that. There is not even a need to require a
@@ -2577,8 +2578,10 @@ define subseqeunt values;  in the sliced expression assigning to
 \code{x}, the entire right-hand side is evaluated before assigning to
 the left-hand side.
 
+
 \chapter{Multiple Indexing and Range Indexing}\label{multi-indexing.chapter}
 
+\noindent
 Stan allows multiple indexes to be provided for containers (i.e.,
 arrays, vectors, and matrices) in a single position, using either an
 array of integer indexes or range bounds.  This allows many models to
@@ -2996,7 +2999,407 @@ entries known to be positive.
 
 
 
+
+\chapter{Map-Reduce}\label{map-reduce.chapter}
+
+\noindent
+Map-reduce allows large calculations (e.g., log likelihoods) to be
+broken into components which may be calculated modularly (e.g., data
+blocks) and combined (e.g., by summation and incrementing the target
+log density).
+
+\section{Overview of Map-Reduce}
+
+A {\slshape map function} is a higher-order function that applies an
+argument function to every member of some collection, returning a
+collection of the results.  For example, mapping the square function,
+$f(x) = x^2$, over the vector $[3, 5, 10]$ produces the vector
+$[9, 25, 100]$.  In other words, map applies the square function
+elementwise.
+
+The output of mapping a sequence is often fed into a reduction.
+A {\slshape reduction function} takes an arbitrarily long sequence of
+inputs and returns a single output.  Examples of reduction functions
+are summation (with the return being a single value) or sorting (with
+the return being a sorted sequence).  The combination of mapping and
+reducing is so common it has its own name, {\slshape map-reduce}.
+
+\section{Map Function}
+
+In order to generalize the form of functions and results that are
+possible and accomodate both parameters (which need derivatives) and
+data values (which don't), Stan's map function operates on more than
+just a sequence of inputs.
+
+\subsection{Map Function Signature}
+
+Stan's map function has the following signature
+%
+\begin{stancode}
+vector map_rect((vector, vector, real[], int[]):vector f,
+                vector phi, vector[] thetas,
+                data real[ , ] x_rs, data int[ , ] x_is);
+\end{stancode}
+%
+The arrays \code{thetas} of parametrs, \code{x\_rs} of real data, and
+\code{x\_is} of integer data have the suffix ``\code{s}'' to indicate they
+are arrays.  These arrays must all be the same size, as they will be
+mapped in parallel by the function \code{f}.  The value of \code{phi}
+is reused in each mapped operation.
+
+The \code{\_rect} suffix in the name arises because the data
+structures it takes as arguments are rectangular.  In order to deal
+with ragged inputs, ragged inputs must be padded out to recangular
+form.
+
+The last two arguments are two dimensional arrays of real and integer
+data values.  These argument types are marked with the \code{data}
+qualifier to indicate that they must only contain variables
+originating in the data or transformed data blocks.  This will allow
+such data to be pinned to a processor on which it is being processed
+to reduce communication overhead.
+
+The notation \code{(vector, vector, real[], int[]):vector} indicates
+that the function argument \code{f} must have the following signature.
+%
+\begin{stancode}
+vector f(vector phi, vector theta,
+         data real[] x_r, data int[] x_i);
+\end{stancode}
+%
+Although \code{f} will often return a vector of size one, the built-in
+flexiblity allows general multivariate functions to be mapped, even
+raggedly.
+
+\subsection{Map Function Semantics}
+
+Stan's map function applies the function \code{f} to the shared
+parameters along with one element each of the job parameters, real
+data, and integer data arrays.  Each of the arguments \code{theta},
+\code{x\_r}, and \code{x\_i} must be arrays of the same size.  If the
+arrays are all size \code{N}, the result is defined as follows.
+%
+\begin{stancode}
+map_rect(f, phi, thetas, xs, ns)
+= f(phi, thetas[1], xs[1], ns[1]) . f(phi, thetas[2], xs[2], ns[2])
+  . ... . f(phi, thetas[N], xs[N], ns[N])
+\end{stancode}
+%
+The dot operators in the notation above are meant to indicate
+concatenation (implemented as \code{append\_row} in Stan).  The output
+of each application of \code{f} is a vector, and the sequence of
+\code{N} vectors is concatenated together to return a single vector.
+
+
+\section{Example:  Mapping Logistic Regression}
+
+An example should help to clarify both the syntax and semantics of the
+mapping operation and how it may be combined with reductions built
+into Stan to provide a map-reduce implementation.
+
+\subsection{Unmapped Logistic Regression}
+
+Consider the following simple logistic regression model, which is
+coded unconventionally to accomodate direct translation to a mapped
+implementation.
+%
+\begin{stancode}
+data {
+  int y[12];
+  real x[12];
+}
+parameters {
+  vector[2] beta;
+}
+model {
+  beta ~ normal(0, 1);
+  y ~ bernoulli_logit(beta[1] + beta[2] * to_vector(x));
+}
+\end{stancode}
+%
+The program is unusual in that it (a) hardcodes the data size, which
+is not required by the map function but is just used here for
+simplicity, (b) represents the predictors as a real array even though
+it needs to be used as a vector, and (c) represents the regression
+coefficients (intercept and slope) as a vector even though they're
+used individually.  The \code{bernoulli\_logit} distribution is used
+because the argument is on the logit scale---it implicitly applies the
+inverse logit function to map the argument to a probability.
+
+
+\subsection{Mapped Logistic Regression}
+
+The unmapped logistic regression model described in the previous
+subsection may be implemented using Stan's rectangular mapping
+functionality as follows.
+%
+\begin{stancode}
+functions {
+  vector lr(vector beta, vector theta, real[] x, int[] y) {
+    real lp = bernoulli_logit_lpmf(y | beta[1] + to_vector(x) * beta[2]);
+    return [lp]';
+  }
+}
+data {
+  int y[12];
+  real x[12];
+}
+transformed data {
+  // K = 3 shards
+  int ys[3, 4] = { y[1:4], y[5:8], y[9:12] };
+  real xs[3, 4] = { x[1:4], x[5:8], x[9:12] };
+  vector[0] theta[3];
+}
+parameters {
+  vector[2] beta;
+}
+model {
+  beta ~ normal(0, 1);
+  target += sum(map_rect(lr, beta, theta, xs, ys));
+}
+\end{stancode}
+%
+The first piece of the code is the actual function to compute the
+logistic regression.  The argument \code{beta} will contain the
+regression coefficients (intercept and slope), as before.  The second
+argument \code{theta} of job-specific parameters is not used, but
+nevertheless must be present.  The modeled data \code{y} is passed as
+an array of integers and the predictors \code{x} as an array of real
+values.  The function body then computes the log probability mass of \code{y} and
+assigns it to the local variable \code{lp}.  This variable is then
+used in \code{[lp]'} to construct a row vector and then transpose it
+to a vector to return.
+
+The data is taken in as before.  There is an additional transformed
+data block that breaks the data up into three shards.%
+%
+\footnote{The term ``shard'' is borrowed from databases, where it
+  refers to a slice of the rows of a database.  That is exactly what
+  it is here if we think of rows of a dataframe.  Stan's shards are
+  more general in that they need not correspond to rows of a
+  dataframe.}
+%
+The value \code{3} is also hard coded; a more practical program would
+allow the number of shards to be controlled.  There are three parallel
+arrays defined here, each of size three, corresponding to the number
+of shards.  The array \code{ys} contains the modeled data variables;
+each element of the array \code{ys} is an array of size four.  The
+second array \code{xs} is for the predictors, and each element of it
+is also of size four.  These contained arrays are the same size
+because the predictors \code{x} stand in a one-to-one relationship
+with the modeled data \code{y}. The final array \code{theta} is also
+of size three;  its elements are empty vectors, because there are no
+shard-specific parameters.
+
+The parameters and the prior are as before.  The likelihood is now
+coded using map-reduce.  The function \code{lr} to compute the log
+probability mass is mapped over the data \code{xs} and \code{ys},
+which contain the original predictors and outcomes broken into shards.
+The parameters \code{beta} are in the first argument because they are
+shared across shards.  There are no shard-specific parameters, so
+the array of job-specific parameters \code{theta} contains only empty
+vectors.
+
+\section{Example:  Hierarchical Logistic Regression}
+
+Consider a hierarchical model of American presidential voting behavior
+based on state of residence.%
+%
+\footnote{This example is a simplified form of the model
+  described in \cite[Section~14.2]{GelmanHill:2007}.}
+%
+Each of the fifty states $k \in 1{:}50$ will have its own slope
+$\beta_k$ and intercept $\alpha_k$ to model the log odds of voting for
+the Republican candidate as a function of income.  Suppose there are
+$N$ voters and with voter $n \in 1{:}N$ being in state $s[n]$ with
+income $x_n$.  The likelihood for the vote $y_n \in \{ 0, 1 \}$ is
+%
+\[
+y_n \sim \mathsf{Bernoulli}
+\left(
+  \mathrm{logit}^{-1}\left( \alpha_{s[n]} +  \beta_{s[n]} \, x_n \right)
+\right).
+\]
+%
+The slopes and intercepts get hierarchical priors,
+%
+\[
+\mbox{ }
+\hfill
+\alpha_k \sim \mathsf{Normal}(\mu_{\alpha}, \sigma_{\alpha})
+\hspace*{0.5in}
+\beta_k \sim \mathsf{Normal}(\mu_{\beta}, \sigma_{\beta})
+\hfill
+\mbox{ }
+\]
+
+\subsection{Unmapped Implementation}
+
+This model can be coded up in Stan directly as follows.
+%
+\begin{stancode}
+data {
+  int<lower = 0> K;
+  int<lower = 0> N;
+  int<lower = 1, upper = K> kk[N];
+  vector[N] x;
+  int<lower = 0, upper = 1> y[N];
+}
+parameters {
+  vector[2] beta[K];
+  vector[2] mu;
+  vector<lower=0>[2] sigma;
+}
+model {
+  mu ~ normal(0, 2);
+  sigma ~ normal(0, 2);
+  for (i in 1:2)
+    beta[ , i] ~ normal(mu[i], sigma[i]);
+  y ~ bernoulli_logit(beta[kk, 1] + beta[kk, 2] .* x);
+}
+\end{stancode}
+%
+The priors for \code{mu} and \code{sigma} are vectorized.  The priors
+on the two components of \code{beta} (intercept and slope,
+respectively) are vectorized over the groups.  The likelihood is also
+vectorized using multi-indexing with index \code{kk} for the states
+and elementwise multiplication (\code{.*}) for the income \code{x}.
+The vectorized likelihood works out to the same thing as the following
+less efficient looped form.
+%
+\begin{stancode}
+for (n in 1:N)
+  y[n] ~ bernoulli_logit(beta[kk[n], 1] + beta[kk[n], 2] * x[n]);
+\end{stancode}
+
+
+
+\subsection{Mapped Implementation}
+
+The mapped version of the model will map over the states \code{K}.
+This means the group-level parameters, real data, and integer-data
+must be arrays of the same size.
+
+The mapped implementation requires a function to be mapped.  The
+following function evaluates both the likelihood for the data observed
+for a group as well as the prior for the group-specific parameters
+(the name \code{bl\_glm} derives from the fact that it's a generalized
+linear model with a Bernoulli likelihood and logistic link function).
+%
+\begin{stancode}
+functions {
+ vector bl_glm(vector mu_sigma, vector beta,
+               real[] x, int[] y) {
+   vector[2] mu = mu_sigma[1:2];
+   vector[2] sigma = mu_sigma[3:4];
+   real lp = normal_lpdf(beta | mu, sigma);
+   real ll = bernoulli_logit_lpmf(y | beta[1] + beta[2] * to_vector(x));
+   return [lp + ll]';
+ }
+}
+\end{stancode}
+%
+The shared parameter \code{mu\_sigma} contains the locations
+(\code{mu\_sigma[1:2]}) and scales (\code{mu\_sigma[3:4]}) of the
+priors, which are extracted in the first two lines of the program.
+The variable \code{lp} is assigned the log density of the prior on
+\code{beta}.  The vector \code{beta} is of size two, as are the
+vectors \code{mu} and \code{sigma}, so everything lines up for the
+vectorization.  Next, the variable \code{ll} is assigned to the log
+likelihood contribution for the group.  Here \code{beta[1]} is the
+intercept of the regression and \code{beta[2]} the slope.  The
+predictor array \code{x} needs to be converted to a vector allow the
+multiplication.
+
+The data block is identical to that of the previous program, but
+repeated here for convenience.  A transformed data block computes the
+data structures needed for the mapping by organizing the data into
+arrays indexed by group.
+%
+\begin{stancode}
+data {
+  int<lower = 0> K;
+  int<lower = 0> N;
+  int<lower = 1, upper = K> kk[N];
+  vector[N] x;
+  int<lower = 0, upper = 1> y[N];
+}
+transformed data {
+  int<lower = 0> J = N / K;
+  real x_r[K, J];
+  int<lower = 0, upper = 1> x_i[K, J];
+  {
+    int pos = 1;
+    for (k in 1:K) {
+      int end = pos + J - 1;
+      x_r[k] = to_array_1d(x[pos:end]);
+      x_i[k] = to_array_1d(y[pos:end]);
+      pos += J;
+    }
+  }
+}
+\end{stancode}
+%
+The integer \code{J} is set to the number of observations per group.%
+%
+\footnote{This makes the very strong assumption that each group has
+  the same number of observations!}
+%
+The real data array \code{x\_r} holds the predictors and the integer
+data array \code{x\_i} holds the outcomes.  The grouped data arrays
+are constructed by slicing the predictor vector \code{x} (and
+converting it to an array) and slicing the outcome array \code{y}.
+
+Given the transformed data with groupings, the parameters are the same
+as the previous program.  The model has the same priors for the
+hyperparameters \code{mu} and \code{sigma}, but moves the prior for
+\code{beta} and the likelihood to the mapped function.
+%
+\begin{stancode}
+parameters {
+  vector[2] beta[K];
+  vector[2] mu;
+  vector<lower=0>[2] sigma;
+}
+model {
+  mu ~ normal(0, 2);
+  sigma ~ normal(0, 2);
+  target += sum(map_rect(bl_glm, append_row(mu, sigma), beta, x_r, x_i));
+}
+\end{stancode}
+%
+
+\section{Ragged Inputs and Outputs}
+
+The previous examples included rectangular data structures and single
+outputs.  Despite the name, this is not technically required by
+\code{map\_rect}.
+
+\subsection{Ragged Inputs}
+
+If each group has a different number of observations, then the
+rectangular data structures for predictors and outcomes will need to
+be padded out to be rectangular.  In addition, the size of the ragged
+structure will need to be passed as integer data. This holds for
+shards with varying numbers of parameters as well as varying numbers
+of data points.
+
+\subsection{Ragged Outputs}
+
+The output of each mapped function is concatenated to produce the
+output of \code{map\_rect}.  When every shard returns a singleton
+(size one) array, the result is the same size as the number of shards
+and is easy to deal with downstream.  If functions return longer
+arrays, they can still be structured using the \code{to\_matrix}
+function if they are rectangular.
+
+If the outputs are of varying sizes, then there will have to be some way
+to convert it back to a usable form based on the input, because there
+is no way to directly return sizes or a ragged structure.
+
+
 \chapter{Optimizing Stan Code for Efficiency}\label{optimization.chapter}
+
 \noindent
 This chapter provides a grab bag of techniques for optimizing Stan
 code, including vectorization, sufficient statistics, and conjugacy.
@@ -4476,3 +4879,19 @@ the transformed model, to
 \begin{stancode}
     y_std ~ normal(alpha_std + beta_std * x_std, sigma_std);
 \end{stancode}
+
+\section{Using Map-Reduce}
+
+The map-reduce operation, even without multi-core MPI support, can be
+used to make programs more scalable and also more efficient.   See
+\refchapter{map-reduce} for more information on implementing
+map-reduce operations.
+
+Map-reduce allows greater scalability because only the Jacobian of the
+mapped function for each shard is stored.  The Jacobian consists of
+all of the derivatives of the outputs with respect to the parameters.
+During execution, the derivatives of the shard are evaluated using
+nested automatic differentiation.  As often happens with modern CPUs,
+reduced memory overhead leads to increased memory locality and faster
+execution.  The Jacobians are all computed with local memory and their
+outputs stored contiguously in memory.
