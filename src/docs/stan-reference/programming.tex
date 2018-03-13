@@ -3369,6 +3369,16 @@ model {
 \end{stancode}
 %
 
+The model as written here computes the priors for each group's
+parameters along with the likelihood contribution for the group.  An
+alternative mapping would leave the prior in the model block and only
+map the likelihood.  In a serial setting this shouldn't make much of a
+difference, but with parallelization, there is reduced communication
+(the prior's parameters need not be transmitted) and also reduced
+parallelization with the version that leaves the prior in the model
+block.
+
+
 \section{Ragged Inputs and Outputs}
 
 The previous examples included rectangular data structures and single

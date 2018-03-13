@@ -102,6 +102,7 @@
 #include <stan/lang/ast/node/int_var_decl.hpp>
 #include <stan/lang/ast/node/lb_idx.hpp>
 #include <stan/lang/ast/node/lub_idx.hpp>
+#include <stan/lang/ast/node/map_rect.hpp>
 #include <stan/lang/ast/node/matrix_var_decl.hpp>
 #include <stan/lang/ast/node/multi_idx.hpp>
 #include <stan/lang/ast/node/no_op_statement.hpp>
@@ -114,7 +115,6 @@
 #include <stan/lang/ast/node/range.hpp>
 #include <stan/lang/ast/node/reject_statement.hpp>
 #include <stan/lang/ast/node/return_statement.hpp>
-#include <stan/lang/ast/node/map_rect.hpp>
 #include <stan/lang/ast/node/matrix_expr.hpp>
 #include <stan/lang/ast/node/row_vector_expr.hpp>
 #include <stan/lang/ast/node/row_vector_var_decl.hpp>
