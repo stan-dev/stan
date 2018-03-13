@@ -284,8 +284,7 @@ namespace stan {
           > expression_g(_r1)     // 4) job-specific integer data vector
           > lit(')')
           [validate_map_rect_f(_val, boost::phoenix::ref(var_map_),
-                               _pass, boost::phoenix::ref(error_msgs_))]
-          ;
+                               _pass, boost::phoenix::ref(error_msgs_))];
 
       factor_r.name("expression");
       factor_r =

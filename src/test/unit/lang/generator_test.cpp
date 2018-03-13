@@ -531,6 +531,8 @@ TEST(genExpression, mapRect) {
       "      = map_rect(foo, shared_params_d, job_params_d, data_r, data_i);"
       "}";
   expect_matches(1, model_code, "map_rect<");
-  expect_matches(1, model_code, "foo>(shared_params_d");
-
+  // can't predict number in between
+  expect_matches(1, model_code,
+                 ", foo_functor__>(shared_params_d,"
+                 " job_params_d, data_r, data_i, pstream__)");
 }
