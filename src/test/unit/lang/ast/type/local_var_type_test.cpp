@@ -34,7 +34,7 @@ TEST(localVarType, createIllFormed) {
 
   std::stringstream ss;
   write_bare_expr_type(ss, x.bare_type());
-  EXPECT_EQ("ill formed", ss.str());
+  EXPECT_EQ("ill-formed", ss.str());
 }
 
 TEST(localVarType, createInt) {
@@ -94,7 +94,7 @@ TEST(localVarType, createRowVector) {
 
   std::stringstream ss;
   write_bare_expr_type(ss, x.bare_type());
-  EXPECT_EQ("row vector", ss.str());
+  EXPECT_EQ("row_vector", ss.str());
 }
 
 TEST(localVarType, createMatrix) {
@@ -160,7 +160,7 @@ TEST(localVarType, createRowVectorSized) {
 
   std::stringstream ss;
   write_bare_expr_type(ss, x.bare_type());
-  EXPECT_EQ("row vector", ss.str());
+  EXPECT_EQ("row_vector", ss.str());
 }
 
 TEST(localVarType, createCopy) {

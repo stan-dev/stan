@@ -9,8 +9,6 @@
 #include <utility>
 #include <vector>
 
-#include <iostream>
-
 namespace stan {
   namespace lang {
 
@@ -49,18 +47,6 @@ namespace stan {
       return false;
     }
 
-    function_signature_t
-    function_signatures::get_definition(const std::string& name,
-                                        const function_signature_t& sig) {
-      const std::vector<function_signature_t> sigs = sigs_map_[name];
-      for (size_t i = 0; i < sigs.size(); ++i)
-        if (sig.first == sigs[i].first && sig.second == sigs[i].second)
-          return sigs[i];
-      bare_expr_type ill_formed;
-      std::vector<bare_expr_type> arg_types;
-      return function_signature_t(ill_formed, arg_types);
-    }
-
     bool function_signatures::discrete_first_arg(const std::string& fun)
       const {
       using std::map;
@@ -79,10 +65,24 @@ namespace stan {
       return true;
     }
 
+    function_signature_t
+    function_signatures::get_definition(const std::string& name,
+                                        const function_signature_t& sig) {
+      const std::vector<function_signature_t> sigs = sigs_map_[name];
+      for (size_t i = 0; i < sigs.size(); ++i)
+        if (sig.first == sigs[i].first && sig.second == sigs[i].second) {
+          return sigs[i];
+        }
+      bare_expr_type ill_formed;
+      std::vector<bare_expr_type> arg_types;
+      return function_signature_t(ill_formed, arg_types);
+    }
+
     void function_signatures::add(const std::string& name,
                                   const bare_expr_type& result_type,
                                   const std::vector<bare_expr_type>&
                                   arg_types) {
+      function_signature_t sig_def(result_type, arg_types);
       sigs_map_[name].push_back(function_signature_t(result_type, arg_types));
     }
 

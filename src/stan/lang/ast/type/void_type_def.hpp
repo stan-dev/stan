@@ -7,6 +7,8 @@
 namespace stan {
   namespace lang {
 
+    void_type::void_type() : is_data_(false) { }
+
     std::string void_type::oid() const {
       return std::string("01_void_type");
     }

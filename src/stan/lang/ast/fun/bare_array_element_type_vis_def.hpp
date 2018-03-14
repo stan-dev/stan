@@ -9,7 +9,10 @@ namespace stan {
     bare_array_element_type_vis::bare_array_element_type_vis() { }
 
     bare_expr_type bare_array_element_type_vis::operator()(const bare_array_type& x) const {
-      return x.element_type_;
+      bare_expr_type result = x.element_type_;
+      if (x.element_type_.is_data())
+        result.set_is_data();
+      return result;
     }
 
     bare_expr_type bare_array_element_type_vis::operator()(const double_type& x) const {

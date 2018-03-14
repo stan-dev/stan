@@ -7,6 +7,10 @@
 namespace stan {
   namespace lang {
 
+    matrix_type::matrix_type() : is_data_(false) { }
+
+    matrix_type::matrix_type(bool is_data) : is_data_(is_data) { }
+
     std::string matrix_type::oid() const {
       return std::string("06_matrix_type");
     }

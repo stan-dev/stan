@@ -31,9 +31,9 @@ TEST(bareExprType, createIllFormed) {
   EXPECT_FALSE(x.is_array_type());
   EXPECT_EQ(x.num_dims(), 0);
 
-  EXPECT_FALSE(x.is_data_);
-  x.set_is_data(true);
-  EXPECT_TRUE(x.is_data_);
+  EXPECT_FALSE(x.is_data());
+  x.set_is_data();
+  EXPECT_FALSE(x.is_data());
   
   bare_expr_type y;
   EXPECT_TRUE(x == y);
@@ -50,7 +50,7 @@ TEST(bareExprType, printIllFormed) {
   bare_expr_type x(tIll);
   std::stringstream ss;
   stan::lang::write_bare_expr_type(ss, x);
-  EXPECT_EQ("ill formed", ss.str());
+  EXPECT_EQ("ill-formed", ss.str());
 }
 
 TEST(bareExprType, createVoid) {
@@ -83,9 +83,14 @@ TEST(bareExprType, createInt) {
   stan::lang::write_bare_expr_type(ss, x);
   EXPECT_EQ("int", ss.str());
 
-  EXPECT_FALSE(x.is_data_);
-  x.set_is_data(true);
-  EXPECT_TRUE(x.is_data_);
+  EXPECT_FALSE(x.is_data());
+  x.set_is_data();
+  EXPECT_TRUE(x.is_data());
+
+  ss.str(std::string());
+  ss.clear();
+  stan::lang::write_bare_expr_type(ss, x);
+  EXPECT_EQ("data int", ss.str());
 
   int_type tInt2;
   bare_expr_type y(tInt2);
@@ -99,6 +104,19 @@ TEST(bareExprType, createInt) {
   EXPECT_TRUE(z <= x);
 }
 
+TEST(bareExprType, createInt_1arg) {
+  int_type tInt(true);
+  EXPECT_EQ(tInt.oid(),"02_int_type");
+  bare_expr_type x(tInt);
+  EXPECT_TRUE(x.is_int_type());
+  EXPECT_TRUE(x.is_data());
+  EXPECT_EQ(x.num_dims(), 0);
+
+  std::stringstream ss;
+  stan::lang::write_bare_expr_type(ss, x);
+  EXPECT_EQ("data int", ss.str());
+}
+
 TEST(bareExprType, createDouble) {
   double_type tDouble;
   EXPECT_EQ(tDouble.oid(),"03_double_type");
@@ -110,6 +128,15 @@ TEST(bareExprType, createDouble) {
   std::stringstream ss;
   stan::lang::write_bare_expr_type(ss, x);
   EXPECT_EQ("real", ss.str());
+
+  EXPECT_FALSE(x.is_data());
+  x.set_is_data();
+  EXPECT_TRUE(x.is_data());
+
+  ss.str(std::string());
+  ss.clear();
+  stan::lang::write_bare_expr_type(ss, x);
+  EXPECT_EQ("data real", ss.str());
 }
 
 TEST(bareExprType, createVector) {
@@ -123,6 +150,15 @@ TEST(bareExprType, createVector) {
   std::stringstream ss;
   stan::lang::write_bare_expr_type(ss, x);
   EXPECT_EQ("vector", ss.str());
+
+  EXPECT_FALSE(x.is_data());
+  x.set_is_data();
+  EXPECT_TRUE(x.is_data());
+
+  ss.str(std::string());
+  ss.clear();
+  stan::lang::write_bare_expr_type(ss, x);
+  EXPECT_EQ("data vector", ss.str());
 }
 
 TEST(bareExprType, createRowVector) {
@@ -134,7 +170,16 @@ TEST(bareExprType, createRowVector) {
 
   std::stringstream ss;
   stan::lang::write_bare_expr_type(ss, x);
-  EXPECT_EQ("row vector", ss.str());
+  EXPECT_EQ("row_vector", ss.str());
+
+  EXPECT_FALSE(x.is_data());
+  x.set_is_data();
+  EXPECT_TRUE(x.is_data());
+
+  ss.str(std::string());
+  ss.clear();
+  stan::lang::write_bare_expr_type(ss, x);
+  EXPECT_EQ("data row_vector", ss.str());
 }
 
 TEST(bareExprType, createMatrix) {
@@ -148,6 +193,15 @@ TEST(bareExprType, createMatrix) {
   std::stringstream ss;
   stan::lang::write_bare_expr_type(ss, x);
   EXPECT_EQ("matrix", ss.str());
+
+  EXPECT_FALSE(x.is_data());
+  x.set_is_data();
+  EXPECT_TRUE(x.is_data());
+
+  ss.str(std::string());
+  ss.clear();
+  stan::lang::write_bare_expr_type(ss, x);
+  EXPECT_EQ("data matrix", ss.str());
 }
 
 TEST(bareExprType, createCopy) {
@@ -160,16 +214,91 @@ TEST(bareExprType, createCopy) {
   EXPECT_FALSE(x.is_array_type());
 }
 
+TEST(bareExprType, createCopyDataType) {
+  bare_expr_type x(int_type(true));
+  EXPECT_TRUE(x.is_data());
+  bare_expr_type y(x);
+  EXPECT_TRUE(y.is_int_type());
+  EXPECT_TRUE(y.is_data());
+  EXPECT_TRUE(x == y);
+  EXPECT_EQ(y.num_dims(), 0);
+  EXPECT_FALSE(x.is_array_type());
+}
+
+TEST(bareExprType, createCopyDataType2) {
+  int_type tInt;
+  bare_expr_type x(tInt);
+  x.set_is_data();
+  EXPECT_TRUE(x.is_data());
+  bare_expr_type y(x);
+  EXPECT_TRUE(y.is_int_type());
+  EXPECT_TRUE(y.is_data());
+  EXPECT_TRUE(x == y);
+  EXPECT_EQ(y.num_dims(), 0);
+  EXPECT_FALSE(x.is_array_type());
+}
+
+TEST(bareExprType, createCopyArrayDataType) {
+  bare_array_type tDataArrayInt(int_type(true), 2);
+  bare_expr_type x(tDataArrayInt);
+  EXPECT_TRUE(x.is_array_type());
+  EXPECT_TRUE(x.is_data());
+
+  bare_expr_type y(x);
+  EXPECT_TRUE(y.is_array_type());
+  EXPECT_TRUE(y.array_contains().is_int_type());
+  EXPECT_TRUE(y.is_data());
+
+  EXPECT_TRUE(x == y);
+  EXPECT_EQ(y.num_dims(), 2);
+
+  std::vector<bare_expr_type> bet_vec;
+  bet_vec.push_back(x);
+  bare_expr_type z = bet_vec[0];
+  EXPECT_TRUE(z.is_array_type());
+  EXPECT_TRUE(z.array_contains().is_int_type());
+  EXPECT_TRUE(z.is_data());
+}
+
 TEST(bareExprType, createArray) {
   int_type tInt;
   bare_array_type d1(tInt);
   bare_expr_type x(d1);
   EXPECT_TRUE(x.is_array_type());
   EXPECT_EQ(x.num_dims(), 1);
+  EXPECT_FALSE(x.is_data());
 
   std::stringstream ss;
   stan::lang::write_bare_expr_type(ss, x);
   EXPECT_EQ("int[ ]", ss.str());
+}
+
+TEST(bareExprType, createArrayData) {
+  bare_array_type d1(int_type(true));
+  bare_expr_type x(d1);
+  EXPECT_TRUE(x.is_array_type());
+  EXPECT_EQ(x.num_dims(), 1);
+  EXPECT_TRUE(x.is_data());
+
+  std::stringstream ss;
+  stan::lang::write_bare_expr_type(ss, x);
+  EXPECT_EQ("data int[ ]", ss.str());
+}
+
+TEST(bareExprType, createArrayData2) {
+  int_type tInt;
+  bare_expr_type betInt(tInt);
+  betInt.set_is_data();
+  EXPECT_TRUE(betInt.is_data());
+  bare_array_type d1(betInt);
+  bare_expr_type x(d1);
+  EXPECT_TRUE(x.is_array_type());
+  EXPECT_EQ(x.num_dims(), 1);
+  EXPECT_TRUE(x.is_data());
+
+  std::stringstream ss;
+  stan::lang::write_bare_expr_type(ss, x);
+  EXPECT_EQ("data int[ ]", ss.str());
 }
 
 TEST(bareExprType, getArrayElType) {
@@ -246,6 +375,7 @@ TEST(bareExprType, create2DArrayOfMatrices) {
 TEST(bareExprType, create3DArrayOfMatrices) {
   matrix_type tMat;
   bare_array_type d1(tMat, 3);
+
   EXPECT_EQ(d1.oid(),"array_array_array_06_matrix_type");
   bare_expr_type x(d1);
   EXPECT_TRUE(x.is_array_type());

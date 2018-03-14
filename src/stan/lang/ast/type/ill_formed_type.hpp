@@ -11,6 +11,17 @@ namespace stan {
      */
     struct ill_formed_type {
       /**
+       * True if variable type declared with "data" qualifier.
+       * Always false.
+       */
+      bool is_data_;
+
+      /**
+       * Construct an ill_formed type with default values.
+       */
+      ill_formed_type();
+
+      /**
        * Returns identity string for this type.
        */
       std::string oid() const;

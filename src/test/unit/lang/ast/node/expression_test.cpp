@@ -1,4 +1,5 @@
 #include <stan/lang/ast_def.cpp>
+
 #include <gtest/gtest.h>
 #include <sstream>
 #include <string>
@@ -290,6 +291,9 @@ TEST(astExpression, index_sliced_2) {
   stan::lang::index_op_sliced i_op_slice(e3, idxs);
 
   stan::lang::expression e4 = i_op_slice;
+
+  std::stringstream ss;
+  
   EXPECT_TRUE(e4.bare_type().num_dims() == 2);
   EXPECT_TRUE(e4.bare_type().array_dims() == 2);
   EXPECT_TRUE(e4.bare_type().base().is_int_type());
@@ -312,17 +316,18 @@ TEST(astExpression, index_sliced_3) {
   idxs.push_back(m_idx);
   idxs.push_back(m_idx);
   idxs.push_back(u_idx);
-
+  
   stan::lang::bare_expr_type d3 = stan::lang::bare_array_type(stan::lang::vector_type(), 2);
   stan::lang::variable v2("bar");
   v2.set_type(d3);
   stan::lang::expression e3(v2);
   stan::lang::index_op_sliced i_op_slice(e3, idxs);
-
   stan::lang::expression e4 = i_op_slice;
+
+  // 3 indexes, reduce vector to double : e.g. [1:5, 1:5, 3]  2-d array of double
   EXPECT_TRUE(e4.bare_type().num_dims() == 2);
-  EXPECT_TRUE(e4.bare_type().array_dims() == 1);
-  EXPECT_TRUE(e4.bare_type().base().is_vector_type());
+  EXPECT_TRUE(e4.bare_type().array_dims() == 2);
+  EXPECT_TRUE(e4.bare_type().base().is_double_type());
 }
 
 TEST(astExpression, index_sliced_4) {
@@ -348,11 +353,12 @@ TEST(astExpression, index_sliced_4) {
   v2.set_type(d3);
   stan::lang::expression e3(v2);
   stan::lang::index_op_sliced i_op_slice(e3, idxs);
-
+  
+  // 3 indexes, reduce 2-d array to 1-d : e.g. [3, 1:5, 1:5] 
   stan::lang::expression e4 = i_op_slice;
   EXPECT_TRUE(e4.bare_type().num_dims() == 2);
-  EXPECT_TRUE(e4.bare_type().array_dims() == 2);
-  EXPECT_TRUE(e4.bare_type().base().is_double_type());
+  EXPECT_TRUE(e4.bare_type().array_dims() == 1);
+  EXPECT_TRUE(e4.bare_type().base().is_vector_type());
 }
 
 TEST(astExpression, index_sliced_5) {
@@ -379,10 +385,11 @@ TEST(astExpression, index_sliced_5) {
   stan::lang::expression e3(v2);
   stan::lang::index_op_sliced i_op_slice(e3, idxs);
 
+  // reduce 1-d array of matrix to matrix
   stan::lang::expression e4 = i_op_slice;
   EXPECT_TRUE(e4.bare_type().num_dims() == 2);
-  EXPECT_TRUE(e4.bare_type().array_dims() == 1);
-  EXPECT_TRUE(e4.bare_type().base().is_row_vector_type());
+  EXPECT_TRUE(e4.bare_type().array_dims() == 0);
+  EXPECT_TRUE(e4.bare_type().base().is_matrix_type());
 }
 
 TEST(astExpression, index_sliced_6) {
@@ -409,8 +416,9 @@ TEST(astExpression, index_sliced_6) {
   stan::lang::expression e3(v2);
   stan::lang::index_op_sliced i_op_slice(e3, idxs);
 
+  // m, u, m - reduce 1-d array of matrix to row vector
   stan::lang::expression e4 = i_op_slice;
   EXPECT_TRUE(e4.bare_type().num_dims() == 2);
   EXPECT_TRUE(e4.bare_type().array_dims() == 1);
-  EXPECT_TRUE(e4.bare_type().base().is_vector_type());
+  EXPECT_TRUE(e4.bare_type().base().is_row_vector_type());
 }

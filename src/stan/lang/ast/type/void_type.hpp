@@ -11,6 +11,17 @@ namespace stan {
      */
     struct void_type {
       /**
+       * True if variable type declared with "data" qualifier.
+       * Always false.
+       */
+      bool is_data_;
+
+      /**
+       * Construct a void type with default values.
+       */
+      void_type();
+
+      /**
        * Returns identity string for this type.
        */
       std::string oid() const;

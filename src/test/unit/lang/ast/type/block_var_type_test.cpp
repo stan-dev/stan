@@ -44,7 +44,7 @@ TEST(blockVarType, createIllFormed) {
 
   std::stringstream ss;
   write_bare_expr_type(ss, x.bare_type());
-  EXPECT_EQ("ill formed", ss.str());
+  EXPECT_EQ("ill-formed", ss.str());
 }
 
 TEST(blockVarType, createInt) {
@@ -178,7 +178,7 @@ TEST(blockVarType, createRowVector) {
 
   std::stringstream ss;
   write_bare_expr_type(ss, x.bare_type());
-  EXPECT_EQ("row vector", ss.str());
+  EXPECT_EQ("row_vector", ss.str());
 }
 
 TEST(blockVarType, createRowVectorBoundedSized) {
@@ -196,7 +196,7 @@ TEST(blockVarType, createRowVectorBoundedSized) {
 
   std::stringstream ss;
   write_bare_expr_type(ss, x.bare_type());
-  EXPECT_EQ("row vector", ss.str());
+  EXPECT_EQ("row_vector", ss.str());
 }
 
 TEST(blockVarType, createMatrixDefault) {

@@ -55,20 +55,25 @@ TEST(langAst, checkDefinition) {
   // tests for Stan lang function definitions with fun argument qualifier "data"
   stan::lang::function_signatures& fs
     = stan::lang::function_signatures::instance();
-  std::string name = "f3args";
+  std::string name = "f3args_data";
+
   bare_expr_type return_type = bare_expr_type(double_type());
-  bare_expr_type data_only_2d_ar_double = bare_expr_type(bare_array_type(double_type(), 2U));
-  data_only_2d_ar_double.set_is_data(true);
+
+  bare_expr_type data_only_2d_ar_double = bare_expr_type(bare_array_type(double_type(true), 2U));
   std::vector<bare_expr_type> arg_types;
   arg_types.push_back(data_only_2d_ar_double);
+  EXPECT_TRUE(arg_types[0].is_data());
   arg_types.push_back(bare_expr_type(bare_array_type(int_type(), 1U)));
   arg_types.push_back(bare_expr_type(vector_type()));
   fs.add(name, return_type, arg_types);
 
   // check definition
   stan::lang::function_signature_t sig(return_type, arg_types);
-  stan::lang::function_signature_t sig2 = fs.get_definition(name, sig);
   EXPECT_EQ(sig, fs.get_definition(name, sig));
+
+  stan::lang::function_signature_t sig2 = fs.get_definition(name, sig);
+  EXPECT_TRUE(sig2.first.is_double_type());
+  EXPECT_EQ(sig2.second.size(), 3);
 
   // check function arguments
   EXPECT_TRUE(sig2.second[0].is_data());
@@ -106,10 +111,9 @@ TEST(langAst, printSignature) {
   stan::lang::print_signature(name, arg_types, sampling_error_style2, msgs2);
   EXPECT_EQ("  foo(real[ , ], int[ ], vector)" + platform_eol,
             msgs2.str());
-
-  bare_expr_type data_only_matrix = bare_expr_type(matrix_type());
-  data_only_matrix.set_is_data(true);
-  arg_types.push_back(data_only_matrix);
+  
+  bare_expr_type bet_data_only = bare_expr_type(matrix_type(true));
+  arg_types.push_back(bet_data_only);
   arg_types.push_back(bare_expr_type(matrix_type()));
 
   std::stringstream msgs3;

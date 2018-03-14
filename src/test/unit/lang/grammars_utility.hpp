@@ -11,15 +11,15 @@
 #include <stan/lang/ast_def.cpp>
 
 // all of this needed for good error messages from parser
-// #include <stan/lang/generator/expression_visgen.hpp>
-// #include <stan/lang/generator/generate_array_builder_adds.hpp>
-// #include <stan/lang/generator/generate_expression.hpp>
-// #include <stan/lang/generator/generate_idxs.hpp>
-// #include <stan/lang/generator/generate_idxs_user.hpp>
-// #include <stan/lang/generator/generate_idx.hpp>
-// #include <stan/lang/generator/generate_idx_user.hpp>
-// #include <stan/lang/generator/idx_visgen.hpp>
-// #include <stan/lang/generator/idx_user_visgen.hpp>
+#include <stan/lang/generator/expression_visgen.hpp>
+#include <stan/lang/generator/generate_array_builder_adds.hpp>
+#include <stan/lang/generator/generate_expression.hpp>
+#include <stan/lang/generator/generate_idxs.hpp>
+#include <stan/lang/generator/generate_idxs_user.hpp>
+#include <stan/lang/generator/generate_idx.hpp>
+#include <stan/lang/generator/generate_idx_user.hpp>
+#include <stan/lang/generator/idx_visgen.hpp>
+#include <stan/lang/generator/idx_user_visgen.hpp>
 
 #include <stan/lang/parser.hpp>
 

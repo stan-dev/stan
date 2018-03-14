@@ -7,6 +7,10 @@
 namespace stan {
   namespace lang {
 
+    row_vector_type::row_vector_type() : is_data_(false) { }
+
+    row_vector_type::row_vector_type(bool is_data) : is_data_(is_data) { }
+
     std::string row_vector_type::oid() const {
       return std::string("05_row_vector_type");
     }

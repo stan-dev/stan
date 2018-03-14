@@ -426,7 +426,8 @@ namespace stan {
                                                     const scope& var_scope,
                                                     bool& pass,
                                                     std::ostream& error_msgs) const {
-      arg_type.set_is_data(var_scope.program_block() == data_origin);
+      if (var_scope.program_block() == data_origin)
+        arg_type.set_is_data();
       pass = !arg_type.is_void_type();
       if (!pass)
         error_msgs << "Functions cannot contain void argument types; "
@@ -604,7 +605,7 @@ namespace stan {
         if (!decl_sig.first.is_ill_formed_type()) {
           for (size_t i = 0; i < decl.arg_decls_.size(); ++i) {
             if (decl_sig.second[i] != arg_types[i]
-                || decl_sig.second[i].is_data_ != arg_types[i].is_data_) {
+                || decl_sig.second[i].is_data() != arg_types[i].is_data()) {
               error_msgs << "Declaration doesn't match definition "
                          << "for function: "
                          << decl.name_ << " argument " << (i + 1)
@@ -1672,6 +1673,7 @@ namespace stan {
     boost::phoenix::function<deprecated_integrate_ode>
     deprecated_integrate_ode_f;
 
+    // ************** stopped here **************************************************************
     template <class T>
     void validate_integrate_ode_non_control_args(const T& ode_fun,
                                                  const variable_map& var_map,
@@ -1679,19 +1681,18 @@ namespace stan {
                                                  std::ostream& error_msgs) {
       pass = true;
 
-      int_type t_int;
-      bare_expr_type bet_int(t_int);
-      bare_array_type ar_int(bet_int);
-      bare_expr_type bet_ar_int(ar_int);
-      bare_expr_type bet_ar_int_data(ar_int);
-      bet_ar_int_data.set_is_data(true);
-
+      int_type t_data_int(true);
       double_type t_double;
+      double_type t_data_double(true);
+
+      bare_expr_type bet_ar_int_data(bare_array_type(t_data_int, 1));
+      bet_ar_int_data.set_is_data();
+
       bare_expr_type bet_double(t_double);
-      bare_array_type ar_double(bet_double);
-      bare_expr_type bet_ar_double(ar_double);
-      bare_expr_type bet_ar_double_data(ar_double);
-      bet_ar_double_data.set_is_data(true);
+      bare_expr_type bet_ar_double(bare_array_type(t_double, 1));
+
+      bare_expr_type bet_ar_double_data(bare_array_type(t_data_double, 1));
+      bet_ar_double_data.set_is_data();
 
       bare_expr_type sys_result_type(bet_ar_double);
       std::vector<bare_expr_type> sys_arg_types;
@@ -1700,6 +1701,7 @@ namespace stan {
       sys_arg_types.push_back(bet_ar_double);
       sys_arg_types.push_back(bet_ar_double_data);
       sys_arg_types.push_back(bet_ar_int_data);
+
       function_signature_t system_signature(sys_result_type, sys_arg_types);
       if (!function_signatures::instance()
           .is_defined(ode_fun.system_function_name_, system_signature)) {
@@ -1711,52 +1713,52 @@ namespace stan {
       }
       // test regular argument types
       if (ode_fun.y0_.bare_type() != bet_ar_double) {
-        error_msgs << "second argument to "
+        error_msgs << "argument y0 (initial system state) "
                    << ode_fun.integration_function_name_
-                   << " must have type real[] for intial system state;"
-                   << " found type="
+                   << " must have type real[ ]; found type="
                    << ode_fun.y0_.bare_type()
                    << ". ";
         pass = false;
       }
-      if (!ode_fun.t0_.bare_type().is_primitive()) {
-        error_msgs << "third argument to "
+      if (!ode_fun.t0_.bare_type().is_double_type()) {
+        error_msgs << "argument t0 (initial system time) "
                    << ode_fun.integration_function_name_
-                   << " must have type real or int for initial time;"
-                   << " found type="
+                   << " must have type real; found type="
                    << ode_fun.t0_.bare_type()
                    << ". ";
         pass = false;
       }
       if (ode_fun.ts_.bare_type() != bet_ar_double) {
-        error_msgs << "fourth argument to "
+        error_msgs << "argument ts (solution times) "
                    << ode_fun.integration_function_name_
-                   << " must have type real[]"
+                   << " must have type real[ ]"
                    << " for requested solution times; found type="
                    << ode_fun.ts_.bare_type()
                    << ". ";
         pass = false;
       }
       if (ode_fun.theta_.bare_type() != bet_ar_double) {
-        error_msgs << "fifth argument to "
+        error_msgs << "argument theta (parameters) "
                    << ode_fun.integration_function_name_
-                   << " must have type real[] for parameters; found type="
+                   << " must have type real[ ]; found type="
                    << ode_fun.theta_.bare_type()
                    << ". ";
         pass = false;
       }
-      if (ode_fun.x_.bare_type() != bet_ar_double) {
-        error_msgs << "sixth argument to "
+      if (ode_fun.x_.bare_type() != bet_ar_double_data
+          || !ode_fun.x_.bare_type().is_data()) {
+        error_msgs << "argument x for real data "
                    << ode_fun.integration_function_name_
-                   << " must have type real[] for real data; found type="
+                   << " must have type data real[ ]; found type="
                    << ode_fun.x_.bare_type()
                    << ". ";
         pass = false;
       }
-      if (ode_fun.x_int_.bare_type() != bet_ar_int) {
-        error_msgs << "seventh argument to "
+      if (ode_fun.x_int_.bare_type() != bet_ar_int_data
+          || !ode_fun.x_int_.bare_type().is_data()) {
+        error_msgs << "argument x_int for int data "
                    << ode_fun.integration_function_name_
-                   << " must have type int[] for integer data; found type="
+                   << " must have type int[ ]; found type="
                    << ode_fun.x_int_.bare_type()
                    << ". ";
         pass = false;
@@ -1872,13 +1874,13 @@ namespace stan {
       bare_expr_type bet_ar_double(ar_double);
 
       bare_expr_type bet_ar_double_data(ar_double);
-      bet_ar_double_data.set_is_data(true);
+      bet_ar_double_data.set_is_data();
 
       vector_type t_vector;
       bare_expr_type bet_vector(t_vector);
 
       bare_expr_type bet_vector_data(t_vector);
-      bet_vector_data.set_is_data(true);
+      bet_vector_data.set_is_data();
 
       bare_expr_type sys_result_type(t_vector);
       std::vector<bare_expr_type> sys_arg_types;
@@ -2051,7 +2053,7 @@ namespace stan {
         function_signatures::instance().get_definition(fun.name_, sig);
       if (!decl_sig.first.is_ill_formed_type()) {
         for (size_t i = 0; i < fun_arg_types.size(); ++i) {
-          if (decl_sig.second[i].is_data_
+          if (decl_sig.second[i].is_data()
               && has_var(fun.args_[i], var_map)) {
             error_msgs << "Function argument error, function: "
                        << fun.name_ << ", argument: " << (i + 1)
@@ -3144,7 +3146,8 @@ namespace stan {
                      << std::endl;      
           return;
       }
-      bare_type.set_is_data(scope.program_block() == data_origin);
+      if (scope.program_block() == data_origin)
+        bare_type.set_is_data();
     }
     boost::phoenix::function<validate_bare_type_is_data>
     validate_bare_type_is_data_f;

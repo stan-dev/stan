@@ -18,8 +18,14 @@ namespace stan {
        * The array element type.
        */
       bare_expr_type element_type_;
+
       /**
-       * Construct an array local var type with default values.
+       * True if variable type declared with "data" qualifier.
+       */
+      bool is_data_;
+
+      /**
+       * Construct a bare array type with default values.
        */
       bare_array_type();
 
@@ -54,7 +60,6 @@ namespace stan {
        * Returns identity string for this type.
        */
       std::string oid() const;
-
     };
   }
 }

@@ -43,11 +43,6 @@ namespace stan {
       bare_t bare_type_;
 
       /**
-       * True if type has "data" qualifier.
-       */
-      bool is_data_;
-
-      /**
        * Construct a bare var type with default values.
        */
       bare_expr_type();
@@ -177,63 +172,6 @@ namespace stan {
       bool operator>=(const bare_expr_type& bare_type) const;
 
       /**
-       * Returns true if `bare_type_` is `ill_formed_type`, false otherwise.
-       */
-      bool is_ill_formed_type() const;
-
-      /**
-       * Returns true if `bare_type_` is `void_type`, false otherwise.
-       */
-      bool is_void_type() const;
-
-      /**
-       * Returns true if `bare_type_` is `int_type`, false otherwise.
-       */
-      bool is_int_type() const;
-
-      /**
-       * Returns true if `bare_type_` is `double_type`, false otherwise.
-       */
-      bool is_double_type() const;
-
-      /**
-       * Returns true if `bare_type_` is `vector_type`, false otherwise.
-       */
-      bool is_vector_type() const;
-
-      /**
-       * Returns true if `bare_type_` is `row_vector_type`, false otherwise.
-       */
-      bool is_row_vector_type() const;
-
-      /**
-       * Returns true if `bare_type_` is `matrix_type`, false otherwise.
-       */
-      bool is_matrix_type() const;
-
-      /**
-       * Returns true if `bare_type_` is `bare_array_type`, false otherwise.
-       */
-      bool is_array_type() const;
-
-      /**
-       * Returns `is_data_`
-       */
-      bool is_data() const;
-
-      /**
-       * Setter for `is_data_`
-       * 
-       * @param bool
-       */
-      void set_is_data(bool f);
-
-      /**
-       * Returns true if `bare_type_` is `int_type` or `double_type`, false otherwise.
-       */
-      bool is_primitive() const;
-
-      /**
        * Returns the element type for `bare_array_type`, otherwise
        * will return `ill_formed_type`.
        */
@@ -258,6 +196,56 @@ namespace stan {
       bare_expr_type base() const;
 
       /**
+       * Returns true if `bare_type_` is `bare_array_type`, false otherwise.
+       */
+      bool is_array_type() const;
+
+      /**
+       * Returns value of `bare_type_` member var `is_data_`.
+       */
+      bool is_data() const;
+
+      /**
+       * Returns true if `bare_type_` is `double_type`, false otherwise.
+       */
+      bool is_double_type() const;
+
+      /**
+       * Returns true if `bare_type_` is `ill_formed_type`, false otherwise.
+       */
+      bool is_ill_formed_type() const;
+
+      /**
+       * Returns true if `bare_type_` is `int_type`, false otherwise.
+       */
+      bool is_int_type() const;
+
+      /**
+       * Returns true if `bare_type_` is `matrix_type`, false otherwise.
+       */
+      bool is_matrix_type() const;
+
+      /**
+       * Returns true if `bare_type_` is `int_type` or `double_type`, false otherwise.
+       */
+      bool is_primitive() const;
+
+      /**
+       * Returns true if `bare_type_` is `row_vector_type`, false otherwise.
+       */
+      bool is_row_vector_type() const;
+
+      /**
+       * Returns true if `bare_type_` is `vector_type`, false otherwise.
+       */
+      bool is_vector_type() const;
+
+      /**
+       * Returns true if `bare_type_` is `void_type`, false otherwise.
+       */
+      bool is_void_type() const;
+
+      /**
        * Returns total number of dimensions for container type.
        * Returns 0 for scalar types.
        */
@@ -267,6 +255,11 @@ namespace stan {
        * Returns order id for this bare type.
        */
       std::string order_id() const;
+
+      /**
+       * Set flag `is_data` to true
+       */
+      void set_is_data();
     };
 
     /**

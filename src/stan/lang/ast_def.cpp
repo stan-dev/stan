@@ -43,7 +43,9 @@
 #include <stan/lang/ast/fun/bare_array_base_type_vis_def.hpp>
 #include <stan/lang/ast/fun/bare_array_dims_vis_def.hpp>
 #include <stan/lang/ast/fun/bare_array_element_type_vis_def.hpp>
+#include <stan/lang/ast/fun/bare_type_is_data_vis_def.hpp>
 #include <stan/lang/ast/fun/bare_type_order_id_vis_def.hpp>
+#include <stan/lang/ast/fun/bare_type_set_is_data_vis_def.hpp>
 #include <stan/lang/ast/fun/bare_type_vis_def.hpp>
 #include <stan/lang/ast/fun/block_array_base_type_vis_def.hpp>
 #include <stan/lang/ast/fun/block_array_dims_vis_def.hpp>

@@ -1,4 +1,16 @@
 #include <stan/lang/ast_def.cpp>
+
+// use to check expressions
+#include <stan/lang/generator/expression_visgen.hpp>
+#include <stan/lang/generator/generate_array_builder_adds.hpp>
+#include <stan/lang/generator/generate_expression.hpp>
+#include <stan/lang/generator/generate_idxs.hpp>
+#include <stan/lang/generator/generate_idxs_user.hpp>
+#include <stan/lang/generator/generate_idx.hpp>
+#include <stan/lang/generator/generate_idx_user.hpp>
+#include <stan/lang/generator/idx_visgen.hpp>
+#include <stan/lang/generator/idx_user_visgen.hpp>
+
 #include <gtest/gtest.h>
 #include <sstream>
 #include <string>
@@ -90,23 +102,32 @@ TEST(arrayLocalVarDecl, createVar3) {
   EXPECT_EQ(lvar_array_lens.size(), lvar.type().array_dims());
   EXPECT_TRUE(lvar_array_lens.at(0).bare_type().is_int_type());
 
-  stan::lang::int_literal
-    tmp = boost::get<stan::lang::int_literal>(lvar_array_lens.at(0).expr_);
-  EXPECT_EQ(tmp.val_, 9);
-  tmp = boost::get<stan::lang::int_literal>(lvar_array_lens.at(1).expr_);
-  EXPECT_EQ(tmp.val_, 8);
-  tmp = boost::get<stan::lang::int_literal>(lvar_array_lens.at(2).expr_);
-  EXPECT_EQ(tmp.val_, 7);
-
-  EXPECT_TRUE(lvar.type().array_contains().arg1().bare_type().is_int_type());
-  tmp = boost::get<stan::lang::int_literal>(lvar.type().array_contains().arg1().expr_);
-  EXPECT_EQ(tmp.val_, 3);
-
-  EXPECT_TRUE(lvar.type().array_contains().arg2().bare_type().is_int_type());
-  tmp = boost::get<stan::lang::int_literal>(lvar.type().array_contains().arg2().expr_);
-  EXPECT_EQ(tmp.val_, 4);
-
   std::stringstream ss;
+  generate_expression(lvar_array_lens.at(0), false, ss);
+  EXPECT_EQ("9", ss.str());
+
+  ss.str(std::string());
+  ss.clear();
+  generate_expression(lvar_array_lens.at(1), false, ss);
+  EXPECT_EQ("8", ss.str());
+
+  ss.str(std::string());
+  ss.clear();
+  generate_expression(lvar_array_lens.at(2), false, ss);
+  EXPECT_EQ("7", ss.str());
+
+  ss.str(std::string());
+  ss.clear();
+  generate_expression(lvar.type().array_contains().arg1(), false, ss);
+  EXPECT_EQ("3", ss.str());
+
+  ss.str(std::string());
+  ss.clear();
+  generate_expression(lvar.type().array_contains().arg2(), false, ss);
+  EXPECT_EQ("4", ss.str());
+
+  ss.str(std::string());
+  ss.clear();
   stan::lang::write_bare_expr_type(ss, lvar.bare_type());
   EXPECT_EQ("matrix[ , , ]", ss.str());
 }
@@ -148,13 +169,17 @@ TEST(matrixLocalVarDecl, createVar1) {
   EXPECT_FALSE(lvar.has_def());
 
   EXPECT_TRUE(lvar.type().arg1().bare_type().is_int_type());
-  stan::lang::int_literal
-  tmp = boost::get<stan::lang::int_literal>(lvar.type().arg1().expr_);
-  EXPECT_EQ(tmp.val_, 3);
+
+  std::stringstream ss;
+  generate_expression(lvar.type().arg1(), false, ss);
+  EXPECT_EQ("3", ss.str());
 
   EXPECT_TRUE(lvar.type().arg2().bare_type().is_int_type());
-  tmp = boost::get<stan::lang::int_literal>(lvar.type().arg2().expr_);
-  EXPECT_EQ(tmp.val_, 4);
+
+  ss.str(std::string());
+  ss.clear();
+  generate_expression(lvar.type().arg2(), false, ss);
+  EXPECT_EQ("4", ss.str());
 
   std::vector<stan::lang::expression> lvar_array_lens = lvar.type().array_lens();
   EXPECT_EQ(lvar_array_lens.size(), lvar.type().array_dims());
@@ -170,9 +195,10 @@ TEST(rowVectorLocalVarDecl, createVar1) {
   EXPECT_FALSE(lvar.has_def());
 
   EXPECT_TRUE(lvar.type().arg1().bare_type().is_int_type());
-  stan::lang::int_literal
-  tmp = boost::get<stan::lang::int_literal>(lvar.type().arg1().expr_);
-  EXPECT_EQ(tmp.val_, 11);
+  std::stringstream ss;
+  generate_expression(lvar.type().arg1(), false, ss);
+  EXPECT_EQ("11", ss.str());
+
   EXPECT_TRUE(lvar.type().arg2().bare_type().is_ill_formed_type());
 
   std::vector<stan::lang::expression> lvar_array_lens = lvar.type().array_lens();
@@ -189,9 +215,10 @@ TEST(vectorLocalVarDecl, createVar1) {
   EXPECT_FALSE(lvar.has_def());
 
   EXPECT_TRUE(lvar.type().arg1().bare_type().is_int_type());
-  stan::lang::int_literal
-  tmp = boost::get<stan::lang::int_literal>(lvar.type().arg1().expr_);
-  EXPECT_EQ(tmp.val_, 11);
+  std::stringstream ss;
+  generate_expression(lvar.type().arg1(), false, ss);
+  EXPECT_EQ("11", ss.str());
+
   EXPECT_TRUE(lvar.type().arg2().bare_type().is_ill_formed_type());
 
   std::vector<stan::lang::expression> lvar_array_lens = lvar.type().array_lens();

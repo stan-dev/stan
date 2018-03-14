@@ -1,4 +1,16 @@
 #include <stan/lang/ast_def.cpp>
+
+// use to check expressions
+#include <stan/lang/generator/expression_visgen.hpp>
+#include <stan/lang/generator/generate_array_builder_adds.hpp>
+#include <stan/lang/generator/generate_expression.hpp>
+#include <stan/lang/generator/generate_idxs.hpp>
+#include <stan/lang/generator/generate_idxs_user.hpp>
+#include <stan/lang/generator/generate_idx.hpp>
+#include <stan/lang/generator/generate_idx_user.hpp>
+#include <stan/lang/generator/idx_visgen.hpp>
+#include <stan/lang/generator/idx_user_visgen.hpp>
+
 #include <gtest/gtest.h>
 #include <sstream>
 #include <string>
@@ -145,22 +157,32 @@ TEST(arrayBlockVarDecl, createVar3) {
   EXPECT_EQ(bvar_array_lens.size(), bvar.type().array_dims());
   EXPECT_TRUE(bvar_array_lens.at(0).bare_type().is_int_type());
 
-  stan::lang::int_literal
-    tmp = boost::get<stan::lang::int_literal>(bvar_array_lens.at(0).expr_);
-  EXPECT_EQ(tmp.val_, 9);
-  tmp = boost::get<stan::lang::int_literal>(bvar_array_lens.at(1).expr_);
-  EXPECT_EQ(tmp.val_, 8);
-  tmp = boost::get<stan::lang::int_literal>(bvar_array_lens.at(2).expr_);
-  EXPECT_EQ(tmp.val_, 7);
-
-  EXPECT_TRUE(bvar.type().array_contains().arg1().bare_type().is_int_type());
-  tmp = boost::get<stan::lang::int_literal>(bvar.type().array_contains().arg1().expr_);
-  EXPECT_EQ(tmp.val_, 3);
-
-  EXPECT_TRUE(bvar.type().array_contains().arg2().bare_type().is_int_type());
-  tmp = boost::get<stan::lang::int_literal>(bvar.type().array_contains().arg2().expr_);
-  EXPECT_EQ(tmp.val_, 4);
   std::stringstream ss;
+  generate_expression(bvar_array_lens.at(0), false, ss);
+  EXPECT_EQ("9", ss.str());
+
+  ss.str(std::string());
+  ss.clear();
+  generate_expression(bvar_array_lens.at(1), false, ss);
+  EXPECT_EQ("8", ss.str());
+
+  ss.str(std::string());
+  ss.clear();
+  generate_expression(bvar_array_lens.at(2), false, ss);
+  EXPECT_EQ("7", ss.str());
+
+  ss.str(std::string());
+  ss.clear();
+  generate_expression(bvar.type().array_contains().arg1(), false, ss);
+  EXPECT_EQ("3", ss.str());
+
+  ss.str(std::string());
+  ss.clear();
+  generate_expression(bvar.type().array_contains().arg2(), false, ss);
+  EXPECT_EQ("4", ss.str());
+
+  ss.str(std::string());
+  ss.clear();
   stan::lang::write_bare_expr_type(ss, bvar.bare_type());
   EXPECT_EQ("matrix[ , , ]", ss.str());
 
@@ -214,12 +236,12 @@ TEST(choleskyFactorBlockVarDecl, createVar1) {
   EXPECT_TRUE(bvar.type().arg1().bare_type().is_int_type());
   EXPECT_TRUE(bvar.type().arg2().bare_type().is_int_type());
 
-  stan::lang::cholesky_factor_cov_block_type cfbt2
-    = boost::get<stan::lang::cholesky_factor_cov_block_type>(bvar.type().var_type_);
-  stan::lang::expression m_size = cfbt2.M();
-  EXPECT_TRUE(m_size.bare_type().is_int_type());
-  stan::lang::expression n_size = cfbt2.N();
-  EXPECT_TRUE(m_size.bare_type().is_int_type());
+  // stan::lang::cholesky_factor_cov_block_type cfbt2
+  //   = boost::get<stan::lang::cholesky_factor_cov_block_type>(bvar.type().var_type_);
+  // stan::lang::expression m_size = cfbt2.M();
+  // EXPECT_TRUE(m_size.bare_type().is_int_type());
+  // stan::lang::expression n_size = cfbt2.N();
+  // EXPECT_TRUE(m_size.bare_type().is_int_type());
 
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvar.type());
@@ -245,11 +267,11 @@ TEST(corrMatrixBlockVarDecl, createVar1) {
   EXPECT_EQ(bvar_array_lens.size(), bvar.type().array_dims());
   EXPECT_TRUE(bvar.type().arg1().bare_type().is_int_type());
 
-  // check corr_matrix_block_var_type
-  stan::lang::corr_matrix_block_type cmbt2
-    = boost::get<stan::lang::corr_matrix_block_type>(bvar.type().var_type_);
-  stan::lang::expression k_size = cmbt2.K();
-  EXPECT_TRUE(k_size.bare_type().is_int_type());
+  // // check corr_matrix_block_var_type
+  // stan::lang::corr_matrix_block_type cmbt2
+  //   = boost::get<stan::lang::corr_matrix_block_type>(bvar.type().var_type_);
+  // stan::lang::expression k_size = cmbt2.K();
+  // EXPECT_TRUE(k_size.bare_type().is_int_type());
 
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvar.type());
@@ -275,11 +297,11 @@ TEST(covMatrixBlockVarDecl, createVar1) {
   EXPECT_EQ(bvar_array_lens.size(), bvar.type().array_dims());
   EXPECT_TRUE(bvar.type().arg1().bare_type().is_int_type());
 
-  // check cov_matrix_block_var_type
-  stan::lang::cov_matrix_block_type cmbt2
-    = boost::get<stan::lang::cov_matrix_block_type>(bvar.type().var_type_);
-  stan::lang::expression k_size = cmbt2.K();
-  EXPECT_TRUE(k_size.bare_type().is_int_type());
+  // // check cov_matrix_block_var_type
+  // stan::lang::cov_matrix_block_type cmbt2
+  //   = boost::get<stan::lang::cov_matrix_block_type>(bvar.type().var_type_);
+  // stan::lang::expression k_size = cmbt2.K();
+  // EXPECT_TRUE(k_size.bare_type().is_int_type());
 
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvar.type());

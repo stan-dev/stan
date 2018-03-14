@@ -313,10 +313,6 @@ TEST(indexedType, indexed_expr_1d_arr_matrix_3_idxs) {
 }
 
 TEST(indexedType, indexed_expr_1d_arr_matrix_3_idxs_pos_0_is_multi) {
-  stan::lang::variable v1("foo");
-  v1.set_type(stan::lang::bare_array_type(stan::lang::matrix_type()));
-  stan::lang::expression e1(v1);
-
   stan::lang::multi_idx m1;
   stan::lang::idx idx1(m1);
   EXPECT_TRUE(stan::lang::is_multi_index(idx1));
@@ -328,15 +324,18 @@ TEST(indexedType, indexed_expr_1d_arr_matrix_3_idxs_pos_0_is_multi) {
   idxs.push_back(idx2);
   idxs.push_back(idx2);
 
+  stan::lang::variable v1("foo");
+  v1.set_type(stan::lang::bare_array_type(stan::lang::matrix_type()));
+  stan::lang::expression e1(v1);
+
+  // m, u, u - reduces array of matrix to array of double
   stan::lang::bare_expr_type idx_type = stan::lang::indexed_type(e1, idxs);
-  EXPECT_TRUE(idx_type.is_vector_type());
+  EXPECT_EQ(idx_type.num_dims(), 1);
+  EXPECT_TRUE(idx_type.is_array_type());
+  EXPECT_TRUE(idx_type.array_contains().is_double_type());
 }
 
 TEST(indexedType, indexed_expr_1d_arr_matrix_3_idxs_pos_0_1_is_multi) {
-  stan::lang::variable v1("foo");
-  v1.set_type(stan::lang::bare_array_type(stan::lang::matrix_type()));
-  stan::lang::expression e1(v1);
-
   stan::lang::multi_idx m1;
   stan::lang::idx idx1(m1);
   EXPECT_TRUE(stan::lang::is_multi_index(idx1));
@@ -348,15 +347,18 @@ TEST(indexedType, indexed_expr_1d_arr_matrix_3_idxs_pos_0_1_is_multi) {
   idxs.push_back(idx1);
   idxs.push_back(idx2);
 
-  stan::lang::bare_expr_type idx_type = stan::lang::indexed_type(e1, idxs);
-  EXPECT_TRUE(idx_type.is_matrix_type());
-}
-
-TEST(indexedType, indexed_expr_1d_arr_matrix_3_idxs_pos_1_is_multi) {
   stan::lang::variable v1("foo");
   v1.set_type(stan::lang::bare_array_type(stan::lang::matrix_type()));
   stan::lang::expression e1(v1);
 
+  // m, m, u - reduces array of matrix to array of vector
+  stan::lang::bare_expr_type idx_type = stan::lang::indexed_type(e1, idxs);
+  EXPECT_EQ(idx_type.num_dims(), 2);
+  EXPECT_TRUE(idx_type.is_array_type());
+  EXPECT_TRUE(idx_type.array_contains().is_vector_type());
+}
+
+TEST(indexedType, indexed_expr_1d_arr_matrix_3_idxs_pos_2_is_multi) {
   stan::lang::multi_idx m1;
   stan::lang::idx idx1(m1);
   EXPECT_TRUE(stan::lang::is_multi_index(idx1));
@@ -368,33 +370,35 @@ TEST(indexedType, indexed_expr_1d_arr_matrix_3_idxs_pos_1_is_multi) {
   idxs.push_back(idx1);
   idxs.push_back(idx2);
 
-  stan::lang::bare_expr_type idx_type = stan::lang::indexed_type(e1, idxs);
-  EXPECT_TRUE(idx_type.is_row_vector_type());
-}
-
-TEST(indexedType, indexed_expr_1d_arr_matrix_3_idxs_pos_1_2_is_multi) {
   stan::lang::variable v1("foo");
   v1.set_type(stan::lang::bare_array_type(stan::lang::matrix_type()));
   stan::lang::expression e1(v1);
 
+  // u, m, u reduces 1-d arr of matrix to vector
+  stan::lang::bare_expr_type idx_type = stan::lang::indexed_type(e1, idxs);
+  EXPECT_TRUE(idx_type.is_vector_type());
+}
+
+TEST(indexedType, indexed_expr_1d_arr_matrix_3_idxs_pos_1_2_is_multi) {
   stan::lang::multi_idx m1;
   stan::lang::idx idx1(m1);
-  stan::lang::multi_idx m2;
-  stan::lang::idx idx2(m2);
-  stan::lang::uni_idx i1;
-  stan::lang::idx idx3(i1);
+  EXPECT_TRUE(stan::lang::is_multi_index(idx1));
+  stan::lang::uni_idx i1(stan::lang::int_literal(7));
+  stan::lang::idx idx2(i1);
+  EXPECT_FALSE(stan::lang::is_multi_index(idx2));
   std::vector<stan::lang::idx> idxs;
-  idxs.push_back(idx3);
-  idxs.push_back(idx2);
   idxs.push_back(idx1);
+  idxs.push_back(idx1);
+  idxs.push_back(idx2);
 
-  EXPECT_TRUE(stan::lang::is_multi_index(idxs[2]));
-  EXPECT_TRUE(stan::lang::is_multi_index(idxs[1]));
-  EXPECT_FALSE(stan::lang::is_multi_index(idxs[0]));
+  stan::lang::variable v1("foo");
+  v1.set_type(stan::lang::bare_array_type(stan::lang::matrix_type()));
+  stan::lang::expression e1(v1);
   
+  // m, m, u reduces 1-d arr of matrix to 1-d arr of vector
   stan::lang::bare_expr_type idx_type = stan::lang::indexed_type(e1, idxs);
   EXPECT_EQ(idx_type.array_dims(), 1);
-  EXPECT_TRUE(idx_type.array_contains().is_row_vector_type());
+  EXPECT_TRUE(idx_type.array_contains().is_vector_type());
 }
 
 TEST(indexedType, indexed_expr_2d_arr_matrix_3_idxs) {
@@ -410,6 +414,7 @@ TEST(indexedType, indexed_expr_2d_arr_matrix_3_idxs) {
   idxs.push_back(idx);
   idxs.push_back(idx);
 
+  // u, u, u reduces 2-d arr of matrix to row_vec
   stan::lang::bare_expr_type idx_type = stan::lang::indexed_type(e1, idxs);
   EXPECT_TRUE(idx_type.is_row_vector_type());
 }
