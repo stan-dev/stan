@@ -569,3 +569,18 @@ TEST(illFormedBlockVarDecl, createVar1) {
   EXPECT_EQ(bvar.type().num_dims(), 0);
   EXPECT_EQ(bvar.type().array_dims(), 0);
 }
+
+// from old src/test/unit/lang/ast_test.cpp
+TEST(langAst, baseVarDecl) {
+  std::vector<stan::lang::expression> dims;
+  dims.push_back(stan::lang::expression(stan::lang::int_literal(0)));
+  // 1d array of int
+  stan::lang::int_block_type btInt;
+  stan::lang::block_array_type bat_int_1d(btInt, dims);
+  stan::lang::block_var_decl bvd("foo", bat_int_1d);
+  EXPECT_EQ("foo", bvd.name());
+  EXPECT_EQ(1, bvd.bare_type().num_dims());
+  EXPECT_EQ(stan::lang::expression(stan::lang::int_literal(0)).bare_type(),
+            bvd.type().array_lens().at(0).bare_type());
+  EXPECT_EQ(stan::lang::bare_expr_type(stan::lang::int_type()), bvd.bare_type().base());
+}
