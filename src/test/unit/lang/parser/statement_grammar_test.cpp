@@ -17,7 +17,7 @@ TEST(langParserStatementGrammar, validateIntExpr2) {
   test_throws("validate_int_expr2_bad2",
               "loop must be over container or range");
   test_throws("validate_int_expr2_bad3",
-              "dimension declaration requires expression denoting integer");
+              "expression denoting integer required");
   test_throws("validate_int_expr2_bad4",
               "loop must be over container or range");
 }

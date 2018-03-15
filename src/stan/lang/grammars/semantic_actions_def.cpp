@@ -1673,7 +1673,7 @@ namespace stan {
     boost::phoenix::function<deprecated_integrate_ode>
     deprecated_integrate_ode_f;
 
-    // ************** stopped here **************************************************************
+    // TODO:mitzi  resolve data_only flag issue w/r/t function_sigs and solvers
     template <class T>
     void validate_integrate_ode_non_control_args(const T& ode_fun,
                                                  const variable_map& var_map,
@@ -1681,19 +1681,20 @@ namespace stan {
                                                  std::ostream& error_msgs) {
       pass = true;
 
-      int_type t_data_int(true);
+      // ode_integrator requires function with signature:
+      // (real, real[ ], real[ ], data real[ ], data int[ ]): real[ ]"
+
+      // TODO:mitzi  names indicate status, but not flagged as data_only
+      // instantiate ode fn arg types
       double_type t_double;
-      double_type t_data_double(true);
-
-      bare_expr_type bet_ar_int_data(bare_array_type(t_data_int, 1));
-      bet_ar_int_data.set_is_data();
-
       bare_expr_type bet_double(t_double);
       bare_expr_type bet_ar_double(bare_array_type(t_double, 1));
+      bare_expr_type bet_ar_double_data(bare_array_type(t_double, 1));
 
-      bare_expr_type bet_ar_double_data(bare_array_type(t_data_double, 1));
-      bet_ar_double_data.set_is_data();
+      int_type t_int_data;
+      bare_expr_type bet_ar_int_data(bare_array_type(t_int_data, 1));
 
+      // validate ode fn signature
       bare_expr_type sys_result_type(bet_ar_double);
       std::vector<bare_expr_type> sys_arg_types;
       sys_arg_types.push_back(bet_double);
@@ -1701,66 +1702,79 @@ namespace stan {
       sys_arg_types.push_back(bet_ar_double);
       sys_arg_types.push_back(bet_ar_double_data);
       sys_arg_types.push_back(bet_ar_int_data);
-
       function_signature_t system_signature(sys_result_type, sys_arg_types);
       if (!function_signatures::instance()
           .is_defined(ode_fun.system_function_name_, system_signature)) {
-        error_msgs << "first argument to "
+        error_msgs << "wrong signature for function "
                    << ode_fun.integration_function_name_
-                   << " must be the name of a function with signature"
-                   << " (real, real[], real[], data real[], data int[]) : real[] ";
+                   << "; first argument must be "
+                   << "the name of a function with signature:"
+                   << " (real, real[ ], real[ ], real[ ], data int[ ]):"
+                   << " real[ ]." << std::endl;
         pass = false;
       }
-      // test regular argument types
+
+      // Stan lang integrate_ode takes 7 args:
+      // fn_name, y0, t0, ts, theta, x_r, x_i
+      // only y0 and theta can have params
       if (ode_fun.y0_.bare_type() != bet_ar_double) {
-        error_msgs << "argument y0 (initial system state) "
+        error_msgs << "second argument to "
                    << ode_fun.integration_function_name_
-                   << " must have type real[ ]; found type="
+                   << " must have type: "
+                   << bet_ar_double
+                   << " found type = "
                    << ode_fun.y0_.bare_type()
-                   << ". ";
+                   << ". " << std::endl;
         pass = false;
       }
       if (!ode_fun.t0_.bare_type().is_double_type()) {
-        error_msgs << "argument t0 (initial system time) "
+        error_msgs << "third argument to "
                    << ode_fun.integration_function_name_
-                   << " must have type real; found type="
+                   << " must have type: "
+                   << bet_double
+                   << " found type = "
                    << ode_fun.t0_.bare_type()
-                   << ". ";
+                   << ". " << std::endl;
         pass = false;
       }
       if (ode_fun.ts_.bare_type() != bet_ar_double) {
-        error_msgs << "argument ts (solution times) "
+        error_msgs << "fourth argument to "
                    << ode_fun.integration_function_name_
-                   << " must have type real[ ]"
-                   << " for requested solution times; found type="
+                   << " must have type: "
+                   << bet_ar_double
+                   << " found type = "
                    << ode_fun.ts_.bare_type()
-                   << ". ";
-        pass = false;
+                   << ". " << std::endl;
+      pass = false;
       }
       if (ode_fun.theta_.bare_type() != bet_ar_double) {
-        error_msgs << "argument theta (parameters) "
+        error_msgs << "fifth argument to "
                    << ode_fun.integration_function_name_
-                   << " must have type real[ ]; found type="
+                   << " must have type: "
+                   << bet_ar_double
+                   << " found type = "
                    << ode_fun.theta_.bare_type()
-                   << ". ";
+                   << ". " << std::endl;
         pass = false;
       }
-      if (ode_fun.x_.bare_type() != bet_ar_double_data
-          || !ode_fun.x_.bare_type().is_data()) {
-        error_msgs << "argument x for real data "
+      if (ode_fun.x_.bare_type() != bet_ar_double_data) {
+        error_msgs << "sixth argument to "
                    << ode_fun.integration_function_name_
-                   << " must have type data real[ ]; found type="
+                   << " must have type: "
+                   << bet_ar_double_data
+                   << " found type = "
                    << ode_fun.x_.bare_type()
-                   << ". ";
+                   << ". " << std::endl;
         pass = false;
       }
-      if (ode_fun.x_int_.bare_type() != bet_ar_int_data
-          || !ode_fun.x_int_.bare_type().is_data()) {
-        error_msgs << "argument x_int for int data "
+      if (ode_fun.x_int_.bare_type() != bet_ar_int_data) {
+        error_msgs << "seventh argument to "
                    << ode_fun.integration_function_name_
-                   << " must have type int[ ]; found type="
+                   << " must have type: "
+                   << bet_ar_int_data
+                   << " found type = "
                    << ode_fun.x_int_.bare_type()
-                   << ". ";
+                   << ". " << std::endl;
         pass = false;
       }
 
@@ -1769,21 +1783,24 @@ namespace stan {
         error_msgs << "third argument to "
                    << ode_fun.integration_function_name_
                    << " (initial times)"
-                   << " must be data only and not reference parameters";
+                   << " must be data only and not reference parameters."
+                   << std::endl;
         pass = false;
       }
       if (has_var(ode_fun.ts_, var_map)) {
         error_msgs << "fourth argument to "
                    << ode_fun.integration_function_name_
                    << " (solution times)"
-                   << " must be data only and not reference parameters";
+                   << " must be data only and not reference parameters."
+                   << std::endl;
         pass = false;
       }
       if (has_var(ode_fun.x_, var_map)) {
         error_msgs << "sixth argument to "
                    << ode_fun.integration_function_name_
                    << " (real data)"
-                   << " must be data only and not reference parameters";
+                   << " must be data only and not reference parameters."
+                   << std::endl;
         pass = false;
       }
     }
@@ -1857,76 +1874,79 @@ namespace stan {
     boost::phoenix::function<validate_integrate_ode_control>
     validate_integrate_ode_control_f;
 
+    // TODO:mitzi  resolve data_only flag issue w/r/t function_sigs and solvers
     template <class T>
     void validate_algebra_solver_non_control_args(const T& alg_fun,
                                                   const variable_map& var_map,
                                                   bool& pass,
                                                   std::ostream& error_msgs) {
       pass = true;
+
+      // algebra_solver requires function with signature:
+      // (vector, vector, real[ ], int[ ]) : vector
+
       int_type t_int;
-      bare_expr_type bet_int(t_int);
-      bare_array_type ar_int(bet_int);
-      bare_expr_type bet_ar_int(ar_int);
-
       double_type t_double;
-      bare_expr_type bet_double(t_double);
-      bare_array_type ar_double(bet_double);
-      bare_expr_type bet_ar_double(ar_double);
-
-      bare_expr_type bet_ar_double_data(ar_double);
-      bet_ar_double_data.set_is_data();
-
       vector_type t_vector;
-      bare_expr_type bet_vector(t_vector);
 
+      // TODO:mitzi  names indicate status, but not flagged as data_only
+      bare_expr_type bet_ar_int_data(bare_array_type(t_int, 1));
+      bare_expr_type bet_ar_double_data(bare_array_type(t_double, 1));
+      bare_expr_type bet_vector(t_vector);
       bare_expr_type bet_vector_data(t_vector);
-      bet_vector_data.set_is_data();
 
       bare_expr_type sys_result_type(t_vector);
       std::vector<bare_expr_type> sys_arg_types;
       sys_arg_types.push_back(bet_vector_data);  // y
-      sys_arg_types.push_back(bet_vector_data);  // theta
+      sys_arg_types.push_back(bet_vector);  // theta
       sys_arg_types.push_back(bet_ar_double_data);  // x_r
-      sys_arg_types.push_back(bet_ar_int);  // x_i
+      sys_arg_types.push_back(bet_ar_int_data);  // x_i
       function_signature_t system_signature(sys_result_type, sys_arg_types);
+
+      // std::cout << "created fun_sig pair" << std::endl;
+
       if (!function_signatures::instance()
           .is_defined(alg_fun.system_function_name_, system_signature)) {
-        error_msgs << "first argument to "
-                   << "algebra_solver"
-                   << " must be the name of a function with signature"
-                   << " (data vector, data vector, data real[], int[]) : vector "
+
+        error_msgs << "wrong signature for function "
+                   << alg_fun.system_function_name_
+                   << " first argument to algebra_solver"
+                   << " must be a function with signature:"
+                   << " (vector, vector, real[ ], int[ ]) : vector."
                    << std::endl;
         pass = false;
       }
 
+      // std::cout << "good sig for solver function" << std::endl;
+
       // test regular argument types
-      if (alg_fun.y_.bare_type() != bet_vector) {
-        error_msgs << "second argument to algebra_solver"
-                   << " must have type vector for initial guess;"
+      if (alg_fun.y_.bare_type() != bet_vector_data) {
+        error_msgs << "second argument to algebra_solver must have type: "
+                   << bet_vector_data
                    << " found type = "
                    << alg_fun.y_.bare_type()
                    << ". " << std::endl;
         pass = false;
       }
       if (alg_fun.theta_.bare_type() != bet_vector) {
-        error_msgs << "third argument to algebra_solver"
-                   << " must have type vector for parameters;"
+        error_msgs << "third argument to algebra_solver must have type: "
+                   << bet_vector
                    << " found type = "
                    << alg_fun.theta_.bare_type()
                    << ". " << std::endl;
         pass = false;
       }
-      if (alg_fun.x_r_.bare_type() != bet_ar_double) {
-        error_msgs << "fourth argument to algebra_solver"
-                   << " must have type real[] for real data;"
+      if (alg_fun.x_r_.bare_type() != bet_ar_double_data) {
+        error_msgs << "fourth argument to algebra_solver must have type: "
+                   << bet_ar_double_data
                    << " found type = "
                    << alg_fun.x_r_.bare_type()
                    << ". " << std::endl;
         pass = false;
       }
-      if (alg_fun.x_i_.bare_type() != bet_ar_int) {
-        error_msgs << "fifth argument to algebra_solver"
-                   << " must have type int[] for integer data;"
+      if (alg_fun.x_i_.bare_type() != bet_ar_int_data) {
+        error_msgs << "fifth argument to algebra_solver must have type: "
+                   << bet_ar_int_data
                    << " found type = "
                    << alg_fun.x_i_.bare_type()
                    << ". " << std::endl;
@@ -1936,14 +1956,12 @@ namespace stan {
       // test data-only variables do not have parameters (int locals OK)
       if (has_var(alg_fun.y_, var_map)) {
         error_msgs << "second argument to algebra_solver"
-                   << " (initial guess)"
                    << " must be data only and not reference parameters"
                    << std::endl;
         pass = false;
       }
       if (has_var(alg_fun.x_r_, var_map)) {
         error_msgs << "fourth argument to algebra_solver"
-                   << " (real data)"
                    << " must be data only and not reference parameters"
                    << std::endl;
         pass = false;

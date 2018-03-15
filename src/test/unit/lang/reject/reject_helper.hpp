@@ -36,7 +36,7 @@ void reject_test(const std::string& expected_msg1 = "",
     M model(empty_data_context, &model_output);
     std::vector<double> cont_vector(model.num_params_r(), 0.0);
     std::vector<int> disc_vector;
-    double lp = model.template log_prob<false,false>(cont_vector, disc_vector, &out);
+    double lp = model.template log_prob<false,false>(cont_vector, &out);
     (void) lp;
     stan::callbacks::stream_writer writer(out);
     std::vector<double> params;
@@ -71,7 +71,7 @@ void print_reject_test(const std::string& expected_msg1 = "") {
     M model(empty_data_context, &ss);
     std::vector<double> cont_vector(model.num_params_r(), 0.0);
     std::vector<int> disc_vector;
-    double lp = model.template log_prob<false,false>(cont_vector, disc_vector, &ss);
+    double lp = model.template log_prob<false,false>(cont_vector, &ss);
     (void) lp;
     std::vector<double> params;
     model.write_array(base_rng, cont_vector, disc_vector,

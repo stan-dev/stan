@@ -51,6 +51,40 @@
 #include <stdexcept>
 #include <iostream>
 
+// parse from file:  folder starts from below src/test/test-models
+stan::lang::program
+parse_program_from_file(const std::string& sub_folder,
+                        const std::string& model_name,
+                        bool& pass,
+                        std::ostream& err_msgs) {
+  pass = false;
+  stan::lang::program parse_result;
+
+  std::string file_name = model_name + ".stan";
+  std::string path = "src/test/test-models/" + file_name;
+  if (sub_folder.size() > 1)
+    path = "src/test/test-models/" + sub_folder + "/" + file_name;
+  std::ifstream fs(path.c_str());
+  if (fs.fail()) {
+    err_msgs <<  "Cannot open model file " << file_name << std::endl;
+    std::cout << "Cannot open model file " << file_name << std::endl;
+    return parse_result;
+  }
+  stan::io::program_reader reader;
+  reader.add_event(0, 0, "start", "utility-stub.stan");
+  reader.add_event(500, 500, "end", "utility-stub.stan");
+  pass = stan::lang::parse(&err_msgs, fs, model_name + "_model",
+                           reader, parse_result, false);
+  return parse_result;
+}
+
+stan::lang::program
+parse_program_from_file(const std::string& model_name,
+                        bool& pass,
+                        std::ostream& err_msgs) {
+  return parse_program_from_file(std::string(), model_name, pass, err_msgs);
+}
+
 stan::lang::program
 parse_program(std::string& input,
               bool& pass,

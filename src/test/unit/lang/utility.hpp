@@ -49,7 +49,6 @@ std::string file_name_to_model_name(const std::string& name) {
   return name_copy;
 }
 
-
 /** test whether model with specified path name parses successfully
  *
  * @param file_name  Filepath of model file
