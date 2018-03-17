@@ -99,7 +99,7 @@ pipeline {
                     steps {
                         unstash 'StanSetup'
                         setupCC(false)
-                        //runTestsWin("src/test/unit")
+                        runTestsWin("src/test/unit")
                     }
                     post { always { deleteDir() } }
                 }
