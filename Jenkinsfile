@@ -94,15 +94,15 @@ pipeline {
         }
         stage('Tests') {
             parallel {
-                //stage('Windows Unit') {
-                //    agent { label 'windows' }
-                //    steps {
-                //        unstash 'StanSetup'
-                //        setupCC(false)
-                //        runTestsWin("src/test/unit")
-                //    }
-                //    post { always { deleteDir() } }
-                //}
+                stage('Windows Unit') {
+                    agent { label 'windows' }
+                    steps {
+                        unstash 'StanSetup'
+                        setupCC(false)
+                        //runTestsWin("src/test/unit")
+                    }
+                    post { always { deleteDir() } }
+                }
                 stage('Windows Headers') {
                     agent { label 'windows' }
                     steps {
