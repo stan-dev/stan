@@ -16,7 +16,7 @@ def setup(String pr) {
     """
     if (pr != '')  {
         prNumber = pr.tokenize('-').last()
-        script += """ 
+        script += """
             cd lib/stan_math
             git fetch https://github.com/stan-dev/math +refs/pull/${prNumber}/merge:refs/remotes/origin/pr/${prNumber}/merge
             git checkout refs/remotes/origin/pr/${prNumber}/merge
@@ -100,22 +100,24 @@ pipeline {
                 stage('Windows Unit') {
                     agent { label 'windows' }
                     steps {
-                        unstash 'StanSetup'
+                        checkout scm
+                        bat setup(params.math_pr)
                         setupCC(false)
                         runTestsWin("src/test/unit")
                     }
                     post { always { deleteDir() } }
                 }
-                stage('Windows Headers') { 
+                stage('Windows Headers') {
                     agent { label 'windows' }
                     steps {
-                        unstash 'StanSetup'
+                        checkout scm
+                        bat setup(params.math_pr)
                         setupCC()
                         bat "make -j${env.PARALLEL} test-headers"
                     }
                     post { always { deleteDir() } }
                 }
-                stage('Unit') { 
+                stage('Unit') {
                     agent any
                     steps {
                         unstash 'StanSetup'
@@ -126,7 +128,7 @@ pipeline {
                 }
                 stage('Integration') {
                     agent any
-                    steps { 
+                    steps {
                         unstash 'StanSetup'
                         setupCC()
                         runTests("src/test/integration", separateMakeStep=false)
@@ -151,7 +153,7 @@ pipeline {
                 sh """
                     ./runTests.py -j${env.PARALLEL} src/test/performance
                     cd test/performance
-                    RScript ../../src/test/performance/plot_performance.R 
+                    RScript ../../src/test/performance/plot_performance.R
                 """
             }
             post {
