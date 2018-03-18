@@ -16,7 +16,7 @@ def setup(String pr) {
     """
     if (pr != '')  {
         prNumber = pr.tokenize('-').last()
-        script += """ 
+        script += """
             cd lib/stan_math
             git fetch https://github.com/stan-dev/math +refs/pull/${prNumber}/merge:refs/remotes/origin/pr/${prNumber}/merge
             git checkout refs/remotes/origin/pr/${prNumber}/merge
@@ -79,92 +79,96 @@ pipeline {
                     sh setup(params.math_pr)
                     stash 'StanSetup'
                     setupCC()
-                    parallel(
-                        CppLint: { sh "make cpplint" },
-                        Documentation: { sh 'make doxygen' },
-                        Manual: { sh "make manual" },
-                        Headers: { sh "make -j${env.PARALLEL} test-headers" }
-                    )
+                    //parallel(
+                    //    Headers: { sh "make -j${env.PARALLEL} test-headers" }
+                    //)
                 }
             }
             post {
                 always {
-                    warnings consoleParsers: [[parserName: 'CppLint']], canRunOnFailed: true
-                    warnings consoleParsers: [[parserName: 'math-dependencies']], canRunOnFailed: true
+                    //warnings consoleParsers: [[parserName: 'CppLint']], canRunOnFailed: true
+                    //warnings consoleParsers: [[parserName: 'math-dependencies']], canRunOnFailed: true
                     deleteDir()
                 }
             }
         }
         stage('Tests') {
+            failFast true
             parallel {
                 stage('Windows Unit') {
                     agent { label 'windows' }
                     steps {
+                        bat "attrib -r -s /s /d"
                         unstash 'StanSetup'
                         setupCC(false)
                         runTestsWin("src/test/unit")
                     }
-                    post { always { deleteDir() } }
+                    post { always {
+                        bat "attrib -r -s /s /d"
+                        deleteDir() } }
                 }
-                stage('Windows Headers') { 
+                stage('Windows Headers') {
                     agent { label 'windows' }
                     steps {
+                        bat "attrib -r -s /s /d"
                         unstash 'StanSetup'
                         setupCC()
                         bat "make -j${env.PARALLEL} test-headers"
                     }
-                    post { always { deleteDir() } }
+                    post { always {
+                            bat "attrib -r -s /s /d"
+                            deleteDir() } }
                 }
-                stage('Unit') { 
-                    agent any
-                    steps {
-                        unstash 'StanSetup'
-                        setupCC(false)
-                        runTests("src/test/unit")
-                    }
-                    post { always { deleteDir() } }
-                }
-                stage('Integration') {
-                    agent any
-                    steps { 
-                        unstash 'StanSetup'
-                        setupCC()
-                        runTests("src/test/integration", separateMakeStep=false)
-                    }
-                    post { always { deleteDir() } }
-                }
-                stage('Upstream CmdStan tests') {
-                    when { expression { env.BRANCH_NAME ==~ /PR-\d+/ } }
-                    steps {
-                        build(job: "CmdStan/${params.cmdstan_pr}",
-                              parameters: [string(name: 'stan_pr', value: env.BRANCH_NAME),
-                                           string(name: 'math_pr', value: params.math_pr)])
-                    }
-                }
+                //stage('Unit') {
+                //    agent any
+                //    steps {
+                //        unstash 'StanSetup'
+                //        setupCC(false)
+                //        runTests("src/test/unit")
+                //    }
+                //    post { always { deleteDir() } }
+                //}
+                //stage('Integration') {
+                //    agent any
+                //    steps {
+                //        unstash 'StanSetup'
+                //        setupCC()
+                //        runTests("src/test/integration", separateMakeStep=false)
+                //    }
+                //    post { always { deleteDir() } }
+                //}
+                //stage('Upstream CmdStan tests') {
+                //    when { expression { env.BRANCH_NAME ==~ /PR-\d+/ } }
+                //    steps {
+                //        build(job: "CmdStan/${params.cmdstan_pr}",
+                //              parameters: [string(name: 'stan_pr', value: env.BRANCH_NAME),
+                //                           string(name: 'math_pr', value: params.math_pr)])
+                //    }
+                //}
             }
         }
-        stage('Performance') {
-            agent { label 'gelman-group-mac' }
-            steps {
-                unstash 'StanSetup'
-                setupCC()
-                sh """
-                    ./runTests.py -j${env.PARALLEL} src/test/performance
-                    cd test/performance
-                    RScript ../../src/test/performance/plot_performance.R 
-                """
-            }
-            post {
-                always {
-                    retry(2) {
-                        junit 'test/**/*.xml'
-                        archiveArtifacts 'test/performance/performance.csv,test/performance/performance.png'
-                        perfReport compareBuildPrevious: true, errorFailedThreshold: 0, errorUnstableThreshold: 0, failBuildIfNoResultFile: false, modePerformancePerTestCase: true, sourceDataFiles: 'test/performance/**.xml'
-                    }
-                    deleteDir()
-                }
-            }
-        }
+        //stage('Performance') {
+        //    agent { label 'gelman-group-mac' }
+        //    steps {
+        //        unstash 'StanSetup'
+        //        setupCC()
+        //        sh """
+        //            ./runTests.py -j${env.PARALLEL} src/test/performance
+        //            cd test/performance
+        //            RScript ../../src/test/performance/plot_performance.R
+        //        """
+        //    }
+        //    post {
+        //        always {
+        //            retry(2) {
+        //                junit 'test/**/*.xml'
+        //                archiveArtifacts 'test/performance/performance.csv,test/performance/performance.png'
+        //                perfReport compareBuildPrevious: true, errorFailedThreshold: 0, errorUnstableThreshold: 0, failBuildIfNoResultFile: false, modePerformancePerTestCase: true, sourceDataFiles: 'test/performance/**.xml'
+        //            }
+        //            deleteDir()
+        //        }
+        //    }
+        //}
     }
     post {
         always {
