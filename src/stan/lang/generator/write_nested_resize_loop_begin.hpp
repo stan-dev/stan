@@ -34,10 +34,10 @@ namespace stan {
         return;
       }
 
-      // declare size_t var i_<n>_max__
+      // declare size_t var d_<n>_max__
       for (size_t i = 0; i < dims.size(); ++i) {
         generate_indent(indent, o);
-        o << "size_t " << name << "_i_" << i << "_max__ = ";
+        o << "size_t " << name << "_d_" << i << "_max__ = ";
         generate_expression(dims[i], NOT_USER_FACING, o);
         o << ";" << EOL;
       }
@@ -48,22 +48,22 @@ namespace stan {
           generate_indent(indent + i, o);
           o << name;
           for (size_t j = 0; j < i; ++j)
-            o << "[i_" << j << "__]";
-          o << ".resize(" << name << "_i_" << i << "_max__);" << EOL;
+            o << "[d_" << j << "__]";
+          o << ".resize(" << name << "_d_" << i << "_max__);" << EOL;
         } else {
           // innermost dimension, reserve
           generate_indent(indent + i, o);
           o << name;
           for (size_t j = 0; j < i; ++j)
-            o << "[i_" << j << "__]";
-          o << ".reserve(" << name << "_i_" <<  i << "_max__);" << EOL;
+            o << "[d_" << j << "__]";
+          o << ".reserve(" << name << "_d_" <<  i << "_max__);" << EOL;
         }
 
         // open for loop
         generate_indent(indent + i, o);
-        o << "for (size_t i_"  << i << "__ = 0;"
-          << " i_" << i << "__ < " << name << "_i_" << i << "_max__;"
-          << " ++i_" << i << "__) {" << EOL;
+        o << "for (size_t d_"  << i << "__ = 0;"
+          << " d_" << i << "__ < " << name << "_d_" << i << "_max__;"
+          << " ++d_" << i << "__) {" << EOL;
       }
     }
 

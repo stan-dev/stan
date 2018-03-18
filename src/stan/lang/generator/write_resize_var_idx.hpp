@@ -17,7 +17,7 @@ namespace stan {
                               std::ostream& o) {
       if (num_ar_dims == 1) return;
       for (size_t i = 0; i < num_ar_dims - 1; ++i)
-        o << "[i_" << i << "__]";
+        o << "[d_" << i << "__]";
     }
 
   }

@@ -24,15 +24,12 @@ namespace stan {
   namespace lang {
 
     /**
-     * Generate the constructors for the specified program with the
-     * specified model name to the specified stream.
+     * Generate the constructor method initial boilerplate.
      *
-     * @param[in] prog program from which to generate
      * @param[in] model_name name of model for class name
      * @param[in,out] o stream for generating
      */
-    void generate_constructor(const program& prog,
-                              const std::string& model_name, std::ostream& o) {
+    void generate_method_begin(const std::string& model_name, std::ostream& o) {
       // constructor without seed or template parameter
       o << INDENT << model_name << "(stan::io::var_context& context__," << EOL;
       o << INDENT << "    std::ostream* pstream__ = 0)" << EOL;
@@ -72,7 +69,20 @@ namespace stan {
         << EOL;
       o << INDENT2 << "(void) DUMMY_VAR__;  // suppress unused var warning"
         << EOL2;
+    }
 
+    /**
+     * Generate the constructors for the specified program with the
+     * specified model name to the specified stream.
+     *
+     * @param[in] prog program from which to generate
+     * @param[in] model_name name of model for class name
+     * @param[in,out] o stream for generating
+     */
+    void generate_constructor(const program& prog,
+                              const std::string& model_name, std::ostream& o) {
+      generate_method_begin(model_name, o);
+      
       generate_try(2, o);
       generate_comment("initialize data block variables from context__", 3, o);
       // todo:  bundle into single function
@@ -85,7 +95,7 @@ namespace stan {
                                        "data initialization", 3, o);
         generate_data_var_ctor(prog.data_decl_[i], 3, o);
         generate_data_var_init(prog.data_decl_[i], 3, o);
-        generate_validate_var_decl(prog.data_decl_[i], false, 3, o);
+        generate_validate_var_decl(prog.data_decl_[i], 3, o);
         o << EOL;
       }
 
@@ -113,7 +123,7 @@ namespace stan {
           generate_indent(3, o);
           o << "current_statement_begin__ = "
             <<  prog.derived_data_decl_.first[i].begin_line_ << ";" << EOL;
-          generate_validate_var_decl(prog.derived_data_decl_.first[i], true, 3, o);
+          generate_validate_var_decl(prog.derived_data_decl_.first[i], 3, o);
           o << EOL;
         }
       }

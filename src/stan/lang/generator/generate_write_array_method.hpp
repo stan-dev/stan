@@ -10,7 +10,7 @@
 #include <stan/lang/generator/generate_read_transform_params.hpp>
 #include <stan/lang/generator/generate_statements.hpp>
 #include <stan/lang/generator/generate_try.hpp>
-//#include <stan/lang/generator/generate_validate_block_var.hpp>
+#include <stan/lang/generator/generate_validate_block_var.hpp>
 #include <stan/lang/generator/generate_write_block_var.hpp>
 #include <stan/lang/generator/generate_void_statement.hpp>
 
@@ -95,7 +95,7 @@ namespace stan {
           generate_indent(3, o);
           o << "current_statement_begin__ = "
             <<  prog.derived_decl_.first[i].begin_line_ << ";" << EOL;
-          generate_validate_block_var(prog.derived_decl_.first[i], true, 3, o);
+          generate_validate_block_var(prog.derived_decl_.first[i], 3, o);
         }
 
         generate_comment("write transformed parameters", 3, o);
@@ -128,7 +128,7 @@ namespace stan {
       if (prog.generated_decl_.first.size() > 0) {
         for (size_t i = 0; i < prog.generated_decl_.first.size(); ++i) {
           generate_comment("validate generated quantities", 3, o);
-          generate_validate_block_var(prog.generated_decl_.first[i], true, 3, o);
+          generate_validate_block_var(prog.generated_decl_.first[i], 3, o);
           o << EOL;
 
           generate_comment("write generated quantities", 3, o);

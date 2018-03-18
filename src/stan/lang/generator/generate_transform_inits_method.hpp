@@ -125,7 +125,7 @@ namespace stan {
         o << "stan::lang::rethrow_located("
           << "std::runtime_error(std::string(\"Variable "
           << var_name
-          << "missing\")), current_statement_begin__, prog_reader__());"
+          << " missing\")), current_statement_begin__, prog_reader__());"
           << EOL;
         // init context position
         generate_indent(indent, o);
@@ -161,12 +161,13 @@ namespace stan {
         write_end_loop(vtype.num_dims(), indent, o);
 
         // unconstrain var contents
-        write_begin_array_dims_loop(vs[i], false, indent, o);
+        write_begin_array_dims_loop(vs[i], true, indent, o);
         generate_indent(indent + vtype.array_dims(), o);
         o << "try {" << EOL;
+        
         generate_indent(indent + vtype.array_dims() + 1, o);
         o << "writer__." << write_constraints_fn(el_type, "unconstrain");
-        if (el_type.has_def_bounds() || el_type.is_specialized())
+        if (vs[i].type().has_def_bounds()) 
           o << ", ";
         o << var_name;
         write_var_idx_array_dims(vtype.array_dims(), o);

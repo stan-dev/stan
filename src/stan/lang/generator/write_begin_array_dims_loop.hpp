@@ -33,15 +33,15 @@ namespace stan {
         generate_indent(indent, o);
         if (declare_size_vars)
           o << "size_t ";
-        o << name << "_k_" << i << "_max__ = ";
+        o << name << "_i_" << i << "_max__ = ";
         generate_expression(ar_var_dims[i], NOT_USER_FACING, o);
         o << ";" << EOL;
       }
       for (size_t i = 0; i < ar_var_dims.size(); ++i) {
         generate_indent(indent + i, o);
-        o << "for (size_t k_"  << i << "__ = 0;"
-          << " k_" << i << "__ < " << name << "_k_" << i << "_max__;"
-          << " ++k_" << i << "__) {" << EOL;
+        o << "for (size_t i_"  << i << "__ = 0;"
+          << " i_" << i << "__ < " << name << "_i_" << i << "_max__;"
+          << " ++i_" << i << "__) {" << EOL;
       }
     }
 

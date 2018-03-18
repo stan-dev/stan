@@ -3,15 +3,16 @@
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
-#include <stan/lang/generator/generate_array_var_type.hpp>
+#include <stan/lang/generator/generate_bare_type.hpp>
 #include <stan/lang/generator/generate_indexed_expr.hpp>
 #include <stan/lang/generator/generate_real_var_type.hpp>
-#include <stan/lang/generator/generate_type.hpp>
 #include <stan/lang/generator/visgen.hpp>
 #include <boost/lexical_cast.hpp>
 #include <ostream>
 #include <string>
 #include <vector>
+
+#include <iostream>
 
 namespace stan {
   namespace lang {
@@ -51,34 +52,34 @@ namespace stan {
       void operator()(const array_expr& x) const {
         std::stringstream ssRealType;
         generate_real_var_type(x.array_expr_scope_, x.has_var_, ssRealType);
+
         std::stringstream ssArrayType;
-        generate_array_var_type(x.type_, ssRealType.str(),
-                                ssArrayType);
+        generate_bare_type(x.type_, ssRealType.str(), ssArrayType);
+
+        // vector x.args_ must have at least 1 element
+        std::stringstream ssArrayElType;
+        generate_bare_type(x.args_[0].bare_type(),
+                           ssRealType.str(), ssArrayElType);
+
         // TODO:mizi do we need static cast? L58-60, L68
-        o_ << "static_cast<";
-        generate_type(ssArrayType.str(), x.args_, x.type_.num_dims(), o_);
-        o_ << " >(";
-        o_ << "stan::math::array_builder<";
-        generate_type(ssArrayType.str(),
-                      x.args_,
-                      x.type_.num_dims() - 1,
-                      o_);
-        o_ << " >()";
+        o_ << "static_cast<"
+           << ssArrayType.str()
+           << " >(stan::math::array_builder<"
+           << ssArrayElType.str()
+           << " >()";
         generate_array_builder_adds(x.args_, user_facing_, o_);
-        o_ << ".array()";
-        o_ << ")";
+        o_ << ".array())";
       }
 
       void operator()(const matrix_expr& x) const {
         std::stringstream ssRealType;
         generate_real_var_type(x.matrix_expr_scope_, x.has_var_, ssRealType);
         // to_matrix arg is std::vector of row vectors (Eigen::Matrix<T, 1, C>)
-        o_ << "stan::math::to_matrix(stan::math::array_builder<Eigen::Matrix<";
-        generate_type(ssRealType.str(), x.args_, 0, o_);
-        o_ << ", 1, Eigen::Dynamic> >()";
+        o_ << "stan::math::to_matrix(stan::math::array_builder<Eigen::Matrix<"
+           << ssRealType.str()
+           << ", 1, Eigen::Dynamic> >()";
         generate_array_builder_adds(x.args_, user_facing_, o_);
-        o_ << ".array()";
-        o_ << ")";
+        o_ << ".array())";
       }
 
       void operator()(const row_vector_expr& x) const {
@@ -86,12 +87,11 @@ namespace stan {
         generate_real_var_type(x.row_vector_expr_scope_, x.has_var_,
                                ssRealType);
         // to_row_vector arg is std::vector of type T
-        o_ << "stan::math::to_row_vector(stan::math::array_builder<";
-        generate_type(ssRealType.str(), x.args_, 0, o_);
-        o_ << " >()";
+        o_ << "stan::math::to_row_vector(stan::math::array_builder<"
+           << ssRealType.str()
+           << " >()";
         generate_array_builder_adds(x.args_, user_facing_, o_);
-        o_ << ".array()";
-        o_ << ")";
+        o_ << ".array())";
       }
 
       void operator()(const variable& v) const { o_ << v.name_; }

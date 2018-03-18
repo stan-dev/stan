@@ -54,7 +54,6 @@
 
 // generation functions, starts from generate_cpp
 #include <stan/lang/generator/generate_arg_decl.hpp>
-#include <stan/lang/generator/generate_array_var_type.hpp>
 #include <stan/lang/generator/generate_array_builder_adds.hpp>
 #include <stan/lang/generator/generate_bare_type.hpp>
 #include <stan/lang/generator/generate_catch_throw_located.hpp>
@@ -110,7 +109,6 @@
 #include <stan/lang/generator/generate_statement.hpp>
 #include <stan/lang/generator/generate_statements.hpp>
 #include <stan/lang/generator/generate_transform_inits_method.hpp>
-#include <stan/lang/generator/generate_type.hpp>
 #include <stan/lang/generator/generate_typedef.hpp>
 #include <stan/lang/generator/generate_typedefs.hpp>
 #include <stan/lang/generator/generate_try.hpp>

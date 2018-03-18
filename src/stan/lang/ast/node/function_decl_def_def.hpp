@@ -20,7 +20,7 @@ namespace stan {
 
     bool function_decl_def::has_only_int_args() const {
       for (size_t i = 0; i < arg_decls_.size(); ++i)
-        if (!arg_decls_[i].bare_type().is_int_type())
+        if (!arg_decls_[i].bare_type().base().is_int_type())
           return false;
       return true;
     }

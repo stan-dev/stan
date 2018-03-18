@@ -74,3 +74,23 @@ TEST(Parser, parse_fun4) {
   bool pass = run_test(input, msgs);
   EXPECT_TRUE(pass);
 }
+
+TEST(Parser, parse_harm_osc_ode) {
+  std::string input(
+                    "functions {\n"
+                    "  real[] harm_osc_ode(real t,\n"
+                    "                      real[] y,         // state\n"
+                    "                      real[] theta,     // parameters\n"
+                    "                      real[] x,         // data\n"
+                    "                      int[] x_int) {    // integer data\n"
+                    "    real dydt[2];\n"
+                    "    dydt[1] <- x[1] * y[2];\n"
+                    "    dydt[2] <- -y[1] - theta[1] * y[2];\n"
+                    "    return dydt;\n"
+                    "  }\n"
+                    "}\n"
+                    );
+  std::stringstream msgs;
+  bool pass = run_test(input, msgs);
+  EXPECT_TRUE(pass);
+}

@@ -55,3 +55,25 @@ TEST(generateFunctions, t2) {
   bool pass = run_test(input, cpp_code);
   EXPECT_TRUE(pass);
 }
+
+
+TEST(generateFunctions, harm_osc_ode) {
+  std::string input(
+                    "functions {\n"
+                    "  real[] harm_osc_ode(real t,\n"
+                    "                      real[] y,         // state\n"
+                    "                      real[] theta,     // parameters\n"
+                    "                      real[] x,         // data\n"
+                    "                      int[] x_int) {    // integer data\n"
+                    "    real dydt[2];\n"
+                    "    dydt[1] <- x[1] * y[2];\n"
+                    "    dydt[2] <- -y[1] - theta[1] * y[2];\n"
+                    "    return dydt;\n"
+                    "  }\n"
+                    "}\n"
+                    );
+  std::stringstream cpp_code;
+  bool pass = run_test(input, cpp_code);
+  EXPECT_TRUE(pass);
+  std::cout << cpp_code.str() << std::endl;
+}

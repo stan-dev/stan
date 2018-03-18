@@ -32,34 +32,34 @@ namespace stan {
       write_begin_all_dims_row_maj_loop(decl, true, indent, o);
       
       // innermost loop stmt: do check, throw exception
-      generate_indent(indent + decl.type().num_dims(), o);
+      generate_indent(indent + decl.bare_type().num_dims(), o);
       o << "if (stan::math::is_uninitialized(" << decl.name();
-      write_var_idx_all_dims(decl.type().num_dims(),
-                             decl.type().num_dims() - decl.type().array_dims(),
-                             o);
+      write_var_idx_all_dims(decl.bare_type().array_dims(),
+                    decl.bare_type().num_dims() - decl.bare_type().array_dims(),
+                    o);
       o << ")) {" << EOL;
 
-      generate_indent(indent + decl.type().num_dims() + 1, o);
+      generate_indent(indent + decl.bare_type().num_dims() + 1, o);
       o << "std::stringstream msg__;" << EOL;
 
-      generate_indent(indent + decl.type().num_dims() + 1, o);
+      generate_indent(indent + decl.bare_type().num_dims() + 1, o);
       o << "msg__ << \"Undefined transformed parameter: " << decl.name() << "\"";
-      write_var_idx_all_dims_msg(decl.type().num_dims(),
-                                 decl.type().num_dims() - decl.type().array_dims(),
-                                 o);
+      write_var_idx_all_dims_msg(decl.bare_type().array_dims(),
+                    decl.bare_type().num_dims() - decl.bare_type().array_dims(),
+                    o);
       o << ";" << EOL;
       
-      generate_indent(indent + decl.type().num_dims() + 1, o);
+      generate_indent(indent + decl.bare_type().num_dims() + 1, o);
       o << "stan::lang::rethrow_located("
         << "std::runtime_error(std::string(\"Error initializing variable "
         << decl.name()
         << ": \") + msg__.str()), current_statement_begin__, prog_reader__());"
         << EOL;
 
-      generate_indent(indent + decl.type().num_dims(), o);
+      generate_indent(indent + decl.bare_type().num_dims(), o);
       o << "}" << EOL;
       
-      write_end_loop(decl.type().num_dims(), indent, o);
+      write_end_loop(decl.bare_type().num_dims(), indent, o);
     }
   }
 }

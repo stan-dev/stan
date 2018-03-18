@@ -24,43 +24,37 @@ namespace stan {
     void generate_bare_type(const bare_expr_type& t,
                             const std::string& scalar_t_name,
                             std::ostream& o) {
-      // unfold array type to get array element info
-      int num_dims = t.array_dims();
-      bare_expr_type bt(t);
-      if (bt.is_array_type())
-          bt = bt.array_contains();
-
-      for (int d = 0; d < num_dims; ++d)
+      for (int i = 0; i < t.array_dims(); ++i)
         o << "std::vector<";
       bool is_template_type = false;
-      if (bt.is_int_type()) {
+      if (t.base().is_int_type()) {
         o << "int";
         is_template_type = false;
-      } else if (bt.is_double_type()) {
+      } else if (t.base().is_double_type()) {
         o << scalar_t_name;
         is_template_type = false;
-      } else if (bt.is_vector_type()) {
+      } else if (t.base().is_vector_type()) {
         o << "Eigen::Matrix<"
           << scalar_t_name
           << ", Eigen::Dynamic, 1>";
         is_template_type = true;
-      } else if (bt.is_row_vector_type()) {
+      } else if (t.base().is_row_vector_type()) {
         o << "Eigen::Matrix<"
           << scalar_t_name
           << ", 1, Eigen::Dynamic>";
         is_template_type = true;
-      } else if (bt.is_matrix_type()) {
+      } else if (t.base().is_matrix_type()) {
         o << "Eigen::Matrix<"
           << scalar_t_name
           << ", Eigen::Dynamic, Eigen::Dynamic>";
         is_template_type = true;
-      } else if (bt.is_void_type()) {
+      } else if (t.base().is_void_type()) {
         o << "void";
       } else {
         o << "UNKNOWN TYPE";
       }
-      for (int d = 0; d < num_dims; ++d) {
-        if (d > 0 || is_template_type)
+      for (int i = 0; i < t.array_dims(); ++i) {
+        if (i > 0 || is_template_type)
           o << " ";
         o << ">";
       }

@@ -100,7 +100,7 @@ namespace stan {
             o << "current_statement_begin__ = "
               <<  prog.derived_decl_.first[i].begin_line_ << ";" << EOL;
             generate_validate_tparam_inits(prog.derived_decl_.first[i], 3, o);
-            generate_validate_var_decl(prog.derived_decl_.first[i], false, 3, o);
+            generate_validate_var_decl(prog.derived_decl_.first[i], 3, o);
             o << EOL;
           }
         }

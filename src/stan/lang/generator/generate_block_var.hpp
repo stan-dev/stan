@@ -36,7 +36,7 @@ namespace stan {
       generate_indent(indent, o);
       generate_bare_type(var_decl.type().bare_type(), type_str, o);
       o << " " << var_name;
-      if (var_decl.type().num_dims() == 0) {
+      if (var_decl.bare_type().num_dims() == 0) {
         o << ";" << EOL;
         generate_void_statement(var_name, indent, o);
       } else {

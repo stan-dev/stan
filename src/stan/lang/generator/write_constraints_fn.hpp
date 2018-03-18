@@ -24,12 +24,18 @@ namespace stan {
      */
     std::string write_constraints_fn(const block_var_type& btype,
                                    std::string fn_name) {
-      bool constrain = fn_name.compare("constrain") == 0;
       std::stringstream ss;
+
       if (btype.bare_type().is_double_type())
         ss << "scalar";
-      else
+      // kludge - inconsistent naming specialized cholesky_factor types
+      else if (btype.name() == "cholesky_factor_cov") 
+        ss << "cholesky_factor";
+      else if (btype.name() == "cholesky_factor_corr")
+        ss << "cholesky_corr";
+      else 
         ss << btype.name();
+
       if (btype.has_def_bounds()) {
         if (btype.bounds().has_low() && btype.bounds().has_high()) {
           ss << "_lub_" << fn_name << "(";
@@ -46,14 +52,15 @@ namespace stan {
       } else {
         ss << "_" << fn_name << "(";
       }
-      if (!constrain) return ss.str();
+      if (!(fn_name.compare("constrain") == 0)) return ss.str();
 
       if (!is_nil(btype.arg1())) {
         if (btype.has_def_bounds())
           ss << ", ";
         generate_expression(btype.arg1(), NOT_USER_FACING, ss);
       }
-      if (btype.name() == "matrix" || btype.name() == "cholesky_factor_cov") {
+      if (btype.name() == "matrix"
+          || btype.name() == "cholesky_factor_cov") {
         ss << ", ";
         generate_expression(btype.arg2(), NOT_USER_FACING, ss);
       }

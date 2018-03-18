@@ -10,7 +10,6 @@
 #include <stan/lang/generator/write_end_loop.hpp>
 #include <stan/lang/generator/write_nested_resize_loop_begin.hpp>
 #include <stan/lang/generator/write_resize_var_idx.hpp>
-#include <stan/lang/generator/write_var_idx_array_dims.hpp>
 #include <iostream>
 #include <ostream>
 #include <vector>

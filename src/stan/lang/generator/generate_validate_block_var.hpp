@@ -14,19 +14,17 @@ namespace stan {
      * Generate validation statements for bounded or specialized block variables.
      *
      * @param[in] var_decl block variable
-     * @param[in] declare_size_vars if true, loops declare size_t vars
      * @param[in] indent indentation level
      * @param[in,out] o stream for generating
      */
     void generate_validate_block_var(const block_var_decl& var_decl,
-                                     bool declare_size_vars,
                                      int indent, std::ostream& o) {
       block_var_type vtype = var_decl.type();
       if (vtype.is_array_type())
         vtype = vtype.array_contains();
       if (vtype.has_def_bounds()
           || vtype.is_specialized()) {
-        generate_validate_var_decl(var_decl, declare_size_vars, indent, o);
+        generate_validate_var_decl(var_decl, indent, o);
         o << EOL;
       }
     }        
