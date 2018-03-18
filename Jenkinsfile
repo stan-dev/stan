@@ -101,14 +101,12 @@ pipeline {
             }
         }
         stage('Tests') {
-            failFast true
             parallel {
                 stage('Windows Unit') {
                     agent { label 'windows' }
                     steps {
                         deleteDirWin()
-                        checkout scm
-                        bat setup(params.math_pr)
+                        unstash 'StanSetup'
                         setupCC(false)
                         runTestsWin("src/test/unit")
                     }
@@ -118,8 +116,7 @@ pipeline {
                     agent { label 'windows' }
                     steps {
                         deleteDirWin()
-                        checkout scm
-                        bat setup(params.math_pr)
+                        unstash 'StanSetup'
                         setupCC()
                         bat "make -j${env.PARALLEL} test-headers"
                     }
