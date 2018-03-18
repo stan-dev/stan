@@ -96,6 +96,7 @@ pipeline {
             }
         }
         stage('Tests') {
+            failFast true
             parallel {
                 stage('Windows Unit') {
                     agent { label 'windows' }
