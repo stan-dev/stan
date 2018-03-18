@@ -48,6 +48,11 @@ def runTestsWin(String testPath) {
     finally { junit 'test/**/*.xml' }
 }
 
+def deleteDirWin() {
+    bat "attrib -r -s /s /d"
+    deleteDir()
+}
+
 pipeline {
     agent none
     parameters {
@@ -101,22 +106,24 @@ pipeline {
                 stage('Windows Unit') {
                     agent { label 'windows' }
                     steps {
+                        deleteDirWin()
                         checkout scm
                         bat setup(params.math_pr)
                         setupCC(false)
                         runTestsWin("src/test/unit")
                     }
-                    post { always { deleteDir() } }
+                    post { always { deleteDirWin() } }
                 }
                 stage('Windows Headers') {
                     agent { label 'windows' }
                     steps {
+                        deleteDirWin()
                         checkout scm
                         bat setup(params.math_pr)
                         setupCC()
                         bat "make -j${env.PARALLEL} test-headers"
                     }
-                    post { always { deleteDir() } }
+                    post { always { deleteDirWin() } }
                 }
                 stage('Unit') {
                     agent any
