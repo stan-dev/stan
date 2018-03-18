@@ -93,24 +93,31 @@ pipeline {
             }
         }
         stage('Tests') {
+            failFast true
             parallel {
                 stage('Windows Unit') {
                     agent { label 'windows' }
                     steps {
+                        bat "attrib -r -s /s /d"
                         unstash 'StanSetup'
                         setupCC(false)
                         runTestsWin("src/test/unit")
                     }
-                    post { always { deleteDir() } }
+                    post { always {
+                        bat "attrib -r -s /s /d"
+                        deleteDir() } }
                 }
                 stage('Windows Headers') {
                     agent { label 'windows' }
                     steps {
+                        bat "attrib -r -s /s /d"
                         unstash 'StanSetup'
                         setupCC()
                         bat "make -j${env.PARALLEL} test-headers"
                     }
-                    post { always { deleteDir() } }
+                    post { always {
+                            bat "attrib -r -s /s /d"
+                            deleteDir() } }
                 }
                 //stage('Unit') {
                 //    agent any
