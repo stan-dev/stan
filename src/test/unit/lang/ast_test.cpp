@@ -1122,8 +1122,7 @@ TEST(StanLangAst, Scope) {
 TEST(StanLangAst, MapRect) {
   // make sure nullary ctor works
   stan::lang::map_rect mr1;
-  stan::lang::map_rect mr2;
-  EXPECT_TRUE(mr1.call_id_ < mr2.call_id_);
+  EXPECT_TRUE(mr1.call_id_ == -1);
 
   // test fidelity of storage
   std::string name = "foo";

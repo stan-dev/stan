@@ -3,6 +3,11 @@
 
 TEST(langParserMapRect, good) {
   test_parsable("map_rect");
+  expect_match("map_rect", "map_rect<");
+  expect_match("map_rect",
+               "STAN_REGISTER_MAP_RECT(1, map_rect_namespace::foo_functor__)");
+  expect_match("map_rect",
+               "STAN_REGISTER_MAP_RECT(16, map_rect_namespace::foo_functor__)");
 }
 
 TEST(langParserMapRect, badFunShape) {
@@ -32,6 +37,7 @@ TEST(langParserMapRect, badDataRealConst) {
   test_throws("map_rect/bad_data_real_const",
               "fourth argment to map_rect must be data only");
 }
+
 TEST(langParserMapRect, badDataIntConst) {
   test_throws("map_rect/bad_data_int_const",
               "fifth argument to map_rect must be data only");

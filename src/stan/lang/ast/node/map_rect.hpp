@@ -3,6 +3,8 @@
 
 #include <stan/lang/ast/node/expression.hpp>
 #include <string>
+#include <utility>
+#include <vector>
 
 namespace stan {
 namespace lang {
@@ -16,6 +18,16 @@ struct map_rect {
    * class.
    */
   static int CALL_ID_;
+
+  /**
+   * Return the singleton sequence of map_rect calls.
+   *
+   * @return the sequence of map_rect calls.
+   */
+  static std::vector<std::pair<int, std::string>>& registered_calls() {
+    static std::vector<std::pair<int, std::string>> REGISTERED_CALLS_;
+    return REGISTERED_CALLS_;
+  }
 
   /**
    * Unique index for this specific instance of map_rect.
@@ -57,7 +69,7 @@ struct map_rect {
    * Copy constructor using the member variables of the specified
    * object to construct a copy.
    *
-   * @param mr rectangular map to copy
+   * @paramp[in] mr rectangular map to copy
    */
   map_rect(const map_rect& mr);
 
@@ -67,7 +79,8 @@ struct map_rect {
    * copy constructor are defined to avoid incrementing the call
    * identifier accidentally.
    *
-   * @param mr rectangular map to assign
+   * @paramp[in] mr rectangular map to assign
+   * @return a reference to this object
    */
   map_rect& operator=(const map_rect& mr);
 
@@ -78,19 +91,26 @@ struct map_rect {
    * and then incremented as the map_rect calls are encountered in the
    * program, starting from 1.
    *
-   * @param fun_name name of function being mapped
-   * @param shared_params expression for vector of parameters used in
+   * @param[in] fun_name name of function being mapped
+   * @param[in] shared_params expression for vector of parameters used in
    * every job
-   * @param job_params expression for array of vectors of job-specific
+   * @param[in] job_params expression for array of vectors of job-specific
    * parameters
-   * @param job_data_r data-only expression for array of arrays of
+   * @param[in] job_data_r data-only expression for array of arrays of
    * job-specific real data
-   * @param job_data_i data-only expression for array of arrays of
+   * @param[in] job_data_i data-only expression for array of arrays of
    * job-specific integer data
    */
   map_rect(const std::string& fun_name, const expression& shared_params,
            const expression& job_params, const expression& job_data_r,
            const expression& job_data_i);
+
+  /**
+   * Add this rectangular map to the sequence of registered
+   * instances.  These will have macros for MPI generated for them by
+   * the generator.
+   */
+  void register_id();
 };
 
 }

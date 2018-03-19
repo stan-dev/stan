@@ -1940,7 +1940,7 @@ namespace stan {
     validate_algebra_solver_control_f;
 
     void validate_map_rect::operator()(
-            const map_rect& mr, const variable_map& var_map,
+            map_rect& mr, const variable_map& var_map,
             bool& pass, std::ostream& error_msgs) const {
       pass = true;
 
@@ -2008,6 +2008,8 @@ namespace stan {
         error_msgs << "fifth argument to map_rect must be data only";
         pass = false;
       }
+      if (pass)
+        mr.register_id();
     }
     boost::phoenix::function<validate_map_rect> validate_map_rect_f;
 

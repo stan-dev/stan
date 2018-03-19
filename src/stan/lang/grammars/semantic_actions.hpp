@@ -628,18 +628,18 @@ namespace stan {
     struct validate_map_rect : public phoenix_functor_quaternary {
       /**
        * Validate that the specified rectangular map object has
-       * appropriately typed argumnets, setting the pass flag to false
-       * and writing an error message to the output stream if they
-       * don't.  Sizes cannot be tested until runtime.
+       * appropriately typed arguments and assign it a unique
+       * identifier, setting the pass flag to false and writing an
+       * error message to the output stream if they don't.
        *
-       * @param mr structure to validate
-       * @param var_map mapping for variables
-       * @param pass reference to set to false upon failure
-       * @param error_msgs reference to error message stream
+       * @param[in,out] mr structure to validate
+       * @param[in] var_map mapping for variables
+       * @param[in,out] pass reference to set to false upon failure
+       * @param[in,out] error_msgs reference to error message stream
        * @throws std::illegal_argument_exception if the arguments are
        * not of the appropriate shapes.
        */
-      void operator()(const map_rect& mr,
+      void operator()(map_rect& mr,
                       const variable_map& var_map, bool& pass,
                       std::ostream& error_msgs) const;
     };
