@@ -1,11 +1,11 @@
 #ifndef TEST_UNIT_LANG_GRAMMARS_UTILITY_HPP
 #define TEST_UNIT_LANG_GRAMMARS_UTILITY_HPP
 
-#include <test/unit/new/grammars/test_functions_grammar_inst.cpp>
-#include <test/unit/new/grammars/test_statement_grammar_inst.cpp>
-#include <test/unit/new/grammars/test_block_var_decls_grammar_inst.cpp>
-#include <test/unit/new/grammars/test_local_var_decls_grammar_inst.cpp>
-#include <test/unit/new/grammars/test_bare_type_grammar_inst.cpp>
+#include <test/unit/lang/parser/test_functions_grammar_inst.cpp>
+#include <test/unit/lang/parser/test_statement_grammar_inst.cpp>
+#include <test/unit/lang/parser/test_block_var_decls_grammar_inst.cpp>
+#include <test/unit/lang/parser/test_local_var_decls_grammar_inst.cpp>
+#include <test/unit/lang/parser/test_bare_type_grammar_inst.cpp>
 #include <stan/io/program_reader.hpp>
 
 #include <stan/lang/ast_def.cpp>
@@ -67,14 +67,17 @@ parse_program_from_file(const std::string& sub_folder,
   std::ifstream fs(path.c_str());
   if (fs.fail()) {
     err_msgs <<  "Cannot open model file " << file_name << std::endl;
-    std::cout << "Cannot open model file " << file_name << std::endl;
     return parse_result;
   }
   stan::io::program_reader reader;
   reader.add_event(0, 0, "start", "utility-stub.stan");
   reader.add_event(500, 500, "end", "utility-stub.stan");
-  pass = stan::lang::parse(&err_msgs, fs, model_name + "_model",
-                           reader, parse_result, false);
+  try {
+    pass = stan::lang::parse(&err_msgs, fs, model_name + "_model",
+                             reader, parse_result, false);
+  } catch (const std::invalid_argument& e) {
+    err_msgs << e.what() << std::endl;
+  }    
   return parse_result;
 }
 

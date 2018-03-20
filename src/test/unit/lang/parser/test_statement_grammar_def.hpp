@@ -1,7 +1,7 @@
-#ifndef STAN_LANG_GRAMMARS_TEST_LOCAL_VAR_DECLS_GRAMMAR_DEF_HPP
-#define STAN_LANG_GRAMMARS_TEST_LOCAL_VAR_DECLS_GRAMMAR_DEF_HPP
+#ifndef STAN_LANG_GRAMMARS_TEST_STATEMENT_GRAMMAR_DEF_HPP
+#define STAN_LANG_GRAMMARS_TEST_STATEMENT_GRAMMAR_DEF_HPP
 
-#include <test/unit/new/grammars/test_local_var_decls_grammar.hpp>
+#include <test/unit/lang/parser/test_statement_grammar.hpp>
 
 #include <stan/io/program_reader.hpp>
 #include <stan/lang/ast.hpp>
@@ -20,22 +20,22 @@ namespace stan {
   namespace lang {
 
     template <typename Iterator>
-    test_local_var_decls_grammar<Iterator>::test_local_var_decls_grammar(
+    test_statement_grammar<Iterator>::test_statement_grammar(
                                             const io::program_reader& reader,
                                             variable_map& var_map,
                                             std::stringstream& error_msgs)
-      : test_local_var_decls_grammar::base_type(test_local_var_decls_r),
+      : test_statement_grammar::base_type(test_statement_r),
         reader_(reader),
         var_map_(var_map),
         error_msgs_(error_msgs),
-        local_var_decls_g(var_map_, error_msgs_) {
+        statement_g(var_map_, error_msgs_) {
       using boost::spirit::qi::eps;
       using boost::spirit::qi::labels::_a;
 
-      test_local_var_decls_r.name("test local_var_decls");
-      test_local_var_decls_r
+      test_statement_r.name("test statement");
+      test_statement_r
         %= eps[set_var_scope_f(_a, derived_origin)]
-        > local_var_decls_g(_a);
+        > statement_g(_a, false);   // not in loop, disallow break/continue
     }
 
   }

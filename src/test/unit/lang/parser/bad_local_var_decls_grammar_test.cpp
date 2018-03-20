@@ -111,7 +111,7 @@ TEST(Parser, parse_local_non_int_dim_1) {
   lvds = parse_local_var_decls(input, pass, msgs);
 
   EXPECT_FALSE(pass);
-  EXPECT_NE(msgs.str().find("expression denoting integer required; found type=real"), std::string::npos);
+  EXPECT_NE(msgs.str().find("Expression denoting integer required; found type=real"), std::string::npos);
 }
 
 TEST(Parser, parse_local_non_int_dim_2) {
@@ -122,7 +122,7 @@ TEST(Parser, parse_local_non_int_dim_2) {
   lvds = parse_local_var_decls(input, pass, msgs);
 
   EXPECT_FALSE(pass);
-  EXPECT_NE(msgs.str().find("expression denoting integer required; found type=real"), std::string::npos);
+  EXPECT_NE(msgs.str().find("Expression denoting integer required; found type=real"), std::string::npos);
 }
 
 TEST(Parser, parse_local_too_many_dims) {
@@ -162,7 +162,7 @@ TEST(Parser, redeclare) {
   lvds = parse_local_var_decls(input, pass, msgs);
 
   EXPECT_FALSE(pass);
-  EXPECT_NE(msgs.str().find("duplicate declaration"), std::string::npos);
+  EXPECT_NE(msgs.str().find("Duplicate declaration"), std::string::npos);
   EXPECT_NE(msgs.str().find("redeclare"), std::string::npos);
 
 }
@@ -175,7 +175,7 @@ TEST(Parser, undeclared_size) {
   lvds = parse_local_var_decls(input, pass, msgs);
 
   EXPECT_FALSE(pass);
-  EXPECT_NE(msgs.str().find("variable \"K\" does not exist."), std::string::npos);
+  EXPECT_NE(msgs.str().find("Variable \"K\" does not exist."), std::string::npos);
 }
 
 TEST(Parser, size_test) {
@@ -188,5 +188,5 @@ TEST(Parser, size_test) {
   lvds = parse_local_var_decls(input, pass, msgs);
 
   EXPECT_FALSE(pass);
-  EXPECT_NE(msgs.str().find("expression denoting integer required"), std::string::npos);
+  EXPECT_NE(msgs.str().find("Expression denoting integer required"), std::string::npos);
 }

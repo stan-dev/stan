@@ -19,11 +19,6 @@ TEST(Parser, parse_indexed_op_lhs) {
   std::stringstream msgs;
   stan::lang::statement stmt;
   stmt = parse_statement(input, pass, msgs);
-  std::cout << "input: " << std::endl;
-  std::cout << input << std::endl;
-  std::cout << "parser msgs: " << std::endl;
-  std::cout << msgs.str() << std::endl << std::endl;
-  
-  //  EXPECT_TRUE(pass);
-  //  EXPECT_EQ(msgs.str(), std::string(""));
+  EXPECT_TRUE(pass);
+  EXPECT_EQ(msgs.str(), std::string(""));
 }

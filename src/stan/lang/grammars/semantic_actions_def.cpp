@@ -163,7 +163,7 @@ namespace stan {
         error_msgs << "Cannot assign to variable outside of declaration block"
                    << "; left-hand-side variable origin=";
         print_scope(error_msgs, lhs_origin);
-        error_msgs << std::endl;
+        error_msgs << "." << std::endl;
         return false;
       }
       // enforce constancy of function args
@@ -200,7 +200,7 @@ namespace stan {
                    << ", type = " << lhs_type
                    << "; right-hand side type = "
                    << rhs_expr.bare_type()
-                   << std::endl;
+                   << "." << std::endl;
         return false;
       }
       
@@ -215,7 +215,7 @@ namespace stan {
                    << ", base type = " << lhs_type.base()
                    << "; right-hand side base type = "
                    << rhs_expr.bare_type().base()
-                   << std::endl;
+                   << "." << std::endl;
         return false;
       }
       return true;
@@ -232,8 +232,8 @@ namespace stan {
       const {
       if (!expr.bare_type().is_double_type()
           && !expr.bare_type().is_int_type()) {
-        error_msgs << "expression denoting real required; found type="
-                   << expr.bare_type() << std::endl;
+        error_msgs << "Expression denoting real required; found type="
+                   << expr.bare_type() << "." << std::endl;
         pass = false;
         return;
       }
@@ -298,7 +298,7 @@ namespace stan {
                                          std::ostream& error_msgs) const {
       pass = !expr.bare_type().is_ill_formed_type();
       if (!pass)
-        error_msgs << "expression is ill formed" << std::endl;
+        error_msgs << "Expression is ill formed." << std::endl;
     }
     boost::phoenix::function<validate_expr_type3> validate_expr_type3_f;
 
@@ -355,10 +355,10 @@ namespace stan {
                                              std::ostream& error_msgs) const {
       bare_expr_type cond_type = conditional_op.cond_.bare_type();
       if (!cond_type.is_int_type()) {
-        error_msgs << "condition in ternary expression must be"
-                   << " primitive int or real;"
+        error_msgs << "Condition in ternary expression must be"
+                   << " primitive int;"
                    << " found type=" << cond_type
-                   << std::endl;
+                   << "." << std::endl;
         pass = false;
         return;
       }
@@ -374,12 +374,12 @@ namespace stan {
             && false_val_type.is_double_type());
 
       if (!types_compatible) {
-        error_msgs << "type mismatch in ternary expression,"
+        error_msgs << "Type mismatch in ternary expression,"
                    << " expression when true is: ";
         write_bare_expr_type(error_msgs, true_val_type);
         error_msgs << "; expression when false is: ";
         write_bare_expr_type(error_msgs, false_val_type);
-        error_msgs << std::endl;
+        error_msgs << "." << std::endl;
         pass = false;
         return;
       }
@@ -405,13 +405,12 @@ namespace stan {
                                     std::ostream& error_msgs) const {
       if (!expr1.bare_type().is_primitive()
           || !expr2.bare_type().is_primitive()) {
-        error_msgs << "binary infix operator " << op
+        error_msgs << "Binary infix operator " << op
                    << " with functional interpretation " << fun_name
                    << " requires arguments or primitive type (int or real)"
                    << ", found left type=" << expr1.bare_type()
                    << ", right arg type=" << expr2.bare_type()
-                   << "; "
-                   << std::endl;
+                   << "." << std::endl;
       }
       std::vector<expression> args;
       args.push_back(expr1);
@@ -568,7 +567,6 @@ namespace stan {
       function_signature_t sig(decl.return_type_, arg_types);
       std::pair<std::string, function_signature_t> name_sig(decl.name_, sig);
 
-      //      std::cout << "check that not already declared if just declaration" << std::endl;
       // check that not already declared if just declaration
       if (decl.body_.is_no_op_statement()
           && fun_exists(functions_declared, name_sig)) {
@@ -578,7 +576,6 @@ namespace stan {
         return;
       }
 
-      //      std::cout << "check not already user defined" << std::endl;
       // check not already user defined
       if (fun_exists(functions_defined, name_sig)) {
         error_msgs << "Parse Error.  Function already defined, name="
@@ -587,7 +584,6 @@ namespace stan {
         return;
       }
 
-      //      std::cout << "check not already system defined" << std::endl;
       // check not already system defined
       if (!fun_exists(functions_declared, name_sig)
           && function_signatures::instance().is_defined(decl.name_, sig)) {
@@ -597,7 +593,6 @@ namespace stan {
         return;
       }
 
-      //      std::cout << "check argument type and qualifiers" << std::endl;
        // check argument type and qualifiers
       if (!decl.body_.is_no_op_statement()) {
         function_signature_t decl_sig =
@@ -649,9 +644,6 @@ namespace stan {
       if (!decl.body_.is_no_op_statement())
         functions_defined.insert(name_sig);
       pass = true;
-
-      //      std::cout << "added function sig" << std::endl;
-
     }
     boost::phoenix::function<add_function_signature> add_function_signature_f;
 
@@ -706,7 +698,7 @@ namespace stan {
            || ends_with("_lccdf", decl.name_))
           && !decl.return_type_.is_double_type()) {
         pass = false;
-        error_msgs << "Require real return type for probability functions"
+        error_msgs << "Real return type required for probability functions"
                    << " ending in _log, _lpdf, _lpmf, _lcdf, or _lccdf."
                    << std::endl;
       }
@@ -736,12 +728,12 @@ namespace stan {
                                      std::ostream& error_msgs) const {
       if (vm.exists(decl.name())) {
         pass = false;
-        error_msgs << "duplicate declaration of variable, name="
+        error_msgs << "Duplicate declaration of variable, name="
                    << decl.name()
                    << "; attempt to redeclare as function argument"
                    << "; original declaration as ";
         print_scope(error_msgs, vm.get_scope(decl.name()));
-        error_msgs << std::endl;
+        error_msgs << " variable." << std::endl;
         return;
       }
       pass = true;
@@ -769,7 +761,7 @@ namespace stan {
                                                   std::ostream& error_msgs)
       const {
       if (!e.bare_type().is_int_type()) {
-        error_msgs << "ERROR:  Indexes must be expressions of integer type."
+        error_msgs << "Error: indexes must be expressions of integer type."
                    << " found type = ";
         write_bare_expr_type(error_msgs, e.bare_type());
         error_msgs << '.' << std::endl;
@@ -783,7 +775,7 @@ namespace stan {
     void validate_ints_expression::operator()(const expression& e, bool& pass,
                                               std::ostream& error_msgs) const {
       if (!e.bare_type().base().is_int_type()) {
-        error_msgs << "ERROR:  Container index must be integer; found type="
+        error_msgs << "Error: container index must be integer; found type="
                    << e.bare_type() << std::endl;
         pass = false;
         return;
@@ -791,7 +783,7 @@ namespace stan {
       if (e.bare_type().num_dims() > 1) {
         // tests > 1 so that message is coherent because the single
         // integer array tests don't print
-        error_msgs << "index must be integer or 1D integer array;"
+        error_msgs << "Index must be integer or 1D integer array;"
                    << " found number of dimensions="
                    << e.bare_type().num_dims()
                    << std::endl;
@@ -866,11 +858,11 @@ namespace stan {
       io::program_reader::trace_t trace = reader.trace(idx_errline);
       std::string origin_file = trace[trace.size() - 1].first;
       size_t origin_line = trace[trace.size() - 1].second;
-      error_msgs << "  error in '" << trace[trace.size() - 1].first
+      error_msgs << " error in '" << trace[trace.size() - 1].first
                  << "' at line " << trace[trace.size() - 1].second
                  << ", column " << idx_errcol << std::endl;
       for (int i = trace.size() - 1; i-- > 0; )
-        error_msgs << "  included from '" << trace[i].first
+        error_msgs << " included from '" << trace[i].first
                    << "' at line " << trace[i].second << std::endl;
 
       // dump context of error
@@ -898,7 +890,7 @@ namespace stan {
                                                std::stringstream& error_msgs)
       const {
       if (!e.bare_type().is_primitive()) {
-        error_msgs << "conditions in if-else statement must be"
+        error_msgs << "Conditions in if-else statement must be"
                    << " primitive int or real;"
                    << " found type=" << e.bare_type()
                    << std::endl;
@@ -1017,7 +1009,7 @@ namespace stan {
       }
       if (a.lhs_var_occurs_on_rhs()) {
         // this only requires a warning --- a deep copy will be made
-        error_msgs << "WARNING: left-hand side variable"
+        error_msgs << "Warning: left-hand side variable"
                    << " (name=" << name << ")"
                    << " occurs on right-hand side of assignment, causing"
                    << " inefficient deep copy to avoid aliasing."
@@ -1266,8 +1258,8 @@ namespace stan {
       }
 
       if (!is_double_return(internal_function_name, arg_types, error_msgs)) {
-        error_msgs << "require real scalar return type for"
-                   << " probability function." << std::endl;
+        error_msgs << "Real return type required for probability function."
+                   << std::endl;
         pass = false;
         return;
       }
@@ -1358,14 +1350,14 @@ namespace stan {
         if (function_name_ccdf == s.dist_.family_
             || !is_double_return(function_name_ccdf, arg_types_trunc,
                               error_msgs)) {
-          error_msgs << "lower truncation not defined for specified"
+          error_msgs << "Lower truncation not defined for specified"
                      << " arguments to "
                      << s.dist_.family_ << std::endl;
           pass = false;
           return;
         }
         if (!is_double_return(function_name_ccdf, arg_types, error_msgs)) {
-          error_msgs << "lower bound in truncation type does not match"
+          error_msgs << "Lower bound in truncation type does not match"
                      << " sampled variate in distribution's type"
                      << std::endl;
           pass = false;
@@ -1380,7 +1372,7 @@ namespace stan {
         if (function_name_cdf == s.dist_.family_
             || !is_double_return(function_name_cdf, arg_types_trunc,
                                  error_msgs)) {
-          error_msgs << "upper truncation not defined for"
+          error_msgs << "Upper truncation not defined for"
                      << " specified arguments to "
                      << s.dist_.family_ << std::endl;
 
@@ -1388,7 +1380,7 @@ namespace stan {
           return;
         }
         if (!is_double_return(function_name_cdf, arg_types, error_msgs)) {
-          error_msgs << "upper bound in truncation type does not match"
+          error_msgs << "Upper bound in truncation type does not match"
                      << " sampled variate in distribution's type"
                      << std::endl;
           pass = false;
@@ -1403,14 +1395,14 @@ namespace stan {
         if (function_name_cdf == s.dist_.family_
             || !is_double_return(function_name_cdf, arg_types_trunc,
                                  error_msgs)) {
-          error_msgs << "lower truncation not defined for specified"
+          error_msgs << "Lower truncation not defined for specified"
                      << " arguments to "
                      << s.dist_.family_ << std::endl;
           pass = false;
           return;
         }
         if (!is_double_return(function_name_cdf, arg_types, error_msgs)) {
-          error_msgs << "lower bound in truncation type does not match"
+          error_msgs << "Lower bound in truncation type does not match"
                      << " sampled variate in distribution's type"
                      << std::endl;
           pass = false;
@@ -1470,7 +1462,7 @@ namespace stan {
                                          std::stringstream& error_msgs) const {
       pass = e.bare_type().is_primitive();
       if (!pass) {
-        error_msgs << "conditions in while statement must be primitive"
+        error_msgs << "Conditions in while statement must be primitive"
                    << " int or real;"
                    << " found type=" << e.bare_type() << std::endl;
         return;
@@ -1493,7 +1485,7 @@ namespace stan {
       name_local = name;
       pass = !vm.exists(name);
       if (!pass)
-        error_msgs << "ERROR: loop variable already declared."
+        error_msgs << "Error: loop variable already declared."
                    << " variable name=\"" << name << "\"" << std::endl;
       else
         // loop over range, loop var type is int
@@ -1510,13 +1502,13 @@ namespace stan {
                    std::stringstream& error_msgs) const {
       pass = !(vm.exists(name));
       if (!pass) {
-        error_msgs << "ERROR: loop variable already declared."
+        error_msgs << "Error: loop variable already declared."
                    << " variable name=\"" << name << "\"" << std::endl;
         return;
       }
       pass = expr.bare_type().is_array_type();
       if (!pass) {
-        error_msgs << "ERROR: loop variable must be array type."
+        error_msgs << "Error: loop variable must be array type."
                    << " variable type=\"" << expr.bare_type() << "\"" << std::endl;
         return;
       }
@@ -1535,14 +1527,14 @@ namespace stan {
                    std::stringstream& error_msgs) const {
       pass = !(vm.exists(name));
       if (!pass) {
-        error_msgs << "ERROR: loop variable already declared."
+        error_msgs << "Error: loop variable already declared."
                    << " variable name=\"" << name << "\"" << std::endl;
         return;
       }
       pass = expr.bare_type().num_dims() > 0
              && !(expr.bare_type().is_array_type());
       if (!pass) {
-        error_msgs << "ERROR: loop must be over container or range."
+        error_msgs << "Error: loop must be over container or range."
                    << std::endl;
         return;
       }
@@ -1570,7 +1562,7 @@ namespace stan {
                                        std::stringstream& error_msgs)
       const {
       if (!expr.bare_type().is_int_type()) {
-        error_msgs << "expression denoting integer required; found type="
+        error_msgs << "Expression denoting integer required; found type="
                    << expr.bare_type() << std::endl;
         pass = false;
         return;
@@ -1622,7 +1614,7 @@ namespace stan {
       const {
       pass = !e.bare_type().is_void_type();
       if (!pass)
-        error_msgs << "attempt to increment log prob with void expression"
+        error_msgs << "Attempt to increment log prob with void expression"
                    << std::endl;
     }
     boost::phoenix::function<validate_non_void_expression>
@@ -1705,11 +1697,11 @@ namespace stan {
       function_signature_t system_signature(sys_result_type, sys_arg_types);
       if (!function_signatures::instance()
           .is_defined(ode_fun.system_function_name_, system_signature)) {
-        error_msgs << "wrong signature for function "
+        error_msgs << "Wrong signature for function "
                    << ode_fun.integration_function_name_
                    << "; first argument must be "
                    << "the name of a function with signature:"
-                   << " (real, real[ ], real[ ], real[ ], data int[ ]):"
+                   << " (real, real[ ], real[ ], data real[ ], data int[ ]):"
                    << " real[ ]." << std::endl;
         pass = false;
       }
@@ -1718,61 +1710,61 @@ namespace stan {
       // fn_name, y0, t0, ts, theta, x_r, x_i
       // only y0 and theta can have params
       if (ode_fun.y0_.bare_type() != bet_ar_double) {
-        error_msgs << "second argument to "
+        error_msgs << "Second argument to "
                    << ode_fun.integration_function_name_
                    << " must have type: "
                    << bet_ar_double
-                   << " found type = "
+                   << "; found type = "
                    << ode_fun.y0_.bare_type()
                    << ". " << std::endl;
         pass = false;
       }
       if (!ode_fun.t0_.bare_type().is_double_type()) {
-        error_msgs << "third argument to "
+        error_msgs << "Third argument to "
                    << ode_fun.integration_function_name_
                    << " must have type: "
                    << bet_double
-                   << " found type = "
+                   << ";  found type = "
                    << ode_fun.t0_.bare_type()
                    << ". " << std::endl;
         pass = false;
       }
       if (ode_fun.ts_.bare_type() != bet_ar_double) {
-        error_msgs << "fourth argument to "
+        error_msgs << "Fourth argument to "
                    << ode_fun.integration_function_name_
                    << " must have type: "
                    << bet_ar_double
-                   << " found type = "
+                   << ";  found type = "
                    << ode_fun.ts_.bare_type()
                    << ". " << std::endl;
       pass = false;
       }
       if (ode_fun.theta_.bare_type() != bet_ar_double) {
-        error_msgs << "fifth argument to "
+        error_msgs << "Fifth argument to "
                    << ode_fun.integration_function_name_
                    << " must have type: "
                    << bet_ar_double
-                   << " found type = "
+                   << ";  found type = "
                    << ode_fun.theta_.bare_type()
                    << ". " << std::endl;
         pass = false;
       }
       if (ode_fun.x_.bare_type() != bet_ar_double_data) {
-        error_msgs << "sixth argument to "
+        error_msgs << "Sixth argument to "
                    << ode_fun.integration_function_name_
                    << " must have type: "
                    << bet_ar_double_data
-                   << " found type = "
+                   << ";  found type = "
                    << ode_fun.x_.bare_type()
                    << ". " << std::endl;
         pass = false;
       }
       if (ode_fun.x_int_.bare_type() != bet_ar_int_data) {
-        error_msgs << "seventh argument to "
+        error_msgs << "Seventh argument to "
                    << ode_fun.integration_function_name_
                    << " must have type: "
                    << bet_ar_int_data
-                   << " found type = "
+                   << ";  found type = "
                    << ode_fun.x_int_.bare_type()
                    << ". " << std::endl;
         pass = false;
@@ -1780,7 +1772,7 @@ namespace stan {
 
       // test data-only variables do not have parameters (int locals OK)
       if (has_var(ode_fun.t0_, var_map)) {
-        error_msgs << "third argument to "
+        error_msgs << "Third argument to "
                    << ode_fun.integration_function_name_
                    << " (initial times)"
                    << " must be data only and not reference parameters."
@@ -1788,7 +1780,7 @@ namespace stan {
         pass = false;
       }
       if (has_var(ode_fun.ts_, var_map)) {
-        error_msgs << "fourth argument to "
+        error_msgs << "Fourth argument to "
                    << ode_fun.integration_function_name_
                    << " (solution times)"
                    << " must be data only and not reference parameters."
@@ -1796,7 +1788,7 @@ namespace stan {
         pass = false;
       }
       if (has_var(ode_fun.x_, var_map)) {
-        error_msgs << "sixth argument to "
+        error_msgs << "Sixth argument to "
                    << ode_fun.integration_function_name_
                    << " (real data)"
                    << " must be data only and not reference parameters."
@@ -1821,7 +1813,7 @@ namespace stan {
       validate_integrate_ode_non_control_args(ode_fun, var_map, pass,
                                               error_msgs);
       if (!ode_fun.rel_tol_.bare_type().is_primitive()) {
-        error_msgs << "eighth argument to "
+        error_msgs << "Eighth argument to "
                    << ode_fun.integration_function_name_
                    << " (relative tolerance) must have type real or int;"
                    << " found type="
@@ -1830,7 +1822,7 @@ namespace stan {
         pass = false;
       }
       if (!ode_fun.abs_tol_.bare_type().is_primitive()) {
-        error_msgs << "ninth argument to "
+        error_msgs << "Ninth argument to "
                    << ode_fun.integration_function_name_
                    << " (absolute tolerance) must have type real or int;"
                    << " found type="
@@ -1839,7 +1831,7 @@ namespace stan {
         pass = false;
       }
       if (!ode_fun.max_num_steps_.bare_type().is_primitive()) {
-        error_msgs << "tenth argument to "
+        error_msgs << "Tenth argument to "
                    << ode_fun.integration_function_name_
                    << " (max steps) must have type real or int;"
                    << " found type="
@@ -1850,46 +1842,40 @@ namespace stan {
 
       // test data-only variables do not have parameters (int locals OK)
       if (has_var(ode_fun.rel_tol_, var_map)) {
-        error_msgs << "eighth argument to "
+        error_msgs << "Eighth argument to "
                    << ode_fun.integration_function_name_
                    << " (relative tolerance) must be data only"
-                   << " and not depend on parameters";
+                   << " and not depend on parameters.";
         pass = false;
       }
       if (has_var(ode_fun.abs_tol_, var_map)) {
-        error_msgs << "ninth argument to "
+        error_msgs << "Ninth argument to "
                    << ode_fun.integration_function_name_
                    << " (absolute tolerance ) must be data only"
-                   << " and not depend parameters";
+                   << " and not depend parameters.";
         pass = false;
       }
       if (has_var(ode_fun.max_num_steps_, var_map)) {
-        error_msgs << "tenth argument to "
+        error_msgs << "Tenth argument to "
                    << ode_fun.integration_function_name_
                    << " (max steps) must be data only"
-                   << " and not depend on parameters";
+                   << " and not depend on parameters.";
         pass = false;
       }
     }
     boost::phoenix::function<validate_integrate_ode_control>
     validate_integrate_ode_control_f;
 
-    // TODO:mitzi  resolve data_only flag issue w/r/t function_sigs and solvers
     template <class T>
     void validate_algebra_solver_non_control_args(const T& alg_fun,
                                                   const variable_map& var_map,
                                                   bool& pass,
                                                   std::ostream& error_msgs) {
       pass = true;
-
-      // algebra_solver requires function with signature:
-      // (vector, vector, real[ ], int[ ]) : vector
-
       int_type t_int;
       double_type t_double;
       vector_type t_vector;
 
-      // TODO:mitzi  names indicate status, but not flagged as data_only
       bare_expr_type bet_ar_int_data(bare_array_type(t_int, 1));
       bare_expr_type bet_ar_double_data(bare_array_type(t_double, 1));
       bare_expr_type bet_vector(t_vector);
@@ -1903,51 +1889,46 @@ namespace stan {
       sys_arg_types.push_back(bet_ar_int_data);  // x_i
       function_signature_t system_signature(sys_result_type, sys_arg_types);
 
-      // std::cout << "created fun_sig pair" << std::endl;
-
       if (!function_signatures::instance()
           .is_defined(alg_fun.system_function_name_, system_signature)) {
-
-        error_msgs << "wrong signature for function "
+        error_msgs << "Wrong signature for function "
                    << alg_fun.system_function_name_
-                   << " first argument to algebra_solver"
+                   << "; first argument to algebra_solver"
                    << " must be a function with signature:"
                    << " (vector, vector, real[ ], int[ ]) : vector."
                    << std::endl;
         pass = false;
       }
 
-      // std::cout << "good sig for solver function" << std::endl;
-
-      // test regular argument types
+      // check solver function arg types
       if (alg_fun.y_.bare_type() != bet_vector_data) {
-        error_msgs << "second argument to algebra_solver must have type: "
+        error_msgs << "Second argument to algebra_solver must have type: "
                    << bet_vector_data
-                   << " found type = "
+                   << "; found type = "
                    << alg_fun.y_.bare_type()
                    << ". " << std::endl;
         pass = false;
       }
       if (alg_fun.theta_.bare_type() != bet_vector) {
-        error_msgs << "third argument to algebra_solver must have type: "
+        error_msgs << "Third argument to algebra_solver must have type: "
                    << bet_vector
-                   << " found type = "
+                   << ";  found type = "
                    << alg_fun.theta_.bare_type()
                    << ". " << std::endl;
         pass = false;
       }
       if (alg_fun.x_r_.bare_type() != bet_ar_double_data) {
-        error_msgs << "fourth argument to algebra_solver must have type: "
+        error_msgs << "Fourth argument to algebra_solver must have type: "
                    << bet_ar_double_data
-                   << " found type = "
+                   << ";  found type = "
                    << alg_fun.x_r_.bare_type()
                    << ". " << std::endl;
         pass = false;
       }
       if (alg_fun.x_i_.bare_type() != bet_ar_int_data) {
-        error_msgs << "fifth argument to algebra_solver must have type: "
+        error_msgs << "Fifth argument to algebra_solver must have type: "
                    << bet_ar_int_data
-                   << " found type = "
+                   << ";  found type = "
                    << alg_fun.x_i_.bare_type()
                    << ". " << std::endl;
         pass = false;
@@ -1955,14 +1936,14 @@ namespace stan {
 
       // test data-only variables do not have parameters (int locals OK)
       if (has_var(alg_fun.y_, var_map)) {
-        error_msgs << "second argument to algebra_solver"
-                   << " must be data only and not reference parameters"
+        error_msgs << "Second argument to algebra_solver"
+                   << " must be data only and not reference parameters."
                    << std::endl;
         pass = false;
       }
       if (has_var(alg_fun.x_r_, var_map)) {
-        error_msgs << "fourth argument to algebra_solver"
-                   << " must be data only and not reference parameters"
+        error_msgs << "Fourth argument to algebra_solver"
+                   << " must be data only and not reference parameters."
                    << std::endl;
         pass = false;
       }
@@ -1985,7 +1966,7 @@ namespace stan {
       validate_algebra_solver_non_control_args(alg_fun, var_map, pass,
                                               error_msgs);
       if (!alg_fun.rel_tol_.bare_type().is_primitive()) {
-        error_msgs << "sixth argument to algebra_solver "
+        error_msgs << "Sixth argument to algebra_solver "
                    << " (relative tolerance) must have type real or int;"
                    << " found type="
                    << alg_fun.rel_tol_.bare_type()
@@ -1993,7 +1974,7 @@ namespace stan {
         pass = false;
       }
       if (!alg_fun.fun_tol_.bare_type().is_primitive()) {
-        error_msgs << "seventh argument to algebra_solver "
+        error_msgs << "Seventh argument to algebra_solver "
                    << " (function tolerance) must have type real or int;"
                    << " found type="
                    << alg_fun.fun_tol_.bare_type()
@@ -2001,7 +1982,7 @@ namespace stan {
         pass = false;
       }
       if (!alg_fun.max_num_steps_.bare_type().is_primitive()) {
-        error_msgs << "eighth argument to algebra_solver"
+        error_msgs << "Eighth argument to algebra_solver"
                    << " (max number of steps) must have type real or int;"
                    << " found type="
                    << alg_fun.max_num_steps_.bare_type()
@@ -2011,21 +1992,21 @@ namespace stan {
 
       // test data-only variables do not have parameters (int locals OK)
       if (has_var(alg_fun.rel_tol_, var_map)) {
-        error_msgs << "sixth argument to algebra_solver"
+        error_msgs << "Sixth argument to algebra_solver"
                    << " (relative tolerance) must be data only"
                    << " and not depend on parameters"
                    << std::endl;
         pass = false;
       }
       if (has_var(alg_fun.fun_tol_, var_map)) {
-        error_msgs << "seventh argument to algebra_solver"
+        error_msgs << "Seventh argument to algebra_solver"
                    << " (function tolerance ) must be data only"
                    << " and not depend parameters"
                    << std::endl;
         pass = false;
       }
       if (has_var(alg_fun.max_num_steps_, var_map)) {
-        error_msgs << "eighth argument to algebra_solver"
+        error_msgs << "Eighth argument to algebra_solver"
                    << " (max number of steps) must be data only"
                    << " and not depend on parameters" << std::endl;
         pass = false;
@@ -2040,7 +2021,6 @@ namespace stan {
                                         bool& pass,
                                         const variable_map& var_map,
                                         std::ostream& error_msgs) const {
-      //      std::cout << "set_fun_type_named?? " << std::endl;
       if (fun.name_ == "get_lp")
         error_msgs << "Warning (non-fatal): get_lp() function deprecated."
                    << std::endl
@@ -2093,7 +2073,6 @@ namespace stan {
              "'_lpdf' for density functions or '_lpmf' for mass functions",
              fun, error_msgs);
 
-
       // use old function names for built-in prob funs
       if (!function_signatures::instance().has_user_defined_key(fun.name_)) {
         replace_suffix("_lpdf", "_log", fun);
@@ -2107,7 +2086,7 @@ namespace stan {
 
       if (has_rng_suffix(fun.name_)) {
         if (!(var_scope.allows_rng())) {
-          error_msgs << "ERROR: random number generators only allowed in"
+          error_msgs << "Error: random number generators only allowed in"
                      << " transformed data block, generated quantities block"
                      << " or user-defined functions with names ending in _rng"
                      << "; found function=" << fun.name_ << " in block=";
@@ -2138,7 +2117,7 @@ namespace stan {
       if (fun.name_ == "abs"
           && fun.args_.size() > 0
           && fun.args_[0].bare_type().is_double_type()) {
-        error_msgs << "Warning: Function abs(real) is deprecated"
+        error_msgs << "Warning: function abs(real) is deprecated"
                    << " in the Stan language."
                    << std::endl
                    << "         It will be removed in a future release."
@@ -2272,7 +2251,7 @@ namespace stan {
                                          std::ostream& error_msgs) const {
       if (!expr1.bare_type().is_primitive()
           || !expr2.bare_type().is_primitive()) {
-        error_msgs << "arguments to ^ must be primitive (real or int)"
+        error_msgs << "Arguments to ^ must be primitive (real or int)"
                    << "; cannot exponentiate "
                    << expr1.bare_type()
                    << " by "
@@ -2362,7 +2341,7 @@ namespace stan {
                                   bool& pass, std::ostream& error_msgs) const {
       if (!expr1.bare_type().is_int_type()
           && !expr2.bare_type().is_int_type()) {
-        error_msgs << "both operands of % must be int"
+        error_msgs << "Both operands of % must be int"
                    << "; cannot modulo "
                    << expr1.bare_type()
                    << " by "
@@ -2455,7 +2434,7 @@ namespace stan {
                                          const expression& expr,
                                          std::ostream& error_msgs) const {
       if (!expr.bare_type().is_primitive()) {
-        error_msgs << "logical negation operator !"
+        error_msgs << "Logical negation operator !"
                    << " only applies to int or real types; ";
         expr_result = expression();
       }
@@ -2533,7 +2512,7 @@ namespace stan {
       std::string name = var_expr.name_;
       if (name == std::string("lp__")) {
         error_msgs << std::endl
-                   << "ERROR (fatal):  Use of lp__ is no longer supported."
+                   << "Error (fatal):  Use of lp__ is no longer supported."
                    << std::endl
                    << "  Use target += ... statement to increment log density."
                    << std::endl
@@ -2542,8 +2521,8 @@ namespace stan {
         pass = false;
         return;
       } else if (name == std::string("params_r__")) {
-        error_msgs << std::endl << "WARNING:" << std::endl
-                   << "  Direct access to params_r__ yields an inconsistent"
+        error_msgs << std::endl << "Warning:" << std::endl
+                   << " Direct access to params_r__ yields an inconsistent"
                    << " statistical model in isolation and no guarantee is"
                    << " made that this model will yield valid inferences."
                    << std::endl
@@ -2555,7 +2534,7 @@ namespace stan {
       if (pass) {
         var_expr.set_type(vm.get_bare_type(name));
       } else {
-        error_msgs << "variable \"" << name << '"' << " does not exist."
+        error_msgs << "Variable \"" << name << '"' << " does not exist."
                    << std::endl;
         return;
       }
@@ -2609,13 +2588,12 @@ namespace stan {
       scope var_scope = var_map_.get_scope(x.name_);
       bool is_data = var_scope.allows_size();
       if (!is_data) {
-        error_msgs_ << "non-data variables not allowed"
-                    << " in dimension declarations."
-                    << std::endl
-                    << "     found variable=" << x.name_
+        error_msgs_ << "Non-data variables are not allowed"
+                    << " in dimension declarations;"
+                    << " found variable=" << x.name_
                     << "; declared in block=";
         print_scope(error_msgs_, var_scope);
-        error_msgs_ << std::endl;
+        error_msgs_ << "." << std::endl;
       }
       return is_data;
     }
@@ -2685,14 +2663,11 @@ namespace stan {
                                          bool& pass,
                                          std::stringstream& error_msgs)
       const {
-      //      std::cout << "validate_definition: " << var_decl.name()
-      //                << "pass: " << pass << std::endl;
-      
       if (is_nil(var_decl.def())) return;
 
       // validate that assigment is allowed in this block
       if (!var_scope.allows_assignment()) {
-        error_msgs << "variable definition not possible in this block"
+        error_msgs << "Variable definition not possible in this block."
                    << std::endl;
         pass = false;
       }
@@ -2709,7 +2684,7 @@ namespace stan {
                    && def_type.is_int_type())))
         || (decl_type == def_type);
       if (!types_compatible) {
-        error_msgs << "variable definition base type mismatch,"
+        error_msgs << "Variable definition base type mismatch,"
                    << " variable declared as base type: ";
         write_bare_expr_type(error_msgs, decl_type);
         error_msgs << " variable definition has base: ";
@@ -2718,7 +2693,7 @@ namespace stan {
       }
       // validate dims
       if (decl_type.num_dims() != def_type.num_dims()) {
-        error_msgs << "variable definition dimensions mismatch,"
+        error_msgs << "Variable definition dimensions mismatch,"
                    << " definition specifies "
                    <<  decl_type.num_dims()
                    << ", declaration specifies "
@@ -2925,7 +2900,7 @@ namespace stan {
       if (len >= 2
           && identifier[len-1] == '_'
           && identifier[len-2] == '_') {
-        error_msgs << "variable identifier (name) may"
+        error_msgs << "Variable identifier (name) may"
                    << " not end in double underscore (__)"
                    << std::endl
                    << "    found identifer=" << identifier << std::endl;
@@ -2934,7 +2909,7 @@ namespace stan {
       }
       size_t period_position = identifier.find('.');
       if (period_position != std::string::npos) {
-        error_msgs << "variable identifier may not contain a period (.)"
+        error_msgs << "Variable identifier may not contain a period (.)"
                    << std::endl
                    << "    found period at position (indexed from 0)="
                    << period_position
@@ -2945,7 +2920,7 @@ namespace stan {
         return;
       }
       if (identifier_exists(identifier)) {
-        error_msgs << "variable identifier (name) may not be reserved word"
+        error_msgs << "Variable identifier (name) may not be reserved word"
                    << std::endl
                    << "    found identifier=" << identifier
                    << std::endl;
@@ -2996,9 +2971,8 @@ namespace stan {
                                                  variable_map& var_map,
                                                  std::stringstream& error_msgs)
       const {
-      //      std::cout << "validate_int_data_only_expr " << pass << std::endl;
       if (!expr.bare_type().is_int_type()) {
-        error_msgs << "dimension declaration requires expression"
+        error_msgs << "Dimension declaration requires expression"
                    << " denoting integer; found type="
                    << expr.bare_type()
                    << std::endl;
@@ -3008,7 +2982,6 @@ namespace stan {
       data_only_expression vis(error_msgs, var_map);
       bool only_data_dimensions = boost::apply_visitor(vis, expr.expr_);
       pass = only_data_dimensions;
-      //      std::cout << "only_data_dimensions? " << pass << std::endl;
       return;
     }
     boost::phoenix::function<validate_int_data_only_expr> validate_int_data_only_expr_f;
@@ -3045,13 +3018,13 @@ namespace stan {
                                         std::ostream& error_msgs) const {
       //      std::cout << "validate_array_block_var_decl" << std::endl;
       if (dims.size() == 0) {
-        error_msgs << "array type requires at least 1 dimension,"
+        error_msgs << "Array type requires at least 1 dimension,"
                    << " none found" << std::endl;
         pass = false;
         return;
       }
       if (el_type.bare_type().is_ill_formed_type()) {
-        error_msgs << "array variable declaration is ill formed,"
+        error_msgs << "Array variable declaration is ill formed,"
                    << " variable name="
                    << name
                    << std::endl;
@@ -3072,7 +3045,7 @@ namespace stan {
                                          bool& pass,
                                          std::ostream& error_msgs) const {
       if (var_decl.bare_type().is_ill_formed_type()) {
-        error_msgs << "variable declaration is ill formed,"
+        error_msgs << "Variable declaration is ill formed,"
                    << " variable name="
                    << var_decl.name()
                    << std::endl;
@@ -3088,7 +3061,7 @@ namespace stan {
                                          bool& pass,
                                          std::ostream& error_msgs) const {
       if (var_decl.bare_type().is_ill_formed_type()) {
-        error_msgs << "variable declaration is ill formed,"
+        error_msgs << "Variable declaration is ill formed,"
                    << " variable name="
                    << var_decl.name()
                    << std::endl;
@@ -3109,13 +3082,13 @@ namespace stan {
                                         std::ostream& error_msgs) const {
       //      std::cout << "validate_array_local_var, name: " << name << std::endl;
       if (dims.size() == 0) {
-        error_msgs << "array type requires at least 1 dimension,"
+        error_msgs << "Array type requires at least 1 dimension,"
                    << " none found" << std::endl;
         pass = false;
         return;
       }
       if (el_type.bare_type().is_ill_formed_type()) {
-        error_msgs << "array variable declaration is ill formed,"
+        error_msgs << "Array variable declaration is ill formed,"
                    << " variable name="
                    << name
                    << std::endl;
@@ -3138,7 +3111,7 @@ namespace stan {
                                       std::ostream& error_msgs) const {
       //      std::cout << "validate_fun_arg_var" << std::endl;
       if (bare_type.is_ill_formed_type()) {
-        error_msgs << "function argument is ill formed,"
+        error_msgs << "Function argument is ill formed,"
                    << " name="
                    << name
                    << std::endl;
@@ -3160,7 +3133,7 @@ namespace stan {
                                        std::ostream& error_msgs) const {
       if (bare_type.is_int_type()) {
           pass = false;
-          error_msgs << "data qualifier cannot be applied to variable of type int"
+          error_msgs << "Data qualifier cannot be applied to variable of type int"
                      << std::endl;      
           return;
       }
@@ -3178,7 +3151,7 @@ namespace stan {
                                         std::ostream& error_msgs) const {
       //      std::cout << "validate_bare_type" << std::endl;
       if (el_type.is_ill_formed_type()) {
-        error_msgs << "ill-formed bare type" << std::endl;
+        error_msgs << "Ill-formed bare type" << std::endl;
         pass = false;
         return;
       }
@@ -3207,18 +3180,20 @@ namespace stan {
                                    const scope& var_scope,
                                    std::ostream& error_msgs) const {
       pass = false;
-      //      std::cout << "add_to_var_map_f,"
+      // std::cout << "add_to_var_map_f,"
       //           << " var decl name: " << decl.name()
       //           << " type: " << decl.type()
       //           << " bare_type: " << decl.bare_type()
       //           << " type.bare_type: " << decl.type().bare_type()
       //           << " begin_line_: " << decl.begin_line_
       //           << " end_line_: " << decl.end_line_
+      //           << " scope: " << var_scope.program_block()
+      //           << " scope.is_local_ " << var_scope.is_local()
       //           << std::endl;
 
       if (vm.exists(decl.name())) {
         var_decl prev_decl = vm.get(decl.name());
-        error_msgs << "duplicate declaration of variable, name="
+        error_msgs << "Duplicate declaration of variable, name="
                    << decl.name();
 
         error_msgs << "; attempt to redeclare as "
@@ -3237,7 +3212,7 @@ namespace stan {
       }
       if (var_scope.par_or_tpar()
           && decl.bare_type().is_int_type()) {
-        error_msgs << "parameters or transformed parameter variables"
+        error_msgs << "Parameters or transformed parameters"
                    << " cannot be integer or integer array; "
                    << " found int variable declaration, name="
                    << decl.name()
@@ -3271,7 +3246,7 @@ namespace stan {
                                       std::ostream& error_msgs) const {
       pass = in_loop;
       if (!pass)
-        error_msgs << "ERROR: break and continue statements are only allowed"
+        error_msgs << "Error: break and continue statements are only allowed"
                    << " in the body of a for-loop or while-loop."
                    << std::endl;
     }
@@ -3283,7 +3258,7 @@ namespace stan {
       pass = !(e.bare_type().is_void_type()
                || e.bare_type().is_ill_formed_type());
         if (!pass)
-        error_msgs << "ERROR:  expected printable (non-void) expression."
+        error_msgs << "Error: expected printable (non-void) expression."
                    << std::endl;
     }
     boost::phoenix::function<non_void_expression> non_void_expression_f;

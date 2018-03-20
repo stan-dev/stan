@@ -50,10 +50,3 @@ TEST(Parser, parse_local_var_past_stmt) {
   EXPECT_FALSE(pass);
   EXPECT_NE(msgs.str().find("PARSER FAILED"), std::string::npos);
 }
-
-
-  // std::cout << "input" << std::endl;
-  // std::cout << input << std::endl;
-  // std::cout << "messages" << std::endl;
-  // std::cout << msgs.str() << std::endl;
-  // std::cout << std::endl;

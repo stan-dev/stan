@@ -9,16 +9,9 @@
 
 bool run_test(std::string& stan_code,
               std::stringstream& msgs) {
-
   bool pass = false;
   std::vector<stan::lang::function_decl_def> fdds;
   fdds = parse_functions(stan_code, pass, msgs);
-
-  std::cout << "\ntest.stan:" << std::endl;
-  std::cout << stan_code << std::endl;
-  std::cout << "parser msgs:" << std::endl;
-  std::cout << msgs.str() << std::endl;
-
   return pass;
 }
 

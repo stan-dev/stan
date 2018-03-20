@@ -1,7 +1,7 @@
-#ifndef STAN_LANG_GRAMMARS_TEST_FUNCTIONS_GRAMMAR_DEF_HPP
-#define STAN_LANG_GRAMMARS_TEST_FUNCTIONS_GRAMMAR_DEF_HPP
+#ifndef STAN_LANG_GRAMMARS_TEST_LOCAL_VAR_DECLS_GRAMMAR_DEF_HPP
+#define STAN_LANG_GRAMMARS_TEST_LOCAL_VAR_DECLS_GRAMMAR_DEF_HPP
 
-#include <test/unit/new/grammars/test_functions_grammar.hpp>
+#include <test/unit/lang/parser/test_local_var_decls_grammar.hpp>
 
 #include <stan/io/program_reader.hpp>
 #include <stan/lang/ast.hpp>
@@ -20,23 +20,22 @@ namespace stan {
   namespace lang {
 
     template <typename Iterator>
-    test_functions_grammar<Iterator>::test_functions_grammar(
+    test_local_var_decls_grammar<Iterator>::test_local_var_decls_grammar(
                                             const io::program_reader& reader,
                                             variable_map& var_map,
                                             std::stringstream& error_msgs)
-      : test_functions_grammar::base_type(test_functions_r),
+      : test_local_var_decls_grammar::base_type(test_local_var_decls_r),
         reader_(reader),
         var_map_(var_map),
-        functions_declared_(),
-        functions_defined_(),
         error_msgs_(error_msgs),
-        statement_g(var_map_, error_msgs_),
-        bare_type_g(error_msgs_),
-        functions_g(var_map_, error_msgs_, false) {
+        local_var_decls_g(var_map_, error_msgs_) {
+      using boost::spirit::qi::eps;
+      using boost::spirit::qi::labels::_a;
 
-      test_functions_r.name("test functions");
-      test_functions_r
-        %= functions_g;
+      test_local_var_decls_r.name("test local_var_decls");
+      test_local_var_decls_r
+        %= eps[set_var_scope_f(_a, derived_origin)]
+        > local_var_decls_g(_a);
     }
 
   }

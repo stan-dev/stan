@@ -103,8 +103,7 @@ TEST(Parser, parse_bounded_simplex) {
 }
 
 TEST(Parser, parse_unclosed_dim) {
-  std::string input("int K;\n"
-                    "simplex[K foo;");
+  std::string input("simplex[7 foo;");
   bool pass = false;
   std::stringstream msgs;
   std::vector<stan::lang::block_var_decl> bvds;
@@ -123,7 +122,7 @@ TEST(Parser, parse_non_int_dim_1) {
   bvds = parse_var_decls(input, pass, msgs);
 
   EXPECT_FALSE(pass);
-  EXPECT_NE(msgs.str().find("expression denoting integer required; found type=real"), std::string::npos);
+  EXPECT_NE(msgs.str().find("Dimension declaration requires expression denoting integer"), std::string::npos);
 }
 
 TEST(Parser, parse_non_int_dim_2) {
@@ -134,14 +133,11 @@ TEST(Parser, parse_non_int_dim_2) {
   bvds = parse_var_decls(input, pass, msgs);
 
   EXPECT_FALSE(pass);
-  EXPECT_NE(msgs.str().find("expression denoting integer required; found type=real"), std::string::npos);
+  EXPECT_NE(msgs.str().find("Dimension declaration requires expression denoting integer"), std::string::npos);
 }
 
 TEST(Parser, parse_too_many_dims) {
-  std::string input("int J;\n"
-                    "int K;\n"
-                    "int L;\n"
-                    "matrix[J, K, L] foo;");
+  std::string input("matrix[6, 7, 8] foo;");
   bool pass = false;
   std::stringstream msgs;
   std::vector<stan::lang::block_var_decl> bvds;
@@ -152,10 +148,7 @@ TEST(Parser, parse_too_many_dims) {
 }
 
 TEST(Parser, parse_no_dims) {
-  std::string input("int J;\n"
-                    "int K;\n"
-                    "int L;\n"
-                    "matrix[,] foo;");
+  std::string input("matrix[,] foo;");
   bool pass = false;
   std::stringstream msgs;
   std::vector<stan::lang::block_var_decl> bvds;
@@ -174,45 +167,33 @@ TEST(Parser, redeclare) {
   bvds = parse_var_decls(input, pass, msgs);
 
   EXPECT_FALSE(pass);
-  EXPECT_NE(msgs.str().find("duplicate declaration"), std::string::npos);
+  EXPECT_NE(msgs.str().find("Duplicate declaration"), std::string::npos);
   EXPECT_NE(msgs.str().find("redeclare"), std::string::npos);
 
 }
 
-TEST(Parser, undeclared_size) {
-  std::string input("simplex[K] a;\n");
-  bool pass = false;
-  std::stringstream msgs;
-  std::vector<stan::lang::block_var_decl> bvds;
-  bvds = parse_var_decls(input, pass, msgs);
-
-  EXPECT_FALSE(pass);
-  EXPECT_NE(msgs.str().find("variable \"K\" does not exist."), std::string::npos);
-}
-
 TEST(Parser, size_test) {
-  std::string input("real K;\n"
-                    "matrix[K, K] a;\n"
-                    "simplex[K] b;\n");
+  std::string input("matrix[9.0, 9.0] a;\n"
+                    "simplex[7.0] b;\n");
   bool pass = false;
   std::stringstream msgs;
   std::vector<stan::lang::block_var_decl> bvds;
   bvds = parse_var_decls(input, pass, msgs);
 
   EXPECT_FALSE(pass);
-  EXPECT_NE(msgs.str().find("expression denoting integer required"), std::string::npos);
+  EXPECT_NE(msgs.str().find("Dimension declaration requires "
+                            "expression denoting integer"), std::string::npos);
 }
 
 TEST(Parser, bounds_test_1) {
-  std::string input("real K;\n"
-                    "int<lower=K> J;\n");
+  std::string input("int<lower=3.0> J;\n");
   bool pass = false;
   std::stringstream msgs;
   std::vector<stan::lang::block_var_decl> bvds;
   bvds = parse_var_decls(input, pass, msgs);
 
   EXPECT_FALSE(pass);
-  EXPECT_NE(msgs.str().find("expression denoting integer required"), std::string::npos);
+  EXPECT_NE(msgs.str().find("Expression denoting integer required"), std::string::npos);
 }
 
 TEST(Parser, bounds_test_2) {
@@ -223,7 +204,7 @@ TEST(Parser, bounds_test_2) {
   bvds = parse_var_decls(input, pass, msgs);
 
   EXPECT_FALSE(pass);
-  EXPECT_NE(msgs.str().find("expression denoting integer required"), std::string::npos);
+  EXPECT_NE(msgs.str().find("Expression denoting integer required"), std::string::npos);
 }
 
 TEST(Parser, bounds_test_3) {

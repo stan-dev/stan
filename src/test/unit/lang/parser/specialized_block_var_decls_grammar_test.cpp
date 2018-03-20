@@ -8,8 +8,7 @@
 #include <iostream>
 
 TEST(Parser, parse_cholesky_factor_corr_block_type) {
-  std::string input("int K;\n"
-                    "cholesky_factor_corr[K] x;");
+  std::string input("cholesky_factor_corr[3] x;");
   bool pass = false;
   std::stringstream msgs;
   std::vector<stan::lang::block_var_decl> bvds;
@@ -17,19 +16,13 @@ TEST(Parser, parse_cholesky_factor_corr_block_type) {
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(2 == bvds.size());
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvds[0].type());
-  EXPECT_EQ("int", ss.str());
-  ss.str(std::string());
-  ss.clear();
-  stan::lang::write_block_var_type(ss, bvds[1].type());
   EXPECT_EQ("cholesky_factor_corr", ss.str());
 }
 
 TEST(Parser, parse_array_of_cholesky_factor_corr_block_type) {
-  std::string input("int K;\n"
-                    "cholesky_factor_corr[K] x[10, 10];");
+  std::string input("cholesky_factor_corr[3] x[10, 10];");
   bool pass = false;
   std::stringstream msgs;
   std::vector<stan::lang::block_var_decl> bvds;
@@ -37,19 +30,13 @@ TEST(Parser, parse_array_of_cholesky_factor_corr_block_type) {
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(2 == bvds.size());
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvds[0].type());
-  EXPECT_EQ("int", ss.str());
-  ss.str(std::string());
-  ss.clear();
-  stan::lang::write_block_var_type(ss, bvds[1].type());
   EXPECT_EQ("2-dim array of cholesky_factor_corr", ss.str());
 }
 
 TEST(Parser, parse_cholesky_factor_cov_block_type_square) {
-  std::string input("int K;\n"
-                    "cholesky_factor_cov[K] x;");
+  std::string input("cholesky_factor_cov[3] x;");
   bool pass = false;
   std::stringstream msgs;
   std::vector<stan::lang::block_var_decl> bvds;
@@ -57,20 +44,13 @@ TEST(Parser, parse_cholesky_factor_cov_block_type_square) {
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(2 == bvds.size());
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvds[0].type());
-  EXPECT_EQ("int", ss.str());
-  ss.str(std::string());
-  ss.clear();
-  stan::lang::write_block_var_type(ss, bvds[1].type());
   EXPECT_EQ("cholesky_factor_cov", ss.str());
 }
 
 TEST(Parser, parse_cholesky_factor_cov_block_type_rect) {
-  std::string input("int M;\n"
-                    "int N;\n"
-                    "cholesky_factor_cov[M, N] x;");
+  std::string input("cholesky_factor_cov[3, 4] x;");
   bool pass = false;
   std::stringstream msgs;
   std::vector<stan::lang::block_var_decl> bvds;
@@ -78,23 +58,13 @@ TEST(Parser, parse_cholesky_factor_cov_block_type_rect) {
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(3 == bvds.size());
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvds[0].type());
-  EXPECT_EQ("int", ss.str());
-  ss.str(std::string());
-  ss.clear();
-  stan::lang::write_block_var_type(ss, bvds[1].type());
-  EXPECT_EQ("int", ss.str());
-  ss.str(std::string());
-  ss.clear();
-  stan::lang::write_block_var_type(ss, bvds[2].type());
   EXPECT_EQ("cholesky_factor_cov", ss.str());
 }
 
 TEST(Parser, parse_array_of_cholesky_factor_cov_block_type) {
-  std::string input("int K;\n"
-                    "cholesky_factor_cov[K] x[10, 10];");
+  std::string input("cholesky_factor_cov[3] x[10, 10];");
   bool pass = false;
   std::stringstream msgs;
   std::vector<stan::lang::block_var_decl> bvds;
@@ -102,19 +72,13 @@ TEST(Parser, parse_array_of_cholesky_factor_cov_block_type) {
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(2 == bvds.size());
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvds[0].type());
-  EXPECT_EQ("int", ss.str());
-  ss.str(std::string());
-  ss.clear();
-  stan::lang::write_block_var_type(ss, bvds[1].type());
   EXPECT_EQ("2-dim array of cholesky_factor_cov", ss.str());
 }
 
 TEST(Parser, parse_corr_matrix_block_type) {
-  std::string input("int K;\n"
-                    "corr_matrix[K] x;");
+  std::string input("corr_matrix[3] x;");
   bool pass = false;
   std::stringstream msgs;
   std::vector<stan::lang::block_var_decl> bvds;
@@ -122,19 +86,13 @@ TEST(Parser, parse_corr_matrix_block_type) {
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(2 == bvds.size());
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvds[0].type());
-  EXPECT_EQ("int", ss.str());
-  ss.str(std::string());
-  ss.clear();
-  stan::lang::write_block_var_type(ss, bvds[1].type());
   EXPECT_EQ("corr_matrix", ss.str());
 }
 
 TEST(Parser, parse_array_of_corr_matrix_block_type) {
-  std::string input("int K;\n"
-                    "corr_matrix[K] x[10, 10];");
+  std::string input("corr_matrix[3] x[10, 10];");
   bool pass = false;
   std::stringstream msgs;
   std::vector<stan::lang::block_var_decl> bvds;
@@ -142,19 +100,13 @@ TEST(Parser, parse_array_of_corr_matrix_block_type) {
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(2 == bvds.size());
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvds[0].type());
-  EXPECT_EQ("int", ss.str());
-  ss.str(std::string());
-  ss.clear();
-  stan::lang::write_block_var_type(ss, bvds[1].type());
   EXPECT_EQ("2-dim array of corr_matrix", ss.str());
 }
 
 TEST(Parser, parse_cov_matrix_block_type) {
-  std::string input("int K;\n"
-                    "cov_matrix[K] x;");
+  std::string input("cov_matrix[3] x;");
   bool pass = false;
   std::stringstream msgs;
   std::vector<stan::lang::block_var_decl> bvds;
@@ -162,19 +114,13 @@ TEST(Parser, parse_cov_matrix_block_type) {
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(2 == bvds.size());
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvds[0].type());
-  EXPECT_EQ("int", ss.str());
-  ss.str(std::string());
-  ss.clear();
-  stan::lang::write_block_var_type(ss, bvds[1].type());
   EXPECT_EQ("cov_matrix", ss.str());
 }
 
 TEST(Parser, parse_array_of_cov_matrix_block_type) {
-  std::string input("int K;\n"
-                    "cov_matrix[K] x[10, 10];");
+  std::string input("cov_matrix[3] x[10, 10];");
   bool pass = false;
   std::stringstream msgs;
   std::vector<stan::lang::block_var_decl> bvds;
@@ -182,19 +128,13 @@ TEST(Parser, parse_array_of_cov_matrix_block_type) {
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(2 == bvds.size());
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvds[0].type());
-  EXPECT_EQ("int", ss.str());
-  ss.str(std::string());
-  ss.clear();
-  stan::lang::write_block_var_type(ss, bvds[1].type());
   EXPECT_EQ("2-dim array of cov_matrix", ss.str());
 }
 
 TEST(Parser, parse_ordered_block_type) {
-  std::string input("int K;\n"
-                    "ordered[K] x;");
+  std::string input("ordered[3] x;");
   bool pass = false;
   std::stringstream msgs;
   std::vector<stan::lang::block_var_decl> bvds;
@@ -202,19 +142,13 @@ TEST(Parser, parse_ordered_block_type) {
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(2 == bvds.size());
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvds[0].type());
-  EXPECT_EQ("int", ss.str());
-  ss.str(std::string());
-  ss.clear();
-  stan::lang::write_block_var_type(ss, bvds[1].type());
   EXPECT_EQ("ordered", ss.str());
 }
 
 TEST(Parser, parse_array_of_ordered_block_type) {
-  std::string input("int K;\n"
-                    "ordered[K] x[10, 10];");
+  std::string input("ordered[3] x[10, 10];");
   bool pass = false;
   std::stringstream msgs;
   std::vector<stan::lang::block_var_decl> bvds;
@@ -222,19 +156,13 @@ TEST(Parser, parse_array_of_ordered_block_type) {
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(2 == bvds.size());
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvds[0].type());
-  EXPECT_EQ("int", ss.str());
-  ss.str(std::string());
-  ss.clear();
-  stan::lang::write_block_var_type(ss, bvds[1].type());
   EXPECT_EQ("2-dim array of ordered", ss.str());
 }
 
 TEST(Parser, parse_positive_ordered_block_type) {
-  std::string input("int K;\n"
-                    "positive_ordered[K] x;");
+  std::string input("positive_ordered[3] x;");
   bool pass = false;
   std::stringstream msgs;
   std::vector<stan::lang::block_var_decl> bvds;
@@ -242,19 +170,13 @@ TEST(Parser, parse_positive_ordered_block_type) {
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(2 == bvds.size());
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvds[0].type());
-  EXPECT_EQ("int", ss.str());
-  ss.str(std::string());
-  ss.clear();
-  stan::lang::write_block_var_type(ss, bvds[1].type());
   EXPECT_EQ("positive_ordered", ss.str());
 }
 
 TEST(Parser, parse_array_of_positive_ordered_block_type) {
-  std::string input("int K;\n"
-                    "positive_ordered[K] x[10, 10];");
+  std::string input("positive_ordered[3] x[10, 10];");
   bool pass = false;
   std::stringstream msgs;
   std::vector<stan::lang::block_var_decl> bvds;
@@ -262,19 +184,13 @@ TEST(Parser, parse_array_of_positive_ordered_block_type) {
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(2 == bvds.size());
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvds[0].type());
-  EXPECT_EQ("int", ss.str());
-  ss.str(std::string());
-  ss.clear();
-  stan::lang::write_block_var_type(ss, bvds[1].type());
   EXPECT_EQ("2-dim array of positive_ordered", ss.str());
 }
 
 TEST(Parser, parse_simplex_block_type) {
-  std::string input("int K;\n"
-                    "simplex[K] x;");
+  std::string input("simplex[3] x;");
   bool pass = false;
   std::stringstream msgs;
   std::vector<stan::lang::block_var_decl> bvds;
@@ -282,19 +198,13 @@ TEST(Parser, parse_simplex_block_type) {
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(2 == bvds.size());
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvds[0].type());
-  EXPECT_EQ("int", ss.str());
-  ss.str(std::string());
-  ss.clear();
-  stan::lang::write_block_var_type(ss, bvds[1].type());
   EXPECT_EQ("simplex", ss.str());
 }
 
 TEST(Parser, parse_array_of_simplex_block_type) {
-  std::string input("int K;\n"
-                    "simplex[K] x[10, 10];");
+  std::string input("simplex[3] x[10, 10];");
   bool pass = false;
   std::stringstream msgs;
   std::vector<stan::lang::block_var_decl> bvds;
@@ -302,19 +212,13 @@ TEST(Parser, parse_array_of_simplex_block_type) {
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(2 == bvds.size());
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvds[0].type());
-  EXPECT_EQ("int", ss.str());
-  ss.str(std::string());
-  ss.clear();
-  stan::lang::write_block_var_type(ss, bvds[1].type());
   EXPECT_EQ("2-dim array of simplex", ss.str());
 }
 
 TEST(Parser, parse_unit_vector_block_type) {
-  std::string input("int K;\n"
-                    "unit_vector[K] x;");
+  std::string input("unit_vector[3] x;");
   bool pass = false;
   std::stringstream msgs;
   std::vector<stan::lang::block_var_decl> bvds;
@@ -322,19 +226,13 @@ TEST(Parser, parse_unit_vector_block_type) {
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(2 == bvds.size());
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvds[0].type());
-  EXPECT_EQ("int", ss.str());
-  ss.str(std::string());
-  ss.clear();
-  stan::lang::write_block_var_type(ss, bvds[1].type());
   EXPECT_EQ("unit_vector", ss.str());
 }
 
 TEST(Parser, parse_array_of_unit_vector_block_type) {
-  std::string input("int K;\n"
-                    "unit_vector[K] x[10, 10];");
+  std::string input("unit_vector[3] x[10, 10];");
   bool pass = false;
   std::stringstream msgs;
   std::vector<stan::lang::block_var_decl> bvds;
@@ -342,24 +240,18 @@ TEST(Parser, parse_array_of_unit_vector_block_type) {
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(2 == bvds.size());
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvds[0].type());
-  EXPECT_EQ("int", ss.str());
-  ss.str(std::string());
-  ss.clear();
-  stan::lang::write_block_var_type(ss, bvds[1].type());
   EXPECT_EQ("2-dim array of unit_vector", ss.str());
 }
 
 TEST(Parser, parse_many_types) {
-  std::string input("int K;\n"
-                    "corr_matrix[K] a;\n"
-                    "corr_matrix[K] b[5];\n"
-                    "corr_matrix[K] c[5, 5];\n"
-                    "ordered[K] d;\n"
-                    "positive_ordered[K] e[5];\n"
-                    "unit_vector[K] f[5, 5];\n");
+  std::string input("corr_matrix[3] a;\n"
+                    "corr_matrix[3] b[5];\n"
+                    "corr_matrix[3] c[5, 5];\n"
+                    "ordered[3] d;\n"
+                    "positive_ordered[3] e[5];\n"
+                    "unit_vector[3] f[5, 5];\n");
 
   bool pass = false;
   std::stringstream msgs;
@@ -368,18 +260,13 @@ TEST(Parser, parse_many_types) {
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(7 == bvds.size());
+  EXPECT_TRUE(6 == bvds.size());
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvds[0].type());
-  EXPECT_EQ("int", ss.str());
-
-  ss.str(std::string());
-  ss.clear();
-  stan::lang::write_block_var_type(ss, bvds[1].type());
   EXPECT_EQ("corr_matrix", ss.str());
 
   ss.str(std::string());
   ss.clear();
-  stan::lang::write_block_var_type(ss, bvds[6].type());
+  stan::lang::write_block_var_type(ss, bvds[5].type());
   EXPECT_EQ("2-dim array of unit_vector", ss.str());
 }

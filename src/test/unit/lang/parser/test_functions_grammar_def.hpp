@@ -1,7 +1,7 @@
-#ifndef STAN_LANG_GRAMMARS_TEST_STATEMENT_GRAMMAR_DEF_HPP
-#define STAN_LANG_GRAMMARS_TEST_STATEMENT_GRAMMAR_DEF_HPP
+#ifndef STAN_LANG_GRAMMARS_TEST_FUNCTIONS_GRAMMAR_DEF_HPP
+#define STAN_LANG_GRAMMARS_TEST_FUNCTIONS_GRAMMAR_DEF_HPP
 
-#include <test/unit/new/grammars/test_statement_grammar.hpp>
+#include <test/unit/lang/parser/test_functions_grammar.hpp>
 
 #include <stan/io/program_reader.hpp>
 #include <stan/lang/ast.hpp>
@@ -20,22 +20,23 @@ namespace stan {
   namespace lang {
 
     template <typename Iterator>
-    test_statement_grammar<Iterator>::test_statement_grammar(
+    test_functions_grammar<Iterator>::test_functions_grammar(
                                             const io::program_reader& reader,
                                             variable_map& var_map,
                                             std::stringstream& error_msgs)
-      : test_statement_grammar::base_type(test_statement_r),
+      : test_functions_grammar::base_type(test_functions_r),
         reader_(reader),
         var_map_(var_map),
+        functions_declared_(),
+        functions_defined_(),
         error_msgs_(error_msgs),
-        statement_g(var_map_, error_msgs_) {
-      using boost::spirit::qi::eps;
-      using boost::spirit::qi::labels::_a;
+        statement_g(var_map_, error_msgs_),
+        bare_type_g(error_msgs_),
+        functions_g(var_map_, error_msgs_, false) {
 
-      test_statement_r.name("test statement");
-      test_statement_r
-        %= eps[set_var_scope_f(_a, derived_origin)]
-        > statement_g(_a, false);   // not in loop, disallow break/continue
+      test_functions_r.name("test functions");
+      test_functions_r
+        %= functions_g;
     }
 
   }

@@ -1,7 +1,7 @@
 #ifndef STAN_LANG_GRAMMARS_TEST_BARE_TYPE_GRAMMAR_DEF_HPP
 #define STAN_LANG_GRAMMARS_TEST_BARE_TYPE_GRAMMAR_DEF_HPP
 
-#include <test/unit/new/grammars/test_bare_type_grammar.hpp>
+#include <test/unit/lang/parser/test_bare_type_grammar.hpp>
 
 #include <stan/io/program_reader.hpp>
 #include <stan/lang/ast.hpp>

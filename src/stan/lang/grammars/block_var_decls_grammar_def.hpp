@@ -308,8 +308,9 @@ namespace stan {
       int_data_expr_r.name("data-only integer expression");
       int_data_expr_r
         %= expression_g(_r1)
-           [validate_int_expr_f(_1, _pass,
-                                boost::phoenix::ref(error_msgs_))];
+           [validate_int_data_only_expr_f(_1, _pass,
+                                          boost::phoenix::ref(var_map_),
+                                          boost::phoenix::ref(error_msgs_))];
 
       identifier_r.name("identifier");
       identifier_r

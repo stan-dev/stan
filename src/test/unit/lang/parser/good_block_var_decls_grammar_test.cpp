@@ -47,7 +47,6 @@ TEST(Parser, parse_2) {
   bvds = parse_var_decls(input, pass, msgs);
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(2 == bvds.size());
 
   std::stringstream ss;
   stan::lang::write_block_var_type(ss, bvds[0].type());
@@ -67,7 +66,6 @@ TEST(Parser, parse_3) {
   bvds = parse_var_decls(input, pass, msgs);
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(3 == bvds.size());
 }
 
 TEST(Parser, parse_matrix) {
@@ -78,7 +76,6 @@ TEST(Parser, parse_matrix) {
   bvds = parse_var_decls(input, pass, msgs);
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(1 == bvds.size());
 }
 
 TEST(Parser, parse_matrix2) {
@@ -89,7 +86,6 @@ TEST(Parser, parse_matrix2) {
   bvds = parse_var_decls(input, pass, msgs);
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(1 == bvds.size());
 }
 
 TEST(Parser, parse_vector) {
@@ -100,7 +96,6 @@ TEST(Parser, parse_vector) {
   bvds = parse_var_decls(input, pass, msgs);
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(1 == bvds.size());
 }
 
 TEST(Parser, parse_vector2) {
@@ -111,7 +106,6 @@ TEST(Parser, parse_vector2) {
   bvds = parse_var_decls(input, pass, msgs);
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(1 == bvds.size());
 }
 
 TEST(Parser, parse_vector3) {
@@ -122,7 +116,6 @@ TEST(Parser, parse_vector3) {
   bvds = parse_var_decls(input, pass, msgs);
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(1 == bvds.size());
 }
 
 TEST(Parser, parse_row_vector) {
@@ -133,19 +126,16 @@ TEST(Parser, parse_row_vector) {
   bvds = parse_var_decls(input, pass, msgs);
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(1 == bvds.size());
 }
 
 TEST(Parser, parse_row_vector2) {
-  std::string input("int N;\n"
-                    "row_vector[N] a;\n");
+  std::string input("row_vector[7] a;\n");
   bool pass = false;
   std::stringstream msgs;
   std::vector<stan::lang::block_var_decl> bvds;
   bvds = parse_var_decls(input, pass, msgs);
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(2 == bvds.size());
 }
 
 TEST(Parser, parse_simplex) {
@@ -156,7 +146,6 @@ TEST(Parser, parse_simplex) {
   bvds = parse_var_decls(input, pass, msgs);
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(1 == bvds.size());
 }
 
 TEST(Parser, parse_array_1) {
@@ -167,7 +156,6 @@ TEST(Parser, parse_array_1) {
   bvds = parse_var_decls(input, pass, msgs);
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(1 == bvds.size());
 }
 
 TEST(Parser, parse_array_2) {
@@ -178,7 +166,6 @@ TEST(Parser, parse_array_2) {
   bvds = parse_var_decls(input, pass, msgs);
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(1 == bvds.size());
 }
 
 TEST(Parser, parse_1d_array_matrix) {
@@ -190,7 +177,6 @@ TEST(Parser, parse_1d_array_matrix) {
   bvds = parse_var_decls(input, pass, msgs);
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(2 == bvds.size());
 }
 
 TEST(Parser, parse_2d_array_matrix) {
@@ -202,21 +188,15 @@ TEST(Parser, parse_2d_array_matrix) {
   bvds = parse_var_decls(input, pass, msgs);
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(2 == bvds.size());
 }
 
 TEST(Parser, parse_2d_array_matrix_2) {
-  std::string input("int N;\n"
-                    "int M;\n"
-                    "int I;\n"
-                    "int J;\n"
-                    "matrix[M,N] d1_array_of_mat[I];\n"
-                    "matrix[M,N] d2_array_of_mat[I, J];\n");
+  std::string input("matrix[3,4] d1_array_of_mat[5];\n"
+                    "matrix[6,7] d2_array_of_mat[8, 9];\n");
   bool pass = false;
   std::stringstream msgs;
   std::vector<stan::lang::block_var_decl> bvds;
   bvds = parse_var_decls(input, pass, msgs);
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
-  EXPECT_TRUE(6 == bvds.size());
 }

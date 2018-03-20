@@ -36,7 +36,6 @@ TEST(Parser, parse_bare_unclosed_dim_2) {
   std::stringstream err_msgs;
   stan::lang::bare_expr_type bet;
   bet = parse_bare_type(input, pass, err_msgs);
-  std::cout << err_msgs.str() << std::endl;
 
   EXPECT_NE(err_msgs.str().find("<comma to indicate more dimensions or ] "), std::string::npos);
   EXPECT_FALSE(pass);
