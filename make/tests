@@ -99,11 +99,17 @@ test/test-model-main.cpp:
 	@echo "  stan_model model(*data);" >> $@
 	@echo >> $@
 	@echo "  std::vector<stan::math::var> params;" >> $@
+	@echo "  std::vector<double> x_r;" >> $@
+	@echo "  std::vector<int> x_i;" >> $@
 	@echo >> $@
-	@echo "  model.log_prob<false, false>(params);" >> $@
-	@echo "  model.log_prob<false, true>(params);" >> $@
-	@echo "  model.log_prob<true, false>(params);" >> $@
-	@echo "  model.log_prob<true, true>(params);" >> $@
+	@echo "  model.log_prob<false, false>(params, x_i);" >> $@
+	@echo "  model.log_prob<false, true>(params, x_i);" >> $@
+	@echo "  model.log_prob<true, false>(params, x_i);" >> $@
+	@echo "  model.log_prob<true, true>(params, x_i);" >> $@
+	@echo "  model.log_prob<false, false>(x_r, x_i);" >> $@
+	@echo "  model.log_prob<false, true>(x_r, x_i);" >> $@
+	@echo "  model.log_prob<true, false>(x_r, x_i);" >> $@
+	@echo "  model.log_prob<true, true>(x_r, x_i);" >> $@
 	@echo >> $@
 	@echo "  return 0;" >> $@
 	@echo "}" >> $@
