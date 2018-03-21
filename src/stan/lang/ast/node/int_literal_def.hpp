@@ -8,7 +8,7 @@ namespace stan {
 
     int_literal::int_literal() : type_(int_type()) { }
 
-    int_literal::int_literal(int val) : val_(val), type_(int_type()) { }
+    int_literal::int_literal(int val) : val_(val),  type_(int_type()) { }
 
   }
 }

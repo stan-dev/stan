@@ -26,7 +26,8 @@ TEST(langAst, solveOde) {
   std::string system_function_name = "foo";
 
   double_type tDouble;
-  int_type tInt;
+  double_type tDoubleData(true);
+  int_type tIntData(true);
 
   variable y0("y0_var_name");
   y0.set_type(bare_array_type(tDouble, 1));
@@ -35,18 +36,16 @@ TEST(langAst, solveOde) {
   t0.set_type(tDouble);
 
   variable ts("ts_var_name");
-  ts.set_type(bare_array_type(tDouble, 1));
+  ts.set_type(bare_array_type(tDoubleData, 1));
 
   variable theta("theta_var_name");
   theta.set_type(bare_array_type(tDouble, 1));
 
   variable x("x_var_name");
-  x.set_type(bare_array_type(tDouble, 1));
-  x.type_.set_is_data();
+  x.set_type(bare_array_type(tDoubleData, 1));
   
   variable x_int("x_int_var_name");
-  x_int.set_type(bare_array_type(tInt, 1));
-  x_int.type_.set_is_data();
+  x_int.set_type(bare_array_type(tIntData, 1));
 
   // example of instantiation
   integrate_ode so2(integration_function_name, system_function_name,
@@ -71,9 +70,11 @@ TEST(langAst, solveAlgebra) {
     std::string system_function_name = "bronzino";
 
     double_type tDouble;
-    int_type tInt;
+    double_type tDoubleData(true);
+    int_type tIntData(true);
     vector_type tVector;
-
+    vector_type tVectorData(true);
+    
     variable y("y_var_name");
     y.set_type(tVector);  // vector from Eigen
     
@@ -81,12 +82,10 @@ TEST(langAst, solveAlgebra) {
     theta.set_type(tVector);
     
     variable x_r("x_r_r_var_name");
-    x_r.set_type(bare_array_type(tDouble, 1));
-    x_r.type_.set_is_data();
+    x_r.set_type(bare_array_type(tDoubleData, 1));
     
     variable x_i("x_i_var_name");
-    x_i.set_type(bare_array_type(tInt, 1));
-    x_i.type_.set_is_data();
+    x_i.set_type(bare_array_type(tIntData, 1));
     
     // example of instantiation
     algebra_solver so2(system_function_name, y, theta, x_r, x_i);

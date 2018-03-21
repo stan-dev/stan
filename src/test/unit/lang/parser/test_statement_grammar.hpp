@@ -29,8 +29,8 @@ namespace stan {
       statement_grammar<Iterator> statement_g;
 
       test_statement_grammar(const io::program_reader& reader,
-                                   variable_map& var_map,
-                                   std::stringstream& error_msgs);
+                             variable_map& var_map,
+                             std::stringstream& error_msgs);
 
       boost::spirit::qi::rule<Iterator,
                               boost::spirit::qi::locals<scope>,

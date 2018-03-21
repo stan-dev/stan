@@ -18,7 +18,7 @@ TEST(astExpression, int_literal) {
   stan::lang::int_literal intLit(5);
   EXPECT_TRUE(intLit.type_.is_int_type());
   EXPECT_EQ(intLit.val_, 5);
-
+  
   stan::lang::expression e1 = intLit;
   EXPECT_TRUE(e1.bare_type().is_int_type());
 }
@@ -27,6 +27,8 @@ TEST(astExpression, double_literal) {
   stan::lang::double_literal dblLit(5.1);
   EXPECT_TRUE(dblLit.type_.is_double_type());
   EXPECT_EQ(dblLit.val_, 5.1);
+  dblLit.string_ = "5.1";
+  EXPECT_EQ(dblLit.string_, "5.1");
 
   stan::lang::expression e1 = dblLit;
   EXPECT_TRUE(e1.bare_type().is_double_type());

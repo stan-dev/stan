@@ -1620,6 +1620,20 @@ namespace stan {
     boost::phoenix::function<validate_non_void_expression>
     validate_non_void_expression_f;
 
+
+    template <typename T, typename I>
+    void add_literal_string::operator()(T& lit,
+                                        const I& begin,
+                                        const I& end) const {
+      lit.string_ = std::string(begin, end);
+    }
+    boost::phoenix::function<add_literal_string>
+    add_literal_string_f;
+
+    template void add_literal_string::operator()(double_literal&,
+                                      const pos_iterator_t& begin,
+                                      const pos_iterator_t& end) const;
+    
     template <typename T, typename I>
     void add_line_number::operator()(T& line,
                                      const I& begin,

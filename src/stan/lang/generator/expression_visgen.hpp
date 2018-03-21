@@ -40,13 +40,15 @@ namespace stan {
         o_ << "nil";
       }
 
-      void operator()(const int_literal& n) const { o_ << n.val_; }
-
-      void operator()(const double_literal& x) const {
-        std::string num_str = boost::lexical_cast<std::string>(x.val_);
+      void operator()(const int_literal& n) const {
+        std::string num_str = boost::lexical_cast<std::string>(n.val_);
         o_ << num_str;
-        if (num_str.find_first_of("eE.") == std::string::npos)
-          o_ << ".0";  // trailing 0 to ensure C++ makes it a double
+      }
+
+      void operator()(const double_literal& x) const { 
+        o_ << x.string_;
+        if (x.string_.find_first_of("eE.") == std::string::npos)
+        o_ << ".0";  // trailing 0 to ensure C++ makes it a double
       }
 
       void operator()(const array_expr& x) const {

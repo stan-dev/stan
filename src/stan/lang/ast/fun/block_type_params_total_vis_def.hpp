@@ -19,32 +19,41 @@ namespace stan {
 
     expression block_type_params_total_vis::operator()(const cholesky_factor_corr_block_type& x) const {
       // (K * (K - 1)) / 2
+      int_literal one(1);
+      int_literal two(2);
       return binary_op(
-              binary_op(x.K_, "*", binary_op(x.K_, "-", int_literal(1))),
-              "/", int_literal(2));
+              binary_op(x.K_, "*", binary_op(x.K_, "-", one)),
+              "/", two);
     }
 
     expression block_type_params_total_vis::operator()(const cholesky_factor_cov_block_type& x) const {
       // (N * (N + 1)) / 2 + (M - N) * N
+      int_literal one(1);
+      int_literal two(2);
       return binary_op(
               binary_op(binary_op(x.N_, "*",
-               binary_op(x.N_, "+", int_literal(1))), "/", int_literal(2)),
+               binary_op(x.N_, "+", one)), "/", two),
               "+",
               binary_op(binary_op(x.M_, "-", x.N_), "*", x.N_));
     }
 
     expression block_type_params_total_vis::operator()(const corr_matrix_block_type& x) const {
       // (K * (K - 1)) / 2
+      int_literal one(1);
+      int_literal two(2);
+
       return binary_op(
-              binary_op(x.K_, "*", binary_op(x.K_, "-", int_literal(1))),
-              "/", int_literal(2));
+              binary_op(x.K_, "*", binary_op(x.K_, "-", one)),
+              "/", two);
     }
 
     expression block_type_params_total_vis::operator()(const cov_matrix_block_type& x) const {
       // K + (K * (K - 1 ) / 2)
+      int_literal one(1);
+      int_literal two(2);
       return binary_op(x.K_, "+", binary_op(
-              binary_op(x.K_, "*", binary_op(x.K_, "-", int_literal(1))),
-              "/", int_literal(2)));
+              binary_op(x.K_, "*", binary_op(x.K_, "-", one)),
+              "/", two));
     }
 
     expression block_type_params_total_vis::operator()(const double_block_type& x) const {
@@ -56,7 +65,7 @@ namespace stan {
     }
 
     expression block_type_params_total_vis::operator()(const int_block_type& x) const {
-      return int_literal(1);  //TODO:mitzi no int type params - return 0? nil?
+      return int_literal(1);
     }
 
     expression block_type_params_total_vis::operator()(const matrix_block_type& x) const {
@@ -76,7 +85,8 @@ namespace stan {
     }
 
     expression block_type_params_total_vis::operator()(const simplex_block_type& x) const {
-      return binary_op(x.K_, "-", int_literal(1));
+      int_literal one(1);
+      return binary_op(x.K_, "-", one);
     }
 
     expression block_type_params_total_vis::operator()(const unit_vector_block_type& x) const {

@@ -2,6 +2,7 @@
 #define STAN_LANG_AST_NODE_DOUBLE_LITERAL_HPP
 
 #include <stan/lang/ast/type/bare_expr_type.hpp>
+#include <string>
 
 namespace stan {
   namespace lang {
@@ -14,6 +15,11 @@ namespace stan {
        * Value of literal.
        */
       double val_;
+
+      /**
+       * String representation.
+       */
+      std::string string_;
 
       /**
        * Expression type.

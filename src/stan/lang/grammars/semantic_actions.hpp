@@ -788,7 +788,6 @@ namespace stan {
       bool operator()(const unary_op& x) const;
     };
 
-    // called from: var_decls_grammar
     struct add_line_number : public phoenix_functor_ternary {
       template <typename T, typename I>
       void operator()(T& line,
@@ -798,8 +797,15 @@ namespace stan {
     extern boost::phoenix::function<add_line_number>
     add_line_number_f;
 
-    // TODO:mitzi - review fn, comments
-    //  called from: block_var_decls_grammar, 
+    struct add_literal_string : public phoenix_functor_ternary {
+      template <typename T, typename I>
+      void operator()(T& lit,
+                      const I& begin,
+                      const I& end) const;
+    };
+    extern boost::phoenix::function<add_literal_string>
+    add_literal_string_f;
+
     struct validate_decl : public phoenix_functor_quaternary {
       void operator()(const bool& declaration_ok, const var_decl& var_decl,
                       bool& pass, std::stringstream& error_msgs) const;
@@ -807,7 +813,6 @@ namespace stan {
     extern boost::phoenix::function<validate_decl>
     validate_decl_f;
 
-    // called from: var_decls_grammar
     struct validate_definition : public phoenix_functor_quaternary {
       template <typename T>
       void operator()(const scope& var_scope, const T& var_decl,
