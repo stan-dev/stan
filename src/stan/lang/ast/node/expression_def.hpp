@@ -2,6 +2,7 @@
 #define STAN_LANG_AST_NODE_EXPRESSION_DEF_HPP
 
 #include <stan/lang/ast.hpp>
+#include <ostream>
 
 namespace stan {
   namespace lang {
@@ -79,6 +80,10 @@ namespace stan {
       return bare_type().num_dims();
     }
 
+    std::string expression::to_string() const {
+      write_expression_vis vis;
+      return boost::apply_visitor(vis, expr_);
+    }
   }
 }
 #endif

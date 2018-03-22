@@ -6,18 +6,6 @@
 #include <stan/lang/grammars/iterator_typedefs.hpp>
 #include <stan/lang/grammars/semantic_actions.hpp>
 
-// all of this needed for good error messages from parser
-// running in standalone testing mode, but not from stanc_helper
-// #include <stan/lang/generator/expression_visgen.hpp>
-// #include <stan/lang/generator/generate_array_builder_adds.hpp>
-// #include <stan/lang/generator/generate_expression.hpp>
-// #include <stan/lang/generator/generate_idxs.hpp>
-// #include <stan/lang/generator/generate_idxs_user.hpp>
-// #include <stan/lang/generator/generate_idx.hpp>
-// #include <stan/lang/generator/generate_idx_user.hpp>
-// #include <stan/lang/generator/idx_visgen.hpp>
-// #include <stan/lang/generator/idx_user_visgen.hpp>
-
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 #include <boost/spirit/include/qi.hpp>
@@ -1033,13 +1021,6 @@ namespace stan {
         return;
       }
 
-      //       std::cout << "validate_assignment"
-      //           << " assigning to var: " << a.var_dims_.name_
-      //           << " with num dims: " << a.var_dims_.dims_.size()
-      //           << " expr: " << a.expr_.bare_type()
-      //           << std::endl;
-
-
       if (!can_assign_to_lhs_var(name, var_scope, vm, error_msgs)) {
         pass = false;
         return;
@@ -1048,8 +1029,6 @@ namespace stan {
         
       bare_expr_type inferred_lhs_type
         = infer_var_dims_type(a.var_type_, a.var_dims_);
-
-      //      std::cout << " inferred_lhs_type " << inferred_lhs_type << std::endl;
 
       if (inferred_lhs_type.is_ill_formed_type()) {
         error_msgs << "Too many indexes for variable"
@@ -1192,8 +1171,6 @@ namespace stan {
     void validate_sample::operator()(sample& s,
                                      const variable_map& var_map, bool& pass,
                                      std::ostream& error_msgs) const {
-      //      std::cout << "validate sample" << std::endl;
-      //      std::cout << " s.expr_.bare_type(): " << s.expr_.bare_type() << std::endl;
       std::vector<bare_expr_type> arg_types;
       arg_types.push_back(s.expr_.bare_type());
       for (size_t i = 0; i < s.dist_.args_.size(); ++i) {
@@ -1264,7 +1241,6 @@ namespace stan {
         return;
       }
       // test for LHS not being purely a variable
-      static const bool user_facing = true;
       if (has_non_param_var(s.expr_, var_map)) {
         error_msgs << "Warning (non-fatal):"
                    << std::endl
@@ -1277,9 +1253,9 @@ namespace stan {
                    << std::endl
                    << "Left-hand-side of sampling statement:"
                    << std::endl
-                   << "    ";
-        generate_expression(s.expr_, user_facing, error_msgs);
-        error_msgs << " ~ " << function_name << "(...)"
+                   << "    "
+                   << s.expr_.to_string()
+                   << " ~ " << function_name << "(...)"
                    << std::endl;
       }
       // validate that variable and params are univariate if truncated
@@ -1288,9 +1264,9 @@ namespace stan {
           error_msgs << "Outcomes in truncated distributions"
                      << " must be univariate."
                      << std::endl
-                     << "  Found outcome expression: ";
-          generate_expression(s.expr_, user_facing, error_msgs);
-          error_msgs << std::endl
+                     << "  Found outcome expression: "
+                     << s.expr_.to_string()
+                     << std::endl
                      << "  with non-univariate type: "
                      << s.expr_.bare_type()
                      << std::endl;
@@ -1302,9 +1278,9 @@ namespace stan {
             error_msgs << "Parameters in truncated distributions"
                        << " must be univariate."
                        << std::endl
-                       << "  Found parameter expression: ";
-            generate_expression(s.dist_.args_[i], user_facing, error_msgs);
-            error_msgs << std::endl
+                       << "  Found parameter expression: "
+                       << s.dist_.args_[i].to_string()
+                       << std::endl
                        << "  with non-univariate type: "
                        << s.dist_.args_[i].bare_type()
                        << std::endl;
@@ -1317,9 +1293,9 @@ namespace stan {
         error_msgs << "Lower bounds in truncated distributions"
                    << " must be univariate."
                    << std::endl
-                   << "  Found lower bound expression: ";
-        generate_expression(s.truncation_.low_, user_facing, error_msgs);
-        error_msgs << std::endl
+                   << "  Found lower bound expression: "
+                   << s.truncation_.low_.to_string()
+                   << std::endl
                    << "  with non-univariate type: "
                    << s.truncation_.low_.bare_type()
                    << std::endl;
@@ -1331,9 +1307,9 @@ namespace stan {
         error_msgs << "Upper bounds in truncated distributions"
                    << " must be univariate."
                    << std::endl
-                   << "  Found upper bound expression: ";
-        generate_expression(s.truncation_.high_, user_facing, error_msgs);
-        error_msgs << std::endl
+                   << "  Found upper bound expression: "
+                   << s.truncation_.high_.to_string()
+                   << std::endl
                    << "  with non-univariate type: "
                    << s.truncation_.high_.bare_type()
                    << std::endl;
@@ -1416,13 +1392,12 @@ namespace stan {
     void expression_as_statement::operator()(bool& pass,
                                      const stan::lang::expression& expr,
                                      std::stringstream& error_msgs) const {
-      static const bool user_facing = true;
       if (!(expr.bare_type().is_void_type())) {
         error_msgs << "Illegal statement beginning with non-void"
                    << " expression parsed as"
-                   << std::endl << "  ";
-        generate_expression(expr.expr_, user_facing, error_msgs);
-        error_msgs << std::endl
+                   << std::endl << "  "
+                   << expr.to_string()
+                   << std::endl
                    << "Not a legal assignment, sampling, or function"
                    << " statement.  Note that"
                    << std::endl
@@ -2312,20 +2287,20 @@ namespace stan {
         expr1 /= expr2;
         return;
       }
-      static const bool user_facing = true;
       std::vector<expression> args;
       args.push_back(expr1);
       args.push_back(expr2);
+
       if (expr1.bare_type().is_int_type()
           && expr2.bare_type().is_int_type()) {
         // result might be assigned to real - generate warning
         error_msgs << "Warning: integer division"
                    << " implicitly rounds to integer."
-                   << " Found int division: ";
-        generate_expression(expr1.expr_, user_facing, error_msgs);
-        error_msgs << " / ";
-        generate_expression(expr2.expr_, user_facing, error_msgs);
-        error_msgs << std::endl
+                   << " Found int division: "
+                   << expr1.to_string()
+                   << " / "
+                   << expr2.to_string()
+                   << std::endl
                    << " Positive values rounded down,"
                    << " negative values rounded up or down"
                    << " in platform-dependent way."

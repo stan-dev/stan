@@ -70,6 +70,7 @@
 #include <stan/lang/ast/fun/var_type_name_vis_def.hpp>
 #include <stan/lang/ast/fun/write_bare_expr_type_def.hpp>
 #include <stan/lang/ast/fun/write_block_var_type_def.hpp>
+#include <stan/lang/ast/fun/write_expression_vis_def.hpp>
 
 #include <stan/lang/ast/fun/ends_with_def.hpp>
 #include <stan/lang/ast/fun/fun_name_exists_def.hpp>

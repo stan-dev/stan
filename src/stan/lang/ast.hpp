@@ -67,6 +67,7 @@
 #include <stan/lang/ast/fun/var_type_name_vis.hpp>
 #include <stan/lang/ast/fun/write_bare_expr_type.hpp>
 #include <stan/lang/ast/fun/write_block_var_type.hpp>
+#include <stan/lang/ast/fun/write_expression_vis.hpp>
 
 #include <stan/lang/ast/fun/has_non_param_var_vis.hpp>
 #include <stan/lang/ast/fun/has_prob_fun_suffix.hpp>

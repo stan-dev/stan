@@ -12,6 +12,7 @@ TEST(astExpression, nil) {
   stan::lang::expression e2 = stan::lang::double_literal(-2.0);
   EXPECT_TRUE(stan::lang::is_nil(e1));
   EXPECT_FALSE(stan::lang::is_nil(e2));
+  EXPECT_EQ(e1.to_string(), "nil");
 }
 
 TEST(astExpression, int_literal) {
@@ -21,17 +22,19 @@ TEST(astExpression, int_literal) {
   
   stan::lang::expression e1 = intLit;
   EXPECT_TRUE(e1.bare_type().is_int_type());
+  EXPECT_EQ(e1.to_string(), "5");
 }
 
 TEST(astExpression, double_literal) {
-  stan::lang::double_literal dblLit(5.1);
+  stan::lang::double_literal dblLit(-5.1);
   EXPECT_TRUE(dblLit.type_.is_double_type());
-  EXPECT_EQ(dblLit.val_, 5.1);
-  dblLit.string_ = "5.1";
-  EXPECT_EQ(dblLit.string_, "5.1");
+  EXPECT_EQ(dblLit.val_, -5.1);
+  dblLit.string_ = "-5.1";
+  EXPECT_EQ(dblLit.string_, "-5.1");
 
   stan::lang::expression e1 = dblLit;
   EXPECT_TRUE(e1.bare_type().is_double_type());
+  EXPECT_EQ(e1.to_string(), "-5.1");
 }
 
 TEST(astExpression, row_vector_expr) {

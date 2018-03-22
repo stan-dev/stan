@@ -2,6 +2,7 @@
 #define STAN_LANG_AST_NODE_EXPRESSION_HPP
 
 #include <boost/variant/recursive_variant.hpp>
+#include <ostream>
 #include <string>
 #include <vector>
 
@@ -72,6 +73,7 @@ namespace stan {
 
       bare_expr_type bare_type() const;
       int total_dims() const;
+      std::string to_string() const;
 
       expression& operator+=(const expression& rhs);
       expression& operator-=(const expression& rhs);
