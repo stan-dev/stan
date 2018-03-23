@@ -622,6 +622,33 @@ namespace stan {
     validate_algebra_solver_control_f;
 
     // called from: term_grammar
+    /**
+     * Functor for validating the arguments to map_rect.
+     */
+    struct validate_map_rect : public phoenix_functor_quaternary {
+      /**
+       * Validate that the specified rectangular map object has
+       * appropriately typed arguments and assign it a unique
+       * identifier, setting the pass flag to false and writing an
+       * error message to the output stream if they don't.
+       *
+       * @param[in,out] mr structure to validate
+       * @param[in] var_map mapping for variables
+       * @param[in,out] pass reference to set to false upon failure
+       * @param[in,out] error_msgs reference to error message stream
+       * @throws std::illegal_argument_exception if the arguments are
+       * not of the appropriate shapes.
+       */
+      void operator()(map_rect& mr,
+                      const variable_map& var_map, bool& pass,
+                      std::ostream& error_msgs) const;
+    };
+    /**
+     * Phoenix wrapper for the rectangular map structure validator.
+     */
+    extern boost::phoenix::function<validate_map_rect> validate_map_rect_f;
+
+    // called from: term_grammar
     struct set_fun_type_named : public phoenix_functor_senary {
       void operator()(expression& fun_result, fun& fun,
                       const scope& var_scope, bool& pass,
@@ -789,6 +816,7 @@ namespace stan {
       bool operator()(const integrate_ode_control& x) const;
       bool operator()(const algebra_solver& x) const;
       bool operator()(const algebra_solver_control& x) const;
+      bool operator()(const map_rect& x) const;
       bool operator()(const fun& x) const;
       bool operator()(const index_op& x) const;
       bool operator()(const index_op_sliced& x) const;
