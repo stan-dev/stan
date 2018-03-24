@@ -64,6 +64,13 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::algebra_solver_control,
                            (stan::lang::expression, fun_tol_)
                            (stan::lang::expression, max_num_steps_) )
 
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::map_rect,
+                          (std::string, fun_name_)
+                          (stan::lang::expression, shared_params_)
+                          (stan::lang::expression, job_params_)
+                          (stan::lang::expression, job_data_r_)
+                          (stan::lang::expression, job_data_i_) )
+
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::fun,
                           (std::string, name_)
                           (std::vector<stan::lang::expression>, args_) )
@@ -233,7 +240,7 @@ namespace stan {
         >> lit('(')
         >> identifier_r          // 1) system function name (function only)
         >> lit(',')
-        >> expression_g(_r1)     // 2) y (data only)
+        >> expression_g(_r1)     // 2) y
         >> lit(',')
         >> expression_g(_r1)     // 3) theta
         >> lit(',')
@@ -258,7 +265,7 @@ namespace stan {
         > lit('(')
         > identifier_r          // 1) system function name (function only)
         > lit(',')
-        > expression_g(_r1)     // 2) y (data only)
+        > expression_g(_r1)     // 2) y
         > lit(',')
         > expression_g(_r1)     // 3) theta
         > lit(',')
@@ -269,12 +276,30 @@ namespace stan {
           [validate_algebra_solver_f(_val, boost::phoenix::ref(var_map_),
                                      _pass, boost::phoenix::ref(error_msgs_))];
 
+      map_rect_r.name("map_rect");
+      map_rect_r
+          %= lit("map_rect")
+          > lit('(')
+          > identifier_r          // 1) mapped function name
+          > lit(',')
+          > expression_g(_r1)     // 2) shared param vector
+          > lit(',')
+          > expression_g(_r1)     // 3) job-specific param vector
+          > lit(',')
+          > expression_g(_r1)     // 4) job-specific real data vector
+          > lit(',')
+          > expression_g(_r1)     // 4) job-specific integer data vector
+          > lit(')')
+          [validate_map_rect_f(_val, boost::phoenix::ref(var_map_),
+                               _pass, boost::phoenix::ref(error_msgs_))];
+
       factor_r.name("expression");
       factor_r =
         integrate_ode_control_r(_r1)[assign_lhs_f(_val, _1)]
         | integrate_ode_r(_r1)[assign_lhs_f(_val, _1)]
         | algebra_solver_control_r(_r1)[assign_lhs_f(_val, _1)]
         | algebra_solver_r(_r1)[assign_lhs_f(_val, _1)]
+        | map_rect_r(_r1)[assign_lhs_f(_val, _1)]
         | (fun_r(_r1)[assign_lhs_f(_b, _1)]
            > eps[set_fun_type_named_f(_val, _b, _r1, _pass,
                                       boost::phoenix::ref(var_map_),

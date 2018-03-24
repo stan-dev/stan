@@ -104,6 +104,13 @@ namespace stan {
       return boost::apply_visitor(*this, e.y_.expr_);
     }
 
+    bool has_non_param_var_vis::operator()(const map_rect& e)
+      const {
+      // if any vars, return true
+      return boost::apply_visitor(*this, e.shared_params_.expr_)
+          || boost::apply_visitor(*this, e.job_params_.expr_);
+    }
+
     bool has_non_param_var_vis::operator()(const fun& e) const {
       // any function applied to non-linearly transformed var
       for (size_t i = 0; i < e.args_.size(); ++i)

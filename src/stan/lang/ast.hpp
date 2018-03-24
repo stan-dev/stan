@@ -141,6 +141,7 @@
 #include <stan/lang/ast/node/int_literal.hpp>
 #include <stan/lang/ast/node/lb_idx.hpp>
 #include <stan/lang/ast/node/lub_idx.hpp>
+#include <stan/lang/ast/node/map_rect.hpp>
 #include <stan/lang/ast/node/multi_idx.hpp>
 #include <stan/lang/ast/node/no_op_statement.hpp>
 #include <stan/lang/ast/node/omni_idx.hpp>

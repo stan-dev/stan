@@ -8064,7 +8064,7 @@ daylight savings time.
 Stan provides a built-in mechanism for specifying and solving systems
 of algebraic equations, using the Powell hybrid method \citep{Powell:1970}.
 The function signatures for Stan's algebraic solver can be found in
-\refchapter{functions-algebraic-solver}.
+\refsection{functions-algebraic-solver}.
 %
 Solving any system of algebraic equations can be translated into a root-finding
 problem, that is, given a function $f$, we wish to find $y$ such that
@@ -8156,10 +8156,11 @@ transformed parameters {
 which returns $y = \{3, -2\}$.
 
 \subsection{Data versus Parameters}
-The arguments for the initial guess \code{y\_guess}, the real data \code{x\_r}, and
+The arguments for the real data \code{x\_r} and
 the integer data \code{x\_i} must be expressions that only involve data or
-transformed data variables. The parameters \code{theta} is the only argument
-which may involve parameters.
+transformed data variables. \code{theta}, on the other hand,
+must only involve parameters. Note there are no restrictions on the initial guess,
+\code{y\_guess}, which may be a data or a parameter vector.
 
 \subsection{Length of the Algebraic Function and of the Vector of Unknowns}
 The Jacobian of the solution with respect to the parameters is computed
@@ -8174,7 +8175,7 @@ Certain systems may be degenerate, meaning they have multiple solutions. The
 algebraic solver will not report these cases, as the algorithm stops once it has found
 an acceptable solution. The initial guess will often determine which solution gets found
 first. The degeneracy may be broken by putting additional constraints on the solution.
-For instance, it might make physical sense for a solution to be positive or negative.
+For instance, it might make ``physical sense'' for a solution to be positive or negative.
 
 On the other hand, a system may not have a solution (for a given point in the parameter
 space). In that case, the solver will not converge to a solution. When the solver fails to
@@ -8242,7 +8243,7 @@ For a discussion of stiff ODE systems, see \refsection{stiff-ode}.  In
 a nutshell, the stiff solvers are slower, but more robust;  how much
 so depends on the system and the region of parameter space.
 The function signatures for Stan's ODE solvers can be found in
-\refchapter{functions-ode-solver}.
+\refsection{functions-ode-solver}.
 
 
 \section{Example: Simple Harmonic Oscillator}

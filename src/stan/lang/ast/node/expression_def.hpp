@@ -2,7 +2,6 @@
 #define STAN_LANG_AST_NODE_EXPRESSION_DEF_HPP
 
 #include <stan/lang/ast.hpp>
-#include <ostream>
 
 namespace stan {
   namespace lang {
@@ -38,6 +37,8 @@ namespace stan {
     expression::expression(const algebra_solver& expr) : expr_(expr) { }
 
     expression::expression(const algebra_solver_control& expr) : expr_(expr) { }
+
+    expression::expression(const map_rect& expr) : expr_(expr) { }
 
     expression::expression(const fun& expr) : expr_(expr) { }
 

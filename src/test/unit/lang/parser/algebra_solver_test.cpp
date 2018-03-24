@@ -17,6 +17,7 @@ TEST(lang_parser, algebra_solver_bad) {
   test_throws("algebra_solver/bad_x_i_type",
               "Fifth argument to algebra_solver must have type");
 
+
   test_throws("algebra_solver/bad_y_var_type",
               "Second argument to algebra_solver must be data only");
   test_throws("algebra_solver/bad_x_r_var_type",

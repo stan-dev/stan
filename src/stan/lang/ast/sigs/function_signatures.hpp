@@ -35,7 +35,7 @@ namespace stan {
 
       /**
        * Set the specified name and signature to be a user-defined
-       * function. 
+       * function.
        *
        * @param name_sig name and signature of user-defined function
        */
@@ -227,7 +227,7 @@ namespace stan {
 
       /**
        * Add built-in functions for all the vectorized form of a unary
-       * function with the speicifed name and a single real argument. 
+       * function with the speicifed name and a single real argument.
        *
        * @param name function name
        */
@@ -256,6 +256,56 @@ namespace stan {
        * @param name function name
        */
       void add_quaternary(const::std::string& name);
+
+      /**
+       * Determine the return type of distributions' RNG function
+       * based on the primitiveness of the arguments. If both
+       * arguments are scalar, the return type is int or real
+       * depending on the distribtuion. Otherwise, the return type is
+       * int[] for discrete distributions and real[] for continuous
+       * ones.
+       *
+       * @param t type of first argument
+       * @return expression type resulting from primitiveness of
+       * arguments and distribution's support
+       */
+      template<typename T>
+      expr_type rng_return_type(const expr_type& t);
+
+      /**
+       * Determine the return type of distributions' RNG function
+       * based on the primitiveness of the arguments. If both
+       * arguments are scalar, the return type is int or real
+       * depending on the distribtuion. Otherwise, the return type is
+       * int[] for discrete distributions and real[] for continuous
+       * ones.
+       *
+       * @param t type of first argument
+       * @param u type of second argument
+       * @return expression type resulting from primitiveness of
+       * arguments and distribution's support
+       */
+      template<typename T>
+      expr_type rng_return_type(const expr_type& t, const expr_type& u);
+
+      /**
+       * Determine the return type of distributions' RNG function
+       * based on the primitiveness of the arguments. If both
+       * arguments are scalar, the return type is int or real
+       * depending on the distribtuion. Otherwise, the return type is
+       * int[] for discrete distributions and real[] for continuous
+       * ones.
+       *
+       * @param t type of first argument
+       * @param u type of second argument
+       * @param v type of third argument
+       * @return expression type resulting from primitiveness of
+       * arguments and distribution's support
+       */
+      template<typename T>
+      expr_type rng_return_type(const expr_type& t,
+                                const expr_type& u,
+                                const expr_type& v);
 
       /**
        * Return the number of integer to real promotions required to
