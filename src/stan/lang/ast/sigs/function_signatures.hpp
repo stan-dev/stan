@@ -270,7 +270,7 @@ namespace stan {
        * arguments and distribution's support
        */
       template<typename T>
-      expr_type rng_return_type(const expr_type& t);
+      bare_expr_type rng_return_type(const bare_expr_type& t);
 
       /**
        * Determine the return type of distributions' RNG function
@@ -286,7 +286,7 @@ namespace stan {
        * arguments and distribution's support
        */
       template<typename T>
-      expr_type rng_return_type(const expr_type& t, const expr_type& u);
+      bare_expr_type rng_return_type(const bare_expr_type& t, const bare_expr_type& u);
 
       /**
        * Determine the return type of distributions' RNG function
@@ -303,9 +303,9 @@ namespace stan {
        * arguments and distribution's support
        */
       template<typename T>
-      expr_type rng_return_type(const expr_type& t,
-                                const expr_type& u,
-                                const expr_type& v);
+      bare_expr_type rng_return_type(const bare_expr_type& t,
+                                const bare_expr_type& u,
+                                const bare_expr_type& v);
 
       /**
        * Return the number of integer to real promotions required to

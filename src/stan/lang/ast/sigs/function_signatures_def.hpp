@@ -257,25 +257,27 @@ namespace stan {
     }
 
     template<typename T>
-    expr_type function_signatures::rng_return_type(const expr_type& t) {
+    bare_expr_type function_signatures::rng_return_type(const bare_expr_type& t) {
       T return_type;
-      return expr_type(return_type, !t.is_primitive());
+      return t.is_primitive() ?
+        bare_expr_type(return_type) :
+        bare_expr_type(bare_array_type(return_type, 1));
     }
 
     template<typename T>
-    expr_type function_signatures::rng_return_type(
-                            const expr_type& t,
-                            const expr_type& u) {
+    bare_expr_type function_signatures::rng_return_type(
+                            const bare_expr_type& t,
+                            const bare_expr_type& u) {
       T return_type;
       return t.is_primitive() && u.is_primitive()
-        ? expr_type(return_type) : expr_type(return_type, 1U);
+        ? bare_expr_type(return_type) : bare_expr_type(bare_array_type(return_type, 1));
     }
 
     template<typename T>
-    expr_type function_signatures::rng_return_type(
-                            const expr_type& t,
-                            const expr_type& u,
-                            const expr_type& v) {
+    bare_expr_type function_signatures::rng_return_type(
+                            const bare_expr_type& t,
+                            const bare_expr_type& u,
+                            const bare_expr_type& v) {
       return rng_return_type<T>(rng_return_type<T>(t, u), v);
     }
 

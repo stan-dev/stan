@@ -13,6 +13,7 @@
 #include <stan/lang/ast/node/integrate_ode_control.hpp>
 #include <stan/lang/ast/node/algebra_solver.hpp>
 #include <stan/lang/ast/node/algebra_solver_control.hpp>
+#include <stan/lang/ast/node/map_rect.hpp>
 #include <stan/lang/ast/node/index_op.hpp>
 #include <stan/lang/ast/node/index_op_sliced.hpp>
 #include <stan/lang/ast/node/conditional_op.hpp>
@@ -90,6 +91,11 @@ namespace stan {
        * Return string representation for expression.
        */
       std::string operator()(const algebra_solver_control& e) const;
+
+      /**
+       * Return string representation for expression.
+       */
+      std::string operator()(const map_rect& e) const;
 
       /**
        * Return string representation for expression.

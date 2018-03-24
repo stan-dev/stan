@@ -83,11 +83,11 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::row_vector_expr,
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::int_literal,
                           (int, val_)
-                          (stan::lang::expr_type, type_))
+                          (stan::lang::bare_expr_type, type_))
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::double_literal,
                           (double, val_)
-                          (stan::lang::expr_type, type_) )
+                          (stan::lang::bare_expr_type, type_) )
 
 
 namespace stan {

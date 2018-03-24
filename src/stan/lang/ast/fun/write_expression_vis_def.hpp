@@ -142,6 +142,18 @@ namespace stan {
     }
 
     std::string
+    write_expression_vis::operator()(const map_rect& e) const {
+      std::stringstream ss;
+      ss << e.call_id_ << ", "
+         << e.fun_name_ << ", "
+         << e.shared_params_.to_string() << ", "
+         << e.job_params_.to_string() << ", "
+         << e.job_data_r_.to_string() << ", "
+         << e.job_data_i_.to_string() << ")";
+      return ss.str();
+    }
+
+    std::string
     write_expression_vis::operator()(const index_op& e) const {
       std::stringstream ss;
       ss << e.expr_.to_string() << "[";

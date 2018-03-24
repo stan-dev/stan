@@ -13,6 +13,7 @@
 #include <stan/lang/ast/node/integrate_ode_control.hpp>
 #include <stan/lang/ast/node/algebra_solver.hpp>
 #include <stan/lang/ast/node/algebra_solver_control.hpp>
+#include <stan/lang/ast/node/map_rect.hpp>
 #include <stan/lang/ast/node/index_op.hpp>
 #include <stan/lang/ast/node/index_op_sliced.hpp>
 #include <stan/lang/ast/node/conditional_op.hpp>
@@ -113,6 +114,14 @@ namespace stan {
        * @return bare expression type
        */
       bare_expr_type operator()(const algebra_solver_control& e) const;
+
+
+      /**
+       * Return the bare_expr_type corresponding to this expression
+       *
+       * @return bare expression type
+       */
+      bare_expr_type operator()(const map_rect& e) const;
 
       /**
        * Return the bare_expr_type corresponding to this expression

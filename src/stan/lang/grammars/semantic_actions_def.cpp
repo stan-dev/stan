@@ -1671,21 +1671,20 @@ namespace stan {
       // TODO:mitzi  names indicate status, but not flagged as data_only
       // instantiate ode fn arg types
       double_type t_double;
-      bare_expr_type bet_double(t_double);
-      bare_expr_type bet_ar_double(bare_array_type(t_double, 1));
-      bare_expr_type bet_ar_double_data(bare_array_type(t_double, 1));
+      bare_expr_type t_ar_double(bare_array_type(t_double, 1));
+      bare_expr_type t_ar_double_data(bare_array_type(t_double, 1));
 
       int_type t_int_data;
-      bare_expr_type bet_ar_int_data(bare_array_type(t_int_data, 1));
+      bare_expr_type t_ar_int_data(bare_array_type(t_int_data, 1));
 
       // validate ode fn signature
-      bare_expr_type sys_result_type(bet_ar_double);
+      bare_expr_type sys_result_type(t_ar_double);
       std::vector<bare_expr_type> sys_arg_types;
-      sys_arg_types.push_back(bet_double);
-      sys_arg_types.push_back(bet_ar_double);
-      sys_arg_types.push_back(bet_ar_double);
-      sys_arg_types.push_back(bet_ar_double_data);
-      sys_arg_types.push_back(bet_ar_int_data);
+      sys_arg_types.push_back(t_double);
+      sys_arg_types.push_back(t_ar_double);
+      sys_arg_types.push_back(t_ar_double);
+      sys_arg_types.push_back(t_ar_double_data);
+      sys_arg_types.push_back(t_ar_int_data);
       function_signature_t system_signature(sys_result_type, sys_arg_types);
       if (!function_signatures::instance()
           .is_defined(ode_fun.system_function_name_, system_signature)) {
@@ -1701,11 +1700,10 @@ namespace stan {
       // Stan lang integrate_ode takes 7 args:
       // fn_name, y0, t0, ts, theta, x_r, x_i
       // only y0 and theta can have params
-      if (ode_fun.y0_.bare_type() != bet_ar_double) {
+      if (ode_fun.y0_.bare_type() != t_ar_double) {
         error_msgs << "Second argument to "
                    << ode_fun.integration_function_name_
-                   << " must have type: "
-                   << bet_ar_double
+                   << " must have type: real"
                    << "; found type = "
                    << ode_fun.y0_.bare_type()
                    << ". " << std::endl;
@@ -1714,48 +1712,43 @@ namespace stan {
       if (!ode_fun.t0_.bare_type().is_double_type()) {
         error_msgs << "Third argument to "
                    << ode_fun.integration_function_name_
-                   << " must have type: "
-                   << bet_double
+                   << " must have type: real"
                    << ";  found type = "
                    << ode_fun.t0_.bare_type()
                    << ". " << std::endl;
         pass = false;
       }
-      if (ode_fun.ts_.bare_type() != bet_ar_double) {
+      if (ode_fun.ts_.bare_type() != t_ar_double) {
         error_msgs << "Fourth argument to "
                    << ode_fun.integration_function_name_
-                   << " must have type: "
-                   << bet_ar_double
+                   << " must have type: real[ ]"
                    << ";  found type = "
                    << ode_fun.ts_.bare_type()
                    << ". " << std::endl;
       pass = false;
       }
-      if (ode_fun.theta_.bare_type() != bet_ar_double) {
+      if (ode_fun.theta_.bare_type() != t_ar_double) {
         error_msgs << "Fifth argument to "
                    << ode_fun.integration_function_name_
-                   << " must have type: "
-                   << bet_ar_double
+                   << " must have type: real[ ]"
                    << ";  found type = "
                    << ode_fun.theta_.bare_type()
                    << ". " << std::endl;
         pass = false;
       }
-      if (ode_fun.x_.bare_type() != bet_ar_double_data) {
+      if (ode_fun.x_.bare_type() != t_ar_double_data) {
         error_msgs << "Sixth argument to "
                    << ode_fun.integration_function_name_
-                   << " must have type: "
-                   << bet_ar_double_data
+                   << " must have type: data real[ ]"
                    << ";  found type = "
                    << ode_fun.x_.bare_type()
                    << ". " << std::endl;
         pass = false;
       }
-      if (ode_fun.x_int_.bare_type() != bet_ar_int_data) {
+      if (ode_fun.x_int_.bare_type() != t_ar_int_data) {
         error_msgs << "Seventh argument to "
                    << ode_fun.integration_function_name_
-                   << " must have type: "
-                   << bet_ar_int_data
+                   << " must have type: data int[ ]"
                    << ";  found type = "
                    << ode_fun.x_int_.bare_type()
                    << ". " << std::endl;
@@ -1867,18 +1860,15 @@ namespace stan {
       int_type t_int;
       double_type t_double;
       vector_type t_vector;
-
-      bare_expr_type bet_ar_int_data(bare_array_type(t_int, 1));
-      bare_expr_type bet_ar_double_data(bare_array_type(t_double, 1));
-      bare_expr_type bet_vector(t_vector);
-      bare_expr_type bet_vector_data(t_vector);
+      bare_expr_type t_ar_int(bare_array_type(t_int, 1));
+      bare_expr_type t_ar_double(bare_array_type(t_double, 1));
 
       bare_expr_type sys_result_type(t_vector);
       std::vector<bare_expr_type> sys_arg_types;
-      sys_arg_types.push_back(bet_vector_data);  // y
-      sys_arg_types.push_back(bet_vector);  // theta
-      sys_arg_types.push_back(bet_ar_double_data);  // x_r
-      sys_arg_types.push_back(bet_ar_int_data);  // x_i
+      sys_arg_types.push_back(t_vector);  // y
+      sys_arg_types.push_back(t_vector);  // theta
+      sys_arg_types.push_back(t_ar_double);  // x_r
+      sys_arg_types.push_back(t_ar_int);  // x_i
       function_signature_t system_signature(sys_result_type, sys_arg_types);
 
       if (!function_signatures::instance()
@@ -1893,33 +1883,29 @@ namespace stan {
       }
 
       // check solver function arg types
-      if (alg_fun.y_.bare_type() != bet_vector_data) {
-        error_msgs << "Second argument to algebra_solver must have type: "
-                   << bet_vector_data
+      if (alg_fun.y_.bare_type() != t_vector) {
+        error_msgs << "Second argument to algebra_solver must have type: vector"
                    << "; found type = "
                    << alg_fun.y_.bare_type()
                    << ". " << std::endl;
         pass = false;
       }
-      if (alg_fun.theta_.bare_type() != bet_vector) {
-        error_msgs << "Third argument to algebra_solver must have type: "
-                   << bet_vector
+      if (alg_fun.theta_.bare_type() != t_vector) {
+        error_msgs << "Third argument to algebra_solver must have type: vector"
                    << ";  found type = "
                    << alg_fun.theta_.bare_type()
                    << ". " << std::endl;
         pass = false;
       }
-      if (alg_fun.x_r_.bare_type() != bet_ar_double_data) {
-        error_msgs << "Fourth argument to algebra_solver must have type: "
-                   << bet_ar_double_data
+      if (alg_fun.x_r_.bare_type() != t_ar_double) {
+        error_msgs << "Fourth argument to algebra_solver must have type: real[ ]"
                    << ";  found type = "
                    << alg_fun.x_r_.bare_type()
                    << ". " << std::endl;
         pass = false;
       }
-      if (alg_fun.x_i_.bare_type() != bet_ar_int_data) {
-        error_msgs << "Fifth argument to algebra_solver must have type: "
-                   << bet_ar_int_data
+      if (alg_fun.x_i_.bare_type() != t_ar_int) {
+        error_msgs << "Fifth argument to algebra_solver must have type: int[ ]"
                    << ";  found type = "
                    << alg_fun.x_i_.bare_type()
                    << ". " << std::endl;
@@ -2015,16 +2001,25 @@ namespace stan {
       // mapped function signature
       // vector f(vector param_shared, vector param_local,
       //          real[] data_r, int[] data_i)
-      expr_type shared_params_type(vector_type(), 0);
-      expr_type job_params_type(vector_type(), 0);
-      expr_type job_data_r_type(double_type(), 1);
-      expr_type job_data_i_type(int_type(), 1);
-      expr_type result_type(vector_type(), 0);
-      std::vector<function_arg_type> arg_types
-          = { function_arg_type(shared_params_type),
-              function_arg_type(job_params_type),
-              function_arg_type(job_data_r_type),
-              function_arg_type(job_data_i_type) };
+      int_type t_int;
+      double_type t_double;
+      vector_type t_vector;
+      bare_expr_type t_ar_int(bare_array_type(t_int, 1));
+      bare_expr_type t_2d_ar_int(bare_array_type(t_int, 2));
+      bare_expr_type t_ar_double(bare_array_type(t_double, 1));
+      bare_expr_type t_2d_ar_double(bare_array_type(t_double, 2));
+      bare_expr_type t_ar_vector(bare_array_type(t_double, 1));
+      
+      bare_expr_type shared_params_type(t_vector);
+      bare_expr_type job_params_type(t_vector);
+      bare_expr_type job_data_r_type(t_ar_double);
+      bare_expr_type job_data_i_type(t_ar_int);
+      bare_expr_type result_type(t_vector);
+      std::vector<bare_expr_type> arg_types;
+      arg_types.push_back(shared_params_type);
+      arg_types.push_back(job_params_type);
+      arg_types.push_back(job_data_r_type);
+      arg_types.push_back(job_data_i_type);
       function_signature_t mapped_fun_signature(result_type, arg_types);
 
       // validate mapped function signature
@@ -2037,28 +2032,28 @@ namespace stan {
       }
 
       // validate parameter and data argument shapes
-      if (mr.shared_params_.expression_type() != shared_params_type) {
+      if (mr.shared_params_.bare_type() != shared_params_type) {
         if (!pass) error_msgs << ";  ";
         error_msgs << "second argument to map_rect must be of type vector";
         pass = false;
       }
       // one more array dim for args other than shared params
-      expr_type job_paramss_type(vector_type(), 1);
-      if (mr.job_params_.expression_type() != job_paramss_type) {
+      bare_expr_type job_paramss_type(t_ar_vector);
+      if (mr.job_params_.bare_type() != job_paramss_type) {
         if (!pass) error_msgs << ";  ";
         error_msgs << "third argument to map_rect must be of type vector[]"
                    << " (array of vectors)";
         pass = false;
       }
-      expr_type job_data_rs_type(double_type(), 2);
-      if (mr.job_data_r_.expression_type() != job_data_rs_type) {
+      bare_expr_type job_data_rs_type(t_2d_ar_double);
+      if (mr.job_data_r_.bare_type() != job_data_rs_type) {
         if (!pass) error_msgs << ";  ";
         error_msgs << "fourth argument to map_rect must be of type real[ , ]"
                    << " (two dimensional array of reals)";
         pass = false;
       }
-      expr_type job_data_is_type(int_type(), 2);
-      if (mr.job_data_i_.expression_type() != job_data_is_type) {
+      bare_expr_type job_data_is_type(t_2d_ar_int);
+      if (mr.job_data_i_.bare_type() != job_data_is_type) {
         if (!pass) error_msgs << ";  ";
         error_msgs << "fifth argument to map_rect must be of type int[ , ]"
                    << " (two dimensional array of integers)";
