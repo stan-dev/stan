@@ -17,9 +17,6 @@ TEST(lang_parser, algebra_solver_bad) {
   test_throws("algebra_solver/bad_x_i_type",
               "Fifth argument to algebra_solver must have type");
 
-
-  test_throws("algebra_solver/bad_y_var_type",
-              "Second argument to algebra_solver must be data only");
   test_throws("algebra_solver/bad_x_r_var_type",
               "Fourth argument to algebra_solver must be data only");
 }
@@ -36,8 +33,6 @@ TEST(lang_parser, algebra_solver_control_bad) {
   test_throws("algebra_solver/bad_x_i_type_control",
               "Fifth argument to algebra_solver must have type");
 
-  test_throws("algebra_solver/bad_y_var_type_control",
-              "Second argument to algebra_solver must be data only");
   test_throws("algebra_solver/bad_x_r_var_type_control",
               "Fourth argument to algebra_solver must be data only");
 

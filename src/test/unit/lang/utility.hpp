@@ -50,6 +50,8 @@ std::string file_name_to_model_name(const std::string& name) {
 }
 
 /** test whether model with specified path name parses successfully
+ * throws exception on parse fail; intended to be called from inside
+ * a try/catch block (i.e., other utility functions defined here).
  *
  * @param file_name  Filepath of model file
  * @param msgs Expected error message (default: none)
@@ -66,8 +68,7 @@ bool is_parsable(const std::string& file_name,
   }
   std::string model_name = file_name_to_model_name(file_name);
   stan::io::program_reader reader = create_stub_reader();
-  bool parsable
-    = stan::lang::parse(msgs, fs, model_name, reader, prog, allow_undefined);
+  bool parsable = stan::lang::parse(msgs, fs, model_name, reader, prog, allow_undefined);
   return parsable;
 }
 
@@ -123,15 +124,17 @@ void test_parsable_standalone_functions(const std::string& model_name) {
 
 /** test that model with specified name in folder "bad" throws
  * an exception containing the second arg as a substring
+ * when model not found, will fail with misleading message.
  *
  * @param model_name Name of model to parse
  * @param msg Substring of error message expected.
  */
 void test_throws(const std::string& model_name, const std::string& error_msg) {
   std::stringstream msgs;
+  bool pass = false;
   try {
-    is_parsable_folder(model_name, "bad", &msgs);
-  } catch (const std::invalid_argument& e) {
+    pass = is_parsable_folder(model_name, "bad", &msgs);
+  } catch (const std::exception& e) {
     if (std::string(e.what()).find(error_msg) == std::string::npos
         && msgs.str().find(error_msg) == std::string::npos) {
       FAIL() << std::endl << "*********************************" << std::endl
@@ -142,6 +145,10 @@ void test_throws(const std::string& model_name, const std::string& error_msg) {
              << "*********************************" << std::endl
              << std::endl;
     }
+    return;
+  }
+  if (!pass) {
+    FAIL() << "model name=" << model_name << " not found" << std::endl;
     return;
   }
   FAIL() << "model name=" << model_name
@@ -196,7 +203,12 @@ std::string model_to_cpp(const std::string& model_text) {
   stan::lang::program prog;
 
   stan::io::program_reader reader = create_stub_reader();
-  bool parsable = stan::lang::parse(&msgs, ss, model_name, reader, prog);
+  bool parsable = false;
+  try {
+    parsable = stan::lang::parse(&msgs, ss, model_name, reader, prog);
+  } catch (const std::exception& e) {
+    msgs << e.what() << std::endl;
+  }    
   EXPECT_TRUE(parsable);
 
   std::stringstream output;

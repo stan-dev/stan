@@ -23,6 +23,8 @@
 #include <utility>
 #include <vector>
 
+#include <typeinfo>
+
 namespace stan {
 
   namespace lang {
@@ -135,10 +137,11 @@ namespace stan {
         .is_double_type();
     }
 
+    //TODO:  mm - allows arrays of int and double types?
     bool is_univariate(const bare_expr_type& et) {
       return et.num_dims() == 0
-        && (et.is_int_type()
-            || et.is_double_type());
+        && (et.base().is_int_type()
+            || et.base().is_double_type());
     }
 
     bool can_assign_to_lhs_var(const std::string& lhs_var_name,
@@ -398,7 +401,7 @@ namespace stan {
           || !expr2.bare_type().is_primitive()) {
         error_msgs << "Binary infix operator " << op
                    << " with functional interpretation " << fun_name
-                   << " requires arguments or primitive type (int or real)"
+                   << " requires arguments of primitive type (int or real)"
                    << ", found left type=" << expr1.bare_type()
                    << ", right arg type=" << expr2.bare_type()
                    << "." << std::endl;
@@ -1599,18 +1602,13 @@ namespace stan {
     validate_non_void_expression_f;
 
 
-    template <typename T, typename I>
-    void add_literal_string::operator()(T& lit,
-                                        const I& begin,
-                                        const I& end) const {
+    void add_literal_string::operator()(double_literal& lit,
+                                        const pos_iterator_t& begin,
+                                        const pos_iterator_t& end) const {
       lit.string_ = std::string(begin, end);
     }
     boost::phoenix::function<add_literal_string>
     add_literal_string_f;
-
-    template void add_literal_string::operator()(double_literal&,
-                                      const pos_iterator_t& begin,
-                                      const pos_iterator_t& end) const;
     
     template <typename T, typename I>
     void add_line_number::operator()(T& line,
@@ -1912,16 +1910,10 @@ namespace stan {
         pass = false;
       }
 
-      // test data-only variables do not have parameters (int locals OK)
-      if (has_var(alg_fun.y_, var_map)) {
-        error_msgs << "Second argument to algebra_solver"
-                   << " must be data only and not reference parameters."
-                   << std::endl;
-        pass = false;
-      }
+      // real data array cannot be param or x-formed param variable
       if (has_var(alg_fun.x_r_, var_map)) {
         error_msgs << "Fourth argument to algebra_solver"
-                   << " must be data only and not reference parameters."
+                   << " must be data only (cannot reference parameters)."
                    << std::endl;
         pass = false;
       }
@@ -1968,7 +1960,7 @@ namespace stan {
         pass = false;
       }
 
-      // test data-only variables do not have parameters (int locals OK)
+      // control args cannot contain param variables
       if (has_var(alg_fun.rel_tol_, var_map)) {
         error_msgs << "Sixth argument to algebra_solver"
                    << " (relative tolerance) must be data only"
@@ -2008,7 +2000,7 @@ namespace stan {
       bare_expr_type t_2d_ar_int(bare_array_type(t_int, 2));
       bare_expr_type t_ar_double(bare_array_type(t_double, 1));
       bare_expr_type t_2d_ar_double(bare_array_type(t_double, 2));
-      bare_expr_type t_ar_vector(bare_array_type(t_double, 1));
+      bare_expr_type t_ar_vector(bare_array_type(t_vector, 1));
       
       bare_expr_type shared_params_type(t_vector);
       bare_expr_type job_params_type(t_vector);
@@ -2027,24 +2019,24 @@ namespace stan {
           .is_defined(mr.fun_name_, mapped_fun_signature)) {
         error_msgs << "first argument to map_rect"
                    << " must be the name of a function with signature"
-                   << " (vector, vector, real[], int[]) : vector";
+                   << " (vector, vector, real[ ], int[ ]) : vector";
         pass = false;
       }
 
-      // validate parameter and data argument shapes
+      // shared parameters - vector
       if (mr.shared_params_.bare_type() != shared_params_type) {
         if (!pass) error_msgs << ";  ";
         error_msgs << "second argument to map_rect must be of type vector";
         pass = false;
       }
-      // one more array dim for args other than shared params
-      bare_expr_type job_paramss_type(t_ar_vector);
-      if (mr.job_params_.bare_type() != job_paramss_type) {
+      // job-specific parameters - array of vectors (array elts map to arg2)
+      if (mr.job_params_.bare_type() != t_ar_vector) {
         if (!pass) error_msgs << ";  ";
-        error_msgs << "third argument to map_rect must be of type vector[]"
+        error_msgs << "third argument to map_rect must be of type vector[ ]"
                    << " (array of vectors)";
         pass = false;
       }
+      // job-specific real data - 2-d array of double (array elts map to arg3)
       bare_expr_type job_data_rs_type(t_2d_ar_double);
       if (mr.job_data_r_.bare_type() != job_data_rs_type) {
         if (!pass) error_msgs << ";  ";
@@ -2052,6 +2044,7 @@ namespace stan {
                    << " (two dimensional array of reals)";
         pass = false;
       }
+      // job-specific int data - 2-d array of int (array elts map to arg4)
       bare_expr_type job_data_is_type(t_2d_ar_int);
       if (mr.job_data_i_.bare_type() != job_data_is_type) {
         if (!pass) error_msgs << ";  ";

@@ -826,10 +826,9 @@ namespace stan {
     add_line_number_f;
 
     struct add_literal_string : public phoenix_functor_ternary {
-      template <typename T, typename I>
-      void operator()(T& lit,
-                      const I& begin,
-                      const I& end) const;
+      void operator()(double_literal& lit,
+                      const pos_iterator_t& begin,
+                      const pos_iterator_t& end) const;
     };
     extern boost::phoenix::function<add_literal_string>
     add_literal_string_f;

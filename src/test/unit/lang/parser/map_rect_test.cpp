@@ -14,7 +14,7 @@ TEST(langParserMapRect, badFunShape) {
   test_throws("map_rect/bad_fun_type",
               "first argument to map_rect must be"
               " the name of a function with signature"
-              " (vector, vector, real[], int[]) : vector");
+              " (vector, vector, real[ ], int[ ]) : vector");
 }
 TEST(langParserMapRect, badSharedParamsShape) {
   test_throws("map_rect/bad_shared_params_type",
@@ -22,7 +22,7 @@ TEST(langParserMapRect, badSharedParamsShape) {
 }
 TEST(langParserMapRect, badJobParamsShape) {
   test_throws("map_rect/bad_job_params_type",
-              "third argument to map_rect must be of type vector[]");
+              "third argument to map_rect must be of type vector[ ]");
 }
 TEST(langParserMapRect, badDataRealShape) {
   test_throws("map_rect/bad_data_r_type",
